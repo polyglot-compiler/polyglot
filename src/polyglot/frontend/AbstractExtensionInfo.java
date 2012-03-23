@@ -83,8 +83,8 @@ public abstract class AbstractExtensionInfo implements ExtensionInfo {
     public abstract Version version();
     
     public Options getOptions() {
-        if (this.options == null) {
-            this.options = createOptions();
+        if (options == null) {
+            options = createOptions();
         }
         return options;
     }
@@ -256,17 +256,15 @@ public abstract class AbstractExtensionInfo implements ExtensionInfo {
     
     public StandardJavaFileManager extFileManager() {
     	if(ext_fm == null)
-    		ext_fm = new CustomExtFileManager();
+    		ext_fm = CustomExtFileManager.getInstance();
     	return ext_fm;
     }
     
     public StandardJavaFileManager javaFileManager() {
-    	if(java_fm == null) {
+    	if(java_fm == null)
     		//java_fm = new CustomJavaFileManager(ToolProvider.getSystemJavaCompiler().getStandardFileManager(null, null, null));
-    		java_fm = new CustomJavaFileManager_(ToolProvider.getSystemJavaCompiler().getStandardFileManager(null, null, null));
+    		java_fm = CustomJavaFileManager_.getInstance();
     		//java_fm = ToolProvider.getSystemJavaCompiler().getStandardFileManager(null, null, null);
-    		//System.out.println(java_fm.getClass().getName());
-    	}
     	return java_fm;
     }
     

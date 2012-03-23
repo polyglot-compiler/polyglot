@@ -26,7 +26,7 @@ public class CustomFileObject implements FileObject {
 	private FileInputStream fis;
 	private FileWriter fw;
 	private FileReader fr;
-	private StringWriter sw;
+	private StringBuilderWriter sw;
 	private String filename;
 	private boolean inMemory;
 	private boolean isInputStream;
@@ -37,7 +37,7 @@ public class CustomFileObject implements FileObject {
 		this.inMemory = inMemory;
 		if(inMemory) {
 			uri = URI.create(fullName);
-			sw = new StringWriter();
+			sw = new StringBuilderWriter();
 		} else
 			f = new File(fullName);
 		filename = fullName;
@@ -59,7 +59,7 @@ public class CustomFileObject implements FileObject {
 
 	public CharSequence getCharContent(boolean arg0) throws IOException {
 		if(inMemory)
-			return sw.getBuffer();
+			return sw.getBuilder();
 		if(f == null)
 			throw new IOException();
 		CharBuffer buf = CharBuffer.allocate((int)f.length());

@@ -14,36 +14,42 @@ import javax.tools.FileObject;
 import javax.tools.JavaFileObject;
 import javax.tools.StandardJavaFileManager;
 import javax.tools.StandardLocation;
+import javax.tools.ToolProvider;
 import javax.tools.JavaFileObject.Kind;
 
 public class CustomJavaFileManager_ implements StandardJavaFileManager {
 
+	private static final StandardJavaFileManager instance = new CustomJavaFileManager_();
 	private final String separator = File.separator;
 	private final char separatorChar = File.separatorChar;
 	
-	private final Map<Location, Iterable<? extends File>> locationPathMap = new HashMap<Location, Iterable<? extends File>>();
+	//private final Map<Location, Iterable<? extends File>> locationPathMap = new HashMap<Location, Iterable<? extends File>>();
 	//private final Map<String, Set<JavaFileObject>> pathObjectMap = new HashMap<String, Set<JavaFileObject>>();
 	//private final Map<String, JavaFileObject> fileObjMap = new HashMap<String, JavaFileObject>();
-	private final StandardJavaFileManager fm;
+	private final StandardJavaFileManager javac_fm;
 	
-	public CustomJavaFileManager_(StandardJavaFileManager fm) {
-		this.fm = fm;
+	private CustomJavaFileManager_() {
+		javac_fm = ToolProvider.getSystemJavaCompiler().getStandardFileManager(null, null, null);
 	}
 
+	public static StandardJavaFileManager getInstance() {
+		return instance;
+	}
+	
 	public int isSupportedOption(String option) {
-		return fm.isSupportedOption(option);
+		return javac_fm.isSupportedOption(option);
 	}
 
 	public void close() throws IOException {
-		fm.close();
+		javac_fm.close();
 	}
 
 	public void flush() throws IOException {
-		fm.flush();
+		javac_fm.flush();
 	}
 
 	public ClassLoader getClassLoader(Location location) {
-		return fm.getClassLoader(location);
+		return javac_fm.getClassLoader(location);
 	}
 
 	public FileObject getFileForInput(Location location, String packageName,
@@ -88,7 +94,32 @@ public class CustomJavaFileManager_ implements StandardJavaFileManager {
 		return null;
 	}*/
 
-	public JavaFileObject getJavaFileForOutput(Location location,
+	public JavaFileObject getJavaFileForOutput(Location location, String className, Kind kind, FileObject sibling) throws IOException {
+		if (!kind.equals(Kind.CLASS))
+			throw new UnsupportedOperationException();
+		if(location == null || !location.equals(StandardLocation.CLASS_OUTPUT) || !javac_fm.hasLocation(location))
+			return null;
+		String path = "";
+		if(sibling == null) {
+			for(File f : javac_fm.getLocation(location)) {
+				path = f.getAbsolutePath();
+				break;
+			}
+		} else {
+			String siblingPath = sibling.getName();
+			path = siblingPath.substring(0, siblingPath.lastIndexOf(separatorChar));
+		}
+		int lastDot = className.lastIndexOf('.');
+		if(lastDot > 0) {
+			String pkg = className.substring(0, lastDot);
+			File f = new File(path + separator + pkg.replace('.', separatorChar));
+			if(!f.exists())
+				f.mkdirs();
+		}
+		String absPath = path + separator + className.replace('.', separatorChar);
+		return new CustomJavaClassObject(absPath);
+	}
+	/*public JavaFileObject getJavaFileForOutput(Location location,
 			String className, Kind kind, FileObject sibling) throws IOException {
 		if (!kind.equals(Kind.CLASS))
 			throw new UnsupportedOperationException();
@@ -114,23 +145,26 @@ public class CustomJavaFileManager_ implements StandardJavaFileManager {
 		String absPath = path + separator + className.replace('.', separatorChar);
 		JavaFileObject fo = new CustomJavaClassObject(absPath);
 		//fileObjMap.put(absPath + ".class", fo);
-		/*if(pathObjectMap.containsKey(path))
-			pathObjectMap.get(path).add(fo);
-		else {
-			Set<JavaFileObject> s = new HashSet<JavaFileObject>();
-			s.add(fo);
-			pathObjectMap.put(path, s);
-		}*/
+		//if(pathObjectMap.containsKey(path))
+		//	pathObjectMap.get(path).add(fo);
+		//else {
+		//	Set<JavaFileObject> s = new HashSet<JavaFileObject>();
+		//	s.add(fo);
+		//	pathObjectMap.put(path, s);
+		//}
 		return fo;
-	}
+	}*/
 
 	public boolean handleOption(String current, Iterator<String> remaining) {
-		return fm.handleOption(current, remaining);
+		return javac_fm.handleOption(current, remaining);
 	}
 
 	public boolean hasLocation(Location location) {
-		return locationPathMap.containsKey(location);
+		return javac_fm.hasLocation(location);
 	}
+	/*public boolean hasLocation(Location location) {
+		return locationPathMap.containsKey(location);
+	}*/
 
 	// TODO: Implement inferBinaryName method correctly
 	public String inferBinaryName(Location location, JavaFileObject file) {
@@ -138,16 +172,16 @@ public class CustomJavaFileManager_ implements StandardJavaFileManager {
 			String className = ((CustomJavaFileObject) file).getName();
 			return className.substring(className.lastIndexOf('.') + 1);
 		}
-		return fm.inferBinaryName(location, file);
+		return javac_fm.inferBinaryName(location, file);
 	}
 
 	public boolean isSameFile(FileObject a, FileObject b) {
-		return fm.isSameFile(a, b);
+		return javac_fm.isSameFile(a, b);
 	}
 
 	private void setFiller(File f, Set<Kind> kinds, boolean recurse, Set<JavaFileObject> s) {
 		for (File file : f.listFiles()) {
-			if (file.isDirectory() && recurse) {
+			if (recurse && file.isDirectory()) {
 				setFiller(file, kinds, recurse, s);
 			} else if (file.isFile()) {
 				String filename = file.getAbsolutePath();
@@ -177,10 +211,13 @@ public class CustomJavaFileManager_ implements StandardJavaFileManager {
 	}*/
 	
 	public Iterable<JavaFileObject> list(Location location, String packageName, Set<Kind> kinds, boolean recurse) throws IOException {
+		return javac_fm.list(location, packageName, kinds, recurse);
+	}
+	/*public Iterable<JavaFileObject> list(Location location, String packageName, Set<Kind> kinds, boolean recurse) throws IOException {
 		if(location == null || !locationPathMap.containsKey(location))
 			return new HashSet<JavaFileObject>();
 		if(location.equals(StandardLocation.PLATFORM_CLASS_PATH))
-			return fm.list(location, packageName, kinds, recurse);
+			return javac_fm.list(location, packageName, kinds, recurse);
 		else if (location.equals(StandardLocation.CLASS_PATH)) {
 			Set<JavaFileObject> s = new HashSet<JavaFileObject>();
 			String pkg = packageName.equals("") ? "" : (separator + packageName.replace('.', separatorChar));
@@ -201,7 +238,7 @@ public class CustomJavaFileManager_ implements StandardJavaFileManager {
 			}
 		}
 		return new HashSet<JavaFileObject>();
-	}
+	}*/
 
 	public Iterable<? extends JavaFileObject> getJavaFileObjects(File... arg0) {
 		throw new UnsupportedOperationException();
@@ -222,12 +259,18 @@ public class CustomJavaFileManager_ implements StandardJavaFileManager {
 	}
 
 	public Iterable<? extends File> getLocation(Location location) {
-		return locationPathMap.get(location);
+		return javac_fm.getLocation(location);
 	}
+	/*public Iterable<? extends File> getLocation(Location location) {
+		return locationPathMap.get(location);
+	}*/
 
-	public void setLocation(Location location, Iterable<? extends File> path)
+	public void setLocation(Location location, Iterable<? extends File> path) throws IOException {
+		javac_fm.setLocation(location, path);
+	}
+	/*public void setLocation(Location location, Iterable<? extends File> path)
 			throws IOException {
 		locationPathMap.put(location, path);
-	}
+	}*/
 
 }

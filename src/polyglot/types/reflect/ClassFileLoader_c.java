@@ -60,11 +60,15 @@ public class ClassFileLoader_c implements ClassFileLoader {
 	}
 
 	public void addLocation(Location loc) {
+		locations.add(loc);
+	}
+	
+	/*public void addLocation(Location loc) {
 		List<Location> newLocs = new ArrayList<Location>(locations.size()+1);
 		newLocs.add(loc);
 		newLocs.addAll(locations);
 		locations = newLocs;
-	}
+	}*/
 	
 	public boolean packageExists(String name) {
 		Boolean exists = packageCache.get(name);

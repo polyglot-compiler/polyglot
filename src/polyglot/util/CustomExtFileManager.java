@@ -23,13 +23,20 @@ import javax.tools.StandardJavaFileManager;
 import javax.tools.StandardLocation;
 import javax.tools.ToolProvider;
 
+/**
+ * Only one instance of CustomExtFileManager exists in the system. (Singleton pattern)
+ */
 public class CustomExtFileManager implements StandardJavaFileManager {
 
+	private static final StandardJavaFileManager instance = new CustomExtFileManager();
 	private final String separator = File.separator;
 	private final char separatorChar = File.separatorChar;
 	
+	//private JarFile rtJar;
+	private final StandardJavaFileManager javac_fm;
+	
 	/** Map for storing locations and associated paths */
-	private final Map<Location, Iterable<? extends File>> locationPathMap;
+	//private final Map<Location, Iterable<? extends File>> locationPathMap;
 	/** Map for storing paths in memory and associated JavaFileObjects */
 	private final Map<String, Set<JavaFileObject>> pathObjectMap;
 	/** Map for storing absolute names and FileObjects */
@@ -37,10 +44,20 @@ public class CustomExtFileManager implements StandardJavaFileManager {
 
 	public static final String DEFAULT_PKG = "intermediate_output";
 
-	public CustomExtFileManager() {
-		locationPathMap = new HashMap<Location, Iterable<? extends File>>();
+	private CustomExtFileManager() {
+		/*try {
+			rtJar = new JarFile(System.getProperty("java.home") + separator + "lib" + separator + "rt.jar");
+		} catch (IOException e) {
+			rtJar = null;
+		}*/
+		javac_fm = ToolProvider.getSystemJavaCompiler().getStandardFileManager(null, null, null);
+		//locationPathMap = new HashMap<Location, Iterable<? extends File>>();
 		pathObjectMap = new HashMap<String, Set<JavaFileObject>>();
 		absPathObjMap = new HashMap<String, FileObject>();
+	}
+	
+	public static StandardJavaFileManager getInstance() {
+		return instance;
 	}
 
 	public void close() throws IOException {
@@ -54,8 +71,23 @@ public class CustomExtFileManager implements StandardJavaFileManager {
 	public ClassLoader getClassLoader(Location location) {
 		throw new UnsupportedOperationException();
 	}
-
+	
 	public FileObject getFileForInput(Location location, String packageName, String relativeName) throws IOException {
+		if(location.equals(StandardLocation.SOURCE_OUTPUT)) {
+			String pkg = packageName.equals("") ? "" : (packageName.replace('.', separatorChar) + separator);
+			for (File f : javac_fm.getLocation(location)) {
+				String absPath = f.getAbsolutePath() + separator + pkg + relativeName;
+				FileObject fo = absPathObjMap.get(absPath);
+				if (fo != null)
+					return fo;
+			}
+			return null;
+		}
+		else
+			return javac_fm.getFileForInput(location, packageName, relativeName);
+	}
+
+	/*public FileObject getFileForInput(Location location, String packageName, String relativeName) throws IOException {
 		if(relativeName.startsWith("/") || relativeName.startsWith("./") || relativeName.startsWith("../"))
 			return new CustomFileObject(relativeName, false);
 		if(location == null || packageName == null || !locationPathMap.containsKey(location))
@@ -70,12 +102,54 @@ public class CustomExtFileManager implements StandardJavaFileManager {
 				return absPathObjMap.get(absPath);
 		}
 		return null;
-	}
+	}*/
 
+	public FileObject getFileForOutput(Location location, String packageName, String relativeName, FileObject sibling) throws IOException {
+		if (location == null || !location.equals(StandardLocation.SOURCE_OUTPUT) || !javac_fm.hasLocation(location))
+			return null;
+		if (packageName == null || packageName.equals(""))
+			packageName = DEFAULT_PKG;
+		String path = "";
+		if(sibling == null) {
+			for(File f : javac_fm.getLocation(location)) {
+				path = f.getAbsolutePath();
+				break;
+			}
+		} else {
+			for(File f : javac_fm.getLocation(location)) {
+				String[] files = f.list();
+				for(String s : files)
+					if(s.equals(sibling.getName()))
+						path = f.getAbsolutePath();
+			}
+		}
+		String parentFilePath = path + separator + packageName.replace('.', separatorChar);
+		String absPath = parentFilePath + separator + relativeName;
+		Kind k;
+		if(absPath.endsWith(".java"))
+			k = Kind.SOURCE;
+		else if(absPath.endsWith(".class"))
+			k = Kind.CLASS;
+		else if(absPath.endsWith(".htm") || absPath.endsWith(".html"))
+			k = Kind.HTML;
+		else
+			k = Kind.OTHER;
+		JavaFileObject fo = new CustomJavaFileObject(absPath, k, true);
+		absPathObjMap.put(absPath, fo);
+		if(pathObjectMap.containsKey(parentFilePath)) {
+			pathObjectMap.get(parentFilePath).add(fo);
+		}
+		else {
+			Set<JavaFileObject> s = new HashSet<JavaFileObject>();
+			s.add(fo);
+			pathObjectMap.put(parentFilePath, s);
+		}
+		return fo;
+	}
 	/**
 	 * NOTE: location must be StandardLocation.SOURCE_OUTPUT. Otherwise returns null.
 	 */
-	public FileObject getFileForOutput(Location location, String packageName, String relativeName, FileObject sibling) throws IOException {
+	/*public FileObject getFileForOutput(Location location, String packageName, String relativeName, FileObject sibling) throws IOException {
 		if(location == null || !location.equals(StandardLocation.SOURCE_OUTPUT) || !locationPathMap.containsKey(location))
 			return null;
 		if (packageName == null || packageName.equals(""))
@@ -116,40 +190,85 @@ public class CustomExtFileManager implements StandardJavaFileManager {
 			pathObjectMap.put(parentFilePath, s);
 		}
 		return fo;
-	}
+	}*/
 
+	public JavaFileObject getJavaFileForInput(Location location, String className, Kind kind) throws IOException {
+		if (!kind.equals(Kind.CLASS))
+			throw new UnsupportedOperationException();
+		return javac_fm.getJavaFileForInput(location, className, kind);
+	}
 	/**
 	 * NOTE: kind must be Kind.CLASS. Otherwise throws UnsupportedOperationException().
 	 */
-	public JavaFileObject getJavaFileForInput(Location location, String className, Kind kind) throws IOException {
+	/*public JavaFileObject getJavaFileForInput(Location location, String className, Kind kind) throws IOException {
+		//return javac_fm.getJavaFileForInput(location, className, kind);
 		if (!kind.equals(Kind.CLASS))
 			throw new UnsupportedOperationException();
 		if (!locationPathMap.containsKey(location))
 			return null;
+		String clazz = className.replace('.', separatorChar) + ".class";
+		String clazzForJar = className.replace('.', '/') + ".class";
 		for (File file : locationPathMap.get(location)) {
 			String filePath = file.getAbsolutePath();
-			String absPath = filePath + separator
-					+ className.replace('.', separatorChar) + ".class";
+			String absPath = filePath + separator + clazz;
 			if (filePath.endsWith(".jar")) {
-				JarFile jarf = new JarFile(filePath);
-				JarEntry entry = jarf.getJarEntry(className.replace('.', separatorChar) + ".class");
-				if (entry != null)
-					return new CustomJavaFileObject(absPath, Kind.CLASS,
-							jarf.getInputStream(entry));
+				JarEntry entry;
+				if(filePath.endsWith("rt.jar")) {
+					entry = rtJar.getJarEntry(clazzForJar);
+					if (entry != null)
+						return new CustomJavaFileObject(absPath, Kind.CLASS, rtJar.getInputStream(entry));
+				} else {
+					JarFile jarf = new JarFile(filePath);
+					entry = jarf.getJarEntry(clazzForJar);
+					if (entry != null)
+						return new CustomJavaFileObject(absPath, Kind.CLASS, jarf.getInputStream(entry));
+				}
+			} else {
+				File f = new File(absPath);
+				if (f.exists())
+					return new CustomJavaFileObject(absPath, Kind.CLASS, false);
 			}
-			File f = new File(absPath);
-			if (f.exists())
-				return new CustomJavaFileObject(absPath, Kind.CLASS, false);
 		}
 		return null;
+	}*/
+	
+	public JavaFileObject getJavaFileForOutput(Location location, String className, Kind kind, FileObject sibling) throws IOException {
+		if (!kind.equals(Kind.SOURCE))
+			throw new UnsupportedOperationException();
+		if(location == null || !location.equals(StandardLocation.SOURCE_OUTPUT) || !javac_fm.hasLocation(location))
+			return null;
+		String path = "";
+		if(sibling == null) {
+			for(File f : javac_fm.getLocation(location)) {
+				path = f.getAbsolutePath();
+				break;
+			}
+		} else {
+			String siblingPath = sibling.getName();
+			path = siblingPath.substring(0, siblingPath.lastIndexOf(separatorChar));
+		}
+		String classNamePath = className.replace('.', separatorChar);
+		String absPath;
+		if(classNamePath.startsWith(path))
+			absPath = classNamePath;
+		else
+			absPath = path + separator + classNamePath.substring(classNamePath.lastIndexOf(separatorChar) + 1);
+		JavaFileObject fo = new CustomJavaSourceObject(absPath);
+		if(pathObjectMap.containsKey(path))
+			pathObjectMap.get(path).add(fo);
+		else {
+			Set<JavaFileObject> s = new HashSet<JavaFileObject>();
+			s.add(fo);
+			pathObjectMap.put(path, s);
+		}
+		return fo;
 	}
-
 	/**
 	 * NOTE: This method must be called when translated java source code needs to 
 	 * be written in an object. (For intermediate code other than java, getFileForOutput
 	 * method must be called.)
 	 */
-	public JavaFileObject getJavaFileForOutput(Location location, String className, Kind kind, FileObject sibling) throws IOException {
+	/*public JavaFileObject getJavaFileForOutput(Location location, String className, Kind kind, FileObject sibling) throws IOException {
 		if (!kind.equals(Kind.SOURCE))
 			throw new UnsupportedOperationException();
 		if(location == null || !location.equals(StandardLocation.SOURCE_OUTPUT) || !locationPathMap.containsKey(location))
@@ -179,15 +298,18 @@ public class CustomExtFileManager implements StandardJavaFileManager {
 			pathObjectMap.put(path, s);
 		}
 		return fo;
-	}
+	}*/
 
 	public boolean handleOption(String current, Iterator<String> remaining) {
 		throw new UnsupportedOperationException();
 	}
 
 	public boolean hasLocation(Location location) {
-		return locationPathMap.containsKey(location);
+		return javac_fm.hasLocation(location);
 	}
+	/*public boolean hasLocation(Location location) {
+		return locationPathMap.containsKey(location);
+	}*/
 
 	public String inferBinaryName(Location location, JavaFileObject file) {
 		throw new UnsupportedOperationException();
@@ -246,6 +368,26 @@ public class CustomExtFileManager implements StandardJavaFileManager {
 	
 	public Iterable<JavaFileObject> list(Location location, String packageName, Set<Kind> kinds, boolean recurse) throws IOException {
 		Set<JavaFileObject> s = new HashSet<JavaFileObject>();
+		if(location == null || !javac_fm.hasLocation(location))
+			return s;
+		if(location.equals(StandardLocation.SOURCE_OUTPUT)) {
+			for (File file : javac_fm.getLocation(location)) {
+				String parentFilePath = file.getAbsolutePath() + separator + packageName.replace('.', separatorChar);
+				if(pathObjectMap.containsKey(parentFilePath)) {
+					setFiller(parentFilePath, kinds, s);
+					if(recurse)
+						for(String str : pathObjectMap.keySet())
+							if(str.startsWith(parentFilePath))
+								setFiller(str, kinds, s);
+				}
+			}
+			return s;
+		}
+		else
+			return javac_fm.list(location, packageName, kinds, recurse);
+	}
+	/*public Iterable<JavaFileObject> list(Location location, String packageName, Set<Kind> kinds, boolean recurse) throws IOException {
+		Set<JavaFileObject> s = new HashSet<JavaFileObject>();
 		if(location == null || !locationPathMap.containsKey(location))
 			return s;
 		if(location.equals(StandardLocation.SOURCE_OUTPUT)) {
@@ -262,24 +404,26 @@ public class CustomExtFileManager implements StandardJavaFileManager {
 		} else {
 			for (File file : locationPathMap.get(location)) {
 				String filePath = file.getAbsolutePath();
-				String parentFilePath = filePath + separator
-						+ packageName.replace('.', separatorChar);
-				//if(kinds.contains(Kind.CLASS) && filePath.endsWith(".jar")) {
+				String parentFilePath = filePath + separator + packageName.replace('.', separatorChar);
+				if(kinds.contains(Kind.CLASS) && filePath.endsWith(".jar")) {
 					//setFiller(filePath, packageName, recurse, s);
 				//	StandardJavaFileManager javac_fm = ToolProvider.getSystemJavaCompiler().getStandardFileManager(null, null, null);
 				//	javac_fm.setLocation(location, locationPathMap.get(location));
 				//	for(JavaFileObject fo : javac_fm.list(location, packageName, kinds, recurse))
 				//		s.add(fo);
-				//} else {
+					Iterable<JavaFileObject> i = javac_fm.list(location, packageName, kinds, recurse);
+					if(i.iterator().hasNext())
+						return i;
+				} else {
 					File f = new File(parentFilePath);
 					if (!f.exists() || !f.isDirectory())
 						return s;
 					setFiller(f, kinds, recurse, s);
-				//}
+				}
 			}
 		} 
 		return s;
-	}
+	}*/
 
 	public int isSupportedOption(String option) {
 		throw new UnsupportedOperationException();
@@ -305,16 +449,22 @@ public class CustomExtFileManager implements StandardJavaFileManager {
 	}
 
 	public Iterable<? extends File> getLocation(Location location) {
-		return locationPathMap.get(location);
+		return javac_fm.getLocation(location);
 	}
+	/*public Iterable<? extends File> getLocation(Location location) {
+		return locationPathMap.get(location);
+	}*/
 
 	public boolean isSameFile(FileObject a, FileObject b) {
 		return a.toUri().equals(b.toUri());
 	}
 
-	public void setLocation(Location location, Iterable<? extends File> path)
+	public void setLocation(Location location, Iterable<? extends File> path) throws IOException {
+		javac_fm.setLocation(location, path);
+	}
+	/*public void setLocation(Location location, Iterable<? extends File> path)
 			throws IOException {
 		locationPathMap.put(location, path);
-	}
+	}*/
 
 }

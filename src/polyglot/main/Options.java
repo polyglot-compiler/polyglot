@@ -123,7 +123,7 @@ public class Options {
 	protected boolean java_output_given = false;
 	protected boolean classpath_given = false;
 	
-	private StandardJavaFileManager ext_fm;
+	protected StandardJavaFileManager ext_fm;
 	private StandardJavaFileManager java_fm;
 
 	/**
