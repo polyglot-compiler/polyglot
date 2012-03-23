@@ -66,10 +66,10 @@ public class StdOutputController extends OutputController{
         int neverSuccess = 0;
         for (Iterator iter = ts.getTests().iterator(); iter.hasNext(); ) {
             Test t = (Test)iter.next();
-            String testName = t.getName();
-            TestResult tr = (TestResult)tsr.testResults.get(testName);
-            if (TestSuite.executeTest(testName, tr)) {
-                displayTestResults(tr, testName);
+            String testId = t.getUniqueId();
+            TestResult tr = (TestResult)tsr.testResults.get(testId);
+            if (TestSuite.executeTest(t.getName(), tr)) {
+                displayTestResults(tr, t.getName());
 
                 total++;
                 if (tr != null && tr.dateLastSuccess != null && tr.dateLastSuccess.equals(tr.dateTestRun)) {

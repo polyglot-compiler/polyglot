@@ -43,6 +43,25 @@ public class SourceFileTest extends AbstractTest {
         this(Arrays.asList(filenames).toString());
     }
     
+    
+    @Override
+    public String getUniqueId() {
+        StringBuffer sb = new StringBuffer();
+        sb.append(this.getName());
+        if (this.extensionClassname != null) {
+            sb.append("::");
+            sb.append(extensionClassname);
+        }
+        if (this.extraArgs != null) {
+            for (int i = 0; i < this.extraArgs.length; i++) {
+                sb.append("::");
+                sb.append(this.extraArgs[i]);
+            }
+        }
+        return sb.toString();
+    }
+
+    
     public void setExpectedFailures(List expectedFailures) {
         this.expectedFailures = expectedFailures;
     }
@@ -403,5 +422,4 @@ public class SourceFileTest extends AbstractTest {
     protected String getSourceDir() {
         return null;
     }
-
 }

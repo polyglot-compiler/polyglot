@@ -105,7 +105,7 @@ public class VerboseOutputController extends OutputController{
         for (Iterator iter = ts.getTests().iterator(); iter.hasNext(); ) {
             Test t = (Test)iter.next();
             String testName = t.getName();
-            TestResult tr = (TestResult)tsr.testResults.get(testName);
+            TestResult tr = (TestResult)tsr.testResults.get(t.getUniqueId());
             if (TestSuite.executeTest(testName, tr)) {
                 displayTestResults(tr, testName);
             }

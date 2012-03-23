@@ -55,7 +55,7 @@ public class TestSuite extends AbstractTest {
         for (Iterator i = tests.iterator(); i.hasNext(); ) {
             Test t = (Test)i.next();
             
-            TestResult tr = (TestResult)oldTestResults.get(t.getName());
+            TestResult tr = (TestResult)oldTestResults.get(t.getUniqueId());
             if (executeTest(t.getName(), tr)) {
                 totalTests++;
                 if (tr != null) {
@@ -73,8 +73,8 @@ public class TestSuite extends AbstractTest {
                     successfulTests++;
                 }
             }
-            this.getTestSuiteResult().testResults.put(t.getName(), tr);
-            newResults.put(t.getName(), tr);
+            this.getTestSuiteResult().testResults.put(t.getUniqueId(), tr);
+            newResults.put(t.getUniqueId(), tr);
             this.postIndividualTest();
         }        
         this.getTestSuiteResult().testResults.clear();
@@ -130,5 +130,10 @@ public class TestSuite extends AbstractTest {
             lastSuccess = lastRun;
         }
         return new TestSuiteResult(this, lastRun, testResults, lastSuccess);
+    }
+
+    @Override
+    public String getUniqueId() {
+        return this.getName();
     }    
 }
