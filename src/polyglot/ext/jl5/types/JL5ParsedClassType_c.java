@@ -137,16 +137,6 @@ public class JL5ParsedClassType_c extends ParsedClassType_c implements JL5Parsed
             return this.name();
         }
         StringBuffer sb = new StringBuffer(this.name);
-        sb.append('<');
-        Iterator<TypeVariable> it =  this.typeVars.iterator();
-        while (it.hasNext()) {
-            TypeVariable act = it.next();
-            sb.append(act);
-            if (it.hasNext()) {
-                sb.append(", ");
-            }
-        }
-        sb.append('>');
         return sb.toString();
     }
 
