@@ -281,3 +281,8 @@ polyglot.frontend.JLExtensionInfo "-cp ." {
 polyglot.frontend.JLExtensionInfo {
 	package3/name/ClassPackConflict.jl;
 }
+
+polyglot.frontend.JLExtensionInfo "-d insensTest -cp insensTest" {
+	Insens.jl;
+	InsensBug.jl;
+}
