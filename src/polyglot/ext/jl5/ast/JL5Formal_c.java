@@ -40,22 +40,6 @@ public class JL5Formal_c extends Formal_c implements JL5Formal {
         }
         JL5Formal_c form = (JL5Formal_c) super.disambiguate(ar);
 
-// !@! SC: not sure why this code was here. I have commented it out for the moment.
-//        //remove type variables from signature
-//        if(form.type().type() instanceof TypeVariable) {
-//        	TypeVariable tv = (TypeVariable) form.type().type();
-//            TypeNode tn = ar.nodeFactory().CanonicalTypeNode(Position.compilerGenerated(), tv.jl4Type());	
-//            return form.type(tn);
-//        }
-//        else if(form.type().type() instanceof ArrayType) {
-//        	ArrayType at = (ArrayType) form.type().type();
-//        	if(at.base() instanceof TypeVariable) {
-//        		TypeVariable tv = (TypeVariable) at.base();
-//        		at = ar.typeSystem().arrayOf(tv.jl4Type());
-//                TypeNode tn = ar.nodeFactory().CanonicalTypeNode(Position.compilerGenerated(), at);	
-//                return form.type(tn);
-//        	}
-//        }
        	return form;
     }
     

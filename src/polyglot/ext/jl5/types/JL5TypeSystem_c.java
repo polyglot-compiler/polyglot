@@ -248,8 +248,6 @@ public class JL5TypeSystem_c extends ParamTypeSystem_c implements JL5TypeSystem 
     @Override
     public MethodInstance methodInstance(Position pos, ReferenceType container, Flags flags,
             Type returnType, String name, List argTypes, List excTypes) {
-        // XXX!@!@ once class file initialization is working, turn this back on
-        //throw new InternalCompilerError("Should never be called: supply type Params");
         return methodInstance(pos, container, flags, returnType, name, argTypes, excTypes, Collections.EMPTY_LIST);
     }
     @Override
@@ -267,8 +265,6 @@ public class JL5TypeSystem_c extends ParamTypeSystem_c implements JL5TypeSystem 
     @Override
     public ConstructorInstance constructorInstance(Position pos, ClassType container, Flags flags,
             List argTypes, List excTypes) {
-        // XXX!@!@ once class file initialization is working, turn this back on
-        //throw new InternalCompilerError("Should never be called: supply type Params");
         return constructorInstance(pos, container, flags, argTypes, excTypes, Collections.EMPTY_LIST);
     }
     @Override

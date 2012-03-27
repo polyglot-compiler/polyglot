@@ -214,46 +214,6 @@ public class JL5MethodInstance_c extends MethodInstance_c implements JL5MethodIn
         JL5MethodInstance p1 = this;
         JL5MethodInstance p2 = (JL5MethodInstance)p;
 
-//        if (p1.isVariableArity() != p2.isVariableArity()) {
-//            // they must both be variable arity or both be fixed arity.
-//            return false;
-//        }
-//        // are they fixed arity or variable arity?
-//        if (!p1.isVariableArity()) {
-//            // p1 and p2 are fixed arity
-//            // !@! XXX need to handle generic methods, by substing types? Inference?
-//            
-//            if (p1.formalTypes().size() != p2.formalTypes().size()) {
-//                return false;
-//            }
-//            Iterator<Type> formal1 = p1.formalTypes().iterator();
-//            Iterator<Type> formal2 = p2.formalTypes().iterator();
-//            while (formal1.hasNext()) {
-//                Type t1 = formal1.next();
-//                Type t2 = formal2.next();
-//                if (!t1.isImplicitCastValid(t2)) {
-//                    return false;
-//                }
-//            }    
-//        }
-//        else {
-//            // p1 and p2 are variable arity
-//            Iterator<Type> formal1 = p1.formalTypes().iterator();
-//            Iterator<Type> formal2 = p2.formalTypes().iterator();
-//            Type t1 = null;
-//            Type t2 = null;
-//            while (formal1.hasNext()) {
-//                if (formal1.hasNext()) {
-//                    t1 = formal1.next();
-//                }
-//                if (formal2.hasNext()) {
-//                    t2 = formal2.next();
-//                }
-//                if (!t1.isImplicitCastValid(t2)) {
-//                    return false;
-//                }
-//            }            
-//        }
         return ts.callValid(p2, p1.formalTypes());
 
     }
