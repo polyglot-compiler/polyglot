@@ -141,14 +141,11 @@ public class JL5MethodInstance_c extends MethodInstance_c implements JL5MethodIn
 	@Override
     public boolean callValidImpl(List argTypes) {
         List<Type> myFormalTypes = this.formalTypes;
+        JL5Subst erasureSubst = null;
         if (this.container() instanceof JL5ParsedClassType) {
             // we have a stripped off class type. Replace any type variables
             // with their bounds.
-            JL5Subst erasureSubst = ((JL5ParsedClassType) this.container())
-                    .erasureSubst();
-            if (erasureSubst != null) {
-                myFormalTypes = erasureSubst.substTypeList(this.formalTypes);
-            }
+            erasureSubst = ((JL5ParsedClassType) this.container()).erasureSubst();
         }
 
 //         System.err.println("JL5MethodInstance_c callValid Impl " + this +" called with " +argTypes);
@@ -177,27 +174,31 @@ public class JL5MethodInstance_c extends MethodInstance_c implements JL5MethodIn
                 ArrayType arr = (ArrayType) myFormalTypes.get(myFormalTypes.size() - 1);
                 formal = arr.base();
             }
-            if (!ts.isImplicitCastValid(actual, formal)) {
-                // the actual can't be cast to the formal.
-                // HOWEVER: there is still hope.
-                if (this.isVariableArity()
-                        && myFormalTypes.size() == argTypes.size()
-                        && !formalTypes.hasNext()) {
-                    // This is a variable arity method (e.g., m(int x,
-                    // String[])) and there
-                    // are the same number of actual arguments as formal
-                    // arguments.
-                    // The last actual can be either the base type of the array,
-                    // or the array type.
-                    ArrayType arr = (ArrayType) myFormalTypes.get(myFormalTypes.size() - 1);
-                    if (!ts.isImplicitCastValid(actual, arr)) {
+            if (ts.isImplicitCastValid(actual, formal)) {
+                return true;
+            }
+            if (erasureSubst != null && ts.isImplicitCastValid(actual, erasureSubst.substType(formal))) {
+                return true;
+            }
+            // the actual can't be cast to the formal.
+            // HOWEVER: there is still hope.
+            if (this.isVariableArity()
+                    && myFormalTypes.size() == argTypes.size()
+                    && !formalTypes.hasNext()) {
+                // This is a variable arity method (e.g., m(int x,
+                // String[])) and there
+                // are the same number of actual arguments as formal
+                // arguments.
+                // The last actual can be either the base type of the array,
+                // or the array type.
+                ArrayType arr = (ArrayType) myFormalTypes.get(myFormalTypes.size() - 1);
+                if (!ts.isImplicitCastValid(actual, arr)) {
 //                         System.err.println("     3: failed " + actual + " to " +formal + " and " + actual + " to " + arr);
-                        return false;
-                    }
-                } else {
-//                     System.err.println("     4: failed " + actual + " to " +formal);
                     return false;
                 }
+            } else {
+//                     System.err.println("     4: failed " + actual + " to " +formal);
+                return false;
             }
         }
 
