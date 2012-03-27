@@ -23,6 +23,14 @@ public abstract class JL5ClassType_c extends ClassType_c implements JL5ClassType
     }
 
     @Override
+    public boolean isCastValidImpl(Type toType){        
+        if (super.isCastValidImpl(toType)) {
+            return true;
+        }
+        return (this.isSubtype(toType) || toType.isSubtype(this));
+    }
+
+    @Override
     public boolean isImplicitCastValidImpl(Type toType){
         throw new InternalCompilerError("Should not be called in JL5");
     }

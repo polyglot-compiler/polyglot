@@ -86,6 +86,14 @@ public class JL5SubstClassType_c extends SubstClassType_c implements JL5SubstCla
     }
 
     @Override
+    public boolean isCastValidImpl(Type toType){        
+        if (super.isCastValidImpl(toType)) {
+            return true;
+        }
+        return (this.isSubtype(toType) || toType.isSubtype(this));
+    }
+
+    @Override
     public boolean isImplicitCastValidImpl(Type toType){
         throw new InternalCompilerError("Should not be called in JL5");
     }

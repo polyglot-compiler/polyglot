@@ -65,6 +65,14 @@ public class JL5ParsedClassType_c extends ParsedClassType_c implements JL5Parsed
     }
     
     @Override
+    public boolean isCastValidImpl(Type toType){        
+        if (super.isCastValidImpl(toType)) {
+            return true;
+        }
+        return (this.isSubtype(toType) || toType.isSubtype(this));
+    }
+
+    @Override
     public boolean isImplicitCastValidImpl(Type toType){
         throw new InternalCompilerError("Should not be called in JL5");
     }
