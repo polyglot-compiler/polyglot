@@ -2,6 +2,7 @@ package polyglot.ext.jl5.types;
 
 import java.util.Collections;
 
+import polyglot.types.ArrayType;
 import polyglot.types.ArrayType_c;
 import polyglot.types.MethodInstance;
 import polyglot.types.Type;
@@ -38,5 +39,21 @@ public class JL5ArrayType_c extends ArrayType_c implements JL5ArrayType {
     public void setVarArg() {
     	this.isVarArg = true;
     }
+
+    @Override
+    public boolean isSubtypeImpl(Type t) {
+        if (super.isSubtypeImpl(t)) {
+            return true;
+        }
+        
+        /* See JLS 3rd Ed 4.10 */
+        if (t instanceof ArrayType) {
+            ArrayType at = (ArrayType)t;
+            return this.base().isSubtype(at.base());
+        }
+        
+        return false;
+    }
+    
 
 }
