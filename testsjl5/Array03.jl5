@@ -1,0 +1,6 @@
+class C<T> {
+  C<?>[] m() { return null; }
+}
+class D extends C {
+  C<D>[] m() { return null; }
+}

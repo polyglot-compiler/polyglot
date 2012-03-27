@@ -91,6 +91,8 @@ polyglot.ext.jl5.ExtensionInfo "-d out -classpath java-out -noserial -post \"jav
 	TC12.jl5;
 	Array.jl5;
 	Array2.jl5 (Semantic, "should be declared abstract");
+	Array03.jl5;
+	Array04.jl5;
 	C.jl5;
 	FBoundSub.jl5;
 	FBoundSub2.jl5;
@@ -217,7 +219,7 @@ polyglot.ext.jl5.ExtensionInfo "-d out -classpath java-out -noserial -post \"jav
 	wildcard18.jl5 (Semantic);
 	wildcard19.jl5 (Semantic, "not a subtype .* bound") , (Semantic);
 	wildcard20.jl5 (Semantic, "cannot be called");
-	wildcard21.jl5 (Semantic, "Unexpected type bound"), (Semantic);
+	wildcard21.jl5 (Semantic, "Unexpected type bound");
 	wildcard22.jl5;
 	wildcard23.jl5;
 	wildcard24.jl5;
@@ -292,6 +294,8 @@ polyglot.ext.jl5.ExtensionInfo "-d out -classpath java-out -removeJava5isms -enu
         TC12.jl5;
         Array.jl5;
         Array2.jl5 (Semantic, "should be declared abstract");
+        Array03.jl5;
+        Array04.jl5;
         C.jl5;
         FBoundSub.jl5;
         FBoundSub2.jl5;
@@ -418,7 +422,7 @@ polyglot.ext.jl5.ExtensionInfo "-d out -classpath java-out -removeJava5isms -enu
         wildcard18.jl5 (Semantic);
         wildcard19.jl5 (Semantic, "not a subtype .* bound") , (Semantic);
         wildcard20.jl5 (Semantic, "cannot be called");
-        wildcard21.jl5 (Semantic, "Unexpected type bound"), (Semantic);
+        wildcard21.jl5 (Semantic, "Unexpected type bound");
         wildcard22.jl5;
         wildcard23.jl5;
         wildcard24.jl5;

@@ -1,0 +1,6 @@
+class C<T> {
+  void m(C<?>[] a) {
+    n(a);
+  }
+  void n(C[] a) { }
+}
