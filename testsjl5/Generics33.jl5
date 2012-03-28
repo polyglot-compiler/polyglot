@@ -1,0 +1,14 @@
+class C<T> {
+}
+class D<U> {
+    C<D<U>> m() {
+	return null;
+    }
+}
+class E {
+    void m() {
+	D<E> foo = new D();	
+	C<D> e;
+	e = foo.m(); // bad
+    }
+}

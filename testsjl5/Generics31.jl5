@@ -1,0 +1,6 @@
+class C<T> {
+  T m() {
+    Object o = null;
+    return (T) o;
+  }
+}

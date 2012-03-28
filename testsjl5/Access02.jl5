@@ -1,0 +1,12 @@
+class C<T> {
+    private static class D {
+	private D() { }
+    }
+    void m() {
+	Object x = new D();
+    }
+    public C<T> getDeclaredConstructor(C<?>... parameterTypes) {
+	return null;
+    }
+
+}
