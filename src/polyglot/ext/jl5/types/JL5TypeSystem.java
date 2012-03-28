@@ -92,6 +92,12 @@ public interface JL5TypeSystem extends TypeSystem, ParamTypeSystem {
      */
     JL5Subst erasureSubst(List<TypeVariable> typeParams);
     
+    /**
+     * Given a list of typeParams, produce a JL5Subst that maps these
+     * TypeVariables to the erasure of their bounds.
+     */
+    JL5Subst erasureSubst(List<TypeVariable> typeParams, boolean isRawClass);
+    
     JL5MethodInstance methodInstance(Position pos, ReferenceType container,
             Flags flags, Type returnType, String name,
             List argTypes, List excTypes, List typeParams);
@@ -197,6 +203,22 @@ public interface JL5TypeSystem extends TypeSystem, ParamTypeSystem {
     Type glb(ReferenceType t1, ReferenceType t2);
 
     UnknownType unknownReferenceType(Position position);
+
+    /**
+     * Create a raw class
+     */
+    Type toRawType(Type t);
+    
+    /**
+     * Create a raw class
+     */
+    RawClass rawClass(JL5ParsedClassType base, Position pos);
+
+    /**
+     * Create a raw class
+     */
+    RawClass rawClass(JL5ParsedClassType base);
+
 
 
 }

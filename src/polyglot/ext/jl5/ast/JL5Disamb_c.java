@@ -26,7 +26,7 @@ public class JL5Disamb_c extends Disamb_c {
 
         if (t.isClass() && typeOK()){
             if (t instanceof JL5SubstClassType) {
-                // if t is an instantiated class, then use the raw class
+                // if t is an instantiated class, then use the base class to resolve names
                 JL5SubstClassType ct = (JL5SubstClassType)t;
                 t = ct.base();
             }

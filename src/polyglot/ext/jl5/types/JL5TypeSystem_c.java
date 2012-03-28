@@ -208,8 +208,9 @@ public class JL5TypeSystem_c extends ParamTypeSystem_c implements JL5TypeSystem 
         }
         EnumInstance ei = null;
 
-        if (container instanceof JL5ParsedClassType) {
-            ei = ((JL5ParsedClassType) container).enumConstantNamed(name);
+        
+        if (container instanceof JL5ClassType) {
+            ei = ((JL5ClassType) container).enumConstantNamed(name);
         }
 
         if (ei != null) {
@@ -314,10 +315,6 @@ public class JL5TypeSystem_c extends ParamTypeSystem_c implements JL5TypeSystem 
             ClassFile clazz) {
         //return new ClassFileLazyClassInitializer(clazz, this);
         return new JL5ClassFileLazyClassInitializer(clazz, this);
-    }
-
-    public boolean equivalent(TypeObject arg1, TypeObject arg2) {
-        return arg1.equalsImpl(arg2);
     }
 
     @Override
@@ -692,8 +689,12 @@ public class JL5TypeSystem_c extends ParamTypeSystem_c implements JL5TypeSystem 
         return sb.toString();
     }
 
+    @Override
     public Subst subst(Map substMap, Map cache) {
-        return new JL5Subst_c(this, substMap, cache);
+        return new JL5Subst_c(this, substMap, cache, false);
+    }
+    protected Subst subst(Map substMap, Map cache, boolean isRawClass) {
+        return new JL5Subst_c(this, substMap, cache, isRawClass);
     }
 
     @Override
@@ -820,76 +821,31 @@ public class JL5TypeSystem_c extends ParamTypeSystem_c implements JL5TypeSystem 
 
     @Override
     public Type erasureType(Type t) {
-       return this.erasureType(t, new HashSet<TypeVariable>(), true);
-    }
-
-    /**
-     * Utility method to implement erasureType, that tracks which type variables
-     * we are in the middle of finding the erasure of.
-     */
-    protected Type erasureType(Type t, Set<TypeVariable> visitedTVs, boolean recurseErasureOfUpperBounds) {
         if (t.isArray()) {
             ArrayType at = t.toArray();
-            return at.base(this.erasureType(at.base(), visitedTVs, recurseErasureOfUpperBounds));
+            return at.base(this.erasureType(at.base()));
         }
         if (t instanceof TypeVariable) {
             TypeVariable tv = (TypeVariable) t;
-            if (visitedTVs.contains(tv)) {
-                return this.Object();
-            }
-            Set<TypeVariable> newVisited = new HashSet(visitedTVs);
-            newVisited.add(tv);
-            return this.erasureType((Type) tv.upperBound(), newVisited, recurseErasureOfUpperBounds);
+            return this.erasureType((Type) tv.upperBound());
         }
         if (t instanceof IntersectionType) {
             IntersectionType it = (IntersectionType) t;
-            return this.erasureType((Type) it.bounds().get(0), visitedTVs, recurseErasureOfUpperBounds);
+            return this.erasureType((Type) it.bounds().get(0));
         }
         if (t instanceof WildCardType) {
             WildCardType tv = (WildCardType) t;
             if(tv.upperBound() == null) {
                 return this.Object();
             }
-            return this.erasureType(tv.upperBound(), visitedTVs, recurseErasureOfUpperBounds);
+            return this.erasureType(tv.upperBound());
         }
         if (t instanceof JL5SubstType) {
             JL5SubstType jst = (JL5SubstType)t;            
-            return this.erasureType(jst.base(), visitedTVs, recurseErasureOfUpperBounds);
+            return this.erasureType(jst.base());
         }
         if (t instanceof JL5ParsedClassType) {
-            if (!recurseErasureOfUpperBounds) {
-                return t;
-            }
-            JL5ParsedClassType ct = (JL5ParsedClassType) t;
-            Map<TypeVariable, Type> m = new LinkedHashMap();
-            Set<TypeVariable> selfReferences = new LinkedHashSet();
-            for (TypeVariable tv : ct.typeVariables()) {
-                Type b = tv.upperBound();
-                if (b instanceof IntersectionType) {
-                    IntersectionType it = (IntersectionType) b;
-                    b = (Type) it.bounds().get(0);
-                }
-                
-                if (ct == b || selfInstantiation(ct).equals(b)) {
-                    // it's this type
-                    selfReferences.add(tv);
-                }
-                else {
-                    m.put(tv, this.erasureType(tv, new HashSet<TypeVariable>(), false));
-                }
-            }
-            if (!m.isEmpty()) {
-                for (TypeVariable selfRef : selfReferences) {
-                    m.put(selfRef, this.Object());
-                }
-                Subst subst = this.subst(m, new HashMap());
-                Type ret = subst.substType(ct);
-                // tie the knot with any self references...
-                for (TypeVariable selfRef : selfReferences) {
-                    m.put(selfRef, ret);
-                }
-                return ret;
-            }
+            return this.toRawType(t);
         }
         return t;
     }
@@ -902,8 +858,13 @@ public class JL5TypeSystem_c extends ParamTypeSystem_c implements JL5TypeSystem 
         return (JL5ClassType)this.subst(ct, m);
     }
 
+
     @Override
     public JL5Subst erasureSubst(List<TypeVariable> typeParams) {
+        return erasureSubst(typeParams, false);
+    }
+    @Override
+    public JL5Subst erasureSubst(List<TypeVariable> typeParams, boolean isRawClass) {
         Map m = new LinkedHashMap();
         Set selfReferences = new LinkedHashSet();
         for (TypeVariable tv : typeParams) {
@@ -912,41 +873,24 @@ public class JL5TypeSystem_c extends ParamTypeSystem_c implements JL5TypeSystem 
         if (m.isEmpty()) {
             return null;
         }
-        JL5Subst ret = (JL5Subst)this.subst(m, new HashMap());
+        JL5Subst ret = (JL5Subst)this.subst(m, new HashMap(), isRawClass);
         return ret;
     }
 
 
-    //    @Override
-    //    public boolean typeEquals(Type type1, Type type2) {
-    //        if (type1 instanceof JL5ParsedClassType && type2 instanceof JL5SubstType) {
-    //            type1 = this.subst(type1, Collections.EMPTY_MAP);
-    //        }
-    //        if (type2 instanceof JL5ParsedClassType && type1 instanceof JL5SubstType) {
-    //            type2 = this.subst(type2, Collections.EMPTY_MAP);
-    //        }
-    //        return super.typeEquals(type1, type2);
-    //    }
-
-
     @Override
     public boolean isContained(Type fromType, Type toType) {
-//        System.err.println("JL5TypeSystem_c: isContainted: " + fromType + " <= " + toType + " ?");
         if (toType instanceof WildCardType) {
-//            System.err.println("   j");
             WildCardType wTo = (WildCardType) toType;
             if (fromType instanceof WildCardType) {
-//                System.err.println("   k");
                 WildCardType wFrom = (WildCardType) fromType;
                 // JLS 3rd ed 4.5.1.1
                 if (wFrom.isExtendsConstraint() && wTo.isExtendsConstraint()) {
-//                    System.err.println("   l");
                     if (isSubtype(wFrom.upperBound(), wTo.upperBound())) {
                         return true;
                     }
                 }
                 if (wFrom.isSuperConstraint() && wTo.isSuperConstraint()) {
-//                    System.err.println("   m");
                     if (isSubtype(wTo.lowerBound(), wFrom.lowerBound())) {
                         return true;
                     }
@@ -954,18 +898,15 @@ public class JL5TypeSystem_c extends ParamTypeSystem_c implements JL5TypeSystem 
 
             }
             if (wTo.isSuperConstraint()) {
-//                System.err.println("   n is implicit cast from " + wTo.lowerBound()  + " to " + fromType + " ? " + isImplicitCastValid(wTo.lowerBound(), fromType));
                 if (isImplicitCastValid(wTo.lowerBound(), fromType)) {
                     return true;
                 }
             }
             else if (wTo.isExtendsConstraint()) {
-//                System.err.println("   o");
                 if (isImplicitCastValid(fromType, wTo.upperBound())) {
                     return true;
                 }
             }
-//            System.err.println("   p");
             return false;
         }
         else {
@@ -1026,7 +967,7 @@ public class JL5TypeSystem_c extends ParamTypeSystem_c implements JL5TypeSystem 
         // Try an unchecked conversion, if toType is a parameterized type.
         if (chain == null && toType instanceof JL5SubstClassType) {
             JL5SubstClassType toSubstCT = (JL5SubstClassType)toType;
-            chain = isImplicitCastValidChain(fromType, toSubstCT.base());
+            chain = isImplicitCastValidChain(fromType, this.rawClass(toSubstCT.base(), toSubstCT.base().position()));
             if (chain != null) {
                 // success!
                 chain.addLast(toType);
@@ -1074,6 +1015,20 @@ public class JL5TypeSystem_c extends ParamTypeSystem_c implements JL5TypeSystem 
     }
 
     @Override
+    public boolean isCastValid(Type fromType, Type toType) {
+        if (super.isCastValid(fromType, toType)) {
+            return true;
+        }
+        // try an unchecked conversion.
+        Type raw = this.toRawType(toType);
+        if (raw != toType) {
+            return isCastValid(fromType, raw);
+        }
+        return false;
+    }
+        
+
+    @Override
     protected List abstractSuperInterfaces(ReferenceType rt) {
         List superInterfaces = new LinkedList();
         superInterfaces.add(rt);
@@ -1089,10 +1044,6 @@ public class JL5TypeSystem_c extends ParamTypeSystem_c implements JL5TypeSystem 
 
         if (rt.superType() != null) {
             JL5ClassType c = (JL5ClassType) rt.superType().toClass();
-            if (c.isRawClass()) {
-                // it's a raw class, so use the erased version of it
-                c = (JL5ClassType) this.erasureType(c);
-            }
             if (c.flags().isAbstract()) {
                 // the superclass is abstract, so it may contain methods
                 // that must be implemented.
@@ -1276,15 +1227,33 @@ public class JL5TypeSystem_c extends ParamTypeSystem_c implements JL5TypeSystem 
             // non-public members of non-classes are inaccessible
             return flags.isPublic();
         }
-
+                
         JL5ClassType targetClass = (JL5ClassType)target.toClass();
+        
+        if (isAccessible_(flags, targetClass, contextClass)) {
+            return true;
+        }
         // make sure we strip away any parameters.
-        if (!targetClass.isRawClass() && targetClass instanceof JL5SubstClassType) {
-            targetClass = ((JL5SubstClassType)targetClass).base();
+        ClassType targetClassDecl = (ClassType)targetClass.declaration();
+        if (targetClassDecl != targetClass && isAccessible_(flags, targetClassDecl, contextClass)) {
+            return true;
+        }
+        
+        ClassType contextClassDecl = (ClassType)contextClass.declaration();
+        if (contextClassDecl != contextClass && isAccessible_(flags, targetClass, contextClassDecl)) {
+            return true;
+        }
+        
+        if (targetClassDecl != targetClass && contextClassDecl != contextClass && isAccessible_(flags, targetClassDecl, contextClassDecl)) {
+            return true;
         }
 
-        
-        if (! classAccessible(targetClass, contextClass)) {
+        return false;
+    }
+    
+    
+    protected boolean isAccessible_(Flags flags, ClassType targetClass, ClassType contextClass) {
+        if (!classAccessible(targetClass, contextClass)) {
             return false;
         }
 
@@ -1325,6 +1294,29 @@ public class JL5TypeSystem_c extends ParamTypeSystem_c implements JL5TypeSystem 
         }
 
         return accessibleFromPackage(flags, targetClass.package_(), contextClass.package_());
+    }
+
+
+    @Override
+    public boolean isEnclosed(ClassType inner, ClassType outer) {
+        if (inner instanceof JL5ClassType) {
+            inner = (ClassType)inner.declaration();
+        }
+        if (outer instanceof JL5ClassType) {
+            outer = (ClassType)outer.declaration();
+        }
+        return inner.isEnclosedImpl(outer);
+    }
+
+    @Override
+    public boolean hasEnclosingInstance(ClassType inner, ClassType encl) {
+        if (inner instanceof JL5ClassType) {
+            inner = (ClassType)inner.declaration();
+        }
+        if (encl instanceof JL5ClassType) {
+            encl = (ClassType)encl.declaration();
+        }
+        return inner.hasEnclosingInstanceImpl(encl);
     }
 
     @Override
@@ -1524,5 +1516,39 @@ public class JL5TypeSystem_c extends ParamTypeSystem_c implements JL5TypeSystem 
     protected UnknownType unknownReferenceType = new UnknownReferenceType_c(this);
 
 
+    @Override
+    public RawClass rawClass(JL5ParsedClassType base) {
+        return this.rawClass(base, base.position());
+    }
+    @Override
+    public RawClass rawClass(JL5ParsedClassType base, Position pos) {
+        if (base.typeVariables().isEmpty()) {
+            throw new InternalCompilerError("Can only create a raw class with a parameterized class");
+        }
+        return new RawClass_c(base, pos);        
+    }
+    
+     @Override
+    public Type toRawType(Type t) {
+        if (!t.isReference()) {
+            return t;
+        }
+        if (t instanceof RawClass) {
+            return t;
+        }
+        if (t instanceof JL5ParsedClassType) {
+            JL5ParsedClassType ct = (JL5ParsedClassType)t;
+            if (ct.typeVariables().isEmpty()) {
+                return t;
+            }
+            return this.rawClass(ct, ct.position());
+        }
+        if (t instanceof ArrayType) {
+            ArrayType at = t.toArray();
+            Type b = this.toRawType(at.base());
+            return at.base(b);
+        }
+        return t;
+    }
 
 }

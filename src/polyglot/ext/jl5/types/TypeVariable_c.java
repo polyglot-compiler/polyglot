@@ -90,11 +90,6 @@ public class TypeVariable_c extends ReferenceType_c implements TypeVariable {
     }
 
     public boolean isCanonical() {
-//        for (Type b : bounds()) {
-//            if (!b.isCanonical()) {
-//                return false;
-//            }
-//        }
         return true; 
     }
 
@@ -107,11 +102,6 @@ public class TypeVariable_c extends ReferenceType_c implements TypeVariable {
         }
         return null;
     }
-    //
-    //    public Flags flags() {
-    //        return flags;
-    //    }
-    //
     public List constructors() {
         return Collections.emptyList();
     }
@@ -123,24 +113,10 @@ public class TypeVariable_c extends ReferenceType_c implements TypeVariable {
 
     public List methods() {
         return Collections.EMPTY_LIST;
-//        List l = getSyntheticClass().methods();
-////        System.out.println("LIST:"+l);
-//        return l;
-//        List m = new ArrayList();
-//        for (ReferenceType t : bounds()) {
-//            m.addAll(t.methods());
-//        }
-//        return m;
     }
 
     public List fields() {
         return Collections.EMPTY_LIST;
-//        return getSyntheticClass().fields();
-//        List m = new ArrayList();
-//        for (ReferenceType t : bounds()) {
-//            m.addAll(t.fields());
-//        }
-//        return m;
     }
     public FieldInstance fieldNamed(String name) {
         for (Iterator i = fields().iterator(); i.hasNext(); ) {
@@ -154,127 +130,17 @@ public class TypeVariable_c extends ReferenceType_c implements TypeVariable {
 
     public List interfaces() {
         return Collections.EMPTY_LIST;
-//        List interfaces = new ArrayList();
-//        for (ReferenceType t : bounds) {
-//            if (t.isClass() && t.toClass().flags().isInterface()) {
-//                interfaces.add(t);
-//            }
-//        }
-//        return interfaces;
-        //return getSyntheticClass().interfaces();
     }
-    //
-    //    public boolean inStaticContext() {
-    //        return false; // not sure
-    //    }
-    //
     public ReferenceType erasureType() {
         return (ReferenceType) ((JL5TypeSystem)this.typeSystem()).erasureType(this);
     }
-    //    
-    //    public String translate(Resolver c) {
-    //    	return jl4Type().translate(c);
-    //    }
-    //
-    //    public String toString() {
-    //        return name;// +":"+bounds;
-    //    }
-    //
-    //    //Compare type equality using JL4 type
-    //    public boolean equalsImpl(TypeObject other) {
-    //        if (other instanceof TypeVariable)
-    //        	return jl4Type().equalsImpl(((TypeVariable) other).jl4Type());
-    //        else
-    //        	return jl4Type().equalsImpl(other);
-    //    }
-    //
-    //    public ClassType toClass() {
-    //        return this;
-    //    }
-    //
-    //	
+
     @Override
     public Type superType() {
         return this.upperBound;
-//        if (bounds.isEmpty()) {
-//            return ts.Object();
-//        }
-//        Type t = bounds.get(0);
-//        if (t.isClass() && !t.toClass().flags().isInterface()) {
-//            return t;
-//        }
-//        return ts.Object();
     }
 
-//    public List<ReferenceType> bounds() {
-//        return bounds;
-//    }
 
-//    public TypeVariable bounds(List<ReferenceType> newBounds) {
-////        System.err.println("BAD TYPEVAR_C");
-//        if (this.bounds == newBounds) {
-//            return this;
-//        }
-//        if (this.bounds != null && newBounds != null && this.bounds.size() == newBounds.size()) {
-//            boolean allEqual = true;
-//            for (int i = 0; i < newBounds.size(); i++) {
-//                if (!ts.typeEquals(this.bounds.get(i), newBounds.get(i))) {
-//                    allEqual = false;
-//                    break;
-//                }
-//            }
-//            if (allEqual) {
-//                return this;
-//            }
-//        }
-//        TypeVariable_c tv = (TypeVariable_c) this.copy();
-//        tv.bounds = newBounds;
-//        return tv;
-//    }
-
-//    @Override
-//    public void setBounds(List<ReferenceType> newBounds) {
-//        this.bounds = newBounds;
-////        System.err.println("TypeVariable_c.setBounds on " + this.name + " are now " + bounds);
-//    }
-
-/*    protected ClassType getSyntheticClass() {
-        if (syntheticClass == null) {
-            syntheticClass = typeSystem().createClassType();
-            for (ReferenceType t : bounds()) {
-                if (t.isClass() && ((ClassType)t).flags().isInterface())
-                    syntheticClass.addInterface(t);
-                else {
-                    if(syntheticClass.supertypesResolved())
-                        throw new InternalCompilerError("Cannot have multiple class boundaries!");
-                    else {
-                        syntheticClass.superType(t);
-                        syntheticClass.setSupertypesResolved(true);
-                    }
-                }
-                for(Iterator it = t.methods().iterator(); it.hasNext();) {
-                    MethodInstance mi = (MethodInstance) it.next();
-                    syntheticClass.addMethod(mi);
-                }
-                for(Iterator it = t.fields().iterator(); it.hasNext();) {
-                    FieldInstance fi = (FieldInstance) it.next();
-                    syntheticClass.addField(fi);
-                }
-                //XXX: do we need to add member classes too?
-            }
-            syntheticClass.setMembersAdded(true);
-            if(!syntheticClass.supertypesResolved()) {
-                syntheticClass.superType(ts.Object());
-                syntheticClass.setSupertypesResolved(true);
-            }
-
-            syntheticClass.package_(this.package_());
-            syntheticClass.setSignaturesResolved(true);
-//            System.out.println("SYNTH: " + syntheticClass.superType() + " implements " + syntheticClass.interfaces());
-        }
-        return syntheticClass;
-    }
-    */
     @Override
     public String translate(Resolver c) {
         return this.name();
@@ -283,29 +149,7 @@ public class TypeVariable_c extends ReferenceType_c implements TypeVariable {
     public String toString() {
         return this.name();
     }
-    @Override
-    public boolean typeEqualsImpl(Type t) {
-        if (this == t) {
-            return true;
-        }
-        if (t instanceof TypeVariable_c) {
-            TypeVariable_c that = (TypeVariable_c) t;
-            if (this.name().equals(that.name())
-                    && this.declaredIn == that.declaredIn
-                    && ((this.declaredIn == TVarDecl.CLASS_TYPE_VARIABLE
-                            && this.declaringClass.equals(that.declaringClass))
-                            || (this.declaredIn == TVarDecl.PROCEDURE_TYPE_VARIABLE
-                                    && this.declaringProcedure.equals(that.declaringProcedure)))
-                    && (this.upperBound == that.upperBound || (this.upperBound != null && this.upperBound.equals(that.upperBound)))
-                    && (this.lowerBound == that.lowerBound || (this.lowerBound != null && this.lowerBound.equals(that.lowerBound)))
-                    ) {
-                return true;
-            }
-            
-        }
-        return false;
-    }
-    
+        
     public boolean isCastValidImpl(Type toType) {
         if (super.isCastValidImpl(toType)) {
             return true;

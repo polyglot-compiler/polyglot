@@ -21,21 +21,15 @@ import polyglot.visit.AscriptionVisitor;
  */
 public class AutoBoxer extends AscriptionVisitor {
 
-    private Type enumType;
-    
-    public AutoBoxer(Job job, TypeSystem ts, NodeFactory nf) {
+    public AutoBoxer(Job job, JL5TypeSystem ts, NodeFactory nf) {
         super(job, ts, nf);
-        try {
-            enumType = ts.typeForName("java.lang.Enum");
-        } catch (SemanticException e) {
-            throw new InternalCompilerError("Couldn't find java.lang.Enum", e);
-        }
     }
 
     @Override
     public Expr ascribe(Expr e, Type toType) throws SemanticException {
         Type fromType = e.type();
-        if(toType.isPrimitive() && !toType.isVoid() && !fromType.isPrimitive() && !fromType.isSubtype(enumType)) {
+        JL5TypeSystem ts = (JL5TypeSystem)this.ts;
+        if(toType.isPrimitive() && !toType.isVoid() && !fromType.isPrimitive() && !fromType.isSubtype(ts.toRawType(ts.Enum()))) {
             // going from a wrapper object to a primitive type
             // translate e to e.XXXvalue() where XXX is int, long, double, etc.
             ClassType wrapperType = ((JL5TypeSystem)ts).wrapperClassOfPrimitive(toType.toPrimitive());

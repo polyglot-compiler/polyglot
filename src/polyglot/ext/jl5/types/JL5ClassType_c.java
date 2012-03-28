@@ -7,8 +7,19 @@ import java.util.List;
 import polyglot.main.Options;
 import polyglot.types.*;
 import polyglot.util.InternalCompilerError;
+import polyglot.util.Position;
 
 public abstract class JL5ClassType_c extends ClassType_c implements JL5ClassType {
+
+    protected JL5ClassType_c() { }
+
+    public JL5ClassType_c(JL5TypeSystem ts) {
+        this(ts, null);
+    }
+
+    public JL5ClassType_c(JL5TypeSystem ts, Position pos) {
+        super(ts, pos);
+    }
 
     public abstract List enumConstants();
     

@@ -214,13 +214,46 @@ public class IntersectionType_c extends ClassType_c implements IntersectionType 
         return boundOf_;
     }
     
+    @Override
     public boolean equalsImpl(TypeObject other) {
         if (!super.equalsImpl(other)) {
-            if (other instanceof ReferenceType) {
-                return typeSystem().isSubtype(this, (Type) other) && typeSystem().isSubtype((Type) other, this);
+            if (other instanceof IntersectionType) {
+                IntersectionType it = (IntersectionType)other;
+                if (it.bounds().size() != this.bounds().size()) {
+                    return false;
+                }
+                for (int i = 0; i < this.bounds().size(); i++) {
+                    Type ti = this.bounds().get(i);
+                    Type tj = it.bounds().get(i);
+                    if (!typeSystem().equals(ti, tj)) {
+                        return false;
+                    }
+                }
+                return true;
             }
         }
-        return true;
+        return false;
+    }
+
+    @Override
+    public boolean typeEqualsImpl(Type other) {
+        if (!super.typeEqualsImpl(other)) {
+            if (other instanceof IntersectionType) {
+                IntersectionType it = (IntersectionType)other;
+                if (it.bounds().size() != this.bounds().size()) {
+                    return false;
+                }
+                for (int i = 0; i < this.bounds().size(); i++) {
+                    Type ti = this.bounds().get(i);
+                    Type tj = it.bounds().get(i);
+                    if (!typeSystem().typeEquals(ti, tj)) {
+                        return false;
+                    }
+                }
+                return true;
+            }
+        }
+        return false;
     }
 
     @Override

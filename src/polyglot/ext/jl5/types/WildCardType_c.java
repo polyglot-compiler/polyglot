@@ -109,6 +109,21 @@ public class WildCardType_c extends ReferenceType_c implements WildCardType {
     }
 
     @Override
+    public boolean equalsImpl(TypeObject t) {
+        if (t instanceof WildCardType_c) {
+            WildCardType_c that = (WildCardType_c) t;
+            if (!(this.upperBound == that.upperBound || (this.upperBound != null && typeSystem().equals(this.upperBound, that.upperBound)))) {
+                return false;
+            }
+            if (!(this.lowerBound == that.lowerBound || (this.lowerBound != null && typeSystem().equals(this.lowerBound, that.lowerBound)))) {
+                return false;
+            }
+            return true;
+        }
+        return super.equalsImpl(t);
+    }
+
+    @Override
     public boolean typeEqualsImpl(Type t) {
         if (t instanceof WildCardType_c) {
             WildCardType_c that = (WildCardType_c) t;

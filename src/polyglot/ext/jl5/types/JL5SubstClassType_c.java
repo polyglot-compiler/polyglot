@@ -23,6 +23,7 @@ public class JL5SubstClassType_c extends SubstClassType_c implements JL5SubstCla
     public JL5SubstClassType_c(JL5TypeSystem ts, Position pos,
                                  JL5ParsedClassType base, JL5Subst subst) {
         super(ts, pos, base, subst);
+        this.setDeclaration(base);
     }
 
     ////////////////////////////////////////////////////////////////
@@ -159,7 +160,8 @@ public class JL5SubstClassType_c extends SubstClassType_c implements JL5SubstCla
                 
             }
         }
-        if (ts.isSubtype(this.base(), ancestor)) {
+        Type rawClass = ts.rawClass(this.base(), this.position);
+        if (ts.isSubtype(rawClass, ancestor)) {
             return true;
         }
         

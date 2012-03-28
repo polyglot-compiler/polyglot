@@ -98,6 +98,11 @@ public class JL5Call_c extends Call_c implements JL5Call {
                                           actualTypeArgs,
                                           c.currentClass());
         
+//        System.err.println("JL5Call_c.typeCheck targettype is " + targetType);
+//        System.err.println("JL5Call_c.typeCheck target is " + this.target);
+//        System.err.println("JL5Call_c.typeCheck target is " + this.target.type());
+//        System.err.println("JL5Call_c.typeCheck mi is " + mi + " return type is " + mi.returnType().getClass());
+//        System.err.println("JL5Call_c.typeCheck mi is " + mi + " container is " + mi.container().getClass());
         /* This call is in a static context if and only if
          * the target (possibly implicit) is a type node.
          */

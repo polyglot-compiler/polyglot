@@ -12,9 +12,11 @@ import polyglot.ast.TypeNode_c;
 import polyglot.ext.jl5.types.JL5ParsedClassType;
 import polyglot.ext.jl5.types.JL5SubstClassType;
 import polyglot.ext.jl5.types.JL5TypeSystem;
+import polyglot.ext.jl5.types.RawClass;
 import polyglot.types.SemanticException;
 import polyglot.types.Type;
 import polyglot.util.CodeWriter;
+import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
 import polyglot.visit.AmbiguityRemover;
 import polyglot.visit.NodeVisitor;
@@ -60,7 +62,17 @@ public class AmbTypeInstantiation extends TypeNode_c implements TypeNode, Ambigu
         while (baseType instanceof JL5SubstClassType) {
             baseType = ((JL5SubstClassType)baseType).base();
         }
-        JL5ParsedClassType pct = (JL5ParsedClassType)baseType;
+        
+        JL5ParsedClassType pct;
+        if (baseType instanceof JL5ParsedClassType) {
+            pct = (JL5ParsedClassType)baseType;
+        }
+        else if (baseType instanceof RawClass) {
+            pct = ((RawClass)baseType).base();
+        }
+        else {
+            throw new InternalCompilerError("Don't know how to handle " + baseType, position);
+        }
 
         if ((pct.pclass() == null || pct.pclass().formals().isEmpty())) {
             if (this.typeArguments.isEmpty()) {

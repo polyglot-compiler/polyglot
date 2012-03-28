@@ -1,6 +1,7 @@
 package polyglot.ext.jl5;
 
 import polyglot.ast.NodeFactory;
+import polyglot.ext.jl5.types.JL5TypeSystem;
 import polyglot.ext.jl5.visit.*;
 import polyglot.frontend.*;
 import polyglot.frontend.ExtensionInfo;
@@ -46,7 +47,7 @@ public class JL5Scheduler extends JLScheduler {
 
     }
     public Goal AutoBoxing(Job job) {
-        TypeSystem ts = extInfo.typeSystem();
+        JL5TypeSystem ts = (JL5TypeSystem)extInfo.typeSystem();
         NodeFactory nf = extInfo.nodeFactory();
         Goal g = new VisitorGoal(job, new AutoBoxer(job, ts, nf));
         try {

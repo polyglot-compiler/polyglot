@@ -105,7 +105,7 @@ public class ExtendedFor_c extends Loop_c implements ExtendedFor {
 //        System.err.println("    t is a " + ts.allAncestorsOf((ReferenceType) t));
 //        System.err.println("    erasure(t) is " + ts.erasureType(t));
 //        System.err.println("    iterable is a " + ts.Iterable().getClass());
-		if (!expr.type().isArray() && !t.isSubtype(ts.Iterable())) {
+		if (!expr.type().isArray() && !t.isSubtype(ts.rawClass((JL5ParsedClassType)ts.Iterable()))) {
 			throw new SemanticException(
 					"Can only iterate over an array or an instance of java.util.Iterable",
 					expr.position());

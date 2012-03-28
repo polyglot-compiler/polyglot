@@ -15,17 +15,21 @@ import polyglot.visit.TypeChecker;
 public class JL5CanonicalTypeNode_c extends polyglot.ast.CanonicalTypeNode_c {
 
     public JL5CanonicalTypeNode_c(Position pos, Type type) {
-        super(pos, type);
+        super(pos, makeRawIfNeeded(type, pos));
+    }
+
+    private static Type makeRawIfNeeded(Type type, Position pos) {
+        if (type instanceof JL5ParsedClassType && !((JL5ParsedClassType)type).typeVariables().isEmpty()) {
+            // needs to be a raw type
+            JL5TypeSystem ts = (JL5TypeSystem)type.typeSystem();
+            return ts.rawClass((JL5ParsedClassType)type, pos);
+        }
+        return type;
     }
 
     public Node typeCheck(TypeChecker tc) throws SemanticException {
         Type t = type();
-        if (t instanceof JL5ParsedClassType && !((JL5ParsedClassType)t).typeVariables().isEmpty()) {
-//            ErrorQueue eq = tc.errorQueue();
-//            eq.enqueue(ErrorInfo.WARNING, "Use of a raw type ("+t+") could lead to unchecked "
-//                    + " operations.", position());
-        } 
-        else if (t instanceof JL5SubstClassType) {
+        if (t instanceof JL5SubstClassType) {
             JL5SubstClassType st = (JL5SubstClassType) type();
 
             JL5TypeSystem ts = (JL5TypeSystem) tc.typeSystem();

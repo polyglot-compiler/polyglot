@@ -9,7 +9,8 @@ import polyglot.util.InternalCompilerError;
 
 public class JL5Subst_c extends Subst_c implements JL5Subst {
 
-    public JL5Subst_c(ParamTypeSystem ts, Map subst, Map cache) {
+    private final boolean isRawClass;
+    public JL5Subst_c(ParamTypeSystem ts, Map subst, Map cache, boolean isRawClass) {
         super(ts, subst, cache);
 //        if (subst.isEmpty()) {
 //            Thread.dumpStack();
@@ -20,9 +21,22 @@ public class JL5Subst_c extends Subst_c implements JL5Subst {
                 continue;
             throw new InternalCompilerError("bad map: " + subst);
         }
+        
+        this.isRawClass = isRawClass;
 
     }
     
+    @Override
+    protected Type uncachedSubstType(Type t) {
+        if (t instanceof JL5SubstClassType && isRawClass) {
+            // don't perform substitution on subst types, just return a raw class
+            JL5SubstClassType sct = (JL5SubstClassType)t;
+            JL5TypeSystem ts = (JL5TypeSystem)this.typeSystem();
+            return ts.rawClass(sct.base(), t.position());
+        }
+        return super.uncachedSubstType(t);
+    }
+
     @Override
     public Type substType(Type t) {
         if (t instanceof TypeVariable) {
@@ -80,15 +94,30 @@ public class JL5Subst_c extends Subst_c implements JL5Subst {
             return t;
         }
 
+        if (t instanceof RawClass) {
+            // don't substitute raw classes
+            return t;
+        }
+        if (t instanceof JL5SubstClassType) {
+            // this case should be impossible
+            throw new InternalCompilerError("Should have no JL5SubstClassTypes");
+        }
+        
         if (t instanceof JL5ParsedClassType) {
-            JL5ParsedClassType pct = (JL5ParsedClassType)t;
+            JL5ParsedClassType pct = (JL5ParsedClassType)t;            
             if (pct.typeVariables().isEmpty()) {
                 // no parameters to be instantiated!
                 return pct;
             }
+            if (isRawClass) {
+                return ((JL5TypeSystem) ts).rawClass(pct, t.position());
+            }
+            return new JL5SubstClassType_c((JL5TypeSystem) ts, t.position(),
+                                           (JL5ParsedClassType) t, this);
         }
-        return new JL5SubstClassType_c((JL5TypeSystem) ts, t.position(),
-                                         (JL5ParsedClassType) t, this);
+
+        throw new InternalCompilerError("Don't know how to handle class type " + t.getClass());
+
     }
 
     @Override

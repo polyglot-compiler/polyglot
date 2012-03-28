@@ -10,7 +10,6 @@ import polyglot.util.TypedList;
 
 @SuppressWarnings("serial")
 public class JL5ParsedClassType_c extends ParsedClassType_c implements JL5ParsedClassType {
-
     protected PClass pclass;
     protected List<TypeVariable> typeVars = Collections.EMPTY_LIST;
 //	protected boolean wasGeneric;
@@ -145,12 +144,22 @@ public class JL5ParsedClassType_c extends ParsedClassType_c implements JL5Parsed
             return this.name();
         }
         StringBuffer sb = new StringBuffer(this.name);
+        sb.append('<');
+        Iterator<TypeVariable> it =  this.typeVars.iterator();
+        while (it.hasNext()) {
+            TypeVariable act = it.next();
+            sb.append(act);
+            if (it.hasNext()) {
+                sb.append(", ");
+            }
+        }
+        sb.append('>');
         return sb.toString();
     }
 
     @Override
     public boolean isRawClass() {
-        return !this.typeVars.isEmpty();
+        return false;
     }
     @Override
     public String translateAsReceiver(Resolver c) {        
@@ -172,5 +181,20 @@ public class JL5ParsedClassType_c extends ParsedClassType_c implements JL5Parsed
         return super.translate(c);
     }
 
+    @Override
+    public boolean descendsFromImpl(Type ancestor) {        
+        if (super.descendsFromImpl(ancestor)) {
+            return true;
+        }
+        if (!this.typeVariables().isEmpty()) {
+            // check for raw class
+            JL5TypeSystem ts = (JL5TypeSystem)this.ts;
+            Type rawClass = ts.rawClass(this, this.position);
+            if (ts.isSubtype(rawClass, ancestor)) {
+                return true;
+            }
+        }
+        return false;
+    }
 
 }
