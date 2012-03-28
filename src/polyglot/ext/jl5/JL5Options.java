@@ -21,6 +21,7 @@ public class JL5Options extends Options {
             super.setDefaultValues();
             this.enumImplClass = null;
             this.removeJava5isms = false;
+            this.assertions = true;
         }
         
         @Override
