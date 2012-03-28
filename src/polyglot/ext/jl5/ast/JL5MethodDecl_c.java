@@ -200,7 +200,7 @@ public class JL5MethodDecl_c extends MethodDecl_c implements JL5MethodDecl {
         
         
         // check that the varargs flag is consistent with the type of the last argument.
-        if (JL5Flags.isVarArgs(this.flags()) != JL5Flags.isVarArgs(flags)) {
+        if (JL5Flags.isVarArgs(md.flags()) != JL5Flags.isVarArgs(flags)) {
             throw new InternalCompilerError("VarArgs flag of AST and type disagree");
         }
         
