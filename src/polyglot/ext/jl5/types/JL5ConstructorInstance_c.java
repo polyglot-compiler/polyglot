@@ -11,17 +11,17 @@ import polyglot.util.Position;
 public class JL5ConstructorInstance_c extends ConstructorInstance_c implements JL5ConstructorInstance {
     private List<TypeVariable> typeParams;
     public JL5ConstructorInstance_c(JL5TypeSystem_c ts,
-			Position pos, ClassType container, Flags flags, List argTypes,
-			List excTypes, List typeParams) {
-    	super(ts, pos, container, flags, argTypes, excTypes);
-    	this.typeParams = typeParams;
-	}
+                                    Position pos, ClassType container, Flags flags, List argTypes,
+                                    List excTypes, List typeParams) {
+        super(ts, pos, container, flags, argTypes, excTypes);
+        this.typeParams = typeParams;
+    }
 
-	public boolean isVariableArity() {
+    public boolean isVariableArity() {
         return JL5Flags.isVarArgs(this.flags());
     }
-	
-	@Override
+
+    @Override
     public boolean callValidImpl(List argTypes) {
         List<Type> myFormalTypes = this.formalTypes;
         JL5Subst erasureSubst = null;
@@ -56,7 +56,7 @@ public class JL5ConstructorInstance_c extends ConstructorInstance_c implements J
             if (!formalTypes.hasNext() && this.isVariableArity()) {
                 // varible arity method, and this is the last arg.
                 ArrayType arr = (ArrayType) myFormalTypes.get(myFormalTypes
-                        .size() - 1);
+                                                              .size() - 1);
                 formal = arr.base();
             }
             if (ts.isImplicitCastValid(actual, formal)) {
@@ -92,12 +92,12 @@ public class JL5ConstructorInstance_c extends ConstructorInstance_c implements J
 
         return true;
     }
-	
+
     @Override
     public boolean isCanonical() {
         return super.isCanonical() && listIsCanonical(typeParams);
     }
-    
+
     @Override
     public boolean isRawGeneric() {
         return !this.typeParams.isEmpty();

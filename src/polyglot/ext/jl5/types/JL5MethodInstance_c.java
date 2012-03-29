@@ -11,21 +11,21 @@ import polyglot.util.Position;
 
 @SuppressWarnings("serial")
 public class JL5MethodInstance_c extends MethodInstance_c implements JL5MethodInstance {
-	private List<TypeVariable> typeParams;
-//    protected PClass instantiatedFrom;
+    private List<TypeVariable> typeParams;
+    //    protected PClass instantiatedFrom;
 
     public JL5MethodInstance_c(JL5TypeSystem_c ts, Position pos,
-			ReferenceType container, Flags flags, Type returnType,
-			String name, List argTypes, List excTypes, List typeParams) {
-    	super(ts, pos, container, flags, returnType, name, argTypes, excTypes);
-    	this.typeParams = typeParams;
-	}
+                               ReferenceType container, Flags flags, Type returnType,
+                               String name, List argTypes, List excTypes, List typeParams) {
+        super(ts, pos, container, flags, returnType, name, argTypes, excTypes);
+        this.typeParams = typeParams;
+    }
 
-	public boolean isVariableArity() {
+    public boolean isVariableArity() {
         return JL5Flags.isVarArgs(this.flags());
     }
 
-	@Override
+    @Override
     public List overridesImpl() {
         List l = new LinkedList();
         ReferenceType rt = container();
@@ -43,15 +43,15 @@ public class JL5MethodInstance_c extends MethodInstance_c implements JL5MethodIn
             if (rt.superType() != null && rt.superType().isReference()) {
                 sup = (ReferenceType) rt.superType();    
             }
-            
+
             rt = sup;
         };
 
         return l;
     }
 
-	public boolean canOverrideImpl(MethodInstance mj, boolean quiet)
-			throws SemanticException {
+    public boolean canOverrideImpl(MethodInstance mj, boolean quiet)
+    throws SemanticException {
         JL5MethodInstance mi = this;
         JL5TypeSystem ts = (JL5TypeSystem)this.typeSystem();
         if (!(ts.areOverrideEquivalent(mi, (JL5MethodInstance)mj))) {
@@ -62,7 +62,7 @@ public class JL5MethodInstance_c extends MethodInstance_c implements JL5MethodIn
                                         "; incompatible parameter types",
                                         mi.position());
         }
-                
+
         Type miRet = mi.returnType();
         Type mjRet = mj.returnType();
 
@@ -136,9 +136,9 @@ public class JL5MethodInstance_c extends MethodInstance_c implements JL5MethodIn
         }
 
         return true;
-	}
-	
-	@Override
+    }
+
+    @Override
     public boolean callValidImpl(List argTypes) {
         List<Type> myFormalTypes = this.formalTypes;
         JL5Subst erasureSubst = null;
@@ -148,15 +148,15 @@ public class JL5MethodInstance_c extends MethodInstance_c implements JL5MethodIn
             erasureSubst = ((JL5ParsedClassType) this.container()).erasureSubst();
         }
 
-//         System.err.println("JL5MethodInstance_c callValid Impl " + this +" called with " +argTypes);
+        //         System.err.println("JL5MethodInstance_c callValid Impl " + this +" called with " +argTypes);
         // now compare myFormalTypes to argTypes
         if (!this.isVariableArity() && argTypes.size() != myFormalTypes.size()) {
-//            System.err.println("     1");
+            //            System.err.println("     1");
             return false;
         }
         if (this.isVariableArity() && argTypes.size() < myFormalTypes.size()-1) {
             // the last (variable) argument can consume 0 or more of the actual arguments. 
-//            System.err.println("     2");
+            //            System.err.println("     2");
             return false;
         }
 
@@ -193,11 +193,11 @@ public class JL5MethodInstance_c extends MethodInstance_c implements JL5MethodIn
                 // or the array type.
                 ArrayType arr = (ArrayType) myFormalTypes.get(myFormalTypes.size() - 1);
                 if (!ts.isImplicitCastValid(actual, arr)) {
-//                         System.err.println("     3: failed " + actual + " to " +formal + " and " + actual + " to " + arr);
+                    //                         System.err.println("     3: failed " + actual + " to " +formal + " and " + actual + " to " + arr);
                     return false;
                 }
             } else {
-//                     System.err.println("     4: failed " + actual + " to " +formal);
+                //                     System.err.println("     4: failed " + actual + " to " +formal);
                 return false;
             }
         }
@@ -205,11 +205,11 @@ public class JL5MethodInstance_c extends MethodInstance_c implements JL5MethodIn
         return true;
     }
 
-	
-	/**
-	 * See JLS 3rd ed. 15.12.2.5.
-	 */
-	@Override
+
+    /**
+     * See JLS 3rd ed. 15.12.2.5.
+     */
+    @Override
     public boolean moreSpecificImpl(ProcedureInstance p) {
         JL5MethodInstance p1 = this;
         JL5MethodInstance p2 = (JL5MethodInstance)p;
