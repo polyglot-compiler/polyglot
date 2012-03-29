@@ -15,9 +15,9 @@ import polyglot.visit.*;
 public class JL5ConstructorDecl_c extends ConstructorDecl_c implements JL5ConstructorDecl {
 
     protected List<TypeNode> typeParams;
-    
+
     public JL5ConstructorDecl_c(Position pos, Flags flags, Id name, List formals, List throwTypes, Block body) {
-    	this(pos, flags, name, formals, throwTypes, body, new ArrayList<ParamTypeNode>());
+        this(pos, flags, name, formals, throwTypes, body, new ArrayList<ParamTypeNode>());
     }
 
     public JL5ConstructorDecl_c(Position pos, Flags flags, Id name, List formals, List throwTypes, Block body, List typeParams){
@@ -26,22 +26,22 @@ public class JL5ConstructorDecl_c extends ConstructorDecl_c implements JL5Constr
     }
 
     @Override
-	public List typeParams(){
+    public List typeParams(){
         return this.typeParams;
     }
 
     @Override
-	public JL5ConstructorDecl typeParams(List<TypeNode> typeParams){
+    public JL5ConstructorDecl typeParams(List<TypeNode> typeParams){
         JL5ConstructorDecl_c n = (JL5ConstructorDecl_c) copy();
         n.typeParams = typeParams;
         return n;
     }
 
     protected JL5ConstructorDecl_c reconstruct(List formals, List throwTypes, Block body, List typeParams){
-		if (!CollectionUtil.equals(formals, this.formals)
-				|| !CollectionUtil.equals(throwTypes, this.throwTypes)
-				|| body != this.body
-				|| !CollectionUtil.equals(typeParams, this.typeParams)) {
+        if (!CollectionUtil.equals(formals, this.formals)
+                || !CollectionUtil.equals(throwTypes, this.throwTypes)
+                || body != this.body
+                || !CollectionUtil.equals(typeParams, this.typeParams)) {
             JL5ConstructorDecl_c n = (JL5ConstructorDecl_c) copy();
             n.formals = TypedList.copyAndCheck(formals, Formal.class, true);
             n.throwTypes = TypedList.copyAndCheck(throwTypes, TypeNode.class, true);
@@ -54,7 +54,7 @@ public class JL5ConstructorDecl_c extends ConstructorDecl_c implements JL5Constr
     }
 
     @Override
-	public Node visitChildren(NodeVisitor v){
+    public Node visitChildren(NodeVisitor v){
         List typeParams = visitList(this.typeParams, v);
         List formals = visitList(this.formals, v);
         List throwTypes = visitList(this.throwTypes, v);
@@ -100,7 +100,7 @@ public class JL5ConstructorDecl_c extends ConstructorDecl_c implements JL5Constr
 
         for (TypeNode tn : n.typeParams) {
             if (!tn.isDisambiguated()) {
-                
+
                 return n;
             }
             TypeVariable tv = (TypeVariable)tn.type();
@@ -113,7 +113,7 @@ public class JL5ConstructorDecl_c extends ConstructorDecl_c implements JL5Constr
         ci.setTypeParams(typeParams);
         return n;
     }
-    
+
     @Override
     public Context enterScope(Context c) {
         c = super.enterScope(c);
@@ -122,7 +122,7 @@ public class JL5ConstructorDecl_c extends ConstructorDecl_c implements JL5Constr
         }
         return c;
     }
-    
+
     @Override
     public void prettyPrintHeader(CodeWriter w, PrettyPrinter tr) {
         w.begin(0);
@@ -181,22 +181,37 @@ public class JL5ConstructorDecl_c extends ConstructorDecl_c implements JL5Constr
 
         w.end();
     }
-       
+
     @Override
-	public Node typeCheck(TypeChecker tc) throws SemanticException {
+    public Node typeCheck(TypeChecker tc) throws SemanticException {
+        // check throws clauses are not parameterized
+        for (Iterator it = throwTypes.iterator(); it.hasNext(); ){
+            TypeNode tn = (TypeNode)it.next();
+            Type next = tn.type();
+        }
+        
+        ConstructorDecl cd = this;
+
         // check at most last formal is variable
         for (int i = 0; i < formals.size(); i++){
             JL5Formal f = (JL5Formal)formals.get(i);
-            if (i != formals.size()-1 && f.isVarArg()){
-                throw new SemanticException("Only last formal can be variable in constructor declaration.", f.position());
+            if (f.isVarArg()){
+                if (i != formals.size()-1) {
+                    throw new SemanticException("Only last formal can be variable in constructor declaration.", f.position());
+                }
+                else {
+                    ci.setFlags(JL5Flags.setVarArgs(ci.flags()));
+                    cd = cd.flags(JL5Flags.setVarArgs(cd.flags()));
+                }
             }
         }
+        
         Flags flags = ci.flags();
         // check that the varargs flag is consistent with the type of the last argument.
-        if (JL5Flags.isVarArgs(this.flags()) != JL5Flags.isVarArgs(flags)) {
+        if (JL5Flags.isVarArgs(cd.flags()) != JL5Flags.isVarArgs(flags)) {
             throw new InternalCompilerError("VarArgs flag of AST and type disagree");
         }
-        
+
         if (JL5Flags.isVarArgs(flags)) {
             // check that the last formal type is an array
             if (ci.formalTypes().isEmpty()) {
