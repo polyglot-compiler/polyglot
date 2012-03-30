@@ -6,6 +6,6 @@ class C {
 	foo("abasdf");
 	foo("abasdf", s1);
 	foo("abasdf", s1, s1, s1, s1);
-	foo("abasdf", a);
+	foo("abasdf", (Object)a);
     }
 }
