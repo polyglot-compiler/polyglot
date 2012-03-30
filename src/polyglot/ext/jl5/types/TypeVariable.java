@@ -3,6 +3,7 @@ package polyglot.ext.jl5.types;
 import polyglot.ext.param.types.Param;
 import polyglot.types.ClassType;
 import polyglot.types.ReferenceType;
+import polyglot.util.Internable;
 
 public interface TypeVariable extends ReferenceType, Param {
     
@@ -15,7 +16,7 @@ public interface TypeVariable extends ReferenceType, Param {
     JL5ProcedureInstance declaringProcedure();
     
     int uniqueIdentifier();
-    
+
     void name(String name);
     String name();
 
@@ -38,4 +39,5 @@ public interface TypeVariable extends ReferenceType, Param {
     ReferenceType lowerBound();
     void setUpperBound(ReferenceType upperBound);
     void setLowerBound(ReferenceType lowerBound);
+    TypeVariable upperBound(ReferenceType upperBound);
 }

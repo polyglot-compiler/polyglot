@@ -62,8 +62,7 @@ public class JL5Subst_c extends Subst_c implements JL5Subst {
                 return (Type) subst.get(k);
             }
         }
-        t = (TypeVariable) t.copy();
-        t.setUpperBound((ReferenceType)substType(t.upperBound()));
+        t = (TypeVariable) t.upperBound((ReferenceType)substType(t.upperBound()));
         return t;
     }
 

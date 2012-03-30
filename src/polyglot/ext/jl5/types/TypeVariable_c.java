@@ -192,5 +192,15 @@ public class TypeVariable_c extends ReferenceType_c implements TypeVariable {
     public void setUpperBound(ReferenceType upperBound) {
         this.upperBound = upperBound;
     }
-    
+
+    @Override
+    public TypeVariable upperBound(ReferenceType upperBound) {
+        if (this.upperBound.equals(upperBound)) {
+            return this;
+        }
+        TypeVariable tv = (TypeVariable)this.copy();
+        tv.setUpperBound(upperBound);
+        return tv;
+    }
+
 }
