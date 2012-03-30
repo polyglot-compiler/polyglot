@@ -239,7 +239,7 @@ public class JL5MethodInstance_c extends MethodInstance_c implements JL5MethodIn
     }
 
     @Override
-    public List<TypeVariable> typeParams() {
+    public List<TypeVariable> typeParams() {    
         return Collections.unmodifiableList(this.typeParams);
     }
 
@@ -247,5 +247,44 @@ public class JL5MethodInstance_c extends MethodInstance_c implements JL5MethodIn
     public JL5Subst erasureSubst() {
         JL5TypeSystem ts = (JL5TypeSystem) this.typeSystem();
         return ts.erasureSubst(this.typeParams);
+    }
+
+
+    @Override
+    public String toString() {
+        StringBuffer sb = new StringBuffer();
+        sb.append(designator());
+        sb.append(" ");
+        if (!this.typeParams.isEmpty()) {
+            sb.append("<");
+            Iterator<TypeVariable> iter = this.typeParams().iterator();
+            while (iter.hasNext()) {
+                sb.append(iter.next());
+                if (iter.hasNext()) {
+                    sb.append(",");
+                }
+            }
+            sb.append(">");
+        }
+        sb.append(flags.translate());
+        sb.append(returnType);
+        sb.append(" ");
+        sb.append(container()); 
+        sb.append(" ");      
+        sb.append(signature());
+
+        if (! throwTypes.isEmpty()) {
+            sb.append(" throws ");
+            for (Iterator i = throwTypes.iterator(); i.hasNext(); ) {
+                Object o = i.next();
+                sb.append(o.toString());
+
+                if (i.hasNext()) {
+                    sb.append(", ");
+                }
+            }
+        }
+
+        return sb.toString();
     }
 }
