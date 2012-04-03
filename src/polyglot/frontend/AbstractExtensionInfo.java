@@ -28,6 +28,15 @@ package polyglot.frontend;
 import java.io.Reader;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.tools.FileObject;
+import javax.tools.JavaCompiler;
+import javax.tools.JavaFileObject;
+import javax.tools.StandardJavaFileManager;
+import javax.tools.ToolProvider;
+import javax.tools.JavaFileManager.Location;
 
 import polyglot.ast.Node;
 import polyglot.ast.NodeFactory;
@@ -38,7 +47,11 @@ import polyglot.translate.ext.ToExt;
 import polyglot.translate.ext.ToExt_c;
 import polyglot.types.TypeSystem;
 import polyglot.types.reflect.ClassFile;
+import polyglot.types.reflect.ClassFileLoader;
+import polyglot.types.reflect.ClassFileLoader_c;
+import polyglot.types.reflect.ClassFile_c;
 import polyglot.util.ErrorQueue;
+import polyglot.util.InternalCompilerError;
 
 /**
  * This is an abstract <code>ExtensionInfo</code>.
@@ -52,6 +65,9 @@ public abstract class AbstractExtensionInfo implements ExtensionInfo {
     protected TargetFactory target_factory = null;
     protected Stats stats;
     protected Scheduler scheduler;
+    protected StandardJavaFileManager file_manager;
+	protected StandardJavaFileManager filemanager;
+	protected ClassFileLoader classFileLoader;
 
     public abstract Goal getCompileGoal(Job job);
     public abstract String compilerName();
@@ -125,7 +141,7 @@ public abstract class AbstractExtensionInfo implements ExtensionInfo {
     /** Get the source file loader object for this extension. */
     public SourceLoader sourceLoader() {
         if (source_loader == null) {
-            source_loader = new SourceLoader(this, getOptions().source_path);
+            source_loader = new SourceLoader_c(this, getOptions().source_path);
         }
 
         return source_loader;
@@ -134,9 +150,11 @@ public abstract class AbstractExtensionInfo implements ExtensionInfo {
     /** Get the target factory object for this extension. */
     public TargetFactory targetFactory() {
         if (target_factory == null) {
-            target_factory = new TargetFactory(getOptions().output_directory,
-                                               getOptions().output_ext,
-                                               getOptions().output_stdout);
+			target_factory = new TargetFactory(
+					getOptions().ext_fm,
+					getOptions().source_output, 
+					getOptions().output_ext,
+					getOptions().output_stdout);
         }
 
         return target_factory;
@@ -190,14 +208,65 @@ public abstract class AbstractExtensionInfo implements ExtensionInfo {
         return getClass().getName();
     }
 
-    public ClassFile createClassFile(File classFileSource, byte[] code){
-        return new ClassFile(classFileSource, code, this);
+    @Deprecated
+    public ClassFile createClassFile(File f, byte[] code) {
+    	for(JavaFileObject jfo : file_manager.getJavaFileObjects(f))
+			try {
+				return new ClassFile_c(jfo,code,this);
+			} catch (IOException e) {
+		    	throw new InternalCompilerError("Error loading class file " + f, e);
+			}
+    	throw new InternalCompilerError("Error loading class file " + f);
     }
 
+    @Deprecated
     public FileSource createFileSource(File f, boolean user)
 	throws IOException
     {
-	return new FileSource(f, user);
+    	for(JavaFileObject jfo : file_manager.getJavaFileObjects(f))
+    		return new Source_c(jfo,user);
+    	
+    	throw new InternalCompilerError("Error loading source file " + f);
+    }
+    
+    public ClassFile createClassFile(FileObject f, byte[] code) throws IOException{
+    	return new ClassFile_c((JavaFileObject) f, code, this);
+    }
+    
+    public FileSource createFileSource(FileObject f, boolean user) throws IOException
+	{
+    	return new Source_c(f, user);
+    }
+    
+    public StandardJavaFileManager fileManager() {
+    	if(file_manager == null) {
+            JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
+            file_manager = compiler.getStandardFileManager(null, null, null);
+    	}
+    	return file_manager;
+    }
+    
+    public StandardJavaFileManager extFileManager() {
+    	return filemanager;
+    }
+    
+    public void setExtFileManager(StandardJavaFileManager fm) {
+    	filemanager = fm;
+    }
+    
+    public ClassLoader classLoader() {
+    	return ToolProvider.getSystemToolClassLoader();
+    }
+ 
+    public ClassFileLoader classFileLoader() {
+    	if(classFileLoader == null) {
+    		List<Location> locations = new ArrayList<Location>();
+    		locations.add(getOptions().bootclasspath);
+    		locations.add(getOptions().classpath);
+    		locations.add(getOptions().class_output);
+    		classFileLoader = new ClassFileLoader_c(this,locations);
+    	}
+		return classFileLoader;
     }
 
 	/**

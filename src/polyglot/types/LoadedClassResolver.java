@@ -28,6 +28,7 @@ package polyglot.types;
 import java.io.InvalidClassException;
 import java.util.*;
 
+import polyglot.frontend.ExtensionInfo;
 import polyglot.frontend.Scheduler;
 import polyglot.frontend.SchedulerException;
 import polyglot.main.Report;
@@ -51,14 +52,16 @@ public class LoadedClassResolver implements TopLevelResolver
 
   protected TypeSystem ts;
   protected TypeEncoder te;
-  protected ClassPathLoader loader;
+  
   protected Version version;
   protected Set nocache;
   protected boolean allowRawClasses;
+  protected ExtensionInfo extInfo;
 
-  protected final static Collection report_topics = CollectionUtil.list(
+  protected final static Collection<String> report_topics = CollectionUtil.list(
     Report.types, Report.resolver, Report.loader);
-
+  protected ClassFileLoader loader;
+  
   /**
    * Create a loaded class resolver.
    * @param ts The type system
@@ -67,18 +70,29 @@ public class LoadedClassResolver implements TopLevelResolver
    * @param version The version of classes to load.
    * @param allowRawClasses allow class files without encoded type information 
    */
+  @Deprecated
   public LoadedClassResolver(TypeSystem ts, String classpath,
                              ClassFileLoader loader, Version version,
                              boolean allowRawClasses)
   {
     this.ts = ts;
     this.te = new TypeEncoder(ts);
-    this.loader = new ClassPathLoader(classpath, loader);
+    this.loader = loader;
     this.version = version;
     this.nocache = new HashSet();
     this.allowRawClasses = allowRawClasses;
   }
 
+  public LoadedClassResolver(ExtensionInfo extInfo, boolean allowRawClasses) {
+	this.extInfo = extInfo;
+	this.ts = extInfo.typeSystem();
+	this.te = new TypeEncoder(extInfo.typeSystem());
+	this.loader = extInfo.classFileLoader();
+	this.version = extInfo.version();
+	this.nocache = new HashSet<String>();
+	this.allowRawClasses = allowRawClasses;
+  }
+  
   public boolean allowRawClasses() {
     return allowRawClasses;
   }
@@ -91,35 +105,7 @@ public class LoadedClassResolver implements TopLevelResolver
    * Load a class file for class <code>name</code>.
    */
   protected ClassFile loadFile(String name) {
-    if (nocache.contains(name)) {
-        return null;
-    }
-    
-    try {
-        ClassFile clazz = loader.loadClass(name);
-
-        if (clazz == null) {
-            if (Report.should_report(report_topics, 4)) {
-                Report.report(4, "Class " + name + " not found in classpath "
-                        + loader.classpath());
-            }
-        }
-        else {
-            if (Report.should_report(report_topics, 4)) {
-                Report.report(4, "Class " + name + " found in classpath "
-                        + loader.classpath());
-            }
-            return clazz;
-        }
-    }
-    catch (ClassFormatError e) {
-        if (Report.should_report(report_topics, 4))
-            Report.report(4, "Class " + name + " format error");
-    }
-
-    nocache.add(name);
-
-    return null;
+	return loader.loadFile(name);
   }
 
   /**

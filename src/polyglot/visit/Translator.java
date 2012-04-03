@@ -34,6 +34,8 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
+import javax.tools.FileObject;
+
 import polyglot.ast.Import;
 import polyglot.ast.Node;
 import polyglot.ast.NodeFactory;
@@ -47,9 +49,6 @@ import polyglot.types.Context;
 import polyglot.types.Package;
 import polyglot.types.TypeSystem;
 import polyglot.util.*;
-import polyglot.util.Copy;
-import polyglot.util.ErrorInfo;
-import polyglot.util.InternalCompilerError;
 
 /**
  * A Translator generates output code from the processed AST.
@@ -218,7 +217,7 @@ public class Translator extends PrettyPrinter implements Copy
     	List exports = exports(sfn);
     	
     	try {
-    	    File of;
+    	    FileObject of;
     	    CodeWriter w;
     	    
     	    String pkg = "";
@@ -232,15 +231,15 @@ public class Translator extends PrettyPrinter implements Copy
     	    
     	    if (exports.size() == 0) {
     	        // Use the source name to derive a default output file name.
-    	        of = tf.outputFile(pkg, sfn.source());
+    	        of = tf.outputFileObject(pkg, sfn.source());
     	    }
     	    else {
     	        first = (TopLevelDecl) exports.get(0);
-    	        of = tf.outputFile(pkg, first.name(), sfn.source());
+    	        of = tf.outputFileObject(pkg, first.name(), sfn.source());
     	    }
     	    
-    	    String opfPath = of.getPath();
-    	    if (!opfPath.endsWith("$")) outputFiles.add(of.getPath());
+    	    String opfPath = of.getName();
+    	    if (!opfPath.endsWith("$")) outputFiles.add(of);
     	    w = tf.outputCodeWriter(of, outputWidth);
     	    
     	    writeHeader(sfn, w);
@@ -254,8 +253,8 @@ public class Translator extends PrettyPrinter implements Copy
     	            w.flush();
     	            w.close();
     	            
-    	            of = tf.outputFile(pkg, decl.name(), sfn.source());
-    	            outputFiles.add(of.getPath());
+    	            of = tf.outputFileObject(pkg, decl.name(), sfn.source());
+    	            outputFiles.add(of);
     	            w = tf.outputCodeWriter(of, outputWidth);
     	            
     	            writeHeader(sfn, w);

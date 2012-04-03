@@ -35,6 +35,11 @@ import polyglot.util.QuotedStringTokenizer;
 import java.io.*;
 import java.util.*;
 
+import javax.tools.FileObject;
+import javax.tools.JavaCompiler;
+import javax.tools.JavaFileManager;
+import javax.tools.JavaCompiler.CompilationTask;
+
 /** Main is the main program of the extensible compiler. It should not
  * need to be replaced.
  */
@@ -155,93 +160,51 @@ public class Main
       }
   }
 
-  protected boolean invokePostCompiler(Options options,
-                                    Compiler compiler,
-                                    ErrorQueue eq) {
-      if (options.post_compiler != null && !options.output_stdout) {
-          Runtime runtime = Runtime.getRuntime();
-          QuotedStringTokenizer st = new QuotedStringTokenizer(options.post_compiler);
-          int pc_size = st.countTokens();
-          int options_size = 2;
-          if (options.class_output_directory != null) {
-              options_size +=2;
-          }
-          if (options.generate_debugging_info) options_size++;
-          String[] javacCmd = new String[pc_size+options_size+compiler.outputFiles().size()];
-          int j = 0;
-          for (int i = 0; i < pc_size; i++) {
-              javacCmd[j++] = st.nextToken();
-          }
-          javacCmd[j++] = "-classpath";
-          javacCmd[j++] = options.constructPostCompilerClasspath();
-          if (options.class_output_directory != null) {
-              javacCmd[j++] = "-d";
-              javacCmd[j++] = options.class_output_directory.toString();
-          }
-          if (options.generate_debugging_info) {
-              javacCmd[j++] = "-g";
-          }
+  protected boolean invokePostCompiler(Options options, Compiler compiler,
+			ErrorQueue eq) {
+		if (options.post_compiler != null && !options.output_stdout) {
+			Runtime runtime = Runtime.getRuntime();
+			QuotedStringTokenizer st = new QuotedStringTokenizer(
+					options.post_compiler_args);
+			int pc_size = st.countTokens();
 
-          Iterator iter = compiler.outputFiles().iterator();
-          for (; iter.hasNext(); j++) {
-              javacCmd[j] = (String) iter.next();
-          }
+			ArrayList<String> javacArgs = new ArrayList<String>(pc_size);
+			while (st.hasMoreTokens()) {
+				javacArgs.add(st.nextToken());
+			}
 
-          if (Report.should_report(verbose, 1)) {
-              StringBuffer cmdStr = new StringBuffer();
-              for (int i = 0; i < javacCmd.length; i++)
-                  cmdStr.append(javacCmd[i]+" ");
-              Report.report(1, "Executing post-compiler " + cmdStr);
-          }
+			if (options.generate_debugging_info) {
+				javacArgs.add("-g");
+			}
 
-          try {
-              if (options.class_output_directory != null) {
-                  options.class_output_directory.mkdirs();
-              }
-              Process proc = runtime.exec(javacCmd);
+			if (Report.should_report(verbose, 1)) {
+				Report.report(1, "Executing post-compiler "
+						+ options.post_compiler.getClass() + " with arguments "
+						+ javacArgs);
+			}
+			try {
+				ByteArrayOutputStream err = new ByteArrayOutputStream();
+				Writer javac_err = new OutputStreamWriter(err);
+				JavaCompiler javac = options.post_compiler;
+				JavaFileManager fileManager = compiler.sourceExtension().getOptions().java_fm;
 
-              InputStreamReader err = new InputStreamReader(proc.getErrorStream());
+				CompilationTask task = javac.getTask(javac_err, fileManager, null, javacArgs, null, compiler.outputFiles());
 
-              try {
-                  char[] c = new char[72];
-                  int len;
-                  StringBuffer sb = new StringBuffer();
-                  while((len = err.read(c)) > 0) {
-                      sb.append(String.valueOf(c, 0, len));
-                  }
+				if (!task.call())
+					eq.enqueue(ErrorInfo.POST_COMPILER_ERROR, err.toString());
 
-                  if (sb.length() != 0) {
-                      eq.enqueue(ErrorInfo.POST_COMPILER_ERROR, sb.toString());
-                  }
-              }
-              finally {
-                  err.close();
-              }
-
-              proc.waitFor();
-
-              if (!options.keep_output_files) {
-                String[] rmCmd = new String[1+compiler.outputFiles().size()];
-                rmCmd[0] = "rm";
-                iter = compiler.outputFiles().iterator();
-                for (int i = 1; iter.hasNext(); i++)
-                  rmCmd[i] = (String) iter.next();
-                runtime.exec(rmCmd);
-              }
-
-              if (proc.exitValue() > 0) {
-                eq.enqueue(ErrorInfo.POST_COMPILER_ERROR,
-                                 "Non-zero return code: " + proc.exitValue());
-                return false;
-              }
-          }
-          catch(Exception e) {
-              eq.enqueue(ErrorInfo.POST_COMPILER_ERROR, e.getMessage());
-              return false;
-          }
-      }
-      return true;
-  }
+				if (!options.keep_output_files) {
+					for (FileObject fo : compiler.outputFiles()) {
+						fo.delete();
+					}
+				}
+			} catch (Exception e) {
+				eq.enqueue(ErrorInfo.POST_COMPILER_ERROR, e.getMessage());
+				return false;
+			}
+		}
+		return true;
+	}
 
   private List explodeOptions(String[] args) throws TerminationException {
       LinkedList ll = new LinkedList();
