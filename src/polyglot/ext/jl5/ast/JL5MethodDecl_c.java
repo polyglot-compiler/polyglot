@@ -65,9 +65,13 @@ public class JL5MethodDecl_c extends MethodDecl_c implements JL5MethodDecl {
             return this;
         }
 
+        
+        boolean isVarArgs = false;
         List formalTypes = new ArrayList(formals.size());
         for (int i = 0; i < formals.size(); i++) {
             formalTypes.add(ts.unknownType(position()));
+            JL5Formal f = (JL5Formal)formals.get(i);
+            isVarArgs |= f.isVarArg();
         }
 
         List throwTypes = new ArrayList(throwTypes().size());
@@ -79,6 +83,10 @@ public class JL5MethodDecl_c extends MethodDecl_c implements JL5MethodDecl {
 
         if (ct.flags().isInterface()) {
             f = f.Public().Abstract();
+        }
+        
+        if (isVarArgs) {
+            f = JL5Flags.setVarArgs(f);
         }
 
         List typeParams = new ArrayList(typeParams().size());
@@ -139,7 +147,6 @@ public class JL5MethodDecl_c extends MethodDecl_c implements JL5MethodDecl {
             TypeNode tn = (TypeNode)it.next();
             Type next = tn.type();
         }
-
 
         // check at most last formal is variable
         List newArgs = new ArrayList();
