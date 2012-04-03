@@ -265,6 +265,12 @@ public interface TypeSystem {
      */
     boolean isAccessible(MemberInstance mi, ClassType contextClass);
 
+    /**
+     * Checks whether a class member mi, which is declared in container or an ancestor of container, can be accessed from the body of
+     * class <code>contextClass</code>, accessing it via the type container.
+     */
+    boolean isAccessible(MemberInstance mi, ReferenceType container, ClassType contextClass);
+
 
     /**
      * Checks whether a class can be accessed from Context context.

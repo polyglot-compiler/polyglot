@@ -451,7 +451,23 @@ public class TypeSystem_c implements TypeSystem
         assert_(mi);
 
         ReferenceType target = mi.container();
+        return isAccessible(mi, target, contextClass);
+    }
+    /**
+     * Checks whether the member mi of container container can be accessed from code that is
+     * declared in the class contextClass.
+     */
+    public boolean isAccessible(MemberInstance mi, ReferenceType container, ClassType contextClass) {
 	Flags flags = mi.flags();
+	
+	ReferenceType target;
+        // does container inhereit mi?
+	if (container.descendsFrom(mi.container()) && mi.flags().isPublic()) {
+	    target = container;
+	}
+	else {
+	    target = mi.container();
+	}
 
         if (! target.isClass()) {
             // public members of non-classes are accessible;
@@ -1127,7 +1143,7 @@ public class TypeSystem_c implements TypeSystem
 		}
 
                 if (methodCallValid(mi, name, argTypes)) {
-                    if (isAccessible(mi, currClass)) {
+                    if (isAccessible(mi, container, currClass)) {
                         if (Report.should_report(Report.types, 3)) {
                             Report.report(3, "->acceptable: " + mi + " in "
                                           + mi.container());

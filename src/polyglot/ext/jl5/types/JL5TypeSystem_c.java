@@ -433,7 +433,7 @@ public class JL5TypeSystem_c extends ParamTypeSystem_c implements JL5TypeSystem 
 //                System.err.println("methodCallValidImpl for " + mi + " " + name + " " + argTypes + " : " + substMi);
                 if (substMi != null) {
                     mi = substMi;
-                    if (isAccessible(mi, currClass)) {
+                    if (isAccessible(mi, container, currClass)) {
                         if (Report.should_report(Report.types, 3)) {
                             Report.report(3, "->acceptable: " + mi + " in " + mi.container());
                         }
@@ -1216,10 +1216,18 @@ public class JL5TypeSystem_c extends ParamTypeSystem_c implements JL5TypeSystem 
 
 
     @Override
-    public boolean isAccessible(MemberInstance mi, ClassType contextClass) {
+    public boolean isAccessible(MemberInstance mi, ReferenceType container, ClassType contextClass) {
         assert_(mi);
 
-        ReferenceType target = mi.container();
+        ReferenceType target;
+        // does container inhereit mi?
+        if (container.descendsFrom(mi.container()) && mi.flags().isPublic()) {
+            target = container;
+        }
+        else {
+            target = mi.container();
+        }
+
         Flags flags = mi.flags();
 
         if (! target.isClass()) {
