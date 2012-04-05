@@ -115,7 +115,7 @@ public class InferenceSolver_c implements InferenceSolver {
                     solution[i] = u.get(0);
                 }
                 else if (u.size() > 1) {
-                    solution[i] = ts.intersectionType(Position.compilerGenerated(), u);
+                    solution[i] = ts.lub(Position.compilerGenerated(), u);
                 }
             }
         }

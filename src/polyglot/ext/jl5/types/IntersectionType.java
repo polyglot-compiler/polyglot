@@ -5,7 +5,7 @@ import java.util.List;
 import polyglot.types.ClassType;
 import polyglot.types.ReferenceType;
 
-public interface IntersectionType extends ClassType {
+public interface IntersectionType extends JL5ClassType {
     List<ReferenceType> bounds();
     void setBounds(List<ReferenceType> newBounds);
     

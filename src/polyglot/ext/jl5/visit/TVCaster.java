@@ -70,6 +70,17 @@ public class TVCaster extends AscriptionVisitor {
             c = (Cast) c.type(c.expr().type());
             ret = c;
         }
+        if (parent instanceof Conditional) {
+            Conditional c = (Conditional)parent;
+            if (c.consequent() == old || c.alternative() == old) {
+                // n is the consequent or alternative
+                if (c.type().isReference() && !((Expr)n).type().equals(c.type())) {
+                    // c is a reference type that's different from the type of the conditional.
+                    // add a cast, since the Java 1.5 typing rules for conditionals are more permissive.
+                    return insertCast((Expr)n, c.type());
+                }
+            }
+        }
         if (parent instanceof Call && old == ((Call)parent).target()) {
             Call c = (Call)parent;
             if (c.target() instanceof Expr && !(c.target() instanceof Special)) {

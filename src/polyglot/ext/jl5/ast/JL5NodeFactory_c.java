@@ -238,15 +238,24 @@ public class JL5NodeFactory_c extends NodeFactory_c implements JL5NodeFactory {
         return n;
 	}
 
-	@Override
-	public Switch Switch(Position pos, Expr expr, List elements) {
-		Switch n = new JL5Switch_c(pos, expr, elements);
+    @Override
+    public Switch Switch(Position pos, Expr expr, List elements) {
+        Switch n = new JL5Switch_c(pos, expr, elements);
         n = (Switch)n.ext(extFactory().extSwitch());
         n = (Switch)n.del(delFactory().delSwitch());
         return n;
-	}
+    }
 
+    
 	@Override
+    public Conditional Conditional(Position pos, Expr cond, Expr consequent, Expr alternative) {
+	    Conditional n = new JL5Conditional_c(pos, cond, consequent, alternative);
+        n = (Conditional)n.ext(extFactory().extConditional());
+        n = (Conditional)n.del(delFactory().delConditional());
+        return n;
+    }
+
+    @Override
 	public Case Case(Position pos, Expr expr) {
 		Case n = new JL5Case_c(pos, expr);
         n = (Case)n.ext(extFactory().extCase());

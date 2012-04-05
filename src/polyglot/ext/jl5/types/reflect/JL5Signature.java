@@ -418,7 +418,7 @@ public class JL5Signature extends Attribute {
             JL5ParsedClassType pct = (JL5ParsedClassType) ct;
             if (!createTypeVars) {
                 try {
-                    ct = ts.instantiate(position, pct.pclass(), (List<Type>)classArgsMap.get(ct.name()));
+                    ct = ts.instantiate(position, pct, (List<Type>)classArgsMap.get(ct.name()));
                 } catch (SemanticException e) {
                     throw new InternalCompilerError(e);
                 }

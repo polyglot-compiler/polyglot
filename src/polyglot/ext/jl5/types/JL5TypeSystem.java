@@ -2,8 +2,8 @@ package polyglot.ext.jl5.types;
 
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
 
+import polyglot.ext.jl5.types.inference.LubType;
 import polyglot.ext.param.types.ParamTypeSystem;
 import polyglot.frontend.Source;
 import polyglot.types.*;
@@ -78,6 +78,12 @@ public interface JL5TypeSystem extends TypeSystem, ParamTypeSystem {
      * and "to" is any parameterized type of the form G<T1 ... Tn>.
      */
     boolean isUncheckedConversion(Type from, Type to);
+    
+    
+    /**
+     * Instantiate class clazz with actuals.
+     */
+    ClassType instantiate(Position pos, JL5ParsedClassType clazz, List<Type> actuals) throws SemanticException;
     
     /**
      * Returns the erased type of t.
@@ -218,6 +224,27 @@ public interface JL5TypeSystem extends TypeSystem, ParamTypeSystem {
      * Create a raw class
      */
     RawClass rawClass(JL5ParsedClassType base);
+
+    /**
+     * Perform boxing conversion on t. If t is a primitive, then
+     * the return type will be the ReferenceType appropriate for boxing t 
+     * (e.g., java.lang.Integer for int, etc.). If t is not a numeric primitive
+     * then the return type is t.
+     */
+    Type boxingConversion(Type t);
+    /**
+     * Perform unboxing conversion on t. If t is a wrapper type for a primitive type, then
+     * the return type will be the appropriate primitive type 
+     * (e.g., int for java.lang.Integer, etc.). If t is not a wrapper type for a  primitive
+     * type then the return type is t.
+     */
+    Type unboxingConversion(Type t);
+
+    /**
+     * Compute the least upper bound of a set of types <code>us</code>. This is the
+     * lub(U1 ... Uk) function, as defined in the JLS 3rd edition, Section 15.12.2.7. 
+     */
+    LubType lub(Position pos, List<ReferenceType> us);
 
 
 

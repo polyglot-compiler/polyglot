@@ -1,9 +1,6 @@
 package polyglot.ext.jl5.types;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 import polyglot.frontend.Job;
 import polyglot.types.*;
@@ -182,12 +179,18 @@ public class IntersectionType_c extends ClassType_c implements IntersectionType 
     }
 
     @Override
-    public boolean isImplicitCastValidImpl(Type toType) {
+    public LinkedList<Type> isImplicitCastValidChainImpl(Type toType) {
+
         for (Type b : bounds()) {
-            if (typeSystem().isImplicitCastValid(b, toType)) return true;
+            if (typeSystem().isImplicitCastValid(b, toType)) {
+                LinkedList<Type> chain = new LinkedList<Type>();
+                chain.add(this);
+                chain.add(toType);
+                return chain;
+            }
         }
         //or just isImplicitCastValid(getSyntaticClass(), toType());
-        return false;
+        return null;
     }
 
     @Override
@@ -269,13 +272,31 @@ public class IntersectionType_c extends ClassType_c implements IntersectionType 
     @Override
     public Job job() {
         throw new UnsupportedOperationException();
-//        // TODO Auto-generated method stub
-//        return null;
     }
 
     @Override
     public void setBounds(List<ReferenceType> newBounds) {
         this.bounds = newBounds;        
         checkBounds();
+    }
+
+    @Override
+    public boolean isRawClass() {
+        return false;
+    }
+
+    @Override
+    public EnumInstance enumConstantNamed(String name) {
+        return null;
+    }
+
+    @Override
+    public List<EnumInstance> enumConstants() {
+        return Collections.emptyList();
+    }
+
+    @Override
+    public String translateAsReceiver(Resolver resolver) {
+        throw new UnsupportedOperationException();
     }
 }

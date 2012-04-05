@@ -4,6 +4,8 @@ import java.util.*;
 
 import polyglot.ext.jl5.types.inference.InferenceSolver;
 import polyglot.ext.jl5.types.inference.InferenceSolver_c;
+import polyglot.ext.jl5.types.inference.LubType;
+import polyglot.ext.jl5.types.inference.LubType_c;
 import polyglot.ext.jl5.types.reflect.JL5ClassFileLazyClassInitializer;
 import polyglot.ext.param.types.PClass;
 import polyglot.ext.param.types.ParamTypeSystem_c;
@@ -603,6 +605,10 @@ public class JL5TypeSystem_c extends ParamTypeSystem_c implements JL5TypeSystem 
     @Override
     public ClassType instantiate(Position pos, PClass base, List actuals) throws SemanticException {
         JL5ParsedClassType clazz = (JL5ParsedClassType) base.clazz();
+        return instantiate(pos, clazz, actuals);
+    }
+    @Override
+    public ClassType instantiate(Position pos, JL5ParsedClassType clazz, List<Type> actuals) throws SemanticException {
         if (clazz.typeVariables().isEmpty() || (actuals == null || actuals.isEmpty())) {
             return clazz;
         }
@@ -616,7 +622,7 @@ public class JL5TypeSystem_c extends ParamTypeSystem_c implements JL5TypeSystem 
         if (allNull) {
             return clazz;
         }
-        return super.instantiate(pos, base, actuals);
+        return super.instantiate(pos, clazz.pclass(), actuals);
     }
     public JL5ProcedureInstance instantiate(Position pos, JL5ProcedureInstance mi, List<Type> actuals) {
         Map<TypeVariable, Type> m = new LinkedHashMap<TypeVariable, Type>();
@@ -1564,5 +1570,32 @@ public class JL5TypeSystem_c extends ParamTypeSystem_c implements JL5TypeSystem 
         }
         return t;
     }
+  
+     @Override
+     public PrimitiveType promote(Type t1, Type t2) throws SemanticException {
+         return super.promote(unboxingConversion(t1), unboxingConversion(t2));
+     }
+
+     @Override
+     public Type boxingConversion(Type t) {
+         if (t.isPrimitive()) {
+             return this.wrapperClassOfPrimitive(t.toPrimitive());
+         }
+         return t;
+     }
+     @Override
+     public Type unboxingConversion(Type t) {
+         Type s = primitiveTypeOfWrapper(t);
+         if (s != null) {
+             return s;
+         }
+         return t;
+     }
+
+    @Override
+    public LubType lub(Position pos, List<ReferenceType> us) {
+        return new LubType_c(this, pos, us);
+    }
+
 
 }

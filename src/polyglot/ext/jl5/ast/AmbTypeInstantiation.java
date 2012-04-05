@@ -92,7 +92,7 @@ public class AmbTypeInstantiation extends TypeNode_c implements TypeNode, Ambigu
         }
         
 //        System.err.println("Instantiating " + pct + " with " + actuals);
-        Type instantiated = ts.instantiate(position, pct.pclass(), actuals);
+        Type instantiated = ts.instantiate(position, pct, actuals);
         return sc.nodeFactory().CanonicalTypeNode(this.position, instantiated);
     }
 
