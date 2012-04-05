@@ -94,6 +94,7 @@ polyglot.ext.jl5.ExtensionInfo "-d out -classpath java-out -noserial -post \"jav
 	WildCard02.jl5 (Semantic, "does not match");
 	TC195.jl5;
 	TC12.jl5;
+	Conditional01.jl5;
 	Array.jl5;
 	Array2.jl5 (Semantic, "should be declared abstract");
 	Array03.jl5;
@@ -302,6 +303,7 @@ polyglot.ext.jl5.ExtensionInfo "-d out -classpath java-out -removeJava5isms -enu
         WildCard02.jl5 (Semantic, "does not match");
         TC195.jl5;
         TC12.jl5;
+	Conditional01.jl5;
         Array.jl5;
         Array2.jl5 (Semantic, "should be declared abstract");
         Array03.jl5;

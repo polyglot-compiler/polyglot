@@ -1,0 +1,11 @@
+ class C {
+    public Object f() {
+	return true? new SliceIS() : new SliceU();
+    }
+
+	static class D  {}
+	static final class SliceU extends D {}
+	
+	static class SliceIS extends D {}
+	static final class SliceUS extends D {}
+}
