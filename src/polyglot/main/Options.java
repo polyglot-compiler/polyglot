@@ -44,6 +44,7 @@ import java.util.StringTokenizer;
 
 import javax.tools.JavaCompiler;
 import javax.tools.JavaFileManager;
+import javax.tools.JavaFileManager.Location;
 import javax.tools.JavaFileObject;
 import javax.tools.StandardJavaFileManager;
 import javax.tools.StandardLocation;
@@ -128,8 +129,8 @@ public class Options {
 	protected boolean classpath_given = false;
 	
 	public StandardJavaFileManager ext_fm;
-	public StandardJavaFileManager jl_fm = CustomExtFileManager.getInstance();
-	protected StandardJavaFileManager java_fm = CustomJavaFileManager_.getInstance();
+	public final StandardJavaFileManager jl_fm = CustomExtFileManager.getInstance();
+	public final StandardJavaFileManager java_fm = CustomJavaFileManager_.getInstance();
 	private boolean extExists;
 
 	/**
@@ -468,6 +469,10 @@ public class Options {
 					ext_fm.setLocation(source_path, sourcepath_directories);
 				else
 					jl_fm.setLocation(source_path, sourcepath_directories);
+				if (!classpath_given) {
+					ext_fm.setLocation(classpath, classpath_directories);
+					jl_fm.setLocation(classpath, classpath_directories);
+				}
 			} catch (IOException e) {
 				throw new UsageError(e.getMessage());
 			}
@@ -680,5 +685,17 @@ public class Options {
 	public String constructPostCompilerClasspath() {
 		return source_output + pathSeparator + "." + pathSeparator
 				+ output_classpath;
+	}
+	
+	protected void processStrAndSetLocation(String str, Set<File> s, Location loc, StandardJavaFileManager fm) throws IOException {
+		StringTokenizer st = new StringTokenizer(str, pathSeparator);
+		while (st.hasMoreTokens()) {
+			File f = new File(st.nextToken());
+			if (f.exists())
+				s.add(f);
+		}
+		fm.setLocation(loc, s);
+		jl_fm.setLocation(loc, s);
+		java_fm.setLocation(loc, s);
 	}
 }

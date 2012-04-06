@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -40,9 +41,11 @@ public class ClassFileLoader_c implements ClassFileLoader {
 
 	protected ExtensionInfo extInfo;
 	
+	private String packageName;
+	
 	protected static final int BUF_SIZE = 1024 * 8;
 	protected final static Set<Kind> ALL_KINDS = new HashSet<Kind>();
-	{
+	static {
 		ALL_KINDS.add(Kind.CLASS);
 		ALL_KINDS.add(Kind.SOURCE);
 		ALL_KINDS.add(Kind.HTML);
@@ -52,23 +55,33 @@ public class ClassFileLoader_c implements ClassFileLoader {
 	protected final static Collection<String> report_topics = CollectionUtil
 	.list(Report.types, Report.resolver, Report.loader);
 
+	public ClassFileLoader_c(ExtensionInfo extInfo) {
+		this(extInfo, Collections.EMPTY_LIST);
+	}
+	
 	public ClassFileLoader_c(ExtensionInfo extInfo, List<Location> locations) {
 		this.extInfo = extInfo;
 		this.locations = new ArrayList<Location>(locations);
-		this.packageCache = new HashMap<String,Boolean>();
+		this.packageCache = new HashMap<String, Boolean>();
 		this.nocache = new HashSet<String>();
+	}
+	
+	/** Constructor for narrow search (i.e. location) */
+	public ClassFileLoader_c(ExtensionInfo extInfo, Location loc) {
+		this(extInfo);
+		this.locations.add(loc);
+	}
+	
+	/** Constructor for narrower search  (i.e. location + package)*/
+	public ClassFileLoader_c(ExtensionInfo extInfo, Location loc, String packageName) {
+		this(extInfo);
+		this.locations.add(loc);
+		this.packageName = packageName;
 	}
 	
 	public void addLocation(Location loc) {
 		locations.add(loc);
 	}
-	
-	/*public void addLocation(Location loc) {
-		List<Location> newLocs = new ArrayList<Location>(locations.size()+1);
-		newLocs.add(loc);
-		newLocs.addAll(locations);
-		locations = newLocs;
-	}*/
 	
 	public boolean packageExists(String name) {
 		Boolean exists = packageCache.get(name);
@@ -77,7 +90,8 @@ public class ClassFileLoader_c implements ClassFileLoader {
 		else {
 			StandardJavaFileManager fm = extInfo.extFileManager();
 			exists = false;
-			for(Location l : locations) {
+			for(int i = locations.size() - 1; i >= 0; i--) {
+				Location l = locations.get(i);
 				Iterable<JavaFileObject> contents;
 				try {
 					contents = fm.list(l, name, ALL_KINDS, false);

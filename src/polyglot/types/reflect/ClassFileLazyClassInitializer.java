@@ -216,8 +216,8 @@ public class ClassFileLazyClassInitializer implements LazyClassInitializer {
      * @param str The type descriptor.
      * @return The corresponding list of types.
      */
-    protected List typeListForString(String str) {
-        List types = new ArrayList();
+    protected List<Type> typeListForString(String str) {
+        List<Type> types = new ArrayList<Type>();
 
         for (int i = 0; i < str.length(); i++) {
             int dims = 0;
@@ -283,10 +283,10 @@ public class ClassFileLazyClassInitializer implements LazyClassInitializer {
      * @return The corresponding type.
      */
     protected Type typeForString(String str) {
-        List l = typeListForString(str);
+        List<Type> l = typeListForString(str);
 
         if (l.size() == 1) {
-            return (Type) l.get(0);
+            return l.get(0);
         }
 
         throw new InternalCompilerError("Bad type string: \"" + str + "\"");
@@ -533,10 +533,10 @@ public class ClassFileLazyClassInitializer implements LazyClassInitializer {
         }
     
         int index = type.indexOf(')', 1);
-        List argTypes = typeListForString(type.substring(1, index));
+        List<Type> argTypes = typeListForString(type.substring(1, index));
         Type returnType = typeForString(type.substring(index+1));
     
-        List excTypes = new ArrayList();
+        List<Type> excTypes = new ArrayList<Type>();
     
         Exceptions exceptions = method.getExceptions();
         if (exceptions != null) {
@@ -563,7 +563,7 @@ public class ClassFileLazyClassInitializer implements LazyClassInitializer {
         // Get a method instance for the <init> method.
         MethodInstance mi = methodInstance(method, ct);
     
-        List formals = mi.formalTypes();
+        List<Type> formals = mi.formalTypes();
     
         if (ct.isInnerClass()) {
             // If an inner class, the first argument may be a reference to an

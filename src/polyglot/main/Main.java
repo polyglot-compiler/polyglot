@@ -163,7 +163,6 @@ public class Main
   protected boolean invokePostCompiler(Options options, Compiler compiler,
 			ErrorQueue eq) {
 		if (options.post_compiler != null && !options.output_stdout) {
-			Runtime runtime = Runtime.getRuntime();
 			QuotedStringTokenizer st = new QuotedStringTokenizer(
 					options.post_compiler_args);
 			int pc_size = st.countTokens();

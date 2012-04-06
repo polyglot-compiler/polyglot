@@ -64,7 +64,9 @@ public class CustomExtFileManager implements StandardJavaFileManager {
 	}
 	
 	public FileObject getFileForInput(Location location, String packageName, String relativeName) throws IOException {
-		if(location.equals(StandardLocation.SOURCE_OUTPUT)) {
+		if (relativeName.startsWith("/") || relativeName.startsWith(".") || relativeName.startsWith(".."))
+			return new CustomFileObject(relativeName, false);
+		if (location.equals(StandardLocation.SOURCE_OUTPUT)) {
 			String pkg = packageName.equals("") ? "" : (packageName.replace('.', separatorChar) + separator);
 			for (File f : javac_fm.getLocation(location)) {
 				String absPath = f.getAbsolutePath() + separator + pkg + relativeName;

@@ -230,7 +230,7 @@ public abstract class AbstractExtensionInfo implements ExtensionInfo {
     }
     
     public ClassFile createClassFile(FileObject f, byte[] code) throws IOException{
-    	return new ClassFile_c((JavaFileObject) f, code, this);
+    	return new ClassFile_c(f, code, this);
     }
     
     public FileSource createFileSource(FileObject f, boolean user) throws IOException
