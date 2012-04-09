@@ -432,7 +432,6 @@ public class JL5TypeSystem_c extends ParamTypeSystem_c implements JL5TypeSystem 
                 // Method name must match
                 if (! mi.name().equals(name)) continue;
                 JL5MethodInstance substMi = methodCallValid(mi, name, argTypes, actualTypeArgs, expectedReturnType); 
-//                System.err.println("methodCallValidImpl for " + mi + " " + name + " " + argTypes + " : " + substMi);
                 if (substMi != null) {
                     mi = substMi;
                     if (isAccessible(mi, container, currClass)) {
