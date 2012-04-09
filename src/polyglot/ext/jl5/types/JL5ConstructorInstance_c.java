@@ -60,10 +60,12 @@ public class JL5ConstructorInstance_c extends ConstructorInstance_c implements J
                 formal = arr.base();
             }
             if (ts.isImplicitCastValid(actual, formal)) {
-                return true;
+                // Yep, this type is OK. Try the next one.
+                continue;
             }
             if (erasureSubst != null && ts.isImplicitCastValid(actual, erasureSubst.substType(formal))) {
-                return true;
+                // Yep, this type is OK. Try the next one.
+                continue;
             }
             // the actual can't be cast to the formal.
             // HOWEVER: there is still hope.
