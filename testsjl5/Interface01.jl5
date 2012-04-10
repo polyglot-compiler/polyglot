@@ -1,0 +1,17 @@
+interface Comp<T> {
+    void m(T x);
+}
+
+abstract class C<U extends C<U>> implements Comp<U> {
+    public void m(U x) { }
+
+    public static <T extends C<T>> void valueOf(String name, T x) {
+    }
+
+}
+
+class D extends C<D> {
+    void foo() {
+	
+    }
+}

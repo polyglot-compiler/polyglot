@@ -77,6 +77,7 @@ polyglot.ext.jl5.ExtensionInfo "-d out -classpath java-out -noserial -post \"jav
         Access01.jl5;
         Access02.jl5;
 	Anonymous01.jl5;
+	Interface01.jl5;
 	Import01.jl5;
 	Import02.jl5;
 	Import03.jl5 (Semantic);
@@ -99,6 +100,7 @@ polyglot.ext.jl5.ExtensionInfo "-d out -classpath java-out -noserial -post \"jav
 	Array2.jl5 (Semantic, "should be declared abstract");
 	Array03.jl5;
 	Array04.jl5;
+	Array05.jl5;
 	C.jl5;
 	FBoundSub.jl5;
 	FBoundSub2.jl5;
@@ -286,6 +288,7 @@ polyglot.ext.jl5.ExtensionInfo "-d out -classpath java-out -removeJava5isms -enu
         Access01.jl5;
         Access02.jl5;
         Anonymous01.jl5;
+	Interface01.jl5;
         Import01.jl5;
         Import02.jl5;
         Import03.jl5 (Semantic);
@@ -308,6 +311,7 @@ polyglot.ext.jl5.ExtensionInfo "-d out -classpath java-out -removeJava5isms -enu
         Array2.jl5 (Semantic, "should be declared abstract");
         Array03.jl5;
         Array04.jl5;
+        Array05.jl5;
         C.jl5;
         FBoundSub.jl5;
         FBoundSub2.jl5;
