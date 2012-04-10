@@ -17,8 +17,23 @@ public class LubType_c extends ClassType_c implements LubType {
 
     protected List<ReferenceType> lubElems;
     public LubType_c(TypeSystem ts, Position pos, List<ReferenceType> lubElems) {
-        super(ts, pos);
-        this.lubElems = lubElems;
+        super(ts, pos);  
+        // replace any raw classes with the erased version of the raw class.
+        List<ReferenceType> l = null;
+        for (int i = 0; i < lubElems.size(); i++) {
+            ReferenceType t = lubElems.get(i);
+            if (t instanceof RawClass) {
+                t = ((RawClass)t).erased();
+               if (l == null) {
+                   l = new ArrayList<ReferenceType>(lubElems);                   
+               }
+               l.set(i, t);
+            }
+        }
+        if (l == null) {
+            l = lubElems;
+        }
+        this.lubElems = l;
     }
 
     public List<ReferenceType> lubElements() {
@@ -46,10 +61,10 @@ public class LubType_c extends ClassType_c implements LubType {
     
     private ReferenceType lub(Type... a) {
         List<ReferenceType> l = new ArrayList<ReferenceType>();
+        JL5TypeSystem ts = (JL5TypeSystem)this.ts;
         for (Type t : a) {
             l.add((ReferenceType) t);
         }
-        JL5TypeSystem ts = (JL5TypeSystem)this.ts;
         return ts.lub(this.position, l);
     }
 
