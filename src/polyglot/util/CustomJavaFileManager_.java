@@ -22,17 +22,11 @@ import javax.tools.JavaFileObject.Kind;
 import static polyglot.util.SharedResources.pathObjectMap;
 
 public class CustomJavaFileManager_ implements StandardJavaFileManager {
-
-	private static final StandardJavaFileManager instance = new CustomJavaFileManager_();
 	
 	private final StandardJavaFileManager javac_fm; //JavacFileManager used by javac
 	
-	private CustomJavaFileManager_() {
+	public CustomJavaFileManager_() {
 		javac_fm = ToolProvider.getSystemJavaCompiler().getStandardFileManager(null, null, null);
-	}
-
-	public static StandardJavaFileManager getInstance() {
-		return instance;
 	}
 	
 	public int isSupportedOption(String option) {

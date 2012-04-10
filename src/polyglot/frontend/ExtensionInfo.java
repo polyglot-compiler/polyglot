@@ -122,20 +122,7 @@ public interface ExtensionInfo {
     /** Get a parser for this language extension. */
     Parser parser(Reader reader, FileSource source, ErrorQueue eq);
 
-    /** Create class file */ 
-    @Deprecated
-    ClassFile createClassFile(File classFileSource, byte[] code);
-
-    /** Create file source for a file. The main purpose is to allow
-        the character encoding to be defined. */
-    @Deprecated
-    FileSource createFileSource(File sourceFile, boolean userSpecified)
-	throws IOException;
-
 	ToExt getToExt(ExtensionInfo to_ext, Node n);
-	
-	/** Get the file manager used by this extension. */
-	StandardJavaFileManager fileManager();
 	
 	/** Get the extension file mananger used by this extension. This 
 	 *  file manager manages the extension source files and translated 
@@ -143,8 +130,10 @@ public interface ExtensionInfo {
 	 */
 	StandardJavaFileManager extFileManager();
 	
-	/** Set the extension file manager to default */
-	void setExtFileManager(StandardJavaFileManager fm);
+	/** Get the file manager associated with the output extension of 
+	 *  this extension. 
+	 */
+	StandardJavaFileManager outputExtFileManager();
 	
 	/** Get the classLoader used by this extension. */
 	ClassLoader classLoader();

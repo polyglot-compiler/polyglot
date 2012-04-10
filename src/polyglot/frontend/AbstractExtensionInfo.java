@@ -50,6 +50,8 @@ import polyglot.types.reflect.ClassFile;
 import polyglot.types.reflect.ClassFileLoader;
 import polyglot.types.reflect.ClassFileLoader_c;
 import polyglot.types.reflect.ClassFile_c;
+import polyglot.util.CustomExtFileManager;
+import polyglot.util.CustomJavaFileManager_;
 import polyglot.util.ErrorQueue;
 import polyglot.util.InternalCompilerError;
 
@@ -65,8 +67,8 @@ public abstract class AbstractExtensionInfo implements ExtensionInfo {
     protected TargetFactory target_factory = null;
     protected Stats stats;
     protected Scheduler scheduler;
-    protected StandardJavaFileManager file_manager;
-	protected StandardJavaFileManager filemanager;
+	protected StandardJavaFileManager extFM;
+	protected StandardJavaFileManager outputExtFM;
 	protected ClassFileLoader classFileLoader;
 
     public abstract Goal getCompileGoal(Job job);
@@ -151,7 +153,7 @@ public abstract class AbstractExtensionInfo implements ExtensionInfo {
     public TargetFactory targetFactory() {
         if (target_factory == null) {
 			target_factory = new TargetFactory(
-					getOptions().ext_fm,
+					extFileManager(),
 					getOptions().source_output, 
 					getOptions().output_ext,
 					getOptions().output_stdout);
@@ -207,27 +209,6 @@ public abstract class AbstractExtensionInfo implements ExtensionInfo {
     public String toString() {
         return getClass().getName();
     }
-
-    @Deprecated
-    public ClassFile createClassFile(File f, byte[] code) {
-    	for(JavaFileObject jfo : file_manager.getJavaFileObjects(f))
-			try {
-				return new ClassFile_c(jfo,code,this);
-			} catch (IOException e) {
-		    	throw new InternalCompilerError("Error loading class file " + f, e);
-			}
-    	throw new InternalCompilerError("Error loading class file " + f);
-    }
-
-    @Deprecated
-    public FileSource createFileSource(File f, boolean user)
-	throws IOException
-    {
-    	for(JavaFileObject jfo : file_manager.getJavaFileObjects(f))
-    		return new Source_c(jfo,user);
-    	
-    	throw new InternalCompilerError("Error loading source file " + f);
-    }
     
     public ClassFile createClassFile(FileObject f, byte[] code) throws IOException{
     	return new ClassFile_c(f, code, this);
@@ -238,20 +219,16 @@ public abstract class AbstractExtensionInfo implements ExtensionInfo {
     	return new Source_c(f, user);
     }
     
-    public StandardJavaFileManager fileManager() {
-    	if(file_manager == null) {
-            JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
-            file_manager = compiler.getStandardFileManager(null, null, null);
-    	}
-    	return file_manager;
-    }
-    
     public StandardJavaFileManager extFileManager() {
-    	return filemanager;
+    	if (extFM == null)
+    		extFM = new CustomExtFileManager();
+    	return extFM;
     }
     
-    public void setExtFileManager(StandardJavaFileManager fm) {
-    	filemanager = fm;
+    public StandardJavaFileManager outputExtFileManager() {
+    	if (outputExtFM == null)
+    		outputExtFM = new CustomExtFileManager();
+    	return outputExtFM; 
     }
     
     public ClassLoader classLoader() {

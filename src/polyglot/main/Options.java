@@ -76,7 +76,7 @@ public class Options {
 	public int error_count = 100;
 	protected Set<File> sourcepath_directories = new LinkedHashSet<File>();
 	protected Set<File> classpath_directories = new LinkedHashSet<File>();
-	public JavaFileManager.Location source_path; // List<File>
+	public JavaFileManager.Location source_path;
 	public JavaFileManager.Location source_output;
 	public JavaFileManager.Location class_output;
 	public JavaFileManager.Location classpath;
@@ -128,10 +128,8 @@ public class Options {
 	protected boolean java_output_given = false;
 	protected boolean classpath_given = false;
 	
-	public StandardJavaFileManager ext_fm;
-	public final StandardJavaFileManager jl_fm = CustomExtFileManager.getInstance();
-	public final StandardJavaFileManager java_fm = CustomJavaFileManager_.getInstance();
-	private boolean extExists;
+	protected StandardJavaFileManager ext_fm;
+	protected StandardJavaFileManager outputExt_fm;
 
 	/**
 	 * Constructor
@@ -139,13 +137,7 @@ public class Options {
 	public Options(ExtensionInfo extension) {
 		this.extension = extension;
 		ext_fm = extension.extFileManager();
-		if (ext_fm == null) {
-			ext_fm = jl_fm;
-			extension.setExtFileManager(jl_fm);
-			extExists = false;
-		}
-		else
-			extExists = true;
+		outputExt_fm = extension.outputExtFileManager();
 		setDefaultValues();
 	}
 
@@ -175,19 +167,15 @@ public class Options {
 		Collection<File> s = Collections.singleton(currFile);
 		Collection<File> b = Collections.singleton(bootclassFile);
 		try {
-			jl_fm.setLocation(source_path, sourcepath_directories);
-			if (extExists)
-				ext_fm.setLocation(source_output, s);
-			jl_fm.setLocation(source_output, s);
-			java_fm.setLocation(source_output, s);
-			jl_fm.setLocation(class_output, s);
-			java_fm.setLocation(class_output, s);
-			jl_fm.setLocation(bootclasspath, b);
-			java_fm.setLocation(bootclasspath, b);
-			if (extExists)
-				ext_fm.setLocation(classpath, classpath_directories);
-			jl_fm.setLocation(classpath, classpath_directories);
-			java_fm.setLocation(classpath, classpath_directories);
+			ext_fm.setLocation(source_path, sourcepath_directories);
+			ext_fm.setLocation(source_output, s);
+			outputExt_fm.setLocation(source_output, s);
+			ext_fm.setLocation(class_output, s);
+			outputExt_fm.setLocation(class_output, s);
+			ext_fm.setLocation(bootclasspath, b);
+			outputExt_fm.setLocation(bootclasspath, b);
+			ext_fm.setLocation(classpath, classpath_directories);
+			outputExt_fm.setLocation(classpath, classpath_directories);
 		} catch (IOException e) {
 			throw new InternalCompilerError(
 					"Error setting directory for class output or bootclasspath or classpath");
@@ -256,16 +244,12 @@ public class Options {
 				f.mkdirs();
 			Collection<File> od = Collections.singleton(f);
 			try {
-				if (extExists)
-					ext_fm.setLocation(class_output, od);
-				jl_fm.setLocation(class_output, od);
-				java_fm.setLocation(class_output, od);
+				ext_fm.setLocation(class_output, od);
+				outputExt_fm.setLocation(class_output, od);
 				//if -D has not been specified, default -D to -d
 				if (!java_output_given) {
-					if (ext_fm != jl_fm)
-						ext_fm.setLocation(source_output, od);
-					jl_fm.setLocation(source_output,od);
-					java_fm.setLocation(source_output, od);
+					ext_fm.setLocation(source_output,od);
+					outputExt_fm.setLocation(source_output, od);
 				}
 			} catch (IOException e) {
 				throw new UsageError(e.getMessage());
@@ -275,10 +259,8 @@ public class Options {
 			i++;
 			Collection<File> od = Collections.singleton(new File(args[i]));
 			try {
-				if (extExists)
-					ext_fm.setLocation(source_output, od);
-				jl_fm.setLocation(source_output, od);
-				java_fm.setLocation(source_output, od);
+				ext_fm.setLocation(source_output, od);
+				outputExt_fm.setLocation(source_output, od);
 			} catch (IOException e) {
 				throw new UsageError(e.getMessage());
 			}
@@ -293,10 +275,8 @@ public class Options {
 					classpath_directories.add(f);
 			}
 			try {
-				if (extExists)
-					ext_fm.setLocation(classpath, classpath_directories);
-				jl_fm.setLocation(classpath, classpath_directories);
-				java_fm.setLocation(classpath, classpath_directories);
+				ext_fm.setLocation(classpath, classpath_directories);
+				outputExt_fm.setLocation(classpath, classpath_directories);
 			} catch (IOException e) {
 				throw new UsageError(e.getMessage());
 			}
@@ -312,10 +292,8 @@ public class Options {
 					path.add(f);
 			}
 			try {
-				if (extExists)
-					ext_fm.setLocation(bootclasspath, path);
-				jl_fm.setLocation(bootclasspath, path);
-				java_fm.setLocation(bootclasspath, path);
+				ext_fm.setLocation(bootclasspath, path);
+				outputExt_fm.setLocation(bootclasspath, path);
 			} catch (IOException e) {
 				throw new UsageError(e.getMessage());
 			}
@@ -329,10 +307,7 @@ public class Options {
 					sourcepath_directories.add(f);
 			}
 			try {
-				if (extExists)
-					ext_fm.setLocation(source_path, sourcepath_directories);
-				else
-					jl_fm.setLocation(source_path, sourcepath_directories);
+				ext_fm.setLocation(source_path, sourcepath_directories);
 			} catch (IOException e) {
 				throw new UsageError(e.getMessage());
 			}
@@ -465,13 +440,10 @@ public class Options {
 					classpath_directories.add(f);
 			}
 			try {
-				if (extExists)
-					ext_fm.setLocation(source_path, sourcepath_directories);
-				else
-					jl_fm.setLocation(source_path, sourcepath_directories);
+				ext_fm.setLocation(source_path, sourcepath_directories);
 				if (!classpath_given) {
 					ext_fm.setLocation(classpath, classpath_directories);
-					jl_fm.setLocation(classpath, classpath_directories);
+					outputExt_fm.setLocation(classpath, classpath_directories);
 				}
 			} catch (IOException e) {
 				throw new UsageError(e.getMessage());
@@ -695,7 +667,7 @@ public class Options {
 				s.add(f);
 		}
 		fm.setLocation(loc, s);
-		jl_fm.setLocation(loc, s);
-		java_fm.setLocation(loc, s);
+		ext_fm.setLocation(loc, s);
+		outputExt_fm.setLocation(loc, s);
 	}
 }

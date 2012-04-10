@@ -2,7 +2,7 @@ package polyglot.util;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.File;
+import static java.io.File.separatorChar;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FileReader;
@@ -21,7 +21,6 @@ import javax.tools.JavaFileObject.Kind;
 
 public class CustomJavaClassObject implements JavaFileObject {
 
-	//private CustomOutputStream cos;
 	private FileOutputStream fos;
 	private FileInputStream fis;
 	private FileWriter fw;
@@ -74,7 +73,7 @@ public class CustomJavaClassObject implements JavaFileObject {
 	}
 
 	public URI toUri() {
-		return URI.create(className.replace('.', File.separatorChar) + Kind.CLASS.extension);
+		return URI.create(className.replace('.', separatorChar) + Kind.CLASS.extension);
 	}
 
 	public Modifier getAccessLevel() {

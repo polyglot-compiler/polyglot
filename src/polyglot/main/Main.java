@@ -47,16 +47,16 @@ public class Main
 {
 
   /** Source files specified on the command line */
-  private Set source;
+  private Set<String> source;
 
   public final static String verbose = "verbose";
 
   /* modifies args */
-  protected ExtensionInfo getExtensionInfo(List args) throws TerminationException {
+  protected ExtensionInfo getExtensionInfo(List<String> args) throws TerminationException {
       ExtensionInfo ext = null;
 
-      for (Iterator i = args.iterator(); i.hasNext(); ) {
-          String s = (String)i.next();
+      for (Iterator<String> i = args.iterator(); i.hasNext(); ) {
+          String s = i.next();
           if (s.equals("-ext") || s.equals("-extension"))
           {
               if (ext != null) {
@@ -67,7 +67,7 @@ public class Main
               if (!i.hasNext()) {
                   throw new TerminationException("missing argument");
               }
-              String extName = (String)i.next();
+              String extName = i.next();
               i.remove();
               ext = loadExtension("polyglot.ext." + extName + ".ExtensionInfo");
           }
@@ -81,7 +81,7 @@ public class Main
               if (!i.hasNext()) {
                   throw new TerminationException("missing argument");
               }
-              String extClass = (String)i.next();
+              String extClass = i.next();
               i.remove();
               ext = loadExtension(extClass);
           }
@@ -105,8 +105,8 @@ public class Main
   }
 
   public void start(String[] argv, ExtensionInfo ext, ErrorQueue eq) throws TerminationException {
-      source = new LinkedHashSet();
-      List args = explodeOptions(argv);
+      source = new LinkedHashSet<String>();
+      List<String> args = explodeOptions(argv);
       if (ext == null) {
           ext = getExtensionInfo(args);
       }
@@ -185,7 +185,7 @@ public class Main
 				ByteArrayOutputStream err = new ByteArrayOutputStream();
 				Writer javac_err = new OutputStreamWriter(err);
 				JavaCompiler javac = options.post_compiler;
-				JavaFileManager fileManager = compiler.sourceExtension().getOptions().java_fm;
+				JavaFileManager fileManager = compiler.sourceExtension().outputExtFileManager();
 
 				CompilationTask task = javac.getTask(javac_err, fileManager, null, javacArgs, null, compiler.outputFiles());
 
@@ -205,8 +205,8 @@ public class Main
 		return true;
 	}
 
-  private List explodeOptions(String[] args) throws TerminationException {
-      LinkedList ll = new LinkedList();
+  private List<String> explodeOptions(String[] args) throws TerminationException {
+      LinkedList<String> ll = new LinkedList<String>();
 
       for (int i = 0; i < args.length; i++) {
           // special case for the @ command-line parameter
@@ -214,7 +214,7 @@ public class Main
               String fn = args[i].substring(1);
               try {
                   BufferedReader lr = new BufferedReader(new FileReader(fn));
-                  LinkedList newArgs = new LinkedList();
+                  LinkedList<String> newArgs = new LinkedList<String>();
 
                   while (true) {
                       String l = lr.readLine();
@@ -254,7 +254,7 @@ public class Main
 
   static ExtensionInfo loadExtension(String ext) throws TerminationException {
     if (ext != null && ! ext.equals("")) {
-      Class extClass = null;
+      Class<?> extClass = null;
 
       try {
         extClass = Class.forName(ext);
@@ -283,7 +283,7 @@ public class Main
     return null;
   }
 
-  static private Collection timeTopics = new ArrayList(1);
+  static private Collection<String> timeTopics = new ArrayList<String>(1);
   static {
       timeTopics.add("time");
   }
