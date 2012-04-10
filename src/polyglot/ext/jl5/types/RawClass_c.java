@@ -33,7 +33,7 @@ public class RawClass_c extends JL5ClassType_c implements RawClass {
     private JL5SubstClassType erased() {
         if (this.erased == null) {            
             JL5TypeSystem ts = (JL5TypeSystem)this.ts;
-            JL5Subst es = ts.erasureSubst(this.base.typeVariables(), true);
+            JL5Subst es = ts.erasureSubst(this.base.typeVariables());
             this.erased = new JL5SubstClassType_c((JL5TypeSystem) ts, base.position(),
                                     (JL5ParsedClassType) base, es);
         }

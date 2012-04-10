@@ -696,10 +696,7 @@ public class JL5TypeSystem_c extends ParamTypeSystem_c implements JL5TypeSystem 
 
     @Override
     public Subst subst(Map substMap, Map cache) {
-        return new JL5Subst_c(this, substMap, cache, false);
-    }
-    protected Subst subst(Map substMap, Map cache, boolean isRawClass) {
-        return new JL5Subst_c(this, substMap, cache, isRawClass);
+        return new JL5Subst_c(this, substMap, cache);
     }
 
     @Override
@@ -866,10 +863,6 @@ public class JL5TypeSystem_c extends ParamTypeSystem_c implements JL5TypeSystem 
 
     @Override
     public JL5Subst erasureSubst(List<TypeVariable> typeParams) {
-        return erasureSubst(typeParams, false);
-    }
-    @Override
-    public JL5Subst erasureSubst(List<TypeVariable> typeParams, boolean isRawClass) {
         Map m = new LinkedHashMap();
         Set selfReferences = new LinkedHashSet();
         for (TypeVariable tv : typeParams) {
@@ -878,7 +871,7 @@ public class JL5TypeSystem_c extends ParamTypeSystem_c implements JL5TypeSystem 
         if (m.isEmpty()) {
             return null;
         }
-        JL5Subst ret = (JL5Subst)this.subst(m, new HashMap(), isRawClass);
+        JL5Subst ret = (JL5Subst)this.subst(m, new HashMap());
         return ret;
     }
 

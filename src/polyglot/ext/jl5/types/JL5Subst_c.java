@@ -4,13 +4,16 @@ import java.util.*;
 
 import polyglot.ext.param.types.ParamTypeSystem;
 import polyglot.ext.param.types.Subst_c;
-import polyglot.types.*;
+import polyglot.types.ClassType;
+import polyglot.types.ConstructorInstance;
+import polyglot.types.MethodInstance;
+import polyglot.types.ReferenceType;
+import polyglot.types.Type;
 import polyglot.util.InternalCompilerError;
 
 public class JL5Subst_c extends Subst_c implements JL5Subst {
 
-    private final boolean isRawClass;
-    public JL5Subst_c(ParamTypeSystem ts, Map subst, Map cache, boolean isRawClass) {
+    public JL5Subst_c(ParamTypeSystem ts, Map subst, Map cache) {
         super(ts, subst, cache);
 //        if (subst.isEmpty()) {
 //            Thread.dumpStack();
@@ -21,22 +24,9 @@ public class JL5Subst_c extends Subst_c implements JL5Subst {
                 continue;
             throw new InternalCompilerError("bad map: " + subst);
         }
-        
-        this.isRawClass = isRawClass;
 
     }
     
-    @Override
-    protected Type uncachedSubstType(Type t) {
-        if (t instanceof JL5SubstClassType && isRawClass) {
-            // don't perform substitution on subst types, just return a raw class
-            JL5SubstClassType sct = (JL5SubstClassType)t;
-            JL5TypeSystem ts = (JL5TypeSystem)this.typeSystem();
-            return ts.rawClass(sct.base(), t.position());
-        }
-        return super.uncachedSubstType(t);
-    }
-
     @Override
     public Type substType(Type t) {
         if (t instanceof TypeVariable) {
@@ -52,17 +42,28 @@ public class JL5Subst_c extends Subst_c implements JL5Subst {
         return super.substType(t);
     }
 
-
+    // when substituting type variables that aren't in the subst map, 
+    // keep track of which ones we have seen already, so that we don't go into 
+    // an infinite loop as we subst on their upper bounds.
+    private LinkedList<TypeVariable> visitedTypeVars = new LinkedList<TypeVariable>();
+    
     public Type substTypeVariable(TypeVariable t) {
         if (subst.containsKey(t)) {
             return (Type)subst.get(t);
+        }
+        if (visitedTypeVars.contains(t)) {
+            return t;
         }
         for (TypeVariable k : (Set<TypeVariable>)subst.keySet()) {
             if (((TypeVariable_c)k).uniqueIdentifier == ((TypeVariable_c)t).uniqueIdentifier) {
                 return (Type) subst.get(k);
             }
         }
+        visitedTypeVars.addLast(t);
         t = (TypeVariable) t.upperBound((ReferenceType)substType(t.upperBound()));
+        if (visitedTypeVars.removeLast() != t) {
+            throw new InternalCompilerError("Unexpected type variable was last on the list");
+        }
         return t;
     }
 
@@ -107,9 +108,6 @@ public class JL5Subst_c extends Subst_c implements JL5Subst {
             if (pct.typeVariables().isEmpty()) {
                 // no parameters to be instantiated!
                 return pct;
-            }
-            if (isRawClass) {
-                return ((JL5TypeSystem) ts).rawClass(pct, t.position());
             }
             return new JL5SubstClassType_c((JL5TypeSystem) ts, t.position(),
                                            (JL5ParsedClassType) t, this);
