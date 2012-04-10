@@ -1,0 +1,12 @@
+interface I { }
+interface J { }
+class C<T> implements I, J {
+    private final C f = null;
+    public C<?> m() {
+	return null;
+    }
+
+    public void n(boolean b) {
+	C o = b ? this.f : this.m();
+    }
+}
