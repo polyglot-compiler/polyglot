@@ -1017,10 +1017,35 @@ public class JL5TypeSystem_c extends ParamTypeSystem_c implements JL5TypeSystem 
         if (super.isCastValid(fromType, toType)) {
             return true;
         }
-        // try an unchecked conversion.
-        Type raw = this.toRawType(toType);
-        if (raw != toType) {
-            return isCastValid(fromType, raw);
+        // JLS 3rd ed. Section 5.5
+        if (fromType.isClass()) {
+            if (!fromType.toClass().flags().isInterface()) {
+                // fromType is class type
+                if (toType instanceof TypeVariable) {
+                    return this.isCastValid(fromType, ((TypeVariable)toType).upperBound());
+                }
+                if (toType.isClass()) {
+                    if (!toType.toClass().flags().isInterface()) {
+                        // toType is a class type
+                        Type erasedFrom = erasureType(fromType);
+                        Type erasedTo = erasureType(toType);
+                        return (erasedFrom != fromType || erasedTo != toType) && (erasedFrom.isSubtype(erasedTo) || erasedTo.isSubtype(erasedFrom));
+                        // TODO: need to check whether there is a supertype X
+                        // of this and Y of toType that have the same erasure 
+                        // and are provably distinct.
+                    }
+                    else {
+                        // toType is an interface
+                        // TODO: need to check whether there is a supertype X
+                        // of this and Y of toType that have the same erasure 
+                        // and are provably distinct.
+                    }
+                }
+            }
+            else {
+                // fromType is an interface
+                // TODO
+            }
         }
         return false;
     }
