@@ -130,11 +130,7 @@ public interface ExtensionInfo {
 	 */
 	StandardJavaFileManager extFileManager();
 	
-	/** Get the file manager associated with the output extension of 
-	 *  this extension. 
-	 */
-	StandardJavaFileManager outputExtFileManager();
-	
+	void addLocationsToFileManager();
 	/** Get the classLoader used by this extension. */
 	ClassLoader classLoader();
 

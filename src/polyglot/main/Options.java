@@ -74,8 +74,13 @@ public class Options {
 	 * Fields for storing values for options.
 	 */
 	public int error_count = 100;
-	protected Set<File> sourcepath_directories = new LinkedHashSet<File>();
-	protected Set<File> classpath_directories = new LinkedHashSet<File>();
+	public Set<File> sourcepath_directories = new LinkedHashSet<File>();
+	public Collection<File> source_output_dir;
+	public Collection<File> class_output_dir;
+	public Set<File> classpath_directories = new LinkedHashSet<File>();
+	public Set<File> bootclasspath_directories = new LinkedHashSet<File>();
+	public File currFile;
+	public File bootFile;
 	public JavaFileManager.Location source_path;
 	public JavaFileManager.Location source_output;
 	public JavaFileManager.Location class_output;
@@ -125,11 +130,12 @@ public class Options {
 	 */
 	public boolean merge_strings = false;
 
-	protected boolean java_output_given = false;
-	protected boolean classpath_given = false;
+	public boolean source_output_given = false;
+	public boolean class_output_given = false;
+	public boolean bootclasspath_given = false;
+	public boolean classpath_given = false;
 	
 	protected StandardJavaFileManager ext_fm;
-	protected StandardJavaFileManager outputExt_fm;
 
 	/**
 	 * Constructor
@@ -137,7 +143,6 @@ public class Options {
 	public Options(ExtensionInfo extension) {
 		this.extension = extension;
 		ext_fm = extension.extFileManager();
-		outputExt_fm = extension.outputExtFileManager();
 		setDefaultValues();
 	}
 
@@ -145,8 +150,8 @@ public class Options {
 	 * Set default values for options
 	 */
 	public void setDefaultValues() {
-		File currFile = new File(System.getProperty("user.dir"));
-		File bootclassFile = new File(System.getProperty("java.home") + separator + "lib" + separator + "rt.jar");
+		currFile = new File(System.getProperty("user.dir"));
+		bootFile = new File(System.getProperty("java.home") + separator + "lib" + separator + "rt.jar");
 		
 		source_path = StandardLocation.SOURCE_PATH;
 		source_output = StandardLocation.SOURCE_OUTPUT;
@@ -162,23 +167,6 @@ public class Options {
 			File f = new File(st.nextToken());
 			if (f.exists())
 				classpath_directories.add(f);
-		}
-		
-		Collection<File> s = Collections.singleton(currFile);
-		Collection<File> b = Collections.singleton(bootclassFile);
-		try {
-			ext_fm.setLocation(source_path, sourcepath_directories);
-			ext_fm.setLocation(source_output, s);
-			outputExt_fm.setLocation(source_output, s);
-			ext_fm.setLocation(class_output, s);
-			outputExt_fm.setLocation(class_output, s);
-			ext_fm.setLocation(bootclasspath, b);
-			outputExt_fm.setLocation(bootclasspath, b);
-			ext_fm.setLocation(classpath, classpath_directories);
-			outputExt_fm.setLocation(classpath, classpath_directories);
-		} catch (IOException e) {
-			throw new InternalCompilerError(
-					"Error setting directory for class output or bootclasspath or classpath");
 		}
 
 		post_compiler = ToolProvider.getSystemJavaCompiler();
@@ -242,29 +230,13 @@ public class Options {
 			File f = new File(args[i]);
 			if (!f.exists())
 				f.mkdirs();
-			Collection<File> od = Collections.singleton(f);
-			try {
-				ext_fm.setLocation(class_output, od);
-				outputExt_fm.setLocation(class_output, od);
-				//if -D has not been specified, default -D to -d
-				if (!java_output_given) {
-					ext_fm.setLocation(source_output,od);
-					outputExt_fm.setLocation(source_output, od);
-				}
-			} catch (IOException e) {
-				throw new UsageError(e.getMessage());
-			}
+			class_output_dir = Collections.singleton(f);
+			class_output_given = true;
 			i++;
 		} else if (args[i].equals("-D")) {
 			i++;
-			Collection<File> od = Collections.singleton(new File(args[i]));
-			try {
-				ext_fm.setLocation(source_output, od);
-				outputExt_fm.setLocation(source_output, od);
-			} catch (IOException e) {
-				throw new UsageError(e.getMessage());
-			}
-			java_output_given = true;
+			source_output_dir = Collections.singleton(new File(args[i]));
+			source_output_given = true;
 			i++;
 		} else if (args[i].equals("-classpath") || args[i].equals("-cp")) {
 			i++;
@@ -274,29 +246,17 @@ public class Options {
 				if (f.exists())
 					classpath_directories.add(f);
 			}
-			try {
-				ext_fm.setLocation(classpath, classpath_directories);
-				outputExt_fm.setLocation(classpath, classpath_directories);
-			} catch (IOException e) {
-				throw new UsageError(e.getMessage());
-			}
 			classpath_given = true;
 			i++;
 		} else if (args[i].equals("-bootclasspath")) {
 			i++;
-			List<File> path = new ArrayList<File>();
 			StringTokenizer st = new StringTokenizer(args[i], pathSeparator);
 			while (st.hasMoreTokens()) {
 				File f = new File(st.nextToken());
 				if (f.exists())
-					path.add(f);
+					bootclasspath_directories.add(f);
 			}
-			try {
-				ext_fm.setLocation(bootclasspath, path);
-				outputExt_fm.setLocation(bootclasspath, path);
-			} catch (IOException e) {
-				throw new UsageError(e.getMessage());
-			}
+			bootclasspath_given = true;
 			i++;
 		} else if (args[i].equals("-sourcepath")) {
 			i++;
@@ -305,11 +265,6 @@ public class Options {
 				File f = new File(st.nextToken());
 				if (f.exists())
 					sourcepath_directories.add(f);
-			}
-			try {
-				ext_fm.setLocation(source_path, sourcepath_directories);
-			} catch (IOException e) {
-				throw new UsageError(e.getMessage());
 			}
 			i++;
 		} else if (args[i].equals("-commandlineonly")) {
@@ -438,15 +393,6 @@ public class Options {
 				sourcepath_directories.add(f);
 				if (!classpath_given)
 					classpath_directories.add(f);
-			}
-			try {
-				ext_fm.setLocation(source_path, sourcepath_directories);
-				if (!classpath_given) {
-					ext_fm.setLocation(classpath, classpath_directories);
-					outputExt_fm.setLocation(classpath, classpath_directories);
-				}
-			} catch (IOException e) {
-				throw new UsageError(e.getMessage());
 			}
 			i++;
 		}
@@ -668,6 +614,5 @@ public class Options {
 		}
 		fm.setLocation(loc, s);
 		ext_fm.setLocation(loc, s);
-		outputExt_fm.setLocation(loc, s);
 	}
 }

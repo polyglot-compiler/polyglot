@@ -29,6 +29,7 @@ import java.io.Reader;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import javax.tools.FileObject;
@@ -68,7 +69,6 @@ public abstract class AbstractExtensionInfo implements ExtensionInfo {
     protected Stats stats;
     protected Scheduler scheduler;
 	protected StandardJavaFileManager extFM;
-	protected StandardJavaFileManager outputExtFM;
 	protected ClassFileLoader classFileLoader;
 
     public abstract Goal getCompileGoal(Job job);
@@ -225,12 +225,6 @@ public abstract class AbstractExtensionInfo implements ExtensionInfo {
     	return extFM;
     }
     
-    public StandardJavaFileManager outputExtFileManager() {
-    	if (outputExtFM == null)
-    		outputExtFM = new CustomExtFileManager();
-    	return outputExtFM; 
-    }
-    
     public ClassLoader classLoader() {
     	return ToolProvider.getSystemToolClassLoader();
     }
@@ -245,6 +239,28 @@ public abstract class AbstractExtensionInfo implements ExtensionInfo {
     	}
 		return classFileLoader;
     }
+    
+    public void addLocationsToFileManager() {
+    	StandardJavaFileManager ext_fm = extFileManager();
+    	Options options = getOptions();
+		try {
+			ext_fm.setLocation(options.source_path, options.sourcepath_directories);
+			if (!options.source_output_given && !options.class_output_given)
+				options.source_output_dir = options.class_output_dir = Collections.singleton(options.currFile);
+			else if (!options.source_output_given && options.class_output_given)
+				options.source_output_dir = options.class_output_dir;
+			else if (!options.class_output_given)
+				options.class_output_dir = Collections.singleton(options.currFile);
+			ext_fm.setLocation(options.source_output, options.source_output_dir);
+			ext_fm.setLocation(options.class_output, options.class_output_dir);
+			if (!options.bootclasspath_given)
+				options.bootclasspath_directories.add(options.bootFile);
+			ext_fm.setLocation(options.bootclasspath, options.bootclasspath_directories);
+			ext_fm.setLocation(options.classpath, options.classpath_directories);
+		} catch (IOException e) {
+			throw new InternalCompilerError(e.getMessage());
+		}
+	}
 
 	/**
 	 * Get the ToExt extension object used for translating AST nodes to the

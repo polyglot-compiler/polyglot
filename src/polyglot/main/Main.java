@@ -128,6 +128,7 @@ public class Main
           throw new TerminationException(ue.exitCode);
       }
 
+      ext.addLocationsToFileManager();
       if (eq == null) {
           eq = new StdErrorQueue(System.err,
                                  options.error_count,
@@ -185,7 +186,7 @@ public class Main
 				ByteArrayOutputStream err = new ByteArrayOutputStream();
 				Writer javac_err = new OutputStreamWriter(err);
 				JavaCompiler javac = options.post_compiler;
-				JavaFileManager fileManager = compiler.sourceExtension().outputExtFileManager();
+				JavaFileManager fileManager = compiler.sourceExtension().extFileManager();
 
 				CompilationTask task = javac.getTask(javac_err, fileManager, null, javacArgs, null, compiler.outputFiles());
 
