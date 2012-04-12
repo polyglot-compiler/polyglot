@@ -1,0 +1,16 @@
+class C {
+	public static <T> T[] copyOf(T[] original) {
+		T[] t = (T[]) new Object[1];
+		return t;
+	}
+	public static <T,U> T[] copyOf(U[] original, Class<? extends T[]> newType) {
+		T[] t = (T[]) new Object[1];
+		return t;
+	}
+	
+	public void f() {
+		Object[] a = new Object[1];
+		Object[] b = new Object[1];
+		this.copyOf(a, b.getClass());
+	}
+}
