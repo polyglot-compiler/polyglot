@@ -1,6 +1,7 @@
 package polyglot.ext.jl5.ast;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
@@ -12,6 +13,7 @@ import polyglot.types.Context;
 import polyglot.types.MethodInstance;
 import polyglot.types.ReferenceType;
 import polyglot.types.SemanticException;
+import polyglot.types.Type;
 import polyglot.util.CodeWriter;
 import polyglot.util.Position;
 import polyglot.visit.NodeVisitor;
@@ -125,6 +127,17 @@ public class JL5Call_c extends Call_c implements JL5Call {
 
         JL5Call_c call = (JL5Call_c)this.methodInstance(mi).type(mi.returnType());
 
+        
+        // Need to deal with Object.getClass() specially. See JLS 3rd ed., section 4.3.2
+        if (mi.name().equals("getClass") && mi.container().equals(ts.Object())) {
+            // the return type of the call is "Class<? extends |T|>" where T is the static type of
+            // the receiver.
+            Type t = call.target().type();
+            ReferenceType et = (ReferenceType)ts.erasureType(t);
+            Type wt = ts.wildCardType(this.position(), et, null);
+            Type instClass = ts.instantiate(this.position(), (JL5ParsedClassType)ts.Class(), Collections.singletonList(wt));
+            call = (JL5Call_c)call.type(instClass);
+        }
 //        System.err.println("JL5Call_c: " + this + " got mi " + mi);
         
         // If we found a method, the call must type check, so no need to check
