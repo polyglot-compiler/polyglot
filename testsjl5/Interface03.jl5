@@ -1,0 +1,12 @@
+interface Dinterface<E> {
+    <T> T[] toArray(T[] a);
+}
+
+abstract class Dabstract<E> {
+    public <T> T[] toArray(T[] a) {
+        return a;
+    }
+}
+
+class Dimpl<E> extends Dabstract<E> implements Dinterface<E> {}
+

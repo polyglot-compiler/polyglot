@@ -1,0 +1,12 @@
+class C<E> {
+	E element() {
+	    E e = (E) new Object();
+        return e;
+    }
+    
+    private class D {
+	    public void f() {
+            E e = C.this.element();
+        }
+    }
+}
