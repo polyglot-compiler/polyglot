@@ -13,6 +13,7 @@ import java.util.List;
 
 import polyglot.ext.param.types.PClass;
 import polyglot.ext.param.types.SubstClassType_c;
+import polyglot.types.ReferenceType;
 import polyglot.types.Resolver;
 import polyglot.types.Type;
 import polyglot.util.InternalCompilerError;
@@ -136,6 +137,14 @@ public class JL5SubstClassType_c extends SubstClassType_c implements JL5SubstCla
             }
         }
         
+        if (ancestor instanceof RawClass) {
+            // it's a raw class! Is it our raw class?
+            RawClass rc = (RawClass)ancestor;
+            if (this.base().equals(rc.base())) {
+                // The raw type C is a direct supertype of C<X>
+                return true;
+            }
+        }
         if (ancestor instanceof JL5SubstClassType_c) {
             JL5SubstClassType_c anc = (JL5SubstClassType_c) ancestor;
 //            System.err.println("      C");
@@ -160,12 +169,7 @@ public class JL5SubstClassType_c extends SubstClassType_c implements JL5SubstCla
                 
             }
         }
-        Type rawClass = ts.rawClass(this.base(), this.position);
-        if (ts.isSubtype(rawClass, ancestor)) {
-            return true;
-        }
         
-//        System.err.println("      F");
         return false;
     }
     
