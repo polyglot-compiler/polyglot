@@ -6,6 +6,7 @@ import polyglot.ext.jl5.types.JL5TypeSystem;
 import polyglot.types.SemanticException;
 import polyglot.types.Type;
 import polyglot.util.CodeWriter;
+import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
 import polyglot.visit.AmbiguityRemover;
 import polyglot.visit.PrettyPrinter;
@@ -30,15 +31,9 @@ public class JL5Case_c extends Case_c implements JL5Case {
     }
 
     @Override
-    public Node typeCheckOverride(Node parent, TypeChecker tc)
-    throws SemanticException {
-        //We can't typecheck unqualified names until the switch expression
-        // is typed.
-        if(expr instanceof AmbExpr) {
-            return this;
-        }
-        else
-            return null;
+    public Node typeCheckOverride(Node parent, TypeChecker tc) throws SemanticException {
+        // We will do type checking vis the resolveCaseLabel method
+        return this;
     }
 
 
@@ -50,23 +45,29 @@ public class JL5Case_c extends Case_c implements JL5Case {
 
         if (expr == null) {
             return this;
-        } else if(switchType.isClass() && !expr.isTypeChecked()) {
-            boolean tced = expr.isTypeChecked();
-            boolean daed = expr.isDisambiguated();
-            AmbExpr amb = (AmbExpr) expr;
-            EnumInstance ei = ts.findEnumConstant(switchType.toReference(), amb.name());
-            Receiver r = nf.CanonicalTypeNode(Position.compilerGenerated(), switchType);
-            EnumConstant e = nf.EnumConstant(expr.position(), r, amb.id()).enumInstance(ei);
-            e = (EnumConstant) e.type(ei.type());
-            JL5Case_c n = (JL5Case_c) expr(e);
-            return n.value(ei.ordinal());
         } 
-
-        JL5Case_c n = null;
+        else if (switchType.isClass()) {
+            if (expr instanceof EnumConstant) {
+                // we have already resolved the expression
+                EnumConstant ec = (EnumConstant)expr;
+                return this.value(ec.enumInstance().ordinal());
+            }
+            else if (expr instanceof AmbExpr) {
+                AmbExpr amb = (AmbExpr) expr;
+                EnumInstance ei = ts.findEnumConstant(switchType.toReference(), amb.name());
+                Receiver r = nf.CanonicalTypeNode(Position.compilerGenerated(), switchType);
+                EnumConstant e = nf.EnumConstant(expr.position(), r, amb.id()).enumInstance(ei);
+                e = (EnumConstant) e.type(ei.type());
+                return this.expr(e).value(ei.ordinal());
+            }
+        } 
+        
+        // switch type is not a class.
+        JL5Case_c n = this;
         if(expr.isTypeChecked()) {
-            n = this; 
+            // all good, nothing to do.
         }
-        else if(!switchType.isClass()) {
+        else if (expr instanceof AmbExpr) {
             AmbExpr amb = (AmbExpr) expr;
             //Disambiguate and typecheck
             Expr e = (Expr) tc.nodeFactory().disamb().disambiguate(amb, tc, expr.position(), null, amb.id());
@@ -74,21 +75,15 @@ public class JL5Case_c extends Case_c implements JL5Case {
             n = (JL5Case_c) expr(e);
         }
         else {
-            throw new SemanticException("Unexpected switch type: " + switchType, position());
+            throw new InternalCompilerError("Unexpected non-type checked expression: " + expr, position());
         }
-        //		
-        //        if (!((n.expr().type().isClass()) 
-        //        		|| ts.isImplicitCastValid(n.expr().type(), ts.Int()))) {
-        //			throw new SemanticException(
-        //					"Case label must be an enum, byte, char, short, or int.",
-        //					position());
-        //		}
 
         Object o = n.expr().constantValue();
         if (o instanceof Number && !(o instanceof Long)
                 && !(o instanceof Float) && !(o instanceof Double)) {
             return n.value(((Number) o).longValue());
-        } else if (o instanceof Character) {
+        } 
+        else if (o instanceof Character) {
             return n.value(((Character) o).charValue());
         }
         throw new SemanticException("Case label must be an integral constant.",
