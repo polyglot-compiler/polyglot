@@ -32,6 +32,9 @@ public class JL5Case_c extends Case_c implements JL5Case {
 
     @Override
     public Node typeCheckOverride(Node parent, TypeChecker tc) throws SemanticException {
+        if (this.expr == null || this.expr instanceof Lit) {
+            return null;
+        }
         // We will do type checking vis the resolveCaseLabel method
         return this;
     }
@@ -75,7 +78,8 @@ public class JL5Case_c extends Case_c implements JL5Case {
             n = (JL5Case_c) expr(e);
         }
         else {
-            throw new InternalCompilerError("Unexpected non-type checked expression: " + expr, position());
+            // try type checking it
+            n = (JL5Case_c) this.expr((Expr)this.expr.visit(tc));
         }
 
         Object o = n.expr().constantValue();
