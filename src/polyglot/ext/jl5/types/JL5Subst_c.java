@@ -60,8 +60,10 @@ public class JL5Subst_c extends Subst_c implements JL5Subst {
             }
         }
         visitedTypeVars.addLast(t);
-        t = (TypeVariable) t.upperBound((ReferenceType)substType(t.upperBound()));
-        if (visitedTypeVars.removeLast() != t) {
+        TypeVariable origT = t;
+        t = (TypeVariable) t.upperBound((ReferenceType)substType(t.upperBound()));        
+
+        if (visitedTypeVars.removeLast() != origT) {
             throw new InternalCompilerError("Unexpected type variable was last on the list");
         }
         return t;
