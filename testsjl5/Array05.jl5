@@ -1,0 +1,15 @@
+import java.util.Collection;
+import java.lang.String;
+
+class C {
+    <T> T[] foo(T[] a) {
+	return a;
+    }
+
+    public String[] getStrings() {
+	//		String[] a = foo(new String[0]);
+	Collection<String> c = null;
+       return c.toArray(new String[10]); // seems to be a class 
+       //	return a;
+    }
+}
