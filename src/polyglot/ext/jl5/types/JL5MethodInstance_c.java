@@ -1,10 +1,8 @@
 package polyglot.ext.jl5.types;
 
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
+import polyglot.ext.param.types.Subst;
 import polyglot.main.Report;
 import polyglot.types.*;
 import polyglot.util.Position;
@@ -50,9 +48,14 @@ public class JL5MethodInstance_c extends MethodInstance_c implements JL5MethodIn
         return l;
     }
 
-    public boolean canOverrideImpl(MethodInstance mj, boolean quiet)
+    public boolean canOverrideImpl(MethodInstance mj_, boolean quiet)
     throws SemanticException {
         JL5MethodInstance mi = this;
+        if (!(mj_ instanceof JL5MethodInstance)) {
+            return false;
+        }
+        JL5MethodInstance mj = (JL5MethodInstance)mj_;
+        
         JL5TypeSystem ts = (JL5TypeSystem)this.typeSystem();
         if (!(ts.areOverrideEquivalent(mi, (JL5MethodInstance)mj))) {
             if (quiet) return false;
@@ -62,6 +65,17 @@ public class JL5MethodInstance_c extends MethodInstance_c implements JL5MethodIn
                                         "; incompatible parameter types",
                                         mi.position());
         }
+        
+        // replace the type variables of mj with the type variables of mi
+        if (!mi.typeParams().isEmpty()) {
+            Map<TypeVariable, Type> substm = new LinkedHashMap();
+            for (int i = 0; i < mi.typeParams().size(); i++) {
+                substm.put(mj.typeParams().get(i), mi.typeParams().get(i));
+            }
+            Subst subst = ts.subst(substm, new HashMap());
+            mj = (JL5MethodInstance)subst.substMethod(mj);
+        }
+
 
         Type miRet = mi.returnType();
         Type mjRet = mj.returnType();
