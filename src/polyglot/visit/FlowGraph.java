@@ -269,7 +269,7 @@ public class FlowGraph {
    * statement to its cases and
    * the flow from a sink node in the control flow graph.
    */
-  public static final EdgeKey EDGE_KEY_OTHER = new EdgeKey("");
+  public static final EdgeKey EDGE_KEY_OTHER = new EdgeKey("other");
 
   /**
    * This class represents an edge in the flow graph. The target of the edge
