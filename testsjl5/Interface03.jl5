@@ -1,8 +1,8 @@
 interface Dinterface<E> {
-    <T> T[] toArray(T[] a);
+    <S> S[] toArray(S[] a);
 }
 
-abstract class Dabstract<E> {
+abstract class Dabstract<E> implements Dinterface<E> {
     public <T> T[] toArray(T[] a) {
         return a;
     }
