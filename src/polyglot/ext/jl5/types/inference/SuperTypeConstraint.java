@@ -13,7 +13,7 @@ import polyglot.types.Type;
 public class SuperTypeConstraint extends Constraint {
 
     public SuperTypeConstraint(Type actual, Type formal, InferenceSolver solver) {
-        super(actual, formal, null);
+        super(actual, formal, solver);
     }
 
     @Override
