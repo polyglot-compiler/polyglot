@@ -5,31 +5,55 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
-import polyglot.ast.ConstructorCall_c;
-import polyglot.ast.Expr;
-import polyglot.ast.IntLit;
-import polyglot.ast.Node;
-import polyglot.ast.NodeFactory;
-import polyglot.ast.ConstructorCall.Kind;
+import polyglot.ast.*;
 import polyglot.ext.jl5.JL5Options;
 import polyglot.ext.jl5.types.JL5Flags;
+import polyglot.ext.jl5.types.JL5TypeSystem;
 import polyglot.types.*;
 import polyglot.util.CodeWriter;
 import polyglot.util.Position;
 import polyglot.visit.AmbiguityRemover;
+import polyglot.visit.NodeVisitor;
 import polyglot.visit.PrettyPrinter;
 import polyglot.visit.TypeChecker;
 
-public class JL5ConstructorCall_c extends ConstructorCall_c {
+public class JL5ConstructorCall_c extends ConstructorCall_c implements JL5ConstructorCall {
     /**
      * Is this constructor call a super call to java.lang.Enum?
      */
     private boolean isEnumConstructorCall;
 
-    public JL5ConstructorCall_c(Position pos, Kind kind, Expr qualifier,
+    private List<TypeNode> typeArgs;
+
+    private JL5TypeSystem ts;
+    
+    public JL5ConstructorCall_c(Position pos, Kind kind, List<TypeNode> typeArgs, Expr qualifier,
                                 List arguments, boolean isEnumConstructorCall) {
         super(pos, kind, qualifier, arguments);
         this.isEnumConstructorCall = isEnumConstructorCall;
+        this.typeArgs = typeArgs;
+    }
+
+    @Override
+    public List<TypeNode> typeArgs() {
+        return this.typeArgs;
+    }
+
+    @Override
+    public JL5ConstructorCall typeArgs(List<TypeNode> typeArgs) {
+        if (this.typeArgs == typeArgs) {
+            return this;
+        }
+        JL5ConstructorCall_c n = (JL5ConstructorCall_c)this.copy();
+        n.typeArgs = typeArgs;
+        return n;
+    }
+
+    @Override
+    public Node visitChildren(NodeVisitor v) {
+        JL5ConstructorCall_c n = (JL5ConstructorCall_c)super.visitChildren(v);
+        List targs = visitList(n.typeArgs, v);
+        return n.typeArgs(targs);
     }
 
     @Override
@@ -68,7 +92,7 @@ public class JL5ConstructorCall_c extends ConstructorCall_c {
     public Node typeCheck(TypeChecker tc) throws SemanticException {
         ConstructorCall_c n = this;
 
-        TypeSystem ts = tc.typeSystem();
+        JL5TypeSystem ts = (JL5TypeSystem)tc.typeSystem();
         Context c = tc.context();
 
         ClassType ct = c.currentClass();
@@ -76,6 +100,16 @@ public class JL5ConstructorCall_c extends ConstructorCall_c {
 
         Expr qualifier = n.qualifier();
         Kind kind = n.kind();
+
+        
+        
+        List actualTypeArgs = null;
+        if (this.typeArgs != null) {
+            actualTypeArgs = new ArrayList(this.typeArgs.size());
+            for (TypeNode tn : this.typeArgs) {
+                actualTypeArgs.add(tn.type());
+            }
+        }
 
         // The qualifier specifies the enclosing instance of this inner class.
         // The type of the qualifier must be the outer class of this
@@ -176,7 +210,7 @@ public class JL5ConstructorCall_c extends ConstructorCall_c {
             ct = ct.superType().toClass();
         }
 
-        ConstructorInstance ci = ts.findConstructor(ct, argTypes, c.currentClass());
+        ConstructorInstance ci = ts.findConstructor(ct, argTypes, actualTypeArgs, c.currentClass());
         return n.constructorInstance(ci);
     }
 

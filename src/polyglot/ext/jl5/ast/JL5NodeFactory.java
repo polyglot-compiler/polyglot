@@ -48,6 +48,15 @@ public interface JL5NodeFactory extends NodeFactory {
     New New(Position pos, List<TypeNode> typeArgs, TypeNode type, List args, ClassBody body);
     New New(Position pos, Expr outer, List<TypeNode> typeArgs, TypeNode objectType, List args, ClassBody body);
     ConstructorCall ConstructorCall(Position pos, Kind kind, Expr outer, List args, boolean isEnumSuperCall);
+    
+    ConstructorCall ThisCall(Position pos, List<TypeNode> typeArgs, List args);
+    ConstructorCall ThisCall(Position pos, List<TypeNode> typeArgs, Expr outer, List args);
+    ConstructorCall SuperCall(Position pos, List<TypeNode> typeArgs, List args);
+    ConstructorCall SuperCall(Position pos, List<TypeNode> typeArgs, Expr outer, List args);
+    ConstructorCall ConstructorCall(Position pos, ConstructorCall.Kind kind, List<TypeNode> typeArgs, List args);
+    ConstructorCall ConstructorCall(Position pos, ConstructorCall.Kind kind, List<TypeNode> typeArgs, 
+                                    Expr outer, List args);
+
 
 }
 
