@@ -236,14 +236,16 @@ public class New_c extends Expr_c implements New
             if (! nn.objectType().isDisambiguated()) {
                 return nn;
             }
-            
-            ClassType ct = nn.objectType().type().toClass();
-            
-            if (ct.isMember() && ! ct.flags().isStatic()) {
-                nn = ((New_c) nn).findQualifier(ar, ct);
 
-                nn = nn.qualifier((Expr) nn.visitChild(nn.qualifier(), childbd));
-                if (childbd.hasErrors()) throw new SemanticException();
+            if (nn.objectType().type().isClass()) {
+                ClassType ct = nn.objectType().type().toClass();
+                
+                if (ct.isMember() && ! ct.flags().isStatic()) {
+                    nn = ((New_c) nn).findQualifier(ar, ct);
+    
+                    nn = nn.qualifier((Expr) nn.visitChild(nn.qualifier(), childbd));
+                    if (childbd.hasErrors()) throw new SemanticException();
+                }
             }
         }
         else {
@@ -407,6 +409,10 @@ public class New_c extends Expr_c implements New
             argTypes.add(e.type());
         }
         
+        if (!tn.type().isClass()) {
+            throw new SemanticException("Must have a class for a new expression.", this.position());
+        }
+        
         typeCheckFlags(tc);
         typeCheckNested(tc);
         
@@ -477,27 +483,32 @@ public class New_c extends Expr_c implements New
     }
 
     protected void typeCheckFlags(TypeChecker tc) throws SemanticException {
-        ClassType ct = tn.type().toClass();
+        if (tn.type().isClass()) {
+            typeCheckFlags(tc, tn.type().toClass().flags());
+        }
+    }
+    
+    protected void typeCheckFlags(TypeChecker tc, Flags classFlags) throws SemanticException {
 
 	if (this.body == null) {
-	    if (ct.flags().isInterface()) {
+	    if (classFlags.isInterface()) {
 		throw new SemanticException(
 		    "Cannot instantiate an interface.", position());
 	    }
 
-	    if (ct.flags().isAbstract()) {
+	    if (classFlags.isAbstract()) {
 		throw new SemanticException(
 		    "Cannot instantiate an abstract class.", position());
 	    }
 	}
 	else {
-	    if (ct.flags().isFinal()) {
+	    if (classFlags.isFinal()) {
 		throw new SemanticException(
 		    "Cannot create an anonymous subclass of a final class.",
                     position());
             }
 
-	    if (ct.flags().isInterface() && ! arguments.isEmpty()) {
+	    if (classFlags.isInterface() && ! arguments.isEmpty()) {
 	        throw new SemanticException(
 		    "Cannot pass arguments to an anonymous class that " +
 		    "implements an interface.",
