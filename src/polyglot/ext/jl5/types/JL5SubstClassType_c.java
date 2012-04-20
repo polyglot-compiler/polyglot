@@ -16,6 +16,7 @@ import polyglot.ext.param.types.SubstClassType_c;
 import polyglot.types.ReferenceType;
 import polyglot.types.Resolver;
 import polyglot.types.Type;
+import polyglot.util.CodeWriter;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
 
@@ -62,13 +63,38 @@ public class JL5SubstClassType_c extends SubstClassType_c implements JL5SubstCla
         return subst.substFieldList(((JL5ClassType)base).enumConstants());
     }
 
+    /** Pretty-print the name of this class to w. */
+    @Override
+    public void print(CodeWriter w) {
+        // XXX This code duplicates the logic of toString.
+        JL5ParsedClassType ct = this.base();
+        ct.printNoParams(w);
+        this.printParams(w);
+    }
+
+    @Override
+    public void printParams(CodeWriter w) {
+        JL5ParsedClassType ct = this.base();
+        w.write("<");
+        Iterator<TypeVariable> it = ct.typeVariables().iterator();
+        while (it.hasNext()) {
+            TypeVariable act = it.next();            
+            this.subst().substType(act).print(w);
+            if (it.hasNext()) {
+                w.write(",");
+                w.allowBreak(0, " ");
+            }
+        }
+        w.write(">");                
+    }
+    
     @Override
     public String toString() {
         JL5ParsedClassType ct = this.base();
         if (ct.typeVariables().isEmpty()) {
-            return ct.name();
+            return ct.toString();
         }
-        StringBuffer sb = new StringBuffer(ct.name());
+        StringBuffer sb = new StringBuffer(ct.toStringNoParams());
         sb.append('<');
         Iterator<TypeVariable> iter = ct.typeVariables().iterator();
         while (iter.hasNext()) {

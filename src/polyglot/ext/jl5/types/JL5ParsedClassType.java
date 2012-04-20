@@ -4,6 +4,7 @@ import java.util.List;
 
 import polyglot.ext.param.types.PClass;
 import polyglot.types.ParsedClassType;
+import polyglot.util.CodeWriter;
 
 /* 
  * A JL5ParsedClassType represents a class with uninstantiated
@@ -35,4 +36,7 @@ public interface JL5ParsedClassType extends ParsedClassType, JL5ClassType {
      * @return
      */
     JL5Subst erasureSubst();
+    
+    void printNoParams(CodeWriter w);
+    String toStringNoParams();
 }

@@ -5,6 +5,7 @@ import java.util.*;
 import polyglot.ext.param.types.PClass;
 import polyglot.frontend.Source;
 import polyglot.types.*;
+import polyglot.util.CodeWriter;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.TypedList;
 
@@ -130,20 +131,43 @@ public class JL5ParsedClassType_c extends ParsedClassType_c implements JL5Parsed
     }
 
 
+    /** Pretty-print the name of this class to w. */
+    public void print(CodeWriter w) {
+        // XXX This code duplicates the logic of toString.
+        this.printNoParams(w);
+        if (this.typeVars == null || this.typeVars.isEmpty()) {
+            return;
+        }
+        w.write("<");
+        Iterator<TypeVariable> it =  this.typeVars.iterator();
+        while (it.hasNext()) {
+            TypeVariable act = it.next();
+            w.write(act.name());
+            if (it.hasNext()) {
+                w.write(",");
+                w.allowBreak(0, " ");
+            }
+        }
+        w.write(">");
+    }
+    
+    @Override
+    public void printNoParams(CodeWriter w) {
+        super.print(w);
+    }
+
+    @Override
+    public String toStringNoParams() {
+        return super.toString();
+    }
+
+    
     @Override
     public String toString() {
-        if (isAnonymous()) {
-            if (interfaces != null && ! interfaces.isEmpty()) {
-                return "<anonymous subtype of " + interfaces.get(0) + ">";
-            }
-            if (superType != null) {
-                return "<anonymous subclass of " + superType + ">";
-            }
-        }
         if (this.typeVars == null || this.typeVars.isEmpty()) {
-            return this.name();
+            return super.toString();
         }
-        StringBuffer sb = new StringBuffer(this.name);
+        StringBuffer sb = new StringBuffer(super.toString());
         sb.append('<');
         Iterator<TypeVariable> it =  this.typeVars.iterator();
         while (it.hasNext()) {
@@ -196,5 +220,4 @@ public class JL5ParsedClassType_c extends ParsedClassType_c implements JL5Parsed
         }
         return false;
     }
-
 }
