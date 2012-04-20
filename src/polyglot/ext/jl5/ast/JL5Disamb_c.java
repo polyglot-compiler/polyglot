@@ -74,12 +74,6 @@ public class JL5Disamb_c extends Disamb_c {
             if (n != null) return n;
         }
         
-        TypeVariable res = ((JL5Context)c).findTypeVariableInThisScope(name.id());
-        if (res != null){
-        	//System.out.println("JL5Disamb: TypeVariable " +name.id() + " has type " + res + " " + res.getClass());
-            return nf.CanonicalTypeNode(pos, res);
-        }
-
         // no variable found. try types.
         if (typeOK()) {
             try {
@@ -102,6 +96,14 @@ public class JL5Disamb_c extends Disamb_c {
                 // It must be a package--ignore the exception.
             }
         }
+        
+        // try type variables.
+        TypeVariable res = ((JL5Context)c).findTypeVariableInThisScope(name.id());
+        if (res != null){
+                //System.out.println("JL5Disamb: TypeVariable " +name.id() + " has type " + res + " " + res.getClass());
+            return nf.CanonicalTypeNode(pos, res);
+        }
+
         // Must be a package then...
         if (packageOK()) {
             return nf.PackageNode(pos, ts.packageForName(name.id()));
