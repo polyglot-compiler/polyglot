@@ -7,11 +7,11 @@ import java.util.List;
 import polyglot.ast.*;
 import polyglot.ext.jl5.types.JL5SubstClassType;
 import polyglot.ext.jl5.types.JL5TypeSystem;
+import polyglot.ext.jl5.visit.JL5Translator;
 import polyglot.types.ClassType;
 import polyglot.types.Context;
 import polyglot.types.SemanticException;
 import polyglot.types.Type;
-import polyglot.types.TypeSystem;
 import polyglot.util.CodeWriter;
 import polyglot.util.Position;
 import polyglot.visit.AmbiguityRemover;
@@ -186,8 +186,15 @@ public class JL5New_c extends New_c implements JL5New {
             ClassType ct = tn.type().toClass();
             w.write(ct.name());
             if (ct instanceof JL5SubstClassType) {
-                JL5SubstClassType jsct = (JL5SubstClassType)ct;
-                jsct.printParams(w);
+                boolean printParams = true;
+                if (tr instanceof JL5Translator) {
+                    JL5Translator jtr = (JL5Translator)tr;
+                    printParams = !jtr.removeJava5isms();
+                }
+                if (printParams) {
+                    JL5SubstClassType jsct = (JL5SubstClassType)ct;
+                    jsct.printParams(w);
+                }
             }
         }
         else {
