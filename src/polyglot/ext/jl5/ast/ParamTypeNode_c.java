@@ -79,7 +79,9 @@ public class ParamTypeNode_c extends TypeNode_c implements ParamTypeNode {
 
     @Override
 	public void addDecls(Context c) {
-        ((JL5Context) c).addTypeVariable((TypeVariable) type());
+        // we do not need to add the type variable to the scope
+        // since that will be taken care of by the parent node.
+        super.addDecls(c);
     }
 
     // nothing needed for buildTypesEnter - not a code block like methods

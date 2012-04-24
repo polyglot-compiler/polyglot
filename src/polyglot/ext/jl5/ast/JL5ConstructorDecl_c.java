@@ -118,7 +118,7 @@ public class JL5ConstructorDecl_c extends ConstructorDecl_c implements JL5Constr
     public Context enterScope(Context c) {
         c = super.enterScope(c);
         for (TypeNode pn : typeParams) {
-            c = ((JL5Context)c).addTypeVariable((TypeVariable)pn.type());
+            ((JL5Context)c).addTypeVariable((TypeVariable)pn.type());
         }
         return c;
     }

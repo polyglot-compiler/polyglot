@@ -1,7 +1,7 @@
 package polyglot.ext.jl5.types;
 
-import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -79,9 +79,10 @@ public class JL5Context_c extends Context_c implements JL5Context {
 		return null;
 	}
 
+	@Override
 	protected Context_c push() {
 		JL5Context_c c = (JL5Context_c) super.push();
-		c.typeVars = this.typeVars;
+		c.typeVars = null;
 		return c;
 	}
 
@@ -89,7 +90,6 @@ public class JL5Context_c extends Context_c implements JL5Context {
 		JL5Context_c v = (JL5Context_c) push();
 		v.typeVariable = iType;
 		v.kind = TYPE_VAR;
-		// v.outer = this;
 		return v;
 	}
 
@@ -110,15 +110,14 @@ public class JL5Context_c extends Context_c implements JL5Context {
 	}
 
 	public String toString() {
-		return super.toString() + "type var: " + typeVariable + "type vars: "
+		return super.toString() + "; type var: " + typeVariable + "; type vars: "
 				+ typeVars;
 	}
 
-	public JL5Context addTypeVariable(TypeVariable type) {
+	public void addTypeVariable(TypeVariable type) {
 		if (typeVars == null)
-			typeVars = new HashMap<String, TypeVariable>();
+			typeVars = new LinkedHashMap<String, TypeVariable>();
 		typeVars.put(type.name(), type);
-		return this;
 	}
 
 	@Override

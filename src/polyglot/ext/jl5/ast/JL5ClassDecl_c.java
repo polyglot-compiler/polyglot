@@ -131,9 +131,9 @@ public class JL5ClassDecl_c extends ClassDecl_c implements JL5ClassDecl {
             c.addNamed(this.type);
         }
         for (ParamTypeNode tn : paramTypes) {
-            c = ((JL5Context) c).addTypeVariable((TypeVariable) tn.type());
+            ((JL5Context) c).addTypeVariable((TypeVariable) tn.type());
         }
-        return super.enterChildScope(child, c);
+        return child.del().enterScope(c);
     }
 
     @Override

@@ -13,7 +13,7 @@ public interface JL5Context extends Context {
 
     boolean inTypeVariable();
 
-    JL5Context addTypeVariable(TypeVariable type);
+    void addTypeVariable(TypeVariable type);
 
     JL5TypeSystem typeSystem();
 	Context pushSwitch(Type type);

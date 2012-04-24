@@ -307,7 +307,7 @@ public class JL5MethodDecl_c extends MethodDecl_c implements JL5MethodDecl {
     public Context enterScope(Context c) {
         c = super.enterScope(c);
         for (ParamTypeNode pn : typeParams) {
-            c = ((JL5Context)c).addTypeVariable((TypeVariable)pn.type());
+            ((JL5Context)c).addTypeVariable((TypeVariable)pn.type());
         }
         return c;
     }
