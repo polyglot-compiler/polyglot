@@ -51,13 +51,13 @@ public class AmbTypeInstantiation extends TypeNode_c implements TypeNode, Ambigu
 //        System.err.println("Base type is " + base);
 //        System.err.println("typeArguments is " + typeArguments);
         Type baseType = this.base.type();
-        if (baseType instanceof JL5SubstClassType) {
-            System.err.println("" + this.position);
-            System.err.println("base type of " + this + " is " + base.type()+ " " + base.type().getClass());
-            System.err.println(" base type base is " + ((JL5SubstClassType)baseType).base());
-            System.err.println(" base type instantiation is is " + ((JL5SubstClassType)baseType).subst());
-            System.err.println(" type args are is " + this.typeArguments);
-        }
+//        if (baseType instanceof JL5SubstClassType) {
+//            System.err.println("" + this.position);
+//            System.err.println("base type of " + this + " is " + base.type()+ " " + base.type().getClass());
+//            System.err.println(" base type base is " + ((JL5SubstClassType)baseType).base());
+//            System.err.println(" base type instantiation is is " + ((JL5SubstClassType)baseType).subst());
+//            System.err.println(" type args are is " + this.typeArguments);
+//        }
         // SC: hack! Not sure what's going on here...
         while (baseType instanceof JL5SubstClassType) {
             baseType = ((JL5SubstClassType)baseType).base();
