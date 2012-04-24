@@ -1,0 +1,22 @@
+class C<E> { // HashSet
+    interface A<K> {  // Set interface
+        public Class<K> get();
+    }
+    abstract class B<E> implements A<E> {}  // AbstractSet abstract class
+    
+    class D<K> { // HashMap class
+        public A<K> getE() { // get KeySet call, returns Set
+            return new E();
+        }
+        
+        private final class E extends B<K> { // KeySet class
+            public Class<K> get() { // get Iterator
+                return null;
+            }
+        }
+    }
+    
+    Class<E> func() { // get HashSets iterator
+        return (new D<E>()).getE().get();
+    }
+}

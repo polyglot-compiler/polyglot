@@ -1,0 +1,5 @@
+class C<T> {
+  void m() {
+    new T(); // bad
+  }
+}

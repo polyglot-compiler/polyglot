@@ -73,6 +73,7 @@ polyglot.ext.jl5.ExtensionInfo "-d out -classpath java-out -noserial -post \"jav
         Generics32.jl5;
         Generics33.jl5 (Semantic);
         Generics34.jl5;
+        Generics35.jl5 (Semantic);
         StaticInit01.jl5;
         InnerClass01.jl5;
         InnerClass02.jl5;
@@ -82,6 +83,7 @@ polyglot.ext.jl5.ExtensionInfo "-d out -classpath java-out -noserial -post \"jav
 	Interface01.jl5;
 	Interface02.jl5;
 	Interface03.jl5;
+	Interface04.jl5;
 	Import01.jl5;
 	Import02.jl5;
 	Import03.jl5 (Semantic);
@@ -107,6 +109,7 @@ polyglot.ext.jl5.ExtensionInfo "-d out -classpath java-out -noserial -post \"jav
 	Array03.jl5;
 	Array04.jl5;
 	Array05.jl5;
+	Array06.jl5;
 	C.jl5;
 	FBoundSub.jl5;
 	FBoundSub2.jl5;
@@ -210,6 +213,7 @@ polyglot.ext.jl5.ExtensionInfo "-d out -classpath java-out -noserial -post \"jav
 	test8.jl5;
 	test9.jl5;
 	wildcard2.jl5 (Semantic), (Semantic), (Semantic);
+	wildcard2.jl5 (Semantic), (Semantic), (Semantic);
 	wildcard2a.jl5;
 	wildcard3.jl5;
 	wildcard4.jl5 (Semantic, "cannot be called"), (Semantic, "cannot be called"), (Semantic, "does not match");
@@ -291,6 +295,7 @@ polyglot.ext.jl5.ExtensionInfo "-d out -classpath java-out -removeJava5isms -enu
         Generics32.jl5;
         Generics33.jl5 (Semantic);
         Generics34.jl5;
+        Generics35.jl5 (Semantic);
         StaticInit01.jl5;
      	InnerClass01.jl5; 
         InnerClass02.jl5;
@@ -300,6 +305,7 @@ polyglot.ext.jl5.ExtensionInfo "-d out -classpath java-out -removeJava5isms -enu
 	Interface01.jl5;
 	Interface02.jl5;
 	Interface03.jl5;
+	Interface04.jl5;
         Import01.jl5;
         Import02.jl5;
         Import03.jl5 (Semantic);
@@ -325,6 +331,7 @@ polyglot.ext.jl5.ExtensionInfo "-d out -classpath java-out -removeJava5isms -enu
         Array03.jl5;
         Array04.jl5;
         Array05.jl5;
+	Array06.jl5;
         C.jl5;
         FBoundSub.jl5;
         FBoundSub2.jl5;
