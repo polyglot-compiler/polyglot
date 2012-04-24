@@ -140,6 +140,9 @@ public abstract class BaseParser extends java_cup.runtime.lr_parser
           // so return the default for that case.
           return posForObject(noEndDefault);
       }
+      if (epos == null) {
+          return posForObject(noEndDefault);
+      }
       return null;
 
   }
