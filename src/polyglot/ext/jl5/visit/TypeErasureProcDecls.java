@@ -60,11 +60,11 @@ public class TypeErasureProcDecls extends ErrorHandlingVisitor {
         ReferenceType erasedMjContainer = (ReferenceType)ts.erasureType(mj.container());
         MethodInstance mjErased;
         try {
-            mjErased = ts.findMethod(erasedMjContainer, mi.name(), miFormalTypes, mi.container().toClass());
+            mjErased = ts.findMethod(erasedMjContainer, mi.name(), miFormalTypes, erasedMjContainer.toClass());
         }
         catch (SemanticException e) {
             // hmmm couldn't find the correct method
-            throw new InternalCompilerError("Couldn't find erased version of " + mj + " in " + erasedMjContainer + " with name " + mi.name() + " and args " + miFormalTypes + ". " + erasedMjContainer.methods());
+            throw new InternalCompilerError("Couldn't find erased version of " + mj + " in " + erasedMjContainer + " with name " + mi.name() + " and args " + miFormalTypes + ". " + erasedMjContainer.methods(), e);
         }
         
         // we need to rewrite the method decl to have the same arguments as mjErased, the erased version of mj.
