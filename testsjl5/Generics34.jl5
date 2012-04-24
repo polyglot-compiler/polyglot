@@ -1,0 +1,61 @@
+abstract class Dabstract<E>  implements Dinterface<E> {
+}
+class Dimpl<E> extends Dabstract<E> implements Dinterface<E> {
+    
+    private transient Eimpl<E,Object> map;
+    
+    public Dimpl() {
+        map = new Eimpl<E,Object>();
+    }
+    
+    public IIterator<E> iterator() {
+        return map.keySet().iterator();
+    }
+}
+interface Dinterface<E> {
+    IIterator<E> iterator();
+}
+abstract class Eabstract<K,V> implements Einterface<K,V> {
+    public Dinterface<K> keySet() {
+        return new Dabstract<K>() {
+            public IIterator<K> iterator() {
+                return null;
+            }
+        };
+    }
+}
+class Eimpl<K,V> extends Eabstract<K,V> implements Einterface<K,V> {
+
+    private abstract class HashIterator<K> implements IIterator<K> {
+        public final boolean hasNext() {
+            return false;
+        }
+    }
+    
+    private final class KeyIterator extends HashIterator<K> {
+        public K next() {
+            return null;
+        }
+    }
+    
+    IIterator<K> newIterator() {
+        return new KeyIterator();
+    }
+    
+    public Dinterface<K> keySet() {
+        return new F();
+    }
+
+    private final class F extends Dabstract<K> {
+        public IIterator<K> iterator() {
+            return newIterator();
+        }
+    }
+ }
+interface Einterface<K,V> {
+    Dinterface<K> keySet();
+}
+interface IIterator<E> {
+    boolean hasNext();
+    E next();
+}

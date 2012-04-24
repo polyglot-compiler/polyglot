@@ -72,6 +72,7 @@ polyglot.ext.jl5.ExtensionInfo "-d out -classpath java-out -noserial -post \"jav
         Generics31.jl5;
         Generics32.jl5;
         Generics33.jl5 (Semantic);
+        Generics34.jl5;
         StaticInit01.jl5;
         InnerClass01.jl5;
         InnerClass02.jl5;
@@ -208,7 +209,8 @@ polyglot.ext.jl5.ExtensionInfo "-d out -classpath java-out -noserial -post \"jav
 	test7.jl5;
 	test8.jl5;
 	test9.jl5;
-	wildcard2.jl5 (Semantic), (Semantic), (Semantic), (Semantic);
+	wildcard2.jl5 (Semantic), (Semantic), (Semantic);
+	wildcard2a.jl5;
 	wildcard3.jl5;
 	wildcard4.jl5 (Semantic, "cannot be called"), (Semantic, "cannot be called"), (Semantic, "does not match");
 	wildcard4a.jl5;
@@ -288,6 +290,7 @@ polyglot.ext.jl5.ExtensionInfo "-d out -classpath java-out -removeJava5isms -enu
         Generics31.jl5;
         Generics32.jl5;
         Generics33.jl5 (Semantic);
+        Generics34.jl5;
         StaticInit01.jl5;
      	InnerClass01.jl5; 
         InnerClass02.jl5;
@@ -424,7 +427,8 @@ polyglot.ext.jl5.ExtensionInfo "-d out -classpath java-out -removeJava5isms -enu
         test7.jl5;
         test8.jl5;
         test9.jl5;
-        wildcard2.jl5 (Semantic), (Semantic), (Semantic), (Semantic);
+        wildcard2.jl5 (Semantic), (Semantic), (Semantic);
+	wildcard2a.jl5;
         wildcard3.jl5;
         wildcard4.jl5 (Semantic, "cannot be called"), (Semantic, "cannot be called"), (Semantic, "does not match");
         wildcard4a.jl5;
