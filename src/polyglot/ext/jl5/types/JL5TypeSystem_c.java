@@ -507,6 +507,16 @@ public class JL5TypeSystem_c extends ParamTypeSystem_c implements JL5TypeSystem 
         if (actualTypeArgs == null) {
             actualTypeArgs = Collections.EMPTY_LIST;
         }
+        
+        // First check that the number of arguments is reasonable
+        if (argTypes.size() != mi.formalTypes().size()) {
+            // the actual args don't match the number of the formal args.
+            if (!(mi.isVariableArity() && argTypes.size() >= mi.formalTypes().size()-1)) {
+                // the last (variable) argument can consume 0 or more of the actual arguments. 
+                return null;
+            }
+
+        }
         JL5Subst subst = null;
         if (!mi.typeParams().isEmpty() && actualTypeArgs.isEmpty()) {
             // need to perform type inference
