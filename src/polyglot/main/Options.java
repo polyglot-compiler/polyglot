@@ -435,9 +435,6 @@ public class Options {
         }
         else if (!args[i].startsWith("-")) {
             source.add(args[i]);
-            File f = new File(args[i]).getParentFile();
-            if (f != null && !source_path.contains(f))
-                source_path.add(f);
             i++;
         }
 
