@@ -53,6 +53,7 @@ public class JL5Scheduler extends JLScheduler {
         try {
             g.addPrerequisiteGoal(TypeChecked(job), this);
             g.addPrerequisiteGoal(RemoveVarArgs(job), this);
+            g.addPrerequisiteGoal(SimplifyExpressionsForBoxing(job), this);
         } catch (CyclicDependencyException e) {
             throw new InternalCompilerError(e);
         }
@@ -79,6 +80,23 @@ public class JL5Scheduler extends JLScheduler {
         TypeSystem ts = extInfo.typeSystem();
         NodeFactory nf = extInfo.nodeFactory();
         Goal g = new VisitorGoal(job, new RemoveVarargVisitor(job, ts, nf));
+        try {
+            g.addPrerequisiteGoal(TypeChecked(job), this);
+        } catch (CyclicDependencyException e) {
+            throw new InternalCompilerError(e);
+        } 
+        return this.internGoal(g);
+    }
+
+    public Goal SimplifyExpressionsForBoxing(Job job) {
+        TypeSystem ts = extInfo.typeSystem();
+        NodeFactory nf = extInfo.nodeFactory();
+        Goal g = new VisitorGoal(job, new SimplifyExpressionsForBoxing(nf, ts));
+        try {
+            g.addPrerequisiteGoal(TypeChecked(job), this);
+        } catch (CyclicDependencyException e) {
+            throw new InternalCompilerError(e);
+        } 
         return this.internGoal(g);
     }
 
