@@ -1,6 +1,7 @@
 package polyglot.ext.jl5.ast;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
@@ -29,14 +30,15 @@ import polyglot.visit.TypeChecker;
 public class JL5ClassDecl_c extends ClassDecl_c implements JL5ClassDecl {
 
     protected List<ParamTypeNode> paramTypes;
+    protected List<AnnotationElem> annotations;
 
-    public JL5ClassDecl_c(Position pos, Flags flags, Id name,
+    public JL5ClassDecl_c(Position pos, Flags flags, List<AnnotationElem> annotations, Id name,
                           TypeNode superClass, List interfaces, ClassBody body) {
-        this(pos, flags, name, superClass, interfaces, body,
+        this(pos, flags, annotations, name, superClass, interfaces, body,
              new ArrayList<ParamTypeNode>());
     }
 
-    public JL5ClassDecl_c(Position pos, Flags fl, Id name, TypeNode superType,
+    public JL5ClassDecl_c(Position pos, Flags fl, List<AnnotationElem> annotations, Id name, TypeNode superType,
                           List interfaces, ClassBody body, List<ParamTypeNode> paramTypes) {
         super(pos, fl, name, superType, interfaces, body);
         if (paramTypes == null)
@@ -45,6 +47,10 @@ public class JL5ClassDecl_c extends ClassDecl_c implements JL5ClassDecl {
         if (pos == null) {
             this.position = Position.compilerGenerated();
         }
+        if (annotations == null) {
+            annotations = Collections.emptyList();
+        }
+        this.annotations = annotations;        
     }
 
     @Override
@@ -181,13 +187,21 @@ public class JL5ClassDecl_c extends ClassDecl_c implements JL5ClassDecl {
         if (f.isInterface()) {
             f = f.clearInterface().clearAbstract();
         }
-        else if (JL5Flags.isEnum(f)) {
+        if (JL5Flags.isEnum(f)) {
             f = JL5Flags.clearEnum(f).clearStatic().clearAbstract();
+        }
+        if (JL5Flags.isAnnotation(f)) {
+            f = JL5Flags.clearAnnotation(f);
         }
         w.write(f.translate());
 
         if (flags.isInterface()) {
-            w.write("interface ");
+            if (JL5Flags.isAnnotation(flags)) {
+                w.write("@interface ");
+            }
+            else {
+                w.write("interface ");                
+            }
         }
         else if (JL5Flags.isEnum(flags)) {
             w.write("enum ");

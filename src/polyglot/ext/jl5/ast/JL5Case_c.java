@@ -67,6 +67,8 @@ public class JL5Case_c extends Case_c implements JL5Case {
         
         // switch type is not a class.
         JL5Case_c n = this;
+        
+
         if(expr.isTypeChecked()) {
             // all good, nothing to do.
         }
@@ -82,13 +84,19 @@ public class JL5Case_c extends Case_c implements JL5Case {
             n = (JL5Case_c) this.expr((Expr)this.expr.visit(tc));
         }
 
-        Object o = n.expr().constantValue();
-        if (o instanceof Number && !(o instanceof Long)
-                && !(o instanceof Float) && !(o instanceof Double)) {
-            return n.value(((Number) o).longValue());
-        } 
-        else if (o instanceof Character) {
-            return n.value(((Character) o).charValue());
+        if (! n.expr().constantValueSet()) {
+            // Not ready yet; pass will get rerun.
+            return n;
+        }
+        if (n.expr().isConstant()) {
+            Object o = n.expr().constantValue();
+            if (o instanceof Number && !(o instanceof Long)
+                    && !(o instanceof Float) && !(o instanceof Double)) {
+                return n.value(((Number) o).longValue());
+            } 
+            else if (o instanceof Character) {
+                return n.value(((Character) o).charValue());
+            }
         }
         throw new SemanticException("Case label must be an integral constant.",
                                     position());

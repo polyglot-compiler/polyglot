@@ -68,6 +68,58 @@ public class JL5ExtFactory_c extends AbstractExtFactory_c implements JL5ExtFacto
     }
     
     
+    @Override
+    public Ext extAnnotationElemDecl() {
+        Ext e = extAnnotationElemDeclImpl();
+
+        if (nextExtFactory() != null) {
+            Ext e2 = nextExtFactory().extAnnotationElemDecl();
+            e = composeExts(e, e2);
+        }
+        return postExtAnnotationElemDecl(e);
+    }
+    @Override
+    public Ext extNormalAnnotationElem() {
+        Ext e = extNormalAnnotationElemImpl();
+
+        if (nextExtFactory() != null) {
+            Ext e2 = nextExtFactory().extNormalAnnotationElem();
+            e = composeExts(e, e2);
+        }
+        return postExtNormalAnnotationElem(e);
+    }
+    @Override
+    public Ext extMarkerAnnotationElem() {
+        Ext e = extMarkerAnnotationElemImpl();
+
+        if (nextExtFactory() != null) {
+            Ext e2 = nextExtFactory().extMarkerAnnotationElem();
+            e = composeExts(e, e2);
+        }
+        return postExtMarkerAnnotationElem(e);
+    }
+    @Override
+    public Ext extSingleElementAnnotationElem() {
+        Ext e = extSingleElementAnnotationElemImpl();
+
+        if (nextExtFactory() != null) {
+            Ext e2 = nextExtFactory().extSingleElementAnnotationElem();
+            e = composeExts(e, e2);
+        }
+        return postExtSingleElementAnnotationElem(e);
+    }
+    @Override
+    public Ext extElementValuePair() {
+        Ext e = extElementValuePairImpl();
+
+        if (nextExtFactory() != null) {
+            Ext e2 = nextExtFactory().extElementValuePair();
+            e = composeExts(e, e2);
+        }
+        return postExtElementValuePair(e);
+    }
+
+    
     public Ext extEnumDeclImpl() {
         return this.extClassDeclImpl();
     }
@@ -109,6 +161,40 @@ public class JL5ExtFactory_c extends AbstractExtFactory_c implements JL5ExtFacto
     }
     public Ext postExtParamTypeNode(Ext ext) {
         return this.postExtTypeNode(ext);
+    }
+
+    
+    private Ext extAnnotationElemDeclImpl() {
+        return this.extClassMemberImpl();
+    }
+    private Ext extNormalAnnotationElemImpl() {
+        return this.extExprImpl();
+    }
+    private Ext extMarkerAnnotationElemImpl() {
+        return this.extNormalAnnotationElemImpl();
+    }
+    private Ext extSingleElementAnnotationElemImpl() {
+        return this.extNormalAnnotationElemImpl();
+    }
+    private Ext extElementValuePairImpl() {
+        return this.extExprImpl();
+    }
+
+    
+    private Ext postExtAnnotationElemDecl(Ext ext) {
+        return ext;
+    }
+    private Ext postExtNormalAnnotationElem(Ext ext) {
+        return ext;
+    }
+    private Ext postExtMarkerAnnotationElem(Ext ext) {
+        return ext;
+    }
+    private Ext postExtSingleElementAnnotationElem(Ext ext) {
+        return ext;
+    }
+    private Ext postExtElementValuePair(Ext ext) {
+        return ext;
     }
 
 

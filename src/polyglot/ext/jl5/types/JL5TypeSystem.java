@@ -3,6 +3,7 @@ package polyglot.ext.jl5.types;
 import java.util.LinkedList;
 import java.util.List;
 
+import polyglot.ast.Expr;
 import polyglot.ext.jl5.types.inference.LubType;
 import polyglot.ext.param.types.ParamTypeSystem;
 import polyglot.frontend.Source;
@@ -21,8 +22,10 @@ public interface JL5TypeSystem extends TypeSystem, ParamTypeSystem {
 
     ClassType Iterator();
 
+    ClassType Annotation();
+
     boolean accessibleFromPackage(Flags flags, Package pkg1, Package pkg2);
-    
+
     /**
      * 
      * @return the list of types that makes the implicit cast valid. Returns empty list if isImplicitCastValid(t1, t2) == false.
@@ -69,7 +72,7 @@ public interface JL5TypeSystem extends TypeSystem, ParamTypeSystem {
      * - if ri is void and rj is void.
      */
     boolean areReturnTypeSubstitutable(Type ri, Type rj);
-    
+
     /**
      * Is there an unchecked conversion from "from" to "to"?
      * See JLS 3rd ed. 5.1.9
@@ -78,35 +81,35 @@ public interface JL5TypeSystem extends TypeSystem, ParamTypeSystem {
      * and "to" is any parameterized type of the form G<T1 ... Tn>.
      */
     boolean isUncheckedConversion(Type from, Type to);
-    
-    
+
+
     /**
      * Instantiate class clazz with actuals.
      */
     ClassType instantiate(Position pos, JL5ParsedClassType clazz, List<Type> actuals) throws SemanticException;
-    
+
     /**
      * Returns the erased type of t.
      * See JLS 3rd ed. 4.6 
      * 
      */
     Type erasureType(Type t);
-    
+
     /**
      * Given a list of typeParams, produce a JL5Subst that maps these
      * TypeVariables to the erasure of their bounds.
      */
     JL5Subst erasureSubst(List<TypeVariable> typeParams);
-    
-    
-    JL5MethodInstance methodInstance(Position pos, ReferenceType container,
-            Flags flags, Type returnType, String name,
-            List argTypes, List excTypes, List typeParams);
-    JL5ConstructorInstance constructorInstance(Position pos, ClassType container,
-            Flags flags, List argTypes,
-            List excTypes, List typeParams);
 
-    
+
+    JL5MethodInstance methodInstance(Position pos, ReferenceType container,
+                                     Flags flags, Type returnType, String name,
+                                     List argTypes, List excTypes, List typeParams);
+    JL5ConstructorInstance constructorInstance(Position pos, ClassType container,
+                                               Flags flags, List argTypes,
+                                               List excTypes, List typeParams);
+
+
     JL5ProcedureInstance instantiate(Position pos, JL5ProcedureInstance mi, List<Type> actuals);
 
     /**
@@ -117,7 +120,7 @@ public interface JL5TypeSystem extends TypeSystem, ParamTypeSystem {
      * Will return null if mi cannot be successfully called. Will return an appropriately 
      * instantiated method instance if the call is valid (i.e., the substitution after type inference). 
      */
-    JL5MethodInstance methodCallValid(JL5MethodInstance mi, String name, List<Type> argTypes, List<Type> actualTypeArgs);
+    JL5MethodInstance methodCallValid(JL5MethodInstance mi, String name, List<Type> argTypes, List<Type> actualTypeArgs, Type expectedReturnType);
 
     /**
      * Check whether <code>ci</code> can be called with
@@ -133,25 +136,25 @@ public interface JL5TypeSystem extends TypeSystem, ParamTypeSystem {
      * Returns the PrimitiveType corresponding to the wrapper type t. For example primitiveOf([java.lang.Integer]) = [int]
      */
     ClassType wrapperClassOfPrimitive(PrimitiveType t);
-    
+
     PrimitiveType primitiveTypeOfWrapper(Type l);
     boolean isPrimitiveWrapper(Type l);
 
     EnumInstance enumInstance(Position pos, ClassType container, Flags f, String name,
-            ParsedClassType anonType, long l);
+                              ParsedClassType anonType, long l);
 
     Context createContext();
 
     EnumInstance findEnumConstant(ReferenceType container, String name, ClassType currClass)
-            throws SemanticException;
+    throws SemanticException;
 
     EnumInstance findEnumConstant(ReferenceType container, String name, Context c)
-            throws SemanticException;
+    throws SemanticException;
 
     EnumInstance findEnumConstant(ReferenceType container, String name) throws SemanticException;
 
     FieldInstance findFieldOrEnum(ReferenceType container, String name, ClassType currClass)
-            throws SemanticException;
+    throws SemanticException;
 
     boolean numericConversionBaseValid(Type t, Object value);
 
@@ -161,12 +164,12 @@ public interface JL5TypeSystem extends TypeSystem, ParamTypeSystem {
      * Is fromType contained in toType? See JLS 3rd ed 4.5.1.1
      */
     boolean isContained(Type fromType, Type toType);
-   
+
     /**
      * Apply capture conversion to t. See JLS 3rd ed 5.1.10
      */
     Type applyCaptureConversion(Type t);
-    
+
     Flags flagsForBits(int bits);
 
     TypeVariable typeVariable(Position pos, String name, ReferenceType upperBound);
@@ -178,14 +181,14 @@ public interface JL5TypeSystem extends TypeSystem, ParamTypeSystem {
 
     List<ReferenceType> allAncestorsOf(ReferenceType rt);
 
-	ArrayType arrayOf(Position position, Type base, boolean isVarargs);
+    ArrayType arrayOf(Position position, Type base, boolean isVarargs);
 
     MethodInstance findMethod(ReferenceType container,
-            String name, List argTypes,  List<Type> typeArgs,
-            ClassType currClass) throws SemanticException;
+                              String name, List argTypes,  List<Type> typeArgs,
+                              ClassType currClass, Type expectedReturnType) throws SemanticException;
 
     ConstructorInstance findConstructor(ClassType container, List argTypes, List<Type> typeArgs,
-            ClassType currClass) throws SemanticException;
+                                        ClassType currClass) throws SemanticException;
 
     /**
      * Base is a generic supertype (e.g., a class C with uninstantiated parameters).
@@ -197,11 +200,8 @@ public interface JL5TypeSystem extends TypeSystem, ParamTypeSystem {
 
     boolean checkIntersectionBounds(List<? extends Type> bounds, boolean quiet) throws SemanticException;
 
-    JL5MethodInstance methodCallValid(JL5MethodInstance mi, String name,
-            List<Type> argTypes, List<Type> actualTypeArgs,
-            Type expectedReturnType);
-
-    Type glb(ReferenceType t1, ReferenceType t2);
+    ReferenceType glb(ReferenceType t1, ReferenceType t2);
+    ReferenceType glb(Position pos, List<ReferenceType> bounds);
 
     UnknownType unknownReferenceType(Position position);
 
@@ -209,7 +209,7 @@ public interface JL5TypeSystem extends TypeSystem, ParamTypeSystem {
      * Create a raw class
      */
     Type toRawType(Type t);
-    
+
     /**
      * Create a raw class
      */
@@ -236,10 +236,25 @@ public interface JL5TypeSystem extends TypeSystem, ParamTypeSystem {
     Type unboxingConversion(Type t);
 
     /**
-     * Compute the least upper bound of a set of types <code>us</code>. This is the
+     * Compute the least upper bound of a set of types <code>bounds</code>. This is the
      * lub(U1 ... Uk) function, as defined in the JLS 3rd edition, Section 15.12.2.7. 
      */
-    LubType lub(Position pos, List<ReferenceType> us);
+    LubType lub(Position pos, List<ReferenceType> bounds);
+
+    boolean isValidAnnotationValueType(Type t);
+    AnnotationElemInstance annotationElemInstance(Position pos, ClassType ct, Flags f, Type type,
+                                                  String name, boolean hasDefault);
+
+    void checkAnnotationValueConstant(Expr value) throws SemanticException;
+
+    AnnotationElemInstance findAnnotation(ReferenceType t, String name, ClassType currentClass) throws SemanticException;
+
+    /**
+     * Return the class representing Class<type>
+     * @param type
+     * @return
+     */
+    Type Class(Position pos, Type type);
 
 
 

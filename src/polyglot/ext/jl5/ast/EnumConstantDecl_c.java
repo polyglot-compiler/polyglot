@@ -23,13 +23,16 @@ public class EnumConstantDecl_c extends Term_c implements EnumConstantDecl
     protected ConstructorInstance constructorInstance;
     protected ParsedClassType type;
     protected long ordinal;
+    protected List<AnnotationElem> annotations;
+
     
-    public EnumConstantDecl_c(Position pos, Flags flags, Id name, List args, ClassBody body){
+    public EnumConstantDecl_c(Position pos, Flags flags, List<AnnotationElem> annotations, Id name, List args, ClassBody body){
         super(pos);
         this.name = name;
         this.args = args;
         this.body = body;
         this.flags = flags;
+        this.annotations = annotations;
     }
 	@Override
 	public long ordinal() {

@@ -17,9 +17,9 @@ import polyglot.visit.TypeChecker;
 
 public class JL5EnumDecl_c extends JL5ClassDecl_c implements JL5EnumDecl {
 
-	public JL5EnumDecl_c(Position pos, Flags flags, Id name,
+	public JL5EnumDecl_c(Position pos, Flags flags, List<AnnotationElem> annotations, Id name,
 			TypeNode superClass, List interfaces, ClassBody body) {
-		super(pos, flags, name, superClass, interfaces, body);
+		super(pos, flags, annotations, name, superClass, interfaces, body);
 	}
 	
 	

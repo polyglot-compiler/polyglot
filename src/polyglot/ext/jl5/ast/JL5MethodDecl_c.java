@@ -16,14 +16,16 @@ public class JL5MethodDecl_c extends MethodDecl_c implements JL5MethodDecl {
 
     protected boolean compilerGenerated;
     protected List<ParamTypeNode> typeParams;
+    protected List<AnnotationElem> annotations;
 
-    public JL5MethodDecl_c(Position pos, Flags flags, TypeNode returnType, Id name, List formals, List throwTypes, Block body){
-        this(pos, flags, returnType, name, formals, throwTypes, body, new ArrayList<ParamTypeNode>());
+    public JL5MethodDecl_c(Position pos, Flags flags, List<AnnotationElem> annotations, TypeNode returnType, Id name, List formals, List throwTypes, Block body){
+        this(pos, flags, annotations, returnType, name, formals, throwTypes, body, new ArrayList<ParamTypeNode>());
     }
 
-    public JL5MethodDecl_c(Position pos, Flags flags, TypeNode returnType, Id name, List formals, List throwTypes, Block body, List typeParams){
+    public JL5MethodDecl_c(Position pos, Flags flags, List<AnnotationElem> annotations, TypeNode returnType, Id name, List formals, List throwTypes, Block body, List typeParams){
         super(pos, flags, returnType, name, formals, throwTypes, body);
         this.typeParams = typeParams;
+        this.annotations = annotations;
     }
 
 

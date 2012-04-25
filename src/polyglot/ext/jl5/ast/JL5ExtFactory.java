@@ -15,4 +15,14 @@ public interface JL5ExtFactory extends ExtFactory {
 
     Ext extParamTypeNode();
 
+    Ext extAnnotationElemDecl();
+
+    Ext extNormalAnnotationElem();
+
+    Ext extMarkerAnnotationElem();
+
+    Ext extSingleElementAnnotationElem();
+
+    Ext extElementValuePair();
+
 }

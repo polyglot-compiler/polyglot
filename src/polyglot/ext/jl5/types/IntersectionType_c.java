@@ -299,4 +299,14 @@ public class IntersectionType_c extends ClassType_c implements IntersectionType 
     public String translateAsReceiver(Resolver resolver) {
         throw new UnsupportedOperationException();
     }
+
+    @Override
+    public AnnotationElemInstance annotationElemNamed(String name) {
+        return null;
+    }
+
+    @Override
+    public List<AnnotationElemInstance> annotationElems() {
+        return Collections.EMPTY_LIST;
+    }
 }

@@ -12,7 +12,7 @@ public class JL5MethodInstance_c extends MethodInstance_c implements JL5MethodIn
     private List<TypeVariable> typeParams;
     //    protected PClass instantiatedFrom;
 
-    public JL5MethodInstance_c(JL5TypeSystem_c ts, Position pos,
+    public JL5MethodInstance_c(JL5TypeSystem ts, Position pos,
                                ReferenceType container, Flags flags, Type returnType,
                                String name, List argTypes, List excTypes, List typeParams) {
         super(ts, pos, container, flags, returnType, name, argTypes, excTypes);

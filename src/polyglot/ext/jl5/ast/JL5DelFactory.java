@@ -15,4 +15,14 @@ public interface JL5DelFactory extends DelFactory {
 
     JL delParamTypeNode();
 
+    JL delAnnotationElemDecl();
+
+    JL delNormalAnnotationElem();
+
+    JL delMarkerAnnotationElem();
+
+    JL delSingleElementAnnotationElem();
+
+    JL delElementValuePair();
+
 }

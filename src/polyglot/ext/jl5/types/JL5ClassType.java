@@ -16,7 +16,11 @@ public interface JL5ClassType extends ClassType {
     
     EnumInstance enumConstantNamed(String name);
     List<EnumInstance> enumConstants();
+    
+    AnnotationElemInstance annotationElemNamed(String name);
+    List<AnnotationElemInstance> annotationElems();
 
+    
     /**
      * Return a chain of types that show that this class can be implicitly cast
      * to toType.
@@ -33,4 +37,5 @@ public interface JL5ClassType extends ClassType {
      * @param context
      */
     String translateAsReceiver(Resolver resolver);
+   
 }

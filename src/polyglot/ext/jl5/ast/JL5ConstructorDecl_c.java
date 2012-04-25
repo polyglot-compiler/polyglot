@@ -15,14 +15,16 @@ import polyglot.visit.*;
 public class JL5ConstructorDecl_c extends ConstructorDecl_c implements JL5ConstructorDecl {
 
     protected List<TypeNode> typeParams;
+    protected List<AnnotationElem> annotations;
 
-    public JL5ConstructorDecl_c(Position pos, Flags flags, Id name, List formals, List throwTypes, Block body) {
-        this(pos, flags, name, formals, throwTypes, body, new ArrayList<ParamTypeNode>());
+    public JL5ConstructorDecl_c(Position pos, Flags flags, List<AnnotationElem> annotations, Id name, List formals, List throwTypes, Block body) {
+        this(pos, flags, annotations, name, formals, throwTypes, body, new ArrayList<ParamTypeNode>());
     }
 
-    public JL5ConstructorDecl_c(Position pos, Flags flags, Id name, List formals, List throwTypes, Block body, List typeParams){
+    public JL5ConstructorDecl_c(Position pos, Flags flags, List<AnnotationElem> annotations, Id name, List formals, List throwTypes, Block body, List typeParams){
         super(pos, flags, name, formals, throwTypes, body);
         this.typeParams = typeParams;
+        this.annotations = annotations;
     }
 
     @Override

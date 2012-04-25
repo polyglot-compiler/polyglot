@@ -49,8 +49,7 @@ public class JL5SubstClassType_c extends SubstClassType_c implements JL5SubstCla
     // Implement methods of JL5ClassType
     @Override
     public EnumInstance enumConstantNamed(String name) {
-        for(Iterator it = enumConstants().iterator(); it.hasNext();){
-            EnumInstance ei = (EnumInstance)it.next();
+        for(EnumInstance ei : enumConstants()){
             if (ei.name().equals(name)){
                 return ei;
             }
@@ -62,6 +61,22 @@ public class JL5SubstClassType_c extends SubstClassType_c implements JL5SubstCla
     public List<EnumInstance> enumConstants() {
         return subst.substFieldList(((JL5ClassType)base).enumConstants());
     }
+    
+    @Override
+    public AnnotationElemInstance annotationElemNamed(String name) {
+        for(AnnotationElemInstance ai : annotationElems()){
+            if (ai.name().equals(name)){
+                return ai;
+            }
+        }
+        return null;
+    }
+
+    @Override
+    public List<AnnotationElemInstance> annotationElems() {
+        return ((JL5ClassType)this.base).annotationElems();
+    }
+
 
     /** Pretty-print the name of this class to w. */
     @Override
@@ -241,4 +256,5 @@ public class JL5SubstClassType_c extends SubstClassType_c implements JL5SubstCla
         return ct.name();
     }
 
+    
 }

@@ -1,6 +1,7 @@
 package polyglot.ext.jl5.types;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import polyglot.frontend.Job;
@@ -204,4 +205,14 @@ public class RawClass_c extends JL5ClassType_c implements RawClass {
         throw new InternalCompilerError("Should never be called");        
     }
 
+    @Override
+    public AnnotationElemInstance annotationElemNamed(String name) {
+        return this.erased().annotationElemNamed(name);
+    }
+
+    @Override
+    public List<AnnotationElemInstance> annotationElems() {
+        return this.erased().annotationElems();
+    }
+    
 }

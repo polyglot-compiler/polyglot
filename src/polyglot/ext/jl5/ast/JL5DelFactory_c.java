@@ -71,6 +71,57 @@ public class JL5DelFactory_c extends AbstractDelFactory_c implements JL5DelFacto
     }
 
     
+    @Override
+    public JL delAnnotationElemDecl() {
+        JL e = delAnnotationElemDeclImpl();
+
+        if (nextDelFactory() != null) {
+            JL e2 = nextDelFactory().delAnnotationElemDecl();
+            e = composeDels(e, e2);
+        }
+        return postDelAnnotationElemDecl(e);
+    }
+    @Override
+    public JL delNormalAnnotationElem() {
+        JL e = delNormalAnnotationElemImpl();
+
+        if (nextDelFactory() != null) {
+            JL e2 = nextDelFactory().delNormalAnnotationElem();
+            e = composeDels(e, e2);
+        }
+        return postDelNormalAnnotationElem(e);
+    }
+    @Override
+    public JL delMarkerAnnotationElem() {
+        JL e = delMarkerAnnotationElemImpl();
+
+        if (nextDelFactory() != null) {
+            JL e2 = nextDelFactory().delMarkerAnnotationElem();
+            e = composeDels(e, e2);
+        }
+        return postDelMarkerAnnotationElem(e);
+    }
+    @Override
+    public JL delSingleElementAnnotationElem() {
+        JL e = delSingleElementAnnotationElemImpl();
+
+        if (nextDelFactory() != null) {
+            JL e2 = nextDelFactory().delSingleElementAnnotationElem();
+            e = composeDels(e, e2);
+        }
+        return postDelSingleElementAnnotationElem(e);
+    }
+    @Override
+    public JL delElementValuePair() {
+        JL e = delElementValuePairImpl();
+
+        if (nextDelFactory() != null) {
+            JL e2 = nextDelFactory().delElementValuePair();
+            e = composeDels(e, e2);
+        }
+        return postDelElementValuePair(e);
+    }
+
     public JL delEnumDeclImpl() {
         return this.delClassDeclImpl();
     }
@@ -112,6 +163,40 @@ public class JL5DelFactory_c extends AbstractDelFactory_c implements JL5DelFacto
     }
     public JL postDelParamTypeNode(JL del) {
         return this.postDelTypeNode(del);
+    }
+
+    
+    private JL postDelAnnotationElemDecl(JL e) {
+        return e;
+    }
+    private JL delAnnotationElemDeclImpl() {
+        return this.delClassMemberImpl();
+    }
+    private JL delNormalAnnotationElemImpl() {
+        return this.delExprImpl();
+    }
+    private JL delMarkerAnnotationElemImpl() {
+        return this.delNormalAnnotationElemImpl();
+    }
+    private JL delSingleElementAnnotationElemImpl() {
+        return this.delNormalAnnotationElemImpl();
+    }
+    private JL delElementValuePairImpl() {
+        return this.delExprImpl();
+    }
+
+    
+    private JL postDelNormalAnnotationElem(JL e) {
+        return e;
+    }
+    private JL postDelMarkerAnnotationElem(JL e) {
+        return e;
+    }
+    private JL postDelSingleElementAnnotationElem(JL e) {
+        return e;
+    }
+    private JL postDelElementValuePair(JL e) {
+        return e;
     }
 
 }

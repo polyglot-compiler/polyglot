@@ -28,9 +28,8 @@ public class JL5Switch_c extends Switch_c implements JL5Switch  {
         JL5Context context = (JL5Context)tc.context();
         JL5NodeFactory nf = (JL5NodeFactory)tc.nodeFactory();
 
-        if (!((expr.type().isClass() && JL5Flags.isEnum(expr.type().toClass().flags())) 
-        		|| ts.isImplicitCastValid(expr.type(), ts.Int()))) {
-            throw new SemanticException("Switch index must be an integer or enum.",
+        if (!isAcceptableSwitchType(expr.type())) { 
+            throw new SemanticException("Switch index must be of type char, byte, short, int, Character, Byte, Short, Integer, or an enum type.",
                                         position());
         }
    
@@ -44,6 +43,23 @@ public class JL5Switch_c extends Switch_c implements JL5Switch  {
         	newels.add(el);
         }
         return elements(newels);
+    }
+
+    protected boolean isAcceptableSwitchType(Type type) {
+        JL5TypeSystem ts = (JL5TypeSystem)type.typeSystem();
+        if (ts.Char().equals(type) || ts.Byte().equals(type) || ts.Short().equals(type) || ts.Int().equals(type)) {
+            return true;
+        }
+        if (ts.wrapperClassOfPrimitive(ts.Char()).equals(type) 
+                || ts.wrapperClassOfPrimitive(ts.Byte()).equals(type)
+                || ts.wrapperClassOfPrimitive(ts.Short()).equals(type)
+                || ts.wrapperClassOfPrimitive(ts.Int()).equals(type)) {
+            return true;
+        }
+        if (type.isClass() && JL5Flags.isEnum(type.toClass().flags())) {
+            return true;
+        }
+        return false;
     }
 
 }

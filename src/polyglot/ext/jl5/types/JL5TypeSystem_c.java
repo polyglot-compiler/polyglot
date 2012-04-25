@@ -2,6 +2,10 @@ package polyglot.ext.jl5.types;
 
 import java.util.*;
 
+import polyglot.ast.ArrayInit;
+import polyglot.ast.ClassLit;
+import polyglot.ast.Expr;
+import polyglot.ast.NullLit;
 import polyglot.ext.jl5.types.inference.InferenceSolver;
 import polyglot.ext.jl5.types.inference.InferenceSolver_c;
 import polyglot.ext.jl5.types.inference.LubType;
@@ -37,6 +41,15 @@ public class JL5TypeSystem_c extends ParamTypeSystem_c implements JL5TypeSystem 
         }
         else {
             return ENUM_ = load("java.lang.Enum");
+        }
+    }
+
+    public ClassType Annotation() {
+        if (ANNOTATION_ != null) {
+            return ANNOTATION_;
+        }
+        else {
+            return ANNOTATION_ = load("java.lang.annotation.Annotation");
         }
     }
 
@@ -97,9 +110,9 @@ public class JL5TypeSystem_c extends ParamTypeSystem_c implements JL5TypeSystem 
         }
     }
 
-    protected final Flags TOP_LEVEL_CLASS_FLAGS = JL5Flags.setEnum(super.TOP_LEVEL_CLASS_FLAGS);
+    protected final Flags TOP_LEVEL_CLASS_FLAGS = JL5Flags.setAnnotation(JL5Flags.setEnum(super.TOP_LEVEL_CLASS_FLAGS));
 
-    protected final Flags MEMBER_CLASS_FLAGS = JL5Flags.setEnum(super.MEMBER_CLASS_FLAGS);
+    protected final Flags MEMBER_CLASS_FLAGS = JL5Flags.setAnnotation(JL5Flags.setEnum(super.MEMBER_CLASS_FLAGS));
 
     public void checkTopLevelClassFlags(Flags f) throws SemanticException {
         if (!f.clear(TOP_LEVEL_CLASS_FLAGS).equals(Flags.NONE)) {
@@ -432,6 +445,7 @@ public class JL5TypeSystem_c extends ParamTypeSystem_c implements JL5TypeSystem 
                 // Method name must match
                 if (! mi.name().equals(name)) continue;
                 JL5MethodInstance substMi = methodCallValid(mi, name, argTypes, actualTypeArgs, expectedReturnType); 
+
                 if (substMi != null) {
                     mi = substMi;
                     if (isAccessible(mi, container, currClass)) {
@@ -496,11 +510,7 @@ public class JL5TypeSystem_c extends ParamTypeSystem_c implements JL5TypeSystem 
     @Override
     public boolean methodCallValid(MethodInstance mi,
             String name, List argTypes) {
-        return this.methodCallValid((JL5MethodInstance) mi, name, argTypes, null) != null;
-    }
-    @Override
-    public JL5MethodInstance methodCallValid(JL5MethodInstance mi, String name, List<Type> argTypes, List<Type> actualTypeArgs) {
-        return methodCallValid(mi, name, argTypes, actualTypeArgs, null);
+        return this.methodCallValid((JL5MethodInstance) mi, name, argTypes, null, null) != null;
     }
     @Override
     public JL5MethodInstance methodCallValid(JL5MethodInstance mi, String name, List<Type> argTypes, List<Type> actualTypeArgs, Type expectedReturnType) {
@@ -597,13 +607,7 @@ public class JL5TypeSystem_c extends ParamTypeSystem_c implements JL5TypeSystem 
      */
     private JL5Subst inferTypeArgs(JL5ProcedureInstance mi, List argTypes, Type expectedReturnType) {
         InferenceSolver s = new InferenceSolver_c(mi, argTypes, this);
-        Map<TypeVariable, Type> m;
-        if (expectedReturnType != null) {
-            m = s.solve(expectedReturnType);
-        }
-        else {
-            m = s.solve();            
-        }
+        Map<TypeVariable, Type> m = s.solve(expectedReturnType);
         if (m == null) return null;
         JL5Subst subst = (JL5Subst) this.subst(m, new HashMap());
         return subst;
@@ -1094,12 +1098,12 @@ public class JL5TypeSystem_c extends ParamTypeSystem_c implements JL5TypeSystem 
     @Override
     public MethodInstance findMethod(ReferenceType container,
             java.lang.String name, List argTypes, List<Type> typeArgs,
-            ClassType currClass) throws SemanticException {
+            ClassType currClass, Type expectedReturnType) throws SemanticException {
 
         assert_(container);
         assert_(argTypes);
 
-        List acceptable = findAcceptableMethods(container, name, argTypes, typeArgs, currClass);
+        List acceptable = findAcceptableMethods(container, name, argTypes, typeArgs, currClass, expectedReturnType);
 
         if (acceptable.size() == 0) {
             throw new NoMemberException(NoMemberException.METHOD,
@@ -1543,13 +1547,20 @@ public class JL5TypeSystem_c extends ParamTypeSystem_c implements JL5TypeSystem 
         List<ReferenceType> l = new ArrayList<ReferenceType>();
         l.add(t1);
         l.add(t2);
+        return glb(Position.compilerGenerated(), l);
+    }
+
+    public ReferenceType glb(Position pos, List<ReferenceType> bounds) {
+        if (bounds == null || bounds.isEmpty()) {
+            return this.Object();
+        }
         try {
             // XXX also need to check that does not have two classes that are not in a subclass relation?
-            if (!this.checkIntersectionBounds(l, true)) {
+            if (!this.checkIntersectionBounds(bounds, true)) {
                 return this.Object();
             }
             else {
-                return this.intersectionType(Position.compilerGenerated(), l);
+                return this.intersectionType(pos, bounds);
             }
         } catch (SemanticException e) {
             return this.Object();
@@ -1622,6 +1633,101 @@ public class JL5TypeSystem_c extends ParamTypeSystem_c implements JL5TypeSystem 
     @Override
     public LubType lub(Position pos, List<ReferenceType> us) {
         return new LubType_c(this, pos, us);
+    }
+
+    @Override
+    public boolean isValidAnnotationValueType(Type t) {
+        // must be one of primitive, String, Class, enum, annotation or
+        // array of one of these
+        if (t.isPrimitive())
+            return true;
+        if (t.isClass()) {
+            if (JL5Flags.isEnum(t.toClass().flags()) || JL5Flags.isAnnotation(t.toClass().flags()) || String().equals(t) || Class().equals(t)) {
+                return true;
+            }
+        }
+        if (t.isArray()) {
+            return isValidAnnotationValueType(t.toArray().base());
+        }
+        return false;
+    }
+
+    @Override
+    public void checkAnnotationValueConstant(Expr value) throws SemanticException {
+        if (value instanceof ArrayInit) {
+            // check elements
+            for (Iterator it = ((ArrayInit) value).elements().iterator(); it.hasNext();) {
+                Expr next = (Expr) it.next();
+                if ((!next.isConstant() || next == null || next instanceof NullLit)
+                        && !(next instanceof ClassLit)) {
+                    throw new SemanticException("Annotation attribute value must be constant", value.position());
+                }
+            }
+        }
+        else if ((!value.isConstant() || value == null || value instanceof NullLit)
+                && !(value instanceof ClassLit)) {
+            // for purposes of annotation elems class lits are constants
+            throw new SemanticException("Annotation attribute value must be constant", value.position());
+        }
+    }
+
+    @Override
+    public AnnotationElemInstance annotationElemInstance(Position pos, ClassType ct, Flags f, Type type, java.lang.String name, boolean hasDefault) {
+        assert_(ct);
+        return new AnnotationElemInstance_c(this, pos, ct, f, type, name, hasDefault);
+   }
+
+    
+    @Override
+    public AnnotationElemInstance findAnnotation(ReferenceType container, String name,
+                                                 ClassType currClass) throws SemanticException {
+        Collection annotations = findAnnotations(container, name);
+        if (annotations.size() == 0) {
+            throw new NoMemberException(JL5NoMemberException.ANNOTATION, "Annotation: \"" + name
+                                        + "\" not found in type \"" + container + "\".");
+        }
+        Iterator i = annotations.iterator();
+        AnnotationElemInstance ai = (AnnotationElemInstance) i.next();
+
+        if (i.hasNext()) {
+            AnnotationElemInstance ai2 = (AnnotationElemInstance) i.next();
+
+            throw new SemanticException("Annotation \"" + name
+                                        + "\" is ambiguous; it is defined in both " + ai.container() + " and "
+                                        + ai2.container() + ".");
+        }
+
+        if (currClass != null && !isAccessible(ai, currClass)) {
+            throw new SemanticException("Cannot access " + ai + ".");
+        }
+        return ai;
+    }
+
+    public Set<AnnotationElemInstance> findAnnotations(ReferenceType container, String name) {
+        assert_(container);
+        if (container == null) {
+            throw new InternalCompilerError("Cannot access annotation \"" + name
+                                            + "\" within a null container type.");
+        }
+        AnnotationElemInstance ai = ((JL5ParsedClassType) container).annotationElemNamed(name);
+
+        if (ai != null) {
+            return Collections.singleton(ai);
+        }
+
+        Set annotations = new HashSet();
+
+        return annotations;
+    }
+
+    @Override
+    public Type Class(Position pos, Type type) {
+        try {
+            return this.instantiate(pos, (JL5ParsedClassType)this.Class(), Collections.singletonList(type));
+        }
+        catch (SemanticException e) {
+            throw new InternalCompilerError("Couldn't create class java.lang.Class<"+type+">", e);
+        }
     }
 
 

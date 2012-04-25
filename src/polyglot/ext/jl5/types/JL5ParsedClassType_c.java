@@ -13,21 +13,13 @@ import polyglot.util.TypedList;
 public class JL5ParsedClassType_c extends ParsedClassType_c implements JL5ParsedClassType {
     protected PClass pclass;
     protected List<TypeVariable> typeVars = Collections.EMPTY_LIST;
-//	protected boolean wasGeneric;
-	protected List<EnumInstance> enumConstants;
+    protected List<EnumInstance> enumConstants;
+    protected List<AnnotationElemInstance> annotationElems;
 
     public JL5ParsedClassType_c( TypeSystem ts, LazyClassInitializer init, Source fromSource){
         super(ts, init, fromSource);
     }
-    
-//    public boolean wasGeneric() {
-//    	return wasGeneric;
-//    }
-    
-//    public void setWasGeneric(boolean wg) {
-//    	this.wasGeneric = wg;
-//    }
-    
+        
     public void addEnumConstant(EnumInstance ei){
     	addField(ei);
         enumConstants().add(ei);
@@ -36,14 +28,13 @@ public class JL5ParsedClassType_c extends ParsedClassType_c implements JL5Parsed
     public List<EnumInstance> enumConstants(){
         if (enumConstants == null){
             enumConstants = new TypedList(new LinkedList(), 
-            		EnumInstance.class, false);
+                        EnumInstance.class, false);
         }    
         return enumConstants;
     }
    
     public EnumInstance enumConstantNamed(String name){
-        for(Iterator it = enumConstants().iterator(); it.hasNext();){
-            EnumInstance ei = (EnumInstance)it.next();
+        for (EnumInstance ei : enumConstants()) {
             if (ei.name().equals(name)){
                 return ei;
             }
@@ -51,6 +42,26 @@ public class JL5ParsedClassType_c extends ParsedClassType_c implements JL5Parsed
         return null;
     }
     
+    @Override
+    public AnnotationElemInstance annotationElemNamed(String name) {
+        for (AnnotationElemInstance ai : annotationElems()) {
+            if (ai.name().equals(name)){
+                return ai;
+            }
+        }
+        return null;
+    }
+
+    @Override
+    public List<AnnotationElemInstance> annotationElems() {
+        if (annotationElems == null){
+            annotationElems = new TypedList(new LinkedList(), 
+                                            AnnotationElemInstance.class, false);
+        }    
+        return annotationElems;
+    }
+
+
 	// find methods with compatible name and formals as the given one
     public List methods(JL5MethodInstance mi) {
         List l = new LinkedList();

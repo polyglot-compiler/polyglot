@@ -1,5 +1,7 @@
 package polyglot.ext.jl5.ast;
 
+import java.util.List;
+
 import polyglot.ast.Formal_c;
 import polyglot.ast.Id;
 import polyglot.ast.Node;
@@ -18,14 +20,17 @@ import polyglot.visit.TypeChecker;
 public class JL5Formal_c extends Formal_c implements JL5Formal {
 
     protected boolean isVarArg;
+    protected List<AnnotationElem> annotations;
 
-    public JL5Formal_c(Position pos, Flags flags, TypeNode type, Id name){
-        this(pos, flags, type, name, false);
+    
+    public JL5Formal_c(Position pos, Flags flags, List<AnnotationElem> annotations, TypeNode type, Id name){
+        this(pos, flags, annotations, type, name, false);
     }
 
-    public JL5Formal_c(Position pos, Flags flags, TypeNode type, Id name, boolean variable){
+    public JL5Formal_c(Position pos, Flags flags, List<AnnotationElem> annotations, TypeNode type, Id name, boolean variable){
         super(pos, flags, type, name);
         this.isVarArg = variable;
+        this.annotations = annotations;
     }
 
     @Override

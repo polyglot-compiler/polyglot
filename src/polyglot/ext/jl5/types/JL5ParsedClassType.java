@@ -38,5 +38,5 @@ public interface JL5ParsedClassType extends ParsedClassType, JL5ClassType {
     JL5Subst erasureSubst();
     
     void printNoParams(CodeWriter w);
-    String toStringNoParams();
+    String toStringNoParams();    
 }
