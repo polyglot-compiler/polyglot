@@ -1,0 +1,17 @@
+class C {
+  void m() {
+    Long i = 0L;
+    Long ii = 0L;
+    i = i + ii;
+    long j = 0L;
+    j += i;
+
+    i += j;
+
+    ii++;
+    --i;
+    j++;
+    --j;
+    i += ii++;
+  }
+}
