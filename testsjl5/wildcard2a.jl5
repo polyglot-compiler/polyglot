@@ -1,0 +1,25 @@
+import java.util.*;
+
+class A {
+}
+
+class B extends A {
+}
+
+class C extends B {
+}
+
+class Pair<X,Y> {
+}
+class M {
+	List<?> l1 = new LinkedList<C>();
+    Collection< Pair<String,Long> >        c1 = new ArrayList<Pair<String,Long>>();
+
+    Collection< Pair<String,Long> >        c2 = c1;  // fine
+    Collection< ? extends Pair<String,?> > c4 = c1;  // fine 
+    void test() {
+String s = new String("abc");
+Class<?>                c1 = s.getClass();  // fine
+Class<? extends String> c2 = s.getClass();  // fine     
+}
+}
