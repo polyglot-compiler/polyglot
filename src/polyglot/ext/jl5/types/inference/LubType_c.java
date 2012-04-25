@@ -349,4 +349,14 @@ public class LubType_c extends ClassType_c implements LubType {
         return ts.Object();
     }
 
+    @Override
+    public AnnotationElemInstance annotationElemNamed(String name) {
+        return null;
+    }
+
+    @Override
+    public List<AnnotationElemInstance> annotationElems() {
+        return Collections.emptyList();
+    }
+
 }

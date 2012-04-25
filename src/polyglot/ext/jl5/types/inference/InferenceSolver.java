@@ -13,7 +13,6 @@ public interface InferenceSolver {
     List<TypeVariable> typeVariablesToSolve();
     boolean isTargetTypeVariable(Type t);
     
-    Map<TypeVariable, Type> solve();
     Map<TypeVariable, Type> solve(Type expectedReturnType);
     
     JL5TypeSystem typeSystem();

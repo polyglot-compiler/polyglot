@@ -3,6 +3,7 @@ package polyglot.ext.jl5.types.inference;
 import java.util.Collections;
 import java.util.List;
 
+import polyglot.ext.jl5.types.TypeVariable;
 import polyglot.types.Type;
 
 /**
@@ -23,7 +24,7 @@ public class SubTypeConstraint extends Constraint {
 
     @Override
     public boolean canSimplify() {
-        return !solver.isTargetTypeVariable(formal);
+        return formal instanceof TypeVariable && !solver.isTargetTypeVariable(formal);
     }
     
     public String toString() {

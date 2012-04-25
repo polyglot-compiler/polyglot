@@ -2,10 +2,19 @@ package polyglot.ext.jl5.types.inference;
 
 import java.util.*;
 
-import polyglot.ext.jl5.types.*;
+import polyglot.ext.jl5.types.JL5ArrayType;
+import polyglot.ext.jl5.types.JL5Flags;
+import polyglot.ext.jl5.types.JL5ProcedureInstance;
+import polyglot.ext.jl5.types.JL5TypeSystem;
+import polyglot.ext.jl5.types.TypeVariable;
+import polyglot.ext.param.types.Subst;
+import polyglot.types.MethodInstance;
 import polyglot.types.ReferenceType;
 import polyglot.types.Type;
+import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
+
+import com.sun.tools.jdi.LinkedHashMap;
 
 public class InferenceSolver_c implements InferenceSolver {
 
@@ -19,8 +28,6 @@ public class InferenceSolver_c implements InferenceSolver {
 
     private List<TypeVariable> typeVariablesToSolve;
 
-    private Type expectedReturnType = null;
-
     public InferenceSolver_c(JL5ProcedureInstance pi, List<Type> actuals, JL5TypeSystem ts) {
         this.pi = pi;
         this.typeVariablesToSolve = pi.typeParams();
@@ -28,14 +35,6 @@ public class InferenceSolver_c implements InferenceSolver {
         this.formalTypes = pi.formalTypes();
         this.ts = ts;
     }
-
-//    public InferenceSolver_c(List<TypeVariable> typeVars, List<Type> formals, List<Type> actuals,
-//            JL5TypeSystem ts) {
-//        this.ts = ts;
-//        this.actualArgumentTypes = actuals;
-//        this.formalTypes = formals;
-//        this.typeVariablesToSolve = typeVars;
-//    }
 
     public boolean isTargetTypeVariable(Type t) {
         if (t instanceof TypeVariable) {
@@ -49,18 +48,21 @@ public class InferenceSolver_c implements InferenceSolver {
         return typeVariablesToSolve;
     }
 
-    public Map<TypeVariable, Type> solve() {
-        List<Constraint> constraints = getInitialConstraints();
+    private Type[] solve(List<Constraint> constraints, boolean useSubtypeConstraints, boolean useSupertypeConstraints) {
         List<EqualConstraint> equals = new ArrayList<EqualConstraint>();
         List<SubTypeConstraint> subs = new ArrayList<SubTypeConstraint>();
         List<SuperTypeConstraint> supers = new ArrayList<SuperTypeConstraint>();
 //        System.err.println("**** inference solver:");
 //        System.err.println("      constraints : " + constraints);
 
+        if (!(useSubtypeConstraints ^ useSupertypeConstraints)) {
+            throw new InternalCompilerError("Must use exactly one of useSubtytpeConstraints and useSuperTypeConstraints");
+        }
         while (!constraints.isEmpty()) {
             Constraint head = constraints.remove(0);
             if (head.canSimplify()) {
-                constraints.addAll(0, head.simplify());
+                List<Constraint> simps = head.simplify();
+                constraints.addAll(0, simps);
             }
             else {
                 if (head instanceof EqualConstraint) {
@@ -77,6 +79,10 @@ public class InferenceSolver_c implements InferenceSolver {
                 }
             }
         }
+//        System.err.println("      a equals : " + equals);
+//        System.err.println("      a subs   : " + subs);
+//        System.err.println("      a supers : " + supers);
+
         Comparator<Constraint> comp = new Comparator<Constraint>() {
             public int compare(Constraint o1, Constraint o2) {
                 return typeVariablesToSolve().indexOf(o1) - typeVariablesToSolve().indexOf(o2);
@@ -84,6 +90,7 @@ public class InferenceSolver_c implements InferenceSolver {
         };
         Collections.sort(equals, comp);
         Collections.sort(subs, comp);
+        Collections.sort(supers, comp);
 
 //        System.err.println("      equals : " + equals);
 //        System.err.println("      subs   : " + subs);
@@ -95,7 +102,6 @@ public class InferenceSolver_c implements InferenceSolver {
             if ((solution[i] != null) && (!ts.equals(eq.actual, solution[i]))) {
                 // incompatible equality constraints!
                 // No solution.
-                //solution[i] = ts.Object();
                 return null;
             }
             else {
@@ -105,28 +111,29 @@ public class InferenceSolver_c implements InferenceSolver {
         for (int i = 0; i < solution.length; i++) {
             if (solution[i] == null) {
                 TypeVariable toSolve = typeVariablesToSolve().get(i);
-                Set<ReferenceType> uset = new HashSet<ReferenceType>();
-                for (Constraint c : subs) {
-                    if (c.formal.equals(toSolve) && c.actual.isReference())
-                        uset.add((ReferenceType) c.actual);
+                Set<ReferenceType> bounds = new HashSet<ReferenceType>();
+                List<? extends Constraint> subSupConstraints = useSubtypeConstraints ? subs : supers;
+                for (Constraint c : subSupConstraints) {
+                    if (c.formal.equals(toSolve) && c.actual.isReference()) {
+                        bounds.add((ReferenceType) c.actual);
+                    }
                 }
-                List<ReferenceType> u = new ArrayList<ReferenceType>(uset);
+                List<ReferenceType> u = new ArrayList<ReferenceType>(bounds);
                 if (u.size() == 1) {
                     solution[i] = u.get(0);
                 }
                 else if (u.size() > 1) {
-                    solution[i] = ts.lub(Position.compilerGenerated(), u);
+                    if (useSubtypeConstraints) {
+                        solution[i] = ts.lub(Position.compilerGenerated(), u);
+                    }
+                    else {
+                        // supertype Constraints
+                        solution[i] = ts.glb(Position.compilerGenerated(), u);
+                    }
                 }
             }
         }
-        Map<TypeVariable, Type> m = new LinkedHashMap();
-        for (int i = 0; i < solution.length; i++) {
-            if (solution[i] == null) {
-                solution[i] = ts.Object();
-            }
-            m.put(typeVariablesToSolve().get(i), solution[i]);
-        }
-        return m;
+        return solution;
     }
 
     private List<Constraint> getInitialConstraints() {
@@ -149,8 +156,70 @@ public class InferenceSolver_c implements InferenceSolver {
     }
 
     public  Map<TypeVariable, Type> solve(Type expectedReturnType) {
-        this.expectedReturnType = expectedReturnType;
-        return solve();
+        // first, solve without considering the return type
+        Type[] solution = this.solve(getInitialConstraints(), true, false);
+        
+        if (solution == null) {
+            // no solution
+            return null;
+        }
+        
+        if (hasUnresolvedTypeArguments(solution)) {
+            // see if the return type is appropriate for inferring additional results
+            if (pi instanceof MethodInstance) {
+                Type returnType =  ((MethodInstance)pi).returnType();
+                if (returnType.isReference() && !returnType.isVoid()) {
+                    // See JLS 3rd ed, 15.12.2.8
+                    if (expectedReturnType == null) {
+                        expectedReturnType = ts.Object();
+                    }
+                    solution = solveWithExpectedReturnType(solution, expectedReturnType, returnType);
+                }
+            }
+        }
+
+        Map m = new LinkedHashMap();
+        for (int i = 0; i < solution.length; i++) {
+            if (solution[i] == null) {
+                // no solution for this variable.
+                solution[i] = ts.Object();
+            }
+            m.put(typeVariablesToSolve().get(i), solution[i]);
+        }
+        return m;
+    }
+
+    private Type[] solveWithExpectedReturnType(Type[] solution, Type expectedReturnType, Type declaredReturnType) {
+        List<Constraint> constraints = new ArrayList<Constraint>();
+        // get the subsitution corresponding to the solution so far
+        Map m = new LinkedHashMap();
+        for (int i = 0; i < solution.length; i++) {
+            Type t = solution[i];
+            if (t == null) {
+                t = typeVariablesToSolve().get(i);
+            }
+            m.put(typeVariablesToSolve().get(i), t);
+        }
+        Subst subst = ts.subst(m, new HashMap());
+        Type rt = subst.substType(declaredReturnType);
+        constraints.add(new SuperConversionConstraint(expectedReturnType, rt, this));
+        for (int i = 0; i < solution.length; i++) {
+            TypeVariable ti = typeVariablesToSolve().get(i);
+            Type bi = subst.substType(ti.upperBound());
+            constraints.add(new SuperConversionConstraint(bi, ti, this));
+        }
+        
+        return solve(constraints, false, true);
+
+    }
+
+    private boolean hasUnresolvedTypeArguments(Type[] solution) {
+        for (int i = 0; i < solution.length; i++) {
+            if (solution[i] == null) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public JL5TypeSystem typeSystem() {
