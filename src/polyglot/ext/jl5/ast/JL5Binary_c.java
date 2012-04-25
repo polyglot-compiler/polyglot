@@ -252,7 +252,14 @@ public class JL5Binary_c extends Binary_c implements JL5Binary {
                     Type childType = ts.primitiveTypeOfWrapper(child.type());
                     if ((childType != null) && childType.isNumeric()) return ts.promote(childType, other.type());
                 }
-
+                
+                // Added case for unboxing, when both operands are wrappers
+                Type otherType = ts.primitiveTypeOfWrapper(other.type());
+                Type childType = ts.primitiveTypeOfWrapper(child.type());
+                if (otherType != null && childType != null && otherType.isNumeric() && childType.isNumeric()) {
+                    return ts.promote(childType, otherType);
+                }
+                
                 return child.type();
             }
 
@@ -288,6 +295,19 @@ public class JL5Binary_c extends Binary_c implements JL5Binary {
                     Type childType = ts.primitiveTypeOfWrapper(child.type());
                     if ((childType != null) && childType.isNumeric()) return ts.promote(childType, other.type());
                 }
+                
+                // Added case for unboxing, when both operands are wrappers
+                Type otherType = ts.primitiveTypeOfWrapper(other.type());
+                Type childType = ts.primitiveTypeOfWrapper(child.type());
+                
+                if (otherType != null && childType != null && otherType.isBoolean() && childType.isBoolean()) {
+                    return childType;
+                }
+                
+                if (otherType != null && childType != null && otherType.isNumeric() && childType.isNumeric()) {
+                    return ts.promote(childType, otherType);
+                }
+                
 
                 return child.type();
             }
@@ -327,6 +347,19 @@ public class JL5Binary_c extends Binary_c implements JL5Binary {
                         }
                     }
                 }
+                // Added case for unboxing, when both operands are wrappers
+                Type otherType = ts.primitiveTypeOfWrapper(other.type());
+                Type childType = ts.primitiveTypeOfWrapper(child.type());
+                if (otherType != null && childType != null && otherType.isNumeric() && childType.isNumeric()) {
+                    Type t = ts.promote(childType, otherType);
+                    if (ts.isImplicitCastValid(t, av.toType())) {
+                        return t;
+                    } else {
+                        return av.toType();
+                    }
+                }
+                
+                
 
                 return child.type();
             }
@@ -376,6 +409,23 @@ public class JL5Binary_c extends Binary_c implements JL5Binary {
                         } else {
                             return ts.promote(childType);
                         }
+                    }
+                }
+
+                
+                // Added case for unboxing, when both operands are wrappers
+                Type otherType = ts.primitiveTypeOfWrapper(other.type());
+                Type childType = ts.primitiveTypeOfWrapper(child.type());
+                if (otherType != null && childType != null && otherType.isNumeric() && childType.isNumeric()) {
+                    if (child == left) {
+                        Type t = ts.promote(childType, otherType);
+                        if (ts.isImplicitCastValid(t, av.toType())) {
+                            return t;
+                        } else {
+                            return av.toType();
+                        }
+                    } else {
+                        return ts.promote(childType);
                     }
                 }
 
