@@ -107,7 +107,7 @@ public class InferenceSolver_c implements InferenceSolver {
                 TypeVariable toSolve = typeVariablesToSolve().get(i);
                 Set<ReferenceType> uset = new HashSet<ReferenceType>();
                 for (Constraint c : subs) {
-                    if (c.formal.equals(toSolve))
+                    if (c.formal.equals(toSolve) && c.actual.isReference())
                         uset.add((ReferenceType) c.actual);
                 }
                 List<ReferenceType> u = new ArrayList<ReferenceType>(uset);
