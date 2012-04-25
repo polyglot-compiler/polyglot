@@ -1,0 +1,4 @@
+class C {
+  <T> T m() { return null; }
+  Integer foo() { return m(); }
+}
