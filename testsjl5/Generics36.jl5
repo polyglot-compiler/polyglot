@@ -1,4 +1,12 @@
 class C {
-  <T> T m() { return null; }
-  Integer foo() { return m(); }
+  <T> T m(T o) { return null; }
+  <S> S m() { return null; }
+  Integer foo() { 
+      Boolean b = m(null);
+      return m(null); 
+  }
+  Integer bar() { 
+      Boolean b = m();
+      return m(); 
+  }
 }
