@@ -1,0 +1,7 @@
+class C {
+    void  m(String s) { }
+    void m(Boolean b) { }
+    void foo(boolean b) {
+	m(b ? "Hello" : null);
+    }
+}
