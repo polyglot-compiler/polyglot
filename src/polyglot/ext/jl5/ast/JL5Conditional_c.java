@@ -54,7 +54,7 @@ public class JL5Conditional_c extends Conditional_c {
             return type(t2);
         }
         if (t2.isNull() && t1.isReference()) {
-            return type(t2);
+            return type(t1);
         }
         
         // Otherwise, if the second and third operands have numeric type, then
