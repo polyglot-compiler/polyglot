@@ -45,22 +45,16 @@ public class SuperConversionConstraint extends Constraint {
         else if ((formal instanceof JL5SubstClassType) && (actual instanceof JL5SubstClassType)) {
             JL5SubstClassType formal_pt = (JL5SubstClassType) formal;
             JL5SubstClassType actual_pt = (JL5SubstClassType) actual;
-            JL5SubstClassType f = null;
             if (!actual_pt.base().equals(formal_pt.base())) {
-                f = solver.typeSystem().findGenericSupertype(actual_pt.base(), formal_pt);
+                JL5SubstClassType f = solver.typeSystem().findGenericSupertype(actual_pt.base(), formal_pt);
                 if (f != null) {
-                    // SC: this appears to be dead code
-                    //solver.typeSystem().applySubstitution(f, formal_pt.base().typeVariables(), formal_pt.typeArguments());
-
+                    // recurse!
+                    r.add(new SuperConversionConstraint(actual, f, solver));
                 }
             }
-            else
-                f = formal_pt;
-            
-            // at this point, 
-            if (f != null) {
+            else {
                 for (TypeVariable tv :  ((JL5ParsedClassType)formal_pt.base()).typeVariables()) {
-                    ReferenceType formal_targ = (ReferenceType) f.subst().substType(tv);
+                    ReferenceType formal_targ = (ReferenceType) formal_pt.subst().substType(tv);
                     ReferenceType actual_targ = (ReferenceType) actual_pt.subst().substType(tv);
                     if (!(formal_targ instanceof WildCardType)) {
                         if (!(actual_targ instanceof WildCardType)) {
