@@ -53,6 +53,7 @@ public class JL5Scheduler extends JLScheduler {
         try {
             g.addPrerequisiteGoal(TypeChecked(job), this);
             g.addPrerequisiteGoal(RemoveVarArgs(job), this);
+            g.addPrerequisiteGoal(RemoveExtendedFors(job), this);
             g.addPrerequisiteGoal(SimplifyExpressionsForBoxing(job), this);
         } catch (CyclicDependencyException e) {
             throw new InternalCompilerError(e);
