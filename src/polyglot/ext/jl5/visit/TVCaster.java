@@ -1,6 +1,7 @@
 package polyglot.ext.jl5.visit;
 
 import polyglot.ast.*;
+import polyglot.ext.jl5.JL5Options;
 import polyglot.ext.jl5.types.JL5TypeSystem;
 import polyglot.frontend.Job;
 import polyglot.types.SemanticException;
@@ -44,7 +45,16 @@ public class TVCaster extends AscriptionVisitor {
         return e;
     }
 
-    private Expr insertCast(Expr e, Type toType) {
+    private Expr insertCast(Expr e, Type toType) throws SemanticException {
+        if (toType.isClass() && toType.toClass().fullName().equals("java.lang.Enum")) {
+            // it's the enum type.
+            // see if we want to replace it
+            JL5Options opts = (JL5Options) job.extensionInfo().getOptions();
+            String enumImpl = opts.enumImplClass;
+            if (opts.removeJava5isms && enumImpl != null) {
+                toType = ts.typeForName(enumImpl);
+            }
+        }
         TypeNode tn = nf.CanonicalTypeNode(Position.compilerGenerated(), toType);
         Expr newE = nf.Cast(Position.compilerGenerated(), tn, e);
         return newE.type(toType);            
