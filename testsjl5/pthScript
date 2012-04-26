@@ -76,6 +76,7 @@ polyglot.ext.jl5.ExtensionInfo "-d out -classpath java-out -noserial -post \"jav
         Generics35.jl5 (Semantic); 
         Generics36.jl5;
         Generics37.jl5;
+        Generics38.jl5;
 	Boxing01.jl5;
 	Boxing02.jl5;
 	Boxing03.jl5;
@@ -141,6 +142,7 @@ polyglot.ext.jl5.ExtensionInfo "-d out -classpath java-out -noserial -post \"jav
 	GenericMethod11.jl5;
 	GenericMethod12.jl5 (Semantic), (Semantic);
 	GenericMethod13.jl5;
+	GenericMethod14.jl5;
 	InfiniteLoop.jl5;
 	Throw02.jl5;
 	JLS8.1.2.jl5;
@@ -306,6 +308,7 @@ polyglot.ext.jl5.ExtensionInfo "-d out -classpath java-out -removeJava5isms -enu
         Generics35.jl5 (Semantic);
         Generics36.jl5;
         Generics37.jl5;
+        Generics38.jl5;
 	Boxing01.jl5;
 	Boxing02.jl5;
 	Boxing03.jl5;
@@ -371,6 +374,7 @@ polyglot.ext.jl5.ExtensionInfo "-d out -classpath java-out -removeJava5isms -enu
         GenericMethod11.jl5;
         GenericMethod12.jl5 (Semantic), (Semantic);
         GenericMethod13.jl5;
+        GenericMethod14.jl5;
         InfiniteLoop.jl5;
         Throw02.jl5;
         JLS8.1.2.jl5;
