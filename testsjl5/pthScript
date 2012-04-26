@@ -262,6 +262,7 @@ polyglot.ext.jl5.ExtensionInfo "-d out -classpath java-out -noserial -post \"jav
 	EnumTest2.jl5;
 	EnumTest3.jl5;
 	EnumTest4.jl5;
+	EnumTest6.jl5;
 	enum1.jl5;
 	enum2.jl5;
 }
@@ -493,6 +494,7 @@ polyglot.ext.jl5.ExtensionInfo "-d out -classpath java-out -removeJava5isms -enu
         EnumTest2.jl5;
         EnumTest3.jl5;
         EnumTest4.jl5;
+        EnumTest6.jl5;
         enum1.jl5;
         enum2.jl5;
 }
