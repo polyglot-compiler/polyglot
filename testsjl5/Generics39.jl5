@@ -1,0 +1,22 @@
+class XObject {
+    String newCursor() {
+	return "newCursor";
+    }
+}
+
+class Resolver<T> { 
+    Resolver(Handler<T> h) { }
+}
+class Handler<S> {
+     void getKey(S o) { }
+}
+
+class D {
+    static void foo() {
+	Resolver<XObject> o = new Resolver<XObject>(
+					new Handler<XObject>() {
+	    void getKey(XObject i) {
+		int j = i.newCursor().length();
+	    }});
+    }
+}
