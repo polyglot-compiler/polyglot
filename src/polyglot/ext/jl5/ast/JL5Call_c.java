@@ -25,19 +25,19 @@ public class JL5Call_c extends Call_c implements JL5Call {
         super(pos, target, name, arguments);
         this.typeArgs = typeArgs;
     } 
-//    public Node disambiguate(AmbiguityRemover ar) throws SemanticException {
-//        JL5Call n = (JL5Call)super.disambiguate(ar);
-//        for (TypeNode tn : n.typeArgs()) {
-//            if (!tn.isDisambiguated()) {
-//                return n;
-//            }
-//        }
-//        // types are disambiguated
-//        // apply them to the method instance if needed.
-//        JL5TypeSystem ts = ar.typeSystem();
-//        ts.instantiateMethodInstance();
-//        return n;
-//    }
+    //    public Node disambiguate(AmbiguityRemover ar) throws SemanticException {
+    //        JL5Call n = (JL5Call)super.disambiguate(ar);
+    //        for (TypeNode tn : n.typeArgs()) {
+    //            if (!tn.isDisambiguated()) {
+    //                return n;
+    //            }
+    //        }
+    //        // types are disambiguated
+    //        // apply them to the method instance if needed.
+    //        JL5TypeSystem ts = ar.typeSystem();
+    //        ts.instantiateMethodInstance();
+    //        return n;
+    //    }
 
     @Override
     public List<TypeNode> typeArgs() {
@@ -60,7 +60,7 @@ public class JL5Call_c extends Call_c implements JL5Call {
         List targs = visitList(n.typeArgs, v);
         return n.typeArgs(targs);
     }
-    
+
     private transient Type expectedReturnType = null;
     @Override
     public Node typeCheckOverride(Node parent, TypeChecker tc) throws SemanticException {
@@ -73,17 +73,30 @@ public class JL5Call_c extends Call_c implements JL5Call {
         if (parent instanceof Assign) {
             Assign a = (Assign)parent;
             if (this == a.right()) {
+                if (a.left().type() == null || !a.left().type().isCanonical()) {
+                    // not ready yet
+                    return this;
+                }
                 setExpectedReturnType(a.left().type());
             }
         }
         if (parent instanceof LocalDecl) {
             LocalDecl ld = (LocalDecl)parent;
+            if (ld.type().type() == null || !ld.type().type().isCanonical()) {
+                // not ready yet
+                return this;
+            }
             setExpectedReturnType(ld.type().type()); 
         }
         if (parent instanceof FieldDecl) {
             FieldDecl fd = (FieldDecl)parent;
+            if (fd.type().type() == null || !fd.type().type().isCanonical()) {
+                // not ready yet
+                return this;
+            }
             setExpectedReturnType(fd.type().type()); 
         }
+        
         return null;
     }
 
@@ -113,7 +126,7 @@ public class JL5Call_c extends Call_c implements JL5Call {
         if (this.target == null) {
             return this.typeCheckNullTarget(tc, argTypes);
         }
-               
+
         if (! this.target.type().isCanonical()) {
             return this;
         }
@@ -121,23 +134,24 @@ public class JL5Call_c extends Call_c implements JL5Call {
         for (TypeNode tn : this.typeArgs) {
             actualTypeArgs.add(tn.type());
         }
-                
+
         ReferenceType targetType = this.findTargetType();
 
         
         JL5MethodInstance mi = (JL5MethodInstance)ts.findMethod(targetType,  
-                                          this.name.id(), 
-                                          argTypes, 
-                                          actualTypeArgs,
-                                          c.currentClass(),
-                                          this.expectedReturnType);
-        
-//        System.err.println("\nJL5Call_c.typeCheck targettype is " + targetType);
-//        System.err.println("  JL5Call_c.typeCheck target is " + this.target);
-//        System.err.println("  JL5Call_c.typeCheck target is " + this.target.type());
-//        System.err.println("  JL5Call_c.typeCheck arg types is " + argTypes);
-//        System.err.println("  JL5Call_c.typeCheck mi is " + mi + " return type is " + mi.returnType().getClass());
-//        System.err.println("  JL5Call_c.typeCheck mi is " + mi + " container is " + mi.container().getClass());
+                                                                this.name.id(), 
+                                                                argTypes, 
+                                                                actualTypeArgs,
+                                                                c.currentClass(),
+                                                                this.expectedReturnType);
+
+//                System.err.println("\nJL5Call_c.typeCheck targettype is " + targetType);
+//                System.err.println("  JL5Call_c.typeCheck target is " + this.target);
+//                System.err.println("  JL5Call_c.typeCheck target is " + this.target.type());
+//                System.err.println("  JL5Call_c.expectedReturnType is " + this.expectedReturnType);
+//                System.err.println("  JL5Call_c.typeCheck arg types is " + argTypes);
+//                System.err.println("  JL5Call_c.typeCheck mi is " + mi + " return type is " + mi.returnType().getClass());
+//                System.err.println("  JL5Call_c.typeCheck mi is " + mi + " container is " + mi.container().getClass());
         /* This call is in a static context if and only if
          * the target (possibly implicit) is a type node.
          */
@@ -145,23 +159,22 @@ public class JL5Call_c extends Call_c implements JL5Call {
 
         if (staticContext && !mi.flags().isStatic()) {
             throw new SemanticException("Cannot call non-static method " + this.name.id()
-                                  + " of " + target.type() + " in static "
-                                  + "context.", this.position());
+                                        + " of " + target.type() + " in static "
+                                        + "context.", this.position());
         }
 
         // If the target is super, but the method is abstract, then complain.
         if (this.target instanceof Special && 
-            ((Special)this.target).kind() == Special.SUPER &&
-            mi.flags().isAbstract()) {
-                throw new SemanticException("Cannot call an abstract method " +
-                               "of the super class", this.position());            
+                ((Special)this.target).kind() == Special.SUPER &&
+                mi.flags().isAbstract()) {
+            throw new SemanticException("Cannot call an abstract method " +
+                                        "of the super class", this.position());            
         }
-        
+
         Type returnType = computeReturnType(mi);
 
         JL5Call_c call = (JL5Call_c)this.methodInstance(mi).type(returnType);
 
-        
         // Need to deal with Object.getClass() specially. See JLS 3rd ed., section 4.3.2
         if (mi.name().equals("getClass") && mi.container().equals(ts.Object())) {
             // the return type of the call is "Class<? extends |T|>" where T is the static type of
@@ -172,8 +185,8 @@ public class JL5Call_c extends Call_c implements JL5Call {
             Type instClass = ts.instantiate(this.position(), (JL5ParsedClassType)ts.Class(), Collections.singletonList(wt));
             call = (JL5Call_c)call.type(instClass);
         }
-//        System.err.println("JL5Call_c: " + this + " got mi " + mi);
-        
+        //        System.err.println("JL5Call_c: " + this + " got mi " + mi);
+
         return call;
     }
 
@@ -184,20 +197,20 @@ public class JL5Call_c extends Call_c implements JL5Call {
         if (mi.returnType().isVoid()) {
             return ts.Void();
         }
-        
-        
+
+
         // Otherwise, if unchecked conversion was necessary for the method to be applicable then the result type is the erasure (§4.6) of the method’s declared return type.
         // XXX how to check this? We need to implement it properly.
-        
+
         // Otherwise, if the method being invoked is generic, then for 1 ≤ i ≤ n , 
         // let Fi be the formal type parameters of the method, let Ai be the actual type arguments inferred for the method invocation, and 
         // let R be the declared return type of the method being invoked. The result type is obtained by applying capture conversion (§5.1.10) to R[F1 := A1, ..., Fn := An].
         // --- mi has already had substitution applied, so it is covered by the following case.
-        
+
         // Otherwise, the result type is obtained by applying capture conversion (§5.1.10) to the type given in the method declaration.
         return ts.applyCaptureConversion(mi.returnType());
     }
-    
+
 
     @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
