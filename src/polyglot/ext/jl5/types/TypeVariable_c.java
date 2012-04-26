@@ -11,7 +11,13 @@ import polyglot.util.Position;
 public class TypeVariable_c extends ReferenceType_c implements TypeVariable {
 
     private static int count = 0;
-    public final int uniqueIdentifier = count++;
+    
+    /**
+     * The unique identifier uniquely identifies a type variable within this invocation of the compiler.
+     * Object equality does not hold, since we may have two objects that represent the same type variable, that have had
+     * substitution applied to their upper bounds. 
+     */
+    public final transient int uniqueIdentifier = count++;
     protected String name;
 
     protected Flags flags;
@@ -201,6 +207,28 @@ public class TypeVariable_c extends ReferenceType_c implements TypeVariable {
         TypeVariable tv = (TypeVariable)this.copy();
         tv.setUpperBound(upperBound);
         return tv;
+    }
+    
+    @Override
+    public boolean equalsImpl(TypeObject t) {
+        if (t instanceof TypeVariable_c) {
+            TypeVariable_c other = (TypeVariable_c)t;
+            return this.uniqueIdentifier == other.uniqueIdentifier;            
+        }
+        return false;
+    }
+    @Override
+    public boolean typeEqualsImpl(Type t) {
+        if (t instanceof TypeVariable_c) {
+            TypeVariable_c other = (TypeVariable_c)t;
+            return this.uniqueIdentifier == other.uniqueIdentifier;            
+        }
+        return false;
+    }
+    
+    @Override
+    public int hashCode() {
+        return this.uniqueIdentifier;
     }
 
 }
