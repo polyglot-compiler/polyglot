@@ -414,12 +414,18 @@ public class JL5Signature extends Attribute {
         catch (SemanticException e) {
             throw new InternalCompilerError("could not load " + className, e);
         }
-        //System.err.println("Now looking up " + ct.name() + " with class name '" + className +"'  in classArgsMap " + classArgsMap + "  " + classArgsMap.containsKey(className) + "  " + createTypeVars);
-        if (classArgsMap.containsKey(className)){            
+        // look up in the map the last part of className, i.e., the part after the last '.'.
+        // This means that java.util.Map$Entry will go to 
+        String lookupClassName = className.substring(className.lastIndexOf('.')+1);
+        //System.err.println("Now looking up " + ct.name() + " with class name '" + className +"'  in classArgsMap " + classArgsMap + "  " + classArgsMap.containsKey(className) + "  " + createTypeVars);        
+//        if (!className.equals(ct.name())) {
+//            System.err.println("---- uh oh:   " + className + "   " + ct.name() +"   " + lookupClassName +"  " +classArgsMap);
+//        }
+        if (classArgsMap.containsKey(lookupClassName)){            
             JL5ParsedClassType pct = (JL5ParsedClassType) ct;
             if (!createTypeVars) {
                 try {
-                    ct = ts.instantiate(position, pct, (List<Type>)classArgsMap.get(className));
+                    ct = ts.instantiate(position, pct, (List<Type>)classArgsMap.get(lookupClassName));
                 } catch (SemanticException e) {
                     throw new InternalCompilerError(e);
                 }
