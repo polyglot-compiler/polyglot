@@ -1,0 +1,8 @@
+import java.util.Collection;
+import java.util.Collections;
+
+class Generics38 {
+  public static void main(String[] args) {
+     Collection<String> c = Collections.emptyList();
+  }
+}
