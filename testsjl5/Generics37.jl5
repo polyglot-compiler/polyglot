@@ -1,0 +1,10 @@
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Collections;
+
+public class Generics37 {
+  public static void main(String[] args) {
+    Map<String,Integer> map = new HashMap<String,Integer>();
+    map = Collections.emptyMap();
+  }
+}
