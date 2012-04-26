@@ -99,11 +99,20 @@ public class JL5ParsedClassType_c extends ParsedClassType_c implements JL5Parsed
         }
         else if (toType.isPrimitive()) {
             // see if unboxing will let us cast to the primitive
-            PrimitiveType pt = toType.toPrimitive();
-            ClassType wrapperType = ts.wrapperClassOfPrimitive(pt);
-            chain = ts.isImplicitCastValidChain(this, wrapperType);
-            if (chain != null) {
-                chain.addLast(toType);
+            if (ts.primitiveTypeOfWrapper(this) != null) {
+                chain = ts.isImplicitCastValidChain(ts.primitiveTypeOfWrapper(this), toType);
+                if (chain != null) {
+                    chain.addFirst(this);
+                }            
+            }
+            else {
+                // try boxing the to type.
+                PrimitiveType pt = toType.toPrimitive();
+                ClassType wrapperType = ts.wrapperClassOfPrimitive(pt);
+                chain = ts.isImplicitCastValidChain(this, wrapperType);
+                if (chain != null) {
+                    chain.addLast(toType);
+                }
             }
         }
         return chain;
