@@ -233,10 +233,10 @@ public class JL5SubstClassType_c extends SubstClassType_c implements JL5SubstCla
     @Override
     public String translate(Resolver c) {
         JL5ParsedClassType ct = this.base();
-        
-        StringBuffer sb = new StringBuffer();
-        sb.append(ct.translate(c));
-        
+        if (ct.typeVariables().isEmpty()) {
+            return ct.name();
+        }
+        StringBuffer sb = new StringBuffer(ct.name());
         sb.append('<');
         Iterator<TypeVariable> iter = ct.typeVariables().iterator();
         while (iter.hasNext()) {
