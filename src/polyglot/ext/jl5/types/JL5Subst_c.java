@@ -129,6 +129,8 @@ public class JL5Subst_c extends Subst_c implements JL5Subst {
             mj = (JL5MethodInstance) mj.copy();
             mj.setTypeParams(l);
         }
+        // subst the type params
+        mj.setTypeParams(this.substTypeList(mj.typeParams()));
         return mj;
     }
 
@@ -142,6 +144,8 @@ public class JL5Subst_c extends Subst_c implements JL5Subst {
             cj = (JL5ConstructorInstance) cj.copy();
             cj.setTypeParams(l);
         }
+        // subst the type params
+        cj.setTypeParams(this.substTypeList(cj.typeParams()));
         return cj;
     }
 
