@@ -16,10 +16,13 @@ public class JL5PrimitiveType_c extends PrimitiveType_c implements JL5PrimitiveT
             return true;
         }
 
-        // We can box this primitive in its wrapper type, so check that.
-        JL5TypeSystem ts = (JL5TypeSystem) typeSystem();
-        Type wrapperType = ts.wrapperClassOfPrimitive(this);
-        return ts.isImplicitCastValid(wrapperType, toType);
+        if (!toType.isPrimitive()) {
+            // We can box this primitive in its wrapper type, so check that.
+            JL5TypeSystem ts = (JL5TypeSystem) typeSystem();
+            Type wrapperType = ts.wrapperClassOfPrimitive(this);
+            return ts.isImplicitCastValid(wrapperType, toType);
+        }
+        return false;
     }
 
     public boolean isCastValidImpl(Type toType){
