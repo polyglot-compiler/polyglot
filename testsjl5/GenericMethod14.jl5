@@ -1,0 +1,22 @@
+import java.util.List;
+import java.util.ArrayList;
+
+public class Test<T> {
+    public enum Action {
+        PREPEND,
+        APPEND,
+        OVERRIDE,
+        REPLACE;
+    }
+
+    public static Test<Number> getTestWithNumber() {
+        return new Test<Number>();
+    }
+
+    public <S extends T> void resolve(List<S> sarg, Action targ) { }
+    
+    public static void main(String[] args) {
+        List<Integer> ints = new ArrayList<Integer>();
+        Test.getTestWithNumber().resolve(ints, Test.Action.APPEND);
+    }
+}
