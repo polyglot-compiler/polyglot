@@ -444,6 +444,7 @@ public class JL5TypeSystem_c extends ParamTypeSystem_c implements JL5TypeSystem 
 
                 // Method name must match
                 if (! mi.name().equals(name)) continue;
+//                System.err.println("      checking " + mi);
                 JL5MethodInstance substMi = methodCallValid(mi, name, argTypes, actualTypeArgs, expectedReturnType); 
 
                 if (substMi != null) {
@@ -619,6 +620,10 @@ public class JL5TypeSystem_c extends ParamTypeSystem_c implements JL5TypeSystem 
     public ClassType instantiate(Position pos, PClass base, List actuals) throws SemanticException {
         JL5ParsedClassType clazz = (JL5ParsedClassType) base.clazz();
         return instantiate(pos, clazz, actuals);
+    }
+    @Override
+    public ClassType instantiate(Position pos, JL5ParsedClassType clazz, Type ... actuals) throws SemanticException {
+        return this.instantiate(pos, clazz, Arrays.asList(actuals));
     }
     @Override
     public ClassType instantiate(Position pos, JL5ParsedClassType clazz, List<Type> actuals) throws SemanticException {

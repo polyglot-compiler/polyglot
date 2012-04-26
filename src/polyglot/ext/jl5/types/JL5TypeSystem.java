@@ -89,6 +89,11 @@ public interface JL5TypeSystem extends TypeSystem, ParamTypeSystem {
     ClassType instantiate(Position pos, JL5ParsedClassType clazz, List<Type> actuals) throws SemanticException;
 
     /**
+     * Instantiate class clazz with actuals.
+     */
+    ClassType instantiate(Position pos, JL5ParsedClassType clazz, Type ... actuals) throws SemanticException;
+
+    /**
      * Returns the erased type of t.
      * See JLS 3rd ed. 4.6 
      * 
