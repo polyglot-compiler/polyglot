@@ -1,0 +1,22 @@
+class C {
+  public enum Status {
+    SUCCESSFUL,
+    ERROR;
+  }
+  private final Status status;
+
+  public C() { status = Status.ERROR; }
+
+  public Status getStatus() {
+    return status;
+  }	  
+}
+
+class D {
+  public static void main(String[] args) {
+    C c = new C();
+    if (c.getStatus().equals(C.Status.SUCCESSFUL)) {
+       System.out.println("");
+    }
+  }
+}
