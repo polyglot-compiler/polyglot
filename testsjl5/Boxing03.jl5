@@ -1,0 +1,6 @@
+public class Boxing02 {
+  public static void main(String[] args) {
+    final Byte b = (byte)5;
+    int i = b;
+  }
+}
