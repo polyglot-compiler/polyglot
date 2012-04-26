@@ -75,6 +75,7 @@ polyglot.ext.jl5.ExtensionInfo "-d out -classpath java-out -noserial -post \"jav
         Generics34.jl5;
         Generics35.jl5 (Semantic); 
         Generics36.jl5;
+        Generics37.jl5;
 	Boxing01.jl5;
         StaticInit01.jl5;
         InnerClass01.jl5;
@@ -174,6 +175,8 @@ polyglot.ext.jl5.ExtensionInfo "-d out -classpath java-out -noserial -post \"jav
 	error7.jl5 (Semantic, "not a subtype");
 	exn1.jl5;
 	exn2.jl5;
+	ExtFor01.jl5;
+	ExtFor02.jl5;
 	forloop1.jl5 (Semantic, "Incompatible"), (Semantic, "Incompatible");
 	forloop1a.jl5;
 	forloop1b.jl5 (Semantic, "Incompatible");
@@ -300,6 +303,7 @@ polyglot.ext.jl5.ExtensionInfo "-d out -classpath java-out -removeJava5isms -enu
         Generics34.jl5;
         Generics35.jl5 (Semantic);
         Generics36.jl5;
+        Generics37.jl5;
 	Boxing01.jl5;
         StaticInit01.jl5;
      	InnerClass01.jl5; 
@@ -399,6 +403,8 @@ polyglot.ext.jl5.ExtensionInfo "-d out -classpath java-out -removeJava5isms -enu
         error7.jl5 (Semantic, "not a subtype");
         exn1.jl5;
         exn2.jl5;
+	ExtFor01.jl5;
+	ExtFor02.jl5;
         forloop1.jl5 (Semantic, "Incompatible"), (Semantic, "Incompatible");
         forloop1a.jl5;
         forloop1b.jl5 (Semantic, "Incompatible");

@@ -1,7 +1,7 @@
 import java.util.HashMap;
 import java.util.Map;
 
-public class ExtFor01 {
+class ExtFor01 {
   public static void main(String[] args) {
     HashMap<String,Integer> map = new HashMap<String,Integer>();
     int i = 0;
