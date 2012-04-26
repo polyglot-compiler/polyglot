@@ -94,7 +94,7 @@ public class TVCaster extends AscriptionVisitor {
         if (parent instanceof Call && old == ((Call)parent).target()) {
             Call c = (Call)parent;
             if (c.target() instanceof Expr && !(c.target() instanceof Special)) {
-                Expr e = (Expr)c.target();
+                Expr e = (Expr)n;
                 if (e instanceof Cast) {
                     e = ((Cast)e).expr();
                 }
