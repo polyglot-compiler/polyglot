@@ -389,12 +389,12 @@ public class JL5Signature extends Attribute {
                               token = value.charAt(pos);
                               break; }
                 case LEFT_ANGLE: { // id is a className
-                                  // System.err.println("Parsing type arg list " + value.substring(pos));
+                                   //System.err.println("Parsing type arg list " + value.substring(pos));
                                    Result tres = typeArgList(value, pos);
-                                  // System.err.println("Got " + tres.result());
+                                   //System.err.println("Got " + tres.result());
                                    pos = tres.pos();
                                    classArgsMap.put(id, tres.result());
-                                   //System.err.println("Adding " + tres.result() + " to map");
+                                   //System.err.println("Adding " + tres.result() + " to map for " + id);
                                    token = value.charAt(pos);
                                    break;}          
                 default: { id += token; 
@@ -414,11 +414,12 @@ public class JL5Signature extends Attribute {
         catch (SemanticException e) {
             throw new InternalCompilerError("could not load " + className, e);
         }
-        if (classArgsMap.containsKey(ct.name())){            
+        //System.err.println("Now looking up " + ct.name() + " with class name '" + className +"'  in classArgsMap " + classArgsMap + "  " + classArgsMap.containsKey(className) + "  " + createTypeVars);
+        if (classArgsMap.containsKey(className)){            
             JL5ParsedClassType pct = (JL5ParsedClassType) ct;
             if (!createTypeVars) {
                 try {
-                    ct = ts.instantiate(position, pct, (List<Type>)classArgsMap.get(ct.name()));
+                    ct = ts.instantiate(position, pct, (List<Type>)classArgsMap.get(className));
                 } catch (SemanticException e) {
                     throw new InternalCompilerError(e);
                 }
@@ -598,6 +599,7 @@ public class JL5Signature extends Attribute {
     // starts pointing at char 
     // ends after (may be end of string
     public Result returnType(String value, int pos){
+        //System.err.println("### Parsing return type sig " + value.substring(pos));
         Result res = null;
         char token = value.charAt(pos);
         switch(token){
