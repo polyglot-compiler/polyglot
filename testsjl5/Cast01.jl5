@@ -1,0 +1,8 @@
+import java.util.*;
+
+class C {
+    static <T> T o(Comparable c) {
+	T x = (T)c;
+	return x;
+    }
+}
