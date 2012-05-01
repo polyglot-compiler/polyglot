@@ -263,6 +263,7 @@ polyglot.frontend.JLExtensionInfo "-cp ." {
 		      (Semantic, "Cannot declare abstract method with flags native");
 	Protection2.jl (Semantic, "cannot override.*overridden method is final");
 	Protection3.jl package1/ProtClassPubMeth.jl package1/PubClassInheritMeth.jl ;
+	Protection4.jl;
 
         // on the following file, javac produces an error, but we intentionally do not.
         //  BadFinalInit13.jl (Post); 
