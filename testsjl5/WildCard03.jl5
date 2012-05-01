@@ -1,0 +1,6 @@
+import java.util.ArrayList;
+class C { 
+    public <T> void func(T r, ArrayList<?> it) {
+        Object ob = (T) it.get(0);
+    }
+}
