@@ -164,4 +164,14 @@ public class WildCardType_c extends ReferenceType_c implements WildCardType {
 
         return false;
     }
+
+    @Override
+    public boolean isCastValidImpl(Type toType) {
+        if (super.isCastValidImpl(toType)) {
+            return true;
+        }
+        // try the upper bound. See JLS 3rd Ed 5.5
+        return this.upperBound().isCastValid(toType);
+    }
+
 }
