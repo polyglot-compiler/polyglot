@@ -278,14 +278,11 @@ public class FieldDecl_c extends Term_c implements FieldDecl {
     }
 
     public Node checkConstants(ConstantChecker cc) throws SemanticException {
-//        if (init != null && ! init.constantValueSet()) {
-//            // HACK to add dependencies for computing the constant value.
-//            Scheduler scheduler = cc.typeSystem().extensionInfo().scheduler();
-//            init.visit(new AddDependenciesVisitor(scheduler, this.fi));
-//            return this;
-//        }
-        
-        if (init == null || ! init.isConstant() || ! fi.flags().isFinal()) {
+        if (init == null || ! fi.flags().isFinal()) {
+            fi.setNotConstant();
+            return this;
+        }        
+        if (! init.isConstant()) {
             fi.setNotConstant();
         }
         else {
@@ -313,9 +310,6 @@ public class FieldDecl_c extends Term_c implements FieldDecl {
         FieldInstance fi = nn.fieldInstance();
         if (fi.constantValueSet()) {
             constantValueSet = true;
-        }
-        else {
-            fi.setNotConstant();
         }
 
         TypeChecker childtc = (TypeChecker) childv;
