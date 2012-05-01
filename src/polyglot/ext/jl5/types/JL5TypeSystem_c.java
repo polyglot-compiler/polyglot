@@ -1063,12 +1063,88 @@ public class JL5TypeSystem_c extends ParamTypeSystem_c implements JL5TypeSystem 
             }
             else {
                 // fromType is an interface
-                // TODO
+                // If T is an array type, then T must implement S, or a compile-time error occurs
+                // This is handled in the super class.
+                
+                if (toType.isClass() && toType.toClass().flags().isFinal()) {
+                    // toType is final.
+                    if (fromType instanceof RawClass || fromType instanceof JL5SubstClassType) {
+                        // S is either a parameterized type that is an invocation of some generic type declaration G, or a raw type corresponding to a generic type declaration G. 
+                        // Then there must exist a supertype X of T, such that X is an invocation of G, or a compile-time error occurs.
+                        JL5ParsedClassType baseClass;
+                        if (fromType instanceof RawClass) {
+                            baseClass = ((RawClass)fromType).base();                            
+                        }
+                        else {
+                            baseClass = ((JL5SubstClassType)fromType).base();
+                        }
+                        JL5SubstClassType x = findGenericSupertype(baseClass, toType.toReference());
+                        if (x == null) {
+                            return false;
+                        }
+                        
+                        // Furthermore, if S and X are provably distinct parameterized types then a compile-time error occurs.
+                        if (fromType instanceof JL5SubstClassType && areProvablyDistinct((JL5SubstClassType)fromType, x)) {
+                            return false;
+                        }
+                        
+                    }
+                    else {
+                        // S is not a parameterized type or a raw type, and T is final
+                        // Then T must implement S, and the cast is statically known to be correct, or a compile-time error occurs.
+                        if (!isSubtype(toType, fromType)) {
+                            // XXX this takes care that T must implement S. Not sure why there is a requirement for the cast to statically known to be correct. That would seem to imply that fromType is a subtype of toType?!
+                            return false;
+                        }
+                        
+                    }
+                
+                }
+                else {
+                    // T is a type that is not final (¤8.1.1), and S is an interface
+                    // if there exists a supertype X of T, and a supertype Y of S, such that both X and Y are provably distinct parameterized types, 
+                    // and that the erasures of X and Y are the same, a compile-time error occurs.
+                    // Go through the supertypes of each.
+                    List<ReferenceType> allY = this.allAncestorsOf(fromType.toReference());
+                    List<ReferenceType> allX = this.allAncestorsOf(toType.toReference());
+                    for (ReferenceType y : allY) {
+                        for (ReferenceType x : allX) {
+                            if (x instanceof JL5SubstClassType && y instanceof JL5SubstClassType &&
+                                    areProvablyDistinct((JL5SubstClassType)x,(JL5SubstClassType)y) && erasureType(x).equals(erasureType(y))) {
+                                return false;
+                            }
+                        }
+                    }
+                    
+                    // Otherwise, the cast is always legal at compile time (because even if T does not implement S, a subclass of T might).
+                    return true;
+                }
             }
         }
         return false;
     }
         
+
+    private boolean areProvablyDistinct(ReferenceType s, ReferenceType t) {
+        if (s instanceof JL5SubstClassType && t instanceof JL5SubstClassType) {
+            JL5SubstClassType x = (JL5SubstClassType)s;
+            JL5SubstClassType y = (JL5SubstClassType)t;
+            if (!x.base().equals(y.base())) {
+                return true;
+            }
+            List<ReferenceType> xActuals = x.actuals();
+            List<ReferenceType> yActuals = y.actuals();
+            if (xActuals.size() != yActuals.size()) {
+                return true;
+            }
+            for (int i = 0; i < xActuals.size(); i++) {
+                if (areProvablyDistinct(xActuals.get(i), xActuals.get(i))) {
+                    return true;
+                }
+            }
+        }            
+        return !s.equals(t);
+    }
 
     @Override
     protected List abstractSuperInterfaces(ReferenceType rt) {
