@@ -33,13 +33,11 @@ public class TVCaster extends AscriptionVisitor {
         if (!fromType.isReference() || !toType.isReference() || ts.Object().equals(toType)) {
             return e;
         }
-        if (e instanceof Special || e instanceof ArrayInit) {
+        if (e instanceof Special || e instanceof ArrayInit || e instanceof Lit) {
             return e;
         }
         
-        if (ts.isCastValid(fromType, toType) 
-                && (promiscuousMode || !ts.isImplicitCastValid(fromType, toType))
-                ) {
+        if (ts.isCastValid(fromType, toType) && (promiscuousMode || !ts.isImplicitCastValid(fromType, toType))) {            
             return insertCast(e, toType);
         }
         return e;
