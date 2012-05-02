@@ -8,5 +8,5 @@ class N {
 }
 
 class M {
-    private static void eq() {} // inaccessible from N.O.
+        private static void eq(int i) {} // inaccessible from N.O
 }

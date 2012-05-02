@@ -77,7 +77,7 @@ polyglot.frontend.JLExtensionInfo "-cp ." {
         Import.jl ;
         Increment.jl ;
         Infinite.jl ;
-        Inherit.jl (Semantic, "Method.*cannot be called with arguments");
+        Inherit.jl (Semantic);
         InheritClass.jl ;
         Init1.jl ; Init2.jl ; Init3.jl ; Init4.jl ; Init5.jl ;
         LiteralsCf.jl   (Lexical, "Illegal float literal"),
@@ -264,6 +264,7 @@ polyglot.frontend.JLExtensionInfo "-cp ." {
 	Protection2.jl (Semantic, "cannot override.*overridden method is final");
 	Protection3.jl package1/ProtClassPubMeth.jl package1/PubClassInheritMeth.jl ;
 	Protection4.jl;
+	Protection5.jl;
 
         // on the following file, javac produces an error, but we intentionally do not.
         //  BadFinalInit13.jl (Post); 
