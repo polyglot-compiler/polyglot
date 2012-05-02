@@ -897,6 +897,48 @@ public class TypeSystem_c implements TypeSystem
         return false;
     }
 
+    public boolean hasAccessibleMethodNamed(ReferenceType container, String name, ClassType currClass) {
+        assert_(container);
+
+        if (container == null) {
+            throw new InternalCompilerError("Cannot access method \"" + name +
+                "\" within a null container type.");
+        }
+        
+        Set visitedTypes = new HashSet();
+
+        LinkedList typeQueue = new LinkedList();
+        typeQueue.addLast(container);
+
+        while (! typeQueue.isEmpty()) {
+            Type type = (Type) typeQueue.removeFirst();
+
+            if (visitedTypes.contains(type)) {
+                continue;
+            }
+
+            visitedTypes.add(type);
+
+            if (! type.isReference()) {
+                continue;
+            }
+            
+            for (Iterator i = type.toReference().methodsNamed(name).iterator(); i.hasNext(); ) {
+                MethodInstance mi = (MethodInstance) i.next();
+
+                if (isAccessible(mi, container, currClass)) {
+                    return true;
+                }
+            }
+            if (type.toReference().superType() != null) {
+                typeQueue.addLast(type.toReference().superType());
+            }
+
+            typeQueue.addAll(type.toReference().interfaces());
+        }
+        return false;
+    }
+
     /**
      * Requires: all type arguments are canonical.
      *
