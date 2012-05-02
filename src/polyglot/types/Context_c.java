@@ -182,7 +182,7 @@ public class Context_c implements Context
         // If found, stop the search since it shadows any enclosing
         // classes method of the same name.
         if (this.currentClass() != null &&
-            ts.hasMethodNamed(this.currentClass(), name)) {
+            ts.hasAccessibleMethodNamed(this.currentClass(), name, this.currentClass())) {
             if (Report.should_report(TOPICS, 3))
               Report.report(3, "find-method " + name + argTypes + " -> " +
                                 this.currentClass());
