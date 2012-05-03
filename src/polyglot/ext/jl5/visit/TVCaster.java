@@ -11,6 +11,12 @@ import polyglot.util.Position;
 import polyglot.visit.AscriptionVisitor;
 import polyglot.visit.NodeVisitor;
 
+/**
+ * Add casts so that we can erase generic classes and the code will still compile under Java 1.4.
+ * We need to insert casts aggressively, although there is definitely opportunity to modify this
+ * code to avoid redundant casts.
+ * 
+ */
 public class TVCaster extends AscriptionVisitor {
     private final boolean promiscuousMode;
     public TVCaster(Job job, TypeSystem ts, NodeFactory nf) {
@@ -34,6 +40,9 @@ public class TVCaster extends AscriptionVisitor {
             return e;
         }
         if (e instanceof Special || e instanceof ArrayInit || e instanceof Lit) {
+            return e;
+        }
+        if (e instanceof New && ts.isImplicitCastValid(((New)e).objectType().type(), toType)) {            
             return e;
         }
         
