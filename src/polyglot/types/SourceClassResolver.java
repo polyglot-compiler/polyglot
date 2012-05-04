@@ -115,30 +115,6 @@ public class SourceClassResolver extends LoadedClassResolver
 	  this.compileCommandLineOnly = compileCommandLineOnly;
 	  this.ignoreModTimes = ignoreModTimes;
   }
-  /**
-   * Create a loaded class resolver.
- * @param compiler The compiler.
- * @param ext The extension to load sources for.
- * @param classpath The class path.
- * @param loader The class file loader to use.
- * @param allowRawClasses True if vanilla Java class files without
-   *                        Polyglot-embedded type information should be
-   *                        allowed.
- * @param compileCommandLineOnly TODO
- * @param ignoreModTimes TODO
-   */
-  @Deprecated
-  public SourceClassResolver(Compiler compiler, ExtensionInfo ext,
-                             String classpath, ClassFileLoader loader,
-                             boolean allowRawClasses,
-                             boolean compileCommandLineOnly, boolean ignoreModTimes)
-  {
-    super(ext.typeSystem(), classpath, loader, ext.version(), allowRawClasses);
-    this.compiler = compiler;
-    this.ext = ext;
-    this.compileCommandLineOnly = compileCommandLineOnly;
-    this.ignoreModTimes = ignoreModTimes;
-  }
 
   public boolean packageExists(String name) {
     if (super.packageExists(name)) {
@@ -201,7 +177,7 @@ public class SourceClassResolver extends LoadedClassResolver
     // use based on compiler compatibility and modification times.
     if (encodedClazz != null && source != null) {
       long classModTime = encodedClazz.sourceLastModified(version.name());
-      long sourceModTime = source.lastModified().getTime();
+      long sourceModTime = source.getLastModified();
 
       int comp = checkCompilerVersion(encodedClazz.compilerVersion(version.name()));
 
@@ -266,7 +242,7 @@ public class SourceClassResolver extends LoadedClassResolver
         // We have a raw class only. We do not have the source code,
         // or encoded class information. 
         throw new SemanticException("Class \"" + name + "\" not found."
-            + " A class file was found at " + clazz.getClassFileLocation()
+            + " A class file was found at " + clazz.getClassFileURI()
             + ", but it did not contain appropriate" 
             + " information for the Polyglot-based compiler " + 
             ext.compilerName() + ". Try using " + ext.compilerName() 

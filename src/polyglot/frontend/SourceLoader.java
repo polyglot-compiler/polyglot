@@ -2,16 +2,24 @@ package polyglot.frontend;
 
 import java.io.IOException;
 
+import javax.tools.JavaFileManager.Location;
+
 public interface SourceLoader {
 
+	boolean packageExists(String name);
+	boolean packageExists(Location location, String name);
 	/** Load a source from a specific file. This method is deprecated in favor of  */
 	FileSource fileSource(String fileName) throws IOException;
 	
 	FileSource fileSource(String fileName, boolean userSpecified)
 			throws IOException;
 
+	FileSource fileSource(Location location, String fileName) throws IOException;
+	
+	FileSource fileSource(Location location, String fileName, boolean userSpecified) throws IOException;
 	/** Load the source file for the given (possibly nested) class name
 	    using the source path. */
 	FileSource classSource(String className);
 
+	FileSource classSource(Location location, String className);
 }

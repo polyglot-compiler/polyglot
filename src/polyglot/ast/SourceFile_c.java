@@ -150,7 +150,7 @@ public class SourceFile_c extends Node_c implements SourceFile
         	pkg = package_.package_();
         }
 
-        ImportTable it = ts.importTable(source.name(), pkg);
+        ImportTable it = ts.importTable(source.getName(), pkg);
         tb = tb.pushPackage(pkg);
         tb.setImportTable(it);
         return tb;

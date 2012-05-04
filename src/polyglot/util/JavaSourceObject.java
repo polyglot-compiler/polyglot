@@ -9,13 +9,13 @@ import java.net.URI;
 import javax.tools.JavaFileManager.Location;
 import javax.tools.SimpleJavaFileObject;
 
-public class CustomJavaSourceObject extends SimpleJavaFileObject {
+public class JavaSourceObject extends SimpleJavaFileObject {
 
 	//private StringWriter sw = new StringWriter();
 	private final StringBuilderWriter sbw = new StringBuilderWriter();
 	private final String fullName;
 	
-	public CustomJavaSourceObject(String fullName) {
+	public JavaSourceObject(String fullName) {
 		super(URI.create(fullName + Kind.SOURCE.extension), Kind.SOURCE);
 		this.fullName = fullName;
 	}

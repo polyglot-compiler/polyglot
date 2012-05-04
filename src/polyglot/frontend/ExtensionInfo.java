@@ -31,7 +31,6 @@ import java.io.File;
 import java.io.IOException;
 
 import javax.tools.FileObject;
-import javax.tools.StandardJavaFileManager;
 
 import polyglot.ast.Node;
 import polyglot.ast.NodeFactory;
@@ -43,6 +42,7 @@ import polyglot.types.reflect.ClassFile;
 import polyglot.types.reflect.ClassFileLoader;
 import polyglot.util.ErrorQueue;
 import polyglot.util.CodeWriter;
+import polyglot.util.FileManager;
 
 /**
  * <code>ExtensionInfo</code> is the main interface for defining language
@@ -128,7 +128,7 @@ public interface ExtensionInfo {
 	 *  file manager manages the extension source files and translated 
 	 *  java code. (Must be overridden for extensions beyond .jl)
 	 */
-	StandardJavaFileManager extFileManager();
+	FileManager extFileManager();
 	
 	void addLocationsToFileManager();
 	/** Get the classLoader used by this extension. */

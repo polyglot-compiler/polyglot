@@ -54,34 +54,13 @@ public class LoadedClassResolver implements TopLevelResolver
   protected TypeEncoder te;
   
   protected Version version;
-  protected Set nocache;
+  protected Set<String> nocache;
   protected boolean allowRawClasses;
   protected ExtensionInfo extInfo;
 
   protected final static Collection<String> report_topics = CollectionUtil.list(
     Report.types, Report.resolver, Report.loader);
   protected ClassFileLoader loader;
-  
-  /**
-   * Create a loaded class resolver.
-   * @param ts The type system
-   * @param classpath The class path
-   * @param loader The class file loader to use.
-   * @param version The version of classes to load.
-   * @param allowRawClasses allow class files without encoded type information 
-   */
-  @Deprecated
-  public LoadedClassResolver(TypeSystem ts, String classpath,
-                             ClassFileLoader loader, Version version,
-                             boolean allowRawClasses)
-  {
-    this.ts = ts;
-    this.te = new TypeEncoder(ts);
-    this.loader = loader;
-    this.version = version;
-    this.nocache = new HashSet();
-    this.allowRawClasses = allowRawClasses;
-  }
 
   public LoadedClassResolver(ExtensionInfo extInfo, boolean allowRawClasses) {
 	this.extInfo = extInfo;
@@ -221,7 +200,7 @@ public class LoadedClassResolver implements TopLevelResolver
             throw e;
         }
         catch (InvalidClassException e) {
-            throw new BadSerializationException(clazz.name() + "@" + clazz.getClassFileLocation());
+            throw new BadSerializationException(clazz.name() + "@" + clazz.getClassFileURI());
         }
         
         if (dt instanceof ClassType) {
@@ -264,18 +243,12 @@ public class LoadedClassResolver implements TopLevelResolver
                     });
                 }
 
-                for (Iterator i = ct.methods().iterator(); i.hasNext(); ) {
-                    MethodInstance mi = (MethodInstance) i.next();
-                    Report.report(2, "* " + mi);
-                }
-                for (Iterator i = ct.fields().iterator(); i.hasNext(); ) {
-                    FieldInstance fi = (FieldInstance) i.next();
-                    Report.report(2, "* " + fi);
-                }
-                for (Iterator i = ct.constructors().iterator(); i.hasNext(); ) {
-                    ConstructorInstance ci = (ConstructorInstance) i.next();
-                    Report.report(2, "* " + ci);
-                }
+                for (Iterator<MethodInstance> i = ct.methods().iterator(); i.hasNext(); )
+                    Report.report(2, "* " + i.next());
+                for (Iterator<FieldInstance> i = ct.fields().iterator(); i.hasNext(); )
+                    Report.report(2, "* " + i.next());
+                for (Iterator<ConstructorInstance> i = ct.constructors().iterator(); i.hasNext(); )
+                    Report.report(2, "* " + i.next());
 
                 if (ct instanceof ParsedClassType) {
                     ParsedClassType pct = (ParsedClassType) ct;

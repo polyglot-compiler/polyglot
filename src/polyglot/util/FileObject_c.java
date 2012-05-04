@@ -19,7 +19,7 @@ import javax.tools.FileObject;
 import javax.tools.JavaFileManager.Location;
 import javax.tools.JavaFileObject.Kind;
 
-public class CustomFileObject implements FileObject {
+public class FileObject_c implements FileObject {
 
 	private File f;
 	private FileOutputStream fos;
@@ -33,7 +33,7 @@ public class CustomFileObject implements FileObject {
 	private InputStream is;
 	private URI uri;
 	
-	public CustomFileObject(String fullName, boolean inMemory) {
+	public FileObject_c(String fullName, boolean inMemory) {
 		this.inMemory = inMemory;
 		if(inMemory) {
 			uri = URI.create(fullName);
@@ -43,7 +43,7 @@ public class CustomFileObject implements FileObject {
 		filename = fullName;
 	}
 	
-	public CustomFileObject(String fullName, InputStream is) {
+	public FileObject_c(String fullName, InputStream is) {
 		isInputStream = true;
 		uri = URI.create(fullName);
 		inMemory = false;

@@ -8,17 +8,17 @@ import javax.lang.model.element.NestingKind;
 import javax.tools.JavaFileManager.Location;
 import javax.tools.JavaFileObject;
 
-public class CustomJavaFileObject extends CustomFileObject implements
+public class JavaFileObject_c extends FileObject_c implements
 		JavaFileObject {
 
 	private Kind k;
 
-	public CustomJavaFileObject(String fullname, Kind kind, boolean inMemory) {
+	public JavaFileObject_c(String fullname, Kind kind, boolean inMemory) {
 		super(fullname, inMemory);
 		k = kind;
 	}
 	
-	public CustomJavaFileObject(String fullname, Kind kind, InputStream is) {
+	public JavaFileObject_c(String fullname, Kind kind, InputStream is) {
 		super(fullname, is);
 		k = kind;
 	}

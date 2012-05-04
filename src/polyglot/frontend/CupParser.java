@@ -72,7 +72,7 @@ public class CupParser implements Parser
 
         if (! eq.hasErrors()) {
             eq.enqueue(ErrorInfo.SYNTAX_ERROR, "Unable to parse " +
-                source.path() + ".");
+                source.toUri().getPath() + ".");
         }
 
 	return null;

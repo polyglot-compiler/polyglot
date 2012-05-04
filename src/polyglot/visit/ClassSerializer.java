@@ -48,17 +48,17 @@ public class ClassSerializer extends NodeVisitor
     
     protected TypeEncoder te;
     protected ErrorQueue eq;
-    protected Date date;
+    protected long time;
     protected TypeSystem ts;
     protected NodeFactory nf;
     protected Version ver;
 
-    public ClassSerializer(TypeSystem ts, NodeFactory nf, Date date, ErrorQueue eq, Version ver) {
+    public ClassSerializer(TypeSystem ts, NodeFactory nf, long time, ErrorQueue eq, Version ver) {
         this.ts = ts;
         this.nf = nf;
         this.te = new TypeEncoder(ts);
         this.eq = eq;
-        this.date = date;
+        this.time = time;
         this.ver = ver;
     }
     
@@ -153,9 +153,6 @@ public class ClassSerializer extends NodeVisitor
 	    f = f.fieldInstance(fi);
             f = f.initializerInstance(ii);
             newMembers.add(f);
-
-	    /* Add the date of the last source file modification. */
-	    long time = date.getTime();
 
 	    fi = ts.fieldInstance(pos, ct,
                                   flags, ts.Long(),

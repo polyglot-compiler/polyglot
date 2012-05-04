@@ -51,8 +51,7 @@ import javax.tools.StandardLocation;
 import javax.tools.ToolProvider;
 
 import polyglot.frontend.ExtensionInfo;
-import polyglot.util.CustomExtFileManager;
-import polyglot.util.CustomJavaFileManager_;
+import polyglot.util.ExtFileManager;
 import polyglot.util.InternalCompilerError;
 
 /**
@@ -129,20 +128,15 @@ public class Options {
 	 * and for serialization.
 	 */
 	public boolean merge_strings = false;
-
-	public boolean source_output_given = false;
-	public boolean class_output_given = false;
-	public boolean bootclasspath_given = false;
-	public boolean classpath_given = false;
 	
-	protected StandardJavaFileManager ext_fm;
+	public boolean classpath_given = false;
+	public boolean bootclasspath_given = false;
 
 	/**
 	 * Constructor
 	 */
 	public Options(ExtensionInfo extension) {
 		this.extension = extension;
-		ext_fm = extension.extFileManager();
 		setDefaultValues();
 	}
 
@@ -231,12 +225,10 @@ public class Options {
 			if (!f.exists())
 				f.mkdirs();
 			class_output_dir = Collections.singleton(f);
-			class_output_given = true;
 			i++;
 		} else if (args[i].equals("-D")) {
 			i++;
 			source_output_dir = Collections.singleton(new File(args[i]));
-			source_output_given = true;
 			i++;
 		} else if (args[i].equals("-classpath") || args[i].equals("-cp")) {
 			i++;
@@ -398,6 +390,22 @@ public class Options {
 		}
 
 		return i;
+	}
+	
+	public boolean isSourceOutputGiven() {
+		return source_output_dir != null && source_output_dir.size() != 0;
+	}
+	
+	public boolean isClassOutputGiven() {
+		return class_output_dir != null && class_output_dir.size() != 0;
+	}
+	
+	public Location outputDirectory() {
+		return source_output;
+	}
+	
+	public Location classOutputDirectory() {
+		return class_output;
 	}
 
 	/**
@@ -613,6 +621,5 @@ public class Options {
 				s.add(f);
 		}
 		fm.setLocation(loc, s);
-		ext_fm.setLocation(loc, s);
 	}
 }

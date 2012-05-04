@@ -6,9 +6,6 @@ import java.net.URI;
 
 public interface ClassFile {
 
-	@Deprecated
-	String getClassFileLocation();
-
 	URI getClassFileURI();
 
 	/**

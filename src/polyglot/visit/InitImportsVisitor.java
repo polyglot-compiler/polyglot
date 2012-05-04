@@ -59,10 +59,10 @@ public class InitImportsVisitor extends ErrorHandlingVisitor
             ImportTable it;
             
             if (pn != null) {
-                it = ts.importTable(sf.source().name(), pn.package_());
+                it = ts.importTable(sf.source().getName(), pn.package_());
             }
             else {
-                it = ts.importTable(sf.source().name(), null);
+                it = ts.importTable(sf.source().getName(), null);
             }
             
             InitImportsVisitor v = (InitImportsVisitor) copy();

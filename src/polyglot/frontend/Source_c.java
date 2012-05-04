@@ -16,37 +16,11 @@ import javax.tools.JavaFileObject.Kind;
 
 public class Source_c extends ForwardingFileObject<FileObject>
 	implements FileSource {
-	@Deprecated
-	protected Date last_modified = null;
 	protected boolean user_specified;
-	protected FileObject file;
 
 	protected Source_c(FileObject f, boolean userSpecified) {
 		super(f);
 		this.user_specified = userSpecified;
-	}
-	
-	@Deprecated
-	public Date lastModified() {
-		if(this.last_modified == null) {
-			this.last_modified = new Date(getLastModified());
-		}
-		return last_modified;
-	}
-
-	@Deprecated
-	public String name() {
-		return getName();
-	}
-
-	@Deprecated
-	public Reader open() throws IOException {
-		return openReader(false);
-	}
-
-	@Deprecated
-	public String path() {
-		return toUri().getPath();
 	}
 
 	public void setUserSpecified(boolean userSpecified) {

@@ -50,8 +50,7 @@ public abstract class ParserlessJLExtensionInfo extends AbstractExtensionInfo {
      * @see polyglot.frontend.ParserlessJLExtensionInfo#initTypeSystem()
      */
     protected LoadedClassResolver makeLoadedClassResolver() {
-        return new SourceClassResolver(compiler, this, getOptions().constructFullClasspath(),
-            compiler.loader(), true, getOptions().compile_command_line_only,
+        return new SourceClassResolver(compiler, this, true, getOptions().compile_command_line_only,
             getOptions().ignore_mod_times);
     }
   

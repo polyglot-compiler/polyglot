@@ -60,13 +60,10 @@ public class Serialized extends SourceFileGoal {
         if (compiler.serializeClassInfo()) {
             TypeSystem ts = extInfo.typeSystem();
             NodeFactory nf = extInfo.nodeFactory();
-            if (false)
-            return new VisitorPass(this,
-                     new InnerClassRemover(job, ts, nf));
             return new VisitorPass(this,
                                    createSerializer(ts,
                                                     nf,
-                                                    job().source().lastModified(),
+                                                    job().source().getLastModified(),
                                                     compiler.errorQueue(),
                                                     extInfo.version()));
         }
@@ -76,7 +73,7 @@ public class Serialized extends SourceFileGoal {
     }
     
     protected ClassSerializer createSerializer(TypeSystem ts, NodeFactory nf,
-            Date lastModified, ErrorQueue eq, Version version) {
+            long lastModified, ErrorQueue eq, Version version) {
         return new ClassSerializer(ts, nf, lastModified, eq, version);
     }
     

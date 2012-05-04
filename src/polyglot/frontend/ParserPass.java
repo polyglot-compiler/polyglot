@@ -75,8 +75,8 @@ public class ParserPass extends AbstractPass
 	}
 	catch (IOException e) {
 	    eq.enqueue(ErrorInfo.IO_ERROR, e.getMessage(),
-                new Position(goal.job().source().path(),
-                             goal.job().source().name(), 1, 1, 1, 1));
+                new Position(goal.job().source().toUri().getPath(),
+                             goal.job().source().getName(), 1, 1, 1, 1));
 
             return false;
 	}

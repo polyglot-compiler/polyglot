@@ -19,7 +19,7 @@ import javax.lang.model.element.NestingKind;
 import javax.tools.JavaFileObject;
 import javax.tools.JavaFileObject.Kind;
 
-public class CustomJavaClassObject implements JavaFileObject {
+public class JavaClassObject implements JavaFileObject {
 
 	private FileOutputStream fos;
 	private FileInputStream fis;
@@ -27,7 +27,7 @@ public class CustomJavaClassObject implements JavaFileObject {
 	private FileReader fr;
 	private String className;
 	
-	public CustomJavaClassObject(String className) throws IOException {
+	public JavaClassObject(String className) throws IOException {
 		this.className = className;
 		String filename = className + ".class";
 		fos = new FileOutputStream(filename);

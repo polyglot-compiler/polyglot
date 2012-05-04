@@ -86,11 +86,12 @@ public class TypeEncoder
         else {
             oos = new TypeOutputStream(baos, ts, t);
         }
-
+        
+        //System.out.println(t + " " + t.isCanonical() + " " + t.position() + " " + t.typeSystem() + " " + t.getClass().getName());
+        //Thread.dumpStack();
         oos.writeObject(t);
         oos.flush();
         oos.close();
-        
         byte[] b = baos.toByteArray();
         
         if (Report.should_report(Report.serialize, 2)) {

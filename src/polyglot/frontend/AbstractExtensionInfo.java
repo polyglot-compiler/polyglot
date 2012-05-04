@@ -49,11 +49,10 @@ import polyglot.translate.ext.ToExt_c;
 import polyglot.types.TypeSystem;
 import polyglot.types.reflect.ClassFile;
 import polyglot.types.reflect.ClassFileLoader;
-import polyglot.types.reflect.ClassFileLoader_c;
 import polyglot.types.reflect.ClassFile_c;
-import polyglot.util.CustomExtFileManager;
-import polyglot.util.CustomJavaFileManager_;
+import polyglot.util.ExtFileManager;
 import polyglot.util.ErrorQueue;
+import polyglot.util.FileManager;
 import polyglot.util.InternalCompilerError;
 
 /**
@@ -64,11 +63,10 @@ public abstract class AbstractExtensionInfo implements ExtensionInfo {
     private Options options;
     protected TypeSystem ts = null;
     protected NodeFactory nf = null;
-    protected SourceLoader source_loader = null;
     protected TargetFactory target_factory = null;
     protected Stats stats;
     protected Scheduler scheduler;
-	protected StandardJavaFileManager extFM;
+	protected FileManager extFM;
 	protected ClassFileLoader classFileLoader;
 
     public abstract Goal getCompileGoal(Job job);
@@ -142,11 +140,7 @@ public abstract class AbstractExtensionInfo implements ExtensionInfo {
 
     /** Get the source file loader object for this extension. */
     public SourceLoader sourceLoader() {
-        if (source_loader == null) {
-            source_loader = new SourceLoader_c(this, getOptions().source_path);
-        }
-
-        return source_loader;
+    	return extFileManager();
     }
 
     /** Get the target factory object for this extension. */
@@ -219,9 +213,9 @@ public abstract class AbstractExtensionInfo implements ExtensionInfo {
     	return new Source_c(f, user);
     }
     
-    public StandardJavaFileManager extFileManager() {
+    public FileManager extFileManager() {
     	if (extFM == null)
-    		extFM = new CustomExtFileManager();
+    		extFM = new ExtFileManager(this);
     	return extFM;
     }
     
@@ -231,11 +225,10 @@ public abstract class AbstractExtensionInfo implements ExtensionInfo {
  
     public ClassFileLoader classFileLoader() {
     	if(classFileLoader == null) {
-    		List<Location> locations = new ArrayList<Location>();
-    		locations.add(getOptions().bootclasspath);
-    		locations.add(getOptions().classpath);
-    		locations.add(getOptions().class_output);
-    		classFileLoader = new ClassFileLoader_c(this,locations);
+    		classFileLoader = extFileManager(); 
+    		classFileLoader.addLocation(getOptions().bootclasspath);
+    		classFileLoader.addLocation(getOptions().classpath);
+    		classFileLoader.addLocation(getOptions().class_output);
     	}
 		return classFileLoader;
     }
@@ -245,11 +238,11 @@ public abstract class AbstractExtensionInfo implements ExtensionInfo {
     	Options options = getOptions();
 		try {
 			ext_fm.setLocation(options.source_path, options.sourcepath_directories);
-			if (!options.source_output_given && !options.class_output_given)
+			if (!options.isSourceOutputGiven() && !options.isClassOutputGiven())
 				options.source_output_dir = options.class_output_dir = Collections.singleton(options.currFile);
-			else if (!options.source_output_given && options.class_output_given)
+			else if (!options.isSourceOutputGiven() && options.isClassOutputGiven())
 				options.source_output_dir = options.class_output_dir;
-			else if (!options.class_output_given)
+			else if (!options.isClassOutputGiven())
 				options.class_output_dir = Collections.singleton(options.currFile);
 			ext_fm.setLocation(options.source_output, options.source_output_dir);
 			ext_fm.setLocation(options.class_output, options.class_output_dir);

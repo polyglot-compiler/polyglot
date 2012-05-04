@@ -37,7 +37,6 @@ import javax.tools.JavaFileObject;
 
 import polyglot.main.Options;
 import polyglot.types.reflect.ClassFileLoader;
-import polyglot.types.reflect.ClassFileLoader_c;
 import polyglot.util.*;
 
 /**
