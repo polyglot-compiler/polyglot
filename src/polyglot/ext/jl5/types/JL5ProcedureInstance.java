@@ -6,11 +6,8 @@ import polyglot.types.MemberInstance;
 import polyglot.types.ProcedureInstance;
 
 public interface JL5ProcedureInstance extends ProcedureInstance, MemberInstance {    
-    boolean isVariableArity();
+    boolean isVariableArity();    
     
-    
-    boolean isRawGeneric();
-    boolean isInstantiatedGeneric();
     void setTypeParams(List<TypeVariable> typeParams);
     List<TypeVariable> typeParams();
 

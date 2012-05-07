@@ -241,16 +241,6 @@ public class JL5MethodInstance_c extends MethodInstance_c implements JL5MethodIn
     }
 
     @Override
-    public boolean isRawGeneric() {
-        return !this.typeParams.isEmpty();
-    }
-
-    @Override
-    public boolean isInstantiatedGeneric() {
-        return false;
-    }
-
-    @Override
     public void setTypeParams(List<TypeVariable> typeParams) {
         this.typeParams = typeParams;
     }

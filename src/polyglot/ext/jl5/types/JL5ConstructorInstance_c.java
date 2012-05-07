@@ -101,16 +101,6 @@ public class JL5ConstructorInstance_c extends ConstructorInstance_c implements J
     }
 
     @Override
-    public boolean isRawGeneric() {
-        return !this.typeParams.isEmpty();
-    }
-
-    @Override
-    public boolean isInstantiatedGeneric() {
-        return false;
-    }
-
-    @Override
     public void setTypeParams(List<TypeVariable> typeParams) {
         this.typeParams = typeParams;
     }
