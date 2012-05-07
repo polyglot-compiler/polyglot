@@ -1,12 +1,14 @@
 package polyglot.ext.jl5.visit;
 
+import java.util.List;
+
 import polyglot.ast.*;
 import polyglot.ext.jl5.JL5Options;
-import polyglot.ext.jl5.types.JL5TypeSystem;
+import polyglot.ext.jl5.types.*;
+import polyglot.ext.param.types.SubstType;
 import polyglot.frontend.Job;
-import polyglot.types.SemanticException;
-import polyglot.types.Type;
-import polyglot.types.TypeSystem;
+import polyglot.types.*;
+import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
 import polyglot.visit.AscriptionVisitor;
 import polyglot.visit.NodeVisitor;
@@ -18,14 +20,8 @@ import polyglot.visit.NodeVisitor;
  * 
  */
 public class TVCaster extends AscriptionVisitor {
-    private final boolean promiscuousMode;
     public TVCaster(Job job, TypeSystem ts, NodeFactory nf) {
-        this(job, ts, nf, false);
-    }
-
-    public TVCaster(Job job, TypeSystem ts, NodeFactory nf, boolean promiscuousMode) {
         super(job, ts, nf);
-        this.promiscuousMode = promiscuousMode;
     }
 
     @Override
@@ -39,17 +35,113 @@ public class TVCaster extends AscriptionVisitor {
         if (!fromType.isReference() || !toType.isReference() || ts.Object().equals(toType)) {
             return e;
         }
-        if (e instanceof Special || e instanceof ArrayInit || e instanceof Lit) {
+        if (e instanceof Special || e instanceof ArrayInit || e instanceof Lit || e instanceof Local) {
             return e;
         }
         if (e instanceof New && ts.isImplicitCastValid(((New)e).objectType().type(), toType)) {            
             return e;
         }
-        
-        if (ts.isCastValid(fromType, toType) && (promiscuousMode || !ts.isImplicitCastValid(fromType, toType))) {            
+        if (isStringLiterals(e)) {
+            return e;
+        }
+        if (e instanceof Field) {
+            Field f = (Field)e;            
+            if (!mayBeParameterizedField(f.fieldInstance())) {
+                return e;
+            }            
+        }
+        if (e instanceof Call) {
+            Call c = (Call)e;            
+            if (!mayHaveParameterizedReturn(c.methodInstance())) {
+                return e;
+            }            
+        }
+                
+        if (ts.isCastValid(fromType, toType)) {            
             return insertCast(e, toType);
         }
         return e;
+    }
+
+    private boolean mayBeParameterizedField(FieldInstance fi) {
+        ReferenceType container = fi.container();
+        JL5ParsedClassType pct = getBase(container);
+        
+        
+        FieldInstance bfi = pct.fieldNamed(fi.name());
+        if (bfi == null) {
+            throw new InternalCompilerError("Couldn't find field named " + fi.name() + " in " + pct);            
+        }
+        
+        return hasTypeVariable(bfi.type());
+    }
+
+    private boolean mayHaveParameterizedReturn(MethodInstance mi) {
+        ReferenceType container = mi.container();
+        JL5ParsedClassType pct = getBase(container);
+        
+        
+        List<MethodInstance> meths = pct.methodsNamed(mi.name());
+        
+        for (MethodInstance bmi : meths) {
+            if (bmi.formalTypes().size() == mi.formalTypes().size()) {
+                // might be the same method...
+                if (hasTypeVariable(bmi.returnType())) {
+                    return true;
+                }
+            }
+        }
+        
+        return false;
+    }
+
+    private boolean hasTypeVariable(Type t) {
+        // really want a type visitor...
+        if (t instanceof TypeVariable) {
+            return true;
+        }
+        if (t instanceof ArrayType) {
+            return hasTypeVariable(((ArrayType)t).base());
+        }
+//        if (t instanceof JL5SubstClassType) {
+//            JL5SubstClassType sct = (JL5SubstClassType)t;
+//            if (hasTypeVariable(sct.base())) {
+//                return true;
+//            }
+//            for (Type s : (List<Type>)sct.actuals()) {
+//                if (hasTypeVariable(s)) {
+//                    return true;
+//                }
+//            }
+//        }
+        return false;
+    }
+
+    private JL5ParsedClassType getBase(ReferenceType container) {
+        if (container instanceof JL5SubstClassType) {
+            return ((JL5SubstClassType)container).base();
+        }
+        else if (container instanceof RawClass) {
+            return ((RawClass)container).base();
+        }
+        else if (container instanceof JL5ParsedClassType) {
+            return (JL5ParsedClassType)container;
+        }
+        throw new InternalCompilerError("Don't know how to deal with container of type " + container.getClass());
+    }
+
+    /**
+     * Does expression e consist only of string literals and concatenations of string literals?
+     */
+    private boolean isStringLiterals(Expr e) {
+        if (e instanceof StringLit) {
+            return true;
+        }
+        if (e instanceof Binary) {
+            Binary b = (Binary)e;
+            return b.operator() == Binary.ADD && isStringLiterals(b.left()) && isStringLiterals(b.right());
+        }
+        return false;
     }
 
     private Expr insertCast(Expr e, Type toType) throws SemanticException {
@@ -100,7 +192,7 @@ public class TVCaster extends AscriptionVisitor {
         }
         if (parent instanceof Call && old == ((Call)parent).target()) {
             Call c = (Call)parent;
-            if (c.target() instanceof Expr && !(c.target() instanceof Special)) {
+            if (c.target() instanceof Expr && !(c.target() instanceof Special || c.target() instanceof Lit || c.target() instanceof Local)) {
                 Expr e = (Expr)n;
                 if (e instanceof Cast) {
                     e = ((Cast)e).expr();

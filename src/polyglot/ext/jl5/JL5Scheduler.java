@@ -33,10 +33,8 @@ public class JL5Scheduler extends JLScheduler {
 	public Goal CastsInserted(Job job) {
         TypeSystem ts = extInfo.typeSystem();
         NodeFactory nf = extInfo.nodeFactory();
-//        Goal g = new VisitorGoal(job, new CastingTypeChecker(job, ts, nf));
-        Goal g = new VisitorGoal(job, new TVCaster(job, ts, nf, true));
+        Goal g = new VisitorGoal(job, new TVCaster(job, ts, nf));
         try {
-//        	g.addPrerequisiteGoal(Disambiguated(job),this);
             g.addPrerequisiteGoal(TypeChecked(job), this);
             g.addPrerequisiteGoal(AutoBoxing(job), this);
             g.addPrerequisiteGoal(RemoveExtendedFors(job), this);
