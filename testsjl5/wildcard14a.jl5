@@ -17,7 +17,7 @@ class Box< T > {
 class Test {
   public static void main(String[] args) {
     Box<Number> numberBox = new Box<Number>(5L); 
-    Box<? extends Number> unknownBox = numberBox; 
+    Box<? super Number> unknownBox = numberBox; 
 
     Comparable<?> comparableToUnknown = new Integer(1);
     Comparable<Object> comparableToObject = null;
@@ -25,5 +25,6 @@ class Test {
 
     int compared = 0;
     compared = unknownBox.compareTo(comparableToUnknown); // error
+
     }
 } 

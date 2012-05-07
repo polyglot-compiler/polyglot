@@ -24,6 +24,9 @@ class Test {
     Comparable<? super Number> comparableToNumber = comparableToObject;
 
     int compared = 0;
-    compared = unknownBox.compareTo(comparableToUnknown); // error
+    compared = unknownBox.compareTo(comparableToObject); // ok
+    compared = unknownBox.compareTo(comparableToNumber); // ok
+
+    Box<?>                box1 = unknownBox.copy(); // ok
     }
 } 

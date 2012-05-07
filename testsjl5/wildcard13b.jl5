@@ -23,7 +23,6 @@ class Test {
     Comparable<Object> comparableToObject = null;
     Comparable<? super Number> comparableToNumber = comparableToObject;
 
-    int compared = 0;
-    compared = unknownBox.compareTo(comparableToUnknown); // error
+    Box<? extends Number> box2 = unknownBox.copy(); // error
     }
 } 
