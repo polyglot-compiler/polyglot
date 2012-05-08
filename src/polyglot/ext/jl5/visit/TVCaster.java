@@ -35,7 +35,7 @@ public class TVCaster extends AscriptionVisitor {
         if (!fromType.isReference() || !toType.isReference() || ts.Object().equals(toType)) {
             return e;
         }
-        if (e instanceof Special || e instanceof ArrayInit || e instanceof Lit || e instanceof Local) {
+        if (e instanceof Special || e instanceof ArrayInit || e instanceof Lit) {
             return e;
         }
         if (e instanceof New && ts.isImplicitCastValid(((New)e).objectType().type(), toType)) {            
@@ -192,7 +192,7 @@ public class TVCaster extends AscriptionVisitor {
         }
         if (parent instanceof Call && old == ((Call)parent).target()) {
             Call c = (Call)parent;
-            if (c.target() instanceof Expr && !(c.target() instanceof Special || c.target() instanceof Lit || c.target() instanceof Local)) {
+            if (c.target() instanceof Expr && !(c.target() instanceof Special || c.target() instanceof Lit)) {
                 Expr e = (Expr)n;
                 if (e instanceof Cast) {
                     e = ((Cast)e).expr();
