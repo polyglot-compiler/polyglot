@@ -1811,5 +1811,35 @@ public class JL5TypeSystem_c extends ParamTypeSystem_c implements JL5TypeSystem 
         }
     }
 
+    @Override
+    public boolean isReifiable(Type t) {
+        if (t.isPrimitive() || t.isNull()) {
+            return true;
+        }
+        if (t instanceof RawClass) {
+            return true;
+        }
+        if (t instanceof JL5ParsedClassType) {
+            return true;
+        }
+        if (t instanceof ArrayType) {
+            return isReifiable(((ArrayType)t).base());
+        }
+        if (t instanceof JL5SubstClassType) {
+            JL5SubstClassType ct = (JL5SubstClassType)t;
+            for (Type a : (List<Type>)ct.actuals()) {
+                if (a instanceof WildCardType) {
+                    WildCardType wc = (WildCardType)a;
+                    if (!wc.hasLowerBound() && wc.upperBound().equals(Object())) {
+                        // the actual is an unbounded wildcard, and so is reifiable
+                        continue;
+                    }
+                }
+                // actual a is not an unbounded wildcard. This type is not reifiable.
+                return false;
+            }
+        }
+        return false;
+    }
 
 }

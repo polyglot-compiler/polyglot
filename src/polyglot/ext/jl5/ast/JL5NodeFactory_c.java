@@ -391,6 +391,16 @@ public class JL5NodeFactory_c extends NodeFactory_c implements JL5NodeFactory {
         n = (New)n.del(delFactory().delNew());
         return n;
     }
+    
+    
+
+    @Override
+    public NewArray NewArray(Position pos, TypeNode base, List dims, int addDims, ArrayInit init) {
+        NewArray n = new JL5NewArray_c(pos, base, CollectionUtil.nonNullList(dims), addDims, init);
+        n = (NewArray)n.ext(extFactory().extNewArray());
+        n = (NewArray)n.del(delFactory().delNewArray());
+        return n;
+    }
 
     @Override
     public Field Field(Position pos, Receiver target, Id name) {

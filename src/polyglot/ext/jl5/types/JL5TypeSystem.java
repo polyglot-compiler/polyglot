@@ -82,6 +82,12 @@ public interface JL5TypeSystem extends TypeSystem, ParamTypeSystem {
      */
     boolean isUncheckedConversion(Type from, Type to);
 
+    
+    /**
+     * Is the type reifiable (i.e., representable at runtime).
+     * See JLS 3rd Ed Section 4.7
+     */
+    boolean isReifiable(Type t);
 
     /**
      * Instantiate class clazz with actuals.
