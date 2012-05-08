@@ -133,7 +133,7 @@ public class JL5ClassDecl_c extends ClassDecl_c implements JL5ClassDecl {
             // Add this class to the context, but don't push a class scope.
             // This allows us to detect loops in the inheritance
             // hierarchy, but avoids an infinite loop.
-            c = c.pushBlock();
+            c = ((JL5Context)c).pushExtendsClause(type);
             c.addNamed(this.type);
         }
         for (ParamTypeNode tn : paramTypes) {

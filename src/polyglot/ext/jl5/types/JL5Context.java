@@ -1,5 +1,6 @@
 package polyglot.ext.jl5.types;
 
+import polyglot.types.ClassType;
 import polyglot.types.Context;
 import polyglot.types.Type;
 import polyglot.types.VarInstance;
@@ -16,8 +17,11 @@ public interface JL5Context extends Context {
     void addTypeVariable(TypeVariable type);
 
     JL5TypeSystem typeSystem();
-	Context pushSwitch(Type type);
-	Type switchType();
+    Context pushSwitch(Type type);
+    Type switchType();
+    Context pushExtendsClause(ClassType declaringClass);
+    boolean inExtendsClause();
+    ClassType extendsClauseDeclaringClass();
 //	public Context pushCase();
 //	boolean inCase();
 }

@@ -10,129 +10,139 @@ import polyglot.util.StringUtil;
 
 public class JL5Context_c extends Context_c implements JL5Context {
 
-	protected Map<String, TypeVariable> typeVars;
+    protected Map<String, TypeVariable> typeVars;
 
-	protected TypeVariable typeVariable;
+    protected TypeVariable typeVariable;
 
-	protected Type switchType;
+    protected Type switchType;
+    protected ClassType declaringClass;
 
-	public static final Kind TYPE_VAR = new Kind("type-var");
-	public static final Kind SWITCH = new Kind("switch");
+    public static final Kind TYPE_VAR = new Kind("type-var");
+    public static final Kind SWITCH = new Kind("switch");
+    public static final Kind EXTENDS = new Kind("extends");
 
-	public JL5Context_c(TypeSystem ts) {
-		super(ts);
-	}
+    public JL5Context_c(TypeSystem ts) {
+        super(ts);
+    }
 
-	public JL5TypeSystem typeSystem() {
-		return (JL5TypeSystem) ts;
-	}
+    public JL5TypeSystem typeSystem() {
+        return (JL5TypeSystem) ts;
+    }
 
-	public VarInstance findVariableSilent(String name) {
-		VarInstance vi = findVariableInThisScope(name);
-		if (vi != null) {
-			return vi;
-		}
+    public VarInstance findVariableSilent(String name) {
+        VarInstance vi = findVariableInThisScope(name);
+        if (vi != null) {
+            return vi;
+        }
 
-		try {
-			// might be static
-			if (importTable() != null) {
-				JL5ImportTable jit = (JL5ImportTable) importTable();
-				for (Iterator it = jit.singleStaticImports().iterator(); it.hasNext();) {
-					String next = (String) it.next();
-					String id = StringUtil.getShortNameComponent(next);
-					if (name.equals(id)) {
-						Named nt = ts.forName(StringUtil.getPackageComponent(next));
-						if (nt instanceof Type) {
-							Type t = (Type) nt;
-							try {
-								vi = ts.findField(t.toClass(), name);
-							} catch (SemanticException e) {
-							}
-							if (vi != null) {
-								return vi;
-							}
-						}
-					}
-				}
-				if (vi == null) {
-					for (Iterator it = jit.staticOnDemandImports().iterator(); it.hasNext();) {
-						String next = (String) it.next();
-						Named nt = ts.forName(next);
-						if (nt instanceof Type) {
-							Type t = (Type) nt;
-							try {
-								vi = ts.findField(t.toClass(), name);
-							} catch (SemanticException e) {
-							}
-							if (vi != null)
-								return vi;
-						}
-					}
-				}
-			}
-		} catch (SemanticException e) {
-		}
+        try {
+            // might be static
+            if (importTable() != null) {
+                JL5ImportTable jit = (JL5ImportTable) importTable();
+                for (Iterator it = jit.singleStaticImports().iterator(); it.hasNext();) {
+                    String next = (String) it.next();
+                    String id = StringUtil.getShortNameComponent(next);
+                    if (name.equals(id)) {
+                        Named nt = ts.forName(StringUtil.getPackageComponent(next));
+                        if (nt instanceof Type) {
+                            Type t = (Type) nt;
+                            try {
+                                vi = ts.findField(t.toClass(), name);
+                            } catch (SemanticException e) {
+                            }
+                            if (vi != null) {
+                                return vi;
+                            }
+                        }
+                    }
+                }
+                if (vi == null) {
+                    for (Iterator it = jit.staticOnDemandImports().iterator(); it.hasNext();) {
+                        String next = (String) it.next();
+                        Named nt = ts.forName(next);
+                        if (nt instanceof Type) {
+                            Type t = (Type) nt;
+                            try {
+                                vi = ts.findField(t.toClass(), name);
+                            } catch (SemanticException e) {
+                            }
+                            if (vi != null)
+                                return vi;
+                        }
+                    }
+                }
+            }
+        } catch (SemanticException e) {
+        }
 
-		if (outer != null) {
-			return outer.findVariableSilent(name);
-		}
-		return null;
-	}
+        if (outer != null) {
+            return outer.findVariableSilent(name);
+        }
+        return null;
+    }
 
-	@Override
-	protected Context_c push() {
-		JL5Context_c c = (JL5Context_c) super.push();
-		c.typeVars = null;
-		return c;
-	}
+    @Override
+    protected Context_c push() {
+        JL5Context_c c = (JL5Context_c) super.push();
+        c.typeVars = null;
+        return c;
+    }
 
-	public JL5Context pushTypeVariable(TypeVariable iType) {
-		JL5Context_c v = (JL5Context_c) push();
-		v.typeVariable = iType;
-		v.kind = TYPE_VAR;
-		return v;
-	}
+    public JL5Context pushTypeVariable(TypeVariable iType) {
+        JL5Context_c v = (JL5Context_c) push();
+        v.typeVariable = iType;
+        v.kind = TYPE_VAR;
+        return v;
+    }
 
-	public TypeVariable findTypeVariableInThisScope(String name) {
-		if (typeVariable != null && typeVariable.name().equals(name))
-			return typeVariable;
-		if (typeVars != null && typeVars.containsKey(name)) {
-			return (TypeVariable) typeVars.get(name);
-		}
-		if (outer != null) {
-			return ((JL5Context) outer).findTypeVariableInThisScope(name);
-		}
-		return null;
-	}
+    public TypeVariable findTypeVariableInThisScope(String name) {
+        if (typeVariable != null && typeVariable.name().equals(name))
+            return typeVariable;
+        if (typeVars != null && typeVars.containsKey(name)) {
+            return (TypeVariable) typeVars.get(name);
+        }
+        if (outer != null) {
+            return ((JL5Context) outer).findTypeVariableInThisScope(name);
+        }
+        return null;
+    }
 
-	public boolean inTypeVariable() {
-		return kind == TYPE_VAR;
-	}
+    public boolean inTypeVariable() {
+        return kind == TYPE_VAR;
+    }
 
-	public String toString() {
-		return super.toString() + "; type var: " + typeVariable + "; type vars: "
-				+ typeVars;
-	}
+    public String toString() {
+        return super.toString() + "; type var: " + typeVariable + "; type vars: "
+        + typeVars;
+    }
 
-	public void addTypeVariable(TypeVariable type) {
-		if (typeVars == null)
-			typeVars = new LinkedHashMap<String, TypeVariable>();
-		typeVars.put(type.name(), type);
-	}
+    public void addTypeVariable(TypeVariable type) {
+        if (typeVars == null)
+            typeVars = new LinkedHashMap<String, TypeVariable>();
+        typeVars.put(type.name(), type);
+    }
 
-	@Override
-	public Context pushSwitch(Type type) {
-		JL5Context_c c = (JL5Context_c) push();
-		c.switchType = type;
-		c.kind = SWITCH;
-		return c;
-	}
+    @Override
+    public Context pushSwitch(Type type) {
+        JL5Context_c c = (JL5Context_c) push();
+        c.switchType = type;
+        c.kind = SWITCH;
+        return c;
+    }
 
-	@Override
-	public Type switchType() {
-		return switchType;
-	}
-	
+    @Override
+    public Context pushExtendsClause(ClassType declaringClass) {
+        JL5Context_c c = (JL5Context_c) push();
+        c.declaringClass = declaringClass;
+        c.kind = EXTENDS;
+        return c;
+    }
+
+    @Override
+    public Type switchType() {
+        return switchType;
+    }
+
     @Override
     public MethodInstance findMethod(String name, List argTypes) throws SemanticException {
         try {
@@ -155,6 +165,16 @@ public class JL5Context_c extends Context_c implements JL5Context {
             }
             throw e;
         }
+    }
+
+    @Override
+    public boolean inExtendsClause() {
+        return this.kind == EXTENDS;
+    }
+
+    @Override
+    public ClassType extendsClauseDeclaringClass() {
+        return this.declaringClass;
     }
 
 

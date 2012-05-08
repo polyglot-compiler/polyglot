@@ -7,6 +7,7 @@ import java.util.Set;
 import polyglot.ast.Node;
 import polyglot.ext.jl5.types.*;
 import polyglot.types.ArrayType;
+import polyglot.types.ClassType;
 import polyglot.types.SemanticException;
 import polyglot.types.Type;
 import polyglot.util.Position;
@@ -56,10 +57,16 @@ public class JL5CanonicalTypeNode_c extends polyglot.ast.CanonicalTypeNode_c {
                 
             }
         }
-        if (tc.context().currentClass() != null) {
-            if (tc.context().currentClass().isNested() && !tc.context().currentClass().isInnerClass()) {
+        ClassType currentClass = tc.context().currentClass();
+        JL5Context jc = (JL5Context)tc.context();
+        if (jc.inExtendsClause()) {
+            currentClass = jc.extendsClauseDeclaringClass();
+        }
+        if (currentClass != null) {
+            if (currentClass.isNested() && !currentClass.isInnerClass()) {
+                // the current class is static.
                 for (TypeVariable tv : findInstanceTypeVariables(t)) {
-                    if (!tv.declaringClass().equals(tc.context().currentClass())) {
+                    if (!tv.declaringClass().equals(currentClass)) {
                         throw new SemanticException("Type variable " + tv + " of class " + tv.declaringClass() + " cannot be used in a nested class", this.position);
                     }
                 }
