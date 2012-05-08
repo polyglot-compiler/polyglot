@@ -1817,10 +1817,11 @@ public class JL5TypeSystem_c extends ParamTypeSystem_c implements JL5TypeSystem 
             return true;
         }
         if (t instanceof RawClass) {
-            return true;
+            return isContainerReifiable(t.toClass());
         }
         if (t instanceof JL5ParsedClassType) {
-            return true;
+            JL5ParsedClassType pct = (JL5ParsedClassType)t;
+            return pct.typeVariables().isEmpty() && isContainerReifiable(t.toClass());
         }
         if (t instanceof ArrayType) {
             return isReifiable(((ArrayType)t).base());
@@ -1838,8 +1839,22 @@ public class JL5TypeSystem_c extends ParamTypeSystem_c implements JL5TypeSystem 
                 // actual a is not an unbounded wildcard. This type is not reifiable.
                 return false;
             }
+            return isContainerReifiable(t.toClass());
         }
         return false;
+    }
+
+    /**
+     * If ct is an inner class, then check that the container of ct is reifiable.
+     * @param ct
+     * @return
+     */
+    private boolean isContainerReifiable(ClassType ct) {
+        if (!ct.isInnerClass()) {
+            // we don't care if the container is reifiable
+            return true;
+        }
+        return isReifiable(ct.container());
     }
 
 }
