@@ -41,7 +41,7 @@ public class ExtendedFor_c extends Loop_c implements ExtendedFor {
 		n.body = body;
 		return n;
 	}
-	
+
 	@Override
 	public LocalDecl decl() {
 		return this.decl;
@@ -55,19 +55,19 @@ public class ExtendedFor_c extends Loop_c implements ExtendedFor {
 		return n;
 	}
 
-        @Override
-        public Expr expr() {
-                return this.expr;
-        }
+	@Override
+	public Expr expr() {
+		return this.expr;
+	}
 
-        @Override
-        public ExtendedFor expr(Expr expr) {
-                ExtendedFor_c n = (ExtendedFor_c) copy();
-                n.expr = expr;
-                return n;
-        }
+	@Override
+	public ExtendedFor expr(Expr expr) {
+		ExtendedFor_c n = (ExtendedFor_c) copy();
+		n.expr = expr;
+		return n;
+	}
 
-        /** Reconstruct the statement. */
+	/** Reconstruct the statement. */
 	protected ExtendedFor_c reconstruct(LocalDecl decl, Expr expr, Stmt body) {
 		if (!decl.equals(this.decl) || expr != this.expr || body != this.body) {
 			ExtendedFor_c n = (ExtendedFor_c) copy();
@@ -93,7 +93,7 @@ public class ExtendedFor_c extends Loop_c implements ExtendedFor {
 	public Context enterScope(Context c) {
 		return c.pushBlock();
 	}
-	
+
 	/** Type check the statement. */
 	@Override
 	public Node typeCheck(TypeChecker tc) throws SemanticException {
@@ -101,31 +101,33 @@ public class ExtendedFor_c extends Loop_c implements ExtendedFor {
 		NodeFactory nf = tc.nodeFactory();
 		// Check that the expr is an array or of type Iterable
 		Type t = expr.type();
-//        System.err.println(" t is a " + t.getClass());
-//        System.err.println("    t is a " + ts.allAncestorsOf((ReferenceType) t));
-//        System.err.println("    erasure(t) is " + ts.erasureType(t));
-//        System.err.println("    iterable is a " + ts.Iterable().getClass());
-		if (!expr.type().isArray() && !t.isSubtype(ts.rawClass((JL5ParsedClassType)ts.Iterable()))) {
+		// System.err.println(" t is a " + t.getClass());
+		// System.err.println("    t is a " + ts.allAncestorsOf((ReferenceType)
+		// t));
+		// System.err.println("    erasure(t) is " + ts.erasureType(t));
+		// System.err.println("    iterable is a " + ts.Iterable().getClass());
+		if (!expr.type().isArray()
+				&& !t.isSubtype(ts.rawClass((JL5ParsedClassType) ts.Iterable()))) {
 			throw new SemanticException(
 					"Can only iterate over an array or an instance of java.util.Iterable",
 					expr.position());
 		}
-		
+
 		// Check that type is the same as elements in expr
 		Type declType = decl().localInstance().type();
 		Type elementType;
 		if (expr.type().isArray()) {
-		    elementType = expr.type().toArray().base();
+			elementType = expr.type().toArray().base();
+		} else {
+			JL5SubstClassType iterableType = ts.findGenericSupertype(
+					(JL5ParsedClassType) ts.Iterable(), t.toReference());
+			elementType = (Type) iterableType.actuals().get(0);
 		}
-		else {
-    		JL5SubstClassType iterableType = ts.findGenericSupertype((JL5ParsedClassType)ts.Iterable(), t.toReference());
-            elementType = (Type)iterableType.actuals().get(0);
+		if (!elementType.isImplicitCastValid(declType)) {
+			throw new SemanticException("Incompatible types: required "
+					+ declType + " but found " + elementType, this.position());
 		}
-        if (!elementType.isImplicitCastValid(declType)) {
-            throw new SemanticException("Incompatible types: required " + declType + " but found " + elementType, this.position());
-        }
-		
-		
+
 		if (expr instanceof Local
 				&& decl.localInstance().equals(((Local) expr).localInstance())) {
 			throw new SemanticException("Variable: " + expr
@@ -140,8 +142,8 @@ public class ExtendedFor_c extends Loop_c implements ExtendedFor {
 							&& decl.localInstance().equals(
 									((Local) next).localInstance())) {
 						throw new SemanticException("Varaible: " + next
-								+ " may not have been initialized", next
-								.position());
+								+ " may not have been initialized",
+								next.position());
 					}
 				}
 			}
@@ -192,26 +194,26 @@ public class ExtendedFor_c extends Loop_c implements ExtendedFor {
 	public Term continueTarget() {
 		return body;
 	}
-	
+
 	/** Write the statement to an output file. */
 	@Override
 	public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
-	    w.write("for (");
-	    w.begin(0);
+		w.write("for (");
+		w.begin(0);
 
-	    boolean oldSemiColon = tr.appendSemicolon(false);
-	    // print the decl without an initializer
-	    printBlock(decl.init(null), w, tr);
-	    tr.appendSemicolon(oldSemiColon);
-	    
-            w.allowBreak(1, " ");
-            w.write(":");
-            w.allowBreak(1, " ");
-            print(expr, w, tr);
-	    w.end();
-	    w.write(")");
+		boolean oldSemiColon = tr.appendSemicolon(false);
+		// print the decl without an initializer
+		printBlock(decl.init(null), w, tr);
+		tr.appendSemicolon(oldSemiColon);
 
-	    printSubStmt(body, w, tr);
+		w.allowBreak(1, " ");
+		w.write(":");
+		w.allowBreak(1, " ");
+		print(expr, w, tr);
+		w.end();
+		w.write(")");
+
+		printSubStmt(body, w, tr);
 	}
 
 }

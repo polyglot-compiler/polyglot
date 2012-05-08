@@ -128,7 +128,7 @@ public class Options {
 	 * and for serialization.
 	 */
 	public boolean merge_strings = false;
-	
+
 	public boolean classpath_given = false;
 	public boolean bootclasspath_given = false;
 
@@ -145,18 +145,20 @@ public class Options {
 	 */
 	public void setDefaultValues() {
 		currFile = new File(System.getProperty("user.dir"));
-		bootFile = new File(System.getProperty("java.home") + separator + "lib" + separator + "rt.jar");
-		
+		bootFile = new File(System.getProperty("java.home") + separator + "lib"
+				+ separator + "rt.jar");
+
 		source_path = StandardLocation.SOURCE_PATH;
 		source_output = StandardLocation.SOURCE_OUTPUT;
 		class_output = StandardLocation.CLASS_OUTPUT;
 		output_classpath = StandardLocation.CLASS_PATH;
 		classpath = StandardLocation.CLASS_PATH;
 		bootclasspath = StandardLocation.PLATFORM_CLASS_PATH;
-		
+
 		sourcepath_directories.add(currFile);
-		
-		StringTokenizer st = new StringTokenizer(System.getProperty("java.class.path"), pathSeparator);
+
+		StringTokenizer st = new StringTokenizer(
+				System.getProperty("java.class.path"), pathSeparator);
 		while (st.hasMoreTokens()) {
 			File f = new File(st.nextToken());
 			if (f.exists())
@@ -391,19 +393,19 @@ public class Options {
 
 		return i;
 	}
-	
+
 	public boolean isSourceOutputGiven() {
 		return source_output_dir != null && source_output_dir.size() != 0;
 	}
-	
+
 	public boolean isClassOutputGiven() {
 		return class_output_dir != null && class_output_dir.size() != 0;
 	}
-	
+
 	public Location outputDirectory() {
 		return source_output;
 	}
-	
+
 	public Location classOutputDirectory() {
 		return class_output;
 	}
@@ -612,8 +614,9 @@ public class Options {
 		return source_output + pathSeparator + "." + pathSeparator
 				+ output_classpath;
 	}
-	
-	protected void processStrAndSetLocation(String str, Set<File> s, Location loc, StandardJavaFileManager fm) throws IOException {
+
+	protected void processStrAndSetLocation(String str, Set<File> s,
+			Location loc, StandardJavaFileManager fm) throws IOException {
 		StringTokenizer st = new StringTokenizer(str, pathSeparator);
 		while (st.hasMoreTokens()) {
 			File f = new File(st.nextToken());

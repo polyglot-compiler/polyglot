@@ -32,18 +32,18 @@ import polyglot.util.Position;
 
 /** A token class for int literals. */
 public class QQNodeToken extends Token {
-    protected Node node;
+	protected Node node;
 
-  public QQNodeToken(Position position, Node node, int sym) {
-      super(position, sym);
-      this.node = node;
-  }
+	public QQNodeToken(Position position, Node node, int sym) {
+		super(position, sym);
+		this.node = node;
+	}
 
-  public Node node() {
-      return node;
-  }
+	public Node node() {
+		return node;
+	}
 
-  public String toString() {
-      return "qq" + symbol() + "(" + node + ")";
-  }
+	public String toString() {
+		return "qq" + symbol() + "(" + node + ")";
+	}
 }

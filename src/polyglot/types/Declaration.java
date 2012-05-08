@@ -36,9 +36,9 @@ package polyglot.types;
  * a reference to itself.
  */
 public interface Declaration extends TypeObject {
-    /** Get the original declaration. */
-    Declaration declaration();
-    
-    /** Set the original declaration. */
-    void setDeclaration(Declaration decl);
+	/** Get the original declaration. */
+	Declaration declaration();
+
+	/** Set the original declaration. */
+	void setDeclaration(Declaration decl);
 }

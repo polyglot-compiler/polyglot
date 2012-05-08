@@ -13,269 +13,276 @@ import polyglot.util.Position;
 
 public class IntersectionType_c extends ClassType_c implements IntersectionType {
 
-    protected List<ReferenceType> bounds;
+	protected List<ReferenceType> bounds;
 
-//    protected List<Type> concreteBounds;
-    
-    protected TypeVariable boundOf_;
+	// protected List<Type> concreteBounds;
 
-    public IntersectionType_c(TypeSystem ts, Position pos, List<ReferenceType> bounds) {
-        super(ts, pos);
-        this.bounds = bounds;
-        checkBounds();
-    }
+	protected TypeVariable boundOf_;
 
-    private void checkBounds() {
-        if (this.bounds == null || this.bounds.size() < 2) {
-            throw new InternalCompilerError("Intersection type needs at least two elements: " + this.bounds);
-        }
-    }
+	public IntersectionType_c(TypeSystem ts, Position pos,
+			List<ReferenceType> bounds) {
+		super(ts, pos);
+		this.bounds = bounds;
+		checkBounds();
+	}
 
-    public List<ReferenceType> bounds() {
-        if (bounds == null || bounds.size() == 0) {
-            bounds = new ArrayList<ReferenceType>();
-            bounds.add(ts.Object());
-        }
-        return bounds;
-    }
+	private void checkBounds() {
+		if (this.bounds == null || this.bounds.size() < 2) {
+			throw new InternalCompilerError(
+					"Intersection type needs at least two elements: "
+							+ this.bounds);
+		}
+	}
 
-    public String translate(Resolver c) {
-        StringBuffer sb = new StringBuffer();//("intersection[ ");
-        for (Iterator<ReferenceType> iter = bounds.iterator(); iter.hasNext();) {
-            Type b = iter.next();
-            sb.append(b.translate(c));
-            if (iter.hasNext())
-                sb.append(" & ");
-        }
-        //sb.append(" ]");
-        return sb.toString();
-    }
+	public List<ReferenceType> bounds() {
+		if (bounds == null || bounds.size() == 0) {
+			bounds = new ArrayList<ReferenceType>();
+			bounds.add(ts.Object());
+		}
+		return bounds;
+	}
 
-    public String toString() {
-        StringBuffer sb = new StringBuffer();//("intersection[ ");
-        sb.append(" ( ");
-        for (Iterator<ReferenceType> iter = bounds.iterator(); iter.hasNext();) {
-            Type b = iter.next();
-            sb.append(b);
-            if (iter.hasNext())
-                sb.append(" & ");
-        }
-        //sb.append(" ]");
-        sb.append(" ) ");
-        return sb.toString();
-    }
+	public String translate(Resolver c) {
+		StringBuffer sb = new StringBuffer();// ("intersection[ ");
+		for (Iterator<ReferenceType> iter = bounds.iterator(); iter.hasNext();) {
+			Type b = iter.next();
+			sb.append(b.translate(c));
+			if (iter.hasNext())
+				sb.append(" & ");
+		}
+		// sb.append(" ]");
+		return sb.toString();
+	}
 
-//    protected List<Type> getConcreteBounds() {
-//        if (concreteBounds == null) {
-//            concreteBounds = ((JL5TypeSystem) typeSystem()).concreteBounds(this.bounds());
-//        }
-//        return concreteBounds;
-//    }
+	public String toString() {
+		StringBuffer sb = new StringBuffer();// ("intersection[ ");
+		sb.append(" ( ");
+		for (Iterator<ReferenceType> iter = bounds.iterator(); iter.hasNext();) {
+			Type b = iter.next();
+			sb.append(b);
+			if (iter.hasNext())
+				sb.append(" & ");
+		}
+		// sb.append(" ]");
+		sb.append(" ) ");
+		return sb.toString();
+	}
 
-    public Type superType() {
-        if (bounds.isEmpty()) {
-            return ts.Object();
-        }
-        Type t = bounds.get(0);
-        if (t.isClass() && !t.toClass().flags().isInterface()) {
-            return t;
-        }
-        return ts.Object();
-        
-//        return getSyntheticClass().superType();
-    }
+	// protected List<Type> getConcreteBounds() {
+	// if (concreteBounds == null) {
+	// concreteBounds = ((JL5TypeSystem)
+	// typeSystem()).concreteBounds(this.bounds());
+	// }
+	// return concreteBounds;
+	// }
 
-    @Override
-    public List constructors() {
-        return Collections.emptyList();
-    }
+	public Type superType() {
+		if (bounds.isEmpty()) {
+			return ts.Object();
+		}
+		Type t = bounds.get(0);
+		if (t.isClass() && !t.toClass().flags().isInterface()) {
+			return t;
+		}
+		return ts.Object();
 
-//    protected ParsedClassType syntheticClass = null;
-//
-//    protected ClassType getSyntheticClass() {
-//        if (syntheticClass == null) {
-//            syntheticClass = typeSystem().createClassType();
-//            ArrayList<Type> onlyClasses = new ArrayList<Type>();
-//            for (ReferenceType t : getConcreteBounds()) {
-//                if (t.isClass() && ((ClassType)t).flags().isInterface())
-//                    syntheticClass.addInterface(t);
-//                else
-//                    onlyClasses.add(t);
-//            }
-//            if (onlyClasses.size() > 0) {
-//                Collections.sort(onlyClasses, new Comparator<ReferenceType>() {
-//                    public int compare(ReferenceType o1, ReferenceType o2) {
-//                        JL5TypeSystem ts = (JL5TypeSystem) typeSystem();
-//                        if (ts.equals(o1, o2))
-//                            return 0;
-//                        if (ts.isSubtype(o1, o2))
-//                            return -1;
-//                        return 1;
-//                    }
-//                });
-//                syntheticClass.superType(onlyClasses.get(0));
-//            }
-//            syntheticClass.package_(this.package_());
-//        }
-//        return syntheticClass;
-//    }
+		// return getSyntheticClass().superType();
+	}
 
-    @Override
-    public List fields() {
-        return Collections.emptyList();
-//        return getSyntheticClass().fields();
-    }
+	@Override
+	public List constructors() {
+		return Collections.emptyList();
+	}
 
-    @Override
-    public Flags flags() {
-        return Flags.PUBLIC.set(Flags.FINAL);
-        //return getSyntheticClass().flags();
-    }
+	// protected ParsedClassType syntheticClass = null;
+	//
+	// protected ClassType getSyntheticClass() {
+	// if (syntheticClass == null) {
+	// syntheticClass = typeSystem().createClassType();
+	// ArrayList<Type> onlyClasses = new ArrayList<Type>();
+	// for (ReferenceType t : getConcreteBounds()) {
+	// if (t.isClass() && ((ClassType)t).flags().isInterface())
+	// syntheticClass.addInterface(t);
+	// else
+	// onlyClasses.add(t);
+	// }
+	// if (onlyClasses.size() > 0) {
+	// Collections.sort(onlyClasses, new Comparator<ReferenceType>() {
+	// public int compare(ReferenceType o1, ReferenceType o2) {
+	// JL5TypeSystem ts = (JL5TypeSystem) typeSystem();
+	// if (ts.equals(o1, o2))
+	// return 0;
+	// if (ts.isSubtype(o1, o2))
+	// return -1;
+	// return 1;
+	// }
+	// });
+	// syntheticClass.superType(onlyClasses.get(0));
+	// }
+	// syntheticClass.package_(this.package_());
+	// }
+	// return syntheticClass;
+	// }
 
-    @Override
-    public List interfaces() {
-        List interfaces = new ArrayList();
-        for (Type t : bounds) {
-            if (t.isClass() && t.toClass().flags().isInterface()) {
-                interfaces.add(t);
-            }
-        }
-        return interfaces;
-//        return getSyntheticClass().interfaces();
-    }
+	@Override
+	public List fields() {
+		return Collections.emptyList();
+		// return getSyntheticClass().fields();
+	}
 
-    @Override
-    public Kind kind() {
-        return INTERSECTION;
-    }
+	@Override
+	public Flags flags() {
+		return Flags.PUBLIC.set(Flags.FINAL);
+		// return getSyntheticClass().flags();
+	}
 
-    @Override
-    public List memberClasses() {
-        return Collections.emptyList();
-    }
+	@Override
+	public List interfaces() {
+		List interfaces = new ArrayList();
+		for (Type t : bounds) {
+			if (t.isClass() && t.toClass().flags().isInterface()) {
+				interfaces.add(t);
+			}
+		}
+		return interfaces;
+		// return getSyntheticClass().interfaces();
+	}
 
-    @Override
-    public List methods() {
-        return Collections.emptyList();
-//        return getSyntheticClass().methods();
-    }
+	@Override
+	public Kind kind() {
+		return INTERSECTION;
+	}
 
-    @Override
-    public String name() {
-        return this.toString();
-    }
+	@Override
+	public List memberClasses() {
+		return Collections.emptyList();
+	}
 
-    @Override
-    public ClassType outer() {
-        return null;
-    }
+	@Override
+	public List methods() {
+		return Collections.emptyList();
+		// return getSyntheticClass().methods();
+	}
 
-    @Override
-    public Package package_() {
-//        if (boundOf() != null) 
-//            return boundOf().package_();
-        return null;
-    }
+	@Override
+	public String name() {
+		return this.toString();
+	}
 
-    public boolean inStaticContext() {
-        return false;
-    }
+	@Override
+	public ClassType outer() {
+		return null;
+	}
 
-    @Override
-    public boolean isImplicitCastValidImpl(Type toType) {
-        for (Type b : bounds()) {
-            if (typeSystem().isImplicitCastValid(b, toType)) return true;
-        }
-        //or just isImplicitCastValid(getSyntaticClass(), toType());
-        return false;
-    }
+	@Override
+	public Package package_() {
+		// if (boundOf() != null)
+		// return boundOf().package_();
+		return null;
+	}
 
-    @Override
-    public boolean isSubtypeImpl(Type ancestor) {
-        for (Type b : bounds()) {
-            if (typeSystem().isSubtype(b, ancestor)) return true;
-        }
-        return false;
-    }
+	public boolean inStaticContext() {
+		return false;
+	}
 
-    @Override
-    public boolean isCastValidImpl(Type toType) {
-        for (Type b : bounds()) {
-            if (typeSystem().isCastValid(b, toType)) return true;
-        }
-        return false;
-    }
+	@Override
+	public boolean isImplicitCastValidImpl(Type toType) {
+		for (Type b : bounds()) {
+			if (typeSystem().isImplicitCastValid(b, toType))
+				return true;
+		}
+		// or just isImplicitCastValid(getSyntaticClass(), toType());
+		return false;
+	}
 
-    public void boundOf(TypeVariable tv) {
-        boundOf_ = tv;
-    }
+	@Override
+	public boolean isSubtypeImpl(Type ancestor) {
+		for (Type b : bounds()) {
+			if (typeSystem().isSubtype(b, ancestor))
+				return true;
+		}
+		return false;
+	}
 
-    public TypeVariable boundOf() {
-        return boundOf_;
-    }
-    
-    @Override
-    public boolean equalsImpl(TypeObject other) {
-        if (!super.equalsImpl(other)) {
-            if (other instanceof IntersectionType) {
-                IntersectionType it = (IntersectionType)other;
-                if (it.bounds().size() != this.bounds().size()) {
-                    return false;
-                }
-                for (int i = 0; i < this.bounds().size(); i++) {
-                    Type ti = this.bounds().get(i);
-                    Type tj = it.bounds().get(i);
-                    if (!typeSystem().equals(ti, tj)) {
-                        return false;
-                    }
-                }
-                return true;
-            }
-        }
-        return false;
-    }
+	@Override
+	public boolean isCastValidImpl(Type toType) {
+		for (Type b : bounds()) {
+			if (typeSystem().isCastValid(b, toType))
+				return true;
+		}
+		return false;
+	}
 
-    @Override
-    public boolean typeEqualsImpl(Type other) {
-        if (!super.typeEqualsImpl(other)) {
-            if (other instanceof IntersectionType) {
-                IntersectionType it = (IntersectionType)other;
-                if (it.bounds().size() != this.bounds().size()) {
-                    return false;
-                }
-                for (int i = 0; i < this.bounds().size(); i++) {
-                    Type ti = this.bounds().get(i);
-                    Type tj = it.bounds().get(i);
-                    if (!typeSystem().typeEquals(ti, tj)) {
-                        return false;
-                    }
-                }
-                return true;
-            }
-        }
-        return false;
-    }
+	public void boundOf(TypeVariable tv) {
+		boundOf_ = tv;
+	}
 
-    @Override
-    public void setFlags(Flags flags) {
-        throw new UnsupportedOperationException();
-    }
+	public TypeVariable boundOf() {
+		return boundOf_;
+	}
 
-    @Override
-    public void setContainer(ReferenceType container) {
-        throw new UnsupportedOperationException();        
-    }
+	@Override
+	public boolean equalsImpl(TypeObject other) {
+		if (!super.equalsImpl(other)) {
+			if (other instanceof IntersectionType) {
+				IntersectionType it = (IntersectionType) other;
+				if (it.bounds().size() != this.bounds().size()) {
+					return false;
+				}
+				for (int i = 0; i < this.bounds().size(); i++) {
+					Type ti = this.bounds().get(i);
+					Type tj = it.bounds().get(i);
+					if (!typeSystem().equals(ti, tj)) {
+						return false;
+					}
+				}
+				return true;
+			}
+		}
+		return false;
+	}
 
-    @Override
-    public Job job() {
-        throw new UnsupportedOperationException();
-//        // TODO Auto-generated method stub
-//        return null;
-    }
+	@Override
+	public boolean typeEqualsImpl(Type other) {
+		if (!super.typeEqualsImpl(other)) {
+			if (other instanceof IntersectionType) {
+				IntersectionType it = (IntersectionType) other;
+				if (it.bounds().size() != this.bounds().size()) {
+					return false;
+				}
+				for (int i = 0; i < this.bounds().size(); i++) {
+					Type ti = this.bounds().get(i);
+					Type tj = it.bounds().get(i);
+					if (!typeSystem().typeEquals(ti, tj)) {
+						return false;
+					}
+				}
+				return true;
+			}
+		}
+		return false;
+	}
 
-    @Override
-    public void setBounds(List<ReferenceType> newBounds) {
-        this.bounds = newBounds;        
-        checkBounds();
-    }
+	@Override
+	public void setFlags(Flags flags) {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public void setContainer(ReferenceType container) {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public Job job() {
+		throw new UnsupportedOperationException();
+		// // TODO Auto-generated method stub
+		// return null;
+	}
+
+	@Override
+	public void setBounds(List<ReferenceType> newBounds) {
+		this.bounds = newBounds;
+		checkBounds();
+	}
 }

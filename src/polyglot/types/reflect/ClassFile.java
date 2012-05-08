@@ -4,6 +4,9 @@ import java.io.DataInputStream;
 import java.io.IOException;
 import java.net.URI;
 
+/**
+ * Interface for defining .class files
+ */
 public interface ClassFile {
 
 	URI getClassFileURI();
@@ -30,21 +33,19 @@ public interface ClassFile {
 
 	/**
 	 * Get the name of the class, including the package name.
-	 *
-	 * @return
-	 *        The name of the class.
+	 * 
+	 * @return The name of the class.
 	 */
 	String name();
 
 	/**
-	 * Read the class's attributes.  Since none of the attributes
-	 * are required, just read the length of each attribute and
-	 * skip that many bytes.
-	 *
+	 * Read the class's attributes. Since none of the attributes are required,
+	 * just read the length of each attribute and skip that many bytes.
+	 * 
 	 * @param in
-	 *        The stream from which to read.
+	 *            The stream from which to read.
 	 * @exception IOException
-	 *        If an error occurs while reading.
+	 *                If an error occurs while reading.
 	 */
 	void readAttributes(DataInputStream in) throws IOException;
 
@@ -52,8 +53,8 @@ public interface ClassFile {
 
 	Field createField(DataInputStream in) throws IOException;
 
-	Attribute createAttribute(DataInputStream in, String name,
-			int nameIndex, int length) throws IOException;
+	Attribute createAttribute(DataInputStream in, String name, int nameIndex,
+			int length) throws IOException;
 
 	Attribute[] getAttrs();
 

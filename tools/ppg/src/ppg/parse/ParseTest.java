@@ -6,11 +6,11 @@ import ppg.lex.*;
 import ppg.spec.*;
 import ppg.util.*;
 
-public class ParseTest
-{
+public class ParseTest {
 	private static final String HEADER = "ppg [parsetest]: ";
-	
-	private ParseTest() {}
+
+	private ParseTest() {
+	}
 
 	public static void main(String args[]) {
 		FileInputStream fileInput;
@@ -19,13 +19,11 @@ public class ParseTest
 		try {
 			filename = args[0];
 			fileInput = new FileInputStream(filename);
-		}
-		catch (FileNotFoundException e) {
-			System.err.println("Error: "+filename+" is not found.");
+		} catch (FileNotFoundException e) {
+			System.err.println("Error: " + filename + " is not found.");
 			return;
-		}
-		catch (ArrayIndexOutOfBoundsException e) {
-			System.err.println(HEADER+"Error: No file name given.");
+		} catch (ArrayIndexOutOfBoundsException e) {
+			System.err.println(HEADER + "Error: No file name given.");
 			return;
 		}
 
@@ -33,23 +31,23 @@ public class ParseTest
 		String simpleName = f.getName();
 
 		Lexer lex = new Lexer(fileInput, simpleName);
-		
+
 		Parser parser = new Parser(filename, lex);
 		try {
 			parser.parse();
 		} catch (Exception e) {
-			System.err.println(HEADER+"Exception: "+e.getMessage());
+			System.err.println(HEADER + "Exception: " + e.getMessage());
 			return;
 		}
-		Spec spec = (Spec)parser.getProgramNode();
-					
-		CodeWriter cw = new CodeWriter(System.out, 72); 
+		Spec spec = (Spec) parser.getProgramNode();
+
+		CodeWriter cw = new CodeWriter(System.out, 72);
 		try {
 			spec.unparse(cw);
 			cw.flush();
 			fileInput.close();
 		} catch (IOException e) {
-			System.err.println(HEADER+"exception: "+e.getMessage());
+			System.err.println(HEADER + "exception: " + e.getMessage());
 			return;
 		}
 	}

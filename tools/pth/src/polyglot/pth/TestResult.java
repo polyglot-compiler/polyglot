@@ -11,19 +11,19 @@ import java.util.Date;
  * 
  */
 public class TestResult implements Serializable {
-    public final String testName; 
-    public final String testUniqueID;
-    public final Date dateTestRun;
-    public final Date dateLastSuccess;
-    public final boolean testRunSucessful;
-    private final String failureMessage;
-    
-    public TestResult(Test t, Date dateTestRun, Date dateLastSuccess) {
-        this.dateTestRun = dateTestRun;
-        this.dateLastSuccess = dateLastSuccess;
-        this.testName = t.getName();
-        this.testUniqueID = t.getUniqueId();
-        this.testRunSucessful = t.success();
-        this.failureMessage = t.getFailureMessage();
-    } 
+	public final String testName;
+	public final String testUniqueID;
+	public final Date dateTestRun;
+	public final Date dateLastSuccess;
+	public final boolean testRunSucessful;
+	private final String failureMessage;
+
+	public TestResult(Test t, Date dateTestRun, Date dateLastSuccess) {
+		this.dateTestRun = dateTestRun;
+		this.dateLastSuccess = dateLastSuccess;
+		this.testName = t.getName();
+		this.testUniqueID = t.getUniqueId();
+		this.testRunSucessful = t.success();
+		this.failureMessage = t.getFailureMessage();
+	}
 }

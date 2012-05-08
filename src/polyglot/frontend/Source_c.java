@@ -14,8 +14,8 @@ import javax.tools.JavaFileManager;
 import javax.tools.SimpleJavaFileObject;
 import javax.tools.JavaFileObject.Kind;
 
-public class Source_c extends ForwardingFileObject<FileObject>
-	implements FileSource {
+public class Source_c extends ForwardingFileObject<FileObject> implements
+		FileSource {
 	protected boolean user_specified;
 
 	protected Source_c(FileObject f, boolean userSpecified) {
@@ -35,23 +35,22 @@ public class Source_c extends ForwardingFileObject<FileObject>
 	public Reader openReader(boolean ignoreEncodingErrors) throws IOException {
 		return new InputStreamReader(openInputStream());
 	}
-		
+
 	@Override
 	public String toString() {
 		return getName();
 	}
-	
+
 	public boolean equals(Object o) {
-		if(o instanceof FileObject) {
+		if (o instanceof FileObject) {
 
 			FileObject fo = (FileObject) o;
 			return toUri().equals(fo.toUri());
-		}
-		else {
+		} else {
 			return false;
 		}
 	}
-	
+
 	public int hashCode() {
 		return toUri().hashCode();
 	}

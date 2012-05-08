@@ -37,13 +37,12 @@ import polyglot.visit.*;
 import java.util.*;
 
 /**
- * An <code>ArrayAccess</code> is an immutable representation of an
- * access of an array member.
+ * An <code>ArrayAccess</code> is an immutable representation of an access of an
+ * array member.
  */
-public class ArrayAccessToExt_c extends ToExt_c implements ToExt
-{
-    public Node toExt(ExtensionRewriter rw) {
-        ArrayAccess aa = (ArrayAccess) node();
-        return rw.to_nf().ArrayAccess(aa.position(), aa.array(), aa.index());
-    }
+public class ArrayAccessToExt_c extends ToExt_c implements ToExt {
+	public Node toExt(ExtensionRewriter rw) {
+		ArrayAccess aa = (ArrayAccess) node();
+		return rw.to_nf().ArrayAccess(aa.position(), aa.array(), aa.index());
+	}
 }

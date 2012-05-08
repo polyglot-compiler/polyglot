@@ -6,28 +6,27 @@ import java.util.List;
 import polyglot.types.Type;
 
 /**
- * Represents a constraint A <: F
- * See JLS 3rd ed. 15.12.2.7
- *
+ * Represents a constraint A <: F See JLS 3rd ed. 15.12.2.7
+ * 
  */
 public class SuperTypeConstraint extends Constraint {
 
-    public SuperTypeConstraint(Type actual, Type formal, InferenceSolver solver) {
-        super(actual, formal, null);
-    }
+	public SuperTypeConstraint(Type actual, Type formal, InferenceSolver solver) {
+		super(actual, formal, null);
+	}
 
-    @Override
-    public List<Constraint> simplify() {
-        return Collections.emptyList();
-    }
+	@Override
+	public List<Constraint> simplify() {
+		return Collections.emptyList();
+	}
 
-    @Override
-    public boolean canSimplify() {
-        return !solver.isTargetTypeVariable(formal);
-    }
-    
-    public String toString() {
-        return actual + " :> " + formal;
-    }
+	@Override
+	public boolean canSimplify() {
+		return !solver.isTargetTypeVariable(formal);
+	}
+
+	public String toString() {
+		return actual + " :> " + formal;
+	}
 
 }

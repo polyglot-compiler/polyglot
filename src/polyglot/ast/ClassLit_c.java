@@ -33,87 +33,86 @@ import polyglot.util.Position;
 import polyglot.visit.*;
 
 /**
- * A <code>ClassLit</code> represents a class literal expression. 
- * A class literal expressions is an expression consisting of the 
- * name of a class, interface, array, or primitive type followed by a period (.) 
- * and the token class. 
+ * A <code>ClassLit</code> represents a class literal expression. A class
+ * literal expressions is an expression consisting of the name of a class,
+ * interface, array, or primitive type followed by a period (.) and the token
+ * class.
  */
-public class ClassLit_c extends Lit_c implements ClassLit
-{
-  protected TypeNode typeNode;
+public class ClassLit_c extends Lit_c implements ClassLit {
+	protected TypeNode typeNode;
 
-  public ClassLit_c(Position pos, TypeNode typeNode) {
-    super(pos);
-    assert(typeNode != null);
-    this.typeNode = typeNode;
-  }
+	public ClassLit_c(Position pos, TypeNode typeNode) {
+		super(pos);
+		assert (typeNode != null);
+		this.typeNode = typeNode;
+	}
 
-  public TypeNode typeNode() {
-    return this.typeNode;
-  }
+	public TypeNode typeNode() {
+		return this.typeNode;
+	}
 
-  public ClassLit typeNode(TypeNode typeNode) {
-      if (this.typeNode == typeNode) {
-          return this;
-      }
-    ClassLit_c n = (ClassLit_c) copy();
-    n.typeNode = typeNode;
-    return n;
-  }
-    
-  /**
-   * Cannot return the correct object (except for maybe
-   * some of the primitive arrays), so we just return null here. 
-   */
-  public Object objValue() {
-    return null;
-  }
+	public ClassLit typeNode(TypeNode typeNode) {
+		if (this.typeNode == typeNode) {
+			return this;
+		}
+		ClassLit_c n = (ClassLit_c) copy();
+		n.typeNode = typeNode;
+		return n;
+	}
 
-  public Term firstChild() {
-      return typeNode;
-  }
+	/**
+	 * Cannot return the correct object (except for maybe some of the primitive
+	 * arrays), so we just return null here.
+	 */
+	public Object objValue() {
+		return null;
+	}
 
-  public List acceptCFG(CFGBuilder v, List succs) {
-      v.visitCFG(typeNode, this, EXIT);
-      return succs;
-  }
+	public Term firstChild() {
+		return typeNode;
+	}
 
-  public Node visitChildren(NodeVisitor v) {
-    TypeNode tn = (TypeNode)visitChild(this.typeNode, v);
-    return this.typeNode(tn);
-  }
+	public List acceptCFG(CFGBuilder v, List succs) {
+		v.visitCFG(typeNode, this, EXIT);
+		return succs;
+	}
 
-  /** Type check the expression. */
-  public Node typeCheck(TypeChecker tc) throws SemanticException {
-    return type(tc.typeSystem().Class());
-  }
+	public Node visitChildren(NodeVisitor v) {
+		TypeNode tn = (TypeNode) visitChild(this.typeNode, v);
+		return this.typeNode(tn);
+	}
 
-  public String toString() {
-    return typeNode.toString() + ".class";
-  }
+	/** Type check the expression. */
+	public Node typeCheck(TypeChecker tc) throws SemanticException {
+		return type(tc.typeSystem().Class());
+	}
 
-  /** Write the expression to an output file. */
-  public void prettyPrint(CodeWriter w, PrettyPrinter tr)
-  {
-    w.begin(0);
-    print(typeNode, w, tr);
-    w.write(".class");
-    w.end();
-  }
+	public String toString() {
+		return typeNode.toString() + ".class";
+	}
 
-  /**
-   * According to the JLS 2nd Ed, sec 15.28, a class literal 
-   * is not a compile time constant.
-   */
-  public boolean isConstant() {
-    return false;
-  }
+	/** Write the expression to an output file. */
+	public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
+		w.begin(0);
+		print(typeNode, w, tr);
+		w.write(".class");
+		w.end();
+	}
 
-  public Object constantValue() {
-    return null;
-  }
-  public Node copy(NodeFactory nf) {
-      return nf.ClassLit(this.position, this.typeNode);
-  }
+	/**
+	 * According to the JLS 2nd Ed, sec 15.28, a class literal is not a compile
+	 * time constant.
+	 */
+	public boolean isConstant() {
+		return false;
+	}
+
+	public Object constantValue() {
+		return null;
+	}
+
+	public Node copy(NodeFactory nf) {
+		return nf.ClassLit(this.position, this.typeNode);
+	}
 
 }

@@ -5,5 +5,5 @@ import java.util.List;
 import polyglot.ast.ClassDecl;
 
 public interface JL5ClassDecl extends ClassDecl {
-    public List paramTypes();
+	public List paramTypes();
 }

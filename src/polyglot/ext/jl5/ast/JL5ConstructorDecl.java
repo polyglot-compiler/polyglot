@@ -5,7 +5,8 @@ import java.util.List;
 import polyglot.ast.ConstructorDecl;
 import polyglot.ast.TypeNode;
 
-public interface JL5ConstructorDecl extends ConstructorDecl{
-    public List typeParams();
-    public JL5ConstructorDecl typeParams(List<TypeNode> typeParams);   
+public interface JL5ConstructorDecl extends ConstructorDecl {
+	public List typeParams();
+
+	public JL5ConstructorDecl typeParams(List<TypeNode> typeParams);
 }

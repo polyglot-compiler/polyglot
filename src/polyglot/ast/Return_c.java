@@ -32,159 +32,153 @@ import polyglot.util.*;
 import java.util.*;
 
 /**
- * A <code>Return</code> represents a <code>return</code> statement in Java.
- * It may or may not return a value.  If not <code>expr()</code> should return
- * null.
+ * A <code>Return</code> represents a <code>return</code> statement in Java. It
+ * may or may not return a value. If not <code>expr()</code> should return null.
  */
-public class Return_c extends Stmt_c implements Return
-{
-    protected Expr expr;
+public class Return_c extends Stmt_c implements Return {
+	protected Expr expr;
 
-    public Return_c(Position pos, Expr expr) {
-	super(pos);
-	assert(true); // expr may be null
-	this.expr = expr;
-    }
-
-    /** Get the expression to return, or null. */
-    public Expr expr() {
-	return this.expr;
-    }
-
-    /** Set the expression to return, or null. */
-    public Return expr(Expr expr) {
-	Return_c n = (Return_c) copy();
-	n.expr = expr;
-	return n;
-    }
-
-    /** Reconstruct the statement. */
-    protected Return_c reconstruct(Expr expr) {
-	if (expr != this.expr) {
-	    Return_c n = (Return_c) copy();
-	    n.expr = expr;
-	    return n;
+	public Return_c(Position pos, Expr expr) {
+		super(pos);
+		assert (true); // expr may be null
+		this.expr = expr;
 	}
 
-	return this;
-    }
-
-    /** Visit the children of the statement. */
-    public Node visitChildren(NodeVisitor v) {
-	Expr expr = (Expr) visitChild(this.expr, v);
-	return reconstruct(expr);
-    }
-
-    /** Type check the statement. */
-    public Node typeCheck(TypeChecker tc) throws SemanticException {
-	TypeSystem ts = tc.typeSystem();
-	Context c = tc.context();
-
-	CodeInstance ci = c.currentCode();
-
-	if (ci instanceof InitializerInstance) {
-	    throw new SemanticException(
-		"Cannot return from an initializer block.", position());
+	/** Get the expression to return, or null. */
+	public Expr expr() {
+		return this.expr;
 	}
 
-	if (ci instanceof ConstructorInstance) {
-	    if (expr != null) {
-		throw new SemanticException(
-		    "Cannot return a value from " + ci + ".",
-		    position());
-	    }
-
-	    return this;
+	/** Set the expression to return, or null. */
+	public Return expr(Expr expr) {
+		Return_c n = (Return_c) copy();
+		n.expr = expr;
+		return n;
 	}
 
-	if (ci instanceof FunctionInstance) {
-	    FunctionInstance fi = (FunctionInstance) ci;
+	/** Reconstruct the statement. */
+	protected Return_c reconstruct(Expr expr) {
+		if (expr != this.expr) {
+			Return_c n = (Return_c) copy();
+			n.expr = expr;
+			return n;
+		}
 
-	    if (fi.returnType().isVoid()) {
-                if (expr != null) {
-                    throw new SemanticException("Cannot return a value from " +
-                        fi + ".", position());
-                }
-                else {
-                    return this;
-                }
-	    }
-            else if (expr == null) {
-                throw new SemanticException("Must return a value from " +
-                    fi + ".", position());
-            }
-
-	    if (ts.isImplicitCastValid(expr.type(), fi.returnType())) {
-	        return this;
-	    }
-
-            if (ts.numericConversionValid(fi.returnType(),
-                                          expr.constantValue())) {
-                return this;
-            }
-
-	    throw new SemanticException("Cannot return expression of type " +
-		expr.type() + " from " + fi + ".", expr.position());
+		return this;
 	}
 
-	throw new InternalCompilerError("Unrecognized code type.");
-    }
-  
-    public Type childExpectedType(Expr child, AscriptionVisitor av) {
-        if (child == expr) {
-            Context c = av.context();
-            CodeInstance ci = c.currentCode();
-
-            if (ci instanceof MethodInstance) {
-                MethodInstance mi = (MethodInstance) ci;
-
-                TypeSystem ts = av.typeSystem();
-
-                // If expr is an integral constant, we can relax the expected
-                // type to the type of the constant.
-                if (ts.numericConversionValid(mi.returnType(),
-                                              child.constantValue())) {
-                    return child.type();
-                }
-                else {
-                    return mi.returnType();
-                }
-            }
-        }
-
-        return child.type();
-    }
-
-    public String toString() {
-	return "return" + (expr != null ? " " + expr : "") + ";";
-    }
-
-    /** Write the statement to an output file. */
-    public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
-	w.write("return") ;
-	if (expr != null) {
-	    w.write(" ");
-	    print(expr, w, tr);
+	/** Visit the children of the statement. */
+	public Node visitChildren(NodeVisitor v) {
+		Expr expr = (Expr) visitChild(this.expr, v);
+		return reconstruct(expr);
 	}
-	w.write(";");
-    }
 
-    public Term firstChild() {
-        if (expr != null) return expr;
-        return null;
-    }
+	/** Type check the statement. */
+	public Node typeCheck(TypeChecker tc) throws SemanticException {
+		TypeSystem ts = tc.typeSystem();
+		Context c = tc.context();
 
-    public List acceptCFG(CFGBuilder v, List succs) {
-        if (expr != null) {
-            v.visitCFG(expr, this, EXIT);
-        }
+		CodeInstance ci = c.currentCode();
 
-        v.visitReturn(this);
-        return Collections.EMPTY_LIST;
-    }
-    
-    public Node copy(NodeFactory nf) {
-        return nf.Return(this.position, this.expr);
-    }
+		if (ci instanceof InitializerInstance) {
+			throw new SemanticException(
+					"Cannot return from an initializer block.", position());
+		}
+
+		if (ci instanceof ConstructorInstance) {
+			if (expr != null) {
+				throw new SemanticException("Cannot return a value from " + ci
+						+ ".", position());
+			}
+
+			return this;
+		}
+
+		if (ci instanceof FunctionInstance) {
+			FunctionInstance fi = (FunctionInstance) ci;
+
+			if (fi.returnType().isVoid()) {
+				if (expr != null) {
+					throw new SemanticException("Cannot return a value from "
+							+ fi + ".", position());
+				} else {
+					return this;
+				}
+			} else if (expr == null) {
+				throw new SemanticException("Must return a value from " + fi
+						+ ".", position());
+			}
+
+			if (ts.isImplicitCastValid(expr.type(), fi.returnType())) {
+				return this;
+			}
+
+			if (ts.numericConversionValid(fi.returnType(), expr.constantValue())) {
+				return this;
+			}
+
+			throw new SemanticException("Cannot return expression of type "
+					+ expr.type() + " from " + fi + ".", expr.position());
+		}
+
+		throw new InternalCompilerError("Unrecognized code type.");
+	}
+
+	public Type childExpectedType(Expr child, AscriptionVisitor av) {
+		if (child == expr) {
+			Context c = av.context();
+			CodeInstance ci = c.currentCode();
+
+			if (ci instanceof MethodInstance) {
+				MethodInstance mi = (MethodInstance) ci;
+
+				TypeSystem ts = av.typeSystem();
+
+				// If expr is an integral constant, we can relax the expected
+				// type to the type of the constant.
+				if (ts.numericConversionValid(mi.returnType(),
+						child.constantValue())) {
+					return child.type();
+				} else {
+					return mi.returnType();
+				}
+			}
+		}
+
+		return child.type();
+	}
+
+	public String toString() {
+		return "return" + (expr != null ? " " + expr : "") + ";";
+	}
+
+	/** Write the statement to an output file. */
+	public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
+		w.write("return");
+		if (expr != null) {
+			w.write(" ");
+			print(expr, w, tr);
+		}
+		w.write(";");
+	}
+
+	public Term firstChild() {
+		if (expr != null)
+			return expr;
+		return null;
+	}
+
+	public List acceptCFG(CFGBuilder v, List succs) {
+		if (expr != null) {
+			v.visitCFG(expr, this, EXIT);
+		}
+
+		v.visitReturn(this);
+		return Collections.EMPTY_LIST;
+	}
+
+	public Node copy(NodeFactory nf) {
+		return nf.Return(this.position, this.expr);
+	}
 
 }

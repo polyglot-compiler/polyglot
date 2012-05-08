@@ -46,101 +46,107 @@ import polyglot.util.FileManager;
 
 /**
  * <code>ExtensionInfo</code> is the main interface for defining language
- * extensions.  The frontend will load the <code>ExtensionInfo</code>
- * specified on the command-line.  It defines the type system, AST node
- * factory, parser, and other parameters of a language extension.
+ * extensions. The frontend will load the <code>ExtensionInfo</code> specified
+ * on the command-line. It defines the type system, AST node factory, parser,
+ * and other parameters of a language extension.
  */
 public interface ExtensionInfo {
-    /** The name of the compiler for usage messages */
-    String compilerName();
+	/** The name of the compiler for usage messages */
+	String compilerName();
 
-    /** Report the version of the extension. */
-    polyglot.main.Version version();
+	/** Report the version of the extension. */
+	polyglot.main.Version version();
 
-    /** Returns the pass scheduler. */
-    Scheduler scheduler();
-    
-    /**
-     * Return the goal for compiling a particular compilation unit.
-     * The goal may have subgoals on which it depends.
-     */
-    Goal getCompileGoal(Job job);
-    
-    /** 
-     * Return an Options object, which will be given the command line to parse.
-     */    
-    Options getOptions();
+	/** Returns the pass scheduler. */
+	Scheduler scheduler();
 
-    /**
-     * Return a Stats object to accumulate and report statistics.
-     */ 
-    Stats getStats();
-
-    /**
-     * Initialize the extension with a particular compiler.  This must
-     * be called after the compiler is initialized, but before the compiler
-     * starts work.
-     */
-    void initCompiler(polyglot.frontend.Compiler compiler);
-
-    Compiler compiler();
-
-    /** The extensions that source files are expected to have.
-     * Defaults to the array defaultFileExtensions. */
-    String[] fileExtensions();
-
-    /** The default extensions that source files are expected to have.
-     * Defaults to an array containing defaultFileExtension */
-    String[] defaultFileExtensions();
-
-    /** The default extension that source files are expected to have. */
-    String defaultFileExtension();
-
-    /** Produce a type system for this language extension. */
-    TypeSystem typeSystem();
-
-    /** Produce a node factory for this language extension. */
-    NodeFactory nodeFactory();
-
-    /** Produce a source factory for this language extension. */
-    SourceLoader sourceLoader();
-
-    /**
-     * Get the job extension for this language extension.  The job
-     * extension is used to extend the <code>Job</code> class
-     * without subtyping.
-     */
-    JobExt jobExt();
-    
-    /**
-     * Produce a target factory for this language extension.  The target
-     * factory is responsible for naming and opening output files given a
-     * package name and a class or source file name.
-     */
-    TargetFactory targetFactory();
-
-    /** Get a parser for this language extension. */
-    Parser parser(Reader reader, FileSource source, ErrorQueue eq);
-
-	ToExt getToExt(ExtensionInfo to_ext, Node n);
-	
-	/** Get the extension file mananger used by this extension. This 
-	 *  file manager manages the extension source files and translated 
-	 *  java code. (Must be overridden for extensions beyond .jl)
+	/**
+	 * Return the goal for compiling a particular compilation unit. The goal may
+	 * have subgoals on which it depends.
 	 */
+	Goal getCompileGoal(Job job);
+
+	/**
+	 * Return an Options object, which will be given the command line to parse.
+	 */
+	Options getOptions();
+
+	/**
+	 * Return a Stats object to accumulate and report statistics.
+	 */
+	Stats getStats();
+
+	/**
+	 * Initialize the extension with a particular compiler. This must be called
+	 * after the compiler is initialized, but before the compiler starts work.
+	 */
+	void initCompiler(polyglot.frontend.Compiler compiler);
+
+	Compiler compiler();
+
+	/**
+	 * Get the file name extension of source files. This is either the language
+	 * extension's default file name extension or the string passed in with the
+	 * "-sx" command-line option.
+	 */
+	String[] fileExtensions();
+
+	/**
+	 * The default extensions that source files are expected to have. Defaults
+	 * to an array containing defaultFileExtension
+	 */
+	String[] defaultFileExtensions();
+
+	/** The default extension that source files are expected to have. */
+	String defaultFileExtension();
+
+	/** Produce a type system for this language extension. */
+	TypeSystem typeSystem();
+
+	/** Produce a node factory for this language extension. */
+	NodeFactory nodeFactory();
+
+	/** Get the source file loader for this extension. */
+	SourceLoader sourceLoader();
+
+	/**
+	 * Get the job extension for this language extension. The job extension is
+	 * used to extend the <code>Job</code> class without subtyping.
+	 */
+	JobExt jobExt();
+
+	/**
+	 * Produce a target factory for this language extension. The target factory
+	 * is responsible for naming and opening output files given a package name
+	 * and a class or source file name.
+	 */
+	TargetFactory targetFactory();
+
+	/** Get a parser for this language extension. */
+	Parser parser(Reader reader, FileSource source, ErrorQueue eq);
+
+	/**
+	 * Get the ToExt extension object used for translating AST nodes to the
+	 * to_ext language.
+	 */
+	ToExt getToExt(ExtensionInfo to_ext, Node n);
+
+	/** Get the extension file mananger used by this extension. */
 	FileManager extFileManager();
-	
+
+	/** Add and set the locations in the file manager used by this extension. */
 	void addLocationsToFileManager();
+
 	/** Get the classLoader used by this extension. */
 	ClassLoader classLoader();
 
-	/** Create class file for a file object. */ 
+	/** Create class file for a file object. */
 	ClassFile createClassFile(FileObject f, byte[] code) throws IOException;
-    
+
 	/** Create file source for a file object. */
 	FileSource createFileSource(FileObject fo, boolean userSpecified)
-		throws IOException;
+			throws IOException;
 
-    /** Produce a class factory for this language extension. */
+	/** Produce a class factory for this language extension. */
 	ClassFileLoader classFileLoader();
 }

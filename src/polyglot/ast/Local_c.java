@@ -44,161 +44,162 @@ import polyglot.visit.TypeChecker;
 import polyglot.visit.CFGBuilder;
 import java.util.List;
 
-/** 
+/**
  * A local variable expression.
  */
-public class Local_c extends Expr_c implements Local
-{
-  protected Id name;
-  protected LocalInstance li;
+public class Local_c extends Expr_c implements Local {
+	protected Id name;
+	protected LocalInstance li;
 
-  public Local_c(Position pos, Id name) {
-    super(pos);
-    assert(name != null);
-    this.name = name;
-  }
+	public Local_c(Position pos, Id name) {
+		super(pos);
+		assert (name != null);
+		this.name = name;
+	}
 
-  /** Get the precedence of the local. */
-  public Precedence precedence() { 
-    return Precedence.LITERAL;
-  }
+	/** Get the precedence of the local. */
+	public Precedence precedence() {
+		return Precedence.LITERAL;
+	}
 
-  /** Get the name of the local. */
-  public Id id() {
-    return this.name;
-  }
-  
-  /** Set the name of the local. */
-  public Local id(Id name) {
-      Local_c n = (Local_c) copy();
-      n.name = name;
-      return n;
-  }
-  
-  /** Get the name of the local. */
-  public String name() {
-      return this.name.id();
-  }
-  
-  /** Set the name of the local. */
-  public Local name(String name) {
-      return id(this.name.id(name));
-  }
+	/** Get the name of the local. */
+	public Id id() {
+		return this.name;
+	}
 
-  /** Return the access flags of the variable. */
-  public Flags flags() {
-    return li.flags();
-  }
+	/** Set the name of the local. */
+	public Local id(Id name) {
+		Local_c n = (Local_c) copy();
+		n.name = name;
+		return n;
+	}
 
-  /** Get the local instance of the local. */
-  public VarInstance varInstance() {
-    return li;
-  }
+	/** Get the name of the local. */
+	public String name() {
+		return this.name.id();
+	}
 
-  /** Get the local instance of the local. */
-  public LocalInstance localInstance() {
-    return li;
-  }
+	/** Set the name of the local. */
+	public Local name(String name) {
+		return id(this.name.id(name));
+	}
 
-  /** Set the local instance of the local. */
-  public Local localInstance(LocalInstance li) {
-    if (li == this.li) return this;
-    Local_c n = (Local_c) copy();
-    n.li = li;
-    return n;
-  }
+	/** Return the access flags of the variable. */
+	public Flags flags() {
+		return li.flags();
+	}
 
-  /** Reconstruct the expression. */
-  protected Local_c reconstruct(Id name) {
-      if (name != this.name) {
-          Local_c n = (Local_c) copy();
-          n.name = name;
-          return n;
-      }
-      
-      return this;
-  }
-  
-  /** Visit the children of the constructor. */
-  public Node visitChildren(NodeVisitor v) {
-      Id name = (Id) visitChild(this.name, v);
-      return reconstruct(name);
-  }
+	/** Get the local instance of the local. */
+	public VarInstance varInstance() {
+		return li;
+	}
 
-  public Node buildTypes(TypeBuilder tb) throws SemanticException {
-      Local_c n = (Local_c) super.buildTypes(tb);
+	/** Get the local instance of the local. */
+	public LocalInstance localInstance() {
+		return li;
+	}
 
-      TypeSystem ts = tb.typeSystem();
+	/** Set the local instance of the local. */
+	public Local localInstance(LocalInstance li) {
+		if (li == this.li)
+			return this;
+		Local_c n = (Local_c) copy();
+		n.li = li;
+		return n;
+	}
 
-      LocalInstance li = ts.localInstance(position(), Flags.NONE,
-                                          ts.unknownType(position()), name.id());
-      return n.localInstance(li);
-  }
+	/** Reconstruct the expression. */
+	protected Local_c reconstruct(Id name) {
+		if (name != this.name) {
+			Local_c n = (Local_c) copy();
+			n.name = name;
+			return n;
+		}
 
-  /** Type check the local. */
-  public Node typeCheck(TypeChecker tc) throws SemanticException {
-    Context c = tc.context();
-    LocalInstance li = c.findLocal(name.id());
-    
-    // if the local is defined in an outer class, then it must be final
-    if (!c.isLocal(li.name())) {
-        // this local is defined in an outer class
-        if (!li.flags().isFinal()) {
-            throw new SemanticException("Local variable \"" + li.name() + 
-                    "\" is accessed from an inner class, and must be declared " +
-                    "final.",
-                    this.position());                     
-        }
-    }
-    
-    return localInstance(li).type(li.type());
-  }
+		return this;
+	}
 
-  public Term firstChild() {
-      return null;
-  }
+	/** Visit the children of the constructor. */
+	public Node visitChildren(NodeVisitor v) {
+		Id name = (Id) visitChild(this.name, v);
+		return reconstruct(name);
+	}
 
-  public List acceptCFG(CFGBuilder v, List succs) {
-      return succs;
-  }
+	public Node buildTypes(TypeBuilder tb) throws SemanticException {
+		Local_c n = (Local_c) super.buildTypes(tb);
 
-  public String toString() {
-    return name.toString();
-  }
+		TypeSystem ts = tb.typeSystem();
 
-  /** Write the local to an output file. */
-  public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
-      tr.print(this, name, w);
-  }
+		LocalInstance li = ts.localInstance(position(), Flags.NONE,
+				ts.unknownType(position()), name.id());
+		return n.localInstance(li);
+	}
 
-  /** Dumps the AST. */
-  public void dump(CodeWriter w) {
-    super.dump(w);
+	/** Type check the local. */
+	public Node typeCheck(TypeChecker tc) throws SemanticException {
+		Context c = tc.context();
+		LocalInstance li = c.findLocal(name.id());
 
-    if (li != null) {
-	w.allowBreak(4, " ");
-	w.begin(0);
-	w.write("(instance " + li + ")");
-	w.end();
-    }
-  }
-  
-  public boolean constantValueSet() {
-      return li != null && li.constantValueSet();
-  }
+		// if the local is defined in an outer class, then it must be final
+		if (!c.isLocal(li.name())) {
+			// this local is defined in an outer class
+			if (!li.flags().isFinal()) {
+				throw new SemanticException(
+						"Local variable \""
+								+ li.name()
+								+ "\" is accessed from an inner class, and must be declared "
+								+ "final.", this.position());
+			}
+		}
 
-  public boolean isConstant() {
-    return li != null && li.isConstant();
-  }
+		return localInstance(li).type(li.type());
+	}
 
-  public Object constantValue() {
-    if (! isConstant()) return null;
-    return li.constantValue();
-  }
-  
-  public Node copy(NodeFactory nf) {
-      return nf.Local(this.position, this.name);
-  }
+	public Term firstChild() {
+		return null;
+	}
 
+	public List acceptCFG(CFGBuilder v, List succs) {
+		return succs;
+	}
+
+	public String toString() {
+		return name.toString();
+	}
+
+	/** Write the local to an output file. */
+	public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
+		tr.print(this, name, w);
+	}
+
+	/** Dumps the AST. */
+	public void dump(CodeWriter w) {
+		super.dump(w);
+
+		if (li != null) {
+			w.allowBreak(4, " ");
+			w.begin(0);
+			w.write("(instance " + li + ")");
+			w.end();
+		}
+	}
+
+	public boolean constantValueSet() {
+		return li != null && li.constantValueSet();
+	}
+
+	public boolean isConstant() {
+		return li != null && li.isConstant();
+	}
+
+	public Object constantValue() {
+		if (!isConstant())
+			return null;
+		return li.constantValue();
+	}
+
+	public Node copy(NodeFactory nf) {
+		return nf.Local(this.position, this.name);
+	}
 
 }

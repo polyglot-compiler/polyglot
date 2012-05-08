@@ -32,23 +32,23 @@ import polyglot.types.ParsedClassType;
 import polyglot.util.InternalCompilerError;
 
 /**
- * A pass that resolves the supertype and interfaces of every parsed class type.  
+ * A pass that resolves the supertype and interfaces of every parsed class type.
  */
 public class ResolveSuperTypesPass extends ClassFilePass {
-    protected Scheduler scheduler;
-    protected SupertypesResolved goal;
-    
-    public ResolveSuperTypesPass(Scheduler scheduler, SupertypesResolved goal) {
-        super(goal);
-        this.scheduler = scheduler;
-        this.goal = goal;
-    }
-    
-    public boolean run() {
-        ParsedClassType ct = goal.type();
-        ct.superType();
-        ct.interfaces();
-        ct.setSupertypesResolved(true);
-        return true;
-    }
+	protected Scheduler scheduler;
+	protected SupertypesResolved goal;
+
+	public ResolveSuperTypesPass(Scheduler scheduler, SupertypesResolved goal) {
+		super(goal);
+		this.scheduler = scheduler;
+		this.goal = goal;
+	}
+
+	public boolean run() {
+		ParsedClassType ct = goal.type();
+		ct.superType();
+		ct.interfaces();
+		ct.setSupertypesResolved(true);
+		return true;
+	}
 }

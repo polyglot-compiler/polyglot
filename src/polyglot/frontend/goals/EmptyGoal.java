@@ -35,17 +35,18 @@ import polyglot.frontend.Pass;
  */
 public class EmptyGoal extends AbstractGoal {
 
-  public EmptyGoal(Job job) {
-    super(job);
-  }
+	public EmptyGoal(Job job) {
+		super(job);
+	}
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see polyglot.frontend.goals.AbstractGoal#createPass(polyglot.frontend.ExtensionInfo)
-   */
-  public Pass createPass(ExtensionInfo extInfo) {
-    return new EmptyPass(this);
-  }
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see polyglot.frontend.goals.AbstractGoal#createPass(polyglot.frontend.
+	 * ExtensionInfo)
+	 */
+	public Pass createPass(ExtensionInfo extInfo) {
+		return new EmptyPass(this);
+	}
 
 }

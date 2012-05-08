@@ -22,7 +22,7 @@ public class CastingTypeChecker extends TypeChecker {
 		tvc = (TVCaster) tvc.begin();
 		tvc = (TVCaster) tvc.context(tc.context());
 		old = n;
-        n = n.visit(tvc);
+		n = n.visit(tvc);
 		return super.leaveCall(old, n, v);
-	}	
+	}
 }

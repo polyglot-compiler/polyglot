@@ -6,10 +6,9 @@ import polyglot.translate.ExtensionRewriter;
 import polyglot.types.SemanticException;
 
 public class ConstructorCallToExt_c extends ToExt_c {
-    public Node toExt(ExtensionRewriter rw) throws SemanticException {
-        ConstructorCall n = (ConstructorCall) node();
-        return rw.to_nf().ConstructorCall(n.position(),
-                n.kind(), n.qualifier(),
-                n.arguments());
-    }
+	public Node toExt(ExtensionRewriter rw) throws SemanticException {
+		ConstructorCall n = (ConstructorCall) node();
+		return rw.to_nf().ConstructorCall(n.position(), n.kind(),
+				n.qualifier(), n.arguments());
+	}
 }

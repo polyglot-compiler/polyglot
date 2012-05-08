@@ -29,7 +29,7 @@ import polyglot.frontend.AbstractPass;
 import polyglot.frontend.goals.Goal;
 
 public abstract class ClassFilePass extends AbstractPass {
-    public ClassFilePass(Goal goal) {
-        super(goal);
-    }
+	public ClassFilePass(Goal goal) {
+		super(goal);
+	}
 }

@@ -35,109 +35,107 @@ import java.util.*;
  * An <code>AmbExpr</code> is an ambiguous AST node composed of a single
  * identifier that must resolve to an expression.
  */
-public class AmbExpr_c extends Expr_c implements AmbExpr
-{
-  protected Id name;
+public class AmbExpr_c extends Expr_c implements AmbExpr {
+	protected Id name;
 
-  public AmbExpr_c(Position pos, Id name) {
-    super(pos);
-    assert(name != null);
-    this.name = name;
-  }
+	public AmbExpr_c(Position pos, Id name) {
+		super(pos);
+		assert (name != null);
+		this.name = name;
+	}
 
-  /** Get the precedence of the field. */
-  public Precedence precedence() {
-    return Precedence.LITERAL;
-  }
-  
-  /** Get the name of the expression. */
-  public Id id() {
-      return this.name;
-  }
-  
-  /** Set the name of the expression. */
-  public AmbExpr id(Id id) {
-      AmbExpr_c n = (AmbExpr_c) copy();
-      n.name = id;
-      return n;
-  }
+	/** Get the precedence of the field. */
+	public Precedence precedence() {
+		return Precedence.LITERAL;
+	}
 
-  /** Get the name of the expression. */
-  public String name() {
-    return this.name.id();
-  }
+	/** Get the name of the expression. */
+	public Id id() {
+		return this.name;
+	}
 
-  /** Set the name of the expression. */
-  public AmbExpr name(String name) {
-      return id(this.name.id(name));
-  }
-  
-  /** Reconstruct the expression. */
-  protected AmbExpr_c reconstruct(Id name) {
-      if (name != this.name) {
-          AmbExpr_c n = (AmbExpr_c) copy();
-          n.name = name;
-          return n;
-      }
-      return this;
-  }
-  
-  /** Visit the children of the constructor. */
-  public Node visitChildren(NodeVisitor v) {
-      Id name = (Id) visitChild(this.name, v);
-      return reconstruct(name);
-  }
+	/** Set the name of the expression. */
+	public AmbExpr id(Id id) {
+		AmbExpr_c n = (AmbExpr_c) copy();
+		n.name = id;
+		return n;
+	}
 
-  /** Disambiguate the expression. */
-  public Node disambiguate(AmbiguityRemover ar) throws SemanticException {
-    Node n = ar.nodeFactory().disamb().disambiguate(this, ar, position(),
-                                                    null, name);
+	/** Get the name of the expression. */
+	public String name() {
+		return this.name.id();
+	}
 
-    if (n instanceof Expr) {
-      return n;
-    }
+	/** Set the name of the expression. */
+	public AmbExpr name(String name) {
+		return id(this.name.id(name));
+	}
 
-    throw new SemanticException("Could not find field or local " +
-                                "variable \"" + name + "\".", position());
-  }
+	/** Reconstruct the expression. */
+	protected AmbExpr_c reconstruct(Id name) {
+		if (name != this.name) {
+			AmbExpr_c n = (AmbExpr_c) copy();
+			n.name = name;
+			return n;
+		}
+		return this;
+	}
 
-  public Node typeCheck(TypeChecker tc) throws SemanticException {
-      // Didn't finish disambiguation; just return.
-      return this;
-  }
+	/** Visit the children of the constructor. */
+	public Node visitChildren(NodeVisitor v) {
+		Id name = (Id) visitChild(this.name, v);
+		return reconstruct(name);
+	}
 
-  /** Check exceptions thrown by the expression. */
-  public Node exceptionCheck(ExceptionChecker ec) throws SemanticException {
-    throw new InternalCompilerError(position(),
-                                    "Cannot exception check ambiguous node "
-                                    + this + ".");
-  } 
+	/** Disambiguate the expression. */
+	public Node disambiguate(AmbiguityRemover ar) throws SemanticException {
+		Node n = ar.nodeFactory().disamb()
+				.disambiguate(this, ar, position(), null, name);
 
-  /** Write the expression to an output file. */
-  public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
-      tr.print(this, name, w);
-  }
+		if (n instanceof Expr) {
+			return n;
+		}
 
-  public String toString() {
-    return name.toString() + "{amb}";
-  }
+		throw new SemanticException("Could not find field or local "
+				+ "variable \"" + name + "\".", position());
+	}
 
-  /**
-   * Return the first (sub)term performed when evaluating this
-   * term.
-   */
-  public Term firstChild() {
-      return null;
-  }
+	public Node typeCheck(TypeChecker tc) throws SemanticException {
+		// Didn't finish disambiguation; just return.
+		return this;
+	}
 
-  /**
-   * Visit this term in evaluation order.
-   */
-  public List acceptCFG(CFGBuilder v, List succs) {
-      return succs;
-  }
-  public Node copy(NodeFactory nf) {
-      return nf.AmbExpr(this.position, this.name);
-  }
-  
+	/** Check exceptions thrown by the expression. */
+	public Node exceptionCheck(ExceptionChecker ec) throws SemanticException {
+		throw new InternalCompilerError(position(),
+				"Cannot exception check ambiguous node " + this + ".");
+	}
+
+	/** Write the expression to an output file. */
+	public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
+		tr.print(this, name, w);
+	}
+
+	public String toString() {
+		return name.toString() + "{amb}";
+	}
+
+	/**
+	 * Return the first (sub)term performed when evaluating this term.
+	 */
+	public Term firstChild() {
+		return null;
+	}
+
+	/**
+	 * Visit this term in evaluation order.
+	 */
+	public List acceptCFG(CFGBuilder v, List succs) {
+		return succs;
+	}
+
+	public Node copy(NodeFactory nf) {
+		return nf.AmbExpr(this.position, this.name);
+	}
+
 }

@@ -28,6 +28,5 @@ package polyglot.ast;
 /**
  * Any statement with sub-statements.
  */
-public interface CompoundStmt extends Stmt 
-{    
+public interface CompoundStmt extends Stmt {
 }

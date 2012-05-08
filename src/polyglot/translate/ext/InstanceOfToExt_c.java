@@ -7,8 +7,9 @@ import polyglot.types.SemanticException;
 
 public class InstanceOfToExt_c extends ToExt_c {
 
-    public Node toExt(ExtensionRewriter rw) throws SemanticException {
-        Instanceof io = (Instanceof)this.node();
-        return rw.to_nf().Instanceof(io.position(), io.expr(), io.compareType());    
-    }
+	public Node toExt(ExtensionRewriter rw) throws SemanticException {
+		Instanceof io = (Instanceof) this.node();
+		return rw.to_nf()
+				.Instanceof(io.position(), io.expr(), io.compareType());
+	}
 }

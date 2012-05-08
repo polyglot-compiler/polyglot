@@ -7,10 +7,10 @@ import polyglot.types.SemanticException;
 
 public class ConstructorDeclToExt_c extends ToExt_c {
 
-    public Node toExt(ExtensionRewriter rw) throws SemanticException {
-        ConstructorDecl n = (ConstructorDecl) node();
+	public Node toExt(ExtensionRewriter rw) throws SemanticException {
+		ConstructorDecl n = (ConstructorDecl) node();
 
-        return rw.to_nf().ConstructorDecl(n.position(), n.flags(), n.id(),
-                n.formals(), n.throwTypes(), n.body());
-    }
+		return rw.to_nf().ConstructorDecl(n.position(), n.flags(), n.id(),
+				n.formals(), n.throwTypes(), n.body());
+	}
 }

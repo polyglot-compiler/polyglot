@@ -34,18 +34,19 @@ import polyglot.types.TypeSystem;
 import polyglot.visit.AmbiguityRemover;
 
 public class Disambiguated extends VisitorGoal {
-    public static Goal create(Scheduler scheduler, Job job, TypeSystem ts, NodeFactory nf) {
-        return scheduler.internGoal(new Disambiguated(job, ts, nf));
-    }
+	public static Goal create(Scheduler scheduler, Job job, TypeSystem ts,
+			NodeFactory nf) {
+		return scheduler.internGoal(new Disambiguated(job, ts, nf));
+	}
 
-    protected Disambiguated(Job job, TypeSystem ts, NodeFactory nf) {
-        super(job, new AmbiguityRemover(job, ts, nf, true, true));
-    }
+	protected Disambiguated(Job job, TypeSystem ts, NodeFactory nf) {
+		super(job, new AmbiguityRemover(job, ts, nf, true, true));
+	}
 
-    public Collection prerequisiteGoals(Scheduler scheduler) {
-        List l = new ArrayList();
-        l.add(scheduler.ImportTableInitialized(job));
-        l.addAll(super.prerequisiteGoals(scheduler));
-        return l;
-    }
+	public Collection prerequisiteGoals(Scheduler scheduler) {
+		List l = new ArrayList();
+		l.add(scheduler.ImportTableInitialized(job));
+		l.addAll(super.prerequisiteGoals(scheduler));
+		return l;
+	}
 }

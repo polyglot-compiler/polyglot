@@ -28,41 +28,41 @@ package polyglot.types;
 import polyglot.util.Position;
 
 /**
- * Signals an error in the class resolver system. This exception is thrown
- * when a <code>ClassResolver</code> is unable to resolve a given class name.
+ * Signals an error in the class resolver system. This exception is thrown when
+ * a <code>ClassResolver</code> is unable to resolve a given class name.
  */
 public class NoClassException extends SemanticException {
-    private String className;
-    
-    private static String message(String className, Named scope) {
-        if (scope == null) {
-            return "Class \"" + className + "\" not found.";
-        }
-        return "Class \"" + className + "\" not found"
-        + (scope != null ? (" in scope of " + scope.toString())
-                : ".");
-    }
-    public NoClassException(String className) {
-        super(message(className, null)); 
-        this.className = className;
-    }
-    
-    public NoClassException(String className, String msg) {
-        super(msg); 
-        this.className = className;
-    }
-    
-    public NoClassException(String className, Named scope) {
-        super(message(className, scope));
-        this.className = className;
-    }
-  
-    public NoClassException(String className, Position position) {
-        super(message(className, null), position);
-        this.className = className;
-    }
-    
-    public String getClassName() {
-        return className;
-    }
+	private String className;
+
+	private static String message(String className, Named scope) {
+		if (scope == null) {
+			return "Class \"" + className + "\" not found.";
+		}
+		return "Class \"" + className + "\" not found"
+				+ (scope != null ? (" in scope of " + scope.toString()) : ".");
+	}
+
+	public NoClassException(String className) {
+		super(message(className, null));
+		this.className = className;
+	}
+
+	public NoClassException(String className, String msg) {
+		super(msg);
+		this.className = className;
+	}
+
+	public NoClassException(String className, Named scope) {
+		super(message(className, scope));
+		this.className = className;
+	}
+
+	public NoClassException(String className, Position position) {
+		super(message(className, null), position);
+		this.className = className;
+	}
+
+	public String getClassName() {
+		return className;
+	}
 }

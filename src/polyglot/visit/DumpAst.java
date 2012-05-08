@@ -36,59 +36,56 @@ import java.io.FileWriter;
 import java.io.Writer;
 import java.io.PrintWriter;
 
-
 /** Visitor which dumps the AST to a file. */
-public class DumpAst extends NodeVisitor
-{
-    protected PrintWriter fw;
-    protected CodeWriter w;
+public class DumpAst extends NodeVisitor {
+	protected PrintWriter fw;
+	protected CodeWriter w;
 
-    /** @deprecated Use the other constructor. */
-    public DumpAst(String name, int width) throws IOException {
-        this.fw = new PrintWriter(new FileWriter(name));
-        this.w = Compiler.createCodeWriter(fw, width);
-    }
+	/** @deprecated Use the other constructor. */
+	public DumpAst(String name, int width) throws IOException {
+		this.fw = new PrintWriter(new FileWriter(name));
+		this.w = Compiler.createCodeWriter(fw, width);
+	}
 
-    public DumpAst(CodeWriter w) {
-        this.w = w;
-    }
+	public DumpAst(CodeWriter w) {
+		this.w = w;
+	}
 
-    /** 
-     * Visit each node before traversal of children. Call <code>dump</code> for
-     * that node. Then we begin a new <code>CodeWriter</code> block and traverse
-     * the children.
-     */
-    public NodeVisitor enter(Node n) {
-        w.write("(");
-        n.dump(w);
-        w.allowBreak(4);
-        w.begin(0);
-        return this;
-    }
+	/**
+	 * Visit each node before traversal of children. Call <code>dump</code> for
+	 * that node. Then we begin a new <code>CodeWriter</code> block and traverse
+	 * the children.
+	 */
+	public NodeVisitor enter(Node n) {
+		w.write("(");
+		n.dump(w);
+		w.allowBreak(4);
+		w.begin(0);
+		return this;
+	}
 
-    /**
-     * This method is called only after normal traversal of the children. Thus
-     * we must end the <code>CodeWriter</code> block that was begun in 
-     * <code>enter</code>.
-     */
-    public Node leave(Node old, Node n, NodeVisitor v) {
-        w.end();
-        w.write(")");
-        w.allowBreak(0);
-        return n;
-    }
+	/**
+	 * This method is called only after normal traversal of the children. Thus
+	 * we must end the <code>CodeWriter</code> block that was begun in
+	 * <code>enter</code>.
+	 */
+	public Node leave(Node old, Node n, NodeVisitor v) {
+		w.end();
+		w.write(")");
+		w.allowBreak(0);
+		return n;
+	}
 
-    public void finish() {
-        try {
-            w.flush();
+	public void finish() {
+		try {
+			w.flush();
 
-            if (fw != null) {
-                fw.flush();
-                fw.close();
-            }
-        }
-        catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
+			if (fw != null) {
+				fw.flush();
+				fw.close();
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
 }

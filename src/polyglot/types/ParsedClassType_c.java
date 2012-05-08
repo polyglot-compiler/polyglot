@@ -37,475 +37,488 @@ import polyglot.util.*;
 
 /**
  * ParsedClassType
- *
- * Overview: 
- * A ParsedClassType represents a information that has been parsed (but not
- * necessarily type checked) from a .java file.
+ * 
+ * Overview: A ParsedClassType represents a information that has been parsed
+ * (but not necessarily type checked) from a .java file.
  **/
-public class ParsedClassType_c extends ClassType_c implements ParsedClassType
-{
-    protected transient LazyClassInitializer init;
-    protected transient Source fromSource;
-    protected transient Job job;
+public class ParsedClassType_c extends ClassType_c implements ParsedClassType {
+	protected transient LazyClassInitializer init;
+	protected transient Source fromSource;
+	protected transient Job job;
 
-    protected Type superType;
-    protected List interfaces;
-    protected List methods;
-    protected List fields;
-    protected List constructors;
-    protected Package package_;
-    protected Flags flags;
-    protected Kind kind;
-    protected String name;
-    protected ClassType outer;
+	protected Type superType;
+	protected List interfaces;
+	protected List methods;
+	protected List fields;
+	protected List constructors;
+	protected Package package_;
+	protected Flags flags;
+	protected Kind kind;
+	protected String name;
+	protected ClassType outer;
 
-    protected transient List memberClasses;
+	protected transient List memberClasses;
 
-    public LazyClassInitializer init() {
-        return init;
-    }
+	public LazyClassInitializer init() {
+		return init;
+	}
 
-    public void setInit(LazyClassInitializer init) {
-        this.init = init;
-    }
-    
-    /** Was the class declared in a static context? */
-    protected boolean inStaticContext = false;
-    
-    /** Wether we need to serialize this class. */
-    protected boolean needSerialization = true;
+	public void setInit(LazyClassInitializer init) {
+		this.init = init;
+	}
 
-    protected ParsedClassType_c() {
-	super();
-    }
+	/** Was the class declared in a static context? */
+	protected boolean inStaticContext = false;
 
-    public ParsedClassType_c(TypeSystem ts, LazyClassInitializer init, 
-                             Source fromSource) {
-        super(ts);
-        this.fromSource = fromSource;
+	/** Wether we need to serialize this class. */
+	protected boolean needSerialization = true;
 
-        setInitializer(init);
+	protected ParsedClassType_c() {
+		super();
+	}
 
-        this.interfaces = new TypedList(new LinkedList(), Type.class, false);
-        this.methods = new TypedList(new LinkedList(), MethodInstance.class, false);
-        this.fields = new TypedList(new LinkedList(), FieldInstance.class, false);
-        this.constructors = new TypedList(new LinkedList(), ConstructorInstance.class, false);
-        this.memberClasses = new TypedList(new LinkedList(), Type.class, false);
-    }
-     
-    public LazyInitializer initializer() {
-        return this.init;
-    }
+	public ParsedClassType_c(TypeSystem ts, LazyClassInitializer init,
+			Source fromSource) {
+		super(ts);
+		this.fromSource = fromSource;
 
-    public void setInitializer(LazyInitializer init) {
-        this.init = (LazyClassInitializer) init;
-        ((LazyClassInitializer) init).setClass(this);
-    }
-        
-    public Source fromSource() {
-        return fromSource;
-    }
-    
-    public Job job() {
-        return job;
-    }
-    
-    public void setJob(Job job) {
-        this.job = job;
-    }
-    
-    public Kind kind() {
-        return kind;
-    }
+		setInitializer(init);
 
-    public void inStaticContext(boolean inStaticContext) {
-        this.inStaticContext = inStaticContext;
-    }
+		this.interfaces = new TypedList(new LinkedList(), Type.class, false);
+		this.methods = new TypedList(new LinkedList(), MethodInstance.class,
+				false);
+		this.fields = new TypedList(new LinkedList(), FieldInstance.class,
+				false);
+		this.constructors = new TypedList(new LinkedList(),
+				ConstructorInstance.class, false);
+		this.memberClasses = new TypedList(new LinkedList(), Type.class, false);
+	}
 
-    public boolean inStaticContext() {
-        return inStaticContext;
-    }
-    
-    public ClassType outer() {
-        if (isTopLevel())
-            return null;
-        if (outer == null)
-            throw new InternalCompilerError("Nested classes must have outer classes.");
-            
-        return outer;
-    }
+	public LazyInitializer initializer() {
+		return this.init;
+	}
 
-    public String name() {
-//        if (isAnonymous())
-//            throw new InternalCompilerError("Anonymous classes cannot have names.");
-//
-//        if (name == null)
-//            throw new InternalCompilerError("Non-anonymous classes must have names.");
-        return name;
-    }
+	public void setInitializer(LazyInitializer init) {
+		this.init = (LazyClassInitializer) init;
+		((LazyClassInitializer) init).setClass(this);
+	}
 
-    /** Get the class's super type. */
-    public Type superType() {
-        init.initSuperclass();
-        return this.superType;
-    }
+	public Source fromSource() {
+		return fromSource;
+	}
 
-    /** Get the class's package. */
-    public Package package_() {
-        return package_;
-    }
+	public Job job() {
+		return job;
+	}
 
-    /** Get the class's flags. */
-    public Flags flags() {
-        if (isAnonymous())
-            return Flags.NONE;
-        return flags;
-    }
-    
-    public void setFlags(Flags flags) {
-        this.flags = flags;
-    }
+	public void setJob(Job job) {
+		this.job = job;
+	}
 
-    public void flags(Flags flags) {
-	this.flags = flags;
-    }
+	public Kind kind() {
+		return kind;
+	}
 
-    public void kind(Kind kind) {
-        this.kind = kind;
-    }
+	public void inStaticContext(boolean inStaticContext) {
+		this.inStaticContext = inStaticContext;
+	}
 
-    public void outer(ClassType outer) {
-        if (isTopLevel())
-            throw new InternalCompilerError("Top-level classes cannot have outer classes.");
-        this.outer = outer;
-    }
-    
-    public void setContainer(ReferenceType container) {
-        if (container instanceof ClassType && isMember()) {
-            outer((ClassType) container);
-        }
-        else {
-            throw new InternalCompilerError("Only member classes can have containers.");
-        }
-    }
+	public boolean inStaticContext() {
+		return inStaticContext;
+	}
 
-    public void name(String name) {
-        if (isAnonymous())
-            throw new InternalCompilerError("Anonymous classes cannot have names.");
-        this.name = name;
-    }
+	public ClassType outer() {
+		if (isTopLevel())
+			return null;
+		if (outer == null)
+			throw new InternalCompilerError(
+					"Nested classes must have outer classes.");
 
-    public void position(Position pos) {
-	this.position = pos;
-    }
+		return outer;
+	}
 
-    public void package_(Package p) {
-	this.package_ = p;
-    }
+	public String name() {
+		// if (isAnonymous())
+		// throw new
+		// InternalCompilerError("Anonymous classes cannot have names.");
+		//
+		// if (name == null)
+		// throw new
+		// InternalCompilerError("Non-anonymous classes must have names.");
+		return name;
+	}
 
-    public void superType(Type t) {
-	this.superType = t;
-    }
+	/** Get the class's super type. */
+	public Type superType() {
+		init.initSuperclass();
+		return this.superType;
+	}
 
-    public void addInterface(Type t) {
-	interfaces.add(t);
-    }
+	/** Get the class's package. */
+	public Package package_() {
+		return package_;
+	}
 
-    public void addMethod(MethodInstance mi) {
-	methods.add(mi);
-    }
+	/** Get the class's flags. */
+	public Flags flags() {
+		if (isAnonymous())
+			return Flags.NONE;
+		return flags;
+	}
 
-    public void addConstructor(ConstructorInstance ci) {
-	constructors.add(ci);
-    }
+	public void setFlags(Flags flags) {
+		this.flags = flags;
+	}
 
-    public void addField(FieldInstance fi) {
-	fields.add(fi);
-    }
+	public void flags(Flags flags) {
+		this.flags = flags;
+	}
 
-    public void addMemberClass(ClassType t) {
-	memberClasses.add(t);
-    }
-    
-    public void setInterfaces(List l) {
-        this.interfaces = new ArrayList(l);
-    }
-    
-    public void setMethods(List l) {
-        this.methods = new ArrayList(l);
-    }
+	public void kind(Kind kind) {
+		this.kind = kind;
+	}
 
-    public void setFields(List l) {
-        this.fields = new ArrayList(l);
-    }
-    
-    public void setConstructors(List l) {
-        this.constructors = new ArrayList(l);
-    }
+	public void outer(ClassType outer) {
+		if (isTopLevel())
+			throw new InternalCompilerError(
+					"Top-level classes cannot have outer classes.");
+		this.outer = outer;
+	}
 
-    public void setMemberClasses(List l) {
-        this.memberClasses = new ArrayList(l);
-    }
-                                          
-    public boolean defaultConstructorNeeded() {
-        init.initConstructors();
-        if (flags().isInterface()) {
-            return false;
-        }
-        return this.constructors.isEmpty();
-    }
-    
-    /** Return an immutable list of constructors */
-    public List constructors() {
-        init.initConstructors();
-        init.canonicalConstructors();
-        return Collections.unmodifiableList(constructors);
-    }
+	public void setContainer(ReferenceType container) {
+		if (container instanceof ClassType && isMember()) {
+			outer((ClassType) container);
+		} else {
+			throw new InternalCompilerError(
+					"Only member classes can have containers.");
+		}
+	}
 
-    /** Return an immutable list of member classes */
-    public List memberClasses() {
-        init.initMemberClasses();
-        return Collections.unmodifiableList(memberClasses);
-    }
+	public void name(String name) {
+		if (isAnonymous())
+			throw new InternalCompilerError(
+					"Anonymous classes cannot have names.");
+		this.name = name;
+	}
 
-    /** Return an immutable list of methods. */
-    public List methods() {
-        init.initMethods();
-        init.canonicalMethods();
-        return Collections.unmodifiableList(methods);
-    }
-    
-    /** Return a list of all methods with the given name. */
-    public List methodsNamed(String name) {
-        // Override to NOT call methods(). Do not check that all
-        // methods are canonical, just that the particular method
-        // returned is canonical.
-        init.initMethods();
+	public void position(Position pos) {
+		this.position = pos;
+	}
 
-        List l = new LinkedList();
-        
-        for (Iterator i = methods.iterator(); i.hasNext(); ) {
-            MethodInstance mi = (MethodInstance) i.next();
-            if (mi.name().equals(name)) {
-                if (! mi.isCanonical()) {
-                    // Force an exception to get thrown.
-                    init.canonicalMethods();
-                }
-                l.add(mi);
-            }
-        }
+	public void package_(Package p) {
+		this.package_ = p;
+	}
 
-        return l;
-    }
+	public void superType(Type t) {
+		this.superType = t;
+	}
 
-    /** Return an immutable list of fields */
-    public List fields() {
-        init.initFields();
-        init.canonicalFields();
-        return Collections.unmodifiableList(fields);
-    }
-    
-    /** Get a field of the class by name. */
-    public FieldInstance fieldNamed(String name) {
-        // Override to NOT call fields(). Do not check that all
-        // fields are canonical, just that the particular field
-        // returned is canonical.  This avoids an infinite loop
-        // during disambiguation of path-dependent types like
-        // in Jx or Jif.
-        init.initFields();
-        
-        for (Iterator i = fields.iterator(); i.hasNext(); ) {
-            FieldInstance fi = (FieldInstance) i.next();
-            if (fi.name().equals(name)) {
-                if (! fi.isCanonical()) {
-                    // Force an exception to get thrown.
-                    init.canonicalFields();
-                }
-                return fi;
-            }
-        }
+	public void addInterface(Type t) {
+		interfaces.add(t);
+	}
 
-        return null;
-    }
+	public void addMethod(MethodInstance mi) {
+		methods.add(mi);
+	}
 
-    /** Return an immutable list of interfaces */
-    public List interfaces() {
-        init.initInterfaces();
-        return Collections.unmodifiableList(interfaces);
-    }
-    
-    protected boolean membersAdded;
-    protected boolean supertypesResolved;
-    protected boolean signaturesResolved;
+	public void addConstructor(ConstructorInstance ci) {
+		constructors.add(ci);
+	}
 
-    /**
-     * @return Returns the membersAdded.
-     */
-    public boolean membersAdded() {
-        return membersAdded;
-    }
-    /**
-     * @param membersAdded The membersAdded to set.
-     */
-    public void setMembersAdded(boolean membersAdded) {
-        this.membersAdded = membersAdded;
-    }
-    /**
-     * @param signaturesDisambiguated The signaturesDisambiguated to set.
-     */
-    public void setSignaturesResolved(boolean signaturesDisambiguated) {
-        this.signaturesResolved = signaturesDisambiguated;
-    }
-    /**
-     * @return Returns the supertypesResolved.
-     */
-    public boolean supertypesResolved() {
-        return supertypesResolved;
-    }
-    /**
-     * @param supertypesResolved The supertypesResolved to set.
-     */
-    public void setSupertypesResolved(boolean supertypesResolved) {
-        this.supertypesResolved = supertypesResolved;
-    }
+	public void addField(FieldInstance fi) {
+		fields.add(fi);
+	}
 
-    public int numSignaturesUnresolved() {
-        Scheduler scheduler = typeSystem().extensionInfo().scheduler();
-        
-        if (signaturesResolved) {
-            return 0;
-        }
-        
-        if (! membersAdded()) {
-            return Integer.MAX_VALUE;
-        }
+	public void addMemberClass(ClassType t) {
+		memberClasses.add(t);
+	}
 
-        // Create a new list of members.  Don't use members() since
-        // it ensures that signatures be resolved and this method
-        // is just suppossed to check if they are resolved.
-        List l = new ArrayList();
-        l.addAll(methods);
-        l.addAll(fields);
-        l.addAll(constructors);
-        l.addAll(memberClasses);
-        
-        int count = 0;
-        
-        for (Iterator i = l.iterator(); i.hasNext(); ) {
-            MemberInstance mi = (MemberInstance) i.next();
-            if (! mi.isCanonical()) {
-                count++;
-            }
-        }
-        
-        if (count == 0) {
-            signaturesResolved = true;
-        }
-        
-        return count;
-    }
+	public void setInterfaces(List l) {
+		this.interfaces = new ArrayList(l);
+	}
 
-    public boolean signaturesResolved() {
-        if (! signaturesResolved) {
-            if (! membersAdded()) {
-                return false;
-            }
+	public void setMethods(List l) {
+		this.methods = new ArrayList(l);
+	}
 
-            Scheduler scheduler = typeSystem().extensionInfo().scheduler();
+	public void setFields(List l) {
+		this.fields = new ArrayList(l);
+	}
 
-            // Create a new list of members.  Don't use members() since
-            // it ensures that signatures be resolved and this method
-            // is just suppossed to check if they are resolved.
-            List l = new ArrayList();
-            l.addAll(methods);
-            l.addAll(fields);
-            l.addAll(constructors);
-            l.addAll(memberClasses);
-            
-            int count = 0;
+	public void setConstructors(List l) {
+		this.constructors = new ArrayList(l);
+	}
 
-            for (Iterator i = l.iterator(); i.hasNext(); ) {
-                MemberInstance mi = (MemberInstance) i.next();
-                if (! mi.isCanonical()) {
-                    if (Report.should_report("ambcheck", 2))
-                        Report.report(2, mi + " is ambiguous");
-                    count++;
-                }
-            }
-            
-            if (count == 0) {
-                signaturesResolved = true;
-            }
-        }
-        
-        return signaturesResolved;
-    }
+	public void setMemberClasses(List l) {
+		this.memberClasses = new ArrayList(l);
+	}
 
-    public String toString() {
-        if (kind() == null) {
-            return "<unknown class " + name + ">";
-        }
-        if (isAnonymous()) {
-            if (interfaces != null && ! interfaces.isEmpty()) {
-                return "<anonymous subtype of " + interfaces.get(0) + ">";
-            }
-            if (superType != null) {
-                return "<anonymous subclass of " + superType + ">";
-            }
-        }
-        return super.toString();
-    }
+	public boolean defaultConstructorNeeded() {
+		init.initConstructors();
+		if (flags().isInterface()) {
+			return false;
+		}
+		return this.constructors.isEmpty();
+	}
 
-    /**
-     * When serializing, write out the place holder as well as the object itself.
-     * This should be done in TypeOutputStream, not here, but I couldn't get it working.
-     * --Nate
-     */
-    private void writeObject(ObjectOutputStream out) throws IOException {
-        Object o = ts.placeHolder(this);
-        if (o instanceof PlaceHolder && o != this) {
-            out.writeBoolean(true);
-            out.writeObject(o);
-        }
-        else {
-            out.writeBoolean(false);
-        }
-        out.defaultWriteObject();
-    }
-    
-    private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
-        if (in instanceof TypeInputStream) {
-            TypeInputStream tin = (TypeInputStream) in;
+	/** Return an immutable list of constructors */
+	public List constructors() {
+		init.initConstructors();
+		init.canonicalConstructors();
+		return Collections.unmodifiableList(constructors);
+	}
 
-            boolean b = tin.readBoolean();
-            
-            if (b) {
-                tin.enableReplace(false);
-                PlaceHolder p = (PlaceHolder) tin.readObject();
-                tin.installInPlaceHolderCache(p, this);
-                tin.enableReplace(true);
-            }
+	/** Return an immutable list of member classes */
+	public List memberClasses() {
+		init.initMemberClasses();
+		return Collections.unmodifiableList(memberClasses);
+	}
 
-            fromSource = null;
-            job = null;
-           
-            init = tin.getTypeSystem().deserializedClassInitializer();
-            init.setClass(this);
-            
-            membersAdded = true;
-            supertypesResolved = true;
-            signaturesResolved = true;
-            memberClasses = new ArrayList();
-        }
+	/** Return an immutable list of methods. */
+	public List methods() {
+		init.initMethods();
+		init.canonicalMethods();
+		return Collections.unmodifiableList(methods);
+	}
 
-        in.defaultReadObject();
-    }
+	/** Return a list of all methods with the given name. */
+	public List methodsNamed(String name) {
+		// Override to NOT call methods(). Do not check that all
+		// methods are canonical, just that the particular method
+		// returned is canonical.
+		init.initMethods();
 
-    public void needSerialization(boolean b) {
-        needSerialization = b;
-    }
-    
-    public boolean needSerialization() {
-        return needSerialization;
-    }
+		List l = new LinkedList();
+
+		for (Iterator i = methods.iterator(); i.hasNext();) {
+			MethodInstance mi = (MethodInstance) i.next();
+			if (mi.name().equals(name)) {
+				if (!mi.isCanonical()) {
+					// Force an exception to get thrown.
+					init.canonicalMethods();
+				}
+				l.add(mi);
+			}
+		}
+
+		return l;
+	}
+
+	/** Return an immutable list of fields */
+	public List fields() {
+		init.initFields();
+		init.canonicalFields();
+		return Collections.unmodifiableList(fields);
+	}
+
+	/** Get a field of the class by name. */
+	public FieldInstance fieldNamed(String name) {
+		// Override to NOT call fields(). Do not check that all
+		// fields are canonical, just that the particular field
+		// returned is canonical. This avoids an infinite loop
+		// during disambiguation of path-dependent types like
+		// in Jx or Jif.
+		init.initFields();
+
+		for (Iterator i = fields.iterator(); i.hasNext();) {
+			FieldInstance fi = (FieldInstance) i.next();
+			if (fi.name().equals(name)) {
+				if (!fi.isCanonical()) {
+					// Force an exception to get thrown.
+					init.canonicalFields();
+				}
+				return fi;
+			}
+		}
+
+		return null;
+	}
+
+	/** Return an immutable list of interfaces */
+	public List interfaces() {
+		init.initInterfaces();
+		return Collections.unmodifiableList(interfaces);
+	}
+
+	protected boolean membersAdded;
+	protected boolean supertypesResolved;
+	protected boolean signaturesResolved;
+
+	/**
+	 * @return Returns the membersAdded.
+	 */
+	public boolean membersAdded() {
+		return membersAdded;
+	}
+
+	/**
+	 * @param membersAdded
+	 *            The membersAdded to set.
+	 */
+	public void setMembersAdded(boolean membersAdded) {
+		this.membersAdded = membersAdded;
+	}
+
+	/**
+	 * @param signaturesDisambiguated
+	 *            The signaturesDisambiguated to set.
+	 */
+	public void setSignaturesResolved(boolean signaturesDisambiguated) {
+		this.signaturesResolved = signaturesDisambiguated;
+	}
+
+	/**
+	 * @return Returns the supertypesResolved.
+	 */
+	public boolean supertypesResolved() {
+		return supertypesResolved;
+	}
+
+	/**
+	 * @param supertypesResolved
+	 *            The supertypesResolved to set.
+	 */
+	public void setSupertypesResolved(boolean supertypesResolved) {
+		this.supertypesResolved = supertypesResolved;
+	}
+
+	public int numSignaturesUnresolved() {
+		Scheduler scheduler = typeSystem().extensionInfo().scheduler();
+
+		if (signaturesResolved) {
+			return 0;
+		}
+
+		if (!membersAdded()) {
+			return Integer.MAX_VALUE;
+		}
+
+		// Create a new list of members. Don't use members() since
+		// it ensures that signatures be resolved and this method
+		// is just suppossed to check if they are resolved.
+		List l = new ArrayList();
+		l.addAll(methods);
+		l.addAll(fields);
+		l.addAll(constructors);
+		l.addAll(memberClasses);
+
+		int count = 0;
+
+		for (Iterator i = l.iterator(); i.hasNext();) {
+			MemberInstance mi = (MemberInstance) i.next();
+			if (!mi.isCanonical()) {
+				count++;
+			}
+		}
+
+		if (count == 0) {
+			signaturesResolved = true;
+		}
+
+		return count;
+	}
+
+	public boolean signaturesResolved() {
+		if (!signaturesResolved) {
+			if (!membersAdded()) {
+				return false;
+			}
+
+			Scheduler scheduler = typeSystem().extensionInfo().scheduler();
+
+			// Create a new list of members. Don't use members() since
+			// it ensures that signatures be resolved and this method
+			// is just suppossed to check if they are resolved.
+			List l = new ArrayList();
+			l.addAll(methods);
+			l.addAll(fields);
+			l.addAll(constructors);
+			l.addAll(memberClasses);
+
+			int count = 0;
+
+			for (Iterator i = l.iterator(); i.hasNext();) {
+				MemberInstance mi = (MemberInstance) i.next();
+				if (!mi.isCanonical()) {
+					if (Report.should_report("ambcheck", 2))
+						Report.report(2, mi + " is ambiguous");
+					count++;
+				}
+			}
+
+			if (count == 0) {
+				signaturesResolved = true;
+			}
+		}
+
+		return signaturesResolved;
+	}
+
+	public String toString() {
+		if (kind() == null) {
+			return "<unknown class " + name + ">";
+		}
+		if (isAnonymous()) {
+			if (interfaces != null && !interfaces.isEmpty()) {
+				return "<anonymous subtype of " + interfaces.get(0) + ">";
+			}
+			if (superType != null) {
+				return "<anonymous subclass of " + superType + ">";
+			}
+		}
+		return super.toString();
+	}
+
+	/**
+	 * When serializing, write out the place holder as well as the object
+	 * itself. This should be done in TypeOutputStream, not here, but I couldn't
+	 * get it working. --Nate
+	 */
+	private void writeObject(ObjectOutputStream out) throws IOException {
+		Object o = ts.placeHolder(this);
+		if (o instanceof PlaceHolder && o != this) {
+			out.writeBoolean(true);
+			out.writeObject(o);
+		} else {
+			out.writeBoolean(false);
+		}
+		out.defaultWriteObject();
+	}
+
+	private void readObject(ObjectInputStream in) throws IOException,
+			ClassNotFoundException {
+		if (in instanceof TypeInputStream) {
+			TypeInputStream tin = (TypeInputStream) in;
+
+			boolean b = tin.readBoolean();
+
+			if (b) {
+				tin.enableReplace(false);
+				PlaceHolder p = (PlaceHolder) tin.readObject();
+				tin.installInPlaceHolderCache(p, this);
+				tin.enableReplace(true);
+			}
+
+			fromSource = null;
+			job = null;
+
+			init = tin.getTypeSystem().deserializedClassInitializer();
+			init.setClass(this);
+
+			membersAdded = true;
+			supertypesResolved = true;
+			signaturesResolved = true;
+			memberClasses = new ArrayList();
+		}
+
+		in.defaultReadObject();
+	}
+
+	public void needSerialization(boolean b) {
+		needSerialization = b;
+	}
+
+	public boolean needSerialization() {
+		return needSerialization;
+	}
 }

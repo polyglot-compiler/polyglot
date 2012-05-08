@@ -34,66 +34,66 @@ import polyglot.util.InternalCompilerError;
 import polyglot.visit.NodeVisitor;
 
 /** A pass which runs a visitor. */
-public class VisitorPass extends AbstractPass
-{
-    protected NodeVisitor v;
+public class VisitorPass extends AbstractPass {
+	protected NodeVisitor v;
 
-    public VisitorPass(Goal goal) {
-	this(goal, null);
-    }
-
-    public VisitorPass(Goal goal, NodeVisitor v) {
-        super(goal);
-        this.v = v;
-    }
-
-    public void visitor(NodeVisitor v) {
-	this.v = v;
-    }
-
-    public NodeVisitor visitor() {
-	return v;
-    }
-  
-    public boolean run() {
-	Node ast = goal.job().ast();
-
-	if (ast == null) {
-	    throw new InternalCompilerError("Null AST for job " + goal.job() + ": did the parser run?");
+	public VisitorPass(Goal goal) {
+		this(goal, null);
 	}
 
-        NodeVisitor v_ = v.begin();
-        
-        if (v_ != null) {
-	    ErrorQueue q = goal.job().compiler().errorQueue();
-	    int nErrsBefore = q.errorCount();
+	public VisitorPass(Goal goal, NodeVisitor v) {
+		super(goal);
+		this.v = v;
+	}
 
-            if (Report.should_report(Report.frontend, 3))
-                Report.report(3, "Running " + v_ + " on " + ast);
+	public void visitor(NodeVisitor v) {
+		this.v = v;
+	}
 
-            ast = ast.visit(v_);
-            v_.finish(ast);
+	public NodeVisitor visitor() {
+		return v;
+	}
 
-            int nErrsAfter = q.errorCount();
+	public boolean run() {
+		Node ast = goal.job().ast();
 
-            goal.job().ast(ast);
+		if (ast == null) {
+			throw new InternalCompilerError("Null AST for job " + goal.job()
+					+ ": did the parser run?");
+		}
 
-            if (nErrsBefore != nErrsAfter) {
-                // because, if they're equal, no new errors occurred,
-                // so the run was successful.
-                return false;
-            }
-           
-            return true;
-        }
+		NodeVisitor v_ = v.begin();
 
-        return false;
-    }
-    
-    public String name() {
-        if (v != null)
-            return v.toString();
-        else 
-            return super.name();
-    }
+		if (v_ != null) {
+			ErrorQueue q = goal.job().compiler().errorQueue();
+			int nErrsBefore = q.errorCount();
+
+			if (Report.should_report(Report.frontend, 3))
+				Report.report(3, "Running " + v_ + " on " + ast);
+
+			ast = ast.visit(v_);
+			v_.finish(ast);
+
+			int nErrsAfter = q.errorCount();
+
+			goal.job().ast(ast);
+
+			if (nErrsBefore != nErrsAfter) {
+				// because, if they're equal, no new errors occurred,
+				// so the run was successful.
+				return false;
+			}
+
+			return true;
+		}
+
+		return false;
+	}
+
+	public String name() {
+		if (v != null)
+			return v.toString();
+		else
+			return super.name();
+	}
 }

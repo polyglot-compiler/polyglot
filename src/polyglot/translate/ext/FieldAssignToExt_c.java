@@ -7,8 +7,9 @@ import polyglot.translate.ExtensionRewriter;
 import polyglot.types.SemanticException;
 
 public class FieldAssignToExt_c extends ToExt_c {
-    public Node toExt(ExtensionRewriter rw) throws SemanticException {
-        FieldAssign n = (FieldAssign)node();
-        return rw.to_nf().FieldAssign(n.position(), (Field)n.left(), n.operator(), n.right());
-    }
+	public Node toExt(ExtensionRewriter rw) throws SemanticException {
+		FieldAssign n = (FieldAssign) node();
+		return rw.to_nf().FieldAssign(n.position(), (Field) n.left(),
+				n.operator(), n.right());
+	}
 }

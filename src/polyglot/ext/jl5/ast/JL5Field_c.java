@@ -20,32 +20,31 @@ import polyglot.visit.TypeChecker;
 
 public class JL5Field_c extends Field_c {
 
-    public JL5Field_c(Position pos, Receiver target, Id name) {
-        super(pos, target, name);
-    }
+	public JL5Field_c(Position pos, Receiver target, Id name) {
+		super(pos, target, name);
+	}
 
-    @Override
-    public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
-        w.begin(0);
-        if (!targetImplicit) {
-            // explicit target.
-            if (target instanceof Expr) {
-                printSubExpr((Expr) target, w, tr);
-            }
-            else if (target instanceof TypeNode || target instanceof AmbReceiver) {
-                if (tr instanceof JL5Translator) {
-                    JL5Translator jltr = (JL5Translator)tr;
-                    jltr.printReceiver(target, w);                    
-                }
-                else {
-                    print(target, w, tr);
-                }
-            }
+	@Override
+	public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
+		w.begin(0);
+		if (!targetImplicit) {
+			// explicit target.
+			if (target instanceof Expr) {
+				printSubExpr((Expr) target, w, tr);
+			} else if (target instanceof TypeNode
+					|| target instanceof AmbReceiver) {
+				if (tr instanceof JL5Translator) {
+					JL5Translator jltr = (JL5Translator) tr;
+					jltr.printReceiver(target, w);
+				} else {
+					print(target, w, tr);
+				}
+			}
 
-            w.write(".");
-            w.allowBreak(2, 3, "", 0);
-        }
-        tr.print(this, name, w);
-        w.end();
-    }
+			w.write(".");
+			w.allowBreak(2, 3, "", 0);
+		}
+		tr.print(this, name, w);
+		w.end();
+	}
 }

@@ -28,14 +28,13 @@ package polyglot.ast;
 import polyglot.types.CodeInstance;
 
 /**
- * A code node.  A "code" is the supertype of methods,
- * constructors, and initalizers.
+ * A code node. A "code" is the supertype of methods, constructors, and
+ * initalizers.
  */
-public interface CodeNode extends Term
-{
-    /** The body of the method, constructor, initializer, or field initializer. */
-    Term codeBody();
+public interface CodeNode extends Term {
+	/** The body of the method, constructor, initializer, or field initializer. */
+	Term codeBody();
 
-    /** The CodeInstance of the method, constructor, or initializer. */
-    CodeInstance codeInstance();
+	/** The CodeInstance of the method, constructor, or initializer. */
+	CodeInstance codeInstance();
 }

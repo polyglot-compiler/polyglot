@@ -31,132 +31,132 @@ import polyglot.visit.*;
 import java.util.*;
 
 /**
- * An <code>ArrayAccess</code> is an immutable representation of an
- * access of an array member.
+ * An <code>ArrayAccess</code> is an immutable representation of an access of an
+ * array member.
  */
-public class ArrayAccess_c extends Expr_c implements ArrayAccess
-{
-    protected Expr array;
-    protected Expr index;
+public class ArrayAccess_c extends Expr_c implements ArrayAccess {
+	protected Expr array;
+	protected Expr index;
 
-    public ArrayAccess_c(Position pos, Expr array, Expr index) {
-	super(pos);
-	assert(array != null && index != null);
-	this.array = array;
-	this.index = index;
-    }
-
-    /** Get the precedence of the expression. */
-    public Precedence precedence() { 
-	return Precedence.LITERAL;
-    }
-
-    /** Get the array of the expression. */
-    public Expr array() {
-	return this.array;
-    }
-
-    /** Set the array of the expression. */
-    public ArrayAccess array(Expr array) {
-	ArrayAccess_c n = (ArrayAccess_c) copy();
-	n.array = array;
-	return n;
-    }
-
-    /** Get the index of the expression. */
-    public Expr index() {
-	return this.index;
-    }
-
-    /** Set the index of the expression. */
-    public ArrayAccess index(Expr index) {
-	ArrayAccess_c n = (ArrayAccess_c) copy();
-	n.index = index;
-	return n;
-    }
-
-    /** Return the access flags of the variable. */
-    public Flags flags() {
-        return Flags.NONE;
-    }
-
-    /** Reconstruct the expression. */
-    protected ArrayAccess_c reconstruct(Expr array, Expr index) {
-	if (array != this.array || index != this.index) {
-	    ArrayAccess_c n = (ArrayAccess_c) copy();
-	    n.array = array;
-	    n.index = index;
-	    return n;
+	public ArrayAccess_c(Position pos, Expr array, Expr index) {
+		super(pos);
+		assert (array != null && index != null);
+		this.array = array;
+		this.index = index;
 	}
 
-	return this;
-    }
-
-    /** Visit the children of the expression. */
-    public Node visitChildren(NodeVisitor v) {
-	Expr array = (Expr) visitChild(this.array, v);
-	Expr index = (Expr) visitChild(this.index, v);
-	return reconstruct(array, index);
-    }
-
-    /** Type check the expression. */
-    public Node typeCheck(TypeChecker tc) throws SemanticException {
-        TypeSystem ts = tc.typeSystem();
-
-	if (! array.type().isArray()) {
-	    throw new SemanticException(
-		"Subscript can only follow an array type.", position());
+	/** Get the precedence of the expression. */
+	public Precedence precedence() {
+		return Precedence.LITERAL;
 	}
 
-	if (! ts.isImplicitCastValid(index.type(), ts.Int())) {
-	    throw new SemanticException(
-		"Array subscript must be an integer.", position());
+	/** Get the array of the expression. */
+	public Expr array() {
+		return this.array;
 	}
 
-	return type(array.type().toArray().base());
-    }
+	/** Set the array of the expression. */
+	public ArrayAccess array(Expr array) {
+		ArrayAccess_c n = (ArrayAccess_c) copy();
+		n.array = array;
+		return n;
+	}
 
-    public Type childExpectedType(Expr child, AscriptionVisitor av) {
-        TypeSystem ts = av.typeSystem();
+	/** Get the index of the expression. */
+	public Expr index() {
+		return this.index;
+	}
 
-        if (child == index) {
-            return ts.Int();
-        }
+	/** Set the index of the expression. */
+	public ArrayAccess index(Expr index) {
+		ArrayAccess_c n = (ArrayAccess_c) copy();
+		n.index = index;
+		return n;
+	}
 
-        if (child == array) {
-            return ts.arrayOf(this.type);
-        }
+	/** Return the access flags of the variable. */
+	public Flags flags() {
+		return Flags.NONE;
+	}
 
-        return child.type();
-    }
+	/** Reconstruct the expression. */
+	protected ArrayAccess_c reconstruct(Expr array, Expr index) {
+		if (array != this.array || index != this.index) {
+			ArrayAccess_c n = (ArrayAccess_c) copy();
+			n.array = array;
+			n.index = index;
+			return n;
+		}
 
-    public String toString() {
-	return array + "[" + index + "]";
-    }
+		return this;
+	}
 
-    /** Write the expression to an output file. */
-    public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
-	printSubExpr(array, w, tr);
-	w.write ("[");
-	printBlock(index, w, tr);
-	w.write ("]");
-    }
+	/** Visit the children of the expression. */
+	public Node visitChildren(NodeVisitor v) {
+		Expr array = (Expr) visitChild(this.array, v);
+		Expr index = (Expr) visitChild(this.index, v);
+		return reconstruct(array, index);
+	}
 
-    public Term firstChild() {
-        return array;
-    }
+	/** Type check the expression. */
+	public Node typeCheck(TypeChecker tc) throws SemanticException {
+		TypeSystem ts = tc.typeSystem();
 
-    public List acceptCFG(CFGBuilder v, List succs) {
-        v.visitCFG(array, index, ENTRY);
-        v.visitCFG(index, this, EXIT);
-        return succs;
-    }
+		if (!array.type().isArray()) {
+			throw new SemanticException(
+					"Subscript can only follow an array type.", position());
+		}
 
-    public List throwTypes(TypeSystem ts) {
-        return CollectionUtil.list(ts.OutOfBoundsException(),
-                                   ts.NullPointerException());
-    }
-    public Node copy(NodeFactory nf) {
-        return nf.ArrayAccess(this.position, this.array, this.index);
-    }
+		if (!ts.isImplicitCastValid(index.type(), ts.Int())) {
+			throw new SemanticException("Array subscript must be an integer.",
+					position());
+		}
+
+		return type(array.type().toArray().base());
+	}
+
+	public Type childExpectedType(Expr child, AscriptionVisitor av) {
+		TypeSystem ts = av.typeSystem();
+
+		if (child == index) {
+			return ts.Int();
+		}
+
+		if (child == array) {
+			return ts.arrayOf(this.type);
+		}
+
+		return child.type();
+	}
+
+	public String toString() {
+		return array + "[" + index + "]";
+	}
+
+	/** Write the expression to an output file. */
+	public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
+		printSubExpr(array, w, tr);
+		w.write("[");
+		printBlock(index, w, tr);
+		w.write("]");
+	}
+
+	public Term firstChild() {
+		return array;
+	}
+
+	public List acceptCFG(CFGBuilder v, List succs) {
+		v.visitCFG(array, index, ENTRY);
+		v.visitCFG(index, this, EXIT);
+		return succs;
+	}
+
+	public List throwTypes(TypeSystem ts) {
+		return CollectionUtil.list(ts.OutOfBoundsException(),
+				ts.NullPointerException());
+	}
+
+	public Node copy(NodeFactory nf) {
+		return nf.ArrayAccess(this.position, this.array, this.index);
+	}
 }

@@ -5,14 +5,14 @@ import polyglot.ast.JL;
 
 public interface JL5DelFactory extends DelFactory {
 
-    JL delEnumDecl();
+	JL delEnumDecl();
 
-    JL delExtendedFor();
+	JL delExtendedFor();
 
-    JL delEnumConstantDecl();
+	JL delEnumConstantDecl();
 
-    JL delEnumConstant();
+	JL delEnumConstant();
 
-    JL delParamTypeNode();
+	JL delParamTypeNode();
 
 }

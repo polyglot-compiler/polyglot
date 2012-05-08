@@ -34,11 +34,12 @@ import polyglot.main.Report;
 import java.util.*;
 
 /**
- * A visitor which maintains a context throughout the visitor's pass.  This is 
+ * A visitor which maintains a context throughout the visitor's pass. This is
  * the base class of the disambiguation and type checking visitors.
- *
- * TODO: update this documentation.
- * For a node <code>n</code> methods are called in this order:
+ * 
+ * TODO: update this documentation. For a node <code>n</code> methods are called
+ * in this order:
+ * 
  * <pre>
  * v.enter(n)
  *   v.enterScope(n);
@@ -50,163 +51,163 @@ import java.util.*;
  *     n.addDecls(c)
  * </pre>
  */
-public class ContextVisitor extends ErrorHandlingVisitor
-{
-    protected ContextVisitor outer;
-    
-    /**
-     * Should MissingDependencyExceptions be rethrown? If not,
-     * then the dependency is added to the scheduler, and
-     * the visitor continues.
-     */
-    protected boolean rethrowMissingDependencies = false;
+public class ContextVisitor extends ErrorHandlingVisitor {
+	protected ContextVisitor outer;
 
-    /** The current context of this visitor. */
-    protected Context context;
+	/**
+	 * Should MissingDependencyExceptions be rethrown? If not, then the
+	 * dependency is added to the scheduler, and the visitor continues.
+	 */
+	protected boolean rethrowMissingDependencies = false;
 
-    public ContextVisitor(Job job, TypeSystem ts, NodeFactory nf) {
-        super(job, ts, nf);
-        this.outer = null;
-        this.context = null;
-    }
+	/** The current context of this visitor. */
+	protected Context context;
 
-    public ContextVisitor rethrowMissingDependencies(boolean rethrow) {
-        if (rethrow == this.rethrowMissingDependencies) {
-            return this;
-        }
-        ContextVisitor cv = (ContextVisitor)this.copy();
-        cv.rethrowMissingDependencies = rethrow;
-        return cv;
-    }
+	public ContextVisitor(Job job, TypeSystem ts, NodeFactory nf) {
+		super(job, ts, nf);
+		this.outer = null;
+		this.context = null;
+	}
 
-    public NodeVisitor begin() {
-        context = ts.createContext();
-        outer = null;
-        return super.begin();
-    }
+	public ContextVisitor rethrowMissingDependencies(boolean rethrow) {
+		if (rethrow == this.rethrowMissingDependencies) {
+			return this;
+		}
+		ContextVisitor cv = (ContextVisitor) this.copy();
+		cv.rethrowMissingDependencies = rethrow;
+		return cv;
+	}
 
-    /** Returns the context for this visitor.
-     *
-     *  @return Returns the context that is currently in use by this visitor.
-     *  @see polyglot.types.Context
-     */
-    public Context context() {
-        return context;
-    }
+	public NodeVisitor begin() {
+		context = ts.createContext();
+		outer = null;
+		return super.begin();
+	}
 
-    /** Returns a new ContextVisitor that is a copy of the current visitor,
-     *  except with an updated context.
-     *
-     *  @param c The new context that is to be used.
-     *  @return Returns a copy of this visitor with the new context 
-     *  <code>c</code>.
-     */
-    public ContextVisitor context(Context c) {
-        ContextVisitor v = (ContextVisitor) this.copy();
-        v.context = c;
-        return v;
-    }
+	/**
+	 * Returns the context for this visitor.
+	 * 
+	 * @return Returns the context that is currently in use by this visitor.
+	 * @see polyglot.types.Context
+	 */
+	public Context context() {
+		return context;
+	}
 
-    /**
-     * Returns a new context based on the current context, the Node current 
-     * being visited (<code>parent</code>), and the Node that is being 
-     * entered (<code>n</code>).  This new context is to be used
-     * for visiting <code>n</code>. 
-     *
-     * @return The new context after entering Node <code>n</code>.
-     */
-    protected Context enterScope(Node parent, Node n) {
-        if (parent != null) {
-            return parent.del().enterChildScope(n, context);
-        }
-        // no parent node yet.
-        return n.del().enterScope(context);
-    }
-   
-    /**
-     * Imperatively update the context with declarations to be added after
-     * visiting the node.
-     */
-    protected void addDecls(Node n) {
-        n.del().addDecls(context);
-    }
-    
-    public final NodeVisitor enter(Node n) {
-    	throw new InternalCompilerError("Cannot call enter(Node n) on a ContextVisitor; use enter(Node parent, Node n) instead");
-    }
-    
-    public final NodeVisitor enter(Node parent, Node n) {
-        if (Report.should_report(Report.visit, 5))
-	    Report.report(5, "enter(" + n + ")");
+	/**
+	 * Returns a new ContextVisitor that is a copy of the current visitor,
+	 * except with an updated context.
+	 * 
+	 * @param c
+	 *            The new context that is to be used.
+	 * @return Returns a copy of this visitor with the new context
+	 *         <code>c</code>.
+	 */
+	public ContextVisitor context(Context c) {
+		ContextVisitor v = (ContextVisitor) this.copy();
+		v.context = c;
+		return v;
+	}
 
-        if (prune) {
-            return new PruningVisitor();
-        }
+	/**
+	 * Returns a new context based on the current context, the Node current
+	 * being visited (<code>parent</code>), and the Node that is being entered (
+	 * <code>n</code>). This new context is to be used for visiting
+	 * <code>n</code>.
+	 * 
+	 * @return The new context after entering Node <code>n</code>.
+	 */
+	protected Context enterScope(Node parent, Node n) {
+		if (parent != null) {
+			return parent.del().enterChildScope(n, context);
+		}
+		// no parent node yet.
+		return n.del().enterScope(context);
+	}
 
-        try {
-            ContextVisitor v = this;
-            
-            Context c = this.enterScope(parent, n);
-            
-            if (c != this.context) {
-                v = (ContextVisitor) this.copy();
-                v.context = c;
-                v.outer = this;
-                v.error = false;
-            }
-            
-            return v.superEnter(parent, n);
-        }
-        catch (MissingDependencyException e) {
-            if (Report.should_report(Report.frontend, 3))
-                e.printStackTrace();
-            Scheduler scheduler = job.extensionInfo().scheduler();
-            Goal g = scheduler.currentGoal();
-            scheduler.addDependencyAndEnqueue(g, e.goal(), e.prerequisite());
-            g.setUnreachableThisRun();
+	/**
+	 * Imperatively update the context with declarations to be added after
+	 * visiting the node.
+	 */
+	protected void addDecls(Node n) {
+		n.del().addDecls(context);
+	}
 
-            // The context for visiting the children
-            // isn't set up correctly, so prune the traversal here.
-            // The context might also be incorrect for later siblings
-            // of this node, so set a flag to prune until the scope
-            // is popped.
-            this.prune = true;            
-            if (this.rethrowMissingDependencies) {
-                throw e;
-            }
-            return new PruningVisitor();
-        }
-    }
+	public final NodeVisitor enter(Node n) {
+		throw new InternalCompilerError(
+				"Cannot call enter(Node n) on a ContextVisitor; use enter(Node parent, Node n) instead");
+	}
 
-    protected boolean prune;
+	public final NodeVisitor enter(Node parent, Node n) {
+		if (Report.should_report(Report.visit, 5))
+			Report.report(5, "enter(" + n + ")");
 
-    public NodeVisitor superEnter(Node parent, Node n) {
-        return super.enter(parent, n);
-    }
+		if (prune) {
+			return new PruningVisitor();
+		}
 
-    public final Node leave(Node parent, Node old, Node n, NodeVisitor v) {
-        // If the traversal was pruned, just return n since leaveCall
-        // might expect a ContextVisitor, not a PruningVisitor.
-        if (v instanceof PruningVisitor || prune) {
-            return n;
-        }
+		try {
+			ContextVisitor v = this;
 
-        try {
-            Node m = super.leave(parent, old, n, v);
-            this.addDecls(m);
-            return m;
-        }
-        catch (MissingDependencyException e) {
-            if (Report.should_report(Report.frontend, 3))
-                e.printStackTrace();
-            Scheduler scheduler = job.extensionInfo().scheduler();
-            Goal g = scheduler.currentGoal();
-            scheduler.addDependencyAndEnqueue(g, e.goal(), e.prerequisite());
-            g.setUnreachableThisRun();
-            if (this.rethrowMissingDependencies) {
-                throw e;
-            }
-        }
-        return n;
-    }
+			Context c = this.enterScope(parent, n);
+
+			if (c != this.context) {
+				v = (ContextVisitor) this.copy();
+				v.context = c;
+				v.outer = this;
+				v.error = false;
+			}
+
+			return v.superEnter(parent, n);
+		} catch (MissingDependencyException e) {
+			if (Report.should_report(Report.frontend, 3))
+				e.printStackTrace();
+			Scheduler scheduler = job.extensionInfo().scheduler();
+			Goal g = scheduler.currentGoal();
+			scheduler.addDependencyAndEnqueue(g, e.goal(), e.prerequisite());
+			g.setUnreachableThisRun();
+
+			// The context for visiting the children
+			// isn't set up correctly, so prune the traversal here.
+			// The context might also be incorrect for later siblings
+			// of this node, so set a flag to prune until the scope
+			// is popped.
+			this.prune = true;
+			if (this.rethrowMissingDependencies) {
+				throw e;
+			}
+			return new PruningVisitor();
+		}
+	}
+
+	protected boolean prune;
+
+	public NodeVisitor superEnter(Node parent, Node n) {
+		return super.enter(parent, n);
+	}
+
+	public final Node leave(Node parent, Node old, Node n, NodeVisitor v) {
+		// If the traversal was pruned, just return n since leaveCall
+		// might expect a ContextVisitor, not a PruningVisitor.
+		if (v instanceof PruningVisitor || prune) {
+			return n;
+		}
+
+		try {
+			Node m = super.leave(parent, old, n, v);
+			this.addDecls(m);
+			return m;
+		} catch (MissingDependencyException e) {
+			if (Report.should_report(Report.frontend, 3))
+				e.printStackTrace();
+			Scheduler scheduler = job.extensionInfo().scheduler();
+			Goal g = scheduler.currentGoal();
+			scheduler.addDependencyAndEnqueue(g, e.goal(), e.prerequisite());
+			g.setUnreachableThisRun();
+			if (this.rethrowMissingDependencies) {
+				throw e;
+			}
+		}
+		return n;
+	}
 }

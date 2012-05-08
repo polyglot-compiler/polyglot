@@ -34,25 +34,26 @@ import polyglot.types.TypeSystem;
 import polyglot.visit.ConstantChecker;
 
 public class ConstantsChecked extends VisitorGoal {
-    public static Goal create(Scheduler scheduler, Job job, TypeSystem ts, NodeFactory nf) {
-        return scheduler.internGoal(new ConstantsChecked(job, ts, nf));
-    }
+	public static Goal create(Scheduler scheduler, Job job, TypeSystem ts,
+			NodeFactory nf) {
+		return scheduler.internGoal(new ConstantsChecked(job, ts, nf));
+	}
 
-    protected ConstantsChecked(Job job, TypeSystem ts, NodeFactory nf) {
-        super(job, new ConstantChecker(job, ts, nf));
-    }
+	protected ConstantsChecked(Job job, TypeSystem ts, NodeFactory nf) {
+		super(job, new ConstantChecker(job, ts, nf));
+	}
 
-    public Collection prerequisiteGoals(Scheduler scheduler) {
-        List l = new ArrayList();
-        l.add(scheduler.Disambiguated(job));
-        l.addAll(super.prerequisiteGoals(scheduler));
-        return l;
-    }
+	public Collection prerequisiteGoals(Scheduler scheduler) {
+		List l = new ArrayList();
+		l.add(scheduler.Disambiguated(job));
+		l.addAll(super.prerequisiteGoals(scheduler));
+		return l;
+	}
 
-    public Collection corequisiteGoals(Scheduler scheduler) {
-        List l = new ArrayList();
-        l.add(scheduler.TypeChecked(job));
-        l.addAll(super.corequisiteGoals(scheduler));
-        return l;
-    }
+	public Collection corequisiteGoals(Scheduler scheduler) {
+		List l = new ArrayList();
+		l.add(scheduler.TypeChecked(job));
+		l.addAll(super.corequisiteGoals(scheduler));
+		return l;
+	}
 }

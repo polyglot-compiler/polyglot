@@ -37,25 +37,26 @@ import polyglot.visit.TypeChecker;
  * a <code>TypeChecked</code> is reached after typechecking.
  */
 public class TypeChecked extends VisitorGoal {
-    public static Goal create(Scheduler scheduler, Job job, TypeSystem ts, NodeFactory nf) {
-        return scheduler.internGoal(new TypeChecked(job, ts, nf));
-    }
+	public static Goal create(Scheduler scheduler, Job job, TypeSystem ts,
+			NodeFactory nf) {
+		return scheduler.internGoal(new TypeChecked(job, ts, nf));
+	}
 
-    protected TypeChecked(Job job, TypeSystem ts, NodeFactory nf) {
-        super(job, new TypeChecker(job, ts, nf));
-    }
+	protected TypeChecked(Job job, TypeSystem ts, NodeFactory nf) {
+		super(job, new TypeChecker(job, ts, nf));
+	}
 
-    public Collection prerequisiteGoals(Scheduler scheduler) {
-        List l = new ArrayList();
-        l.add(scheduler.Disambiguated(job));
-        l.addAll(super.prerequisiteGoals(scheduler));
-        return l;
-    }
+	public Collection prerequisiteGoals(Scheduler scheduler) {
+		List l = new ArrayList();
+		l.add(scheduler.Disambiguated(job));
+		l.addAll(super.prerequisiteGoals(scheduler));
+		return l;
+	}
 
-//    public Collection corequisiteGoals(Scheduler scheduler) {
-//        List l = new ArrayList();
-//        l.add(scheduler.ConstantsChecked(job));
-//        l.addAll(super.corequisiteGoals(scheduler));
-//        return l;
-//    }
+	// public Collection corequisiteGoals(Scheduler scheduler) {
+	// List l = new ArrayList();
+	// l.add(scheduler.ConstantsChecked(job));
+	// l.addAll(super.corequisiteGoals(scheduler));
+	// return l;
+	// }
 }

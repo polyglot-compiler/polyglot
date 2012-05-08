@@ -27,28 +27,28 @@ package polyglot.ast;
 
 import polyglot.types.LocalInstance;
 
-/** 
+/**
  * A local variable expression.
  */
-public interface Local extends NamedVariable
-{
-    /** Get the name of the local variable. */
-    Id id();
-    
-    /** Set the name of the local variable. */
-    Local id(Id name);
+public interface Local extends NamedVariable {
+	/** Get the name of the local variable. */
+	Id id();
 
-    /** Get the name of the local variable. */
-    String name();
+	/** Set the name of the local variable. */
+	Local id(Id name);
 
-    /** Set the name of the local variable. */
-    Local name(String name);
+	/** Get the name of the local variable. */
+	String name();
 
-    /**
-     * Get the type object for the local.  This field may not be valid until
-     * after type checking.
-     */
-    LocalInstance localInstance();
-    /** Set the type object for the local. */
-    Local localInstance(LocalInstance li);
+	/** Set the name of the local variable. */
+	Local name(String name);
+
+	/**
+	 * Get the type object for the local. This field may not be valid until
+	 * after type checking.
+	 */
+	LocalInstance localInstance();
+
+	/** Set the type object for the local. */
+	Local localInstance(LocalInstance li);
 }

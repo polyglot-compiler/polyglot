@@ -36,37 +36,37 @@ import polyglot.util.Position;
  * @author nystrom
  */
 public class UnavailableTypeException extends SchedulerException {
-    protected Job job;
-    protected Position position;
-    
-    /**
-     * @param job
-     * @param fullName
-     */
-    public UnavailableTypeException(Job job, String fullName) {
-        this(job, fullName, null);
-    }
+	protected Job job;
+	protected Position position;
 
-    /**
-     * @param job
-     * @param fullName
-     * @param position
-     */
-    public UnavailableTypeException(Job job, String fullName, Position position) {
-        super(fullName);
-        this.job = job;
-        this.position = position;
-    }
-    
-    public UnavailableTypeException(ParsedTypeObject ct) {
-        this(ct.job(), ct.fullName(), ct.position());
-    }
-    
-    public Job job() {
-        return job;
-    }
-    
-    public Position position() {
-        return position;
-    }
+	/**
+	 * @param job
+	 * @param fullName
+	 */
+	public UnavailableTypeException(Job job, String fullName) {
+		this(job, fullName, null);
+	}
+
+	/**
+	 * @param job
+	 * @param fullName
+	 * @param position
+	 */
+	public UnavailableTypeException(Job job, String fullName, Position position) {
+		super(fullName);
+		this.job = job;
+		this.position = position;
+	}
+
+	public UnavailableTypeException(ParsedTypeObject ct) {
+		this(ct.job(), ct.fullName(), ct.position());
+	}
+
+	public Job job() {
+		return job;
+	}
+
+	public Position position() {
+		return position;
+	}
 }

@@ -2,29 +2,29 @@ package ppg.atoms;
 
 import ppg.util.*;
 
-public class PrecedenceModifier
-    extends GrammarPart
-    implements Equatable
-{
-    protected String terminalName;
-    public String getTerminalName() { return terminalName; }
+public class PrecedenceModifier extends GrammarPart implements Equatable {
+	protected String terminalName;
 
-    public PrecedenceModifier(String terminalName) {
-        this.terminalName = terminalName;
-    }
+	public String getTerminalName() {
+		return terminalName;
+	}
 
-    public Object clone() {
-        return new PrecedenceModifier(getTerminalName());
-    }
+	public PrecedenceModifier(String terminalName) {
+		this.terminalName = terminalName;
+	}
 
-    public void unparse(CodeWriter cw) {
-        cw.begin(0);
-        cw.write("%prec ");
-        cw.write(getTerminalName());
-        cw.end();
-    }
+	public Object clone() {
+		return new PrecedenceModifier(getTerminalName());
+	}
 
-    public String toString() {
-        return "%prec " + getTerminalName();
-    }
+	public void unparse(CodeWriter cw) {
+		cw.begin(0);
+		cw.write("%prec ");
+		cw.write(getTerminalName());
+		cw.end();
+	}
+
+	public String toString() {
+		return "%prec " + getTerminalName();
+	}
 }

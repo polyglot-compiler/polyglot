@@ -25,17 +25,15 @@
 
 package polyglot.frontend;
 
-
 /**
- * Thrown during when the compiler tries to run a pass that is
- * already running.
+ * Thrown during when the compiler tries to run a pass that is already running.
  */
 public class CyclicDependencyException extends Exception {
-    public CyclicDependencyException() {
-        super();
-    }
+	public CyclicDependencyException() {
+		super();
+	}
 
-    public CyclicDependencyException(String m) {
-        super(m);
-    }
+	public CyclicDependencyException(String m) {
+		super(m);
+	}
 }

@@ -54,7 +54,7 @@ public class ExtFileManager implements FileManager {
 	protected final List<Location> locations;
 	/** A cache for package look ups */
 	protected final Map<String, Boolean> packageCache;
-	/** A cache for the packages that don't exist */
+	/** A cache for the class files that don't exist */
 	protected final Set<String> nocache;
 
 	protected static final int BUF_SIZE = 1024 * 8;

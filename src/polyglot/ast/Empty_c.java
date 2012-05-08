@@ -32,30 +32,30 @@ import java.util.*;
 /**
  * <code>Empty</code> is the class for a empty statement <code>(;)</code>.
  */
-public class Empty_c extends Stmt_c implements Empty
-{
-    public Empty_c(Position pos) {
-	super(pos);
-    }
+public class Empty_c extends Stmt_c implements Empty {
+	public Empty_c(Position pos) {
+		super(pos);
+	}
 
-    /** Write the statement to an output file. */
-    public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
-	w.write(";");
-    }
+	/** Write the statement to an output file. */
+	public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
+		w.write(";");
+	}
 
-    public Term firstChild() {
-        return null;
-    }
+	public Term firstChild() {
+		return null;
+	}
 
-    public List acceptCFG(CFGBuilder v, List succs) {
-        return succs;
-    }
+	public List acceptCFG(CFGBuilder v, List succs) {
+		return succs;
+	}
 
-    public String toString() {
-	return ";";
-    }
-    public Node copy(NodeFactory nf) {
-        return nf.Empty(this.position);
-    }
+	public String toString() {
+		return ";";
+	}
+
+	public Node copy(NodeFactory nf) {
+		return nf.Empty(this.position);
+	}
 
 }

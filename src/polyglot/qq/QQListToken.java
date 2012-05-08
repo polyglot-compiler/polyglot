@@ -33,18 +33,18 @@ import java.util.List;
 
 /** A token class for int literals. */
 public class QQListToken extends Token {
-    protected List list;
+	protected List list;
 
-  public QQListToken(Position position, List list, int sym) {
-      super(position, sym);
-      this.list = list;
-  }
+	public QQListToken(Position position, List list, int sym) {
+		super(position, sym);
+		this.list = list;
+	}
 
-  public List list() {
-      return list;
-  }
+	public List list() {
+		return list;
+	}
 
-  public String toString() {
-      return "qq(" + list + ")";
-  }
+	public String toString() {
+		return "qq(" + list + ")";
+	}
 }

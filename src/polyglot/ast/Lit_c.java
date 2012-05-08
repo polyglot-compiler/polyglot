@@ -32,32 +32,31 @@ import java.util.List;
 /**
  * <code>Lit</code> represents any Java literal.
  */
-public abstract class Lit_c extends Expr_c implements Lit
-{
-    public Lit_c(Position pos) {
-	super(pos);
-    }
+public abstract class Lit_c extends Expr_c implements Lit {
+	public Lit_c(Position pos) {
+		super(pos);
+	}
 
-    /** Get the precedence of the expression. */
-    public Precedence precedence() {
-        return Precedence.LITERAL;
-    }
+	/** Get the precedence of the expression. */
+	public Precedence precedence() {
+		return Precedence.LITERAL;
+	}
 
-    public Term firstChild() {
-        return null;
-    }
+	public Term firstChild() {
+		return null;
+	}
 
-    public List acceptCFG(CFGBuilder v, List succs) {
-        return succs;
-    }
+	public List acceptCFG(CFGBuilder v, List succs) {
+		return succs;
+	}
 
-    public boolean constantValueSet() {
-        return true;
-    }
+	public boolean constantValueSet() {
+		return true;
+	}
 
-    public boolean isConstant() {
-	return true;
-    }
-    
-    public abstract Object constantValue();
+	public boolean isConstant() {
+		return true;
+	}
+
+	public abstract Object constantValue();
 }

@@ -42,55 +42,53 @@ import polyglot.types.Package;
 import polyglot.util.*;
 
 /** Visitor which traverses the AST constructing type objects. */
-public class InitImportsVisitor extends ErrorHandlingVisitor
-{
-    protected ImportTable importTable;
-    
-    public InitImportsVisitor(Job job, TypeSystem ts, NodeFactory nf) {
-        super(job, ts, nf);
-    }
-    
-    public NodeVisitor enterCall(Node n) throws SemanticException {
-        if (n instanceof SourceFile) {
-            SourceFile sf = (SourceFile) n;
-            
-            PackageNode pn = sf.package_();
-            
-            ImportTable it;
-            
-            if (pn != null) {
-                it = ts.importTable(sf.source().getName(), pn.package_());
-            }
-            else {
-                it = ts.importTable(sf.source().getName(), null);
-            }
-            
-            InitImportsVisitor v = (InitImportsVisitor) copy();
-            v.importTable = it;
-            return v;
-        }
-        
-        return this;
-    }
-    
-    public Node leaveCall(Node old, Node n, NodeVisitor v) throws SemanticException {
-        if (n instanceof SourceFile) {
-            SourceFile sf = (SourceFile) n;
-            InitImportsVisitor v_ = (InitImportsVisitor) v;
-            ImportTable it = v_.importTable;
-            return sf.importTable(it);
-        }
-        if (n instanceof Import) {
-            Import im = (Import) n;
-            
-            if (im.kind() == Import.CLASS) {
-                this.importTable.addClassImport(im.name(), im.position());
-            }
-            else if (im.kind() == Import.PACKAGE) {
-                this.importTable.addPackageImport(im.name(), im.position());
-            }
-        }
+public class InitImportsVisitor extends ErrorHandlingVisitor {
+	protected ImportTable importTable;
 
-        return n;
-    }
+	public InitImportsVisitor(Job job, TypeSystem ts, NodeFactory nf) {
+		super(job, ts, nf);
+	}
+
+	public NodeVisitor enterCall(Node n) throws SemanticException {
+		if (n instanceof SourceFile) {
+			SourceFile sf = (SourceFile) n;
+
+			PackageNode pn = sf.package_();
+
+			ImportTable it;
+
+			if (pn != null) {
+				it = ts.importTable(sf.source().getName(), pn.package_());
+			} else {
+				it = ts.importTable(sf.source().getName(), null);
+			}
+
+			InitImportsVisitor v = (InitImportsVisitor) copy();
+			v.importTable = it;
+			return v;
+		}
+
+		return this;
+	}
+
+	public Node leaveCall(Node old, Node n, NodeVisitor v)
+			throws SemanticException {
+		if (n instanceof SourceFile) {
+			SourceFile sf = (SourceFile) n;
+			InitImportsVisitor v_ = (InitImportsVisitor) v;
+			ImportTable it = v_.importTable;
+			return sf.importTable(it);
+		}
+		if (n instanceof Import) {
+			Import im = (Import) n;
+
+			if (im.kind() == Import.CLASS) {
+				this.importTable.addClassImport(im.name(), im.position());
+			} else if (im.kind() == Import.PACKAGE) {
+				this.importTable.addPackageImport(im.name(), im.position());
+			}
+		}
+
+		return n;
+	}
 }

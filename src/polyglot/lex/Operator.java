@@ -30,11 +30,14 @@ import polyglot.util.Position;
 
 /** A token class for operators. */
 public class Operator extends Token {
-    protected String which;
-  public Operator(Position position, String which, int sym) {
-      super(position, sym);
-      this.which = which;
-  }
+	protected String which;
 
-  public String toString() { return "operator " + which; }
+	public Operator(Position position, String which, int sym) {
+		super(position, sym);
+		this.which = which;
+	}
+
+	public String toString() {
+		return "operator " + which;
+	}
 }

@@ -12,41 +12,43 @@ import polyglot.types.ParsedClassType;
 
 /**
  * An immutable representation of a Java language extended <code>for</code>
- * statement.  Contains a statement to be executed and an expression
- * to be tested indicating whether to reexecute the statement.
+ * statement. Contains a statement to be executed and an expression to be tested
+ * indicating whether to reexecute the statement.
  */
-public interface EnumConstantDecl extends ClassMember
-{    
-    /** get args */
-    List args();
+public interface EnumConstantDecl extends ClassMember {
+	/** get args */
+	List args();
 
-    /** set args */
-    EnumConstantDecl args(List args);
+	/** set args */
+	EnumConstantDecl args(List args);
 
-    /** set name */
-    EnumConstantDecl name(Id name);
+	/** set name */
+	EnumConstantDecl name(Id name);
 
-    /** get name */
-    Id name();
-    
-    /** set body */
-    EnumConstantDecl body(ClassBody body);
+	/** get name */
+	Id name();
 
-    /** get body */
-    ClassBody body();
+	/** set body */
+	EnumConstantDecl body(ClassBody body);
 
-    ParsedClassType type();
-    EnumConstantDecl type(ParsedClassType pct);
+	/** get body */
+	ClassBody body();
 
-    ConstructorInstance constructorInstance();
-    EnumConstantDecl constructorInstance(ConstructorInstance ci);
-    
-    EnumInstance enumInstance();
+	ParsedClassType type();
 
-    EnumConstantDecl enumInstance(EnumInstance ei);
+	EnumConstantDecl type(ParsedClassType pct);
 
-    Flags flags();
+	ConstructorInstance constructorInstance();
+
+	EnumConstantDecl constructorInstance(ConstructorInstance ci);
+
+	EnumInstance enumInstance();
+
+	EnumConstantDecl enumInstance(EnumInstance ei);
+
+	Flags flags();
 
 	long ordinal();
+
 	EnumConstantDecl ordinal(long ordinal);
 }

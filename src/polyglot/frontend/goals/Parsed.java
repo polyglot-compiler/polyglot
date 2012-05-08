@@ -28,16 +28,18 @@ package polyglot.frontend.goals;
 import polyglot.frontend.*;
 
 /**
- * The <code>Parsed</code> is reached when a type is parsed. 
+ * The <code>Parsed</code> is reached when a type is parsed.
  */
 public class Parsed extends SourceFileGoal {
-    public static Goal create(Scheduler scheduler, Job job) {
-        return scheduler.internGoal(new Parsed(job));
-    }
+	public static Goal create(Scheduler scheduler, Job job) {
+		return scheduler.internGoal(new Parsed(job));
+	}
 
-    protected Parsed(Job job) { super(job); }
-    
-    public Pass createPass(ExtensionInfo extInfo) {
-        return new ParserPass(extInfo.compiler(), this);
-    }
+	protected Parsed(Job job) {
+		super(job);
+	}
+
+	public Pass createPass(ExtensionInfo extInfo) {
+		return new ParserPass(extInfo.compiler(), this);
+	}
 }

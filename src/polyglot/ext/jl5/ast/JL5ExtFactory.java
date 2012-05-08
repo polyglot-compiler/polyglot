@@ -5,14 +5,14 @@ import polyglot.ast.ExtFactory;
 
 public interface JL5ExtFactory extends ExtFactory {
 
-    Ext extEnumDecl();
+	Ext extEnumDecl();
 
-    Ext extExtendedFor();
+	Ext extExtendedFor();
 
-    Ext extEnumConstantDecl();
+	Ext extEnumConstantDecl();
 
-    Ext extEnumConstant();
+	Ext extEnumConstant();
 
-    Ext extParamTypeNode();
+	Ext extParamTypeNode();
 
 }

@@ -10,29 +10,35 @@ import polyglot.types.ParsedClassType;
  * type parameters. In some ways it corresponds to a raw type. 
  */
 public interface JL5ParsedClassType extends ParsedClassType, JL5ClassType {
-    /**
-     * Get the pclass for this class. The pclass is used by the param type system to keep
-     * track of instantiated types.
-     */
-    PClass pclass();
-    void setPClass(PClass pc);
-    void setTypeVariables(List<TypeVariable> typeVars);
-    List<TypeVariable> typeVariables();
+	/**
+	 * Get the pclass for this class. The pclass is used by the param type
+	 * system to keep track of instantiated types.
+	 */
+	PClass pclass();
 
-    void addEnumConstant(EnumInstance ei);
-    List enumConstants();
-    EnumInstance enumConstantNamed(String name);
-    
+	void setPClass(PClass pc);
+
+	void setTypeVariables(List<TypeVariable> typeVars);
+
+	List<TypeVariable> typeVariables();
+
+	void addEnumConstant(EnumInstance ei);
+
+	List enumConstants();
+
+	EnumInstance enumConstantNamed(String name);
+
 	// find methods with compatible name and formals as the given one
-    List methods(JL5MethodInstance mi);
-    
-//    boolean wasGeneric();
-    
-    /**
-     * Returns a subst suitable for the erased type: the subst
-     * maps any type variables to their erasure. Will return null
-     * if the substitution is empty.
-     * @return
-     */
-    JL5Subst erasureSubst();
+	List methods(JL5MethodInstance mi);
+
+	// boolean wasGeneric();
+
+	/**
+	 * Returns a subst suitable for the erased type: the subst maps any type
+	 * variables to their erasure. Will return null if the substitution is
+	 * empty.
+	 * 
+	 * @return
+	 */
+	JL5Subst erasureSubst();
 }

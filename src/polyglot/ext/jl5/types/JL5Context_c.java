@@ -37,11 +37,13 @@ public class JL5Context_c extends Context_c implements JL5Context {
 			// might be static
 			if (importTable() != null) {
 				JL5ImportTable jit = (JL5ImportTable) importTable();
-				for (Iterator it = jit.singleStaticImports().iterator(); it.hasNext();) {
+				for (Iterator it = jit.singleStaticImports().iterator(); it
+						.hasNext();) {
 					String next = (String) it.next();
 					String id = StringUtil.getShortNameComponent(next);
 					if (name.equals(id)) {
-						Named nt = ts.forName(StringUtil.getPackageComponent(next));
+						Named nt = ts.forName(StringUtil
+								.getPackageComponent(next));
 						if (nt instanceof Type) {
 							Type t = (Type) nt;
 							try {
@@ -55,7 +57,8 @@ public class JL5Context_c extends Context_c implements JL5Context {
 					}
 				}
 				if (vi == null) {
-					for (Iterator it = jit.staticOnDemandImports().iterator(); it.hasNext();) {
+					for (Iterator it = jit.staticOnDemandImports().iterator(); it
+							.hasNext();) {
 						String next = (String) it.next();
 						Named nt = ts.forName(next);
 						if (nt instanceof Type) {
@@ -133,30 +136,29 @@ public class JL5Context_c extends Context_c implements JL5Context {
 	public Type switchType() {
 		return switchType;
 	}
-	
-    @Override
-    public MethodInstance findMethod(String name, List argTypes) throws SemanticException {
-        try {
-            return super.findMethod(name, argTypes);
-        }
-        catch (SemanticException e) {
-            // couldn't find the method.
-            // try static imports.
-            JL5ImportTable it = (JL5ImportTable)this.importTable();
-            if (it != null && this.currentClass() != null) {
-                ReferenceType rt = it.findTypeContainingMethodOrField(name);
-                if (rt != null) {
-                    try {
-                        return ts.findMethod(rt, name, argTypes, this.currentClass());
-                    }
-                    catch (SemanticException f) {
-                        // ignore this exception and throw the previous one.
-                    }
-                }
-            }
-            throw e;
-        }
-    }
 
+	@Override
+	public MethodInstance findMethod(String name, List argTypes)
+			throws SemanticException {
+		try {
+			return super.findMethod(name, argTypes);
+		} catch (SemanticException e) {
+			// couldn't find the method.
+			// try static imports.
+			JL5ImportTable it = (JL5ImportTable) this.importTable();
+			if (it != null && this.currentClass() != null) {
+				ReferenceType rt = it.findTypeContainingMethodOrField(name);
+				if (rt != null) {
+					try {
+						return ts.findMethod(rt, name, argTypes,
+								this.currentClass());
+					} catch (SemanticException f) {
+						// ignore this exception and throw the previous one.
+					}
+				}
+			}
+			throw e;
+		}
+	}
 
 }

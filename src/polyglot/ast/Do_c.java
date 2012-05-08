@@ -31,128 +31,125 @@ import polyglot.util.*;
 import java.util.*;
 
 /**
- * A immutable representation of a Java language <code>do</code> statement. 
- * It contains a statement to be executed and an expression to be tested 
- * indicating whether to reexecute the statement.
- */ 
-public class Do_c extends Loop_c implements Do
-{
-    protected Stmt body;
-    protected Expr cond;
+ * A immutable representation of a Java language <code>do</code> statement. It
+ * contains a statement to be executed and an expression to be tested indicating
+ * whether to reexecute the statement.
+ */
+public class Do_c extends Loop_c implements Do {
+	protected Stmt body;
+	protected Expr cond;
 
-    public Do_c(Position pos, Stmt body, Expr cond) {
-	super(pos);
-	assert(body != null && cond != null);
-	this.body = body;
-	this.cond = cond;
-    }
-
-    /** Get the body of the statement. */
-    public Stmt body() {
-	return this.body;
-    }
-
-    /** Set the body of the statement. */
-    public Do body(Stmt body) {
-	Do_c n = (Do_c) copy();
-	n.body = body;
-	return n;
-    }
-
-    /** Get the conditional of the statement. */
-    public Expr cond() {
-	return this.cond;
-    }
-
-    /** Set the conditional of the statement. */
-    public Do cond(Expr cond) {
-	Do_c n = (Do_c) copy();
-	n.cond = cond;
-	return n;
-    }
-
-    /** Reconstruct the statement. */
-    protected Do_c reconstruct(Stmt body, Expr cond) {
-	if (body != this.body || cond != this.cond) {
-	    Do_c n = (Do_c) copy();
-	    n.body = body;
-	    n.cond = cond;
-	    return n;
+	public Do_c(Position pos, Stmt body, Expr cond) {
+		super(pos);
+		assert (body != null && cond != null);
+		this.body = body;
+		this.cond = cond;
 	}
 
-	return this;
-    }
-
-    /** Visit the children of the statement. */
-    public Node visitChildren(NodeVisitor v) {
-        Node body = visitChild(this.body, v);
-        if (body instanceof NodeList) body = ((NodeList) body).toBlock();
-	Expr cond = (Expr) visitChild(this.cond, v);
-	return reconstruct((Stmt) body, cond);
-    }
-
-    /** Type check the statement. */
-    public Node typeCheck(TypeChecker tc) throws SemanticException
-    {
-        TypeSystem ts = tc.typeSystem();
-
-        if (! ts.typeEquals(cond.type(), ts.Boolean())) {
-	    throw new SemanticException(
-		"Condition of do statement must have boolean type.",
-		cond.position());
+	/** Get the body of the statement. */
+	public Stmt body() {
+		return this.body;
 	}
 
-	return this;
-    }
+	/** Set the body of the statement. */
+	public Do body(Stmt body) {
+		Do_c n = (Do_c) copy();
+		n.body = body;
+		return n;
+	}
 
-    public Type childExpectedType(Expr child, AscriptionVisitor av) {
-        TypeSystem ts = av.typeSystem();
+	/** Get the conditional of the statement. */
+	public Expr cond() {
+		return this.cond;
+	}
 
-        if (child == cond) {
-            return ts.Boolean();
-        }
+	/** Set the conditional of the statement. */
+	public Do cond(Expr cond) {
+		Do_c n = (Do_c) copy();
+		n.cond = cond;
+		return n;
+	}
 
-        return child.type();
-    }
+	/** Reconstruct the statement. */
+	protected Do_c reconstruct(Stmt body, Expr cond) {
+		if (body != this.body || cond != this.cond) {
+			Do_c n = (Do_c) copy();
+			n.body = body;
+			n.cond = cond;
+			return n;
+		}
 
-    public String toString() {
-	return "do { ... } while (" + cond + ")";
-    }
+		return this;
+	}
 
-    /** Write the statement to an output file. */
-    public void prettyPrint(CodeWriter w, PrettyPrinter tr)
-    {
-	w.write("do ");
-	printSubStmt(body, w, tr);
-	w.write("while(");
-	printBlock(cond, w, tr);
-	w.write("); ");
-    }
+	/** Visit the children of the statement. */
+	public Node visitChildren(NodeVisitor v) {
+		Node body = visitChild(this.body, v);
+		if (body instanceof NodeList)
+			body = ((NodeList) body).toBlock();
+		Expr cond = (Expr) visitChild(this.cond, v);
+		return reconstruct((Stmt) body, cond);
+	}
 
+	/** Type check the statement. */
+	public Node typeCheck(TypeChecker tc) throws SemanticException {
+		TypeSystem ts = tc.typeSystem();
 
-    public Term firstChild() {
-        return body;
-    }
+		if (!ts.typeEquals(cond.type(), ts.Boolean())) {
+			throw new SemanticException(
+					"Condition of do statement must have boolean type.",
+					cond.position());
+		}
 
-    public List acceptCFG(CFGBuilder v, List succs) {
-        v.push(this).visitCFG(body, cond, ENTRY);
+		return this;
+	}
 
-        if (condIsConstantTrue()) {
-            v.visitCFG(cond, body, ENTRY);
-        }
-        else {
-            v.visitCFG(cond, FlowGraph.EDGE_KEY_TRUE, body, ENTRY, 
-                             FlowGraph.EDGE_KEY_FALSE, this, EXIT);
-        }
+	public Type childExpectedType(Expr child, AscriptionVisitor av) {
+		TypeSystem ts = av.typeSystem();
 
-        return succs;
-    }
+		if (child == cond) {
+			return ts.Boolean();
+		}
 
-    public Term continueTarget() {
-        return cond;
-    }
-    public Node copy(NodeFactory nf) {
-        return nf.Do(this.position, this.body, this.cond);
-    }
+		return child.type();
+	}
+
+	public String toString() {
+		return "do { ... } while (" + cond + ")";
+	}
+
+	/** Write the statement to an output file. */
+	public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
+		w.write("do ");
+		printSubStmt(body, w, tr);
+		w.write("while(");
+		printBlock(cond, w, tr);
+		w.write("); ");
+	}
+
+	public Term firstChild() {
+		return body;
+	}
+
+	public List acceptCFG(CFGBuilder v, List succs) {
+		v.push(this).visitCFG(body, cond, ENTRY);
+
+		if (condIsConstantTrue()) {
+			v.visitCFG(cond, body, ENTRY);
+		} else {
+			v.visitCFG(cond, FlowGraph.EDGE_KEY_TRUE, body, ENTRY,
+					FlowGraph.EDGE_KEY_FALSE, this, EXIT);
+		}
+
+		return succs;
+	}
+
+	public Term continueTarget() {
+		return cond;
+	}
+
+	public Node copy(NodeFactory nf) {
+		return nf.Do(this.position, this.body, this.cond);
+	}
 
 }

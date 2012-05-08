@@ -35,445 +35,450 @@ import polyglot.util.*;
 import polyglot.visit.*;
 
 /**
- * A <code>FieldDecl</code> is an immutable representation of the declaration
- * of a field of a class.
+ * A <code>FieldDecl</code> is an immutable representation of the declaration of
+ * a field of a class.
  */
 public class FieldDecl_c extends Term_c implements FieldDecl {
-    protected Flags flags;
-    protected TypeNode type;
-    protected Id name;
-    protected Expr init;
-    protected FieldInstance fi;
-    protected InitializerInstance ii;
+	protected Flags flags;
+	protected TypeNode type;
+	protected Id name;
+	protected Expr init;
+	protected FieldInstance fi;
+	protected InitializerInstance ii;
 
-    public FieldDecl_c(Position pos, Flags flags, TypeNode type,
-                       Id name, Expr init)
-    {
-        super(pos);
-        assert(flags != null && type != null && name != null); // init may be null
-        this.flags = flags;
-        this.type = type;
-        this.name = name;
-        this.init = init;
-    }
+	public FieldDecl_c(Position pos, Flags flags, TypeNode type, Id name,
+			Expr init) {
+		super(pos);
+		assert (flags != null && type != null && name != null); // init may be
+																// null
+		this.flags = flags;
+		this.type = type;
+		this.name = name;
+		this.init = init;
+	}
 
-    public boolean isDisambiguated() {
-        return fi != null && fi.isCanonical() && (init == null || (ii != null && ii.isCanonical())) && super.isDisambiguated();
-    }
-    
-    public MemberInstance memberInstance() {
-        return fi;
-    }
+	public boolean isDisambiguated() {
+		return fi != null && fi.isCanonical()
+				&& (init == null || (ii != null && ii.isCanonical()))
+				&& super.isDisambiguated();
+	}
 
-    public VarInstance varInstance() {
-        return fi;
-    }
-    
-    public CodeInstance codeInstance() {
-        return ii;
-    }
+	public MemberInstance memberInstance() {
+		return fi;
+	}
 
-    /** Get the initializer instance of the initializer. */
-    public InitializerInstance initializerInstance() {
-        return ii;
-    }
+	public VarInstance varInstance() {
+		return fi;
+	}
 
-    /** Set the initializer instance of the initializer. */
-    public FieldDecl initializerInstance(InitializerInstance ii) {
-        if (ii == this.ii) return this;
-        FieldDecl_c n = (FieldDecl_c) copy();
-        n.ii = ii;
-        return n;
-    }
+	public CodeInstance codeInstance() {
+		return ii;
+	}
 
-    /** Get the type of the declaration. */
-    public Type declType() {
-        return type.type();
-    }
+	/** Get the initializer instance of the initializer. */
+	public InitializerInstance initializerInstance() {
+		return ii;
+	}
 
-    /** Get the flags of the declaration. */
-    public Flags flags() {
-        return flags;
-    }
+	/** Set the initializer instance of the initializer. */
+	public FieldDecl initializerInstance(InitializerInstance ii) {
+		if (ii == this.ii)
+			return this;
+		FieldDecl_c n = (FieldDecl_c) copy();
+		n.ii = ii;
+		return n;
+	}
 
-    /** Set the flags of the declaration. */
-    public FieldDecl flags(Flags flags) {
-        if (flags.equals(this.flags)) return this;
-        FieldDecl_c n = (FieldDecl_c) copy();
-        n.flags = flags;
-        return n;
-    }
+	/** Get the type of the declaration. */
+	public Type declType() {
+		return type.type();
+	}
 
-    /** Get the type node of the declaration. */
-    public TypeNode type() {
-        return type;
-    }
+	/** Get the flags of the declaration. */
+	public Flags flags() {
+		return flags;
+	}
 
-    /** Set the type of the declaration. */
-    public FieldDecl type(TypeNode type) {
-        FieldDecl_c n = (FieldDecl_c) copy();
-        n.type = type;
-        return n;
-    }
-    
-    /** Get the name of the declaration. */
-    public Id id() {
-        return name;
-    }
-    
-    /** Set the name of the declaration. */
-    public FieldDecl id(Id name) {
-        FieldDecl_c n = (FieldDecl_c) copy();
-        n.name = name;
-        return n;
-    }
+	/** Set the flags of the declaration. */
+	public FieldDecl flags(Flags flags) {
+		if (flags.equals(this.flags))
+			return this;
+		FieldDecl_c n = (FieldDecl_c) copy();
+		n.flags = flags;
+		return n;
+	}
 
-    /** Get the name of the declaration. */
-    public String name() {
-        return name.id();
-    }
+	/** Get the type node of the declaration. */
+	public TypeNode type() {
+		return type;
+	}
 
-    /** Set the name of the declaration. */
-    public FieldDecl name(String name) {
-        return id(this.name.id(name));
-    }
-    
-    public Term codeBody() {
-        return init;
-    }
+	/** Set the type of the declaration. */
+	public FieldDecl type(TypeNode type) {
+		FieldDecl_c n = (FieldDecl_c) copy();
+		n.type = type;
+		return n;
+	}
 
-    /** Get the initializer of the declaration. */
-    public Expr init() {
-        return init;
-    }
+	/** Get the name of the declaration. */
+	public Id id() {
+		return name;
+	}
 
-    /** Set the initializer of the declaration. */
-    public FieldDecl init(Expr init) {
-        FieldDecl_c n = (FieldDecl_c) copy();
-        n.init = init;
-        return n;
-    }
+	/** Set the name of the declaration. */
+	public FieldDecl id(Id name) {
+		FieldDecl_c n = (FieldDecl_c) copy();
+		n.name = name;
+		return n;
+	}
 
-    /** Set the field instance of the declaration. */
-    public FieldDecl fieldInstance(FieldInstance fi) {
-        if (fi == this.fi) return this;
-        FieldDecl_c n = (FieldDecl_c) copy();
-        n.fi = fi;
-        return n;
-    }
+	/** Get the name of the declaration. */
+	public String name() {
+		return name.id();
+	}
 
-    /** Get the field instance of the declaration. */
-    public FieldInstance fieldInstance() {
-        return fi;
-    }
+	/** Set the name of the declaration. */
+	public FieldDecl name(String name) {
+		return id(this.name.id(name));
+	}
 
-    /** Reconstruct the declaration. */
-    protected FieldDecl_c reconstruct(TypeNode type, Id name, Expr init) {
-        if (this.type != type || this.name != name || this.init != init) {
-            FieldDecl_c n = (FieldDecl_c) copy();
-            n.type = type;
-            n.name = name;
-            n.init = init;
-            return n;
-        }
+	public Term codeBody() {
+		return init;
+	}
 
-        return this;
-    }
+	/** Get the initializer of the declaration. */
+	public Expr init() {
+		return init;
+	}
 
-    /** Visit the children of the declaration. */
-    public Node visitChildren(NodeVisitor v) {
-        TypeNode type = (TypeNode) visitChild(this.type, v);
-        Id name = (Id) visitChild(this.name, v);
-        Expr init = (Expr) visitChild(this.init, v);
-        return reconstruct(type, name, init);
-    }
+	/** Set the initializer of the declaration. */
+	public FieldDecl init(Expr init) {
+		FieldDecl_c n = (FieldDecl_c) copy();
+		n.init = init;
+		return n;
+	}
 
-    public NodeVisitor buildTypesEnter(TypeBuilder tb) throws SemanticException {
-        return tb.pushCode();
-    }
+	/** Set the field instance of the declaration. */
+	public FieldDecl fieldInstance(FieldInstance fi) {
+		if (fi == this.fi)
+			return this;
+		FieldDecl_c n = (FieldDecl_c) copy();
+		n.fi = fi;
+		return n;
+	}
 
-    public Node buildTypes(TypeBuilder tb) throws SemanticException {
-        TypeSystem ts = tb.typeSystem();
+	/** Get the field instance of the declaration. */
+	public FieldInstance fieldInstance() {
+		return fi;
+	}
 
-        ParsedClassType ct = tb.currentClass();
+	/** Reconstruct the declaration. */
+	protected FieldDecl_c reconstruct(TypeNode type, Id name, Expr init) {
+		if (this.type != type || this.name != name || this.init != init) {
+			FieldDecl_c n = (FieldDecl_c) copy();
+			n.type = type;
+			n.name = name;
+			n.init = init;
+			return n;
+		}
 
-        if (ct == null) {
-            return this;
-        }
+		return this;
+	}
 
-        Flags f = flags;
+	/** Visit the children of the declaration. */
+	public Node visitChildren(NodeVisitor v) {
+		TypeNode type = (TypeNode) visitChild(this.type, v);
+		Id name = (Id) visitChild(this.name, v);
+		Expr init = (Expr) visitChild(this.init, v);
+		return reconstruct(type, name, init);
+	}
 
-        if (ct.flags().isInterface()) {
-            f = f.Public().Static().Final();
-        }
-        
-        FieldDecl n;
+	public NodeVisitor buildTypesEnter(TypeBuilder tb) throws SemanticException {
+		return tb.pushCode();
+	}
 
-        if (init != null) {
-            Flags iflags = f.isStatic() ? Flags.STATIC : Flags.NONE;
-            InitializerInstance ii = ts.initializerInstance(init.position(),
-                                                            ct, iflags);
-            n = initializerInstance(ii);
-        }
-        else {
-            n = this;
-        }
+	public Node buildTypes(TypeBuilder tb) throws SemanticException {
+		TypeSystem ts = tb.typeSystem();
 
-        // XXX: MutableFieldInstance
-        FieldInstance fi = ts.fieldInstance(position(), ct, f,
-                                            ts.unknownType(position()), name.id());
-        ct.addField(fi);
+		ParsedClassType ct = tb.currentClass();
 
-        return n.flags(f).fieldInstance(fi);
-    }
+		if (ct == null) {
+			return this;
+		}
 
-    public Node disambiguate(AmbiguityRemover ar) throws SemanticException {
-        if (this.fi.isCanonical()) {
-            // Nothing to do.
-            return this;
-        }
+		Flags f = flags;
 
-        if (declType().isCanonical()) {
-            this.fi.setType(declType());
-        }
-        
-        return this;
-    }
+		if (ct.flags().isInterface()) {
+			f = f.Public().Static().Final();
+		}
 
-    public Context enterScope(Context c) {
-        if (ii != null) {
-            return c.pushCode(ii);
-        }
-        return c;
-    }
-   
-    public static class AddDependenciesVisitor extends NodeVisitor {
-        protected Scheduler scheduler;
-        protected FieldInstance fi;
-        
-        AddDependenciesVisitor(Scheduler scheduler, FieldInstance fi) {
-            this.scheduler = scheduler;
-            this.fi = fi;
-        }
-        
-        public Node leave(Node old, Node n, NodeVisitor v) {
-            if (n instanceof Field) {
-                Field f = (Field) n;
-                if (!f.fieldInstance().orig().constantValueSet()) {
-                    Goal newGoal = scheduler.FieldConstantsChecked(f.fieldInstance().orig());
-                    Goal myGoal = scheduler.FieldConstantsChecked(this.fi);
-                    
-                    for (Iterator i = newGoal.prerequisiteGoals(scheduler).iterator(); i.hasNext();) {
-                        Goal g = (Goal) i.next();
-                        if (scheduler.prerequisiteDependsOn(g, myGoal)) {
-                            this.fi.setNotConstant();
-                            return n;
-                        }
-                    }
-                    throw new MissingDependencyException(newGoal, true);
-                }
-            }
-            return n;
-        }   
-    }
+		FieldDecl n;
 
-    public Node checkConstants(ConstantChecker cc) throws SemanticException {
-//        if (init != null && ! init.constantValueSet()) {
-//            // HACK to add dependencies for computing the constant value.
-//            Scheduler scheduler = cc.typeSystem().extensionInfo().scheduler();
-//            init.visit(new AddDependenciesVisitor(scheduler, this.fi));
-//            return this;
-//        }
-        
-        if (init == null || ! init.isConstant() || ! fi.flags().isFinal()) {
-            fi.setNotConstant();
-        }
-        else {
-            fi.setConstantValue(init.constantValue());
-        }
+		if (init != null) {
+			Flags iflags = f.isStatic() ? Flags.STATIC : Flags.NONE;
+			InitializerInstance ii = ts.initializerInstance(init.position(),
+					ct, iflags);
+			n = initializerInstance(ii);
+		} else {
+			n = this;
+		}
 
-        return this;
-    }
-    
-    public boolean constantValueSet() {
-        return fi != null && fi.constantValueSet();
-    }
+		// XXX: MutableFieldInstance
+		FieldInstance fi = ts.fieldInstance(position(), ct, f,
+				ts.unknownType(position()), name.id());
+		ct.addField(fi);
 
-    public Node typeCheckOverride(Node parent, TypeChecker tc) throws SemanticException {
-        FieldDecl nn = this;
-        FieldDecl old = this;
-        
-        NodeVisitor childv = tc.enter(parent, this);
+		return n.flags(f).fieldInstance(fi);
+	}
 
-        if (childv instanceof PruningVisitor) {
-            return nn;
-        }
+	public Node disambiguate(AmbiguityRemover ar) throws SemanticException {
+		if (this.fi.isCanonical()) {
+			// Nothing to do.
+			return this;
+		}
 
-        boolean constantValueSet = false;
-        FieldInstance fi = nn.fieldInstance();
-        if (fi.constantValueSet()) {
-            constantValueSet = true;
-        }
-        else {
-            fi.setNotConstant();
-        }
+		if (declType().isCanonical()) {
+			this.fi.setType(declType());
+		}
 
-        TypeChecker childtc = (TypeChecker) childv;
-        nn = (FieldDecl) nn.visitChildren(childtc);
-        nn = (FieldDecl) tc.leave(parent, old, nn, childtc);
+		return this;
+	}
 
-        if (! constantValueSet) {
-            ConstantChecker cc = new ConstantChecker(tc.job(), tc.typeSystem(), tc.nodeFactory());
-            cc = (ConstantChecker) cc.context(childtc.context());
-            nn = (FieldDecl) nn.del().checkConstants(cc);
-        }
-        
-        return nn;
-    }
+	public Context enterScope(Context c) {
+		if (ii != null) {
+			return c.pushCode(ii);
+		}
+		return c;
+	}
 
-    /** Type check the declaration. */
-    public Node typeCheck(TypeChecker tc) throws SemanticException {
-        TypeSystem ts = tc.typeSystem();
+	public static class AddDependenciesVisitor extends NodeVisitor {
+		protected Scheduler scheduler;
+		protected FieldInstance fi;
 
-        // Get the fi flags, not the node flags since the fi flags
-        // account for being nested within an interface.
-        Flags flags = fi.flags();
-        
-        try {
-            ts.checkFieldFlags(flags);
-        }
-        catch (SemanticException e) {
-            throw new SemanticException(e.getMessage(), position());
-        }
+		AddDependenciesVisitor(Scheduler scheduler, FieldInstance fi) {
+			this.scheduler = scheduler;
+			this.fi = fi;
+		}
 
-        if (tc.context().currentClass().flags().isInterface()) {
-            if (flags.isProtected() || flags.isPrivate()) {
-                throw new SemanticException("Interface members must be public.",
-                                            position());
-            }
-        }
+		public Node leave(Node old, Node n, NodeVisitor v) {
+			if (n instanceof Field) {
+				Field f = (Field) n;
+				if (!f.fieldInstance().orig().constantValueSet()) {
+					Goal newGoal = scheduler.FieldConstantsChecked(f
+							.fieldInstance().orig());
+					Goal myGoal = scheduler.FieldConstantsChecked(this.fi);
 
-        if (init != null) {
-            if (init instanceof ArrayInit) {
-                ((ArrayInit) init).typeCheckElements(type.type());
-            }
-            else {
-                if (! ts.isImplicitCastValid(init.type(), type.type()) &&
-                    ! ts.typeEquals(init.type(), type.type()) &&
-                    ! ts.numericConversionValid(type.type(),
-                                                init.constantValue())) {
+					for (Iterator i = newGoal.prerequisiteGoals(scheduler)
+							.iterator(); i.hasNext();) {
+						Goal g = (Goal) i.next();
+						if (scheduler.prerequisiteDependsOn(g, myGoal)) {
+							this.fi.setNotConstant();
+							return n;
+						}
+					}
+					throw new MissingDependencyException(newGoal, true);
+				}
+			}
+			return n;
+		}
+	}
 
-                    throw new SemanticException("The type of the variable " +
-                                                "initializer \"" + init.type() +
-                                                "\" does not match that of " +
-                                                "the declaration \"" +
-                                                type.type() + "\".",
-                                                init.position());
-                }
-            }
-        }
+	public Node checkConstants(ConstantChecker cc) throws SemanticException {
+		// if (init != null && ! init.constantValueSet()) {
+		// // HACK to add dependencies for computing the constant value.
+		// Scheduler scheduler = cc.typeSystem().extensionInfo().scheduler();
+		// init.visit(new AddDependenciesVisitor(scheduler, this.fi));
+		// return this;
+		// }
 
-        // check that inner classes do not declare static fields, unless they
-        // are compile-time constants
-        if (flags().isStatic() &&
-              fieldInstance().container().toClass().isInnerClass()) {
-            // it's a static field in an inner class.
-            if (!flags().isFinal() || init == null || !init.isConstant()) {
-                throw new SemanticException("Inner classes cannot declare " +
-                        "static fields, unless they are compile-time " +
-                        "constant fields.", this.position());
-            }
+		if (init == null || !init.isConstant() || !fi.flags().isFinal()) {
+			fi.setNotConstant();
+		} else {
+			fi.setConstantValue(init.constantValue());
+		}
 
-        }
+		return this;
+	}
 
-        return this;
-    }
+	public boolean constantValueSet() {
+		return fi != null && fi.constantValueSet();
+	}
 
-    public NodeVisitor exceptionCheckEnter(ExceptionChecker ec) throws SemanticException {
-        return ec.push(new ExceptionChecker.CodeTypeReporter("field initializer"));
-    }
+	public Node typeCheckOverride(Node parent, TypeChecker tc)
+			throws SemanticException {
+		FieldDecl nn = this;
+		FieldDecl old = this;
 
-    public Type childExpectedType(Expr child, AscriptionVisitor av) {
-        if (child == init) {
-            TypeSystem ts = av.typeSystem();
+		NodeVisitor childv = tc.enter(parent, this);
 
-            // If the RHS is an integral constant, we can relax the expected
-            // type to the type of the constant.
-            if (ts.numericConversionValid(type.type(), child.constantValue())) {
-                return child.type();
-            }
-            else {
-                return type.type();
-            }
-        }
+		if (childv instanceof PruningVisitor) {
+			return nn;
+		}
 
-        return child.type();
-    }
+		boolean constantValueSet = false;
+		FieldInstance fi = nn.fieldInstance();
+		if (fi.constantValueSet()) {
+			constantValueSet = true;
+		} else {
+			fi.setNotConstant();
+		}
 
-    public Term firstChild() {
-        return type;
-    }
+		TypeChecker childtc = (TypeChecker) childv;
+		nn = (FieldDecl) nn.visitChildren(childtc);
+		nn = (FieldDecl) tc.leave(parent, old, nn, childtc);
 
-    public List acceptCFG(CFGBuilder v, List succs) {
-        if (init != null) {
-            v.visitCFG(type, init, ENTRY);
-            v.visitCFG(init, this, EXIT);
-        } else {
-            v.visitCFG(type, this, EXIT);
-        }
-        
-        return succs;
-    }
+		if (!constantValueSet) {
+			ConstantChecker cc = new ConstantChecker(tc.job(), tc.typeSystem(),
+					tc.nodeFactory());
+			cc = (ConstantChecker) cc.context(childtc.context());
+			nn = (FieldDecl) nn.del().checkConstants(cc);
+		}
 
+		return nn;
+	}
 
-    public String toString() {
-        return flags.translate() + type + " " + name +
-                (init != null ? " = " + init : "");
-    }
+	/** Type check the declaration. */
+	public Node typeCheck(TypeChecker tc) throws SemanticException {
+		TypeSystem ts = tc.typeSystem();
 
-    public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
-        boolean isInterface = fi != null && fi.container() != null &&
-                              fi.container().toClass().flags().isInterface();
+		// Get the fi flags, not the node flags since the fi flags
+		// account for being nested within an interface.
+		Flags flags = fi.flags();
 
-        Flags f = flags;
+		try {
+			ts.checkFieldFlags(flags);
+		} catch (SemanticException e) {
+			throw new SemanticException(e.getMessage(), position());
+		}
 
-        if (isInterface) {
-            f = f.clearPublic();
-            f = f.clearStatic();
-            f = f.clearFinal();
-        }
+		if (tc.context().currentClass().flags().isInterface()) {
+			if (flags.isProtected() || flags.isPrivate()) {
+				throw new SemanticException(
+						"Interface members must be public.", position());
+			}
+		}
 
-        w.write(f.translate());
-        print(type, w, tr);
-	w.allowBreak(2, 2, " ", 1);
-        tr.print(this, name, w);
+		if (init != null) {
+			if (init instanceof ArrayInit) {
+				((ArrayInit) init).typeCheckElements(type.type());
+			} else {
+				if (!ts.isImplicitCastValid(init.type(), type.type())
+						&& !ts.typeEquals(init.type(), type.type())
+						&& !ts.numericConversionValid(type.type(),
+								init.constantValue())) {
 
-        if (init != null) {
-            w.write(" =");
-            w.allowBreak(2, " ");
-            print(init, w, tr);
-        }
+					throw new SemanticException("The type of the variable "
+							+ "initializer \"" + init.type()
+							+ "\" does not match that of "
+							+ "the declaration \"" + type.type() + "\".",
+							init.position());
+				}
+			}
+		}
 
-        w.write(";");
-    }
+		// check that inner classes do not declare static fields, unless they
+		// are compile-time constants
+		if (flags().isStatic()
+				&& fieldInstance().container().toClass().isInnerClass()) {
+			// it's a static field in an inner class.
+			if (!flags().isFinal() || init == null || !init.isConstant()) {
+				throw new SemanticException("Inner classes cannot declare "
+						+ "static fields, unless they are compile-time "
+						+ "constant fields.", this.position());
+			}
 
-    public void dump(CodeWriter w) {
-        super.dump(w);
+		}
 
-        if (fi != null) {
-            w.allowBreak(4, " ");
-            w.begin(0);
-            w.write("(instance " + fi + ")");
-            w.end();
-        }
+		return this;
+	}
 
-	w.allowBreak(4, " ");
-	w.begin(0);
-	w.write("(name " + name + ")");
-	w.end();
-    }
-    public Node copy(NodeFactory nf) {
-        return nf.FieldDecl(this.position, this.flags, this.type, this.name, this.init);
-    }
+	public NodeVisitor exceptionCheckEnter(ExceptionChecker ec)
+			throws SemanticException {
+		return ec.push(new ExceptionChecker.CodeTypeReporter(
+				"field initializer"));
+	}
+
+	public Type childExpectedType(Expr child, AscriptionVisitor av) {
+		if (child == init) {
+			TypeSystem ts = av.typeSystem();
+
+			// If the RHS is an integral constant, we can relax the expected
+			// type to the type of the constant.
+			if (ts.numericConversionValid(type.type(), child.constantValue())) {
+				return child.type();
+			} else {
+				return type.type();
+			}
+		}
+
+		return child.type();
+	}
+
+	public Term firstChild() {
+		return type;
+	}
+
+	public List acceptCFG(CFGBuilder v, List succs) {
+		if (init != null) {
+			v.visitCFG(type, init, ENTRY);
+			v.visitCFG(init, this, EXIT);
+		} else {
+			v.visitCFG(type, this, EXIT);
+		}
+
+		return succs;
+	}
+
+	public String toString() {
+		return flags.translate() + type + " " + name
+				+ (init != null ? " = " + init : "");
+	}
+
+	public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
+		boolean isInterface = fi != null && fi.container() != null
+				&& fi.container().toClass().flags().isInterface();
+
+		Flags f = flags;
+
+		if (isInterface) {
+			f = f.clearPublic();
+			f = f.clearStatic();
+			f = f.clearFinal();
+		}
+
+		w.write(f.translate());
+		print(type, w, tr);
+		w.allowBreak(2, 2, " ", 1);
+		tr.print(this, name, w);
+
+		if (init != null) {
+			w.write(" =");
+			w.allowBreak(2, " ");
+			print(init, w, tr);
+		}
+
+		w.write(";");
+	}
+
+	public void dump(CodeWriter w) {
+		super.dump(w);
+
+		if (fi != null) {
+			w.allowBreak(4, " ");
+			w.begin(0);
+			w.write("(instance " + fi + ")");
+			w.end();
+		}
+
+		w.allowBreak(4, " ");
+		w.begin(0);
+		w.write("(name " + name + ")");
+		w.end();
+	}
+
+	public Node copy(NodeFactory nf) {
+		return nf.FieldDecl(this.position, this.flags, this.type, this.name,
+				this.init);
+	}
 
 }

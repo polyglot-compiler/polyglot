@@ -16,17 +16,29 @@ import polyglot.util.ErrorQueue;
 /**
  * 
  */
-public class SilentOutputController extends OutputController{
-    public SilentOutputController(PrintStream out) {
-        super(out);
-    }
-     
-    protected void startScriptTestSuite(ScriptTestSuite sts) { }
-    protected void startSourceFileTest(SourceFileTest sft) { }
-    protected void finishScriptTestSuite(ScriptTestSuite sts) { }
-    protected void finishSourceFileTest(SourceFileTest sft, ErrorQueue eq) { }
-    public void displayTestSuiteResults(String suiteName, TestSuite ts) { }
-    public void displayTestResults(TestResult tr, String testName) { }
+public class SilentOutputController extends OutputController {
+	public SilentOutputController(PrintStream out) {
+		super(out);
+	}
 
-    public void warning(String w) { }
+	protected void startScriptTestSuite(ScriptTestSuite sts) {
+	}
+
+	protected void startSourceFileTest(SourceFileTest sft) {
+	}
+
+	protected void finishScriptTestSuite(ScriptTestSuite sts) {
+	}
+
+	protected void finishSourceFileTest(SourceFileTest sft, ErrorQueue eq) {
+	}
+
+	public void displayTestSuiteResults(String suiteName, TestSuite ts) {
+	}
+
+	public void displayTestResults(TestResult tr, String testName) {
+	}
+
+	public void warning(String w) {
+	}
 }

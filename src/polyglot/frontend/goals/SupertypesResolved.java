@@ -38,68 +38,68 @@ import polyglot.visit.TypeChecker;
 
 /**
  * Comment for <code>SuperTypesResolved</code>
- *
+ * 
  * @author nystrom
  */
 public class SupertypesResolved extends ClassTypeGoal {
-    public static Goal create(Scheduler scheduler, ParsedClassType ct) {
-        return scheduler.internGoal(new SupertypesResolved(ct));
-    }
+	public static Goal create(Scheduler scheduler, ParsedClassType ct) {
+		return scheduler.internGoal(new SupertypesResolved(ct));
+	}
 
-    protected SupertypesResolved(ParsedClassType ct) {
-        super(ct);
-    }
-    
-    protected static class SupertypesResolvedPass extends AbstractPass {
-        SupertypesResolvedPass(Goal goal) {
-            super(goal);
-        }
-        
-        public boolean run() {
-            SupertypesResolved goal = (SupertypesResolved) this.goal;
-            if (! goal.type().supertypesResolved()) {
-                throw new SchedulerException();
-            }
-            return true;
-        }
-    }
+	protected SupertypesResolved(ParsedClassType ct) {
+		super(ct);
+	}
 
-    public Pass createPass(ExtensionInfo extInfo) {
-        if (job() != null) {
-            return new SupertypesResolvedPass(this);
-        }
-        return new ResolveSuperTypesPass(extInfo.scheduler(), this);
-    }
+	protected static class SupertypesResolvedPass extends AbstractPass {
+		SupertypesResolvedPass(Goal goal) {
+			super(goal);
+		}
 
-    public Collection prerequisiteGoals(Scheduler scheduler) {
-        List l = new ArrayList();
-        l.add(scheduler.MembersAdded(ct));
-        if (ct.job() != null) {
-            l.add(scheduler.TypesInitialized(ct.job()));
-        }
-        l.addAll(super.prerequisiteGoals(scheduler));
-        return l;
-    }
+		public boolean run() {
+			SupertypesResolved goal = (SupertypesResolved) this.goal;
+			if (!goal.type().supertypesResolved()) {
+				throw new SchedulerException();
+			}
+			return true;
+		}
+	}
 
-    protected boolean isGlobal(ParsedClassType ct) {
-        return ct.isTopLevel() || (ct.isMember() && isGlobal((ParsedClassType) ct.container()));
-    }
-    
-    public Collection corequisiteGoals(Scheduler scheduler) {
-        List l = new ArrayList();
-        if (ct.job() != null) {
-            if (isGlobal(ct)) {
-                l.add(scheduler.SupertypesDisambiguated(ct.job()));
-            }
-            else {
-                l.add(scheduler.Disambiguated(ct.job()));
-            }
-        }
-        l.addAll(super.corequisiteGoals(scheduler));
-        return l;
-    }
-    
-    public boolean equals(Object o) {
-        return o instanceof SupertypesResolved && super.equals(o);
-    }
+	public Pass createPass(ExtensionInfo extInfo) {
+		if (job() != null) {
+			return new SupertypesResolvedPass(this);
+		}
+		return new ResolveSuperTypesPass(extInfo.scheduler(), this);
+	}
+
+	public Collection prerequisiteGoals(Scheduler scheduler) {
+		List l = new ArrayList();
+		l.add(scheduler.MembersAdded(ct));
+		if (ct.job() != null) {
+			l.add(scheduler.TypesInitialized(ct.job()));
+		}
+		l.addAll(super.prerequisiteGoals(scheduler));
+		return l;
+	}
+
+	protected boolean isGlobal(ParsedClassType ct) {
+		return ct.isTopLevel()
+				|| (ct.isMember() && isGlobal((ParsedClassType) ct.container()));
+	}
+
+	public Collection corequisiteGoals(Scheduler scheduler) {
+		List l = new ArrayList();
+		if (ct.job() != null) {
+			if (isGlobal(ct)) {
+				l.add(scheduler.SupertypesDisambiguated(ct.job()));
+			} else {
+				l.add(scheduler.Disambiguated(ct.job()));
+			}
+		}
+		l.addAll(super.corequisiteGoals(scheduler));
+		return l;
+	}
+
+	public boolean equals(Object o) {
+		return o instanceof SupertypesResolved && super.equals(o);
+	}
 }

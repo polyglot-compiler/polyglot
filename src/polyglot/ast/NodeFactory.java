@@ -33,296 +33,404 @@ import polyglot.util.Position;
 import java.util.List;
 
 /**
- * A <code>NodeFactory</code> constructs AST nodes.  All node construction
- * should go through this factory or be done with the <code>copy()</code>
- * method of <code>Node</code>.
+ * A <code>NodeFactory</code> constructs AST nodes. All node construction should
+ * go through this factory or be done with the <code>copy()</code> method of
+ * <code>Node</code>.
  */
-public interface NodeFactory
-{
+public interface NodeFactory {
 
-    /**
-     * Returns a disambiguator for nodes from this factory.
-     */
-    Disamb disamb();
-    
-    //////////////////////////////////////////////////////////////////
-    // Factory Methods
-    //////////////////////////////////////////////////////////////////
+	/**
+	 * Returns a disambiguator for nodes from this factory.
+	 */
+	Disamb disamb();
 
-    Id Id(Position pos, String id);
-    
-    AmbExpr AmbExpr(Position pos, Id name);
-    /** @deprecated */
-    AmbExpr AmbExpr(Position pos, String name);
-    Expr ExprFromQualifiedName(Position pos, String qualifiedName);
-    
-    // type or expr
-    AmbReceiver AmbReceiver(Position pos, Id name);
-    AmbReceiver AmbReceiver(Position pos, Prefix prefix, Id name);
-    /** @deprecated */
-    AmbReceiver AmbReceiver(Position pos, String name);
-    /** @deprecated */
-    AmbReceiver AmbReceiver(Position pos, Prefix prefix, String name);
-    Receiver ReceiverFromQualifiedName(Position pos, String qualifiedName);
-    
-    // package or type
-    AmbQualifierNode AmbQualifierNode(Position pos, Id name);
-    AmbQualifierNode AmbQualifierNode(Position pos, QualifierNode qual, Id name);
-    /** @deprecated */
-    AmbQualifierNode AmbQualifierNode(Position pos, String name);
-    /** @deprecated */
-    AmbQualifierNode AmbQualifierNode(Position pos, QualifierNode qual, String name);
-    QualifierNode QualifierNodeFromQualifiedName(Position pos, String qualifiedName);
-    
-    // package or type or expr
-    AmbPrefix AmbPrefix(Position pos, Id name);
-    AmbPrefix AmbPrefix(Position pos, Prefix prefix, Id name);
-    /** @deprecated */
-    AmbPrefix AmbPrefix(Position pos, String name);
-    /** @deprecated */
-    AmbPrefix AmbPrefix(Position pos, Prefix prefix, String name);
-    Prefix PrefixFromQualifiedName(Position pos, String qualifiedName);
-    
-    AmbTypeNode AmbTypeNode(Position pos, Id name);
-    AmbTypeNode AmbTypeNode(Position pos, QualifierNode qualifier, Id name);
-    /** @deprecated */
-    AmbTypeNode AmbTypeNode(Position pos, String name);
-    /** @deprecated */
-    AmbTypeNode AmbTypeNode(Position pos, QualifierNode qualifier, String name);
-    TypeNode TypeNodeFromQualifiedName(Position pos, String qualifiedName);
-    
-    ArrayTypeNode ArrayTypeNode(Position pos, TypeNode base);
-    CanonicalTypeNode CanonicalTypeNode(Position pos, Type type);
+	// ////////////////////////////////////////////////////////////////
+	// Factory Methods
+	// ////////////////////////////////////////////////////////////////
 
-    ArrayAccess ArrayAccess(Position pos, Expr base, Expr index);
+	Id Id(Position pos, String id);
 
-    ArrayInit ArrayInit(Position pos);
-    ArrayInit ArrayInit(Position pos, List elements);
+	AmbExpr AmbExpr(Position pos, Id name);
 
-    Assert Assert(Position pos, Expr cond);
-    Assert Assert(Position pos, Expr cond, Expr errorMessage);
+	/** @deprecated */
+	AmbExpr AmbExpr(Position pos, String name);
 
-    Assign Assign(Position pos, Expr target, Assign.Operator op, Expr source);
-    LocalAssign LocalAssign(Position pos, Local target, Assign.Operator op, Expr source);
-    FieldAssign FieldAssign(Position pos, Field target, Assign.Operator op, Expr source);
-    ArrayAccessAssign ArrayAccessAssign(Position pos, ArrayAccess target, Assign.Operator op, Expr source);
-    AmbAssign AmbAssign(Position pos, Expr target, Assign.Operator op, Expr source);
+	Expr ExprFromQualifiedName(Position pos, String qualifiedName);
 
-    Binary Binary(Position pos, Expr left, Binary.Operator op, Expr right);
+	// type or expr
+	AmbReceiver AmbReceiver(Position pos, Id name);
 
-    Block Block(Position pos);
-    Block Block(Position pos, Stmt s1);
-    Block Block(Position pos, Stmt s1, Stmt s2);
-    Block Block(Position pos, Stmt s1, Stmt s2, Stmt s3);
-    Block Block(Position pos, Stmt s1, Stmt s2, Stmt s3, Stmt s4);
-    Block Block(Position pos, List statements);
+	AmbReceiver AmbReceiver(Position pos, Prefix prefix, Id name);
 
-    SwitchBlock SwitchBlock(Position pos, List statements);
+	/** @deprecated */
+	AmbReceiver AmbReceiver(Position pos, String name);
 
-    BooleanLit BooleanLit(Position pos, boolean value);
+	/** @deprecated */
+	AmbReceiver AmbReceiver(Position pos, Prefix prefix, String name);
 
-    Branch Break(Position pos);
-    Branch Break(Position pos, Id label);
-    /** @deprecated */
-    Branch Break(Position pos, String label);
+	Receiver ReceiverFromQualifiedName(Position pos, String qualifiedName);
 
-    Branch Continue(Position pos);
-    Branch Continue(Position pos, Id label);
-    /** @deprecated */
-    Branch Continue(Position pos, String label);
+	// package or type
+	AmbQualifierNode AmbQualifierNode(Position pos, Id name);
 
-    Branch Branch(Position pos, Branch.Kind kind);
-    Branch Branch(Position pos, Branch.Kind kind, Id label);
-    /** @deprecated */
-    Branch Branch(Position pos, Branch.Kind kind, String label);
+	AmbQualifierNode AmbQualifierNode(Position pos, QualifierNode qual, Id name);
 
-    Call Call(Position pos, Id name);
-    Call Call(Position pos, Id name, Expr a1);
-    Call Call(Position pos, Id name, Expr a1, Expr a2);
-    Call Call(Position pos, Id name, Expr a1, Expr a2, Expr a3);
-    Call Call(Position pos, Id name, Expr a1, Expr a2, Expr a3, Expr a4);
-    Call Call(Position pos, Id name, List args);
-    
-    Call Call(Position pos, Receiver target, Id name);
-    Call Call(Position pos, Receiver target, Id name, Expr a1);
-    Call Call(Position pos, Receiver target, Id name, Expr a1, Expr a2);
-    Call Call(Position pos, Receiver target, Id name, Expr a1, Expr a2, Expr a3);
-    Call Call(Position pos, Receiver target, Id name, Expr a1, Expr a2, Expr a3, Expr a4);
-    Call Call(Position pos, Receiver target, Id name, List args);
+	/** @deprecated */
+	AmbQualifierNode AmbQualifierNode(Position pos, String name);
 
-    /** @deprecated */
-    Call Call(Position pos, String name);
-    /** @deprecated */
-    Call Call(Position pos, String name, Expr a1);
-    /** @deprecated */
-    Call Call(Position pos, String name, Expr a1, Expr a2);
-    /** @deprecated */
-    Call Call(Position pos, String name, Expr a1, Expr a2, Expr a3);
-    /** @deprecated */
-    Call Call(Position pos, String name, Expr a1, Expr a2, Expr a3, Expr a4);
-    /** @deprecated */
-    Call Call(Position pos, String name, List args);
+	/** @deprecated */
+	AmbQualifierNode AmbQualifierNode(Position pos, QualifierNode qual,
+			String name);
 
-    /** @deprecated */
-    Call Call(Position pos, Receiver target, String name);
-    /** @deprecated */
-    Call Call(Position pos, Receiver target, String name, Expr a1);
-    /** @deprecated */
-    Call Call(Position pos, Receiver target, String name, Expr a1, Expr a2);
-    /** @deprecated */
-    Call Call(Position pos, Receiver target, String name, Expr a1, Expr a2, Expr a3);
-    /** @deprecated */
-    Call Call(Position pos, Receiver target, String name, Expr a1, Expr a2, Expr a3, Expr a4);
-    /** @deprecated */
-    Call Call(Position pos, Receiver target, String name, List args);
+	QualifierNode QualifierNodeFromQualifiedName(Position pos,
+			String qualifiedName);
 
-    Case Default(Position pos);
-    Case Case(Position pos, Expr expr);
-    
-    Cast Cast(Position pos, TypeNode type, Expr expr);
+	// package or type or expr
+	AmbPrefix AmbPrefix(Position pos, Id name);
 
-    Catch Catch(Position pos, Formal formal, Block body);
+	AmbPrefix AmbPrefix(Position pos, Prefix prefix, Id name);
 
-    CharLit CharLit(Position pos, char value);
+	/** @deprecated */
+	AmbPrefix AmbPrefix(Position pos, String name);
 
-    ClassBody ClassBody(Position pos, List members);
+	/** @deprecated */
+	AmbPrefix AmbPrefix(Position pos, Prefix prefix, String name);
 
-    ClassDecl ClassDecl(Position pos, Flags flags, Id name,
-            TypeNode superClass, List interfaces, ClassBody body);
-    /** @deprecated */
-    ClassDecl ClassDecl(Position pos, Flags flags, String name,
-	                TypeNode superClass, List interfaces, ClassBody body);
+	Prefix PrefixFromQualifiedName(Position pos, String qualifiedName);
 
-    ClassLit ClassLit(Position pos, TypeNode typeNode);
+	AmbTypeNode AmbTypeNode(Position pos, Id name);
 
-    Conditional Conditional(Position pos, Expr cond, Expr consequent, Expr alternative);
+	AmbTypeNode AmbTypeNode(Position pos, QualifierNode qualifier, Id name);
 
-    ConstructorCall ThisCall(Position pos, List args);
-    ConstructorCall ThisCall(Position pos, Expr outer, List args);
-    ConstructorCall SuperCall(Position pos, List args);
-    ConstructorCall SuperCall(Position pos, Expr outer, List args);
-    ConstructorCall ConstructorCall(Position pos, ConstructorCall.Kind kind, List args);
-    ConstructorCall ConstructorCall(Position pos, ConstructorCall.Kind kind,
-	                            Expr outer, List args);
+	/** @deprecated */
+	AmbTypeNode AmbTypeNode(Position pos, String name);
 
-    ConstructorDecl ConstructorDecl(Position pos, Flags flags, Id name,
-            List formals, List throwTypes,
-            Block body);
-    /** @deprecated */
-    ConstructorDecl ConstructorDecl(Position pos, Flags flags, String name,
-            List formals, List throwTypes,
-            Block body);
+	/** @deprecated */
+	AmbTypeNode AmbTypeNode(Position pos, QualifierNode qualifier, String name);
 
-    FieldDecl FieldDecl(Position pos, Flags flags, TypeNode type, Id name);
-    FieldDecl FieldDecl(Position pos, Flags flags, TypeNode type, Id name, Expr init);
-    /** @deprecated */
-    FieldDecl FieldDecl(Position pos, Flags flags, TypeNode type, String name);
-    /** @deprecated */
-    FieldDecl FieldDecl(Position pos, Flags flags, TypeNode type, String name, Expr init);
+	TypeNode TypeNodeFromQualifiedName(Position pos, String qualifiedName);
 
-    Do Do(Position pos, Stmt body, Expr cond);
+	ArrayTypeNode ArrayTypeNode(Position pos, TypeNode base);
 
-    Empty Empty(Position pos);
+	CanonicalTypeNode CanonicalTypeNode(Position pos, Type type);
 
-    Eval Eval(Position pos, Expr expr);
+	ArrayAccess ArrayAccess(Position pos, Expr base, Expr index);
 
-    Field Field(Position pos, Id name);
-    Field Field(Position pos, Receiver target, Id name);
-    /** @deprecated */
-    Field Field(Position pos, String name);
-    /** @deprecated */
-    Field Field(Position pos, Receiver target, String name);
+	ArrayInit ArrayInit(Position pos);
 
-    FloatLit FloatLit(Position pos, FloatLit.Kind kind, double value);
+	ArrayInit ArrayInit(Position pos, List elements);
 
-    For For(Position pos, List inits, Expr cond, List iters, Stmt body);
+	Assert Assert(Position pos, Expr cond);
 
-    Formal Formal(Position pos, Flags flags, TypeNode type, Id name);
-    /** @deprecated */
-    Formal Formal(Position pos, Flags flags, TypeNode type, String name);
+	Assert Assert(Position pos, Expr cond, Expr errorMessage);
 
-    If If(Position pos, Expr cond, Stmt consequent);
-    If If(Position pos, Expr cond, Stmt consequent, Stmt alternative);
+	Assign Assign(Position pos, Expr target, Assign.Operator op, Expr source);
 
-    Import Import(Position pos, Import.Kind kind, String name);
+	LocalAssign LocalAssign(Position pos, Local target, Assign.Operator op,
+			Expr source);
 
-    Initializer Initializer(Position pos, Flags flags, Block body);
+	FieldAssign FieldAssign(Position pos, Field target, Assign.Operator op,
+			Expr source);
 
-    Instanceof Instanceof(Position pos, Expr expr, TypeNode type);
+	ArrayAccessAssign ArrayAccessAssign(Position pos, ArrayAccess target,
+			Assign.Operator op, Expr source);
 
-    IntLit IntLit(Position pos, IntLit.Kind kind, long value);
+	AmbAssign AmbAssign(Position pos, Expr target, Assign.Operator op,
+			Expr source);
 
-    Labeled Labeled(Position pos, Id label, Stmt body);
-    /** @deprecated */
-    Labeled Labeled(Position pos, String label, Stmt body);
+	Binary Binary(Position pos, Expr left, Binary.Operator op, Expr right);
 
-    Local Local(Position pos, Id name);
-    /** @deprecated */
-    Local Local(Position pos, String name);
+	Block Block(Position pos);
 
-    LocalClassDecl LocalClassDecl(Position pos, ClassDecl decl);
+	Block Block(Position pos, Stmt s1);
 
-    LocalDecl LocalDecl(Position pos, Flags flags, TypeNode type, Id name);
-    LocalDecl LocalDecl(Position pos, Flags flags, TypeNode type, Id name, Expr init);
-    /** @deprecated */
-    LocalDecl LocalDecl(Position pos, Flags flags, TypeNode type, String name);
-    /** @deprecated */
-    LocalDecl LocalDecl(Position pos, Flags flags, TypeNode type, String name, Expr init);
+	Block Block(Position pos, Stmt s1, Stmt s2);
 
-    MethodDecl MethodDecl(Position pos, Flags flags, TypeNode returnType, Id name,
-            List formals, List throwTypes, Block body);
-    /** @deprecated */
-    MethodDecl MethodDecl(Position pos, Flags flags, TypeNode returnType, String name,
-	                  List formals, List throwTypes, Block body);
+	Block Block(Position pos, Stmt s1, Stmt s2, Stmt s3);
 
-    New New(Position pos, TypeNode type, List args);
-    New New(Position pos, TypeNode type, List args, ClassBody body);
+	Block Block(Position pos, Stmt s1, Stmt s2, Stmt s3, Stmt s4);
 
-    New New(Position pos, Expr outer, TypeNode objectType, List args);
-    New New(Position pos, Expr outer, TypeNode objectType, List args, ClassBody body);
+	Block Block(Position pos, List statements);
 
-    NewArray NewArray(Position pos, TypeNode base, List dims);
-    NewArray NewArray(Position pos, TypeNode base, List dims, int addDims);
-    NewArray NewArray(Position pos, TypeNode base, int addDims, ArrayInit init);
-    NewArray NewArray(Position pos, TypeNode base, List dims, int addDims, ArrayInit init);
-    
-    NodeList NodeList(Position pos, List nodes);
-    NodeList NodeList(Position pos, NodeFactory nf, List nodes);
+	SwitchBlock SwitchBlock(Position pos, List statements);
 
-    NullLit NullLit(Position pos);
+	BooleanLit BooleanLit(Position pos, boolean value);
 
-    Return Return(Position pos);
-    Return Return(Position pos, Expr expr);
+	Branch Break(Position pos);
 
-    SourceCollection SourceCollection(Position pos, List sources);
+	Branch Break(Position pos, Id label);
 
-    SourceFile SourceFile(Position pos, List decls);
-    SourceFile SourceFile(Position pos, List imports, List decls);
-    SourceFile SourceFile(Position pos, PackageNode packageName, List imports, List decls);
+	/** @deprecated */
+	Branch Break(Position pos, String label);
 
-    Special This(Position pos);
-    Special This(Position pos, TypeNode outer);
+	Branch Continue(Position pos);
 
-    Special Super(Position pos);
-    Special Super(Position pos, TypeNode outer);
-    Special Special(Position pos, Special.Kind kind);
-    Special Special(Position pos, Special.Kind kind, TypeNode outer);
+	Branch Continue(Position pos, Id label);
 
-    StringLit StringLit(Position pos, String value);
+	/** @deprecated */
+	Branch Continue(Position pos, String label);
 
-    Switch Switch(Position pos, Expr expr, List elements);
+	Branch Branch(Position pos, Branch.Kind kind);
 
-    Synchronized Synchronized(Position pos, Expr expr, Block body);
+	Branch Branch(Position pos, Branch.Kind kind, Id label);
 
-    Throw Throw(Position pos, Expr expr);
+	/** @deprecated */
+	Branch Branch(Position pos, Branch.Kind kind, String label);
 
-    Try Try(Position pos, Block tryBlock, List catchBlocks);
-    Try Try(Position pos, Block tryBlock, List catchBlocks, Block finallyBlock);
+	Call Call(Position pos, Id name);
 
-    PackageNode PackageNode(Position pos, Package p);
+	Call Call(Position pos, Id name, Expr a1);
 
-    Unary Unary(Position pos, Unary.Operator op, Expr expr);
-    Unary Unary(Position pos, Expr expr, Unary.Operator op);
+	Call Call(Position pos, Id name, Expr a1, Expr a2);
 
-    While While(Position pos, Expr cond, Stmt body);
+	Call Call(Position pos, Id name, Expr a1, Expr a2, Expr a3);
+
+	Call Call(Position pos, Id name, Expr a1, Expr a2, Expr a3, Expr a4);
+
+	Call Call(Position pos, Id name, List args);
+
+	Call Call(Position pos, Receiver target, Id name);
+
+	Call Call(Position pos, Receiver target, Id name, Expr a1);
+
+	Call Call(Position pos, Receiver target, Id name, Expr a1, Expr a2);
+
+	Call Call(Position pos, Receiver target, Id name, Expr a1, Expr a2, Expr a3);
+
+	Call Call(Position pos, Receiver target, Id name, Expr a1, Expr a2,
+			Expr a3, Expr a4);
+
+	Call Call(Position pos, Receiver target, Id name, List args);
+
+	/** @deprecated */
+	Call Call(Position pos, String name);
+
+	/** @deprecated */
+	Call Call(Position pos, String name, Expr a1);
+
+	/** @deprecated */
+	Call Call(Position pos, String name, Expr a1, Expr a2);
+
+	/** @deprecated */
+	Call Call(Position pos, String name, Expr a1, Expr a2, Expr a3);
+
+	/** @deprecated */
+	Call Call(Position pos, String name, Expr a1, Expr a2, Expr a3, Expr a4);
+
+	/** @deprecated */
+	Call Call(Position pos, String name, List args);
+
+	/** @deprecated */
+	Call Call(Position pos, Receiver target, String name);
+
+	/** @deprecated */
+	Call Call(Position pos, Receiver target, String name, Expr a1);
+
+	/** @deprecated */
+	Call Call(Position pos, Receiver target, String name, Expr a1, Expr a2);
+
+	/** @deprecated */
+	Call Call(Position pos, Receiver target, String name, Expr a1, Expr a2,
+			Expr a3);
+
+	/** @deprecated */
+	Call Call(Position pos, Receiver target, String name, Expr a1, Expr a2,
+			Expr a3, Expr a4);
+
+	/** @deprecated */
+	Call Call(Position pos, Receiver target, String name, List args);
+
+	Case Default(Position pos);
+
+	Case Case(Position pos, Expr expr);
+
+	Cast Cast(Position pos, TypeNode type, Expr expr);
+
+	Catch Catch(Position pos, Formal formal, Block body);
+
+	CharLit CharLit(Position pos, char value);
+
+	ClassBody ClassBody(Position pos, List members);
+
+	ClassDecl ClassDecl(Position pos, Flags flags, Id name,
+			TypeNode superClass, List interfaces, ClassBody body);
+
+	/** @deprecated */
+	ClassDecl ClassDecl(Position pos, Flags flags, String name,
+			TypeNode superClass, List interfaces, ClassBody body);
+
+	ClassLit ClassLit(Position pos, TypeNode typeNode);
+
+	Conditional Conditional(Position pos, Expr cond, Expr consequent,
+			Expr alternative);
+
+	ConstructorCall ThisCall(Position pos, List args);
+
+	ConstructorCall ThisCall(Position pos, Expr outer, List args);
+
+	ConstructorCall SuperCall(Position pos, List args);
+
+	ConstructorCall SuperCall(Position pos, Expr outer, List args);
+
+	ConstructorCall ConstructorCall(Position pos, ConstructorCall.Kind kind,
+			List args);
+
+	ConstructorCall ConstructorCall(Position pos, ConstructorCall.Kind kind,
+			Expr outer, List args);
+
+	ConstructorDecl ConstructorDecl(Position pos, Flags flags, Id name,
+			List formals, List throwTypes, Block body);
+
+	/** @deprecated */
+	ConstructorDecl ConstructorDecl(Position pos, Flags flags, String name,
+			List formals, List throwTypes, Block body);
+
+	FieldDecl FieldDecl(Position pos, Flags flags, TypeNode type, Id name);
+
+	FieldDecl FieldDecl(Position pos, Flags flags, TypeNode type, Id name,
+			Expr init);
+
+	/** @deprecated */
+	FieldDecl FieldDecl(Position pos, Flags flags, TypeNode type, String name);
+
+	/** @deprecated */
+	FieldDecl FieldDecl(Position pos, Flags flags, TypeNode type, String name,
+			Expr init);
+
+	Do Do(Position pos, Stmt body, Expr cond);
+
+	Empty Empty(Position pos);
+
+	Eval Eval(Position pos, Expr expr);
+
+	Field Field(Position pos, Id name);
+
+	Field Field(Position pos, Receiver target, Id name);
+
+	/** @deprecated */
+	Field Field(Position pos, String name);
+
+	/** @deprecated */
+	Field Field(Position pos, Receiver target, String name);
+
+	FloatLit FloatLit(Position pos, FloatLit.Kind kind, double value);
+
+	For For(Position pos, List inits, Expr cond, List iters, Stmt body);
+
+	Formal Formal(Position pos, Flags flags, TypeNode type, Id name);
+
+	/** @deprecated */
+	Formal Formal(Position pos, Flags flags, TypeNode type, String name);
+
+	If If(Position pos, Expr cond, Stmt consequent);
+
+	If If(Position pos, Expr cond, Stmt consequent, Stmt alternative);
+
+	Import Import(Position pos, Import.Kind kind, String name);
+
+	Initializer Initializer(Position pos, Flags flags, Block body);
+
+	Instanceof Instanceof(Position pos, Expr expr, TypeNode type);
+
+	IntLit IntLit(Position pos, IntLit.Kind kind, long value);
+
+	Labeled Labeled(Position pos, Id label, Stmt body);
+
+	/** @deprecated */
+	Labeled Labeled(Position pos, String label, Stmt body);
+
+	Local Local(Position pos, Id name);
+
+	/** @deprecated */
+	Local Local(Position pos, String name);
+
+	LocalClassDecl LocalClassDecl(Position pos, ClassDecl decl);
+
+	LocalDecl LocalDecl(Position pos, Flags flags, TypeNode type, Id name);
+
+	LocalDecl LocalDecl(Position pos, Flags flags, TypeNode type, Id name,
+			Expr init);
+
+	/** @deprecated */
+	LocalDecl LocalDecl(Position pos, Flags flags, TypeNode type, String name);
+
+	/** @deprecated */
+	LocalDecl LocalDecl(Position pos, Flags flags, TypeNode type, String name,
+			Expr init);
+
+	MethodDecl MethodDecl(Position pos, Flags flags, TypeNode returnType,
+			Id name, List formals, List throwTypes, Block body);
+
+	/** @deprecated */
+	MethodDecl MethodDecl(Position pos, Flags flags, TypeNode returnType,
+			String name, List formals, List throwTypes, Block body);
+
+	New New(Position pos, TypeNode type, List args);
+
+	New New(Position pos, TypeNode type, List args, ClassBody body);
+
+	New New(Position pos, Expr outer, TypeNode objectType, List args);
+
+	New New(Position pos, Expr outer, TypeNode objectType, List args,
+			ClassBody body);
+
+	NewArray NewArray(Position pos, TypeNode base, List dims);
+
+	NewArray NewArray(Position pos, TypeNode base, List dims, int addDims);
+
+	NewArray NewArray(Position pos, TypeNode base, int addDims, ArrayInit init);
+
+	NewArray NewArray(Position pos, TypeNode base, List dims, int addDims,
+			ArrayInit init);
+
+	NodeList NodeList(Position pos, List nodes);
+
+	NodeList NodeList(Position pos, NodeFactory nf, List nodes);
+
+	NullLit NullLit(Position pos);
+
+	Return Return(Position pos);
+
+	Return Return(Position pos, Expr expr);
+
+	SourceCollection SourceCollection(Position pos, List sources);
+
+	SourceFile SourceFile(Position pos, List decls);
+
+	SourceFile SourceFile(Position pos, List imports, List decls);
+
+	SourceFile SourceFile(Position pos, PackageNode packageName, List imports,
+			List decls);
+
+	Special This(Position pos);
+
+	Special This(Position pos, TypeNode outer);
+
+	Special Super(Position pos);
+
+	Special Super(Position pos, TypeNode outer);
+
+	Special Special(Position pos, Special.Kind kind);
+
+	Special Special(Position pos, Special.Kind kind, TypeNode outer);
+
+	StringLit StringLit(Position pos, String value);
+
+	Switch Switch(Position pos, Expr expr, List elements);
+
+	Synchronized Synchronized(Position pos, Expr expr, Block body);
+
+	Throw Throw(Position pos, Expr expr);
+
+	Try Try(Position pos, Block tryBlock, List catchBlocks);
+
+	Try Try(Position pos, Block tryBlock, List catchBlocks, Block finallyBlock);
+
+	PackageNode PackageNode(Position pos, Package p);
+
+	Unary Unary(Position pos, Unary.Operator op, Expr expr);
+
+	Unary Unary(Position pos, Expr expr, Unary.Operator op);
+
+	While While(Position pos, Expr cond, Stmt body);
 }

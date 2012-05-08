@@ -25,7 +25,6 @@
 
 package polyglot.frontend.goals;
 
-
 import java.util.*;
 
 import polyglot.ast.NodeFactory;
@@ -39,68 +38,68 @@ import polyglot.visit.TypeChecker;
 
 /**
  * Comment for <code>SignaturesDisambiguated</code>
- *
+ * 
  * @author nystrom
  */
 public class SignaturesResolved extends ClassTypeGoal {
-    public static Goal create(Scheduler scheduler, ParsedClassType ct) {
-        return scheduler.internGoal(new SignaturesResolved(ct));
-    }
+	public static Goal create(Scheduler scheduler, ParsedClassType ct) {
+		return scheduler.internGoal(new SignaturesResolved(ct));
+	}
 
-    protected SignaturesResolved(ParsedClassType ct) {
-        super(ct);
-    }
-    
-    protected static class SignaturesResolvedPass extends AbstractPass {
-        SignaturesResolvedPass(Goal goal) {
-            super(goal);
-        }
-        
-        public boolean run() {
-            SignaturesResolved goal = (SignaturesResolved) this.goal;
-            if (! goal.type().signaturesResolved()) {
-                throw new SchedulerException();
-            }
-            return true;
-        }
-    }
+	protected SignaturesResolved(ParsedClassType ct) {
+		super(ct);
+	}
 
-    public Pass createPass(ExtensionInfo extInfo) {
-        if (job() != null) {
-            return new SignaturesResolvedPass(this);
-        }
-        return new DisambiguateSignaturesPass(extInfo.scheduler(), this);
-    }
-    
-    public Collection prerequisiteGoals(Scheduler scheduler) {
-        List l = new ArrayList();
-        if (ct.job() != null) {
-            l.add(scheduler.TypesInitialized(ct.job()));
-        }
-        l.add(scheduler.SupertypesResolved(ct));
-        l.addAll(super.prerequisiteGoals(scheduler));
-        return l;
-    }
+	protected static class SignaturesResolvedPass extends AbstractPass {
+		SignaturesResolvedPass(Goal goal) {
+			super(goal);
+		}
 
-    protected boolean isGlobal(ParsedClassType ct) {
-        return ct.isTopLevel() || (ct.isMember() && isGlobal((ParsedClassType) ct.container()));
-    }
-    
-    public Collection corequisiteGoals(Scheduler scheduler) {
-        List l = new ArrayList();
-        if (ct.job() != null) {
-            if (isGlobal(ct)) {
-                l.add(scheduler.SignaturesDisambiguated(ct.job()));
-            }
-            else {
-                l.add(scheduler.Disambiguated(ct.job()));
-            }
-        }
-        l.addAll(super.corequisiteGoals(scheduler));
-        return l;
-    }
-    
-    public boolean equals(Object o) {
-        return o instanceof SignaturesResolved && super.equals(o);
-    }
+		public boolean run() {
+			SignaturesResolved goal = (SignaturesResolved) this.goal;
+			if (!goal.type().signaturesResolved()) {
+				throw new SchedulerException();
+			}
+			return true;
+		}
+	}
+
+	public Pass createPass(ExtensionInfo extInfo) {
+		if (job() != null) {
+			return new SignaturesResolvedPass(this);
+		}
+		return new DisambiguateSignaturesPass(extInfo.scheduler(), this);
+	}
+
+	public Collection prerequisiteGoals(Scheduler scheduler) {
+		List l = new ArrayList();
+		if (ct.job() != null) {
+			l.add(scheduler.TypesInitialized(ct.job()));
+		}
+		l.add(scheduler.SupertypesResolved(ct));
+		l.addAll(super.prerequisiteGoals(scheduler));
+		return l;
+	}
+
+	protected boolean isGlobal(ParsedClassType ct) {
+		return ct.isTopLevel()
+				|| (ct.isMember() && isGlobal((ParsedClassType) ct.container()));
+	}
+
+	public Collection corequisiteGoals(Scheduler scheduler) {
+		List l = new ArrayList();
+		if (ct.job() != null) {
+			if (isGlobal(ct)) {
+				l.add(scheduler.SignaturesDisambiguated(ct.job()));
+			} else {
+				l.add(scheduler.Disambiguated(ct.job()));
+			}
+		}
+		l.addAll(super.corequisiteGoals(scheduler));
+		return l;
+	}
+
+	public boolean equals(Object o) {
+		return o instanceof SignaturesResolved && super.equals(o);
+	}
 }

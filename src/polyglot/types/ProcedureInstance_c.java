@@ -33,226 +33,232 @@ import java.util.*;
  * A <code>ProcedureInstance_c</code> contains the type information for a Java
  * procedure (either a method or a constructor).
  */
-public abstract class ProcedureInstance_c extends TypeObject_c
-                                       implements ProcedureInstance
-{
-    protected ReferenceType container;
-    protected Flags flags;
-    protected List formalTypes;
-    protected List throwTypes;
+public abstract class ProcedureInstance_c extends TypeObject_c implements
+		ProcedureInstance {
+	protected ReferenceType container;
+	protected Flags flags;
+	protected List formalTypes;
+	protected List throwTypes;
 
-    /** Used for deserializing types. */
-    protected ProcedureInstance_c() { }
-
-    public ProcedureInstance_c(TypeSystem ts, Position pos,
-			       ReferenceType container,
-			       Flags flags, List formalTypes, List excTypes) {
-        super(ts, pos);
-	this.container = container;
-	this.flags = flags;
-	this.formalTypes = TypedList.copyAndCheck(formalTypes, Type.class, true);
-	this.throwTypes = TypedList.copyAndCheck(excTypes, Type.class, true);
-    }
-    
-    public ReferenceType container() {
-        return container;
-    }
-
-    public Flags flags() {
-        return flags;
-    }
-
-    public List formalTypes() {
-        return Collections.unmodifiableList(formalTypes);
-    }
-
-    public List throwTypes() {
-        return Collections.unmodifiableList(throwTypes);
-    }
-
-    /**
-     * @param container The container to set.
-     */
-    public void setContainer(ReferenceType container) {
-        this.container = container;
-    }
-    
-    /**
-     * @param flags The flags to set.
-     */
-    public void setFlags(Flags flags) {
-        this.flags = flags;
-    }
-    
-    /**
-     * @param formalTypes The formalTypes to set.
-     */
-    public void setFormalTypes(List formalTypes) {
-        this.formalTypes = TypedList.copyAndCheck(formalTypes, Type.class, true);
-    }
-    
-    /**
-     * @param throwTypes The throwTypes to set.
-     */
-    public void setThrowTypes(List throwTypes) {
-        this.throwTypes = TypedList.copyAndCheck(throwTypes, Type.class, true);
-    }
-     
-    public int hashCode() {
-        return container.hashCode() + flags.hashCode();
-    }
-
-    public boolean equalsImpl(TypeObject o) {
-        if (o instanceof ProcedureInstance) {
-	    ProcedureInstance i = (ProcedureInstance) o;
-	    // FIXME: Check excTypes too?
-	    return flags.equals(i.flags())
-	        && ts.hasFormals(this, i.formalTypes());
+	/** Used for deserializing types. */
+	protected ProcedureInstance_c() {
 	}
 
-	return false;
-    }
+	public ProcedureInstance_c(TypeSystem ts, Position pos,
+			ReferenceType container, Flags flags, List formalTypes,
+			List excTypes) {
+		super(ts, pos);
+		this.container = container;
+		this.flags = flags;
+		this.formalTypes = TypedList
+				.copyAndCheck(formalTypes, Type.class, true);
+		this.throwTypes = TypedList.copyAndCheck(excTypes, Type.class, true);
+	}
 
-    protected boolean listIsCanonical(List l) {
-	for (Iterator i = l.iterator(); i.hasNext(); ) {
-	    TypeObject o = (TypeObject) i.next();
-	    if (! o.isCanonical()) {
+	public ReferenceType container() {
+		return container;
+	}
+
+	public Flags flags() {
+		return flags;
+	}
+
+	public List formalTypes() {
+		return Collections.unmodifiableList(formalTypes);
+	}
+
+	public List throwTypes() {
+		return Collections.unmodifiableList(throwTypes);
+	}
+
+	/**
+	 * @param container
+	 *            The container to set.
+	 */
+	public void setContainer(ReferenceType container) {
+		this.container = container;
+	}
+
+	/**
+	 * @param flags
+	 *            The flags to set.
+	 */
+	public void setFlags(Flags flags) {
+		this.flags = flags;
+	}
+
+	/**
+	 * @param formalTypes
+	 *            The formalTypes to set.
+	 */
+	public void setFormalTypes(List formalTypes) {
+		this.formalTypes = TypedList
+				.copyAndCheck(formalTypes, Type.class, true);
+	}
+
+	/**
+	 * @param throwTypes
+	 *            The throwTypes to set.
+	 */
+	public void setThrowTypes(List throwTypes) {
+		this.throwTypes = TypedList.copyAndCheck(throwTypes, Type.class, true);
+	}
+
+	public int hashCode() {
+		return container.hashCode() + flags.hashCode();
+	}
+
+	public boolean equalsImpl(TypeObject o) {
+		if (o instanceof ProcedureInstance) {
+			ProcedureInstance i = (ProcedureInstance) o;
+			// FIXME: Check excTypes too?
+			return flags.equals(i.flags())
+					&& ts.hasFormals(this, i.formalTypes());
+		}
+
 		return false;
-	    }
 	}
 
-	return true;
-    }
+	protected boolean listIsCanonical(List l) {
+		for (Iterator i = l.iterator(); i.hasNext();) {
+			TypeObject o = (TypeObject) i.next();
+			if (!o.isCanonical()) {
+				return false;
+			}
+		}
 
-    public final boolean moreSpecific(ProcedureInstance p) {
-        return ts.moreSpecific(this, p);
-    }
+		return true;
+	}
 
+	public final boolean moreSpecific(ProcedureInstance p) {
+		return ts.moreSpecific(this, p);
+	}
 
-    /**
-     * Returns whether <code>this</code> is <i>more specific</i> than
-     * <code>p</code>, where <i>more specific</i> is defined as JLS
-     * 15.12.2.2.
-     *<p>
-     * <b>Note:</b> There is a fair amount of guesswork since the JLS
-     * does not include any info regarding Java 1.2, so all inner class
-     * rules are found empirically using jikes and javac.
-     */
-    public boolean moreSpecificImpl(ProcedureInstance p) {
-        ProcedureInstance p1 = this;
-        ProcedureInstance p2 = p;
+	/**
+	 * Returns whether <code>this</code> is <i>more specific</i> than
+	 * <code>p</code>, where <i>more specific</i> is defined as JLS 15.12.2.2.
+	 * <p>
+	 * <b>Note:</b> There is a fair amount of guesswork since the JLS does not
+	 * include any info regarding Java 1.2, so all inner class rules are found
+	 * empirically using jikes and javac.
+	 */
+	public boolean moreSpecificImpl(ProcedureInstance p) {
+		ProcedureInstance p1 = this;
+		ProcedureInstance p2 = p;
 
-        // rule 1:
-        ReferenceType t1 = null;
-        ReferenceType t2 = null;
-        
-        if (p1 instanceof MemberInstance) {
-            if (p1 instanceof Declaration) {
-                t1 = ((MemberInstance) ((Declaration) p1).declaration()).container();
-            }
-            else {
-                t1 = ((MemberInstance) p1).container();
-            }
-        }
-        if (p2 instanceof MemberInstance) {
-            if (p2 instanceof Declaration) {
-                t2 = ((MemberInstance) ((Declaration) p2).declaration()).container();
-            }
-            else {
-                t2 = ((MemberInstance) p2).container();
-            }
-        }
-        
-        if (t1 != null && t2 != null) {
-            if (t1.isClass() && t2.isClass()) {
-                if (! t1.isSubtype(t2) &&
-                        ! t1.toClass().isEnclosed(t2.toClass())) {
-                    return false;
-                }
-            }
-            else {
-                if (! t1.isSubtype(t2)) {
-                    return false;
-                }
-            }
-        }
+		// rule 1:
+		ReferenceType t1 = null;
+		ReferenceType t2 = null;
 
-        // rule 2:
-        return p2.callValid(p1.formalTypes());
-    }
+		if (p1 instanceof MemberInstance) {
+			if (p1 instanceof Declaration) {
+				t1 = ((MemberInstance) ((Declaration) p1).declaration())
+						.container();
+			} else {
+				t1 = ((MemberInstance) p1).container();
+			}
+		}
+		if (p2 instanceof MemberInstance) {
+			if (p2 instanceof Declaration) {
+				t2 = ((MemberInstance) ((Declaration) p2).declaration())
+						.container();
+			} else {
+				t2 = ((MemberInstance) p2).container();
+			}
+		}
 
-    /** Returns true if the procedure has the given formal parameter types. */
-    public final boolean hasFormals(List formalTypes) {
-        return ts.hasFormals(this, formalTypes);
-    }
+		if (t1 != null && t2 != null) {
+			if (t1.isClass() && t2.isClass()) {
+				if (!t1.isSubtype(t2) && !t1.toClass().isEnclosed(t2.toClass())) {
+					return false;
+				}
+			} else {
+				if (!t1.isSubtype(t2)) {
+					return false;
+				}
+			}
+		}
 
-    /** Returns true if the procedure has the given formal parameter types. */
-    public boolean hasFormalsImpl(List formalTypes) {
-        List l1 = this.formalTypes();
-        List l2 = formalTypes;
+		// rule 2:
+		return p2.callValid(p1.formalTypes());
+	}
 
-        Iterator i1 = l1.iterator();
-        Iterator i2 = l2.iterator();
+	/** Returns true if the procedure has the given formal parameter types. */
+	public final boolean hasFormals(List formalTypes) {
+		return ts.hasFormals(this, formalTypes);
+	}
 
-        while (i1.hasNext() && i2.hasNext()) {
-            Type t1 = (Type) i1.next();
-            Type t2 = (Type) i2.next();
+	/** Returns true if the procedure has the given formal parameter types. */
+	public boolean hasFormalsImpl(List formalTypes) {
+		List l1 = this.formalTypes();
+		List l2 = formalTypes;
 
-            if (! ts.equals(t1, t2)) {
-                return false;
-            }
-        }
+		Iterator i1 = l1.iterator();
+		Iterator i2 = l2.iterator();
 
-        return ! (i1.hasNext() || i2.hasNext());
-    }
+		while (i1.hasNext() && i2.hasNext()) {
+			Type t1 = (Type) i1.next();
+			Type t2 = (Type) i2.next();
 
-    /** Returns true iff <code>this</code> throws fewer exceptions than
-     * <code>p</code>. */
-    public final boolean throwsSubset(ProcedureInstance p) {
-        return ts.throwsSubset(this, p);
-    }
+			if (!ts.equals(t1, t2)) {
+				return false;
+			}
+		}
 
-    /** Returns true iff <code>this</code> throws fewer exceptions than
-     * <code>p</code>. */
-    public boolean throwsSubsetImpl(ProcedureInstance p) {
-        SubtypeSet s1 = new SubtypeSet(ts.Throwable());
-        SubtypeSet s2 = new SubtypeSet(ts.Throwable());
+		return !(i1.hasNext() || i2.hasNext());
+	}
 
-        s1.addAll(this.throwTypes());
-        s2.addAll(p.throwTypes());
+	/**
+	 * Returns true iff <code>this</code> throws fewer exceptions than
+	 * <code>p</code>.
+	 */
+	public final boolean throwsSubset(ProcedureInstance p) {
+		return ts.throwsSubset(this, p);
+	}
 
-        for (Iterator i = s1.iterator(); i.hasNext(); ) {
-            Type t = (Type) i.next();
-            if (! ts.isUncheckedException(t) && ! s2.contains(t)) {
-                return false;
-            }
-        }
+	/**
+	 * Returns true iff <code>this</code> throws fewer exceptions than
+	 * <code>p</code>.
+	 */
+	public boolean throwsSubsetImpl(ProcedureInstance p) {
+		SubtypeSet s1 = new SubtypeSet(ts.Throwable());
+		SubtypeSet s2 = new SubtypeSet(ts.Throwable());
 
-        return true;
-    }
+		s1.addAll(this.throwTypes());
+		s2.addAll(p.throwTypes());
 
-    /** Returns true if a call can be made with the given argument types. */
-    public final boolean callValid(List argTypes) {
-        return ts.callValid(this, argTypes);
-    }
+		for (Iterator i = s1.iterator(); i.hasNext();) {
+			Type t = (Type) i.next();
+			if (!ts.isUncheckedException(t) && !s2.contains(t)) {
+				return false;
+			}
+		}
 
-    /** Returns true if a call can be made with the given argument types. */
-    public boolean callValidImpl(List argTypes) {
-        List l1 = this.formalTypes();
-        List l2 = argTypes;
+		return true;
+	}
 
-        Iterator i1 = l1.iterator();
-        Iterator i2 = l2.iterator();
+	/** Returns true if a call can be made with the given argument types. */
+	public final boolean callValid(List argTypes) {
+		return ts.callValid(this, argTypes);
+	}
 
-        while (i1.hasNext() && i2.hasNext()) {
-            Type t1 = (Type) i1.next();
-            Type t2 = (Type) i2.next();
+	/** Returns true if a call can be made with the given argument types. */
+	public boolean callValidImpl(List argTypes) {
+		List l1 = this.formalTypes();
+		List l2 = argTypes;
 
-            if (! ts.isImplicitCastValid(t2, t1)) {
-                return false;
-            }
-        }
+		Iterator i1 = l1.iterator();
+		Iterator i2 = l2.iterator();
 
-        return ! (i1.hasNext() || i2.hasNext());
-    }
+		while (i1.hasNext() && i2.hasNext()) {
+			Type t1 = (Type) i1.next();
+			Type t2 = (Type) i2.next();
+
+			if (!ts.isImplicitCastValid(t2, t1)) {
+				return false;
+			}
+		}
+
+		return !(i1.hasNext() || i2.hasNext());
+	}
 }

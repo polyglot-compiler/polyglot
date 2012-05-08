@@ -3,25 +3,23 @@ package ppg.lex;
 import java.io.*;
 import ppg.parse.*;
 
-public class LexTest
-{
+public class LexTest {
 	private static final String HEADER = "ppg [lexertest]: ";
-	
-	public LexTest() {}
-	
+
+	public LexTest() {
+	}
+
 	public static void main(String args[]) {
 		FileInputStream fileInput;
 		String filename = null;
 		try {
 			filename = args[0];
 			fileInput = new FileInputStream(filename);
-		}
-		catch (FileNotFoundException e) {
-			System.err.println("Error: "+filename+" is not found.");
+		} catch (FileNotFoundException e) {
+			System.err.println("Error: " + filename + " is not found.");
 			return;
-		}
-		catch (ArrayIndexOutOfBoundsException e) {
-			System.err.println(HEADER+"Error: No file name given.");
+		} catch (ArrayIndexOutOfBoundsException e) {
+			System.err.println(HEADER + "Error: No file name given.");
 			return;
 		}
 
@@ -32,7 +30,7 @@ public class LexTest
 		Token t = null;
 		try {
 			while (true) {
-				t=lex.getToken();
+				t = lex.getToken();
 				t.unparse(System.out);
 				if (t.getCode() == Constant.EOF) {
 					break;

@@ -34,18 +34,19 @@ import polyglot.types.TypeSystem;
 import polyglot.visit.InitChecker;
 
 public class InitializationsChecked extends VisitorGoal {
-    public static Goal create(Scheduler scheduler, Job job, TypeSystem ts, NodeFactory nf) {
-        return scheduler.internGoal(new InitializationsChecked(job, ts, nf));
-    }
+	public static Goal create(Scheduler scheduler, Job job, TypeSystem ts,
+			NodeFactory nf) {
+		return scheduler.internGoal(new InitializationsChecked(job, ts, nf));
+	}
 
-    protected InitializationsChecked(Job job, TypeSystem ts, NodeFactory nf) {
-        super(job, new InitChecker(job, ts, nf));
-    }
+	protected InitializationsChecked(Job job, TypeSystem ts, NodeFactory nf) {
+		super(job, new InitChecker(job, ts, nf));
+	}
 
-    public Collection prerequisiteGoals(Scheduler scheduler) {
-        List l = new ArrayList();
-        l.add(scheduler.ReachabilityChecked(job));
-        l.addAll(super.prerequisiteGoals(scheduler));
-        return l;
-    }
+	public Collection prerequisiteGoals(Scheduler scheduler) {
+		List l = new ArrayList();
+		l.add(scheduler.ReachabilityChecked(job));
+		l.addAll(super.prerequisiteGoals(scheduler));
+		return l;
+	}
 }

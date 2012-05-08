@@ -36,21 +36,21 @@ import polyglot.types.TypeSystem;
  * A visitor which traverses the AST and remove ambiguities found in fields,
  * method signatures and the code itself.
  */
-public class OuterScopeDisambiguator extends Disambiguator
-{
-    public OuterScopeDisambiguator(DisambiguationDriver dd) {
-        super(dd);
-    }
+public class OuterScopeDisambiguator extends Disambiguator {
+	public OuterScopeDisambiguator(DisambiguationDriver dd) {
+		super(dd);
+	}
 
-    public OuterScopeDisambiguator(Job job, TypeSystem ts, NodeFactory nf, Context c) {
-        super(job, ts, nf, c);
-    }
-    
-    public Node override(Node parent, Node n) {
-        // Only visit imports and package declarations.
-        if (n instanceof TopLevelDecl) {
-            return n;
-        }
-        return null;
-    }
+	public OuterScopeDisambiguator(Job job, TypeSystem ts, NodeFactory nf,
+			Context c) {
+		super(job, ts, nf, c);
+	}
+
+	public Node override(Node parent, Node n) {
+		// Only visit imports and package declarations.
+		if (n instanceof TopLevelDecl) {
+			return n;
+		}
+		return null;
+	}
 }

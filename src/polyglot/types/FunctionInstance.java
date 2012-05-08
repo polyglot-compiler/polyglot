@@ -34,16 +34,16 @@ import polyglot.util.CollectionUtil;
  * A <code>FunctionInstance</code> represents the type information for a
  * function.
  */
-public interface FunctionInstance extends ProcedureInstance
-{
-    /**
-     * The functions's return type.
-     */
-    Type returnType();
-    
-    /**
-     * Destructively set the functions's return type.
-     * @param type
-     */
-    void setReturnType(Type type);
+public interface FunctionInstance extends ProcedureInstance {
+	/**
+	 * The functions's return type.
+	 */
+	Type returnType();
+
+	/**
+	 * Destructively set the functions's return type.
+	 * 
+	 * @param type
+	 */
+	void setReturnType(Type type);
 }

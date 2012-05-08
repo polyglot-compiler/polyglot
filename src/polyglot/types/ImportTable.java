@@ -30,7 +30,6 @@ import polyglot.main.Report;
 
 import java.util.*;
 
-
 /**
  * An <code>ImportTable</code> is a type of <code>ClassResolver</code> that
  * corresponds to a particular source file.
@@ -38,457 +37,460 @@ import java.util.*;
  * It has a set of package and class imports, which caches the results of
  * lookups for future reference.
  */
-public class ImportTable implements Resolver
-{
-    protected TypeSystem ts;
-    /** A list of all package imports. */
-    protected List packageImports;
-    /** Map from names to classes found, or to the NOT_FOUND object. */
-    protected Map map;
-    /** List of class imports which will be lazily added to the table at the
-     * next lookup. */
-    protected List lazyImports;
-    /** Parallel list of positions for lazyImports. */
-    protected List lazyImportPositions;
-    /** List of explicitly imported classes added to the table or pending in
-     * the lazyImports list. */
-    protected List classImports;
-    /** Source name to use for debugging and error reporting */
-    protected String sourceName;
-    /** Position to use for error reporting */
-    protected Position sourcePos;
-    /** Our package */
-    protected Package pkg;
+public class ImportTable implements Resolver {
+	protected TypeSystem ts;
+	/** A list of all package imports. */
+	protected List packageImports;
+	/** Map from names to classes found, or to the NOT_FOUND object. */
+	protected Map map;
+	/**
+	 * List of class imports which will be lazily added to the table at the next
+	 * lookup.
+	 */
+	protected List lazyImports;
+	/** Parallel list of positions for lazyImports. */
+	protected List lazyImportPositions;
+	/**
+	 * List of explicitly imported classes added to the table or pending in the
+	 * lazyImports list.
+	 */
+	protected List classImports;
+	/** Source name to use for debugging and error reporting */
+	protected String sourceName;
+	/** Position to use for error reporting */
+	protected Position sourcePos;
+	/** Our package */
+	protected Package pkg;
 
-    private static final Object NOT_FOUND = "NOT FOUND";
+	private static final Object NOT_FOUND = "NOT FOUND";
 
-    /**
-     * Create an import table.
-     * @param ts The type system
-     * @param pkg The package of the source we are importing types into.
-     */
-    public ImportTable(TypeSystem ts, Package pkg) {
-        this(ts, pkg, null);
-    }
+	/**
+	 * Create an import table.
+	 * 
+	 * @param ts
+	 *            The type system
+	 * @param pkg
+	 *            The package of the source we are importing types into.
+	 */
+	public ImportTable(TypeSystem ts, Package pkg) {
+		this(ts, pkg, null);
+	}
 
-    /**
-     * Create an import table.
-     * @param ts The type system
-     * @param pkg The package of the source we are importing types into.
-     * @param src The name of the source file we are importing into.
-     */
-    public ImportTable(TypeSystem ts, Package pkg, String src) {
-        this.ts = ts;
-        this.sourceName = src;
-        this.sourcePos = src != null ? new Position(null, src) : null;
-        this.pkg = pkg;
+	/**
+	 * Create an import table.
+	 * 
+	 * @param ts
+	 *            The type system
+	 * @param pkg
+	 *            The package of the source we are importing types into.
+	 * @param src
+	 *            The name of the source file we are importing into.
+	 */
+	public ImportTable(TypeSystem ts, Package pkg, String src) {
+		this.ts = ts;
+		this.sourceName = src;
+		this.sourcePos = src != null ? new Position(null, src) : null;
+		this.pkg = pkg;
 
-        this.map = new HashMap();
-        this.packageImports = new ArrayList();
-        this.lazyImports = new ArrayList();
-        this.lazyImportPositions = new ArrayList();
-        this.classImports = new ArrayList();
-    }
+		this.map = new HashMap();
+		this.packageImports = new ArrayList();
+		this.lazyImports = new ArrayList();
+		this.lazyImportPositions = new ArrayList();
+		this.classImports = new ArrayList();
+	}
 
-    /**
-     * The package of the source we are importing types into.
-     */
-    public Package package_() {
-        return pkg;
-    }
+	/**
+	 * The package of the source we are importing types into.
+	 */
+	public Package package_() {
+		return pkg;
+	}
 
-    /**
-     * Add a class import.
-     */
-    public void addClassImport(String className) {
-        addClassImport(className, null);
-    }
+	/**
+	 * Add a class import.
+	 */
+	public void addClassImport(String className) {
+		addClassImport(className, null);
+	}
 
-    /**
-     * Add a class import.
-     */
-    public void addClassImport(String className, Position pos) {
-        if (Report.should_report(TOPICS, 2))
-            Report.report(2, this + ": lazy import " + className);
+	/**
+	 * Add a class import.
+	 */
+	public void addClassImport(String className, Position pos) {
+		if (Report.should_report(TOPICS, 2))
+			Report.report(2, this + ": lazy import " + className);
 
-        lazyImports.add(className);
-        lazyImportPositions.add(pos);
-        classImports.add(className);
-    }
+		lazyImports.add(className);
+		lazyImportPositions.add(pos);
+		classImports.add(className);
+	}
 
-    /**
-     * Add a package import.
-     */
-    public void addPackageImport(String pkgName, Position pos) {
-        // pos ignored since it's never used
-        addPackageImport(pkgName);
-    }
+	/**
+	 * Add a package import.
+	 */
+	public void addPackageImport(String pkgName, Position pos) {
+		// pos ignored since it's never used
+		addPackageImport(pkgName);
+	}
 
-    /**
-     * Add a package import.
-     */
-    public void addPackageImport(String pkgName) {
-        // don't add the import if it is the same as the current package,
-        // the same as a default import, or has already been imported
-        if ((pkg != null && pkg.fullName().equals(pkgName)) ||
-                ts.defaultPackageImports().contains(pkgName) ||
-                packageImports.contains(pkgName)) {
-            return;
-        }
+	/**
+	 * Add a package import.
+	 */
+	public void addPackageImport(String pkgName) {
+		// don't add the import if it is the same as the current package,
+		// the same as a default import, or has already been imported
+		if ((pkg != null && pkg.fullName().equals(pkgName))
+				|| ts.defaultPackageImports().contains(pkgName)
+				|| packageImports.contains(pkgName)) {
+			return;
+		}
 
-        packageImports.add(pkgName);
-    }
+		packageImports.add(pkgName);
+	}
 
-    /**
-     * List the packages we import from.
-     */
-    public List packageImports() {
-        return packageImports;
-    }
+	/**
+	 * List the packages we import from.
+	 */
+	public List packageImports() {
+		return packageImports;
+	}
 
-    /**
-     * List the classes explicitly imported.
-     */
-    public List classImports() {
-        return classImports;
-    }
+	/**
+	 * List the classes explicitly imported.
+	 */
+	public List classImports() {
+		return classImports;
+	}
 
-    /**
-     * The name of the source file we are importing into.
-     */
-    public String sourceName() {
-        return sourceName;
-    }
+	/**
+	 * The name of the source file we are importing into.
+	 */
+	public String sourceName() {
+		return sourceName;
+	}
 
-    /**
-     * Find a type by name, using the cache and the outer resolver,
-     * but not the import table.
-     */
-    protected Named cachedFind(String name) throws SemanticException {
-        Object res = map.get(name);
+	/**
+	 * Find a type by name, using the cache and the outer resolver, but not the
+	 * import table.
+	 */
+	protected Named cachedFind(String name) throws SemanticException {
+		Object res = map.get(name);
 
-        if (res != null) {
-            return (Named) res;
-        }
+		if (res != null) {
+			return (Named) res;
+		}
 
-        Named t = ts.systemResolver().find(name);
-        map.put(name, t);
-        return t;
-    }
+		Named t = ts.systemResolver().find(name);
+		map.put(name, t);
+		return t;
+	}
 
-    /**
-     * Find a type by name, searching the import table.
-     */
-    public Named find(String name) throws SemanticException {
-        if (Report.should_report(TOPICS, 2))
-            Report.report(2, this + ".find(" + name + ")");
+	/**
+	 * Find a type by name, searching the import table.
+	 */
+	public Named find(String name) throws SemanticException {
+		if (Report.should_report(TOPICS, 2))
+			Report.report(2, this + ".find(" + name + ")");
 
-        /* First add any lazy imports. */
-        lazyImport();
+		/* First add any lazy imports. */
+		lazyImport();
 
-        if (!StringUtil.isNameShort(name)) {
-            // The name was long.
-            return ts.systemResolver().find(name);
-        }
+		if (!StringUtil.isNameShort(name)) {
+			// The name was long.
+			return ts.systemResolver().find(name);
+		}
 
-        // The class name is short.
-        // First see if we have a mapping already.
-        Object res = map.get(name);
+		// The class name is short.
+		// First see if we have a mapping already.
+		Object res = map.get(name);
 
-        if (res != null) {
-            if (res == NOT_FOUND) {
-                throw new NoClassException(name, sourcePos);
-            }
-            return (Named) res;
-        }
+		if (res != null) {
+			if (res == NOT_FOUND) {
+				throw new NoClassException(name, sourcePos);
+			}
+			return (Named) res;
+		}
 
-        try {
-            if (pkg != null) {
-                // check if the current package defines it.
-                // If so, this takes priority over the package imports (or 
-                // "type-import-on-demand" declarations as they are called in
-                // the JLS), so even if another package defines the same name,
-                // there is no conflict. See Section 6.5.2 of JLS, 2nd Ed.
-                Named n = findInPkg(name, pkg.fullName());
-                if (n != null) {
-                    if (Report.should_report(TOPICS, 3))
-                        Report.report(3, this + ".find(" + name + "): found in current package");
+		try {
+			if (pkg != null) {
+				// check if the current package defines it.
+				// If so, this takes priority over the package imports (or
+				// "type-import-on-demand" declarations as they are called in
+				// the JLS), so even if another package defines the same name,
+				// there is no conflict. See Section 6.5.2 of JLS, 2nd Ed.
+				Named n = findInPkg(name, pkg.fullName());
+				if (n != null) {
+					if (Report.should_report(TOPICS, 3))
+						Report.report(3, this + ".find(" + name
+								+ "): found in current package");
 
-                    // Memoize the result.
-                    map.put(name, n);
-                    return n;
-                }
-            }
+					// Memoize the result.
+					map.put(name, n);
+					return n;
+				}
+			}
 
-            List imports = new ArrayList(packageImports.size() + 5);
+			List imports = new ArrayList(packageImports.size() + 5);
 
-            imports.addAll(ts.defaultPackageImports());
-            imports.addAll(packageImports);
+			imports.addAll(ts.defaultPackageImports());
+			imports.addAll(packageImports);
 
-            // It wasn't a ClassImport.  Maybe it was a PackageImport?
-            Named resolved = null;
-            for (Iterator iter = imports.iterator(); iter.hasNext(); ) {
-                String pkgName = (String) iter.next();
-                Named n = findInPkg(name, pkgName);
-                if (n != null) {
-                    if (resolved == null) {
-                        // This is the first occurrence of name we've found
-                        // in a package import.
-                        // Record it, and keep going, to see if there
-                        // are any conflicts.
-                        resolved = n;
-                    }
-                    else {
-                        // This is the 2nd occurrence of name we've found
-                        // in an imported package.
-                        // That's bad.
-                        throw new SemanticException("Reference to \"" + 
-                                                    name + "\" is ambiguous; both " + 
-                                                    resolved.fullName() + " and " + n.fullName() + 
-                        " match.");
-                    }
-                }
-            }
+			// It wasn't a ClassImport. Maybe it was a PackageImport?
+			Named resolved = null;
+			for (Iterator iter = imports.iterator(); iter.hasNext();) {
+				String pkgName = (String) iter.next();
+				Named n = findInPkg(name, pkgName);
+				if (n != null) {
+					if (resolved == null) {
+						// This is the first occurrence of name we've found
+						// in a package import.
+						// Record it, and keep going, to see if there
+						// are any conflicts.
+						resolved = n;
+					} else {
+						// This is the 2nd occurrence of name we've found
+						// in an imported package.
+						// That's bad.
+						throw new SemanticException("Reference to \"" + name
+								+ "\" is ambiguous; both "
+								+ resolved.fullName() + " and " + n.fullName()
+								+ " match.");
+					}
+				}
+			}
 
-            if (resolved == null) {
-                // The name was short, but not in any imported class or package.
-                // Check the null package.
-                resolved = ts.systemResolver().find(name); // may throw exception
+			if (resolved == null) {
+				// The name was short, but not in any imported class or package.
+				// Check the null package.
+				resolved = ts.systemResolver().find(name); // may throw
+															// exception
 
-                if (!isVisibleFrom(resolved, "")) {
-                    // Not visible.
-                    throw new NoClassException(name, sourcePos);
-                }
-            }
+				if (!isVisibleFrom(resolved, "")) {
+					// Not visible.
+					throw new NoClassException(name, sourcePos);
+				}
+			}
 
-            // Memoize the result.
-            if (Report.should_report(TOPICS, 3))
-                Report.report(3, this + ".find(" + name + "): found as " + resolved.fullName());
-            map.put(name, resolved);
-            return resolved;
-        }
-        catch (NoClassException e) {
-            // memoize the no class exception
-            if (Report.should_report(TOPICS, 3))
-                Report.report(3, this + ".find(" + name + "): didn't find it");
-            map.put(name, NOT_FOUND);
-            throw e;
-        }
-    }
+			// Memoize the result.
+			if (Report.should_report(TOPICS, 3))
+				Report.report(3, this + ".find(" + name + "): found as "
+						+ resolved.fullName());
+			map.put(name, resolved);
+			return resolved;
+		} catch (NoClassException e) {
+			// memoize the no class exception
+			if (Report.should_report(TOPICS, 3))
+				Report.report(3, this + ".find(" + name + "): didn't find it");
+			map.put(name, NOT_FOUND);
+			throw e;
+		}
+	}
 
-    protected Named findInPkg(String name, String pkgName) throws SemanticException {
-        String fullName = pkgName + "." + name;
+	protected Named findInPkg(String name, String pkgName)
+			throws SemanticException {
+		String fullName = pkgName + "." + name;
 
-        try {
-            Named n = ts.systemResolver().find(fullName);
+		try {
+			Named n = ts.systemResolver().find(fullName);
 
-            // Check if the type is visible in this package.
-            if (isVisibleFrom(n, pkgName)) {
-                return n;
-            }
-        }
-        catch (NoClassException ex) {
-            // Do nothing.
-        }
-        /*
-        try {
-            Named n = ts.systemResolver().find(pkgName);
+			// Check if the type is visible in this package.
+			if (isVisibleFrom(n, pkgName)) {
+				return n;
+			}
+		} catch (NoClassException ex) {
+			// Do nothing.
+		}
+		/*
+		 * try { Named n = ts.systemResolver().find(pkgName);
+		 * 
+		 * if (n instanceof ClassType) { n = ((ClassType)
+		 * n).resolver().find(name); return n; } } catch (NoClassException ex) {
+		 * // Do nothing. }
+		 */
 
-            if (n instanceof ClassType) {
-                n = ((ClassType) n).resolver().find(name);
-                return n;
-            }
-        }
-        catch (NoClassException ex) {
-            // Do nothing.
-        }
-         */
+		return null;
+	}
 
-        return null;
-    }
+	/**
+	 * Return whether <code>n</code> in package <code>pkgName</code> is visible
+	 * from within package <code>pkg</code>. The empty string may be passed in
+	 * to represent the default package.
+	 */
+	protected boolean isVisibleFrom(Named n, String pkgName) {
+		boolean isVisible = false;
+		boolean inSamePackage = this.pkg != null
+				&& this.pkg.fullName().equals(pkgName) || this.pkg == null
+				&& pkgName.equals("");
+		if (n instanceof Type) {
+			Type t = (Type) n;
+			// FIXME: Assume non-class types are always visible.
+			isVisible = !t.isClass() || t.toClass().flags().isPublic()
+					|| inSamePackage;
+		} else {
+			// FIXME: Assume non-types are always visible.
+			isVisible = true;
+		}
+		return isVisible;
+	}
 
-    /**
-     * Return whether <code>n</code> in package <code>pkgName</code> is visible from within
-     * package <code>pkg</code>.  The empty string may
-     * be passed in to represent the default package.
-     */
-    protected boolean isVisibleFrom(Named n, String pkgName) {
-        boolean isVisible = false;
-        boolean inSamePackage = this.pkg != null 
-        && this.pkg.fullName().equals(pkgName)
-        || this.pkg == null 
-        && pkgName.equals("");
-        if (n instanceof Type) {
-            Type t = (Type) n;
-            //FIXME: Assume non-class types are always visible.
-            isVisible = !t.isClass() 
-            || t.toClass().flags().isPublic() 
-            || inSamePackage; 
-        } else {
-            //FIXME: Assume non-types are always visible.
-            isVisible = true;
-        }
-        return isVisible;
-    }
+	/**
+	 * Load the class imports, lazily.
+	 */
+	protected void lazyImport() throws SemanticException {
+		if (lazyImports.isEmpty()) {
+			return;
+		}
 
-    /**
-     * Load the class imports, lazily.
-     */
-    protected void lazyImport() throws SemanticException {
-        if (lazyImports.isEmpty()) {
-            return;
-        }
+		for (int i = 0; i < lazyImports.size(); i++) {
+			String longName = (String) lazyImports.get(i);
 
-        for (int i = 0; i < lazyImports.size(); i++) {
-            String longName = (String) lazyImports.get(i);
+			if (Report.should_report(TOPICS, 2))
+				Report.report(2, this + ": import " + longName);
 
-            if (Report.should_report(TOPICS, 2))
-                Report.report(2, this + ": import " + longName);
+			try {
+				lazyImportLongName(longName);
+			} catch (SemanticException e) {
+				System.err.println("  foo " + e.getClass());
+				if (e.position == null) {
+					e.position = (Position) lazyImportPositions.get(i);
+				}
+				if (e.position == null) {
+					e.position = sourcePos;
+				}
 
-            try {
-                lazyImportLongName(longName);
-            }
-            catch (SemanticException e) {
-                System.err.println("  foo " + e.getClass());
-                if (e.position == null) {
-                    e.position = (Position) lazyImportPositions.get(i);
-                }
-                if (e.position == null) {
-                    e.position = sourcePos;
-                }
+				throw e;
+			}
+		}
 
-                throw e;
-            }
-        }
+		lazyImports = new ArrayList();
+		lazyImportPositions = new ArrayList();
+	}
 
-        lazyImports = new ArrayList();
-        lazyImportPositions = new ArrayList();
-    }
+	/**
+	 * Try to import the class longName
+	 * 
+	 * @param longName
+	 * @throws SemanticException
+	 */
+	protected void lazyImportLongName(String longName) throws SemanticException {
+		try {
+			// first try finding the long name. If it works, great! It's nice
+			// and simple
+			Named t = ts.systemResolver().find(longName);
+			String shortName = StringUtil.getShortNameComponent(longName);
+			map.put(shortName, t);
+			return;
+		} catch (NoClassException e) {
+			// didn't find it
+		}
+		// The class may be a static member class of another,
+		lazyImportLongNameStaticMember(longName);
+	}
 
-    /**
-     * Try to import the class longName
-     * @param longName
-     * @throws SemanticException
-     */
-    protected void lazyImportLongName(String longName) throws SemanticException {
-        try {
-            // first try finding the long name. If it works, great! It's nice and simple
-            Named t = ts.systemResolver().find(longName);
-            String shortName = StringUtil.getShortNameComponent(longName);                    
-            map.put(shortName, t);
-            return;
-        }
-        catch (NoClassException e) {
-            // didn't find it
-        }
-        // The class may be a static member class of another, 
-        lazyImportLongNameStaticMember(longName);
-    }
+	/**
+	 * The class longName may be a static nested class. Try to import it.
+	 * 
+	 * @param longName
+	 * @throws SemanticException
+	 */
+	protected void lazyImportLongNameStaticMember(String longName)
+			throws SemanticException {
+		// Try to find the shortest prefix of longName that is a class
 
-    /**
-     * The class longName may be a static nested class. Try to import it.
-     * @param longName
-     * @throws SemanticException
-     */
-    protected void lazyImportLongNameStaticMember(String longName) throws SemanticException {
-        // Try to find the shortest prefix of longName that is a class
-        
-        StringTokenizer st = new StringTokenizer(longName, ".");
-        StringBuffer name = new StringBuffer();
+		StringTokenizer st = new StringTokenizer(longName, ".");
+		StringBuffer name = new StringBuffer();
 
-        Named t = null;
-        while (st.hasMoreTokens()) {
-            String s = st.nextToken();
-            if (name.length() > 0) {
-                name.append(".");
-            }
-            name.append(s);
-            
-            try {
-                t = cachedFind(name.toString());
-            }
-            catch (NoClassException e) {
-                if (! st.hasMoreTokens()) {
-                    // no more types to try to find.
-                    throw e;
-                }    
-            }
-            if (t != null) {
-                // we found a type t!
-                if (! st.hasMoreTokens()) {
-                    // this is the one we were looking for!
-                    break;
-                }
+		Named t = null;
+		while (st.hasMoreTokens()) {
+			String s = st.nextToken();
+			if (name.length() > 0) {
+				name.append(".");
+			}
+			name.append(s);
 
-                // We now have a type t, and we need to navigate to the appropriate nested class
-                while (st.hasMoreTokens()) {
-                    String n = st.nextToken();
+			try {
+				t = cachedFind(name.toString());
+			} catch (NoClassException e) {
+				if (!st.hasMoreTokens()) {
+					// no more types to try to find.
+					throw e;
+				}
+			}
+			if (t != null) {
+				// we found a type t!
+				if (!st.hasMoreTokens()) {
+					// this is the one we were looking for!
+					break;
+				}
 
-                    if (t instanceof ClassType) {
-                        // If we find a class that is further qualfied,
-                        // search for member classes of that class.
-                        ClassType ct = (ClassType) t;
-                        t = ct.resolver().find(n);
-                        if (t instanceof ClassType) {
-                            // map.put(n, t); SC: no need to make n to the type.
-                        }
-                        else {
-                            // In JL, the result must be a class.
-                            throw new NoClassException(n, ct);
-                        }
-                    }
-                    else if (t instanceof Package) {
-                        Package p = (Package) t;
-                        t = p.resolver().find(n);
-                        if (t instanceof ClassType) {
-                            // map.put(n, p); SC: no need to map n to the type
-                        }
-                    }
-                    else {
-                        // t, whatever it is, is further qualified, but 
-                        // should be, at least in Java, a ClassType.
-                        throw new InternalCompilerError("Qualified type \"" + t + "\" is not a class type.", sourcePos);
-                    }
+				// We now have a type t, and we need to navigate to the
+				// appropriate nested class
+				while (st.hasMoreTokens()) {
+					String n = st.nextToken();
 
-                }
-            }
-        }
+					if (t instanceof ClassType) {
+						// If we find a class that is further qualfied,
+						// search for member classes of that class.
+						ClassType ct = (ClassType) t;
+						t = ct.resolver().find(n);
+						if (t instanceof ClassType) {
+							// map.put(n, t); SC: no need to make n to the type.
+						} else {
+							// In JL, the result must be a class.
+							throw new NoClassException(n, ct);
+						}
+					} else if (t instanceof Package) {
+						Package p = (Package) t;
+						t = p.resolver().find(n);
+						if (t instanceof ClassType) {
+							// map.put(n, p); SC: no need to map n to the type
+						}
+					} else {
+						// t, whatever it is, is further qualified, but
+						// should be, at least in Java, a ClassType.
+						throw new InternalCompilerError("Qualified type \"" + t
+								+ "\" is not a class type.", sourcePos);
+					}
 
-        if (t == null) {
-            // couldn't find it, so throw an exception be executing the find again.
-            cachedFind(longName);
-        }
-        
-        // at this point, we found it, and it is in t!
-        String shortName = StringUtil.getShortNameComponent(longName);
+				}
+			}
+		}
 
-        if (Report.should_report(TOPICS, 2))
-            Report.report(2, this + ": import " + shortName + " as " + t);
+		if (t == null) {
+			// couldn't find it, so throw an exception be executing the find
+			// again.
+			cachedFind(longName);
+		}
 
-        if (map.containsKey(shortName)) {
-            Named s = (Named) map.get(shortName);
+		// at this point, we found it, and it is in t!
+		String shortName = StringUtil.getShortNameComponent(longName);
 
-            if (! ts.equals(s, t)) {
-                throw new SemanticException("Class " + shortName +
-                                            " already defined as " + map.get(shortName),
-                                            sourcePos);
-            }
-        }
+		if (Report.should_report(TOPICS, 2))
+			Report.report(2, this + ": import " + shortName + " as " + t);
 
-        // map.put(longName, t); // should already be in the cache
-        map.put(shortName, t);        
-    }        
+		if (map.containsKey(shortName)) {
+			Named s = (Named) map.get(shortName);
 
-    public String toString() {
-        if (sourceName != null) {
-            return "(import " + sourceName + ")";
-        }
-        else {
-            return "(import)";
-        }
-    }
+			if (!ts.equals(s, t)) {
+				throw new SemanticException("Class " + shortName
+						+ " already defined as " + map.get(shortName),
+						sourcePos);
+			}
+		}
 
-    private static final Collection TOPICS = 
-        CollectionUtil.list(Report.types, Report.resolver, Report.imports);
+		// map.put(longName, t); // should already be in the cache
+		map.put(shortName, t);
+	}
+
+	public String toString() {
+		if (sourceName != null) {
+			return "(import " + sourceName + ")";
+		} else {
+			return "(import)";
+		}
+	}
+
+	private static final Collection TOPICS = CollectionUtil.list(Report.types,
+			Report.resolver, Report.imports);
 
 }

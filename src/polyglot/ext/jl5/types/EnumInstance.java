@@ -6,4 +6,3 @@ import polyglot.types.MemberInstance;
 public interface EnumInstance extends FieldInstance, MemberInstance {
 	long ordinal();
 }
-

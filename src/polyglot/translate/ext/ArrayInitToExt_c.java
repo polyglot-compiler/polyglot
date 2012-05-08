@@ -6,9 +6,9 @@ import polyglot.translate.ExtensionRewriter;
 import polyglot.types.SemanticException;
 
 public class ArrayInitToExt_c extends ToExt_c {
-    public Node toExt(ExtensionRewriter rw) throws SemanticException {
-        ArrayInit n = (ArrayInit)node();
-        return rw.to_nf().ArrayInit(n.position(), n.elements());
+	public Node toExt(ExtensionRewriter rw) throws SemanticException {
+		ArrayInit n = (ArrayInit) node();
+		return rw.to_nf().ArrayInit(n.position(), n.elements());
 
-    }
+	}
 }

@@ -29,13 +29,15 @@ package polyglot.ast;
  * An <code>AmbExpr</code> is an ambiguous AST node composed of a single
  * identifier that must resolve to an expression.
  */
-public interface AmbExpr extends Expr, Ambiguous
-{
-    /**
-     * Ambiguous name.
-     */
-    Id id();
-    AmbExpr id(Id name);
-    String name();
-    AmbExpr name(String name);
+public interface AmbExpr extends Expr, Ambiguous {
+	/**
+	 * Ambiguous name.
+	 */
+	Id id();
+
+	AmbExpr id(Id name);
+
+	String name();
+
+	AmbExpr name(String name);
 }

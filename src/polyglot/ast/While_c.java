@@ -32,125 +32,124 @@ import polyglot.util.*;
 import java.util.*;
 
 /**
- * An immutable representation of a Java language <code>while</code>
- * statement.  It contains a statement to be executed and an expression
- * to be tested indicating whether to reexecute the statement.
- */ 
-public class While_c extends Loop_c implements While
-{
-    protected Expr cond;
-    protected Stmt body;
+ * An immutable representation of a Java language <code>while</code> statement.
+ * It contains a statement to be executed and an expression to be tested
+ * indicating whether to reexecute the statement.
+ */
+public class While_c extends Loop_c implements While {
+	protected Expr cond;
+	protected Stmt body;
 
-    public While_c(Position pos, Expr cond, Stmt body) {
-	super(pos);
-	assert(cond != null && body != null);
-	this.cond = cond;
-	this.body = body;
-    }
-
-    /** Get the conditional of the statement. */
-    public Expr cond() {
-	return this.cond;
-    }
-
-    /** Set the conditional of the statement. */
-    public While cond(Expr cond) {
-	While_c n = (While_c) copy();
-	n.cond = cond;
-	return n;
-    }
-
-    /** Get the body of the statement. */
-    public Stmt body() {
-	return this.body;
-    }
-
-    /** Set the body of the statement. */
-    public While body(Stmt body) {
-	While_c n = (While_c) copy();
-	n.body = body;
-	return n;
-    }
-
-    /** Reconstruct the statement. */
-    protected While_c reconstruct(Expr cond, Stmt body) {
-	if (cond != this.cond || body != this.body) {
-	    While_c n = (While_c) copy();
-	    n.cond = cond;
-	    n.body = body;
-	    return n;
+	public While_c(Position pos, Expr cond, Stmt body) {
+		super(pos);
+		assert (cond != null && body != null);
+		this.cond = cond;
+		this.body = body;
 	}
 
-	return this;
-    }
-
-    /** Visit the children of the statement. */
-    public Node visitChildren(NodeVisitor v) {
-	Expr cond = (Expr) visitChild(this.cond, v);
-	Node body = visitChild(this.body, v);
-        if (body instanceof NodeList) body = ((NodeList) body).toBlock();
-	return reconstruct(cond, (Stmt) body);
-    }
-
-    /** Type check the statement. */
-    public Node typeCheck(TypeChecker tc) throws SemanticException {
-	TypeSystem ts = tc.typeSystem();
-	
-	if (! ts.typeEquals(cond.type(), ts.Boolean())) {
-	    throw new SemanticException(
-		"Condition of while statement must have boolean type.",
-		cond.position());
+	/** Get the conditional of the statement. */
+	public Expr cond() {
+		return this.cond;
 	}
-	
-	return this;
-    }
 
-    public Type childExpectedType(Expr child, AscriptionVisitor av) {
-        TypeSystem ts = av.typeSystem();
+	/** Set the conditional of the statement. */
+	public While cond(Expr cond) {
+		While_c n = (While_c) copy();
+		n.cond = cond;
+		return n;
+	}
 
-        if (child == cond) {
-            return ts.Boolean();
-        }
+	/** Get the body of the statement. */
+	public Stmt body() {
+		return this.body;
+	}
 
-        return child.type();
-    }
+	/** Set the body of the statement. */
+	public While body(Stmt body) {
+		While_c n = (While_c) copy();
+		n.body = body;
+		return n;
+	}
 
-    public String toString() {
-	return "while (" + cond + ") ...";
-    }
+	/** Reconstruct the statement. */
+	protected While_c reconstruct(Expr cond, Stmt body) {
+		if (cond != this.cond || body != this.body) {
+			While_c n = (While_c) copy();
+			n.cond = cond;
+			n.body = body;
+			return n;
+		}
 
-    /** Write the statement to an output file. */
-    public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
-	w.write("while (");
-	printBlock(cond, w, tr);
-	w.write(")");
-	printSubStmt(body, w, tr);
-    }
+		return this;
+	}
 
-    public Term firstChild() {
-        return cond;
-    }
+	/** Visit the children of the statement. */
+	public Node visitChildren(NodeVisitor v) {
+		Expr cond = (Expr) visitChild(this.cond, v);
+		Node body = visitChild(this.body, v);
+		if (body instanceof NodeList)
+			body = ((NodeList) body).toBlock();
+		return reconstruct(cond, (Stmt) body);
+	}
 
-    public List acceptCFG(CFGBuilder v, List succs) {
-        if (condIsConstantTrue()) {
-            v.visitCFG(cond, body, ENTRY);
-        }
-        else {
-            v.visitCFG(cond, FlowGraph.EDGE_KEY_TRUE, body, ENTRY, 
-                             FlowGraph.EDGE_KEY_FALSE, this, EXIT);
-        }
+	/** Type check the statement. */
+	public Node typeCheck(TypeChecker tc) throws SemanticException {
+		TypeSystem ts = tc.typeSystem();
 
-        v.push(this).visitCFG(body, cond, ENTRY);
+		if (!ts.typeEquals(cond.type(), ts.Boolean())) {
+			throw new SemanticException(
+					"Condition of while statement must have boolean type.",
+					cond.position());
+		}
 
-        return succs;
-    }
+		return this;
+	}
 
-    public Term continueTarget() {
-        return cond;
-    }
-    
-    public Node copy(NodeFactory nf) {
-        return nf.While(this.position, this.cond, this.body);
-    }
+	public Type childExpectedType(Expr child, AscriptionVisitor av) {
+		TypeSystem ts = av.typeSystem();
+
+		if (child == cond) {
+			return ts.Boolean();
+		}
+
+		return child.type();
+	}
+
+	public String toString() {
+		return "while (" + cond + ") ...";
+	}
+
+	/** Write the statement to an output file. */
+	public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
+		w.write("while (");
+		printBlock(cond, w, tr);
+		w.write(")");
+		printSubStmt(body, w, tr);
+	}
+
+	public Term firstChild() {
+		return cond;
+	}
+
+	public List acceptCFG(CFGBuilder v, List succs) {
+		if (condIsConstantTrue()) {
+			v.visitCFG(cond, body, ENTRY);
+		} else {
+			v.visitCFG(cond, FlowGraph.EDGE_KEY_TRUE, body, ENTRY,
+					FlowGraph.EDGE_KEY_FALSE, this, EXIT);
+		}
+
+		v.push(this).visitCFG(body, cond, ENTRY);
+
+		return succs;
+	}
+
+	public Term continueTarget() {
+		return cond;
+	}
+
+	public Node copy(NodeFactory nf) {
+		return nf.While(this.position, this.cond, this.body);
+	}
 
 }

@@ -30,118 +30,125 @@ import polyglot.types.TypeSystem;
 import polyglot.util.*;
 
 /**
- * Represents an ambiguous, possibly qualified, identifier encountered while parsing.
+ * Represents an ambiguous, possibly qualified, identifier encountered while
+ * parsing.
  */
 public class Name {
-    public final Name prefix;
-    public final Id name;
-    public final Position pos;
-    public final NodeFactory nf;
-    public final TypeSystem ts;
+	public final Name prefix;
+	public final Id name;
+	public final Position pos;
+	public final NodeFactory nf;
+	public final TypeSystem ts;
 
-    public Name(NodeFactory nf, TypeSystem ts, Position pos, Id name) {
-        this(nf, ts, pos, null, name);
-    }
-    
-    public Name(NodeFactory nf, TypeSystem ts, Position pos, Name prefix, Id name) {
-        this.nf = nf;
-        this.ts = ts;
-        this.pos = pos != null ? pos : Position.compilerGenerated();
-        this.prefix = prefix;
-        this.name = name;
-    }
+	public Name(NodeFactory nf, TypeSystem ts, Position pos, Id name) {
+		this(nf, ts, pos, null, name);
+	}
 
-    /** @deprecated */
-    private Name(NodeFactory nf, TypeSystem ts, Position pos, Name prefix, String qualifiedName) {
-    	this.nf = nf;
-        this.ts = ts;
-        this.pos = pos != null ? pos : Position.compilerGenerated();
-        
-        if (! StringUtil.isNameShort(qualifiedName)) {
-            if (prefix == null) {
-                Position prefixPos = pos.truncateEnd(qualifiedName.length()+1);
-                Position namePos = new Position(pos.truncateEnd(qualifiedName.length()).endOf(), pos.endOf());
-                this.prefix = new Name(nf, ts, prefixPos, null, StringUtil.getPackageComponent(qualifiedName));
-                this.name = nf.Id(namePos, StringUtil.getShortNameComponent(qualifiedName));
-            }
-            else {
-                throw new InternalCompilerError("Can only construct a qualified Name with a short name string: " + qualifiedName + " is not short.");
-            }
-        }
-        else {
-        	Position idPos;
-        	
-            if (prefix == null) {
-              idPos = pos;
-            }
-            else {
-             idPos = new Position(pos.truncateEnd(qualifiedName.length()).endOf(), pos.endOf());
-            }
-            this.prefix = prefix;
-            this.name = nf.Id(idPos, qualifiedName);
-        }
-    }
-    
-    // expr
-    public Expr toExpr() {
-        if (prefix == null) {
-            return nf.AmbExpr(pos, name);
-        }
+	public Name(NodeFactory nf, TypeSystem ts, Position pos, Name prefix,
+			Id name) {
+		this.nf = nf;
+		this.ts = ts;
+		this.pos = pos != null ? pos : Position.compilerGenerated();
+		this.prefix = prefix;
+		this.name = name;
+	}
 
-        return nf.Field(pos, prefix.toReceiver(), name);
-    }
+	/** @deprecated */
+	private Name(NodeFactory nf, TypeSystem ts, Position pos, Name prefix,
+			String qualifiedName) {
+		this.nf = nf;
+		this.ts = ts;
+		this.pos = pos != null ? pos : Position.compilerGenerated();
 
-    // expr or type
-    public Receiver toReceiver() {
-        if (prefix == null) {
-            return nf.AmbReceiver(pos, name);
-        }
+		if (!StringUtil.isNameShort(qualifiedName)) {
+			if (prefix == null) {
+				Position prefixPos = pos
+						.truncateEnd(qualifiedName.length() + 1);
+				Position namePos = new Position(pos.truncateEnd(
+						qualifiedName.length()).endOf(), pos.endOf());
+				this.prefix = new Name(nf, ts, prefixPos, null,
+						StringUtil.getPackageComponent(qualifiedName));
+				this.name = nf.Id(namePos,
+						StringUtil.getShortNameComponent(qualifiedName));
+			} else {
+				throw new InternalCompilerError(
+						"Can only construct a qualified Name with a short name string: "
+								+ qualifiedName + " is not short.");
+			}
+		} else {
+			Position idPos;
 
-        return nf.AmbReceiver(pos, prefix.toPrefix(), name);
-    }
+			if (prefix == null) {
+				idPos = pos;
+			} else {
+				idPos = new Position(pos.truncateEnd(qualifiedName.length())
+						.endOf(), pos.endOf());
+			}
+			this.prefix = prefix;
+			this.name = nf.Id(idPos, qualifiedName);
+		}
+	}
 
-    // expr, type, or package
-    public Prefix toPrefix() {
-        if (prefix == null) {
-            return nf.AmbPrefix(pos, name);
-        }
+	// expr
+	public Expr toExpr() {
+		if (prefix == null) {
+			return nf.AmbExpr(pos, name);
+		}
 
-        return nf.AmbPrefix(pos, prefix.toPrefix(), name);
-    }
+		return nf.Field(pos, prefix.toReceiver(), name);
+	}
 
-    // type or package
-    public QualifierNode toQualifier() {
-        if (prefix == null) {
-            return nf.AmbQualifierNode(pos, name);
-        }
+	// expr or type
+	public Receiver toReceiver() {
+		if (prefix == null) {
+			return nf.AmbReceiver(pos, name);
+		}
 
-        return nf.AmbQualifierNode(pos, prefix.toQualifier(), name);
-    }
+		return nf.AmbReceiver(pos, prefix.toPrefix(), name);
+	}
 
-    // package
-    public PackageNode toPackage() {
-        if (prefix == null) {
-            return nf.PackageNode(pos, ts.createPackage(null, name.id()));
-        }
-        else {
-            return nf.PackageNode(pos, ts.createPackage(prefix.toPackage().package_(), name.id()));
-        }
-    }
+	// expr, type, or package
+	public Prefix toPrefix() {
+		if (prefix == null) {
+			return nf.AmbPrefix(pos, name);
+		}
 
-    // type
-    public TypeNode toType() {
-        if (prefix == null) {
-            return nf.AmbTypeNode(pos, name);
-        }
+		return nf.AmbPrefix(pos, prefix.toPrefix(), name);
+	}
 
-        return nf.AmbTypeNode(pos, prefix.toQualifier(), name);
-    }
+	// type or package
+	public QualifierNode toQualifier() {
+		if (prefix == null) {
+			return nf.AmbQualifierNode(pos, name);
+		}
 
-    public String toString() {
-        if (prefix == null) {
-            return name.toString();
-        }
+		return nf.AmbQualifierNode(pos, prefix.toQualifier(), name);
+	}
 
-        return prefix.toString() + "." + name.toString();
-    }
+	// package
+	public PackageNode toPackage() {
+		if (prefix == null) {
+			return nf.PackageNode(pos, ts.createPackage(null, name.id()));
+		} else {
+			return nf.PackageNode(pos,
+					ts.createPackage(prefix.toPackage().package_(), name.id()));
+		}
+	}
+
+	// type
+	public TypeNode toType() {
+		if (prefix == null) {
+			return nf.AmbTypeNode(pos, name);
+		}
+
+		return nf.AmbTypeNode(pos, prefix.toQualifier(), name);
+	}
+
+	public String toString() {
+		if (prefix == null) {
+			return name.toString();
+		}
+
+		return prefix.toString() + "." + name.toString();
+	}
 }

@@ -29,15 +29,16 @@ import polyglot.frontend.Job;
 import polyglot.frontend.Scheduler;
 
 public class TypesInitializedForCommandLine extends Barrier {
-    public static Goal create(Scheduler scheduler) {
-        return scheduler.internGoal(new TypesInitializedForCommandLine(scheduler));
-    }
+	public static Goal create(Scheduler scheduler) {
+		return scheduler.internGoal(new TypesInitializedForCommandLine(
+				scheduler));
+	}
 
-    protected TypesInitializedForCommandLine(Scheduler scheduler) {
-        super("TYPES_INIT_BARRIER", scheduler);
-    }
-    
-    public Goal goalForJob(Job j) {
-        return scheduler.TypesInitialized(j);
-    }
+	protected TypesInitializedForCommandLine(Scheduler scheduler) {
+		super("TYPES_INIT_BARRIER", scheduler);
+	}
+
+	public Goal goalForJob(Job j) {
+		return scheduler.TypesInitialized(j);
+	}
 }

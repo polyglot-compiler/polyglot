@@ -34,19 +34,20 @@ import polyglot.types.TypeSystem;
 import polyglot.visit.ReachChecker;
 
 public class ReachabilityChecked extends VisitorGoal {
-    public static Goal create(Scheduler scheduler, Job job, TypeSystem ts, NodeFactory nf) {
-        return scheduler.internGoal(new ReachabilityChecked(job, ts, nf));
-    }
+	public static Goal create(Scheduler scheduler, Job job, TypeSystem ts,
+			NodeFactory nf) {
+		return scheduler.internGoal(new ReachabilityChecked(job, ts, nf));
+	}
 
-    protected ReachabilityChecked(Job job, TypeSystem ts, NodeFactory nf) {
-        super(job, new ReachChecker(job, ts, nf));
-    }
+	protected ReachabilityChecked(Job job, TypeSystem ts, NodeFactory nf) {
+		super(job, new ReachChecker(job, ts, nf));
+	}
 
-    public Collection prerequisiteGoals(Scheduler scheduler) {
-        List l = new ArrayList();
-        l.add(scheduler.TypeChecked(job));
-//        l.add(scheduler.ConstantsChecked(job));
-        l.addAll(super.prerequisiteGoals(scheduler));
-        return l;
-    }
+	public Collection prerequisiteGoals(Scheduler scheduler) {
+		List l = new ArrayList();
+		l.add(scheduler.TypeChecked(job));
+		// l.add(scheduler.ConstantsChecked(job));
+		l.addAll(super.prerequisiteGoals(scheduler));
+		return l;
+	}
 }

@@ -31,242 +31,249 @@ import polyglot.util.*;
 import java.util.*;
 
 /**
- * An immutable representation of a Java language <code>for</code>
- * statement.  Contains a statement to be executed and an expression
- * to be tested indicating whether to reexecute the statement.
+ * An immutable representation of a Java language <code>for</code> statement.
+ * Contains a statement to be executed and an expression to be tested indicating
+ * whether to reexecute the statement.
  */
-public class For_c extends Loop_c implements For
-{
-    protected List inits;
-    protected Expr cond;
-    protected List iters;
-    protected Stmt body;
+public class For_c extends Loop_c implements For {
+	protected List inits;
+	protected Expr cond;
+	protected List iters;
+	protected Stmt body;
 
-    public For_c(Position pos, List inits, Expr cond, List iters, Stmt body) {
-	super(pos);
-	assert(inits != null && iters != null && body != null); // cond may be null, inits and iters may be empty
-	this.inits = TypedList.copyAndCheck(inits, ForInit.class, true);
-	this.cond = cond;
-	this.iters = TypedList.copyAndCheck(iters, ForUpdate.class, true);
-	this.body = body;
-    }
-
-    /** List of initialization statements */
-    public List inits() {
-	return Collections.unmodifiableList(this.inits);
-    }
-
-    /** Set the inits of the statement. */
-    public For inits(List inits) {
-	For_c n = (For_c) copy();
-	n.inits = TypedList.copyAndCheck(inits, ForInit.class, true);
-	return n;
-    }
-
-    /** Loop condition */
-    public Expr cond() {
-	return this.cond;
-    }
-
-    /** Set the conditional of the statement. */
-    public For cond(Expr cond) {
-	For_c n = (For_c) copy();
-	n.cond = cond;
-	return n;
-    }
-
-    /** List of iterator expressions. */
-    public List iters() {
-	return Collections.unmodifiableList(this.iters);
-    }
-
-    /** Set the iterator expressions of the statement. */
-    public For iters(List iters) {
-	For_c n = (For_c) copy();
-	n.iters = TypedList.copyAndCheck(iters, ForUpdate.class, true);
-	return n;
-    }
-
-    /** Loop body */
-    public Stmt body() {
-	return this.body;
-    }
-
-    /** Set the body of the statement. */
-    public For body(Stmt body) {
-	For_c n = (For_c) copy();
-	n.body = body;
-	return n;
-    }
-
-    /** Reconstruct the statement. */
-    protected For_c reconstruct(List inits, Expr cond, List iters, Stmt body) {
-	if (! CollectionUtil.equals(inits, this.inits) || cond != this.cond || ! CollectionUtil.equals(iters, this.iters) || body != this.body) {
-	    For_c n = (For_c) copy();
-	    n.inits = TypedList.copyAndCheck(inits, ForInit.class, true);
-	    n.cond = cond;
-	    n.iters = TypedList.copyAndCheck(iters, ForUpdate.class, true);
-	    n.body = body;
-	    return n;
+	public For_c(Position pos, List inits, Expr cond, List iters, Stmt body) {
+		super(pos);
+		assert (inits != null && iters != null && body != null); // cond may be
+																	// null,
+																	// inits and
+																	// iters may
+																	// be empty
+		this.inits = TypedList.copyAndCheck(inits, ForInit.class, true);
+		this.cond = cond;
+		this.iters = TypedList.copyAndCheck(iters, ForUpdate.class, true);
+		this.body = body;
 	}
 
-	return this;
-    }
-
-    /** Visit the children of the statement. */
-    public Node visitChildren(NodeVisitor v) {
-	List inits = visitList(this.inits, v);
-	Expr cond = (Expr) visitChild(this.cond, v);
-	List iters = visitList(this.iters, v);
-        Node body = visitChild(this.body, v);
-	if (body instanceof NodeList) body = ((NodeList) body).toBlock();
-	return reconstruct(inits, cond, iters, (Stmt) body);
-    }
-
-    public Context enterScope(Context c) {
-	return c.pushBlock();
-    }
-
-    /** Type check the statement. */
-    public Node typeCheck(TypeChecker tc) throws SemanticException {
-	TypeSystem ts = tc.typeSystem();
-
-        // Check that all initializers have the same type.
-        // This should be enforced by the parser, but check again here,
-        // just to be sure.
-        Type t = null;
-
-        for (Iterator i = inits.iterator(); i.hasNext(); ) {
-            ForInit s = (ForInit) i.next();
-
-            if (s instanceof LocalDecl) {
-                LocalDecl d = (LocalDecl) s;
-                Type dt = d.type().type();
-                if (t == null) {
-                    t = dt;
-                }
-                else if (! t.equals(dt)) {
-                    throw new InternalCompilerError("Local variable " +
-                        "declarations in a for loop initializer must all " +
-                        "be the same type, in this case " + t + ", not " +
-                        dt + ".", d.position());
-                }
-            }
-        }
-
-	if (cond != null &&
-	    ! ts.isImplicitCastValid(cond.type(), ts.Boolean())) {
-	    throw new SemanticException(
-		"The condition of a for statement must have boolean type.",
-		cond.position());
+	/** List of initialization statements */
+	public List inits() {
+		return Collections.unmodifiableList(this.inits);
 	}
 
-	return this;
-    }
+	/** Set the inits of the statement. */
+	public For inits(List inits) {
+		For_c n = (For_c) copy();
+		n.inits = TypedList.copyAndCheck(inits, ForInit.class, true);
+		return n;
+	}
 
-    public Type childExpectedType(Expr child, AscriptionVisitor av) {
-        TypeSystem ts = av.typeSystem();
+	/** Loop condition */
+	public Expr cond() {
+		return this.cond;
+	}
 
-        if (child == cond) {
-            return ts.Boolean();
-        }
+	/** Set the conditional of the statement. */
+	public For cond(Expr cond) {
+		For_c n = (For_c) copy();
+		n.cond = cond;
+		return n;
+	}
 
-        return child.type();
-    }
+	/** List of iterator expressions. */
+	public List iters() {
+		return Collections.unmodifiableList(this.iters);
+	}
 
-    /** Write the statement to an output file. */
-    public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
-	w.write("for (");
-	w.begin(0);
+	/** Set the iterator expressions of the statement. */
+	public For iters(List iters) {
+		For_c n = (For_c) copy();
+		n.iters = TypedList.copyAndCheck(iters, ForUpdate.class, true);
+		return n;
+	}
 
-	if (inits != null) {
-            boolean first = true;
-	    for (Iterator i = inits.iterator(); i.hasNext(); ) {
-		ForInit s = (ForInit) i.next();
-	        printForInit(s, w, tr, first);
-                first = false;
+	/** Loop body */
+	public Stmt body() {
+		return this.body;
+	}
 
-		if (i.hasNext()) {
-		    w.write(",");
-		    w.allowBreak(2, " ");
+	/** Set the body of the statement. */
+	public For body(Stmt body) {
+		For_c n = (For_c) copy();
+		n.body = body;
+		return n;
+	}
+
+	/** Reconstruct the statement. */
+	protected For_c reconstruct(List inits, Expr cond, List iters, Stmt body) {
+		if (!CollectionUtil.equals(inits, this.inits) || cond != this.cond
+				|| !CollectionUtil.equals(iters, this.iters)
+				|| body != this.body) {
+			For_c n = (For_c) copy();
+			n.inits = TypedList.copyAndCheck(inits, ForInit.class, true);
+			n.cond = cond;
+			n.iters = TypedList.copyAndCheck(iters, ForUpdate.class, true);
+			n.body = body;
+			return n;
 		}
-	    }
+
+		return this;
 	}
 
-	w.write(";"); 
-	w.allowBreak(0);
-
-	if (cond != null) {
-	    printBlock(cond, w, tr);
+	/** Visit the children of the statement. */
+	public Node visitChildren(NodeVisitor v) {
+		List inits = visitList(this.inits, v);
+		Expr cond = (Expr) visitChild(this.cond, v);
+		List iters = visitList(this.iters, v);
+		Node body = visitChild(this.body, v);
+		if (body instanceof NodeList)
+			body = ((NodeList) body).toBlock();
+		return reconstruct(inits, cond, iters, (Stmt) body);
 	}
 
-	w.write (";");
-	w.allowBreak(0);
-	
-	if (iters != null) {
-	    for (Iterator i = iters.iterator(); i.hasNext();) {
-		ForUpdate s = (ForUpdate) i.next();
-		printForUpdate(s, w, tr);
-		
-		if (i.hasNext()) {
-		    w.write(",");
-		    w.allowBreak(2, " ");
+	public Context enterScope(Context c) {
+		return c.pushBlock();
+	}
+
+	/** Type check the statement. */
+	public Node typeCheck(TypeChecker tc) throws SemanticException {
+		TypeSystem ts = tc.typeSystem();
+
+		// Check that all initializers have the same type.
+		// This should be enforced by the parser, but check again here,
+		// just to be sure.
+		Type t = null;
+
+		for (Iterator i = inits.iterator(); i.hasNext();) {
+			ForInit s = (ForInit) i.next();
+
+			if (s instanceof LocalDecl) {
+				LocalDecl d = (LocalDecl) s;
+				Type dt = d.type().type();
+				if (t == null) {
+					t = dt;
+				} else if (!t.equals(dt)) {
+					throw new InternalCompilerError(
+							"Local variable "
+									+ "declarations in a for loop initializer must all "
+									+ "be the same type, in this case " + t
+									+ ", not " + dt + ".", d.position());
+				}
+			}
 		}
-	    }
+
+		if (cond != null && !ts.isImplicitCastValid(cond.type(), ts.Boolean())) {
+			throw new SemanticException(
+					"The condition of a for statement must have boolean type.",
+					cond.position());
+		}
+
+		return this;
 	}
 
-	w.end();
-	w.write(")");
+	public Type childExpectedType(Expr child, AscriptionVisitor av) {
+		TypeSystem ts = av.typeSystem();
 
-	printSubStmt(body, w, tr);
-    }
+		if (child == cond) {
+			return ts.Boolean();
+		}
 
-    public String toString() {
-	return "for (...) ...";
-    }
+		return child.type();
+	}
 
-    private void printForInit(ForInit s, CodeWriter w, PrettyPrinter tr, boolean printType) {
-        boolean oldSemiColon = tr.appendSemicolon(false);
-        boolean oldPrintType = tr.printType(printType);
-        printBlock(s, w, tr);
-        tr.printType(oldPrintType);
-        tr.appendSemicolon(oldSemiColon);
-    }
+	/** Write the statement to an output file. */
+	public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
+		w.write("for (");
+		w.begin(0);
 
-    private void printForUpdate(ForUpdate s, CodeWriter w, PrettyPrinter tr) {
-        boolean oldSemiColon = tr.appendSemicolon(false);
-        printBlock(s, w, tr);
-        tr.appendSemicolon(oldSemiColon);
-    }
+		if (inits != null) {
+			boolean first = true;
+			for (Iterator i = inits.iterator(); i.hasNext();) {
+				ForInit s = (ForInit) i.next();
+				printForInit(s, w, tr, first);
+				first = false;
 
-    public Term firstChild() {
-        return listChild(inits, cond != null ? (Term) cond : body);
-    }
+				if (i.hasNext()) {
+					w.write(",");
+					w.allowBreak(2, " ");
+				}
+			}
+		}
 
-    public List acceptCFG(CFGBuilder v, List succs) {
-        v.visitCFGList(inits, cond != null ? (Term) cond : body, ENTRY);
+		w.write(";");
+		w.allowBreak(0);
 
-        if (cond != null) {
-            if (condIsConstantTrue()) {
-                v.visitCFG(cond, body, ENTRY);
-            }
-            else {
-                v.visitCFG(cond, FlowGraph.EDGE_KEY_TRUE, body, ENTRY, 
-                                 FlowGraph.EDGE_KEY_FALSE, this, EXIT);
-            }
-        }
+		if (cond != null) {
+			printBlock(cond, w, tr);
+		}
 
-        v.push(this).visitCFG(body, continueTarget(), ENTRY);
-        v.visitCFGList(iters, cond != null ? (Term) cond : body, ENTRY);
+		w.write(";");
+		w.allowBreak(0);
 
-        return succs;
-    }
+		if (iters != null) {
+			for (Iterator i = iters.iterator(); i.hasNext();) {
+				ForUpdate s = (ForUpdate) i.next();
+				printForUpdate(s, w, tr);
 
-    public Term continueTarget() {
-        return listChild(iters, cond != null ? (Term) cond : body);
-    }
-    public Node copy(NodeFactory nf) {
-        return nf.For(this.position, this.inits, this.cond, this.iters, this.body);
-    }
+				if (i.hasNext()) {
+					w.write(",");
+					w.allowBreak(2, " ");
+				}
+			}
+		}
+
+		w.end();
+		w.write(")");
+
+		printSubStmt(body, w, tr);
+	}
+
+	public String toString() {
+		return "for (...) ...";
+	}
+
+	private void printForInit(ForInit s, CodeWriter w, PrettyPrinter tr,
+			boolean printType) {
+		boolean oldSemiColon = tr.appendSemicolon(false);
+		boolean oldPrintType = tr.printType(printType);
+		printBlock(s, w, tr);
+		tr.printType(oldPrintType);
+		tr.appendSemicolon(oldSemiColon);
+	}
+
+	private void printForUpdate(ForUpdate s, CodeWriter w, PrettyPrinter tr) {
+		boolean oldSemiColon = tr.appendSemicolon(false);
+		printBlock(s, w, tr);
+		tr.appendSemicolon(oldSemiColon);
+	}
+
+	public Term firstChild() {
+		return listChild(inits, cond != null ? (Term) cond : body);
+	}
+
+	public List acceptCFG(CFGBuilder v, List succs) {
+		v.visitCFGList(inits, cond != null ? (Term) cond : body, ENTRY);
+
+		if (cond != null) {
+			if (condIsConstantTrue()) {
+				v.visitCFG(cond, body, ENTRY);
+			} else {
+				v.visitCFG(cond, FlowGraph.EDGE_KEY_TRUE, body, ENTRY,
+						FlowGraph.EDGE_KEY_FALSE, this, EXIT);
+			}
+		}
+
+		v.push(this).visitCFG(body, continueTarget(), ENTRY);
+		v.visitCFGList(iters, cond != null ? (Term) cond : body, ENTRY);
+
+		return succs;
+	}
+
+	public Term continueTarget() {
+		return listChild(iters, cond != null ? (Term) cond : body);
+	}
+
+	public Node copy(NodeFactory nf) {
+		return nf.For(this.position, this.inits, this.cond, this.iters,
+				this.body);
+	}
 
 }

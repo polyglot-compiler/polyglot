@@ -32,9 +32,9 @@ import polyglot.types.VarInstance;
  * initialize a variable or field.
  */
 public interface VarInit {
-    /** The variable being initialized. */
-    VarInstance varInstance();
-    
-    /** Whether the initializer has been determined to be constant or not. */
-    boolean constantValueSet();
+	/** The variable being initialized. */
+	VarInstance varInstance();
+
+	/** Whether the initializer has been determined to be constant or not. */
+	boolean constantValueSet();
 }

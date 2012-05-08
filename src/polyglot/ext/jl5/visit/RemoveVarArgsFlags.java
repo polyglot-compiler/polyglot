@@ -8,29 +8,29 @@ import polyglot.visit.NodeVisitor;
 
 public class RemoveVarArgsFlags extends NodeVisitor {
 
-    public RemoveVarArgsFlags(Job job, TypeSystem ts, NodeFactory nf) {
-        super();
-    }
+	public RemoveVarArgsFlags(Job job, TypeSystem ts, NodeFactory nf) {
+		super();
+	}
 
-    @Override
-    public Node leave(Node parent, Node old, Node n, NodeVisitor v) {
-        if (n instanceof MethodDecl) {
-            MethodDecl d = (MethodDecl) n;
-            return d.flags(JL5Flags.clearVarArgs(d.flags()));
-        }
-        if (n instanceof ConstructorDecl) {
-            ConstructorDecl d = (ConstructorDecl) n;
-            return d.flags(JL5Flags.clearVarArgs(d.flags()));
-        }
-        if (n instanceof Formal) {
-            Formal d = (Formal) n;
-            return d.flags(JL5Flags.clearVarArgs(d.flags()));
-        }
-        if (n instanceof LocalDecl) {
-            LocalDecl d = (LocalDecl) n;
-            return d.flags(JL5Flags.clearVarArgs(d.flags()));
-        }
-        return n;
-    }
+	@Override
+	public Node leave(Node parent, Node old, Node n, NodeVisitor v) {
+		if (n instanceof MethodDecl) {
+			MethodDecl d = (MethodDecl) n;
+			return d.flags(JL5Flags.clearVarArgs(d.flags()));
+		}
+		if (n instanceof ConstructorDecl) {
+			ConstructorDecl d = (ConstructorDecl) n;
+			return d.flags(JL5Flags.clearVarArgs(d.flags()));
+		}
+		if (n instanceof Formal) {
+			Formal d = (Formal) n;
+			return d.flags(JL5Flags.clearVarArgs(d.flags()));
+		}
+		if (n instanceof LocalDecl) {
+			LocalDecl d = (LocalDecl) n;
+			return d.flags(JL5Flags.clearVarArgs(d.flags()));
+		}
+		return n;
+	}
 
 }

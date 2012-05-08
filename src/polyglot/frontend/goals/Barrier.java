@@ -33,82 +33,83 @@ import polyglot.frontend.*;
 import polyglot.util.InternalCompilerError;
 
 /**
- * A <code>Barrier</code> goal synchronizes all the jobs to reach the same goal. 
- *
+ * A <code>Barrier</code> goal synchronizes all the jobs to reach the same goal.
+ * 
  * @author nystrom
  */
 public abstract class Barrier extends AbstractGoal {
-    protected Scheduler scheduler;
-    
-    protected Barrier(Scheduler scheduler) {
-        super(null);
-        this.scheduler = scheduler;
-    }
+	protected Scheduler scheduler;
 
-    protected Barrier(String name, Scheduler scheduler) {
-        super(null, name);
-        this.scheduler = scheduler;
-    }
-    
-    public Collection jobs() {
-        return scheduler.jobs();
-    }
+	protected Barrier(Scheduler scheduler) {
+		super(null);
+		this.scheduler = scheduler;
+	}
 
-    /* (non-Javadoc)
-     * @see polyglot.frontend.goals.Goal#createPass(polyglot.frontend.ExtensionInfo)
-     */
-    public Pass createPass(ExtensionInfo extInfo) {
-        return new BarrierPass(scheduler, this);
-    }
+	protected Barrier(String name, Scheduler scheduler) {
+		super(null, name);
+		this.scheduler = scheduler;
+	}
 
-    protected static class BarrierPass extends AbstractPass {
-        public Scheduler scheduler;
-        
-        protected BarrierPass(Scheduler scheduler, Barrier barrier) {
-            super(barrier);
-            this.scheduler = scheduler;
-        }
-                
-        public boolean run() {
-            Barrier barrier = (Barrier) goal();
-            for (Iterator i = barrier.jobs().iterator(); i.hasNext(); ) {
-                Job job = (Job) i.next();
-                Goal subgoal = barrier.goalForJob(job);
-                if (! subgoal.hasBeenReached()) {
-                    scheduler.addDependencyAndEnqueue(barrier, subgoal, true);
-                    barrier.setUnreachableThisRun();
-                }
-            }
-            return true;
-        }
-    }
+	public Collection jobs() {
+		return scheduler.jobs();
+	}
 
-    public abstract Goal goalForJob(Job job); 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * polyglot.frontend.goals.Goal#createPass(polyglot.frontend.ExtensionInfo)
+	 */
+	public Pass createPass(ExtensionInfo extInfo) {
+		return new BarrierPass(scheduler, this);
+	}
 
-    public String toString() {
-        if (name == null) {
-            return super.toString();
-        }
-        return name;
-    }
-    
-    public int hashCode() {
-        if (name == null) {
-            return System.identityHashCode(this);
-        }
-        else {
-            return name.hashCode();
-        }
-    }
+	protected static class BarrierPass extends AbstractPass {
+		public Scheduler scheduler;
 
-    public boolean equals(Object o) {
-        if (name == null) {
-            return this == o;
-        }
-        else if (o instanceof Barrier) {
-            Barrier b = (Barrier) o;
-            return name.equals(b.name);
-        }
-        return false;
-    }
+		protected BarrierPass(Scheduler scheduler, Barrier barrier) {
+			super(barrier);
+			this.scheduler = scheduler;
+		}
+
+		public boolean run() {
+			Barrier barrier = (Barrier) goal();
+			for (Iterator i = barrier.jobs().iterator(); i.hasNext();) {
+				Job job = (Job) i.next();
+				Goal subgoal = barrier.goalForJob(job);
+				if (!subgoal.hasBeenReached()) {
+					scheduler.addDependencyAndEnqueue(barrier, subgoal, true);
+					barrier.setUnreachableThisRun();
+				}
+			}
+			return true;
+		}
+	}
+
+	public abstract Goal goalForJob(Job job);
+
+	public String toString() {
+		if (name == null) {
+			return super.toString();
+		}
+		return name;
+	}
+
+	public int hashCode() {
+		if (name == null) {
+			return System.identityHashCode(this);
+		} else {
+			return name.hashCode();
+		}
+	}
+
+	public boolean equals(Object o) {
+		if (name == null) {
+			return this == o;
+		} else if (o instanceof Barrier) {
+			Barrier b = (Barrier) o;
+			return name.equals(b.name);
+		}
+		return false;
+	}
 }

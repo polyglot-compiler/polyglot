@@ -29,13 +29,18 @@ import polyglot.util.Position;
 
 /** Token class for boolean literals. */
 public class BooleanLiteral extends Literal {
-    protected Boolean val;
-  public BooleanLiteral(Position position, boolean b, int sym) {
-      super(position, sym);
-      this.val = Boolean.valueOf(b);
-  }
-  
-  public Boolean getValue() { return val; }
+	protected Boolean val;
 
-  public String toString() { return "boolean literal " + val.toString(); }
+	public BooleanLiteral(Position position, boolean b, int sym) {
+		super(position, sym);
+		this.val = Boolean.valueOf(b);
+	}
+
+	public Boolean getValue() {
+		return val;
+	}
+
+	public String toString() {
+		return "boolean literal " + val.toString();
+	}
 }

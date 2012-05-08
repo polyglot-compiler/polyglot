@@ -30,27 +30,27 @@ import polyglot.frontend.goals.MembersAdded;
 import polyglot.types.ParsedClassType;
 
 /**
- * This pass sets members of parsed classes, i.e., fields, methods, constructors, 
- * and nested classes. 
+ * This pass sets members of parsed classes, i.e., fields, methods,
+ * constructors, and nested classes.
  */
 public class AddMembersPass extends ClassFilePass {
-    protected Scheduler scheduler;
-    protected MembersAdded goal;
-    
-    public AddMembersPass(Scheduler scheduler, MembersAdded goal) {
-        super(goal);
-        this.scheduler = scheduler;
-        this.goal = goal;
-    }
-    
-    public boolean run() {
-        ParsedClassType ct = goal.type();
-        // force the members to get initialized.
-        ct.fields();
-        ct.methods();
-        ct.constructors();
-        ct.memberClasses();
-        ct.setMembersAdded(true);
-        return true;
-    }
+	protected Scheduler scheduler;
+	protected MembersAdded goal;
+
+	public AddMembersPass(Scheduler scheduler, MembersAdded goal) {
+		super(goal);
+		this.scheduler = scheduler;
+		this.goal = goal;
+	}
+
+	public boolean run() {
+		ParsedClassType ct = goal.type();
+		// force the members to get initialized.
+		ct.fields();
+		ct.methods();
+		ct.constructors();
+		ct.memberClasses();
+		ct.setMembersAdded(true);
+		return true;
+	}
 }

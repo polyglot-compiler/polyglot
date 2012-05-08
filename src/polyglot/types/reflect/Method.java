@@ -31,105 +31,110 @@ import java.util.*;
 import java.io.*;
 
 /**
- * Method represents a method in a Java classfile.  A method's name and
- * value (the types of its parameters and its return type) are modeled
- * as indices into it class's constant pool.  A method has modifiers 
- * that determine whether it is public, private, static, final, etc.
- * Methods have a number of attributes such as their Code and any
- * Exceptions they may throw.
- *
+ * Method represents a method in a Java classfile. A method's name and value
+ * (the types of its parameters and its return type) are modeled as indices into
+ * it class's constant pool. A method has modifiers that determine whether it is
+ * public, private, static, final, etc. Methods have a number of attributes such
+ * as their Code and any Exceptions they may throw.
+ * 
  * @see polyglot.types.reflect Code
  * @see polyglot.types.reflect Exceptions
- *
- * @author Nate Nystrom
- *         (<a href="mailto:nystrom@cs.purdue.edu">nystrom@cs.purdue.edu</a>)
+ * 
+ * @author Nate Nystrom (<a
+ *         href="mailto:nystrom@cs.purdue.edu">nystrom@cs.purdue.edu</a>)
  */
-public class Method
-{
-  protected ClassFile clazz; 
-  protected DataInputStream in;
-  
-  protected int modifiers;
-  protected int name;
-  protected int type;
-  protected Attribute[] attrs;
-  protected Exceptions exceptions;
-  protected boolean synthetic;
+public class Method {
+	protected ClassFile clazz;
+	protected DataInputStream in;
 
-  /**
-   * Constructor.  Read a method from a class file.
-   *
-   * @param in
-   *        The data stream of the class file.
-   * @param clazz
-   *        The class file containing the method.
-   * @exception IOException
-   *        If an error occurs while reading.
-   */
-  public Method(DataInputStream in, ClassFile clazz) 
-  {
-    this.clazz = clazz;
-    this.in = in;
-  }
+	protected int modifiers;
+	protected int name;
+	protected int type;
+	protected Attribute[] attrs;
+	protected Exceptions exceptions;
+	protected boolean synthetic;
 
-  public void initialize() throws IOException {
-    modifiers = in.readUnsignedShort();
+	/**
+	 * Constructor. Read a method from a class file.
+	 * 
+	 * @param in
+	 *            The data stream of the class file.
+	 * @param clazz
+	 *            The class file containing the method.
+	 * @exception IOException
+	 *                If an error occurs while reading.
+	 */
+	public Method(DataInputStream in, ClassFile clazz) {
+		this.clazz = clazz;
+		this.in = in;
+	}
 
-    name = in.readUnsignedShort();
-    type = in.readUnsignedShort();
+	public void initialize() throws IOException {
+		modifiers = in.readUnsignedShort();
 
-    int numAttributes = in.readUnsignedShort();
+		name = in.readUnsignedShort();
+		type = in.readUnsignedShort();
 
-    attrs = new Attribute[numAttributes];
+		int numAttributes = in.readUnsignedShort();
 
-    for (int i = 0; i < numAttributes; i++) {
-      int nameIndex = in.readUnsignedShort();
-      int length = in.readInt();
+		attrs = new Attribute[numAttributes];
 
-      Constant name = clazz.getConstants()[nameIndex];
+		for (int i = 0; i < numAttributes; i++) {
+			int nameIndex = in.readUnsignedShort();
+			int length = in.readInt();
 
-      if (name != null) {
-        if ("Exceptions".equals(name.value())) {
-          exceptions = new Exceptions(clazz, in, nameIndex, length);
-          attrs[i] = exceptions;
-        }
-        if ("Synthetic".equals(name.value())) {
-          synthetic = true;
-        }
-      }
+			Constant name = clazz.getConstants()[nameIndex];
 
-      if (attrs[i] == null) {
-        long n = in.skip(length);
-        if (n != length) {
-          throw new EOFException();
-        }
-      }
-    }
-    this.in = null; // RMF 7/23/2008 - Don't need the input stream any more, so don't hang onto it
-  }
+			if (name != null) {
+				if ("Exceptions".equals(name.value())) {
+					exceptions = new Exceptions(clazz, in, nameIndex, length);
+					attrs[i] = exceptions;
+				}
+				if ("Synthetic".equals(name.value())) {
+					synthetic = true;
+				}
+			}
 
-  public boolean isSynthetic() {
-    return synthetic;
-  }
-  public Attribute[] getAttrs() {
-      return attrs;
-  }
-  public ClassFile getClazz() {
-      return clazz;
-  }
-  public Exceptions getExceptions() {
-      return exceptions;
-  }
-  public int getModifiers() {
-      return modifiers;
-  }
-  public int getName() {
-      return name;
-  }
-  public int getType() {
-      return type;
-  }
-  public String name() {
-    return (String) clazz.getConstants()[this.name].value();
-  }
+			if (attrs[i] == null) {
+				long n = in.skip(length);
+				if (n != length) {
+					throw new EOFException();
+				}
+			}
+		}
+		this.in = null; // RMF 7/23/2008 - Don't need the input stream any more,
+						// so don't hang onto it
+	}
+
+	public boolean isSynthetic() {
+		return synthetic;
+	}
+
+	public Attribute[] getAttrs() {
+		return attrs;
+	}
+
+	public ClassFile getClazz() {
+		return clazz;
+	}
+
+	public Exceptions getExceptions() {
+		return exceptions;
+	}
+
+	public int getModifiers() {
+		return modifiers;
+	}
+
+	public int getName() {
+		return name;
+	}
+
+	public int getType() {
+		return type;
+	}
+
+	public String name() {
+		return (String) clazz.getConstants()[this.name].value();
+	}
 }

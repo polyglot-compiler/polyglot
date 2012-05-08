@@ -26,9 +26,8 @@
 package polyglot.ast;
 
 /**
- * A code declaration.  A "code" is the supertype of methods,
- * constructors, and initalizers.
+ * A code declaration. A "code" is the supertype of methods, constructors, and
+ * initalizers.
  */
-public interface CodeDecl extends CodeBlock, ClassMember
-{
+public interface CodeDecl extends CodeBlock, ClassMember {
 }

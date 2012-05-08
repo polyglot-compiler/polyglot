@@ -34,43 +34,44 @@ import java.util.*;
  * A base implementation for mutable parametric classes.
  */
 public class MuPClass_c extends PClass_c implements MuPClass {
-    protected List/*[Param]*/ formals;
-    protected ClassType clazz;
-	
-    protected MuPClass_c() { }
+	protected List/* [Param] */formals;
+	protected ClassType clazz;
 
-    public MuPClass_c(TypeSystem ts) {
-        this(ts, null);
-    }
+	protected MuPClass_c() {
+	}
 
-    public MuPClass_c(TypeSystem ts, Position pos) {
-	super(ts, pos);
-	formals = new TypedList(new LinkedList(), Param.class, false);
-    }
+	public MuPClass_c(TypeSystem ts) {
+		this(ts, null);
+	}
 
-    /////////////////////////////////////////////////////////////////////////
-    // Implement PClass
+	public MuPClass_c(TypeSystem ts, Position pos) {
+		super(ts, pos);
+		formals = new TypedList(new LinkedList(), Param.class, false);
+	}
 
-    public List formals() {
-	return formals;
-    }
+	// ///////////////////////////////////////////////////////////////////////
+	// Implement PClass
 
-    public ClassType clazz() {
-        return clazz;
-    }
-    
-    /////////////////////////////////////////////////////////////////////////
-    // Implement MuPClass
+	public List formals() {
+		return formals;
+	}
 
-    public void formals(List formals) {
-	this.formals = formals;
-    }
+	public ClassType clazz() {
+		return clazz;
+	}
 
-    public void addFormal(Param param) {
-	formals().add(param);
-    }
-    
-    public void clazz(ClassType clazz) {
-	this.clazz = clazz;
-    }
+	// ///////////////////////////////////////////////////////////////////////
+	// Implement MuPClass
+
+	public void formals(List formals) {
+		this.formals = formals;
+	}
+
+	public void addFormal(Param param) {
+		formals().add(param);
+	}
+
+	public void clazz(ClassType clazz) {
+		this.clazz = clazz;
+	}
 }

@@ -37,63 +37,64 @@ import java.util.Iterator;
  * cyclic dependencies between classes.
  */
 public class DeserializedClassInitializer implements LazyClassInitializer {
-    protected TypeSystem ts;
-    protected ParsedClassType ct;
-    protected boolean init;
-    
-    public DeserializedClassInitializer(TypeSystem ts) {
-        this.ts = ts;
-    }
-    
-    public void setClass(ParsedClassType ct) {
-        this.ct = ct;
-    }
+	protected TypeSystem ts;
+	protected ParsedClassType ct;
+	protected boolean init;
 
-    public boolean fromClassFile() {
-        return false;
-    }
+	public DeserializedClassInitializer(TypeSystem ts) {
+		this.ts = ts;
+	}
 
-    public void initTypeObject() {
-        if (this.init) return;
-        if (ct.isMember() && ct.outer() instanceof ParsedClassType) {
-            ParsedClassType outer = (ParsedClassType) ct.outer();
-            outer.addMemberClass(ct);
-        }
-        for (Iterator i = ct.memberClasses().iterator(); i.hasNext(); ) {
-            ParsedClassType ct = (ParsedClassType) i.next();
-            ct.initializer().initTypeObject();
-        }
-        this.init = true;
-    }
+	public void setClass(ParsedClassType ct) {
+		this.ct = ct;
+	}
 
-    public boolean isTypeObjectInitialized() {
-        return this.init;
-    }
+	public boolean fromClassFile() {
+		return false;
+	}
 
-    public void initSuperclass() {
-    }
+	public void initTypeObject() {
+		if (this.init)
+			return;
+		if (ct.isMember() && ct.outer() instanceof ParsedClassType) {
+			ParsedClassType outer = (ParsedClassType) ct.outer();
+			outer.addMemberClass(ct);
+		}
+		for (Iterator i = ct.memberClasses().iterator(); i.hasNext();) {
+			ParsedClassType ct = (ParsedClassType) i.next();
+			ct.initializer().initTypeObject();
+		}
+		this.init = true;
+	}
 
-    public void initInterfaces() {
-    }
+	public boolean isTypeObjectInitialized() {
+		return this.init;
+	}
 
-    public void initMemberClasses() {
-    }
+	public void initSuperclass() {
+	}
 
-    public void initConstructors() {
-    }
+	public void initInterfaces() {
+	}
 
-    public void initMethods() {
-    }
+	public void initMemberClasses() {
+	}
 
-    public void initFields() {
-    }
+	public void initConstructors() {
+	}
 
-    public void canonicalConstructors() {
-    }
+	public void initMethods() {
+	}
 
-    public void canonicalMethods() {
-    }
+	public void initFields() {
+	}
 
-    public void canonicalFields() {
-    }
+	public void canonicalConstructors() {
+	}
+
+	public void canonicalMethods() {
+	}
+
+	public void canonicalFields() {
+	}
 }

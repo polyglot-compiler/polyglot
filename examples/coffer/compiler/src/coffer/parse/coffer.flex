@@ -44,8 +44,8 @@ import java.math.BigInteger;
 
     public Lexer_c(java.io.Reader reader, FileSource file, ErrorQueue eq) {
         this(new EscapedUnicodeReader(reader));
-        this.file = file.name();
-        this.path = file.path();
+        this.file = file.getName();
+        this.path = file.toUri().getPath();
         this.eq = eq;
         this.keywords = new HashMap();
         init_keywords();

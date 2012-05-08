@@ -27,35 +27,38 @@ package polyglot.frontend;
 
 import polyglot.frontend.goals.Goal;
 
-
-/** A <code>Pass</code> represents a compiler pass that runs on a
+/**
+ * A <code>Pass</code> represents a compiler pass that runs on a
  * <code>Job</code>. All work in the compiler is done by passes, which are
- * scheduled by the scheduler (<code>Scheduler</code>) to satisfy goals
- * (<code>Goal</code>).
+ * scheduled by the scheduler (<code>Scheduler</code>) to satisfy goals (
+ * <code>Goal</code>).
  * 
  */
-public interface Pass
-{
-    /** The goal the pass is trying to satisfy. */
-    public Goal goal();
-    
-    /** Return a user-readable name for the pass. */
-    public String name();
+public interface Pass {
+	/** The goal the pass is trying to satisfy. */
+	public Goal goal();
 
-    /** Run the pass. */
-    public boolean run();
+	/** Return a user-readable name for the pass. */
+	public String name();
 
-    /** Reset the pass timers to 0. */
-    public void resetTimers();
+	/** Run the pass. */
+	public boolean run();
 
-    /** Start/stop the pass timers. */
-    public void toggleTimers(boolean exclusive_only);
+	/** Reset the pass timers to 0. */
+	public void resetTimers();
 
-    /** The total accumulated time in ms since the last timer reset
-      * that the pass was running, including spawned passes. */
-    public long inclusiveTime();
+	/** Start/stop the pass timers. */
+	public void toggleTimers(boolean exclusive_only);
 
-    /** The total accumulated time in ms since the last timer reset
-      * that the pass was running, excluding spawned passes. */
-    public long exclusiveTime();
+	/**
+	 * The total accumulated time in ms since the last timer reset that the pass
+	 * was running, including spawned passes.
+	 */
+	public long inclusiveTime();
+
+	/**
+	 * The total accumulated time in ms since the last timer reset that the pass
+	 * was running, excluding spawned passes.
+	 */
+	public long exclusiveTime();
 }

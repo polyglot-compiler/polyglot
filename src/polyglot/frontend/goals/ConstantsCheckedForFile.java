@@ -38,20 +38,20 @@ import polyglot.types.TypeSystem;
 import polyglot.visit.ConstantChecker;
 import polyglot.visit.NodeVisitor;
 
-
 public class ConstantsCheckedForFile extends SourceFileGoal {
-    protected boolean reached;
-    
-    public ConstantsCheckedForFile(Job job) {
-        super(job);
-        this.reached = false;
-    }
+	protected boolean reached;
 
-    public Pass createPass(ExtensionInfo extInfo) {
-        TypeSystem ts = extInfo.typeSystem();
-        NodeFactory nf = extInfo.nodeFactory();
-        return new ConstantCheckPass(this, new ConstantChecker(job(), ts, nf));
-    }
+	public ConstantsCheckedForFile(Job job) {
+		super(job);
+		this.reached = false;
+	}
 
-    private static final Collection TOPICS = Arrays.asList(new String[] { Report.types, Report.frontend });
+	public Pass createPass(ExtensionInfo extInfo) {
+		TypeSystem ts = extInfo.typeSystem();
+		NodeFactory nf = extInfo.nodeFactory();
+		return new ConstantCheckPass(this, new ConstantChecker(job(), ts, nf));
+	}
+
+	private static final Collection TOPICS = Arrays.asList(new String[] {
+			Report.types, Report.frontend });
 }
