@@ -198,7 +198,7 @@ public class JL5ParsedClassType_c extends ParsedClassType_c implements JL5Parsed
     }
     @Override
     public String translateAsReceiver(Resolver c) {        
-        return this.name();
+        return this.translate(c);
     }
     
     @Override

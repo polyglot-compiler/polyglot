@@ -13,10 +13,8 @@ import java.util.List;
 
 import polyglot.ext.param.types.PClass;
 import polyglot.ext.param.types.SubstClassType_c;
-import polyglot.types.ClassType;
-import polyglot.types.ReferenceType;
-import polyglot.types.Resolver;
-import polyglot.types.Type;
+import polyglot.main.Options;
+import polyglot.types.*;
 import polyglot.util.CodeWriter;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
@@ -233,7 +231,7 @@ public class JL5SubstClassType_c extends SubstClassType_c implements JL5SubstCla
     
     @Override
     public String translate(Resolver c) {
-        StringBuffer sb = new StringBuffer(super.translate(c));
+        StringBuffer sb = new StringBuffer(this.translateAsReceiver(c));
 
         JL5ParsedClassType ct = this.base();
         if (ct.typeVariables().isEmpty()) {
@@ -253,9 +251,60 @@ public class JL5SubstClassType_c extends SubstClassType_c implements JL5SubstCla
     }
 
     @Override
-    public String translateAsReceiver(Resolver c) {        
-        JL5ParsedClassType ct = this.base();
-        return ct.name();
+    public String translateAsReceiver(Resolver c) {
+        if (isTopLevel()) {
+            if (package_() == null) {
+                return name();
+            }
+
+            // Use the short name if it is unique.
+            if (c != null && !Options.global.fully_qualified_names) {
+                try {
+                    Named x = c.find(name());
+
+                    if (ts.equals(this, x)) {
+                        return name();
+                    }
+                }
+                catch (SemanticException e) {
+                }
+            }
+
+            return package_().translate(c) + "." + name();
+        }
+        else if (isMember()) {
+            // Use only the short name if the outer class is anonymous.
+            if (container().toClass().isAnonymous()) {
+                return name();
+            }
+
+            // Use the short name if it is unique.
+            if (c != null && !Options.global.fully_qualified_names) {
+                try {
+                    Named x = c.find(name());
+
+                    if (ts.equals(this, x) || ts.equals(this.base(), x)) {
+                        return name();
+                    }
+                }
+                catch (SemanticException e) {
+                }
+            }
+            ReferenceType container = this.container();
+            if (!this.isInnerClass()) {
+                // if we are not an inner class, then make sure that we
+                // do not print out the parameters for our container.
+                JL5TypeSystem ts = (JL5TypeSystem)this.ts;
+                container = (ReferenceType)ts.erasureType(this.container());
+            }
+            return container.translate(c) + "." + name();
+        }
+        else if (isLocal()) {
+            return name();
+        }
+        else {
+            throw new InternalCompilerError("Cannot translate an anonymous class.");
+        }
     }
 
     

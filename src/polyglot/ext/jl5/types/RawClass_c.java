@@ -160,7 +160,7 @@ public class RawClass_c extends JL5ClassType_c implements RawClass {
 
     @Override
     public String translateAsReceiver(Resolver c) {        
-        return this.name();
+        return this.base.translate(c);
     }
     
     @Override
