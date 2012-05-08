@@ -1,0 +1,8 @@
+class C {
+    private static class UnmodifiableMap  {
+	static class UnmodifiableEntrySet<S> extends D<S> {
+	}
+    }
+}
+
+class D<T> { }

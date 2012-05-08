@@ -84,6 +84,9 @@ polyglot.ext.jl5.ExtensionInfo "-d out -classpath java-out -noserial -post \"jav
         StaticInit01.jl5;
         InnerClass01.jl5;
         InnerClass02.jl5;
+        InnerClass03.jl5;
+        InnerClass04.jl5;
+        InnerClass05.jl5 (Semantic);
         Access01.jl5;
         Access02.jl5;
 	Anonymous01.jl5;
@@ -331,6 +334,9 @@ polyglot.ext.jl5.ExtensionInfo "-d out -classpath java-out -removeJava5isms -enu
         StaticInit01.jl5;
      	InnerClass01.jl5; 
         InnerClass02.jl5;
+        InnerClass03.jl5;
+        InnerClass04.jl5;
+        InnerClass05.jl5 (Semantic);
         Access01.jl5;
         Access02.jl5;
         Anonymous01.jl5;

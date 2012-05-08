@@ -1,0 +1,13 @@
+import java.util.ArrayList;
+class C {
+    private static class F<K,V> implements D.E<K,V> {
+        public K getKey() {
+            return null;
+        }
+    }
+}
+class D<K,V> {
+    interface E<K,V> {
+        K getKey();
+    }
+}
