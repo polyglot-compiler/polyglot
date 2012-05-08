@@ -8,6 +8,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Enumeration;
@@ -37,6 +38,11 @@ import polyglot.main.Report;
 import polyglot.types.reflect.ClassFile;
 import polyglot.types.reflect.ClassFileLoader;
 
+/**
+ * FileManager implementation - A class that provides input and output access to
+ * the local file system. (NOTE: Extensions may extend this implementation and
+ * are not forced to use local file system for i/o.)
+ */
 public class ExtFileManager implements FileManager {
 
 	protected final ExtensionInfo extInfo;
@@ -48,7 +54,7 @@ public class ExtFileManager implements FileManager {
 	protected final List<Location> locations;
 	/** A cache for package look ups */
 	protected final Map<String, Boolean> packageCache;
-
+	/** A cache for the packages that don't exist */
 	protected final Set<String> nocache;
 
 	protected static final int BUF_SIZE = 1024 * 8;
@@ -67,12 +73,12 @@ public class ExtFileManager implements FileManager {
 	 * Map for storing in-memory FileObjects and associated fully qualified
 	 * names
 	 */
-	protected final Map<String, JavaFileObject> absPathObjMap;
+	protected final Map<URI, JavaFileObject> absPathObjMap;
 	/**
 	 * Map for storing fully qualified package names and contained
 	 * JavaFileObjects
 	 */
-	protected final Map<String, Set<JavaFileObject>> pathObjectMap;
+	protected final Map<URI, Set<JavaFileObject>> pathObjectMap;
 
 	public static final String DEFAULT_PKG = "intermediate_output";
 
@@ -84,8 +90,8 @@ public class ExtFileManager implements FileManager {
 		locations = new ArrayList<Location>();
 		packageCache = new HashMap<String, Boolean>();
 		nocache = new HashSet<String>();
-		absPathObjMap = new HashMap<String, JavaFileObject>();
-		pathObjectMap = new HashMap<String, Set<JavaFileObject>>();
+		absPathObjMap = new HashMap<URI, JavaFileObject>();
+		pathObjectMap = new HashMap<URI, Set<JavaFileObject>>();
 	}
 
 	public void close() throws IOException {
@@ -105,15 +111,13 @@ public class ExtFileManager implements FileManager {
 		Options options = extInfo.getOptions();
 		Location sourceOutputLoc = options.outputDirectory();
 		if (sourceOutputLoc.equals(location)) {
-			String newName = separator
-					+ (packageName.equals("") ? ("" + relativeName)
-							: (packageName.replace('.', separatorChar)
-									+ separator + relativeName));
+			String newName = packageName.equals("") ? ("" + relativeName)
+					: (packageName.replace('.', separatorChar) + separator + relativeName);
 			for (File f : javac_fm.getLocation(location)) {
-				String absPath = f.getAbsolutePath() + newName;
-				JavaFileObject fo = absPathObjMap.get(absPath);
-				if (fo != null)
-					return fo;
+				URI u = new File(f, newName).toURI();
+				JavaFileObject jfo = absPathObjMap.get(u);
+				if (jfo != null)
+					return jfo;
 			}
 			return null;
 		}
@@ -127,44 +131,47 @@ public class ExtFileManager implements FileManager {
 		if (location == null || !sourceOutputLoc.equals(location)
 				|| !javac_fm.hasLocation(sourceOutputLoc))
 			return null;
-		if (packageName == null || packageName.equals(""))
-			packageName = DEFAULT_PKG;
-		String path = "";
-		if (sibling == null) {
-			for (File f : javac_fm.getLocation(sourceOutputLoc)) {
-				path = f.getAbsolutePath();
-				break;
-			}
-		} else {
-			for (File f : javac_fm.getLocation(sourceOutputLoc)) {
-				String[] files = f.list();
-				for (String s : files)
-					if (s.equals(sibling.getName()))
-						path = f.getAbsolutePath();
-			}
-		}
-		String parentFilePath = path + separator
-				+ packageName.replace('.', separatorChar);
-		String absPath = parentFilePath + separator + relativeName;
+		URI srcUri, srcParentUri;
 		Kind k;
-		if (absPath.endsWith(".java"))
+		if (relativeName.endsWith(".java"))
 			k = Kind.SOURCE;
-		else if (absPath.endsWith(".class"))
+		else if (relativeName.endsWith(".class"))
 			k = Kind.CLASS;
-		else if (absPath.endsWith(".htm") || absPath.endsWith(".html"))
+		else if (relativeName.endsWith(".html")
+				|| relativeName.endsWith(".htm"))
 			k = Kind.HTML;
 		else
 			k = Kind.OTHER;
-		JavaFileObject fo = new JavaFileObject_c(absPath, k, true);
-		absPathObjMap.put(absPath, fo);
-		if (pathObjectMap.containsKey(parentFilePath))
-			pathObjectMap.get(parentFilePath).add(fo);
+		if (sibling == null) {
+			File sourcedir = null;
+			for (File f : javac_fm.getLocation(sourceOutputLoc)) {
+				sourcedir = f;
+				break;
+			}
+			if (sourcedir == null)
+				throw new IOException("Source output directory is not set.");
+			File sourcefile = new File(sourcedir, packageName.replace('.',
+					separatorChar) + separator + relativeName);
+			srcUri = sourcefile.toURI();
+			srcParentUri = sourcefile.getParentFile().toURI();
+		} else {
+			File sourcedir = new File(sibling.toUri()).getParentFile();
+			File sourcefile = new File(sourcedir,
+					relativeName.substring(relativeName
+							.lastIndexOf(separatorChar) + 1));
+			srcUri = sourcefile.toURI();
+			srcParentUri = sourcefile.getParentFile().toURI();
+		}
+		JavaFileObject jfo = new SourceObject(srcUri, k);
+		absPathObjMap.put(srcUri, jfo);
+		if (pathObjectMap.containsKey(srcParentUri))
+			pathObjectMap.get(srcParentUri).add(jfo);
 		else {
 			Set<JavaFileObject> s = new HashSet<JavaFileObject>();
-			s.add(fo);
-			pathObjectMap.put(parentFilePath, s);
+			s.add(jfo);
+			pathObjectMap.put(srcParentUri, s);
 		}
-		return fo;
+		return jfo;
 	}
 
 	public JavaFileObject getJavaFileForInput(Location location,
@@ -172,13 +179,13 @@ public class ExtFileManager implements FileManager {
 		Options options = extInfo.getOptions();
 		Location sourceOutputLoc = options.outputDirectory();
 		if (sourceOutputLoc.equals(location)) {
-			String clazz = separator + className.replace('.', separatorChar)
+			String clazz = className.replace('.', separatorChar)
 					+ kind.extension;
 			for (File f : javac_fm.getLocation(sourceOutputLoc)) {
-				String absPath = f.getAbsolutePath() + clazz;
-				JavaFileObject fo = absPathObjMap.get(absPath);
-				if (fo != null)
-					return fo;
+				URI u = new File(f, clazz).toURI();
+				JavaFileObject jfo = absPathObjMap.get(u);
+				if (jfo != null)
+					return jfo;
 			}
 			return null;
 		}
@@ -194,61 +201,43 @@ public class ExtFileManager implements FileManager {
 			if (location == null || !sourceOutputLoc.equals(location)
 					|| !javac_fm.hasLocation(sourceOutputLoc))
 				return null;
-			String path = "";
+			URI srcUri, srcParentUri;
 			if (sibling == null) {
+				File sourcedir = null;
 				for (File f : javac_fm.getLocation(sourceOutputLoc)) {
-					path = f.getAbsolutePath();
+					sourcedir = f;
 					break;
 				}
+				if (sourcedir == null)
+					throw new IOException("Source output directory is not set.");
+				File sourcefile = new File(sourcedir, className.replace('.',
+						separatorChar) + kind.extension);
+				srcUri = sourcefile.toURI();
+				srcParentUri = sourcefile.getParentFile().toURI();
 			} else {
-				String siblingPath = sibling.getName();
-				path = siblingPath.substring(0,
-						siblingPath.lastIndexOf(separatorChar));
+				File sourcedir = new File(sibling.toUri()).getParentFile();
+				File sourcefile = new File(sourcedir,
+						className.substring(className.lastIndexOf('.') + 1)
+								+ kind.extension);
+				srcUri = sourcefile.toURI();
+				srcParentUri = sourcefile.getParentFile().toURI();
 			}
-			String classNamePath = className.replace('.', separatorChar);
-			String absPath;
-			if (classNamePath.startsWith(path))
-				absPath = classNamePath;
-			else
-				absPath = path
-						+ separator
-						+ classNamePath.substring(classNamePath
-								.lastIndexOf(separatorChar) + 1);
-			JavaFileObject fo = new JavaSourceObject(absPath);
-			if (pathObjectMap.containsKey(path))
-				pathObjectMap.get(path).add(fo);
+			JavaFileObject jfo = new SourceObject(srcUri, kind);
+			absPathObjMap.put(srcUri, jfo);
+			if (pathObjectMap.containsKey(srcParentUri))
+				pathObjectMap.get(srcParentUri).add(jfo);
 			else {
 				Set<JavaFileObject> s = new HashSet<JavaFileObject>();
-				s.add(fo);
-				pathObjectMap.put(path, s);
+				s.add(jfo);
+				pathObjectMap.put(srcParentUri, s);
 			}
-			return fo;
+			return jfo;
 		} else if (kind.equals(Kind.CLASS)) {
 			if (location == null || !classOutputLoc.equals(location)
 					|| !javac_fm.hasLocation(classOutputLoc))
 				return null;
-			String path = "";
-			if (sibling == null) {
-				for (File f : javac_fm.getLocation(classOutputLoc)) {
-					path = f.getAbsolutePath();
-					break;
-				}
-			} else {
-				String siblingPath = sibling.getName();
-				path = siblingPath.substring(0,
-						siblingPath.lastIndexOf(separatorChar));
-			}
-			int lastDot = className.lastIndexOf('.');
-			if (lastDot > 0) {
-				String pkg = className.substring(0, lastDot);
-				File f = new File(path + separator
-						+ pkg.replace('.', separatorChar));
-				if (!f.exists())
-					f.mkdirs();
-			}
-			String absPath = path + separator
-					+ className.replace('.', separatorChar);
-			return new JavaClassObject(absPath);
+			return javac_fm.getJavaFileForOutput(classOutputLoc, className, kind,
+					sibling);
 		} else {
 			throw new UnsupportedOperationException();
 		}
@@ -263,24 +252,15 @@ public class ExtFileManager implements FileManager {
 	}
 
 	public String inferBinaryName(Location location, JavaFileObject file) {
-		if (file instanceof FileObject_c) {
-			String className = ((FileObject_c) file).getName();
-			return className.substring(className.lastIndexOf('.') + 1);
-		}
-		if (file instanceof JavaSourceObject) {
-			String className = ((JavaSourceObject) file).getName();
-			return className.substring(className.lastIndexOf('.') + 1);
-		}
-		if (file instanceof JavaClassObject) {
-			String className = ((JavaClassObject) file).getName();
+		if (file instanceof SourceObject) {
+			String className = ((SourceObject) file).getName();
 			return className.substring(className.lastIndexOf('.') + 1);
 		}
 		return javac_fm.inferBinaryName(location, file);
 	}
 
-	private void setFiller(String parentFilePath, Set<Kind> kinds,
-			Set<JavaFileObject> s) {
-		for (JavaFileObject fo : pathObjectMap.get(parentFilePath)) {
+	private void setFiller(URI parentUri, Set<Kind> kinds, Set<JavaFileObject> s) {
+		for (JavaFileObject fo : pathObjectMap.get(parentUri)) {
 			if (kinds.contains(Kind.SOURCE) && fo.getKind().equals(Kind.SOURCE))
 				s.add(fo);
 			else if (kinds.contains(Kind.CLASS)
@@ -306,15 +286,15 @@ public class ExtFileManager implements FileManager {
 			return new HashSet<JavaFileObject>();
 		if (sourceOutputLoc.equals(location)) {
 			Set<JavaFileObject> s = new HashSet<JavaFileObject>();
-			String pkg = separator + packageName.replace('.', separatorChar);
+			String pkg = packageName.replace('.', separatorChar);
 			for (File file : javac_fm.getLocation(sourceOutputLoc)) {
-				String parentFilePath = file.getAbsolutePath() + pkg;
-				if (pathObjectMap.containsKey(parentFilePath)) {
-					setFiller(parentFilePath, kinds, s);
+				URI parentUri = new File(file, pkg).toURI();
+				if (pathObjectMap.containsKey(parentUri)) {
+					setFiller(parentUri, kinds, s);
 					if (recurse)
-						for (String str : pathObjectMap.keySet())
-							if (str.startsWith(parentFilePath))
-								setFiller(str, kinds, s);
+						for (URI u : pathObjectMap.keySet())
+							if (u.getPath().startsWith(parentUri.getPath()))
+								setFiller(u, kinds, s);
 				}
 			}
 			return s;

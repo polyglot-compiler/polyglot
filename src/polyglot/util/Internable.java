@@ -31,8 +31,7 @@ import java.io.ObjectOutputStream;
 import java.io.IOException;
 import java.util.*;
 
-/** An Internable object.  intern() is called during deserialization. */
-public interface Internable
-{
-    public Object intern();
+/** An Internable object. intern() is called during deserialization. */
+public interface Internable {
+	public Object intern();
 }

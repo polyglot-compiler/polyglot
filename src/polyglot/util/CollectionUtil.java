@@ -28,8 +28,7 @@ package polyglot.util;
 import java.util.*;
 
 /** Collection utilities. */
-public class CollectionUtil
-{
+public class CollectionUtil {
 	/** Append <code>o</code> to <code>l</code>, returning <code>l</code>. */
 	public static List add(List l, Object o) {
 		l.add(o);
@@ -37,20 +36,19 @@ public class CollectionUtil
 	}
 
 	/**
-	 * Return true if <code>a</code> and <code>b</code> are
-	 * pointer equal, or if iterators over both return the same
-	 * sequence of pointer equal elements.
+	 * Return true if <code>a</code> and <code>b</code> are pointer equal, or if
+	 * iterators over both return the same sequence of pointer equal elements.
 	 */
 	public static boolean equals(Collection a, Collection b) {
 		if (a == b) {
 			return true;
 		}
-		
+
 		// the case where both are null is handled in the previous if.
 		if (a == null ^ b == null) {
 			return false;
 		}
-		
+
 		Iterator i = a.iterator();
 		Iterator j = b.iterator();
 
@@ -74,7 +72,7 @@ public class CollectionUtil
 	public static List list() {
 		return Collections.EMPTY_LIST;
 	}
-	
+
 	/** Return a singleton list containing <code>o</code>. */
 	public static List list(Object o) {
 		return Collections.singletonList(o);
@@ -107,35 +105,36 @@ public class CollectionUtil
 		return l;
 	}
 
-        public static Object firstOrElse(Collection l, Object alt) {
-                Iterator i = l.iterator();
-                if (i.hasNext()) return i.next();
-                return alt;
-        }
+	public static Object firstOrElse(Collection l, Object alt) {
+		Iterator i = l.iterator();
+		if (i.hasNext())
+			return i.next();
+		return alt;
+	}
 
-
-        public static Iterator pairs(Collection l) {
-                List x = new LinkedList();
-                Object prev = null;
-                for (Iterator i = l.iterator(); i.hasNext(); ) {
-                    Object curr = i.next();
-                    if (prev != null) x.add(new Object[] { prev, curr });
-                    prev = curr;
-                }
-                return x.iterator();
-        }
+	public static Iterator pairs(Collection l) {
+		List x = new LinkedList();
+		Object prev = null;
+		for (Iterator i = l.iterator(); i.hasNext();) {
+			Object curr = i.next();
+			if (prev != null)
+				x.add(new Object[] { prev, curr });
+			prev = curr;
+		}
+		return x.iterator();
+	}
 
 	/**
-	 * Apply <code>t</code> to each element of <code>l</code>.
-	 * <code>l</code> is not modified.  
-	 * @return A list containing the result of each transformation,
-	 * in the same order as the original elements.
+	 * Apply <code>t</code> to each element of <code>l</code>. <code>l</code> is
+	 * not modified.
+	 * 
+	 * @return A list containing the result of each transformation, in the same
+	 *         order as the original elements.
 	 */
 	public static List map(List l, Transformation t) {
 		List m = new ArrayList(l.size());
-		for (Iterator i = new TransformingIterator(l.iterator(), t); 
-			i.hasNext(); )
-		{
+		for (Iterator i = new TransformingIterator(l.iterator(), t); i
+				.hasNext();) {
 			m.add(i.next());
 		}
 		return m;
@@ -144,7 +143,8 @@ public class CollectionUtil
 	/**
 	 * Return an empty non-null list if the argument list is null.
 	 * 
-	 * @param l a possibly null list
+	 * @param l
+	 *            a possibly null list
 	 * @return a non-null list
 	 */
 	public static List nonNullList(List l) {

@@ -9,31 +9,24 @@ import java.net.URI;
 import javax.tools.JavaFileManager.Location;
 import javax.tools.SimpleJavaFileObject;
 
-public class JavaSourceObject extends SimpleJavaFileObject {
+/**
+ * This class represents a source object to be kept in memory.
+ */
+public class SourceObject extends SimpleJavaFileObject {
 
-	//private StringWriter sw = new StringWriter();
 	private final StringBuilderWriter sbw = new StringBuilderWriter();
-	private final String fullName;
-	
-	public JavaSourceObject(String fullName) {
-		super(URI.create(fullName + Kind.SOURCE.extension), Kind.SOURCE);
-		this.fullName = fullName;
+
+	public SourceObject(URI u, Kind k) {
+		super(u, k);
 	}
-	
-	@Override
-	public String getName() {
-		return fullName + Kind.SOURCE.extension;
-	}
-	
+
 	@Override
 	public Writer openWriter() throws IOException {
 		return sbw;
-		//return sw;
 	}
-	
+
 	@Override
 	public CharSequence getCharContent(boolean ignoreEncodingErrors) {
 		return sbw.getBuilder();
-		//return sw.getBuffer();
 	}
 }

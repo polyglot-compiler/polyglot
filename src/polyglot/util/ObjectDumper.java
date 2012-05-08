@@ -38,74 +38,71 @@ import java.util.Map;
 import java.util.Set;
 
 public class ObjectDumper {
-    CodeWriter w;
-    int modifiersMask;
-    
-    public ObjectDumper(CodeWriter w) {
-        this(w, Modifier.TRANSIENT | Modifier.STATIC);
-    }
+	CodeWriter w;
+	int modifiersMask;
 
-    public ObjectDumper(CodeWriter w, int modifiersMask) {
-        this.w = w;
-        this.modifiersMask = modifiersMask;
-    }
-    
-    public void dump(Object o) {
-	Set cache = new java.util.HashSet();
-	w.write("(");
-        dumpObject(o, cache);
-	w.write(")");
-	w.newline(0);
-        try {
-            w.flush();
-        }
-        catch (IOException e) {}
-    }
-  
-    protected void dumpObject(Object obj, Set cache) {
-        if (obj == null) {
-            w.write("null");
-            return;
-        }
-        
-        w.write(StringUtil.getShortNameComponent(obj.getClass().getName()));
+	public ObjectDumper(CodeWriter w) {
+		this(w, Modifier.TRANSIENT | Modifier.STATIC);
+	}
 
-//        w.allowBreak(0, " ");
-//        w.write(obj.toString());
-        
-        if (cache.contains(obj)) {
-            return;
-        }
-        cache.add(obj);
+	public ObjectDumper(CodeWriter w, int modifiersMask) {
+		this.w = w;
+		this.modifiersMask = modifiersMask;
+	}
 
-        w.allowBreak(1, " ");
-        w.begin(0);
-
-	try {
-	    Field[] fields = obj.getClass().getDeclaredFields();
-	    java.lang.reflect.AccessibleObject.setAccessible(fields, true);
-	    for (int i = 0; i < fields.length; i++) {
-		Field field = fields[i];
-                if ((field.getModifiers() & modifiersMask) != 0)
-                    continue;
+	public void dump(Object o) {
+		Set cache = new java.util.HashSet();
 		w.write("(");
-                w.write(field.getName());
-                w.allowBreak(1, " ");
+		dumpObject(o, cache);
+		w.write(")");
+		w.newline(0);
 		try {
-		    Object o = field.get(obj);
-		    dumpObject(o, cache);
+			w.flush();
+		} catch (IOException e) {
 		}
-                catch (IllegalAccessException exn) {
-		    w.write("##["+exn.getMessage()+"]");
-		}
-                w.write(")");
-                w.newline(0);
-	    }
-	}
-        catch (SecurityException exn) {
 	}
 
-        w.end();
-    }
+	protected void dumpObject(Object obj, Set cache) {
+		if (obj == null) {
+			w.write("null");
+			return;
+		}
+
+		w.write(StringUtil.getShortNameComponent(obj.getClass().getName()));
+
+		// w.allowBreak(0, " ");
+		// w.write(obj.toString());
+
+		if (cache.contains(obj)) {
+			return;
+		}
+		cache.add(obj);
+
+		w.allowBreak(1, " ");
+		w.begin(0);
+
+		try {
+			Field[] fields = obj.getClass().getDeclaredFields();
+			java.lang.reflect.AccessibleObject.setAccessible(fields, true);
+			for (int i = 0; i < fields.length; i++) {
+				Field field = fields[i];
+				if ((field.getModifiers() & modifiersMask) != 0)
+					continue;
+				w.write("(");
+				w.write(field.getName());
+				w.allowBreak(1, " ");
+				try {
+					Object o = field.get(obj);
+					dumpObject(o, cache);
+				} catch (IllegalAccessException exn) {
+					w.write("##[" + exn.getMessage() + "]");
+				}
+				w.write(")");
+				w.newline(0);
+			}
+		} catch (SecurityException exn) {
+		}
+
+		w.end();
+	}
 }
-
