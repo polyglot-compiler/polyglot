@@ -111,6 +111,7 @@ polyglot.ext.jl5.ExtensionInfo "-d out -classpath java-out -noserial -post \"jav
 	WildCard02.jl5 (Semantic, "does not match");
 	WildCard03.jl5;
 	WildCard04.jl5;
+	WildCard05.jl5;
 	TC195.jl5;
 	TC12.jl5;
 	Call01.jl5;
@@ -361,6 +362,8 @@ polyglot.ext.jl5.ExtensionInfo "-d out -classpath java-out -removeJava5isms -enu
         WildCard01.jl5;
         WildCard02.jl5 (Semantic, "does not match"); 
 	WildCard03.jl5;
+	WildCard04.jl5;
+	WildCard05.jl5;
         TC195.jl5;
         TC12.jl5;
 	Call01.jl5;

@@ -1,30 +1,16 @@
 import java.util.ArrayList;
-interface M<K,V> {
-    public ArrayList<K> keySet();
+interface AL<S> { }
+
+interface M<U> {
+    public AL<U> keySet();
 }
 
-class N {
-    
-    public static <T> ArrayList<T> unmodifiableList(ArrayList<? extends T> s) {
-        return new UnmodifiableList<T>(s);
-    }
-
-    static class UnmodifiableList<E> extends ArrayList<E> {
-        UnmodifiableList(ArrayList<? extends E> s)     {}
-    }
-    
-    private static class O<K,V> implements M<K,V> {
-        
-        O(M<? extends K, ? extends V> m) {
-            this.m = m;
-        }
-        
-        private final M<? extends K, ? extends V> m;
-        private transient ArrayList<K> keySet = null;
-        
-        public ArrayList<K> keySet() {
-            keySet = unmodifiableList(m.keySet());
-            return keySet;
-        }
+class N {  
+    public native static <T> AL<T> unmodifiableList(AL<? extends T> s);
+}
+class O<K> { 
+    public void  m(M<? extends K> m, AL<? extends K> foo) {
+	AL<K> a = N.unmodifiableList(m.keySet());
+	AL<K> b = N.unmodifiableList(foo);
     }
 }
