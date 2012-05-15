@@ -7,6 +7,7 @@ import polyglot.ext.jl5.types.JL5ParsedClassType;
 import polyglot.ext.jl5.types.JL5SubstClassType_c;
 import polyglot.ext.jl5.types.TypeVariable;
 import polyglot.ext.jl5.types.WildCardType;
+import polyglot.types.NullType;
 import polyglot.types.ReferenceType;
 import polyglot.types.Type;
 
@@ -19,7 +20,10 @@ public class EqualConstraint extends Constraint {
     @Override
     public List<Constraint> simplify() {
         List<Constraint> r = new ArrayList<Constraint>();
-        if (formal.isArray()) {
+        if (actual instanceof NullType) {
+            // no constraint implied!
+        }
+        else if (formal.isArray()) {
             if (actual.isArray() && actual.toArray().base().isReference()) {
                 r.add(new EqualConstraint((ReferenceType)actual.toArray().base(), (ReferenceType)formal.toArray().base(), solver));
             }

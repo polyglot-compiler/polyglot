@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import polyglot.ext.jl5.types.*;
+import polyglot.types.NullType;
 import polyglot.types.ReferenceType;
 import polyglot.types.Type;
 
@@ -24,6 +25,9 @@ public class SubConversionConstraint extends Constraint {
         if (actual instanceof JL5PrimitiveType) {
             JL5PrimitiveType prim_actual = (JL5PrimitiveType) actual;
             r.add(new SubConversionConstraint(solver().typeSystem().wrapperClassOfPrimitive(prim_actual), formal, solver));
+        }
+        else if (actual instanceof NullType) {
+            // no constraint implied!
         }
         else if (solver().isTargetTypeVariable(formal)) {
             r.add(new SubTypeConstraint(actual, formal, solver));
