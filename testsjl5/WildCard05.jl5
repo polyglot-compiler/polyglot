@@ -8,6 +8,6 @@ interface M<U> {
 class O<K> { 
     public native static <T> AL<T> unmodifiableList(AL<? extends T> s);
     public void  m(M<? extends K> m) {
-	AL<K> keySet = N.unmodifiableList(m.keySet());
+	AL<K> keySet = unmodifiableList(m.keySet());
     }
 }
