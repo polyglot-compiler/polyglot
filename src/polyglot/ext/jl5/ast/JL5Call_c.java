@@ -253,5 +253,11 @@ public class JL5Call_c extends Call_c implements JL5Call {
         w.end();
     }
 
+    @Override
+    protected Type findContainer(TypeSystem ts, MethodInstance mi) {
+        JL5TypeSystem jts = (JL5TypeSystem)ts;
+        return jts.erasureType(mi.container());    
+    }
+
 
 }
