@@ -66,6 +66,19 @@ public class JL5MethodInstance_c extends MethodInstance_c implements JL5MethodIn
                                         mi.position());
         }
         
+        if (mi != mj && !mi.equals(mj) && mj.flags().isFinal()) {
+            // mi can "override" a final method mj if mi and mj are the same method instance.
+            if (Report.should_report(Report.types, 3))
+                Report.report(3, mj.flags() + " final");
+            if (quiet) return false;
+            throw new SemanticException(mi.signature() + " in " + mi.container() +
+                                        " cannot override " + 
+                                        mj.signature() + " in " + mj.container() + 
+                                        "; overridden method is final", 
+                                        mi.position());
+        }
+
+        
         // replace the type variables of mj with the type variables of mi
         if (!mi.typeParams().isEmpty()) {
             Map<TypeVariable, Type> substm = new LinkedHashMap();
@@ -134,18 +147,6 @@ public class JL5MethodInstance_c extends MethodInstance_c implements JL5MethodIn
                                         "; overridden method is " + 
                                         (mj.flags().isStatic() ? "" : "not") +
                                         "static", 
-                                        mi.position());
-        }
-
-        if (mi != mj && !mi.equals(mj) && mj.flags().isFinal()) {
-            // mi can "override" a final method mj if mi and mj are the same method instance.
-            if (Report.should_report(Report.types, 3))
-                Report.report(3, mj.flags() + " final");
-            if (quiet) return false;
-            throw new SemanticException(mi.signature() + " in " + mi.container() +
-                                        " cannot override " + 
-                                        mj.signature() + " in " + mj.container() + 
-                                        "; overridden method is final", 
                                         mi.position());
         }
 
