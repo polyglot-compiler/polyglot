@@ -35,7 +35,7 @@ javac "-d java-out -cp ." {
         java-src/MyEnum.java;
 }
  
-polyglot.ext.jl5.ExtensionInfo "-d out -classpath java-out -noserial -post \"javac -source 1.5\"" {
+polyglot.ext.jl5.ExtensionInfo "-d out -classpath java-out -noserial -post \"javac -source 1.5\" -morepermissiveinference" {
         HexFloatingPoint.jl5;
         Generics01.jl5;
 	Generics02.jl5;
@@ -87,6 +87,7 @@ polyglot.ext.jl5.ExtensionInfo "-d out -classpath java-out -noserial -post \"jav
         InnerClass03.jl5;
         InnerClass04.jl5;
         InnerClass05.jl5 (Semantic);
+        InnerClass06.jl5;
         Access01.jl5;
         Access02.jl5;
 	Anonymous01.jl5;
@@ -107,6 +108,7 @@ polyglot.ext.jl5.ExtensionInfo "-d out -classpath java-out -noserial -post \"jav
 	VarArgs03.jl5;
 	VarArgs04.jl5;
 	VarArgs05.jl5;
+	VarArgs06.jl5;
 	WildCard01.jl5;
 	WildCard02.jl5 (Semantic, "does not match");
 	WildCard03.jl5;
@@ -339,6 +341,7 @@ polyglot.ext.jl5.ExtensionInfo "-d out -classpath java-out -removeJava5isms -enu
         InnerClass03.jl5;
         InnerClass04.jl5;
         InnerClass05.jl5 (Semantic);
+        InnerClass06.jl5;
         Access01.jl5;
         Access02.jl5;
         Anonymous01.jl5;
@@ -359,6 +362,7 @@ polyglot.ext.jl5.ExtensionInfo "-d out -classpath java-out -removeJava5isms -enu
         VarArgs03.jl5;
         VarArgs04.jl5;
         VarArgs05.jl5;
+        VarArgs06.jl5;
         WildCard01.jl5;
         WildCard02.jl5 (Semantic, "does not match"); 
 	WildCard03.jl5;

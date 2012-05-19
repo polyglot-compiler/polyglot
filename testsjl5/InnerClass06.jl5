@@ -1,0 +1,5 @@
+class M {	
+    static class C<S> {
+	static final <T> void m(T o) { }
+    }
+}
