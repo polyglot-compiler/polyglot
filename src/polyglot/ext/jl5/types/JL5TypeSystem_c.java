@@ -1515,6 +1515,10 @@ public class JL5TypeSystem_c extends ParamTypeSystem_c implements JL5TypeSystem 
         return JL5Flags.setVarArgs(super.legalMethodFlags());
     }
 
+    public Flags legalAbstractMethodFlags() {
+        return JL5Flags.setVarArgs(super.legalAbstractMethodFlags());
+    }
+
     
     @Override
     public JL5SubstClassType findGenericSupertype(JL5ParsedClassType base, ReferenceType sub) {
