@@ -1,0 +1,44 @@
+class C {
+	public void funct() {
+		D d = new D();
+		boolean bool = d.get("temp", true);
+		byte byt = d.get("temp", (byte) 0);
+		char cha = d.get("temp", '0');
+		short shor = d.get("temp", (short) 0);
+		int count = d.get("temp", (int) 0);
+		long lon = d.get("temp", (long) 0);
+		float floa = d.get("temp", (float) 0.0);
+		double doub = d.get("temp", (double) 0.0);
+		Object obj = d.get("temp", new Object());
+	}
+	
+	public static class D {
+		public boolean get(String name, boolean val) {
+			return true;
+		}
+	    public byte get(String name, byte val) {
+			return (byte) 0;
+		}
+	    public char get(String name, char val) {
+			return (char) '0';
+		}
+	    public short get(String name, short val) {
+			return (short) 0;
+		}
+	    public int get(String name, int val) {
+			return (int) 0;
+		}
+	    public long get(String name, long val) {
+			return (long) 0;
+		}
+	    public float get(String name, float val) {
+			return (float) 0.0;
+		}
+	    public double get(String name, double val) {
+			return (double) 0.0;
+		}
+	    public Object get(String name, Object val) {
+			return new Object();
+		}
+	}
+}
