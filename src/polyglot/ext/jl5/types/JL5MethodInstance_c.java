@@ -156,12 +156,6 @@ public class JL5MethodInstance_c extends MethodInstance_c implements JL5MethodIn
     @Override
     public boolean callValidImpl(List argTypes) {
         List<Type> myFormalTypes = this.formalTypes;
-        JL5Subst erasureSubst = null;
-        if (this.container() instanceof JL5ParsedClassType) {
-            // we have a stripped off class type. Replace any type variables
-            // with their bounds.
-            erasureSubst = ((JL5ParsedClassType) this.container()).erasureSubst();
-        }
 
         //         System.err.println("JL5MethodInstance_c callValid Impl " + this +" called with " +argTypes);
         // now compare myFormalTypes to argTypes
@@ -191,10 +185,6 @@ public class JL5MethodInstance_c extends MethodInstance_c implements JL5MethodIn
             }
              
             if (ts.isImplicitCastValid(actual, formal)) {
-                // Yep, this type is OK. Try the next one.
-                continue;
-            }
-            if (erasureSubst != null && ts.isImplicitCastValid(actual, erasureSubst.substType(formal))) {
                 // Yep, this type is OK. Try the next one.
                 continue;
             }
@@ -254,7 +244,7 @@ public class JL5MethodInstance_c extends MethodInstance_c implements JL5MethodIn
     @Override
     public JL5Subst erasureSubst() {
         JL5TypeSystem ts = (JL5TypeSystem) this.typeSystem();
-        return ts.erasureSubst(this.typeParams);
+        return ts.erasureSubst(this);
     }
 
 

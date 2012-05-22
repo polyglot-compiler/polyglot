@@ -881,7 +881,8 @@ public class JL5TypeSystem_c extends ParamTypeSystem_c implements JL5TypeSystem 
 
 
     @Override
-    public JL5Subst erasureSubst(List<TypeVariable> typeParams) {
+    public JL5Subst erasureSubst(JL5ProcedureInstance pi) {
+        List<TypeVariable> typeParams = pi.typeParams();
         Map m = new LinkedHashMap();
         Set selfReferences = new LinkedHashSet();
         for (TypeVariable tv : typeParams) {
@@ -890,8 +891,20 @@ public class JL5TypeSystem_c extends ParamTypeSystem_c implements JL5TypeSystem 
         if (m.isEmpty()) {
             return null;
         }
-        JL5Subst ret = (JL5Subst)this.subst(m, new HashMap());
-        return ret;
+        return new JL5Subst_c(this, m, new HashMap());
+    }
+    @Override
+    public JL5Subst erasureSubst(JL5ParsedClassType base) {
+        List<TypeVariable> typeParams = base.typeVariables();
+        Map m = new LinkedHashMap();
+        Set selfReferences = new LinkedHashSet();
+        for (TypeVariable tv : typeParams) {
+            m.put(tv, tv.erasureType());
+        }
+        if (m.isEmpty()) {
+            return null;
+        }
+        return new JL5RawSubst_c(this, m, new HashMap(), base);
     }
 
 

@@ -87,8 +87,11 @@ public class JL5SubstClassType_c extends SubstClassType_c implements JL5SubstCla
     }
 
     @Override
-    public void printParams(CodeWriter w) {
+    public void printParams(CodeWriter w) {        
         JL5ParsedClassType ct = this.base();
+        if (ct.typeVariables().isEmpty()) {
+            return;
+        }
         w.write("<");
         Iterator<TypeVariable> it = ct.typeVariables().iterator();
         while (it.hasNext()) {
@@ -105,20 +108,19 @@ public class JL5SubstClassType_c extends SubstClassType_c implements JL5SubstCla
     @Override
     public String toString() {
         JL5ParsedClassType ct = this.base();
-        if (ct.typeVariables().isEmpty()) {
-            return ct.toString();
-        }
         StringBuffer sb = new StringBuffer(ct.toStringNoParams());
-        sb.append('<');
-        Iterator<TypeVariable> iter = ct.typeVariables().iterator();
-        while (iter.hasNext()) {
-            TypeVariable act = iter.next();            
-            sb.append(this.subst().substType(act));
-            if (iter.hasNext()) {
-                sb.append(',');                    
+        if (!ct.typeVariables().isEmpty()) {
+            sb.append('<');
+            Iterator<TypeVariable> iter = ct.typeVariables().iterator();
+            while (iter.hasNext()) {
+                TypeVariable act = iter.next();            
+                sb.append(this.subst().substType(act));
+                if (iter.hasNext()) {
+                    sb.append(',');                    
+                }
             }
+            sb.append('>');
         }
-        sb.append('>');
         return sb.toString();
     }
 
@@ -278,21 +280,11 @@ public class JL5SubstClassType_c extends SubstClassType_c implements JL5SubstCla
                 return name();
             }
 
-            // Use the short name if it is unique.
-            if (c != null && !Options.global.fully_qualified_names) {
-                try {
-                    Named x = c.find(name());
-
-                    if (ts.equals(this, x) || ts.equals(this.base(), x)) {
-                        return name();
-                    }
-                }
-                catch (SemanticException e) {
-                }
-            }
+            // never use the short name for a member class if we need to perform substitution...
             ReferenceType container = this.container();
             if (!this.isInnerClass()) {
-                // if we are not an inner class, then make sure that we
+                // if we are not an inner class (i.e., we are
+                // a static nested class), then make sure that we
                 // do not print out the parameters for our container.
                 JL5TypeSystem ts = (JL5TypeSystem)this.ts;
                 container = (ReferenceType)ts.erasureType(this.container());

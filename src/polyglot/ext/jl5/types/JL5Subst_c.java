@@ -106,17 +106,33 @@ public class JL5Subst_c extends Subst_c implements JL5Subst {
         }
         
         if (t instanceof JL5ParsedClassType) {
-            JL5ParsedClassType pct = (JL5ParsedClassType)t;            
-            if (pct.typeVariables().isEmpty()) {
+            JL5ParsedClassType pct = (JL5ParsedClassType)t;
+            if (!hasTypeVariables(pct)) {
                 // no parameters to be instantiated!
                 return pct;
             }
             return new JL5SubstClassType_c((JL5TypeSystem) ts, t.position(),
-                                           (JL5ParsedClassType) t, this);
+                                           pct, this);
         }
 
         throw new InternalCompilerError("Don't know how to handle class type " + t.getClass());
 
+    }
+
+    /**
+     * Does pct, or a containing class of pct, have type variables?
+     */
+    private boolean hasTypeVariables(JL5ParsedClassType pct) {
+        if (!pct.typeVariables().isEmpty()) {
+            return true;
+        }
+        if (pct.outer() == null) {
+            return false;
+        }
+        if (pct.outer() instanceof JL5ParsedClassType) {
+            return hasTypeVariables((JL5ParsedClassType)pct.outer());
+        }
+        return true;
     }
 
     @Override

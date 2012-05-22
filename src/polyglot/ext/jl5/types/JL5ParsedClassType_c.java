@@ -138,7 +138,7 @@ public class JL5ParsedClassType_c extends ParsedClassType_c implements JL5Parsed
     @Override
     public JL5Subst erasureSubst() {
         JL5TypeSystem ts = (JL5TypeSystem) this.typeSystem();
-        return ts.erasureSubst(this.typeVariables());
+        return ts.erasureSubst(this);
     }
 
 
