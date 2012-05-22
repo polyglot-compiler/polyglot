@@ -55,6 +55,7 @@ public class InferenceSolver_c implements InferenceSolver {
         List<SuperTypeConstraint> supers = new ArrayList<SuperTypeConstraint>();
 //        System.err.println("**** inference solver:");
 //        System.err.println("      constraints : " + constraints);
+//        System.err.println("      use subs? : " + useSubtypeConstraints +  "   use sups? : " + useSupertypeConstraints);
 //        System.err.println("      variables : " + typeVariablesToSolve());
 
         while (!constraints.isEmpty()) {
@@ -147,10 +148,20 @@ public class InferenceSolver_c implements InferenceSolver {
         if (numFormals > 0) {
             if (pi != null && JL5Flags.isVarArgs(pi.flags())) {
                 JL5ArrayType lastFormal = (JL5ArrayType) pi.formalTypes().get(numFormals - 1);
-                for (int i = numFormals - 1; i < actualArgumentTypes.size() - 1; i++) {
-                    constraints.add(new SubConversionConstraint(actualArgumentTypes.get(i), lastFormal.base(), this));
-                }                
+                if (actualArgumentTypes.size() == numFormals && ((Type)actualArgumentTypes.get(numFormals-1)).isArray()) {
+                    // there are the same number of actuals as formals, and the last actual is an array type.
+                    // So the last actual must be convertible to the array type.
+                    constraints.add(new SubConversionConstraint(actualArgumentTypes.get(numFormals - 1), formalTypes.get(numFormals - 1), this));
+                }
+                else {
+                    // more than one remaining actual, or the last remaining actual is not an array type.
+                    // all remaining actuals must be convertible to the basetype of the last (i.e. varargs) formal.
+                    for (int i = numFormals - 1; i < actualArgumentTypes.size(); i++) {
+                        constraints.add(new SubConversionConstraint(actualArgumentTypes.get(i), lastFormal.base(), this));
+                    }
+                }
             } else if (numFormals == actualArgumentTypes.size()) {
+                // not a varargs method
                 constraints.add(new SubConversionConstraint(actualArgumentTypes.get(numFormals - 1), formalTypes.get(numFormals - 1), this));
             }
         }
