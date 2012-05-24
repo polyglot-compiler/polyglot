@@ -88,6 +88,7 @@ polyglot.ext.jl5.ExtensionInfo "-d out -classpath java-out -noserial -post \"jav
         InnerClass04.jl5;
         InnerClass05.jl5 (Semantic);
         InnerClass06.jl5;
+        InnerClass07.jl5;
         Access01.jl5;
         Access02.jl5;
 	Anonymous01.jl5;
@@ -109,6 +110,7 @@ polyglot.ext.jl5.ExtensionInfo "-d out -classpath java-out -noserial -post \"jav
 	VarArgs04.jl5;
 	VarArgs05.jl5;
 	VarArgs06.jl5;
+	VarArgs07.jl5;
 	WildCard01.jl5;
 	WildCard02.jl5 (Semantic, "does not match");
 	WildCard03.jl5;
@@ -117,6 +119,7 @@ polyglot.ext.jl5.ExtensionInfo "-d out -classpath java-out -noserial -post \"jav
 	TC195.jl5;
 	TC12.jl5;
 	Call01.jl5;
+	ImplicitCast01.jl5;
 	Cast01.jl5;
 	Cast02.jl5;
 	Conditional01.jl5;
@@ -279,6 +282,10 @@ polyglot.ext.jl5.ExtensionInfo "-d out -classpath java-out -noserial -post \"jav
 	RawReturn04.jl5 (Semantic);
 	RawReturn05.jl5;
 	RawReturn06.jl5;
+	RawType01.jl5;
+	RawType02.jl5;
+	RawType03.jl5 (Semantic);
+	RawType04.jl5 (Semantic);
 	EnumTest1.jl5;
 	EnumTest2.jl5;
 	EnumTest3.jl5;
@@ -290,7 +297,7 @@ polyglot.ext.jl5.ExtensionInfo "-d out -classpath java-out -noserial -post \"jav
 
 # Now run the tests again removing the Java 5-isms.
 # This one uses 1.4 to suppress the warning about raw classes.
-polyglot.ext.jl5.ExtensionInfo "-d out -classpath java-out -removeJava5isms -enumImplClass MyEnum -noserial -post \"javac -source 1.4\"" {
+polyglot.ext.jl5.ExtensionInfo "-d out -classpath java-out -removeJava5isms -enumImplClass MyEnum -noserial -post \"javac -source 1.4\" -morepermissiveinference" {
         Generics01.jl5;
         Generics02.jl5;
         Generics03.jl5;
@@ -363,6 +370,7 @@ polyglot.ext.jl5.ExtensionInfo "-d out -classpath java-out -removeJava5isms -enu
         VarArgs04.jl5;
         VarArgs05.jl5;
         VarArgs06.jl5;
+	VarArgs07.jl5;
         WildCard01.jl5;
         WildCard02.jl5 (Semantic, "does not match"); 
 	WildCard03.jl5;
@@ -371,6 +379,7 @@ polyglot.ext.jl5.ExtensionInfo "-d out -classpath java-out -removeJava5isms -enu
         TC195.jl5;
         TC12.jl5;
 	Call01.jl5;
+	ImplicitCast01.jl5;
 	Cast01.jl5;
 	Cast02.jl5;
 	Conditional01.jl5;
@@ -532,6 +541,10 @@ polyglot.ext.jl5.ExtensionInfo "-d out -classpath java-out -removeJava5isms -enu
         RawReturn04.jl5 (Semantic);
         RawReturn05.jl5;
         RawReturn06.jl5;
+	RawType01.jl5;
+	RawType02.jl5;
+	RawType03.jl5 (Semantic);
+	RawType04.jl5 (Semantic);
         EnumTest1.jl5;
         EnumTest2.jl5;
         EnumTest3.jl5;

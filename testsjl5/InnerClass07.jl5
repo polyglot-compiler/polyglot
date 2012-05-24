@@ -1,0 +1,57 @@
+// Test the use of inner classes contained in parameterized outer classes, and vice versa
+class C1 {
+    D1 newd1() { return new D1(); }
+    D2<Integer> newd2() { return new D2<Integer>(); }
+    class D1 { 
+	E1 newe1() { return new E1(); }
+	E2<String> newe2() { return new E2<String>(); }
+	class E1 { }
+	class E2<V> { }
+    }
+    class D2<U> { 
+	E1 newe1() { return new E1(); }
+	E2<String> newe2() { return new E2<String>(); }
+	class E1 { }
+	class E2<V> { }
+    }
+}
+
+class C2<T> {
+    D1 newd1() { return new D1(); }
+    D2<Integer> newd2() { return new D2<Integer>(); }
+    class D1 { 
+	E1 newe1() { return new E1(); }
+	E2<String> newe2() { return new E2<String>(); }
+	class E1 { }
+	class E2<V> { }
+    }
+    class D2<U> { 
+	E1 newe1() { return new E1(); }
+	E2<String> newe2() { return new E2<String>(); }
+	class E1 { }
+	class E2<V> { }
+    }
+}
+
+class C {
+    void m() {
+	C1         c1 = new C1();
+	C2<Double> c2 = new C2<Double>();
+
+	C1.D1          c1d1 = c1.newd1();
+	C1.D2<Integer> c1d2 = c1.newd2();
+
+	C2<Double>.D1          c2d1 = c2.newd1();
+	C2<Double>.D2<Integer> c2d2 = c2.newd2();
+
+	C1.D1.E1                          c1d1e1 = c1d1.newe1();
+	C1.D1.E2<String>                  c1d1e2 = c1d1.newe2();
+	C1.D2<Integer>.E1                 c1d2e1 = c1d2.newe1();
+	C1.D2<Integer>.E2<String>         c1d2e2 = c1d2.newe2();
+	C2<Double>.D1.E1                  c2d1e1 = c2d1.newe1();
+	C2<Double>.D1.E2<String>          c2d1e2 = c2d1.newe2();
+	C2<Double>.D2<Integer>.E1         c2d2e1 = c2d2.newe1();
+	C2<Double>.D2<Integer>.E2<String> c2d2e2 = c2d2.newe2();
+
+    }
+}
