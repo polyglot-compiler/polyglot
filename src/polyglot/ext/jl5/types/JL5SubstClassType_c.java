@@ -317,5 +317,16 @@ public class JL5SubstClassType_c extends SubstClassType_c implements JL5SubstCla
         }
     }
 
+    @Override
+    public ClassType outer() {
+        if (this.isMember() && !this.isInnerClass()) {
+            if (!(super.outer() instanceof RawClass)) {
+                JL5TypeSystem ts = (JL5TypeSystem)this.typeSystem();
+                return (ClassType)ts.erasureType(super.outer());
+            }
+        }
+        return super.outer();
+    }
+
     
 }

@@ -4,10 +4,7 @@ import java.io.DataInputStream;
 import java.io.IOException;
 import java.util.*;
 
-import polyglot.ext.jl5.types.JL5ParsedClassType;
-import polyglot.ext.jl5.types.JL5SubstClassType;
-import polyglot.ext.jl5.types.JL5TypeSystem;
-import polyglot.ext.jl5.types.TypeVariable;
+import polyglot.ext.jl5.types.*;
 import polyglot.types.*;
 import polyglot.types.reflect.Attribute;
 import polyglot.types.reflect.ClassFile;
@@ -421,8 +418,8 @@ public class JL5Signature extends Attribute {
 //        if (!className.equals(ct.name())) {
 //            System.err.println("---- uh oh:   " + className + "   " + ct.name() +"   " + lookupClassName +"  " +classArgsMap);
 //        }
-        if (classArgsMap.containsKey(lookupClassName)){            
-            JL5ParsedClassType pct = (JL5ParsedClassType) ct;
+        if (classArgsMap.containsKey(lookupClassName)){
+            JL5ParsedClassType pct = parsedClassTypeForClass(ct);
             if (!createTypeVars) {
                 try {
                     ct = ts.instantiate(position, pct, (List<Type>)classArgsMap.get(lookupClassName));
@@ -441,22 +438,14 @@ public class JL5Signature extends Attribute {
 //                System.err.println("Outer is " + outer.name() + " and classArgsMap is " + classArgsMap + " outer is " + outer.getClass());
 //                System.err.println("  outer base is " + ((JL5SubstClassType)outer).base());
 //                System.err.println("  outer subst is " + ((JL5SubstClassType)outer).subst());
-                JL5ParsedClassType pct = null;
-                if (outer instanceof JL5ParsedClassType) {
-                    pct = (JL5ParsedClassType) outer;
-                }
-                else {
-                    JL5SubstClassType sct = (JL5SubstClassType) outer;
-                    pct = sct.base();
-                }
+                JL5ParsedClassType pct = parsedClassTypeForClass(outer);
                 try {
                     ClassType pt = ts.instantiate(position, pct.pclass(), (List)classArgsMap.get(outer.name()));
                     if (current instanceof JL5ParsedClassType) {
                         ((JL5ParsedClassType)current).outer(pt);
                     }
                 } catch (SemanticException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
+                    throw new InternalCompilerError(e);
                 }
             }
             if (current == current.outer()) break;
@@ -467,6 +456,21 @@ public class JL5Signature extends Attribute {
         return new Result(ct, pos);
     }
     
+    private JL5ParsedClassType parsedClassTypeForClass(ClassType ct) {
+        if (ct instanceof JL5ParsedClassType) {
+            return (JL5ParsedClassType)ct;
+        }
+        else if (ct instanceof RawClass) {
+            return ((RawClass)ct).base();
+        }
+        else if (ct instanceof JL5SubstClassType) {
+            return ((JL5SubstClassType)ct).base();                
+        }
+        else {
+            throw new InternalCompilerError("Don't know how to deal with finding base of class " + ct);
+        }
+    }
+
     public Result typeVarSig(String value, int pos){
         //System.err.println("### Parsing type var sig " + value.substring(pos));
         Result res = null;

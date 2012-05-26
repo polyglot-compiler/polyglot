@@ -900,6 +900,10 @@ public class JL5TypeSystem_c extends ParamTypeSystem_c implements JL5TypeSystem 
             for (TypeVariable tv : t.typeVariables()) {
                 m.put(tv, tv.erasureType());
             }
+            if (!(t.outer() instanceof JL5ParsedClassType)) {
+                // no more type variables that we care about!
+                break;
+            }
             t = (JL5ParsedClassType)t.outer();
         }
         if (m.isEmpty()) {
@@ -1719,9 +1723,13 @@ public class JL5TypeSystem_c extends ParamTypeSystem_c implements JL5TypeSystem 
          if (!ct.typeVariables().isEmpty()) {
              return true;
          }
-         if (ct.outer() == null) {
+         if (ct.isNested() && !ct.isInnerClass()) {
+             // ct is a static nested class. Ignore any type variables contained in outer classes.
              return false;
          }
+         if (ct.outer() == null) {
+             return false;
+         }         
          if (ct.outer() instanceof JL5ParsedClassType) {
              return hasTypeVariables((JL5ParsedClassType)ct.outer());
          }

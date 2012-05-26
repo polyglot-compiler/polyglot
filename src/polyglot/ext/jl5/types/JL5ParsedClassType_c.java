@@ -76,6 +76,17 @@ public class JL5ParsedClassType_c extends ParsedClassType_c implements JL5Parsed
     }
     
     @Override
+    public ClassType outer() {
+        if (this.isMember() && !this.isInnerClass()) {
+            if (!(super.outer() instanceof RawClass)) {
+                JL5TypeSystem ts = (JL5TypeSystem)this.typeSystem();
+                return (ClassType)ts.erasureType(super.outer());
+            }
+        }
+        return super.outer();
+    }
+    
+    @Override
     public boolean isCastValidImpl(Type toType){        
         if (super.isCastValidImpl(toType)) {
             return true;
