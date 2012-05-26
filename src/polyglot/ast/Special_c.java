@@ -162,13 +162,13 @@ public class Special_c extends Expr_c implements Special
     }
 
     public String toString() {
-	return (qualifier != null ? qualifier + "." : "") + kind;
+	return (qualifier != null ? qualifier.type().toClass().name() + "." : "") + kind;
     }
 
     /** Write the expression to an output file. */
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
 	if (qualifier != null) {
-	    print(qualifier, w, tr);
+	    w.write(qualifier.type().toClass().name());
 	    w.write(".");
 	}
 
