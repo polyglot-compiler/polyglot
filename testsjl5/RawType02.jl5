@@ -1,0 +1,16 @@
+// From JLS 3rd ed. 4.8
+class Cell<E> {
+    E value;
+    Cell (E v) { value=v; }
+    E get() { return value; }
+    void set(E v) { value=v; }
+}
+
+class C {
+    static {
+	Cell x = new Cell<String>("abc");
+	Object y = x.value; // OK, has type Object
+	x.get(); // OK, has type Object
+	x.set("def"); // unchecked warning
+    }
+}
