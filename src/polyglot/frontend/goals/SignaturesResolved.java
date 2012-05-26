@@ -26,16 +26,14 @@
 package polyglot.frontend.goals;
 
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
-import polyglot.ast.NodeFactory;
 import polyglot.frontend.*;
-import polyglot.frontend.passes.*;
+import polyglot.frontend.passes.DisambiguateSignaturesPass;
+import polyglot.types.ClassType;
 import polyglot.types.ParsedClassType;
-import polyglot.types.TypeSystem;
-import polyglot.util.InternalCompilerError;
-import polyglot.visit.AmbiguityRemover;
-import polyglot.visit.TypeChecker;
 
 /**
  * Comment for <code>SignaturesDisambiguated</code>
@@ -82,8 +80,8 @@ public class SignaturesResolved extends ClassTypeGoal {
         return l;
     }
 
-    protected boolean isGlobal(ParsedClassType ct) {
-        return ct.isTopLevel() || (ct.isMember() && isGlobal((ParsedClassType) ct.container()));
+    protected boolean isGlobal(ClassType ct) {
+        return ct.isTopLevel() || (ct.isMember() && isGlobal((ClassType) ct.container()));
     }
     
     public Collection corequisiteGoals(Scheduler scheduler) {
