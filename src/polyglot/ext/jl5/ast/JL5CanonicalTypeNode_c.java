@@ -29,26 +29,47 @@ public class JL5CanonicalTypeNode_c extends polyglot.ast.CanonicalTypeNode_c {
     }
 
     public Node typeCheck(TypeChecker tc) throws SemanticException {
-        Type t = type();
+        Type t = this.type();
         if (t instanceof JL5SubstClassType) {
-            JL5SubstClassType st = (JL5SubstClassType) type();
-
+            JL5SubstClassType st = (JL5SubstClassType) t;
             JL5TypeSystem ts = (JL5TypeSystem) tc.typeSystem();
-            //first we must perform capture conversion. see beginning of JLS 4.5            
-            JL5SubstClassType capCT = (JL5SubstClassType) ts.applyCaptureConversion(st);
 
-            for (int i = 0; i < capCT.actuals().size(); i++) {
-                TypeVariable ai = capCT.base().typeVariables().get(i);                
-                Type xi = (Type) capCT.actuals().get(i);
-
+            
+            // Check for rare types: e.g., Outer<String>.Inner, where Inner has uninstantiated type variables
+            // See JLS 3rd ed. 4.8
+            if (st.isInnerClass() && !st.base().typeVariables().isEmpty()) {
+                // st is an inner class, with type variables. Make sure that
+                // these type variables are acutally instantiated
+                for (TypeVariable tv : st.base().typeVariables()) {
+                    if (!st.subst().substitutions().keySet().contains(tv)) {
+                        throw new SemanticException("\"Rare\" types are not allowed: cannot " +
+                                "use raw class " + st.name() + 
+                                " when the outer class " + st.outer() + " has instantiated type variables.", position);
+                    }
+                }
                 
-                //require that arguments obey their bounds
-                if (!ts.isSubtype(xi, capCT.subst().substType(ai.upperBound()))) {
-                    throw new SemanticException("Type argument " + st.actuals().get(i) + 
-                            " is not a subtype of its declared bound " + ai.upperBound(), position());
+            }
+            {
+                // check that arguments obey their bounds.
+                
+                   
+                //first we must perform capture conversion. see beginning of JLS 4.5            
+                JL5SubstClassType capCT = (JL5SubstClassType) ts.applyCaptureConversion(st);
+
+                for (int i = 0; i < capCT.actuals().size(); i++) {
+                    TypeVariable ai = capCT.base().typeVariables().get(i);                
+                    Type xi = (Type) capCT.actuals().get(i);
+
+
+                    //require that arguments obey their bounds
+                    if (!ts.isSubtype(xi, capCT.subst().substType(ai.upperBound()))) {
+                        throw new SemanticException("Type argument " + st.actuals().get(i) + 
+                                                    " is not a subtype of its declared bound " + ai.upperBound(), position());
+                    }
                 }
             }
         }
+        
         // check for uses of type variables in static contexts
         if (tc.context().inStaticContext()) {
             for (TypeVariable tv : findInstanceTypeVariables(t)) {

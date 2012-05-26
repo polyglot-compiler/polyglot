@@ -174,8 +174,6 @@ public class JL5ConstructorCall_c extends ConstructorCall_c implements JL5Constr
                 while (e != null) {
                     // use isImplicitCastValid instead of isSubtype in order to allow unchecked conversion.
                     if (e.isImplicitCastValid(superContainer) && ct.hasEnclosingInstance(e)) {
-                        NodeFactory nf = tc.nodeFactory();
-                        q = nf.This(position(), nf.CanonicalTypeNode(position(), e)).type(e);
                         break; 
                     }
                     e = e.outer();
@@ -192,8 +190,7 @@ public class JL5ConstructorCall_c extends ConstructorCall_c implements JL5Constr
                 }
             }
 
-            if (qualifier != q)
-                n = (ConstructorCall_c) n.qualifier(q);
+            // we differ here from the implementation in ConstructorCall_c in that we do not modify the qualifier
         }
 
         List argTypes = new LinkedList();

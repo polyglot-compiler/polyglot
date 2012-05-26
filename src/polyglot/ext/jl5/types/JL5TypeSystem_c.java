@@ -884,7 +884,6 @@ public class JL5TypeSystem_c extends ParamTypeSystem_c implements JL5TypeSystem 
     public JL5Subst erasureSubst(JL5ProcedureInstance pi) {
         List<TypeVariable> typeParams = pi.typeParams();
         Map m = new LinkedHashMap();
-        Set selfReferences = new LinkedHashSet();
         for (TypeVariable tv : typeParams) {
             m.put(tv, tv.erasureType());
         }
@@ -895,11 +894,13 @@ public class JL5TypeSystem_c extends ParamTypeSystem_c implements JL5TypeSystem 
     }
     @Override
     public JL5Subst erasureSubst(JL5ParsedClassType base) {
-        List<TypeVariable> typeParams = base.typeVariables();
         Map m = new LinkedHashMap();
-        Set selfReferences = new LinkedHashSet();
-        for (TypeVariable tv : typeParams) {
-            m.put(tv, tv.erasureType());
+        JL5ParsedClassType t = base;
+        while (t != null) {
+            for (TypeVariable tv : t.typeVariables()) {
+                m.put(tv, tv.erasureType());
+            }
+            t = (JL5ParsedClassType)t.outer();
         }
         if (m.isEmpty()) {
             return null;
@@ -1678,9 +1679,9 @@ public class JL5TypeSystem_c extends ParamTypeSystem_c implements JL5TypeSystem 
     }
     @Override
     public RawClass rawClass(JL5ParsedClassType base, Position pos) {
-        if (base.typeVariables().isEmpty()) {
-            throw new InternalCompilerError("Can only create a raw class with a parameterized class");
-        }
+//        if (base.typeVariables().isEmpty()) {
+//            throw new InternalCompilerError("Can only create a raw class with a parameterized class");
+//        }
         return new RawClass_c(base, pos);        
     }
     
@@ -1694,10 +1695,13 @@ public class JL5TypeSystem_c extends ParamTypeSystem_c implements JL5TypeSystem 
         }
         if (t instanceof JL5ParsedClassType) {
             JL5ParsedClassType ct = (JL5ParsedClassType)t;
-            if (ct.typeVariables().isEmpty()) {
+            if (hasTypeVariables(ct)) {
+                return this.rawClass(ct, ct.position());
+            }
+            else {
+                // neither t nor it's containers has type variables
                 return t;
             }
-            return this.rawClass(ct, ct.position());
         }
         if (t instanceof ArrayType) {
             ArrayType at = t.toArray();
@@ -1706,6 +1710,24 @@ public class JL5TypeSystem_c extends ParamTypeSystem_c implements JL5TypeSystem 
         }
         return t;
     }
+     
+     /**
+      * Does pct, or a containing class of pct, have type variables?
+      */
+     @Override
+     public boolean hasTypeVariables(JL5ParsedClassType ct) {
+         if (!ct.typeVariables().isEmpty()) {
+             return true;
+         }
+         if (ct.outer() == null) {
+             return false;
+         }
+         if (ct.outer() instanceof JL5ParsedClassType) {
+             return hasTypeVariables((JL5ParsedClassType)ct.outer());
+         }
+         return true;
+     }
+
   
      @Override
      public PrimitiveType promote(Type t1, Type t2) throws SemanticException {

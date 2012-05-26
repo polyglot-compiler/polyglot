@@ -1,18 +1,13 @@
 package polyglot.ext.jl5.ast;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 import polyglot.ast.Ambiguous;
 import polyglot.ast.Node;
 import polyglot.ast.TypeNode;
 import polyglot.ast.TypeNode_c;
-import polyglot.ext.jl5.types.JL5ParsedClassType;
-import polyglot.ext.jl5.types.JL5SubstClassType;
-import polyglot.ext.jl5.types.JL5TypeSystem;
-import polyglot.ext.jl5.types.RawClass;
+import polyglot.ext.jl5.types.*;
+import polyglot.types.ClassType;
 import polyglot.types.SemanticException;
 import polyglot.types.Type;
 import polyglot.util.CodeWriter;
@@ -48,27 +43,49 @@ public class AmbTypeInstantiation extends TypeNode_c implements TypeNode, Ambigu
         }
 
         JL5TypeSystem ts = (JL5TypeSystem)sc.typeSystem();
+        Type baseType = this.base.type();
 //        System.err.println("Base type is " + base);
 //        System.err.println("typeArguments is " + typeArguments);
-        Type baseType = this.base.type();
 //        if (baseType instanceof JL5SubstClassType) {
-//            System.err.println("" + this.position);
-//            System.err.println("base type of " + this + " is " + base.type()+ " " + base.type().getClass());
-//            System.err.println(" base type base is " + ((JL5SubstClassType)baseType).base());
-//            System.err.println(" base type instantiation is is " + ((JL5SubstClassType)baseType).subst());
-//            System.err.println(" type args are is " + this.typeArguments);
+//            System.err.println("  " + this.position);
+//            System.err.println("    base type of " + this + " is " + base.type()+ " " + base.type().getClass());
+//            System.err.println("   base type base is " + ((JL5SubstClassType)baseType).base());
+//            System.err.println("   base type instantiation is " + ((JL5SubstClassType)baseType).subst() + "  " + ((JL5SubstClassType)baseType).subst().getClass());
+//            System.err.println("   type args are is " + this.typeArguments);
 //        }
-        // SC: hack! Not sure what's going on here...
-        while (baseType instanceof JL5SubstClassType) {
-            baseType = ((JL5SubstClassType)baseType).base();
+        
+        if (baseType instanceof ClassType) {
+            ClassType ct = (ClassType)baseType;
+            if (ct.isInnerClass()) {
+                if (ct.outer() instanceof RawClass && !(ct instanceof RawClass)) {
+                    // we are trying to create a "rare" class!
+                    // That is, we are
+                    // trying to instantiate a member class of
+                    // a raw class.
+                    // See JLS 3rd ed. 4.8
+                    throw new SemanticException("\"Rare\" types are not allowed: cannot provide " +
+                    		"type arguments to member class " + ct.name() + 
+                    		" of raw class " + ct.outer() + ".", position);
+                }
+            }
         }
         
         JL5ParsedClassType pct;
+        Map<TypeVariable, Type> typeMap = new LinkedHashMap();
         if (baseType instanceof JL5ParsedClassType) {
             pct = (JL5ParsedClassType)baseType;
         }
         else if (baseType instanceof RawClass) {
             pct = ((RawClass)baseType).base();
+        }
+        else if (baseType instanceof JL5SubstClassType) {
+            JL5SubstClassType sct = (JL5SubstClassType)baseType;
+            pct = sct.base();
+            Iterator<Map.Entry<TypeVariable, Type>> iter = sct.subst().entries();
+            while (iter.hasNext()) {
+                Map.Entry<TypeVariable, Type> e = iter.next();
+                typeMap.put(e.getKey(), e.getValue());
+            }
         }
         else {
             throw new InternalCompilerError("Don't know how to handle " + baseType, position);
@@ -86,13 +103,22 @@ public class AmbTypeInstantiation extends TypeNode_c implements TypeNode, Ambigu
         }
 
         
-        List<Type> actuals = new ArrayList(typeArguments.size());
-        for (TypeNode tn : typeArguments) {
-            actuals.add(tn.type());
+        // if subst is not null, check that subst does not already define the formal type variables
+        if (!typeMap.isEmpty()) {
+            if (typeMap.keySet().containsAll(pct.typeVariables())) {
+                throw new SemanticException("Cannot instantiate " + baseType + " with arguments " + typeArguments, this.position());
+            }
+        }
+
+        // add the new mappings 
+        List<TypeVariable> formals = pct.typeVariables();
+        for (int i = 0; i < formals.size(); i++) {
+            Type t = ((TypeNode)typeArguments.get(i)).type();
+            typeMap.put(formals.get(i), t);
         }
         
 //        System.err.println("Instantiating " + pct + " with " + actuals);
-        Type instantiated = ts.instantiate(position, pct, actuals);
+        Type instantiated = ts.subst(pct, typeMap);
         return sc.nodeFactory().CanonicalTypeNode(this.position, instantiated);
     }
 

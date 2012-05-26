@@ -198,22 +198,26 @@ public class JL5ParsedClassType_c extends ParsedClassType_c implements JL5Parsed
     }
     @Override
     public String translateAsReceiver(Resolver c) {        
-        return this.translate(c);
+        return super.translate(c);
     }
     
     @Override
     public String translate(Resolver c) {
-        // it is a nested class of a parameterized class, use the full name.
-        if (isMember()) {
-            ClassType container = container().toClass(); 
-            if (container instanceof JL5SubstClassType) {
-                container = ((JL5SubstClassType)container).base();
-            }
-            if (container instanceof JL5ParsedClassType && !((JL5ParsedClassType)container).typeVariables().isEmpty()) {
-                return container().translate(c) + "." + name();                
+        StringBuffer sb = new StringBuffer(super.translate(c));
+        if (this.typeVariables().isEmpty()) {
+            return sb.toString();
+        }
+        sb.append('<');
+        Iterator<TypeVariable> iter = typeVariables().iterator();
+        while (iter.hasNext()) {
+            TypeVariable act = iter.next();            
+            sb.append(act.translate(c));
+            if (iter.hasNext()) {
+                sb.append(',');                    
             }
         }
-        return super.translate(c);
+        sb.append('>');
+        return sb.toString();
     }
 
     @Override

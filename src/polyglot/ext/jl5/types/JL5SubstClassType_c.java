@@ -80,9 +80,7 @@ public class JL5SubstClassType_c extends SubstClassType_c implements JL5SubstCla
     /** Pretty-print the name of this class to w. */
     @Override
     public void print(CodeWriter w) {
-        // XXX This code duplicates the logic of toString.
-        JL5ParsedClassType ct = this.base();
-        ct.printNoParams(w);
+        super.print(w);
         this.printParams(w);
     }
 
@@ -107,8 +105,29 @@ public class JL5SubstClassType_c extends SubstClassType_c implements JL5SubstCla
     
     @Override
     public String toString() {
+        // really want to call ClassType_c.toString here, but we will copy code :(
+        StringBuffer sb = new StringBuffer();
+        if (isTopLevel()) {
+            if (package_() != null) {
+                sb.append(package_() + ".");
+            }
+            sb.append(name());
+        }
+        else if (isMember()) {
+            sb.append(container().toString() + "." + name());
+        }
+        else if (isLocal()) {
+            sb.append(name());
+        }
+        else if (isAnonymous()) {
+            sb.append("<anonymous class>");
+        }
+        else {
+            sb.append("<unknown class>");
+        }
+
+        // now append the parameters.
         JL5ParsedClassType ct = this.base();
-        StringBuffer sb = new StringBuffer(ct.toStringNoParams());
         if (!ct.typeVariables().isEmpty()) {
             sb.append('<');
             Iterator<TypeVariable> iter = ct.typeVariables().iterator();
@@ -234,7 +253,6 @@ public class JL5SubstClassType_c extends SubstClassType_c implements JL5SubstCla
     @Override
     public String translate(Resolver c) {
         StringBuffer sb = new StringBuffer(this.translateAsReceiver(c));
-
         JL5ParsedClassType ct = this.base();
         if (ct.typeVariables().isEmpty()) {
             return sb.toString();
