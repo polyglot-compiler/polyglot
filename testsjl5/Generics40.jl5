@@ -1,0 +1,18 @@
+class MyThreadLocal<T> {
+    LocalMap a(Thread t) {
+    	return null;
+    }
+    MyThreadLocal.LocalMap getMap(Thread t) {
+    	return null;
+    }
+    static class LocalMap {
+    }
+}
+class InheritableMyThreadLocal<S> extends MyThreadLocal<S> {
+    LocalMap a(Thread t) {
+    	return null;
+    }
+    MyThreadLocal.LocalMap getMap(Thread t) {
+    	return null;
+    }
+}
