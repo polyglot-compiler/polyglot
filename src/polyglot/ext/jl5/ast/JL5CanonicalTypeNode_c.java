@@ -49,10 +49,8 @@ public class JL5CanonicalTypeNode_c extends polyglot.ast.CanonicalTypeNode_c {
                 }
                 
             }
-            {
+            if (!st.base().typeVariables().isEmpty()){
                 // check that arguments obey their bounds.
-                
-                   
                 //first we must perform capture conversion. see beginning of JLS 4.5            
                 JL5SubstClassType capCT = (JL5SubstClassType) ts.applyCaptureConversion(st);
 
