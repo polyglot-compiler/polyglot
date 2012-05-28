@@ -20,10 +20,25 @@ public class JL5CanonicalTypeNode_c extends polyglot.ast.CanonicalTypeNode_c {
     }
 
     private static Type makeRawIfNeeded(Type type, Position pos) {
-        if (type instanceof JL5ParsedClassType && !((JL5ParsedClassType)type).typeVariables().isEmpty()) {
-            // needs to be a raw type
+        if (type.isClass()) {
             JL5TypeSystem ts = (JL5TypeSystem)type.typeSystem();
-            return ts.rawClass((JL5ParsedClassType)type, pos);
+            if (type instanceof JL5ParsedClassType && !((JL5ParsedClassType)type).typeVariables().isEmpty()) {
+                // needs to be a raw type
+                return ts.rawClass((JL5ParsedClassType)type, pos);
+            }
+            if (type.toClass().isInnerClass()) {
+                ClassType t = type.toClass();
+                ClassType outer = type.toClass().outer();
+                while (t.isInnerClass() && outer != null) {
+                    if (outer instanceof RawClass) {
+                        // an inner class of a raw class should be a raw class.
+                        return ts.erasureType(type);
+                    }
+                    t = outer;
+                    outer = outer.outer();
+
+                }
+            }
         }
         return type;
     }

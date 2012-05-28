@@ -108,10 +108,20 @@ public class JL5Subst_c extends Subst_c implements JL5Subst {
         if (t instanceof JL5ParsedClassType) {
             JL5ParsedClassType pct = (JL5ParsedClassType)t;
             JL5TypeSystem ts = (JL5TypeSystem)this.ts;
-            if (!ts.hasTypeVariables(pct)) {
+            List<TypeVariable> typeVars = ts.classAndEnclosingTypeVariables(pct);
+            // are the type variables of pct actually relevant to this subst? If not, then return the pct.
+            boolean typeVarsRelevant = false;
+            for (TypeVariable tv : typeVars) {
+                if (this.substitutions().containsKey(tv)) {
+                    typeVarsRelevant = true;
+                    break;
+                }
+            }
+            if (!typeVarsRelevant) {
                 // no parameters to be instantiated!
                 return pct;
             }
+            
             return new JL5SubstClassType_c((JL5TypeSystem) ts, t.position(),
                                            pct, this);
         }

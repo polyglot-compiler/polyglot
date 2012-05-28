@@ -993,6 +993,16 @@ public class JL5TypeSystem_c extends ParamTypeSystem_c implements JL5TypeSystem 
                 return true;
             }
         }
+        if (t2 instanceof IntersectionType) {
+            IntersectionType it = (IntersectionType)t2;
+            // t1 is a substype of u1&u2&...&un if there is some ui such
+            // that t1 is a subtype of ui.
+            for (Type t : it.bounds()) {
+                if (isSubtype(t1, t)) {
+                    return true;
+                }
+            }
+        }
         return false;
     }
 
@@ -1556,7 +1566,7 @@ public class JL5TypeSystem_c extends ParamTypeSystem_c implements JL5TypeSystem 
     }
 
     @Override
-    public ReferenceType intersectionType(Position pos, List<ReferenceType> types) {       
+    public ReferenceType intersectionType(Position pos, List<ReferenceType> types) {
         if (types.size() == 1) {
             return types.get(0);
         }
@@ -1699,7 +1709,7 @@ public class JL5TypeSystem_c extends ParamTypeSystem_c implements JL5TypeSystem 
         }
         if (t instanceof JL5ParsedClassType) {
             JL5ParsedClassType ct = (JL5ParsedClassType)t;
-            if (hasTypeVariables(ct)) {
+            if (!classAndEnclosingTypeVariables(ct).isEmpty()) {
                 return this.rawClass(ct, ct.position());
             }
             else {
@@ -1719,21 +1729,26 @@ public class JL5TypeSystem_c extends ParamTypeSystem_c implements JL5TypeSystem 
       * Does pct, or a containing class of pct, have type variables?
       */
      @Override
-     public boolean hasTypeVariables(JL5ParsedClassType ct) {
+     public List<TypeVariable> classAndEnclosingTypeVariables(JL5ParsedClassType ct) {
+         List<TypeVariable> l = new ArrayList<TypeVariable>();
+         classAndEnclosingTypeVariables(ct, l);
+         return l;
+     }
+     protected void classAndEnclosingTypeVariables(JL5ParsedClassType ct, List<TypeVariable> l) {
+
          if (!ct.typeVariables().isEmpty()) {
-             return true;
+             l.addAll(ct.typeVariables());
          }
          if (ct.isNested() && !ct.isInnerClass()) {
              // ct is a static nested class. Ignore any type variables contained in outer classes.
-             return false;
+             return;
          }
          if (ct.outer() == null) {
-             return false;
+             return;
          }         
          if (ct.outer() instanceof JL5ParsedClassType) {
-             return hasTypeVariables((JL5ParsedClassType)ct.outer());
+             classAndEnclosingTypeVariables((JL5ParsedClassType)ct.outer(), l);
          }
-         return true;
      }
 
   

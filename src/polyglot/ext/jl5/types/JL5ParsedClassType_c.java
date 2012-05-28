@@ -87,6 +87,20 @@ public class JL5ParsedClassType_c extends ParsedClassType_c implements JL5Parsed
     }
     
     @Override
+    public boolean isEnclosedImpl(ClassType maybe_outer) {
+        if (super.isEnclosedImpl(maybe_outer)) {
+            return true;
+        }
+        // try it with the stripped out outer...
+        if (outer() != null && super.outer() != this.outer()) {
+            return super.outer().equals(maybe_outer) ||
+                    super.outer().isEnclosed(maybe_outer);
+        }
+        return false;
+    }
+
+    
+    @Override
     public boolean isCastValidImpl(Type toType){        
         if (super.isCastValidImpl(toType)) {
             return true;

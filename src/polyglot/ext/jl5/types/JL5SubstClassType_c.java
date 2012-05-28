@@ -327,6 +327,20 @@ public class JL5SubstClassType_c extends SubstClassType_c implements JL5SubstCla
         }
         return super.outer();
     }
+    
+    @Override
+    public boolean isEnclosedImpl(ClassType maybe_outer) {
+        if (super.isEnclosedImpl(maybe_outer)) {
+            return true;
+        }
+        // try it with the stripped out outer...
+        if (outer() != null && super.outer() != this.outer()) {
+            return super.outer().equals(maybe_outer) ||
+                    super.outer().isEnclosed(maybe_outer);
+        }
+        return false;
+    }
+
 
     
 }

@@ -273,11 +273,10 @@ public interface JL5TypeSystem extends TypeSystem, ParamTypeSystem {
     Type Class(Position pos, Type type);
 
     /**
-     * Does the class ct, or an outer class, have any type variables?
-     * This method is used to determine whether or not we need to substitute
-     * any type variables in ct.
+     * What are the type variables of class ct or any outer 
+     * class for which an instance of ct has an enclosing instance?
      */
-    boolean hasTypeVariables(JL5ParsedClassType ct);
+    List<TypeVariable> classAndEnclosingTypeVariables(JL5ParsedClassType ct);
 
 
 
