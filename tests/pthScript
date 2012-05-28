@@ -142,6 +142,7 @@ polyglot.frontend.JLExtensionInfo "-cp ." {
         Return1.jl ; Return2.jl ; Return3.jl ;
         Return4.jl ;
         Return5.jl ;
+        Return6.jl ;
         Semicolon.jl ;
         SemicolonClass.jl ;
         Shadowing.jl ;
