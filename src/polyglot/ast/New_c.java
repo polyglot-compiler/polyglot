@@ -281,8 +281,8 @@ public class New_c extends Expr_c implements New
                 }
             }
             else if (! nn.objectType().isDisambiguated()) {
-                throw new SemanticException("Only simply-named member classes may be instantiated by a qualified new expression.",
-                                            nn.objectType().position());
+                // not yet disambiguated.
+                return nn;
             }
             else {
                 // already disambiguated
