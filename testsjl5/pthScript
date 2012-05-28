@@ -79,6 +79,9 @@ polyglot.ext.jl5.ExtensionInfo "-d out -classpath java-out -noserial -post \"jav
         Generics38.jl5;
         Generics39.jl5;
         Generics40.jl5;
+        Generics41.jl5;
+        Generics42.jl5;
+        Generics43.jl5;
 	Boxing01.jl5;
 	Boxing02.jl5;
 	Boxing03.jl5;
@@ -341,7 +344,10 @@ polyglot.ext.jl5.ExtensionInfo "-d out -classpath java-out -removeJava5isms -enu
         Generics38.jl5;
         Generics39.jl5;
         Generics40.jl5;
-	Boxing01.jl5;
+        Generics41.jl5;
+        Generics42.jl5;
+        Generics43.jl5;
+ 	Boxing01.jl5;
 	Boxing02.jl5;
 	Boxing03.jl5;
         StaticInit01.jl5;

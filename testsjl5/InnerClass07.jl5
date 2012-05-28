@@ -48,8 +48,8 @@ class C {
 	C1.D1.E2<String>                  c1d1e2 = c1d1.newe2();
 	C1.D2<Integer>.E1                 c1d2e1 = c1d2.newe1();
 	C1.D2<Integer>.E2<String>         c1d2e2 = c1d2.newe2();
-	C2<Double>.D1.E1                  c2d1e1 = c2d1.newe1();
-	C2<Double>.D1.E2<String>          c2d1e2 = c2d1.newe2();
+	// C2<Double>.D1.E1                  c2d1e1 = c2d1.newe1();
+	// C2<Double>.D1.E2<String>          c2d1e2 = c2d1.newe2();
 	C2<Double>.D2<Integer>.E1         c2d2e1 = c2d2.newe1();
 	C2<Double>.D2<Integer>.E2<String> c2d2e2 = c2d2.newe2();
 

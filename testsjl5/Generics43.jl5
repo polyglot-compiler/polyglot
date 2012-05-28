@@ -1,0 +1,11 @@
+class C<T> {
+    private T referent;
+    D<? super T> queue;
+    C(T referent, D<? super T> queue) {
+        this.referent = referent;
+	D foo = null;
+	this.queue = (queue == null) ?  queue : foo;
+    }
+}
+
+class D<S> { }
