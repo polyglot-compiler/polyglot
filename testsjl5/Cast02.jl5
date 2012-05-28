@@ -1,0 +1,35 @@
+import java.util.*;
+
+class C {
+    static <T> T m(T x) {
+	return x;
+    }
+    <T> T n(T x) {
+	return x;
+    }
+
+    D<String> foo() { return new D<String>(); }
+
+    void test() {
+	String s = m("Hello"); // cast needed in translation to 1.4
+	s = n("Hello"); // cast needed in translation to 1.4
+
+	D<Integer> d = new D<Integer>();
+	s = d.bar(); // no cast needed in translation to 1.4
+	s = this.foo().bar(); // no cast needed in translation to 1.4
+	s = d.what;// no cast needed in translation to 1.4
+
+	Integer i = d.foo; // cast needed
+	i = d.m(); // cast needed
+    }
+}
+
+
+class D<T> {
+    T foo;
+    String what = "what?";
+    T m() {
+	return foo;
+    }
+    String bar() { return "hi"; }
+}

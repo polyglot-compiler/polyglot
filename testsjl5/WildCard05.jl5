@@ -1,0 +1,13 @@
+import java.util.ArrayList;
+interface AL<S> { }
+
+interface M<U> {
+    public AL<U> keySet();
+}
+
+class O<K> { 
+    public native static <T> AL<T> unmodifiableList(AL<? extends T> s);
+    public void  m(M<? extends K> m) {
+	AL<K> keySet = unmodifiableList(m.keySet());
+    }
+}

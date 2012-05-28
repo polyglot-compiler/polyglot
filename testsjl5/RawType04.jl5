@@ -1,0 +1,12 @@
+// From JLS 3rd ed. 4.8
+class Outer<T>{
+    class Inner<S> {
+	S s;
+    }
+}
+
+class C {
+    void m() {
+	Outer<Integer>.Inner x = null; // illegal
+    }
+}

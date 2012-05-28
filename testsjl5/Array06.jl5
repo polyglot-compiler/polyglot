@@ -1,0 +1,15 @@
+import java.util.Collection;
+import java.lang.String;
+
+class C {
+
+    public static <T> T copyOf(Class<T> newType) {
+	return null;
+    }
+
+    public <S> S toArray(S a) {
+	//Class<S> c = null;
+	return copyOf((Class<S>) a.getClass());
+    }
+
+}

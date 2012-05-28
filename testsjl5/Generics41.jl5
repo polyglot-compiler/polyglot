@@ -1,0 +1,10 @@
+class ThreadLocal<T> {
+    private final static class EnclosingMethodInfo {
+        private String descriptor;
+
+        private String EnclosingMethodInfo() {
+	    return descriptor;
+	}
+    }
+}
+

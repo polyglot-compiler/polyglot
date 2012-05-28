@@ -1,0 +1,35 @@
+interface Map<A,B> {
+    Entry<A,B> getEntry();
+    interface Entry<T,U> { 
+	T getKey();
+	U getValue();
+    }
+
+}
+
+class HMap<K,V> implements Map<K,V> {
+    public Entry<K,V> getEntry() {
+	return null;
+    }
+    static class Entry<E,F> implements Map.Entry<E,F> {
+	public E getKey() {
+	    return null;
+	}
+	public F getValue() {
+	    return null;
+	}
+        public final boolean equals(Object o) {
+            if (!(o instanceof Map.Entry)) {
+		return false;
+	    }
+	    return true;
+	}
+    }
+}
+
+class C {
+    void m() {
+	Map<String, C> m = null;
+	C x = m.getEntry().getValue();
+    }
+}

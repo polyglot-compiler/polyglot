@@ -1,0 +1,15 @@
+
+class D {
+    static {
+	Integer[] arr = null;
+	foo(asList(arr));			
+    }
+
+    public static <T> C<T> asList(T... a) {
+	return null;
+    }
+    static void foo(C<Integer> x) { }
+
+}
+
+class C<S> { }
