@@ -37,52 +37,50 @@ import polyglot.util.ErrorQueue;
 import polyglot.util.Position;
 
 /**
- * A pass which runs a parser.  After parsing it stores the AST in the Job.
- * so it can be accessed by later passes.
+ * A pass which runs a parser. After parsing it stores the AST in the Job. so it
+ * can be accessed by later passes.
  */
-public class ParserPass extends AbstractPass
-{
-    protected Compiler compiler;
+public class ParserPass extends AbstractPass {
+	protected Compiler compiler;
 
-    public ParserPass(Compiler compiler, Goal goal) {
-        super(goal);
-	this.compiler = compiler;
-    }
-
-    public boolean run() {
-	ErrorQueue eq = compiler.errorQueue();
-        
-	FileSource source = (FileSource) goal.job().source();
-
-	try {
-	    Reader reader = source.open();
-            
-            Parser p = goal.job().extensionInfo().parser(reader, source, eq);
-
-	    if (Report.should_report(Report.frontend, 2))
-		Report.report(2, "Using parser " + p);
-
-	    Node ast = p.parse();
-
-	    source.close();
-
-	    if (ast != null) {
-		goal.job().ast(ast);
-		return true;
-	    }
-
-	    return false;
+	public ParserPass(Compiler compiler, Goal goal) {
+		super(goal);
+		this.compiler = compiler;
 	}
-	catch (IOException e) {
-	    eq.enqueue(ErrorInfo.IO_ERROR, e.getMessage(),
-                new Position(goal.job().source().path(),
-                             goal.job().source().name(), 1, 1, 1, 1));
 
-            return false;
+	public boolean run() {
+		ErrorQueue eq = compiler.errorQueue();
+
+		FileSource source = (FileSource) goal.job().source();
+
+		try {
+			Reader reader = source.openReader(false);
+
+			Parser p = goal.job().extensionInfo().parser(reader, source, eq);
+
+			if (Report.should_report(Report.frontend, 2))
+				Report.report(2, "Using parser " + p);
+
+			Node ast = p.parse();
+
+			reader.close();
+
+			if (ast != null) {
+				goal.job().ast(ast);
+				return true;
+			}
+
+			return false;
+		} catch (IOException e) {
+			eq.enqueue(ErrorInfo.IO_ERROR, e.getMessage(), new Position(goal
+					.job().source().toUri().getPath(), goal.job().source()
+					.getName(), 1, 1, 1, 1));
+
+			return false;
+		}
 	}
-    }
 
-    public String toString() {
-	return super.toString() + "(" + goal.job().source() + ")";
-    }
+	public String toString() {
+		return super.toString() + "(" + goal.job().source() + ")";
+	}
 }

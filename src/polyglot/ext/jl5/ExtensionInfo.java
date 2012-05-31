@@ -1,7 +1,10 @@
 package polyglot.ext.jl5;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.Reader;
+
+import javax.tools.FileObject;
 
 import polyglot.ast.NodeFactory;
 import polyglot.ext.jl5.ast.JL5NodeFactory_c;
@@ -28,10 +31,10 @@ public class ExtensionInfo extends JLExtensionInfo {
 
 	@Override
 	public String[] defaultFileExtensions() {
-        String ext = defaultFileExtension();
-        return new String[] { ext, "java" };
-    }
-	
+		String ext = defaultFileExtension();
+		return new String[] { ext, "java" };
+	}
+
 	@Override
 	public String compilerName() {
 		return "jl5c";
@@ -51,16 +54,17 @@ public class ExtensionInfo extends JLExtensionInfo {
 	public Scheduler createScheduler() {
 		return new JL5Scheduler(this);
 	}
-	
+
 	@Override
 	protected Options createOptions() {
-        return new JL5Options(this);
-    }
-	
+		return new JL5Options(this);
+	}
+
 	@Override
-	public ClassFile createClassFile(File classFileSource, byte[] code){
-        return new JL5ClassFile(classFileSource, code, this);
-    }
+	public ClassFile createClassFile(FileObject classFileSource, byte[] code)
+			throws IOException {
+		return new JL5ClassFile(classFileSource, code, this);
+	}
 
 	/**
 	 * Return a parser for <code>source</code> using the given
