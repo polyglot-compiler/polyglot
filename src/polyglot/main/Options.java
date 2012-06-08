@@ -145,9 +145,16 @@ public class Options {
 	 */
 	public void setDefaultValues() {
 		currFile = new File(System.getProperty("user.dir"));
-		bootFile = new File(System.getProperty("java.home") + separator + "lib"
-				+ separator + "rt.jar");
-
+		//TODO : make external config property file.
+		if (System.getProperty("os.name").indexOf("Mac") != -1) {
+			//XXX: gross! 
+			bootFile = new File(System.getProperty("java.home") + separator
+					+ ".." + separator + "Classes" + separator + "classes.jar");
+		}
+		else {
+			bootFile = new File(System.getProperty("java.home") + separator
+					+ "lib" + separator + "rt.jar");
+		}
 		source_path = StandardLocation.SOURCE_PATH;
 		source_output = StandardLocation.SOURCE_OUTPUT;
 		class_output = StandardLocation.CLASS_OUTPUT;
