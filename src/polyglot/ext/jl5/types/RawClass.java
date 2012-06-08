@@ -1,7 +1,7 @@
 package polyglot.ext.jl5.types;
 
 /**
- * Represents a raw class. See JLS 3rd ed., 
+ * Represents a raw class. See JLS 3rd ed., 4.8.
  *
  */
 public interface RawClass extends JL5ClassType {

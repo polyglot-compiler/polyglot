@@ -25,15 +25,13 @@ public class JL5Disamb_c extends Disamb_c {
         }
 
         if (t.isClass() && typeOK()){
-            if (t instanceof JL5SubstClassType) {
-                // if t is an instantiated class, then use the base class to resolve names
-                JL5SubstClassType ct = (JL5SubstClassType)t;
-                t = ct.base();
-            }
             Resolver tc = ts.classContextResolver(t.toClass());            
             Named n = tc.find(name.id());
             if (n instanceof Type){
-                Type type = (Type)n;
+                // we found a type that was named appropriately. Access it 
+                // through t in order to ensure that substitution is 
+                // applied correctly.
+                Type type = t.toClass().memberClassNamed(name.id());
                 return nf.CanonicalTypeNode(pos, type);
             }
         }

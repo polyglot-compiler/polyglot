@@ -76,6 +76,31 @@ public class JL5ParsedClassType_c extends ParsedClassType_c implements JL5Parsed
     }
     
     @Override
+    public ClassType outer() {
+        if (this.isMember() && !this.isInnerClass()) {
+            if (!(super.outer() instanceof RawClass)) {
+                JL5TypeSystem ts = (JL5TypeSystem)this.typeSystem();
+                return (ClassType)ts.erasureType(super.outer());
+            }
+        }
+        return super.outer();
+    }
+    
+    @Override
+    public boolean isEnclosedImpl(ClassType maybe_outer) {
+        if (super.isEnclosedImpl(maybe_outer)) {
+            return true;
+        }
+        // try it with the stripped out outer...
+        if (outer() != null && super.outer() != this.outer()) {
+            return super.outer().equals(maybe_outer) ||
+                    super.outer().isEnclosed(maybe_outer);
+        }
+        return false;
+    }
+
+    
+    @Override
     public boolean isCastValidImpl(Type toType){        
         if (super.isCastValidImpl(toType)) {
             return true;
@@ -138,7 +163,7 @@ public class JL5ParsedClassType_c extends ParsedClassType_c implements JL5Parsed
     @Override
     public JL5Subst erasureSubst() {
         JL5TypeSystem ts = (JL5TypeSystem) this.typeSystem();
-        return ts.erasureSubst(this.typeVariables());
+        return ts.erasureSubst(this);
     }
 
 
@@ -198,22 +223,26 @@ public class JL5ParsedClassType_c extends ParsedClassType_c implements JL5Parsed
     }
     @Override
     public String translateAsReceiver(Resolver c) {        
-        return this.translate(c);
+        return super.translate(c);
     }
     
     @Override
     public String translate(Resolver c) {
-        // it is a nested class of a parameterized class, use the full name.
-        if (isMember()) {
-            ClassType container = container().toClass(); 
-            if (container instanceof JL5SubstClassType) {
-                container = ((JL5SubstClassType)container).base();
-            }
-            if (container instanceof JL5ParsedClassType && !((JL5ParsedClassType)container).typeVariables().isEmpty()) {
-                return container().translate(c) + "." + name();                
+        StringBuffer sb = new StringBuffer(super.translate(c));
+        if (this.typeVariables().isEmpty()) {
+            return sb.toString();
+        }
+        sb.append('<');
+        Iterator<TypeVariable> iter = typeVariables().iterator();
+        while (iter.hasNext()) {
+            TypeVariable act = iter.next();            
+            sb.append(act.translate(c));
+            if (iter.hasNext()) {
+                sb.append(',');                    
             }
         }
-        return super.translate(c);
+        sb.append('>');
+        return sb.toString();
     }
 
     @Override

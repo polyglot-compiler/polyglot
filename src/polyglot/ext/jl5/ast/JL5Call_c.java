@@ -199,15 +199,15 @@ public class JL5Call_c extends Call_c implements JL5Call {
         }
 
 
-        // Otherwise, if unchecked conversion was necessary for the method to be applicable then the result type is the erasure (¤4.6) of the methodÕs declared return type.
+        // Otherwise, if unchecked conversion was necessary for the method to be applicable then the result type is the erasure (ï¿½4.6) of the methodï¿½s declared return type.
         // XXX how to check this? We need to implement it properly.
 
-        // Otherwise, if the method being invoked is generic, then for 1 ² i ² n , 
+        // Otherwise, if the method being invoked is generic, then for 1 ï¿½ i ï¿½ n , 
         // let Fi be the formal type parameters of the method, let Ai be the actual type arguments inferred for the method invocation, and 
-        // let R be the declared return type of the method being invoked. The result type is obtained by applying capture conversion (¤5.1.10) to R[F1 := A1, ..., Fn := An].
+        // let R be the declared return type of the method being invoked. The result type is obtained by applying capture conversion (ï¿½5.1.10) to R[F1 := A1, ..., Fn := An].
         // --- mi has already had substitution applied, so it is covered by the following case.
 
-        // Otherwise, the result type is obtained by applying capture conversion (¤5.1.10) to the type given in the method declaration.
+        // Otherwise, the result type is obtained by applying capture conversion (ï¿½5.1.10) to the type given in the method declaration.
         return ts.applyCaptureConversion(mi.returnType());
     }
 
@@ -251,6 +251,12 @@ public class JL5Call_c extends Call_c implements JL5Call {
         }
         w.write(")");
         w.end();
+    }
+
+    @Override
+    protected Type findContainer(TypeSystem ts, MethodInstance mi) {
+        JL5TypeSystem jts = (JL5TypeSystem)ts;
+        return jts.erasureType(mi.container());    
     }
 
 

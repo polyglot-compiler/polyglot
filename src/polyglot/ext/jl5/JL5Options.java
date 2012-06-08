@@ -11,6 +11,7 @@ import polyglot.main.UsageError;
 public class JL5Options extends Options {
         public String enumImplClass;
         public boolean removeJava5isms;
+        public boolean morePermissiveInference;
         
         public JL5Options(ExtensionInfo extension) {
             super(extension);
@@ -22,6 +23,7 @@ public class JL5Options extends Options {
             this.enumImplClass = null;
             this.removeJava5isms = false;
             this.assertions = true;
+            this.morePermissiveInference = false;
         }
         
         @Override
@@ -38,6 +40,12 @@ public class JL5Options extends Options {
                 return index;
             }
            
+            if (args[index].equals("-morepermissiveinference") || args[index].equals("--morepermissiveinference")) {
+                index++;
+                this.morePermissiveInference = true;
+                return index;
+            }
+           
             return super.parseCommand(args, index, source);
         }
         
@@ -46,5 +54,6 @@ public class JL5Options extends Options {
             super.usage(out);
             usageForFlag(out, "-removeJava5isms", "Translate Java 5 language features to Java 1.4 features");
             usageForFlag(out, "-enumImplClass", "Runtime class to implement Enums (if not specified, translate to java.lang.Enum)");
+            usageForFlag(out, "-morepermissiveinference", "Use a more permissive algorithm for type inference. (Experimental)");
         }
 }

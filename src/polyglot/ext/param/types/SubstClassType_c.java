@@ -30,13 +30,7 @@ import java.util.List;
 
 import polyglot.frontend.Job;
 import polyglot.types.*;
-import polyglot.types.ClassType_c;
-import polyglot.types.ClassType;
-import polyglot.types.Flags;
 import polyglot.types.Package;
-import polyglot.types.Resolver;
-import polyglot.types.Type;
-import polyglot.types.TypeObject;
 import polyglot.util.Position;
 
 /**
@@ -58,6 +52,12 @@ public class SubstClassType_c extends ClassType_c implements SubstType
         super(ts, pos);
         this.base = base;
         this.subst = subst;
+        if (subst == null) {
+            throw new IllegalArgumentException("null subst");
+        }
+        if (base == null) {
+            throw new IllegalArgumentException("null base");
+        }
     }
 
     /**

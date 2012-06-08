@@ -607,18 +607,4 @@ public class Options {
 			out.print(' ');
 		}
 	}
-
-	/*public String constructFullClasspath() {
-		StringBuffer fullcp = new StringBuffer();
-		if (bootclasspath != null) {
-			fullcp.append(bootclasspath);
-		}
-		fullcp.append(classpath);
-		return fullcp.toString();
-	}*/
-
-	/*public String constructPostCompilerClasspath() {
-		return source_output + pathSeparator + "." + pathSeparator
-				+ output_classpath;
-	}*/
 }

@@ -34,7 +34,7 @@ public class RawClass_c extends JL5ClassType_c implements RawClass {
     public JL5SubstClassType erased() {
         if (this.erased == null) {            
             JL5TypeSystem ts = (JL5TypeSystem)this.ts;
-            JL5Subst es = ts.erasureSubst(this.base.typeVariables());
+            JL5Subst es = ts.erasureSubst(this.base);
             this.erased = new JL5SubstClassType_c((JL5TypeSystem) ts, base.position(),
                                     (JL5ParsedClassType) base, es);
         }
@@ -58,7 +58,13 @@ public class RawClass_c extends JL5ClassType_c implements RawClass {
 
     @Override
     public ClassType outer() {
-        return this.erased().outer();
+        ClassType t = this.erased().outer();
+        if (t == null) {
+            return t;
+        }
+        JL5TypeSystem ts = (JL5TypeSystem)this.typeSystem();
+        
+        return (ClassType)ts.erasureType(this.erased().outer());
     }
 
     @Override
@@ -81,9 +87,6 @@ public class RawClass_c extends JL5ClassType_c implements RawClass {
     public List constructors() {
         if (constructors == null) {
             this.constructors = this.erased().constructors();
-            for (ConstructorInstance ci : this.constructors) {
-                ci.setContainer(this);
-            }
         }
         return this.constructors;
     }
@@ -93,9 +96,6 @@ public class RawClass_c extends JL5ClassType_c implements RawClass {
     public List memberClasses() {
         if (memberClasses == null) {
             this.memberClasses = this.erased().memberClasses();
-//            for (ClassType ct : this.memberClasses) {
-//                ct.setContainer(this);
-//            }
         }
         return this.memberClasses;
     }
@@ -105,9 +105,6 @@ public class RawClass_c extends JL5ClassType_c implements RawClass {
     public List methods() {
         if (methods == null) {
             this.methods = this.erased().methods();
-            for (MethodInstance mi : this.methods) {
-                mi.setContainer(this);
-            }
         }
         return this.methods;
     }
@@ -160,14 +157,9 @@ public class RawClass_c extends JL5ClassType_c implements RawClass {
 
     @Override
     public String translateAsReceiver(Resolver c) {        
-        return this.base.translate(c);
+        return this.translate(c);
     }
     
-    @Override
-    public String translate(Resolver c) {
-        return this.base.translate(c);
-    }
-
     @Override
     public boolean descendsFromImpl(Type ancestor) {
 //        System.err.println("   Raw class " + this + " descends from " + ancestor + " ?  interfaces is " + this.interfaces() + "  ::: " + super.descendsFromImpl(ancestor));

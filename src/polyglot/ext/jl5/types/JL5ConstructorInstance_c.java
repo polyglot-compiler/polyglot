@@ -24,12 +24,6 @@ public class JL5ConstructorInstance_c extends ConstructorInstance_c implements J
     @Override
     public boolean callValidImpl(List argTypes) {
         List<Type> myFormalTypes = this.formalTypes;
-        JL5Subst erasureSubst = null;
-        if (this.container() instanceof JL5ParsedClassType) {
-            // we have a stripped off class type. Replace any type variables
-            // with their bounds.
-            erasureSubst = ((JL5ParsedClassType) this.container()).erasureSubst();
-        }
 
         // System.err.println("JL5MethodInstance_c callValid Impl " + this +
         // " called with " +argTypes);
@@ -60,10 +54,6 @@ public class JL5ConstructorInstance_c extends ConstructorInstance_c implements J
                 formal = arr.base();
             }
             if (ts.isImplicitCastValid(actual, formal)) {
-                // Yep, this type is OK. Try the next one.
-                continue;
-            }
-            if (erasureSubst != null && ts.isImplicitCastValid(actual, erasureSubst.substType(formal))) {
                 // Yep, this type is OK. Try the next one.
                 continue;
             }
@@ -109,9 +99,10 @@ public class JL5ConstructorInstance_c extends ConstructorInstance_c implements J
     public List<TypeVariable> typeParams() {
         return Collections.unmodifiableList(this.typeParams);
     }
+    
     @Override
     public JL5Subst erasureSubst() {
         JL5TypeSystem ts = (JL5TypeSystem) this.typeSystem();
-        return ts.erasureSubst(this.typeParams);
+        return ts.erasureSubst(this);
     }
 }

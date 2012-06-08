@@ -80,15 +80,16 @@ public class JL5SubstClassType_c extends SubstClassType_c implements JL5SubstCla
     /** Pretty-print the name of this class to w. */
     @Override
     public void print(CodeWriter w) {
-        // XXX This code duplicates the logic of toString.
-        JL5ParsedClassType ct = this.base();
-        ct.printNoParams(w);
+        super.print(w);
         this.printParams(w);
     }
 
     @Override
-    public void printParams(CodeWriter w) {
+    public void printParams(CodeWriter w) {        
         JL5ParsedClassType ct = this.base();
+        if (ct.typeVariables().isEmpty()) {
+            return;
+        }
         w.write("<");
         Iterator<TypeVariable> it = ct.typeVariables().iterator();
         while (it.hasNext()) {
@@ -104,21 +105,41 @@ public class JL5SubstClassType_c extends SubstClassType_c implements JL5SubstCla
     
     @Override
     public String toString() {
-        JL5ParsedClassType ct = this.base();
-        if (ct.typeVariables().isEmpty()) {
-            return ct.toString();
-        }
-        StringBuffer sb = new StringBuffer(ct.toStringNoParams());
-        sb.append('<');
-        Iterator<TypeVariable> iter = ct.typeVariables().iterator();
-        while (iter.hasNext()) {
-            TypeVariable act = iter.next();            
-            sb.append(this.subst().substType(act));
-            if (iter.hasNext()) {
-                sb.append(',');                    
+        // really want to call ClassType_c.toString here, but we will copy code :(
+        StringBuffer sb = new StringBuffer();
+        if (isTopLevel()) {
+            if (package_() != null) {
+                sb.append(package_() + ".");
             }
+            sb.append(name());
         }
-        sb.append('>');
+        else if (isMember()) {
+            sb.append(container().toString() + "." + name());
+        }
+        else if (isLocal()) {
+            sb.append(name());
+        }
+        else if (isAnonymous()) {
+            sb.append("<anonymous class>");
+        }
+        else {
+            sb.append("<unknown class>");
+        }
+
+        // now append the parameters.
+        JL5ParsedClassType ct = this.base();
+        if (!ct.typeVariables().isEmpty()) {
+            sb.append('<');
+            Iterator<TypeVariable> iter = ct.typeVariables().iterator();
+            while (iter.hasNext()) {
+                TypeVariable act = iter.next();            
+                sb.append(this.subst().substType(act));
+                if (iter.hasNext()) {
+                    sb.append(',');                    
+                }
+            }
+            sb.append('>');
+        }
         return sb.toString();
     }
 
@@ -232,7 +253,6 @@ public class JL5SubstClassType_c extends SubstClassType_c implements JL5SubstCla
     @Override
     public String translate(Resolver c) {
         StringBuffer sb = new StringBuffer(this.translateAsReceiver(c));
-
         JL5ParsedClassType ct = this.base();
         if (ct.typeVariables().isEmpty()) {
             return sb.toString();
@@ -278,21 +298,11 @@ public class JL5SubstClassType_c extends SubstClassType_c implements JL5SubstCla
                 return name();
             }
 
-            // Use the short name if it is unique.
-            if (c != null && !Options.global.fully_qualified_names) {
-                try {
-                    Named x = c.find(name());
-
-                    if (ts.equals(this, x) || ts.equals(this.base(), x)) {
-                        return name();
-                    }
-                }
-                catch (SemanticException e) {
-                }
-            }
+            // never use the short name for a member class if we need to perform substitution...
             ReferenceType container = this.container();
             if (!this.isInnerClass()) {
-                // if we are not an inner class, then make sure that we
+                // if we are not an inner class (i.e., we are
+                // a static nested class), then make sure that we
                 // do not print out the parameters for our container.
                 JL5TypeSystem ts = (JL5TypeSystem)this.ts;
                 container = (ReferenceType)ts.erasureType(this.container());
@@ -306,6 +316,31 @@ public class JL5SubstClassType_c extends SubstClassType_c implements JL5SubstCla
             throw new InternalCompilerError("Cannot translate an anonymous class.");
         }
     }
+
+    @Override
+    public ClassType outer() {
+        if (this.isMember() && !this.isInnerClass()) {
+            if (!(super.outer() instanceof RawClass)) {
+                JL5TypeSystem ts = (JL5TypeSystem)this.typeSystem();
+                return (ClassType)ts.erasureType(super.outer());
+            }
+        }
+        return super.outer();
+    }
+    
+    @Override
+    public boolean isEnclosedImpl(ClassType maybe_outer) {
+        if (super.isEnclosedImpl(maybe_outer)) {
+            return true;
+        }
+        // try it with the stripped out outer...
+        if (outer() != null && super.outer() != this.outer()) {
+            return super.outer().equals(maybe_outer) ||
+                    super.outer().isEnclosed(maybe_outer);
+        }
+        return false;
+    }
+
 
     
 }

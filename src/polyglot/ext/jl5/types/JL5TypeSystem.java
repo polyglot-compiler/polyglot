@@ -107,10 +107,15 @@ public interface JL5TypeSystem extends TypeSystem, ParamTypeSystem {
     Type erasureType(Type t);
 
     /**
-     * Given a list of typeParams, produce a JL5Subst that maps these
+     * Given a JL5ProcedureInstance, produce a JL5Subst that maps the
      * TypeVariables to the erasure of their bounds.
      */
-    JL5Subst erasureSubst(List<TypeVariable> typeParams);
+    JL5Subst erasureSubst(JL5ProcedureInstance pi);
+    /**
+     * Given a , produce a JL5RawSubst that maps the
+     * TypeVariables to the erasure of their bounds.
+     */
+    JL5Subst erasureSubst(JL5ParsedClassType base);
 
 
     JL5MethodInstance methodInstance(Position pos, ReferenceType container,
@@ -266,6 +271,12 @@ public interface JL5TypeSystem extends TypeSystem, ParamTypeSystem {
      * @return
      */
     Type Class(Position pos, Type type);
+
+    /**
+     * What are the type variables of class ct or any outer 
+     * class for which an instance of ct has an enclosing instance?
+     */
+    List<TypeVariable> classAndEnclosingTypeVariables(JL5ParsedClassType ct);
 
 
 

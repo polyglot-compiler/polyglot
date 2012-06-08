@@ -2,6 +2,7 @@ package polyglot.ext.jl5.types.inference;
 
 import java.util.*;
 
+import polyglot.ext.jl5.JL5Options;
 import polyglot.ext.jl5.types.JL5ArrayType;
 import polyglot.ext.jl5.types.JL5Flags;
 import polyglot.ext.jl5.types.JL5ProcedureInstance;
@@ -54,10 +55,9 @@ public class InferenceSolver_c implements InferenceSolver {
         List<SuperTypeConstraint> supers = new ArrayList<SuperTypeConstraint>();
 //        System.err.println("**** inference solver:");
 //        System.err.println("      constraints : " + constraints);
+//        System.err.println("      use subs? : " + useSubtypeConstraints +  "   use sups? : " + useSupertypeConstraints);
+//        System.err.println("      variables : " + typeVariablesToSolve());
 
-        if (!(useSubtypeConstraints ^ useSupertypeConstraints)) {
-            throw new InternalCompilerError("Must use exactly one of useSubtytpeConstraints and useSuperTypeConstraints");
-        }
         while (!constraints.isEmpty()) {
             Constraint head = constraints.remove(0);
             if (head.canSimplify()) {
@@ -133,6 +133,9 @@ public class InferenceSolver_c implements InferenceSolver {
                 }
             }
         }
+        
+//        System.err.println("      Solution : " + Arrays.asList(solution));
+
         return solution;
     }
 
@@ -145,10 +148,20 @@ public class InferenceSolver_c implements InferenceSolver {
         if (numFormals > 0) {
             if (pi != null && JL5Flags.isVarArgs(pi.flags())) {
                 JL5ArrayType lastFormal = (JL5ArrayType) pi.formalTypes().get(numFormals - 1);
-                for (int i = numFormals - 1; i < actualArgumentTypes.size() - 1; i++) {
-                    constraints.add(new SubConversionConstraint(actualArgumentTypes.get(i), lastFormal.base(), this));
-                }                
+                if (actualArgumentTypes.size() == numFormals && ((Type)actualArgumentTypes.get(numFormals-1)).isArray()) {
+                    // there are the same number of actuals as formals, and the last actual is an array type.
+                    // So the last actual must be convertible to the array type.
+                    constraints.add(new SubConversionConstraint(actualArgumentTypes.get(numFormals - 1), formalTypes.get(numFormals - 1), this));
+                }
+                else {
+                    // more than one remaining actual, or the last remaining actual is not an array type.
+                    // all remaining actuals must be convertible to the basetype of the last (i.e. varargs) formal.
+                    for (int i = numFormals - 1; i < actualArgumentTypes.size(); i++) {
+                        constraints.add(new SubConversionConstraint(actualArgumentTypes.get(i), lastFormal.base(), this));
+                    }
+                }
             } else if (numFormals == actualArgumentTypes.size()) {
+                // not a varargs method
                 constraints.add(new SubConversionConstraint(actualArgumentTypes.get(numFormals - 1), formalTypes.get(numFormals - 1), this));
             }
         }
@@ -164,16 +177,36 @@ public class InferenceSolver_c implements InferenceSolver {
             return null;
         }
         
+
         if (hasUnresolvedTypeArguments(solution)) {
             // see if the return type is appropriate for inferring additional results
-            if (pi instanceof MethodInstance) {
-                Type returnType =  ((MethodInstance)pi).returnType();
-                if (returnType.isReference() && !returnType.isVoid()) {
-                    // See JLS 3rd ed, 15.12.2.8
-                    if (expectedReturnType == null) {
-                        expectedReturnType = ts.Object();
-                    }
-                    solution = solveWithExpectedReturnType(solution, expectedReturnType, returnType);
+            Type returnType = returnType(pi);
+            if (returnType != null && returnType.isReference() && !returnType.isVoid()) {
+                // See JLS 3rd ed, 15.12.2.8
+                if (expectedReturnType == null) {
+                    expectedReturnType = ts.Object();
+                }
+                solution = solveWithExpectedReturnType(solution, expectedReturnType, returnType);
+            }
+        }
+        else {
+            // resolved all type arguments. Do we want to try to be more permissive?
+            JL5Options opts = (JL5Options) ts.extensionInfo().getOptions();
+            Type returnType = returnType(pi);
+            if (opts.morePermissiveInference && returnType != null && returnType.isReference() && !returnType.isVoid() && expectedReturnType != null) {
+                // Try to perform a more permissive inference where we take the
+                // expected return type into consideration, even if the the previous
+                // step finds a solution for all type variables. This may find a better one.
+                // We do this for compatibility with javac, which appears to deviate
+                // from the Java Language Spec on type inference.
+
+                List<Constraint> cons = new ArrayList<Constraint>();
+                cons.addAll(getInitialConstraints());
+                cons.add(new SuperConversionConstraint(expectedReturnType, returnType, this));
+                Type[] betterSolution = this.solve(cons, true, true);
+                if (betterSolution != null) {
+//                    System.err.println("Found a better solution: " + Arrays.asList(betterSolution));
+                    solution = betterSolution;
                 }
             }
         }
@@ -187,6 +220,13 @@ public class InferenceSolver_c implements InferenceSolver {
             m.put(typeVariablesToSolve().get(i), solution[i]);
         }
         return m;
+    }
+
+    private static Type returnType(JL5ProcedureInstance pi) {
+        if (pi instanceof MethodInstance) {
+            return ((MethodInstance)pi).returnType();
+        }
+        return null;
     }
 
     private Type[] solveWithExpectedReturnType(Type[] solution, Type expectedReturnType, Type declaredReturnType) {

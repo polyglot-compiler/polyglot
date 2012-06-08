@@ -881,17 +881,35 @@ public class JL5TypeSystem_c extends ParamTypeSystem_c implements JL5TypeSystem 
 
 
     @Override
-    public JL5Subst erasureSubst(List<TypeVariable> typeParams) {
+    public JL5Subst erasureSubst(JL5ProcedureInstance pi) {
+        List<TypeVariable> typeParams = pi.typeParams();
         Map m = new LinkedHashMap();
-        Set selfReferences = new LinkedHashSet();
         for (TypeVariable tv : typeParams) {
             m.put(tv, tv.erasureType());
         }
         if (m.isEmpty()) {
             return null;
         }
-        JL5Subst ret = (JL5Subst)this.subst(m, new HashMap());
-        return ret;
+        return new JL5Subst_c(this, m, new HashMap());
+    }
+    @Override
+    public JL5Subst erasureSubst(JL5ParsedClassType base) {
+        Map m = new LinkedHashMap();
+        JL5ParsedClassType t = base;
+        while (t != null) {
+            for (TypeVariable tv : t.typeVariables()) {
+                m.put(tv, tv.erasureType());
+            }
+            if (!(t.outer() instanceof JL5ParsedClassType)) {
+                // no more type variables that we care about!
+                break;
+            }
+            t = (JL5ParsedClassType)t.outer();
+        }
+        if (m.isEmpty()) {
+            return null;
+        }
+        return new JL5RawSubst_c(this, m, new HashMap(), base);
     }
 
 
@@ -973,6 +991,16 @@ public class JL5TypeSystem_c extends ParamTypeSystem_c implements JL5TypeSystem 
             TypeVariable tv = (TypeVariable)t2;
             if (tv.hasLowerBound() && isSubtype(t1, tv.lowerBound())) {
                 return true;
+            }
+        }
+        if (t2 instanceof IntersectionType) {
+            IntersectionType it = (IntersectionType)t2;
+            // t1 is a substype of u1&u2&...&un if there is some ui such
+            // that t1 is a subtype of ui.
+            for (Type t : it.bounds()) {
+                if (isSubtype(t1, t)) {
+                    return true;
+                }
             }
         }
         return false;
@@ -1101,7 +1129,7 @@ public class JL5TypeSystem_c extends ParamTypeSystem_c implements JL5TypeSystem 
                 
                 }
                 else {
-                    // T is a type that is not final (¤8.1.1), and S is an interface
+                    // T is a type that is not final (ï¿½8.1.1), and S is an interface
                     // if there exists a supertype X of T, and a supertype Y of S, such that both X and Y are provably distinct parameterized types, 
                     // and that the erasures of X and Y are the same, a compile-time error occurs.
                     // Go through the supertypes of each.
@@ -1515,6 +1543,10 @@ public class JL5TypeSystem_c extends ParamTypeSystem_c implements JL5TypeSystem 
         return JL5Flags.setVarArgs(super.legalMethodFlags());
     }
 
+    public Flags legalAbstractMethodFlags() {
+        return JL5Flags.setVarArgs(super.legalAbstractMethodFlags());
+    }
+
     
     @Override
     public JL5SubstClassType findGenericSupertype(JL5ParsedClassType base, ReferenceType sub) {
@@ -1534,7 +1566,7 @@ public class JL5TypeSystem_c extends ParamTypeSystem_c implements JL5TypeSystem 
     }
 
     @Override
-    public ReferenceType intersectionType(Position pos, List<ReferenceType> types) {       
+    public ReferenceType intersectionType(Position pos, List<ReferenceType> types) {
         if (types.size() == 1) {
             return types.get(0);
         }
@@ -1661,9 +1693,9 @@ public class JL5TypeSystem_c extends ParamTypeSystem_c implements JL5TypeSystem 
     }
     @Override
     public RawClass rawClass(JL5ParsedClassType base, Position pos) {
-        if (base.typeVariables().isEmpty()) {
-            throw new InternalCompilerError("Can only create a raw class with a parameterized class");
-        }
+//        if (base.typeVariables().isEmpty()) {
+//            throw new InternalCompilerError("Can only create a raw class with a parameterized class");
+//        }
         return new RawClass_c(base, pos);        
     }
     
@@ -1677,10 +1709,13 @@ public class JL5TypeSystem_c extends ParamTypeSystem_c implements JL5TypeSystem 
         }
         if (t instanceof JL5ParsedClassType) {
             JL5ParsedClassType ct = (JL5ParsedClassType)t;
-            if (ct.typeVariables().isEmpty()) {
+            if (!classAndEnclosingTypeVariables(ct).isEmpty()) {
+                return this.rawClass(ct, ct.position());
+            }
+            else {
+                // neither t nor it's containers has type variables
                 return t;
             }
-            return this.rawClass(ct, ct.position());
         }
         if (t instanceof ArrayType) {
             ArrayType at = t.toArray();
@@ -1689,6 +1724,33 @@ public class JL5TypeSystem_c extends ParamTypeSystem_c implements JL5TypeSystem 
         }
         return t;
     }
+     
+     /**
+      * Does pct, or a containing class of pct, have type variables?
+      */
+     @Override
+     public List<TypeVariable> classAndEnclosingTypeVariables(JL5ParsedClassType ct) {
+         List<TypeVariable> l = new ArrayList<TypeVariable>();
+         classAndEnclosingTypeVariables(ct, l);
+         return l;
+     }
+     protected void classAndEnclosingTypeVariables(JL5ParsedClassType ct, List<TypeVariable> l) {
+
+         if (!ct.typeVariables().isEmpty()) {
+             l.addAll(ct.typeVariables());
+         }
+         if (ct.isNested() && !ct.isInnerClass()) {
+             // ct is a static nested class. Ignore any type variables contained in outer classes.
+             return;
+         }
+         if (ct.outer() == null) {
+             return;
+         }         
+         if (ct.outer() instanceof JL5ParsedClassType) {
+             classAndEnclosingTypeVariables((JL5ParsedClassType)ct.outer(), l);
+         }
+     }
+
   
      @Override
      public PrimitiveType promote(Type t1, Type t2) throws SemanticException {

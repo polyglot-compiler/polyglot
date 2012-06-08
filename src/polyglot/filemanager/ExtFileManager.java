@@ -11,6 +11,7 @@ import java.io.InputStream;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -52,7 +53,7 @@ public class ExtFileManager implements FileManager {
 	/** JavacFileManager used by java compiler */
 	protected final StandardJavaFileManager javac_fm;
 	/** Map of sources already loaded */
-	protected final Map<Object, FileSource> loadedSources;
+	protected final Map<String, FileSource> loadedSources;
 	/** List of locations in which .class files are searched */
 	protected final List<Location> locations;
 	/** A cache for package look ups */
@@ -89,7 +90,7 @@ public class ExtFileManager implements FileManager {
 		this.extInfo = extInfo;
 		javac_fm = ToolProvider.getSystemJavaCompiler().getStandardFileManager(
 				null, null, null);
-		loadedSources = new HashMap<Object, FileSource>();
+		loadedSources = new HashMap<String, FileSource>();
 		locations = new ArrayList<Location>();
 		packageCache = new HashMap<String, Boolean>();
 		nocache = new HashSet<String>();
@@ -111,7 +112,6 @@ public class ExtFileManager implements FileManager {
 
 	public FileObject getFileForInput(Location location, String packageName,
 			String relativeName) throws IOException {
-		//System.out.println("In getFileForInput - packageName: " + packageName);
 		Options options = extInfo.getOptions();
 		Location sourceOutputLoc = options.outputDirectory();
 		if (sourceOutputLoc.equals(location)) {
@@ -180,7 +180,6 @@ public class ExtFileManager implements FileManager {
 
 	public JavaFileObject getJavaFileForInput(Location location,
 			String className, Kind kind) throws IOException {
-		//System.out.println("In getJavaFileForInput - className: " + className);
 		Options options = extInfo.getOptions();
 		Location sourceOutputLoc = options.outputDirectory();
 		if (sourceOutputLoc.equals(location)) {
@@ -281,7 +280,6 @@ public class ExtFileManager implements FileManager {
 
 	public Iterable<JavaFileObject> list(Location location, String packageName,
 			Set<Kind> kinds, boolean recurse) throws IOException {
-		//System.out.println("In list - packageName: " + packageName);
 		Options options = extInfo.getOptions();
 		Location sourceOutputLoc = options.outputDirectory();
 		Location classOutputLoc = options.classOutputDirectory();
@@ -361,6 +359,20 @@ public class ExtFileManager implements FileManager {
 
 	@Override
 	public boolean packageExists(Location location, String name) {
+		String pkg = name.replace('.', File.separatorChar);
+		Iterable<? extends File> files = getLocation(location);
+		if (files == null)
+			return false;
+		for (File f : files) {
+			File newFile = new File(f, pkg);
+			if (newFile.exists() && newFile.isDirectory())
+				return true;
+		}
+		return false;
+	}
+	
+	/*@Override
+	public boolean packageExists(Location location, String name) {
 		Iterable<JavaFileObject> contents;
 		try {
 			contents = list(location, name, ALL_KINDS, false);
@@ -369,7 +381,7 @@ public class ExtFileManager implements FileManager {
 					+ name, e);
 		}
 		return contents.iterator().hasNext();
-	}
+	}*/
 
 	@Override
 	public ClassFile loadFile(String name) {
@@ -457,7 +469,9 @@ public class ExtFileManager implements FileManager {
 	@Override
 	public FileSource fileSource(Location location, String fileName,
 			boolean userSpecified) throws IOException {
-		FileSource sourceFile = loadedSources.get(fileName);
+		String key = fileKey(location, "", fileName);
+		
+		FileSource sourceFile = loadedSources.get(key);
 		if (sourceFile != null)
 			return sourceFile;
 
@@ -512,7 +526,7 @@ public class ExtFileManager implements FileManager {
 			return sourceFile;
 		}
 
-		loadedSources.put(fileKey(fo), sourceFile);
+		loadedSources.put(key, sourceFile);
 		return sourceFile;
 	}
 
@@ -547,6 +561,13 @@ public class ExtFileManager implements FileManager {
 			String shortName = StringUtil.getShortNameComponent(className);
 			String fileName = shortName + "." + exts[k];
 
+			String key = fileKey(location, pkgName, fileName);
+			FileSource source = loadedSources.get(key);
+			// Skip it if already loaded
+			if (source != null) {
+				return source;
+			}
+			
 			FileObject fo;
 			try {
 				fo = getFileForInput(location, pkgName, fileName);
@@ -556,18 +577,12 @@ public class ExtFileManager implements FileManager {
 			if (fo == null)
 				continue;
 
-			FileSource source = (FileSource) loadedSources.get(fileKey(fo));
-			// Skip it if already loaded
-			if (source != null) {
-				return source;
-			}
-
 			try {
 				source = extInfo.createFileSource(fo, false);
 				if (Report.should_report(Report.loader, 2))
 					Report.report(2, "Loading " + className + " from " + source);
 
-				loadedSources.put(fileKey(fo), source);
+				loadedSources.put(key, source);
 				return source;
 			} catch (IOException e) {
 			}
@@ -575,8 +590,15 @@ public class ExtFileManager implements FileManager {
 		return null;
 	}
 
-	protected Object fileKey(FileObject fo) {
-		return fo.getName();
+	protected String fileKey(Location location, String packageName, String fileName) {
+		/*if (packageName.equals(""))
+			return location + "/" + fileName;*/
+		return location + "/" + packageName + "/" + fileName;
+	}
+
+	@Override
+	public Map<URI, JavaFileObject> getAbsPathObjMap() {
+		return Collections.unmodifiableMap(absPathObjMap);
 	}
 
 }

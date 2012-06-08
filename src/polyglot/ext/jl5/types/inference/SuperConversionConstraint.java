@@ -7,6 +7,7 @@ import polyglot.ext.jl5.types.JL5ParsedClassType;
 import polyglot.ext.jl5.types.JL5SubstClassType;
 import polyglot.ext.jl5.types.TypeVariable;
 import polyglot.ext.jl5.types.WildCardType;
+import polyglot.types.NullType;
 import polyglot.types.ReferenceType;
 import polyglot.types.Type;
 
@@ -25,7 +26,10 @@ public class SuperConversionConstraint extends Constraint {
     @Override
     public List<Constraint> simplify() {
         List<Constraint> r = new ArrayList<Constraint>();
-        if (solver().isTargetTypeVariable(formal)) {
+        if (actual instanceof NullType) {
+            // no constraint implied!
+        }
+        else if (solver().isTargetTypeVariable(formal)) {
             r.add(new SuperTypeConstraint(actual, formal, solver));
         }
         else if (formal.isArray()) {
