@@ -4,11 +4,7 @@ import java.io.DataInputStream;
 import java.io.IOException;
 import java.util.*;
 
-import polyglot.ext.jl5.types.JL5ParsedClassType;
-import polyglot.ext.jl5.types.JL5SubstClassType;
-import polyglot.ext.jl5.types.JL5TypeSystem;
-import polyglot.ext.jl5.types.RawClass;
-import polyglot.ext.jl5.types.TypeVariable;
+import polyglot.ext.jl5.types.*;
 import polyglot.types.*;
 import polyglot.types.reflect.Attribute;
 import polyglot.types.reflect.ClassFile;
