@@ -25,6 +25,8 @@
 
 package polyglot.types;
 
+import java.io.File;
+
 import polyglot.frontend.*;
 import polyglot.frontend.Compiler;
 import polyglot.frontend.goals.Goal;
@@ -146,9 +148,9 @@ public class SourceClassResolver extends LoadedClassResolver
    * Find a type by name.
    */
   public Named find(String name) throws SemanticException {
-    if (Report.should_report(report_topics, 3))
+    if (Report.should_report(report_topics, 3)) 
 	Report.report(3, "SourceCR.find(" + name + ")");
-
+    
     ClassFile clazz = null;
     ClassFile encodedClazz = null;
     FileSource source = null;
@@ -161,6 +163,13 @@ public class SourceClassResolver extends LoadedClassResolver
         if (Report.should_report(report_topics, 4))
           Report.report(4, "Class " + name + " has encoded type info");
         encodedClazz = clazz;
+      }
+      if (encodedClazz != null && 
+    		  !name.replace(".", File.separator).equals(encodedClazz.name())) {
+          if (Report.should_report(report_topics, 3))
+      	    Report.report(3, "Not using " + encodedClazz.name() + "(case-insensitive filesystem?)");
+        encodedClazz = null;
+        clazz = null;
       }
     }
 
@@ -186,7 +195,6 @@ public class SourceClassResolver extends LoadedClassResolver
 	Report.report(4, "Not using raw class file for " + name);
       clazz = null;
     }
-
     // If both the source and encoded class are available, we decide which to
     // use based on compiler compatibility and modification times.
     if (encodedClazz != null && source != null) {
@@ -194,7 +202,6 @@ public class SourceClassResolver extends LoadedClassResolver
       long sourceModTime = source.lastModified().getTime();
 
       int comp = checkCompilerVersion(encodedClazz.compilerVersion(version.name()));
-
       if (! ignoreModTimes && classModTime < sourceModTime) {
         if (Report.should_report(report_topics, 3))
 	    Report.report(3, "Source file version is newer than compiled for " +
