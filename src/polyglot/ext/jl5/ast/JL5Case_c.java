@@ -49,7 +49,8 @@ public class JL5Case_c extends Case_c implements JL5Case {
         if (expr == null) {
             return this;
         } 
-        else if (switchType.isClass()) {
+        else if (switchType.isClass() && !isNumericSwitchType(switchType, ts)) {
+            // must be an enum...
             if (expr instanceof EnumConstant) {
                 // we have already resolved the expression
                 EnumConstant ec = (EnumConstant)expr;
@@ -62,6 +63,9 @@ public class JL5Case_c extends Case_c implements JL5Case {
                 EnumConstant e = nf.EnumConstant(expr.position(), r, amb.id()).enumInstance(ei);
                 e = (EnumConstant) e.type(ei.type());
                 return this.expr(e).value(ei.ordinal());
+            }
+            else {
+                throw new InternalCompilerError("Unexpected case label " + expr);
             }
         } 
         
@@ -100,6 +104,22 @@ public class JL5Case_c extends Case_c implements JL5Case {
         }
         throw new SemanticException("Case label must be an integral constant.",
                                     position());
+    }
+
+    private boolean isNumericSwitchType(Type switchType, JL5TypeSystem ts) {
+        if (ts.Char().equals(switchType) || ts.wrapperClassOfPrimitive(ts.Char()).equals(switchType) ) {
+            return true;
+        }
+        if (ts.Byte().equals(switchType) || ts.wrapperClassOfPrimitive(ts.Byte()).equals(switchType) ) {
+            return true;
+        }
+        if (ts.Short().equals(switchType) || ts.wrapperClassOfPrimitive(ts.Short()).equals(switchType) ) {
+            return true;
+        }
+        if (ts.Int().equals(switchType) || ts.wrapperClassOfPrimitive(ts.Int()).equals(switchType) ) {
+            return true;
+        }
+        return false;
     }
 
     @Override
