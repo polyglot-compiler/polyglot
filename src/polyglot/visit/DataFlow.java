@@ -1464,7 +1464,8 @@ public abstract class DataFlow extends ErrorHandlingVisitor
             Report.report(2,
                           p.hashCode() + " [ label = \"" +
                           StringUtil.escape(p.node.toString()) + "\\n(" + 
-                          StringUtil.escape(StringUtil.getShortNameComponent(p.node.getClass().getName()))+ ")\" ];");
+                          StringUtil.escape(StringUtil.getShortNameComponent(p.node.getClass().getName()))+ ")" +
+                          (p.path_to_finally.isEmpty()?"":StringUtil.escape(p.path_to_finally.toString())) + "\" ];");
             
             // dump out the successors.
             for (Iterator iter2 = p.succs.iterator(); iter2.hasNext(); ) {
@@ -1472,7 +1473,8 @@ public abstract class DataFlow extends ErrorHandlingVisitor
                 Report.report(2,
                               q.getTarget().hashCode() + " [ label = \"" +
                               StringUtil.escape(q.getTarget().node.toString()) + " (" + 
-                              StringUtil.escape(StringUtil.getShortNameComponent(q.getTarget().node.getClass().getName()))+ ")\" ];");
+                              StringUtil.escape(StringUtil.getShortNameComponent(q.getTarget().node.getClass().getName()))+ ")" +
+                              (q.getTarget().path_to_finally.isEmpty()?"":StringUtil.escape(q.getTarget().path_to_finally.toString())) + "\" ];");
                 String label = q.getKey().toString();
                 if (p.outItems != null) {
                     label += "\\n" + p.outItems.get(q.getKey());
