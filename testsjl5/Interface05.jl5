@@ -1,0 +1,8 @@
+class H implements R {
+    public R validate(Object request) {
+        return null;
+    }
+}
+interface R {
+    public <T extends R> T validate(Object request);
+}
