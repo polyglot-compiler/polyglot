@@ -25,6 +25,8 @@
 
 package polyglot.types;
 
+import java.io.File;
+
 import polyglot.frontend.*;
 import polyglot.frontend.Compiler;
 import polyglot.frontend.goals.Goal;

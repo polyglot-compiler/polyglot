@@ -3,19 +3,12 @@ package polyglot.ext.jl5.types.inference;
 import java.util.*;
 
 import polyglot.ext.jl5.JL5Options;
-import polyglot.ext.jl5.types.JL5ArrayType;
-import polyglot.ext.jl5.types.JL5Flags;
-import polyglot.ext.jl5.types.JL5ProcedureInstance;
-import polyglot.ext.jl5.types.JL5TypeSystem;
-import polyglot.ext.jl5.types.TypeVariable;
+import polyglot.ext.jl5.types.*;
 import polyglot.ext.param.types.Subst;
 import polyglot.types.MethodInstance;
 import polyglot.types.ReferenceType;
 import polyglot.types.Type;
-import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
-
-import com.sun.tools.jdi.LinkedHashMap;
 
 public class InferenceSolver_c implements InferenceSolver {
 

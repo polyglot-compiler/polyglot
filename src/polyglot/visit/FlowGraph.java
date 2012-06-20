@@ -314,9 +314,12 @@ public class FlowGraph {
     protected Term node; // The AST node that this peer is an occurrence of.
     protected List succs; // List of successor Edges 
     protected List preds; // List of predecessor Edges 
-    protected List path_to_finally; // the path to the finally block that 
-                                    // uniquely distinguishes this Peer
-                                    // from the other Peers for the AST node.
+    /**
+     * the path to the finally block that uniquely distinguishes this Peer
+     * from the other Peers for the AST node. See documentation for CFGBuilder
+     * for more information on the contents on path_to_finally.
+     */
+    protected List path_to_finally; 
 
     protected int entry; // Term.ENTRY or Term.EXIT
     
@@ -400,8 +403,8 @@ public class FlowGraph {
      */
     public static class PeerKey {
 
-        protected List list;
-        protected int entry;
+        protected final List list;
+        protected final int entry;
 
         public PeerKey(List list, int entry) {
             this.list = list;

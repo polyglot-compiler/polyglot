@@ -370,18 +370,6 @@ public class ExtFileManager implements FileManager {
 		}
 		return false;
 	}
-	
-	/*@Override
-	public boolean packageExists(Location location, String name) {
-		Iterable<JavaFileObject> contents;
-		try {
-			contents = list(location, name, ALL_KINDS, false);
-		} catch (IOException e) {
-			throw new InternalCompilerError("Error while checking for package "
-					+ name, e);
-		}
-		return contents.iterator().hasNext();
-	}*/
 
 	@Override
 	public ClassFile loadFile(String name) {
@@ -591,8 +579,6 @@ public class ExtFileManager implements FileManager {
 	}
 
 	protected String fileKey(Location location, String packageName, String fileName) {
-		/*if (packageName.equals(""))
-			return location + "/" + fileName;*/
 		return location + "/" + packageName + "/" + fileName;
 	}
 
