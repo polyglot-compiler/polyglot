@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
 
+import polyglot.ext.jl5.types.JL5ClassType;
 import polyglot.ext.jl5.types.JL5MethodInstance;
 import polyglot.ext.jl5.types.JL5ParsedClassType;
 import polyglot.ext.jl5.types.JL5TypeSystem;
@@ -13,6 +14,7 @@ import polyglot.ext.param.types.MuPClass;
 import polyglot.main.Report;
 import polyglot.types.*;
 import polyglot.types.reflect.*;
+import polyglot.util.Position;
 import polyglot.util.StringUtil;
 
 /**
@@ -261,6 +263,15 @@ public class JL5ClassFileLazyClassInitializer extends ClassFileLazyClassInitiali
     }
 
     @Override
+	protected ClassType quietTypeForName(String name) {
+    	JL5ParsedClassType ct = (JL5ParsedClassType) super.quietTypeForName(name);
+    	if (!ct.typeVariables().isEmpty()) {
+    		return ((JL5TypeSystem)ts).rawClass(ct,Position.compilerGenerated());
+    	}
+    	return ct;
+	}
+
+	@Override
     protected ConstructorInstance constructorInstance(Method method,
                                                       ClassType ct, Field[] fields) {
         // Get a method instance for the <init> method.

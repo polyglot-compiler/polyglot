@@ -428,6 +428,13 @@ public class JL5Signature extends Attribute {
                 }
             }
         }
+        else {
+        	// Check if ct is a generic class.  If so, then make a raw class
+        	// since the signature doesn't instantiate any params
+            JL5ParsedClassType pct = parsedClassTypeForClass(ct);
+            if (!pct.typeVariables().isEmpty())          	
+            	ct = ts.rawClass(pct, Position.compilerGenerated());
+        }
         ClassType current = ct;
         ClassType outer = current.outer();
         while (outer != null) {
