@@ -1,0 +1,5 @@
+class C {
+    public Integer f() {
+        return true ? 0 : null;
+    }
+}
