@@ -803,7 +803,7 @@ public class JL5TypeSystem_c extends ParamTypeSystem_c implements JL5TypeSystem 
             return ri.equals(rj);
         }
         else if (ri.isReference()) {
-            return ri.isSubtype(rj) || this.isUncheckedConversion(ri, rj) || ri.typeEquals(this.erasureType(rj));
+            return ri.isSubtype(rj) || this.isUncheckedConversion(ri, rj) || ri.isSubtype(this.erasureType(rj));
         }
         else if (ri.isVoid()) {
             return rj.isVoid();
@@ -1137,7 +1137,7 @@ public class JL5TypeSystem_c extends ParamTypeSystem_c implements JL5TypeSystem 
                 
                 }
                 else {
-                    // T is a type that is not final (¤8.1.1), and S is an interface
+                    // T is a type that is not final (ï¿½8.1.1), and S is an interface
                     // if there exists a supertype X of T, and a supertype Y of S, such that both X and Y are provably distinct parameterized types, 
                     // and that the erasures of X and Y are the same, a compile-time error occurs.
                     // Go through the supertypes of each.
