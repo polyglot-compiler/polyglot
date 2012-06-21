@@ -50,11 +50,19 @@ public class JL5Conditional_c extends Conditional_c {
         // If one of the second and third operands is of the null type and the type of 
         // the other is a reference type, then the type of the conditional expression is 
         // that reference type.
-        if (t1.isNull() && t2.isReference()) {
-            return type(t2);
+        if (t1.isNull()) {
+        	if(t2.isReference())
+        		return type(t2);
+        	else if (t2.isPrimitive())
+                // shortcut for lub(null, box(t2))
+                return type(ts.boxingConversion(t2));
         }
-        if (t2.isNull() && t1.isReference()) {
-            return type(t1);
+        if (t2.isNull()) {
+        	if(t1.isReference())
+        		return type(t1);
+        	else if (t1.isPrimitive())
+                // shortcut for lub(box(t1), null)
+                return type(ts.boxingConversion(t1));
         }
         
         // Otherwise, if the second and third operands have numeric type, then
@@ -135,7 +143,7 @@ public class JL5Conditional_c extends Conditional_c {
             //  Otherwise, binary numeric promotion (5.6.2) is applied to the operand types, 
             // and the type of the conditional expression is the promoted type of the second and
             // third operands. Note that binary numeric promotion performs unboxing 
-            // conversion (¤5.1.8) and value set conversion (¤5.1.13).
+            // conversion (ï¿½5.1.8) and value set conversion (ï¿½5.1.13).
             return type(ts.promote(t1, t2));
         }
         
@@ -143,9 +151,10 @@ public class JL5Conditional_c extends Conditional_c {
         // respectively. Let s1 be the type that results from applying boxing conversion to t1, 
         // and let s2 be the type that results from applying boxing conversion to t2. 
         // The type of the conditional expression is the result of applying capture conversion 
-        // (¤5.1.10) to lub(s1, s2) (¤15.12.2.7).
+        // (ï¿½5.1.10) to lub(s1, s2) (ï¿½15.12.2.7).
         Type s1 = ts.boxingConversion(t1);
         Type s2 = ts.boxingConversion(t2);
+        
         LubType lub = ts.lub(this.position, CollectionUtil.list(s1, s2));
         return type(ts.applyCaptureConversion(lub.calculateLub()));
    }
