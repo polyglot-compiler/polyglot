@@ -729,12 +729,20 @@ public class JL5TypeSystem_c extends ParamTypeSystem_c implements JL5TypeSystem 
         if (mi.formalTypes().size() != mj.formalTypes().size()) {
             return false;
         }
-        if (mi.typeParams().size() != mj.typeParams().size()) {
+        if (eraseMj && !mi.typeParams().isEmpty()) {
+            // we are erasing mj, so it has no type parameters.
+            // so mi better have no type parameters
+            return false;
+            
+        }
+        else if (!eraseMj && mi.typeParams().size() != mj.typeParams().size()) {
+            // we are not erasing mj, so it and mi better
+            // have the same number of type parameters.
             return false;            
         }
         
         // replace the type variables of mj with the type variables of mi
-        if (!mi.typeParams().isEmpty()) {
+        if (!eraseMj && !mi.typeParams().isEmpty()) {
             Map<TypeVariable, Type> substm = new LinkedHashMap();
             for (int i = 0; i < mi.typeParams().size(); i++) {
                 substm.put(mj.typeParams().get(i), mi.typeParams().get(i));
