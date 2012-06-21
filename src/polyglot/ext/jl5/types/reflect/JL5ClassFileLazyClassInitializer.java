@@ -8,12 +8,15 @@ import java.util.StringTokenizer;
 import polyglot.ext.jl5.types.JL5ClassType;
 import polyglot.ext.jl5.types.JL5MethodInstance;
 import polyglot.ext.jl5.types.JL5ParsedClassType;
+import polyglot.ext.jl5.types.JL5SubstClassType;
 import polyglot.ext.jl5.types.JL5TypeSystem;
+import polyglot.ext.jl5.types.RawClass;
 import polyglot.ext.jl5.types.TypeVariable;
 import polyglot.ext.param.types.MuPClass;
 import polyglot.main.Report;
 import polyglot.types.*;
 import polyglot.types.reflect.*;
+import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
 import polyglot.util.StringUtil;
 
@@ -264,11 +267,20 @@ public class JL5ClassFileLazyClassInitializer extends ClassFileLazyClassInitiali
 
     @Override
 	protected ClassType quietTypeForName(String name) {
-    	JL5ParsedClassType ct = (JL5ParsedClassType) super.quietTypeForName(name);
-    	if (!ct.typeVariables().isEmpty()) {
-    		return ((JL5TypeSystem)ts).rawClass(ct,Position.compilerGenerated());
-    	}
-    	return ct;
+        JL5ParsedClassType pct;
+        ClassType ct = super.quietTypeForName(name);
+        // If ct is a parameterized type, since we got here from a raw 
+        // name we need to create a raw type
+        if (ct instanceof JL5ParsedClassType)
+            pct = (JL5ParsedClassType)ct;
+        else
+            // Only worried about ParsedClassTypes 
+        	return ct;
+
+        if (!pct.typeVariables().isEmpty()) {
+    	    return ((JL5TypeSystem)ts).rawClass(pct,Position.compilerGenerated());
+        }
+        return ct;
 	}
 
 	@Override
