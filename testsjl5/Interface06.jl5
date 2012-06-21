@@ -1,0 +1,12 @@
+class Q {
+}
+class P extends Q {
+}
+class H implements R {
+    public P validate(Object request) {
+        return null;
+    }
+}
+interface R {
+    public <T extends Q> T validate(Object request);
+}
