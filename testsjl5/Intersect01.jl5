@@ -1,0 +1,12 @@
+interface R {}
+interface Q {}
+class A {
+    <T extends Q & R> T f() {
+        return null;
+    }
+}
+class B extends A {
+    <U extends R & Q> U f() {
+        return null;
+    }
+}
