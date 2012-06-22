@@ -52,7 +52,8 @@ public class TVCaster extends AscriptionVisitor {
         }
         if (e instanceof Call) {
             Call c = (Call)e;            
-            if (!mayHaveParameterizedReturn(c.methodInstance())) {
+            if (!mayHaveParameterizedReturn(c.methodInstance())
+            		&& !mayHaveCovariantReturn(c.methodInstance())) {
                 return e;
             }            
         }
@@ -63,7 +64,7 @@ public class TVCaster extends AscriptionVisitor {
         return e;
     }
 
-    private boolean mayBeParameterizedField(FieldInstance fi) {
+	private boolean mayBeParameterizedField(FieldInstance fi) {
         ReferenceType container = fi.container();
         JL5ParsedClassType pct = getBase(container);
         
@@ -94,6 +95,21 @@ public class TVCaster extends AscriptionVisitor {
         
         return false;
     }
+
+    private boolean mayHaveCovariantReturn(MethodInstance mi) {
+    	if (mi.returnType().isClass()) {
+    		List<MethodInstance> overrides = ts.overrides(mi);
+    		overrides.addAll(ts.implemented(mi));
+    		ClassType ret = mi.returnType().toClass();
+    		for (MethodInstance ovr : overrides) {
+    			ClassType supRet = ovr.returnType().toClass();
+    			if (!ts.equals(ret, supRet)) {
+    				return true;
+    			}
+    		}
+    	}
+    	return false;
+	}
 
     private boolean hasTypeVariable(Type t) {
         // really want a type visitor...
