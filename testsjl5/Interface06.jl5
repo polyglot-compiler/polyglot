@@ -10,3 +10,8 @@ class H implements R {
 interface R {
     public <T extends Q> T validate(Object request);
 }
+class X {
+    public void bar(H h) {
+        P p = h.validate(null);
+    }
+}
