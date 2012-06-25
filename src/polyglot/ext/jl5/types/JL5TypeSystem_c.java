@@ -860,7 +860,36 @@ public class JL5TypeSystem_c extends ParamTypeSystem_c implements JL5TypeSystem 
         }
         if (t instanceof IntersectionType) {
             IntersectionType it = (IntersectionType) t;
-            return this.erasureType((Type) it.bounds().get(0));
+            ClassType ct = null;            
+            ClassType iface = null;	
+            boolean subtypes = true;
+            // Find the most specific class 
+            for (ReferenceType rt : it.bounds()) {
+            	ClassType next = (ClassType) rt;
+            	if (equals(Object(), next))
+            		continue;
+            	if (!next.toClass().flags().isInterface()) {
+            		// Is next more specific than ct?
+            		if (ct == null || next.descendsFrom(ct))
+            			ct = next;
+            	}
+            	else if (subtypes) {
+            		// Is next a more specific subtype than iface?
+            		if (iface == null 
+            				|| next.descendsFrom(iface))
+            			iface = next;
+            		// Is iface a subtype of next?
+            		else if (!iface.descendsFrom(next)) {
+            			subtypes = false;
+            		}
+            	}
+            }
+            // Return the most-specific class, if there is one
+            if (ct != null) return erasureType(ct);
+            // Otherwise if the interfaces are all subtypes, return iface 
+            if (subtypes && iface != null) return erasureType(iface);
+            return Object();
+            
         }
         if (t instanceof WildCardType) {
             WildCardType tv = (WildCardType) t;
