@@ -307,12 +307,14 @@ public class Main
         return (ExtensionInfo) extClass.newInstance();
       }
       catch (ClassCastException e) {
+          e.printStackTrace();
           throw new TerminationException(
-	    ext + " is not a valid polyglot extension:" +
+	    ext + " is not a valid Polyglot extension:" +
 	    " extension class " + ext +
-	    " exists but is not a subclass of ExtensionInfo");
+	    " exists but is not a subclass of ExtensionInfo.");
       }
       catch (Exception e) {
+          e.printStackTrace();
           throw new TerminationException(
 	           "Extension " + ext +
 	           " could not be loaded: could not instantiate " + ext + ".");
