@@ -31,6 +31,7 @@ import polyglot.util.ErrorInfo;
 import polyglot.util.ErrorQueue;
 import polyglot.util.StdErrorQueue;
 import polyglot.util.QuotedStringTokenizer;
+import polyglot.util.InternalCompilerError;
 
 import java.io.*;
 import java.util.*;
@@ -307,17 +308,15 @@ public class Main
         return (ExtensionInfo) extClass.newInstance();
       }
       catch (ClassCastException e) {
-          e.printStackTrace();
           throw new TerminationException(
 	    ext + " is not a valid Polyglot extension:" +
 	    " extension class " + ext +
 	    " exists but is not a subclass of ExtensionInfo.");
       }
       catch (Exception e) {
-          e.printStackTrace();
-          throw new TerminationException(
+          throw new InternalCompilerError(
 	           "Extension " + ext +
-	           " could not be loaded: could not instantiate " + ext + ".");
+	           " could not be loaded: could not instantiate " + ext + ".", e);
       }
     }
     return null;
