@@ -304,19 +304,23 @@ public class Main
             " not found: could not find class " + ext + ".");
       }
 
+      Object extobj;
       try {
-        return (ExtensionInfo) extClass.newInstance();
+          extobj = extClass.newInstance();
+      }
+      catch (Exception e) {
+          throw new InternalCompilerError(
+	           "Extension " + ext +
+	           " could not be loaded: could not instantiate " + ext + ".", e);
+      }
+      try {
+        return (ExtensionInfo) extobj;
       }
       catch (ClassCastException e) {
           throw new TerminationException(
 	    ext + " is not a valid Polyglot extension:" +
 	    " extension class " + ext +
 	    " exists but is not a subclass of ExtensionInfo.");
-      }
-      catch (Exception e) {
-          throw new InternalCompilerError(
-	           "Extension " + ext +
-	           " could not be loaded: could not instantiate " + ext + ".", e);
       }
     }
     return null;
