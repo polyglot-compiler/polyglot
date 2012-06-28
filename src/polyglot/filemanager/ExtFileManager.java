@@ -83,6 +83,14 @@ public class ExtFileManager implements FileManager {
 	 * JavaFileObjects
 	 */
 	protected final Map<URI, Set<JavaFileObject>> pathObjectMap;
+	/**
+	 * Indicates if the file system is case-insensitive.
+	 */
+	private int caseInsensitive;
+	/**
+	 * Indicates if the file system case-sensitivity is set
+	 */
+	private boolean caseInsensitivityComputed;
 
 	public static final String DEFAULT_PKG = "intermediate_output";
 
@@ -135,6 +143,8 @@ public class ExtFileManager implements FileManager {
 		if (location == null || !sourceOutputLoc.equals(location)
 				|| !javac_fm.hasLocation(sourceOutputLoc))
 			return null;
+		if (options.outputToFS)
+			return javac_fm.getFileForOutput(location, packageName, relativeName, sibling);
 		URI srcUri, srcParentUri;
 		Kind k;
 		if (relativeName.endsWith(".java"))
@@ -154,8 +164,8 @@ public class ExtFileManager implements FileManager {
 			}
 			if (sourcedir == null)
 				throw new IOException("Source output directory is not set.");
-			File sourcefile = new File(sourcedir, packageName.replace('.',
-					separatorChar) + separator + relativeName);
+			String pkg = packageName.equals("") ? "" : (packageName.replace('.', separatorChar) + separator);
+			File sourcefile = new File(sourcedir, pkg + relativeName);
 			srcUri = sourcefile.toURI();
 			srcParentUri = sourcefile.getParentFile().toURI();
 		} else {
@@ -205,6 +215,8 @@ public class ExtFileManager implements FileManager {
 			if (location == null || !sourceOutputLoc.equals(location)
 					|| !javac_fm.hasLocation(sourceOutputLoc))
 				return null;
+			if (options.outputToFS)
+				return javac_fm.getJavaFileForOutput(location, className, kind, sibling);
 			URI srcUri, srcParentUri;
 			if (sibling == null) {
 				File sourcedir = null;
@@ -587,4 +599,71 @@ public class ExtFileManager implements FileManager {
 		return Collections.unmodifiableMap(absPathObjMap);
 	}
 
+	@Override
+	public boolean caseInsensitive() {
+		if (!caseInsensitivityComputed) {
+			setCaseInsensitive(System.getProperty("user.dir"));
+			caseInsensitivityComputed = true;
+		}
+		if (caseInsensitive == 0) {
+            throw new InternalCompilerError("unknown case sensitivity");
+        }
+        return caseInsensitive == 1;
+	}
+	
+	private void setCaseInsensitive(String fileName) {
+        if (caseInsensitive != 0) {
+            return;
+        }
+
+        // File.equals doesn't work correctly on the Mac.
+        // So, get the list of files in the same directory
+        // as sourceFile.  Check if the sourceFile with two
+        // different cases exists but only appears in the list once.
+        File f1 = new File(fileName.toUpperCase());
+        File f2 = new File(fileName.toLowerCase());
+
+        if (f1.equals(f2)) {
+            caseInsensitive = 1;
+        }
+        else if (f1.exists() && f2.exists()) {
+            boolean f1Exists = false;
+            boolean f2Exists = false;
+
+            File dir;
+
+            if (f1.getParent() != null) {
+                dir = new File(f1.getParent());
+            }
+            else {
+                dir = new File(fileName);
+            }
+
+            File[] ls = dir.listFiles();
+            if (ls != null) {
+                for (int i = 0; i < ls.length; i++) {
+                    if (f1.equals(ls[i])) {
+                        f1Exists = true;
+                    }
+                    if (f2.equals(ls[i])) {
+                        f2Exists = true;
+                    }
+                }
+            }
+            else {
+                // dir not found
+            }
+
+            if (! f1Exists || ! f2Exists) {
+                caseInsensitive = 1;
+            }
+            else {
+                // There are two files.
+                caseInsensitive = -1;
+            }
+        }
+        else {
+            caseInsensitive = -1;
+        }
+    }
 }

@@ -25,28 +25,31 @@
 
 package polyglot.frontend;
 
+import polyglot.filemanager.FileManager;
 import polyglot.main.Options;
 import polyglot.main.Report;
 import polyglot.types.*;
 import polyglot.util.*;
 
 import java.io.*;
+import java.net.URI;
 import java.util.*;
 
 import javax.tools.FileObject;
 import javax.tools.JavaFileManager;
+import javax.tools.JavaFileManager.Location;
 import javax.tools.JavaFileObject;
 import javax.tools.JavaFileObject.Kind;
 
 /** A <code>TargetFactory</code> is responsible for opening output files. */
 public class TargetFactory {
-	protected JavaFileManager fileManager = null;
+	protected FileManager fileManager = null;
 	protected JavaFileManager.Location outputLocation = null;
 	protected String outputExtension;
 	protected boolean outputStdout;
 
-	public TargetFactory(JavaFileManager fileManager,
-			JavaFileManager.Location outputLocation, String outExt, boolean so) {
+	public TargetFactory(FileManager fileManager, Location outputLocation,
+			String outExt, boolean so) {
 		this.fileManager = fileManager;
 		this.outputLocation = outputLocation;
 		this.outputExtension = outExt;
@@ -94,6 +97,27 @@ public class TargetFactory {
 			throw new InternalCompilerError("Output location not set.");
 		}
 
+		/*if (packageName == null || packageName.equals("")) {
+			URI uri = source.toUri();
+			URI outputUri = null;
+			for (File f : fileManager.getLocation(outputLocation)) {
+				outputUri = f.toURI();
+				break;
+			}
+			if (outputUri == null)
+				throw new InternalCompilerError(
+						"Output location for source files is not set");
+			String pkgClass = outputUri.relativize(uri).toString();
+			pkgClass = pkgClass.substring(0, pkgClass.lastIndexOf('.'));
+			int lastIndex = pkgClass.lastIndexOf('/');
+			if (lastIndex > 0) {
+				packageName = pkgClass.substring(0, lastIndex);
+				className = pkgClass.substring(lastIndex + 1);
+			} else {
+				packageName = "";
+				className = pkgClass;
+			}
+		}*/
 		try {
 			if (outputExtension.equals("java")) {
 				if (packageName != null && !packageName.equals("")) {

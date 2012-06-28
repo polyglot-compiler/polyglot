@@ -38,6 +38,8 @@ import java.util.*;
 import javax.tools.FileObject;
 import javax.tools.JavaCompiler;
 import javax.tools.JavaFileManager;
+import javax.tools.JavaFileObject;
+import javax.tools.ToolProvider;
 import javax.tools.JavaCompiler.CompilationTask;
 
 /**
@@ -166,42 +168,86 @@ public class Main {
 
 	protected boolean invokePostCompiler(Options options, Compiler compiler,
 			ErrorQueue eq) {
-		if (options.post_compiler != null && !options.output_stdout) {
-			QuotedStringTokenizer st = new QuotedStringTokenizer(
-					options.post_compiler_args);
-			int pc_size = st.countTokens();
-
-			ArrayList<String> javacArgs = new ArrayList<String>(pc_size);
-			while (st.hasMoreTokens()) {
-				javacArgs.add(st.nextToken());
-			}
-
-			if (options.generate_debugging_info) {
-				javacArgs.add("-g");
-			}
-
-			if (Report.should_report(verbose, 1)) {
-				Report.report(1, "Executing post-compiler "
-						+ options.post_compiler.getClass() + " with arguments "
-						+ javacArgs);
-			}
+		if (!options.output_stdout) {
 			try {
-				ByteArrayOutputStream err = new ByteArrayOutputStream();
-				Writer javac_err = new OutputStreamWriter(err);
-				JavaCompiler javac = options.post_compiler;
-				JavaFileManager fileManager = compiler.sourceExtension()
-						.extFileManager();
+				if (options.post_compiler == null) {
+					ArrayList<String> postCompilerArgs = new ArrayList<String>(
+							1);
+					if (options.generate_debugging_info)
+						postCompilerArgs.add("-g");
+					ByteArrayOutputStream err = new ByteArrayOutputStream();
+					Writer javac_err = new OutputStreamWriter(err);
+					JavaFileManager fileManager = compiler.sourceExtension()
+							.extFileManager();
+					CompilationTask task = ToolProvider.getSystemJavaCompiler()
+							.getTask(javac_err, fileManager, null,
+									postCompilerArgs, null,
+									compiler.outputFiles());
 
-				CompilationTask task = javac.getTask(javac_err, fileManager,
-						null, javacArgs, null, compiler.outputFiles());
+					if (!task.call())
+						eq.enqueue(ErrorInfo.POST_COMPILER_ERROR,
+								err.toString());
+				} else {
+					QuotedStringTokenizer st = new QuotedStringTokenizer(
+							options.post_compiler);
+					int pc_size = st.countTokens();
 
-				if (!task.call())
-					eq.enqueue(ErrorInfo.POST_COMPILER_ERROR, err.toString());
+					ArrayList<String> postCompilerArgs = new ArrayList<String>(
+							pc_size);
+					while (st.hasMoreTokens())
+						postCompilerArgs.add(st.nextToken());
 
-				if (!options.keep_output_files) {
-					for (FileObject fo : compiler.outputFiles()) {
-						fo.delete();
+					if (options.generate_debugging_info) {
+						postCompilerArgs.add("-g");
 					}
+
+					List<String> l = null;
+					if (Report.should_report(verbose, 1)) {
+						l = new ArrayList<String>();
+						for (JavaFileObject jfo : compiler.outputFiles())
+							l.add(new File(jfo.toUri()).getAbsolutePath());
+						StringBuffer cmdStr = new StringBuffer();
+						for (int i = 0; i < postCompilerArgs.size(); i++)
+							cmdStr.append(postCompilerArgs.get(i) + " ");
+						for (int i = 0; i < l.size(); i++)
+							cmdStr.append(l.get(i) + " ");
+						Report.report(1, "Executing post-compiler " + cmdStr);
+					}
+					Runtime runtime = Runtime.getRuntime();
+					if (l == null)
+						for (JavaFileObject jfo : compiler.outputFiles())
+							postCompilerArgs.add(new File(jfo.toUri())
+									.getAbsolutePath());
+					else
+						postCompilerArgs.addAll(l);
+					Process proc = runtime.exec(postCompilerArgs
+							.toArray(new String[0]));
+
+					InputStreamReader error = new InputStreamReader(
+							proc.getErrorStream());
+
+					try {
+						char[] c = new char[72];
+						int len;
+						StringBuffer sb = new StringBuffer();
+						while ((len = error.read(c)) > 0) {
+							sb.append(String.valueOf(c, 0, len));
+						}
+
+						if (sb.length() != 0) {
+							eq.enqueue(ErrorInfo.POST_COMPILER_ERROR,
+									sb.toString());
+						}
+					} finally {
+						error.close();
+					}
+
+					proc.waitFor();
+
+				}
+				if (!options.keep_output_files) {
+					for (FileObject fo : compiler.outputFiles())
+						fo.delete();
 				}
 			} catch (Exception e) {
 				eq.enqueue(ErrorInfo.POST_COMPILER_ERROR, e.getMessage());

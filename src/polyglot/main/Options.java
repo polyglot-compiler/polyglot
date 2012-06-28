@@ -86,6 +86,7 @@ public class Options {
 	public JavaFileManager.Location classpath;
 	public JavaFileManager.Location output_classpath;
 	public JavaFileManager.Location bootclasspath;
+	public boolean outputToFS = false;
 	public boolean assertions = false;
 	public boolean generate_debugging_info = false;
 
@@ -95,9 +96,8 @@ public class Options {
 	public String output_ext = "java"; // java, by default
 	public boolean output_stdout = false; // whether to output to stdout
 	// compiler to run on java output file
-	public JavaCompiler post_compiler;
-	// arguments passed to post compiler
-	public String post_compiler_args;
+	// NOTE: null value of post_compiler sets JavaCompiler provided by ToolProvider as the default post compiler
+	public String post_compiler;
 
 	public int output_width = 80;
 	public boolean fully_qualified_names = false;
@@ -171,9 +171,6 @@ public class Options {
 			if (f.exists())
 				classpath_directories.add(f);
 		}
-
-		post_compiler = ToolProvider.getSystemJavaCompiler();
-		post_compiler_args = "";
 	}
 
 	/**
@@ -302,20 +299,7 @@ public class Options {
 			i++;
 		} else if (args[i].equals("-post")) {
 			i++;
-			ServiceLoader<JavaCompiler> loader = java.util.ServiceLoader.load(
-					JavaCompiler.class, extension.classLoader());
-			JavaCompiler javac = null;
-			for (JavaCompiler c : loader) {
-				if (c.getClass().getName().equals(args[i]))
-					javac = c;
-			}
-			if (javac == null)
-				throw new UsageError("Compiler " + args[i] + " not found.");
-			post_compiler = javac;
-			i++;
-		} else if (args[i].equals("-post_args")) {
-			i++;
-			post_compiler_args = args[i];
+			post_compiler = args[i];
 			i++;
 		} else if (args[i].equals("-stdout")) {
 			i++;
@@ -387,7 +371,10 @@ public class Options {
 		} else if (args[i].equals("-mergestrings")) {
 			merge_strings = true;
 			i++;
-		} else if (!args[i].startsWith("-")) {
+		} else if (args[i].equals("-output-to-fs")) {
+			outputToFS = true;
+			i++;
+		}else if (!args[i].startsWith("-")) {
 			source.add(args[i]);
 			File f = new File(args[i]).getAbsoluteFile().getParentFile();
 			if (f != null && !sourcepath_directories.contains(f)) {

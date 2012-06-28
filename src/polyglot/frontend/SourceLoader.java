@@ -94,4 +94,8 @@ public interface SourceLoader {
 	 *         otherwise null
 	 */
 	FileSource classSource(Location location, String className);
+	/**
+	 * @return true if the file system is case-insensitive, otherwise false.
+	 */
+	boolean caseInsensitive();
 }
