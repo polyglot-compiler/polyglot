@@ -2,11 +2,29 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-<title>Changes in Polyglot</title>
+<link rel="stylesheet" href="../overview.css" type="text/css">
+<title>Changes to Polyglot for Version 2.5</title>
 </head>
 <body>
+
+<h1>Changes to Polyglot for Version 2.5</h1>
+
+<p>
+The way Polyglot handles intermediate source files and generated class files has been changed in version 2.5.
+In previous versions, the back end of the compiler generated <tt>.java</tt> files that stored to the file system and then
+handed off to <tt>javac</tt>, unless the <tt>-post</tt> option was given to specify a different postcompiler. The new
+standard behavior is to generate Java source code internally, and use the Java compiler support in the <tt>javax.tools.compiler</tt>
+package to invoke the Java compiler within the same JVM as Polyglot itself. This change improves performance and lessens dependency
+on the file system. The original functionality is still available in version 2.5 via the <tt>-post</tt> option.
+</p>
+<p>
+The changes made to Polyglot are summarized below. Most Polyglot extensions should require few or no changes to work with version 2.5.
+If changes are required, the <a href="PortingGuide.html">Porting Guide</a> should be helpful.
+</p>
+
 	<h2>Design Changes</h2>
-	<ul>
+        <p>The following changes to the design are also summarized in the UML diagram below.</p>
+	<ul class="ulpara">
 		<li>SourceLoader is now an interface. Implementation of this
 			interface is now encapsulated in filemanager (ExtFileManager).</li>
 		<li>ClassFileLoader is now an interface. Implementation of this
@@ -36,6 +54,6 @@
 		calling addLocationsToFileManager method of ExtensionInfo interface.</p>
 	<br />
 	<h2>FileManager implementation and associated SourceObject</h2>
-	<img alt="UML Diagram" src="./doc/FileManager/PolyglotFileManager.png" />
+	<img alt="UML Diagram" src="PolyglotFileManager.png" />
 </body>
 </html>
