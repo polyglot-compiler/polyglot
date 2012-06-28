@@ -9,9 +9,9 @@ For a class extending polyglot.frontend.AbstractExtensionInfo, ParserlessJLExten
 4. extFileManager() - You might want to instantiate your own file manager implementation in this method.
 5. classFileLoader() - You might want to add more locations (for searching .class files) to ClassFileLoader.
 6. addLocationsToFileManager() - You might want to set locations other than standard ones (as in source_output, class_output, bootclasspath, classpath and sourcepath) to your file manager.
-7. initTypeSystem() / makeLoadedClassResolver() - Signature of SourceClassResolver constructor -> SourceClassResolver(Compiler compiler, ExtensionInfo ext, boolean allowRawClasses, boolean 							  compileCommandLineOnly, boolean ignoreModTimes) and LoadedClassResolver constructor -> LoadedClassResolver(ExtensionInfo extInfo, boolean allowRawClasses)
+7. initTypeSystem() / makeLoadedClassResolver() - Signature of SourceClassResolver constructor -> SourceClassResolver(Compiler compiler, ExtensionInfo ext, boolean allowRawClasses, boolean compileCommandLineOnly, boolean ignoreModTimes) and LoadedClassResolver constructor -> LoadedClassResolver(ExtensionInfo extInfo, boolean allowRawClasses)
 
-In a class polyglot.frontend.Compiler, variable outputFiles is now Collection of JavaFileObject (instead of Collection of raw types).
+In a class polyglot.frontend.Compiler, variable outputFiles is now Collection of JavaFileObject (instead of Collection of raw types). So you might want to change the way your extension collects the output files (.java files).
 
 For a class extending polyglot.frontend.TargetFactory, watch out for the followings:
 

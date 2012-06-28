@@ -10,8 +10,6 @@ Design changes in Polyglot
   interface.
 - Source and FileSource are now interfaces. Source_c implements FileSource.
 - Setting of post compiler classpath and full classpath has been deleted.
-- Main method is now calling call method of CompilationTask(which is 
-  obtained by calling getTask method on JavaCompiler) to compile .java files.
 
 Additions to Polyglot
 =====================

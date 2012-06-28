@@ -1,0 +1,41 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>Changes in Polyglot</title>
+</head>
+<body>
+	<h2>Design Changes</h2>
+	<ul>
+		<li>SourceLoader is now an interface. Implementation of this
+			interface is now encapsulated in filemanager (ExtFileManager).</li>
+		<li>ClassFileLoader is now an interface. Implementation of this
+			interface is now encapsulated in filemanager (ExtFileManager).</li>
+		<li>ClassPathLoader has been deleted.</li>
+		<li>ClassFile is an interface and ClassFile_c is an
+			implementation of that interface.</li>
+		<li>Source and FileSource are now interfaces. Source_c implements
+			FileSource.</li>
+		<li>Setting of post compiler classpath and full classpath has
+			been deleted.</li>
+	</ul>
+	<h2>Additions</h2>
+	<ul>
+		<li>ExtensionInfo interface has an additional method
+			classFileLoader which creates a loader that loads .class files from
+			multiple locations.</li>
+		<li>FileManager interface, extending StandardJavaFileManager,
+			SourceLoader and ClassFileLoader</li>
+		<li>ExtFileManager class, implementing FileManager interface</li>
+		<li>SourceObject class, extending SimpleJavaFileObject to provide
+			in-memory objects to hold translated Java code</li>
+		<li>StringBuilderWriter class, providing a writer that writes to
+			a StringBuilder</li>
+	</ul>
+	<p>NOTE: Locations in ExtFileManager are set in Main method by
+		calling addLocationsToFileManager method of ExtensionInfo interface.</p>
+	<br />
+	<h2>FileManager implementation and associated SourceObject</h2>
+	<img alt="UML Diagram" src="./doc/FileManager/PolyglotFileManager.png" />
+</body>
+</html>
