@@ -1092,6 +1092,9 @@ public class JL5TypeSystem_c extends ParamTypeSystem_c implements JL5TypeSystem 
     public LinkedList<Type> isImplicitCastValidChain(Type fromType, Type toType) {
         assert_(fromType);
         assert_(toType);
+        if (fromType == null || toType == null) {
+            throw new IllegalArgumentException("isImplicitCastValidChain: " + fromType + " " + toType);
+        }
 
         LinkedList<Type> chain = null; 
         if (fromType instanceof JL5ClassType) {
