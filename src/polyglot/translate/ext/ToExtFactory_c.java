@@ -2,10 +2,18 @@ package polyglot.translate.ext;
 
 import polyglot.ast.AbstractExtFactory_c;
 import polyglot.ast.Ext;
+import polyglot.ast.ExtFactory;
 
 public class ToExtFactory_c extends AbstractExtFactory_c {
+	
+    public ToExtFactory_c() {
+    	super();
+    }
 
-    
+    public ToExtFactory_c(ExtFactory nextExtFactory) {
+    	super(nextExtFactory);
+    }
+
     protected Ext extIdImpl() {
         return new IdToExt_c();
     }

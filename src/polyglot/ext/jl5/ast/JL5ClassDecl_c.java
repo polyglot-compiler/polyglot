@@ -58,6 +58,10 @@ public class JL5ClassDecl_c extends ClassDecl_c implements JL5ClassDecl {
         return this.paramTypes;
     }
 
+    @Override
+    public List<AnnotationElem> annotations() {
+        return this.annotations;
+    }
 
 
     @Override
@@ -90,19 +94,27 @@ public class JL5ClassDecl_c extends ClassDecl_c implements JL5ClassDecl {
         n.paramTypes = types;
         return n;
     }
+    
+    public JL5ClassDecl annotations(List<AnnotationElem> annotations) {
+        JL5ClassDecl_c n = (JL5ClassDecl_c) copy();
+        n.annotations = annotations;
+        return n;
+    }
 
     protected ClassDecl reconstruct(Id name, TypeNode superClass, List interfaces,
-                                    ClassBody body, List paramTypes) {
+                                    ClassBody body, List paramTypes, List annotations) {
         if (superClass != this.superClass
                 || !CollectionUtil.equals(interfaces, this.interfaces)
                 || body != this.body
-                || !CollectionUtil.equals(paramTypes, this.paramTypes)) {
+                || !CollectionUtil.equals(paramTypes, this.paramTypes)
+                || !CollectionUtil.equals(annotations, this.annotations)) {
             JL5ClassDecl_c n = (JL5ClassDecl_c) copy();
             n.superClass = superClass;
             n.interfaces = TypedList.copyAndCheck(interfaces, TypeNode.class,
                                                   false);
             n.body = body;
             n.paramTypes = paramTypes;
+            n.annotations = annotations;
             return n;
         }
         return this;
@@ -110,12 +122,13 @@ public class JL5ClassDecl_c extends ClassDecl_c implements JL5ClassDecl {
 
     @Override
     public Node visitChildren(NodeVisitor v) {
+    	List annotations = visitList(this.annotations, v);
         List paramTypes = visitList(this.paramTypes, v);
         Id name = (Id) visitChild(this.name, v);
         TypeNode superClass = (TypeNode) visitChild(this.superClass, v);
         List interfaces = visitList(this.interfaces, v);
         ClassBody body = (ClassBody) visitChild(this.body, v);
-        return reconstruct(name, superClass, interfaces, body, paramTypes);
+        return reconstruct(name, superClass, interfaces, body, paramTypes, annotations);
     }
 
     /*

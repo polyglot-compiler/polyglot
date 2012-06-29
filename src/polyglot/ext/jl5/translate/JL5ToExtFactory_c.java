@@ -1,16 +1,19 @@
-package polyglot.ext.jl5.ast;
+package polyglot.ext.jl5.translate;
 
-import polyglot.ast.*;
+import polyglot.ast.Ext;
+import polyglot.ext.jl5.ast.JL5AssignDel;
+import polyglot.ext.jl5.ast.JL5Del;
+import polyglot.ext.jl5.ast.JL5ExtFactory;
+import polyglot.translate.ext.ToExtFactory_c;
 
-public class JL5ExtFactory_c extends AbstractExtFactory_c implements
-		JL5ExtFactory {
+public class JL5ToExtFactory_c extends ToExtFactory_c implements JL5ExtFactory {
 
-	public JL5ExtFactory_c() {
+	public JL5ToExtFactory_c() {
 		super();
 	}
 
-	public JL5ExtFactory_c(JL5ExtFactory extFactory) {
-		super(extFactory);
+	public JL5ToExtFactory_c(JL5ExtFactory nextExtFactory) {
+		super(nextExtFactory);
 	}
 
 	@Override
@@ -128,26 +131,26 @@ public class JL5ExtFactory_c extends AbstractExtFactory_c implements
 		return postExtElementValuePair(e);
 	}
 
-	protected Ext extEnumDeclImpl() {
-		return this.extClassDeclImpl();
-	}
-
-	protected Ext extExtendedForImpl() {
-		return this.extLoopImpl();
-	}
-
-	protected Ext extEnumConstantDeclImpl() {
-		return this.extClassMemberImpl();
-	}
-
-	protected Ext extEnumConstantImpl() {
-		return this.extFieldImpl();
-	}
-
-	protected Ext extParamTypeNodeImpl() {
-		return this.extTypeNodeImpl();
-	}
-
+    protected Ext extEnumDeclImpl() {
+    	return new EnumDeclToExt_c();
+    }
+    
+    protected Ext extExtendedForImpl() {
+        return new ExtendedForToExt_c();
+    }
+    
+    protected Ext extEnumConstantDeclImpl() {
+        return new EnumConstantDeclToExt_c();
+    }
+    
+    protected Ext extEnumConstantImpl() {
+        return new EnumConstantToExt_c();
+    }
+    
+    protected Ext extParamTypeNodeImpl() {
+        return new ParamTypeNodeToExt_c();
+    }
+    
 	@Override
 	protected Ext extAssignImpl() {
 		return new JL5AssignDel();
@@ -178,44 +181,43 @@ public class JL5ExtFactory_c extends AbstractExtFactory_c implements
 		return this.postExtTypeNode(ext);
 	}
 
-	private Ext extAnnotationElemDeclImpl() {
+	protected Ext extAnnotationElemDeclImpl() {
 		return this.extClassMemberImpl();
 	}
 
-	private Ext extNormalAnnotationElemImpl() {
+	protected Ext extNormalAnnotationElemImpl() {
 		return this.extExprImpl();
 	}
 
-	private Ext extMarkerAnnotationElemImpl() {
+	protected Ext extMarkerAnnotationElemImpl() {
 		return this.extNormalAnnotationElemImpl();
 	}
 
-	private Ext extSingleElementAnnotationElemImpl() {
+	protected Ext extSingleElementAnnotationElemImpl() {
 		return this.extNormalAnnotationElemImpl();
 	}
 
-	private Ext extElementValuePairImpl() {
+	protected Ext extElementValuePairImpl() {
 		return this.extExprImpl();
 	}
 
-	private Ext postExtAnnotationElemDecl(Ext ext) {
+	protected Ext postExtAnnotationElemDecl(Ext ext) {
 		return ext;
 	}
 
-	private Ext postExtNormalAnnotationElem(Ext ext) {
+	protected Ext postExtNormalAnnotationElem(Ext ext) {
 		return ext;
 	}
 
-	private Ext postExtMarkerAnnotationElem(Ext ext) {
+	protected Ext postExtMarkerAnnotationElem(Ext ext) {
 		return ext;
 	}
 
-	private Ext postExtSingleElementAnnotationElem(Ext ext) {
+	protected Ext postExtSingleElementAnnotationElem(Ext ext) {
 		return ext;
 	}
 
-	private Ext postExtElementValuePair(Ext ext) {
+	protected Ext postExtElementValuePair(Ext ext) {
 		return ext;
 	}
-
 }

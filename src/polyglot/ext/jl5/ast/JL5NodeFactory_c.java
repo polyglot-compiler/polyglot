@@ -1,5 +1,6 @@
 package polyglot.ext.jl5.ast;
 
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -17,27 +18,18 @@ import polyglot.util.TypedList;
  * NodeFactory for jl5 extension.
  */
 public class JL5NodeFactory_c extends NodeFactory_c implements JL5NodeFactory {
-    // TODO:  Implement factory methods for new AST nodes.
-    QQ qq;
-    public JL5NodeFactory_c(QQ qq) {
-        super(new JL5ExtFactory_c() { }, new JL5DelFactory_c());
-        this.qq = qq;
+    public JL5NodeFactory_c() {
+        super(new JL5ExtFactory_c(), new JL5DelFactory_c());
     }
 
-    public JL5NodeFactory_c(QQ qq, JL5ExtFactory extFactory) {
+    public JL5NodeFactory_c(JL5ExtFactory extFactory) {
         super(extFactory, new JL5DelFactory_c()); 
-        this.qq = qq;
     }
 
-    public JL5NodeFactory_c(QQ qq, JL5ExtFactory extFactory, JL5DelFactory delFactory) {
-        super(extFactory, new JL5DelFactory_c(delFactory)); 
-        this.qq = qq;
+    public JL5NodeFactory_c(JL5ExtFactory extFactory, JL5DelFactory delFactory) {
+        super(extFactory, delFactory); 
     }
-
-    public QQ qq() {
-        return qq;
-    }
-
+    
     @Override
     public JL5ExtFactory extFactory() {
         return (JL5ExtFactory)super.extFactory();
@@ -111,10 +103,16 @@ public class JL5NodeFactory_c extends NodeFactory_c implements JL5NodeFactory {
         return n;
     }
 
-
-    
     
     @Override
+	public ClassDecl ClassDecl(Position pos, Flags flags, Id name,
+			TypeNode superClass, List interfaces, ClassBody body) {
+		return ClassDecl(pos, flags, Collections.<AnnotationElem> emptyList(),
+				name, superClass, interfaces, body,
+				Collections.<ParamTypeNode> emptyList());
+	}
+
+	@Override
     public JL5ClassDecl ClassDecl(Position pos, Flags flags, List<AnnotationElem> annotations, Id name, TypeNode superType,  List interfaces, ClassBody body, List paramTypes ){
         JL5ClassDecl n = new JL5ClassDecl_c(pos, flags, annotations, name, superType, interfaces, body, paramTypes);
         n = (JL5ClassDecl)n.ext(extFactory().extClassDecl());

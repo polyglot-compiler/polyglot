@@ -34,6 +34,7 @@ import polyglot.ast.NodeFactory;
 import polyglot.frontend.goals.Goal;
 import polyglot.main.Options;
 import polyglot.main.Version;
+import polyglot.translate.JLOutputExtensionInfo;
 import polyglot.translate.ext.ToExt;
 import polyglot.translate.ext.ToExt_c;
 import polyglot.types.TypeSystem;
@@ -83,9 +84,13 @@ public abstract class AbstractExtensionInfo implements ExtensionInfo {
 
     public void initCompiler(Compiler compiler) {
         this.compiler = compiler;
-
+        
         // Register the extension with the compiler.
         compiler.addExtension(this);
+        
+        // Initialize the output extension if there is one
+        if (this.outputExtensionInfo() != null)
+        	this.outputExtensionInfo().initCompiler(compiler);
 
         // Create the type system and node factory.
         typeSystem();
@@ -209,4 +214,9 @@ public abstract class AbstractExtensionInfo implements ExtensionInfo {
     	return ToExt_c.ext(n);
     }
     
+	@Override
+	public ExtensionInfo outputExtensionInfo() {
+		return null;
+	}
+	
 }

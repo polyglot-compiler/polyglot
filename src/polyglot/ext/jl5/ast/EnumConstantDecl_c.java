@@ -1,17 +1,40 @@
 package polyglot.ext.jl5.ast;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 
-import polyglot.ast.*;
+import polyglot.ast.ClassBody;
+import polyglot.ast.Expr;
+import polyglot.ast.Id;
+import polyglot.ast.Node;
+import polyglot.ast.Term;
+import polyglot.ast.Term_c;
 import polyglot.ext.jl5.types.EnumInstance;
 import polyglot.ext.jl5.types.JL5ParsedClassType;
 import polyglot.ext.jl5.types.JL5TypeSystem;
-import polyglot.types.*;
+import polyglot.types.ConstructorInstance;
+import polyglot.types.Context;
+import polyglot.types.Flags;
+import polyglot.types.MemberInstance;
+import polyglot.types.ParsedClassType;
+import polyglot.types.SemanticException;
 import polyglot.util.CodeWriter;
 import polyglot.util.CollectionUtil;
 import polyglot.util.Position;
 import polyglot.util.TypedList;
-import polyglot.visit.*;
+import polyglot.visit.AmbiguityRemover;
+import polyglot.visit.BodyDisambiguator;
+import polyglot.visit.CFGBuilder;
+import polyglot.visit.NodeVisitor;
+import polyglot.visit.PrettyPrinter;
+import polyglot.visit.PruningVisitor;
+import polyglot.visit.SignatureDisambiguator;
+import polyglot.visit.SupertypeDisambiguator;
+import polyglot.visit.TypeBuilder;
+import polyglot.visit.TypeChecker;
 
 public class EnumConstantDecl_c extends Term_c implements EnumConstantDecl
 {   
@@ -23,10 +46,10 @@ public class EnumConstantDecl_c extends Term_c implements EnumConstantDecl
     protected ConstructorInstance constructorInstance;
     protected ParsedClassType type;
     protected long ordinal;
-    protected List<AnnotationElem> annotations;
+    protected List annotations;
 
     
-    public EnumConstantDecl_c(Position pos, Flags flags, List<AnnotationElem> annotations, Id name, List args, ClassBody body){
+    public EnumConstantDecl_c(Position pos, Flags flags, List annotations, Id name, List args, ClassBody body){
         super(pos);
         this.name = name;
         this.args = args;
@@ -45,6 +68,17 @@ public class EnumConstantDecl_c extends Term_c implements EnumConstantDecl
         return n;
 	}
 	
+    @Override
+    public List annotations() {
+        return this.annotations;
+    }
+
+    public EnumConstantDecl annotations(List annotations) {
+    	EnumConstantDecl_c n = (EnumConstantDecl_c) copy();
+        n.annotations = annotations;
+        return n;
+    }
+
     public MemberInstance memberInstance() {
         return enumInstance;
     }

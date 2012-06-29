@@ -128,4 +128,10 @@ public interface ExtensionInfo {
 
 	ToExt getToExt(ExtensionInfo to_ext, Node n);
 
+	/**
+	 * Produce an extension info object for the output language this extension
+	 * translates to.
+	 */
+	ExtensionInfo outputExtensionInfo();
+
 }
