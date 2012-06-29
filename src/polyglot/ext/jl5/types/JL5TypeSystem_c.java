@@ -850,17 +850,23 @@ public class JL5TypeSystem_c extends ParamTypeSystem_c implements JL5TypeSystem 
 
     @Override
     public Type erasureType(Type t) {
+        return this.erasureType(t, new HashSet<TypeVariable>());
+    }
+    protected Type erasureType(Type t, Set<TypeVariable> visitedTypeVariables) {
+
         if (t.isArray()) {
             ArrayType at = t.toArray();
-            return at.base(this.erasureType(at.base()));
+            return at.base(this.erasureType(at.base(), visitedTypeVariables));
         }
         if (t instanceof TypeVariable) {
             TypeVariable tv = (TypeVariable) t;
-            // XXX: this is an error that should have 
-            // been prevented by this point.
-            if (tv == tv.upperBound())
-            	throw new InternalCompilerError("Type variable cannot be its own upper bound.");
-            return this.erasureType((Type) tv.upperBound());
+            if (visitedTypeVariables.add(tv)) {
+                // tv was already in visitedTypeVariables
+                // whoops, we're in some kind of recursive type
+                return this.Object();
+            }
+            
+            return this.erasureType((Type) tv.upperBound(), visitedTypeVariables);
         }
         if (t instanceof IntersectionType) {
             IntersectionType it = (IntersectionType) t;
@@ -889,9 +895,9 @@ public class JL5TypeSystem_c extends ParamTypeSystem_c implements JL5TypeSystem 
             	}
             }
             // Return the most-specific class, if there is one
-            if (ct != null) return erasureType(ct);
+            if (ct != null) return erasureType(ct, visitedTypeVariables);
             // Otherwise if the interfaces are all subtypes, return iface 
-            if (subtypes && iface != null) return erasureType(iface);
+            if (subtypes && iface != null) return erasureType(iface, visitedTypeVariables);
             return Object();
             
         }
@@ -900,11 +906,11 @@ public class JL5TypeSystem_c extends ParamTypeSystem_c implements JL5TypeSystem 
             if(tv.upperBound() == null) {
                 return this.Object();
             }
-            return this.erasureType(tv.upperBound());
+            return this.erasureType(tv.upperBound(), visitedTypeVariables);
         }
         if (t instanceof JL5SubstType) {
             JL5SubstType jst = (JL5SubstType)t;            
-            return this.erasureType(jst.base());
+            return this.erasureType(jst.base(), visitedTypeVariables);
         }
         if (t instanceof JL5ParsedClassType) {
             return this.toRawType(t);
