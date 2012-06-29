@@ -39,12 +39,14 @@ public class JL5ConstructorDecl_c extends ConstructorDecl_c implements JL5Constr
         return n;
     }
 
-    protected JL5ConstructorDecl_c reconstruct(List formals, List throwTypes, Block body, List typeParams){
+    protected JL5ConstructorDecl_c reconstruct(Id name, List formals, List throwTypes, Block body, List typeParams){
         if (!CollectionUtil.equals(formals, this.formals)
+        		|| name != this.name
                 || !CollectionUtil.equals(throwTypes, this.throwTypes)
                 || body != this.body
                 || !CollectionUtil.equals(typeParams, this.typeParams)) {
             JL5ConstructorDecl_c n = (JL5ConstructorDecl_c) copy();
+    	    n.name = name;
             n.formals = TypedList.copyAndCheck(formals, Formal.class, true);
             n.throwTypes = TypedList.copyAndCheck(throwTypes, TypeNode.class, true);
             n.body = body;
@@ -58,10 +60,11 @@ public class JL5ConstructorDecl_c extends ConstructorDecl_c implements JL5Constr
     @Override
     public Node visitChildren(NodeVisitor v){
         List typeParams = visitList(this.typeParams, v);
+        Id name = (Id) visitChild(this.name, v);
         List formals = visitList(this.formals, v);
         List throwTypes = visitList(this.throwTypes, v);
         Block body = (Block) visitChild(this.body, v);
-        return reconstruct(formals, throwTypes, body, typeParams);
+        return reconstruct(name, formals, throwTypes, body, typeParams);
     }
 
     public Node buildTypes(TypeBuilder tb) throws SemanticException {

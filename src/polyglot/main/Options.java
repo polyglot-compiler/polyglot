@@ -114,8 +114,9 @@ public class Options {
     }
 
     /**
-     * Set values using another options object
-     */
+	 * Set values using another options object. This helps extensions configure
+	 * an output extension.
+	 */
     public void setValuesFrom(Options opt) {
         this.error_count = opt.error_count;
         this.source_path = opt.source_path;
