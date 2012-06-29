@@ -248,7 +248,7 @@ public class RemoveEnums extends ContextVisitor {
         // public static T valueOf(String s) { return (T)Enum.valueOf(T.class, s); }
         Position pos = Position.compilerGenerated();
         Local arg = nf.Local(pos, nf.Id(pos, "s"));
-        Field clazz = nf.Field(pos, nf.CanonicalTypeNode(pos, enumDeclType), nf.Id(pos, "class"));
+        ClassLit clazz = nf.ClassLit(pos, nf.CanonicalTypeNode(pos, enumDeclType));
 
         LocalInstance argLI = ts.localInstance(pos, Flags.NONE, ts.String(), arg.name());
         arg = arg.localInstance(argLI);

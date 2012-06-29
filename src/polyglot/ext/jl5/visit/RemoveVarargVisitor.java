@@ -73,8 +73,8 @@ public class RemoveVarargVisitor extends ErrorHandlingVisitor {
 			ArrayInit initValues = nf.ArrayInit(Position.compilerGenerated(), n.arguments().subList(numStandardFormals, numArgs));
 			initValues = (ArrayInit) initValues.type(varArgArrayType);
 			NewArray varArgArray = nf.NewArray(Position.compilerGenerated(), 
-											   nf.CanonicalTypeNode(Position.compilerGenerated(), varArgArrayType),
-											   0, initValues);
+											   nf.CanonicalTypeNode(Position.compilerGenerated(), varArgArrayType.base()),
+											   1, initValues);
 			varArgArray = (NewArray) varArgArray.type(varArgArrayType);
 			standardArgs.add(varArgArray);
 			n = n.arguments(standardArgs);

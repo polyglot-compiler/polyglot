@@ -856,6 +856,10 @@ public class JL5TypeSystem_c extends ParamTypeSystem_c implements JL5TypeSystem 
         }
         if (t instanceof TypeVariable) {
             TypeVariable tv = (TypeVariable) t;
+            // XXX: this is an error that should have 
+            // been prevented by this point.
+            if (tv == tv.upperBound())
+            	throw new InternalCompilerError("Type variable cannot be its own upper bound.");
             return this.erasureType((Type) tv.upperBound());
         }
         if (t instanceof IntersectionType) {
