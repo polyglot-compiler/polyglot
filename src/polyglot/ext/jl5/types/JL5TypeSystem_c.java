@@ -2,10 +2,7 @@ package polyglot.ext.jl5.types;
 
 import java.util.*;
 
-import polyglot.ast.ArrayInit;
-import polyglot.ast.ClassLit;
-import polyglot.ast.Expr;
-import polyglot.ast.NullLit;
+import polyglot.ast.*;
 import polyglot.ext.jl5.types.inference.InferenceSolver;
 import polyglot.ext.jl5.types.inference.InferenceSolver_c;
 import polyglot.ext.jl5.types.inference.LubType;
@@ -1851,17 +1848,33 @@ public class JL5TypeSystem_c extends ParamTypeSystem_c implements JL5TypeSystem 
             // check elements
             for (Iterator it = ((ArrayInit) value).elements().iterator(); it.hasNext();) {
                 Expr next = (Expr) it.next();
-                if ((!next.isConstant() || next == null || next instanceof NullLit)
-                        && !(next instanceof ClassLit)) {
-                    throw new SemanticException("Annotation attribute value must be constant", value.position());
+                if (!isAnnotationValueConstant(next)) {
+                    throw new SemanticException("Annotation attribute value must be constant", next.position());
                 }
             }
         }
-        else if ((!value.isConstant() || value == null || value instanceof NullLit)
-                && !(value instanceof ClassLit)) {
-            // for purposes of annotation elems class lits are constants
-            throw new SemanticException("Annotation attribute value must be constant", value.position());
+        else if (!isAnnotationValueConstant(value)) {
+            throw new SemanticException("Annotation attribute value must be constant: " + value.constantValueSet() + " " + value.getClass(), value.position());
         }
+    }
+    
+    protected boolean isAnnotationValueConstant(Expr value) {
+        if (value == null  || value instanceof NullLit || value instanceof ClassLit) {
+            // for purposes of annotation elems class lits are constants
+            // we're ok, try the next one.
+            return true;
+        }
+        if (value.constantValueSet() && value.isConstant()) {
+            // value is a constant
+            return true;
+        }
+        if (!value.constantValueSet()) {
+            // the constant value hasn't been set yet...
+            return true; // TODO: should this throw a missing dependency exception?
+        }
+
+        return false;
+        
     }
 
     @Override
