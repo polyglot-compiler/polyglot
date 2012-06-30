@@ -15,6 +15,10 @@ public class EnumConstant_c extends Field_c implements EnumConstant{
     }
     
     @Override
+    public boolean constantValueSet() {
+        return true;
+    }
+    @Override
 	public boolean isConstant(){
         return true;
     }
