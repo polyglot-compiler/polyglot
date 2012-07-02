@@ -17,7 +17,6 @@ public class JL5Options extends Options {
         super(extension);
     }
     
-    @Override
     public void setDefaultValues() {
         super.setDefaultValues();
         this.enumImplClass = null;
@@ -26,7 +25,6 @@ public class JL5Options extends Options {
         this.morePermissiveInference = false;
     }
     
-    @Override
     public void setValuesFrom(Options opt) {
         super.setValuesFrom(opt);
         if (opt instanceof JL5Options) {
@@ -37,7 +35,6 @@ public class JL5Options extends Options {
         }
     }
 
-	@Override
     protected int parseCommand(String args[], int index, Set source) throws UsageError, Main.TerminationException {
         if (args[index].equals("-enumImplClass") || args[index].equals("--enumImplClass")) {
             index++;
@@ -60,7 +57,6 @@ public class JL5Options extends Options {
         return super.parseCommand(args, index, source);
     }
     
-    @Override
     public void usage(PrintStream out) {
         super.usage(out);
         usageForFlag(out, "-removeJava5isms", "Translate Java 5 language features to Java 1.4 features");
