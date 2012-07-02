@@ -24,7 +24,6 @@ public class JLOutputExtensionInfo extends JLExtensionInfo {
 		return new JLOutputScheduler(this);
 	}
 
-	@Override
 	protected Options createOptions() {
 		return parent.getOptions();
 	}

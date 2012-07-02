@@ -214,7 +214,6 @@ public abstract class AbstractExtensionInfo implements ExtensionInfo {
     	return ToExt_c.ext(n);
     }
     
-	@Override
 	public ExtensionInfo outputExtensionInfo() {
 		return null;
 	}
