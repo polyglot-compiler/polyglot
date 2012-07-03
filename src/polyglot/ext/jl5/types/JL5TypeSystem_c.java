@@ -857,7 +857,7 @@ public class JL5TypeSystem_c extends ParamTypeSystem_c implements JL5TypeSystem 
         }
         if (t instanceof TypeVariable) {
             TypeVariable tv = (TypeVariable) t;
-            if (visitedTypeVariables.add(tv)) {
+            if (!visitedTypeVariables.add(tv)) {
                 // tv was already in visitedTypeVariables
                 // whoops, we're in some kind of recursive type
                 return this.Object();
