@@ -6,7 +6,7 @@ import polyglot.translate.ext.ClassDeclToExt_c;
 import polyglot.types.SemanticException;
 import polyglot.visit.NodeVisitor;
 
-public class JL5ClassDeclToExt_c extends ClassDeclToExt_c {
+public class JL5ClassDeclToJL_c extends ClassDeclToExt_c {
 
 	@Override
 	public NodeVisitor toExtEnter(ExtensionRewriter rw)
