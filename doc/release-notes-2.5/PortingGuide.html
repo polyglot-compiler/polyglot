@@ -6,111 +6,128 @@
 <title>Porting Guide</title>
 </head>
 <body>
-    <h2>Welcome to Polyglot 2.5</h2>
-    <p>
-      Some Polyglot extensions may need minor changes to work with the new version of Polyglot. This
-      document is intended to help developers fix their extensions accordingly.
-    </p>
-    <h3>File manager</h3>
-    <p>
-        The new Polyglot uses a file manager as a source and class file
-        loader. For the extensions built on the old Polyglot (directly or
-        indirectly) to be compatible with this new version, developers should
-        look at the <a href="PolyglotChanges.html">design
-        changes</a> made in Polyglot and consider the following issues:
-    </p>
-    <ul>
-        <li>For a class extending
-            <tt>polyglot.frontend.AbstractExtensionInfo</tt>, ParserlessJLExtensionInfo or
-                JLExtensionInfo, watch out for the following methods. If the extension overrides
-                any of these methods, they will need to be changed to use a different type
-                signature.
-            <ol>
-                <li>targetFactory() - Signature of TargetFactory constructor &rarr;
-                    TargetFactory(FileManager fileManager, Location outputLocation,
-                    String outExt, boolean so)</li>
-                <li>createClassFile() - Signature of the method &rarr;
-                    createClassFile(FileObject f, byte[] code)</li>
-                <li>createFileSource() - Signature of the method &rarr;
-                    createFileSource(FileObject f, boolean user)</li>
-                <li>extFileManager() - You might want to instantiate your own
-                    file manager implementation in this method.</li>
-                <li>classFileLoader() - You might want to add more locations
-                    (for searching .class files) to ClassFileLoader.</li>
-                <li>addLocationsToFileManager() - You might want to set
-                    locations other than standard ones (as in source_output,
-                    class_output, bootclasspath, classpath and sourcepath) to your file
-                    manager.</li>
-                <li>initTypeSystem() / makeLoadedClassResolver() - Signature of
-                    SourceClassResolver constructor &rarr; SourceClassResolver(Compiler
-                    compiler, ExtensionInfo ext, boolean allowRawClasses, boolean
-                    compileCommandLineOnly, boolean ignoreModTimes) and
-                    LoadedClassResolver constructor &rarr;
-                    LoadedClassResolver(ExtensionInfo extInfo, boolean allowRawClasses)</li>
-            </ol>
-        </li>
-        <li>In a class polyglot.frontend.Compiler, variable outputFiles
-            is now Collection of JavaFileObject (instead of Collection of raw
-            types). So you might want to change the way your extension collects
-            the output files (.java files).</li>
-        <li>For a class extending <tt>polyglot.frontend.TargetFactory</tt>, watch
-            out for the following methods:
-            <ol>
-                <li>The constructor signature as mentioned above</li>
-                <li>Method outputWriter(String packageName, String className,
-                    Source source) throws IOException is deleted.</li>
-                <li>outputCodeWriter() - Signature of the method &rarr;
-                    outputCodeWriter(FileObject f, int width) throws IOException</li>
-                <li>Methods File outputFile(String packageName, Source source)
-                    and File outputFile(String packageName, String className, Source
-                    source) are replaced by JavaFileObject outputFileObject(String
-                    packageName, Source source) and JavaFileObject
-                    outputFileObject(String packageName, String className, Source
-                    source) respectively.</li>
-            </ol>
-        </li>
-        <li>For a class extending polyglot.frontend.goals.Serialized,
-            watch out for the following methods:
-            <ol>
-                <li>createSerializer() - Signature of the method &rarr;
-                    createSerializer(TypeSystem ts, NodeFactory nf, long lastModified,
-                    ErrorQueue eq, Version version)<br /> (NOTE: Wherever applicable,
-                    use getLastModified method of "source" type to have "long" type
-                    instead of "Date" type)
-                </li>
-            </ol>
-        </li>
-        <li>For a class extending polyglot.main.Main, watch out for the
-            following:
-            <ol>
-                <li>If you override start(String[] argv, ExtensionInfo ext,
-                    ErrorQueue eq) throws TerminationException, call
-                    addLocationsToFileManager() method of ExtensionInfo immediately
-                    after parsing commandline options.</li>
-            </ol>
-        </li>
-        <li>For a class extending polyglot.types.LoadedClassResolver or
-            SourceClassResolver, watch out for the followings:
-            <ol>
-                <li>Signature of LoadedClassResolver constructor as mentioned
-                    above</li>
-                <li>Signature of SourceClassResolver constructor as mentioned
-                    above</li>
-            </ol>
-        </li>
-        <li>For a class extending polyglot.visit.ClassSerializer, watch
-            out for the following:
-            <ol>
-                <li>Signature of ClassSerializer constructor &rarr;
-                    ClassSerializer(TypeSystem ts, NodeFactory nf, long time,
-                    ErrorQueue eq, Version ver)</li>
-            </ol>
-        </li>
-    </ul>
-    <p><b>General instructions:</b> In any extension, any source file rewriter
-        that needs an object to hold the translated Java code must call
-        the <tt>getJavaFileForOutput()</tt> method on the <tt>FileManager</tt> of the <tt>OutputExtensionInfo</tt>
-        instead of creating a <tt>Source</tt> object.</p>
+	<h2>Welcome to Polyglot 2.5</h2>
+	<p>Some Polyglot extensions may need minor changes to work with the
+		new version of Polyglot. This document is intended to help developers
+		fix their extensions accordingly.</p>
+	<h3>File manager</h3>
+	<p>
+		The new Polyglot uses a file manager as a source and class file
+		loader. For the extensions built on the old Polyglot (directly or
+		indirectly) to be compatible with this new version, developers should
+		look at the <a href="PolyglotChanges.html">design changes</a> made in
+		Polyglot and consider the following issues:
+	</p>
+	<ul>
+		<li>For a class extending <tt>polyglot.frontend.AbstractExtensionInfo</tt>,
+			<tt>ParserlessJLExtensionInfo</tt> or <tt>JLExtensionInfo</tt>, watch
+			out for the following methods. If the extension overrides any of
+			these methods, they will need to be changed to use a different type
+			signature.
+			<ol>
+				<li><tt>targetFactory()</tt> - Signature of TargetFactory
+					constructor &rarr; <tt>TargetFactory(FileManager fileManager,
+						Location outputLocation, String outExt, boolean so)</tt></li>
+				<li><tt>createClassFile()</tt> - Signature of the method &rarr;
+					<tt>createClassFile(FileObject f, byte[] code)</tt></li>
+				<li><tt>createFileSource()</tt> - Signature of the method
+					&rarr; <tt>createFileSource(FileObject f, boolean user)</tt></li>
+				<li><tt>extFileManager()</tt> - You might want to instantiate
+					your own file manager implementation in this method.</li>
+				<li><tt>classFileLoader()</tt> - You might want to add more
+					locations (for searching <tt>.class</tt> files) to <tt>ClassFileLoader</tt>.</li>
+				<li><tt>addLocationsToFileManager()</tt> - You might want to
+					set locations other than standard ones (as in source_output,
+					class_output, bootclasspath, classpath and sourcepath) to your file
+					manager.</li>
+				<li><tt>initTypeSystem()</tt> / <tt>makeLoadedClassResolver()</tt>
+					- Signature of SourceClassResolver constructor &rarr; <tt>SourceClassResolver(Compiler
+						compiler, ExtensionInfo ext, boolean allowRawClasses, boolean
+						compileCommandLineOnly, boolean ignoreModTimes)</tt> and
+					LoadedClassResolver constructor &rarr; <tt>LoadedClassResolver(ExtensionInfo
+						extInfo, boolean allowRawClasses)</tt></li>
+			</ol>
+		</li>
+		<li>In a class <tt>polyglot.frontend.Compiler</tt>, the reference
+			variable <tt>outputFiles</tt> is now <tt>Collection&lt;JavaFileObject&gt;</tt>
+			(instead of Collection of raw types). So you might want to change the
+			way your extension collects the output files (<tt>.java</tt> files).
+		</li>
+		<li>For a class extending <tt>polyglot.frontend.TargetFactory</tt>,
+			watch out for the following:
+			<ol>
+				<li>The constructor signature as mentioned above</li>
+				<li>Method <tt>outputWriter(String packageName, String
+						className, Source source) throws IOException</tt> is deleted.
+				</li>
+				<li><tt>outputCodeWriter()</tt> - Signature of the method
+					&rarr; <tt>outputCodeWriter(FileObject f, int width) throws
+						IOException</tt></li>
+				<li>Methods <tt>File outputFile(String packageName, Source
+						source)</tt> and <tt>File outputFile(String packageName, String
+						className, Source source)</tt> are replaced by <tt>JavaFileObject
+						outputFileObject(String packageName, Source source)</tt> and <tt>JavaFileObject
+						outputFileObject(String packageName, String className, Source
+						source)</tt> respectively.
+				</li>
+			</ol>
+		</li>
+		<li>For a class extending <tt>polyglot.frontend.goals.Serialized</tt>,
+			watch out for the following:
+			<ol>
+				<li><tt>createSerializer()</tt> - Signature of the method
+					&rarr; <tt>createSerializer(TypeSystem ts, NodeFactory nf,
+						long lastModified, ErrorQueue eq, Version version)</tt><br /> (NOTE:
+					Wherever applicable, use <tt>getLastModified()</tt> method of <tt>Source</tt>
+					type to have <tt>long</tt> instead of <tt>Date</tt>)</li>
+			</ol>
+		</li>
+		<li>For a class extending <tt>polyglot.main.Main</tt>, watch out
+			for the following:
+			<ol>
+				<li>If you override <tt>start(String[] argv, ExtensionInfo
+						ext, ErrorQueue eq) throws TerminationException</tt>, call <tt>addLocationsToFileManager()</tt>
+					method of <tt>polyglot.frontend.ExtensionInfo</tt> immediately
+					after parsing command-line options.
+				</li>
+			</ol>
+		</li>
+		<li>For a class extending <tt>polyglot.types.LoadedClassResolver</tt>
+			or <tt>SourceClassResolver</tt>, watch out for the following:
+			<ol>
+				<li>Signature of LoadedClassResolver constructor as mentioned
+					above</li>
+				<li>Signature of SourceClassResolver constructor as mentioned
+					above</li>
+			</ol>
+		</li>
+		<li>For a class extending <tt>polyglot.visit.ClassSerializer</tt>,
+			watch out for the following:
+			<ol>
+				<li>Signature of ClassSerializer constructor &rarr; <tt>ClassSerializer(TypeSystem
+						ts, NodeFactory nf, long time, ErrorQueue eq, Version ver)</tt></li>
+			</ol>
+		</li>
+	</ul>
+	<p>
+		<b>General instructions:</b> In any extension, any source file
+		rewriter that needs an object to hold the translated Java code must
+		call the
+		<tt>getJavaFileForOutput()</tt>
+		method on the
+		<tt>FileManager</tt>
+		instance of the
+		<tt>OutputExtensionInfo</tt>
+		to have a
+		<tt>javax.tools.JavaFileObject</tt>
+		object and use this object to create a
+		<tt>polyglot.frontend.Source</tt>
+		object by calling the
+		<tt>createFileSource()</tt>
+		method of the
+		<tt>OutputExtensionInfo</tt>
+		.
+	</p>
 </body>
 </html>
 <!-- vim: ts=4

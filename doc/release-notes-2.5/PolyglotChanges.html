@@ -7,51 +7,92 @@
 </head>
 <body>
 
-<h1>Changes to Polyglot for Version 2.5</h1>
+	<h1>Changes to Polyglot for Version 2.5</h1>
 
-<p>
-The way Polyglot handles intermediate source files and generated class files has been changed in version 2.5.
-In previous versions, the back end of the compiler generated <tt>.java</tt> files that stored to the file system and then
-handed off to <tt>javac</tt>, unless the <tt>-post</tt> option was given to specify a different postcompiler. The new
-standard behavior is to generate Java source code internally, and use the Java compiler support in the <tt>javax.tools.compiler</tt>
-package to invoke the Java compiler within the same JVM as Polyglot itself. This change improves performance and lessens dependency
-on the file system. The original functionality is still available in version 2.5 via the <tt>-post</tt> option.
-</p>
-<p>
-The changes made to Polyglot are summarized below. Most Polyglot extensions should require few or no changes to work with version 2.5.
-If changes are required, the <a href="PortingGuide.html">Porting Guide</a> should be helpful.
-</p>
+	<p>
+		The way Polyglot handles intermediate source files and generated class
+		files has been changed in version 2.5. In previous versions, the back
+		end of the compiler was generating
+		<tt>.java</tt>
+		files which were stored to the file system and then handed off to
+		<tt>javac</tt>
+		, unless the
+		<tt>-post</tt>
+		option was given to specify a different post-compiler. The new
+		standard behavior is to generate Java source code internally, and use
+		the Java compiler support provided in the
+		<tt>
+			<a
+				href="http://docs.oracle.com/javase/6/docs/api/javax/tools/package-summary.html">javax.tools</a>
+		</tt>
+		package to invoke
+		<tt>javac</tt>
+		within the same JVM as Polyglot itself. This change improves
+		performance and lessens dependency on the file system. The original
+		functionality is still available in version 2.5 via the
+		<tt>-post</tt>
+		option.
+	</p>
+	<p>
+		The changes made to Polyglot are summarized below. Most Polyglot
+		extensions should require few or no changes to work with version 2.5.
+		If changes are required, the <a href="PortingGuide.html">Porting
+			Guide</a> should be helpful.
+	</p>
 
 	<h2>Design Changes</h2>
-        <p>The following changes to the design are also summarized in the UML diagram below.</p>
+	<p>The following changes to the design are also summarized in the
+		UML diagram below.</p>
 	<ul class="ulpara">
-		<li>SourceLoader is now an interface. Implementation of this
-			interface is now encapsulated in filemanager (ExtFileManager).</li>
-		<li>ClassFileLoader is now an interface. Implementation of this
-			interface is now encapsulated in filemanager (ExtFileManager).</li>
-		<li>ClassPathLoader has been deleted.</li>
-		<li>ClassFile is an interface and ClassFile_c is an
-			implementation of that interface.</li>
-		<li>Source and FileSource are now interfaces. Source_c implements
-			FileSource.</li>
-		<li>Setting of post compiler classpath and full classpath has
+		<li><tt>polyglot.frontend.SourceLoader</tt> is now an interface.
+			Implementation of this interface is now provided in <tt>polyglot.filemanager.ExtFileManager</tt>.</li>
+		<li><tt>polyglot.types.reflect.ClassFileLoader</tt> is now an
+			interface. Implementation of this interface is now provided in <tt>polyglot.filemanager.ExtFileManager</tt>.</li>
+		<li><tt>polyglot.types.reflect.ClassPathLoader</tt> has been
+			deleted.</li>
+		<li><tt>polyglot.types.reflect.ClassFile</tt> is an interface and
+			<tt>polyglot.types.reflect.ClassFile_c</tt> is an implementation of
+			that interface.</li>
+		<li><tt>polyglot.frontend.Source</tt> and <tt>FileSource</tt> are
+			now interfaces. <tt>polyglot.frontend.Source_c</tt> implements <tt>FileSource</tt>.</li>
+		<li>Setting of post-compiler classpath and full classpath has
 			been deleted.</li>
 	</ul>
 	<h2>Additions</h2>
 	<ul>
-		<li>ExtensionInfo interface has an additional method
-			classFileLoader which creates a loader that loads .class files from
-			multiple locations.</li>
-		<li>FileManager interface, extending StandardJavaFileManager,
-			SourceLoader and ClassFileLoader</li>
-		<li>ExtFileManager class, implementing FileManager interface</li>
-		<li>SourceObject class, extending SimpleJavaFileObject to provide
-			in-memory objects to hold translated Java code</li>
-		<li>StringBuilderWriter class, providing a writer that writes to
-			a StringBuilder</li>
+		<li><tt>polyglot.frontend.ExtensionInfo</tt> interface has an
+			additional method <tt>classFileLoader()</tt> which creates a loader
+			that loads <tt>.class</tt> files from multiple locations.</li>
+		<li><tt>polyglot.filemanager.FileManager</tt> interface,
+			extending <tt>
+				<a
+					href="http://docs.oracle.com/javase/6/docs/api/javax/tools/StandardJavaFileManager.html">javax.tools.StandardJavaFileManager</a>
+			</tt>, <tt>polyglot.frontend.SourceLoader</tt> and <tt>polyglot.types.reflect.ClassFileLoader</tt></li>
+		<li><tt>polyglot.filemanager.ExtFileManager</tt> class,
+			implementing <tt>polyglot.filemanager.FileManager</tt> interface</li>
+		<li><tt>polyglot.filemanager.SourceObject</tt> class, extending <tt>javax.tools.SimpleJavaFileObject</tt>
+			to provide in-memory objects to hold translated Java code</li>
+		<li><tt>polyglot.util.StringBuilderWriter</tt> class, providing a
+			writer that writes to a StringBuilder</li>
 	</ul>
-	<p>NOTE: Locations in ExtFileManager are set in Main method by
-		calling addLocationsToFileManager method of ExtensionInfo interface.</p>
+	<p>
+		NOTE: Instances of
+		<tt>
+			<a
+				href="http://docs.oracle.com/javase/6/docs/api/javax/tools/JavaFileManager.Location.html">javax.tools.JavaFileManager.Location</a>
+		</tt>
+		in
+		<tt>polyglot.filemanager.ExtFileManager</tt>
+		are set in
+		<tt>start()</tt>
+		method (of
+		<tt>polyglot.main.Main</tt>
+		) by calling
+		<tt>addLocationsToFileManager()</tt>
+		method of
+		<tt>polyglot.frontend.ExtensionInfo</tt>
+		interface.
+	</p>
 	<br />
 	<h2>FileManager implementation and associated SourceObject</h2>
 	<img alt="UML Diagram" src="PolyglotFileManager.png" />
