@@ -143,6 +143,13 @@ public class SourceClassResolver extends LoadedClassResolver {
 					Report.report(4, "Class " + name + " has encoded type info");
 				encodedClazz = clazz;
 			}
+			if (encodedClazz != null && 
+		    		  !name.replace(".", File.separator).equals(encodedClazz.name())) {
+		          if (Report.should_report(report_topics, 3))
+		      	    Report.report(3, "Not using " + encodedClazz.name() + "(case-insensitive filesystem?)");
+		        encodedClazz = null;
+		        clazz = null;
+		    }
 		}
 
 		// Now, try and find the source file.

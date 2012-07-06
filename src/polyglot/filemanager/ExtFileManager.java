@@ -523,10 +523,9 @@ public class ExtFileManager implements FileManager {
 			if (!sourceFile.userSpecified() && userSpecified) {
 				sourceFile.setUserSpecified(true);
 			}
+			loadedSources.put(key, sourceFile);
 			return sourceFile;
 		}
-
-		loadedSources.put(key, sourceFile);
 		return sourceFile;
 	}
 
