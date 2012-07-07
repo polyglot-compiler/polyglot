@@ -1,5 +1,8 @@
 package polyglot.ext.jl5.ast;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import polyglot.ast.*;
 import polyglot.ext.jl5.types.*;
 import polyglot.types.*;
@@ -31,7 +34,17 @@ public class JL5Disamb_c extends Disamb_c {
                 // we found a type that was named appropriately. Access it 
                 // through t in order to ensure that substitution is 
                 // applied correctly.
-                Type type = t.toClass().memberClassNamed(name.id());
+                ClassType outer = t.toClass();
+                ClassType type = null;
+                while (type == null) {
+                    if (outer.equals(ts.Object()))
+                        throw new InternalCompilerError("Expected to find member class "+ name);
+                    type = outer.toClass().memberClassNamed(name.id());                    
+                    outer = outer.superType().toClass();
+                }
+                if (type.isInnerClass()) {
+                    type = ((JL5TypeSystem) ts).instantiateInnerClassIfNeeded(c, type);
+                }
                 return nf.CanonicalTypeNode(pos, type);
             }
         }
@@ -81,6 +94,10 @@ public class JL5Disamb_c extends Disamb_c {
                     if (! type.isCanonical()) {
                         throw new InternalCompilerError("Found an ambiguous type in the context: " + type, pos);
                     }
+                    if (type.isClass() && type.toClass().isInnerClass()){
+                        type = ((JL5TypeSystem)ts).instantiateInnerClassIfNeeded(c, type.toClass());
+                    }
+
                     return nf.CanonicalTypeNode(pos, type);
                 }
             } catch (NoClassException e) {
@@ -108,4 +125,5 @@ public class JL5Disamb_c extends Disamb_c {
         }
         return null;
     }
+
 }

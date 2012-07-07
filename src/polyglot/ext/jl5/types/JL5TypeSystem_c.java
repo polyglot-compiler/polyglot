@@ -442,6 +442,8 @@ public class JL5TypeSystem_c extends ParamTypeSystem_c implements JL5TypeSystem 
                 // Method name must match
                 if (! mi.name().equals(name)) continue;
 //                System.err.println("      checking " + mi);
+                
+
                 JL5MethodInstance substMi = methodCallValid(mi, name, argTypes, actualTypeArgs, expectedReturnType); 
 
                 if (substMi != null) {
@@ -563,6 +565,7 @@ public class JL5TypeSystem_c extends ParamTypeSystem_c implements JL5TypeSystem 
             actualTypeArgs = Collections.EMPTY_LIST;
         }
         JL5Subst subst = null;
+
         if (!mi.typeParams().isEmpty() && actualTypeArgs.isEmpty()) {
             // need to perform type inference
             subst = inferTypeArgs(mi, argTypes, null);
@@ -575,7 +578,7 @@ public class JL5TypeSystem_c extends ParamTypeSystem_c implements JL5TypeSystem 
             }
             subst = (JL5Subst) this.subst(m, new HashMap());
         }
-        
+                
         JL5ProcedureInstance mj = mi;
         if (!mi.typeParams().isEmpty() && subst != null) {
             // check that the substitution satisfies the bounds
@@ -1365,7 +1368,7 @@ public class JL5TypeSystem_c extends ParamTypeSystem_c implements JL5TypeSystem 
 
         if (Report.should_report(Report.types, 2))
             Report.report(2, "Searching type " + container + " for constructor " + container + "(" + listToString(argTypes) + ")");
-
+        JL5ConstructorInstance errorci = null;
         for (JL5ConstructorInstance ci : (List<JL5ConstructorInstance>) container.constructors()) {
             if (Report.should_report(Report.types, 3)) Report.report(3, "Trying " + ci);
 
@@ -1390,6 +1393,7 @@ public class JL5TypeSystem_c extends ParamTypeSystem_c implements JL5TypeSystem 
                             "Constructor " + ci.signature() +
                             " cannot be invoked with arguments " +
                             "(" + listToString(argTypes) + ").");
+                    errorci = ci;
                 }
             }
         }
@@ -1982,4 +1986,36 @@ public class JL5TypeSystem_c extends ParamTypeSystem_c implements JL5TypeSystem 
         return isReifiable(ct.container());
     }
 
+    @Override
+    public ClassType instantiateInnerClassIfNeeded(Context c, ClassType ct) {
+        ReferenceType container = ct.container();
+        ClassType fromCtx = c.currentClass();
+
+        // First, see if the inner class's container has substitutions
+        if (ct.container() instanceof JL5SubstClassType) {
+            JL5SubstClassType sct = (JL5SubstClassType) ct.container();
+            return (ClassType) sct.subst().substType(ct);
+        }
+
+        // Otherwise, find the container in the context
+        while (fromCtx != null) {
+            if (fromCtx instanceof JL5SubstClassType) {
+                JL5SubstClassType sct = (JL5SubstClassType) fromCtx;
+                ClassType rawCT = sct.base();
+                if (container.equals(rawCT)) {
+                    return (ClassType) sct.subst().substType(ct);
+                }
+            }
+            else if (fromCtx instanceof JL5ParsedClassType) {
+                if (container.equals(fromCtx)) {
+                    // nothing to substitute
+                    return ct;
+                }
+            }
+            fromCtx = (ClassType) fromCtx.superType();
+        }
+        throw new InternalCompilerError(
+                "Could not find container of inner class "
+                        + ct + " in current context");
+    }
 }

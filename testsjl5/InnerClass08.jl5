@@ -1,9 +1,9 @@
 class TreeMap<K> { }
-class NavSubmap<K> {
+class NavSubmap<Q> {
     class SubmapKi { 
-        SubmapKi(TreeMap<K> o) {
+        SubmapKi(TreeMap<Q> o) {
         }
-        void bar(TreeMap<K> o) {
+        void bar(TreeMap<Q> o) {
         }
     }
 }

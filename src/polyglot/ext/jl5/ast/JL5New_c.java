@@ -99,6 +99,12 @@ public class JL5New_c extends New_c implements JL5New {
         
         ClassType ct = tn.type().toClass();
         
+        if (ct.isInnerClass()) {
+            ClassType outer = ct.outer();   
+            JL5TypeSystem ts5 = (JL5TypeSystem) tc.typeSystem();
+            ct = ts5.instantiateInnerClassIfNeeded(tc.context(), ct);            
+        }
+        
         if (! ct.flags().isInterface()) {
             Context c = tc.context();
             if (anonType != null) {
@@ -130,7 +136,7 @@ public class JL5New_c extends New_c implements JL5New {
         // static type "T", the TypeNode for "C" is actually the type "T.C".
         // But, if we print "T.C", the post compiler will try to lookup "T"
         // in "T".  Instead, we print just "C".
-        if (qualifier != null) {
+        if (tn.type().isClass() && tn.type().toClass().isInnerClass()) {
             ClassType ct = tn.type().toClass();
             w.write(ct.name());
             if (ct instanceof JL5SubstClassType) {

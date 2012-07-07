@@ -278,6 +278,8 @@ public interface JL5TypeSystem extends TypeSystem, ParamTypeSystem {
      */
     List<TypeVariable> classAndEnclosingTypeVariables(JL5ParsedClassType ct);
 
+    ClassType instantiateInnerClassIfNeeded(Context c, ClassType ct);
+
 
 
 }
