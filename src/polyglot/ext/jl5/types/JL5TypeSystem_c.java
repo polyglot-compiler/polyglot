@@ -1987,35 +1987,31 @@ public class JL5TypeSystem_c extends ParamTypeSystem_c implements JL5TypeSystem 
     }
 
     @Override
-    public ClassType instantiateInnerClassIfNeeded(Context c, ClassType ct) {
-        ReferenceType container = ct.container();
+    public ClassType instantiateInnerClassFromContext(Context c, ClassType ct) {
+        ReferenceType outer = ct.outer();
         ClassType fromCtx = c.currentClass();
-
-        // First, see if the inner class's container has substitutions
-        if (ct.container() instanceof JL5SubstClassType) {
-            JL5SubstClassType sct = (JL5SubstClassType) ct.container();
-            return (ClassType) sct.subst().substType(ct);
-        }
-
+        
         // Otherwise, find the container in the context
         while (fromCtx != null) {
             if (fromCtx instanceof JL5SubstClassType) {
                 JL5SubstClassType sct = (JL5SubstClassType) fromCtx;
                 ClassType rawCT = sct.base();
-                if (container.equals(rawCT)) {
+                if (outer.equals(rawCT)) {
                     return (ClassType) sct.subst().substType(ct);
                 }
             }
             else if (fromCtx instanceof JL5ParsedClassType) {
-                if (container.equals(fromCtx)) {
+                if (outer.equals(fromCtx)) {
                     // nothing to substitute
                     return ct;
                 }
             }
             fromCtx = (ClassType) fromCtx.superType();
         }
-        throw new InternalCompilerError(
-                "Could not find container of inner class "
-                        + ct + " in current context");
+        // XXX: Couldn't find container, why are we here?
+        return ct;
+//        throw new InternalCompilerError(
+//                "Could not find container of inner class "
+//                        + ct + " in current context");
     }
 }

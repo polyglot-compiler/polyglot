@@ -43,7 +43,11 @@ public class JL5Disamb_c extends Disamb_c {
                     outer = outer.superType().toClass();
                 }
                 if (type.isInnerClass()) {
-                    type = ((JL5TypeSystem) ts).instantiateInnerClassIfNeeded(c, type);
+                    // First, see if the inner class's container has substitutions
+                    if (type.outer() instanceof JL5SubstClassType) {
+                        JL5SubstClassType sct = (JL5SubstClassType) type.outer();
+                        type = (ClassType) sct.subst().substType(type);
+                    }
                 }
                 return nf.CanonicalTypeNode(pos, type);
             }
@@ -95,7 +99,7 @@ public class JL5Disamb_c extends Disamb_c {
                         throw new InternalCompilerError("Found an ambiguous type in the context: " + type, pos);
                     }
                     if (type.isClass() && type.toClass().isInnerClass()){
-                        type = ((JL5TypeSystem)ts).instantiateInnerClassIfNeeded(c, type.toClass());
+                        type = ((JL5TypeSystem)ts).instantiateInnerClassFromContext(c, type.toClass());
                     }
 
                     return nf.CanonicalTypeNode(pos, type);

@@ -102,7 +102,13 @@ public class JL5New_c extends New_c implements JL5New {
         if (ct.isInnerClass()) {
             ClassType outer = ct.outer();   
             JL5TypeSystem ts5 = (JL5TypeSystem) tc.typeSystem();
-            ct = ts5.instantiateInnerClassIfNeeded(tc.context(), ct);            
+            if (outer instanceof JL5SubstClassType) {
+                JL5SubstClassType sct = (JL5SubstClassType) outer;
+                ct = (ClassType) sct.subst().substType(ct);
+            }
+            else {
+                ct = ts5.instantiateInnerClassFromContext(tc.context(), ct);            
+            }
         }
         
         if (! ct.flags().isInterface()) {
