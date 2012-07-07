@@ -590,6 +590,8 @@ public class ExtFileManager implements FileManager {
 	}
 
 	protected String fileKey(Location location, String packageName, String fileName) {
+		if (caseInsensitive())
+			return location + "/" + packageName.toLowerCase() + "/" + fileName.toLowerCase();
 		return location + "/" + packageName + "/" + fileName;
 	}
 
