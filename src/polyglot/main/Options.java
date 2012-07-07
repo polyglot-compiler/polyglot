@@ -235,6 +235,7 @@ public class Options {
 		} else if (args[i].equals("-D")) {
 			i++;
 			source_output_dir = Collections.singleton(new File(args[i]));
+			outputToFS = true;
 			i++;
 		} else if (args[i].equals("-classpath") || args[i].equals("-cp")) {
 			i++;
@@ -300,6 +301,7 @@ public class Options {
 		} else if (args[i].equals("-post")) {
 			i++;
 			post_compiler = args[i];
+			outputToFS = true;
 			i++;
 		} else if (args[i].equals("-stdout")) {
 			i++;
@@ -438,6 +440,7 @@ public class Options {
 		// "scramble the ast (for testing)");
 		usageForFlag(out, "-noserial", "disable class serialization");
 		usageForFlag(out, "-D <directory>", "output directory for .java files");
+		usageForFlag(out, "-output-to-fs", "put .java files on the file system");
 		usageForFlag(out, "-nooutput", "delete output files after compilation");
 		usageForFlag(out, "-c", "compile only to .java");
 		usageForFlag(out, "-post <compiler>",

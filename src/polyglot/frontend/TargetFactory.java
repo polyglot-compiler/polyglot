@@ -32,6 +32,7 @@ import polyglot.types.*;
 import polyglot.util.*;
 
 import java.io.*;
+import static java.io.File.separatorChar;
 import java.net.URI;
 import java.util.*;
 
@@ -85,8 +86,10 @@ public class TargetFactory {
 	 */
 	public JavaFileObject outputFileObject(String packageName, Source source) {
 		String name;
-		name = source.getName();
+		name = source.name();
 		name = name.substring(0, name.lastIndexOf('.'));
+		int lastIndex = name.lastIndexOf(separatorChar);
+		name = lastIndex >= 0 ? name.substring(lastIndex + 1) : name;
 		return outputFileObject(packageName, name, source);
 	}
 
@@ -97,27 +100,6 @@ public class TargetFactory {
 			throw new InternalCompilerError("Output location not set.");
 		}
 
-		/*if (packageName == null || packageName.equals("")) {
-			URI uri = source.toUri();
-			URI outputUri = null;
-			for (File f : fileManager.getLocation(outputLocation)) {
-				outputUri = f.toURI();
-				break;
-			}
-			if (outputUri == null)
-				throw new InternalCompilerError(
-						"Output location for source files is not set");
-			String pkgClass = outputUri.relativize(uri).toString();
-			pkgClass = pkgClass.substring(0, pkgClass.lastIndexOf('.'));
-			int lastIndex = pkgClass.lastIndexOf('/');
-			if (lastIndex > 0) {
-				packageName = pkgClass.substring(0, lastIndex);
-				className = pkgClass.substring(lastIndex + 1);
-			} else {
-				packageName = "";
-				className = pkgClass;
-			}
-		}*/
 		try {
 			if (outputExtension.equals("java")) {
 				if (packageName != null && !packageName.equals("")) {
