@@ -5,6 +5,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import polyglot.main.Report;
 import polyglot.types.*;
 import polyglot.util.StringUtil;
 
@@ -16,6 +17,8 @@ public class JL5Context_c extends Context_c implements JL5Context {
 
     protected Type switchType;
     protected ClassType declaringClass;
+
+    protected boolean ctorCall;
 
     public static final Kind TYPE_VAR = new Kind("type-var");
     public static final Kind SWITCH = new Kind("switch");
@@ -87,6 +90,16 @@ public class JL5Context_c extends Context_c implements JL5Context {
         c.typeVars = null;
         return c;
     }
+    
+    /**
+     * pushes an additional static scoping level.
+     */
+    public Context pushCTORCall() {
+        JL5Context_c v = (JL5Context_c) push();
+        v.staticContext = true;
+        v.ctorCall = true;
+        return v;
+    }
 
     public JL5Context pushTypeVariable(TypeVariable iType) {
         JL5Context_c v = (JL5Context_c) push();
@@ -109,6 +122,10 @@ public class JL5Context_c extends Context_c implements JL5Context {
 
     public boolean inTypeVariable() {
         return kind == TYPE_VAR;
+    }
+
+    public boolean inCTORCall() {
+        return ctorCall;
     }
 
     public String toString() {

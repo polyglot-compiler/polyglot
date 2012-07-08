@@ -7,6 +7,7 @@ import java.util.List;
 
 import polyglot.ast.*;
 import polyglot.ext.jl5.JL5Options;
+import polyglot.ext.jl5.types.JL5Context;
 import polyglot.ext.jl5.types.JL5Flags;
 import polyglot.ext.jl5.types.JL5TypeSystem;
 import polyglot.types.*;
@@ -47,6 +48,14 @@ public class JL5ConstructorCall_c extends ConstructorCall_c implements JL5Constr
         JL5ConstructorCall_c n = (JL5ConstructorCall_c)this.copy();
         n.typeArgs = typeArgs;
         return n;
+    }
+    
+    /**
+     * An explicit constructor call is *like* a static context. References to
+     * instance fields or methods are forbidden, but type variables are OK.
+     */
+    public Context enterScope(Context c) {
+        return ((JL5Context)c).pushCTORCall();
     }
 
     @Override
