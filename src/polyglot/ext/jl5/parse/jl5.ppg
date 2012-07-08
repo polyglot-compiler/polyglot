@@ -146,7 +146,7 @@ non terminal List enum_constants_opt;
 non terminal List enum_constants;
 non terminal EnumConstantDecl enum_constant;
 non terminal List enum_arguments_opt, enum_body_declarations_opt;
-
+non terminal comma_opt;
 // 19.8.3) Method Declarations
 
 // 19.8.5) Constructor Declarations
@@ -493,11 +493,16 @@ enum_body ::=
             {: a.addAll(b);
                RESULT = parser.nf.ClassBody(parser.pos(n, c), a); :}
 	;
+comma_opt ::=		
+    |	COMMA
+    ;
+
 enum_constants_opt ::=
         {: RESULT = new TypedList(new LinkedList(), ClassMember.class, false); :}
-	|	enum_constants:a
+	|	enum_constants:a comma_opt
         {: RESULT = a; :}
 	;
+
 enum_constants ::=
 		enum_constant:a
         {: List l = new TypedList(new LinkedList(), ClassMember.class, false);

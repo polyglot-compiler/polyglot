@@ -300,8 +300,10 @@ polyglot.ext.jl5.ExtensionInfo "-d out -classpath java-out -noserial -post \"jav
 	EnumTest3.jl5;
 	EnumTest4.jl5;
 	EnumTest6.jl5;
+	EnumTest7.jl5;
 	enum1.jl5;
 	enum2.jl5;
+    ConstructorCall01.jl5;
 }
 
 # Now run the tests again removing the Java 5-isms.
@@ -568,6 +570,8 @@ polyglot.ext.jl5.ExtensionInfo "-d out -classpath java-out -removeJava5isms -enu
         EnumTest3.jl5;
         EnumTest4.jl5;
         EnumTest6.jl5;
+	    EnumTest7.jl5;
         enum1.jl5;
         enum2.jl5;
+        ConstructorCall01.jl5;
 }
