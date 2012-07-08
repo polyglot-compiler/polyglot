@@ -106,8 +106,13 @@ public class JL5New_c extends New_c implements JL5New {
                 JL5SubstClassType sct = (JL5SubstClassType) outer;
                 ct = (ClassType) sct.subst().substType(ct);
             }
-            else {
+            else if (qualifier == null || (qualifier instanceof Special 
+                    && ((Special)qualifier).kind() == Special.THIS)) {
                 ct = ts5.instantiateInnerClassFromContext(tc.context(), ct);            
+            }
+            else if (qualifier.type() instanceof JL5SubstClassType) {
+                JL5SubstClassType sct = (JL5SubstClassType) qualifier().type();
+                ct = (ClassType) sct.subst().substType(ct);
             }
         }
         
