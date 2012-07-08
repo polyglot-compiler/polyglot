@@ -70,12 +70,12 @@ public class JL5Conditional_c extends Conditional_c {
         if (t1.isNumeric() && t2.isNumeric()) {
             // If one of the operands is of type byte or Byte and the other is of type 
             // short or Short, then the type of the conditional expression is short.
-            if ((t1.isByte() || t1.equals(ts.typeForName("java.lang.Byte")) && 
-                    (t2.isShort() || t2.equals(ts.typeForName("java.lang.Short"))))) {
+            if ((t1.isByte() || t1.equals(ts.typeForName("java.lang.Byte"))) && 
+                    (t2.isShort() || t2.equals(ts.typeForName("java.lang.Short")))) {
                 return type(ts.Short());
             }
-            if ((t2.isByte() || t2.equals(ts.typeForName("java.lang.Byte")) && 
-                    (t1.isShort() || t1.equals(ts.typeForName("java.lang.Short"))))) {
+            if ((t2.isByte() || t2.equals(ts.typeForName("java.lang.Byte"))) && 
+                    (t1.isShort() || t1.equals(ts.typeForName("java.lang.Short")))) {
                 return type(ts.Short());
             }
             
