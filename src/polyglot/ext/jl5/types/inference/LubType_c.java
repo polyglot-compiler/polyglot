@@ -2,8 +2,6 @@ package polyglot.ext.jl5.types.inference;
 
 import java.util.*;
 
-import com.sun.codemodel.internal.ClassType;
-
 import polyglot.ext.jl5.types.*;
 import polyglot.frontend.Job;
 import polyglot.types.*;
