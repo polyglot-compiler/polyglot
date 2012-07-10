@@ -67,6 +67,10 @@ public class JL5TypeSystem_c extends ParamTypeSystem_c implements JL5TypeSystem 
             return ITERATOR_ = load("java.util.Iterator");
         }
     }
+    
+    public LazyClassInitializer defaultClassInitializer() {
+        return new JL5SchedulerClassInitializer(this);
+    }
 
     public boolean accessibleFromPackage(Flags flags, Package pkg1, Package pkg2) {
         return super.accessibleFromPackage(flags, pkg1, pkg2);
@@ -299,7 +303,7 @@ public class JL5TypeSystem_c extends ParamTypeSystem_c implements JL5TypeSystem 
         if (toType.isArray()) {
             Type base = ((ArrayType) toType).base();
             assert_(base);
-            return fromType.isImplicitCastValidImpl(base);
+            return isImplicitCastValid(fromType, base);
         }
         return false;
     }
@@ -318,6 +322,9 @@ public class JL5TypeSystem_c extends ParamTypeSystem_c implements JL5TypeSystem 
         }
         if ((bits & JL5Flags.VARARGS_MOD) != 0) {
             f = JL5Flags.setVarArgs(f);
+        }
+        if ((bits & JL5Flags.ANNOTATION_MOD) != 0) {
+            f = JL5Flags.setAnnotation(f);
         }
         return f;
     }

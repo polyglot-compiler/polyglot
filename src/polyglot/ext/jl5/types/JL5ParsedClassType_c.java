@@ -1,10 +1,21 @@
 package polyglot.ext.jl5.types;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 
+import polyglot.ext.jl5.types.reflect.JL5LazyClassInitializer;
 import polyglot.ext.param.types.PClass;
 import polyglot.frontend.Source;
-import polyglot.types.*;
+import polyglot.types.ClassType;
+import polyglot.types.LazyClassInitializer;
+import polyglot.types.ParsedClassType_c;
+import polyglot.types.ProcedureInstance;
+import polyglot.types.Resolver;
+import polyglot.types.Type;
+import polyglot.types.TypeSystem;
 import polyglot.util.CodeWriter;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.TypedList;
@@ -18,6 +29,8 @@ public class JL5ParsedClassType_c extends ParsedClassType_c implements JL5Parsed
 
     public JL5ParsedClassType_c( TypeSystem ts, LazyClassInitializer init, Source fromSource){
         super(ts, init, fromSource);
+        annotationElems = new TypedList(new LinkedList(),
+                AnnotationElemInstance.class, false);
     }
         
     public void addEnumConstant(EnumInstance ei){
@@ -51,14 +64,17 @@ public class JL5ParsedClassType_c extends ParsedClassType_c implements JL5Parsed
         }
         return null;
     }
+    
+    @Override
+    public void addAnnotationElem(AnnotationElemInstance ai){
+        addMethod(ai);
+        annotationElems.add(ai);
+    }
 
     @Override
     public List<AnnotationElemInstance> annotationElems() {
-        if (annotationElems == null){
-            annotationElems = new TypedList(new LinkedList(), 
-                                            AnnotationElemInstance.class, false);
-        }    
-        return annotationElems;
+        ((JL5LazyClassInitializer) init).initAnnotationElems();
+        return Collections.unmodifiableList(annotationElems);
     }
 
 
