@@ -1,0 +1,3 @@
+@SuppressWarnings("unchecked")
+public abstract class ClassUtils {
+}
