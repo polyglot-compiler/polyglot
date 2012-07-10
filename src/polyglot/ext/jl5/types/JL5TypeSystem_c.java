@@ -1018,6 +1018,14 @@ public class JL5TypeSystem_c extends ParamTypeSystem_c implements JL5TypeSystem 
 //                System.err.println("   : descends from 2");
                 return isSubtype(child, w.lowerBound());
             }            
+        }        
+        if (ancestor instanceof LubType) {
+            LubType lub = (LubType) ancestor;
+            // LUB is a supertype of each of its elements
+            for (ReferenceType rt : lub.lubElements()) {
+                if (descendsFrom(child, rt))
+                    return true;
+            }
         }
 //        System.err.println("   : descends from 3");
         return false;

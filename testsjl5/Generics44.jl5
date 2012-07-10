@@ -1,0 +1,15 @@
+class A<K> {
+}
+class C {
+    <T> void foo(T ... args) {
+    }
+    <T> void bar(T one, T two, T three) {
+    }
+    void m() {
+        A<String> a = new A<String>();
+        A<Integer> b = new A<Integer>();
+        A<Byte> c = new A<Byte>();
+        this.foo(a, b, c);
+        this.bar(a, b, c);
+    }
+}
