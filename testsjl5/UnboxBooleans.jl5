@@ -1,0 +1,14 @@
+class A {
+   int x(Boolean o) {
+     if (o) return 0;
+     else return 1;
+   } 
+   int y(Boolean o) {
+     while (o) return 0;
+     return 1;
+   } 
+   int z(Boolean o) {
+     for(;o;) return 0;
+     return 1;
+   }
+}
