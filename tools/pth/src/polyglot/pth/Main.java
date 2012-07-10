@@ -30,8 +30,7 @@ public class Main {
         
         OutputController outCtrl = createOutputController(options);
         
-        for (Iterator iter = options.inputFilenames.iterator(); iter.hasNext(); ) {
-            String filename = (String)iter.next();
+        for (String filename : options.inputFilenames) {
             ScriptTestSuite t = new ScriptTestSuite(filename);
             t.setOutputController(outCtrl);
             if (options.showResultsOnly) {

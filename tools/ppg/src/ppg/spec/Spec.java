@@ -2,13 +2,17 @@ package ppg.spec;
 
 import java.util.*;
 import ppg.*;
+import ppg.atoms.Precedence;
+import ppg.atoms.SymbolList;
 import ppg.code.*;
 import ppg.parse.*;
 
 public abstract class Spec implements Unparse
 {
 	protected String packageName;
-	protected Vector imports, symbols, prec;
+	protected Vector<String> imports;
+	protected Vector<SymbolList> symbols;
+	protected Vector<Precedence> prec;
 	protected InitCode initCode;
 	protected ActionCode actionCode;
 	protected ParserCode parserCode;
@@ -28,14 +32,14 @@ public abstract class Spec implements Unparse
 			packageName = pkgName; 
 	}
 	
-	public void replaceCode (Vector codeParts) {
+	public void replaceCode (Vector<Code> codeParts) {
 		if (codeParts == null) 
 			return;
 		
 		Code code=null;
 		for (int i=0; i < codeParts.size(); i++) {
 			try {
-				code = (Code) codeParts.elementAt(i);
+				code = codeParts.elementAt(i);
 				if (code instanceof ActionCode) {
 					actionCode = (ActionCode) code.clone();
 				} else if (code instanceof InitCode) {
@@ -55,7 +59,7 @@ public abstract class Spec implements Unparse
 		}
 	}
 	
-	public void addImports (Vector imp) {
+	public void addImports (Vector<String> imp) {
 		if (imp == null)
 			return;
 		

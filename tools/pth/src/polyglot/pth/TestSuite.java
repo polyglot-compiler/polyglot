@@ -11,20 +11,20 @@ import java.util.regex.Pattern;
  * 
  */
 public class TestSuite extends AbstractTest {
-    protected List tests;
+    protected List<Test> tests;
     protected boolean haltOnFirstFailure = false;
     protected int totalTests = 0;
     protected int successfulTests = 0;
 
     public TestSuite(String name) {
-        this(name, new ArrayList(), false);
+        this(name, new ArrayList<Test>(), false);
     }
 
-    public TestSuite(String name, List tests) {
+    public TestSuite(String name, List<Test> tests) {
         this(name, tests, false);
     }
 
-    public TestSuite(String name, List tests, boolean haltOnFirstFailure) {
+    public TestSuite(String name, List<Test> tests, boolean haltOnFirstFailure) {
         super(name);
         this.tests = tests;
         this.haltOnFirstFailure = haltOnFirstFailure;        
@@ -36,8 +36,7 @@ public class TestSuite extends AbstractTest {
     
     public void setOutputController(OutputController output) {
         super.setOutputController(output);
-        for (Iterator iter = tests.iterator(); iter.hasNext(); ) {
-            Test t = (Test)iter.next();
+        for (Test t : tests) {
             t.setOutputController(output);
         }
     }
@@ -49,13 +48,11 @@ public class TestSuite extends AbstractTest {
             this.setTestResult(this.createTestResult(null));
         }        
         
-        Map oldTestResults = new HashMap(this.getTestSuiteResult().testResults);
-        Map newResults = new HashMap();
+        Map<String, TestResult> oldTestResults = new HashMap<String, TestResult>(this.getTestSuiteResult().testResults);
+        Map<String, TestResult> newResults = new HashMap<String, TestResult>();
         
-        for (Iterator i = tests.iterator(); i.hasNext(); ) {
-            Test t = (Test)i.next();
-            
-            TestResult tr = (TestResult)oldTestResults.get(t.getUniqueId());
+        for (Test t : tests) {
+            TestResult tr = oldTestResults.get(t.getUniqueId());
             if (executeTest(t.getName(), tr)) {
                 totalTests++;
                 if (tr != null) {
@@ -113,17 +110,17 @@ public class TestSuite extends AbstractTest {
         return (TestSuiteResult)this.getTestResult();
     }
     
-    public List getTests() {
+    public List<Test> getTests() {
         return Collections.unmodifiableList(this.tests);
     }
 
     protected TestResult createTestResult(Date lastSuccess) {
-        Map testResults;
+        Map<String, TestResult> testResults;
         if (this.getTestSuiteResult() != null) {
             testResults = getTestSuiteResult().testResults;
         }
         else {
-            testResults = new LinkedHashMap();
+            testResults = new LinkedHashMap<String, TestResult>();
         }
         Date lastRun = new Date();
         if (this.success()) {

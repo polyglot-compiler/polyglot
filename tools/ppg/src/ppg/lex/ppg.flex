@@ -3,6 +3,7 @@ package ppg.lex;
 import java.io.InputStream;
 import ppg.parse.*;
 
+@SuppressWarnings("all")
 %%
 
 %init{

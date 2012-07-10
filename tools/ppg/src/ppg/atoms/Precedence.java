@@ -9,17 +9,17 @@ public class Precedence
 	public static final int NONASSOC = 2;
 	
 	private	int type;
-	private Vector symbols;
+	private Vector<GrammarSymbol> symbols;
 	
-	public Precedence(int type, Vector syms) {
+	public Precedence(int type, Vector<GrammarSymbol> syms) {
 		this.type = type;
 		symbols = syms;
 	}
 	
 	public Object clone () {
-		Vector newSyms = new Vector();
+		Vector<GrammarSymbol> newSyms = new Vector<GrammarSymbol>();
 		for (int i=0; i < symbols.size(); i++) {
-			newSyms.addElement( ((GrammarSymbol)symbols.elementAt(i)).clone() );
+			newSyms.addElement( (GrammarSymbol) symbols.elementAt(i).clone() );
 		}
 		return new Precedence(type, newSyms);
 	}

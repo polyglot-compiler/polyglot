@@ -2,6 +2,7 @@ package ppg.spec;
 
 import java.io.*;
 import java.util.*;
+
 import ppg.*;
 import ppg.atoms.*;
 import ppg.cmds.*;
@@ -13,9 +14,10 @@ import ppg.util.*;
 public class PPGSpec extends Spec
 {
 	private String include;
-	private Vector commands, code;
+	private Vector<Command> commands;
+	private Vector<Code> code;
 	private Spec parent;
-	private Vector startSyms;
+	private Vector<String> startSyms;
 	
 	/**
 	 * PPG spec
@@ -37,9 +39,9 @@ public class PPGSpec extends Spec
 	}
 	*/
 	
-	public PPGSpec (String incFile, String pkg, Vector imp,
-					  Vector codeParts, Vector syms,
-					  Vector precedence, Vector startList, Vector cmds)
+	public PPGSpec (String incFile, String pkg, Vector<String> imp,
+					  Vector<Code> codeParts, Vector<SymbolList> syms,
+					  Vector<Precedence> precedence, Vector<String> startList, Vector<Command> cmds)
 	{
 		super();
 		include = incFile;
@@ -92,7 +94,7 @@ public class PPGSpec extends Spec
 
 	public void patchMultiStartSymbols (CUPSpec cupSpec) {
 		if (!isMultiStartSymbol()) {
-			cupSpec.setStart((String) startSyms.elementAt(0));
+			cupSpec.setStart(startSyms.elementAt(0));
 			return;
 		}
 
@@ -103,16 +105,16 @@ public class PPGSpec extends Spec
 		parseCode += "Symbol " + currSymbolName + ";\n\n";
 		
 		// Generate token names
-		Vector tokens = new Vector();
+		Vector<String> tokens = new Vector<String>();
 		for (int i=0; i < startSyms.size(); i+=2) {
 			tokens.addElement("JLGEN_TOKEN_"+String.valueOf(i/2));
 		}
 		
 		String startSym, method, token;
 		for (int i=0; i < startSyms.size(); i += 2) {
-			startSym = (String) startSyms.elementAt(i);
-			method = (String) startSyms.elementAt(i+1);
-			token = (String) tokens.elementAt(i/2); //startSyms.elementAt(i+2);
+			startSym = startSyms.elementAt(i);
+			method = startSyms.elementAt(i+1);
+			token = tokens.elementAt(i/2); //startSyms.elementAt(i+2);
 			parseCode += "public Symbol "+ method + " () throws Exception {\n"+
 						 "\t"+currSymbolName+" = "+"new Symbol("+
 						 PPG.SYMBOL_CLASS_NAME+"."+token+")"+";\n"+"\t"+
@@ -145,27 +147,26 @@ public class PPGSpec extends Spec
 		// set start symbol
 		cupSpec.setStart(newStartSym);
 		Nonterminal startNT = new Nonterminal(newStartSym, null);
-		Vector newSymbols = new Vector();
+		Vector<String> newSymbols = new Vector<String>();
 		newSymbols.addElement(newStartSym);
 		
 		// add start symbol to the grammar
 		SymbolList sl = new SymbolList(SymbolList.NONTERMINAL, null, newSymbols);
-		Vector addedSymbols = new Vector(); addedSymbols.addElement(sl);
+		Vector<SymbolList> addedSymbols = new Vector<SymbolList>(); addedSymbols.addElement(sl);
 		cupSpec.addSymbols(addedSymbols);
 		
 		// add token declaration to the grammar
 		SymbolList tokenList = new SymbolList(SymbolList.TERMINAL, "Symbol", tokens);
-		Vector addedTokens = new Vector(); addedTokens.addElement(tokenList);
+		Vector<SymbolList> addedTokens = new Vector<SymbolList>(); addedTokens.addElement(tokenList);
 		cupSpec.addSymbols(addedTokens);
 		
-		Vector rhs = new Vector();
+		Vector<Vector<GrammarPart>> rhs = new Vector<Vector<GrammarPart>>();
 		
 		//String grammarPatch = newStartSym + " ::=\n";
-		Vector rhsPart;
 		for (int i=0; i < startSyms.size(); i += 2) {
-			rhsPart = new Vector();
-			startSym = (String) startSyms.elementAt(i);
-			token = (String) tokens.elementAt(i/2); //startSyms.elementAt(i+2); 
+			Vector<GrammarPart> rhsPart = new Vector<GrammarPart>();
+			startSym = startSyms.elementAt(i);
+			token = tokens.elementAt(i/2); //startSyms.elementAt(i+2); 
 			//if (i > 0) grammarPatch += "|";
 			//grammarPatch += "\t"+token+" "+startSym+":s {: RESULT = s; :}\n";
 			// add new symbols into vector
@@ -290,17 +291,17 @@ public class PPGSpec extends Spec
 		Command cmd;
 		DropCmd drop;
 		for (int i=0; i < commands.size(); i++) {
-			cmd = (Command) commands.elementAt(i);
+			cmd = commands.elementAt(i);
 			if (cmd instanceof DropCmd) {
 				drop = (DropCmd) cmd;
 				if (drop.isProdDrop()) {
 					// remove all productions that have NT as lhs
 					newSpec.dropProductions(drop.getProduction());
 				} else { /* symbol Drop */
-					Vector symbols = drop.getSymbols(); 
+					Vector<String> symbols = drop.getSymbols(); 
 					String sym;
 					for (int j=0; j < symbols.size(); j++) {
-						sym = (String) symbols.elementAt(j);
+						sym = symbols.elementAt(j);
 						// remove nonterminals from list of symbols
 						newSpec.dropSymbol(sym);
 						// remove all productions that have NT as lhs, if possible
@@ -316,7 +317,7 @@ public class PPGSpec extends Spec
 		Command cmd;
 		OverrideCmd override;
 		for (int i=0; i < commands.size(); i++) {
-			cmd = (Command) commands.elementAt(i);
+			cmd = commands.elementAt(i);
 			if (cmd instanceof OverrideCmd) {
 				override = (OverrideCmd) cmd;
 				newSpec.dropProductions(override.getLHS());
@@ -330,7 +331,7 @@ public class PPGSpec extends Spec
 		Command cmd;
 		ExtendCmd extend;
 		for (int i=0; i < commands.size(); i++) {
-			cmd = (Command) commands.elementAt(i);
+			cmd = commands.elementAt(i);
 			if (cmd instanceof ExtendCmd) {
 				extend = (ExtendCmd) cmd;
 				newSpec.addProductions(extend.getProduction());
@@ -340,23 +341,18 @@ public class PPGSpec extends Spec
 	
 	private void processTransferL (CUPSpec combined, CUPSpec newSpec) {
 		// TRANSFER_L
-		Command cmd;
-		TransferCmd transfer;
-		Production prod;
-		Nonterminal source;
-		Vector prodList;
 		for (int i=0; i < commands.size(); i++) {
-			cmd = (Command) commands.elementAt(i);
+			Command cmd = commands.elementAt(i);
 			if (cmd instanceof TransferCmd) {
-				transfer = (TransferCmd) cmd;
-				source = transfer.getSource();
-				prodList = transfer.getTransferList();
+				TransferCmd transfer = (TransferCmd) cmd;
+				Nonterminal source = transfer.getSource();
+				Vector<Production> prodList = transfer.getTransferList();
 				
 				// there must be at least one production by the grammar definition
-				prod = (Production) prodList.elementAt(0);
+				Production prod = prodList.elementAt(0);
 				prod = (Production) prod.clone();
 				for (int j=1; j < prodList.size(); j++) {
-					Production prodNew = (Production) prodList.elementAt(j);
+					Production prodNew = prodList.elementAt(j);
 					prod.union( (Production) prodNew.clone() );	
 					//prod.union( (Production) prodList.elementAt(j) );	
 				}
@@ -369,22 +365,17 @@ public class PPGSpec extends Spec
 	
 	private void processTransferR (CUPSpec combined, CUPSpec newSpec) {
 		// TRANSFER_R
-		Command cmd;
-		TransferCmd transfer;
-		Production prod, prodTransfer;
-		Vector prodList;
-		Nonterminal target;
 		for (int i=0; i < commands.size(); i++) {
-			cmd = (Command) commands.elementAt(i);
+			Command cmd = commands.elementAt(i);
 			if (cmd instanceof TransferCmd) {
-				transfer = (TransferCmd) cmd;
-				prodList = transfer.getTransferList();
+				TransferCmd transfer = (TransferCmd) cmd;
+				Vector<Production> prodList = transfer.getTransferList();
 				for (int j=0; j < prodList.size(); j++) {
-					prod = (Production) prodList.elementAt(j);
-					target = prod.getLHS();
+					Production prod = prodList.elementAt(j);
+					Nonterminal target = prod.getLHS();
 					// make sure we get the productions from the source!
 					prod.setLHS(transfer.getSource());
-					prodTransfer = combined.findProduction(prod);
+					Production prodTransfer = combined.findProduction(prod);
 					// but set the LHS back to the actual target
 					// so it is added to the right nonterminal
 					prodTransfer.setLHS(target);
@@ -400,7 +391,7 @@ public class PPGSpec extends Spec
 		NewProdCmd newProd;
 		Command cmd;
 		for (int i=0; i < commands.size(); i++) {
-			cmd = (Command) commands.elementAt(i);
+			cmd = commands.elementAt(i);
 			if (cmd instanceof NewProdCmd) {
 				newProd = (NewProdCmd) cmd;
 				newSpec.addProductions(newProd.getProduction());
@@ -418,7 +409,7 @@ public class PPGSpec extends Spec
 		}
 		if (commands != null) {
 			for (int i=0; i < commands.size(); i++) {
-				((Command)commands.elementAt(i)).unparse(cw);
+				commands.elementAt(i).unparse(cw);
 			}
 		}
 		cw.end();

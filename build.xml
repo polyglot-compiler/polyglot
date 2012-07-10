@@ -229,7 +229,7 @@
 
 	<!-- compile the base compiler except for the quasiquoter and generated parser -->
 	<target name="compile-base" depends="init,base-parser">
-        <javac source="1.4" target="1.4" srcdir="${src}" destdir="${classes}" debug="on" includes="polyglot/**" excludes="polyglot/ext/jl5/**,polyglot/qq/**,polyglot/parse/Lexer_c.java,polyglot/parse/sym.java,polyglot/parse/Grm.java">
+        <javac source="1.5" target="1.5" srcdir="${src}" destdir="${classes}" debug="on" includes="polyglot/**" excludes="polyglot/ext/jl5/**,polyglot/qq/**,polyglot/parse/Lexer_c.java,polyglot/parse/sym.java,polyglot/parse/Grm.java">
             <classpath refid="standard.classpath" />
         </javac>
 		<!-- Compile the JL5 code -->
@@ -239,7 +239,7 @@
     </target>
 
     	<target name="compile-epl-base" depends="init">
-          <javac source="1.4" target="1.4" srcdir="${src}" destdir="${classes}" debug="on" includes="polyglot/**" excludes="polyglot/ext/**,polyglot/qq/**,polyglot/parse/BaseParser.java,polyglot/parse/sym.java,polyglot/parse/Grm.java,polyglot/parse/Lexer_c.java,polyglot/frontend/JLExtensionInfo.java,polyglot/lex/EscapedUnicodeReader.java">
+          <javac source="1.5" target="1.5" srcdir="${src}" destdir="${classes}" debug="on" includes="polyglot/**" excludes="polyglot/ext/**,polyglot/qq/**,polyglot/parse/BaseParser.java,polyglot/parse/sym.java,polyglot/parse/Grm.java,polyglot/parse/Lexer_c.java,polyglot/frontend/JLExtensionInfo.java,polyglot/lex/EscapedUnicodeReader.java">
 			<classpath refid="standard.classpath" />
 		</javac>
 	</target>
@@ -251,7 +251,7 @@
 			<param name="parser.class" value="parser" />
 			<param name="symbol.class" value="sym" />
 		</antcall>
-		<javac source="1.4" target="1.4" srcdir="${cup.src}" destdir="${cup.classes}" debug="on" includes="java_cup/**">
+		<javac source="1.5" target="1.5" srcdir="${cup.src}" destdir="${cup.classes}" debug="on" includes="java_cup/**">
 			<classpath refid="cup.jar.classpath" />
 		</javac>
 
@@ -277,6 +277,14 @@
 			<arg value="${symbol.class}" />
 			<arg value="${cup.file}" />
 		</java>
+		<!-- Hack to suppress warnings in parser. -->
+		<replaceregexp
+		  file="${parser.dir}/${parser.class}.java"
+		  match="^(public )?class"
+		  replace="@SuppressWarnings(&quot;all&quot;) \1class"
+		  flags="g"
+		  byline="yes"
+		/>
 	</target>
 
 	<!-- The following target builds a cup parser using the version of
@@ -407,7 +415,7 @@
 			<param name="parser.class" value="Grm" />
 			<param name="symbol.class" value="sym" />
 		</antcall>
-		<javac source="1.4" target="1.4" srcdir="${src}" destdir="${classes}" debug="on" includes="polyglot/parse/**,polyglot/qq/**">
+		<javac source="1.5" target="1.5" srcdir="${src}" destdir="${classes}" debug="on" includes="polyglot/parse/**,polyglot/qq/**">
 			<classpath refid="standard.classpath" />
 		</javac>
 
@@ -515,7 +523,7 @@
 			<param name="symbol.class" value="Constant" />
 			<param name="cup.file" value="ppg.cup" />
 		</antcall>
-		<javac source="1.4" target="1.4" srcdir="${ppg.src}" destdir="${ppg.classes}" debug="on" includes="ppg/**">
+		<javac source="1.5" target="1.5" srcdir="${ppg.src}" destdir="${ppg.classes}" debug="on" includes="ppg/**">
 			<classpath refid="standard.classpath" />
 		</javac>
 	</target>

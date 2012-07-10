@@ -26,8 +26,8 @@ public final class TestSuiteResult extends TestResult {
         return parent + RESULT_FILE_PREFIX + script.getName() +
                         RESULT_FILE_SUFFIX;
     }
-    public final Map testResults;
-    public TestSuiteResult(Test t, Date dateTestRun, Map testResults, Date dateLastSuccess) {
+    public final Map<String, TestResult> testResults;
+    public TestSuiteResult(Test t, Date dateTestRun, Map<String, TestResult> testResults, Date dateLastSuccess) {
         super(t, dateTestRun, dateLastSuccess);
         this.testResults = testResults;
     }    

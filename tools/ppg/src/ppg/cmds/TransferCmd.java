@@ -7,15 +7,15 @@ import ppg.util.*;
 public class TransferCmd implements Command
 {
 	private Nonterminal nonterminal;
-	private Vector transferList;
+	private Vector<Production> transferList;
 	
-	public TransferCmd(String nt, Vector tlist) {
+	public TransferCmd(String nt, Vector<Production> tlist) {
 		nonterminal = new Nonterminal(nt);
 		transferList = tlist;
 	}
 
 	public Nonterminal getSource() { return nonterminal; }
-	public Vector getTransferList() { return transferList; }
+	public Vector<Production> getTransferList() { return transferList; }
 	
 	public void unparse(CodeWriter cw) {
 		//cw.begin(0);
@@ -24,7 +24,7 @@ public class TransferCmd implements Command
 		cw.write(nonterminal + " to ");
 		Production prod;
 		for (int i=0; i < transferList.size(); i++) {
-			prod = (Production) transferList.elementAt(i);
+			prod = transferList.elementAt(i);
 			prod.unparse(cw);
 		}
 		//cw.end();
