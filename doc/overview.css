@@ -35,6 +35,8 @@ ul.ulpara {
 body.toc { margin: 2em 1.5em }
 div.toc { padding-left: 1em }
 
+div.content { max-width: 120ex; margin: 0 auto }
+
 p.cont {
     text-indent: 0ex;
 }
