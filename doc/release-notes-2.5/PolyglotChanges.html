@@ -4,8 +4,13 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <link rel="stylesheet" href="../overview.css" type="text/css">
 <title>Changes to Polyglot for Version 2.5</title>
+<style>
+  p { width: 100ex }
+</style>
+
 </head>
 <body>
+    <div class="content">
 
 	<h1>Changes to Polyglot for Version 2.5</h1>
 
@@ -21,10 +26,7 @@
 		option was given to specify a different post-compiler. The new
 		standard behavior is to generate Java source code internally, and use
 		the Java compiler support provided in the
-		<tt>
-			<a
-				href="http://docs.oracle.com/javase/6/docs/api/javax/tools/package-summary.html">javax.tools</a>
-		</tt>
+		<tt><a href="http://docs.oracle.com/javase/6/docs/api/javax/tools/package-summary.html">javax.tools</a></tt>
 		package to invoke
 		<tt>javac</tt>
 		within the same JVM as Polyglot itself. This change improves
@@ -61,15 +63,16 @@
 	<h2>Additions</h2>
 	<ul>
 		<li><tt>polyglot.frontend.ExtensionInfo</tt> interface has an
-			additional method <tt>classFileLoader()</tt> which creates a loader
+			additional method <tt>classFileLoader()</tt> that creates a loader
 			that loads <tt>.class</tt> files from multiple locations.</li>
 		<li><tt>polyglot.filemanager.FileManager</tt> interface,
-			extending <tt>
-				<a
-					href="http://docs.oracle.com/javase/6/docs/api/javax/tools/StandardJavaFileManager.html">javax.tools.StandardJavaFileManager</a>
-			</tt>, <tt>polyglot.frontend.SourceLoader</tt> and <tt>polyglot.types.reflect.ClassFileLoader</tt></li>
+			extending
+                    <tt>
+                        <a href="http://docs.oracle.com/javase/6/docs/api/javax/tools/StandardJavaFileManager.html">
+                            javax.tools.StandardJavaFileManager</a></tt>,
+                        <tt>polyglot.frontend.SourceLoader</tt> and <tt>polyglot.types.reflect.ClassFileLoader</tt></li>
 		<li><tt>polyglot.filemanager.ExtFileManager</tt> class,
-			implementing <tt>polyglot.filemanager.FileManager</tt> interface</li>
+			implementing the <tt>polyglot.filemanager.FileManager</tt> interface</li>
 		<li><tt>polyglot.filemanager.SourceObject</tt> class, extending <tt>javax.tools.SimpleJavaFileObject</tt>
 			to provide in-memory objects to hold translated Java code</li>
 		<li><tt>polyglot.util.StringBuilderWriter</tt> class, providing a
@@ -95,6 +98,10 @@
 	</p>
 	<br />
 	<h2>FileManager implementation and associated SourceObject</h2>
-	<img alt="UML Diagram" src="PolyglotFileManager.png" />
+        <p>
+        The following UML diagrams show how the different parts of the new file manager implementation are composed.
+        </p>
+	<img alt="UML Diagram" src="PolyglotFileManager.png" width="100%"/>
+    </div>
 </body>
 </html>
