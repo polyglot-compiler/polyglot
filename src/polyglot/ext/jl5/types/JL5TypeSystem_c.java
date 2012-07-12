@@ -1603,7 +1603,12 @@ public class JL5TypeSystem_c extends ParamTypeSystem_c implements JL5TypeSystem 
     public Flags legalLocalFlags() {
         return JL5Flags.setVarArgs(super.legalLocalFlags());
     }
-    
+
+    @Override
+    public Flags legalConstructorFlags() {
+        return JL5Flags.setVarArgs(super.legalConstructorFlags());
+    }
+
     @Override
     public Flags legalMethodFlags() {
         return JL5Flags.setVarArgs(super.legalMethodFlags());

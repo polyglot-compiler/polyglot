@@ -76,10 +76,14 @@ public class JL5ConstructorDecl_c extends ConstructorDecl_c implements JL5Constr
             return this;
         }
 
+        boolean vararg = false;
         List formalTypes = new ArrayList(formals.size());
         for (int i = 0; i < formals.size(); i++) {
             formalTypes.add(ts.unknownType(position()));
-        }
+            JL5Formal f = (JL5Formal) formals.get(i);            
+            if (f.isVarArg())
+            	vararg = true;
+        }       
 
         List throwTypes = new ArrayList(throwTypes().size());
         for (int i = 0; i < throwTypes().size(); i++) {
@@ -90,12 +94,13 @@ public class JL5ConstructorDecl_c extends ConstructorDecl_c implements JL5Constr
         for (int i = 0; i < typeParams().size(); i++) {
             typeParams.add(ts.unknownType(position()));
         }
-
+        if (vararg)
+        	flags = JL5Flags.VARARGS.set(this.flags);
         ConstructorInstance ci = ts.constructorInstance(position(), ct,
                                                         flags, formalTypes, throwTypes, typeParams);
         ct.addConstructor(ci);
 
-        return constructorInstance(ci);
+        return constructorInstance(ci).flags(flags);
     }
 
     @Override
