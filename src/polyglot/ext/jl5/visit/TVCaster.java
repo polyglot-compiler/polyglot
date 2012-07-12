@@ -4,6 +4,7 @@ import java.util.List;
 
 import polyglot.ast.*;
 import polyglot.ext.jl5.JL5Options;
+import polyglot.ext.jl5.ast.AnnotationElem;
 import polyglot.ext.jl5.types.*;
 import polyglot.ext.param.types.SubstType;
 import polyglot.frontend.Job;
@@ -23,7 +24,7 @@ public class TVCaster extends AscriptionVisitor {
     public TVCaster(Job job, TypeSystem ts, NodeFactory nf) {
         super(job, ts, nf);
     }
-
+        
     @Override
     public Expr ascribe(Expr e, Type toType) throws SemanticException {
         if (e.type() == null || toType == null || !toType.isCanonical()) {
@@ -64,7 +65,15 @@ public class TVCaster extends AscriptionVisitor {
         return e;
     }
 
-	private boolean mayBeParameterizedField(FieldInstance fi) {
+	@Override
+    public NodeVisitor enterCall(Node parent, Node n) throws SemanticException {
+	    if (n instanceof AnnotationElem) {
+	        return bypassChildren(n);
+	    }
+        return super.enterCall(parent, n);
+    }
+
+    private boolean mayBeParameterizedField(FieldInstance fi) {
         ReferenceType container = fi.container();
         JL5ParsedClassType pct = getBase(container);
         

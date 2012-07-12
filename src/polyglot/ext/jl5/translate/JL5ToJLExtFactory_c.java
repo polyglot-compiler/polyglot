@@ -9,7 +9,15 @@ public class JL5ToJLExtFactory_c extends JL5ToExtFactory_c {
 	protected Ext extClassDeclImpl() {
 		return new JL5ClassDeclToJL_c();
 	}
-	
+	@Override
+	protected Ext extMethodDeclImpl() {
+	    return new JL5MethodDeclToJL_c();
+	}
+    @Override
+    protected Ext extConstructorDeclImpl() {
+        return new JL5ConstructorDeclToJL_c();
+    }
+
 	@Override
 	protected Ext extCanonicalTypeNodeImpl() {
 		return new JL5TypeNodeToJL_c();
@@ -41,5 +49,20 @@ public class JL5ToJLExtFactory_c extends JL5ToExtFactory_c {
 	protected Ext extEnumConstantDeclImpl() {
 		return new CannotToExt_c();
 	}
+
+    @Override
+    protected Ext extAnnotationElemDeclImpl() {
+        return new CannotToExt_c();
+    }
+
+    @Override
+    protected Ext extNormalAnnotationElemImpl() {
+        return new CannotToExt_c();
+    }
+
+    @Override
+    protected Ext extElementValuePairImpl() {
+        return new CannotToExt_c();
+    }
 
 }
