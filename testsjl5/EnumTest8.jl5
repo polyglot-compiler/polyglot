@@ -1,0 +1,15 @@
+enum Color {
+    RED {
+        public int foo() {
+            return 1;
+        }
+    }, 
+    GREEN {
+        public int foo() {
+            return 2;
+        }
+    };
+    public int foo() {
+        return 0;
+    }
+} 

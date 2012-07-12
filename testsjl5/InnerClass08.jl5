@@ -1,0 +1,17 @@
+class TreeMap<K> { }
+class NavSubmap<Q> {
+    class SubmapKi { 
+        SubmapKi(TreeMap<Q> o) {
+        }
+        void bar(TreeMap<Q> o) {
+        }
+    }
+}
+class AscSubmap<K> extends NavSubmap<K> {
+    public void foo(SubmapKi c, TreeMap<K> a) {
+        // both of these calls appear 
+        // to fail for the same reason.
+        SubmapKi b = new SubmapKi(a);
+        c.bar(a);
+    }
+}

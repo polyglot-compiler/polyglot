@@ -1,0 +1,22 @@
+class Q {
+}
+class X extends Q {
+}
+class Y extends X {
+}
+class C implements I1, I2 {
+    public Y f(Object request) {
+        return null;
+    }
+}
+interface I1 {
+    public <T extends Q> T f(Object request);
+}
+interface I2 extends I1 {
+    public <T extends X> T f(Object request);
+}
+class M {
+    public void bar(C h) {
+        Y p = h.f(null);
+    }
+}

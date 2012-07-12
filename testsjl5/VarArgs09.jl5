@@ -1,0 +1,12 @@
+//import java.util.Arrays;
+class A {
+    void m(Ctor a) {
+        a.foo();
+        Ctor c = new Ctor();
+    }
+}
+class Ctor {
+    public Ctor(Object... a) { super(); }
+    
+    public void foo(Object... a) {  }
+}

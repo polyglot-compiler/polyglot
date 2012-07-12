@@ -1,0 +1,6 @@
+@interface Documented {}
+@interface Target { int value(); }
+@Documented
+@Target(5)
+public @interface Inherited {
+}
