@@ -75,8 +75,19 @@ public class TVCaster extends AscriptionVisitor {
 
     private boolean mayBeParameterizedField(FieldInstance fi) {
         ReferenceType container = fi.container();
-        JL5ParsedClassType pct = getBase(container);
-        
+        JL5ParsedClassType pct;
+        if (container.isArray()) {
+        	if (container.toArray().base().isReference()) {
+        		ReferenceType base = (ReferenceType) container.toArray().base();
+        		if (base instanceof TypeVariable)
+        			return true;
+        		pct = getBase(base);
+        	}
+        	else
+        		return false;
+        }
+        else
+        	pct = getBase(container);
         
         FieldInstance bfi = pct.fieldNamed(fi.name());
         if (bfi == null) {
@@ -88,9 +99,20 @@ public class TVCaster extends AscriptionVisitor {
 
     private boolean mayHaveParameterizedReturn(MethodInstance mi) {
         ReferenceType container = mi.container();
-        JL5ParsedClassType pct = getBase(container);
-        
-        
+        JL5ParsedClassType pct;
+        if (container.isArray()) {
+        	if (container.toArray().base().isReference()) {
+        		ReferenceType base = (ReferenceType) container.toArray().base();
+        		if (base instanceof TypeVariable)
+        			return true;
+        		pct = getBase(base);
+        	}
+        	else
+        		return false;
+        }
+        else
+        	pct = getBase(container);
+
         List<MethodInstance> meths = pct.methodsNamed(mi.name());
         
         for (MethodInstance bmi : meths) {

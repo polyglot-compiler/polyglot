@@ -141,6 +141,7 @@ polyglot.ext.jl5.ExtensionInfo "-d out -classpath java-out -noserial -post \"jav
 	Array05.jl5;
 	Array06.jl5;
 	Array07.jl5 (Semantic, "reifiable");
+	Array08.jl5;
 	C.jl5;
 	FBoundSub.jl5;
 	FBoundSub2.jl5;
@@ -430,6 +431,7 @@ polyglot.ext.jl5.ExtensionInfo "-d out -classpath java-out -removeJava5isms -enu
         Array05.jl5;
 	Array06.jl5;
 	Array07.jl5 (Semantic, "reifiable");
+	Array08.jl5;
         C.jl5;
         FBoundSub.jl5;
         FBoundSub2.jl5;
