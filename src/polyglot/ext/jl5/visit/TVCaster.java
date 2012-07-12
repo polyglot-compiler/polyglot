@@ -77,11 +77,13 @@ public class TVCaster extends AscriptionVisitor {
         ReferenceType container = fi.container();
         JL5ParsedClassType pct;
         if (container.isArray()) {
-        	if (container.toArray().base().isReference()) {
-        		ReferenceType base = (ReferenceType) container.toArray().base();
-        		if (base instanceof TypeVariable)
-        			return true;
-        		pct = getBase(base);
+    		Type base = container.toArray().base();
+    		while (base.isArray())
+    			base = base.toArray().base();
+    		if (base instanceof TypeVariable)
+    			return true;
+        	if (base.isReference()) {
+        		pct = getBase(base.toReference());
         	}
         	else
         		return false;
@@ -101,11 +103,13 @@ public class TVCaster extends AscriptionVisitor {
         ReferenceType container = mi.container();
         JL5ParsedClassType pct;
         if (container.isArray()) {
-        	if (container.toArray().base().isReference()) {
-        		ReferenceType base = (ReferenceType) container.toArray().base();
-        		if (base instanceof TypeVariable)
-        			return true;
-        		pct = getBase(base);
+    		Type base = container.toArray().base();
+    		while (base.isArray())
+    			base = base.toArray().base();
+    		if (base instanceof TypeVariable)
+    			return true;
+        	if (base.isReference()) {
+        		pct = getBase(base.toReference());
         	}
         	else
         		return false;
