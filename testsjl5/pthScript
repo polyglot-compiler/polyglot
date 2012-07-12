@@ -304,11 +304,28 @@ polyglot.ext.jl5.ExtensionInfo "-d out -classpath java-out -noserial -post \"jav
 	enum1.jl5;
 	enum2.jl5;
     ConstructorCall01.jl5;
+    Annotations01.jl5;
+    Annotations02.jl5;
+    Call02.jl5;
+    ClassLoad01.jl5;
+    CovariantRet01.jl5;
+    EnumTest5.jl5;
+    EnumTest8.jl5;
+    Generics44.jl5;
+    InnerClass09.jl5;
+    Interface07.jl5;
+    Iterator01.jl5;
+    Negate01.jl5;
+    Throw01.jl5;
+    UnboxBooleans.jl5;
+    VarArgs08.jl5;
+    VarArgs09.jl5;
 }
 
 # Now run the tests again removing the Java 5-isms.
 # This one uses 1.4 to suppress the warning about raw classes.
 polyglot.ext.jl5.ExtensionInfo "-d out -classpath java-out -removeJava5isms -enumImplClass MyEnum -noserial -post \"javac -source 1.4\" -morepermissiveinference" {
+        HexFloatingPoint.jl5;
         Generics01.jl5;
         Generics02.jl5;
         Generics03.jl5;
@@ -405,6 +422,7 @@ polyglot.ext.jl5.ExtensionInfo "-d out -classpath java-out -removeJava5isms -enu
 	Conditional01.jl5;
 	Conditional02.jl5;
 	Conditional03.jl5;
+    Conditional04.jl5
         Array.jl5;
         Array2.jl5 (Semantic, "should be declared abstract");
         Array03.jl5;
@@ -574,4 +592,20 @@ polyglot.ext.jl5.ExtensionInfo "-d out -classpath java-out -removeJava5isms -enu
         enum1.jl5;
         enum2.jl5;
         ConstructorCall01.jl5;
+        Annotations01.jl5;
+        Annotations02.jl5;
+        Call02.jl5;
+        ClassLoad01.jl5;
+        CovariantRet01.jl5;
+        EnumTest5.jl5;
+        EnumTest8.jl5;
+        Generics44.jl5;
+        InnerClass09.jl5;
+        Interface07.jl5;
+        Iterator01.jl5;
+        Negate01.jl5;
+        Throw01.jl5;
+        UnboxBooleans.jl5;
+        VarArgs08.jl5;
+        VarArgs09.jl5;
 }

@@ -1,0 +1,9 @@
+class B<T> {
+}
+class A<T> {
+    A() {
+        this(new B<T>());
+    }
+    A(B<T> o) {
+    }
+}
