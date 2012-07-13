@@ -85,6 +85,7 @@ public class ScriptTestSuite extends TestSuite {
                           new FileInputStream(TestSuiteResult.getResultsFileName(this.scriptFile)));
             TestResult tr = (TestResult)ois.readObject();
             this.setTestResult(tr);
+            ois.close();
         }
         catch (FileNotFoundException e) { 
             // ignore, and fail silently
@@ -101,7 +102,8 @@ public class ScriptTestSuite extends TestSuite {
             ObjectOutputStream oos = 
                  new ObjectOutputStream(
                           new FileOutputStream(TestSuiteResult.getResultsFileName(this.scriptFile)));
-            oos.writeObject(this.getTestSuiteResult());            
+            oos.writeObject(this.getTestSuiteResult());    
+            oos.close();
         }
         catch (IOException e) {
             System.err.println("Unable to save results for test suite " + this.getName());
