@@ -218,7 +218,7 @@ public class Main {
 					}
 
 					for (JavaFileObject jfo : compiler.outputFiles())
-						javacCmd[j++] = new File(jfo.toUri()).getAbsolutePath();
+						javacCmd[j++] = new File(jfo.toUri().getPath()).getAbsolutePath();
 
 					if (Report.should_report(verbose, 1)) {
 						StringBuffer cmdStr = new StringBuffer();
