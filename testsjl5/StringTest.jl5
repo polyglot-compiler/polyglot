@@ -1,7 +1,0 @@
-
-class C {
-    void m() {
-	String s = "hi";
-	s += "there";
-    }
-}

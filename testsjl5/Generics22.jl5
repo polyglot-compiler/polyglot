@@ -1,5 +1,0 @@
-class C<T> {
-    class D {
-	static  T x = null; // error
-    }
-}

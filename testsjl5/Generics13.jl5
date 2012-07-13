@@ -1,9 +1,0 @@
-class C<E> {
-    public static void main(String[] args) {
-    }
-}
-class D {
-    void foo(String[] args) {
-	C.main(args);
-    }
-}

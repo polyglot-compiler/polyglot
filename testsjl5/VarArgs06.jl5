@@ -1,3 +1,0 @@
-abstract class C {
-  abstract void m(int x, Object... y);
-}

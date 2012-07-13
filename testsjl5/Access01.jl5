@@ -1,6 +1,0 @@
-class C<T> {
-  private static Object o = null;
-  void m() {
-    Object x = o;
-  }
-}

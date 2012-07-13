@@ -1,8 +1,0 @@
-
-interface I<T> {
-    void m(T o);
-}
-
-class C<S> implements I<S> {
-    public void m(S o) {}
-}

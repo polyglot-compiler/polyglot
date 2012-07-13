@@ -1,4 +1,0 @@
-import java.util.List;
-public class B {
-    public void f(List l) {}
-}

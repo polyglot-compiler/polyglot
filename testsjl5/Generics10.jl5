@@ -1,7 +1,0 @@
-class C<T> {
-    void foo() {
-	C x = new C<String>();
-	C<String> foo = x;
-    }
-}
-

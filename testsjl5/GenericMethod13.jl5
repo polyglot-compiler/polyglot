@@ -1,7 +1,0 @@
-class Test<S> {
-	S s;
-	<T> void test(T t) {
-		test(s);
-	}
-	
-}

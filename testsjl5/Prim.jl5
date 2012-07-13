@@ -1,7 +1,0 @@
-class C {
-      public static void main(String[] args) {
-      	long startTime = 98345L;
-      	long stopTime = 98349345L;
-	String e = "wer" + (stopTime - startTime);
-	}
-}

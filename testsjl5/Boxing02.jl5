@@ -1,6 +1,0 @@
-class Boxing02 {
-  public static void main(String[] args) {
-    final Byte b = (byte)Byte.parseByte(args[0]);
-    int i = b;
-  }
-}

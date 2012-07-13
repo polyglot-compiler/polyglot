@@ -1,8 +1,0 @@
-class C {
-    private static class UnmodifiableMap<U>  {
-	static class UnmodifiableEntrySet<S> extends D<U> { // can't use U here!
-	}
-    }
-}
-
-class D<T> { }

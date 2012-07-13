@@ -1,3 +1,0 @@
-class Seq<T> { 
-    void zip(Seq<T> that) { }
-}

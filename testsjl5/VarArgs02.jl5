@@ -1,5 +1,0 @@
-class C {
-    void m(String s1) {
-	System.out.printf("abasdf", s1, 4, s1);
-    }
-}

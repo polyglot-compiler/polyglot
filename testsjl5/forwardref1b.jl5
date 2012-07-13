@@ -1,1 +1,0 @@
-class F<T extends D<S,S>, S> {} //error S is D<S,S> is not bounded by T
