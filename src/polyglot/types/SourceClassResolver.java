@@ -103,6 +103,21 @@ public class SourceClassResolver extends LoadedClassResolver {
 	protected boolean compileCommandLineOnly;
 	protected boolean ignoreModTimes;
 
+	/**
+	 * Create a loaded class resolver.
+	 * 
+	 * @param compiler
+	 *            The compiler.
+	 * @param ext
+	 *            The extension to load sources for.
+	 * @param allowRawClasses
+	 *            True if vanilla Java class files without Polyglot-embedded
+	 *            type information should be allowed.
+	 * @param compileCommandLineOnly
+	 *            TODO
+	 * @param ignoreModTimes
+	 *            TODO
+	 */
 	public SourceClassResolver(Compiler compiler, ExtensionInfo ext,
 			boolean allowRawClasses, boolean compileCommandLineOnly,
 			boolean ignoreModTimes) {
@@ -143,13 +158,15 @@ public class SourceClassResolver extends LoadedClassResolver {
 					Report.report(4, "Class " + name + " has encoded type info");
 				encodedClazz = clazz;
 			}
-			if (encodedClazz != null && 
-		    		  !name.replace(".", File.separator).equals(encodedClazz.name())) {
-		          if (Report.should_report(report_topics, 3))
-		      	    Report.report(3, "Not using " + encodedClazz.name() + "(case-insensitive filesystem?)");
-		        encodedClazz = null;
-		        clazz = null;
-		    }
+			if (encodedClazz != null
+					&& !name.replace(".", File.separator).equals(
+							encodedClazz.name())) {
+				if (Report.should_report(report_topics, 3))
+					Report.report(3, "Not using " + encodedClazz.name()
+							+ "(case-insensitive filesystem?)");
+				encodedClazz = null;
+				clazz = null;
+			}
 		}
 
 		// Now, try and find the source file.
@@ -174,7 +191,6 @@ public class SourceClassResolver extends LoadedClassResolver {
 				Report.report(4, "Not using raw class file for " + name);
 			clazz = null;
 		}
-
 		// If both the source and encoded class are available, we decide which
 		// to
 		// use based on compiler compatibility and modification times.
@@ -184,7 +200,6 @@ public class SourceClassResolver extends LoadedClassResolver {
 
 			int comp = checkCompilerVersion(encodedClazz
 					.compilerVersion(version.name()));
-
 			if (!ignoreModTimes && classModTime < sourceModTime) {
 				if (Report.should_report(report_topics, 3))
 					Report.report(3,

@@ -21,6 +21,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
 
 import javax.tools.FileObject;
 import javax.tools.JavaFileManager.Location;
@@ -60,6 +62,10 @@ public class ExtFileManager implements FileManager {
 	protected final Map<String, Boolean> packageCache;
 	/** A cache for the class files that don't exist */
 	protected final Set<String> nocache;
+
+	protected final Map<File, Object> zipCache;
+
+	protected final static Object not_found = new Object();
 
 	protected static final int BUF_SIZE = 1024 * 8;
 
@@ -102,6 +108,7 @@ public class ExtFileManager implements FileManager {
 		locations = new ArrayList<Location>();
 		packageCache = new HashMap<String, Boolean>();
 		nocache = new HashSet<String>();
+		zipCache = new HashMap<File, Object>();
 		absPathObjMap = new HashMap<URI, JavaFileObject>();
 		pathObjectMap = new HashMap<URI, Set<JavaFileObject>>();
 	}
@@ -144,7 +151,8 @@ public class ExtFileManager implements FileManager {
 				|| !javac_fm.hasLocation(sourceOutputLoc))
 			return null;
 		if (options.outputToFS)
-			return javac_fm.getFileForOutput(location, packageName, relativeName, sibling);
+			return javac_fm.getFileForOutput(location, packageName,
+					relativeName, sibling);
 		URI srcUri, srcParentUri;
 		Kind k;
 		if (relativeName.endsWith(".java"))
@@ -164,7 +172,8 @@ public class ExtFileManager implements FileManager {
 			}
 			if (sourcedir == null)
 				throw new IOException("Source output directory is not set.");
-			String pkg = packageName.equals("") ? "" : (packageName.replace('.', separatorChar) + separator);
+			String pkg = packageName.equals("") ? "" : (packageName.replace(
+					'.', separatorChar) + separator);
 			File sourcefile = new File(sourcedir, pkg + relativeName);
 			srcUri = sourcefile.toURI();
 			srcParentUri = sourcefile.getParentFile().toURI();
@@ -216,7 +225,8 @@ public class ExtFileManager implements FileManager {
 					|| !javac_fm.hasLocation(sourceOutputLoc))
 				return null;
 			if (options.outputToFS)
-				return javac_fm.getJavaFileForOutput(location, className, kind, sibling);
+				return javac_fm.getJavaFileForOutput(location, className, kind,
+						sibling);
 			URI srcUri, srcParentUri;
 			if (sibling == null) {
 				File sourcedir = null;
@@ -252,8 +262,8 @@ public class ExtFileManager implements FileManager {
 			if (location == null || !classOutputLoc.equals(location)
 					|| !javac_fm.hasLocation(classOutputLoc))
 				return null;
-			return javac_fm.getJavaFileForOutput(classOutputLoc, className, kind,
-					sibling);
+			return javac_fm.getJavaFileForOutput(classOutputLoc, className,
+					kind, sibling);
 		} else {
 			throw new UnsupportedOperationException();
 		}
@@ -311,8 +321,7 @@ public class ExtFileManager implements FileManager {
 				}
 			}
 			return s;
-		}
-		else if (classOutputLoc.equals(location))
+		} else if (classOutputLoc.equals(location))
 			return javac_fm.list(classOutputLoc, packageName, kinds, recurse);
 		else
 			return javac_fm.list(location, packageName, kinds, recurse);
@@ -369,16 +378,70 @@ public class ExtFileManager implements FileManager {
 		return exists;
 	}
 
+	ZipFile loadZip(File dir) throws IOException {
+		Object o = zipCache.get(dir);
+		if (o != not_found) {
+			ZipFile zip = (ZipFile) o;
+			if (zip != null) {
+				return zip;
+			} else {
+				// the zip is not in the cache.
+				// try to get it.
+				if (!dir.exists()) {
+					// record that the file does not exist,
+					zipCache.put(dir, not_found);
+				} else {
+					// get the zip and put it in the cache.
+					if (Report.should_report(verbose, 2))
+						Report.report(2, "Opening zip " + dir);
+					if (dir.getName().endsWith(".jar")) {
+						zip = new JarFile(dir);
+					} else {
+						zip = new ZipFile(dir);
+					}
+					zipCache.put(dir, zip);
+
+					// Load the package cache
+					Enumeration<? extends ZipEntry> i = zip.entries();
+					while (i.hasMoreElements()) {
+						ZipEntry ei = i.nextElement();
+						String n = ei.getName();
+						int index = n.indexOf('/');
+						while (index >= 0) {
+							packageCache.put(n.substring(0, index), true);
+							index = n.indexOf('/', index + 1);
+						}
+					}
+					return zip;
+				}
+			}
+		}
+		return null;
+	}
+
 	@Override
 	public boolean packageExists(Location location, String name) {
-		String pkg = name.replace('.', File.separatorChar);
 		Iterable<? extends File> files = getLocation(location);
 		if (files == null)
 			return false;
 		for (File f : files) {
-			File newFile = new File(f, pkg);
-			if (newFile.exists() && newFile.isDirectory())
-				return true;
+			String fileName = f.getName();
+			if (fileName.endsWith(".jar") || fileName.endsWith(".zip")) {
+				String entryName = name.replace('.', '/');
+				try {
+					loadZip(f);
+				} catch (IOException e) {
+					throw new InternalCompilerError(e);
+				}
+				Boolean contains = packageCache.get(entryName);
+				if (contains != null && contains)
+					return true;
+			} else {
+				File newFile = new File(f,
+						name.replace('.', File.separatorChar));
+				if (newFile.exists() && newFile.isDirectory())
+					return true;
+			}
 		}
 		return false;
 	}
@@ -470,7 +533,7 @@ public class ExtFileManager implements FileManager {
 	public FileSource fileSource(Location location, String fileName,
 			boolean userSpecified) throws IOException {
 		String key = fileKey(location, "", fileName);
-		
+
 		FileSource sourceFile = loadedSources.get(key);
 		if (sourceFile != null)
 			return sourceFile;
@@ -550,7 +613,7 @@ public class ExtFileManager implements FileManager {
 		}
 		return null;
 	}
-	
+
 	/** Load the source file for the given class name using the source path. */
 	protected FileSource checkForSource(Location location, String className) {
 		/* Search the source path. */
@@ -566,7 +629,7 @@ public class ExtFileManager implements FileManager {
 			if (source != null) {
 				return source;
 			}
-			
+
 			FileObject fo;
 			try {
 				fo = getFileForInput(location, pkgName, fileName);
@@ -589,9 +652,11 @@ public class ExtFileManager implements FileManager {
 		return null;
 	}
 
-	protected String fileKey(Location location, String packageName, String fileName) {
+	protected String fileKey(Location location, String packageName,
+			String fileName) {
 		if (caseInsensitive())
-			return location + "/" + packageName.toLowerCase() + "/" + fileName.toLowerCase();
+			return location + "/" + packageName.toLowerCase() + "/"
+					+ fileName.toLowerCase();
 		return location + "/" + packageName + "/" + fileName;
 	}
 
@@ -607,64 +672,66 @@ public class ExtFileManager implements FileManager {
 			caseInsensitivityComputed = true;
 		}
 		if (caseInsensitive == 0) {
-            throw new InternalCompilerError("unknown case sensitivity");
-        }
-        return caseInsensitive == 1;
+			throw new InternalCompilerError("unknown case sensitivity");
+		}
+		return caseInsensitive == 1;
 	}
-	
+
 	private void setCaseInsensitive(String fileName) {
-        if (caseInsensitive != 0) {
-            return;
-        }
+		if (caseInsensitive != 0) {
+			return;
+		}
 
-        // File.equals doesn't work correctly on the Mac.
-        // So, get the list of files in the same directory
-        // as sourceFile.  Check if the sourceFile with two
-        // different cases exists but only appears in the list once.
-        File f1 = new File(fileName.toUpperCase());
-        File f2 = new File(fileName.toLowerCase());
+		// File.equals doesn't work correctly on the Mac.
+		// So, get the list of files in the same directory
+		// as sourceFile. Check if the sourceFile with two
+		// different cases exists but only appears in the list once.
+		File f1 = new File(fileName.toUpperCase());
+		File f2 = new File(fileName.toLowerCase());
 
-        if (f1.equals(f2)) {
-            caseInsensitive = 1;
-        }
-        else if (f1.exists() && f2.exists()) {
-            boolean f1Exists = false;
-            boolean f2Exists = false;
+		if (f1.equals(f2)) {
+			caseInsensitive = 1;
+		} else if (f1.exists() && f2.exists()) {
+			boolean f1Exists = false;
+			boolean f2Exists = false;
 
-            File dir;
+			File dir;
 
-            if (f1.getParent() != null) {
-                dir = new File(f1.getParent());
-            }
-            else {
-                dir = new File(fileName);
-            }
+			if (f1.getParent() != null) {
+				dir = new File(f1.getParent());
+			} else {
+				dir = new File(fileName);
+			}
 
-            File[] ls = dir.listFiles();
-            if (ls != null) {
-                for (int i = 0; i < ls.length; i++) {
-                    if (f1.equals(ls[i])) {
-                        f1Exists = true;
-                    }
-                    if (f2.equals(ls[i])) {
-                        f2Exists = true;
-                    }
-                }
-            }
-            else {
-                // dir not found
-            }
+			File[] ls = dir.listFiles();
+			if (ls != null) {
+				for (int i = 0; i < ls.length; i++) {
+					if (f1.equals(ls[i])) {
+						f1Exists = true;
+					}
+					if (f2.equals(ls[i])) {
+						f2Exists = true;
+					}
+				}
+			} else {
+				// dir not found
+			}
 
-            if (! f1Exists || ! f2Exists) {
-                caseInsensitive = 1;
-            }
-            else {
-                // There are two files.
-                caseInsensitive = -1;
-            }
-        }
-        else {
-            caseInsensitive = -1;
-        }
-    }
+			if (!f1Exists || !f2Exists) {
+				caseInsensitive = 1;
+			} else {
+				// There are two files.
+				caseInsensitive = -1;
+			}
+		} else {
+			caseInsensitive = -1;
+		}
+	}
+
+	protected static Collection<String> verbose;
+
+	static {
+		verbose = new HashSet<String>();
+		verbose.add("filemanager");
+	}
 }

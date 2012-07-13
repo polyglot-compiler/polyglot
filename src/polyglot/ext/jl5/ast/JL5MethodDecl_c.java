@@ -125,9 +125,13 @@ public class JL5MethodDecl_c extends MethodDecl_c implements JL5MethodDecl {
         return n;
     }
 
-    protected MethodDecl_c reconstruct(TypeNode returnType, List formals, List throwTypes, Block body, List paramTypes){
-        if (returnType != this.returnType || ! CollectionUtil.equals(formals, this.formals) || ! CollectionUtil.equals(throwTypes, this.throwTypes) || body != this.body || !CollectionUtil.equals(paramTypes, this.typeParams)) {
+    protected MethodDecl_c reconstruct(TypeNode returnType, Id name, List formals, List throwTypes, Block body, List paramTypes){
+        if (returnType != this.returnType || name != this.name 
+        		|| ! CollectionUtil.equals(formals, this.formals) 
+        		|| ! CollectionUtil.equals(throwTypes, this.throwTypes) 
+        		|| body != this.body || !CollectionUtil.equals(paramTypes, this.typeParams)) {
             JL5MethodDecl_c n = (JL5MethodDecl_c) copy();
+            n.name = name;
             n.returnType = returnType;
             n.formals = TypedList.copyAndCheck(formals, Formal.class, true);
             n.throwTypes = TypedList.copyAndCheck(throwTypes, TypeNode.class, true);
@@ -232,11 +236,12 @@ public class JL5MethodDecl_c extends MethodDecl_c implements JL5MethodDecl {
     @Override
     public Node visitChildren(NodeVisitor v){
         List paramTypes = visitList(this.typeParams, v);
+        Id name = (Id) visitChild(this.name, v);
         List formals = visitList(this.formals, v);
         TypeNode returnType = (TypeNode) visitChild(this.returnType, v);
         List throwTypes = visitList(this.throwTypes, v);
         Block body = (Block) visitChild(this.body, v);
-        return reconstruct(returnType, formals, throwTypes, body, paramTypes);
+        return reconstruct(returnType, name, formals, throwTypes, body, paramTypes);
     }
 
     @Override

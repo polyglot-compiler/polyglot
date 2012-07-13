@@ -40,13 +40,15 @@ public class Position implements Serializable
     private String path;
     private String file;
     private String info;
-
+    
     private int line;
     private int column;
     
     private int endLine;
     private int endColumn;
 
+    private boolean compilerGenerated = false;
+    
     // Position in characters from the beginning of the containing character
     // stream
     private int offset;
@@ -54,7 +56,7 @@ public class Position implements Serializable
 
     public static final int UNKNOWN = -1;
     public static final int END_UNUSED = -2;
-    public static final Position COMPILER_GENERATED = new Position(null, "Compiler Generated");
+    public static final Position COMPILER_GENERATED = new Position("Compiler Generated", true);
     
     public static final int THIS_METHOD = 1;
     public static final int CALLER = THIS_METHOD + 1;
@@ -68,7 +70,7 @@ public class Position implements Serializable
             return COMPILER_GENERATED;
         StackTraceElement[] stack = new Exception().getStackTrace();
         if (depth < stack.length) {
-            return new Position(null, stack[depth].getFileName() + " (compiler generated)", stack[depth].getLineNumber());
+            return new Position(stack[depth].getFileName() + " (compiler generated)", stack[depth].getLineNumber(), true);
         }
         else {
             return COMPILER_GENERATED;
@@ -89,12 +91,27 @@ public class Position implements Serializable
     public void setInfo(String info) {
     	this.info = info;
     }
+    
+    /** Get a compiler generated position. */ 
+    public boolean isCompilerGenerated() {
+        return compilerGenerated;
+    }
 
     /** For deserialization. */
     protected Position() {
         line = endLine = 0;
         column = endColumn = 0;
         offset = endOffset = 0;
+    }
+
+    public Position(String desc, boolean compilerGenerated) {
+        this(null, desc, UNKNOWN, UNKNOWN);
+        this.compilerGenerated = compilerGenerated;
+    }
+    
+    public Position(String desc, int line, boolean compilerGenerated) {
+        this(null, desc, line, UNKNOWN);
+        this.compilerGenerated = compilerGenerated;
     }
 
     public Position(String path, String file) {

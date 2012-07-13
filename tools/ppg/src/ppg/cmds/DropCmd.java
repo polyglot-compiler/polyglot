@@ -6,7 +6,7 @@ import ppg.util.*;
 public class DropCmd implements Command
 {
 	private Production prod; // productions to be dropped for some nonterminal
-	private Vector sym; // or, the single nonterminal to be dropped
+	private Vector<String> sym; // or, the single nonterminal to be dropped
 	
 	/*
 	public DropCmd(String symbol)
@@ -17,7 +17,7 @@ public class DropCmd implements Command
 	}
 	*/
 	
-	public DropCmd(Vector symbols)
+	public DropCmd(Vector<String> symbols)
 	{
 		sym = symbols;
 		prod = null;
@@ -33,7 +33,7 @@ public class DropCmd implements Command
 	public boolean isSymbolDrop() { return sym != null; }
 	
 	public Production getProduction() { return prod; }
-	public Vector getSymbols() { return sym; }
+	public Vector<String> getSymbols() { return sym; }
 	
 	public void unparse(CodeWriter cw) {
 		//cw.begin(0);
@@ -43,7 +43,7 @@ public class DropCmd implements Command
 			prod.unparse(cw);
 		else
 			for (int i=0; i < sym.size(); i++) {
-				cw.write((String)sym.elementAt(i));
+				cw.write(sym.elementAt(i));
 			}
 		//cw.end();
 	}

@@ -33,18 +33,18 @@ import java.util.List;
  */
 public class SilentErrorQueue extends AbstractErrorQueue
 {
-    private List errors;
+    private List<ErrorInfo> errors;
 
     public SilentErrorQueue(int limit, String name) {
         super(limit, name);
-        this.errors = new ArrayList(limit);
+        this.errors = new ArrayList<ErrorInfo>(limit);
     }
 
     public void displayError(ErrorInfo e) {
         errors.add(e);
     }
     
-    public List getErrors() {
+    public List<ErrorInfo> getErrors() {
         return errors;
     }
 }

@@ -25,34 +25,26 @@
 
 package polyglot.main;
 
-import java.io.File;
 import static java.io.File.pathSeparator;
+import static java.io.File.pathSeparatorChar;
 import static java.io.File.separator;
-import java.io.IOException;
+
+import java.io.File;
 import java.io.PrintStream;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
-import java.util.List;
-import java.util.ServiceLoader;
 import java.util.Set;
 import java.util.StringTokenizer;
 
-import javax.tools.JavaCompiler;
 import javax.tools.JavaFileManager;
-import javax.tools.JavaFileManager.Location;
-import javax.tools.JavaFileObject;
-import javax.tools.StandardJavaFileManager;
 import javax.tools.StandardLocation;
-import javax.tools.ToolProvider;
+import javax.tools.JavaFileManager.Location;
 
-import polyglot.filemanager.ExtFileManager;
 import polyglot.frontend.ExtensionInfo;
-import polyglot.util.InternalCompilerError;
 
 /**
  * This object encapsulates various polyglot options.
@@ -75,7 +67,9 @@ public class Options {
 	public int error_count = 100;
 	public Set<File> sourcepath_directories = new LinkedHashSet<File>();
 	public Collection<File> source_output_dir;
+	public String source_output_directory;
 	public Collection<File> class_output_dir;
+	public String class_output_directory;
 	public Set<File> classpath_directories = new LinkedHashSet<File>();
 	public Set<File> bootclasspath_directories = new LinkedHashSet<File>();
 	public File currFile;
@@ -84,8 +78,9 @@ public class Options {
 	public JavaFileManager.Location source_output;
 	public JavaFileManager.Location class_output;
 	public JavaFileManager.Location classpath;
-	public JavaFileManager.Location output_classpath;
+	public String output_classpath;
 	public JavaFileManager.Location bootclasspath;
+	public String bootClassPath;
 	public boolean outputToFS = false;
 	public boolean assertions = false;
 	public boolean generate_debugging_info = false;
@@ -96,7 +91,8 @@ public class Options {
 	public String output_ext = "java"; // java, by default
 	public boolean output_stdout = false; // whether to output to stdout
 	// compiler to run on java output file
-	// NOTE: null value of post_compiler sets JavaCompiler provided by ToolProvider as the default post compiler
+	// NOTE: null value of post_compiler sets JavaCompiler provided by
+	// ToolProvider as the default post compiler
 	public String post_compiler;
 
 	public int output_width = 80;
@@ -145,27 +141,27 @@ public class Options {
 	 */
 	public void setDefaultValues() {
 		currFile = new File(System.getProperty("user.dir"));
-		//TODO : make external config property file.
+		// TODO : make external config property file.
 		if (System.getProperty("os.name").indexOf("Mac") != -1) {
-			//XXX: gross! 
+			// XXX: gross!
 			bootFile = new File(System.getProperty("java.home") + separator
 					+ ".." + separator + "Classes" + separator + "classes.jar");
-		}
-		else {
+		} else {
 			bootFile = new File(System.getProperty("java.home") + separator
 					+ "lib" + separator + "rt.jar");
 		}
 		source_path = StandardLocation.SOURCE_PATH;
 		source_output = StandardLocation.SOURCE_OUTPUT;
 		class_output = StandardLocation.CLASS_OUTPUT;
-		output_classpath = StandardLocation.CLASS_PATH;
 		classpath = StandardLocation.CLASS_PATH;
+		String systemJavaClasspath = System.getProperty("java.class.path");
+		output_classpath = systemJavaClasspath;
 		bootclasspath = StandardLocation.PLATFORM_CLASS_PATH;
 
 		sourcepath_directories.add(currFile);
 
-		StringTokenizer st = new StringTokenizer(
-				System.getProperty("java.class.path"), pathSeparator);
+		StringTokenizer st = new StringTokenizer(systemJavaClasspath,
+				pathSeparator);
 		while (st.hasMoreTokens()) {
 			File f = new File(st.nextToken());
 			if (f.exists())
@@ -179,8 +175,7 @@ public class Options {
 	 * @throws UsageError
 	 *             if the usage is incorrect.
 	 */
-	public void parseCommandLine(String args[], Set<String> source)
-			throws UsageError {
+	public void parseCommandLine(String args[], Set source) throws UsageError {
 		if (args.length < 1) {
 			throw new UsageError("No command line arguments given");
 		}
@@ -210,7 +205,7 @@ public class Options {
 	 * @return the next index to process. i.e., if calling this method processes
 	 *         two commands, then the return value should be index+2
 	 */
-	protected int parseCommand(String args[], int index, Set<String> source)
+	protected int parseCommand(String args[], int index, Set source)
 			throws UsageError, Main.TerminationException {
 		int i = index;
 		if (args[i].equals("-h") || args[i].equals("-help")
@@ -231,14 +226,17 @@ public class Options {
 			if (!f.exists())
 				f.mkdirs();
 			class_output_dir = Collections.singleton(f);
+			class_output_directory = args[i];
 			i++;
 		} else if (args[i].equals("-D")) {
 			i++;
 			source_output_dir = Collections.singleton(new File(args[i]));
+			source_output_directory = args[i];
 			outputToFS = true;
 			i++;
 		} else if (args[i].equals("-classpath") || args[i].equals("-cp")) {
 			i++;
+			output_classpath = args[i] + pathSeparator + output_classpath;
 			StringTokenizer st = new StringTokenizer(args[i], pathSeparator);
 			while (st.hasMoreTokens()) {
 				File f = new File(st.nextToken());
@@ -249,6 +247,7 @@ public class Options {
 			i++;
 		} else if (args[i].equals("-bootclasspath")) {
 			i++;
+			bootClassPath = args[i];
 			StringTokenizer st = new StringTokenizer(args[i], pathSeparator);
 			while (st.hasMoreTokens()) {
 				File f = new File(st.nextToken());
@@ -376,7 +375,7 @@ public class Options {
 		} else if (args[i].equals("-output-to-fs")) {
 			outputToFS = true;
 			i++;
-		}else if (!args[i].startsWith("-")) {
+		} else if (!args[i].startsWith("-")) {
 			source.add(args[i]);
 			File f = new File(args[i]).getAbsoluteFile().getParentFile();
 			if (f != null && !sourcepath_directories.contains(f)) {
@@ -440,7 +439,6 @@ public class Options {
 		// "scramble the ast (for testing)");
 		usageForFlag(out, "-noserial", "disable class serialization");
 		usageForFlag(out, "-D <directory>", "output directory for .java files");
-		usageForFlag(out, "-output-to-fs", "put .java files on the file system");
 		usageForFlag(out, "-nooutput", "delete output files after compilation");
 		usageForFlag(out, "-c", "compile only to .java");
 		usageForFlag(out, "-post <compiler>",
@@ -456,7 +454,7 @@ public class Options {
 						+ "topic at specified verbosity");
 
 		StringBuffer allowedTopics = new StringBuffer("Allowed topics: ");
-		for (Iterator<String> iter = Report.topics.iterator(); iter.hasNext();) {
+		for (Iterator iter = Report.topics.iterator(); iter.hasNext();) {
 			allowedTopics.append(iter.next().toString());
 			if (iter.hasNext()) {
 				allowedTopics.append(", ");
@@ -596,5 +594,19 @@ public class Options {
 		while (n-- > 0) {
 			out.print(' ');
 		}
+	}
+
+	public String constructPostCompilerClasspath() {
+		StringBuilder builder = new StringBuilder();
+		for (File f : source_output_dir) {
+			builder.append(f.getAbsolutePath());
+			builder.append(pathSeparatorChar);
+		}
+		builder.append('.');
+		builder.append(pathSeparatorChar);
+		builder.append(output_classpath);
+		if (bootClassPath != null)
+			builder.append(bootClassPath);
+		return builder.toString();
 	}
 }

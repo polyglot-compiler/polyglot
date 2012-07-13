@@ -9,9 +9,9 @@ public class SymbolList
 	
 	private int variety;
 	private String type;
-	private Vector symbols;
+	private Vector<String> symbols;
 	
-	public SymbolList(int which, String type, Vector syms) {
+	public SymbolList(int which, String type, Vector<String> syms) {
 		variety = which;
 		this.type = type;
 		symbols = syms;
@@ -30,9 +30,9 @@ public class SymbolList
 	
 	public Object clone() {
 		String newType = (type == null) ? null : type.toString();
-		Vector newSyms = new Vector();
+		Vector<String> newSyms = new Vector<String>();
 		for (int i=0; i < symbols.size(); i++) {
-			newSyms.addElement( ((String)symbols.elementAt(i)).toString() );
+			newSyms.addElement( symbols.elementAt(i).toString() );
 		}
 		return new SymbolList(variety, newType, newSyms);
 	}
@@ -51,7 +51,7 @@ public class SymbolList
 		
 			int size = symbols.size();
 			for (int i=0; i < size; i++) {
-				result += (String)symbols.elementAt(i);
+				result += symbols.elementAt(i);
 				if (i < size - 1)
 					result += ", ";
 			}

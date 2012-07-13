@@ -11,6 +11,7 @@ import polyglot.ext.jl5.types.JL5TypeSystem;
 import polyglot.ext.jl5.visit.JL5Translator;
 import polyglot.types.*;
 import polyglot.util.CodeWriter;
+import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
 import polyglot.visit.AmbiguityRemover;
 import polyglot.visit.NodeVisitor;
@@ -98,6 +99,23 @@ public class JL5New_c extends New_c implements JL5New {
         
         ClassType ct = tn.type().toClass();
         
+        if (ct.isInnerClass()) {
+            ClassType outer = ct.outer();   
+            JL5TypeSystem ts5 = (JL5TypeSystem) tc.typeSystem();
+            if (outer instanceof JL5SubstClassType) {
+                JL5SubstClassType sct = (JL5SubstClassType) outer;
+                ct = (ClassType) sct.subst().substType(ct);
+            }
+            else if (qualifier == null || (qualifier instanceof Special 
+                    && ((Special)qualifier).kind() == Special.THIS)) {
+                ct = ts5.instantiateInnerClassFromContext(tc.context(), ct);            
+            }
+            else if (qualifier.type() instanceof JL5SubstClassType) {
+                JL5SubstClassType sct = (JL5SubstClassType) qualifier().type();
+                ct = (ClassType) sct.subst().substType(ct);
+            }
+        }
+        
         if (! ct.flags().isInterface()) {
             Context c = tc.context();
             if (anonType != null) {
@@ -129,7 +147,7 @@ public class JL5New_c extends New_c implements JL5New {
         // static type "T", the TypeNode for "C" is actually the type "T.C".
         // But, if we print "T.C", the post compiler will try to lookup "T"
         // in "T".  Instead, we print just "C".
-        if (qualifier != null) {
+        if (tn.type().isClass() && tn.type().toClass().isInnerClass()) {
             ClassType ct = tn.type().toClass();
             w.write(ct.name());
             if (ct instanceof JL5SubstClassType) {
@@ -168,7 +186,7 @@ public class JL5New_c extends New_c implements JL5New {
         }
         return t;
     }
-    ClassType findEnclosingClassFrom(ClassType t, Context c, ClassType ct) {
+    ClassType findEnclosingClassFrom(ClassType t, Context c, ClassType ct) {        
         JL5TypeSystem ts = (JL5TypeSystem)ct.typeSystem();
         String name = ct.name();
         while (t != null) {
@@ -176,10 +194,16 @@ public class JL5New_c extends New_c implements JL5New {
                 ClassType mt = ts.findMemberClass(t, name, c.currentClass());
                 if (mt != null) {
                     // get the class directly from t, so that substitution works properly...
-                    mt = t.memberClassNamed(name);
-                }
-                if (ts.isImplicitCastValid(mt, ct)) {
-                    return t;
+                    mt = findMemberClass(name, t);
+                    if (mt == null) {
+                        throw new InternalCompilerError("Couldn't find member class " + name + " in " + t);
+                    }
+                    if (ts.isImplicitCastValid(mt, ct)) {
+                        return t;
+                    }
+                    if (ts.isImplicitCastValid(ts.erasureType(mt), ts.erasureType(ct))) {
+                        return (ClassType)ts.erasureType(t);
+                    }
                 }
             }
             catch (SemanticException e) {
@@ -187,7 +211,34 @@ public class JL5New_c extends New_c implements JL5New {
 
             t = t.outer();
         }
+        return null;
+    }
 
+    private ClassType findMemberClass(String name, ClassType t) {
+        TypeSystem ts = t.typeSystem();
+        ClassType mt = t.memberClassNamed(name);
+        if (mt != null) {
+            return mt;
+        }
+        if (t.superType() != null) {
+            Type sup = t.superType();
+            if (sup instanceof ClassType) {
+                mt = findMemberClass(name, sup.toClass());
+                if (mt != null) {
+                    return mt;
+                }
+            }
+        }
+        
+        for (Iterator i = t.interfaces().iterator(); i.hasNext(); ) {
+            Type sup = (Type) i.next();
+            if (sup instanceof ClassType) {
+                mt = findMemberClass(name, sup.toClass());
+                if (mt != null) {
+                    return mt;
+                }
+            }
+        }
         return null;
     }
 

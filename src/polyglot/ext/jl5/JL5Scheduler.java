@@ -1,15 +1,36 @@
 package polyglot.ext.jl5;
 
+import java.util.Iterator;
+
 import polyglot.ast.NodeFactory;
+import polyglot.ext.jl5.translate.JL5ToJLRewriter;
 import polyglot.ext.jl5.types.JL5TypeSystem;
-import polyglot.ext.jl5.visit.*;
-import polyglot.frontend.*;
+import polyglot.ext.jl5.visit.AutoBoxer;
+import polyglot.ext.jl5.visit.JL5InitChecker;
+import polyglot.ext.jl5.visit.JL5InitImportsVisitor;
+import polyglot.ext.jl5.visit.JL5Translator;
+import polyglot.ext.jl5.visit.RemoveEnums;
+import polyglot.ext.jl5.visit.RemoveExtendedFors;
+import polyglot.ext.jl5.visit.RemoveStaticImports;
+import polyglot.ext.jl5.visit.RemoveVarArgsFlags;
+import polyglot.ext.jl5.visit.RemoveVarargVisitor;
+import polyglot.ext.jl5.visit.SimplifyExpressionsForBoxing;
+import polyglot.ext.jl5.visit.TVCaster;
+import polyglot.ext.jl5.visit.TypeErasureProcDecls;
+import polyglot.frontend.CyclicDependencyException;
 import polyglot.frontend.ExtensionInfo;
+import polyglot.frontend.JLExtensionInfo;
+import polyglot.frontend.JLScheduler;
+import polyglot.frontend.Job;
+import polyglot.frontend.OutputPass;
+import polyglot.frontend.Pass;
+import polyglot.frontend.Scheduler;
 import polyglot.frontend.goals.CodeGenerated;
 import polyglot.frontend.goals.EmptyGoal;
 import polyglot.frontend.goals.Goal;
 import polyglot.frontend.goals.VisitorGoal;
 import polyglot.main.Options;
+import polyglot.translate.ExtensionRewriter;
 import polyglot.types.TypeSystem;
 import polyglot.util.InternalCompilerError;
 
@@ -36,6 +57,7 @@ public class JL5Scheduler extends JLScheduler {
         Goal g = new VisitorGoal(job, new TVCaster(job, ts, nf));
         try {
             g.addPrerequisiteGoal(TypeChecked(job), this);
+            g.addPrerequisiteGoal(TypeClosure(job), this);
             g.addPrerequisiteGoal(AutoBoxing(job), this);
             g.addPrerequisiteGoal(RemoveExtendedFors(job), this);
         } catch (CyclicDependencyException e) {
@@ -150,7 +172,9 @@ public class JL5Scheduler extends JLScheduler {
     }
 
     public Goal RemoveJava5isms(Job job) {
-        Goal g = new EmptyGoal(job);
+        ExtensionInfo toExtInfo = extInfo.outputExtensionInfo();
+        Goal g = internGoal(new VisitorGoal(job, new JL5ToJLRewriter(job,
+                extInfo, toExtInfo)));
         try {
             g.addPrerequisiteGoal(CastsInserted(job), this);
             g.addPrerequisiteGoal(TypeErasureProcDecls(job), this);
@@ -160,6 +184,16 @@ public class JL5Scheduler extends JLScheduler {
             g.addPrerequisiteGoal(RemoveVarArgsFlags(job), this);
             g.addPrerequisiteGoal(RemoveExtendedFors(job), this);
             g.addPrerequisiteGoal(RemoveStaticImports(job), this);
+        } catch (CyclicDependencyException e) {
+            throw new InternalCompilerError(e);
+        }
+        return this.internGoal(g);
+    }
+
+    public Goal TypeClosure(Job job) {
+        Goal g = internGoal(new VisitorGoal(job, new polyglot.visit.TypeClosure()));
+        try {
+            g.addPrerequisiteGoal(TypeChecked(job), this);
         } catch (CyclicDependencyException e) {
             throw new InternalCompilerError(e);
         }
@@ -182,8 +216,21 @@ public class JL5Scheduler extends JLScheduler {
 
     @Override
     public Goal CodeGenerated(Job job) {
-        return JL5CodeGenerated.create(this, job);
+        Options opts = extInfo.getOptions();
+        if (opts instanceof JL5Options && ((JL5Options)opts).removeJava5isms) {
+        	Goal g = new EmptyGoal(job);
+            try {
+                g.addPrerequisiteGoal(RemoveJava5isms(job), this);
+            }
+            catch (CyclicDependencyException e) {
+                throw new InternalCompilerError(e);
+            }
+            return internGoal(g);
+        }
+        else
+        	return JL5CodeGenerated.create(this, job);
     }
+    
     @Override
     public Goal Serialized(Job job) {
         Goal g = super.Serialized(job);
@@ -206,7 +253,26 @@ public class JL5Scheduler extends JLScheduler {
     //          return this.internGoal(g);
     //  }
     
-    private static class JL5CodeGenerated extends CodeGenerated {
+    @Override
+	public boolean runToCompletion() {
+        boolean complete = super.runToCompletion();
+        Options opts = extInfo.getOptions();
+        if (complete && ((JL5Options)opts).removeJava5isms) {
+        	ExtensionInfo outExtInfo = extInfo.outputExtensionInfo();
+            // Flush the outputfiles collection
+            extInfo.compiler().outputFiles().clear();
+
+            // Create a goal to compile every source file.
+            for (Iterator i = outExtInfo.scheduler().jobs().iterator(); i.hasNext(); ) {
+                Job job = (Job) i.next();
+                outExtInfo.scheduler().addGoal(outExtInfo.getCompileGoal(job));
+            }
+            return outExtInfo.scheduler().runToCompletion();
+        }
+        return complete;
+	}
+
+	private static class JL5CodeGenerated extends CodeGenerated {
         public static Goal create(Scheduler scheduler, Job job) {
             return scheduler.internGoal(new JL5CodeGenerated(job));
         }

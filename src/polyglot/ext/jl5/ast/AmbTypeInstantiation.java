@@ -30,7 +30,10 @@ public class AmbTypeInstantiation extends TypeNode_c implements TypeNode, Ambigu
         this.typeArguments = typeArguments;
     }
 
-    
+    public String name() {
+        return base.name();
+    }
+
     @Override
     public Node disambiguate(AmbiguityRemover sc) throws SemanticException {
         if (!this.base.isDisambiguated()) {

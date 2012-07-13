@@ -2,6 +2,7 @@ package polyglot.pth;
 
 import java_cup.runtime.Symbol;
 
+@SuppressWarnings("all")
 %%
 %cup
 %public

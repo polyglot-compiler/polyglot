@@ -2,8 +2,6 @@ package polyglot.ext.jl5.types.inference;
 
 import java.util.*;
 
-import com.sun.codemodel.internal.ClassType;
-
 import polyglot.ext.jl5.types.*;
 import polyglot.frontend.Job;
 import polyglot.types.*;
@@ -70,12 +68,12 @@ public class LubType_c extends ClassType_c implements LubType {
 
     private Type lub_force() {
         JL5TypeSystem ts = (JL5TypeSystem)this.ts;
-        Set<Type> st = new HashSet<Type>();
+        Set<Type> st = new LinkedHashSet<Type>();
         Set<Type> est = null;
         for (Type u : lubElems) {
             List<Type> u_supers = new ArrayList<Type>(ts.allAncestorsOf((ReferenceType) u));
             st.addAll(u_supers);
-            Set<Type> est_of_u = new HashSet<Type>();
+            Set<Type> est_of_u = new LinkedHashSet<Type>();
             for (Type super_of_u : u_supers) {
                 if (super_of_u instanceof JL5SubstClassType) {
                     JL5SubstClassType g = (JL5SubstClassType) super_of_u;
@@ -84,14 +82,14 @@ public class LubType_c extends ClassType_c implements LubType {
                 else est_of_u.add(super_of_u);
             }
             if (est == null) {
-                est = new HashSet<Type>();
+                est = new LinkedHashSet<Type>();
                 est.addAll(est_of_u);
             }
             else {
                 est.retainAll(est_of_u);
             }
         }
-        Set<Type> mec = new HashSet<Type>(est);
+        Set<Type> mec = new LinkedHashSet<Type>(est);
         for (Type e1 : est) {
             for (Type e2 : est) {
                 if (!ts.equals(e1,e2) && ts.isSubtype(e2, e1)) {

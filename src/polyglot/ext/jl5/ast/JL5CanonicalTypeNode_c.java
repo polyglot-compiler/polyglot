@@ -84,7 +84,7 @@ public class JL5CanonicalTypeNode_c extends polyglot.ast.CanonicalTypeNode_c {
         }
         
         // check for uses of type variables in static contexts
-        if (tc.context().inStaticContext()) {
+        if (tc.context().inStaticContext() && !((JL5Context) tc.context()).inCTORCall()) {
             for (TypeVariable tv : findInstanceTypeVariables(t)) {
                 throw new SemanticException("Type variable " + tv + 
                                             " cannot be used in a static context", this.position);                

@@ -5,6 +5,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import polyglot.ast.*;
+import polyglot.ext.jl5.types.EnumInstance;
 import polyglot.ext.jl5.types.JL5ParsedClassType;
 import polyglot.ext.jl5.types.JL5TypeSystem;
 import polyglot.ext.jl5.visit.JL5Translator;
@@ -24,6 +25,19 @@ public class JL5Field_c extends Field_c {
         super(pos, target, name);
     }
 
+    @Override
+    public Node typeCheck(TypeChecker tc) throws SemanticException {
+        Field n = (Field)super.typeCheck(tc);
+        if (n.fieldInstance() instanceof EnumInstance) {
+            // it's an enum, so replace this with the appropriate AST node for enum constants.
+            JL5NodeFactory nf = (JL5NodeFactory)tc.nodeFactory();
+            EnumConstant ec = nf.EnumConstant(this.position(), this.target(), nf.Id(this.position, this.name()));
+            ec = (EnumConstant)ec.type(this.type);
+            ec = ec.enumInstance((EnumInstance)n.fieldInstance());
+            n = ec;
+        }
+        return n;        
+    }
     @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
         w.begin(0);

@@ -12,7 +12,6 @@ import polyglot.util.Position;
  * NodeFactory for jl5 extension.
  */
 public interface JL5NodeFactory extends NodeFactory {
-    QQ qq();
     JL5EnumDecl EnumDecl(Position pos, Flags flags, List<AnnotationElem> annotations,  Id name,
                          TypeNode superType, List interfaces, ClassBody body);
 

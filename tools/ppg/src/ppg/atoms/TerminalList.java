@@ -5,9 +5,9 @@ import java.util.*;
 public class TerminalList
 {
 	private String type;
-	private Vector symbols;
+	private Vector<String> symbols;
 	
-	public TerminalList(String type, Vector syms) {
+	public TerminalList(String type, Vector<String> syms) {
 		this.type = type;
 		symbols = syms;
 	}	
@@ -18,7 +18,7 @@ public class TerminalList
 			result += type;
 		
 		for (int i=0; i < symbols.size(); i++) {
-			result += (String)symbols.elementAt(i);
+			result += symbols.elementAt(i);
 			if (i < symbols.size() - 1)
 				result += ", ";
 		}

@@ -75,8 +75,7 @@ public class VerboseOutputController extends OutputController{
                          sft.getName());
                          
             SilentErrorQueue seq = (SilentErrorQueue)eq;
-            for (Iterator i = seq.getErrors().iterator(); i.hasNext(); ) {
-                ErrorInfo ei = (ErrorInfo)i.next();
+            for (ErrorInfo ei : seq.getErrors()) {
                 stdeq.enqueue(ei);
             }
             stdeq.flush();
@@ -102,10 +101,9 @@ public class VerboseOutputController extends OutputController{
         int lastSuccess = 0;
         int neverRun = 0;
         int neverSuccess = 0;
-        for (Iterator iter = ts.getTests().iterator(); iter.hasNext(); ) {
-            Test t = (Test)iter.next();
+        for (Test t : ts.getTests()) {
             String testName = t.getName();
-            TestResult tr = (TestResult)tsr.testResults.get(t.getUniqueId());
+            TestResult tr = tsr.testResults.get(t.getUniqueId());
             if (TestSuite.executeTest(testName, tr)) {
                 displayTestResults(tr, testName);
             }

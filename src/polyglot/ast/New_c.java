@@ -252,8 +252,7 @@ public class New_c extends Expr_c implements New
             nn = nn.qualifier((Expr) nn.visitChild(nn.qualifier(), childbd));
             if (childbd.hasErrors()) throw new SemanticException();
 
-            if (nn.objectType() instanceof AmbTypeNode &&
-                    ((AmbTypeNode) nn.objectType()).qual() == null) {
+            if (nn.objectType() instanceof Ambiguous) {
 
                 // We have to disambiguate the type node as if it were a member of the
                 // static type, outer, of the qualifier.  For Java this is simple: type
@@ -263,7 +262,7 @@ public class New_c extends Expr_c implements New
                 // just a name.  We'll just punt here and let the extensions handle
                 // this complexity.
 
-                String name = ((AmbTypeNode) nn.objectType()).name();
+                String name = ((TypeNode) nn.objectType()).name();
 
                 if (nn.qualifier().isDisambiguated() && nn.qualifier().type() != null && nn.qualifier().type().isCanonical()) {
                     TypeSystem ts = ar.typeSystem();

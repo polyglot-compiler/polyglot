@@ -22,6 +22,8 @@ public interface JL5Context extends Context {
     Context pushExtendsClause(ClassType declaringClass);
     boolean inExtendsClause();
     ClassType extendsClauseDeclaringClass();
+    Context pushCTORCall();
+    boolean inCTORCall();
 //	public Context pushCase();
 //	boolean inCase();
 }

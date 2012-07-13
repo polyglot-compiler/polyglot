@@ -93,6 +93,7 @@ polyglot.ext.jl5.ExtensionInfo "-d out -classpath java-out -noserial -post \"jav
         InnerClass05.jl5 (Semantic);
         InnerClass06.jl5;
         InnerClass07.jl5;
+        InnerClass08.jl5;
         Access01.jl5;
         Access02.jl5;
 	Anonymous01.jl5;
@@ -100,6 +101,9 @@ polyglot.ext.jl5.ExtensionInfo "-d out -classpath java-out -noserial -post \"jav
 	Interface02.jl5;
 	Interface03.jl5;
 	Interface04.jl5;
+	Interface05.jl5;
+	Interface06.jl5;
+	Intersect01.jl5;
 	Import01.jl5;
 	Import02.jl5;
 	Import03.jl5 (Semantic);
@@ -129,6 +133,7 @@ polyglot.ext.jl5.ExtensionInfo "-d out -classpath java-out -noserial -post \"jav
 	Conditional01.jl5;
 	Conditional02.jl5;
 	Conditional03.jl5;
+	Conditional04.jl5;
 	Array.jl5;
 	Array2.jl5 (Semantic, "should be declared abstract");
 	Array03.jl5;
@@ -136,6 +141,7 @@ polyglot.ext.jl5.ExtensionInfo "-d out -classpath java-out -noserial -post \"jav
 	Array05.jl5;
 	Array06.jl5;
 	Array07.jl5 (Semantic, "reifiable");
+	Array08.jl5;
 	C.jl5;
 	FBoundSub.jl5;
 	FBoundSub2.jl5;
@@ -295,13 +301,32 @@ polyglot.ext.jl5.ExtensionInfo "-d out -classpath java-out -noserial -post \"jav
 	EnumTest3.jl5;
 	EnumTest4.jl5;
 	EnumTest6.jl5;
+	EnumTest7.jl5;
 	enum1.jl5;
 	enum2.jl5;
+    ConstructorCall01.jl5;
+    Annotations01.jl5;
+    Annotations02.jl5;
+    Call02.jl5;
+    ClassLoad01.jl5;
+    CovariantRet01.jl5;
+    EnumTest5.jl5;
+    EnumTest8.jl5;
+    Generics44.jl5;
+    InnerClass09.jl5;
+    Interface07.jl5;
+    Iterator01.jl5;
+    Negate01.jl5;
+    Throw01.jl5;
+    UnboxBooleans.jl5;
+    VarArgs08.jl5;
+    VarArgs09.jl5;
 }
 
 # Now run the tests again removing the Java 5-isms.
 # This one uses 1.4 to suppress the warning about raw classes.
 polyglot.ext.jl5.ExtensionInfo "-d out -classpath java-out -removeJava5isms -enumImplClass MyEnum -noserial -post \"javac -source 1.4\" -morepermissiveinference" {
+        HexFloatingPoint.jl5;
         Generics01.jl5;
         Generics02.jl5;
         Generics03.jl5;
@@ -357,6 +382,8 @@ polyglot.ext.jl5.ExtensionInfo "-d out -classpath java-out -removeJava5isms -enu
         InnerClass04.jl5;
         InnerClass05.jl5 (Semantic);
         InnerClass06.jl5;
+        InnerClass07.jl5;
+        InnerClass08.jl5;
         Access01.jl5;
         Access02.jl5;
         Anonymous01.jl5;
@@ -364,6 +391,9 @@ polyglot.ext.jl5.ExtensionInfo "-d out -classpath java-out -removeJava5isms -enu
 	Interface02.jl5;
 	Interface03.jl5;
 	Interface04.jl5;
+	Interface05.jl5;
+	Interface06.jl5;
+	Intersect01.jl5;
         Import01.jl5;
         Import02.jl5;
         Import03.jl5 (Semantic);
@@ -393,6 +423,7 @@ polyglot.ext.jl5.ExtensionInfo "-d out -classpath java-out -removeJava5isms -enu
 	Conditional01.jl5;
 	Conditional02.jl5;
 	Conditional03.jl5;
+    Conditional04.jl5
         Array.jl5;
         Array2.jl5 (Semantic, "should be declared abstract");
         Array03.jl5;
@@ -400,6 +431,7 @@ polyglot.ext.jl5.ExtensionInfo "-d out -classpath java-out -removeJava5isms -enu
         Array05.jl5;
 	Array06.jl5;
 	Array07.jl5 (Semantic, "reifiable");
+	Array08.jl5;
         C.jl5;
         FBoundSub.jl5;
         FBoundSub2.jl5;
@@ -558,6 +590,24 @@ polyglot.ext.jl5.ExtensionInfo "-d out -classpath java-out -removeJava5isms -enu
         EnumTest3.jl5;
         EnumTest4.jl5;
         EnumTest6.jl5;
+	    EnumTest7.jl5;
         enum1.jl5;
         enum2.jl5;
+        ConstructorCall01.jl5;
+        Annotations01.jl5;
+        Annotations02.jl5;
+        Call02.jl5;
+        ClassLoad01.jl5;
+        CovariantRet01.jl5;
+        EnumTest5.jl5;
+        EnumTest8.jl5;
+        Generics44.jl5;
+        InnerClass09.jl5;
+        Interface07.jl5;
+        Iterator01.jl5;
+        Negate01.jl5;
+        Throw01.jl5;
+        UnboxBooleans.jl5;
+        VarArgs08.jl5;
+        VarArgs09.jl5;
 }

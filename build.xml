@@ -277,6 +277,14 @@
 			<arg value="${symbol.class}" />
 			<arg value="${cup.file}" />
 		</java>
+		<!-- Hack to suppress warnings in parser. -->
+		<replaceregexp
+		  file="${parser.dir}/${parser.class}.java"
+		  match="^(public )?class"
+		  replace="@SuppressWarnings(&quot;all&quot;) \1class"
+		  flags="g"
+		  byline="yes"
+		/>
 	</target>
 
 	<!-- The following target builds a cup parser using the version of
@@ -442,7 +450,7 @@
 
 			<attribute name="Implementation-Version" value="${jl.version}" />
 			<attribute name="Built-Date" value="${jl.version.build}" />
-			<attribute name="Class-Path" value="java_cup.jar ppg.jar" />
+			<attribute name="Class-Path" value="java_cup.jar polyglot.jar ppg.jar" />
 		</manifest>
 
 		<jar destfile="${lib}/polyglot.jar" basedir="${classes}" manifest="${classes}/MANIFEST.MF" includes="polyglot/ast/**,polyglot/frontend/**,polyglot/lex/**,polyglot/main/**,polyglot/parse/**,polyglot/qq/**,polyglot/types/**,polyglot/util/**,polyglot/visit/**,ppg/**,polyglot/ext/param/**,polyglot/ext/jl5/**,polyglot/translate/**,polyglot/filemanager/**" />

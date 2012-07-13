@@ -7,14 +7,18 @@ import java.io.Reader;
 import javax.tools.FileObject;
 
 import polyglot.ast.NodeFactory;
+import polyglot.ext.jl5.ast.JL5DelFactory_c;
+import polyglot.ext.jl5.ast.JL5ExtFactory_c;
 import polyglot.ext.jl5.ast.JL5NodeFactory_c;
 import polyglot.ext.jl5.parse.Grm;
 import polyglot.ext.jl5.parse.Lexer_c;
+import polyglot.ext.jl5.translate.JL5ToJLExtFactory_c;
 import polyglot.ext.jl5.types.JL5TypeSystem_c;
 import polyglot.ext.jl5.types.reflect.JL5ClassFile;
 import polyglot.frontend.*;
 import polyglot.main.Options;
 import polyglot.qq.QQ;
+import polyglot.translate.JLOutputExtensionInfo;
 import polyglot.types.TypeSystem;
 import polyglot.types.reflect.ClassFile;
 import polyglot.util.ErrorQueue;
@@ -23,6 +27,8 @@ import polyglot.util.ErrorQueue;
  * Extension information for jl5 extension.
  */
 public class ExtensionInfo extends JLExtensionInfo {
+
+	protected polyglot.frontend.ExtensionInfo outputExtensionInfo;
 
 	@Override
 	public String defaultFileExtension() {
@@ -42,12 +48,22 @@ public class ExtensionInfo extends JLExtensionInfo {
 
 	@Override
 	protected NodeFactory createNodeFactory() {
-		return new JL5NodeFactory_c(new QQ(this));
+		JL5Options opt = (JL5Options) getOptions();
+		if (!opt.removeJava5isms)
+			return new JL5NodeFactory_c(new JL5ExtFactory_c(), new JL5DelFactory_c());
+		else		
+			return new JL5NodeFactory_c(new JL5ExtFactory_c(new JL5ToJLExtFactory_c()), new JL5DelFactory_c());
 	}
 
 	@Override
 	protected TypeSystem createTypeSystem() {
 		return new JL5TypeSystem_c();
+	}
+	
+	@Override
+	public void addLocationsToFileManager() {
+		super.addLocationsToFileManager();
+		outputExtensionInfo().addLocationsToFileManager();
 	}
 
 	@Override
@@ -79,4 +95,11 @@ public class ExtensionInfo extends JLExtensionInfo {
 		return new CupParser(parser, source, eq);
 	}
 
+	@Override
+	public polyglot.frontend.ExtensionInfo outputExtensionInfo() {
+        if (this.outputExtensionInfo == null) {
+            this.outputExtensionInfo = new JLOutputExtensionInfo(this);
+        }
+        return outputExtensionInfo;
+	}
 }

@@ -49,4 +49,6 @@ public interface EnumConstantDecl extends ClassMember
 
 	long ordinal();
 	EnumConstantDecl ordinal(long ordinal);
+
+	List annotations();
 }

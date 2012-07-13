@@ -40,7 +40,8 @@
 				<li><tt>addLocationsToFileManager()</tt> - You might want to
 					set locations other than standard ones (as in source_output,
 					class_output, bootclasspath, classpath and sourcepath) to your file
-					manager.</li>
+					manager.When you override this method, don't forget to call this 
+					method on the output ExtensionInfo instance.</li>
 				<li><tt>initTypeSystem()</tt> / <tt>makeLoadedClassResolver()</tt>
 					- Signature of SourceClassResolver constructor &rarr; <tt>SourceClassResolver(Compiler
 						compiler, ExtensionInfo ext, boolean allowRawClasses, boolean
@@ -120,7 +121,7 @@
 		instance of the
 		<tt>OutputExtensionInfo</tt>
 		to have a
-		<tt>javax.tools.JavaFileObject</tt>
+		<tt><a href="http://docs.oracle.com/javase/6/docs/api/javax/tools/JavaFileObject.html">javax.tools.JavaFileObject</a></tt>
 		object and use this object to create a
 		<tt>polyglot.frontend.Source</tt>
 		object by calling the

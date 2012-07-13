@@ -137,9 +137,6 @@ public interface ExtensionInfo {
 	/** Add and set the locations in the file manager used by this extension. */
 	void addLocationsToFileManager();
 
-	/** Get the classLoader used by this extension. */
-	ClassLoader classLoader();
-
 	/** Create class file for a file object. */
 	ClassFile createClassFile(FileObject f, byte[] code) throws IOException;
 
@@ -149,4 +146,10 @@ public interface ExtensionInfo {
 
 	/** Produce a class factory for this language extension. */
 	ClassFileLoader classFileLoader();
+	
+	/**
+	 * Produce an extension info object for the output language this extension
+	 * translates to.
+	 */
+	ExtensionInfo outputExtensionInfo();
 }

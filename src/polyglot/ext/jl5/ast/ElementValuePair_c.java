@@ -9,11 +9,13 @@ import polyglot.ast.Node;
 import polyglot.ast.Term;
 import polyglot.ext.jl5.types.JL5TypeSystem;
 import polyglot.types.SemanticException;
+import polyglot.types.Type;
 import polyglot.util.CodeWriter;
 import polyglot.util.Position;
 import polyglot.visit.CFGBuilder;
 import polyglot.visit.NodeVisitor;
 import polyglot.visit.Translator;
+import polyglot.visit.TypeBuilder;
 import polyglot.visit.TypeChecker;
 
 public class ElementValuePair_c extends Expr_c implements ElementValuePair {
@@ -74,8 +76,7 @@ public class ElementValuePair_c extends Expr_c implements ElementValuePair {
     public Node typeCheck(TypeChecker tc) throws SemanticException{
         JL5TypeSystem ts = (JL5TypeSystem)tc.typeSystem();
         ts.checkAnnotationValueConstant(value);
-
-        return this;
+        return type(value.type());
     }
     
     public void translate(CodeWriter w, Translator tr){

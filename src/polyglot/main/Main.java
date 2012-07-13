@@ -31,12 +31,12 @@ import polyglot.util.ErrorInfo;
 import polyglot.util.ErrorQueue;
 import polyglot.util.StdErrorQueue;
 import polyglot.util.QuotedStringTokenizer;
+import polyglot.util.InternalCompilerError;
 
 import java.io.*;
 import java.util.*;
 
 import javax.tools.FileObject;
-import javax.tools.JavaCompiler;
 import javax.tools.JavaFileManager;
 import javax.tools.JavaFileObject;
 import javax.tools.ToolProvider;
@@ -49,17 +49,17 @@ import javax.tools.JavaCompiler.CompilationTask;
 public class Main {
 
 	/** Source files specified on the command line */
-	private Set<String> source;
+	private Set source;
 
 	public final static String verbose = "verbose";
 
 	/* modifies args */
-	protected ExtensionInfo getExtensionInfo(List<String> args)
+	protected ExtensionInfo getExtensionInfo(List args)
 			throws TerminationException {
 		ExtensionInfo ext = null;
 
-		for (Iterator<String> i = args.iterator(); i.hasNext();) {
-			String s = i.next();
+		for (Iterator i = args.iterator(); i.hasNext();) {
+			String s = (String) i.next();
 			if (s.equals("-ext") || s.equals("-extension")) {
 				if (ext != null) {
 					throw new TerminationException(
@@ -70,7 +70,7 @@ public class Main {
 				if (!i.hasNext()) {
 					throw new TerminationException("missing argument");
 				}
-				String extName = i.next();
+				String extName = (String) i.next();
 				i.remove();
 				ext = loadExtension("polyglot.ext." + extName
 						+ ".ExtensionInfo");
@@ -84,7 +84,7 @@ public class Main {
 				if (!i.hasNext()) {
 					throw new TerminationException("missing argument");
 				}
-				String extClass = i.next();
+				String extClass = (String) i.next();
 				i.remove();
 				ext = loadExtension(extClass);
 			}
@@ -110,8 +110,8 @@ public class Main {
 
 	public void start(String[] argv, ExtensionInfo ext, ErrorQueue eq)
 			throws TerminationException {
-		source = new LinkedHashSet<String>();
-		List<String> args = explodeOptions(argv);
+		source = new LinkedHashSet();
+		List args = explodeOptions(argv);
 		if (ext == null) {
 			ext = getExtensionInfo(args);
 		}
@@ -150,6 +150,9 @@ public class Main {
 		if (Report.should_report(verbose, 1))
 			Report.report(1, "Output files: " + compiler.outputFiles());
 
+		Collection<JavaFileObject> outputFiles = compiler.outputFiles();
+	    if (outputFiles == null || outputFiles.size() == 0) return;
+	    
 		long start_time = System.currentTimeMillis();
 
 		/* Now call javac or jikes, if necessary. */
@@ -188,49 +191,52 @@ public class Main {
 						eq.enqueue(ErrorInfo.POST_COMPILER_ERROR,
 								err.toString());
 				} else {
+					Runtime runtime = Runtime.getRuntime();
 					QuotedStringTokenizer st = new QuotedStringTokenizer(
 							options.post_compiler);
 					int pc_size = st.countTokens();
-
-					ArrayList<String> postCompilerArgs = new ArrayList<String>(
-							pc_size);
-					while (st.hasMoreTokens())
-						postCompilerArgs.add(st.nextToken());
-
+					int options_size = 2;
+					if (options.class_output_directory != null) {
+						options_size += 2;
+					}
+					if (options.generate_debugging_info)
+						options_size++;
+					String[] javacCmd = new String[pc_size + options_size
+							+ compiler.outputFiles().size()];
+					int j = 0;
+					for (int i = 0; i < pc_size; i++) {
+						javacCmd[j++] = st.nextToken();
+					}
+					javacCmd[j++] = "-classpath";
+					javacCmd[j++] = options.constructPostCompilerClasspath();
+					if (options.class_output_directory != null) {
+						javacCmd[j++] = "-d";
+						javacCmd[j++] = options.class_output_directory;
+					}
 					if (options.generate_debugging_info) {
-						postCompilerArgs.add("-g");
+						javacCmd[j++] = "-g";
 					}
 
-					List<String> l = null;
+					for (JavaFileObject jfo : compiler.outputFiles())
+						javacCmd[j++] = new File(jfo.toUri()).getAbsolutePath();
+
 					if (Report.should_report(verbose, 1)) {
-						l = new ArrayList<String>();
-						for (JavaFileObject jfo : compiler.outputFiles())
-							l.add(new File(jfo.toUri()).getAbsolutePath());
 						StringBuffer cmdStr = new StringBuffer();
-						for (int i = 0; i < postCompilerArgs.size(); i++)
-							cmdStr.append(postCompilerArgs.get(i) + " ");
-						for (int i = 0; i < l.size(); i++)
-							cmdStr.append(l.get(i) + " ");
+						for (int i = 0; i < javacCmd.length; i++)
+							cmdStr.append(javacCmd[i] + " ");
 						Report.report(1, "Executing post-compiler " + cmdStr);
 					}
-					Runtime runtime = Runtime.getRuntime();
-					if (l == null)
-						for (JavaFileObject jfo : compiler.outputFiles())
-							postCompilerArgs.add(new File(jfo.toUri())
-									.getAbsolutePath());
-					else
-						postCompilerArgs.addAll(l);
-					Process proc = runtime.exec(postCompilerArgs
-							.toArray(new String[0]));
 
-					InputStreamReader error = new InputStreamReader(
+					Process proc = runtime.exec(javacCmd);
+
+					InputStreamReader err = new InputStreamReader(
 							proc.getErrorStream());
 
 					try {
 						char[] c = new char[72];
 						int len;
 						StringBuffer sb = new StringBuffer();
-						while ((len = error.read(c)) > 0) {
+						while ((len = err.read(c)) > 0) {
 							sb.append(String.valueOf(c, 0, len));
 						}
 
@@ -239,15 +245,21 @@ public class Main {
 									sb.toString());
 						}
 					} finally {
-						error.close();
+						err.close();
 					}
 
 					proc.waitFor();
 
-				}
-				if (!options.keep_output_files) {
-					for (FileObject fo : compiler.outputFiles())
-						fo.delete();
+					if (!options.keep_output_files) {
+						for (FileObject fo : compiler.outputFiles())
+							fo.delete();
+					}
+					
+					if (proc.exitValue() > 0) {
+						eq.enqueue(ErrorInfo.POST_COMPILER_ERROR,
+								"Non-zero return code: " + proc.exitValue());
+						return false;
+					}
 				}
 			} catch (Exception e) {
 				eq.enqueue(ErrorInfo.POST_COMPILER_ERROR, e.getMessage());
@@ -257,9 +269,8 @@ public class Main {
 		return true;
 	}
 
-	private List<String> explodeOptions(String[] args)
-			throws TerminationException {
-		LinkedList<String> ll = new LinkedList<String>();
+	private List explodeOptions(String[] args) throws TerminationException {
+		LinkedList ll = new LinkedList();
 
 		for (int i = 0; i < args.length; i++) {
 			// special case for the @ command-line parameter
@@ -267,7 +278,7 @@ public class Main {
 				String fn = args[i].substring(1);
 				try {
 					BufferedReader lr = new BufferedReader(new FileReader(fn));
-					LinkedList<String> newArgs = new LinkedList<String>();
+					LinkedList newArgs = new LinkedList();
 
 					while (true) {
 						String l = lr.readLine();
@@ -307,7 +318,7 @@ public class Main {
 
 	static ExtensionInfo loadExtension(String ext) throws TerminationException {
 		if (ext != null && !ext.equals("")) {
-			Class<?> extClass = null;
+			Class extClass = null;
 
 			try {
 				extClass = Class.forName(ext);
@@ -316,23 +327,27 @@ public class Main {
 						+ " not found: could not find class " + ext + ".");
 			}
 
+			Object extobj;
 			try {
-				return (ExtensionInfo) extClass.newInstance();
+				extobj = extClass.newInstance();
+			} catch (Exception e) {
+				throw new InternalCompilerError("Extension " + ext
+						+ " could not be loaded: could not instantiate " + ext
+						+ ".", e);
+			}
+			try {
+				return (ExtensionInfo) extobj;
 			} catch (ClassCastException e) {
 				throw new TerminationException(ext
-						+ " is not a valid polyglot extension:"
+						+ " is not a valid Polyglot extension:"
 						+ " extension class " + ext
-						+ " exists but is not a subclass of ExtensionInfo");
-			} catch (Exception e) {
-				throw new TerminationException("Extension " + ext
-						+ " could not be loaded: could not instantiate " + ext
-						+ ".");
+						+ " exists but is not a subclass of ExtensionInfo.");
 			}
 		}
 		return null;
 	}
 
-	static private Collection<String> timeTopics = new ArrayList<String>(1);
+	static private Collection timeTopics = new ArrayList(1);
 	static {
 		timeTopics.add("time");
 	}

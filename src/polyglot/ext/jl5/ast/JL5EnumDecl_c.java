@@ -5,6 +5,8 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
+import com.sun.org.apache.bcel.internal.generic.ISTORE;
+
 import polyglot.ast.*;
 import polyglot.ext.jl5.types.JL5MethodInstance;
 import polyglot.types.*;
@@ -43,7 +45,7 @@ public class JL5EnumDecl_c extends JL5ClassDecl_c implements JL5EnumDecl {
         if (flags().isAbstract()) {
             throw new SemanticException("Enum types cannot have abstract modifier", this.position());
         }
-        if (flags().isPrivate() && !type().isInnerClass()) {
+        if (flags().isPrivate() && !type().isNested()) {
             throw new SemanticException("Top level enum types cannot have private modifier", this.position());
         }
         if (flags().isFinal()) {

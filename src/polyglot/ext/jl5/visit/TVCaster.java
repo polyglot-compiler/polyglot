@@ -4,6 +4,7 @@ import java.util.List;
 
 import polyglot.ast.*;
 import polyglot.ext.jl5.JL5Options;
+import polyglot.ext.jl5.ast.AnnotationElem;
 import polyglot.ext.jl5.types.*;
 import polyglot.ext.param.types.SubstType;
 import polyglot.frontend.Job;
@@ -23,7 +24,7 @@ public class TVCaster extends AscriptionVisitor {
     public TVCaster(Job job, TypeSystem ts, NodeFactory nf) {
         super(job, ts, nf);
     }
-
+        
     @Override
     public Expr ascribe(Expr e, Type toType) throws SemanticException {
         if (e.type() == null || toType == null || !toType.isCanonical()) {
@@ -52,7 +53,8 @@ public class TVCaster extends AscriptionVisitor {
         }
         if (e instanceof Call) {
             Call c = (Call)e;            
-            if (!mayHaveParameterizedReturn(c.methodInstance())) {
+            if (!mayHaveParameterizedReturn(c.methodInstance())
+            		&& !mayHaveCovariantReturn(c.methodInstance())) {
                 return e;
             }            
         }
@@ -63,10 +65,31 @@ public class TVCaster extends AscriptionVisitor {
         return e;
     }
 
+	@Override
+    public NodeVisitor enterCall(Node parent, Node n) throws SemanticException {
+	    if (n instanceof AnnotationElem) {
+	        return bypassChildren(n);
+	    }
+        return super.enterCall(parent, n);
+    }
+
     private boolean mayBeParameterizedField(FieldInstance fi) {
         ReferenceType container = fi.container();
-        JL5ParsedClassType pct = getBase(container);
-        
+        JL5ParsedClassType pct;
+        if (container.isArray()) {
+    		Type base = container.toArray().base();
+    		while (base.isArray())
+    			base = base.toArray().base();
+    		if (base instanceof TypeVariable)
+    			return true;
+        	if (base.isReference()) {
+        		pct = getBase(base.toReference());
+        	}
+        	else
+        		return false;
+        }
+        else
+        	pct = getBase(container);
         
         FieldInstance bfi = pct.fieldNamed(fi.name());
         if (bfi == null) {
@@ -78,9 +101,22 @@ public class TVCaster extends AscriptionVisitor {
 
     private boolean mayHaveParameterizedReturn(MethodInstance mi) {
         ReferenceType container = mi.container();
-        JL5ParsedClassType pct = getBase(container);
-        
-        
+        JL5ParsedClassType pct;
+        if (container.isArray()) {
+    		Type base = container.toArray().base();
+    		while (base.isArray())
+    			base = base.toArray().base();
+    		if (base instanceof TypeVariable)
+    			return true;
+        	if (base.isReference()) {
+        		pct = getBase(base.toReference());
+        	}
+        	else
+        		return false;
+        }
+        else
+        	pct = getBase(container);
+
         List<MethodInstance> meths = pct.methodsNamed(mi.name());
         
         for (MethodInstance bmi : meths) {
@@ -94,6 +130,21 @@ public class TVCaster extends AscriptionVisitor {
         
         return false;
     }
+
+    private boolean mayHaveCovariantReturn(MethodInstance mi) {
+    	if (mi.returnType().isClass()) {
+    		List<MethodInstance> overrides = ts.overrides(mi);
+    		overrides.addAll(ts.implemented(mi));
+    		ClassType ret = mi.returnType().toClass();
+    		for (MethodInstance ovr : overrides) {
+    			ClassType supRet = ovr.returnType().toClass();
+    			if (!ts.equals(ret, supRet)) {
+    				return true;
+    			}
+    		}
+    	}
+    	return false;
+	}
 
     private boolean hasTypeVariable(Type t) {
         // really want a type visitor...

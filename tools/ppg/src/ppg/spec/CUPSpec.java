@@ -2,6 +2,7 @@ package ppg.spec;
 
 import java.io.*;
 import java.util.*;
+
 import ppg.*;
 import ppg.atoms.*;
 import ppg.code.*;
@@ -11,14 +12,14 @@ import ppg.util.*;
 
 public class CUPSpec extends Spec
 {
-	private Vector productions;
+	private Vector<Production> productions;
 	// maps nonterminal to its index in the vector of productions
-	private Hashtable ntProds;
+	private Hashtable<String, Integer> ntProds;
 	private String start;
 	private final int NT_NOT_FOUND = -1;
 	
-	public CUPSpec (String pkg, Vector imp, Vector codeParts, Vector syms,
-					Vector precedence, String startSym, Vector prods)
+	public CUPSpec (String pkg, Vector<String> imp, Vector<Code> codeParts, Vector<SymbolList> syms,
+					Vector<Precedence> precedence, String startSym, Vector<Production> prods)
 	{
 		super();
 		packageName = pkg;
@@ -28,7 +29,7 @@ public class CUPSpec extends Spec
 		prec = precedence;
 		start = startSym;
 		productions = prods;
-		ntProds = new Hashtable();
+		ntProds = new Hashtable<String, Integer>();
 		hashNonterminals();
 	}
 	public void setStart (String startSym) {
@@ -42,7 +43,7 @@ public class CUPSpec extends Spec
 		
 		Production prod;
 		for (int i=0; i < productions.size(); i++) {
-			prod = (Production) productions.elementAt(i);
+			prod = productions.elementAt(i);
 			ntProds.put(prod.getLHS().getName(), new Integer(i));
 		}
 	}
@@ -61,22 +62,21 @@ public class CUPSpec extends Spec
 		// find the nonterminal which would contain this production
 		Nonterminal nt = p.getLHS();
 		int pos = errorNotFound(findNonterminal(nt), nt);
-		Production sourceProd = (Production) productions.elementAt(pos);
+		Production sourceProd = productions.elementAt(pos);
 		
-		Vector sourceRHSList = sourceProd.getRHS();
+		Vector<Vector<GrammarPart>> sourceRHSList = sourceProd.getRHS();
 
-		Vector rhs = p.getRHS();
-		Production result = new Production(nt, new Vector());
+		Vector<Vector<GrammarPart>> rhs = p.getRHS();
+		Production result = new Production(nt, new Vector<Vector<GrammarPart>>());
 
-		Vector toMatch, source, clone;
 		for (int i=0; i < rhs.size(); i++) {
-			toMatch = (Vector) rhs.elementAt(i);
+			Vector<GrammarPart> toMatch = rhs.elementAt(i);
 			for (int j=0; j < sourceRHSList.size(); j++) {
-				source = (Vector) sourceRHSList.elementAt(j);
+				Vector<GrammarPart> source = sourceRHSList.elementAt(j);
 				if (Production.isSameProduction(toMatch, source)) {
-					clone = new Vector();
+					Vector<GrammarPart> clone = new Vector<GrammarPart>();
 					for (int k=0; k < source.size(); k++) {
-						clone.addElement( ((GrammarPart)source.elementAt(k)).clone() );
+						clone.addElement( (GrammarPart) source.elementAt(k).clone() );
 					}
 					//result.addToRHS((Vector) source.clone());
 					result.addToRHS(clone);
@@ -91,7 +91,7 @@ public class CUPSpec extends Spec
 	public void removeEmptyProductions () {
 		Production prod;
 		for (int i=0; i < productions.size(); i++) {
-			prod = (Production) productions.elementAt(i);
+			prod = productions.elementAt(i);
 			if (prod.getRHS().size() == 0) {
 				productions.removeElementAt(i);
 				i--;
@@ -102,12 +102,12 @@ public class CUPSpec extends Spec
 	public Object clone() {
 		String newPkgName = (packageName == null) ? null : packageName.toString();
 		/*******************/
-		Vector newImports = new Vector();
+		Vector<String> newImports = new Vector<String>();
 		for (int i=0; i < imports.size(); i++) {
-			newImports.addElement( ((String) imports.elementAt(i)).toString());
+			newImports.addElement( imports.elementAt(i).toString());
 		}
 		/*******************/
-		Vector newCode = new Vector();
+		Vector<Code> newCode = new Vector<Code>();
 		if (actionCode != null) newCode.addElement(actionCode);
 		if (initCode != null) newCode.addElement(initCode);
 		if (parserCode != null) newCode.addElement(parserCode);
@@ -116,21 +116,21 @@ public class CUPSpec extends Spec
 			newCode.addElement( ((Code) code.elementAt(i)).clone());
 		}*/
 		/*******************/
-		Vector newSymbols = new Vector();
+		Vector<SymbolList> newSymbols = new Vector<SymbolList>();
 		for (int i=0; i < symbols.size(); i++) {
-			newSymbols.addElement( ((SymbolList) symbols.elementAt(i)).clone());
+			newSymbols.addElement( (SymbolList) symbols.elementAt(i).clone());
 		}
 		/*******************/
-		Vector newPrec = new Vector();
+		Vector<Precedence> newPrec = new Vector<Precedence>();
 		for (int i=0; i < prec.size(); i++) {
-			newPrec.addElement( ((Precedence) prec.elementAt(i)).clone());
+			newPrec.addElement( (Precedence) prec.elementAt(i).clone());
 		}
 		/*******************/
 		String newStart = (start == null) ? null : start.toString();
 		/*******************/
-		Vector newProductions = new Vector();
+		Vector<Production> newProductions = new Vector<Production>();
 		for (int i=0; i < productions.size(); i++) {
-			newProductions.addElement( ((Production) productions.elementAt(i)).clone());
+			newProductions.addElement( (Production) productions.elementAt(i).clone());
 		}
 
 		return new CUPSpec(newPkgName, newImports, newCode, newSymbols, 
@@ -147,7 +147,7 @@ public class CUPSpec extends Spec
 		*/
 	}
 	
-	public void addSymbols(Vector syms) {
+	public void addSymbols(Vector<SymbolList> syms) {
 		if (syms == null)
 			return;
 		
@@ -159,7 +159,7 @@ public class CUPSpec extends Spec
 	public void dropSymbol(String gs) throws PPGError {
 		boolean dropped = false;
 		for (int i=0; i < symbols.size(); i++ ) {
-			SymbolList list = (SymbolList) symbols.elementAt(i);
+			SymbolList list = symbols.elementAt(i);
 			dropped = dropped || list.dropSymbol(gs);
 		}
 		//TODO: error if symbol being dropped was not found
@@ -173,14 +173,14 @@ public class CUPSpec extends Spec
 		Nonterminal nt = p.getLHS();
 		int pos = errorNotFound(findNonterminal(nt), nt);
 		// should be a valid index from which we can drop productions
-		Production prod = (Production) productions.elementAt(pos);
+		Production prod = productions.elementAt(pos);
 		prod.drop(p);
 	}
 	
 	public void dropProductions(Nonterminal nt) {
 		int pos = errorNotFound(findNonterminal(nt), nt);
 		// should be a valid index from which we can drop productions
-		Production prod = (Production) productions.elementAt(pos);
+		Production prod = productions.elementAt(pos);
 		prod.drop((Production) prod.clone());
 	}
 	
@@ -205,7 +205,7 @@ public class CUPSpec extends Spec
 			productions.addElement(p);
 		} else {
 			// attach to specific nonterminal in our list of productions
-			Production prod = (Production) productions.elementAt(pos);
+			Production prod = productions.elementAt(pos);
 			prod.add(p);
 			//productions.setElementAt(prod, pos);
 		}
@@ -220,7 +220,7 @@ public class CUPSpec extends Spec
 	}
 	
 	private int findNonterminal(String nt) {
-		Integer pos = (Integer) ntProds.get(nt);
+		Integer pos = ntProds.get(nt);
 		if (pos == null)
 			return NT_NOT_FOUND;
 		else
@@ -245,7 +245,7 @@ public class CUPSpec extends Spec
 	
 		// import
 		for (int i=0; i < imports.size(); i++) {
-			cw.write("import " + (String) imports.elementAt(i) + ";");
+			cw.write("import " + imports.elementAt(i) + ";");
 			cw.newline();
 		}
 		if (imports.size() > 0)
@@ -264,14 +264,14 @@ public class CUPSpec extends Spec
 		
 		// symbols
 		for (int i=0; i < symbols.size(); i++) {
-			cw.write( ((SymbolList) symbols.elementAt(i)).toString() );
+			cw.write( symbols.elementAt(i).toString() );
 			cw.newline();
 		}
 		cw.newline();
 		
 		// precedence
 		for (int i=0; i < prec.size(); i++) {
-			cw.write( ((Precedence) prec.elementAt(i)).toString() );
+			cw.write( prec.elementAt(i).toString() );
 			cw.newline();
 		}
 		cw.newline();
@@ -284,7 +284,7 @@ public class CUPSpec extends Spec
 		
 		// productions
 		for (int i=0; i < productions.size(); i++) {
-			((Production) productions.elementAt(i)).unparse(cw);
+			productions.elementAt(i).unparse(cw);
 		}		
 		cw.newline();
 		cw.end();
@@ -310,7 +310,7 @@ public class CUPSpec extends Spec
 		
 		// import
 		for (int i=0; i < imports.size(); i++)
-			out.println("import " + (String) imports.elementAt(i) + ";");
+			out.println("import " + imports.elementAt(i) + ";");
 		out.println();
 
 		// code
@@ -330,12 +330,12 @@ public class CUPSpec extends Spec
 		
 		// symbols
 		for (int i=0; i < symbols.size(); i++)
-			out.println( ((SymbolList) symbols.elementAt(i)).toString() );
+			out.println( symbols.elementAt(i).toString() );
 		out.println();
 		
 		// precedence
 		for (int i=0; i < prec.size(); i++)
-			out.println( ((Precedence) prec.elementAt(i)).toString() );
+			out.println( prec.elementAt(i).toString() );
 		out.println();
 		
 		// start
@@ -344,7 +344,7 @@ public class CUPSpec extends Spec
 		
 		// productions
 		for (int i=0; i < productions.size(); i++)
-			out.println( ((Production) productions.elementAt(i)).toString() );
+			out.println( productions.elementAt(i).toString() );
 		out.println();
 		
 		out.flush();

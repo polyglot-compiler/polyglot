@@ -8,6 +8,6 @@ import polyglot.types.SemanticException;
 public class IdToExt_c extends ToExt_c {
     public Node toExt(ExtensionRewriter rw) throws SemanticException {
         Id n = (Id) node();
-        return rw.nodeFactory().Id(n.position(), n.id());
+        return rw.to_nf().Id(n.position(), n.id());
     }
 }

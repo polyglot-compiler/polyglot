@@ -104,7 +104,7 @@ public class InferenceSolver_c implements InferenceSolver {
         for (int i = 0; i < solution.length; i++) {
             if (solution[i] == null) {
                 TypeVariable toSolve = typeVariablesToSolve().get(i);
-                Set<ReferenceType> bounds = new HashSet<ReferenceType>();
+                Set<ReferenceType> bounds = new LinkedHashSet<ReferenceType>();
                 List<? extends Constraint> subSupConstraints = useSubtypeConstraints ? subs : supers;
                 for (Constraint c : subSupConstraints) {
                     if (c.formal.equals(toSolve) && c.actual.isReference()) {

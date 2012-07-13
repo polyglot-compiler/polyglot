@@ -15,16 +15,16 @@ import polyglot.util.SilentErrorQueue;
  */
 public class SourceFileTest extends AbstractTest {
     private static final String JAVAC = "javac";
-    protected final List sourceFilenames;
+    protected final List<String> sourceFilenames;
     protected String extensionClassname = null;
     protected String[] extraArgs;
-    protected List mainExtraArgs;
+    protected List<String> mainExtraArgs;
     protected final SilentErrorQueue eq;
     protected String destDir;
     
-    protected List expectedFailures;
+    protected List<ExpectedFailure> expectedFailures;
     
-    protected Set undefinedEnvVars = new HashSet();
+    protected Set<String> undefinedEnvVars = new HashSet<String>();
         
     public SourceFileTest(String filename) {
         super(new File(filename).getName());
@@ -33,7 +33,7 @@ public class SourceFileTest extends AbstractTest {
 
     }
 
-    public SourceFileTest(List filenames) {
+    public SourceFileTest(List<String> filenames) {
         super(filenames.toString());
         this.sourceFilenames = filenames;
         this.eq = new SilentErrorQueue(100, this.getName()); 
@@ -62,13 +62,13 @@ public class SourceFileTest extends AbstractTest {
     }
 
     
-    public void setExpectedFailures(List expectedFailures) {
+    public void setExpectedFailures(List<ExpectedFailure> expectedFailures) {
         this.expectedFailures = expectedFailures;
     }
 
     protected boolean runTest() {
-        for (Iterator i = sourceFilenames.iterator(); i.hasNext(); ) {
-            File sourceFile = new File((String)i.next());
+        for (String filename : sourceFilenames) {
+            File sourceFile = new File(filename);
             if (!sourceFile.exists()) {
                 setFailureMessage("File not found.");
                 return false;
@@ -118,19 +118,18 @@ public class SourceFileTest extends AbstractTest {
     }
 
     protected boolean checkErrorQueue(SilentErrorQueue eq) {
-        List errors = new ArrayList(eq.getErrors());
+        List<ErrorInfo> errors = new ArrayList<ErrorInfo>(eq.getErrors());
         
         boolean swallowRemainingFailures = false;
-        for (Iterator i = expectedFailures.iterator(); i.hasNext(); ) {
-            ExpectedFailure f = (ExpectedFailure)i.next();
+        for (ExpectedFailure f : expectedFailures) {
             if (f instanceof AnyExpectedFailure) {
                 swallowRemainingFailures = true;
                 continue;
             }
             
             boolean found = false;
-            for (Iterator j = errors.iterator(); j.hasNext(); ) {
-                ErrorInfo e =(ErrorInfo)j.next();
+            for (Iterator<ErrorInfo> j = errors.iterator(); j.hasNext(); ) {
+                ErrorInfo e = j.next();
                 if (f.matches(e)) {
                     // this error info has been matched. remove it.
                     found = true;
@@ -147,8 +146,8 @@ public class SourceFileTest extends AbstractTest {
         // are there any unaccounted for errors?
         if (!errors.isEmpty() && !swallowRemainingFailures) {
             StringBuffer sb = new StringBuffer();
-            for (Iterator iter = errors.iterator(); iter.hasNext(); ) {
-                ErrorInfo err = (ErrorInfo)iter.next();                        
+            for (Iterator<ErrorInfo> iter = errors.iterator(); iter.hasNext(); ) {
+                ErrorInfo err = iter.next();                        
                 sb.append(err.getMessage());
                 if (err.getPosition() != null) {
                     sb.append(" (");
@@ -163,7 +162,7 @@ public class SourceFileTest extends AbstractTest {
     }
     
     protected String[] getSourceFileNames() {
-        return (String[])sourceFilenames.toArray(new String[0]);
+        return sourceFilenames.toArray(new String[0]);
     }
     
     protected void invokePolyglot(String[] files) 
@@ -247,7 +246,7 @@ public class SourceFileTest extends AbstractTest {
     }
 
     protected String[] buildCmdLine(String[] files) {
-        ArrayList args = new ArrayList();
+        ArrayList<String> args = new ArrayList<String>();
         
         String s;
         String[] sa;
@@ -275,7 +274,7 @@ public class SourceFileTest extends AbstractTest {
         char pathSep = File.pathSeparatorChar;
         
         if (mainExtraArgs == null && (s = Main.options.extraArgs) != null) {
-            mainExtraArgs = new ArrayList();
+            mainExtraArgs = new ArrayList<String>();
             sa = breakString(Main.options.extraArgs);
             for (int i = 0; i < sa.length; i++) {
                 String sas = sa[i];
@@ -302,7 +301,7 @@ public class SourceFileTest extends AbstractTest {
         
         args.addAll(Arrays.asList(files));
         
-        return (String[])args.toArray(new String[0]);
+        return args.toArray(new String[0]);
     }
         
     /**
@@ -367,7 +366,7 @@ public class SourceFileTest extends AbstractTest {
     }
     
     protected static String[] breakString(String s) {        
-        ArrayList l = new ArrayList();
+        ArrayList<String> l = new ArrayList<String>();
         int i = 0;
         String token = "";
         // if endChar != 0, then we are parsing a long token that may
@@ -403,7 +402,7 @@ public class SourceFileTest extends AbstractTest {
             l.add(token);                    
         }
 
-        return (String[])l.toArray(new String[l.size()]);
+        return l.toArray(new String[l.size()]);
     }
     protected void setExtraCmdLineArgs(String args) {
         if (args != null) {

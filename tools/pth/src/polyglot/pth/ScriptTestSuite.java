@@ -69,7 +69,7 @@ public class ScriptTestSuite extends TestSuite {
     protected boolean parseScript() {        
         Grm grm = new Grm(this.scriptFile);
         try {
-            this.tests = (List)grm.parse().value;
+            this.tests = (List<Test>)grm.parse().value;
         }
         catch (Exception e) {
             this.setFailureMessage("Parsing error: " + e.getMessage());
@@ -110,7 +110,7 @@ public class ScriptTestSuite extends TestSuite {
         return true;
     }
 
-    public List getTests() {
+    public List<Test> getTests() {
         this.loadScript();
         return super.getTests();
     }

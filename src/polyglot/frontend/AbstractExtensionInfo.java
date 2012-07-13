@@ -105,6 +105,10 @@ public abstract class AbstractExtensionInfo implements ExtensionInfo {
 
 		// Register the extension with the compiler.
 		compiler.addExtension(this);
+		
+		// Initialize the output extension if there is one
+        if (this.outputExtensionInfo() != null)
+        	this.outputExtensionInfo().initCompiler(compiler);
 
 		// Create the type system and node factory.
 		typeSystem();
@@ -207,10 +211,6 @@ public abstract class AbstractExtensionInfo implements ExtensionInfo {
 		return extFM;
 	}
 
-	public ClassLoader classLoader() {
-		return ToolProvider.getSystemToolClassLoader();
-	}
-
 	public ClassFileLoader classFileLoader() {
 		if (classFileLoader == null) {
 			classFileLoader = extFileManager();
@@ -251,6 +251,10 @@ public abstract class AbstractExtensionInfo implements ExtensionInfo {
 	public ToExt getToExt(ExtensionInfo to_ext, Node n) {
 		// just return the first ToExt extension we find.
 		return ToExt_c.ext(n);
+	}
+	
+	public ExtensionInfo outputExtensionInfo() {
+		return null;
 	}
 
 }

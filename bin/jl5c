@@ -107,6 +107,10 @@ while true; do
             usage=1
             break
             ;;
+        -rdebug)
+          shift
+          vmargs="${vmargs} -Xdebug -Xrunjdwp:transport=dt_socket,address=6666,server=y,suspend=y"
+          ;;
         *)
             args="$args '$1'"
             shift
@@ -116,7 +120,7 @@ done
 
 unixclasspath=`unixpath $CLASSPATH`
 classpath="$extra_cp"
-classpath="$classpath:$dir/classes:$dir/lib/polyglot.jar:$dir/lib/java_cup.jar:$dir/lib/JFlex.jar"
+classpath="$classpath:$dir/classes:$dir/tools/java_cup/classes:$dir/lib/JFlex.jar"
 
 PATH_unix=`unixpath $PATH`
 
