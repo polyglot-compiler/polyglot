@@ -34,6 +34,7 @@ import polyglot.util.QuotedStringTokenizer;
 import polyglot.util.InternalCompilerError;
 
 import java.io.*;
+import java.net.URI;
 import java.util.*;
 
 import javax.tools.FileObject;
@@ -217,9 +218,17 @@ public class Main {
 						javacCmd[j++] = "-g";
 					}
 
-					for (JavaFileObject jfo : compiler.outputFiles())
-						javacCmd[j++] = new File(jfo.toUri().getPath()).getAbsolutePath();
-
+					for (JavaFileObject jfo : compiler.outputFiles()) {
+						URI jfoURI = jfo.toUri();
+						// XXX: the JavaCompiler API spec says toURI() must be absolute, 
+						//      but OSX does not put a scheme component on files.
+						File outfile;
+						if (!jfoURI.isAbsolute())
+							outfile = new File(jfoURI.getPath());
+						else
+							outfile = new File(jfoURI);
+						javacCmd[j++] = outfile.getAbsolutePath();
+					}
 					if (Report.should_report(verbose, 1)) {
 						StringBuffer cmdStr = new StringBuffer();
 						for (int i = 0; i < javacCmd.length; i++)
