@@ -216,7 +216,6 @@ public abstract class AbstractExtensionInfo implements ExtensionInfo {
 			classFileLoader = extFileManager();
 			classFileLoader.addLocation(getOptions().bootclasspath);
 			classFileLoader.addLocation(getOptions().classpath);
-			classFileLoader.addLocation(getOptions().class_output);
 		}
 		return classFileLoader;
 	}
