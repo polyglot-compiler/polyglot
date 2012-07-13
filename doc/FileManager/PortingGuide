@@ -1,0 +1,46 @@
+Porting guide
+=============
+
+For a class extending polyglot.frontend.AbstractExtensionInfo, ParserlessJLExtensionInfo or JLExtensionInfo, watch out for following methods:
+
+1. targetFactory() - Signature of TargetFactory constructor -> TargetFactory(FileManager fileManager, Location outputLocation, String outExt, boolean so)
+2. createClassFile() - Signature of the method -> createClassFile(FileObject f, byte[] code)
+3. createFileSource() - Signature of the method -> createFileSource(FileObject f, boolean user)
+4. extFileManager() - You might want to instantiate your own file manager implementation in this method.
+5. classFileLoader() - You might want to add more locations (for searching .class files) to ClassFileLoader.
+6. addLocationsToFileManager() - You might want to set locations other than standard ones (as in source_output, class_output, bootclasspath, classpath and sourcepath) to your file manager.
+7. initTypeSystem() / makeLoadedClassResolver() - Signature of SourceClassResolver constructor -> SourceClassResolver(Compiler compiler, ExtensionInfo ext, boolean allowRawClasses, boolean compileCommandLineOnly, boolean ignoreModTimes) and LoadedClassResolver constructor -> LoadedClassResolver(ExtensionInfo extInfo, boolean allowRawClasses)
+
+In a class polyglot.frontend.Compiler, variable outputFiles is now Collection of JavaFileObject (instead of Collection of raw types). So you might want to change the way your extension collects the output files (.java files).
+
+For a class extending polyglot.frontend.TargetFactory, watch out for the followings:
+
+1. Constructor signature as mentioned above
+2. Method outputWriter(String packageName, String className, Source source) throws IOException is deleted.
+3. outputCodeWriter() - Signature of the method -> outputCodeWriter(FileObject f, int width) throws IOException
+4. Methods 
+	File outputFile(String packageName, Source source) and 
+	File outputFile(String packageName, String className, Source source) are replaced by
+	JavaFileObject outputFileObject(String packageName, Source source) and 
+	JavaFileObject outputFileObject(String packageName, String className, Source source) respectively.
+
+For a class extending polyglot.frontend.goals.Serialized, watch out for the following:
+
+1. createSerializer() - Signature of the method -> createSerializer(TypeSystem ts, NodeFactory nf, long lastModified, ErrorQueue eq, Version version)
+(NOTE: Wherever applicable, use getLastModified method of "source" type to have "long" type instead of "Date" type)
+
+For a class extending polyglot.main.Main, watch out for the following:
+
+1. If you override start(String[] argv, ExtensionInfo ext, ErrorQueue eq) throws TerminationException, call addLocationsToFileManager() method of ExtensionInfo immediately after parsing commandline options.
+
+For a class extending polyglot.types.LoadedClassResolver or SourceClassResolver, watch out for the followings:
+
+1. Signature of LoadedClassResolver constructor as mentioned above
+2. Signature of SourceClassResolver constructor as mentioned above
+
+For a class extending polyglot.visit.ClassSerializer, watch out for the following:
+
+1. Signature of ClassSerializer constructor -> ClassSerializer(TypeSystem ts, NodeFactory nf, long time, ErrorQueue eq, Version ver)
+
+General:
+In any extension, any source file rewriter that needs an object to hold the translated Java code must call getJavaFileForOutput method on filemanager of the OutputExtensionInfo instead of creating Source object.

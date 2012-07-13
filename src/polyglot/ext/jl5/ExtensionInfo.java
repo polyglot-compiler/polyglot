@@ -1,7 +1,10 @@
 package polyglot.ext.jl5;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.Reader;
+
+import javax.tools.FileObject;
 
 import polyglot.ast.NodeFactory;
 import polyglot.ext.jl5.ast.JL5DelFactory_c;
@@ -9,7 +12,6 @@ import polyglot.ext.jl5.ast.JL5ExtFactory_c;
 import polyglot.ext.jl5.ast.JL5NodeFactory_c;
 import polyglot.ext.jl5.parse.Grm;
 import polyglot.ext.jl5.parse.Lexer_c;
-import polyglot.ext.jl5.translate.JL5ToExtFactory_c;
 import polyglot.ext.jl5.translate.JL5ToJLExtFactory_c;
 import polyglot.ext.jl5.types.JL5TypeSystem_c;
 import polyglot.ext.jl5.types.reflect.JL5ClassFile;
@@ -35,15 +37,15 @@ public class ExtensionInfo extends JLExtensionInfo {
 
 	@Override
 	public String[] defaultFileExtensions() {
-        String ext = defaultFileExtension();
-        return new String[] { ext, "java" };
-    }
-	
+		String ext = defaultFileExtension();
+		return new String[] { ext, "java" };
+	}
+
 	@Override
 	public String compilerName() {
 		return "jl5c";
 	}
-	
+
 	@Override
 	protected NodeFactory createNodeFactory() {
 		JL5Options opt = (JL5Options) getOptions();
@@ -57,21 +59,28 @@ public class ExtensionInfo extends JLExtensionInfo {
 	protected TypeSystem createTypeSystem() {
 		return new JL5TypeSystem_c();
 	}
+	
+	@Override
+	public void addLocationsToFileManager() {
+		super.addLocationsToFileManager();
+		outputExtensionInfo().addLocationsToFileManager();
+	}
 
 	@Override
 	public Scheduler createScheduler() {
 		return new JL5Scheduler(this);
 	}
-	
+
 	@Override
 	protected Options createOptions() {
-        return new JL5Options(this);
-    }
-	
+		return new JL5Options(this);
+	}
+
 	@Override
-	public ClassFile createClassFile(File classFileSource, byte[] code){
-        return new JL5ClassFile(classFileSource, code, this);
-    }
+	public ClassFile createClassFile(FileObject classFileSource, byte[] code)
+			throws IOException {
+		return new JL5ClassFile(classFileSource, code, this);
+	}
 
 	/**
 	 * Return a parser for <code>source</code> using the given

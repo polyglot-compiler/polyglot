@@ -453,7 +453,7 @@
 			<attribute name="Class-Path" value="java_cup.jar polyglot.jar ppg.jar" />
 		</manifest>
 
-		<jar destfile="${lib}/polyglot.jar" basedir="${classes}" manifest="${classes}/MANIFEST.MF" includes="polyglot/ast/**,polyglot/frontend/**,polyglot/lex/**,polyglot/main/**,polyglot/parse/**,polyglot/qq/**,polyglot/types/**,polyglot/util/**,polyglot/visit/**,ppg/**,polyglot/ext/param/**,polyglot/ext/jl5/**" />
+		<jar destfile="${lib}/polyglot.jar" basedir="${classes}" manifest="${classes}/MANIFEST.MF" includes="polyglot/ast/**,polyglot/frontend/**,polyglot/lex/**,polyglot/main/**,polyglot/parse/**,polyglot/qq/**,polyglot/types/**,polyglot/util/**,polyglot/visit/**,ppg/**,polyglot/ext/param/**,polyglot/ext/jl5/**,polyglot/translate/**,polyglot/filemanager/**" />
 
 		<delete file="${classes}/MANIFEST.MF" failonerror="false" />
 	</target>
