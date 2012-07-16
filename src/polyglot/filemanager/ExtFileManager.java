@@ -331,24 +331,28 @@ public class ExtFileManager implements FileManager {
 		return javac_fm.isSupportedOption(option);
 	}
 
-	// Use this method for obtaining JavaFileObjects representing files on the local file system
+	// Use this method for obtaining JavaFileObjects representing files on the
+	// local file system
 	public Iterable<? extends JavaFileObject> getJavaFileObjects(File... files) {
 		return javac_fm.getJavaFileObjects(files);
 	}
 
-	// Use this method for obtaining JavaFileObjects representing files on the local file system
+	// Use this method for obtaining JavaFileObjects representing files on the
+	// local file system
 	public Iterable<? extends JavaFileObject> getJavaFileObjects(
 			String... names) {
 		return javac_fm.getJavaFileObjects(names);
 	}
 
-	// Use this method for obtaining JavaFileObjects representing files on the local file system
+	// Use this method for obtaining JavaFileObjects representing files on the
+	// local file system
 	public Iterable<? extends JavaFileObject> getJavaFileObjectsFromFiles(
 			Iterable<? extends File> files) {
 		return javac_fm.getJavaFileObjectsFromFiles(files);
 	}
 
-	// Use this method for obtaining JavaFileObjects representing files on the local file system
+	// Use this method for obtaining JavaFileObjects representing files on the
+	// local file system
 	public Iterable<? extends JavaFileObject> getJavaFileObjectsFromStrings(
 			Iterable<String> names) {
 		return javac_fm.getJavaFileObjectsFromStrings(names);
@@ -536,17 +540,31 @@ public class ExtFileManager implements FileManager {
 	@Override
 	public FileSource fileSource(Location location, String fileName,
 			boolean userSpecified) throws IOException {
-		String key = fileKey(location, "", fileName);
-
-		FileSource sourceFile = loadedSources.get(key);
-		if (sourceFile != null)
-			return sourceFile;
-
-		FileObject fo = getFileForInput(location, "", fileName);
-		if (fo == null)
-			throw new FileNotFoundException("File: " + fileName + " not found.");
+		File f = new File(fileName);
+		FileSource sourceFile;
+		FileObject fo = null;
+		String key;
+		if (f.isAbsolute()) {
+			key = fileName;
+			sourceFile = loadedSources.get(key);
+			if (sourceFile != null)
+				return sourceFile;
+			for (FileObject jfo : javac_fm.getJavaFileObjects(f)) {
+				if (fo != null)
+					throw new InternalCompilerError("Two files exist of the same name");
+				fo = jfo;
+			}
+		} else {
+			key = fileKey(location, "", fileName);
+			sourceFile = loadedSources.get(key);
+			if (sourceFile != null)
+				return sourceFile;
+			fo = getFileForInput(location, "", fileName);
+			if (fo == null)
+				throw new FileNotFoundException("File: " + fileName
+						+ " not found.");
+		}
 		sourceFile = extInfo.createFileSource(fo, userSpecified);
-
 		String[] exts = extInfo.fileExtensions();
 		boolean ok = false;
 
