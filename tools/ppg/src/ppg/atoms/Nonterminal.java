@@ -1,8 +1,5 @@
 package ppg.atoms;
 
-import java.util.*;
-import ppg.parse.*;
-import ppg.util.*;
 
 public class Nonterminal extends GrammarSymbol
 {
@@ -16,11 +13,13 @@ public class Nonterminal extends GrammarSymbol
 		label = null;
 	}
 
-	public Object clone() {
+	@Override
+  public Object clone() {
 		return new Nonterminal(name, label);
 	}
 	
-	public boolean equals(Object o) {
+	@Override
+  public boolean equals(Object o) {
 		if (o instanceof Nonterminal) {
 			return name.equals( ((Nonterminal)o).getName() );
 		} else if (o instanceof String) {

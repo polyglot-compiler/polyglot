@@ -1,7 +1,6 @@
 package ppg.parse;
 
-import java.io.*;
-import ppg.lex.*;
+import ppg.lex.Token;
 
 /** 
  * This error is thrown when the parser has an internal error -- the user should not see these

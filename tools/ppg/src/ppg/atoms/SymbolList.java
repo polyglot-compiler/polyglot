@@ -28,7 +28,8 @@ public class SymbolList
 		return false;
 	}
 	
-	public Object clone() {
+	@Override
+  public Object clone() {
 		String newType = (type == null) ? null : type.toString();
 		Vector<String> newSyms = new Vector<String>();
 		for (int i=0; i < symbols.size(); i++) {
@@ -37,7 +38,8 @@ public class SymbolList
 		return new SymbolList(variety, newType, newSyms);
 	}
 	
-	public String toString() {
+	@Override
+  public String toString() {
 		String result = "";
 
 		if (symbols.size() > 0) {

@@ -3,6 +3,7 @@ package ppg.code;
 public abstract class Code
 {
 	protected String value;
+	@Override
 	public abstract Object clone();
 	
 	public void append(String s) {
@@ -13,5 +14,6 @@ public abstract class Code
 		value = s + "\n" + value;					   
 	}
 	
+	@Override
 	public abstract String toString();
 }

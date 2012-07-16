@@ -10,7 +10,8 @@ public abstract class GrammarSymbol extends GrammarPart implements Equatable
 		return name;	
 	}
 
-	public void unparse(CodeWriter cw) {
+	@Override
+  public void unparse(CodeWriter cw) {
 		cw.begin(0);
 		cw.write(name);
 		if (label != null)
@@ -18,7 +19,8 @@ public abstract class GrammarSymbol extends GrammarPart implements Equatable
 		cw.end();
 	}
 	
-	public String toString() {
+	@Override
+  public String toString() {
 		String result = name;
 		if (label != null)
 			result += ":" + label;

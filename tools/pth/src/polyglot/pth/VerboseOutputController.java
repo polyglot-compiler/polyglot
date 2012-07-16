@@ -5,13 +5,11 @@
 package polyglot.pth;
 
 import java.io.PrintStream;
-import java.text.DateFormat;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.regex.Pattern;
 
-import polyglot.util.*;
+import polyglot.util.ErrorInfo;
+import polyglot.util.ErrorQueue;
+import polyglot.util.SilentErrorQueue;
+import polyglot.util.StdErrorQueue;
 
 /**
  * 
@@ -23,6 +21,7 @@ public class VerboseOutputController extends OutputController{
         this.alwaysShowErrorQ = alwaysShowErrorQ;
     }
      
+    @Override
     protected void startScriptTestSuite(ScriptTestSuite sts) {
         out.println("Test script " + sts.getName());
         if (sts.getDescription() != null && sts.getDescription().length() > 0) {
@@ -34,6 +33,7 @@ public class VerboseOutputController extends OutputController{
         }
         out.println("==============================");
     }
+    @Override
     protected void finishScriptTestSuite(ScriptTestSuite sts) {
         out.println("Test script " + sts.getName() + " finished");
         if (!sts.success() && sts.failureMessage != null) {
@@ -45,6 +45,7 @@ public class VerboseOutputController extends OutputController{
             " tests succeeded.");
     }
 
+    @Override
     protected void startSourceFileTest(SourceFileTest sft) {
         out.println(sft.getName() + ": ");
         if (sft.getDescription() != null && sft.getDescription().length() > 0) {
@@ -56,6 +57,7 @@ public class VerboseOutputController extends OutputController{
         }
     }
         
+    @Override
     protected void finishSourceFileTest(SourceFileTest sft, ErrorQueue eq) {
         if (sft.success()) {
             out.println("    Test completed OK");
@@ -86,6 +88,7 @@ public class VerboseOutputController extends OutputController{
     }
     
 
+    @Override
     public void displayTestSuiteResults(String suiteName, TestSuite ts) {
         TestSuiteResult tsr = ts.getTestSuiteResult();
         if (tsr == null || tsr.testResults.isEmpty()) {
@@ -124,12 +127,14 @@ public class VerboseOutputController extends OutputController{
         out.println("   Never succeeded   : " + neverSuccess);
     }
 
+    @Override
     public void displayTestResults(TestResult tr, String testName) {
         out.println("    " + testName);
         out.println("      Last run    : " + getDateDisplay(tr==null?null:tr.dateTestRun));
         out.println("      Last success: " + getDateDisplay(tr==null?null:tr.dateLastSuccess));
     }
 
+    @Override
     public void warning(String w) {
         out.println("Warning: " + w);
     }

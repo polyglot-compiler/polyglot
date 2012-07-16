@@ -109,11 +109,13 @@ public class Token /* extends Symbol */ implements LexerResult {
 		return null;
 	}
 
+	@Override
 	public String toString () {
 		return (String) value;
 		//return filename + ":" + lineno + ": \"" + value + "\"";
     }
 
+    @Override
     public void unparse (java.io.OutputStream o) {
 		
 		if (value != null) {
@@ -130,6 +132,7 @@ public class Token /* extends Symbol */ implements LexerResult {
 		return filename;
 	}
 	
+    @Override
     public int lineNumber () {
 		return lineno;
 	}

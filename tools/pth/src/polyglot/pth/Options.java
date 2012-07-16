@@ -40,35 +40,40 @@ public class Options {
     protected CommandLineOption[] commandLineOpts = {
         new CommandLineOption(new String[] {"f", "filter"}, "regexp", 
                            "only execute the tests for which the regular expression regexp occurs somewhere in the test's name.") { 
-               protected int invoke(int index, String[] args) {
+               @Override
+              protected int invoke(int index, String[] args) {
                    testFilter = ".*" + getStringArg(++index, args) + ".*";
                    return index + 1;
                }
          },
         new CommandLineOption(new String[] {"p", "preserve"}, 
                            "preserve output files between tests; default is to delete") { 
-               protected int invoke(int index, String[] args) {
+               @Override
+              protected int invoke(int index, String[] args) {
                    deleteOutputFiles = false;
                    return index + 1;
                }
          },
         new CommandLineOption(new String[] {"q", "question"}, 
                            "show the latest results for the scripts; don't run any tests") { 
-               protected int invoke(int index, String[] args) {
+               @Override
+              protected int invoke(int index, String[] args) {
                    showResultsOnly = true;
                    return index + 1;
                }
          },
         new CommandLineOption("s", 
                            "only execute the tests which did not succeed last time they were executed.") { 
-               protected int invoke(int index, String[] args) {
+               @Override
+              protected int invoke(int index, String[] args) {
                    testPreviouslyFailedOnly = true;
                    return index + 1;
                }
          },
         new CommandLineOption(new String[] {"v"}, "n", 
                            "set verbosity level to n. n should be between 0 (quiet) and 9 (most verbose).") { 
-               protected int invoke(int index, String[] args) {
+               @Override
+              protected int invoke(int index, String[] args) {
                    verbosity = getIntArg(++index, args);
                    if (verbosity < 0 || verbosity > 9) {
                        throw new IllegalArgumentException("Verbosity must be " +
@@ -79,21 +84,24 @@ public class Options {
          },
         new CommandLineOption(new String[] {"cp", "classpath"}, "path", 
                            "set the class path for the Polyglot compiler.") { 
-               protected int invoke(int index, String[] args) {
+               @Override
+              protected int invoke(int index, String[] args) {
                    classpath = getStringArg(++index, args);
                    return index + 1;
                }
          },
         new CommandLineOption(new String[] {"args"}, "extraArgs", 
                            "provide additional command line arguments to the Polyglot compiler.") { 
-               protected int invoke(int index, String[] args) {
+               @Override
+              protected int invoke(int index, String[] args) {
                    extraArgs = getStringArg(++index, args);
                    return index + 1;
                }
          },
         new CommandLineOption(new String[] {"h", "help", "?"}, 
                            "Display this message.") { 
-               protected int invoke(int index, String[] args) {
+               @Override
+              protected int invoke(int index, String[] args) {
                    usage(System.out);
                    System.exit(0);
                    return index + 1;
@@ -101,8 +109,10 @@ public class Options {
          },
         new CommandLineOption(new String[] {}, 
                            "Files") { 
-                   protected int invoke(int index, String[] args) { return index; }
-                   protected int parse(int index, String[] args) {
+                   @Override
+                  protected int invoke(int index, String[] args) { return index; }
+                   @Override
+                  protected int parse(int index, String[] args) {
                        if (!args[index].startsWith("-")) inputFilenames.add(args[index++]);
                        return index; 
                    }               

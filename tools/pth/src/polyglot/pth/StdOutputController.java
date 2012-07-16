@@ -5,7 +5,6 @@
 package polyglot.pth;
 
 import java.io.PrintStream;
-import java.util.Iterator;
 
 import polyglot.util.ErrorQueue;
 
@@ -17,9 +16,11 @@ public class StdOutputController extends OutputController{
         super(out);
     }
      
+    @Override
     protected void startScriptTestSuite(ScriptTestSuite sts) {
         out.println("Test script " + sts.getName());
     }
+    @Override
     protected void finishScriptTestSuite(ScriptTestSuite sts) {
         if (!sts.success() && sts.failureMessage != null) {
             out.println(sts.failureMessage); 
@@ -30,10 +31,12 @@ public class StdOutputController extends OutputController{
             " tests succeeded.");
     }
 
+    @Override
     protected void startSourceFileTest(SourceFileTest sft) {
         out.print("  " + sft.getName() + ": ");
     }
     
+    @Override
     protected void finishSourceFileTest(SourceFileTest sft, ErrorQueue eq) {
         if (sft.success()) {
             out.println("OK");
@@ -47,6 +50,7 @@ public class StdOutputController extends OutputController{
     }
     
 
+    @Override
     public void displayTestSuiteResults(String suiteName, TestSuite ts) {
         TestSuiteResult tsr = ts.getTestSuiteResult();
         
@@ -94,6 +98,7 @@ public class StdOutputController extends OutputController{
     }
 
     private static final int TEST_NAME_COLUMN_WIDTH = 30;
+    @Override
     public void displayTestResults(TestResult tr, String testName) {
         StringBuffer sb = new StringBuffer();
         sb.append("    ");
@@ -107,6 +112,7 @@ public class StdOutputController extends OutputController{
         sb.append(getDateDisplay(tr==null?null:tr.dateLastSuccess));
         out.println(sb.toString());
     }
+    @Override
     public void warning(String w) {
         out.println("Warning: " + w);
     }

@@ -186,6 +186,7 @@ public class PPGSpec extends Spec
         /**
          * Parse the chain of inheritance via include files
          */
+        @Override
         public void parseChain (String basePath) {
             InputStream is;
             File file = null;
@@ -212,7 +213,7 @@ public class PPGSpec extends Spec
 
                 PPG.DEBUG("parsing "+simpleName);
                 parser.parse();
-                parent = (Spec)parser.getProgramNode();
+                parent = (Spec)Parser.getProgramNode();
                 is.close();
 
             } catch (FileNotFoundException e) {
@@ -231,7 +232,8 @@ public class PPGSpec extends Spec
             parent.parseChain(parentDir == null ? "" : parentDir);            
         }
 
-	public CUPSpec coalesce() throws PPGError {
+	@Override
+  public CUPSpec coalesce() throws PPGError {
 		// parent cannot be null by definition
 		CUPSpec combined = parent.coalesce();
 		
@@ -286,7 +288,7 @@ public class PPGSpec extends Spec
 		return newSpec;
 	}
 	
-	private void processDrop (CUPSpec combined, CUPSpec newSpec) throws PPGError {
+	private void processDrop (CUPSpec combined, CUPSpec newSpec) {
 		// DROP
 		Command cmd;
 		DropCmd drop;
@@ -345,7 +347,6 @@ public class PPGSpec extends Spec
 			Command cmd = commands.elementAt(i);
 			if (cmd instanceof TransferCmd) {
 				TransferCmd transfer = (TransferCmd) cmd;
-				Nonterminal source = transfer.getSource();
 				Vector<Production> prodList = transfer.getTransferList();
 				
 				// there must be at least one production by the grammar definition
@@ -402,7 +403,8 @@ public class PPGSpec extends Spec
 	/**
 	 * Write out contents to a CodeWriter
 	 */
-	public void unparse (CodeWriter cw) {
+	@Override
+  public void unparse (CodeWriter cw) {
 		cw.begin(0);
 		if (include != null) {
 			cw.write(include+"\n");

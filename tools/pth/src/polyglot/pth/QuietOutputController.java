@@ -5,11 +5,6 @@
 package polyglot.pth;
 
 import java.io.PrintStream;
-import java.text.DateFormat;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.regex.Pattern;
 
 import polyglot.util.ErrorQueue;
 
@@ -42,6 +37,7 @@ public class QuietOutputController extends StdOutputController{
         this.showFinishFile = showFinishFile;
     }
      
+    @Override
     protected void finishScriptTestSuite(ScriptTestSuite sts) {
         if (showScriptProgress) {
             out.println();
@@ -51,6 +47,7 @@ public class QuietOutputController extends StdOutputController{
         }
     }
 
+    @Override
     protected void finishSourceFileTest(SourceFileTest sft, ErrorQueue eq) {
         if (showFinishFile) {
             super.finishSourceFileTest(sft, eq);
@@ -64,12 +61,14 @@ public class QuietOutputController extends StdOutputController{
         }
     }
 
+    @Override
     protected void startScriptTestSuite(ScriptTestSuite sts) {
         if (showStartScript) {
             super.startScriptTestSuite(sts);
         }
     }
 
+    @Override
     protected void startSourceFileTest(SourceFileTest sft) {
         if (showStartFile) {
             super.startSourceFileTest(sft);

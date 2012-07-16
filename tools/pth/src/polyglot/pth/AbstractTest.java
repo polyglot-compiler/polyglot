@@ -23,10 +23,12 @@ public abstract class AbstractTest implements Test {
         this.name = name;
     }
     
+    @Override
     public void setOutputController(OutputController output) {
         this.output = output;
     }
     
+    @Override
     public final boolean run() {
         preRun();
         this.success = this.runTest();
@@ -59,10 +61,12 @@ public abstract class AbstractTest implements Test {
         return new TestResult(this, lastRun, lastSuccess);
     }
     
+    @Override
     public boolean success() {
         return success;
     }
     
+    @Override
     public String getFailureMessage() {
         return failureMessage;
     }
@@ -71,9 +75,11 @@ public abstract class AbstractTest implements Test {
         this.failureMessage= failureMessage;
     }
     
+    @Override
     public String getDescription() {
         return description;
     }
+    @Override
     public String getName() {
         return name;
     }
@@ -83,9 +89,11 @@ public abstract class AbstractTest implements Test {
     public void setName(String string) {
         name = string;
     }    
+    @Override
     public TestResult getTestResult() {
         return testResult;
     }
+    @Override
     public void setTestResult(TestResult tr) {
         testResult = tr;
     }

@@ -6,10 +6,12 @@ public class ScanCode extends Code
 		value = scanCode;
 	}
 
+	@Override
 	public Object clone () {
 		return new ScanCode(value.toString());	
 	}
 	
+	@Override
 	public String toString () {
 		return "scan with {:" + value + ":};";
 	}

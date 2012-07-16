@@ -1,7 +1,6 @@
 package ppg.atoms;
 
-import ppg.parse.*;
-import ppg.util.*;
+import ppg.util.CodeWriter;
 public class SemanticAction extends GrammarPart
 {
 	private String action;
@@ -10,11 +9,13 @@ public class SemanticAction extends GrammarPart
 		action = actionCode;
 	}
 
-	public Object clone() {
+	@Override
+  public Object clone() {
 		return new SemanticAction(action.toString());	
 	}
 	
-	public void unparse(CodeWriter cw) {
+	@Override
+  public void unparse(CodeWriter cw) {
 		cw.begin(0);
 		cw.write("{:");
 		cw.allowBreak(-1);
@@ -24,7 +25,8 @@ public class SemanticAction extends GrammarPart
 		cw.end();
 	}
 	
-	public String toString () {
+	@Override
+  public String toString () {
 		return "{:" + action + ":}\n";
 	}
 }

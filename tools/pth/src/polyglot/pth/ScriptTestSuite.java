@@ -45,6 +45,7 @@ public class ScriptTestSuite extends TestSuite {
         return true;
     }
     
+    @Override
     protected boolean runTest() {
         saveProblem = false;
         if (!loadScript()) {
@@ -55,12 +56,14 @@ public class ScriptTestSuite extends TestSuite {
         return super.runTest();            
     }
         
+    @Override
     protected void postIndividualTest() {
         if (!saveProblem) {
             this.saveProblem = !saveResults();
         }
     }
     
+    @Override
     protected void postRun() {
         super.postRun();
         this.saveResults();
@@ -69,7 +72,9 @@ public class ScriptTestSuite extends TestSuite {
     protected boolean parseScript() {        
         Grm grm = new Grm(this.scriptFile);
         try {
-            this.tests = (List<Test>)grm.parse().value;
+            @SuppressWarnings("unchecked")
+            List<Test> value = (List<Test>) grm.parse().value;
+            this.tests = value;
         }
         catch (Exception e) {
             this.setFailureMessage("Parsing error: " + e.getMessage());
@@ -112,6 +117,7 @@ public class ScriptTestSuite extends TestSuite {
         return true;
     }
 
+    @Override
     public List<Test> getTests() {
         this.loadScript();
         return super.getTests();

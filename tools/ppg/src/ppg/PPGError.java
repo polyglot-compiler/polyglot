@@ -11,6 +11,7 @@ public class PPGError extends Throwable
 		error = errorMsg;
 	}
 	
+	@Override
 	public String getMessage() {
 		return filename + ":" + line + ": syntax error: " + error;
 	}

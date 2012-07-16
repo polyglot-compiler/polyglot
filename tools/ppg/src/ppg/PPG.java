@@ -1,11 +1,17 @@
 package ppg;
 
-import java.io.*;
-import ppg.cmds.*;
-import ppg.lex.*;
-import ppg.parse.*;
-import ppg.spec.*;
-import ppg.util.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.PrintStream;
+
+import ppg.lex.Lexer;
+import ppg.parse.Parser;
+import ppg.spec.CUPSpec;
+import ppg.spec.Spec;
+import ppg.util.CodeWriter;
 
 public class PPG
 {
@@ -108,7 +114,7 @@ public class PPG
 	    System.err.println (HEADER + "Exception: " + e.getMessage ());
 	    return;
 	}
-	Spec spec = (Spec) parser.getProgramNode ();
+	Spec spec = (Spec) Parser.getProgramNode ();
 
         File file = new File(filename);
 	String parent = file.getParent ();

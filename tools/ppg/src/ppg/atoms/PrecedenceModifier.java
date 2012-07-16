@@ -13,10 +13,12 @@ public class PrecedenceModifier
         this.terminalName = terminalName;
     }
 
+    @Override
     public Object clone() {
         return new PrecedenceModifier(getTerminalName());
     }
 
+    @Override
     public void unparse(CodeWriter cw) {
         cw.begin(0);
         cw.write("%prec ");
@@ -24,6 +26,7 @@ public class PrecedenceModifier
         cw.end();
     }
 
+    @Override
     public String toString() {
         return "%prec " + getTerminalName();
     }

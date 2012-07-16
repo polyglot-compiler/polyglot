@@ -34,6 +34,7 @@ public class TestSuite extends AbstractTest {
         return haltOnFirstFailure;
     }
     
+    @Override
     public void setOutputController(OutputController output) {
         super.setOutputController(output);
         for (Test t : tests) {
@@ -41,6 +42,7 @@ public class TestSuite extends AbstractTest {
         }
     }
 
+    @Override
     protected boolean runTest() {
         boolean okay = true;
 
@@ -114,6 +116,7 @@ public class TestSuite extends AbstractTest {
         return Collections.unmodifiableList(this.tests);
     }
 
+    @Override
     protected TestResult createTestResult(Date lastSuccess) {
         Map<String, TestResult> testResults;
         if (this.getTestSuiteResult() != null) {

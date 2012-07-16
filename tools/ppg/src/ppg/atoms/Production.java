@@ -20,6 +20,8 @@ public class Production implements Unparse
 	public void setLHS(Nonterminal nt) { lhs = nt; }
 	public Vector<Vector<GrammarPart>> getRHS() { return rhs; }
 	
+	@SuppressWarnings("unchecked")
+	@Override
 	public Object clone() {
 		return new Production((Nonterminal) lhs.clone(),
 							  (Vector<Vector<GrammarPart>>) rhs.clone());
@@ -128,14 +130,7 @@ public class Production implements Unparse
 		rhs.addElement(rhsPart);
 	}
 	
-	private void assertSameLHS(Production prod, String function) {
-		if (! (prod.getLHS().equals(lhs)) ) {
-			System.err.println(HEADER + "nonterminals do not match in Production."+
-							   function + "(): current is "+lhs+", given: "+
-							   prod.getLHS());
-			System.exit(1);
-		}
-	}
+	@Override
 	public void unparse (CodeWriter cw) {
 		cw.begin(0);
 		cw.write(lhs.toString() + " ::=");
@@ -157,7 +152,8 @@ public class Production implements Unparse
 		cw.end();
 	}
 	
-	public String toString() {
+	@Override
+  public String toString() {
 		String result = lhs.toString();
 		result += " ::=";
 		for (int i=0; i < rhs.size(); i++) {

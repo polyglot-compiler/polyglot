@@ -12,6 +12,7 @@ public class TerminalList
 		symbols = syms;
 	}	
 	
+	@Override
 	public String toString() {
 		String result = "TERMINAL ";
 		if (type != null)

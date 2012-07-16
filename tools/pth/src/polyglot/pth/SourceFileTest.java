@@ -66,6 +66,7 @@ public class SourceFileTest extends AbstractTest {
         this.expectedFailures = expectedFailures;
     }
 
+    @Override
     protected boolean runTest() {
         for (String filename : sourceFilenames) {
             File sourceFile = new File(filename);
@@ -113,6 +114,7 @@ public class SourceFileTest extends AbstractTest {
         return checkErrorQueue(eq);
     }
     
+    @Override
     protected void postRun() {
         output.finishTest(this, eq);
     }
@@ -209,10 +211,9 @@ public class SourceFileTest extends AbstractTest {
         setDestDir(tmpdir.getPath());
 
         String[] cmdLine = buildCmdLine(files);
-        com.sun.tools.javac.Main compiler = new com.sun.tools.javac.Main();
 
         try {
-            compiler.compile(cmdLine);
+            com.sun.tools.javac.Main.compile(cmdLine);
         }
         finally {
             if (Main.options.deleteOutputFiles) {

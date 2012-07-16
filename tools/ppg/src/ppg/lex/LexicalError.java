@@ -14,10 +14,12 @@ public class LexicalError extends Exception implements LexerResult {
 		this.lineNumber = lineNumber;
 	}
 
+	@Override
 	public void unparse(OutputStream o) throws IOException { 
 		o.write(this.toString().getBytes());
 	}
 	
+	@Override
 	public String toString() {
 		return filename + "(" + lineNumber + ") : Lexical error : " + message;
 	}
@@ -26,10 +28,12 @@ public class LexicalError extends Exception implements LexerResult {
 		return filename;
 	}
 
+	@Override
 	public String getMessage(){
 		return toString();
 	}
 	
+	@Override
 	public int lineNumber() { 
 		return lineNumber; 
 	}

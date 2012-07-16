@@ -1,10 +1,13 @@
 package ppg.parse;
 
-import java.io.*;
-import ppg.*;
-import ppg.lex.*;
-import ppg.spec.*;
-import ppg.util.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+
+import ppg.lex.Lexer;
+import ppg.spec.Spec;
+import ppg.util.CodeWriter;
 
 public class ParseTest
 {
@@ -41,7 +44,7 @@ public class ParseTest
 			System.err.println(HEADER+"Exception: "+e.getMessage());
 			return;
 		}
-		Spec spec = (Spec)parser.getProgramNode();
+		Spec spec = (Spec)Parser.getProgramNode();
 					
 		CodeWriter cw = new CodeWriter(System.out, 72); 
 		try {

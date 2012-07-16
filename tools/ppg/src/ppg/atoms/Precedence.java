@@ -16,7 +16,8 @@ public class Precedence
 		symbols = syms;
 	}
 	
-	public Object clone () {
+	@Override
+  public Object clone () {
 		Vector<GrammarSymbol> newSyms = new Vector<GrammarSymbol>();
 		for (int i=0; i < symbols.size(); i++) {
 			newSyms.addElement( (GrammarSymbol) symbols.elementAt(i).clone() );
@@ -24,7 +25,8 @@ public class Precedence
 		return new Precedence(type, newSyms);
 	}
 	
-	public String toString () {
+	@Override
+  public String toString () {
 		String result = "precedence ";
 		switch (type) {
 			case (LEFT): result += "left "; break;

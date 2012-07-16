@@ -11,10 +11,12 @@ public class ParserCode extends Code
 	this.extendsimpls = extendsimpls;
 	value = parserCode;
     }
+    @Override
     public Object clone ()
     {
 	return new ParserCode (classname, extendsimpls, value);
     }
+    @Override
     public String toString ()
     {
 	if (classname == null)

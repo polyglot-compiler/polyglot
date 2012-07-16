@@ -15,7 +15,8 @@ public class OverrideCmd implements Command
 	public Nonterminal getLHS() { return prod.getLHS(); }
 	public Production getProduction() { return prod; }
 	
-	public void unparse(CodeWriter cw) {
+	@Override
+        public void unparse(CodeWriter cw) {
 		//cw.begin(0);
 		cw.write("OverrideCmd");
 		cw.allowBreak(0);

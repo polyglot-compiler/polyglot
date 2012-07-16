@@ -5,11 +5,10 @@
 
 package ppg.util;
 
+import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
-import java.io.IOException;
-import java.util.Vector;
 
 /** 
  * A <code>CodeWriter</code> is a pretty-printing engine.
@@ -262,6 +261,7 @@ class Block extends Item {
         last = it;
     }
 
+@Override
 int formatN(int lmargin, int pos, int rmargin, int fin, boolean can_break,
     		boolean nofail) throws Overrun {
 	    // "this_fin" is a final-position bound for the formatting of
@@ -298,6 +298,7 @@ int formatN(int lmargin, int pos, int rmargin, int fin, boolean can_break,
 	}
     }
 
+    @Override
     int sendOutput(Writer o, int lmargin, int pos) throws IOException {
         Item it = first;
         lmargin = pos+indent;
@@ -308,6 +309,7 @@ int formatN(int lmargin, int pos, int rmargin, int fin, boolean can_break,
         return pos;
     }
 
+    @Override
     void free() {
         super.free();
   
@@ -323,11 +325,13 @@ class StringItem extends Item {
     String s;
     StringItem(String s_) { s = s_; }
         
+    @Override
     int formatN(int lmargin, int pos, int rmargin, int fin, boolean can_break,
 		boolean nofail) throws Overrun {
 	return format(next, lmargin, pos + s.length(), rmargin, fin,
 		      can_break, nofail);
     }
+    @Override
     int sendOutput(Writer o, int lm, int pos) throws IOException {
         o.write(s);
         return pos + s.length();
@@ -343,6 +347,7 @@ class AllowBreak extends Item
         
     AllowBreak(int n_, String alt_) { indent = n_; alt = alt_; }
         
+    @Override
     int formatN(int lmargin, int pos, int rmargin, int fin, boolean can_break,
     		boolean nofail) throws Overrun {
         if (can_break) { pos = lmargin + indent; broken = true; }
@@ -350,6 +355,7 @@ class AllowBreak extends Item
 	return format(next, lmargin, pos, rmargin, fin, can_break, nofail);
     }
         
+    @Override
     int sendOutput(Writer o, int lmargin, int pos)
         throws IOException {
         if (broken) {
@@ -367,6 +373,7 @@ class Newline extends AllowBreak
 {
     Newline(int n_) { super(n_, ""); }
         
+    @Override
     int formatN(int lmargin, int pos, int rmargin, int fin, boolean can_break,
 		boolean nofail) throws Overrun {
         broken = true;
@@ -375,6 +382,7 @@ class Newline extends AllowBreak
 			can_break, nofail);
     }
         
+    @Override
     int sendOutput(Writer o, int lmargin, int pos)
             throws IOException {
         o.write("\r\n");

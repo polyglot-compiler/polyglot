@@ -4,5 +4,6 @@ import ppg.parse.*;
 
 public abstract class GrammarPart implements Unparse
 {
-	public abstract Object clone();
+	@Override
+  public abstract Object clone();
 }

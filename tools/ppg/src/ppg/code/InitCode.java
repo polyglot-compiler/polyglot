@@ -6,10 +6,12 @@ public class InitCode extends Code
 		value = initCode;
 	}
 
+	@Override
 	public Object clone () {
 		return new InitCode(value.toString());	
 	}
 	
+	@Override
 	public String toString () {
 		return "init code {:\n" + value + "\n:}\n";
 	}

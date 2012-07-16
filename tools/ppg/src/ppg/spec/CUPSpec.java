@@ -1,14 +1,17 @@
 package ppg.spec;
 
-import java.io.*;
-import java.util.*;
+import java.io.PrintStream;
+import java.util.Hashtable;
+import java.util.Vector;
 
-import ppg.*;
-import ppg.atoms.*;
-import ppg.code.*;
-import ppg.lex.*;
-import ppg.parse.*;
-import ppg.util.*;
+import ppg.PPG;
+import ppg.atoms.GrammarPart;
+import ppg.atoms.Nonterminal;
+import ppg.atoms.Precedence;
+import ppg.atoms.Production;
+import ppg.atoms.SymbolList;
+import ppg.code.Code;
+import ppg.util.CodeWriter;
 
 public class CUPSpec extends Spec
 {
@@ -48,6 +51,7 @@ public class CUPSpec extends Spec
 		}
 	}
 	
+	@Override
 	public CUPSpec coalesce() {
 		// cannot have a parent by definition
 		return this;
@@ -99,7 +103,8 @@ public class CUPSpec extends Spec
 		}
 	}
 	
-	public Object clone() {
+	@Override
+  public Object clone() {
 		String newPkgName = (packageName == null) ? null : packageName.toString();
 		/*******************/
 		Vector<String> newImports = new Vector<String>();
@@ -156,7 +161,7 @@ public class CUPSpec extends Spec
 		}
 	}
 	
-	public void dropSymbol(String gs) throws PPGError {
+	public void dropSymbol(String gs) {
 		boolean dropped = false;
 		for (int i=0; i < symbols.size(); i++ ) {
 			SymbolList list = symbols.elementAt(i);
@@ -236,7 +241,8 @@ public class CUPSpec extends Spec
 		return i;
 	}
 	
-	public void unparse(CodeWriter cw) {
+	@Override
+  public void unparse(CodeWriter cw) {
 		cw.begin(0);
 		if (packageName != null) {
 			cw.write("package " + packageName + ";");

@@ -16,7 +16,6 @@ public class TestResult implements Serializable {
     public final Date dateTestRun;
     public final Date dateLastSuccess;
     public final boolean testRunSucessful;
-    private final String failureMessage;
     
     public TestResult(Test t, Date dateTestRun, Date dateLastSuccess) {
         this.dateTestRun = dateTestRun;
@@ -24,6 +23,5 @@ public class TestResult implements Serializable {
         this.testName = t.getName();
         this.testUniqueID = t.getUniqueId();
         this.testRunSucessful = t.success();
-        this.failureMessage = t.getFailureMessage();
     } 
 }

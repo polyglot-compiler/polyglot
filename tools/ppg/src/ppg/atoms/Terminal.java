@@ -1,7 +1,5 @@
 package ppg.atoms;
 
-import ppg.parse.*;
-import ppg.util.*;
 public class Terminal extends GrammarSymbol
 {
 	public Terminal(String name, String label) {
@@ -14,11 +12,13 @@ public class Terminal extends GrammarSymbol
 		label = null;
 	}
 
-	public Object clone () {
+	@Override
+  public Object clone () {
 		return new Terminal(name, label);	
 	}
 	
-	public boolean equals(Object o) {
+	@Override
+  public boolean equals(Object o) {
 		if (o instanceof Terminal) {
 			return name.equals( ((Terminal)o).getName() );	
 		} else if (o instanceof String) {

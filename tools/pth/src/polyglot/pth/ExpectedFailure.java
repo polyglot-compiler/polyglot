@@ -40,6 +40,7 @@ public class ExpectedFailure {
         return true;
     }
     
+    @Override
     public boolean equals(Object o) {
         if (o instanceof ExpectedFailure) {
             ExpectedFailure that = (ExpectedFailure)o;
@@ -49,11 +50,13 @@ public class ExpectedFailure {
         }
         return false;
     }
+    @Override
     public int hashCode() {
         return (errMsgRegExp==null ? -323
                                    : errMsgRegExp.hashCode()) 
               + (kind==null ? 41 : kind.hashCode());
     }
+    @Override
     public String toString() {
         StringBuffer sb = new StringBuffer();
         if (kind != null) {
