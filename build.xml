@@ -77,12 +77,34 @@
 		<property name="jl.version.build" value="${jl.version} (${now})" />
 	</target>
 
-	<target name="configure" description="Check the build configuration" depends="check-jars,configure-buildstring" unless="configure.up-to-date">
+	<target name="configure" description="Check the build configuration" depends="check-jars,configure-buildstring,eclipse" unless="configure.up-to-date">
 		<echo message="java version is ${java.version}" />
 		<echo message="current directory is ${user.dir}" />
 		<echo message="Java home directory is ${java.home}" />
 		<echo message="Polyglot version is ${jl.version.build}" />
 		<property name="configure.up-to-date" value="true" />
+	</target>
+
+	<!-- Configures Eclipse's .classpath file. -->
+	<target name="eclipse" depends="eclipse-check"
+			unless="eclipse.up-to-date"
+			description="Configures Eclipse's .classpath file">
+                <property environment="env" />
+                <condition property="tools.jar-entry"
+                        value="&lt;classpathentry kind=&quot;lib&quot; path=&quot;${env.JAVA_HOME}/lib/tools.jar&quot;/&gt;"
+                        else="">
+                        <available file="${env.JAVA_HOME}/lib/tools.jar" />
+		</condition>
+		<copy file="eclipse/classpath.in" tofile=".classpath">
+			<filterset>
+				<filter token="TOOLS.JAR" value="${tools.jar-entry}" />
+			</filterset>
+		</copy>
+	</target>
+
+	<target name="eclipse-check">
+		<uptodate property="eclipse.up-to-date" targetfile=".classpath"
+				srcfile="eclipse/classpath.in" />
 	</target>
 
 	<target name="check-jars">
@@ -858,4 +880,3 @@ public class JLVersion extends polyglot.main.Version {
 </echo>
 	</target>
 </project>
-
