@@ -238,7 +238,7 @@ public abstract class AbstractExtensionInfo implements ExtensionInfo {
 			ext_fm.setLocation(options.source_output, options.source_output_dir);
 			ext_fm.setLocation(options.class_output, options.class_output_dir);
 			if (!options.bootclasspath_given)
-				options.bootclasspath_directories.add(options.default_bootclasspath);
+				options.bootclasspath_directories.addAll(options.default_bootclasspath_directories);
 			ext_fm.setLocation(options.bootclasspath,
 					options.bootclasspath_directories);
 			ext_fm.setLocation(options.classpath, options.classpath_directories);

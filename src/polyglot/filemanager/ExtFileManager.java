@@ -471,6 +471,13 @@ public class ExtFileManager implements FileManager {
 
 	@Override
 	public ClassFile loadFile(Location location, String name) {
+        if (Report.should_report(report_topics, 3)) {
+        	Report.report(3, "looking in " + location + " for " + name);
+        }
+        if (Report.should_report(report_topics, 4)) {
+        	Report.report(4, "Location " + location + " has " + getLocation(location));
+        }
+
 		try {
 			JavaFileObject jfo = null;
 			try {

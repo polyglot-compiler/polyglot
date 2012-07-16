@@ -73,7 +73,7 @@ public class Options {
 	public Set<File> classpath_directories = new LinkedHashSet<File>();
 	public Set<File> bootclasspath_directories = new LinkedHashSet<File>();
 	public File current_directory;
-	public File default_bootclasspath;
+	public Set<File> default_bootclasspath_directories  = new LinkedHashSet<File>();
 	public JavaFileManager.Location source_path;
 	public JavaFileManager.Location source_output;
 	public JavaFileManager.Location class_output;
@@ -141,14 +141,33 @@ public class Options {
 	 */
 	public void setDefaultValues() {
 		current_directory = new File(System.getProperty("user.dir"));
-		// TODO : make external config property file.
-		if (System.getProperty("os.name").indexOf("Mac") != -1) {
-			// XXX: gross!
-			default_bootclasspath = new File(System.getProperty("java.home") + separator
-					+ ".." + separator + "Classes" + separator + "classes.jar");
-		} else {
-			default_bootclasspath = new File(System.getProperty("java.home") + separator
-					+ "lib" + separator + "rt.jar");
+		
+		String bootclasspath_prop = System.getProperty("sun.boot.class.path");
+		if (bootclasspath_prop != null) {
+			bootclasspath_expression = bootclasspath_prop;
+			StringTokenizer st = new StringTokenizer(bootclasspath_prop,
+					pathSeparator);
+			while (st.hasMoreTokens()) {
+				File f = new File(st.nextToken());
+				if (f.exists())
+					default_bootclasspath_directories.add(f);				
+			}
+		}
+		else {
+			// XXX: Hack for when we can't find the bootclasspath from
+			// the JVM system property.
+			String runtime_jar;
+			// TODO : make external config property file.
+			if (System.getProperty("os.name").indexOf("Mac") != -1) {
+				// XXX: gross!
+				runtime_jar = System.getProperty("java.home") + separator
+						+ ".." + separator + "Classes" + separator + "classes.jar";
+			} else {
+				runtime_jar = System.getProperty("java.home") + separator
+						+ "lib" + separator + "rt.jar";
+			}
+			bootclasspath_expression = runtime_jar;
+			default_bootclasspath_directories.add(new File(runtime_jar));
 		}
 		source_path = StandardLocation.SOURCE_PATH;
 		source_output = StandardLocation.SOURCE_OUTPUT;
@@ -183,7 +202,7 @@ public class Options {
     	this.classpath_directories = opt.classpath_directories;
     	this.bootclasspath_directories = opt.bootclasspath_directories;
     	this.current_directory = opt.current_directory;
-    	this.default_bootclasspath = opt.default_bootclasspath;
+    	this.default_bootclasspath_directories = opt.default_bootclasspath_directories;
     	this.source_path = opt.source_path;
     	this.source_output = opt.source_output;
     	this.class_output = opt.class_output;
