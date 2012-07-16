@@ -59,7 +59,7 @@ public class Options {
 	/**
 	 * Back pointer to the extension that owns this options
 	 */
-	public ExtensionInfo extension = null;
+	public final ExtensionInfo extension;
 
 	/*
 	 * Fields for storing values for options.
@@ -72,15 +72,15 @@ public class Options {
 	public String class_output_directory;
 	public Set<File> classpath_directories = new LinkedHashSet<File>();
 	public Set<File> bootclasspath_directories = new LinkedHashSet<File>();
-	public File currFile;
-	public File bootFile;
+	public File current_directory;
+	public File default_bootclasspath;
 	public JavaFileManager.Location source_path;
 	public JavaFileManager.Location source_output;
 	public JavaFileManager.Location class_output;
 	public JavaFileManager.Location classpath;
 	public String output_classpath;
 	public JavaFileManager.Location bootclasspath;
-	public String bootClassPath;
+	public String bootclasspath_expression;
 	public boolean outputToFS = false;
 	public boolean assertions = false;
 	public boolean generate_debugging_info = false;
@@ -140,14 +140,14 @@ public class Options {
 	 * Set default values for options
 	 */
 	public void setDefaultValues() {
-		currFile = new File(System.getProperty("user.dir"));
+		current_directory = new File(System.getProperty("user.dir"));
 		// TODO : make external config property file.
 		if (System.getProperty("os.name").indexOf("Mac") != -1) {
 			// XXX: gross!
-			bootFile = new File(System.getProperty("java.home") + separator
+			default_bootclasspath = new File(System.getProperty("java.home") + separator
 					+ ".." + separator + "Classes" + separator + "classes.jar");
 		} else {
-			bootFile = new File(System.getProperty("java.home") + separator
+			default_bootclasspath = new File(System.getProperty("java.home") + separator
 					+ "lib" + separator + "rt.jar");
 		}
 		source_path = StandardLocation.SOURCE_PATH;
@@ -158,7 +158,7 @@ public class Options {
 		output_classpath = systemJavaClasspath;
 		bootclasspath = StandardLocation.PLATFORM_CLASS_PATH;
 
-		sourcepath_directories.add(currFile);
+		sourcepath_directories.add(current_directory);
 
 		StringTokenizer st = new StringTokenizer(systemJavaClasspath,
 				pathSeparator);
@@ -168,6 +168,50 @@ public class Options {
 				classpath_directories.add(f);
 		}
 	}
+	
+    /**
+	 * Set values using another options object. This helps extensions configure
+	 * an output extension.
+	 */
+    public void setValuesFrom(Options opt) {
+    	this.error_count = opt.error_count;
+    	this.sourcepath_directories = opt.sourcepath_directories;
+    	this.source_output_dir = opt.source_output_dir;
+    	this.source_output_directory = opt.source_output_directory;
+    	this.class_output_dir = opt.class_output_dir;
+    	this.class_output_directory = opt.class_output_directory;
+    	this.classpath_directories = opt.classpath_directories;
+    	this.bootclasspath_directories = opt.bootclasspath_directories;
+    	this.current_directory = opt.current_directory;
+    	this.default_bootclasspath = opt.default_bootclasspath;
+    	this.source_path = opt.source_path;
+    	this.source_output = opt.source_output;
+    	this.class_output = opt.class_output;
+    	this.classpath = opt.classpath;
+    	this.output_classpath = opt.output_classpath;
+    	this.bootclasspath = opt.bootclasspath;
+    	this.bootclasspath_expression = opt.bootclasspath_expression;
+    	this.outputToFS = opt.outputToFS;
+    	this.assertions = opt.assertions;
+    	this.generate_debugging_info = opt.generate_debugging_info;
+    	this.compile_command_line_only = opt.compile_command_line_only;
+    	this.source_ext = opt.source_ext;
+    	this.output_ext = opt.output_ext;
+    	this.output_stdout = opt.output_stdout;
+    	this.post_compiler = opt.post_compiler;
+    	this.output_width = opt.output_width;
+    	this.fully_qualified_names = opt.fully_qualified_names;
+    	this.serialize_type_info = opt.serialize_type_info;
+    	this.dump_ast = opt.dump_ast;
+    	this.print_ast = opt.print_ast;
+    	this.disable_passes = opt.disable_passes;
+    	this.keep_output_files = opt.keep_output_files;
+    	this.precise_compiler_generated_positions = opt.precise_compiler_generated_positions;
+    	this.use_simple_code_writer = opt.use_simple_code_writer;
+    	this.merge_strings = opt.merge_strings;
+    	this.classpath_given = opt.classpath_given;
+    	this.bootclasspath_given = opt.bootclasspath_given;
+    }
 
 	/**
 	 * Parse the command line
@@ -247,7 +291,7 @@ public class Options {
 			i++;
 		} else if (args[i].equals("-bootclasspath")) {
 			i++;
-			bootClassPath = args[i];
+			bootclasspath_expression = args[i];
 			StringTokenizer st = new StringTokenizer(args[i], pathSeparator);
 			while (st.hasMoreTokens()) {
 				File f = new File(st.nextToken());
@@ -605,8 +649,8 @@ public class Options {
 		builder.append('.');
 		builder.append(pathSeparatorChar);
 		builder.append(output_classpath);
-		if (bootClassPath != null)
-			builder.append(bootClassPath);
+		if (bootclasspath_expression != null)
+			builder.append(bootclasspath_expression);
 		return builder.toString();
 	}
 }
