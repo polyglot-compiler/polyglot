@@ -331,23 +331,27 @@ public class ExtFileManager implements FileManager {
 		return javac_fm.isSupportedOption(option);
 	}
 
+	// Use this method for obtaining JavaFileObjects representing files on the local file system
 	public Iterable<? extends JavaFileObject> getJavaFileObjects(File... files) {
-		throw new UnsupportedOperationException();
+		return javac_fm.getJavaFileObjects(files);
 	}
 
+	// Use this method for obtaining JavaFileObjects representing files on the local file system
 	public Iterable<? extends JavaFileObject> getJavaFileObjects(
 			String... names) {
-		throw new UnsupportedOperationException();
+		return javac_fm.getJavaFileObjects(names);
 	}
 
+	// Use this method for obtaining JavaFileObjects representing files on the local file system
 	public Iterable<? extends JavaFileObject> getJavaFileObjectsFromFiles(
 			Iterable<? extends File> files) {
-		throw new UnsupportedOperationException();
+		return javac_fm.getJavaFileObjectsFromFiles(files);
 	}
 
+	// Use this method for obtaining JavaFileObjects representing files on the local file system
 	public Iterable<? extends JavaFileObject> getJavaFileObjectsFromStrings(
 			Iterable<String> names) {
-		throw new UnsupportedOperationException();
+		return javac_fm.getJavaFileObjectsFromStrings(names);
 	}
 
 	public Iterable<? extends File> getLocation(Location location) {
