@@ -238,7 +238,7 @@ public class Options {
 	 * @throws UsageError
 	 *             if the usage is incorrect.
 	 */
-	public void parseCommandLine(String args[], Set source) throws UsageError {
+	public final void parseCommandLine(String args[], Set source) throws UsageError {
 		if (args.length < 1) {
 			throw new UsageError("No command line arguments given");
 		}
