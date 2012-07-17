@@ -126,7 +126,7 @@ public abstract class AbstractBlock_c extends Stmt_c implements Block
 
     @Override
     public Term firstChild() {
-        return listChild(statements, null);
+        return listChild(statements, (Stmt) null);
     }
 
     @Override

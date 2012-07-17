@@ -343,7 +343,7 @@ public class ConstructorCall_c extends Stmt_c implements ConstructorCall
         if (qualifier != null) {
             return qualifier;
         } else {
-            return listChild(arguments, null);
+            return listChild(arguments, (Expr) null);
         }
     }
 
@@ -351,7 +351,7 @@ public class ConstructorCall_c extends Stmt_c implements ConstructorCall
     public <T> List<T> acceptCFG(CFGBuilder v, List<T> succs) {
         if (qualifier != null) {
             if (!arguments.isEmpty()) {
-                v.visitCFG(qualifier, listChild(arguments, null), ENTRY);
+                v.visitCFG(qualifier, listChild(arguments, (Expr) null), ENTRY);
                 v.visitCFGList(arguments, this, EXIT);
             } else {
                 v.visitCFG(qualifier, this, EXIT);

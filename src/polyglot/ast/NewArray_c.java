@@ -218,7 +218,7 @@ public class NewArray_c extends Expr_c implements NewArray
             v.visitCFGList(dims, init, ENTRY);
             v.visitCFG(init, this, EXIT);
         } else {
-            v.visitCFG(baseType, listChild(dims, null), ENTRY);
+            v.visitCFG(baseType, listChild(dims, (Expr) null), ENTRY);
             v.visitCFGList(dims, this, EXIT);
         }
         

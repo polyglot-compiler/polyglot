@@ -448,7 +448,7 @@ public class Call_c extends Expr_c implements Call
       if (target instanceof Term) {
           return (Term) target;
       }
-      return listChild(arguments, null);
+      return listChild(arguments, (Expr) null);
   }
 
   @Override
@@ -457,7 +457,7 @@ public class Call_c extends Expr_c implements Call
           Term t = (Term) target;
 
           if (!arguments.isEmpty()) {
-              v.visitCFG(t, listChild(arguments, null), ENTRY);
+              v.visitCFG(t, listChild(arguments, (Expr) null), ENTRY);
               v.visitCFGList(arguments, this, EXIT);
           } else {
               v.visitCFG(t, this, EXIT);

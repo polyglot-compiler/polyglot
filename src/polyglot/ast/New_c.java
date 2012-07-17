@@ -698,7 +698,7 @@ public class New_c extends Expr_c implements New
             v.visitCFG(body(), this, EXIT);
         } else {
             if (!arguments.isEmpty()) {
-                v.visitCFG(tn, listChild(arguments, null), ENTRY);
+                v.visitCFG(tn, listChild(arguments, (Expr) null), ENTRY);
                 v.visitCFGList(arguments, this, EXIT);
             } else {
                 v.visitCFG(tn, this, EXIT);

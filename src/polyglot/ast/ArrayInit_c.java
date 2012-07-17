@@ -191,7 +191,7 @@ public class ArrayInit_c extends Expr_c implements ArrayInit
 
     @Override
     public Term firstChild() {
-        return listChild(elements, null);
+        return listChild(elements, (Expr) null);
     }
 
     @Override
