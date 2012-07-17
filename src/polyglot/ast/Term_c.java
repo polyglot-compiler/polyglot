@@ -79,7 +79,7 @@ public abstract class Term_c extends Node_c implements Term
 
     /** Utility function to get the first entry of a list, or else alt. */
     public static <T extends Term, U extends T, V extends T> T listChild(List<U> l, V alt) {
-        T c = CollectionUtil.firstOrElse(l, alt);
+        T c = CollectionUtil.<T,U,V> firstOrElse(l, alt);
         return c;
     }
     
