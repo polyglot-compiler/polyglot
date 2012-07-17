@@ -119,11 +119,7 @@ public interface NodeFactory
 
     Binary Binary(Position pos, Expr left, Binary.Operator op, Expr right);
 
-    Block Block(Position pos);
-    Block Block(Position pos, Stmt s1);
-    Block Block(Position pos, Stmt s1, Stmt s2);
-    Block Block(Position pos, Stmt s1, Stmt s2, Stmt s3);
-    Block Block(Position pos, Stmt s1, Stmt s2, Stmt s3, Stmt s4);
+    Block Block(Position pos, Stmt... statements);
     Block Block(Position pos, List<Stmt> statements);
 
     SwitchBlock SwitchBlock(Position pos, List<Stmt> statements);
@@ -148,54 +144,22 @@ public interface NodeFactory
     @Deprecated
     Branch Branch(Position pos, Branch.Kind kind, String label);
 
-    Call Call(Position pos, Id name);
-    Call Call(Position pos, Id name, Expr a1);
-    Call Call(Position pos, Id name, Expr a1, Expr a2);
-    Call Call(Position pos, Id name, Expr a1, Expr a2, Expr a3);
-    Call Call(Position pos, Id name, Expr a1, Expr a2, Expr a3, Expr a4);
+    Call Call(Position pos, Id name, Expr... args);
     Call Call(Position pos, Id name, List<Expr> args);
     
-    Call Call(Position pos, Receiver target, Id name);
-    Call Call(Position pos, Receiver target, Id name, Expr a1);
-    Call Call(Position pos, Receiver target, Id name, Expr a1, Expr a2);
-    Call Call(Position pos, Receiver target, Id name, Expr a1, Expr a2, Expr a3);
-    Call Call(Position pos, Receiver target, Id name, Expr a1, Expr a2, Expr a3, Expr a4);
+    Call Call(Position pos, Receiver target, Id name, Expr... args);
     Call Call(Position pos, Receiver target, Id name, List<Expr> args);
 
     /** @deprecated */
     @Deprecated
-    Call Call(Position pos, String name);
-    /** @deprecated */
-    @Deprecated
-    Call Call(Position pos, String name, Expr a1);
-    /** @deprecated */
-    @Deprecated
-    Call Call(Position pos, String name, Expr a1, Expr a2);
-    /** @deprecated */
-    @Deprecated
-    Call Call(Position pos, String name, Expr a1, Expr a2, Expr a3);
-    /** @deprecated */
-    @Deprecated
-    Call Call(Position pos, String name, Expr a1, Expr a2, Expr a3, Expr a4);
+    Call Call(Position pos, String name, Expr... args);
     /** @deprecated */
     @Deprecated
     Call Call(Position pos, String name, List<Expr> args);
 
     /** @deprecated */
     @Deprecated
-    Call Call(Position pos, Receiver target, String name);
-    /** @deprecated */
-    @Deprecated
-    Call Call(Position pos, Receiver target, String name, Expr a1);
-    /** @deprecated */
-    @Deprecated
-    Call Call(Position pos, Receiver target, String name, Expr a1, Expr a2);
-    /** @deprecated */
-    @Deprecated
-    Call Call(Position pos, Receiver target, String name, Expr a1, Expr a2, Expr a3);
-    /** @deprecated */
-    @Deprecated
-    Call Call(Position pos, Receiver target, String name, Expr a1, Expr a2, Expr a3, Expr a4);
+    Call Call(Position pos, Receiver target, String name, Expr... args);
     /** @deprecated */
     @Deprecated
     Call Call(Position pos, Receiver target, String name, List<Expr> args);

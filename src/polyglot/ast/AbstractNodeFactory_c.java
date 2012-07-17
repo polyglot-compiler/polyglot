@@ -193,41 +193,9 @@ public abstract class AbstractNodeFactory_c implements NodeFactory
     }
 
     @Override
-    public final Block Block(Position pos) {
-	return Block(pos, Collections.<Stmt> emptyList());
-    }
-
-    @Override
-    public final Block Block(Position pos, Stmt s1) {
+    public final Block Block(Position pos, Stmt... stmts) {
         List<Stmt> l = new ArrayList<Stmt>(1);
-	l.add(s1);
-	return Block(pos, l);
-    }
-
-    @Override
-    public final Block Block(Position pos, Stmt s1, Stmt s2) {
-        List<Stmt> l = new ArrayList<Stmt>(2);
-	l.add(s1);
-	l.add(s2);
-	return Block(pos, l);
-    }
-
-    @Override
-    public final Block Block(Position pos, Stmt s1, Stmt s2, Stmt s3) {
-        List<Stmt> l = new ArrayList<Stmt>(3);
-	l.add(s1);
-	l.add(s2);
-	l.add(s3);
-	return Block(pos, l);
-    }
-
-    @Override
-    public final Block Block(Position pos, Stmt s1, Stmt s2, Stmt s3, Stmt s4) {
-        List<Stmt> l = new ArrayList<Stmt>(4);
-	l.add(s1);
-	l.add(s2);
-	l.add(s3);
-	l.add(s4);
+	Collections.addAll(l, stmts);
 	return Block(pos, l);
     }
     
@@ -277,79 +245,16 @@ public abstract class AbstractNodeFactory_c implements NodeFactory
     }
 
     @Override
-    public final Call Call(Position pos, Id name) {
-        return Call(pos, null, name, Collections.<Expr> emptyList());
-    }
-
-    @Override
-    public final Call Call(Position pos, String name) {
-	return Call(pos, null, name, Collections.<Expr> emptyList());
-    }
-
-    @Override
-    public final Call Call(Position pos, Id name, Expr a1) {
+    public final Call Call(Position pos, Id name, Expr... args) {
         List<Expr> l = new ArrayList<Expr>(1);
-        l.add(a1);
+        Collections.addAll(l, args);
         return Call(pos, null, name, l);
     }
 
     @Override
-    public final Call Call(Position pos, String name, Expr a1) {
+    public final Call Call(Position pos, String name, Expr... args) {
         List<Expr> l = new ArrayList<Expr>(1);
-	l.add(a1);
-	return Call(pos, null, name, l);
-    }
-
-    @Override
-    public final Call Call(Position pos, Id name, Expr a1, Expr a2) {
-        List<Expr> l = new ArrayList<Expr>(2);
-        l.add(a1);
-        l.add(a2);
-        return Call(pos, null, name, l);
-    }
-    
-    @Override
-    public final Call Call(Position pos, String name, Expr a1, Expr a2) {
-        List<Expr> l = new ArrayList<Expr>(2);
-	l.add(a1);
-	l.add(a2);
-	return Call(pos, null, name, l);
-    }
-
-    @Override
-    public final Call Call(Position pos, Id name, Expr a1, Expr a2, Expr a3) {
-        List<Expr> l = new ArrayList<Expr>(3);
-        l.add(a1);
-        l.add(a2);
-        l.add(a3);
-        return Call(pos, null, name, l);
-    }
-    @Override
-    public final Call Call(Position pos, String name, Expr a1, Expr a2, Expr a3) {
-        List<Expr> l = new ArrayList<Expr>(3);
-	l.add(a1);
-	l.add(a2);
-	l.add(a3);
-	return Call(pos, null, name, l);
-    }
-    
-    @Override
-    public final Call Call(Position pos, Id name, Expr a1, Expr a2, Expr a3, Expr a4) {
-        List<Expr> l = new ArrayList<Expr>(4);
-        l.add(a1);
-        l.add(a2);
-        l.add(a3);
-        l.add(a4);
-        return Call(pos, null, name, l);
-    }
-
-    @Override
-    public final Call Call(Position pos, String name, Expr a1, Expr a2, Expr a3, Expr a4) {
-        List<Expr> l = new ArrayList<Expr>(4);
-	l.add(a1);
-	l.add(a2);
-	l.add(a3);
-	l.add(a4);
+	Collections.addAll(l, args);
 	return Call(pos, null, name, l);
     }
 
@@ -362,82 +267,18 @@ public abstract class AbstractNodeFactory_c implements NodeFactory
     public final Call Call(Position pos, String name, List<Expr> args) {
         return Call(pos, null, name, args);
     }
-    
-    @Override
-    public final Call Call(Position pos, Receiver target, Id name) {
-        return Call(pos, target, name, Collections.<Expr> emptyList());
-    }
 
     @Override
-    public final Call Call(Position pos, Receiver target, String name) {
-	return Call(pos, target, name, Collections.<Expr> emptyList());
-    }
-
-    @Override
-    public final Call Call(Position pos, Receiver target, Id name, Expr a1) {
+    public final Call Call(Position pos, Receiver target, Id name, Expr... args) {
         List<Expr> l = new ArrayList<Expr>(1);
-        l.add(a1);
+        Collections.addAll(l, args);
         return Call(pos, target, name, l);
     }
     
     @Override
-    public final Call Call(Position pos, Receiver target, String name, Expr a1) {
+    public final Call Call(Position pos, Receiver target, String name, Expr... args) {
         List<Expr> l = new ArrayList<Expr>(1);
-	l.add(a1);
-	return Call(pos, target, name, l);
-    }
-
-    @Override
-    public final Call Call(Position pos, Receiver target, Id name, Expr a1, Expr a2) {
-        List<Expr> l = new ArrayList<Expr>(2);
-        l.add(a1);
-        l.add(a2);
-        return Call(pos, target, name, l);
-    }
-    
-    @Override
-    public final Call Call(Position pos, Receiver target, String name, Expr a1, Expr a2) {
-        List<Expr> l = new ArrayList<Expr>(2);
-	l.add(a1);
-	l.add(a2);
-	return Call(pos, target, name, l);
-    }
-
-    @Override
-    public final Call Call(Position pos, Receiver target, Id name, Expr a1, Expr a2, Expr a3) {
-        List<Expr> l = new ArrayList<Expr>(3);
-        l.add(a1);
-        l.add(a2);
-        l.add(a3);
-        return Call(pos, target, name, l);
-    }
-    
-    @Override
-    public final Call Call(Position pos, Receiver target, String name, Expr a1, Expr a2, Expr a3) {
-        List<Expr> l = new ArrayList<Expr>(3);
-	l.add(a1);
-	l.add(a2);
-	l.add(a3);
-	return Call(pos, target, name, l);
-    }
-    
-    @Override
-    public final Call Call(Position pos, Receiver target, Id name, Expr a1, Expr a2, Expr a3, Expr a4) {
-        List<Expr> l = new ArrayList<Expr>(4);
-        l.add(a1);
-        l.add(a2);
-        l.add(a3);
-        l.add(a4);
-        return Call(pos, target, name, l);
-    }
-
-    @Override
-    public final Call Call(Position pos, Receiver target, String name, Expr a1, Expr a2, Expr a3, Expr a4) {
-	List<Expr> l = new ArrayList<Expr>(4);
-	l.add(a1);
-	l.add(a2);
-	l.add(a3);
-	l.add(a4);
+	Collections.addAll(l, args);
 	return Call(pos, target, name, l);
     }
 
