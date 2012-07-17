@@ -171,6 +171,18 @@ public class SourceClassResolver extends LoadedClassResolver {
 
 		// Now, try and find the source file.
 		source = ext.sourceLoader().classSource(name);
+        if (source != null) {
+                // Check if this is the actual source file we wanted...
+                String className = source.name();
+                int dot1 = className.lastIndexOf('.');
+                className = dot1 > 0 ? className.substring(0, dot1) : className;
+                int slash1 = className.lastIndexOf(File.separatorChar);
+                className = slash1 > 0 ? className.substring(slash1 + 1) : className;
+                int dot2 = name.lastIndexOf('.');
+                String clazzName = dot2 > 0 ? name.substring(dot2 + 1) : name;
+                if (!className.equals(clazzName))
+                        source = null;
+        }
 
 		// Check if a job for the source already exists.
 		if (ext.scheduler().sourceHasJob(source)) {
