@@ -84,5 +84,6 @@ public interface FieldDecl extends ClassMember, VarInit, CodeNode
     /** Set the type object for the initializer expression. */
     FieldDecl initializerInstance(InitializerInstance fi);
     
+    @Override
     boolean constantValueSet();
 }

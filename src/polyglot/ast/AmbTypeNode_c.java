@@ -25,9 +25,16 @@
 
 package polyglot.ast;
 
-import polyglot.types.*;
-import polyglot.visit.*;
-import polyglot.util.*;
+import polyglot.types.SemanticException;
+import polyglot.util.CodeWriter;
+import polyglot.util.InternalCompilerError;
+import polyglot.util.Position;
+import polyglot.visit.AmbiguityRemover;
+import polyglot.visit.ExceptionChecker;
+import polyglot.visit.NodeVisitor;
+import polyglot.visit.PrettyPrinter;
+import polyglot.visit.TypeBuilder;
+import polyglot.visit.TypeChecker;
 
 /**
  * An <code>AmbTypeNode</code> is an ambiguous AST node composed of
@@ -45,28 +52,34 @@ assert(name != null); // qual may be null
     this.name = name;
   }
 
+  @Override
   public Id id() {
       return this.name;
   }
   
+  @Override
   public AmbTypeNode id(Id name) {
       AmbTypeNode_c n = (AmbTypeNode_c) copy();
       n.name = name;
       return n;
   }
   
+  @Override
   public String name() {
     return this.name.id();
   }
 
+  @Override
   public AmbTypeNode name(String name) {
       return id(this.name.id(name));
   }
 
+  @Override
   public QualifierNode qual() {
     return this.qual;
   }
 
+  @Override
   public AmbTypeNode qual(QualifierNode qual) {
     AmbTypeNode_c n = (AmbTypeNode_c) copy();
     n.qual = qual;
@@ -84,16 +97,19 @@ assert(name != null); // qual may be null
     return this;
   }
 
+  @Override
   public Node buildTypes(TypeBuilder tb) throws SemanticException {
     return type(tb.typeSystem().unknownType(position()));
   }
 
+  @Override
   public Node visitChildren(NodeVisitor v) {
       QualifierNode qual = (QualifierNode) visitChild(this.qual, v);
       Id name = (Id) visitChild(this.name, v);
       return reconstruct(qual, name);
   }
 
+  @Override
   public Node disambiguate(AmbiguityRemover sc) throws SemanticException {
       if (qual != null && ! qual.isDisambiguated()) {
           return this;
@@ -111,17 +127,20 @@ assert(name != null); // qual may be null
                                   "\".", position());
   }
 
+  @Override
   public Node typeCheck(TypeChecker tc) throws SemanticException {
       // Didn't finish disambiguation; just return.
       return this;
   }
 
+  @Override
   public Node exceptionCheck(ExceptionChecker ec) throws SemanticException {
     throw new InternalCompilerError(position(),
                                     "Cannot exception check ambiguous node "
                                     + this + ".");
   } 
 
+  @Override
   public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
     if (qual != null) {
         print(qual, w, tr);
@@ -132,11 +151,13 @@ assert(name != null); // qual may be null
     tr.print(this, name, w);
   }
 
+  @Override
   public String toString() {
     return (qual == null
             ? name.toString()
             : qual.toString() + "." + name.toString()) + "{amb}";
   }
+  @Override
   public Node copy(NodeFactory nf) {
       return nf.AmbTypeNode(this.position, this.qual, this.name);
   }

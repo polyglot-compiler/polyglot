@@ -38,16 +38,16 @@ public interface ProcedureInstance extends CodeInstance
      * @return A list of <code>Type</code>.
      * @see polyglot.types.Type
      */
-    List formalTypes();
-    void setFormalTypes(List l);
+    List<Type> formalTypes();
+    void setFormalTypes(List<Type> l);
     
     /**
      * List of declared exception types thrown.
      * @return A list of <code>Type</code>.
      * @see polyglot.types.Type
      */
-    List throwTypes();
-    void setThrowTypes(List l);
+    List<? extends Type> throwTypes();
+    void setThrowTypes(List<Type> l);
     
     /**
      * Returns a String representing the signature of the procedure.
@@ -70,7 +70,7 @@ public interface ProcedureInstance extends CodeInstance
     /**
      * Returns true if the procedure has the given arguments.
      */
-    boolean hasFormals(List arguments);
+    boolean hasFormals(List<Type> arguments);
 
     /**
      * Returns true if the procedure throws a subset of the exceptions
@@ -81,7 +81,7 @@ public interface ProcedureInstance extends CodeInstance
     /**
      * Returns true if the procedure can be called with the given arguments.
      */
-    boolean callValid(List actualTypes);
+    boolean callValid(List<Type> actualTypes);
 
     /**
      * Return true if <code>this</code> is more specific than <code>pi</code>
@@ -92,7 +92,7 @@ public interface ProcedureInstance extends CodeInstance
     /**
      * Returns true if the procedure has the given arguments.
      */
-    boolean hasFormalsImpl(List arguments);
+    boolean hasFormalsImpl(List<Type> arguments);
 
     /**
      * Returns true if the procedure throws a subset of the exceptions
@@ -103,5 +103,5 @@ public interface ProcedureInstance extends CodeInstance
     /**
      * Returns true if the procedure can be called with the given arguments.
      */
-    boolean callValidImpl(List actualTypes);
+    boolean callValidImpl(List<Type> actualTypes);
 }

@@ -45,11 +45,13 @@ public class Eval_c extends Stmt_c implements Eval
     }
 
     /** Get the expression of the statement. */
+    @Override
     public Expr expr() {
 	return this.expr;
     }
 
     /** Set the expression of the statement. */
+    @Override
     public Eval expr(Expr expr) {
 	Eval_c n = (Eval_c) copy();
 	n.expr = expr;
@@ -67,6 +69,7 @@ public class Eval_c extends Stmt_c implements Eval
 	return this;
     }
 
+    @Override
     public Type childExpectedType(Expr child, AscriptionVisitor av) {
         TypeSystem ts = av.typeSystem();
 
@@ -78,16 +81,19 @@ public class Eval_c extends Stmt_c implements Eval
     }
 
     /** Visit the children of the statement. */
+    @Override
     public Node visitChildren(NodeVisitor v) {
 	Expr expr = (Expr) visitChild(this.expr, v);
 	return reconstruct(expr);
     }
 
+    @Override
     public String toString() {
 	return "eval(" + expr.toString() + ");";
     }
 
     /** Write the statement to an output file. */
+    @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
 	boolean semi = tr.appendSemicolon(true);
 
@@ -100,14 +106,17 @@ public class Eval_c extends Stmt_c implements Eval
 	tr.appendSemicolon(semi);
     }
 
+    @Override
     public Term firstChild() {
         return expr;
     }
 
-    public List acceptCFG(CFGBuilder v, List succs) {
+    @Override
+    public <T> List<T> acceptCFG(CFGBuilder v, List<T> succs) {
         v.visitCFG(expr, this, EXIT);
         return succs;
     }
+    @Override
     public Node copy(NodeFactory nf) {
         return nf.Eval(this.position, this.expr);
     }

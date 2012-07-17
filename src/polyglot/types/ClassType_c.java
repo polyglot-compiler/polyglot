@@ -26,8 +26,6 @@
 package polyglot.types;
 
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
 
 import polyglot.frontend.Job;
@@ -56,6 +54,7 @@ public abstract class ClassType_c extends ReferenceType_c implements ClassType
     
     protected transient Resolver memberCache;
     
+    @Override
     public Resolver resolver() {
         if (memberCache == null) {
             memberCache = new CachingResolver(ts.createClassContextResolver(this));
@@ -63,6 +62,7 @@ public abstract class ClassType_c extends ReferenceType_c implements ClassType
         return memberCache;
     }
     
+    @Override
     public Object copy() {
         ClassType_c n = (ClassType_c) super.copy();
         n.memberCache = null;
@@ -71,10 +71,12 @@ public abstract class ClassType_c extends ReferenceType_c implements ClassType
     
     protected ClassType decl;
     
+    @Override
     public Declaration declaration() {
         return decl;
     }
     
+    @Override
     public void setDeclaration(Declaration decl) {
         this.decl = (ClassType) decl;        
     }
@@ -82,15 +84,19 @@ public abstract class ClassType_c extends ReferenceType_c implements ClassType
     public abstract Job job();
     
     /** Get the class's kind. */
+    @Override
     public abstract Kind kind();
 
     /** Get the class's outer class, or null if a top-level class. */
+    @Override
     public abstract ClassType outer();
 
     /** Get the short name of the class, if possible. */ 
+    @Override
     public abstract String name();
 
     /** Get the container class if a member class. */
+    @Override
     public ReferenceType container() {
         if (! isMember())
             throw new InternalCompilerError("Non-member class " + this + " cannot have container classes.");
@@ -100,6 +106,7 @@ public abstract class ClassType_c extends ReferenceType_c implements ClassType
     }
 
     /** Get the full name of the class, if possible. */
+    @Override
     public String fullName() {
         if (isAnonymous()) {
             return toString();
@@ -116,62 +123,82 @@ public abstract class ClassType_c extends ReferenceType_c implements ClassType
         }
     }
 
+    @Override
     public boolean isTopLevel() { return kind() == TOP_LEVEL; }
+    @Override
     public boolean isMember() { return kind() == MEMBER; }
+    @Override
     public boolean isLocal() { return kind() == LOCAL; }
+    @Override
     public boolean isAnonymous() { return kind() == ANONYMOUS; }
 
     /**
     * @deprecated Was incorrectly defined. Use isNested for nested classes, 
     *          and isInnerClass for inner classes.
     */
+    @Deprecated
+    @Override
     public final boolean isInner() {
         return isNested();
     }
 
+    @Override
     public boolean isNested() {
         // Implement this way rather than with ! isTopLevel() so that
         // extensions can add more kinds.
         return kind() == MEMBER || kind() == LOCAL || kind() == ANONYMOUS;
     }
     
+    @Override
     public boolean isInnerClass() {
         // it's an inner class if it is not an interface, it is a nested
         // class, and it is not explicitly or implicitly static. 
         return !flags().isInterface() && isNested() && !flags().isStatic() && !inStaticContext();
     }
     
+    @Override
     public boolean isCanonical() { return true; }
+    @Override
     public boolean isClass() { return true; }
+    @Override
     public ClassType toClass() { return this; }
 
     /** Get the class's package. */
+    @Override
     public abstract Package package_();
 
     /** Get the class's flags. */
+    @Override
     public abstract Flags flags();
 
     /** Get the class's constructors. */
-    public abstract List constructors();
+    @Override
+    public abstract List<ConstructorInstance> constructors();
 
     /** Get the class's member classes. */
-    public abstract List memberClasses();
+    @Override
+    public abstract List<ClassType> memberClasses();
 
     /** Get the class's methods. */
-    public abstract List methods();
+    @Override
+    public abstract List<? extends MethodInstance> methods();
 
     /** Get the class's fields. */
-    public abstract List fields();
+    @Override
+    public abstract List<? extends FieldInstance> fields();
 
     /** Get the class's interfaces. */
-    public abstract List interfaces();
+    @Override
+    public abstract List<? extends Type> interfaces();
 
     /** Get the class's super type. */
+    @Override
     public abstract Type superType();
     
     /** Get a list of all the class's MemberInstances. */
-    public List members() {
-        List l = new ArrayList();
+    @Override
+    public List<? extends MemberInstance> members() {
+        List<MemberInstance> l = new ArrayList<MemberInstance>();
         l.addAll(methods());
         l.addAll(fields());
         l.addAll(constructors());
@@ -180,9 +207,9 @@ public abstract class ClassType_c extends ReferenceType_c implements ClassType
     }
 
     /** Get a field of the class by name. */
+    @Override
     public FieldInstance fieldNamed(String name) {
-        for (Iterator i = fields().iterator(); i.hasNext(); ) {
-	    FieldInstance fi = (FieldInstance) i.next();
+        for (FieldInstance fi : fields()) {
 	    if (fi.name().equals(name)) {
 	        return fi;
 	    }
@@ -192,9 +219,9 @@ public abstract class ClassType_c extends ReferenceType_c implements ClassType
     }
 
     /** Get a member class of the class by name. */
+    @Override
     public ClassType memberClassNamed(String name) {
-        for (Iterator i = memberClasses().iterator(); i.hasNext(); ) {
-	    ClassType t = (ClassType) i.next();
+        for (ClassType t : memberClasses()) {
 	    if (t.name().equals(name)) {
 	        return t;
 	    }
@@ -203,6 +230,7 @@ public abstract class ClassType_c extends ReferenceType_c implements ClassType
 	return null;
     }
 
+    @Override
     public boolean descendsFromImpl(Type ancestor) {
         if (! ancestor.isCanonical()) {
             return false;
@@ -240,9 +268,7 @@ public abstract class ClassType_c extends ReferenceType_c implements ClassType
         }
 
         // Next check interfaces.
-        for (Iterator i = interfaces().iterator(); i.hasNext(); ) {
-            Type parentType = (Type) i.next();
-
+        for (Type parentType : interfaces()) {
             if (ts.isSubtype(parentType, ancestor)) {
                 return true;
             }
@@ -251,17 +277,15 @@ public abstract class ClassType_c extends ReferenceType_c implements ClassType
         return false;
     }
 
+    @Override
     public boolean isThrowable() {
         return ts.isSubtype(this, ts.Throwable());
     }
 
+    @Override
     public boolean isUncheckedException() {
         if (isThrowable()) {
-            Collection c = ts.uncheckedExceptions();
-                                  
-            for (Iterator i = c.iterator(); i.hasNext(); ) {
-                Type t = (Type) i.next();
-
+            for (Type t : ts.uncheckedExceptions()) {
                 if (ts.isSubtype(this, t)) {
                     return true;
                 }
@@ -271,6 +295,7 @@ public abstract class ClassType_c extends ReferenceType_c implements ClassType
         return false;
     }
 
+    @Override
     public boolean isImplicitCastValidImpl(Type toType) {
         if (! toType.isClass()) return false;
         return ts.isSubtype(this, toType);
@@ -282,6 +307,7 @@ public abstract class ClassType_c extends ReferenceType_c implements ClassType
      * Returns true iff a cast from this to toType is valid; in other
      * words, some non-null members of this are also members of toType.
      **/
+    @Override
     public boolean isCastValidImpl(Type toType) {
 	if (! toType.isCanonical()) return false;
 	if (! toType.isReference()) return false;
@@ -335,14 +361,17 @@ public abstract class ClassType_c extends ReferenceType_c implements ClassType
 	}
     }
 
+    @Override
     public final boolean isEnclosed(ClassType maybe_outer) {
         return ts.isEnclosed(this, maybe_outer);
     }
 
+    @Override
     public final boolean hasEnclosingInstance(ClassType encl) {
         return ts.hasEnclosingInstance(this, encl);
     }
 
+    @Override
     public String translate(Resolver c) {
         if (isTopLevel()) {
             if (package_() == null) {
@@ -393,6 +422,7 @@ public abstract class ClassType_c extends ReferenceType_c implements ClassType
         }
     }
 
+    @Override
     public String toString() {
         if (isTopLevel()) {
             if (package_() != null) {
@@ -415,6 +445,7 @@ public abstract class ClassType_c extends ReferenceType_c implements ClassType
     }
     
     /** Pretty-print the name of this class to w. */
+    @Override
     public void print(CodeWriter w) {
 	// XXX This code duplicates the logic of toString.
         if (isTopLevel()) {
@@ -438,6 +469,7 @@ public abstract class ClassType_c extends ReferenceType_c implements ClassType
         }
     }
 
+    @Override
     public boolean isEnclosedImpl(ClassType maybe_outer) {
         if (isTopLevel())
             return false;
@@ -453,6 +485,7 @@ public abstract class ClassType_c extends ReferenceType_c implements ClassType
      * Return true if an object of the class has
      * an enclosing instance of <code>encl</code>. 
      */
+    @Override
     public boolean hasEnclosingInstanceImpl(ClassType encl) {
         if (this.equals(encl)) {
             // object o is the zeroth lexically enclosing instance of itself. 

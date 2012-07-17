@@ -5,9 +5,9 @@ import polyglot.ast.Expr;
 import polyglot.ast.Node;
 import polyglot.ext.jl5.types.JL5TypeSystem;
 import polyglot.ext.jl5.types.inference.LubType;
+import polyglot.types.ReferenceType;
 import polyglot.types.SemanticException;
 import polyglot.types.Type;
-import polyglot.types.TypeSystem;
 import polyglot.util.CollectionUtil;
 import polyglot.util.Position;
 import polyglot.visit.TypeChecker;
@@ -19,6 +19,7 @@ public class JL5Conditional_c extends Conditional_c {
     }
     
     
+    @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
         JL5TypeSystem ts = (JL5TypeSystem)tc.typeSystem();
         
@@ -152,8 +153,8 @@ public class JL5Conditional_c extends Conditional_c {
         // and let s2 be the type that results from applying boxing conversion to t2. 
         // The type of the conditional expression is the result of applying capture conversion 
         // (�5.1.10) to lub(s1, s2) (�15.12.2.7).
-        Type s1 = ts.boxingConversion(t1);
-        Type s2 = ts.boxingConversion(t2);
+        ReferenceType s1 = (ReferenceType) ts.boxingConversion(t1);
+        ReferenceType s2 = (ReferenceType) ts.boxingConversion(t2);
         
         LubType lub = ts.lub(this.position, CollectionUtil.list(s1, s2));
         return type(ts.applyCaptureConversion(lub.calculateLub()));

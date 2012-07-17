@@ -25,15 +25,14 @@
 
 package polyglot.ast;
 
-import polyglot.util.Copy;
-import polyglot.util.CodeWriter;
-import polyglot.util.Position;
-import polyglot.types.ParsedClassType;
-import polyglot.types.Type;
-import polyglot.visit.*;
-
-import java.util.Collection;
 import java.util.List;
+
+import polyglot.types.Type;
+import polyglot.util.CodeWriter;
+import polyglot.util.Copy;
+import polyglot.util.Position;
+import polyglot.visit.AscriptionVisitor;
+import polyglot.visit.NodeVisitor;
 
 /**
  * A <code>Node</code> represents an AST node.  All AST nodes must implement
@@ -120,6 +119,7 @@ public interface Node extends JL, Copy, java.io.Serializable
      * 
      * @deprecated Call {@link Node#visitChild(Node, NodeVisitor)} instead.
      */
+    @Deprecated
     Node visitEdge(Node parent, NodeVisitor v);
 
     /**
@@ -141,7 +141,7 @@ public interface Node extends JL, Copy, java.io.Serializable
      *         If <code>l</code> is <code>null</code>,
      *         <code>null</code> is returned.
      */
-    public <T> List<T> visitList(List<T> l, NodeVisitor v);
+    public <T extends Node> List<T> visitList(List<T> l, NodeVisitor v);
 
     /**
      * Get the expected type of a child expression of <code>this</code>.

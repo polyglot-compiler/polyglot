@@ -26,11 +26,15 @@
 package polyglot.ast;
 
 import polyglot.frontend.ExtensionInfo;
-import polyglot.main.Options;
-import polyglot.types.*;
+import polyglot.types.ClassType;
+import polyglot.types.SemanticException;
+import polyglot.types.Type;
+import polyglot.types.TypeSystem;
 import polyglot.util.CodeWriter;
 import polyglot.util.Position;
-import polyglot.visit.*;
+import polyglot.visit.PrettyPrinter;
+import polyglot.visit.Translator;
+import polyglot.visit.TypeChecker;
 
 /**
  * A <code>CanonicalTypeNode</code> is a type node for a canonical type.
@@ -44,6 +48,7 @@ public class CanonicalTypeNode_c extends TypeNode_c implements CanonicalTypeNode
   }
   
   /** Type check the type node.  Check accessibility of class types. */
+  @Override
   public Node typeCheck(TypeChecker tc) throws SemanticException {
       TypeSystem ts = tc.typeSystem();
 
@@ -61,6 +66,7 @@ public class CanonicalTypeNode_c extends TypeNode_c implements CanonicalTypeNode
       return this;
   }
   
+  @Override
   public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
     if (type == null) {
         w.write("<unknown-type>");
@@ -76,15 +82,18 @@ public class CanonicalTypeNode_c extends TypeNode_c implements CanonicalTypeNode
    * Otherwise, the string that originally represented the type in the
    * source file is used.
    */
+  @Override
   public void translate(CodeWriter w, Translator tr) {
       w.write(type.translate(tr.context()));
   }
 
+  @Override
   public String toString() {
     if (type == null) return "<unknown-type>";
     return type.toString();
   }
 
+  @Override
   public void dump(CodeWriter w) {
     super.dump(w);
     w.allowBreak(4, " ");
@@ -92,11 +101,13 @@ public class CanonicalTypeNode_c extends TypeNode_c implements CanonicalTypeNode
     w.write("(type " + type + ")");
     w.end();
   }
+  @Override
   public Node copy(NodeFactory nf) {
     CanonicalTypeNode result =
       nf.CanonicalTypeNode(this.position, this.type);
     return result;
   }
+  @Override
   public Node copy(ExtensionInfo extInfo) throws SemanticException {
       TypeNode tn = (TypeNode)this.del().copy(extInfo.nodeFactory());
       Type t = tn.type();

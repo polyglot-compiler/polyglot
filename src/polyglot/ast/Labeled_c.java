@@ -46,11 +46,13 @@ public class Labeled_c extends Stmt_c implements Labeled
     }
     
     /** Get the label of the statement. */
+    @Override
     public Id labelNode() {
         return this.label;
     }
     
     /** Set the label of the statement. */
+    @Override
     public Labeled labelNode(Id label) {
         Labeled_c n = (Labeled_c) copy();
         n.label = label;
@@ -58,21 +60,25 @@ public class Labeled_c extends Stmt_c implements Labeled
     }
 
     /** Get the label of the statement. */
+    @Override
     public String label() {
 	return this.label.id();
     }
 
     /** Set the label of the statement. */
+    @Override
     public Labeled label(String label) {
 	return labelNode(this.label.id(label));
     }
 
     /** Get the sub-statement of the statement. */
+    @Override
     public Stmt statement() {
 	return this.statement;
     }
 
     /** Set the sub-statement of the statement. */
+    @Override
     public Labeled statement(Stmt statement) {
 	Labeled_c n = (Labeled_c) copy();
 	n.statement = statement;
@@ -92,6 +98,7 @@ public class Labeled_c extends Stmt_c implements Labeled
     }
 
     /** Visit the children of the statement. */
+    @Override
     public Node visitChildren(NodeVisitor v) {
         Id label = (Id) visitChild(this.label, v);
 	Node statement = visitChild(this.statement, v);
@@ -99,10 +106,11 @@ public class Labeled_c extends Stmt_c implements Labeled
         if (statement instanceof NodeList) {
           // Return a NodeList of statements, applying the label to the first
           // statement.
-          NodeList nl = (NodeList) statement;
-          List stmts = new ArrayList(nl.nodes());
+          @SuppressWarnings("unchecked")
+          NodeList<Stmt> nl = (NodeList<Stmt>) statement;
+          List<Stmt> stmts = new ArrayList<Stmt>(nl.nodes());
           
-          Stmt first = (Stmt) stmts.get(0);
+          Stmt first = stmts.get(0);
           first = reconstruct(label, first);
           stmts.set(0, first);
           
@@ -112,25 +120,30 @@ public class Labeled_c extends Stmt_c implements Labeled
 	return reconstruct(label, (Stmt) statement);
     }
 
+    @Override
     public String toString() {
 	return label + ": " + statement;
     }
 
     /** Write the statement to an output file. */
+    @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
 	w.write(label + ": ");
 	print(statement, w, tr);
     }
 
+    @Override
     public Term firstChild() {
         return statement;
     }
 
-    public List acceptCFG(CFGBuilder v, List succs) {
+    @Override
+    public <T> List<T> acceptCFG(CFGBuilder v, List<T> succs) {
         v.push(this).visitCFG(statement, this, EXIT);
         return succs;
     }
     
+    @Override
     public Node copy(NodeFactory nf) {
         return nf.Labeled(this.position, this.label, this.statement);
     }

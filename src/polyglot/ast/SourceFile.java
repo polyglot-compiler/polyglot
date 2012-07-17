@@ -45,22 +45,22 @@ public interface SourceFile extends Node
     /** Get the source's declared imports.
      * @return A list of {@link polyglot.ast.Import Import}.
      */
-    List imports();
+    List<Import> imports();
 
     /** Set the source's declared imports.
      * @param imports A list of {@link polyglot.ast.Import Import}.
      */
-    SourceFile imports(List imports);
+    SourceFile imports(List<Import> imports);
 
     /** Get the source's top-level declarations.
      * @return A list of {@link polyglot.ast.TopLevelDecl TopLevelDecl}.
      */
-    List decls();
+    List<TopLevelDecl> decls();
 
     /** Set the source's top-level declarations.
      * @param decls A list of {@link polyglot.ast.TopLevelDecl TopLevelDecl}.
      */
-    SourceFile decls(List decls);
+    SourceFile decls(List<TopLevelDecl> decls);
 
     /** Get the source's import table. */
     ImportTable importTable();

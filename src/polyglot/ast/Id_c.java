@@ -47,11 +47,13 @@ public class Id_c extends Node_c implements Id
   public final void equals(String s) { }
 
   /** Get the name of the expression. */
+  @Override
   public String id() {
     return this.id;
   }
 
   /** Set the name of the expression. */
+  @Override
   public Id id(String id) {
     Id_c n = (Id_c) copy();
     n.id = id;
@@ -59,18 +61,22 @@ public class Id_c extends Node_c implements Id
   }
 
   /** Write the name to an output file. */
+  @Override
   public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
     w.write(id);
   }
 
+  @Override
   public String toString() {
     return id;
   }
 
+  @Override
   public void dump(CodeWriter w) {
     w.write("(Id \"" + id + "\")");
   }
   
+  @Override
   public Node copy(NodeFactory nf) {
       return nf.Id(this.position, this.id);
   }

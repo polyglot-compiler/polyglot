@@ -50,11 +50,13 @@ public class If_c extends Stmt_c implements If
     }
 
     /** Get the conditional of the statement. */
+    @Override
     public Expr cond() {
 	return this.cond;
     }
 
     /** Set the conditional of the statement. */
+    @Override
     public If cond(Expr cond) {
 	If_c n = (If_c) copy();
 	n.cond = cond;
@@ -62,11 +64,13 @@ public class If_c extends Stmt_c implements If
     }
 
     /** Get the consequent of the statement. */
+    @Override
     public Stmt consequent() {
 	return this.consequent;
     }
 
     /** Set the consequent of the statement. */
+    @Override
     public If consequent(Stmt consequent) {
 	If_c n = (If_c) copy();
 	n.consequent = consequent;
@@ -74,11 +78,13 @@ public class If_c extends Stmt_c implements If
     }
 
     /** Get the alternative of the statement. */
+    @Override
     public Stmt alternative() {
 	return this.alternative;
     }
 
     /** Set the alternative of the statement. */
+    @Override
     public If alternative(Stmt alternative) {
 	If_c n = (If_c) copy();
 	n.alternative = alternative;
@@ -99,18 +105,20 @@ public class If_c extends Stmt_c implements If
     }
 
     /** Visit the children of the statement. */
+    @Override
     public Node visitChildren(NodeVisitor v) {
 	Expr cond = (Expr) visitChild(this.cond, v);
 	Node consequent = visitChild(this.consequent, v);
         if (consequent instanceof NodeList)
-          consequent = ((NodeList) consequent).toBlock();
+          consequent = ((NodeList<?>) consequent).toBlock();
 	Node alternative = visitChild(this.alternative, v);
         if (alternative instanceof NodeList)
-          alternative = ((NodeList) alternative).toBlock();
+          alternative = ((NodeList<?>) alternative).toBlock();
 	return reconstruct(cond, (Stmt) consequent, (Stmt) alternative);
     }
 
     /** Type check the statement. */
+    @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
         TypeSystem ts = tc.typeSystem();
         
@@ -124,6 +132,7 @@ public class If_c extends Stmt_c implements If
 	return this;
     }
 
+    @Override
     public Type childExpectedType(Expr child, AscriptionVisitor av) {
         TypeSystem ts = av.typeSystem();
 
@@ -134,12 +143,14 @@ public class If_c extends Stmt_c implements If
         return child.type();
     }
 
+    @Override
     public String toString() {
 	return "if (" + cond + ") " + consequent +
 	    (alternative != null ? " else " + alternative : "");
     }
 
     /** Write the statement to an output file. */
+    @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {    
 	w.write("if (");
 	printBlock(cond, w, tr);
@@ -165,11 +176,13 @@ public class If_c extends Stmt_c implements If
 	}
     }
 
+    @Override
     public Term firstChild() {
         return cond;
     }
 
-    public List acceptCFG(CFGBuilder v, List succs) {
+    @Override
+    public <T> List<T> acceptCFG(CFGBuilder v, List<T> succs) {
         if (alternative == null) {
             v.visitCFG(cond, FlowGraph.EDGE_KEY_TRUE, consequent, ENTRY, 
                              FlowGraph.EDGE_KEY_FALSE, this, EXIT);
@@ -185,6 +198,7 @@ public class If_c extends Stmt_c implements If
         return succs;
     }
     
+    @Override
     public Node copy(NodeFactory nf) {
         return nf.If(this.position, this.cond, this.consequent, this.alternative);
     }

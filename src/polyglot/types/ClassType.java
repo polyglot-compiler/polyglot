@@ -67,6 +67,7 @@ public interface ClassType extends Importable, ReferenceType, MemberInstance, De
      * @deprecated Was incorrectly defined. Use isNested for nested classes, 
      *          and isInnerClass for inner classes.
      */
+    @Deprecated
     boolean isInner();
 
     /**
@@ -111,19 +112,20 @@ public interface ClassType extends Importable, ReferenceType, MemberInstance, De
      * A list of <code>ConstructorInstance</code>.
      * @see polyglot.types.ConstructorInstance
      */
-    List constructors();
+    List<? extends ConstructorInstance> constructors();
 
     /**
      * The class's member classes.
      * A list of <code>ClassType</code>.
      * @see polyglot.types.ClassType
      */
-    List memberClasses();
+    List<ClassType> memberClasses();
 
     /** Returns the member class with the given name, or null. */
     ClassType memberClassNamed(String name);
 
     /** Get a field by name, or null. */
+    @Override
     FieldInstance fieldNamed(String name);
 
     /** Return true if the class is strictly contained in <code>outer</code>. */

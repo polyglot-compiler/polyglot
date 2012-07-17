@@ -61,16 +61,19 @@ public class Field_c extends Expr_c implements Field
   }
 
   /** Get the precedence of the field. */
+  @Override
   public Precedence precedence() { 
     return Precedence.LITERAL;
   }
 
   /** Get the target of the field. */
+  @Override
   public Receiver target() {
     return this.target;
   }
 
   /** Set the target of the field. */
+  @Override
   public Field target(Receiver target) {
     Field_c n = (Field_c) copy();
     n.target = target;
@@ -78,11 +81,13 @@ public class Field_c extends Expr_c implements Field
   }
   
   /** Get the name of the field. */
+  @Override
   public Id id() {
       return this.name;
   }
   
   /** Set the name of the field. */
+  @Override
   public Field id(Id name) {
       Field_c n = (Field_c) copy();
       n.name = name;
@@ -90,31 +95,37 @@ public class Field_c extends Expr_c implements Field
   }
 
   /** Get the name of the field. */
+  @Override
   public String name() {
     return this.name.id();
   }
 
   /** Set the name of the field. */
+  @Override
   public Field name(String name) {
       return id(this.name.id(name));
   }
 
   /** Return the access flags of the variable. */
+  @Override
   public Flags flags() {
     return fi.flags();
   }
 
   /** Get the field instance of the field. */
+  @Override
   public VarInstance varInstance() {
     return fi;
   }
 
   /** Get the field instance of the field. */
+  @Override
   public FieldInstance fieldInstance() {
     return fi;
   }
 
   /** Set the field instance of the field. */
+  @Override
   public Field fieldInstance(FieldInstance fi) {
     if (fi == this.fi) return this;
     Field_c n = (Field_c) copy();
@@ -122,10 +133,12 @@ public class Field_c extends Expr_c implements Field
     return n;
   }
 
+  @Override
   public boolean isTargetImplicit() {
       return this.targetImplicit;
   }
 
+  @Override
   public Field targetImplicit(boolean implicit) {
       Field_c n = (Field_c) copy();
       n.targetImplicit = implicit;
@@ -145,12 +158,14 @@ public class Field_c extends Expr_c implements Field
   }
 
   /** Visit the children of the field. */
+  @Override
   public Node visitChildren(NodeVisitor v) {
     Receiver target = (Receiver) visitChild(this.target, v);
     Id name = (Id) visitChild(this.name, v);
     return reconstruct(target, name);
   }
 
+  @Override
   public Node buildTypes(TypeBuilder tb) throws SemanticException {
       Field_c n = (Field_c) super.buildTypes(tb);
 
@@ -162,6 +177,7 @@ public class Field_c extends Expr_c implements Field
   }
 
   /** Type check the field. */
+  @Override
   public Node typeCheck(TypeChecker tc) throws SemanticException {
       Context c = tc.context();
       TypeSystem ts = tc.typeSystem();
@@ -193,6 +209,7 @@ public class Field_c extends Expr_c implements Field
                                                   target.type() + "\".", target.position());
   }
   
+  @Override
   public Node checkConstants(ConstantChecker cc) throws SemanticException {
       // Just check if the field is constant to force a dependency to be
       // created.
@@ -200,6 +217,7 @@ public class Field_c extends Expr_c implements Field
       return this;
   }
   
+  @Override
   public Type childExpectedType(Expr child, AscriptionVisitor av)
   {
       if (child == target) {
@@ -210,6 +228,7 @@ public class Field_c extends Expr_c implements Field
   }
 
   /** Write the field to an output file. */
+  @Override
   public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
     w.begin(0);
     if (!targetImplicit) {
@@ -228,6 +247,7 @@ public class Field_c extends Expr_c implements Field
     w.end();
   }
 
+  @Override
   public void dump(CodeWriter w) {
     super.dump(w);
 
@@ -244,6 +264,7 @@ public class Field_c extends Expr_c implements Field
     w.end();
   }
 
+  @Override
   public Term firstChild() {
       if (target instanceof Term) {
           return (Term) target;
@@ -252,7 +273,8 @@ public class Field_c extends Expr_c implements Field
       return null;
   }
 
-  public List acceptCFG(CFGBuilder v, List succs) {
+  @Override
+  public <T> List<T> acceptCFG(CFGBuilder v, List<T> succs) {
       if (target instanceof Term) {
           v.visitCFG((Term) target, this, EXIT);
       }
@@ -261,19 +283,22 @@ public class Field_c extends Expr_c implements Field
   }
 
 
+  @Override
   public String toString() {
     return (target != null ? target + "." : "") + name;
   }
 
 
-  public List throwTypes(TypeSystem ts) {
+  @Override
+  public List<Type> throwTypes(TypeSystem ts) {
       if (target instanceof Expr && ! (target instanceof Special)) {
-          return Collections.singletonList(ts.NullPointerException());
+          return Collections.singletonList((Type) ts.NullPointerException());
       }
 
-      return Collections.EMPTY_LIST;
+      return Collections.<Type> emptyList();
   }
 
+  @Override
   public boolean constantValueSet() {
       if (fi != null &&
               (target instanceof TypeNode ||
@@ -283,6 +308,7 @@ public class Field_c extends Expr_c implements Field
       return fi != null;
   }
   
+  @Override
   public boolean isConstant() {
       if (fi != null &&
               (target instanceof TypeNode ||
@@ -293,6 +319,7 @@ public class Field_c extends Expr_c implements Field
       return false;
   }
 
+  @Override
   public Object constantValue() {
     if (isConstant()) {
       return fi.constantValue();
@@ -329,6 +356,7 @@ public class Field_c extends Expr_c implements Field
       }      
   }
 
+  @Override
   public Node copy(NodeFactory nf) {
       return nf.Field(this.position, this.target, this.name);
   }

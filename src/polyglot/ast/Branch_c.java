@@ -46,11 +46,13 @@ public class Branch_c extends Stmt_c implements Branch
     }
 
     /** Get the kind of the branch. */
+    @Override
     public Branch.Kind kind() {
 	return this.kind;
     }
 
     /** Set the kind of the branch. */
+    @Override
     public Branch kind(Branch.Kind kind) {
 	Branch_c n = (Branch_c) copy();
 	n.kind = kind;
@@ -58,11 +60,13 @@ public class Branch_c extends Stmt_c implements Branch
     }
     
     /** Get the target label of the branch. */
+    @Override
     public Id labelNode() {
         return this.label;
     }
     
     /** Set the target label of the branch. */
+    @Override
     public Branch labelNode(Id label) {
         Branch_c n = (Branch_c) copy();
         n.label = label;
@@ -70,11 +74,13 @@ public class Branch_c extends Stmt_c implements Branch
     }
 
     /** Get the target label of the branch. */
+    @Override
     public String label() {
         return this.label != null ? this.label.id() : null;
     }
 
     /** Set the target label of the branch. */
+    @Override
     public Branch label(String label) {
         return labelNode(this.label.id(label));
     }
@@ -91,16 +97,19 @@ public class Branch_c extends Stmt_c implements Branch
     }
     
     /** Visit the children of the constructor. */
+    @Override
     public Node visitChildren(NodeVisitor v) {
         Id label = (Id) visitChild(this.label, v);
         return reconstruct(label);
     }
 
+    @Override
     public String toString() {
 	return kind.toString() + (label != null ? " " + label.toString() : "");
     }
 
     /** Write the expression to an output file. */
+    @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
 	w.write(kind.toString());
 	if (label != null) {
@@ -113,14 +122,17 @@ public class Branch_c extends Stmt_c implements Branch
      * Return the first (sub)term performed when evaluating this
      * term.
      */
+    @Override
     public Term firstChild() {
         return null;
     }
 
-    public List acceptCFG(CFGBuilder v, List succs) {
+    @Override
+    public <T> List<T> acceptCFG(CFGBuilder v, List<T> succs) {
         v.visitBranchTarget(this);
-        return Collections.EMPTY_LIST;
+        return Collections.<T> emptyList();
     }
+    @Override
     public Node copy(NodeFactory nf) {
         return nf.Branch(this.position, this.kind, this.label);
     }

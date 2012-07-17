@@ -148,7 +148,7 @@ public class JL5EnumDecl_c extends JL5ClassDecl_c implements JL5EnumDecl {
 
         // add valueOf method
         JL5MethodInstance valueOfMI = (JL5MethodInstance)ts.methodInstance(position(), this.type(), flags, this.type(), "valueOf", 
-        		Collections.singletonList(ts.String()), 
+        		Collections.singletonList((Type) ts.String()), 
         		Collections.EMPTY_LIST);
         this.type.addMethod(valueOfMI);
 

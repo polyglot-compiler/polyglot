@@ -47,16 +47,19 @@ public class Instanceof_c extends Expr_c implements Instanceof
     }
 
     /** Get the precedence of the expression. */
+    @Override
     public Precedence precedence() {
 	return Precedence.INSTANCEOF;
     }
 
     /** Get the expression to be tested. */
+    @Override
     public Expr expr() {
 	return this.expr;
     }
 
     /** Set the expression to be tested. */
+    @Override
     public Instanceof expr(Expr expr) {
 	Instanceof_c n = (Instanceof_c) copy();
 	n.expr = expr;
@@ -64,11 +67,13 @@ public class Instanceof_c extends Expr_c implements Instanceof
     }
 
     /** Get the type to be compared against. */
+    @Override
     public TypeNode compareType() {
 	return this.compareType;
     }
 
     /** Set the type to be compared against. */
+    @Override
     public Instanceof compareType(TypeNode compareType) {
 	Instanceof_c n = (Instanceof_c) copy();
 	n.compareType = compareType;
@@ -88,6 +93,7 @@ public class Instanceof_c extends Expr_c implements Instanceof
     }
 
     /** Visit the children of the expression. */
+    @Override
     public Node visitChildren(NodeVisitor v) {
 	Expr expr = (Expr) visitChild(this.expr, v)  ;
 	TypeNode compareType = (TypeNode) visitChild(this.compareType, v);
@@ -95,6 +101,7 @@ public class Instanceof_c extends Expr_c implements Instanceof
     }
 
     /** Type check the expression. */
+    @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
         TypeSystem ts = tc.typeSystem();
 
@@ -113,6 +120,7 @@ public class Instanceof_c extends Expr_c implements Instanceof
 	return type(ts.Boolean());
     }
 
+    @Override
     public Type childExpectedType(Expr child, AscriptionVisitor av) {
         TypeSystem ts = av.typeSystem();
 
@@ -123,27 +131,32 @@ public class Instanceof_c extends Expr_c implements Instanceof
         return child.type();
     }
 
+    @Override
     public String toString() {
 	return expr + " instanceof " + compareType;
     }
 
     /** Write the expression to an output file. */
+    @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
 	printSubExpr(expr, w, tr);
 	w.write(" instanceof ");
 	print(compareType, w, tr);
     }
 
+    @Override
     public Term firstChild() {
         return expr;
     }
 
-    public List acceptCFG(CFGBuilder v, List succs) {
+    @Override
+    public <T> List<T> acceptCFG(CFGBuilder v, List<T> succs) {
         v.visitCFG(expr, compareType, ENTRY);
         v.visitCFG(compareType, this, EXIT);
         return succs;
     }
     
+    @Override
     public Node copy(NodeFactory nf) {
         return nf.Instanceof(this.position, this.expr, this.compareType);
     }

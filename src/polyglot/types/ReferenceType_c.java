@@ -25,9 +25,11 @@
 
 package polyglot.types;
 
-import polyglot.types.*;
-import polyglot.util.*;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+
+import polyglot.util.Position;
 
 /**
  * A <code>ReferenceType</code> represents a reference type --
@@ -48,12 +50,15 @@ public abstract class ReferenceType_c extends Type_c implements ReferenceType
 	super(ts, pos);
     }
 
+    @Override
     public boolean isReference() { return true; }
+    @Override
     public ReferenceType toReference() { return this; }
 
     /** Get a list of all the type's MemberInstances. */
-    public List members() {
-        List l = new ArrayList();
+    @Override
+    public List<? extends MemberInstance> members() {
+        List<MemberInstance> l = new ArrayList<MemberInstance>();
         l.addAll(methods());
         l.addAll(fields());
         return l;
@@ -63,35 +68,39 @@ public abstract class ReferenceType_c extends Type_c implements ReferenceType
      * Returns a list of MethodInstances for all the methods declared in this.
      * It does not return methods declared in supertypes.
      */
-    public abstract List methods();
+    @Override
+    public abstract List<? extends MethodInstance> methods();
 
     /**
      * Returns a list of FieldInstances for all the fields declared in this.
      * It does not return fields declared in supertypes.
      */
-    public abstract List fields();
+    @Override
+    public abstract List<? extends FieldInstance> fields();
 
     /** 
      * Returns the supertype of this class.  For every class except Object,
      * this is non-null.
      */
+    @Override
     public abstract Type superType();
 
     /**
      * Returns a list of the types of this class's interfaces.
      */
-    public abstract List interfaces();
+    @Override
+    public abstract List<? extends Type> interfaces();
 
     /** Return true if t has a method mi */
+    @Override
     public final boolean hasMethod(MethodInstance mi) {
         return ts.hasMethod(this, mi);
     }
 
     /** Return true if t has a method mi */
+    @Override
     public boolean hasMethodImpl(MethodInstance mi) {
-        for (Iterator j = methods().iterator(); j.hasNext(); ) {
-            MethodInstance mj = (MethodInstance) j.next();
-
+        for (MethodInstance mj : methods()) {
             if (ts.isSameMethod(mi, mj)) {
                 return true;
             }
@@ -100,6 +109,7 @@ public abstract class ReferenceType_c extends Type_c implements ReferenceType
         return false;
     }
 
+    @Override
     public boolean descendsFromImpl(Type ancestor) {
         if (! ancestor.isCanonical()) {
             return false;
@@ -122,9 +132,7 @@ public abstract class ReferenceType_c extends Type_c implements ReferenceType
         }
 
         // Next check interfaces.
-        for (Iterator i = interfaces().iterator(); i.hasNext(); ) {
-            Type parentType = (Type) i.next();
-
+        for (Type parentType : interfaces()) {
             if (ts.isSubtype(parentType, ancestor)) {
                 return true;
             }
@@ -133,15 +141,16 @@ public abstract class ReferenceType_c extends Type_c implements ReferenceType
         return false;
     }
 
+    @Override
     public boolean isImplicitCastValidImpl(Type toType) {
         return ts.isSubtype(this, toType);
     }
 
-    public List methodsNamed(String name) {
-        List l = new LinkedList();
+    @Override
+    public List<MethodInstance> methodsNamed(String name) {
+        List<MethodInstance> l = new LinkedList<MethodInstance>();
 
-        for (Iterator i = methods().iterator(); i.hasNext(); ) {
-            MethodInstance mi = (MethodInstance) i.next();
+        for (MethodInstance mi : methods()) {
             if (mi.name().equals(name)) {
                 l.add(mi);
             }
@@ -150,11 +159,11 @@ public abstract class ReferenceType_c extends Type_c implements ReferenceType
         return l;
     }
 
-    public List methods(String name, List argTypes) {
-        List l = new LinkedList();
+    @Override
+    public List<? extends MethodInstance> methods(String name, List<Type> argTypes) {
+        List<MethodInstance> l = new LinkedList<MethodInstance>();
 
-        for (Iterator i = methodsNamed(name).iterator(); i.hasNext(); ) {
-            MethodInstance mi = (MethodInstance) i.next();
+        for (MethodInstance mi : methodsNamed(name)) {
             if (mi.hasFormals(argTypes)) {
                 l.add(mi);
             }
@@ -169,6 +178,7 @@ public abstract class ReferenceType_c extends Type_c implements ReferenceType
      * Returns true iff a cast from this to toType is valid; in other
      * words, some non-null members of this are also members of toType.
      **/
+    @Override
     public boolean isCastValidImpl(Type toType) {
         if (! toType.isReference()) return false;
         return ts.isSubtype(this, toType) || ts.isSubtype(toType, this);

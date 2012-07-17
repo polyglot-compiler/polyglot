@@ -25,11 +25,19 @@
 
 package polyglot.ast;
 
-import polyglot.ast.*;
-import polyglot.types.*;
-import polyglot.visit.*;
-import polyglot.util.*;
-import java.util.*;
+import java.util.List;
+
+import polyglot.types.SemanticException;
+import polyglot.types.Type;
+import polyglot.types.TypeSystem;
+import polyglot.util.CodeWriter;
+import polyglot.util.Position;
+import polyglot.visit.AscriptionVisitor;
+import polyglot.visit.CFGBuilder;
+import polyglot.visit.FlowGraph;
+import polyglot.visit.NodeVisitor;
+import polyglot.visit.PrettyPrinter;
+import polyglot.visit.TypeChecker;
 
 /**
  * An immutable representation of a Java language <code>while</code>
@@ -49,11 +57,13 @@ public class While_c extends Loop_c implements While
     }
 
     /** Get the conditional of the statement. */
+    @Override
     public Expr cond() {
 	return this.cond;
     }
 
     /** Set the conditional of the statement. */
+    @Override
     public While cond(Expr cond) {
 	While_c n = (While_c) copy();
 	n.cond = cond;
@@ -61,11 +71,13 @@ public class While_c extends Loop_c implements While
     }
 
     /** Get the body of the statement. */
+    @Override
     public Stmt body() {
 	return this.body;
     }
 
     /** Set the body of the statement. */
+    @Override
     public While body(Stmt body) {
 	While_c n = (While_c) copy();
 	n.body = body;
@@ -85,14 +97,16 @@ public class While_c extends Loop_c implements While
     }
 
     /** Visit the children of the statement. */
+    @Override
     public Node visitChildren(NodeVisitor v) {
 	Expr cond = (Expr) visitChild(this.cond, v);
 	Node body = visitChild(this.body, v);
-        if (body instanceof NodeList) body = ((NodeList) body).toBlock();
+        if (body instanceof NodeList) body = ((NodeList<?>) body).toBlock();
 	return reconstruct(cond, (Stmt) body);
     }
 
     /** Type check the statement. */
+    @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
 	TypeSystem ts = tc.typeSystem();
 	
@@ -105,6 +119,7 @@ public class While_c extends Loop_c implements While
 	return this;
     }
 
+    @Override
     public Type childExpectedType(Expr child, AscriptionVisitor av) {
         TypeSystem ts = av.typeSystem();
 
@@ -115,11 +130,13 @@ public class While_c extends Loop_c implements While
         return child.type();
     }
 
+    @Override
     public String toString() {
 	return "while (" + cond + ") ...";
     }
 
     /** Write the statement to an output file. */
+    @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
 	w.write("while (");
 	printBlock(cond, w, tr);
@@ -127,11 +144,13 @@ public class While_c extends Loop_c implements While
 	printSubStmt(body, w, tr);
     }
 
+    @Override
     public Term firstChild() {
         return cond;
     }
 
-    public List acceptCFG(CFGBuilder v, List succs) {
+    @Override
+    public <T> List<T> acceptCFG(CFGBuilder v, List<T> succs) {
         if (condIsConstantTrue()) {
             v.visitCFG(cond, body, ENTRY);
         }
@@ -145,10 +164,12 @@ public class While_c extends Loop_c implements While
         return succs;
     }
 
+    @Override
     public Term continueTarget() {
         return cond;
     }
     
+    @Override
     public Node copy(NodeFactory nf) {
         return nf.While(this.position, this.cond, this.body);
     }

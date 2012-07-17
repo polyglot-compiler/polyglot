@@ -43,10 +43,12 @@ public class ArrayTypeNode_c extends TypeNode_c implements ArrayTypeNode
 	this.base = base;
     }
 
+    @Override
     public TypeNode base() {
         return base;
     }
 
+    @Override
     public ArrayTypeNode base(TypeNode base) {
         ArrayTypeNode_c n = (ArrayTypeNode_c) copy();
 	n.base = base;
@@ -63,20 +65,24 @@ public class ArrayTypeNode_c extends TypeNode_c implements ArrayTypeNode
 	return this;
     }
     
+    @Override
     public boolean isDisambiguated() {
         return false;
     }
     
+    @Override
     public Node visitChildren(NodeVisitor v) {
         TypeNode base = (TypeNode) visitChild(this.base, v);
 	return reconstruct(base);
     }
 
+    @Override
     public Node buildTypes(TypeBuilder tb) throws SemanticException {
 	TypeSystem ts = tb.typeSystem();
         return type(ts.arrayOf(position(), base.type()));
     }
 
+    @Override
     public Node disambiguate(AmbiguityRemover ar) throws SemanticException {
 	TypeSystem ts = ar.typeSystem();
 	NodeFactory nf = ar.nodeFactory();
@@ -95,24 +101,29 @@ public class ArrayTypeNode_c extends TypeNode_c implements ArrayTypeNode
 		                    ts.arrayOf(position(), baseType));
     }
 
+    @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
 	throw new InternalCompilerError(position(),
 	    "Cannot type check ambiguous node " + this + ".");
     }
 
+    @Override
     public Node exceptionCheck(ExceptionChecker ec) throws SemanticException {
 	throw new InternalCompilerError(position(),
 	    "Cannot exception check ambiguous node " + this + ".");
     }
 
+    @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
         print(base, w, tr);
         w.write("[]");
     }
 
+    @Override
     public String toString() {
         return base.toString() + "[]";
     }
+    @Override
     public Node copy(NodeFactory nf) {
         return nf.ArrayTypeNode(this.position, this.base);
     }

@@ -50,6 +50,7 @@ public abstract class Ext_c implements Ext {
      * This also initializes the back pointers for all extensions of
      * the extension.
      */
+    @Override
     public void init(Node node) {
         if (this.node != null) {
             throw new InternalCompilerError("Already initialized.");
@@ -65,6 +66,7 @@ public abstract class Ext_c implements Ext {
     /**
      * Return the node we ultimately extend.
      */
+    @Override
     public Node node() {
 	return node;
     }
@@ -72,10 +74,12 @@ public abstract class Ext_c implements Ext {
     /**
      * Return our extension object, or null.
      */
+    @Override
     public Ext ext() {
         return ext;
     }
 
+    @Override
     public Ext ext(Ext ext) {
         Ext old = this.ext;
         this.ext = null;
@@ -92,6 +96,7 @@ public abstract class Ext_c implements Ext {
     /**
      * Copy the extension.
      */
+    @Override
     public Object copy() {
         try {
             Ext_c copy = (Ext_c) super.clone();
@@ -106,6 +111,7 @@ public abstract class Ext_c implements Ext {
         }
     }
 
+    @Override
     public String toString() {
         return StringUtil.getShortNameComponent(getClass().getName());
     }
@@ -113,6 +119,7 @@ public abstract class Ext_c implements Ext {
     /**
      * Dump the AST node for debugging purposes.
      */
+    @Override
     public void dump(CodeWriter w) {
       w.write(toString());
     }

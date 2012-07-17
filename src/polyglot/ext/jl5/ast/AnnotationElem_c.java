@@ -72,7 +72,7 @@ public class AnnotationElem_c extends Expr_c implements AnnotationElem {
         return this;
     }
     
-    public List acceptCFG(CFGBuilder v, List succs) {
+    public <T> List<T> acceptCFG(CFGBuilder v, List<T> succs) {
         return succs;
     }
 

@@ -48,11 +48,13 @@ public class Assert_c extends Stmt_c implements Assert
     }
 
     /** Get the condition to check. */
+    @Override
     public Expr cond() {
 	return this.cond;
     }
 
     /** Set the condition to check. */
+    @Override
     public Assert cond(Expr cond) {
 	Assert_c n = (Assert_c) copy();
 	n.cond = cond;
@@ -60,11 +62,13 @@ public class Assert_c extends Stmt_c implements Assert
     }
 
     /** Get the error message to report. */
+    @Override
     public Expr errorMessage() {
 	return this.errorMessage;
     }
 
     /** Set the error message to report. */
+    @Override
     public Assert errorMessage(Expr errorMessage) {
 	Assert_c n = (Assert_c) copy();
 	n.errorMessage = errorMessage;
@@ -83,6 +87,7 @@ public class Assert_c extends Stmt_c implements Assert
 	return this;
     }
 
+    @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
         TypeSystem ts = tc.typeSystem();
 
@@ -111,6 +116,7 @@ public class Assert_c extends Stmt_c implements Assert
         return this;
     }
 
+    @Override
     public Type childExpectedType(Expr child, AscriptionVisitor av) {
         TypeSystem ts = av.typeSystem();
 
@@ -128,12 +134,14 @@ public class Assert_c extends Stmt_c implements Assert
     }
 
     /** Visit the children of the statement. */
+    @Override
     public Node visitChildren(NodeVisitor v) {
 	Expr cond = (Expr) visitChild(this.cond, v);
 	Expr errorMessage = (Expr) visitChild(this.errorMessage, v);
 	return reconstruct(cond, errorMessage);
     }
 
+    @Override
     public String toString() {
 	return "assert " + cond.toString() +
                 (errorMessage != null
@@ -141,6 +149,7 @@ public class Assert_c extends Stmt_c implements Assert
     }
 
     /** Write the statement to an output file. */
+    @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
         w.write("assert ");
 	print(cond, w, tr);
@@ -153,6 +162,7 @@ public class Assert_c extends Stmt_c implements Assert
         w.write(";");
     }
 
+    @Override
     public void translate(CodeWriter w, Translator tr) {
         if (! Options.global.assertions) {
             w.write(";");
@@ -162,11 +172,13 @@ public class Assert_c extends Stmt_c implements Assert
         }
     }
 
+    @Override
     public Term firstChild() {
         return cond;
     }
 
-    public List acceptCFG(CFGBuilder v, List succs) {
+    @Override
+    public <T> List<T> acceptCFG(CFGBuilder v, List<T> succs) {
         if (errorMessage != null) {
             v.visitCFG(cond, errorMessage, ENTRY);
             v.visitCFG(errorMessage, this, EXIT);
@@ -177,6 +189,7 @@ public class Assert_c extends Stmt_c implements Assert
 
         return succs;
     }
+    @Override
     public Node copy(NodeFactory nf) {
         return nf.Assert(this.position, this.cond, this.errorMessage);
     }

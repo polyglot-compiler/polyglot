@@ -37,11 +37,11 @@ import polyglot.util.Position;
  * <code>NodeList</code> to the visitor. The rewritten node's parent would
  * then be responsible for properly splicing those nodes into the AST.
  */
-public class NodeList_c extends Node_c implements NodeList {
+public class NodeList_c<N extends Node> extends Node_c implements NodeList<N> {
   protected NodeFactory nf;
-  protected List<Node> nodes;
+  protected List<N> nodes;
 
-  public NodeList_c(Position pos, NodeFactory nf, List nodes) {
+  public NodeList_c(Position pos, NodeFactory nf, List<N> nodes) {
     super(pos);
     assert (nodes != null);
     this.nf = nf;
@@ -53,7 +53,8 @@ public class NodeList_c extends Node_c implements NodeList {
    * 
    * @see polyglot.ast.NodeList#nodes()
    */
-  public List nodes() {
+  @Override
+  public List<N> nodes() {
     return nodes;
   }
 
@@ -62,10 +63,17 @@ public class NodeList_c extends Node_c implements NodeList {
    * 
    * @see polyglot.ast.NodeList#nodes(java.util.List)
    */
-  public NodeList nodes(List nodes) {
-    NodeList_c result = (NodeList_c) copy();
+  @Override
+  public NodeList<N> nodes(List<N> nodes) {
+    NodeList_c<N> result = copy();
     result.nodes = ListUtil.copy(nodes, true);
     return result;
+  }
+
+  @SuppressWarnings("unchecked")
+  @Override
+  public NodeList_c<N> copy() {
+    return (NodeList_c<N>) super.copy();
   }
 
   /*
@@ -73,6 +81,7 @@ public class NodeList_c extends Node_c implements NodeList {
    * 
    * @see polyglot.ast.NodeList#nodeFactory()
    */
+  @Override
   public NodeFactory nodeFactory() {
     return nf;
   }
@@ -82,8 +91,11 @@ public class NodeList_c extends Node_c implements NodeList {
    * 
    * @see polyglot.ast.NodeList#toBlock()
    */
+  @Override
   public Block toBlock() {
-    return nf.Block(position, nodes);
+    @SuppressWarnings("unchecked")
+    List<Stmt> stmts = (List<Stmt>) nodes;
+    return nf.Block(position, stmts);
   }
 
 }

@@ -25,11 +25,18 @@
 
 package polyglot.ast;
 
-import polyglot.ast.*;
-import polyglot.types.*;
-import polyglot.visit.*;
-import polyglot.util.*;
-import java.util.*;
+import java.util.List;
+
+import polyglot.types.SemanticException;
+import polyglot.types.Type;
+import polyglot.types.TypeSystem;
+import polyglot.util.CodeWriter;
+import polyglot.util.Position;
+import polyglot.visit.AscriptionVisitor;
+import polyglot.visit.CFGBuilder;
+import polyglot.visit.NodeVisitor;
+import polyglot.visit.PrettyPrinter;
+import polyglot.visit.TypeChecker;
 
 /**
  * An immutable representation of a Java language <code>synchronized</code>
@@ -49,11 +56,13 @@ public class Synchronized_c extends Stmt_c implements Synchronized
     }
 
     /** Get the expression to synchronize. */
+    @Override
     public Expr expr() {
 	return this.expr;
     }
 
     /** Set the expression to synchronize. */
+    @Override
     public Synchronized expr(Expr expr) {
 	Synchronized_c n = (Synchronized_c) copy();
 	n.expr = expr;
@@ -61,11 +70,13 @@ public class Synchronized_c extends Stmt_c implements Synchronized
     }
 
     /** Get the body of the statement. */
+    @Override
     public Block body() {
 	return this.body;
     }
 
     /** Set the body of the statement. */
+    @Override
     public Synchronized body(Block body) {
 	Synchronized_c n = (Synchronized_c) copy();
 	n.body = body;
@@ -85,6 +96,7 @@ public class Synchronized_c extends Stmt_c implements Synchronized
     }
 
     /** Visit the children of the statement. */
+    @Override
     public Node visitChildren(NodeVisitor v) {
 	Expr expr = (Expr) visitChild(this.expr, v);
 	Block body = (Block) visitChild(this.body, v);
@@ -92,6 +104,7 @@ public class Synchronized_c extends Stmt_c implements Synchronized
     }
 
     /** Type check the statement. */
+    @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
 	TypeSystem ts = tc.typeSystem();
 
@@ -104,6 +117,7 @@ public class Synchronized_c extends Stmt_c implements Synchronized
 	return this;
     }
 
+    @Override
     public Type childExpectedType(Expr child, AscriptionVisitor av) {
         TypeSystem ts = av.typeSystem();
 
@@ -114,11 +128,13 @@ public class Synchronized_c extends Stmt_c implements Synchronized
         return child.type();
     }
 
+    @Override
     public String toString() {
 	return "synchronized (" + expr + ") { ... }";
     }
 
     /** Write the statement to an output file. */
+    @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
 	w.write("synchronized (");
 	printBlock(expr, w, tr);
@@ -126,16 +142,19 @@ public class Synchronized_c extends Stmt_c implements Synchronized
 	printSubStmt(body, w, tr);
     }
 
+    @Override
     public Term firstChild() {
         return expr;
     }
 
-    public List acceptCFG(CFGBuilder v, List succs) {
+    @Override
+    public <T> List<T> acceptCFG(CFGBuilder v, List<T> succs) {
         v.visitCFG(expr, body, ENTRY);
         v.visitCFG(body, this, EXIT);
         return succs;
     }
     
+    @Override
     public Node copy(NodeFactory nf) {
         return nf.Synchronized(this.position, this.expr, this.body);
     }

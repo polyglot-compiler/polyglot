@@ -33,6 +33,7 @@ import polyglot.util.CodeWriter;
 import polyglot.frontend.ExtensionInfo;
 import polyglot.types.SemanticException;
 import polyglot.types.Context;
+import polyglot.types.Type;
 import polyglot.types.TypeSystem;
 import polyglot.visit.*;
 
@@ -257,7 +258,7 @@ public interface NodeOps
      * List of Types of exceptions that might get thrown.  The result is
      * not necessarily correct until after type checking. 
      */
-    List throwTypes(TypeSystem ts);
+    List<Type> throwTypes(TypeSystem ts);
 
     /** Dump the AST for debugging. */
     public void dump(OutputStream os);

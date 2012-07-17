@@ -82,7 +82,7 @@ public class RawClass_c extends JL5ClassType_c implements RawClass {
         return this.erased().flags();
     }
 
-    private transient List<ConstructorInstance> constructors = null;
+    private transient List<? extends ConstructorInstance> constructors = null;
     @Override
     public List constructors() {
         if (constructors == null) {
@@ -100,18 +100,18 @@ public class RawClass_c extends JL5ClassType_c implements RawClass {
         return this.memberClasses;
     }
 
-    private transient List<MethodInstance> methods = null;
+    private transient List<? extends MethodInstance> methods = null;
     @Override
-    public List methods() {
+    public List<? extends MethodInstance> methods() {
         if (methods == null) {
             this.methods = this.erased().methods();
         }
         return this.methods;
     }
 
-    private transient List<FieldInstance> fields = null;
+    private transient List<? extends FieldInstance> fields = null;
     @Override
-    public List fields() {
+    public List<? extends FieldInstance> fields() {
         if (fields == null) {
             this.fields = this.erased().fields();
             for (FieldInstance fi : this.fields) {
@@ -122,7 +122,7 @@ public class RawClass_c extends JL5ClassType_c implements RawClass {
     }
 
     @Override
-    public List interfaces() {
+    public List<? extends Type> interfaces() {
         return this.erased().interfaces();
     }
 

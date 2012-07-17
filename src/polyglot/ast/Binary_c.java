@@ -25,12 +25,20 @@
 
 package polyglot.ast;
 
-import polyglot.ast.*;
-import polyglot.util.*;
-import polyglot.visit.*;
-import polyglot.types.*;
+import java.util.Collections;
+import java.util.List;
 
-import java.util.*;
+import polyglot.types.SemanticException;
+import polyglot.types.Type;
+import polyglot.types.TypeSystem;
+import polyglot.util.CodeWriter;
+import polyglot.util.Position;
+import polyglot.visit.AscriptionVisitor;
+import polyglot.visit.CFGBuilder;
+import polyglot.visit.FlowGraph;
+import polyglot.visit.NodeVisitor;
+import polyglot.visit.PrettyPrinter;
+import polyglot.visit.TypeChecker;
 
 /**
  * A <code>Binary</code> represents a Java binary expression, an
@@ -56,11 +64,13 @@ public class Binary_c extends Expr_c implements Binary
     }
 
     /** Get the left operand of the expression. */
+    @Override
     public Expr left() {
 	return this.left;
     }
 
     /** Set the left operand of the expression. */
+    @Override
     public Binary left(Expr left) {
 	Binary_c n = (Binary_c) copy();
 	n.left = left;
@@ -68,11 +78,13 @@ public class Binary_c extends Expr_c implements Binary
     }
 
     /** Get the operator of the expression. */
+    @Override
     public Operator operator() {
 	return this.op;
     }
 
     /** Set the operator of the expression. */
+    @Override
     public Binary operator(Operator op) {
 	Binary_c n = (Binary_c) copy();
 	n.op = op;
@@ -80,11 +92,13 @@ public class Binary_c extends Expr_c implements Binary
     }
 
     /** Get the right operand of the expression. */
+    @Override
     public Expr right() {
 	return this.right;
     }
 
     /** Set the right operand of the expression. */
+    @Override
     public Binary right(Expr right) {
 	Binary_c n = (Binary_c) copy();
 	n.right = right;
@@ -92,10 +106,12 @@ public class Binary_c extends Expr_c implements Binary
     }
 
     /** Get the precedence of the expression. */
+    @Override
     public Precedence precedence() {
 	return this.precedence;
     }
 
+    @Override
     public Binary precedence(Precedence precedence) {
 	Binary_c n = (Binary_c) copy();
 	n.precedence = precedence;
@@ -115,20 +131,24 @@ public class Binary_c extends Expr_c implements Binary
     }
 
     /** Visit the children of the expression. */
+    @Override
     public Node visitChildren(NodeVisitor v) {
 	Expr left = (Expr) visitChild(this.left, v);
 	Expr right = (Expr) visitChild(this.right, v);
 	return reconstruct(left, right);
     }
     
+    @Override
     public boolean constantValueSet() {
         return left.constantValueSet() && right.constantValueSet();
     }
     
+    @Override
     public boolean isConstant() {
         return left.isConstant() && right.isConstant();
     }
     
+    @Override
     public Object constantValue() {
 	if (! isConstant()) {
 	    return null;
@@ -271,6 +291,7 @@ public class Binary_c extends Expr_c implements Binary
     }
 
     /** Type check the expression. */
+    @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
         Type l = left.type();
 	Type r = right.type();
@@ -406,6 +427,7 @@ public class Binary_c extends Expr_c implements Binary
 	return type(ts.promote(l, r));
     }
 
+    @Override
     public Type childExpectedType(Expr child, AscriptionVisitor av) {
         Expr other;
 
@@ -517,6 +539,7 @@ public class Binary_c extends Expr_c implements Binary
     }
 
     /** Get the throwsArithmeticException of the expression. */
+    @Override
     public boolean throwsArithmeticException() {
 	// conservatively assume that any division or mod may throw
 	// ArithmeticException this is NOT true-- floats and doubles don't
@@ -524,11 +547,13 @@ public class Binary_c extends Expr_c implements Binary
 	return op == DIV || op == MOD;
     }
 
+    @Override
     public String toString() {
 	return left + " " + op + " " + right;
     }
 
     /** Write the expression to an output file. */
+    @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
 	printSubExpr(left, true, w, tr);
 	w.write(" ");
@@ -537,6 +562,7 @@ public class Binary_c extends Expr_c implements Binary
 	printSubExpr(right, false, w, tr);
     }
 
+  @Override
   public void dump(CodeWriter w) {
     super.dump(w);
 
@@ -553,11 +579,13 @@ public class Binary_c extends Expr_c implements Binary
     w.end();
   }
 
+  @Override
   public Term firstChild() {
     return left;
   }
 
-  public List acceptCFG(CFGBuilder v, List succs) {
+  @Override
+  public <T> List<T> acceptCFG(CFGBuilder v, List<T> succs) {
     if (op == COND_AND || op == COND_OR) {
       // short-circuit
       if (left instanceof BooleanLit) {
@@ -603,13 +631,15 @@ public class Binary_c extends Expr_c implements Binary
     return succs;
   }
 
-  public List throwTypes(TypeSystem ts) {
+  @Override
+  public List<Type> throwTypes(TypeSystem ts) {
     if (throwsArithmeticException()) {
-      return Collections.singletonList(ts.ArithmeticException());
+      return Collections.singletonList((Type) ts.ArithmeticException());
     }
 
-    return Collections.EMPTY_LIST;
+    return Collections.<Type> emptyList();
   }
+  @Override
   public Node copy(NodeFactory nf) {
       return nf.Binary(this.position, this.left, this.op, this.right);
   }

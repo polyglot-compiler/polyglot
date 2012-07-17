@@ -25,10 +25,20 @@
 
 package polyglot.ast;
 
-import polyglot.types.*;
-import polyglot.visit.*;
-import polyglot.util.*;
-import java.util.*;
+import java.util.LinkedList;
+import java.util.List;
+
+import polyglot.types.SemanticException;
+import polyglot.types.Type;
+import polyglot.types.TypeSystem;
+import polyglot.util.CodeWriter;
+import polyglot.util.InternalCompilerError;
+import polyglot.util.Position;
+import polyglot.visit.AscriptionVisitor;
+import polyglot.visit.CFGBuilder;
+import polyglot.visit.NodeVisitor;
+import polyglot.visit.PrettyPrinter;
+import polyglot.visit.TypeChecker;
 
 /**
  * An <code>Assign</code> represents a Java assignment expression.
@@ -48,16 +58,19 @@ public abstract class Assign_c extends Expr_c implements Assign
   }
 
   /** Get the precedence of the expression. */
+  @Override
   public Precedence precedence() {
     return Precedence.ASSIGN;
   }
 
   /** Get the left operand of the expression. */
+  @Override
   public Expr left() {
     return this.left;
   }
 
   /** Set the left operand of the expression. */
+  @Override
   public Assign left(Expr left) {
     Assign_c n = (Assign_c) copy();
     n.left = left;
@@ -65,11 +78,13 @@ public abstract class Assign_c extends Expr_c implements Assign
   }
 
   /** Get the operator of the expression. */
+  @Override
   public Operator operator() {
     return this.op;
   }
 
   /** Set the operator of the expression. */
+  @Override
   public Assign operator(Operator op) {
     Assign_c n = (Assign_c) copy();
     n.op = op;
@@ -77,11 +92,13 @@ public abstract class Assign_c extends Expr_c implements Assign
   }
 
   /** Get the right operand of the expression. */
+  @Override
   public Expr right() {
     return this.right;
   }
 
   /** Set the right operand of the expression. */
+  @Override
   public Assign right(Expr right) {
     Assign_c n = (Assign_c) copy();
     n.right = right;
@@ -101,6 +118,7 @@ public abstract class Assign_c extends Expr_c implements Assign
   }
 
   /** Visit the children of the expression. */
+  @Override
   public Node visitChildren(NodeVisitor v) {
     Expr left = (Expr) visitChild(this.left, v);
     Expr right = (Expr) visitChild(this.right, v);
@@ -109,6 +127,7 @@ public abstract class Assign_c extends Expr_c implements Assign
 
 
   /** Type check the expression. */
+  @Override
   public Node typeCheck(TypeChecker tc) throws SemanticException {
     Type t = left.type();
     Type s = right.type();
@@ -189,6 +208,7 @@ public abstract class Assign_c extends Expr_c implements Assign
                                     op + ".");
   }
   
+  @Override
   public Type childExpectedType(Expr child, AscriptionVisitor av) {
       if (child == right) {
           TypeSystem ts = av.typeSystem();
@@ -207,6 +227,7 @@ public abstract class Assign_c extends Expr_c implements Assign
   }
 
   /** Get the throwsArithmeticException of the expression. */
+  @Override
   public boolean throwsArithmeticException() {
     // conservatively assume that any division or mod may throw
     // ArithmeticException this is NOT true-- floats and doubles don't
@@ -214,11 +235,13 @@ public abstract class Assign_c extends Expr_c implements Assign
     return op == DIV_ASSIGN || op == MOD_ASSIGN;
   }
 
+  @Override
   public String toString() {
     return left + " " + op + " " + right;
   }
 
   /** Write the expression to an output file. */
+  @Override
   public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
     printSubExpr(left, true, w, tr);
     w.write(" ");
@@ -230,6 +253,7 @@ public abstract class Assign_c extends Expr_c implements Assign
   }
 
   /** Dumps the AST. */
+  @Override
   public void dump(CodeWriter w) {
     super.dump(w);
     w.allowBreak(4, " ");
@@ -238,9 +262,11 @@ public abstract class Assign_c extends Expr_c implements Assign
     w.end();
   }
 
+  @Override
   abstract public Term firstChild();
 
-  public List acceptCFG(CFGBuilder v, List succs) {
+  @Override
+  public <T> List<T> acceptCFG(CFGBuilder v, List<T> succs) {
       if (operator() == ASSIGN) {
           acceptCFGAssign(v);          
       }
@@ -262,8 +288,9 @@ public abstract class Assign_c extends Expr_c implements Assign
    */
   protected abstract void acceptCFGOpAssign(CFGBuilder v);
   
-  public List throwTypes(TypeSystem ts) {
-    List l = new LinkedList();
+  @Override
+  public List<Type> throwTypes(TypeSystem ts) {
+    List<Type> l = new LinkedList<Type>();
 
     if (throwsArithmeticException()) {
       l.add(ts.ArithmeticException());
@@ -271,6 +298,7 @@ public abstract class Assign_c extends Expr_c implements Assign
 
     return l;
   }
+  @Override
   public Node copy(NodeFactory nf) {
       return nf.Assign(this.position, this.left, this.op, this.right);
   }

@@ -59,6 +59,7 @@ public class JL_c extends Ext_c implements JL {
      * @param v The visitor that will traverse/rewrite the AST.
      * @return A new AST if a change was made, or <code>this</code>.
      */
+    @Override
     public Node visitChildren(NodeVisitor v) {
         return jl().visitChildren(v);
     }
@@ -72,6 +73,7 @@ public class JL_c extends Ext_c implements JL {
      * @param c the current <code>Context</code>
      * @return the <code>Context</code> to be used for visiting this node. 
      */
+    @Override
     public Context enterScope(Context c) {
         return jl().enterScope(c);
     }
@@ -86,6 +88,7 @@ public class JL_c extends Ext_c implements JL {
      * @return the <code>Context</code> to be used for visiting node 
      *           <code>child</code>
      */
+    @Override
     public Context enterChildScope(Node child, Context c) {
         return jl().enterChildScope(child, c);
     }
@@ -95,6 +98,7 @@ public class JL_c extends Ext_c implements JL {
      * visiting later sibling nodes.
      * @param c The context to which to add declarations.
      */
+    @Override
     public void addDecls(Context c) {
         jl().addDecls(c);
     }
@@ -114,6 +118,7 @@ public class JL_c extends Ext_c implements JL {
      * @param tb The visitor which adds new type objects to the
      * <code>TypeSystem</code>.
      */
+    @Override
     public NodeVisitor buildTypesEnter(TypeBuilder tb) throws SemanticException {
 	return jl().buildTypesEnter(tb);
     }
@@ -132,6 +137,7 @@ public class JL_c extends Ext_c implements JL {
      * @param tb The visitor which adds new type objects to the
      * <code>TypeSystem</code>.
      */
+    @Override
     public Node buildTypes(TypeBuilder tb) throws SemanticException {
 	return jl().buildTypes(tb);
     }
@@ -148,9 +154,11 @@ public class JL_c extends Ext_c implements JL {
      *
      * @param ar The visitor which disambiguates.
      */
+    @Override
     public Node disambiguateOverride(Node parent, AmbiguityRemover ar) throws SemanticException {
 	return jl().disambiguateOverride(parent, ar);
     }
+    @Override
     public NodeVisitor disambiguateEnter(AmbiguityRemover ar) throws SemanticException {
 	return jl().disambiguateEnter(ar);
     }
@@ -166,6 +174,7 @@ public class JL_c extends Ext_c implements JL {
      *
      * @param ar The visitor which disambiguates.
      */
+    @Override
     public Node disambiguate(AmbiguityRemover ar) throws SemanticException {
 	return jl().disambiguate(ar);
     }
@@ -182,10 +191,12 @@ public class JL_c extends Ext_c implements JL {
      *
      * @param tc The type checking visitor.
      */
+    @Override
     public Node typeCheckOverride(Node parent, TypeChecker tc) throws SemanticException {
 	return jl().typeCheckOverride(parent, tc);
     }
     
+    @Override
     public NodeVisitor typeCheckEnter(TypeChecker tc) throws SemanticException {
 	return jl().typeCheckEnter(tc);
     }
@@ -201,10 +212,12 @@ public class JL_c extends Ext_c implements JL {
      *
      * @param tc The type checking visitor.
      */
+    @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
 	return jl().typeCheck(tc);
     }
 
+    @Override
     public Node checkConstants(ConstantChecker cc) throws SemanticException {
         return jl().checkConstants(cc);
     }
@@ -221,6 +234,7 @@ public class JL_c extends Ext_c implements JL {
      *
      * @param ec The visitor.
      */
+    @Override
     public NodeVisitor exceptionCheckEnter(ExceptionChecker ec) throws SemanticException {
 	return jl().exceptionCheckEnter(ec);
     }
@@ -236,6 +250,7 @@ public class JL_c extends Ext_c implements JL {
      *
      * @param ec The visitor.
      */
+    @Override
     public Node exceptionCheck(ExceptionChecker ec) throws SemanticException {
 	return jl().exceptionCheck(ec);
     }
@@ -244,26 +259,31 @@ public class JL_c extends Ext_c implements JL {
      * List of Types of exceptions that might get thrown.  The result is
      * not necessarily correct until after type checking. 
      */
-    public List throwTypes(TypeSystem ts) {
+    @Override
+    public List<Type> throwTypes(TypeSystem ts) {
 	   return jl().throwTypes(ts);
     }
 
     /** Dump the AST for debugging. */
+    @Override
     public void dump(OutputStream os) {
             jl().dump(os);
     }
     
     /** Dump the AST for debugging. */
+    @Override
     public void dump(Writer w) {
             jl().dump(w);
     }
     
     /** Pretty-print the AST for debugging. */
+    @Override
     public void prettyPrint(OutputStream os) {
             jl().prettyPrint(os);
     }
     
     /** Pretty-print the AST for debugging. */
+    @Override
     public void prettyPrint(Writer w) {
             jl().prettyPrint(w);
     }
@@ -274,6 +294,7 @@ public class JL_c extends Ext_c implements JL {
      * @param w The code writer to which to write.
      * @param pp The pretty printer.  This is <i>not</i> a visitor.
      */
+    @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter pp) {
         jl().prettyPrint(w, pp);
     }
@@ -284,13 +305,16 @@ public class JL_c extends Ext_c implements JL {
      * @param w The code writer to which to write.
      * @param tr The translation pass.  This is <i>not</i> a visitor.
      */
+    @Override
     public void translate(CodeWriter w, Translator tr) {
         jl().translate(w, tr);
     }
     
+    @Override
     public Node copy(NodeFactory nf) {
         return jl().copy(nf);
     }
+    @Override
     public Node copy(ExtensionInfo extInfo) throws SemanticException {
         return jl().copy(extInfo);
     }

@@ -27,12 +27,26 @@ package polyglot.ast;
 
 import java.util.List;
 
-import polyglot.frontend.*;
+import polyglot.frontend.MissingDependencyException;
+import polyglot.frontend.Scheduler;
 import polyglot.frontend.goals.Goal;
-import polyglot.types.*;
+import polyglot.types.Context;
+import polyglot.types.Flags;
+import polyglot.types.LocalInstance;
+import polyglot.types.SemanticException;
+import polyglot.types.Type;
+import polyglot.types.TypeSystem;
+import polyglot.types.VarInstance;
 import polyglot.util.CodeWriter;
 import polyglot.util.Position;
-import polyglot.visit.*;
+import polyglot.visit.AmbiguityRemover;
+import polyglot.visit.AscriptionVisitor;
+import polyglot.visit.CFGBuilder;
+import polyglot.visit.ConstantChecker;
+import polyglot.visit.NodeVisitor;
+import polyglot.visit.PrettyPrinter;
+import polyglot.visit.TypeBuilder;
+import polyglot.visit.TypeChecker;
 
 /**
  * A <code>LocalDecl</code> is an immutable representation of the declaration
@@ -56,21 +70,25 @@ public class LocalDecl_c extends Stmt_c implements LocalDecl {
         this.init = init;
     }
     
+    @Override
     public boolean isDisambiguated() {
         return li != null && li.isCanonical() && super.isDisambiguated();
     }
 
     /** Get the type of the declaration. */
+    @Override
     public Type declType() {
         return type.type();
     }
 
     /** Get the flags of the declaration. */
+    @Override
     public Flags flags() {
         return flags;
     }
 
     /** Set the flags of the declaration. */
+    @Override
     public LocalDecl flags(Flags flags) {
         if (flags.equals(this.flags)) return this;
         LocalDecl_c n = (LocalDecl_c) copy();
@@ -79,11 +97,13 @@ public class LocalDecl_c extends Stmt_c implements LocalDecl {
     }
 
     /** Get the type node of the declaration. */
+    @Override
     public TypeNode type() {
         return type;
     }
 
     /** Set the type of the declaration. */
+    @Override
     public LocalDecl type(TypeNode type) {
         if (type == this.type) return this;
         LocalDecl_c n = (LocalDecl_c) copy();
@@ -92,11 +112,13 @@ public class LocalDecl_c extends Stmt_c implements LocalDecl {
     }
     
     /** Get the name of the declaration. */
+    @Override
     public Id id() {
         return name;
     }
     
     /** Set the name of the declaration. */
+    @Override
     public LocalDecl id(Id name) {
         LocalDecl_c n = (LocalDecl_c) copy();
         n.name = name;
@@ -104,21 +126,25 @@ public class LocalDecl_c extends Stmt_c implements LocalDecl {
     }
 
     /** Get the name of the declaration. */
+    @Override
     public String name() {
         return name.id();
     }
 
     /** Set the name of the declaration. */
+    @Override
     public LocalDecl name(String name) {
         return id(this.name.id(name));
     }
 
     /** Get the initializer of the declaration. */
+    @Override
     public Expr init() {
         return init;
     }
 
     /** Set the initializer of the declaration. */
+    @Override
     public LocalDecl init(Expr init) {
         if (init == this.init) return this;
         LocalDecl_c n = (LocalDecl_c) copy();
@@ -127,6 +153,7 @@ public class LocalDecl_c extends Stmt_c implements LocalDecl {
     }
 
     /** Set the local instance of the declaration. */
+    @Override
     public LocalDecl localInstance(LocalInstance li) {
         if (li == this.li) return this;
         LocalDecl_c n = (LocalDecl_c) copy();
@@ -135,10 +162,12 @@ public class LocalDecl_c extends Stmt_c implements LocalDecl {
     }
 
     /** Get the local instance of the declaration. */
+    @Override
     public LocalInstance localInstance() {
         return li;
     }
     
+    @Override
     public VarInstance varInstance() {
         return li;
     }
@@ -157,6 +186,7 @@ public class LocalDecl_c extends Stmt_c implements LocalDecl {
     }
 
     /** Visit the children of the declaration. */
+    @Override
     public Node visitChildren(NodeVisitor v) {
         TypeNode type = (TypeNode) visitChild(this.type, v);
         Id name = (Id) visitChild(this.name, v);
@@ -168,6 +198,7 @@ public class LocalDecl_c extends Stmt_c implements LocalDecl {
      * Add the declaration of the variable as we enter the scope of the
      * intializer
      */
+    @Override
     public Context enterChildScope(Node child, Context c) {
         if (child == init) {
             c.addVariable(li);
@@ -175,12 +206,14 @@ public class LocalDecl_c extends Stmt_c implements LocalDecl {
         return super.enterChildScope(child, c);
     }
 
+    @Override
     public void addDecls(Context c) {
         // Add the declaration of the variable in case we haven't already done
         // so in enterScope, when visiting the initializer.
         c.addVariable(li);
     }
 
+    @Override
     public Node buildTypes(TypeBuilder tb) throws SemanticException {
         LocalDecl_c n = (LocalDecl_c) super.buildTypes(tb);
 
@@ -191,6 +224,7 @@ public class LocalDecl_c extends Stmt_c implements LocalDecl {
         return n.localInstance(li);
     }
 
+    @Override
     public Node disambiguate(AmbiguityRemover ar) throws SemanticException {
         if (li.isCanonical()) {
             return this;
@@ -205,6 +239,7 @@ public class LocalDecl_c extends Stmt_c implements LocalDecl {
      * Override superclass behaviour to check if the variable is multiply
      * defined.
      */
+    @Override
     public NodeVisitor typeCheckEnter(TypeChecker tc) throws SemanticException {
         // Check if the variable is multiply defined.
         // we do it in type check enter, instead of type check since
@@ -225,6 +260,7 @@ public class LocalDecl_c extends Stmt_c implements LocalDecl {
     }
     
     /** Type check the declaration. */
+    @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
         TypeSystem ts = tc.typeSystem();
 
@@ -268,7 +304,8 @@ public class LocalDecl_c extends Stmt_c implements LocalDecl {
             this.li = li;
         }
         
-        public Node leave(Node old, Node n, NodeVisitor v) {
+        @Override
+        public <N extends Node> N leave(N old, N n, NodeVisitor v) {
             if (n instanceof Field) {
                 Field f = (Field) n;
                 if (! f.fieldInstance().orig().constantValueSet()) {
@@ -288,6 +325,7 @@ public class LocalDecl_c extends Stmt_c implements LocalDecl {
         }
     }
     
+    @Override
     public Node checkConstants(ConstantChecker cc) throws SemanticException {
 //        if (init != null && ! init.constantValueSet()) {
 //            // HACK to add dependencies for computing the constant value.
@@ -305,10 +343,12 @@ public class LocalDecl_c extends Stmt_c implements LocalDecl {
         return this;
     }
     
+    @Override
     public boolean constantValueSet() {
         return li != null && li.constantValueSet();
     }
 
+    @Override
     public Type childExpectedType(Expr child, AscriptionVisitor av) {
         if (child == init) {
             TypeSystem ts = av.typeSystem();
@@ -326,11 +366,13 @@ public class LocalDecl_c extends Stmt_c implements LocalDecl {
         return child.type();
     }
 
+    @Override
     public String toString() {
         return flags.translate() + type + " " + name +
                 (init != null ? " = " + init : "") + ";";
     }
 
+    @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
         boolean printSemi = tr.appendSemicolon(true);
         boolean printType = tr.printType(true);
@@ -356,6 +398,7 @@ public class LocalDecl_c extends Stmt_c implements LocalDecl {
         tr.appendSemicolon(printSemi);
     }
 
+    @Override
     public void dump(CodeWriter w) {
         super.dump(w);
 
@@ -367,11 +410,13 @@ public class LocalDecl_c extends Stmt_c implements LocalDecl {
         }
     }
 
+    @Override
     public Term firstChild() {
         return type();
     }
 
-    public List acceptCFG(CFGBuilder v, List succs) {
+    @Override
+    public <T> List<T> acceptCFG(CFGBuilder v, List<T> succs) {
         if (init() != null) {
             v.visitCFG(type(), init(), ENTRY);
             v.visitCFG(init(), this, EXIT);
@@ -382,6 +427,7 @@ public class LocalDecl_c extends Stmt_c implements LocalDecl {
         return succs;
     }
     
+    @Override
     public Node copy(NodeFactory nf) {
         return nf.LocalDecl(this.position, this.flags, this.type, this.name, this.init);
     }

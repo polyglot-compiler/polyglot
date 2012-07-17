@@ -43,6 +43,7 @@ public class FieldAssign_c extends Assign_c implements FieldAssign
     super(pos, left, op, right);
   }
 
+  @Override
   public Assign left(Expr left) {
       FieldAssign_c n = (FieldAssign_c)super.left(left);
       n.assertLeftType();
@@ -55,6 +56,7 @@ public class FieldAssign_c extends Assign_c implements FieldAssign
       }
   }
   
+  @Override
   public Term firstChild() {
       Field f = (Field)left();
       if (f.target() instanceof Expr) {
@@ -70,6 +72,7 @@ public class FieldAssign_c extends Assign_c implements FieldAssign
       }
   }
   
+  @Override
   protected void acceptCFGAssign(CFGBuilder v) {
       Field f = (Field)left();
       if (f.target() instanceof Expr) {
@@ -85,6 +88,7 @@ public class FieldAssign_c extends Assign_c implements FieldAssign
       }
       
   }
+  @Override
   protected void acceptCFGOpAssign(CFGBuilder v) {
       /*
       Field f = (Field)left();
@@ -109,8 +113,9 @@ public class FieldAssign_c extends Assign_c implements FieldAssign
       v.visitCFG(right(), this, EXIT);
   }
 
-  public List throwTypes(TypeSystem ts) {
-      List l = new ArrayList(super.throwTypes(ts));
+  @Override
+  public List<Type> throwTypes(TypeSystem ts) {
+      List<Type> l = new ArrayList<Type>(super.throwTypes(ts));
 
       Field f = (Field)left();
       if (f.target() instanceof Expr) {

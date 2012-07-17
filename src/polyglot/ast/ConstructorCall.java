@@ -59,13 +59,15 @@ public interface ConstructorCall extends Stmt, ProcedureCall
      * Actual arguments.
      * @return A list of {@link polyglot.ast.Expr Expr}.
      */
-    List arguments();
+    @Override
+    List<Expr> arguments();
 
     /**
      * Set the actual arguments.
      * @param arguments A list of {@link polyglot.ast.Expr Expr}.
      */
-    ProcedureCall arguments(List arguments);
+    @Override
+    ProcedureCall arguments(List<Expr> arguments);
 
     /**
      * The constructor that is called.  This field may not be valid until

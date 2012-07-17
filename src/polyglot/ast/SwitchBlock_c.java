@@ -36,7 +36,7 @@ import polyglot.util.Position;
  */
 public class SwitchBlock_c extends AbstractBlock_c implements SwitchBlock
 {
-    public SwitchBlock_c(Position pos, List statements) {
+    public SwitchBlock_c(Position pos, List<Stmt> statements) {
 	super(pos, statements);
     }
     
@@ -54,10 +54,12 @@ public class SwitchBlock_c extends AbstractBlock_c implements SwitchBlock
      * } 
      * </pre>
      */
+    @Override
     public Context enterScope(Context c) {
         return c;
     }
     
+    @Override
     public Node copy(NodeFactory nf) {
         return nf.SwitchBlock(this.position, statements);
     }

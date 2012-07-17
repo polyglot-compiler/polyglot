@@ -49,11 +49,13 @@ public class Import_c extends Node_c implements Import
     }
 
     /** Get the name of the import. */
+    @Override
     public String name() {
 	return this.name;
     }
 
     /** Set the name of the import. */
+    @Override
     public Import name(String name) {
 	Import_c n = (Import_c) copy();
 	n.name = name;
@@ -61,11 +63,13 @@ public class Import_c extends Node_c implements Import
     }
 
     /** Get the kind of the import. */
+    @Override
     public Kind kind() {
 	return this.kind;
     }
 
     /** Set the kind of the import. */
+    @Override
     public Import kind(Kind kind) {
 	Import_c n = (Import_c) copy();
 	n.kind = kind;
@@ -89,6 +93,7 @@ public class Import_c extends Node_c implements Import
      */
 
     /** Check that imported classes and packages exist. */
+    @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
         if (kind == PACKAGE && tc.typeSystem().packageExists(name)) {
             return this;
@@ -119,11 +124,13 @@ public class Import_c extends Node_c implements Import
 	return this;
     }
 
+    @Override
     public String toString() {
 	return "import " + name + (kind == PACKAGE ? ".*" : "");
     }
 
     /** Write the import to an output file. */
+    @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
 	if (! Options.global.fully_qualified_names) {
 	    w.write("import ");
@@ -138,6 +145,7 @@ public class Import_c extends Node_c implements Import
 	}
     }
     
+    @Override
     public Node copy(NodeFactory nf) {
         return nf.Import(this.position, this.kind, this.name);
     }

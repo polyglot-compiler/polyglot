@@ -25,15 +25,40 @@
 
 package polyglot.ast;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 
-import polyglot.ast.*;
-import polyglot.frontend.*;
-import polyglot.frontend.goals.Goal;
-import polyglot.main.Report;
-import polyglot.types.*;
-import polyglot.util.*;
-import polyglot.visit.*;
+import polyglot.types.ClassType;
+import polyglot.types.ConstructorInstance;
+import polyglot.types.Context;
+import polyglot.types.Flags;
+import polyglot.types.ParsedClassType;
+import polyglot.types.ProcedureInstance;
+import polyglot.types.ReferenceType;
+import polyglot.types.SemanticException;
+import polyglot.types.Type;
+import polyglot.types.TypeSystem;
+import polyglot.util.CodeWriter;
+import polyglot.util.CollectionUtil;
+import polyglot.util.InternalCompilerError;
+import polyglot.util.ListUtil;
+import polyglot.util.Position;
+import polyglot.visit.AmbiguityRemover;
+import polyglot.visit.AscriptionVisitor;
+import polyglot.visit.BodyDisambiguator;
+import polyglot.visit.CFGBuilder;
+import polyglot.visit.ConstantChecker;
+import polyglot.visit.ExceptionChecker;
+import polyglot.visit.NodeVisitor;
+import polyglot.visit.PrettyPrinter;
+import polyglot.visit.PruningVisitor;
+import polyglot.visit.SignatureDisambiguator;
+import polyglot.visit.SupertypeDisambiguator;
+import polyglot.visit.TypeBuilder;
+import polyglot.visit.TypeChecker;
 
 /**
  * A <code>New</code> is an immutable representation of the use of the
@@ -51,7 +76,7 @@ public class New_c extends Expr_c implements New
     protected ConstructorInstance ci;
     protected ParsedClassType anonType;
 
-    public New_c(Position pos, Expr qualifier, TypeNode tn, List arguments, ClassBody body) {
+    public New_c(Position pos, Expr qualifier, TypeNode tn, List<Expr> arguments, ClassBody body) {
         super(pos);
         assert(tn != null && arguments != null); // qualifier and body may be null
         this.qualifier = qualifier;
@@ -61,11 +86,13 @@ public class New_c extends Expr_c implements New
     }
 
     /** Get the qualifier expression of the allocation. */
+    @Override
     public Expr qualifier() {
         return this.qualifier;
     }
 
     /** Set the qualifier expression of the allocation. */
+    @Override
     public New qualifier(Expr qualifier) {
         New_c n = (New_c) copy();
         n.qualifier = qualifier;
@@ -73,21 +100,25 @@ public class New_c extends Expr_c implements New
     }
 
     /** Get the type we are instantiating. */
+    @Override
     public TypeNode objectType() {
         return this.tn;
     }
 
     /** Set the type we are instantiating. */
+    @Override
     public New objectType(TypeNode tn) {
         New_c n = (New_c) copy();
         n.tn = tn;
         return n;
     }
 
+    @Override
     public ParsedClassType anonType() {
         return this.anonType;
     }
 
+    @Override
     public New anonType(ParsedClassType anonType) {
         if (anonType == this.anonType) return this;
         New_c n = (New_c) copy();
@@ -95,14 +126,17 @@ public class New_c extends Expr_c implements New
         return n;
     }
 
+    @Override
     public ProcedureInstance procedureInstance() {
         return constructorInstance();
     }
 
+    @Override
     public ConstructorInstance constructorInstance() {
         return this.ci;
     }
 
+    @Override
     public New constructorInstance(ConstructorInstance ci) {
         if (ci == this.ci) return this;
         New_c n = (New_c) copy();
@@ -110,20 +144,24 @@ public class New_c extends Expr_c implements New
         return n;
     }
 
-    public List arguments() {
+    @Override
+    public List<Expr> arguments() {
         return this.arguments;
     }
 
-    public ProcedureCall arguments(List arguments) {
+    @Override
+    public ProcedureCall arguments(List<Expr> arguments) {
         New_c n = (New_c) copy();
         n.arguments = ListUtil.copy(arguments, true);
         return n;
     }
 
+    @Override
     public ClassBody body() {
         return this.body;
     }
 
+    @Override
     public New body(ClassBody body) {
         New_c n = (New_c) copy();
         n.body = body;
@@ -131,7 +169,7 @@ public class New_c extends Expr_c implements New
     }
 
     /** Reconstruct the expression. */
-    protected New_c reconstruct(Expr qualifier, TypeNode tn, List arguments, ClassBody body) {
+    protected New_c reconstruct(Expr qualifier, TypeNode tn, List<Expr> arguments, ClassBody body) {
         if (qualifier != this.qualifier || tn != this.tn || ! CollectionUtil.equals(arguments, this.arguments) || body != this.body) {
             New_c n = (New_c) copy();
             n.tn = tn;
@@ -145,14 +183,16 @@ public class New_c extends Expr_c implements New
     }
 
     /** Visit the children of the expression. */
+    @Override
     public Node visitChildren(NodeVisitor v) {
         Expr qualifier = (Expr) visitChild(this.qualifier, v);
         TypeNode tn = (TypeNode) visitChild(this.tn, v);
-        List arguments = visitList(this.arguments, v);
+        List<Expr> arguments = visitList(this.arguments, v);
         ClassBody body = (ClassBody) visitChild(this.body, v);
         return reconstruct(qualifier, tn, arguments, body);
     }
 
+    @Override
     public Context enterChildScope(Node child, Context c) {
         if (child == body && anonType != null && body != null) {
             c = c.pushClass(anonType, anonType);
@@ -160,6 +200,7 @@ public class New_c extends Expr_c implements New
         return super.enterChildScope(child, c);
     }
 
+    @Override
     public NodeVisitor buildTypesEnter(TypeBuilder tb) throws SemanticException {
         if (body != null) {
             /*
@@ -177,11 +218,12 @@ public class New_c extends Expr_c implements New
         return tb;
     }
 
+    @Override
     public Node buildTypes(TypeBuilder tb) throws SemanticException {
         New_c n = this;
         TypeSystem ts = tb.typeSystem();
 
-        List l = new ArrayList(n.arguments.size());
+        List<Type> l = new ArrayList<Type>(n.arguments.size());
         for (int i = 0; i < n.arguments.size(); i++) {
             l.add(ts.unknownType(position()));
         }
@@ -189,7 +231,8 @@ public class New_c extends Expr_c implements New
         ConstructorInstance ci = ts.constructorInstance(position(), 
                                                         tb.currentClass(),
                                                         Flags.NONE, l,
-                                                        Collections.EMPTY_LIST);
+                                                        Collections
+                                                            .<Type> emptyList());
         n = (New_c) n.constructorInstance(ci);
 
         if (n.body() != null) {
@@ -215,6 +258,7 @@ public class New_c extends Expr_c implements New
         return n.type(ts.unknownType(position()));
     }
 
+    @Override
     public Node disambiguateOverride(Node parent, AmbiguityRemover ar) throws SemanticException {
         New nn = this;
         New old = nn;
@@ -262,7 +306,7 @@ public class New_c extends Expr_c implements New
                 // just a name.  We'll just punt here and let the extensions handle
                 // this complexity.
 
-                String name = ((TypeNode) nn.objectType()).name();
+                String name = nn.objectType().name();
 
                 if (nn.qualifier().isDisambiguated() && nn.qualifier().type() != null && nn.qualifier().type().isCanonical()) {
                     TypeSystem ts = ar.typeSystem();
@@ -331,6 +375,7 @@ public class New_c extends Expr_c implements New
         return nn;
     }
 
+    @Override
     public Node disambiguate(AmbiguityRemover ar) throws SemanticException {
         // Everything is done in disambiguateOverride.
         return this;
@@ -345,7 +390,6 @@ public class New_c extends Expr_c implements New
         // If we're instantiating a non-static member class, add a "this"
         // qualifier.
         NodeFactory nf = ar.nodeFactory();
-        TypeSystem ts = ar.typeSystem();
         Context c = ar.context();
 
         // Search for the outer class of the member.  The outer class is
@@ -373,13 +417,13 @@ public class New_c extends Expr_c implements New
         return qualifier(q);
     }
 
+    @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
         TypeSystem ts = tc.typeSystem();
 
-        List argTypes = new ArrayList(arguments.size());
+        List<Type> argTypes = new ArrayList<Type>(arguments.size());
 
-        for (Iterator i = this.arguments.iterator(); i.hasNext(); ) {
-            Expr e = (Expr) i.next();
+        for (Expr e : arguments) {
             argTypes.add(e.type());
         }
 
@@ -521,11 +565,12 @@ public class New_c extends Expr_c implements New
                 throw new SemanticException(
                                             "Cannot pass arguments to an anonymous class that " +
                                                     "implements an interface.",
-                                                    ((Expr) arguments.get(0)).position());
+                                                    arguments.get(0).position());
             }
         }
     }
 
+    @Override
     public Type childExpectedType(Expr child, AscriptionVisitor av) {
         if (child == qualifier) {
             ReferenceType t = ci.container();
@@ -538,12 +583,12 @@ public class New_c extends Expr_c implements New
             return child.type();
         }
 
-        Iterator i = this.arguments.iterator();
-        Iterator j = ci.formalTypes().iterator();
+        Iterator<Expr> i = this.arguments.iterator();
+        Iterator<Type> j = ci.formalTypes().iterator();
 
         while (i.hasNext() && j.hasNext()) {
-            Expr e = (Expr) i.next();
-            Type t = (Type) j.next();
+            Expr e = i.next();
+            Type t = j.next();
 
             if (e == child) {
                 return t;
@@ -553,6 +598,7 @@ public class New_c extends Expr_c implements New
         return child.type();
     }
 
+    @Override
     public Node exceptionCheck(ExceptionChecker ec) throws SemanticException {
         // something didn't work in the type check phase, so just ignore it.
         if (ci == null) {
@@ -560,8 +606,7 @@ public class New_c extends Expr_c implements New
                     "Null constructor instance after type check.");
         }
 
-        for (Iterator i = ci.throwTypes().iterator(); i.hasNext(); ) {
-            Type t = (Type) i.next();
+        for (Type t : ci.throwTypes()) {
             ec.throwsException(t, position());
         }
 
@@ -569,10 +614,12 @@ public class New_c extends Expr_c implements New
     }
 
     /** Get the precedence of the expression. */
+    @Override
     public Precedence precedence() {
         return Precedence.LITERAL;
     }
 
+    @Override
     public String toString() {
         return (qualifier != null ? (qualifier.toString() + ".") : "") +
                 "new " + tn + "(...)" + (body != null ? " " + body : "");
@@ -590,8 +637,8 @@ public class New_c extends Expr_c implements New
         w.allowBreak(2, 2, "", 0);
         w.begin(0);
 
-        for (Iterator i = arguments.iterator(); i.hasNext();) {
-            Expr e = (Expr) i.next();
+        for (Iterator<Expr> i = arguments.iterator(); i.hasNext();) {
+            Expr e = i.next();
 
             print(e, w, tr);
 
@@ -613,6 +660,7 @@ public class New_c extends Expr_c implements New
         }
     }
 
+    @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
         printQualifier(w, tr);
         w.write("new ");
@@ -633,11 +681,13 @@ public class New_c extends Expr_c implements New
         printBody(w, tr);
     }
 
+    @Override
     public Term firstChild() {
         return qualifier != null ? (Term) qualifier : tn;
     }
 
-    public List acceptCFG(CFGBuilder v, List succs) {
+    @Override
+    public <T> List<T> acceptCFG(CFGBuilder v, List<T> succs) {
         if (qualifier != null) {
             v.visitCFG(qualifier, tn, ENTRY);
         }
@@ -658,8 +708,9 @@ public class New_c extends Expr_c implements New
         return succs;
     }
 
-    public List throwTypes(TypeSystem ts) {
-        List l = new LinkedList();
+    @Override
+    public List<Type> throwTypes(TypeSystem ts) {
+        List<Type> l = new LinkedList<Type>();
         l.addAll(ci.throwTypes());
         l.addAll(ts.uncheckedExceptions());
         return l;
@@ -669,6 +720,7 @@ public class New_c extends Expr_c implements New
      * @param parent
      * @param tc
      */
+    @Override
     public Node typeCheckOverride(Node parent, TypeChecker tc) throws SemanticException {
         New nn = this;
         New old = nn;
@@ -691,7 +743,7 @@ public class New_c extends Expr_c implements New
             }
 
             // Force the object type and class body, if any, to be disambiguated.
-            nn = (New) bd.visitEdge(parent, nn);
+            nn = bd.visitEdge(parent, nn);
             if (bd.hasErrors()) throw new SemanticException();
 
             if (! nn.objectType().isDisambiguated()) {
@@ -722,6 +774,7 @@ public class New_c extends Expr_c implements New
         return nn;
     }
 
+    @Override
     public Node copy(NodeFactory nf) {
         return nf.New(this.position, this.qualifier, this.tn, this.arguments, this.body);
     }

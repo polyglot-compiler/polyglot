@@ -26,6 +26,7 @@
 package polyglot.ast;
 
 import java.util.*;
+
 import polyglot.types.*;
 import polyglot.util.*;
 import polyglot.visit.*;
@@ -41,7 +42,7 @@ public class ConstructorCall_c extends Stmt_c implements ConstructorCall
     protected List<Expr> arguments;
     protected ConstructorInstance ci;
 
-    public ConstructorCall_c(Position pos, Kind kind, Expr qualifier, List arguments) {
+    public ConstructorCall_c(Position pos, Kind kind, Expr qualifier, List<Expr> arguments) {
 	super(pos);
 	assert(kind != null && arguments != null); // qualifier may be null
 	this.kind = kind;
@@ -50,11 +51,13 @@ public class ConstructorCall_c extends Stmt_c implements ConstructorCall
     }
     
     /** Get the qualifier of the constructor call. */
+    @Override
     public Expr qualifier() {
 	return this.qualifier;
     }
 
     /** Set the qualifier of the constructor call. */
+    @Override
     public ConstructorCall qualifier(Expr qualifier) {
 	ConstructorCall_c n = (ConstructorCall_c) copy();
 	n.qualifier = qualifier;
@@ -62,11 +65,13 @@ public class ConstructorCall_c extends Stmt_c implements ConstructorCall
     }
 
     /** Get the kind of the constructor call. */
+    @Override
     public Kind kind() {
 	return this.kind;
     }
 
     /** Set the kind of the constructor call. */
+    @Override
     public ConstructorCall kind(Kind kind) {
 	ConstructorCall_c n = (ConstructorCall_c) copy();
 	n.kind = kind;
@@ -74,27 +79,32 @@ public class ConstructorCall_c extends Stmt_c implements ConstructorCall
     }
 
     /** Get the actual arguments of the constructor call. */
-    public List arguments() {
+    @Override
+    public List<Expr> arguments() {
 	return Collections.unmodifiableList(this.arguments);
     }
 
     /** Set the actual arguments of the constructor call. */
-    public ProcedureCall arguments(List arguments) {
+    @Override
+    public ProcedureCall arguments(List<Expr> arguments) {
 	ConstructorCall_c n = (ConstructorCall_c) copy();
 	n.arguments = ListUtil.copy(arguments, true);
 	return n;
     }
 
+    @Override
     public ProcedureInstance procedureInstance() {
 	return constructorInstance();
     }
 
     /** Get the constructor we are calling. */
+    @Override
     public ConstructorInstance constructorInstance() {
         return ci;
     }
 
     /** Set the constructor we are calling. */
+    @Override
     public ConstructorCall constructorInstance(ConstructorInstance ci) {
         if (ci == this.ci) return this;
 	ConstructorCall_c n = (ConstructorCall_c) copy();
@@ -106,12 +116,13 @@ public class ConstructorCall_c extends Stmt_c implements ConstructorCall
      * An explicit constructor call is a static context. We need to record
      * this.
      */
+    @Override
     public Context enterScope(Context c) {
         return c.pushStatic();
     }
 
     /** Reconstruct the constructor call. */
-    protected ConstructorCall_c reconstruct(Expr qualifier, List arguments) {
+    protected ConstructorCall_c reconstruct(Expr qualifier, List<Expr> arguments) {
 	if (qualifier != this.qualifier || ! CollectionUtil.equals(arguments, this.arguments)) {
 	    ConstructorCall_c n = (ConstructorCall_c) copy();
 	    n.qualifier = qualifier;
@@ -123,12 +134,14 @@ public class ConstructorCall_c extends Stmt_c implements ConstructorCall
     }
 
     /** Visit the children of the call. */
+    @Override
     public Node visitChildren(NodeVisitor v) {
 	Expr qualifier = (Expr) visitChild(this.qualifier, v);
-	List arguments = visitList(this.arguments, v);
+	List<Expr> arguments = visitList(this.arguments, v);
 	return reconstruct(qualifier, arguments);
     }
 
+    @Override
     public Node buildTypes(TypeBuilder tb) throws SemanticException {
         TypeSystem ts = tb.typeSystem();
 
@@ -141,7 +154,7 @@ public class ConstructorCall_c extends Stmt_c implements ConstructorCall
 
         ConstructorCall_c n = (ConstructorCall_c) super.buildTypes(tb);
 
-        List l = new ArrayList(arguments.size());
+        List<Type> l = new ArrayList<Type>(arguments.size());
         for (int i = 0; i < arguments.size(); i++) {
           l.add(ts.unknownType(position()));
         }
@@ -149,11 +162,13 @@ public class ConstructorCall_c extends Stmt_c implements ConstructorCall
         ConstructorInstance ci = ts.constructorInstance(position(), 
                                                         tb.currentClass(),
                                                         Flags.NONE, l,
-                                                        Collections.EMPTY_LIST);
+                                                        Collections
+                                                            .<Type> emptyList());
         return n.constructorInstance(ci);
     }
 
     /** Type check the call. */
+    @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
         ConstructorCall_c n = this;
         
@@ -250,10 +265,9 @@ public class ConstructorCall_c extends Stmt_c implements ConstructorCall
                 n = (ConstructorCall_c) n.qualifier(q);
 	}
 
-	List argTypes = new LinkedList();
+	List<Type> argTypes = new LinkedList<Type>();
 	
-	for (Iterator iter = n.arguments.iterator(); iter.hasNext();) {
-	    Expr e = (Expr) iter.next();
+	for (Expr e : n.arguments) {
 	    if (! e.isDisambiguated()) {
 	        return this;
 	    }
@@ -268,6 +282,7 @@ public class ConstructorCall_c extends Stmt_c implements ConstructorCall
 	return n.constructorInstance(ci);
     }
 
+    @Override
     public Type childExpectedType(Expr child, AscriptionVisitor av) {
         TypeSystem ts = av.typeSystem();
 
@@ -276,12 +291,12 @@ public class ConstructorCall_c extends Stmt_c implements ConstructorCall
             return ts.Object();
         }
 
-        Iterator i = this.arguments.iterator();
-        Iterator j = ci.formalTypes().iterator();
+        Iterator<Expr> i = this.arguments.iterator();
+        Iterator<Type> j = ci.formalTypes().iterator();
 
         while (i.hasNext() && j.hasNext()) {
-	    Expr e = (Expr) i.next();
-	    Type t = (Type) j.next();
+	    Expr e = i.next();
+	    Type t = j.next();
 
             if (e == child) {
                 return t;
@@ -291,11 +306,13 @@ public class ConstructorCall_c extends Stmt_c implements ConstructorCall
         return child.type();
     }
 
+    @Override
     public String toString() {
 	return (qualifier != null ? qualifier + "." : "") + kind + "(...)";
     }
 
     /** Write the call to an output file. */
+    @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
 	if (qualifier != null) {
 	    print(qualifier, w, tr);
@@ -306,8 +323,8 @@ public class ConstructorCall_c extends Stmt_c implements ConstructorCall
 
 	w.begin(0);
 
-	for (Iterator i = arguments.iterator(); i.hasNext(); ) {
-	    Expr e = (Expr) i.next();
+	for (Iterator<Expr> i = arguments.iterator(); i.hasNext(); ) {
+	    Expr e = i.next();
 	    print(e, w, tr);
 
 	    if (i.hasNext()) {
@@ -321,6 +338,7 @@ public class ConstructorCall_c extends Stmt_c implements ConstructorCall
 	w.write(");");
     }
 
+    @Override
     public Term firstChild() {
         if (qualifier != null) {
             return qualifier;
@@ -329,7 +347,8 @@ public class ConstructorCall_c extends Stmt_c implements ConstructorCall
         }
     }
 
-    public List acceptCFG(CFGBuilder v, List succs) {
+    @Override
+    public <T> List<T> acceptCFG(CFGBuilder v, List<T> succs) {
         if (qualifier != null) {
             if (!arguments.isEmpty()) {
                 v.visitCFG(qualifier, listChild(arguments, null), ENTRY);
@@ -346,12 +365,14 @@ public class ConstructorCall_c extends Stmt_c implements ConstructorCall
         return succs;
     }
 
-    public List throwTypes(TypeSystem ts) {
-        List l = new LinkedList();
+    @Override
+    public List<Type> throwTypes(TypeSystem ts) {
+        List<Type> l = new LinkedList<Type>();
         l.addAll(ci.throwTypes());
         l.addAll(ts.uncheckedExceptions());
         return l;
     }
+    @Override
     public Node copy(NodeFactory nf) {
         return nf.ConstructorCall(this.position, this.kind, this.qualifier, this.arguments);
     }

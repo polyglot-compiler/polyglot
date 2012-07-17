@@ -25,11 +25,18 @@
 
 package polyglot.ast;
 
-import polyglot.types.*;
-import polyglot.visit.*;
-import polyglot.util.*;
+import java.util.List;
 
-import java.util.*;
+import polyglot.types.SemanticException;
+import polyglot.util.CodeWriter;
+import polyglot.util.InternalCompilerError;
+import polyglot.util.Position;
+import polyglot.visit.AmbiguityRemover;
+import polyglot.visit.CFGBuilder;
+import polyglot.visit.ExceptionChecker;
+import polyglot.visit.NodeVisitor;
+import polyglot.visit.PrettyPrinter;
+import polyglot.visit.TypeChecker;
 
 /**
  * An <code>AmbExpr</code> is an ambiguous AST node composed of a single
@@ -46,16 +53,19 @@ public class AmbExpr_c extends Expr_c implements AmbExpr
   }
 
   /** Get the precedence of the field. */
+  @Override
   public Precedence precedence() {
     return Precedence.LITERAL;
   }
   
   /** Get the name of the expression. */
+  @Override
   public Id id() {
       return this.name;
   }
   
   /** Set the name of the expression. */
+  @Override
   public AmbExpr id(Id id) {
       AmbExpr_c n = (AmbExpr_c) copy();
       n.name = id;
@@ -63,11 +73,13 @@ public class AmbExpr_c extends Expr_c implements AmbExpr
   }
 
   /** Get the name of the expression. */
+  @Override
   public String name() {
     return this.name.id();
   }
 
   /** Set the name of the expression. */
+  @Override
   public AmbExpr name(String name) {
       return id(this.name.id(name));
   }
@@ -83,12 +95,14 @@ public class AmbExpr_c extends Expr_c implements AmbExpr
   }
   
   /** Visit the children of the constructor. */
+  @Override
   public Node visitChildren(NodeVisitor v) {
       Id name = (Id) visitChild(this.name, v);
       return reconstruct(name);
   }
 
   /** Disambiguate the expression. */
+  @Override
   public Node disambiguate(AmbiguityRemover ar) throws SemanticException {
     Node n = ar.nodeFactory().disamb().disambiguate(this, ar, position(),
                                                     null, name);
@@ -101,12 +115,14 @@ public class AmbExpr_c extends Expr_c implements AmbExpr
                                 "variable \"" + name + "\".", position());
   }
 
+  @Override
   public Node typeCheck(TypeChecker tc) throws SemanticException {
       // Didn't finish disambiguation; just return.
       return this;
   }
 
   /** Check exceptions thrown by the expression. */
+  @Override
   public Node exceptionCheck(ExceptionChecker ec) throws SemanticException {
     throw new InternalCompilerError(position(),
                                     "Cannot exception check ambiguous node "
@@ -114,10 +130,12 @@ public class AmbExpr_c extends Expr_c implements AmbExpr
   } 
 
   /** Write the expression to an output file. */
+  @Override
   public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
       tr.print(this, name, w);
   }
 
+  @Override
   public String toString() {
     return name.toString() + "{amb}";
   }
@@ -126,6 +144,7 @@ public class AmbExpr_c extends Expr_c implements AmbExpr
    * Return the first (sub)term performed when evaluating this
    * term.
    */
+  @Override
   public Term firstChild() {
       return null;
   }
@@ -133,9 +152,11 @@ public class AmbExpr_c extends Expr_c implements AmbExpr
   /**
    * Visit this term in evaluation order.
    */
-  public List acceptCFG(CFGBuilder v, List succs) {
+  @Override
+  public <T> List<T> acceptCFG(CFGBuilder v, List<T> succs) {
       return succs;
   }
+  @Override
   public Node copy(NodeFactory nf) {
       return nf.AmbExpr(this.position, this.name);
   }

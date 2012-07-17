@@ -40,11 +40,13 @@ public class CharLit_c extends NumLit_c implements CharLit
     }
 
     /** Get the value of the expression. */
+    @Override
     public char value() {
 	return (char) longValue();
     }
 
     /** Set the value of the expression. */
+    @Override
     public CharLit value(char value) {
 	CharLit_c n = (CharLit_c) copy();
 	n.value = value;
@@ -52,24 +54,29 @@ public class CharLit_c extends NumLit_c implements CharLit
     }
 
     /** Type check the expression. */
+    @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
 	return type(tc.typeSystem().Char());
     }  
 
+    @Override
     public String toString() {
         return "'" + StringUtil.escape((char) value) + "'";
     }
 
     /** Write the expression to an output file. */
+    @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
         w.write("'");
 	w.write(StringUtil.escape((char) value));
         w.write("'");
     }
 
+    @Override
     public Object constantValue() {
       return new Character((char) value);
     }
+    @Override
     public Node copy(NodeFactory nf) {
         return nf.CharLit(this.position, (char)this.value);
     }

@@ -25,10 +25,8 @@
 
 package polyglot.ast;
 
-import polyglot.ast.*;
-import polyglot.types.*;
-import polyglot.visit.*;
-import polyglot.util.*;
+import polyglot.util.CodeWriter;
+import polyglot.util.Position;
 
 /**
  * An integer literal: longs, ints, shorts, bytes, and chars.
@@ -43,10 +41,12 @@ public abstract class NumLit_c extends Lit_c implements NumLit
     }
 
     /** Get the value of the expression. */
+    @Override
     public long longValue() {
 	return this.value;
     }
 
+    @Override
     public void dump(CodeWriter w) {
         super.dump(w);
 

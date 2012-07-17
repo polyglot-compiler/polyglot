@@ -51,16 +51,19 @@ public class Cast_c extends Expr_c implements Cast
     }
 
     /** Get the precedence of the expression. */
+    @Override
     public Precedence precedence() {
 	return Precedence.CAST;
     }
 
     /** Get the cast type of the expression. */
+    @Override
     public TypeNode castType() {
 	return this.castType;
     }
 
     /** Set the cast type of the expression. */
+    @Override
     public Cast castType(TypeNode castType) {
 	Cast_c n = (Cast_c) copy();
 	n.castType = castType;
@@ -68,11 +71,13 @@ public class Cast_c extends Expr_c implements Cast
     }
 
     /** Get the expression being cast. */
+    @Override
     public Expr expr() {
 	return this.expr;
     }
 
     /** Set the expression being cast. */
+    @Override
     public Cast expr(Expr expr) {
 	Cast_c n = (Cast_c) copy();
 	n.expr = expr;
@@ -92,6 +97,7 @@ public class Cast_c extends Expr_c implements Cast
     }
 
     /** Visit the children of the expression. */
+    @Override
     public Node visitChildren(NodeVisitor v) {
 	TypeNode castType = (TypeNode) visitChild(this.castType, v);
 	Expr expr = (Expr) visitChild(this.expr, v);
@@ -99,6 +105,7 @@ public class Cast_c extends Expr_c implements Cast
     }
 
     /** Type check the expression. */
+    @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException
     {
         TypeSystem ts = tc.typeSystem();
@@ -113,6 +120,7 @@ public class Cast_c extends Expr_c implements Cast
 	return type(castType.type());
     }
 
+    @Override
     public Type childExpectedType(Expr child, AscriptionVisitor av) {
         TypeSystem ts = av.typeSystem();
 
@@ -131,11 +139,13 @@ public class Cast_c extends Expr_c implements Cast
         return child.type();
     }
   
+    @Override
     public String toString() {
 	return "(" + castType + ") " + expr;
     }
 
     /** Write the expression to an output file. */
+    @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr)
     {
 	w.begin(0);
@@ -147,28 +157,33 @@ public class Cast_c extends Expr_c implements Cast
 	w.end();
     }
 
+    @Override
     public Term firstChild() {
         return expr;
     }
 
-    public List acceptCFG(CFGBuilder v, List succs) {
+    @Override
+    public <T> List<T> acceptCFG(CFGBuilder v, List<T> succs) {
         v.visitCFG(expr, castType, ENTRY);
         v.visitCFG(castType, this, EXIT);
         return succs;
     }
 
-    public List throwTypes(TypeSystem ts) {
+    @Override
+    public List<Type> throwTypes(TypeSystem ts) {
         if (expr.type().isReference()) {
-            return Collections.singletonList(ts.ClassCastException());
+            return Collections.singletonList((Type) ts.ClassCastException());
         }
 
-        return Collections.EMPTY_LIST;
+        return Collections.<Type> emptyList();
     }
     
+    @Override
     public boolean isConstant() {
 	return expr.isConstant() && castType.type().isPrimitive();
     }
     
+    @Override
     public Object constantValue() {
         Object v = expr.constantValue();
 
@@ -188,7 +203,7 @@ public class Cast_c extends Expr_c implements Cast
         if (v instanceof Double) {
             double vv = ((Double) v).doubleValue();
 
-            if (castType.type().isDouble()) return new Double((double) vv);
+            if (castType.type().isDouble()) return new Double(vv);
             if (castType.type().isFloat()) return new Float((float) vv);
             if (castType.type().isLong()) return new Long((long) vv);
             if (castType.type().isInt()) return new Integer((int) vv);
@@ -200,8 +215,8 @@ public class Cast_c extends Expr_c implements Cast
         if (v instanceof Float) {
             float vv = ((Float) v).floatValue();
 
-            if (castType.type().isDouble()) return new Double((double) vv);
-            if (castType.type().isFloat()) return new Float((float) vv);
+            if (castType.type().isDouble()) return new Double(vv);
+            if (castType.type().isFloat()) return new Float(vv);
             if (castType.type().isLong()) return new Long((long) vv);
             if (castType.type().isInt()) return new Integer((int) vv);
             if (castType.type().isChar()) return new Character((char) vv);
@@ -212,9 +227,9 @@ public class Cast_c extends Expr_c implements Cast
         if (v instanceof Number) {
             long vv = ((Number) v).longValue();
 
-            if (castType.type().isDouble()) return new Double((double) vv);
-            if (castType.type().isFloat()) return new Float((float) vv);
-            if (castType.type().isLong()) return new Long((long) vv);
+            if (castType.type().isDouble()) return new Double(vv);
+            if (castType.type().isFloat()) return new Float(vv);
+            if (castType.type().isLong()) return new Long(vv);
             if (castType.type().isInt()) return new Integer((int) vv);
             if (castType.type().isChar()) return new Character((char) vv);
             if (castType.type().isShort()) return new Short((short) vv);
@@ -224,11 +239,11 @@ public class Cast_c extends Expr_c implements Cast
         if (v instanceof Character) {
             char vv = ((Character) v).charValue();
 
-            if (castType.type().isDouble()) return new Double((double) vv);
-            if (castType.type().isFloat()) return new Float((float) vv);
-            if (castType.type().isLong()) return new Long((long) vv);
-            if (castType.type().isInt()) return new Integer((int) vv);
-            if (castType.type().isChar()) return new Character((char) vv);
+            if (castType.type().isDouble()) return new Double(vv);
+            if (castType.type().isFloat()) return new Float(vv);
+            if (castType.type().isLong()) return new Long(vv);
+            if (castType.type().isInt()) return new Integer(vv);
+            if (castType.type().isChar()) return new Character(vv);
             if (castType.type().isShort()) return new Short((short) vv);
             if (castType.type().isByte()) return new Byte((byte) vv);
         }
@@ -236,6 +251,7 @@ public class Cast_c extends Expr_c implements Cast
         // not a constant
         return null;
     }
+    @Override
     public Node copy(NodeFactory nf) {
         return nf.Cast(this.position, this.castType, this.expr);
     }

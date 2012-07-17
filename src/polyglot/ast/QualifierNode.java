@@ -25,9 +25,7 @@
 
 package polyglot.ast;
 
-import polyglot.types.TypeSystem;
 import polyglot.types.Qualifier;
-import polyglot.types.SemanticException;
 
 /**
  * A <code>QualifierNode</code> represents any node that can be used as a type

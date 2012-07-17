@@ -36,7 +36,7 @@ public class TypeErasureProcDecls extends ErrorHandlingVisitor {
         MethodInstance mi = n.methodInstance();
         JL5TypeSystem ts = (JL5TypeSystem)this.typeSystem();
         
-        List<MethodInstance> implemented = mi.implemented();
+        List<? extends MethodInstance> implemented = mi.implemented();
         if (implemented.isEmpty()) {
             // doesn't implement anything
             return n;

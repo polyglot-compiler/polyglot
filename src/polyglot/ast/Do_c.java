@@ -48,11 +48,13 @@ public class Do_c extends Loop_c implements Do
     }
 
     /** Get the body of the statement. */
+    @Override
     public Stmt body() {
 	return this.body;
     }
 
     /** Set the body of the statement. */
+    @Override
     public Do body(Stmt body) {
 	Do_c n = (Do_c) copy();
 	n.body = body;
@@ -60,11 +62,13 @@ public class Do_c extends Loop_c implements Do
     }
 
     /** Get the conditional of the statement. */
+    @Override
     public Expr cond() {
 	return this.cond;
     }
 
     /** Set the conditional of the statement. */
+    @Override
     public Do cond(Expr cond) {
 	Do_c n = (Do_c) copy();
 	n.cond = cond;
@@ -84,14 +88,16 @@ public class Do_c extends Loop_c implements Do
     }
 
     /** Visit the children of the statement. */
+    @Override
     public Node visitChildren(NodeVisitor v) {
         Node body = visitChild(this.body, v);
-        if (body instanceof NodeList) body = ((NodeList) body).toBlock();
+        if (body instanceof NodeList) body = ((NodeList<?>) body).toBlock();
 	Expr cond = (Expr) visitChild(this.cond, v);
 	return reconstruct((Stmt) body, cond);
     }
 
     /** Type check the statement. */
+    @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException
     {
         TypeSystem ts = tc.typeSystem();
@@ -105,6 +111,7 @@ public class Do_c extends Loop_c implements Do
 	return this;
     }
 
+    @Override
     public Type childExpectedType(Expr child, AscriptionVisitor av) {
         TypeSystem ts = av.typeSystem();
 
@@ -115,11 +122,13 @@ public class Do_c extends Loop_c implements Do
         return child.type();
     }
 
+    @Override
     public String toString() {
 	return "do { ... } while (" + cond + ")";
     }
 
     /** Write the statement to an output file. */
+    @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr)
     {
 	w.write("do ");
@@ -130,11 +139,13 @@ public class Do_c extends Loop_c implements Do
     }
 
 
+    @Override
     public Term firstChild() {
         return body;
     }
 
-    public List acceptCFG(CFGBuilder v, List succs) {
+    @Override
+    public <T> List<T> acceptCFG(CFGBuilder v, List<T> succs) {
         v.push(this).visitCFG(body, cond, ENTRY);
 
         if (condIsConstantTrue()) {
@@ -148,9 +159,11 @@ public class Do_c extends Loop_c implements Do
         return succs;
     }
 
+    @Override
     public Term continueTarget() {
         return cond;
     }
+    @Override
     public Node copy(NodeFactory nf) {
         return nf.Do(this.position, this.body, this.cond);
     }

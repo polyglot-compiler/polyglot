@@ -39,6 +39,7 @@ public interface Local extends NamedVariable
     Local id(Id name);
 
     /** Get the name of the local variable. */
+    @Override
     String name();
 
     /** Set the name of the local variable. */

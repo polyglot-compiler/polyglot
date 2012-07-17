@@ -77,7 +77,7 @@ public class RemoveExtendedFors extends ContextVisitor {
         {
             Call iterator = nodeFactory().Call(pos, n.expr(), "iterator");
             iterator = (Call) iterator.type(iterType);
-            iterator = iterator.methodInstance(ts.findMethod(n.expr().type().toClass(), "iterator", Collections.emptyList(), this.context().currentClass()));
+            iterator = iterator.methodInstance(ts.findMethod(n.expr().type().toClass(), "iterator", Collections.<Type> emptyList(), this.context().currentClass()));
         
             iterDecl = nodeFactory().LocalDecl(pos, Flags.NONE, nodeFactory().CanonicalTypeNode(pos, iterType), iterName, iterator);
             iterDecl = iterDecl.localInstance(iterLI);
@@ -91,7 +91,7 @@ public class RemoveExtendedFors extends ContextVisitor {
                     ((Local)nodeFactory().Local(pos, iterName).type(iterType)).localInstance(iterDecl.localInstance()),
                     "next");
             call = (Call) call.type(ts.Object());
-            call = call.methodInstance(ts.findMethod(iterType.toClass(), "next", Collections.emptyList(), this.context().currentClass()));
+            call = call.methodInstance(ts.findMethod(iterType.toClass(), "next", Collections.<Type> emptyList(), this.context().currentClass()));
         
             Cast cast = nodeFactory().Cast(pos, nodeFactory().CanonicalTypeNode(pos, iteratedType), call);
             cast = (Cast) cast.type(iteratedType);

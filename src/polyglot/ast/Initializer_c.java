@@ -25,14 +25,27 @@
 
 package polyglot.ast;
 
-import java.util.Iterator;
 import java.util.List;
 
-import polyglot.types.*;
+import polyglot.types.ClassType;
+import polyglot.types.CodeInstance;
+import polyglot.types.ConstructorInstance;
+import polyglot.types.Context;
+import polyglot.types.Flags;
+import polyglot.types.InitializerInstance;
+import polyglot.types.MemberInstance;
+import polyglot.types.SemanticException;
+import polyglot.types.Type;
+import polyglot.types.TypeSystem;
 import polyglot.util.CodeWriter;
 import polyglot.util.Position;
 import polyglot.util.SubtypeSet;
-import polyglot.visit.*;
+import polyglot.visit.CFGBuilder;
+import polyglot.visit.ExceptionChecker;
+import polyglot.visit.NodeVisitor;
+import polyglot.visit.PrettyPrinter;
+import polyglot.visit.TypeBuilder;
+import polyglot.visit.TypeChecker;
 
 /**
  * An <code>Initializer</code> is an immutable representation of an
@@ -54,20 +67,24 @@ public class Initializer_c extends Term_c implements Initializer
 	this.body = body;
     }
     
+    @Override
     public boolean isDisambiguated() {
         return ii != null && ii.isCanonical() && super.isDisambiguated();
     }
 
+    @Override
     public MemberInstance memberInstance() {
         return ii;
     }
 
     /** Get the flags of the initializer. */
+    @Override
     public Flags flags() {
 	return this.flags;
     }
 
     /** Set the flags of the initializer. */
+    @Override
     public Initializer flags(Flags flags) {
         if (flags.equals(this.flags)) return this;
 	Initializer_c n = (Initializer_c) copy();
@@ -76,15 +93,18 @@ public class Initializer_c extends Term_c implements Initializer
     }
 
     /** Get the initializer instance of the initializer. */
+    @Override
     public InitializerInstance initializerInstance() {
         return ii;
     }
 
+    @Override
     public CodeInstance codeInstance() {
 	return initializerInstance();
     }
 
     /** Set the initializer instance of the initializer. */
+    @Override
     public Initializer initializerInstance(InitializerInstance ii) {
         if (ii == this.ii) return this;
 	Initializer_c n = (Initializer_c) copy();
@@ -92,16 +112,19 @@ public class Initializer_c extends Term_c implements Initializer
 	return n;
     }
 
+    @Override
     public Term codeBody() {
         return this.body;
     }
     
     /** Get the body of the initializer. */
+    @Override
     public Block body() {
 	return this.body;
     }
 
     /** Set the body of the initializer. */
+    @Override
     public CodeBlock body(Block body) {
 	Initializer_c n = (Initializer_c) copy();
 	n.body = body;
@@ -120,15 +143,18 @@ public class Initializer_c extends Term_c implements Initializer
     }
 
     /** Visit the children of the initializer. */
+    @Override
     public Node visitChildren(NodeVisitor v) {
 	Block body = (Block) visitChild(this.body, v);
 	return reconstruct(body);
     }
 
+    @Override
     public Context enterScope(Context c) {
 	return c.pushCode(ii);
     }
 
+    @Override
     public NodeVisitor buildTypesEnter(TypeBuilder tb) throws SemanticException {
         return tb.pushCode();
     }
@@ -137,16 +163,19 @@ public class Initializer_c extends Term_c implements Initializer
      * Return the first (sub)term performed when evaluating this
      * term.
      */
+    @Override
     public Term firstChild() {
         return body();
     }
 
-    public List acceptCFG(CFGBuilder v, List succs) {
+    @Override
+    public <T> List<T> acceptCFG(CFGBuilder v, List<T> succs) {
         v.visitCFG(body(), this, EXIT);
         return succs;
     }
 
     /** Build type objects for the method. */
+    @Override
     public Node buildTypes(TypeBuilder tb) throws SemanticException {
         TypeSystem ts = tb.typeSystem();
         ClassType ct = tb.currentClass();
@@ -155,6 +184,7 @@ public class Initializer_c extends Term_c implements Initializer
     }
 
     /** Type check the initializer. */
+    @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
 	TypeSystem ts = tc.typeSystem();
 
@@ -176,6 +206,7 @@ public class Initializer_c extends Term_c implements Initializer
 	return this;
     }
 
+    @Override
     public NodeVisitor exceptionCheckEnter(ExceptionChecker ec) throws SemanticException {
         if (initializerInstance().flags().isStatic()) {
             return ec.push(new ExceptionChecker.CodeTypeReporter("static initializer block"));
@@ -192,8 +223,7 @@ public class Initializer_c extends Term_c implements Initializer
             SubtypeSet allowed = null;
             Type throwable = ec.typeSystem().Throwable();
             ClassType container = initializerInstance().container().toClass();
-            for (Iterator iter = container.constructors().iterator(); iter.hasNext(); ) {
-                ConstructorInstance ci = (ConstructorInstance)iter.next();
+            for (ConstructorInstance ci : container.constructors()) {
                 if (allowed == null) {
                     allowed = new SubtypeSet(throwable);
                     allowed.addAll(ci.throwTypes());
@@ -203,15 +233,13 @@ public class Initializer_c extends Term_c implements Initializer
                     SubtypeSet other = new SubtypeSet(throwable);
                     other.addAll(ci.throwTypes());
                     SubtypeSet inter = new SubtypeSet(throwable);
-                    for (Iterator i = allowed.iterator(); i.hasNext(); ) {
-                        Type t = (Type)i.next();
+                    for (Type t : allowed) {
                         if (other.contains(t)) {
                             // t or a supertype is thrown by other.
                             inter.add(t);
                         }
                     }
-                    for (Iterator i = other.iterator(); i.hasNext(); ) {
-                        Type t = (Type)i.next();
+                    for (Type t : other) {
                         if (allowed.contains(t)) {
                             // t or a supertype is thrown by the allowed.
                             inter.add(t);
@@ -234,6 +262,7 @@ public class Initializer_c extends Term_c implements Initializer
 
 
     /** Write the initializer to an output file. */
+    @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
 	w.begin(0);
 	w.write(flags.translate());
@@ -241,6 +270,7 @@ public class Initializer_c extends Term_c implements Initializer
 	w.end();
     }
 
+    @Override
     public void dump(CodeWriter w) {
 	super.dump(w);
 
@@ -252,10 +282,12 @@ public class Initializer_c extends Term_c implements Initializer
 	}
     }
 
+    @Override
     public String toString() {
 	return flags.translate() + "{ ... }";
     }
     
+    @Override
     public Node copy(NodeFactory nf) {
         return nf.Initializer(this.position, this.flags, this.body);
     }

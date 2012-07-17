@@ -35,11 +35,12 @@ import java.util.*;
  */
 public class Block_c extends AbstractBlock_c implements Block
 {
-    public Block_c(Position pos, List statements) {
+    public Block_c(Position pos, List<Stmt> statements) {
 	super(pos, statements);
     }
 
     /** Write the block to an output file. */
+    @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
 	w.write("{");
 	w.unifiedBreak(4, 1, " ", 1);
@@ -49,6 +50,7 @@ public class Block_c extends AbstractBlock_c implements Block
 	w.unifiedBreak(0, 1, " ", 1);
 	w.write("}");
     }
+    @Override
     public Node copy(NodeFactory nf) {
         return nf.Block(this.position, this.statements);
     }

@@ -25,11 +25,14 @@
 
 package polyglot.ast;
 
-import polyglot.ast.*;
-import polyglot.util.*;
-import polyglot.types.*;
-import polyglot.visit.*;
-import java.util.*;
+import java.util.List;
+
+import polyglot.util.CodeWriter;
+import polyglot.util.CollectionUtil;
+import polyglot.util.ListUtil;
+import polyglot.util.Position;
+import polyglot.visit.NodeVisitor;
+import polyglot.visit.PrettyPrinter;
 
 /**
  * A <code>SourceCollection</code> represents a collection of source files.
@@ -38,30 +41,33 @@ public class SourceCollection_c extends Node_c implements SourceCollection
 {
     protected List<SourceFile> sources;
 
-    public SourceCollection_c(Position pos, List sources) {
+    public SourceCollection_c(Position pos, List<SourceFile> sources) {
 	super(pos);
 	assert(sources != null);
 	this.sources = ListUtil.copy(sources, true);
     }
 
+    @Override
     public String toString() {
 	return sources.toString();
     }
 
     /** Get the source files. */
-    public List sources() {
+    @Override
+    public List<SourceFile> sources() {
 	return this.sources;
     }
 
     /** Set the statements of the block. */
-    public SourceCollection sources(List sources) {
+    @Override
+    public SourceCollection sources(List<SourceFile> sources) {
 	SourceCollection_c n = (SourceCollection_c) copy();
 	n.sources = ListUtil.copy(sources, true);
 	return n;
     }
 
     /** Reconstruct the collection. */
-    protected SourceCollection_c reconstruct(List sources) {
+    protected SourceCollection_c reconstruct(List<SourceFile> sources) {
 	if (! CollectionUtil.equals(sources, this.sources)) {
 	    SourceCollection_c n = (SourceCollection_c) copy();
 	    n.sources = ListUtil.copy(sources, true);
@@ -72,20 +78,22 @@ public class SourceCollection_c extends Node_c implements SourceCollection
     }
 
     /** Visit the children of the block. */
+    @Override
     public Node visitChildren(NodeVisitor v) {
-        List sources = visitList(this.sources, v);
+        List<SourceFile> sources = visitList(this.sources, v);
 	return reconstruct(sources);
     }
 
     /** Write the source files to an output file. */
+    @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
-        for (Iterator i = sources.iterator(); i.hasNext(); ) {
-            SourceFile s = (SourceFile) i.next();
+        for (SourceFile s : sources) {
             print(s, w, tr);
             w.newline(0);
         }
     }
     
+    @Override
     public Node copy(NodeFactory nf) {
         return nf.SourceCollection(this.position, this.sources);
     }

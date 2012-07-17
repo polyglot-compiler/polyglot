@@ -46,7 +46,7 @@ public class Call_c extends Expr_c implements Call
   protected boolean targetImplicit;
 
   public Call_c(Position pos, Receiver target, Id name,
-                List arguments) {
+                List<Expr> arguments) {
     super(pos);
     assert(name != null && arguments != null); // target may be null
     this.target = target;
@@ -56,16 +56,19 @@ public class Call_c extends Expr_c implements Call
   }
 
   /** Get the precedence of the call. */
+  @Override
   public Precedence precedence() {
     return Precedence.LITERAL;
   }
 
   /** Get the target object or type of the call. */
+  @Override
   public Receiver target() {
     return this.target;
   }
 
   /** Set the target object or type of the call. */
+  @Override
   public Call target(Receiver target) {
     Call_c n = (Call_c) copy();
     n.target = target;
@@ -73,11 +76,13 @@ public class Call_c extends Expr_c implements Call
   }
   
   /** Get the name of the call. */
+  @Override
   public Id id() {
       return this.name;
   }
   
   /** Set the name of the call. */
+  @Override
   public Call id(Id name) {
       Call_c n = (Call_c) copy();
       n.name = name;
@@ -85,25 +90,30 @@ public class Call_c extends Expr_c implements Call
   }
 
   /** Get the name of the call. */
+  @Override
   public String name() {
     return this.name.id();
   }
 
   /** Set the name of the call. */
+  @Override
   public Call name(String name) {
       return id(this.name.id(name));
   }
 
+  @Override
   public ProcedureInstance procedureInstance() {
       return methodInstance();
   }
 
   /** Get the method instance of the call. */
+  @Override
   public MethodInstance methodInstance() {
     return this.mi;
   }
 
   /** Set the method instance of the call. */
+  @Override
   public Call methodInstance(MethodInstance mi) {
     if (mi == this.mi) return this;
     Call_c n = (Call_c) copy();
@@ -111,10 +121,12 @@ public class Call_c extends Expr_c implements Call
     return n;
   }
 
+  @Override
   public boolean isTargetImplicit() {
       return this.targetImplicit;
   }
 
+  @Override
   public Call targetImplicit(boolean targetImplicit) {
       if (targetImplicit == this.targetImplicit) {
           return this;
@@ -126,19 +138,21 @@ public class Call_c extends Expr_c implements Call
   }
 
   /** Get the actual arguments of the call. */
-  public List arguments() {
+  @Override
+  public List<Expr> arguments() {
     return this.arguments;
   }
 
   /** Set the actual arguments of the call. */
-  public ProcedureCall arguments(List arguments) {
+  @Override
+  public ProcedureCall arguments(List<Expr> arguments) {
     Call_c n = (Call_c) copy();
     n.arguments = ListUtil.copy(arguments, true);
     return n;
   }
 
   /** Reconstruct the call. */
-  protected Call_c reconstruct(Receiver target, Id name, List arguments) {
+  protected Call_c reconstruct(Receiver target, Id name, List<Expr> arguments) {
     if (target != this.target || name != this.name || ! CollectionUtil.equals(arguments,
                                                          this.arguments)) {
       Call_c n = (Call_c) copy();
@@ -156,19 +170,21 @@ public class Call_c extends Expr_c implements Call
   }
 
   /** Visit the children of the call. */
+  @Override
   public Node visitChildren(NodeVisitor v) {
       Receiver target = (Receiver) visitChild(this.target, v);
       Id name = (Id) visitChild(this.name, v);
-      List arguments = visitList(this.arguments, v);
+      List<Expr> arguments = visitList(this.arguments, v);
       return reconstruct(target, name, arguments);
   }
 
+  @Override
   public Node buildTypes(TypeBuilder tb) throws SemanticException {
     Call_c n = (Call_c) super.buildTypes(tb);
 
     TypeSystem ts = tb.typeSystem();
 
-    List l = new ArrayList(arguments.size());
+    List<Type> l = new ArrayList<Type>(arguments.size());
     for (int i = 0; i < arguments.size(); i++) {
       l.add(ts.unknownType(position()));
     }
@@ -178,7 +194,7 @@ public class Call_c extends Expr_c implements Call
                                           Flags.NONE,
                                           ts.unknownType(position()),
                                           name.id(), l,
-                                          Collections.EMPTY_LIST);
+                                          Collections.<Type> emptyList());
     return n.methodInstance(mi);
   }
 
@@ -188,7 +204,7 @@ public class Call_c extends Expr_c implements Call
      * 
      * @param argTypes list of <code>Type</code>s of the arguments
      */
-    protected Node typeCheckNullTarget(TypeChecker tc, List argTypes) throws SemanticException {
+    protected Node typeCheckNullTarget(TypeChecker tc, List<Type> argTypes) throws SemanticException {
         TypeSystem ts = tc.typeSystem();
         NodeFactory nf = tc.nodeFactory();
         Context c = tc.context();
@@ -235,14 +251,14 @@ public class Call_c extends Expr_c implements Call
     }
 
     /** Type check the call. */
+    @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
         TypeSystem ts = tc.typeSystem();
         Context c = tc.context();
 
-        List argTypes = new ArrayList(this.arguments.size());
+        List<Type> argTypes = new ArrayList<Type>(this.arguments.size());
 
-        for (Iterator i = this.arguments.iterator(); i.hasNext(); ) {
-            Expr e = (Expr) i.next();
+        for (Expr e : arguments) {
             if (! e.type().isCanonical()) {
                 return this;
             }
@@ -314,18 +330,19 @@ public class Call_c extends Expr_c implements Call
         }
     }
 
+  @Override
   public Type childExpectedType(Expr child, AscriptionVisitor av)
   {
       if (child == target) {
           return mi.container();
       }
 
-      Iterator i = this.arguments.iterator();
-      Iterator j = mi.formalTypes().iterator();
+      Iterator<Expr> i = this.arguments.iterator();
+      Iterator<Type> j = mi.formalTypes().iterator();
 
       while (i.hasNext() && j.hasNext()) {
-          Expr e = (Expr) i.next();
-          Type t = (Type) j.next();
+          Expr e = i.next();
+          Type t = j.next();
 
           if (e == child) {
               return t;
@@ -335,6 +352,7 @@ public class Call_c extends Expr_c implements Call
       return child.type();
   }
 
+  @Override
   public String toString() {
     StringBuffer sb = new StringBuffer();
     sb.append(targetImplicit ? "" : target.toString() + ".");
@@ -343,13 +361,13 @@ public class Call_c extends Expr_c implements Call
 
     int count = 0;
 
-    for (Iterator i = arguments.iterator(); i.hasNext(); ) {
+    for (Iterator<Expr> i = arguments.iterator(); i.hasNext(); ) {
         if (count++ > 2) {
             sb.append("...");
             break;
         }
 
-        Expr n = (Expr) i.next();
+        Expr n = i.next();
         sb.append(n.toString());
 
         if (i.hasNext()) {
@@ -362,6 +380,7 @@ public class Call_c extends Expr_c implements Call
   }
 
   /** Write the expression to an output file. */
+  @Override
   public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
     if (!targetImplicit) {
         if (target instanceof Expr) {
@@ -380,8 +399,8 @@ public class Call_c extends Expr_c implements Call
 	w.allowBreak(2, 2, "", 0); // miser mode
 	w.begin(0);
 		    
-	for(Iterator i = arguments.iterator(); i.hasNext();) {
-	    Expr e = (Expr) i.next();
+	for(Iterator<Expr> i = arguments.iterator(); i.hasNext();) {
+	    Expr e = i.next();
 	    print(e, w, tr);
 
 	    if (i.hasNext()) {
@@ -397,6 +416,7 @@ public class Call_c extends Expr_c implements Call
   }
 
   /** Dumps the AST. */
+  @Override
   public void dump(CodeWriter w) {
     super.dump(w);
 
@@ -423,6 +443,7 @@ public class Call_c extends Expr_c implements Call
     w.end();
   }
 
+  @Override
   public Term firstChild() {
       if (target instanceof Term) {
           return (Term) target;
@@ -430,7 +451,8 @@ public class Call_c extends Expr_c implements Call
       return listChild(arguments, null);
   }
 
-  public List acceptCFG(CFGBuilder v, List succs) {
+  @Override
+  public <T> List<T> acceptCFG(CFGBuilder v, List<T> succs) {
       if (target instanceof Term) {
           Term t = (Term) target;
 
@@ -449,6 +471,7 @@ public class Call_c extends Expr_c implements Call
   }
 
   /** Check exceptions thrown by the call. */
+  @Override
   public Node exceptionCheck(ExceptionChecker ec) throws SemanticException {
     if (mi == null) {
       throw new InternalCompilerError(position(),
@@ -460,8 +483,9 @@ public class Call_c extends Expr_c implements Call
   }
 
 
-  public List throwTypes(TypeSystem ts) {
-    List l = new LinkedList();
+  @Override
+  public List<Type> throwTypes(TypeSystem ts) {
+    List<Type> l = new LinkedList<Type>();
 
     l.addAll(mi.throwTypes());
     l.addAll(ts.uncheckedExceptions());
@@ -482,6 +506,7 @@ public class Call_c extends Expr_c implements Call
           
           // as exception will be thrown if no appropriate method
           // exists. 
+          @SuppressWarnings("unused")
           MethodInstance ctxtMI = c.findMethod(name.id(), mi.formalTypes());
           
           // cannot perform this check due to the context's findMethod returning a 
@@ -493,6 +518,7 @@ public class Call_c extends Expr_c implements Call
 //          }
       }      
   }
+  @Override
   public Node copy(NodeFactory nf) {
       return nf.Call(this.position, this.target, this.name, this.arguments);
   }

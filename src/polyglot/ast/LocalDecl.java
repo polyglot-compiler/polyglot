@@ -25,7 +25,6 @@
 
 package polyglot.ast;
 
-import polyglot.types.Type;
 import polyglot.types.Flags;
 import polyglot.types.LocalInstance;
 
@@ -57,5 +56,6 @@ public interface LocalDecl extends ForInit, VarDecl, VarInit
      */
     LocalDecl localInstance(LocalInstance li);
     
+    @Override
     boolean constantValueSet();
 }

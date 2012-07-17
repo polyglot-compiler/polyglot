@@ -37,12 +37,12 @@ public interface For extends Loop
     /** List of initialization statements.
      * @return A list of {@link polyglot.ast.ForInit ForInit}.
      */
-    List inits();
+    List<ForInit> inits();
 
     /** Set the list of initialization statements.
      * @param inits A list of {@link polyglot.ast.ForInit ForInit}.
      */
-    For inits(List inits);
+    For inits(List<ForInit> inits);
 
     /** Set the loop condition */
     For cond(Expr cond);
@@ -50,12 +50,12 @@ public interface For extends Loop
     /** List of iterator expressions.
      * @return A list of {@link polyglot.ast.ForUpdate ForUpdate}.
      */
-    List iters();
+    List<ForUpdate> iters();
 
     /** Set the list of iterator expressions.
      * @param iters A list of {@link polyglot.ast.ForUpdate ForUpdate}.
      */
-    For iters(List iters);
+    For iters(List<ForUpdate> iters);
 
     /** Set the loop body */
     For body(Stmt body);

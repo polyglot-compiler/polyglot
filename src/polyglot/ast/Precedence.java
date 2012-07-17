@@ -40,11 +40,13 @@ public class Precedence extends Enum {
 	this.value = value;
     }
 
+    @Override
     public int hashCode() {
         return value;
     }
 
     /** Returns true if this and p have the same precedence. */
+    @Override
     public boolean equals(Object o) {
         return o instanceof Precedence && equals((Precedence) o);
     }

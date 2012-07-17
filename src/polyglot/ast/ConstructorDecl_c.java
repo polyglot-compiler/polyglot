@@ -25,11 +25,34 @@
 
 package polyglot.ast;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 
-import polyglot.types.*;
-import polyglot.util.*;
-import polyglot.visit.*;
+import polyglot.types.ClassType;
+import polyglot.types.CodeInstance;
+import polyglot.types.ConstructorInstance;
+import polyglot.types.Context;
+import polyglot.types.Flags;
+import polyglot.types.MemberInstance;
+import polyglot.types.ParsedClassType;
+import polyglot.types.ProcedureInstance;
+import polyglot.types.SemanticException;
+import polyglot.types.Type;
+import polyglot.types.TypeSystem;
+import polyglot.util.CodeWriter;
+import polyglot.util.CollectionUtil;
+import polyglot.util.ListUtil;
+import polyglot.util.Position;
+import polyglot.visit.AmbiguityRemover;
+import polyglot.visit.CFGBuilder;
+import polyglot.visit.ExceptionChecker;
+import polyglot.visit.NodeVisitor;
+import polyglot.visit.PrettyPrinter;
+import polyglot.visit.TypeBuilder;
+import polyglot.visit.TypeChecker;
 
 /**
  * A <code>ConstructorDecl</code> is an immutable representation of a
@@ -44,7 +67,7 @@ public class ConstructorDecl_c extends Term_c implements ConstructorDecl
     protected Block body;
     protected ConstructorInstance ci;
 
-    public ConstructorDecl_c(Position pos, Flags flags, Id name, List formals, List throwTypes, Block body) {
+    public ConstructorDecl_c(Position pos, Flags flags, Id name, List<Formal> formals, List<TypeNode> throwTypes, Block body) {
 	super(pos);
 	assert(flags != null && name != null && formals != null && throwTypes != null); // body may be null
 	this.flags = flags;
@@ -54,20 +77,24 @@ public class ConstructorDecl_c extends Term_c implements ConstructorDecl
 	this.body = body;
     }
     
+    @Override
     public boolean isDisambiguated() {
         return ci != null && ci.isCanonical() && super.isDisambiguated();
     }
     
+    @Override
     public MemberInstance memberInstance() {
         return ci;
     }
 
     /** Get the flags of the constructor. */
+    @Override
     public Flags flags() {
 	return this.flags;
     }
 
     /** Set the flags of the constructor. */
+    @Override
     public ConstructorDecl flags(Flags flags) {
         if (flags.equals(this.flags)) return this;
 	ConstructorDecl_c n = (ConstructorDecl_c) copy();
@@ -76,11 +103,13 @@ public class ConstructorDecl_c extends Term_c implements ConstructorDecl
     }
     
     /** Get the name of the constructor. */
+    @Override
     public Id id() {
         return this.name;
     }
     
     /** Set the name of the constructor. */
+    @Override
     public ConstructorDecl id(Id name) {
         ConstructorDecl_c n = (ConstructorDecl_c) copy();
         n.name = name;
@@ -88,49 +117,58 @@ public class ConstructorDecl_c extends Term_c implements ConstructorDecl
     }
 
     /** Get the name of the constructor. */
+    @Override
     public String name() {
 	return this.name.id();
     }
 
     /** Set the name of the constructor. */
+    @Override
     public ConstructorDecl name(String name) {
         return id(this.name.id(name));
     }
 
     /** Get the formals of the constructor. */
-    public List formals() {
+    @Override
+    public List<Formal> formals() {
 	return Collections.unmodifiableList(this.formals);
     }
 
     /** Set the formals of the constructor. */
-    public ConstructorDecl formals(List formals) {
+    @Override
+    public ConstructorDecl formals(List<Formal> formals) {
 	ConstructorDecl_c n = (ConstructorDecl_c) copy();
 	n.formals = ListUtil.copy(formals, true);
 	return n;
     }
 
     /** Get the throwTypes of the constructor. */
-    public List throwTypes() {
+    @Override
+    public List<TypeNode> throwTypes() {
 	return Collections.unmodifiableList(this.throwTypes);
     }
 
     /** Set the throwTypes of the constructor. */
-    public ConstructorDecl throwTypes(List throwTypes) {
+    @Override
+    public ConstructorDecl throwTypes(List<TypeNode> throwTypes) {
 	ConstructorDecl_c n = (ConstructorDecl_c) copy();
 	n.throwTypes = ListUtil.copy(throwTypes, true);
 	return n;
     }
 
+    @Override
     public Term codeBody() {
         return this.body;
     }
     
     /** Get the body of the constructor. */
+    @Override
     public Block body() {
 	return this.body;
     }
 
     /** Set the body of the constructor. */
+    @Override
     public CodeBlock body(Block body) {
 	ConstructorDecl_c n = (ConstructorDecl_c) copy();
 	n.body = body;
@@ -138,21 +176,25 @@ public class ConstructorDecl_c extends Term_c implements ConstructorDecl
     }
 
     /** Get the constructorInstance of the constructor. */
+    @Override
     public ConstructorInstance constructorInstance() {
 	return ci;
     }
 
 
     /** Get the procedureInstance of the constructor. */
+    @Override
     public ProcedureInstance procedureInstance() {
 	return ci;
     }
 
+    @Override
     public CodeInstance codeInstance() {
 	return procedureInstance();
     }
     
     /** Set the constructorInstance of the constructor. */
+    @Override
     public ConstructorDecl constructorInstance(ConstructorInstance ci) {
         if (ci == this.ci) return this;
 	ConstructorDecl_c n = (ConstructorDecl_c) copy();
@@ -161,7 +203,7 @@ public class ConstructorDecl_c extends Term_c implements ConstructorDecl
     }
 
     /** Reconstruct the constructor. */
-    protected ConstructorDecl_c reconstruct(Id name, List formals, List throwTypes, Block body) {
+    protected ConstructorDecl_c reconstruct(Id name, List<Formal> formals, List<TypeNode> throwTypes, Block body) {
 	if (name != this.name || ! CollectionUtil.equals(formals, this.formals) || ! CollectionUtil.equals(throwTypes, this.throwTypes) || body != this.body) {
 	    ConstructorDecl_c n = (ConstructorDecl_c) copy();
 	    n.name = name;
@@ -175,18 +217,21 @@ public class ConstructorDecl_c extends Term_c implements ConstructorDecl
     }
 
     /** Visit the children of the constructor. */
+    @Override
     public Node visitChildren(NodeVisitor v) {
         Id name = (Id) visitChild(this.name, v);
-	List formals = visitList(this.formals, v);
-	List throwTypes = visitList(this.throwTypes, v);
+	List<Formal> formals = visitList(this.formals, v);
+	List<TypeNode> throwTypes = visitList(this.throwTypes, v);
 	Block body = (Block) visitChild(this.body, v);
 	return reconstruct(name, formals, throwTypes, body);
     }
 
+    @Override
     public NodeVisitor buildTypesEnter(TypeBuilder tb) throws SemanticException {
         return tb.pushCode();
     }
 
+    @Override
     public Node buildTypes(TypeBuilder tb) throws SemanticException {
         TypeSystem ts = tb.typeSystem();
 
@@ -196,12 +241,12 @@ public class ConstructorDecl_c extends Term_c implements ConstructorDecl
             return this;
         }
 
-        List formalTypes = new ArrayList(formals.size());
+        List<Type> formalTypes = new ArrayList<Type>(formals.size());
         for (int i = 0; i < formals.size(); i++) {
             formalTypes.add(ts.unknownType(position()));
         }
 
-        List throwTypes = new ArrayList(throwTypes().size());
+        List<Type> throwTypes = new ArrayList<Type>(throwTypes().size());
         for (int i = 0; i < throwTypes().size(); i++) {
             throwTypes.add(ts.unknownType(position()));
         }
@@ -213,17 +258,17 @@ public class ConstructorDecl_c extends Term_c implements ConstructorDecl
         return constructorInstance(ci);
     }
 
+    @Override
     public Node disambiguate(AmbiguityRemover ar) throws SemanticException {
         if (this.ci.isCanonical()) {
             // already done
             return this;
         }
 
-        List formalTypes = new LinkedList();
-        List throwTypes = new LinkedList();
+        List<Type> formalTypes = new LinkedList<Type>();
+        List<Type> throwTypes = new LinkedList<Type>();
             
-        for (Iterator i = formals.iterator(); i.hasNext(); ) {
-            Formal f = (Formal) i.next();
+        for (Formal f : formals) {
             if (! f.isDisambiguated()) {
                 return this;
             }
@@ -232,8 +277,7 @@ public class ConstructorDecl_c extends Term_c implements ConstructorDecl
 
         ci.setFormalTypes(formalTypes);
 
-        for (Iterator i = throwTypes().iterator(); i.hasNext(); ) {
-            TypeNode tn = (TypeNode) i.next();
+        for (TypeNode tn : throwTypes()) {
             if (! tn.isDisambiguated()) {
                 return this;
             }
@@ -245,11 +289,13 @@ public class ConstructorDecl_c extends Term_c implements ConstructorDecl
         return this;
     }
 
+    @Override
     public Context enterScope(Context c) {
         return c.pushCode(ci);
     }
 
     /** Type check the constructor. */
+    @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
         Context c = tc.context();
         TypeSystem ts = tc.typeSystem();
@@ -293,8 +339,7 @@ public class ConstructorDecl_c extends Term_c implements ConstructorDecl
 		"A native constructor cannot have a body.", position());
 	}
 
-        for (Iterator i = throwTypes().iterator(); i.hasNext(); ) {
-            TypeNode tn = (TypeNode) i.next();
+        for (TypeNode tn : throwTypes()) {
             Type t = tn.type();
             if (! t.isThrowable()) {
                 throw new SemanticException("Type \"" + t +
@@ -306,10 +351,12 @@ public class ConstructorDecl_c extends Term_c implements ConstructorDecl
         return this;
     }
 
+    @Override
     public NodeVisitor exceptionCheckEnter(ExceptionChecker ec) throws SemanticException {
         return ec.push(constructorInstance().throwTypes());
     }
 
+    @Override
     public String toString() {
 	return flags.translate() + name + "(...)";
     }
@@ -324,8 +371,8 @@ public class ConstructorDecl_c extends Term_c implements ConstructorDecl
 
 	w.begin(0);
 
-	for (Iterator i = formals.iterator(); i.hasNext(); ) {
-	    Formal f = (Formal) i.next();
+	for (Iterator<Formal> i = formals.iterator(); i.hasNext(); ) {
+	    Formal f = i.next();
 	    print(f, w, tr);
 
 	    if (i.hasNext()) {
@@ -341,8 +388,8 @@ public class ConstructorDecl_c extends Term_c implements ConstructorDecl
 	    w.allowBreak(6);
 	    w.write("throws ");
 
-	    for (Iterator i = throwTypes().iterator(); i.hasNext(); ) {
-	        TypeNode tn = (TypeNode) i.next();
+	    for (Iterator<TypeNode> i = throwTypes().iterator(); i.hasNext(); ) {
+	        TypeNode tn = i.next();
 		print(tn, w, tr);
 
 		if (i.hasNext()) {
@@ -355,6 +402,7 @@ public class ConstructorDecl_c extends Term_c implements ConstructorDecl
 	w.end();
     }
 
+    @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
         prettyPrintHeader(w, tr);
 
@@ -366,6 +414,7 @@ public class ConstructorDecl_c extends Term_c implements ConstructorDecl
 	}
     }
 
+    @Override
     public void dump(CodeWriter w) {
 	super.dump(w);
 
@@ -377,11 +426,13 @@ public class ConstructorDecl_c extends Term_c implements ConstructorDecl
 	}
     }
 
+    @Override
     public Term firstChild() {
         return listChild(formals(), body() != null ? body() : null);
     }
 
-    public List acceptCFG(CFGBuilder v, List succs) {
+    @Override
+    public <T> List<T> acceptCFG(CFGBuilder v, List<T> succs) {
         if (body() != null) {
             v.visitCFGList(formals(), body(), ENTRY);
             v.visitCFG(body(), this, EXIT);
@@ -392,6 +443,7 @@ public class ConstructorDecl_c extends Term_c implements ConstructorDecl
         
         return succs;
     }
+    @Override
     public Node copy(NodeFactory nf) {
         return nf.ConstructorDecl(this.position, this.flags, this.name, this.formals, this.throwTypes, this.body);
     }

@@ -68,6 +68,7 @@ public abstract class AbstractExtFactory_c implements ExtFactory
      */
     private ExtFactory nextExtFactory;
 
+    @Override
     public ExtFactory nextExtFactory() {
         return nextExtFactory;
     }
@@ -93,6 +94,7 @@ public abstract class AbstractExtFactory_c implements ExtFactory
     // also has an extension. Finally, call an appropriate post method,
     // to allow subclasses to perform operations on the construction Exts
     // ******************************************
+    @Override
     public final Ext extId() {
         Ext e = extIdImpl();
         
@@ -103,6 +105,7 @@ public abstract class AbstractExtFactory_c implements ExtFactory
         return postExtId(e);
     }
 
+    @Override
     public final Ext extAmbAssign() {
         Ext e = extAmbAssignImpl();
 
@@ -113,6 +116,7 @@ public abstract class AbstractExtFactory_c implements ExtFactory
         return postExtAmbAssign(e);
     }
 
+    @Override
     public final Ext extAmbExpr() {
         Ext e = extAmbExprImpl();
 
@@ -123,6 +127,7 @@ public abstract class AbstractExtFactory_c implements ExtFactory
         return postExtAmbExpr(e);
     }
 
+    @Override
     public final Ext extAmbPrefix() {
         Ext e = extAmbPrefixImpl();
 
@@ -133,6 +138,7 @@ public abstract class AbstractExtFactory_c implements ExtFactory
         return postExtAmbPrefix(e);
     }
 
+    @Override
     public final Ext extAmbQualifierNode() {
         Ext e = extAmbQualifierNodeImpl();
 
@@ -143,6 +149,7 @@ public abstract class AbstractExtFactory_c implements ExtFactory
         return postExtAmbQualifierNode(e);
     }
 
+    @Override
     public final Ext extAmbReceiver() {
         Ext e = extAmbReceiverImpl();
 
@@ -153,6 +160,7 @@ public abstract class AbstractExtFactory_c implements ExtFactory
         return postExtAmbReceiver(e);
     }
 
+    @Override
     public final Ext extAmbTypeNode() {
         Ext e = extAmbTypeNodeImpl();
 
@@ -163,6 +171,7 @@ public abstract class AbstractExtFactory_c implements ExtFactory
         return postExtAmbTypeNode(e);
     }
 
+    @Override
     public final Ext extArrayAccess() {
         Ext e = extArrayAccessImpl();
 
@@ -173,6 +182,7 @@ public abstract class AbstractExtFactory_c implements ExtFactory
         return postExtArrayAccess(e);
     }
 
+    @Override
     public final Ext extArrayInit() {
         Ext e = extArrayInitImpl();
 
@@ -183,6 +193,7 @@ public abstract class AbstractExtFactory_c implements ExtFactory
         return postExtArrayInit(e);
     }
 
+    @Override
     public final Ext extArrayTypeNode() {
         Ext e = extArrayTypeNodeImpl();
 
@@ -193,6 +204,7 @@ public abstract class AbstractExtFactory_c implements ExtFactory
         return postExtArrayTypeNode(e);
     }
 
+    @Override
     public final Ext extAssert() {
         Ext e = extAssertImpl();
 
@@ -203,6 +215,7 @@ public abstract class AbstractExtFactory_c implements ExtFactory
         return postExtAssert(e);
     }
 
+    @Override
     public final Ext extAssign() {
         Ext e = extAssignImpl();
 
@@ -213,6 +226,7 @@ public abstract class AbstractExtFactory_c implements ExtFactory
         return postExtAssign(e);
     }
 
+    @Override
     public final Ext extLocalAssign() {
         Ext e = extLocalAssignImpl();
 
@@ -223,6 +237,7 @@ public abstract class AbstractExtFactory_c implements ExtFactory
         return postExtLocalAssign(e);
     }
 
+    @Override
     public final Ext extFieldAssign() {
         Ext e = extFieldAssignImpl();
 
@@ -233,6 +248,7 @@ public abstract class AbstractExtFactory_c implements ExtFactory
         return postExtFieldAssign(e);
     }
 
+    @Override
     public final Ext extArrayAccessAssign() {
         Ext e = extArrayAccessAssignImpl();
 
@@ -243,6 +259,7 @@ public abstract class AbstractExtFactory_c implements ExtFactory
         return postExtArrayAccessAssign(e);
     }
 
+    @Override
     public final Ext extBinary() {
         Ext e = extBinaryImpl();
 
@@ -253,6 +270,7 @@ public abstract class AbstractExtFactory_c implements ExtFactory
         return postExtBinary(e);
     }
 
+    @Override
     public final Ext extBlock() {
         Ext e = extBlockImpl();
 
@@ -263,6 +281,7 @@ public abstract class AbstractExtFactory_c implements ExtFactory
         return postExtBlock(e);
     }
 
+    @Override
     public final Ext extBooleanLit() {
         Ext e = extBooleanLitImpl();
 
@@ -273,6 +292,7 @@ public abstract class AbstractExtFactory_c implements ExtFactory
         return postExtBooleanLit(e);
     }
 
+    @Override
     public final Ext extBranch() {
         Ext e = extBranchImpl();
 
@@ -283,6 +303,7 @@ public abstract class AbstractExtFactory_c implements ExtFactory
         return postExtBranch(e);
     }
 
+    @Override
     public final Ext extCall() {
         Ext e = extCallImpl();
 
@@ -293,6 +314,7 @@ public abstract class AbstractExtFactory_c implements ExtFactory
         return postExtCall(e);
     }
 
+    @Override
     public final Ext extCanonicalTypeNode() {
         Ext e = extCanonicalTypeNodeImpl();
 
@@ -303,6 +325,7 @@ public abstract class AbstractExtFactory_c implements ExtFactory
         return postExtCanonicalTypeNode(e);
     }
 
+    @Override
     public final Ext extCase() {
         Ext e = extCaseImpl();
 
@@ -313,6 +336,7 @@ public abstract class AbstractExtFactory_c implements ExtFactory
         return postExtCase(e);
     }
 
+    @Override
     public final Ext extCast() {
         Ext e = extCastImpl();
 
@@ -323,6 +347,7 @@ public abstract class AbstractExtFactory_c implements ExtFactory
         return postExtCast(e);
     }
 
+    @Override
     public final Ext extCatch() {
         Ext e = extCatchImpl();
 
@@ -333,6 +358,7 @@ public abstract class AbstractExtFactory_c implements ExtFactory
         return postExtCatch(e);
     }
 
+    @Override
     public final Ext extCharLit() {
         Ext e = extCharLitImpl();
 
@@ -343,6 +369,7 @@ public abstract class AbstractExtFactory_c implements ExtFactory
         return postExtCharLit(e);
     }
 
+    @Override
     public final Ext extClassBody() {
         Ext e = extClassBodyImpl();
 
@@ -353,6 +380,7 @@ public abstract class AbstractExtFactory_c implements ExtFactory
         return postExtClassBody(e);
     }
 
+    @Override
     public final Ext extClassDecl() {
         Ext e = extClassDeclImpl();
 
@@ -363,6 +391,7 @@ public abstract class AbstractExtFactory_c implements ExtFactory
         return postExtClassDecl(e);
     }
 
+    @Override
     public final Ext extClassLit() {
         Ext e = extClassLitImpl();
 
@@ -373,6 +402,7 @@ public abstract class AbstractExtFactory_c implements ExtFactory
         return postExtClassLit(e);
     }
 
+    @Override
     public final Ext extClassMember() {
         Ext e = extClassMemberImpl();
 
@@ -383,6 +413,7 @@ public abstract class AbstractExtFactory_c implements ExtFactory
         return postExtClassMember(e);
     }
 
+    @Override
     public final Ext extCodeDecl() {
         Ext e = extCodeDeclImpl();
 
@@ -393,6 +424,7 @@ public abstract class AbstractExtFactory_c implements ExtFactory
         return postExtCodeDecl(e);
     }
     
+    @Override
     public final Ext extCompoundStmt() {
         Ext e = extCompoundStmtImpl();
       
@@ -403,6 +435,7 @@ public abstract class AbstractExtFactory_c implements ExtFactory
         return postExtCompoundStmt(e);
     }
 
+    @Override
     public final Ext extConditional() {
         Ext e = extConditionalImpl();
 
@@ -413,6 +446,7 @@ public abstract class AbstractExtFactory_c implements ExtFactory
         return postExtConditional(e);
     }
 
+    @Override
     public final Ext extConstructorCall() {
         Ext e = extConstructorCallImpl();
 
@@ -423,6 +457,7 @@ public abstract class AbstractExtFactory_c implements ExtFactory
         return postExtConstructorCall(e);
     }
 
+    @Override
     public final Ext extConstructorDecl() {
         Ext e = extConstructorDeclImpl();
 
@@ -433,6 +468,7 @@ public abstract class AbstractExtFactory_c implements ExtFactory
         return postExtConstructorDecl(e);
     }
 
+    @Override
     public final Ext extDo() {
         Ext e = extDoImpl();
 
@@ -443,6 +479,7 @@ public abstract class AbstractExtFactory_c implements ExtFactory
         return postExtDo(e);
     }
 
+    @Override
     public final Ext extEmpty() {
         Ext e = extEmptyImpl();
 
@@ -453,6 +490,7 @@ public abstract class AbstractExtFactory_c implements ExtFactory
         return postExtEmpty(e);
     }
 
+    @Override
     public final Ext extEval() {
         Ext e = extEvalImpl();
 
@@ -463,6 +501,7 @@ public abstract class AbstractExtFactory_c implements ExtFactory
         return postExtEval(e);
     }
 
+    @Override
     public final Ext extExpr() {
         Ext e = extExprImpl();
 
@@ -473,6 +512,7 @@ public abstract class AbstractExtFactory_c implements ExtFactory
         return postExtExpr(e);
     }
 
+    @Override
     public final Ext extField() {
         Ext e = extFieldImpl();
 
@@ -483,6 +523,7 @@ public abstract class AbstractExtFactory_c implements ExtFactory
         return postExtField(e);
     }
 
+    @Override
     public final Ext extFieldDecl() {
         Ext e = extFieldDeclImpl();
 
@@ -493,6 +534,7 @@ public abstract class AbstractExtFactory_c implements ExtFactory
         return postExtFieldDecl(e);
     }
 
+    @Override
     public final Ext extFloatLit() {
         Ext e = extFloatLitImpl();
 
@@ -503,6 +545,7 @@ public abstract class AbstractExtFactory_c implements ExtFactory
         return postExtFloatLit(e);
     }
 
+    @Override
     public final Ext extFor() {
         Ext e = extForImpl();
 
@@ -513,6 +556,7 @@ public abstract class AbstractExtFactory_c implements ExtFactory
         return postExtFor(e);
     }
 
+    @Override
     public final Ext extFormal() {
         Ext e = extFormalImpl();
 
@@ -523,6 +567,7 @@ public abstract class AbstractExtFactory_c implements ExtFactory
         return postExtFormal(e);
     }
 
+    @Override
     public final Ext extIf() {
         Ext e = extIfImpl();
 
@@ -533,6 +578,7 @@ public abstract class AbstractExtFactory_c implements ExtFactory
         return postExtIf(e);
     }
 
+    @Override
     public final Ext extImport() {
         Ext e = extImportImpl();
 
@@ -543,6 +589,7 @@ public abstract class AbstractExtFactory_c implements ExtFactory
         return postExtImport(e);
     }
 
+    @Override
     public final Ext extInitializer() {
         Ext e = extInitializerImpl();
 
@@ -553,6 +600,7 @@ public abstract class AbstractExtFactory_c implements ExtFactory
         return postExtInitializer(e);
     }
 
+    @Override
     public final Ext extInstanceof() {
         Ext e = extInstanceofImpl();
 
@@ -563,6 +611,7 @@ public abstract class AbstractExtFactory_c implements ExtFactory
         return postExtInstanceof(e);
     }
 
+    @Override
     public final Ext extIntLit() {
         Ext e = extIntLitImpl();
 
@@ -573,6 +622,7 @@ public abstract class AbstractExtFactory_c implements ExtFactory
         return postExtIntLit(e);
     }
 
+    @Override
     public final Ext extLabeled() {
         Ext e = extLabeledImpl();
 
@@ -583,6 +633,7 @@ public abstract class AbstractExtFactory_c implements ExtFactory
         return postExtLabeled(e);
     }
 
+    @Override
     public final Ext extLit() {
         Ext e = extLitImpl();
 
@@ -593,6 +644,7 @@ public abstract class AbstractExtFactory_c implements ExtFactory
         return postExtLit(e);
     }
 
+    @Override
     public final Ext extLocal() {
         Ext e = extLocalImpl();
 
@@ -603,6 +655,7 @@ public abstract class AbstractExtFactory_c implements ExtFactory
         return postExtLocal(e);
     }
 
+    @Override
     public final Ext extLocalClassDecl() {
         Ext e = extLocalClassDeclImpl();
 
@@ -613,6 +666,7 @@ public abstract class AbstractExtFactory_c implements ExtFactory
         return postExtLocalClassDecl(e);
     }
 
+    @Override
     public final Ext extLocalDecl() {
         Ext e = extLocalDeclImpl();
 
@@ -623,6 +677,7 @@ public abstract class AbstractExtFactory_c implements ExtFactory
         return postExtLocalDecl(e);
     }
 
+    @Override
     public final Ext extLoop() {
         Ext e = extLoopImpl();
 
@@ -633,6 +688,7 @@ public abstract class AbstractExtFactory_c implements ExtFactory
         return postExtLoop(e);
     }
 
+    @Override
     public final Ext extMethodDecl() {
         Ext e = extMethodDeclImpl();
 
@@ -643,6 +699,7 @@ public abstract class AbstractExtFactory_c implements ExtFactory
         return postExtMethodDecl(e);
     }
 
+    @Override
     public final Ext extNewArray() {
         Ext e = extNewArrayImpl();
 
@@ -653,6 +710,7 @@ public abstract class AbstractExtFactory_c implements ExtFactory
         return postExtNewArray(e);
     }
 
+    @Override
     public final Ext extNode() {
         Ext e = extNodeImpl();
 
@@ -663,6 +721,7 @@ public abstract class AbstractExtFactory_c implements ExtFactory
         return postExtNode(e);
     }
     
+    @Override
     public final Ext extNodeList() {
         Ext e = extNodeListImpl();
         
@@ -673,6 +732,7 @@ public abstract class AbstractExtFactory_c implements ExtFactory
         return postExtNodeList(e);
     }
 
+    @Override
     public final Ext extNew() {
         Ext e = extNewImpl();
 
@@ -683,6 +743,7 @@ public abstract class AbstractExtFactory_c implements ExtFactory
         return postExtNew(e);
     }
 
+    @Override
     public final Ext extNullLit() {
         Ext e = extNullLitImpl();
 
@@ -693,6 +754,7 @@ public abstract class AbstractExtFactory_c implements ExtFactory
         return postExtNullLit(e);
     }
 
+    @Override
     public final Ext extNumLit() {
         Ext e = extNumLitImpl();
 
@@ -703,6 +765,7 @@ public abstract class AbstractExtFactory_c implements ExtFactory
         return postExtNumLit(e);
     }
 
+    @Override
     public final Ext extPackageNode() {
         Ext e = extPackageNodeImpl();
 
@@ -713,6 +776,7 @@ public abstract class AbstractExtFactory_c implements ExtFactory
         return postExtPackageNode(e);
     }
 
+    @Override
     public final Ext extProcedureDecl() {
         Ext e = extProcedureDeclImpl();
 
@@ -723,6 +787,7 @@ public abstract class AbstractExtFactory_c implements ExtFactory
         return postExtProcedureDecl(e);
     }
 
+    @Override
     public final Ext extReturn() {
         Ext e = extReturnImpl();
 
@@ -733,6 +798,7 @@ public abstract class AbstractExtFactory_c implements ExtFactory
         return postExtReturn(e);
     }
 
+    @Override
     public final Ext extSourceCollection() {
         Ext e = extSourceCollectionImpl();
 
@@ -743,6 +809,7 @@ public abstract class AbstractExtFactory_c implements ExtFactory
         return postExtSourceCollection(e);
     }
 
+    @Override
     public final Ext extSourceFile() {
         Ext e = extSourceFileImpl();
 
@@ -753,6 +820,7 @@ public abstract class AbstractExtFactory_c implements ExtFactory
         return postExtSourceFile(e);
     }
 
+    @Override
     public final Ext extSpecial() {
         Ext e = extSpecialImpl();
 
@@ -763,6 +831,7 @@ public abstract class AbstractExtFactory_c implements ExtFactory
         return postExtSpecial(e);
     }
 
+    @Override
     public final Ext extStmt() {
         Ext e = extStmtImpl();
 
@@ -773,6 +842,7 @@ public abstract class AbstractExtFactory_c implements ExtFactory
         return postExtStmt(e);
     }
 
+    @Override
     public final Ext extStringLit() {
         Ext e = extStringLitImpl();
 
@@ -783,6 +853,7 @@ public abstract class AbstractExtFactory_c implements ExtFactory
         return postExtStringLit(e);
     }
 
+    @Override
     public final Ext extSwitchBlock() {
         Ext e = extSwitchBlockImpl();
 
@@ -793,6 +864,7 @@ public abstract class AbstractExtFactory_c implements ExtFactory
         return postExtSwitchBlock(e);
     }
 
+    @Override
     public final Ext extSwitchElement() {
         Ext e = extSwitchElementImpl();
 
@@ -803,6 +875,7 @@ public abstract class AbstractExtFactory_c implements ExtFactory
         return postExtSwitchElement(e);
     }
 
+    @Override
     public final Ext extSwitch() {
         Ext e = extSwitchImpl();
 
@@ -813,6 +886,7 @@ public abstract class AbstractExtFactory_c implements ExtFactory
         return postExtSwitch(e);
     }
 
+    @Override
     public final Ext extSynchronized() {
         Ext e = extSynchronizedImpl();
 
@@ -823,6 +897,7 @@ public abstract class AbstractExtFactory_c implements ExtFactory
         return postExtSynchronized(e);
     }
 
+    @Override
     public final Ext extTerm() {
         Ext e = extTermImpl();
 
@@ -833,6 +908,7 @@ public abstract class AbstractExtFactory_c implements ExtFactory
         return postExtTerm(e);
     }
 
+    @Override
     public final Ext extThrow() {
         Ext e = extThrowImpl();
 
@@ -843,6 +919,7 @@ public abstract class AbstractExtFactory_c implements ExtFactory
         return postExtThrow(e);
     }
 
+    @Override
     public final Ext extTry() {
         Ext e = extTryImpl();
 
@@ -853,6 +930,7 @@ public abstract class AbstractExtFactory_c implements ExtFactory
         return postExtTry(e);
     }
 
+    @Override
     public final Ext extTypeNode() {
         Ext e = extTypeNodeImpl();
 
@@ -863,6 +941,7 @@ public abstract class AbstractExtFactory_c implements ExtFactory
         return postExtTypeNode(e);
     }
 
+    @Override
     public final Ext extUnary() {
         Ext e = extUnaryImpl();
 
@@ -873,6 +952,7 @@ public abstract class AbstractExtFactory_c implements ExtFactory
         return postExtUnary(e);
     }
 
+    @Override
     public final Ext extWhile() {
         Ext e = extWhileImpl();
 

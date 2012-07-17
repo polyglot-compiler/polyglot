@@ -52,7 +52,7 @@ public class ClassDecl_c extends Term_c implements ClassDecl
     protected ParsedClassType type;
 
     public ClassDecl_c(Position pos, Flags flags, Id name,
-                       TypeNode superClass, List interfaces, ClassBody body) {
+                       TypeNode superClass, List<TypeNode> interfaces, ClassBody body) {
 	    super(pos);
 	    assert(flags != null && name != null && interfaces != null && body != null); // superClass may be null, interfaces may be empty
 	    this.flags = flags;
@@ -62,18 +62,22 @@ public class ClassDecl_c extends Term_c implements ClassDecl
 	    this.body = body;
     }
     
+    @Override
     public boolean isDisambiguated() {
         return super.isDisambiguated() && type != null && type.isCanonical() && type.supertypesResolved() && type.signaturesResolved();
     }
     
+    @Override
     public MemberInstance memberInstance() {
         return type;
     }
 
+    @Override
     public ParsedClassType type() {
 	    return type;
     }
 
+    @Override
     public ClassDecl type(ParsedClassType type) {
             if (type == this.type) return this;
 	    ClassDecl_c n = (ClassDecl_c) copy();
@@ -81,10 +85,12 @@ public class ClassDecl_c extends Term_c implements ClassDecl
 	    return n;
     }
 
+    @Override
     public Flags flags() {
 	    return this.flags;
     }
 
+    @Override
     public ClassDecl flags(Flags flags) {
             if (flags.equals(this.flags)) return this;
 	    ClassDecl_c n = (ClassDecl_c) copy();
@@ -92,55 +98,65 @@ public class ClassDecl_c extends Term_c implements ClassDecl
 	    return n;
     }
     
+    @Override
     public Id id() {
         return this.name;
     }
     
+    @Override
     public ClassDecl id(Id name) {
         ClassDecl_c n = (ClassDecl_c) copy();
         n.name = name;
         return n;
     }
 
+    @Override
     public String name() {
 	    return this.name.id();
     }
 
+    @Override
     public ClassDecl name(String name) {
         return id(this.name.id(name));
     }
 
+    @Override
     public TypeNode superClass() {
 	    return this.superClass;
     }
 
+    @Override
     public ClassDecl superClass(TypeNode superClass) {
 	    ClassDecl_c n = (ClassDecl_c) copy();
 	    n.superClass = superClass;
 	    return n;
     }
 
-    public List interfaces() {
+    @Override
+    public List<TypeNode> interfaces() {
 	    return this.interfaces;
     }
 
-    public ClassDecl interfaces(List interfaces) {
+    @Override
+    public ClassDecl interfaces(List<TypeNode> interfaces) {
 	    ClassDecl_c n = (ClassDecl_c) copy();
 	    n.interfaces = ListUtil.copy(interfaces, true);
 	    return n;
     }
 
+    @Override
     public ClassBody body() {
 	    return this.body;
     }
 
+    @Override
     public ClassDecl body(ClassBody body) {
 	    ClassDecl_c n = (ClassDecl_c) copy();
 	    n.body = body;
 	    return n;
     }
 
-    protected ClassDecl_c reconstruct(Id name, TypeNode superClass, List interfaces, ClassBody body) {
+    protected ClassDecl_c reconstruct(Id name, TypeNode superClass, List<TypeNode> interfaces, ClassBody body) {
 	    if (name != this.name || superClass != this.superClass || ! CollectionUtil.equals(interfaces, this.interfaces) || body != this.body) {
 		    ClassDecl_c n = (ClassDecl_c) copy();
 		    n.name = name;
@@ -157,6 +173,7 @@ public class ClassDecl_c extends Term_c implements ClassDecl
      * Return the first (sub)term performed when evaluating this
      * term.
      */
+    @Override
     public Term firstChild() {
         return body();
     }
@@ -164,19 +181,22 @@ public class ClassDecl_c extends Term_c implements ClassDecl
     /**
      * Visit this term in evaluation order.
      */
-    public List acceptCFG(CFGBuilder v, List succs) {
+    @Override
+    public <T> List<T> acceptCFG(CFGBuilder v, List<T> succs) {
         v.visitCFG(this.body(), this, EXIT);
         return succs;
     }
 
+    @Override
     public Node visitChildren(NodeVisitor v) {
         Id name = (Id) visitChild(this.name, v);
         TypeNode superClass = (TypeNode) visitChild(this.superClass, v);
-        List interfaces = visitList(this.interfaces, v);
+        List<TypeNode> interfaces = visitList(this.interfaces, v);
         ClassBody body = (ClassBody) visitChild(this.body, v);
         return reconstruct(name, superClass, interfaces, body);
     }
 
+    @Override
     public NodeVisitor buildTypesEnter(TypeBuilder tb) throws SemanticException {
 	tb = tb.pushClass(position(), flags, name.id());
         
@@ -200,6 +220,7 @@ public class ClassDecl_c extends Term_c implements ClassDecl
         return tb;
     }
 
+    @Override
     public Node buildTypes(TypeBuilder tb) throws SemanticException {
 	ParsedClassType type = tb.currentClass();        
 
@@ -230,6 +251,7 @@ public class ClassDecl_c extends Term_c implements ClassDecl
         return n.type(type).flags(type.flags());
     }
 
+    @Override
     public Context enterChildScope(Node child, Context c) {
         if (child == this.body) {
             TypeSystem ts = c.typeSystem();
@@ -245,6 +267,7 @@ public class ClassDecl_c extends Term_c implements ClassDecl
         return super.enterChildScope(child, c);
     }
     
+    @Override
     public Node disambiguate(AmbiguityRemover ar) throws SemanticException {
 	if (type == null) {
 	    throw new InternalCompilerError("Missing type.", position());
@@ -279,8 +302,7 @@ public class ClassDecl_c extends Term_c implements ClassDecl
                 supertypesResolved = false;
             }
             
-            for (Iterator i = interfaces.iterator(); supertypesResolved && i.hasNext(); ) {
-                TypeNode tn = (TypeNode) i.next();
+            for (TypeNode tn : interfaces) {
                 if (! tn.isDisambiguated()) {
                     supertypesResolved = false;
                 }
@@ -312,8 +334,7 @@ public class ClassDecl_c extends Term_c implements ClassDecl
             ts.checkCycles(t);
         }
         
-        for (Iterator i = type.interfaces().iterator(); i.hasNext(); ) {
-            Type it = (Type) i.next();
+        for (Type it : type.interfaces()) {
             if (! it.isReference()) {
                 String s = type.flags().isInterface() ? "extend" : "implement";
                 throw new SemanticException("Cannot " + s + " type " + it + ".",
@@ -324,6 +345,9 @@ public class ClassDecl_c extends Term_c implements ClassDecl
         }
     }
     
+    /**
+     * @throws SemanticException 
+     */
     protected void setSuperClass(AmbiguityRemover ar, TypeNode superClass) throws SemanticException {
         TypeSystem ts = ar.typeSystem();
 
@@ -349,9 +373,11 @@ public class ClassDecl_c extends Term_c implements ClassDecl
         }    
     }
 
-    protected void setInterfaces(AmbiguityRemover ar, List newInterfaces) throws SemanticException {
-        for (Iterator i = newInterfaces.iterator(); i.hasNext(); ) {
-            TypeNode tn = (TypeNode) i.next();
+    /**
+     * @throws SemanticException  
+     */
+    protected void setInterfaces(AmbiguityRemover ar, List<TypeNode> newInterfaces) throws SemanticException {
+        for (TypeNode tn : newInterfaces) {
             Type t = tn.type();
     
             if (Report.should_report(Report.types, 3))
@@ -378,8 +404,7 @@ public class ClassDecl_c extends Term_c implements ClassDecl
         }
 
         // We added it to the type, check if it's in the class body.
-        for (Iterator i = body().members().iterator(); i.hasNext(); ) {
-            ClassMember cm = (ClassMember) i.next();
+        for (ClassMember cm : body().members()) {
             if (cm instanceof ConstructorDecl) {
                 ConstructorDecl cd = (ConstructorDecl) cm;
                 if (cd.constructorInstance() == defaultCI) {
@@ -403,11 +428,11 @@ public class ClassDecl_c extends Term_c implements ClassDecl
         Block block = null;
         if (this.type.superType() instanceof ClassType) {
             ConstructorInstance sci = ts.findConstructor(
-                (ClassType) this.type.superType(), Collections.EMPTY_LIST,
+                (ClassType) this.type.superType(), Collections.<Type> emptyList(),
                 this.type);
 
             ConstructorCall cc = nf.SuperCall(position().startOf(), 
-                                              Collections.EMPTY_LIST);
+                                              Collections.<Expr> emptyList());
             cc = cc.constructorInstance(sci);
             block = nf.Block(position().startOf(), cc);
         }
@@ -416,19 +441,22 @@ public class ClassDecl_c extends Term_c implements ClassDecl
         }
         ConstructorDecl cd = nf.ConstructorDecl(body().position().startOf(),
                                                 Flags.PUBLIC,
-                                                name, Collections.EMPTY_LIST,
-                                                Collections.EMPTY_LIST,
+                                                name, Collections
+                                                    .<Formal> emptyList(),
+                                                Collections
+                                                    .<TypeNode> emptyList(),
                                                 block);
-        cd = (ConstructorDecl) cd.constructorInstance(ci);
+        cd = cd.constructorInstance(ci);
         return body(body.addMember(cd));
     }
 
+    @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
-        if (this.type().isNested() && (this.type() instanceof Named)) {
+        if (this.type().isNested() && this.type() != null) {
             // The class cannot have the same simple name as any enclosing class.
             ClassType container = this.type.outer();
 
-            while (container instanceof Named) {
+            while (container != null) {
                 if (!container.isAnonymous()) {
                     String name = ((Named) container).name();
     
@@ -503,8 +531,7 @@ public class ClassDecl_c extends Term_c implements ClassDecl
             }
         }
         
-        for (Iterator i = interfaces.iterator(); i.hasNext(); ) {
-            TypeNode tn = (TypeNode) i.next();
+        for (TypeNode tn : interfaces) {
             Type t = tn.type();
     
             if (! t.isClass() || ! t.toClass().flags().isInterface()) {
@@ -541,6 +568,7 @@ public class ClassDecl_c extends Term_c implements ClassDecl
         return this;
     }
 
+    @Override
     public String toString() {
 	    return flags.clearInterface().translate() +
 		       (flags.isInterface() ? "interface " : "class ") + name + " " + body;
@@ -580,8 +608,8 @@ public class ClassDecl_c extends Term_c implements ClassDecl
             }
 
             w.begin(0);
-            for (Iterator i = interfaces().iterator(); i.hasNext(); ) {
-                TypeNode tn = (TypeNode) i.next();
+            for (Iterator<TypeNode> i = interfaces().iterator(); i.hasNext(); ) {
+                TypeNode tn = i.next();
                 print(tn, w, tr);
 
                 if (i.hasNext()) {
@@ -601,12 +629,14 @@ public class ClassDecl_c extends Term_c implements ClassDecl
         w.newline(0);
     }
     
+    @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
         prettyPrintHeader(w, tr);
         print(body(), w, tr);
         prettyPrintFooter(w, tr);
     }
 
+    @Override
     public void dump(CodeWriter w) {
             super.dump(w);
 
@@ -627,6 +657,7 @@ public class ClassDecl_c extends Term_c implements ClassDecl
      * @param parent
      * @param ar
      */
+    @Override
     public Node disambiguateOverride(Node parent, AmbiguityRemover ar) throws SemanticException {
         /*
         // Don't do anything special for member classes; the disambiguation passes
@@ -664,6 +695,7 @@ public class ClassDecl_c extends Term_c implements ClassDecl
 
         return null;
     }
+    @Override
     public Node copy(NodeFactory nf) {
         return nf.ClassDecl(this.position, this.flags, this.name, this.superClass, this.interfaces, this.body);
     }

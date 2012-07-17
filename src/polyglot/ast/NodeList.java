@@ -34,7 +34,7 @@ import java.util.List;
  * <code>NodeList</code> to the visitor. The rewritten node's parent would
  * then be responsible for properly splicing those nodes into the AST.
  */
-public interface NodeList extends Node {
+public interface NodeList<T extends Node> extends Node {
   /**
    * Get the <code>NodeFactory</code> to use when converting the list to a
    * proper AST node.
@@ -42,10 +42,10 @@ public interface NodeList extends Node {
   NodeFactory nodeFactory();
   
   /** Get the nodes contained in the list. */
-  List nodes();
+  List<T> nodes();
   
   /** Set the nodes contained in the list. */
-  NodeList nodes(List nodes);
+  NodeList<T> nodes(List<T> nodes);
   
   /** Convert the list into a <code>Block</code>. */
   Block toBlock();

@@ -37,13 +37,13 @@ public interface ClassBody extends Term
      * List of the class's members.
      * @return A list of {@link polyglot.ast.ClassMember ClassMember}.
      */
-    List members();
+    List<ClassMember> members();
 
     /**
      * Set the class's members.
      * @param members A list of {@link polyglot.ast.ClassMember ClassMember}.
      */
-    ClassBody members(List members);
+    ClassBody members(List<ClassMember> members);
 
     /**
      * Add a member to the class, returning a new node.

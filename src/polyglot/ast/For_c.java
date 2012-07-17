@@ -42,7 +42,7 @@ public class For_c extends Loop_c implements For
     protected List<ForUpdate> iters;
     protected Stmt body;
 
-    public For_c(Position pos, List inits, Expr cond, List iters, Stmt body) {
+    public For_c(Position pos, List<ForInit> inits, Expr cond, List<ForUpdate> iters, Stmt body) {
 	super(pos);
 	assert(inits != null && iters != null && body != null); // cond may be null, inits and iters may be empty
 	this.inits = ListUtil.copy(inits, true);
@@ -52,23 +52,27 @@ public class For_c extends Loop_c implements For
     }
 
     /** List of initialization statements */
-    public List inits() {
+    @Override
+    public List<ForInit> inits() {
 	return Collections.unmodifiableList(this.inits);
     }
 
     /** Set the inits of the statement. */
-    public For inits(List inits) {
+    @Override
+    public For inits(List<ForInit> inits) {
 	For_c n = (For_c) copy();
 	n.inits = ListUtil.copy(inits, true);
 	return n;
     }
 
     /** Loop condition */
+    @Override
     public Expr cond() {
 	return this.cond;
     }
 
     /** Set the conditional of the statement. */
+    @Override
     public For cond(Expr cond) {
 	For_c n = (For_c) copy();
 	n.cond = cond;
@@ -76,23 +80,27 @@ public class For_c extends Loop_c implements For
     }
 
     /** List of iterator expressions. */
-    public List iters() {
+    @Override
+    public List<ForUpdate> iters() {
 	return Collections.unmodifiableList(this.iters);
     }
 
     /** Set the iterator expressions of the statement. */
-    public For iters(List iters) {
+    @Override
+    public For iters(List<ForUpdate> iters) {
 	For_c n = (For_c) copy();
 	n.iters = ListUtil.copy(iters, true);
 	return n;
     }
 
     /** Loop body */
+    @Override
     public Stmt body() {
 	return this.body;
     }
 
     /** Set the body of the statement. */
+    @Override
     public For body(Stmt body) {
 	For_c n = (For_c) copy();
 	n.body = body;
@@ -100,7 +108,7 @@ public class For_c extends Loop_c implements For
     }
 
     /** Reconstruct the statement. */
-    protected For_c reconstruct(List inits, Expr cond, List iters, Stmt body) {
+    protected For_c reconstruct(List<ForInit> inits, Expr cond, List<ForUpdate> iters, Stmt body) {
 	if (! CollectionUtil.equals(inits, this.inits) || cond != this.cond || ! CollectionUtil.equals(iters, this.iters) || body != this.body) {
 	    For_c n = (For_c) copy();
 	    n.inits = ListUtil.copy(inits, true);
@@ -114,20 +122,23 @@ public class For_c extends Loop_c implements For
     }
 
     /** Visit the children of the statement. */
+    @Override
     public Node visitChildren(NodeVisitor v) {
-	List inits = visitList(this.inits, v);
+	List<ForInit> inits = visitList(this.inits, v);
 	Expr cond = (Expr) visitChild(this.cond, v);
-	List iters = visitList(this.iters, v);
+	List<ForUpdate> iters = visitList(this.iters, v);
         Node body = visitChild(this.body, v);
-	if (body instanceof NodeList) body = ((NodeList) body).toBlock();
+	if (body instanceof NodeList) body = ((NodeList<?>) body).toBlock();
 	return reconstruct(inits, cond, iters, (Stmt) body);
     }
 
+    @Override
     public Context enterScope(Context c) {
 	return c.pushBlock();
     }
 
     /** Type check the statement. */
+    @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
 	TypeSystem ts = tc.typeSystem();
 
@@ -136,9 +147,7 @@ public class For_c extends Loop_c implements For
         // just to be sure.
         Type t = null;
 
-        for (Iterator i = inits.iterator(); i.hasNext(); ) {
-            ForInit s = (ForInit) i.next();
-
+        for (ForInit s : inits) {
             if (s instanceof LocalDecl) {
                 LocalDecl d = (LocalDecl) s;
                 Type dt = d.type().type();
@@ -164,6 +173,7 @@ public class For_c extends Loop_c implements For
 	return this;
     }
 
+    @Override
     public Type childExpectedType(Expr child, AscriptionVisitor av) {
         TypeSystem ts = av.typeSystem();
 
@@ -175,14 +185,15 @@ public class For_c extends Loop_c implements For
     }
 
     /** Write the statement to an output file. */
+    @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
 	w.write("for (");
 	w.begin(0);
 
 	if (inits != null) {
             boolean first = true;
-	    for (Iterator i = inits.iterator(); i.hasNext(); ) {
-		ForInit s = (ForInit) i.next();
+	    for (Iterator<ForInit> i = inits.iterator(); i.hasNext(); ) {
+		ForInit s = i.next();
 	        printForInit(s, w, tr, first);
                 first = false;
 
@@ -204,8 +215,8 @@ public class For_c extends Loop_c implements For
 	w.allowBreak(0);
 	
 	if (iters != null) {
-	    for (Iterator i = iters.iterator(); i.hasNext();) {
-		ForUpdate s = (ForUpdate) i.next();
+	    for (Iterator<ForUpdate> i = iters.iterator(); i.hasNext();) {
+		ForUpdate s = i.next();
 		printForUpdate(s, w, tr);
 		
 		if (i.hasNext()) {
@@ -221,6 +232,7 @@ public class For_c extends Loop_c implements For
 	printSubStmt(body, w, tr);
     }
 
+    @Override
     public String toString() {
 	return "for (...) ...";
     }
@@ -239,11 +251,13 @@ public class For_c extends Loop_c implements For
         tr.appendSemicolon(oldSemiColon);
     }
 
+    @Override
     public Term firstChild() {
         return listChild(inits, cond != null ? (Term) cond : body);
     }
 
-    public List acceptCFG(CFGBuilder v, List succs) {
+    @Override
+    public <T> List<T> acceptCFG(CFGBuilder v, List<T> succs) {
         v.visitCFGList(inits, cond != null ? (Term) cond : body, ENTRY);
 
         if (cond != null) {
@@ -262,9 +276,11 @@ public class For_c extends Loop_c implements For
         return succs;
     }
 
+    @Override
     public Term continueTarget() {
         return listChild(iters, cond != null ? (Term) cond : body);
     }
+    @Override
     public Node copy(NodeFactory nf) {
         return nf.For(this.position, this.inits, this.cond, this.iters, this.body);
     }

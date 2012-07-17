@@ -27,11 +27,16 @@ package polyglot.ast;
 
 import java.util.List;
 
-import polyglot.ast.*;
-import polyglot.types.*;
+import polyglot.types.ClassType;
+import polyglot.types.Context;
+import polyglot.types.SemanticException;
+import polyglot.types.TypeSystem;
 import polyglot.util.CodeWriter;
 import polyglot.util.Position;
-import polyglot.visit.*;
+import polyglot.visit.CFGBuilder;
+import polyglot.visit.NodeVisitor;
+import polyglot.visit.PrettyPrinter;
+import polyglot.visit.TypeChecker;
 
 /**
  * A <code>Special</code> is an immutable representation of a
@@ -52,16 +57,19 @@ public class Special_c extends Expr_c implements Special
     }
 
     /** Get the precedence of the expression. */
+    @Override
     public Precedence precedence() {
 	return Precedence.LITERAL;
     }
 
     /** Get the kind of the special expression, either this or super. */
+    @Override
     public Special.Kind kind() {
 	return this.kind;
     }
 
     /** Set the kind of the special expression, either this or super. */
+    @Override
     public Special kind(Special.Kind kind) {
 	Special_c n = (Special_c) copy();
 	n.kind = kind;
@@ -69,11 +77,13 @@ public class Special_c extends Expr_c implements Special
     }
 
     /** Get the qualifier of the special expression. */
+    @Override
     public TypeNode qualifier() {
 	return this.qualifier;
     }
 
     /** Set the qualifier of the special expression. */
+    @Override
     public Special qualifier(TypeNode qualifier) {
 	Special_c n = (Special_c) copy();
 	n.qualifier = qualifier;
@@ -92,12 +102,14 @@ public class Special_c extends Expr_c implements Special
     }
 
     /** Visit the children of the expression. */
+    @Override
     public Node visitChildren(NodeVisitor v) {
 	TypeNode qualifier = (TypeNode) visitChild(this.qualifier, v);
 	return reconstruct(qualifier);
     }
 
     /** Type check the expression. */
+    @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
         TypeSystem ts = tc.typeSystem();
         Context c = tc.context();
@@ -145,6 +157,7 @@ public class Special_c extends Expr_c implements Special
         return this;
     }
 
+    @Override
     public Term firstChild() {
         if (qualifier != null) {
             return qualifier;
@@ -153,7 +166,8 @@ public class Special_c extends Expr_c implements Special
         return null;
     }
 
-    public List acceptCFG(CFGBuilder v, List succs) {
+    @Override
+    public <T> List<T> acceptCFG(CFGBuilder v, List<T> succs) {
         if (qualifier != null) {
             v.visitCFG(qualifier, this, EXIT);
         }
@@ -161,11 +175,13 @@ public class Special_c extends Expr_c implements Special
         return succs;
     }
 
+    @Override
     public String toString() {
 	return (qualifier != null ? qualifier.type().toClass().name() + "." : "") + kind;
     }
 
     /** Write the expression to an output file. */
+    @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
 	if (qualifier != null) {
 	    w.write(qualifier.type().toClass().name());
@@ -175,6 +191,7 @@ public class Special_c extends Expr_c implements Special
 	w.write(kind.toString());
     }
 
+    @Override
     public void dump(CodeWriter w) {
       super.dump(w);
 
@@ -186,6 +203,7 @@ public class Special_c extends Expr_c implements Special
       }
     }
     
+    @Override
     public Node copy(NodeFactory nf) {
         return nf.Special(this.position, this.kind, this.qualifier);
     }

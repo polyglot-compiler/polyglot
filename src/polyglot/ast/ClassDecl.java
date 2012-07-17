@@ -48,6 +48,7 @@ public interface ClassDecl extends Term, TopLevelDecl, ClassMember
     /**
      * The class declaration's flags.
      */
+    @Override
     Flags flags();
 
     /**
@@ -68,6 +69,7 @@ public interface ClassDecl extends Term, TopLevelDecl, ClassMember
     /**
      * The class declaration's name.
      */
+    @Override
     String name();
 
     /**
@@ -89,13 +91,13 @@ public interface ClassDecl extends Term, TopLevelDecl, ClassMember
      * The class's interface list.
      * @return A list of {@link polyglot.ast.TypeNode TypeNode}.
      */
-    List interfaces();
+    List<TypeNode> interfaces();
 
     /**
      * Set the class's interface list.
      * @param interfaces A list of {@link polyglot.ast.TypeNode TypeNode}.
      */
-    ClassDecl interfaces(List interfaces);
+    ClassDecl interfaces(List<TypeNode> interfaces);
 
     /**
      * The class's body.

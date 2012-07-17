@@ -40,26 +40,28 @@ public class ArrayInit_c extends Expr_c implements ArrayInit
 {
     protected List<Expr> elements;
 
-    public ArrayInit_c(Position pos, List elements) {
+    public ArrayInit_c(Position pos, List<Expr> elements) {
 	super(pos);
 	assert(elements != null);
 	this.elements = ListUtil.copy(elements, true);
     }
 
     /** Get the elements of the initializer. */
-    public List elements() {
+    @Override
+    public List<Expr> elements() {
 	return this.elements;
     }
 
     /** Set the elements of the initializer. */
-    public ArrayInit elements(List elements) {
+    @Override
+    public ArrayInit elements(List<Expr> elements) {
 	ArrayInit_c n = (ArrayInit_c) copy();
 	n.elements = ListUtil.copy(elements, true);
 	return n;
     }
 
     /** Reconstruct the initializer. */
-    protected ArrayInit_c reconstruct(List elements) {
+    protected ArrayInit_c reconstruct(List<Expr> elements) {
 	if (! CollectionUtil.equals(elements, this.elements)) {
 	    ArrayInit_c n = (ArrayInit_c) copy();
 	    n.elements = ListUtil.copy(elements, true);
@@ -70,20 +72,20 @@ public class ArrayInit_c extends Expr_c implements ArrayInit
     }
 
     /** Visit the children of the initializer. */
+    @Override
     public Node visitChildren(NodeVisitor v) {
-	List elements = visitList(this.elements, v);
+	List<Expr> elements = visitList(this.elements, v);
 	return reconstruct(elements);
     }
 
     /** Type check the initializer. */
+    @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
         TypeSystem ts = tc.typeSystem();
 
 	Type type = null;
 
-	for (Iterator i = elements.iterator(); i.hasNext(); ) {
-	    Expr e = (Expr) i.next();
-
+	for (Expr e : elements) {
 	    if (type == null) {
 	        type = e.type();
 	    }
@@ -104,6 +106,7 @@ public class ArrayInit_c extends Expr_c implements ArrayInit
         return ts.arrayOf(baseType);
     }
 
+    @Override
     public Type childExpectedType(Expr child, AscriptionVisitor av) {
         if (elements.isEmpty()) {
             return child.type();
@@ -120,9 +123,7 @@ public class ArrayInit_c extends Expr_c implements ArrayInit
 
         TypeSystem ts = av.typeSystem();
 
-	for (Iterator i = elements.iterator(); i.hasNext(); ) {
-	    Expr e = (Expr) i.next();
-
+	for (Expr e : elements) {
             if (e == child) {
                 if (ts.numericConversionValid(t, e.constantValue())) {
                     return child.type();
@@ -136,6 +137,7 @@ public class ArrayInit_c extends Expr_c implements ArrayInit
         return child.type();
     }
 
+    @Override
     public void typeCheckElements(Type lhsType) throws SemanticException {
         TypeSystem ts = lhsType.typeSystem();
 
@@ -147,8 +149,7 @@ public class ArrayInit_c extends Expr_c implements ArrayInit
         // Check if we can assign each individual element.
         Type t = lhsType.toArray().base();
 
-        for (Iterator i = elements.iterator(); i.hasNext(); ) {
-            Expr e = (Expr) i.next();
+        for (Expr e : elements) {
             Type s = e.type();
 
             if (e instanceof ArrayInit) {
@@ -165,16 +166,18 @@ public class ArrayInit_c extends Expr_c implements ArrayInit
         }
     }
 
+    @Override
     public String toString() {
 	return "{ ... }";
     }
 
     /** Write the initializer to an output file. */
+    @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
 	w.write("{ ");
 
-	for (Iterator i = elements.iterator(); i.hasNext(); ) {
-	    Expr e = (Expr) i.next();
+	for (Iterator<Expr> i = elements.iterator(); i.hasNext(); ) {
+	    Expr e = i.next();
 	    print(e, w, tr);
 
 	    if (i.hasNext()) {
@@ -186,14 +189,17 @@ public class ArrayInit_c extends Expr_c implements ArrayInit
 	w.write(" }");
     }
 
+    @Override
     public Term firstChild() {
         return listChild(elements, null);
     }
 
-    public List acceptCFG(CFGBuilder v, List succs) {
+    @Override
+    public <T> List<T> acceptCFG(CFGBuilder v, List<T> succs) {
         v.visitCFGList(elements, this, EXIT);
         return succs;
     }
+    @Override
     public Node copy(NodeFactory nf) {
         return nf.ArrayInit(this.position, this.elements);
     }

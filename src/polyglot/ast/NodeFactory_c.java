@@ -71,7 +71,7 @@ public class NodeFactory_c extends AbstractNodeFactory_c
     /**
      * Utility method to find an instance of an Extension Factory
      */
-    protected final ExtFactory findExtFactInstance(Class c) {
+    protected final ExtFactory findExtFactInstance(Class<? extends ExtFactory> c) {
         ExtFactory e = extFactory();
         while (e != null) {
             if (c.isInstance(e)) {
@@ -83,6 +83,7 @@ public class NodeFactory_c extends AbstractNodeFactory_c
         return null;
     }
     
+    @Override
     public Id Id(Position pos, String name) {
         Id n = new Id_c(pos, name);
         n = (Id) n.ext(extFactory.extId());
@@ -90,6 +91,7 @@ public class NodeFactory_c extends AbstractNodeFactory_c
         return n;
     }
 
+    @Override
     public AmbPrefix AmbPrefix(Position pos, Prefix prefix, Id name) {
         AmbPrefix n = new AmbPrefix_c(pos, prefix, name);
         n = (AmbPrefix)n.ext(extFactory.extAmbPrefix());
@@ -97,6 +99,7 @@ public class NodeFactory_c extends AbstractNodeFactory_c
         return n;
     }
     
+    @Override
     public AmbReceiver AmbReceiver(Position pos, Prefix prefix, Id name) {
         AmbReceiver n = new AmbReceiver_c(pos, prefix, name);
         n = (AmbReceiver)n.ext(extFactory.extAmbReceiver());
@@ -104,6 +107,7 @@ public class NodeFactory_c extends AbstractNodeFactory_c
         return n;
     }
 
+    @Override
     public AmbQualifierNode AmbQualifierNode(Position pos, QualifierNode qualifier, Id name) {
         AmbQualifierNode n = new AmbQualifierNode_c(pos, qualifier, name);
         n = (AmbQualifierNode)n.ext(extFactory.extAmbQualifierNode());
@@ -111,6 +115,7 @@ public class NodeFactory_c extends AbstractNodeFactory_c
         return n;
     }
     
+    @Override
     public AmbExpr AmbExpr(Position pos, Id name) {
         AmbExpr n = new AmbExpr_c(pos, name);
         n = (AmbExpr)n.ext(extFactory.extAmbExpr());
@@ -118,6 +123,7 @@ public class NodeFactory_c extends AbstractNodeFactory_c
         return n;
     }
     
+    @Override
     public AmbTypeNode AmbTypeNode(Position pos, QualifierNode qualifier, Id name) {
         AmbTypeNode n = new AmbTypeNode_c(pos, qualifier, name);
         n = (AmbTypeNode)n.ext(extFactory.extAmbTypeNode());
@@ -125,6 +131,7 @@ public class NodeFactory_c extends AbstractNodeFactory_c
         return n;
     }
 
+    @Override
     public ArrayAccess ArrayAccess(Position pos, Expr base, Expr index) {
         ArrayAccess n = new ArrayAccess_c(pos, base, index);
         n = (ArrayAccess)n.ext(extFactory.extArrayAccess());
@@ -132,13 +139,15 @@ public class NodeFactory_c extends AbstractNodeFactory_c
         return n;
     }
 
-    public ArrayInit ArrayInit(Position pos, List elements) {
+    @Override
+    public ArrayInit ArrayInit(Position pos, List<Expr> elements) {
         ArrayInit n = new ArrayInit_c(pos, CollectionUtil.nonNullList(elements));
         n = (ArrayInit)n.ext(extFactory.extArrayInit());
         n = (ArrayInit)n.del(delFactory.delArrayInit());
         return n;
     }
 
+    @Override
     public Assert Assert(Position pos, Expr cond, Expr errorMessage) {
         Assert n = new Assert_c(pos, cond, errorMessage);
         n = (Assert)n.ext(extFactory.extAssert());
@@ -146,6 +155,7 @@ public class NodeFactory_c extends AbstractNodeFactory_c
         return n;
     }
 
+    @Override
     public Assign Assign(Position pos, Expr left, Assign.Operator op, Expr right) {
         if (left instanceof Local) {
             return LocalAssign(pos, (Local)left, op, right);
@@ -159,24 +169,28 @@ public class NodeFactory_c extends AbstractNodeFactory_c
         return AmbAssign(pos, left, op, right);
     }
 
+    @Override
     public LocalAssign LocalAssign(Position pos, Local left, Assign.Operator op, Expr right) {
         LocalAssign n = new LocalAssign_c(pos, left, op, right);
         n = (LocalAssign)n.ext(extFactory.extLocalAssign());
         n = (LocalAssign)n.del(delFactory.delLocalAssign());
         return n;
     }
+    @Override
     public FieldAssign FieldAssign(Position pos, Field left, Assign.Operator op, Expr right) {
         FieldAssign n = new FieldAssign_c(pos, left, op, right);
         n = (FieldAssign)n.ext(extFactory.extFieldAssign());
         n = (FieldAssign)n.del(delFactory.delFieldAssign());
         return n;
     }
+    @Override
     public ArrayAccessAssign ArrayAccessAssign(Position pos, ArrayAccess left, Assign.Operator op, Expr right) {
         ArrayAccessAssign n = new ArrayAccessAssign_c(pos, left, op, right);
         n = (ArrayAccessAssign)n.ext(extFactory.extArrayAccessAssign());
         n = (ArrayAccessAssign)n.del(delFactory.delArrayAccessAssign());
         return n;
     }
+    @Override
     public AmbAssign AmbAssign(Position pos, Expr left, Assign.Operator op, Expr right) {
         AmbAssign n = new AmbAssign_c(pos, left, op, right);
         n = (AmbAssign)n.ext(extFactory.extAmbAssign());
@@ -184,6 +198,7 @@ public class NodeFactory_c extends AbstractNodeFactory_c
         return n;
     }
 
+    @Override
     public Binary Binary(Position pos, Expr left, Binary.Operator op, Expr right) {
         Binary n = new Binary_c(pos, left, op, right);
         n = (Binary)n.ext(extFactory.extBinary());
@@ -191,20 +206,23 @@ public class NodeFactory_c extends AbstractNodeFactory_c
         return n;
     }
 
-    public Block Block(Position pos, List statements) {
+    @Override
+    public Block Block(Position pos, List<Stmt> statements) {
         Block n = new Block_c(pos, CollectionUtil.nonNullList(statements));
         n = (Block)n.ext(extFactory.extBlock());
         n = (Block)n.del(delFactory.delBlock());
         return n;
     }
 
-    public SwitchBlock SwitchBlock(Position pos, List statements) {
+    @Override
+    public SwitchBlock SwitchBlock(Position pos, List<Stmt> statements) {
         SwitchBlock n = new SwitchBlock_c(pos, CollectionUtil.nonNullList(statements));
         n = (SwitchBlock)n.ext(extFactory.extSwitchBlock());
         n = (SwitchBlock)n.del(delFactory.delSwitchBlock());
         return n;
     }
 
+    @Override
     public BooleanLit BooleanLit(Position pos, boolean value) {
         BooleanLit n = new BooleanLit_c(pos, value);
         n = (BooleanLit)n.ext(extFactory.extBooleanLit());
@@ -212,6 +230,7 @@ public class NodeFactory_c extends AbstractNodeFactory_c
         return n;
     }
 
+    @Override
     public Branch Branch(Position pos, Branch.Kind kind, Id label) {
         Branch n = new Branch_c(pos, kind, label);
         n = (Branch)n.ext(extFactory.extBranch());
@@ -219,13 +238,15 @@ public class NodeFactory_c extends AbstractNodeFactory_c
         return n;
     }
 
-    public Call Call(Position pos, Receiver target, Id name, List args) {
+    @Override
+    public Call Call(Position pos, Receiver target, Id name, List<Expr> args) {
         Call n = new Call_c(pos, target, name, CollectionUtil.nonNullList(args));
         n = (Call)n.ext(extFactory.extCall());
         n = (Call)n.del(delFactory.delCall());
         return n;
     }
 
+    @Override
     public Case Case(Position pos, Expr expr) {
         Case n = new Case_c(pos, expr);
         n = (Case)n.ext(extFactory.extCase());
@@ -233,6 +254,7 @@ public class NodeFactory_c extends AbstractNodeFactory_c
         return n;
     }
 
+    @Override
     public Cast Cast(Position pos, TypeNode type, Expr expr) {
         Cast n = new Cast_c(pos, type, expr);
         n = (Cast)n.ext(extFactory.extCast());
@@ -240,6 +262,7 @@ public class NodeFactory_c extends AbstractNodeFactory_c
         return n;
     }
 
+    @Override
     public Catch Catch(Position pos, Formal formal, Block body) {
         Catch n = new Catch_c(pos, formal, body);
         n = (Catch)n.ext(extFactory.extCatch());
@@ -247,6 +270,7 @@ public class NodeFactory_c extends AbstractNodeFactory_c
         return n;
     }
 
+    @Override
     public CharLit CharLit(Position pos, char value) {
         CharLit n = new CharLit_c(pos, value);
         n = (CharLit)n.ext(extFactory.extCharLit());
@@ -254,20 +278,23 @@ public class NodeFactory_c extends AbstractNodeFactory_c
         return n;
     }
 
-    public ClassBody ClassBody(Position pos, List members) {
+    @Override
+    public ClassBody ClassBody(Position pos, List<ClassMember> members) {
         ClassBody n = new ClassBody_c(pos, CollectionUtil.nonNullList(members));
         n = (ClassBody)n.ext(extFactory.extClassBody());
         n = (ClassBody)n.del(delFactory.delClassBody());
         return n;
     }
     
-    public ClassDecl ClassDecl(Position pos, Flags flags, Id name, TypeNode superClass, List interfaces, ClassBody body) {
+    @Override
+    public ClassDecl ClassDecl(Position pos, Flags flags, Id name, TypeNode superClass, List<TypeNode> interfaces, ClassBody body) {
         ClassDecl n = new ClassDecl_c(pos, flags, name, superClass, CollectionUtil.nonNullList(interfaces), body);
         n = (ClassDecl)n.ext(extFactory.extClassDecl());
         n = (ClassDecl)n.del(delFactory.delClassDecl());
         return n;
     }
 
+    @Override
     public ClassLit ClassLit(Position pos, TypeNode typeNode) {
         ClassLit n = new ClassLit_c(pos, typeNode);
         n = (ClassLit)n.ext(extFactory.extClassLit());
@@ -275,6 +302,7 @@ public class NodeFactory_c extends AbstractNodeFactory_c
         return n;
     }
 
+    @Override
     public Conditional Conditional(Position pos, Expr cond, Expr consequent, Expr alternative) {
         Conditional n = new Conditional_c(pos, cond, consequent, alternative);
         n = (Conditional)n.ext(extFactory.extConditional());
@@ -282,20 +310,23 @@ public class NodeFactory_c extends AbstractNodeFactory_c
         return n;
     }
 
-    public ConstructorCall ConstructorCall(Position pos, ConstructorCall.Kind kind, Expr outer, List args) {
+    @Override
+    public ConstructorCall ConstructorCall(Position pos, ConstructorCall.Kind kind, Expr outer, List<Expr> args) {
         ConstructorCall n = new ConstructorCall_c(pos, kind, outer, CollectionUtil.nonNullList(args));
         n = (ConstructorCall)n.ext(extFactory.extConstructorCall());
         n = (ConstructorCall)n.del(delFactory.delConstructorCall());
         return n;
     }
     
-    public ConstructorDecl ConstructorDecl(Position pos, Flags flags, Id name, List formals, List throwTypes, Block body) {
+    @Override
+    public ConstructorDecl ConstructorDecl(Position pos, Flags flags, Id name, List<Formal> formals, List<TypeNode> throwTypes, Block body) {
         ConstructorDecl n = new ConstructorDecl_c(pos, flags, name, CollectionUtil.nonNullList(formals), CollectionUtil.nonNullList(throwTypes), body);
         n = (ConstructorDecl)n.ext(extFactory.extConstructorDecl());
         n = (ConstructorDecl)n.del(delFactory.delConstructorDecl());
         return n;
     }
 
+    @Override
     public FieldDecl FieldDecl(Position pos, Flags flags, TypeNode type, Id name, Expr init) {
         FieldDecl n = new FieldDecl_c(pos, flags, type, name, init);
         n = (FieldDecl)n.ext(extFactory.extFieldDecl());
@@ -303,6 +334,7 @@ public class NodeFactory_c extends AbstractNodeFactory_c
         return n;
     }
 
+    @Override
     public Do Do(Position pos, Stmt body, Expr cond) {
         Do n = new Do_c(pos, body, cond);
         n = (Do)n.ext(extFactory.extDo());
@@ -310,6 +342,7 @@ public class NodeFactory_c extends AbstractNodeFactory_c
         return n;
     }
 
+    @Override
     public Empty Empty(Position pos) {
         Empty n = new Empty_c(pos);
         n = (Empty)n.ext(extFactory.extEmpty());
@@ -317,6 +350,7 @@ public class NodeFactory_c extends AbstractNodeFactory_c
         return n;
     }
 
+    @Override
     public Eval Eval(Position pos, Expr expr) {
         Eval n = new Eval_c(pos, expr);
         n = (Eval)n.ext(extFactory.extEval());
@@ -324,6 +358,7 @@ public class NodeFactory_c extends AbstractNodeFactory_c
         return n;
     }
     
+    @Override
     public Field Field(Position pos, Receiver target, Id name) {
         Field n = new Field_c(pos, target, name);
         n = (Field)n.ext(extFactory.extField());
@@ -331,6 +366,7 @@ public class NodeFactory_c extends AbstractNodeFactory_c
         return n;
     }
 
+    @Override
     public FloatLit FloatLit(Position pos, FloatLit.Kind kind, double value) {
         FloatLit n = new FloatLit_c(pos, kind, value);
         n = (FloatLit)n.ext(extFactory.extFloatLit());
@@ -338,13 +374,15 @@ public class NodeFactory_c extends AbstractNodeFactory_c
         return n;
     }
 
-    public For For(Position pos, List inits, Expr cond, List iters, Stmt body) {
+    @Override
+    public For For(Position pos, List<ForInit> inits, Expr cond, List<ForUpdate> iters, Stmt body) {
         For n = new For_c(pos, CollectionUtil.nonNullList(inits), cond, CollectionUtil.nonNullList(iters), body);
         n = (For)n.ext(extFactory.extFor());
         n = (For)n.del(delFactory.delFor());
         return n;
     }
 
+    @Override
     public Formal Formal(Position pos, Flags flags, TypeNode type, Id name) {
         Formal n = new Formal_c(pos, flags, type, name);
         n = (Formal)n.ext(extFactory.extFormal());
@@ -352,6 +390,7 @@ public class NodeFactory_c extends AbstractNodeFactory_c
         return n;
     }
     
+    @Override
     public If If(Position pos, Expr cond, Stmt consequent, Stmt alternative) {
         If n = new If_c(pos, cond, consequent, alternative);
         n = (If)n.ext(extFactory.extIf());
@@ -359,6 +398,7 @@ public class NodeFactory_c extends AbstractNodeFactory_c
         return n;
     }
     
+    @Override
     public Import Import(Position pos, Import.Kind kind, String name) {
         Import n = new Import_c(pos, kind, name);
         n = (Import)n.ext(extFactory.extImport());
@@ -366,6 +406,7 @@ public class NodeFactory_c extends AbstractNodeFactory_c
         return n;
     }
 
+    @Override
     public Initializer Initializer(Position pos, Flags flags, Block body) {
         Initializer n = new Initializer_c(pos, flags, body);
         n = (Initializer)n.ext(extFactory.extInitializer());
@@ -373,6 +414,7 @@ public class NodeFactory_c extends AbstractNodeFactory_c
         return n;
     }
 
+    @Override
     public Instanceof Instanceof(Position pos, Expr expr, TypeNode type) {
         Instanceof n = new Instanceof_c(pos, expr, type);
         n = (Instanceof)n.ext(extFactory.extInstanceof());
@@ -380,6 +422,7 @@ public class NodeFactory_c extends AbstractNodeFactory_c
         return n;
     }
 
+    @Override
     public IntLit IntLit(Position pos, IntLit.Kind kind, long value) {
         IntLit n = new IntLit_c(pos, kind, value);
         n = (IntLit)n.ext(extFactory.extIntLit());
@@ -387,6 +430,7 @@ public class NodeFactory_c extends AbstractNodeFactory_c
         return n;
     }
 
+    @Override
     public Labeled Labeled(Position pos, Id label, Stmt body) {
         Labeled n = new Labeled_c(pos, label, body);
         n = (Labeled)n.ext(extFactory.extLabeled());
@@ -394,6 +438,7 @@ public class NodeFactory_c extends AbstractNodeFactory_c
         return n;
     }
 
+    @Override
     public Local Local(Position pos, Id name) {
         Local n = new Local_c(pos, name);
         n = (Local)n.ext(extFactory.extLocal());
@@ -401,6 +446,7 @@ public class NodeFactory_c extends AbstractNodeFactory_c
         return n;
     }
 
+    @Override
     public LocalClassDecl LocalClassDecl(Position pos, ClassDecl decl) {
         LocalClassDecl n = new LocalClassDecl_c(pos, decl);
         n = (LocalClassDecl)n.ext(extFactory.extLocalClassDecl());
@@ -408,6 +454,7 @@ public class NodeFactory_c extends AbstractNodeFactory_c
         return n;
     }
     
+    @Override
     public LocalDecl LocalDecl(Position pos, Flags flags, TypeNode type, Id name, Expr init) {
         LocalDecl n = new LocalDecl_c(pos, flags, type, name, init);
         n = (LocalDecl)n.ext(extFactory.extLocalDecl());
@@ -415,34 +462,40 @@ public class NodeFactory_c extends AbstractNodeFactory_c
         return n;
     }
 
-    public MethodDecl MethodDecl(Position pos, Flags flags, TypeNode returnType, Id name, List formals, List throwTypes, Block body) {
+    @Override
+    public MethodDecl MethodDecl(Position pos, Flags flags, TypeNode returnType, Id name, List<Formal> formals, List<TypeNode> throwTypes, Block body) {
         MethodDecl n = new MethodDecl_c(pos, flags, returnType, name, CollectionUtil.nonNullList(formals), CollectionUtil.nonNullList(throwTypes), body);
         n = (MethodDecl)n.ext(extFactory.extMethodDecl());
         n = (MethodDecl)n.del(delFactory.delMethodDecl());
         return n;
     }
 
-    public New New(Position pos, Expr outer, TypeNode objectType, List args, ClassBody body) {
+    @Override
+    public New New(Position pos, Expr outer, TypeNode objectType, List<Expr> args, ClassBody body) {
         New n = new New_c(pos, outer, objectType, CollectionUtil.nonNullList(args), body);
         n = (New)n.ext(extFactory.extNew());
         n = (New)n.del(delFactory.delNew());
         return n;
     }
 
-    public NewArray NewArray(Position pos, TypeNode base, List dims, int addDims, ArrayInit init) {
+    @Override
+    public NewArray NewArray(Position pos, TypeNode base, List<Expr> dims, int addDims, ArrayInit init) {
         NewArray n = new NewArray_c(pos, base, CollectionUtil.nonNullList(dims), addDims, init);
         n = (NewArray)n.ext(extFactory.extNewArray());
         n = (NewArray)n.del(delFactory.delNewArray());
         return n;
     }
     
-    public NodeList NodeList(Position pos, NodeFactory nf, List nodes) {
-        NodeList n = new NodeList_c(pos, nf, nodes);
-        n = (NodeList) n.ext(extFactory.extNodeList());
-        n = (NodeList) n.del(delFactory.delNodeList());
+    @SuppressWarnings("unchecked")
+    @Override
+    public <N extends Node> NodeList<N> NodeList(Position pos, NodeFactory nf, List<N> nodes) {
+        NodeList<N> n = new NodeList_c<N>(pos, nf, nodes);
+        n = (NodeList<N>) n.ext(extFactory.extNodeList());
+        n = (NodeList<N>) n.del(delFactory.delNodeList());
         return n;
     }
 
+    @Override
     public NullLit NullLit(Position pos) {
         NullLit n = new NullLit_c(pos);
         n = (NullLit)n.ext(extFactory.extNullLit());
@@ -450,6 +503,7 @@ public class NodeFactory_c extends AbstractNodeFactory_c
         return n;
     }
 
+    @Override
     public Return Return(Position pos, Expr expr) {
         Return n = new Return_c(pos, expr);
         n = (Return)n.ext(extFactory.extReturn());
@@ -457,20 +511,23 @@ public class NodeFactory_c extends AbstractNodeFactory_c
         return n;
     }
 
-    public SourceCollection SourceCollection(Position pos, List sources) {
+    @Override
+    public SourceCollection SourceCollection(Position pos, List<SourceFile> sources) {
         SourceCollection n = new SourceCollection_c(pos, CollectionUtil.nonNullList(sources));
         n = (SourceCollection)n.ext(extFactory.extSourceCollection());
         n = (SourceCollection)n.del(delFactory.delSourceCollection());
         return n;
     }
 
-    public SourceFile SourceFile(Position pos, PackageNode packageName, List imports, List decls) {
+    @Override
+    public SourceFile SourceFile(Position pos, PackageNode packageName, List<Import> imports, List<TopLevelDecl> decls) {
         SourceFile n = new SourceFile_c(pos, packageName, CollectionUtil.nonNullList(imports), CollectionUtil.nonNullList(decls));
         n = (SourceFile)n.ext(extFactory.extSourceFile());
         n = (SourceFile)n.del(delFactory.delSourceFile());
         return n;
     }
 
+    @Override
     public Special Special(Position pos, Special.Kind kind, TypeNode outer) {
          Special n = new Special_c(pos, kind, outer);
         n = (Special)n.ext(extFactory.extSpecial());
@@ -478,6 +535,7 @@ public class NodeFactory_c extends AbstractNodeFactory_c
         return n;
     }
 
+    @Override
     public StringLit StringLit(Position pos, String value) {
         StringLit n = new StringLit_c(pos, value);
         n = (StringLit)n.ext(extFactory.extStringLit());
@@ -485,13 +543,15 @@ public class NodeFactory_c extends AbstractNodeFactory_c
         return n;
     }
 
-    public Switch Switch(Position pos, Expr expr, List elements) {
+    @Override
+    public Switch Switch(Position pos, Expr expr, List<SwitchElement> elements) {
         Switch n = new Switch_c(pos, expr, CollectionUtil.nonNullList(elements));
         n = (Switch)n.ext(extFactory.extSwitch());
         n = (Switch)n.del(delFactory.delSwitch());
         return n;
     }
 
+    @Override
     public Synchronized Synchronized(Position pos, Expr expr, Block body) {
         Synchronized n = new Synchronized_c(pos, expr, body);
         n = (Synchronized)n.ext(extFactory.extSynchronized());
@@ -499,6 +559,7 @@ public class NodeFactory_c extends AbstractNodeFactory_c
         return n;
     }
 
+    @Override
     public Throw Throw(Position pos, Expr expr) {
         Throw n = new Throw_c(pos, expr);
         n = (Throw)n.ext(extFactory.extThrow());
@@ -506,13 +567,15 @@ public class NodeFactory_c extends AbstractNodeFactory_c
         return n;
     }
 
-    public Try Try(Position pos, Block tryBlock, List catchBlocks, Block finallyBlock) {
+    @Override
+    public Try Try(Position pos, Block tryBlock, List<Catch> catchBlocks, Block finallyBlock) {
         Try n = new Try_c(pos, tryBlock, CollectionUtil.nonNullList(catchBlocks), finallyBlock);
         n = (Try)n.ext(extFactory.extTry());
         n = (Try)n.del(delFactory.delTry());
         return n;
     }
 
+    @Override
     public ArrayTypeNode ArrayTypeNode(Position pos, TypeNode base) {
         ArrayTypeNode n = new ArrayTypeNode_c(pos, base);
         n = (ArrayTypeNode)n.ext(extFactory.extArrayTypeNode());
@@ -520,6 +583,7 @@ public class NodeFactory_c extends AbstractNodeFactory_c
         return n;
     }
     
+    @Override
     public CanonicalTypeNode CanonicalTypeNode(Position pos, Type type) {
         if (! type.isCanonical()) {
             throw new InternalCompilerError("Cannot construct a canonical " +
@@ -532,6 +596,7 @@ public class NodeFactory_c extends AbstractNodeFactory_c
         return n;
     }
 
+    @Override
     public PackageNode PackageNode(Position pos, Package p) {
         PackageNode n = new PackageNode_c(pos, p);
         n = (PackageNode)n.ext(extFactory.extPackageNode());
@@ -539,6 +604,7 @@ public class NodeFactory_c extends AbstractNodeFactory_c
         return n;
     }
 
+    @Override
     public Unary Unary(Position pos, Unary.Operator op, Expr expr) {
         Unary n = new Unary_c(pos, op, expr);
         n = (Unary)n.ext(extFactory.extUnary());
@@ -546,6 +612,7 @@ public class NodeFactory_c extends AbstractNodeFactory_c
         return n;
     }
 
+    @Override
     public While While(Position pos, Expr cond, Stmt body) {
         While n = new While_c(pos, cond, body);
         n = (While)n.ext(extFactory.extWhile());

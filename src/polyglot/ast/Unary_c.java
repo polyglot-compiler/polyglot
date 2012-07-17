@@ -25,11 +25,19 @@
 
 package polyglot.ast;
 
-import polyglot.ast.*;
-import polyglot.types.*;
-import polyglot.visit.*;
-import polyglot.util.*;
-import java.util.*;
+import java.util.List;
+
+import polyglot.types.SemanticException;
+import polyglot.types.Type;
+import polyglot.types.TypeSystem;
+import polyglot.util.CodeWriter;
+import polyglot.util.Position;
+import polyglot.visit.AscriptionVisitor;
+import polyglot.visit.CFGBuilder;
+import polyglot.visit.FlowGraph;
+import polyglot.visit.NodeVisitor;
+import polyglot.visit.PrettyPrinter;
+import polyglot.visit.TypeChecker;
 
 /**
  * A <code>Unary</code> represents a Java unary expression, an
@@ -48,25 +56,30 @@ public class Unary_c extends Expr_c implements Unary
     }
 
     /** Get the precedence of the expression. */
+    @Override
     public Precedence precedence() {
 	return Precedence.UNARY;
     }
 
     /** Get the sub-expression of the expression. */
+    @Override
     public Expr expr() {
 	return this.expr;
     }
 
     /** Set the sub-expression of the expression. */
+    @Override
     public Unary expr(Expr expr) { Unary_c n = (Unary_c) copy(); n.expr = expr;
       return n; }
 
     /** Get the operator. */
+    @Override
     public Unary.Operator operator() {
 	return this.op;
     }
 
     /** Set the operator. */
+    @Override
     public Unary operator(Unary.Operator op) {
 	Unary_c n = (Unary_c) copy();
 	n.op = op;
@@ -85,12 +98,14 @@ public class Unary_c extends Expr_c implements Unary
     }
 
     /** Visit the children of the expression. */
+    @Override
     public Node visitChildren(NodeVisitor v) {
 	Expr expr = (Expr) visitChild(this.expr, v);
 	return reconstruct(expr);
     }
 
     /** Type check the expression. */
+    @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
         TypeSystem ts = tc.typeSystem();
 
@@ -146,6 +161,7 @@ public class Unary_c extends Expr_c implements Unary
 	return this;
     }
 
+    @Override
     public Type childExpectedType(Expr child, AscriptionVisitor av) {
         TypeSystem ts = av.typeSystem();
 
@@ -189,6 +205,7 @@ public class Unary_c extends Expr_c implements Unary
     }
 
     /** Check exceptions thrown by the statement. */
+    @Override
     public String toString() {
         if (op == NEG && expr instanceof IntLit && ((IntLit) expr).boundary()) {
             return op.toString() + ((IntLit) expr).positiveToString();
@@ -201,6 +218,7 @@ public class Unary_c extends Expr_c implements Unary
 	}
     }
 
+    @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
         if (op == NEG && expr instanceof IntLit && ((IntLit) expr).boundary()) {
 	    w.write(op.toString());
@@ -216,11 +234,13 @@ public class Unary_c extends Expr_c implements Unary
 	}
     }
 
+    @Override
     public Term firstChild() {
         return expr;
     }
 
-    public List acceptCFG(CFGBuilder v, List succs) {
+    @Override
+    public <T> List<T> acceptCFG(CFGBuilder v, List<T> succs) {
         if (expr.type().isBoolean()) {
             v.visitCFG(expr, FlowGraph.EDGE_KEY_TRUE, this, EXIT,
                              FlowGraph.EDGE_KEY_FALSE, this, EXIT);
@@ -231,10 +251,12 @@ public class Unary_c extends Expr_c implements Unary
         return succs;
     }
     
+    @Override
     public boolean constantValueSet() {
         return expr.constantValueSet();
     }
     
+    @Override
     public boolean isConstant() {
 	if (op == POST_INC || op == POST_DEC ||
 	    op == PRE_INC || op == PRE_DEC) {
@@ -243,6 +265,7 @@ public class Unary_c extends Expr_c implements Unary
 	return expr.isConstant();
     }
 
+    @Override
     public Object constantValue() {
         if (! isConstant()) {
 	    return null;
@@ -299,6 +322,7 @@ public class Unary_c extends Expr_c implements Unary
         return null;
     }
     
+    @Override
     public Node copy(NodeFactory nf) {
         return nf.Unary(this.position, this.op, this.expr);
     }

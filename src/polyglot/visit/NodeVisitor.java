@@ -66,7 +66,7 @@ public abstract class NodeVisitor implements Copy
      * @return A node if normal traversal is to stop, <code>null</code> if it
      * is to continue.
      */
-    public Node override(Node parent, Node n) {
+    public <N extends Node> N override(Node parent, N n) {
         return override(n);
     }
 
@@ -89,7 +89,7 @@ public abstract class NodeVisitor implements Copy
      * @return A node if normal traversal is to stop, <code>null</code> if it
      * is to continue.
      */
-    public Node override(Node n) {
+    public <N extends Node> N override(N n) {
 	return null;
     }
 
@@ -155,7 +155,7 @@ public abstract class NodeVisitor implements Copy
      * @return The final result of the traversal of the tree rooted at
      * <code>n</code>.
      */
-    public Node leave(Node parent, Node old, Node n, NodeVisitor v) {
+    public <N extends Node> N leave(Node parent, N old, N n, NodeVisitor v) {
         return leave(old, n, v);
     }
 
@@ -184,7 +184,7 @@ public abstract class NodeVisitor implements Copy
      * @return The final result of the traversal of the tree rooted at
      * <code>n</code>.
      */
-    public Node leave(Node old, Node n, NodeVisitor v) {
+    public <N extends Node> N leave(N old, N n, NodeVisitor v) {
         return n;
     }
 
@@ -209,6 +209,7 @@ public abstract class NodeVisitor implements Copy
     public void finish() { }
     public void finish(Node ast) { this.finish(); }
     
+    @Override
     public String toString() {
         return StringUtil.getShortNameComponent(getClass().getName());
     }
@@ -227,9 +228,9 @@ public abstract class NodeVisitor implements Copy
      * @return the (possibly new) version of <code>child</code> after the 
      *       subtree rooted at <code>child</code> has been recursively visited.
      */
-    public Node visitEdge(Node parent, Node child) {
+    public <N extends Node> N visitEdge(Node parent, N child) {
         try {
-            Node n = override(parent, child);
+            N n = override(parent, child);
 
             if (n == null) {
                 return visitEdgeNoOverride(parent, child);
@@ -255,7 +256,7 @@ public abstract class NodeVisitor implements Copy
      * @return the (possibly new) version of <code>child</code> after the 
      *       subtree rooted at <code>child</code> has been recursively visited.
      */
-    public Node visitEdgeNoOverride(Node parent, Node child) {
+    public <N extends Node> N visitEdgeNoOverride(Node parent, N child) {
         if (child == null) {
             return null;
         }
@@ -266,7 +267,8 @@ public abstract class NodeVisitor implements Copy
             throw new InternalCompilerError("NodeVisitor.enter() returned null.");
         }
 
-        Node n = child.del().visitChildren(v_);
+        @SuppressWarnings("unchecked")
+        N n = (N) child.del().visitChildren(v_);
 	    
         if (n == null) {
             throw new InternalCompilerError("Node.visitChildren() returned null.");
@@ -285,7 +287,8 @@ public abstract class NodeVisitor implements Copy
     }
     
 
-    public Object copy() {
+    @Override
+    public NodeVisitor copy() {
         try {
             return (NodeVisitor) super.clone();
         }

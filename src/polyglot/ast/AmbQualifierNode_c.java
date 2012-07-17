@@ -47,10 +47,12 @@ public class AmbQualifierNode_c extends Node_c implements AmbQualifierNode
 	this.name = name;
     }
     
+    @Override
     public Qualifier qualifier() {
 	return this.qualifier;
     }
     
+    @Override
     public Id id() {
         return this.name;
     }
@@ -61,6 +63,7 @@ public class AmbQualifierNode_c extends Node_c implements AmbQualifierNode
         return n;
     }
 
+    @Override
     public String name() {
 	return this.name.id();
     }
@@ -69,6 +72,7 @@ public class AmbQualifierNode_c extends Node_c implements AmbQualifierNode
         return id(this.name.id(name));
     }
 
+    @Override
     public QualifierNode qual() {
 	return this.qual;
     }
@@ -96,16 +100,19 @@ public class AmbQualifierNode_c extends Node_c implements AmbQualifierNode
 	return this;
     }
 
+    @Override
     public Node visitChildren(NodeVisitor v) {
         Id name = (Id) visitChild(this.name, v);
 	QualifierNode qual = (QualifierNode) visitChild(this.qual, v);
 	return reconstruct(qual, name);
     }
 
+    @Override
     public Node buildTypes(TypeBuilder tb) throws SemanticException {
         return qualifier(tb.typeSystem().unknownQualifier(position()));
     }
 
+    @Override
     public Node disambiguate(AmbiguityRemover sc) throws SemanticException {
         if (qual != null && ! qual.isDisambiguated()) {
             return this;
@@ -122,16 +129,19 @@ public class AmbQualifierNode_c extends Node_c implements AmbQualifierNode
 	    "\".", position());
     }
 
+    @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
         // Didn't finish disambiguation; just return.
         return this;
     }
     
+    @Override
     public Node exceptionCheck(ExceptionChecker ec) throws SemanticException {
 	throw new InternalCompilerError(position(),
 	    "Cannot exception check ambiguous node " + this + ".");
     } 
 
+    @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
 	if (qual != null) {
             print(qual, w, tr);
@@ -142,11 +152,13 @@ public class AmbQualifierNode_c extends Node_c implements AmbQualifierNode
         tr.print(this, name, w);
     }
 
+    @Override
     public String toString() {
 	return (qual == null
 		? name.toString()
 		: qual.toString() + "." + name.toString()) + "{amb}";
     }
+    @Override
     public Node copy(NodeFactory nf) {
         return nf.AmbQualifierNode(this.position, this.qual, this.name);
     }

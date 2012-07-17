@@ -1,11 +1,33 @@
 package polyglot.ext.jl5.types.inference;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedHashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
 
-import polyglot.ext.jl5.types.*;
+import polyglot.ext.jl5.types.AnnotationElemInstance;
+import polyglot.ext.jl5.types.EnumInstance;
+import polyglot.ext.jl5.types.JL5ParsedClassType;
+import polyglot.ext.jl5.types.JL5SubstClassType;
+import polyglot.ext.jl5.types.JL5TypeSystem;
+import polyglot.ext.jl5.types.JL5TypeSystem_c;
+import polyglot.ext.jl5.types.RawClass;
+import polyglot.ext.jl5.types.WildCardType;
 import polyglot.frontend.Job;
-import polyglot.types.*;
+import polyglot.types.ClassType;
+import polyglot.types.ClassType_c;
+import polyglot.types.ConstructorInstance;
+import polyglot.types.FieldInstance;
+import polyglot.types.Flags;
+import polyglot.types.MethodInstance;
 import polyglot.types.Package;
+import polyglot.types.ReferenceType;
+import polyglot.types.Resolver;
+import polyglot.types.SemanticException;
+import polyglot.types.Type;
+import polyglot.types.TypeSystem;
 import polyglot.util.CollectionUtil;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
@@ -34,11 +56,13 @@ public class LubType_c extends ClassType_c implements LubType {
         this.lubElems = l;
     }
 
+    @Override
     public List<ReferenceType> lubElements() {
         return lubElems;
     }
     
     protected Type lubCalculated = null;
+    @Override
     public Type calculateLub() {
         if (lubCalculated == null) {
             lubCalculated = lub_force();
@@ -203,13 +227,13 @@ public class LubType_c extends ClassType_c implements LubType {
             return a1;
         }
         else {
-            return ts.wildCardType(position, ts.lub(position, CollectionUtil.list(a1, a2)), null);
+            return ts.wildCardType(position, ts.lub(position, CollectionUtil.list((ReferenceType) a1, (ReferenceType) a2)), null);
         }
     }
 
     private ReferenceType glb(Type t1, Type t2) {
         JL5TypeSystem ts = (JL5TypeSystem)this.ts;
-        List<ReferenceType> l = CollectionUtil.list(t1, t2);
+        List<ReferenceType> l = CollectionUtil.list((ReferenceType) t1, (ReferenceType) t2);
         try {
             if (!ts.checkIntersectionBounds(l, true)) {
                 return ts.Object();
@@ -222,6 +246,7 @@ public class LubType_c extends ClassType_c implements LubType {
         }
     }
     
+    @Override
     public String toString() {
         StringBuffer sb = new StringBuffer("lub(");
         sb.append(JL5TypeSystem_c.listToString(lubElems));
@@ -269,7 +294,7 @@ public class LubType_c extends ClassType_c implements LubType {
 
     @Override
     public List<EnumInstance> enumConstants() {
-        return Collections.emptyList();
+        return Collections.<EnumInstance> emptyList();
     }
 
     @Override
@@ -318,28 +343,28 @@ public class LubType_c extends ClassType_c implements LubType {
     }
 
     @Override
-    public List constructors() {
-        return Collections.emptyList();
+    public List<ConstructorInstance> constructors() {
+        return Collections.<ConstructorInstance> emptyList();
     }
 
     @Override
-    public List memberClasses() {
-        return Collections.emptyList();
+    public List<ClassType> memberClasses() {
+        return Collections.<ClassType> emptyList();
     }
 
     @Override
-    public List methods() {
-        return Collections.emptyList();
+    public List<? extends MethodInstance> methods() {
+        return Collections.<MethodInstance> emptyList();
     }
 
     @Override
-    public List fields() {
-        return Collections.emptyList();
+    public List<? extends FieldInstance> fields() {
+        return Collections.<FieldInstance> emptyList();
     }
 
     @Override
-    public List interfaces() {
-        return Collections.emptyList();
+    public List<? extends Type> interfaces() {
+        return Collections.<Type> emptyList();
     }
 
     @Override
@@ -354,7 +379,7 @@ public class LubType_c extends ClassType_c implements LubType {
 
     @Override
     public List<AnnotationElemInstance> annotationElems() {
-        return Collections.emptyList();
+        return Collections.<AnnotationElemInstance> emptyList();
     }
 
 }

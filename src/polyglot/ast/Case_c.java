@@ -46,6 +46,7 @@ public class Case_c extends Stmt_c implements Case
     }
 
     /** Returns true iff this is the default case. */
+    @Override
     public boolean isDefault() {
 	return this.expr == null;
     }
@@ -54,11 +55,13 @@ public class Case_c extends Stmt_c implements Case
      * Get the case label.  This must should a constant expression.
      * The case label is null for the <code>default</code> case.
      */
+    @Override
     public Expr expr() {
 	return this.expr;
     }
 
     /** Set the case label.  This must should a constant expression, or null. */
+    @Override
     public Case expr(Expr expr) {
 	Case_c n = (Case_c) copy();
 	n.expr = expr;
@@ -69,11 +72,13 @@ public class Case_c extends Stmt_c implements Case
      * Returns the value of the case label.  This value is only valid
      * after type-checking.
      */
+    @Override
     public long value() {
 	return this.value;
     }
 
     /** Set the value of the case label. */
+    @Override
     public Case value(long value) {
 	Case_c n = (Case_c) copy();
 	n.value = value;
@@ -92,12 +97,14 @@ public class Case_c extends Stmt_c implements Case
     }
 
     /** Visit the children of the statement. */
+    @Override
     public Node visitChildren(NodeVisitor v) {
         Expr expr = (Expr) visitChild(this.expr, v);
         return reconstruct(expr);
     }
 
     /** Type check the statement. */
+    @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
         if (expr == null) {
 	    return this;
@@ -114,6 +121,7 @@ public class Case_c extends Stmt_c implements Case
 	return this;
     }
     
+    @Override
     public Node checkConstants(ConstantChecker cc) throws SemanticException {
         if (expr == null) {
             return this;
@@ -141,6 +149,7 @@ public class Case_c extends Stmt_c implements Case
                                     position());
     }
 
+    @Override
     public Type childExpectedType(Expr child, AscriptionVisitor av) {
         TypeSystem ts = av.typeSystem();
 
@@ -151,6 +160,7 @@ public class Case_c extends Stmt_c implements Case
         return child.type();
     }
 
+    @Override
     public String toString() {
         if (expr == null) {
 	    return "default:";
@@ -161,6 +171,7 @@ public class Case_c extends Stmt_c implements Case
     }
 
     /** Write the statement to an output file. */
+    @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
         if (expr == null) {
 	    w.write("default:");
@@ -172,18 +183,21 @@ public class Case_c extends Stmt_c implements Case
 	}
     }
 
+    @Override
     public Term firstChild() {
         if (expr != null) return expr;
         return null;
     }
 
-    public List acceptCFG(CFGBuilder v, List succs) {
+    @Override
+    public <T> List<T> acceptCFG(CFGBuilder v, List<T> succs) {
         if (expr != null) {
             v.visitCFG(expr, this, EXIT);
         }
 
         return succs;
     }
+    @Override
     public Node copy(NodeFactory nf) {
         return nf.Case(this.position, this.expr).value(value);
     }

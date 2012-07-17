@@ -25,12 +25,14 @@
 
 package polyglot.ast;
 
-import polyglot.ast.*;
 import polyglot.frontend.ExtensionInfo;
-import polyglot.types.*;
-import polyglot.visit.*;
-import polyglot.util.*;
 import polyglot.types.Package;
+import polyglot.types.Qualifier;
+import polyglot.types.SemanticException;
+import polyglot.util.CodeWriter;
+import polyglot.util.Position;
+import polyglot.visit.PrettyPrinter;
+import polyglot.visit.Translator;
 
 /**
  * A <code>PackageNode</code> is the syntactic representation of a 
@@ -46,21 +48,25 @@ public class PackageNode_c extends Node_c implements PackageNode
 	this.package_ = package_;
     }
     
+    @Override
     public boolean isDisambiguated() {
         return package_ != null && package_.isCanonical() && super.isDisambiguated();
     }
 
     /** Get the package as a qualifier. */
+    @Override
     public Qualifier qualifier() {
         return this.package_;
     }
 
     /** Get the package. */
+    @Override
     public Package package_() {
 	return this.package_;
     }
 
     /** Set the package. */
+    @Override
     public PackageNode package_(Package package_) {
 	PackageNode_c n = (PackageNode_c) copy();
 	n.package_ = package_;
@@ -68,6 +74,7 @@ public class PackageNode_c extends Node_c implements PackageNode
     }
 
     /** Write the package name to an output file. */
+    @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
         if (package_ == null) {
             w.write("<unknown-package>");
@@ -77,17 +84,21 @@ public class PackageNode_c extends Node_c implements PackageNode
         }
     }
     
+    @Override
     public void translate(CodeWriter w, Translator tr) {
         w.write(package_.translate(tr.context()));
     }
 
+    @Override
     public String toString() {
         return package_.toString();
     }
     
+    @Override
     public Node copy(NodeFactory nf) {
         return nf.PackageNode(this.position, this.package_);
     }
+    @Override
     public Node copy(ExtensionInfo extInfo) throws SemanticException {
         PackageNode pn = (PackageNode)this.del().copy(extInfo.nodeFactory());
         if (pn.package_() != null) {

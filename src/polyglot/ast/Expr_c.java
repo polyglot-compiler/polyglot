@@ -46,11 +46,13 @@ public abstract class Expr_c extends Term_c implements Expr
      * <code>UnknownType</code> before type-checking, but should return the
      * correct type after type-checking.
      */
+    @Override
     public Type type() {
 	return this.type;
     }
 
     /** Set the type of the expression. */
+    @Override
     public Expr type(Type type) {
         if (type == this.type) return this;
 	Expr_c n = (Expr_c) copy();
@@ -58,6 +60,7 @@ public abstract class Expr_c extends Term_c implements Expr
 	return n;
     }
 
+    @Override
     public void dump(CodeWriter w) {
         super.dump(w);
 
@@ -70,18 +73,22 @@ public abstract class Expr_c extends Term_c implements Expr
     }
 
     /** Get the precedence of the expression. */
+    @Override
     public Precedence precedence() {
 	return Precedence.UNKNOWN;
     }
 
+    @Override
     public boolean constantValueSet() {
         return true;
     }
 
+    @Override
     public boolean isConstant() {
         return false;
     }
 
+    @Override
     public Object constantValue() {
         return null;
     }
@@ -122,10 +129,12 @@ public abstract class Expr_c extends Term_c implements Expr
         return ((Double) constantValue()).doubleValue();
     }
 
+    @Override
     public boolean isTypeChecked() {
         return super.isTypeChecked() && type != null && type.isCanonical();
     }
     
+    @Override
     public Node buildTypes(TypeBuilder tb) throws SemanticException {
         return type(tb.typeSystem().unknownType(position()));
     }
@@ -141,6 +150,7 @@ public abstract class Expr_c extends Term_c implements Expr
      * @param w The output writer.
      * @param pp The pretty printer.
      */
+    @Override
     public void printSubExpr(Expr expr, CodeWriter w, PrettyPrinter pp) {
         printSubExpr(expr, true, w, pp);
     }
@@ -160,6 +170,7 @@ public abstract class Expr_c extends Term_c implements Expr
      * @param w The output writer.
      * @param pp The pretty printer.
      */
+    @Override
     public void printSubExpr(Expr expr, boolean associative,
                              CodeWriter w, PrettyPrinter pp) {
         if (! associative && precedence().equals(expr.precedence()) ||

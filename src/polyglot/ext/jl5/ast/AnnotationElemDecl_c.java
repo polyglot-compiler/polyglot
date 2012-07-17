@@ -197,7 +197,7 @@ public class AnnotationElemDecl_c extends Term_c implements AnnotationElemDecl {
     
 
     
-    public List acceptCFG(CFGBuilder v, List succs){
+    public <T> List<T> acceptCFG(CFGBuilder v, List<T> succs){
         if (defaultVal != null) {
             v.visitCFG(defaultVal, this, EXIT);
         }

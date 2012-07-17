@@ -42,6 +42,7 @@ public class LocalAssign_c extends Assign_c implements LocalAssign
     super(pos, left, op, right);
   }
 
+  @Override
   public Assign left(Expr left) {
       LocalAssign_c n = (LocalAssign_c)super.left(left);
       n.assertLeftType();
@@ -54,6 +55,7 @@ public class LocalAssign_c extends Assign_c implements LocalAssign
       }
   }
 
+  @Override
   public Term firstChild() {
     if (operator() != Assign.ASSIGN) {
       return left();
@@ -62,12 +64,14 @@ public class LocalAssign_c extends Assign_c implements LocalAssign
     return right();
   }
   
+  @Override
   protected void acceptCFGAssign(CFGBuilder v) {
 	  // do not visit left()
       // l = e: visit e -> (l = e)      
       v.visitCFG(right(), this, EXIT);
   }
   
+  @Override
   protected void acceptCFGOpAssign(CFGBuilder v) {
       /*
       Local l = (Local)left();

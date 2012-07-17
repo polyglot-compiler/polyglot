@@ -49,6 +49,7 @@ public interface Disamb
      * @return An unambiguous AST node, or null if disambiguation fails.
      * @deprecated
      */
+    @Deprecated
     Node disambiguate(Ambiguous amb, ContextVisitor v, Position pos,
                       Prefix prefix, String name) throws SemanticException;
 }

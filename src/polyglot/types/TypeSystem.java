@@ -65,6 +65,7 @@ public interface TypeSystem {
      * This resolver contains types parsed from source files.
      * @deprecated
      */
+    @Deprecated
     CachingResolver parsedResolver();
     
     /** Create and install a duplicate of the system resolver and return the original. */
@@ -100,7 +101,7 @@ public interface TypeSystem {
      * Return a list of the packages names that will be imported by
      * default.  A list of Strings is returned, not a list of Packages.
      */
-    List defaultPackageImports();
+    List<String> defaultPackageImports();
 
     /**
      * Returns true if the package named <code>name</code> exists.
@@ -135,8 +136,8 @@ public interface TypeSystem {
      * @param excTypes The constructor's exception throw types.
      */
     ConstructorInstance constructorInstance(Position pos, ClassType container,
-                                            Flags flags, List argTypes,
-                                            List excTypes);
+                                            Flags flags, List<Type> argTypes,
+                                            List<Type> excTypes);
 
     /** Create a method instance.
      * @param pos Position of the method.
@@ -149,7 +150,8 @@ public interface TypeSystem {
      */
     MethodInstance methodInstance(Position pos, ReferenceType container,
                                   Flags flags, Type returnType, String name,
-                                  List argTypes, List excTypes);
+                                  List<Type> argTypes,
+                                  List<Type> excTypes);
 
     /** Create a field instance.
      * @param pos Position of the field.
@@ -325,7 +327,7 @@ public interface TypeSystem {
      * Returns a collection of the Throwable types that need not be declared
      * in method and constructor signatures.
      */
-    Collection uncheckedExceptions();
+    Collection<Type> uncheckedExceptions();
 
     /** Unary promotion for numeric types.
      * @exception SemanticException if the type cannot be promoted. 
@@ -345,6 +347,7 @@ public interface TypeSystem {
      * Deprecated version of the findField method.
      * @deprecated
      */
+    @Deprecated
     FieldInstance findField(ReferenceType container, String name, Context c)
         throws SemanticException;
 
@@ -375,14 +378,15 @@ public interface TypeSystem {
      * inaccessible.
      */
     MethodInstance findMethod(ReferenceType container,
-                              String name, List argTypes,
+                              String name, List<Type> argTypes,
                               ClassType currClass) throws SemanticException;
     /**
      * Deprecated version of the findMethod method.
      * @deprecated
      */
+    @Deprecated
     MethodInstance findMethod(ReferenceType container,
-                              String name, List argTypes,
+                              String name, List<Type> argTypes,
                               Context c) throws SemanticException;
 
     /**
@@ -393,14 +397,15 @@ public interface TypeSystem {
      * @exception SemanticException if the constructor cannot be found or is
      * inaccessible.
      */
-    ConstructorInstance findConstructor(ClassType container, List argTypes,
+    ConstructorInstance findConstructor(ClassType container, List<Type> argTypes,
                                         ClassType currClass) throws SemanticException;
 
     /**
      * Deprecated version of the findConstructor method.
      * @deprecated
      */
-    ConstructorInstance findConstructor(ClassType container, List argTypes,
+    @Deprecated
+    ConstructorInstance findConstructor(ClassType container, List<Type> argTypes,
                                         Context c) throws SemanticException;
 
     /**
@@ -416,6 +421,7 @@ public interface TypeSystem {
      * Deprecated version of the findMemberClass method.
      * @deprecated
      */
+    @Deprecated
     ClassType findMemberClass(ClassType container, String name, Context c)
     throws SemanticException;
 
@@ -437,7 +443,7 @@ public interface TypeSystem {
      * Returns an immutable list of all the interface types which type
      * implements.
      **/
-    List interfaces(ReferenceType type);
+    List<? extends Type> interfaces(ReferenceType type);
 
     ////
     // Functions for method testing.
@@ -480,7 +486,7 @@ public interface TypeSystem {
      * Returns true iff <code>p</code> has exactly the formal arguments
      * <code>formalTypes</code>.
      */
-    boolean hasFormals(ProcedureInstance p, List formalTypes);
+    boolean hasFormals(ProcedureInstance p, List<Type> formalTypes);
 
     ////
     // Functions which yield particular types.
@@ -659,6 +665,7 @@ public interface TypeSystem {
     AccessControlResolver createPackageContextResolver(Package pkg);
     
     /** @deprecated */
+    @Deprecated
     Resolver packageContextResolver(Resolver cr, Package pkg);
 
     /** Get a resolver for looking up a type in a class context. */
@@ -706,7 +713,7 @@ public interface TypeSystem {
      * and the usual class resolvers can't otherwise find them) they
      * should be returned in the set in addition to object.
      */
-    Set getTypeEncoderRootSet(TypeObject o);
+    Set<?> getTypeEncoderRootSet(TypeObject o);
 
     /**
      * Get the transformed class name of a class.
@@ -723,7 +730,7 @@ public interface TypeSystem {
      * @param roots The root objects for the serialization.  Place holders
      * are not created for these.
      */
-    Object placeHolder(TypeObject o, Set roots);
+    Object placeHolder(TypeObject o, Set<?> roots);
 
     /** Get a place-holder for serializing a type object.
      * @param o The object to get the place-holder for.
@@ -759,20 +766,20 @@ public interface TypeSystem {
      * Return true if <code>mi</code> can be called with name <code>name</code>
      * and actual parameters of types <code>actualTypes</code>.
      */
-    boolean methodCallValid(MethodInstance mi, String name, List argTypes);
+    boolean methodCallValid(MethodInstance mi, String name, List<Type> argTypes);
 
     /**
      * Return true if <code>pi</code> can be called with 
      * actual parameters of types <code>actualTypes</code>.
      */
-    boolean callValid(ProcedureInstance mi, List argTypes);
+    boolean callValid(ProcedureInstance mi, List<Type> argTypes);
 
     /**
      * Get the list of methods <code>mi</code> (potentially) overrides, in
      * order from this class (that is, including <code>this</code>) to super
      * classes.
      */
-    List overrides(MethodInstance mi);
+    List<MethodInstance> overrides(MethodInstance mi);
 
     /**
      * Return true if <code>mi</code> can override <code>mj</code>.
@@ -789,7 +796,7 @@ public interface TypeSystem {
      * Get the list of methods <code>mi</code> implements, in no
      * specified order.
      */
-    List implemented(MethodInstance mi);
+    List<MethodInstance> implemented(MethodInstance mi);
     
     /**
      * Return the primitive with the given name.

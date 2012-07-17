@@ -60,7 +60,7 @@ public class ExceptionChecker extends ErrorHandlingVisitor
      *     { D }
      *     { A, B }
      */
-    protected Set catchable;
+    protected Set<Type> catchable;
     
 
     /**
@@ -96,9 +96,9 @@ public class ExceptionChecker extends ErrorHandlingVisitor
         ec.throwsSet = new SubtypeSet(ts.Throwable());
         return ec;
     }
-    public ExceptionChecker push(Collection catchableTypes) {
+    public ExceptionChecker push(Collection<? extends Type> catchableTypes) {
         ExceptionChecker ec = this.push();
-        ec.catchable = new HashSet(catchableTypes);
+        ec.catchable = new HashSet<Type>(catchableTypes);
         ec.throwsSet = new SubtypeSet(ts.Throwable());
         return ec;
     }
@@ -122,10 +122,12 @@ public class ExceptionChecker extends ErrorHandlingVisitor
         return outer;
     }
 
+    @Override
     protected NodeVisitor enterCall(Node n) throws SemanticException {
         return n.del().exceptionCheckEnter(this);
     }
 
+    @Override
     protected NodeVisitor enterError(Node n) {
         return push();
     }
@@ -139,6 +141,7 @@ public class ExceptionChecker extends ErrorHandlingVisitor
      * @return The final result of the traversal of the tree rooted at 
      *  <code>n</code>.
      */
+    @Override
     protected Node leaveCall(Node old, Node n, NodeVisitor v)
 	throws SemanticException {
         
@@ -181,8 +184,7 @@ public class ExceptionChecker extends ErrorHandlingVisitor
             ExceptionChecker ec = this;
             while (!exceptionCaught && ec != null) {
                 if (ec.catchable != null) {
-                    for (Iterator iter = ec.catchable.iterator(); iter.hasNext(); ) {
-                        Type catchType = (Type)iter.next();
+                    for (Type catchType : ec.catchable) {
                         if (ts.isSubtype(t, catchType)) {
                             exceptionCaught = true;
                             break;
@@ -241,6 +243,7 @@ public class ExceptionChecker extends ErrorHandlingVisitor
         public CodeTypeReporter(String codeType) {
             this.codeType = codeType;
         }
+        @Override
         void uncaughtType(Type t, Position pos) throws SemanticException {
             throw new SemanticException("A " + codeType + " can not " +
                         "throw a \"" + t + "\".", pos);

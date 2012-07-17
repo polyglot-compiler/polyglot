@@ -39,9 +39,9 @@ import polyglot.types.*;
  * call to remove <code>r</code> removes all <code>s</code> s.t. r is a 
  * a supertype of s.
  */
-public class SubtypeSet implements java.util.Set
+public class SubtypeSet implements java.util.Set<Type>
 {
-    protected List v; 
+    protected List<Type> v; 
     protected TypeSystem ts;
     protected Type topType;  // Everything in the set must be a subtype of topType.
 
@@ -53,7 +53,7 @@ public class SubtypeSet implements java.util.Set
     }
 
     public SubtypeSet(Type top) {
-	v = new ArrayList();
+	v = new ArrayList<Type>();
         this.ts = top.typeSystem();
 	this.topType = top;
     }
@@ -62,17 +62,17 @@ public class SubtypeSet implements java.util.Set
      * Creates a copy of the given SubtypeSet
      */
     public SubtypeSet(SubtypeSet s) {
-      v = new Vector(s.v);
+      v = new ArrayList<Type>(s.v);
       ts = s.ts;
       topType = s.topType;
     }
 
-    public SubtypeSet(TypeSystem ts, Collection c) {
+    public SubtypeSet(TypeSystem ts, Collection<? extends Type> c) {
       this(ts);
       addAll(c);
     }
 
-    public SubtypeSet(Type top, Collection c) {
+    public SubtypeSet(Type top, Collection<? extends Type> c) {
       this(top);
       addAll(c);
     }
@@ -82,56 +82,54 @@ public class SubtypeSet implements java.util.Set
      * only if it has no supertypes already in the set. If we do add it, 
      * remove any subtypes of <code>o</code>
      * 
-     * @param o The element to add.
+     * @param type The element to add.
      */
-    public boolean add(Object o) {
-        if (o == null) {
+    @Override
+    public boolean add(Type type) {
+        if (type == null) {
 	    return false;
 	}
 
-	if (o instanceof Type) {
-	    Type type = (Type) o;
-
-	    if (ts.isSubtype(type, topType)) {
-		boolean haveToAdd = true;
-
-		for (Iterator i = v.iterator(); i.hasNext(); ) {
-		    Type t = (Type) i.next();
-
-		    if (ts.descendsFrom(t, type)) {
-			i.remove();
-		    }
-
-		    if (ts.isSubtype(type, t)) {
-			haveToAdd = false;
-			break;
-		    }
-		}
-
-		if (haveToAdd) {
-		    v.add(type);
-		}
-
-		return haveToAdd;
-	    }
-	}
-
-	throw new InternalCompilerError(
-	      "Can only add " + topType + "s to the set. Got a " + o);
+        if (ts.isSubtype(type, topType)) {
+            boolean haveToAdd = true;
+  
+            for (Iterator<Type> i = v.iterator(); i.hasNext(); ) {
+                Type t = i.next();
+  
+                if (ts.descendsFrom(t, type)) {
+                    i.remove();
+                }
+  
+                if (ts.isSubtype(type, t)) {
+                    haveToAdd = false;
+                    break;
+                }
+            }
+  
+            if (haveToAdd) {
+                v.add(type);
+            }
+  
+            return haveToAdd;
+        }
+        
+        throw new InternalCompilerError(
+            "Can only add " + topType + "s to the set. Got a " + type);
     }
 
     /**
      * Adds all elements from c into this set.
      */
-    public boolean addAll(Collection c) {
+    @Override
+    public boolean addAll(Collection<? extends Type> c) {
 	if (c == null) {
 	    return false;
 	}
 
 	boolean changed = false;
 
-	for (Iterator i = c.iterator(); i.hasNext(); ) {
-	    changed |= add(i.next()); 
+	for (Type t : c) {
+	    changed |= add(t); 
 	}
 
 	return changed;
@@ -140,6 +138,7 @@ public class SubtypeSet implements java.util.Set
     /**
      * Removes all elements from the set
      */
+    @Override
     public void clear() {
 	v.clear();
     }
@@ -149,12 +148,12 @@ public class SubtypeSet implements java.util.Set
      * semantics of the subtype set, <code>o</code> is in the set iff
      * it descends from (or is equal to) one of the elements in the set.
      */
+    @Override
     public boolean contains(Object o) {
 	if (o instanceof Type) {
 	    Type type = (Type) o;
 	    
-	    for (Iterator i = v.iterator(); i.hasNext(); ) {
-		Type t = (Type) i.next();
+	    for (Type t : v) {
 		if (ts.isSubtype(type, t)) {
 		    return true;
 		}
@@ -170,8 +169,7 @@ public class SubtypeSet implements java.util.Set
      * one of the elements in the set.
      */
     public boolean containsSubtype(Type type) {
-	for (Iterator i = v.iterator(); i.hasNext(); ) {
-	    Type t = (Type)i.next();
+	for (Type t : v) {
 	    if (ts.isSubtype(type, t) || ts.isSubtype(t, type)) return true;
 	}
 
@@ -181,9 +179,10 @@ public class SubtypeSet implements java.util.Set
     /**
      * Checks whether all elements of the collection are in the set
      */
-    public boolean containsAll(Collection c) {
-	for (Iterator i = c.iterator(); i.hasNext(); ) {
-	    if (! contains (i.next())) {
+    @Override
+    public boolean containsAll(Collection<?> c) {
+	for (Object o : c) {
+	    if (! contains (o)) {
 		return false;
 	    }
 	}
@@ -191,11 +190,13 @@ public class SubtypeSet implements java.util.Set
 	return true;
     }
 
+    @Override
     public boolean isEmpty() {
 	return v.isEmpty();
     }
     
-    public Iterator iterator() {
+    @Override
+    public Iterator<Type> iterator() {
 	return v.iterator();
     }
 
@@ -205,13 +206,14 @@ public class SubtypeSet implements java.util.Set
      *
      * @return whether or not an element was removed.
      */
+    @Override
     public boolean remove(Object o) {
 	Type type = (Type) o;
 
 	boolean removed = false;
 
-	for (Iterator i = v.iterator(); i.hasNext(); ) {
-	    Type t = (Type) i.next();
+	for (Iterator<Type> i = v.iterator(); i.hasNext(); ) {
+	    Type t = i.next();
 
 	    if (ts.isSubtype(t, type)) {
 		removed = true;
@@ -222,33 +224,38 @@ public class SubtypeSet implements java.util.Set
 	return removed;
     }
     
-    public boolean removeAll(Collection c) {
+    @Override
+    public boolean removeAll(Collection<?> c) {
         boolean changed = false;
 
-	for (Iterator i = c.iterator(); i.hasNext(); ) {
-	    Object o = i.next();
+	for (Object o : c) {
 	    changed |= remove(o);
 	}
 
 	return changed;
     }
 
-    public boolean retainAll(Collection c) {
+    @Override
+    public boolean retainAll(Collection<?> c) {
 	throw new UnsupportedOperationException("Not supported");
     }
 
+    @Override
     public int size() {
 	return v.size();
     }
 
+    @Override
     public Object[] toArray() {
 	return v.toArray();
     }
 
-    public Object[] toArray(Object[] a) {
+    @Override
+    public <U> U[] toArray(U[] a) {
 	return v.toArray(a);
     }
 
+    @Override
     public String toString() {
 	return v.toString();
     }

@@ -25,12 +25,26 @@
 
 package polyglot.ast;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
-import polyglot.main.Report;
-import polyglot.types.*;
-import polyglot.util.*;
-import polyglot.visit.*;
+import polyglot.types.ClassType;
+import polyglot.types.ConstructorInstance;
+import polyglot.types.FieldInstance;
+import polyglot.types.MethodInstance;
+import polyglot.types.SemanticException;
+import polyglot.types.TypeSystem;
+import polyglot.util.CodeWriter;
+import polyglot.util.CollectionUtil;
+import polyglot.util.ListUtil;
+import polyglot.util.Position;
+import polyglot.visit.AmbiguityRemover;
+import polyglot.visit.CFGBuilder;
+import polyglot.visit.ExceptionChecker;
+import polyglot.visit.NodeVisitor;
+import polyglot.visit.PrettyPrinter;
+import polyglot.visit.TypeChecker;
 
 /**
  * A <code>ClassBody</code> represents the body of a class or interface
@@ -40,32 +54,35 @@ public class ClassBody_c extends Term_c implements ClassBody
 {
     protected List<ClassMember> members;
 
-    public ClassBody_c(Position pos, List members) {
+    public ClassBody_c(Position pos, List<ClassMember> members) {
         super(pos);
         assert(members != null);
         this.members = ListUtil.copy(members, true);
     }
 
-    public List members() {
+    @Override
+    public List<ClassMember> members() {
         return this.members;
     }
 
-    public ClassBody members(List members) {
+    @Override
+    public ClassBody members(List<ClassMember> members) {
         ClassBody_c n = (ClassBody_c) copy();
         n.members = ListUtil.copy(members, true);
         return n;
     }
 
+    @Override
     public ClassBody addMember(ClassMember member) {
         ClassBody_c n = (ClassBody_c) copy();
-        List l = new ArrayList(this.members.size() + 1);
+        List<ClassMember> l = new ArrayList<ClassMember>(this.members.size() + 1);
         l.addAll(this.members);
         l.add(member);
         n.members = ListUtil.copy(l, true);
         return n;
     }
 
-    protected ClassBody_c reconstruct(List members) {
+    protected ClassBody_c reconstruct(List<ClassMember> members) {
         if (! CollectionUtil.equals(members, this.members)) {
             ClassBody_c n = (ClassBody_c) copy();
             n.members = ListUtil.copy(members, true);
@@ -75,15 +92,18 @@ public class ClassBody_c extends Term_c implements ClassBody
         return this;
     }
 
+    @Override
     public Node visitChildren(NodeVisitor v) {
-        List members = visitList(this.members, v);
+        List<ClassMember> members = visitList(this.members, v);
         return reconstruct(members);
     }
 
+    @Override
     public Node disambiguate(AmbiguityRemover ar) throws SemanticException {
         return this;
     }
 
+    @Override
     public String toString() {
         return "{ ... }";
     }
@@ -91,13 +111,13 @@ public class ClassBody_c extends Term_c implements ClassBody
     protected void duplicateFieldCheck(TypeChecker tc) throws SemanticException {
         ClassType type = tc.context().currentClass();
 
-        ArrayList l = new ArrayList(type.fields());
+        ArrayList<FieldInstance> l = new ArrayList<FieldInstance>(type.fields());
 
         for (int i = 0; i < l.size(); i++) {
-            FieldInstance fi = (FieldInstance) l.get(i);
+            FieldInstance fi = l.get(i);
 
             for (int j = i+1; j < l.size(); j++) {
-                FieldInstance fj = (FieldInstance) l.get(j);
+                FieldInstance fj = l.get(j);
 
                 if (fi.name().equals(fj.name())) {
                     throw new SemanticException("Duplicate field \"" + fj + "\".", fj.position());
@@ -109,13 +129,13 @@ public class ClassBody_c extends Term_c implements ClassBody
     protected void duplicateConstructorCheck(TypeChecker tc) throws SemanticException {
         ClassType type = tc.context().currentClass();
 
-        ArrayList l = new ArrayList(type.constructors());
+        ArrayList<ConstructorInstance> l = new ArrayList<ConstructorInstance>(type.constructors());
 
         for (int i = 0; i < l.size(); i++) {
-            ConstructorInstance ci = (ConstructorInstance) l.get(i);
+            ConstructorInstance ci = l.get(i);
 
             for (int j = i+1; j < l.size(); j++) {
-                ConstructorInstance cj = (ConstructorInstance) l.get(j);
+                ConstructorInstance cj = l.get(j);
 
                 if (ci.hasFormals(cj.formalTypes())) {
                     throw new SemanticException("Duplicate constructor \"" + cj + "\".", cj.position());
@@ -128,13 +148,13 @@ public class ClassBody_c extends Term_c implements ClassBody
         ClassType type = tc.context().currentClass();
         TypeSystem ts = tc.typeSystem();
 
-        ArrayList l = new ArrayList(type.methods());
+        ArrayList<MethodInstance> l = new ArrayList<MethodInstance>(type.methods());
 
         for (int i = 0; i < l.size(); i++) {
-            MethodInstance mi = (MethodInstance) l.get(i);
+            MethodInstance mi = l.get(i);
 
             for (int j = i+1; j < l.size(); j++) {
-                MethodInstance mj = (MethodInstance) l.get(j);
+                MethodInstance mj = l.get(j);
 
                 if (isSameMethod(ts, mi, mj)) {
                     throw new SemanticException("Duplicate method \"" + mj + "\".", mj.position());
@@ -146,13 +166,13 @@ public class ClassBody_c extends Term_c implements ClassBody
     protected void duplicateMemberClassCheck(TypeChecker tc) throws SemanticException {
         ClassType type = tc.context().currentClass();
 
-        ArrayList l = new ArrayList(type.memberClasses());
+        ArrayList<ClassType> l = new ArrayList<ClassType>(type.memberClasses());
 
         for (int i = 0; i < l.size(); i++) {
-            ClassType mi = (ClassType) l.get(i);
+            ClassType mi = l.get(i);
 
             for (int j = i+1; j < l.size(); j++) {
-                ClassType mj = (ClassType) l.get(j);
+                ClassType mj = l.get(j);
 
                 if (mi.name().equals(mj.name())) {
                     throw new SemanticException("Duplicate member type \"" + mj + "\".", mj.position());
@@ -166,6 +186,7 @@ public class ClassBody_c extends Term_c implements ClassBody
         return mi.isSameMethod(mj);
     }
 
+    @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
         duplicateFieldCheck(tc);
         duplicateConstructorCheck(tc);
@@ -175,18 +196,20 @@ public class ClassBody_c extends Term_c implements ClassBody
         return this;
     }
     
+    @Override
     public NodeVisitor exceptionCheckEnter(ExceptionChecker ec) throws SemanticException {
         return ec.push();
     }
 
+    @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
         if (!members.isEmpty()) {
             w.newline(4);
             w.begin(0);
 	    ClassMember prev = null;
 
-            for (Iterator i = members.iterator(); i.hasNext(); ) {
-                ClassMember member = (ClassMember) i.next();
+            for (Iterator<ClassMember> i = members.iterator(); i.hasNext(); ) {
+                ClassMember member = i.next();
 		if ((member instanceof polyglot.ast.CodeDecl) ||
 		    (prev instanceof polyglot.ast.CodeDecl)) {
 			w.newline(0);
@@ -207,6 +230,7 @@ public class ClassBody_c extends Term_c implements ClassBody
      * Return the first (sub)term performed when evaluating this
      * term.
      */
+    @Override
     public Term firstChild() {
         // Do _not_ visit class members.
         return null;
@@ -215,14 +239,13 @@ public class ClassBody_c extends Term_c implements ClassBody
     /**
      * Visit this term in evaluation order.
      */
-    public List acceptCFG(CFGBuilder v, List succs) {
+    @Override
+    public <T> List<T> acceptCFG(CFGBuilder v, List<T> succs) {
         return succs;
     }
+    @Override
     public Node copy(NodeFactory nf) {
         return nf.ClassBody(this.position, this.members);
     }
-
-    private static final Collection TOPICS = 
-                CollectionUtil.list(Report.types, Report.context);
      
 }

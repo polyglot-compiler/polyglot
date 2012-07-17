@@ -59,16 +59,19 @@ public class Local_c extends Expr_c implements Local
   }
 
   /** Get the precedence of the local. */
+  @Override
   public Precedence precedence() { 
     return Precedence.LITERAL;
   }
 
   /** Get the name of the local. */
+  @Override
   public Id id() {
     return this.name;
   }
   
   /** Set the name of the local. */
+  @Override
   public Local id(Id name) {
       Local_c n = (Local_c) copy();
       n.name = name;
@@ -76,31 +79,37 @@ public class Local_c extends Expr_c implements Local
   }
   
   /** Get the name of the local. */
+  @Override
   public String name() {
       return this.name.id();
   }
   
   /** Set the name of the local. */
+  @Override
   public Local name(String name) {
       return id(this.name.id(name));
   }
 
   /** Return the access flags of the variable. */
+  @Override
   public Flags flags() {
     return li.flags();
   }
 
   /** Get the local instance of the local. */
+  @Override
   public VarInstance varInstance() {
     return li;
   }
 
   /** Get the local instance of the local. */
+  @Override
   public LocalInstance localInstance() {
     return li;
   }
 
   /** Set the local instance of the local. */
+  @Override
   public Local localInstance(LocalInstance li) {
     if (li == this.li) return this;
     Local_c n = (Local_c) copy();
@@ -120,11 +129,13 @@ public class Local_c extends Expr_c implements Local
   }
   
   /** Visit the children of the constructor. */
+  @Override
   public Node visitChildren(NodeVisitor v) {
       Id name = (Id) visitChild(this.name, v);
       return reconstruct(name);
   }
 
+  @Override
   public Node buildTypes(TypeBuilder tb) throws SemanticException {
       Local_c n = (Local_c) super.buildTypes(tb);
 
@@ -136,6 +147,7 @@ public class Local_c extends Expr_c implements Local
   }
 
   /** Type check the local. */
+  @Override
   public Node typeCheck(TypeChecker tc) throws SemanticException {
     Context c = tc.context();
     LocalInstance li = c.findLocal(name.id());
@@ -154,24 +166,29 @@ public class Local_c extends Expr_c implements Local
     return localInstance(li).type(li.type());
   }
 
+  @Override
   public Term firstChild() {
       return null;
   }
 
-  public List acceptCFG(CFGBuilder v, List succs) {
+  @Override
+  public <T> List<T> acceptCFG(CFGBuilder v, List<T> succs) {
       return succs;
   }
 
+  @Override
   public String toString() {
     return name.toString();
   }
 
   /** Write the local to an output file. */
+  @Override
   public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
       tr.print(this, name, w);
   }
 
   /** Dumps the AST. */
+  @Override
   public void dump(CodeWriter w) {
     super.dump(w);
 
@@ -183,19 +200,23 @@ public class Local_c extends Expr_c implements Local
     }
   }
   
+  @Override
   public boolean constantValueSet() {
       return li != null && li.constantValueSet();
   }
 
+  @Override
   public boolean isConstant() {
     return li != null && li.isConstant();
   }
 
+  @Override
   public Object constantValue() {
     if (! isConstant()) return null;
     return li.constantValue();
   }
   
+  @Override
   public Node copy(NodeFactory nf) {
       return nf.Local(this.position, this.name);
   }

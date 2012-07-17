@@ -36,6 +36,7 @@ import polyglot.types.Flags;
 public interface ConstructorDecl extends ProcedureDecl 
 {
     /** The constructor's flags. */
+    @Override
     Flags flags();
 
     /** Set the constructor's flags. */
@@ -54,6 +55,7 @@ public interface ConstructorDecl extends ProcedureDecl
      * The constructor's name.  This should be the short name of the
      * containing class.
      */
+    @Override
     String name();
 
     /** Set the constructor's name. */
@@ -62,22 +64,24 @@ public interface ConstructorDecl extends ProcedureDecl
     /** The constructor's formal parameters.
      * @return A list of {@link polyglot.ast.Formal Formal}.
      */
-    List formals();
+    @Override
+    List<Formal> formals();
 
     /** Set the constructor's formal parameters.
      * @param formals A list of {@link polyglot.ast.Formal Formal}.
      */
-    ConstructorDecl formals(List formals);
+    ConstructorDecl formals(List<Formal> formals);
 
     /** The constructor's exception throw types.
      * @return A list of {@link polyglot.ast.TypeNode TypeNode}.
      */
-    List throwTypes();
+    @Override
+    List<TypeNode> throwTypes();
 
     /** Set the constructor's exception throw types.
      * @param throwTypes A list of {@link polyglot.ast.TypeNode TypeNode}.
      */
-    ConstructorDecl throwTypes(List throwTypes);
+    ConstructorDecl throwTypes(List<TypeNode> throwTypes);
 
     /**
      * The constructor type object.  This field may not be valid until

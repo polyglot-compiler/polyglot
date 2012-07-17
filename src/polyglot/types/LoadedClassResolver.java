@@ -26,19 +26,22 @@
 package polyglot.types;
 
 import java.io.InvalidClassException;
-import java.util.*;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.StringTokenizer;
 
 import polyglot.frontend.ExtensionInfo;
-import polyglot.frontend.Scheduler;
 import polyglot.frontend.SchedulerException;
 import polyglot.main.Report;
 import polyglot.main.Version;
-import polyglot.types.reflect.*;
+import polyglot.types.reflect.ClassFile;
+import polyglot.types.reflect.ClassFileLoader;
 import polyglot.util.CollectionUtil;
+import polyglot.util.InternalCompilerError;
 import polyglot.util.ObjectDumper;
 import polyglot.util.SimpleCodeWriter;
 import polyglot.util.TypeEncoder;
-import polyglot.util.InternalCompilerError;
 
 /**
  * Loads class information from class files, or serialized class infomation from
@@ -75,7 +78,8 @@ public class LoadedClassResolver implements TopLevelResolver {
 		return allowRawClasses;
 	}
 
-	public boolean packageExists(String name) {
+	@Override
+  public boolean packageExists(String name) {
 		return loader.packageExists(name);
 	}
 
@@ -89,7 +93,8 @@ public class LoadedClassResolver implements TopLevelResolver {
 	/**
 	 * Find a type by name.
 	 */
-	public Named find(String name) throws SemanticException {
+	@Override
+  public Named find(String name) throws SemanticException {
 		if (Report.should_report(report_topics, 3))
 			Report.report(3, "LoadedCR.find(" + name + ")");
 
@@ -151,8 +156,6 @@ public class LoadedClassResolver implements TopLevelResolver {
 
 		// Check to see if it has serialized info. If so then check the
 		// version.
-		FieldInstance field;
-
 		int comp = checkCompilerVersion(clazz.compilerVersion(version.name()));
 
 		if (comp == NOT_COMPATIBLE) {
@@ -232,58 +235,68 @@ public class LoadedClassResolver implements TopLevelResolver {
 						ParsedClassType pct = (ParsedClassType) ct;
 						init = pct.initializer();
 						pct.setInitializer(new LazyClassInitializer() {
-							public boolean fromClassFile() {
+							@Override
+              public boolean fromClassFile() {
 								return false;
 							}
 
-							public void setClass(ParsedClassType ct) {
+							@Override
+              public void setClass(ParsedClassType ct) {
 							}
 
-							public void initTypeObject() {
+							@Override
+              public void initTypeObject() {
 							}
 
-							public boolean isTypeObjectInitialized() {
+							@Override
+              public boolean isTypeObjectInitialized() {
 								return true;
 							}
 
-							public void initSuperclass() {
+							@Override
+              public void initSuperclass() {
 							}
 
-							public void initInterfaces() {
+							@Override
+              public void initInterfaces() {
 							}
 
-							public void initMemberClasses() {
+							@Override
+              public void initMemberClasses() {
 							}
 
-							public void initConstructors() {
+							@Override
+              public void initConstructors() {
 							}
 
-							public void initMethods() {
+							@Override
+              public void initMethods() {
 							}
 
-							public void initFields() {
+							@Override
+              public void initFields() {
 							}
 
-							public void canonicalConstructors() {
+							@Override
+              public void canonicalConstructors() {
 							}
 
-							public void canonicalMethods() {
+							@Override
+              public void canonicalMethods() {
 							}
 
-							public void canonicalFields() {
+							@Override
+              public void canonicalFields() {
 							}
 						});
 					}
 
-					for (Iterator<MethodInstance> i = ct.methods().iterator(); i
-							.hasNext();)
-						Report.report(2, "* " + i.next());
-					for (Iterator<FieldInstance> i = ct.fields().iterator(); i
-							.hasNext();)
-						Report.report(2, "* " + i.next());
-					for (Iterator<ConstructorInstance> i = ct.constructors()
-							.iterator(); i.hasNext();)
-						Report.report(2, "* " + i.next());
+					for (MethodInstance mi : ct.methods())
+						Report.report(2, "* " + mi);
+					for (FieldInstance fi : ct.fields())
+						Report.report(2, "* " + fi);
+					for (ConstructorInstance ci : ct.constructors())
+						Report.report(2, "* " + ci);
 
 					if (ct instanceof ParsedClassType) {
 						ParsedClassType pct = (ParsedClassType) ct;

@@ -52,12 +52,12 @@ public interface NewArray extends Expr
     /** List of dimension expressions.
      * @return A list of {@link polyglot.ast.Expr Expr}.
      */
-    List dims();
+    List<Expr> dims();
 
     /** Set the list of dimension expressions.
      * @param dims A list of {@link polyglot.ast.Expr Expr}.
      */
-    NewArray dims(List dims);
+    NewArray dims(List<Expr> dims);
 
     /** The number of additional dimensions. */
     int additionalDims();

@@ -25,12 +25,23 @@
 
 package polyglot.ast;
 
-import polyglot.ast.*;
-import polyglot.util.*;
-import polyglot.types.*;
-import polyglot.visit.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.ListIterator;
 
-import java.util.*;
+import polyglot.types.SemanticException;
+import polyglot.types.Type;
+import polyglot.types.TypeSystem;
+import polyglot.util.CodeWriter;
+import polyglot.util.CollectionUtil;
+import polyglot.util.ListUtil;
+import polyglot.util.Position;
+import polyglot.util.SubtypeSet;
+import polyglot.visit.CFGBuilder;
+import polyglot.visit.ExceptionChecker;
+import polyglot.visit.NodeVisitor;
+import polyglot.visit.PrettyPrinter;
 
 /**
  * An immutable representation of a <code>try</code> block, one or more
@@ -42,7 +53,7 @@ public class Try_c extends Stmt_c implements Try
     protected List<Catch> catchBlocks;
     protected Block finallyBlock;
 
-    public Try_c(Position pos, Block tryBlock, List catchBlocks, Block finallyBlock) {
+    public Try_c(Position pos, Block tryBlock, List<Catch> catchBlocks, Block finallyBlock) {
 	super(pos);
 	assert(tryBlock != null && catchBlocks != null); // finallyBlock may be null, catchBlocks empty
 	assert(! catchBlocks.isEmpty() || finallyBlock != null); // must be either try-catch or try(-catch)-finally
@@ -52,11 +63,13 @@ public class Try_c extends Stmt_c implements Try
     }
 
     /** Get the try block of the statement. */
+    @Override
     public Block tryBlock() {
 	return this.tryBlock;
     }
 
     /** Set the try block of the statement. */
+    @Override
     public Try tryBlock(Block tryBlock) {
 	Try_c n = (Try_c) copy();
 	n.tryBlock = tryBlock;
@@ -64,23 +77,27 @@ public class Try_c extends Stmt_c implements Try
     }
 
     /** Get the catch blocks of the statement. */
-    public List catchBlocks() {
+    @Override
+    public List<Catch> catchBlocks() {
 	return Collections.unmodifiableList(this.catchBlocks);
     }
 
     /** Set the catch blocks of the statement. */
-    public Try catchBlocks(List catchBlocks) {
+    @Override
+    public Try catchBlocks(List<Catch> catchBlocks) {
 	Try_c n = (Try_c) copy();
 	n.catchBlocks = ListUtil.copy(catchBlocks, true);
 	return n;
     }
 
     /** Get the finally block of the statement. */
+    @Override
     public Block finallyBlock() {
 	return this.finallyBlock;
     }
 
     /** Set the finally block of the statement. */
+    @Override
     public Try finallyBlock(Block finallyBlock) {
 	Try_c n = (Try_c) copy();
 	n.finallyBlock = finallyBlock;
@@ -88,7 +105,7 @@ public class Try_c extends Stmt_c implements Try
     }
 
     /** Reconstruct the statement. */
-    protected Try_c reconstruct(Block tryBlock, List catchBlocks, Block finallyBlock) {
+    protected Try_c reconstruct(Block tryBlock, List<Catch> catchBlocks, Block finallyBlock) {
 	if (tryBlock != this.tryBlock || ! CollectionUtil.equals(catchBlocks, this.catchBlocks) || finallyBlock != this.finallyBlock) {
 	    Try_c n = (Try_c) copy();
 	    n.tryBlock = tryBlock;
@@ -101,9 +118,10 @@ public class Try_c extends Stmt_c implements Try
     }
 
     /** Visit the children of the statement. */
+    @Override
     public Node visitChildren(NodeVisitor v) {
 	Block tryBlock = (Block) visitChild(this.tryBlock, v);
-	List catchBlocks = visitList(this.catchBlocks, v);
+	List<Catch> catchBlocks = visitList(this.catchBlocks, v);
 	Block finallyBlock = (Block) visitChild(this.finallyBlock, v);
 	return reconstruct(tryBlock, catchBlocks, finallyBlock);
     }
@@ -115,6 +133,7 @@ public class Try_c extends Stmt_c implements Try
      * exceptionCheck(), called from ExceptionChecker.leave(),
      * will handle visiting children.
      */
+    @Override
     public NodeVisitor exceptionCheckEnter(ExceptionChecker ec)
 	throws SemanticException
     {
@@ -131,6 +150,7 @@ public class Try_c extends Stmt_c implements Try
      * child node. It contains the exceptions that can be thrown by the try
      * block.
      */
+    @Override
     public Node exceptionCheck(ExceptionChecker ec)
     throws SemanticException
     {
@@ -148,8 +168,8 @@ public class Try_c extends Stmt_c implements Try
         }
         
         ExceptionChecker newec = ec.push();
-        for (ListIterator i = this.catchBlocks.listIterator(this.catchBlocks.size()); i.hasPrevious(); ) {
-            Catch cb = (Catch) i.previous();
+        for (ListIterator<Catch> i = this.catchBlocks.listIterator(this.catchBlocks.size()); i.hasPrevious(); ) {
+            Catch cb = i.previous();
             Type catchType = cb.catchType();
             
             newec = newec.push(catchType);
@@ -162,8 +182,7 @@ public class Try_c extends Stmt_c implements Try
         
         // Walk through our catch blocks, making sure that they each can 
         // catch something.
-        for (Iterator i = this.catchBlocks.iterator(); i.hasNext(); ) {
-            Catch cb = (Catch) i.next();
+        for (Catch cb : this.catchBlocks) {
             Type catchType = cb.catchType();
             
             
@@ -179,11 +198,9 @@ public class Try_c extends Stmt_c implements Try
         
         
         // now visit the catch blocks, using the original exception checker
-        List catchBlocks = new ArrayList(this.catchBlocks.size());
+        List<Catch> catchBlocks = new ArrayList<Catch>(this.catchBlocks.size());
         
-        for (Iterator i = this.catchBlocks.iterator(); i.hasNext(); ) {
-            Catch cb = (Catch) i.next();
-            
+        for (Catch cb : this.catchBlocks) {
             ec = ec.push();
             cb = (Catch) this.visitChild(cb, ec);
             catchBlocks.add(cb);
@@ -215,6 +232,7 @@ public class Try_c extends Stmt_c implements Try
         return t.reconstruct(tryBlock, catchBlocks, finallyBlock);
     }
 
+    @Override
     public String toString() {
         StringBuffer sb = new StringBuffer();
         sb.append("try ");
@@ -222,9 +240,7 @@ public class Try_c extends Stmt_c implements Try
 
         int count = 0;
 
-	for (Iterator it = catchBlocks.iterator(); it.hasNext(); ) {
-	    Catch cb = (Catch) it.next();
-
+	for (Catch cb : catchBlocks) {
             if (count++ > 2) {
               sb.append("...");
               break;
@@ -242,12 +258,12 @@ public class Try_c extends Stmt_c implements Try
         return sb.toString();
     }
 
+    @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
 	w.write("try");
 	printSubStmt(tryBlock, w, tr);
 
-	for (Iterator it = catchBlocks.iterator(); it.hasNext(); ) {
-	    Catch cb = (Catch) it.next();
+	for (Catch cb : catchBlocks) {
 	    w.newline(0);
 	    printBlock(cb, w, tr);
 	}
@@ -259,11 +275,13 @@ public class Try_c extends Stmt_c implements Try
 	}
     }
 
+    @Override
     public Term firstChild() {
         return tryBlock;
     }
 
-    public List acceptCFG(CFGBuilder v, List succs) {
+    @Override
+    public <T> List<T> acceptCFG(CFGBuilder v, List<T> succs) {
         // Add edges from the try entry to any catch blocks for Error and
         // RuntimeException.
         TypeSystem ts = v.typeSystem();
@@ -271,8 +289,7 @@ public class Try_c extends Stmt_c implements Try
         CFGBuilder v1 = v.push(this, false);
         CFGBuilder v2 = v.push(this, true);
 
-        for (Iterator i = ts.uncheckedExceptions().iterator(); i.hasNext(); ) {
-            Type type = (Type) i.next();
+        for (Type type : ts.uncheckedExceptions()) {
             v1.visitThrow(tryBlock, ENTRY, type);
         }
 
@@ -285,8 +302,7 @@ public class Try_c extends Stmt_c implements Try
             v1.visitCFG(tryBlock, this, EXIT);
         }
 
-        for (Iterator it = catchBlocks.iterator(); it.hasNext(); ) {
-            Catch cb = (Catch) it.next();
+        for (Catch cb : catchBlocks) {
             if (finallyBlock != null) {
                 v2.visitCFG(cb, finallyBlock, ENTRY);
             } else {
@@ -297,6 +313,7 @@ public class Try_c extends Stmt_c implements Try
         return succs;
     }
     
+    @Override
     public Node copy(NodeFactory nf) {
         return nf.Try(this.position, this.tryBlock, this.catchBlocks, this.finallyBlock);
     }

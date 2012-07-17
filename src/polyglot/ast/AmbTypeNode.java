@@ -54,6 +54,7 @@ public interface AmbTypeNode extends TypeNode, Ambiguous
     /**
      * Ambiguous name.
      */
+    @Override
     String name();
 
     /**

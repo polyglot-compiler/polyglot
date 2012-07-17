@@ -46,6 +46,7 @@ public class AmbPrefix_c extends Node_c implements AmbPrefix
     }
     
     /** Get the name of the prefix. */
+    @Override
     public Id nameNode() {
         return this.name;
     }
@@ -58,6 +59,7 @@ public class AmbPrefix_c extends Node_c implements AmbPrefix
     }
 
     /** Get the name of the prefix. */
+    @Override
     public String name() {
 	return this.name.id();
     }
@@ -68,6 +70,7 @@ public class AmbPrefix_c extends Node_c implements AmbPrefix
     }
 
     /** Get the prefix of the prefix. */
+    @Override
     public Prefix prefix() {
 	return this.prefix;
     }
@@ -92,6 +95,7 @@ public class AmbPrefix_c extends Node_c implements AmbPrefix
     }
 
     /** Visit the children of the prefix. */
+    @Override
     public Node visitChildren(NodeVisitor v) {
 	Prefix prefix = (Prefix) visitChild(this.prefix, v);
         Id name = (Id) visitChild(this.name, v);
@@ -99,6 +103,7 @@ public class AmbPrefix_c extends Node_c implements AmbPrefix
     }
 
     /** Disambiguate the prefix. */
+    @Override
     public Node disambiguate(AmbiguityRemover ar) throws SemanticException {
         if (prefix != null && ! prefix.isDisambiguated()) {
             return this;
@@ -107,18 +112,21 @@ public class AmbPrefix_c extends Node_c implements AmbPrefix
 	return ar.nodeFactory().disamb().disambiguate(this, ar, position(), prefix, name);
     }
 
+    @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
         // Didn't finish disambiguation; just return.
         return this;
     }
 
     /** Check exceptions thrown by the prefix. */
+    @Override
     public Node exceptionCheck(ExceptionChecker ec) throws SemanticException {
 	throw new InternalCompilerError(position(),
 	    "Cannot exception check ambiguous node " + this + ".");
     } 
 
     /** Write the prefix to an output file. */
+    @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
 	if (prefix != null) {
             print(prefix, w, tr);
@@ -128,11 +136,13 @@ public class AmbPrefix_c extends Node_c implements AmbPrefix
         tr.print(this, name, w);
     }
 
+    @Override
     public String toString() {
 	return (prefix == null
 		? name.toString()
 		: prefix.toString() + "." + name.toString()) + "{amb}";
     }
+    @Override
     public Node copy(NodeFactory nf) {
         return nf.AmbPrefix(this.position, this.prefix, this.name);
     }

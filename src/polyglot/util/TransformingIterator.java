@@ -37,41 +37,47 @@ import java.util.Collection;
  *
  *     Does not support Remove.
  **/
-public final class TransformingIterator implements Iterator {
-  public TransformingIterator(Iterator iter, Transformation trans) {
+public final class TransformingIterator<T, U> implements Iterator<U> {
+  @SuppressWarnings("unchecked")
+  public TransformingIterator(Iterator<T> iter, Transformation<T, U> trans) {
     this(new Iterator[]{iter}, trans);
   }
 
-  public TransformingIterator(Collection iters, Transformation trans) {
+  public TransformingIterator(Collection<Iterator<T>> iters, Transformation<T, U> trans) {
     index = 0;
-    backing_iterators = (Iterator[]) iters.toArray(new Iterator[0]);
+    @SuppressWarnings("unchecked")
+    Iterator<T>[] tmp = new Iterator[0];
+    backing_iterators = iters.toArray(tmp);
     transformation = trans;
     if (backing_iterators.length > 0)
       current_iter = backing_iterators[0];
     findNextItem();
   }
 
-  public TransformingIterator(Iterator[] iters, Transformation trans) {
+  public TransformingIterator(Iterator<T>[] iters, Transformation<T, U> trans) {
     index = 0;
-    backing_iterators = (Iterator[]) iters.clone();
+    backing_iterators = iters.clone();
     transformation = trans;
     if (iters.length > 0) 
       current_iter = iters[0];
     findNextItem();
   }
 
-  public Object next() {
-    Object res = next_item;
+  @Override
+  public U next() {
+    U res = next_item;
     if (res == null)
       throw new java.util.NoSuchElementException();
     findNextItem();
     return res;
   }
 
+  @Override
   public boolean hasNext() {
     return next_item != null;
   }
   
+  @Override
   public void remove() {
     throw new UnsupportedOperationException("TransformingIterator.remove");
   }
@@ -81,8 +87,8 @@ public final class TransformingIterator implements Iterator {
     while (current_iter != null) {
     inner_loop:
       while (current_iter.hasNext()) {		
-	Object o = current_iter.next();	
-	Object res = transformation.transform(o);
+	T o = current_iter.next();	
+	U res = transformation.transform(o);
 	if (res == Transformation.NOTHING)
 	  continue inner_loop;
 	next_item = res;
@@ -103,11 +109,11 @@ public final class TransformingIterator implements Iterator {
   //      those elements e of backing_iterator[index] transformed by TRANS.
   // RI: current_iter = backing_iterators[index], or null if no 
   //     backing_iterator hasNext.
-  protected Object next_item;
-  protected Iterator current_iter;
+  protected U next_item;
+  protected Iterator<T> current_iter;
   protected int index;
-  protected Iterator[] backing_iterators;
-  protected Transformation transformation;
+  protected Iterator<T>[] backing_iterators;
+  protected Transformation<T, U> transformation;
 }
 
 

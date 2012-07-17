@@ -42,6 +42,7 @@ public class AmbReceiver_c extends AmbPrefix_c implements AmbReceiver
 	assert(name != null); // prefix may be null
     }
 
+    @Override
     public Type type() {
             return this.type;
     }
@@ -52,11 +53,13 @@ public class AmbReceiver_c extends AmbPrefix_c implements AmbReceiver
             return n;
     }
 
+    @Override
     public Node buildTypes(TypeBuilder tb) throws SemanticException {
         return type(tb.typeSystem().unknownType(position()));
     }
 
     /** Disambiguate the receiver. */
+    @Override
     public Node disambiguate(AmbiguityRemover ar) throws SemanticException {
 	Node n = super.disambiguate(ar);
 
@@ -71,10 +74,12 @@ public class AmbReceiver_c extends AmbPrefix_c implements AmbReceiver
     }
     
 
+    @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
         // Didn't finish disambiguation; just return.
         return this;
     }
+    @Override
     public Node copy(NodeFactory nf) {
         return nf.AmbReceiver(this.position, this.prefix, this.name);
     }

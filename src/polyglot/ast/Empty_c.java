@@ -39,21 +39,26 @@ public class Empty_c extends Stmt_c implements Empty
     }
 
     /** Write the statement to an output file. */
+    @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
 	w.write(";");
     }
 
+    @Override
     public Term firstChild() {
         return null;
     }
 
-    public List acceptCFG(CFGBuilder v, List succs) {
+    @Override
+    public <T> List<T> acceptCFG(CFGBuilder v, List<T> succs) {
         return succs;
     }
 
+    @Override
     public String toString() {
 	return ";";
     }
+    @Override
     public Node copy(NodeFactory nf) {
         return nf.Empty(this.position);
     }

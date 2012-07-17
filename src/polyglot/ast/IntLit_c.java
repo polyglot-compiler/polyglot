@@ -48,17 +48,20 @@ public class IntLit_c extends NumLit_c implements IntLit
      * @return True if this is a boundary case: the literal can only appear
      * as the operand of a unary minus.
      */
+    @Override
     public boolean boundary() {
         return (kind == INT && (int) value == Integer.MIN_VALUE)
             || (kind == LONG && value == Long.MIN_VALUE);
     }
 
     /** Get the value of the expression. */
+    @Override
     public long value() {
         return longValue();
     }
 
     /** Set the value of the expression. */
+    @Override
     public IntLit value(long value) {
         IntLit_c n = (IntLit_c) copy();
 	n.value = value;
@@ -66,11 +69,13 @@ public class IntLit_c extends NumLit_c implements IntLit
     }
 
     /** Get the kind of the expression. */
+    @Override
     public IntLit.Kind kind() {
         return kind;
     }
 
     /** Set the kind of the expression. */
+    @Override
     public IntLit kind(IntLit.Kind kind) {
 	IntLit_c n = (IntLit_c) copy();
 	n.kind = kind;
@@ -78,6 +83,7 @@ public class IntLit_c extends NumLit_c implements IntLit
     }
 
     /** Type check the expression. */
+    @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
         TypeSystem ts = tc.typeSystem();
 
@@ -94,6 +100,7 @@ public class IntLit_c extends NumLit_c implements IntLit
 	}
     }
 
+    @Override
     public String positiveToString() {
 	if (kind() == LONG) {
             if (boundary()) {
@@ -121,6 +128,7 @@ public class IntLit_c extends NumLit_c implements IntLit
 	}
     }
 
+    @Override
     public String toString() {
 	if (kind() == LONG) {
             return Long.toString(value) + "L";
@@ -130,10 +138,12 @@ public class IntLit_c extends NumLit_c implements IntLit
 	}
     }
 
+    @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
         w.write(toString());
     }
 
+    @Override
     public Object constantValue() {
 	if (kind() == LONG) {
             return new Long(value);
@@ -143,6 +153,7 @@ public class IntLit_c extends NumLit_c implements IntLit
 	}
     }
 
+    @Override
     public Precedence precedence() {
         if (value < 0L && ! boundary()) {
             return Precedence.UNARY;
@@ -152,6 +163,7 @@ public class IntLit_c extends NumLit_c implements IntLit
         }
     }
     
+    @Override
     public Node copy(NodeFactory nf) {
         return nf.IntLit(this.position, this.kind, this.value);
     }

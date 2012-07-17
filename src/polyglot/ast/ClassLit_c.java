@@ -48,6 +48,7 @@ public class ClassLit_c extends Lit_c implements ClassLit
     this.typeNode = typeNode;
   }
 
+  @Override
   public TypeNode typeNode() {
     return this.typeNode;
   }
@@ -69,30 +70,36 @@ public class ClassLit_c extends Lit_c implements ClassLit
     return null;
   }
 
+  @Override
   public Term firstChild() {
       return typeNode;
   }
 
-  public List acceptCFG(CFGBuilder v, List succs) {
+  @Override
+  public <T> List<T> acceptCFG(CFGBuilder v, List<T> succs) {
       v.visitCFG(typeNode, this, EXIT);
       return succs;
   }
 
+  @Override
   public Node visitChildren(NodeVisitor v) {
-    TypeNode tn = (TypeNode)visitChild(this.typeNode, v);
+    TypeNode tn = (TypeNode) visitChild(this.typeNode, v);
     return this.typeNode(tn);
   }
 
   /** Type check the expression. */
+  @Override
   public Node typeCheck(TypeChecker tc) throws SemanticException {
     return type(tc.typeSystem().Class());
   }
 
+  @Override
   public String toString() {
     return typeNode.toString() + ".class";
   }
 
   /** Write the expression to an output file. */
+  @Override
   public void prettyPrint(CodeWriter w, PrettyPrinter tr)
   {
     w.begin(0);
@@ -105,13 +112,16 @@ public class ClassLit_c extends Lit_c implements ClassLit
    * According to the JLS 2nd Ed, sec 15.28, a class literal 
    * is not a compile time constant.
    */
+  @Override
   public boolean isConstant() {
     return false;
   }
 
+  @Override
   public Object constantValue() {
     return null;
   }
+  @Override
   public Node copy(NodeFactory nf) {
       return nf.ClassLit(this.position, this.typeNode);
   }

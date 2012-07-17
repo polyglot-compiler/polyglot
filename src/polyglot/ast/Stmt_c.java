@@ -25,9 +25,7 @@
 
 package polyglot.ast;
 
-import polyglot.ast.*;
-import polyglot.visit.*;
-import polyglot.util.*;
+import polyglot.util.Position;
 
 /**
  * A <code>Stmt</code> represents any Java statement.  All statements must

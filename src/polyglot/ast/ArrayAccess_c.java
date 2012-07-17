@@ -47,16 +47,19 @@ public class ArrayAccess_c extends Expr_c implements ArrayAccess
     }
 
     /** Get the precedence of the expression. */
+    @Override
     public Precedence precedence() { 
 	return Precedence.LITERAL;
     }
 
     /** Get the array of the expression. */
+    @Override
     public Expr array() {
 	return this.array;
     }
 
     /** Set the array of the expression. */
+    @Override
     public ArrayAccess array(Expr array) {
 	ArrayAccess_c n = (ArrayAccess_c) copy();
 	n.array = array;
@@ -64,11 +67,13 @@ public class ArrayAccess_c extends Expr_c implements ArrayAccess
     }
 
     /** Get the index of the expression. */
+    @Override
     public Expr index() {
 	return this.index;
     }
 
     /** Set the index of the expression. */
+    @Override
     public ArrayAccess index(Expr index) {
 	ArrayAccess_c n = (ArrayAccess_c) copy();
 	n.index = index;
@@ -76,6 +81,7 @@ public class ArrayAccess_c extends Expr_c implements ArrayAccess
     }
 
     /** Return the access flags of the variable. */
+    @Override
     public Flags flags() {
         return Flags.NONE;
     }
@@ -93,6 +99,7 @@ public class ArrayAccess_c extends Expr_c implements ArrayAccess
     }
 
     /** Visit the children of the expression. */
+    @Override
     public Node visitChildren(NodeVisitor v) {
 	Expr array = (Expr) visitChild(this.array, v);
 	Expr index = (Expr) visitChild(this.index, v);
@@ -100,6 +107,7 @@ public class ArrayAccess_c extends Expr_c implements ArrayAccess
     }
 
     /** Type check the expression. */
+    @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
         TypeSystem ts = tc.typeSystem();
 
@@ -116,6 +124,7 @@ public class ArrayAccess_c extends Expr_c implements ArrayAccess
 	return type(array.type().toArray().base());
     }
 
+    @Override
     public Type childExpectedType(Expr child, AscriptionVisitor av) {
         TypeSystem ts = av.typeSystem();
 
@@ -130,11 +139,13 @@ public class ArrayAccess_c extends Expr_c implements ArrayAccess
         return child.type();
     }
 
+    @Override
     public String toString() {
 	return array + "[" + index + "]";
     }
 
     /** Write the expression to an output file. */
+    @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
 	printSubExpr(array, w, tr);
 	w.write ("[");
@@ -142,20 +153,24 @@ public class ArrayAccess_c extends Expr_c implements ArrayAccess
 	w.write ("]");
     }
 
+    @Override
     public Term firstChild() {
         return array;
     }
 
-    public List acceptCFG(CFGBuilder v, List succs) {
+    @Override
+    public <T> List<T> acceptCFG(CFGBuilder v, List<T> succs) {
         v.visitCFG(array, index, ENTRY);
         v.visitCFG(index, this, EXIT);
         return succs;
     }
 
-    public List throwTypes(TypeSystem ts) {
-        return CollectionUtil.list(ts.OutOfBoundsException(),
+    @Override
+    public List<Type> throwTypes(TypeSystem ts) {
+        return CollectionUtil.list((Type) ts.OutOfBoundsException(),
                                    ts.NullPointerException());
     }
+    @Override
     public Node copy(NodeFactory nf) {
         return nf.ArrayAccess(this.position, this.array, this.index);
     }

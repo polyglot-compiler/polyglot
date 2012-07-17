@@ -35,6 +35,7 @@ import java.util.List;
 public interface MethodDecl extends ProcedureDecl 
 {
     /** The method's flags. */
+    @Override
     Flags flags();
 
     /** Set the method's flags. */
@@ -53,6 +54,7 @@ public interface MethodDecl extends ProcedureDecl
     MethodDecl id(Id name);
     
     /** The method's name. */
+    @Override
     String name();
 
     /** Set the method's name. */
@@ -61,22 +63,24 @@ public interface MethodDecl extends ProcedureDecl
     /** The method's formal parameters.
      * @return A list of {@link polyglot.ast.Formal Formal}.
      */
-    List formals();
+    @Override
+    List<Formal> formals();
 
     /** Set the method's formal parameters.
      * @param formals A list of {@link polyglot.ast.Formal Formal}.
      */
-    MethodDecl formals(List formals);
+    MethodDecl formals(List<Formal> formals);
 
     /** The method's exception throw types.
      * @return A list of {@link polyglot.ast.TypeNode TypeNode}.
      */
-    List throwTypes();
+    @Override
+    List<TypeNode> throwTypes();
 
     /** Set the method's exception throw types.
      * @param throwTypes A list of {@link polyglot.ast.TypeNode TypeNode}.
      */
-    MethodDecl throwTypes(List throwTypes);
+    MethodDecl throwTypes(List<TypeNode> throwTypes);
 
     /**
      * The method type object.  This field may not be valid until

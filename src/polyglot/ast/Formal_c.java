@@ -53,21 +53,25 @@ public class Formal_c extends Term_c implements Formal
         this.name = name;
     }
 
+    @Override
     public boolean isDisambiguated() {
         return li != null && li.isCanonical() && super.isDisambiguated();
     }
 
     /** Get the type of the formal. */
+    @Override
     public Type declType() {
         return type.type();
     }
 
     /** Get the flags of the formal. */
+    @Override
     public Flags flags() {
 	return flags;
     }
 
     /** Set the flags of the formal. */
+    @Override
     public Formal flags(Flags flags) {
         if (flags.equals(this.flags)) return this;
 	Formal_c n = (Formal_c) copy();
@@ -76,11 +80,13 @@ public class Formal_c extends Term_c implements Formal
     }
 
     /** Get the type node of the formal. */
+    @Override
     public TypeNode type() {
 	return type;
     }
 
     /** Set the type node of the formal. */
+    @Override
     public Formal type(TypeNode type) {
 	Formal_c n = (Formal_c) copy();
 	n.type = type;
@@ -88,11 +94,13 @@ public class Formal_c extends Term_c implements Formal
     }
     
     /** Get the name of the formal. */
+    @Override
     public Id id() {
         return name;
     }
     
     /** Set the name of the formal. */
+    @Override
     public Formal id(Id name) {
         Formal_c n = (Formal_c) copy();
         n.name = name;
@@ -100,21 +108,25 @@ public class Formal_c extends Term_c implements Formal
     }
 
     /** Get the name of the formal. */
+    @Override
     public String name() {
 	return name.id();
     }
 
     /** Set the name of the formal. */
+    @Override
     public Formal name(String name) {
         return id(this.name.id(name));
     }
 
     /** Get the local instance of the formal. */
+    @Override
     public LocalInstance localInstance() {
         return li;
     }
 
     /** Set the local instance of the formal. */
+    @Override
     public Formal localInstance(LocalInstance li) {
         if (li == this.li) return this;
         Formal_c n = (Formal_c) copy();
@@ -135,17 +147,20 @@ public class Formal_c extends Term_c implements Formal
     }
 
     /** Visit the children of the formal. */
+    @Override
     public Node visitChildren(NodeVisitor v) {
 	TypeNode type = (TypeNode) visitChild(this.type, v);
         Id name = (Id) visitChild(this.name, v);
 	return reconstruct(type, name);
     }
 
+    @Override
     public void addDecls(Context c) {
         c.addVariable(li);
     }
 
     /** Write the formal to an output file. */
+    @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
         w.write(flags.translate());
         print(type, w, tr);
@@ -154,6 +169,7 @@ public class Formal_c extends Term_c implements Formal
     }
 
     /** Build type objects for the formal. */
+    @Override
     public Node buildTypes(TypeBuilder tb) throws SemanticException {
         Formal_c n = (Formal_c) super.buildTypes(tb);
 
@@ -165,6 +181,7 @@ public class Formal_c extends Term_c implements Formal
         return n.localInstance(li);
     }
 
+    @Override
     public Node disambiguate(AmbiguityRemover ar) throws SemanticException {
         if (li.isCanonical()) {
             return this;
@@ -178,6 +195,7 @@ public class Formal_c extends Term_c implements Formal
     }
 
     /** Type check the formal. */
+    @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
         // Check if the variable is multiply defined.
         Context c = tc.context();
@@ -203,15 +221,18 @@ public class Formal_c extends Term_c implements Formal
 	return this;
     }
 
+    @Override
     public Term firstChild() {
         return type;
     }
 
-    public List acceptCFG(CFGBuilder v, List succs) {
+    @Override
+    public <T> List<T> acceptCFG(CFGBuilder v, List<T> succs) {
         v.visitCFG(type, this, EXIT);        
         return succs;
     }
 
+    @Override
     public void dump(CodeWriter w) {
 	super.dump(w);
 
@@ -228,9 +249,11 @@ public class Formal_c extends Term_c implements Formal
 	w.end();
     }
 
+    @Override
     public String toString() {
         return flags.translate() + type + " " + name;
     }
+    @Override
     public Node copy(NodeFactory nf) {
         return nf.Formal(this.position, this.flags, this.type, this.name);
     }

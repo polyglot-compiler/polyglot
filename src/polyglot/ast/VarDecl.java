@@ -25,10 +25,9 @@
 
 package polyglot.ast;
 
-import polyglot.types.Type;
 import polyglot.types.Flags;
 import polyglot.types.LocalInstance;
-import polyglot.types.SemanticException;
+import polyglot.types.Type;
 
 /**
  * A <code>VarDecl</code> represents a local variable declaration, of either a formal

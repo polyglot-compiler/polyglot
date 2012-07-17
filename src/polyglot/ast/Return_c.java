@@ -25,11 +25,26 @@
 
 package polyglot.ast;
 
-import polyglot.ast.*;
-import polyglot.types.*;
-import polyglot.visit.*;
-import polyglot.util.*;
-import java.util.*;
+import java.util.Collections;
+import java.util.List;
+
+import polyglot.types.CodeInstance;
+import polyglot.types.ConstructorInstance;
+import polyglot.types.Context;
+import polyglot.types.FunctionInstance;
+import polyglot.types.InitializerInstance;
+import polyglot.types.MethodInstance;
+import polyglot.types.SemanticException;
+import polyglot.types.Type;
+import polyglot.types.TypeSystem;
+import polyglot.util.CodeWriter;
+import polyglot.util.InternalCompilerError;
+import polyglot.util.Position;
+import polyglot.visit.AscriptionVisitor;
+import polyglot.visit.CFGBuilder;
+import polyglot.visit.NodeVisitor;
+import polyglot.visit.PrettyPrinter;
+import polyglot.visit.TypeChecker;
 
 /**
  * A <code>Return</code> represents a <code>return</code> statement in Java.
@@ -47,11 +62,13 @@ public class Return_c extends Stmt_c implements Return
     }
 
     /** Get the expression to return, or null. */
+    @Override
     public Expr expr() {
 	return this.expr;
     }
 
     /** Set the expression to return, or null. */
+    @Override
     public Return expr(Expr expr) {
 	Return_c n = (Return_c) copy();
 	n.expr = expr;
@@ -70,12 +87,14 @@ public class Return_c extends Stmt_c implements Return
     }
 
     /** Visit the children of the statement. */
+    @Override
     public Node visitChildren(NodeVisitor v) {
 	Expr expr = (Expr) visitChild(this.expr, v);
 	return reconstruct(expr);
     }
 
     /** Type check the statement. */
+    @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
 	TypeSystem ts = tc.typeSystem();
 	Context c = tc.context();
@@ -130,6 +149,7 @@ public class Return_c extends Stmt_c implements Return
 	throw new InternalCompilerError("Unrecognized code type.");
     }
   
+    @Override
     public Type childExpectedType(Expr child, AscriptionVisitor av) {
         if (child == expr) {
             Context c = av.context();
@@ -155,11 +175,13 @@ public class Return_c extends Stmt_c implements Return
         return child.type();
     }
 
+    @Override
     public String toString() {
 	return "return" + (expr != null ? " " + expr : "") + ";";
     }
 
     /** Write the statement to an output file. */
+    @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
 	w.write("return") ;
 	if (expr != null) {
@@ -169,20 +191,23 @@ public class Return_c extends Stmt_c implements Return
 	w.write(";");
     }
 
+    @Override
     public Term firstChild() {
         if (expr != null) return expr;
         return null;
     }
 
-    public List acceptCFG(CFGBuilder v, List succs) {
+    @Override
+    public <T> List<T> acceptCFG(CFGBuilder v, List<T> succs) {
         if (expr != null) {
             v.visitCFG(expr, this, EXIT);
         }
 
         v.visitReturn(this);
-        return Collections.EMPTY_LIST;
+        return Collections.<T> emptyList();
     }
     
+    @Override
     public Node copy(NodeFactory nf) {
         return nf.Return(this.position, this.expr);
     }

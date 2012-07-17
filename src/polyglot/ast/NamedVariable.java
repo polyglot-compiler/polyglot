@@ -35,6 +35,7 @@ import polyglot.types.VarInstance;
 public interface NamedVariable extends Variable
 {
     /** Return the access flags of the variable, or Flags.NONE */
+    @Override
     public Flags flags();
 
     /** Return the name of the variable. */

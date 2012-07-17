@@ -45,11 +45,13 @@ public class LocalClassDecl_c extends Stmt_c implements LocalClassDecl
     }
 
     /** Get the class declaration. */
+    @Override
     public ClassDecl decl() {
 	return this.decl;
     }
 
     /** Set the class declaration. */
+    @Override
     public LocalClassDecl decl(ClassDecl decl) {
 	LocalClassDecl_c n = (LocalClassDecl_c) copy();
 	n.decl = decl;
@@ -71,6 +73,7 @@ public class LocalClassDecl_c extends Stmt_c implements LocalClassDecl
      * Return the first (sub)term performed when evaluating this
      * term.
      */
+    @Override
     public Term firstChild() {
         return decl();
     }
@@ -78,12 +81,14 @@ public class LocalClassDecl_c extends Stmt_c implements LocalClassDecl
     /**
      * Visit this term in evaluation order.
      */
-    public List acceptCFG(CFGBuilder v, List succs) {
+    @Override
+    public <T> List<T> acceptCFG(CFGBuilder v, List<T> succs) {
         v.visitCFG(decl(), this, EXIT);
         return succs;
     }
 
     /** Visit the children of the statement. */
+    @Override
     public Node visitChildren(NodeVisitor v) {
         Node decl = visitChild(this.decl, v);
         if (decl instanceof NodeList) {
@@ -100,6 +105,7 @@ public class LocalClassDecl_c extends Stmt_c implements LocalClassDecl
         return reconstruct((ClassDecl) decl);
     }
 
+    @Override
     public void addDecls(Context c) {
         // We should now be back in the scope of the enclosing block.
         // Add the type.
@@ -109,16 +115,19 @@ public class LocalClassDecl_c extends Stmt_c implements LocalClassDecl
         c.addNamed(decl.type().toClass());
     }
 
+    @Override
     public String toString() {
 	return decl.toString();
     }
 
     /** Write the statement to an output file. */
+    @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
         printBlock(decl, w, tr);
 	w.write(";");
     }
     
+    @Override
     public Node copy(NodeFactory nf) {
         return nf.LocalClassDecl(this.position, this.decl);
     }

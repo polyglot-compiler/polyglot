@@ -49,16 +49,19 @@ public class Conditional_c extends Expr_c implements Conditional
     }
 
     /** Get the precedence of the expression. */
+    @Override
     public Precedence precedence() { 
 	return Precedence.CONDITIONAL;
     }
 
     /** Get the conditional of the expression. */
+    @Override
     public Expr cond() {
 	return this.cond;
     }
 
     /** Set the conditional of the expression. */
+    @Override
     public Conditional cond(Expr cond) {
 	Conditional_c n = (Conditional_c) copy();
 	n.cond = cond;
@@ -66,11 +69,13 @@ public class Conditional_c extends Expr_c implements Conditional
     }
 
     /** Get the consequent of the expression. */
+    @Override
     public Expr consequent() {
 	return this.consequent;
     }
 
     /** Set the consequent of the expression. */
+    @Override
     public Conditional consequent(Expr consequent) {
 	Conditional_c n = (Conditional_c) copy();
 	n.consequent = consequent;
@@ -78,11 +83,13 @@ public class Conditional_c extends Expr_c implements Conditional
     }
 
     /** Get the alternative of the expression. */
+    @Override
     public Expr alternative() {
 	return this.alternative;
     }
 
     /** Set the alternative of the expression. */
+    @Override
     public Conditional alternative(Expr alternative) {
 	Conditional_c n = (Conditional_c) copy();
 	n.alternative = alternative;
@@ -103,6 +110,7 @@ public class Conditional_c extends Expr_c implements Conditional
     }
 
     /** Visit the children of the expression. */
+    @Override
     public Node visitChildren(NodeVisitor v) {
 	Expr cond = (Expr) visitChild(this.cond, v);
 	Expr consequent = (Expr) visitChild(this.consequent, v);
@@ -111,6 +119,7 @@ public class Conditional_c extends Expr_c implements Conditional
     }
 
     /** Type check the expression. */
+    @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
         TypeSystem ts = tc.typeSystem();
         
@@ -191,6 +200,7 @@ public class Conditional_c extends Expr_c implements Conditional
                                     position());
    }
 
+    @Override
     public Type childExpectedType(Expr child, AscriptionVisitor av) {
         TypeSystem ts = av.typeSystem();
 
@@ -205,11 +215,13 @@ public class Conditional_c extends Expr_c implements Conditional
         return child.type();
     }
 
+    @Override
     public String toString() {
 	return cond + " ? " + consequent + " : " + alternative;
     }
 
     /** Write the expression to an output file. */
+    @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr)
     {
 	printSubExpr(cond, false, w, tr);
@@ -221,11 +233,13 @@ public class Conditional_c extends Expr_c implements Conditional
 	printSubExpr(alternative, false, w, tr);
     }
 
+    @Override
     public Term firstChild() {
         return cond;
     }
 
-    public List acceptCFG(CFGBuilder v, List succs) {
+    @Override
+    public <T> List<T> acceptCFG(CFGBuilder v, List<T> succs) {
         v.visitCFG(cond, FlowGraph.EDGE_KEY_TRUE, consequent, ENTRY,
                          FlowGraph.EDGE_KEY_FALSE, alternative, ENTRY);
         v.visitCFG(consequent, this, EXIT);
@@ -234,10 +248,12 @@ public class Conditional_c extends Expr_c implements Conditional
         return succs;
     }
     
+    @Override
     public boolean isConstant() {
 	return cond.isConstant() && consequent.isConstant() && alternative.isConstant();
     }
 
+    @Override
     public Object constantValue() {
         Object cond_ = cond.constantValue();
         Object then_ = consequent.constantValue();
@@ -255,6 +271,7 @@ public class Conditional_c extends Expr_c implements Conditional
 
         return null;
     }
+    @Override
     public Node copy(NodeFactory nf) {
         return nf.Conditional(this.position, this.cond, this.consequent, this.alternative);
     }

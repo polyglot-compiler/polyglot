@@ -26,13 +26,26 @@
 
 package polyglot.types.reflect;
 
-import java.io.*;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.StringTokenizer;
 
 import polyglot.main.Report;
-import polyglot.types.*;
+import polyglot.types.ClassType;
+import polyglot.types.ConstructorInstance;
+import polyglot.types.FieldInstance;
+import polyglot.types.LazyClassInitializer;
+import polyglot.types.MethodInstance;
+import polyglot.types.ParsedClassType;
+import polyglot.types.SemanticException;
+import polyglot.types.Type;
+import polyglot.types.TypeSystem;
 import polyglot.types.reflect.InnerClasses.Info;
-import polyglot.util.*;
+import polyglot.util.InternalCompilerError;
+import polyglot.util.Position;
+import polyglot.util.StringUtil;
 
 /**
  * ClassFile basically represents a Java classfile as it is found on disk. The
@@ -70,10 +83,12 @@ public class ClassFileLazyClassInitializer implements LazyClassInitializer {
         this.ts = ts;
     }
     
+    @Override
     public void setClass(ParsedClassType ct) {
         this.ct = ct;
     }
 
+    @Override
     public boolean fromClassFile() {
         return true;
     }
@@ -322,14 +337,17 @@ public class ClassFileLazyClassInitializer implements LazyClassInitializer {
         return (ClassType) ts.systemResolver().find(name);
     }
 
+    @Override
     public void initTypeObject() {
         this.init = true;
     }
 
+    @Override
     public boolean isTypeObjectInitialized() {
         return this.init;
     }
 
+    @Override
     public void initSuperclass() {
         if (superclassInitialized) {
             return;
@@ -356,6 +374,7 @@ public class ClassFileLazyClassInitializer implements LazyClassInitializer {
         }
     }
 
+    @Override
     public void initInterfaces() {
         if (interfacesInitialized) {
             return;
@@ -374,6 +393,7 @@ public class ClassFileLazyClassInitializer implements LazyClassInitializer {
         }
     }
 
+    @Override
     public void initMemberClasses() {
         if (memberClassesInitialized) {
             return;
@@ -428,18 +448,22 @@ public class ClassFileLazyClassInitializer implements LazyClassInitializer {
         }
     }
 
+    @Override
     public void canonicalFields() {
         initFields();
     }
     
+    @Override
     public void canonicalMethods() {
         initMethods();
     }
     
+    @Override
     public void canonicalConstructors() {
         initConstructors();
     }
     
+    @Override
     public void initFields() {
         if (fieldsInitialized) {
             return;
@@ -463,6 +487,7 @@ public class ClassFileLazyClassInitializer implements LazyClassInitializer {
         }
     }
 
+    @Override
     public void initMethods() {
         if (methodsInitialized) {
             return;
@@ -487,6 +512,7 @@ public class ClassFileLazyClassInitializer implements LazyClassInitializer {
         }
     }
 
+    @Override
     public void initConstructors() {
         if (constructorsInitialized) {
             return;
@@ -585,8 +611,10 @@ public class ClassFileLazyClassInitializer implements LazyClassInitializer {
             }
         }
         
+        @SuppressWarnings("unchecked")
+        List<Type> throwTypes = (List<Type>) mi.throwTypes();
         return ts.constructorInstance(mi.position(), ct, mi.flags(),
-                                      formals, mi.throwTypes());
+                                      formals, throwTypes);
     }
 
     /**

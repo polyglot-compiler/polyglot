@@ -46,10 +46,10 @@ public interface Switch extends CompoundStmt
     /** List of switch elements: case statements or blocks.
      * @return A list of {@link polyglot.ast.SwitchElement SwitchElement}.
      */
-    List elements();
+    List<SwitchElement> elements();
 
     /** Set the list of switch elements: case statements or blocks.
      * @param elements A list of {@link polyglot.ast.SwitchElement SwitchElement}.
      */
-    Switch elements(List elements);
+    Switch elements(List<SwitchElement> elements);
 }

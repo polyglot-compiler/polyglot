@@ -25,9 +25,10 @@
 
 package polyglot.ast;
 
-import polyglot.types.ProcedureInstance;
-import polyglot.types.Flags;
 import java.util.List;
+
+import polyglot.types.Flags;
+import polyglot.types.ProcedureInstance;
 
 /**
  * A procedure declaration.  A procedure is the supertype of methods and
@@ -44,12 +45,12 @@ public interface ProcedureDecl extends CodeDecl
     /** The procedure's formal parameters.
      * @return A list of {@link polyglot.ast.Formal Formal}.
      */
-    List formals();
+    List<Formal> formals();
 
     /** The procedure's exception throw types.
      * @return A list of {@link polyglot.ast.TypeNode TypeNode}.
      */
-    List throwTypes();
+    List<TypeNode> throwTypes();
 
     /**
      * The procedure type object.  This field may not be valid until

@@ -25,10 +25,10 @@
 
 package polyglot.ast;
 
-import polyglot.ast.*;
-import polyglot.types.*;
-import polyglot.visit.*;
-import polyglot.util.*;
+import polyglot.util.CodeWriter;
+import polyglot.util.Position;
+import polyglot.visit.PrettyPrinter;
+import polyglot.visit.TypeChecker;
 
 /**
  * The Java literal <code>null</code>.
@@ -40,6 +40,7 @@ public class NullLit_c extends Lit_c implements NullLit
     }
 
     /** Type check the expression. */
+    @Override
     public Node typeCheck(TypeChecker tc) {
 	return type(tc.typeSystem().Null());
     }
@@ -49,19 +50,23 @@ public class NullLit_c extends Lit_c implements NullLit
 	return null;
     }
 
+    @Override
     public String toString() {
 	return "null";
     }
 
     /** Write the expression to an output file. */
+    @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
 	w.write("null");
     }
 
+    @Override
     public Object constantValue() {
         return null;
     }
     
+    @Override
     public Node copy(NodeFactory nf) {
         return nf.NullLit(this.position);
     }

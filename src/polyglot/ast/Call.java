@@ -82,13 +82,15 @@ public interface Call extends Expr, ProcedureCall
      * The call's actual arguments.
      * @return A list of {@link polyglot.ast.Expr Expr}.
      */
-    List arguments();
+    @Override
+    List<Expr> arguments();
 
     /**
      * Set the call's actual arguments.
      * @param arguments A list of {@link polyglot.ast.Expr Expr}.
      */
-    ProcedureCall arguments(List arguments);
+    @Override
+    ProcedureCall arguments(List<Expr> arguments);
 
     /**
      * The type object of the method we are calling.  This is, generally, only

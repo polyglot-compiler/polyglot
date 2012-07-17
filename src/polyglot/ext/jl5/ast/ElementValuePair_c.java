@@ -88,7 +88,7 @@ public class ElementValuePair_c extends Expr_c implements ElementValuePair {
         return this;
     }
     
-    public List acceptCFG(CFGBuilder v, List succs) {
+    public <T> List<T> acceptCFG(CFGBuilder v, List<T> succs) {
         v.visitCFG(value, this, EXIT);
         return succs;
     }

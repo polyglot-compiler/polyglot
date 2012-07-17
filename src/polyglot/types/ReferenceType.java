@@ -43,28 +43,28 @@ public interface ReferenceType extends Type
      * @return A list of <code>Type</code>.
      * @see polyglot.types.Type
      */
-    List interfaces();
+    List<? extends Type> interfaces();
 
     /**
      * Return a list of a all the type's members.
      * @return A list of <code>MemberInstance</code>.
      * @see polyglot.types.MemberInstance
      */
-    List members();
+    List<? extends MemberInstance> members();
     
     /**
      * Return the type's fields.
      * @return A list of <code>FieldInstance</code>.
      * @see polyglot.types.FieldInstance
      */
-    List fields();
+    List<? extends FieldInstance> fields();
 
     /**
      * Return the type's methods.
      * @return A list of <code>MethodInstance</code>.
      * @see polyglot.types.MethodInstance
      */
-    List methods();
+    List<? extends MethodInstance> methods();
 
     /**
      * Return the field named <code>name</code>, or null.
@@ -77,7 +77,7 @@ public interface ReferenceType extends Type
      * @return A list of <code>MethodInstance</code>.
      * @see polyglot.types.MethodInstance
      */
-    List methodsNamed(String name);
+    List<MethodInstance> methodsNamed(String name);
 
     /**
      * Return the methods named <code>name</code> with the given formal
@@ -88,7 +88,7 @@ public interface ReferenceType extends Type
      * @see polyglot.types.Type
      * @see polyglot.types.MethodInstance
      */
-    List methods(String name, List argTypes);
+    List<? extends MethodInstance> methods(String name, List<Type> argTypes);
 
     /**
      * Return the true if the type has the given method.

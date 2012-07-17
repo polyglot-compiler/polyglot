@@ -25,12 +25,14 @@
 
 package polyglot.ast;
 
-import polyglot.ast.*;
-import polyglot.types.*;
-import polyglot.visit.*;
-import polyglot.util.*;
+import java.util.List;
 
-import java.util.*;
+import polyglot.types.SemanticException;
+import polyglot.util.CollectionUtil;
+import polyglot.util.Position;
+import polyglot.util.SubtypeSet;
+import polyglot.visit.CFGBuilder;
+import polyglot.visit.ExceptionChecker;
 
 /**
  * A <code>Term</code> represents any Java expression or statement on which
@@ -47,7 +49,8 @@ public abstract class Term_c extends Node_c implements Term
     /**
      * Visit this term in evaluation order.
      */
-    public abstract List acceptCFG(CFGBuilder v, List succs);
+    @Override
+    public abstract <T> List<T> acceptCFG(CFGBuilder v, List<T> succs);
 
     /**
      * Return true if this term is eachable.  This attribute is not
@@ -55,6 +58,7 @@ public abstract class Term_c extends Node_c implements Term
      *
      * @see polyglot.visit.ReachChecker
      */
+    @Override
     public boolean reachable() {
         return reachable;
     }
@@ -62,6 +66,7 @@ public abstract class Term_c extends Node_c implements Term
     /**
      * Set the reachability of this term.
      */
+    @Override
     public Term reachable(boolean reachability) {
         if (this.reachable == reachability) {
             return this;
@@ -73,23 +78,26 @@ public abstract class Term_c extends Node_c implements Term
     }
 
     /** Utility function to get the first entry of a list, or else alt. */
-    public static Term listChild(List l, Term alt) {
-        Term c = (Term) CollectionUtil.firstOrElse(l, alt);
+    public static <T extends Term, U extends T, V extends T> T listChild(List<U> l, V alt) {
+        T c = CollectionUtil.firstOrElse(l, alt);
         return c;
     }
     
     protected SubtypeSet exceptions;
     
+    @Override
     public SubtypeSet exceptions() {
         return exceptions;
     }
     
+    @Override
     public Term exceptions(SubtypeSet exceptions) {
         Term_c n = (Term_c) copy();
         n.exceptions = new SubtypeSet(exceptions);
         return n;
     }
     
+    @Override
     public Node exceptionCheck(ExceptionChecker ec) throws SemanticException {
         Term t = (Term) super.exceptionCheck(ec);
         //System.out.println("exceptions for " + t + " = " + ec.throwsSet());

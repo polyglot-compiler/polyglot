@@ -37,13 +37,13 @@ public interface Block extends CompoundStmt
      * Get the statements in the block.
      * @return A list of {@link polyglot.ast.Stmt Stmt}.
      */
-    List statements();
+    List<Stmt> statements();
 
     /**
      * Set the statements in the block.
      * @param statements A list of {@link polyglot.ast.Stmt Stmt}.
      */
-    Block statements(List statements);
+    Block statements(List<Stmt> statements);
 
     /**
      * Append a statement to the block, returning a new block.

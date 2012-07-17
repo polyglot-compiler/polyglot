@@ -67,13 +67,13 @@ public interface Goal {
      * corequisite goals are run (possibly more than once) they should all
      * eventually be reached.
      */
-    public Collection corequisiteGoals(Scheduler scheduler);
+    public Collection<Goal> corequisiteGoals(Scheduler scheduler);
     
     /**
      * Goals that must be completed before attempting this goal. The graph of
      * dependencies between prerequisite goals should be acyclic.
      */
-    public Collection prerequisiteGoals(Scheduler scheduler);
+    public Collection<Goal> prerequisiteGoals(Scheduler scheduler);
      
     /**
      * Add a new corequisite subgoal <code>g</code>.  <code>g</code> is a

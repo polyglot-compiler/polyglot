@@ -51,6 +51,7 @@ public class Disamb_c implements Disamb
      * @return An unambiguous AST node, or null if disambiguation
      *         fails.
      */
+    @Override
     public Node disambiguate(Ambiguous amb, ContextVisitor v, Position pos,
             Prefix prefix, String name) throws SemanticException {
         return disambiguate(amb, v, pos, prefix, v.nodeFactory().Id(pos, name));
@@ -61,6 +62,7 @@ public class Disamb_c implements Disamb
      * @return An unambiguous AST node, or null if disambiguation
      *         fails.
      */
+    @Override
     public Node disambiguate(Ambiguous amb, ContextVisitor v, Position pos,
             Prefix prefix, Id name) throws SemanticException {
 
@@ -100,6 +102,9 @@ public class Disamb_c implements Disamb
         return result;
     }
 
+    /**
+     * @throws SemanticException  
+     */
     protected Node disambiguatePackagePrefix(PackageNode pn) throws SemanticException {
         Resolver pc = ts.packageContextResolver(pn.package_());
 
@@ -170,6 +175,9 @@ public class Disamb_c implements Disamb
         return null;
     }
 
+    /**
+     * @throws SemanticException  
+     */
     protected Node disambiguateExprPrefix(Expr e) throws SemanticException {
         // Must be a non-static field.
         if (exprOK()) {
@@ -275,6 +283,7 @@ public class Disamb_c implements Disamb
                amb instanceof Prefix);
     }
     
+    @Override
     public String toString() {
         return "Disamb(" + amb.getClass().getName() + ": " + amb + ")";
     }

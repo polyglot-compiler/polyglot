@@ -25,9 +25,10 @@
 
 package polyglot.ast;
 
+import java.util.List;
+
 import polyglot.util.SubtypeSet;
-import polyglot.visit.*;
-import java.util.*;
+import polyglot.visit.CFGBuilder;
 
 /**
  * A <code>Term</code> represents any Java expression or statement on which
@@ -59,7 +60,7 @@ public interface Term extends Node
      * Visit this node, calling calling v.edge() for each successor in succs,
      * if data flows on that edge.
      */
-    public List acceptCFG(CFGBuilder v, List succs);
+    public <T> List<T> acceptCFG(CFGBuilder v, List<T> succs);
     
     /**
      * Returns true if the term is reachable.  This attribute is not

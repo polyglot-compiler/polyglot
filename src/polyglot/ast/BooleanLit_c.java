@@ -42,11 +42,13 @@ public class BooleanLit_c extends Lit_c implements BooleanLit
   }
 
   /** Get the value of the expression. */
+  @Override
   public boolean value() {
     return this.value;
   }
 
   /** Set the value of the expression. */
+  @Override
   public BooleanLit value(boolean value) {
     BooleanLit_c n = (BooleanLit_c) copy();
     n.value = value;
@@ -54,20 +56,24 @@ public class BooleanLit_c extends Lit_c implements BooleanLit
   }
 
   /** Type check the expression. */
+  @Override
   public Node typeCheck(TypeChecker tc) throws SemanticException {
     return type(tc.typeSystem().Boolean());
   }
 
+  @Override
   public String toString() {
     return String.valueOf(value);
   }
 
   /** Write the expression to an output file. */
+  @Override
   public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
     w.write(String.valueOf(value));
   }
 
   /** Dumps the AST. */
+  @Override
   public void dump(CodeWriter w) {
     super.dump(w);
 
@@ -77,9 +83,11 @@ public class BooleanLit_c extends Lit_c implements BooleanLit
     w.end();
   }
 
+  @Override
   public Object constantValue() {
     return Boolean.valueOf(value);
   }
+  @Override
   public Node copy(NodeFactory nf) {
       return nf.BooleanLit(this.position, this.value);
   }

@@ -48,16 +48,19 @@ public class Catch_c extends Stmt_c implements Catch
     }
 
     /** Get the catchType of the catch block. */
+    @Override
     public Type catchType() {
         return formal.declType();
     }
 
     /** Get the formal of the catch block. */
+    @Override
     public Formal formal() {
 	return this.formal;
     }
 
     /** Set the formal of the catch block. */
+    @Override
     public Catch formal(Formal formal) {
 	Catch_c n = (Catch_c) copy();
 	n.formal = formal;
@@ -65,11 +68,13 @@ public class Catch_c extends Stmt_c implements Catch
     }
 
     /** Get the body of the catch block. */
+    @Override
     public Block body() {
 	return this.body;
     }
 
     /** Set the body of the catch block. */
+    @Override
     public Catch body(Block body) {
 	Catch_c n = (Catch_c) copy();
 	n.body = body;
@@ -89,17 +94,20 @@ public class Catch_c extends Stmt_c implements Catch
     }
 
     /** Visit the children of the catch block. */
+    @Override
     public Node visitChildren(NodeVisitor v) {
 	Formal formal = (Formal) visitChild(this.formal, v);
 	Block body = (Block) visitChild(this.body, v);
 	return reconstruct(formal, body);
     }
 
+    @Override
     public Context enterScope(Context c) {
         return c.pushBlock();
     }
 
     /** Type check the catch block. */
+    @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
         TypeSystem ts = tc.typeSystem();
 
@@ -113,11 +121,13 @@ public class Catch_c extends Stmt_c implements Catch
 	return this;
     }
 
+    @Override
     public String toString() {
 	return "catch (" + formal + ") " + body;
     }
 
     /** Write the catch block to an output file. */
+    @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
 	w.write("catch (");
 	printBlock(formal, w, tr);
@@ -125,15 +135,18 @@ public class Catch_c extends Stmt_c implements Catch
 	printSubStmt(body, w, tr);
     }
 
+    @Override
     public Term firstChild() {
         return formal;
     }
 
-    public List acceptCFG(CFGBuilder v, List succs) {
+    @Override
+    public <T> List<T> acceptCFG(CFGBuilder v, List<T> succs) {
         v.visitCFG(formal, body, ENTRY);
         v.visitCFG(body, this, EXIT);
         return succs;
     }
+    @Override
     public Node copy(NodeFactory nf) {
         return nf.Catch(this.position, this.formal, this.body);
     }

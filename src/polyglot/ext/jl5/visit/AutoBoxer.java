@@ -46,11 +46,11 @@ public class AutoBoxer extends AscriptionVisitor {
     private Expr fromPrimToWrap(PrimitiveType fromType, Type toType, Expr e) throws SemanticException {
         JL5TypeSystem ts = (JL5TypeSystem)this.ts;
         String methodName = "valueOf";
-        ClassType wrapperType = ((JL5TypeSystem)ts).wrapperClassOfPrimitive(fromType);
+        ClassType wrapperType = ts.wrapperClassOfPrimitive(fromType);
         TypeNode tn = nf.CanonicalTypeNode(e.position(), wrapperType);
         Call call = nf.Call(e.position(), tn, methodName, e);
         call = (Call)call.type(wrapperType);
-        call = call.methodInstance(ts.findMethod(wrapperType, methodName, CollectionUtil.list(fromType), this.context().currentClass()));          
+        call = call.methodInstance(ts.findMethod(wrapperType, methodName, CollectionUtil.list((Type) fromType), this.context().currentClass()));          
         return call;
     }
 
@@ -61,13 +61,13 @@ public class AutoBoxer extends AscriptionVisitor {
             wrapperType = fromType.toClass();
         }
         else {
-            wrapperType = ((JL5TypeSystem)ts).wrapperClassOfPrimitive(toType.toPrimitive());
+            wrapperType = ts.wrapperClassOfPrimitive(toType.toPrimitive());
         }
         
         String methodName = toType.toPrimitive().name() + "Value";
         Call call = nf.Call(e.position(), e, methodName);
         call = (Call)call.type(toType);
-        call = call.methodInstance(ts.findMethod(wrapperType, methodName, Collections.emptyList(), this.context().currentClass()));
+        call = call.methodInstance(ts.findMethod(wrapperType, methodName, Collections.<Type> emptyList(), this.context().currentClass()));
         return call;
     }
 

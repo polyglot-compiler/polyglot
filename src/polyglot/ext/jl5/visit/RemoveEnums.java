@@ -57,7 +57,7 @@ public class RemoveEnums extends ContextVisitor {
     @Override
     protected NodeVisitor enterCall(Node n) throws SemanticException {
         if (n instanceof ClassBody) {
-            this.classMembersToAdd.push(new ArrayList());
+            this.classMembersToAdd.push(new ArrayList<ClassMember>());
         }
         if (n instanceof JL5EnumDecl) {
             return this.inEnumDecl(((JL5EnumDecl)n).type());
@@ -132,7 +132,7 @@ public class RemoveEnums extends ContextVisitor {
                 JL5Flags.clearEnum(enumDecl.flags()), 
                 enumDecl.id(),
                 nf.CanonicalTypeNode(enumDecl.position(), ts.typeForName(this.enumImplClass)),
-                Collections.EMPTY_LIST,
+                Collections.<TypeNode> emptyList(),
                 body);
 
 
@@ -174,7 +174,7 @@ public class RemoveEnums extends ContextVisitor {
         // use those arguments in the super call
         List newStmts = new ArrayList();
         newStmts.add(nodeFactory().ConstructorCall(pos, ConstructorCall.SUPER, 
-                CollectionUtil.list(nodeFactory().Local(pos, enumName).localInstance(enumNameLI), 
+                CollectionUtil.list((Expr) nodeFactory().Local(pos, enumName).localInstance(enumNameLI), 
                         nodeFactory().Local(pos, enumOrdinal).localInstance(enumOrdLI))));
         List oldStmts = new LinkedList(n.body().statements());
         if (oldStmts.get(0) instanceof ConstructorCall) {
@@ -234,11 +234,11 @@ public class RemoveEnums extends ContextVisitor {
                 Flags.PUBLIC.Static(), 
                 nf.CanonicalTypeNode(pos, ts.arrayOf(enumDeclType)),
                 "values",
-                Collections.emptyList(), 
-                Collections.emptyList(), 
+                Collections.<Formal> emptyList(), 
+                Collections.<TypeNode> emptyList(), 
                 nf.Block(pos, ret));
         
-        MethodInstance mi = ts.methodInstance(pos, enumDeclType, Flags.NONE, ts.arrayOf(enumDeclType), "values", Collections.emptyList(), Collections.emptyList());        
+        MethodInstance mi = ts.methodInstance(pos, enumDeclType, Flags.NONE, ts.arrayOf(enumDeclType), "values", Collections.<Type> emptyList(), Collections.<Type> emptyList());        
         md = md.methodInstance(mi);
         
         return body.addMember(md);
@@ -263,9 +263,9 @@ public class RemoveEnums extends ContextVisitor {
                 nf.CanonicalTypeNode(pos, enumDeclType),
                 nf.Id(pos, "valueOf"),
                 Collections.singletonList(formal), 
-                Collections.emptyList(), 
+                Collections.<TypeNode> emptyList(), 
                 nf.Block(pos, ret));
-        MethodInstance mi = ts.methodInstance(pos, enumDeclType, Flags.NONE, enumDeclType, "valueOf", Collections.singletonList(ts.String()), Collections.emptyList());        
+        MethodInstance mi = ts.methodInstance(pos, enumDeclType, Flags.NONE, enumDeclType, "valueOf", Collections.singletonList((Type) ts.String()), Collections.<Type> emptyList());        
         md = md.methodInstance(mi);
         
         return body.addMember(md);
@@ -498,11 +498,11 @@ public class RemoveEnums extends ContextVisitor {
                 nodeFactory().CanonicalTypeNode(pos, ts.Int()), 
                 methodName, 
                 formals,
-                Collections.emptyList(),
+                Collections.<TypeNode> emptyList(),
                 nodeFactory().Block(pos, stmts));
 
         ClassType container = this.context().currentClass();
-        MethodInstance mi = ts.methodInstance(pos, container, Flags.NONE, ts.Int(), methodName.id(), Collections.singletonList(ts.Object()), Collections.emptyList());        
+        MethodInstance mi = ts.methodInstance(pos, container, Flags.NONE, ts.Int(), methodName.id(), Collections.singletonList((Type) ts.Object()), Collections.<Type> emptyList());        
         switchMethod = switchMethod.methodInstance(mi);
         
         addClassMemberToAdd(switchMethod);

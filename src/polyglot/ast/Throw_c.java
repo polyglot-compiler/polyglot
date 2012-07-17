@@ -25,12 +25,20 @@
 
 package polyglot.ast;
 
-import polyglot.ast.*;
+import java.util.Collections;
+import java.util.List;
 
-import polyglot.util.*;
-import polyglot.types.*;
-import polyglot.visit.*;
-import java.util.*;
+import polyglot.types.SemanticException;
+import polyglot.types.Type;
+import polyglot.types.TypeSystem;
+import polyglot.util.CodeWriter;
+import polyglot.util.CollectionUtil;
+import polyglot.util.Position;
+import polyglot.visit.AscriptionVisitor;
+import polyglot.visit.CFGBuilder;
+import polyglot.visit.NodeVisitor;
+import polyglot.visit.PrettyPrinter;
+import polyglot.visit.TypeChecker;
 
 /**
  * A <code>Throw</code> is an immutable representation of a <code>throw</code>
@@ -48,11 +56,13 @@ public class Throw_c extends Stmt_c implements Throw
     }
 
     /** Get the expression to throw. */
+    @Override
     public Expr expr() {
 	return this.expr;
     }
 
     /** Set the expression to throw. */
+    @Override
     public Throw expr(Expr expr) {
 	Throw_c n = (Throw_c) copy();
 	n.expr = expr;
@@ -71,12 +81,14 @@ public class Throw_c extends Stmt_c implements Throw
     }
 
     /** Visit the children of the statement. */
+    @Override
     public Node visitChildren(NodeVisitor v) {
 	Expr expr = (Expr) visitChild(this.expr, v);
 	return reconstruct(expr);
     }
 
     /** Type check the statement. */
+    @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
 	if (! expr.type().isThrowable()) {
 	    throw new SemanticException(
@@ -87,6 +99,7 @@ public class Throw_c extends Stmt_c implements Throw
 	return this;
     }
 
+    @Override
     public Type childExpectedType(Expr child, AscriptionVisitor av) {
         TypeSystem ts = av.typeSystem();
 
@@ -97,34 +110,40 @@ public class Throw_c extends Stmt_c implements Throw
         return child.type();
     }
 
+    @Override
     public String toString() {
 	return "throw " + expr + ";";
     }
 
     /** Write the statement to an output file. */
+    @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
 	w.write("throw ");
 	print(expr, w, tr);
 	w.write(";");
     }
 
+    @Override
     public Term firstChild() {
         return expr;
     }
 
-    public List acceptCFG(CFGBuilder v, List succs) {
+    @Override
+    public <T> List<T> acceptCFG(CFGBuilder v, List<T> succs) {
         v.visitCFG(expr, this, EXIT);
 
         // Throw edges will be handled by visitor.
-        return Collections.EMPTY_LIST;
+        return Collections.<T> emptyList();
     }
 
-    public List throwTypes(TypeSystem ts) {
+    @Override
+    public List<Type> throwTypes(TypeSystem ts) {
         // if the exception that a throw statement is given to throw is null,
         // then a NullPointerException will be thrown.
         return CollectionUtil.list(expr.type(), ts.NullPointerException());
     }
     
+    @Override
     public Node copy(NodeFactory nf) {
         return nf.Throw(this.position, this.expr);
     }

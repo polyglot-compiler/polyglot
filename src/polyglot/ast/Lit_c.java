@@ -39,25 +39,31 @@ public abstract class Lit_c extends Expr_c implements Lit
     }
 
     /** Get the precedence of the expression. */
+    @Override
     public Precedence precedence() {
         return Precedence.LITERAL;
     }
 
+    @Override
     public Term firstChild() {
         return null;
     }
 
-    public List acceptCFG(CFGBuilder v, List succs) {
+    @Override
+    public <T> List<T> acceptCFG(CFGBuilder v, List<T> succs) {
         return succs;
     }
 
+    @Override
     public boolean constantValueSet() {
         return true;
     }
 
+    @Override
     public boolean isConstant() {
 	return true;
     }
     
+    @Override
     public abstract Object constantValue();
 }

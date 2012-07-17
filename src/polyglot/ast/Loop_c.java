@@ -25,8 +25,7 @@
 
 package polyglot.ast;
 
-import polyglot.util.*;
-import java.util.*;
+import polyglot.util.Position;
 
 /**
  * An immutable representation of a Java language <code>while</code>
@@ -39,10 +38,12 @@ public abstract class Loop_c extends Stmt_c implements Loop
 	super(pos);
     }
 
+    @Override
     public boolean condIsConstant() {
         return cond().isConstant();
     }
 
+    @Override
     public boolean condIsConstantTrue() {
         return Boolean.TRUE.equals(cond().constantValue());
     }

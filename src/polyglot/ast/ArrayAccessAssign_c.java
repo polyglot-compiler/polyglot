@@ -44,6 +44,7 @@ public class ArrayAccessAssign_c extends Assign_c implements ArrayAccessAssign
     super(pos, left, op, right);
   }
 
+  @Override
   public Assign left(Expr left) {
       ArrayAccessAssign_c n = (ArrayAccessAssign_c)super.left(left);
       n.assertLeftType();
@@ -56,6 +57,7 @@ public class ArrayAccessAssign_c extends Assign_c implements ArrayAccessAssign
       }
   }
   
+  @Override
   public Term firstChild() {
       if (operator() == ASSIGN) {
           return ((ArrayAccess) left()).array();
@@ -64,6 +66,7 @@ public class ArrayAccessAssign_c extends Assign_c implements ArrayAccessAssign
       }
   }
   
+  @Override
   protected void acceptCFGAssign(CFGBuilder v) {
       ArrayAccess a = (ArrayAccess) left();
       
@@ -72,6 +75,7 @@ public class ArrayAccessAssign_c extends Assign_c implements ArrayAccessAssign
       v.visitCFG(a.index(), right(), ENTRY);
       v.visitCFG(right(), this, EXIT);
   }
+  @Override
   protected void acceptCFGOpAssign(CFGBuilder v) {
       /*
       ArrayAccess a = (ArrayAccess)left();
@@ -88,8 +92,9 @@ public class ArrayAccessAssign_c extends Assign_c implements ArrayAccessAssign
       v.visitCFG(right(), this, EXIT);
   }
 
-  public List throwTypes(TypeSystem ts) {
-      List l = new ArrayList(super.throwTypes(ts));
+  @Override
+  public List<Type> throwTypes(TypeSystem ts) {
+      List<Type> l = new ArrayList<Type>(super.throwTypes(ts));
       
       if (throwsArrayStoreException()) {
           l.add(ts.ArrayStoreException());
@@ -102,6 +107,7 @@ public class ArrayAccessAssign_c extends Assign_c implements ArrayAccessAssign
   }
   
   /** Get the throwsArrayStoreException of the expression. */
+  @Override
   public boolean throwsArrayStoreException() {
     return op == ASSIGN && left.type().isReference();
   }

@@ -25,11 +25,17 @@
 
 package polyglot.ast;
 
-import polyglot.ast.*;
-import polyglot.types.*;
-import polyglot.visit.*;
-import polyglot.util.*;
-import java.util.*;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+
+import polyglot.types.SemanticException;
+import polyglot.util.CodeWriter;
+import polyglot.util.InternalCompilerError;
+import polyglot.util.Position;
+import polyglot.util.StringUtil;
+import polyglot.visit.PrettyPrinter;
+import polyglot.visit.TypeChecker;
 
 /** 
  * A <code>StringLit</code> represents an immutable instance of a 
@@ -46,11 +52,13 @@ public class StringLit_c extends Lit_c implements StringLit
     }
 
     /** Get the value of the expression. */
+    @Override
     public String value() {
 	return this.value;
     }
 
     /** Set the value of the expression. */
+    @Override
     public StringLit value(String value) {
 	StringLit_c n = (StringLit_c) copy();
 	n.value = value;
@@ -58,10 +66,12 @@ public class StringLit_c extends Lit_c implements StringLit
     }
 
     /** Type check the expression. */
+    @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
         return type(tc.typeSystem().String());
     }
 
+    @Override
     public String toString() {
         if (StringUtil.unicodeEscape(value).length() > 11) {
             return "\"" + StringUtil.unicodeEscape(value).substring(0,8) + "...\"";
@@ -73,8 +83,9 @@ public class StringLit_c extends Lit_c implements StringLit
     protected int MAX_LENGTH = 60;
  
     /** Write the expression to an output file. */
+    @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
-        List l = breakupString();
+        List<String> l = breakupString();
 
         // If we break up the string, parenthesize it to avoid precedence bugs.
         if (l.size() > 1) {
@@ -83,8 +94,8 @@ public class StringLit_c extends Lit_c implements StringLit
 
         w.begin(0);
 
-        for (Iterator i = l.iterator(); i.hasNext(); ) {
-            String s = (String) i.next();
+        for (Iterator<String> i = l.iterator(); i.hasNext(); ) {
+            String s = i.next();
 
             w.write("\"");
             w.write(StringUtil.escape(s));
@@ -107,8 +118,8 @@ public class StringLit_c extends Lit_c implements StringLit
      * Break a long string literal into a concatenation of small string
      * literals.  This avoids messing up the pretty printer and editors. 
      */
-    protected List breakupString() {
-        List result = new LinkedList();
+    protected List<String> breakupString() {
+        List<String> result = new LinkedList<String>();
         int n = value.length();
         int i = 0;
 
@@ -142,10 +153,12 @@ public class StringLit_c extends Lit_c implements StringLit
         return result;
     }
     
+    @Override
     public Object constantValue() {
 	return value;
     }
     
+    @Override
     public Node copy(NodeFactory nf) {
         return nf.StringLit(this.position, this.value);
     }

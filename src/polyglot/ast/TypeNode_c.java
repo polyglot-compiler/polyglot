@@ -27,11 +27,16 @@ package polyglot.ast;
 
 import java.util.List;
 
-import polyglot.ast.*;
-
-import polyglot.util.*;
-import polyglot.types.*;
-import polyglot.visit.*;
+import polyglot.types.Named;
+import polyglot.types.Qualifier;
+import polyglot.types.SemanticException;
+import polyglot.types.Type;
+import polyglot.types.TypeSystem;
+import polyglot.util.CodeWriter;
+import polyglot.util.Position;
+import polyglot.visit.CFGBuilder;
+import polyglot.visit.PrettyPrinter;
+import polyglot.visit.TypeBuilder;
 
 /**
  * A <code>TypeNode</code> is the syntactic representation of a 
@@ -45,27 +50,32 @@ public abstract class TypeNode_c extends Term_c implements TypeNode
 	super(pos);
     }
     
+    @Override
     public boolean isDisambiguated() {
         return super.isDisambiguated() && type != null && type.isCanonical();
     }
 
     /** Get the type as a qualifier. */
+    @Override
     public Qualifier qualifier() {
         return type();
     }
 
     /** Get the type this node encapsulates. */
+    @Override
     public Type type() {
 	return this.type;
     }
 
     /** Set the type this node encapsulates. */
+    @Override
     public TypeNode type(Type type) {
 	TypeNode_c n = (TypeNode_c) copy();
 	n.type = type;
 	return n;
     }
 
+    @Override
     public Node buildTypes(TypeBuilder tb) throws SemanticException {
         if (type == null) {
             TypeSystem ts = tb.typeSystem();
@@ -76,14 +86,17 @@ public abstract class TypeNode_c extends Term_c implements TypeNode
         }
     }
 
+    @Override
     public Term firstChild() {
         return null;
     }
 
-    public List acceptCFG(CFGBuilder v, List succs) {
+    @Override
+    public <T> List<T> acceptCFG(CFGBuilder v, List<T> succs) {
         return succs;
     }
 
+    @Override
     public String toString() {
 	if (type != null) {
 	    return type.toString();
@@ -93,8 +106,10 @@ public abstract class TypeNode_c extends Term_c implements TypeNode
 	}
     }
 
+    @Override
     public abstract void prettyPrint(CodeWriter w, PrettyPrinter tr);
 
+    @Override
     public String name() {
           if (type instanceof Named) {
               return ((Named) type).name();

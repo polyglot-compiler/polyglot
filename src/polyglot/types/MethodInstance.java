@@ -25,10 +25,7 @@
 
 package polyglot.types;
 
-import java.util.ArrayList;
 import java.util.List;
-
-import polyglot.util.CollectionUtil;
 
 /**
  * A <code>MethodInstance</code> represents the type information for a Java
@@ -51,8 +48,8 @@ public interface MethodInstance extends FunctionInstance, MemberInstance, Declar
     MethodInstance flags(Flags flags);
     MethodInstance name(String name);
     MethodInstance returnType(Type returnType);
-    MethodInstance formalTypes(List l);
-    MethodInstance throwTypes(List l);
+    MethodInstance formalTypes(List<Type> l);
+    MethodInstance throwTypes(List<Type> l);
     MethodInstance container(ReferenceType container);
     
     MethodInstance orig();
@@ -65,7 +62,7 @@ public interface MethodInstance extends FunctionInstance, MemberInstance, Declar
      * in interfaces. Use <code>implemented</code> for that.
      * @see polyglot.types.MethodInstance
      */
-    List overrides();
+    List<MethodInstance> overrides();
 
     /**
      * Return true if this method can override <code>mi</code>, false otherwise.
@@ -84,7 +81,7 @@ public interface MethodInstance extends FunctionInstance, MemberInstance, Declar
      * (i.e., they can form a tree).  
      * @return List[MethodInstance]
      */
-    List implemented(); 
+    List<? extends MethodInstance> implemented(); 
     
     /**
      * Return true if this method has the same signature as <code>mi</code>.
@@ -98,7 +95,7 @@ public interface MethodInstance extends FunctionInstance, MemberInstance, Declar
      * @param actualTypes A list of argument types of type <code>Type</code>.
      * @see polyglot.types.Type
      */
-    boolean methodCallValid(String name, List actualTypes);
+    boolean methodCallValid(String name, List<Type> actualTypes);
 
     /**
      * Get the list of methods this method (potentially) overrides, in order
@@ -109,7 +106,7 @@ public interface MethodInstance extends FunctionInstance, MemberInstance, Declar
      * <code>this</code>.
      * @see polyglot.types.MethodInstance
      */
-    List overridesImpl();
+    List<MethodInstance> overridesImpl();
 
     /**
      * Return true if this method can override <code>mi</code>.
@@ -127,7 +124,7 @@ public interface MethodInstance extends FunctionInstance, MemberInstance, Declar
      * @return List[MethodInstance]
      * @param rt The point in the type hierarchy to begin looking for methods.
      */
-    List implementedImpl(ReferenceType rt);
+    List<MethodInstance> implementedImpl(ReferenceType rt);
     
     /**
      * Return true if this method has the same signature as <code>mi</code>.
@@ -142,5 +139,5 @@ public interface MethodInstance extends FunctionInstance, MemberInstance, Declar
      * This method should not be called except by <code>TypeSystem</code>
      * and by subclasses.
      */
-    boolean methodCallValidImpl(String name, List actualTypes);
+    boolean methodCallValidImpl(String name, List<Type> actualTypes);
 }

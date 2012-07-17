@@ -25,10 +25,11 @@
 
 package polyglot.ast;
 
-import polyglot.types.*;
-import polyglot.visit.*;
-import polyglot.util.*;
-import java.util.*;
+import polyglot.types.SemanticException;
+import polyglot.util.Position;
+import polyglot.visit.AmbiguityRemover;
+import polyglot.visit.CFGBuilder;
+import polyglot.visit.TypeChecker;
 
 /**
  * A <code>AmbAssign</code> represents a Java assignment expression to
@@ -40,6 +41,7 @@ public class AmbAssign_c extends Assign_c implements AmbAssign
     super(pos, left, op, right);
   }
   
+  @Override
   public Term firstChild() {
     if (operator() != Assign.ASSIGN) {
       return left();
@@ -48,15 +50,18 @@ public class AmbAssign_c extends Assign_c implements AmbAssign
     return right();
   }
   
+  @Override
   protected void acceptCFGAssign(CFGBuilder v) {
       v.visitCFG(right(), this, EXIT);
   }
   
+  @Override
   protected void acceptCFGOpAssign(CFGBuilder v) {
       v.visitCFG(left(), right(), ENTRY);
       v.visitCFG(right(), this, EXIT);
   }
   
+  @Override
   public Node disambiguate(AmbiguityRemover ar) throws SemanticException {
       Assign n = (Assign) super.disambiguate(ar);
       
@@ -76,10 +81,12 @@ public class AmbAssign_c extends Assign_c implements AmbAssign
   }
   
 
+  @Override
   public Node typeCheck(TypeChecker tc) throws SemanticException {
       // Didn't finish disambiguation; just return.
       return this;
   }
+  @Override
   public Node copy(NodeFactory nf) {
       return nf.AmbAssign(this.position, this.left, this.op, this.right);
   }
