@@ -86,11 +86,11 @@ public class ParsedClassType_c extends ClassType_c implements ParsedClassType
 
         setInitializer(init);
 
-        this.interfaces = new TypedList(new LinkedList(), Type.class, false);
-        this.methods = new TypedList(new LinkedList(), MethodInstance.class, false);
-        this.fields = new TypedList(new LinkedList(), FieldInstance.class, false);
-        this.constructors = new TypedList(new LinkedList(), ConstructorInstance.class, false);
-        this.memberClasses = new TypedList(new LinkedList(), Type.class, false);
+        this.interfaces = new LinkedList<Type>();
+        this.methods = new LinkedList<MethodInstance>();
+        this.fields = new LinkedList<FieldInstance>();
+        this.constructors = new LinkedList<ConstructorInstance>();
+        this.memberClasses = new LinkedList<Type>();
     }
      
     public LazyInitializer initializer() {

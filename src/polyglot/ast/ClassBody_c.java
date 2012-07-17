@@ -38,12 +38,12 @@ import polyglot.visit.*;
  */
 public class ClassBody_c extends Term_c implements ClassBody
 {
-    protected List members;
+    protected List<ClassMember> members;
 
     public ClassBody_c(Position pos, List members) {
         super(pos);
         assert(members != null);
-        this.members = TypedList.copyAndCheck(members, ClassMember.class, true);
+        this.members = ListUtil.copy(members, true);
     }
 
     public List members() {
@@ -52,7 +52,7 @@ public class ClassBody_c extends Term_c implements ClassBody
 
     public ClassBody members(List members) {
         ClassBody_c n = (ClassBody_c) copy();
-        n.members = TypedList.copyAndCheck(members, ClassMember.class, true);
+        n.members = ListUtil.copy(members, true);
         return n;
     }
 
@@ -61,15 +61,14 @@ public class ClassBody_c extends Term_c implements ClassBody
         List l = new ArrayList(this.members.size() + 1);
         l.addAll(this.members);
         l.add(member);
-        n.members = TypedList.copyAndCheck(l, ClassMember.class, true);
+        n.members = ListUtil.copy(l, true);
         return n;
     }
 
     protected ClassBody_c reconstruct(List members) {
         if (! CollectionUtil.equals(members, this.members)) {
             ClassBody_c n = (ClassBody_c) copy();
-            n.members = TypedList.copyAndCheck(members,
-                                               ClassMember.class, true);
+            n.members = ListUtil.copy(members, true);
             return n;
         }
 

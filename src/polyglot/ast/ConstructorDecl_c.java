@@ -39,8 +39,8 @@ public class ConstructorDecl_c extends Term_c implements ConstructorDecl
 {
     protected Flags flags;
     protected Id name;
-    protected List formals;
-    protected List throwTypes;
+    protected List<Formal> formals;
+    protected List<TypeNode> throwTypes;
     protected Block body;
     protected ConstructorInstance ci;
 
@@ -49,8 +49,8 @@ public class ConstructorDecl_c extends Term_c implements ConstructorDecl
 	assert(flags != null && name != null && formals != null && throwTypes != null); // body may be null
 	this.flags = flags;
 	this.name = name;
-	this.formals = TypedList.copyAndCheck(formals, Formal.class, true);
-	this.throwTypes = TypedList.copyAndCheck(throwTypes, TypeNode.class, true);
+	this.formals = ListUtil.copy(formals, true);
+	this.throwTypes = ListUtil.copy(throwTypes, true);
 	this.body = body;
     }
     
@@ -105,7 +105,7 @@ public class ConstructorDecl_c extends Term_c implements ConstructorDecl
     /** Set the formals of the constructor. */
     public ConstructorDecl formals(List formals) {
 	ConstructorDecl_c n = (ConstructorDecl_c) copy();
-	n.formals = TypedList.copyAndCheck(formals, Formal.class, true);
+	n.formals = ListUtil.copy(formals, true);
 	return n;
     }
 
@@ -117,7 +117,7 @@ public class ConstructorDecl_c extends Term_c implements ConstructorDecl
     /** Set the throwTypes of the constructor. */
     public ConstructorDecl throwTypes(List throwTypes) {
 	ConstructorDecl_c n = (ConstructorDecl_c) copy();
-	n.throwTypes = TypedList.copyAndCheck(throwTypes, TypeNode.class, true);
+	n.throwTypes = ListUtil.copy(throwTypes, true);
 	return n;
     }
 
@@ -165,8 +165,8 @@ public class ConstructorDecl_c extends Term_c implements ConstructorDecl
 	if (name != this.name || ! CollectionUtil.equals(formals, this.formals) || ! CollectionUtil.equals(throwTypes, this.throwTypes) || body != this.body) {
 	    ConstructorDecl_c n = (ConstructorDecl_c) copy();
 	    n.name = name;
-	    n.formals = TypedList.copyAndCheck(formals, Formal.class, true);
-	    n.throwTypes = TypedList.copyAndCheck(throwTypes, TypeNode.class, true);
+	    n.formals = ListUtil.copy(formals, true);
+	    n.throwTypes = ListUtil.copy(throwTypes, true);
 	    n.body = body;
 	    return n;
 	}

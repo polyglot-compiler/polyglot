@@ -38,7 +38,7 @@ public class ConstructorCall_c extends Stmt_c implements ConstructorCall
 {
     protected Kind kind;
     protected Expr qualifier;
-    protected List arguments;
+    protected List<Expr> arguments;
     protected ConstructorInstance ci;
 
     public ConstructorCall_c(Position pos, Kind kind, Expr qualifier, List arguments) {
@@ -46,7 +46,7 @@ public class ConstructorCall_c extends Stmt_c implements ConstructorCall
 	assert(kind != null && arguments != null); // qualifier may be null
 	this.kind = kind;
 	this.qualifier = qualifier;
-	this.arguments = TypedList.copyAndCheck(arguments, Expr.class, true);
+	this.arguments = ListUtil.copy(arguments, true);
     }
     
     /** Get the qualifier of the constructor call. */
@@ -81,7 +81,7 @@ public class ConstructorCall_c extends Stmt_c implements ConstructorCall
     /** Set the actual arguments of the constructor call. */
     public ProcedureCall arguments(List arguments) {
 	ConstructorCall_c n = (ConstructorCall_c) copy();
-	n.arguments = TypedList.copyAndCheck(arguments, Expr.class, true);
+	n.arguments = ListUtil.copy(arguments, true);
 	return n;
     }
 
@@ -115,7 +115,7 @@ public class ConstructorCall_c extends Stmt_c implements ConstructorCall
 	if (qualifier != this.qualifier || ! CollectionUtil.equals(arguments, this.arguments)) {
 	    ConstructorCall_c n = (ConstructorCall_c) copy();
 	    n.qualifier = qualifier;
-	    n.arguments = TypedList.copyAndCheck(arguments, Expr.class, true);
+	    n.arguments = ListUtil.copy(arguments, true);
 	    return n;
 	}
 

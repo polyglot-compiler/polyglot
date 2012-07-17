@@ -45,7 +45,7 @@ public class MuPClass_c extends PClass_c implements MuPClass {
 
     public MuPClass_c(TypeSystem ts, Position pos) {
 	super(ts, pos);
-	formals = new TypedList(new LinkedList(), Param.class, false);
+	formals = new LinkedList<Param>();
     }
 
     /////////////////////////////////////////////////////////////////////////

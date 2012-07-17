@@ -105,7 +105,7 @@ parser Grm extends polyglot.parse.Grm  {:
 
     public ParamTypeNode toParamType(Position pos, Id id, List bounds){
         if (bounds == null){
-            bounds = new TypedList(new LinkedList(), TypeNode.class, false);
+            bounds = new LinkedList<TypeNode>();
         }
         ParamTypeNode tn = nf.ParamTypeNode(pos, bounds, id);
         return tn;
@@ -114,7 +114,7 @@ parser Grm extends polyglot.parse.Grm  {:
     public List variableDeclarators(TypeNode a, List b, Flags flags, List annotations)
     throws Exception
     {
-      List l = new TypedList(new LinkedList(), LocalDecl.class, false);
+      List l = new LinkedList<LocalDecl>();
       for (Iterator i = b.iterator(); i.hasNext(); ) {
           VarDeclarator d = (VarDeclarator) i.next();
           l.add(nf.LocalDecl(pos(d), flags, annotations, array(a, d.dims),
@@ -355,7 +355,7 @@ reference_type_3 ::=
 	;
 type_argument_list ::=
 	type_argument:a
-        {: List l = new TypedList(new LinkedList(), TypeNode.class, false);
+        {: List l = new LinkedList<TypeNode>();
            l.add(a);
            RESULT = l; 
          :}
@@ -367,7 +367,7 @@ type_argument_list ::=
 	;
 type_argument_list_1 ::=
 		type_argument_1:a
-		{: List l = new TypedList(new LinkedList(), TypeNode.class, false);
+		{: List l = new LinkedList<TypeNode>();
            l.add(a);
            RESULT = l; 
          :}
@@ -378,7 +378,7 @@ type_argument_list_1 ::=
 	;
 type_argument_list_2 ::=
 		type_argument_2:a
-	{: List l = new TypedList(new LinkedList(), TypeNode.class, false);
+	{: List l = new LinkedList<TypeNode>();
            l.add(a);
            RESULT = l; 
          :}
@@ -390,7 +390,7 @@ type_argument_list_2 ::=
 	;
 type_argument_list_3 ::=
 		type_argument_3:a
-        {: List l = new TypedList(new LinkedList(), TypeNode.class, false);
+        {: List l = new LinkedList<TypeNode>();
            l.add(a);
            RESULT = l; 
          :}
@@ -471,11 +471,11 @@ drop { class_member_declaration ::= modifiers_opt CLASS IDENTIFIER super_opt int
 
 extend class_member_declaration ::=
     enum_declaration:a
-    {: List l = new TypedList(new LinkedList(), ClassMember.class, false);
+    {: List l = new LinkedList<ClassMember>();
        l.add(a);
        RESULT = l; :}
  |  class_declaration:a 
-    {: List l = new TypedList(new LinkedList(), ClassMember.class, false);
+    {: List l = new LinkedList<ClassMember>();
        l.add(a);
        RESULT = l; :}
 	;
@@ -498,14 +498,14 @@ comma_opt ::=
     ;
 
 enum_constants_opt ::=
-        {: RESULT = new TypedList(new LinkedList(), ClassMember.class, false); :}
+        {: RESULT = new LinkedList<ClassMember>(); :}
 	|	enum_constants:a comma_opt
         {: RESULT = a; :}
 	;
 
 enum_constants ::=
 		enum_constant:a
-        {: List l = new TypedList(new LinkedList(), ClassMember.class, false);
+        {: List l = new LinkedList<ClassMember>();
            parser.next_ordinal = 0;
            l.add(a.ordinal(parser.next_ordinal++));
            RESULT = l; :}
@@ -521,19 +521,19 @@ enum_constant ::=
         {: RESULT = parser.nf.EnumConstantDecl(parser.pos(a), d.flags(), d.annotations(), parser.nf.Id(parser.pos(a), a.getIdentifier()), b, c); :}
 	;
 enum_arguments_opt ::=
-        {: RESULT = new TypedList(new LinkedList(), Expr.class, false); :}
+        {: RESULT = new LinkedList<Expr>(); :}
 	|	LPAREN argument_list_opt:a RPAREN
         {: RESULT = a; :}
 	;
 enum_body_declarations_opt ::=
-        {: RESULT = new TypedList(new LinkedList(), ClassMember.class, false); :}
+        {: RESULT = new LinkedList<ClassMember>(); :}
 	|	SEMICOLON class_body_declarations_opt:a
         {: RESULT = a; :}
 	;
 
 override field_declaration ::=
     modifiers_or_annotations_opt:a type:b variable_declarators:c SEMICOLON:e
-    {: List l = new TypedList(new LinkedList(), ClassMember.class, false);
+    {: List l = new LinkedList<ClassMember>();
        for (Iterator i = c.iterator(); i.hasNext(); ) {
          VarDeclarator d = (VarDeclarator) i.next();
          l.add(parser.nf.FieldDecl(parser.pos(b, e),
@@ -551,7 +551,7 @@ override method_header ::=
         // but it might still turn out to be a field declaration).
         modifiers_or_annotations_opt:a type:b IDENTIFIER:d LPAREN
                 formal_parameter_list_opt:e RPAREN:f dims_opt:g throws_opt:h
-        {: RESULT = parser.nf.MethodDecl(parser.pos(b, f, d), a.flags(), a.annotations(), parser.array(b, g.intValue()), parser.nf.Id(parser.pos(d), d.getIdentifier()), e, h, null, new TypedList(new LinkedList(), TypeNode.class, false)); :}
+        {: RESULT = parser.nf.MethodDecl(parser.pos(b, f, d), a.flags(), a.annotations(), parser.array(b, g.intValue()), parser.nf.Id(parser.pos(d), d.getIdentifier()), e, h, null, new LinkedList<TypeNode>()); :}
         |       
     modifiers_or_annotations_opt:a LT:b type_parameter_list_1:c type:d IDENTIFIER:i LPAREN
                 formal_parameter_list_opt:e RPAREN:f dims_opt:g throws_opt:h
@@ -559,7 +559,7 @@ override method_header ::=
         |       
     modifiers_or_annotations_opt:a VOID:b IDENTIFIER:c LPAREN
                 formal_parameter_list_opt:e RPAREN:f dims_opt:g throws_opt:h
-        {: RESULT = parser.nf.MethodDecl(parser.pos(b, f, c), a.flags(), a.annotations(), parser.nf.CanonicalTypeNode(parser.pos(b), parser.ts.Void()), parser.nf.Id(parser.pos(c), c.getIdentifier()), e, h, null, new TypedList(new LinkedList(), TypeNode.class, false)); :}
+        {: RESULT = parser.nf.MethodDecl(parser.pos(b, f, c), a.flags(), a.annotations(), parser.nf.CanonicalTypeNode(parser.pos(b), parser.ts.Void()), parser.nf.Id(parser.pos(c), c.getIdentifier()), e, h, null, new LinkedList<TypeNode>()); :}
         |       
     modifiers_or_annotations_opt:a LT:b type_parameter_list_1:c VOID:d IDENTIFIER:i LPAREN
                 formal_parameter_list_opt:e RPAREN:f dims_opt:g throws_opt:h
@@ -608,7 +608,7 @@ override local_variable_declaration ::=
 // 19.8.5) Constructor Declarations
 override constructor_declaration ::=
         modifiers_or_annotations_opt:a  simple_name:d LPAREN formal_parameter_list_opt:e RPAREN  throws_opt:f constructor_body:g
-        {: RESULT = parser.nf.ConstructorDecl(d.pos, a.flags(), a.annotations(), d.name, e, f, g, new TypedList(new LinkedList(), TypeNode.class, false)); :} 
+        {: RESULT = parser.nf.ConstructorDecl(d.pos, a.flags(), a.annotations(), d.name, e, f, g, new LinkedList<TypeNode>()); :}
         |       
     modifiers_or_annotations_opt:a LT:b type_parameter_list_1:c simple_name:d LPAREN formal_parameter_list_opt:e RPAREN throws_opt:f constructor_body:g
         {: RESULT = parser.nf.ConstructorDecl(d.pos, a.flags(), a.annotations(), d.name, e, f, g, c); :} 
@@ -642,18 +642,18 @@ override interface_declaration ::=
 		modifiers_or_annotations_opt:a INTERFACE:b IDENTIFIER:c type_parameters_opt:d extends_interfaces_opt:e interface_body:f
         {: RESULT = parser.nf.ClassDecl(parser.pos(b, f), a.setFlag(Flags.INTERFACE).flags(), a.annotations(), parser.nf.Id(parser.pos(c), c.getIdentifier()), null, e, f, d); :}
     | AT:a INTERFACE:b IDENTIFIER:c annotation_body:d
-        {: List superints = new TypedList(new LinkedList(), TypeNode.class, false);
+        {: List superints = new LinkedList<TypeNode>();
            superints.add(parser.nf.CanonicalTypeNode(parser.pos(b, d), parser.ts.Annotation()));
            RESULT = parser.nf.ClassDecl(parser.pos(a, d), Flags.INTERFACE.set(JL5Flags.ANNOTATION), null, parser.nf.Id(parser.pos(c), c.getIdentifier()), null, superints, d, null); :}
     | modifiers_or_annotations:a AT:b INTERFACE:c IDENTIFIER:d annotation_body:e
-        {: List superints = new TypedList(new LinkedList(), TypeNode.class, false);
+        {: List superints = new LinkedList<TypeNode>();
            superints.add(parser.nf.CanonicalTypeNode(parser.pos(b, e), parser.ts.Annotation()));
            RESULT = parser.nf.ClassDecl(parser.pos(a, d), a.setFlag(Flags.INTERFACE.set(JL5Flags.ANNOTATION)).flags(), a.annotations(), parser.nf.Id(parser.pos(d), d.getIdentifier()), null, superints, e, null); :}
 	;
 	
 extend interface_member_declaration ::=
 	enum_declaration:a
-        {: List l = new TypedList(new LinkedList(), ClassMember.class, false);
+        {: List l = new LinkedList<ClassMember>();
            l.add(a);
            RESULT = l; :}
 	;
@@ -662,11 +662,11 @@ extend interface_member_declaration ::=
 // 19.11) Blocks and Statements
 extend block_statement ::=
 	enum_declaration:a
-        {: List l = new TypedList(new LinkedList(), Stmt.class, false);
+        {: List l = new LinkedList<Stmt>();
            l.add(a);
            RESULT = l; :}
 	|	interface_declaration:a
-        {: List l = new TypedList(new LinkedList(), Stmt.class, false);
+        {: List l = new LinkedList<Stmt>();
            l.add(a);
            RESULT = l; :}
 	;
@@ -877,7 +877,7 @@ type_parameters_opt ::=
     type_parameters:a 
     {: RESULT = a; :}
     | 
-    {: RESULT = new TypedList(new LinkedList(), TypeNode.class, false); :}
+    {: RESULT = new LinkedList<TypeNode>(); :}
 ;
 type_parameters ::=
 		LT type_parameter_list_1:a
@@ -889,13 +889,13 @@ type_parameter_list ::=
            RESULT = a; :}
 	|	
     type_parameter:a
-        {: List l = new TypedList(new LinkedList(), TypeNode.class, false);
+        {: List l = new LinkedList<TypeNode>();
            l.add(a);
            RESULT = l; :}
 	;
 type_parameter_list_1 ::=
     type_parameter_1:a
-        {: List l = new TypedList(new LinkedList(), TypeNode.class, false);
+        {: List l = new LinkedList<TypeNode>();
            l.add(a);
            RESULT = l; :}
 	|	
@@ -922,7 +922,7 @@ type_bound_opt ::=
 type_bound ::=
 		EXTENDS reference_type:a additional_bound_list_opt:b
         {: if (b == null) {
-                List l = new TypedList(new LinkedList(), TypeNode.class, false);
+                List l = new LinkedList<TypeNode>();
                 l.add(a);
                 RESULT = l;
            } 
@@ -933,7 +933,7 @@ type_bound ::=
 	;
 type_bound_1 ::=
 		EXTENDS reference_type_1:a
-        {: List l = new TypedList(new LinkedList(), TypeNode.class, false);
+        {: List l = new LinkedList<TypeNode>();
            l.add(a);
            RESULT = l; :}
 	|	EXTENDS reference_type:a additional_bound_list_1:b
@@ -951,7 +951,7 @@ additional_bound_list ::=
         {: b.add(0, a);
            RESULT = b; :}
 	|	additional_bound:a
-        {: List l = new TypedList(new LinkedList(), TypeNode.class, false);
+        {: List l = new LinkedList<TypeNode>();
            l.add(a);
            RESULT = l; :}
 	;
@@ -960,7 +960,7 @@ additional_bound_list_1 ::=
         {: b.add(0, a);
            RESULT = b; :}
 	|	additional_bound_1:a
-        {: List l = new TypedList(new LinkedList(), TypeNode.class, false);
+        {: List l = new LinkedList<TypeNode>();
            l.add(a);
            RESULT = l; :}
 	;
@@ -1236,7 +1236,7 @@ normal_annotation ::=
 ;
 
 element_value_pairs_opt ::=
-        {: RESULT = new TypedList(new LinkedList(), ElementValuePair.class, false); :}
+        {: RESULT = new LinkedList<ElementValuePair>(); :}
     |
     element_value_pairs:a
         {: RESULT = a; :}
@@ -1244,7 +1244,7 @@ element_value_pairs_opt ::=
 
 element_value_pairs ::=
     element_value_pair:a
-        {: List l = new TypedList(new LinkedList(), ElementValuePair.class, false);
+        {: List l = new LinkedList<ElementValuePair>();
            l.add(a);
            RESULT = l;
         :}
@@ -1264,7 +1264,7 @@ annotation_body ::=
 ;
 
 annotation_type_element_declarations_opt ::=
-        {: RESULT = new TypedList(new LinkedList(), ClassMember.class, false); :}
+        {: RESULT = new LinkedList<ClassMember>(); :}
     |
     annotation_type_element_declarations:a
         {: RESULT = a; :}
@@ -1280,7 +1280,7 @@ annotation_type_element_declarations ::=
 ;
 annotation_type_element_declaration ::=
     modifiers_or_annotations_opt:a type:b IDENTIFIER:c LPAREN RPAREN default_value_opt:d SEMICOLON
-        {: List l = new TypedList(new LinkedList(), ClassMember.class, false);
+        {: List l = new LinkedList<ClassMember>();
            l.add(parser.nf.AnnotationElemDecl(parser.pos(b,d), a.flags(), parser.array(b, (new Integer(0)).intValue()), parser.nf.Id(parser.pos(c), c.getIdentifier()), d));
            RESULT = l; :}
     |
@@ -1288,17 +1288,17 @@ annotation_type_element_declaration ::=
         {: RESULT = a; :}
     |
     class_declaration:a
-        {: List l = new TypedList(new LinkedList(), ClassMember.class, false);
+        {: List l = new LinkedList<ClassMember>();
            l.add(a);
            RESULT = l; :}
     |
     interface_declaration:a
-        {: List l = new TypedList(new LinkedList(), ClassMember.class, false);
+        {: List l = new LinkedList<ClassMember>();
            l.add(a);
            RESULT = l; :}
     |
     enum_declaration:a
-        {: List l = new TypedList(new LinkedList(), ClassMember.class, false);
+        {: List l = new LinkedList<ClassMember>();
            l.add(a);
            RESULT = l; :}
     SEMICOLON
@@ -1315,7 +1315,7 @@ default_value_opt ::=
 
 element_values ::=
     element_value:a
-        {: List l = new TypedList(new LinkedList(), Expr.class, false);
+        {: List l = new LinkedList<Expr>();
            l.add(a);
            RESULT = l;
         :}

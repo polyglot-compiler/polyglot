@@ -42,7 +42,7 @@ import java.util.*;
 public class NewArray_c extends Expr_c implements NewArray
 {
     protected TypeNode baseType;
-    protected List dims;
+    protected List<Expr> dims;
     protected int addDims;
     protected ArrayInit init;
 
@@ -55,7 +55,7 @@ public class NewArray_c extends Expr_c implements NewArray
 	assert(dims.size() + addDims > 0); // must allocate something
 	
 	this.baseType = baseType;
-	this.dims = TypedList.copyAndCheck(dims, Expr.class, true);
+	this.dims = ListUtil.copy(dims, true);
 	this.addDims = addDims;
 	this.init = init;
     }
@@ -80,7 +80,7 @@ public class NewArray_c extends Expr_c implements NewArray
     /** Set the dimension expressions of the expression. */
     public NewArray dims(List dims) {
 	NewArray_c n = (NewArray_c) copy();
-	n.dims = TypedList.copyAndCheck(dims, Expr.class, true);
+	n.dims = ListUtil.copy(dims, true);
 	return n;
     }
 
@@ -118,7 +118,7 @@ public class NewArray_c extends Expr_c implements NewArray
 	if (baseType != this.baseType || ! CollectionUtil.equals(dims, this.dims) || init != this.init) {
 	    NewArray_c n = (NewArray_c) copy();
 	    n.baseType = baseType;
-	    n.dims = TypedList.copyAndCheck(dims, Expr.class, true);
+	    n.dims = ListUtil.copy(dims, true);
 	    n.init = init;
 	    return n;
 	}

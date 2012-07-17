@@ -41,7 +41,7 @@ public class Call_c extends Expr_c implements Call
 {
   protected Receiver target;
   protected Id name;
-  protected List arguments;
+  protected List<Expr> arguments;
   protected MethodInstance mi;
   protected boolean targetImplicit;
 
@@ -51,7 +51,7 @@ public class Call_c extends Expr_c implements Call
     assert(name != null && arguments != null); // target may be null
     this.target = target;
     this.name = name;
-    this.arguments = TypedList.copyAndCheck(arguments, Expr.class, true);
+    this.arguments = ListUtil.copy(arguments, true);
     this.targetImplicit = (target == null);
   }
 
@@ -133,7 +133,7 @@ public class Call_c extends Expr_c implements Call
   /** Set the actual arguments of the call. */
   public ProcedureCall arguments(List arguments) {
     Call_c n = (Call_c) copy();
-    n.arguments = TypedList.copyAndCheck(arguments, Expr.class, true);
+    n.arguments = ListUtil.copy(arguments, true);
     return n;
   }
 
@@ -148,7 +148,7 @@ public class Call_c extends Expr_c implements Call
       
       n.target = target;
       n.name = name;
-      n.arguments = TypedList.copyAndCheck(arguments, Expr.class, true);
+      n.arguments = ListUtil.copy(arguments, true);
       return n;
     }
 

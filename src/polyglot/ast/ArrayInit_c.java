@@ -38,12 +38,12 @@ import java.util.*;
  */
 public class ArrayInit_c extends Expr_c implements ArrayInit
 {
-    protected List elements;
+    protected List<Expr> elements;
 
     public ArrayInit_c(Position pos, List elements) {
 	super(pos);
 	assert(elements != null);
-	this.elements = TypedList.copyAndCheck(elements, Expr.class, true);
+	this.elements = ListUtil.copy(elements, true);
     }
 
     /** Get the elements of the initializer. */
@@ -54,7 +54,7 @@ public class ArrayInit_c extends Expr_c implements ArrayInit
     /** Set the elements of the initializer. */
     public ArrayInit elements(List elements) {
 	ArrayInit_c n = (ArrayInit_c) copy();
-	n.elements = TypedList.copyAndCheck(elements, Expr.class, true);
+	n.elements = ListUtil.copy(elements, true);
 	return n;
     }
 
@@ -62,7 +62,7 @@ public class ArrayInit_c extends Expr_c implements ArrayInit
     protected ArrayInit_c reconstruct(List elements) {
 	if (! CollectionUtil.equals(elements, this.elements)) {
 	    ArrayInit_c n = (ArrayInit_c) copy();
-	    n.elements = TypedList.copyAndCheck(elements, Expr.class, true);
+	    n.elements = ListUtil.copy(elements, true);
 	    return n;
 	}
 

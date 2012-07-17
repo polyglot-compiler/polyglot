@@ -42,13 +42,13 @@ import java.util.*;
 public class Switch_c extends Stmt_c implements Switch
 {
     protected Expr expr;
-    protected List elements;
+    protected List<SwitchElement> elements;
 
     public Switch_c(Position pos, Expr expr, List elements) {
 	super(pos);
 	assert(expr != null && elements != null);
 	this.expr = expr;
-	this.elements = TypedList.copyAndCheck(elements, SwitchElement.class, true);
+	this.elements = ListUtil.copy(elements, true);
     }
 
     /** Get the expression to switch on. */
@@ -71,7 +71,7 @@ public class Switch_c extends Stmt_c implements Switch
     /** Set the switch elements of the statement. */
     public Switch elements(List elements) {
 	Switch_c n = (Switch_c) copy();
-	n.elements = TypedList.copyAndCheck(elements, SwitchElement.class, true);
+	n.elements = ListUtil.copy(elements, true);
 	return n;
     }
 
@@ -80,7 +80,7 @@ public class Switch_c extends Stmt_c implements Switch
 	if (expr != this.expr || ! CollectionUtil.equals(elements, this.elements)) {
 	    Switch_c n = (Switch_c) copy();
 	    n.expr = expr;
-	    n.elements = TypedList.copyAndCheck(elements, SwitchElement.class, true);
+	    n.elements = ListUtil.copy(elements, true);
 	    return n;
 	}
 

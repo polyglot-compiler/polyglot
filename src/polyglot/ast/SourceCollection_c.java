@@ -36,12 +36,12 @@ import java.util.*;
  */
 public class SourceCollection_c extends Node_c implements SourceCollection
 {
-    protected List sources;
+    protected List<SourceFile> sources;
 
     public SourceCollection_c(Position pos, List sources) {
 	super(pos);
 	assert(sources != null);
-	this.sources = TypedList.copyAndCheck(sources, SourceFile.class, true);
+	this.sources = ListUtil.copy(sources, true);
     }
 
     public String toString() {
@@ -56,7 +56,7 @@ public class SourceCollection_c extends Node_c implements SourceCollection
     /** Set the statements of the block. */
     public SourceCollection sources(List sources) {
 	SourceCollection_c n = (SourceCollection_c) copy();
-	n.sources = TypedList.copyAndCheck(sources, SourceFile.class, true);
+	n.sources = ListUtil.copy(sources, true);
 	return n;
     }
 
@@ -64,7 +64,7 @@ public class SourceCollection_c extends Node_c implements SourceCollection
     protected SourceCollection_c reconstruct(List sources) {
 	if (! CollectionUtil.equals(sources, this.sources)) {
 	    SourceCollection_c n = (SourceCollection_c) copy();
-	    n.sources = TypedList.copyAndCheck(sources, SourceFile.class, true);
+	    n.sources = ListUtil.copy(sources, true);
 	    return n;
 	}
 

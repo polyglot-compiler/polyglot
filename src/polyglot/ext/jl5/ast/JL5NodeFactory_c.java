@@ -12,7 +12,6 @@ import polyglot.types.Type;
 import polyglot.util.CollectionUtil;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
-import polyglot.util.TypedList;
 
 /**
  * NodeFactory for jl5 extension.
@@ -89,7 +88,7 @@ public class JL5NodeFactory_c extends NodeFactory_c implements JL5NodeFactory {
 
     @Override
     public SingleElementAnnotationElem SingleElementAnnotationElem(Position pos, TypeNode name, Expr value) {
-        List l = new TypedList(new LinkedList(), ElementValuePair.class, false);
+        List l = new LinkedList<ElementValuePair>();
         l.add(ElementValuePair(pos, this.Id(pos, "value"), value));
         SingleElementAnnotationElem n = new SingleElementAnnotationElem_c(pos, name, l);
         return n;

@@ -38,8 +38,8 @@ public abstract class ProcedureInstance_c extends TypeObject_c
 {
     protected ReferenceType container;
     protected Flags flags;
-    protected List formalTypes;
-    protected List throwTypes;
+    protected List<Type> formalTypes;
+    protected List<Type> throwTypes;
 
     /** Used for deserializing types. */
     protected ProcedureInstance_c() { }
@@ -50,8 +50,8 @@ public abstract class ProcedureInstance_c extends TypeObject_c
         super(ts, pos);
 	this.container = container;
 	this.flags = flags;
-	this.formalTypes = TypedList.copyAndCheck(formalTypes, Type.class, true);
-	this.throwTypes = TypedList.copyAndCheck(excTypes, Type.class, true);
+	this.formalTypes = ListUtil.copy(formalTypes, true);
+	this.throwTypes = ListUtil.copy(excTypes, true);
     }
     
     public ReferenceType container() {
@@ -88,14 +88,14 @@ public abstract class ProcedureInstance_c extends TypeObject_c
      * @param formalTypes The formalTypes to set.
      */
     public void setFormalTypes(List formalTypes) {
-        this.formalTypes = TypedList.copyAndCheck(formalTypes, Type.class, true);
+        this.formalTypes = ListUtil.copy(formalTypes, true);
     }
     
     /**
      * @param throwTypes The throwTypes to set.
      */
     public void setThrowTypes(List throwTypes) {
-        this.throwTypes = TypedList.copyAndCheck(throwTypes, Type.class, true);
+        this.throwTypes = ListUtil.copy(throwTypes, true);
     }
      
     public int hashCode() {

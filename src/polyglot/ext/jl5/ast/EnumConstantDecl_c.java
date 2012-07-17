@@ -23,8 +23,8 @@ import polyglot.types.ParsedClassType;
 import polyglot.types.SemanticException;
 import polyglot.util.CodeWriter;
 import polyglot.util.CollectionUtil;
+import polyglot.util.ListUtil;
 import polyglot.util.Position;
-import polyglot.util.TypedList;
 import polyglot.visit.AmbiguityRemover;
 import polyglot.visit.BodyDisambiguator;
 import polyglot.visit.CFGBuilder;
@@ -168,7 +168,7 @@ public class EnumConstantDecl_c extends Term_c implements EnumConstantDecl
     protected EnumConstantDecl_c reconstruct(List args, ClassBody body){
         if (!CollectionUtil.equals(args, this.args) || body != this.body) {
             EnumConstantDecl_c n = (EnumConstantDecl_c) copy();
-            n.args = TypedList.copyAndCheck(args, Expr.class, true);
+            n.args = ListUtil.copy(args, true);
             n.body = body;
             return n;
         }

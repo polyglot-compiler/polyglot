@@ -40,8 +40,8 @@ public class MethodDecl_c extends Term_c implements MethodDecl
     protected Flags flags;
     protected TypeNode returnType;
     protected Id name;
-    protected List formals;
-    protected List throwTypes;
+    protected List<Formal> formals;
+    protected List<TypeNode> throwTypes;
     protected Block body;
     protected MethodInstance mi;
 
@@ -51,8 +51,8 @@ public class MethodDecl_c extends Term_c implements MethodDecl
 	this.flags = flags;
 	this.returnType = returnType;
 	this.name = name;
-	this.formals = TypedList.copyAndCheck(formals, Formal.class, true);
-	this.throwTypes = TypedList.copyAndCheck(throwTypes, TypeNode.class, true);
+	this.formals = ListUtil.copy(formals, true);
+	this.throwTypes = ListUtil.copy(throwTypes, true);
 	this.body = body;
     }
 
@@ -119,7 +119,7 @@ public class MethodDecl_c extends Term_c implements MethodDecl
     /** Set the formals of the method. */
     public MethodDecl formals(List formals) {
 	MethodDecl_c n = (MethodDecl_c) copy();
-	n.formals = TypedList.copyAndCheck(formals, Formal.class, true);
+	n.formals = ListUtil.copy(formals, true);
 	return n;
     }
 
@@ -131,7 +131,7 @@ public class MethodDecl_c extends Term_c implements MethodDecl
     /** Set the exception types of the method. */
     public MethodDecl throwTypes(List throwTypes) {
 	MethodDecl_c n = (MethodDecl_c) copy();
-	n.throwTypes = TypedList.copyAndCheck(throwTypes, TypeNode.class, true);
+	n.throwTypes = ListUtil.copy(throwTypes, true);
 	return n;
     }
 
@@ -179,8 +179,8 @@ public class MethodDecl_c extends Term_c implements MethodDecl
 	    MethodDecl_c n = (MethodDecl_c) copy();
 	    n.returnType = returnType;
             n.name = name;
-	    n.formals = TypedList.copyAndCheck(formals, Formal.class, true);
-	    n.throwTypes = TypedList.copyAndCheck(throwTypes, TypeNode.class, true);
+	    n.formals = ListUtil.copy(formals, true);
+	    n.throwTypes = ListUtil.copy(throwTypes, true);
 	    n.body = body;
 	    return n;
 	}

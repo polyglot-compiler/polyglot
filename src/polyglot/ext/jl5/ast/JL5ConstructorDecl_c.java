@@ -47,8 +47,8 @@ public class JL5ConstructorDecl_c extends ConstructorDecl_c implements JL5Constr
                 || !CollectionUtil.equals(typeParams, this.typeParams)) {
             JL5ConstructorDecl_c n = (JL5ConstructorDecl_c) copy();
     	    n.name = name;
-            n.formals = TypedList.copyAndCheck(formals, Formal.class, true);
-            n.throwTypes = TypedList.copyAndCheck(throwTypes, TypeNode.class, true);
+            n.formals = ListUtil.copy(formals, true);
+            n.throwTypes = ListUtil.copy(throwTypes, true);
             n.body = body;
             n.typeParams = typeParams;
             return n;

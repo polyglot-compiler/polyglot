@@ -5,7 +5,6 @@ import java.util.List;
 
 import polyglot.ext.jl5.ast.AnnotationElem;
 import polyglot.types.Flags;
-import polyglot.util.TypedList;
 
 public class FlagAnnotations {
 
@@ -14,7 +13,7 @@ public class FlagAnnotations {
 
     public FlagAnnotations(){
         classicFlags = Flags.NONE;
-        annotations = new TypedList(new LinkedList(), AnnotationElem.class, false);
+        annotations = new LinkedList<AnnotationElem>();
     }
 
     public Flags flags(){

@@ -232,12 +232,10 @@ public abstract class Node_c implements Node
      * @param v The visitor to use.
      * @return A new list with each element from the old list
      *         replaced by the result of visiting that element.
-     *         If <code>l</code> is a <code>TypedList</code>, the
-     *         new list will also be typed with the same type as 
-     *         <code>l</code>.  If <code>l</code> is <code>null</code>,
+     *         If <code>l</code> is <code>null</code>,
      *         <code>null</code> is returned.
      */
-    public List visitList(List l, NodeVisitor v) {
+    public <T> List<T> visitList(List<T> l, NodeVisitor v) {
 	if (l == null) {
 	    return null;
 	}

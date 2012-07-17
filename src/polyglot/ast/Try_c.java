@@ -39,7 +39,7 @@ import java.util.*;
 public class Try_c extends Stmt_c implements Try
 {
     protected Block tryBlock;
-    protected List catchBlocks;
+    protected List<Catch> catchBlocks;
     protected Block finallyBlock;
 
     public Try_c(Position pos, Block tryBlock, List catchBlocks, Block finallyBlock) {
@@ -47,7 +47,7 @@ public class Try_c extends Stmt_c implements Try
 	assert(tryBlock != null && catchBlocks != null); // finallyBlock may be null, catchBlocks empty
 	assert(! catchBlocks.isEmpty() || finallyBlock != null); // must be either try-catch or try(-catch)-finally
 	this.tryBlock = tryBlock;
-	this.catchBlocks = TypedList.copyAndCheck(catchBlocks, Catch.class, true);
+	this.catchBlocks = ListUtil.copy(catchBlocks, true);
 	this.finallyBlock = finallyBlock;
     }
 
@@ -71,7 +71,7 @@ public class Try_c extends Stmt_c implements Try
     /** Set the catch blocks of the statement. */
     public Try catchBlocks(List catchBlocks) {
 	Try_c n = (Try_c) copy();
-	n.catchBlocks = TypedList.copyAndCheck(catchBlocks, Catch.class, true);
+	n.catchBlocks = ListUtil.copy(catchBlocks, true);
 	return n;
     }
 
@@ -92,7 +92,7 @@ public class Try_c extends Stmt_c implements Try
 	if (tryBlock != this.tryBlock || ! CollectionUtil.equals(catchBlocks, this.catchBlocks) || finallyBlock != this.finallyBlock) {
 	    Try_c n = (Try_c) copy();
 	    n.tryBlock = tryBlock;
-	    n.catchBlocks = TypedList.copyAndCheck(catchBlocks, Catch.class, true);
+	    n.catchBlocks = ListUtil.copy(catchBlocks, true);
 	    n.finallyBlock = finallyBlock;
 	    return n;
 	}

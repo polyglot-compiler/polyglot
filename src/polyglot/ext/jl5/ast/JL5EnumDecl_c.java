@@ -5,8 +5,6 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
-import com.sun.org.apache.bcel.internal.generic.ISTORE;
-
 import polyglot.ast.*;
 import polyglot.ext.jl5.types.JL5MethodInstance;
 import polyglot.types.*;

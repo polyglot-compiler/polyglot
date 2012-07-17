@@ -1,6 +1,5 @@
 package polyglot.ext.jl5.types;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -18,7 +17,7 @@ import polyglot.types.Type;
 import polyglot.types.TypeSystem;
 import polyglot.util.CodeWriter;
 import polyglot.util.InternalCompilerError;
-import polyglot.util.TypedList;
+import polyglot.util.ListUtil;
 
 @SuppressWarnings("serial")
 public class JL5ParsedClassType_c extends ParsedClassType_c implements JL5ParsedClassType {
@@ -29,8 +28,7 @@ public class JL5ParsedClassType_c extends ParsedClassType_c implements JL5Parsed
 
     public JL5ParsedClassType_c( TypeSystem ts, LazyClassInitializer init, Source fromSource){
         super(ts, init, fromSource);
-        annotationElems = new TypedList(new LinkedList(),
-                AnnotationElemInstance.class, false);
+        annotationElems = new LinkedList<AnnotationElemInstance>();
     }
         
     public void addEnumConstant(EnumInstance ei){
@@ -40,8 +38,7 @@ public class JL5ParsedClassType_c extends ParsedClassType_c implements JL5Parsed
 
     public List<EnumInstance> enumConstants(){
         if (enumConstants == null){
-            enumConstants = new TypedList(new LinkedList(), 
-                        EnumInstance.class, false);
+            enumConstants = new LinkedList<EnumInstance>();
         }    
         return enumConstants;
     }
@@ -168,7 +165,7 @@ public class JL5ParsedClassType_c extends ParsedClassType_c implements JL5Parsed
             this.typeVars = Collections.EMPTY_LIST;
         }
         else {
-            this.typeVars = new TypedList(new ArrayList(typeVars), TypeVariable.class, true);
+            this.typeVars = ListUtil.copy(typeVars, true);
         }
     }
     @Override

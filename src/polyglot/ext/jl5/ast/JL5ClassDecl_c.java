@@ -15,8 +15,8 @@ import polyglot.types.SemanticException;
 import polyglot.types.TypeSystem;
 import polyglot.util.CodeWriter;
 import polyglot.util.CollectionUtil;
+import polyglot.util.ListUtil;
 import polyglot.util.Position;
-import polyglot.util.TypedList;
 import polyglot.visit.NodeVisitor;
 import polyglot.visit.PrettyPrinter;
 import polyglot.visit.TypeBuilder;
@@ -111,8 +111,7 @@ public class JL5ClassDecl_c extends ClassDecl_c implements JL5ClassDecl {
             JL5ClassDecl_c n = (JL5ClassDecl_c) copy();
             n.name = name;
             n.superClass = superClass;
-            n.interfaces = TypedList.copyAndCheck(interfaces, TypeNode.class,
-                                                  false);
+            n.interfaces = ListUtil.copy(interfaces, false);
             n.body = body;
             n.paramTypes = paramTypes;
             n.annotations = annotations;

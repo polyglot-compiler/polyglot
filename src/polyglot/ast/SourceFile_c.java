@@ -41,8 +41,8 @@ import java.util.*;
 public class SourceFile_c extends Node_c implements SourceFile
 {
     protected PackageNode package_;
-    protected List imports;
-    protected List decls;
+    protected List<Import> imports;
+    protected List<TopLevelDecl> decls;
     protected ImportTable importTable;
     protected Source source;
 
@@ -50,8 +50,8 @@ public class SourceFile_c extends Node_c implements SourceFile
 	super(pos);
 	assert(imports != null && decls != null && ! decls.isEmpty()); // package_ may be null, imports empty
 	this.package_ = package_;
-	this.imports = TypedList.copyAndCheck(imports, Import.class, true);
-	this.decls = TypedList.copyAndCheck(decls, TopLevelDecl.class, true);
+	this.imports = ListUtil.copy(imports, true);
+	this.decls = ListUtil.copy(decls, true);
     }
     
     public boolean isDisambiguated() {
@@ -90,7 +90,7 @@ public class SourceFile_c extends Node_c implements SourceFile
     /** Set the imports of the source file. */
     public SourceFile imports(List imports) {
 	SourceFile_c n = (SourceFile_c) copy();
-	n.imports = TypedList.copyAndCheck(imports, Import.class, true);
+	n.imports = ListUtil.copy(imports, true);
 	return n;
     }
 
@@ -102,7 +102,7 @@ public class SourceFile_c extends Node_c implements SourceFile
     /** Set the declarations of the source file. */
     public SourceFile decls(List decls) {
 	SourceFile_c n = (SourceFile_c) copy();
-	n.decls = TypedList.copyAndCheck(decls, TopLevelDecl.class, true);
+	n.decls = ListUtil.copy(decls, true);
 	return n;
     }
 
@@ -123,8 +123,8 @@ public class SourceFile_c extends Node_c implements SourceFile
 	if (package_ != this.package_ || ! CollectionUtil.equals(imports, this.imports) || ! CollectionUtil.equals(decls, this.decls)) {
 	    SourceFile_c n = (SourceFile_c) copy();
 	    n.package_ = package_;
-	    n.imports = TypedList.copyAndCheck(imports, Import.class, true);
-	    n.decls = TypedList.copyAndCheck(decls, TopLevelDecl.class, true);
+	    n.imports = ListUtil.copy(imports, true);
+	    n.decls = ListUtil.copy(decls, true);
 	    return n;
 	}
 

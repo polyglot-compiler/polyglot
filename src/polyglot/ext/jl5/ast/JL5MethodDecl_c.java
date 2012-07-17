@@ -133,8 +133,8 @@ public class JL5MethodDecl_c extends MethodDecl_c implements JL5MethodDecl {
             JL5MethodDecl_c n = (JL5MethodDecl_c) copy();
             n.name = name;
             n.returnType = returnType;
-            n.formals = TypedList.copyAndCheck(formals, Formal.class, true);
-            n.throwTypes = TypedList.copyAndCheck(throwTypes, TypeNode.class, true);
+            n.formals = ListUtil.copy(formals, true);
+            n.throwTypes = ListUtil.copy(throwTypes, true);
             n.body = body;
             n.typeParams = paramTypes;
             return n;

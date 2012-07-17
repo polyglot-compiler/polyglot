@@ -1,6 +1,5 @@
 package polyglot.ext.jl5;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.Reader;
 
@@ -17,7 +16,6 @@ import polyglot.ext.jl5.types.JL5TypeSystem_c;
 import polyglot.ext.jl5.types.reflect.JL5ClassFile;
 import polyglot.frontend.*;
 import polyglot.main.Options;
-import polyglot.qq.QQ;
 import polyglot.translate.JLOutputExtensionInfo;
 import polyglot.types.TypeSystem;
 import polyglot.types.reflect.ClassFile;

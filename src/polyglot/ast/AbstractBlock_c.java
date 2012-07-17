@@ -38,12 +38,12 @@ import java.util.*;
  */
 public abstract class AbstractBlock_c extends Stmt_c implements Block
 {
-    protected List statements;
+    protected List<Stmt> statements;
 
     public AbstractBlock_c(Position pos, List statements) {
 	super(pos);
 	assert(statements != null);
-	this.statements = TypedList.copyAndCheck(statements, Stmt.class, true);
+	this.statements = ListUtil.copy(statements, true);
     }
 
     /** Get the statements of the block. */
@@ -54,7 +54,7 @@ public abstract class AbstractBlock_c extends Stmt_c implements Block
     /** Set the statements of the block. */
     public Block statements(List statements) {
 	AbstractBlock_c n = (AbstractBlock_c) copy();
-	n.statements = TypedList.copyAndCheck(statements, Stmt.class, true);
+	n.statements = ListUtil.copy(statements, true);
 	return n;
     }
 
@@ -78,7 +78,7 @@ public abstract class AbstractBlock_c extends Stmt_c implements Block
     protected AbstractBlock_c reconstruct(List statements) {
 	if (! CollectionUtil.equals(statements, this.statements)) {
 	    AbstractBlock_c n = (AbstractBlock_c) copy();
-	    n.statements = TypedList.copyAndCheck(statements, Stmt.class, true);
+	    n.statements = ListUtil.copy(statements, true);
 	    return n;
 	}
 

@@ -27,8 +27,8 @@ package polyglot.ast;
 
 import java.util.List;
 
+import polyglot.util.ListUtil;
 import polyglot.util.Position;
-import polyglot.util.TypedList;
 
 /**
  * A <code>NodeList</code> represents a list of AST nodes.
@@ -39,13 +39,13 @@ import polyglot.util.TypedList;
  */
 public class NodeList_c extends Node_c implements NodeList {
   protected NodeFactory nf;
-  protected List nodes;
+  protected List<Node> nodes;
 
   public NodeList_c(Position pos, NodeFactory nf, List nodes) {
     super(pos);
     assert (nodes != null);
     this.nf = nf;
-    this.nodes = TypedList.copyAndCheck(nodes, Node.class, true);
+    this.nodes = ListUtil.copy(nodes, true);
   }
 
   /*
@@ -64,7 +64,7 @@ public class NodeList_c extends Node_c implements NodeList {
    */
   public NodeList nodes(List nodes) {
     NodeList_c result = (NodeList_c) copy();
-    result.nodes = TypedList.copyAndCheck(nodes, Node.class, true);
+    result.nodes = ListUtil.copy(nodes, true);
     return result;
   }
 

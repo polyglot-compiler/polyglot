@@ -45,7 +45,7 @@ public class ClassDecl_c extends Term_c implements ClassDecl
     protected Flags flags;
     protected Id name;
     protected TypeNode superClass;
-    protected List interfaces;
+    protected List<TypeNode> interfaces;
     protected ClassBody body;
     protected ConstructorInstance defaultCI;
 
@@ -58,7 +58,7 @@ public class ClassDecl_c extends Term_c implements ClassDecl
 	    this.flags = flags;
 	    this.name = name;
 	    this.superClass = superClass;
-	    this.interfaces = TypedList.copyAndCheck(interfaces, TypeNode.class, true);
+	    this.interfaces = ListUtil.copy(interfaces, true);
 	    this.body = body;
     }
     
@@ -126,7 +126,7 @@ public class ClassDecl_c extends Term_c implements ClassDecl
 
     public ClassDecl interfaces(List interfaces) {
 	    ClassDecl_c n = (ClassDecl_c) copy();
-	    n.interfaces = TypedList.copyAndCheck(interfaces, TypeNode.class, true);
+	    n.interfaces = ListUtil.copy(interfaces, true);
 	    return n;
     }
 
@@ -145,7 +145,7 @@ public class ClassDecl_c extends Term_c implements ClassDecl
 		    ClassDecl_c n = (ClassDecl_c) copy();
 		    n.name = name;
 		    n.superClass = superClass;
-		    n.interfaces = TypedList.copyAndCheck(interfaces, TypeNode.class, true);
+		    n.interfaces = ListUtil.copy(interfaces, true);
 		    n.body = body;
 		    return n;
 	    }

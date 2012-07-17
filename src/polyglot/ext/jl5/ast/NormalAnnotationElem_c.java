@@ -14,19 +14,19 @@ import polyglot.types.Context;
 import polyglot.types.SemanticException;
 import polyglot.util.CodeWriter;
 import polyglot.util.CollectionUtil;
+import polyglot.util.ListUtil;
 import polyglot.util.Position;
-import polyglot.util.TypedList;
 import polyglot.visit.NodeVisitor;
 import polyglot.visit.Translator;
 import polyglot.visit.TypeChecker;
 
 public class NormalAnnotationElem_c extends AnnotationElem_c implements NormalAnnotationElem {
 
-    protected List elements;
+    protected List<ElementValuePair> elements;
 
     public NormalAnnotationElem_c(Position pos, TypeNode typeName, List elements){
         super(pos, typeName);
-        this.elements = TypedList.copyAndCheck(elements, ElementValuePair.class, true);
+        this.elements = ListUtil.copy(elements, true);
     }
     
     public List elements(){
@@ -35,7 +35,7 @@ public class NormalAnnotationElem_c extends AnnotationElem_c implements NormalAn
     
     public NormalAnnotationElem elements(List elements){
         NormalAnnotationElem_c n = (NormalAnnotationElem_c) copy();
-        n.elements = TypedList.copyAndCheck(elements, ElementValuePair.class, true);
+        n.elements = ListUtil.copy(elements, true);
         return n;
     }
 
@@ -43,7 +43,7 @@ public class NormalAnnotationElem_c extends AnnotationElem_c implements NormalAn
         if (tn != this.typeName || !CollectionUtil.equals(elements, this.elements)) {
             NormalAnnotationElem_c n = (NormalAnnotationElem_c) copy();
             n.typeName = tn;
-            n.elements = TypedList.copyAndCheck(elements, ElementValuePair.class, true);
+            n.elements = ListUtil.copy(elements, true);
             return n;
         }
         return this;

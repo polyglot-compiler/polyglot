@@ -37,17 +37,17 @@ import java.util.*;
  */
 public class For_c extends Loop_c implements For
 {
-    protected List inits;
+    protected List<ForInit> inits;
     protected Expr cond;
-    protected List iters;
+    protected List<ForUpdate> iters;
     protected Stmt body;
 
     public For_c(Position pos, List inits, Expr cond, List iters, Stmt body) {
 	super(pos);
 	assert(inits != null && iters != null && body != null); // cond may be null, inits and iters may be empty
-	this.inits = TypedList.copyAndCheck(inits, ForInit.class, true);
+	this.inits = ListUtil.copy(inits, true);
 	this.cond = cond;
-	this.iters = TypedList.copyAndCheck(iters, ForUpdate.class, true);
+	this.iters = ListUtil.copy(iters, true);
 	this.body = body;
     }
 
@@ -59,7 +59,7 @@ public class For_c extends Loop_c implements For
     /** Set the inits of the statement. */
     public For inits(List inits) {
 	For_c n = (For_c) copy();
-	n.inits = TypedList.copyAndCheck(inits, ForInit.class, true);
+	n.inits = ListUtil.copy(inits, true);
 	return n;
     }
 
@@ -83,7 +83,7 @@ public class For_c extends Loop_c implements For
     /** Set the iterator expressions of the statement. */
     public For iters(List iters) {
 	For_c n = (For_c) copy();
-	n.iters = TypedList.copyAndCheck(iters, ForUpdate.class, true);
+	n.iters = ListUtil.copy(iters, true);
 	return n;
     }
 
@@ -103,9 +103,9 @@ public class For_c extends Loop_c implements For
     protected For_c reconstruct(List inits, Expr cond, List iters, Stmt body) {
 	if (! CollectionUtil.equals(inits, this.inits) || cond != this.cond || ! CollectionUtil.equals(iters, this.iters) || body != this.body) {
 	    For_c n = (For_c) copy();
-	    n.inits = TypedList.copyAndCheck(inits, ForInit.class, true);
+	    n.inits = ListUtil.copy(inits, true);
 	    n.cond = cond;
-	    n.iters = TypedList.copyAndCheck(iters, ForUpdate.class, true);
+	    n.iters = ListUtil.copy(iters, true);
 	    n.body = body;
 	    return n;
 	}

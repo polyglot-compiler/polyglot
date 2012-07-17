@@ -46,7 +46,7 @@ public class New_c extends Expr_c implements New
 {
     protected Expr qualifier;
     protected TypeNode tn;
-    protected List arguments;
+    protected List<Expr> arguments;
     protected ClassBody body;
     protected ConstructorInstance ci;
     protected ParsedClassType anonType;
@@ -56,7 +56,7 @@ public class New_c extends Expr_c implements New
         assert(tn != null && arguments != null); // qualifier and body may be null
         this.qualifier = qualifier;
         this.tn = tn;
-        this.arguments = TypedList.copyAndCheck(arguments, Expr.class, true);
+        this.arguments = ListUtil.copy(arguments, true);
         this.body = body;
     }
 
@@ -116,7 +116,7 @@ public class New_c extends Expr_c implements New
 
     public ProcedureCall arguments(List arguments) {
         New_c n = (New_c) copy();
-        n.arguments = TypedList.copyAndCheck(arguments, Expr.class, true);
+        n.arguments = ListUtil.copy(arguments, true);
         return n;
     }
 
@@ -136,7 +136,7 @@ public class New_c extends Expr_c implements New
             New_c n = (New_c) copy();
             n.tn = tn;
             n.qualifier = qualifier;
-            n.arguments = TypedList.copyAndCheck(arguments, Expr.class, true);
+            n.arguments = ListUtil.copy(arguments, true);
             n.body = body;
             return n;
         }
