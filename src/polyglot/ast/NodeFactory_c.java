@@ -485,15 +485,6 @@ public class NodeFactory_c extends AbstractNodeFactory_c
         n = (NewArray)n.del(delFactory.delNewArray());
         return n;
     }
-    
-    @SuppressWarnings("unchecked")
-    @Override
-    public <N extends Node> NodeList<N> NodeList(Position pos, NodeFactory nf, List<N> nodes) {
-        NodeList<N> n = new NodeList_c<N>(pos, nf, nodes);
-        n = (NodeList<N>) n.ext(extFactory.extNodeList());
-        n = (NodeList<N>) n.del(delFactory.delNodeList());
-        return n;
-    }
 
     @Override
     public NullLit NullLit(Position pos) {

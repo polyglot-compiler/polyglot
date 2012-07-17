@@ -127,9 +127,8 @@ public class For_c extends Loop_c implements For
 	List<ForInit> inits = visitList(this.inits, v);
 	Expr cond = (Expr) visitChild(this.cond, v);
 	List<ForUpdate> iters = visitList(this.iters, v);
-        Node body = visitChild(this.body, v);
-	if (body instanceof NodeList) body = ((NodeList<?>) body).toBlock();
-	return reconstruct(inits, cond, iters, (Stmt) body);
+        Stmt body = (Stmt) visitChild(this.body, v);
+	return reconstruct(inits, cond, iters, body);
     }
 
     @Override

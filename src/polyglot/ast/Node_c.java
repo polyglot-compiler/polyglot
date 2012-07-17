@@ -284,11 +284,7 @@ public abstract class Node_c implements Node
 	    if (n != m) {
 	        result = vl;
 	    }
-            if (m instanceof NodeList) {
-                @SuppressWarnings("unchecked")
-                NodeList<T> ms = (NodeList<T>) m;
-                vl.addAll(ms.nodes());
-            } else if (m != null) {
+            if (m != null) {
                 @SuppressWarnings("unchecked")
                 T t = (T) m;
 	        vl.add(t);

@@ -100,9 +100,8 @@ public class While_c extends Loop_c implements While
     @Override
     public Node visitChildren(NodeVisitor v) {
 	Expr cond = (Expr) visitChild(this.cond, v);
-	Node body = visitChild(this.body, v);
-        if (body instanceof NodeList) body = ((NodeList<?>) body).toBlock();
-	return reconstruct(cond, (Stmt) body);
+	Stmt body = (Stmt) visitChild(this.body, v);
+	return reconstruct(cond, body);
     }
 
     /** Type check the statement. */

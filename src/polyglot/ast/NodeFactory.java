@@ -321,9 +321,6 @@ public interface NodeFactory
     NewArray NewArray(Position pos, TypeNode base, List<Expr> dims, int addDims);
     NewArray NewArray(Position pos, TypeNode base, int addDims, ArrayInit init);
     NewArray NewArray(Position pos, TypeNode base, List<Expr> dims, int addDims, ArrayInit init);
-    
-    <N extends Node> NodeList<N> NodeList(Position pos, List<N> nodes);
-    <N extends Node> NodeList<N> NodeList(Position pos, NodeFactory nf, List<N> nodes);
 
     NullLit NullLit(Position pos);
 

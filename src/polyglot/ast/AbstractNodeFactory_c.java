@@ -585,11 +585,6 @@ public abstract class AbstractNodeFactory_c implements NodeFactory
     public final NewArray NewArray(Position pos, TypeNode base, int addDims, ArrayInit init) {
 	return NewArray(pos, base, Collections.<Expr> emptyList(), addDims, init);
     }
-    
-    @Override
-    public final <N extends Node> NodeList<N> NodeList(Position pos, List<N> nodes) {
-        return NodeList(pos, this, nodes);
-    }
 
     @Override
     public final Return Return(Position pos) {
