@@ -36,7 +36,8 @@ public class Keyword extends Token {
       keyword = s;
   }
 
-  public String toString() {
+  @Override
+public String toString() {
       return keyword;
   }
 }

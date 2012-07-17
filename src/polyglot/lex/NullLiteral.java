@@ -30,5 +30,6 @@ import polyglot.util.Position;
 /** A token class for null literals. */
 public class NullLiteral extends Literal {
   public NullLiteral(Position position, int sym) { super(position, sym); }
-  public String toString() { return "literal null"; }
+  @Override
+public String toString() { return "literal null"; }
 }

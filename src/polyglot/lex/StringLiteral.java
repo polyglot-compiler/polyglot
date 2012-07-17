@@ -37,7 +37,8 @@ public class StringLiteral extends Literal {
 
   public String getValue() { return val; }
 
-  public String toString() {
+  @Override
+public String toString() {
     return "string literal \""+Token.escape(val)+"\"";
   }
 }

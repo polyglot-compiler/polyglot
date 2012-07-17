@@ -25,9 +25,8 @@
 
 package polyglot.qq;
 
-import polyglot.lex.*;
-import polyglot.ast.*;
-import java_cup.runtime.Symbol;
+import polyglot.ast.Node;
+import polyglot.lex.Token;
 import polyglot.util.Position;
 
 /** A token class for int literals. */
@@ -43,7 +42,8 @@ public class QQNodeToken extends Token {
       return node;
   }
 
-  public String toString() {
+  @Override
+public String toString() {
       return "qq" + symbol() + "(" + node + ")";
   }
 }

@@ -47,7 +47,8 @@ public class CharacterLiteral extends Literal {
     return Token.escape( String.valueOf( val));
   }
 
-  public String toString() 
+  @Override
+public String toString() 
   {
     return "char literal '" + getEscapedValue() + "'";
   }

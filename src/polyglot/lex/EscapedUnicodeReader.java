@@ -40,7 +40,8 @@ public class EscapedUnicodeReader extends FilterReader {
   public EscapedUnicodeReader(Reader in) {
     super(in);
   }
-  public int read() throws IOException {
+  @Override
+public int read() throws IOException {
     int r = (pushback==-1)?in.read():pushback; pushback=-1;
     
     if (r!='\\') {
@@ -92,7 +93,8 @@ public class EscapedUnicodeReader extends FilterReader {
     }
   }
   // synthesize array read from single-character read.
-  public int read(char cbuf[], int off, int len) throws IOException {
+  @Override
+public int read(char cbuf[], int off, int len) throws IOException {
     for (int i=0; i<len; i++) {
       int c = read();
       if (c==-1) return (i==0)?-1:i; // end of stream reached.
@@ -101,9 +103,11 @@ public class EscapedUnicodeReader extends FilterReader {
     return len;
   }
 
-  public boolean markSupported() { return false; }
+  @Override
+public boolean markSupported() { return false; }
 
-  public boolean ready() throws IOException {
+  @Override
+public boolean ready() throws IOException {
     if (pushback!=-1) return true;
     else return in.ready();
   }

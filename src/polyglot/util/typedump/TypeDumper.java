@@ -26,7 +26,6 @@
 package polyglot.util.typedump;
 
 import polyglot.util.*;
-import polyglot.util.CodeWriter;
 import polyglot.types.*;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
@@ -35,9 +34,9 @@ import java.util.Map;
 import java.util.Set;
 
 class TypeDumper {
-    static Set dontExpand;
+    static Set<Class<?>> dontExpand;
     static {
-	Object[] primitiveLike = {
+	Class<?>[] primitiveLike = {
 	    Void.class,
 	    Boolean.class,
 	    Short.class,
@@ -49,7 +48,7 @@ class TypeDumper {
 	    String.class,
 	};
 	dontExpand =
-	    new java.util.HashSet(java.util.Arrays.asList(primitiveLike));
+	    new java.util.HashSet<Class<?>>(java.util.Arrays.asList(primitiveLike));
     }
 
     TypeObject theType;
@@ -68,7 +67,7 @@ class TypeDumper {
 	throws ClassNotFoundException, NoSuchFieldException, 
 	       java.io.IOException, SecurityException
     {
-	Class c = Class.forName(name);
+	Class<?> c = Class.forName(name);
 	try {
 	    Field jlcVersion = c.getDeclaredField("jlc$CompilerVersion");
 	    Field jlcTimestamp = c.getDeclaredField("jlc$SourceLastModified");
@@ -85,7 +84,7 @@ class TypeDumper {
     }
 
     public void dump(CodeWriter w) {
-	Map cache = new java.util.HashMap();
+	Map<Object, Object> cache = new java.util.HashMap<Object, Object>();
 	cache.put(theType, theType);
 	w.write("Type "+rawName+ " {");
 	w.allowBreak(2);
@@ -107,7 +106,7 @@ class TypeDumper {
 	w.newline(0);
     }
 
-    protected void dumpObject(CodeWriter w, Object obj, Map cache) {
+    protected void dumpObject(CodeWriter w, Object obj, Map<Object, Object> cache) {
 	w.write(" fields {");
 	w.allowBreak(2);
 	w.begin(0);
@@ -125,7 +124,7 @@ class TypeDumper {
 		try {
 		    Object o = declaredFields[i].get(obj);
 		    if (o != null) {
-			Class rtType = o.getClass();
+			Class<?> rtType = o.getClass();
 			w.write("<"+rtType.toString()+">:");
 			w.allowBreak(0);
 			w.write(o.toString());
@@ -155,7 +154,7 @@ class TypeDumper {
 	}
     }
 
-    static boolean dontDump(Class c) {
+    static boolean dontDump(Class<?> c) {
 	return dontExpand.contains(c);
     }
 

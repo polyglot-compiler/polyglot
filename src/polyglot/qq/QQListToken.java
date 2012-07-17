@@ -25,26 +25,26 @@
 
 package polyglot.qq;
 
-import polyglot.lex.*;
-import polyglot.ast.*;
-import java_cup.runtime.Symbol;
-import polyglot.util.Position;
 import java.util.List;
+
+import polyglot.lex.Token;
+import polyglot.util.Position;
 
 /** A token class for int literals. */
 public class QQListToken extends Token {
-    protected List list;
+    protected List<Object> list;
 
-  public QQListToken(Position position, List list, int sym) {
+  public QQListToken(Position position, List<Object> list, int sym) {
       super(position, sym);
       this.list = list;
   }
 
-  public List list() {
+  public List<Object> list() {
       return list;
   }
 
-  public String toString() {
+  @Override
+public String toString() {
       return "qq(" + list + ")";
   }
 }

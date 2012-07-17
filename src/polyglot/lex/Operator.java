@@ -25,7 +25,6 @@
 
 package polyglot.lex;
 
-import java.util.Hashtable;
 import polyglot.util.Position;
 
 /** A token class for operators. */
@@ -36,5 +35,6 @@ public class Operator extends Token {
       this.which = which;
   }
 
-  public String toString() { return "operator " + which; }
+  @Override
+public String toString() { return "operator " + which; }
 }

@@ -30,9 +30,9 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Stack;
+
 import polyglot.util.ErrorInfo;
 import polyglot.util.ErrorQueue;
 import polyglot.util.Position;
@@ -42,17 +42,17 @@ import polyglot.util.SimpleErrorQueue;
 public class Report {
   /** A collection of string names of topics which can be used with the
       -report command-line switch */
-  public final static Collection topics = new HashSet();
+  public final static Collection<String> topics = new HashSet<String>();
 
   /** A collection of string names of topics which we should always check
       if we should report. */
-  public final static Stack should_report = new Stack();
+  public final static Stack<String> should_report = new Stack<String>();
 
   /** 
    * The topics that the user has selected to report, mapped to the level
    * they want to report them to.
    */
-  protected final static Map reportTopics = new HashMap(); // Map[String, Integer]
+  protected final static Map<String, Integer> reportTopics = new HashMap<String, Integer>(); // Map[String, Integer]
   
   /** Error queue to which to write messages. */
   protected static ErrorQueue eq;
@@ -140,18 +140,16 @@ public class Report {
    * <code>level</code> should be reported, based on use of the
    * -report command-line switches given by the user.
    */
-  public static boolean should_report(Collection topics, int level) {
+  public static boolean should_report(Collection<String> topics, int level) {
       if (noReporting)
           return false;
       synchronized (should_report) {
-          for (Iterator i = should_report.iterator(); i.hasNext();) {
-              String topic = (String) i.next();
+          for (String topic : should_report) {
               if (level(topic) >= level) return true;
           }
       }
       if (topics != null) {
-          for (Iterator i = topics.iterator(); i.hasNext();) {
-              String topic = (String) i.next();
+          for (String topic : topics) {
               if (level(topic) >= level) return true;
           }
       }
@@ -159,7 +157,7 @@ public class Report {
   }
   
   public static void addTopic(String topic, int level) {
-      Integer i = (Integer)reportTopics.get(topic);
+      Integer i = reportTopics.get(topic);
       if (i == null || i.intValue() < level) {
           reportTopics.put(topic, new Integer(level));
       }

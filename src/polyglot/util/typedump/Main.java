@@ -25,11 +25,10 @@
 
 package polyglot.util.typedump;
 
-import polyglot.util.*;
-import polyglot.util.*;
-import polyglot.types.Type;
-import polyglot.types.TypeSystem;
 import polyglot.frontend.ExtensionInfo;
+import polyglot.types.TypeSystem;
+import polyglot.util.CodeWriter;
+import polyglot.util.OptimalCodeWriter;
 
 public class Main {
     public static void main(String args[]) {
@@ -54,7 +53,7 @@ public class Main {
 
         String extClassName =
             "polyglot.ext." + extension + ".ExtensionInfo";
-        Class extClass = null;
+        Class<?> extClass = null;
 
         try {
             extClass = Class.forName(extClassName);

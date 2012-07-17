@@ -55,9 +55,9 @@ public abstract class Token {
       case '\f': sb.append("\\f"); break;
       case '\n': sb.append("\\n"); break;
       default:
-	if ((int)s.charAt(i)<0x20 ||
-              ((int)s.charAt(i) > 0x7e && (int)s.charAt(i) < 0xFF))
-	  sb.append("\\"+Integer.toOctalString((int)s.charAt(i)));
+	if (s.charAt(i)<0x20 ||
+              (s.charAt(i) > 0x7e && s.charAt(i) < 0xFF))
+	  sb.append("\\"+Integer.toOctalString(s.charAt(i)));
 	else
 	  sb.append(s.charAt(i));
       }

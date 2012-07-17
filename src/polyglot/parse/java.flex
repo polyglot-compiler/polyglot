@@ -36,6 +36,7 @@ import polyglot.frontend.FileSource;
 import java.util.HashMap;
 import java.math.BigInteger;
 
+@SuppressWarnings("all")
 %%
 
 %public

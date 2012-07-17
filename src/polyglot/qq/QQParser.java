@@ -26,7 +26,6 @@
 package polyglot.qq;
 
 import java_cup.runtime.Symbol;
-import polyglot.ast.*;
 
 /** Quasiquoting parser.  Interface to the parser with new start rules
   to enable quasiquoting. */

@@ -25,19 +25,27 @@
 
 package polyglot.qq;
 
-import polyglot.ast.*;
-import polyglot.types.*;
-import polyglot.util.*;
-import polyglot.visit.*;
-import polyglot.frontend.*;
-import polyglot.main.Report;
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.ListIterator;
+
+import polyglot.ast.ClassDecl;
+import polyglot.ast.ClassMember;
+import polyglot.ast.Expr;
+import polyglot.ast.Node;
+import polyglot.ast.NodeFactory;
+import polyglot.ast.SourceFile;
+import polyglot.ast.Stmt;
+import polyglot.ast.TypeNode;
+import polyglot.frontend.ExtensionInfo;
 import polyglot.lex.Lexer;
-
-import polyglot.qq.Lexer_c;
-import polyglot.qq.Grm;
-
-import java.util.*;
-import java.io.*;
+import polyglot.main.Report;
+import polyglot.types.Type;
+import polyglot.types.TypeSystem;
+import polyglot.util.ErrorQueue;
+import polyglot.util.Position;
 
 /**
   Java language quasiquoter.  This class contains methods for parsing strings
@@ -108,55 +116,55 @@ public class QQ {
     }
 
     /** Create an empty list. */
-    private List list() { return Collections.EMPTY_LIST; }
+    private List<Object> list() { return Collections.emptyList(); }
 
     /** Create a singleton list. */
-    private List list(Object o1) {
+    private List<Object> list(Object o1) {
 	return list(new Object[] { o1 });
     }
 
     /** Create a 2-element list. */
-    private List list(Object o1, Object o2) {
+    private List<Object> list(Object o1, Object o2) {
         return list(new Object[] { o1, o2 });
     }
  
     /** Create a 3-element list. */
-    private List list(Object o1, Object o2, Object o3) {
+    private List<Object> list(Object o1, Object o2, Object o3) {
         return list(new Object[] { o1, o2, o3 });
     }
 
     /** Create a 4-element list. */
-    private List list(Object o1, Object o2, Object o3, Object o4) {
+    private List<Object> list(Object o1, Object o2, Object o3, Object o4) {
         return list(new Object[] { o1, o2, o3, o4 });
     }
 
     /** Create a 5-element list. */
-    private List list(Object o1, Object o2, Object o3, Object o4, Object o5) {
+    private List<Object> list(Object o1, Object o2, Object o3, Object o4, Object o5) {
         return list(new Object[] { o1, o2, o3, o4, o5 });
     }
 
     /** Create a 6-element list. */
-    private List list(Object o1, Object o2, Object o3, Object o4, Object o5, Object o6) {
+    private List<Object> list(Object o1, Object o2, Object o3, Object o4, Object o5, Object o6) {
         return list(new Object[] { o1, o2, o3, o4, o5, o6 });
     }
 
     /** Create a 7-element list. */
-    private List list(Object o1, Object o2, Object o3, Object o4, Object o5, Object o6, Object o7) {
+    private List<Object> list(Object o1, Object o2, Object o3, Object o4, Object o5, Object o6, Object o7) {
         return list(new Object[] { o1, o2, o3, o4, o5, o6, o7 });
     }
 
     /** Create a 8-element list. */
-    private List list(Object o1, Object o2, Object o3, Object o4, Object o5, Object o6, Object o7, Object o8) {
+    private List<Object> list(Object o1, Object o2, Object o3, Object o4, Object o5, Object o6, Object o7, Object o8) {
         return list(new Object[] { o1, o2, o3, o4, o5, o6, o7, o8 });
     }
 
     /** Create a 9-element list. */
-    private List list(Object o1, Object o2, Object o3, Object o4, Object o5, Object o6, Object o7, Object o8, Object o9) {
+    private List<Object> list(Object o1, Object o2, Object o3, Object o4, Object o5, Object o6, Object o7, Object o8, Object o9) {
         return list(new Object[] { o1, o2, o3, o4, o5, o6, o7, o8, o9 });
     }
 
     /** Create a list from an array. */
-    private List list(Object[] os) {
+    private List<Object> list(Object[] os) {
         return Arrays.asList(os);
     }
 
@@ -264,7 +272,7 @@ public class QQ {
      * Parse a string into a <code>SourceFile</code> AST node,
      * applying substitutions.
      */
-    public SourceFile parseFile(String fmt, List subst) {
+    public SourceFile parseFile(String fmt, List<Object> subst) {
         return (SourceFile) parse(fmt, subst, FILE);
     }
 
@@ -350,7 +358,7 @@ public class QQ {
 
     /** Parse a string into a <code>ClassDecl</code> AST node,
      * applying substitutions. */
-    public ClassDecl parseDecl(String fmt, List subst) {
+    public ClassDecl parseDecl(String fmt, List<Object> subst) {
         return (ClassDecl) parse(fmt, subst, DECL);
     }
 
@@ -436,7 +444,7 @@ public class QQ {
 
     /** Parse a string into a <code>ClassMember</code> AST node,
      * applying substitutions. */
-    public ClassMember parseMember(String fmt, List subst) {
+    public ClassMember parseMember(String fmt, List<Object> subst) {
         return (ClassMember) parse(fmt, subst, MEMB);
     }
 
@@ -522,7 +530,7 @@ public class QQ {
 
     /** Parse a string into a <code>Expr</code> AST node,
      * applying substitutions. */
-    public Expr parseExpr(String fmt, List subst) {
+    public Expr parseExpr(String fmt, List<Object> subst) {
         return (Expr) parse(fmt, subst, EXPR);
     }
 
@@ -608,7 +616,7 @@ public class QQ {
 
     /** Parse a string into a <code>Stmt</code> AST node,
      * applying substitutions. */
-    public Stmt parseStmt(String fmt, List subst) {
+    public Stmt parseStmt(String fmt, List<Object> subst) {
         return (Stmt) parse(fmt, subst, STMT);
     }
 
@@ -694,12 +702,12 @@ public class QQ {
 
     /** Parse a string into a <code>TypeNode</code> AST node,
      * applying substitutions. */
-    public TypeNode parseType(String fmt, List subst) {
+    public TypeNode parseType(String fmt, List<Object> subst) {
         return (TypeNode) parse(fmt, subst, TYPE);
     }
 
     /** Create a lexer that performs the substitutions in <code>subst</code>. */
-    protected Lexer lexer(String fmt, Position pos, List subst) {
+    protected Lexer lexer(String fmt, Position pos, List<Object> subst) {
         return new polyglot.qq.Lexer_c(fmt, pos, subst);
     }
 
@@ -710,13 +718,13 @@ public class QQ {
 
     /** Parse a string into an AST node of the given type,
      * applying substitutions. */
-    protected Node parse(String fmt, List subst, int kind) {
+    protected Node parse(String fmt, List<Object> subst, int kind) {
         TypeSystem ts = ext.typeSystem();
         NodeFactory nf = ext.nodeFactory();
         ErrorQueue eq = ext.compiler().errorQueue();
 
         // Replace Types with TypeNodes
-        for (ListIterator i = subst.listIterator(); i.hasNext(); ) {
+        for (ListIterator<Object> i = subst.listIterator(); i.hasNext(); ) {
             Object o = i.next();
 
             if (o instanceof Type) {
@@ -724,9 +732,10 @@ public class QQ {
                 i.set(nf.CanonicalTypeNode(t.position(), t));
             }
             else if (o instanceof List) {
-                List l = (List) o;
+                @SuppressWarnings("unchecked")
+                List<Object> l = (List<Object>) o;
 
-                for (ListIterator j = l.listIterator(); j.hasNext(); ) {
+                for (ListIterator<Object> j = l.listIterator(); j.hasNext(); ) {
                     Object p = j.next();
 
                     if (p instanceof Type) {

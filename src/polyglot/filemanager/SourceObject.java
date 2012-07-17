@@ -1,12 +1,9 @@
 package polyglot.filemanager;
 
-import java.io.File;
 import java.io.IOException;
-import java.io.StringWriter;
 import java.io.Writer;
 import java.net.URI;
 
-import javax.tools.JavaFileManager.Location;
 import javax.tools.SimpleJavaFileObject;
 
 import polyglot.util.StringBuilderWriter;

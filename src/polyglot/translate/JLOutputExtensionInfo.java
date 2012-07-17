@@ -1,7 +1,5 @@
 package polyglot.translate;
 
-import polyglot.ast.NodeFactory;
-import polyglot.ext.jl5.JL5Options;
 import polyglot.frontend.EmptyPass;
 import polyglot.frontend.ExtensionInfo;
 import polyglot.frontend.JLExtensionInfo;
@@ -20,11 +18,13 @@ public class JLOutputExtensionInfo extends JLExtensionInfo {
 		this.parent = parent;
 	}
 
-	public Scheduler createScheduler() {
+	@Override
+    public Scheduler createScheduler() {
 		return new JLOutputScheduler(this);
 	}
 
-	protected Options createOptions() {
+	@Override
+    protected Options createOptions() {
 		return parent.getOptions();
 	}
 
@@ -33,9 +33,11 @@ public class JLOutputExtensionInfo extends JLExtensionInfo {
 			super(extInfo);
 		}
 
-		public Goal Parsed(Job job) {
+		@Override
+        public Goal Parsed(Job job) {
 			return internGoal(new SourceFileGoal(job) {
-				public Pass createPass(ExtensionInfo extInfo) {
+				@Override
+                public Pass createPass(ExtensionInfo extInfo) {
 					return new EmptyPass(this);
 				}
 			});

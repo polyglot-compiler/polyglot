@@ -1,10 +1,10 @@
 package polyglot.filemanager;
 
-import java.io.File;
 import static java.io.File.separator;
 import static java.io.File.separatorChar;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -19,27 +19,21 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
 import javax.tools.FileObject;
-import javax.tools.JavaFileManager.Location;
 import javax.tools.JavaFileObject;
 import javax.tools.JavaFileObject.Kind;
-import javax.tools.JavaFileManager;
 import javax.tools.StandardJavaFileManager;
-import javax.tools.StandardLocation;
 import javax.tools.ToolProvider;
 
 import polyglot.frontend.ExtensionInfo;
 import polyglot.frontend.FileSource;
-import polyglot.frontend.SourceLoader;
 import polyglot.main.Options;
 import polyglot.main.Report;
 import polyglot.types.reflect.ClassFile;
-import polyglot.types.reflect.ClassFileLoader;
 import polyglot.util.CollectionUtil;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.StringUtil;
@@ -113,19 +107,23 @@ public class ExtFileManager implements FileManager {
 		pathObjectMap = new HashMap<URI, Set<JavaFileObject>>();
 	}
 
-	public void close() throws IOException {
+	@Override
+    public void close() throws IOException {
 		javac_fm.close();
 	}
 
-	public void flush() throws IOException {
+	@Override
+    public void flush() throws IOException {
 		javac_fm.flush();
 	}
 
-	public ClassLoader getClassLoader(Location location) {
+	@Override
+    public ClassLoader getClassLoader(Location location) {
 		return javac_fm.getClassLoader(location);
 	}
 
-	public FileObject getFileForInput(Location location, String packageName,
+	@Override
+    public FileObject getFileForInput(Location location, String packageName,
 			String relativeName) throws IOException {
 		Options options = extInfo.getOptions();
 		Location sourceOutputLoc = options.outputDirectory();
@@ -143,7 +141,8 @@ public class ExtFileManager implements FileManager {
 		return javac_fm.getFileForInput(location, packageName, relativeName);
 	}
 
-	public FileObject getFileForOutput(Location location, String packageName,
+	@Override
+    public FileObject getFileForOutput(Location location, String packageName,
 			String relativeName, FileObject sibling) throws IOException {
 		Options options = extInfo.getOptions();
 		Location sourceOutputLoc = options.outputDirectory();
@@ -197,7 +196,8 @@ public class ExtFileManager implements FileManager {
 		return jfo;
 	}
 
-	public JavaFileObject getJavaFileForInput(Location location,
+	@Override
+    public JavaFileObject getJavaFileForInput(Location location,
 			String className, Kind kind) throws IOException {
 		Options options = extInfo.getOptions();
 		Location sourceOutputLoc = options.outputDirectory();
@@ -215,7 +215,8 @@ public class ExtFileManager implements FileManager {
 		return javac_fm.getJavaFileForInput(location, className, kind);
 	}
 
-	public JavaFileObject getJavaFileForOutput(Location location,
+	@Override
+    public JavaFileObject getJavaFileForOutput(Location location,
 			String className, Kind kind, FileObject sibling) throws IOException {
 		Options options = extInfo.getOptions();
 		Location sourceOutputLoc = options.outputDirectory();
@@ -269,15 +270,18 @@ public class ExtFileManager implements FileManager {
 		}
 	}
 
-	public boolean handleOption(String current, Iterator<String> remaining) {
+	@Override
+    public boolean handleOption(String current, Iterator<String> remaining) {
 		return javac_fm.handleOption(current, remaining);
 	}
 
-	public boolean hasLocation(Location location) {
+	@Override
+    public boolean hasLocation(Location location) {
 		return javac_fm.hasLocation(location);
 	}
 
-	public String inferBinaryName(Location location, JavaFileObject file) {
+	@Override
+    public String inferBinaryName(Location location, JavaFileObject file) {
 		if (file instanceof SourceObject) {
 			String className = ((SourceObject) file).getName();
 			return className.substring(className.lastIndexOf('.') + 1);
@@ -300,7 +304,8 @@ public class ExtFileManager implements FileManager {
 		}
 	}
 
-	public Iterable<JavaFileObject> list(Location location, String packageName,
+	@Override
+    public Iterable<JavaFileObject> list(Location location, String packageName,
 			Set<Kind> kinds, boolean recurse) throws IOException {
 		Options options = extInfo.getOptions();
 		Location sourceOutputLoc = options.outputDirectory();
@@ -327,46 +332,54 @@ public class ExtFileManager implements FileManager {
 			return javac_fm.list(location, packageName, kinds, recurse);
 	}
 
-	public int isSupportedOption(String option) {
+	@Override
+    public int isSupportedOption(String option) {
 		return javac_fm.isSupportedOption(option);
 	}
 
 	// Use this method for obtaining JavaFileObjects representing files on the
 	// local file system
-	public Iterable<? extends JavaFileObject> getJavaFileObjects(File... files) {
+	@Override
+    public Iterable<? extends JavaFileObject> getJavaFileObjects(File... files) {
 		return javac_fm.getJavaFileObjects(files);
 	}
 
 	// Use this method for obtaining JavaFileObjects representing files on the
 	// local file system
-	public Iterable<? extends JavaFileObject> getJavaFileObjects(
+	@Override
+    public Iterable<? extends JavaFileObject> getJavaFileObjects(
 			String... names) {
 		return javac_fm.getJavaFileObjects(names);
 	}
 
 	// Use this method for obtaining JavaFileObjects representing files on the
 	// local file system
-	public Iterable<? extends JavaFileObject> getJavaFileObjectsFromFiles(
+	@Override
+    public Iterable<? extends JavaFileObject> getJavaFileObjectsFromFiles(
 			Iterable<? extends File> files) {
 		return javac_fm.getJavaFileObjectsFromFiles(files);
 	}
 
 	// Use this method for obtaining JavaFileObjects representing files on the
 	// local file system
-	public Iterable<? extends JavaFileObject> getJavaFileObjectsFromStrings(
+	@Override
+    public Iterable<? extends JavaFileObject> getJavaFileObjectsFromStrings(
 			Iterable<String> names) {
 		return javac_fm.getJavaFileObjectsFromStrings(names);
 	}
 
-	public Iterable<? extends File> getLocation(Location location) {
+	@Override
+    public Iterable<? extends File> getLocation(Location location) {
 		return javac_fm.getLocation(location);
 	}
 
-	public boolean isSameFile(FileObject a, FileObject b) {
+	@Override
+    public boolean isSameFile(FileObject a, FileObject b) {
 		return a.toUri().equals(b.toUri());
 	}
 
-	public void setLocation(Location location, Iterable<? extends File> path)
+	@Override
+    public void setLocation(Location location, Iterable<? extends File> path)
 			throws IOException {
 		javac_fm.setLocation(location, path);
 	}

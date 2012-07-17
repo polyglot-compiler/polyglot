@@ -36,13 +36,12 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
-import java.util.LinkedList;
 import java.util.Set;
 import java.util.StringTokenizer;
 
 import javax.tools.JavaFileManager;
-import javax.tools.StandardLocation;
 import javax.tools.JavaFileManager.Location;
+import javax.tools.StandardLocation;
 
 import polyglot.frontend.ExtensionInfo;
 
@@ -238,7 +237,7 @@ public class Options {
 	 * @throws UsageError
 	 *             if the usage is incorrect.
 	 */
-	public final void parseCommandLine(String args[], Set source) throws UsageError {
+	public final void parseCommandLine(String args[], Set<String> source) throws UsageError {
 		if (args.length < 1) {
 			throw new UsageError("No command line arguments given");
 		}
@@ -268,7 +267,7 @@ public class Options {
 	 * @return the next index to process. i.e., if calling this method processes
 	 *         two commands, then the return value should be index+2
 	 */
-	protected int parseCommand(String args[], int index, Set source)
+	protected int parseCommand(String args[], int index, Set<String> source)
 			throws UsageError, Main.TerminationException {
 		int i = index;
 		if (args[i].equals("-h") || args[i].equals("-help")
@@ -412,7 +411,6 @@ public class Options {
 			Report.addTopic("verbose", 1);
 		} else if (args[i].equals("-report")) {
 			i++;
-			String report_option = args[i];
 			StringTokenizer st = new StringTokenizer(args[i], "=");
 			String topic = "";
 			int level = 0;
@@ -517,8 +515,8 @@ public class Options {
 						+ "topic at specified verbosity");
 
 		StringBuffer allowedTopics = new StringBuffer("Allowed topics: ");
-		for (Iterator iter = Report.topics.iterator(); iter.hasNext();) {
-			allowedTopics.append(iter.next().toString());
+		for (Iterator<String> iter = Report.topics.iterator(); iter.hasNext();) {
+			allowedTopics.append(iter.next());
 			if (iter.hasNext()) {
 				allowedTopics.append(", ");
 			}

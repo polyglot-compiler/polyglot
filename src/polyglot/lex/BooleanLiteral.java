@@ -37,5 +37,6 @@ public class BooleanLiteral extends Literal {
   
   public Boolean getValue() { return val; }
 
-  public String toString() { return "boolean literal " + val.toString(); }
+  @Override
+public String toString() { return "boolean literal " + val.toString(); }
 }

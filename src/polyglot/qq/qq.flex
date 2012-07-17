@@ -21,6 +21,7 @@ import java.util.*;
 import java.io.StringReader;
 import java.math.BigInteger;
 
+@SuppressWarnings("all")
 %%
 
 %public

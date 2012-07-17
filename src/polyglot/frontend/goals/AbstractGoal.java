@@ -25,12 +25,16 @@
 
 package polyglot.frontend.goals;
 
-import java.util.*;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.LinkedHashSet;
+import java.util.Set;
 
-import polyglot.frontend.*;
-import polyglot.util.InternalCompilerError;
+import polyglot.frontend.CyclicDependencyException;
+import polyglot.frontend.ExtensionInfo;
+import polyglot.frontend.Job;
+import polyglot.frontend.Pass;
+import polyglot.frontend.Scheduler;
 import polyglot.util.StringUtil;
 
 /**
@@ -43,13 +47,13 @@ public abstract class AbstractGoal implements Goal {
     protected Job job;
     protected String name;
     protected int state;
-    protected Set corequisites;
-    protected Set prerequisites;
+    protected Set<Goal> corequisites;
+    protected Set<Goal> prerequisites;
 
     private AbstractGoal() {
         this.state = UNREACHED;
-        this.prerequisites = Collections.EMPTY_SET;
-        this.corequisites = Collections.EMPTY_SET;
+        this.prerequisites = Collections.<Goal> emptySet();
+        this.corequisites = Collections.<Goal> emptySet();
     }
     
     protected AbstractGoal(Job job) {
@@ -68,34 +72,41 @@ public abstract class AbstractGoal implements Goal {
      * Return true if this goal conflicts with the other; that is passes running
      * over both goals could access the same data.
      */
+    @Override
     public boolean conflictsWith(Goal goal) {
         return job() != null && job() == goal.job();
     }
    
     /** Creates a pass to attempt to satisfy the goal. */
+    @Override
     public abstract Pass createPass(ExtensionInfo extInfo);
     
+    @Override
     public String name() {
         return name;
     }
 
+    @Override
     public Job job() {
         return job;
     }
     
-    public Collection prerequisiteGoals(Scheduler scheduler) {
+    @Override
+    public Collection<Goal> prerequisiteGoals(Scheduler scheduler) {
         return prerequisites;
     }
     
-    public Collection corequisiteGoals(Scheduler scheduler) {
+    @Override
+    public Collection<Goal> corequisiteGoals(Scheduler scheduler) {
         return corequisites;
     }
 
+    @Override
     public void addPrerequisiteGoal(Goal g, Scheduler scheduler) throws CyclicDependencyException {
         // This takes a hell of a long time.  Disable the check for now.
         // checkCycles(g, scheduler);
         if (prerequisites == Collections.EMPTY_SET) {
-            prerequisites = new LinkedHashSet();
+            prerequisites = new LinkedHashSet<Goal>();
         }
         prerequisites.add(g);
     }
@@ -105,48 +116,56 @@ public abstract class AbstractGoal implements Goal {
             throw new CyclicDependencyException("Goal " + this + " cannot depend on itself.");
         }
         
-        for (Iterator i = current.prerequisiteGoals(scheduler).iterator(); i.hasNext(); ) {
-            Goal subgoal = (Goal) i.next();
+        for (Goal subgoal : current.prerequisiteGoals(scheduler)) {
             checkCycles(subgoal, scheduler);
         }
     }
     
+    @Override
     public void addCorequisiteGoal(Goal g, Scheduler scheduler) {
         if (corequisites == Collections.EMPTY_SET) {
-            corequisites = new LinkedHashSet();
+            corequisites = new LinkedHashSet<Goal>();
         }
         corequisites.add(g);
     }
 
     /** Mark the goal as reached or not reached. */
+    @Override
     public void setUnreachableThisRun() {
         setState(UNREACHABLE_THIS_RUN);
     }
     
+    @Override
     public int state() {
         return state;
     }
     
+    @Override
     public void setState(int state) {
         this.state = state;
     }
 
+    @Override
     public boolean hasBeenReached() {
         return state == REACHED;
     }
     
+    @Override
     public void setUnreachable() {
         setState(UNREACHABLE);
     }
     
+    @Override
     public boolean isReachable() {
         return this.state != UNREACHABLE;
     }
 
+    @Override
     public int hashCode() {
         return (job != null ? job.hashCode() : 0) + name.hashCode();
     }
 
+    @Override
     public boolean equals(Object o) {
         if (o instanceof Goal) {
             Goal g = (Goal) o;
@@ -178,6 +197,7 @@ public abstract class AbstractGoal implements Goal {
         return "unknown-goal-state";
     }
     
+    @Override
     public String toString() {
         return job + ":" + (job != null ? job.extensionInfo() + ":" : "")
             + name + " (" + stateString() + ")";

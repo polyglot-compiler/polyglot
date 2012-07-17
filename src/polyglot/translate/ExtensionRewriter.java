@@ -1,8 +1,5 @@
 package polyglot.translate;
 
-import java.util.Iterator;
-import java.util.List;
-
 import polyglot.ast.Node;
 import polyglot.ast.NodeFactory;
 import polyglot.ast.SourceCollection;
@@ -44,6 +41,7 @@ public class ExtensionRewriter extends ContextVisitor
         this.qq = new QQ(to_ext);
     }
 
+    @Override
     public NodeVisitor enterCall(Node n) throws SemanticException {
         try {
             ToExt ext = from_ext.getToExt(to_ext, n);
@@ -63,6 +61,7 @@ public class ExtensionRewriter extends ContextVisitor
         }
     }
 
+    @Override
     public Node leaveCall(Node old, Node n, NodeVisitor v) throws SemanticException {
         try {
             ToExt ext = from_ext.getToExt(to_ext, n);            
@@ -82,11 +81,11 @@ public class ExtensionRewriter extends ContextVisitor
         }
     }
     
+    @Override
     public void finish(Node ast) {
         if (ast instanceof SourceCollection) {
             SourceCollection c = (SourceCollection) ast;
-			for (Iterator it = c.sources().iterator(); it.hasNext();) {
-				SourceFile sf = (SourceFile) it.next();
+            for (SourceFile sf : c.sources()) {
                 to_ext.scheduler().addJob(sf.source(), sf);                
             }
         }
@@ -119,6 +118,7 @@ public class ExtensionRewriter extends ContextVisitor
         return to_ext.nodeFactory();
     }
 
+    @Override
     public ErrorQueue errorQueue() {
         return job.compiler().errorQueue();
     }

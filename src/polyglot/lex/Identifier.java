@@ -38,5 +38,6 @@ public class Identifier extends Token {
 
   public String getIdentifier() { return identifier; }
 
-  public String toString() { return "identifier \"" + identifier + "\""; }
+  @Override
+public String toString() { return "identifier \"" + identifier + "\""; }
 }
