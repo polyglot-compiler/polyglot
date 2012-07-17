@@ -116,7 +116,7 @@ public class QQ {
     }
 
     /** Create an empty list. */
-    private List<Object> list() { return Collections.emptyList(); }
+    private List<Object> list() { return Collections.<Object> emptyList(); }
 
     /** Create a singleton list. */
     private List<Object> list(Object o1) {
@@ -272,7 +272,7 @@ public class QQ {
      * Parse a string into a <code>SourceFile</code> AST node,
      * applying substitutions.
      */
-    public SourceFile parseFile(String fmt, List<Object> subst) {
+    public SourceFile parseFile(String fmt, List subst) {
         return (SourceFile) parse(fmt, subst, FILE);
     }
 
@@ -358,7 +358,7 @@ public class QQ {
 
     /** Parse a string into a <code>ClassDecl</code> AST node,
      * applying substitutions. */
-    public ClassDecl parseDecl(String fmt, List<Object> subst) {
+    public ClassDecl parseDecl(String fmt, List subst) {
         return (ClassDecl) parse(fmt, subst, DECL);
     }
 
@@ -444,7 +444,7 @@ public class QQ {
 
     /** Parse a string into a <code>ClassMember</code> AST node,
      * applying substitutions. */
-    public ClassMember parseMember(String fmt, List<Object> subst) {
+    public ClassMember parseMember(String fmt, List subst) {
         return (ClassMember) parse(fmt, subst, MEMB);
     }
 
@@ -530,7 +530,7 @@ public class QQ {
 
     /** Parse a string into a <code>Expr</code> AST node,
      * applying substitutions. */
-    public Expr parseExpr(String fmt, List<Object> subst) {
+    public Expr parseExpr(String fmt, List subst) {
         return (Expr) parse(fmt, subst, EXPR);
     }
 
@@ -616,7 +616,7 @@ public class QQ {
 
     /** Parse a string into a <code>Stmt</code> AST node,
      * applying substitutions. */
-    public Stmt parseStmt(String fmt, List<Object> subst) {
+    public Stmt parseStmt(String fmt, List subst) {
         return (Stmt) parse(fmt, subst, STMT);
     }
 
@@ -702,12 +702,12 @@ public class QQ {
 
     /** Parse a string into a <code>TypeNode</code> AST node,
      * applying substitutions. */
-    public TypeNode parseType(String fmt, List<Object> subst) {
+    public TypeNode parseType(String fmt, List subst) {
         return (TypeNode) parse(fmt, subst, TYPE);
     }
 
     /** Create a lexer that performs the substitutions in <code>subst</code>. */
-    protected Lexer lexer(String fmt, Position pos, List<Object> subst) {
+    protected Lexer lexer(String fmt, Position pos, List subst) {
         return new polyglot.qq.Lexer_c(fmt, pos, subst);
     }
 
@@ -718,13 +718,13 @@ public class QQ {
 
     /** Parse a string into an AST node of the given type,
      * applying substitutions. */
-    protected Node parse(String fmt, List<Object> subst, int kind) {
+    protected Node parse(String fmt, List subst, int kind) {
         TypeSystem ts = ext.typeSystem();
         NodeFactory nf = ext.nodeFactory();
         ErrorQueue eq = ext.compiler().errorQueue();
 
         // Replace Types with TypeNodes
-        for (ListIterator<Object> i = subst.listIterator(); i.hasNext(); ) {
+        for (ListIterator i = subst.listIterator(); i.hasNext(); ) {
             Object o = i.next();
 
             if (o instanceof Type) {
@@ -732,10 +732,9 @@ public class QQ {
                 i.set(nf.CanonicalTypeNode(t.position(), t));
             }
             else if (o instanceof List) {
-                @SuppressWarnings("unchecked")
-                List<Object> l = (List<Object>) o;
+                List l = (List) o;
 
-                for (ListIterator<Object> j = l.listIterator(); j.hasNext(); ) {
+                for (ListIterator j = l.listIterator(); j.hasNext(); ) {
                     Object p = j.next();
 
                     if (p instanceof Type) {
