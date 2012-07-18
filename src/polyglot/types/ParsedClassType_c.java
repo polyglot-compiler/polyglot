@@ -25,15 +25,20 @@
 
 package polyglot.types;
 
-import java.io.*;
-import java.util.*;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
 
-import polyglot.frontend.*;
-import polyglot.frontend.goals.*;
+import polyglot.frontend.Job;
+import polyglot.frontend.Source;
 import polyglot.main.Report;
-import polyglot.types.*;
-import polyglot.types.Package;
-import polyglot.util.*;
+import polyglot.util.InternalCompilerError;
+import polyglot.util.Position;
+import polyglot.util.TypeInputStream;
 
 /**
  * ParsedClassType
@@ -49,17 +54,17 @@ public class ParsedClassType_c extends ClassType_c implements ParsedClassType
     protected transient Job job;
 
     protected Type superType;
-    protected List interfaces;
-    protected List methods;
-    protected List fields;
-    protected List constructors;
+    protected List<ReferenceType> interfaces;
+    protected List<MethodInstance> methods;
+    protected List<FieldInstance> fields;
+    protected List<ConstructorInstance> constructors;
     protected Package package_;
     protected Flags flags;
     protected Kind kind;
     protected String name;
     protected ClassType outer;
 
-    protected transient List memberClasses;
+    protected transient List<ClassType> memberClasses;
 
     public LazyClassInitializer init() {
         return init;
@@ -86,46 +91,55 @@ public class ParsedClassType_c extends ClassType_c implements ParsedClassType
 
         setInitializer(init);
 
-        this.interfaces = new LinkedList<Type>();
+        this.interfaces = new LinkedList<ReferenceType>();
         this.methods = new LinkedList<MethodInstance>();
         this.fields = new LinkedList<FieldInstance>();
         this.constructors = new LinkedList<ConstructorInstance>();
-        this.memberClasses = new LinkedList<Type>();
+        this.memberClasses = new LinkedList<ClassType>();
     }
      
+    @Override
     public LazyInitializer initializer() {
         return this.init;
     }
 
+    @Override
     public void setInitializer(LazyInitializer init) {
         this.init = (LazyClassInitializer) init;
         ((LazyClassInitializer) init).setClass(this);
     }
         
+    @Override
     public Source fromSource() {
         return fromSource;
     }
     
+    @Override
     public Job job() {
         return job;
     }
     
+    @Override
     public void setJob(Job job) {
         this.job = job;
     }
     
+    @Override
     public Kind kind() {
         return kind;
     }
 
+    @Override
     public void inStaticContext(boolean inStaticContext) {
         this.inStaticContext = inStaticContext;
     }
 
+    @Override
     public boolean inStaticContext() {
         return inStaticContext;
     }
     
+    @Override
     public ClassType outer() {
         if (isTopLevel())
             return null;
@@ -135,6 +149,7 @@ public class ParsedClassType_c extends ClassType_c implements ParsedClassType
         return outer;
     }
 
+    @Override
     public String name() {
 //        if (isAnonymous())
 //            throw new InternalCompilerError("Anonymous classes cannot have names.");
@@ -145,41 +160,49 @@ public class ParsedClassType_c extends ClassType_c implements ParsedClassType
     }
 
     /** Get the class's super type. */
+    @Override
     public Type superType() {
         init.initSuperclass();
         return this.superType;
     }
 
     /** Get the class's package. */
+    @Override
     public Package package_() {
         return package_;
     }
 
     /** Get the class's flags. */
+    @Override
     public Flags flags() {
         if (isAnonymous())
             return Flags.NONE;
         return flags;
     }
     
+    @Override
     public void setFlags(Flags flags) {
         this.flags = flags;
     }
 
+    @Override
     public void flags(Flags flags) {
 	this.flags = flags;
     }
 
+    @Override
     public void kind(Kind kind) {
         this.kind = kind;
     }
 
+    @Override
     public void outer(ClassType outer) {
         if (isTopLevel())
             throw new InternalCompilerError("Top-level classes cannot have outer classes.");
         this.outer = outer;
     }
     
+    @Override
     public void setContainer(ReferenceType container) {
         if (container instanceof ClassType && isMember()) {
             outer((ClassType) container);
@@ -189,64 +212,79 @@ public class ParsedClassType_c extends ClassType_c implements ParsedClassType
         }
     }
 
+    @Override
     public void name(String name) {
         if (isAnonymous())
             throw new InternalCompilerError("Anonymous classes cannot have names.");
         this.name = name;
     }
 
+    @Override
     public void position(Position pos) {
 	this.position = pos;
     }
 
+    @Override
     public void package_(Package p) {
 	this.package_ = p;
     }
 
+    @Override
     public void superType(Type t) {
 	this.superType = t;
     }
 
-    public void addInterface(Type t) {
+    @Override
+    public void addInterface(ReferenceType t) {
 	interfaces.add(t);
     }
 
+    @Override
     public void addMethod(MethodInstance mi) {
 	methods.add(mi);
     }
 
+    @Override
     public void addConstructor(ConstructorInstance ci) {
 	constructors.add(ci);
     }
 
+    @Override
     public void addField(FieldInstance fi) {
 	fields.add(fi);
     }
 
+    @Override
     public void addMemberClass(ClassType t) {
 	memberClasses.add(t);
     }
     
-    public void setInterfaces(List l) {
-        this.interfaces = new ArrayList(l);
+    @Override
+    public void setInterfaces(List<? extends ReferenceType> l) {
+        this.interfaces = new ArrayList<ReferenceType>(l);
     }
     
-    public void setMethods(List l) {
-        this.methods = new ArrayList(l);
+    @Override
+    public void setMethods(List<? extends MethodInstance> l) {
+        this.methods = new ArrayList<MethodInstance>(l);
     }
 
-    public void setFields(List l) {
-        this.fields = new ArrayList(l);
+    @Override
+    public void setFields(List<? extends FieldInstance> l) {
+        this.fields = new ArrayList<FieldInstance>(l);
     }
     
-    public void setConstructors(List l) {
-        this.constructors = new ArrayList(l);
+    @Override
+    public void setConstructors(List<? extends ConstructorInstance> l) {
+        this.constructors = new ArrayList<ConstructorInstance>(l);
     }
 
-    public void setMemberClasses(List l) {
-        this.memberClasses = new ArrayList(l);
+    @Override
+    public void setMemberClasses(List<? extends ClassType> l) {
+        this.memberClasses = new ArrayList<ClassType>(l);
     }
                                           
+    @Override
     public boolean defaultConstructorNeeded() {
         init.initConstructors();
         if (flags().isInterface()) {
@@ -256,36 +294,39 @@ public class ParsedClassType_c extends ClassType_c implements ParsedClassType
     }
     
     /** Return an immutable list of constructors */
-    public List constructors() {
+    @Override
+    public List<? extends ConstructorInstance> constructors() {
         init.initConstructors();
         init.canonicalConstructors();
         return Collections.unmodifiableList(constructors);
     }
 
     /** Return an immutable list of member classes */
-    public List memberClasses() {
+    @Override
+    public List<? extends ClassType> memberClasses() {
         init.initMemberClasses();
         return Collections.unmodifiableList(memberClasses);
     }
 
     /** Return an immutable list of methods. */
-    public List methods() {
+    @Override
+    public List<? extends MethodInstance> methods() {
         init.initMethods();
         init.canonicalMethods();
         return Collections.unmodifiableList(methods);
     }
     
     /** Return a list of all methods with the given name. */
-    public List methodsNamed(String name) {
+    @Override
+    public List<MethodInstance> methodsNamed(String name) {
         // Override to NOT call methods(). Do not check that all
         // methods are canonical, just that the particular method
         // returned is canonical.
         init.initMethods();
 
-        List l = new LinkedList();
+        List<MethodInstance> l = new LinkedList<MethodInstance>();
         
-        for (Iterator i = methods.iterator(); i.hasNext(); ) {
-            MethodInstance mi = (MethodInstance) i.next();
+        for (MethodInstance mi : methods) {
             if (mi.name().equals(name)) {
                 if (! mi.isCanonical()) {
                     // Force an exception to get thrown.
@@ -299,13 +340,15 @@ public class ParsedClassType_c extends ClassType_c implements ParsedClassType
     }
 
     /** Return an immutable list of fields */
-    public List fields() {
+    @Override
+    public List<? extends FieldInstance> fields() {
         init.initFields();
         init.canonicalFields();
         return Collections.unmodifiableList(fields);
     }
     
     /** Get a field of the class by name. */
+    @Override
     public FieldInstance fieldNamed(String name) {
         // Override to NOT call fields(). Do not check that all
         // fields are canonical, just that the particular field
@@ -314,8 +357,7 @@ public class ParsedClassType_c extends ClassType_c implements ParsedClassType
         // in Jx or Jif.
         init.initFields();
         
-        for (Iterator i = fields.iterator(); i.hasNext(); ) {
-            FieldInstance fi = (FieldInstance) i.next();
+        for (FieldInstance fi : fields) {
             if (fi.name().equals(name)) {
                 if (! fi.isCanonical()) {
                     // Force an exception to get thrown.
@@ -329,7 +371,8 @@ public class ParsedClassType_c extends ClassType_c implements ParsedClassType
     }
 
     /** Return an immutable list of interfaces */
-    public List interfaces() {
+    @Override
+    public List<? extends ReferenceType> interfaces() {
         init.initInterfaces();
         return Collections.unmodifiableList(interfaces);
     }
@@ -341,37 +384,41 @@ public class ParsedClassType_c extends ClassType_c implements ParsedClassType
     /**
      * @return Returns the membersAdded.
      */
+    @Override
     public boolean membersAdded() {
         return membersAdded;
     }
     /**
      * @param membersAdded The membersAdded to set.
      */
+    @Override
     public void setMembersAdded(boolean membersAdded) {
         this.membersAdded = membersAdded;
     }
     /**
      * @param signaturesDisambiguated The signaturesDisambiguated to set.
      */
+    @Override
     public void setSignaturesResolved(boolean signaturesDisambiguated) {
         this.signaturesResolved = signaturesDisambiguated;
     }
     /**
      * @return Returns the supertypesResolved.
      */
+    @Override
     public boolean supertypesResolved() {
         return supertypesResolved;
     }
     /**
      * @param supertypesResolved The supertypesResolved to set.
      */
+    @Override
     public void setSupertypesResolved(boolean supertypesResolved) {
         this.supertypesResolved = supertypesResolved;
     }
 
+    @Override
     public int numSignaturesUnresolved() {
-        Scheduler scheduler = typeSystem().extensionInfo().scheduler();
-        
         if (signaturesResolved) {
             return 0;
         }
@@ -383,7 +430,7 @@ public class ParsedClassType_c extends ClassType_c implements ParsedClassType
         // Create a new list of members.  Don't use members() since
         // it ensures that signatures be resolved and this method
         // is just suppossed to check if they are resolved.
-        List l = new ArrayList();
+        List<MemberInstance> l = new ArrayList<MemberInstance>();
         l.addAll(methods);
         l.addAll(fields);
         l.addAll(constructors);
@@ -391,8 +438,7 @@ public class ParsedClassType_c extends ClassType_c implements ParsedClassType
         
         int count = 0;
         
-        for (Iterator i = l.iterator(); i.hasNext(); ) {
-            MemberInstance mi = (MemberInstance) i.next();
+        for (MemberInstance mi : l) {
             if (! mi.isCanonical()) {
                 count++;
             }
@@ -405,18 +451,17 @@ public class ParsedClassType_c extends ClassType_c implements ParsedClassType
         return count;
     }
 
+    @Override
     public boolean signaturesResolved() {
         if (! signaturesResolved) {
             if (! membersAdded()) {
                 return false;
             }
 
-            Scheduler scheduler = typeSystem().extensionInfo().scheduler();
-
             // Create a new list of members.  Don't use members() since
             // it ensures that signatures be resolved and this method
             // is just suppossed to check if they are resolved.
-            List l = new ArrayList();
+            List<MemberInstance> l = new ArrayList<MemberInstance>();
             l.addAll(methods);
             l.addAll(fields);
             l.addAll(constructors);
@@ -424,8 +469,7 @@ public class ParsedClassType_c extends ClassType_c implements ParsedClassType
             
             int count = 0;
 
-            for (Iterator i = l.iterator(); i.hasNext(); ) {
-                MemberInstance mi = (MemberInstance) i.next();
+            for (MemberInstance mi : l) {
                 if (! mi.isCanonical()) {
                     if (Report.should_report("ambcheck", 2))
                         Report.report(2, mi + " is ambiguous");
@@ -441,6 +485,7 @@ public class ParsedClassType_c extends ClassType_c implements ParsedClassType
         return signaturesResolved;
     }
 
+    @Override
     public String toString() {
         if (kind() == null) {
             return "<unknown class " + name + ">";
@@ -495,16 +540,18 @@ public class ParsedClassType_c extends ClassType_c implements ParsedClassType
             membersAdded = true;
             supertypesResolved = true;
             signaturesResolved = true;
-            memberClasses = new ArrayList();
+            memberClasses = new ArrayList<ClassType>();
         }
 
         in.defaultReadObject();
     }
 
+    @Override
     public void needSerialization(boolean b) {
         needSerialization = b;
     }
     
+    @Override
     public boolean needSerialization() {
         return needSerialization;
     }

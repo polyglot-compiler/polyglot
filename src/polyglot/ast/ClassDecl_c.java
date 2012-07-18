@@ -378,7 +378,7 @@ public class ClassDecl_c extends Term_c implements ClassDecl
      */
     protected void setInterfaces(AmbiguityRemover ar, List<TypeNode> newInterfaces) throws SemanticException {
         for (TypeNode tn : newInterfaces) {
-            Type t = tn.type();
+            ClassType t = (ClassType) tn.type();
     
             if (Report.should_report(Report.types, 3))
                 Report.report(3, "adding interface of " + this.type + " to " + t);

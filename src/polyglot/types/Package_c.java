@@ -25,8 +25,6 @@
 
 package polyglot.types;
 
-import polyglot.types.*;
-import polyglot.types.Package;
 import polyglot.util.CodeWriter;
 
 /**
@@ -63,6 +61,7 @@ public class Package_c extends TypeObject_c implements Package
     
     protected transient Resolver memberCache;
     
+    @Override
     public Resolver resolver() {
         if (memberCache == null) {
             memberCache = new CachingResolver(ts.createPackageContextResolver(this));
@@ -70,7 +69,8 @@ public class Package_c extends TypeObject_c implements Package
         return memberCache;
     }
     
-    public Object copy() {
+    @Override
+    public Package_c copy() {
         Package_c n = (Package_c) super.copy();
         n.memberCache = null;
         return n;
@@ -78,14 +78,17 @@ public class Package_c extends TypeObject_c implements Package
     
     protected Package decl;
     
+    @Override
     public Declaration declaration() {
         return decl;
     }
     
+    @Override
     public void setDeclaration(Declaration decl) {
         this.decl = (Package) decl;        
     }
     
+    @Override
     public boolean equalsImpl(TypeObject o) {
         if (o instanceof Package) {
             Package p = (Package) o;
@@ -99,10 +102,12 @@ public class Package_c extends TypeObject_c implements Package
         return false;
     }
         
+    @Override
     public final boolean packageEquals(Package p) {
         return ts.packageEquals(this, p);
     }
     
+    @Override
     public boolean packageEqualsImpl(Package p) {
         if (name.equals(p.name())) {
             if (prefix == null)
@@ -113,19 +118,26 @@ public class Package_c extends TypeObject_c implements Package
         return false;
     }
 
+    @Override
     public boolean isType() { return false; }
+    @Override
     public boolean isPackage() { return true; }
+    @Override
     public Type toType() { return null; }
+    @Override
     public Package toPackage() { return this; }
 
+    @Override
     public Package prefix() {
 	return prefix;
     }
 
+    @Override
     public String name() {
 	return name;
     }
 
+    @Override
     public String translate(Resolver c) {
         if (prefix() == null) {
           return name();
@@ -134,6 +146,7 @@ public class Package_c extends TypeObject_c implements Package
         return prefix().translate(c) + "." + name();
     }
 
+    @Override
     public String fullName() {
         if (fullname == null) {
             fullname = prefix() == null ? name : prefix().fullName() + "." + name;
@@ -141,9 +154,11 @@ public class Package_c extends TypeObject_c implements Package
         return fullname;
     }
 
+    @Override
     public String toString() {
 	return prefix() == null ? name : prefix().toString() + "." + name;
     }
+    @Override
     public void print(CodeWriter w) {
 	if (prefix() != null) {
 	    prefix().print(w);
@@ -153,10 +168,12 @@ public class Package_c extends TypeObject_c implements Package
 	w.write(name);
     }
 
+    @Override
     public int hashCode() {
         return name.hashCode();
     }
 
+    @Override
     public boolean isCanonical() {
 	return true;
     }

@@ -44,6 +44,7 @@ public abstract class AbstractAccessControlResolver implements AccessControlReso
         this.ts = ts;
     }
     
+    @Override
     public final Named find(String name) throws SemanticException {
         return find(name, null);
     }

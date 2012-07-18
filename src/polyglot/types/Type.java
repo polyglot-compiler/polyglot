@@ -25,7 +25,6 @@
 
 package polyglot.types;
 
-import polyglot.util.Position;
 import polyglot.util.CodeWriter;
 
 /**
@@ -272,6 +271,7 @@ public interface Type extends Qualifier
      * human-readable representation that can be used
      * both in error messages and in generated output.
      */
+    @Override
     String toString();
 
     /**

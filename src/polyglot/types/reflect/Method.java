@@ -26,9 +26,9 @@
 
 package polyglot.types.reflect;
 
-import polyglot.types.*;
-import java.util.*;
-import java.io.*;
+import java.io.DataInputStream;
+import java.io.EOFException;
+import java.io.IOException;
 
 /**
  * Method represents a method in a Java classfile.  A method's name and

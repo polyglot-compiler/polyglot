@@ -27,7 +27,6 @@ package polyglot.types;
 
 import java.util.List;
 
-import polyglot.frontend.goals.Goal;
 import polyglot.util.Copy;
 
 /**
@@ -57,7 +56,7 @@ public interface Context extends Resolver, Copy
      * @param formalTypes A list of <code>Type</code>.
      * @see polyglot.types.Type
      */
-    MethodInstance findMethod(String name, List formalTypes) throws SemanticException;
+    MethodInstance findMethod(String name, List<? extends Type> formalTypes) throws SemanticException;
 
     /** Looks up a local variable or field in the current scope. */
     VarInstance findVariable(String name) throws SemanticException;
@@ -93,6 +92,7 @@ public interface Context extends Resolver, Copy
      * This is usually just the system resolver.
      * @deprecated
      */
+    @Deprecated
     Resolver outerResolver();
 
     /** Enter the scope of a source file. */

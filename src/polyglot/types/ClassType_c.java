@@ -63,7 +63,7 @@ public abstract class ClassType_c extends ReferenceType_c implements ClassType
     }
     
     @Override
-    public Object copy() {
+    public ClassType_c copy() {
         ClassType_c n = (ClassType_c) super.copy();
         n.memberCache = null;
         return n;
@@ -173,11 +173,11 @@ public abstract class ClassType_c extends ReferenceType_c implements ClassType
 
     /** Get the class's constructors. */
     @Override
-    public abstract List<ConstructorInstance> constructors();
+    public abstract List<? extends ConstructorInstance> constructors();
 
     /** Get the class's member classes. */
     @Override
-    public abstract List<ClassType> memberClasses();
+    public abstract List<? extends ClassType> memberClasses();
 
     /** Get the class's methods. */
     @Override
@@ -189,7 +189,7 @@ public abstract class ClassType_c extends ReferenceType_c implements ClassType
 
     /** Get the class's interfaces. */
     @Override
-    public abstract List<? extends Type> interfaces();
+    public abstract List<? extends ReferenceType> interfaces();
 
     /** Get the class's super type. */
     @Override

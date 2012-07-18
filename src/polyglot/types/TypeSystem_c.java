@@ -149,7 +149,7 @@ public class TypeSystem_c implements TypeSystem
     @Override
     public SystemResolver saveSystemResolver() {
         SystemResolver r = this.systemResolver;
-        this.systemResolver = (SystemResolver) r.copy();
+        this.systemResolver = r.copy();
         return r;
     }
     
@@ -347,8 +347,8 @@ public class TypeSystem_c implements TypeSystem
     @Override
     public ConstructorInstance constructorInstance(Position pos,
 	                                           ClassType container,
-						   Flags flags, List<Type> argTypes,
-						   List<Type> excTypes) {
+						   Flags flags, List<? extends Type> argTypes,
+						   List<? extends Type> excTypes) {
         assert_(container);
         assert_(argTypes);
         assert_(excTypes);
@@ -926,7 +926,7 @@ public class TypeSystem_c implements TypeSystem
     @Deprecated
     @Override
     public MethodInstance findMethod(ReferenceType container,
-                                 String name, List<Type> argTypes, Context c)
+                                 String name, List<? extends Type> argTypes, Context c)
     throws SemanticException {
         return findMethod(container, name, argTypes, c.currentClass());
     }
@@ -1018,7 +1018,7 @@ public class TypeSystem_c implements TypeSystem
      **/
     @Override
     public MethodInstance findMethod(ReferenceType container,
-	                             String name, List<Type> argTypes, ClassType currClass)
+	                             String name, List<? extends Type> argTypes, ClassType currClass)
 	throws SemanticException {
 
         assert_(container);
@@ -1071,14 +1071,14 @@ public class TypeSystem_c implements TypeSystem
     @Deprecated
     @Override
     public ConstructorInstance findConstructor(ClassType container,
-                                 List<Type> argTypes, Context c)
+            List<? extends Type> argTypes, Context c)
     throws SemanticException {
         return findConstructor(container, argTypes, c.currentClass());
     }
 
     @Override
     public ConstructorInstance findConstructor(ClassType container,
-                           List<Type> argTypes, ClassType currClass)
+            List<? extends Type> argTypes, ClassType currClass)
 	throws SemanticException {
 
         assert_(container);
@@ -1206,7 +1206,7 @@ public class TypeSystem_c implements TypeSystem
      * Applicable and Accessible as defined by JLS 15.11.2.1
      */
     protected List<MethodInstance> findAcceptableMethods(ReferenceType container, String name,
-                                     List<Type> argTypes, ClassType currClass)
+                                     List<? extends Type> argTypes, ClassType currClass)
 	throws SemanticException {
 
         assert_(container);
@@ -1325,8 +1325,7 @@ public class TypeSystem_c implements TypeSystem
      * Applicable and Accessible as defined by JLS 15.11.2.1
      */
     protected List<ConstructorInstance> findAcceptableConstructors(ClassType container,
-                                              List<Type> argTypes,
-                                              ClassType currClass)
+            List<? extends Type> argTypes, ClassType currClass)
         throws SemanticException
     {
         assert_(container);
@@ -1501,7 +1500,7 @@ public class TypeSystem_c implements TypeSystem
 
     /** Return true if t overrides mi */
     @Override
-    public boolean hasFormals(ProcedureInstance pi, List<Type> formalTypes) {
+    public boolean hasFormals(ProcedureInstance pi, List<? extends Type> formalTypes) {
         assert_(pi);
         assert_(formalTypes);
         return pi.hasFormalsImpl(formalTypes);
@@ -1555,14 +1554,14 @@ public class TypeSystem_c implements TypeSystem
 
     @Override
     public boolean methodCallValid(MethodInstance prototype,
-				   String name, List<Type> argTypes) {
+				   String name, List<? extends Type> argTypes) {
         assert_(prototype);
         assert_(argTypes);
 	return prototype.methodCallValidImpl(name, argTypes);
     }
 
     @Override
-    public boolean callValid(ProcedureInstance prototype, List<Type> argTypes) {
+    public boolean callValid(ProcedureInstance prototype, List<? extends Type> argTypes) {
         assert_(prototype);
         assert_(argTypes);
         return prototype.callValidImpl(argTypes);

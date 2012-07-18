@@ -26,8 +26,8 @@
 
 package polyglot.types.reflect;
 
-import java.util.*;
-import java.io.*;
+import java.io.DataInputStream;
+import java.io.IOException;
 
 /**
  * The ConstantValue attribute stores an index into the constant pool

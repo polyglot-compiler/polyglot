@@ -35,6 +35,7 @@ public class AccessControlWrapperResolver implements Resolver {
         this.accessor = accessor;
     }
     
+    @Override
     public Named find(String name) throws SemanticException {
         return inner.find(name, accessor);
     }

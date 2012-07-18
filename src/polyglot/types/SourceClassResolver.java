@@ -27,12 +27,15 @@ package polyglot.types;
 
 import java.io.File;
 
-import polyglot.frontend.*;
 import polyglot.frontend.Compiler;
+import polyglot.frontend.ExtensionInfo;
+import polyglot.frontend.FileSource;
+import polyglot.frontend.Job;
+import polyglot.frontend.MissingDependencyException;
+import polyglot.frontend.Scheduler;
 import polyglot.frontend.goals.Goal;
 import polyglot.main.Report;
-import polyglot.types.reflect.*;
-import polyglot.util.InternalCompilerError;
+import polyglot.types.reflect.ClassFile;
 
 /**
  * Loads class information from source files, class files, or serialized class
@@ -128,7 +131,8 @@ public class SourceClassResolver extends LoadedClassResolver {
 		this.ignoreModTimes = ignoreModTimes;
 	}
 
-	public boolean packageExists(String name) {
+	@Override
+    public boolean packageExists(String name) {
 		if (super.packageExists(name)) {
 			return true;
 		}
@@ -141,7 +145,8 @@ public class SourceClassResolver extends LoadedClassResolver {
 	/**
 	 * Find a type by name.
 	 */
-	public Named find(String name) throws SemanticException {
+	@Override
+    public Named find(String name) throws SemanticException {
 		if (Report.should_report(report_topics, 3))
 			Report.report(3, "SourceCR.find(" + name + ")");
 

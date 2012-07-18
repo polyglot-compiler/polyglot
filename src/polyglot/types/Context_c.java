@@ -25,16 +25,12 @@
 
 package polyglot.types;
 
-import java.util.*;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Collection;
 import java.util.Map;
 
-import polyglot.frontend.goals.Goal;
 import polyglot.main.Report;
-import polyglot.types.*;
-import polyglot.types.Package;
 import polyglot.util.CollectionUtil;
 import polyglot.util.Enum;
 import polyglot.util.InternalCompilerError;
@@ -78,10 +74,12 @@ public class Context_c implements Context
     public boolean isOuter() { return kind == OUTER; }
     public boolean isSource() { return kind == SOURCE; }
 
+    @Override
     public TypeSystem typeSystem() {
         return ts;
     }
 
+    @Override
     public Object copy() {
         try {
             return super.clone();
@@ -107,8 +105,8 @@ public class Context_c implements Context
     protected ClassType type;
     protected ParsedClassType scope;
     protected CodeInstance code;
-    protected Map types;
-    protected Map vars;
+    protected Map<String, Named> types;
+    protected Map<String, VarInstance> vars;
     protected boolean inCode;
 
     /**
@@ -117,20 +115,25 @@ public class Context_c implements Context
     protected boolean staticContext;
 
     /** @deprecated */
+    @Deprecated
+    @Override
     public Resolver outerResolver() {
         return ts.systemResolver();
     }
 
+    @Override
     public ImportTable importTable() {
         return it;
     }
 
     /** The current package, or null if not in a package. */
+    @Override
     public Package package_() {
         return importTable().package_();
     }
     
     /** Return the code def that defines the local variable or type with the given name. */
+    @Override
     public CodeInstance definingCodeDef(String name) {
         if ((isBlock() || isCode()) &&
                 (findVariableInThisScope(name) != null || findInThisScope(name) != null)) {
@@ -149,6 +152,7 @@ public class Context_c implements Context
      * in this scope, we ask the parent scope, but don't traverse to enclosing
      * classes.
      */
+    @Override
     public boolean isLocal(String name) {
         if (isClass()) {
             return false;
@@ -174,7 +178,8 @@ public class Context_c implements Context
      * Looks up a method with name "name" and arguments compatible with
      * "argTypes".
      */
-    public MethodInstance findMethod(String name, List argTypes) throws SemanticException {
+    @Override
+    public MethodInstance findMethod(String name, List<? extends Type> argTypes) throws SemanticException {
         if (Report.should_report(TOPICS, 3))
           Report.report(3, "find-method " + name + argTypes + " in " + this);
 
@@ -208,6 +213,7 @@ public class Context_c implements Context
      * @throws SemanticException
      *           if there is no such local 
      */
+    @Override
     public LocalInstance findLocal(String name) throws SemanticException {
     	LocalInstance vi = findLocalSilent(name);
 
@@ -222,6 +228,7 @@ public class Context_c implements Context
      * 
      * @return the local instance, or null if none exists
      */
+    @Override
     public LocalInstance findLocalSilent(String name) {
     	VarInstance vi = findVariableSilent(name);
     	
@@ -235,6 +242,7 @@ public class Context_c implements Context
     /**
      * Finds the class which added a field to the scope.
      */
+    @Override
     public ClassType findFieldScope(String name) throws SemanticException {
         if (Report.should_report(TOPICS, 3))
           Report.report(3, "find-field-scope " + name + " in " + this);
@@ -256,6 +264,7 @@ public class Context_c implements Context
 
     /** Finds the class which added a method to the scope.
      */
+    @Override
     public ClassType findMethodScope(String name) throws SemanticException {
         if (Report.should_report(TOPICS, 3))
           Report.report(3, "find-method-scope " + name + " in " + this);
@@ -278,6 +287,7 @@ public class Context_c implements Context
     /**
      * Gets a field of a particular name.
      */
+    @Override
     public FieldInstance findField(String name) throws SemanticException {
 	VarInstance vi = findVariableSilent(name);
 
@@ -299,6 +309,7 @@ public class Context_c implements Context
     /**
      * Gets a local or field of a particular name.
      */
+    @Override
     public VarInstance findVariable(String name) throws SemanticException {
 	VarInstance vi = findVariableSilent(name);
 
@@ -314,6 +325,7 @@ public class Context_c implements Context
     /**
      * Gets a local or field of a particular name.
      */
+    @Override
     public VarInstance findVariableSilent(String name) {
         if (Report.should_report(TOPICS, 3))
           Report.report(3, "find-var " + name + " in " + this);
@@ -337,10 +349,12 @@ public class Context_c implements Context
         return "types=" + types + " vars=" + vars;
     }
 
+    @Override
     public String toString() {
         return "(" + kind + " " + mapsToString() + " " + outer + ")";
     }
 
+    @Override
     public Context pop() {
         return outer;
     }
@@ -348,6 +362,7 @@ public class Context_c implements Context
     /**
      * Finds the definition of a particular type.
      */
+    @Override
     public Named find(String name) throws SemanticException {
         if (Report.should_report(TOPICS, 3))
             Report.report(3, "find-type " + name + " in " + this);
@@ -373,6 +388,7 @@ public class Context_c implements Context
     /**
      * Push a source file scope.
      */
+    @Override
     public Context pushSource(ImportTable it) {
         Context_c v = push();
         v.kind = SOURCE;
@@ -395,6 +411,7 @@ public class Context_c implements Context
      * @return A new context with a new scope and which maps the short name
      * of type to type.
      */
+    @Override
     public Context pushClass(ParsedClassType classScope, ClassType type) {
         if (Report.should_report(TOPICS, 4))
           Report.report(4, "push class " + classScope + " " + classScope.position());
@@ -415,6 +432,7 @@ public class Context_c implements Context
     /**
      * pushes an additional block-scoping level.
      */
+    @Override
     public Context pushBlock() {
         if (Report.should_report(TOPICS, 4))
           Report.report(4, "push block");
@@ -426,6 +444,7 @@ public class Context_c implements Context
     /**
      * pushes an additional static scoping level.
      */
+    @Override
     public Context pushStatic() {
         if (Report.should_report(TOPICS, 4))
           Report.report(4, "push static");
@@ -437,6 +456,7 @@ public class Context_c implements Context
     /**
      * enters a method
      */
+    @Override
     public Context pushCode(CodeInstance ci) {
         if (Report.should_report(TOPICS, 4))
           Report.report(4, "push code " + ci + " " + ci.position());
@@ -451,6 +471,7 @@ public class Context_c implements Context
     /**
      * Gets the current method
      */
+    @Override
     public CodeInstance currentCode() {
         return code;
     }
@@ -459,6 +480,7 @@ public class Context_c implements Context
      * Return true if in a method's scope and not in a local class within the
      * innermost method.
      */
+    @Override
     public boolean inCode() {
         return inCode;
     }
@@ -473,6 +495,7 @@ public class Context_c implements Context
      * variable initializer of a static variable, or an explicity constructor 
      * invocation statment. (Java Language Spec, 2nd Edition, 8.1.2)
      */
+    @Override
     public boolean inStaticContext() {
         return staticContext;
     }
@@ -480,6 +503,7 @@ public class Context_c implements Context
     /**
      * Gets current class
      */
+    @Override
     public ClassType currentClass() {
         return type;
     }
@@ -487,6 +511,7 @@ public class Context_c implements Context
     /**
      * Gets current class
      */
+    @Override
     public ParsedClassType currentClassScope() {
         return scope;
     }
@@ -494,6 +519,7 @@ public class Context_c implements Context
     /**
      * Adds a symbol to the current scoping level.
      */
+    @Override
     public void addVariable(VarInstance vi) {
         if (Report.should_report(TOPICS, 3))
           Report.report(3, "Adding " + vi + " to context.");
@@ -505,6 +531,8 @@ public class Context_c implements Context
      * Actually, this does nothing now.
      * @deprecated
      */
+    @Deprecated
+    @Override
     public void addMethod(MethodInstance mi) {
         if (Report.should_report(TOPICS, 3))
           Report.report(3, "Adding " + mi + " to context.");
@@ -513,6 +541,7 @@ public class Context_c implements Context
     /**
      * Adds a named type object to the current scoping level.
      */
+    @Override
     public void addNamed(Named t) {
         if (Report.should_report(TOPICS, 3))
           Report.report(3, "Adding type " + t + " to context.");
@@ -522,7 +551,7 @@ public class Context_c implements Context
     public Named findInThisScope(String name) {
         Named t = null;
         if (types != null) {
-            t = (Named) types.get(name);
+            t = types.get(name);
         }
         if (t == null && isClass()) {
             if (! this.type.isAnonymous() &&
@@ -541,7 +570,7 @@ public class Context_c implements Context
     }
 
     public void addNamedToThisScope(Named type) {
-        if (types == null) types = new HashMap();
+        if (types == null) types = new HashMap<String, Named>();
         types.put(type.name(), type);
     }
 
@@ -555,7 +584,7 @@ public class Context_c implements Context
     public VarInstance findVariableInThisScope(String name) {
         VarInstance vi = null;
         if (vars != null) {
-            vi = (VarInstance) vars.get(name);
+            vi = vars.get(name);
         }
         if (vi == null && isClass()) {
             try {
@@ -569,11 +598,11 @@ public class Context_c implements Context
     }
 
     public void addVariableToThisScope(VarInstance var) {
-        if (vars == null) vars = new HashMap();
+        if (vars == null) vars = new HashMap<String, VarInstance>();
         vars.put(var.name(), var);
     }
 
-    private static final Collection TOPICS = 
+    private static final Collection<String> TOPICS = 
                 CollectionUtil.list(Report.types, Report.context);
 
 }

@@ -50,7 +50,8 @@ public abstract class ProcedureInstance_c extends TypeObject_c
 
     public ProcedureInstance_c(TypeSystem ts, Position pos,
 			       ReferenceType container,
-			       Flags flags, List formalTypes, List excTypes) {
+			       Flags flags, List<? extends Type> formalTypes,
+			       List<? extends Type> excTypes) {
         super(ts, pos);
 	this.container = container;
 	this.flags = flags;
@@ -62,14 +63,17 @@ public abstract class ProcedureInstance_c extends TypeObject_c
         return container;
     }
 
+    @Override
     public Flags flags() {
         return flags;
     }
 
+    @Override
     public List<Type> formalTypes() {
         return Collections.unmodifiableList(formalTypes);
     }
 
+    @Override
     public List<Type> throwTypes() {
         return Collections.unmodifiableList(throwTypes);
     }
@@ -91,21 +95,25 @@ public abstract class ProcedureInstance_c extends TypeObject_c
     /**
      * @param formalTypes The formalTypes to set.
      */
-    public void setFormalTypes(List formalTypes) {
+    @Override
+    public void setFormalTypes(List<? extends Type> formalTypes) {
         this.formalTypes = ListUtil.copy(formalTypes, true);
     }
     
     /**
      * @param throwTypes The throwTypes to set.
      */
-    public void setThrowTypes(List throwTypes) {
+    @Override
+    public void setThrowTypes(List<? extends Type> throwTypes) {
         this.throwTypes = ListUtil.copy(throwTypes, true);
     }
      
+    @Override
     public int hashCode() {
         return container.hashCode() + flags.hashCode();
     }
 
+    @Override
     public boolean equalsImpl(TypeObject o) {
         if (o instanceof ProcedureInstance) {
 	    ProcedureInstance i = (ProcedureInstance) o;
@@ -117,9 +125,8 @@ public abstract class ProcedureInstance_c extends TypeObject_c
 	return false;
     }
 
-    protected boolean listIsCanonical(List l) {
-	for (Iterator i = l.iterator(); i.hasNext(); ) {
-	    TypeObject o = (TypeObject) i.next();
+    protected boolean listIsCanonical(List<? extends TypeObject> l) {
+	for (TypeObject o : l) {
 	    if (! o.isCanonical()) {
 		return false;
 	    }
@@ -128,6 +135,7 @@ public abstract class ProcedureInstance_c extends TypeObject_c
 	return true;
     }
 
+    @Override
     public final boolean moreSpecific(ProcedureInstance p) {
         return ts.moreSpecific(this, p);
     }
@@ -142,6 +150,7 @@ public abstract class ProcedureInstance_c extends TypeObject_c
      * does not include any info regarding Java 1.2, so all inner class
      * rules are found empirically using jikes and javac.
      */
+    @Override
     public boolean moreSpecificImpl(ProcedureInstance p) {
         ProcedureInstance p1 = this;
         ProcedureInstance p2 = p;
@@ -186,21 +195,23 @@ public abstract class ProcedureInstance_c extends TypeObject_c
     }
 
     /** Returns true if the procedure has the given formal parameter types. */
-    public final boolean hasFormals(List formalTypes) {
+    @Override
+    public final boolean hasFormals(List<? extends Type> formalTypes) {
         return ts.hasFormals(this, formalTypes);
     }
 
     /** Returns true if the procedure has the given formal parameter types. */
-    public boolean hasFormalsImpl(List formalTypes) {
-        List l1 = this.formalTypes();
-        List l2 = formalTypes;
+    @Override
+    public boolean hasFormalsImpl(List<? extends Type> formalTypes) {
+        List<? extends Type> l1 = this.formalTypes();
+        List<? extends Type> l2 = formalTypes;
 
-        Iterator i1 = l1.iterator();
-        Iterator i2 = l2.iterator();
+        Iterator<? extends Type> i1 = l1.iterator();
+        Iterator<? extends Type> i2 = l2.iterator();
 
         while (i1.hasNext() && i2.hasNext()) {
-            Type t1 = (Type) i1.next();
-            Type t2 = (Type) i2.next();
+            Type t1 = i1.next();
+            Type t2 = i2.next();
 
             if (! ts.equals(t1, t2)) {
                 return false;
@@ -212,12 +223,14 @@ public abstract class ProcedureInstance_c extends TypeObject_c
 
     /** Returns true iff <code>this</code> throws fewer exceptions than
      * <code>p</code>. */
+    @Override
     public final boolean throwsSubset(ProcedureInstance p) {
         return ts.throwsSubset(this, p);
     }
 
     /** Returns true iff <code>this</code> throws fewer exceptions than
      * <code>p</code>. */
+    @Override
     public boolean throwsSubsetImpl(ProcedureInstance p) {
         SubtypeSet s1 = new SubtypeSet(ts.Throwable());
         SubtypeSet s2 = new SubtypeSet(ts.Throwable());
@@ -225,8 +238,7 @@ public abstract class ProcedureInstance_c extends TypeObject_c
         s1.addAll(this.throwTypes());
         s2.addAll(p.throwTypes());
 
-        for (Iterator i = s1.iterator(); i.hasNext(); ) {
-            Type t = (Type) i.next();
+        for (Type t : s1) {
             if (! ts.isUncheckedException(t) && ! s2.contains(t)) {
                 return false;
             }
@@ -236,21 +248,23 @@ public abstract class ProcedureInstance_c extends TypeObject_c
     }
 
     /** Returns true if a call can be made with the given argument types. */
-    public final boolean callValid(List argTypes) {
+    @Override
+    public final boolean callValid(List<? extends Type> argTypes) {
         return ts.callValid(this, argTypes);
     }
 
     /** Returns true if a call can be made with the given argument types. */
-    public boolean callValidImpl(List argTypes) {
-        List l1 = this.formalTypes();
-        List l2 = argTypes;
+    @Override
+    public boolean callValidImpl(List<? extends Type> argTypes) {
+        List<? extends Type> l1 = this.formalTypes();
+        List<? extends Type> l2 = argTypes;
 
-        Iterator i1 = l1.iterator();
-        Iterator i2 = l2.iterator();
+        Iterator<? extends Type> i1 = l1.iterator();
+        Iterator<? extends Type> i2 = l2.iterator();
 
         while (i1.hasNext() && i2.hasNext()) {
-            Type t1 = (Type) i1.next();
-            Type t2 = (Type) i2.next();
+            Type t1 = i1.next();
+            Type t2 = i2.next();
 
             if (! ts.isImplicitCastValid(t2, t1)) {
                 return false;

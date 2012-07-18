@@ -25,10 +25,6 @@
 
 package polyglot.types;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import polyglot.util.CollectionUtil;
 
 /**
  * A <code>FunctionInstance</code> represents the type information for a

@@ -25,7 +25,6 @@
 
 package polyglot.types;
 
-import polyglot.ast.*;
 
 /**
  * A <code>Resolver</code> is responsible for looking up types and

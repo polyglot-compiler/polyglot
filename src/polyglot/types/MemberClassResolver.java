@@ -25,12 +25,13 @@
 
 package polyglot.types;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 
 import polyglot.main.Report;
 import polyglot.util.CollectionUtil;
 import polyglot.util.StringUtil;
-import polyglot.util.InternalCompilerError;
 
 /**
  * Loads member classes using a TopLevelResolver that can only handle
@@ -41,9 +42,9 @@ public class MemberClassResolver implements TopLevelResolver
     protected TypeSystem ts;
     protected TopLevelResolver inner;
     protected boolean allowRawClasses;
-    protected Set nocache;
+    protected Set<String> nocache;
 
-  protected final static Collection report_topics = CollectionUtil.list(
+  protected final static Collection<String> report_topics = CollectionUtil.list(
     Report.types, Report.resolver, Report.loader, "mcr");
 
   /**
@@ -55,17 +56,19 @@ public class MemberClassResolver implements TopLevelResolver
     this.ts = ts;
     this.inner = inner;
     this.allowRawClasses = allowRawClasses;
-    this.nocache = new HashSet();
+    this.nocache = new HashSet<String>();
   }
 
-  public boolean packageExists(String name) {
+  @Override
+public boolean packageExists(String name) {
     return inner.packageExists(name);
   }
 
   /**
    * Find a type by name.
    */
-  public Named find(String name) throws SemanticException {
+  @Override
+public Named find(String name) throws SemanticException {
     if (Report.should_report(report_topics, 3))
       Report.report(3, "MemberCR.find(" + name + ")");
 
@@ -115,13 +118,7 @@ public class MemberClassResolver implements TopLevelResolver
         // This may be called during deserialization; n's
         // member classes might not be initialized yet.
         if (n instanceof ParsedTypeObject) {
-            if (true || ((ParsedTypeObject) n).initializer() != null &&
-                ((ParsedTypeObject) n).initializer().isTypeObjectInitialized()) {
-                return findMember(n, suffix);
-            }
-            else {
-                install = false;
-            }
+            return findMember(n, suffix);
         }
     }
     catch (SemanticException e) {

@@ -25,9 +25,12 @@
 
 package polyglot.types;
 
-import polyglot.types.*;
-import polyglot.util.*;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
+import polyglot.util.CodeWriter;
+import polyglot.util.Position;
 
 /**
  * An <code>ArrayType</code> represents an array of base java types.
@@ -35,9 +38,9 @@ import java.util.*;
 public class ArrayType_c extends ReferenceType_c implements ArrayType
 {
     protected Type base;
-    protected List fields;
-    protected List methods;
-    protected List interfaces;
+    protected List<FieldInstance> fields;
+    protected List<MethodInstance> methods;
+    protected List<ClassType> interfaces;
 
     /** Used for deserializing types. */
     protected ArrayType_c() { }
@@ -53,27 +56,27 @@ public class ArrayType_c extends ReferenceType_c implements ArrayType
 
     protected void init() {
         if (methods == null) {
-            methods = new ArrayList(1);
+            methods = new ArrayList<MethodInstance>(1);
 
             // Add method public Object clone()
             methods.add(createCloneMethodInstance());
         }
 
         if (fields == null) {
-            fields = new ArrayList(1);
+            fields = new ArrayList<FieldInstance>(1);
 
             // Add field public final int length
             fields.add(createLengthFieldInstance());
         }
 
         if (interfaces == null) {
-            interfaces = new ArrayList(2);
+            interfaces = new ArrayList<ClassType>(2);
             interfaces.add(ts.Cloneable());
             interfaces.add(ts.Serializable());
         }
     }
 
-    protected Object createLengthFieldInstance() {
+    protected FieldInstance createLengthFieldInstance() {
         FieldInstance fi = ts.fieldInstance(position(),
                 this,
                 ts.Public().Final(),
@@ -89,16 +92,18 @@ public class ArrayType_c extends ReferenceType_c implements ArrayType
                 ts.Public(),
                 ts.Object(),
                 "clone",
-                Collections.EMPTY_LIST,
-                Collections.EMPTY_LIST);
+                Collections.<Type> emptyList(),
+                Collections.<Type> emptyList());
     }
 
     /** Get the base type of the array. */
+    @Override
     public Type base() {
         return base;
     }
 
     /** Set the base type of the array. */
+    @Override
     public ArrayType base(Type base) {
         if (base == this.base)
             return this;
@@ -108,6 +113,7 @@ public class ArrayType_c extends ReferenceType_c implements ArrayType
     }
 
     /** Get the ulitimate base type of the array. */
+    @Override
     public Type ultimateBase() {
         if (base().isArray()) {
             return base().toArray().ultimateBase();
@@ -116,75 +122,91 @@ public class ArrayType_c extends ReferenceType_c implements ArrayType
         return base();
     }
 
+    @Override
     public int dims() {
         return 1 + (base().isArray() ? base().toArray().dims() : 0);
     }
 
+    @Override
     public String toString() {
         return base().toString() + "[]";
     }
 
+    @Override
     public void print(CodeWriter w) {
 	base().print(w);
 	w.write("[]");
     }
 
     /** Translate the type. */
+    @Override
     public String translate(Resolver c) {
         return base().translate(c) + "[]"; 
     }
 
     /** Returns true iff the type is canonical. */
+    @Override
     public boolean isCanonical() {
 	return base().isCanonical();
     }
 
+    @Override
     public boolean isArray() { return true; }
+    @Override
     public ArrayType toArray() { return this; }
 
     /** Get the methods implemented by the array type. */
-    public List methods() {
+    @Override
+    public List<? extends MethodInstance> methods() {
         init();
 	return Collections.unmodifiableList(methods);
     }
 
     /** Get the fields of the array type. */
-    public List fields() {
+    @Override
+    public List<? extends FieldInstance> fields() {
         init();
 	return Collections.unmodifiableList(fields);
     }
 
     /** Get the clone() method. */
+    @Override
     public MethodInstance cloneMethod() {
-	return (MethodInstance) methods().get(0);
+	return methods().get(0);
     }
 
     /** Get a field of the type by name. */
+    @Override
     public FieldInstance fieldNamed(String name) {
         FieldInstance fi = lengthField();
         return name.equals(fi.name()) ? fi : null;
     }
 
     /** Get the length field. */
+    @Override
     public FieldInstance lengthField() {
-	return (FieldInstance) fields().get(0);
+	return fields().get(0);
     }
 
     /** Get the super type of the array type. */
+    @Override
     public Type superType() {
 	return ts.Object();
     }
 
     /** Get the interfaces implemented by the array type. */
-    public List interfaces() {
+    @Override
+    public List<? extends ReferenceType> interfaces() {
         init();
 	return Collections.unmodifiableList(interfaces);
     }
 
+    @Override
     public int hashCode() {
 	return base().hashCode() << 1;
     }
 
+    @Override
     public boolean equalsImpl(TypeObject t) {
         if (t instanceof ArrayType) {
             ArrayType a = (ArrayType) t;
@@ -193,6 +215,7 @@ public class ArrayType_c extends ReferenceType_c implements ArrayType
 	return false;
     }
 
+    @Override
     public boolean typeEqualsImpl(Type t) {
         if (t instanceof ArrayType) {
             ArrayType a = (ArrayType) t;
@@ -201,6 +224,7 @@ public class ArrayType_c extends ReferenceType_c implements ArrayType
 	return false;
     }
 
+    @Override
     public boolean isImplicitCastValidImpl(Type toType) {
         if (toType.isArray()) {
             if (base().isPrimitive() || toType.toArray().base().isPrimitive()) {
@@ -223,6 +247,7 @@ public class ArrayType_c extends ReferenceType_c implements ArrayType
      * Returns true iff a cast from this to toType is valid; in other
      * words, some non-null members of this are also members of toType.
      **/
+    @Override
     public boolean isCastValidImpl(Type toType) {
         if (! toType.isReference()) return false;
 

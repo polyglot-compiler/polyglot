@@ -584,7 +584,7 @@ public class New_c extends Expr_c implements New
         }
 
         Iterator<Expr> i = this.arguments.iterator();
-        Iterator<Type> j = ci.formalTypes().iterator();
+        Iterator<? extends Type> j = ci.formalTypes().iterator();
 
         while (i.hasNext() && j.hasNext()) {
             Expr e = i.next();

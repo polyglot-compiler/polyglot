@@ -589,7 +589,7 @@ public class ClassFileLazyClassInitializer implements LazyClassInitializer {
         // Get a method instance for the <init> method.
         MethodInstance mi = methodInstance(method, ct);
     
-        List<Type> formals = mi.formalTypes();
+        List<? extends Type> formals = mi.formalTypes();
     
         if (ct.isInnerClass()) {
             // If an inner class, the first argument may be a reference to an

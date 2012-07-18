@@ -89,7 +89,7 @@ public abstract class ReferenceType_c extends Type_c implements ReferenceType
      * Returns a list of the types of this class's interfaces.
      */
     @Override
-    public abstract List<? extends Type> interfaces();
+    public abstract List<? extends ReferenceType> interfaces();
 
     /** Return true if t has a method mi */
     @Override
@@ -160,7 +160,7 @@ public abstract class ReferenceType_c extends Type_c implements ReferenceType
     }
 
     @Override
-    public List<? extends MethodInstance> methods(String name, List<Type> argTypes) {
+    public List<? extends MethodInstance> methods(String name, List<? extends Type> argTypes) {
         List<MethodInstance> l = new LinkedList<MethodInstance>();
 
         for (MethodInstance mi : methodsNamed(name)) {

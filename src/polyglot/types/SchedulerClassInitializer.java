@@ -25,14 +25,8 @@
 
 package polyglot.types;
 
-import java.util.HashSet;
-import java.util.Set;
-
-import polyglot.frontend.*;
-import polyglot.frontend.goals.*;
-import polyglot.main.Report;
-import polyglot.types.*;
-import polyglot.util.InternalCompilerError;
+import polyglot.frontend.MissingDependencyException;
+import polyglot.frontend.Scheduler;
 
 /**
  * A LazyClassInitializer is responsible for initializing members of a class
@@ -63,22 +57,27 @@ public class SchedulerClassInitializer implements LazyClassInitializer {
         this.scheduler = ts.extensionInfo().scheduler();
     }
     
+    @Override
     public void setClass(ParsedClassType ct) {
         this.ct = ct;
     }
 
+    @Override
     public boolean fromClassFile() {
         return false;
     }
 
+    @Override
     public void initTypeObject() {
         this.init = true;
     }
 
+    @Override
     public boolean isTypeObjectInitialized() {
         return this.init;
     }
 
+    @Override
     public void initSuperclass() {
         if (!superclassInitialized) {
             if (ct.supertypesResolved()) {
@@ -90,6 +89,7 @@ public class SchedulerClassInitializer implements LazyClassInitializer {
         }
     }
 
+    @Override
     public void initInterfaces() {
         if (!interfacesInitialized) {
             if (ct.supertypesResolved()) {
@@ -101,6 +101,7 @@ public class SchedulerClassInitializer implements LazyClassInitializer {
         }
     }
 
+    @Override
     public void initMemberClasses() {
         if (!memberClassesInitialized) {
             if (ct.membersAdded()) {
@@ -112,6 +113,7 @@ public class SchedulerClassInitializer implements LazyClassInitializer {
         }
     }
 
+    @Override
     public void canonicalConstructors() {
         if (!constructorsCanonicalized) {
             if (ct.signaturesResolved()) {
@@ -123,6 +125,7 @@ public class SchedulerClassInitializer implements LazyClassInitializer {
         }
     }
 
+    @Override
     public void canonicalMethods() {
         if (!methodsCanonicalized) {
             if (ct.signaturesResolved()) {
@@ -134,6 +137,7 @@ public class SchedulerClassInitializer implements LazyClassInitializer {
         }
     }
 
+    @Override
     public void canonicalFields() {
         if (!fieldsCanonicalized) {
             if (ct.signaturesResolved()) {
@@ -145,6 +149,7 @@ public class SchedulerClassInitializer implements LazyClassInitializer {
         }
     }
     
+    @Override
     public void initConstructors() {
         if (!constructorsInitialized) {
             if (ct.membersAdded()) {
@@ -156,6 +161,7 @@ public class SchedulerClassInitializer implements LazyClassInitializer {
         }
     }
 
+    @Override
     public void initMethods() {
         if (!methodsInitialized) {
             if (ct.membersAdded()) {
@@ -167,6 +173,7 @@ public class SchedulerClassInitializer implements LazyClassInitializer {
         }
     }
 
+    @Override
     public void initFields() {
         if (!fieldsInitialized) {
             if (ct.membersAdded()) {

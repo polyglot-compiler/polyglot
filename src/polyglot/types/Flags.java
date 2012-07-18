@@ -25,11 +25,14 @@
 
 package polyglot.types;
 
-import polyglot.util.InternalCompilerError;
-import polyglot.util.Enum;
-
 import java.io.Serializable;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.List;
+import java.util.ListIterator;
+import java.util.Set;
+import java.util.TreeSet;
 
 /**
  * <code>Flags</code> is an immutable set of class, method, or field modifiers.
@@ -38,17 +41,18 @@ import java.util.*;
  */
 public class Flags implements Serializable
 {
-    protected Set flags;
+    protected Set<String> flags;
 
-    protected static class FlagComparator implements Comparator {
-        protected static List order = new ArrayList(
-            Arrays.asList(new String[] {
+    protected static class FlagComparator implements Comparator<String> {
+        protected static List<String> order = new ArrayList<String>(
+            Arrays.asList(
                 "public", "private", "protected", "static", "final",
                 "synchronized", "transient", "native", "interface",
                 "abstract", "volatile", "strictfp"
-            }));
+            ));
 
-        public int compare(Object o1, Object o2) {
+        @Override
+        public int compare(String o1, String o2) {
             if (o1.equals(o2)) return 0;
 
             for (int i = 0; i < order.size(); i++) {
@@ -56,7 +60,7 @@ public class Flags implements Serializable
                 if (o2.equals(order.get(i))) return 1;
             }
 
-            return ((String) o1).compareTo((String) o2);
+            return o1.compareTo(o2);
         }
     }
 
@@ -93,7 +97,7 @@ public class Flags implements Serializable
     }
 
     public static void addToOrder(String name, Flags after) {
-        List order = FlagComparator.order;
+        List<String> order = FlagComparator.order;
         boolean added = false;
 
         if (after == null) {
@@ -103,8 +107,8 @@ public class Flags implements Serializable
             order.add(0, name);
         }
         else {
-            for (ListIterator i = order.listIterator(); i.hasNext(); ) {
-                String s = (String) i.next();
+            for (ListIterator<String> i = order.listIterator(); i.hasNext(); ) {
+                String s = i.next();
                 after = after.clear(new Flags(s));
                 if (after.flags.isEmpty()) {
                     i.add(name);
@@ -124,7 +128,7 @@ public class Flags implements Serializable
      * Effects: returns a new accessflags object with no accessflags set.
      */
     protected Flags() {
-        this.flags = new TreeSet();
+        this.flags = new TreeSet<String>();
     }
 
     protected Flags(String name) {
@@ -132,7 +136,7 @@ public class Flags implements Serializable
         flags.add(name);
     }
 
-    public Set flags() {
+    public Set<String> flags() {
         return this.flags;
     }
 
@@ -170,8 +174,7 @@ public class Flags implements Serializable
      * Check if <i>any</i> flags in <code>other</code> are set.
      */
     public boolean intersects(Flags other) {
-        for (Iterator i = this.flags.iterator(); i.hasNext(); ) {
-            String name = (String) i.next();
+        for (String name : this.flags) {
             if (other.flags.contains(name)) {
                 return true;
             }
@@ -499,6 +502,7 @@ public class Flags implements Serializable
         return false;
     }
 
+    @Override
     public String toString() {
         return translate().trim();
     }
@@ -509,9 +513,7 @@ public class Flags implements Serializable
     public String translate() {
         StringBuffer sb = new StringBuffer();
 
-        for (Iterator i = this.flags.iterator(); i.hasNext(); ) {
-            String s = (String) i.next();
-
+        for (String s : this.flags) {
             sb.append(s);
             sb.append(" ");
         }
@@ -519,10 +521,12 @@ public class Flags implements Serializable
         return sb.toString();
     }
 
+    @Override
     public int hashCode() {
         return flags.hashCode();
     }
 
+    @Override
     public boolean equals(Object o) {
 	return o instanceof Flags && flags.equals(((Flags) o).flags);
     }

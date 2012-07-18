@@ -25,10 +25,11 @@
 
 package polyglot.types;
 
-import polyglot.frontend.*;
+import polyglot.frontend.MissingDependencyException;
+import polyglot.frontend.Scheduler;
+import polyglot.frontend.SchedulerException;
 import polyglot.frontend.goals.Goal;
-import polyglot.types.*;
-import polyglot.util.*;
+import polyglot.util.CannotResolvePlaceHolderException;
 
 /**
  * A place holder type when serializing the Polylgot type information. 
@@ -55,14 +56,17 @@ public class PlaceHolder_c implements NamedPlaceHolder
         this.name = name;
     }
 
+    @Override
     public String name() {
         return name;
     }
 
+    @Override
     public int hashCode() {
         return name.hashCode();
     }
     
+    @Override
     public boolean equals(Object o) {
         return o == this || (o instanceof PlaceHolder_c && name.equals(((PlaceHolder_c) o).name));
     }
@@ -74,6 +78,7 @@ public class PlaceHolder_c implements NamedPlaceHolder
      * until after another pass runs.  The method is responsible for setting
      * up the appropriate dependencies to reattempt the current goal.
      */
+    @Override
     public TypeObject resolve(TypeSystem ts) throws CannotResolvePlaceHolderException {
         return resolveUnsafe(ts);
     }
@@ -125,6 +130,7 @@ public class PlaceHolder_c implements NamedPlaceHolder
         throw new CannotResolvePlaceHolderException("Could not resolve " + name);
     }
     
+    @Override
     public String toString() {
 	return "PlaceHolder(" + name + ")";
     }

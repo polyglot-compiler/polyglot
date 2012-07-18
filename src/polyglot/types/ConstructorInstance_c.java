@@ -25,9 +25,10 @@
 
 package polyglot.types;
 
-import polyglot.types.*;
-import polyglot.util.*;
-import java.util.*;
+import java.util.List;
+
+import polyglot.util.CollectionUtil;
+import polyglot.util.Position;
 
 /**
  * A <code>ConstructorInstance</code> contains type information for a
@@ -41,25 +42,30 @@ public class ConstructorInstance_c extends ProcedureInstance_c
 
     public ConstructorInstance_c(TypeSystem ts, Position pos,
 	                         ClassType container,
-				 Flags flags, List formalTypes, List excTypes) {
+				 Flags flags, List<? extends Type> formalTypes,
+				 List<? extends Type> excTypes) {
         super(ts, pos, container, flags, formalTypes, excTypes);
         this.decl = this;
     }
 
     protected ConstructorInstance decl;
     
+    @Override
     public Declaration declaration() {
         return decl;
     }
     
+    @Override
     public void setDeclaration(Declaration decl) {
         this.decl = (ConstructorInstance) decl;        
     }
     
+    @Override
     public ConstructorInstance orig() {
         return (ConstructorInstance) declaration();
     }
     
+    @Override
     public ConstructorInstance flags(Flags flags) {
         if (!flags.equals(this.flags)) {
             ConstructorInstance_c n = (ConstructorInstance_c) copy();
@@ -69,7 +75,8 @@ public class ConstructorInstance_c extends ProcedureInstance_c
         return this;
     }
 
-    public ConstructorInstance formalTypes(List l) {
+    @Override
+    public ConstructorInstance formalTypes(List<? extends Type> l) {
         if (!CollectionUtil.equals(this.formalTypes, l)) {
             ConstructorInstance_c n = (ConstructorInstance_c) copy();
             n.setFormalTypes(l);
@@ -78,7 +85,8 @@ public class ConstructorInstance_c extends ProcedureInstance_c
         return this;
     }
 
-    public ConstructorInstance throwTypes(List l) {
+    @Override
+    public ConstructorInstance throwTypes(List<? extends Type> l) {
         if (!CollectionUtil.equals(this.throwTypes, l)) {
             ConstructorInstance_c n = (ConstructorInstance_c) copy();
             n.setThrowTypes(l);
@@ -87,6 +95,7 @@ public class ConstructorInstance_c extends ProcedureInstance_c
         return this;
     }
 
+    @Override
     public ConstructorInstance container(ClassType container) {
         if (this.container != container) {
             ConstructorInstance_c n = (ConstructorInstance_c) copy();
@@ -96,18 +105,22 @@ public class ConstructorInstance_c extends ProcedureInstance_c
         return this;
     }
 
+    @Override
     public String toString() {
 	return designator() + " " + flags.translate() + signature();
     }
     
+    @Override
     public String signature() {
         return container + "(" + TypeSystem_c.listToString(formalTypes) + ")";
     }
 
+    @Override
     public String designator() {
         return "constructor";
     }
 
+    @Override
     public boolean equalsImpl(TypeObject o) {
         if (o instanceof ConstructorInstance) {
             ConstructorInstance i = (ConstructorInstance) o;
@@ -118,6 +131,7 @@ public class ConstructorInstance_c extends ProcedureInstance_c
         return false;
     }
 
+    @Override
     public boolean isCanonical() {
 	return container.isCanonical()
 	    && listIsCanonical(formalTypes)

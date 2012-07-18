@@ -26,9 +26,12 @@
 
 package polyglot.types.reflect;
 
-import polyglot.types.*;
-import java.util.*;
-import java.io.*;
+import java.io.DataInputStream;
+import java.io.EOFException;
+import java.io.IOException;
+
+import polyglot.types.SemanticException;
+import polyglot.types.Type;
 
 /**
  * Field models a field (member variable) in a class.  The Field class

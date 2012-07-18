@@ -35,8 +35,8 @@ public interface ConstructorInstance extends ProcedureInstance, MemberInstance, 
 {
     /** Non-destructive updates. */
     ConstructorInstance flags(Flags flags);
-    ConstructorInstance formalTypes(List l);
-    ConstructorInstance throwTypes(List l);
+    ConstructorInstance formalTypes(List<? extends Type> l);
+    ConstructorInstance throwTypes(List<? extends Type> l);
     ConstructorInstance container(ClassType container);
     ConstructorInstance orig();
 }

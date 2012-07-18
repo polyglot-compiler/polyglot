@@ -338,7 +338,7 @@ public class Call_c extends Expr_c implements Call
       }
 
       Iterator<Expr> i = this.arguments.iterator();
-      Iterator<Type> j = mi.formalTypes().iterator();
+      Iterator<? extends Type> j = mi.formalTypes().iterator();
 
       while (i.hasNext() && j.hasNext()) {
           Expr e = i.next();

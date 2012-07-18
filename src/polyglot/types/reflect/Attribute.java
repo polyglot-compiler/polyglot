@@ -26,8 +26,6 @@
 
 package polyglot.types.reflect;
 
-import java.util.*;
-import java.io.*;
 
 /**
  * Attribute is an abstract class for an attribute defined for a method,

@@ -91,7 +91,7 @@ public class RawClass_c extends JL5ClassType_c implements RawClass {
         return this.constructors;
     }
 
-    private transient List<ClassType> memberClasses = null;
+    private transient List<? extends ClassType> memberClasses = null;
     @Override
     public List memberClasses() {
         if (memberClasses == null) {
@@ -122,7 +122,7 @@ public class RawClass_c extends JL5ClassType_c implements RawClass {
     }
 
     @Override
-    public List<? extends Type> interfaces() {
+    public List<? extends ReferenceType> interfaces() {
         return this.erased().interfaces();
     }
 

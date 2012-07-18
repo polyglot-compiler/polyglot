@@ -48,8 +48,8 @@ public interface MethodInstance extends FunctionInstance, MemberInstance, Declar
     MethodInstance flags(Flags flags);
     MethodInstance name(String name);
     MethodInstance returnType(Type returnType);
-    MethodInstance formalTypes(List<Type> l);
-    MethodInstance throwTypes(List<Type> l);
+    MethodInstance formalTypes(List<? extends Type> l);
+    MethodInstance throwTypes(List<? extends Type> l);
     MethodInstance container(ReferenceType container);
     
     MethodInstance orig();
@@ -95,7 +95,7 @@ public interface MethodInstance extends FunctionInstance, MemberInstance, Declar
      * @param actualTypes A list of argument types of type <code>Type</code>.
      * @see polyglot.types.Type
      */
-    boolean methodCallValid(String name, List<Type> actualTypes);
+    boolean methodCallValid(String name, List<? extends Type> actualTypes);
 
     /**
      * Get the list of methods this method (potentially) overrides, in order
@@ -139,5 +139,5 @@ public interface MethodInstance extends FunctionInstance, MemberInstance, Declar
      * This method should not be called except by <code>TypeSystem</code>
      * and by subclasses.
      */
-    boolean methodCallValidImpl(String name, List<Type> actualTypes);
+    boolean methodCallValidImpl(String name, List<? extends Type> actualTypes);
 }

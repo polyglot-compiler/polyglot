@@ -25,11 +25,6 @@
 
 package polyglot.types;
 
-import polyglot.frontend.*;
-import polyglot.frontend.goals.*;
-import polyglot.types.*;
-import polyglot.util.InternalCompilerError;
-import java.util.Iterator;
 
 /**
  * A LazyClassInitializer is responsible for initializing members of a class
@@ -45,55 +40,67 @@ public class DeserializedClassInitializer implements LazyClassInitializer {
         this.ts = ts;
     }
     
+    @Override
     public void setClass(ParsedClassType ct) {
         this.ct = ct;
     }
 
+    @Override
     public boolean fromClassFile() {
         return false;
     }
 
+    @Override
     public void initTypeObject() {
         if (this.init) return;
         if (ct.isMember() && ct.outer() instanceof ParsedClassType) {
             ParsedClassType outer = (ParsedClassType) ct.outer();
             outer.addMemberClass(ct);
         }
-        for (Iterator i = ct.memberClasses().iterator(); i.hasNext(); ) {
-            ParsedClassType ct = (ParsedClassType) i.next();
-            ct.initializer().initTypeObject();
+        for (ClassType ct : this.ct.memberClasses()) {
+            ((ParsedClassType) ct).initializer().initTypeObject();
         }
         this.init = true;
     }
 
+    @Override
     public boolean isTypeObjectInitialized() {
         return this.init;
     }
 
+    @Override
     public void initSuperclass() {
     }
 
+    @Override
     public void initInterfaces() {
     }
 
+    @Override
     public void initMemberClasses() {
     }
 
+    @Override
     public void initConstructors() {
     }
 
+    @Override
     public void initMethods() {
     }
 
+    @Override
     public void initFields() {
     }
 
+    @Override
     public void canonicalConstructors() {
     }
 
+    @Override
     public void canonicalMethods() {
     }
 
+    @Override
     public void canonicalFields() {
     }
 }

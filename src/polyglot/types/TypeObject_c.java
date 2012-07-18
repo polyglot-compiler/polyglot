@@ -25,9 +25,13 @@
 
 package polyglot.types;
 
-import polyglot.types.*;
-import polyglot.util.*;
-import java.io.*;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+
+import polyglot.util.InternalCompilerError;
+import polyglot.util.Position;
+import polyglot.util.TypeInputStream;
 
 /**
  * Abstract implementation of a type object.  Contains a reference to the
@@ -52,7 +56,8 @@ public abstract class TypeObject_c implements TypeObject
 	this.position = pos;
     }
 
-    public Object copy() {
+    @Override
+    public TypeObject_c copy() {
         try {
             return (TypeObject_c) super.clone();
         }
@@ -61,10 +66,12 @@ public abstract class TypeObject_c implements TypeObject
         }
     }
 
+    @Override
     public TypeSystem typeSystem() {
         return ts;
     }
 
+    @Override
     public Position position() {
         return position;
     }
@@ -86,10 +93,12 @@ public abstract class TypeObject_c implements TypeObject
      * Return whether o is structurally equivalent to o.
      * Implementations should override equalsImpl().
      */
+    @Override
     public final boolean equals(Object o) {
         return o instanceof TypeObject && ts.equals(this, (TypeObject) o);
     }
 
+    @Override
     public int hashCode() {
         return super.hashCode();
     }
@@ -97,6 +106,7 @@ public abstract class TypeObject_c implements TypeObject
     /**
      * Default implementation is pointer equality.
      */
+    @Override
     public boolean equalsImpl(TypeObject t) {
         return t == this;
     }

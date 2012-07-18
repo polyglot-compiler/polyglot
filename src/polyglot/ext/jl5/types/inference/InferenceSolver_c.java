@@ -18,7 +18,7 @@ public class InferenceSolver_c implements InferenceSolver {
 
     private List<Type> actualArgumentTypes;
 
-    private List<Type> formalTypes;
+    private List<? extends Type> formalTypes;
 
     private List<TypeVariable> typeVariablesToSolve;
 

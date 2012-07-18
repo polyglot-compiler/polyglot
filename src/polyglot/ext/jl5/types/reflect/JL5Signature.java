@@ -172,7 +172,7 @@ public class JL5Signature extends Attribute {
 
     
     class ClassSig {
-        public ClassSig(List<TypeVariable> typeVars, Type superType, List<Type> interfaces){
+        public ClassSig(List<TypeVariable> typeVars, Type superType, List<ClassType> interfaces){
             this.typeVars = typeVars;
             this. superType = superType;
             this.interfaces = interfaces;
@@ -185,8 +185,8 @@ public class JL5Signature extends Attribute {
         public Type superType(){
             return superType;
         }
-        protected List<Type> interfaces; // list of types 
-        public List<Type> interfaces(){
+        protected List<ClassType> interfaces; // list of types 
+        public List<ClassType> interfaces(){
             return interfaces;
         }
     }
@@ -246,7 +246,7 @@ public class JL5Signature extends Attribute {
             //typeVars = (List)fres.result();
         }
         Result<ClassType> sres = classTypeSig(value, pos);
-        List<Type> superInterfaces = new ArrayList<Type>();
+        List<ClassType> superInterfaces = new ArrayList<ClassType>();
         pos = sres.pos();
         while (pos < value.length()){
             Result<ClassType> ires = classTypeSig(value, pos);

@@ -49,7 +49,7 @@ public class TypeErasureProcDecls extends ErrorHandlingVisitor {
         }
 
         JL5ClassType miContainer = (JL5ClassType) mi.container();
-        List<Type> miFormalTypes = mi.formalTypes();
+        List<? extends Type> miFormalTypes = mi.formalTypes();
         if (miContainer instanceof JL5ParsedClassType) {
             JL5ParsedClassType pct = (JL5ParsedClassType) miContainer;
             JL5Subst es = pct.erasureSubst();

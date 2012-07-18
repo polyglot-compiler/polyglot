@@ -47,6 +47,7 @@ public class ClassContextResolver extends AbstractAccessControlResolver {
         this.type = type;
     }
     
+    @Override
     public String toString() {
         return "(class-context " + type + ")";
     }
@@ -55,6 +56,7 @@ public class ClassContextResolver extends AbstractAccessControlResolver {
      * Find a type object in the context of the class.
      * @param name The name to search for.
      */
+    @Override
     public Named find(String name, ClassType accessor) throws SemanticException {
         if (Report.should_report(TOPICS, 2))
 	    Report.report(2, "Looking for " + name + " in " + this);
@@ -130,7 +132,7 @@ public class ClassContextResolver extends AbstractAccessControlResolver {
         
         // Collect all members of the super types.
         // Use a Set to eliminate duplicates.
-        Set acceptable = new HashSet();
+        Set<Named> acceptable = new HashSet<Named>();
         
         if (type.superType() != null) {
             Type sup = type.superType();
@@ -145,8 +147,7 @@ public class ClassContextResolver extends AbstractAccessControlResolver {
             }
         }
         
-        for (Iterator i = type.interfaces().iterator(); i.hasNext(); ) {
-            Type sup = (Type) i.next();
+        for (Type sup : type.interfaces()) {
             if (sup instanceof ClassType) {
                 Resolver r = ts.classContextResolver((ClassType) sup, accessor);
                 try {
@@ -162,9 +163,8 @@ public class ClassContextResolver extends AbstractAccessControlResolver {
             throw new NoClassException(name, type);
         }
         else if (acceptable.size() > 1) {
-            Set containers = new HashSet(acceptable.size());
-            for (Iterator i = acceptable.iterator(); i.hasNext(); ) {
-                Named n = (Named) i.next();
+            Set<ReferenceType> containers = new HashSet<ReferenceType>(acceptable.size());
+            for (Named n : acceptable) {
                 if (n instanceof MemberInstance) {
                     MemberInstance mi = (MemberInstance) n;
                     containers.add(mi.container());
@@ -172,9 +172,9 @@ public class ClassContextResolver extends AbstractAccessControlResolver {
             }
             
             if (containers.size() == 2) {
-                Iterator i = containers.iterator();
-                Type t1 = (Type) i.next();
-                Type t2 = (Type) i.next();
+                Iterator<ReferenceType> i = containers.iterator();
+                Type t1 = i.next();
+                Type t2 = i.next();
                 throw new SemanticException("Member \"" + name +
                                             "\" of " + type + " is ambiguous; it is defined in both " +
                                             t1 + " and " + t2 + ".");
@@ -186,7 +186,7 @@ public class ClassContextResolver extends AbstractAccessControlResolver {
             }
         }
         
-        Named t = (Named) acceptable.iterator().next();
+        Named t = acceptable.iterator().next();
         
         if (Report.should_report(TOPICS, 2))
             Report.report(2, "Found member class " + t);
@@ -208,7 +208,7 @@ public class ClassContextResolver extends AbstractAccessControlResolver {
 	return type;
     }
 
-    private static final Collection TOPICS = 
+    private static final Collection<String> TOPICS = 
             CollectionUtil.list(Report.types, Report.resolver);
 
 }

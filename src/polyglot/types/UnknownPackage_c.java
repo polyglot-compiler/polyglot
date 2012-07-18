@@ -25,10 +25,8 @@
 
 package polyglot.types;
 
-import polyglot.types.*;
-import polyglot.util.*;
-import polyglot.types.Package;
-import java.io.*;
+import polyglot.util.CodeWriter;
+import polyglot.util.InternalCompilerError;
 
 /**
  * An unknown type.  This is used as a place-holder until types are
@@ -44,17 +42,21 @@ public class UnknownPackage_c extends Package_c implements UnknownPackage
         super(ts);
     }
 
+    @Override
     public boolean isCanonical() {
         return false;
     }
 
+    @Override
     public String translate(Resolver c) {
 	throw new InternalCompilerError("Cannot translate an unknown package.");
     }
 
+    @Override
     public String toString() {
 	return "<unknown>";
     }
+    @Override
     public void print(CodeWriter w) {
 	w.write(toString());
     }

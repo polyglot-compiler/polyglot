@@ -26,8 +26,8 @@
 
 package polyglot.types.reflect;
 
-import java.util.*;
-import java.io.*;
+import java.io.DataInputStream;
+import java.io.IOException;
 
 /**
  * Exceptions describes the types of exceptions that a method may throw.

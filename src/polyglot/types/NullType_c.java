@@ -25,8 +25,7 @@
 
 package polyglot.types;
 
-import polyglot.types.*;
-import polyglot.util.*;
+import polyglot.util.InternalCompilerError;
 
 /**
  * A <code>NullType</code> represents the type of the Java keyword
@@ -41,33 +40,42 @@ public class NullType_c extends Type_c implements NullType
 	super(ts);
     }
     
+    @Override
     public String translate(Resolver c) {
 	throw new InternalCompilerError("Cannot translate a null type.");
     }
 
+    @Override
     public String toString() {
 	return "type(null)";
     }
     
+    @Override
     public boolean equalsImpl(TypeObject t) {
         return t instanceof NullType;
     }
 
+    @Override
     public int hashCode() {
 	return 6060842;
     }
 
+    @Override
     public boolean isCanonical() { return true; }
+    @Override
     public boolean isNull() { return true; }
 
+    @Override
     public NullType toNull() { return this; }
 
+    @Override
     public boolean descendsFromImpl(Type ancestor) {
         if (ancestor.isNull()) return false;
         if (ancestor.isReference()) return true;
         return false;
     }
 
+    @Override
     public boolean isImplicitCastValidImpl(Type toType) {
         return toType.isNull() || toType.isReference();
     }
@@ -78,6 +86,7 @@ public class NullType_c extends Type_c implements NullType
      * Returns true iff a cast from this to toType is valid; in other
      * words, some non-null members of this are also members of toType.
      **/
+    @Override
     public boolean isCastValidImpl(Type toType) {
         return toType.isNull() || toType.isReference();
     }

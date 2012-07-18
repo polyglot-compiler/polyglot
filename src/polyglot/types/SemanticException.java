@@ -25,9 +25,8 @@
 
 package polyglot.types;
 
-import polyglot.util.Position;
 import polyglot.main.Report;
-import java.util.*;
+import polyglot.util.Position;
 
 /**
  * Thrown during any number of phases of the compiler during which a semantic
@@ -74,6 +73,7 @@ public class SemanticException extends Exception {
     private static boolean init = false;
     public static boolean fillInStackTrace = true;
     
+    @Override
     public synchronized Throwable fillInStackTrace() {
         if (! fillInStackTrace) {
             // fast path: init==true, fillInStackTrace==false

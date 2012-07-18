@@ -26,7 +26,6 @@
 package polyglot.types;
 
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -50,7 +49,8 @@ public class MethodInstance_c extends ProcedureInstance_c
     public MethodInstance_c(TypeSystem ts, Position pos,
 	 		    ReferenceType container,
 	                    Flags flags, Type returnType, String name,
-			    List formalTypes, List excTypes) {
+			    List<? extends Type> formalTypes,
+			    List<? extends Type> excTypes) {
         super(ts, pos, container, flags, formalTypes, excTypes);
 	this.returnType = returnType;
 	this.name = name;
@@ -117,7 +117,7 @@ public class MethodInstance_c extends ProcedureInstance_c
     }
 
     @Override
-    public MethodInstance formalTypes(List l) {
+    public MethodInstance formalTypes(List<? extends Type> l) {
         if (!CollectionUtil.equals(this.formalTypes, l)) {
             MethodInstance_c n = (MethodInstance_c) copy();
             n.setFormalTypes(l);
@@ -127,7 +127,7 @@ public class MethodInstance_c extends ProcedureInstance_c
     }
 
     @Override
-    public MethodInstance throwTypes(List l) {
+    public MethodInstance throwTypes(List<? extends Type> l) {
         if (!CollectionUtil.equals(this.throwTypes, l)) {
             MethodInstance_c n = (MethodInstance_c) copy();
             n.setThrowTypes(l);
@@ -225,12 +225,12 @@ public class MethodInstance_c extends ProcedureInstance_c
     }
 
     @Override
-    public final boolean methodCallValid(String name, List argTypes) {
+    public final boolean methodCallValid(String name, List<? extends Type> argTypes) {
         return ts.methodCallValid(this, name, argTypes);
     }
 
     @Override
-    public boolean methodCallValidImpl(String name, List argTypes) {
+    public boolean methodCallValidImpl(String name, List<? extends Type> argTypes) {
         return name().equals(name) && ts.callValid(this, argTypes);
     }
 
@@ -241,7 +241,7 @@ public class MethodInstance_c extends ProcedureInstance_c
 
     @Override
     public List<MethodInstance> overridesImpl() {
-        List l = new LinkedList();
+        List<MethodInstance> l = new LinkedList<MethodInstance>();
         ReferenceType rt = container();
 
         while (rt != null) {
@@ -274,7 +274,7 @@ public class MethodInstance_c extends ProcedureInstance_c
      * Leave this method in for historic reasons, to make sure that extensions
      * modify their code correctly.
      */
-    public final boolean canOverrideImpl(MethodInstance mj) throws SemanticException {
+    public final boolean canOverrideImpl(MethodInstance mj) {
         throw new RuntimeException("canOverrideImpl(MethodInstance mj) should not be called.");
     }
         
@@ -391,12 +391,12 @@ public class MethodInstance_c extends ProcedureInstance_c
     }
 
     @Override
-    public List implementedImpl(ReferenceType rt) {
+    public List<MethodInstance> implementedImpl(ReferenceType rt) {
 	if (rt == null) {
-	    return Collections.EMPTY_LIST;
+	    return Collections.<MethodInstance> emptyList();
 	}
 
-        List l = new LinkedList();
+        List<MethodInstance> l = new LinkedList<MethodInstance>();
         l.addAll(rt.methods(name, formalTypes));
 
 	Type superType = rt.superType();
@@ -404,9 +404,8 @@ public class MethodInstance_c extends ProcedureInstance_c
 	    l.addAll(implementedImpl(superType.toReference())); 
 	}
 	
-	List ints = rt.interfaces();
-	for (Iterator i = ints.iterator(); i.hasNext(); ) {
-            ReferenceType rt2 = (ReferenceType) i.next();
+	List<? extends ReferenceType> ints = rt.interfaces();
+	for (ReferenceType rt2 : ints) {
 	    l.addAll(implementedImpl(rt2));
 	}
 	

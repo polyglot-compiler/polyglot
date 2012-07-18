@@ -26,17 +26,20 @@
 
 package polyglot.types.reflect;
 
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.DataInputStream;
+import java.io.EOFException;
+import java.io.IOException;
 import java.net.URI;
-import java.util.*;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
 
 import javax.tools.FileObject;
-import javax.tools.SimpleJavaFileObject;
 
-import polyglot.frontend.*;
-
-import polyglot.types.*;
-import polyglot.util.*;
+import polyglot.frontend.ExtensionInfo;
+import polyglot.types.SemanticException;
 
 /**
  * ClassFile represents a Java classfile as it is found on disk. The classfile
@@ -63,7 +66,7 @@ public class ClassFile_c implements ClassFile {
 	protected FileObject classFileSource;
 	protected ExtensionInfo extensionInfo;
 
-	protected Map jlcInfoCache = new HashMap();
+	protected Map<String, JLCInfo> jlcInfoCache = new HashMap<String, JLCInfo>();
 
 	protected static Collection<String> verbose;
 	static {
@@ -95,13 +98,14 @@ public class ClassFile_c implements ClassFile {
 		return getClassFileURI().getPath();
 	}
 
-	public URI getClassFileURI() {
+	@Override
+    public URI getClassFileURI() {
 		return classFileSource.toUri();
 	}
 
 	JLCInfo getJLCInfo(String typeSystemKey) {
 		// Check if already set.
-		JLCInfo jlc = (JLCInfo) jlcInfoCache.get(typeSystemKey);
+		JLCInfo jlc = jlcInfoCache.get(typeSystemKey);
 
 		if (jlc != null) {
 			return jlc;
@@ -171,7 +175,8 @@ public class ClassFile_c implements ClassFile {
 	 * @see
 	 * polyglot.types.reflect.ClassFileI#sourceLastModified(java.lang.String)
 	 */
-	public long sourceLastModified(String ts) {
+	@Override
+    public long sourceLastModified(String ts) {
 		JLCInfo jlc = getJLCInfo(ts);
 		return jlc.sourceLastModified;
 	}
@@ -181,7 +186,8 @@ public class ClassFile_c implements ClassFile {
 	 * 
 	 * @see polyglot.types.reflect.ClassFileI#compilerVersion(java.lang.String)
 	 */
-	public String compilerVersion(String ts) {
+	@Override
+    public String compilerVersion(String ts) {
 		JLCInfo jlc = getJLCInfo(ts);
 		return jlc.compilerVersion;
 	}
@@ -191,7 +197,8 @@ public class ClassFile_c implements ClassFile {
 	 * 
 	 * @see polyglot.types.reflect.ClassFileI#encodedClassType(java.lang.String)
 	 */
-	public String encodedClassType(String typeSystemKey) {
+	@Override
+    public String encodedClassType(String typeSystemKey) {
 		JLCInfo jlc = getJLCInfo(typeSystemKey);
 		return jlc.encodedClassType;
 	}
@@ -215,7 +222,8 @@ public class ClassFile_c implements ClassFile {
 	 * 
 	 * @see polyglot.types.reflect.ClassFileI#classNameCP(int)
 	 */
-	public String classNameCP(int index) {
+	@Override
+    public String classNameCP(int index) {
 		Constant c = constants[index];
 
 		if (c != null && c.tag() == Constant.CLASS) {
@@ -237,7 +245,8 @@ public class ClassFile_c implements ClassFile {
 	 * 
 	 * @see polyglot.types.reflect.ClassFileI#name()
 	 */
-	public String name() {
+	@Override
+    public String name() {
 		Constant c = constants[thisClass];
 		if (c.tag() == Constant.CLASS) {
 			Integer nameIndex = (Integer) c.value();
@@ -318,7 +327,10 @@ public class ClassFile_c implements ClassFile {
 			throw new ClassFormatError("Bad magic number.");
 		}
 
+		@SuppressWarnings("unused")
 		int major = in.readUnsignedShort();
+		
+		@SuppressWarnings("unused")
 		int minor = in.readUnsignedShort();
 	}
 
@@ -377,8 +389,6 @@ public class ClassFile_c implements ClassFile {
 	 *                If an error occurs while reading.
 	 */
 	void readClassInfo(DataInputStream in) throws IOException {
-		int index;
-
 		thisClass = in.readUnsignedShort();
 		superClass = in.readUnsignedShort();
 
@@ -433,7 +443,8 @@ public class ClassFile_c implements ClassFile {
 	 * @see
 	 * polyglot.types.reflect.ClassFileI#readAttributes(java.io.DataInputStream)
 	 */
-	public void readAttributes(DataInputStream in) throws IOException {
+	@Override
+    public void readAttributes(DataInputStream in) throws IOException {
 		int numAttributes = in.readUnsignedShort();
 
 		attrs = new Attribute[numAttributes];
@@ -460,7 +471,8 @@ public class ClassFile_c implements ClassFile {
 	 * @see
 	 * polyglot.types.reflect.ClassFileI#createMethod(java.io.DataInputStream)
 	 */
-	public Method createMethod(DataInputStream in) throws IOException {
+	@Override
+    public Method createMethod(DataInputStream in) throws IOException {
 		Method m = new Method(in, this);
 		m.initialize();
 		return m;
@@ -472,7 +484,8 @@ public class ClassFile_c implements ClassFile {
 	 * @see
 	 * polyglot.types.reflect.ClassFileI#createField(java.io.DataInputStream)
 	 */
-	public Field createField(DataInputStream in) throws IOException {
+	@Override
+    public Field createField(DataInputStream in) throws IOException {
 		Field f = new Field(in, this);
 		f.initialize();
 		return f;
@@ -485,7 +498,8 @@ public class ClassFile_c implements ClassFile {
 	 * polyglot.types.reflect.ClassFileI#createAttribute(java.io.DataInputStream
 	 * , java.lang.String, int, int)
 	 */
-	public Attribute createAttribute(DataInputStream in, String name,
+	@Override
+    public Attribute createAttribute(DataInputStream in, String name,
 			int nameIndex, int length) throws IOException {
 		if (name.equals("InnerClasses")) {
 			innerClasses = new InnerClasses(in, nameIndex, length);
@@ -499,7 +513,8 @@ public class ClassFile_c implements ClassFile {
 	 * 
 	 * @see polyglot.types.reflect.ClassFileI#getAttrs()
 	 */
-	public Attribute[] getAttrs() {
+	@Override
+    public Attribute[] getAttrs() {
 		return attrs;
 	}
 
@@ -508,7 +523,8 @@ public class ClassFile_c implements ClassFile {
 	 * 
 	 * @see polyglot.types.reflect.ClassFileI#getConstants()
 	 */
-	public Constant[] getConstants() {
+	@Override
+    public Constant[] getConstants() {
 		return constants;
 	}
 
@@ -517,7 +533,8 @@ public class ClassFile_c implements ClassFile {
 	 * 
 	 * @see polyglot.types.reflect.ClassFileI#getFields()
 	 */
-	public Field[] getFields() {
+	@Override
+    public Field[] getFields() {
 		return fields;
 	}
 
@@ -526,7 +543,8 @@ public class ClassFile_c implements ClassFile {
 	 * 
 	 * @see polyglot.types.reflect.ClassFileI#getInnerClasses()
 	 */
-	public InnerClasses getInnerClasses() {
+	@Override
+    public InnerClasses getInnerClasses() {
 		return innerClasses;
 	}
 
@@ -535,7 +553,8 @@ public class ClassFile_c implements ClassFile {
 	 * 
 	 * @see polyglot.types.reflect.ClassFileI#getInterfaces()
 	 */
-	public int[] getInterfaces() {
+	@Override
+    public int[] getInterfaces() {
 		return interfaces;
 	}
 
@@ -544,7 +563,8 @@ public class ClassFile_c implements ClassFile {
 	 * 
 	 * @see polyglot.types.reflect.ClassFileI#getMethods()
 	 */
-	public Method[] getMethods() {
+	@Override
+    public Method[] getMethods() {
 		return methods;
 	}
 
@@ -553,7 +573,8 @@ public class ClassFile_c implements ClassFile {
 	 * 
 	 * @see polyglot.types.reflect.ClassFileI#getModifiers()
 	 */
-	public int getModifiers() {
+	@Override
+    public int getModifiers() {
 		return modifiers;
 	}
 
@@ -562,7 +583,8 @@ public class ClassFile_c implements ClassFile {
 	 * 
 	 * @see polyglot.types.reflect.ClassFileI#getSuperClass()
 	 */
-	public int getSuperClass() {
+	@Override
+    public int getSuperClass() {
 		return superClass;
 	}
 
@@ -571,11 +593,13 @@ public class ClassFile_c implements ClassFile {
 	 * 
 	 * @see polyglot.types.reflect.ClassFileI#getThisClass()
 	 */
-	public int getThisClass() {
+	@Override
+    public int getThisClass() {
 		return thisClass;
 	}
 
-	public String toString() {
+	@Override
+    public String toString() {
 		return name();
 	}
 }

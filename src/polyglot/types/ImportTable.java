@@ -25,10 +25,18 @@
 
 package polyglot.types;
 
-import polyglot.util.*;
-import polyglot.main.Report;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.StringTokenizer;
 
-import java.util.*;
+import polyglot.main.Report;
+import polyglot.util.CollectionUtil;
+import polyglot.util.InternalCompilerError;
+import polyglot.util.Position;
+import polyglot.util.StringUtil;
 
 
 /**
@@ -42,17 +50,17 @@ public class ImportTable implements Resolver
 {
     protected TypeSystem ts;
     /** A list of all package imports. */
-    protected List packageImports;
+    protected List<String> packageImports;
     /** Map from names to classes found, or to the NOT_FOUND object. */
-    protected Map map;
+    protected Map<String, Named> map;
     /** List of class imports which will be lazily added to the table at the
      * next lookup. */
-    protected List lazyImports;
+    protected List<String> lazyImports;
     /** Parallel list of positions for lazyImports. */
-    protected List lazyImportPositions;
+    protected List<Position> lazyImportPositions;
     /** List of explicitly imported classes added to the table or pending in
      * the lazyImports list. */
-    protected List classImports;
+    protected List<String> classImports;
     /** Source name to use for debugging and error reporting */
     protected String sourceName;
     /** Position to use for error reporting */
@@ -60,7 +68,48 @@ public class ImportTable implements Resolver
     /** Our package */
     protected Package pkg;
 
-    private static final Object NOT_FOUND = "NOT FOUND";
+    protected static final Named NOT_FOUND = new Named() {
+        @Override
+        public boolean isCanonical() {
+            // TODO Auto-generated method stub
+            return false;
+        }
+
+        @Override
+        public TypeSystem typeSystem() {
+            // TODO Auto-generated method stub
+            return null;
+        }
+
+        @Override
+        public Position position() {
+            // TODO Auto-generated method stub
+            return null;
+        }
+
+        @Override
+        public boolean equalsImpl(TypeObject t) {
+            // TODO Auto-generated method stub
+            return false;
+        }
+
+        @Override
+        public Object copy() {
+            // TODO Auto-generated method stub
+            return null;
+        }
+
+        @Override
+        public String name() {
+            // TODO Auto-generated method stub
+            return null;
+        }
+
+        @Override
+        public String fullName() {
+            // TODO Auto-generated method stub
+            return null;
+        }};
 
     /**
      * Create an import table.
@@ -83,11 +132,11 @@ public class ImportTable implements Resolver
         this.sourcePos = src != null ? new Position(null, src) : null;
         this.pkg = pkg;
 
-        this.map = new HashMap();
-        this.packageImports = new ArrayList();
-        this.lazyImports = new ArrayList();
-        this.lazyImportPositions = new ArrayList();
-        this.classImports = new ArrayList();
+        this.map = new HashMap<String, Named>();
+        this.packageImports = new ArrayList<String>();
+        this.lazyImports = new ArrayList<String>();
+        this.lazyImportPositions = new ArrayList<Position>();
+        this.classImports = new ArrayList<String>();
     }
 
     /**
@@ -142,14 +191,14 @@ public class ImportTable implements Resolver
     /**
      * List the packages we import from.
      */
-    public List packageImports() {
+    public List<String> packageImports() {
         return packageImports;
     }
 
     /**
      * List the classes explicitly imported.
      */
-    public List classImports() {
+    public List<String> classImports() {
         return classImports;
     }
 
@@ -165,10 +214,10 @@ public class ImportTable implements Resolver
      * but not the import table.
      */
     protected Named cachedFind(String name) throws SemanticException {
-        Object res = map.get(name);
+        Named res = map.get(name);
 
         if (res != null) {
-            return (Named) res;
+            return res;
         }
 
         Named t = ts.systemResolver().find(name);
@@ -179,6 +228,7 @@ public class ImportTable implements Resolver
     /**
      * Find a type by name, searching the import table.
      */
+    @Override
     public Named find(String name) throws SemanticException {
         if (Report.should_report(TOPICS, 2))
             Report.report(2, this + ".find(" + name + ")");
@@ -193,13 +243,13 @@ public class ImportTable implements Resolver
 
         // The class name is short.
         // First see if we have a mapping already.
-        Object res = map.get(name);
+        Named res = map.get(name);
 
         if (res != null) {
             if (res == NOT_FOUND) {
                 throw new NoClassException(name, sourcePos);
             }
-            return (Named) res;
+            return res;
         }
 
         try {
@@ -220,15 +270,14 @@ public class ImportTable implements Resolver
                 }
             }
 
-            List imports = new ArrayList(packageImports.size() + 5);
+            List<String> imports = new ArrayList<String>(packageImports.size() + 5);
 
             imports.addAll(ts.defaultPackageImports());
             imports.addAll(packageImports);
 
             // It wasn't a ClassImport.  Maybe it was a PackageImport?
             Named resolved = null;
-            for (Iterator iter = imports.iterator(); iter.hasNext(); ) {
-                String pkgName = (String) iter.next();
+            for (String pkgName : imports) {
                 Named n = findInPkg(name, pkgName);
                 if (n != null) {
                     if (resolved == null) {
@@ -340,7 +389,7 @@ public class ImportTable implements Resolver
         }
 
         for (int i = 0; i < lazyImports.size(); i++) {
-            String longName = (String) lazyImports.get(i);
+            String longName = lazyImports.get(i);
 
             if (Report.should_report(TOPICS, 2))
                 Report.report(2, this + ": import " + longName);
@@ -351,7 +400,7 @@ public class ImportTable implements Resolver
             catch (SemanticException e) {
                 System.err.println("  foo " + e.getClass());
                 if (e.position == null) {
-                    e.position = (Position) lazyImportPositions.get(i);
+                    e.position = lazyImportPositions.get(i);
                 }
                 if (e.position == null) {
                     e.position = sourcePos;
@@ -361,8 +410,8 @@ public class ImportTable implements Resolver
             }
         }
 
-        lazyImports = new ArrayList();
-        lazyImportPositions = new ArrayList();
+        lazyImports = new ArrayList<String>();
+        lazyImportPositions = new ArrayList<Position>();
     }
 
     /**
@@ -466,7 +515,7 @@ public class ImportTable implements Resolver
             Report.report(2, this + ": import " + shortName + " as " + t);
 
         if (map.containsKey(shortName)) {
-            Named s = (Named) map.get(shortName);
+            Named s = map.get(shortName);
 
             if (! ts.equals(s, t)) {
                 throw new SemanticException("Class " + shortName +
@@ -479,6 +528,7 @@ public class ImportTable implements Resolver
         map.put(shortName, t);        
     }        
 
+    @Override
     public String toString() {
         if (sourceName != null) {
             return "(import " + sourceName + ")";
@@ -488,7 +538,7 @@ public class ImportTable implements Resolver
         }
     }
 
-    private static final Collection TOPICS = 
+    private static final Collection<String> TOPICS = 
         CollectionUtil.list(Report.types, Report.resolver, Report.imports);
 
 }

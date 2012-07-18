@@ -290,7 +290,7 @@ public class JL5ClassFileLazyClassInitializer extends
         // Get a method instance for the <init> method.
         JL5MethodInstance mi = (JL5MethodInstance) methodInstance(method, ct);
 
-        List<Type> formals = mi.formalTypes();
+        List<? extends Type> formals = mi.formalTypes();
 
         if (ct.isInnerClass()) {
             // If an inner class, the first argument may be a reference to an

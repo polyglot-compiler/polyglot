@@ -26,7 +26,6 @@
 
 package polyglot.types.reflect;
 
-import java.io.*;
 
 /**
  * A Constant is used to represent an item in the constant pool of a class.
@@ -152,6 +151,7 @@ public class Constant
      * @return
      *        The hash code.
      */
+    @Override
     public int hashCode()
     {
 	switch (tag) {
@@ -181,6 +181,7 @@ public class Constant
      * @return
      *        true if equal, false if not.
      */
+    @Override
     public boolean equals(Object other)
     {
 	if (! (other instanceof Constant)) {

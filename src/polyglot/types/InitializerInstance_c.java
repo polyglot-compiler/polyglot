@@ -25,8 +25,7 @@
 
 package polyglot.types;
 
-import polyglot.types.*;
-import polyglot.util.*;
+import polyglot.util.Position;
 
 /**
  * A <code>InitializerInstance</code> contains the type information for a
@@ -48,10 +47,12 @@ public class InitializerInstance_c extends TypeObject_c
 	this.flags = flags;
     }
 
+    @Override
     public ReferenceType container() {
         return container;
     }
 
+    @Override
     public InitializerInstance container(ClassType container) {
         if (this.container != container) {
             InitializerInstance_c n = (InitializerInstance_c) copy();
@@ -61,14 +62,17 @@ public class InitializerInstance_c extends TypeObject_c
         return this;
     }
     
+    @Override
     public void setContainer(ReferenceType container) {
         this.container = (ClassType) container;
     }
 
+    @Override
     public Flags flags() {
         return flags;
     }
 
+    @Override
     public InitializerInstance flags(Flags flags) {
         if (!flags.equals(this.flags)) {
             InitializerInstance_c n = (InitializerInstance_c) copy();
@@ -88,14 +92,17 @@ public class InitializerInstance_c extends TypeObject_c
     /**
      * @param flags The flags to set.
      */
+    @Override
     public void setFlags(Flags flags) {
         this.flags = flags;
     }
     
+    @Override
     public int hashCode() {
         return container.hashCode() + flags.hashCode();
     }
 
+    @Override
     public boolean equalsImpl(TypeObject o) {
         if (o instanceof InitializerInstance) {
 	    InitializerInstance i = (InitializerInstance) o;
@@ -105,10 +112,12 @@ public class InitializerInstance_c extends TypeObject_c
 	return false;
     }
 
+    @Override
     public String toString() {
         return flags.translate() + "initializer";
     }
 
+    @Override
     public boolean isCanonical() {
 	return true;
     }

@@ -38,8 +38,8 @@ public interface ProcedureInstance extends CodeInstance
      * @return A list of <code>Type</code>.
      * @see polyglot.types.Type
      */
-    List<Type> formalTypes();
-    void setFormalTypes(List<Type> l);
+    List<? extends Type> formalTypes();
+    void setFormalTypes(List<? extends Type> l);
     
     /**
      * List of declared exception types thrown.
@@ -47,7 +47,7 @@ public interface ProcedureInstance extends CodeInstance
      * @see polyglot.types.Type
      */
     List<? extends Type> throwTypes();
-    void setThrowTypes(List<Type> l);
+    void setThrowTypes(List<? extends Type> l);
     
     /**
      * Returns a String representing the signature of the procedure.
@@ -70,7 +70,7 @@ public interface ProcedureInstance extends CodeInstance
     /**
      * Returns true if the procedure has the given arguments.
      */
-    boolean hasFormals(List<Type> arguments);
+    boolean hasFormals(List<? extends Type> arguments);
 
     /**
      * Returns true if the procedure throws a subset of the exceptions
@@ -81,7 +81,7 @@ public interface ProcedureInstance extends CodeInstance
     /**
      * Returns true if the procedure can be called with the given arguments.
      */
-    boolean callValid(List<Type> actualTypes);
+    boolean callValid(List<? extends Type> actualTypes);
 
     /**
      * Return true if <code>this</code> is more specific than <code>pi</code>
@@ -92,7 +92,7 @@ public interface ProcedureInstance extends CodeInstance
     /**
      * Returns true if the procedure has the given arguments.
      */
-    boolean hasFormalsImpl(List<Type> arguments);
+    boolean hasFormalsImpl(List<? extends Type> arguments);
 
     /**
      * Returns true if the procedure throws a subset of the exceptions
@@ -103,5 +103,5 @@ public interface ProcedureInstance extends CodeInstance
     /**
      * Returns true if the procedure can be called with the given arguments.
      */
-    boolean callValidImpl(List<Type> actualTypes);
+    boolean callValidImpl(List<? extends Type> actualTypes);
 }

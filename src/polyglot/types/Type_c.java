@@ -25,10 +25,8 @@
 
 package polyglot.types;
 
-import polyglot.types.*;
-import polyglot.util.*;
-import polyglot.types.Package;
-import java.io.*;
+import polyglot.util.CodeWriter;
+import polyglot.util.Position;
 
 /**
  * Abstract implementation of a <code>Type</code>.  This implements most of
@@ -55,38 +53,62 @@ public abstract class Type_c extends TypeObject_c implements Type
      * @param c A resolver in which to lookup this type to determine if
      * the type is unique in the given resolver.
      */
+    @Override
     public abstract String translate(Resolver c);
 
+    @Override
     public boolean isType() { return true; }
+    @Override
     public boolean isPackage() { return false; }
+    @Override
     public Type toType() { return this; }
+    @Override
     public Package toPackage() { return null; }
 
     /* To be filled in by subtypes. */
+    @Override
     public boolean isCanonical() { return false; }
 
+    @Override
     public boolean isPrimitive() { return false; }
+    @Override
     public boolean isNumeric() { return false; }
+    @Override
     public boolean isIntOrLess() { return false; }
+    @Override
     public boolean isLongOrLess() { return false; }
+    @Override
     public boolean isVoid() { return false; }
+    @Override
     public boolean isBoolean() { return false; }
+    @Override
     public boolean isChar() { return false; }
+    @Override
     public boolean isByte() { return false; }
+    @Override
     public boolean isShort() { return false; }
+    @Override
     public boolean isInt() { return false; }
+    @Override
     public boolean isLong() { return false; }
+    @Override
     public boolean isFloat() { return false; }
+    @Override
     public boolean isDouble() { return false; }
 
+    @Override
     public boolean isReference() { return false; }
+    @Override
     public boolean isNull() { return false; }
+    @Override
     public boolean isClass() { return false; }
+    @Override
     public boolean isArray() { return false; }
 
     /**
      * Return true if a subclass of Throwable.
      */
+    @Override
     public boolean isThrowable() {
 	return false;
     }
@@ -94,31 +116,37 @@ public abstract class Type_c extends TypeObject_c implements Type
     /**
      * Return true if an unchecked exception.
      */
+    @Override
     public boolean isUncheckedException() {
 	return false;
     }
     
     /** Returns a non-null iff isClass() returns true. */
+    @Override
     public ClassType toClass() {
 	return null;
     }
 
     /** Returns a non-null iff isNull() returns true. */
+    @Override
     public NullType toNull() {
 	return null;
     }
 
     /** Returns a non-null iff isReference() returns true. */
+    @Override
     public ReferenceType toReference() {
 	return null;
     }
 
     /** Returns a non-null iff isPrimitive() returns true. */
+    @Override
     public PrimitiveType toPrimitive() {
 	return null;
     }
 
     /** Returns a non-null iff isArray() returns true. */
+    @Override
     public ArrayType toArray() {
 	return null;
     }
@@ -126,6 +154,7 @@ public abstract class Type_c extends TypeObject_c implements Type
     /**
      * Return a <code>dims</code>-array of this type.
      */
+    @Override
     public ArrayType arrayOf(int dims) {
 	return ts.arrayOf(this, dims); 
     }  
@@ -133,14 +162,17 @@ public abstract class Type_c extends TypeObject_c implements Type
     /**
      * Return an array of this type.
      */
+    @Override
     public ArrayType arrayOf() {
 	return ts.arrayOf(this);
     }  
     
+    @Override
     public final boolean typeEquals(Type t) {
         return ts.typeEquals(this, t);
     }
     
+    @Override
     public boolean typeEqualsImpl(Type t) {
         return this == t;
     }
@@ -148,6 +180,7 @@ public abstract class Type_c extends TypeObject_c implements Type
     /**
      * Return true if this type is a subtype of <code>ancestor</code>.
      */
+    @Override
     public final boolean isSubtype(Type t) {
 	return ts.isSubtype(this, t);
     }
@@ -155,6 +188,7 @@ public abstract class Type_c extends TypeObject_c implements Type
     /**
      * Return true if this type is a subtype of <code>ancestor</code>.
      */
+    @Override
     public boolean isSubtypeImpl(Type t) {
 	return ts.typeEquals(this, t) || ts.descendsFrom(this, t);
     }
@@ -162,6 +196,7 @@ public abstract class Type_c extends TypeObject_c implements Type
     /**
      * Return true if this type descends from <code>ancestor</code>.
      */
+    @Override
     public final boolean descendsFrom(Type t) {
         return ts.descendsFrom(this, t);
     }
@@ -169,6 +204,7 @@ public abstract class Type_c extends TypeObject_c implements Type
     /**
      * Return true if this type descends from <code>ancestor</code>.
      */
+    @Override
     public boolean descendsFromImpl(Type t) {
         return false;
     }
@@ -176,6 +212,7 @@ public abstract class Type_c extends TypeObject_c implements Type
     /**
      * Return true if this type can be cast to <code>toType</code>.
      */
+    @Override
     public final boolean isCastValid(Type toType) {
 	return ts.isCastValid(this, toType);
     }
@@ -183,6 +220,7 @@ public abstract class Type_c extends TypeObject_c implements Type
     /**
      * Return true if this type can be cast to <code>toType</code>.
      */
+    @Override
     public boolean isCastValidImpl(Type toType) {
 	return false;
     }
@@ -191,6 +229,7 @@ public abstract class Type_c extends TypeObject_c implements Type
      * Return true if a value of this type can be assigned to a variable of
      * type <code>toType</code>.
      */
+    @Override
     public final boolean isImplicitCastValid(Type toType) {
         return ts.isImplicitCastValid(this, toType);
     }
@@ -199,6 +238,7 @@ public abstract class Type_c extends TypeObject_c implements Type
      * Return true if a value of this type can be assigned to a variable of
      * type <code>toType</code>.
      */
+    @Override
     public boolean isImplicitCastValidImpl(Type toType) {
         return false;
     }
@@ -207,6 +247,7 @@ public abstract class Type_c extends TypeObject_c implements Type
      * Return true if a literal <code>value</code> can be converted to this type.
      * This method should be removed.  It is kept for backward compatibility.
      */
+    @Override
     public final boolean numericConversionValid(long value) {
         return ts.numericConversionValid(this, value);
     }
@@ -215,6 +256,7 @@ public abstract class Type_c extends TypeObject_c implements Type
      * Return true if a literal <code>value</code> can be converted to this type.
      * This method should be removed.  It is kept for backward compatibility.
      */
+    @Override
     public boolean numericConversionValidImpl(long value) {
         return false;
     }
@@ -222,6 +264,7 @@ public abstract class Type_c extends TypeObject_c implements Type
     /**
      * Return true if a literal <code>value</code> can be converted to this type.
      */
+    @Override
     public final boolean numericConversionValid(Object value) {
         return ts.numericConversionValid(this, value);
     }
@@ -229,6 +272,7 @@ public abstract class Type_c extends TypeObject_c implements Type
     /**
      * Return true if a literal <code>value</code> can be converted to this type.
      */
+    @Override
     public boolean numericConversionValidImpl(Object value) {
         return false;
     }
@@ -237,10 +281,12 @@ public abstract class Type_c extends TypeObject_c implements Type
      * Return true if the types can be compared; that is, if they have
      * the same type system.
      */
+    @Override
     public boolean isComparable(Type t) {
 	return t.typeSystem() == ts;
     }
 
+    @Override
     public abstract String toString();
 
     /**
@@ -250,6 +296,7 @@ public abstract class Type_c extends TypeObject_c implements Type
      * <code>Type.toString()</code>, this implementation needs to be overridden
      * if <code>toString</code> does not produce a compilable representation.
      */
+    @Override
     public void print(CodeWriter w) {
 	w.write(toString());
     }

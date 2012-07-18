@@ -363,8 +363,8 @@ public class LubType_c extends ClassType_c implements LubType {
     }
 
     @Override
-    public List<? extends Type> interfaces() {
-        return Collections.<Type> emptyList();
+    public List<? extends ReferenceType> interfaces() {
+        return Collections.<ReferenceType> emptyList();
     }
 
     @Override

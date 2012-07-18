@@ -25,14 +25,10 @@
 
 package polyglot.types;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import polyglot.frontend.*;
-import polyglot.frontend.goals.FieldConstantsChecked;
+import polyglot.frontend.MissingDependencyException;
+import polyglot.frontend.Scheduler;
 import polyglot.frontend.goals.Goal;
-import polyglot.types.*;
-import polyglot.util.*;
+import polyglot.util.Position;
 
 /**
  * A <code>FieldInstance</code> contains type information for a field.
@@ -51,10 +47,12 @@ public class FieldInstance_c extends VarInstance_c implements FieldInstance
         this.container = container;
     }
     
+    @Override
     public FieldInstance orig() {
         return (FieldInstance) declaration();
     }
     
+    @Override
     public FieldInstance flags(Flags flags) {
         if (!flags.equals(this.flags)) {
             FieldInstance n = (FieldInstance) copy();
@@ -64,6 +62,7 @@ public class FieldInstance_c extends VarInstance_c implements FieldInstance
         return this;
     }
 
+    @Override
     public FieldInstance name(String name) {
         if ((name != null && !name.equals(this.name)) ||
             (name == null && this.name != null)) {
@@ -74,6 +73,7 @@ public class FieldInstance_c extends VarInstance_c implements FieldInstance
         return this;
     }
 
+    @Override
     public FieldInstance type(Type type) {
         if (this.type != type) {
             FieldInstance n = (FieldInstance) copy();
@@ -83,6 +83,7 @@ public class FieldInstance_c extends VarInstance_c implements FieldInstance
         return this;
     }
 
+    @Override
     public FieldInstance container(ReferenceType container) {
         if (this.container != container) {
             FieldInstance_c n = (FieldInstance_c) copy();
@@ -92,6 +93,7 @@ public class FieldInstance_c extends VarInstance_c implements FieldInstance
         return this;
     }
     
+    @Override
     public FieldInstance constantValue(Object constantValue) {
         if (!constantValueSet
                 || (constantValue != null && !constantValue.equals(this.constantValue))
@@ -103,6 +105,7 @@ public class FieldInstance_c extends VarInstance_c implements FieldInstance
         return this;
     }
     
+    @Override
     public FieldInstance notConstant() {
         if (! this.constantValueSet || this.isConstant) {
             FieldInstance copy = (FieldInstance) this.copy();
@@ -113,10 +116,12 @@ public class FieldInstance_c extends VarInstance_c implements FieldInstance
     }
 
 
+    @Override
     public ReferenceType container() {
         return container;
     }
     
+    @Override
     public boolean isConstant() {
         if (this != orig()) {
             return orig().isConstant();
@@ -140,10 +145,12 @@ public class FieldInstance_c extends VarInstance_c implements FieldInstance
     /**
      * @param container The container to set.
      */
+    @Override
     public void setContainer(ReferenceType container) {
         this.container = container;
     }
      
+    @Override
     public boolean equalsImpl(TypeObject o) {
         if (o instanceof FieldInstance) {
 	    FieldInstance i = (FieldInstance) o;
@@ -153,6 +160,7 @@ public class FieldInstance_c extends VarInstance_c implements FieldInstance
 	return false;
     }
 
+    @Override
     public String toString() {
         Object v = constantValue;
         if (v instanceof String) {
@@ -170,6 +178,7 @@ public class FieldInstance_c extends VarInstance_c implements FieldInstance
 	    (isConstant ? (" = " + v) : "");
     }
 
+    @Override
     public boolean isCanonical() {
 	return container.isCanonical() && type.isCanonical();
     }

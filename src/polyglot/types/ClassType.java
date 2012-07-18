@@ -119,7 +119,7 @@ public interface ClassType extends Importable, ReferenceType, MemberInstance, De
      * A list of <code>ClassType</code>.
      * @see polyglot.types.ClassType
      */
-    List<ClassType> memberClasses();
+    List<? extends ClassType> memberClasses();
 
     /** Returns the member class with the given name, or null. */
     ClassType memberClassNamed(String name);

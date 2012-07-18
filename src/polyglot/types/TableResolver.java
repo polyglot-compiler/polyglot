@@ -31,13 +31,13 @@ import java.util.*;
 
 /** A class resolver implemented as a map from names to types. */
 public class TableResolver implements TopLevelResolver {
-    protected Map table;
+    protected Map<String, Named> table;
 
     /**
      * Create a resolver.
      */
     public TableResolver() {
-	this.table = new HashMap();
+	this.table = new HashMap<String, Named>();
     }
 
     /**
@@ -59,11 +59,10 @@ public class TableResolver implements TopLevelResolver {
 	table.put(name, type);
     }
 
+    @Override
     public boolean packageExists(String name) {
         /* Check if a package exists in the table. */
-        for (Iterator i = table.entrySet().iterator(); i.hasNext(); ) {
-            Map.Entry e = (Map.Entry) i.next();
-            Named type = (Named) e.getValue();
+        for (Named type : table.values()) {
             if (type instanceof Importable) {
                 Importable im = (Importable) type;
                 if (im.package_() != null &&
@@ -80,11 +79,12 @@ public class TableResolver implements TopLevelResolver {
     /**
      * Find a type by name.
      */
+    @Override
     public Named find(String name) throws SemanticException {
         if (Report.should_report(TOPICS, 3))
 	    Report.report(3, "TableCR.find(" + name + ")");
 
-	Named n = (Named) table.get(name);
+	Named n = table.get(name);
 
 	if (n != null) {
 	    return n;
@@ -93,10 +93,11 @@ public class TableResolver implements TopLevelResolver {
 	throw new NoClassException(name);
     }
 
+    @Override
     public String toString() {
         return "(table " + table + ")";
     }
     
-    private static final Collection TOPICS = 
+    private static final Collection<String> TOPICS = 
                 CollectionUtil.list(Report.types, Report.resolver);
 }

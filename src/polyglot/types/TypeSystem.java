@@ -136,8 +136,8 @@ public interface TypeSystem {
      * @param excTypes The constructor's exception throw types.
      */
     ConstructorInstance constructorInstance(Position pos, ClassType container,
-                                            Flags flags, List<Type> argTypes,
-                                            List<Type> excTypes);
+                                            Flags flags, List<? extends Type> argTypes,
+                                            List<? extends Type> excTypes);
 
     /** Create a method instance.
      * @param pos Position of the method.
@@ -378,7 +378,7 @@ public interface TypeSystem {
      * inaccessible.
      */
     MethodInstance findMethod(ReferenceType container,
-                              String name, List<Type> argTypes,
+                              String name, List<? extends Type> argTypes,
                               ClassType currClass) throws SemanticException;
     /**
      * Deprecated version of the findMethod method.
@@ -386,7 +386,7 @@ public interface TypeSystem {
      */
     @Deprecated
     MethodInstance findMethod(ReferenceType container,
-                              String name, List<Type> argTypes,
+                              String name, List<? extends Type> argTypes,
                               Context c) throws SemanticException;
 
     /**
@@ -397,7 +397,7 @@ public interface TypeSystem {
      * @exception SemanticException if the constructor cannot be found or is
      * inaccessible.
      */
-    ConstructorInstance findConstructor(ClassType container, List<Type> argTypes,
+    ConstructorInstance findConstructor(ClassType container, List<? extends Type> argTypes,
                                         ClassType currClass) throws SemanticException;
 
     /**
@@ -405,7 +405,7 @@ public interface TypeSystem {
      * @deprecated
      */
     @Deprecated
-    ConstructorInstance findConstructor(ClassType container, List<Type> argTypes,
+    ConstructorInstance findConstructor(ClassType container, List<? extends Type> argTypes,
                                         Context c) throws SemanticException;
 
     /**
@@ -486,7 +486,7 @@ public interface TypeSystem {
      * Returns true iff <code>p</code> has exactly the formal arguments
      * <code>formalTypes</code>.
      */
-    boolean hasFormals(ProcedureInstance p, List<Type> formalTypes);
+    boolean hasFormals(ProcedureInstance p, List<? extends Type> formalTypes);
 
     ////
     // Functions which yield particular types.
@@ -766,13 +766,13 @@ public interface TypeSystem {
      * Return true if <code>mi</code> can be called with name <code>name</code>
      * and actual parameters of types <code>actualTypes</code>.
      */
-    boolean methodCallValid(MethodInstance mi, String name, List<Type> argTypes);
+    boolean methodCallValid(MethodInstance mi, String name, List<? extends Type> argTypes);
 
     /**
      * Return true if <code>pi</code> can be called with 
      * actual parameters of types <code>actualTypes</code>.
      */
-    boolean callValid(ProcedureInstance mi, List<Type> argTypes);
+    boolean callValid(ProcedureInstance mi, List<? extends Type> argTypes);
 
     /**
      * Get the list of methods <code>mi</code> (potentially) overrides, in

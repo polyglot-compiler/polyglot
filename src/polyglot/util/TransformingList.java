@@ -32,23 +32,25 @@ import java.util.*;
  * the underlying list's elements.  The transformation is applied on every
  * access to the underlying members.
  */
-public class TransformingList extends java.util.AbstractList {
-    protected final Transformation trans;
-    protected final List underlying;
+public class TransformingList<T,U> extends java.util.AbstractList<U> {
+    protected final Transformation<T,U> trans;
+    protected final List<T> underlying;
     
 
-    public TransformingList(Collection underlying, Transformation trans) {
-	this(new ArrayList(underlying), trans);
+    public TransformingList(Collection<T> underlying, Transformation<T,U> trans) {
+	this(new ArrayList<T>(underlying), trans);
     }
 
-    public TransformingList(List underlying, Transformation trans) {
+    public TransformingList(List<T> underlying, Transformation<T,U> trans) {
       this.underlying = underlying;
       this.trans = trans;
     }
 
+    @Override
     public int size() { return underlying.size(); }
 
-    public Object get(int index) {
+    @Override
+    public U get(int index) {
 	return trans.transform(underlying.get(index));
     }
 

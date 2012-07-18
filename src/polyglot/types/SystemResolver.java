@@ -25,21 +25,28 @@
 
 package polyglot.types;
 
-import polyglot.util.*;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.Map;
+
 import polyglot.frontend.ExtensionInfo;
 import polyglot.main.Report;
-import polyglot.types.Package;
-import java.util.*;
+import polyglot.util.CollectionUtil;
+import polyglot.util.Pair;
+import polyglot.util.StringUtil;
+import polyglot.util.Transformation;
+import polyglot.util.TransformingList;
 
 /**
  * The <code>SystemResolver</code> is the main resolver for
  * fully-qualified names.
  */
 public class SystemResolver extends CachingResolver implements TopLevelResolver {
-    protected Map packageCache;
+    protected Map<String, Boolean> packageCache;
     protected ExtensionInfo extInfo;
     protected SystemResolver previous;
-    protected Collection justAdded;
+    protected Collection<Pair<String, Named>> justAdded;
     
     /**
      * Create a caching resolver.
@@ -48,20 +55,21 @@ public class SystemResolver extends CachingResolver implements TopLevelResolver 
     public SystemResolver(TopLevelResolver inner, ExtensionInfo extInfo) {
         super(inner);
         this.extInfo = extInfo;
-        this.packageCache = new HashMap();
+        this.packageCache = new HashMap<String, Boolean>();
         this.previous = null;
-        this.justAdded = new LinkedList();
+        this.justAdded = new LinkedList<Pair<String, Named>>();
     }
 
     public SystemResolver previous() {
         return previous;
     }
     
-    public Object copy() {
+    @Override
+    public SystemResolver copy() {
         SystemResolver r = (SystemResolver) super.copy();
-        r.packageCache = new HashMap(this.packageCache);
+        r.packageCache = new HashMap<String, Boolean>(this.packageCache);
         r.previous = this;
-        r.justAdded = new LinkedList();
+        r.justAdded = new LinkedList<Pair<String, Named>>();
         return r;
     }
     
@@ -84,10 +92,12 @@ public class SystemResolver extends CachingResolver implements TopLevelResolver 
 
     /** Check if a package exists in the resolver cache. */
     protected boolean packageExistsInCache(String name) {
-        for (Iterator i = cachedObjects().iterator(); i.hasNext(); ) {
-            Object o = i.next();
-            if (o instanceof Importable) {
-                Importable im = (Importable) o;
+        for (CachedResult cr : cachedResults()) {
+            if (!(cr instanceof CachedResult.Success)) continue;
+            
+            Named named = ((CachedResult.Success) cr).named;
+            if (named instanceof Importable) {
+                Importable im = (Importable) named;
                 if (im.package_() != null &&
                     im.package_().fullName() != null &&
                     (im.package_().fullName().equals(name) ||
@@ -103,16 +113,17 @@ public class SystemResolver extends CachingResolver implements TopLevelResolver 
     /**
      * Check if a package exists.
      */
+    @Override
     public boolean packageExists(String name) {
-	Boolean b = (Boolean) packageCache.get(name);
+	Boolean b = packageCache.get(name);
 	if (b != null) {
-	    return b.booleanValue();
+	    return b;
 	}
 	else {
             String prefix = StringUtil.getPackageComponent(name);
 
-            if (packageCache.get(prefix) == Boolean.FALSE) {
-                packageCache.put(name, Boolean.FALSE);
+            if (!packageCache.get(prefix)) {
+                packageCache.put(name, false);
                 return false;
             }
 
@@ -123,15 +134,15 @@ public class SystemResolver extends CachingResolver implements TopLevelResolver 
             }
 
             if (exists) {
-                packageCache.put(name, Boolean.TRUE);
+                packageCache.put(name, true);
 
                 do {
-                    packageCache.put(prefix, Boolean.TRUE);
+                    packageCache.put(prefix, true);
                     prefix = StringUtil.getPackageComponent(prefix);
                 } while (! prefix.equals(""));
             }
             else {
-                packageCache.put(name, Boolean.FALSE);
+                packageCache.put(name, false);
             }
 
             return exists;
@@ -140,7 +151,7 @@ public class SystemResolver extends CachingResolver implements TopLevelResolver 
 
     protected void cachePackage(Package p) {
         if (p != null) {
-            packageCache.put(p.fullName(), Boolean.TRUE);
+            packageCache.put(p.fullName(), true);
             cachePackage(p.prefix());
         }
     }
@@ -153,24 +164,27 @@ public class SystemResolver extends CachingResolver implements TopLevelResolver 
         return (Type) check(name);
     }
 
-    public Collection justAdded() {
-        return new TransformingList(justAdded, new Transformation() {
-            public Object transform(Object o) {
-                Object[] p = (Object[]) o;
-                return p[1];
-            }
-        });
+    public Collection<Named> justAdded() {
+        return new TransformingList<Pair<String, Named>, Named>(justAdded,
+                new Transformation<Pair<String, Named>, Named>() {
+                    @Override
+                    public Named transform(Pair<String, Named> o) {
+                        return o.part2();
+                    }
+                });
     }
 
     public void clearAdded() {
-        justAdded = new LinkedList();
+        justAdded = new LinkedList<Pair<String, Named>>();
     }
 
+    /**
+     * @throws SemanticException  
+     */
     public void putAll(SystemResolver r) throws SemanticException {
-        for (Iterator i = r.justAdded.iterator(); i.hasNext(); ) {
-            Object[] e = (Object[]) i.next();
-            String name = (String) e[0];
-            Named n = (Named) e[1];
+        for (Pair<String, Named> e : r.justAdded) {
+            String name = e.part1();
+            Named n = e.part2();;
 
             install(name, n);
 
@@ -187,6 +201,7 @@ public class SystemResolver extends CachingResolver implements TopLevelResolver 
      * exceptions are for resolving names in deserialized types and in types
      * loaded from raw class files.
      */
+    @Override
     public Named find(String name) throws SemanticException {
         if (previous == null) {
             clearAdded();
@@ -219,6 +234,7 @@ public class SystemResolver extends CachingResolver implements TopLevelResolver 
         return n;
     }
 
+    @Override
     public void install(String name, Named q) {
         if (Report.should_report(TOPICS, 2) && check(name) == null)
             Report.report(2, (previous == null ? "root" : "non-root") + " SR installing " + name + "->" + q);
@@ -235,7 +251,7 @@ public class SystemResolver extends CachingResolver implements TopLevelResolver 
             }
         }
         else {
-            justAdded.add(new Object[] { name, q });
+            justAdded.add(new Pair<String, Named>(name, q));
         }
     }
 
@@ -244,6 +260,7 @@ public class SystemResolver extends CachingResolver implements TopLevelResolver 
      * @param name The name of the qualifier to insert.
      * @param q The qualifier to insert.
      */
+    @Override
     public void addNamed(String name, Named q) throws SemanticException {
         super.addNamed(name, q);
 
@@ -281,7 +298,7 @@ public class SystemResolver extends CachingResolver implements TopLevelResolver 
         }
     }
 
-    private static final Collection TOPICS =
+    private static final Collection<String> TOPICS =
                     CollectionUtil.list(Report.types,
                                         Report.resolver,
                                         "sysresolver");

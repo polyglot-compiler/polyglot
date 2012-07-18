@@ -25,10 +25,8 @@
 
 package polyglot.types;
 
-import polyglot.frontend.Scheduler;
-import polyglot.frontend.goals.FieldConstantsChecked;
-import polyglot.types.*;
-import polyglot.util.*;
+import polyglot.util.InternalCompilerError;
+import polyglot.util.Position;
 
 /**
  * A <code>VarInstance</code> contains type information for a variable.  It may
@@ -57,14 +55,17 @@ public abstract class VarInstance_c extends TypeObject_c implements VarInstance
     
     protected VarInstance decl;
     
+    @Override
     public Declaration declaration() {
         return decl;
     }
     
+    @Override
     public void setDeclaration(Declaration decl) {
         this.decl = (VarInstance) decl;        
     }
     
+    @Override
     public boolean constantValueSet() {
         if (this != declaration()) {
             return ((VarInstance) declaration()).constantValueSet();
@@ -73,6 +74,7 @@ public abstract class VarInstance_c extends TypeObject_c implements VarInstance
         return constantValueSet;
     }
     
+    @Override
     public boolean isConstant() {
         if (this != declaration()) {
             return ((VarInstance) declaration()).isConstant();
@@ -89,6 +91,7 @@ public abstract class VarInstance_c extends TypeObject_c implements VarInstance
         return isConstant;
     }
 
+    @Override
     public Object constantValue() {
         if (this != declaration()) {
             return ((VarInstance) declaration()).constantValue();
@@ -100,22 +103,27 @@ public abstract class VarInstance_c extends TypeObject_c implements VarInstance
         return null;
     }
 
+    @Override
     public Flags flags() {
         return flags;
     }
     
+    @Override
     public Type type() {
         return type;
     }
 
+    @Override
     public String name() {
         return name;
     }
 
+    @Override
     public int hashCode() {
         return flags.hashCode() + name.hashCode();
     }
 
+    @Override
     public boolean equalsImpl(TypeObject o) {
         if (o instanceof VarInstance) {
 	    VarInstance i = (VarInstance) o;
@@ -127,19 +135,23 @@ public abstract class VarInstance_c extends TypeObject_c implements VarInstance
 	return false;
     }
 
+    @Override
     public boolean isCanonical() {
 	return true;
     }
 
+    @Override
     public void setType(Type type) {
         this.type = type;
     }
 
+    @Override
     public void setFlags(Flags flags) {
         this.flags = flags;
     }
     
     /** Destructive update of constant value. */
+    @Override
     public void setConstantValue(Object constantValue) {
         if (! (constantValue == null) &&
                 ! (constantValue instanceof Boolean) &&
@@ -156,6 +168,7 @@ public abstract class VarInstance_c extends TypeObject_c implements VarInstance
         this.constantValueSet = true;
     }
     
+    @Override
     public void setNotConstant() {
         this.constantValue = null;
         this.isConstant = false;
@@ -165,6 +178,7 @@ public abstract class VarInstance_c extends TypeObject_c implements VarInstance
     /**
      * @param name The name to set.
      */
+    @Override
     public void setName(String name) {
         this.name = name;
     }

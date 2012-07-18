@@ -25,9 +25,8 @@
 
 package polyglot.types;
 
-import polyglot.ast.*;
-import polyglot.util.*;
-import polyglot.types.Package;
+import polyglot.util.InternalCompilerError;
+import polyglot.util.StringUtil;
 
 /**
  * A <code>PackageContextResolver</code> is responsible for looking up types
@@ -64,6 +63,7 @@ public class PackageContextResolver extends AbstractAccessControlResolver
     /**
      * Find a type object by name.
      */
+    @Override
     public Named find(String name, ClassType accessor) throws SemanticException {
 	if (! StringUtil.isNameShort(name)) {
 	    throw new InternalCompilerError(
@@ -100,6 +100,7 @@ public class PackageContextResolver extends AbstractAccessControlResolver
         return true;
     }
 
+    @Override
     public String toString() {
         return "(package-context " + p.toString() + ")";
     }

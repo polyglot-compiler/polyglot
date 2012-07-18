@@ -25,9 +25,8 @@
 
 package polyglot.types;
 
-import java.util.*;
+import java.util.List;
 
-import polyglot.frontend.*;
 import polyglot.frontend.Job;
 import polyglot.frontend.Source;
 import polyglot.util.Position;
@@ -65,12 +64,12 @@ public interface ParsedClassType extends ClassType, ParsedTypeObject
     /**
      * Add an interface to the class.
      */
-    void addInterface(Type t);
+    void addInterface(ReferenceType t);
 
     /**
      * Set the class's interfaces.
      */
-    void setInterfaces(List l);
+    void setInterfaces(List<? extends ReferenceType> l);
     
     /**
      * Add a field to the class.
@@ -80,7 +79,7 @@ public interface ParsedClassType extends ClassType, ParsedTypeObject
     /**
      * Set the class's fields.
      */
-    void setFields(List l);
+    void setFields(List<? extends FieldInstance> l);
     
     /**
      * Add a method to the class.
@@ -90,7 +89,7 @@ public interface ParsedClassType extends ClassType, ParsedTypeObject
     /**
      * Set the class's methods.
      */
-    void setMethods(List l);
+    void setMethods(List<? extends MethodInstance> l);
 
     /**
      * Add a constructor to the class.
@@ -100,7 +99,7 @@ public interface ParsedClassType extends ClassType, ParsedTypeObject
     /**
      * Set the class's constructors.
      */
-    void setConstructors(List l);
+    void setConstructors(List<? extends ConstructorInstance> l);
     
     /**
      * Add a member class to the class.
@@ -110,7 +109,7 @@ public interface ParsedClassType extends ClassType, ParsedTypeObject
     /**
      * Set the class's member classes.
      */
-    void setMemberClasses(List l);
+    void setMemberClasses(List<? extends ClassType> l);
 
     /**
      * Set the flags of the class.

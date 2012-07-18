@@ -25,9 +25,6 @@
 
 package polyglot.types;
 
-import polyglot.ast.*;
-import polyglot.util.*;
-import java.util.*;
 
 /**
  * An <code>CompoundResolver</code> resolves names using more than one
@@ -47,6 +44,7 @@ public class CompoundResolver implements TopLevelResolver {
 	this.tail = tail;
     }
 
+    @Override
     public String toString() {
         return "(compound " + head + " " + tail + ")";
     }
@@ -54,6 +52,7 @@ public class CompoundResolver implements TopLevelResolver {
     /**
      * Check if a package exists.
      */
+    @Override
     public boolean packageExists(String name) {
 	return head.packageExists(name) || tail.packageExists(name);
     }
@@ -61,6 +60,7 @@ public class CompoundResolver implements TopLevelResolver {
     /**
      * Find a type object by name.
      */
+    @Override
     public Named find(String name) throws SemanticException {
 	try {
 	    return head.find(name);
