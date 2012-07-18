@@ -17,10 +17,12 @@ public class ToExt_c extends Ext_c implements ToExt {
         return (ToExt)e;
     }
 
+    @Override
     public NodeVisitor toExtEnter(ExtensionRewriter rw) throws SemanticException {
         return rw;
     }
 
+    @Override
     public Node toExt(ExtensionRewriter rw) throws SemanticException {
         throw new InternalCompilerError("Cannot transalate " + node() +":" + node().ext().getClass());
     }    

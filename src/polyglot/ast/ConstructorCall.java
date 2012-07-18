@@ -25,9 +25,10 @@
 
 package polyglot.ast;
 
+import java.util.List;
+
 import polyglot.types.ConstructorInstance;
 import polyglot.util.Enum;
-import java.util.List;
 
 /**
  * A <code>ConstructorCall</code> represents a direct call to a constructor.

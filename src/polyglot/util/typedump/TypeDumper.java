@@ -25,13 +25,16 @@
 
 package polyglot.util.typedump;
 
-import polyglot.util.*;
-import polyglot.types.*;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.Date;
 import java.util.Map;
 import java.util.Set;
+
+import polyglot.types.TypeObject;
+import polyglot.types.TypeSystem;
+import polyglot.util.CodeWriter;
+import polyglot.util.TypeEncoder;
 
 class TypeDumper {
     static Set<Class<?>> dontExpand;

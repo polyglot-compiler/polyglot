@@ -25,10 +25,14 @@
 
 package polyglot.ast;
 
-import polyglot.types.*;
-import polyglot.visit.*;
-import polyglot.util.*;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+
+import polyglot.types.Type;
+import polyglot.types.TypeSystem;
+import polyglot.util.InternalCompilerError;
+import polyglot.util.Position;
+import polyglot.visit.CFGBuilder;
 
 /**
  * A <code>FieldAssign_c</code> represents a Java assignment expression to
@@ -73,7 +77,7 @@ public class FieldAssign_c extends Assign_c implements FieldAssign
   }
   
   @Override
-  protected void acceptCFGAssign(CFGBuilder v) {
+  protected void acceptCFGAssign(CFGBuilder<?> v) {
       Field f = (Field)left();
       if (f.target() instanceof Expr) {
           Expr o = (Expr) f.target();
@@ -89,7 +93,7 @@ public class FieldAssign_c extends Assign_c implements FieldAssign
       
   }
   @Override
-  protected void acceptCFGOpAssign(CFGBuilder v) {
+  protected void acceptCFGOpAssign(CFGBuilder<?> v) {
       /*
       Field f = (Field)left();
       if (f.target() instanceof Expr) {

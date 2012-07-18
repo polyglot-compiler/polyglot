@@ -25,7 +25,7 @@
 
 package polyglot.ast;
 
-import java.util.*;
+import java.util.List;
 
 /**
  * An immutable representation of a Java language <code>for</code>

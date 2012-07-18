@@ -122,7 +122,7 @@ public class SystemResolver extends CachingResolver implements TopLevelResolver 
 	else {
             String prefix = StringUtil.getPackageComponent(name);
            
-            if (!packageCache.containsKey(prefix)) {
+            if (packageCache.containsKey(prefix) && !packageCache.get(prefix)) {
                 packageCache.put(name, false);
                 return false;
             }

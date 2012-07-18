@@ -28,9 +28,15 @@ package polyglot.visit;
 import java.util.ArrayList;
 import java.util.List;
 
-import polyglot.ast.*;
+import polyglot.ast.ConstructorCall;
+import polyglot.ast.Expr;
+import polyglot.ast.New;
+import polyglot.ast.Node;
+import polyglot.ast.NodeFactory;
 import polyglot.frontend.Job;
-import polyglot.types.*;
+import polyglot.types.ClassType;
+import polyglot.types.SemanticException;
+import polyglot.types.TypeSystem;
 
 /**
  * @author nystrom
@@ -44,6 +50,7 @@ public class InnerClassConstructorFixer extends InnerClassAbstractRemover
         super(job, ts, nf);
     }
 
+    @Override
     protected Node leaveCall(Node old, Node n, NodeVisitor v) throws SemanticException {
         if (n instanceof New) {
             New newExp = (New) n;
@@ -52,7 +59,7 @@ public class InnerClassConstructorFixer extends InnerClassAbstractRemover
             // If instantiating an inner class, pass in the environment at
             // the class declaration.  env(ct) will be empty of the class
             // was not inner.
-            List newArgs = new ArrayList(newExp.arguments());
+            List<Expr> newArgs = new ArrayList<Expr>(newExp.arguments());
             newArgs.addAll(envAsActuals(env(ct, true), ct.outer(), newExp.qualifier()));
             newExp = (New) newExp.arguments(newArgs);
             
@@ -61,7 +68,7 @@ public class InnerClassConstructorFixer extends InnerClassAbstractRemover
             // FIXME: need a barrier after this pass.
             // FIXME: should rewrite "new" after the barrier.
             // or should pass in all enclosing classes
-            newExp = (New) newExp.qualifier(null);
+            newExp = newExp.qualifier(null);
             
             n = newExp;
         }
@@ -72,7 +79,7 @@ public class InnerClassConstructorFixer extends InnerClassAbstractRemover
             ClassType ct = context.currentClass();
             
             if (cc.kind() == ConstructorCall.THIS) {
-                List newArgs = new ArrayList();
+                List<Expr> newArgs = new ArrayList<Expr>();
                 newArgs.addAll(cc.arguments());
                 newArgs.addAll(envAsActuals(env(ct, true), ct.outer(), cc.qualifier()));
                 
@@ -82,7 +89,7 @@ public class InnerClassConstructorFixer extends InnerClassAbstractRemover
             }
             else {
                 // adjust the super call arguments
-                List newArgs = new ArrayList();
+                List<Expr> newArgs = new ArrayList<Expr>();
                 newArgs.addAll(cc.arguments());
                 ClassType sup = (ClassType) ct.superType();
                 if (sup.isInnerClass()) {

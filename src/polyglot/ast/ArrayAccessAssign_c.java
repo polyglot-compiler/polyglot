@@ -25,10 +25,14 @@
 
 package polyglot.ast;
 
-import polyglot.types.*;
-import polyglot.visit.*;
-import polyglot.util.*;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+
+import polyglot.types.Type;
+import polyglot.types.TypeSystem;
+import polyglot.util.InternalCompilerError;
+import polyglot.util.Position;
+import polyglot.visit.CFGBuilder;
 
 /**
  * A <code>ArrayAccessAssign_c</code> represents a Java assignment expression
@@ -67,7 +71,7 @@ public class ArrayAccessAssign_c extends Assign_c implements ArrayAccessAssign
   }
   
   @Override
-  protected void acceptCFGAssign(CFGBuilder v) {
+  protected void acceptCFGAssign(CFGBuilder<?> v) {
       ArrayAccess a = (ArrayAccess) left();
       
       //    a[i] = e: visit a -> i -> e -> (a[i] = e)
@@ -76,7 +80,7 @@ public class ArrayAccessAssign_c extends Assign_c implements ArrayAccessAssign
       v.visitCFG(right(), this, EXIT);
   }
   @Override
-  protected void acceptCFGOpAssign(CFGBuilder v) {
+  protected void acceptCFGOpAssign(CFGBuilder<?> v) {
       /*
       ArrayAccess a = (ArrayAccess)left();
       

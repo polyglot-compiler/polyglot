@@ -7,6 +7,7 @@ import polyglot.types.Package;
 import polyglot.types.SemanticException;
 
 public class PackageNodeToExt_c extends ToExt_c {
+    @Override
     public Node toExt(ExtensionRewriter rw) throws SemanticException {
         PackageNode n = (PackageNode) node();
         Package p = n.package_();

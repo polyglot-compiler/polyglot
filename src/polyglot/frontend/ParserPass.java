@@ -30,7 +30,6 @@ import java.io.Reader;
 
 import polyglot.ast.Node;
 import polyglot.frontend.goals.Goal;
-import polyglot.frontend.goals.SourceFileGoal;
 import polyglot.main.Report;
 import polyglot.util.ErrorInfo;
 import polyglot.util.ErrorQueue;
@@ -48,7 +47,8 @@ public class ParserPass extends AbstractPass {
 		this.compiler = compiler;
 	}
 
-	public boolean run() {
+	@Override
+    public boolean run() {
 		ErrorQueue eq = compiler.errorQueue();
 
 		FileSource source = (FileSource) goal.job().source();
@@ -79,7 +79,8 @@ public class ParserPass extends AbstractPass {
 		}
 	}
 
-	public String toString() {
+	@Override
+    public String toString() {
 		return super.toString() + "(" + goal.job().source() + ")";
 	}
 }

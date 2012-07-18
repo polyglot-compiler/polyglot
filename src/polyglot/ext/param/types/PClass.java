@@ -25,21 +25,24 @@
 
 package polyglot.ext.param.types;
 
-import polyglot.types.*;
-import polyglot.util.Position;  
-import java.util.List;  
+import java.util.List;
+
+import polyglot.types.ClassType;
+import polyglot.types.Importable;
+import polyglot.types.SemanticException;
+import polyglot.types.TypeObject;
+import polyglot.util.Position;
 
 /**
  * Parametric class.  This class is a wrapper around
  * a ClassType that associates formal parameters with the class.
  * formals can be any type object.
  */
-public interface PClass extends Importable {
+public interface PClass<Formal extends Param, Actual extends TypeObject> extends Importable {
     /**
      * The formal type parameters associated with <code>this</code>.
-     * XXX What is this a list OF?
      */
-    List formals();
+    List<Formal> formals();
     
     /**
      * The class associated with <code>this</code>.  Note that
@@ -52,5 +55,5 @@ public interface PClass extends Importable {
      * @param pos The position of the instantiation
      * @param actuals The actual type parameters for the instantiation
      */
-    ClassType instantiate(Position pos, List actuals) throws SemanticException;
+    ClassType instantiate(Position pos, List<Actual> actuals) throws SemanticException;
 }

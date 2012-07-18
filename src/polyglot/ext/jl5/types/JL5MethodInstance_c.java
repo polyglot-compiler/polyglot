@@ -81,12 +81,12 @@ public class JL5MethodInstance_c extends MethodInstance_c implements JL5MethodIn
         
         // replace the type variables of mj with the type variables of mi
         if (!mi.typeParams().isEmpty()) {
-            Map<TypeVariable, Type> substm = new LinkedHashMap();
+            Map<TypeVariable, ReferenceType> substm = new LinkedHashMap<TypeVariable, ReferenceType>();
             for (int i = 0; i < mi.typeParams().size(); i++) {
                 substm.put(mj.typeParams().get(i), mi.typeParams().get(i));
             }
-            Subst subst = ts.subst(substm, new HashMap());
-            mj = (JL5MethodInstance)subst.substMethod(mj);
+            Subst<TypeVariable, ReferenceType> subst = ts.subst(substm);
+            mj = subst.substMethod(mj);
         }
 
 

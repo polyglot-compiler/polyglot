@@ -60,7 +60,7 @@ public interface Term extends Node
      * Visit this node, calling calling v.edge() for each successor in succs,
      * if data flows on that edge.
      */
-    public <T> List<T> acceptCFG(CFGBuilder v, List<T> succs);
+    public <T> List<T> acceptCFG(CFGBuilder<?> v, List<T> succs);
     
     /**
      * Returns true if the term is reachable.  This attribute is not

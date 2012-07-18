@@ -6,10 +6,10 @@ import polyglot.translate.ExtensionRewriter;
 import polyglot.types.LocalInstance;
 import polyglot.types.SemanticException;
 import polyglot.types.Type;
-import polyglot.visit.NodeVisitor;
 
 public class LocalDeclToExt_c extends ToExt_c {
    
+    @Override
     public Node toExt(ExtensionRewriter rw) throws SemanticException {
         LocalDecl n = (LocalDecl) node();
         Type type = rw.to_ts().unknownType(n.position());

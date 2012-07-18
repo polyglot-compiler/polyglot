@@ -25,13 +25,48 @@
 
 package polyglot.visit;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 
-import polyglot.ast.*;
+import polyglot.ast.Binary;
+import polyglot.ast.ClassBody;
+import polyglot.ast.ClassDecl;
+import polyglot.ast.ClassMember;
+import polyglot.ast.CodeNode;
+import polyglot.ast.ConstructorCall;
+import polyglot.ast.ConstructorDecl;
+import polyglot.ast.Expr;
+import polyglot.ast.Field;
+import polyglot.ast.FieldAssign;
+import polyglot.ast.FieldDecl;
+import polyglot.ast.Formal;
+import polyglot.ast.Initializer;
+import polyglot.ast.Local;
+import polyglot.ast.LocalAssign;
+import polyglot.ast.LocalDecl;
+import polyglot.ast.New;
+import polyglot.ast.Node;
+import polyglot.ast.NodeFactory;
+import polyglot.ast.Special;
+import polyglot.ast.Term;
+import polyglot.ast.Unary;
 import polyglot.frontend.Job;
-import polyglot.types.*;
+import polyglot.types.ClassType;
+import polyglot.types.ConstructorInstance;
+import polyglot.types.FieldInstance;
+import polyglot.types.LocalInstance;
+import polyglot.types.SemanticException;
+import polyglot.types.TypeSystem;
+import polyglot.types.VarInstance;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
+import polyglot.visit.FlowGraph.EdgeKey;
 
 /**
  * Visitor which checks that all local variables must be defined before use, 
@@ -50,7 +85,7 @@ import polyglot.util.Position;
  * the new construct's initialization behavior.
  * 
  */
-public class InitChecker extends DataFlow
+public class InitChecker extends DataFlow<InitChecker.FlowItem>
 {
     public InitChecker(Job job, TypeSystem ts, NodeFactory nf) {
         super(job, ts, nf, 
@@ -84,33 +119,37 @@ public class InitChecker extends DataFlow
          * to MinMaxInitCounts. This Map is used as the basis for the Maps returned
          * in createInitialItem(). 
          * */
-        public Map currClassFinalFieldInitCounts = new HashMap();
+        public Map<FieldInstance, MinMaxInitCount> currClassFinalFieldInitCounts =
+                new HashMap<FieldInstance, MinMaxInitCount>();
         /**
          * List of all the constructors. These will be checked once all the
          * initializer blocks have been processed.
          */
-        public List allConstructors = new ArrayList();
+        public List<ConstructorDecl> allConstructors =
+                new ArrayList<ConstructorDecl>();
 
         /**
          * Map from ConstructorInstances to ConstructorInstances detailing
          * which constructors call which constructors.
          * This is used in checking the initialization of final fields.
          */
-        public Map constructorCalls = new HashMap();
+        public Map<ConstructorInstance, ConstructorInstance> constructorCalls =
+                new HashMap<ConstructorInstance, ConstructorInstance>();
         
         /**
          * Map from ConstructorInstances to Sets of FieldInstances, detailing
          * which final non-static fields each constructor initializes. 
          * This is used in checking the initialization of final fields.
          */
-        public Map fieldsConstructorInitializes = new HashMap();
+        public Map<ConstructorInstance, Set<FieldInstance>> fieldsConstructorInitializes =
+                new HashMap<ConstructorInstance, Set<FieldInstance>>();
         
         /**
          * Set of LocalInstances from the outer class body that were used
          * during the declaration of this class. We need to track this
          * in order to correctly populate <code>localsUsedInClassBodies</code>
          */
-        public Set outerLocalsUsed = new HashSet();
+        public Set<LocalInstance> outerLocalsUsed = new HashSet<LocalInstance>();
         
         /**
          * Map from <code>ClassBody</code>s to <code>Set</code>s of 
@@ -122,7 +161,8 @@ public class InitChecker extends DataFlow
          * these local variables are definitely assigned before the class
          * declaration of C. 
          */
-        public Map localsUsedInClassBodies = new HashMap();
+        public Map<ClassBody, Set<LocalInstance>> localsUsedInClassBodies =
+                new HashMap<ClassBody, Set<LocalInstance>>();
         
         /**
          * Set of LocalInstances that we have seen declarations for in this 
@@ -131,7 +171,8 @@ public class InitChecker extends DataFlow
          * their own initialization) or are locals declared in an enclosing 
          * class.
          */
-        public Set localDeclarations = new HashSet();
+        public Set<LocalInstance> localDeclarations =
+                new HashSet<LocalInstance>();
     }
 
 
@@ -149,10 +190,12 @@ public class InitChecker extends DataFlow
             count = i;
         }
 
+        @Override
         public int hashCode() {
             return count;
         }
         
+        @Override
         public boolean equals(Object o) {
             if (o instanceof InitCount) {
                 return this.count == ((InitCount)o).count;
@@ -160,6 +203,7 @@ public class InitChecker extends DataFlow
             return false;
         }
         
+        @Override
         public String toString() {
             if (count == 0) {
                 return "0";
@@ -212,12 +256,15 @@ public class InitChecker extends DataFlow
         }
         InitCount getMin() { return min; }
         InitCount getMax() { return max; }
+        @Override
         public int hashCode() {
             return min.hashCode() * 4 + max.hashCode();
         }
+        @Override
         public String toString() {
             return "[ min: " + min + "; max: " + max + " ]";
         }
+        @Override
         public boolean equals(Object o) {
             if (o instanceof MinMaxInitCount) {
                 return this.min.equals(((MinMaxInitCount)o).min) &&
@@ -240,6 +287,8 @@ public class InitChecker extends DataFlow
         }
     }
         
+    protected static abstract class FlowItem extends DataFlow.Item {}
+    
     /**
      * Dataflow items for this dataflow are maps of VarInstances to counts
      * of the min and max number of times those variables/fields have
@@ -249,17 +298,19 @@ public class InitChecker extends DataFlow
      * 
      * This class is immutable.
      */
-    protected static class DataFlowItem extends Item {
-        public Map initStatus; // map of VarInstances to MinMaxInitCount
+    protected static class DataFlowItem extends FlowItem {
+        public Map<VarInstance, MinMaxInitCount> initStatus; // map of VarInstances to MinMaxInitCount
 
-        DataFlowItem(Map m) {
+        DataFlowItem(Map<VarInstance, MinMaxInitCount> m) {
             this.initStatus = Collections.unmodifiableMap(m);
         }
 
+        @Override
         public String toString() {
             return initStatus.toString();
         }
 
+        @Override
         public boolean equals(Object o) {
             if (o instanceof DataFlowItem) {
                 return this.initStatus.equals(((DataFlowItem)o).initStatus);
@@ -267,22 +318,25 @@ public class InitChecker extends DataFlow
             return false;
         }
         
+        @Override
         public int hashCode() {
             return (initStatus.hashCode());
         }
 
     }
     
-    protected static class BottomItem extends Item {
+    protected static class BottomItem extends FlowItem {
+        @Override
         public boolean equals(Object i) {
             return i == this;
         }
+        @Override
         public int hashCode() {
             return -5826349;
         }
     }
 
-    protected static final Item BOTTOM = new BottomItem();
+    protected static final FlowItem BOTTOM = new BottomItem();
 
     /**
      * Initialise the FlowGraph to be used in the dataflow analysis.
@@ -290,9 +344,10 @@ public class InitChecker extends DataFlow
      *         code declaration; otherwise, an apropriately initialized
      *         FlowGraph.
      */
-    protected FlowGraph initGraph(CodeNode code, Term root) {
+    @Override
+    protected FlowGraph<FlowItem> initGraph(CodeNode code, Term root) {
         currCBI.currCodeDecl = code;
-        return new FlowGraph(root, forward);
+        return new FlowGraph<FlowItem>(root, forward);
     }
 
     /**
@@ -300,6 +355,7 @@ public class InitChecker extends DataFlow
      * 
      * Set up the state that must be tracked during a Class Declaration.
      */
+    @Override
     protected NodeVisitor enterCall(Node parent, Node n) throws SemanticException {
         if (n instanceof ClassBody) {
             // we are starting to process a class declaration, but have yet
@@ -334,11 +390,12 @@ public class InitChecker extends DataFlow
      * taking into account the constructor calls.
      * 
      */
+    @Override
     protected Node leaveCall(Node old, Node n, NodeVisitor v) throws SemanticException {
         if (n instanceof ConstructorDecl) {
             // postpone the checking of the constructors until all the 
             // initializer blocks have been processed.
-            currCBI.allConstructors.add(n);
+            currCBI.allConstructors.add((ConstructorDecl) n);
             return n;
         }
         
@@ -348,10 +405,7 @@ public class InitChecker extends DataFlow
             // we can now process the constructors.
             
             try {
-                for (Iterator iter = currCBI.allConstructors.iterator(); 
-                        iter.hasNext(); ) {
-                    ConstructorDecl cd = (ConstructorDecl)iter.next();
-                    
+                for (ConstructorDecl cd : currCBI.allConstructors) {
                     // rely on the fact that our dataflow does not change the
                     // AST, so we can discard the result of this call.
 
@@ -368,7 +422,7 @@ public class InitChecker extends DataFlow
                 
                 // copy the locals used to the outer scope
                 if (currCBI.outer != null) {
-                    currCBI.outer.localsUsedInClassBodies.put(n, 
+                    currCBI.outer.localsUsedInClassBodies.put((ClassBody) n, 
                                                   currCBI.outerLocalsUsed);
                 }
             }
@@ -390,9 +444,7 @@ public class InitChecker extends DataFlow
 
         // set up currClassFinalFieldInitCounts to contain mappings
         // for all the final fields of the class.            
-        Iterator classMembers = n.members().iterator();            
-        while (classMembers.hasNext()) {
-            ClassMember cm = (ClassMember)classMembers.next();
+	for (ClassMember cm : n.members()) {
             if (cm instanceof FieldDecl) {
                 FieldDecl fd = (FieldDecl)cm;
                 if (fd.flags().isFinal()) {
@@ -425,18 +477,14 @@ public class InitChecker extends DataFlow
      */
     protected void checkStaticFinalFieldsInit(ClassBody cb) throws SemanticException {
         // check that all static fields have been initialized exactly once.             
-        for (Iterator iter = currCBI.currClassFinalFieldInitCounts.entrySet().iterator(); 
-                iter.hasNext(); ) {
-            Map.Entry e = (Map.Entry)iter.next();
-            if (e.getKey() instanceof FieldInstance) {
-                FieldInstance fi = (FieldInstance)e.getKey();
-                if (fi.flags().isStatic() && fi.flags().isFinal()) {
-                    MinMaxInitCount initCount = (MinMaxInitCount)e.getValue();
-                    if (InitCount.ZERO.equals(initCount.getMin())) {
-                        throw new SemanticException("Final field \"" + fi.name() +
-                            "\" might not have been initialized",
-                            cb.position());                                
-                    }
+        for (Entry<FieldInstance, MinMaxInitCount> e : currCBI.currClassFinalFieldInitCounts.entrySet()) {
+            FieldInstance fi = e.getKey();
+            if (fi.flags().isStatic() && fi.flags().isFinal()) {
+                MinMaxInitCount initCount = e.getValue();
+                if (InitCount.ZERO.equals(initCount.getMin())) {
+                    throw new SemanticException("Final field \"" + fi.name()
+                            + "\" might not have been initialized",
+                            cb.position());
                 }
             }
         }   
@@ -453,9 +501,7 @@ public class InitChecker extends DataFlow
     protected void checkNonStaticFinalFieldsInit(ClassBody cb) throws SemanticException {
         // for each non-static final field instance, check that all 
         // constructors intialize it exactly once, taking into account constructor calls.
-        for (Iterator iter = currCBI.currClassFinalFieldInitCounts.keySet().iterator(); 
-                iter.hasNext(); ) {
-            FieldInstance fi = (FieldInstance)iter.next();
+        for (FieldInstance fi : currCBI.currClassFinalFieldInitCounts.keySet()) {
             if (fi.flags().isFinal() && !fi.flags().isStatic()) {
                 // the field is final and not static
                 // it must be initialized exactly once.
@@ -463,22 +509,21 @@ public class InitChecker extends DataFlow
                 // that this constructor calls.
                                     
                 boolean fieldInitializedBeforeConstructors = false;
-                MinMaxInitCount ic = (MinMaxInitCount)
-                    currCBI.currClassFinalFieldInitCounts.get(fi.orig());
+                MinMaxInitCount ic = currCBI.currClassFinalFieldInitCounts.get(fi.orig());
                 if (ic != null && !InitCount.ZERO.equals(ic.getMin())) {
                     fieldInitializedBeforeConstructors = true;
                 }
                             
-                for (Iterator iter2 = currCBI.allConstructors.iterator(); 
-                        iter2.hasNext(); ) {
-                    ConstructorDecl cd = (ConstructorDecl)iter2.next();
+                for (ConstructorDecl cd : currCBI.allConstructors) {
                     ConstructorInstance ciStart = cd.constructorInstance();
                     ConstructorInstance ci = ciStart;
                         
                     boolean isInitialized = fieldInitializedBeforeConstructors;
                         
                     while (ci != null) {
-                        Set s = (Set)currCBI.fieldsConstructorInitializes.get(ci.orig());
+                        Set<FieldInstance> s =
+                                currCBI.fieldsConstructorInitializes.get(ci
+                                        .orig());
                         if (s != null && s.contains(fi)) {
                             if (isInitialized) {
                                 throw new SemanticException("Final field \"" + fi.name() +
@@ -487,7 +532,7 @@ public class InitChecker extends DataFlow
                             }
                             isInitialized = true;
                         }                                
-                        ci = (ConstructorInstance)currCBI.constructorCalls.get(ci.orig());
+                        ci = currCBI.constructorCalls.get(ci.orig());
                     }
                     if (!isInitialized) {
                         throw new SemanticException("Final field \"" + fi.name() +
@@ -510,8 +555,8 @@ public class InitChecker extends DataFlow
      */
     protected void dataflow(Expr root) throws SemanticException {
         // Build the control flow graph.
-        FlowGraph g = new FlowGraph(root, forward);
-        CFGBuilder v = createCFGBuilder(ts, g);
+        FlowGraph<FlowItem> g = new FlowGraph<FlowItem>(root, forward);
+        CFGBuilder<FlowItem> v = createCFGBuilder(ts, g);
         v.visitGraph();
         dataflow(g);
         post(g, root);        
@@ -521,7 +566,8 @@ public class InitChecker extends DataFlow
      * The initial item to be given to the entry point of the dataflow contains
      * the init counts for the final fields.
      */
-    public Item createInitialItem(FlowGraph graph, Term node, boolean entry) {
+    @Override
+    public FlowItem createInitialItem(FlowGraph<FlowItem> graph, Term node, boolean entry) {
         if (node == graph.root() && entry) {
             return createInitDFI();
         }
@@ -529,7 +575,8 @@ public class InitChecker extends DataFlow
     }
 
     private DataFlowItem createInitDFI() {
-        return new DataFlowItem(new HashMap(currCBI.currClassFinalFieldInitCounts));
+        return new DataFlowItem(new HashMap<VarInstance, MinMaxInitCount>(
+                currCBI.currClassFinalFieldInitCounts));
     }
     
     /**
@@ -541,15 +588,16 @@ public class InitChecker extends DataFlow
      * for these <code>Term</code>s, otherwise 
      * <code>confluence(List, Term)</code> is called instead. 
      */
-    protected Item confluence(List items, List itemKeys, 
-            Term node, boolean entry, FlowGraph graph) {
+    @Override
+    protected FlowItem confluence(List<FlowItem> items, List<EdgeKey> itemKeys, 
+            Term node, boolean entry, FlowGraph<FlowItem> graph) {
         if (node instanceof Initializer || node instanceof ConstructorDecl) {
-            List filtered = filterItemsNonException(items, itemKeys);
+            List<FlowItem> filtered = filterItemsNonException(items, itemKeys);
             if (filtered.isEmpty()) {
                 return createInitDFI();
             }
             else if (filtered.size() == 1) {
-                return (Item)filtered.get(0);
+                return filtered.get(0);
             }
             else {
                return confluence(filtered, node, entry, graph);
@@ -565,23 +613,22 @@ public class InitChecker extends DataFlow
      * VarInstance, the conflict must be resolved, by using the
      * minimum of all mins and the maximum of all maxs. 
      */
-    public Item confluence(List inItems, Term node, boolean entry, FlowGraph graph) {        
+    @Override
+    public FlowItem confluence(List<FlowItem> inItems, Term node, boolean entry, FlowGraph<FlowItem> graph) {        
         // Resolve any conflicts pairwise.
-        Iterator iter = inItems.iterator();
-        Map m = null;
-        while (iter.hasNext()) {
-            Item itm = (Item)iter.next();
+        Map<VarInstance, MinMaxInitCount> m = null;
+	for (FlowItem itm : inItems) {
             if (itm == BOTTOM) continue;
             if (m == null) {
-                m = new HashMap(((DataFlowItem)itm).initStatus);
+                m = new HashMap<VarInstance, MinMaxInitCount>(((DataFlowItem)itm).initStatus);
             } 
             else { 
-                Map n = ((DataFlowItem)itm).initStatus;
-                for (Iterator iter2 = n.entrySet().iterator(); iter2.hasNext(); ) {
-                    Map.Entry e = (Map.Entry)iter2.next();
-                    VarInstance v = (VarInstance)e.getKey();
-                    MinMaxInitCount initCount1 = (MinMaxInitCount)m.get(v);
-                    MinMaxInitCount initCount2 = (MinMaxInitCount)e.getValue();
+                Map<VarInstance, MinMaxInitCount> n =
+                        ((DataFlowItem) itm).initStatus;
+                for (Entry<VarInstance, MinMaxInitCount> e : n.entrySet()) {
+                    VarInstance v = e.getKey();
+                    MinMaxInitCount initCount1 = m.get(v);
+                    MinMaxInitCount initCount2 = e.getValue();
                     m.put(v, MinMaxInitCount.join(initCount1, initCount2));                                        
                 }
             }
@@ -593,8 +640,9 @@ public class InitChecker extends DataFlow
     }
     
 
-    protected Map flow(List inItems, List inItemKeys, FlowGraph graph, 
-            Term n, boolean entry, Set edgeKeys) {
+    @Override
+    protected Map<EdgeKey, FlowItem> flow(List<FlowItem> inItems, List<EdgeKey> inItemKeys, FlowGraph<FlowItem> graph, 
+            Term n, boolean entry, Set<EdgeKey> edgeKeys) {
         return this.flowToBooleanFlow(inItems, inItemKeys, graph, n, entry, edgeKeys);
     }
 
@@ -612,9 +660,10 @@ public class InitChecker extends DataFlow
      *              are interested in, then increment the min and max counts
      *              for that local var or field.   
      */
-    public Map flow(Item trueItem, Item falseItem, Item otherItem,
-            FlowGraph graph, Term n, boolean entry, Set succEdgeKeys) {
-        Item inItem = safeConfluence(trueItem, FlowGraph.EDGE_KEY_TRUE, 
+    @Override
+    public Map<EdgeKey, FlowItem> flow(FlowItem trueItem, FlowItem falseItem, FlowItem otherItem,
+            FlowGraph<FlowItem> graph, Term n, boolean entry, Set<EdgeKey> succEdgeKeys) {
+        FlowItem inItem = safeConfluence(trueItem, FlowGraph.EDGE_KEY_TRUE, 
                                      falseItem, FlowGraph.EDGE_KEY_FALSE,
                                      otherItem, FlowGraph.EDGE_KEY_OTHER,
                                      n, entry, graph);
@@ -627,7 +676,7 @@ public class InitChecker extends DataFlow
         }                                     
         
         DataFlowItem inDFItem = ((DataFlowItem)inItem);
-        Map ret = null;        
+        Map<EdgeKey, FlowItem> ret = null;        
         if (n instanceof Formal) {            
             // formal argument declaration.
             ret = flowFormal(inDFItem, graph, (Formal)n, succEdgeKeys);
@@ -667,27 +716,29 @@ public class InitChecker extends DataFlow
      * Perform the appropriate flow operations for declaration of a formal 
      * parameter
      */
-    protected Map flowFormal(DataFlowItem inItem, FlowGraph graph, Formal f, Set succEdgeKeys) {
-        Map m = new HashMap(inItem.initStatus);
+    protected Map<EdgeKey, FlowItem> flowFormal(DataFlowItem inItem,
+            FlowGraph<FlowItem> graph, Formal f, Set<EdgeKey> succEdgeKeys) {
+        Map<VarInstance, MinMaxInitCount> m = new HashMap<VarInstance, MinMaxInitCount>(inItem.initStatus);
         // a formal argument is always defined.            
         m.put(f.localInstance().orig(), new MinMaxInitCount(InitCount.ONE,InitCount.ONE));
             
         // record the fact that we have seen the formal declaration
         currCBI.localDeclarations.add(f.localInstance().orig());
 
-        return itemToMap(new DataFlowItem(m), succEdgeKeys);
+        return DataFlow.<FlowItem> itemToMap(new DataFlowItem(m), succEdgeKeys);
     }
     
     /**
      * Perform the appropriate flow operations for declaration of a local 
      * variable
      */
-    protected Map flowLocalDecl(DataFlowItem inItem, 
-                                FlowGraph graph, 
+    protected Map<EdgeKey, FlowItem> flowLocalDecl(DataFlowItem inItem, 
+                                FlowGraph<FlowItem> graph, 
                                 LocalDecl ld, 
-                                Set succEdgeKeys) {
-        Map m = new HashMap(inItem.initStatus);
-        MinMaxInitCount initCount = (MinMaxInitCount)m.get(ld.localInstance().orig());
+                                Set<EdgeKey> succEdgeKeys) {
+        Map<VarInstance, MinMaxInitCount> m =
+                new HashMap<VarInstance, MinMaxInitCount>(inItem.initStatus);
+        MinMaxInitCount initCount = m.get(ld.localInstance().orig());
         //if (initCount == null) {
             if (ld.init() != null) {
                 // declaration of local var with initialization.
@@ -714,20 +765,21 @@ public class InitChecker extends DataFlow
         // record the fact that we have seen a local declaration
         currCBI.localDeclarations.add(ld.localInstance());
         
-        return itemToMap(new DataFlowItem(m), succEdgeKeys);
+        return DataFlow.<FlowItem> itemToMap(new DataFlowItem(m), succEdgeKeys);
     }
     
     /**
      * Perform the appropriate flow operations for assignment to a local 
      * variable
      */
-    protected Map flowLocalAssign(DataFlowItem inItem, 
-                                  FlowGraph graph, 
+    protected Map<EdgeKey, FlowItem> flowLocalAssign(DataFlowItem inItem, 
+                                  FlowGraph<FlowItem> graph, 
                                   LocalAssign a, 
-                                  Set succEdgeKeys) {
+                                  Set<EdgeKey> succEdgeKeys) {
           Local l = (Local) a.left();
-          Map m = new HashMap(inItem.initStatus);
-          MinMaxInitCount initCount = (MinMaxInitCount)m.get(l.localInstance().orig());
+        Map<VarInstance, MinMaxInitCount> m =
+                new HashMap<VarInstance, MinMaxInitCount>(inItem.initStatus);
+          MinMaxInitCount initCount = m.get(l.localInstance().orig());
 
           // initcount could be null if the local is defined in the outer
           // class, or if we have not yet seen its declaration (i.e. the
@@ -740,31 +792,31 @@ public class InitChecker extends DataFlow
                                           initCount.getMax().increment());
 
           m.put(l.localInstance().orig(), initCount);
-          return itemToMap(new DataFlowItem(m), succEdgeKeys);  
+          return DataFlow.<FlowItem> itemToMap(new DataFlowItem(m), succEdgeKeys);  
     }
 
     /**
      * Perform the appropriate flow operations for assignment to a field
      */
-    protected Map flowFieldAssign(DataFlowItem inItem, 
-                                  FlowGraph graph, 
+    protected Map<EdgeKey, FlowItem> flowFieldAssign(DataFlowItem inItem, 
+                                  FlowGraph<FlowItem> graph, 
                                   FieldAssign a, 
-                                  Set succEdgeKeys) {
+                                  Set<EdgeKey> succEdgeKeys) {
         Field f = (Field)a.left();
         FieldInstance fi = f.fieldInstance();
         
         if (fi.flags().isFinal() && isFieldsTargetAppropriate(f)) {
             // this field is final and the target for this field is 
             // appropriate for what we are interested in.
-            Map m = new HashMap(inItem.initStatus);
-            MinMaxInitCount initCount = (MinMaxInitCount)m.get(fi.orig());
+            Map<VarInstance, MinMaxInitCount> m = new HashMap<VarInstance, MinMaxInitCount>(inItem.initStatus);
+            MinMaxInitCount initCount = m.get(fi.orig());
             // initCount may be null if the field is defined in an
             // outer class.
             if (initCount != null) {
                 initCount = new MinMaxInitCount(initCount.getMin().increment(),
                           initCount.getMax().increment());
                 m.put(fi.orig(), initCount);
-                return itemToMap(new DataFlowItem(m), succEdgeKeys);
+                return DataFlow.<FlowItem> itemToMap(new DataFlowItem(m), succEdgeKeys);
             }
         }
         return null;
@@ -773,10 +825,10 @@ public class InitChecker extends DataFlow
     /**
      * Perform the appropriate flow operations for a constructor call
      */
-    protected Map flowConstructorCall(DataFlowItem inItem, 
-                                      FlowGraph graph, 
+    protected Map<EdgeKey, FlowItem> flowConstructorCall(DataFlowItem inItem, 
+                                      FlowGraph<FlowItem> graph, 
                                       ConstructorCall cc, 
-                                      Set succEdgeKeys) {
+                                      Set<EdgeKey> succEdgeKeys) {
         if (ConstructorCall.THIS.equals(cc.kind())) {
             // currCodeDecl must be a ConstructorDecl, as that
             // is the only place constructor calls are allowed
@@ -792,7 +844,7 @@ public class InitChecker extends DataFlow
     /**
      * Allow subclasses to override if necessary.
      */
-    protected Map flowOther(DataFlowItem inItem, FlowGraph graph, Node n, Set succEdgeKeys) {
+    protected Map<EdgeKey, FlowItem> flowOther(DataFlowItem inItem, FlowGraph<FlowItem> graph, Node n, Set<EdgeKey> succEdgeKeys) {
         return null;
     }
     
@@ -803,7 +855,6 @@ public class InitChecker extends DataFlow
      * the field is not static then the target must be "this".
      */
     protected boolean isFieldsTargetAppropriate(Field f) {
-        CodeInstance ci = currCBI.currCodeDecl.codeInstance();
         ClassType containingClass = currCBI.currClass;
 
         if (f.fieldInstance().flags().isStatic()) {
@@ -837,7 +888,10 @@ public class InitChecker extends DataFlow
      * dataflows over Initializers, by copying back the appropriate 
      * MinMaxInitCounts to the map currClassFinalFieldInitCounts.
      */
-    public void check(FlowGraph graph, Term n, boolean entry, Item inItem, Map outItems) throws SemanticException {
+    @Override
+    public void check(FlowGraph<FlowItem> graph, Term n, boolean entry,
+            FlowItem inItem, Map<EdgeKey, FlowItem> outItems)
+            throws SemanticException {
         DataFlowItem dfIn = (DataFlowItem)inItem;        
         if (dfIn == null) {
             // There is no input data flow item. This can happen if we are 
@@ -898,7 +952,7 @@ public class InitChecker extends DataFlow
      * Perform necessary actions upon seeing the Initializer 
      * <code>initializer</code>.
      */
-    protected void finishInitializer(FlowGraph graph, 
+    protected void finishInitializer(FlowGraph<FlowItem> graph, 
                                     Initializer initializer, 
                                     DataFlowItem dfIn, 
                                     DataFlowItem dfOut) {
@@ -906,9 +960,7 @@ public class InitChecker extends DataFlow
         // We need to copy back the init counts of any fields back into
         // currClassFinalFieldInitCounts, so that the counts are 
         // correct for the next initializer or constructor.
-        Iterator iter = dfOut.initStatus.entrySet().iterator();
-        while (iter.hasNext()) {
-            Map.Entry e = (Map.Entry)iter.next();
+	for (Entry<VarInstance, MinMaxInitCount> e : dfOut.initStatus.entrySet()) {
             if (e.getKey() instanceof FieldInstance) {
                 FieldInstance fi = (FieldInstance)e.getKey();
                 if (fi.flags().isFinal()) {
@@ -926,7 +978,7 @@ public class InitChecker extends DataFlow
      * Perform necessary actions upon seeing the ConstructorDecl 
      * <code>cd</code>.
      */
-    protected void finishConstructorDecl(FlowGraph graph, 
+    protected void finishConstructorDecl(FlowGraph<FlowItem> graph, 
                                         ConstructorDecl cd, 
                                         DataFlowItem dfIn, 
                                         DataFlowItem dfOut) {
@@ -945,19 +997,17 @@ public class InitChecker extends DataFlow
         // of the initializations performed by initializers), then
         // the constructor does indeed initialize the field.
 
-        Set s = new HashSet();
+        Set<FieldInstance> s = new HashSet<FieldInstance>();
                 
         // go through every final non-static field in dfOut.initStatus
-        Iterator iter = dfOut.initStatus.entrySet().iterator();
-        while (iter.hasNext()) {
-            Map.Entry e = (Map.Entry)iter.next();
+	for (Entry<VarInstance, MinMaxInitCount> e : dfOut.initStatus.entrySet()) {
             if (e.getKey() instanceof FieldInstance && 
                     ((FieldInstance)e.getKey()).flags().isFinal() && 
                     !((FieldInstance)e.getKey()).flags().isStatic()) {
                 // we have a final non-static field                           
                 FieldInstance fi = (FieldInstance)e.getKey();
-                MinMaxInitCount initCount = (MinMaxInitCount)e.getValue();
-                MinMaxInitCount origInitCount = (MinMaxInitCount)currCBI.currClassFinalFieldInitCounts.get(fi);
+                MinMaxInitCount initCount = e.getValue();
+                MinMaxInitCount origInitCount = currCBI.currClassFinalFieldInitCounts.get(fi);
                 if (initCount.getMin() == InitCount.ONE &&
                      (origInitCount == null || origInitCount.getMin() == InitCount.ZERO)) {
                     // the constructor initialized this field
@@ -973,7 +1023,7 @@ public class InitChecker extends DataFlow
     /**
      * Check that the local variable <code>l</code> is used correctly.
      */
-    protected void checkLocal(FlowGraph graph, 
+    protected void checkLocal(FlowGraph<FlowItem> graph, 
                               Local l, 
                               DataFlowItem dfIn, 
                               DataFlowItem dfOut) 
@@ -990,8 +1040,7 @@ public class InitChecker extends DataFlow
             currCBI.outerLocalsUsed.add(l.localInstance().orig());                
         }
         else { 
-            MinMaxInitCount initCount = (MinMaxInitCount) 
-                      dfIn.initStatus.get(l.localInstance().orig());         
+            MinMaxInitCount initCount = dfIn.initStatus.get(l.localInstance().orig());         
             if (initCount != null && InitCount.ZERO.equals(initCount.getMin())) {
                 // the local variable may not have been initialized. 
                 // However, we only want to complain if the local is reachable
@@ -1008,7 +1057,7 @@ public class InitChecker extends DataFlow
                                           DataFlowItem dfIn, 
                                           Position pos) 
     throws SemanticException {
-        MinMaxInitCount initCount = (MinMaxInitCount)dfIn.initStatus.get(li.orig());         
+        MinMaxInitCount initCount = dfIn.initStatus.get(li.orig());         
         if (initCount != null && InitCount.ZERO.equals(initCount.getMin())) {
             // the local variable may not have been initialized. 
             throw new SemanticException("Local variable \"" + li.name() +
@@ -1020,7 +1069,7 @@ public class InitChecker extends DataFlow
     /**
      * Check that the assignment to a local variable is correct.
      */
-    protected void checkLocalAssign(FlowGraph graph, 
+    protected void checkLocalAssign(FlowGraph<FlowItem> graph, 
                                     LocalAssign a, 
                                     DataFlowItem dfIn, 
                                     DataFlowItem dfOut) 
@@ -1032,8 +1081,7 @@ public class InitChecker extends DataFlow
                     a.position());                     
         }
         
-        MinMaxInitCount initCount = (MinMaxInitCount) 
-                               dfOut.initStatus.get(li.orig());                                
+        MinMaxInitCount initCount = dfOut.initStatus.get(li.orig());                                
 
         if (li.flags().isFinal() && InitCount.MANY.equals(initCount.getMax())) {
             throw new SemanticException("Final variable \"" + li.name() +
@@ -1045,7 +1093,7 @@ public class InitChecker extends DataFlow
     /**
      * Check that the assignment to a field is correct.
      */
-    protected void checkFieldAssign(FlowGraph graph, 
+    protected void checkFieldAssign(FlowGraph<FlowItem> graph, 
                                     FieldAssign a, 
                                     DataFlowItem dfIn, 
                                     DataFlowItem dfOut) 
@@ -1063,8 +1111,7 @@ public class InitChecker extends DataFlow
                 // target of the field is this. 
                 // So a final field in this situation can be 
                 // assigned to at most once.                    
-                MinMaxInitCount initCount = (MinMaxInitCount) 
-                                       dfOut.initStatus.get(fi.orig());
+                MinMaxInitCount initCount = dfOut.initStatus.get(fi.orig());
                 if (initCount == null) {
                     // This should not happen.
                     throw new InternalCompilerError(
@@ -1096,14 +1143,14 @@ public class InitChecker extends DataFlow
      * are initialized before the class declaration.
      * @throws SemanticException
      */
-    protected void checkClassBody(FlowGraph graph, 
+    protected void checkClassBody(FlowGraph<FlowItem> graph, 
                                   ClassBody cb, 
                                   DataFlowItem dfIn, 
                                   DataFlowItem dfOut) 
     throws SemanticException {  
         // we need to check that the locals used inside this class body
         // have all been defined at this point.
-        Set localsUsed = (Set)currCBI.localsUsedInClassBodies.get(cb);
+        Set<LocalInstance> localsUsed = currCBI.localsUsedInClassBodies.get(cb);
     
         if (localsUsed != null) {
             checkLocalsUsedByInnerClass(graph, 
@@ -1120,16 +1167,14 @@ public class InitChecker extends DataFlow
      * class declared by <code>cb</code>
      * are initialized before the class declaration.
      */
-    protected void checkLocalsUsedByInnerClass(FlowGraph graph, 
+    protected void checkLocalsUsedByInnerClass(FlowGraph<FlowItem> graph, 
                                                ClassBody cb,
-                                               Set localsUsed,
+                                               Set<LocalInstance> localsUsed,
                                                DataFlowItem dfIn,
                                                DataFlowItem dfOut) 
     throws SemanticException {
-        for (Iterator iter = localsUsed.iterator(); iter.hasNext(); ) {
-            LocalInstance li = (LocalInstance)iter.next();
-            MinMaxInitCount initCount = (MinMaxInitCount)
-                                            dfOut.initStatus.get(li.orig());                                
+	for (LocalInstance li : localsUsed) {
+            MinMaxInitCount initCount = dfOut.initStatus.get(li.orig());                                
             if (!currCBI.localDeclarations.contains(li.orig())) {
                 // the local wasn't defined in this scope.
                 currCBI.outerLocalsUsed.add(li.orig());
@@ -1152,8 +1197,9 @@ public class InitChecker extends DataFlow
 
     /**
      * Allow subclasses to override the checking of other nodes, if needed.
+     * @throws SemanticException 
      */
-    protected void checkOther(FlowGraph graph, 
+    protected void checkOther(FlowGraph<FlowItem> graph, 
                               Node n, 
                               DataFlowItem dfIn, 
                               DataFlowItem dfOut) 

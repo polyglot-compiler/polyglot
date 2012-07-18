@@ -25,14 +25,20 @@
 
 package polyglot.visit;
 
-import java.util.*;
 import java.util.ArrayList;
-import java.util.Iterator;
+import java.util.List;
 
-import polyglot.ast.*;
+import polyglot.ast.ClassBody;
+import polyglot.ast.ClassDecl;
+import polyglot.ast.ClassMember;
+import polyglot.ast.Expr;
+import polyglot.ast.Node;
+import polyglot.ast.NodeFactory;
+import polyglot.ast.Stmt;
+import polyglot.ast.TypeNode;
 import polyglot.frontend.Job;
-import polyglot.types.*;
-import polyglot.types.SemanticException;
+import polyglot.types.Context;
+import polyglot.types.TypeSystem;
 
 /**
  * A visitor which traverses the AST and remove ambiguities found in fields,
@@ -48,6 +54,7 @@ public class SupertypeDisambiguator extends Disambiguator
         super(job, ts, nf, c);
     }
     
+    @Override
     public Node override(Node parent, Node n) {
         if (n instanceof ClassDecl) {
             ClassDecl cd = (ClassDecl) n;
@@ -60,9 +67,8 @@ public class SupertypeDisambiguator extends Disambiguator
             cd = cd.superClass((TypeNode) cd.visitChild(cd.superClass(), v));
             if (v.hasErrors()) return cd;
             
-            List newInterfaces = new ArrayList();
-            for (Iterator i = cd.interfaces().iterator(); i.hasNext(); ) {
-                TypeNode tn = (TypeNode) i.next();
+            List<TypeNode> newInterfaces = new ArrayList<TypeNode>();
+            for (TypeNode tn : cd.interfaces()) {
                 newInterfaces.add((TypeNode) cd.visitChild(tn, v));
                 if (v.hasErrors()) return cd;
             }

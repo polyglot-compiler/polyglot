@@ -25,7 +25,9 @@
 
 package polyglot.types;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.List;
+import java.util.Set;
 
 import polyglot.frontend.ExtensionInfo;
 import polyglot.frontend.Source;
@@ -713,7 +715,7 @@ public interface TypeSystem {
      * and the usual class resolvers can't otherwise find them) they
      * should be returned in the set in addition to object.
      */
-    Set<?> getTypeEncoderRootSet(TypeObject o);
+    Set<? extends TypeObject> getTypeEncoderRootSet(TypeObject o);
 
     /**
      * Get the transformed class name of a class.
@@ -730,7 +732,7 @@ public interface TypeSystem {
      * @param roots The root objects for the serialization.  Place holders
      * are not created for these.
      */
-    Object placeHolder(TypeObject o, Set<?> roots);
+    Object placeHolder(TypeObject o, Set<? extends TypeObject> roots);
 
     /** Get a place-holder for serializing a type object.
      * @param o The object to get the place-holder for.

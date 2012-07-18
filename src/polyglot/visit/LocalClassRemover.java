@@ -28,11 +28,9 @@ package polyglot.visit;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import polyglot.ast.Assign;
 import polyglot.ast.Block;
 import polyglot.ast.ClassBody;
 import polyglot.ast.ClassDecl;
@@ -40,10 +38,8 @@ import polyglot.ast.ClassMember;
 import polyglot.ast.CodeNode;
 import polyglot.ast.ConstructorCall;
 import polyglot.ast.ConstructorDecl;
-import polyglot.ast.Eval;
 import polyglot.ast.Expr;
 import polyglot.ast.Field;
-import polyglot.ast.FieldDecl;
 import polyglot.ast.Formal;
 import polyglot.ast.Id;
 import polyglot.ast.Local;
@@ -53,26 +49,19 @@ import polyglot.ast.Node;
 import polyglot.ast.NodeFactory;
 import polyglot.ast.ProcedureCall;
 import polyglot.ast.Receiver;
-import polyglot.ast.SourceFile;
 import polyglot.ast.Special;
 import polyglot.ast.Stmt;
-import polyglot.ast.SwitchBlock;
 import polyglot.ast.TypeNode;
 import polyglot.frontend.Job;
 import polyglot.types.ClassType;
-import polyglot.types.CodeInstance;
 import polyglot.types.ConstructorInstance;
 import polyglot.types.Context;
 import polyglot.types.FieldInstance;
 import polyglot.types.Flags;
-import polyglot.types.InitializerInstance;
 import polyglot.types.LocalInstance;
-import polyglot.types.MemberInstance;
-import polyglot.types.MethodInstance;
 import polyglot.types.ParsedClassType;
 import polyglot.types.SemanticException;
 import polyglot.types.Type;
-import polyglot.types.TypeObject;
 import polyglot.types.TypeSystem;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Pair;
@@ -89,15 +78,16 @@ import polyglot.util.UniqueID;
 
 public class LocalClassRemover extends ContextVisitor {
     protected final class ConstructorCallRewriter extends NodeVisitor {
-        private final List newFields;
+        private final List<FieldInstance> newFields;
         private final ClassType theLocalClass;
         ParsedClassType curr;
 
-        protected ConstructorCallRewriter(List fields, ClassType ct) {
+        protected ConstructorCallRewriter(List<FieldInstance> fields, ClassType ct) {
             this.newFields = fields;
             this.theLocalClass = ct;
         }
 
+        @Override
         public NodeVisitor enter(Node n) {
             if (n instanceof ClassDecl) {
                 ConstructorCallRewriter v = (ConstructorCallRewriter) copy();
@@ -107,6 +97,7 @@ public class LocalClassRemover extends ContextVisitor {
             return this;
         }
 
+        @Override
         public Node leave(Node old, Node n, NodeVisitor v) {
             if (n instanceof New) {
                 New neu = (New) n;
@@ -153,10 +144,12 @@ public class LocalClassRemover extends ContextVisitor {
         super(job, ts, nf);
     }
 
-    Map fieldForLocal = new HashMap();
-    Map orphans = new HashMap();
-    Map newFields = new HashMap();
+    Map<Pair<LocalInstance, ClassType>, FieldInstance> fieldForLocal = new HashMap<Pair<LocalInstance, ClassType>, FieldInstance>();
+    Map<ParsedClassType, List<ClassDecl>> orphans =
+            new HashMap<ParsedClassType, List<ClassDecl>>();
+    Map<ParsedClassType, List<FieldInstance>> newFields = new HashMap<ParsedClassType, List<FieldInstance>>();
 
+    @Override
     public Node override(Node parent, Node n) {
         // Find local classes in a block and remove them.
         // Rewrite local classes to instance member classes.
@@ -169,9 +162,9 @@ public class LocalClassRemover extends ContextVisitor {
         
         if (n instanceof Block) {
             final Block b = (Block) n;
-            List ss = new ArrayList(b.statements());
+            List<Stmt> ss = new ArrayList<Stmt>(b.statements());
             for (int i = 0; i < ss.size(); i++) {
-                Stmt s = (Stmt) ss.get(i);
+                Stmt s = ss.get(i);
                 if (s instanceof LocalClassDecl) {
                     s = (Stmt) n.visitChild(s, this);
 
@@ -182,7 +175,7 @@ public class LocalClassRemover extends ContextVisitor {
                     cd.type().flags(flags);
                     cd.type().kind(ClassType.MEMBER);
 
-                    cd = rewriteLocalClass(cd, (List) hashGet(newFields, cd.type(), Collections.EMPTY_LIST));
+                    cd = rewriteLocalClass(cd, hashGet(newFields, cd.type(), Collections.<FieldInstance> emptyList()));
 
                     if (cd != lcd.decl()) {
                         ss.set(i, lcd.decl(cd));
@@ -190,8 +183,8 @@ public class LocalClassRemover extends ContextVisitor {
                         // Rewrite the constructor calls in the remaining statements, including the class declaration statement
                         // itself.
                         for (int j = i; j < ss.size(); j++) {
-                            Stmt sj = (Stmt) ss.get(j);
-                            sj = (Stmt) rewriteConstructorCalls(sj, cd.type(), (List) hashGet(newFields, cd.type(), Collections.EMPTY_LIST));
+                            Stmt sj = ss.get(j);
+                            sj = (Stmt) rewriteConstructorCalls(sj, cd.type(), hashGet(newFields, cd.type(), Collections.<FieldInstance> emptyList()));
                             ss.set(j, sj);
                         }
                         
@@ -219,6 +212,7 @@ public class LocalClassRemover extends ContextVisitor {
     
     boolean inConstructorCall;
     
+    @Override
     protected NodeVisitor enterCall(Node parent, Node n) throws SemanticException {
         LocalClassRemover v = (LocalClassRemover) super.enterCall(parent, n);
         if (n instanceof ConstructorCall) {
@@ -242,10 +236,9 @@ public class LocalClassRemover extends ContextVisitor {
     	return c.isLocal(name);
     }
 
+    @Override
     protected Node leaveCall(Node old, Node n, NodeVisitor v)
             throws SemanticException {
-
-        Context c = this.context();
 
         Position pos = n.position();
 
@@ -273,7 +266,7 @@ public class LocalClassRemover extends ContextVisitor {
 
             // Check if extending a class or an interface.
             TypeNode superClass = neu.objectType();
-            List interfaces = Collections.EMPTY_LIST;
+            List<TypeNode> interfaces = Collections.emptyList();
 
             Type supertype = neu.objectType().type();
             if (supertype instanceof ClassType) {
@@ -307,14 +300,13 @@ public class LocalClassRemover extends ContextVisitor {
             {
                 // Append the constructor to the body.
                 ClassBody b = cd.body();
-                List members = new ArrayList();
+                List<ClassMember> members = new ArrayList<ClassMember>();
                 members.addAll(b.members());
                 members.add(td);
                 b = b.members(members);
                 cd = cd.body(b);
             }
         
-            ConstructorInstance oldCi = neu.constructorInstance();
             neu = neu.constructorInstance(td.constructorInstance());
             neu = neu.anonType(null);
 
@@ -322,21 +314,21 @@ public class LocalClassRemover extends ContextVisitor {
                 neu = neu.qualifier(nf.This(pos).type(context.currentClass()));
             }
 
-            cd = rewriteLocalClass(cd, (List) hashGet(newFields, cd.type(), Collections.EMPTY_LIST));
+            cd = rewriteLocalClass(cd, hashGet(newFields, cd.type(), Collections.<FieldInstance> emptyList()));
             hashAdd(orphans, context.currentClassScope(), cd);
             neu = neu.objectType(nf.CanonicalTypeNode(pos, type)).body(null);
-            neu = (New) rewriteConstructorCalls(neu, cd.type(), (List) hashGet(newFields, cd.type(), Collections.EMPTY_LIST));
+            neu = (New) rewriteConstructorCalls(neu, cd.type(), hashGet(newFields, cd.type(), Collections.<FieldInstance> emptyList()));
             return neu;
         }
 
         // Add any orphaned declarations created below to the class body
         if (n instanceof ClassDecl) {
             ClassDecl cd = (ClassDecl) n;
-            List o = (List) orphans.get(cd.type());
+            List<ClassDecl> o = orphans.get(cd.type());
             if (o == null)
                 return cd;
             ClassBody b = cd.body();
-            List members = new ArrayList();
+            List<ClassMember> members = new ArrayList<ClassMember>();
             members.addAll(b.members());
             members.addAll(o);
             b = b.members(members);
@@ -354,11 +346,11 @@ public class LocalClassRemover extends ContextVisitor {
         return nf.CanonicalTypeNode(pos, ts.Object());
     }
     
-    ClassDecl rewriteLocalClass(ClassDecl cd, List newFields) {
+    ClassDecl rewriteLocalClass(ClassDecl cd, List<FieldInstance> newFields) {
         return InnerClassRemover.addFieldsToClass(cd, newFields, ts, nf, false);
     }
 
-    Node rewriteConstructorCalls(Node s, final ClassType ct, final List fields) {
+    Node rewriteConstructorCalls(Node s, final ClassType ct, final List<FieldInstance> fields) {
         Node r = s.visit(new ConstructorCallRewriter(fields, ct));
         return r;
     }
@@ -366,13 +358,12 @@ public class LocalClassRemover extends ContextVisitor {
     // Create a new constructor for an anonymous class.
     ConstructorDecl addConstructor(ClassDecl cd, New neu) {
         // Build the list of formal parameters and list of arguments for the super call.
-        List formals = new ArrayList();
-        List args = new ArrayList();
-        List argTypes = new ArrayList();
+        List<Formal> formals = new ArrayList<Formal>();
+        List<Expr> args = new ArrayList<Expr>();
+        List<Type> argTypes = new ArrayList<Type>();
         int i = 1;
         
-        for (Iterator j = neu.arguments().iterator(); j.hasNext(); ) {
-            Expr e = (Expr) j.next();
+	for (Expr e : neu.arguments()) {
             Position pos = e.position();
             Id name = nf.Id(pos, "a" + i);
             i++;
@@ -397,14 +388,13 @@ public class LocalClassRemover extends ContextVisitor {
         cc = cc.constructorInstance(neu.constructorInstance());
         cc = cc.qualifier(adjustQualifier(neu.qualifier()));
 
-        List statements = new ArrayList();
+        List<Stmt> statements = new ArrayList<Stmt>();
         statements.add(cc);
         
         // Build the list of throw types, copied from the new expression's constructor (now the superclass constructor).
-        List throwTypeNodes = new ArrayList();
-        List throwTypes = new ArrayList();
-        for (Iterator j = neu.constructorInstance().throwTypes().iterator(); j.hasNext(); ) {
-            Type t = (Type) j.next();
+        List<TypeNode> throwTypeNodes = new ArrayList<TypeNode>();
+        List<Type> throwTypes = new ArrayList<Type>();
+        for (Type t : neu.constructorInstance().throwTypes()) {
             throwTypes.add(t);
             throwTypeNodes.add(nf.CanonicalTypeNode(pos, t));
         }
@@ -428,12 +418,11 @@ public class LocalClassRemover extends ContextVisitor {
     }
 
     // Add local variables to the argument list until it matches the declaration.
-    List addArgs(ProcedureCall n, ConstructorInstance nci, List fields, ClassType curr, ClassType theLocalClass) {
+    List<Expr> addArgs(ProcedureCall n, ConstructorInstance nci, List<FieldInstance> fields, ClassType curr, ClassType theLocalClass) {
         if (nci == null || fields == null || fields.isEmpty() || n.arguments().size() == nci.formalTypes().size())
             return n.arguments();
-        List args = new ArrayList();
-        for (Iterator i = fields.iterator(); i.hasNext(); ) {
-            FieldInstance fi = (FieldInstance) i.next();
+        List<Expr> args = new ArrayList<Expr>();
+	for (FieldInstance fi : fields) {
             if (curr != null && theLocalClass != null && ts.isEnclosed((ClassType) curr.declaration(), (ClassType) theLocalClass.declaration())) {
                 // If in the local class being rewritten, use the boxed local (i.e., field) instead of the local.
                 // This could generate a bad constructor call since the field will refer to 'this' before the superclass
@@ -445,7 +434,7 @@ public class LocalClassRemover extends ContextVisitor {
                 args.add(f);
             }
             else {
-                LocalInstance li = (LocalInstance) localOfField.get(fi);
+                LocalInstance li = localOfField.get(fi);
                 if (li != null) {
                     Local l = nf.Local(li.position(), nf.Id(li.position(), li.name()));
                     l = l.localInstance(li);
@@ -463,7 +452,7 @@ public class LocalClassRemover extends ContextVisitor {
         return args;
     }
 
-    Map localOfField = new HashMap();
+    Map<FieldInstance, LocalInstance> localOfField = new HashMap<FieldInstance, LocalInstance>();
 
     // Create a field instance for a local.
     private FieldInstance boxLocal(LocalInstance li) {
@@ -475,8 +464,8 @@ public class LocalClassRemover extends ContextVisitor {
     	
     	li = (LocalInstance) li.declaration();
     	
-        Pair key = new Pair(li, curr);
-		FieldInstance fi = (FieldInstance) fieldForLocal.get(key);
+        Pair<LocalInstance, ClassType> key = new Pair<LocalInstance, ClassType>(li, curr);
+		FieldInstance fi = fieldForLocal.get(key);
         if (fi != null)
 			return fi;
 
@@ -488,7 +477,7 @@ public class LocalClassRemover extends ContextVisitor {
         ParsedClassType ct = (ParsedClassType) curr.declaration();
         ct.addField(fi);
 
-        List l = (List) hashGet(newFields, ct, new ArrayList());
+        List<FieldInstance> l = hashGet(newFields, ct, new ArrayList<FieldInstance>());
         l.add(fi);
         
         localOfField.put(fi, li);
@@ -536,18 +525,18 @@ public class LocalClassRemover extends ContextVisitor {
         return r;
     }
     
-    public static Object hashGet(Map map, Object k, Object v) {
-        Object x = map.get(k);
+    public static <K, V> V hashGet(Map<K, V> map, K k, V v) {
+        V x = map.get(k);
         if (x != null)
             return x;
         map.put(k, v);
         return v;
     }
     
-    public static void hashAdd(Map map, Object k, Object v) {
-        List l = (List) map.get(k);
+    public static <K, V> void hashAdd(Map<K, List<V>> map, K k, V v) {
+        List<V> l = map.get(k);
         if (l == null) {
-            l = new ArrayList();
+            l = new ArrayList<V>();
             map.put(k, l);
         }
         l.add(v);

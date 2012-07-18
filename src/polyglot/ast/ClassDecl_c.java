@@ -25,15 +25,36 @@
 
 package polyglot.ast;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
 
 import polyglot.frontend.MissingDependencyException;
 import polyglot.frontend.Scheduler;
 import polyglot.frontend.goals.Goal;
 import polyglot.main.Report;
-import polyglot.types.*;
-import polyglot.util.*;
-import polyglot.visit.*;
+import polyglot.types.ClassType;
+import polyglot.types.ConstructorInstance;
+import polyglot.types.Context;
+import polyglot.types.Flags;
+import polyglot.types.MemberInstance;
+import polyglot.types.Named;
+import polyglot.types.ParsedClassType;
+import polyglot.types.ReferenceType;
+import polyglot.types.SemanticException;
+import polyglot.types.Type;
+import polyglot.types.TypeSystem;
+import polyglot.util.CodeWriter;
+import polyglot.util.CollectionUtil;
+import polyglot.util.InternalCompilerError;
+import polyglot.util.ListUtil;
+import polyglot.util.Position;
+import polyglot.visit.AmbiguityRemover;
+import polyglot.visit.CFGBuilder;
+import polyglot.visit.NodeVisitor;
+import polyglot.visit.PrettyPrinter;
+import polyglot.visit.TypeBuilder;
+import polyglot.visit.TypeChecker;
 
 /**
  * A <code>ClassDecl</code> is the definition of a class, abstract class,
@@ -182,7 +203,7 @@ public class ClassDecl_c extends Term_c implements ClassDecl
      * Visit this term in evaluation order.
      */
     @Override
-    public <T> List<T> acceptCFG(CFGBuilder v, List<T> succs) {
+    public <T> List<T> acceptCFG(CFGBuilder<?> v, List<T> succs) {
         v.visitCFG(this.body(), this, EXIT);
         return succs;
     }

@@ -240,7 +240,7 @@ public class ClassBody_c extends Term_c implements ClassBody
      * Visit this term in evaluation order.
      */
     @Override
-    public <T> List<T> acceptCFG(CFGBuilder v, List<T> succs) {
+    public <T> List<T> acceptCFG(CFGBuilder<?> v, List<T> succs) {
         return succs;
     }
     @Override

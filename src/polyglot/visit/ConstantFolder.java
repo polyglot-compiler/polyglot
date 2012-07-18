@@ -25,9 +25,13 @@
 
 package polyglot.visit;
 
-import polyglot.ast.*;
+import polyglot.ast.Binary;
+import polyglot.ast.Expr;
+import polyglot.ast.FloatLit;
+import polyglot.ast.IntLit;
+import polyglot.ast.Node;
+import polyglot.ast.NodeFactory;
 import polyglot.types.TypeSystem;
-import polyglot.frontend.Job;
 import polyglot.util.Position;
 
 /** Visitor which performs constant folding. */
@@ -49,6 +53,7 @@ public class ConstantFolder extends NodeVisitor
       return nf;
     }
 
+    @Override
     public Node leave(Node old, Node n, NodeVisitor v_) {
 	if (! (n instanceof Expr)) {
 	    return n;

@@ -25,19 +25,12 @@
 
 package polyglot.frontend;
 
-import java.io.Reader;
-import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
+import java.io.Reader;
 import java.util.Collections;
-import java.util.List;
 
 import javax.tools.FileObject;
-import javax.tools.JavaCompiler;
-import javax.tools.JavaFileObject;
 import javax.tools.StandardJavaFileManager;
-import javax.tools.ToolProvider;
-import javax.tools.JavaFileManager.Location;
 
 import polyglot.ast.Node;
 import polyglot.ast.NodeFactory;
@@ -69,15 +62,20 @@ public abstract class AbstractExtensionInfo implements ExtensionInfo {
 	protected FileManager extFM;
 	protected ClassFileLoader classFileLoader;
 
-	public abstract Goal getCompileGoal(Job job);
+	@Override
+    public abstract Goal getCompileGoal(Job job);
 
-	public abstract String compilerName();
+	@Override
+    public abstract String compilerName();
 
-	public abstract String defaultFileExtension();
+	@Override
+    public abstract String defaultFileExtension();
 
-	public abstract Version version();
+	@Override
+    public abstract Version version();
 
-	public Options getOptions() {
+	@Override
+    public Options getOptions() {
 		if (this.options == null) {
 			this.options = createOptions();
 		}
@@ -89,18 +87,21 @@ public abstract class AbstractExtensionInfo implements ExtensionInfo {
 	}
 
 	/** Return a Stats object to accumulate and report statistics. */
-	public Stats getStats() {
+	@Override
+    public Stats getStats() {
 		if (this.stats == null) {
 			this.stats = new Stats(this);
 		}
 		return stats;
 	}
 
-	public Compiler compiler() {
+	@Override
+    public Compiler compiler() {
 		return compiler;
 	}
 
-	public void initCompiler(Compiler compiler) {
+	@Override
+    public void initCompiler(Compiler compiler) {
 		this.compiler = compiler;
 
 		// Register the extension with the compiler.
@@ -121,7 +122,8 @@ public abstract class AbstractExtensionInfo implements ExtensionInfo {
 	/** Initialize the type system of this extension. */
 	protected abstract void initTypeSystem();
 
-	public String[] fileExtensions() {
+	@Override
+    public String[] fileExtensions() {
 		String[] sx = getOptions() == null ? null : getOptions().source_ext;
 
 		if (sx == null) {
@@ -135,16 +137,19 @@ public abstract class AbstractExtensionInfo implements ExtensionInfo {
 		return sx;
 	}
 
-	public String[] defaultFileExtensions() {
+	@Override
+    public String[] defaultFileExtensions() {
 		String ext = defaultFileExtension();
 		return new String[] { ext };
 	}
 
-	public SourceLoader sourceLoader() {
+	@Override
+    public SourceLoader sourceLoader() {
 		return extFileManager();
 	}
 
-	public TargetFactory targetFactory() {
+	@Override
+    public TargetFactory targetFactory() {
 		if (target_factory == null) {
 			target_factory = new TargetFactory(extFileManager(),
 					getOptions().source_output, getOptions().output_ext,
@@ -157,7 +162,8 @@ public abstract class AbstractExtensionInfo implements ExtensionInfo {
 	/** Create the scheduler for this extension. */
 	protected abstract Scheduler createScheduler();
 
-	public Scheduler scheduler() {
+	@Override
+    public Scheduler scheduler() {
 		if (scheduler == null) {
 			scheduler = createScheduler();
 		}
@@ -167,7 +173,8 @@ public abstract class AbstractExtensionInfo implements ExtensionInfo {
 	/** Create the type system for this extension. */
 	protected abstract TypeSystem createTypeSystem();
 
-	public TypeSystem typeSystem() {
+	@Override
+    public TypeSystem typeSystem() {
 		if (ts == null) {
 			ts = createTypeSystem();
 		}
@@ -177,41 +184,49 @@ public abstract class AbstractExtensionInfo implements ExtensionInfo {
 	/** Create the node factory for this extension. */
 	protected abstract NodeFactory createNodeFactory();
 
-	public NodeFactory nodeFactory() {
+	@Override
+    public NodeFactory nodeFactory() {
 		if (nf == null) {
 			nf = createNodeFactory();
 		}
 		return nf;
 	}
 
-	public JobExt jobExt() {
+	@Override
+    public JobExt jobExt() {
 		return null;
 	}
 
-	public abstract Parser parser(Reader reader, FileSource source,
+	@Override
+    public abstract Parser parser(Reader reader, FileSource source,
 			ErrorQueue eq);
 
-	public String toString() {
+	@Override
+    public String toString() {
 		return getClass().getName();
 	}
 
-	public ClassFile createClassFile(FileObject f, byte[] code)
+	@Override
+    public ClassFile createClassFile(FileObject f, byte[] code)
 			throws IOException {
 		return new ClassFile_c(f, code, this);
 	}
 
-	public FileSource createFileSource(FileObject f, boolean user)
+	@Override
+    public FileSource createFileSource(FileObject f, boolean user)
 			throws IOException {
 		return new Source_c(f, user);
 	}
 
-	public FileManager extFileManager() {
+	@Override
+    public FileManager extFileManager() {
 		if (extFM == null)
 			extFM = new ExtFileManager(this);
 		return extFM;
 	}
 
-	public ClassFileLoader classFileLoader() {
+	@Override
+    public ClassFileLoader classFileLoader() {
 		if (classFileLoader == null) {
 			classFileLoader = extFileManager();
 			classFileLoader.addLocation(getOptions().bootclasspath);
@@ -220,7 +235,8 @@ public abstract class AbstractExtensionInfo implements ExtensionInfo {
 		return classFileLoader;
 	}
 
-	public void addLocationsToFileManager() {
+	@Override
+    public void addLocationsToFileManager() {
 		StandardJavaFileManager ext_fm = extFileManager();
 		Options options = getOptions();
 		try {
@@ -247,12 +263,14 @@ public abstract class AbstractExtensionInfo implements ExtensionInfo {
 		}
 	}
 
-	public ToExt getToExt(ExtensionInfo to_ext, Node n) {
+	@Override
+    public ToExt getToExt(ExtensionInfo to_ext, Node n) {
 		// just return the first ToExt extension we find.
 		return ToExt_c.ext(n);
 	}
 	
-	public ExtensionInfo outputExtensionInfo() {
+	@Override
+    public ExtensionInfo outputExtensionInfo() {
 		return null;
 	}
 

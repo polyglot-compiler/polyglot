@@ -167,7 +167,7 @@ public class Special_c extends Expr_c implements Special
     }
 
     @Override
-    public <T> List<T> acceptCFG(CFGBuilder v, List<T> succs) {
+    public <T> List<T> acceptCFG(CFGBuilder<?> v, List<T> succs) {
         if (qualifier != null) {
             v.visitCFG(qualifier, this, EXIT);
         }

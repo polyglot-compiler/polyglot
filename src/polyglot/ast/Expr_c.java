@@ -25,9 +25,12 @@
 
 package polyglot.ast;
 
-import polyglot.types.*;
-import polyglot.visit.*;
-import polyglot.util.*;
+import polyglot.types.SemanticException;
+import polyglot.types.Type;
+import polyglot.util.CodeWriter;
+import polyglot.util.Position;
+import polyglot.visit.PrettyPrinter;
+import polyglot.visit.TypeBuilder;
 
 /**
  * An <code>Expr</code> represents any Java expression.  All expressions

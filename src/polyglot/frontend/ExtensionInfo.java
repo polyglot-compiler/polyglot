@@ -25,10 +25,8 @@
 
 package polyglot.frontend;
 
-import java.io.Reader;
-import java.io.OutputStream;
-import java.io.File;
 import java.io.IOException;
+import java.io.Reader;
 
 import javax.tools.FileObject;
 
@@ -42,7 +40,6 @@ import polyglot.types.TypeSystem;
 import polyglot.types.reflect.ClassFile;
 import polyglot.types.reflect.ClassFileLoader;
 import polyglot.util.ErrorQueue;
-import polyglot.util.CodeWriter;
 
 /**
  * <code>ExtensionInfo</code> is the main interface for defining language

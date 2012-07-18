@@ -25,9 +25,15 @@
 
 package polyglot.types;
 
-import polyglot.util.*;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Set;
+
 import polyglot.main.Report;
-import java.util.*;
+import polyglot.util.CollectionUtil;
+import polyglot.util.InternalCompilerError;
+import polyglot.util.StringUtil;
 
 /**
  * A <code>ClassContextResolver</code> looks up type names qualified with a class name.

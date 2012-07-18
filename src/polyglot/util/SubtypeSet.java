@@ -25,9 +25,13 @@
 
 package polyglot.util;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
 
-import polyglot.types.*;
+import polyglot.types.Type;
+import polyglot.types.TypeSystem;
 
 /**
  * Class to implement sets containing <code>polyglot.types.Type </code>.  

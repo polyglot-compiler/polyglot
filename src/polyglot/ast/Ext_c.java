@@ -25,7 +25,9 @@
 
 package polyglot.ast;
 
-import polyglot.util.*;
+import polyglot.util.CodeWriter;
+import polyglot.util.InternalCompilerError;
+import polyglot.util.StringUtil;
 
 /**
  * <code>Ext</code> is the super type of all node extension objects.

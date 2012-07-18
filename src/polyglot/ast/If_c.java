@@ -25,10 +25,19 @@
 
 package polyglot.ast;
 
-import polyglot.types.*;
-import polyglot.visit.*;
-import polyglot.util.*;
-import java.util.*;
+import java.util.List;
+
+import polyglot.types.SemanticException;
+import polyglot.types.Type;
+import polyglot.types.TypeSystem;
+import polyglot.util.CodeWriter;
+import polyglot.util.Position;
+import polyglot.visit.AscriptionVisitor;
+import polyglot.visit.CFGBuilder;
+import polyglot.visit.FlowGraph;
+import polyglot.visit.NodeVisitor;
+import polyglot.visit.PrettyPrinter;
+import polyglot.visit.TypeChecker;
 
 /**
  * An immutable representation of a Java language <code>if</code> statement.
@@ -178,7 +187,7 @@ public class If_c extends Stmt_c implements If
     }
 
     @Override
-    public <T> List<T> acceptCFG(CFGBuilder v, List<T> succs) {
+    public <T> List<T> acceptCFG(CFGBuilder<?> v, List<T> succs) {
         if (alternative == null) {
             v.visitCFG(cond, FlowGraph.EDGE_KEY_TRUE, consequent, ENTRY, 
                              FlowGraph.EDGE_KEY_FALSE, this, EXIT);

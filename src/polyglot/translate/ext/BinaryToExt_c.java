@@ -8,6 +8,7 @@ import polyglot.types.SemanticException;
 
 public class BinaryToExt_c extends ToExt_c {
 
+    @Override
     public Node toExt(ExtensionRewriter rw) throws SemanticException {
         Binary b = (Binary) node();        
         Precedence precedence = b.precedence();

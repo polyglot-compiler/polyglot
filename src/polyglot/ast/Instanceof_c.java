@@ -25,10 +25,18 @@
 
 package polyglot.ast;
 
-import polyglot.types.*;
-import polyglot.visit.*;
-import polyglot.util.*;
-import java.util.*;
+import java.util.List;
+
+import polyglot.types.SemanticException;
+import polyglot.types.Type;
+import polyglot.types.TypeSystem;
+import polyglot.util.CodeWriter;
+import polyglot.util.Position;
+import polyglot.visit.AscriptionVisitor;
+import polyglot.visit.CFGBuilder;
+import polyglot.visit.NodeVisitor;
+import polyglot.visit.PrettyPrinter;
+import polyglot.visit.TypeChecker;
 
 /**
  * An <code>Instanceof</code> is an immutable representation of
@@ -150,7 +158,7 @@ public class Instanceof_c extends Expr_c implements Instanceof
     }
 
     @Override
-    public <T> List<T> acceptCFG(CFGBuilder v, List<T> succs) {
+    public <T> List<T> acceptCFG(CFGBuilder<?> v, List<T> succs) {
         v.visitCFG(expr, compareType, ENTRY);
         v.visitCFG(compareType, this, EXIT);
         return succs;

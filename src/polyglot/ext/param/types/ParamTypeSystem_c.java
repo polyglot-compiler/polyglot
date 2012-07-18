@@ -25,25 +25,33 @@
 
 package polyglot.ext.param.types;
 
-import polyglot.types.TypeSystem_c;
-import polyglot.types.*;
-import polyglot.util.*;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
-import java.util.*;
+import polyglot.types.ClassType;
+import polyglot.types.SemanticException;
+import polyglot.types.Type;
+import polyglot.types.TypeObject;
+import polyglot.types.TypeSystem_c;
+import polyglot.util.InternalCompilerError;
+import polyglot.util.Position;
 
 /**
  * Implementation of type system for parameterized types.
  */
-public abstract class ParamTypeSystem_c extends TypeSystem_c
-    implements ParamTypeSystem
+public abstract class ParamTypeSystem_c<Formal extends Param, Actual extends TypeObject> extends TypeSystem_c
+    implements ParamTypeSystem<Formal, Actual>
 {
     /**
      * Create a new mutable PClass.
      *
      * @param pos The position of the PClass.
      */
-    public MuPClass mutablePClass(Position pos) {
-        return new MuPClass_c(this, pos);
+    @Override
+    public MuPClass<Formal, Actual> mutablePClass(Position pos) {
+        return new MuPClass_c<Formal, Actual>(this, pos);
     }
 
     /**
@@ -55,7 +63,8 @@ public abstract class ParamTypeSystem_c extends TypeSystem_c
      *
      * @throws SemanticException when the actuals do not agree with the formals
      */
-    public ClassType instantiate(Position pos, PClass base, List actuals) 
+    @Override
+    public ClassType instantiate(Position pos, PClass<Formal, Actual> base, List<? extends Actual> actuals) 
         throws SemanticException
     {
         checkInstantiation(pos, base, actuals);
@@ -72,8 +81,8 @@ public abstract class ParamTypeSystem_c extends TypeSystem_c
      *
      * @throws SemanticException when the actuals do not agree with the formals
      */
-    protected void checkInstantiation(Position pos, PClass base,
-        List actuals) throws SemanticException
+    protected void checkInstantiation(Position pos, PClass<Formal, Actual> base,
+        List<? extends Actual> actuals) throws SemanticException
     {
         if (base.formals().size() != actuals.size()) {
             throw new SemanticException("Wrong number of actual parameters " +
@@ -90,16 +99,16 @@ public abstract class ParamTypeSystem_c extends TypeSystem_c
      * @param base The parameterized type
      * @param actuals The list of actuals
      */
-    protected ClassType uncheckedInstantiate(Position pos, PClass base,
-        List actuals)
+    protected ClassType uncheckedInstantiate(Position pos, PClass<Formal, Actual> base,
+        List<? extends Actual> actuals)
     {
-        Map substMap = new HashMap();
-        Iterator i = base.formals().iterator();
-        Iterator j = actuals.iterator();
+        Map<Formal, Actual> substMap = new HashMap<Formal, Actual>();
+        Iterator<Formal> i = base.formals().iterator();
+        Iterator<? extends Actual> j = actuals.iterator();
 
         while (i.hasNext() && j.hasNext()) {
-            Object formal = i.next();
-            Object actual = j.next();
+            Formal formal = i.next();
+            Actual actual = j.next();
             substMap.put(formal, actual);
         }
 
@@ -108,7 +117,7 @@ public abstract class ParamTypeSystem_c extends TypeSystem_c
                 "parameters for instantiation " + "of \"" + base + "\".", pos);
         }
 
-        Type inst = subst(base.clazz(), substMap, new HashMap());
+        Type inst = subst(base.clazz(), substMap);
         if (!inst.isClass()) {
             throw new InternalCompilerError("Instantiating a PClass "
                 + "produced something other than a ClassType.", pos);
@@ -125,22 +134,9 @@ public abstract class ParamTypeSystem_c extends TypeSystem_c
      * @param substMap Map from formal parameters to actuals; the formals are
      * not necessarily formals of <code>t</code>.
      */
-    public Type subst(Type t, Map substMap) {
-        return subst(t, substMap, new HashMap());
-    }
-
-    /**
-     * Apply a parameter substitution to a type.
-     *
-     * @param t The type on which we perform substitutions.
-     * @param substMap Map from formal parameters to actuals; the formals are
-     * not necessarily formals of <code>t</code>.
-     * @param cache Cache of substitutions performed, implemented as a map from
-     * type to substituted type.  This is passed in to ensure pointers to
-     * outer classes are substituted correctly.
-     */
-    public Type subst(Type t, Map substMap, Map cache) {
-        return subst(substMap, cache).substType(t);
+    @Override
+    public Type subst(Type t, Map<Formal, Actual> substMap) {
+        return subst(substMap).substType(t);
     }
 
     /**
@@ -152,7 +148,8 @@ public abstract class ParamTypeSystem_c extends TypeSystem_c
      * type to substituted type.  This is passed in to ensure pointers to
      * outer classes are substituted correctly.
      */
-    public Subst subst(Map substMap, Map cache) {
-        return new Subst_c(this, substMap, cache);
+    @Override
+    public Subst<Formal, Actual> subst(Map<Formal, Actual> substMap) {
+        return new Subst_c<Formal, Actual>(this, substMap);
     }
 }

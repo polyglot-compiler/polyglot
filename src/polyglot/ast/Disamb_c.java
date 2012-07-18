@@ -25,9 +25,21 @@
 
 package polyglot.ast;
 
-import polyglot.types.*;
-import polyglot.util.Position;
+import polyglot.types.ClassType;
+import polyglot.types.Context;
+import polyglot.types.FieldInstance;
+import polyglot.types.LocalInstance;
+import polyglot.types.Named;
+import polyglot.types.NoClassException;
+import polyglot.types.NoMemberException;
+import polyglot.types.Qualifier;
+import polyglot.types.Resolver;
+import polyglot.types.SemanticException;
+import polyglot.types.Type;
+import polyglot.types.TypeSystem;
+import polyglot.types.VarInstance;
 import polyglot.util.InternalCompilerError;
+import polyglot.util.Position;
 import polyglot.visit.ContextVisitor;
 
 /**

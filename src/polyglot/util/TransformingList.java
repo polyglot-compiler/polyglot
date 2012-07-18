@@ -25,7 +25,9 @@
 
 package polyglot.util;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 /**
  * This unmodifiable List supports performing an arbitrary transformation on

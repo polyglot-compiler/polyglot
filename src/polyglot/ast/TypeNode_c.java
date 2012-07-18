@@ -92,7 +92,7 @@ public abstract class TypeNode_c extends Term_c implements TypeNode
     }
 
     @Override
-    public <T> List<T> acceptCFG(CFGBuilder v, List<T> succs) {
+    public <T> List<T> acceptCFG(CFGBuilder<?> v, List<T> succs) {
         return succs;
     }
 

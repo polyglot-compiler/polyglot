@@ -25,14 +25,24 @@
 
 package polyglot.ast;
 
-import java.util.List;
 import java.io.OutputStream;
 import java.io.Writer;
+import java.util.List;
 
 import polyglot.frontend.ExtensionInfo;
-import polyglot.types.*;
-import polyglot.visit.*;
-import polyglot.util.*;
+import polyglot.types.Context;
+import polyglot.types.SemanticException;
+import polyglot.types.Type;
+import polyglot.types.TypeSystem;
+import polyglot.util.CodeWriter;
+import polyglot.visit.AmbiguityRemover;
+import polyglot.visit.ConstantChecker;
+import polyglot.visit.ExceptionChecker;
+import polyglot.visit.NodeVisitor;
+import polyglot.visit.PrettyPrinter;
+import polyglot.visit.Translator;
+import polyglot.visit.TypeBuilder;
+import polyglot.visit.TypeChecker;
 
 /**
  * <code>JL_c</code> is the super class of JL node delegates objects.

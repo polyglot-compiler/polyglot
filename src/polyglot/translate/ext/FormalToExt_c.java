@@ -8,6 +8,7 @@ import polyglot.types.SemanticException;
 import polyglot.types.Type;
 
 public class FormalToExt_c extends ToExt_c {
+    @Override
     public Node toExt(ExtensionRewriter rw) throws SemanticException {
         Formal n = (Formal) node();
         

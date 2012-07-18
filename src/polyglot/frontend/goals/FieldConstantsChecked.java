@@ -25,17 +25,18 @@
 
 package polyglot.frontend.goals;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
-import polyglot.ast.NodeFactory;
-import polyglot.frontend.*;
+import polyglot.frontend.ExtensionInfo;
+import polyglot.frontend.Pass;
+import polyglot.frontend.Scheduler;
 import polyglot.frontend.passes.CheckFieldConstantsPass;
-import polyglot.frontend.passes.ConstantCheckPass;
-import polyglot.types.*;
+import polyglot.types.FieldInstance;
+import polyglot.types.ParsedClassType;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.StringUtil;
-import polyglot.visit.ConstantChecker;
-import polyglot.visit.TypeBuilder;
 
 /**
  * Comment for <code>MembersAdded</code>
@@ -54,7 +55,7 @@ public class FieldConstantsChecked extends AbstractGoal {
         super(null);
         this.vi = fi.orig();
         
-        ParsedClassType ct = (ParsedClassType) findContainer();
+        ParsedClassType ct = findContainer();
         if (ct != null) {
             this.job = ct.job();
         }
@@ -76,12 +77,14 @@ public class FieldConstantsChecked extends AbstractGoal {
         return null;
     }
 
+    @Override
     public Pass createPass(ExtensionInfo extInfo) {
         return new CheckFieldConstantsPass(extInfo.scheduler(), this);
     }
     
-    public Collection prerequisiteGoals(Scheduler scheduler) {
-        List l = new ArrayList();
+    @Override
+    public Collection<Goal> prerequisiteGoals(Scheduler scheduler) {
+        List<Goal> l = new ArrayList<Goal>();
         if (ct != null) {
             l.add(scheduler.SignaturesResolved(ct));
         }
@@ -89,8 +92,9 @@ public class FieldConstantsChecked extends AbstractGoal {
         return l;
     }
 
-    public Collection corequisiteGoals(Scheduler scheduler) {
-        List l = new ArrayList();
+    @Override
+    public Collection<Goal> corequisiteGoals(Scheduler scheduler) {
+        List<Goal> l = new ArrayList<Goal>();
         if (ct != null && ct.job() != null) {
             l.add(scheduler.TypeChecked(ct.job()));
         }
@@ -102,14 +106,17 @@ public class FieldConstantsChecked extends AbstractGoal {
         return vi;
     }
     
+    @Override
     public int hashCode() {
         return vi.hashCode() + super.hashCode();
     }
     
+    @Override
     public boolean equals(Object o) {
         return o instanceof FieldConstantsChecked && ((FieldConstantsChecked) o).vi.equals(vi) && super.equals(o);
     }
     
+    @Override
     public String toString() {
         return StringUtil.getShortNameComponent(getClass().getName()) + "(" + vi + ")";
     }

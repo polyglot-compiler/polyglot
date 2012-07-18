@@ -25,24 +25,21 @@
 
 package polyglot.ast;
 
-import polyglot.ast.Local;
-import polyglot.ast.Node;
-import polyglot.ast.Term;
-import polyglot.ast.Precedence;
+import java.util.List;
+
 import polyglot.types.Context;
 import polyglot.types.Flags;
-import polyglot.types.VarInstance;
 import polyglot.types.LocalInstance;
 import polyglot.types.SemanticException;
 import polyglot.types.TypeSystem;
+import polyglot.types.VarInstance;
 import polyglot.util.CodeWriter;
 import polyglot.util.Position;
+import polyglot.visit.CFGBuilder;
 import polyglot.visit.NodeVisitor;
 import polyglot.visit.PrettyPrinter;
 import polyglot.visit.TypeBuilder;
 import polyglot.visit.TypeChecker;
-import polyglot.visit.CFGBuilder;
-import java.util.List;
 
 /** 
  * A local variable expression.
@@ -172,7 +169,7 @@ public class Local_c extends Expr_c implements Local
   }
 
   @Override
-  public <T> List<T> acceptCFG(CFGBuilder v, List<T> succs) {
+  public <T> List<T> acceptCFG(CFGBuilder<?> v, List<T> succs) {
       return succs;
   }
 

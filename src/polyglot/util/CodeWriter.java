@@ -173,5 +173,6 @@ public abstract class CodeWriter
      * Return a readable representation of all the structured input given to
      * the CodeWriter since the last flush.
      */
+    @Override
     public abstract String toString();
 }

@@ -25,9 +25,11 @@
 
 package polyglot.ast;
 
-import polyglot.util.*;
-import polyglot.visit.*;
-import java.util.*;
+import java.util.List;
+
+import polyglot.util.CodeWriter;
+import polyglot.util.Position;
+import polyglot.visit.PrettyPrinter;
 
 /**
  * A <code>Block</code> represents a Java block statement -- an immutable

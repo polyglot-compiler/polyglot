@@ -25,14 +25,16 @@
 
 package polyglot.visit;
 
-import java.util.Iterator;
-
-import polyglot.ast.*;
-import polyglot.frontend.*;
+import polyglot.ast.Expr;
+import polyglot.ast.Node;
+import polyglot.ast.NodeFactory;
+import polyglot.frontend.Job;
+import polyglot.frontend.MissingDependencyException;
+import polyglot.frontend.Scheduler;
 import polyglot.frontend.goals.Goal;
 import polyglot.main.Report;
-import polyglot.types.*;
-import polyglot.util.InternalCompilerError;
+import polyglot.types.SemanticException;
+import polyglot.types.TypeSystem;
 
 /** Visitor which performs type checking on the AST. */
 public class ConstantChecker extends ContextVisitor
@@ -57,6 +59,7 @@ public class ConstantChecker extends ContextVisitor
     
     protected static class TypeCheckChecker extends NodeVisitor {
         public boolean checked = true;
+        @Override
         public Node override(Node n) {   
             if (! n.isTypeChecked()) {
                 checked = false;
@@ -65,6 +68,7 @@ public class ConstantChecker extends ContextVisitor
         }
     }
     
+    @Override
     protected Node leaveCall(Node old, Node n, NodeVisitor v) throws SemanticException {
         if (Report.should_report(Report.visit, 2))
             Report.report(2, ">> " + this + "::leave " + n);

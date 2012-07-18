@@ -175,7 +175,7 @@ public class ExtendedFor_c extends Loop_c implements ExtendedFor {
 	}
 
 	@Override
-	public <T> List<T> acceptCFG(CFGBuilder v, List<T> succs) {
+	public <T> List<T> acceptCFG(CFGBuilder<?> v, List<T> succs) {
 		v.visitCFG(expr, FlowGraph.EDGE_KEY_TRUE, decl, ENTRY,
 				FlowGraph.EDGE_KEY_FALSE, this, EXIT);
 		v.visitCFG(decl, body, ENTRY);

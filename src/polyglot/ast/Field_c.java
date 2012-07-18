@@ -28,9 +28,23 @@ package polyglot.ast;
 import java.util.Collections;
 import java.util.List;
 
-import polyglot.types.*;
-import polyglot.util.*;
-import polyglot.visit.*;
+import polyglot.types.Context;
+import polyglot.types.FieldInstance;
+import polyglot.types.Flags;
+import polyglot.types.SemanticException;
+import polyglot.types.Type;
+import polyglot.types.TypeSystem;
+import polyglot.types.VarInstance;
+import polyglot.util.CodeWriter;
+import polyglot.util.InternalCompilerError;
+import polyglot.util.Position;
+import polyglot.visit.AscriptionVisitor;
+import polyglot.visit.CFGBuilder;
+import polyglot.visit.ConstantChecker;
+import polyglot.visit.NodeVisitor;
+import polyglot.visit.PrettyPrinter;
+import polyglot.visit.TypeBuilder;
+import polyglot.visit.TypeChecker;
 
 /**
  * A <code>Field</code> is an immutable representation of a Java field
@@ -274,7 +288,7 @@ public class Field_c extends Expr_c implements Field
   }
 
   @Override
-  public <T> List<T> acceptCFG(CFGBuilder v, List<T> succs) {
+  public <T> List<T> acceptCFG(CFGBuilder<?> v, List<T> succs) {
       if (target instanceof Term) {
           v.visitCFG((Term) target, this, EXIT);
       }

@@ -25,9 +25,15 @@
 
 package polyglot.ast;
 
-import polyglot.types.*;
-import polyglot.visit.*;
-import polyglot.util.*;
+import polyglot.types.SemanticException;
+import polyglot.util.CodeWriter;
+import polyglot.util.InternalCompilerError;
+import polyglot.util.Position;
+import polyglot.visit.AmbiguityRemover;
+import polyglot.visit.ExceptionChecker;
+import polyglot.visit.NodeVisitor;
+import polyglot.visit.PrettyPrinter;
+import polyglot.visit.TypeChecker;
 
 /**
  * An <code>AmbPrefix</code> is an ambiguous AST node composed of dot-separated

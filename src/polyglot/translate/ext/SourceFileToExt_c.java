@@ -7,6 +7,7 @@ import polyglot.translate.ExtensionRewriter;
 import polyglot.types.SemanticException;
 
 public class SourceFileToExt_c extends ToExt_c {
+    @Override
     public Node toExt(ExtensionRewriter rw) throws SemanticException {
         SourceFile n = (SourceFile) node();
         Source source = n.source();        

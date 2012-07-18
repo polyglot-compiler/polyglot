@@ -25,10 +25,21 @@
 
 package polyglot.visit;
 
-import polyglot.ast.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+import java.util.Stack;
+
+import polyglot.ast.Block;
+import polyglot.ast.Catch;
+import polyglot.ast.Local;
+import polyglot.ast.LocalDecl;
+import polyglot.ast.Node;
+import polyglot.ast.NodeFactory;
 import polyglot.types.LocalInstance;
-import polyglot.util.*;
-import java.util.*;
+import polyglot.util.InternalCompilerError;
+import polyglot.util.UniqueID;
 
 /**
  * The <code>AlphaRenamer</code> runs over the AST and alpha-renames any local
@@ -40,12 +51,12 @@ public class AlphaRenamer extends NodeVisitor {
 
   // Each set in this stack tracks the set of local decls in a block that
   // we're traversing.
-  protected Stack setStack;
+  protected Stack<Set<String>> setStack;
 
-  protected Map renamingMap;
+  protected Map<String, String> renamingMap;
 
   // Tracks the set of variables known to be fresh.
-  protected Set freshVars;
+  protected Set<String> freshVars;
   
   /**
    * Should we also alpha-rename catch formals?
@@ -63,19 +74,20 @@ public class AlphaRenamer extends NodeVisitor {
   public AlphaRenamer(NodeFactory nf, boolean renameCatchFormals) {
     this.nf = nf;
 
-    this.setStack = new Stack();
-    this.setStack.push( new HashSet() );
+    this.setStack = new Stack<Set<String>>();
+    this.setStack.push( new HashSet<String>() );
 
-    this.renamingMap = new HashMap();
-    this.freshVars = new HashSet();
+    this.renamingMap = new HashMap<String, String>();
+    this.freshVars = new HashSet<String>();
     
     this.renameCatchFormals = renameCatchFormals;
   }
 
-  public NodeVisitor enter( Node n ) {
+  @Override
+public NodeVisitor enter( Node n ) {
     if ( n instanceof Block ) {
       // Push a new, empty set onto the stack.
-      setStack.push( new HashSet() );
+      setStack.push( new HashSet<String>() );
     }
 
     if (this.renameCatchFormals && n instanceof Catch) {
@@ -96,17 +108,18 @@ public class AlphaRenamer extends NodeVisitor {
 
       freshVars.add(name_);
 
-      ((Set)setStack.peek()).add( name );
+      setStack.peek().add( name );
       renamingMap.put( name, name_ );
     }
   }
   
 
-  public Node leave( Node old, Node n, NodeVisitor v ) {
+  @Override
+  public Node leave(Node old, Node n, NodeVisitor v ) {
     if ( n instanceof Block ) {
       // Pop the current name set off the stack and remove the corresponding
       // entries from the renaming map.
-      Set s = (Set)setStack.pop();
+      Set<String> s = setStack.pop();
       renamingMap.keySet().removeAll(s);
       return n;
     }
@@ -121,7 +134,7 @@ public class AlphaRenamer extends NodeVisitor {
       }
       
       // Update the local instance as necessary.
-      String newName = (String) renamingMap.get(name);
+      String newName = renamingMap.get(name);
       LocalInstance li = l.localInstance();
       if (li != null) li.setName(newName);
 
@@ -143,9 +156,10 @@ public class AlphaRenamer extends NodeVisitor {
       }
 
       // Update the local instance as necessary.
-      String newName = (String) renamingMap.get(name);
+      String newName = renamingMap.get(name);
       LocalInstance li = l.localInstance();
       if (li != null) li.setName(newName);
+      
       return l.name(newName);
     }
 
@@ -164,9 +178,10 @@ public class AlphaRenamer extends NodeVisitor {
         }
 
         // Update the local instance as necessary.
-        String newName = (String) renamingMap.get(name);
+        String newName = renamingMap.get(name);
         LocalInstance li = c.formal().localInstance();
         if (li != null) li.setName(newName);
+        
         return c.formal(c.formal().name(newName));
       }
 

@@ -149,7 +149,7 @@ public class While_c extends Loop_c implements While
     }
 
     @Override
-    public <T> List<T> acceptCFG(CFGBuilder v, List<T> succs) {
+    public <T> List<T> acceptCFG(CFGBuilder<?> v, List<T> succs) {
         if (condIsConstantTrue()) {
             v.visitCFG(cond, body, ENTRY);
         }

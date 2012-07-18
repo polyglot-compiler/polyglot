@@ -25,28 +25,32 @@
 
 package polyglot.util;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * This subclass of TransformingList applies the transformation to each
  * element of the underlying list at most once.
  */
-public class CachingTransformingList extends TransformingList {
-    protected ArrayList cache;
+public class CachingTransformingList<T,U> extends TransformingList<T,U> {
+    protected ArrayList<U> cache;
 
-    public CachingTransformingList(Collection underlying,
-				   Transformation trans)
+    public CachingTransformingList(Collection<? extends T> underlying,
+				   Transformation<T,U> trans)
 	{
-	    this(new ArrayList(underlying), trans);
+	    this(new ArrayList<T>(underlying), trans);
 	}
 
-    public CachingTransformingList(List underlying, Transformation trans) {
+    public CachingTransformingList(List<T> underlying, Transformation<T,U> trans) {
 	super(underlying, trans);
-	cache = new ArrayList(Collections.nCopies(underlying.size(), null));
+	cache = new ArrayList<U>(Collections.<U> nCopies(underlying.size(), null));
     }
 
-    public Object get(int index) {
-	Object o = cache.get(index);
+    @Override
+    public U get(int index) {
+	U o = cache.get(index);
 	if (o == null) {
 	    o = trans.transform(underlying.get(index));
 	    cache.set(index, o);

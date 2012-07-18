@@ -25,13 +25,10 @@
 
 package polyglot.visit;
 
-import polyglot.ast.*;
-import polyglot.frontend.*;
-import polyglot.util.*;
-import polyglot.util.CodeWriter;
+import java.io.IOException;
 
-import java.io.*;
-import java.util.*;
+import polyglot.ast.Node;
+import polyglot.util.CodeWriter;
 
 /**
  * A PrettyPrinter generates output code from the processed AST.

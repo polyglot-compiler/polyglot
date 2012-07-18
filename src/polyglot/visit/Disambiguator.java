@@ -25,12 +25,10 @@
 
 package polyglot.visit;
 
-import polyglot.ast.*;
+import polyglot.ast.NodeFactory;
 import polyglot.frontend.Job;
-import polyglot.frontend.goals.Goal;
-import polyglot.main.Report;
-import polyglot.types.*;
-import polyglot.util.*;
+import polyglot.types.Context;
+import polyglot.types.TypeSystem;
 
 /** Visitor which performs type checking on the AST. */
 public class Disambiguator extends AmbiguityRemover
@@ -47,6 +45,7 @@ public class Disambiguator extends AmbiguityRemover
         this.context = c;
     }
 
+    @Override
     public NodeVisitor begin() {
         Disambiguator v = (Disambiguator) super.begin();
         v.context = beginContext;

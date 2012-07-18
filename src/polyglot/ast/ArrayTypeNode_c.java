@@ -25,9 +25,18 @@
 
 package polyglot.ast;
 
-import polyglot.types.*;
-import polyglot.util.*;
-import polyglot.visit.*;
+import polyglot.types.SemanticException;
+import polyglot.types.Type;
+import polyglot.types.TypeSystem;
+import polyglot.util.CodeWriter;
+import polyglot.util.InternalCompilerError;
+import polyglot.util.Position;
+import polyglot.visit.AmbiguityRemover;
+import polyglot.visit.ExceptionChecker;
+import polyglot.visit.NodeVisitor;
+import polyglot.visit.PrettyPrinter;
+import polyglot.visit.TypeBuilder;
+import polyglot.visit.TypeChecker;
 
 /**
  * A <code>TypeNode</code> represents the syntactic representation of a

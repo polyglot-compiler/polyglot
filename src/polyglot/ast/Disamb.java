@@ -25,9 +25,9 @@
 
 package polyglot.ast;
 
-import polyglot.types.*;
-import polyglot.visit.*;
-import polyglot.util.*;
+import polyglot.types.SemanticException;
+import polyglot.util.Position;
+import polyglot.visit.ContextVisitor;
 
 /**
  * Utility class which is used to disambiguate ambiguous

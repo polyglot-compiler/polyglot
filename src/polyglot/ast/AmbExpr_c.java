@@ -153,7 +153,7 @@ public class AmbExpr_c extends Expr_c implements AmbExpr
    * Visit this term in evaluation order.
    */
   @Override
-  public <T> List<T> acceptCFG(CFGBuilder v, List<T> succs) {
+  public <T> List<T> acceptCFG(CFGBuilder<?> v, List<T> succs) {
       return succs;
   }
   @Override

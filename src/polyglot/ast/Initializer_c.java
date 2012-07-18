@@ -169,7 +169,7 @@ public class Initializer_c extends Term_c implements Initializer
     }
 
     @Override
-    public <T> List<T> acceptCFG(CFGBuilder v, List<T> succs) {
+    public <T> List<T> acceptCFG(CFGBuilder<?> v, List<T> succs) {
         v.visitCFG(body(), this, EXIT);
         return succs;
     }

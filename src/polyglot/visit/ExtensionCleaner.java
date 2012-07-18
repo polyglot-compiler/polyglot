@@ -25,13 +25,28 @@
 
 package polyglot.visit;
 
-import polyglot.ast.*;
-import polyglot.types.*;
+import polyglot.ast.Call;
+import polyglot.ast.CanonicalTypeNode;
+import polyglot.ast.ClassDecl;
+import polyglot.ast.ConstructorCall;
+import polyglot.ast.Expr;
+import polyglot.ast.Field;
+import polyglot.ast.FieldDecl;
+import polyglot.ast.Formal;
+import polyglot.ast.Initializer;
+import polyglot.ast.Local;
+import polyglot.ast.LocalDecl;
+import polyglot.ast.MethodDecl;
+import polyglot.ast.New;
+import polyglot.ast.Node;
+import polyglot.ast.NodeFactory;
+import polyglot.ast.PackageNode;
+import polyglot.ast.TypeNode;
 import polyglot.frontend.ExtensionInfo;
-import polyglot.util.*;
 import polyglot.types.Package;
-
-import java.util.*;
+import polyglot.types.Type;
+import polyglot.types.TypeSystem;
+import polyglot.util.InternalCompilerError;
 
 /**
  * This visitor overwrites all extension object refs with null,
@@ -49,6 +64,7 @@ public class ExtensionCleaner extends NodeVisitor {
         this.ts = javaExt.typeSystem();
     }
 
+    @Override
     public Node leave(Node old, Node n, NodeVisitor v) {
         n = n.ext(null);
         n = n.del(null);

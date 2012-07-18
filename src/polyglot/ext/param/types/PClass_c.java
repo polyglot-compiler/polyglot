@@ -25,11 +25,15 @@
 
 package polyglot.ext.param.types;
 
-import polyglot.types.*;
-import polyglot.types.Package;
-import polyglot.util.*;
+import java.util.List;
 
-import java.util.*;
+import polyglot.types.ClassType;
+import polyglot.types.Package;
+import polyglot.types.SemanticException;
+import polyglot.types.TypeObject;
+import polyglot.types.TypeObject_c;
+import polyglot.types.TypeSystem;
+import polyglot.util.Position;
 
 /**
  * A base implementation for parametric classes.
@@ -37,7 +41,7 @@ import java.util.*;
  * a ClassType that associates formal parameters with the class.
  * formals can be any type object.
  */
-public abstract class PClass_c extends TypeObject_c implements PClass {
+public abstract class PClass_c<Formal extends Param, Actual extends TypeObject> extends TypeObject_c implements PClass<Formal, Actual> {
     protected PClass_c() { }
 
     public PClass_c(TypeSystem ts) {
@@ -48,13 +52,20 @@ public abstract class PClass_c extends TypeObject_c implements PClass {
 	super(ts, pos);
     }
 
+    @SuppressWarnings("unchecked")
+    @Override
+    public ParamTypeSystem<Formal, Actual> typeSystem() {
+        return (ParamTypeSystem<Formal, Actual>) super.typeSystem();
+    }
+
     /////////////////////////////////////////////////////////////////////////
     // Implement PClass
 
-    public ClassType instantiate(Position pos, List actuals) 
+    @Override
+    public ClassType instantiate(Position pos, List<Actual> actuals) 
         throws SemanticException
     {
-	ParamTypeSystem pts = (ParamTypeSystem) typeSystem();
+	ParamTypeSystem<Formal, Actual> pts = typeSystem();
         return pts.instantiate(pos, this, actuals);
     }
     
@@ -62,13 +73,13 @@ public abstract class PClass_c extends TypeObject_c implements PClass {
     /////////////////////////////////////////////////////////////////////////
     // Implement TypeObject
     
+    @Override
     public boolean isCanonical() {
         if (!clazz().isCanonical()) {
             return false;
         } 
      
-        for (Iterator i = formals().iterator(); i.hasNext(); ) {
-            Param p = (Param) i.next();
+        for (Param p : formals()) {
             if (!p.isCanonical()) {
                 return false;
             }
@@ -81,10 +92,12 @@ public abstract class PClass_c extends TypeObject_c implements PClass {
     /////////////////////////////////////////////////////////////////////////
     // Implement Named
    
+    @Override
     public String name() {
         return clazz().name();
     }
 
+    @Override
     public String fullName() {
         return clazz().fullName();
     }
@@ -93,6 +106,7 @@ public abstract class PClass_c extends TypeObject_c implements PClass {
     /////////////////////////////////////////////////////////////////////////
     // Implement Importable
 
+    @Override
     public Package package_() {
         return clazz().package_();
     }

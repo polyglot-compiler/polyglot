@@ -25,7 +25,10 @@
 
 package polyglot.visit;
 
-import polyglot.ast.*;
+import polyglot.ast.Expr;
+import polyglot.ast.Node;
+import polyglot.ast.NodeFactory;
+import polyglot.ast.Stmt;
 import polyglot.frontend.Job;
 import polyglot.types.Context;
 import polyglot.types.TypeSystem;
@@ -44,6 +47,7 @@ public class SignatureDisambiguator extends Disambiguator
         super(job, ts, nf, c);
     }
     
+    @Override
     public Node override(Node parent, Node n) {
         if (n instanceof Stmt || n instanceof Expr) {
             return n;

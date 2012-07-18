@@ -25,22 +25,25 @@
 
 package polyglot.ext.param.types;
 
-import polyglot.types.*;
 import java.util.Iterator;
+import java.util.Map.Entry;
+
+import polyglot.types.Type;
+import polyglot.types.TypeObject;
 
 /**
  * A type on which substitutions have been applied.
  */
-public interface SubstType extends Type
+public interface SubstType<Formal extends Param, Actual extends TypeObject> extends Type
 {
     /** The type on which substitutions are performed. */ 
     Type base();
 
     /** The substitution function. */ 
-    Subst subst();
+    Subst<Formal, Actual> subst();
 
     /** Entries of underlying substitution map.
      * @return An <code>Iterator</code> of <code>Map.Entry</code>.
      */ 
-    Iterator entries();
+    Iterator<Entry<Formal, Actual>> entries();
 }

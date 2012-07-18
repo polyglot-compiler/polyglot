@@ -25,10 +25,16 @@
 
 package polyglot.ast;
 
-import polyglot.types.*;
-import polyglot.visit.*;
-import polyglot.util.*;
-import java.util.*;
+import java.util.List;
+
+import polyglot.types.Type;
+import polyglot.types.TypeSystem;
+import polyglot.util.CodeWriter;
+import polyglot.util.Position;
+import polyglot.visit.AscriptionVisitor;
+import polyglot.visit.CFGBuilder;
+import polyglot.visit.NodeVisitor;
+import polyglot.visit.PrettyPrinter;
 
 /**
  * An <code>Eval</code> is a wrapper for an expression in the context of
@@ -112,7 +118,7 @@ public class Eval_c extends Stmt_c implements Eval
     }
 
     @Override
-    public <T> List<T> acceptCFG(CFGBuilder v, List<T> succs) {
+    public <T> List<T> acceptCFG(CFGBuilder<?> v, List<T> succs) {
         v.visitCFG(expr, this, EXIT);
         return succs;
     }

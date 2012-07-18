@@ -8,6 +8,7 @@ import polyglot.ast.Node;
 import polyglot.ext.jl5.types.*;
 import polyglot.types.ArrayType;
 import polyglot.types.ClassType;
+import polyglot.types.ReferenceType;
 import polyglot.types.SemanticException;
 import polyglot.types.Type;
 import polyglot.util.Position;
@@ -133,7 +134,7 @@ public class JL5CanonicalTypeNode_c extends polyglot.ast.CanonicalTypeNode_c {
         }
         if (t instanceof JL5SubstClassType) {
             JL5SubstClassType ct = (JL5SubstClassType)t;
-            for (Type at : (List<Type>)ct.actuals()) {
+            for (ReferenceType at : ct.actuals()) {
                 findInstanceTypeVariables(at, tvs);
             }
         }

@@ -29,13 +29,23 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.Writer;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
 
 import javax.tools.JavaFileObject;
 
 import polyglot.main.Options;
 import polyglot.types.reflect.ClassFileLoader;
-import polyglot.util.*;
+import polyglot.util.CodeWriter;
+import polyglot.util.ErrorInfo;
+import polyglot.util.ErrorLimitError;
+import polyglot.util.ErrorQueue;
+import polyglot.util.InternalCompilerError;
+import polyglot.util.OptimalCodeWriter;
+import polyglot.util.SimpleCodeWriter;
+import polyglot.util.StdErrorQueue;
 
 /**
  * This is the main entry point for the compiler. It contains a work list that

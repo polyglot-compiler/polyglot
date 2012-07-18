@@ -25,16 +25,9 @@
 
 package polyglot.util;
 
-import polyglot.util.*;
-import polyglot.visit.NodeVisitor;
-import polyglot.ast.Node;
-import polyglot.types.*;
-
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
-import java.util.Date;
-import java.util.Map;
 import java.util.Set;
 
 public class ObjectDumper {
@@ -51,7 +44,7 @@ public class ObjectDumper {
     }
     
     public void dump(Object o) {
-	Set cache = new java.util.HashSet();
+	Set<Object> cache = new java.util.HashSet<Object>();
 	w.write("(");
         dumpObject(o, cache);
 	w.write(")");
@@ -62,7 +55,7 @@ public class ObjectDumper {
         catch (IOException e) {}
     }
   
-    protected void dumpObject(Object obj, Set cache) {
+    protected void dumpObject(Object obj, Set<Object> cache) {
         if (obj == null) {
             w.write("null");
             return;

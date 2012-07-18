@@ -29,7 +29,6 @@ import polyglot.ast.Node;
 import polyglot.ast.NodeFactory;
 import polyglot.frontend.Job;
 import polyglot.frontend.TargetFactory;
-import polyglot.types.Context;
 import polyglot.types.TypeSystem;
 import polyglot.util.CodeWriter;
 import polyglot.util.InternalCompilerError;
@@ -49,6 +48,7 @@ public class TypedTranslator extends Translator {
         super(job, ts, nf, tf);
     }
     
+    @Override
     public void print(Node parent, Node child, CodeWriter w) {
         if (context == null) {
             throw new InternalCompilerError("Null context found during type-directed code generation.", child.position());

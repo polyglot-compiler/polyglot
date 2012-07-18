@@ -21,7 +21,7 @@ import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
 import polyglot.util.UniqueID;
 
-public class JL5TypeSystem_c extends ParamTypeSystem_c implements JL5TypeSystem {
+public class JL5TypeSystem_c extends ParamTypeSystem_c<TypeVariable, ReferenceType> implements JL5TypeSystem {
 
     protected ClassType ENUM_;
 
@@ -545,7 +545,7 @@ public class JL5TypeSystem_c extends ParamTypeSystem_c implements JL5TypeSystem 
             for (TypeVariable tv : mi.typeParams()) {
                 m.put(tv, iter.next());
             }
-            subst = (JL5Subst) this.subst(m, new HashMap());
+            subst = (JL5Subst) this.subst(m);
         }
         JL5MethodInstance mj = mi;
         if (!mi.typeParams().isEmpty() && subst != null) {
@@ -583,7 +583,7 @@ public class JL5TypeSystem_c extends ParamTypeSystem_c implements JL5TypeSystem 
             for (TypeVariable tv : mi.typeParams()) {
                 m.put(tv, iter.next());
             }
-            subst = (JL5Subst) this.subst(m, new HashMap());
+            subst = (JL5Subst) this.subst(m);
         }
                 
         JL5ProcedureInstance mj = mi;
@@ -617,7 +617,7 @@ public class JL5TypeSystem_c extends ParamTypeSystem_c implements JL5TypeSystem 
         InferenceSolver s = new InferenceSolver_c(mi, argTypes, this);
         Map<TypeVariable, Type> m = s.solve(expectedReturnType);
         if (m == null) return null;
-        JL5Subst subst = (JL5Subst) this.subst(m, new HashMap());
+        JL5Subst subst = (JL5Subst) this.subst(m);
         return subst;
         
     }
@@ -629,11 +629,11 @@ public class JL5TypeSystem_c extends ParamTypeSystem_c implements JL5TypeSystem 
         return instantiate(pos, clazz, actuals);
     }
     @Override
-    public ClassType instantiate(Position pos, JL5ParsedClassType clazz, Type ... actuals) throws SemanticException {
+    public ClassType instantiate(Position pos, JL5ParsedClassType clazz, ReferenceType ... actuals) throws SemanticException {
         return this.instantiate(pos, clazz, Arrays.asList(actuals));
     }
     @Override
-    public ClassType instantiate(Position pos, JL5ParsedClassType clazz, List<? extends Type> actuals) throws SemanticException {
+    public ClassType instantiate(Position pos, JL5ParsedClassType clazz, List<? extends ReferenceType> actuals) throws SemanticException {
         if (clazz.typeVariables().isEmpty() || (actuals == null || actuals.isEmpty())) {
             return clazz;
         }
@@ -655,7 +655,7 @@ public class JL5TypeSystem_c extends ParamTypeSystem_c implements JL5TypeSystem 
         for (TypeVariable tv : mi.typeParams()) {
             m.put(tv, iter.next());
         }
-        JL5Subst subst = (JL5Subst) this.subst(m, new HashMap());
+        JL5Subst subst = (JL5Subst) this.subst(m);
         JL5ProcedureInstance ret = subst.substProcedure(mi);
         ret.setContainer(mi.container());
         return ret;
@@ -721,8 +721,8 @@ public class JL5TypeSystem_c extends ParamTypeSystem_c implements JL5TypeSystem 
     }
 
     @Override
-    public Subst subst(Map substMap, Map cache) {
-        return new JL5Subst_c(this, substMap, cache);
+    public Subst subst(Map substMap) {
+        return new JL5Subst_c(this, substMap);
     }
 
     @Override
@@ -754,7 +754,7 @@ public class JL5TypeSystem_c extends ParamTypeSystem_c implements JL5TypeSystem 
             for (int i = 0; i < mi.typeParams().size(); i++) {
                 substm.put(mj.typeParams().get(i), mi.typeParams().get(i));
             }
-            Subst subst = this.subst(substm, new HashMap());
+            Subst subst = this.subst(substm);
             mj = (JL5MethodInstance)subst.substMethod(mj);
         }
         
@@ -937,14 +937,14 @@ public class JL5TypeSystem_c extends ParamTypeSystem_c implements JL5TypeSystem 
     @Override
     public JL5Subst erasureSubst(JL5ProcedureInstance pi) {
         List<TypeVariable> typeParams = pi.typeParams();
-        Map m = new LinkedHashMap();
+        Map<TypeVariable, ReferenceType> m = new LinkedHashMap<TypeVariable, ReferenceType>();
         for (TypeVariable tv : typeParams) {
             m.put(tv, tv.erasureType());
         }
         if (m.isEmpty()) {
             return null;
         }
-        return new JL5Subst_c(this, m, new HashMap());
+        return new JL5Subst_c(this, m);
     }
     @Override
     public JL5Subst erasureSubst(JL5ParsedClassType base) {
@@ -963,7 +963,7 @@ public class JL5TypeSystem_c extends ParamTypeSystem_c implements JL5TypeSystem 
         if (m.isEmpty()) {
             return null;
         }
-        return new JL5RawSubst_c(this, m, new HashMap(), base);
+        return new JL5RawSubst_c(this, m, base);
     }
 
 
@@ -1574,7 +1574,7 @@ public class JL5TypeSystem_c extends ParamTypeSystem_c implements JL5TypeSystem 
             capturedActuals.add(si);
             substmap.put(a, si);
         }
-        JL5Subst subst = (JL5Subst) this.subst(substmap, new HashMap());
+        JL5Subst subst = (JL5Subst) this.subst(substmap);
         
         // now go through and substitute the bounds if needed.
         for (TypeVariable a : g.typeVariables()) {
@@ -1951,7 +1951,7 @@ public class JL5TypeSystem_c extends ParamTypeSystem_c implements JL5TypeSystem 
     }
 
     @Override
-    public Type Class(Position pos, Type type) {
+    public Type Class(Position pos, ReferenceType type) {
         try {
             return this.instantiate(pos, (JL5ParsedClassType)this.Class(), Collections.singletonList(type));
         }
@@ -1977,7 +1977,7 @@ public class JL5TypeSystem_c extends ParamTypeSystem_c implements JL5TypeSystem 
         }
         if (t instanceof JL5SubstClassType) {
             JL5SubstClassType ct = (JL5SubstClassType)t;
-            for (Type a : (List<Type>)ct.actuals()) {
+            for (ReferenceType a : ct.actuals()) {
                 if (a instanceof WildCardType) {
                     WildCardType wc = (WildCardType)a;
                     if (!wc.hasLowerBound() && wc.upperBound().equals(Object())) {

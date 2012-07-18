@@ -181,7 +181,7 @@ public class JL5Call_c extends Call_c implements JL5Call {
             // the receiver.
             Type t = call.target().type();
             ReferenceType et = (ReferenceType)ts.erasureType(t);
-            Type wt = ts.wildCardType(this.position(), et, null);
+            ReferenceType wt = ts.wildCardType(this.position(), et, null);
             Type instClass = ts.instantiate(this.position(), (JL5ParsedClassType)ts.Class(), Collections.singletonList(wt));
             call = (JL5Call_c)call.type(instClass);
         }

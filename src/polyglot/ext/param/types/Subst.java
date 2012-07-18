@@ -25,52 +25,58 @@
 
 package polyglot.ext.param.types;
 
-import polyglot.types.*;
-import polyglot.types.Package;
-import polyglot.util.*;
-import java.util.*;
-import java.io.*;
+import java.io.Serializable;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+
+import polyglot.types.ConstructorInstance;
+import polyglot.types.FieldInstance;
+import polyglot.types.MethodInstance;
+import polyglot.types.Type;
+import polyglot.types.TypeObject;
 
 /**
  * Utility class that performs substitutions on type objects.
  */
-public interface Subst extends Serializable
+public interface Subst<Formal extends Param, Actual extends TypeObject> extends Serializable
 {
     /** Entries of the underlying substitution map.
      * @return An <code>Iterator</code> of <code>Map.Entry</code>.
      */
-    public Iterator entries();
+    public Iterator<Entry<Formal, Actual>> entries();
 
     /** Type system */
-    public ParamTypeSystem typeSystem();
+    public ParamTypeSystem<Formal, Actual> typeSystem();
 
     /** Get the map of formals to actuals. */
-    public Map substitutions();
+    public Map<Formal, Actual> substitutions();
 
     /** Perform substitutions on a type. */
     public Type substType(Type t);
 
     /** Perform substitutions on a PClass. */
-    public PClass substPClass(PClass pc);
+    public PClass<Formal, Actual> substPClass(PClass<Formal, Actual> pc);
 
     /** Perform substititions on a field. */
-    public FieldInstance substField(FieldInstance fi);
+    public <T extends FieldInstance> T substField(T fi);
 
     /** Perform substititions on a method. */
-    public MethodInstance substMethod(MethodInstance mi);
+    public <T extends MethodInstance> T substMethod(T mi);
 
     /** Perform substititions on a constructor. */
-    public ConstructorInstance substConstructor(ConstructorInstance ci);
+    public <T extends ConstructorInstance> T substConstructor(T ci);
 
     /** Perform substitutions on a list of types. */
-    public List substTypeList(List list);
+    public <T extends Type> List<T> substTypeList(List<? extends Type> list);
 
     /** Perform substitutions on a list of methods. */
-    public List substMethodList(List list);
+    public <T extends MethodInstance> List<T> substMethodList(List<T> list);
 
     /** Perform substitutions on a list of constructors. */
-    public List substConstructorList(List list);
+    public <T extends ConstructorInstance> List<T> substConstructorList(List<T> list);
 
     /** Perform substitutions on a list of fields. */
-    public List substFieldList(List list);
+    public <T extends FieldInstance> List<T> substFieldList(List<T> list);
 }

@@ -36,6 +36,7 @@ public class EmptyPass extends AbstractPass
       	super(goal);
     }
 
+    @Override
     public boolean run() {
         return true;
     }

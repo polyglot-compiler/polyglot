@@ -40,15 +40,18 @@ public class IdentityKey
         return obj;
     }
 
+    @Override
     public int hashCode() {
         return System.identityHashCode(obj);
     }
 
+    @Override
     public boolean equals(Object other) {
         return other instanceof IdentityKey
             && ((IdentityKey) other).obj == obj;
     }
 
+    @Override
     public String toString() {
         return "Id(" + obj + ")";
     }

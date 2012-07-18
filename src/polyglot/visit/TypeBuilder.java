@@ -25,21 +25,25 @@
 
 package polyglot.visit;
 
-import java.util.*;
-import java.util.HashSet;
-import java.util.Stack;
+import java.util.LinkedList;
 
-import polyglot.ast.*;
 import polyglot.ast.Node;
 import polyglot.ast.NodeFactory;
-import polyglot.frontend.*;
 import polyglot.frontend.Job;
-import polyglot.frontend.goals.Goal;
-import polyglot.frontend.goals.TypeExists;
 import polyglot.main.Report;
-import polyglot.types.*;
+import polyglot.types.ClassType;
+import polyglot.types.Context;
+import polyglot.types.Flags;
+import polyglot.types.ImportTable;
+import polyglot.types.Named;
 import polyglot.types.Package;
-import polyglot.util.*;
+import polyglot.types.ParsedClassType;
+import polyglot.types.SemanticException;
+import polyglot.types.TypeSystem;
+import polyglot.util.ErrorInfo;
+import polyglot.util.ErrorQueue;
+import polyglot.util.InternalCompilerError;
+import polyglot.util.Position;
 
 /** Visitor which traverses the AST constructing type objects. */
 public class TypeBuilder extends NodeVisitor
@@ -87,10 +91,12 @@ public class TypeBuilder extends NodeVisitor
         return ts;
     }
 
+    @Override
     public NodeVisitor begin() {
         return this;
     }
 
+    @Override
     public NodeVisitor enter(Node n) {
         try {
 	    return n.del().buildTypesEnter(this);
@@ -111,6 +117,7 @@ public class TypeBuilder extends NodeVisitor
 	}
     }
 
+    @Override
     public Node leave(Node old, Node n, NodeVisitor v) {
 	try {
 	    return n.del().buildTypes((TypeBuilder) v);
@@ -132,7 +139,7 @@ public class TypeBuilder extends NodeVisitor
     }
 
     public TypeBuilder pushContext(Context c) throws SemanticException {
-        LinkedList stack = new LinkedList();
+        LinkedList<Context> stack = new LinkedList<Context>();
         while (c != null) {
             stack.addFirst(c);
             c = c.pop();
@@ -140,9 +147,8 @@ public class TypeBuilder extends NodeVisitor
         
         TypeBuilder tb = this;
         boolean inCode = false;
-        for (Iterator i = stack.iterator(); i.hasNext(); ) {
-            c = (Context) i.next();
-            if (c.inCode()) {
+        for (Context ctx : stack) {
+            if (ctx.inCode()) {
                 if (! inCode) {
                     // entering code
                     inCode = true;
@@ -150,18 +156,18 @@ public class TypeBuilder extends NodeVisitor
                 }
             }
             else {
-                if (c.importTable() != null && tb.importTable() == null) {
+                if (ctx.importTable() != null && tb.importTable() == null) {
                     // entering class file
-                    tb.setImportTable(c.importTable());
+                    tb.setImportTable(ctx.importTable());
                 }
-                if (c.importTable() != null && c.package_() != null &&
+                if (ctx.importTable() != null && ctx.package_() != null &&
                     tb.currentPackage() == null) {
                     // entering package context in source
-                    tb = tb.pushPackage(c.package_());
+                    tb = tb.pushPackage(ctx.package_());
                 }
-                if (c.currentClassScope() != tb.currentClass()) {
+                if (ctx.currentClassScope() != tb.currentClass()) {
                     // entering class
-                    tb = tb.pushClass(c.currentClassScope());
+                    tb = tb.pushClass(ctx.currentClassScope());
                 }
             }
         }
@@ -187,6 +193,9 @@ public class TypeBuilder extends NodeVisitor
         return tb;
     }
 
+    /**
+     * @throws SemanticException  
+     */
     protected TypeBuilder pushClass(ParsedClassType type) throws SemanticException {
         if (Report.should_report(Report.visit, 4))
 	    Report.report(4, "TB pushing class " + type + ": " + context());

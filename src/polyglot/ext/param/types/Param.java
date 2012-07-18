@@ -25,7 +25,7 @@
 
 package polyglot.ext.param.types;
 
-import polyglot.types.*;
+import polyglot.types.TypeObject;
 
 //XXX Is this obsolete? Coffer doesn't seem to use it. --AM
 

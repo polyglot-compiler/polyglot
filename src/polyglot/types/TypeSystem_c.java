@@ -1695,11 +1695,11 @@ public class TypeSystem_c implements TypeSystem
     
     @Override
     public Object placeHolder(TypeObject o) {
-        return placeHolder(o, Collections.EMPTY_SET);
+        return placeHolder(o, Collections.<TypeObject> emptySet());
     }
 
     @Override
-    public Object placeHolder(TypeObject o, Set<?> roots) {
+    public Object placeHolder(TypeObject o, Set<? extends TypeObject> roots) {
         assert_(o);
 
         if (o instanceof ParsedClassType) {
@@ -1871,7 +1871,7 @@ public class TypeSystem_c implements TypeSystem
      * should be returned in the set in addition to clazz.
      */
     @Override
-    public Set<?> getTypeEncoderRootSet(TypeObject t) {
+    public Set<TypeObject> getTypeEncoderRootSet(TypeObject t) {
 	return Collections.singleton(t);
     }
 

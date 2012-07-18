@@ -25,12 +25,22 @@
 
 package polyglot.ast;
 
-import polyglot.ast.Assert;
-import polyglot.types.*;
-import polyglot.visit.*;
-import polyglot.util.*;
+import java.util.List;
+
 import polyglot.main.Options;
-import java.util.*;
+import polyglot.types.SemanticException;
+import polyglot.types.Type;
+import polyglot.types.TypeSystem;
+import polyglot.util.CodeWriter;
+import polyglot.util.ErrorInfo;
+import polyglot.util.ErrorQueue;
+import polyglot.util.Position;
+import polyglot.visit.AscriptionVisitor;
+import polyglot.visit.CFGBuilder;
+import polyglot.visit.NodeVisitor;
+import polyglot.visit.PrettyPrinter;
+import polyglot.visit.Translator;
+import polyglot.visit.TypeChecker;
 
 /**
  * An <code>Assert</code> is an assert statement.
@@ -178,7 +188,7 @@ public class Assert_c extends Stmt_c implements Assert
     }
 
     @Override
-    public <T> List<T> acceptCFG(CFGBuilder v, List<T> succs) {
+    public <T> List<T> acceptCFG(CFGBuilder<?> v, List<T> succs) {
         if (errorMessage != null) {
             v.visitCFG(cond, errorMessage, ENTRY);
             v.visitCFG(errorMessage, this, EXIT);

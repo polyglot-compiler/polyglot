@@ -25,7 +25,9 @@
 
 package polyglot.frontend.goals;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 import polyglot.ast.NodeFactory;
 import polyglot.frontend.Job;
@@ -42,8 +44,9 @@ public class Disambiguated extends VisitorGoal {
         super(job, new AmbiguityRemover(job, ts, nf, true, true));
     }
 
-    public Collection prerequisiteGoals(Scheduler scheduler) {
-        List l = new ArrayList();
+    @Override
+    public Collection<Goal> prerequisiteGoals(Scheduler scheduler) {
+        List<Goal> l = new ArrayList<Goal>();
         l.add(scheduler.ImportTableInitialized(job));
         l.addAll(super.prerequisiteGoals(scheduler));
         return l;

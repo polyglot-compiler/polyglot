@@ -167,14 +167,17 @@ public class Job
 	return lang.compiler();
     }
     
+    @Override
     public String toString() {
         return source.toString();
     }
 
+    @Override
     public int hashCode() {
         return source.hashCode();
     }
     
+    @Override
     public boolean equals(Object o) {
         return o instanceof Job && ((Job) o).source.equals(source);
     }

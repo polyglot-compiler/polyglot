@@ -25,11 +25,13 @@
 
 package polyglot.visit;
 
-import polyglot.ast.*;
-import polyglot.types.*;
-import polyglot.util.*;
+import polyglot.ast.Expr;
+import polyglot.ast.Node;
+import polyglot.ast.NodeFactory;
 import polyglot.frontend.Job;
-import java.util.*;
+import polyglot.types.SemanticException;
+import polyglot.types.Type;
+import polyglot.types.TypeSystem;
 
 /** Visitor which allows type information to be utilized to perform AST 
     modifications.  
@@ -81,6 +83,7 @@ public class AscriptionVisitor extends ContextVisitor
      *  as the <code>enterCall</code> method in 
      *  <code>ErrorHandlingVisitor</code>.
      */
+    @Override
     public NodeVisitor enterCall(Node parent, Node n) throws SemanticException {
         Type t = null;
 
@@ -111,6 +114,7 @@ public class AscriptionVisitor extends ContextVisitor
       * @param toType The type that the parent node is expecting.
       * @return The new translated Expr node, or if nothing has changed, just
       * e.
+      * @throws SemanticException 
       */
     public Expr ascribe(Expr e, Type toType) throws SemanticException {
         return e;
@@ -121,6 +125,7 @@ public class AscriptionVisitor extends ContextVisitor
      *  as appropriate. Otherwise functionally the same as the <code> 
      *  leaveCall</code> method in <code>ErrorHandlingVisitor</code>.
      */
+    @Override
     public Node leaveCall(Node old, Node n, NodeVisitor v)
         throws SemanticException {
 

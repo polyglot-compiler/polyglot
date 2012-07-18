@@ -130,7 +130,7 @@ public abstract class AbstractBlock_c extends Stmt_c implements Block
     }
 
     @Override
-    public <T> List<T> acceptCFG(CFGBuilder v, List<T> succs) {
+    public <T> List<T> acceptCFG(CFGBuilder<?> v, List<T> succs) {
         v.visitCFGList(statements, this, EXIT);
         return succs;
     }

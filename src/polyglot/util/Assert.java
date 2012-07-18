@@ -60,7 +60,6 @@ public final class Assert {
   private Assert() {}
   // The error thrown.
   private static class AssertionFailedError extends Error {
-    public AssertionFailedError() { super(); }
     public AssertionFailedError(String s) { super(s); }
   }
 

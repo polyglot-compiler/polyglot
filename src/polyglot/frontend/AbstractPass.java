@@ -51,19 +51,23 @@ public abstract class AbstractPass implements Pass
         this.goal = goal;
     }
  
+    @Override
     public Goal goal() {
         return goal;
     }
 
     /** The human-readable name of the pass. */
+    @Override
     public String name() {
         return StringUtil.getShortNameComponent(this.getClass().getName());
     }
 
     /** Run the pass, returning true on success. */
+    @Override
     public abstract boolean run();
 
     /** Start or stop the pass timer. */
+    @Override
     public void toggleTimers(boolean exclusive_only) {
         // How this works:
         // reset: time = 0
@@ -78,6 +82,7 @@ public abstract class AbstractPass implements Pass
     }
 
     /** Reset the pass timer. */
+    @Override
     public void resetTimers() {
         inclusive_time = 0;
         exclusive_time = 0;
@@ -85,16 +90,19 @@ public abstract class AbstractPass implements Pass
 
     /** Return the time in ms taken to run the pass, excluding the time in
      * spawned passes */
+    @Override
     public long exclusiveTime() {
         return exclusive_time;
     }
 
     /** Return the time in ms taken to run the pass, including the time in
      * spawned passes */
+    @Override
     public long inclusiveTime() {
         return inclusive_time;
     }
 
+    @Override
     public String toString() {
         return name();
     }

@@ -25,10 +25,22 @@
 
 package polyglot.ast;
 
-import polyglot.types.*;
-import polyglot.util.*;
-import polyglot.visit.*;
-import java.util.*;
+import java.util.Iterator;
+import java.util.List;
+
+import polyglot.types.SemanticException;
+import polyglot.types.Type;
+import polyglot.types.TypeSystem;
+import polyglot.util.CodeWriter;
+import polyglot.util.CollectionUtil;
+import polyglot.util.InternalCompilerError;
+import polyglot.util.ListUtil;
+import polyglot.util.Position;
+import polyglot.visit.AscriptionVisitor;
+import polyglot.visit.CFGBuilder;
+import polyglot.visit.NodeVisitor;
+import polyglot.visit.PrettyPrinter;
+import polyglot.visit.TypeChecker;
 
 /**
  * An <code>ArrayInit</code> is an immutable representation of
@@ -195,7 +207,7 @@ public class ArrayInit_c extends Expr_c implements ArrayInit
     }
 
     @Override
-    public <T> List<T> acceptCFG(CFGBuilder v, List<T> succs) {
+    public <T> List<T> acceptCFG(CFGBuilder<?> v, List<T> succs) {
         v.visitCFGList(elements, this, EXIT);
         return succs;
     }

@@ -26,13 +26,28 @@
 package polyglot.visit;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
-import polyglot.ast.*;
+import polyglot.ast.ClassBody;
+import polyglot.ast.ClassDecl;
+import polyglot.ast.ClassMember;
+import polyglot.ast.FieldDecl;
+import polyglot.ast.IntLit;
+import polyglot.ast.Node;
+import polyglot.ast.NodeFactory;
 import polyglot.main.Report;
 import polyglot.main.Version;
-import polyglot.types.*;
-import polyglot.util.*;
+import polyglot.types.ClassType;
+import polyglot.types.FieldInstance;
+import polyglot.types.Flags;
+import polyglot.types.InitializerInstance;
+import polyglot.types.TypeSystem;
+import polyglot.util.ErrorInfo;
+import polyglot.util.ErrorQueue;
+import polyglot.util.Position;
+import polyglot.util.TypeEncoder;
 
 /**
  * Visitor which serializes class objects and adds a field to the class
@@ -63,7 +78,8 @@ public class ClassSerializer extends NodeVisitor {
 		this.ver = ver;
 	}
 
-	public Node override(Node n) {
+	@Override
+    public Node override(Node n) {
 		// Stop at class members. We only want to encode top-level classes.
 		if (n instanceof ClassMember && !(n instanceof ClassDecl)) {
 			return n;
@@ -72,7 +88,8 @@ public class ClassSerializer extends NodeVisitor {
 		return null;
 	}
 
-	public Node leave(Node old, Node n, NodeVisitor v) {
+	@Override
+    public Node leave(Node old, Node n, NodeVisitor v) {
 		if (!(n instanceof ClassDecl)) {
 			return n;
 		}
@@ -80,24 +97,22 @@ public class ClassSerializer extends NodeVisitor {
 		ClassDecl cd = (ClassDecl) n;
 		ClassBody body = cd.body();
 
-		List l = createSerializationMembers(cd);
+		List<ClassMember> l = createSerializationMembers(cd);
 
-		for (Iterator i = l.iterator(); i.hasNext();) {
-			ClassMember m = (ClassMember) i.next();
+		for (ClassMember m : l) {
 			body = body.addMember(m);
 		}
 
 		return cd.body(body);
 	}
 
-	public List createSerializationMembers(ClassDecl cd) {
+	public List<ClassMember> createSerializationMembers(ClassDecl cd) {
 		return createSerializationMembers(cd.type());
 	}
 
-	public List createSerializationMembers(ClassType ct) {
+	public List<ClassMember> createSerializationMembers(ClassType ct) {
 		try {
-			byte[] b;
-			List newMembers = new ArrayList(3);
+			List<ClassMember> newMembers = new ArrayList<ClassMember>(3);
 
 			// HACK: force class members to get created from lazy class
 			// initializer.
@@ -110,7 +125,7 @@ public class ClassSerializer extends NodeVisitor {
 
 			// Only serialize top-level and member classes.
 			if (!ct.isTopLevel() && !ct.isMember()) {
-				return Collections.EMPTY_LIST;
+				return Collections.emptyList();
 			}
 
 			/* Add the compiler version number. */
@@ -125,7 +140,7 @@ public class ClassSerializer extends NodeVisitor {
 						"Cannot serialize class information "
 								+ "more than once.");
 
-				return Collections.EMPTY_LIST;
+				return Collections.emptyList();
 			}
 
 			Flags flags = Flags.PUBLIC.set(Flags.STATIC).set(Flags.FINAL);
@@ -203,7 +218,7 @@ public class ClassSerializer extends NodeVisitor {
 				e.printStackTrace();
 			eq.enqueue(ErrorInfo.IO_ERROR,
 					"Unable to serialize class information.");
-			return Collections.EMPTY_LIST;
+			return Collections.emptyList();
 		}
 	}
 }

@@ -31,8 +31,13 @@ import polyglot.ast.NodeFactory;
 import polyglot.ast.NodeFactory_c;
 import polyglot.frontend.goals.Goal;
 import polyglot.main.Version;
-import polyglot.types.*;
+import polyglot.types.LoadedClassResolver;
+import polyglot.types.MemberClassResolver;
+import polyglot.types.SemanticException;
+import polyglot.types.SourceClassResolver;
+import polyglot.types.TopLevelResolver;
 import polyglot.types.TypeSystem;
+import polyglot.types.TypeSystem_c;
 import polyglot.util.ErrorQueue;
 import polyglot.util.InternalCompilerError;
 
@@ -58,7 +63,8 @@ public abstract class ParserlessJLExtensionInfo extends AbstractExtensionInfo {
 				getOptions().ignore_mod_times);
 	}
 
-	protected void initTypeSystem() {
+	@Override
+    protected void initTypeSystem() {
 		try {
 			LoadedClassResolver lr = makeLoadedClassResolver();
 
@@ -77,33 +83,40 @@ public abstract class ParserlessJLExtensionInfo extends AbstractExtensionInfo {
 		}
 	}
 
-	protected polyglot.frontend.Scheduler createScheduler() {
+	@Override
+    protected polyglot.frontend.Scheduler createScheduler() {
 		return new JLScheduler(this);
 	}
 
-	public String defaultFileExtension() {
+	@Override
+    public String defaultFileExtension() {
 		return "jl";
 	}
 
-	public String compilerName() {
+	@Override
+    public String compilerName() {
 		return "jlc";
 	}
 
-	public Version version() {
+	@Override
+    public Version version() {
 		return new JLVersion();
 	}
 
 	/** Create the type system for this extension. */
-	protected TypeSystem createTypeSystem() {
+	@Override
+    protected TypeSystem createTypeSystem() {
 		return new TypeSystem_c();
 	}
 
 	/** Create the node factory for this extension. */
-	protected NodeFactory createNodeFactory() {
+	@Override
+    protected NodeFactory createNodeFactory() {
 		return new NodeFactory_c();
 	}
 
-	public JobExt jobExt() {
+	@Override
+    public JobExt jobExt() {
 		return null;
 	}
 
@@ -111,18 +124,22 @@ public abstract class ParserlessJLExtensionInfo extends AbstractExtensionInfo {
 	 * Return a parser for <code>source</code> using the given
 	 * <code>reader</code>.
 	 */
-	public abstract Parser parser(Reader reader, FileSource source,
+	@Override
+    public abstract Parser parser(Reader reader, FileSource source,
 			ErrorQueue eq);
 
 	/**
 	 * Return the <code>Goal</code> to compile the source file associated with
 	 * <code>job</code> to completion.
 	 */
-	public Goal getCompileGoal(Job job) {
+	@Override
+    public Goal getCompileGoal(Job job) {
 		return scheduler.CodeGenerated(job);
 	}
 
 	static {
+	        // Force Topics to load.
+		@SuppressWarnings("unused")
 		Topics t = new Topics();
 	}
 

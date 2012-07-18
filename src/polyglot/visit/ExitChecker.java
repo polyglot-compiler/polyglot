@@ -25,18 +25,25 @@
 
 package polyglot.visit;
 
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
-import polyglot.ast.*;
+import polyglot.ast.CodeNode;
+import polyglot.ast.MethodDecl;
+import polyglot.ast.NodeFactory;
+import polyglot.ast.Return;
+import polyglot.ast.Term;
 import polyglot.frontend.Job;
 import polyglot.types.SemanticException;
 import polyglot.types.TypeSystem;
+import polyglot.visit.FlowGraph.EdgeKey;
 
 /**
  * Visitor which checks that all (terminating) paths through a 
  * method must return.
  */
-public class ExitChecker extends DataFlow
+public class ExitChecker extends DataFlow<ExitChecker.DataFlowItem>
 {
     protected CodeNode code;
 
@@ -44,9 +51,8 @@ public class ExitChecker extends DataFlow
 	super(job, ts, nf, false /* backward analysis */);
     }
 
-    protected FlowGraph initGraph(CodeNode code, Term root) {
-        boolean returnsValue;
-
+    @Override
+    protected FlowGraph<DataFlowItem> initGraph(CodeNode code, Term root) {
         this.code = code;
 
         if (code instanceof MethodDecl) {
@@ -59,11 +65,12 @@ public class ExitChecker extends DataFlow
         return null;
     }
 
-    public Item createInitialItem(FlowGraph graph, Term node, boolean entry) {
+    @Override
+    public DataFlowItem createInitialItem(FlowGraph<DataFlowItem> graph, Term node, boolean entry) {
         return DataFlowItem.EXITS;
     }
 
-    protected static class DataFlowItem extends Item {
+    protected static class DataFlowItem extends DataFlow.Item {
         public final boolean exits; // whether all paths leaving this node lead to an exit 
 
         protected DataFlowItem(boolean exits) {
@@ -73,22 +80,26 @@ public class ExitChecker extends DataFlow
         public static final DataFlowItem EXITS = new DataFlowItem(true);
         public static final DataFlowItem DOES_NOT_EXIT = new DataFlowItem(false);
 
+        @Override
         public String toString() {
             return "exits=" + exits;
         }
+        @Override
         public boolean equals(Object o) {
             if (o instanceof DataFlowItem) {
                 return this.exits == ((DataFlowItem)o).exits;
             }
             return false;
         }
+        @Override
         public int hashCode() {
             return (exits ? 5235 : 8673);
         }
         
     }
     
-    public Map flow(Item in, FlowGraph graph, Term n, boolean entry, Set succEdgeKeys) {
+    @Override
+    public Map<EdgeKey, DataFlowItem> flow(DataFlowItem in, FlowGraph<DataFlowItem> graph, Term n, boolean entry, Set<EdgeKey> succEdgeKeys) {
         // If every path from the exit node to the entry goes through a return,
         // we're okay.  So make the exit bit false at exit and true at every return;
         // the confluence operation is &&. 
@@ -102,7 +113,7 @@ public class ExitChecker extends DataFlow
             // all exception edges to the exit node are regarded as exiting
             // correctly. Make sure non-exception edges have the
             // exit bit false.
-            Map m = itemToMap(DataFlowItem.EXITS, succEdgeKeys);
+            Map<EdgeKey, DataFlowItem> m = itemToMap(DataFlowItem.EXITS, succEdgeKeys);
             if (succEdgeKeys.contains(FlowGraph.EDGE_KEY_OTHER)) {
                 m.put(FlowGraph.EDGE_KEY_OTHER, DataFlowItem.DOES_NOT_EXIT);
             }
@@ -120,17 +131,19 @@ public class ExitChecker extends DataFlow
     }
 
 
-    public Item confluence(List inItems, Term node, boolean entry, FlowGraph graph) {
+    @Override
+    public DataFlowItem confluence(List<DataFlowItem> inItems, Term node, boolean entry, FlowGraph<DataFlowItem> graph) {
         // all paths must have an exit
-        for (Iterator i = inItems.iterator(); i.hasNext(); ) {
-            if (!((DataFlowItem)i.next()).exits) {
+        for (DataFlowItem item : inItems) {
+            if (!item.exits) {
                 return DataFlowItem.DOES_NOT_EXIT;
             }
         }
         return DataFlowItem.EXITS; 
     }
 
-    public void check(FlowGraph graph, Term n, boolean entry, Item inItem, Map outItems) throws SemanticException {
+    @Override
+    public void check(FlowGraph<DataFlowItem> graph, Term n, boolean entry, DataFlowItem inItem, Map<EdgeKey, DataFlowItem> outItems) throws SemanticException {
         // Check for statements not on the path to exit; compound
         // statements are allowed to be off the path.  (e.g., "{ return; }"
         // or "while (true) S").  If a compound statement is truly
@@ -140,7 +153,7 @@ public class ExitChecker extends DataFlow
             if (outItems != null && !outItems.isEmpty()) {
                 // due to the flow equations, all DataFlowItems in the outItems map
                 // are the same, so just take the first one.
-                DataFlowItem outItem = (DataFlowItem)outItems.values().iterator().next(); 
+                DataFlowItem outItem = outItems.values().iterator().next(); 
                 if (outItem != null && !outItem.exits) { 
                     throw new SemanticException("Missing return statement.",
                             code.position());

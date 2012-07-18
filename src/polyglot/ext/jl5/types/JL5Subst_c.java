@@ -11,10 +11,10 @@ import polyglot.types.ReferenceType;
 import polyglot.types.Type;
 import polyglot.util.InternalCompilerError;
 
-public class JL5Subst_c extends Subst_c implements JL5Subst {
+public class JL5Subst_c extends Subst_c<TypeVariable, ReferenceType> implements JL5Subst {
 
-    public JL5Subst_c(ParamTypeSystem ts, Map subst, Map cache) {
-        super(ts, subst, cache);
+    public JL5Subst_c(ParamTypeSystem<TypeVariable, ReferenceType> ts, Map<TypeVariable, ReferenceType> subst) {
+        super(ts, subst);
 //        if (subst.isEmpty()) {
 //            Thread.dumpStack();
 //        }
@@ -47,21 +47,21 @@ public class JL5Subst_c extends Subst_c implements JL5Subst {
     // an infinite loop as we subst on their upper bounds.
     private LinkedList<TypeVariable> visitedTypeVars = new LinkedList<TypeVariable>();
     
-    public Type substTypeVariable(TypeVariable t) {
+    public ReferenceType substTypeVariable(TypeVariable t) {
         if (subst.containsKey(t)) {
-            return (Type)subst.get(t);
+            return subst.get(t);
         }
         if (visitedTypeVars.contains(t)) {
             return t;
         }
-        for (TypeVariable k : (Set<TypeVariable>)subst.keySet()) {
+        for (TypeVariable k : subst.keySet()) {
             if (((TypeVariable_c)k).uniqueIdentifier == ((TypeVariable_c)t).uniqueIdentifier) {
-                return (Type) subst.get(k);
+                return subst.get(k);
             }
         }
         visitedTypeVars.addLast(t);
         TypeVariable origT = t;
-        t = (TypeVariable) t.upperBound((ReferenceType)substType(t.upperBound()));        
+        t = t.upperBound((ReferenceType)substType(t.upperBound()));        
 
         if (visitedTypeVars.removeLast() != origT) {
             throw new InternalCompilerError("Unexpected type variable was last on the list");
@@ -85,8 +85,8 @@ public class JL5Subst_c extends Subst_c implements JL5Subst {
 
 
     @Override
-    protected Object substSubstValue(Object value) {
-        return substType((Type) value);
+    protected ReferenceType substSubstValue(ReferenceType value) {
+        return (ReferenceType) substType(value);
     }
 
     @Override
@@ -122,7 +122,7 @@ public class JL5Subst_c extends Subst_c implements JL5Subst {
                 return pct;
             }
             
-            return new JL5SubstClassType_c((JL5TypeSystem) ts, t.position(),
+            return new JL5SubstClassType_c(ts, t.position(),
                                            pct, this);
         }
 
@@ -141,7 +141,7 @@ public class JL5Subst_c extends Subst_c implements JL5Subst {
             mj.setTypeParams(l);
         }
         // subst the type params
-        mj.setTypeParams(this.substTypeList(mj.typeParams()));
+        mj.setTypeParams(this.<TypeVariable> substTypeList(mj.typeParams()));
         return mj;
     }
 
@@ -156,7 +156,7 @@ public class JL5Subst_c extends Subst_c implements JL5Subst {
             cj.setTypeParams(l);
         }
         // subst the type params
-        cj.setTypeParams(this.substTypeList(cj.typeParams()));
+        cj.setTypeParams(this.<TypeVariable> substTypeList(cj.typeParams()));
         return cj;
     }
 

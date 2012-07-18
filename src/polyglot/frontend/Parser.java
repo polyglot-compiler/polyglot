@@ -25,9 +25,7 @@
 
 package polyglot.frontend;
 
-import java.io.*;
-import polyglot.ast.*;
-import polyglot.util.*;
+import polyglot.ast.Node;
 
 /**
  * A parser interface.  It defines one method, <code>parse()</code>,

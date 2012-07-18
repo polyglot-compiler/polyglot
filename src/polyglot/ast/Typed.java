@@ -25,7 +25,7 @@
 
 package polyglot.ast;
 
-import polyglot.types.*;
+import polyglot.types.Type;
 
 /**
  * <code>Typed</code> represents any node that has a type

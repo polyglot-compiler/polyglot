@@ -28,10 +28,16 @@ package polyglot.ast;
 import java.util.Collections;
 import java.util.List;
 
-import polyglot.types.*;
+import polyglot.types.SemanticException;
+import polyglot.types.Type;
+import polyglot.types.TypeSystem;
 import polyglot.util.CodeWriter;
 import polyglot.util.Position;
-import polyglot.visit.*;
+import polyglot.visit.AscriptionVisitor;
+import polyglot.visit.CFGBuilder;
+import polyglot.visit.NodeVisitor;
+import polyglot.visit.PrettyPrinter;
+import polyglot.visit.TypeChecker;
 
 /**
  * A <code>Cast</code> is an immutable representation of a casting
@@ -163,7 +169,7 @@ public class Cast_c extends Expr_c implements Cast
     }
 
     @Override
-    public <T> List<T> acceptCFG(CFGBuilder v, List<T> succs) {
+    public <T> List<T> acceptCFG(CFGBuilder<?> v, List<T> succs) {
         v.visitCFG(expr, castType, ENTRY);
         v.visitCFG(castType, this, EXIT);
         return succs;

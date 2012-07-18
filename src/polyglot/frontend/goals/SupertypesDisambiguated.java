@@ -25,10 +25,16 @@
 
 package polyglot.frontend.goals;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 import polyglot.ast.NodeFactory;
-import polyglot.frontend.*;
+import polyglot.frontend.ExtensionInfo;
+import polyglot.frontend.Job;
+import polyglot.frontend.Pass;
+import polyglot.frontend.Scheduler;
+import polyglot.frontend.VisitorPass;
 import polyglot.types.TypeSystem;
 import polyglot.visit.AmbiguityRemover;
 import polyglot.visit.NodeVisitor;
@@ -42,13 +48,15 @@ public class SupertypesDisambiguated extends VisitorGoal {
         super(job, new AmbiguityRemover(job, ts, nf, false, false));
     }
 
-    public Collection prerequisiteGoals(Scheduler scheduler) {
-        List l = new ArrayList();
+    @Override
+    public Collection<Goal> prerequisiteGoals(Scheduler scheduler) {
+        List<Goal> l = new ArrayList<Goal>();
         l.add(scheduler.ImportTableInitialized(job));
         l.addAll(super.prerequisiteGoals(scheduler));
         return l;
     }
 
+    @Override
     public Pass createPass(ExtensionInfo extInfo) {
         Scheduler scheduler = extInfo.scheduler();
         Goal sigDisam = scheduler.SignaturesDisambiguated(job);
@@ -71,6 +79,7 @@ public class SupertypesDisambiguated extends VisitorGoal {
             this.allDisam = allDisam;
         }
 
+        @Override
         public boolean run() {
             if (sigDisam.hasBeenReached() || allDisam.hasBeenReached()) {
                 // If the goal to disambiguate the entire source file has

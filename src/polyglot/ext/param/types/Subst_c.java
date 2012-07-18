@@ -26,37 +26,51 @@
 package polyglot.ext.param.types;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import polyglot.ext.param.Topics;
 import polyglot.main.Report;
-import polyglot.types.*;
-import polyglot.util.*;
+import polyglot.types.ArrayType;
+import polyglot.types.ClassType;
+import polyglot.types.ConstructorInstance;
+import polyglot.types.FieldInstance;
+import polyglot.types.MethodInstance;
+import polyglot.types.ReferenceType;
+import polyglot.types.Type;
+import polyglot.types.TypeObject;
+import polyglot.util.CachingTransformingList;
+import polyglot.util.Transformation;
+import polyglot.util.TypeInputStream;
 
 /**
  * Utility class that performs substitutions on type objects using a
  * map.  Subclasses must define how the substititions are performed and
  * how to cache substituted types.
  */
-public class Subst_c implements Subst
+public class Subst_c<Formal extends Param, Actual extends TypeObject> implements Subst<Formal,Actual>
 {
     /** Map from formal parameters (of type Param) to actuals. */
-    protected Map subst;
+    protected Map<Formal, Actual> subst;
 
     /** Cache of types. From CacheTypeWrapper(t) to subst(t)*/
-    protected transient Map cache;
+    protected transient Map<CacheTypeWrapper, Type> cache;
 
-    protected transient ParamTypeSystem ts;
+    protected transient ParamTypeSystem<Formal, Actual> ts;
 
-    public Subst_c(ParamTypeSystem ts, Map subst, Map cache)
+    public Subst_c(ParamTypeSystem<Formal, Actual> ts, Map<Formal, Actual> subst)
     {
         this.ts = ts;
         this.subst = subst;
-        this.cache = new HashMap();
-        this.cache.putAll(cache);
+        this.cache = new HashMap<CacheTypeWrapper, Type>();
     }
 
-    public ParamTypeSystem typeSystem() {
+    @Override
+    public ParamTypeSystem<Formal, Actual> typeSystem() {
         return ts;
     }
 
@@ -64,14 +78,16 @@ public class Subst_c implements Subst
      * Entries of the underlying substitution map.
      * @return an <code>Iterator</code> of <code>Map.Entry</code>.
      */
-    public Iterator entries() {
+    @Override
+    public Iterator<Entry<Formal, Actual>> entries() {
         return substitutions().entrySet().iterator();
     }
 
     /**
      * The underlying substitution map.
      */
-    public Map substitutions() {
+    @Override
+    public Map<Formal, Actual> substitutions() {
         return Collections.unmodifiableMap(subst);
     }
 
@@ -84,16 +100,17 @@ public class Subst_c implements Subst
 
         // We may have a parameterized type instantiated on the formals.
         if (t instanceof SubstType) {
-            Type tbase = ((SubstType) t).base();
-            Map tsubst = ((SubstType) t).subst().substitutions();
+            @SuppressWarnings("unchecked")
+            SubstType<Formal, Actual> substType = (SubstType<Formal, Actual>) t;
+            Type tbase = substType.base();
+            Map<Formal, Actual> tsubst = substType.subst().substitutions();
 
-            Map newSubst = new HashMap();
+            Map<Formal, Actual> newSubst = new HashMap<Formal, Actual>();
 
             // go through the map, and perform substitution on the actuals
-            for (Iterator i = tsubst.entrySet().iterator(); i.hasNext(); ) {
-                Map.Entry e = (Map.Entry) i.next();
-                Object formal = e.getKey();
-                Object actual = e.getValue();
+            for (Entry<Formal, Actual> e : tsubst.entrySet()) {
+                Formal formal = e.getKey();
+                Actual actual = e.getValue();
                 
                 newSubst.put(formal, substSubstValue(actual));
             }
@@ -119,17 +136,18 @@ public class Subst_c implements Subst
      * example above). Subclasses may need to override this
      * if the keys and values are not the same object.
      */
-    protected Object substSubstValue(Object value) {
+    protected Actual substSubstValue(Actual value) {
         return value;
     }
     
     /** Perform substitutions on a class type. Substitutions are performed
      * lazily. */
     public ClassType substClassType(ClassType t) {
-        return new SubstClassType_c(ts, t.position(), t, this);
+        return new SubstClassType_c<Formal, Actual>(ts, t.position(), t, this);
     }
 
     /** Perform substitutions on a type. */
+    @Override
     public Type substType(Type t) {
         if (t == null || t == this) // XXX comparison t == this can't succeed! (Findbugs)
             return t;
@@ -154,25 +172,30 @@ public class Subst_c implements Subst
     }
 
     protected Type cacheGet(Type t) {
-        return (Type)cache.get(new CacheTypeWrapper(t));
+        return cache.get(new CacheTypeWrapper(t));
     }
 
     class CacheTypeWrapper {
         final Type t;
         CacheTypeWrapper(Type t) { this.t = t; }
         
+        @Override
         public boolean equals(Object o) {
-            if (o instanceof CacheTypeWrapper) {
-                return Subst_c.this.cacheTypeEquality(t, ((CacheTypeWrapper)o).t);
+            if (o instanceof Subst_c.CacheTypeWrapper) {
+                @SuppressWarnings("unchecked")
+                CacheTypeWrapper wrapper = (CacheTypeWrapper)o;
+                return Subst_c.this.cacheTypeEquality(t, wrapper.t);
             }
             if (o instanceof Type) {
                 return Subst_c.this.cacheTypeEquality(t, (Type)o);
             }
             return false;
         }
+        @Override
         public String toString() {
             return String.valueOf(t);
         }
+        @Override
         public int hashCode() {
             return t==null?0:t.hashCode();           
         }
@@ -187,8 +210,9 @@ public class Subst_c implements Subst
     }
 
     /** Perform substitution on a PClass. */
-    public PClass substPClass(PClass pclazz) {
-        MuPClass newPclazz = ts.mutablePClass(pclazz.position());
+    @Override
+    public PClass<Formal, Actual> substPClass(PClass<Formal, Actual> pclazz) {
+        MuPClass<Formal, Actual> newPclazz = ts.mutablePClass(pclazz.position());
         newPclazz.formals(pclazz.formals());
         newPclazz.clazz((ClassType) substType(pclazz.clazz()));
         return newPclazz;
@@ -196,28 +220,32 @@ public class Subst_c implements Subst
 
 
     /** Perform substititions on a field. */
-    public FieldInstance substField(FieldInstance fi) {
+    @Override
+    public <T extends FieldInstance> T substField(T fi) {
         ReferenceType ct = (ReferenceType) substType(fi.container());
         Type t = substType(fi.type());
-        FieldInstance newFI = (FieldInstance) fi.copy();
+        @SuppressWarnings("unchecked")
+        T newFI = (T) fi.copy();
         newFI.setType(t);
         newFI.setContainer(ct);
         return newFI;
     }
 
     /** Perform substititions on a method. */
-    public MethodInstance substMethod(MethodInstance mi) {
+    @Override
+    public <T extends MethodInstance> T substMethod(T mi) {
         ReferenceType ct = (ReferenceType) substType(mi.container());
 
         Type rt = substType(mi.returnType());
 
-        List formalTypes = mi.formalTypes();
+        List<? extends Type> formalTypes = mi.formalTypes();
         formalTypes = substTypeList(formalTypes);
 
-        List throwTypes = mi.throwTypes();
+        List<? extends Type> throwTypes = mi.throwTypes();
         throwTypes = substTypeList(throwTypes);
 
-        MethodInstance tmpMi = (MethodInstance) mi.copy();
+        @SuppressWarnings("unchecked")
+        T tmpMi = (T) mi.copy();
         tmpMi.setReturnType(rt);
         tmpMi.setFormalTypes(formalTypes);
         tmpMi.setThrowTypes(throwTypes);
@@ -227,17 +255,19 @@ public class Subst_c implements Subst
     }
 
     /** Perform substititions on a constructor. */
-    public ConstructorInstance substConstructor(ConstructorInstance ci) {
+    @Override
+    public <T extends ConstructorInstance> T substConstructor(T ci) {
         ClassType ct = (ClassType) substType(ci.container());
 
-        List formalTypes = ci.formalTypes();
+        List<? extends Type> formalTypes = ci.formalTypes();
         formalTypes = substTypeList(formalTypes);
 
-        List throwTypes = ci.throwTypes();
+        List<? extends Type> throwTypes = ci.throwTypes();
         throwTypes = substTypeList(throwTypes);
         
 
-        ConstructorInstance tmpCi = (ConstructorInstance) ci.copy();
+        @SuppressWarnings("unchecked")
+        T tmpCi = (T) ci.copy();
         tmpCi.setFormalTypes(formalTypes);
         tmpCi.setThrowTypes(throwTypes);
         tmpCi.setContainer(ct);
@@ -246,83 +276,79 @@ public class Subst_c implements Subst
     }
 
     /** Perform substititions on a list of <code>Type</code>. */
-    public List substTypeList(List list) {
-        return new CachingTransformingList(list, new TypeXform());
+    @Override
+    public <T extends Type> List<T> substTypeList(List<? extends Type> list) {
+        return new CachingTransformingList<Type, T>(list, new TypeXform<T>());
     }
 
     /** Perform substititions on a list of <code>MethodInstance</code>. */
-    public List substMethodList(List list) {
-        return new CachingTransformingList(list, new MethodXform());
+    @Override
+    public <T extends MethodInstance> List<T> substMethodList(List<T> list) {
+        return new CachingTransformingList<T, T>(list, new MethodXform<T>());
     }
 
     /** Perform substititions on a list of <code>ConstructorInstance</code>. */
-    public List substConstructorList(List list) {
-        return new CachingTransformingList(list, new ConstructorXform());
+    @Override
+    public <T extends ConstructorInstance> List<T> substConstructorList(List<T> list) {
+        return new CachingTransformingList<T, T>(list, new ConstructorXform<T>());
     }
 
     /** Perform substititions on a list of <code>FieldInstance</code>. */
-    public List substFieldList(List list) {
-        return new CachingTransformingList(list, new FieldXform());
+    @Override
+    public <T extends FieldInstance> List<T> substFieldList(List<T> list) {
+        return new CachingTransformingList<T, T>(list, new FieldXform<T>());
     }
 
     ////////////////////////////////////////////////////////////////
     // Substitution machinery
 
     /** Function object for transforming types. */
-    public class TypeXform implements Transformation {
-        public Object transform(Object o) {
-            if (! (o instanceof Type)) {
-                throw new InternalCompilerError(o + " is not a type.");
-            }
-
-            return substType((Type) o);
+    public class TypeXform<T extends Type> implements Transformation<Type, T> {
+        @Override
+        public T transform(Type o) {
+            @SuppressWarnings("unchecked")
+            T result = (T) substType(o);
+            return result;
         }
     }
 
     /** Function object for transforming fields. */
-    public class FieldXform implements Transformation {
-        public Object transform(Object o) {
-            if (! (o instanceof FieldInstance)) {
-                throw new InternalCompilerError(o + " is not a field.");
-            }
-
-            return substField((FieldInstance) o);
+    public class FieldXform<T extends FieldInstance> implements Transformation<T,T> {
+        @Override
+        public T transform(T o) {
+            return substField(o);
         }
     }
 
     /** Function object for transforming methods. */
-    public class MethodXform implements Transformation {
-        public Object transform(Object o) {
-            if (! (o instanceof MethodInstance)) {
-                throw new InternalCompilerError(o + " is not a method.");
-            }
-
-            return substMethod((MethodInstance) o);
+    public class MethodXform<T extends MethodInstance> implements Transformation<T,T> {
+        @Override
+        public T transform(T o) {
+            return substMethod(o);
         }
     }
 
     /** Function object for transforming constructors. */
-    public class ConstructorXform implements Transformation {
-        public Object transform(Object o) {
-            if (! (o instanceof ConstructorInstance)) {
-                throw new InternalCompilerError(o + " is not a constructor.");
-            }
-
-            return substConstructor((ConstructorInstance) o);
+    public class ConstructorXform<T extends ConstructorInstance> implements Transformation<T,T> {
+        @Override
+        public T transform(T o) {
+            return substConstructor(o);
         }
     }
 
     ////////////////////////////////////////////////////////////////
     // Equality
 
+    @Override
     public boolean equals(Object o) {
         if (o instanceof Subst) {
-            return subst.equals(((Subst) o).substitutions());
+            return subst.equals(((Subst<?,?>) o).substitutions());
         }
 
         return false;
     }
 
+    @Override
     public int hashCode() {
         return subst.hashCode();
     }
@@ -330,11 +356,12 @@ public class Subst_c implements Subst
     ////////////////////////////////////////////////////////////////
     // Utility functions
 
+    @Override
     public String toString() {
         String str = "[";
-        for (Iterator iter = subst.keySet().iterator(); iter.hasNext(); ) {
-            Object key = iter.next();
-            str += "<" + key + ": " + subst.get(key) + ">";
+        for (Iterator<Entry<Formal, Actual>> iter = subst.entrySet().iterator(); iter.hasNext(); ) {
+            Entry<Formal, Actual> entry = iter.next();
+            str += "<" + entry.getKey() + ": " + entry.getValue() + ">";
             if (iter.hasNext())
                 str += ", ";
         }	
@@ -351,10 +378,12 @@ public class Subst_c implements Subst
 	throws IOException, ClassNotFoundException
     {
         if (in instanceof TypeInputStream) {
-            this.ts = (ParamTypeSystem) ((TypeInputStream) in).getTypeSystem();
+            @SuppressWarnings("unchecked")
+            ParamTypeSystem<Formal, Actual> ts = (ParamTypeSystem<Formal, Actual>) ((TypeInputStream) in).getTypeSystem();
+            this.ts = ts;
         }
 
-	this.cache = new HashMap();
+	this.cache = new HashMap<CacheTypeWrapper, Type>();
 
         in.defaultReadObject();
     }

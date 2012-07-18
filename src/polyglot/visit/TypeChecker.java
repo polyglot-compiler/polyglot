@@ -25,15 +25,17 @@
 
 package polyglot.visit;
 
-import java.util.Iterator;
-
-import polyglot.ast.*;
-import polyglot.frontend.*;
+import polyglot.ast.Node;
+import polyglot.ast.NodeFactory;
+import polyglot.frontend.Job;
+import polyglot.frontend.MissingDependencyException;
+import polyglot.frontend.Scheduler;
 import polyglot.frontend.goals.Goal;
 import polyglot.main.Report;
 import polyglot.types.SemanticException;
 import polyglot.types.TypeSystem;
-import polyglot.util.*;
+import polyglot.util.ErrorInfo;
+import polyglot.util.Position;
 
 /** Visitor which performs type checking on the AST. */
 public class TypeChecker extends DisambiguationDriver
@@ -48,6 +50,7 @@ public class TypeChecker extends DisambiguationDriver
         this.checkConstants = check;
     }
 
+    @Override
     public Node override(Node parent, Node n) {
         try {
             if (Report.should_report(Report.visit, 2))
@@ -92,6 +95,7 @@ public class TypeChecker extends DisambiguationDriver
         }
     }
  
+    @Override
     protected NodeVisitor enterCall(Node n) throws SemanticException {
         if (Report.should_report(Report.visit, 2))
             Report.report(2, ">> " + this + "::enter " + n);
@@ -107,6 +111,7 @@ public class TypeChecker extends DisambiguationDriver
     protected static class AmbChecker extends NodeVisitor {
         public boolean amb;
         
+        @Override
         public Node override(Node n) {   
             if (! n.isDisambiguated() || ! n.isTypeChecked()) {
 //                System.out.println("  !!!!! no type at " + n + " (" + n.getClass().getName() + ")");
@@ -118,6 +123,7 @@ public class TypeChecker extends DisambiguationDriver
         }
     }
     
+    @Override
     protected Node leaveCall(Node old, Node n, NodeVisitor v) throws SemanticException {
         if (Report.should_report(Report.visit, 2))
             Report.report(2, ">> " + this + "::leave " + n);

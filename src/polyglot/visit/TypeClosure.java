@@ -1,11 +1,9 @@
 package polyglot.visit;
 
 import polyglot.ast.Call;
-import polyglot.ast.CodeDecl;
 import polyglot.ast.Field;
 import polyglot.ast.New;
 import polyglot.ast.Node;
-import polyglot.ast.TypeNode;
 
 public class TypeClosure extends NodeVisitor {
     @Override

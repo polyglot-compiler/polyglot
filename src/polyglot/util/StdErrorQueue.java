@@ -25,7 +25,11 @@
 
 package polyglot.util;
 
-import java.io.*;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.LineNumberReader;
+import java.io.PrintStream;
+import java.io.Reader;
 import java.util.StringTokenizer;
 
 /**
@@ -40,6 +44,7 @@ public class StdErrorQueue extends AbstractErrorQueue
 	this.err = err;
     }
 
+    @Override
     public void displayError(ErrorInfo e) {
 	String message = e.getErrorKind() != ErrorInfo.DEBUG
 		       ? e.getMessage()
@@ -147,6 +152,7 @@ public class StdErrorQueue extends AbstractErrorQueue
 	}
     }
     
+    @Override
     protected void tooManyErrors(ErrorInfo lastError) {
         Position position = lastError.getPosition();
         String prefix = position != null ? (position.file() + ": ") : "";
@@ -260,6 +266,7 @@ public class StdErrorQueue extends AbstractErrorQueue
         err.println();
     }
     
+    @Override
     public void flush() {
 	if (! flushed) {
             if (errorCount() > 0) {

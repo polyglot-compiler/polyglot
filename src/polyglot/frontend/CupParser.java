@@ -47,6 +47,7 @@ public class CupParser implements Parser
        	this.eq = eq;
     }
 
+    @Override
     public Node parse() {
 	try {
 	    java_cup.runtime.Symbol sym = grm.parse();
@@ -78,6 +79,7 @@ public class CupParser implements Parser
 	return null;
     }
 
+    @Override
     public String toString() {
 	return "CupParser(" + grm.getClass().getName() + ")";
     }

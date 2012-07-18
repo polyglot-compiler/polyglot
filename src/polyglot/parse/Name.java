@@ -25,9 +25,16 @@
 
 package polyglot.parse;
 
-import polyglot.ast.*;
+import polyglot.ast.Expr;
+import polyglot.ast.Id;
+import polyglot.ast.NodeFactory;
+import polyglot.ast.PackageNode;
+import polyglot.ast.Prefix;
+import polyglot.ast.QualifierNode;
+import polyglot.ast.Receiver;
+import polyglot.ast.TypeNode;
 import polyglot.types.TypeSystem;
-import polyglot.util.*;
+import polyglot.util.Position;
 
 /**
  * Represents an ambiguous, possibly qualified, identifier encountered while parsing.

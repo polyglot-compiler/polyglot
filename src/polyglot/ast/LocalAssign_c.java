@@ -65,14 +65,14 @@ public class LocalAssign_c extends Assign_c implements LocalAssign
   }
   
   @Override
-  protected void acceptCFGAssign(CFGBuilder v) {
+  protected void acceptCFGAssign(CFGBuilder<?> v) {
 	  // do not visit left()
       // l = e: visit e -> (l = e)      
       v.visitCFG(right(), this, EXIT);
   }
   
   @Override
-  protected void acceptCFGOpAssign(CFGBuilder v) {
+  protected void acceptCFGOpAssign(CFGBuilder<?> v) {
       /*
       Local l = (Local)left();
       

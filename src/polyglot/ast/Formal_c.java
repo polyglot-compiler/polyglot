@@ -25,11 +25,22 @@
 
 package polyglot.ast;
 
-import polyglot.types.*;
-import polyglot.util.*;
-import polyglot.visit.*;
+import java.util.List;
 
-import java.util.*;
+import polyglot.types.Context;
+import polyglot.types.Flags;
+import polyglot.types.LocalInstance;
+import polyglot.types.SemanticException;
+import polyglot.types.Type;
+import polyglot.types.TypeSystem;
+import polyglot.util.CodeWriter;
+import polyglot.util.Position;
+import polyglot.visit.AmbiguityRemover;
+import polyglot.visit.CFGBuilder;
+import polyglot.visit.NodeVisitor;
+import polyglot.visit.PrettyPrinter;
+import polyglot.visit.TypeBuilder;
+import polyglot.visit.TypeChecker;
 
 /**
  * A <code>Formal</code> represents a formal parameter for a procedure
@@ -227,7 +238,7 @@ public class Formal_c extends Term_c implements Formal
     }
 
     @Override
-    public <T> List<T> acceptCFG(CFGBuilder v, List<T> succs) {
+    public <T> List<T> acceptCFG(CFGBuilder<?> v, List<T> succs) {
         v.visitCFG(type, this, EXIT);        
         return succs;
     }

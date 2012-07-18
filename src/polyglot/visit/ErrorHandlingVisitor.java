@@ -25,13 +25,20 @@
 
 package polyglot.visit;
 
-import polyglot.ast.*;
-import polyglot.types.*;
-import polyglot.util.*;
+import polyglot.ast.ClassDecl;
+import polyglot.ast.ClassMember;
+import polyglot.ast.Import;
+import polyglot.ast.Node;
+import polyglot.ast.NodeFactory;
+import polyglot.ast.SourceFile;
+import polyglot.ast.Stmt;
 import polyglot.frontend.Job;
-import polyglot.frontend.goals.Goal;
 import polyglot.main.Report;
-import java.util.*;
+import polyglot.types.SemanticException;
+import polyglot.types.TypeSystem;
+import polyglot.util.ErrorInfo;
+import polyglot.util.ErrorQueue;
+import polyglot.util.Position;
 
 /**
  */
@@ -60,6 +67,7 @@ public class ErrorHandlingVisitor extends HaltingVisitor
      * Part of the initialization done by begin() in an ErrorHandlingVisitor
      * method is initializing the error-handling state.
      */
+    @Override
     public NodeVisitor begin() {
         this.error = false;
         return super.begin();
@@ -122,6 +130,9 @@ public class ErrorHandlingVisitor extends HaltingVisitor
         return enterCall(n);
     }
 
+    /**
+     * @throws SemanticException  
+     */
     protected NodeVisitor enterCall(Node n) throws SemanticException {
         return this;
     }
@@ -166,6 +177,9 @@ public class ErrorHandlingVisitor extends HaltingVisitor
 	return leaveCall(n);
     }
 
+    /**
+     * @throws SemanticException  
+     */
     protected Node leaveCall(Node n) throws SemanticException {
 	return n;
     }
@@ -197,6 +211,7 @@ public class ErrorHandlingVisitor extends HaltingVisitor
      * @return The <code>NodeVisitor</code> which should be used to visit the
      * children of <code>n</code>.
      */
+    @Override
     public NodeVisitor enter(Node parent, Node n) {
         if (Report.should_report(Report.visit, 5))
 	    Report.report(5, "enter(" + n + ")");
@@ -207,7 +222,7 @@ public class ErrorHandlingVisitor extends HaltingVisitor
 
         try {
             // should copy the visitor
-            return (ErrorHandlingVisitor) enterCall(parent, n);
+            return enterCall(parent, n);
         }
 	catch (SemanticException e) {
             if (e.getMessage() != null) {
@@ -263,6 +278,7 @@ public class ErrorHandlingVisitor extends HaltingVisitor
      * <code>n</code>.
      */
  
+    @Override
     public Node leave(Node parent, Node old, Node n, NodeVisitor v) {
         try {
             if (v instanceof ErrorHandlingVisitor &&

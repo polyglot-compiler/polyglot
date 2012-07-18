@@ -26,7 +26,9 @@
 package polyglot.visit;
 
 import polyglot.ast.Node;
-import polyglot.util.*;
+import polyglot.util.Copy;
+import polyglot.util.InternalCompilerError;
+import polyglot.util.StringUtil;
 
 /**
  * The <code>NodeVisitor</code> represents an implementation of the "Visitor"
@@ -66,7 +68,7 @@ public abstract class NodeVisitor implements Copy
      * @return A node if normal traversal is to stop, <code>null</code> if it
      * is to continue.
      */
-    public <N extends Node> N override(Node parent, N n) {
+    public Node override(Node parent, Node n) {
         return override(n);
     }
 
@@ -89,7 +91,7 @@ public abstract class NodeVisitor implements Copy
      * @return A node if normal traversal is to stop, <code>null</code> if it
      * is to continue.
      */
-    public <N extends Node> N override(N n) {
+    public Node override(Node n) {
 	return null;
     }
 
@@ -155,7 +157,7 @@ public abstract class NodeVisitor implements Copy
      * @return The final result of the traversal of the tree rooted at
      * <code>n</code>.
      */
-    public <N extends Node> N leave(Node parent, N old, N n, NodeVisitor v) {
+    public Node leave(Node parent, Node old, Node n, NodeVisitor v) {
         return leave(old, n, v);
     }
 
@@ -184,7 +186,7 @@ public abstract class NodeVisitor implements Copy
      * @return The final result of the traversal of the tree rooted at
      * <code>n</code>.
      */
-    public <N extends Node> N leave(N old, N n, NodeVisitor v) {
+    public Node leave(Node old, Node n, NodeVisitor v) {
         return n;
     }
 
@@ -230,7 +232,8 @@ public abstract class NodeVisitor implements Copy
      */
     public <N extends Node> N visitEdge(Node parent, N child) {
         try {
-            N n = override(parent, child);
+            @SuppressWarnings("unchecked")
+            N n = (N) override(parent, child);
 
             if (n == null) {
                 return visitEdgeNoOverride(parent, child);
@@ -275,15 +278,15 @@ public abstract class NodeVisitor implements Copy
         }
         
         try {
-            n = this.leave(parent, child, n, v_);
+            @SuppressWarnings("unchecked")
+            N result = (N) this.leave(parent, child, n, v_);
+            return result;
         }
         catch (InternalCompilerError e) {
             if (e.position() == null && n != null)
                 e.setPosition(n.position());
             throw e;
         }
-        
-        return n;
     }
     
 

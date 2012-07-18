@@ -25,7 +25,12 @@
 
 package polyglot.util;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 
 /** Collection utilities. */
 public class CollectionUtil

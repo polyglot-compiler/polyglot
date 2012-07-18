@@ -25,11 +25,33 @@
 
 package polyglot.ast;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 
-import polyglot.types.*;
-import polyglot.util.*;
-import polyglot.visit.*;
+import polyglot.types.ClassType;
+import polyglot.types.Context;
+import polyglot.types.Flags;
+import polyglot.types.MethodInstance;
+import polyglot.types.ProcedureInstance;
+import polyglot.types.ReferenceType;
+import polyglot.types.SemanticException;
+import polyglot.types.Type;
+import polyglot.types.TypeSystem;
+import polyglot.util.CodeWriter;
+import polyglot.util.CollectionUtil;
+import polyglot.util.InternalCompilerError;
+import polyglot.util.ListUtil;
+import polyglot.util.Position;
+import polyglot.visit.AscriptionVisitor;
+import polyglot.visit.CFGBuilder;
+import polyglot.visit.ExceptionChecker;
+import polyglot.visit.NodeVisitor;
+import polyglot.visit.PrettyPrinter;
+import polyglot.visit.TypeBuilder;
+import polyglot.visit.TypeChecker;
 
 /**
  * A <code>Call</code> is an immutable representation of a Java
@@ -452,7 +474,7 @@ public class Call_c extends Expr_c implements Call
   }
 
   @Override
-  public <T> List<T> acceptCFG(CFGBuilder v, List<T> succs) {
+  public <T> List<T> acceptCFG(CFGBuilder<?> v, List<T> succs) {
       if (target instanceof Term) {
           Term t = (Term) target;
 

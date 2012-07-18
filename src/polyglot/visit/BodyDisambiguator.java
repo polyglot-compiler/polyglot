@@ -25,7 +25,9 @@
 
 package polyglot.visit;
 
-import polyglot.ast.*;
+import polyglot.ast.ClassDecl;
+import polyglot.ast.Node;
+import polyglot.ast.NodeFactory;
 import polyglot.frontend.Job;
 import polyglot.types.Context;
 import polyglot.types.TypeSystem;
@@ -44,8 +46,8 @@ public class BodyDisambiguator extends Disambiguator
         super(job, ts, nf, c);
     }
 
+    @Override
     public Node override(Node parent, Node n) {
-        Context c = this.context();
         if (n instanceof ClassDecl && ! ((ClassDecl) n).type().isMember()) {
             // Will be invoked by ComputeTypesVisitor.override.
             return n;

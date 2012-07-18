@@ -43,14 +43,17 @@ public abstract class AbstractErrorQueue implements ErrorQueue
         this.flushed = true;
     }
 
+    @Override
     public final void enqueue(int type, String message) {
 	enqueue(type, message, null);
     }
 
+    @Override
     public final void enqueue(int type, String message, Position position) {
 	enqueue(new ErrorInfo(type, message, position));
     }
 
+    @Override
     public final void enqueue(ErrorInfo e) {
 	if (e.getErrorKind() != ErrorInfo.WARNING &&
             e.getErrorKind() != ErrorInfo.DEBUG) {
@@ -84,14 +87,17 @@ public abstract class AbstractErrorQueue implements ErrorQueue
      * This method is called to flush the error queue. Subclasses may want to
      * print summary information in this method.
      */
+    @Override
     public void flush() {
         flushed = true;
     }
 
+    @Override
     public final boolean hasErrors() {
       return errorCount > 0;
     }
 
+    @Override
     public final int errorCount() {
         return errorCount;
     }

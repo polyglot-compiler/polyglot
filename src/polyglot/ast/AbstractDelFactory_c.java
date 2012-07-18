@@ -25,8 +25,6 @@
 
 package polyglot.ast;
 
-import polyglot.ast.DelFactory;
-import polyglot.ast.JL;
 import polyglot.util.InternalCompilerError;
 
 /**

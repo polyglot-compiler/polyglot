@@ -10,6 +10,7 @@ import polyglot.ext.jl5.types.JL5ParsedClassType;
 import polyglot.ext.jl5.types.JL5TypeSystem;
 import polyglot.ext.jl5.types.TypeVariable;
 import polyglot.ext.param.types.MuPClass;
+import polyglot.ext.param.types.Param;
 import polyglot.main.Report;
 import polyglot.types.ClassType;
 import polyglot.types.ConstructorInstance;
@@ -156,7 +157,7 @@ public class JL5ClassFileLazyClassInitializer extends
             List<TypeVariable> typeVars = signature
                     .parseClassTypeVariables(ts, position());
             ct.setTypeVariables(typeVars);
-            pc.formals(new ArrayList<TypeVariable>(ct.typeVariables()));
+            pc.formals(new ArrayList<Param>(ct.typeVariables()));
 
             signature.parseClassSignature(ts, position());
 

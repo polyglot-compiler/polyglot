@@ -198,7 +198,7 @@ public class Return_c extends Stmt_c implements Return
     }
 
     @Override
-    public <T> List<T> acceptCFG(CFGBuilder v, List<T> succs) {
+    public <T> List<T> acceptCFG(CFGBuilder<?> v, List<T> succs) {
         if (expr != null) {
             v.visitCFG(expr, this, EXIT);
         }

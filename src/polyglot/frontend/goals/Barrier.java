@@ -25,12 +25,13 @@
 
 package polyglot.frontend.goals;
 
-import java.util.*;
 import java.util.Collection;
-import java.util.Iterator;
 
-import polyglot.frontend.*;
-import polyglot.util.InternalCompilerError;
+import polyglot.frontend.AbstractPass;
+import polyglot.frontend.ExtensionInfo;
+import polyglot.frontend.Job;
+import polyglot.frontend.Pass;
+import polyglot.frontend.Scheduler;
 
 /**
  * A <code>Barrier</code> goal synchronizes all the jobs to reach the same goal. 
@@ -50,13 +51,14 @@ public abstract class Barrier extends AbstractGoal {
         this.scheduler = scheduler;
     }
     
-    public Collection jobs() {
+    public Collection<Job> jobs() {
         return scheduler.jobs();
     }
 
     /* (non-Javadoc)
      * @see polyglot.frontend.goals.Goal#createPass(polyglot.frontend.ExtensionInfo)
      */
+    @Override
     public Pass createPass(ExtensionInfo extInfo) {
         return new BarrierPass(scheduler, this);
     }
@@ -69,10 +71,10 @@ public abstract class Barrier extends AbstractGoal {
             this.scheduler = scheduler;
         }
                 
+        @Override
         public boolean run() {
             Barrier barrier = (Barrier) goal();
-            for (Iterator i = barrier.jobs().iterator(); i.hasNext(); ) {
-                Job job = (Job) i.next();
+            for (Job job : barrier.jobs()) {
                 Goal subgoal = barrier.goalForJob(job);
                 if (! subgoal.hasBeenReached()) {
                     scheduler.addDependencyAndEnqueue(barrier, subgoal, true);
@@ -85,6 +87,7 @@ public abstract class Barrier extends AbstractGoal {
 
     public abstract Goal goalForJob(Job job); 
 
+    @Override
     public String toString() {
         if (name == null) {
             return super.toString();
@@ -92,6 +95,7 @@ public abstract class Barrier extends AbstractGoal {
         return name;
     }
     
+    @Override
     public int hashCode() {
         if (name == null) {
             return System.identityHashCode(this);
@@ -101,6 +105,7 @@ public abstract class Barrier extends AbstractGoal {
         }
     }
 
+    @Override
     public boolean equals(Object o) {
         if (name == null) {
             return this == o;

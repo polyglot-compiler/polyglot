@@ -154,11 +154,11 @@ public class LubType_c extends ClassType_c implements LubType {
             if (next instanceof RawClass || next instanceof JL5ParsedClassType) {
                 return next;
             }
-            List<Type> lcta_args = new ArrayList<Type>();
+            List<ReferenceType> lcta_args = new ArrayList<ReferenceType>();
             JL5SubstClassType nextp = (JL5SubstClassType) next;
             for (int argi = 0; argi < res.actuals().size(); argi++) {
-                Type a1 = (Type)res.actuals().get(argi);
-                Type a2 = (Type)nextp.actuals().get(argi);
+                ReferenceType a1 = res.actuals().get(argi);
+                ReferenceType a2 = nextp.actuals().get(argi);
                 lcta_args.add(lcta(a1,a2));
             }
             try {
@@ -171,7 +171,7 @@ public class LubType_c extends ClassType_c implements LubType {
         return res;
     }
 
-    private Type lcta(Type a1, Type a2) {
+    private ReferenceType lcta(ReferenceType a1, ReferenceType a2) {
         JL5TypeSystem ts = (JL5TypeSystem)this.ts;
         if (a1 instanceof WildCardType) {
             WildCardType a1wc = (WildCardType) a1;

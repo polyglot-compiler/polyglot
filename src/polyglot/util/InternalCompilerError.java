@@ -67,6 +67,7 @@ public class InternalCompilerError extends RuntimeException
 	return super.getMessage();
     }
 
+    @Override
     public String getMessage() {
 	return pos == null ? message() : pos + ": " + message();
     }

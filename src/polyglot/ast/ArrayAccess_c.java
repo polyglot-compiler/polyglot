@@ -25,10 +25,20 @@
 
 package polyglot.ast;
 
-import polyglot.util.*;
-import polyglot.types.*;
-import polyglot.visit.*;
-import java.util.*;
+import java.util.List;
+
+import polyglot.types.Flags;
+import polyglot.types.SemanticException;
+import polyglot.types.Type;
+import polyglot.types.TypeSystem;
+import polyglot.util.CodeWriter;
+import polyglot.util.CollectionUtil;
+import polyglot.util.Position;
+import polyglot.visit.AscriptionVisitor;
+import polyglot.visit.CFGBuilder;
+import polyglot.visit.NodeVisitor;
+import polyglot.visit.PrettyPrinter;
+import polyglot.visit.TypeChecker;
 
 /**
  * An <code>ArrayAccess</code> is an immutable representation of an
@@ -159,7 +169,7 @@ public class ArrayAccess_c extends Expr_c implements ArrayAccess
     }
 
     @Override
-    public <T> List<T> acceptCFG(CFGBuilder v, List<T> succs) {
+    public <T> List<T> acceptCFG(CFGBuilder<?> v, List<T> succs) {
         v.visitCFG(array, index, ENTRY);
         v.visitCFG(index, this, EXIT);
         return succs;

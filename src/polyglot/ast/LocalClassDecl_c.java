@@ -25,10 +25,15 @@
 
 package polyglot.ast;
 
-import polyglot.types.*;
-import polyglot.util.*;
-import polyglot.visit.*;
-import java.util.*;
+import java.util.List;
+
+import polyglot.types.Context;
+import polyglot.util.CodeWriter;
+import polyglot.util.InternalCompilerError;
+import polyglot.util.Position;
+import polyglot.visit.CFGBuilder;
+import polyglot.visit.NodeVisitor;
+import polyglot.visit.PrettyPrinter;
 
 /**
  * A local class declaration statement.  The node is just a wrapper around
@@ -82,7 +87,7 @@ public class LocalClassDecl_c extends Stmt_c implements LocalClassDecl
      * Visit this term in evaluation order.
      */
     @Override
-    public <T> List<T> acceptCFG(CFGBuilder v, List<T> succs) {
+    public <T> List<T> acceptCFG(CFGBuilder<?> v, List<T> succs) {
         v.visitCFG(decl(), this, EXIT);
         return succs;
     }

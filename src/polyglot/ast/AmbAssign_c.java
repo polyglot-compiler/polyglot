@@ -51,12 +51,12 @@ public class AmbAssign_c extends Assign_c implements AmbAssign
   }
   
   @Override
-  protected void acceptCFGAssign(CFGBuilder v) {
+  protected void acceptCFGAssign(CFGBuilder<?> v) {
       v.visitCFG(right(), this, EXIT);
   }
   
   @Override
-  protected void acceptCFGOpAssign(CFGBuilder v) {
+  protected void acceptCFGOpAssign(CFGBuilder<?> v) {
       v.visitCFG(left(), right(), ENTRY);
       v.visitCFG(right(), this, EXIT);
   }

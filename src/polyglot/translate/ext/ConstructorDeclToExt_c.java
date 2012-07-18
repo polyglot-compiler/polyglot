@@ -7,6 +7,7 @@ import polyglot.types.SemanticException;
 
 public class ConstructorDeclToExt_c extends ToExt_c {
 
+    @Override
     public Node toExt(ExtensionRewriter rw) throws SemanticException {
         ConstructorDecl n = (ConstructorDecl) node();
 

@@ -25,9 +25,9 @@
 
 package polyglot.visit;
 
-import polyglot.ast.*;
-import polyglot.ast.TopLevelDecl;
 import polyglot.ast.Node;
+import polyglot.ast.NodeFactory;
+import polyglot.ast.TopLevelDecl;
 import polyglot.frontend.Job;
 import polyglot.types.Context;
 import polyglot.types.TypeSystem;
@@ -46,6 +46,7 @@ public class OuterScopeDisambiguator extends Disambiguator
         super(job, ts, nf, c);
     }
     
+    @Override
     public Node override(Node parent, Node n) {
         // Only visit imports and package declarations.
         if (n instanceof TopLevelDecl) {

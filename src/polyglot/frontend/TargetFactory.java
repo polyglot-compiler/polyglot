@@ -25,22 +25,25 @@
 
 package polyglot.frontend;
 
-import polyglot.filemanager.FileManager;
-import polyglot.main.Options;
-import polyglot.main.Report;
-import polyglot.types.*;
-import polyglot.util.*;
-
-import java.io.*;
 import static java.io.File.separatorChar;
-import java.net.URI;
-import java.util.*;
+
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.Writer;
 
 import javax.tools.FileObject;
 import javax.tools.JavaFileManager;
 import javax.tools.JavaFileManager.Location;
 import javax.tools.JavaFileObject;
 import javax.tools.JavaFileObject.Kind;
+
+import polyglot.filemanager.FileManager;
+import polyglot.main.Report;
+import polyglot.util.CodeWriter;
+import polyglot.util.InternalCompilerError;
+import polyglot.util.UnicodeWriter;
 
 /** A <code>TargetFactory</code> is responsible for opening output files. */
 public class TargetFactory {

@@ -25,8 +25,9 @@
 
 package polyglot.frontend.goals;
 
-import polyglot.ast.NodeFactory;
-import polyglot.frontend.*;
+import polyglot.frontend.ExtensionInfo;
+import polyglot.frontend.Pass;
+import polyglot.frontend.Scheduler;
 import polyglot.frontend.passes.TypeExistsPass;
 import polyglot.types.TypeSystem;
 
@@ -47,9 +48,9 @@ public class TypeExists extends AbstractGoal {
         this.typeName = name;
     }
     
+    @Override
     public Pass createPass(ExtensionInfo extInfo) {
         TypeSystem ts = extInfo.typeSystem();
-        NodeFactory nf = extInfo.nodeFactory();
         return new TypeExistsPass(extInfo.scheduler(), ts, this);
     }
     
@@ -57,14 +58,17 @@ public class TypeExists extends AbstractGoal {
         return typeName;
     }
 
+    @Override
     public int hashCode() {
         return typeName.hashCode() + super.hashCode();
     }
     
+    @Override
     public boolean equals(Object o) {
         return o instanceof TypeExists && ((TypeExists) o).typeName.equals(typeName) && super.equals(o);
     }
     
+    @Override
     public String toString() {
         return "TypeExists(" + typeName + ")";
     }

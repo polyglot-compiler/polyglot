@@ -25,9 +25,13 @@
 
 package polyglot.ast;
 
-import polyglot.visit.*;
-import polyglot.util.*;
-import java.util.*;
+import java.util.List;
+
+import polyglot.util.CodeWriter;
+import polyglot.util.Position;
+import polyglot.visit.CFGBuilder;
+import polyglot.visit.NodeVisitor;
+import polyglot.visit.PrettyPrinter;
 
 /**
  * Am immutable representation of a Java statement with a label.  A labeled
@@ -123,7 +127,7 @@ public class Labeled_c extends Stmt_c implements Labeled
     }
 
     @Override
-    public <T> List<T> acceptCFG(CFGBuilder v, List<T> succs) {
+    public <T> List<T> acceptCFG(CFGBuilder<?> v, List<T> succs) {
         v.push(this).visitCFG(statement, this, EXIT);
         return succs;
     }

@@ -25,10 +25,16 @@
 
 package polyglot.frontend.goals;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 import polyglot.ast.NodeFactory;
-import polyglot.frontend.*;
+import polyglot.frontend.ExtensionInfo;
+import polyglot.frontend.Job;
+import polyglot.frontend.OutputPass;
+import polyglot.frontend.Pass;
+import polyglot.frontend.Scheduler;
 import polyglot.types.TypeSystem;
 import polyglot.visit.Translator;
 
@@ -49,6 +55,7 @@ public class CodeGenerated extends SourceFileGoal implements EndGoal {
         super(job);
     }
     
+    @Override
     public Pass createPass(ExtensionInfo extInfo) {
         TypeSystem ts = extInfo.typeSystem();
         NodeFactory nf = extInfo.nodeFactory();
@@ -56,8 +63,9 @@ public class CodeGenerated extends SourceFileGoal implements EndGoal {
                                                    extInfo.targetFactory()));
     }
     
-    public Collection prerequisiteGoals(Scheduler scheduler) {
-        List l = new ArrayList();
+    @Override
+    public Collection<Goal> prerequisiteGoals(Scheduler scheduler) {
+        List<Goal> l = new ArrayList<Goal>();
         l.add(scheduler.Serialized(job));
         l.addAll(super.prerequisiteGoals(scheduler));
         return l;

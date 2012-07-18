@@ -25,46 +25,69 @@
 
 package polyglot.visit;
 
-import polyglot.ast.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
+
+import polyglot.ast.Assign;
+import polyglot.ast.Block;
+import polyglot.ast.Catch;
+import polyglot.ast.Expr;
+import polyglot.ast.For;
+import polyglot.ast.If;
+import polyglot.ast.Local;
+import polyglot.ast.LocalDecl;
+import polyglot.ast.Loop;
+import polyglot.ast.Node;
+import polyglot.ast.NodeFactory;
+import polyglot.ast.Stmt;
+import polyglot.ast.Term;
+import polyglot.ast.Unary;
 import polyglot.frontend.Job;
 import polyglot.main.Report;
-import polyglot.types.*;
+import polyglot.types.LocalInstance;
+import polyglot.types.SemanticException;
+import polyglot.types.TypeSystem;
 import polyglot.util.InternalCompilerError;
-
-import java.util.*;
+import polyglot.visit.FlowGraph.EdgeKey;
+import polyglot.visit.FlowGraph.Peer;
 
 /**
  * Visitor which performs copy propagation.
  */
-public class CopyPropagator extends DataFlow {
+public class CopyPropagator extends DataFlow<CopyPropagator.DataFlowItem> {
     public CopyPropagator(Job job, TypeSystem ts, NodeFactory nf) {
 	super(job, ts, nf,
 	      true /* forward analysis */,
 	      true /* perform dataflow on entry to CodeDecls */);
     }
 
-    protected static class DataFlowItem extends Item {
+    protected static class DataFlowItem extends DataFlow.Item {
 	// Map of LocalInstance -> CopyInfo.  The CopyInfo nodes form a forest
 	// to represent copy information.
-	private Map map;  
+	private Map<LocalInstance, CopyInfo> map;  
 
 	/**
 	 * Constructor for creating an empty set.
 	 */
 	protected DataFlowItem() {
-	    this.map = new HashMap();
+	    this.map = new HashMap<LocalInstance, CopyInfo>();
 	}
 
 	/**
 	 * Deep copy constructor.
 	 */
 	protected DataFlowItem(DataFlowItem dfi) {
-	    map = new HashMap(dfi.map.size());
-	    for (Iterator it = dfi.map.entrySet().iterator(); it.hasNext(); ) {
-		Map.Entry e = (Map.Entry)it.next();
-
-		LocalInstance li = (LocalInstance)e.getKey();
-		CopyInfo ci = (CopyInfo)e.getValue();
+	    map = new HashMap<LocalInstance, CopyInfo>(dfi.map.size());
+	    for (Map.Entry<LocalInstance, CopyInfo> e : dfi.map.entrySet()) {
+		LocalInstance li = e.getKey();
+		CopyInfo ci = e.getValue();
 		if (ci.from != null) add(ci.from.li, li);
 	    }
 	}
@@ -72,7 +95,7 @@ public class CopyPropagator extends DataFlow {
 	protected static class CopyInfo {
 	    final public LocalInstance li; // Local instance this node pertains to.
 	    public CopyInfo from;    // In edge.
-	    public Set to;	      // Out edges.
+	    public Set<CopyInfo> to;	      // Out edges.
 	    public CopyInfo root;    // Root CopyInfo node for this tree.
 
 	    protected CopyInfo(LocalInstance li) {
@@ -83,21 +106,22 @@ public class CopyPropagator extends DataFlow {
 
 		this.li = li;
 		this.from = null;
-		this.to = new HashSet();
+		this.to = new HashSet<CopyInfo>();
 		this.root = this;
 	    }
 
 	    protected void setRoot(CopyInfo root) {
-		List worklist = new ArrayList();
+		List<CopyInfo> worklist = new ArrayList<CopyInfo>();
 		worklist.add(this);
 		while (worklist.size() > 0) {
-		    CopyInfo ci = (CopyInfo)worklist.remove(worklist.size()-1);
+		    CopyInfo ci = worklist.remove(worklist.size()-1);
 		    worklist.addAll(ci.to);
 		    ci.root = root;
 		}
 	    }
 
-	    public boolean equals(Object o) {
+	    @Override
+        public boolean equals(Object o) {
 		if (!(o instanceof CopyInfo)) return false;
 		CopyInfo ci = (CopyInfo)o;
 
@@ -109,7 +133,8 @@ public class CopyPropagator extends DataFlow {
 		    && root.li == ci.root.li;
 	    }
 
-	    public int hashCode() {
+	    @Override
+        public int hashCode() {
 		return li.hashCode()
 		    + 31*(from == null ? 0 : from.li.hashCode()
 			+ 31*root.li.hashCode());
@@ -124,13 +149,13 @@ public class CopyPropagator extends DataFlow {
 		ciTo = new CopyInfo(to);
 		map.put(to, ciTo);
 	    } else {
-		ciTo = (CopyInfo)map.get(to);
+		ciTo = map.get(to);
 	    }
 
 	    // Get the 'from' node.
 	    CopyInfo ciFrom;
 	    if (map.containsKey(from)) {
-		ciFrom = (CopyInfo)map.get(from);
+		ciFrom = map.get(from);
 	    } else {
 		ciFrom = new CopyInfo(from);
 		map.put(from, ciFrom);
@@ -158,10 +183,10 @@ public class CopyPropagator extends DataFlow {
 	protected void intersect(DataFlowItem dfi) {
 	    boolean modified = false;
 
-	    for (Iterator it = map.entrySet().iterator(); it.hasNext(); ) {
-		Map.Entry e = (Map.Entry)it.next();
-		LocalInstance li = (LocalInstance)e.getKey();
-		CopyInfo ci = (CopyInfo)e.getValue();
+	    for (Iterator<Map.Entry<LocalInstance, CopyInfo>> it = map.entrySet().iterator(); it.hasNext(); ) {
+		Map.Entry<LocalInstance, CopyInfo> e = it.next();
+		LocalInstance li = e.getKey();
+		CopyInfo ci = e.getValue();
 
 		if (!dfi.map.containsKey(li)) {
 		    modified = true;
@@ -171,8 +196,7 @@ public class CopyPropagator extends DataFlow {
 		    // Surgery.  Bypass and remove the node.  We'll fix
 		    // consistency later.
 		    if (ci.from != null) ci.from.to.remove(ci);
-		    for (Iterator i = ci.to.iterator(); i.hasNext(); ) {
-			CopyInfo toCI = (CopyInfo)i.next();
+		    for (CopyInfo toCI : ci.to) {
 			toCI.from = null;
 		    }
 
@@ -185,8 +209,8 @@ public class CopyPropagator extends DataFlow {
 		// Make sure that ci and ci.from are also in the same tree in
 		// the other DFI.  If not, break the link in the intersection
 		// result.
-		CopyInfo otherCI = (CopyInfo)dfi.map.get(li);
-		CopyInfo otherCIfrom = (CopyInfo)dfi.map.get(ci.from.li);
+		CopyInfo otherCI = dfi.map.get(li);
+		CopyInfo otherCIfrom = dfi.map.get(ci.from.li);
 
 		if (otherCIfrom == null || otherCI.root != otherCIfrom.root) {
 		    modified = true;
@@ -200,9 +224,9 @@ public class CopyPropagator extends DataFlow {
 	    if (!modified) return;
 
 	    // Fix consistency.
-	    for (Iterator it = map.entrySet().iterator(); it.hasNext(); ) {
-		Map.Entry e = (Map.Entry)it.next();
-		CopyInfo ci = (CopyInfo)e.getValue();
+	    for (Iterator<Map.Entry<LocalInstance, CopyInfo>> it = map.entrySet().iterator(); it.hasNext(); ) {
+		Entry<LocalInstance, CopyInfo> e = it.next();
+		CopyInfo ci = e.getValue();
 
 		// Only work on roots.
 		if (ci.from != null) continue;
@@ -221,13 +245,12 @@ public class CopyPropagator extends DataFlow {
 	public void kill(LocalInstance var) {
 	    if (!map.containsKey(var)) return;
 
-	    CopyInfo ci = (CopyInfo)map.get(var);
+	    CopyInfo ci = map.get(var);
 	    map.remove(var);
 
 	    // Splice out 'ci' and fix consistency.
 	    if (ci.from != null) ci.from.to.remove(ci);
-	    for (Iterator it = ci.to.iterator(); it.hasNext(); ) {
-		CopyInfo toCI = (CopyInfo)it.next();
+	    for (CopyInfo toCI : ci.to) {
 		toCI.from = ci.from;
 		if (ci.from == null) {
 		    toCI.setRoot(toCI);
@@ -239,7 +262,7 @@ public class CopyPropagator extends DataFlow {
 
 	public LocalInstance getRoot(LocalInstance var) {
 	    if (!map.containsKey(var)) return null;
-	    return ((CopyInfo)map.get(var)).root.li;
+	    return map.get(var).root.li;
 	}
 
 	private void die() {
@@ -247,12 +270,11 @@ public class CopyPropagator extends DataFlow {
 		+ "consistency error.");
 	}
 
+	@SuppressWarnings("unused")
 	private void consistencyCheck() {
-	    for (Iterator it = map.entrySet().iterator(); it.hasNext(); ) {
-		Map.Entry e = (Map.Entry)it.next();
-
-		LocalInstance li = (LocalInstance)e.getKey();
-		CopyInfo ci = (CopyInfo)e.getValue();
+	    for (Map.Entry<LocalInstance, CopyInfo> e : map.entrySet()) {
+		LocalInstance li = e.getKey();
+		CopyInfo ci = e.getValue();
 
 		if (li != ci.li) die();
 		if (!map.containsKey(ci.root.li)) die();
@@ -267,8 +289,7 @@ public class CopyPropagator extends DataFlow {
 		    if (!ci.from.to.contains(ci)) die();
 		}
 
-		for (Iterator i = ci.to.iterator(); i.hasNext(); ) {
-		    CopyInfo toCI = (CopyInfo)i.next();
+		for (CopyInfo toCI : ci.to) {
 		    if (!map.containsKey(toCI.li)) die();
 		    if (map.get(toCI.li) != toCI) die();
 		    if (toCI.root != ci.root) die();
@@ -277,10 +298,10 @@ public class CopyPropagator extends DataFlow {
 	    }
 	}
 
-	public int hashCode() {
+	@Override
+    public int hashCode() {
 	    int result = 0;
-	    for (Iterator it = map.entrySet().iterator(); it.hasNext(); ) {
-		Map.Entry e = (Map.Entry)it.next();
+	    for (Entry<LocalInstance, CopyInfo> e : map.entrySet()) {
 		result = 31*result + e.getKey().hashCode();
 		result = 31*result + e.getValue().hashCode();
 	    }
@@ -288,19 +309,20 @@ public class CopyPropagator extends DataFlow {
 	    return result;
 	}
 
-	public boolean equals(Object o) {
+	@Override
+    public boolean equals(Object o) {
 	    if (!(o instanceof DataFlowItem)) return false;
 
 	    DataFlowItem dfi = (DataFlowItem)o;
 	    return map.equals(dfi.map);
 	}
 
-	public String toString() {
+	@Override
+    public String toString() {
 	    String result = "";
 	    boolean first = true;
 
-	    for (Iterator it = map.values().iterator(); it.hasNext(); ) {
-		CopyInfo ci = (CopyInfo)it.next();
+	    for (CopyInfo ci : map.values()) {
 		if (ci.from != null) {
 		    if (!first) result += ", ";
 		    if (ci.root != ci.from) result += ci.root.li + " ->* ";
@@ -312,14 +334,15 @@ public class CopyPropagator extends DataFlow {
 	}
     }
 
-    public Item createInitialItem(FlowGraph graph, Term node, boolean entry) {
+    @Override
+    public DataFlowItem createInitialItem(FlowGraph<DataFlowItem> graph, Term node, boolean entry) {
 	return new DataFlowItem();
     }
 
-    public Item confluence(List inItems, Term node, boolean entry, FlowGraph graph) {
+    @Override
+    public DataFlowItem confluence(List<DataFlowItem> inItems, Term node, boolean entry, FlowGraph<DataFlowItem> graph) {
 	DataFlowItem result = null;
-	for (Iterator it = inItems.iterator(); it.hasNext(); ) {
-	    DataFlowItem inItem = (DataFlowItem)it.next();
+	for (DataFlowItem inItem : inItems) {
 	    if (result == null) {
 		result = new DataFlowItem(inItem);
 	    } else {
@@ -336,8 +359,8 @@ public class CopyPropagator extends DataFlow {
 	}
     }
 
-    protected DataFlowItem flow(Item in, FlowGraph graph, Term t, boolean entry) {
-	DataFlowItem result = new DataFlowItem((DataFlowItem)in);
+    protected DataFlowItem flow(DataFlowItem in, FlowGraph<DataFlowItem> graph, Term t, boolean entry) {
+	DataFlowItem result = new DataFlowItem(in);
     
     if (entry) {
         return result;
@@ -386,15 +409,15 @@ public class CopyPropagator extends DataFlow {
 	} else if (t instanceof Block) {
 	    // Kill locals that were declared in the block.
 	    Block n = (Block)t;
-	    for (Iterator it = n.statements().iterator(); it.hasNext(); ) {
-		killDecl(result, (Stmt)it.next());
+	    for (Stmt stmt : n.statements()) {
+		killDecl(result, stmt);
 	    }
 	} else if (t instanceof Loop) {
 	    if (t instanceof For) {
 		// Kill locals that were declared in the initializers.
 		For n = (For)t;
-		for (Iterator it = n.inits().iterator(); it.hasNext(); ) {
-		    killDecl(result, (Stmt)it.next());
+		for (Stmt stmt : n.inits()) {
+		    killDecl(result, stmt);
 		}
 	    }
 
@@ -413,42 +436,45 @@ public class CopyPropagator extends DataFlow {
 	return result;
     }
 
-    public Map flow(Item in, FlowGraph graph, Term t, boolean entry, Set succEdgeKeys) {
+    @Override
+    public Map<EdgeKey, DataFlowItem> flow(DataFlowItem in, FlowGraph<DataFlowItem> graph, Term t, boolean entry, Set<EdgeKey> succEdgeKeys) {
 	return itemToMap(flow(in, graph, t, entry), succEdgeKeys);
     }
 
-    public void post(FlowGraph graph, Term root) throws SemanticException {
+    @Override
+    public void post(FlowGraph<DataFlowItem> graph, Term root) throws SemanticException {
 	// No need to do any checking.
 	if (Report.should_report(Report.cfg, 2)) {
 	    dumpFlowGraph(graph, root);
 	}
     }
 
-    public void check(FlowGraph graph, Term n, boolean entry, Item inItem, Map outItems)
+    @Override
+    public void check(FlowGraph<DataFlowItem> graph, Term n, boolean entry, DataFlowItem inItem, Map<EdgeKey, DataFlowItem> outItems)
 	throws SemanticException {
 
 	throw new InternalCompilerError("CopyPropagator.check should never be "
 	    + "called.");
     }
 
+    @Override
     public Node leaveCall(Node old, Node n, NodeVisitor v)
 	throws SemanticException {
 
 	if (n instanceof Local) {
-	    FlowGraph g = currentFlowGraph();
+	    FlowGraph<DataFlowItem> g = currentFlowGraph();
 	    if (g == null) return n;
 
 	    Local l = (Local)n;
-	    Collection peers = g.peers(l, Term.EXIT);
+	    Collection<Peer<DataFlowItem>> peers = g.peers(l, Term.EXIT);
 	    if (peers == null || peers.isEmpty()) return n;
 
-	    List items = new ArrayList();
-	    for (Iterator it = peers.iterator(); it.hasNext(); ) {
-		FlowGraph.Peer p = (FlowGraph.Peer)it.next();
+	    List<DataFlowItem> items = new ArrayList<DataFlowItem>();
+	    for (Peer<DataFlowItem> p : peers) {
 		if (p.inItem() != null) items.add(p.inItem());
 	    }
 
-	    DataFlowItem in = (DataFlowItem)confluence(items, l, false, g);
+	    DataFlowItem in = confluence(items, l, false, g);
 	    if (in == null) return n;
 
 	    LocalInstance root = in.getRoot(l.localInstance().orig());

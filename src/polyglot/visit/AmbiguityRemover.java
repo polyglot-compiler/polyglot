@@ -25,16 +25,26 @@
 
 package polyglot.visit;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collection;
 
-import polyglot.ast.*;
-import polyglot.frontend.*;
+import polyglot.ast.ClassDecl;
+import polyglot.ast.ClassMember;
+import polyglot.ast.CodeDecl;
+import polyglot.ast.FieldDecl;
+import polyglot.ast.New;
+import polyglot.ast.Node;
+import polyglot.ast.NodeFactory;
 import polyglot.frontend.Job;
 import polyglot.frontend.MissingDependencyException;
+import polyglot.frontend.Scheduler;
 import polyglot.frontend.goals.Goal;
 import polyglot.main.Report;
-import polyglot.types.*;
-import polyglot.util.*;
+import polyglot.types.SemanticException;
+import polyglot.types.TypeSystem;
+import polyglot.util.ErrorInfo;
+import polyglot.util.InternalCompilerError;
+import polyglot.util.Position;
 
 /**
  * A visitor which traverses the AST and remove ambiguities found in fields,
@@ -55,6 +65,7 @@ public class AmbiguityRemover extends DisambiguationDriver
         this.visitBodies = visitBodies;
     }
     
+    @Override
     public Node override(Node parent, Node n) {
         if (! visitSigs && n instanceof ClassMember && ! (n instanceof ClassDecl)) {
             return n;
@@ -111,6 +122,7 @@ public class AmbiguityRemover extends DisambiguationDriver
         }    
     }
     
+    @Override
     protected NodeVisitor enterCall(Node n) throws SemanticException {
         if (Report.should_report(Report.visit, 2))
             Report.report(2, ">> " + this + "::enter " + n + " (" + n.getClass().getName() + ")");
@@ -125,6 +137,7 @@ public class AmbiguityRemover extends DisambiguationDriver
     
     protected static class AmbChecker2 extends NodeVisitor {
         public boolean amb;
+        @Override
         public Node override(Node n) {
             if (! n.isDisambiguated()) {
                 amb = true;
@@ -133,6 +146,7 @@ public class AmbiguityRemover extends DisambiguationDriver
         }
     }
 
+    @Override
     protected Node leaveCall(Node old, Node n, NodeVisitor v) throws SemanticException {
         if (Report.should_report(Report.visit, 2))
             Report.report(2, ">> " + this + "::leave " + n + " (" + n.getClass().getName() + ")");
@@ -153,17 +167,20 @@ public class AmbiguityRemover extends DisambiguationDriver
         return m;
     }
     
-    public HaltingVisitor bypass(Collection c) {
+    @Override
+    public HaltingVisitor bypass(Collection<? extends Node> c) {
         throw new InternalCompilerError("AmbiguityRemover does not support bypassing. " +
                                         "Implement any required functionality using " +
                                         "Node.disambiguateOverride(Node, AmbiguityRemover).");
     }
+    @Override
     public HaltingVisitor bypass(Node n) {
         throw new InternalCompilerError("AmbiguityRemover does not support bypassing. " +
                                         "Implement any required functionality using " +
                                         "Node.disambiguateOverride(Node, AmbiguityRemover).");
     }
    
+    @Override
     public HaltingVisitor bypassChildren(Node n) {
         throw new InternalCompilerError("AmbiguityRemover does not support bypassing. " +
                                         "Implement any required functionality using " +
@@ -177,8 +194,9 @@ public class AmbiguityRemover extends DisambiguationDriver
     protected static class AmbChecker extends NodeVisitor {
         public int notOkCount;
 
+        @Override
         public Node override(Node parent, Node n) {
-            final Collection TOPICS = Arrays.asList(new String[] { Report.types, Report.frontend, "disam-check" });
+            final Collection<String> TOPICS = Arrays.asList(new String[] { Report.types, Report.frontend, "disam-check" });
 
             // Don't check if New is disambiguated; this is handled
             // during type-checking.

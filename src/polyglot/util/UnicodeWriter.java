@@ -25,7 +25,9 @@
 
 package polyglot.util;
 
-import java.io.*;
+import java.io.FilterWriter;
+import java.io.IOException;
+import java.io.Writer;
 
 /**
  * Output stream for writing unicode.  Non-ASCII Unicode characters
@@ -38,7 +40,8 @@ public class UnicodeWriter extends FilterWriter
     super(out);
   }
 
-  public void write(int c) throws IOException
+  @Override
+public void write(int c) throws IOException
   {
     if( c <= 0xFF) {
       super.write(c);
@@ -54,15 +57,17 @@ public class UnicodeWriter extends FilterWriter
     }
   }
   
-  public void write(char[] cbuf, int off, int len) throws IOException
+  @Override
+public void write(char[] cbuf, int off, int len) throws IOException
   {
     for( int i = 0; i < len; i++)
     {
-      write((int)cbuf[i+off]);
+      write(cbuf[i+off]);
     }
   }
 
-  public void write(String str, int off, int len) throws IOException
+  @Override
+public void write(String str, int off, int len) throws IOException
   {
     write(str.toCharArray(), off, len);
   }

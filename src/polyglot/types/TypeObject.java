@@ -25,8 +25,10 @@
 
 package polyglot.types;
 
-import polyglot.util.*;
-import java.io.*;
+import java.io.Serializable;
+
+import polyglot.util.Copy;
+import polyglot.util.Position;
 
 /**
  * A <code>TypeObject</code> is a compile-time value created by the type system.

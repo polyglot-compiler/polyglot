@@ -21,8 +21,8 @@ import polyglot.util.Transformation;
  */
 public class JL5RawSubst_c extends JL5Subst_c implements JL5Subst {
     private final JL5ParsedClassType base;
-    public JL5RawSubst_c(JL5TypeSystem ts, Map subst, Map cache, JL5ParsedClassType base) {
-        super(ts, subst, cache);
+    public JL5RawSubst_c(JL5TypeSystem ts, Map subst, JL5ParsedClassType base) {
+        super(ts, subst);
         this.base = base;
     }
     
@@ -75,7 +75,7 @@ public class JL5RawSubst_c extends JL5Subst_c implements JL5Subst {
             // JLS 3rd ed 4.8: "The type of a static member of a raw type C is the same as its type in the generic declaration corresponding to C."
             return (MethodInstance)mi.declaration();
         }
-        // The type of a constructor (¤8.8), instance method (¤8.8, ¤9.4), or non-static field (¤8.3) M 
+        // The type of a constructor (ï¿½8.8), instance method (ï¿½8.8, ï¿½9.4), or non-static field (ï¿½8.3) M 
         // of a raw type C that is not inherited from its superclasses or super- interfaces is the erasure of 
         // its type in the generic declaration corresponding to C.
         
@@ -97,7 +97,7 @@ public class JL5RawSubst_c extends JL5Subst_c implements JL5Subst {
         tmpMi.setContainer(ts.rawClass(base));
         
         // subst the type params
-        tmpMi.setTypeParams(this.substTypeList(tmpMi.typeParams()));
+        tmpMi.setTypeParams(this.<TypeVariable> substTypeList(tmpMi.typeParams()));
         
         // now erase the type params, if there are any
         JL5Subst eraseMI = ts.erasureSubst(tmpMi);
@@ -117,7 +117,7 @@ public class JL5RawSubst_c extends JL5Subst_c implements JL5Subst {
         
         // ci is a member of the raw class we are substituting.
 
-        // The type of a constructor (¤8.8), instance method (¤8.8, ¤9.4), or non-static field (¤8.3) M 
+        // The type of a constructor (ï¿½8.8), instance method (ï¿½8.8, ï¿½9.4), or non-static field (ï¿½8.3) M 
         // of a raw type C that is not inherited from its superclasses or super- interfaces is the erasure of 
         // its type in the generic declaration corresponding to C.
         
@@ -136,7 +136,7 @@ public class JL5RawSubst_c extends JL5Subst_c implements JL5Subst {
         tmpCi.setContainer(ts.rawClass(base));
         
         // subst the type params
-        tmpCi.setTypeParams(this.substTypeList(tmpCi.typeParams()));
+        tmpCi.setTypeParams(this.<TypeVariable> substTypeList(tmpCi.typeParams()));
         
         // now erase the type params, if there are any
         JL5Subst eraseCI = ts.erasureSubst(tmpCi);

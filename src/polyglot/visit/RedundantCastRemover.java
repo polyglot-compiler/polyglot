@@ -25,9 +25,14 @@
 
 package polyglot.visit;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
-import polyglot.ast.*;
+import polyglot.ast.Cast;
+import polyglot.ast.Expr;
+import polyglot.ast.Node;
+import polyglot.ast.ProcedureCall;
 import polyglot.types.Type;
 
 /**
@@ -40,6 +45,7 @@ public class RedundantCastRemover extends NodeVisitor {
         super();
     }
     
+    @Override
     public Node leave(Node old, Node n, NodeVisitor v) {
         if (n instanceof Cast) {
             Cast c = (Cast) n;
@@ -57,13 +63,13 @@ public class RedundantCastRemover extends NodeVisitor {
         if (n instanceof ProcedureCall) {
             ProcedureCall newCall = (ProcedureCall) n;
             ProcedureCall oldCall = (ProcedureCall) old;
-            List newArgs = new ArrayList(newCall.arguments().size());
+            List<Expr> newArgs = new ArrayList<Expr>(newCall.arguments().size());
             boolean changed = false;
-            Iterator i = newCall.arguments().iterator();
-            Iterator j = oldCall.arguments().iterator();
+            Iterator<Expr> i = newCall.arguments().iterator();
+            Iterator<Expr> j = oldCall.arguments().iterator();
             while (i.hasNext() && j.hasNext()) {
-                Expr newE = (Expr) i.next();
-                Expr oldE = (Expr) j.next();
+                Expr newE = i.next();
+                Expr oldE = j.next();
                 if (oldE instanceof Cast) {
                     newArgs.add(oldE);
                     changed = true;

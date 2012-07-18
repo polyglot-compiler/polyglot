@@ -27,7 +27,6 @@ package polyglot.frontend;
 
 import polyglot.ast.Node;
 import polyglot.frontend.goals.Goal;
-import polyglot.frontend.goals.SourceFileGoal;
 import polyglot.main.Report;
 import polyglot.util.ErrorQueue;
 import polyglot.util.InternalCompilerError;
@@ -55,6 +54,7 @@ public class VisitorPass extends AbstractPass
 	return v;
     }
   
+    @Override
     public boolean run() {
 	Node ast = goal.job().ast();
 
@@ -90,6 +90,7 @@ public class VisitorPass extends AbstractPass
         return false;
     }
     
+    @Override
     public String name() {
         if (v != null)
             return v.toString();

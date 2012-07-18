@@ -227,7 +227,7 @@ public class Switch_c extends Stmt_c implements Switch
     }
 
     @Override
-    public <T> List<T> acceptCFG(CFGBuilder v, List<T> succs) {
+    public <T> List<T> acceptCFG(CFGBuilder<?> v, List<T> succs) {
         List<Term> cases = new LinkedList<Term>();
         List<Integer> entry = new LinkedList<Integer>();
         boolean hasDefault = false;

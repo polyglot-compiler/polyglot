@@ -35,7 +35,7 @@ public class FlagAnnotations {
         return this;
     }
     
-    public List annotations(){
+    public List<AnnotationElem> annotations(){
         return annotations;
     }
     

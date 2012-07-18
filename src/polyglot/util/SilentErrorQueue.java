@@ -40,6 +40,7 @@ public class SilentErrorQueue extends AbstractErrorQueue
         this.errors = new ArrayList<ErrorInfo>(limit);
     }
 
+    @Override
     public void displayError(ErrorInfo e) {
         errors.add(e);
     }

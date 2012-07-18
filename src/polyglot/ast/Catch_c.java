@@ -25,11 +25,18 @@
 
 package polyglot.ast;
 
-import polyglot.util.*;
-import polyglot.types.*;
-import polyglot.visit.*;
+import java.util.List;
 
-import java.util.*;
+import polyglot.types.Context;
+import polyglot.types.SemanticException;
+import polyglot.types.Type;
+import polyglot.types.TypeSystem;
+import polyglot.util.CodeWriter;
+import polyglot.util.Position;
+import polyglot.visit.CFGBuilder;
+import polyglot.visit.NodeVisitor;
+import polyglot.visit.PrettyPrinter;
+import polyglot.visit.TypeChecker;
 
 /**
  * A <code>Catch</code> represents one half of a <code>try-catch</code>
@@ -141,7 +148,7 @@ public class Catch_c extends Stmt_c implements Catch
     }
 
     @Override
-    public <T> List<T> acceptCFG(CFGBuilder v, List<T> succs) {
+    public <T> List<T> acceptCFG(CFGBuilder<?> v, List<T> succs) {
         v.visitCFG(formal, body, ENTRY);
         v.visitCFG(body, this, EXIT);
         return succs;

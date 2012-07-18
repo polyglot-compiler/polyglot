@@ -240,7 +240,7 @@ public class Unary_c extends Expr_c implements Unary
     }
 
     @Override
-    public <T> List<T> acceptCFG(CFGBuilder v, List<T> succs) {
+    public <T> List<T> acceptCFG(CFGBuilder<?> v, List<T> succs) {
         if (expr.type().isBoolean()) {
             v.visitCFG(expr, FlowGraph.EDGE_KEY_TRUE, this, EXIT,
                              FlowGraph.EDGE_KEY_FALSE, this, EXIT);

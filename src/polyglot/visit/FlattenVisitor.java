@@ -25,11 +25,35 @@
 
 package polyglot.visit;
 
-import polyglot.ast.*;
-import polyglot.types.*;
-import polyglot.util.Position;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
 
-import java.util.*;
+import polyglot.ast.ArrayInit;
+import polyglot.ast.Assign;
+import polyglot.ast.Block;
+import polyglot.ast.ConstructorCall;
+import polyglot.ast.Do;
+import polyglot.ast.Eval;
+import polyglot.ast.Expr;
+import polyglot.ast.FieldDecl;
+import polyglot.ast.For;
+import polyglot.ast.If;
+import polyglot.ast.Lit;
+import polyglot.ast.Local;
+import polyglot.ast.LocalDecl;
+import polyglot.ast.Node;
+import polyglot.ast.NodeFactory;
+import polyglot.ast.Special;
+import polyglot.ast.Stmt;
+import polyglot.ast.Switch;
+import polyglot.ast.Term;
+import polyglot.ast.Unary;
+import polyglot.ast.While;
+import polyglot.types.Flags;
+import polyglot.types.TypeSystem;
+import polyglot.util.Position;
 
 /**
  * The <code>FlattenVisitor</code> flattens the AST,
@@ -38,14 +62,15 @@ public class FlattenVisitor extends NodeVisitor
 {
     protected TypeSystem ts;
     protected NodeFactory nf;
-    protected LinkedList stack;
+    protected LinkedList<List<Stmt>> stack;
 
     public FlattenVisitor(TypeSystem ts, NodeFactory nf) {
 	this.ts = ts;
 	this.nf = nf;
-	stack = new LinkedList();
+	stack = new LinkedList<List<Stmt>>();
     }
 
+    @Override
     public Node override(Node parent, Node n) {
         // Insert Blocks when needed to allow local decls to be inserted.
         if (n instanceof If) {
@@ -90,8 +115,8 @@ public class FlattenVisitor extends NodeVisitor
 
 	if (n instanceof FieldDecl || n instanceof ConstructorCall) {
             if (! stack.isEmpty()) {
-                List l = (List) stack.getFirst();
-                l.add(n);
+                List<Stmt> l = stack.getFirst();
+                l.add((Stmt) n);
             }
 	    return n;
 	}
@@ -119,16 +144,17 @@ public class FlattenVisitor extends NodeVisitor
 	return "flat$$$" + count++;
     }
 
-    protected Set noFlatten = new HashSet();
-    protected Set neverFlatten = new HashSet();
+    protected Set<Term> noFlatten = new HashSet<Term>();
+    protected Set<Term> neverFlatten = new HashSet<Term>();
 
     /** 
      * When entering a BlockStatement, place a new StatementList
      * onto the stack
      */
+    @Override
     public NodeVisitor enter(Node parent, Node n) {
 	if (n instanceof Block) {
-	    stack.addFirst(new LinkedList());
+	    stack.addFirst(new LinkedList<Stmt>());
 	}
 
 	if (n instanceof Eval) {
@@ -179,6 +205,7 @@ public class FlattenVisitor extends NodeVisitor
     /** 
      * Flatten complex expressions within the AST
      */
+    @Override
     public Node leave(Node parent, Node old, Node n, NodeVisitor v) {
         if (noFlatten.contains(old)) {
 	    noFlatten.remove(old);
@@ -186,17 +213,17 @@ public class FlattenVisitor extends NodeVisitor
 	}
 
 	if (n instanceof Block) {
-	    List l = (List) stack.removeFirst();
+	    List<Stmt> l = stack.removeFirst();
             Block block = ((Block) n).statements(l);
             if (parent instanceof Block && !stack.isEmpty()) {
-              l = (List) stack.getFirst();
+              l = stack.getFirst();
               l.add(block);
             }
 	    return block;
 	}
 	else if (n instanceof Stmt) {
-	    List l = (List) stack.getFirst();
-	    l.add(n);
+	    List<Stmt> l = stack.getFirst();
+	    l.add((Stmt) n);
 	    return n;
 	}
 	else if (n instanceof Expr && ! (n instanceof Lit) &&
@@ -226,7 +253,7 @@ public class FlattenVisitor extends NodeVisitor
 	    def = def.localInstance(ts.localInstance(e.position(), Flags.FINAL,
 						     e.type(), name));
 
-	    List l = (List) stack.getFirst();
+	    List<Stmt> l = stack.getFirst();
 	    l.add(def);
 
 	    // return the local temp instead of the complex expression

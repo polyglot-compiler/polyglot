@@ -25,13 +25,10 @@
 
 package polyglot.visit;
 
-import java.util.*;
-
 import polyglot.ast.Node;
-import polyglot.ast.SourceFile;
 import polyglot.ast.SourceCollection;
+import polyglot.ast.SourceFile;
 import polyglot.frontend.ExtensionInfo;
-import polyglot.visit.NodeVisitor;
 
 /**
  * This visitor adds jobs for <code>SourceFile</code>s in the AST to the
@@ -45,6 +42,7 @@ public class HandoffVisitor extends NodeVisitor
         this.ext = ext;
     }
 
+    @Override
     public Node override(Node n) {
         if (n instanceof SourceFile || n instanceof SourceCollection) {
             return null;
@@ -52,6 +50,7 @@ public class HandoffVisitor extends NodeVisitor
         return n;
     }
 
+    @Override
     public Node leave(Node old, Node n, NodeVisitor v) {
         if (n instanceof SourceFile) {
             SourceFile sf = (SourceFile) n;

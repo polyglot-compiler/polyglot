@@ -25,16 +25,13 @@
 
 package polyglot.visit;
 
-import java.io.File;
 import java.io.IOException;
-import java.io.Writer;
-import java.io.PrintWriter;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
-import javax.tools.FileObject;
+import javax.tools.JavaFileObject;
 
 import polyglot.ast.Import;
 import polyglot.ast.Node;
@@ -44,11 +41,13 @@ import polyglot.ast.SourceFile;
 import polyglot.ast.TopLevelDecl;
 import polyglot.frontend.Job;
 import polyglot.frontend.TargetFactory;
-import polyglot.types.ClassType;
 import polyglot.types.Context;
 import polyglot.types.Package;
 import polyglot.types.TypeSystem;
-import polyglot.util.*;
+import polyglot.util.CodeWriter;
+import polyglot.util.Copy;
+import polyglot.util.ErrorInfo;
+import polyglot.util.InternalCompilerError;
 
 /**
  * A Translator generates output code from the processed AST. Output is sent to
@@ -105,9 +104,10 @@ public class Translator extends PrettyPrinter implements Copy {
 	}
 
 	/** Copy the translator. */
-	public Object copy() {
+	@Override
+	public Translator copy() {
 		try {
-			return super.clone();
+			return (Translator) super.clone();
 		} catch (CloneNotSupportedException e) {
 			throw new InternalCompilerError("Java clone() weirdness.");
 		}
@@ -136,7 +136,7 @@ public class Translator extends PrettyPrinter implements Copy {
 		if (c == this.context) {
 			return this;
 		}
-		Translator tr = (Translator) copy();
+		Translator tr = copy();
 		tr.context = c;
 		return tr;
 	}
@@ -147,7 +147,8 @@ public class Translator extends PrettyPrinter implements Copy {
 	 * <code>translate(Node)</code> instead. This method should only be called
 	 * by nodes to print their children.
 	 */
-	public void print(Node parent, Node child, CodeWriter w) {
+	@Override
+    public void print(Node parent, Node child, CodeWriter w) {
 		Translator tr = this;
 
 		if (context != null) {
@@ -185,8 +186,7 @@ public class Translator extends PrettyPrinter implements Copy {
 
 			boolean okay = true;
 
-			for (Iterator i = sc.sources().iterator(); i.hasNext();) {
-				SourceFile sfn = (SourceFile) i.next();
+			for (SourceFile sfn : sc.sources()) {
 				okay &= translateSource(sfn);
 			}
 
@@ -199,21 +199,19 @@ public class Translator extends PrettyPrinter implements Copy {
 
 	/** Translate a single SourceFile node */
 	protected boolean translateSource(SourceFile sfn) {
-		TypeSystem ts = typeSystem();
-		NodeFactory nf = nodeFactory();
 		TargetFactory tf = this.tf;
 		int outputWidth = job.compiler().outputWidth();
-		Collection outputFiles = job.compiler().outputFiles();
+		Collection<JavaFileObject> outputFiles = job.compiler().outputFiles();
 
 		// Find the public declarations in the file. We'll use these to
 		// derive the names of the target files. There will be one
 		// target file per public declaration. If there are no public
 		// declarations, we'll use the source file name to derive the
 		// target file name.
-		List exports = exports(sfn);
+		List<TopLevelDecl> exports = exports(sfn);
 
 		try {
-			FileObject of;
+			JavaFileObject of;
 			CodeWriter w;
 
 			String pkg = "";
@@ -229,7 +227,7 @@ public class Translator extends PrettyPrinter implements Copy {
 				// Use the source name to derive a default output file name.
 				of = tf.outputFileObject(pkg, sfn.source());
 			} else {
-				first = (TopLevelDecl) exports.get(0);
+				first = exports.get(0);
 				of = tf.outputFileObject(pkg, first.name(), sfn.source());
 			}
 
@@ -240,8 +238,8 @@ public class Translator extends PrettyPrinter implements Copy {
 
 			writeHeader(sfn, w);
 
-			for (Iterator i = sfn.decls().iterator(); i.hasNext();) {
-				TopLevelDecl decl = (TopLevelDecl) i.next();
+			for (Iterator<TopLevelDecl> i = sfn.decls().iterator(); i.hasNext();) {
+				TopLevelDecl decl = i.next();
 
 				if (decl.flags().isPublic() && decl != first) {
 					// We hit a new exported declaration, open a new file.
@@ -306,8 +304,7 @@ public class Translator extends PrettyPrinter implements Copy {
 
 		boolean newline = false;
 
-		for (Iterator i = sfn.imports().iterator(); i.hasNext();) {
-			Import imp = (Import) i.next();
+		for (Import imp : sfn.imports()) {
 			imp.del().translate(w, this);
 			newline = true;
 		}
@@ -318,12 +315,10 @@ public class Translator extends PrettyPrinter implements Copy {
 	}
 
 	/** Get the list of public top-level classes declared in the source file. */
-	protected List exports(SourceFile sfn) {
-		List exports = new LinkedList();
+	protected List<TopLevelDecl> exports(SourceFile sfn) {
+		List<TopLevelDecl> exports = new LinkedList<TopLevelDecl>();
 
-		for (Iterator i = sfn.decls().iterator(); i.hasNext();) {
-			TopLevelDecl decl = (TopLevelDecl) i.next();
-
+		for (TopLevelDecl decl : sfn.decls()) {
 			if (decl.flags().isPublic()) {
 				exports.add(decl);
 			}
@@ -332,7 +327,8 @@ public class Translator extends PrettyPrinter implements Copy {
 		return exports;
 	}
 
-	public String toString() {
+	@Override
+    public String toString() {
 		return "Translator";
 	}
 }

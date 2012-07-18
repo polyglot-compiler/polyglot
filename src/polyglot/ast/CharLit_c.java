@@ -25,9 +25,12 @@
 
 package polyglot.ast;
 
-import polyglot.types.*;
-import polyglot.visit.*;
-import polyglot.util.*;
+import polyglot.types.SemanticException;
+import polyglot.util.CodeWriter;
+import polyglot.util.Position;
+import polyglot.util.StringUtil;
+import polyglot.visit.PrettyPrinter;
+import polyglot.visit.TypeChecker;
 
 /** 
  * An <code>CharLit</code> represents a literal in java of

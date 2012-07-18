@@ -129,7 +129,7 @@ public class Throw_c extends Stmt_c implements Throw
     }
 
     @Override
-    public <T> List<T> acceptCFG(CFGBuilder v, List<T> succs) {
+    public <T> List<T> acceptCFG(CFGBuilder<?> v, List<T> succs) {
         v.visitCFG(expr, this, EXIT);
 
         // Throw edges will be handled by visitor.

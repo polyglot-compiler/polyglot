@@ -266,7 +266,7 @@ public abstract class Assign_c extends Expr_c implements Assign
   abstract public Term firstChild();
 
   @Override
-  public <T> List<T> acceptCFG(CFGBuilder v, List<T> succs) {
+  public <T> List<T> acceptCFG(CFGBuilder<?> v, List<T> succs) {
       if (operator() == ASSIGN) {
           acceptCFGAssign(v);          
       }
@@ -280,13 +280,13 @@ public abstract class Assign_c extends Expr_c implements Assign
    * Construct a CFG for this assignment when the assignment operator
    * is ASSIGN (i.e., the normal, simple assignment =).
    */
-  protected abstract void acceptCFGAssign(CFGBuilder v);
+  protected abstract void acceptCFGAssign(CFGBuilder<?> v);
 
   /**
    * Construct a CFG for this assignment when the assignment operator
    * is of the form op= for some operation op.
    */
-  protected abstract void acceptCFGOpAssign(CFGBuilder v);
+  protected abstract void acceptCFGOpAssign(CFGBuilder<?> v);
   
   @Override
   public List<Type> throwTypes(TypeSystem ts) {

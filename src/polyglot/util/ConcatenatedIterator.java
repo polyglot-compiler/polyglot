@@ -25,6 +25,7 @@
 
 package polyglot.util;
 
+import java.util.Collection;
 import java.util.Iterator;
 
 /**
@@ -36,21 +37,14 @@ import java.util.Iterator;
  *
  *     Does not support Remove.
  **/
-public final class ConcatenatedIterator implements Iterator {
-  /**
-   * Constructs a new ConcatenatedIterator which yields all of the
-   * elements of <iter1>, followed by all the elements of <iter2>.
-   **/
-  public ConcatenatedIterator(Iterator iter1, Iterator iter2) {
-    this(new Iterator[]{iter1, iter2});
-  }
+public final class ConcatenatedIterator<T> implements Iterator<T> {
 
   /**
    * Constructs a new ConcatenatedIterator which yields every element, in
    *  order, of every element of the array iters, in order.
    **/
-  public ConcatenatedIterator(Iterator[] iters) {
-    this.backing_iterators = (Iterator[]) iters.clone();
+  public ConcatenatedIterator(Iterator<T>... iters) {
+    this.backing_iterators = iters.clone();
     findNextItem();
   }
 
@@ -58,31 +52,35 @@ public final class ConcatenatedIterator implements Iterator {
    * Constructs a new ConcatenatedIterator which yields every element, in
    * order, of every element of the collection iters, in order.
    **/
-  public ConcatenatedIterator(java.util.Collection iters) {
-    this.backing_iterators = (Iterator[])iters.toArray(new Iterator[0]);
+  @SuppressWarnings("unchecked")
+  public ConcatenatedIterator(Collection<T> iters) {
+    this.backing_iterators = (Iterator<T>[]) iters.toArray();
     findNextItem();
   }
 
-  public Object next() {
-    Object res = next_item;
+  @Override
+public T next() {
+    T res = next_item;
     if (res == null)
       throw new java.util.NoSuchElementException();
     findNextItem();
     return res;
   }
 
-  public boolean hasNext() {
+  @Override
+public boolean hasNext() {
     return next_item != null;
   }
   
-  public void remove() {
+  @Override
+public void remove() {
     throw new UnsupportedOperationException("ConcatenatedIterator.remove");
   }
 
   // Advances the internal iterator.
   private void findNextItem() {
     while(index < backing_iterators.length) {
-      Iterator it = backing_iterators[index];
+      Iterator<T> it = backing_iterators[index];
       if (it.hasNext()) {
 	next_item = it.next();
 	return;
@@ -97,8 +95,8 @@ public final class ConcatenatedIterator implements Iterator {
   //      otherwise, this iterator will yield next_item, followed by the 
   //      remaining elements of backing_iterators[index], followed by the
   //      elements of backing_iterators[index+1]...
-  protected Object next_item;
-  protected Iterator[] backing_iterators;
+  protected T next_item;
+  protected Iterator<T>[] backing_iterators;
   protected int index;
 }
 

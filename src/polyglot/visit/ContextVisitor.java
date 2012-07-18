@@ -25,13 +25,16 @@
 
 package polyglot.visit;
 
-import polyglot.ast.*;
-import polyglot.types.*;
-import polyglot.util.*;
-import polyglot.frontend.*;
+import polyglot.ast.Node;
+import polyglot.ast.NodeFactory;
+import polyglot.frontend.Job;
+import polyglot.frontend.MissingDependencyException;
+import polyglot.frontend.Scheduler;
 import polyglot.frontend.goals.Goal;
 import polyglot.main.Report;
-import java.util.*;
+import polyglot.types.Context;
+import polyglot.types.TypeSystem;
+import polyglot.util.InternalCompilerError;
 
 /**
  * A visitor which maintains a context throughout the visitor's pass.  This is 
@@ -79,6 +82,7 @@ public class ContextVisitor extends ErrorHandlingVisitor
         return cv;
     }
 
+    @Override
     public NodeVisitor begin() {
         context = ts.createContext();
         outer = null;
@@ -131,10 +135,12 @@ public class ContextVisitor extends ErrorHandlingVisitor
         n.del().addDecls(context);
     }
     
+    @Override
     public final NodeVisitor enter(Node n) {
     	throw new InternalCompilerError("Cannot call enter(Node n) on a ContextVisitor; use enter(Node parent, Node n) instead");
     }
     
+    @Override
     public final NodeVisitor enter(Node parent, Node n) {
         if (Report.should_report(Report.visit, 5))
 	    Report.report(5, "enter(" + n + ")");
@@ -184,6 +190,7 @@ public class ContextVisitor extends ErrorHandlingVisitor
         return super.enter(parent, n);
     }
 
+    @Override
     public final Node leave(Node parent, Node old, Node n, NodeVisitor v) {
         // If the traversal was pruned, just return n since leaveCall
         // might expect a ContextVisitor, not a PruningVisitor.

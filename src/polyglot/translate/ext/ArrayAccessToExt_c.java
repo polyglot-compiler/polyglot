@@ -25,16 +25,9 @@
 
 package polyglot.translate.ext;
 
-import polyglot.util.*;
 import polyglot.ast.ArrayAccess;
-import polyglot.ast.Expr;
-import polyglot.ast.Ext_c;
 import polyglot.ast.Node;
 import polyglot.translate.ExtensionRewriter;
-import polyglot.types.*;
-import polyglot.visit.*;
-
-import java.util.*;
 
 /**
  * An <code>ArrayAccess</code> is an immutable representation of an
@@ -42,6 +35,7 @@ import java.util.*;
  */
 public class ArrayAccessToExt_c extends ToExt_c implements ToExt
 {
+    @Override
     public Node toExt(ExtensionRewriter rw) {
         ArrayAccess aa = (ArrayAccess) node();
         return rw.to_nf().ArrayAccess(aa.position(), aa.array(), aa.index());

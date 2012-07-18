@@ -25,21 +25,15 @@
 
 package polyglot.visit;
 
-import java.util.*;
-import java.util.HashSet;
-import java.util.Stack;
-
-import polyglot.ast.*;
+import polyglot.ast.Import;
 import polyglot.ast.Node;
 import polyglot.ast.NodeFactory;
-import polyglot.frontend.*;
+import polyglot.ast.PackageNode;
+import polyglot.ast.SourceFile;
 import polyglot.frontend.Job;
-import polyglot.frontend.goals.Goal;
-import polyglot.frontend.goals.TypeExists;
-import polyglot.main.Report;
-import polyglot.types.*;
-import polyglot.types.Package;
-import polyglot.util.*;
+import polyglot.types.ImportTable;
+import polyglot.types.SemanticException;
+import polyglot.types.TypeSystem;
 
 /** Visitor which traverses the AST constructing type objects. */
 public class InitImportsVisitor extends ErrorHandlingVisitor
@@ -50,6 +44,7 @@ public class InitImportsVisitor extends ErrorHandlingVisitor
         super(job, ts, nf);
     }
     
+    @Override
     public NodeVisitor enterCall(Node n) throws SemanticException {
         if (n instanceof SourceFile) {
             SourceFile sf = (SourceFile) n;
@@ -73,6 +68,7 @@ public class InitImportsVisitor extends ErrorHandlingVisitor
         return this;
     }
     
+    @Override
     public Node leaveCall(Node old, Node n, NodeVisitor v) throws SemanticException {
         if (n instanceof SourceFile) {
             SourceFile sf = (SourceFile) n;

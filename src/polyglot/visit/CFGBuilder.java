@@ -49,15 +49,16 @@ import polyglot.util.CollectionUtil;
 import polyglot.util.Copy;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.StringUtil;
+import polyglot.visit.FlowGraph.Edge;
 import polyglot.visit.FlowGraph.Peer;
 
 /**
  * Class used to construct a CFG.
  */
-public class CFGBuilder implements Copy
+public class CFGBuilder<FlowItem extends DataFlow.Item> implements Copy
 {
     /** The flowgraph under construction. */
-    protected FlowGraph graph;
+    protected FlowGraph<FlowItem> graph;
 
     /** The type system. */
     protected TypeSystem ts;
@@ -66,7 +67,7 @@ public class CFGBuilder implements Copy
      * The outer CFGBuilder.  We create a new inner CFGBuilder when entering a
      * loop or try-block and when entering a finally block.
      */
-    protected CFGBuilder outer;
+    protected CFGBuilder<FlowItem> outer;
 
     /**
      * The innermost loop or try-block in lexical scope.  We maintain a stack
@@ -119,7 +120,7 @@ public class CFGBuilder implements Copy
     protected List<Term> path_to_finally;
 
     /** The data flow analysis for which we are constructing the graph. */
-    protected DataFlow df;
+    protected DataFlow<FlowItem> df;
 
     /**
      * True if we should skip the catch blocks for the innermost try when
@@ -134,7 +135,7 @@ public class CFGBuilder implements Copy
      */
     protected boolean errorEdgesToExitNode;
 
-    public CFGBuilder(TypeSystem ts, FlowGraph graph, DataFlow df) {
+    public CFGBuilder(TypeSystem ts, FlowGraph<FlowItem> graph, DataFlow<FlowItem> df) {
         this.ts = ts;
         this.graph = graph;
         this.df = df;
@@ -145,9 +146,9 @@ public class CFGBuilder implements Copy
         this.errorEdgesToExitNode = false;
     }
 
-    public FlowGraph graph() { return graph; }
-    public DataFlow dataflow() { return df; }
-    public CFGBuilder outer() { return outer; }
+    public FlowGraph<FlowItem> graph() { return graph; }
+    public DataFlow<FlowItem> dataflow() { return df; }
+    public CFGBuilder<FlowItem> outer() { return outer; }
     public Stmt innermostTarget() { return innermostTarget; }
     public boolean skipInnermostCatches() { return skipInnermostCatches; }
 
@@ -158,9 +159,11 @@ public class CFGBuilder implements Copy
 
     /** Copy the CFGBuilder. */
     @Override
-    public CFGBuilder copy() {
+    public CFGBuilder<FlowItem> copy() {
         try {
-            return (CFGBuilder) super.clone();
+            @SuppressWarnings("unchecked")
+            CFGBuilder<FlowItem> clone = (CFGBuilder<FlowItem>) super.clone();
+            return clone;
         }
         catch (CloneNotSupportedException e) {
             throw new InternalCompilerError("Java clone() weirdness.");
@@ -171,7 +174,7 @@ public class CFGBuilder implements Copy
      * Construct a new CFGBuilder with the a new innermost loop or
      * try-block <code>n</code>.
      */
-    public CFGBuilder push(Stmt n) {
+    public CFGBuilder<FlowItem> push(Stmt n) {
         return push(n, false);
     }
 
@@ -179,8 +182,8 @@ public class CFGBuilder implements Copy
      * Construct a new CFGBuilder with the a new innermost loop or
      * try-block <code>n</code>, optionally skipping innermost catch blocks.
      */
-    public CFGBuilder push(Stmt n, boolean skipInnermostCatches) {
-        CFGBuilder v = copy();
+    public CFGBuilder<FlowItem> push(Stmt n, boolean skipInnermostCatches) {
+        CFGBuilder<FlowItem> v = copy();
         v.outer = this;
         v.innermostTarget = n;
         v.skipInnermostCatches = skipInnermostCatches;
@@ -192,9 +195,9 @@ public class CFGBuilder implements Copy
      * the loop, visiting any finally blocks encountered.
      */
     public void visitBranchTarget(Branch b) {
-        Peer last_peer = graph.peer(b, this.path_to_finally, Term.EXIT);
+        Peer<FlowItem> last_peer = graph.peer(b, this.path_to_finally, Term.EXIT);
 
-        for (CFGBuilder v = this; v != null; v = v.outer) {
+        for (CFGBuilder<FlowItem> v = this; v != null; v = v.outer) {
             Term c = v.innermostTarget;
 
             if (c instanceof Try) {
@@ -257,9 +260,9 @@ public class CFGBuilder implements Copy
      * finally blocks encountered.
      */
     public void visitReturn(Return r) {
-        Peer last_peer = this.graph().peer(r, this.path_to_finally, Term.EXIT);
+        Peer<FlowItem> last_peer = this.graph().peer(r, this.path_to_finally, Term.EXIT);
 
-        for (CFGBuilder v = this; v != null; v = v.outer) {
+        for (CFGBuilder<FlowItem> v = this; v != null; v = v.outer) {
             Term c = v.innermostTarget;
 
             if (c instanceof Try) {
@@ -309,14 +312,14 @@ public class CFGBuilder implements Copy
     /**
      * Utility method to get the peer for the entry of the flow graph.
      */
-    protected Peer entryPeer() {
+    protected Peer<FlowItem> entryPeer() {
         return graph.peer(graph.root(), Collections.<Term> emptyList(), Term.ENTRY);
     }
 
     /**
      * Utility method to get the peer for the exit of the flow graph.
      */
-    protected Peer exitPeer() {
+    protected Peer<FlowItem> exitPeer() {
         return graph.peer(graph.root(), Collections.<Term> emptyList(), Term.EXIT);
     }
 
@@ -493,9 +496,9 @@ public class CFGBuilder implements Copy
      * Create edges for an exception thrown from term <code>t</code>.
      */
     public void visitThrow(Term t, int entry, Type type) {
-        Peer last_peer = this.graph.peer(t, this.path_to_finally, entry);
+        Peer<FlowItem> last_peer = this.graph.peer(t, this.path_to_finally, entry);
 
-        for (CFGBuilder v = this; v != null; v = v.outer) {
+        for (CFGBuilder<FlowItem> v = this; v != null; v = v.outer) {
             Term c = v.innermostTarget;
 
             if (c instanceof Try) {
@@ -545,17 +548,17 @@ public class CFGBuilder implements Copy
      *        due to the (attempted) abrupt completion of the term <code>last.node</code>.
      * @param finallyBlock the finally block associated with a try finally block.
      */
-    protected static Peer tryFinally(CFGBuilder v, Peer last, boolean abruptCompletion, Block finallyBlock) {
-        CFGBuilder v_ = v.outer.enterFinally(last, abruptCompletion);
+    protected static <FlowItem extends DataFlow.Item> Peer<FlowItem> tryFinally(CFGBuilder<FlowItem> v, Peer<FlowItem> last, boolean abruptCompletion, Block finallyBlock) {
+        CFGBuilder<FlowItem> v_ = v.outer.enterFinally(last, abruptCompletion);
 
-        Peer finallyBlockEntryPeer = v_.graph.peer(finallyBlock, v_.path_to_finally, Term.ENTRY);
+        Peer<FlowItem> finallyBlockEntryPeer = v_.graph.peer(finallyBlock, v_.path_to_finally, Term.ENTRY);
         v_.edge(last, finallyBlockEntryPeer, FlowGraph.EDGE_KEY_OTHER);
 
         // visit the finally block.  
         v_.visitCFG(finallyBlock, Collections.<EdgeKeyTermPair> emptyList());
 
         // the ext peer for the finally block.
-        Peer finallyBlockExitPeer = v_.graph.peer(finallyBlock, v_.path_to_finally, Term.EXIT);
+        Peer<FlowItem> finallyBlockExitPeer = v_.graph.peer(finallyBlock, v_.path_to_finally, Term.EXIT);
         return finallyBlockExitPeer;
     }
 
@@ -570,9 +573,9 @@ public class CFGBuilder implements Copy
      * <code>from.path_to_finally</code>.
      *  
      */
-    protected CFGBuilder enterFinally(Peer from, boolean abruptCompletion) {
+    protected CFGBuilder<FlowItem> enterFinally(Peer<FlowItem> from, boolean abruptCompletion) {
         if (abruptCompletion) {
-            CFGBuilder v = this.copy();
+            CFGBuilder<FlowItem> v = this.copy();
             v.path_to_finally = new ArrayList<Term>(from.path_to_finally.size()+1);
             v.path_to_finally.addAll(from.path_to_finally);
             v.path_to_finally.add(from.node);
@@ -582,7 +585,7 @@ public class CFGBuilder implements Copy
             if (CollectionUtil.equals(this.path_to_finally, from.path_to_finally)) {
                 return this;
             }
-            CFGBuilder v = this.copy();
+            CFGBuilder<FlowItem> v = this.copy();
             v.path_to_finally = new ArrayList<Term>(from.path_to_finally);
             return v;            
         }
@@ -609,7 +612,7 @@ public class CFGBuilder implements Copy
      * Add an edge to the CFG from the exit of <code>p</code> to either the
      * entry or exit of <code>q</code>.
      */
-    public void edge(CFGBuilder p_visitor, Term p, 
+    public void edge(CFGBuilder<FlowItem> p_visitor, Term p, 
                      Term q, int qEntry, FlowGraph.EdgeKey edgeKey) {
         edge(p_visitor, p, Term.EXIT, q, qEntry, edgeKey);
     }
@@ -617,8 +620,8 @@ public class CFGBuilder implements Copy
     /**
      * Add an edge to the CFG from the exit of <code>p</code> to peer pq.
      */
-    public void edge(CFGBuilder p_visitor, Term p, Peer pq, FlowGraph.EdgeKey edgeKey) {
-        FlowGraph.Peer pp = graph.peer(p, p_visitor.path_to_finally, Term.EXIT);
+    public void edge(CFGBuilder<FlowItem> p_visitor, Term p, Peer<FlowItem> pq, FlowGraph.EdgeKey edgeKey) {
+        Peer<FlowItem> pp = graph.peer(p, p_visitor.path_to_finally, Term.EXIT);
         edge(pp, pq, edgeKey);
     }
 
@@ -632,14 +635,14 @@ public class CFGBuilder implements Copy
      * @param qEntry whether we are working with the entry or exit of q. Can be
      *      Term.ENTRY or Term.EXIT.
      */
-    public void edge(CFGBuilder p_visitor, Term p, int pEntry, 
+    public void edge(CFGBuilder<FlowItem> p_visitor, Term p, int pEntry, 
                      Term q, int qEntry, FlowGraph.EdgeKey edgeKey) {
 
-        FlowGraph.Peer pp = graph.peer(p, p_visitor.path_to_finally, pEntry);
-        FlowGraph.Peer pq = graph.peer(q, path_to_finally, qEntry);
+        Peer<FlowItem> pp = graph.peer(p, p_visitor.path_to_finally, pEntry);
+        Peer<FlowItem> pq = graph.peer(q, path_to_finally, qEntry);
         edge(pp, pq, edgeKey);
     }
-    protected void edge(FlowGraph.Peer pp, FlowGraph.Peer pq, FlowGraph.EdgeKey edgeKey) {        
+    protected void edge(Peer<FlowItem> pp, Peer<FlowItem> pq, FlowGraph.EdgeKey edgeKey) {        
         if (Report.should_report(Report.cfg, 2))
             Report.report(2, "//     edge " + pp.node() + " -> " + pq.node());
 
@@ -667,15 +670,15 @@ public class CFGBuilder implements Copy
             if (Report.should_report(Report.cfg, 2)) {
                 Report.report(2, pp.hashCode() + " -> " + pq.hashCode() + " [label=\"" + edgeKey + "\"];");
             }
-            pp.succs.add(new FlowGraph.Edge(edgeKey, pq));
-            pq.preds.add(new FlowGraph.Edge(edgeKey, pp));
+            pp.succs.add(new Edge<FlowItem>(edgeKey, pq));
+            pq.preds.add(new Edge<FlowItem>(edgeKey, pp));
         }
         else {
             if (Report.should_report(Report.cfg, 2)) {
                 Report.report(2, pq.hashCode() + " -> " + pp.hashCode() + " [label=\"" + edgeKey + "\"];");
             }
-            pq.succs.add(new FlowGraph.Edge(edgeKey, pp));
-            pp.preds.add(new FlowGraph.Edge(edgeKey, pq));
+            pq.succs.add(new Edge<FlowItem>(edgeKey, pp));
+            pp.preds.add(new Edge<FlowItem>(edgeKey, pq));
         }
     }
 

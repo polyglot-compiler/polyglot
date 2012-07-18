@@ -25,16 +25,19 @@
 
 package polyglot.ext.param.types;
 
-import polyglot.types.*;
-import polyglot.util.*;
+import java.util.LinkedList;
+import java.util.List;
 
-import java.util.*;
+import polyglot.types.ClassType;
+import polyglot.types.TypeObject;
+import polyglot.types.TypeSystem;
+import polyglot.util.Position;
 
 /**
  * A base implementation for mutable parametric classes.
  */
-public class MuPClass_c extends PClass_c implements MuPClass {
-    protected List/*[Param]*/ formals;
+public class MuPClass_c<Formal extends Param, Actual extends TypeObject> extends PClass_c<Formal, Actual> implements MuPClass<Formal, Actual> {
+    protected List<Formal> formals;
     protected ClassType clazz;
 	
     protected MuPClass_c() { }
@@ -45,16 +48,18 @@ public class MuPClass_c extends PClass_c implements MuPClass {
 
     public MuPClass_c(TypeSystem ts, Position pos) {
 	super(ts, pos);
-	formals = new LinkedList<Param>();
+	formals = new LinkedList<Formal>();
     }
 
     /////////////////////////////////////////////////////////////////////////
     // Implement PClass
 
-    public List formals() {
+    @Override
+    public List<Formal> formals() {
 	return formals;
     }
 
+    @Override
     public ClassType clazz() {
         return clazz;
     }
@@ -62,14 +67,17 @@ public class MuPClass_c extends PClass_c implements MuPClass {
     /////////////////////////////////////////////////////////////////////////
     // Implement MuPClass
 
-    public void formals(List formals) {
+    @Override
+    public void formals(List<Formal> formals) {
 	this.formals = formals;
     }
 
-    public void addFormal(Param param) {
+    @Override
+    public void addFormal(Formal param) {
 	formals().add(param);
     }
     
+    @Override
     public void clazz(ClassType clazz) {
 	this.clazz = clazz;
     }

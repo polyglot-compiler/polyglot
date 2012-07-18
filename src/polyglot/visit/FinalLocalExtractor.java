@@ -28,9 +28,14 @@ package polyglot.visit;
 import java.util.HashSet;
 import java.util.Set;
 
-import polyglot.ast.*;
+import polyglot.ast.Assign;
+import polyglot.ast.Formal;
+import polyglot.ast.Local;
+import polyglot.ast.LocalDecl;
 import polyglot.ast.Node;
 import polyglot.ast.NodeFactory;
+import polyglot.ast.SourceFile;
+import polyglot.ast.Unary;
 import polyglot.frontend.Job;
 import polyglot.types.LocalInstance;
 import polyglot.types.TypeSystem;
@@ -44,7 +49,7 @@ import polyglot.types.TypeSystem;
 public class FinalLocalExtractor extends NodeVisitor {
 
     /** Set of LocalInstances declared final; these should not be made non-final. */
-    protected Set isFinal;
+    protected Set<LocalInstance> isFinal;
     
     /**
      * @param job
@@ -55,11 +60,13 @@ public class FinalLocalExtractor extends NodeVisitor {
         super();
     }
 
+    @Override
     public NodeVisitor begin() {
-        isFinal = new HashSet();
+        isFinal = new HashSet<LocalInstance>();
         return super.begin();
     }
     
+    @Override
     public void finish() {
         isFinal = null;
     }
@@ -74,6 +81,7 @@ public class FinalLocalExtractor extends NodeVisitor {
     // is assigned, rather than marking the original as final.  If a local
     // requires a phi-function, just mark it non-final rather than generating
     // the phi.
+    @Override
     public NodeVisitor enter(Node parent, Node n) {
         if (n instanceof Formal) {
             Formal d = (Formal) n;
@@ -121,6 +129,7 @@ public class FinalLocalExtractor extends NodeVisitor {
     }
     
     protected static class LocalDeclFixer extends NodeVisitor {
+        @Override
         public Node leave(Node old, Node n, NodeVisitor v) {
             if (n instanceof Formal) {
                 Formal d = (Formal) n;
@@ -134,6 +143,7 @@ public class FinalLocalExtractor extends NodeVisitor {
         }
     }
     
+    @Override
     public Node leave(Node old, Node n, NodeVisitor v) {
         // Revisit everything to ensure the local decls' flags agree with
         // their local instance's.

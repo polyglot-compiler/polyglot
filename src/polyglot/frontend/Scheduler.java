@@ -30,7 +30,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -80,8 +79,8 @@ public abstract class Scheduler {
     /**
      * Collection of uncompleted goals.
      */
-    protected Set inWorklist;
-    protected LinkedList worklist;
+    protected Set<Goal> inWorklist;
+    protected LinkedList<Goal> worklist;
     
     /**
      * A map from <code>Source</code>s to <code>Job</code>s or to
@@ -92,13 +91,13 @@ public abstract class Scheduler {
      */
     protected Map<Source, Job> jobs;
     
-    protected Collection commandLineJobs;
+    protected Collection<Job> commandLineJobs;
 
     /** Map from goals to goals used to intern goals. */
-    protected Map goals;
+    protected Map<Goal, Goal> goals;
     
     /** Map from goals to number of times a pass was run for the goal. */
-    protected Map runCount;
+    protected Map<Goal, Integer> runCount;
     
     /** True if any pass has failed. */
     protected boolean failed;
@@ -109,19 +108,19 @@ public abstract class Scheduler {
     public Scheduler(ExtensionInfo extInfo) {
         this.extInfo = extInfo;
 
-        this.jobs = new HashMap();
-        this.goals = new HashMap();
-        this.runCount = new HashMap();
-        this.inWorklist = new HashSet();
-        this.worklist = new LinkedList();
+        this.jobs = new HashMap<Source, Job>();
+        this.goals = new HashMap<Goal, Goal>();
+        this.runCount = new HashMap<Goal, Integer>();
+        this.inWorklist = new HashSet<Goal>();
+        this.worklist = new LinkedList<Goal>();
         this.currentPass = null;
     }
     
-    public Collection commandLineJobs() {
+    public Collection<Job> commandLineJobs() {
         return this.commandLineJobs;
     }
     
-    public void setCommandLineJobs(Collection c) {
+    public void setCommandLineJobs(Collection<Job> c) {
         this.commandLineJobs = Collections.unmodifiableCollection(c);
     }
     
@@ -130,8 +129,7 @@ public abstract class Scheduler {
             return true;
         }
 
-        for (Iterator i = goal.prerequisiteGoals(this).iterator(); i.hasNext();) {
-            Goal g = (Goal) i.next();
+        for (Goal g : goal.prerequisiteGoals(this)) {
             if (prerequisiteDependsOn(g, subgoal)) {
                 return true;
             }
@@ -191,10 +189,9 @@ public abstract class Scheduler {
     }
     
     /** Add prerequisite dependencies between adjacent items in a list of goals. */
-    public void addPrerequisiteDependencyChain(List deps) throws CyclicDependencyException {
+    public void addPrerequisiteDependencyChain(List<Goal> deps) throws CyclicDependencyException {
         Goal prev = null;
-        for (Iterator i = deps.iterator(); i.hasNext(); ) {
-            Goal curr = (Goal) i.next();
+        for (Goal curr : deps) {
             if (prev != null)
                 addPrerequisiteDependency(curr, prev);
             prev = curr;
@@ -208,7 +205,7 @@ public abstract class Scheduler {
      * @return the interned copy of <code>goal</code>
      */
     public synchronized Goal internGoal(Goal goal) {
-        Goal g = (Goal) goals.get(goal);
+        Goal g = goals.get(goal);
         if (g == null) {
             g = goal;
             goals.put(g, g);
@@ -249,7 +246,7 @@ public abstract class Scheduler {
         }
     }
 
-    protected List worklist() {
+    protected List<Goal> worklist() {
         return worklist;
     }
 
@@ -262,7 +259,7 @@ public abstract class Scheduler {
         }
 
         @Override
-        public Collection prerequisiteGoals(Scheduler scheduler) {
+        public Collection<Goal> prerequisiteGoals(Scheduler scheduler) {
             return scheduler.worklist();
         }
 
@@ -271,7 +268,7 @@ public abstract class Scheduler {
             return "TheEnd(" + scheduler.getClass().getName() + ")";
         }
 
-        protected Collection goals() {
+        protected Collection<Goal> goals() {
             return scheduler.worklist();
         }
 
@@ -289,9 +286,7 @@ public abstract class Scheduler {
             public boolean run() {
                 TheEndGoal end = (TheEndGoal) goal();
 
-                for (Iterator i = end.goals().iterator(); i.hasNext(); ) {
-                    Goal goal = (Goal) i.next();
-
+                for (Goal goal : end.goals()) {
                     if (! goal.hasBeenReached()) {
                         throw new MissingDependencyException(goal, true);
                     }
@@ -391,10 +386,10 @@ public abstract class Scheduler {
      *         there was no error, even if the goal was not reached.
      */ 
     public boolean attemptGoal(Goal goal) {
-        return attemptGoal(goal, new HashSet());
+        return attemptGoal(goal, new HashSet<Goal>());
     }
 
-    protected boolean attemptGoal(Goal goal, Set above) {
+    protected boolean attemptGoal(Goal goal, Set<Goal> above) {
         if (Report.should_report("dump-dep-graph", 2))
             dumpInFlightDependenceGraph();
 
@@ -415,7 +410,7 @@ public abstract class Scheduler {
 
         boolean progress = true;
     
-        Set newAbove = new HashSet();
+        Set<Goal> newAbove = new HashSet<Goal>();
         newAbove.addAll(above);
         newAbove.add(goal);
 
@@ -427,11 +422,7 @@ public abstract class Scheduler {
                 Report.report(4, "outer loop for " + goal);
 
             // Run the prereqs of the goal.
-            List prereqs = new ArrayList(goal.prerequisiteGoals(this));
-
-            for (Iterator j = prereqs.iterator(); j.hasNext(); ) {
-                Goal subgoal = (Goal) j.next();
-
+            for (Goal subgoal : new ArrayList<Goal>(goal.prerequisiteGoals(this))) {
                 if (reached(subgoal)) {
                     continue;
                 }
@@ -452,8 +443,7 @@ public abstract class Scheduler {
             // If any has not, just return.
             boolean runPass = true;
 
-            for (Iterator j = goal.prerequisiteGoals(this).iterator(); j.hasNext(); ) {
-                Goal subgoal = (Goal) j.next();
+            for (Goal subgoal : goal.prerequisiteGoals(this)) {
                 if (! reached(subgoal)) {
                     runPass = false;
                 }
@@ -483,11 +473,7 @@ public abstract class Scheduler {
             }
 
             // If the goal was not reached, run the coreqs of the goal. 
-            List coreqs = new ArrayList(goal.corequisiteGoals(this));
-
-            for (Iterator j = coreqs.iterator(); j.hasNext(); ) {
-                Goal subgoal = (Goal) j.next();
-
+            for (Goal subgoal : new ArrayList<Goal>(goal.corequisiteGoals(this))) {
                 if (reached(subgoal)) {
                     continue;
                 }
@@ -554,10 +540,10 @@ public abstract class Scheduler {
             throw new InternalCompilerError("Cannot run a pass for completed goal " + goal);
         }
         
-        Integer countObj = (Integer) this.runCount.get(goal);
+        Integer countObj = this.runCount.get(goal);
         int count = countObj != null ? countObj.intValue() : 0;
         count++;
-        this.runCount.put(goal, new Integer(count));
+        this.runCount.put(goal, count);
 
         
         if (count >= MAX_RUN_COUNT) {
@@ -870,13 +856,10 @@ public abstract class Scheduler {
         String name = "FullDepGraph";
         name += dumpCounter++;
 
-        String rootName = "";
-
         Report.report(2, "digraph " + name + " {");
         Report.report(2, "  fontsize=20; center=true; ratio=auto; size = \"8.5,11\";");
 
-        for (Iterator i = new ArrayList(goals.keySet()).iterator(); i.hasNext(); ) {
-            Goal g = (Goal) i.next();
+        for (Goal g : new ArrayList<Goal>(goals.keySet())) {
             g = internGoal(g);
             
             int h = System.identityHashCode(g);
@@ -887,15 +870,13 @@ public abstract class Scheduler {
                           StringUtil.escape(g.toString()) + "\" ];");
             
             // dump out the successors.
-            for (Iterator j = new ArrayList(g.prerequisiteGoals(this)).iterator(); j.hasNext(); ) {
-                Goal g2 = (Goal) j.next();
+            for (Goal g2 : g.prerequisiteGoals(this)) {
                 g2 = internGoal(g2);
                 int h2 = System.identityHashCode(g2);
                 Report.report(2, h2 + " -> " + h + " [style=bold]");
             }
             
-            for (Iterator j = new ArrayList(g.corequisiteGoals(this)).iterator(); j.hasNext(); ) {
-                Goal g2 = (Goal) j.next();
+            for (Goal g2 : g.corequisiteGoals(this)) {
                 g2 = internGoal(g2);
                 int h2 = System.identityHashCode(g2);
                 Report.report(2, h2 + " -> " + h);
@@ -912,15 +893,12 @@ public abstract class Scheduler {
         String name = "InFlightDepGraph";
         name += dumpCounter++;
     
-        String rootName = "";
-    
         Report.report(2, "digraph " + name + " {");
         Report.report(2, "  fontsize=20; center=true; ratio=auto; size = \"8.5,11\";");
 
-        Set print = new HashSet();
+        Set<Goal> print = new HashSet<Goal>();
     
-        for (Iterator i = new ArrayList(goals.keySet()).iterator(); i.hasNext(); ) {
-            Goal g = (Goal) i.next();
+        for (Goal g : new ArrayList<Goal>(goals.keySet())) {
             g = internGoal(g);
             
             if (g.state() == Goal.REACHED || g.state() == Goal.UNREACHED || g.state() == Goal.UNREACHABLE) {
@@ -929,21 +907,18 @@ public abstract class Scheduler {
 
             print.add(g);
 
-            for (Iterator j = new ArrayList(g.prerequisiteGoals(this)).iterator(); j.hasNext(); ) {
-                Goal g2 = (Goal) j.next();
+            for (Goal g2 : g.prerequisiteGoals(this)) {
                 g2 = internGoal(g2);
                 print.add(g2);
             }
 
-            for (Iterator j = new ArrayList(g.corequisiteGoals(this)).iterator(); j.hasNext(); ) {
-                Goal g2 = (Goal) j.next();
+            for (Goal g2 : g.corequisiteGoals(this)) {
                 g2 = internGoal(g2);
                 print.add(g2);
             }
         }
 
-        for (Iterator i = print.iterator(); i.hasNext(); ) {
-            Goal g = (Goal) i.next();
+        for (Goal g : print) {
             g = internGoal(g);
 
             int h = System.identityHashCode(g);
@@ -954,8 +929,7 @@ public abstract class Scheduler {
                           StringUtil.escape(g.toString()) + "\" ];");
             
             // dump out the successors.
-            for (Iterator j = new ArrayList(g.prerequisiteGoals(this)).iterator(); j.hasNext(); ) {
-                Goal g2 = (Goal) j.next();
+            for (Goal g2 : g.prerequisiteGoals(this)) {
                 g2 = internGoal(g2);
                 if (! print.contains(g2))
                     continue;
@@ -963,8 +937,7 @@ public abstract class Scheduler {
                 Report.report(2, h2 + " -> " + h + " [style=bold]");
             }
             
-            for (Iterator j = new ArrayList(g.corequisiteGoals(this)).iterator(); j.hasNext(); ) {
-                Goal g2 = (Goal) j.next();
+            for (Goal g2 : g.corequisiteGoals(this)) {
                 g2 = internGoal(g2);
                 if (! print.contains(g2))
                     continue;
@@ -983,8 +956,6 @@ public abstract class Scheduler {
         String name = "DepGraph";
         name += dumpCounter++;
 
-        String rootName = "";
-
         Report.report(2, "digraph " + name + " {");
         Report.report(2, "  fontsize=20; center=true; ratio=auto; size = \"8.5,11\";");
 
@@ -997,16 +968,15 @@ public abstract class Scheduler {
                       h + " [ label = \"" +
                       StringUtil.escape(g.toString()) + "\" ];");
         
-        Set seen = new HashSet();
-        seen.add(new Integer(h));
+        Set<Integer> seen = new HashSet<Integer>();
+        seen.add(h);
         
         // dump out the successors.
-        for (Iterator j = new ArrayList(g.prerequisiteGoals(this)).iterator(); j.hasNext(); ) {
-            Goal g2 = (Goal) j.next();
+        for (Goal g2 : g.prerequisiteGoals(this)) {
             g2 = internGoal(g2);
             int h2 = System.identityHashCode(g2);
-            if (! seen.contains(new Integer(h2))) {
-                seen.add(new Integer(h2));
+            if (! seen.contains(h2)) {
+                seen.add(h2);
                 Report.report(2,
                               h2 + " [ label = \"" +
                               StringUtil.escape(g2.toString()) + "\" ];");
@@ -1014,12 +984,11 @@ public abstract class Scheduler {
             Report.report(2, h2 + " -> " + h + " [style=bold]");
         }
         
-        for (Iterator j = new ArrayList(g.corequisiteGoals(this)).iterator(); j.hasNext(); ) {
-            Goal g2 = (Goal) j.next();
+        for (Goal g2 : g.corequisiteGoals(this)) {
             g2 = internGoal(g2);
             int h2 = System.identityHashCode(g2);
-            if (! seen.contains(new Integer(h2))) {
-                seen.add(new Integer(h2));
+            if (! seen.contains(h2)) {
+                seen.add(h2);
                 Report.report(2,
                               h2 + " [ label = \"" +
                               StringUtil.escape(g2.toString()) + "\" ];");

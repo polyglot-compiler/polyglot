@@ -25,15 +25,17 @@
 
 package polyglot.frontend.goals;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
-import polyglot.ast.NodeFactory;
-import polyglot.frontend.*;
+import polyglot.frontend.AbstractPass;
+import polyglot.frontend.ExtensionInfo;
+import polyglot.frontend.Pass;
+import polyglot.frontend.Scheduler;
+import polyglot.frontend.SchedulerException;
 import polyglot.frontend.passes.AddMembersPass;
 import polyglot.types.ParsedClassType;
-import polyglot.types.TypeSystem;
-import polyglot.util.InternalCompilerError;
-import polyglot.visit.TypeBuilder;
 
 /**
  * Comment for <code>MembersAdded</code>
@@ -54,6 +56,7 @@ public class MembersAdded extends ClassTypeGoal {
             super(goal);
         }
         
+        @Override
         public boolean run() {
             MembersAdded goal = (MembersAdded) this.goal;
             if (! goal.type().membersAdded()) {
@@ -63,6 +66,7 @@ public class MembersAdded extends ClassTypeGoal {
         }
     }
 
+    @Override
     public Pass createPass(ExtensionInfo extInfo) {
         if (job() != null) {
             return new MembersAddedPass(this);
@@ -70,8 +74,9 @@ public class MembersAdded extends ClassTypeGoal {
         return new AddMembersPass(extInfo.scheduler(), this);
     }
     
-    public Collection prerequisiteGoals(Scheduler scheduler) {
-        List l = new ArrayList();
+    @Override
+    public Collection<Goal> prerequisiteGoals(Scheduler scheduler) {
+        List<Goal> l = new ArrayList<Goal>();
         if (ct.job() != null) {
             l.add(scheduler.Parsed(ct.job()));
         }
@@ -79,8 +84,9 @@ public class MembersAdded extends ClassTypeGoal {
         return l;
     }
 
-    public Collection corequisiteGoals(Scheduler scheduler) {
-        List l = new ArrayList();
+    @Override
+    public Collection<Goal> corequisiteGoals(Scheduler scheduler) {
+        List<Goal> l = new ArrayList<Goal>();
         if (ct.job() != null) {
             l.add(scheduler.TypesInitialized(ct.job()));
         }
@@ -88,6 +94,7 @@ public class MembersAdded extends ClassTypeGoal {
         return l;
     }
     
+    @Override
     public boolean equals(Object o) {
         return o instanceof MembersAdded && super.equals(o);
     }

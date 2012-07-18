@@ -25,18 +25,24 @@
 
 package polyglot.util;
 
-import polyglot.main.Report;
-import polyglot.types.*;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
+import java.io.OutputStream;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
-import java.io.*;
-import java.util.*;
+import polyglot.main.Report;
+import polyglot.types.TypeObject;
+import polyglot.types.TypeSystem;
 
 /** Output stream for writing type objects. */
 public class TypeOutputStream extends ObjectOutputStream
 {
     protected TypeSystem ts;
-    protected Set roots;
-    protected Map placeHolders;
+    protected Set<? extends TypeObject> roots;
+    protected Map<IdentityKey, Object> placeHolders;
     
     public TypeOutputStream(OutputStream out, TypeSystem ts, TypeObject root) 
         throws IOException
@@ -45,7 +51,7 @@ public class TypeOutputStream extends ObjectOutputStream
         
         this.ts = ts;
         this.roots = ts.getTypeEncoderRootSet(root);
-        this.placeHolders = new HashMap();
+        this.placeHolders = new HashMap<IdentityKey, Object>();
         
         if (Report.should_report(Report.serialize, 2)) {
             Report.report(2, "Began TypeOutputStream with roots: " + roots);
@@ -55,15 +61,16 @@ public class TypeOutputStream extends ObjectOutputStream
     }
     
     protected Object placeHolder(TypeObject o, boolean useRoots) {
-        Object k = new IdentityKey(o);
+        IdentityKey k = new IdentityKey(o);
         Object p = placeHolders.get(k);
         if (p == null) {
-            p = ts.placeHolder(o, useRoots ? roots : Collections.EMPTY_SET);
+            p = ts.placeHolder(o, useRoots ? roots : Collections.<TypeObject> emptySet());
             placeHolders.put(k, p);
         }
         return p;
     }
     
+    @Override
     protected Object replaceObject(Object o) throws IOException {
         if (o instanceof TypeObject) {
             Object r;

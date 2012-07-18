@@ -25,10 +25,15 @@
 
 package polyglot.ast;
 
-import polyglot.types.*;
-import polyglot.util.*;
-import polyglot.visit.*;
 import polyglot.main.Options;
+import polyglot.types.Named;
+import polyglot.types.SemanticException;
+import polyglot.types.Type;
+import polyglot.util.CodeWriter;
+import polyglot.util.Position;
+import polyglot.util.StringUtil;
+import polyglot.visit.PrettyPrinter;
+import polyglot.visit.TypeChecker;
 
 /**
  * An <code>Import</code> is an immutable representation of a Java

@@ -233,7 +233,7 @@ public class InferenceSolver_c implements InferenceSolver {
             }
             m.put(typeVariablesToSolve().get(i), t);
         }
-        Subst subst = ts.subst(m, new HashMap());
+        Subst subst = ts.subst(m);
         Type rt = subst.substType(declaredReturnType);
         constraints.add(new SuperConversionConstraint(expectedReturnType, rt, this));
         for (int i = 0; i < solution.length; i++) {

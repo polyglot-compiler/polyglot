@@ -343,7 +343,7 @@ public class EnumConstantDecl_c extends Term_c implements EnumConstantDecl
     }
 
     @Override
-	public <T> List<T> acceptCFG(CFGBuilder v, List<T> succs){
+	public <T> List<T> acceptCFG(CFGBuilder<?> v, List<T> succs){
         return succs;
     }
 

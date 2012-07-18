@@ -29,7 +29,11 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import polyglot.frontend.*;
+import polyglot.frontend.AbstractPass;
+import polyglot.frontend.ExtensionInfo;
+import polyglot.frontend.Pass;
+import polyglot.frontend.Scheduler;
+import polyglot.frontend.SchedulerException;
 import polyglot.frontend.passes.ResolveSuperTypesPass;
 import polyglot.types.ClassType;
 import polyglot.types.ParsedClassType;
@@ -53,6 +57,7 @@ public class SupertypesResolved extends ClassTypeGoal {
             super(goal);
         }
         
+        @Override
         public boolean run() {
             SupertypesResolved goal = (SupertypesResolved) this.goal;
             if (! goal.type().supertypesResolved()) {
@@ -62,6 +67,7 @@ public class SupertypesResolved extends ClassTypeGoal {
         }
     }
 
+    @Override
     public Pass createPass(ExtensionInfo extInfo) {
         if (job() != null) {
             return new SupertypesResolvedPass(this);
@@ -69,8 +75,9 @@ public class SupertypesResolved extends ClassTypeGoal {
         return new ResolveSuperTypesPass(extInfo.scheduler(), this);
     }
 
-    public Collection prerequisiteGoals(Scheduler scheduler) {
-        List l = new ArrayList();
+    @Override
+    public Collection<Goal> prerequisiteGoals(Scheduler scheduler) {
+        List<Goal> l = new ArrayList<Goal>();
         l.add(scheduler.MembersAdded(ct));
         if (ct.job() != null) {
             l.add(scheduler.TypesInitialized(ct.job()));
@@ -83,8 +90,9 @@ public class SupertypesResolved extends ClassTypeGoal {
         return ct.isTopLevel() || (ct.isMember() && isGlobal((ClassType) ct.container()));
     }
     
-    public Collection corequisiteGoals(Scheduler scheduler) {
-        List l = new ArrayList();
+    @Override
+    public Collection<Goal> corequisiteGoals(Scheduler scheduler) {
+        List<Goal> l = new ArrayList<Goal>();
         if (ct.job() != null) {
             if (isGlobal(ct)) {
                 l.add(scheduler.SupertypesDisambiguated(ct.job()));
@@ -97,6 +105,7 @@ public class SupertypesResolved extends ClassTypeGoal {
         return l;
     }
     
+    @Override
     public boolean equals(Object o) {
         return o instanceof SupertypesResolved && super.equals(o);
     }

@@ -281,13 +281,13 @@ public class Try_c extends Stmt_c implements Try
     }
 
     @Override
-    public <T> List<T> acceptCFG(CFGBuilder v, List<T> succs) {
+    public <T> List<T> acceptCFG(CFGBuilder<?> v, List<T> succs) {
         // Add edges from the try entry to any catch blocks for Error and
         // RuntimeException.
         TypeSystem ts = v.typeSystem();
 
-        CFGBuilder v1 = v.push(this, false);
-        CFGBuilder v2 = v.push(this, true);
+        CFGBuilder<?> v1 = v.push(this, false);
+        CFGBuilder<?> v2 = v.push(this, true);
 
         for (Type type : ts.uncheckedExceptions()) {
             v1.visitThrow(tryBlock, ENTRY, type);

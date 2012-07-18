@@ -25,7 +25,9 @@
 
 package polyglot.frontend.goals;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 import polyglot.ast.NodeFactory;
 import polyglot.frontend.Job;
@@ -42,15 +44,17 @@ public class ConstantsChecked extends VisitorGoal {
         super(job, new ConstantChecker(job, ts, nf));
     }
 
-    public Collection prerequisiteGoals(Scheduler scheduler) {
-        List l = new ArrayList();
+    @Override
+    public Collection<Goal> prerequisiteGoals(Scheduler scheduler) {
+        List<Goal> l = new ArrayList<Goal>();
         l.add(scheduler.Disambiguated(job));
         l.addAll(super.prerequisiteGoals(scheduler));
         return l;
     }
 
-    public Collection corequisiteGoals(Scheduler scheduler) {
-        List l = new ArrayList();
+    @Override
+    public Collection<Goal> corequisiteGoals(Scheduler scheduler) {
+        List<Goal> l = new ArrayList<Goal>();
         l.add(scheduler.TypeChecked(job));
         l.addAll(super.corequisiteGoals(scheduler));
         return l;

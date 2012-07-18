@@ -25,8 +25,9 @@
 
 package polyglot.ast;
 
-import polyglot.types.ConstructorInstance;
 import java.util.List;
+
+import polyglot.types.ConstructorInstance;
 import polyglot.types.Flags;
 
 /**

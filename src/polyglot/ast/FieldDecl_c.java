@@ -302,7 +302,7 @@ public class FieldDecl_c extends Term_c implements FieldDecl {
         }
         
         @Override
-        public <N extends Node> N leave(N old, N n, NodeVisitor v) {
+        public Node leave(Node old, Node n, NodeVisitor v) {
             if (n instanceof Field) {
                 Field f = (Field) n;
                 if (!f.fieldInstance().orig().constantValueSet()) {
@@ -461,7 +461,7 @@ public class FieldDecl_c extends Term_c implements FieldDecl {
     }
 
     @Override
-    public <T> List<T> acceptCFG(CFGBuilder v, List<T> succs) {
+    public <T> List<T> acceptCFG(CFGBuilder<?> v, List<T> succs) {
         if (init != null) {
             v.visitCFG(type, init, ENTRY);
             v.visitCFG(init, this, EXIT);

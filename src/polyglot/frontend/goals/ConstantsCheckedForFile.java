@@ -25,18 +25,13 @@
 
 package polyglot.frontend.goals;
 
-import java.util.*;
-import java.util.Iterator;
-
-import polyglot.ast.*;
 import polyglot.ast.NodeFactory;
-import polyglot.frontend.*;
+import polyglot.frontend.ExtensionInfo;
+import polyglot.frontend.Job;
+import polyglot.frontend.Pass;
 import polyglot.frontend.passes.ConstantCheckPass;
-import polyglot.main.Report;
-import polyglot.types.ParsedClassType;
 import polyglot.types.TypeSystem;
 import polyglot.visit.ConstantChecker;
-import polyglot.visit.NodeVisitor;
 
 
 public class ConstantsCheckedForFile extends SourceFileGoal {
@@ -47,11 +42,10 @@ public class ConstantsCheckedForFile extends SourceFileGoal {
         this.reached = false;
     }
 
+    @Override
     public Pass createPass(ExtensionInfo extInfo) {
         TypeSystem ts = extInfo.typeSystem();
         NodeFactory nf = extInfo.nodeFactory();
         return new ConstantCheckPass(this, new ConstantChecker(job(), ts, nf));
     }
-
-    private static final Collection TOPICS = Arrays.asList(new String[] { Report.types, Report.frontend });
 }

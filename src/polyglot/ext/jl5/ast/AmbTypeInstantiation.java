@@ -8,6 +8,7 @@ import polyglot.ast.TypeNode;
 import polyglot.ast.TypeNode_c;
 import polyglot.ext.jl5.types.*;
 import polyglot.types.ClassType;
+import polyglot.types.ReferenceType;
 import polyglot.types.SemanticException;
 import polyglot.types.Type;
 import polyglot.util.CodeWriter;
@@ -74,7 +75,7 @@ public class AmbTypeInstantiation extends TypeNode_c implements TypeNode, Ambigu
         }
         
         JL5ParsedClassType pct;
-        Map<TypeVariable, Type> typeMap = new LinkedHashMap();
+        Map<TypeVariable, ReferenceType> typeMap = new LinkedHashMap();
         if (baseType instanceof JL5ParsedClassType) {
             pct = (JL5ParsedClassType)baseType;
         }
@@ -84,9 +85,9 @@ public class AmbTypeInstantiation extends TypeNode_c implements TypeNode, Ambigu
         else if (baseType instanceof JL5SubstClassType) {
             JL5SubstClassType sct = (JL5SubstClassType)baseType;
             pct = sct.base();
-            Iterator<Map.Entry<TypeVariable, Type>> iter = sct.subst().entries();
+            Iterator<Map.Entry<TypeVariable, ReferenceType>> iter = sct.subst().entries();
             while (iter.hasNext()) {
-                Map.Entry<TypeVariable, Type> e = iter.next();
+                Map.Entry<TypeVariable, ReferenceType> e = iter.next();
                 typeMap.put(e.getKey(), e.getValue());
             }
         }
@@ -116,7 +117,7 @@ public class AmbTypeInstantiation extends TypeNode_c implements TypeNode, Ambigu
         // add the new mappings 
         List<TypeVariable> formals = pct.typeVariables();
         for (int i = 0; i < formals.size(); i++) {
-            Type t = ((TypeNode)typeArguments.get(i)).type();
+            ReferenceType t = (ReferenceType) typeArguments.get(i).type();
             typeMap.put(formals.get(i), t);
         }
         

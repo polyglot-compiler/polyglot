@@ -25,11 +25,39 @@
 
 package polyglot.visit;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
-import polyglot.ast.*;
+import polyglot.ast.Assign;
+import polyglot.ast.Block;
+import polyglot.ast.ClassBody;
+import polyglot.ast.ClassDecl;
+import polyglot.ast.ClassMember;
+import polyglot.ast.ConstructorCall;
+import polyglot.ast.ConstructorDecl;
+import polyglot.ast.Field;
+import polyglot.ast.FieldAssign;
+import polyglot.ast.FieldDecl;
+import polyglot.ast.Formal;
+import polyglot.ast.Id;
+import polyglot.ast.Local;
+import polyglot.ast.Node;
+import polyglot.ast.NodeFactory;
+import polyglot.ast.Special;
+import polyglot.ast.Stmt;
 import polyglot.frontend.Job;
-import polyglot.types.*;
+import polyglot.types.ClassType;
+import polyglot.types.ConstructorInstance;
+import polyglot.types.Context;
+import polyglot.types.FieldInstance;
+import polyglot.types.Flags;
+import polyglot.types.LocalInstance;
+import polyglot.types.ParsedClassType;
+import polyglot.types.SemanticException;
+import polyglot.types.Type;
+import polyglot.types.TypeSystem;
 import polyglot.util.Position;
 
 /**
@@ -60,32 +88,35 @@ public class InnerClassRewriter extends InnerClassAbstractRemover
     }
     
     FieldDecl createFieldDecl(FieldInstance fi) {
+        Id id = nf.Id(Position.compilerGenerated(), fi.name());
         FieldDecl fd = nf.FieldDecl(fi.position(), fi.flags(),
-                                    nf.CanonicalTypeNode(fi.position(), fi.type()), fi.name());
+                                    nf.CanonicalTypeNode(fi.position(), fi.type()), id);
         fd = fd.fieldInstance(fi);
         return fd;
     }
     
     class ClassBodyTranslator extends NodeVisitor { 
         ParsedClassType ct;
-        Map fieldMap;
+        Map<ClassType, FieldInstance> fieldMap;
         Context outerContext;
         
-        ClassBodyTranslator(ParsedClassType ct, Map fieldMap, Context context) {
+        ClassBodyTranslator(ParsedClassType ct, Map<ClassType, FieldInstance> fieldMap, Context context) {
             this.ct = ct;
             this.fieldMap = fieldMap;
             this.outerContext = context;
         }
         
+        @Override
         public Node leave(Node old, Node n, NodeVisitor v) {
             if (n instanceof Special) {
                 Special s = (Special) n;
                 if (s.qualifier() != null) {
-                    FieldInstance fi = (FieldInstance) fieldMap.get(s.qualifier().type());
+                    FieldInstance fi = fieldMap.get(s.qualifier().type());
                     if (fi != null) {
                         Special this_ = nf.Special(s.position(), Special.THIS);
                         this_ = (Special) this_.type(ct);
-                        Field f = nf.Field(s.position(), this_, fi.name());
+                        Id id = nf.Id(Position.compilerGenerated(), fi.name());
+                        Field f = nf.Field(s.position(), this_, id);
                         f = f.fieldInstance(fi);
                         f = (Field) f.type(fi.type());
                         n = f;
@@ -105,21 +136,21 @@ public class InnerClassRewriter extends InnerClassAbstractRemover
         }
     }
     
-    void addEnvToCI(ConstructorInstance ci, List env) {
-        List formals = new ArrayList(ci.formalTypes());
+    void addEnvToCI(ConstructorInstance ci, List<ClassType> env) {
+        List<Type> formals = new ArrayList<Type>(ci.formalTypes());
         formals.addAll(envAsFormalTypes(env));
         ci.setFormalTypes(formals);
     }
 
-    ConstructorDecl translateConstructorDecl(ParsedClassType ct, ConstructorDecl cd, Map m) {
-        List env = env(ct, true);
+    ConstructorDecl translateConstructorDecl(ParsedClassType ct, ConstructorDecl cd, Map<ClassType, FieldInstance> m) {
+        List<ClassType> env = env(ct, true);
 
         addEnvToCI(cd.constructorInstance(), env);
 
         cd = cd.name(ct.name());
 
         // Add the new formals.
-        List newFormals = new ArrayList();
+        List<Formal> newFormals = new ArrayList<Formal>();
         newFormals.addAll(cd.formals());
         newFormals.addAll(envAsFormals(env));
         cd = cd.formals(newFormals);
@@ -130,8 +161,8 @@ public class InnerClassRewriter extends InnerClassAbstractRemover
             return cd;
         }
 
-        List oldStmts = cd.body().statements();
-        List newStmts = new ArrayList();
+        List<Stmt> oldStmts = cd.body().statements();
+        List<Stmt> newStmts = new ArrayList<Stmt>();
 
         // Check if this constructor invokes another with a this call.
         // If so, don't initialize the fields, but do pass the environment
@@ -139,7 +170,7 @@ public class InnerClassRewriter extends InnerClassAbstractRemover
         ConstructorCall cc = null;
 
         if (oldStmts.size() >= 1) {
-            Stmt s = (Stmt) oldStmts.get(0);
+            Stmt s = oldStmts.get(0);
             if (s instanceof ConstructorCall) {
                 cc = (ConstructorCall) s;
             }
@@ -151,10 +182,9 @@ public class InnerClassRewriter extends InnerClassAbstractRemover
         
         // Initialize the new fields.
         if (cc == null || cc.kind() == ConstructorCall.SUPER) {
-            for (Iterator i = envAsFormals(env).iterator(); i.hasNext(); ) {
-                Formal f = (Formal) i.next();
+            for (Formal f : envAsFormals(env)) {
                 LocalInstance li = f.localInstance();
-                FieldInstance fi = (FieldInstance) m.get(li.type());
+                FieldInstance fi = m.get(li.type());
                 
                 if (fi == null) {
                     // Not a enclosing class of ct, so must be an enclosing class
@@ -165,11 +195,13 @@ public class InnerClassRewriter extends InnerClassAbstractRemover
                 Special this_ = nf.Special(Position.compilerGenerated(), Special.THIS);
                 this_ = (Special) this_.type(ct);
                 
-                Field target = nf.Field(Position.compilerGenerated(), this_, fi.name());
+                Id targetId = nf.Id(Position.compilerGenerated(), fi.name());
+                Field target = nf.Field(Position.compilerGenerated(), this_, targetId);
                 target = target.fieldInstance(fi);
                 target = (Field) target.type(fi.type());
                 
-                Local source = nf.Local(Position.compilerGenerated(), li.name());
+                Id sourceId = nf.Id(Position.compilerGenerated(), li.name());
+                Local source = nf.Local(Position.compilerGenerated(), sourceId);
                 source = source.localInstance(li);
                 source = (Local) source.type(li.type());
                 
@@ -194,13 +226,14 @@ public class InnerClassRewriter extends InnerClassAbstractRemover
         return cd;
     }
     
+    @Override
     protected Node leaveCall(Node old, Node n, NodeVisitor v) throws SemanticException {
         if (n instanceof ClassDecl) {
             ClassDecl cd = (ClassDecl) n;
             
             ParsedClassType ct = cd.type();
          
-            List env = env(ct, true);
+            List<ClassType> env = env(ct, true);
             
             if (! env.isEmpty()) {
                 // Translate the class body if any supertype (including ct itself)
@@ -217,14 +250,13 @@ public class InnerClassRewriter extends InnerClassAbstractRemover
     }
 
     protected ClassBody translateClassBody(ParsedClassType ct, ClassBody body, Context context) {
-        List members = new ArrayList();
+        List<ClassMember> members = new ArrayList<ClassMember>();
 
-        List env = env(ct, false);
+        List<ClassType> env = env(ct, false);
 
-        Map fieldMap = new HashMap();
+        Map<ClassType, FieldInstance> fieldMap = new HashMap<ClassType, FieldInstance>();
 
-        for (Iterator i = env.iterator(); i.hasNext(); ) {
-            ClassType outer = (ClassType) i.next();
+        for (ClassType outer : env) {
             FieldInstance fi = localToField(ct, outer);
             fieldMap.put(outer, fi);
             ct.addField(fi);
@@ -234,12 +266,11 @@ public class InnerClassRewriter extends InnerClassAbstractRemover
         // Now add existing members, making sure constructors appear
         // first.  The constructors may have field
         // initializers which must be run before other initializers.
-        List ctors = new ArrayList();
-        List others = new ArrayList();
-        for (Iterator i = body.members().iterator(); i.hasNext(); ) {
-            ClassMember cm = (ClassMember) i.next();
+        List<ConstructorDecl> ctors = new ArrayList<ConstructorDecl>();
+        List<ClassMember> others = new ArrayList<ClassMember>();
+        for (ClassMember cm : body.members()) {
             if (cm instanceof ConstructorDecl) {
-                ctors.add(cm);
+                ctors.add((ConstructorDecl) cm);
             }
             else {
                 others.add(cm);

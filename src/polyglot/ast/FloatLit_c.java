@@ -25,9 +25,12 @@
 
 package polyglot.ast;
 
-import polyglot.types.*;
-import polyglot.visit.*;
-import polyglot.util.*;
+import polyglot.types.SemanticException;
+import polyglot.util.CodeWriter;
+import polyglot.util.InternalCompilerError;
+import polyglot.util.Position;
+import polyglot.visit.PrettyPrinter;
+import polyglot.visit.TypeChecker;
 
 /** 
  * A <code>FloatLit</code> represents a literal in java of type

@@ -25,9 +25,11 @@
 
 package polyglot.visit;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+
 import polyglot.ast.Node;
-import polyglot.util.*;
-import java.util.*;
 
 /**
  * A HaltingVisitor is used to prune the traversal of the AST at a
@@ -37,7 +39,7 @@ import java.util.*;
 public abstract class HaltingVisitor extends NodeVisitor
 {
     protected Node bypassParent;
-    protected Collection bypass;
+    protected Collection<Node> bypass;
 
     /** Return a new visitor that will bypass all children of node n. */ 
     public HaltingVisitor bypassChildren(Node n) {
@@ -66,7 +68,7 @@ public abstract class HaltingVisitor extends NodeVisitor
             v.bypass = Collections.singleton(n);
         }
         else {
-            v.bypass = new ArrayList(this.bypass.size()+1);
+            v.bypass = new ArrayList<Node>(this.bypass.size()+1);
             v.bypass.addAll(bypass);
             v.bypass.add(n);
         }
@@ -75,7 +77,7 @@ public abstract class HaltingVisitor extends NodeVisitor
     }
 
     /** Return a new visitor that will bypass all nodes in collection c. */
-    public HaltingVisitor bypass(Collection c) {
+    public HaltingVisitor bypass(Collection<? extends Node> c) {
         if (c == null) return this;
 
         HaltingVisitor v = (HaltingVisitor) copy();
@@ -83,10 +85,10 @@ public abstract class HaltingVisitor extends NodeVisitor
         // FIXME: Using a collection is expensive, but is hopefully not
         // often used.
         if (this.bypass == null) {
-            v.bypass = new ArrayList(c);
+            v.bypass = new ArrayList<Node>(c);
         }
         else {
-            v.bypass = new ArrayList(this.bypass.size()+c.size());
+            v.bypass = new ArrayList<Node>(this.bypass.size()+c.size());
             v.bypass.addAll(bypass);
             v.bypass.addAll(c);
         }
@@ -94,6 +96,7 @@ public abstract class HaltingVisitor extends NodeVisitor
         return v;
     }
 
+    @Override
     public Node override(Node parent, Node n) {
         if (bypassParent != null && bypassParent == parent) {
             // System.out.println("bypassing " + n +
@@ -102,8 +105,8 @@ public abstract class HaltingVisitor extends NodeVisitor
         }
 
         if (bypass != null) {
-            for (Iterator i = bypass.iterator(); i.hasNext(); ) {
-                if (i.next() == n) {
+            for (Node n2 : bypass) {
+                if (n2 == n) {
                     // System.out.println("bypassing " + n);
                     return n;
                 }

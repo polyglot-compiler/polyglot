@@ -25,20 +25,26 @@
 
 package polyglot.ext.param.types;
 
-import polyglot.types.*;
+import java.util.List;
+import java.util.Map;
+
+import polyglot.types.ClassType;
+import polyglot.types.SemanticException;
+import polyglot.types.Type;
+import polyglot.types.TypeObject;
+import polyglot.types.TypeSystem;
 import polyglot.util.Position;
-import java.util.*;
 
 /**
  * Type system for parameterized types.
  */
-public interface ParamTypeSystem extends TypeSystem {
+public interface ParamTypeSystem<Formal extends Param, Actual extends TypeObject> extends TypeSystem {
     /**
      * Create a new mutable PClass.
      *
      * @param pos The position of the pclass
      */
-    MuPClass mutablePClass(Position pos);
+    MuPClass<Formal, Actual> mutablePClass(Position pos);
 
     /**
      * Instantiate a parametric type on a list of actual parameters.
@@ -49,7 +55,7 @@ public interface ParamTypeSystem extends TypeSystem {
      *
      * @throws SemanticException when the actuals do not agree with the formals
      */
-    ClassType instantiate(Position pos, PClass base, List actuals)
+    ClassType instantiate(Position pos, PClass<Formal, Actual> base, List<? extends Actual> actuals)
         throws SemanticException;
 
     /**
@@ -59,19 +65,7 @@ public interface ParamTypeSystem extends TypeSystem {
      * @param substMap Map from formal parameters to actuals; the formals are
      * not necessarily formals of <code>base</code>.
      */
-    Type subst(Type base, Map substMap);
-
-    /**
-     * Apply a parameter substitution to a type.
-     *
-     * @param base The type on which we perform substitutions.
-     * @param substMap Map from formal parameters to actuals; the formals are
-     * not necessarily formals of <code>base</code>.
-     * @param cache Cache of substitutions performed, implemented as a map from
-     * base type to substituted type.  This is passed in to ensure pointers to
-     * outer classes are substituted correctly.
-     */
-    Type subst(Type base, Map substMap, Map cache);
+    Type subst(Type base, Map<Formal, Actual> substMap);
 
     /**
      * Create a substitutor.
@@ -82,5 +76,5 @@ public interface ParamTypeSystem extends TypeSystem {
      * base type to substituted type.  This is passed in to ensure pointers to
      * outer classes are substituted correctly.
      */
-    Subst subst(Map substMap, Map cache);
+    Subst<Formal, Actual> subst(Map<Formal, Actual> substMap);
 }

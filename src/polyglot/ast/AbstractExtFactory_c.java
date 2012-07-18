@@ -25,9 +25,6 @@
 
 package polyglot.ast;
 
-import polyglot.ast.Ext;
-import polyglot.ast.ExtFactory;
-
 /**
  * This abstract implementation of <code>ExtFactory</code> provides
  * a way of chaining together ExtFactories, and default implementations

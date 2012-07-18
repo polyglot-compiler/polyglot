@@ -27,7 +27,6 @@ package polyglot.frontend.goals;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Date;
 import java.util.List;
 
 import polyglot.ast.NodeFactory;
@@ -42,7 +41,6 @@ import polyglot.main.Version;
 import polyglot.types.TypeSystem;
 import polyglot.util.ErrorQueue;
 import polyglot.visit.ClassSerializer;
-import polyglot.visit.InnerClassRemover;
 
 /**
  * The <code>Serialized</code> goal is reached after typing information is serialized
@@ -55,6 +53,7 @@ public class Serialized extends SourceFileGoal {
 
     protected Serialized(Job job) { super(job); }
     
+    @Override
     public Pass createPass(ExtensionInfo extInfo) {
 		Compiler compiler = extInfo.compiler();
 		if (compiler.serializeClassInfo()) {
@@ -73,8 +72,9 @@ public class Serialized extends SourceFileGoal {
 		return new ClassSerializer(ts, nf, lastModified, eq, version);
 	}
     
-    public Collection prerequisiteGoals(Scheduler scheduler) {
-        List l = new ArrayList();
+    @Override
+    public Collection<Goal> prerequisiteGoals(Scheduler scheduler) {
+        List<Goal> l = new ArrayList<Goal>();
         l.add(scheduler.TypeChecked(job));
 //        l.add(scheduler.ConstantsChecked(job));
         l.add(scheduler.ReachabilityChecked(job));

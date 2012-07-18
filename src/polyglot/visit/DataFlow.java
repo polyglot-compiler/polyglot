@@ -63,7 +63,7 @@ import polyglot.visit.FlowGraph.PeerKey;
  * Abstract dataflow Visitor, to allow simple dataflow equations to be easily
  * implemented.
  */
-public abstract class DataFlow extends ErrorHandlingVisitor
+public abstract class DataFlow<FlowItem extends DataFlow.Item> extends ErrorHandlingVisitor
 {
     /**
      * Indicates whether this dataflow is a forward analysis.
@@ -98,19 +98,19 @@ public abstract class DataFlow extends ErrorHandlingVisitor
      * to update AST nodes. The stack is maintained only if 
      * <code>dataflowOnEntry</code> is true.
      */
-    protected LinkedList<FlowGraphSource> flowgraphStack;
+    protected LinkedList<FlowGraphSource<FlowItem>> flowgraphStack;
     
-    protected static class FlowGraphSource {
-        FlowGraphSource(FlowGraph g, CodeDecl s) {
+    protected static class FlowGraphSource<FlowItem extends Item> {
+        FlowGraphSource(FlowGraph<FlowItem> g, CodeDecl s) {
             this(g, (CodeNode) s);
         }
-        FlowGraphSource(FlowGraph g, CodeNode s) {
+        FlowGraphSource(FlowGraph<FlowItem> g, CodeNode s) {
             flowgraph = g;
             source = s;
         }
-        private FlowGraph flowgraph;
+        private FlowGraph<FlowItem> flowgraph;
         private CodeNode source;
-        public FlowGraph flowGraph() { return flowgraph; }
+        public FlowGraph<FlowItem> flowGraph() { return flowgraph; }
         public CodeNode source() { return source; }
     }
     
@@ -145,7 +145,7 @@ public abstract class DataFlow extends ErrorHandlingVisitor
         this.detectBackEdges = detectBackEdges;
         this.dataflowOnEntry = dataflowOnEntry;
         if (dataflowOnEntry)
-            this.flowgraphStack = new LinkedList<FlowGraphSource>();
+            this.flowgraphStack = new LinkedList<FlowGraphSource<FlowItem>>();
         else 
             this.flowgraphStack = null;
     }
@@ -176,7 +176,7 @@ public abstract class DataFlow extends ErrorHandlingVisitor
      * 
      * @return a (possibly null) Item.
      */
-    protected abstract Item createInitialItem(FlowGraph graph, Term node, boolean entry);
+    protected abstract FlowItem createInitialItem(FlowGraph<FlowItem> graph, Term node, boolean entry);
     
     /**
      * Produce new <code>Item</code>s as appropriate for the
@@ -194,7 +194,7 @@ public abstract class DataFlow extends ErrorHandlingVisitor
      * @return a Map from FlowGraph.EdgeKeys to Items. The map must have 
      *          entries for all EdgeKeys in edgeKeys. 
      */
-    protected Map<EdgeKey, Item> flow(Item in, FlowGraph graph, Term n, boolean entry, Set<EdgeKey> edgeKeys) {
+    protected Map<EdgeKey, FlowItem> flow(FlowItem in, FlowGraph<FlowItem> graph, Term n, boolean entry, Set<EdgeKey> edgeKeys) {
         throw new InternalCompilerError("Unimplemented: should be " +
                                         "implemented by subclasses if " +
                                         "needed");
@@ -211,7 +211,7 @@ public abstract class DataFlow extends ErrorHandlingVisitor
      * @return a Map from FlowGraph.EdgeKeys to Items. The map must have 
      *          entries for all EdgeKeys in edgeKeys. 
      */
-    protected Map<EdgeKey, Item> flow(List<Item> inItems, List<EdgeKey> inItemKeys, FlowGraph graph, Peer peer) {
+    protected Map<EdgeKey, FlowItem> flow(List<FlowItem> inItems, List<EdgeKey> inItemKeys, FlowGraph<FlowItem> graph, Peer<FlowItem> peer) {
         return this.flow(inItems, inItemKeys, graph, peer.node, peer.isEntry(), peer.succEdgeKeys());
     }
     
@@ -229,8 +229,8 @@ public abstract class DataFlow extends ErrorHandlingVisitor
      * @return a Map from FlowGraph.EdgeKeys to Items. The map must have 
      *          entries for all EdgeKeys in edgeKeys. 
      */
-    protected Map<EdgeKey, Item> flow(List<Item> inItems, List<EdgeKey> inItemKeys, List<Peer> inItemPeers,
-            FlowGraph graph, Peer p) {
+    protected Map<EdgeKey, FlowItem> flow(List<FlowItem> inItems, List<EdgeKey> inItemKeys, List<Peer<FlowItem>> inItemPeers,
+            FlowGraph<FlowItem> graph, Peer<FlowItem> p) {
     	if (this.detectBackEdges) {
     		// determine for each inItemPeer whether it represents a back edge or not,
     		// and record the results in a list.
@@ -241,7 +241,7 @@ public abstract class DataFlow extends ErrorHandlingVisitor
     		
     		int currentPeerOrder = postordering.get(p).intValue();
 
-    		for (Peer inPeer : inItemPeers) {
+    		for (Peer<FlowItem> inPeer : inItemPeers) {
     		  	int inPeerOrder = postordering.get(inPeer).intValue();
     		  	isBackEdges.add(Boolean.valueOf(inPeerOrder < currentPeerOrder));
     		}
@@ -262,8 +262,8 @@ public abstract class DataFlow extends ErrorHandlingVisitor
      * @return a Map from FlowGraph.EdgeKeys to Items. The map must have 
      *          entries for all EdgeKeys in edgeKeys. 
      */
-    protected Map<EdgeKey, Item> flow(List<Item> inItems, List<EdgeKey> inItemKeys, List<Peer> inItemPeers, List<Boolean> isBackEdges,
-            FlowGraph graph, Peer p) {
+    protected Map<EdgeKey, FlowItem> flow(List<FlowItem> inItems, List<EdgeKey> inItemKeys, List<Peer<FlowItem>> inItemPeers, List<Boolean> isBackEdges,
+            FlowGraph<FlowItem> graph, Peer<FlowItem> p) {
     	throw new InternalCompilerError("Unimplemented. Should be implemented if a subclass wants to detect back edges." +
     			" The standard thing to do in this method is to merge the inItems by item key, using the widening operator " +
     			"for back edges, and the standard merge operator otherwise.");
@@ -289,9 +289,9 @@ public abstract class DataFlow extends ErrorHandlingVisitor
      * @return a Map from FlowGraph.EdgeKeys to Items. The map must have 
      *          entries for all EdgeKeys in edgeKeys. 
      */
-    protected Map<EdgeKey, Item> flow(List<Item> inItems, List<EdgeKey> inItemKeys, FlowGraph graph, 
+    protected Map<EdgeKey, FlowItem> flow(List<FlowItem> inItems, List<EdgeKey> inItemKeys, FlowGraph<FlowItem> graph, 
             Term n, boolean entry, Set<EdgeKey> edgeKeys) {
-        Item inItem = this.safeConfluence(inItems, inItemKeys, n, entry, graph);
+        FlowItem inItem = this.safeConfluence(inItems, inItemKeys, n, entry, graph);
         
         return this.flow(inItem, graph, n, entry, edgeKeys);
     }  
@@ -318,19 +318,19 @@ public abstract class DataFlow extends ErrorHandlingVisitor
      * @return a Map from FlowGraph.EdgeKeys to Items. The map must have 
      *          entries for all EdgeKeys in edgeKeys. 
      */
-    protected final Map<EdgeKey, Item> flowToBooleanFlow(List<Item> inItems, List<EdgeKey> inItemKeys, 
-            FlowGraph graph, Term n, boolean entry, Set<EdgeKey> edgeKeys) {
-        List<Item> trueItems = new ArrayList<Item>();
+    protected final Map<EdgeKey, FlowItem> flowToBooleanFlow(List<FlowItem> inItems, List<EdgeKey> inItemKeys, 
+            FlowGraph<FlowItem> graph, Term n, boolean entry, Set<EdgeKey> edgeKeys) {
+        List<FlowItem> trueItems = new ArrayList<FlowItem>();
         List<EdgeKey> trueItemKeys = new ArrayList<EdgeKey>();
-        List<Item> falseItems = new ArrayList<Item>();
+        List<FlowItem> falseItems = new ArrayList<FlowItem>();
         List<EdgeKey> falseItemKeys = new ArrayList<EdgeKey>();
-        List<Item> otherItems = new ArrayList<Item>();
+        List<FlowItem> otherItems = new ArrayList<FlowItem>();
         List<EdgeKey> otherItemKeys = new ArrayList<EdgeKey>();
         
-        Iterator<Item> i = inItems.iterator();
+        Iterator<FlowItem> i = inItems.iterator();
         Iterator<EdgeKey> j = inItemKeys.iterator();
         while (i.hasNext() || j.hasNext()) {
-            Item item = i.next();
+            FlowItem item = i.next();
             EdgeKey key = j.next();
             
             if (FlowGraph.EDGE_KEY_TRUE.equals(key)) {
@@ -347,15 +347,15 @@ public abstract class DataFlow extends ErrorHandlingVisitor
             }
         }
         
-        Item trueItem = trueItems.isEmpty() ? null : this.safeConfluence(trueItems, trueItemKeys, n, entry, graph);
-        Item falseItem = falseItems.isEmpty() ? null : this.safeConfluence(falseItems, falseItemKeys, n, entry, graph);
-        Item otherItem = otherItems.isEmpty() ? null : this.safeConfluence(otherItems, otherItemKeys, n, entry, graph);
+        FlowItem trueItem = trueItems.isEmpty() ? null : this.safeConfluence(trueItems, trueItemKeys, n, entry, graph);
+        FlowItem falseItem = falseItems.isEmpty() ? null : this.safeConfluence(falseItems, falseItemKeys, n, entry, graph);
+        FlowItem otherItem = otherItems.isEmpty() ? null : this.safeConfluence(otherItems, otherItemKeys, n, entry, graph);
 
         return this.flow(trueItem, falseItem, otherItem, graph, n, entry, edgeKeys);
     }
 
-    protected Map<EdgeKey, Item> flow(Item trueItem, Item falseItem, Item otherItem, 
-                       FlowGraph graph, Term n, boolean entry, Set<EdgeKey> edgeKeys) {
+    protected Map<EdgeKey, FlowItem> flow(FlowItem trueItem, FlowItem falseItem, FlowItem otherItem, 
+                       FlowGraph<FlowItem> graph, Term n, boolean entry, Set<EdgeKey> edgeKeys) {
        throw new InternalCompilerError("Unimplemented: should be " +
                                        "implemented by subclasses if " +
                                        "needed");        
@@ -372,8 +372,8 @@ public abstract class DataFlow extends ErrorHandlingVisitor
      *      operator was not one of !, &&, ||, & or |, to allow the calling
      *      method to determine which map to use.
      */
-    protected Map<EdgeKey, Item> flowBooleanConditions(Item trueItem, Item falseItem, Item otherItem, 
-                                        FlowGraph graph, Expr n, Set<EdgeKey> edgeKeys) {
+    protected Map<EdgeKey, FlowItem> flowBooleanConditions(FlowItem trueItem, FlowItem falseItem, FlowItem otherItem, 
+                                        FlowGraph<FlowItem> graph, Expr n, Set<EdgeKey> edgeKeys) {
         if (!n.type().isBoolean() || !(n instanceof Binary || n instanceof Unary)) {
             throw new InternalCompilerError("This method only takes binary " +
                       "or unary operators of boolean type");
@@ -406,7 +406,7 @@ public abstract class DataFlow extends ErrorHandlingVisitor
                 // there is both a true and a false item coming into this node, 
                 // from the second operand. However, this operator could be false
                 // if either the first or the second argument returned false.
-                Item bitANDFalse = 
+                FlowItem bitANDFalse = 
                      this.safeConfluence(trueItem, FlowGraph.EDGE_KEY_TRUE,
                                          falseItem, FlowGraph.EDGE_KEY_FALSE, 
                                          n, false, graph);
@@ -416,7 +416,7 @@ public abstract class DataFlow extends ErrorHandlingVisitor
                 // there is both a true and a false item coming into this node, 
                 // from the second operand. However, this operator could be true
                 // if either the first or the second argument returned true.
-                Item bitORTrue = 
+                FlowItem bitORTrue = 
                     this.safeConfluence(trueItem, FlowGraph.EDGE_KEY_TRUE,
                                         falseItem, FlowGraph.EDGE_KEY_FALSE, 
                                         n, false, graph);
@@ -440,8 +440,8 @@ public abstract class DataFlow extends ErrorHandlingVisitor
      *          node.
      * @return a non-null Item.
      */
-    protected abstract Item confluence(List<Item> items, Term node, boolean entry, 
-            FlowGraph graph);
+    protected abstract FlowItem confluence(List<FlowItem> items, Term node, boolean entry, 
+            FlowGraph<FlowItem> graph);
     
     /**
      * The confluence operator for many flows. This method produces a single
@@ -460,8 +460,8 @@ public abstract class DataFlow extends ErrorHandlingVisitor
      *          node.
      * @return a non-null Item.
      */
-    protected Item confluence(List<Item> items, List<EdgeKey> itemKeys, Term node, boolean entry, 
-            FlowGraph graph) {
+    protected FlowItem confluence(List<FlowItem> items, List<EdgeKey> itemKeys, Term node, boolean entry, 
+            FlowGraph<FlowItem> graph) {
         return confluence(items, node, entry, graph); 
     }
     
@@ -479,7 +479,7 @@ public abstract class DataFlow extends ErrorHandlingVisitor
      * @param peer <code>Peer</code> for which the <code>items</code> are 
      *          flowing into.
      */
-    protected Item safeConfluence(List<Item> items, List<EdgeKey> itemKeys, Peer peer, FlowGraph graph) {
+    protected FlowItem safeConfluence(List<FlowItem> items, List<EdgeKey> itemKeys, Peer<FlowItem> peer, FlowGraph<FlowItem> graph) {
         return this.safeConfluence(items, itemKeys, peer.node(), peer.isEntry(), graph);        
     }
 
@@ -500,8 +500,8 @@ public abstract class DataFlow extends ErrorHandlingVisitor
      *          node.
      * @return a non-null Item.
      */
-    protected Item safeConfluence(List<Item> items, List<EdgeKey> itemKeys, Term node, 
-            boolean entry, FlowGraph graph) {
+    protected FlowItem safeConfluence(List<FlowItem> items, List<EdgeKey> itemKeys, Term node, 
+            boolean entry, FlowGraph<FlowItem> graph) {
         if (items.isEmpty()) {
             return this.createInitialItem(graph, node, entry);
         }
@@ -511,17 +511,16 @@ public abstract class DataFlow extends ErrorHandlingVisitor
         return confluence(items, itemKeys, node, entry, graph); 
     }
 
-    protected Item safeConfluence(Item item1, FlowGraph.EdgeKey key1,
-                                  Item item2, FlowGraph.EdgeKey key2,
-                                  Term node, boolean entry, FlowGraph graph) {
+    protected FlowItem safeConfluence(FlowItem item1, FlowGraph.EdgeKey key1,
+            FlowItem item2, FlowGraph.EdgeKey key2, Term node, boolean entry,
+            FlowGraph<FlowItem> graph) {
         return safeConfluence(item1, key1, item2, key2, null, null, node, entry, graph);
     }
                                   
-    protected Item safeConfluence(Item item1, FlowGraph.EdgeKey key1,
-                                  Item item2, FlowGraph.EdgeKey key2,
-                                  Item item3, FlowGraph.EdgeKey key3,
-                                  Term node, boolean entry, FlowGraph graph) {
-        List<Item> items = new ArrayList<Item>(3);
+    protected FlowItem safeConfluence(FlowItem item1, FlowGraph.EdgeKey key1,
+            FlowItem item2, FlowGraph.EdgeKey key2, FlowItem item3,
+            FlowGraph.EdgeKey key3, Term node, boolean entry, FlowGraph<FlowItem> graph) {
+        List<FlowItem> items = new ArrayList<FlowItem>(3);
         List<EdgeKey> itemKeys = new ArrayList<EdgeKey>(3);
         
         if (item1 != null) {
@@ -549,8 +548,8 @@ public abstract class DataFlow extends ErrorHandlingVisitor
      * @throws SemanticException if the properties this dataflow
      *         analysis is checking for is not satisfied.
      */
-    protected abstract void check(FlowGraph graph, Term n, boolean entry, 
-            Item inItem, Map<EdgeKey, Item> outItems) throws SemanticException;
+    protected abstract void check(FlowGraph<FlowItem> graph, Term n, boolean entry, 
+            FlowItem inItem, Map<EdgeKey, FlowItem> outItems) throws SemanticException;
 
     /**
      * Check that the term n satisfies whatever properties this
@@ -561,7 +560,7 @@ public abstract class DataFlow extends ErrorHandlingVisitor
      * @throws SemanticException if the properties this dataflow
      *         analysis is checking for is not satisfied.
      */
-    protected void check(FlowGraph graph, Peer p) throws SemanticException {
+    protected void check(FlowGraph<FlowItem> graph, Peer<FlowItem> p) throws SemanticException {
         check(graph, p.node(), p.isEntry(), p.inItem(), p.outItems);
     }
 
@@ -581,11 +580,11 @@ public abstract class DataFlow extends ErrorHandlingVisitor
         // only bother to do the flow analysis if the body is not null...
         if (cd.codeBody() != null) {
             // Compute the successor of each child node.
-            FlowGraph g = initGraph(cd, cd);
+            FlowGraph<FlowItem> g = initGraph(cd, cd);
 
             if (g != null) {
                 // Build the control flow graph.
-                CFGBuilder v = createCFGBuilder(ts, g);
+                CFGBuilder<FlowItem> v = createCFGBuilder(ts, g);
 
                 try {
                     v.visitGraph();
@@ -600,20 +599,20 @@ public abstract class DataFlow extends ErrorHandlingVisitor
 
                 // push the CFG onto the stack if we are dataflowing on entry
                 if (dataflowOnEntry)
-                    flowgraphStack.addFirst(new FlowGraphSource(g, cd));
+                    flowgraphStack.addFirst(new FlowGraphSource<FlowItem>(g, cd));
             }
         }
     }
 
-    protected Frame createFrame(Peer p, boolean forward, FlowGraph grahp) {
-        return new Frame(p, forward);
+    protected Frame<FlowItem> createFrame(Peer<FlowItem> p, boolean forward, FlowGraph<FlowItem> grahp) {
+        return new Frame<FlowItem>(p, forward);
     }
     /** A "stack frame" for recursive DFS */
-    static protected class Frame {
-        protected Peer peer;
-        protected Iterator<Edge> edges;
+    static protected class Frame<FlowItem extends Item> {
+        protected Peer<FlowItem> peer;
+        protected Iterator<Edge<FlowItem>> edges;
         protected Frame() { }
-	Frame(Peer p, boolean forward) {
+	Frame(Peer<FlowItem> p, boolean forward) {
 	    peer = p;
 	    if (forward) edges = p.succs().iterator();
 	    else edges = p.preds().iterator();
@@ -626,10 +625,11 @@ public abstract class DataFlow extends ErrorHandlingVisitor
      *  scc_head[n] where n is the first peer in an SCC is set to -1.
      *  scc_head[n] where n is the last peer in a (non-singleton) SCC is set
      *  to the index of the first peer. Otherwise it is -2. */
-    protected Pair<Peer[], int[]> findSCCs(FlowGraph graph) {
-	Collection<Peer> peers = graph.peers();
-	Peer[] sorted = new Peer[peers.size()];
-        Collection<Peer> start = graph.startPeers();
+    protected Pair<Peer<FlowItem>[], int[]> findSCCs(FlowGraph<FlowItem> graph) {
+	Collection<Peer<FlowItem>> peers = graph.peers();
+	@SuppressWarnings("unchecked")
+	Peer<FlowItem>[] sorted = new Peer[peers.size()];
+        Collection<Peer<FlowItem>> start = graph.startPeers();
 	  // if start == peers, making all nodes reachable,
 	  // the problem still arises.
 
@@ -637,17 +637,17 @@ public abstract class DataFlow extends ErrorHandlingVisitor
 
 // First, topologically sort the nodes (put in postorder)
 	int n = 0;
-	LinkedList<Frame> stack = new LinkedList<Frame>();
-	HashSet<Peer> reachable = new HashSet<Peer>();
-	for (Peer peer : start) {
+	LinkedList<Frame<FlowItem>> stack = new LinkedList<Frame<FlowItem>>();
+	HashSet<Peer<FlowItem>> reachable = new HashSet<Peer<FlowItem>>();
+	for (Peer<FlowItem> peer : start) {
 	  if (!reachable.contains(peer)) {
 	    reachable.add(peer);
 	    stack.addFirst(createFrame(peer, true, graph));
 	    while (stack.size() != 0) {
-		Frame top = stack.getFirst();
+		Frame<FlowItem> top = stack.getFirst();
 		if (top.edges.hasNext()) {
-		    Edge e = top.edges.next();
-		    Peer q = e.getTarget();
+		    Edge<FlowItem> e = top.edges.next();
+		    Peer<FlowItem> q = e.getTarget();
 		    if (!reachable.contains(q)) {
 			reachable.add(q);
 			stack.addFirst(createFrame(q, true, graph));
@@ -663,24 +663,25 @@ public abstract class DataFlow extends ErrorHandlingVisitor
 // Now, walk the transposed graph picking nodes in reverse
 // postorder, thus picking out one SCC at a time and
 // appending it to "by_scc".
-	Peer[] by_scc = new Peer[n];
+	@SuppressWarnings("unchecked")
+	Peer<FlowItem>[] by_scc = new Peer[n];
 	int[] scc_head = new int[n];
-	HashSet<Peer> visited = new HashSet<Peer>();
+	HashSet<Peer<FlowItem>> visited = new HashSet<Peer<FlowItem>>();
 	int head = 0;
 	for (int i=n-1; i>=0; i--) {
 	    if (!visited.contains(sorted[i])) {
 		// First, find all the nodes in the SCC
-		HashSet<Peer> SCC = new HashSet<Peer>();
+		HashSet<Peer<FlowItem>> SCC = new HashSet<Peer<FlowItem>>();
 		visited.add(sorted[i]);
 		stack.add(createFrame(sorted[i], false, graph));
 		while (stack.size() != 0) {
-		    Frame top = stack.getFirst();
+		    Frame<FlowItem> top = stack.getFirst();
 		    if (top.edges.hasNext()) {
-			Edge e = top.edges.next();
-			Peer q = e.getTarget();
+			Edge<FlowItem> e = top.edges.next();
+			Peer<FlowItem> q = e.getTarget();
 			if (reachable.contains(q) && !visited.contains(q)) {
 			    visited.add(q);
-			    Frame f = createFrame(q, false, graph);
+			    Frame<FlowItem> f = createFrame(q, false, graph);
 			    stack.addFirst(f);
 			}
 		    } else {
@@ -691,18 +692,18 @@ public abstract class DataFlow extends ErrorHandlingVisitor
 		// Now, topologically sort the SCC (as much as possible)
 		// and place into by_scc[head..head+scc_size-1]
 		stack.add(createFrame(sorted[i], true, graph));
-		HashSet<Peer> revisited = new HashSet<Peer>();
+		HashSet<Peer<FlowItem>> revisited = new HashSet<Peer<FlowItem>>();
 		revisited.add(sorted[i]);
 		int scc_size = SCC.size();
 		int nsorted = 0;
 		while (stack.size() != 0) {
-		    Frame top = stack.getFirst();
+		    Frame<FlowItem> top = stack.getFirst();
 		    if (top.edges.hasNext()) {
-			Edge e = top.edges.next();
-			Peer q = e.getTarget();
+			Edge<FlowItem> e = top.edges.next();
+			Peer<FlowItem> q = e.getTarget();
 			if (SCC.contains(q) && !revisited.contains(q)) {
 			    revisited.add(q);
-			    Frame f = createFrame(q, true, graph);
+			    Frame<FlowItem> f = createFrame(q, true, graph);
 			    stack.addFirst(f);
 			}
 		    } else {
@@ -725,19 +726,19 @@ public abstract class DataFlow extends ErrorHandlingVisitor
 		    case -2: Report.report(2, j + "       : " + by_scc[j]); break;
 		    default: Report.report(2, j + " ->"+ scc_head[j] + " : " + by_scc[j]);
 		}
-		for (Edge e : by_scc[j].succs()) {
+		for (Edge<FlowItem> e : by_scc[j].succs()) {
 		    Report.report(3, "     successor: " + e.getTarget());
 		}
 	    }
 	}
-	return new Pair<Peer[], int[]>(by_scc, scc_head);
+	return new Pair<Peer<FlowItem>[], int[]>(by_scc, scc_head);
     }
 
     /**
      * Map from <code>Peer</code>s to <code>Integer</code>s that contains a post-ordering
      * of <code>Peer</code>s if <code>this.detectBackEdges</code> is true.
      */
-    protected Map<Peer, Integer> postordering = null;
+    protected Map<Peer<FlowItem>, Integer> postordering = null;
     
     /**
      * Create a postorder on <code>Peer p</code> and all <code>Peer</code>s 
@@ -750,14 +751,14 @@ public abstract class DataFlow extends ErrorHandlingVisitor
      * @param visited Set of Peer
      * @return
      */
-    private int postorder(Peer p, int count, Set<Peer> visited) {
+    private int postorder(Peer<FlowItem> p, int count, Set<Peer<FlowItem>> visited) {
         if (visited.contains(p)) return count;
         
         // visit p
         visited.add(p);
         
         // visit all the successors of p
-        for (Edge e : p.succs()) {
+        for (Edge<FlowItem> e : p.succs()) {
             count = postorder(e.getTarget(), count, visited); 
         }
         
@@ -770,12 +771,12 @@ public abstract class DataFlow extends ErrorHandlingVisitor
     /**
      * Perform the dataflow on flowgraph <code>graph</code>.
      */
-    protected void dataflow(FlowGraph graph) {
+    protected void dataflow(FlowGraph<FlowItem> graph) {
 	if (Report.should_report(Report.dataflow, 1)) {
 	    Report.report(1, "Finding strongly connected components");
 	}
-	Pair<Peer[], int[]> pair = findSCCs(graph);
-	Peer[] by_scc = pair.part1();
+	Pair<Peer<FlowItem>[], int[]> pair = findSCCs(graph);
+	Peer<FlowItem>[] by_scc = pair.part1();
 	int[] scc_head = pair.part2();
 	int npeers = by_scc.length;
 
@@ -787,10 +788,10 @@ public abstract class DataFlow extends ErrorHandlingVisitor
 	
 	if (this.detectBackEdges) {
 		// construct a postordering of the peers by visiting each peer in a depth first manner
-		this.postordering = new HashMap<Peer, Integer>();
+		this.postordering = new HashMap<Peer<FlowItem>, Integer>();
 		int count = 0;
-		Set<Peer> visited = new HashSet<Peer>();
-		for (Peer p : graph.startPeers()) {
+		Set<Peer<FlowItem>> visited = new HashSet<Peer<FlowItem>>();
+		for (Peer<FlowItem> p : graph.startPeers()) {
 			count =  postorder(p, count, visited);
 		}
 	}
@@ -803,18 +804,18 @@ public abstract class DataFlow extends ErrorHandlingVisitor
 	boolean change = false;
 
 	while (current < npeers) {
-            Peer p = by_scc[current];
+            Peer<FlowItem> p = by_scc[current];
 	    if (scc_head[current] == -1) {
 		change = false; // just started working on a new SCC
 	    }
 
             // get the in items by examining the out items of all
             // the predecessors of p
-            List<Item> inItems = new ArrayList<Item>(p.preds.size());
+            List<FlowItem> inItems = new ArrayList<FlowItem>(p.preds.size());
             List<EdgeKey> inItemKeys = new ArrayList<EdgeKey>(p.preds.size());
-            List<Peer> inItemPeers = new ArrayList<Peer>(p.preds.size());
-            for (Edge e : p.preds) {
-                Peer o = e.getTarget();
+            List<Peer<FlowItem>> inItemPeers = new ArrayList<Peer<FlowItem>>(p.preds.size());
+            for (Edge<FlowItem> e : p.preds) {
+                Peer<FlowItem> o = e.getTarget();
                 if (o.outItems != null) {
                     if (!o.outItems.keySet().contains(e.getKey())) {
                         throw new InternalCompilerError("There should have " +
@@ -822,7 +823,7 @@ public abstract class DataFlow extends ErrorHandlingVisitor
                                 "; instead there were only " + 
                                 o.outItems.keySet());
                     }
-                    Item it = o.outItems.get(e.getKey());
+                    FlowItem it = o.outItems.get(e.getKey());
                     if (it != null) {
                         inItems.add(it);
                         inItemKeys.add(e.getKey());
@@ -832,7 +833,7 @@ public abstract class DataFlow extends ErrorHandlingVisitor
             }
                 
             // calculate the out item
-            Map<EdgeKey, Item> oldOutItems = p.outItems;
+            Map<EdgeKey, FlowItem> oldOutItems = p.outItems;
             p.inItem = this.safeConfluence(inItems, inItemKeys, p, graph);
             p.outItems = this.flow(inItems, inItemKeys, inItemPeers, graph, p);
                     
@@ -871,8 +872,8 @@ public abstract class DataFlow extends ErrorHandlingVisitor
      *         code declaration; otherwise, an appropriately initialized
      *         <code>FlowGraph.</code>
      */
-    protected FlowGraph initGraph(CodeNode code, Term root) {
-        return new FlowGraph(root, forward);
+    protected FlowGraph<FlowItem> initGraph(CodeNode code, Term root) {
+        return new FlowGraph<FlowItem>(root, forward);
     }
 
     /**
@@ -883,7 +884,7 @@ public abstract class DataFlow extends ErrorHandlingVisitor
      *         code declaration; otherwise, an appropriately initialized
      *         <code>FlowGraph.</code>
      */
-    protected FlowGraph initGraph(CodeDecl code, Term root) {
+    protected FlowGraph<FlowItem> initGraph(CodeDecl code, Term root) {
         return initGraph((CodeNode) code, root);
     }
 
@@ -894,8 +895,8 @@ public abstract class DataFlow extends ErrorHandlingVisitor
      * @param g The flow graph to that the CFGBuilder will construct.
      * @return a new CFGBuilder
      */
-    protected CFGBuilder createCFGBuilder(TypeSystem ts, FlowGraph g) {
-        return new CFGBuilder(ts, g, this);
+    protected CFGBuilder<FlowItem> createCFGBuilder(TypeSystem ts, FlowGraph<FlowItem> g) {
+        return new CFGBuilder<FlowItem>(ts, g, this);
     }
 
     /**
@@ -923,7 +924,7 @@ public abstract class DataFlow extends ErrorHandlingVisitor
                 // We currently only update the key in the peerMap.
                 // We DO NOT update the Terms inside the peers, nor the
                 // List of Terms that are the path maps. 
-                Map<PeerKey, Peer> o = currentFlowGraph().peerMap.get(new IdentityKey(old));
+                Map<PeerKey, Peer<FlowItem>> o = currentFlowGraph().peerMap.get(new IdentityKey(old));
                 if (o != null) {
                     currentFlowGraph().peerMap.put(new IdentityKey(n), o);
                 }
@@ -943,7 +944,7 @@ public abstract class DataFlow extends ErrorHandlingVisitor
                 dataflow((CodeNode)n);
             }
             else if (dataflowOnEntry && !flowgraphStack.isEmpty()) {
-                FlowGraphSource fgs = flowgraphStack.getFirst();
+                FlowGraphSource<FlowItem> fgs = flowgraphStack.getFirst();
                 if (fgs.source.equals(old)) {
                     // we are leaving the code decl that pushed this flowgraph 
                     // on the stack. pop tbe stack.
@@ -958,22 +959,22 @@ public abstract class DataFlow extends ErrorHandlingVisitor
      * Check all of the Peers in the graph, after the dataflow analysis has
      * been performed.
      */
-    protected void post(FlowGraph graph, Term root) throws SemanticException {
+    protected void post(FlowGraph<FlowItem> graph, Term root) throws SemanticException {
         if (Report.should_report(Report.cfg, 2)) {
             dumpFlowGraph(graph, root);
         }
         
         // Check the nodes in approximately flow order.
-        Set<Peer> uncheckedPeers = new HashSet<Peer>(graph.peers());
-        LinkedList<Peer> peersToCheck = new LinkedList<Peer>(graph.startPeers());
+        Set<Peer<FlowItem>> uncheckedPeers = new HashSet<Peer<FlowItem>>(graph.peers());
+        LinkedList<Peer<FlowItem>> peersToCheck = new LinkedList<Peer<FlowItem>>(graph.startPeers());
         while (!peersToCheck.isEmpty()) {
-            Peer p = peersToCheck.removeFirst();
+            Peer<FlowItem> p = peersToCheck.removeFirst();
             uncheckedPeers.remove(p);
 
             this.check(graph, p);
             
-            for (Edge e : p.succs) {
-                Peer q = e.getTarget();
+            for (Edge<FlowItem> e : p.succs) {
+                Peer<FlowItem> q = e.getTarget();
                 if (uncheckedPeers.contains(q) && !peersToCheck.contains(q)) {
                     // q hasn't been checked yet.
                     peersToCheck.addLast(q);
@@ -982,7 +983,7 @@ public abstract class DataFlow extends ErrorHandlingVisitor
             
             if (peersToCheck.isEmpty() && !uncheckedPeers.isEmpty()) {
                 // done all the we can reach...
-                Iterator<Peer> i = uncheckedPeers.iterator();                
+                Iterator<Peer<FlowItem>> i = uncheckedPeers.iterator();                
                 peersToCheck.add(i.next());
                 i.remove();
             }
@@ -1001,7 +1002,7 @@ public abstract class DataFlow extends ErrorHandlingVisitor
      * should be the <code>FlowGraph</code> for the dataflow for innermost
      * <code>CodeNode</code>.
      */
-    protected FlowGraph currentFlowGraph() {
+    protected FlowGraph<FlowItem> currentFlowGraph() {
         if (!dataflowOnEntry) {
             throw new InternalCompilerError("currentFlowGraph() cannot be" +
                 " called when dataflow is not performed on entry");
@@ -1028,8 +1029,8 @@ public abstract class DataFlow extends ErrorHandlingVisitor
      *           <code>EdgeKey</code> in <code>edgeKeys</code> to the
      *           <code>Item i</code>.
      */
-    public static final Map<EdgeKey, Item> itemToMap(Item i, Set<EdgeKey> edgeKeys) {
-        Map<EdgeKey, Item> m = new HashMap<EdgeKey, Item>();
+    public static final <FlowItem> Map<EdgeKey, FlowItem> itemToMap(FlowItem i, Set<EdgeKey> edgeKeys) {
+        Map<EdgeKey, FlowItem> m = new HashMap<EdgeKey, FlowItem>();
         for (EdgeKey k : edgeKeys) {
             m.put(k, i);
         }
@@ -1061,8 +1062,8 @@ public abstract class DataFlow extends ErrorHandlingVisitor
      *           <code>EdgeKey</code> in <code>edgeKeys</code> to the
      *           <code>Item i</code>.
      */
-    protected static final Map<EdgeKey, Item> itemsToMap(Item trueItem, Item falseItem, Item remainingItem, Set<EdgeKey> edgeKeys) {
-        Map<EdgeKey, Item> m = new HashMap<EdgeKey, Item>();
+    protected static final <FlowItem> Map<EdgeKey, FlowItem> itemsToMap(FlowItem trueItem, FlowItem falseItem, FlowItem remainingItem, Set<EdgeKey> edgeKeys) {
+        Map<EdgeKey, FlowItem> m = new HashMap<EdgeKey, FlowItem>();
         
         for (EdgeKey k : edgeKeys) {
             if (FlowGraph.EDGE_KEY_TRUE.equals(k)) {
@@ -1092,12 +1093,12 @@ public abstract class DataFlow extends ErrorHandlingVisitor
      *            are not <code>FlowGraph.ExceptionEdgeKey</code>s with 
      *            whose exception types are <code>Error</code>s.
      */    
-    protected final List<Item> filterItemsNonError(List<Item> items, List<EdgeKey> itemKeys) {
-        List<Item> filtered = new ArrayList<Item>(items.size());
-        Iterator<Item> i = items.iterator();
+    protected final List<FlowItem> filterItemsNonError(List<FlowItem> items, List<EdgeKey> itemKeys) {
+        List<FlowItem> filtered = new ArrayList<FlowItem>(items.size());
+        Iterator<FlowItem> i = items.iterator();
         Iterator<EdgeKey> j = itemKeys.iterator();
         while (i.hasNext() && j.hasNext()) {
-            Item item = i.next();
+            FlowItem item = i.next();
             EdgeKey key = j.next();
             
             if (!(key instanceof ExceptionEdgeKey &&
@@ -1127,12 +1128,12 @@ public abstract class DataFlow extends ErrorHandlingVisitor
 	 * @return a filtered list of items, containing only those whose edge keys
 	 *            are not <code>FlowGraph.ExceptionEdgeKey</code>s.
 	 */    
-	protected final List<Item> filterItemsNonException(List<Item> items, List<EdgeKey> itemKeys) {
-		List<Item> filtered = new ArrayList<Item>(items.size());
-		Iterator<Item> i = items.iterator();
+	protected final List<FlowItem> filterItemsNonException(List<FlowItem> items, List<EdgeKey> itemKeys) {
+		List<FlowItem> filtered = new ArrayList<FlowItem>(items.size());
+		Iterator<FlowItem> i = items.iterator();
 		Iterator<EdgeKey> j = itemKeys.iterator();
 		while (i.hasNext() && j.hasNext()) {
-			Item item = i.next();
+			FlowItem item = i.next();
 			EdgeKey key = j.next();
             
 			if (!(key instanceof ExceptionEdgeKey)) {
@@ -1164,12 +1165,12 @@ public abstract class DataFlow extends ErrorHandlingVisitor
 	 * @return a filtered list of items, containing only those whose edge keys
 	 *            are not <code>FlowGraph.ExceptionEdgeKey</code>s.
 	 */    
-	protected final List<Item> filterItemsExceptionSubclass(List<Item> items, List<EdgeKey> itemKeys, Type excType) {
-		List<Item> filtered = new ArrayList<Item>(items.size());
-		Iterator<Item> i = items.iterator();
+	protected final List<FlowItem> filterItemsExceptionSubclass(List<FlowItem> items, List<EdgeKey> itemKeys, Type excType) {
+		List<FlowItem> filtered = new ArrayList<FlowItem>(items.size());
+		Iterator<FlowItem> i = items.iterator();
 		Iterator<EdgeKey> j = itemKeys.iterator();
 		while (i.hasNext() && j.hasNext()) {
-			Item item = i.next();
+			FlowItem item = i.next();
 			EdgeKey key = j.next();
             
 			if (key instanceof ExceptionEdgeKey) {
@@ -1200,12 +1201,12 @@ public abstract class DataFlow extends ErrorHandlingVisitor
      * @return a filtered list of items, containing only those whose edge keys
      *            are the same as <code>filterEdgeKey</code>s.
      */    
-    protected final List<Item> filterItems(List<Item> items, List<EdgeKey> itemKeys, FlowGraph.EdgeKey filterEdgeKey) {
-        List<Item> filtered = new ArrayList<Item>(items.size());
-        Iterator<Item> i = items.iterator();
+    protected final List<FlowItem> filterItems(List<FlowItem> items, List<EdgeKey> itemKeys, FlowGraph.EdgeKey filterEdgeKey) {
+        List<FlowItem> filtered = new ArrayList<FlowItem>(items.size());
+        Iterator<FlowItem> i = items.iterator();
         Iterator<EdgeKey> j = itemKeys.iterator();
         while (i.hasNext() && j.hasNext()) {
-            Item item = i.next();
+            FlowItem item = i.next();
             EdgeKey key = j.next();
             
             if (filterEdgeKey.equals(key)) {
@@ -1269,10 +1270,10 @@ public abstract class DataFlow extends ErrorHandlingVisitor
      * @deprecated
      */
     @Deprecated
-    protected static Map<EdgeKey, Item> constructItemsFromCondition(Expr booleanCond, 
-                                                     Item startingItem,
+    protected static <FlowItem extends Item> Map<EdgeKey, FlowItem> constructItemsFromCondition(Expr booleanCond, 
+                                                     FlowItem startingItem,
                                                      Set<EdgeKey> succEdgeKeys,
-                                                     ConditionNavigator navigator) {
+                                                     ConditionNavigator<FlowItem> navigator) {
         // check the arguments to make sure this method is used correctly
         if (!booleanCond.type().isBoolean()) {
             throw new IllegalArgumentException("booleanCond must be a boolean expression");
@@ -1282,9 +1283,9 @@ public abstract class DataFlow extends ErrorHandlingVisitor
         }
         
         
-        BoolItem results = navigator.navigate(booleanCond, startingItem);
+        BoolItem<FlowItem> results = navigator.navigate(booleanCond, startingItem);
         
-        Map<EdgeKey, Item> m = new HashMap<EdgeKey, Item>();
+        Map<EdgeKey, FlowItem> m = new HashMap<EdgeKey, FlowItem>();
         m.put(FlowGraph.EDGE_KEY_TRUE, results.trueItem);
         m.put(FlowGraph.EDGE_KEY_FALSE, results.falseItem);
         
@@ -1308,15 +1309,15 @@ public abstract class DataFlow extends ErrorHandlingVisitor
      * @deprecated Use flowBooleanConditions
      */
     @Deprecated
-    protected static class BoolItem {
-        public BoolItem(Item trueItem, Item falseItem) {
+    protected static class BoolItem<FlowItem extends Item> {
+        public BoolItem(FlowItem trueItem, FlowItem falseItem) {
             this.trueItem = trueItem;
             this.falseItem = falseItem;            
         }
-        private Item trueItem;
-        private Item falseItem;
-        public Item trueItem() { return trueItem; }
-        public Item falseItem() { return falseItem; }
+        private FlowItem trueItem;
+        private FlowItem falseItem;
+        public FlowItem trueItem() { return trueItem; }
+        public FlowItem falseItem() { return falseItem; }
         @Override
         public String toString() {
             return "[ true: " + trueItem + "; false: " + falseItem + " ]";
@@ -1341,7 +1342,7 @@ public abstract class DataFlow extends ErrorHandlingVisitor
      * @deprecated
      */
     @Deprecated
-    protected abstract static class ConditionNavigator {
+    protected abstract static class ConditionNavigator<FlowItem extends Item> {
         /**
          * Navigate the expression <code>expr</code>, where the 
          * <code>Item</code> at the start of evaluating the expression is 
@@ -1351,43 +1352,43 @@ public abstract class DataFlow extends ErrorHandlingVisitor
          * <code>Item</code>s that are appropriate when <code>expr</code>
          * evaluates to true and false.
          */
-        public BoolItem navigate(Expr expr, Item startingItem) {
+        public BoolItem<FlowItem> navigate(Expr expr, FlowItem startingItem) {
             if (expr.type().isBoolean()) {
                 if (expr instanceof Binary) {
                     Binary b = (Binary)expr;
                     if (Binary.COND_AND.equals(b.operator()) ||
                         Binary.BIT_AND.equals(b.operator())) {
                         
-                        BoolItem leftRes = navigate(b.left(), startingItem);
-                        Item rightResStart = startingItem;
+                        BoolItem<FlowItem> leftRes = navigate(b.left(), startingItem);
+                        FlowItem rightResStart = startingItem;
                         if (Binary.COND_AND.equals(b.operator())) {
                             // due to short circuiting, if the right
                             // branch is evaluated, the starting item is
                             // in fact the true part of the left result
                             rightResStart = leftRes.trueItem;                            
                         }
-                        BoolItem rightRes = navigate(b.right(), rightResStart);
+                        BoolItem<FlowItem> rightRes = navigate(b.right(), rightResStart);
                         return andResults(leftRes, rightRes, startingItem);
                     }
                     else if (Binary.COND_OR.equals(b.operator()) ||
                              Binary.BIT_OR.equals(b.operator())) {
                         
-                        BoolItem leftRes = navigate(b.left(), startingItem);
-                        Item rightResStart = startingItem;
+                        BoolItem<FlowItem> leftRes = navigate(b.left(), startingItem);
+                        FlowItem rightResStart = startingItem;
                         if (Binary.COND_OR.equals(b.operator())) {
                             // due to short circuiting, if the right
                             // branch is evaluated, the starting item is
                             // in fact the false part of the left result
                             rightResStart = leftRes.falseItem;                            
                         }
-                        BoolItem rightRes = navigate(b.right(), rightResStart);
+                        BoolItem<FlowItem> rightRes = navigate(b.right(), rightResStart);
                         return orResults(leftRes, rightRes, startingItem);
                     }
                 }
                 else if (expr instanceof Unary) {
                     Unary u = (Unary)expr;
                     if (Unary.NOT.equals(u.operator())) {
-                        BoolItem res = navigate(u.expr(), startingItem);
+                        BoolItem<FlowItem> res = navigate(u.expr(), startingItem);
                         return notResult(res);
                     }
                 }
@@ -1403,10 +1404,10 @@ public abstract class DataFlow extends ErrorHandlingVisitor
          * Combine the results of analyzing the left and right arms of
          * an AND boolean operator (either &amp;&amp; or &amp;).
          */
-        public BoolItem andResults(BoolItem left, 
-                                   BoolItem right, 
-                                   Item startingItem) {
-            return new BoolItem(combine(left.trueItem, right.trueItem),
+        public BoolItem<FlowItem> andResults(BoolItem<FlowItem> left, 
+                                   BoolItem<FlowItem> right, 
+                                   FlowItem startingItem) {
+            return new BoolItem<FlowItem>(combine(left.trueItem, right.trueItem),
                                 startingItem);            
         }
 
@@ -1414,10 +1415,10 @@ public abstract class DataFlow extends ErrorHandlingVisitor
          * Combine the results of analyzing the left and right arms of
          * an OR boolean operator (either || or |).
          */
-        public BoolItem orResults(BoolItem left, 
-                                  BoolItem right, 
-                                  Item startingItem) {
-            return new BoolItem(startingItem,
+        public BoolItem<FlowItem> orResults(BoolItem<FlowItem> left, 
+                                  BoolItem<FlowItem> right, 
+                                  FlowItem startingItem) {
+            return new BoolItem<FlowItem>(startingItem,
                                 combine(left.falseItem, right.falseItem));                        
         }
 
@@ -1425,8 +1426,8 @@ public abstract class DataFlow extends ErrorHandlingVisitor
          * Modify the results of analyzing the child of 
          * a NEGATION boolean operator (a !).
          */
-        public BoolItem notResult(BoolItem results) {
-            return new BoolItem(results.falseItem, results.trueItem);            
+        public BoolItem<FlowItem> notResult(BoolItem<FlowItem> results) {
+            return new BoolItem<FlowItem>(results.falseItem, results.trueItem);            
         }
 
         /**
@@ -1436,13 +1437,13 @@ public abstract class DataFlow extends ErrorHandlingVisitor
          * combining them corresponds to unioning the sets. Note that this
          * could be a different operation to the confluence operation.
          */
-        public abstract Item combine(Item item1, Item item2);
+        public abstract FlowItem combine(FlowItem item1, FlowItem item2);
 
         /**
          * Produce a <code>BoolItem</code> for an expression that is not
          * a boolean operator, such as &&, &, ||, | or !.
          */
-        public abstract BoolItem handleExpression(Expr expr, Item startingItem);
+        public abstract BoolItem<FlowItem> handleExpression(Expr expr, FlowItem startingItem);
     }
     
     protected static int flowCounter = 0;
@@ -1450,7 +1451,7 @@ public abstract class DataFlow extends ErrorHandlingVisitor
      * Dump a flow graph, labeling edges with their flows, to aid in the
      * debugging of data flow.
      */
-    protected void dumpFlowGraph(FlowGraph graph, Term root) {
+    protected void dumpFlowGraph(FlowGraph<FlowItem> graph, Term root) {
         String name = StringUtil.getShortNameComponent(this.getClass().getName());
         name += flowCounter++;
 
@@ -1469,7 +1470,7 @@ public abstract class DataFlow extends ErrorHandlingVisitor
             "\"; fontsize=20; center=true; ratio=auto; size = \"8.5,11\";");
 
         // Loop around the nodes...
-        for (Peer p : graph.peers()) {
+        for (Peer<FlowItem> p : graph.peers()) {
             // dump out this node
             Report.report(2,
                           p.hashCode() + " [ label = \"" +
@@ -1478,7 +1479,7 @@ public abstract class DataFlow extends ErrorHandlingVisitor
                           (p.path_to_finally.isEmpty()?"":StringUtil.escape(p.path_to_finally.toString())) + "\" ];");
             
             // dump out the successors.
-            for (Edge q : p.succs) {
+            for (Edge<FlowItem> q : p.succs) {
                 Report.report(2,
                               q.getTarget().hashCode() + " [ label = \"" +
                               StringUtil.escape(q.getTarget().node.toString()) + " (" + 

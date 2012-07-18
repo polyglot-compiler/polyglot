@@ -78,10 +78,12 @@ public class OptimalCodeWriter extends CodeWriter {
         this(new PrintWriter(o), width_);
     }
         
+    @Override
     public void write(String s) {
        if (s.length() > 0) write(s, s.length());
     }
 
+    @Override
     public void write(String s, int length) {
         if (OptimalCodeWriter.showInput) {
             trace("write '" + s + "' (" + length + ")");
@@ -111,6 +113,7 @@ public class OptimalCodeWriter extends CodeWriter {
      *            to the current position) for all lines in the block.
      *            Requires: n >= 0.
      */         
+    @Override
     public void begin(int n) {
         if (OptimalCodeWriter.showInput) {
             trace("begin " + n);
@@ -124,6 +127,7 @@ public class OptimalCodeWriter extends CodeWriter {
     /**
      * Terminate the most recent outstanding <code>begin</code>.
      */
+    @Override
     public void end() {
         if (OptimalCodeWriter.showInput) {
             decIndent();
@@ -134,6 +138,7 @@ public class OptimalCodeWriter extends CodeWriter {
         // if (current == null) throw new RuntimeException();
     }
 
+    @Override
     public void allowBreak(int n, int level, String alt, int altlen) {
         if (OptimalCodeWriter.showInput) {
             trace("allowBreak " + n + " level=" + level);
@@ -142,6 +147,7 @@ public class OptimalCodeWriter extends CodeWriter {
     }
 
     /** @see polyglot.util.CodeWriter#unifiedBreak */
+    @Override
     public void unifiedBreak(int n, int level, String alt, int altlen) {
         if (OptimalCodeWriter.showInput) {
             trace("unifiedBreak " + n + " level=" + level);
@@ -154,12 +160,14 @@ public class OptimalCodeWriter extends CodeWriter {
      * <code>allowBreak</code> is preferable because forcing a newline also
      * causes all breaks in containing blocks to be broken.
      */
+    @Override
     public void newline() {
         newline(0, 1);
     }
     /**
      * Like newline(), but forces a newline with a specified indentation.
      */
+    @Override
     public void newline(int n, int level) {
         if (OptimalCodeWriter.showInput) {
             trace("newline " + n);
@@ -173,6 +181,7 @@ public class OptimalCodeWriter extends CodeWriter {
      * reset to 0. Returns true if formatting was completely successful (the
      * margins were obeyed).
      */
+    @Override
     public boolean flush() throws IOException {
         return flush(true);
     }
@@ -184,6 +193,7 @@ public class OptimalCodeWriter extends CodeWriter {
      * @return whether formatting was completely successful.
      * @throws IOException
      */
+    @Override
     public boolean flush(boolean format) throws IOException {
         if (OptimalCodeWriter.showInput) {
             trace("flush");
@@ -208,6 +218,7 @@ public class OptimalCodeWriter extends CodeWriter {
 	return success;
     }
 
+    @Override
     public void close() throws IOException {
 	flush();
 	output.close();
@@ -217,6 +228,7 @@ public class OptimalCodeWriter extends CodeWriter {
      * Return a readable representation of all the structured input given to
      * the CodeWriter since the last flush.
      */
+    @Override
     public String toString() {
 	return input.toString();
     }
@@ -526,18 +538,18 @@ abstract class Item
     /** Minimum lmargin-rhs width on second and following lines. 
      * A map from max levels to Integer(width). */
 
-    Map min_widths = new HashMap();
+    Map<MaxLevels, Integer> min_widths = new HashMap<MaxLevels, Integer>();
     
     /** Minimum lmargin-final offset */
-    Map min_indents = new HashMap();
+    Map<MaxLevels, Integer> min_indents = new HashMap<MaxLevels, Integer>();
 
     /** Minimum pos-rhs width (i.e., min width up to first break) */
-    Map min_pos_width = new HashMap();
+    Map<MaxLevels, Integer> min_pos_width = new HashMap<MaxLevels, Integer>();
     
     static int getMinWidth(Item it, MaxLevels m) {
 	if (it == null) return NO_WIDTH;
 	if (it.min_widths.containsKey(m))
-	    return ((Integer)it.min_widths.get(m)).intValue();
+	    return it.min_widths.get(m);
 	int p1 = it.selfMinWidth(m);	  
 	int p2 = it.selfMinIndent(m);	
 	int p3 = (p2 != NO_WIDTH) ? getMinPosWidth(it.next, m) + p2 : NO_WIDTH;	
@@ -546,14 +558,14 @@ abstract class Item
 	if (OptimalCodeWriter.debug)
 	System.err.println("minwidth" + m + ": item = " + it + ":  p1 = " + p1 + ", p2 = " + p2 + ", p3 = " + p3 + ", p4 = " + p4);
 	int result = Math.max(Math.max(p1, p3), p4);
-	it.min_widths.put(m, new Integer(result));
+	it.min_widths.put(m, result);
 	return result;
     }
 
     static int getMinPosWidth(Item it, MaxLevels m) {
 	if (it == null) return 0;
 	if (it.min_pos_width.containsKey(m)) {
-	    return ((Integer)it.min_pos_width.get(m)).intValue();
+	    return it.min_pos_width.get(m);
 	}
 	int p1 = it.selfMinPosWidth(m);
 	int result;
@@ -566,14 +578,14 @@ abstract class Item
 	    if (OptimalCodeWriter.debug)
 	    System.err.println("minpos " + m + ": item = " + it + ":  p1 = " + p1 + " + " + getMinPosWidth(it.next, m) + " = " + result);
 	}
-	it.min_pos_width.put(m, new Integer(result));
+	it.min_pos_width.put(m, result);
 	return result;
     }
 
     static int getMinIndent(Item it, MaxLevels m) {
 	if (it == null) return NO_WIDTH;
 	if (it.min_indents.containsKey(m)) {
-	    return ((Integer)it.min_indents.get(m)).intValue();
+	    return it.min_indents.get(m);
 	}
 	int p1 = it.selfMinIndent(m);
 	if (it.next == null) return p1;
@@ -582,7 +594,7 @@ abstract class Item
 	    result = getMinIndent(it.next, m);
 	else 
 	    result = getMinPosWidth(it.next, m);
-	it.min_indents.put(m, new Integer(result));
+	it.min_indents.put(m, result);
 	return result;
     }
 
@@ -606,6 +618,7 @@ abstract class Item
 	return s.substring(0, 76) + "...";
     }
 
+    @Override
     public String toString() {
 	if (next == null) return summarize(selfToString());
 	return summarize(selfToString() + next.toString());
@@ -625,20 +638,27 @@ class TextItem extends Item {
     
     TextItem(String s_, int length_) { s = s_; length = length_; }
         
+    @Override
     FormatResult formatN(int lmargin, int pos, int rmargin, int fin,
             MaxLevels m, int minLevel, int minLevelUnified) throws Overrun {
         return format(next, lmargin, pos + length, rmargin, fin,
 		      m, minLevel, minLevelUnified);
         // all overruns passed through
     }
+    @Override
     int sendOutput(PrintWriter o, int lm, int pos, int rm, boolean success, Item last) throws IOException {
         o.write(s);
         return pos + length;
     }
+    @Override
     boolean selfContainsBreaks(MaxLevels m) { return false; }
+    @Override
     int selfMinIndent(MaxLevels m) { return NO_WIDTH; }
+    @Override
     int selfMinWidth(MaxLevels m) { return NO_WIDTH; } // length only counts on s lines
+    @Override
     int selfMinPosWidth(MaxLevels m) { return length; }
+    @Override
     String selfToString() {
 	java.io.StringWriter sw = new java.io.StringWriter();
 	for (int i = 0; i < s.length(); i++) {
@@ -675,6 +695,7 @@ class AllowBreak extends Item {
         indent = n_; alt = alt_; altlen = altlen_;
         level = level_; unified = u; }
         
+    @Override
     FormatResult formatN(int lmargin, int pos, int rmargin, int fin,
             MaxLevels m, int minLevel, int minLevelUnified) throws Overrun {
         if (canLeaveUnbroken(minLevel, minLevelUnified)) {
@@ -734,6 +755,7 @@ class AllowBreak extends Item {
 	  "internal error: could not either break or not break");
     }
         
+    @Override
     int sendOutput(PrintWriter o, int lmargin, int pos, int rmargin, boolean success,
 		   Item last)
       throws IOException
@@ -754,22 +776,27 @@ class AllowBreak extends Item {
     boolean canLeaveUnbroken(int minLevel, int minLevelUnified) {
         return (level > minLevelUnified || !unified && level > minLevel);
     }
+    @Override
     int selfMinIndent(MaxLevels m) {
         if (canBreak(m)) return indent;
         else return NO_WIDTH;
     }
+    @Override
     int selfMinPosWidth(MaxLevels m) {
         if (canBreak(m)) return 0;
         else return altlen;
     }
+    @Override
     int selfMinWidth(MaxLevels m) {
         if (canBreak(m)) return indent;
         else return NO_WIDTH;
     }
+    @Override
     boolean selfContainsBreaks(MaxLevels m) {
         return canBreak(m);
     }
 
+    @Override
     String selfToString() {
 	if (indent == 0) return " ";
 	else return "^" + indent; }
@@ -787,23 +814,28 @@ class Newline extends AllowBreak {
 	broken = true;
     }
     boolean canLeaveUnbroken() { return false; }
+    @Override
     String selfToString() {
 	if (indent == 0) return "\\n";
 	else return "\\n[" + indent + "]"; }
     // XXX should not need to override sendOutput
+    @Override
     int sendOutput(PrintWriter o, int lmargin, int pos, int rmargin, boolean success, Item last)
         throws IOException {
 	    broken = true; // XXX how can this be necessary?
 	    return super.sendOutput(o, lmargin, pos, rmargin, success, last);
     }
+    @Override
     int selfMinIndent(MaxLevels m) {
         if (canBreak(m)) return indent;
         else return NEWLINE_VIOLATION;
     }
+    @Override
     int selfMinPosWidth(MaxLevels m) {
         if (canBreak(m)) return 0;
         else return NEWLINE_VIOLATION;
     }
+    @Override
     int selfMinWidth(MaxLevels m) {
         if (canBreak(m)) return indent;
         else return NEWLINE_VIOLATION;
@@ -845,6 +877,7 @@ class BlockItem extends Item {
         last = it;
     }
 
+    @Override
     FormatResult formatN(int lmargin, int pos, int rmargin, int fin,
             MaxLevels m, int minLevel, int minLevelUnified) throws Overrun {
         int childfin = fin;
@@ -870,6 +903,7 @@ class BlockItem extends Item {
         }
     }
 
+    @Override
     int sendOutput(PrintWriter o, int lmargin, int pos, int rmargin, boolean success, Item last) throws IOException {
         Item it = first;
         lmargin = pos + indent;
@@ -887,14 +921,17 @@ class BlockItem extends Item {
         return pos;
     }
 
+    @Override
     int selfMinWidth(MaxLevels m) {
         return getMinWidth(first,
                 new MaxLevels(m.maxLevelInner, m.maxLevelInner));
     }
+    @Override
     int selfMinPosWidth(MaxLevels m) {
 	return getMinPosWidth(first,
                 new MaxLevels(m.maxLevelInner, m.maxLevelInner));
     }
+    @Override
     int selfMinIndent(MaxLevels m) {
         return getMinIndent(first,
                 new MaxLevels(m.maxLevelInner, m.maxLevelInner));
@@ -904,8 +941,9 @@ class BlockItem extends Item {
      * Map from maxlevels to either null or non-null, the latter if it can
      * contain breaks at those maxlevels.
      */
-    Map containsBreaks = new HashMap();
+    Map<MaxLevels, MaxLevels> containsBreaks = new HashMap<MaxLevels, MaxLevels>();
     
+    @Override
     boolean selfContainsBreaks(MaxLevels m) {
 	if (containsBreaks.containsKey(m)) {
 	    return (containsBreaks.get(m) != null);
@@ -916,6 +954,7 @@ class BlockItem extends Item {
 	containsBreaks.put(m, result ? m : null);
 	return result;
     }
+    @Override
     String selfToString() {
 	if (indent == 0) return "[" + first + "]";
 	else return "[" + indent + first + "]";
@@ -937,9 +976,11 @@ class MaxLevels {
         maxLevel = ml;
         maxLevelInner = mli;
     }
+    @Override
     public int hashCode() {
         return maxLevel * 17 + maxLevelInner;
     }
+    @Override
     public boolean equals(Object o) {
         if (o instanceof MaxLevels) {
             MaxLevels m2 = (MaxLevels)o;
@@ -948,6 +989,7 @@ class MaxLevels {
         } else
             return false;
     }
+    @Override
     public String toString() {
         return "[" + maxLevel + "/" + maxLevelInner + "]";
     }

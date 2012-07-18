@@ -29,13 +29,20 @@ import java.io.OutputStream;
 import java.io.Writer;
 import java.util.List;
 
-import polyglot.util.CodeWriter;
 import polyglot.frontend.ExtensionInfo;
-import polyglot.types.SemanticException;
 import polyglot.types.Context;
+import polyglot.types.SemanticException;
 import polyglot.types.Type;
 import polyglot.types.TypeSystem;
-import polyglot.visit.*;
+import polyglot.util.CodeWriter;
+import polyglot.visit.AmbiguityRemover;
+import polyglot.visit.ConstantChecker;
+import polyglot.visit.ExceptionChecker;
+import polyglot.visit.NodeVisitor;
+import polyglot.visit.PrettyPrinter;
+import polyglot.visit.Translator;
+import polyglot.visit.TypeBuilder;
+import polyglot.visit.TypeChecker;
 
 /**
  * A <code>Node</code> represents an AST node.  All AST nodes must implement

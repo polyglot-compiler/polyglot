@@ -25,7 +25,11 @@
 
 package polyglot.frontend.goals;
 
-import polyglot.frontend.*;
+import polyglot.frontend.ExtensionInfo;
+import polyglot.frontend.Job;
+import polyglot.frontend.ParserPass;
+import polyglot.frontend.Pass;
+import polyglot.frontend.Scheduler;
 
 /**
  * The <code>Parsed</code> is reached when a type is parsed. 
@@ -37,6 +41,7 @@ public class Parsed extends SourceFileGoal {
 
     protected Parsed(Job job) { super(job); }
     
+    @Override
     public Pass createPass(ExtensionInfo extInfo) {
         return new ParserPass(extInfo.compiler(), this);
     }

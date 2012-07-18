@@ -25,8 +25,9 @@
 
 package polyglot.ast;
 
-import polyglot.types.MethodInstance;
 import java.util.List;
+
+import polyglot.types.MethodInstance;
 
 /**
  * A <code>Call</code> is an immutable representation of a Java

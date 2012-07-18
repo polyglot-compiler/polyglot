@@ -25,8 +25,8 @@
 
 package polyglot.util;
 
-import java.util.StringTokenizer;
 import java.util.NoSuchElementException;
+import java.util.StringTokenizer;
 
 /**
  * A string tokenizer that understands quotes and escape characters.
@@ -140,6 +140,7 @@ public class QuotedStringTokenizer extends StringTokenizer {
      * Tests if there are more tokens available from this tokenizer's string.
      * Pre-condition: not inside a quoted string (token).
      */
+    @Override
     public boolean hasMoreTokens() {
         if (!returnDelims) {
             pos = skipDelim(pos);
@@ -150,6 +151,7 @@ public class QuotedStringTokenizer extends StringTokenizer {
     /**
      * Returns the next token from this string tokenizer.
      */
+    @Override
     public String nextToken() {
         if (!returnDelims)
             pos = skipDelim(pos);
@@ -166,6 +168,7 @@ public class QuotedStringTokenizer extends StringTokenizer {
     /**
      * Returns the next token in this string tokenizer's string.
      */
+    @Override
     public String nextToken(String delim) {
         this.delim = delim;
         return nextToken();
@@ -175,6 +178,7 @@ public class QuotedStringTokenizer extends StringTokenizer {
      * Calculates the number of times that this tokenizer's nextToken method
      * can be called before it generates an exception.
      */
+    @Override
     public int countTokens() {
         int count = 0;
         int dcount = 0;
@@ -196,12 +200,14 @@ public class QuotedStringTokenizer extends StringTokenizer {
     /**
      * Returns the same value as the hasMoreTokens method.
      */
+    @Override
     public boolean hasMoreElements() { return hasMoreTokens(); }
 
     /**
      * Returns the same value as the nextToken method, except that its declared
      * return value is Object rather than String.
      */
+    @Override
     public Object nextElement() { return nextToken(); }
 }
 

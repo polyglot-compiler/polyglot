@@ -27,7 +27,11 @@ package polyglot.frontend.goals;
 
 import java.util.Collection;
 
-import polyglot.frontend.*;
+import polyglot.frontend.CyclicDependencyException;
+import polyglot.frontend.ExtensionInfo;
+import polyglot.frontend.Job;
+import polyglot.frontend.Pass;
+import polyglot.frontend.Scheduler;
 
 /**
  * A goal abstractly represents something that the compiler is supposed to

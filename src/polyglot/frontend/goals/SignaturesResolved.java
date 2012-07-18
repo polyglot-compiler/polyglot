@@ -30,7 +30,11 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import polyglot.frontend.*;
+import polyglot.frontend.AbstractPass;
+import polyglot.frontend.ExtensionInfo;
+import polyglot.frontend.Pass;
+import polyglot.frontend.Scheduler;
+import polyglot.frontend.SchedulerException;
 import polyglot.frontend.passes.DisambiguateSignaturesPass;
 import polyglot.types.ClassType;
 import polyglot.types.ParsedClassType;
@@ -54,6 +58,7 @@ public class SignaturesResolved extends ClassTypeGoal {
             super(goal);
         }
         
+        @Override
         public boolean run() {
             SignaturesResolved goal = (SignaturesResolved) this.goal;
             if (! goal.type().signaturesResolved()) {
@@ -63,6 +68,7 @@ public class SignaturesResolved extends ClassTypeGoal {
         }
     }
 
+    @Override
     public Pass createPass(ExtensionInfo extInfo) {
         if (job() != null) {
             return new SignaturesResolvedPass(this);
@@ -70,8 +76,9 @@ public class SignaturesResolved extends ClassTypeGoal {
         return new DisambiguateSignaturesPass(extInfo.scheduler(), this);
     }
     
-    public Collection prerequisiteGoals(Scheduler scheduler) {
-        List l = new ArrayList();
+    @Override
+    public Collection<Goal> prerequisiteGoals(Scheduler scheduler) {
+        List<Goal> l = new ArrayList<Goal>();
         if (ct.job() != null) {
             l.add(scheduler.TypesInitialized(ct.job()));
         }
@@ -84,8 +91,9 @@ public class SignaturesResolved extends ClassTypeGoal {
         return ct.isTopLevel() || (ct.isMember() && isGlobal((ClassType) ct.container()));
     }
     
-    public Collection corequisiteGoals(Scheduler scheduler) {
-        List l = new ArrayList();
+    @Override
+    public Collection<Goal> corequisiteGoals(Scheduler scheduler) {
+        List<Goal> l = new ArrayList<Goal>();
         if (ct.job() != null) {
             if (isGlobal(ct)) {
                 l.add(scheduler.SignaturesDisambiguated(ct.job()));
@@ -98,6 +106,7 @@ public class SignaturesResolved extends ClassTypeGoal {
         return l;
     }
     
+    @Override
     public boolean equals(Object o) {
         return o instanceof SignaturesResolved && super.equals(o);
     }

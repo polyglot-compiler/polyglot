@@ -56,6 +56,7 @@ public class MissingDependencyException extends SchedulerException {
         return prerequisite;
     }
     
+    @Override
     public void printStackTrace() {
         super.printStackTrace();
     }

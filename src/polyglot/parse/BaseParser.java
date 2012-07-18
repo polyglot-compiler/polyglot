@@ -25,13 +25,28 @@
 
 package polyglot.parse;
 
-import polyglot.ast.*;
-import polyglot.lex.*;
-import polyglot.types.*;
-import polyglot.util.*;
-import java_cup.runtime.Symbol;
+import java.util.List;
 
-import java.util.*;
+import java_cup.runtime.Symbol;
+import polyglot.ast.AmbExpr;
+import polyglot.ast.AmbPrefix;
+import polyglot.ast.AmbReceiver;
+import polyglot.ast.AmbTypeNode;
+import polyglot.ast.CanonicalTypeNode;
+import polyglot.ast.Expr;
+import polyglot.ast.Field;
+import polyglot.ast.Node;
+import polyglot.ast.NodeFactory;
+import polyglot.ast.Prefix;
+import polyglot.ast.QualifierNode;
+import polyglot.ast.Receiver;
+import polyglot.ast.TypeNode;
+import polyglot.lex.Lexer;
+import polyglot.lex.Token;
+import polyglot.types.Type;
+import polyglot.types.TypeSystem;
+import polyglot.util.ErrorQueue;
+import polyglot.util.Position;
 
 public abstract class BaseParser extends java_cup.runtime.lr_parser
 {

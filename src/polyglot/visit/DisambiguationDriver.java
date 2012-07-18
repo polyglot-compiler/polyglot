@@ -27,7 +27,6 @@ package polyglot.visit;
 
 import polyglot.ast.NodeFactory;
 import polyglot.frontend.Job;
-import polyglot.frontend.goals.Goal;
 import polyglot.types.TypeSystem;
 
 /**

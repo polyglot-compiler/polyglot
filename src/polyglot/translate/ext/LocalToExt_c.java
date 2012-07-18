@@ -8,6 +8,7 @@ import polyglot.types.SemanticException;
 import polyglot.types.Type;
 
 public class LocalToExt_c extends ToExt_c {
+    @Override
     public Node toExt(ExtensionRewriter rw) throws SemanticException {
         Local n = (Local) node();
         Type type = rw.to_ts().unknownType(n.position());

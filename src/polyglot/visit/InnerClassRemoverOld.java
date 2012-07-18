@@ -25,9 +25,13 @@
 
 package polyglot.visit;
 
-import polyglot.ast.*;
+import polyglot.ast.ClassDecl;
+import polyglot.ast.Node;
+import polyglot.ast.NodeFactory;
 import polyglot.frontend.Job;
-import polyglot.types.*;
+import polyglot.types.ParsedClassType;
+import polyglot.types.SemanticException;
+import polyglot.types.TypeSystem;
 
 /**
  * @author nystrom
@@ -41,6 +45,7 @@ public class InnerClassRemoverOld extends ContextVisitor
         super(job, ts, nf);
     }
     
+    @Override
     protected Node leaveCall(Node old, Node n, NodeVisitor v) throws SemanticException {
         if (n instanceof ClassDecl) {
             ClassDecl cd = (ClassDecl) n;

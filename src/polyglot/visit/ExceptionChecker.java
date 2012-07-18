@@ -25,7 +25,10 @@
 
 package polyglot.visit;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 
 import polyglot.ast.Node;
 import polyglot.ast.NodeFactory;
@@ -33,7 +36,9 @@ import polyglot.frontend.Job;
 import polyglot.types.SemanticException;
 import polyglot.types.Type;
 import polyglot.types.TypeSystem;
-import polyglot.util.*;
+import polyglot.util.InternalCompilerError;
+import polyglot.util.Position;
+import polyglot.util.SubtypeSet;
 
 /** Visitor which checks if exceptions are caught or declared properly. */
 public class ExceptionChecker extends ErrorHandlingVisitor

@@ -27,7 +27,6 @@ package polyglot.ast;
 
 import java.util.List;
 
-import polyglot.ast.SwitchBlock;
 import polyglot.types.Context;
 import polyglot.util.Position;
 

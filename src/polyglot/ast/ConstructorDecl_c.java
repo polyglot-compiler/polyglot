@@ -432,7 +432,7 @@ public class ConstructorDecl_c extends Term_c implements ConstructorDecl
     }
 
     @Override
-    public <T> List<T> acceptCFG(CFGBuilder v, List<T> succs) {
+    public <T> List<T> acceptCFG(CFGBuilder<?> v, List<T> succs) {
         if (body() != null) {
             v.visitCFGList(formals(), body(), ENTRY);
             v.visitCFG(body(), this, EXIT);

@@ -19,7 +19,7 @@ import polyglot.util.CodeWriter;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
 
-public class JL5SubstClassType_c extends SubstClassType_c implements JL5SubstClassType
+public class JL5SubstClassType_c extends SubstClassType_c<TypeVariable, ReferenceType> implements JL5SubstClassType
 {
     public JL5SubstClassType_c(JL5TypeSystem ts, Position pos,
                                  JL5ParsedClassType base, JL5Subst subst) {

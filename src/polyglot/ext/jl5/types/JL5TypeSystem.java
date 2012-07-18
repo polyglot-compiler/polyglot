@@ -11,7 +11,7 @@ import polyglot.types.*;
 import polyglot.types.Package;
 import polyglot.util.Position;
 
-public interface JL5TypeSystem extends TypeSystem, ParamTypeSystem {
+public interface JL5TypeSystem extends TypeSystem, ParamTypeSystem<TypeVariable, ReferenceType> {
     ParsedClassType createClassType(LazyClassInitializer init, Source fromSource);
 
     ParsedClassType createClassType(Source fromSource);
@@ -92,12 +92,12 @@ public interface JL5TypeSystem extends TypeSystem, ParamTypeSystem {
     /**
      * Instantiate class clazz with actuals.
      */
-    ClassType instantiate(Position pos, JL5ParsedClassType clazz, List<? extends Type> actuals) throws SemanticException;
+    ClassType instantiate(Position pos, JL5ParsedClassType clazz, List<? extends ReferenceType> actuals) throws SemanticException;
 
     /**
      * Instantiate class clazz with actuals.
      */
-    ClassType instantiate(Position pos, JL5ParsedClassType clazz, Type ... actuals) throws SemanticException;
+    ClassType instantiate(Position pos, JL5ParsedClassType clazz, ReferenceType ... actuals) throws SemanticException;
 
     /**
      * Returns the erased type of t.
@@ -270,7 +270,7 @@ public interface JL5TypeSystem extends TypeSystem, ParamTypeSystem {
      * @param type
      * @return
      */
-    Type Class(Position pos, Type type);
+    Type Class(Position pos, ReferenceType type);
 
     /**
      * What are the type variables of class ct or any outer 

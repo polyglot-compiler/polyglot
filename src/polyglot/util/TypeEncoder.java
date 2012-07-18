@@ -25,14 +25,21 @@
 
 package polyglot.util;
 
-import java.io.*;
-import java.util.*;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InvalidClassException;
+import java.io.ObjectOutputStream;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
 import polyglot.frontend.SchedulerException;
 import polyglot.main.Report;
-import polyglot.types.*;
+import polyglot.types.Named;
+import polyglot.types.TypeObject;
+import polyglot.types.TypeSystem;
 
 /**
  * The <code>TypeEncoder</code> gives the ability to encode a polyglot 
@@ -55,8 +62,7 @@ public class TypeEncoder
     protected final boolean zip = true;
     protected final boolean base64 = true;
     protected final boolean test = false;
-    protected Map placeHolderCache;
-    protected Map dependencies;
+    protected Map<Object, Object> placeHolderCache;
     protected int depth;
     
     public TypeEncoder(TypeSystem ts) {
@@ -142,8 +148,9 @@ public class TypeEncoder
      * @return The decoded TypeObject, or null if deserialization fails.
      * @throws InvalidClassException If the string is malformed.
      */
+    @SuppressWarnings("unused")
     public TypeObject decode(String s, String name) throws InvalidClassException {
-        TypeInputStream ois;
+        TypeInputStream ois = null;
         byte[] b;
         
         if (base64) {
@@ -157,15 +164,10 @@ public class TypeEncoder
                 b[i] = (byte) source[i];
         }
         
-        Map oldCache = placeHolderCache;
-        placeHolderCache = new HashMap();
+        Map<Object, Object> oldCache = placeHolderCache;
+        placeHolderCache = new HashMap<Object, Object>();
         if (oldCache != null) {
             placeHolderCache.putAll(oldCache);
-        }
-
-        Map oldDeps = dependencies;
-        if (oldDeps == null) {
-            dependencies = new HashMap(); 
         }
 
         if (Report.should_report(Report.serialize, 1))
@@ -208,8 +210,15 @@ public class TypeEncoder
         }
         finally {
             placeHolderCache = oldCache;
-            dependencies = oldDeps;
             depth--;
+            if (ois != null) {
+                try {
+                    ois.close();
+                } catch (IOException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+            }
         }
     }
 }

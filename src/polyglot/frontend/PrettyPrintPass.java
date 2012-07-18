@@ -46,6 +46,7 @@ public class PrettyPrintPass extends AbstractPass
         this.w = w;
     }
 
+    @Override
     public boolean run() {
         Node ast = goal.job().ast();
 

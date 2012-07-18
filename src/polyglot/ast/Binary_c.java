@@ -585,7 +585,7 @@ public class Binary_c extends Expr_c implements Binary
   }
 
   @Override
-  public <T> List<T> acceptCFG(CFGBuilder v, List<T> succs) {
+  public <T> List<T> acceptCFG(CFGBuilder<?> v, List<T> succs) {
     if (op == COND_AND || op == COND_OR) {
       // short-circuit
       if (left instanceof BooleanLit) {

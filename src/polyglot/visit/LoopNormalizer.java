@@ -26,17 +26,31 @@
 package polyglot.visit;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
-import polyglot.ast.*;
+import polyglot.ast.Assign;
+import polyglot.ast.Block;
+import polyglot.ast.BooleanLit;
+import polyglot.ast.Branch;
+import polyglot.ast.Do;
+import polyglot.ast.Eval;
+import polyglot.ast.Expr;
+import polyglot.ast.For;
+import polyglot.ast.ForUpdate;
+import polyglot.ast.If;
+import polyglot.ast.Local;
+import polyglot.ast.LocalDecl;
+import polyglot.ast.Loop;
+import polyglot.ast.Node;
+import polyglot.ast.NodeFactory;
+import polyglot.ast.Stmt;
+import polyglot.ast.While;
 import polyglot.frontend.Job;
 import polyglot.types.Flags;
 import polyglot.types.LocalInstance;
 import polyglot.types.TypeSystem;
 import polyglot.util.Position;
 import polyglot.util.UniqueID;
-import polyglot.visit.NodeVisitor;
 
 /** 
  * Turns all loops into while(true) loops.
@@ -53,6 +67,7 @@ public class LoopNormalizer extends NodeVisitor {
         this.nf = nf;
     }
 
+    @Override
     public Node leave(Node parent, Node old, Node n, NodeVisitor v) {
         if (n instanceof While) {
             While s = (While) n;
@@ -74,7 +89,7 @@ public class LoopNormalizer extends NodeVisitor {
 
     /** Whenever a new node is created, this method is called and should do
       * additional processing of the node as needed. */
-    protected Node postCreate(Node n) {
+    protected <N extends Node> N postCreate(N n) {
         return n;
     }
 
@@ -82,18 +97,18 @@ public class LoopNormalizer extends NodeVisitor {
         return UniqueID.newID("loop");
     }
 
-    protected Block createBlock(List stmts) {
-        return (Block) postCreate(nf.Block(Position.compilerGenerated(), stmts));
+    protected Block createBlock(List<Stmt> stmts) {
+        return postCreate(nf.Block(Position.compilerGenerated(), stmts));
     }
     
     protected Block createBlock() {
-        return (Block) postCreate(nf.Block(Position.compilerGenerated()));
+        return postCreate(nf.Block(Position.compilerGenerated()));
     }
 
     protected While createLoop(Loop source) {
         Position pos = source.position();
         While w = nf.While(pos, createBool(true), createBlock());
-        w = (While) postCreate(w);
+        w = postCreate(w);
         return w;
     }
     
@@ -102,10 +117,10 @@ public class LoopNormalizer extends NodeVisitor {
         LocalInstance li = ts.localInstance(pos, Flags.NONE, ts.Boolean(), 
             newId());
         LocalDecl var = nf.LocalDecl(pos, Flags.NONE,
-            (TypeNode) postCreate(nf.CanonicalTypeNode(pos, ts.Boolean())), 
-            (Id) postCreate(nf.Id(pos, li.name())), cond);
+            postCreate(nf.CanonicalTypeNode(pos, ts.Boolean())), 
+            postCreate(nf.Id(pos, li.name())), cond);
         var = var.localInstance(li);
-        var = (LocalDecl) postCreate(var);
+        var = postCreate(var);
         return var;
     }
     
@@ -116,17 +131,17 @@ public class LoopNormalizer extends NodeVisitor {
     protected If createLoopIf(LocalDecl var, Stmt body) {
         Position pos = var.position();
         Local cond = createLocal(var.localInstance(), pos);
-        Branch exit = (Branch) postCreate(nf.Branch(pos, Branch.BREAK));
+        Branch exit = postCreate(nf.Branch(pos, Branch.BREAK));
         If s = nf.If(pos, cond, body, exit);
-        s = (If) postCreate(s);
+        s = postCreate(s);
         return s;
     }
     
     protected Eval createAssign(LocalDecl var, Expr right) {
         Position pos = var.position();
         Local left = createLocal(var.localInstance(), pos);
-        Eval a = nf.Eval(pos, (Assign) postCreate(nf.Assign(pos, left, Assign.ASSIGN, right)));
-        a = (Eval) postCreate(a);
+        Eval a = nf.Eval(pos, postCreate(nf.Assign(pos, left, Assign.ASSIGN, right)));
+        a = postCreate(a);
         return a;
     }
     
@@ -138,35 +153,33 @@ public class LoopNormalizer extends NodeVisitor {
         Position pos = var.position();
         Local use = createLocal(var.localInstance(), pos);
         If s = nf.If(pos, use, createAssign(var, cond), createAssign(var));
-        s = (If) postCreate(s);
+        s = postCreate(s);
         return s;
     }
     
-    protected If createIterIf(LocalDecl var, List iters) {
+    protected If createIterIf(LocalDecl var, List<ForUpdate> iters) {
         Position pos = var.position();
         Local use = createLocal(var.localInstance(), pos);
-        List stmts = new ArrayList(iters.size());
+        List<Stmt> stmts = new ArrayList<Stmt>(iters.size());
         
-        for (Iterator it = iters.iterator(); it.hasNext();) {
-            Stmt s = (Stmt) it.next();
-            stmts.add((Stmt) postCreate(s));
+        for (Stmt s : iters) {
+            stmts.add(postCreate(s));
         }
         
         If s = nf.If(pos, use, createBlock(stmts));
-        s = (If) postCreate(s);
+        s = postCreate(s);
         return s;
     }
     protected Local createLocal(LocalInstance li, Position pos) {
         Local l = nf.Local(pos, nf.Id(pos, li.name()));
         l = l.localInstance(li);
         l = (Local)l.type(li.type());
-        l = (Local) postCreate(l);
+        l = postCreate(l);
         return l;
     }
     
-    protected void addInits(List stmts, For source) {
-        for (Iterator it = source.inits().iterator(); it.hasNext();) {
-            Stmt s = (Stmt) it.next();
+    protected void addInits(List<Stmt> stmts, For source) {
+        for (Stmt s : source.inits()) {
             stmts.add(postCreate(s));
         }
     }
@@ -204,7 +217,7 @@ public class LoopNormalizer extends NodeVisitor {
         While w = createLoop(s);
         LocalDecl var = createLoopVar(s, cond);
         If branch = createLoopIf(var, s.body());
-        List stmts = new ArrayList(2);
+        List<Stmt> stmts = new ArrayList<Stmt>(2);
         stmts.add(var);
         stmts.add(branch);
         w = w.body(((Block) w.body()).statements(stmts));
@@ -236,11 +249,11 @@ public class LoopNormalizer extends NodeVisitor {
         LocalDecl var = createLoopVar(s);
         If init = createInitIf(var, cond);
         If branch = createLoopIf(var, s.body());
-        List stmts = new ArrayList(2);
+        List<Stmt> stmts = new ArrayList<Stmt>(2);
         stmts.add(init);
         stmts.add(branch);
         w = w.body(((Block) w.body()).statements(stmts));
-        stmts = new ArrayList(2);
+        stmts = new ArrayList<Stmt>(2);
         stmts.add(var);
         stmts.add(w);
         
@@ -277,12 +290,12 @@ public class LoopNormalizer extends NodeVisitor {
         If iter = createIterIf(var, s.iters());
         Eval update = createAssign(var, cond);
         If branch = createLoopIf(var, s.body());
-        List stmts = new ArrayList(3);
+        List<Stmt> stmts = new ArrayList<Stmt>(3);
         stmts.add(iter);
         stmts.add(update);
         stmts.add(branch);
         w = w.body(((Block) w.body()).statements(stmts));
-        stmts = new ArrayList(s.inits().size() + 2);
+        stmts = new ArrayList<Stmt>(s.inits().size() + 2);
         addInits(stmts, s);
         stmts.add(var);
         stmts.add(w);

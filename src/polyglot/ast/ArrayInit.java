@@ -25,8 +25,10 @@
 
 package polyglot.ast;
 
-import polyglot.types.*;
 import java.util.List;
+
+import polyglot.types.SemanticException;
+import polyglot.types.Type;
 
 /**
  * An <code>ArrayInit</code> is an immutable representation of

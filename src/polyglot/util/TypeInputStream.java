@@ -25,21 +25,29 @@
 
 package polyglot.util;
 
-import polyglot.main.Report;
-import polyglot.types.*;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.ObjectInputStream;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
-import java.util.*;
-import java.io.*;
+import polyglot.main.Report;
+import polyglot.types.Named;
+import polyglot.types.NamedPlaceHolder;
+import polyglot.types.PlaceHolder;
+import polyglot.types.TypeObject;
+import polyglot.types.TypeSystem;
 
 /** Input stream for reading type objects. */
 public class TypeInputStream extends ObjectInputStream {
     protected TypeSystem ts;
-    protected Map cache;
+    protected Map<Object, Object> cache;
     protected boolean failed;
     protected boolean enableReplace;
-    protected Set placeHoldersUsed;
+    protected Set<Object> placeHoldersUsed;
     
-    public TypeInputStream(InputStream in, TypeSystem ts, Map cache)
+    public TypeInputStream(InputStream in, TypeSystem ts, Map<Object, Object> cache)
         throws IOException
     {
         super(in);
@@ -50,10 +58,10 @@ public class TypeInputStream extends ObjectInputStream {
         this.cache = cache;
         this.failed = false;
         this.enableReplace = true;
-        this.placeHoldersUsed = new HashSet();
+        this.placeHoldersUsed = new HashSet<Object>();
     }
     
-    public Set placeHoldersUsed() {
+    public Set<Object> placeHoldersUsed() {
         return placeHoldersUsed;
     }
 
@@ -97,6 +105,7 @@ public class TypeInputStream extends ObjectInputStream {
         this.enableReplace = f;
     }
 
+    @Override
     protected Object resolveObject(Object o) {
         if (! enableReplace) {
             return o;

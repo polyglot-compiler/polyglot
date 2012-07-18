@@ -25,9 +25,10 @@
 
 package polyglot.ast;
 
-import polyglot.visit.*;
-import polyglot.util.*;
 import java.util.List;
+
+import polyglot.util.Position;
+import polyglot.visit.CFGBuilder;
 
 /**
  * <code>Lit</code> represents any Java literal.
@@ -50,7 +51,7 @@ public abstract class Lit_c extends Expr_c implements Lit
     }
 
     @Override
-    public <T> List<T> acceptCFG(CFGBuilder v, List<T> succs) {
+    public <T> List<T> acceptCFG(CFGBuilder<?> v, List<T> succs) {
         return succs;
     }
 

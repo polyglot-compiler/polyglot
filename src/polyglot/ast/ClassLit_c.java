@@ -30,7 +30,10 @@ import java.util.List;
 import polyglot.types.SemanticException;
 import polyglot.util.CodeWriter;
 import polyglot.util.Position;
-import polyglot.visit.*;
+import polyglot.visit.CFGBuilder;
+import polyglot.visit.NodeVisitor;
+import polyglot.visit.PrettyPrinter;
+import polyglot.visit.TypeChecker;
 
 /**
  * A <code>ClassLit</code> represents a class literal expression. 
@@ -76,7 +79,7 @@ public class ClassLit_c extends Lit_c implements ClassLit
   }
 
   @Override
-  public <T> List<T> acceptCFG(CFGBuilder v, List<T> succs) {
+  public <T> List<T> acceptCFG(CFGBuilder<?> v, List<T> succs) {
       v.visitCFG(typeNode, this, EXIT);
       return succs;
   }

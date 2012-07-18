@@ -25,9 +25,12 @@
 
 package polyglot.ast;
 
-import polyglot.visit.*;
-import polyglot.util.*;
-import java.util.*;
+import java.util.List;
+
+import polyglot.util.CodeWriter;
+import polyglot.util.Position;
+import polyglot.visit.CFGBuilder;
+import polyglot.visit.PrettyPrinter;
 
 /**
  * <code>Empty</code> is the class for a empty statement <code>(;)</code>.
@@ -50,7 +53,7 @@ public class Empty_c extends Stmt_c implements Empty
     }
 
     @Override
-    public <T> List<T> acceptCFG(CFGBuilder v, List<T> succs) {
+    public <T> List<T> acceptCFG(CFGBuilder<?> v, List<T> succs) {
         return succs;
     }
 

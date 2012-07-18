@@ -25,14 +25,16 @@
 
 package polyglot.ext.param.types;
 
-import polyglot.types.*;
 import java.util.List;
+
+import polyglot.types.Type;
+import polyglot.types.TypeObject;
 
 /**
  * A parameterized type instantiated on actual arguments.
  */
-public interface InstType extends Type
+public interface InstType<Formal extends Param, Actual extends TypeObject> extends Type
 {
-    PClass instantiatedFrom();
-    List actuals();
+    PClass<Formal, Actual> instantiatedFrom();
+    List<Actual> actuals();
 }

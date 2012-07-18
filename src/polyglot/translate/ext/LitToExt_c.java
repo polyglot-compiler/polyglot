@@ -14,6 +14,7 @@ import polyglot.types.SemanticException;
 import polyglot.util.InternalCompilerError;
 
 public class LitToExt_c extends ToExt_c {
+    @Override
     public Node toExt(ExtensionRewriter rw) throws SemanticException {
         Lit n = (Lit)node();
         if (n instanceof BooleanLit) {

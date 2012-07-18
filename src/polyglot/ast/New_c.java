@@ -687,7 +687,7 @@ public class New_c extends Expr_c implements New
     }
 
     @Override
-    public <T> List<T> acceptCFG(CFGBuilder v, List<T> succs) {
+    public <T> List<T> acceptCFG(CFGBuilder<?> v, List<T> succs) {
         if (qualifier != null) {
             v.visitCFG(qualifier, tn, ENTRY);
         }

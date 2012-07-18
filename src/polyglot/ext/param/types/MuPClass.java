@@ -28,25 +28,26 @@ package polyglot.ext.param.types;
 import java.util.List;
 
 import polyglot.types.ClassType;
+import polyglot.types.TypeObject;
 
 /*
  * Mutable parametric classes.  This interface is a wrapper around
  * a ClassType that associates formal parameters with the class.
  * formals can be any type object.
  */
-public interface MuPClass extends PClass {
+public interface MuPClass<Formal extends Param, Actual extends TypeObject> extends PClass<Formal, Actual> {
 
     /**
      * Destructively update the formals.
      * @param formals The new formals
      */
-    void formals(List formals);
+    void formals(List<Formal> formals);
 
     /**
      * Destructively add a formal to the end of the formals list.
      * @param param The new formal
      */
-    void addFormal(Param param);
+    void addFormal(Formal param);
 
     /**
      * Destructively update the clazz.

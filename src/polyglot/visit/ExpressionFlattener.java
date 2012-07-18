@@ -25,10 +25,40 @@
 
 package polyglot.visit;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.Stack;
 
-import polyglot.ast.*;
+import polyglot.ast.ArrayInit;
+import polyglot.ast.Assign;
+import polyglot.ast.Binary;
 import polyglot.ast.Binary.Operator;
+import polyglot.ast.Block;
+import polyglot.ast.BooleanLit;
+import polyglot.ast.Conditional;
+import polyglot.ast.ConstructorCall;
+import polyglot.ast.Do;
+import polyglot.ast.Empty;
+import polyglot.ast.Eval;
+import polyglot.ast.Expr;
+import polyglot.ast.FieldDecl;
+import polyglot.ast.For;
+import polyglot.ast.Id;
+import polyglot.ast.If;
+import polyglot.ast.IntLit;
+import polyglot.ast.Lit;
+import polyglot.ast.Local;
+import polyglot.ast.LocalDecl;
+import polyglot.ast.NewArray;
+import polyglot.ast.Node;
+import polyglot.ast.NodeFactory;
+import polyglot.ast.Special;
+import polyglot.ast.Stmt;
+import polyglot.ast.TypeNode;
+import polyglot.ast.Unary;
+import polyglot.ast.While;
 import polyglot.frontend.Job;
 import polyglot.types.ArrayType;
 import polyglot.types.Flags;
@@ -37,7 +67,6 @@ import polyglot.types.Type;
 import polyglot.types.TypeSystem;
 import polyglot.util.Position;
 import polyglot.util.UniqueID;
-import polyglot.visit.NodeVisitor;
 
 /**
  * Flattens expressions and removes initializers from local variable
@@ -78,12 +107,12 @@ public class ExpressionFlattener extends NodeVisitor {
     protected final NodeFactory nf;
 
     /** Stack of nested blocks we are currently in. */
-    protected final Stack blockStack = new Stack();
+    protected final Stack<List<Stmt>> blockStack = new Stack<List<Stmt>>();
     
     /** Set of expressions not to flatten. Only applies to the expressions
       * themselves, and not their subexpressions (unless they are also in
       * the set explicitly). */
-    protected final Set dontFlatten = new HashSet();
+    protected final Set<Expr> dontFlatten = new HashSet<Expr>();
     
     /** Used to copy a whole AST subtree. */
     protected final DeepCopier deepCopier = new DeepCopier();
@@ -106,6 +135,7 @@ public class ExpressionFlattener extends NodeVisitor {
         this.flatten_all_decls = flatten_all_decls;
     }
 
+    @Override
     public Node override(Node parent, Node n) {
         // insert blocks when needed to allow local decls to be inserted.
         if (n instanceof If) {
@@ -126,7 +156,7 @@ public class ExpressionFlattener extends NodeVisitor {
 
         if (n instanceof While) {
             While s = (While) n;
-            Stmt b = (Stmt) visitEdge(s, createBlock(s.body()));
+            Stmt b = visitEdge(s, createBlock(s.body()));
             s = s.body(b);
             addStmt(s);
             return s;
@@ -134,7 +164,7 @@ public class ExpressionFlattener extends NodeVisitor {
 
         if (n instanceof Do) {
             Do s = (Do) n;
-            Stmt b = (Stmt) visitEdge(s, createBlock(s.body()));
+            Stmt b = visitEdge(s, createBlock(s.body()));
             s = s.body(b);
             addStmt(s);
             return s;
@@ -142,7 +172,7 @@ public class ExpressionFlattener extends NodeVisitor {
 
         if (n instanceof For) {
             For s = (For) n;
-            Stmt b = (Stmt) visitEdge(s, createBlock(s.body()));
+            Stmt b = visitEdge(s, createBlock(s.body()));
             s = s.body(b);
             addStmt(s);
             return s;
@@ -157,13 +187,13 @@ public class ExpressionFlattener extends NodeVisitor {
         // conditional ? :
         if (n instanceof Conditional) {
             Conditional c = (Conditional) n;
-            Expr cond = (Expr) visitEdge(c, c.cond());
+            Expr cond = visitEdge(c, c.cond());
             LocalDecl d = createDecl(c, null);
             addStmt(d);
             
             Local l = createLocal(d);
             If s = createCondIf(cond, l, c.consequent(), c.alternative(), c);
-            s = (If) visitEdge(c, s);
+            s = visitEdge(c, s);
             addStmt(s);
             
             return l;
@@ -183,6 +213,7 @@ public class ExpressionFlattener extends NodeVisitor {
         return null;
     }
 
+    @Override
     public NodeVisitor enter(Node n) {
         // push a new statement list for each block
         if (n instanceof Block) {
@@ -234,6 +265,7 @@ public class ExpressionFlattener extends NodeVisitor {
         return this;
     }
 
+    @Override
     public Node leave(Node parent, Node old, Node n, NodeVisitor v) {
         // replace blocks with list of replacement statements
         if (n instanceof Block) {
@@ -285,7 +317,7 @@ public class ExpressionFlattener extends NodeVisitor {
                 }
                 
                 if (u.operator().isPrefix()) {
-                    inc = (Block) visitEdge(n, inc);
+                    inc = visitEdge(n, inc);
                     addStmt(inc);
                     
                     if (flatten) {
@@ -296,7 +328,7 @@ public class ExpressionFlattener extends NodeVisitor {
                         addStmt(a);
                     }
                     
-                    inc = (Block) visitEdge(n, inc);
+                    inc = visitEdge(n, inc);
                     addStmt(inc);
                 }
                 
@@ -357,7 +389,7 @@ public class ExpressionFlattener extends NodeVisitor {
     }
     protected Node translateShortCircuitBinary(Binary b) {
         if (b.operator() == Binary.COND_AND) {
-            Expr left = (Expr) visitEdge(b, b.left());
+            Expr left = visitEdge(b, b.left());
 
             if (left instanceof BooleanLit) {
                 BooleanLit lit = (BooleanLit) left;
@@ -373,13 +405,13 @@ public class ExpressionFlattener extends NodeVisitor {
 
                 Local r = createLocal(d);
                 If s = createAndIf(left, r, b.right(), b);
-                s = (If) visitEdge(b, s);
+                s = visitEdge(b, s);
                 addStmt(s);
 
                 return r;
             }
         } else if (b.operator() == Binary.COND_OR) {
-            Expr left = (Expr) visitEdge(b, b.left());
+            Expr left = visitEdge(b, b.left());
 
             if (left instanceof BooleanLit) {
                 BooleanLit lit = (BooleanLit) left;
@@ -395,7 +427,7 @@ public class ExpressionFlattener extends NodeVisitor {
 
                 Local r = createLocal(d);
                 If s = createOrIf(left, r, b.right(), b);
-                s = (If) visitEdge(b, s);
+                s = visitEdge(b, s);
                 addStmt(s);
 
                 return r;
@@ -469,12 +501,12 @@ public class ExpressionFlattener extends NodeVisitor {
     
     /** Pushes a new (nested) block onto the stack. */
     protected void pushBlock() {
-        blockStack.push(new ArrayList());
+        blockStack.push(new ArrayList<Stmt>());
     }
     
     /** Pops a block off the stack. */
-    protected List popBlock() {
-        return (List) blockStack.pop();
+    protected List<Stmt> popBlock() {
+        return blockStack.pop();
     }
     
     /** Checks to see if we are in a block. */
@@ -484,7 +516,7 @@ public class ExpressionFlattener extends NodeVisitor {
     
     /** Adds a statement to the current block. */
     protected void addStmt(Stmt s) {
-        ((List) blockStack.peek()).add(s);
+        blockStack.peek().add(s);
     }
     
     /** Whenever a new node is created, this method is called and should do
@@ -689,6 +721,7 @@ public class ExpressionFlattener extends NodeVisitor {
     /** Makes a deep copy of an AST node. */
     protected class DeepCopier extends NodeVisitor {
         
+        @Override
         public Node leave(Node old, Node n, NodeVisitor v) {
             return (Node) n.copy();
         }

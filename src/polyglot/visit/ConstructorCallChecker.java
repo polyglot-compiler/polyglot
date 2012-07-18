@@ -45,8 +45,10 @@ public class ConstructorCallChecker extends ContextVisitor
 	super(job, ts, nf);
     }
 
-    protected Map constructorInvocations = new HashMap();
+    protected Map<ConstructorInstance, ConstructorInstance> constructorInvocations =
+            new HashMap<ConstructorInstance, ConstructorInstance>();
     
+    @Override
     protected NodeVisitor enterCall(Node n) throws SemanticException {
         if (n instanceof ConstructorCall) {
             ConstructorCall cc = (ConstructorCall)n;
@@ -63,7 +65,7 @@ public class ConstructorCallChecker extends ContextVisitor
                 
                 constructorInvocations.put(srcCI, destCI);
                 while (destCI != null) {
-                    destCI = (ConstructorInstance)constructorInvocations.get(destCI);
+                    destCI = constructorInvocations.get(destCI);
                     if (destCI != null && srcCI.equals(destCI)) {
                         // loop in the constructor invocations!
                         throw new SemanticException("Recursive constructor " +

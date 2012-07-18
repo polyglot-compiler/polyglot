@@ -50,7 +50,7 @@ public abstract class Term_c extends Node_c implements Term
      * Visit this term in evaluation order.
      */
     @Override
-    public abstract <T> List<T> acceptCFG(CFGBuilder v, List<T> succs);
+    public abstract <T> List<T> acceptCFG(CFGBuilder<?> v, List<T> succs);
 
     /**
      * Return true if this term is eachable.  This attribute is not
