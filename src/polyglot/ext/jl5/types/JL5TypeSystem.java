@@ -92,7 +92,7 @@ public interface JL5TypeSystem extends TypeSystem, ParamTypeSystem {
     /**
      * Instantiate class clazz with actuals.
      */
-    ClassType instantiate(Position pos, JL5ParsedClassType clazz, List<Type> actuals) throws SemanticException;
+    ClassType instantiate(Position pos, JL5ParsedClassType clazz, List<? extends Type> actuals) throws SemanticException;
 
     /**
      * Instantiate class clazz with actuals.

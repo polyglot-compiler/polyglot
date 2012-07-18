@@ -368,7 +368,7 @@ public class TypeSystem_c implements TypeSystem
     public MethodInstance methodInstance(Position pos,
 	                                 ReferenceType container, Flags flags,
 					 Type returnType, String name,
-					 List<Type> argTypes, List<Type> excTypes) {
+					 List<? extends Type> argTypes, List<? extends Type> excTypes) {
 
         assert_(container);
         assert_(returnType);

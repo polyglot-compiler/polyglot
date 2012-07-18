@@ -25,11 +25,12 @@
 
 package polyglot.types;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 
-import polyglot.main.Options;
 import polyglot.main.Report;
-import polyglot.types.*;
 import polyglot.util.CollectionUtil;
 import polyglot.util.Position;
 
@@ -59,26 +60,32 @@ public class MethodInstance_c extends ProcedureInstance_c
     
     protected MethodInstance decl;
     
+    @Override
     public Declaration declaration() {
         return decl;
     }
     
+    @Override
     public void setDeclaration(Declaration decl) {
         this.decl = (MethodInstance) decl;        
     }
  
+    @Override
     public MethodInstance orig() {
         return (MethodInstance) declaration();
     }
     
+    @Override
     public String name() {
         return name;
     }
 
+    @Override
     public Type returnType() {
         return returnType;
     }
 
+    @Override
     public MethodInstance flags(Flags flags) {
         if (!flags.equals(this.flags)) {
             MethodInstance_c n = (MethodInstance_c) copy();
@@ -88,6 +95,7 @@ public class MethodInstance_c extends ProcedureInstance_c
         return this;
     }
 
+    @Override
     public MethodInstance name(String name) {
         if ((name != null && !name.equals(this.name)) ||
             (name == null && name != this.name)) {
@@ -98,6 +106,7 @@ public class MethodInstance_c extends ProcedureInstance_c
         return this;
     }
 
+    @Override
     public MethodInstance returnType(Type returnType) {
         if (this.returnType != returnType) {
             MethodInstance_c n = (MethodInstance_c) copy();
@@ -107,6 +116,7 @@ public class MethodInstance_c extends ProcedureInstance_c
         return this;
     }
 
+    @Override
     public MethodInstance formalTypes(List l) {
         if (!CollectionUtil.equals(this.formalTypes, l)) {
             MethodInstance_c n = (MethodInstance_c) copy();
@@ -116,6 +126,7 @@ public class MethodInstance_c extends ProcedureInstance_c
         return this;
     }
 
+    @Override
     public MethodInstance throwTypes(List l) {
         if (!CollectionUtil.equals(this.throwTypes, l)) {
             MethodInstance_c n = (MethodInstance_c) copy();
@@ -125,6 +136,7 @@ public class MethodInstance_c extends ProcedureInstance_c
         return this;
     }
 
+    @Override
     public MethodInstance container(ReferenceType container) {
         if (this.container != container) {
             MethodInstance_c n = (MethodInstance_c) copy();
@@ -137,6 +149,7 @@ public class MethodInstance_c extends ProcedureInstance_c
     /**
      * @param name The name to set.
      */
+    @Override
     public void setName(String name) {
         this.name = name;
     }
@@ -144,16 +157,19 @@ public class MethodInstance_c extends ProcedureInstance_c
     /**
      * @param returnType The returnType to set.
      */
+    @Override
     public void setReturnType(Type returnType) {
         this.returnType = returnType;
     }
     
+    @Override
     public int hashCode() {
         //return container.hashCode() + flags.hashCode() +
 	//       returnType.hashCode() + name.hashCode();
 	return flags.hashCode() + name.hashCode();
     }
 
+    @Override
     public boolean equalsImpl(TypeObject o) {
         if (o instanceof MethodInstance) {
 	    MethodInstance i = (MethodInstance) o;
@@ -166,6 +182,7 @@ public class MethodInstance_c extends ProcedureInstance_c
 	return false;
     }
 
+    @Override
     public String toString() {
 	String s = designator() + " " + flags.translate() + returnType + " " +
                    container() + "." + signature();
@@ -177,24 +194,29 @@ public class MethodInstance_c extends ProcedureInstance_c
 	return s;
     }
 
+    @Override
     public String signature() {
         return name + "(" + TypeSystem_c.listToString(formalTypes) + ")";
     }
 
+    @Override
     public String designator() {
         return "method";
     }
 
     /** Returns true iff <this> is the same method as <m> */
+    @Override
     public final boolean isSameMethod(MethodInstance m) {
         return ts.isSameMethod(this, m);
     }
 
     /** Returns true iff <this> is the same method as <m> */
+    @Override
     public boolean isSameMethodImpl(MethodInstance m) {
         return this.name().equals(m.name()) && hasFormals(m.formalTypes());
     }
 
+    @Override
     public boolean isCanonical() {
 	return container.isCanonical()
 	    && returnType.isCanonical()
@@ -202,19 +224,23 @@ public class MethodInstance_c extends ProcedureInstance_c
 	    && listIsCanonical(throwTypes);
     }
 
+    @Override
     public final boolean methodCallValid(String name, List argTypes) {
         return ts.methodCallValid(this, name, argTypes);
     }
 
+    @Override
     public boolean methodCallValidImpl(String name, List argTypes) {
         return name().equals(name) && ts.callValid(this, argTypes);
     }
 
-    public List overrides() {
+    @Override
+    public List<MethodInstance> overrides() {
         return ts.overrides(this);
     }
 
-    public List overridesImpl() {
+    @Override
+    public List<MethodInstance> overridesImpl() {
         List l = new LinkedList();
         ReferenceType rt = container();
 
@@ -234,10 +260,12 @@ public class MethodInstance_c extends ProcedureInstance_c
         return l;
     }
 
+    @Override
     public final boolean canOverride(MethodInstance mj) {
         return ts.canOverride(this, mj);
     }
 
+    @Override
     public final void checkOverride(MethodInstance mj) throws SemanticException {
         ts.checkOverride(this, mj);
     }
@@ -256,6 +284,7 @@ public class MethodInstance_c extends ProcedureInstance_c
      *              cannot override, then a SemanticException will be thrown, else
      *              the method will return true.
      */
+    @Override
     public boolean canOverrideImpl(MethodInstance mj, boolean quiet) throws SemanticException {
         MethodInstance mi = this;
 
@@ -356,10 +385,12 @@ public class MethodInstance_c extends ProcedureInstance_c
         return true;
     }
     
-    public List implemented() {
+    @Override
+    public List<? extends MethodInstance> implemented() {
 	return ts.implemented(this);
     }
 
+    @Override
     public List implementedImpl(ReferenceType rt) {
 	if (rt == null) {
 	    return Collections.EMPTY_LIST;

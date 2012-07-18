@@ -43,6 +43,7 @@ public class AddMembersPass extends ClassFilePass {
         this.goal = goal;
     }
     
+    @Override
     public boolean run() {
         ParsedClassType ct = goal.type();
         // force the members to get initialized.

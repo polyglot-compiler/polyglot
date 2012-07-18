@@ -1,24 +1,31 @@
 package polyglot.ext.jl5.types.reflect;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
 
 import polyglot.ext.jl5.types.AnnotationElemInstance;
-import polyglot.ext.jl5.types.JL5ClassType;
-import polyglot.ext.jl5.types.JL5Flags;
 import polyglot.ext.jl5.types.JL5MethodInstance;
 import polyglot.ext.jl5.types.JL5ParsedClassType;
-import polyglot.ext.jl5.types.JL5SubstClassType;
 import polyglot.ext.jl5.types.JL5TypeSystem;
-import polyglot.ext.jl5.types.RawClass;
 import polyglot.ext.jl5.types.TypeVariable;
 import polyglot.ext.param.types.MuPClass;
 import polyglot.main.Report;
-import polyglot.types.*;
-import polyglot.types.reflect.*;
-import polyglot.util.InternalCompilerError;
+import polyglot.types.ClassType;
+import polyglot.types.ConstructorInstance;
+import polyglot.types.FieldInstance;
+import polyglot.types.MethodInstance;
+import polyglot.types.ParsedClassType;
+import polyglot.types.ReferenceType;
+import polyglot.types.SemanticException;
+import polyglot.types.Type;
+import polyglot.types.TypeSystem;
+import polyglot.types.reflect.ClassFile;
+import polyglot.types.reflect.ClassFileLazyClassInitializer;
+import polyglot.types.reflect.Constant;
+import polyglot.types.reflect.Exceptions;
+import polyglot.types.reflect.Field;
+import polyglot.types.reflect.Method;
 import polyglot.util.Position;
 import polyglot.util.StringUtil;
 
@@ -36,6 +43,7 @@ public class JL5ClassFileLazyClassInitializer extends
         super(file, ts);
     }
 
+    @Override
     protected boolean initialized() {       
         return super.initialized() & annotationsInitialized;
     }
@@ -145,25 +153,12 @@ public class JL5ClassFileLazyClassInitializer extends
             MuPClass pc = ((JL5TypeSystem) ts).mutablePClass(ct.position());
             ct.setPClass(pc);
             pc.clazz(ct);
-            try {
-                List<TypeVariable> typeVars = signature
-                        .parseClassTypeVariables(ts, position());
-                ct.setTypeVariables(typeVars);
-                pc.formals(new ArrayList(ct.typeVariables()));
-            } catch (IOException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
+            List<TypeVariable> typeVars = signature
+                    .parseClassTypeVariables(ts, position());
+            ct.setTypeVariables(typeVars);
+            pc.formals(new ArrayList<TypeVariable>(ct.typeVariables()));
 
-            try {
-                signature.parseClassSignature(ts, position());
-            } catch (IOException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            } catch (SemanticException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
+            signature.parseClassSignature(ts, position());
 
             // Set then read then set to force initialization of the classes
             // and interfaces so that they are initialized before we unify any
@@ -215,7 +210,7 @@ public class JL5ClassFileLazyClassInitializer extends
         String type = (String) constants[method.getType()].value();
         JL5Signature signature = method.getSignature();
 
-        List excTypes = new ArrayList();
+        List<ReferenceType> excTypes = new ArrayList<ReferenceType>();
 
         // JL5 method signature does not contain the throw types
         // so parse that first, so we can use it in both cases.
@@ -229,18 +224,9 @@ public class JL5ClassFileLazyClassInitializer extends
         }
 
         if (signature != null) {
-            try {
-                signature.parseMethodSignature(ts, position(), ct);
-            } catch (IOException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            } catch (SemanticException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
-            Type jl5RetType = signature.methodSignature.returnType;
+            signature.parseMethodSignature(ts, position(), ct);
 
-            List tt = signature.methodSignature.throwTypes();
+            List<ReferenceType> tt = signature.methodSignature.throwTypes();
             if (tt != null && !tt.isEmpty()) {
                 // be robust in case for some reason the signature did include
                 // throw types info
@@ -270,7 +256,7 @@ public class JL5ClassFileLazyClassInitializer extends
             }
 
             int index = type.indexOf(')', 1);
-            List argTypes = typeListForString(type.substring(1, index));
+            List<Type> argTypes = typeListForString(type.substring(1, index));
             Type returnType = typeForString(type.substring(index + 1));
 
             return ((JL5TypeSystem) ts).methodInstance(ct.position(), ct,
@@ -304,7 +290,7 @@ public class JL5ClassFileLazyClassInitializer extends
         // Get a method instance for the <init> method.
         JL5MethodInstance mi = (JL5MethodInstance) methodInstance(method, ct);
 
-        List formals = mi.formalTypes();
+        List<Type> formals = mi.formalTypes();
 
         if (ct.isInnerClass()) {
             // If an inner class, the first argument may be a reference to an
@@ -340,25 +326,12 @@ public class JL5ClassFileLazyClassInitializer extends
         FieldInstance fi = null;
         JL5Signature signature = field.getSignature();
         if (signature != null) {
-            try {
-                signature.parseFieldSignature(ts, position(), ct);
-                Type jl5FieldType = signature.fieldSignature.type;
-                // System.err.println("Field type for " + name + " is "
-                // +jl5FieldType);
-                fi = ts.fieldInstance(ct.position(), ct,
-                        ts.flagsForBits(field.getModifiers()),
-                        signature.fieldSignature.type, name);
-            } catch (IOException e1) {
-                e1.printStackTrace();
-                fi = ts.fieldInstance(ct.position(), ct,
-                        ts.flagsForBits(field.getModifiers()),
-                        typeForString(type), name);
-            } catch (SemanticException e1) {
-                e1.printStackTrace();
-                fi = ts.fieldInstance(ct.position(), ct,
-                        ts.flagsForBits(field.getModifiers()),
-                        typeForString(type), name);
-            }
+            signature.parseFieldSignature(ts, position(), ct);
+            // System.err.println("Field type for " + name + " is "
+            // +jl5FieldType);
+            fi = ts.fieldInstance(ct.position(), ct,
+                    ts.flagsForBits(field.getModifiers()),
+                    signature.fieldSignature.type, name);
         } else {
             fi = ts.fieldInstance(ct.position(), ct,
                     ts.flagsForBits(field.getModifiers()), typeForString(type),
@@ -401,6 +374,7 @@ public class JL5ClassFileLazyClassInitializer extends
         return fi;
     }
 
+    @Override
     public void initAnnotationElems() {
         if (annotationsInitialized) {
             return;

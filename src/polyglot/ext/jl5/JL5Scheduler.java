@@ -1,7 +1,5 @@
 package polyglot.ext.jl5;
 
-import java.util.Iterator;
-
 import polyglot.ast.NodeFactory;
 import polyglot.ext.jl5.translate.JL5ToJLRewriter;
 import polyglot.ext.jl5.types.JL5TypeSystem;
@@ -30,7 +28,6 @@ import polyglot.frontend.goals.EmptyGoal;
 import polyglot.frontend.goals.Goal;
 import polyglot.frontend.goals.VisitorGoal;
 import polyglot.main.Options;
-import polyglot.translate.ExtensionRewriter;
 import polyglot.types.TypeSystem;
 import polyglot.util.InternalCompilerError;
 
@@ -263,8 +260,7 @@ public class JL5Scheduler extends JLScheduler {
             extInfo.compiler().outputFiles().clear();
 
             // Create a goal to compile every source file.
-            for (Iterator i = outExtInfo.scheduler().jobs().iterator(); i.hasNext(); ) {
-                Job job = (Job) i.next();
+            for (Job job : outExtInfo.scheduler().jobs()) {
                 outExtInfo.scheduler().addGoal(outExtInfo.getCompileGoal(job));
             }
             return outExtInfo.scheduler().runToCompletion();
@@ -292,6 +288,7 @@ public class JL5Scheduler extends JLScheduler {
                     extInfo.targetFactory()));
         }
     }
+    @Override
     public Goal InitializationsChecked(Job job) {
         TypeSystem ts = extInfo.typeSystem();
         NodeFactory nf = extInfo.nodeFactory();

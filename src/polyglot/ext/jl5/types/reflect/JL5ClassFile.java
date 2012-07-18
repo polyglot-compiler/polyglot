@@ -1,14 +1,12 @@
 package polyglot.ext.jl5.types.reflect;
 
 import java.io.DataInputStream;
-import java.io.File;
 import java.io.IOException;
 
 import javax.tools.FileObject;
 
 import polyglot.frontend.ExtensionInfo;
 import polyglot.types.reflect.Attribute;
-import polyglot.types.reflect.ClassFile;
 import polyglot.types.reflect.ClassFile_c;
 import polyglot.types.reflect.Field;
 import polyglot.types.reflect.InnerClasses;

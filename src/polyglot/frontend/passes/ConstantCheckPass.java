@@ -26,9 +26,10 @@
 package polyglot.frontend.passes;
 
 import polyglot.frontend.VisitorPass;
-import polyglot.frontend.goals.*;
+import polyglot.frontend.goals.ConstantsCheckedForFile;
+import polyglot.frontend.goals.FieldConstantsChecked;
+import polyglot.frontend.goals.Goal;
 import polyglot.visit.ConstantChecker;
-import polyglot.visit.TypeChecker;
 
 /**
  * Comment for <code>DisambiguationPass</code>

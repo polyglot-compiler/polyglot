@@ -25,11 +25,9 @@
 
 package polyglot.frontend.passes;
 
-import polyglot.frontend.MissingDependencyException;
 import polyglot.frontend.Scheduler;
 import polyglot.frontend.goals.SupertypesResolved;
 import polyglot.types.ParsedClassType;
-import polyglot.util.InternalCompilerError;
 
 /**
  * A pass that resolves the supertype and interfaces of every parsed class type.  
@@ -44,6 +42,7 @@ public class ResolveSuperTypesPass extends ClassFilePass {
         this.goal = goal;
     }
     
+    @Override
     public boolean run() {
         ParsedClassType ct = goal.type();
         ct.superType();

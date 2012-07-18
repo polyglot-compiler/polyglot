@@ -633,7 +633,7 @@ public class JL5TypeSystem_c extends ParamTypeSystem_c implements JL5TypeSystem 
         return this.instantiate(pos, clazz, Arrays.asList(actuals));
     }
     @Override
-    public ClassType instantiate(Position pos, JL5ParsedClassType clazz, List<Type> actuals) throws SemanticException {
+    public ClassType instantiate(Position pos, JL5ParsedClassType clazz, List<? extends Type> actuals) throws SemanticException {
         if (clazz.typeVariables().isEmpty() || (actuals == null || actuals.isEmpty())) {
             return clazz;
         }

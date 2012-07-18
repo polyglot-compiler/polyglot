@@ -150,8 +150,8 @@ public interface TypeSystem {
      */
     MethodInstance methodInstance(Position pos, ReferenceType container,
                                   Flags flags, Type returnType, String name,
-                                  List<Type> argTypes,
-                                  List<Type> excTypes);
+                                  List<? extends Type> argTypes,
+                                  List<? extends Type> excTypes);
 
     /** Create a field instance.
      * @param pos Position of the field.

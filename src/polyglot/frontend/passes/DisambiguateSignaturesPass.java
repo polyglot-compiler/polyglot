@@ -40,6 +40,7 @@ public class DisambiguateSignaturesPass extends ClassFilePass {
         this.goal = goal;
     }
 
+    @Override
     public boolean run() {
         ParsedClassType ct = goal.type();
         ct.superType();

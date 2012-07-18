@@ -25,15 +25,29 @@
 
 package polyglot.frontend;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import polyglot.ast.Node;
-import polyglot.frontend.goals.*;
-import polyglot.main.*;
+import polyglot.frontend.goals.AbstractGoal;
+import polyglot.frontend.goals.EndGoal;
+import polyglot.frontend.goals.Goal;
+import polyglot.main.Main;
+import polyglot.main.Report;
 import polyglot.types.FieldInstance;
 import polyglot.types.ParsedClassType;
-import polyglot.util.*;
-import polyglot.visit.*;
+import polyglot.util.ErrorInfo;
+import polyglot.util.ErrorQueue;
+import polyglot.util.InternalCompilerError;
+import polyglot.util.StringUtil;
 
 
 /**
@@ -76,7 +90,7 @@ public abstract class Scheduler {
      * but has now finished. The map contains entries for all
      * <code>Source</code>s that have had <code>Job</code>s added for them.
      */
-    protected Map jobs;
+    protected Map<Source, Job> jobs;
     
     protected Collection commandLineJobs;
 
@@ -88,8 +102,6 @@ public abstract class Scheduler {
     
     /** True if any pass has failed. */
     protected boolean failed;
-
-    protected static final Object COMPLETED_JOB = "COMPLETED JOB";
 
     /** The currently running pass, or null if no pass is running. */
     protected Pass currentPass;
@@ -230,7 +242,7 @@ public abstract class Scheduler {
 
     protected void completeJob(Job job) {
         if (job != null) {
-            jobs.put(job.source(), COMPLETED_JOB);
+            jobs.put(job.source(), Job.COMPLETED);
             if (Report.should_report(Report.frontend, 1)) {
                 Report.report(1, "Completed job " + job);
             }
@@ -249,10 +261,12 @@ public abstract class Scheduler {
             this.scheduler = scheduler;
         }
 
+        @Override
         public Collection prerequisiteGoals(Scheduler scheduler) {
             return scheduler.worklist();
         }
 
+        @Override
         public String toString() {
             return "TheEnd(" + scheduler.getClass().getName() + ")";
         }
@@ -261,6 +275,7 @@ public abstract class Scheduler {
             return scheduler.worklist();
         }
 
+        @Override
         public Pass createPass(ExtensionInfo extInfo) {
             return new EndPass(this);
         }
@@ -270,6 +285,7 @@ public abstract class Scheduler {
                 super(g);
             }
 
+            @Override
             public boolean run() {
                 TheEndGoal end = (TheEndGoal) goal();
 
@@ -285,10 +301,12 @@ public abstract class Scheduler {
             }
         }
         
+        @Override
         public int hashCode() {
             return Boolean.TRUE.hashCode();
         }
 
+        @Override
         public boolean equals(Object o) {
             return o instanceof TheEndGoal;
         }
@@ -767,13 +785,12 @@ public abstract class Scheduler {
     public abstract Goal CodeGenerated(Job job);
     
     /** Return all compilation units currently being compiled. */
-    public Collection jobs() {
-        ArrayList l = new ArrayList(jobs.size());
+    public Collection<Job> jobs() {
+        ArrayList<Job> l = new ArrayList<Job>(jobs.size());
         
-        for (Iterator i = jobs.values().iterator(); i.hasNext(); ) {
-            Object o = i.next();
-            if (o != COMPLETED_JOB) {
-                l.add(o);
+        for (Job job : jobs.values()) {
+            if (job != Job.COMPLETED) {
+                l.add(job);
             }
         }
         
@@ -800,31 +817,27 @@ public abstract class Scheduler {
      * will be returned.
      */
     public Job addJob(Source source, Node ast) {
-        Object o = jobs.get(source);
-        Job job = null;
+        Job job = jobs.get(source);
         
-        if (o == COMPLETED_JOB) {
+        if (job == Job.COMPLETED) {
             // the job has already been completed.
             // We don't need to add a job
             return null;
         }
-        else if (o == null) {
-            // No appropriate job yet exists, we will create one.
-            
-            job = this.createSourceJob(source, ast);
+        
+        if (job != null) return job;
+        
+        // No appropriate job yet exists, we will create one.
+        job = this.createSourceJob(source, ast);
 
-            // record the job in the map and the worklist.
-            jobs.put(source, job);
+        // record the job in the map and the worklist.
+        jobs.put(source, job);
     
-            if (Report.should_report(Report.frontend, 4)) {
-                Report.report(4, "Adding job for " + source + " at the " +
+        if (Report.should_report(Report.frontend, 4)) {
+            Report.report(4, "Adding job for " + source + " at the " +
                     "request of pass " + currentPass);
-            }
         }
-        else {
-            job = (Job) o;
-        }
-    
+            
         return job;
     }
 
@@ -836,6 +849,7 @@ public abstract class Scheduler {
         return new Job(extInfo, extInfo.jobExt(), source, ast);
     }
 
+    @Override
     public String toString() {
         return getClass().getName() + " worklist=" + worklist;
     }   

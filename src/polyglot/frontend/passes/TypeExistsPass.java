@@ -27,10 +27,12 @@ package polyglot.frontend.passes;
 
 import polyglot.frontend.Scheduler;
 import polyglot.frontend.goals.TypeExists;
-import polyglot.types.*;
+import polyglot.types.Named;
+import polyglot.types.SemanticException;
+import polyglot.types.Type;
+import polyglot.types.TypeSystem;
 import polyglot.util.ErrorInfo;
 import polyglot.util.ErrorQueue;
-import polyglot.main.Report;
 
 
 public class TypeExistsPass extends ClassFilePass {
@@ -45,6 +47,7 @@ public class TypeExistsPass extends ClassFilePass {
         this.goal = goal;
     }
     
+    @Override
     public boolean run() {
         String name = goal.typeName();
         try {

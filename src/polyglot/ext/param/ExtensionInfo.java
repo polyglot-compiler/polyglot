@@ -34,6 +34,7 @@ import polyglot.frontend.JLExtensionInfo;
 public abstract class ExtensionInfo extends JLExtensionInfo {
     static {
         // force Topics to load
+        @SuppressWarnings("unused")
         Topics t = new Topics();
     }
 }

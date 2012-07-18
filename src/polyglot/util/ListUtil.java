@@ -5,7 +5,7 @@ import java.util.Collections;
 import java.util.List;
 
 public class ListUtil {
-  public static <T> List<T> copy(List<T> src, boolean immutable) {
+  public static <T> List<T> copy(List<? extends T> src, boolean immutable) {
     if (src == null) return null;
     List<T> result = new ArrayList<T>(src);
     if (immutable) return Collections.unmodifiableList(result);

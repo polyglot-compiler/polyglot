@@ -25,9 +25,13 @@
 
 package polyglot.types;
 
-import polyglot.types.*;
-import polyglot.util.*;
-import java.util.*;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
+
+import polyglot.util.ListUtil;
+import polyglot.util.Position;
+import polyglot.util.SubtypeSet;
 
 /**
  * A <code>ProcedureInstance_c</code> contains the type information for a Java
@@ -62,11 +66,11 @@ public abstract class ProcedureInstance_c extends TypeObject_c
         return flags;
     }
 
-    public List formalTypes() {
+    public List<Type> formalTypes() {
         return Collections.unmodifiableList(formalTypes);
     }
 
-    public List throwTypes() {
+    public List<Type> throwTypes() {
         return Collections.unmodifiableList(throwTypes);
     }
 

@@ -61,6 +61,11 @@ public class Job
 
     /** The <code>Source</code> that this <code>Job</code> represents. */
     protected Source source;
+    
+    /**
+     * Global constant representing a job that has been completed.
+     */
+    public static final Job COMPLETED = new Job(null, null, null, null);
 
     public Job(ExtensionInfo lang, JobExt ext, Source source, Node ast) {
         this.lang = lang;

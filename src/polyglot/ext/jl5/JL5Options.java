@@ -27,7 +27,7 @@ public class JL5Options extends Options {
         }
         
         @Override
-        protected int parseCommand(String args[], int index, Set source) throws UsageError, Main.TerminationException {
+        protected int parseCommand(String args[], int index, Set<String> source) throws UsageError, Main.TerminationException {
             if (args[index].equals("-enumImplClass") || args[index].equals("--enumImplClass")) {
                 index++;
                 this.enumImplClass = args[index++];

@@ -28,7 +28,6 @@ package polyglot.frontend.passes;
 import polyglot.frontend.Scheduler;
 import polyglot.frontend.SchedulerException;
 import polyglot.frontend.goals.FieldConstantsChecked;
-import polyglot.types.ParsedClassType;
 import polyglot.types.FieldInstance;
 
 
@@ -42,6 +41,7 @@ public class CheckFieldConstantsPass extends ClassFilePass {
         this.goal = goal;
     }
     
+    @Override
     public boolean run() {
         // Force fields of the container to be initialized.
         goal.container().fields();
