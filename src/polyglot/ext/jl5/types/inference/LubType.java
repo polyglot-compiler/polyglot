@@ -3,7 +3,6 @@ package polyglot.ext.jl5.types.inference;
 import java.util.List;
 
 import polyglot.ext.jl5.types.JL5ClassType;
-import polyglot.types.ClassType.Kind;
 import polyglot.types.ReferenceType;
 import polyglot.types.Type;
 /**

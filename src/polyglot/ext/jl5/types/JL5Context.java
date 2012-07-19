@@ -7,6 +7,7 @@ import polyglot.types.VarInstance;
 public interface JL5Context extends Context {
 
     VarInstance findVariableInThisScope(String name);
+    @Override
     VarInstance findVariableSilent(String name);
 
     JL5Context pushTypeVariable(TypeVariable iType);
@@ -16,6 +17,7 @@ public interface JL5Context extends Context {
 
     void addTypeVariable(TypeVariable type);
 
+    @Override
     JL5TypeSystem typeSystem();
     Context pushSwitch(Type type);
     Type switchType();

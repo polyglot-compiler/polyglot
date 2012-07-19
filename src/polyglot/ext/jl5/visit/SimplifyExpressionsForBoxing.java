@@ -1,9 +1,19 @@
 package polyglot.ext.jl5.visit;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import polyglot.ast.*;
+import polyglot.ast.ArrayAccess;
+import polyglot.ast.Assign;
+import polyglot.ast.Binary;
+import polyglot.ast.Cast;
+import polyglot.ast.Eval;
+import polyglot.ast.Expr;
+import polyglot.ast.Field;
+import polyglot.ast.IntLit;
+import polyglot.ast.Local;
+import polyglot.ast.Node;
+import polyglot.ast.NodeFactory;
+import polyglot.ast.Receiver;
+import polyglot.ast.Special;
+import polyglot.ast.Unary;
 import polyglot.ext.jl5.types.JL5TypeSystem;
 import polyglot.types.PrimitiveType;
 import polyglot.types.SemanticException;

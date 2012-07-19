@@ -5,12 +5,29 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
-import polyglot.ast.*;
+import polyglot.ast.Assign;
+import polyglot.ast.Call_c;
+import polyglot.ast.Expr;
+import polyglot.ast.FieldDecl;
+import polyglot.ast.Id;
+import polyglot.ast.LocalDecl;
+import polyglot.ast.Node;
+import polyglot.ast.Receiver;
+import polyglot.ast.Return;
+import polyglot.ast.Special;
+import polyglot.ast.TypeNode;
 import polyglot.ext.jl5.types.JL5MethodInstance;
 import polyglot.ext.jl5.types.JL5ParsedClassType;
 import polyglot.ext.jl5.types.JL5TypeSystem;
 import polyglot.ext.jl5.visit.JL5Translator;
-import polyglot.types.*;
+import polyglot.types.CodeInstance;
+import polyglot.types.Context;
+import polyglot.types.FunctionInstance;
+import polyglot.types.MethodInstance;
+import polyglot.types.ReferenceType;
+import polyglot.types.SemanticException;
+import polyglot.types.Type;
+import polyglot.types.TypeSystem;
 import polyglot.util.CodeWriter;
 import polyglot.util.Position;
 import polyglot.visit.NodeVisitor;
@@ -21,7 +38,7 @@ public class JL5Call_c extends Call_c implements JL5Call {
 
     private List<TypeNode> typeArgs;
 
-    public JL5Call_c(Position pos, Receiver target, List typeArgs, Id name, List arguments) {
+    public JL5Call_c(Position pos, Receiver target, List<TypeNode> typeArgs, Id name, List<Expr> arguments) {
         super(pos, target, name, arguments);
         this.typeArgs = typeArgs;
     } 
@@ -57,7 +74,7 @@ public class JL5Call_c extends Call_c implements JL5Call {
     @Override
     public Node visitChildren(NodeVisitor v) {
         JL5Call_c n = (JL5Call_c)super.visitChildren(v);
-        List targs = visitList(n.typeArgs, v);
+        List<TypeNode> targs = visitList(n.typeArgs, v);
         return n.typeArgs(targs);
     }
 
@@ -113,10 +130,9 @@ public class JL5Call_c extends Call_c implements JL5Call {
         JL5TypeSystem ts = (JL5TypeSystem)tc.typeSystem();
         Context c = tc.context();
 
-        List argTypes = new ArrayList(this.arguments.size());
+        List<Type> argTypes = new ArrayList<Type>(this.arguments.size());
 
-        for (Iterator i = this.arguments.iterator(); i.hasNext(); ) {
-            Expr e = (Expr) i.next();
+        for (Expr e : this.arguments) {
             if (! e.type().isCanonical()) {
                 return this;
             }
@@ -130,9 +146,9 @@ public class JL5Call_c extends Call_c implements JL5Call {
         if (! this.target.type().isCanonical()) {
             return this;
         }
-        List actualTypeArgs = new ArrayList(this.typeArgs.size());
+        List<ReferenceType> actualTypeArgs = new ArrayList<ReferenceType>(this.typeArgs.size());
         for (TypeNode tn : this.typeArgs) {
-            actualTypeArgs.add(tn.type());
+            actualTypeArgs.add((ReferenceType) tn.type());
         }
 
         ReferenceType targetType = this.findTargetType();
@@ -237,8 +253,8 @@ public class JL5Call_c extends Call_c implements JL5Call {
             w.allowBreak(2, 2, "", 0); // miser mode
             w.begin(0);
 
-            for(Iterator i = arguments.iterator(); i.hasNext();) {
-                Expr e = (Expr) i.next();
+            for(Iterator<Expr> i = arguments.iterator(); i.hasNext();) {
+                Expr e = i.next();
                 print(e, w, tr);
 
                 if (i.hasNext()) {

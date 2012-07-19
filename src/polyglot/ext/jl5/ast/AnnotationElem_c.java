@@ -7,8 +7,6 @@ import polyglot.ast.Node;
 import polyglot.ast.Term;
 import polyglot.ast.TypeNode;
 import polyglot.ext.jl5.types.JL5Flags;
-import polyglot.ext.jl5.types.JL5ParsedClassType;
-import polyglot.ext.jl5.types.JL5TypeSystem;
 import polyglot.types.SemanticException;
 import polyglot.util.CodeWriter;
 import polyglot.util.Position;
@@ -26,10 +24,12 @@ public class AnnotationElem_c extends Expr_c implements AnnotationElem {
         this.typeName = typeName;
     }
 
+    @Override
     public TypeNode typeName(){
         return typeName;
     }
 
+    @Override
     public AnnotationElem typeName(TypeNode typeName){
         if (!typeName.equals(this.typeName)){
             AnnotationElem_c n = (AnnotationElem_c) copy();
@@ -48,13 +48,14 @@ public class AnnotationElem_c extends Expr_c implements AnnotationElem {
         return this;
     }
     
+    @Override
     public Node visitChildren(NodeVisitor v){
         TypeNode tn = (TypeNode)visitChild(this.typeName, v);
         return reconstruct(tn);
     }
 
+    @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
-        JL5TypeSystem ts = (JL5TypeSystem)tc.typeSystem();
         // only make annotation elements out of annotation types
         if (!typeName.type().isClass() || !JL5Flags.isAnnotation(typeName.type().toClass().flags())) {
             throw new SemanticException("Annotation: "+typeName+" must be an annotation type, ", position());
@@ -63,6 +64,7 @@ public class AnnotationElem_c extends Expr_c implements AnnotationElem {
         return type(typeName.type());
     }
    
+    @Override
     public void translate(CodeWriter w, Translator tr){
         w.write("@");
         print(typeName, w, tr);
@@ -72,14 +74,17 @@ public class AnnotationElem_c extends Expr_c implements AnnotationElem {
         return this;
     }
     
+    @Override
     public <T> List<T> acceptCFG(CFGBuilder<?> v, List<T> succs) {
         return succs;
     }
 
+    @Override
     public boolean isConstant(){
         return true;
     }
 
+    @Override
     public String toString(){
         return "Annotation Type: "+typeName();
     }

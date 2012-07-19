@@ -1,12 +1,20 @@
 package polyglot.ext.jl5.ast;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 import polyglot.ast.Ambiguous;
 import polyglot.ast.Node;
 import polyglot.ast.TypeNode;
 import polyglot.ast.TypeNode_c;
-import polyglot.ext.jl5.types.*;
+import polyglot.ext.jl5.types.JL5ParsedClassType;
+import polyglot.ext.jl5.types.JL5SubstClassType;
+import polyglot.ext.jl5.types.JL5TypeSystem;
+import polyglot.ext.jl5.types.RawClass;
+import polyglot.ext.jl5.types.TypeVariable;
 import polyglot.types.ClassType;
 import polyglot.types.ReferenceType;
 import polyglot.types.SemanticException;
@@ -22,15 +30,16 @@ public class AmbTypeInstantiation extends TypeNode_c implements TypeNode, Ambigu
 
     private TypeNode base;
     private List<TypeNode> typeArguments;
-    public AmbTypeInstantiation(Position pos, TypeNode base, List typeArguments) {
+    public AmbTypeInstantiation(Position pos, TypeNode base, List<TypeNode> typeArguments) {
         super(pos);
         this.base = base;
         if (typeArguments == null) {
-            typeArguments = Collections.EMPTY_LIST;
+            typeArguments = Collections.emptyList();
         }
         this.typeArguments = typeArguments;
     }
 
+    @Override
     public String name() {
         return base.name();
     }
@@ -75,7 +84,7 @@ public class AmbTypeInstantiation extends TypeNode_c implements TypeNode, Ambigu
         }
         
         JL5ParsedClassType pct;
-        Map<TypeVariable, ReferenceType> typeMap = new LinkedHashMap();
+        Map<TypeVariable, ReferenceType> typeMap = new LinkedHashMap<TypeVariable, ReferenceType>();
         if (baseType instanceof JL5ParsedClassType) {
             pct = (JL5ParsedClassType)baseType;
         }
@@ -130,9 +139,9 @@ public class AmbTypeInstantiation extends TypeNode_c implements TypeNode, Ambigu
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
         base.prettyPrint(w, tr);
         w.write("<");
-        Iterator iter = typeArguments.iterator();
+        Iterator<TypeNode> iter = typeArguments.iterator();
         while (iter.hasNext() ) {
-            TypeNode tn = (TypeNode)iter.next();             
+            TypeNode tn = iter.next();             
             tn.prettyPrint(w, tr);
 
             if (iter.hasNext()) {
@@ -146,12 +155,12 @@ public class AmbTypeInstantiation extends TypeNode_c implements TypeNode, Ambigu
     @Override
     public Node visitChildren(NodeVisitor v) {
         TypeNode base = (TypeNode)visitChild(this.base, v);
-        List arguments = visitList(this.typeArguments, v);
+        List<TypeNode> arguments = visitList(this.typeArguments, v);
         return this.base(base).typeArguments(arguments);
     }
 
 
-    private AmbTypeInstantiation typeArguments(List arguments) {
+    private AmbTypeInstantiation typeArguments(List<TypeNode> arguments) {
         if (this.typeArguments == arguments) {
             return this;
         }

@@ -27,6 +27,7 @@ public class SubTypeConstraint extends Constraint {
         return formal instanceof TypeVariable && !solver.isTargetTypeVariable(formal);
     }
     
+    @Override
     public String toString() {
         return actual + " <: " + formal;
     }

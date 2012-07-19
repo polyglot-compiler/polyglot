@@ -22,6 +22,7 @@ public class JL5LocalDecl_c extends LocalDecl_c implements LocalDecl {
         this.annotations = annotations;
     }
     
+    @Override
     public Type childExpectedType(Expr child, AscriptionVisitor av) {
         if (child == init) {
             TypeSystem ts = av.typeSystem();

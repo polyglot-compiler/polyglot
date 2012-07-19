@@ -2,10 +2,18 @@ package polyglot.ext.jl5.ast;
 
 import java.util.List;
 
-import polyglot.ast.*;
+import polyglot.ast.Import;
+import polyglot.ast.Import_c;
+import polyglot.ast.Node;
+import polyglot.ast.SourceFile;
+import polyglot.ast.TopLevelDecl;
 import polyglot.ext.jl5.types.JL5TypeSystem;
-import polyglot.types.*;
+import polyglot.types.ClassType;
+import polyglot.types.FieldInstance;
+import polyglot.types.MethodInstance;
 import polyglot.types.Package;
+import polyglot.types.SemanticException;
+import polyglot.types.Type;
 import polyglot.util.CodeWriter;
 import polyglot.util.Position;
 import polyglot.util.StringUtil;
@@ -58,7 +66,7 @@ public class JL5Import_c extends Import_c implements JL5Import{
         catch(SemanticException e){}
 
         if (ts.hasMethodNamed(t, id)) {
-            List<MethodInstance> meths = t.methodsNamed(id);
+            List<? extends MethodInstance> meths = t.methodsNamed(id);
             boolean anyAccessible = false;
             for (MethodInstance mi : meths) {
                 if (ts.accessibleFromPackage(mi.flags(), t.package_(), package_)) {

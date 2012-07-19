@@ -1,6 +1,10 @@
 package polyglot.ext.jl5.types;
 
-import polyglot.types.*;
+import polyglot.types.FieldInstance_c;
+import polyglot.types.Flags;
+import polyglot.types.ParsedClassType;
+import polyglot.types.ReferenceType;
+import polyglot.types.TypeSystem;
 import polyglot.util.Position;
 
 @SuppressWarnings("serial")
@@ -18,6 +22,7 @@ public class EnumInstance_c extends FieldInstance_c implements EnumInstance {
         this.ordinal = ordinal;
     }
     
+    @Override
     public ParsedClassType type(){
         return (ParsedClassType) type;
     }

@@ -1,16 +1,24 @@
 package polyglot.ext.jl5.ast;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
-import polyglot.ast.*;
+import polyglot.ast.ConstructorCall_c;
+import polyglot.ast.Expr;
+import polyglot.ast.IntLit;
+import polyglot.ast.Node;
+import polyglot.ast.TypeNode;
 import polyglot.ext.jl5.JL5Options;
 import polyglot.ext.jl5.types.JL5Context;
 import polyglot.ext.jl5.types.JL5Flags;
 import polyglot.ext.jl5.types.JL5TypeSystem;
-import polyglot.types.*;
+import polyglot.types.ClassType;
+import polyglot.types.ConstructorInstance;
+import polyglot.types.Context;
+import polyglot.types.ReferenceType;
+import polyglot.types.SemanticException;
+import polyglot.types.Type;
 import polyglot.util.CodeWriter;
 import polyglot.util.Position;
 import polyglot.visit.AmbiguityRemover;
@@ -25,11 +33,9 @@ public class JL5ConstructorCall_c extends ConstructorCall_c implements JL5Constr
     private boolean isEnumConstructorCall;
 
     private List<TypeNode> typeArgs;
-
-    private JL5TypeSystem ts;
     
     public JL5ConstructorCall_c(Position pos, Kind kind, List<TypeNode> typeArgs, Expr qualifier,
-                                List arguments, boolean isEnumConstructorCall) {
+                                List<? extends Expr> arguments, boolean isEnumConstructorCall) {
         super(pos, kind, qualifier, arguments);
         this.isEnumConstructorCall = isEnumConstructorCall;
         this.typeArgs = typeArgs;
@@ -54,6 +60,7 @@ public class JL5ConstructorCall_c extends ConstructorCall_c implements JL5Constr
      * An explicit constructor call is *like* a static context. References to
      * instance fields or methods are forbidden, but type variables are OK.
      */
+    @Override
     public Context enterScope(Context c) {
         return ((JL5Context)c).pushCTORCall();
     }
@@ -61,7 +68,7 @@ public class JL5ConstructorCall_c extends ConstructorCall_c implements JL5Constr
     @Override
     public Node visitChildren(NodeVisitor v) {
         JL5ConstructorCall_c n = (JL5ConstructorCall_c)super.visitChildren(v);
-        List targs = visitList(n.typeArgs, v);
+        List<TypeNode> targs = visitList(n.typeArgs, v);
         return n.typeArgs(targs);
     }
 
@@ -72,7 +79,7 @@ public class JL5ConstructorCall_c extends ConstructorCall_c implements JL5Constr
             if (this.arguments().isEmpty()) {
                 // this is an enum decl, so we need to replace a call to the default
                 // constructor with a call to java.lang.Enum.Enum(String, int)
-                List args = new ArrayList(2);// XXX the right thing to do is change the type of java.lang.Enum instead of adding these dummy params
+                List<Expr> args = new ArrayList<Expr>(2);// XXX the right thing to do is change the type of java.lang.Enum instead of adding these dummy params
                 args.add(ar.nodeFactory().NullLit(Position.compilerGenerated()));
                 args.add(ar.nodeFactory().IntLit(Position.compilerGenerated(), IntLit.INT, 0));
                 JL5ConstructorCall_c n = (JL5ConstructorCall_c) this.arguments(args);
@@ -112,11 +119,11 @@ public class JL5ConstructorCall_c extends ConstructorCall_c implements JL5Constr
 
         
         
-        List actualTypeArgs = null;
+        List<ReferenceType> actualTypeArgs = null;
         if (this.typeArgs != null) {
-            actualTypeArgs = new ArrayList(this.typeArgs.size());
+            actualTypeArgs = new ArrayList<ReferenceType>(this.typeArgs.size());
             for (TypeNode tn : this.typeArgs) {
-                actualTypeArgs.add(tn.type());
+                actualTypeArgs.add((ReferenceType) tn.type());
             }
         }
 
@@ -202,10 +209,9 @@ public class JL5ConstructorCall_c extends ConstructorCall_c implements JL5Constr
             // we differ here from the implementation in ConstructorCall_c in that we do not modify the qualifier
         }
 
-        List argTypes = new LinkedList();
+        List<Type> argTypes = new LinkedList<Type>();
 
-        for (Iterator iter = n.arguments().iterator(); iter.hasNext();) {
-            Expr e = (Expr) iter.next();
+        for (Expr e : n.arguments()) {
             if (! e.isDisambiguated()) {
                 return this;
             }

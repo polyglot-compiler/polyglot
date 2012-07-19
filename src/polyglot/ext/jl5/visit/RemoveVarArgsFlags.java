@@ -1,6 +1,11 @@
 package polyglot.ext.jl5.visit;
 
-import polyglot.ast.*;
+import polyglot.ast.ConstructorDecl;
+import polyglot.ast.Formal;
+import polyglot.ast.LocalDecl;
+import polyglot.ast.MethodDecl;
+import polyglot.ast.Node;
+import polyglot.ast.NodeFactory;
 import polyglot.ext.jl5.types.JL5Flags;
 import polyglot.frontend.Job;
 import polyglot.types.TypeSystem;

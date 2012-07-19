@@ -1,10 +1,24 @@
 package polyglot.ext.jl5.types;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 
 import polyglot.frontend.Job;
-import polyglot.types.*;
+import polyglot.types.ClassType;
+import polyglot.types.ClassType_c;
+import polyglot.types.ConstructorInstance;
+import polyglot.types.FieldInstance;
+import polyglot.types.Flags;
+import polyglot.types.MethodInstance;
 import polyglot.types.Package;
+import polyglot.types.ReferenceType;
+import polyglot.types.Resolver;
+import polyglot.types.Type;
+import polyglot.types.TypeObject;
+import polyglot.types.TypeSystem;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
 
@@ -28,6 +42,7 @@ public class IntersectionType_c extends ClassType_c implements IntersectionType 
         }
     }
 
+    @Override
     public List<ReferenceType> bounds() {
         if (bounds == null || bounds.size() == 0) {
             bounds = new ArrayList<ReferenceType>();
@@ -36,6 +51,7 @@ public class IntersectionType_c extends ClassType_c implements IntersectionType 
         return bounds;
     }
 
+    @Override
     public String translate(Resolver c) {
         StringBuffer sb = new StringBuffer();//("intersection[ ");
         for (Iterator<ReferenceType> iter = bounds.iterator(); iter.hasNext();) {
@@ -48,6 +64,7 @@ public class IntersectionType_c extends ClassType_c implements IntersectionType 
         return sb.toString();
     }
 
+    @Override
     public String toString() {
         StringBuffer sb = new StringBuffer();//("intersection[ ");
         sb.append(" ( ");
@@ -69,6 +86,7 @@ public class IntersectionType_c extends ClassType_c implements IntersectionType 
 //        return concreteBounds;
 //    }
 
+    @Override
     public Type superType() {
         if (bounds.isEmpty()) {
             return ts.Object();
@@ -83,7 +101,7 @@ public class IntersectionType_c extends ClassType_c implements IntersectionType 
     }
 
     @Override
-    public List constructors() {
+    public List<? extends ConstructorInstance> constructors() {
         return Collections.emptyList();
     }
 
@@ -118,7 +136,7 @@ public class IntersectionType_c extends ClassType_c implements IntersectionType 
 //    }
 
     @Override
-    public List fields() {
+    public List<? extends FieldInstance> fields() {
         return Collections.emptyList();
 //        return getSyntheticClass().fields();
     }
@@ -130,11 +148,11 @@ public class IntersectionType_c extends ClassType_c implements IntersectionType 
     }
 
     @Override
-    public List interfaces() {
-        List interfaces = new ArrayList();
+    public List<? extends ReferenceType> interfaces() {
+        List<ClassType> interfaces = new ArrayList<ClassType>();
         for (Type t : bounds) {
             if (t.isClass() && t.toClass().flags().isInterface()) {
-                interfaces.add(t);
+                interfaces.add((ClassType) t);
             }
         }
         return interfaces;
@@ -147,12 +165,12 @@ public class IntersectionType_c extends ClassType_c implements IntersectionType 
     }
 
     @Override
-    public List memberClasses() {
+    public List<? extends ClassType> memberClasses() {
         return Collections.emptyList();
     }
 
     @Override
-    public List methods() {
+    public List<? extends MethodInstance> methods() {
         return Collections.emptyList();
 //        return getSyntheticClass().methods();
     }
@@ -174,6 +192,7 @@ public class IntersectionType_c extends ClassType_c implements IntersectionType 
         return null;
     }
 
+    @Override
     public boolean inStaticContext() {
         return false;
     }
@@ -209,10 +228,12 @@ public class IntersectionType_c extends ClassType_c implements IntersectionType 
         return false;
     }
 
+    @Override
     public void boundOf(TypeVariable tv) {
         boundOf_ = tv;
     }
 
+    @Override
     public TypeVariable boundOf() {
         return boundOf_;
     }
@@ -307,6 +328,6 @@ public class IntersectionType_c extends ClassType_c implements IntersectionType 
 
     @Override
     public List<AnnotationElemInstance> annotationElems() {
-        return Collections.EMPTY_LIST;
+        return Collections.emptyList();
     }
 }

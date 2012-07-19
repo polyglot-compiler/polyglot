@@ -24,22 +24,24 @@ public class NormalAnnotationElem_c extends AnnotationElem_c implements NormalAn
 
     protected List<ElementValuePair> elements;
 
-    public NormalAnnotationElem_c(Position pos, TypeNode typeName, List elements){
+    public NormalAnnotationElem_c(Position pos, TypeNode typeName, List<ElementValuePair> elements){
         super(pos, typeName);
         this.elements = ListUtil.copy(elements, true);
     }
     
-    public List elements(){
+    @Override
+    public List<ElementValuePair> elements(){
         return Collections.unmodifiableList(this.elements);
     }
     
-    public NormalAnnotationElem elements(List elements){
+    @Override
+    public NormalAnnotationElem elements(List<ElementValuePair> elements){
         NormalAnnotationElem_c n = (NormalAnnotationElem_c) copy();
         n.elements = ListUtil.copy(elements, true);
         return n;
     }
 
-    protected Node reconstruct(TypeNode tn, List elements){
+    protected Node reconstruct(TypeNode tn, List<ElementValuePair> elements){
         if (tn != this.typeName || !CollectionUtil.equals(elements, this.elements)) {
             NormalAnnotationElem_c n = (NormalAnnotationElem_c) copy();
             n.typeName = tn;
@@ -49,18 +51,19 @@ public class NormalAnnotationElem_c extends AnnotationElem_c implements NormalAn
         return this;
     }
 
+    @Override
     public Node visitChildren(NodeVisitor v){
         TypeNode tn = (TypeNode) visitChild(this.typeName, v);
-        List elements = visitList(this.elements, v);
+        List<ElementValuePair> elements = visitList(this.elements, v);
         return reconstruct(tn, elements);
     }
    
+    @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
         JL5TypeSystem ts = (JL5TypeSystem)tc.typeSystem(); 
         Context c = tc.context();
         // check that elements refer to annotation element instances
-        for (Iterator it = elements().iterator(); it.hasNext(); ){
-            ElementValuePair next = (ElementValuePair)it.next();
+        for (ElementValuePair next : elements()) {
             AnnotationElemInstance ai = ts.findAnnotation(typeName().type().toReference(), next.name(), c.currentClass());
             // and value has to be the right type
             if (! ts.isImplicitCastValid(next.value().type(), ai.type()) &&
@@ -73,9 +76,8 @@ public class NormalAnnotationElem_c extends AnnotationElem_c implements NormalAn
         }
 
         // check all elements assigned values or have defaults
-        List requiredAnnots = ((JL5ParsedClassType)typeName().type()).annotationElems();
-        for(Iterator it = requiredAnnots.iterator(); it.hasNext(); ){
-            AnnotationElemInstance next = (AnnotationElemInstance)it.next();
+        List<AnnotationElemInstance> requiredAnnots = ((JL5ParsedClassType)typeName().type()).annotationElems();
+        for (AnnotationElemInstance next : requiredAnnots) {
             if (!next.hasDefault()){
                 // if the annotation decl doesn't have a default value
                 // then one of the elements must be setting it
@@ -86,11 +88,11 @@ public class NormalAnnotationElem_c extends AnnotationElem_c implements NormalAn
         }
     
         // check duplicat mem val pairs
-        ArrayList list = new ArrayList(elements);
+        ArrayList<ElementValuePair> list = new ArrayList<ElementValuePair>(elements);
         for (int i = 0; i < list.size(); i++){
-            ElementValuePair ei = (ElementValuePair) list.get(i);
+            ElementValuePair ei = list.get(i);
             for (int j = i+1; j < list.size(); j++){
-                ElementValuePair ej = (ElementValuePair) list.get(j);
+                ElementValuePair ej = list.get(j);
                 if (ei.name().equals(ej.name())){
                     throw new SemanticException("Duplicate annotation member value name in "+this.typeName(), ej.position());
                 }
@@ -101,17 +103,18 @@ public class NormalAnnotationElem_c extends AnnotationElem_c implements NormalAn
     }
 
     protected boolean elementForNoDefault(AnnotationElemInstance ai){
-        for (Iterator it = elements.iterator(); it.hasNext(); ){
-            if (((ElementValuePair)it.next()).name().equals(ai.name())) return true;
+        for (ElementValuePair e : elements) {
+            if (e.name().equals(ai.name())) return true;
         }
         return false;
     }
     
+    @Override
     public void translate(CodeWriter w, Translator tr){
         super.translate(w, tr);
         w.write("(");
-        for (Iterator it = elements().iterator(); it.hasNext(); ){
-            print((ElementValuePair)it.next(), w, tr);
+        for (Iterator<ElementValuePair> it = elements().iterator(); it.hasNext(); ){
+            print(it.next(), w, tr);
             if (it.hasNext()){
                 w.write(",");
             }

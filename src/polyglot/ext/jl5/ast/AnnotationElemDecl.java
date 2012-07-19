@@ -11,13 +11,17 @@ public interface AnnotationElemDecl extends MethodDecl {
     AnnotationElemDecl type(TypeNode type);
     TypeNode type();
     
+    @Override
     AnnotationElemDecl flags(Flags flags);
+    @Override
     Flags flags();
 
     AnnotationElemDecl defaultVal(Expr def);
     Expr defaultVal();
 
+    @Override
     AnnotationElemDecl name(String name);
+    @Override
     String name();
 
     AnnotationElemDecl annotationElemInstance(AnnotationElemInstance ai);

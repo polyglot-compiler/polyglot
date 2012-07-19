@@ -4,6 +4,7 @@ import java.util.List;
 
 import polyglot.ext.param.types.PClass;
 import polyglot.types.ParsedClassType;
+import polyglot.types.ReferenceType;
 import polyglot.util.CodeWriter;
 
 /* 
@@ -15,17 +16,19 @@ public interface JL5ParsedClassType extends ParsedClassType, JL5ClassType {
      * Get the pclass for this class. The pclass is used by the param type system to keep
      * track of instantiated types.
      */
-    PClass pclass();
-    void setPClass(PClass pc);
+    PClass<TypeVariable, ReferenceType> pclass();
+    void setPClass(PClass<TypeVariable, ReferenceType> pc);
     void setTypeVariables(List<TypeVariable> typeVars);
     List<TypeVariable> typeVariables();
 
     void addEnumConstant(EnumInstance ei);
-    List enumConstants();
+    @Override
+    List<EnumInstance> enumConstants();
+    @Override
     EnumInstance enumConstantNamed(String name);
     
 	// find methods with compatible name and formals as the given one
-    List methods(JL5MethodInstance mi);
+    List<? extends JL5MethodInstance> methods(JL5MethodInstance mi);
     
 //    boolean wasGeneric();
     

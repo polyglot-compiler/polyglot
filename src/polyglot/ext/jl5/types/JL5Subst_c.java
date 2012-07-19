@@ -1,6 +1,9 @@
 package polyglot.ext.jl5.types;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
 import polyglot.ext.param.types.ParamTypeSystem;
 import polyglot.ext.param.types.Subst_c;
@@ -18,13 +21,6 @@ public class JL5Subst_c extends Subst_c<TypeVariable, ReferenceType> implements 
 //        if (subst.isEmpty()) {
 //            Thread.dumpStack();
 //        }
-        for (Iterator i = entries(); i.hasNext(); ) {
-            Map.Entry e = (Map.Entry) i.next();
-            if (e.getKey() instanceof TypeVariable && e.getValue() instanceof Type)
-                continue;
-            throw new InternalCompilerError("bad map: " + subst);
-        }
-
     }
     
     @Override
@@ -131,33 +127,40 @@ public class JL5Subst_c extends Subst_c<TypeVariable, ReferenceType> implements 
     }
 
     @Override
-    public MethodInstance substMethod(MethodInstance mi) {
+    public <T extends MethodInstance> T substMethod(T mi) {
         JL5MethodInstance mj = (JL5MethodInstance) super.substMethod(mi);
         if (mj.typeParams() != null && !mj.typeParams().isEmpty()) {
             // remove any type params we have replced.
-            List l = new ArrayList(mj.typeParams());
+            List<TypeVariable> l = new ArrayList<TypeVariable>(mj.typeParams());
             l.removeAll(this.subst.keySet());
             mj = (JL5MethodInstance) mj.copy();
             mj.setTypeParams(l);
         }
         // subst the type params
         mj.setTypeParams(this.<TypeVariable> substTypeList(mj.typeParams()));
-        return mj;
+        
+        @SuppressWarnings("unchecked")
+        T result = (T) mj;
+        return result;
     }
 
     @Override
-    public ConstructorInstance substConstructor(ConstructorInstance ci) {
+    public <T extends ConstructorInstance> T substConstructor(T ci) {
         JL5ConstructorInstance cj = (JL5ConstructorInstance) super.substConstructor(ci);
         if (cj.typeParams() != null && !cj.typeParams().isEmpty()) {
             // remove any type params we have replced.
-            List l = new ArrayList(cj.typeParams());
+            List<TypeVariable> l = new ArrayList<TypeVariable>(cj.typeParams());
             l.removeAll(this.subst.keySet());
             cj = (JL5ConstructorInstance) cj.copy();
             cj.setTypeParams(l);
         }
+        
         // subst the type params
         cj.setTypeParams(this.<TypeVariable> substTypeList(cj.typeParams()));
-        return cj;
+        
+        @SuppressWarnings("unchecked")
+        T result = (T) cj;
+        return result;
     }
 
     @Override

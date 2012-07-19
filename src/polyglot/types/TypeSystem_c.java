@@ -1024,7 +1024,7 @@ public class TypeSystem_c implements TypeSystem
         assert_(container);
         assert_(argTypes);
         
-        List<MethodInstance> acceptable = findAcceptableMethods(container, name, argTypes, currClass);
+        List<? extends MethodInstance> acceptable = findAcceptableMethods(container, name, argTypes, currClass);
         
         if (acceptable.size() == 0) {
             throw new NoMemberException(NoMemberException.METHOD,
@@ -1034,12 +1034,12 @@ public class TypeSystem_c implements TypeSystem
                                         container + ".");
         }
     
-        Collection<MethodInstance> maximal =
+        Collection<? extends MethodInstance> maximal =
             findMostSpecificProcedures(acceptable);
     
 	if (maximal.size() > 1) {
 	    StringBuffer sb = new StringBuffer();
-            for (Iterator<MethodInstance> i = maximal.iterator(); i.hasNext();) {
+            for (Iterator<? extends MethodInstance> i = maximal.iterator(); i.hasNext();) {
                 MethodInstance ma = i.next();
                 sb.append(ma.returnType());
                 sb.append(" ");
@@ -1084,7 +1084,7 @@ public class TypeSystem_c implements TypeSystem
         assert_(container);
         assert_(argTypes);
 
-	List<ConstructorInstance> acceptable = findAcceptableConstructors(container, argTypes, currClass);
+	List<? extends ConstructorInstance> acceptable = findAcceptableConstructors(container, argTypes, currClass);
 
 	if (acceptable.size() == 0) {
 	    throw new NoMemberException(NoMemberException.CONSTRUCTOR,
@@ -1092,7 +1092,7 @@ public class TypeSystem_c implements TypeSystem
                                         container + "(" + listToString(argTypes) + ").");
 	}
 
-	Collection<ConstructorInstance> maximal = findMostSpecificProcedures(acceptable);
+	Collection<? extends ConstructorInstance> maximal = findMostSpecificProcedures(acceptable);
 
 	if (maximal.size() > 1) {
 	    throw new NoMemberException(NoMemberException.CONSTRUCTOR,
@@ -1205,7 +1205,7 @@ public class TypeSystem_c implements TypeSystem
      * Populates the list acceptable with those MethodInstances which are
      * Applicable and Accessible as defined by JLS 15.11.2.1
      */
-    protected List<MethodInstance> findAcceptableMethods(ReferenceType container, String name,
+    protected List<? extends MethodInstance> findAcceptableMethods(ReferenceType container, String name,
                                      List<? extends Type> argTypes, ClassType currClass)
 	throws SemanticException {
 
@@ -1324,7 +1324,7 @@ public class TypeSystem_c implements TypeSystem
      * Populates the list acceptable with those MethodInstances which are
      * Applicable and Accessible as defined by JLS 15.11.2.1
      */
-    protected List<ConstructorInstance> findAcceptableConstructors(ClassType container,
+    protected List<? extends ConstructorInstance> findAcceptableConstructors(ClassType container,
             List<? extends Type> argTypes, ClassType currClass)
         throws SemanticException
     {

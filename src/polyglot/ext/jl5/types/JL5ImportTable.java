@@ -1,10 +1,15 @@
 package polyglot.ext.jl5.types;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
-import polyglot.types.*;
+import polyglot.types.ClassType;
+import polyglot.types.ImportTable;
+import polyglot.types.Named;
+import polyglot.types.ReferenceType;
+import polyglot.types.SemanticException;
+import polyglot.types.Type;
+import polyglot.types.TypeSystem;
 import polyglot.util.Position;
 import polyglot.util.StringUtil;
 
@@ -18,8 +23,8 @@ public class JL5ImportTable extends ImportTable {
     
     public JL5ImportTable(TypeSystem ts, polyglot.types.Package pkg, String src) {
         super(ts, pkg, src);
-        this.singleStaticImports = new ArrayList();
-        this.staticOnDemandImports = new ArrayList();
+        this.singleStaticImports = new ArrayList<String>();
+        this.staticOnDemandImports = new ArrayList<String>();
     }
 
     public JL5ImportTable(TypeSystem ts, polyglot.types.Package pkg) {
@@ -34,19 +39,19 @@ public class JL5ImportTable extends ImportTable {
         staticOnDemandImports.add(className);
     }
 
-    public List singleStaticImports(){
+    public List<String> singleStaticImports(){
         return singleStaticImports;
     }
 
-    public List staticOnDemandImports(){
+    public List<String> staticOnDemandImports(){
         return staticOnDemandImports;
     }
 
+    @Override
     public Named find(String name) throws SemanticException {
         Named result = null;
         // may be member in static import
-        for (Iterator it = singleStaticImports.iterator(); it.hasNext(); ){
-            String next = (String)it.next();
+        for (String next : singleStaticImports) {
             String id = StringUtil.getShortNameComponent(next);
             if (name.equals(id)){
                 String className = StringUtil.getPackageComponent(next);
@@ -63,8 +68,7 @@ public class JL5ImportTable extends ImportTable {
             }
         }
 
-        for (Iterator it = staticOnDemandImports.iterator(); it.hasNext(); ){
-            String next = (String)it.next();
+        for (String next : staticOnDemandImports) {
             Named nt = ts.forName(next);
             
             if (nt instanceof Type){
@@ -81,8 +85,7 @@ public class JL5ImportTable extends ImportTable {
         return super.find(name);
     }
     public ReferenceType findTypeContainingMethodOrField(String name) throws SemanticException {
-        for (Iterator it = singleStaticImports.iterator(); it.hasNext(); ){
-            String next = (String)it.next();
+        for (String next : singleStaticImports) {
             String id = StringUtil.getShortNameComponent(next);
             if (name.equals(id)) {
                 // it's a match
@@ -97,8 +100,7 @@ public class JL5ImportTable extends ImportTable {
             }
         }
 
-        for (Iterator it = staticOnDemandImports.iterator(); it.hasNext(); ){
-            String next = (String)it.next();
+        for (String next : staticOnDemandImports) {
             Named nt = ts.forName(next);
             
             if (nt instanceof ReferenceType) {

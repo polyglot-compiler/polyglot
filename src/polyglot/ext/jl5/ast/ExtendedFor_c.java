@@ -1,20 +1,33 @@
 package polyglot.ext.jl5.ast;
 
-import java.util.Iterator;
 import java.util.List;
 
-import polyglot.ast.*;
+import polyglot.ast.Expr;
+import polyglot.ast.FloatLit;
+import polyglot.ast.IntLit;
+import polyglot.ast.Lit;
+import polyglot.ast.Local;
+import polyglot.ast.LocalDecl;
+import polyglot.ast.Loop_c;
+import polyglot.ast.NewArray;
+import polyglot.ast.Node;
+import polyglot.ast.NodeFactory;
+import polyglot.ast.Stmt;
+import polyglot.ast.Term;
 import polyglot.ext.jl5.types.JL5ParsedClassType;
 import polyglot.ext.jl5.types.JL5SubstClassType;
 import polyglot.ext.jl5.types.JL5TypeSystem;
 import polyglot.types.Context;
-import polyglot.types.ReferenceType;
 import polyglot.types.SemanticException;
 import polyglot.types.Type;
 import polyglot.util.CodeWriter;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
-import polyglot.visit.*;
+import polyglot.visit.CFGBuilder;
+import polyglot.visit.FlowGraph;
+import polyglot.visit.NodeVisitor;
+import polyglot.visit.PrettyPrinter;
+import polyglot.visit.TypeChecker;
 
 public class ExtendedFor_c extends Loop_c implements ExtendedFor {
 	/** Loop body */
@@ -119,7 +132,7 @@ public class ExtendedFor_c extends Loop_c implements ExtendedFor {
 		}
 		else {
     		JL5SubstClassType iterableType = ts.findGenericSupertype((JL5ParsedClassType)ts.Iterable(), t.toReference());
-            elementType = (Type)iterableType.actuals().get(0);
+            elementType = iterableType.actuals().get(0);
 		}
         if (!elementType.isImplicitCastValid(declType)) {
             throw new SemanticException("Incompatible types: required " + declType + " but found " + elementType, this.position());
@@ -133,9 +146,7 @@ public class ExtendedFor_c extends Loop_c implements ExtendedFor {
 		}
 		if (expr instanceof NewArray) {
 			if (((NewArray) expr).init() != null) {
-				for (Iterator it = ((NewArray) expr).init().elements()
-						.iterator(); it.hasNext();) {
-					Expr next = (Expr) it.next();
+				for (Expr next : ((NewArray) expr).init().elements()) {
 					if (next instanceof Local
 							&& decl.localInstance().equals(
 									((Local) next).localInstance())) {

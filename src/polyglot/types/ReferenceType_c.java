@@ -147,7 +147,7 @@ public abstract class ReferenceType_c extends Type_c implements ReferenceType
     }
 
     @Override
-    public List<MethodInstance> methodsNamed(String name) {
+    public List<? extends MethodInstance> methodsNamed(String name) {
         List<MethodInstance> l = new LinkedList<MethodInstance>();
 
         for (MethodInstance mi : methods()) {

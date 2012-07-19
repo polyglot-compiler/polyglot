@@ -7,13 +7,29 @@ import polyglot.ast.Expr;
 import polyglot.ext.jl5.types.inference.LubType;
 import polyglot.ext.param.types.ParamTypeSystem;
 import polyglot.frontend.Source;
-import polyglot.types.*;
+import polyglot.types.ArrayType;
+import polyglot.types.ClassType;
+import polyglot.types.ConstructorInstance;
+import polyglot.types.Context;
+import polyglot.types.FieldInstance;
+import polyglot.types.Flags;
+import polyglot.types.LazyClassInitializer;
+import polyglot.types.MethodInstance;
 import polyglot.types.Package;
+import polyglot.types.ParsedClassType;
+import polyglot.types.PrimitiveType;
+import polyglot.types.ReferenceType;
+import polyglot.types.SemanticException;
+import polyglot.types.Type;
+import polyglot.types.TypeObject;
+import polyglot.types.TypeSystem;
 import polyglot.util.Position;
 
 public interface JL5TypeSystem extends TypeSystem, ParamTypeSystem<TypeVariable, ReferenceType> {
+    @Override
     ParsedClassType createClassType(LazyClassInitializer init, Source fromSource);
 
+    @Override
     ParsedClassType createClassType(Source fromSource);
 
     ClassType Enum();
@@ -120,13 +136,13 @@ public interface JL5TypeSystem extends TypeSystem, ParamTypeSystem<TypeVariable,
 
     JL5MethodInstance methodInstance(Position pos, ReferenceType container,
                                      Flags flags, Type returnType, String name,
-                                     List argTypes, List excTypes, List typeParams);
+                                     List<? extends Type> argTypes, List<? extends Type> excTypes, List<TypeVariable> typeParams);
     JL5ConstructorInstance constructorInstance(Position pos, ClassType container,
-                                               Flags flags, List argTypes,
-                                               List excTypes, List typeParams);
+                                               Flags flags, List<? extends Type> argTypes,
+                                               List<? extends Type> excTypes, List<TypeVariable> typeParams);
 
 
-    JL5ProcedureInstance instantiate(Position pos, JL5ProcedureInstance mi, List<Type> actuals);
+    JL5ProcedureInstance instantiate(Position pos, JL5ProcedureInstance mi, List<? extends ReferenceType> actuals);
 
     /**
      * Check whether <code>mi</code> can be called with name <code>name</code>
@@ -136,7 +152,7 @@ public interface JL5TypeSystem extends TypeSystem, ParamTypeSystem<TypeVariable,
      * Will return null if mi cannot be successfully called. Will return an appropriately 
      * instantiated method instance if the call is valid (i.e., the substitution after type inference). 
      */
-    JL5MethodInstance methodCallValid(JL5MethodInstance mi, String name, List<Type> argTypes, List<Type> actualTypeArgs, Type expectedReturnType);
+    JL5MethodInstance methodCallValid(JL5MethodInstance mi, String name, List<? extends Type> argTypes, List<? extends ReferenceType> actualTypeArgs, Type expectedReturnType);
 
     /**
      * Check whether <code>ci</code> can be called with
@@ -146,7 +162,7 @@ public interface JL5TypeSystem extends TypeSystem, ParamTypeSystem<TypeVariable,
      * Will return null if ci cannot be successfully called. Will return an appropriately 
      * instantiated instance if the call is valid (i.e., the substitution after type inference). 
      */
-    JL5ProcedureInstance callValid(JL5ProcedureInstance mi, List<Type> argTypes, List<Type> actualTypeArgs);
+    JL5ProcedureInstance callValid(JL5ProcedureInstance mi, List<? extends Type> argTypes, List<? extends ReferenceType> actualTypeArgs);
 
     /**
      * Returns the PrimitiveType corresponding to the wrapper type t. For example primitiveOf([java.lang.Integer]) = [int]
@@ -159,6 +175,7 @@ public interface JL5TypeSystem extends TypeSystem, ParamTypeSystem<TypeVariable,
     EnumInstance enumInstance(Position pos, ClassType container, Flags f, String name,
                               ParsedClassType anonType, long l);
 
+    @Override
     Context createContext();
 
     EnumInstance findEnumConstant(ReferenceType container, String name, ClassType currClass)
@@ -186,6 +203,7 @@ public interface JL5TypeSystem extends TypeSystem, ParamTypeSystem<TypeVariable,
      */
     Type applyCaptureConversion(Type t);
 
+    @Override
     Flags flagsForBits(int bits);
 
     TypeVariable typeVariable(Position pos, String name, ReferenceType upperBound);
@@ -193,6 +211,7 @@ public interface JL5TypeSystem extends TypeSystem, ParamTypeSystem<TypeVariable,
     WildCardType wildCardType(Position position);
     WildCardType wildCardType(Position position, ReferenceType upperBound, ReferenceType lowerBound);
 
+    @Override
     boolean equals(TypeObject arg1, TypeObject arg2);
 
     List<ReferenceType> allAncestorsOf(ReferenceType rt);
@@ -200,10 +219,10 @@ public interface JL5TypeSystem extends TypeSystem, ParamTypeSystem<TypeVariable,
     ArrayType arrayOf(Position position, Type base, boolean isVarargs);
 
     MethodInstance findMethod(ReferenceType container,
-                              String name, List argTypes,  List<Type> typeArgs,
+                              String name, List<? extends Type> argTypes,  List<? extends ReferenceType> typeArgs,
                               ClassType currClass, Type expectedReturnType) throws SemanticException;
 
-    ConstructorInstance findConstructor(ClassType container, List argTypes, List<Type> typeArgs,
+    ConstructorInstance findConstructor(ClassType container, List<? extends Type> argTypes, List<? extends ReferenceType> typeArgs,
                                         ClassType currClass) throws SemanticException;
 
     /**
@@ -219,7 +238,7 @@ public interface JL5TypeSystem extends TypeSystem, ParamTypeSystem<TypeVariable,
     ReferenceType glb(ReferenceType t1, ReferenceType t2);
     ReferenceType glb(Position pos, List<ReferenceType> bounds);
 
-    UnknownType unknownReferenceType(Position position);
+    UnknownReferenceType unknownReferenceType(Position position);
 
     /**
      * Create a raw class
@@ -279,6 +298,12 @@ public interface JL5TypeSystem extends TypeSystem, ParamTypeSystem<TypeVariable,
     List<TypeVariable> classAndEnclosingTypeVariables(JL5ParsedClassType ct);
 
     ClassType instantiateInnerClassFromContext(Context c, ClassType ct);
+
+    /**
+     * @param position
+     * @return
+     */
+    UnknownTypeVariable unknownTypeVariable(Position position);
 
 
 

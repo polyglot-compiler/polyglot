@@ -1,12 +1,19 @@
 package polyglot.ext.jl5.types;
 
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import polyglot.main.Report;
-import polyglot.types.*;
+import polyglot.types.ClassType;
+import polyglot.types.Context;
+import polyglot.types.Context_c;
+import polyglot.types.MethodInstance;
+import polyglot.types.Named;
+import polyglot.types.ReferenceType;
+import polyglot.types.SemanticException;
+import polyglot.types.Type;
+import polyglot.types.TypeSystem;
+import polyglot.types.VarInstance;
 import polyglot.util.StringUtil;
 
 public class JL5Context_c extends Context_c implements JL5Context {
@@ -28,10 +35,12 @@ public class JL5Context_c extends Context_c implements JL5Context {
         super(ts);
     }
 
+    @Override
     public JL5TypeSystem typeSystem() {
         return (JL5TypeSystem) ts;
     }
 
+    @Override
     public VarInstance findVariableSilent(String name) {
         VarInstance vi = findVariableInThisScope(name);
         if (vi != null) {
@@ -42,8 +51,7 @@ public class JL5Context_c extends Context_c implements JL5Context {
             // might be static
             if (importTable() != null) {
                 JL5ImportTable jit = (JL5ImportTable) importTable();
-                for (Iterator it = jit.singleStaticImports().iterator(); it.hasNext();) {
-                    String next = (String) it.next();
+                for (String next : jit.singleStaticImports()) {
                     String id = StringUtil.getShortNameComponent(next);
                     if (name.equals(id)) {
                         Named nt = ts.forName(StringUtil.getPackageComponent(next));
@@ -60,8 +68,7 @@ public class JL5Context_c extends Context_c implements JL5Context {
                     }
                 }
                 if (vi == null) {
-                    for (Iterator it = jit.staticOnDemandImports().iterator(); it.hasNext();) {
-                        String next = (String) it.next();
+                    for (String next : jit.staticOnDemandImports()) {
                         Named nt = ts.forName(next);
                         if (nt instanceof Type) {
                             Type t = (Type) nt;
@@ -94,6 +101,7 @@ public class JL5Context_c extends Context_c implements JL5Context {
     /**
      * pushes an additional static scoping level.
      */
+    @Override
     public Context pushCTORCall() {
         JL5Context_c v = (JL5Context_c) push();
         v.staticContext = true;
@@ -101,6 +109,7 @@ public class JL5Context_c extends Context_c implements JL5Context {
         return v;
     }
 
+    @Override
     public JL5Context pushTypeVariable(TypeVariable iType) {
         JL5Context_c v = (JL5Context_c) push();
         v.typeVariable = iType;
@@ -108,11 +117,12 @@ public class JL5Context_c extends Context_c implements JL5Context {
         return v;
     }
 
+    @Override
     public TypeVariable findTypeVariableInThisScope(String name) {
         if (typeVariable != null && typeVariable.name().equals(name))
             return typeVariable;
         if (typeVars != null && typeVars.containsKey(name)) {
-            return (TypeVariable) typeVars.get(name);
+            return typeVars.get(name);
         }
         if (outer != null) {
             return ((JL5Context) outer).findTypeVariableInThisScope(name);
@@ -120,19 +130,23 @@ public class JL5Context_c extends Context_c implements JL5Context {
         return null;
     }
 
+    @Override
     public boolean inTypeVariable() {
         return kind == TYPE_VAR;
     }
 
+    @Override
     public boolean inCTORCall() {
         return ctorCall;
     }
 
+    @Override
     public String toString() {
         return super.toString() + "; type var: " + typeVariable + "; type vars: "
         + typeVars;
     }
 
+    @Override
     public void addTypeVariable(TypeVariable type) {
         if (typeVars == null)
             typeVars = new LinkedHashMap<String, TypeVariable>();
@@ -161,7 +175,7 @@ public class JL5Context_c extends Context_c implements JL5Context {
     }
 
     @Override
-    public MethodInstance findMethod(String name, List argTypes) throws SemanticException {
+    public MethodInstance findMethod(String name, List<? extends Type> argTypes) throws SemanticException {
         try {
             return super.findMethod(name, argTypes);
         }

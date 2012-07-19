@@ -12,14 +12,16 @@ public class AnnotationElemInstance_c extends JL5MethodInstance_c implements Ann
     protected boolean hasDefault;
         
     public AnnotationElemInstance_c(JL5TypeSystem ts, Position pos, ReferenceType container, Flags flags, Type type, String name, boolean hasDefault){
-        super(ts, pos, container, flags, type, name, Collections.emptyList(), Collections.emptyList(), Collections.emptyList());
+        super(ts, pos, container, flags, type, name, Collections.<Type> emptyList(), Collections.<Type> emptyList(), Collections.<TypeVariable> emptyList());
         this.hasDefault = hasDefault;
     }
 
+    @Override
     public Type type(){
         return this.returnType();
     }
 
+    @Override
     public boolean hasDefault(){
         return hasDefault;
     }

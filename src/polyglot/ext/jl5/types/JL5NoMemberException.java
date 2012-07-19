@@ -16,6 +16,7 @@ public class JL5NoMemberException extends NoMemberException {
         super(kind, s, pos);
     }
     
+    @Override
     public String getKindStr(){
         switch(getKind()){
             case ENUM_CONSTANT:

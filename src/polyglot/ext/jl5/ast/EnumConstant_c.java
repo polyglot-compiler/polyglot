@@ -28,11 +28,13 @@ public class EnumConstant_c extends Field_c implements EnumConstant{
     	return enumInstance().ordinal();
     }
     
+    @Override
     public EnumInstance enumInstance() {
     	return (EnumInstance) fieldInstance();
     }
 
-	public EnumConstant enumInstance(EnumInstance enumInstance) {
+	@Override
+    public EnumConstant enumInstance(EnumInstance enumInstance) {
 		return (EnumConstant) fieldInstance(enumInstance);
 	}
 

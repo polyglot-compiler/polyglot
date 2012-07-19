@@ -2,7 +2,6 @@ package polyglot.ext.jl5.translate;
 
 import polyglot.ast.Node;
 import polyglot.ext.jl5.ast.EnumConstant;
-import polyglot.ext.jl5.ast.JL5NodeFactory;
 import polyglot.translate.ExtensionRewriter;
 import polyglot.types.SemanticException;
 

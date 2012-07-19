@@ -4,13 +4,21 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import polyglot.ast.*;
+import polyglot.ast.Formal;
+import polyglot.ast.MethodDecl;
+import polyglot.ast.Node;
+import polyglot.ast.NodeFactory;
+import polyglot.ast.TypeNode;
 import polyglot.ext.jl5.types.JL5ClassType;
 import polyglot.ext.jl5.types.JL5ParsedClassType;
 import polyglot.ext.jl5.types.JL5Subst;
 import polyglot.ext.jl5.types.JL5TypeSystem;
 import polyglot.frontend.Job;
-import polyglot.types.*;
+import polyglot.types.MethodInstance;
+import polyglot.types.ReferenceType;
+import polyglot.types.SemanticException;
+import polyglot.types.Type;
+import polyglot.types.TypeSystem;
 import polyglot.util.InternalCompilerError;
 import polyglot.visit.ErrorHandlingVisitor;
 
@@ -69,10 +77,10 @@ public class TypeErasureProcDecls extends ErrorHandlingVisitor {
         
         // we need to rewrite the method decl to have the same arguments as mjErased, the erased version of mj.
         boolean changed = false;
-        List<Formal> newFormals = new ArrayList(n.formals().size());
-        Iterator formals = n.formals().iterator();
-        for (Type tj : (List<Type>)mjErased.formalTypes()) {
-            Formal f = (Formal)formals.next();
+        List<Formal> newFormals = new ArrayList<Formal>(n.formals().size());
+        Iterator<Formal> formals = n.formals().iterator();
+        for (Type tj : mjErased.formalTypes()) {
+            Formal f = formals.next();
             TypeNode tn = f.type();
             TypeNode newTn = tn.type(ts.erasureType(tj));
             changed = changed || (tn != newTn);

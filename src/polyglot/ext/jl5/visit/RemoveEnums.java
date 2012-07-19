@@ -1,8 +1,38 @@
 package polyglot.ext.jl5.visit;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Stack;
 
-import polyglot.ast.*;
+import polyglot.ast.ArrayInit;
+import polyglot.ast.Block;
+import polyglot.ast.Call;
+import polyglot.ast.Case;
+import polyglot.ast.Cast;
+import polyglot.ast.ClassBody;
+import polyglot.ast.ClassDecl;
+import polyglot.ast.ClassLit;
+import polyglot.ast.ClassMember;
+import polyglot.ast.ConstructorCall;
+import polyglot.ast.ConstructorDecl;
+import polyglot.ast.Expr;
+import polyglot.ast.Field;
+import polyglot.ast.FieldDecl;
+import polyglot.ast.Formal;
+import polyglot.ast.Id;
+import polyglot.ast.IntLit;
+import polyglot.ast.Local;
+import polyglot.ast.MethodDecl;
+import polyglot.ast.New;
+import polyglot.ast.Node;
+import polyglot.ast.NodeFactory;
+import polyglot.ast.Return;
+import polyglot.ast.Stmt;
+import polyglot.ast.Switch;
+import polyglot.ast.TypeNode;
 import polyglot.ext.jl5.JL5Options;
 import polyglot.ext.jl5.ast.EnumConstantDecl;
 import polyglot.ext.jl5.ast.JL5EnumDecl;
@@ -10,7 +40,15 @@ import polyglot.ext.jl5.types.EnumInstance;
 import polyglot.ext.jl5.types.JL5Flags;
 import polyglot.frontend.Job;
 import polyglot.qq.QQ;
-import polyglot.types.*;
+import polyglot.types.ClassType;
+import polyglot.types.FieldInstance;
+import polyglot.types.Flags;
+import polyglot.types.LocalInstance;
+import polyglot.types.MemberInstance;
+import polyglot.types.MethodInstance;
+import polyglot.types.SemanticException;
+import polyglot.types.Type;
+import polyglot.types.TypeSystem;
 import polyglot.util.CodeWriter;
 import polyglot.util.CollectionUtil;
 import polyglot.util.InternalCompilerError;
@@ -163,7 +201,7 @@ public class RemoveEnums extends ContextVisitor {
         Id enumOrdinal = nodeFactory().Id(pos, "enum$ordinal");
 
         // add two new arguments to the constructor
-        List newFormals = new ArrayList();		
+        List<Formal> newFormals = new ArrayList<Formal>();		
         LocalInstance enumNameLI = ts.localInstance(pos, Flags.NONE, ts.String(), enumName.id());
         LocalInstance enumOrdLI = ts.localInstance(pos, Flags.NONE, ts.Int(), enumOrdinal.id());
         newFormals.add(nodeFactory().Formal(pos, Flags.NONE, nodeFactory().CanonicalTypeNode(pos, ts.String()), enumName).localInstance(enumNameLI));
@@ -172,11 +210,11 @@ public class RemoveEnums extends ContextVisitor {
         n = n.formals(newFormals);
 
         // use those arguments in the super call
-        List newStmts = new ArrayList();
+        List<Stmt> newStmts = new ArrayList<Stmt>();
         newStmts.add(nodeFactory().ConstructorCall(pos, ConstructorCall.SUPER, 
                 CollectionUtil.list((Expr) nodeFactory().Local(pos, enumName).localInstance(enumNameLI), 
                         nodeFactory().Local(pos, enumOrdinal).localInstance(enumOrdLI))));
-        List oldStmts = new LinkedList(n.body().statements());
+        List<Stmt> oldStmts = new LinkedList<Stmt>(n.body().statements());
         if (oldStmts.get(0) instanceof ConstructorCall) {
             oldStmts.remove(0);
         }
@@ -202,7 +240,7 @@ public class RemoveEnums extends ContextVisitor {
         // private static final T[] values = {decl1, decl2, ...};
         Position pos = Position.compilerGenerated();
         List<Expr> decls = new ArrayList<Expr>();
-        for (MemberInstance mi : (Collection<MemberInstance>)enumDeclType.toClass().members()) {
+        for (MemberInstance mi : enumDeclType.toClass().members()) {
             if (mi instanceof EnumInstance) {
                 EnumInstance ei = (EnumInstance) mi;
                 Field f = nf.Field(pos, nf.CanonicalTypeNode(pos, enumDeclType), nf.Id(pos, ei.name()));
@@ -227,13 +265,15 @@ public class RemoveEnums extends ContextVisitor {
         // public static T[] values() { return (T[])T.values.clone(); }
         Position pos = Position.compilerGenerated();
         Field f = nf.Field(pos, nf.CanonicalTypeNode(pos, enumDeclType), nf.Id(pos, "values"));
-        Call cl = nf.Call(pos, f, "clone");
+        Id clid = nodeFactory().Id(pos, "clone");
+        Call cl = nf.Call(pos, f, clid);
         Cast cst = nf.Cast(pos, nf.CanonicalTypeNode(pos, ts.arrayOf(enumDeclType)), cl);
         Return ret = nf.Return(pos, cst);
+        Id mdid = nodeFactory().Id(pos, "values");
         MethodDecl md = nf.MethodDecl(pos,
                 Flags.PUBLIC.Static(), 
                 nf.CanonicalTypeNode(pos, ts.arrayOf(enumDeclType)),
-                "values",
+                mdid,
                 Collections.<Formal> emptyList(), 
                 Collections.<TypeNode> emptyList(), 
                 nf.Block(pos, ret));
@@ -280,7 +320,7 @@ public class RemoveEnums extends ContextVisitor {
         //		System.err.println("Translate enum constant decl " + ecd);
         //		System.err.println("  " + ecd.constructorInstance());
         //		System.err.println("  " + ecd.ordinal());
-        List args = new ArrayList();
+        List<Expr> args = new ArrayList<Expr>();
         // add the name and ordinal
         args.add(nf.StringLit(Position.compilerGenerated(), ecd.name().id()));
         args.add(nf.IntLit(Position.compilerGenerated(), IntLit.INT, ecd.ordinal()));
@@ -320,9 +360,9 @@ public class RemoveEnums extends ContextVisitor {
         w.write("{");
 
         // figure out which members to add and which to ignore
-        List<FieldDecl> enumConstDecls = new ArrayList();
-        List<ClassMember> otherMembers = new ArrayList();
-        for (ClassMember cm : (List<ClassMember>)decl.body().members()) {
+        List<FieldDecl> enumConstDecls = new ArrayList<FieldDecl>();
+        List<ClassMember> otherMembers = new ArrayList<ClassMember>();
+        for (ClassMember cm : decl.body().members()) {
             boolean isEnumConstDecl = false;
             boolean addMember = true;
             if (cm instanceof FieldDecl) {
@@ -354,10 +394,10 @@ public class RemoveEnums extends ContextVisitor {
         }				
 
         // print the enum const decls
-        Iterator iter = enumConstDecls.iterator();
+        Iterator<FieldDecl> iter = enumConstDecls.iterator();
         w.allowBreak(1," ");
         while (iter.hasNext()) {
-            FieldDecl fd = (FieldDecl) iter.next();
+            FieldDecl fd = iter.next();
             prettyPrintEnumConstFieldDecl(fd, w, tr);
             if (iter.hasNext()) {
                 w.write(",");
@@ -371,8 +411,8 @@ public class RemoveEnums extends ContextVisitor {
         w.begin(0);
         ClassMember prev = null;
 
-        for (Iterator i = otherMembers.iterator(); i.hasNext(); ) {
-            ClassMember member = (ClassMember) i.next();
+        for (Iterator<ClassMember> i = otherMembers.iterator(); i.hasNext(); ) {
+            ClassMember member = i.next();
             if ((member instanceof polyglot.ast.CodeDecl) ||
                     (prev instanceof polyglot.ast.CodeDecl)) {
                 w.newline(0);
@@ -404,14 +444,14 @@ public class RemoveEnums extends ContextVisitor {
             New ne = (New) init;
             // we have added two args to the new statement
             // remove them to print the args nicely
-            List newArgs = new LinkedList(ne.arguments());
+            List<Expr> newArgs = new LinkedList<Expr>(ne.arguments());
             newArgs.remove(0);
             newArgs.remove(0);
             if (!newArgs.isEmpty()) {
                 w.write("(");
-                Iterator iter = newArgs.iterator();
+                Iterator<Expr> iter = newArgs.iterator();
                 while (iter.hasNext()) {
-                    Expr e = (Expr) iter.next();
+                    Expr e = iter.next();
                     e.prettyPrint(w, tr);
                     if (iter.hasNext()) {
                         w.write(",");
@@ -435,7 +475,7 @@ public class RemoveEnums extends ContextVisitor {
 
     private static void prettyPrintConstructorDeclAsEnumConstructorDecl(ConstructorDecl cd, CodeWriter w, PrettyPrinter tr) {
         // remove the two dummy arguments
-        List<Formal> newFormals = new LinkedList(cd.formals());
+        List<Formal> newFormals = new LinkedList<Formal>(cd.formals());
         newFormals.remove(0);
         newFormals.remove(0);
         
@@ -443,7 +483,7 @@ public class RemoveEnums extends ContextVisitor {
         
         // remove the call to super
         
-        List newStmts = new LinkedList(cd.body().statements());
+        List<Stmt> newStmts = new LinkedList<Stmt>(cd.body().statements());
         if (!newStmts.isEmpty() && newStmts.get(0) instanceof ConstructorCall) {
             newStmts.remove(0);
         }
@@ -478,11 +518,10 @@ public class RemoveEnums extends ContextVisitor {
         
         // the body of the method is something like "private static int enum$SwitchMap(Object e) { if (e == Coin.GREEN) return Coin.GREEN.ordinal(); ... return -1; } 
         Id arg = nodeFactory().Id(pos, "e");
-        List<Stmt> stmts = new ArrayList();
+        List<Stmt> stmts = new ArrayList<Stmt>();
         
         LocalInstance argLI = ts.localInstance(pos, Flags.NONE, enumType, arg.id());
         // add the if statements
-        int count = 0;
         for (FieldInstance field : enumConstantFieldInstances(enumType)) {
             int index = findEnumConstIndex(enumType, field);
             Stmt s = qq.parseStmt("if (%E == %T."+field.name()+") return " + index +  ";", nodeFactory().Local(pos, arg).localInstance(argLI).type(enumType), enumType);
@@ -523,7 +562,7 @@ public class RemoveEnums extends ContextVisitor {
     }
 
     private int findEnumConstIndex(ClassType enumType, FieldInstance field) {
-        List l = enumConstantFieldInstances(enumType);
+        List<FieldInstance> l = enumConstantFieldInstances(enumType);
         for (int i = 0; i < l.size(); i++) {
             if (l.get(i) == field) {
                 return i;
@@ -533,8 +572,8 @@ public class RemoveEnums extends ContextVisitor {
     }
     
     private List<FieldInstance> enumConstantFieldInstances(ClassType enumType) {
-        List<FieldInstance> l = new ArrayList();
-        for (FieldInstance f : (List<FieldInstance>)enumType.fields()) {
+        List<FieldInstance> l = new ArrayList<FieldInstance>();
+        for (FieldInstance f : enumType.fields()) {
             if (f.flags().isStatic() && f.type() == enumType) {
                 // it's an enum
                 l.add(f);

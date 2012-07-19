@@ -15,7 +15,6 @@ import polyglot.util.CodeWriter;
 import polyglot.util.Position;
 import polyglot.visit.AmbiguityRemover;
 import polyglot.visit.PrettyPrinter;
-import polyglot.visit.TypeChecker;
 
 public class JL5Formal_c extends Formal_c implements JL5Formal {
 

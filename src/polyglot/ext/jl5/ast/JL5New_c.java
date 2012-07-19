@@ -1,15 +1,24 @@
 package polyglot.ext.jl5.ast;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
-import polyglot.ast.*;
+import polyglot.ast.ClassBody;
+import polyglot.ast.Expr;
+import polyglot.ast.New;
+import polyglot.ast.New_c;
+import polyglot.ast.Node;
+import polyglot.ast.Special;
+import polyglot.ast.TypeNode;
 import polyglot.ext.jl5.types.JL5ParsedClassType;
 import polyglot.ext.jl5.types.JL5SubstClassType;
 import polyglot.ext.jl5.types.JL5TypeSystem;
 import polyglot.ext.jl5.visit.JL5Translator;
-import polyglot.types.*;
+import polyglot.types.ClassType;
+import polyglot.types.Context;
+import polyglot.types.ReferenceType;
+import polyglot.types.SemanticException;
+import polyglot.types.Type;
 import polyglot.util.CodeWriter;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
@@ -23,8 +32,8 @@ public class JL5New_c extends New_c implements JL5New {
     private List<TypeNode> typeArgs;
 
     public JL5New_c(Position pos, Expr outer, List<TypeNode> typeArgs,
-            TypeNode objectType, List argTypes, ClassBody body) {
-        super(pos, outer, objectType, argTypes, body);
+            TypeNode objectType, List<Expr> args, ClassBody body) {
+        super(pos, outer, objectType, args, body);
         this.typeArgs = typeArgs;
     }
 
@@ -46,7 +55,7 @@ public class JL5New_c extends New_c implements JL5New {
     @Override
     public Node visitChildren(NodeVisitor v) {
         JL5New_c n = (JL5New_c)super.visitChildren(v);
-        List targs = visitList(n.typeArgs, v);
+        List<TypeNode> targs = visitList(n.typeArgs, v);
         return n.typeArgs(targs);
     }
     
@@ -54,8 +63,7 @@ public class JL5New_c extends New_c implements JL5New {
     public Node disambiguateOverride(Node parent, AmbiguityRemover ar) throws SemanticException {
         JL5New n = (JL5New) super.disambiguateOverride(parent, ar);
         // now do the type args
-        n = (JL5New) n.typeArgs(n.visitList(n.typeArgs(), ar));
-        return n;
+        return n.typeArgs(n.visitList(n.typeArgs(), ar));
     }
     
     @Override
@@ -77,17 +85,15 @@ public class JL5New_c extends New_c implements JL5New {
             throw new SemanticException("Must have a class for a new expression.", this.position());
         }
 
-        List argTypes = new ArrayList(arguments.size());
+        List<Type> argTypes = new ArrayList<Type>(arguments.size());
         
-        for (Iterator i = this.arguments.iterator(); i.hasNext(); ) {
-            Expr e = (Expr) i.next();
+        for (Expr e : this.arguments) {
             argTypes.add(e.type());
         }
         
-        List<Type> actualTypeArgs = new ArrayList(typeArgs.size());
-        for (Iterator i = this.typeArgs.iterator(); i.hasNext(); ) {
-            TypeNode tn = (TypeNode) i.next();
-            actualTypeArgs.add(tn.type());
+        List<ReferenceType> actualTypeArgs = new ArrayList<ReferenceType>(typeArgs.size());
+        for (TypeNode tn : this.typeArgs) {
+            actualTypeArgs.add((ReferenceType) tn.type());
         }
 
         typeCheckFlags(tc);
@@ -179,7 +185,7 @@ public class JL5New_c extends New_c implements JL5New {
         }
         
         JL5TypeSystem ts = (JL5TypeSystem)ct.typeSystem();
-        ClassType t = findEnclosingClassFrom((JL5ParsedClassType)c.currentClass(), c, ct);
+        ClassType t = findEnclosingClassFrom(c.currentClass(), c, ct);
         if (t == null) {
             // couldn't find anything suitable using the JL5ParsedClassType. Try using the raw class.
             t = findEnclosingClassFrom(ts.rawClass((JL5ParsedClassType)c.currentClass()), c, ct);
@@ -215,7 +221,6 @@ public class JL5New_c extends New_c implements JL5New {
     }
 
     private ClassType findMemberClass(String name, ClassType t) {
-        TypeSystem ts = t.typeSystem();
         ClassType mt = t.memberClassNamed(name);
         if (mt != null) {
             return mt;
@@ -230,8 +235,7 @@ public class JL5New_c extends New_c implements JL5New {
             }
         }
         
-        for (Iterator i = t.interfaces().iterator(); i.hasNext(); ) {
-            Type sup = (Type) i.next();
+        for (Type sup : t.interfaces()) {
             if (sup instanceof ClassType) {
                 mt = findMemberClass(name, sup.toClass());
                 if (mt != null) {

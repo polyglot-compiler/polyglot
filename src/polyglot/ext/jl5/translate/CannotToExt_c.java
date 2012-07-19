@@ -8,6 +8,7 @@ import polyglot.types.SemanticException;
 import polyglot.util.InternalCompilerError;
 
 public class CannotToExt_c extends ToExt_c implements Ext {
+    @Override
     public Node toExt(ExtensionRewriter rw) throws SemanticException {
         throw new InternalCompilerError("Cannot transalate " + node() +":" + node().getClass());
     }

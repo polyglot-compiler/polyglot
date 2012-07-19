@@ -1,9 +1,20 @@
 package polyglot.ext.jl5.types.inference;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import polyglot.ext.jl5.JL5Options;
-import polyglot.ext.jl5.types.*;
+import polyglot.ext.jl5.types.JL5ArrayType;
+import polyglot.ext.jl5.types.JL5Flags;
+import polyglot.ext.jl5.types.JL5ProcedureInstance;
+import polyglot.ext.jl5.types.JL5TypeSystem;
+import polyglot.ext.jl5.types.TypeVariable;
 import polyglot.ext.param.types.Subst;
 import polyglot.types.MethodInstance;
 import polyglot.types.ReferenceType;
@@ -16,13 +27,13 @@ public class InferenceSolver_c implements InferenceSolver {
 
     private JL5ProcedureInstance pi = null;
 
-    private List<Type> actualArgumentTypes;
+    private List<? extends Type> actualArgumentTypes;
 
     private List<? extends Type> formalTypes;
 
     private List<TypeVariable> typeVariablesToSolve;
 
-    public InferenceSolver_c(JL5ProcedureInstance pi, List<Type> actuals, JL5TypeSystem ts) {
+    public InferenceSolver_c(JL5ProcedureInstance pi, List<? extends Type> actuals, JL5TypeSystem ts) {
         this.pi = pi;
         this.typeVariablesToSolve = pi.typeParams();
         this.actualArgumentTypes = actuals;
@@ -30,6 +41,7 @@ public class InferenceSolver_c implements InferenceSolver {
         this.ts = ts;
     }
 
+    @Override
     public boolean isTargetTypeVariable(Type t) {
         if (t instanceof TypeVariable) {
             TypeVariable tv = (TypeVariable) t;
@@ -38,6 +50,7 @@ public class InferenceSolver_c implements InferenceSolver {
         return false;
     }
 
+    @Override
     public List<TypeVariable> typeVariablesToSolve() {
         return typeVariablesToSolve;
     }
@@ -77,6 +90,7 @@ public class InferenceSolver_c implements InferenceSolver {
 //        System.err.println("      a supers : " + supers);
 
         Comparator<Constraint> comp = new Comparator<Constraint>() {
+            @Override
             public int compare(Constraint o1, Constraint o2) {
                 return typeVariablesToSolve().indexOf(o1) - typeVariablesToSolve().indexOf(o2);
             }
@@ -161,7 +175,8 @@ public class InferenceSolver_c implements InferenceSolver {
         return constraints;
     }
 
-    public  Map<TypeVariable, Type> solve(Type expectedReturnType) {
+    @Override
+    public  Map<TypeVariable, ReferenceType> solve(Type expectedReturnType) {
         // first, solve without considering the return type
         Type[] solution = this.solve(getInitialConstraints(), true, false);
         
@@ -204,13 +219,13 @@ public class InferenceSolver_c implements InferenceSolver {
             }
         }
 
-        Map m = new LinkedHashMap();
+        Map<TypeVariable, ReferenceType> m = new LinkedHashMap<TypeVariable, ReferenceType>();
         for (int i = 0; i < solution.length; i++) {
             if (solution[i] == null) {
                 // no solution for this variable.
                 solution[i] = ts.Object();
             }
-            m.put(typeVariablesToSolve().get(i), solution[i]);
+            m.put(typeVariablesToSolve().get(i), (ReferenceType) solution[i]);
         }
         return m;
     }
@@ -225,15 +240,15 @@ public class InferenceSolver_c implements InferenceSolver {
     private Type[] solveWithExpectedReturnType(Type[] solution, Type expectedReturnType, Type declaredReturnType) {
         List<Constraint> constraints = new ArrayList<Constraint>();
         // get the subsitution corresponding to the solution so far
-        Map m = new LinkedHashMap();
+        Map<TypeVariable, ReferenceType> m = new LinkedHashMap<TypeVariable, ReferenceType>();
         for (int i = 0; i < solution.length; i++) {
-            Type t = solution[i];
+            ReferenceType t = (ReferenceType) solution[i];
             if (t == null) {
                 t = typeVariablesToSolve().get(i);
             }
             m.put(typeVariablesToSolve().get(i), t);
         }
-        Subst subst = ts.subst(m);
+        Subst<TypeVariable, ReferenceType> subst = ts.subst(m);
         Type rt = subst.substType(declaredReturnType);
         constraints.add(new SuperConversionConstraint(expectedReturnType, rt, this));
         for (int i = 0; i < solution.length; i++) {
@@ -255,6 +270,7 @@ public class InferenceSolver_c implements InferenceSolver {
         return false;
     }
 
+    @Override
     public JL5TypeSystem typeSystem() {
         return ts;
     }

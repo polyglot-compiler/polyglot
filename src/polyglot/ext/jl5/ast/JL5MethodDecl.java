@@ -9,7 +9,7 @@ public interface JL5MethodDecl extends MethodDecl {
     public boolean isCompilerGenerated();
     public JL5MethodDecl setCompilerGenerated(boolean val);
    
-    public List typeParams();
-    public JL5MethodDecl typeParams(List typeParams);
+    public List<ParamTypeNode> typeParams();
+    public JL5MethodDecl typeParams(List<ParamTypeNode> typeParams);
 
 }

@@ -318,7 +318,7 @@ public class ParsedClassType_c extends ClassType_c implements ParsedClassType
     
     /** Return a list of all methods with the given name. */
     @Override
-    public List<MethodInstance> methodsNamed(String name) {
+    public List<? extends MethodInstance> methodsNamed(String name) {
         // Override to NOT call methods(). Do not check that all
         // methods are canonical, just that the particular method
         // returned is canonical.

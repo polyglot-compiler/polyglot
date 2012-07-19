@@ -3,7 +3,6 @@ package polyglot.ext.jl5.types;
 import polyglot.ext.param.types.Param;
 import polyglot.types.ClassType;
 import polyglot.types.ReferenceType;
-import polyglot.util.Internable;
 
 public interface TypeVariable extends ReferenceType, Param {
     

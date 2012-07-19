@@ -9,13 +9,11 @@ import polyglot.ast.Node;
 import polyglot.ast.Term;
 import polyglot.ext.jl5.types.JL5TypeSystem;
 import polyglot.types.SemanticException;
-import polyglot.types.Type;
 import polyglot.util.CodeWriter;
 import polyglot.util.Position;
 import polyglot.visit.CFGBuilder;
 import polyglot.visit.NodeVisitor;
 import polyglot.visit.Translator;
-import polyglot.visit.TypeBuilder;
 import polyglot.visit.TypeChecker;
 
 public class ElementValuePair_c extends Expr_c implements ElementValuePair {
@@ -29,10 +27,12 @@ public class ElementValuePair_c extends Expr_c implements ElementValuePair {
         this.value = value;
     }
 
+    @Override
     public String name(){
         return name.id();
     }
 
+    @Override
     public Id id(){
         return name;
     }
@@ -46,6 +46,7 @@ public class ElementValuePair_c extends Expr_c implements ElementValuePair {
         return this;
     }
 
+    @Override
     public Expr value(){
         return value;
     }
@@ -68,17 +69,20 @@ public class ElementValuePair_c extends Expr_c implements ElementValuePair {
         return this;
     }
     
+    @Override
     public Node visitChildren(NodeVisitor v){
         Expr value = (Expr) visitChild(this.value, v);
         return reconstruct(value);
     }
 
+    @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException{
         JL5TypeSystem ts = (JL5TypeSystem)tc.typeSystem();
         ts.checkAnnotationValueConstant(value);
         return type(value.type());
     }
     
+    @Override
     public void translate(CodeWriter w, Translator tr){
         w.write(name+"=");
         print(value, w, tr);
@@ -88,6 +92,7 @@ public class ElementValuePair_c extends Expr_c implements ElementValuePair {
         return this;
     }
     
+    @Override
     public <T> List<T> acceptCFG(CFGBuilder<?> v, List<T> succs) {
         v.visitCFG(value, this, EXIT);
         return succs;

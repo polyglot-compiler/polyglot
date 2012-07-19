@@ -1,10 +1,16 @@
 package polyglot.ext.jl5.types;
 
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 
-import polyglot.types.*;
+import polyglot.types.FieldInstance;
+import polyglot.types.MethodInstance;
+import polyglot.types.ReferenceType;
+import polyglot.types.ReferenceType_c;
+import polyglot.types.Resolver;
+import polyglot.types.Type;
+import polyglot.types.TypeObject;
+import polyglot.types.TypeSystem;
 import polyglot.util.Position;
 
 public class WildCardType_c extends ReferenceType_c implements WildCardType {
@@ -19,8 +25,7 @@ public class WildCardType_c extends ReferenceType_c implements WildCardType {
 
     @Override
     public FieldInstance fieldNamed(String name) {
-        for (Iterator i = fields().iterator(); i.hasNext(); ) {
-            FieldInstance fi = (FieldInstance) i.next();
+        for (FieldInstance fi : fields()) {
             if (fi.name().equals(name)) {
                 return fi;
             }
@@ -63,13 +68,13 @@ public class WildCardType_c extends ReferenceType_c implements WildCardType {
     }
 
     @Override
-    public List methods() {
-        return Collections.EMPTY_LIST;
+    public List<? extends MethodInstance> methods() {
+        return Collections.emptyList();
     }
 
     @Override
-    public List fields() {
-        return Collections.EMPTY_LIST;
+    public List<? extends FieldInstance> fields() {
+        return Collections.emptyList();
     }
 
     @Override
@@ -81,11 +86,11 @@ public class WildCardType_c extends ReferenceType_c implements WildCardType {
     }
 
     @Override
-    public List interfaces() {
+    public List<? extends ReferenceType> interfaces() {
         if (this.upperBound().isClass() && this.upperBound().toClass().flags().isInterface()) {
             return Collections.singletonList(this.upperBound());
         }
-        return Collections.EMPTY_LIST;
+        return Collections.emptyList();
     }
 
     @Override

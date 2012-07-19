@@ -1,7 +1,6 @@
 package polyglot.ext.jl5.translate;
 
 import polyglot.ast.Ext;
-import polyglot.ext.jl5.ast.JL5CanonicalTypeNode_c;
 
 public class JL5ToJLExtFactory_c extends JL5ToExtFactory_c {
 	

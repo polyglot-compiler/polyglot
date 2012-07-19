@@ -3,7 +3,10 @@ package polyglot.ext.jl5.types.inference;
 import java.util.ArrayList;
 import java.util.List;
 
-import polyglot.ext.jl5.types.*;
+import polyglot.ext.jl5.types.JL5PrimitiveType;
+import polyglot.ext.jl5.types.JL5SubstClassType;
+import polyglot.ext.jl5.types.TypeVariable;
+import polyglot.ext.jl5.types.WildCardType;
 import polyglot.types.NullType;
 import polyglot.types.ReferenceType;
 import polyglot.types.Type;
@@ -46,9 +49,9 @@ public class SubConversionConstraint extends Constraint {
         }
         else if (formal instanceof JL5SubstClassType) {
             JL5SubstClassType formal_pt = (JL5SubstClassType) formal;
-            JL5SubstClassType s = solver.typeSystem().findGenericSupertype((JL5ParsedClassType)formal_pt.base(), (ReferenceType)actual);
+            JL5SubstClassType s = solver.typeSystem().findGenericSupertype(formal_pt.base(), (ReferenceType)actual);
             if (s != null) {
-                for (TypeVariable tv : ((JL5ParsedClassType)formal_pt.base()).typeVariables()) {
+                for (TypeVariable tv : formal_pt.base().typeVariables()) {
                     ReferenceType formal_targ = (ReferenceType) formal_pt.subst().substType(tv);
                     ReferenceType actual_targ = (ReferenceType) s.subst().substType(tv);
                     if (!(formal_targ instanceof WildCardType)) {
@@ -80,10 +83,12 @@ public class SubConversionConstraint extends Constraint {
         return r;
     }
 
+    @Override
     public boolean canSimplify() {
         return true;
     }
     
+    @Override
     public String toString() {
         return actual + " << " + formal;
     }

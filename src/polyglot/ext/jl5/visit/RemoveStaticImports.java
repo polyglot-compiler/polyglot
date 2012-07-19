@@ -4,10 +4,19 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import polyglot.ast.*;
+import polyglot.ast.Call;
+import polyglot.ast.Field;
+import polyglot.ast.Import;
+import polyglot.ast.Node;
+import polyglot.ast.NodeFactory;
+import polyglot.ast.SourceFile;
 import polyglot.ext.jl5.ast.JL5Import;
 import polyglot.frontend.Job;
-import polyglot.types.*;
+import polyglot.types.ClassType;
+import polyglot.types.FieldInstance;
+import polyglot.types.MethodInstance;
+import polyglot.types.SemanticException;
+import polyglot.types.TypeSystem;
 import polyglot.visit.ContextVisitor;
 import polyglot.visit.NodeVisitor;
 
@@ -24,7 +33,7 @@ public class RemoveStaticImports extends ContextVisitor {
         if (n instanceof SourceFile) {
             // remove the static imports
             SourceFile sf = (SourceFile)n;
-            List<Import> imports = new ArrayList(sf.imports());
+            List<Import> imports = new ArrayList<Import>(sf.imports());
             boolean changed = false;
             for (Iterator<Import> iter = imports.iterator(); iter.hasNext(); ) {
                 Import imp = iter.next();

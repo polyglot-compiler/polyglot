@@ -8,6 +8,6 @@ import polyglot.ast.TypeNode;
 public interface ParamTypeNode extends TypeNode {
     ParamTypeNode id(Id id);
     Id id();
-	ParamTypeNode bounds(List l);
-	List bounds();
+	ParamTypeNode bounds(List<TypeNode> l);
+	List<TypeNode> bounds();
 }

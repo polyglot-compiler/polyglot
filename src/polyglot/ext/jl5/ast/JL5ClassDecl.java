@@ -5,6 +5,6 @@ import java.util.List;
 import polyglot.ast.ClassDecl;
 
 public interface JL5ClassDecl extends ClassDecl {
-    List paramTypes();
-    List annotations();
+    List<ParamTypeNode> paramTypes();
+    List<AnnotationElem> annotations();
 }

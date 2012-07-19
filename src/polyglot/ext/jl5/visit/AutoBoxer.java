@@ -4,6 +4,7 @@ import java.util.Collections;
 
 import polyglot.ast.Call;
 import polyglot.ast.Expr;
+import polyglot.ast.Id;
 import polyglot.ast.NodeFactory;
 import polyglot.ast.TypeNode;
 import polyglot.ext.jl5.types.JL5TypeSystem;
@@ -48,7 +49,8 @@ public class AutoBoxer extends AscriptionVisitor {
         String methodName = "valueOf";
         ClassType wrapperType = ts.wrapperClassOfPrimitive(fromType);
         TypeNode tn = nf.CanonicalTypeNode(e.position(), wrapperType);
-        Call call = nf.Call(e.position(), tn, methodName, e);
+        Id id = nodeFactory().Id(e.position(), methodName);
+        Call call = nf.Call(e.position(), tn, id, e);
         call = (Call)call.type(wrapperType);
         call = call.methodInstance(ts.findMethod(wrapperType, methodName, CollectionUtil.list((Type) fromType), this.context().currentClass()));          
         return call;
@@ -65,7 +67,8 @@ public class AutoBoxer extends AscriptionVisitor {
         }
         
         String methodName = toType.toPrimitive().name() + "Value";
-        Call call = nf.Call(e.position(), e, methodName);
+        Id id = nodeFactory().Id(e.position(), methodName);
+        Call call = nf.Call(e.position(), e, id);
         call = (Call)call.type(toType);
         call = call.methodInstance(ts.findMethod(wrapperType, methodName, Collections.<Type> emptyList(), this.context().currentClass()));
         return call;

@@ -227,7 +227,7 @@ public class LubType_c extends ClassType_c implements LubType {
             return a1;
         }
         else {
-            return ts.wildCardType(position, ts.lub(position, CollectionUtil.list((ReferenceType) a1, (ReferenceType) a2)), null);
+            return ts.wildCardType(position, ts.lub(position, CollectionUtil.list(a1, a2)), null);
         }
     }
 

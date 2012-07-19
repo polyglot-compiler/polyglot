@@ -4,25 +4,30 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
-import polyglot.types.*;
+import polyglot.types.ArrayType;
+import polyglot.types.ClassType;
+import polyglot.types.ConstructorInstance_c;
+import polyglot.types.Flags;
+import polyglot.types.Type;
 import polyglot.util.Position;
 
 @SuppressWarnings("serial")
 public class JL5ConstructorInstance_c extends ConstructorInstance_c implements JL5ConstructorInstance {
     private List<TypeVariable> typeParams;
     public JL5ConstructorInstance_c(JL5TypeSystem_c ts,
-                                    Position pos, ClassType container, Flags flags, List argTypes,
-                                    List excTypes, List typeParams) {
+                                    Position pos, ClassType container, Flags flags, List<? extends Type> argTypes,
+                                    List<? extends Type> excTypes, List<TypeVariable> typeParams) {
         super(ts, pos, container, flags, argTypes, excTypes);
         this.typeParams = typeParams;
     }
 
+    @Override
     public boolean isVariableArity() {
         return JL5Flags.isVarArgs(this.flags());
     }
 
     @Override
-    public boolean callValidImpl(List argTypes) {
+    public boolean callValidImpl(List<? extends Type> argTypes) {
         List<Type> myFormalTypes = this.formalTypes;
 
         // System.err.println("JL5MethodInstance_c callValid Impl " + this +
@@ -39,13 +44,13 @@ public class JL5ConstructorInstance_c extends ConstructorInstance_c implements J
         }
 
         // Here, argTypes has at least myFormalTypes.size()-1 elements.
-        Iterator formalTypes = myFormalTypes.iterator();
-        Iterator actualTypes = argTypes.iterator();
+        Iterator<Type> formalTypes = myFormalTypes.iterator();
+        Iterator<? extends Type> actualTypes = argTypes.iterator();
         Type formal = null;
         while (actualTypes.hasNext()) {
-            Type actual = (Type) actualTypes.next();
+            Type actual = actualTypes.next();
             if (formalTypes.hasNext()) {
-                formal = (Type) formalTypes.next();
+                formal = formalTypes.next();
             }
             if (!formalTypes.hasNext() && this.isVariableArity()) {
                 // varible arity method, and this is the last arg.

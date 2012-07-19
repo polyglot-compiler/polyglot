@@ -3,7 +3,16 @@ package polyglot.ext.jl5.visit;
 import java.util.ArrayList;
 import java.util.List;
 
-import polyglot.ast.*;
+import polyglot.ast.ArrayInit;
+import polyglot.ast.ConstructorDecl;
+import polyglot.ast.Expr;
+import polyglot.ast.Formal;
+import polyglot.ast.MethodDecl;
+import polyglot.ast.NewArray;
+import polyglot.ast.Node;
+import polyglot.ast.NodeFactory;
+import polyglot.ast.ProcedureCall;
+import polyglot.ast.ProcedureDecl;
 import polyglot.ext.jl5.ast.JL5Formal;
 import polyglot.ext.jl5.types.JL5ProcedureInstance;
 import polyglot.frontend.Job;
@@ -62,7 +71,7 @@ public class RemoveVarargVisitor extends ErrorHandlingVisitor {
 			ArrayType varArgArrayType = (ArrayType) n.procedureInstance().formalTypes().get(numStandardFormals);
 			
 			if (numStandardFormals == numArgs-1) {
-				Type lastArgType = ((Expr)n.arguments().get(numStandardFormals)).type();
+				Type lastArgType = n.arguments().get(numStandardFormals).type();
 				if (lastArgType.isImplicitCastValid(varArgArrayType)) {
 					return n;
 				}

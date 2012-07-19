@@ -1,18 +1,37 @@
 package polyglot.ext.jl5.ast;
 
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 
-import polyglot.ast.*;
-import polyglot.ext.jl5.types.*;
-import polyglot.types.*;
+import polyglot.ast.ArrayInit;
+import polyglot.ast.Block;
+import polyglot.ast.CodeBlock;
+import polyglot.ast.Expr;
+import polyglot.ast.Formal;
+import polyglot.ast.Id;
+import polyglot.ast.MethodDecl;
+import polyglot.ast.Node;
+import polyglot.ast.Term;
+import polyglot.ast.Term_c;
+import polyglot.ast.TypeNode;
+import polyglot.ext.jl5.types.AnnotationElemInstance;
+import polyglot.ext.jl5.types.JL5TypeSystem;
+import polyglot.types.CodeInstance;
+import polyglot.types.Flags;
+import polyglot.types.MemberInstance;
+import polyglot.types.MethodInstance;
+import polyglot.types.ParsedClassType;
+import polyglot.types.ProcedureInstance;
+import polyglot.types.SemanticException;
 import polyglot.util.CodeWriter;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
-import polyglot.visit.*;
+import polyglot.visit.AmbiguityRemover;
+import polyglot.visit.CFGBuilder;
+import polyglot.visit.NodeVisitor;
+import polyglot.visit.PrettyPrinter;
+import polyglot.visit.TypeBuilder;
+import polyglot.visit.TypeChecker;
 
 public class AnnotationElemDecl_c extends Term_c implements AnnotationElemDecl {
 
@@ -30,6 +49,7 @@ public class AnnotationElemDecl_c extends Term_c implements AnnotationElemDecl {
         this.name = name;
     }
     
+    @Override
     public AnnotationElemDecl type(TypeNode type){
         if (!type.equals(this.type)){ 
             AnnotationElemDecl_c n = (AnnotationElemDecl_c) copy();
@@ -39,10 +59,12 @@ public class AnnotationElemDecl_c extends Term_c implements AnnotationElemDecl {
         return this;
     }
     
+    @Override
     public TypeNode type(){
         return type;
     }
     
+    @Override
     public AnnotationElemDecl flags(Flags flags){
         if (!flags.equals(this.flags)){
             AnnotationElemDecl_c n = (AnnotationElemDecl_c) copy();
@@ -52,10 +74,12 @@ public class AnnotationElemDecl_c extends Term_c implements AnnotationElemDecl {
         return this;
     }
     
+    @Override
     public Flags flags(){
         return flags;
     }
 
+    @Override
     public AnnotationElemDecl defaultVal(Expr def){
         if (!def.equals(this.defaultVal)){
             AnnotationElemDecl_c n = (AnnotationElemDecl_c) copy();
@@ -65,10 +89,12 @@ public class AnnotationElemDecl_c extends Term_c implements AnnotationElemDecl {
         return this;
     }
     
+    @Override
     public Expr defaultVal(){
         return defaultVal;
     }
 
+    @Override
     public AnnotationElemDecl name(String name){
         if (!name.equals(this.name())){
             AnnotationElemDecl_c n = (AnnotationElemDecl_c) copy();
@@ -78,16 +104,19 @@ public class AnnotationElemDecl_c extends Term_c implements AnnotationElemDecl {
         return this;
     }
     
+    @Override
     public String name(){
         return this.name.id();
     }
 
+    @Override
     public AnnotationElemDecl annotationElemInstance(AnnotationElemInstance ai){
         AnnotationElemDecl_c n = (AnnotationElemDecl_c) copy();
         n.ai = ai;
         return n;
     }
 
+    @Override
     public AnnotationElemInstance annotationElemInstance(){
         return ai;
     }
@@ -102,12 +131,14 @@ public class AnnotationElemDecl_c extends Term_c implements AnnotationElemDecl {
         return this;
     }
 
+    @Override
     public Node visitChildren(NodeVisitor v){
         TypeNode type = (TypeNode) visitChild( this.type, v);
         Expr defVal = (Expr)visitChild(this.defaultVal, v);
         return reconstruct(type, defVal);
     }
 
+    @Override
     public NodeVisitor buildTypesEnter(TypeBuilder tb) throws SemanticException {
         // this may not be neccessary - I think this is for scopes for
         // symbol checking? - in fields and meths there many anon inner 
@@ -116,6 +147,7 @@ public class AnnotationElemDecl_c extends Term_c implements AnnotationElemDecl {
         return tb.pushCode();
     }
 
+    @Override
     public Node buildTypes(TypeBuilder tb) throws SemanticException {
         JL5TypeSystem ts = (JL5TypeSystem)tb.typeSystem();
 
@@ -150,6 +182,7 @@ public class AnnotationElemDecl_c extends Term_c implements AnnotationElemDecl {
     }
 
     
+    @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
     
         JL5TypeSystem ts = (JL5TypeSystem)tc.typeSystem();
@@ -173,7 +206,6 @@ public class AnnotationElemDecl_c extends Term_c implements AnnotationElemDecl {
                 ((ArrayInit)defaultVal).typeCheckElements(type.type());
             }
             else {
-                boolean intConversion = false;
                 if (! ts.isImplicitCastValid(defaultVal.type(), type.type()) &&
                     ! ts.equals(defaultVal.type(), type.type()) &&
                     ! ts.numericConversionValid(type.type(), defaultVal.constantValue()) &&
@@ -197,6 +229,7 @@ public class AnnotationElemDecl_c extends Term_c implements AnnotationElemDecl {
     
 
     
+    @Override
     public <T> List<T> acceptCFG(CFGBuilder<?> v, List<T> succs){
         if (defaultVal != null) {
             v.visitCFG(defaultVal, this, EXIT);
@@ -204,6 +237,7 @@ public class AnnotationElemDecl_c extends Term_c implements AnnotationElemDecl {
         return succs;
     }
 
+    @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
         w.begin(0);
         
@@ -247,12 +281,12 @@ public class AnnotationElemDecl_c extends Term_c implements AnnotationElemDecl {
     }
 
     @Override
-    public List formals() {
+    public List<Formal> formals() {
         return Collections.emptyList();
     }
 
     @Override
-    public MethodDecl formals(List formals) {
+    public MethodDecl formals(List<Formal> formals) {
         if (!formals.isEmpty()) {
             throw new InternalCompilerError("Shouldn't have an Annotation Elem with formals");
         }
@@ -260,13 +294,13 @@ public class AnnotationElemDecl_c extends Term_c implements AnnotationElemDecl {
     }
 
     @Override
-    public List throwTypes() {
+    public List<TypeNode> throwTypes() {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public MethodDecl throwTypes(List throwTypes) {
+    public MethodDecl throwTypes(List<TypeNode> throwTypes) {
         if (!throwTypes.isEmpty()) {
             throw new InternalCompilerError("Shouldn't have an Annotation Elem with throw types");
         }

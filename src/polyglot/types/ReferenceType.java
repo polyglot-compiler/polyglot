@@ -77,7 +77,7 @@ public interface ReferenceType extends Type
      * @return A list of <code>MethodInstance</code>.
      * @see polyglot.types.MethodInstance
      */
-    List<MethodInstance> methodsNamed(String name);
+    List<? extends MethodInstance> methodsNamed(String name);
 
     /**
      * Return the methods named <code>name</code> with the given formal

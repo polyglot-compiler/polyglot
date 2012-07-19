@@ -1,6 +1,12 @@
 package polyglot.ext.jl5.ast;
 
-import polyglot.ast.*;
+import polyglot.ast.AmbExpr;
+import polyglot.ast.Case_c;
+import polyglot.ast.Expr;
+import polyglot.ast.Field;
+import polyglot.ast.Lit;
+import polyglot.ast.Node;
+import polyglot.ast.Receiver;
 import polyglot.ext.jl5.types.EnumInstance;
 import polyglot.ext.jl5.types.JL5TypeSystem;
 import polyglot.types.SemanticException;

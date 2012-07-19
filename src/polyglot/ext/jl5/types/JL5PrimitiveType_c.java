@@ -11,6 +11,7 @@ public class JL5PrimitiveType_c extends PrimitiveType_c implements JL5PrimitiveT
         super(ts, kind);
     }
     
+    @Override
     public boolean isImplicitCastValidImpl(Type toType) {
         if (super.isImplicitCastValidImpl(toType)) {
             return true;
@@ -25,6 +26,7 @@ public class JL5PrimitiveType_c extends PrimitiveType_c implements JL5PrimitiveT
         return false;
     }
 
+    @Override
     public boolean isCastValidImpl(Type toType){
         if (super.isCastValidImpl(toType)) {
             return true;

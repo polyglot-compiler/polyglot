@@ -7,7 +7,7 @@ import polyglot.util.Position;
 
 public class SingleElementAnnotationElem_c extends NormalAnnotationElem_c implements SingleElementAnnotationElem {
 
-    public SingleElementAnnotationElem_c(Position pos, TypeNode typeName, List elements){
+    public SingleElementAnnotationElem_c(Position pos, TypeNode typeName, List<ElementValuePair> elements){
         super(pos, typeName, elements);
     }
 

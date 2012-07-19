@@ -17,14 +17,17 @@ public class MarkerAnnotationElem_c extends NormalAnnotationElem_c implements Ma
         super(pos, typeName, new LinkedList<ElementValuePair>());
     }
 
+    @Override
     public Node visitChildren(NodeVisitor v){
         return super.visitChildren(v);
     }
 
+    @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
         return super.typeCheck(tc);
     }
     
+    @Override
     public void translate(CodeWriter w, Translator tr){
         super.translate(w, tr);
     }

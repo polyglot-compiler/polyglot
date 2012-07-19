@@ -551,7 +551,7 @@ override method_header ::=
         // but it might still turn out to be a field declaration).
         modifiers_or_annotations_opt:a type:b IDENTIFIER:d LPAREN
                 formal_parameter_list_opt:e RPAREN:f dims_opt:g throws_opt:h
-        {: RESULT = parser.nf.MethodDecl(parser.pos(b, f, d), a.flags(), a.annotations(), parser.array(b, g.intValue()), parser.nf.Id(parser.pos(d), d.getIdentifier()), e, h, null, new LinkedList<TypeNode>()); :}
+        {: RESULT = parser.nf.MethodDecl(parser.pos(b, f, d), a.flags(), a.annotations(), parser.array(b, g.intValue()), parser.nf.Id(parser.pos(d), d.getIdentifier()), e, h, null, new LinkedList<ParamTypeNode>()); :}
         |       
     modifiers_or_annotations_opt:a LT:b type_parameter_list_1:c type:d IDENTIFIER:i LPAREN
                 formal_parameter_list_opt:e RPAREN:f dims_opt:g throws_opt:h
@@ -559,7 +559,7 @@ override method_header ::=
         |       
     modifiers_or_annotations_opt:a VOID:b IDENTIFIER:c LPAREN
                 formal_parameter_list_opt:e RPAREN:f dims_opt:g throws_opt:h
-        {: RESULT = parser.nf.MethodDecl(parser.pos(b, f, c), a.flags(), a.annotations(), parser.nf.CanonicalTypeNode(parser.pos(b), parser.ts.Void()), parser.nf.Id(parser.pos(c), c.getIdentifier()), e, h, null, new LinkedList<TypeNode>()); :}
+        {: RESULT = parser.nf.MethodDecl(parser.pos(b, f, c), a.flags(), a.annotations(), parser.nf.CanonicalTypeNode(parser.pos(b), parser.ts.Void()), parser.nf.Id(parser.pos(c), c.getIdentifier()), e, h, null, new LinkedList<ParamTypeNode>()); :}
         |       
     modifiers_or_annotations_opt:a LT:b type_parameter_list_1:c VOID:d IDENTIFIER:i LPAREN
                 formal_parameter_list_opt:e RPAREN:f dims_opt:g throws_opt:h
@@ -608,7 +608,7 @@ override local_variable_declaration ::=
 // 19.8.5) Constructor Declarations
 override constructor_declaration ::=
         modifiers_or_annotations_opt:a  simple_name:d LPAREN formal_parameter_list_opt:e RPAREN  throws_opt:f constructor_body:g
-        {: RESULT = parser.nf.ConstructorDecl(d.pos, a.flags(), a.annotations(), d.name, e, f, g, new LinkedList<TypeNode>()); :}
+        {: RESULT = parser.nf.ConstructorDecl(d.pos, a.flags(), a.annotations(), d.name, e, f, g, new LinkedList<ParamTypeNode>()); :}
         |       
     modifiers_or_annotations_opt:a LT:b type_parameter_list_1:c simple_name:d LPAREN formal_parameter_list_opt:e RPAREN throws_opt:f constructor_body:g
         {: RESULT = parser.nf.ConstructorDecl(d.pos, a.flags(), a.annotations(), d.name, e, f, g, c); :} 

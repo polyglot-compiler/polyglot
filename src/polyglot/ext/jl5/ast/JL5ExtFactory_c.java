@@ -1,6 +1,7 @@
 package polyglot.ext.jl5.ast;
 
-import polyglot.ast.*;
+import polyglot.ast.AbstractExtFactory_c;
+import polyglot.ast.Ext;
 
 public class JL5ExtFactory_c extends AbstractExtFactory_c implements
 		JL5ExtFactory {

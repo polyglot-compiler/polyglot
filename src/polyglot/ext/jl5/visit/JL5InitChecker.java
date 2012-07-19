@@ -1,6 +1,10 @@
 package polyglot.ext.jl5.visit;
 
-import polyglot.ast.*;
+import polyglot.ast.ClassBody;
+import polyglot.ast.ClassDecl;
+import polyglot.ast.New;
+import polyglot.ast.Node;
+import polyglot.ast.NodeFactory;
 import polyglot.ext.jl5.ast.EnumConstantDecl;
 import polyglot.frontend.Job;
 import polyglot.types.ClassType;
@@ -16,6 +20,7 @@ public class JL5InitChecker extends InitChecker
         super(job, ts, nf);
     }
     
+    @Override
     protected NodeVisitor enterCall(Node parent, Node n) throws SemanticException {
         if (n instanceof ClassBody) {
             // we are starting to process a class declaration, but have yet

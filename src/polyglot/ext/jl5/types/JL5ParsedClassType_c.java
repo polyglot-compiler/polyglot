@@ -11,7 +11,7 @@ import polyglot.frontend.Source;
 import polyglot.types.ClassType;
 import polyglot.types.LazyClassInitializer;
 import polyglot.types.ParsedClassType_c;
-import polyglot.types.ProcedureInstance;
+import polyglot.types.ReferenceType;
 import polyglot.types.Resolver;
 import polyglot.types.Type;
 import polyglot.types.TypeSystem;
@@ -21,8 +21,8 @@ import polyglot.util.ListUtil;
 
 @SuppressWarnings("serial")
 public class JL5ParsedClassType_c extends ParsedClassType_c implements JL5ParsedClassType {
-    protected PClass pclass;
-    protected List<TypeVariable> typeVars = Collections.EMPTY_LIST;
+    protected PClass<TypeVariable, ReferenceType> pclass;
+    protected List<TypeVariable> typeVars = Collections.emptyList();
     protected List<EnumInstance> enumConstants;
     protected List<AnnotationElemInstance> annotationElems;
 
@@ -31,11 +31,13 @@ public class JL5ParsedClassType_c extends ParsedClassType_c implements JL5Parsed
         annotationElems = new LinkedList<AnnotationElemInstance>();
     }
         
+    @Override
     public void addEnumConstant(EnumInstance ei){
     	addField(ei);
         enumConstants().add(ei);
     }
 
+    @Override
     public List<EnumInstance> enumConstants(){
         if (enumConstants == null){
             enumConstants = new LinkedList<EnumInstance>();
@@ -43,6 +45,7 @@ public class JL5ParsedClassType_c extends ParsedClassType_c implements JL5Parsed
         return enumConstants;
     }
    
+    @Override
     public EnumInstance enumConstantNamed(String name){
         for (EnumInstance ei : enumConstants()) {
             if (ei.name().equals(name)){
@@ -76,11 +79,11 @@ public class JL5ParsedClassType_c extends ParsedClassType_c implements JL5Parsed
 
 
 	// find methods with compatible name and formals as the given one
-    public List methods(JL5MethodInstance mi) {
-        List l = new LinkedList();
+    @Override
+    public List<? extends JL5MethodInstance> methods(JL5MethodInstance mi) {
+        List<JL5MethodInstance> l = new LinkedList<JL5MethodInstance>();
 
-        for (Object o : methodsNamed(mi.name())) {
-        	ProcedureInstance pi = (ProcedureInstance) o;
+        for (JL5MethodInstance pi : methodsNamed(mi.name())) {
             if (pi.hasFormals(mi.formalTypes())) {
                 l.add(pi);
             }
@@ -88,6 +91,13 @@ public class JL5ParsedClassType_c extends ParsedClassType_c implements JL5Parsed
 	return l;
     }
     
+    @Override
+    public List<JL5MethodInstance> methodsNamed(String name) {
+        @SuppressWarnings("unchecked")
+        List<JL5MethodInstance> result = (List<JL5MethodInstance>) super.methodsNamed(name);
+        return result;
+    }
+
     @Override
     public ClassType outer() {
         if (this.isMember() && !this.isInnerClass()) {
@@ -150,19 +160,19 @@ public class JL5ParsedClassType_c extends ParsedClassType_c implements JL5Parsed
 	// /////////////////////////////////////
 	// 
     @Override
-    public PClass pclass() {
+    public PClass<TypeVariable, ReferenceType> pclass() {
         return pclass;
     }
 
     @Override
-    public void setPClass(PClass pc) {
+    public void setPClass(PClass<TypeVariable, ReferenceType> pc) {
         this.pclass = pc;
     }
 
     @Override
     public void setTypeVariables(List<TypeVariable> typeVars) {
         if (typeVars == null) {
-            this.typeVars = Collections.EMPTY_LIST;
+            this.typeVars = Collections.emptyList();
         }
         else {
             this.typeVars = ListUtil.copy(typeVars, true);
@@ -181,6 +191,7 @@ public class JL5ParsedClassType_c extends ParsedClassType_c implements JL5Parsed
 
 
     /** Pretty-print the name of this class to w. */
+    @Override
     public void print(CodeWriter w) {
         // XXX This code duplicates the logic of toString.
         this.printNoParams(w);

@@ -1,17 +1,14 @@
 package polyglot.ext.jl5.types;
 
-import java.util.*;
+import java.util.List;
+import java.util.Map;
 
-import polyglot.ext.param.types.ParamTypeSystem;
-import polyglot.ext.param.types.Subst_c;
-import polyglot.ext.param.types.Subst_c.TypeXform;
 import polyglot.types.ClassType;
 import polyglot.types.ConstructorInstance;
 import polyglot.types.MethodInstance;
 import polyglot.types.ReferenceType;
 import polyglot.types.Type;
 import polyglot.util.CachingTransformingList;
-import polyglot.util.InternalCompilerError;
 import polyglot.util.Transformation;
 
 /**
@@ -21,7 +18,7 @@ import polyglot.util.Transformation;
  */
 public class JL5RawSubst_c extends JL5Subst_c implements JL5Subst {
     private final JL5ParsedClassType base;
-    public JL5RawSubst_c(JL5TypeSystem ts, Map subst, JL5ParsedClassType base) {
+    public JL5RawSubst_c(JL5TypeSystem ts, Map<TypeVariable, ReferenceType> subst, JL5ParsedClassType base) {
         super(ts, subst);
         this.base = base;
     }
@@ -63,7 +60,7 @@ public class JL5RawSubst_c extends JL5Subst_c implements JL5Subst {
     }
 
     @Override
-    public MethodInstance substMethod(MethodInstance mi) {
+    public <T extends MethodInstance> T substMethod(T mi) {
         JL5TypeSystem ts = (JL5TypeSystem)this.ts;
         if (!base.equals(mi.container())) {
             return super.substMethod(mi);
@@ -73,7 +70,9 @@ public class JL5RawSubst_c extends JL5Subst_c implements JL5Subst {
         if (mi.flags().isStatic()) {
             // static method!
             // JLS 3rd ed 4.8: "The type of a static member of a raw type C is the same as its type in the generic declaration corresponding to C."
-            return (MethodInstance)mi.declaration();
+            @SuppressWarnings("unchecked")
+            T result = (T) mi.declaration();
+            return result;
         }
         // The type of a constructor (�8.8), instance method (�8.8, �9.4), or non-static field (�8.3) M 
         // of a raw type C that is not inherited from its superclasses or super- interfaces is the erasure of 
@@ -83,10 +82,10 @@ public class JL5RawSubst_c extends JL5Subst_c implements JL5Subst {
         
         Type rt = ts.erasureType(mj.returnType());
 
-        List formalTypes = mj.formalTypes();
+        List<? extends Type> formalTypes = mj.formalTypes();
         formalTypes = eraseTypeList(formalTypes);
 
-        List throwTypes = mj.throwTypes();
+        List<? extends Type> throwTypes = mj.throwTypes();
         throwTypes = eraseTypeList(throwTypes);
 
 
@@ -102,14 +101,16 @@ public class JL5RawSubst_c extends JL5Subst_c implements JL5Subst {
         // now erase the type params, if there are any
         JL5Subst eraseMI = ts.erasureSubst(tmpMi);
         if (eraseMI != null) {
-            tmpMi = (JL5MethodInstance)eraseMI.substMethod(tmpMi);
+            tmpMi = eraseMI.substMethod(tmpMi);
         }
 
-        return tmpMi;
+        @SuppressWarnings("unchecked")
+        T result = (T) tmpMi;
+        return result;
     }
 
     @Override
-    public ConstructorInstance substConstructor(ConstructorInstance ci) {
+    public <T extends ConstructorInstance> T substConstructor(T ci) {
         JL5TypeSystem ts = (JL5TypeSystem)this.ts;
         if (!base.equals(ci.container())) {
             return super.substConstructor(ci);
@@ -123,10 +124,10 @@ public class JL5RawSubst_c extends JL5Subst_c implements JL5Subst {
         
         JL5ConstructorInstance cj = (JL5ConstructorInstance)ci.declaration();
         
-        List formalTypes = cj.formalTypes();
+        List<? extends Type> formalTypes = cj.formalTypes();
         formalTypes = eraseTypeList(formalTypes);
 
-        List throwTypes = cj.throwTypes();
+        List<? extends Type> throwTypes = cj.throwTypes();
         throwTypes = eraseTypeList(throwTypes);
 
 
@@ -141,23 +142,23 @@ public class JL5RawSubst_c extends JL5Subst_c implements JL5Subst {
         // now erase the type params, if there are any
         JL5Subst eraseCI = ts.erasureSubst(tmpCi);
         if (eraseCI != null) {
-            tmpCi = (JL5ConstructorInstance)eraseCI.substConstructor(tmpCi);
+            tmpCi = eraseCI.substConstructor(tmpCi);
         }
-        return tmpCi;
+        
+        @SuppressWarnings("unchecked")
+        T result = (T) tmpCi;
+        return result;
     }
 
-    public List<Type> eraseTypeList(List<Type> list) {
-        return new CachingTransformingList(list, new TypeErase());
+    public List<Type> eraseTypeList(List<? extends Type> list) {
+        return new CachingTransformingList<Type,Type>(list, new TypeErase());
     }
     
     /** Function object for transforming types. */
-    private class TypeErase implements Transformation {
-        public Object transform(Object o) {
-            if (! (o instanceof Type)) {
-                throw new InternalCompilerError(o + " is not a type.");
-            }
-
-            return ((JL5TypeSystem)ts).erasureType((Type) o);
+    private class TypeErase implements Transformation<Type, Type> {
+        @Override
+        public Type transform(Type o) {
+            return ((JL5TypeSystem)ts).erasureType(o);
         }
     }
 

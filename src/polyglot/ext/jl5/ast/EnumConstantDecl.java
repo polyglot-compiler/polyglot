@@ -4,6 +4,7 @@ import java.util.List;
 
 import polyglot.ast.ClassBody;
 import polyglot.ast.ClassMember;
+import polyglot.ast.Expr;
 import polyglot.ast.Id;
 import polyglot.ext.jl5.types.EnumInstance;
 import polyglot.types.ConstructorInstance;
@@ -18,10 +19,10 @@ import polyglot.types.ParsedClassType;
 public interface EnumConstantDecl extends ClassMember
 {    
     /** get args */
-    List args();
+    List<Expr> args();
 
     /** set args */
-    EnumConstantDecl args(List args);
+    EnumConstantDecl args(List<Expr> args);
 
     /** set name */
     EnumConstantDecl name(Id name);
@@ -50,5 +51,5 @@ public interface EnumConstantDecl extends ClassMember
 	long ordinal();
 	EnumConstantDecl ordinal(long ordinal);
 
-	List annotations();
+	List<AnnotationElem> annotations();
 }

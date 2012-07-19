@@ -2,13 +2,39 @@ package polyglot.ext.jl5.visit;
 
 import java.util.List;
 
-import polyglot.ast.*;
+import polyglot.ast.ArrayInit;
+import polyglot.ast.Assign;
+import polyglot.ast.Binary;
+import polyglot.ast.Call;
+import polyglot.ast.Cast;
+import polyglot.ast.Conditional;
+import polyglot.ast.Eval;
+import polyglot.ast.Expr;
+import polyglot.ast.Field;
+import polyglot.ast.Lit;
+import polyglot.ast.New;
+import polyglot.ast.Node;
+import polyglot.ast.NodeFactory;
+import polyglot.ast.Special;
+import polyglot.ast.StringLit;
+import polyglot.ast.Throw;
+import polyglot.ast.TypeNode;
 import polyglot.ext.jl5.JL5Options;
 import polyglot.ext.jl5.ast.AnnotationElem;
-import polyglot.ext.jl5.types.*;
-import polyglot.ext.param.types.SubstType;
+import polyglot.ext.jl5.types.JL5ParsedClassType;
+import polyglot.ext.jl5.types.JL5SubstClassType;
+import polyglot.ext.jl5.types.JL5TypeSystem;
+import polyglot.ext.jl5.types.RawClass;
+import polyglot.ext.jl5.types.TypeVariable;
 import polyglot.frontend.Job;
-import polyglot.types.*;
+import polyglot.types.ArrayType;
+import polyglot.types.ClassType;
+import polyglot.types.FieldInstance;
+import polyglot.types.MethodInstance;
+import polyglot.types.ReferenceType;
+import polyglot.types.SemanticException;
+import polyglot.types.Type;
+import polyglot.types.TypeSystem;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
 import polyglot.visit.AscriptionVisitor;
@@ -117,7 +143,7 @@ public class TVCaster extends AscriptionVisitor {
         else
         	pct = getBase(container);
 
-        List<MethodInstance> meths = pct.methodsNamed(mi.name());
+        List<? extends MethodInstance> meths = pct.methodsNamed(mi.name());
         
         for (MethodInstance bmi : meths) {
             if (bmi.formalTypes().size() == mi.formalTypes().size()) {

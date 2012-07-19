@@ -21,6 +21,8 @@ import polyglot.types.Flags;
 import polyglot.types.MemberInstance;
 import polyglot.types.ParsedClassType;
 import polyglot.types.SemanticException;
+import polyglot.types.Type;
+import polyglot.types.UnknownType;
 import polyglot.util.CodeWriter;
 import polyglot.util.CollectionUtil;
 import polyglot.util.ListUtil;
@@ -38,7 +40,7 @@ import polyglot.visit.TypeChecker;
 
 public class EnumConstantDecl_c extends Term_c implements EnumConstantDecl
 {   
-    protected List args;
+    protected List<Expr> args;
     protected Id name;
     protected Flags flags;
     protected ClassBody body;
@@ -46,10 +48,10 @@ public class EnumConstantDecl_c extends Term_c implements EnumConstantDecl
     protected ConstructorInstance constructorInstance;
     protected ParsedClassType type;
     protected long ordinal;
-    protected List annotations;
+    protected List<AnnotationElem> annotations;
 
     
-    public EnumConstantDecl_c(Position pos, Flags flags, List annotations, Id name, List args, ClassBody body){
+    public EnumConstantDecl_c(Position pos, Flags flags, List<AnnotationElem> annotations, Id name, List<Expr> args, ClassBody body){
         super(pos);
         this.name = name;
         this.args = args;
@@ -62,42 +64,45 @@ public class EnumConstantDecl_c extends Term_c implements EnumConstantDecl
 		return ordinal;
 	}
     
-	public EnumConstantDecl ordinal(long ordinal) {
+	@Override
+    public EnumConstantDecl ordinal(long ordinal) {
         EnumConstantDecl_c n = (EnumConstantDecl_c)copy();
         n.ordinal = ordinal;
         return n;
 	}
 	
     @Override
-    public List annotations() {
+    public List<AnnotationElem> annotations() {
         return this.annotations;
     }
 
-    public EnumConstantDecl annotations(List annotations) {
+    public EnumConstantDecl annotations(List<AnnotationElem> annotations) {
     	EnumConstantDecl_c n = (EnumConstantDecl_c) copy();
         n.annotations = annotations;
         return n;
     }
 
+    @Override
     public MemberInstance memberInstance() {
         return enumInstance;
     }
     
     /** get args */
     @Override
-	public List args(){
+	public List<Expr> args(){
         return args;
     }
 
     /** set args */
     @Override
-	public EnumConstantDecl args(List args){
+	public EnumConstantDecl args(List<Expr> args){
         EnumConstantDecl_c n = (EnumConstantDecl_c)copy();
         n.args = args;
         return n;
     }
 
     /** set name */
+    @Override
     public EnumConstantDecl name(Id name){
         EnumConstantDecl_c n = (EnumConstantDecl_c)copy();
         n.name = name;
@@ -165,10 +170,10 @@ public class EnumConstantDecl_c extends Term_c implements EnumConstantDecl
         return constructorInstance;
     }
     
-    protected EnumConstantDecl_c reconstruct(List args, ClassBody body){
+    protected EnumConstantDecl_c reconstruct(List<Expr> args, ClassBody body){
         if (!CollectionUtil.equals(args, this.args) || body != this.body) {
             EnumConstantDecl_c n = (EnumConstantDecl_c) copy();
-            n.args = ListUtil.copy(args, true);
+            n.args = ListUtil.<Expr> copy(args, true);
             n.body = body;
             return n;
         }
@@ -177,11 +182,12 @@ public class EnumConstantDecl_c extends Term_c implements EnumConstantDecl
 
     @Override
 	public Node visitChildren(NodeVisitor v){
-        List args = visitList(this.args, v);
+        List<Expr> args = visitList(this.args, v);
         ClassBody body = (ClassBody) visitChild(this.body, v);
         return reconstruct(args, body);
     }
 
+    @Override
     public Context enterChildScope(Node child, Context c) {
         if (child == body && type != null && body != null){
             c = c.pushClass(type, type);
@@ -201,13 +207,13 @@ public class EnumConstantDecl_c extends Term_c implements EnumConstantDecl
 	public Node buildTypes(TypeBuilder tb) throws SemanticException {
         JL5TypeSystem ts = (JL5TypeSystem)tb.typeSystem();
         
-        List l = new ArrayList(args().size());
+        List<UnknownType> l = new ArrayList<UnknownType>(args().size());
         for (int i = 0; i < args().size(); i++){
             l.add(ts.unknownType(position()));
         }
 
 		ConstructorInstance ci = ts.constructorInstance(position(),
-				ts.Object(), Flags.NONE, l, Collections.EMPTY_LIST);
+				ts.Object(), Flags.NONE, l, Collections.<Type> emptyList());
 
         EnumConstantDecl n = constructorInstance(ci);
         JL5ParsedClassType enumType = null;
@@ -264,12 +270,10 @@ public class EnumConstantDecl_c extends Term_c implements EnumConstantDecl
         BodyDisambiguator childbd = (BodyDisambiguator) childv;
 
         // Now disambiguate the actuals.
-        nn = (EnumConstantDecl) nn.args(nn.visitList(nn.args(), childbd));
+        nn = nn.args(nn.visitList(nn.args(), childbd));
         if (childbd.hasErrors()) throw new SemanticException();
         
         if (nn.body() != null) {
-            ParsedClassType anonType = nn.type();
-            
             SupertypeDisambiguator supDisamb = new SupertypeDisambiguator(childbd);
             nn = nn.body((ClassBody) nn.visitChild(nn.body(), supDisamb));
             if (supDisamb.hasErrors()) throw new SemanticException();
@@ -293,9 +297,8 @@ public class EnumConstantDecl_c extends Term_c implements EnumConstantDecl
         Context c = tc.context();
         JL5ParsedClassType ct = (JL5ParsedClassType) c.currentClass();
 
-        List argTypes = new LinkedList();
-        for (Iterator it = this.args.iterator(); it.hasNext();){
-            Expr e = (Expr) it.next();
+        List<Type> argTypes = new LinkedList<Type>();
+        for (Expr e : this.args) {
             argTypes.add(e.type());
         }
         
@@ -324,9 +327,9 @@ public class EnumConstantDecl_c extends Term_c implements EnumConstantDecl
         w.write(name.id());
         if (args != null && !args.isEmpty()){
             w.write(" ( ");
-            Iterator it = args.iterator();
+            Iterator<Expr> it = args.iterator();
             while (it.hasNext()){
-                Expr e = (Expr) it.next();
+                Expr e = it.next();
                 print(e, w, tr);
                 if (it.hasNext()){
                     w.write(", ");

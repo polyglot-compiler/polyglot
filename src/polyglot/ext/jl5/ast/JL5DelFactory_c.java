@@ -1,7 +1,6 @@
 package polyglot.ext.jl5.ast;
 
 import polyglot.ast.AbstractDelFactory_c;
-import polyglot.ast.DelFactory;
 import polyglot.ast.JL;
 
 public class JL5DelFactory_c extends AbstractDelFactory_c implements JL5DelFactory {

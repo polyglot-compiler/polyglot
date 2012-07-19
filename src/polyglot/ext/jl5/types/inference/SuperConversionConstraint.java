@@ -3,7 +3,6 @@ package polyglot.ext.jl5.types.inference;
 import java.util.ArrayList;
 import java.util.List;
 
-import polyglot.ext.jl5.types.JL5ParsedClassType;
 import polyglot.ext.jl5.types.JL5SubstClassType;
 import polyglot.ext.jl5.types.TypeVariable;
 import polyglot.ext.jl5.types.WildCardType;
@@ -57,7 +56,7 @@ public class SuperConversionConstraint extends Constraint {
                 }
             }
             else {
-                for (TypeVariable tv :  ((JL5ParsedClassType)formal_pt.base()).typeVariables()) {
+                for (TypeVariable tv :  formal_pt.base().typeVariables()) {
                     ReferenceType formal_targ = (ReferenceType) formal_pt.subst().substType(tv);
                     ReferenceType actual_targ = (ReferenceType) actual_pt.subst().substType(tv);
                     if (!(formal_targ instanceof WildCardType)) {
@@ -96,6 +95,7 @@ public class SuperConversionConstraint extends Constraint {
         return true;
     }
 
+    @Override
     public String toString() {
         return actual + " >> " + formal;
     }

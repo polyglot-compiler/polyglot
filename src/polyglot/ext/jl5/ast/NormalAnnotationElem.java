@@ -4,6 +4,6 @@ import java.util.List;
 
 public interface NormalAnnotationElem extends AnnotationElem {
 
-    List elements();
-    NormalAnnotationElem elements(List elements);
+    List<ElementValuePair> elements();
+    NormalAnnotationElem elements(List<ElementValuePair> elements);
 }

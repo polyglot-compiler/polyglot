@@ -14,7 +14,12 @@ import java.util.List;
 import polyglot.ext.param.types.PClass;
 import polyglot.ext.param.types.SubstClassType_c;
 import polyglot.main.Options;
-import polyglot.types.*;
+import polyglot.types.ClassType;
+import polyglot.types.Named;
+import polyglot.types.ReferenceType;
+import polyglot.types.Resolver;
+import polyglot.types.SemanticException;
+import polyglot.types.Type;
 import polyglot.util.CodeWriter;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
@@ -31,13 +36,13 @@ public class JL5SubstClassType_c extends SubstClassType_c<TypeVariable, Referenc
     // Implement methods of JL5SubstType
 
     @Override
-    public PClass instantiatedFrom() {
+    public PClass<TypeVariable, ReferenceType> instantiatedFrom() {
         return base().pclass();
     }
 
     @Override
-    public List actuals() {
-        PClass pc = instantiatedFrom();
+    public List<ReferenceType> actuals() {
+        PClass<TypeVariable, ReferenceType> pc = instantiatedFrom();
         JL5Subst subst = (JL5Subst) this.subst;
 
         return subst.substTypeList(pc.formals());

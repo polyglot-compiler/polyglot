@@ -1,12 +1,18 @@
 package polyglot.ext.jl5.types;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import polyglot.frontend.Job;
-import polyglot.types.*;
+import polyglot.types.ClassType;
+import polyglot.types.ConstructorInstance;
+import polyglot.types.FieldInstance;
+import polyglot.types.Flags;
+import polyglot.types.MethodInstance;
 import polyglot.types.Package;
+import polyglot.types.ReferenceType;
+import polyglot.types.Resolver;
+import polyglot.types.Type;
+import polyglot.types.TypeObject;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
 
@@ -31,18 +37,19 @@ public class RawClass_c extends JL5ClassType_c implements RawClass {
         return this.base;
     }
 
+    @Override
     public JL5SubstClassType erased() {
         if (this.erased == null) {            
             JL5TypeSystem ts = (JL5TypeSystem)this.ts;
             JL5Subst es = ts.erasureSubst(this.base);
-            this.erased = new JL5SubstClassType_c((JL5TypeSystem) ts, base.position(),
-                                    (JL5ParsedClassType) base, es);
+            this.erased = new JL5SubstClassType_c(ts, base.position(),
+                                    base, es);
         }
         return this.erased;
     }
 
     @Override
-    public List enumConstants() {
+    public List<EnumInstance> enumConstants() {
         return this.erased().enumConstants();
     }
 
@@ -84,7 +91,7 @@ public class RawClass_c extends JL5ClassType_c implements RawClass {
 
     private transient List<? extends ConstructorInstance> constructors = null;
     @Override
-    public List constructors() {
+    public List<? extends ConstructorInstance> constructors() {
         if (constructors == null) {
             this.constructors = this.erased().constructors();
         }
@@ -93,7 +100,7 @@ public class RawClass_c extends JL5ClassType_c implements RawClass {
 
     private transient List<? extends ClassType> memberClasses = null;
     @Override
-    public List memberClasses() {
+    public List<? extends ClassType> memberClasses() {
         if (memberClasses == null) {
             this.memberClasses = this.erased().memberClasses();
         }

@@ -1,11 +1,25 @@
 package polyglot.ext.jl5.ast;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import polyglot.ast.*;
-import polyglot.ext.jl5.types.*;
-import polyglot.types.*;
+import polyglot.ast.Disamb_c;
+import polyglot.ast.Expr;
+import polyglot.ast.Node;
+import polyglot.ast.Receiver;
+import polyglot.ast.TypeNode;
+import polyglot.ext.jl5.types.JL5Context;
+import polyglot.ext.jl5.types.JL5NoMemberException;
+import polyglot.ext.jl5.types.JL5SubstClassType;
+import polyglot.ext.jl5.types.JL5TypeSystem;
+import polyglot.ext.jl5.types.TypeVariable;
+import polyglot.types.ClassType;
+import polyglot.types.FieldInstance;
+import polyglot.types.LocalInstance;
+import polyglot.types.Named;
+import polyglot.types.NoClassException;
+import polyglot.types.NoMemberException;
+import polyglot.types.Resolver;
+import polyglot.types.SemanticException;
+import polyglot.types.Type;
+import polyglot.types.VarInstance;
 import polyglot.util.InternalCompilerError;
 
 public class JL5Disamb_c extends Disamb_c {

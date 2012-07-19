@@ -1,10 +1,22 @@
 package polyglot.ext.jl5.types;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
 import polyglot.ext.param.types.Subst;
 import polyglot.main.Report;
-import polyglot.types.*;
+import polyglot.types.ArrayType;
+import polyglot.types.Flags;
+import polyglot.types.MethodInstance;
+import polyglot.types.MethodInstance_c;
+import polyglot.types.ProcedureInstance;
+import polyglot.types.ReferenceType;
+import polyglot.types.SemanticException;
+import polyglot.types.Type;
 import polyglot.util.Position;
 
 @SuppressWarnings("serial")
@@ -14,24 +26,25 @@ public class JL5MethodInstance_c extends MethodInstance_c implements JL5MethodIn
 
     public JL5MethodInstance_c(JL5TypeSystem ts, Position pos,
                                ReferenceType container, Flags flags, Type returnType,
-                               String name, List argTypes, List excTypes, List typeParams) {
+                               String name, List<? extends Type> argTypes, List<? extends Type> excTypes, List<TypeVariable> typeParams) {
         super(ts, pos, container, flags, returnType, name, argTypes, excTypes);
         this.typeParams = typeParams;
     }
 
+    @Override
     public boolean isVariableArity() {
         return JL5Flags.isVarArgs(this.flags());
     }
 
     @Override
-    public List overridesImpl() {
-        List l = new LinkedList();
+    public List<MethodInstance> overridesImpl() {
+        List<MethodInstance> l = new LinkedList<MethodInstance>();
         ReferenceType rt = container();
         JL5TypeSystem ts = (JL5TypeSystem)this.typeSystem();
         while (rt != null) {
             // add any method with the same name and formalTypes from 
             // rt
-            for (MethodInstance mj : (List<MethodInstance>)rt.methodsNamed(name)) {
+            for (MethodInstance mj : rt.methodsNamed(name)) {
                 if (ts.areOverrideEquivalent(this, (JL5MethodInstance)mj)) {
                     l.add(mj);
                 }
@@ -48,6 +61,7 @@ public class JL5MethodInstance_c extends MethodInstance_c implements JL5MethodIn
         return l;
     }
 
+    @Override
     public boolean canOverrideImpl(MethodInstance mj_, boolean quiet)
     throws SemanticException {
         JL5MethodInstance mi = this;
@@ -57,7 +71,7 @@ public class JL5MethodInstance_c extends MethodInstance_c implements JL5MethodIn
         JL5MethodInstance mj = (JL5MethodInstance)mj_;
         
         JL5TypeSystem ts = (JL5TypeSystem)this.typeSystem();
-        if (!(ts.areOverrideEquivalent(mi, (JL5MethodInstance)mj))) {
+        if (!(ts.areOverrideEquivalent(mi, mj))) {
             if (quiet) return false;
             throw new SemanticException(mi.signature() + " in " + mi.container() +
                                         " cannot override " + 
@@ -154,7 +168,7 @@ public class JL5MethodInstance_c extends MethodInstance_c implements JL5MethodIn
     }
 
     @Override
-    public boolean callValidImpl(List argTypes) {
+    public boolean callValidImpl(List<? extends Type> argTypes) {
         List<Type> myFormalTypes = this.formalTypes;
 
         //         System.err.println("JL5MethodInstance_c callValid Impl " + this +" called with " +argTypes);
@@ -170,13 +184,13 @@ public class JL5MethodInstance_c extends MethodInstance_c implements JL5MethodIn
         }
 
         // Here, argTypes has at least myFormalTypes.size()-1 elements.
-        Iterator formalTypes = myFormalTypes.iterator();
-        Iterator actualTypes = argTypes.iterator();
+        Iterator<Type> formalTypes = myFormalTypes.iterator();
+        Iterator<? extends Type> actualTypes = argTypes.iterator();
         Type formal = null;
         while (actualTypes.hasNext()) {
-            Type actual = (Type) actualTypes.next();
+            Type actual = actualTypes.next();
             if (formalTypes.hasNext()) {
-                formal = (Type) formalTypes.next();
+                formal = formalTypes.next();
             }
             if (!formalTypes.hasNext() && this.isVariableArity()) {
                 // varible arity method, and this is the last arg.
@@ -273,7 +287,7 @@ public class JL5MethodInstance_c extends MethodInstance_c implements JL5MethodIn
 
         if (! throwTypes.isEmpty()) {
             sb.append(" throws ");
-            for (Iterator i = throwTypes.iterator(); i.hasNext(); ) {
+            for (Iterator<Type> i = throwTypes.iterator(); i.hasNext(); ) {
                 Object o = i.next();
                 sb.append(o.toString());
 

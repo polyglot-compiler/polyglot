@@ -1,11 +1,17 @@
 package polyglot.ext.jl5.ast;
 
 import java.util.LinkedHashSet;
-import java.util.List;
 import java.util.Set;
 
 import polyglot.ast.Node;
-import polyglot.ext.jl5.types.*;
+import polyglot.ext.jl5.types.IntersectionType;
+import polyglot.ext.jl5.types.JL5Context;
+import polyglot.ext.jl5.types.JL5ParsedClassType;
+import polyglot.ext.jl5.types.JL5SubstClassType;
+import polyglot.ext.jl5.types.JL5TypeSystem;
+import polyglot.ext.jl5.types.RawClass;
+import polyglot.ext.jl5.types.TypeVariable;
+import polyglot.ext.jl5.types.WildCardType;
 import polyglot.types.ArrayType;
 import polyglot.types.ClassType;
 import polyglot.types.ReferenceType;
@@ -44,6 +50,7 @@ public class JL5CanonicalTypeNode_c extends polyglot.ast.CanonicalTypeNode_c {
         return type;
     }
 
+    @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
         Type t = this.type();
         if (t instanceof JL5SubstClassType) {
@@ -72,7 +79,7 @@ public class JL5CanonicalTypeNode_c extends polyglot.ast.CanonicalTypeNode_c {
 
                 for (int i = 0; i < capCT.actuals().size(); i++) {
                     TypeVariable ai = capCT.base().typeVariables().get(i);                
-                    Type xi = (Type) capCT.actuals().get(i);
+                    Type xi = capCT.actuals().get(i);
 
 
                     //require that arguments obey their bounds

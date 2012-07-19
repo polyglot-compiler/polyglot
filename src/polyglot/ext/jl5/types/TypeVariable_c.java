@@ -1,10 +1,19 @@
 package polyglot.ext.jl5.types;
 
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 
-import polyglot.types.*;
+import polyglot.types.ClassType;
+import polyglot.types.ConstructorInstance;
+import polyglot.types.FieldInstance;
+import polyglot.types.Flags;
+import polyglot.types.MethodInstance;
+import polyglot.types.ReferenceType;
+import polyglot.types.ReferenceType_c;
+import polyglot.types.Resolver;
+import polyglot.types.Type;
+import polyglot.types.TypeObject;
+import polyglot.types.TypeSystem;
 import polyglot.util.Position;
 
 @SuppressWarnings("serial")
@@ -53,18 +62,21 @@ public class TypeVariable_c extends ReferenceType_c implements TypeVariable {
     //        throw new InternalCompilerError("No job for a type variable");
     //    }
     //    
+    @Override
     public void declaringProcedure(JL5ProcedureInstance pi) {
         declaredIn = TVarDecl.PROCEDURE_TYPE_VARIABLE;
         declaringProcedure = pi;
         declaringClass = null;
     }
 
+    @Override
     public void declaringClass(ClassType ct) {
         declaredIn = TVarDecl.CLASS_TYPE_VARIABLE;
         declaringProcedure = null;
         declaringClass = ct;
     }
 
+    @Override
     public TVarDecl declaredIn() {
         if (declaredIn == null) {
             declaredIn = TVarDecl.SYNTHETIC_TYPE_VARIABLE;
@@ -73,11 +85,13 @@ public class TypeVariable_c extends ReferenceType_c implements TypeVariable {
     }
 
 
+    @Override
     public ClassType declaringClass() {
         if (declaredIn.equals(TVarDecl.CLASS_TYPE_VARIABLE)) return declaringClass;
         return null;
     }
 
+    @Override
     public JL5ProcedureInstance declaringProcedure() {
         if (declaredIn.equals(TVarDecl.PROCEDURE_TYPE_VARIABLE)) return declaringProcedure;
         return null;
@@ -87,14 +101,17 @@ public class TypeVariable_c extends ReferenceType_c implements TypeVariable {
     //        return null;
     //    }
     //
+    @Override
     public String name() {
         return name;
     }
 
+    @Override
     public void name(String name) {
         this.name = name;
     }
 
+    @Override
     public boolean isCanonical() {
         return true; 
     }
@@ -108,25 +125,27 @@ public class TypeVariable_c extends ReferenceType_c implements TypeVariable {
         }
         return null;
     }
-    public List constructors() {
+    public List<? extends ConstructorInstance> constructors() {
         return Collections.emptyList();
     }
 
-    public List memberClasses() {
-        return Collections.EMPTY_LIST;
+    public List<? extends ClassType> memberClasses() {
+        return Collections.emptyList();
         //return getSyntheticClass().memberClasses();
     }
 
-    public List methods() {
-        return Collections.EMPTY_LIST;
+    @Override
+    public List<? extends MethodInstance> methods() {
+        return Collections.emptyList();
     }
 
-    public List fields() {
-        return Collections.EMPTY_LIST;
+    @Override
+    public List<? extends FieldInstance> fields() {
+        return Collections.emptyList();
     }
+    @Override
     public FieldInstance fieldNamed(String name) {
-        for (Iterator i = fields().iterator(); i.hasNext(); ) {
-            FieldInstance fi = (FieldInstance) i.next();
+        for (FieldInstance fi : fields()) {
             if (fi.name().equals(name)) {
                 return fi;
             }
@@ -134,9 +153,11 @@ public class TypeVariable_c extends ReferenceType_c implements TypeVariable {
         return null;
     }
 
-    public List interfaces() {
-        return Collections.EMPTY_LIST;
+    @Override
+    public List<? extends ReferenceType> interfaces() {
+        return Collections.emptyList();
     }
+    @Override
     public ReferenceType erasureType() {
         return (ReferenceType) ((JL5TypeSystem)this.typeSystem()).erasureType(this);
     }
@@ -156,6 +177,7 @@ public class TypeVariable_c extends ReferenceType_c implements TypeVariable {
         return this.name();
     }
         
+    @Override
     public boolean isCastValidImpl(Type toType) {
         if (super.isCastValidImpl(toType)) {
             return true;

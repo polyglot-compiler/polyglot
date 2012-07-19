@@ -3,9 +3,15 @@ package polyglot.ext.jl5.types;
 import java.util.Collections;
 import java.util.List;
 
-import polyglot.types.*;
+import polyglot.types.FieldInstance;
+import polyglot.types.MemberInstance;
+import polyglot.types.MethodInstance;
+import polyglot.types.ReferenceType;
+import polyglot.types.Type;
+import polyglot.types.TypeSystem;
+import polyglot.types.UnknownType_c;
 
-public class UnknownReferenceType_c extends UnknownType_c implements UnknownType, ReferenceType {
+public class UnknownReferenceType_c extends UnknownType_c implements UnknownReferenceType {
 
     public UnknownReferenceType_c(TypeSystem ts) {
         super(ts);
@@ -17,23 +23,23 @@ public class UnknownReferenceType_c extends UnknownType_c implements UnknownType
     }
 
     @Override
-    public List interfaces() {
-        return Collections.EMPTY_LIST;
+    public List<? extends ReferenceType> interfaces() {
+        return Collections.emptyList();
     }
 
     @Override
-    public List members() {
-        return Collections.EMPTY_LIST;
+    public List<? extends MemberInstance> members() {
+        return Collections.emptyList();
     }
 
     @Override
-    public List fields() {
-        return Collections.EMPTY_LIST;
+    public List<? extends FieldInstance> fields() {
+        return Collections.emptyList();
     }
 
     @Override
-    public List methods() {
-        return Collections.EMPTY_LIST;
+    public List<? extends MethodInstance> methods() {
+        return Collections.emptyList();
     }
 
     @Override
@@ -42,13 +48,13 @@ public class UnknownReferenceType_c extends UnknownType_c implements UnknownType
     }
 
     @Override
-    public List methodsNamed(String name) {
-        return Collections.EMPTY_LIST;
+    public List<MethodInstance> methodsNamed(String name) {
+        return Collections.emptyList();
     }
 
     @Override
-    public List methods(String name, List argTypes) {
-        return Collections.EMPTY_LIST;
+    public List<? extends MethodInstance> methods(String name, List<? extends Type> argTypes) {
+        return Collections.emptyList();
     }
 
     @Override

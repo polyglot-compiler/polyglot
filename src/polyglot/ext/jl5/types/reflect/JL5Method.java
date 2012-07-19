@@ -4,7 +4,11 @@ import java.io.DataInputStream;
 import java.io.EOFException;
 import java.io.IOException;
 
-import polyglot.types.reflect.*;
+import polyglot.types.reflect.Attribute;
+import polyglot.types.reflect.ClassFile;
+import polyglot.types.reflect.Constant;
+import polyglot.types.reflect.Exceptions;
+import polyglot.types.reflect.Method;
 
 public class JL5Method extends Method {
     protected JL5Signature signature;

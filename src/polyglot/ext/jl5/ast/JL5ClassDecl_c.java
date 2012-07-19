@@ -5,12 +5,22 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
-import polyglot.ast.*;
-import polyglot.ext.jl5.types.*;
+import polyglot.ast.ClassBody;
+import polyglot.ast.ClassDecl;
+import polyglot.ast.ClassDecl_c;
+import polyglot.ast.Id;
+import polyglot.ast.Node;
+import polyglot.ast.TypeNode;
+import polyglot.ext.jl5.types.JL5Context;
+import polyglot.ext.jl5.types.JL5Flags;
+import polyglot.ext.jl5.types.JL5ParsedClassType;
+import polyglot.ext.jl5.types.JL5TypeSystem;
+import polyglot.ext.jl5.types.TypeVariable;
 import polyglot.ext.jl5.visit.JL5Translator;
 import polyglot.ext.param.types.MuPClass;
 import polyglot.types.Context;
 import polyglot.types.Flags;
+import polyglot.types.ReferenceType;
 import polyglot.types.SemanticException;
 import polyglot.types.TypeSystem;
 import polyglot.util.CodeWriter;
@@ -33,13 +43,13 @@ public class JL5ClassDecl_c extends ClassDecl_c implements JL5ClassDecl {
     protected List<AnnotationElem> annotations;
 
     public JL5ClassDecl_c(Position pos, Flags flags, List<AnnotationElem> annotations, Id name,
-                          TypeNode superClass, List interfaces, ClassBody body) {
+                          TypeNode superClass, List<TypeNode> interfaces, ClassBody body) {
         this(pos, flags, annotations, name, superClass, interfaces, body,
              new ArrayList<ParamTypeNode>());
     }
 
     public JL5ClassDecl_c(Position pos, Flags fl, List<AnnotationElem> annotations, Id name, TypeNode superType,
-                          List interfaces, ClassBody body, List<ParamTypeNode> paramTypes) {
+                          List<TypeNode> interfaces, ClassBody body, List<ParamTypeNode> paramTypes) {
         super(pos, fl, name, superType, interfaces, body);
         if (paramTypes == null)
             paramTypes = new ArrayList<ParamTypeNode>();
@@ -70,19 +80,19 @@ public class JL5ClassDecl_c extends ClassDecl_c implements JL5ClassDecl {
         JL5TypeSystem ts = (JL5TypeSystem)tb.typeSystem();
         JL5ParsedClassType ct = (JL5ParsedClassType) n.type();
 
-        MuPClass pc = ts.mutablePClass(ct.position());
+        MuPClass<TypeVariable, ReferenceType> pc = ts.mutablePClass(ct.position());
         ct.setPClass(pc);
         pc.clazz(ct);
 
         if (paramTypes() != null && !paramTypes().isEmpty()) {
-            List<TypeVariable> typeVars = new ArrayList(this.paramTypes().size());
+            List<TypeVariable> typeVars = new ArrayList<TypeVariable>(this.paramTypes().size());
             for (ParamTypeNode ptn : this.paramTypes()) {
                 TypeVariable tv = (TypeVariable)ptn.type(); 
                 typeVars.add(tv);
                 tv.declaringClass(ct);
             }
             ct.setTypeVariables(typeVars);
-            pc.formals(new ArrayList(typeVars));
+            pc.formals(new ArrayList<TypeVariable>(typeVars));
         }
 
         return n;
@@ -101,8 +111,8 @@ public class JL5ClassDecl_c extends ClassDecl_c implements JL5ClassDecl {
         return n;
     }
 
-    protected ClassDecl reconstruct(Id name, TypeNode superClass, List interfaces,
-                                    ClassBody body, List paramTypes, List annotations) {
+    protected ClassDecl reconstruct(Id name, TypeNode superClass, List<TypeNode> interfaces,
+                                    ClassBody body, List<ParamTypeNode> paramTypes, List<AnnotationElem> annotations) {
         if (name != this.name || superClass != this.superClass
                 || !CollectionUtil.equals(interfaces, this.interfaces)
                 || body != this.body
@@ -122,11 +132,11 @@ public class JL5ClassDecl_c extends ClassDecl_c implements JL5ClassDecl {
 
     @Override
     public Node visitChildren(NodeVisitor v) {
-    	List annotations = visitList(this.annotations, v);
-        List paramTypes = visitList(this.paramTypes, v);
+    	List<AnnotationElem> annotations = visitList(this.annotations, v);
+        List<ParamTypeNode> paramTypes = visitList(this.paramTypes, v);
         Id name = (Id) visitChild(this.name, v);
         TypeNode superClass = (TypeNode) visitChild(this.superClass, v);
-        List interfaces = visitList(this.interfaces, v);
+        List<TypeNode> interfaces = visitList(this.interfaces, v);
         ClassBody body = (ClassBody) visitChild(this.body, v);
         return reconstruct(name, superClass, interfaces, body, paramTypes, annotations);
     }
@@ -240,8 +250,8 @@ public class JL5ClassDecl_c extends ClassDecl_c implements JL5ClassDecl {
                 w.write(" implements ");
             }
 
-            for (Iterator i = interfaces().iterator(); i.hasNext();) {
-                TypeNode tn = (TypeNode) i.next();
+            for (Iterator<TypeNode> i = interfaces().iterator(); i.hasNext();) {
+                TypeNode tn = i.next();
                 print(tn, w, tr);
 
                 if (i.hasNext()) {

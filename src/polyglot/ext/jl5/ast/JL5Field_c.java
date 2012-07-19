@@ -1,21 +1,18 @@
 package polyglot.ext.jl5.ast;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-
-import polyglot.ast.*;
+import polyglot.ast.AmbReceiver;
+import polyglot.ast.Expr;
+import polyglot.ast.Field;
+import polyglot.ast.Field_c;
+import polyglot.ast.Id;
+import polyglot.ast.Node;
+import polyglot.ast.Receiver;
+import polyglot.ast.TypeNode;
 import polyglot.ext.jl5.types.EnumInstance;
-import polyglot.ext.jl5.types.JL5ParsedClassType;
-import polyglot.ext.jl5.types.JL5TypeSystem;
 import polyglot.ext.jl5.visit.JL5Translator;
-import polyglot.types.Context;
-import polyglot.types.MethodInstance;
-import polyglot.types.ReferenceType;
 import polyglot.types.SemanticException;
 import polyglot.util.CodeWriter;
 import polyglot.util.Position;
-import polyglot.visit.NodeVisitor;
 import polyglot.visit.PrettyPrinter;
 import polyglot.visit.TypeChecker;
 

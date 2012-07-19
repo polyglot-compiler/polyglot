@@ -40,7 +40,7 @@ public class EqualConstraint extends Constraint {
             JL5SubstClassType_c formal_pt = (JL5SubstClassType_c) formal;
             JL5SubstClassType_c actual_pt = (JL5SubstClassType_c) actual;
             if (formal_pt.base().equals(actual_pt.base())) {
-                JL5ParsedClassType g = (JL5ParsedClassType) formal_pt.base();
+                JL5ParsedClassType g = formal_pt.base();
                 for (TypeVariable tv : g.typeVariables()) {
                     
                     ReferenceType formal_targ = (ReferenceType) formal_pt.subst().substType(tv);
@@ -69,6 +69,7 @@ public class EqualConstraint extends Constraint {
         return !solver.isTargetTypeVariable(formal);
     }
     
+    @Override
     public String toString() {
         return actual + " = " + formal;
     }

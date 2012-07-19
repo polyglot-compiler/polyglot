@@ -1,11 +1,13 @@
 package polyglot.ext.jl5.types;
 
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
-import polyglot.main.Options;
-import polyglot.types.*;
+import polyglot.types.ClassType;
+import polyglot.types.ClassType_c;
+import polyglot.types.PrimitiveType;
+import polyglot.types.Resolver;
+import polyglot.types.Type;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
 
@@ -21,11 +23,12 @@ public abstract class JL5ClassType_c extends ClassType_c implements JL5ClassType
         super(ts, pos);
     }
 
-    public abstract List enumConstants();
+    @Override
+    public abstract List<EnumInstance> enumConstants();
     
+    @Override
     public EnumInstance enumConstantNamed(String name){
-        for(Iterator it = enumConstants().iterator(); it.hasNext();){
-            EnumInstance ei = (EnumInstance)it.next();
+        for(EnumInstance ei : enumConstants()) {
             if (ei.name().equals(name)){
                 return ei;
             }

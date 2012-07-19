@@ -26,8 +26,8 @@ public class JL5ArrayType_c extends ArrayType_c implements JL5ArrayType {
                 ts.Public(),
                 this, // clone returns this type
                 "clone",
-                Collections.EMPTY_LIST,
-                Collections.EMPTY_LIST);
+                Collections.<Type> emptyList(),
+                Collections.<Type> emptyList());
     }
 
     @Override

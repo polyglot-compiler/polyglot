@@ -12,7 +12,7 @@ import polyglot.visit.PrettyPrinter;
 
 public class JL5ClassBody_c extends ClassBody_c {
 
-    public JL5ClassBody_c(Position pos, List members) {
+    public JL5ClassBody_c(Position pos, List<ClassMember> members) {
         super(pos, members);
     }
     
@@ -30,8 +30,8 @@ public class JL5ClassBody_c extends ClassBody_c {
             w.begin(0);
             ClassMember prev = null;
 
-            for (Iterator i = ecds.iterator(); i.hasNext(); ) {
-                EnumConstantDecl ecd = (EnumConstantDecl)i.next();
+            for (Iterator<EnumConstantDecl> i = ecds.iterator(); i.hasNext(); ) {
+                EnumConstantDecl ecd = i.next();
                 prev = ecd;
                 print(ecd, w, tr);
                 w.write(i.hasNext() ? "," : ";");
@@ -41,8 +41,8 @@ public class JL5ClassBody_c extends ClassBody_c {
                 w.newline(0);                
             }
             
-            for (Iterator i = members.iterator(); i.hasNext(); ) {
-                ClassMember member = (ClassMember) i.next();
+            for (Iterator<ClassMember> i = members.iterator(); i.hasNext(); ) {
+                ClassMember member = i.next();
                 if (member instanceof EnumConstantDecl) {
                     // already printed it
                     continue;
@@ -65,8 +65,8 @@ public class JL5ClassBody_c extends ClassBody_c {
     }
 
     protected List<EnumConstantDecl> enumConstantDecls() {
-        List<EnumConstantDecl> ecds = new ArrayList();
-        for (ClassMember m : (List<ClassMember>)this.members) {
+        List<EnumConstantDecl> ecds = new ArrayList<EnumConstantDecl>();
+        for (ClassMember m : this.members) {
             if (m instanceof EnumConstantDecl) {
                 ecds.add((EnumConstantDecl)m);
             }

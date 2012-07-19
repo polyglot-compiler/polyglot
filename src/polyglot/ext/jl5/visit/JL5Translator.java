@@ -1,6 +1,10 @@
 package polyglot.ext.jl5.visit;
 
-import polyglot.ast.*;
+import polyglot.ast.ClassDecl;
+import polyglot.ast.Node;
+import polyglot.ast.NodeFactory;
+import polyglot.ast.Receiver;
+import polyglot.ast.TypeNode;
 import polyglot.ext.jl5.JL5Options;
 import polyglot.ext.jl5.types.JL5ClassType;
 import polyglot.ext.jl5.types.JL5SubstClassType;

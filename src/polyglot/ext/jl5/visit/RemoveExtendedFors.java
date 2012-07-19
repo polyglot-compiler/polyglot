@@ -5,10 +5,30 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
-import polyglot.ast.*;
+import polyglot.ast.Assign;
+import polyglot.ast.Binary;
+import polyglot.ast.Block;
+import polyglot.ast.Call;
+import polyglot.ast.Cast;
+import polyglot.ast.CodeDecl;
+import polyglot.ast.Expr;
+import polyglot.ast.Field;
+import polyglot.ast.Id;
+import polyglot.ast.IntLit;
+import polyglot.ast.Labeled;
+import polyglot.ast.Local;
+import polyglot.ast.LocalDecl;
+import polyglot.ast.Node;
+import polyglot.ast.NodeFactory;
+import polyglot.ast.Stmt;
+import polyglot.ast.While;
 import polyglot.ext.jl5.ast.ExtendedFor;
 import polyglot.frontend.Job;
-import polyglot.types.*;
+import polyglot.types.Flags;
+import polyglot.types.LocalInstance;
+import polyglot.types.SemanticException;
+import polyglot.types.Type;
+import polyglot.types.TypeSystem;
 import polyglot.util.Position;
 import polyglot.visit.ContextVisitor;
 import polyglot.visit.NodeVisitor;
@@ -24,7 +44,7 @@ public class RemoveExtendedFors extends ContextVisitor {
     /** track how many iterator variables we have created in this CodeDecl
      * 
      */
-    private LinkedList<Integer> varCount = new LinkedList(); 
+    private LinkedList<Integer> varCount = new LinkedList<Integer>(); 
 
     @Override
     protected NodeVisitor enterCall(Node n) throws SemanticException {
@@ -36,14 +56,14 @@ public class RemoveExtendedFors extends ContextVisitor {
     @Override
     protected Node leaveCall(Node parent, Node old, Node n, NodeVisitor v) throws SemanticException {
         if (n instanceof ExtendedFor && !(parent instanceof Labeled)) {
-            n = translateExtendedFor((ExtendedFor)n, (List<String>)Collections.EMPTY_LIST);
+            n = translateExtendedFor((ExtendedFor)n, Collections.<String> emptyList());
         }
         if (n instanceof CodeDecl) {
             varCount.removeLast();
         }
         if (n instanceof Labeled && !(parent instanceof Labeled)) {
             Node s = n;
-            List<String> labels = new ArrayList();
+            List<String> labels = new ArrayList<String>();
             while (s instanceof Labeled) {
                 Labeled lbled = (Labeled) s;
                 labels.add(lbled.label());
@@ -75,7 +95,8 @@ public class RemoveExtendedFors extends ContextVisitor {
         LocalDecl iterDecl;
         LocalInstance iterLI = ts.localInstance(pos, Flags.NONE, iterType, iterName.id());
         {
-            Call iterator = nodeFactory().Call(pos, n.expr(), "iterator");
+            Id id = nodeFactory().Id(pos, "iterator");
+            Call iterator = nodeFactory().Call(pos, n.expr(), id);
             iterator = (Call) iterator.type(iterType);
             iterator = iterator.methodInstance(ts.findMethod(n.expr().type().toClass(), "iterator", Collections.<Type> emptyList(), this.context().currentClass()));
         
@@ -87,9 +108,10 @@ public class RemoveExtendedFors extends ContextVisitor {
         // create the loop body
         List<Stmt> loopBody = new ArrayList<Stmt>();
         {
+            Id id = nodeFactory().Id(pos, "next");
             Call call = nodeFactory().Call(pos, 
                     ((Local)nodeFactory().Local(pos, iterName).type(iterType)).localInstance(iterDecl.localInstance()),
-                    "next");
+                    id);
             call = (Call) call.type(ts.Object());
             call = call.methodInstance(ts.findMethod(iterType.toClass(), "next", Collections.<Type> emptyList(), this.context().currentClass()));
         
@@ -103,11 +125,12 @@ public class RemoveExtendedFors extends ContextVisitor {
         // create the while loop
         While loop;
         {
+            Id id = nodeFactory().Id(pos, "hasNext");
             Call cond = nodeFactory().Call(pos, 
                     ((Local)nodeFactory().Local(pos, iterName).type(iterType)).localInstance(iterDecl.localInstance()),
-            "hasNext");
+            id);
             cond = (Call) cond.type(ts.Boolean());
-            cond = cond.methodInstance(ts.findMethod(iterType.toClass(), "hasNext", Collections.EMPTY_LIST, this.context().currentClass()));
+            cond = cond.methodInstance(ts.findMethod(iterType.toClass(), "hasNext", Collections.<Type> emptyList(), this.context().currentClass()));
 
             loop = nodeFactory().While(pos, cond, nodeFactory().Block(pos, loopBody));
         }
@@ -156,7 +179,8 @@ public class RemoveExtendedFors extends ContextVisitor {
         {
             Local iterLocal = (Local) nodeFactory().Local(pos, iterID).localInstance(iterLI).type(ts.Int());
             Local arrLocal = (Local) nodeFactory().Local(pos,arrID).localInstance(arrLI).type(arrLI.type());
-            Field field = (Field) nodeFactory().Field(pos, arrLocal, "length").type(ts.Int());
+            Id id = nodeFactory().Id(pos, "length");
+            Field field = (Field) nodeFactory().Field(pos, arrLocal, id).type(ts.Int());
             field = field.fieldInstance(ts.findField(arrLI.type().toReference(), "length"));
             
             cond = nodeFactory().Binary(pos, iterLocal, Binary.LT, field).type(ts.Boolean());
@@ -200,7 +224,8 @@ public class RemoveExtendedFors extends ContextVisitor {
      */
     private Stmt labelStmt(Stmt s, List<String> labels) {
         for (int i = labels.size()-1; i >= 0; i--) {
-            s = nodeFactory().Labeled(Position.compilerGenerated(), labels.get(i), s);
+            Id id = nodeFactory().Id(Position.compilerGenerated(), labels.get(i));
+            s = nodeFactory().Labeled(Position.compilerGenerated(), id, s);
         }
         return s;
     }
