@@ -4,8 +4,8 @@ Polyglot Change Log
 This file documents changes between releases of Polyglot. More information
 about some releases may be found in the doc/ directory.
 
-?, 2012 : Polyglot 2.5.0
-============================
+August ?, 2012 : Polyglot 2.5.0
+===============================
 
 Added JL5 extension (polyglot.ext.jl5) to support Java 1.5 language features. 
 Based on the "Polyglot for Java 5" project by Milan Stanojevic and Todd 
@@ -20,15 +20,19 @@ by running the javac backend, by default, directly within the same JVM
 as Polyglot. See the release notes for more details about how to modify
 existing extensions accordingly.
 
-Miscellaneous bug fixes.
+The source code of Polyglot has itself been updated to take advantage of the
+generics support introduced in Java 1.5. This may break older extensions that
+assume non-generic interfaces.
 
 Precedence of = vs. ?: fixed.
  
-Added -mergestrings option.
+The -mergestrings option was added.
 
 Class polyglot.visit.DataFlow refactored to allow detection of back
 edges in control flow graphs, which allows subclasses to use a
 widening operator.
+
+Many miscellaneous bug fixes were made.
 
 Aug 14, 2008: Polyglot 2.4.0
 ============================
