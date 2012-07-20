@@ -669,9 +669,17 @@
         <copy file="${bin}/jlc" todir="${tmp}/bin" />
         <copy file="${bin}/jl5c" todir="${tmp}/bin" />
 		<copy file="${bin}/pth" todir="${tmp}/bin" />
+                <!--
 		<copy file="doc/Upgrade.txt" todir="${tmp}/doc" />
-		<copy file="doc/Overview.txt" todir="${tmp}/doc" />
 		<copy file="doc/DATAFLOW_2_0.txt" todir="${tmp}/doc" />
+                -->
+		<copy todir="${tmp}/doc/release-2.0-notes">
+                    <fileset dir="doc/release-2.0-notes" />
+                </copy>
+		<copy todir="${tmp}/doc/release-2.5-notes">
+                    <fileset dir="doc/release-2.5-notes" />
+                </copy>
+		<copy file="doc/Overview.txt" todir="${tmp}/doc" />
 		<copy file="doc/ppg.html" todir="${tmp}/doc" />
 		<!--
 		<copy file="${lib}/polyglot.jar" todir="${tmp}/lib" />
@@ -701,9 +709,11 @@
 
         <copy file="${bin}/jlc" todir="${tmp}/bin" />
         <copy file="${bin}/jl5c" todir="${tmp}/bin" />
-		<copy file="doc/Upgrade.txt" todir="${tmp}/doc" />
 		<copy file="doc/Overview.txt" todir="${tmp}/doc" />
+                <!--
+		<copy file="doc/Upgrade.txt" todir="${tmp}/doc" />
 		<copy file="doc/DATAFLOW_2_0.txt" todir="${tmp}/doc" />
+                -->
 		<copy file="${lib}/polyglot-epl.jar" todir="${tmp}/lib" />
 		<copy file="build.xml" todir="${tmp}" />
 		<copy file="build.properties" todir="${tmp}" />
