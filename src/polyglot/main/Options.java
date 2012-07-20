@@ -433,7 +433,6 @@ public class Options {
         validateArgs();
         applyArgs(source);
         postApplyArgs();
-        printCommandLine(System.out);
     }
 
     protected void postApplyArgs() {
@@ -611,13 +610,6 @@ public class Options {
     protected void handleSourceArg(Arg<?> arg, Set<String> source) {
         String filename = (String) arg.value();        
         source.add(filename);
-//        File src = new File(filename);
-//        File dir = src.getParentFile();
-//        if (dir != null && !sourcepath_directories.contains(dir)) {
-//                sourcepath_directories.add(dir);
-//                if (!classpath_given)
-//                        classpath_directories.add(dir);
-//        }
     }
 
     protected void setClassOutput(File f) {
