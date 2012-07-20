@@ -131,9 +131,6 @@ public interface ExtensionInfo {
 	/** Get the extension file mananger used by this extension. */
 	FileManager extFileManager();
 
-	/** Add and set the locations in the file manager used by this extension. */
-	void addLocationsToFileManager();
-
 	/** Create class file for a file object. */
 	ClassFile createClassFile(FileObject f, byte[] code) throws IOException;
 

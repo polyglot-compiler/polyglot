@@ -25,12 +25,21 @@
 
 package polyglot.frontend;
 
-import java.io.IOException;
 import java.io.Reader;
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
+import java.util.Set;
 
 import javax.tools.FileObject;
+import javax.tools.JavaCompiler;
+import javax.tools.JavaFileObject;
 import javax.tools.StandardJavaFileManager;
+import javax.tools.StandardLocation;
+import javax.tools.ToolProvider;
+import javax.tools.JavaFileManager.Location;
 
 import polyglot.ast.Node;
 import polyglot.ast.NodeFactory;
@@ -220,10 +229,26 @@ public abstract class AbstractExtensionInfo implements ExtensionInfo {
 
 	@Override
     public FileManager extFileManager() {
-		if (extFM == null)
+		if (extFM == null) {
 			extFM = new ExtFileManager(this);
+			configureFileManager(getOptions());
+		}
 		return extFM;
 	}
+
+        protected void configureFileManager(Options opt) {
+            try {
+                extFM.setLocation(opt.source_path, opt.sourcepath_directories);
+                extFM.setLocation(opt.source_output,
+                        Collections.singleton(opt.source_output_directory));
+                extFM.setLocation(opt.class_output,
+                        Collections.singleton(opt.class_output_directory));
+                extFM.setLocation(opt.bootclasspath, opt.bootclasspath_directories);
+                extFM.setLocation(opt.classpath, opt.classpath_directories);
+            } catch (IOException e) {
+                throw new InternalCompilerError(e.getMessage());
+            }
+        }
 
 	@Override
     public ClassFileLoader classFileLoader() {
@@ -233,34 +258,6 @@ public abstract class AbstractExtensionInfo implements ExtensionInfo {
 			classFileLoader.addLocation(getOptions().classpath);
 		}
 		return classFileLoader;
-	}
-
-	@Override
-    public void addLocationsToFileManager() {
-		StandardJavaFileManager ext_fm = extFileManager();
-		Options options = getOptions();
-		try {
-			ext_fm.setLocation(options.source_path,
-					options.sourcepath_directories);
-			if (!options.isSourceOutputGiven() && !options.isClassOutputGiven())
-				options.source_output_dir = options.class_output_dir = Collections
-						.singleton(options.current_directory);
-			else if (!options.isSourceOutputGiven()
-					&& options.isClassOutputGiven())
-				options.source_output_dir = options.class_output_dir;
-			else if (!options.isClassOutputGiven())
-				options.class_output_dir = Collections
-						.singleton(options.current_directory);
-			ext_fm.setLocation(options.source_output, options.source_output_dir);
-			ext_fm.setLocation(options.class_output, options.class_output_dir);
-			if (!options.bootclasspath_given)
-				options.bootclasspath_directories.addAll(options.default_bootclasspath_directories);
-			ext_fm.setLocation(options.bootclasspath,
-					options.bootclasspath_directories);
-			ext_fm.setLocation(options.classpath, options.classpath_directories);
-		} catch (IOException e) {
-			throw new InternalCompilerError(e.getMessage());
-		}
 	}
 
 	@Override

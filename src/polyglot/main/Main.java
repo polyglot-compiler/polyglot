@@ -148,7 +148,6 @@ public class Main {
 			throw new TerminationException(ue.exitCode);
 		}
 
-		ext.addLocationsToFileManager();
 		if (eq == null) {
 			eq = new StdErrorQueue(System.err, options.error_count,
 					ext.compilerName());
@@ -186,7 +185,7 @@ public class Main {
 
 	protected boolean invokePostCompiler(Options options, Compiler compiler,
 			ErrorQueue eq) {
-		if (!options.output_stdout) {
+		if (!options.output_source_only && !options.output_stdout) {
 			try {
 				if (options.post_compiler == null) {
 					ArrayList<String> postCompilerArgs = new ArrayList<String>(
@@ -226,7 +225,7 @@ public class Main {
 					javacCmd[j++] = options.constructPostCompilerClasspath();
 					if (options.class_output_directory != null) {
 						javacCmd[j++] = "-d";
-						javacCmd[j++] = options.class_output_directory;
+						javacCmd[j++] = options.class_output_directory.getPath();
 					}
 					if (options.generate_debugging_info) {
 						javacCmd[j++] = "-g";
