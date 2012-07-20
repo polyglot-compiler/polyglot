@@ -575,6 +575,9 @@ public class ExtFileManager implements FileManager {
 				fo = jfo;
 			}
 		} else {
+		    if (f.isAbsolute()) 
+		        throw new InternalCompilerError("Expected relative filename");
+
 			key = fileKey(location, "", fileName);
 			sourceFile = loadedSources.get(key);
 			if (sourceFile != null)

@@ -361,7 +361,7 @@ public class Options {
         }
         flags.add(new OptFlag<Pair<String, Integer>>("-report", "<topic>=<level>",
                 "print verbose debugging information about"
-                        + " topic at specified verbosity\n"
+                        + " topic at specified verbosity. "
                         + allowedTopics.toString()) {
             @Override
             public Arg<Pair<String, Integer>> handle(String[] args, int index)
