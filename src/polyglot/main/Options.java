@@ -20,10 +20,8 @@ import static java.io.File.pathSeparatorChar;
 import static java.io.File.separator;
 
 import java.io.File;
-import java.io.IOException;
 import java.io.PrintStream;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -32,7 +30,6 @@ import java.util.StringTokenizer;
 
 import javax.tools.JavaFileManager;
 import javax.tools.JavaFileManager.Location;
-import javax.tools.StandardJavaFileManager;
 import javax.tools.StandardLocation;
 
 import polyglot.frontend.ExtensionInfo;
@@ -436,8 +433,7 @@ public class Options {
         validateArgs();
         applyArgs(source);
         postApplyArgs();
-//        configureFileManager(source);
-//        printCommandLine(System.out);
+        printCommandLine(System.out);
     }
 
     protected void postApplyArgs() {
@@ -615,13 +611,13 @@ public class Options {
     protected void handleSourceArg(Arg<?> arg, Set<String> source) {
         String filename = (String) arg.value();        
         source.add(filename);
-        File src = new File(filename);
-        File dir = src.getAbsoluteFile().getParentFile();
-        if (dir != null && !sourcepath_directories.contains(dir)) {
-                sourcepath_directories.add(dir);
-                if (!classpath_given)
-                        classpath_directories.add(dir);
-        }
+//        File src = new File(filename);
+//        File dir = src.getParentFile();
+//        if (dir != null && !sourcepath_directories.contains(dir)) {
+//                sourcepath_directories.add(dir);
+//                if (!classpath_given)
+//                        classpath_directories.add(dir);
+//        }
     }
 
     protected void setClassOutput(File f) {
@@ -779,7 +775,6 @@ public class Options {
         return src.next();
     }
     
-    @SuppressWarnings("unchecked")
     public Location outputDirectory() {
         return source_output;
     }

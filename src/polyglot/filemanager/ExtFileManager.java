@@ -564,7 +564,7 @@ public class ExtFileManager implements FileManager {
 		FileSource sourceFile;
 		FileObject fo = null;
 		String key;
-		if (f.isAbsolute()) {
+		if (userSpecified) {
 			key = fileName;
 			sourceFile = loadedSources.get(key);
 			if (sourceFile != null)
