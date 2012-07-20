@@ -133,8 +133,21 @@ public class Options {
         setDefaultValues();
     }
 
+    public Set<OptFlag<?>> flags() {
+        return flags;
+    }
+
     public List<OptFlag.Arg<?>> arguments() {
         return arguments;
+    }
+    
+    public List<OptFlag.Arg<?>> filterArgs(Set<OptFlag<?>> flags) {
+        List<Arg<?>> matches = new ArrayList<OptFlag.Arg<?>>();
+        for (Arg<?> arg : arguments) {
+            if (arg.flag != null && flags.contains(arg.flag()))
+                matches.add(arg);
+        }
+        return matches;
     }
     
     protected void populateFlags(Set<OptFlag<?>> flags) {
@@ -410,7 +423,7 @@ public class Options {
     }
 
     /**
-     * Parse the command line
+     * Parse the command line and process arguments.
      * 
      * @throws UsageError
      *             if the usage is incorrect.
@@ -435,6 +448,22 @@ public class Options {
         postApplyArgs();
     }
 
+    /**
+     * Process a list of arguments
+     * 
+     * @throws UsageError
+     *             if the usage is incorrect.
+     */
+    public final void processArguments(List<Arg<?>> arguments, Set<String> source)
+            throws UsageError {
+        this.arguments.clear();
+        this.arguments.addAll(arguments);
+        validateArgs();
+        applyArgs(source);
+        postApplyArgs();
+    }
+
+    
     protected void postApplyArgs() {
 
     }
@@ -622,14 +651,17 @@ public class Options {
     }
     
     protected void setClasspath(List<File> value) {
+        classpath_directories.clear();
         classpath_directories.addAll(value);
     }
     
     protected void setBootclasspath(List<File> value) {
+        bootclasspath_directories.clear();
         bootclasspath_directories.addAll(value);
     }
     
     protected void setSourcepath(List<File> value) {
+        sourcepath_directories.clear();
         sourcepath_directories.addAll(value);
     }
 

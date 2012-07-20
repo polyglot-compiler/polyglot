@@ -56,6 +56,6 @@ public class JL5Options extends Options {
             else if (arg.flag().ids().contains("-morepermissiveinference")) {
                 this.morePermissiveInference = (Boolean) arg.value();
             }
-            super.handleArg(arg);
+            else super.handleArg(arg);
         }        
 }

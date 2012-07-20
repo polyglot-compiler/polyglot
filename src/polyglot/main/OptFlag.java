@@ -60,6 +60,20 @@ public abstract class OptFlag<T> {
     protected final String usage;
     protected final String defaultValue;
 
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof OptFlag) {
+            OptFlag<?> that = (OptFlag<?>) obj;
+            return kind == that.kind && ids.equals(that.ids); 
+        }
+        return false;
+    }
+    
+    @Override
+    public int hashCode() {
+        return kind.hashCode() ^ ids.hashCode(); 
+    }
+    
     /**
      * @param id
      *            The flag ID. e.g., "--name", "-n", or "-name".
@@ -541,32 +555,55 @@ public abstract class OptFlag<T> {
      * 
      * @param <T>
      */
-    public static class Switch extends OptFlag<Boolean> {        
+    public static class Switch extends OptFlag<Boolean> { 
+        protected final boolean on;
+        
         @Override
         public Arg<Boolean> handle(String[] args, int index) {
-            return createArg(index, true);
+            return createArg(index, on);
         }
 
         @Override
         public Arg<Boolean> defaultArg() {
-            return createDefault(false);
+            return createDefault(!on);
         }
         
-        public Switch(Kind kind, String id, String usage) {
+        public Switch(Kind kind, String id, String usage, boolean on) {
             super(kind, id, null, usage);
+            this.on = on;
+        }
+
+        public Switch(Kind kind, String id, String usage) {
+            this(kind, id, usage, true);
+        }
+
+        public Switch(Kind kind, String[] ids,
+                String usage, boolean on) {
+            super(kind, ids, null, usage);
+            this.on = on;
         }
 
         public Switch(Kind kind, String[] ids,
                 String usage) {
-            super(kind, ids, null, usage);
+            this(kind, ids, usage, true);
+        }
+        
+        public Switch(String id, String usage, boolean on) {
+            super(id, null, usage);
+            this.on = on;
         }
 
         public Switch(String id, String usage) {
-            super(id, null, usage);
+            this(id, usage, true);
         }
+        
+        public Switch(String[] ids, String usage, boolean on) {
+            super(ids, null, usage);
+            this.on = on;
+        }            
 
         public Switch(String[] ids, String usage) {
-            super(ids, null, usage);
+            this(ids, usage, true);
         }            
     }
     
