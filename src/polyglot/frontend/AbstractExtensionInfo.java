@@ -230,24 +230,26 @@ public abstract class AbstractExtensionInfo implements ExtensionInfo {
 	@Override
     public FileManager extFileManager() {
 		if (extFM == null) {
-			extFM = new ExtFileManager(this);
-			configureFileManager(getOptions());
+			extFM = createFileManager();
 		}
 		return extFM;
 	}
 
-        protected void configureFileManager(Options opt) {
+        protected FileManager createFileManager() {
+            FileManager fm = new ExtFileManager(this);
+            Options opt = getOptions();
             try {
-                extFM.setLocation(opt.source_path, opt.sourcepath_directories);
-                extFM.setLocation(opt.source_output,
+                fm.setLocation(opt.source_path, opt.sourcepath_directories);
+                fm.setLocation(opt.source_output,
                         Collections.singleton(opt.source_output_directory));
-                extFM.setLocation(opt.class_output,
+                fm.setLocation(opt.class_output,
                         Collections.singleton(opt.class_output_directory));
-                extFM.setLocation(opt.bootclasspath, opt.bootclasspath_directories);
-                extFM.setLocation(opt.classpath, opt.classpath_directories);
+                fm.setLocation(opt.bootclasspath, opt.bootclasspath_directories);
+                fm.setLocation(opt.classpath, opt.classpath_directories);
             } catch (IOException e) {
                 throw new InternalCompilerError(e.getMessage());
             }
+            return fm;
         }
 
 	@Override
