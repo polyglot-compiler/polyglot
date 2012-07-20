@@ -673,9 +673,11 @@
 		<copy file="doc/Upgrade.txt" todir="${tmp}/doc" />
 		<copy file="doc/DATAFLOW_2_0.txt" todir="${tmp}/doc" />
                 -->
+		<mkdir dir="${tmp}/doc/release-2.0-notes" />
 		<copy todir="${tmp}/doc/release-2.0-notes">
                     <fileset dir="doc/release-2.0-notes" />
                 </copy>
+		<mkdir dir="${tmp}/doc/release-2.5-notes" />
 		<copy todir="${tmp}/doc/release-2.5-notes">
                     <fileset dir="doc/release-2.5-notes" />
                 </copy>
