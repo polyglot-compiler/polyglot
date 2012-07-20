@@ -63,12 +63,6 @@ public class ExtensionInfo extends JLExtensionInfo {
 	}
 	
 	@Override
-	public void addLocationsToFileManager() {
-		super.addLocationsToFileManager();
-		outputExtensionInfo().addLocationsToFileManager();
-	}
-
-	@Override
 	public Scheduler createScheduler() {
 		return new JL5Scheduler(this);
 	}

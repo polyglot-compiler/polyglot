@@ -26,7 +26,7 @@ public class JL5Translator extends Translator {
     public JL5Translator(Job job, TypeSystem ts, NodeFactory nf,
             TargetFactory tf) {
         super(job, ts, nf, tf);
-        translateEnums = ((JL5Options)job.extensionInfo().getOptions()).enumImplClass == null;
+        translateEnums = ((JL5Options)job.extensionInfo().getOptions()).translateEnums;
         removeJava5isms = ((JL5Options)job.extensionInfo().getOptions()).removeJava5isms;
     }
 

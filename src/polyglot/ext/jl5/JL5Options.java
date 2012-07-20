@@ -1,14 +1,16 @@
 package polyglot.ext.jl5;
 
-import java.io.PrintStream;
 import java.util.Set;
 
 import polyglot.frontend.ExtensionInfo;
-import polyglot.main.Main;
+import polyglot.main.OptFlag;
 import polyglot.main.Options;
 import polyglot.main.UsageError;
+import polyglot.main.OptFlag.Arg;
+import polyglot.main.OptFlag.Switch;
 
 public class JL5Options extends Options {
+        public boolean translateEnums;
         public String enumImplClass;
         public boolean removeJava5isms;
         public boolean morePermissiveInference;
@@ -16,44 +18,44 @@ public class JL5Options extends Options {
         public JL5Options(ExtensionInfo extension) {
             super(extension);
         }
-        
+                
         @Override
-        public void setDefaultValues() {
-            super.setDefaultValues();
-            this.enumImplClass = null;
-            this.removeJava5isms = false;
-            this.assertions = true;
-            this.morePermissiveInference = false;
+        protected void populateFlags(Set<OptFlag<?>> flags) {
+            super.populateFlags(flags);
+
+            flags.add(new OptFlag<String>(new String[] {"--enumImplClass", "-enumImplClass"}, "<classname>",
+                    "Runtime class to implement Enums", "java.lang.Enum") {
+                @Override
+                public Arg<String> handle(String[] args, int index)
+                        throws UsageError {
+                    return createArg(index + 1, args[index]);
+                }
+
+                @Override
+                public Arg<String> defaultArg() {
+                    return createDefault("java.lang.Enum");
+                }                
+            });
+            flags.add(new Switch(new String[] { "-removeJava5isms", "--removeJava5isms" },
+                    "Translate Java 5 language features to Java 1.4 features"));
+            flags.add(new Switch(new String[] { "-morepermissiveinference", "--morepermissiveinference" },
+                    "Use a more permissive algorithm for type inference. (Experimental)"));
         }
-        
+
         @Override
-        protected int parseCommand(String args[], int index, Set<String> source) throws UsageError, Main.TerminationException {
-            if (args[index].equals("-enumImplClass") || args[index].equals("--enumImplClass")) {
-                index++;
-                this.enumImplClass = args[index++];
-                return index;
+        protected void handleArg(Arg<?> arg) {
+            if (arg.flag().ids().contains("-enumImplClass")) {
+                this.enumImplClass = (String) arg.value();
+                // if anything other than java.lang.Enum, we may need to
+                // translate Enums to normal Java classes
+                translateEnums = enumImplClass.equals("java.lang.Enum");
+            }           
+            else if (arg.flag().ids().contains("-removeJava5isms")) {
+                this.removeJava5isms = (Boolean) arg.value();
             }
-           
-            if (args[index].equals("-removeJava5isms") || args[index].equals("--removeJava5isms")) {
-                index++;
-                this.removeJava5isms = true;
-                return index;
+            else if (arg.flag().ids().contains("-morepermissiveinference")) {
+                this.morePermissiveInference = (Boolean) arg.value();
             }
-           
-            if (args[index].equals("-morepermissiveinference") || args[index].equals("--morepermissiveinference")) {
-                index++;
-                this.morePermissiveInference = true;
-                return index;
-            }
-           
-            return super.parseCommand(args, index, source);
-        }
-        
-        @Override
-        public void usage(PrintStream out) {
-            super.usage(out);
-            usageForFlag(out, "-removeJava5isms", "Translate Java 5 language features to Java 1.4 features");
-            usageForFlag(out, "-enumImplClass", "Runtime class to implement Enums (if not specified, translate to java.lang.Enum)");
-            usageForFlag(out, "-morepermissiveinference", "Use a more permissive algorithm for type inference. (Experimental)");
-        }
+            super.handleArg(arg);
+        }        
 }

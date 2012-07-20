@@ -94,7 +94,7 @@ public class JL5ConstructorCall_c extends ConstructorCall_c implements JL5Constr
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
         // are we a super call within an enum const decl?
         if (isEnumConstructorCall) {
-            boolean translateEnums = ((JL5Options)this.ci.typeSystem().extensionInfo().getOptions()).enumImplClass == null;
+            boolean translateEnums = ((JL5Options)this.ci.typeSystem().extensionInfo().getOptions()).translateEnums;
             boolean removeJava5isms = ((JL5Options)this.ci.typeSystem().extensionInfo().getOptions()).removeJava5isms;
             if (!removeJava5isms && translateEnums) {
                 // we don't print an explicit call to super

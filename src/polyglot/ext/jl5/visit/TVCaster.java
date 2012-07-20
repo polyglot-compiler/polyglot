@@ -227,7 +227,7 @@ public class TVCaster extends AscriptionVisitor {
             // see if we want to replace it
             JL5Options opts = (JL5Options) job.extensionInfo().getOptions();
             String enumImpl = opts.enumImplClass;
-            if (opts.removeJava5isms && enumImpl != null) {
+            if (opts.removeJava5isms) {
                 toType = ts.typeForName(enumImpl);
             }
         }

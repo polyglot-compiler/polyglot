@@ -88,8 +88,7 @@ public class RemoveEnums extends ContextVisitor {
         super(job, ts, nf);
         qq = new QQ(job.extensionInfo());
         
-        String enumClass = ((JL5Options) job.extensionInfo().getOptions()).enumImplClass;
-        this.enumImplClass = (enumClass == null) ? "java.lang.Enum" : enumClass;
+        this.enumImplClass = ((JL5Options) job.extensionInfo().getOptions()).enumImplClass;
     }
 
     @Override
