@@ -1,5 +1,17 @@
-                    Polyglot Extensible Compiler Framework
-                    --------------------------------------
+             Polyglot Extensible Compiler Framework (Version 2.5.0)
+             ------------------------------------------------------
+
+Overview
+--------
+
+This is release 2.5 of the Polyglot extensible compiler framework.
+It contains many improvements over previous releases of Polyglot,
+including support for Java 5 and significantly improved performance.
+More details on these changes can be found in the file
+release-2.5-notes/PolyglotChanges.html.
+
+Contents
+--------
 
 Since you are reading this file, you have already downloaded and
 unpacked the Polyglot distribution.  Your installation directory
@@ -175,23 +187,28 @@ instructions earlier in this file for how to use the compiler.
 Credits and Acknowledgments
 ---------------------------
 
-The current Polyglot developers are:
+Version 2.5 of Polyglot was prepared largely through the work of the following people:
 
-        Nathaniel Nystrom
+	Steve Chong (Harvard)
+	Owen Arden (Cornell)
+	Scott Moore (Harvard)
+	Samarth Lad (Cornell)
+	Jed Liu (Cornell)
 
-The Polyglot project group is supervised by Prof. Andrew Myers at the
-Cornell University Computer Science Department.  Nathaniel Nystrom is
-currently at IBM Research.
+The Polyglot project is jointly supervised by Prof. Andrew Myers (Cornell University),
+by Prof. Stephen Chong (Harvard University), and by Prof. Nathaniel Nystrom (U. Lugano).
 
-Several other people have contributed to the development:
+Many people have contributed substantially to the development of Polyglot, including:
 
         Owen Arden              Michael Brukman
         Stephen Chong           Michael Clarkson
         Matt Harren             Aleksey Kliger
-        Jed Liu                 Scott Moore
-        Naveen Sastry           Dan Spoonhower 
-        Xin Qi                  Steve Zdancewic         
-        Lantian Zheng           Xin Zheng
+		Samarth Lad		        Jed Liu               
+		Scott Moore		        Andrew Myers
+		Nate Nystrom			Naveen Sastry   
+		Dan Spoonhower 	        Xin Qi     
+	    Steve Zdancewic         Lantian Zheng
+	    Xin Zheng
 
 The Polyglot class file parsing code (src/polyglot/types/reflect)
 is derived from code written for the BLOAT bytecode optimizer written
