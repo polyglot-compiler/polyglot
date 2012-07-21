@@ -696,8 +696,8 @@ public class JL5TypeSystem_c extends ParamTypeSystem_c<TypeVariable, ReferenceTy
             return clazz;
         }
         boolean allNull = true;
-        for (Object o : actuals) {
-            if (o != null) {
+        for (ReferenceType t : actuals) {
+            if (t != null) {
                 allNull = false;
                 break;
             }

@@ -25,21 +25,11 @@
 
 package polyglot.frontend;
 
-import java.io.Reader;
-import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
+import java.io.Reader;
 import java.util.Collections;
-import java.util.List;
-import java.util.Set;
 
 import javax.tools.FileObject;
-import javax.tools.JavaCompiler;
-import javax.tools.JavaFileObject;
-import javax.tools.StandardJavaFileManager;
-import javax.tools.StandardLocation;
-import javax.tools.ToolProvider;
-import javax.tools.JavaFileManager.Location;
 
 import polyglot.ast.Node;
 import polyglot.ast.NodeFactory;
@@ -61,216 +51,216 @@ import polyglot.util.InternalCompilerError;
  * This is an abstract <code>ExtensionInfo</code>.
  */
 public abstract class AbstractExtensionInfo implements ExtensionInfo {
-	protected Compiler compiler;
-	private Options options;
-	protected TypeSystem ts = null;
-	protected NodeFactory nf = null;
-	protected TargetFactory target_factory = null;
-	protected Stats stats;
-	protected Scheduler scheduler;
-	protected FileManager extFM;
-	protected ClassFileLoader classFileLoader;
+    protected Compiler compiler;
+    private Options options;
+    protected TypeSystem ts = null;
+    protected NodeFactory nf = null;
+    protected TargetFactory target_factory = null;
+    protected Stats stats;
+    protected Scheduler scheduler;
+    protected FileManager extFM;
+    protected ClassFileLoader classFileLoader;
 
-	@Override
+    @Override
     public abstract Goal getCompileGoal(Job job);
 
-	@Override
+    @Override
     public abstract String compilerName();
 
-	@Override
+    @Override
     public abstract String defaultFileExtension();
 
-	@Override
+    @Override
     public abstract Version version();
 
-	@Override
+    @Override
     public Options getOptions() {
-		if (this.options == null) {
-			this.options = createOptions();
-		}
-		return options;
-	}
+        if (this.options == null) {
+            this.options = createOptions();
+        }
+        return options;
+    }
 
-	protected Options createOptions() {
-		return new Options(this);
-	}
+    protected Options createOptions() {
+        return new Options(this);
+    }
 
-	/** Return a Stats object to accumulate and report statistics. */
-	@Override
+    /** Return a Stats object to accumulate and report statistics. */
+    @Override
     public Stats getStats() {
-		if (this.stats == null) {
-			this.stats = new Stats(this);
-		}
-		return stats;
-	}
+        if (this.stats == null) {
+            this.stats = new Stats(this);
+        }
+        return stats;
+    }
 
-	@Override
+    @Override
     public Compiler compiler() {
-		return compiler;
-	}
+        return compiler;
+    }
 
-	@Override
+    @Override
     public void initCompiler(Compiler compiler) {
-		this.compiler = compiler;
+        this.compiler = compiler;
 
-		// Register the extension with the compiler.
-		compiler.addExtension(this);
-		
-		// Initialize the output extension if there is one
+        // Register the extension with the compiler.
+        compiler.addExtension(this);
+
+        // Initialize the output extension if there is one
         if (this.outputExtensionInfo() != null)
-        	this.outputExtensionInfo().initCompiler(compiler);
+            this.outputExtensionInfo().initCompiler(compiler);
 
-		// Create the type system and node factory.
-		typeSystem();
-		nodeFactory();
-		scheduler();
+        // Create the type system and node factory.
+        typeSystem();
+        nodeFactory();
+        scheduler();
 
-		initTypeSystem();
-	}
+        initTypeSystem();
+    }
 
-	/** Initialize the type system of this extension. */
-	protected abstract void initTypeSystem();
+    /** Initialize the type system of this extension. */
+    protected abstract void initTypeSystem();
 
-	@Override
+    @Override
     public String[] fileExtensions() {
-		String[] sx = getOptions() == null ? null : getOptions().source_ext;
+        String[] sx = getOptions() == null ? null : getOptions().source_ext;
 
-		if (sx == null) {
-			sx = defaultFileExtensions();
-		}
-
-		if (sx.length == 0) {
-			return defaultFileExtensions();
-		}
-
-		return sx;
-	}
-
-	@Override
-    public String[] defaultFileExtensions() {
-		String ext = defaultFileExtension();
-		return new String[] { ext };
-	}
-
-	@Override
-    public SourceLoader sourceLoader() {
-		return extFileManager();
-	}
-
-	@Override
-    public TargetFactory targetFactory() {
-		if (target_factory == null) {
-			target_factory = new TargetFactory(extFileManager(),
-					getOptions().source_output, getOptions().output_ext,
-					getOptions().output_stdout);
-		}
-
-		return target_factory;
-	}
-
-	/** Create the scheduler for this extension. */
-	protected abstract Scheduler createScheduler();
-
-	@Override
-    public Scheduler scheduler() {
-		if (scheduler == null) {
-			scheduler = createScheduler();
-		}
-		return scheduler;
-	}
-
-	/** Create the type system for this extension. */
-	protected abstract TypeSystem createTypeSystem();
-
-	@Override
-    public TypeSystem typeSystem() {
-		if (ts == null) {
-			ts = createTypeSystem();
-		}
-		return ts;
-	}
-
-	/** Create the node factory for this extension. */
-	protected abstract NodeFactory createNodeFactory();
-
-	@Override
-    public NodeFactory nodeFactory() {
-		if (nf == null) {
-			nf = createNodeFactory();
-		}
-		return nf;
-	}
-
-	@Override
-    public JobExt jobExt() {
-		return null;
-	}
-
-	@Override
-    public abstract Parser parser(Reader reader, FileSource source,
-			ErrorQueue eq);
-
-	@Override
-    public String toString() {
-		return getClass().getName();
-	}
-
-	@Override
-    public ClassFile createClassFile(FileObject f, byte[] code)
-			throws IOException {
-		return new ClassFile_c(f, code, this);
-	}
-
-	@Override
-    public FileSource createFileSource(FileObject f, boolean user)
-			throws IOException {
-		return new Source_c(f, user);
-	}
-
-	@Override
-    public FileManager extFileManager() {
-		if (extFM == null) {
-			extFM = createFileManager();
-		}
-		return extFM;
-	}
-
-        protected FileManager createFileManager() {
-            FileManager fm = new ExtFileManager(this);
-            Options opt = getOptions();
-            try {
-                fm.setLocation(opt.source_path, opt.sourcepath_directories);
-                fm.setLocation(opt.source_output,
-                        Collections.singleton(opt.source_output_directory));
-                fm.setLocation(opt.class_output,
-                        Collections.singleton(opt.class_output_directory));
-                fm.setLocation(opt.bootclasspath, opt.bootclasspath_directories);
-                fm.setLocation(opt.classpath, opt.classpath_directories);
-            } catch (IOException e) {
-                throw new InternalCompilerError(e.getMessage());
-            }
-            return fm;
+        if (sx == null) {
+            sx = defaultFileExtensions();
         }
 
-	@Override
-    public ClassFileLoader classFileLoader() {
-		if (classFileLoader == null) {
-			classFileLoader = extFileManager();
-			classFileLoader.addLocation(getOptions().bootclasspath);
-			classFileLoader.addLocation(getOptions().classpath);
-		}
-		return classFileLoader;
-	}
+        if (sx.length == 0) {
+            return defaultFileExtensions();
+        }
 
-	@Override
+        return sx;
+    }
+
+    @Override
+    public String[] defaultFileExtensions() {
+        String ext = defaultFileExtension();
+        return new String[] { ext };
+    }
+
+    @Override
+    public SourceLoader sourceLoader() {
+        return extFileManager();
+    }
+
+    @Override
+    public TargetFactory targetFactory() {
+        if (target_factory == null) {
+            target_factory = new TargetFactory(extFileManager(),
+                    getOptions().source_output, getOptions().output_ext,
+                    getOptions().output_stdout);
+        }
+
+        return target_factory;
+    }
+
+    /** Create the scheduler for this extension. */
+    protected abstract Scheduler createScheduler();
+
+    @Override
+    public Scheduler scheduler() {
+        if (scheduler == null) {
+            scheduler = createScheduler();
+        }
+        return scheduler;
+    }
+
+    /** Create the type system for this extension. */
+    protected abstract TypeSystem createTypeSystem();
+
+    @Override
+    public TypeSystem typeSystem() {
+        if (ts == null) {
+            ts = createTypeSystem();
+        }
+        return ts;
+    }
+
+    /** Create the node factory for this extension. */
+    protected abstract NodeFactory createNodeFactory();
+
+    @Override
+    public NodeFactory nodeFactory() {
+        if (nf == null) {
+            nf = createNodeFactory();
+        }
+        return nf;
+    }
+
+    @Override
+    public JobExt jobExt() {
+        return null;
+    }
+
+    @Override
+    public abstract Parser parser(Reader reader, FileSource source,
+            ErrorQueue eq);
+
+    @Override
+    public String toString() {
+        return getClass().getName();
+    }
+
+    @Override
+    public ClassFile createClassFile(FileObject f, byte[] code)
+            throws IOException {
+        return new ClassFile_c(f, code, this);
+    }
+
+    @Override
+    public FileSource createFileSource(FileObject f, boolean user)
+            throws IOException {
+        return new Source_c(f, user);
+    }
+
+    @Override
+    public FileManager extFileManager() {
+        if (extFM == null) {
+            extFM = createFileManager();
+        }
+        return extFM;
+    }
+
+    protected FileManager createFileManager() {
+        FileManager fm = new ExtFileManager(this);
+        Options opt = getOptions();
+        try {
+            fm.setLocation(opt.source_path, opt.sourcepath_directories);
+            fm.setLocation(opt.source_output,
+                    Collections.singleton(opt.source_output_directory));
+            fm.setLocation(opt.class_output,
+                    Collections.singleton(opt.class_output_directory));
+            fm.setLocation(opt.bootclasspath, opt.bootclasspath_directories);
+            fm.setLocation(opt.classpath, opt.classpath_directories);
+        } catch (IOException e) {
+            throw new InternalCompilerError(e.getMessage());
+        }
+        return fm;
+    }
+
+    @Override
+    public ClassFileLoader classFileLoader() {
+        if (classFileLoader == null) {
+            classFileLoader = extFileManager();
+            classFileLoader.addLocation(getOptions().bootclasspath);
+            classFileLoader.addLocation(getOptions().classpath);
+        }
+        return classFileLoader;
+    }
+
+    @Override
     public ToExt getToExt(ExtensionInfo to_ext, Node n) {
-		// just return the first ToExt extension we find.
-		return ToExt_c.ext(n);
-	}
-	
-	@Override
+        // just return the first ToExt extension we find.
+        return ToExt_c.ext(n);
+    }
+
+    @Override
     public ExtensionInfo outputExtensionInfo() {
-		return null;
-	}
+        return null;
+    }
 
 }
