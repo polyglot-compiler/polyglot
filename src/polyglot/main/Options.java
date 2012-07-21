@@ -541,8 +541,7 @@ public class Options {
      */
     @SuppressWarnings("unchecked")
     protected void handleArg(Arg<?> arg) {
-        if (arg.flag == null)
-            throw new InternalCompilerError("Unexpected source argument: " + arg);
+        assert(arg.flag != null);
         
         if (arg.flag().ids().contains("-d")) {
             setClassOutput((File) arg.value());

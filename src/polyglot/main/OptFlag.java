@@ -347,7 +347,7 @@ public abstract class OptFlag<T> {
          * @param value
          *      the value representing this argument
          */
-        protected Arg(int next, T value) {
+        public Arg(int next, T value) {
             this(null, next, value);
         }
 
@@ -360,7 +360,7 @@ public abstract class OptFlag<T> {
          * @param value
          *      the value representing this argument
          */
-        protected Arg(OptFlag<T> flag, int next, T value) {
+        public Arg(OptFlag<T> flag, int next, T value) {
             this.flag = flag;
             this.next = next;
             this.value = value;
