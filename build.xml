@@ -682,6 +682,8 @@
                     <fileset dir="doc/release-notes-2.5" />
                 </copy>
 		<copy file="doc/Overview.txt" todir="${tmp}/doc" />
+		<copy file="doc/Overview.html" todir="${tmp}/doc" />
+		<copy file="doc/overview.css" todir="${tmp}/doc" />
 		<copy file="doc/ppg.html" todir="${tmp}/doc" />
 		<!--
 		<copy file="${lib}/polyglot.jar" todir="${tmp}/lib" />
