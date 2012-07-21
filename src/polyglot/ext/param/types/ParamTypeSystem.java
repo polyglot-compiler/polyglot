@@ -65,7 +65,7 @@ public interface ParamTypeSystem<Formal extends Param, Actual extends TypeObject
      * @param substMap Map from formal parameters to actuals; the formals are
      * not necessarily formals of <code>base</code>.
      */
-    Type subst(Type base, Map<Formal, Actual> substMap);
+    Type subst(Type base, Map<Formal, ? extends Actual> substMap);
 
     /**
      * Create a substitutor.
@@ -76,5 +76,5 @@ public interface ParamTypeSystem<Formal extends Param, Actual extends TypeObject
      * base type to substituted type.  This is passed in to ensure pointers to
      * outer classes are substituted correctly.
      */
-    Subst<Formal, Actual> subst(Map<Formal, Actual> substMap);
+    Subst<Formal, Actual> subst(Map<Formal, ? extends Actual> substMap);
 }

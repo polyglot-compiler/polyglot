@@ -64,9 +64,8 @@ public abstract class ParamTypeSystem_c<Formal extends Param, Actual extends Typ
      * @throws SemanticException when the actuals do not agree with the formals
      */
     @Override
-    public ClassType instantiate(Position pos, PClass<Formal, Actual> base, List<? extends Actual> actuals) 
-        throws SemanticException
-    {
+    public ClassType instantiate(Position pos, PClass<Formal, Actual> base,
+            List<? extends Actual> actuals) throws SemanticException {
         checkInstantiation(pos, base, actuals);
         return uncheckedInstantiate(pos, base, actuals);
     }
@@ -81,9 +80,9 @@ public abstract class ParamTypeSystem_c<Formal extends Param, Actual extends Typ
      *
      * @throws SemanticException when the actuals do not agree with the formals
      */
-    protected void checkInstantiation(Position pos, PClass<Formal, Actual> base,
-        List<? extends Actual> actuals) throws SemanticException
-    {
+    protected void checkInstantiation(Position pos,
+            PClass<Formal, Actual> base, List<? extends Actual> actuals)
+            throws SemanticException {
         if (base.formals().size() != actuals.size()) {
             throw new SemanticException("Wrong number of actual parameters " +
                                         "for instantiation of \"" +
@@ -99,9 +98,8 @@ public abstract class ParamTypeSystem_c<Formal extends Param, Actual extends Typ
      * @param base The parameterized type
      * @param actuals The list of actuals
      */
-    protected ClassType uncheckedInstantiate(Position pos, PClass<Formal, Actual> base,
-        List<? extends Actual> actuals)
-    {
+    protected ClassType uncheckedInstantiate(Position pos,
+            PClass<Formal, Actual> base, List<? extends Actual> actuals) {
         Map<Formal, Actual> substMap = new HashMap<Formal, Actual>();
         Iterator<Formal> i = base.formals().iterator();
         Iterator<? extends Actual> j = actuals.iterator();
@@ -135,7 +133,7 @@ public abstract class ParamTypeSystem_c<Formal extends Param, Actual extends Typ
      * not necessarily formals of <code>t</code>.
      */
     @Override
-    public Type subst(Type t, Map<Formal, Actual> substMap) {
+    public Type subst(Type t, Map<Formal, ? extends Actual> substMap) {
         return subst(substMap).substType(t);
     }
 
@@ -149,7 +147,7 @@ public abstract class ParamTypeSystem_c<Formal extends Param, Actual extends Typ
      * outer classes are substituted correctly.
      */
     @Override
-    public Subst<Formal, Actual> subst(Map<Formal, Actual> substMap) {
+    public Subst<Formal, Actual> subst(Map<Formal, ? extends Actual> substMap) {
         return new Subst_c<Formal, Actual>(this, substMap);
     }
 }

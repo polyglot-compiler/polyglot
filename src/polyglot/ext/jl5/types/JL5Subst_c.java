@@ -16,7 +16,8 @@ import polyglot.util.InternalCompilerError;
 
 public class JL5Subst_c extends Subst_c<TypeVariable, ReferenceType> implements JL5Subst {
 
-    public JL5Subst_c(ParamTypeSystem<TypeVariable, ReferenceType> ts, Map<TypeVariable, ReferenceType> subst) {
+    public JL5Subst_c(ParamTypeSystem<TypeVariable, ReferenceType> ts,
+            Map<TypeVariable, ? extends ReferenceType> subst) {
         super(ts, subst);
 //        if (subst.isEmpty()) {
 //            Thread.dumpStack();

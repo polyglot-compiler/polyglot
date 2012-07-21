@@ -62,10 +62,11 @@ public class Subst_c<Formal extends Param, Actual extends TypeObject> implements
 
     protected transient ParamTypeSystem<Formal, Actual> ts;
 
-    public Subst_c(ParamTypeSystem<Formal, Actual> ts, Map<Formal, Actual> subst)
+    public Subst_c(ParamTypeSystem<Formal, Actual> ts,
+            Map<Formal, ? extends Actual> subst)
     {
         this.ts = ts;
-        this.subst = subst;
+        this.subst = new HashMap<Formal, Actual>(subst);
         this.cache = new HashMap<CacheTypeWrapper, Type>();
     }
 
@@ -359,8 +360,9 @@ public class Subst_c<Formal extends Param, Actual extends TypeObject> implements
     @Override
     public String toString() {
         String str = "[";
-        for (Iterator<Entry<Formal, Actual>> iter = subst.entrySet().iterator(); iter.hasNext(); ) {
-            Entry<Formal, Actual> entry = iter.next();
+        for (Iterator<Entry<Formal, Actual>> iter =
+                subst.entrySet().iterator(); iter.hasNext();) {
+            Entry<Formal, ? extends Actual> entry = iter.next();
             str += "<" + entry.getKey() + ": " + entry.getValue() + ">";
             if (iter.hasNext())
                 str += ", ";

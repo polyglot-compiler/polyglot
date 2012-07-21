@@ -390,8 +390,8 @@ public abstract class Node_c implements Node
     }
 
     @Override
-    public Node exceptionCheck(ExceptionChecker ec) throws SemanticException { 
-        List<Type> l = this.del().throwTypes(ec.typeSystem());
+    public Node exceptionCheck(ExceptionChecker ec) throws SemanticException {
+        List<? extends Type> l = this.del().throwTypes(ec.typeSystem());
         for (Type exc : l) {
             ec.throwsException(exc, position());
         }

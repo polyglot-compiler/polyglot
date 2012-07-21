@@ -780,7 +780,8 @@ public class JL5TypeSystem_c extends ParamTypeSystem_c<TypeVariable, ReferenceTy
     }
 
     @Override
-    public Subst<TypeVariable, ReferenceType> subst(Map<TypeVariable, ReferenceType> substMap) {
+    public Subst<TypeVariable, ReferenceType> subst(
+            Map<TypeVariable, ? extends ReferenceType> substMap) {
         return new JL5Subst_c(this, substMap);
     }
 
