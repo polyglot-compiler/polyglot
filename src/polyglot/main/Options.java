@@ -126,10 +126,26 @@ public class Options {
      * Constructor
      */
     public Options(ExtensionInfo extension) {
+        this(extension, true);
+    }
+
+    public Options(ExtensionInfo extension, boolean checkFlags) {
         this.extension = extension;
         this.flags = new HashSet<OptFlag<?>>();
         this.arguments = new ArrayList<Arg<?>>();
         populateFlags(flags);
+        if (checkFlags) {
+            Set<String> ids = new HashSet<String>();
+            for (OptFlag<?> flag : flags) {
+                for (String id : flag.ids()) {
+                    if (!ids.add(id)) {
+                        throw new InternalCompilerError("Flag " + flag.ids()
+                                + " conflicts with "
+                                + OptFlag.lookupFlag(id, flags).ids());
+                    }
+                }
+            }
+        }
         setDefaultValues();
     }
 
@@ -489,7 +505,7 @@ public class Options {
      * @param source
      *          The set of source filenames provided on the command line.
      */
-    final protected void applyArgs(Set<String> source) {
+    final protected void applyArgs(Set<String> source) throws UsageError {
         Set<OptFlag<?>> seen = new HashSet<OptFlag<?>>();
         for (Arg<?> arg : arguments) {
             if (arg.flag == null) {
@@ -540,7 +556,7 @@ public class Options {
      * Process the option specified by <code>arg</code>
      */
     @SuppressWarnings("unchecked")
-    protected void handleArg(Arg<?> arg) {
+    protected void handleArg(Arg<?> arg) throws UsageError {
         assert(arg.flag != null);
         
         if (arg.flag().ids().contains("-d")) {
@@ -627,7 +643,8 @@ public class Options {
         
         } else if (arg.flag().ids().contains("-output-to-fs")) {
             setOutputToFS((Boolean) arg.value());
-        }
+
+        } else throw new UsageError("Unhandled argument: " + arg);
     }
     
     /**

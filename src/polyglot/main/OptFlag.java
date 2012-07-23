@@ -4,6 +4,7 @@ import static java.io.File.pathSeparator;
 
 import java.io.PrintStream;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -17,7 +18,45 @@ import java.util.StringTokenizer;
  * @param <T> The type of value parsed by this option.
  */
 public abstract class OptFlag<T> {
+    /**
+     * Remove the flag matching id
+     * @param id 
+     *          command line flag of the OptFlag to remove
+     * @param flags
+     *          the list of OptFlags
+     * @return
+     *        true if the id was found
+     */
+    public static boolean removeFlag(String id, Set<OptFlag<?>> flags) {
+        for (Iterator<OptFlag<?>> it = flags.iterator(); it.hasNext();) {
+            OptFlag<?> flag = it.next();
+            if (flag.ids.contains(id)) {
+                it.remove();
+                return true;
+            }
+        }
+        return false;
+    }
     
+    /**
+     * Lookup the flag matching id
+     * @param id 
+     *          command line flag of the OptFlag
+     * @param flags
+     *          the list of OptFlags
+     * @return
+     *        true if the id was found
+     */
+    public static OptFlag<?> lookupFlag(String id, Set<OptFlag<?>> flags) {
+        for (Iterator<OptFlag<?>> it = flags.iterator(); it.hasNext();) {
+            OptFlag<?> flag = it.next();
+            if (flag.ids.contains(id)) {
+                return flag;
+            }
+        }
+        return null;
+    }
+
     public static boolean hasSourceArg(List<Arg<?>> arguments) {
         for (Arg<?> arg : arguments) {
             if (arg.flag == null)
@@ -61,17 +100,22 @@ public abstract class OptFlag<T> {
     protected final String defaultValue;
 
     @Override
+    public String toString() {
+        return ids.toString();
+    }
+
+    @Override
     public boolean equals(Object obj) {
         if (obj instanceof OptFlag) {
             OptFlag<?> that = (OptFlag<?>) obj;
-            return kind == that.kind && ids.equals(that.ids); 
+            return kind == that.kind && ids.equals(that.ids);
         }
         return false;
     }
-    
+
     @Override
     public int hashCode() {
-        return kind.hashCode() ^ ids.hashCode(); 
+        return kind.hashCode() ^ ids.hashCode();
     }
     
     /**

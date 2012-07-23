@@ -4,10 +4,10 @@ import java.util.Set;
 
 import polyglot.frontend.ExtensionInfo;
 import polyglot.main.OptFlag;
-import polyglot.main.Options;
-import polyglot.main.UsageError;
 import polyglot.main.OptFlag.Arg;
 import polyglot.main.OptFlag.Switch;
+import polyglot.main.Options;
+import polyglot.main.UsageError;
 
 public class JL5Options extends Options {
         public boolean translateEnums;
@@ -43,7 +43,7 @@ public class JL5Options extends Options {
         }
 
         @Override
-        protected void handleArg(Arg<?> arg) {
+    protected void handleArg(Arg<?> arg) throws UsageError {
             if (arg.flag().ids().contains("-enumImplClass")) {
                 this.enumImplClass = (String) arg.value();
                 // if anything other than java.lang.Enum, we may need to
