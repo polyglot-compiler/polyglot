@@ -17,11 +17,11 @@
 package polyglot.main;
 
 import static java.io.File.pathSeparatorChar;
-import static java.io.File.separator;
 
 import java.io.File;
 import java.io.PrintStream;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -72,7 +72,7 @@ public class Options {
     public JavaFileManager.Location classpath = StandardLocation.CLASS_PATH;
     public JavaFileManager.Location bootclasspath = StandardLocation.PLATFORM_CLASS_PATH;
 
-    public boolean outputToFS = false;
+    public boolean noOutputToFS = false;
     public boolean assertions = false;
     public boolean generate_debugging_info = false;
 
@@ -121,6 +121,8 @@ public class Options {
     protected final List<OptFlag.Arg<?>> arguments;
 
     protected boolean output_source_only;
+
+    protected Boolean print_args;
 
     /**
      * Constructor
@@ -252,31 +254,7 @@ public class Options {
                 "JVM property: sun.boot.class.path (or all jars in java.home/lib)") {
             @Override
             public Arg<List<File>> defaultArg() {
-                String boot = System.getProperty("sun.boot.class.path");
-                if (boot == null) {
-                    boot = "";
-                    // TODO : make external config property file.
-                    File java_home_libdir;
-                    if (System.getProperty("os.name").indexOf("Mac") != -1) {
-                        // XXX: gross!
-                        java_home_libdir =
-                                new File(System.getProperty("java.home")
-                                        + separator + ".." + separator
-                                        + "Classes");
-                    } else {
-                        java_home_libdir =
-                                new File(System.getProperty("java.home")
-                                        + separator + "lib");
-                    }
-                    File[] files = java_home_libdir.listFiles();
-                    StringBuilder sb = new StringBuilder();
-                    for (int i = 0; i < files.length; i++) {
-                        sb.append(files[i]);
-                        if (i + 1 < files.length) sb.append(';');
-                    }
-                    boot = sb.toString();
-                }
-                return handle(new String[] { boot }, 0);
+                return handle(new String[] { jvmbootclasspath() }, 0);
             }
 
             @Override
@@ -415,20 +393,11 @@ public class Options {
         flags.add(new Switch("-simpleoutput", "use SimpleCodeWriter"));
         flags.add(new Switch("-mergestrings",
                 "parse concatenated string literals as one single string literal"));
-        flags.add(new Switch("-output-to-fs",
-                "force output .java files to be written to disk") {
-
-                    @Override
-                    public Arg<Boolean> defaultArg(List<Arg<?>> args) {
-                        // Must write java files to disk if we use a
-                        // custom (external) post compiler.
-                        Arg<?> post = OptFlag.lookup("-post", args);
-                        if (post != null) 
-                            return createDefault(true);
-                        else 
-                            return createDefault(false);
-                    }            
-        });
+        flags.add(new Switch(Kind.SECRET, "-print-arguments",
+                "Check that no options try to handle the same command line flag."));
+        flags.add(new Switch("-no-output-to-fs",
+                "keep .java files in memory if possible"));
+        ;
     }
 
     /**
@@ -461,6 +430,7 @@ public class Options {
         }
         validateArgs();
         applyArgs(source);
+        if (print_args) printCommandLine(System.out);
         postApplyArgs();
     }
 
@@ -476,12 +446,17 @@ public class Options {
         this.arguments.addAll(arguments);
         validateArgs();
         applyArgs(source);
+        if (print_args) printCommandLine(System.out);
         postApplyArgs();
     }
 
     
     protected void postApplyArgs() {
-
+        // If we are using an external post compiler, 
+        // we have to output files to disk
+        if (post_compiler != null || keep_output_files) {
+            noOutputToFS = false;
+        }
     }
 
     /**
@@ -550,6 +525,7 @@ public class Options {
                     out.print(" " + arg.toString());
             }
         }
+        out.println();
     }
 
     /**
@@ -641,8 +617,11 @@ public class Options {
         } else if (arg.flag().ids().contains("-mergestrings")) {
             setMergeStrings((Boolean) arg.value());
         
-        } else if (arg.flag().ids().contains("-output-to-fs")) {
-            setOutputToFS((Boolean) arg.value());
+        } else if (arg.flag().ids().contains("-print-arguments")) {
+            print_args = (Boolean) arg.value();
+
+        } else if (arg.flag().ids().contains("-no-output-to-fs")) {
+            noOutputToFS =  (Boolean) arg.value();
 
         } else throw new UsageError("Unhandled argument: " + arg);
     }
@@ -663,7 +642,6 @@ public class Options {
 
     protected void setSourceOutput(File f) {
         source_output_directory = f;
-        outputToFS = true;
     }
     
     protected void setClasspath(List<File> value) {
@@ -780,10 +758,6 @@ public class Options {
         merge_strings = value;
     }
 
-    protected void setOutputToFS(boolean value) {
-        outputToFS = value;
-    }
-
     /**
      * Parse a command
      * 
@@ -815,7 +789,7 @@ public class Options {
         return src.next();
     }
     
-    public Location outputDirectory() {
+    public Location outputLocation() {
         return source_output;
     }
 
@@ -834,7 +808,9 @@ public class Options {
         usageHeader(out);
 
         boolean firstSecretItem = true;
-        for (OptFlag<?> flag : flags) {
+        List<OptFlag<?>> sorted = new ArrayList<OptFlag<?>>(flags);
+        Collections.sort(sorted);
+        for (OptFlag<?> flag : sorted) {
           boolean isSecret = flag.kind.compareTo(Kind.SECRET) >= 0;
           if (showSecretMenu && isSecret && firstSecretItem) {
             out.println();
@@ -1009,6 +985,36 @@ public class Options {
             builder.append(pathSeparatorChar);
         }
         return builder.toString();
+    }
+
+    public String jvmbootclasspath() {
+        String boot = System.getProperty("sun.boot.class.path");
+        if (boot == null) {
+            boot = "";
+            // TODO : make external config property file.
+            File java_home_libdir;
+            if (System.getProperty("os.name").indexOf("Mac") != -1) {
+                // XXX: gross!
+                java_home_libdir =
+                        new File(System.getProperty("java.home")
+                                + File.separator + ".." + File.separator
+                                + "Classes");
+            } else {
+                java_home_libdir =
+                        new File(System.getProperty("java.home")
+                                + File.separator + "lib");
+            }
+            File[] files = java_home_libdir.listFiles();
+            StringBuilder sb = new StringBuilder();
+            for (int i = 0; i < files.length; i++) {
+                if (files[i].getName().endsWith("jar")) {
+                    sb.append(files[i]);
+                    if (i + 1 < files.length) sb.append(';');
+                }
+            }
+            boot = sb.toString();
+        }
+        return boot;
     }
 }
 // vim: ts=4

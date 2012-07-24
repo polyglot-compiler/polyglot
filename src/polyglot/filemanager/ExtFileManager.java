@@ -126,7 +126,7 @@ public class ExtFileManager implements FileManager {
     public FileObject getFileForInput(Location location, String packageName,
 			String relativeName) throws IOException {
 		Options options = extInfo.getOptions();
-		Location sourceOutputLoc = options.outputDirectory();
+		Location sourceOutputLoc = options.outputLocation();
 		if (sourceOutputLoc.equals(location)) {
 			String newName = packageName.equals("") ? ("" + relativeName)
 					: (packageName.replace('.', separatorChar) + separator + relativeName);
@@ -145,11 +145,11 @@ public class ExtFileManager implements FileManager {
     public FileObject getFileForOutput(Location location, String packageName,
 			String relativeName, FileObject sibling) throws IOException {
 		Options options = extInfo.getOptions();
-		Location sourceOutputLoc = options.outputDirectory();
+		Location sourceOutputLoc = options.outputLocation();
 		if (location == null || !sourceOutputLoc.equals(location)
 				|| !javac_fm.hasLocation(sourceOutputLoc))
 			return null;
-		if (options.outputToFS)
+        if (!options.noOutputToFS)
 			return javac_fm.getFileForOutput(location, packageName,
 					relativeName, sibling);
 		URI srcUri, srcParentUri;
@@ -200,7 +200,7 @@ public class ExtFileManager implements FileManager {
     public JavaFileObject getJavaFileForInput(Location location,
 			String className, Kind kind) throws IOException {
 		Options options = extInfo.getOptions();
-		Location sourceOutputLoc = options.outputDirectory();
+		Location sourceOutputLoc = options.outputLocation();
 		if (sourceOutputLoc.equals(location)) {
 			String clazz = className.replace('.', separatorChar)
 					+ kind.extension;
@@ -219,13 +219,14 @@ public class ExtFileManager implements FileManager {
     public JavaFileObject getJavaFileForOutput(Location location,
 			String className, Kind kind, FileObject sibling) throws IOException {
 		Options options = extInfo.getOptions();
-		Location sourceOutputLoc = options.outputDirectory();
+		Location sourceOutputLoc = options.outputLocation();
 		Location classOutputLoc = options.classOutputDirectory();
-		if (kind.equals(Kind.SOURCE)) {
-			if (location == null || !sourceOutputLoc.equals(location)
-					|| !javac_fm.hasLocation(sourceOutputLoc))
-				return null;
-			if (options.outputToFS)
+        if (kind.equals(Kind.SOURCE)) {
+            if (location == null || !sourceOutputLoc.equals(location)
+                    || !javac_fm.hasLocation(sourceOutputLoc))
+                throw new IllegalArgumentException("Unknown output location: "
+                        + location);
+            if (!options.noOutputToFS)
 				return javac_fm.getJavaFileForOutput(location, className, kind,
 						sibling);
 			URI srcUri, srcParentUri;
@@ -308,7 +309,7 @@ public class ExtFileManager implements FileManager {
     public Iterable<JavaFileObject> list(Location location, String packageName,
 			Set<Kind> kinds, boolean recurse) throws IOException {
 		Options options = extInfo.getOptions();
-		Location sourceOutputLoc = options.outputDirectory();
+		Location sourceOutputLoc = options.outputLocation();
 		Location classOutputLoc = options.classOutputDirectory();
 		if (location == null)
 			return new HashSet<JavaFileObject>();
@@ -560,12 +561,13 @@ public class ExtFileManager implements FileManager {
 	@Override
 	public FileSource fileSource(Location location, String fileName,
 			boolean userSpecified) throws IOException {
-		File f = new File(fileName);
+        File f = new File(fileName);
 		FileSource sourceFile;
 		FileObject fo = null;
 		String key;
 		if (userSpecified) {
 			key = fileName;
+            f = f.getAbsoluteFile();
 			sourceFile = loadedSources.get(key);
 			if (sourceFile != null)
 				return sourceFile;

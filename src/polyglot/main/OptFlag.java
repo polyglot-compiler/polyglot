@@ -10,6 +10,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.StringTokenizer;
 
+import polyglot.util.InternalCompilerError;
+
 /**
  * An OptFlag represents a command line option. It groups parsing and usage
  * information together so that compilers may easily compose options from
@@ -17,7 +19,7 @@ import java.util.StringTokenizer;
  * 
  * @param <T> The type of value parsed by this option.
  */
-public abstract class OptFlag<T> {
+public abstract class OptFlag<T> implements Comparable<OptFlag<T>> {
     /**
      * Remove the flag matching id
      * @param id 
@@ -118,6 +120,14 @@ public abstract class OptFlag<T> {
         return kind.hashCode() ^ ids.hashCode();
     }
     
+    @Override
+    public int compareTo(OptFlag<T> flag) {
+        for (String id1 : ids) {
+            for (String id2 : flag.ids())
+                return id1.compareTo(id2);
+        }
+        throw new InternalCompilerError("Empty ids!");
+    }
     /**
      * @param id
      *            The flag ID. e.g., "--name", "-n", or "-name".
@@ -362,7 +372,9 @@ public abstract class OptFlag<T> {
     public Arg<T> defaultArg() {
         if (defaultValue != null)
             throw new UnsupportedOperationException(
-                    "Usage specifies a default value, but flag does not implement one.");
+                    "Usage for "
+                            + ids()
+                            + " specifies a default value, but flag does not implement one.");
         return null;
     }
 
@@ -428,10 +440,7 @@ public abstract class OptFlag<T> {
             if (flag == null)
                 sb.append(value());
             else {
-                for (String id : flag.ids()) {
-                    sb.append(id);
-                    break;
-                }
+                sb.append(flag.ids().toString());
                 if (flag.params != null) {
                     sb.append(" ");
                     sb.append(value());
