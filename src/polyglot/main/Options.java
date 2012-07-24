@@ -809,7 +809,7 @@ public class Options {
 
         boolean firstSecretItem = true;
         List<OptFlag<?>> sorted = new ArrayList<OptFlag<?>>(flags);
-        Collections.sort(sorted);
+        Collections.sort(sorted, null);
         for (OptFlag<?> flag : sorted) {
           boolean isSecret = flag.kind.compareTo(Kind.SECRET) >= 0;
           if (showSecretMenu && isSecret && firstSecretItem) {
