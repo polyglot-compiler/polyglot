@@ -265,6 +265,17 @@ public class Options {
                 else return null;
             }
         });
+        flags.add(new PathFlag<File>("-addbootcp", "<path>",
+                "prepend <path> to the bootclasspath") {
+            @Override
+            public File handlePathEntry(String entry) {
+                File f = new File(entry);
+                if (f.exists())
+                    return f;
+                else return null;
+            }
+            });
+
         flags.add(new PathFlag<File>("-sourcepath", "<path>",
                 "where to find source files", "current directory") {
             @Override
@@ -546,7 +557,8 @@ public class Options {
         
         } else if (arg.flag().ids().contains("-bootclasspath")) {
             setBootclasspath((List<File>) arg.value());
-        
+        } else if (arg.flag().ids().contains("-addbootcp")) {
+            addBootCP((List<File>) arg.value());        
         } else if (arg.flag().ids().contains("-sourcepath")) {
             setSourcepath((List<File>) arg.value());
         
@@ -645,17 +657,18 @@ public class Options {
     }
     
     protected void setClasspath(List<File> value) {
-        classpath_directories.clear();
         classpath_directories.addAll(value);
     }
     
     protected void setBootclasspath(List<File> value) {
-        bootclasspath_directories.clear();
         bootclasspath_directories.addAll(value);
     }
-    
+
+    protected void addBootCP(List<File> value) {
+        bootclasspath_directories.addAll(value);
+    }
+
     protected void setSourcepath(List<File> value) {
-        sourcepath_directories.clear();
         sourcepath_directories.addAll(value);
     }
 
