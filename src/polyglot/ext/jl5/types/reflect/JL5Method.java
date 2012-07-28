@@ -12,6 +12,11 @@ import polyglot.types.reflect.Method;
 
 public class JL5Method extends Method {
     protected JL5Signature signature;
+    /**
+     * Record whether an annotation has a default value.
+     */
+    protected boolean defaultVal; 
+
 
     public JL5Method(DataInputStream in, ClassFile clazz) {
         super(in, clazz);
@@ -45,6 +50,9 @@ public class JL5Method extends Method {
                 if ("Synthetic".equals(name.value())) {
                     synthetic = true;
                 }
+                if ("AnnotationDefault".equals(name.value())){
+                    defaultVal = true;
+                }
                 if ("Signature".equals(name.value())) {
                     signature = new JL5Signature(clazz, in, nameIndex, length);
                     attrs[i] = signature;
@@ -64,6 +72,10 @@ public class JL5Method extends Method {
     
     public JL5Signature getSignature() {
         return signature;
+    }
+    
+    public boolean hasDefaultVal(){
+        return defaultVal;
     }
 
 }

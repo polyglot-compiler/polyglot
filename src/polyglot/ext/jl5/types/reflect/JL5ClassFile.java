@@ -48,6 +48,7 @@ public class JL5ClassFile extends ClassFile_c {
 		return null;
 	}
 
+
 	public JL5Signature getSignature() {
 		return signature;
 	}

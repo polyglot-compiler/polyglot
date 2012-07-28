@@ -385,8 +385,9 @@ ClassFileLazyClassInitializer implements JL5LazyClassInitializer {
             if (!methods[i].name().equals("<init>")
                     && !methods[i].name().equals("<clinit>")
                     && !methods[i].isSynthetic()) {
-                AnnotationElemInstance mi = this.annotationElemInstance(
-                        (JL5Method) methods[i], ct);
+                AnnotationElemInstance mi =
+                        this.annotationElemInstance((JL5Method) methods[i], ct,
+                                ((JL5Method) methods[i]).hasDefaultVal());
                 if (Report.should_report(verbose, 3))
                     Report.report(3, "adding " + mi + " to " + ct);
                 ((JL5ParsedClassType) ct).addAnnotationElem(mi);
@@ -401,7 +402,7 @@ ClassFileLazyClassInitializer implements JL5LazyClassInitializer {
     }
 
     private AnnotationElemInstance annotationElemInstance(JL5Method annot,
-            ParsedClassType ct) {
+            ParsedClassType ct, boolean hasDefault) {
         Constant[] constants = clazz.getConstants();
         String name = (String) constants[annot.getName()].value();
         String type = (String) constants[annot.getType()].value();
@@ -411,8 +412,8 @@ ClassFileLazyClassInitializer implements JL5LazyClassInitializer {
 
         int index = type.indexOf(')', 1);
         Type returnType = typeForString(type.substring(index + 1));
-        // TODO: Support default values.
         return ((JL5TypeSystem) ts).annotationElemInstance(ct.position(), ct,
-                ts.flagsForBits(annot.getModifiers()), returnType, name, false);
+                ts.flagsForBits(annot.getModifiers()), returnType, name,
+                hasDefault);
     }
 }
