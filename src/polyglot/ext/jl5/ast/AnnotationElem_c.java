@@ -1,5 +1,6 @@
 package polyglot.ext.jl5.ast;
 
+import java.util.Collections;
 import java.util.List;
 
 import polyglot.ast.Expr_c;
@@ -9,6 +10,7 @@ import polyglot.ast.TypeNode;
 import polyglot.ext.jl5.types.JL5Flags;
 import polyglot.types.SemanticException;
 import polyglot.util.CodeWriter;
+import polyglot.util.ListUtil;
 import polyglot.util.Position;
 import polyglot.visit.CFGBuilder;
 import polyglot.visit.NodeVisitor;
@@ -16,13 +18,21 @@ import polyglot.visit.PrettyPrinter;
 import polyglot.visit.Translator;
 import polyglot.visit.TypeChecker;
 
-public abstract class AnnotationElem_c extends Expr_c implements AnnotationElem {
+public class AnnotationElem_c extends Expr_c implements AnnotationElem {
 
     protected TypeNode typeName;
+    protected List<ElementValuePair> elements;
 
+    public AnnotationElem_c(Position pos, TypeNode typeName,
+            List<ElementValuePair> elements) {
+        super(pos);
+        this.typeName = typeName;
+        this.elements = ListUtil.copy(elements, true);
+    }
     public AnnotationElem_c(Position pos, TypeNode typeName){
         super(pos);
         this.typeName = typeName;
+        this.elements = Collections.emptyList();
     }
 
     @Override
@@ -87,7 +97,7 @@ public abstract class AnnotationElem_c extends Expr_c implements AnnotationElem 
     }
 
     @Override
-    public boolean isConstant(){
+    public boolean isConstant() {
         return true;
     }
 
@@ -99,6 +109,21 @@ public abstract class AnnotationElem_c extends Expr_c implements AnnotationElem 
     @Override
     public Term firstChild() {
         return typeName;
+    }
+
+    @Override
+    public List<ElementValuePair> elements() {
+        return this.elements;
+    }
+
+    @Override
+    public boolean isMarkerAnnotation() {
+        return elements().isEmpty();
+    }
+
+    @Override
+    public boolean isSingleElementAnnotation() {
+        return elements().size() == 1;
     }
 
 }

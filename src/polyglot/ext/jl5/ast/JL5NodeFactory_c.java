@@ -99,13 +99,15 @@ public class JL5NodeFactory_c extends NodeFactory_c implements JL5NodeFactory {
     }
 
     @Override
-    public AnnotationElem NormalAnnotationElem(Position pos, TypeNode name, List<ElementValuePair> elements) {
-        NormalAnnotationElem n = new NormalAnnotationElem_c(pos, name, elements);
-        n = (NormalAnnotationElem)n.ext(extFactory().extNormalAnnotationElem());
-        n = (NormalAnnotationElem)n.del(delFactory().delNormalAnnotationElem());
+    public AnnotationElem NormalAnnotationElem(Position pos, TypeNode name,
+            List<ElementValuePair> elements) {
+        AnnotationElem n = new AnnotationElem_c(pos, name, elements);
+        n = (AnnotationElem) n.ext(extFactory().extNormalAnnotationElem());
+        n = (AnnotationElem) n.del(delFactory().delNormalAnnotationElem());
         return n;
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public AnnotationElem MarkerAnnotationElem(Position pos, TypeNode name) {
         return NormalAnnotationElem(pos, name, Collections.EMPTY_LIST);
