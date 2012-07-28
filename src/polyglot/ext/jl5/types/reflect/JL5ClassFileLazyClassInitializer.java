@@ -30,13 +30,13 @@ import polyglot.util.Position;
 import polyglot.util.StringUtil;
 
 /**
- * XXX TODO 
+ * XXX TODO
  * Enums
  * default annotation vals
  */
 public class JL5ClassFileLazyClassInitializer extends
-        ClassFileLazyClassInitializer implements JL5LazyClassInitializer {
-    
+ClassFileLazyClassInitializer implements JL5LazyClassInitializer {
+
     protected boolean annotationsInitialized;
 
     public JL5ClassFileLazyClassInitializer(ClassFile file, TypeSystem ts) {
@@ -44,7 +44,7 @@ public class JL5ClassFileLazyClassInitializer extends
     }
 
     @Override
-    protected boolean initialized() {       
+    protected boolean initialized() {
         return super.initialized() & annotationsInitialized;
     }
     /**
@@ -217,8 +217,8 @@ public class JL5ClassFileLazyClassInitializer extends
         Exceptions exceptions = method.getExceptions();
         if (exceptions != null) {
             int[] throwTypes = exceptions.getThrowTypes();
-            for (int i = 0; i < throwTypes.length; i++) {
-                String s = clazz.classNameCP(throwTypes[i]);
+            for (int throwType : throwTypes) {
+                String s = clazz.classNameCP(throwType);
                 excTypes.add(quietTypeForName(s));
             }
         }
@@ -299,8 +299,8 @@ public class JL5ClassFileLazyClassInitializer extends
             // Count the number of synthetic fields.
             int numSynthetic = 0;
 
-            for (int i = 0; i < fields.length; i++) {
-                if (fields[i].isSynthetic()) {
+            for (Field field : fields) {
+                if (field.isSynthetic()) {
                     numSynthetic++;
                 }
             }
@@ -415,5 +415,4 @@ public class JL5ClassFileLazyClassInitializer extends
         return ((JL5TypeSystem) ts).annotationElemInstance(ct.position(), ct,
                 ts.flagsForBits(annot.getModifiers()), returnType, name, false);
     }
-
 }
