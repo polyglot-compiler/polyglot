@@ -162,7 +162,6 @@ public class AnnotationElemDecl_c extends Term_c implements AnnotationElemDecl {
         f = f.Public().Abstract();
 
         AnnotationElemInstance ai = ts.annotationElemInstance(position(), ct, f, ts.unknownType(position()), this.name(), defaultVal != null);
-        ct.addMethod(ai);
         ct.addAnnotationElem(ai);
         
         return annotationElemInstance(ai);

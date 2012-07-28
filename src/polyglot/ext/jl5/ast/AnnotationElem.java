@@ -22,10 +22,9 @@ public interface AnnotationElem extends Expr {
      * @return
      */
     boolean isMarkerAnnotation();
-//    NormalAnnotationElem elements(List<ElementValuePair> elements);
 
     /**
-     * An annotation is a single-element annotation if it has one element
+     * An annotation is a single-element annotation if it has one element named "value"
      * @return
      */
     boolean isSingleElementAnnotation();

@@ -1,6 +1,7 @@
 package polyglot.ext.jl5.ast;
 
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 
 import polyglot.ast.Expr_c;
@@ -15,7 +16,6 @@ import polyglot.util.Position;
 import polyglot.visit.CFGBuilder;
 import polyglot.visit.NodeVisitor;
 import polyglot.visit.PrettyPrinter;
-import polyglot.visit.Translator;
 import polyglot.visit.TypeChecker;
 
 public class AnnotationElem_c extends Expr_c implements AnnotationElem {
@@ -79,12 +79,27 @@ public class AnnotationElem_c extends Expr_c implements AnnotationElem {
     public void prettyPrint(CodeWriter w, PrettyPrinter pp) {
         w.write("@");
         print(typeName, w, pp);
-    }
+        if (this.isMarkerAnnotation()) {
+            // marker annotation, so no values to print out.
+            return;
+        }
+        w.write("(");
 
-    @Override
-    public void translate(CodeWriter w, Translator tr) {
-        w.write("@");
-        print(typeName, w, tr);
+        // Single-element annotation named "value": special case
+        if (this.isSingleElementAnnotation()) {
+            print(elements().get(0).value(), w, pp);
+        }
+        else {
+
+            for (Iterator<ElementValuePair> it = elements().iterator(); it
+                    .hasNext();) {
+                print(it.next(), w, pp);
+                if (it.hasNext()) {
+                    w.write(", ");
+                }
+            }
+        }
+        w.write(") ");
     }
 
     public Term entry() {
@@ -123,7 +138,9 @@ public class AnnotationElem_c extends Expr_c implements AnnotationElem {
 
     @Override
     public boolean isSingleElementAnnotation() {
-        return elements().size() == 1;
+        return elements().size() == 1
+                && elements().get(0).name()
+                        .equals("value");
     }
 
 }
