@@ -17,6 +17,7 @@ import polyglot.util.CollectionUtil;
 import polyglot.util.ListUtil;
 import polyglot.util.Position;
 import polyglot.visit.NodeVisitor;
+import polyglot.visit.PrettyPrinter;
 import polyglot.visit.Translator;
 import polyglot.visit.TypeChecker;
 
@@ -28,12 +29,12 @@ public class NormalAnnotationElem_c extends AnnotationElem_c implements NormalAn
         super(pos, typeName);
         this.elements = ListUtil.copy(elements, true);
     }
-    
+
     @Override
     public List<ElementValuePair> elements(){
         return Collections.unmodifiableList(this.elements);
     }
-    
+
     @Override
     public NormalAnnotationElem elements(List<ElementValuePair> elements){
         NormalAnnotationElem_c n = (NormalAnnotationElem_c) copy();
@@ -57,20 +58,20 @@ public class NormalAnnotationElem_c extends AnnotationElem_c implements NormalAn
         List<ElementValuePair> elements = visitList(this.elements, v);
         return reconstruct(tn, elements);
     }
-   
+
     @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
-        JL5TypeSystem ts = (JL5TypeSystem)tc.typeSystem(); 
+        JL5TypeSystem ts = (JL5TypeSystem)tc.typeSystem();
         Context c = tc.context();
         // check that elements refer to annotation element instances
         for (ElementValuePair next : elements()) {
             AnnotationElemInstance ai = ts.findAnnotation(typeName().type().toReference(), next.name(), c.currentClass());
             // and value has to be the right type
             if (! ts.isImplicitCastValid(next.value().type(), ai.type()) &&
-                ! ts.equals(next.value().type(), ai.type()) &&
-                ! ts.numericConversionValid(ai.type(), next.value().constantValue()) && 
-                ! ts.isBaseCastValid(next.value().type(), ai.type()) &&
-                ! ts.numericConversionBaseValid(ai.type(), next.value().constantValue())){
+                    ! ts.equals(next.value().type(), ai.type()) &&
+                    ! ts.numericConversionValid(ai.type(), next.value().constantValue()) &&
+                    ! ts.isBaseCastValid(next.value().type(), ai.type()) &&
+                    ! ts.numericConversionBaseValid(ai.type(), next.value().constantValue())){
                 throw new SemanticException("The type of the value: "+next.value().type()+" for element: "+next.name()+" does not match the declared annotation type: "+ai.type(), next.value().position());
             }
         }
@@ -86,7 +87,7 @@ public class NormalAnnotationElem_c extends AnnotationElem_c implements NormalAn
                 }
             }
         }
-    
+
         // check duplicat mem val pairs
         ArrayList<ElementValuePair> list = new ArrayList<ElementValuePair>(elements);
         for (int i = 0; i < list.size(); i++){
@@ -97,9 +98,10 @@ public class NormalAnnotationElem_c extends AnnotationElem_c implements NormalAn
                     throw new SemanticException("Duplicate annotation member value name in "+this.typeName(), ej.position());
                 }
             }
-        }            
-        
-        return super.typeCheck(tc);
+        }
+
+        NormalAnnotationElem_c n = (NormalAnnotationElem_c) super.typeCheck(tc);
+        return n;
     }
 
     protected boolean elementForNoDefault(AnnotationElemInstance ai){
@@ -108,7 +110,32 @@ public class NormalAnnotationElem_c extends AnnotationElem_c implements NormalAn
         }
         return false;
     }
-    
+
+    @Override
+    public void prettyPrint(CodeWriter w, PrettyPrinter pp) {
+        super.prettyPrint(w, pp);
+
+        // It's not a Marker Annotation
+        if (!elements().isEmpty()) {
+            w.write("(");
+
+            // Single-element annotation named "value": special case
+            if (elements().size() == 1 && elements().get(0).name().equals("value")) {
+                print(elements().get(0).value(), w, pp);
+            }
+            // Else multiple-valued (Normal) Annotation Element
+            else {
+                for (Iterator<ElementValuePair> it = elements().iterator(); it.hasNext(); ) {
+                    print(it.next(), w, pp);
+                    if (it.hasNext()){
+                        w.write(", ");
+                    }
+                }
+            }
+            w.write(") ");
+        }
+    }
+
     @Override
     public void translate(CodeWriter w, Translator tr){
         super.translate(w, tr);
@@ -119,6 +146,5 @@ public class NormalAnnotationElem_c extends AnnotationElem_c implements NormalAn
                 w.write(",");
             }
         }
-        w.write(") ");
     }
 }

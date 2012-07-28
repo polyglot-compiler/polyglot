@@ -3,20 +3,21 @@ package polyglot.ext.jl5.ast;
 import java.util.List;
 
 import polyglot.ast.Expr;
-import polyglot.ast.Expr_c;
 import polyglot.ast.Id;
 import polyglot.ast.Node;
 import polyglot.ast.Term;
+import polyglot.ast.Term_c;
 import polyglot.ext.jl5.types.JL5TypeSystem;
 import polyglot.types.SemanticException;
 import polyglot.util.CodeWriter;
 import polyglot.util.Position;
 import polyglot.visit.CFGBuilder;
 import polyglot.visit.NodeVisitor;
+import polyglot.visit.PrettyPrinter;
 import polyglot.visit.Translator;
 import polyglot.visit.TypeChecker;
 
-public class ElementValuePair_c extends Expr_c implements ElementValuePair {
+public class ElementValuePair_c extends Term_c implements ElementValuePair {
    
     protected Id name;
     protected Expr value;
@@ -38,7 +39,7 @@ public class ElementValuePair_c extends Expr_c implements ElementValuePair {
     }
 
     public ElementValuePair name(String name){
-        if (!name.equals(this.name)){
+        if (!name.equals(this.name.id())){
             ElementValuePair_c n = (ElementValuePair_c)copy();
             n.name = this.name.id(name);
             return n;
@@ -60,26 +61,24 @@ public class ElementValuePair_c extends Expr_c implements ElementValuePair {
         return this;
     }
 
-    protected Node reconstruct(Expr value){
-        if (value != this.value){
-            ElementValuePair_c n = (ElementValuePair_c) copy();
-            n.value = value;
-            return n;
-        }
-        return this;
-    }
     
     @Override
     public Node visitChildren(NodeVisitor v){
         Expr value = (Expr) visitChild(this.value, v);
-        return reconstruct(value);
+        return value(value);
     }
 
     @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException{
         JL5TypeSystem ts = (JL5TypeSystem)tc.typeSystem();
         ts.checkAnnotationValueConstant(value);
-        return type(value.type());
+        return this;
+    }
+    
+    @Override
+	public void prettyPrint(CodeWriter w, PrettyPrinter pp) {
+        w.write(name+"=");
+        print(value, w, pp);
     }
     
     @Override

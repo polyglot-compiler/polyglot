@@ -11,13 +11,16 @@ import polyglot.ast.ClassDecl_c;
 import polyglot.ast.Id;
 import polyglot.ast.Node;
 import polyglot.ast.TypeNode;
+import polyglot.ext.jl5.types.AnnotationElemInstance;
 import polyglot.ext.jl5.types.JL5Context;
 import polyglot.ext.jl5.types.JL5Flags;
 import polyglot.ext.jl5.types.JL5ParsedClassType;
 import polyglot.ext.jl5.types.JL5TypeSystem;
 import polyglot.ext.jl5.types.TypeVariable;
+import polyglot.ext.jl5.visit.AnnotationChecker;
 import polyglot.ext.jl5.visit.JL5Translator;
 import polyglot.ext.param.types.MuPClass;
+import polyglot.types.ClassType;
 import polyglot.types.Context;
 import polyglot.types.Flags;
 import polyglot.types.ReferenceType;
@@ -43,13 +46,13 @@ public class JL5ClassDecl_c extends ClassDecl_c implements JL5ClassDecl {
     protected List<AnnotationElem> annotations;
 
     public JL5ClassDecl_c(Position pos, Flags flags, List<AnnotationElem> annotations, Id name,
-                          TypeNode superClass, List<TypeNode> interfaces, ClassBody body) {
+            TypeNode superClass, List<TypeNode> interfaces, ClassBody body) {
         this(pos, flags, annotations, name, superClass, interfaces, body,
-             new ArrayList<ParamTypeNode>());
+                new ArrayList<ParamTypeNode>());
     }
 
     public JL5ClassDecl_c(Position pos, Flags fl, List<AnnotationElem> annotations, Id name, TypeNode superType,
-                          List<TypeNode> interfaces, ClassBody body, List<ParamTypeNode> paramTypes) {
+            List<TypeNode> interfaces, ClassBody body, List<ParamTypeNode> paramTypes) {
         super(pos, fl, name, superType, interfaces, body);
         if (paramTypes == null)
             paramTypes = new ArrayList<ParamTypeNode>();
@@ -87,7 +90,7 @@ public class JL5ClassDecl_c extends ClassDecl_c implements JL5ClassDecl {
         if (paramTypes() != null && !paramTypes().isEmpty()) {
             List<TypeVariable> typeVars = new ArrayList<TypeVariable>(this.paramTypes().size());
             for (ParamTypeNode ptn : this.paramTypes()) {
-                TypeVariable tv = (TypeVariable)ptn.type(); 
+                TypeVariable tv = (TypeVariable)ptn.type();
                 typeVars.add(tv);
                 tv.declaringClass(ct);
             }
@@ -104,20 +107,22 @@ public class JL5ClassDecl_c extends ClassDecl_c implements JL5ClassDecl {
         n.paramTypes = types;
         return n;
     }
-    
+
     public JL5ClassDecl annotations(List<AnnotationElem> annotations) {
         JL5ClassDecl_c n = (JL5ClassDecl_c) copy();
         n.annotations = annotations;
         return n;
     }
 
-    protected ClassDecl reconstruct(Id name, TypeNode superClass, List<TypeNode> interfaces,
-                                    ClassBody body, List<ParamTypeNode> paramTypes, List<AnnotationElem> annotations) {
+    protected ClassDecl reconstruct(Id name, TypeNode superClass,
+            List<TypeNode> interfaces, ClassBody body,
+            List<ParamTypeNode> paramTypes, List<AnnotationElem> annotations) {
         if (name != this.name || superClass != this.superClass
                 || !CollectionUtil.equals(interfaces, this.interfaces)
                 || body != this.body
                 || !CollectionUtil.equals(paramTypes, this.paramTypes)
                 || !CollectionUtil.equals(annotations, this.annotations)) {
+
             JL5ClassDecl_c n = (JL5ClassDecl_c) copy();
             n.name = name;
             n.superClass = superClass;
@@ -132,13 +137,14 @@ public class JL5ClassDecl_c extends ClassDecl_c implements JL5ClassDecl {
 
     @Override
     public Node visitChildren(NodeVisitor v) {
-    	List<AnnotationElem> annotations = visitList(this.annotations, v);
+        List<AnnotationElem> annotations = visitList(this.annotations, v);
         List<ParamTypeNode> paramTypes = visitList(this.paramTypes, v);
         Id name = (Id) visitChild(this.name, v);
         TypeNode superClass = (TypeNode) visitChild(this.superClass, v);
         List<TypeNode> interfaces = visitList(this.interfaces, v);
         ClassBody body = (ClassBody) visitChild(this.body, v);
-        return reconstruct(name, superClass, interfaces, body, paramTypes, annotations);
+        return reconstruct(name, superClass, interfaces, body, paramTypes,
+                annotations);
     }
 
     /*
@@ -176,8 +182,14 @@ public class JL5ClassDecl_c extends ClassDecl_c implements JL5ClassDecl {
 
         if (ts.equals(ts.Object(), type()) && !paramTypes.isEmpty()) {
             throw new SemanticException("Type: " + type()
-                                        + " cannot declare type variables.", position());
+                    + " cannot declare type variables.", position());
         }
+
+        if (JL5Flags.isAnnotation(flags()) && flags().isPrivate()) {
+            throw new SemanticException("Annotation types cannot have explicit private modifier", this.position());
+        }
+
+        ts.checkDuplicateAnnotations(annotations);
 
         // check not extending java.lang.Throwable (or any of its subclasses)
         // with a generic class
@@ -186,8 +198,8 @@ public class JL5ClassDecl_c extends ClassDecl_c implements JL5ClassDecl {
                 && !paramTypes.isEmpty()) {
             // JLS 3rd ed. 8.1.2
             throw new SemanticException(
-                                        "Cannot subclass java.lang.Throwable or any of its subtypes with a generic class",
-                                        superClass().position());
+                    "Cannot subclass java.lang.Throwable or any of its subtypes with a generic class",
+                    superClass().position());
         }
 
         // check duplicate type variable decls
@@ -197,12 +209,41 @@ public class JL5ClassDecl_c extends ClassDecl_c implements JL5ClassDecl {
                 TypeNode tj = paramTypes.get(j);
                 if (ti.name().equals(tj.name())) {
                     throw new SemanticException(
-                                                "Duplicate type variable declaration.",
-                                                tj.position());
+                            "Duplicate type variable declaration.",
+                            tj.position());
                 }
             }
         }
+
         return super.typeCheck(tc);
+    }
+
+    @Override
+    public Node annotationCheck(AnnotationChecker annoCheck) throws SemanticException {
+
+        // check proper used of predefined annotations
+        JL5TypeSystem ts = (JL5TypeSystem) annoCheck.typeSystem();
+        for (AnnotationElem element : annotations) {
+            ts.checkAnnotationApplicability(element, this.type());
+        }
+
+        // check annotation circularity
+        if (JL5Flags.isAnnotation(flags())) {
+            JL5ParsedClassType ct = (JL5ParsedClassType) type();
+            for (AnnotationElemInstance ai : ct.annotationElems()) {
+                if (ai.type() instanceof ClassType
+                        && ((ClassType) ((ClassType) ai.type()).superType()).fullName().equals("java.lang.annotation.Annotation")) {
+                    JL5ParsedClassType other = (JL5ParsedClassType) ai.type();
+                    for (Object element2 : other.annotationElems()) {
+                        AnnotationElemInstance aj = (AnnotationElemInstance) element2;
+                        if (aj.type().equals(ct)) {
+                            throw new SemanticException("cyclic annotation element type", aj.position());
+                        }
+                    }
+                }
+            }
+        }
+        return this;
     }
 
     public void prettyPrintModifiers(CodeWriter w, PrettyPrinter tr) {
@@ -223,7 +264,7 @@ public class JL5ClassDecl_c extends ClassDecl_c implements JL5ClassDecl {
                 w.write("@interface ");
             }
             else {
-                w.write("interface ");                
+                w.write("interface ");
             }
         }
         else if (JL5Flags.isEnum(flags)) {
@@ -238,12 +279,12 @@ public class JL5ClassDecl_c extends ClassDecl_c implements JL5ClassDecl {
     }
 
     public void prettyPrintHeaderRest(CodeWriter w, PrettyPrinter tr) {
-        if (superClass() != null && !JL5Flags.isEnum(type.flags())) {
+        if (superClass() != null && !JL5Flags.isEnum(type.flags()) && !JL5Flags.isAnnotation(type.flags())) {
             w.write(" extends ");
             print(superClass(), w, tr);
         }
 
-        if (!interfaces.isEmpty()) {
+        if (!interfaces.isEmpty() && !JL5Flags.isAnnotation(type.flags())) {
             if (flags.isInterface()) {
                 w.write(" extends ");
             } else {
@@ -265,6 +306,14 @@ public class JL5ClassDecl_c extends ClassDecl_c implements JL5ClassDecl {
 
     @Override
     public void prettyPrintHeader(CodeWriter w, PrettyPrinter tr) {
+
+        w.begin(0);
+        for (AnnotationElem ae : annotations) {
+            ae.prettyPrint(w, tr);
+            w.newline();
+        }
+        w.end();
+
         prettyPrintModifiers(w, tr);
         prettyPrintName(w, tr);
         // print type variables
@@ -279,12 +328,12 @@ public class JL5ClassDecl_c extends ClassDecl_c implements JL5ClassDecl {
                 ParamTypeNode ptn = iter.next();
                 ptn.prettyPrint(w, tr);
                 if (iter.hasNext()) {
-                    w.write(", ");                    
+                    w.write(", ");
                 }
             }
             w.write(">");
         }
         prettyPrintHeaderRest(w, tr);
 
-    }	
+    }
 }

@@ -7,9 +7,9 @@ import polyglot.types.ParsedClassType;
 import polyglot.types.ReferenceType;
 import polyglot.util.CodeWriter;
 
-/* 
+/*
  * A JL5ParsedClassType represents a class with uninstantiated
- * type parameters. In some ways it corresponds to a raw type. 
+ * type parameters. In some ways it corresponds to a raw type.
  */
 public interface JL5ParsedClassType extends ParsedClassType, JL5ClassType {
     /**
@@ -26,12 +26,12 @@ public interface JL5ParsedClassType extends ParsedClassType, JL5ClassType {
     List<EnumInstance> enumConstants();
     @Override
     EnumInstance enumConstantNamed(String name);
-    
-	// find methods with compatible name and formals as the given one
+
+    // find methods with compatible name and formals as the given one
     List<? extends JL5MethodInstance> methods(JL5MethodInstance mi);
-    
-//    boolean wasGeneric();
-    
+
+    //    boolean wasGeneric();
+
     /**
      * Returns a subst suitable for the erased type: the subst
      * maps any type variables to their erasure. Will return null
@@ -39,7 +39,7 @@ public interface JL5ParsedClassType extends ParsedClassType, JL5ClassType {
      * @return
      */
     JL5Subst erasureSubst();
-    
+
     void printNoParams(CodeWriter w);
     String toStringNoParams();
     void addAnnotationElem(AnnotationElemInstance ai);    

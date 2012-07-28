@@ -18,6 +18,7 @@ import polyglot.ast.ArrayInit;
 import polyglot.ast.ClassLit;
 import polyglot.ast.Expr;
 import polyglot.ast.NullLit;
+import polyglot.ext.jl5.ast.AnnotationElem;
 import polyglot.ext.jl5.types.inference.InferenceSolver;
 import polyglot.ext.jl5.types.inference.InferenceSolver_c;
 import polyglot.ext.jl5.types.inference.LubType;
@@ -32,6 +33,7 @@ import polyglot.types.ArrayType;
 import polyglot.types.ClassType;
 import polyglot.types.ConstructorInstance;
 import polyglot.types.Context;
+import polyglot.types.Declaration;
 import polyglot.types.FieldInstance;
 import polyglot.types.Flags;
 import polyglot.types.ImportTable;
@@ -58,6 +60,8 @@ public class JL5TypeSystem_c extends ParamTypeSystem_c<TypeVariable, ReferenceTy
     protected ClassType ENUM_;
 
     protected ClassType ANNOTATION_;
+    protected ClassType OVERRIDE_ANNOTATION_;
+    protected ClassType TARGET_ANNOTATION_;
 
     // this is for extended for
     protected ClassType ITERABLE_;
@@ -81,6 +85,24 @@ public class JL5TypeSystem_c extends ParamTypeSystem_c<TypeVariable, ReferenceTy
         }
         else {
             return ANNOTATION_ = load("java.lang.annotation.Annotation");
+        }
+    }
+
+    @Override
+    public ClassType OverrideAnnotation() {
+        if (OVERRIDE_ANNOTATION_ != null) {
+            return OVERRIDE_ANNOTATION_;
+        } else {
+            return OVERRIDE_ANNOTATION_ = load("java.lang.Override");
+        }
+    }
+
+    @Override
+    public ClassType TargetAnnotation() {
+        if (TARGET_ANNOTATION_ != null) {
+            return TARGET_ANNOTATION_;
+        } else {
+            return TARGET_ANNOTATION_ = load("java.lang.annotation.Override");
         }
     }
 
@@ -1954,8 +1976,112 @@ public class JL5TypeSystem_c extends ParamTypeSystem_c<TypeVariable, ReferenceTy
     }
 
     @Override
+    public void checkAnnotationApplicability(AnnotationElem annotation,
+            Declaration decl)
+            throws SemanticException {
+        JL5ClassType annotationType =
+                (JL5ClassType) annotation.typeName().type().toClass();
+        if (annotationType.equals(OverrideAnnotation())) {
+            checkOverrideAnnotation(decl);
+        }
+        // If annotationType specifies what kind of target it is meant to be applied to,
+        // then check that.
+        for (AnnotationElemInstance aei : annotationType.annotationElems()) {
+            if (aei.type().equals(TargetAnnotation())) {
+                // annotationType has a target annotation!
+                // XXX TODO check that the annotation is applied to an appropriate target
+            }
+        }
+    }
+
+    @Override
+    public void checkDuplicateAnnotations(List<AnnotationElem> annotations)
+            throws SemanticException {
+        // check no duplicate annotations used
+        ArrayList<AnnotationElem> l = new ArrayList<AnnotationElem>(annotations);
+        for (int i = 0; i < l.size(); i++) {
+            AnnotationElem ai = l.get(i);
+            for (int j = i + 1; j < l.size(); j++) {
+                AnnotationElem aj = l.get(j);
+                if (ai.typeName().type() == aj.typeName().type()) {
+                    throw new SemanticException("Duplicate annotation use: "
+                            + aj.typeName(), aj.position());
+                }
+            }
+        }
+    }
+
+//    //rdj-added from UCLA implementation. 
+//    private void appCheckValue(String val, Node n) throws SemanticException {
+//        if (val.equals("ANNOTATION_TYPE")) {
+//            if (!(n instanceof ClassDecl)
+//                    || !JL5Flags.isAnnotation(((ClassDecl) n).flags())) {
+//                throw new SemanticException(
+//                        "Annotation type not applicable to this kind of declaration",
+//                        n.position());
+//            }
+//        } else if (val.equals("CONSTRUCTOR")) {
+//            if (!(n instanceof ConstructorDecl)) {
+//                throw new SemanticException(
+//                        "Annotation type not applicable to this kind of declaration",
+//                        n.position());
+//            }
+//        } else if (val.equals("FIELD")) {
+//            if (!(n instanceof FieldDecl)) {
+//                throw new SemanticException(
+//                        "Annotation type not applicable to this kind of declaration",
+//                        n.position());
+//            }
+//        } else if (val.equals("LOCAL_VARIABLE")) {
+//            if (!(n instanceof LocalDecl)) {
+//                throw new SemanticException(
+//                        "Annotation type not applicable to this kind of declaration",
+//                        n.position());
+//            }
+//        } else if (val.equals("METHOD")) {
+//            if (!(n instanceof MethodDecl)) {
+//                throw new SemanticException(
+//                        "Annotation type not applicable to this kind of declaration",
+//                        n.position());
+//            }
+//        } else if (val.equals("PACKAGE")) {
+//        } else if (val.equals("PARAMETER")) {
+//            if (!(n instanceof Formal)) {
+//                throw new SemanticException(
+//                        "Annotation type not applicable to this kind of declaration",
+//                        n.position());
+//            }
+//        } else if (val.equals("TYPE")) {
+//            if (!(n instanceof ClassDecl)) {
+//                throw new SemanticException(
+//                        "Annotation type not applicable to this kind of declaration",
+//                        n.position());
+//            }
+//        }
+//    }
+
+    protected void checkOverrideAnnotation(Declaration decl)
+            throws SemanticException {
+        if (!(decl instanceof MethodInstance)) {
+            throw new SemanticException(
+                    "An override annotation can apply only to methods.",
+                    decl.position());
+        }
+        MethodInstance mi = (MethodInstance) decl;
+        List<MethodInstance> overrides =
+                new LinkedList<MethodInstance>(this.overrides(mi));
+        overrides.remove(mi);
+        if (overrides.isEmpty()) {
+            throw new SemanticException("Method " + mi.signature()
+                    + " not override a method.",
+                    decl.position());
+        }
+    }
+
+    @Override
     public AnnotationElemInstance annotationElemInstance(Position pos, ClassType ct, Flags f, Type type, java.lang.String name, boolean hasDefault) {
         assert_(ct);
+        assert_(type);
         return new AnnotationElemInstance_c(this, pos, ct, f, type, name, hasDefault);
    }
 

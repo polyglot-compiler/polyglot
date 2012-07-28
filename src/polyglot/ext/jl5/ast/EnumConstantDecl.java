@@ -12,11 +12,9 @@ import polyglot.types.Flags;
 import polyglot.types.ParsedClassType;
 
 /**
- * An immutable representation of a Java language extended <code>for</code>
- * statement.  Contains a statement to be executed and an expression
- * to be tested indicating whether to reexecute the statement.
+ * Decalration of an enum constant.
  */
-public interface EnumConstantDecl extends ClassMember
+public interface EnumConstantDecl extends ClassMember, AnnotatedElement
 {    
     /** get args */
     List<Expr> args();
@@ -29,7 +27,7 @@ public interface EnumConstantDecl extends ClassMember
 
     /** get name */
     Id name();
-    
+
     /** set body */
     EnumConstantDecl body(ClassBody body);
 
@@ -41,15 +39,14 @@ public interface EnumConstantDecl extends ClassMember
 
     ConstructorInstance constructorInstance();
     EnumConstantDecl constructorInstance(ConstructorInstance ci);
-    
+
     EnumInstance enumInstance();
 
     EnumConstantDecl enumInstance(EnumInstance ei);
 
     Flags flags();
 
-	long ordinal();
-	EnumConstantDecl ordinal(long ordinal);
+    long ordinal();
 
-	List<AnnotationElem> annotations();
+    EnumConstantDecl ordinal(long ordinal);
 }

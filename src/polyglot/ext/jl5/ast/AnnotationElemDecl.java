@@ -13,6 +13,7 @@ public interface AnnotationElemDecl extends MethodDecl {
     
     @Override
     AnnotationElemDecl flags(Flags flags);
+
     @Override
     Flags flags();
 

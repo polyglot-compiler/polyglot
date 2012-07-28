@@ -1,6 +1,7 @@
 package polyglot.ext.jl5.ast;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -19,6 +20,7 @@ import polyglot.ext.jl5.types.JL5Flags;
 import polyglot.ext.jl5.types.JL5ProcedureInstance;
 import polyglot.ext.jl5.types.JL5TypeSystem;
 import polyglot.ext.jl5.types.TypeVariable;
+import polyglot.ext.jl5.visit.AnnotationChecker;
 import polyglot.ext.jl5.visit.JL5Translator;
 import polyglot.types.ConstructorInstance;
 import polyglot.types.Context;
@@ -47,10 +49,25 @@ public class JL5ConstructorDecl_c extends ConstructorDecl_c implements JL5Constr
         this(pos, flags, annotations, name, formals, throwTypes, body, new ArrayList<ParamTypeNode>());
     }
 
+
     public JL5ConstructorDecl_c(Position pos, Flags flags, List<AnnotationElem> annotations, Id name, List<Formal> formals, List<TypeNode> throwTypes, Block body, List<ParamTypeNode> typeParams){
         super(pos, flags, name, formals, throwTypes, body);
         this.typeParams = typeParams;
+        if (annotations == null){
+            annotations = Collections.emptyList();
+        }
         this.annotations = annotations;
+    }
+
+    @Override
+    public List<AnnotationElem> annotations(){
+        return this.annotations;
+    }
+
+    public JL5ConstructorDecl annotations(List<AnnotationElem> annotations){
+        JL5ConstructorDecl_c n = (JL5ConstructorDecl_c) copy();
+        n.annotations = annotations;
+        return n;
     }
 
     @Override
@@ -65,17 +82,22 @@ public class JL5ConstructorDecl_c extends ConstructorDecl_c implements JL5Constr
         return n;
     }
 
-    protected JL5ConstructorDecl_c reconstruct(Id name, List<Formal> formals, List<TypeNode> throwTypes, Block body, List<ParamTypeNode> typeParams){
+
+    protected JL5ConstructorDecl_c reconstruct(Id name, List<Formal> formals,
+            List<TypeNode> throwTypes, Block body,
+            List<AnnotationElem> annotations, List<ParamTypeNode> typeParams) {
         if (!CollectionUtil.equals(formals, this.formals)
-        		|| name != this.name
+                || name != this.name
                 || !CollectionUtil.equals(throwTypes, this.throwTypes)
                 || body != this.body
+                || !CollectionUtil.equals(annotations, this.annotations)
                 || !CollectionUtil.equals(typeParams, this.typeParams)) {
             JL5ConstructorDecl_c n = (JL5ConstructorDecl_c) copy();
-    	    n.name = name;
+            n.name = name;
             n.formals = ListUtil.copy(formals, true);
             n.throwTypes = ListUtil.copy(throwTypes, true);
             n.body = body;
+            n.annotations = ListUtil.copy(annotations, true);
             n.typeParams = typeParams;
             return n;
         }
@@ -85,12 +107,14 @@ public class JL5ConstructorDecl_c extends ConstructorDecl_c implements JL5Constr
 
     @Override
     public Node visitChildren(NodeVisitor v){
+        List<AnnotationElem> annotations = visitList(this.annotations, v);
         List<ParamTypeNode> typeParams = visitList(this.typeParams, v);
         Id name = (Id) visitChild(this.name, v);
         List<Formal> formals = visitList(this.formals, v);
         List<TypeNode> throwTypes = visitList(this.throwTypes, v);
         Block body = (Block) visitChild(this.body, v);
-        return reconstruct(name, formals, throwTypes, body, typeParams);
+        return reconstruct(name, formals, throwTypes, body, annotations,
+                typeParams);
     }
 
     @Override
@@ -107,10 +131,10 @@ public class JL5ConstructorDecl_c extends ConstructorDecl_c implements JL5Constr
         List<UnknownType> formalTypes = new ArrayList<UnknownType>(formals.size());
         for (int i = 0; i < formals.size(); i++) {
             formalTypes.add(ts.unknownType(position()));
-            JL5Formal f = (JL5Formal) formals.get(i);            
+            JL5Formal f = (JL5Formal) formals.get(i);
             if (f.isVarArg())
-            	vararg = true;
-        }       
+                vararg = true;
+        }
 
         List<UnknownType> throwTypes = new ArrayList<UnknownType>(throwTypes().size());
         for (int i = 0; i < throwTypes().size(); i++) {
@@ -122,9 +146,9 @@ public class JL5ConstructorDecl_c extends ConstructorDecl_c implements JL5Constr
             typeParams.add(ts.unknownTypeVariable(position()));
         }
         if (vararg)
-        	flags = JL5Flags.VARARGS.set(this.flags);
+            flags = JL5Flags.VARARGS.set(this.flags);
         ConstructorInstance ci = ts.constructorInstance(position(), ct,
-                                                        flags, formalTypes, throwTypes, typeParams);
+                flags, formalTypes, throwTypes, typeParams);
         ct.addConstructor(ci);
 
         return constructorInstance(ci).flags(flags);
@@ -161,8 +185,25 @@ public class JL5ConstructorDecl_c extends ConstructorDecl_c implements JL5Constr
     }
 
     @Override
+    public Node annotationCheck(AnnotationChecker annoCheck) throws SemanticException {
+        JL5TypeSystem ts = (JL5TypeSystem)annoCheck.typeSystem();
+        for (AnnotationElem element : annotations) {
+            ts.checkAnnotationApplicability(element, this.constructorInstance());
+        }
+        return this;
+    }
+
+    @Override
     public void prettyPrintHeader(CodeWriter w, PrettyPrinter tr) {
         w.begin(0);
+
+        w.begin(0);
+        for (AnnotationElem ae : annotations) {
+            ae.prettyPrint(w, tr);
+            w.newline();
+        }
+        w.end();
+
         w.write(JL5Flags.clearVarArgs(flags).translate());
 
         // type params
@@ -236,7 +277,7 @@ public class JL5ConstructorDecl_c extends ConstructorDecl_c implements JL5Constr
                 }
             }
         }
-        
+
         Flags flags = ci.flags();
         // check that the varargs flag is consistent with the type of the last argument.
         if (JL5Flags.isVarArgs(cd.flags()) != JL5Flags.isVarArgs(flags)) {
@@ -254,5 +295,5 @@ public class JL5ConstructorDecl_c extends ConstructorDecl_c implements JL5Constr
             }
         }
         return super.typeCheck(tc);
-    }    
+    }
 }

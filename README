@@ -189,11 +189,11 @@ Credits and Acknowledgments
 
 Version 2.5 of Polyglot was prepared largely through the work of the following people:
 
-	Steve Chong (Harvard)
-	Owen Arden (Cornell)
-	Scott Moore (Harvard)
-	Samarth Lad (Cornell)
-	Jed Liu (Cornell)
+    Steve Chong (Harvard)
+    Owen Arden (Cornell)
+    Scott Moore (Harvard)
+    Samarth Lad (Cornell)
+    Jed Liu (Cornell)
 
 The Polyglot project is jointly supervised by Prof. Andrew Myers (Cornell University),
 by Prof. Stephen Chong (Harvard University), and by Prof. Nathaniel Nystrom (U. Lugano).
@@ -202,13 +202,13 @@ Many people have contributed substantially to the development of Polyglot, inclu
 
         Owen Arden              Michael Brukman
         Stephen Chong           Michael Clarkson
-        Matt Harren             Aleksey Kliger
-		Samarth Lad		        Jed Liu               
-		Scott Moore		        Andrew Myers
-		Nate Nystrom			Naveen Sastry   
-		Dan Spoonhower 	        Xin Qi     
-	    Steve Zdancewic         Lantian Zheng
-	    Xin Zheng
+        Matt Harren             Rob Jellinek
+        Aleksey Kliger          Samarth Lad
+        Jed Liu                 Scott Moore
+        Andrew Myers            Nate Nystrom  
+        Naveen Sastry           Dan Spoonhower 
+        Xin Qi                  Steve Zdancewic 
+        Lantian Zheng           Xin Zheng
 
 The Polyglot class file parsing code (src/polyglot/types/reflect)
 is derived from code written for the BLOAT bytecode optimizer written
@@ -232,7 +232,7 @@ The following people have provided patches:
         Pavel Avgustinov <pavel.avgustinov@magdalen.oxford.ac.uk>
         Alessandro Warth <alexwarth@gmail.com>
         Igor Peshansky <igorp@us.ibm.com>
-        Robert Fuhrer <rfuhrer@us.ibm.com>
+        Robert Fuhrer <rfuhrer@us.ibm.com>        
 
 The development of the Polyglot project has been supported by a
 number of funding sources, including DARPA Contract F30602-99-1-0533,

@@ -12,13 +12,14 @@ import polyglot.util.CodeWriter;
 import polyglot.util.Position;
 import polyglot.visit.CFGBuilder;
 import polyglot.visit.NodeVisitor;
+import polyglot.visit.PrettyPrinter;
 import polyglot.visit.Translator;
 import polyglot.visit.TypeChecker;
 
-public class AnnotationElem_c extends Expr_c implements AnnotationElem {
+public abstract class AnnotationElem_c extends Expr_c implements AnnotationElem {
 
     protected TypeNode typeName;
-    
+
     public AnnotationElem_c(Position pos, TypeNode typeName){
         super(pos);
         this.typeName = typeName;
@@ -47,7 +48,7 @@ public class AnnotationElem_c extends Expr_c implements AnnotationElem {
         }
         return this;
     }
-    
+
     @Override
     public Node visitChildren(NodeVisitor v){
         TypeNode tn = (TypeNode)visitChild(this.typeName, v);
@@ -59,21 +60,27 @@ public class AnnotationElem_c extends Expr_c implements AnnotationElem {
         // only make annotation elements out of annotation types
         if (!typeName.type().isClass() || !JL5Flags.isAnnotation(typeName.type().toClass().flags())) {
             throw new SemanticException("Annotation: "+typeName+" must be an annotation type, ", position());
-                    
+
         }
         return type(typeName.type());
     }
-   
+
     @Override
-    public void translate(CodeWriter w, Translator tr){
+    public void prettyPrint(CodeWriter w, PrettyPrinter pp) {
+        w.write("@");
+        print(typeName, w, pp);
+    }
+
+    @Override
+    public void translate(CodeWriter w, Translator tr) {
         w.write("@");
         print(typeName, w, tr);
     }
-    
+
     public Term entry() {
         return this;
     }
-    
+
     @Override
     public <T> List<T> acceptCFG(CFGBuilder<?> v, List<T> succs) {
         return succs;
@@ -93,5 +100,5 @@ public class AnnotationElem_c extends Expr_c implements AnnotationElem {
     public Term firstChild() {
         return typeName;
     }
-        
+
 }

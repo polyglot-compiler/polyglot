@@ -15,12 +15,12 @@ import polyglot.ast.Term;
 import polyglot.ast.Term_c;
 import polyglot.ast.TypeNode;
 import polyglot.ext.jl5.types.AnnotationElemInstance;
+import polyglot.ext.jl5.types.JL5ParsedClassType;
 import polyglot.ext.jl5.types.JL5TypeSystem;
 import polyglot.types.CodeInstance;
 import polyglot.types.Flags;
 import polyglot.types.MemberInstance;
 import polyglot.types.MethodInstance;
-import polyglot.types.ParsedClassType;
 import polyglot.types.ProcedureInstance;
 import polyglot.types.SemanticException;
 import polyglot.util.CodeWriter;
@@ -151,7 +151,8 @@ public class AnnotationElemDecl_c extends Term_c implements AnnotationElemDecl {
     public Node buildTypes(TypeBuilder tb) throws SemanticException {
         JL5TypeSystem ts = (JL5TypeSystem)tb.typeSystem();
 
-        ParsedClassType ct = tb.currentClass();
+        JL5ParsedClassType ct = (JL5ParsedClassType)tb.currentClass(); 
+
 
         if (ct == null) {
             return this;
@@ -162,8 +163,11 @@ public class AnnotationElemDecl_c extends Term_c implements AnnotationElemDecl {
 
         AnnotationElemInstance ai = ts.annotationElemInstance(position(), ct, f, ts.unknownType(position()), this.name(), defaultVal != null);
         ct.addMethod(ai);
+        ct.addAnnotationElem(ai);
+        
         return annotationElemInstance(ai);
     }
+    
     
     @Override
     public Node disambiguate(AmbiguityRemover ar) throws SemanticException {

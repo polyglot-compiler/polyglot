@@ -3,6 +3,7 @@ package polyglot.ext.jl5;
 import polyglot.ast.NodeFactory;
 import polyglot.ext.jl5.translate.JL5ToJLRewriter;
 import polyglot.ext.jl5.types.JL5TypeSystem;
+import polyglot.ext.jl5.visit.AnnotationChecker;
 import polyglot.ext.jl5.visit.AutoBoxer;
 import polyglot.ext.jl5.visit.JL5InitChecker;
 import polyglot.ext.jl5.visit.JL5InitImportsVisitor;
@@ -54,6 +55,7 @@ public class JL5Scheduler extends JLScheduler {
         Goal g = new VisitorGoal(job, new TVCaster(job, ts, nf));
         try {
             g.addPrerequisiteGoal(TypeChecked(job), this);
+            g.addPrerequisiteGoal(AnnotationCheck(job), this); 
             g.addPrerequisiteGoal(TypeClosure(job), this);
             g.addPrerequisiteGoal(AutoBoxing(job), this);
             g.addPrerequisiteGoal(RemoveExtendedFors(job), this);
@@ -72,6 +74,7 @@ public class JL5Scheduler extends JLScheduler {
             g.addPrerequisiteGoal(RemoveVarArgs(job), this);
             g.addPrerequisiteGoal(RemoveExtendedFors(job), this);
             g.addPrerequisiteGoal(SimplifyExpressionsForBoxing(job), this);
+            g.addPrerequisiteGoal(AnnotationCheck(job), this); 
         } catch (CyclicDependencyException e) {
             throw new InternalCompilerError(e);
         }
@@ -85,6 +88,7 @@ public class JL5Scheduler extends JLScheduler {
         try {
             g.addPrerequisiteGoal(CastsInserted(job), this);
             g.addPrerequisiteGoal(TypeChecked(job), this);
+            g.addPrerequisiteGoal(AnnotationCheck(job), this); 
             g.addPrerequisiteGoal(AutoBoxing(job), this);
             g.addPrerequisiteGoal(RemoveExtendedFors(job), this);
         } catch (CyclicDependencyException e) {
@@ -100,6 +104,7 @@ public class JL5Scheduler extends JLScheduler {
         Goal g = new VisitorGoal(job, new RemoveVarargVisitor(job, ts, nf));
         try {
             g.addPrerequisiteGoal(TypeChecked(job), this);
+            g.addPrerequisiteGoal(AnnotationCheck(job), this); 
         } catch (CyclicDependencyException e) {
             throw new InternalCompilerError(e);
         } 
@@ -112,6 +117,7 @@ public class JL5Scheduler extends JLScheduler {
         Goal g = new VisitorGoal(job, new SimplifyExpressionsForBoxing(nf, ts));
         try {
             g.addPrerequisiteGoal(TypeChecked(job), this);
+            g.addPrerequisiteGoal(AnnotationCheck(job), this); 
         } catch (CyclicDependencyException e) {
             throw new InternalCompilerError(e);
         } 
@@ -126,6 +132,7 @@ public class JL5Scheduler extends JLScheduler {
         try {
             g.addPrerequisiteGoal(CastsInserted(job), this);
             g.addPrerequisiteGoal(TypeChecked(job), this);
+            g.addPrerequisiteGoal(AnnotationCheck(job), this); 
             g.addPrerequisiteGoal(RemoveStaticImports(job), this);
         } catch (CyclicDependencyException e) {
             throw new InternalCompilerError(e);
@@ -149,6 +156,7 @@ public class JL5Scheduler extends JLScheduler {
         Goal g = new VisitorGoal(job, new RemoveExtendedFors(job, ts, nf));
         try {
             g.addPrerequisiteGoal(TypeChecked(job), this);
+            g.addPrerequisiteGoal(AnnotationCheck(job), this); 
         } catch (CyclicDependencyException e) {
             throw new InternalCompilerError(e);
         }
@@ -161,6 +169,7 @@ public class JL5Scheduler extends JLScheduler {
         Goal g = new VisitorGoal(job, new RemoveStaticImports(job, ts, nf));
         try {
             g.addPrerequisiteGoal(TypeChecked(job), this);
+            g.addPrerequisiteGoal(AnnotationCheck(job), this); 
         } catch (CyclicDependencyException e) {
             throw new InternalCompilerError(e);
         }
@@ -185,6 +194,20 @@ public class JL5Scheduler extends JLScheduler {
             throw new InternalCompilerError(e);
         }
         return this.internGoal(g);
+    }
+    
+    public Goal AnnotationCheck(Job job) {
+       
+        TypeSystem ts = extInfo.typeSystem();
+        NodeFactory nf = extInfo.nodeFactory();
+        Goal g = new VisitorGoal(job, new AnnotationChecker(job, ts, nf));
+        try {
+            g.addPrerequisiteGoal(TypeChecked(job), this);   
+        } catch (CyclicDependencyException e) {
+            throw new InternalCompilerError(e);
+        }
+        return this.internGoal(g);
+
     }
 
     public Goal TypeClosure(Job job) {
@@ -232,13 +255,14 @@ public class JL5Scheduler extends JLScheduler {
     public Goal Serialized(Job job) {
         Goal g = super.Serialized(job);
         Options opts = extInfo.getOptions();
-        if (opts instanceof JL5Options && ((JL5Options)opts).removeJava5isms) {
-            try {
-                g.addPrerequisiteGoal(RemoveJava5isms(job), this);
-            }
-            catch (CyclicDependencyException e) {
-                throw new InternalCompilerError(e);
-            }
+        try {
+    		g.addPrerequisiteGoal(AnnotationCheck(job), this);
+        	if (opts instanceof JL5Options && ((JL5Options)opts).removeJava5isms) {
+        		g.addPrerequisiteGoal(RemoveJava5isms(job), this);
+        	}
+        }
+        catch (CyclicDependencyException e) {
+        	throw new InternalCompilerError(e);
         }
         return this.internGoal(g);
     }

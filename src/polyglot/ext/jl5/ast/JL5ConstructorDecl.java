@@ -4,7 +4,7 @@ import java.util.List;
 
 import polyglot.ast.ConstructorDecl;
 
-public interface JL5ConstructorDecl extends ConstructorDecl{
+public interface JL5ConstructorDecl extends ConstructorDecl, AnnotatedElement {
     public List<ParamTypeNode> typeParams();
     public JL5ConstructorDecl typeParams(List<ParamTypeNode> typeParams);   
 }

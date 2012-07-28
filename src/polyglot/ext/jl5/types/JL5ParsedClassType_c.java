@@ -30,10 +30,10 @@ public class JL5ParsedClassType_c extends ParsedClassType_c implements JL5Parsed
         super(ts, init, fromSource);
         annotationElems = new LinkedList<AnnotationElemInstance>();
     }
-        
+
     @Override
     public void addEnumConstant(EnumInstance ei){
-    	addField(ei);
+        addField(ei);
         enumConstants().add(ei);
     }
 
@@ -41,10 +41,10 @@ public class JL5ParsedClassType_c extends ParsedClassType_c implements JL5Parsed
     public List<EnumInstance> enumConstants(){
         if (enumConstants == null){
             enumConstants = new LinkedList<EnumInstance>();
-        }    
+        }
         return enumConstants;
     }
-   
+
     @Override
     public EnumInstance enumConstantNamed(String name){
         for (EnumInstance ei : enumConstants()) {
@@ -54,7 +54,7 @@ public class JL5ParsedClassType_c extends ParsedClassType_c implements JL5Parsed
         }
         return null;
     }
-    
+
     @Override
     public AnnotationElemInstance annotationElemNamed(String name) {
         for (AnnotationElemInstance ai : annotationElems()) {
@@ -64,7 +64,7 @@ public class JL5ParsedClassType_c extends ParsedClassType_c implements JL5Parsed
         }
         return null;
     }
-    
+
     @Override
     public void addAnnotationElem(AnnotationElemInstance ai){
         addMethod(ai);
@@ -73,12 +73,13 @@ public class JL5ParsedClassType_c extends ParsedClassType_c implements JL5Parsed
 
     @Override
     public List<AnnotationElemInstance> annotationElems() {
+
         ((JL5LazyClassInitializer) init).initAnnotationElems();
         return Collections.unmodifiableList(annotationElems);
     }
 
 
-	// find methods with compatible name and formals as the given one
+    // find methods with compatible name and formals as the given one
     @Override
     public List<? extends JL5MethodInstance> methods(JL5MethodInstance mi) {
         List<JL5MethodInstance> l = new LinkedList<JL5MethodInstance>();
@@ -88,9 +89,9 @@ public class JL5ParsedClassType_c extends ParsedClassType_c implements JL5Parsed
                 l.add(pi);
             }
         }
-	return l;
+        return l;
     }
-    
+
     @Override
     public List<JL5MethodInstance> methodsNamed(String name) {
         @SuppressWarnings("unchecked")
@@ -108,7 +109,7 @@ public class JL5ParsedClassType_c extends ParsedClassType_c implements JL5Parsed
         }
         return super.outer();
     }
-    
+
     @Override
     public boolean isEnclosedImpl(ClassType maybe_outer) {
         if (super.isEnclosedImpl(maybe_outer)) {
@@ -122,9 +123,9 @@ public class JL5ParsedClassType_c extends ParsedClassType_c implements JL5Parsed
         return false;
     }
 
-    
+
     @Override
-    public boolean isCastValidImpl(Type toType){        
+    public boolean isCastValidImpl(Type toType){
         if (super.isCastValidImpl(toType)) {
             return true;
         }
@@ -140,7 +141,7 @@ public class JL5ParsedClassType_c extends ParsedClassType_c implements JL5Parsed
     public LinkedList<Type> isImplicitCastValidChainImpl(Type toType) {
         JL5TypeSystem ts = (JL5TypeSystem)this.ts;
         LinkedList<Type> chain = null;
-        if (ts.isSubtype(this, toType)) {   
+        if (ts.isSubtype(this, toType)) {
             chain = new LinkedList<Type>();
             chain.add(this);
             chain.add(toType);
@@ -151,14 +152,14 @@ public class JL5ParsedClassType_c extends ParsedClassType_c implements JL5Parsed
                 chain = ts.isImplicitCastValidChain(ts.primitiveTypeOfWrapper(this), toType);
                 if (chain != null) {
                     chain.addFirst(this);
-                }            
+                }
             }
         }
         return chain;
     }
 
-	// /////////////////////////////////////
-	// 
+    // /////////////////////////////////////
+    //
     @Override
     public PClass<TypeVariable, ReferenceType> pclass() {
         return pclass;
@@ -182,7 +183,7 @@ public class JL5ParsedClassType_c extends ParsedClassType_c implements JL5Parsed
     public List<TypeVariable> typeVariables() {
         return this.typeVars;
     }
-    
+
     @Override
     public JL5Subst erasureSubst() {
         JL5TypeSystem ts = (JL5TypeSystem) this.typeSystem();
@@ -210,7 +211,7 @@ public class JL5ParsedClassType_c extends ParsedClassType_c implements JL5Parsed
         }
         w.write(">");
     }
-    
+
     @Override
     public void printNoParams(CodeWriter w) {
         super.print(w);
@@ -221,7 +222,7 @@ public class JL5ParsedClassType_c extends ParsedClassType_c implements JL5Parsed
         return super.toString();
     }
 
-    
+
     @Override
     public String toString() {
         if (this.typeVars == null || this.typeVars.isEmpty()) {
@@ -246,10 +247,10 @@ public class JL5ParsedClassType_c extends ParsedClassType_c implements JL5Parsed
         return false;
     }
     @Override
-    public String translateAsReceiver(Resolver c) {        
+    public String translateAsReceiver(Resolver c) {
         return super.translate(c);
     }
-    
+
     @Override
     public String translate(Resolver c) {
         StringBuffer sb = new StringBuffer(super.translate(c));
@@ -259,10 +260,10 @@ public class JL5ParsedClassType_c extends ParsedClassType_c implements JL5Parsed
         sb.append('<');
         Iterator<TypeVariable> iter = typeVariables().iterator();
         while (iter.hasNext()) {
-            TypeVariable act = iter.next();            
+            TypeVariable act = iter.next();
             sb.append(act.translate(c));
             if (iter.hasNext()) {
-                sb.append(',');                    
+                sb.append(',');
             }
         }
         sb.append('>');
@@ -270,7 +271,7 @@ public class JL5ParsedClassType_c extends ParsedClassType_c implements JL5Parsed
     }
 
     @Override
-    public boolean descendsFromImpl(Type ancestor) {        
+    public boolean descendsFromImpl(Type ancestor) {
         if (super.descendsFromImpl(ancestor)) {
             return true;
         }

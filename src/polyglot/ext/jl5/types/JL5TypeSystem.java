@@ -4,6 +4,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import polyglot.ast.Expr;
+import polyglot.ext.jl5.ast.AnnotationElem;
 import polyglot.ext.jl5.types.inference.LubType;
 import polyglot.ext.param.types.ParamTypeSystem;
 import polyglot.frontend.Source;
@@ -11,6 +12,7 @@ import polyglot.types.ArrayType;
 import polyglot.types.ClassType;
 import polyglot.types.ConstructorInstance;
 import polyglot.types.Context;
+import polyglot.types.Declaration;
 import polyglot.types.FieldInstance;
 import polyglot.types.Flags;
 import polyglot.types.LazyClassInitializer;
@@ -40,6 +42,26 @@ public interface JL5TypeSystem extends TypeSystem, ParamTypeSystem<TypeVariable,
 
     ClassType Annotation();
 
+    ClassType OverrideAnnotation();
+
+    ClassType TargetAnnotation();
+
+    /** 
+     * 
+     * Is the annotation element <code>annotation</code> applicable
+     * to Declaration decl? For example, if annotation is "@Override" then decl
+     * better be a methodInstance that overrides another method. If annotation's
+     * type itself has annotations describing which targets are appropriate,
+     * then decl must be an appropriate target.
+     * 
+     * @param annotation
+     * @param decl
+     * @throws SemanticException
+     */
+    void checkAnnotationApplicability(AnnotationElem annotation,
+            Declaration decl)
+            throws SemanticException;
+    
     boolean accessibleFromPackage(Flags flags, Package pkg1, Package pkg2);
 
     /**
@@ -284,6 +306,9 @@ public interface JL5TypeSystem extends TypeSystem, ParamTypeSystem<TypeVariable,
 
     AnnotationElemInstance findAnnotation(ReferenceType t, String name, ClassType currentClass) throws SemanticException;
 
+    void checkDuplicateAnnotations(List<AnnotationElem> annotations) throws SemanticException;
+
+    
     /**
      * Return the class representing Class<type>
      * @param type

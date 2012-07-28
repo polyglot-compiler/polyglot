@@ -25,7 +25,7 @@ import polyglot.util.Position;
  */
 public interface JL5NodeFactory extends NodeFactory {
     JL5EnumDecl EnumDecl(Position pos, Flags flags, List<AnnotationElem> annotations,  Id name,
-                         TypeNode superType, List<TypeNode> interfaces, ClassBody body);
+            TypeNode superType, List<TypeNode> interfaces, ClassBody body);
 
     EnumConstantDecl EnumConstantDecl(Position pos, Flags flags, List<AnnotationElem> annotations,Id name, List<Expr> args, ClassBody body);
 
@@ -34,14 +34,14 @@ public interface JL5NodeFactory extends NodeFactory {
     ParamTypeNode ParamTypeNode(Position pos, List<TypeNode> bounds, Id id);
 
     JL5ClassDecl ClassDecl(Position pos, Flags flags, List<AnnotationElem> annotations,Id name,
-                           TypeNode superType, List<TypeNode> interfaces, ClassBody body, List<ParamTypeNode> paramTypes);
+            TypeNode superType, List<TypeNode> interfaces, ClassBody body, List<ParamTypeNode> paramTypes);
 
     JL5ConstructorDecl ConstructorDecl(Position pos,
-                                       Flags flags, List<AnnotationElem> annotations,Id name, List<Formal> formals,
-                                       List<TypeNode> throwTypes, Block body, List<ParamTypeNode> typeParams);
+            Flags flags, List<AnnotationElem> annotations,Id name, List<Formal> formals,
+            List<TypeNode> throwTypes, Block body, List<ParamTypeNode> typeParams);
 
     JL5MethodDecl MethodDecl(Position pos, Flags flags, List<AnnotationElem> annotations,TypeNode returnType,
-                             Id name, List<Formal> formals, List<TypeNode> throwTypes, Block body, List<ParamTypeNode> typeParams);
+            Id name, List<Formal> formals, List<TypeNode> throwTypes, Block body, List<ParamTypeNode> typeParams);
 
     Formal Formal(Position pos, Flags flags, List<AnnotationElem> annotations,TypeNode type, Id name, boolean var_args);
     Formal Formal(Position pos, Flags flags, List<AnnotationElem> annotations,TypeNode type, Id name);
@@ -72,15 +72,17 @@ public interface JL5NodeFactory extends NodeFactory {
     ConstructorCall SuperCall(Position pos, List<TypeNode> typeArgs, List<Expr> args);
     ConstructorCall SuperCall(Position pos, List<TypeNode> typeArgs, Expr outer, List<Expr> args);
     ConstructorCall ConstructorCall(Position pos, ConstructorCall.Kind kind, List<TypeNode> typeArgs, List<Expr> args);
-    ConstructorCall ConstructorCall(Position pos, ConstructorCall.Kind kind, List<TypeNode> typeArgs, 
-                                    Expr outer, List<Expr> args);
+    ConstructorCall ConstructorCall(Position pos, ConstructorCall.Kind kind, List<TypeNode> typeArgs,
+            Expr outer, List<Expr> args);
 
-    
+
     AnnotationElemDecl AnnotationElemDecl(Position pos, Flags flags, TypeNode type, Id name, Expr def);
-    
-    NormalAnnotationElem NormalAnnotationElem(Position pos, TypeNode name, List<ElementValuePair> elements);
-    MarkerAnnotationElem MarkerAnnotationElem(Position pos, TypeNode name);
-    SingleElementAnnotationElem SingleElementAnnotationElem(Position pos, TypeNode name, Expr value);
+
+    AnnotationElem NormalAnnotationElem(Position pos, TypeNode name,
+            List<ElementValuePair> elements);
+    AnnotationElem MarkerAnnotationElem(Position pos, TypeNode name);
+    AnnotationElem SingleElementAnnotationElem(Position pos, TypeNode name, Expr value);
+
 
     ElementValuePair ElementValuePair(Position pos, Id name, Expr value);
 
