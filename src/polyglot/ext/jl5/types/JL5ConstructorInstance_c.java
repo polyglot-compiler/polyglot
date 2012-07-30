@@ -14,6 +14,8 @@ import polyglot.util.Position;
 @SuppressWarnings("serial")
 public class JL5ConstructorInstance_c extends ConstructorInstance_c implements JL5ConstructorInstance {
     private List<TypeVariable> typeParams;
+    private RetainedAnnotations retainedAnnotations;
+
     public JL5ConstructorInstance_c(JL5TypeSystem_c ts,
                                     Position pos, ClassType container, Flags flags, List<? extends Type> argTypes,
                                     List<? extends Type> excTypes, List<TypeVariable> typeParams) {
@@ -110,4 +112,15 @@ public class JL5ConstructorInstance_c extends ConstructorInstance_c implements J
         JL5TypeSystem ts = (JL5TypeSystem) this.typeSystem();
         return ts.erasureSubst(this);
     }
+
+    @Override
+    public RetainedAnnotations retainedAnnotations() {
+        return this.retainedAnnotations;
+    }
+
+    @Override
+    public void setRetainedAnnotations(RetainedAnnotations retainedAnnotations) {
+        this.retainedAnnotations = retainedAnnotations;
+    }
+
 }

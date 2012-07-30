@@ -22,7 +22,7 @@ import polyglot.util.Position;
 @SuppressWarnings("serial")
 public class JL5MethodInstance_c extends MethodInstance_c implements JL5MethodInstance {
     private List<TypeVariable> typeParams;
-    //    protected PClass instantiatedFrom;
+    private RetainedAnnotations retainedAnnotations;
 
     public JL5MethodInstance_c(JL5TypeSystem ts, Position pos,
                                ReferenceType container, Flags flags, Type returnType,
@@ -298,5 +298,15 @@ public class JL5MethodInstance_c extends MethodInstance_c implements JL5MethodIn
         }
 
         return sb.toString();
+    }
+
+    @Override
+    public RetainedAnnotations retainedAnnotations() {
+        return this.retainedAnnotations;
+    }
+
+    @Override
+    public void setRetainedAnnotations(RetainedAnnotations retainedAnnotations) {
+        this.retainedAnnotations = retainedAnnotations;
     }
 }

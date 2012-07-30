@@ -67,8 +67,8 @@ public class JL5SubstClassType_c extends SubstClassType_c<TypeVariable, Referenc
     }
     
     @Override
-    public AnnotationElemInstance annotationElemNamed(String name) {
-        for(AnnotationElemInstance ai : annotationElems()){
+    public AnnotationTypeElemInstance annotationElemNamed(String name) {
+        for(AnnotationTypeElemInstance ai : annotationElems()){
             if (ai.name().equals(name)){
                 return ai;
             }
@@ -77,7 +77,7 @@ public class JL5SubstClassType_c extends SubstClassType_c<TypeVariable, Referenc
     }
 
     @Override
-    public List<AnnotationElemInstance> annotationElems() {
+    public List<AnnotationTypeElemInstance> annotationElems() {
         return ((JL5ClassType)this.base).annotationElems();
     }
 
@@ -347,5 +347,9 @@ public class JL5SubstClassType_c extends SubstClassType_c<TypeVariable, Referenc
     }
 
 
+    @Override
+    public RetainedAnnotations retainedAnnotations() {
+        return ((JL5TypeSystem) this.typeSystem()).NoRetainedAnnotations();
+    }
     
 }

@@ -13,7 +13,7 @@ public class EnumDeclToExt_c extends ClassDeclToExt_c implements ToExt {
     public Node toExt(ExtensionRewriter rw) throws SemanticException {
         JL5EnumDecl cd = (JL5EnumDecl) node();
 		return ((JL5NodeFactory) rw.to_nf()).EnumDecl(cd.position(),
-				cd.flags(), cd.annotations(), cd.id(), cd.superClass(),
+				cd.flags(), cd.annotationElems(), cd.id(), cd.superClass(),
 				cd.interfaces(), cd.body());
     }
 }

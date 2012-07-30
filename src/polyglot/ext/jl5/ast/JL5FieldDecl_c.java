@@ -9,6 +9,7 @@ import polyglot.ast.FieldDecl_c;
 import polyglot.ast.Id;
 import polyglot.ast.Node;
 import polyglot.ast.TypeNode;
+import polyglot.ext.jl5.types.JL5FieldInstance;
 import polyglot.ext.jl5.types.JL5TypeSystem;
 import polyglot.ext.jl5.visit.AnnotationChecker;
 import polyglot.types.Flags;
@@ -19,6 +20,7 @@ import polyglot.util.ListUtil;
 import polyglot.util.Position;
 import polyglot.visit.NodeVisitor;
 import polyglot.visit.PrettyPrinter;
+import polyglot.visit.TypeChecker;
 
 public class JL5FieldDecl_c extends FieldDecl_c implements FieldDecl,
         AnnotatedElement {
@@ -35,7 +37,7 @@ public class JL5FieldDecl_c extends FieldDecl_c implements FieldDecl,
     }
 
     @Override
-    public List<AnnotationElem> annotations(){
+    public List<AnnotationElem> annotationElems(){
         return this.annotations;
     }
     
@@ -74,6 +76,17 @@ public class JL5FieldDecl_c extends FieldDecl_c implements FieldDecl,
         return this;
    }
     
+    @Override
+    public Node typeCheck(TypeChecker tc) throws SemanticException {
+        JL5FieldDecl_c n = (JL5FieldDecl_c) super.typeCheck(tc);
+        // set the retained annotations
+        JL5FieldInstance fi = (JL5FieldInstance) n.fieldInstance();
+        JL5TypeSystem ts = (JL5TypeSystem) fi.typeSystem();
+        fi.setRetainedAnnotations(ts.createRetainedAnnotations(this
+.annotationElems(), this.position()));
+        return n;
+    }
+
     @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {        
         for (AnnotationElem ae : annotations) {

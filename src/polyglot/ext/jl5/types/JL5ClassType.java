@@ -17,8 +17,8 @@ public interface JL5ClassType extends ClassType {
     EnumInstance enumConstantNamed(String name);
     List<EnumInstance> enumConstants();
     
-    AnnotationElemInstance annotationElemNamed(String name);
-    List<AnnotationElemInstance> annotationElems();
+    AnnotationTypeElemInstance annotationElemNamed(String name);
+    List<AnnotationTypeElemInstance> annotationElems();
 
     
     /**
@@ -38,4 +38,10 @@ public interface JL5ClassType extends ClassType {
      */
     String translateAsReceiver(Resolver resolver);
    
+    /**
+     * Annotations on the declaration of this type such that the annotation type has
+     * a retention policy of annotation.RetentionPolicy.CLASS or annotation.RetentionPolicy.RUNTIME.
+     */
+    RetainedAnnotations retainedAnnotations();
+
 }

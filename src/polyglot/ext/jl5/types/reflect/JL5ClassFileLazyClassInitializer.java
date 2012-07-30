@@ -4,7 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
 
-import polyglot.ext.jl5.types.AnnotationElemInstance;
+import polyglot.ext.jl5.types.AnnotationTypeElemInstance;
+import polyglot.ext.jl5.types.JL5Flags;
 import polyglot.ext.jl5.types.JL5MethodInstance;
 import polyglot.ext.jl5.types.JL5ParsedClassType;
 import polyglot.ext.jl5.types.JL5TypeSystem;
@@ -14,6 +15,7 @@ import polyglot.main.Report;
 import polyglot.types.ClassType;
 import polyglot.types.ConstructorInstance;
 import polyglot.types.FieldInstance;
+import polyglot.types.Flags;
 import polyglot.types.MethodInstance;
 import polyglot.types.ParsedClassType;
 import polyglot.types.ReferenceType;
@@ -325,17 +327,20 @@ ClassFileLazyClassInitializer implements JL5LazyClassInitializer {
 
         FieldInstance fi = null;
         JL5Signature signature = field.getSignature();
+        Flags flags = ts.flagsForBits(field.getModifiers());
+        Type fieldType;
         if (signature != null) {
             signature.parseFieldSignature(ts, position(), ct);
-            // System.err.println("Field type for " + name + " is "
-            // +jl5FieldType);
-            fi = ts.fieldInstance(ct.position(), ct,
-                    ts.flagsForBits(field.getModifiers()),
-                    signature.fieldSignature.type, name);
+            fieldType = signature.fieldSignature.type;
         } else {
-            fi = ts.fieldInstance(ct.position(), ct,
-                    ts.flagsForBits(field.getModifiers()), typeForString(type),
-                    name);
+            fieldType = typeForString(type);
+        }
+        if (JL5Flags.isEnum(flags)) {
+            fi =
+                    ((JL5TypeSystem) ts).enumInstance(ct.position(), ct, flags,
+                            name, (ParsedClassType) fieldType, 0);
+        } else {
+            fi = ts.fieldInstance(ct.position(), ct, flags, fieldType, name);
         }
 
         if (field.isConstant()) {
@@ -385,7 +390,7 @@ ClassFileLazyClassInitializer implements JL5LazyClassInitializer {
             if (!methods[i].name().equals("<init>")
                     && !methods[i].name().equals("<clinit>")
                     && !methods[i].isSynthetic()) {
-                AnnotationElemInstance mi =
+                AnnotationTypeElemInstance mi =
                         this.annotationElemInstance((JL5Method) methods[i], ct,
                                 ((JL5Method) methods[i]).hasDefaultVal());
                 if (Report.should_report(verbose, 3))
@@ -401,7 +406,7 @@ ClassFileLazyClassInitializer implements JL5LazyClassInitializer {
         }
     }
 
-    private AnnotationElemInstance annotationElemInstance(JL5Method annot,
+    private AnnotationTypeElemInstance annotationElemInstance(JL5Method annot,
             ParsedClassType ct, boolean hasDefault) {
         Constant[] constants = clazz.getConstants();
         String name = (String) constants[annot.getName()].value();

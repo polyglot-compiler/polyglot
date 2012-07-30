@@ -107,7 +107,7 @@ public class JL5Formal_c extends Formal_c implements JL5Formal {
     }
 
     @Override
-    public List<AnnotationElem> annotations() {
+    public List<AnnotationElem> annotationElems() {
         return this.annotations;
     }
 }

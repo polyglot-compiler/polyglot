@@ -205,13 +205,18 @@ public class RawClass_c extends JL5ClassType_c implements RawClass {
     }
 
     @Override
-    public AnnotationElemInstance annotationElemNamed(String name) {
+    public AnnotationTypeElemInstance annotationElemNamed(String name) {
         return this.erased().annotationElemNamed(name);
     }
 
     @Override
-    public List<AnnotationElemInstance> annotationElems() {
+    public List<AnnotationTypeElemInstance> annotationElems() {
         return this.erased().annotationElems();
+    }
+
+    @Override
+    public RetainedAnnotations retainedAnnotations() {
+        return ((JL5TypeSystem) this.typeSystem()).NoRetainedAnnotations();
     }
     
 }

@@ -74,7 +74,7 @@ public class EnumConstantDecl_c extends Term_c implements EnumConstantDecl
     }
 
     @Override
-    public List<AnnotationElem> annotations() {
+    public List<AnnotationElem> annotationElems() {
         return this.annotations;
     }
 
@@ -315,7 +315,7 @@ public class EnumConstantDecl_c extends Term_c implements EnumConstantDecl
                     + " on enum constant declaration", this.position());
         }
 
-        ts.checkDuplicateAnnotations(n.annotations());
+        ts.checkDuplicateAnnotations(n.annotationElems());
 
         if (this.body != null) {
             ts.checkClassConformance(type);

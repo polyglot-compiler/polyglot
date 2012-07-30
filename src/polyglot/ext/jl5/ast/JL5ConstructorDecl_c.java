@@ -60,7 +60,7 @@ public class JL5ConstructorDecl_c extends ConstructorDecl_c implements JL5Constr
     }
 
     @Override
-    public List<AnnotationElem> annotations(){
+    public List<AnnotationElem> annotationElems(){
         return this.annotations;
     }
 
@@ -263,6 +263,9 @@ public class JL5ConstructorDecl_c extends ConstructorDecl_c implements JL5Constr
     @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
         ConstructorDecl cd = this;
+        JL5ConstructorInstance ci =
+                (JL5ConstructorInstance) this.constructorInstance();
+        JL5TypeSystem ts = (JL5TypeSystem) ci.typeSystem();
 
         // check at most last formal is variable
         for (int i = 0; i < formals.size(); i++){
@@ -294,6 +297,11 @@ public class JL5ConstructorDecl_c extends ConstructorDecl_c implements JL5Constr
                 throw new InternalCompilerError("Inconsistent var args flag with procedure type");
             }
         }
+
+        // set the retained annotations
+        ci.setRetainedAnnotations(ts.createRetainedAnnotations(this
+.annotationElems(), this.position()));
+
         return super.typeCheck(tc);
     }
 }

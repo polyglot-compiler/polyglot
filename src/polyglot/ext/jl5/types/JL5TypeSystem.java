@@ -2,6 +2,7 @@ package polyglot.ext.jl5.types;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import polyglot.ast.Expr;
 import polyglot.ext.jl5.ast.AnnotationElem;
@@ -45,6 +46,10 @@ public interface JL5TypeSystem extends TypeSystem, ParamTypeSystem<TypeVariable,
     ClassType OverrideAnnotation();
 
     ClassType TargetAnnotation();
+
+    ClassType RetentionAnnotation();
+
+    ClassType AnnotationElementType();
 
     /** 
      * 
@@ -299,12 +304,12 @@ public interface JL5TypeSystem extends TypeSystem, ParamTypeSystem<TypeVariable,
     LubType lub(Position pos, List<ReferenceType> bounds);
 
     boolean isValidAnnotationValueType(Type t);
-    AnnotationElemInstance annotationElemInstance(Position pos, ClassType ct, Flags f, Type type,
+    AnnotationTypeElemInstance annotationElemInstance(Position pos, ClassType ct, Flags f, Type type,
                                                   String name, boolean hasDefault);
 
     void checkAnnotationValueConstant(Expr value) throws SemanticException;
 
-    AnnotationElemInstance findAnnotation(ReferenceType t, String name, ClassType currentClass) throws SemanticException;
+    AnnotationTypeElemInstance findAnnotation(ReferenceType t, String name, ClassType currentClass) throws SemanticException;
 
     void checkDuplicateAnnotations(List<AnnotationElem> annotations) throws SemanticException;
 
@@ -330,6 +335,29 @@ public interface JL5TypeSystem extends TypeSystem, ParamTypeSystem<TypeVariable,
      */
     UnknownTypeVariable unknownTypeVariable(Position position);
 
+    /**
+     * Given a list of annotation elements, create a RetainedAnnotations
+     * for the annotations that should survive in the binary (i.e., in the
+     * type information)
+     * @throws SemanticException 
+     */
+    RetainedAnnotations createRetainedAnnotations(
+            List<AnnotationElem> annotationElems, Position pos)
+            throws SemanticException;
 
+    /**
+     * A special RetainedAnnotations that has no retained annotations.
+     */
+    RetainedAnnotations NoRetainedAnnotations();
 
+    AnnotationElementValue AnnotationElementValueArray(Position pos,
+            List<AnnotationElementValue> vals);
+
+    AnnotationElementValue AnnotationElementValueAnnotation(Position pos,
+            Type type,
+            Map<String, AnnotationElementValue> annotationElementValues);
+
+    AnnotationElementValue AnnotationElementValueConstant(Position pos,
+            Type type,
+            Object constVal);
 }

@@ -11,7 +11,7 @@ import polyglot.ast.ClassDecl_c;
 import polyglot.ast.Id;
 import polyglot.ast.Node;
 import polyglot.ast.TypeNode;
-import polyglot.ext.jl5.types.AnnotationElemInstance;
+import polyglot.ext.jl5.types.AnnotationTypeElemInstance;
 import polyglot.ext.jl5.types.JL5Context;
 import polyglot.ext.jl5.types.JL5Flags;
 import polyglot.ext.jl5.types.JL5ParsedClassType;
@@ -72,7 +72,7 @@ public class JL5ClassDecl_c extends ClassDecl_c implements JL5ClassDecl {
     }
 
     @Override
-    public List<AnnotationElem> annotations() {
+    public List<AnnotationElem> annotationElems() {
         return this.annotations;
     }
 
@@ -214,6 +214,11 @@ public class JL5ClassDecl_c extends ClassDecl_c implements JL5ClassDecl {
                 }
             }
         }
+        
+        // set the retained annotations
+        ((JL5ParsedClassType) type()).setRetainedAnnotations(ts
+                .createRetainedAnnotations(this.annotationElems(),
+                        this.position()));
 
         return super.typeCheck(tc);
     }
@@ -230,12 +235,12 @@ public class JL5ClassDecl_c extends ClassDecl_c implements JL5ClassDecl {
         // check annotation circularity
         if (JL5Flags.isAnnotation(flags())) {
             JL5ParsedClassType ct = (JL5ParsedClassType) type();
-            for (AnnotationElemInstance ai : ct.annotationElems()) {
+            for (AnnotationTypeElemInstance ai : ct.annotationElems()) {
                 if (ai.type() instanceof ClassType
                         && ((ClassType) ((ClassType) ai.type()).superType()).fullName().equals("java.lang.annotation.Annotation")) {
                     JL5ParsedClassType other = (JL5ParsedClassType) ai.type();
                     for (Object element2 : other.annotationElems()) {
-                        AnnotationElemInstance aj = (AnnotationElemInstance) element2;
+                        AnnotationTypeElemInstance aj = (AnnotationTypeElemInstance) element2;
                         if (aj.type().equals(ct)) {
                             throw new SemanticException("cyclic annotation element type", aj.position());
                         }

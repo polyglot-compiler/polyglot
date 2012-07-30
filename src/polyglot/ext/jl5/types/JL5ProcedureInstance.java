@@ -19,4 +19,12 @@ public interface JL5ProcedureInstance extends ProcedureInstance, MemberInstance 
      */
     JL5Subst erasureSubst();
 
+    /**
+     * Annotations on the declaration of this type such that the annotation type has
+     * a retention policy of annotation.RetentionPolicy.CLASS or annotation.RetentionPolicy.RUNTIME.
+     */
+    RetainedAnnotations retainedAnnotations();
+
+    void setRetainedAnnotations(RetainedAnnotations createRetainedAnnotations);
+
 }

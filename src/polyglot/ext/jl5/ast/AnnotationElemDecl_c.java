@@ -14,7 +14,7 @@ import polyglot.ast.Node;
 import polyglot.ast.Term;
 import polyglot.ast.Term_c;
 import polyglot.ast.TypeNode;
-import polyglot.ext.jl5.types.AnnotationElemInstance;
+import polyglot.ext.jl5.types.AnnotationTypeElemInstance;
 import polyglot.ext.jl5.types.JL5ParsedClassType;
 import polyglot.ext.jl5.types.JL5TypeSystem;
 import polyglot.types.CodeInstance;
@@ -39,7 +39,7 @@ public class AnnotationElemDecl_c extends Term_c implements AnnotationElemDecl {
     protected Flags flags;
     protected Expr defaultVal;
     protected Id name;
-    protected AnnotationElemInstance ai;
+    protected AnnotationTypeElemInstance ai;
     
     public AnnotationElemDecl_c(Position pos, Flags flags, TypeNode type, Id name, Expr defaultVal){
         super(pos);
@@ -110,14 +110,14 @@ public class AnnotationElemDecl_c extends Term_c implements AnnotationElemDecl {
     }
 
     @Override
-    public AnnotationElemDecl annotationElemInstance(AnnotationElemInstance ai){
+    public AnnotationElemDecl annotationElemInstance(AnnotationTypeElemInstance ai){
         AnnotationElemDecl_c n = (AnnotationElemDecl_c) copy();
         n.ai = ai;
         return n;
     }
 
     @Override
-    public AnnotationElemInstance annotationElemInstance(){
+    public AnnotationTypeElemInstance annotationElemInstance(){
         return ai;
     }
     
@@ -161,7 +161,7 @@ public class AnnotationElemDecl_c extends Term_c implements AnnotationElemDecl {
         Flags f = this.flags;
         f = f.Public().Abstract();
 
-        AnnotationElemInstance ai = ts.annotationElemInstance(position(), ct, f, ts.unknownType(position()), this.name(), defaultVal != null);
+        AnnotationTypeElemInstance ai = ts.annotationElemInstance(position(), ct, f, ts.unknownType(position()), this.name(), defaultVal != null);
         ct.addAnnotationElem(ai);
         
         return annotationElemInstance(ai);
@@ -317,7 +317,7 @@ public class AnnotationElemDecl_c extends Term_c implements AnnotationElemDecl {
 
     @Override
     public MethodDecl methodInstance(MethodInstance mi) {
-        return this.annotationElemInstance((AnnotationElemInstance)mi);
+        return this.annotationElemInstance((AnnotationTypeElemInstance)mi);
     }
 
     @Override

@@ -63,7 +63,7 @@ public class JL5MethodDecl_c extends MethodDecl_c implements JL5MethodDecl {
     }
 
     @Override
-    public List<AnnotationElem> annotations() {
+    public List<AnnotationElem> annotationElems() {
         return this.annotations;
     }
 
@@ -198,6 +198,7 @@ public class JL5MethodDecl_c extends MethodDecl_c implements JL5MethodDecl {
         // check no duplicate annotations used
         JL5TypeSystem ts = (JL5TypeSystem)tc.typeSystem();
         MethodDecl md = this;
+        JL5MethodInstance mi = (JL5MethodInstance) this.methodInstance();
         ts.checkDuplicateAnnotations(annotations);
 
 
@@ -275,6 +276,10 @@ public class JL5MethodDecl_c extends MethodDecl_c implements JL5MethodDecl {
         }
 
         overrideMethodCheck(tc);
+
+        // set the retained annotations
+        mi.setRetainedAnnotations(ts.createRetainedAnnotations(this
+.annotationElems(), this.position()));
 
         return md;
     }

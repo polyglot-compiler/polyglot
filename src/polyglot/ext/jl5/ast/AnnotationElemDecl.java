@@ -3,7 +3,7 @@ package polyglot.ext.jl5.ast;
 import polyglot.ast.Expr;
 import polyglot.ast.MethodDecl;
 import polyglot.ast.TypeNode;
-import polyglot.ext.jl5.types.AnnotationElemInstance;
+import polyglot.ext.jl5.types.AnnotationTypeElemInstance;
 import polyglot.types.Flags;
 
 public interface AnnotationElemDecl extends MethodDecl {
@@ -25,6 +25,6 @@ public interface AnnotationElemDecl extends MethodDecl {
     @Override
     String name();
 
-    AnnotationElemDecl annotationElemInstance(AnnotationElemInstance ai);
-    AnnotationElemInstance annotationElemInstance();
+    AnnotationElemDecl annotationElemInstance(AnnotationTypeElemInstance ai);
+    AnnotationTypeElemInstance annotationElemInstance();
 }

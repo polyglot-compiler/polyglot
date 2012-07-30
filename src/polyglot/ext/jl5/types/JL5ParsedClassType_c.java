@@ -24,11 +24,12 @@ public class JL5ParsedClassType_c extends ParsedClassType_c implements JL5Parsed
     protected PClass<TypeVariable, ReferenceType> pclass;
     protected List<TypeVariable> typeVars = Collections.emptyList();
     protected List<EnumInstance> enumConstants;
-    protected List<AnnotationElemInstance> annotationElems;
+    protected List<AnnotationTypeElemInstance> annotationElems;
+    protected RetainedAnnotations retainedAnnotations;
 
     public JL5ParsedClassType_c( TypeSystem ts, LazyClassInitializer init, Source fromSource){
         super(ts, init, fromSource);
-        annotationElems = new LinkedList<AnnotationElemInstance>();
+        annotationElems = new LinkedList<AnnotationTypeElemInstance>();
     }
 
     @Override
@@ -56,8 +57,8 @@ public class JL5ParsedClassType_c extends ParsedClassType_c implements JL5Parsed
     }
 
     @Override
-    public AnnotationElemInstance annotationElemNamed(String name) {
-        for (AnnotationElemInstance ai : annotationElems()) {
+    public AnnotationTypeElemInstance annotationElemNamed(String name) {
+        for (AnnotationTypeElemInstance ai : annotationElems()) {
             if (ai.name().equals(name)){
                 return ai;
             }
@@ -66,13 +67,13 @@ public class JL5ParsedClassType_c extends ParsedClassType_c implements JL5Parsed
     }
 
     @Override
-    public void addAnnotationElem(AnnotationElemInstance ai){
+    public void addAnnotationElem(AnnotationTypeElemInstance ai){
         addMethod(ai);
         annotationElems.add(ai);
     }
 
     @Override
-    public List<AnnotationElemInstance> annotationElems() {
+    public List<AnnotationTypeElemInstance> annotationElems() {
 
         ((JL5LazyClassInitializer) init).initAnnotationElems();
         return Collections.unmodifiableList(annotationElems);
@@ -285,4 +286,15 @@ public class JL5ParsedClassType_c extends ParsedClassType_c implements JL5Parsed
         }
         return false;
     }
+
+    @Override
+    public RetainedAnnotations retainedAnnotations() {
+        return this.retainedAnnotations;
+    }
+
+    @Override
+    public void setRetainedAnnotations(RetainedAnnotations retainedAnnotations) {
+        this.retainedAnnotations = retainedAnnotations;
+    }
+
 }

@@ -56,7 +56,7 @@ public class JL5LocalDecl_c extends LocalDecl_c implements LocalDecl,
     }
 
     @Override
-    public List<AnnotationElem> annotations(){
+    public List<AnnotationElem> annotationElems(){
         return annotations;
     }
 

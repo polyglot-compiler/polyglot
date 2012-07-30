@@ -13,7 +13,7 @@ public class JL5ClassDeclToJL_c extends ClassDeclToExt_c {
 			throws SemanticException {
 		//Skip annotations and parameter nodes
 		JL5ClassDecl cd = (JL5ClassDecl) node();
-		rw = (ExtensionRewriter) rw.bypass(cd.annotations());
+		rw = (ExtensionRewriter) rw.bypass(cd.annotationElems());
 		rw = (ExtensionRewriter) rw.bypass(cd.paramTypes());
 		return rw;
 	}

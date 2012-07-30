@@ -322,12 +322,17 @@ public class IntersectionType_c extends ClassType_c implements IntersectionType 
     }
 
     @Override
-    public AnnotationElemInstance annotationElemNamed(String name) {
+    public AnnotationTypeElemInstance annotationElemNamed(String name) {
         return null;
     }
 
     @Override
-    public List<AnnotationElemInstance> annotationElems() {
+    public List<AnnotationTypeElemInstance> annotationElems() {
         return Collections.emptyList();
+    }
+
+    @Override
+    public RetainedAnnotations retainedAnnotations() {
+        return ((JL5TypeSystem) this.typeSystem()).NoRetainedAnnotations();
     }
 }

@@ -1,16 +1,25 @@
 package polyglot.ext.jl5.ast;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
+import polyglot.ast.ArrayInit;
+import polyglot.ast.ClassLit;
+import polyglot.ast.Expr;
 import polyglot.ast.Expr_c;
 import polyglot.ast.Node;
 import polyglot.ast.Term;
 import polyglot.ast.TypeNode;
+import polyglot.ext.jl5.types.AnnotationElementValue;
 import polyglot.ext.jl5.types.JL5Flags;
+import polyglot.ext.jl5.types.JL5TypeSystem;
 import polyglot.types.SemanticException;
 import polyglot.util.CodeWriter;
+import polyglot.util.CollectionUtil;
 import polyglot.util.ListUtil;
 import polyglot.util.Position;
 import polyglot.visit.CFGBuilder;
@@ -50,10 +59,14 @@ public class AnnotationElem_c extends Expr_c implements AnnotationElem {
         return this;
     }
 
-    protected AnnotationElem_c reconstruct(TypeNode typeName){
-        if (!typeName.equals(this.typeName)){
+    protected AnnotationElem_c reconstruct(TypeNode typeName,
+            List<ElementValuePair> elements) {
+        if (!typeName.equals(this.typeName)
+                || !CollectionUtil.equals(elements, this.elements)) {
             AnnotationElem_c n = (AnnotationElem_c) copy();
             n.typeName = typeName;
+            n.elements = ListUtil.copy(elements, true);
+
             return n;
         }
         return this;
@@ -62,7 +75,9 @@ public class AnnotationElem_c extends Expr_c implements AnnotationElem {
     @Override
     public Node visitChildren(NodeVisitor v){
         TypeNode tn = (TypeNode)visitChild(this.typeName, v);
-        return reconstruct(tn);
+        List<ElementValuePair> elements = visitList(this.elements, v);
+
+        return reconstruct(tn, elements);
     }
 
     @Override
@@ -141,6 +156,45 @@ public class AnnotationElem_c extends Expr_c implements AnnotationElem {
         return elements().size() == 1
                 && elements().get(0).name()
                         .equals("value");
+    }
+
+    @Override
+    public Map<String, AnnotationElementValue> toAnnotationElementValues(
+            JL5TypeSystem ts) throws SemanticException {
+        Map<String, AnnotationElementValue> m =
+                new LinkedHashMap<String, AnnotationElementValue>();
+        for (ElementValuePair p : this.elements()) {
+            m.put(p.name(), toAnnotationElementValue(p.value(), ts));
+        }
+        return m;
+    }
+
+    private AnnotationElementValue toAnnotationElementValue(Expr value,
+            JL5TypeSystem ts) throws SemanticException {
+        if (value instanceof ArrayInit) {
+            ArrayInit init = (ArrayInit) value;
+            List<AnnotationElementValue> vals = new ArrayList();
+            for (Expr v : init.elements()) {
+                vals.add(toAnnotationElementValue(v, ts));
+            }
+            return ts.AnnotationElementValueArray(value.position(),
+                                                  vals);
+        }
+        if (value instanceof AnnotationElem) {
+            AnnotationElem ae = (AnnotationElem) value;
+            ts.AnnotationElementValueAnnotation(value.position(),
+                                                ae.type(),
+                    ae.toAnnotationElementValues(ts));
+        }
+        // Otherwise, it should be a constant value.
+        ts.checkAnnotationValueConstant(value);
+        Object constVal = value.constantValue();
+        if (value instanceof ClassLit) {
+            constVal = ((ClassLit)value).typeNode().type();
+        }
+        return ts.AnnotationElementValueConstant(value.position(),
+                                                 value.type(),
+                                                 constVal);
     }
 
 }

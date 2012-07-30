@@ -19,6 +19,7 @@ import polyglot.ast.ClassLit;
 import polyglot.ast.Expr;
 import polyglot.ast.NullLit;
 import polyglot.ext.jl5.ast.AnnotationElem;
+import polyglot.ext.jl5.ast.JL5Field_c;
 import polyglot.ext.jl5.types.inference.InferenceSolver;
 import polyglot.ext.jl5.types.inference.InferenceSolver_c;
 import polyglot.ext.jl5.types.inference.LubType;
@@ -38,6 +39,7 @@ import polyglot.types.FieldInstance;
 import polyglot.types.Flags;
 import polyglot.types.ImportTable;
 import polyglot.types.LazyClassInitializer;
+import polyglot.types.LocalInstance;
 import polyglot.types.MemberInstance;
 import polyglot.types.MethodInstance;
 import polyglot.types.NoMemberException;
@@ -62,6 +64,8 @@ public class JL5TypeSystem_c extends ParamTypeSystem_c<TypeVariable, ReferenceTy
     protected ClassType ANNOTATION_;
     protected ClassType OVERRIDE_ANNOTATION_;
     protected ClassType TARGET_ANNOTATION_;
+    protected ClassType RETENTION_ANNOTATION_;
+    protected ClassType ELEMENT_TYPE_;
 
     // this is for extended for
     protected ClassType ITERABLE_;
@@ -102,7 +106,26 @@ public class JL5TypeSystem_c extends ParamTypeSystem_c<TypeVariable, ReferenceTy
         if (TARGET_ANNOTATION_ != null) {
             return TARGET_ANNOTATION_;
         } else {
-            return TARGET_ANNOTATION_ = load("java.lang.annotation.Override");
+            return TARGET_ANNOTATION_ = load("java.lang.annotation.Target");
+        }
+    }
+
+    @Override
+    public ClassType RetentionAnnotation() {
+        if (RETENTION_ANNOTATION_ != null) {
+            return RETENTION_ANNOTATION_;
+        } else {
+            return RETENTION_ANNOTATION_ =
+                    load("java.lang.annotation.Retention");
+        }
+    }
+
+    @Override
+    public ClassType AnnotationElementType() {
+        if (ELEMENT_TYPE_ != null) {
+            return ELEMENT_TYPE_;
+        } else {
+            return ELEMENT_TYPE_ = load("java.lang.annotation.ElementType");
         }
     }
 
@@ -360,6 +383,15 @@ public class JL5TypeSystem_c extends ParamTypeSystem_c<TypeVariable, ReferenceTy
         assert_(excTypes);
         assert_(typeParams);
         return new JL5ConstructorInstance_c(this, pos, container, flags, argTypes, excTypes, typeParams);
+    }
+
+
+    @Override
+    public JL5FieldInstance fieldInstance(Position pos,
+            ReferenceType container, Flags flags, Type type, String name) {
+        assert_(container);
+        assert_(type);
+        return new JL5FieldInstance_c(this, pos, container, flags, type, name);
     }
 
     @Override
@@ -1952,7 +1984,12 @@ public class JL5TypeSystem_c extends ParamTypeSystem_c<TypeVariable, ReferenceTy
             }
         }
         else if (!isAnnotationValueConstant(value)) {
-            throw new SemanticException("Annotation attribute value must be constant: " + value.constantValueSet() + " " + value.getClass(), value.position());
+            throw new SemanticException(
+                    "Annotation attribute value must be constant: "
+                            + value.constantValueSet() + " \'"
+                            + ((JL5Field_c) value).fieldInstance().getClass()
+                            + "\'",
+                    value.position());
         }
     }
     
@@ -1986,12 +2023,57 @@ public class JL5TypeSystem_c extends ParamTypeSystem_c<TypeVariable, ReferenceTy
         }
         // If annotationType specifies what kind of target it is meant to be applied to,
         // then check that.
-        for (AnnotationElemInstance aei : annotationType.annotationElems()) {
-            if (aei.type().equals(TargetAnnotation())) {
-                // annotationType has a target annotation!
-                // XXX TODO check that the annotation is applied to an appropriate target
+
+        RetainedAnnotations ra = annotationType.retainedAnnotations();
+        if (ra != null) {
+            for (Type at : ra.annotationTypes()) {
+                if (at.equals(TargetAnnotation())) {
+                    // annotationType has a target annotation!
+                    EnumInstance ei = annotationElementTypeForDeclaration(decl);
+//                    if (ra.singleElement(at) instanceof EnumConstant) {
+//                        if (!ei.equals(ra.singleElement(at))) {
+//                            throw new SemanticException("Annotation "
+//                                    + annotation
+//                                    + " not applicable to declaration " + decl,
+//                                    annotation.position());
+//                        }
+//                    }
+//                    else if (ra.singleElement(at) instanceof )
+
+                }
             }
         }
+    }
+
+    private EnumInstance annotationElementTypeForDeclaration(Declaration decl) {
+        ClassType aet = AnnotationElementType();
+        if (decl instanceof MethodInstance) {
+            return (EnumInstance) aet.fieldNamed("METHOD");
+        }
+        if (decl instanceof FieldInstance) {
+            return (EnumInstance) aet.fieldNamed("FIELD");
+        }
+        if (decl instanceof LocalInstance) {
+            // it's either a local instance or a formal
+            LocalInstance li = (LocalInstance) decl;
+            return (EnumInstance) aet.fieldNamed("LOCAL_VARIABLE");
+            //return (EnumInstance) aet.fieldNamed("PARAMETER");
+        }
+        if (decl instanceof ClassType) {
+            return (EnumInstance) aet.fieldNamed("TYPE");
+        }
+        if (decl instanceof ConstructorInstance) {
+            return (EnumInstance) aet.fieldNamed("CONSTRUCTOR");
+        }
+        if (decl instanceof Package) {
+            return (EnumInstance) aet.fieldNamed("PACKAGE");
+        }
+
+//
+//    /** Annotation type declaration */
+//    ANNOTATION_TYPE,
+
+        throw new InternalCompilerError("Don't know how to deal with " + decl);
     }
 
     @Override
@@ -2079,26 +2161,26 @@ public class JL5TypeSystem_c extends ParamTypeSystem_c<TypeVariable, ReferenceTy
     }
 
     @Override
-    public AnnotationElemInstance annotationElemInstance(Position pos, ClassType ct, Flags f, Type type, java.lang.String name, boolean hasDefault) {
+    public AnnotationTypeElemInstance annotationElemInstance(Position pos, ClassType ct, Flags f, Type type, java.lang.String name, boolean hasDefault) {
         assert_(ct);
         assert_(type);
-        return new AnnotationElemInstance_c(this, pos, ct, f, type, name, hasDefault);
+        return new AnnotationTypeElemInstance_c(this, pos, ct, f, type, name, hasDefault);
    }
 
     
     @Override
-    public AnnotationElemInstance findAnnotation(ReferenceType container, String name,
+    public AnnotationTypeElemInstance findAnnotation(ReferenceType container, String name,
                                                  ClassType currClass) throws SemanticException {
-        Set<AnnotationElemInstance> annotations = findAnnotations(container, name);
+        Set<AnnotationTypeElemInstance> annotations = findAnnotations(container, name);
         if (annotations.size() == 0) {
             throw new NoMemberException(JL5NoMemberException.ANNOTATION, "Annotation: \"" + name
                                         + "\" not found in type \"" + container + "\".");
         }
-        Iterator<AnnotationElemInstance> i = annotations.iterator();
-        AnnotationElemInstance ai = i.next();
+        Iterator<AnnotationTypeElemInstance> i = annotations.iterator();
+        AnnotationTypeElemInstance ai = i.next();
 
         if (i.hasNext()) {
-            AnnotationElemInstance ai2 = i.next();
+            AnnotationTypeElemInstance ai2 = i.next();
 
             throw new SemanticException("Annotation \"" + name
                                         + "\" is ambiguous; it is defined in both " + ai.container() + " and "
@@ -2111,19 +2193,19 @@ public class JL5TypeSystem_c extends ParamTypeSystem_c<TypeVariable, ReferenceTy
         return ai;
     }
 
-    public Set<AnnotationElemInstance> findAnnotations(ReferenceType container, String name) {
+    public Set<AnnotationTypeElemInstance> findAnnotations(ReferenceType container, String name) {
         assert_(container);
         if (container == null) {
             throw new InternalCompilerError("Cannot access annotation \"" + name
                                             + "\" within a null container type.");
         }
-        AnnotationElemInstance ai = ((JL5ParsedClassType) container).annotationElemNamed(name);
+        AnnotationTypeElemInstance ai = ((JL5ParsedClassType) container).annotationElemNamed(name);
 
         if (ai != null) {
             return Collections.singleton(ai);
         }
 
-        return new HashSet<AnnotationElemInstance>();
+        return new HashSet<AnnotationTypeElemInstance>();
     }
 
     @Override
@@ -2211,5 +2293,83 @@ public class JL5TypeSystem_c extends ParamTypeSystem_c<TypeVariable, ReferenceTy
 //        throw new InternalCompilerError(
 //                "Could not find container of inner class "
 //                        + ct + " in current context");
+    }
+
+    @Override
+    public RetainedAnnotations createRetainedAnnotations(
+            List<AnnotationElem> annotationElems, Position pos)
+            throws SemanticException {
+        Map<Type, Map<String, AnnotationElementValue>> m =
+                new LinkedHashMap<Type, Map<String, AnnotationElementValue>>();
+        for (AnnotationElem ae : annotationElems) {
+            Type annotationType = ae.typeName().type();
+            if (retainAnnotation(annotationType)) {
+                m.put(annotationType, ae.toAnnotationElementValues(this));
+            }
+        }
+        return new RetainedAnnotations_c(m, this, pos);
+    }
+
+    /**
+     * Given an annotation of type annotationType, should the annotation
+     * be retained in the binary? See JLS 3rd ed, 9.6.1.2
+     */
+    protected boolean retainAnnotation(Type annotationType) {
+        if (annotationType.isClass()
+                && annotationType.toClass().isSubtype(this.Annotation())) {
+            // well, it's an annotation type at least.
+            // check if there is a retention policy on it.
+            JL5ClassType ct = (JL5ClassType) annotationType.toClass();
+            RetainedAnnotations ra = ct.retainedAnnotations();
+            if (ra == null) {
+                // by default, use RetentionPolicy.CLASS
+                return true;
+            }
+            AnnotationElementValue v =
+                    ra.singleElement(RetentionAnnotation());
+            if (v == null) {
+                // by default, use RetentionPolicy.CLASS
+                return true;
+            }
+            if (v instanceof AnnotationElementValueConstant) {
+                // XXX missing logic here
+                System.err.println("What do we do with " + v);
+                throw new UnsupportedOperationException("To implement...");
+            }
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public RetainedAnnotations NoRetainedAnnotations() {
+        return new RetainedAnnotations_c(this, Position.compilerGenerated(1));
+    }
+
+    @Override
+    public AnnotationElementValueArray AnnotationElementValueArray(
+            Position pos,
+            List<AnnotationElementValue> vals) {
+        return new AnnotationElementValueArray_c(this,
+                                                 pos,
+ vals);
+    }
+
+    @Override
+    public AnnotationElementValueAnnotation AnnotationElementValueAnnotation(
+            Position pos, Type annotationType,
+            Map<String, AnnotationElementValue> annotationElementValues) {
+        return new AnnotationElementValueAnnotation_c(this,
+                                                      pos,
+                                                      annotationType,
+                                                      annotationElementValues);
+    }
+
+    @Override
+    public AnnotationElementValueConstant AnnotationElementValueConstant(
+            Position pos,
+            Type type,
+            Object constVal) {
+        return new AnnotationElementValueConstant_c(this, pos, type, constVal);
     }
 }

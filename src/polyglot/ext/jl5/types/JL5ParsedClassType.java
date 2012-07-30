@@ -42,5 +42,13 @@ public interface JL5ParsedClassType extends ParsedClassType, JL5ClassType {
 
     void printNoParams(CodeWriter w);
     String toStringNoParams();
-    void addAnnotationElem(AnnotationElemInstance ai);    
+
+    /**
+     * Add an AnnotationElemInstance. Should only be used if the
+     * ClassType is an Annotation type (i.e., declared using "@interface")
+     */
+    void addAnnotationElem(AnnotationTypeElemInstance ai);
+
+    void setRetainedAnnotations(RetainedAnnotations createRetainedAnnotations);
+
 }
