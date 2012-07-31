@@ -173,7 +173,8 @@ public class AnnotationElem_c extends Expr_c implements AnnotationElem {
             JL5TypeSystem ts) throws SemanticException {
         if (value instanceof ArrayInit) {
             ArrayInit init = (ArrayInit) value;
-            List<AnnotationElementValue> vals = new ArrayList();
+            List<AnnotationElementValue> vals =
+                    new ArrayList<AnnotationElementValue>();
             for (Expr v : init.elements()) {
                 vals.add(toAnnotationElementValue(v, ts));
             }
