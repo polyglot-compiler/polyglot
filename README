@@ -8,7 +8,7 @@ This is release 2.5 of the Polyglot extensible compiler framework.
 It contains many improvements over previous releases of Polyglot,
 including support for Java 5 and significantly improved performance.
 More details on these changes can be found in the file
-release-2.5-notes/PolyglotChanges.html.
+doc/release-2.5-notes/PolyglotChanges.html.
 
 Contents
 --------
@@ -25,7 +25,7 @@ contains the following sub-directories:
   - tools/java_cup: tweaked version of the Java CUP parser generator 0.10k.
   - tools/ppg: the Polyglot parser generator, an extension of Java CUP
   - tools/pth: Polyglot test harness
-  - doc: documentation about writing Polyglot extensions
+  - doc: documentation
   - doc/api: Javadoc descriptions of Polyglot classes
   - tests: test cases for the Polyglot Java language extension
   - testsjl5: test cases for the Polyglot Java5 language extension
@@ -39,40 +39,39 @@ Polyglot is research software.  Over time, some of the interfaces in the
 framework may change.  This may require some extensions to be changed to
 conform to the new interfaces.  Also, Polyglot is not well-documented; in
 particular, some of the javadoc is missing or out-of-date.  We are working on
-writing better documentation.  Watch the web page:
+writing better documentation.  For future updates, watch this web page:
 
     http://www.cs.cornell.edu/Projects/polyglot
 
-for further updates.  If you use Polyglot, we'd appreciate your letting
-us know.  Send your comments and bug reports to Nate Nystrom at
-nate@nanocow.com.
+If you use Polyglot, we'd appreciate your letting us know.  Send comments
+and bug reports to polyglot-developers-L@cornell.edu.
 
 Requirements
 ------------
 
-Polyglot builds on Unix and on Windows using the Cygwin environment.  We
-recommend that you use JDK 1.5 or later.  You will experience problems
-with versions of the JDK older than 1.5.  You must ensure that java and
-javac are in your path.  Polyglot is compiled with the Ant build tool
-(http://jakarta.apache.org/ant).
+Polyglot builds on Unix, Mac OS X, and on Windows using the Cygwin
+environment.  We recommend that you use JDK 1.5 or later.  You will
+experience problems with versions of the JDK older than 1.5.  You must
+ensure that java and javac are in your path.  Polyglot is compiled
+with the Ant build tool (http://jakarta.apache.org/ant).
 
 Polyglot uses the JFlex scanner generator.  The JFlex jar file is
-included in the Polyglot distribution.  Polyglot is distributed
-under LGPL, but JFlex is distributed under GPL.  See the JFlex web
-site at:
+included in the Polyglot distribution.  Polyglot is distributed under
+LGPL, but JFlex is distributed under GPL.  See the JFlex web site
 
         http://www.jflex.de
 
 for updates and the source code of JFlex.  The output of JFlex
-inherits the copyright of the specification--licensed under LGPL
-in Polyglot's case.  You may be able to substitute JLex
+inherits the copyright of the specification--licensed under
+LGPL in Polyglot's case.  It is possible to substitute your own
+lexical analysis or to use another lexer generator such as JLex
 (http://www.cs.princeton.edu/~appel/modern/java/JLex/), but this
-is untested.
+is not encouraged.
 
 Creating an extension
 ---------------------
 
-To create your own extensions, see the file doc/Overview.txt.
+To see how to create your own extensions, see the file doc/Overview.txt.
 
 Running Polyglot
 ----------------
@@ -221,7 +220,7 @@ code by Robert Harder <rob@iharder.net>.  See http://iharder.net/base64.
 
 The JL5 extension was based on the "Polyglot for Java 5" project by 
 Milan Stanojevic and Todd Millstein (http://www.cs.ucla.edu/~todd/research/polyglot5.html), 
-with additional input from Vincent CavŽ.
+with additional input from Vincent Cavé.
 
 The following people have provided patches:
 
