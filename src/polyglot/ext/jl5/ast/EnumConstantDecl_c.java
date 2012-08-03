@@ -58,6 +58,9 @@ public class EnumConstantDecl_c extends Term_c implements EnumConstantDecl
         this.args = args;
         this.body = body;
         this.flags = flags;
+        if (annotations == null) {
+            annotations = Collections.emptyList();
+        }
         this.annotations = annotations;
     }
 

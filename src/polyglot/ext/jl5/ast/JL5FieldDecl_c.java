@@ -30,7 +30,7 @@ public class JL5FieldDecl_c extends FieldDecl_c implements FieldDecl,
     public JL5FieldDecl_c(Position pos, Flags flags, List<AnnotationElem> annotations, 
     		TypeNode type, Id name, Expr init) {
         super(pos, flags, type, name, init);
-        if (annotations != null) {
+        if (annotations == null) {
         	annotations = Collections.emptyList();
         }
         this.annotations = annotations;
@@ -88,7 +88,7 @@ public class JL5FieldDecl_c extends FieldDecl_c implements FieldDecl,
     }
 
     @Override
-    public void prettyPrint(CodeWriter w, PrettyPrinter tr) {        
+    public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
         for (AnnotationElem ae : annotations) {
             ae.prettyPrint(w, tr);
             w.newline();

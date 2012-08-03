@@ -1,5 +1,6 @@
 package polyglot.ext.jl5.ast;
 
+import java.util.Collections;
 import java.util.List;
 
 import polyglot.ast.Formal;
@@ -35,6 +36,9 @@ public class JL5Formal_c extends Formal_c implements JL5Formal {
     public JL5Formal_c(Position pos, Flags flags, List<AnnotationElem> annotations, TypeNode type, Id name, boolean variable){
         super(pos, flags, type, name);
         this.isVarArg = variable;
+        if (annotations == null) {
+            annotations = Collections.emptyList();
+        }
         this.annotations = annotations;
     }
 
