@@ -12,7 +12,23 @@
 <body>
     <div class="content">
 
-	<h1>Changes to Polyglot for Version 2.5</h1>
+	<h1>Major changes to Polyglot for Version 2.5</h1>
+        <p>
+          See the file CHANGES for more information about the changes
+        made to Polyglot for Version 2.5.
+        </p>
+      <p>Support for Java 1.5 language features added, through the JL5 extension (<code>polyglot.ext.jl5</code>). 
+      This extension is based on the <i><a href="http://www.cs.ucla.edu/~todd/research/polyglot5.html">Polyglot for Java 5</a></i> project by Milan Stanojevic and Todd 
+Millstein (), with additional input from Vincent Cav&eacute;. The extension currently
+supports all Java 5 langage features, except for annotations, for
+        which only limited support is currently provided. Additional
+        support will be added in later releases.
+</p>
+
+      <p>The source code of Polyglot has itself been updated to take advantage of the
+generics support introduced in Java 1.5. This may break older extensions that
+assume non-generic interfaces.
+</p>
 
 	<p>
 		The way Polyglot handles intermediate source files and generated class
@@ -97,6 +113,79 @@
 		interface.
 	</p>
 	<br />
+	<h2>JL5 Extension</h2>
+	<p>The package <code>polyglot.ext.jl5</code> implements
+	support for Java 1.5 language features. This requires
+	significant changes to the type system to support Java
+	generics. For information on how to write an extension that supports
+	Java 1.5 language features, please see the <a
+	href="PortingGuide.html">Porting Guide</a>.
+	</p>
+	<p>
+	Code can be compiled with the JL5 extension using the
+	<code>jl5c</code> script in the <code>bin</code>
+	directory. The script <code>jl5c</code> adds several new
+	command-line arguments, described below.
+	<ul>
+	  <li><code>-morepermissiveinference</code>: Calls to methods with
+	type parameters will infer types for the type parameters. This
+	is detailed in the <i>Java Language Specification, 3rd
+	edition</i> in Section 15.12.2.7. In some situations, the
+	expected return type of the call is used to help the inference
+	(Section 15.12.2.8). According to the language specification,
+	this should only occur when there are unresolved type
+	arguments to the method call. However, <code>javac</code>
+	appears to use the expected return type of the call in
+	additional situations, in order to provide more precise type
+	inference. To preserve compatibility with <code>javac</code>,
+	this command-line option will use the expected return type of
+	method calls in type inference to infer type arguments that
+	are similar to those produced by <code>javac</code>.
+	  <p>The following program illustrates the need for the
+	command-line option. <code>javac</code> will accept this code
+	snippet; <code>jl5c</code> will reject it unless the
+	<code>-morepermissiveinference</code> command-line argument is
+	specified.
+<pre>
+abstract class C { 
+    public void  m(D&lt;? extends C&gt; x) {
+	E&lt;C&gt; a = foo(x.bar());
+    }
+    abstract &lt;T&gt; E&lt;T&gt; foo(E&lt;? extends T&gt; s);
+}
+
+interface D&lt;U&gt; {
+    public E&lt;U&gt; bar();
+}
+
+interface E&lt;S&gt; { }
+</pre>	  
+	  </li>
+	  <li><code>-removeJava5isms</code>: The compiler will perform
+	passes that remove Java 1.5 language features, and produces
+	Java 1.4 compliant code. This essentially translates Java 1.5
+	code to Java 1.4 code.
+	  </li>
+	  <li><code>-enumImplClass <i>classname</i></code>: If
+	<code>-removeJava5isms</code> is specified, then the compiler
+	needs to use some class as the superclass of
+	<code>enum</code>s. This would normally be
+	<code>java.lang.Enum</code>. However, the <code>javac</code>
+	compiler does not allow 
+	<code>java.lang.Enum</code> to be the super-class of any
+	declared class, even when <code>-source 1.4</code> is
+	specified. This command-line argument can be used to specify a
+	different class that provides the same functionality as
+	<code>java.lang.Enum</code>, and can be used to compile Java
+	1.5 code to Java 1.4 code that will compile with
+	<code>javac</code>. See the file
+	<code>testsjl5/java-src/MyEnum.java</code> for an example of a
+	class suitable for specifying as an argument to this
+	command-line option.
+	  </li>
+	</ul>
+	</p>
+
 	<h2>FileManager implementation and associated SourceObject</h2>
         <p>
         The following UML diagrams show how the different parts of the new file manager implementation are composed.
