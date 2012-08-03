@@ -23,7 +23,9 @@ public class JL5Options extends Options {
         protected void populateFlags(Set<OptFlag<?>> flags) {
             super.populateFlags(flags);
 
-            flags.add(new OptFlag<String>(new String[] {"--enumImplClass", "-enumImplClass"}, "<classname>",
+        flags.add(new OptFlag<String>(new String[] { "-enumImplClass",
+                                              "--enumImplClass" },
+                                      "<classname>",
                     "Runtime class to implement Enums", "java.lang.Enum") {
                 @Override
                 public Arg<String> handle(String[] args, int index)
