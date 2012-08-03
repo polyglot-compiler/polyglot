@@ -11,7 +11,43 @@
 	<p>Some Polyglot extensions may need minor changes to work with the
 		new version of Polyglot. This document is intended to help developers
 		fix their extensions accordingly.</p>
-	<h3>File manager</h3>
+   <h3>JL5 extension</h3>
+   <p>Polyglot 2.5 supoprts Java 1.5 language features, via the JL5
+   extension (package <code>polyglot.ext.jl5</code>). There are two
+   option to implement a
+   Polyglot extension that supports Java 1.5 language features
+   (whether porting an existing extension, or writing a new one).
+   <ol>
+     <li><b>Translate to Java 1.4.</b> <p>The JL5 extension can be used
+     to translate from Java 1.5 language features to equivalent Java
+     1.4 code. Extension writers can leverage this to provide support for
+     Java 1.5 langauge features without needing to directly reason
+     about such features in their features.</p>
+     <p>
+     To write an extension that first translates Java 1.5 code to Java
+     1.4 code, the extension's scheduler should indicate a dependence
+     on <b>XXX Owen, sketching in some details would be useful here please</b>.
+     </p></li>
+     <li><b>Directly support Java 1.5.</b>
+     <p>The JL5 extension can be directly extended, allowing
+     extensions to directly support Java 1.5 langauge features such as
+     generics, enhanced for loops, enums, and annotations.</p>
+     <p>To extend the JL5 extension, simply extend the appropriate
+     <code>polyglot.ext.jl5</code> classes instead of the
+     base Polyglot versions.  For example:
+     <ul>
+       <li>Extend  <code>polyglot.ext.jl5.ExtensionInfo</code> instead of <code>polyglot.frontend.JLExtensionInfo</code>.</li>
+       <li>Extend  <code>polyglot.ext.jl5.types.JL5TypeSystem_c</code> instead of <code>polyglot.types.TypeSystem_c</code>.</li>
+       <li>Extend  <code>polyglot.ext.jl5.ast.JL5NodeFactory_c</code> instead of <code>polyglot.ast.NodeFactory_c</code>.</li>
+       <li>Extend  <code>polyglot.ext.jl5.ast.JL5ExtFactory_c</code> instead of <code>polyglot.ast.AbstractExtFactory_c</code>.</li>
+       <li>Etc.</li>
+       </ul>
+    </p>
+   </li>
+   </ol>
+   </p>
+   
+   <h3>File manager</h3>
 	<p>
 		The new Polyglot uses a file manager as a source and class file
 		loader. For the extensions built on the old Polyglot (directly or
