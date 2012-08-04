@@ -2,10 +2,11 @@ Polyglot Change Log
 ===================
 
 This file documents changes between releases of Polyglot. More information
-about some releases may be found in the doc/ directory.
+about some releases may be found in the appropriate directory
+doc/release-notes-<version>.
 
-August ?, 2012 : Polyglot 2.5.0
-===============================
+August 10, 2012 : Polyglot 2.5.0
+================================
 
 Added JL5 extension (polyglot.ext.jl5) to support Java 1.5 language features. 
 Based on the "Polyglot for Java 5" project by Milan Stanojevic and Todd 
