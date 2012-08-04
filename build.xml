@@ -485,6 +485,7 @@
 	<target name="jar-epl-base" depends="bin-epl.jar" description="Build a jar file containing the EPL-licensed base compiler"/>
 
 	<target name="javadoc" description="Runs javadoc over the Polyglot source code" depends="jl">
+	 <echo>javadoc starting... ${src}</echo>
 		<javadoc sourcepath="${basedir}" destdir="doc/api" encoding="iso-8859-1">
 			<packageset dir="${src}" defaultexcludes="yes">
 				<include name="polyglot/**" />
@@ -645,6 +646,9 @@
 
 		<copy todir="${tmp}/tools" includeEmptyDirs="false">
 			<fileset dir="${basedir}/tools" includes="pth/**,ppg/**,java_cup/**" excludes="**/classes,**/Makefile,**/tests/**/*.java,**/tests/**/*.class,**/tests/**/*.results" />
+		</copy>
+		<copy todir="${tmp}/eclipse" includeEmptyDirs="false">
+			<fileset dir="${basedir}/eclipse" includes="*.in" />
 		</copy>
 
 		<copy todir="${tmp}/doc/api" includeEmptyDirs="false">
