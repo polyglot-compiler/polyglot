@@ -14,7 +14,7 @@
    <h3>JL5 extension</h3>
    <p>Polyglot 2.5 supoprts Java 1.5 language features, via the JL5
    extension (package <code>polyglot.ext.jl5</code>). There are two
-   option to implement a
+   options to implement a
    Polyglot extension that supports Java 1.5 language features
    (whether porting an existing extension, or writing a new one).
    <ol>
@@ -23,10 +23,15 @@
      1.4 code. Extension writers can leverage this to provide support for
      Java 1.5 langauge features without needing to directly reason
      about such features in their features.</p>
-     <p>
-     To write an extension that first translates Java 1.5 code to Java
-     1.4 code, the extension's scheduler should indicate a dependence
-     on <b>XXX Owen, sketching in some details would be useful here please</b>.
+     <p> The easiest way to write an extension that first translates Java 1.5 code
+     to Java 1.4 code is to use the ExtensionRewriter pattern.  This pattern
+     rewrites Java 1.5 AST nodes to the extension's AST nodes.  An example of
+     this pattern is used by the JL5 extension to output Java 1.4 files.  The
+     JL5 AST is translated to JL ASTs, typechecked as Java 1.4, and then output
+     to disk.  See the <code>RemoveJava5isms</code> goal in
+     <code>polyglot.ext.jl5.JL5Scheduler</code> for more info, as well as
+     <code>polyglot.translate.JLOutputExtensionInfo</code>, for more
+     information.
      </p></li>
      <li><b>Directly support Java 1.5.</b>
      <p>The JL5 extension can be directly extended, allowing
