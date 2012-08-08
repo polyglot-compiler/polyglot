@@ -1,5 +1,5 @@
 <body> 
-Contains the standard visitor which provide type checking as well as
+Contains the standard visitors which provide type checking as well as
 output.  The visitor specification is defined in {@link
 polyglot.visit.NodeVisitor polyglot.visit.NodeVisitor}.  
 
@@ -12,10 +12,9 @@ Most other visitors are subclasses of this class.
 
 {@link polyglot.visit.PrettyPrinter PrettyPrinter} is <strong>not</strong>
 a visitor (the package name is a misnomer for historical reasons).
-It contains methods for pretty printing the AST.
+It contains methods for pretty-printing the AST.
 
 The code generator is implemented by the {@link polyglot.visit.Translator
 Translator} translator class, which is {@link polyglot.visit.PrettyPrinter
 PrettyPrinter} that opens appropriate Java output files.
-
 </body>

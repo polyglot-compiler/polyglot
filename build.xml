@@ -251,17 +251,20 @@
 
 	<!-- compile the base compiler except for the quasiquoter and generated parser -->
 	<target name="compile-base" depends="init,base-parser">
-        <javac source="1.5" target="1.5" srcdir="${src}" destdir="${classes}" debug="on" includes="polyglot/**" excludes="polyglot/ext/jl5/**,polyglot/qq/**,polyglot/parse/Lexer_c.java,polyglot/parse/sym.java,polyglot/parse/Grm.java">
+        <javac source="1.5" target="1.5" srcdir="${src}" destdir="${classes}" debug="on" includes="polyglot/**" excludes="polyglot/ext/jl5/**,polyglot/qq/**,polyglot/parse/Lexer_c.java,polyglot/parse/sym.java,polyglot/parse/Grm.java"
+               includeantruntime="false">
             <classpath refid="standard.classpath" />
         </javac>
 		<!-- Compile the JL5 code -->
-        <javac source="1.5" target="1.5" srcdir="${src}" destdir="${classes}" debug="on" includes="polyglot/ext/jl5/**" includeAntRuntime="true" excludes="polyglot/ext/jl5/parse/Lexer_c.java,polyglot/ext/jl5/parse/sym.java,polyglot/ext/jl5/parse/Grm.java">
+        <javac source="1.5" target="1.5" srcdir="${src}" destdir="${classes}" debug="on" includes="polyglot/ext/jl5/**" includeAntRuntime="true" excludes="polyglot/ext/jl5/parse/Lexer_c.java,polyglot/ext/jl5/parse/sym.java,polyglot/ext/jl5/parse/Grm.java"
+               includeantruntime="false">
             <classpath refid="standard.classpath" />
         </javac>
     </target>
 
     	<target name="compile-epl-base" depends="init">
-          <javac source="1.5" target="1.5" srcdir="${src}" destdir="${classes}" debug="on" includes="polyglot/**" excludes="polyglot/ext/**,polyglot/qq/**,polyglot/parse/BaseParser.java,polyglot/parse/sym.java,polyglot/parse/Grm.java,polyglot/parse/Lexer_c.java,polyglot/frontend/JLExtensionInfo.java,polyglot/lex/EscapedUnicodeReader.java">
+          <javac source="1.5" target="1.5" srcdir="${src}" destdir="${classes}" debug="on" includes="polyglot/**" excludes="polyglot/ext/**,polyglot/qq/**,polyglot/parse/BaseParser.java,polyglot/parse/sym.java,polyglot/parse/Grm.java,polyglot/parse/Lexer_c.java,polyglot/frontend/JLExtensionInfo.java,polyglot/lex/EscapedUnicodeReader.java"
+               includeantruntime="false">
 			<classpath refid="standard.classpath" />
 		</javac>
 	</target>
@@ -273,7 +276,8 @@
 			<param name="parser.class" value="parser" />
 			<param name="symbol.class" value="sym" />
 		</antcall>
-		<javac source="1.5" target="1.5" srcdir="${cup.src}" destdir="${cup.classes}" debug="on" includes="java_cup/**">
+		<javac source="1.5" target="1.5" srcdir="${cup.src}" destdir="${cup.classes}" debug="on" includes="java_cup/**"
+               includeantruntime="false">
 			<classpath refid="cup.jar.classpath" />
 		</javac>
 
@@ -437,7 +441,8 @@
 			<param name="parser.class" value="Grm" />
 			<param name="symbol.class" value="sym" />
 		</antcall>
-		<javac source="1.5" target="1.5" srcdir="${src}" destdir="${classes}" debug="on" includes="polyglot/parse/**,polyglot/qq/**">
+		<javac source="1.5" target="1.5" srcdir="${src}" destdir="${classes}" debug="on" includes="polyglot/parse/**,polyglot/qq/**"
+               includeantruntime="false">
 			<classpath refid="standard.classpath" />
 		</javac>
 
@@ -455,7 +460,8 @@
             <param name="symbol.class" value="sym" />
         </antcall>
         <copy file="${src}/polyglot/parse/java12.cup" todir="${classes}/polyglot/ext/jl5/parse" />
-        <javac source="1.5" target="1.5" srcdir="${src}" destdir="${classes}" debug="on" includes="polyglot/ext/jl5/parse/**">
+        <javac source="1.5" target="1.5" srcdir="${src}" destdir="${classes}" debug="on" includes="polyglot/ext/jl5/parse/**"
+               includeantruntime="false">
             <classpath refid="standard.classpath" />
         </javac>
     </target>
@@ -486,22 +492,15 @@
 
 	<target name="javadoc" description="Runs javadoc over the Polyglot source code" depends="jl">
 	 <echo>javadoc starting... ${src}</echo>
-		<javadoc sourcepath="${basedir}" destdir="doc/api" encoding="iso-8859-1">
+		<javadoc destdir="doc/api" encoding="utf-8">
 			<packageset dir="${src}" defaultexcludes="yes">
 				<include name="polyglot/**" />
-				<exclude name="**/tests" />
-				<exclude name="**/testsjl5" />
-				<exclude name="**/test" />
 			</packageset>
 			<packageset dir="${ppg.src}" defaultexcludes="yes">
 				<include name="ppg/**" />
-				<exclude name="**/tests" />
-				<exclude name="**/test" />
 			</packageset>
 			<packageset dir="${pth.src}" defaultexcludes="yes">
 				<include name="polyglot/pth/**" />
-				<exclude name="**/tests" />
-				<exclude name="**/test" />
 			</packageset>
 			<classpath refid="standard.classpath" />
 		</javadoc>
@@ -520,7 +519,8 @@
 			<param name="symbol.class" value="sym" />
 			<param name="cup.file" value="script.cup" />
 		</antcall>
-		<javac source="1.5" target="1.5" srcdir="${pth.src}" destdir="${pth.classes}" debug="on" includes="polyglot/**">
+		<javac source="1.5" target="1.5" srcdir="${pth.src}" destdir="${pth.classes}" debug="on" includes="polyglot/**"
+               includeantruntime="false">
 			<classpath refid="standard.classpath" />
 		</javac>
 	</target>
@@ -546,7 +546,8 @@
 			<param name="symbol.class" value="Constant" />
 			<param name="cup.file" value="ppg.cup" />
 		</antcall>
-		<javac source="1.5" target="1.5" srcdir="${ppg.src}" destdir="${ppg.classes}" debug="on" includes="ppg/**">
+		<javac source="1.5" target="1.5" srcdir="${ppg.src}" destdir="${ppg.classes}" debug="on" includes="ppg/**"
+               includeantruntime="false">
 			<classpath refid="standard.classpath" />
 		</javac>
 	</target>
