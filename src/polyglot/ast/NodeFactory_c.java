@@ -50,19 +50,34 @@ public class NodeFactory_c extends AbstractNodeFactory_c
     protected static class EmptyDelFactory extends AbstractDelFactory_c { }
     
     public NodeFactory_c() {
-        this(new EmptyExtFactory(), 
-             new EmptyDelFactory()); 
+        this(new EmptyExtFactory(), new EmptyDelFactory());
     }
     public NodeFactory_c(ExtFactory extFactory) {
-        this(extFactory, 
-             new EmptyDelFactory()); 
+        this(extFactory, new EmptyDelFactory());
     }
     public NodeFactory_c(ExtFactory extFactory,
                            DelFactory delFactory ) {
-        this.extFactory = extFactory; 
-        this.delFactory = delFactory; 
+        this.extFactory = extFactory;
+        this.delFactory = delFactory;
+        initEnums();
     }
     
+    /**
+     * Ensure the enums in the AST are initialized and interned before any 
+     * deserialization occurs.
+     */
+    protected void initEnums() {
+        // Just force the static initializers of these classes to run.
+        @SuppressWarnings("unused")
+        Object o;
+        o = Branch.BREAK;
+        o = ConstructorCall.SUPER;
+        o = FloatLit.FLOAT;
+        o = Import.CLASS;
+        o = IntLit.INT;
+        o = Special.SUPER;
+    }
+
     protected ExtFactory extFactory() {
         return this.extFactory;
     }

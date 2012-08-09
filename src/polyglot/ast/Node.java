@@ -25,6 +25,7 @@
 
 package polyglot.ast;
 
+import java.io.Serializable;
 import java.util.List;
 
 import polyglot.types.Type;
@@ -40,7 +41,7 @@ import polyglot.visit.NodeVisitor;
  * of the node should copy the node, set the field in the copy, and then
  * return the copy.
  */
-public interface Node extends JL, Copy, java.io.Serializable
+public interface Node extends JL, Copy, Serializable
 {
     /**
      * Set the delegate of the node.

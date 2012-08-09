@@ -25,6 +25,8 @@
 
 package polyglot.ast;
 
+import java.io.Serializable;
+
 import polyglot.util.CodeWriter;
 import polyglot.util.Copy;
 
@@ -33,7 +35,7 @@ import polyglot.util.Copy;
  * It contains a pointer back to the node it is extending and a possibly-null
  * pointer to another extension node.
  */
-public interface Ext extends Copy
+public interface Ext extends Copy, Serializable
 {
     /** The node that we are extending. */
     Node node();

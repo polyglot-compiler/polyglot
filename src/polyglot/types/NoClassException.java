@@ -39,8 +39,7 @@ public class NoClassException extends SemanticException {
             return "Class \"" + className + "\" not found.";
         }
         return "Class \"" + className + "\" not found"
-        + (scope != null ? (" in scope of " + scope.toString())
-                : ".");
+        + " in scope of " + scope.toString();
     }
     public NoClassException(String className) {
         super(message(className, null)); 

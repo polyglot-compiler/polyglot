@@ -44,8 +44,8 @@ import polyglot.util.SimpleCodeWriter;
 import polyglot.util.TypeEncoder;
 
 /**
- * Loads class information from class files, or serialized class infomation from
- * within class files. It does not load from source files.
+ * Loads class information from class files, or serialized class information
+ * from within class files. It does not load from source files.
  */
 public class LoadedClassResolver implements TopLevelResolver {
 	protected final static int NOT_COMPATIBLE = -1;
