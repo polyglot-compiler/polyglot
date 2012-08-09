@@ -890,10 +890,19 @@ package polyglot.frontend;
  * Version information for the base compiler.
  */
 public class JLVersion extends polyglot.main.Version {
+    @Override
     public String name() { return "jl"; }
+
+    @Override
     public int major() { return ${jl.version.major}; }
+
+    @Override
     public int minor() { return ${jl.version.minor}; }
+
+    @Override
     public int patch_level() { return ${jl.version.patch}; }
+
+    @Override
     public String toString() { return "${jl.version.build}"; }
 }
 </echo>
