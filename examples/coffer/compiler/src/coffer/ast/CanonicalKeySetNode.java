@@ -7,10 +7,7 @@
 
 package coffer.ast;
 
-import polyglot.ast.*;
-import polyglot.types.*;
-import polyglot.visit.*;
-import coffer.types.*;
+import coffer.types.KeySet;
 
 /**
  * A canonical key set AST node.  This is just an AST node

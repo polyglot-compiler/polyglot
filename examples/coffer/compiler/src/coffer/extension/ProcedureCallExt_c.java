@@ -7,15 +7,15 @@
 
 package coffer.extension;
 
-import polyglot.ast.*;
-import polyglot.types.*;
-import polyglot.util.*;
-import coffer.ast.*;
-import coffer.types.*;
-
-import java.util.*;
+import polyglot.ast.ProcedureCall;
+import polyglot.types.SemanticException;
+import polyglot.types.Type;
+import coffer.types.CofferProcedureInstance;
+import coffer.types.KeySet;
+import coffer.types.ThrowConstraint;
 
 public class ProcedureCallExt_c extends CofferExt_c {
+    @Override
     public KeySet keyFlow(KeySet held_keys, Type throwType) {
         ProcedureCall n = (ProcedureCall) node();
         CofferProcedureInstance vmi = (CofferProcedureInstance) n.procedureInstance();
@@ -24,8 +24,7 @@ public class ProcedureCallExt_c extends CofferExt_c {
             return held_keys.removeAll(vmi.entryKeys()).addAll(vmi.returnKeys());
         }
 
-        for (Iterator i = vmi.throwConstraints().iterator(); i.hasNext(); ) {
-            ThrowConstraint c = (ThrowConstraint) i.next();
+        for (ThrowConstraint c : vmi.throwConstraints()) {
             if (throwType.equals(c.throwType())) {
                 return held_keys.removeAll(vmi.entryKeys()).addAll(c.keys());
             }
@@ -35,6 +34,7 @@ public class ProcedureCallExt_c extends CofferExt_c {
         return held_keys;
     }
 
+    @Override
     public void checkHeldKeys(KeySet held, KeySet stored) throws SemanticException {
         ProcedureCall n = (ProcedureCall) node();
         CofferProcedureInstance vmi = (CofferProcedureInstance) n.procedureInstance();

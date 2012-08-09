@@ -7,9 +7,8 @@
 
 package coffer.ast;
 
-import coffer.types.*;
-import polyglot.ast.*;
-import java.util.*;
+import polyglot.ast.Ambiguous;
+import polyglot.ast.TypeNode;
 
 /** Type node for a class instantiated with a key.
  */

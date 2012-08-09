@@ -7,8 +7,9 @@
 
 package coffer.ast;
 
-import polyglot.ast.*;
-import java.util.*;
+import java.util.List;
+
+import polyglot.ast.Ambiguous;
 
 /**
  * An ambiguous key set AST node.  This is essentially a list of possibly
@@ -16,6 +17,7 @@ import java.util.*;
  */
 public interface AmbKeySetNode extends KeySetNode, Ambiguous
 {
-    public List keyNodes();
-    public AmbKeySetNode keyNodes(List keyNodes);
+    public List<KeyNode> keyNodes();
+
+    public AmbKeySetNode keyNodes(List<KeyNode> keyNodes);
 }

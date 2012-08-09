@@ -29,6 +29,7 @@ import coffer.types.CofferClassType;
 import coffer.types.CofferContext;
 import coffer.types.CofferParsedClassType;
 import coffer.types.CofferTypeSystem;
+import coffer.types.Key;
 
 /**
  * An implementation of the <code>CofferClassDecl</code> interface.
@@ -46,18 +47,20 @@ public class CofferClassDecl_c extends ClassDecl_c implements CofferClassDecl
         this.key = key;
     }
 
+    @Override
     public KeyNode key() {
 	return this.key;
     }
 
+    @Override
     public CofferClassDecl key(KeyNode key) {
 	CofferClassDecl_c n = (CofferClassDecl_c) copy();
 	n.key = key;
 	return n;
     }
 
-    protected CofferClassDecl_c reconstruct(Id name, KeyNode key, TypeNode superClass,
-                                           List interfaces, ClassBody body) {
+    protected CofferClassDecl_c reconstruct(Id name, KeyNode key,
+            TypeNode superClass, List<TypeNode> interfaces, ClassBody body) {
         CofferClassDecl_c n = this;
 
 	if (this.key != key) {
@@ -68,21 +71,22 @@ public class CofferClassDecl_c extends ClassDecl_c implements CofferClassDecl
         return (CofferClassDecl_c) n.reconstruct(name, superClass, interfaces, body);
     }
 
+    @Override
     public Node visitChildren(NodeVisitor v) {
 	Id name = (Id) visitChild(this.name, v);
 	KeyNode key = (KeyNode) visitChild(this.key, v);
 	TypeNode superClass = (TypeNode) visitChild(this.superClass, v);
-	List interfaces = visitList(this.interfaces, v);
+        List<TypeNode> interfaces = visitList(this.interfaces, v);
 	ClassBody body = (ClassBody) visitChild(this.body, v);
 	return reconstruct(name, key, superClass, interfaces, body);
     }
     
+    @Override
     public Context enterChildScope(Node child, Context context) {
         CofferContext c = (CofferContext) context;
-        CofferTypeSystem ts = (CofferTypeSystem) c.typeSystem();
 
         CofferParsedClassType ct = (CofferParsedClassType) this.type;
-        CofferClassType inst = (CofferClassType) ct;
+        CofferClassType inst = ct;
         
         if (child == this.body) {
             c = (CofferContext) c.pushClass(ct, inst);
@@ -94,6 +98,7 @@ public class CofferClassDecl_c extends ClassDecl_c implements CofferClassDecl
         return c;
     }
 
+    @Override
     public Node buildTypes(TypeBuilder tb) throws SemanticException {
         CofferClassDecl_c n = (CofferClassDecl_c) super.buildTypes(tb);
 
@@ -101,7 +106,7 @@ public class CofferClassDecl_c extends ClassDecl_c implements CofferClassDecl
 
         CofferParsedClassType ct = (CofferParsedClassType) n.type;
 
-        MuPClass pc = ts.mutablePClass(ct.position());
+        MuPClass<Key, Key> pc = ts.mutablePClass(ct.position());
         ct.setInstantiatedFrom(pc);
         pc.clazz(ct);
 
@@ -112,6 +117,7 @@ public class CofferClassDecl_c extends ClassDecl_c implements CofferClassDecl
         return n;
     }
 
+    @Override
     public void prettyPrintHeader(CodeWriter w, PrettyPrinter tr) {
         if (flags.isInterface()) {
             w.write(flags.clearInterface().clearAbstract().translate());
@@ -148,8 +154,8 @@ public class CofferClassDecl_c extends ClassDecl_c implements CofferClassDecl
                 w.write(" implements ");
             }
 
-            for (Iterator i = interfaces().iterator(); i.hasNext(); ) {
-                TypeNode tn = (TypeNode) i.next();
+            for (Iterator<TypeNode> i = interfaces().iterator(); i.hasNext();) {
+                TypeNode tn = i.next();
                 print(tn, w, tr);
 
                 if (i.hasNext()) {
@@ -161,6 +167,7 @@ public class CofferClassDecl_c extends ClassDecl_c implements CofferClassDecl
         w.write(" {");
     }
 
+    @Override
     public void translate(CodeWriter w, Translator tr) {
         ((CofferClassDecl_c) key(null)).superTranslate(w, tr);
     }

@@ -7,19 +7,19 @@
 
 package coffer.extension;
 
-import polyglot.ast.*;
-import polyglot.types.*;
-import polyglot.util.*;
-import coffer.types.*;
-import coffer.ast.*;
-
-import java.util.*;
+import polyglot.ast.ProcedureDecl;
+import polyglot.types.SemanticException;
+import polyglot.util.Position;
+import coffer.types.CofferProcedureInstance;
+import coffer.types.KeySet;
+import coffer.types.ThrowConstraint;
 
 /** The Coffer extension of the <code>ProcedureDecl</code> node. 
  * 
  *  @see polyglot.ast.ProcedureDecl
  */
 public class ProcedureDeclExt_c extends CofferExt_c {
+    @Override
     public void checkHeldKeys(KeySet held, KeySet stored) throws SemanticException {
         ProcedureDecl n = (ProcedureDecl) node();
 
@@ -38,10 +38,10 @@ public class ProcedureDeclExt_c extends CofferExt_c {
     private void checkHeldKeys(KeySet held, KeySet returnKeys, Position pos) throws SemanticException {
         if (! held.equals(returnKeys)) {
             KeySet too_much = held.removeAll(returnKeys);
-            KeySet not_enough = returnKeys.removeAll(held);
+            returnKeys.removeAll(held);
 
             if (too_much.size() == 1) {
-                Key k = (Key) too_much.iterator().next();
+                too_much.iterator().next();
                 throw new SemanticException(KeysToString(too_much) +
                                             " not freed at return.",
                                             pos);

@@ -7,6 +7,7 @@
 
 package coffer.types;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -18,10 +19,8 @@ import polyglot.types.Flags;
 import polyglot.types.Type;
 import polyglot.util.CachingTransformingList;
 import polyglot.util.InternalCompilerError;
-import polyglot.util.ListUtil;
 import polyglot.util.Position;
 import polyglot.util.Transformation;
-import coffer.ast.ThrowConstraintNode;
 
 /** An implementation of the <code>CofferConstructorInstance</code> interface. 
  */
@@ -30,25 +29,30 @@ public class CofferConstructorInstance_c extends ConstructorInstance_c
 {
     protected KeySet entryKeys;
     protected KeySet returnKeys;
-    protected List<ThrowConstraintNode> throwConstraints;
+    protected List<ThrowConstraint> throwConstraints;
 
     public CofferConstructorInstance_c(CofferTypeSystem ts, Position pos,
-	    ClassType container, Flags flags,
-	    List argTypes,
-            KeySet entryKeys, KeySet returnKeys, List throwConstraints)
-    {
-	super(ts, pos, container, flags, argTypes, Collections.EMPTY_LIST);
+            ClassType container, Flags flags, List<? extends Type> argTypes,
+            KeySet entryKeys, KeySet returnKeys,
+            List<ThrowConstraint> throwConstraints) {
+        super(ts,
+              pos,
+              container,
+              flags,
+              argTypes,
+              Collections.<Type> emptyList());
         this.entryKeys = entryKeys;
         this.returnKeys = returnKeys;
-        this.throwConstraints = ListUtil.copy(throwConstraints, true);
+        this.throwConstraints =
+                new ArrayList<ThrowConstraint>(throwConstraints);
 
         if (entryKeys == null)
             throw new InternalCompilerError("null entry keys for " + this);
     }
     
+    @Override
     public boolean isCanonical() {
-        for (Iterator i = throwConstraints.iterator(); i.hasNext(); ) {
-            ThrowConstraint c = (ThrowConstraint) i.next();
+        for (ThrowConstraint c : throwConstraints) {
             if (! c.isCanonical()) {
                 return false;
             }
@@ -65,37 +69,44 @@ public class CofferConstructorInstance_c extends ConstructorInstance_c
         return super.isCanonical();
     }
 
+    @Override
     public KeySet entryKeys() {
 	return entryKeys;
     }
 
+    @Override
     public KeySet returnKeys() {
 	return returnKeys;
     }
 
-    public List throwConstraints() {
+    @Override
+    public List<ThrowConstraint> throwConstraints() {
         return throwConstraints;
     }
 
-    public List throwTypes() {
-        return new CachingTransformingList(throwConstraints, new GetType());
+    @Override
+    public List<Type> throwTypes() {
+        return new CachingTransformingList<ThrowConstraint, Type>(throwConstraints,
+                                                                  new GetType());
     }
 
-    public class GetType implements Transformation {
-        public Object transform(Object o) {
-            return ((ThrowConstraint) o).throwType();
+    public class GetType implements Transformation<ThrowConstraint, Type> {
+        @Override
+        public Type transform(ThrowConstraint tc) {
+            return tc.throwType();
         }
     }
 
-    public void setThrowTypes(List throwTypes) {
-        Iterator i = throwTypes.iterator();
-        Iterator j = throwConstraints.iterator();
+    @Override
+    public void setThrowTypes(List<? extends Type> throwTypes) {
+        Iterator<? extends Type> i = throwTypes.iterator();
+        Iterator<ThrowConstraint> j = throwConstraints.iterator();
 
-        List l = new LinkedList();
+        List<ThrowConstraint> l = new LinkedList<ThrowConstraint>();
 
         while (i.hasNext() && j.hasNext()) {
-            Type t = (Type) i.next();
-            ThrowConstraint c = (ThrowConstraint) j.next();
+            Type t = i.next();
+            ThrowConstraint c = j.next();
             if (t != c.throwType()) {
                 c = (ThrowConstraint) c.copy();
                 c.setThrowType(t);
@@ -111,18 +122,23 @@ public class CofferConstructorInstance_c extends ConstructorInstance_c
         this.throwConstraints = l;
     }
 
+    @Override
     public void setEntryKeys(KeySet entryKeys) {
         this.entryKeys = entryKeys;
     }
 
+    @Override
     public void setReturnKeys(KeySet returnKeys) {
         this.returnKeys = returnKeys;
     }
 
-    public void setThrowConstraints(List throwConstraints) {
-        this.throwConstraints = ListUtil.copy(throwConstraints, true);
+    @Override
+    public void setThrowConstraints(List<ThrowConstraint> throwConstraints) {
+        this.throwConstraints =
+                new ArrayList<ThrowConstraint>(throwConstraints);
     }
 
+    @Override
     public String toString() {
         return super.toString() + " " + entryKeys + "->" + returnKeys +
                                   " throws " + throwConstraints;

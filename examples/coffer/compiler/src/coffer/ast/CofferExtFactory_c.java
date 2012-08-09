@@ -7,15 +7,17 @@
 
 package coffer.ast;
 
-import polyglot.ast.*;
-import coffer.types.*;
-import coffer.extension.*;
-import polyglot.types.Flags;
-import polyglot.types.Package;
-import polyglot.types.Type;
-import polyglot.types.Qualifier;
-import polyglot.util.*;
-import java.util.*;
+import polyglot.ast.AbstractExtFactory_c;
+import polyglot.ast.Ext;
+import coffer.extension.AssignExt_c;
+import coffer.extension.CofferExt_c;
+import coffer.extension.FreeExt_c;
+import coffer.extension.LocalDeclExt_c;
+import coffer.extension.LocalExt_c;
+import coffer.extension.NewExt_c;
+import coffer.extension.ProcedureCallExt_c;
+import coffer.extension.ProcedureDeclExt_c;
+import coffer.extension.SpecialExt_c;
 
 /** An implementation of the <code>CofferNodeFactory</code> interface. 
  */
@@ -54,30 +56,37 @@ public class CofferExtFactory_c extends AbstractExtFactory_c
         return e;
     }
 
+    @Override
     public Ext extNodeImpl() {
         return new CofferExt_c();
     }
 
+    @Override
     public Ext extAssignImpl() {
         return new AssignExt_c();
     }
 
+    @Override
     public Ext extLocalImpl() {
         return new LocalExt_c();
     }
 
+    @Override
     public Ext extSpecialImpl() {
         return new SpecialExt_c();
     }
 
+    @Override
     public Ext extLocalDeclImpl() {
         return new LocalDeclExt_c();
     }
 
+    @Override
     public Ext extConstructorCallImpl() {
         return extProcedureCallImpl();
     }
 
+    @Override
     public Ext extCallImpl() {
         return extProcedureCallImpl();
     }
@@ -86,6 +95,7 @@ public class CofferExtFactory_c extends AbstractExtFactory_c
         return new ProcedureCallExt_c();
     }
 
+    @Override
     public Ext extNewImpl() {
         return new NewExt_c();
     }
@@ -112,6 +122,7 @@ public class CofferExtFactory_c extends AbstractExtFactory_c
         return  extNodeImpl();
     }
 
+    @Override
     public Ext extProcedureDeclImpl() {
         return new ProcedureDeclExt_c();
     }

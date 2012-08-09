@@ -7,8 +7,7 @@
 
 package coffer.ast;
 
-import polyglot.ast.*;
-import java.util.*;
+import polyglot.ast.ClassDecl;
 
 /**
  * A Coffer class declaration.

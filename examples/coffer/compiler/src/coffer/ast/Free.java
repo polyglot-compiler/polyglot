@@ -7,7 +7,8 @@
 
 package coffer.ast;
 
-import polyglot.ast.*;
+import polyglot.ast.Expr;
+import polyglot.ast.Stmt;
 
 /**
  * This statement revokes the key associated with a tracked expression.

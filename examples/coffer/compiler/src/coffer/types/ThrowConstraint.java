@@ -7,7 +7,8 @@
 
 package coffer.types;
 
-import polyglot.types.*;
+import polyglot.types.Type;
+import polyglot.types.TypeObject;
 
 public interface ThrowConstraint extends TypeObject {
     public KeySet keys();

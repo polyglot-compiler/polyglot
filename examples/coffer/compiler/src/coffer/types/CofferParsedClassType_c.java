@@ -7,15 +7,19 @@
 
 package coffer.types;
 
-import polyglot.types.*;
-import polyglot.ext.param.types.*;
+import java.util.Collections;
+import java.util.List;
+
+import polyglot.ext.param.types.PClass;
 import polyglot.frontend.Source;
-import java.util.*;
+import polyglot.types.LazyClassInitializer;
+import polyglot.types.ParsedClassType_c;
+import polyglot.types.TypeSystem;
 
 public class CofferParsedClassType_c extends ParsedClassType_c
                                          implements CofferParsedClassType
 {
-    PClass instantiatedFrom;
+    PClass<Key, Key> instantiatedFrom;
     Key key;
 
     public CofferParsedClassType_c(TypeSystem ts, LazyClassInitializer init, 
@@ -23,27 +27,32 @@ public class CofferParsedClassType_c extends ParsedClassType_c
         super(ts, init, fromSource);
     }
 
-    public PClass instantiatedFrom() {
+    @Override
+    public PClass<Key, Key> instantiatedFrom() {
         return instantiatedFrom;
     }
 
-    public void setInstantiatedFrom(PClass pc) {
+    @Override
+    public void setInstantiatedFrom(PClass<Key, Key> pc) {
         this.instantiatedFrom = pc;
     }
 
-    public List actuals() {
+    @Override
+    public List<Key> actuals() {
         if (key != null) {
             return Collections.singletonList(key);
         }
         else {
-            return Collections.EMPTY_LIST;
+            return Collections.emptyList();
         }
     }
 
+    @Override
     public Key key() {
         return key;
     }
 
+    @Override
     public void setKey(Key key) {
         this.key = key;
     }

@@ -7,22 +7,18 @@
 
 package coffer.extension;
 
-import polyglot.ast.*;
-import polyglot.types.*;
-import polyglot.util.*;
-import coffer.ast.*;
-import coffer.types.*;
-
-import java.util.*;
+import polyglot.ast.New;
+import polyglot.types.SemanticException;
+import coffer.types.CofferClassType;
+import coffer.types.Key;
+import coffer.types.KeySet;
 
 public class NewExt_c extends ProcedureCallExt_c {
+    @Override
     public void checkHeldKeys(KeySet held, KeySet stored)
         throws SemanticException
     {
         New n = (New) node();
-
-        CofferConstructorInstance vci =
-            (CofferConstructorInstance) n.constructorInstance();
 
         super.checkHeldKeys(held, stored);
 

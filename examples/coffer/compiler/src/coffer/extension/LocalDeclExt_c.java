@@ -7,21 +7,14 @@
 
 package coffer.extension;
 
-import polyglot.ast.*;
-import polyglot.types.*;
-import polyglot.util.*;
-import polyglot.visit.*;
-import coffer.ast.*;
-import coffer.types.*;
-
-import java.util.*;
+import polyglot.ast.LocalDecl;
+import polyglot.types.SemanticException;
+import polyglot.types.Type;
+import coffer.types.CofferClassType;
+import coffer.types.KeySet;
 
 public class LocalDeclExt_c extends CofferExt_c {
-    public KeySet keyFlow(KeySet held_keys, Type throwType) {
-        LocalDecl n = (LocalDecl) node();
-        return super.keyFlow(held_keys, throwType);
-    }
-
+    @Override
     public KeySet keyAlias(KeySet stored_keys, Type throwType) {
         LocalDecl n = (LocalDecl) node();
 
@@ -36,6 +29,7 @@ public class LocalDeclExt_c extends CofferExt_c {
         return stored_keys;
     }
 
+    @Override
     public void checkHeldKeys(KeySet held, KeySet stored) throws SemanticException {
         LocalDecl n = (LocalDecl) node();
 

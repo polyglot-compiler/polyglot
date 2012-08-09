@@ -7,10 +7,11 @@
 
 package coffer.types;
 
-import polyglot.types.*;
-import polyglot.ext.param.types.*;
+import polyglot.ext.param.types.PClass;
+import polyglot.types.ParsedClassType;
 
 public interface CofferParsedClassType extends CofferClassType, ParsedClassType {
     void setKey(Key key);
-    void setInstantiatedFrom(PClass pc);
+
+    void setInstantiatedFrom(PClass<Key, Key> pc);
 }

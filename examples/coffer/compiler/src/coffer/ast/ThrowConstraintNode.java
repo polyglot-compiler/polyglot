@@ -7,8 +7,9 @@
 
 package coffer.ast;
 
-import polyglot.ast.*;
-import coffer.types.*;
+import polyglot.ast.Node;
+import polyglot.ast.TypeNode;
+import coffer.types.ThrowConstraint;
 
 /**
  * An AST node for an exception throw declaration annotated with a key set.

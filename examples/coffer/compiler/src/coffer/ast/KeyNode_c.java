@@ -7,11 +7,19 @@
 
 package coffer.ast;
 
-import coffer.types.*;
-import polyglot.ast.*;
-import polyglot.types.*;
-import polyglot.visit.*;
-import polyglot.util.*;
+import polyglot.ast.Node;
+import polyglot.ast.Node_c;
+import polyglot.types.Context;
+import polyglot.types.SemanticException;
+import polyglot.util.CodeWriter;
+import polyglot.util.InternalCompilerError;
+import polyglot.util.Position;
+import polyglot.visit.AmbiguityRemover;
+import polyglot.visit.PrettyPrinter;
+import polyglot.visit.Translator;
+import coffer.types.CofferContext;
+import coffer.types.CofferTypeSystem;
+import coffer.types.Key;
 
 /**
  * An AST node for a <code>Key</code>.  The key may be ambiguous. 
@@ -25,24 +33,29 @@ public class KeyNode_c extends Node_c implements KeyNode
         this.key = key;
     }
 
+    @Override
     public String name() {
         return key.name();
     }
 
+    @Override
     public Key key() {
         return key;
     }
 
+    @Override
     public KeyNode key(Key key) {
         KeyNode_c n = (KeyNode_c) copy();
         n.key = key;
         return n;
     }
 
+    @Override
     public boolean isDisambiguated() {
         return super.isDisambiguated() && key != null && key.isCanonical();
     }
 
+    @Override
     public Node disambiguate(AmbiguityRemover sc) throws SemanticException {
         CofferTypeSystem ts = (CofferTypeSystem) sc.typeSystem();
 
@@ -71,6 +84,7 @@ public class KeyNode_c extends Node_c implements KeyNode
         return this.key(key);
     }
 
+    @Override
     public void addDecls(Context c) {
         CofferContext vc = (CofferContext) c;
         if (key.isCanonical()) {
@@ -78,15 +92,18 @@ public class KeyNode_c extends Node_c implements KeyNode
         }
     }
 
+    @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
         w.write(key.toString());
     }
 
+    @Override
     public void translate(CodeWriter w, Translator tr) {
 	throw new InternalCompilerError(position(),
 	    "Cannot translate key \"" + key + "\".");
     }
 
+    @Override
     public String toString() {
         return key.toString();
     }

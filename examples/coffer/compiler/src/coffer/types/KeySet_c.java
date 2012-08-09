@@ -7,78 +7,90 @@
 
 package coffer.types;
 
-import polyglot.types.*;
-import polyglot.visit.*;
-import polyglot.util.*;
+import java.util.HashSet;
+import java.util.Iterator;
 
-import java.util.*;
+import polyglot.types.TypeObject;
+import polyglot.types.TypeObject_c;
+import polyglot.types.TypeSystem;
+import polyglot.util.Position;
 
 public class KeySet_c extends TypeObject_c implements KeySet
 {
-    HashSet set;
+    HashSet<Key> set;
 
     public KeySet_c(TypeSystem ts, Position pos) {
         super(ts, pos);
-        this.set = new HashSet();
+        this.set = new HashSet<Key>();
     }
 
+    @Override
     public int size() {
         return set.size();
     }
 
-    public Iterator iterator() {
+    @Override
+    public Iterator<Key> iterator() {
         return set.iterator();
     }
 
+    @Override
     public boolean contains(Key key) {
         return set.contains(key);
     }
 
+    @Override
     public KeySet add(Key key) {
         if (set.contains(key)) return this;
         KeySet_c s = (KeySet_c) copy();
-        s.set = new HashSet(set);
+        s.set = new HashSet<Key>(set);
         s.set.add(key);
         return s;
     }
 
+    @Override
     public KeySet remove(Key key) {
         if (! set.contains(key)) return this;
         KeySet_c s = (KeySet_c) copy();
-        s.set = new HashSet(set);
+        s.set = new HashSet<Key>(set);
         s.set.remove(key);
         return s;
     }
 
+    @Override
     public KeySet addAll(KeySet keys) {
         KeySet_c other = (KeySet_c) keys;
         KeySet_c s = (KeySet_c) copy();
-        s.set = new HashSet(set);
+        s.set = new HashSet<Key>(set);
         s.set.addAll(other.set);
         return s;
     }
 
+    @Override
     public KeySet removeAll(KeySet keys) {
         KeySet_c other = (KeySet_c) keys;
         KeySet_c s = (KeySet_c) copy();
-        s.set = new HashSet(set);
+        s.set = new HashSet<Key>(set);
         s.set.removeAll(other.set);
         return s;
     }
 
+    @Override
     public KeySet retainAll(KeySet keys) {
         KeySet_c other = (KeySet_c) keys;
         KeySet_c s = (KeySet_c) copy();
-        s.set = new HashSet(set);
+        s.set = new HashSet<Key>(set);
         s.set.retainAll(other.set);
         return s;
     }
 
+    @Override
     public boolean containsAll(KeySet keys) {
         KeySet_c other = (KeySet_c) keys;
         return set.containsAll(other.set);
     }
 
+    @Override
     public boolean equalsImpl(TypeObject o) {
         if (o instanceof KeySet_c) {
             KeySet_c other = (KeySet_c) o;
@@ -87,19 +99,21 @@ public class KeySet_c extends TypeObject_c implements KeySet
         return false;
     }
 
+    @Override
     public boolean isEmpty() {
         return set.isEmpty();
     }
 
+    @Override
     public boolean isCanonical() {
-        for (Iterator i = iterator(); i.hasNext(); ) {
-            Key k = (Key) i.next();
+        for (Key k : set) {
             if (! k.isCanonical())
                 return false;
         }
         return true;
     }
 
+    @Override
     public String toString() {
         return set.toString().replace('[', '{').replace(']', '}');
     }

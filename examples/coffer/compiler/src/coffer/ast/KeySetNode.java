@@ -7,10 +7,8 @@
 
 package coffer.ast;
 
-import polyglot.ast.*;
-import polyglot.types.*;
-import polyglot.visit.*;
-import coffer.types.*;
+import polyglot.ast.Node;
+import coffer.types.KeySet;
 
 /**
  * An AST node for a <code>KeySet</code>.  The key set may be ambiguous. 

@@ -7,12 +7,16 @@
 
 package coffer.types;
 
-import polyglot.ext.param.types.*;
-import polyglot.types.*;
-import polyglot.util.*;
-import java.util.*;
+import java.util.List;
 
-public interface CofferTypeSystem extends ParamTypeSystem {
+import polyglot.ext.param.types.ParamTypeSystem;
+import polyglot.types.ClassType;
+import polyglot.types.Flags;
+import polyglot.types.ReferenceType;
+import polyglot.types.Type;
+import polyglot.util.Position;
+
+public interface CofferTypeSystem extends ParamTypeSystem<Key, Key> {
     InstKey instKey(Position pos, String name);
     ParamKey paramKey(Position pos, String name);
     UnknownKey unknownKey(Position pos, String name);
@@ -21,11 +25,12 @@ public interface CofferTypeSystem extends ParamTypeSystem {
     KeySet emptyKeySet(Position pos);
 
     CofferMethodInstance cofferMethodInstance(Position pos,
-        ReferenceType container, Flags flags, Type returnType,
-        String name, List argTypes, KeySet entryKeys, KeySet returnKeys,
-        List throwConstraints);
+            ReferenceType container, Flags flags, Type returnType, String name,
+            List<? extends Type> argTypes, KeySet entryKeys, KeySet returnKeys,
+            List<ThrowConstraint> throwConstraints);
 
     CofferConstructorInstance cofferConstructorInstance(Position pos,
-        ClassType container, Flags flags, List argTypes,
-        KeySet entryKeys, KeySet returnKeys, List throwConstraints);
+            ClassType container, Flags flags, List<? extends Type> argTypes,
+            KeySet entryKeys, KeySet returnKeys,
+            List<ThrowConstraint> throwConstraints);
 }

@@ -7,16 +7,17 @@
 
 package coffer.extension;
 
-import polyglot.ast.*;
-import polyglot.types.*;
-import polyglot.util.*;
-import polyglot.visit.*;
-import coffer.ast.*;
-import coffer.types.*;
-
-import java.util.*;
+import polyglot.ast.ArrayAccess;
+import polyglot.ast.Assign;
+import polyglot.ast.Field;
+import polyglot.ast.JL_c;
+import polyglot.ast.Node;
+import polyglot.types.SemanticException;
+import polyglot.visit.TypeChecker;
+import coffer.types.CofferClassType;
 
 public class AssignDel_c extends JL_c {
+    @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
         Assign n = (Assign) super.typeCheck(tc);
 

@@ -7,21 +7,15 @@
 
 package coffer.extension;
 
-import polyglot.ast.*;
-import polyglot.types.*;
-import polyglot.util.*;
-import polyglot.visit.*;
-import coffer.ast.*;
-import coffer.types.*;
-
-import java.util.*;
+import polyglot.ast.Assign;
+import polyglot.ast.Local;
+import polyglot.types.SemanticException;
+import polyglot.types.Type;
+import coffer.types.CofferClassType;
+import coffer.types.KeySet;
 
 public class AssignExt_c extends CofferExt_c {
-    public KeySet keyFlow(KeySet held_keys, Type throwType) {
-        Assign n = (Assign) node();
-        return super.keyFlow(held_keys, throwType);
-    }
-
+    @Override
     public KeySet keyAlias(KeySet stored_keys, Type throwType) {
         Assign n = (Assign) node();
 
@@ -36,6 +30,7 @@ public class AssignExt_c extends CofferExt_c {
         return stored_keys;
     }
 
+    @Override
     public void checkHeldKeys(KeySet held, KeySet stored) throws SemanticException {
         Assign n = (Assign) node();
 

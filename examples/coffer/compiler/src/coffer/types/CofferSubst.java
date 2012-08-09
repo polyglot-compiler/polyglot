@@ -9,10 +9,9 @@ package coffer.types;
 
 import java.util.List;
 
-import polyglot.ext.param.types.Param;
 import polyglot.ext.param.types.Subst;
 
-public interface CofferSubst<Formal extends Param> extends Subst<Key, Key>
+public interface CofferSubst extends Subst<Key, Key>
 {
     public Key substKey(Key key);
     public KeySet substKeySet(KeySet key);

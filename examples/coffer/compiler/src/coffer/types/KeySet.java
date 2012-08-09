@@ -7,17 +7,11 @@
 
 package coffer.types;
 
-import polyglot.ast.*;
-import polyglot.types.*;
-import polyglot.visit.*;
-import polyglot.util.*;
+import polyglot.types.TypeObject;
 
-import java.util.*;
-
-public interface KeySet extends TypeObject
+public interface KeySet extends TypeObject, Iterable<Key>
 {
     int size();
-    Iterator iterator();
     boolean contains(Key key);
     KeySet add(Key key);
     KeySet remove(Key key);

@@ -7,8 +7,7 @@
 
 package coffer.types;
 
-import polyglot.ext.param.types.*;
-import java.util.List;
+import polyglot.ext.param.types.SubstType;
 
-public interface CofferSubstType extends CofferClassType, SubstType {
+public interface CofferSubstType extends CofferClassType, SubstType<Key, Key> {
 }

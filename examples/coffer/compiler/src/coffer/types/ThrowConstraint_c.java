@@ -7,9 +7,9 @@
 
 package coffer.types;
 
-import polyglot.types.*;
-import polyglot.util.*;
-import java.util.*;
+import polyglot.types.Type;
+import polyglot.types.TypeObject_c;
+import polyglot.util.Position;
 
 public class ThrowConstraint_c extends TypeObject_c implements ThrowConstraint {
     Type throwType;
@@ -22,26 +22,32 @@ public class ThrowConstraint_c extends TypeObject_c implements ThrowConstraint {
         this.keys = keys;
     }
 
+    @Override
     public KeySet keys() {
         return keys;
     }
 
+    @Override
     public void setKeys(KeySet keys) {
         this.keys = keys;
     }
 
+    @Override
     public Type throwType() {
         return throwType;
     }
 
+    @Override
     public void setThrowType(Type throwType) {
         this.throwType = throwType;
     }
 
+    @Override
     public boolean isCanonical() {
         return (keys == null || keys.isCanonical()) && throwType.isCanonical();
     }
 
+    @Override
     public String toString() {
         return throwType.toString() + (keys == null ? "" : keys.toString());
     }

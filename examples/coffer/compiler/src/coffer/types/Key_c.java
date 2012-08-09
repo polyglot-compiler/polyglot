@@ -7,9 +7,10 @@
 
 package coffer.types;
 
-import polyglot.types.*;
-import polyglot.visit.*;
-import polyglot.util.*;
+import polyglot.types.TypeObject;
+import polyglot.types.TypeObject_c;
+import polyglot.types.TypeSystem;
+import polyglot.util.Position;
 
 public abstract class Key_c extends TypeObject_c implements Key
 {
@@ -20,6 +21,7 @@ public abstract class Key_c extends TypeObject_c implements Key
         this.name = name;
     }
 
+    @Override
     public String name() {
         return name;
     }
@@ -30,19 +32,23 @@ public abstract class Key_c extends TypeObject_c implements Key
 	return n;
     }
 
+    @Override
     public boolean equalsImpl(TypeObject o) {
         return o == this;
     }
 
+    @Override
     public int hashCode() {
         return name.hashCode();
     }
 
+    @Override
     public String toString() {
         return name;
         // return getClass().getName() + "(" + name + "@" + System.identityHashCode(this) + ")";
     }
 
+    @Override
     public boolean isCanonical() {
         return true;
     }

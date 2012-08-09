@@ -7,10 +7,10 @@
 
 package coffer.extension;
 
-import polyglot.ast.*;
-import polyglot.types.*;
-import coffer.types.*;
-import java.util.*;
+import polyglot.ast.Ext;
+import polyglot.types.SemanticException;
+import polyglot.types.Type;
+import coffer.types.KeySet;
 
 /** An immutable representation of the Coffer class declaration.
  *  It extends the Java class declaration with the label/principal parameters

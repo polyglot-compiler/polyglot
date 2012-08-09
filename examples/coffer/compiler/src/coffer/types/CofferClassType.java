@@ -7,9 +7,9 @@
 
 package coffer.types;
 
-import polyglot.types.*;
-import polyglot.ext.param.types.*;
+import polyglot.ext.param.types.InstType;
+import polyglot.types.ClassType;
 
-public interface CofferClassType extends ClassType, InstType {
+public interface CofferClassType extends ClassType, InstType<Key, Key> {
     Key key();
 }

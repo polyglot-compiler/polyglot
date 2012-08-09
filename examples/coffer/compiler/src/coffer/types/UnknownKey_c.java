@@ -7,9 +7,8 @@
 
 package coffer.types;
 
-import polyglot.types.*;
-import polyglot.visit.*;
-import polyglot.util.*;
+import polyglot.types.TypeSystem;
+import polyglot.util.Position;
 
 public class UnknownKey_c extends Key_c implements UnknownKey
 {
@@ -17,6 +16,7 @@ public class UnknownKey_c extends Key_c implements UnknownKey
         super(ts, pos, name);
     }
 
+    @Override
     public boolean isCanonical() {
         return false;
     }

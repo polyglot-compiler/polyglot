@@ -7,24 +7,22 @@
 
 package coffer.visit;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import polyglot.ast.NodeFactory;
 import polyglot.ast.ProcedureDecl;
 import polyglot.ast.Term;
-import coffer.Topics;
-import coffer.extension.CofferExt;
-import coffer.extension.ProcedureDeclExt_c;
-import coffer.types.*;
-import coffer.types.CofferClassType;
-import coffer.types.CofferProcedureInstance;
-import coffer.types.CofferTypeSystem;
-import coffer.types.KeySet;
 import polyglot.frontend.Job;
 import polyglot.main.Report;
 import polyglot.types.SemanticException;
 import polyglot.types.Type;
+import polyglot.types.TypeObject;
 import polyglot.types.TypeSystem;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
@@ -32,11 +30,19 @@ import polyglot.visit.DataFlow;
 import polyglot.visit.FlowGraph;
 import polyglot.visit.FlowGraph.EdgeKey;
 import polyglot.visit.FlowGraph.ExceptionEdgeKey;
+import coffer.Topics;
+import coffer.extension.CofferExt;
+import coffer.extension.ProcedureDeclExt_c;
+import coffer.types.CofferClassType;
+import coffer.types.CofferProcedureInstance;
+import coffer.types.CofferTypeSystem;
+import coffer.types.KeySet;
+import coffer.types.ThrowConstraint;
 
 /**
  * Data flow analysis to compute and check held key sets.
  */
-public class KeyChecker extends DataFlow
+public class KeyChecker extends DataFlow<DataFlow.Item>
 {
     public KeyChecker(Job job, TypeSystem ts, NodeFactory nf) {
         super(job, ts, nf, true /* forward analysis */);
@@ -44,7 +50,9 @@ public class KeyChecker extends DataFlow
         EMPTY = vts.emptyKeySet(Position.COMPILER_GENERATED);
     }
 
-    public Item createInitialItem(FlowGraph graph, Term node, boolean entry) {
+    @Override
+    public Item createInitialItem(FlowGraph<Item> graph, Term node,
+            boolean entry) {
         ProcedureDecl decl = (ProcedureDecl) graph.root();
         CofferProcedureInstance pi = (CofferProcedureInstance)
             decl.procedureInstance();
@@ -66,12 +74,15 @@ public class KeyChecker extends DataFlow
 
     class ExitTermItem extends Item {
         DataFlowItem nonExItem;
-        Map excEdgesToItems; // map from ExceptionEdgeKeys to DataFlowItems
-        public ExitTermItem(DataFlowItem nonExItem, Map excItems) {
+        Map<ExceptionEdgeKey, DataFlowItem> excEdgesToItems; // map from ExceptionEdgeKeys to DataFlowItems
+
+        public ExitTermItem(DataFlowItem nonExItem,
+                Map<ExceptionEdgeKey, DataFlowItem> excItems) {
             this.nonExItem = nonExItem;
             this.excEdgesToItems = excItems;
         }
 
+        @Override
         public boolean equals(Object i) {
             if (i instanceof ExitTermItem) {
                 ExitTermItem that = (ExitTermItem)i;
@@ -81,6 +92,7 @@ public class KeyChecker extends DataFlow
             return false;
         }
 
+        @Override
         public int hashCode() {
             return nonExItem.hashCode() + excEdgesToItems.hashCode();
         }
@@ -107,6 +119,7 @@ public class KeyChecker extends DataFlow
             this.may_stored = may_stored;
         }
 
+        @Override
         public String toString() {
             return "held_keys(must_held=" + must_held + ", " +
                              "may_held=" + may_held + ", " +
@@ -114,6 +127,7 @@ public class KeyChecker extends DataFlow
                              "may_stored=" + may_stored + ")";
         }
 
+        @Override
         public boolean equals(Object o) {
             if (o instanceof DataFlowItem) {
                 DataFlowItem that = (DataFlowItem) o;
@@ -125,13 +139,16 @@ public class KeyChecker extends DataFlow
             return false;
         }
 
+        @Override
         public int hashCode() {
             return must_held.hashCode() + may_held.hashCode() +
                    must_stored.hashCode() + may_stored.hashCode();
         }
     }
 
-    public Map flow(Item in, FlowGraph graph, Term n, boolean entry, Set succEdgeKeys) {
+    @Override
+    public Map<EdgeKey, Item> flow(Item in, FlowGraph<Item> graph, Term n,
+            boolean entry, Set<EdgeKey> succEdgeKeys) {
         if (entry) return itemToMap(in, succEdgeKeys);
         if (in instanceof ExitTermItem) {
             return itemToMap(in, succEdgeKeys);
@@ -142,10 +159,9 @@ public class KeyChecker extends DataFlow
         if (n.ext() instanceof CofferExt) {
             CofferExt ext = (CofferExt) n.ext();
 
-            Map m = new HashMap();
+            Map<EdgeKey, Item> m = new HashMap<EdgeKey, Item>();
 
-            for (Iterator i = succEdgeKeys.iterator(); i.hasNext(); ) {
-                FlowGraph.EdgeKey e = (FlowGraph.EdgeKey) i.next();
+            for (EdgeKey e : succEdgeKeys) {
                 Type t = null;
 
                 if (e instanceof FlowGraph.ExceptionEdgeKey) {
@@ -178,59 +194,68 @@ public class KeyChecker extends DataFlow
         return itemToMap(in, succEdgeKeys);
     }
 
-    protected Item safeConfluence(List items, List itemKeys, Term node, boolean entry, FlowGraph graph) {
+    @Override
+    protected Item safeConfluence(List<Item> items, List<EdgeKey> itemKeys,
+            Term node, boolean entry, FlowGraph<Item> graph) {
         if (!entry && graph.root().equals(node)) {
             return confluenceExitTerm(items, itemKeys, graph);
         }
         return super.safeConfluence(items, itemKeys, node, entry, graph);
     }
 
-    protected Item confluence(List items, List itemKeys, Term node, boolean entry, FlowGraph graph) {
+    @Override
+    protected Item confluence(List<Item> items, List<EdgeKey> itemKeys,
+            Term node, boolean entry, FlowGraph<Item> graph) {
         if (!entry && graph.root().equals(node)) {
             return confluenceExitTerm(items, itemKeys, graph);
         }
         return confluence(items, node, entry, graph);
     }
 
-    protected Item confluenceExitTerm(List items, List itemKeys, FlowGraph graph) {
-        List nonExcItems = filterItemsNonException(items, itemKeys);
+    protected Item confluenceExitTerm(List<Item> items, List<EdgeKey> itemKeys,
+            FlowGraph<Item> graph) {
+        List<Item> nonExcItems = filterItemsNonException(items, itemKeys);
         DataFlowItem nonExc;
 
         if (nonExcItems.isEmpty()) {
             nonExc = new DataFlowItem();
         }
         else {
-            nonExc = (DataFlowItem)confluence(nonExcItems, graph.root(), false, graph);
+            nonExc = confluence(nonExcItems, graph.root(), false, graph);
         }
 
-        Map excItemLists = new HashMap();
-        for (Iterator i = items.iterator(), j = itemKeys.iterator();
-             i.hasNext() && j.hasNext();  ) {
-            FlowGraph.EdgeKey key = (EdgeKey)j.next();
+        Map<ExceptionEdgeKey, List<Item>> excItemLists =
+                new HashMap<ExceptionEdgeKey, List<Item>>();
+        Iterator<Item> i = items.iterator();
+        Iterator<EdgeKey> j = itemKeys.iterator();
+        while (i.hasNext() && j.hasNext()) {
+            FlowGraph.EdgeKey key = j.next();
             DataFlowItem item = (DataFlowItem)i.next();
-            if (key instanceof FlowGraph.ExceptionEdgeKey) {
-                List l = (List)excItemLists.get(key);
+            if (key instanceof ExceptionEdgeKey) {
+                List<Item> l = excItemLists.get(key);
                 if (l == null) {
-                        l = new ArrayList();
-                        excItemLists.put(key, l);
+                        l = new ArrayList<Item>();
+                        excItemLists.put((ExceptionEdgeKey) key, l);
                 }
                 l.add(item);
             }
         }
 
-        Map excItems = new HashMap(excItemLists.size());
-        for (Iterator i = excItemLists.entrySet().iterator(); i.hasNext(); ) {
-                Map.Entry e = (Entry)i.next();
-                excItems.put(e.getKey(), confluence((List)e.getValue(), graph.root(), false, graph));
+        Map<ExceptionEdgeKey, DataFlowItem> excItems =
+                new HashMap<ExceptionEdgeKey, DataFlowItem>(excItemLists.size());
+        for (Entry<ExceptionEdgeKey, List<Item>> e : excItemLists.entrySet()) {
+            excItems.put(e.getKey(), confluence(e.getValue(), graph.root(), false, graph));
         }
         return new ExitTermItem(nonExc, excItems);
     }
 
-    protected Item confluence(List inItems, Term node, boolean entry, FlowGraph graph) {
+    @Override
+    protected DataFlowItem confluence(List<Item> inItems, Term node,
+            boolean entry, FlowGraph<Item> graph) {
         DataFlowItem outItem = null;
 
-        for (Iterator i = inItems.iterator(); i.hasNext(); ) {
-            DataFlowItem df = (DataFlowItem) i.next();
+        for (Item item : inItems) {
+            DataFlowItem df = (DataFlowItem) item;
 
             if (outItem == null) {
                 outItem = new DataFlowItem(df.must_held, df.may_held,
@@ -254,8 +279,7 @@ public class KeyChecker extends DataFlow
         if (Report.should_report(Topics.keycheck, 2)) {
             Report.report(2, "confluence(" + node + "):");
 
-            for (Iterator i = inItems.iterator(); i.hasNext(); ) {
-                DataFlowItem df = (DataFlowItem) i.next();
+            for (Item df : inItems) {
                 Report.report(2, "   " + df);
             }
 
@@ -265,9 +289,9 @@ public class KeyChecker extends DataFlow
         return outItem;
     }
 
-    public void check(FlowGraph graph, Term n, boolean entry, Item inItem, Map outItems)
-        throws SemanticException
-    {
+    @Override
+    public void check(FlowGraph<Item> graph, Term n, boolean entry,
+            Item inItem, Map<EdgeKey, Item> outItems) throws SemanticException {
         if (!entry) {
             if (graph.root().equals(n)) {
                 checkExitTerm(graph, (ExitTermItem)inItem);
@@ -307,51 +331,50 @@ public class KeyChecker extends DataFlow
         }
     }
 
-    private void checkExitTerm(FlowGraph graph, ExitTermItem item)
+    private void checkExitTerm(FlowGraph<Item> graph, ExitTermItem item)
         throws SemanticException
     {
         check(graph.root(), item.nonExItem, true);
 
-        List excepts;
+        List<TypeObject> excepts;
         ProcedureDeclExt_c ext = null;
         
         if (graph.root() instanceof ProcedureDecl) {
             ProcedureDecl pd = (ProcedureDecl)graph.root();
             CofferProcedureInstance pi = (CofferProcedureInstance)pd.procedureInstance();
-            excepts = pi.throwConstraints();
+            excepts = new ArrayList<TypeObject>(pi.throwConstraints());
             ext = (ProcedureDeclExt_c)pd.ext();
         }
         else {
-            excepts = new ArrayList();
-            for (Iterator i = item.excEdgesToItems.keySet().iterator(); i.hasNext(); ) {
-                FlowGraph.ExceptionEdgeKey key = (ExceptionEdgeKey)i.next();
+            excepts = new ArrayList<TypeObject>();
+            for (ExceptionEdgeKey key : item.excEdgesToItems.keySet()) {
                 excepts.add(key.type());
             }
         }
 
-        List excKeys = new ArrayList();
-        List excItems = new ArrayList();
+        List<EdgeKey> excKeys = new ArrayList<EdgeKey>();
+        List<Item> excItems = new ArrayList<Item>();
 
-        for (Iterator i = item.excEdgesToItems.entrySet().iterator(); i.hasNext(); ) {
-            Entry e = (Entry)i.next();
+        for (Entry<ExceptionEdgeKey, DataFlowItem> e : item.excEdgesToItems.entrySet()) {
             excKeys.add(e.getKey());
             excItems.add(e.getValue());
         }
 
-        for (Iterator i = excepts.iterator(); i.hasNext(); ) {
-            Object o = i.next();
+        for (TypeObject t : excepts) {
             ThrowConstraint tc = null;
             Type excType = null;
-            if (o instanceof ThrowConstraint) {
-                tc = (ThrowConstraint)o;
+            if (t instanceof ThrowConstraint) {
+                tc = (ThrowConstraint) t;
                 excType = tc.throwType();
             }
             else {
-                excType = (Type)o;
+                excType = (Type) t;
             }
-            List matchingExc = filterItemsExceptionSubclass(excItems, excKeys, excType);
+            List<Item> matchingExc =
+                    filterItemsExceptionSubclass(excItems, excKeys, excType);
             if (!matchingExc.isEmpty()) {
-                DataFlowItem df = (DataFlowItem)confluence(matchingExc, graph.root(), false, graph);
+                DataFlowItem df =
+                        confluence(matchingExc, graph.root(), false, graph);
                 check(graph.root(), df, false);
 
                 if (ext != null && tc != null) {

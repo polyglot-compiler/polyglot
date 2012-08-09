@@ -9,6 +9,7 @@ package coffer.ast;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -25,7 +26,6 @@ import polyglot.util.CachingTransformingList;
 import polyglot.util.CodeWriter;
 import polyglot.util.CollectionUtil;
 import polyglot.util.InternalCompilerError;
-import polyglot.util.ListUtil;
 import polyglot.util.Position;
 import polyglot.util.Transformation;
 import polyglot.visit.AmbiguityRemover;
@@ -62,7 +62,8 @@ public class CofferMethodDecl_c extends MethodDecl_c implements CofferMethodDecl
               body);
 	this.entryKeys = entryKeys;
 	this.returnKeys = returnKeys;
-        this.throwConstraints = ListUtil.copy(throwConstraints, true);
+        this.throwConstraints =
+                new ArrayList<ThrowConstraintNode>(throwConstraints);
     }
 
     @Override
@@ -117,7 +118,8 @@ public class CofferMethodDecl_c extends MethodDecl_c implements CofferMethodDecl
     public CofferMethodDecl throwConstraints(
             List<ThrowConstraintNode> throwConstraints) {
 	CofferMethodDecl_c n = (CofferMethodDecl_c) copy();
-        n.throwConstraints = ListUtil.copy(throwConstraints, true);
+        n.throwConstraints =
+                new ArrayList<ThrowConstraintNode>(throwConstraints);
 	return n;
     }
 
@@ -144,7 +146,8 @@ public class CofferMethodDecl_c extends MethodDecl_c implements CofferMethodDecl
           CofferMethodDecl_c n = (CofferMethodDecl_c) copy();
           n.entryKeys = entryKeys;
           n.returnKeys = returnKeys;
-            n.throwConstraints = ListUtil.copy(throwConstraints, true);
+            n.throwConstraints =
+                    new ArrayList<ThrowConstraintNode>(throwConstraints);
             return (CofferMethodDecl_c) n.reconstruct(returnType,
                                                       name,
                                                       formals,
@@ -257,6 +260,7 @@ public class CofferMethodDecl_c extends MethodDecl_c implements CofferMethodDecl
         CofferMethodDecl_c n = (CofferMethodDecl_c) super.disambiguate(ar);
         
         CofferTypeSystem vts = (CofferTypeSystem) ar.typeSystem();
+        
         KeySet entryKeys;
         KeySet returnKeys;
         
@@ -278,10 +282,9 @@ public class CofferMethodDecl_c extends MethodDecl_c implements CofferMethodDecl
         mi.setEntryKeys(entryKeys);
         mi.setReturnKeys(returnKeys);
         
-        ArrayList<ThrowConstraint> throwConstraints =
+        List<ThrowConstraint> throwConstraints =
                 new ArrayList<ThrowConstraint>(n.throwConstraints.size());
         for (ThrowConstraintNode cn : n.throwConstraints) {
-
             if (! cn.isDisambiguated()) {
                 return this;
             }
@@ -313,14 +316,14 @@ public class CofferMethodDecl_c extends MethodDecl_c implements CofferMethodDecl
 
 	w.begin(0);
 
-        boolean first = true;
-        for (Formal f : formals) {
-            if (!first) {
-                w.write(",");
-                w.allowBreak(0, " ");
-            }
-            first = false;
-            print(f, w, tr);
+        for (Iterator<Formal> i = formals.iterator(); i.hasNext();) {
+            Formal f = i.next();
+	    print(f, w, tr);
+
+	    if (i.hasNext()) {
+		w.write(",");
+		w.allowBreak(0, " ");
+	    }
 	}
 
 	w.end();
@@ -341,14 +344,14 @@ public class CofferMethodDecl_c extends MethodDecl_c implements CofferMethodDecl
 	    w.allowBreak(6);
 	    w.write("throws ");
 
-            first = true;
-            for (ThrowConstraintNode cn : throwConstraints) {
-                if (!first) {
-                    w.write(",");
-                    w.allowBreak(4, " ");
-                }
-                first = false;
-                print(cn, w, tr);
+            for (Iterator<ThrowConstraintNode> i = throwConstraints.iterator(); i.hasNext();) {
+                ThrowConstraintNode cn = i.next();
+		print(cn, w, tr);
+
+		if (i.hasNext()) {
+		    w.write(",");
+		    w.allowBreak(4, " ");
+		}
 	    }
 	}
 

@@ -7,15 +7,14 @@
 
 package coffer.extension;
 
-import polyglot.ast.*;
-import polyglot.types.*;
-import polyglot.util.*;
-import coffer.ast.*;
-import coffer.types.*;
-
-import java.util.*;
+import polyglot.types.SemanticException;
+import polyglot.types.Type;
+import coffer.ast.Free;
+import coffer.types.CofferClassType;
+import coffer.types.KeySet;
 
 public class FreeExt_c extends CofferExt_c {
+    @Override
     public KeySet keyFlow(KeySet held_keys, Type throwType) {
         Free f = (Free) node();
 
@@ -30,6 +29,7 @@ public class FreeExt_c extends CofferExt_c {
         return held_keys.remove(ct.key());
     }
 
+    @Override
     public void checkHeldKeys(KeySet held, KeySet stored) throws SemanticException {
         Free f = (Free) node();
 

@@ -98,11 +98,9 @@ public class CofferNodeFactory_c extends NodeFactory_c implements CofferNodeFact
     }
 
     @Override
-    public CofferClassDecl CofferClassDecl(Position pos, Flags flags,
-                                         Id name, KeyNode key,
- TypeNode superClass, List<TypeNode> interfaces,
-                                         ClassBody body)
-    {
+    public CofferClassDecl CofferClassDecl(Position pos, Flags flags, Id name,
+            KeyNode key, TypeNode superClass, List<TypeNode> interfaces,
+            ClassBody body) {
         CofferClassDecl n = new CofferClassDecl_c(pos, flags, name, key,
                 superClass, interfaces, body);
         n = (CofferClassDecl)n.ext(extFactory().extClassDecl());
@@ -118,43 +116,48 @@ public class CofferNodeFactory_c extends NodeFactory_c implements CofferNodeFact
 
     @Override
     public MethodDecl MethodDecl(Position pos, Flags flags,
-            TypeNode returnType, Id name, List<Formal> argTypes,
-            List<TypeNode> excTypes, Block body)
-    {
+            TypeNode returnType, Id name, List<Formal> formals,
+            List<TypeNode> excTypes, Block body) {
         List<ThrowConstraintNode> l = new LinkedList<ThrowConstraintNode>();
 
         for (TypeNode tn : excTypes) {
             l.add(ThrowConstraintNode(tn.position(), tn, null));
         }
 
-        return CofferMethodDecl(pos, flags, returnType, name, argTypes,
-                               null, null, l, body);
+        return CofferMethodDecl(pos,
+                                flags,
+                                returnType,
+                                name,
+                                formals,
+                                null,
+                                null,
+                                l,
+                                body);
 
     }
 
     @Override
-    public ConstructorDecl ConstructorDecl(Position pos, Flags flags,
- Id name,
-            List<Formal> argTypes, List<TypeNode> excTypes, Block body)
-    {
+    public ConstructorDecl ConstructorDecl(Position pos, Flags flags, Id name,
+            List<Formal> formals, List<TypeNode> excTypes, Block body) {
         List<ThrowConstraintNode> l = new LinkedList<ThrowConstraintNode>();
 
         for (TypeNode tn : excTypes) {
             l.add(ThrowConstraintNode(tn.position(), tn, null));
         }
 
-        return CofferConstructorDecl(pos, flags, name, argTypes,
+        return CofferConstructorDecl(pos,
+                                     flags,
+                                     name,
+                                     formals,
                                      null, null, l, body);
     }
 
     @Override
     public CofferMethodDecl CofferMethodDecl(Position pos, Flags flags,
-            TypeNode returnType, Id name, List<Formal> argTypes,
+            TypeNode returnType, Id name, List<Formal> formals,
             KeySetNode entryKeys, KeySetNode returnKeys,
-            List<ThrowConstraintNode> throwConstraints,
- Block body)
-    {
-        CofferMethodDecl n = new CofferMethodDecl_c(pos, flags, returnType, name, argTypes,
+            List<ThrowConstraintNode> throwConstraints, Block body) {
+        CofferMethodDecl n = new CofferMethodDecl_c(pos, flags, returnType, name, formals,
                 entryKeys, returnKeys, throwConstraints, body);
         n = (CofferMethodDecl)n.ext(extFactory().extMethodDecl());
         return n;
@@ -162,11 +165,10 @@ public class CofferNodeFactory_c extends NodeFactory_c implements CofferNodeFact
 
     @Override
     public CofferConstructorDecl CofferConstructorDecl(Position pos,
-            Flags flags, Id name, List<Formal> argTypes, KeySetNode entryKeys,
+            Flags flags, Id name, List<Formal> formals, KeySetNode entryKeys,
             KeySetNode returnKeys, List<ThrowConstraintNode> throwConstraints,
-            Block body)
-    {
-        CofferConstructorDecl n = new CofferConstructorDecl_c(pos, flags, name, argTypes,
+            Block body) {
+        CofferConstructorDecl n = new CofferConstructorDecl_c(pos, flags, name, formals,
                 entryKeys, returnKeys, throwConstraints, body);
         n = (CofferConstructorDecl)n.ext(extFactory().extConstructorDecl());
         return n;
@@ -176,17 +178,14 @@ public class CofferNodeFactory_c extends NodeFactory_c implements CofferNodeFact
     public FieldAssign FieldAssign(Position pos, Field left, Assign.Operator op, Expr right) {
         return (FieldAssign) super.FieldAssign(pos, left, op, right).del(new AssignDel_c());
     }
-
     @Override
     public ArrayAccessAssign ArrayAccessAssign(Position pos, ArrayAccess left, Assign.Operator op, Expr right) {
         return (ArrayAccessAssign) super.ArrayAccessAssign(pos, left, op, right).del(new AssignDel_c());
     }
-
     @Override
     public LocalAssign LocalAssign(Position pos, Local left, Assign.Operator op, Expr right) {
         return (LocalAssign) super.LocalAssign(pos, left, op, right).del(new AssignDel_c());
     }
-
     @Override
     public Assign Assign(Position pos, Expr left, Assign.Operator op, Expr right) {
         return (Assign) super.Assign(pos, left, op, right).del(new AssignDel_c());

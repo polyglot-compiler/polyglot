@@ -7,11 +7,13 @@
 
 package coffer.ast;
 
-import coffer.types.*;
-import polyglot.ast.*;
-import polyglot.types.*;
-import polyglot.visit.*;
-import polyglot.util.*;
+import polyglot.ast.Node_c;
+import polyglot.util.CodeWriter;
+import polyglot.util.InternalCompilerError;
+import polyglot.util.Position;
+import polyglot.visit.PrettyPrinter;
+import polyglot.visit.Translator;
+import coffer.types.KeySet;
 
 /**
  * Implementation of a canonical key set AST node.  This is just an AST node
@@ -26,25 +28,30 @@ public class CanonicalKeySetNode_c extends Node_c implements CanonicalKeySetNode
         this.keys = keys;
     }
 
+    @Override
     public KeySet keys() {
         return keys;
     }
 
+    @Override
     public CanonicalKeySetNode keys(KeySet keys) {
         CanonicalKeySetNode_c n = (CanonicalKeySetNode_c) copy();
         n.keys = keys;
         return n;
     }
 
+    @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
         w.write(keys.toString());
     }
 
+    @Override
     public void translate(CodeWriter w, Translator tr) {
 	throw new InternalCompilerError(position(),
 	    "Cannot translate " + this + ".");
     }
 
+    @Override
     public String toString() {
         return keys.toString();
     }

@@ -7,8 +7,7 @@
 
 package coffer.types;
 
-import polyglot.types.*;
-import java.util.*;
+import polyglot.types.MethodInstance;
 
 /** Coffer method instance. A wrapper of all the type information related to
  *  a method. 

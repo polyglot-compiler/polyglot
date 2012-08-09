@@ -7,9 +7,9 @@
 
 package coffer.types;
 
-import polyglot.types.*;
-import polyglot.visit.*;
-import polyglot.util.*;
+import polyglot.types.TypeObject;
+import polyglot.types.TypeSystem;
+import polyglot.util.Position;
 
 public class InstKey_c extends Key_c implements InstKey
 {
@@ -17,6 +17,7 @@ public class InstKey_c extends Key_c implements InstKey
         super(ts, pos, name);
     }
 
+    @Override
     public boolean equalsImpl(TypeObject o) {
         if (o instanceof InstKey) {
             return name.equals(((InstKey) o).name());

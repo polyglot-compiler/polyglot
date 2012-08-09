@@ -7,15 +7,14 @@
 
 package coffer.extension;
 
-import polyglot.ast.*;
-import polyglot.types.*;
-import polyglot.util.*;
-import coffer.ast.*;
-import coffer.types.*;
-
-import java.util.*;
+import polyglot.ast.Special;
+import polyglot.types.SemanticException;
+import coffer.types.CofferClassType;
+import coffer.types.Key;
+import coffer.types.KeySet;
 
 public class SpecialExt_c extends CofferExt_c {
+    @Override
     public void checkHeldKeys(KeySet held, KeySet stored) throws SemanticException {
         Special e = (Special) node();
 

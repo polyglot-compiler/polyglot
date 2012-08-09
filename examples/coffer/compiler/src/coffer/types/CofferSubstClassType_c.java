@@ -7,12 +7,15 @@
 
 package coffer.types;
 
-import polyglot.types.*;
-import polyglot.ext.param.types.*;
-import polyglot.util.*;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
-public class CofferSubstClassType_c extends SubstClassType_c
+import polyglot.ext.param.types.PClass;
+import polyglot.ext.param.types.SubstClassType_c;
+import polyglot.types.ClassType;
+import polyglot.util.Position;
+
+public class CofferSubstClassType_c extends SubstClassType_c<Key, Key>
     implements CofferSubstType
 {
     public CofferSubstClassType_c(CofferTypeSystem ts, Position pos,
@@ -23,18 +26,19 @@ public class CofferSubstClassType_c extends SubstClassType_c
     ////////////////////////////////////////////////////////////////
     // Implement methods of CofferSubstType
 
-    public PClass instantiatedFrom() {
+    @Override
+    public PClass<Key, Key> instantiatedFrom() {
         return ((CofferParsedClassType) base).instantiatedFrom();
     }
 
-    public List actuals() {
-        PClass pc = instantiatedFrom();
+    @Override
+    public List<Key> actuals() {
+        PClass<Key, Key> pc = instantiatedFrom();
         CofferSubst subst = (CofferSubst) this.subst;
 
-        List actuals = new ArrayList(pc.formals().size());
+        List<Key> actuals = new ArrayList<Key>(pc.formals().size());
 
-        for (Iterator i = pc.formals().iterator(); i.hasNext(); ) {
-            Key key = (Key) i.next();
+        for (Key key : pc.formals()) {
             actuals.add(subst.substKey(key));
         }
 
@@ -44,12 +48,14 @@ public class CofferSubstClassType_c extends SubstClassType_c
     ////////////////////////////////////////////////////////////////
     // Implement methods of CofferClassType
 
+    @Override
     public Key key() {
         CofferClassType base = (CofferClassType) this.base;
         CofferSubst subst = (CofferSubst) this.subst;
         return subst.substKey(base.key());
     }
 
+    @Override
     public String toString() {
         return "tracked(" + subst + ") " + base;
     }

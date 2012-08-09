@@ -7,8 +7,9 @@
 
 package coffer.ast;
 
-import polyglot.ast.*;
-import java.util.*;
+import java.util.List;
+
+import polyglot.ast.ConstructorDecl;
 
 /** An immutable representation of the Coffer constructor declaration.
  * <code>ConstructorDecl</code> is extended with pre- and post-conditions.
@@ -20,6 +21,8 @@ public interface CofferConstructorDecl extends ConstructorDecl {
     KeySetNode returnKeys();
     CofferConstructorDecl returnKeys(KeySetNode returnKeys);
 
-    List throwConstraints();
-    CofferConstructorDecl throwConstraints(List throwConstraints);
+    List<ThrowConstraintNode> throwConstraints();
+
+    CofferConstructorDecl throwConstraints(
+            List<ThrowConstraintNode> throwConstraints);
 }

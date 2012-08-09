@@ -7,6 +7,7 @@
 
 package coffer.ast;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
@@ -16,7 +17,6 @@ import polyglot.types.SemanticException;
 import polyglot.util.CodeWriter;
 import polyglot.util.CollectionUtil;
 import polyglot.util.InternalCompilerError;
-import polyglot.util.ListUtil;
 import polyglot.util.Position;
 import polyglot.visit.AmbiguityRemover;
 import polyglot.visit.NodeVisitor;
@@ -36,7 +36,7 @@ public class AmbKeySetNode_c extends Node_c implements AmbKeySetNode
 
     public AmbKeySetNode_c(Position pos, List<KeyNode> keys) {
         super(pos);
-        this.keys = ListUtil.copy(keys, true);
+        this.keys = new ArrayList<KeyNode>(keys);
     }
 
     @Override
@@ -50,16 +50,16 @@ public class AmbKeySetNode_c extends Node_c implements AmbKeySetNode
     }
 
     @Override
-    public AmbKeySetNode keyNodes(List keys) {
+    public AmbKeySetNode keyNodes(List<KeyNode> keys) {
         AmbKeySetNode_c n = (AmbKeySetNode_c) copy();
-        n.keys = ListUtil.copy(keys, true);
+        n.keys = new ArrayList<KeyNode>(keys);
         return n;
     }
 
-    public AmbKeySetNode_c reconstruct(List keys) {
+    public AmbKeySetNode_c reconstruct(List<KeyNode> keys) {
         if (! CollectionUtil.equals(this.keys, keys)) {
             AmbKeySetNode_c n = (AmbKeySetNode_c) copy();
-            n.keys = ListUtil.copy(keys, true);
+            n.keys = new ArrayList<KeyNode>(keys);
             return n;
         }
 
@@ -77,9 +77,9 @@ public class AmbKeySetNode_c extends Node_c implements AmbKeySetNode
         CofferTypeSystem ts = (CofferTypeSystem) tb.typeSystem();
 
         KeySet s = ts.emptyKeySet(position());
-        
-        for (KeyNode i : keys) {
-            s = s.add(i.key());
+
+        for (KeyNode key : keys) {
+            s = s.add(key.key());
         }
 
         AmbKeySetNode_c n = (AmbKeySetNode_c) copy();
@@ -96,7 +96,6 @@ public class AmbKeySetNode_c extends Node_c implements AmbKeySetNode
         KeySet s = ts.emptyKeySet(position());
 
         for (KeyNode key : keys) {
-
             if (! key.key().isCanonical()) {
                 return this;
             }
@@ -111,18 +110,18 @@ public class AmbKeySetNode_c extends Node_c implements AmbKeySetNode
         w.write("[");
 
         w.begin(0);
-        
-        boolean first = true;
-        for (KeyNode key : keys) {
-            if (!first) {
+
+        for (Iterator<KeyNode> i = keys.iterator(); i.hasNext(); ) {
+            KeyNode key = i.next();
+            print(key, w, tr);
+            if (i.hasNext()) {
                 w.write(",");
                 w.allowBreak(0, " ");
             }
-            first = false;
-            print(key, w, tr);
         }
 
         w.end();
+
         w.write("]");
     }
 

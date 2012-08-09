@@ -7,8 +7,10 @@
 
 package coffer.types;
 
-import polyglot.types.*;
-import java.util.*;
+import java.util.List;
+
+import polyglot.types.MemberInstance;
+import polyglot.types.ProcedureInstance;
 
 /** Coffer procedure instance. A wrapper of all the type information 
  *  related to a procedure. 
@@ -17,9 +19,11 @@ public interface CofferProcedureInstance extends ProcedureInstance, MemberInstan
 {
     KeySet entryKeys();
     KeySet returnKeys();
-    List throwConstraints();
+
+    List<ThrowConstraint> throwConstraints();
 
     void setEntryKeys(KeySet entryKeys);
     void setReturnKeys(KeySet returnKeys);
-    void setThrowConstraints(List throwConstraints);
+
+    void setThrowConstraints(List<ThrowConstraint> throwConstraints);
 }

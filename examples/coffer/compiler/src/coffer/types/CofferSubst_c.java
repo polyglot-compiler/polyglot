@@ -7,33 +7,21 @@
 
 package coffer.types;
 
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 
-import polyglot.ast.Formal;
 import polyglot.ext.param.types.Subst_c;
 import polyglot.types.ClassType;
 import polyglot.types.ConstructorInstance;
 import polyglot.types.MethodInstance;
 import polyglot.types.Type;
 import polyglot.util.CachingTransformingList;
-import polyglot.util.InternalCompilerError;
 import polyglot.util.Transformation;
 
 public class CofferSubst_c extends Subst_c<Key, Key> implements CofferSubst
 {
-    public CofferSubst_c(CofferTypeSystem ts, Map<Formal, Actual> subst,
-            Map<Formal, Actual> cache) {
+    public CofferSubst_c(CofferTypeSystem ts, Map<Key, ? extends Key> subst) {
         super(ts, subst);
-
-        for (Iterator<Entry<Formal, Actual>> i = entries(); i.hasNext();) {
-            Map.Entry e = i.next();
-            if (e.getKey() instanceof Key && e.getValue() instanceof Key)
-                continue;
-            throw new InternalCompilerError("bad map: " + subst);
-        }
     }
 
     @Override
@@ -49,6 +37,7 @@ public class CofferSubst_c extends Subst_c<Key, Key> implements CofferSubst
     ////////////////////////////////////////////////////////////////
     // Override substitution methods to handle Coffer constructs
 
+    @Override
     public ClassType substClassType(ClassType t) {
         // Don't bother trying to substitute into a non-Coffer class.
         if (! (t instanceof CofferClassType)) {
@@ -59,7 +48,8 @@ public class CofferSubst_c extends Subst_c<Key, Key> implements CofferSubst
                                          (CofferClassType) t, this);
     }
 
-    public MethodInstance substMethod(MethodInstance mi) {
+    @Override
+    public <T extends MethodInstance> T substMethod(T mi) {
         mi = super.substMethod(mi);
 
         if (mi instanceof CofferMethodInstance) {
@@ -69,13 +59,16 @@ public class CofferSubst_c extends Subst_c<Key, Key> implements CofferSubst
             vmi.setReturnKeys(substKeySet(vmi.returnKeys()));
             vmi.setThrowConstraints(substThrowConstraintList(vmi.throwConstraints()));
 
-            mi = vmi;
+            @SuppressWarnings("unchecked")
+            T result = (T) vmi;
+            return result;
         }
 
         return mi;
     }
 
-    public ConstructorInstance substConstructor(ConstructorInstance ci) {
+    @Override
+    public <T extends ConstructorInstance> T substConstructor(T ci) {
         ci = super.substConstructor(ci);
 
         if (ci instanceof CofferConstructorInstance) {
@@ -85,7 +78,9 @@ public class CofferSubst_c extends Subst_c<Key, Key> implements CofferSubst
             vci.setReturnKeys(substKeySet(vci.returnKeys()));
             vci.setThrowConstraints(substThrowConstraintList(vci.throwConstraints()));
 
-            ci = vci;
+            @SuppressWarnings("unchecked")
+            T result = (T) vci;
+            return result;
         }
 
         return ci;
@@ -94,23 +89,26 @@ public class CofferSubst_c extends Subst_c<Key, Key> implements CofferSubst
     ////////////////////////////////////////////////////////////////
     // Substitution methods for Coffer constructs
 
-    public class ConstraintXform implements Transformation {
-        public Object transform(Object o) {
-            return substThrowConstraint((ThrowConstraint) o);
+    public class ConstraintXform implements
+            Transformation<ThrowConstraint, ThrowConstraint> {
+        @Override
+        public ThrowConstraint transform(ThrowConstraint tc) {
+            return substThrowConstraint(tc);
         }
     }
 
-    public List substThrowConstraintList(List l) {
-        return new CachingTransformingList(l, new ConstraintXform());
+    @Override
+    public List<ThrowConstraint> substThrowConstraintList(
+            List<ThrowConstraint> l) {
+        return new CachingTransformingList<ThrowConstraint, ThrowConstraint>(l,
+                                                                             new ConstraintXform());
     }
 
+    @Override
     public ThrowConstraint substThrowConstraint(ThrowConstraint c) {
         if (c == null) {
             return null;
         }
-
-        CofferTypeSystem ts = (CofferTypeSystem) this.ts;
-        ThrowConstraint c2;
 
         Type t = substType(c.throwType());
         KeySet k = substKeySet(c.keys());
@@ -124,6 +122,7 @@ public class CofferSubst_c extends Subst_c<Key, Key> implements CofferSubst
         return c;
     }
 
+    @Override
     public KeySet substKeySet(KeySet keys) {
         if (keys == null) {
             return null;
@@ -133,8 +132,7 @@ public class CofferSubst_c extends Subst_c<Key, Key> implements CofferSubst
 
         CofferTypeSystem ts = (CofferTypeSystem) this.ts;
         KeySet newKeys = ts.emptyKeySet(keys.position());
-        for (Iterator i = keys.iterator(); i.hasNext(); ) {
-            Key key = (Key) i.next();
+        for (Key key : keys) {
             Key key2 = substKey(key);
             if (key != key2)
                 changed = true;
@@ -147,12 +145,13 @@ public class CofferSubst_c extends Subst_c<Key, Key> implements CofferSubst
         return newKeys;
     }
 
+    @Override
     public Key substKey(Key key) {
 	if (key == null) {
 	    return null;
 	}
 
-        Key newKey = (Key) subst.get(key);
+        Key newKey = subst.get(key);
 
         if (newKey != null) {
             return newKey;

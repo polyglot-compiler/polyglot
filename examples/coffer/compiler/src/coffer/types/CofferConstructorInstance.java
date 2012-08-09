@@ -7,8 +7,7 @@
 
 package coffer.types;
 
-import polyglot.types.*;
-import java.util.*;
+import polyglot.types.ConstructorInstance;
 
 /** Coffer constructor instance. 
  */

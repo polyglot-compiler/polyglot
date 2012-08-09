@@ -7,13 +7,22 @@
 
 package coffer.ast;
 
-import polyglot.ast.*;
-import coffer.types.*;
-import polyglot.types.*;
-import polyglot.util.*;
-import polyglot.visit.*;
+import java.util.List;
 
-import java.util.*;
+import polyglot.ast.Expr;
+import polyglot.ast.Node;
+import polyglot.ast.Stmt_c;
+import polyglot.ast.Term;
+import polyglot.types.SemanticException;
+import polyglot.types.Type;
+import polyglot.util.CodeWriter;
+import polyglot.util.Position;
+import polyglot.visit.CFGBuilder;
+import polyglot.visit.NodeVisitor;
+import polyglot.visit.PrettyPrinter;
+import polyglot.visit.Translator;
+import polyglot.visit.TypeChecker;
+import coffer.types.CofferClassType;
 
 /**
  * This statement revokes the key associated with a tracked expression.
@@ -28,10 +37,12 @@ public class Free_c extends Stmt_c implements Free
         this.expr = expr;
     }
 
+    @Override
     public Expr expr() {
         return expr;
     }
 
+    @Override
     public Free expr(Expr expr) {
         Free_c n = (Free_c) copy();
         n.expr = expr;
@@ -47,14 +58,14 @@ public class Free_c extends Stmt_c implements Free
         return this;
     }
 
+    @Override
     public Node visitChildren(NodeVisitor v) {
         Expr expr = (Expr) visitChild(this.expr, v);
         return reconstruct(expr);
     }
 
+    @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
-        CofferContext c = (CofferContext) tc.context();
-
         Type t = expr.type();
 
         if (! (t instanceof CofferClassType)) {
@@ -64,25 +75,30 @@ public class Free_c extends Stmt_c implements Free
         return this;
     }
 
+    @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
         w.write("free ");
         print(expr, w, tr);
         w.write(";");
     }
 
+    @Override
     public void translate(CodeWriter w, Translator tr) {
         w.write(";");
     }
 
+    @Override
     public String toString() {
         return "free " + expr + ";";
     }
 
+    @Override
     public Term firstChild() {
         return expr;
     }
 
-    public List acceptCFG(CFGBuilder v, List succs) {
+    @Override
+    public <T> List<T> acceptCFG(CFGBuilder<?> v, List<T> succs) {
         v.visitCFG(expr, this, EXIT);
         return succs;
     }
