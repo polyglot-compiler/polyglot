@@ -7,8 +7,14 @@
 
 package pao.extension;
 
-import polyglot.ast.*;
 import pao.types.PaoTypeSystem;
+import polyglot.ast.Binary;
+import polyglot.ast.Call;
+import polyglot.ast.Expr;
+import polyglot.ast.Node;
+import polyglot.ast.NodeFactory;
+import polyglot.ast.TypeNode;
+import polyglot.ast.Unary;
 import polyglot.types.MethodInstance;
 
 /**
@@ -23,13 +29,14 @@ public class PaoBinaryExt_c extends PaoExt_c {
      * @see PaoExt#rewrite(PaoTypeSystem, NodeFactory)
      * @see pao.runtime.Primitive#equals(Object, Object)
      */
+    @Override
     public Node rewrite(PaoTypeSystem ts, NodeFactory nf) {
         Binary b = (Binary) node();
         Expr l = b.left();
         Expr r = b.right();
 
         if (b.operator() == Binary.EQ || b.operator() == Binary.NE) {
-            MethodInstance mi = ((PaoTypeSystem) ts).primitiveEquals();
+            MethodInstance mi = ts.primitiveEquals();
 
             // The container of mi, mi.container(), is the super class of
             // the runtime boxed representations of primitive values.
@@ -46,7 +53,12 @@ public class PaoBinaryExt_c extends PaoExt_c {
                 	// Primitive.equals(Object, Object).
                     TypeNode x = nf.CanonicalTypeNode(b.position(),
                                                       mi.container());
-                    Call y = nf.Call(b.position(), x, mi.name(), l, r);
+                    Call y =
+                            nf.Call(b.position(),
+                                    x,
+                                    nf.Id(mi.position(), mi.name()),
+                                    l,
+                                    r);
                     y = (Call) y.type(mi.returnType());
                     if (b.operator() == Binary.NE) {
                         return nf.Unary(b.position(), Unary.NOT, y).type(mi.returnType());

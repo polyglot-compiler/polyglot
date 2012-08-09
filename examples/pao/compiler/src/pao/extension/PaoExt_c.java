@@ -7,10 +7,10 @@
 
 package pao.extension;
 
+import pao.types.PaoTypeSystem;
+import polyglot.ast.Ext_c;
 import polyglot.ast.Node;
 import polyglot.ast.NodeFactory;
-import polyglot.ast.Ext_c;
-import pao.types.PaoTypeSystem;
 
 /**
  * Default implementation of <code>PaoExt</code>.
@@ -22,6 +22,7 @@ public class PaoExt_c extends Ext_c implements PaoExt {
 	 * 
 	 * @see PaoExt#rewrite(PaoTypeSystem, NodeFactory)
 	 */
+    @Override
     public Node rewrite(PaoTypeSystem ts, NodeFactory nf) {
         return node();
     }

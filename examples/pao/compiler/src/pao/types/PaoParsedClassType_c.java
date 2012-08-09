@@ -7,9 +7,9 @@
 
 package pao.types;
 
-import polyglot.types.ParsedClassType_c;
 import polyglot.frontend.Source;
 import polyglot.types.LazyClassInitializer;
+import polyglot.types.ParsedClassType_c;
 import polyglot.types.Type;
 import polyglot.types.TypeSystem;
 
@@ -35,6 +35,7 @@ public class PaoParsedClassType_c extends ParsedClassType_c {
      * 
      * @see polyglot.types.ClassType_c#isCastValidImpl(Type)
      */
+    @Override
     public boolean isCastValidImpl(Type toType) {
         return toType.isPrimitive() && ts.equals(this, ts.Object())
                 || super.isCastValidImpl(toType);

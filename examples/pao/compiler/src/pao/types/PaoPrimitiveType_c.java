@@ -30,6 +30,7 @@ public class PaoPrimitiveType_c extends PrimitiveType_c
      * <code>Object</code> type, as primitives are considered a
      * subtype of <code>Object</code>.
      */
+    @Override
     public boolean descendsFromImpl(Type ancestor) {
         return ts.equals(ancestor, ts.Object());
     }
@@ -39,6 +40,7 @@ public class PaoPrimitiveType_c extends PrimitiveType_c
      * hold, or if casting a primitive to <code>Object</code>, as primitives
      * are considered a subtype of <code>Object</code>. 
      */
+    @Override
     public boolean isImplicitCastValidImpl(Type toType) {
         return ts.equals(toType, ts.Object()) ||
                super.isImplicitCastValidImpl(toType);
@@ -49,6 +51,7 @@ public class PaoPrimitiveType_c extends PrimitiveType_c
      * hold, or if casting a primitive to <code>Object</code>, as primitives
      * are considered a subtype of <code>Object</code>. 
      */
+    @Override
     public boolean isCastValidImpl(Type toType) {
         return ts.equals(toType, ts.Object()) || super.isCastValidImpl(toType);
     }

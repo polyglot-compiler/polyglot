@@ -7,10 +7,10 @@
 
 package pao.extension;
 
+import pao.types.PaoTypeSystem;
 import polyglot.ast.Ext;
 import polyglot.ast.Node;
 import polyglot.ast.NodeFactory;
-import pao.types.PaoTypeSystem;
 
 /**
  * The <code>Ext</code> interface for the pao extension. The

@@ -8,20 +8,26 @@
 package pao;
 
 import java.io.Reader;
-import java.util.*;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
-import polyglot.ast.NodeFactory;
 import pao.ast.PaoNodeFactory_c;
 import pao.parse.Grm;
 import pao.parse.Lexer_c;
 import pao.types.PaoTypeSystem_c;
 import pao.visit.PaoBoxer;
-import polyglot.frontend.*;
-import polyglot.frontend.goals.*;
+import polyglot.ast.NodeFactory;
+import polyglot.frontend.CupParser;
+import polyglot.frontend.FileSource;
+import polyglot.frontend.JLExtensionInfo;
+import polyglot.frontend.JLScheduler;
+import polyglot.frontend.Job;
+import polyglot.frontend.Parser;
+import polyglot.frontend.Scheduler;
 import polyglot.frontend.goals.Goal;
 import polyglot.frontend.goals.Serialized;
+import polyglot.frontend.goals.VisitorGoal;
 import polyglot.lex.Lexer;
 import polyglot.types.TypeSystem;
 import polyglot.util.ErrorQueue;
@@ -37,27 +43,33 @@ import polyglot.util.ErrorQueue;
  * @see pao.types.PaoTypeSystem_c 
  */
 public class ExtensionInfo extends JLExtensionInfo {
+    @Override
     public String defaultFileExtension() {
         return "pao";
     }
 
+    @Override
     public String compilerName() {
         return "paoc";
     }
 
+    @Override
     public Parser parser(Reader reader, FileSource source, ErrorQueue eq) {
         Lexer lexer = new Lexer_c(reader, source, eq);
         Grm grm = new Grm(lexer, ts, nf, eq);
         return new CupParser(grm, source, eq);
     }
 
+    @Override
     protected NodeFactory createNodeFactory() {
         return new PaoNodeFactory_c();
     }
+    @Override
     protected TypeSystem createTypeSystem() {
         return new PaoTypeSystem_c();
     }
 
+    @Override
     public Scheduler createScheduler() {
         return new PAOScheduler(this);
     }
@@ -72,8 +84,10 @@ public class ExtensionInfo extends JLExtensionInfo {
             NodeFactory nf = job.extensionInfo().nodeFactory();
 
             Goal g = internGoal(new VisitorGoal(job, new PaoBoxer(job, ts, nf)) {
-                public Collection prerequisiteGoals(Scheduler scheduler) {
-                    List l = new ArrayList();
+                @Override
+                        public Collection<Goal> prerequisiteGoals(
+                                Scheduler scheduler) {
+                            List<Goal> l = new ArrayList<Goal>();
                     l.addAll(super.prerequisiteGoals(scheduler));
                     l.add(scheduler.TypeChecked(job));
                     l.add(scheduler.ConstantsChecked(job));
@@ -89,10 +103,12 @@ public class ExtensionInfo extends JLExtensionInfo {
             return g;
         }
 
+        @Override
         public Goal Serialized(final Job job) { 
             Goal g = internGoal(new Serialized(job) {
-                public Collection prerequisiteGoals(Scheduler scheduler) {
-                    List l = new ArrayList();
+                @Override
+                public Collection<Goal> prerequisiteGoals(Scheduler scheduler) {
+                    List<Goal> l = new ArrayList<Goal>();
                     l.addAll(super.prerequisiteGoals(scheduler));
                     l.add(Rewrite(job));
                     return l;

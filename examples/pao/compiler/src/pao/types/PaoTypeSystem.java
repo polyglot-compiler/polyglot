@@ -7,7 +7,11 @@
 
 package pao.types;
 
-import polyglot.types.*;
+import polyglot.types.ClassType;
+import polyglot.types.ConstructorInstance;
+import polyglot.types.MethodInstance;
+import polyglot.types.PrimitiveType;
+import polyglot.types.TypeSystem;
 
 /**
  * The PAO type system interface. Several new methods are added to the

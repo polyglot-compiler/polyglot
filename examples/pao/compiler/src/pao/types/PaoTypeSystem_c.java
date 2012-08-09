@@ -8,13 +8,20 @@
 package pao.types;
 
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
-import polyglot.types.TypeSystem_c;
 import polyglot.frontend.Source;
-import polyglot.types.*;
+import polyglot.types.ClassType;
+import polyglot.types.ConstructorInstance;
+import polyglot.types.LazyClassInitializer;
+import polyglot.types.MethodInstance;
+import polyglot.types.ParsedClassType;
+import polyglot.types.PrimitiveType;
+import polyglot.types.ReferenceType;
+import polyglot.types.SemanticException;
+import polyglot.types.Type;
+import polyglot.types.TypeSystem_c;
 import polyglot.util.InternalCompilerError;
 
 /**
@@ -27,6 +34,7 @@ public class PaoTypeSystem_c extends TypeSystem_c implements PaoTypeSystem {
      * Returns a new instance of <code>PaoPrimitiveType_c</code>
      * @see PaoPrimitiveType_c
      */
+    @Override
     public PrimitiveType createPrimitive(PrimitiveType.Kind kind) {
         return new PaoPrimitiveType_c(this, kind);
     }
@@ -35,6 +43,7 @@ public class PaoTypeSystem_c extends TypeSystem_c implements PaoTypeSystem {
      * Returns a new instance of <code>PaoParsedClassType_c</code>
      * @see PaoParsedClassType_c
      */
+    @Override
     public ParsedClassType createClassType(LazyClassInitializer init, 
                                            Source fromSource) {
         return new PaoParsedClassType_c(this, init, fromSource);
@@ -49,6 +58,7 @@ public class PaoTypeSystem_c extends TypeSystem_c implements PaoTypeSystem {
     /**
      * @see pao.types.PaoTypeSystem#primitiveEquals()
      */
+    @Override
     public MethodInstance primitiveEquals() {
         // The method instance could be cached for greater efficiency,
         // but we are not too worried about this.
@@ -59,14 +69,15 @@ public class PaoTypeSystem_c extends TypeSystem_c implements PaoTypeSystem {
             Type ct = (Type) systemResolver().find(name);
 
             // create an argument list: two arguments of type Object.
-            List args = new LinkedList();
+            List<ClassType> args = new LinkedList<ClassType>();
             args.add(Object());
             args.add(Object());
 
             // take the first method "equals(Object, Object)" in ct.
-            List l = ct.toClass().methods("equals", args);
+            List<? extends MethodInstance> l =
+                    ct.toClass().methods("equals", args);
             if (!l.isEmpty()) {
-                return (MethodInstance)l.get(0);
+                return l.get(0);
             }
         }
         catch (SemanticException e) {
@@ -76,6 +87,7 @@ public class PaoTypeSystem_c extends TypeSystem_c implements PaoTypeSystem {
         throw new InternalCompilerError("Could not find equals method.");
     }
 
+    @Override
     public MethodInstance getter(PrimitiveType t) {
         // The method instances could be cached for greater efficiency,
         // but we are not too worried about this.
@@ -87,14 +99,16 @@ public class PaoTypeSystem_c extends TypeSystem_c implements PaoTypeSystem {
 
         // take the first method with the appropriate name and an empty 
         // argument list, in the type boxedType
-        List l = boxedType.methods(methodName, Collections.EMPTY_LIST);
+        List<? extends MethodInstance> l =
+                boxedType.methods(methodName, Collections.<Type> emptyList());
         if (!l.isEmpty()) {
-            return (MethodInstance)l.get(0);
+            return l.get(0);
         }
 
         throw new InternalCompilerError("Could not find getter for " + t);
     }
 
+    @Override
     public ClassType boxedType(PrimitiveType t) {
         // The class types could be cached for greater efficiency,
         // but we are not too worried about this.
@@ -111,15 +125,15 @@ public class PaoTypeSystem_c extends TypeSystem_c implements PaoTypeSystem {
         }
     }
 
+    @Override
     public ConstructorInstance wrapper(PrimitiveType t) {
         // The constructor instances could be cached for greater efficiency,
         // but we are not too worried about this.
 
         ClassType ct = boxedType(t);
-        for (Iterator i = ct.constructors().iterator(); i.hasNext(); ) {
-            ConstructorInstance ci = (ConstructorInstance) i.next();
+        for (ConstructorInstance ci : ct.constructors()) {
             if (ci.formalTypes().size() == 1) {
-                Type argType = (Type) ci.formalTypes().get(0);
+                Type argType = ci.formalTypes().get(0);
                 if (equals(argType, t)) {
                     // found the appropriate constructor
                     return ci;

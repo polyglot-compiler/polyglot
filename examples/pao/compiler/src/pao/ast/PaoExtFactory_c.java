@@ -7,12 +7,12 @@
 
 package pao.ast;
 
-import polyglot.ast.Ext;
-import polyglot.ast.AbstractExtFactory_c;
 import pao.extension.PaoBinaryExt_c;
 import pao.extension.PaoCastExt_c;
 import pao.extension.PaoExt_c;
 import pao.extension.PaoInstanceofExt_c;
+import polyglot.ast.AbstractExtFactory_c;
+import polyglot.ast.Ext;
 
 /**
  * Extension factory for the pao extension. The extension factory 
@@ -29,6 +29,7 @@ public class PaoExtFactory_c extends AbstractExtFactory_c  {
      * nodes other than <code>InstanceOf</code>, 
      * <code>Cast</code> and <code>Binary</code>.
      */
+    @Override
     public Ext extNodeImpl() {
         return new PaoExt_c();
     }
@@ -36,6 +37,7 @@ public class PaoExtFactory_c extends AbstractExtFactory_c  {
     /**
      * @see AbstractExtFactory_c#extInstanceofImpl()
      */
+    @Override
     public Ext extInstanceofImpl() {
         return new PaoInstanceofExt_c();
     }
@@ -43,6 +45,7 @@ public class PaoExtFactory_c extends AbstractExtFactory_c  {
     /**
      * @see AbstractExtFactory_c#extCastImpl()
      */
+    @Override
     public Ext extCastImpl() {
         return new PaoCastExt_c();
     }
@@ -50,6 +53,7 @@ public class PaoExtFactory_c extends AbstractExtFactory_c  {
     /**
      * @see AbstractExtFactory_c#extBinaryImpl()
      */
+    @Override
     public Ext extBinaryImpl() {
         return new PaoBinaryExt_c();
     }

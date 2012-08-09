@@ -11,8 +11,13 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import polyglot.ast.*;
 import pao.types.PaoTypeSystem;
+import polyglot.ast.Call;
+import polyglot.ast.Cast;
+import polyglot.ast.Expr;
+import polyglot.ast.New;
+import polyglot.ast.Node;
+import polyglot.ast.NodeFactory;
 import polyglot.types.ConstructorInstance;
 import polyglot.types.MethodInstance;
 import polyglot.types.Type;
@@ -28,7 +33,8 @@ public class PaoCastExt_c extends PaoExt_c {
      * @see PaoExt_c#rewrite(PaoTypeSystem, NodeFactory)
      * @see pao.visit.PaoBoxer
      */
-	public Node rewrite(PaoTypeSystem ts, NodeFactory nf) {
+	@Override
+    public Node rewrite(PaoTypeSystem ts, NodeFactory nf) {
 
         Cast c = (Cast) node();
         Type rtype = c.expr().type();
@@ -49,8 +55,11 @@ public class PaoCastExt_c extends PaoExt_c {
                              c.expr());
             x = (Cast) x.type(mi.container());
 
-            Call y = nf.Call(c.position(), x, mi.name(),
-                             Collections.EMPTY_LIST);
+            Call y =
+                    nf.Call(c.position(),
+                            x,
+                            nf.Id(c.position(), mi.name()),
+                            Collections.<Expr> emptyList());
             y = (Call) y.type(mi.returnType());
 
             return y.methodInstance(mi);
@@ -65,7 +74,7 @@ public class PaoCastExt_c extends PaoExt_c {
 
             ConstructorInstance ci = ts.wrapper(rtype.toPrimitive());
 
-            List args = new ArrayList(1);
+            List<Expr> args = new ArrayList<Expr>(1);
             args.add(c.expr());
 
             New x = nf.New(c.position(),

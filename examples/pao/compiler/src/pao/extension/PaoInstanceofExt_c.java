@@ -7,10 +7,10 @@
 
 package pao.extension;
 
+import pao.types.PaoTypeSystem;
 import polyglot.ast.Instanceof;
 import polyglot.ast.Node;
 import polyglot.ast.NodeFactory;
-import pao.types.PaoTypeSystem;
 import polyglot.types.Type;
 
 /**
@@ -26,6 +26,7 @@ public class PaoInstanceofExt_c extends PaoExt_c {
 	 * 
 	 * @see PaoExt#rewrite(PaoTypeSystem, NodeFactory)
 	 */
+    @Override
     public Node rewrite(PaoTypeSystem ts, NodeFactory nf) {
     	Instanceof n = (Instanceof) node();
     	Type rtype = n.compareType().type();

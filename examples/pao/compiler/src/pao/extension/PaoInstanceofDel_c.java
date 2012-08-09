@@ -8,8 +8,8 @@
 package pao.extension;
 
 import polyglot.ast.Instanceof;
-import polyglot.ast.Node;
 import polyglot.ast.JL_c;
+import polyglot.ast.Node;
 import polyglot.types.SemanticException;
 import polyglot.types.Type;
 import polyglot.visit.TypeChecker;
@@ -26,7 +26,8 @@ public class PaoInstanceofDel_c extends JL_c {
 	 * @see polyglot.ast.NodeOps#typeCheck(TypeChecker)
 	 * @see polyglot.ast.Instanceof_c#typeCheck(TypeChecker)
 	 */
-	public Node typeCheck(TypeChecker tc) throws SemanticException {
+	@Override
+    public Node typeCheck(TypeChecker tc) throws SemanticException {
 		Instanceof n = (Instanceof) node();
 		Type rtype = n.compareType().type();
 		Type ltype = n.expr().type();

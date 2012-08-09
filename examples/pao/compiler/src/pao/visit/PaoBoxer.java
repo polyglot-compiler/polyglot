@@ -7,11 +7,11 @@
 
 package pao.visit;
 
+import pao.extension.PaoExt;
+import pao.types.PaoTypeSystem;
 import polyglot.ast.Expr;
 import polyglot.ast.Node;
 import polyglot.ast.NodeFactory;
-import pao.extension.PaoExt;
-import pao.types.PaoTypeSystem;
 import polyglot.frontend.Job;
 import polyglot.types.SemanticException;
 import polyglot.types.Type;
@@ -42,6 +42,7 @@ public class PaoBoxer extends AscriptionVisitor
      * will ensure that these explicit casts are rewritten to the correct
      * boxing and unboxing code.
      */
+    @Override
     public Expr ascribe(Expr e, Type toType) {
         Type fromType = e.type();
 
@@ -66,6 +67,7 @@ public class PaoBoxer extends AscriptionVisitor
      * method to rewrite the explicit casts inserted by the 
      * <code>ascribe</code> method into correct boxing and unboxing code.
      */
+    @Override
     public Node leaveCall(Node old, Node n, NodeVisitor v) throws SemanticException {
         n = super.leaveCall(old, n, v);
 
