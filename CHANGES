@@ -25,6 +25,14 @@ The source code of Polyglot has itself been updated to take advantage of the
 generics support introduced in Java 1.5. This may break older extensions that
 assume non-generic interfaces.
 
+A common pattern used for outputting AST nodes as input to another extension
+has been imported into the Polyglot framework.  The polyglot.translate package
+contains the ExtensionRewriter for rewriting ASTs and many convenience classes
+for default translations.
+
+Parsing of command line options has been overhauled.  These changes bring more
+flexibility to configuring multiple extensions in a pipeline using ExtensionRewriters.
+
 Precedence of = vs. ?: fixed.
  
 The -mergestrings option was added.
