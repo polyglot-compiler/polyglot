@@ -346,6 +346,14 @@ sh ${compiler.sh} %CMD_LINE_ARGS%
             <arg value="${symbol.class}"/>
             <arg value="${cup.file}"/>
         </java>
+	<!-- Hack to suppress warnings in parser. -->
+	<replaceregexp
+	  file="${parser.dir}/${parser.class}.java"
+	  match="^(public )?class"
+	  replace="@SuppressWarnings(&quot;all&quot;) \1class"
+	  flags="g"
+	  byline="yes"
+	/>
     </target>
 
     <!-- Set the property cup.parser.up-to-date if the parser is in fact
