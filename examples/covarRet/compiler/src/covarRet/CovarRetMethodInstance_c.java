@@ -1,9 +1,15 @@
-package polyglot.ext.covarRet;
+package covarRet;
 
-import polyglot.ext.jl.types.*;
-import polyglot.types.*;
-import polyglot.util.*;
-import java.util.*;
+import java.util.List;
+
+import polyglot.types.Flags;
+import polyglot.types.MethodInstance;
+import polyglot.types.MethodInstance_c;
+import polyglot.types.ReferenceType;
+import polyglot.types.SemanticException;
+import polyglot.types.Type;
+import polyglot.types.TypeSystem;
+import polyglot.util.Position;
 
 /**
  * A <code>MethodInstance</code> represents the type information for a Java
@@ -15,12 +21,12 @@ public class CovarRetMethodInstance_c extends MethodInstance_c
     protected CovarRetMethodInstance_c() { }
 
     public CovarRetMethodInstance_c(TypeSystem ts, Position pos,
-	 		    ReferenceType container,
-	                    Flags flags, Type returnType, String name,
-			    List argTypes, List excTypes) {
+            ReferenceType container, Flags flags, Type returnType, String name,
+            List<? extends Type> argTypes, List<? extends Type> excTypes) {
         super(ts, pos, container, flags, returnType, name, argTypes, excTypes);
     }
 
+    @Override
     public boolean canOverrideImpl(MethodInstance mj, boolean quiet) throws SemanticException {
         MethodInstance mi = this;
 

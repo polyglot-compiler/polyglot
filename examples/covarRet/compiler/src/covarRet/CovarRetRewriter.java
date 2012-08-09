@@ -1,11 +1,18 @@
-package polyglot.ext.covarRet;
+package covarRet;
 
-import polyglot.ast.*;
-import polyglot.types.*;
-import polyglot.util.*;
-import polyglot.frontend.*;
-import polyglot.visit.*;
-import java.util.*;
+import polyglot.ast.Call;
+import polyglot.ast.Expr;
+import polyglot.ast.MethodDecl;
+import polyglot.ast.Node;
+import polyglot.ast.NodeFactory;
+import polyglot.frontend.Job;
+import polyglot.types.MethodInstance;
+import polyglot.types.SemanticException;
+import polyglot.types.Type;
+import polyglot.types.TypeSystem;
+import polyglot.util.Position;
+import polyglot.visit.AscriptionVisitor;
+import polyglot.visit.NodeVisitor;
 
 /**
  * This visitor rewrites the AST to translate from Java with covariant returns
@@ -17,6 +24,7 @@ public class CovarRetRewriter extends AscriptionVisitor
         super(job, ts, nf);
     }
 
+    @Override
     public Expr ascribe(Expr e, Type toType) {
         if (e instanceof Call) {
             /* Add a cast to the appropriate subclass, if necessary */
@@ -41,6 +49,7 @@ public class CovarRetRewriter extends AscriptionVisitor
         return e;
     }
 
+    @Override
     public Node leaveCall(Node old, Node n, NodeVisitor v)
         throws SemanticException {
 
@@ -69,9 +78,7 @@ public class CovarRetRewriter extends AscriptionVisitor
     private Type getOverridenReturnType(MethodInstance mi) {
         Type retType = null;
 
-        for (Iterator j = ts.overrides(mi).iterator(); j.hasNext(); ) {
-            MethodInstance mj = (MethodInstance) j.next();
-
+        for (MethodInstance mj : ts.overrides(mi)) {
             if (! ts.isAccessible(mj, this.context)) {
                 break;
             }

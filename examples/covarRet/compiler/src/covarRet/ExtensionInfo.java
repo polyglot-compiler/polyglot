@@ -1,21 +1,26 @@
-package polyglot.ext.covarRet;
+package covarRet;
 
-import polyglot.ast.*;
-import polyglot.types.*;
-import polyglot.util.*;
-import polyglot.visit.*;
-import polyglot.frontend.*;
-import polyglot.frontend.goals.*;
-import polyglot.ext.jl.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
-import java.util.*;
-import java.io.*;
+import polyglot.ast.NodeFactory;
+import polyglot.frontend.JLExtensionInfo;
+import polyglot.frontend.JLScheduler;
+import polyglot.frontend.Job;
+import polyglot.frontend.Scheduler;
+import polyglot.frontend.goals.Goal;
+import polyglot.frontend.goals.Serialized;
+import polyglot.frontend.goals.VisitorGoal;
+import polyglot.types.TypeSystem;
 
 public class ExtensionInfo extends JLExtensionInfo {
+    @Override
     public String defaultFileExtension() {
 	return "jl";
     }
 
+    @Override
     protected TypeSystem createTypeSystem() {
 	return new CovarRetTypeSystem();
     }
@@ -28,6 +33,7 @@ public class ExtensionInfo extends JLExtensionInfo {
 //                                  job, new CovarRetRewriter(job, ts, nf)));
 //        return l;
 //    }
+    @Override
     public Scheduler createScheduler() {
         return new CovarRetScheduler(this);
     }
@@ -42,8 +48,9 @@ public class ExtensionInfo extends JLExtensionInfo {
     		NodeFactory nf = job.extensionInfo().nodeFactory();
     		
     		Goal g = internGoal(new VisitorGoal(job, new CovarRetRewriter(job, ts, nf)) {
-    			public Collection prerequisiteGoals(Scheduler scheduler) {
-                    List l = new ArrayList();
+    			@Override
+                public Collection<Goal> prerequisiteGoals(Scheduler scheduler) {
+                    List<Goal> l = new ArrayList<Goal>();
                     l.addAll(super.prerequisiteGoals(scheduler));
                     l.add(scheduler.TypeChecked(job));
                     l.add(scheduler.ConstantsChecked(job));
@@ -60,10 +67,12 @@ public class ExtensionInfo extends JLExtensionInfo {
     		return g;
     	}
     	
-    	public Goal Serialized(final Job job) {
+    	@Override
+        public Goal Serialized(final Job job) {
     		Goal g = internGoal(new Serialized(job) {
-    			public Collection prerequisiteGoals(Scheduler scheduler) {
-                    List l = new ArrayList();
+    			@Override
+                public Collection<Goal> prerequisiteGoals(Scheduler scheduler) {
+                    List<Goal> l = new ArrayList<Goal>();
                     l.addAll(super.prerequisiteGoals(scheduler));
                     l.add(CovarRetRewrite(job));
                     return l;

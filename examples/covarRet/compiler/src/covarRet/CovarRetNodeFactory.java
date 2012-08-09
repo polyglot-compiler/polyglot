@@ -1,16 +1,15 @@
-package polyglot.ext.covarRet;
+package covarRet;
 
-import polyglot.ast.*;
-import polyglot.ext.jl.ast.*;
-import polyglot.types.Flags;
-import polyglot.types.Package;
-import polyglot.types.Type;
-import polyglot.types.Qualifier;
-import polyglot.util.*;
-import java.util.*;
+import java.util.List;
+
+import polyglot.ast.ClassBody;
+import polyglot.ast.ClassMember;
+import polyglot.ast.NodeFactory_c;
+import polyglot.util.Position;
 
 public class CovarRetNodeFactory extends NodeFactory_c {
-    public ClassBody ClassBody(Position pos, List members) {
+    @Override
+    public ClassBody ClassBody(Position pos, List<ClassMember> members) {
 	return new CovarRetClassBody_c(pos, members);
     }
 }

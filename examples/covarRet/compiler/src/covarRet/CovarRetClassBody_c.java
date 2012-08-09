@@ -1,11 +1,17 @@
-package polyglot.ext.covarRet;
+package covarRet;
 
-import polyglot.ast.*;
-import polyglot.types.*;
-import polyglot.visit.*;
-import polyglot.util.*;
-import polyglot.frontend.*;
-import java.util.*;
+import java.util.List;
+
+import polyglot.ast.ClassBody_c;
+import polyglot.ast.ClassMember;
+import polyglot.types.ClassType;
+import polyglot.types.MethodInstance;
+import polyglot.types.ReferenceType;
+import polyglot.types.SemanticException;
+import polyglot.types.Type;
+import polyglot.types.TypeSystem;
+import polyglot.util.Position;
+import polyglot.visit.TypeChecker;
 
 /**
  * A <code>ClassBody</code> represents the body of a class or interface
@@ -17,7 +23,7 @@ import java.util.*;
  */
 public class CovarRetClassBody_c extends ClassBody_c
 {
-    public CovarRetClassBody_c(Position pos, List members) {
+    public CovarRetClassBody_c(Position pos, List<ClassMember> members) {
         super(pos, members);
     }
 
@@ -25,18 +31,14 @@ public class CovarRetClassBody_c extends ClassBody_c
         ClassType type = tc.context().currentClass();
         TypeSystem ts = tc.typeSystem();
 
-        for (Iterator i = type.methods().iterator(); i.hasNext(); ) {
-            MethodInstance mi = (MethodInstance) i.next();
-
+        for (MethodInstance mi : type.methods()) {
             Type t = type.superType();
 
             while (t instanceof ReferenceType) {
                 ReferenceType rt = (ReferenceType) t;
                 t = rt.superType();
 
-                for (Iterator j = rt.methods().iterator(); j.hasNext(); ) {
-                    MethodInstance mj = (MethodInstance) j.next();
-
+                for (MethodInstance mj : rt.methods()) {
                     if (! mi.name().equals(mj.name()) ||
                         ! mi.hasFormals(mj.formalTypes()) /*(qixin) ts.hasSameArguments(mi, mj) */ ||
                         ! ts.isAccessible(mj, tc.context())) {
