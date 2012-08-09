@@ -7,15 +7,33 @@
 
 package coffer.ast;
 
-import polyglot.ast.*;
-import coffer.types.*;
-import coffer.extension.*;
+import java.util.LinkedList;
+import java.util.List;
+
+import polyglot.ast.ArrayAccess;
+import polyglot.ast.ArrayAccessAssign;
+import polyglot.ast.Assign;
+import polyglot.ast.Block;
+import polyglot.ast.ClassBody;
+import polyglot.ast.ClassDecl;
+import polyglot.ast.ConstructorDecl;
+import polyglot.ast.Expr;
+import polyglot.ast.ExtFactory;
+import polyglot.ast.Field;
+import polyglot.ast.FieldAssign;
+import polyglot.ast.Formal;
+import polyglot.ast.Id;
+import polyglot.ast.Local;
+import polyglot.ast.LocalAssign;
+import polyglot.ast.MethodDecl;
+import polyglot.ast.New;
+import polyglot.ast.NodeFactory_c;
+import polyglot.ast.TypeNode;
 import polyglot.types.Flags;
-import polyglot.types.Package;
-import polyglot.types.Type;
-import polyglot.types.Qualifier;
-import polyglot.util.*;
-import java.util.*;
+import polyglot.util.Position;
+import coffer.extension.AssignDel_c;
+import coffer.types.Key;
+import coffer.types.KeySet;
 
 /** An implementation of the <code>CofferNodeFactory</code> interface. 
  */
@@ -28,52 +46,61 @@ public class CofferNodeFactory_c extends NodeFactory_c implements CofferNodeFact
         super(extFact);
     }
 
-    public New TrackedNew(Position pos, Expr outer, KeyNode key, TypeNode objectType, List args, ClassBody body) {
+    @Override
+    public New TrackedNew(Position pos, Expr outer, KeyNode key,
+            TypeNode objectType, List<Expr> args, ClassBody body) {
         return New(pos, outer, TrackedTypeNode(key.position(), key, objectType), args, body);
         
     }
 
+    @Override
     public Free Free(Position pos, Expr expr) {
         Free n = new Free_c(pos, expr);
         n = (Free)n.ext(((CofferExtFactory_c)extFactory()).extFree());
         return n;
     }
 
+    @Override
     public TrackedTypeNode TrackedTypeNode(Position pos, KeyNode key, TypeNode base) {
         TrackedTypeNode n = new TrackedTypeNode_c(pos, key, base);
         n = (TrackedTypeNode)n.ext(((CofferExtFactory_c)extFactory()).extTrackedTypeNode());
         return n;
     }
 
-    public AmbKeySetNode AmbKeySetNode(Position pos, List keys) {
+    @Override
+    public AmbKeySetNode AmbKeySetNode(Position pos, List<KeyNode> keys) {
         AmbKeySetNode n = new AmbKeySetNode_c(pos, keys);
         n = (AmbKeySetNode)n.ext(((CofferExtFactory_c)extFactory()).extAmbKeySetNode());
         return n;
     }
 
+    @Override
     public CanonicalKeySetNode CanonicalKeySetNode(Position pos, KeySet keys) {
         CanonicalKeySetNode n = new CanonicalKeySetNode_c(pos, keys);
         n = (CanonicalKeySetNode)n.ext(((CofferExtFactory_c)extFactory()).extCanonicalKeySetNode());
         return n;
     }
 
+    @Override
     public KeyNode KeyNode(Position pos, Key key) {
         KeyNode n = new KeyNode_c(pos, key);
         n = (KeyNode)n.ext(((CofferExtFactory_c)extFactory()).extKeyNode());
         return n;
     }
 
+    @Override
     public ClassDecl ClassDecl(Position pos, Flags flags, Id name,
-                               TypeNode superClass, List interfaces,
+            TypeNode superClass, List<TypeNode> interfaces,
                                ClassBody body)
     {
         return CofferClassDecl(pos, flags, name, null,
                               superClass, interfaces, body);
     }
 
+    @Override
     public CofferClassDecl CofferClassDecl(Position pos, Flags flags,
                                          Id name, KeyNode key,
-                                         TypeNode superClass, List interfaces,
+ TypeNode superClass, List<TypeNode> interfaces,
                                          ClassBody body)
     {
         CofferClassDecl n = new CofferClassDecl_c(pos, flags, name, key,
@@ -82,20 +109,21 @@ public class CofferNodeFactory_c extends NodeFactory_c implements CofferNodeFact
         return n;
     }
 
+    @Override
     public ThrowConstraintNode ThrowConstraintNode(Position pos, TypeNode tn, KeySetNode keys) {
         ThrowConstraintNode n = new ThrowConstraintNode_c(pos, tn, keys);
         n = (ThrowConstraintNode)n.ext(((CofferExtFactory_c)extFactory()).extThrowConstraintNode());
         return n;
     }
 
+    @Override
     public MethodDecl MethodDecl(Position pos, Flags flags,
-                                 TypeNode returnType, Id name,
-                                 List argTypes, List excTypes, Block body)
+            TypeNode returnType, Id name, List<Formal> argTypes,
+            List<TypeNode> excTypes, Block body)
     {
-        List l = new LinkedList();
+        List<ThrowConstraintNode> l = new LinkedList<ThrowConstraintNode>();
 
-        for (Iterator i = excTypes.iterator(); i.hasNext(); ) {
-            TypeNode tn = (TypeNode) i.next();
+        for (TypeNode tn : excTypes) {
             l.add(ThrowConstraintNode(tn.position(), tn, null));
         }
 
@@ -104,14 +132,14 @@ public class CofferNodeFactory_c extends NodeFactory_c implements CofferNodeFact
 
     }
 
+    @Override
     public ConstructorDecl ConstructorDecl(Position pos, Flags flags,
-                                           Id name, List argTypes,
-                                           List excTypes, Block body)
+ Id name,
+            List<Formal> argTypes, List<TypeNode> excTypes, Block body)
     {
-        List l = new LinkedList();
+        List<ThrowConstraintNode> l = new LinkedList<ThrowConstraintNode>();
 
-        for (Iterator i = excTypes.iterator(); i.hasNext(); ) {
-            TypeNode tn = (TypeNode) i.next();
+        for (TypeNode tn : excTypes) {
             l.add(ThrowConstraintNode(tn.position(), tn, null));
         }
 
@@ -119,13 +147,12 @@ public class CofferNodeFactory_c extends NodeFactory_c implements CofferNodeFact
                                      null, null, l, body);
     }
 
+    @Override
     public CofferMethodDecl CofferMethodDecl(Position pos, Flags flags,
-                                              TypeNode returnType, Id name,
-                                              List argTypes,
-                                              KeySetNode entryKeys,
-                                              KeySetNode returnKeys,
-                                              List throwConstraints,
-                                              Block body)
+            TypeNode returnType, Id name, List<Formal> argTypes,
+            KeySetNode entryKeys, KeySetNode returnKeys,
+            List<ThrowConstraintNode> throwConstraints,
+ Block body)
     {
         CofferMethodDecl n = new CofferMethodDecl_c(pos, flags, returnType, name, argTypes,
                 entryKeys, returnKeys, throwConstraints, body);
@@ -133,14 +160,11 @@ public class CofferNodeFactory_c extends NodeFactory_c implements CofferNodeFact
         return n;
     }
 
+    @Override
     public CofferConstructorDecl CofferConstructorDecl(Position pos,
-                                                        Flags flags,
-                                                        Id name,
-                                                        List argTypes,
-                                                        KeySetNode entryKeys,
-                                                        KeySetNode returnKeys,
-                                                        List throwConstraints,
-                                                        Block body)
+            Flags flags, Id name, List<Formal> argTypes, KeySetNode entryKeys,
+            KeySetNode returnKeys, List<ThrowConstraintNode> throwConstraints,
+            Block body)
     {
         CofferConstructorDecl n = new CofferConstructorDecl_c(pos, flags, name, argTypes,
                 entryKeys, returnKeys, throwConstraints, body);
@@ -148,15 +172,22 @@ public class CofferNodeFactory_c extends NodeFactory_c implements CofferNodeFact
         return n;
     }
     
+    @Override
     public FieldAssign FieldAssign(Position pos, Field left, Assign.Operator op, Expr right) {
         return (FieldAssign) super.FieldAssign(pos, left, op, right).del(new AssignDel_c());
     }
+
+    @Override
     public ArrayAccessAssign ArrayAccessAssign(Position pos, ArrayAccess left, Assign.Operator op, Expr right) {
         return (ArrayAccessAssign) super.ArrayAccessAssign(pos, left, op, right).del(new AssignDel_c());
     }
+
+    @Override
     public LocalAssign LocalAssign(Position pos, Local left, Assign.Operator op, Expr right) {
         return (LocalAssign) super.LocalAssign(pos, left, op, right).del(new AssignDel_c());
     }
+
+    @Override
     public Assign Assign(Position pos, Expr left, Assign.Operator op, Expr right) {
         return (Assign) super.Assign(pos, left, op, right).del(new AssignDel_c());
     }

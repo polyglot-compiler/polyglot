@@ -7,28 +7,41 @@
 
 package coffer.types;
 
-import polyglot.types.*;
-import polyglot.ext.param.types.*;
-import polyglot.util.*;
-import java.util.*;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
-public class CofferSubst_c extends Subst_c implements CofferSubst
+import polyglot.ast.Formal;
+import polyglot.ext.param.types.Subst_c;
+import polyglot.types.ClassType;
+import polyglot.types.ConstructorInstance;
+import polyglot.types.MethodInstance;
+import polyglot.types.Type;
+import polyglot.util.CachingTransformingList;
+import polyglot.util.InternalCompilerError;
+import polyglot.util.Transformation;
+
+public class CofferSubst_c extends Subst_c<Key, Key> implements CofferSubst
 {
-    public CofferSubst_c(CofferTypeSystem ts, Map subst, Map cache) {
-        super(ts, subst, cache);
+    public CofferSubst_c(CofferTypeSystem ts, Map<Formal, Actual> subst,
+            Map<Formal, Actual> cache) {
+        super(ts, subst);
 
-        for (Iterator i = entries(); i.hasNext(); ) {
-            Map.Entry e = (Map.Entry) i.next();
+        for (Iterator<Entry<Formal, Actual>> i = entries(); i.hasNext();) {
+            Map.Entry e = i.next();
             if (e.getKey() instanceof Key && e.getValue() instanceof Key)
                 continue;
             throw new InternalCompilerError("bad map: " + subst);
         }
     }
 
+    @Override
     public Key get(Key formal) {
-        return (Key) subst.get(formal);
+        return subst.get(formal);
     }
 
+    @Override
     public void put(Key formal, Key actual) {
         subst.put(formal, actual);
     }

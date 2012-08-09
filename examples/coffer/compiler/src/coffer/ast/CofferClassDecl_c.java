@@ -7,13 +7,28 @@
 
 package coffer.ast;
 
-import polyglot.ext.param.types.*;
-import coffer.types.*;
-import polyglot.ast.*;
-import polyglot.types.*;
-import polyglot.visit.*;
-import polyglot.util.*;
-import java.util.*;
+import java.util.Iterator;
+import java.util.List;
+
+import polyglot.ast.ClassBody;
+import polyglot.ast.ClassDecl_c;
+import polyglot.ast.Id;
+import polyglot.ast.Node;
+import polyglot.ast.TypeNode;
+import polyglot.ext.param.types.MuPClass;
+import polyglot.types.Context;
+import polyglot.types.Flags;
+import polyglot.types.SemanticException;
+import polyglot.util.CodeWriter;
+import polyglot.util.Position;
+import polyglot.visit.NodeVisitor;
+import polyglot.visit.PrettyPrinter;
+import polyglot.visit.Translator;
+import polyglot.visit.TypeBuilder;
+import coffer.types.CofferClassType;
+import coffer.types.CofferContext;
+import coffer.types.CofferParsedClassType;
+import coffer.types.CofferTypeSystem;
 
 /**
  * An implementation of the <code>CofferClassDecl</code> interface.
@@ -24,7 +39,8 @@ public class CofferClassDecl_c extends ClassDecl_c implements CofferClassDecl
     protected KeyNode key;
 
     public CofferClassDecl_c(Position pos, Flags flags, Id name,
-	    KeyNode key, TypeNode superClass, List interfaces,
+ KeyNode key,
+            TypeNode superClass, List<TypeNode> interfaces,
 	    ClassBody body) {
 	super(pos, flags, name, superClass, interfaces, body);
         this.key = key;

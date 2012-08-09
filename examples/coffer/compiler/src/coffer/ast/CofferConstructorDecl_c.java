@@ -7,13 +7,39 @@
 
 package coffer.ast;
 
-import coffer.types.*;
-import coffer.extension.*;
-import polyglot.ast.*;
-import polyglot.types.*;
-import polyglot.visit.*;
-import polyglot.util.*;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+
+import polyglot.ast.Block;
+import polyglot.ast.ConstructorDecl;
+import polyglot.ast.ConstructorDecl_c;
+import polyglot.ast.Formal;
+import polyglot.ast.Id;
+import polyglot.ast.Node;
+import polyglot.types.ClassType;
+import polyglot.types.Flags;
+import polyglot.types.SemanticException;
+import polyglot.util.CachingTransformingList;
+import polyglot.util.CodeWriter;
+import polyglot.util.CollectionUtil;
+import polyglot.util.InternalCompilerError;
+import polyglot.util.ListUtil;
+import polyglot.util.Position;
+import polyglot.util.Transformation;
+import polyglot.visit.AmbiguityRemover;
+import polyglot.visit.NodeVisitor;
+import polyglot.visit.PrettyPrinter;
+import polyglot.visit.Translator;
+import polyglot.visit.TypeBuilder;
+import polyglot.visit.TypeChecker;
+import coffer.types.CofferClassType;
+import coffer.types.CofferConstructorInstance;
+import coffer.types.CofferTypeSystem;
+import coffer.types.KeySet;
+import coffer.types.ThrowConstraint;
 
 /** An implementation of the <code>CofferConstructorDecl</code> interface.
  * <code>ConstructorDecl</code> is extended with pre- and post-conditions.
@@ -22,13 +48,15 @@ public class CofferConstructorDecl_c extends ConstructorDecl_c implements Coffer
 {
     protected KeySetNode entryKeys;
     protected KeySetNode returnKeys;
-    protected List throwConstraints;
+    protected List<ThrowConstraintNode> throwConstraints;
 
-    public CofferConstructorDecl_c(Position pos, Flags flags, Id name, List formals, KeySetNode entryKeys, KeySetNode returnKeys, List throwConstraints, Block body) {
+    public CofferConstructorDecl_c(Position pos, Flags flags, Id name,
+            List<Formal> formals, KeySetNode entryKeys, KeySetNode returnKeys,
+            List<ThrowConstraintNode> throwConstraints, Block body) {
 	super(pos, flags, name, formals, Collections.EMPTY_LIST, body);
 	this.entryKeys = entryKeys;
         this.returnKeys = returnKeys;
-	this.throwConstraints = TypedList.copyAndCheck(throwConstraints, ThrowConstraintNode.class, true);
+        this.throwConstraints = ListUtil.copy(throwConstraints, true);
     }
 
     public KeySetNode entryKeys() {
@@ -71,7 +99,7 @@ public class CofferConstructorDecl_c extends ConstructorDecl_c implements Coffer
 
     public CofferConstructorDecl throwConstraints(List throwConstraints) {
 	CofferConstructorDecl_c n = (CofferConstructorDecl_c) copy();
-	n.throwConstraints = TypedList.copyAndCheck(throwConstraints, ThrowConstraintNode.class, true);
+        n.throwConstraints = ListUtil.copy(throwConstraints, true);
 	return n;
     }
 
@@ -96,7 +124,7 @@ public class CofferConstructorDecl_c extends ConstructorDecl_c implements Coffer
 	    CofferConstructorDecl_c n = (CofferConstructorDecl_c) copy();
 	    n.entryKeys = entryKeys;
 	    n.returnKeys = returnKeys;
-	    n.throwConstraints = TypedList.copyAndCheck(throwConstraints, ThrowConstraintNode.class, true);
+            n.throwConstraints = ListUtil.copy(throwConstraints, true);
 	    return (CofferConstructorDecl_c) n.reconstruct(name, formals, Collections.EMPTY_LIST, body);
 	}
 
@@ -108,7 +136,8 @@ public class CofferConstructorDecl_c extends ConstructorDecl_c implements Coffer
         List formals = visitList(this.formals, v);
         KeySetNode entryKeys = (KeySetNode) visitChild(this.entryKeys, v);
         KeySetNode returnKeys = (KeySetNode) visitChild(this.returnKeys, v);
-	List throwConstraints = visitList(this.throwConstraints, v);
+        List<ThrowConstraintNode> throwConstraints =
+                visitList(this.throwConstraints, v);
 	Block body = (Block) visitChild(this.body, v);
 	return reconstruct(name, formals, entryKeys, returnKeys, throwConstraints, body);
     }

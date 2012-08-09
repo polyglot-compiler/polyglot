@@ -7,10 +7,22 @@
 
 package coffer.types;
 
-import polyglot.types.*;
-import polyglot.util.*;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 
-import java.util.*;
+import polyglot.types.Flags;
+import polyglot.types.MethodInstance;
+import polyglot.types.MethodInstance_c;
+import polyglot.types.ReferenceType;
+import polyglot.types.SemanticException;
+import polyglot.types.Type;
+import polyglot.util.CachingTransformingList;
+import polyglot.util.InternalCompilerError;
+import polyglot.util.ListUtil;
+import polyglot.util.Position;
+import polyglot.util.Transformation;
 
 /** An implementation of the <code>CofferMethodInstance</code> interface. 
  */
@@ -30,7 +42,7 @@ public class CofferMethodInstance_c extends MethodInstance_c
 
         this.entryKeys = entryKeys;
         this.returnKeys = returnKeys;
-        this.throwConstraints = TypedList.copyAndCheck(throwConstraints, ThrowConstraint.class, true);
+        this.throwConstraints = ListUtil.copy(throwConstraints, true);
 
         if (entryKeys == null)
             throw new InternalCompilerError("null entry keys for " + this);
@@ -110,7 +122,7 @@ public class CofferMethodInstance_c extends MethodInstance_c
     }
 
     public void setThrowConstraints(List throwConstraints) {
-        this.throwConstraints = TypedList.copyAndCheck(throwConstraints, ThrowConstraint.class, true);
+        this.throwConstraints = ListUtil.copy(throwConstraints, true);
     }
 
     public boolean canOverrideImpl(MethodInstance mj, boolean quiet) throws SemanticException {

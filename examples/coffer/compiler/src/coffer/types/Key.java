@@ -7,9 +7,7 @@
 
 package coffer.types;
 
-import polyglot.types.*;
-import polyglot.visit.*;
-import polyglot.util.*;
+import polyglot.types.TypeObject;
 
 public interface Key extends TypeObject
 {

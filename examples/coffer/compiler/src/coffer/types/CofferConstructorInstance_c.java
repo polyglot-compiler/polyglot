@@ -7,9 +7,21 @@
 
 package coffer.types;
 
-import polyglot.types.*;
-import polyglot.util.*;
-import java.util.*;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+
+import polyglot.types.ClassType;
+import polyglot.types.ConstructorInstance_c;
+import polyglot.types.Flags;
+import polyglot.types.Type;
+import polyglot.util.CachingTransformingList;
+import polyglot.util.InternalCompilerError;
+import polyglot.util.ListUtil;
+import polyglot.util.Position;
+import polyglot.util.Transformation;
+import coffer.ast.ThrowConstraintNode;
 
 /** An implementation of the <code>CofferConstructorInstance</code> interface. 
  */
@@ -18,7 +30,7 @@ public class CofferConstructorInstance_c extends ConstructorInstance_c
 {
     protected KeySet entryKeys;
     protected KeySet returnKeys;
-    protected List throwConstraints;
+    protected List<ThrowConstraintNode> throwConstraints;
 
     public CofferConstructorInstance_c(CofferTypeSystem ts, Position pos,
 	    ClassType container, Flags flags,
@@ -28,7 +40,7 @@ public class CofferConstructorInstance_c extends ConstructorInstance_c
 	super(ts, pos, container, flags, argTypes, Collections.EMPTY_LIST);
         this.entryKeys = entryKeys;
         this.returnKeys = returnKeys;
-        this.throwConstraints = TypedList.copyAndCheck(throwConstraints, ThrowConstraint.class, true);
+        this.throwConstraints = ListUtil.copy(throwConstraints, true);
 
         if (entryKeys == null)
             throw new InternalCompilerError("null entry keys for " + this);
@@ -108,7 +120,7 @@ public class CofferConstructorInstance_c extends ConstructorInstance_c
     }
 
     public void setThrowConstraints(List throwConstraints) {
-        this.throwConstraints = TypedList.copyAndCheck(throwConstraints, ThrowConstraint.class, true);
+        this.throwConstraints = ListUtil.copy(throwConstraints, true);
     }
 
     public String toString() {

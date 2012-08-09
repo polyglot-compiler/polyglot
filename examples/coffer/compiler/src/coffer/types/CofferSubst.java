@@ -7,17 +7,19 @@
 
 package coffer.types;
 
-import polyglot.types.*;
-import polyglot.ext.param.types.*;
-import polyglot.util.*;
-import java.util.*;
+import java.util.List;
 
-public interface CofferSubst extends Subst
+import polyglot.ext.param.types.Param;
+import polyglot.ext.param.types.Subst;
+
+public interface CofferSubst<Formal extends Param> extends Subst<Key, Key>
 {
     public Key substKey(Key key);
     public KeySet substKeySet(KeySet key);
     public ThrowConstraint substThrowConstraint(ThrowConstraint c);
-    public List substThrowConstraintList(List l);
+
+    public List<ThrowConstraint> substThrowConstraintList(
+            List<ThrowConstraint> l);
 
     public Key get(Key formal);
     public void put(Key formal, Key actual);
