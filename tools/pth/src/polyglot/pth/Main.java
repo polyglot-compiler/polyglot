@@ -1,7 +1,7 @@
 package polyglot.pth;
 
 /**
- * 
+ *  Main program for the Polyglot Test Harness
  */
 public class Main {
     public static void main(String[] args) {
