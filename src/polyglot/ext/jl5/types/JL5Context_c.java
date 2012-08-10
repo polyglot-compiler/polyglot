@@ -54,12 +54,14 @@ public class JL5Context_c extends Context_c implements JL5Context {
                 for (String next : jit.singleStaticImports()) {
                     String id = StringUtil.getShortNameComponent(next);
                     if (name.equals(id)) {
-                        Named nt = ts.forName(StringUtil.getPackageComponent(next));
+                        Named nt =
+                                ts.forName(StringUtil.getPackageComponent(next));
                         if (nt instanceof Type) {
                             Type t = (Type) nt;
                             try {
                                 vi = ts.findField(t.toClass(), name);
-                            } catch (SemanticException e) {
+                            }
+                            catch (SemanticException e) {
                             }
                             if (vi != null) {
                                 return vi;
@@ -74,15 +76,16 @@ public class JL5Context_c extends Context_c implements JL5Context {
                             Type t = (Type) nt;
                             try {
                                 vi = ts.findField(t.toClass(), name);
-                            } catch (SemanticException e) {
                             }
-                            if (vi != null)
-                                return vi;
+                            catch (SemanticException e) {
+                            }
+                            if (vi != null) return vi;
                         }
                     }
                 }
             }
-        } catch (SemanticException e) {
+        }
+        catch (SemanticException e) {
         }
 
         if (outer != null) {
@@ -97,7 +100,7 @@ public class JL5Context_c extends Context_c implements JL5Context {
         c.typeVars = null;
         return c;
     }
-    
+
     /**
      * pushes an additional static scoping level.
      */
@@ -142,8 +145,8 @@ public class JL5Context_c extends Context_c implements JL5Context {
 
     @Override
     public String toString() {
-        return super.toString() + "; type var: " + typeVariable + "; type vars: "
-        + typeVars;
+        return super.toString() + "; type var: " + typeVariable
+                + "; type vars: " + typeVars;
     }
 
     @Override
@@ -175,19 +178,23 @@ public class JL5Context_c extends Context_c implements JL5Context {
     }
 
     @Override
-    public MethodInstance findMethod(String name, List<? extends Type> argTypes) throws SemanticException {
+    public MethodInstance findMethod(String name, List<? extends Type> argTypes)
+            throws SemanticException {
         try {
             return super.findMethod(name, argTypes);
         }
         catch (SemanticException e) {
             // couldn't find the method.
             // try static imports.
-            JL5ImportTable it = (JL5ImportTable)this.importTable();
+            JL5ImportTable it = (JL5ImportTable) this.importTable();
             if (it != null && this.currentClass() != null) {
                 ReferenceType rt = it.findTypeContainingMethodOrField(name);
                 if (rt != null) {
                     try {
-                        return ts.findMethod(rt, name, argTypes, this.currentClass());
+                        return ts.findMethod(rt,
+                                             name,
+                                             argTypes,
+                                             this.currentClass());
                     }
                     catch (SemanticException f) {
                         // ignore this exception and throw the previous one.
@@ -207,6 +214,5 @@ public class JL5Context_c extends Context_c implements JL5Context {
     public ClassType extendsClauseDeclaringClass() {
         return this.declaringClass;
     }
-
 
 }

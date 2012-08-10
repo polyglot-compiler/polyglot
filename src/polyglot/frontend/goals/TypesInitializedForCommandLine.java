@@ -36,7 +36,7 @@ public class TypesInitializedForCommandLine extends Barrier {
     protected TypesInitializedForCommandLine(Scheduler scheduler) {
         super("TYPES_INIT_BARRIER", scheduler);
     }
-    
+
     @Override
     public Goal goalForJob(Job j) {
         return scheduler.TypesInitialized(j);

@@ -31,8 +31,7 @@ import java.util.List;
 /**
  * A <code>SilentErrorQueue</code> records but does not output error messages.
  */
-public class SilentErrorQueue extends AbstractErrorQueue
-{
+public class SilentErrorQueue extends AbstractErrorQueue {
     private List<ErrorInfo> errors;
 
     public SilentErrorQueue(int limit, String name) {
@@ -44,7 +43,7 @@ public class SilentErrorQueue extends AbstractErrorQueue
     public void displayError(ErrorInfo e) {
         errors.add(e);
     }
-    
+
     public List<ErrorInfo> getErrors() {
         return errors;
     }

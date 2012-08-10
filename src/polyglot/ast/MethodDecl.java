@@ -32,8 +32,7 @@ import java.util.List;
 /**
  * A method declaration.
  */
-public interface MethodDecl extends ProcedureDecl 
-{
+public interface MethodDecl extends ProcedureDecl {
     /** The method's flags. */
     @Override
     Flags flags();
@@ -49,10 +48,10 @@ public interface MethodDecl extends ProcedureDecl
 
     /** The method's name. */
     Id id();
-    
+
     /** Set the method's name. */
     MethodDecl id(Id name);
-    
+
     /** The method's name. */
     @Override
     String name();

@@ -78,31 +78,33 @@ public class ExtensionInfo extends polyglot.ext.param.ExtensionInfo {
             super(extInfo);
         }
 
-        public Goal KeyCheck(final Job job) { 
+        public Goal KeyCheck(final Job job) {
             TypeSystem ts = job.extensionInfo().typeSystem();
             NodeFactory nf = job.extensionInfo().nodeFactory();
 
-            Goal g = internGoal(new VisitorGoal(job, new KeyChecker(job, ts, nf)) {
+            Goal g =
+                    internGoal(new VisitorGoal(job, new KeyChecker(job, ts, nf)) {
                         @Override
-                public Collection<Goal> prerequisiteGoals(Scheduler scheduler) {
-                    List<Goal> l = new ArrayList<Goal>();
-                    l.addAll(super.prerequisiteGoals(scheduler));
-                    l.add(scheduler.TypeChecked(job));
-                    l.add(scheduler.ConstantsChecked(job));
-                    l.add(scheduler.ReachabilityChecked(job));
-                    l.add(scheduler.ExceptionsChecked(job));
-                    l.add(scheduler.ExitPathsChecked(job));
-                    l.add(scheduler.InitializationsChecked(job));
-                    l.add(scheduler.ConstructorCallsChecked(job));
-                    l.add(scheduler.ForwardReferencesChecked(job));
-                    return l;
-                }
-            });
+                        public Collection<Goal> prerequisiteGoals(
+                                Scheduler scheduler) {
+                            List<Goal> l = new ArrayList<Goal>();
+                            l.addAll(super.prerequisiteGoals(scheduler));
+                            l.add(scheduler.TypeChecked(job));
+                            l.add(scheduler.ConstantsChecked(job));
+                            l.add(scheduler.ReachabilityChecked(job));
+                            l.add(scheduler.ExceptionsChecked(job));
+                            l.add(scheduler.ExitPathsChecked(job));
+                            l.add(scheduler.InitializationsChecked(job));
+                            l.add(scheduler.ConstructorCallsChecked(job));
+                            l.add(scheduler.ForwardReferencesChecked(job));
+                            return l;
+                        }
+                    });
             return g;
         }
 
         @Override
-        public Goal Serialized(final Job job) { 
+        public Goal Serialized(final Job job) {
             Goal g = internGoal(new Serialized(job) {
                 @Override
                 public Collection<Goal> prerequisiteGoals(Scheduler scheduler) {
@@ -118,6 +120,6 @@ public class ExtensionInfo extends polyglot.ext.param.ExtensionInfo {
 
     static {
         // Make sure the class Topics is loaded.
-        new Topics(); 
+        new Topics();
     }
 }

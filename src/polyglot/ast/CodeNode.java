@@ -31,8 +31,7 @@ import polyglot.types.CodeInstance;
  * A code node.  A "code" is the supertype of methods,
  * constructors, and initalizers.
  */
-public interface CodeNode extends Term
-{
+public interface CodeNode extends Term {
     /** The body of the method, constructor, initializer, or field initializer. */
     Term codeBody();
 

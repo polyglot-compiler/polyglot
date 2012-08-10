@@ -36,8 +36,7 @@ import polyglot.util.CodeWriter;
  * 
  * TODO: The class should probably be renamed to, say, CompilationUnit.
  */
-public class Job
-{
+public class Job {
     /** Field used for storing extension-specific information. */
     protected JobExt ext;
 
@@ -61,7 +60,7 @@ public class Job
 
     /** The <code>Source</code> that this <code>Job</code> represents. */
     protected Source source;
-    
+
     /**
      * Global constant representing a job that has been completed.
      */
@@ -80,7 +79,7 @@ public class Job
     }
 
     public JobExt ext() {
-      return ext;
+        return ext;
     }
 
     public void setRunningPass(Pass pass) {
@@ -113,7 +112,7 @@ public class Job
 
     /** Get the state's AST. */
     public Node ast() {
-	return ast;
+        return ast;
     }
 
     /** Set the state's AST. */
@@ -127,9 +126,9 @@ public class Job
     }
 
     public void dump(CodeWriter cw) {
-	if (ast != null) {
-	    ast.dump(cw);
-	}
+        if (ast != null) {
+            ast.dump(cw);
+        }
     }
 
     /**
@@ -139,7 +138,7 @@ public class Job
     public Source source() {
         return this.source;
     }
-    
+
     /**
      * Returns whether the source for this job was explicitly specified
      * by the user, or if it was drawn into the compilation process due
@@ -150,23 +149,23 @@ public class Job
     }
 
     public void updateStatus(boolean status) {
-        if (! status) {
+        if (!status) {
             this.status = false;
         }
     }
-   
+
     public boolean status() {
         return status;
     }
 
     public ExtensionInfo extensionInfo() {
-	return lang;
+        return lang;
     }
 
     public Compiler compiler() {
-	return lang.compiler();
+        return lang.compiler();
     }
-    
+
     @Override
     public String toString() {
         return source.toString();
@@ -176,7 +175,7 @@ public class Job
     public int hashCode() {
         return source.hashCode();
     }
-    
+
     @Override
     public boolean equals(Object o) {
         return o instanceof Job && ((Job) o).source.equals(source);

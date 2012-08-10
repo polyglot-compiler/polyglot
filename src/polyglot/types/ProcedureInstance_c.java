@@ -37,28 +37,27 @@ import polyglot.util.SubtypeSet;
  * A <code>ProcedureInstance_c</code> contains the type information for a Java
  * procedure (either a method or a constructor).
  */
-public abstract class ProcedureInstance_c extends TypeObject_c
-                                       implements ProcedureInstance
-{
+public abstract class ProcedureInstance_c extends TypeObject_c implements
+        ProcedureInstance {
     protected ReferenceType container;
     protected Flags flags;
     protected List<Type> formalTypes;
     protected List<Type> throwTypes;
 
     /** Used for deserializing types. */
-    protected ProcedureInstance_c() { }
+    protected ProcedureInstance_c() {
+    }
 
     public ProcedureInstance_c(TypeSystem ts, Position pos,
-			       ReferenceType container,
-			       Flags flags, List<? extends Type> formalTypes,
-			       List<? extends Type> excTypes) {
+            ReferenceType container, Flags flags,
+            List<? extends Type> formalTypes, List<? extends Type> excTypes) {
         super(ts, pos);
-	this.container = container;
-	this.flags = flags;
-	this.formalTypes = ListUtil.copy(formalTypes, true);
-	this.throwTypes = ListUtil.copy(excTypes, true);
+        this.container = container;
+        this.flags = flags;
+        this.formalTypes = ListUtil.copy(formalTypes, true);
+        this.throwTypes = ListUtil.copy(excTypes, true);
     }
-    
+
     public ReferenceType container() {
         return container;
     }
@@ -84,14 +83,14 @@ public abstract class ProcedureInstance_c extends TypeObject_c
     public void setContainer(ReferenceType container) {
         this.container = container;
     }
-    
+
     /**
      * @param flags The flags to set.
      */
     public void setFlags(Flags flags) {
         this.flags = flags;
     }
-    
+
     /**
      * @param formalTypes The formalTypes to set.
      */
@@ -99,7 +98,7 @@ public abstract class ProcedureInstance_c extends TypeObject_c
     public void setFormalTypes(List<? extends Type> formalTypes) {
         this.formalTypes = ListUtil.copy(formalTypes, true);
     }
-    
+
     /**
      * @param throwTypes The throwTypes to set.
      */
@@ -107,7 +106,7 @@ public abstract class ProcedureInstance_c extends TypeObject_c
     public void setThrowTypes(List<? extends Type> throwTypes) {
         this.throwTypes = ListUtil.copy(throwTypes, true);
     }
-     
+
     @Override
     public int hashCode() {
         return container.hashCode() + flags.hashCode();
@@ -116,30 +115,29 @@ public abstract class ProcedureInstance_c extends TypeObject_c
     @Override
     public boolean equalsImpl(TypeObject o) {
         if (o instanceof ProcedureInstance) {
-	    ProcedureInstance i = (ProcedureInstance) o;
-	    // FIXME: Check excTypes too?
-	    return flags.equals(i.flags())
-	        && ts.hasFormals(this, i.formalTypes());
-	}
+            ProcedureInstance i = (ProcedureInstance) o;
+            // FIXME: Check excTypes too?
+            return flags.equals(i.flags())
+                    && ts.hasFormals(this, i.formalTypes());
+        }
 
-	return false;
+        return false;
     }
 
     protected boolean listIsCanonical(List<? extends TypeObject> l) {
-	for (TypeObject o : l) {
-	    if (! o.isCanonical()) {
-		return false;
-	    }
-	}
+        for (TypeObject o : l) {
+            if (!o.isCanonical()) {
+                return false;
+            }
+        }
 
-	return true;
+        return true;
     }
 
     @Override
     public final boolean moreSpecific(ProcedureInstance p) {
         return ts.moreSpecific(this, p);
     }
-
 
     /**
      * Returns whether <code>this</code> is <i>more specific</i> than
@@ -158,10 +156,11 @@ public abstract class ProcedureInstance_c extends TypeObject_c
         // rule 1:
         ReferenceType t1 = null;
         ReferenceType t2 = null;
-        
+
         if (p1 instanceof MemberInstance) {
             if (p1 instanceof Declaration) {
-                t1 = ((MemberInstance) ((Declaration) p1).declaration()).container();
+                t1 =
+                        ((MemberInstance) ((Declaration) p1).declaration()).container();
             }
             else {
                 t1 = ((MemberInstance) p1).container();
@@ -169,22 +168,22 @@ public abstract class ProcedureInstance_c extends TypeObject_c
         }
         if (p2 instanceof MemberInstance) {
             if (p2 instanceof Declaration) {
-                t2 = ((MemberInstance) ((Declaration) p2).declaration()).container();
+                t2 =
+                        ((MemberInstance) ((Declaration) p2).declaration()).container();
             }
             else {
                 t2 = ((MemberInstance) p2).container();
             }
         }
-        
+
         if (t1 != null && t2 != null) {
             if (t1.isClass() && t2.isClass()) {
-                if (! t1.isSubtype(t2) &&
-                        ! t1.toClass().isEnclosed(t2.toClass())) {
+                if (!t1.isSubtype(t2) && !t1.toClass().isEnclosed(t2.toClass())) {
                     return false;
                 }
             }
             else {
-                if (! t1.isSubtype(t2)) {
+                if (!t1.isSubtype(t2)) {
                     return false;
                 }
             }
@@ -213,12 +212,12 @@ public abstract class ProcedureInstance_c extends TypeObject_c
             Type t1 = i1.next();
             Type t2 = i2.next();
 
-            if (! ts.equals(t1, t2)) {
+            if (!ts.equals(t1, t2)) {
                 return false;
             }
         }
 
-        return ! (i1.hasNext() || i2.hasNext());
+        return !(i1.hasNext() || i2.hasNext());
     }
 
     /** Returns true iff <code>this</code> throws fewer exceptions than
@@ -239,7 +238,7 @@ public abstract class ProcedureInstance_c extends TypeObject_c
         s2.addAll(p.throwTypes());
 
         for (Type t : s1) {
-            if (! ts.isUncheckedException(t) && ! s2.contains(t)) {
+            if (!ts.isUncheckedException(t) && !s2.contains(t)) {
                 return false;
             }
         }
@@ -266,11 +265,11 @@ public abstract class ProcedureInstance_c extends TypeObject_c
             Type t1 = i1.next();
             Type t2 = i2.next();
 
-            if (! ts.isImplicitCastValid(t2, t1)) {
+            if (!ts.isImplicitCastValid(t2, t1)) {
                 return false;
             }
         }
 
-        return ! (i1.hasNext() || i2.hasNext());
+        return !(i1.hasNext() || i2.hasNext());
     }
 }

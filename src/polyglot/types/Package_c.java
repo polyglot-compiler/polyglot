@@ -32,8 +32,7 @@ import polyglot.util.CodeWriter;
  * not be fully qualified. Package types are never canonical and never
  * primitive.
  */
-public class Package_c extends TypeObject_c implements Package
-{
+public class Package_c extends TypeObject_c implements Package {
     protected Package prefix;
     protected String name;
     /**
@@ -42,8 +41,9 @@ public class Package_c extends TypeObject_c implements Package
     protected String fullname = null;
 
     /** Used for deserializing types. */
-    protected Package_c() { }
-    
+    protected Package_c() {
+    }
+
     public Package_c(TypeSystem ts) {
         this(ts, null, null);
     }
@@ -58,36 +58,37 @@ public class Package_c extends TypeObject_c implements Package
         this.name = name;
         this.decl = this;
     }
-    
+
     protected transient Resolver memberCache;
-    
+
     @Override
     public Resolver resolver() {
         if (memberCache == null) {
-            memberCache = new CachingResolver(ts.createPackageContextResolver(this));
+            memberCache =
+                    new CachingResolver(ts.createPackageContextResolver(this));
         }
         return memberCache;
     }
-    
+
     @Override
     public Package_c copy() {
         Package_c n = (Package_c) super.copy();
         n.memberCache = null;
         return n;
     }
-    
+
     protected Package decl;
-    
+
     @Override
     public Declaration declaration() {
         return decl;
     }
-    
+
     @Override
     public void setDeclaration(Declaration decl) {
-        this.decl = (Package) decl;        
+        this.decl = (Package) decl;
     }
-    
+
     @Override
     public boolean equalsImpl(TypeObject o) {
         if (o instanceof Package) {
@@ -95,52 +96,61 @@ public class Package_c extends TypeObject_c implements Package
             if (name.equals(p.name())) {
                 if (prefix == null)
                     return p.prefix() == null;
-                else
-                    return ts.equals(prefix, p.prefix());
+                else return ts.equals(prefix, p.prefix());
             }
         }
         return false;
     }
-        
+
     @Override
     public final boolean packageEquals(Package p) {
         return ts.packageEquals(this, p);
     }
-    
+
     @Override
     public boolean packageEqualsImpl(Package p) {
         if (name.equals(p.name())) {
             if (prefix == null)
                 return p.prefix() == null;
-            else
-                return ts.packageEquals(prefix, p.prefix());
+            else return ts.packageEquals(prefix, p.prefix());
         }
         return false;
     }
 
     @Override
-    public boolean isType() { return false; }
+    public boolean isType() {
+        return false;
+    }
+
     @Override
-    public boolean isPackage() { return true; }
+    public boolean isPackage() {
+        return true;
+    }
+
     @Override
-    public Type toType() { return null; }
+    public Type toType() {
+        return null;
+    }
+
     @Override
-    public Package toPackage() { return this; }
+    public Package toPackage() {
+        return this;
+    }
 
     @Override
     public Package prefix() {
-	return prefix;
+        return prefix;
     }
 
     @Override
     public String name() {
-	return name;
+        return name;
     }
 
     @Override
     public String translate(Resolver c) {
         if (prefix() == null) {
-          return name();
+            return name();
         }
 
         return prefix().translate(c) + "." + name();
@@ -149,23 +159,25 @@ public class Package_c extends TypeObject_c implements Package
     @Override
     public String fullName() {
         if (fullname == null) {
-            fullname = prefix() == null ? name : prefix().fullName() + "." + name;
+            fullname =
+                    prefix() == null ? name : prefix().fullName() + "." + name;
         }
         return fullname;
     }
 
     @Override
     public String toString() {
-	return prefix() == null ? name : prefix().toString() + "." + name;
+        return prefix() == null ? name : prefix().toString() + "." + name;
     }
+
     @Override
     public void print(CodeWriter w) {
-	if (prefix() != null) {
-	    prefix().print(w);
-	    w.write(".");
-	    w.allowBreak(2, 3, "", 0);
-	}
-	w.write(name);
+        if (prefix() != null) {
+            prefix().print(w);
+            w.write(".");
+            w.allowBreak(2, 3, "", 0);
+        }
+        w.write(name);
     }
 
     @Override
@@ -175,6 +187,6 @@ public class Package_c extends TypeObject_c implements Package
 
     @Override
     public boolean isCanonical() {
-	return true;
+        return true;
     }
 }

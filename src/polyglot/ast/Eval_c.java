@@ -40,39 +40,38 @@ import polyglot.visit.PrettyPrinter;
  * An <code>Eval</code> is a wrapper for an expression in the context of
  * a statement.
  */
-public class Eval_c extends Stmt_c implements Eval
-{
+public class Eval_c extends Stmt_c implements Eval {
     protected Expr expr;
 
     public Eval_c(Position pos, Expr expr) {
-	super(pos);
-	assert(expr != null);
-	this.expr = expr;
+        super(pos);
+        assert (expr != null);
+        this.expr = expr;
     }
 
     /** Get the expression of the statement. */
     @Override
     public Expr expr() {
-	return this.expr;
+        return this.expr;
     }
 
     /** Set the expression of the statement. */
     @Override
     public Eval expr(Expr expr) {
-	Eval_c n = (Eval_c) copy();
-	n.expr = expr;
-	return n;
+        Eval_c n = (Eval_c) copy();
+        n.expr = expr;
+        return n;
     }
 
     /** Reconstruct the statement. */
     protected Eval_c reconstruct(Expr expr) {
-	if (expr != this.expr) {
-	    Eval_c n = (Eval_c) copy();
-	    n.expr = expr;
-	    return n;
-	}
+        if (expr != this.expr) {
+            Eval_c n = (Eval_c) copy();
+            n.expr = expr;
+            return n;
+        }
 
-	return this;
+        return this;
     }
 
     @Override
@@ -89,27 +88,27 @@ public class Eval_c extends Stmt_c implements Eval
     /** Visit the children of the statement. */
     @Override
     public Node visitChildren(NodeVisitor v) {
-	Expr expr = (Expr) visitChild(this.expr, v);
-	return reconstruct(expr);
+        Expr expr = (Expr) visitChild(this.expr, v);
+        return reconstruct(expr);
     }
 
     @Override
     public String toString() {
-	return "eval(" + expr.toString() + ");";
+        return "eval(" + expr.toString() + ");";
     }
 
     /** Write the statement to an output file. */
     @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
-	boolean semi = tr.appendSemicolon(true);
+        boolean semi = tr.appendSemicolon(true);
 
-	print(expr, w, tr);
+        print(expr, w, tr);
 
-	if (semi) {
-	    w.write(";");
-	}
+        if (semi) {
+            w.write(";");
+        }
 
-	tr.appendSemicolon(semi);
+        tr.appendSemicolon(semi);
     }
 
     @Override
@@ -122,6 +121,7 @@ public class Eval_c extends Stmt_c implements Eval
         v.visitCFG(expr, this, EXIT);
         return succs;
     }
+
     @Override
     public Node copy(NodeFactory nf) {
         return nf.Eval(this.position, this.expr);

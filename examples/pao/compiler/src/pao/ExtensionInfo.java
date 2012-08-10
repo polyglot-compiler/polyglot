@@ -64,6 +64,7 @@ public class ExtensionInfo extends JLExtensionInfo {
     protected NodeFactory createNodeFactory() {
         return new PaoNodeFactory_c();
     }
+
     @Override
     protected TypeSystem createTypeSystem() {
         return new PaoTypeSystem_c();
@@ -79,32 +80,33 @@ public class ExtensionInfo extends JLExtensionInfo {
             super(extInfo);
         }
 
-        public Goal Rewrite(final Job job) { 
+        public Goal Rewrite(final Job job) {
             TypeSystem ts = job.extensionInfo().typeSystem();
             NodeFactory nf = job.extensionInfo().nodeFactory();
 
-            Goal g = internGoal(new VisitorGoal(job, new PaoBoxer(job, ts, nf)) {
-                @Override
+            Goal g =
+                    internGoal(new VisitorGoal(job, new PaoBoxer(job, ts, nf)) {
+                        @Override
                         public Collection<Goal> prerequisiteGoals(
                                 Scheduler scheduler) {
                             List<Goal> l = new ArrayList<Goal>();
-                    l.addAll(super.prerequisiteGoals(scheduler));
-                    l.add(scheduler.TypeChecked(job));
-                    l.add(scheduler.ConstantsChecked(job));
-                    l.add(scheduler.ReachabilityChecked(job));
-                    l.add(scheduler.ExceptionsChecked(job));
-                    l.add(scheduler.ExitPathsChecked(job));
-                    l.add(scheduler.InitializationsChecked(job));
-                    l.add(scheduler.ConstructorCallsChecked(job));
-                    l.add(scheduler.ForwardReferencesChecked(job));
-                    return l;
-                }
-            });
+                            l.addAll(super.prerequisiteGoals(scheduler));
+                            l.add(scheduler.TypeChecked(job));
+                            l.add(scheduler.ConstantsChecked(job));
+                            l.add(scheduler.ReachabilityChecked(job));
+                            l.add(scheduler.ExceptionsChecked(job));
+                            l.add(scheduler.ExitPathsChecked(job));
+                            l.add(scheduler.InitializationsChecked(job));
+                            l.add(scheduler.ConstructorCallsChecked(job));
+                            l.add(scheduler.ForwardReferencesChecked(job));
+                            return l;
+                        }
+                    });
             return g;
         }
 
         @Override
-        public Goal Serialized(final Job job) { 
+        public Goal Serialized(final Job job) {
             Goal g = internGoal(new Serialized(job) {
                 @Override
                 public Collection<Goal> prerequisiteGoals(Scheduler scheduler) {
@@ -120,6 +122,6 @@ public class ExtensionInfo extends JLExtensionInfo {
 
     static {
         // Make sure the class Topics is loaded.
-        new Topics(); 
+        new Topics();
     }
 }

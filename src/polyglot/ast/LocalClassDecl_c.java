@@ -39,39 +39,38 @@ import polyglot.visit.PrettyPrinter;
  * A local class declaration statement.  The node is just a wrapper around
  * a class declaration.
  */
-public class LocalClassDecl_c extends Stmt_c implements LocalClassDecl
-{
+public class LocalClassDecl_c extends Stmt_c implements LocalClassDecl {
     protected ClassDecl decl;
 
     public LocalClassDecl_c(Position pos, ClassDecl decl) {
-	super(pos);
-	assert(decl != null);
-	this.decl = decl;
+        super(pos);
+        assert (decl != null);
+        this.decl = decl;
     }
 
     /** Get the class declaration. */
     @Override
     public ClassDecl decl() {
-	return this.decl;
+        return this.decl;
     }
 
     /** Set the class declaration. */
     @Override
     public LocalClassDecl decl(ClassDecl decl) {
-	LocalClassDecl_c n = (LocalClassDecl_c) copy();
-	n.decl = decl;
-	return n;
+        LocalClassDecl_c n = (LocalClassDecl_c) copy();
+        n.decl = decl;
+        return n;
     }
 
     /** Reconstruct the statement. */
     protected LocalClassDecl_c reconstruct(ClassDecl decl) {
         if (decl != this.decl) {
-	    LocalClassDecl_c n = (LocalClassDecl_c) copy();
-	    n.decl = decl;
-	    return n;
-	}
+            LocalClassDecl_c n = (LocalClassDecl_c) copy();
+            n.decl = decl;
+            return n;
+        }
 
-	return this;
+        return this;
     }
 
     /**
@@ -103,24 +102,24 @@ public class LocalClassDecl_c extends Stmt_c implements LocalClassDecl
     public void addDecls(Context c) {
         // We should now be back in the scope of the enclosing block.
         // Add the type.
-        if (! decl.type().toClass().isLocal())
-            throw new InternalCompilerError("Non-local " + decl.type() +
-                                            " found in method body.");
+        if (!decl.type().toClass().isLocal())
+            throw new InternalCompilerError("Non-local " + decl.type()
+                    + " found in method body.");
         c.addNamed(decl.type().toClass());
     }
 
     @Override
     public String toString() {
-	return decl.toString();
+        return decl.toString();
     }
 
     /** Write the statement to an output file. */
     @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
         printBlock(decl, w, tr);
-	w.write(";");
+        w.write(";");
     }
-    
+
     @Override
     public Node copy(NodeFactory nf) {
         return nf.LocalClassDecl(this.position, this.decl);

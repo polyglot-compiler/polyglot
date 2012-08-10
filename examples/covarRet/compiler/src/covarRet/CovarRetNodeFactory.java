@@ -10,6 +10,6 @@ import polyglot.util.Position;
 public class CovarRetNodeFactory extends NodeFactory_c {
     @Override
     public ClassBody ClassBody(Position pos, List<ClassMember> members) {
-	return new CovarRetClassBody_c(pos, members);
+        return new CovarRetClassBody_c(pos, members);
     }
 }

@@ -44,97 +44,95 @@ import polyglot.visit.TypeChecker;
  * Contains an expression whose value is tested, a ``then'' statement 
  * (consequent), and optionally an ``else'' statement (alternate).
  */
-public class If_c extends Stmt_c implements If
-{
+public class If_c extends Stmt_c implements If {
     protected Expr cond;
     protected Stmt consequent;
     protected Stmt alternative;
 
     public If_c(Position pos, Expr cond, Stmt consequent, Stmt alternative) {
-	super(pos);
-	assert(cond != null && consequent != null); // alternative may be null;
-	this.cond = cond;
-	this.consequent = consequent;
-	this.alternative = alternative;
+        super(pos);
+        assert (cond != null && consequent != null); // alternative may be null;
+        this.cond = cond;
+        this.consequent = consequent;
+        this.alternative = alternative;
     }
 
     /** Get the conditional of the statement. */
     @Override
     public Expr cond() {
-	return this.cond;
+        return this.cond;
     }
 
     /** Set the conditional of the statement. */
     @Override
     public If cond(Expr cond) {
-	If_c n = (If_c) copy();
-	n.cond = cond;
-	return n;
+        If_c n = (If_c) copy();
+        n.cond = cond;
+        return n;
     }
 
     /** Get the consequent of the statement. */
     @Override
     public Stmt consequent() {
-	return this.consequent;
+        return this.consequent;
     }
 
     /** Set the consequent of the statement. */
     @Override
     public If consequent(Stmt consequent) {
-	If_c n = (If_c) copy();
-	n.consequent = consequent;
-	return n;
+        If_c n = (If_c) copy();
+        n.consequent = consequent;
+        return n;
     }
 
     /** Get the alternative of the statement. */
     @Override
     public Stmt alternative() {
-	return this.alternative;
+        return this.alternative;
     }
 
     /** Set the alternative of the statement. */
     @Override
     public If alternative(Stmt alternative) {
-	If_c n = (If_c) copy();
-	n.alternative = alternative;
-	return n;
+        If_c n = (If_c) copy();
+        n.alternative = alternative;
+        return n;
     }
 
     /** Reconstruct the statement. */
     protected If_c reconstruct(Expr cond, Stmt consequent, Stmt alternative) {
-	if (cond != this.cond || consequent != this.consequent || alternative != this.alternative) {
-	    If_c n = (If_c) copy();
-	    n.cond = cond;
-	    n.consequent = consequent;
-	    n.alternative = alternative;
-	    return n;
-	}
+        if (cond != this.cond || consequent != this.consequent
+                || alternative != this.alternative) {
+            If_c n = (If_c) copy();
+            n.cond = cond;
+            n.consequent = consequent;
+            n.alternative = alternative;
+            return n;
+        }
 
-	return this;
+        return this;
     }
 
     /** Visit the children of the statement. */
     @Override
     public Node visitChildren(NodeVisitor v) {
-	Expr cond = (Expr) visitChild(this.cond, v);
-	Node consequent = visitChild(this.consequent, v);
-	Node alternative = visitChild(this.alternative, v);
-	return reconstruct(cond, (Stmt) consequent, (Stmt) alternative);
+        Expr cond = (Expr) visitChild(this.cond, v);
+        Node consequent = visitChild(this.consequent, v);
+        Node alternative = visitChild(this.alternative, v);
+        return reconstruct(cond, (Stmt) consequent, (Stmt) alternative);
     }
 
     /** Type check the statement. */
     @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
         TypeSystem ts = tc.typeSystem();
-        
 
-	if (! ts.isImplicitCastValid(cond.type(), ts.Boolean())) {
-	    throw new SemanticException(
-		"Condition of if statement must have boolean type.",
-		cond.position());
-	}
+        if (!ts.isImplicitCastValid(cond.type(), ts.Boolean())) {
+            throw new SemanticException("Condition of if statement must have boolean type.",
+                                        cond.position());
+        }
 
-	return this;
+        return this;
     }
 
     @Override
@@ -150,35 +148,37 @@ public class If_c extends Stmt_c implements If
 
     @Override
     public String toString() {
-	return "if (" + cond + ") " + consequent +
-	    (alternative != null ? " else " + alternative : "");
+        return "if (" + cond + ") " + consequent
+                + (alternative != null ? " else " + alternative : "");
     }
 
     /** Write the statement to an output file. */
     @Override
-    public void prettyPrint(CodeWriter w, PrettyPrinter tr) {    
-	w.write("if (");
-	printBlock(cond, w, tr);
-	w.write(")");
-       
-	printSubStmt(consequent, w, tr);
+    public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
+        w.write("if (");
+        printBlock(cond, w, tr);
+        w.write(")");
 
-	if (alternative != null) {
-	    if (consequent instanceof Block) {
-		// allow the "} else {" formatting except in emergencies
+        printSubStmt(consequent, w, tr);
+
+        if (alternative != null) {
+            if (consequent instanceof Block) {
+                // allow the "} else {" formatting except in emergencies
                 w.allowBreak(0, 2, " ", 1);
-	    } else {
-		w.allowBreak(0, " ");
-	    }
+            }
+            else {
+                w.allowBreak(0, " ");
+            }
 
             if (alternative instanceof Block) {
-		w.write ("else ");
-		print(alternative, w, tr);
-	    } else {
-		w.write("else");
-		printSubStmt(alternative, w, tr);
-	    }
-	}
+                w.write("else ");
+                print(alternative, w, tr);
+            }
+            else {
+                w.write("else");
+                printSubStmt(alternative, w, tr);
+            }
+        }
     }
 
     @Override
@@ -189,23 +189,36 @@ public class If_c extends Stmt_c implements If
     @Override
     public <T> List<T> acceptCFG(CFGBuilder<?> v, List<T> succs) {
         if (alternative == null) {
-            v.visitCFG(cond, FlowGraph.EDGE_KEY_TRUE, consequent, ENTRY, 
-                             FlowGraph.EDGE_KEY_FALSE, this, EXIT);
+            v.visitCFG(cond,
+                       FlowGraph.EDGE_KEY_TRUE,
+                       consequent,
+                       ENTRY,
+                       FlowGraph.EDGE_KEY_FALSE,
+                       this,
+                       EXIT);
             v.visitCFG(consequent, this, EXIT);
         }
         else {
-            v.visitCFG(cond, FlowGraph.EDGE_KEY_TRUE, consequent, ENTRY,
-                             FlowGraph.EDGE_KEY_FALSE, alternative, ENTRY);
+            v.visitCFG(cond,
+                       FlowGraph.EDGE_KEY_TRUE,
+                       consequent,
+                       ENTRY,
+                       FlowGraph.EDGE_KEY_FALSE,
+                       alternative,
+                       ENTRY);
             v.visitCFG(consequent, this, EXIT);
             v.visitCFG(alternative, this, EXIT);
         }
 
         return succs;
     }
-    
+
     @Override
     public Node copy(NodeFactory nf) {
-        return nf.If(this.position, this.cond, this.consequent, this.alternative);
+        return nf.If(this.position,
+                     this.cond,
+                     this.consequent,
+                     this.alternative);
     }
 
 }

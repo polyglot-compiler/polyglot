@@ -15,8 +15,7 @@ public class JL5Method extends Method {
     /**
      * Record whether an annotation has a default value.
      */
-    protected boolean defaultVal; 
-
+    protected boolean defaultVal;
 
     public JL5Method(DataInputStream in, ClassFile clazz) {
         super(in, clazz);
@@ -50,7 +49,7 @@ public class JL5Method extends Method {
                 if ("Synthetic".equals(name.value())) {
                     synthetic = true;
                 }
-                if ("AnnotationDefault".equals(name.value())){
+                if ("AnnotationDefault".equals(name.value())) {
                     defaultVal = true;
                 }
                 if ("Signature".equals(name.value())) {
@@ -69,12 +68,12 @@ public class JL5Method extends Method {
         this.in = null; // RMF 7/23/2008 - Don't need the input stream any more,
                         // so don't hang onto it
     }
-    
+
     public JL5Signature getSignature() {
         return signature;
     }
-    
-    public boolean hasDefaultVal(){
+
+    public boolean hasDefaultVal() {
         return defaultVal;
     }
 

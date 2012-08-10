@@ -8,25 +8,25 @@ import java.io.Writer;
  */
 public class StringBuilderWriter extends Writer {
 
-	private final StringBuilder builder = new StringBuilder();
+    private final StringBuilder builder = new StringBuilder();
 
-	@Override
-	public void close() throws IOException {
+    @Override
+    public void close() throws IOException {
 
-	}
+    }
 
-	@Override
-	public void flush() throws IOException {
+    @Override
+    public void flush() throws IOException {
 
-	}
+    }
 
-	@Override
-	public void write(char[] cbuf, int off, int len) throws IOException {
-		builder.append(cbuf, off, len);
-	}
+    @Override
+    public void write(char[] cbuf, int off, int len) throws IOException {
+        builder.append(cbuf, off, len);
+    }
 
-	public StringBuilder getBuilder() {
-		return builder;
-	}
+    public StringBuilder getBuilder() {
+        return builder;
+    }
 
 }

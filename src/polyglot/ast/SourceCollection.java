@@ -33,8 +33,7 @@ import java.util.List;
  * generation in order to generate multiple target files from a single
  * AST.
  */
-public interface SourceCollection extends Node
-{
+public interface SourceCollection extends Node {
     /** List of source files in the collection.
      * @return A list of {@link polyglot.ast.SourceFile SourceFile}.
      */

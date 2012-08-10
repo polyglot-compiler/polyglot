@@ -34,37 +34,36 @@ import polyglot.util.Position;
  * A <code>ConstructorInstance</code> contains type information for a
  * constructor.
  */
-public class ConstructorInstance_c extends ProcedureInstance_c
-                                implements ConstructorInstance
-{
+public class ConstructorInstance_c extends ProcedureInstance_c implements
+        ConstructorInstance {
     /** Used for deserializing types. */
-    protected ConstructorInstance_c() { }
+    protected ConstructorInstance_c() {
+    }
 
     public ConstructorInstance_c(TypeSystem ts, Position pos,
-	                         ClassType container,
-				 Flags flags, List<? extends Type> formalTypes,
-				 List<? extends Type> excTypes) {
+            ClassType container, Flags flags, List<? extends Type> formalTypes,
+            List<? extends Type> excTypes) {
         super(ts, pos, container, flags, formalTypes, excTypes);
         this.decl = this;
     }
 
     protected ConstructorInstance decl;
-    
+
     @Override
     public Declaration declaration() {
         return decl;
     }
-    
+
     @Override
     public void setDeclaration(Declaration decl) {
-        this.decl = (ConstructorInstance) decl;        
+        this.decl = (ConstructorInstance) decl;
     }
-    
+
     @Override
     public ConstructorInstance orig() {
         return (ConstructorInstance) declaration();
     }
-    
+
     @Override
     public ConstructorInstance flags(Flags flags) {
         if (!flags.equals(this.flags)) {
@@ -107,9 +106,9 @@ public class ConstructorInstance_c extends ProcedureInstance_c
 
     @Override
     public String toString() {
-	return designator() + " " + flags.translate() + signature();
+        return designator() + " " + flags.translate() + signature();
     }
-    
+
     @Override
     public String signature() {
         return container + "(" + TypeSystem_c.listToString(formalTypes) + ")";
@@ -124,8 +123,7 @@ public class ConstructorInstance_c extends ProcedureInstance_c
     public boolean equalsImpl(TypeObject o) {
         if (o instanceof ConstructorInstance) {
             ConstructorInstance i = (ConstructorInstance) o;
-            return ts.equals(container, i.container())
-                && super.equalsImpl(i);
+            return ts.equals(container, i.container()) && super.equalsImpl(i);
         }
 
         return false;
@@ -133,8 +131,7 @@ public class ConstructorInstance_c extends ProcedureInstance_c
 
     @Override
     public boolean isCanonical() {
-	return container.isCanonical()
-	    && listIsCanonical(formalTypes)
-	    && listIsCanonical(throwTypes);
+        return container.isCanonical() && listIsCanonical(formalTypes)
+                && listIsCanonical(throwTypes);
     }
 }

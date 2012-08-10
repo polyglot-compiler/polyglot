@@ -39,8 +39,10 @@ public class Parsed extends SourceFileGoal {
         return scheduler.internGoal(new Parsed(job));
     }
 
-    protected Parsed(Job job) { super(job); }
-    
+    protected Parsed(Job job) {
+        super(job);
+    }
+
     @Override
     public Pass createPass(ExtensionInfo extInfo) {
         return new ParserPass(extInfo.compiler(), this);

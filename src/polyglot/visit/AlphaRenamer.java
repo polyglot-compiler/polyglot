@@ -47,144 +47,145 @@ import polyglot.util.UniqueID;
  **/
 public class AlphaRenamer extends NodeVisitor {
 
-  protected NodeFactory nf;
+    protected NodeFactory nf;
 
-  // Each set in this stack tracks the set of local decls in a block that
-  // we're traversing.
-  protected Stack<Set<String>> setStack;
+    // Each set in this stack tracks the set of local decls in a block that
+    // we're traversing.
+    protected Stack<Set<String>> setStack;
 
-  protected Map<String, String> renamingMap;
+    protected Map<String, String> renamingMap;
 
-  // Tracks the set of variables known to be fresh.
-  protected Set<String> freshVars;
-  
-  /**
-   * Should we also alpha-rename catch formals?
-   */
-  protected boolean renameCatchFormals;
+    // Tracks the set of variables known to be fresh.
+    protected Set<String> freshVars;
 
-  /**
-   * Creates a visitor for alpha-renaming locals.
-   *
-   * @param nf  The node factory to be used when generating new nodes.
-   **/
-  public AlphaRenamer(NodeFactory nf) {
-      this(nf, false);
-  }
-  public AlphaRenamer(NodeFactory nf, boolean renameCatchFormals) {
-    this.nf = nf;
+    /**
+     * Should we also alpha-rename catch formals?
+     */
+    protected boolean renameCatchFormals;
 
-    this.setStack = new Stack<Set<String>>();
-    this.setStack.push( new HashSet<String>() );
-
-    this.renamingMap = new HashMap<String, String>();
-    this.freshVars = new HashSet<String>();
-    
-    this.renameCatchFormals = renameCatchFormals;
-  }
-
-  @Override
-public NodeVisitor enter( Node n ) {
-    if ( n instanceof Block ) {
-      // Push a new, empty set onto the stack.
-      setStack.push( new HashSet<String>() );
+    /**
+     * Creates a visitor for alpha-renaming locals.
+     *
+     * @param nf  The node factory to be used when generating new nodes.
+     **/
+    public AlphaRenamer(NodeFactory nf) {
+        this(nf, false);
     }
 
-    if (this.renameCatchFormals && n instanceof Catch) {
-      Catch c = (Catch)n;
-      addToRenamingMap(c.formal().name());
-    }
-    if ( n instanceof LocalDecl ) {
-      LocalDecl l = (LocalDecl)n;
-      addToRenamingMap(l.name());
-    }
+    public AlphaRenamer(NodeFactory nf, boolean renameCatchFormals) {
+        this.nf = nf;
 
-    return this;
-  }
-  protected void addToRenamingMap(String name) {
-    if ( !freshVars.contains(name) ) {
-      // Add a new entry to the current renaming map.
-      String name_ = UniqueID.newID(name);
+        this.setStack = new Stack<Set<String>>();
+        this.setStack.push(new HashSet<String>());
 
-      freshVars.add(name_);
+        this.renamingMap = new HashMap<String, String>();
+        this.freshVars = new HashSet<String>();
 
-      setStack.peek().add( name );
-      renamingMap.put( name, name_ );
-    }
-  }
-  
-
-  @Override
-  public Node leave(Node old, Node n, NodeVisitor v ) {
-    if ( n instanceof Block ) {
-      // Pop the current name set off the stack and remove the corresponding
-      // entries from the renaming map.
-      Set<String> s = setStack.pop();
-      renamingMap.keySet().removeAll(s);
-      return n;
+        this.renameCatchFormals = renameCatchFormals;
     }
 
-    if ( n instanceof Local ) {
-      // Rename the local if its name is in the renaming map.
-      Local l = (Local)n;
-      String name = l.name();
-
-      if ( !renamingMap.containsKey(name) ) {
-        return n;
-      }
-      
-      // Update the local instance as necessary.
-      String newName = renamingMap.get(name);
-      LocalInstance li = l.localInstance();
-      if (li != null) li.setName(newName);
-
-      return l.name(newName);
-    }
-
-    if ( n instanceof LocalDecl ) {
-      // Rename the local decl.
-      LocalDecl l = (LocalDecl)n;
-      String name = l.name();
-
-      if ( freshVars.contains(name) ) {
-        return n;
-      }
-
-      if ( !renamingMap.containsKey(name) ) {
-        throw new InternalCompilerError( "Unexpected error encountered while "
-                                         + "alpha-renaming." );
-      }
-
-      // Update the local instance as necessary.
-      String newName = renamingMap.get(name);
-      LocalInstance li = l.localInstance();
-      if (li != null) li.setName(newName);
-      
-      return l.name(newName);
-    }
-
-    if ( n instanceof Catch && this.renameCatchFormals ) {
-        // Rename the catch formal.
-        Catch c = (Catch)n;
-        String name = c.formal().name();
-
-        if ( freshVars.contains(name) ) {
-          return n;
+    @Override
+    public NodeVisitor enter(Node n) {
+        if (n instanceof Block) {
+            // Push a new, empty set onto the stack.
+            setStack.push(new HashSet<String>());
         }
 
-        if ( !renamingMap.containsKey(name) ) {
-          throw new InternalCompilerError( "Unexpected error encountered while "
-                                           + "alpha-renaming." );
+        if (this.renameCatchFormals && n instanceof Catch) {
+            Catch c = (Catch) n;
+            addToRenamingMap(c.formal().name());
+        }
+        if (n instanceof LocalDecl) {
+            LocalDecl l = (LocalDecl) n;
+            addToRenamingMap(l.name());
         }
 
-        // Update the local instance as necessary.
-        String newName = renamingMap.get(name);
-        LocalInstance li = c.formal().localInstance();
-        if (li != null) li.setName(newName);
-        
-        return c.formal(c.formal().name(newName));
-      }
+        return this;
+    }
 
-    return n;
-  }
+    protected void addToRenamingMap(String name) {
+        if (!freshVars.contains(name)) {
+            // Add a new entry to the current renaming map.
+            String name_ = UniqueID.newID(name);
+
+            freshVars.add(name_);
+
+            setStack.peek().add(name);
+            renamingMap.put(name, name_);
+        }
+    }
+
+    @Override
+    public Node leave(Node old, Node n, NodeVisitor v) {
+        if (n instanceof Block) {
+            // Pop the current name set off the stack and remove the corresponding
+            // entries from the renaming map.
+            Set<String> s = setStack.pop();
+            renamingMap.keySet().removeAll(s);
+            return n;
+        }
+
+        if (n instanceof Local) {
+            // Rename the local if its name is in the renaming map.
+            Local l = (Local) n;
+            String name = l.name();
+
+            if (!renamingMap.containsKey(name)) {
+                return n;
+            }
+
+            // Update the local instance as necessary.
+            String newName = renamingMap.get(name);
+            LocalInstance li = l.localInstance();
+            if (li != null) li.setName(newName);
+
+            return l.name(newName);
+        }
+
+        if (n instanceof LocalDecl) {
+            // Rename the local decl.
+            LocalDecl l = (LocalDecl) n;
+            String name = l.name();
+
+            if (freshVars.contains(name)) {
+                return n;
+            }
+
+            if (!renamingMap.containsKey(name)) {
+                throw new InternalCompilerError("Unexpected error encountered while "
+                        + "alpha-renaming.");
+            }
+
+            // Update the local instance as necessary.
+            String newName = renamingMap.get(name);
+            LocalInstance li = l.localInstance();
+            if (li != null) li.setName(newName);
+
+            return l.name(newName);
+        }
+
+        if (n instanceof Catch && this.renameCatchFormals) {
+            // Rename the catch formal.
+            Catch c = (Catch) n;
+            String name = c.formal().name();
+
+            if (freshVars.contains(name)) {
+                return n;
+            }
+
+            if (!renamingMap.containsKey(name)) {
+                throw new InternalCompilerError("Unexpected error encountered while "
+                        + "alpha-renaming.");
+            }
+
+            // Update the local instance as necessary.
+            String newName = renamingMap.get(name);
+            LocalInstance li = c.formal().localInstance();
+            if (li != null) li.setName(newName);
+
+            return c.formal(c.formal().name(newName));
+        }
+
+        return n;
+    }
 }

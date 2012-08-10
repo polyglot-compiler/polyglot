@@ -31,18 +31,24 @@ public class AssignExt_c extends CofferExt_c {
     }
 
     @Override
-    public void checkHeldKeys(KeySet held, KeySet stored) throws SemanticException {
+    public void checkHeldKeys(KeySet held, KeySet stored)
+            throws SemanticException {
         Assign n = (Assign) node();
 
         if (n.right().type() instanceof CofferClassType) {
             CofferClassType t = (CofferClassType) n.right().type();
 
-            if (t.key() != null && ! held.contains(t.key())) {
-                throw new SemanticException("Cannot assign tracked value unless key \"" + t.key() + "\" held.", n.position());
+            if (t.key() != null && !held.contains(t.key())) {
+                throw new SemanticException("Cannot assign tracked value unless key \""
+                                                    + t.key() + "\" held.",
+                                            n.position());
             }
 
             if (t.key() != null && stored.contains(t.key())) {
-                throw new SemanticException("Cannot assign tracked value with key \"" + t.key() + "\" more than once.", n.position());
+                throw new SemanticException("Cannot assign tracked value with key \""
+                                                    + t.key()
+                                                    + "\" more than once.",
+                                            n.position());
             }
         }
     }

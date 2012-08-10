@@ -14,30 +14,28 @@ public class JL5ArrayType_c extends ArrayType_c implements JL5ArrayType {
 
     protected boolean isVarArg;
 
-    public JL5ArrayType_c(TypeSystem ts, Position pos, Type base, boolean isVarargs){
+    public JL5ArrayType_c(TypeSystem ts, Position pos, Type base,
+            boolean isVarargs) {
         super(ts, pos, base);
         this.isVarArg = isVarargs;
     }
-    
+
     @Override
     protected MethodInstance createCloneMethodInstance() {
-        return ts.methodInstance(position(),
-                this,
-                ts.Public(),
-                this, // clone returns this type
-                "clone",
-                Collections.<Type> emptyList(),
-                Collections.<Type> emptyList());
+        return ts.methodInstance(position(), this, ts.Public(), this, // clone returns this type
+                                 "clone",
+                                 Collections.<Type> emptyList(),
+                                 Collections.<Type> emptyList());
     }
 
     @Override
-    public boolean isVarArg(){
+    public boolean isVarArg() {
         return this.isVarArg;
     }
-    
+
     @Override
     public void setVarArg() {
-    	this.isVarArg = true;
+        this.isVarArg = true;
     }
 
     @Override
@@ -45,15 +43,14 @@ public class JL5ArrayType_c extends ArrayType_c implements JL5ArrayType {
         if (super.isSubtypeImpl(t)) {
             return true;
         }
-        
+
         /* See JLS 3rd Ed 4.10 */
         if (t instanceof ArrayType) {
-            ArrayType at = (ArrayType)t;
+            ArrayType at = (ArrayType) t;
             return this.base().isSubtype(at.base());
         }
-        
+
         return false;
     }
-    
 
 }

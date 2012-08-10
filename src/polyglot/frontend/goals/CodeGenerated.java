@@ -54,15 +54,17 @@ public class CodeGenerated extends SourceFileGoal implements EndGoal {
     protected CodeGenerated(Job job) {
         super(job);
     }
-    
+
     @Override
     public Pass createPass(ExtensionInfo extInfo) {
         TypeSystem ts = extInfo.typeSystem();
         NodeFactory nf = extInfo.nodeFactory();
-        return new OutputPass(this, new Translator(job(), ts, nf,
+        return new OutputPass(this, new Translator(job(),
+                                                   ts,
+                                                   nf,
                                                    extInfo.targetFactory()));
     }
-    
+
     @Override
     public Collection<Goal> prerequisiteGoals(Scheduler scheduler) {
         List<Goal> l = new ArrayList<Goal>();
@@ -70,5 +72,5 @@ public class CodeGenerated extends SourceFileGoal implements EndGoal {
         l.addAll(super.prerequisiteGoals(scheduler));
         return l;
     }
-    
+
 }

@@ -44,179 +44,181 @@ import polyglot.visit.TypeChecker;
 /** 
  * A local variable expression.
  */
-public class Local_c extends Expr_c implements Local
-{
-  protected Id name;
-  protected LocalInstance li;
+public class Local_c extends Expr_c implements Local {
+    protected Id name;
+    protected LocalInstance li;
 
-  public Local_c(Position pos, Id name) {
-    super(pos);
-    assert(name != null);
-    this.name = name;
-  }
+    public Local_c(Position pos, Id name) {
+        super(pos);
+        assert (name != null);
+        this.name = name;
+    }
 
-  /** Get the precedence of the local. */
-  @Override
-  public Precedence precedence() { 
-    return Precedence.LITERAL;
-  }
+    /** Get the precedence of the local. */
+    @Override
+    public Precedence precedence() {
+        return Precedence.LITERAL;
+    }
 
-  /** Get the name of the local. */
-  @Override
-  public Id id() {
-    return this.name;
-  }
-  
-  /** Set the name of the local. */
-  @Override
-  public Local id(Id name) {
-      Local_c n = (Local_c) copy();
-      n.name = name;
-      return n;
-  }
-  
-  /** Get the name of the local. */
-  @Override
-  public String name() {
-      return this.name.id();
-  }
-  
-  /** Set the name of the local. */
-  @Override
-  public Local name(String name) {
-      return id(this.name.id(name));
-  }
+    /** Get the name of the local. */
+    @Override
+    public Id id() {
+        return this.name;
+    }
 
-  /** Return the access flags of the variable. */
-  @Override
-  public Flags flags() {
-    return li.flags();
-  }
+    /** Set the name of the local. */
+    @Override
+    public Local id(Id name) {
+        Local_c n = (Local_c) copy();
+        n.name = name;
+        return n;
+    }
 
-  /** Get the local instance of the local. */
-  @Override
-  public VarInstance varInstance() {
-    return li;
-  }
+    /** Get the name of the local. */
+    @Override
+    public String name() {
+        return this.name.id();
+    }
 
-  /** Get the local instance of the local. */
-  @Override
-  public LocalInstance localInstance() {
-    return li;
-  }
+    /** Set the name of the local. */
+    @Override
+    public Local name(String name) {
+        return id(this.name.id(name));
+    }
 
-  /** Set the local instance of the local. */
-  @Override
-  public Local localInstance(LocalInstance li) {
-    if (li == this.li) return this;
-    Local_c n = (Local_c) copy();
-    n.li = li;
-    return n;
-  }
+    /** Return the access flags of the variable. */
+    @Override
+    public Flags flags() {
+        return li.flags();
+    }
 
-  /** Reconstruct the expression. */
-  protected Local_c reconstruct(Id name) {
-      if (name != this.name) {
-          Local_c n = (Local_c) copy();
-          n.name = name;
-          return n;
-      }
-      
-      return this;
-  }
-  
-  /** Visit the children of the constructor. */
-  @Override
-  public Node visitChildren(NodeVisitor v) {
-      Id name = (Id) visitChild(this.name, v);
-      return reconstruct(name);
-  }
+    /** Get the local instance of the local. */
+    @Override
+    public VarInstance varInstance() {
+        return li;
+    }
 
-  @Override
-  public Node buildTypes(TypeBuilder tb) throws SemanticException {
-      Local_c n = (Local_c) super.buildTypes(tb);
+    /** Get the local instance of the local. */
+    @Override
+    public LocalInstance localInstance() {
+        return li;
+    }
 
-      TypeSystem ts = tb.typeSystem();
+    /** Set the local instance of the local. */
+    @Override
+    public Local localInstance(LocalInstance li) {
+        if (li == this.li) return this;
+        Local_c n = (Local_c) copy();
+        n.li = li;
+        return n;
+    }
 
-      LocalInstance li = ts.localInstance(position(), Flags.NONE,
-                                          ts.unknownType(position()), name.id());
-      return n.localInstance(li);
-  }
+    /** Reconstruct the expression. */
+    protected Local_c reconstruct(Id name) {
+        if (name != this.name) {
+            Local_c n = (Local_c) copy();
+            n.name = name;
+            return n;
+        }
 
-  /** Type check the local. */
-  @Override
-  public Node typeCheck(TypeChecker tc) throws SemanticException {
-    Context c = tc.context();
-    LocalInstance li = c.findLocal(name.id());
-    
-    // if the local is defined in an outer class, then it must be final
-    if (!c.isLocal(li.name())) {
-        // this local is defined in an outer class
-        if (!li.flags().isFinal()) {
-            throw new SemanticException("Local variable \"" + li.name() + 
-                    "\" is accessed from an inner class, and must be declared " +
-                    "final.",
-                    this.position());                     
+        return this;
+    }
+
+    /** Visit the children of the constructor. */
+    @Override
+    public Node visitChildren(NodeVisitor v) {
+        Id name = (Id) visitChild(this.name, v);
+        return reconstruct(name);
+    }
+
+    @Override
+    public Node buildTypes(TypeBuilder tb) throws SemanticException {
+        Local_c n = (Local_c) super.buildTypes(tb);
+
+        TypeSystem ts = tb.typeSystem();
+
+        LocalInstance li =
+                ts.localInstance(position(),
+                                 Flags.NONE,
+                                 ts.unknownType(position()),
+                                 name.id());
+        return n.localInstance(li);
+    }
+
+    /** Type check the local. */
+    @Override
+    public Node typeCheck(TypeChecker tc) throws SemanticException {
+        Context c = tc.context();
+        LocalInstance li = c.findLocal(name.id());
+
+        // if the local is defined in an outer class, then it must be final
+        if (!c.isLocal(li.name())) {
+            // this local is defined in an outer class
+            if (!li.flags().isFinal()) {
+                throw new SemanticException("Local variable \""
+                                                    + li.name()
+                                                    + "\" is accessed from an inner class, and must be declared "
+                                                    + "final.",
+                                            this.position());
+            }
+        }
+
+        return localInstance(li).type(li.type());
+    }
+
+    @Override
+    public Term firstChild() {
+        return null;
+    }
+
+    @Override
+    public <T> List<T> acceptCFG(CFGBuilder<?> v, List<T> succs) {
+        return succs;
+    }
+
+    @Override
+    public String toString() {
+        return name.toString();
+    }
+
+    /** Write the local to an output file. */
+    @Override
+    public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
+        tr.print(this, name, w);
+    }
+
+    /** Dumps the AST. */
+    @Override
+    public void dump(CodeWriter w) {
+        super.dump(w);
+
+        if (li != null) {
+            w.allowBreak(4, " ");
+            w.begin(0);
+            w.write("(instance " + li + ")");
+            w.end();
         }
     }
-    
-    return localInstance(li).type(li.type());
-  }
 
-  @Override
-  public Term firstChild() {
-      return null;
-  }
-
-  @Override
-  public <T> List<T> acceptCFG(CFGBuilder<?> v, List<T> succs) {
-      return succs;
-  }
-
-  @Override
-  public String toString() {
-    return name.toString();
-  }
-
-  /** Write the local to an output file. */
-  @Override
-  public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
-      tr.print(this, name, w);
-  }
-
-  /** Dumps the AST. */
-  @Override
-  public void dump(CodeWriter w) {
-    super.dump(w);
-
-    if (li != null) {
-	w.allowBreak(4, " ");
-	w.begin(0);
-	w.write("(instance " + li + ")");
-	w.end();
+    @Override
+    public boolean constantValueSet() {
+        return li != null && li.constantValueSet();
     }
-  }
-  
-  @Override
-  public boolean constantValueSet() {
-      return li != null && li.constantValueSet();
-  }
 
-  @Override
-  public boolean isConstant() {
-    return li != null && li.isConstant();
-  }
+    @Override
+    public boolean isConstant() {
+        return li != null && li.isConstant();
+    }
 
-  @Override
-  public Object constantValue() {
-    if (! isConstant()) return null;
-    return li.constantValue();
-  }
-  
-  @Override
-  public Node copy(NodeFactory nf) {
-      return nf.Local(this.position, this.name);
-  }
+    @Override
+    public Object constantValue() {
+        if (!isConstant()) return null;
+        return li.constantValue();
+    }
 
+    @Override
+    public Node copy(NodeFactory nf) {
+        return nf.Local(this.position, this.name);
+    }
 
 }

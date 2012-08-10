@@ -37,8 +37,7 @@ import polyglot.main.Report;
  * Extensions can override this to collect more stats or to change
  * reporting.
  */
-public class Stats
-{
+public class Stats {
     protected static class Times {
         public long inclusive;
         public long exclusive;
@@ -90,16 +89,17 @@ public class Stats
     /** Report the stats. */
     public void report() {
         if (Report.should_report(Report.time, 1)) {
-            Report.report(1, "\nStatistics for " + ext.compilerName() +
-                          " (" + ext.getClass().getName() + ")");
+            Report.report(1, "\nStatistics for " + ext.compilerName() + " ("
+                    + ext.getClass().getName() + ")");
             Report.report(1, "Inclusive Exclusive Key");
             Report.report(1, "--------- --------- ---");
 
             for (Object key : keys) {
                 Times t = passTimes.get(key);
 
-                Report.report(1, t.inclusive + " " + t.exclusive + " " +
-                                 key.toString());
+                Report.report(1,
+                              t.inclusive + " " + t.exclusive + " "
+                                      + key.toString());
             }
         }
     }

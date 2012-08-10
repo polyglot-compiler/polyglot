@@ -11,7 +11,7 @@ public interface RawClass extends JL5ClassType {
      * 
      */
     JL5ParsedClassType base();
-    
+
     /**
      * Return the JL5SubstClassType erased version of the raw class. This should be used very cautiously,
      * as the erased class type is not the same as the raw type. For example, given

@@ -28,8 +28,7 @@ package polyglot.types;
 /**
  * A <code>Named</code> is a TypeObject that is named.
  */
-public interface Named extends TypeObject
-{
+public interface Named extends TypeObject {
     /**
      * Simple name of the type object. Anonymous classes do not have names.
      */

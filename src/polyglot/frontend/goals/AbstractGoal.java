@@ -55,7 +55,7 @@ public abstract class AbstractGoal implements Goal {
         this.prerequisites = Collections.<Goal> emptySet();
         this.corequisites = Collections.<Goal> emptySet();
     }
-    
+
     protected AbstractGoal(Job job) {
         this();
         this.job = job;
@@ -67,7 +67,7 @@ public abstract class AbstractGoal implements Goal {
         this.job = job;
         this.name = name;
     }
-    
+
     /**
      * Return true if this goal conflicts with the other; that is passes running
      * over both goals could access the same data.
@@ -76,11 +76,11 @@ public abstract class AbstractGoal implements Goal {
     public boolean conflictsWith(Goal goal) {
         return job() != null && job() == goal.job();
     }
-   
+
     /** Creates a pass to attempt to satisfy the goal. */
     @Override
     public abstract Pass createPass(ExtensionInfo extInfo);
-    
+
     @Override
     public String name() {
         return name;
@@ -90,19 +90,20 @@ public abstract class AbstractGoal implements Goal {
     public Job job() {
         return job;
     }
-    
+
     @Override
     public Collection<Goal> prerequisiteGoals(Scheduler scheduler) {
         return prerequisites;
     }
-    
+
     @Override
     public Collection<Goal> corequisiteGoals(Scheduler scheduler) {
         return corequisites;
     }
 
     @Override
-    public void addPrerequisiteGoal(Goal g, Scheduler scheduler) throws CyclicDependencyException {
+    public void addPrerequisiteGoal(Goal g, Scheduler scheduler)
+            throws CyclicDependencyException {
         // This takes a hell of a long time.  Disable the check for now.
         // checkCycles(g, scheduler);
         if (prerequisites == Collections.EMPTY_SET) {
@@ -110,17 +111,19 @@ public abstract class AbstractGoal implements Goal {
         }
         prerequisites.add(g);
     }
-    
-    protected void checkCycles(Goal current, Scheduler scheduler) throws CyclicDependencyException {
+
+    protected void checkCycles(Goal current, Scheduler scheduler)
+            throws CyclicDependencyException {
         if (this == current) {
-            throw new CyclicDependencyException("Goal " + this + " cannot depend on itself.");
+            throw new CyclicDependencyException("Goal " + this
+                    + " cannot depend on itself.");
         }
-        
+
         for (Goal subgoal : current.prerequisiteGoals(scheduler)) {
             checkCycles(subgoal, scheduler);
         }
     }
-    
+
     @Override
     public void addCorequisiteGoal(Goal g, Scheduler scheduler) {
         if (corequisites == Collections.EMPTY_SET) {
@@ -134,12 +137,12 @@ public abstract class AbstractGoal implements Goal {
     public void setUnreachableThisRun() {
         setState(UNREACHABLE_THIS_RUN);
     }
-    
+
     @Override
     public int state() {
         return state;
     }
-    
+
     @Override
     public void setState(int state) {
         this.state = state;
@@ -149,12 +152,12 @@ public abstract class AbstractGoal implements Goal {
     public boolean hasBeenReached() {
         return state == REACHED;
     }
-    
+
     @Override
     public void setUnreachable() {
         setState(UNREACHABLE);
     }
-    
+
     @Override
     public boolean isReachable() {
         return this.state != UNREACHABLE;
@@ -178,28 +181,28 @@ public abstract class AbstractGoal implements Goal {
         }
         return false;
     }
-    
+
     protected String stateString() {
         switch (state) {
-            case UNREACHABLE:
-                return "unreachable";
-            case UNREACHABLE_THIS_RUN:
-                return "running-but-unreachable-this-run";
-            case UNREACHED:
-                return "unreached";
-            case ATTEMPTED:
-                return "attempted";
-            case REACHED:
-                return "reached";
-            case RUNNING:
-                return "running";
+        case UNREACHABLE:
+            return "unreachable";
+        case UNREACHABLE_THIS_RUN:
+            return "running-but-unreachable-this-run";
+        case UNREACHED:
+            return "unreached";
+        case ATTEMPTED:
+            return "attempted";
+        case REACHED:
+            return "reached";
+        case RUNNING:
+            return "running";
         }
         return "unknown-goal-state";
     }
-    
+
     @Override
     public String toString() {
         return job + ":" + (job != null ? job.extensionInfo() + ":" : "")
-            + name + " (" + stateString() + ")";
+                + name + " (" + stateString() + ")";
     }
 }

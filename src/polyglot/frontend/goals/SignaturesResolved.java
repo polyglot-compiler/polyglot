@@ -25,7 +25,6 @@
 
 package polyglot.frontend.goals;
 
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -52,16 +51,16 @@ public class SignaturesResolved extends ClassTypeGoal {
     protected SignaturesResolved(ParsedClassType ct) {
         super(ct);
     }
-    
+
     protected static class SignaturesResolvedPass extends AbstractPass {
         SignaturesResolvedPass(Goal goal) {
             super(goal);
         }
-        
+
         @Override
         public boolean run() {
             SignaturesResolved goal = (SignaturesResolved) this.goal;
-            if (! goal.type().signaturesResolved()) {
+            if (!goal.type().signaturesResolved()) {
                 throw new SchedulerException();
             }
             return true;
@@ -75,7 +74,7 @@ public class SignaturesResolved extends ClassTypeGoal {
         }
         return new DisambiguateSignaturesPass(extInfo.scheduler(), this);
     }
-    
+
     @Override
     public Collection<Goal> prerequisiteGoals(Scheduler scheduler) {
         List<Goal> l = new ArrayList<Goal>();
@@ -88,9 +87,10 @@ public class SignaturesResolved extends ClassTypeGoal {
     }
 
     protected boolean isGlobal(ClassType ct) {
-        return ct.isTopLevel() || (ct.isMember() && isGlobal((ClassType) ct.container()));
+        return ct.isTopLevel()
+                || (ct.isMember() && isGlobal((ClassType) ct.container()));
     }
-    
+
     @Override
     public Collection<Goal> corequisiteGoals(Scheduler scheduler) {
         List<Goal> l = new ArrayList<Goal>();
@@ -105,7 +105,7 @@ public class SignaturesResolved extends ClassTypeGoal {
         l.addAll(super.corequisiteGoals(scheduler));
         return l;
     }
-    
+
     @Override
     public boolean equals(Object o) {
         return o instanceof SignaturesResolved && super.equals(o);

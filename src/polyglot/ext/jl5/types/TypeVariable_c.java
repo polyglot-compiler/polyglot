@@ -20,7 +20,7 @@ import polyglot.util.Position;
 public class TypeVariable_c extends ReferenceType_c implements TypeVariable {
 
     private static int count = 0;
-    
+
     /**
      * The unique identifier uniquely identifies a type variable within this invocation of the compiler.
      * Object equality does not hold, since we may have two objects that represent the same type variable, that have had
@@ -34,8 +34,8 @@ public class TypeVariable_c extends ReferenceType_c implements TypeVariable {
     protected TVarDecl declaredIn;
 
     protected ClassType declaringClass;
-    protected JL5ProcedureInstance declaringProcedure;    
-    
+    protected JL5ProcedureInstance declaringProcedure;
+
 //    private List<ReferenceType> bounds;
     //private ParsedClassType syntheticClass; // SC: should probably combine with bounds, and have intersection classes...
 
@@ -48,8 +48,9 @@ public class TypeVariable_c extends ReferenceType_c implements TypeVariable {
      * It is possible for type variables to have lower bounds. See JLS 3rd ed 4.10.2 and 5.1.10 
      */
     private ReferenceType lowerBound = null;
-        
-    public TypeVariable_c(TypeSystem ts, Position pos, String id, ReferenceType upperBound) {
+
+    public TypeVariable_c(TypeSystem ts, Position pos, String id,
+            ReferenceType upperBound) {
         super(ts, pos);
         this.name = id;
         if (upperBound == null) {
@@ -57,6 +58,7 @@ public class TypeVariable_c extends ReferenceType_c implements TypeVariable {
         }
         this.upperBound = upperBound;
     }
+
     //    
     //    public Job job() {
     //        throw new InternalCompilerError("No job for a type variable");
@@ -84,18 +86,20 @@ public class TypeVariable_c extends ReferenceType_c implements TypeVariable {
         return declaredIn;
     }
 
-
     @Override
     public ClassType declaringClass() {
-        if (declaredIn.equals(TVarDecl.CLASS_TYPE_VARIABLE)) return declaringClass;
+        if (declaredIn.equals(TVarDecl.CLASS_TYPE_VARIABLE))
+            return declaringClass;
         return null;
     }
 
     @Override
     public JL5ProcedureInstance declaringProcedure() {
-        if (declaredIn.equals(TVarDecl.PROCEDURE_TYPE_VARIABLE)) return declaringProcedure;
+        if (declaredIn.equals(TVarDecl.PROCEDURE_TYPE_VARIABLE))
+            return declaringProcedure;
         return null;
     }
+
     //
     //    public ClassType outer() {
     //        return null;
@@ -113,7 +117,7 @@ public class TypeVariable_c extends ReferenceType_c implements TypeVariable {
 
     @Override
     public boolean isCanonical() {
-        return true; 
+        return true;
     }
 
     public polyglot.types.Package package_() {
@@ -125,6 +129,7 @@ public class TypeVariable_c extends ReferenceType_c implements TypeVariable {
         }
         return null;
     }
+
     public List<? extends ConstructorInstance> constructors() {
         return Collections.emptyList();
     }
@@ -143,6 +148,7 @@ public class TypeVariable_c extends ReferenceType_c implements TypeVariable {
     public List<? extends FieldInstance> fields() {
         return Collections.emptyList();
     }
+
     @Override
     public FieldInstance fieldNamed(String name) {
         for (FieldInstance fi : fields()) {
@@ -157,9 +163,10 @@ public class TypeVariable_c extends ReferenceType_c implements TypeVariable {
     public List<? extends ReferenceType> interfaces() {
         return Collections.emptyList();
     }
+
     @Override
     public ReferenceType erasureType() {
-        return (ReferenceType) ((JL5TypeSystem)this.typeSystem()).erasureType(this);
+        return (ReferenceType) ((JL5TypeSystem) this.typeSystem()).erasureType(this);
     }
 
     @Override
@@ -167,26 +174,25 @@ public class TypeVariable_c extends ReferenceType_c implements TypeVariable {
         return this.upperBound;
     }
 
-
     @Override
     public String translate(Resolver c) {
         return this.name();
     }
+
     @Override
     public String toString() {
         return this.name();
     }
-        
+
     @Override
     public boolean isCastValidImpl(Type toType) {
         if (super.isCastValidImpl(toType)) {
             return true;
         }
-        
+
         return ts.isCastValid(this.upperBound(), toType);
     }
 
-    
     @Override
     public boolean descendsFromImpl(Type ancestor) {
         if (super.descendsFromImpl(ancestor)) {
@@ -195,27 +201,32 @@ public class TypeVariable_c extends ReferenceType_c implements TypeVariable {
         // See JLS 3rd ed 4.10.2
         return ts.isSubtype(this.upperBound, ancestor);
     }
+
     @Override
     public boolean hasLowerBound() {
         return this.lowerBound != null;
     }
+
     @Override
     public ReferenceType lowerBound() {
         return this.lowerBound;
     }
+
     @Override
     public void setLowerBound(ReferenceType lowerBound) {
         this.lowerBound = lowerBound;
     }
-    
+
     @Override
     public int uniqueIdentifier() {
         return uniqueIdentifier;
     }
+
     @Override
     public ReferenceType upperBound() {
         return upperBound;
     }
+
     @Override
     public void setUpperBound(ReferenceType upperBound) {
         this.upperBound = upperBound;
@@ -226,28 +237,29 @@ public class TypeVariable_c extends ReferenceType_c implements TypeVariable {
         if (this.upperBound.equals(upperBound)) {
             return this;
         }
-        TypeVariable tv = (TypeVariable)this.copy();
+        TypeVariable tv = (TypeVariable) this.copy();
         tv.setUpperBound(upperBound);
         return tv;
     }
-    
+
     @Override
     public boolean equalsImpl(TypeObject t) {
         if (t instanceof TypeVariable_c) {
-            TypeVariable_c other = (TypeVariable_c)t;
-            return this.uniqueIdentifier == other.uniqueIdentifier;            
+            TypeVariable_c other = (TypeVariable_c) t;
+            return this.uniqueIdentifier == other.uniqueIdentifier;
         }
         return false;
     }
+
     @Override
     public boolean typeEqualsImpl(Type t) {
         if (t instanceof TypeVariable_c) {
-            TypeVariable_c other = (TypeVariable_c)t;
-            return this.uniqueIdentifier == other.uniqueIdentifier;            
+            TypeVariable_c other = (TypeVariable_c) t;
+            return this.uniqueIdentifier == other.uniqueIdentifier;
         }
         return false;
     }
-    
+
     @Override
     public int hashCode() {
         return this.uniqueIdentifier;

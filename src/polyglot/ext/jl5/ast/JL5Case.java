@@ -8,6 +8,7 @@ import polyglot.visit.TypeChecker;
 
 public interface JL5Case extends Case {
 
-	Node resolveCaseLabel(TypeChecker tc, Type switchType) throws SemanticException;
+    Node resolveCaseLabel(TypeChecker tc, Type switchType)
+            throws SemanticException;
 
 }

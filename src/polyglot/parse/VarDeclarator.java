@@ -48,12 +48,15 @@ public class VarDeclarator {
     public Id name() {
         return name;
     }
+
     public int dims() {
         return dims;
     }
+
     public Expr init() {
         return init;
     }
+
     public Position position() {
         return pos;
     }

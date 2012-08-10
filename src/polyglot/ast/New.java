@@ -36,8 +36,7 @@ import java.util.List;
  * list of arguments to be passed to the constructor of the object and an
  * optional <code>ClassBody</code> used to support anonymous classes.
  */
-public interface New extends Expr, ProcedureCall
-{
+public interface New extends Expr, ProcedureCall {
     /** The type object for anonymous classes, or null. */
     ParsedClassType anonType();
 

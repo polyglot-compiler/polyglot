@@ -39,17 +39,23 @@ import java.util.TreeSet;
  * We represent package scope as the absence of private, public and protected
  * scope modifiers.
  */
-public class Flags implements Serializable
-{
+public class Flags implements Serializable {
     protected Set<String> flags;
 
     protected static class FlagComparator implements Comparator<String> {
-        protected static List<String> order = new ArrayList<String>(
-            Arrays.asList(
-                "public", "private", "protected", "static", "final",
-                "synchronized", "transient", "native", "interface",
-                "abstract", "volatile", "strictfp"
-            ));
+        protected static List<String> order =
+                new ArrayList<String>(Arrays.asList("public",
+                                                    "private",
+                                                    "protected",
+                                                    "static",
+                                                    "final",
+                                                    "synchronized",
+                                                    "transient",
+                                                    "native",
+                                                    "interface",
+                                                    "abstract",
+                                                    "volatile",
+                                                    "strictfp"));
 
         @Override
         public int compare(String o1, String o2) {
@@ -64,22 +70,23 @@ public class Flags implements Serializable
         }
     }
 
-    public static final Flags NONE         = new Flags();
-    public static final Flags PUBLIC       = createFlag("public", null);
-    public static final Flags PRIVATE      = createFlag("private", null);
-    public static final Flags PROTECTED    = createFlag("protected", null);
-    public static final Flags STATIC       = createFlag("static", null);
-    public static final Flags FINAL        = createFlag("final", null);
+    public static final Flags NONE = new Flags();
+    public static final Flags PUBLIC = createFlag("public", null);
+    public static final Flags PRIVATE = createFlag("private", null);
+    public static final Flags PROTECTED = createFlag("protected", null);
+    public static final Flags STATIC = createFlag("static", null);
+    public static final Flags FINAL = createFlag("final", null);
     public static final Flags SYNCHRONIZED = createFlag("synchronized", null);
-    public static final Flags TRANSIENT    = createFlag("transient", null);
-    public static final Flags NATIVE       = createFlag("native", null);
-    public static final Flags INTERFACE    = createFlag("interface", null);
-    public static final Flags ABSTRACT     = createFlag("abstract", null);
-    public static final Flags VOLATILE     = createFlag("volatile", null);
-    public static final Flags STRICTFP     = createFlag("strictfp", null);
+    public static final Flags TRANSIENT = createFlag("transient", null);
+    public static final Flags NATIVE = createFlag("native", null);
+    public static final Flags INTERFACE = createFlag("interface", null);
+    public static final Flags ABSTRACT = createFlag("abstract", null);
+    public static final Flags VOLATILE = createFlag("volatile", null);
+    public static final Flags STRICTFP = createFlag("strictfp", null);
 
     /** All access flags. */
-    protected static final Flags ACCESS_FLAGS = PUBLIC.set(PRIVATE).set(PROTECTED);
+    protected static final Flags ACCESS_FLAGS = PUBLIC.set(PRIVATE)
+                                                      .set(PROTECTED);
 
     /**
      * Return a new Flags object with a new name.  Should be called only once
@@ -107,7 +114,7 @@ public class Flags implements Serializable
             order.add(0, name);
         }
         else {
-            for (ListIterator<String> i = order.listIterator(); i.hasNext(); ) {
+            for (ListIterator<String> i = order.listIterator(); i.hasNext();) {
                 String s = i.next();
                 after = after.clear(new Flags(s));
                 if (after.flags.isEmpty()) {
@@ -117,7 +124,7 @@ public class Flags implements Serializable
                 }
             }
 
-            if (! added) {
+            if (!added) {
                 // shouldn't happen
                 order.add(name);
             }
@@ -194,7 +201,7 @@ public class Flags implements Serializable
      * flag set.
      */
     public Flags Public() {
-	return set(PUBLIC);
+        return set(PUBLIC);
     }
 
     /**
@@ -202,14 +209,14 @@ public class Flags implements Serializable
      * flag clear.
      */
     public Flags clearPublic() {
-	return clear(PUBLIC);
+        return clear(PUBLIC);
     }
 
     /**
      * Return true if <code>this</code> has the <code>public</code> flag set.
      */
     public boolean isPublic() {
-	return contains(PUBLIC);
+        return contains(PUBLIC);
     }
 
     /**
@@ -217,7 +224,7 @@ public class Flags implements Serializable
      * flag set.
      */
     public Flags Private() {
-	return set(PRIVATE);
+        return set(PRIVATE);
     }
 
     /**
@@ -225,14 +232,14 @@ public class Flags implements Serializable
      * flag clear.
      */
     public Flags clearPrivate() {
-	return clear(PRIVATE);
+        return clear(PRIVATE);
     }
 
     /**
      * Return true if <code>this</code> has the <code>private</code> flag set.
      */
     public boolean isPrivate() {
-	return contains(PRIVATE);
+        return contains(PRIVATE);
     }
 
     /**
@@ -240,7 +247,7 @@ public class Flags implements Serializable
      * flag set.
      */
     public Flags Protected() {
-	return set(PROTECTED);
+        return set(PROTECTED);
     }
 
     /**
@@ -248,14 +255,14 @@ public class Flags implements Serializable
      * flag clear.
      */
     public Flags clearProtected() {
-	return clear(PROTECTED);
+        return clear(PROTECTED);
     }
 
     /**
      * Return true if <code>this</code> has the <code>protected</code> flag set.
      */
     public boolean isProtected() {
-	return contains(PROTECTED);
+        return contains(PROTECTED);
     }
 
     /**
@@ -271,7 +278,7 @@ public class Flags implements Serializable
      * (<code>public</code>, <code>private</code>, <code>protected</code>) set.
      */
     public boolean isPackage() {
-        return ! intersects(ACCESS_FLAGS);
+        return !intersects(ACCESS_FLAGS);
     }
 
     /**
@@ -279,7 +286,7 @@ public class Flags implements Serializable
      * flag set.
      */
     public Flags Static() {
-	return set(STATIC);
+        return set(STATIC);
     }
 
     /**
@@ -287,14 +294,14 @@ public class Flags implements Serializable
      * flag clear.
      */
     public Flags clearStatic() {
-	return clear(STATIC);
+        return clear(STATIC);
     }
 
     /**
      * Return true if <code>this</code> has the <code>static</code> flag set.
      */
     public boolean isStatic() {
-	return contains(STATIC);
+        return contains(STATIC);
     }
 
     /**
@@ -302,7 +309,7 @@ public class Flags implements Serializable
      * flag set.
      */
     public Flags Final() {
-	return set(FINAL);
+        return set(FINAL);
     }
 
     /**
@@ -310,14 +317,14 @@ public class Flags implements Serializable
      * flag clear.
      */
     public Flags clearFinal() {
-	return clear(FINAL);
+        return clear(FINAL);
     }
 
     /**
      * Return true if <code>this</code> has the <code>final</code> flag set.
      */
     public boolean isFinal() {
-	return contains(FINAL);
+        return contains(FINAL);
     }
 
     /**
@@ -325,7 +332,7 @@ public class Flags implements Serializable
      * <code>synchronized</code> flag set.
      */
     public Flags Synchronized() {
-	return set(SYNCHRONIZED);
+        return set(SYNCHRONIZED);
     }
 
     /**
@@ -333,7 +340,7 @@ public class Flags implements Serializable
      * <code>synchronized</code> flag clear.
      */
     public Flags clearSynchronized() {
-	return clear(SYNCHRONIZED);
+        return clear(SYNCHRONIZED);
     }
 
     /**
@@ -341,7 +348,7 @@ public class Flags implements Serializable
      * set.
      */
     public boolean isSynchronized() {
-	return contains(SYNCHRONIZED);
+        return contains(SYNCHRONIZED);
     }
 
     /**
@@ -349,7 +356,7 @@ public class Flags implements Serializable
      * flag set.
      */
     public Flags Transient() {
-	return set(TRANSIENT);
+        return set(TRANSIENT);
     }
 
     /**
@@ -357,14 +364,14 @@ public class Flags implements Serializable
      * flag clear.
      */
     public Flags clearTransient() {
-	return clear(TRANSIENT);
+        return clear(TRANSIENT);
     }
 
     /**
      * Return true if <code>this</code> has the <code>transient</code> flag set.
      */
     public boolean isTransient() {
-	return contains(TRANSIENT);
+        return contains(TRANSIENT);
     }
 
     /**
@@ -372,7 +379,7 @@ public class Flags implements Serializable
      * flag set.
      */
     public Flags Native() {
-	return set(NATIVE);
+        return set(NATIVE);
     }
 
     /**
@@ -380,14 +387,14 @@ public class Flags implements Serializable
      * flag clear.
      */
     public Flags clearNative() {
-	return clear(NATIVE);
+        return clear(NATIVE);
     }
 
     /**
      * Return true if <code>this</code> has the <code>native</code> flag set.
      */
     public boolean isNative() {
-	return contains(NATIVE);
+        return contains(NATIVE);
     }
 
     /**
@@ -395,7 +402,7 @@ public class Flags implements Serializable
      * flag set.
      */
     public Flags Interface() {
-	return set(INTERFACE);
+        return set(INTERFACE);
     }
 
     /**
@@ -403,14 +410,14 @@ public class Flags implements Serializable
      * flag clear.
      */
     public Flags clearInterface() {
-	return clear(INTERFACE);
+        return clear(INTERFACE);
     }
 
     /**
      * Return true if <code>this</code> has the <code>interface</code> flag set.
      */
     public boolean isInterface() {
-	return contains(INTERFACE);
+        return contains(INTERFACE);
     }
 
     /**
@@ -418,7 +425,7 @@ public class Flags implements Serializable
      * flag set.
      */
     public Flags Abstract() {
-	return set(ABSTRACT);
+        return set(ABSTRACT);
     }
 
     /**
@@ -426,14 +433,14 @@ public class Flags implements Serializable
      * flag clear.
      */
     public Flags clearAbstract() {
-	return clear(ABSTRACT);
+        return clear(ABSTRACT);
     }
 
     /**
      * Return true if <code>this</code> has the <code>abstract</code> flag set.
      */
     public boolean isAbstract() {
-	return contains(ABSTRACT);
+        return contains(ABSTRACT);
     }
 
     /**
@@ -441,7 +448,7 @@ public class Flags implements Serializable
      * flag set.
      */
     public Flags Volatile() {
-	return set(VOLATILE);
+        return set(VOLATILE);
     }
 
     /**
@@ -449,14 +456,14 @@ public class Flags implements Serializable
      * flag clear.
      */
     public Flags clearVolatile() {
-	return clear(VOLATILE);
+        return clear(VOLATILE);
     }
 
     /**
      * Return true if <code>this</code> has the <code>volatile</code> flag set.
      */
     public boolean isVolatile() {
-	return contains(VOLATILE);
+        return contains(VOLATILE);
     }
 
     /**
@@ -464,7 +471,7 @@ public class Flags implements Serializable
      * flag set.
      */
     public Flags StrictFP() {
-	return set(STRICTFP);
+        return set(STRICTFP);
     }
 
     /**
@@ -472,14 +479,14 @@ public class Flags implements Serializable
      * flag clear.
      */
     public Flags clearStrictFP() {
-	return clear(STRICTFP);
+        return clear(STRICTFP);
     }
 
     /**
      * Return true if <code>this</code> has the <code>strictfp</code> flag set.
      */
     public boolean isStrictFP() {
-	return contains(STRICTFP);
+        return contains(STRICTFP);
     }
 
     /**
@@ -528,6 +535,6 @@ public class Flags implements Serializable
 
     @Override
     public boolean equals(Object o) {
-	return o instanceof Flags && flags.equals(((Flags) o).flags);
+        return o instanceof Flags && flags.equals(((Flags) o).flags);
     }
 }

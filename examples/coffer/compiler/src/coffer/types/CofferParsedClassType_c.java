@@ -16,14 +16,13 @@ import polyglot.types.LazyClassInitializer;
 import polyglot.types.ParsedClassType_c;
 import polyglot.types.TypeSystem;
 
-public class CofferParsedClassType_c extends ParsedClassType_c
-                                         implements CofferParsedClassType
-{
+public class CofferParsedClassType_c extends ParsedClassType_c implements
+        CofferParsedClassType {
     PClass<Key, Key> instantiatedFrom;
     Key key;
 
-    public CofferParsedClassType_c(TypeSystem ts, LazyClassInitializer init, 
-                                   Source fromSource) {
+    public CofferParsedClassType_c(TypeSystem ts, LazyClassInitializer init,
+            Source fromSource) {
         super(ts, init, fromSource);
     }
 

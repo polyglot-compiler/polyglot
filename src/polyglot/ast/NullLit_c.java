@@ -33,39 +33,38 @@ import polyglot.visit.TypeChecker;
 /**
  * The Java literal <code>null</code>.
  */
-public class NullLit_c extends Lit_c implements NullLit
-{
+public class NullLit_c extends Lit_c implements NullLit {
     public NullLit_c(Position pos) {
-	super(pos);
+        super(pos);
     }
 
     /** Type check the expression. */
     @Override
     public Node typeCheck(TypeChecker tc) {
-	return type(tc.typeSystem().Null());
+        return type(tc.typeSystem().Null());
     }
 
     /** Get the value of the expression, as an object. */
     public Object objValue() {
-	return null;
+        return null;
     }
 
     @Override
     public String toString() {
-	return "null";
+        return "null";
     }
 
     /** Write the expression to an output file. */
     @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
-	w.write("null");
+        w.write("null");
     }
 
     @Override
     public Object constantValue() {
         return null;
     }
-    
+
     @Override
     public Node copy(NodeFactory nf) {
         return nf.NullLit(this.position);

@@ -40,19 +40,19 @@ public class PaoBinaryExt_c extends PaoExt_c {
 
             // The container of mi, mi.container(), is the super class of
             // the runtime boxed representations of primitive values.
-            if (ts.isSubtype(l.type(), mi.container()) ||
-                ts.equals(l.type(), ts.Object())) {
+            if (ts.isSubtype(l.type(), mi.container())
+                    || ts.equals(l.type(), ts.Object())) {
                 // The left operand is either a subtype of
-            	// pao.runtime.Primitive, or it is an
-            	// Object, and thus possibly a subtype of 
-            	// pao.runtime.Primitive. Either way,
-            	// it may be a boxed primitive.
+                // pao.runtime.Primitive, or it is an
+                // Object, and thus possibly a subtype of 
+                // pao.runtime.Primitive. Either way,
+                // it may be a boxed primitive.
                 if (r.type().isReference()) {
-                	// The right operand is a reference type, so replace the
-                	// binary operation with a call to
-                	// Primitive.equals(Object, Object).
-                    TypeNode x = nf.CanonicalTypeNode(b.position(),
-                                                      mi.container());
+                    // The right operand is a reference type, so replace the
+                    // binary operation with a call to
+                    // Primitive.equals(Object, Object).
+                    TypeNode x =
+                            nf.CanonicalTypeNode(b.position(), mi.container());
                     Call y =
                             nf.Call(b.position(),
                                     x,
@@ -61,7 +61,8 @@ public class PaoBinaryExt_c extends PaoExt_c {
                                     r);
                     y = (Call) y.type(mi.returnType());
                     if (b.operator() == Binary.NE) {
-                        return nf.Unary(b.position(), Unary.NOT, y).type(mi.returnType());
+                        return nf.Unary(b.position(), Unary.NOT, y)
+                                 .type(mi.returnType());
                     }
                     else {
                         return y;
@@ -69,7 +70,7 @@ public class PaoBinaryExt_c extends PaoExt_c {
                 }
             }
         }
-        
+
         // we do not need to rewrite the binary operator.
         return super.rewrite(ts, nf);
     }

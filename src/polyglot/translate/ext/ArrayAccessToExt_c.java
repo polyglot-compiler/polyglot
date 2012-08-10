@@ -33,8 +33,7 @@ import polyglot.translate.ExtensionRewriter;
  * An <code>ArrayAccess</code> is an immutable representation of an
  * access of an array member.
  */
-public class ArrayAccessToExt_c extends ToExt_c implements ToExt
-{
+public class ArrayAccessToExt_c extends ToExt_c implements ToExt {
     @Override
     public Node toExt(ExtensionRewriter rw) {
         ArrayAccess aa = (ArrayAccess) node();

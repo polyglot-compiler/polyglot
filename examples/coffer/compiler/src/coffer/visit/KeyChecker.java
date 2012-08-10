@@ -42,8 +42,7 @@ import coffer.types.ThrowConstraint;
 /**
  * Data flow analysis to compute and check held key sets.
  */
-public class KeyChecker extends DataFlow<DataFlow.Item>
-{
+public class KeyChecker extends DataFlow<DataFlow.Item> {
     public KeyChecker(Job job, TypeSystem ts, NodeFactory nf) {
         super(job, ts, nf, true /* forward analysis */);
         CofferTypeSystem vts = (CofferTypeSystem) ts;
@@ -54,8 +53,8 @@ public class KeyChecker extends DataFlow<DataFlow.Item>
     public Item createInitialItem(FlowGraph<Item> graph, Term node,
             boolean entry) {
         ProcedureDecl decl = (ProcedureDecl) graph.root();
-        CofferProcedureInstance pi = (CofferProcedureInstance)
-            decl.procedureInstance();
+        CofferProcedureInstance pi =
+                (CofferProcedureInstance) decl.procedureInstance();
 
         CofferClassType t = (CofferClassType) pi.container();
 
@@ -85,9 +84,9 @@ public class KeyChecker extends DataFlow<DataFlow.Item>
         @Override
         public boolean equals(Object i) {
             if (i instanceof ExitTermItem) {
-                ExitTermItem that = (ExitTermItem)i;
-                return this.excEdgesToItems.equals(that.excEdgesToItems) &&
-                       this.nonExItem.equals(that.nonExItem);
+                ExitTermItem that = (ExitTermItem) i;
+                return this.excEdgesToItems.equals(that.excEdgesToItems)
+                        && this.nonExItem.equals(that.nonExItem);
             }
             return false;
         }
@@ -112,7 +111,7 @@ public class KeyChecker extends DataFlow<DataFlow.Item>
         }
 
         private DataFlowItem(KeySet must_held, KeySet may_held,
-                             KeySet must_stored, KeySet may_stored) {
+                KeySet must_stored, KeySet may_stored) {
             this.must_held = must_held;
             this.may_held = may_held;
             this.must_stored = must_stored;
@@ -121,10 +120,9 @@ public class KeyChecker extends DataFlow<DataFlow.Item>
 
         @Override
         public String toString() {
-            return "held_keys(must_held=" + must_held + ", " +
-                             "may_held=" + may_held + ", " +
-                             "must_stored=" + must_stored + ", " +
-                             "may_stored=" + may_stored + ")";
+            return "held_keys(must_held=" + must_held + ", " + "may_held="
+                    + may_held + ", " + "must_stored=" + must_stored + ", "
+                    + "may_stored=" + may_stored + ")";
         }
 
         @Override
@@ -132,17 +130,17 @@ public class KeyChecker extends DataFlow<DataFlow.Item>
             if (o instanceof DataFlowItem) {
                 DataFlowItem that = (DataFlowItem) o;
                 return this.must_held.equals(that.must_held)
-                    && this.may_held.equals(that.may_held)
-                    && this.must_stored.equals(that.must_stored)
-                    && this.may_stored.equals(that.may_stored);
+                        && this.may_held.equals(that.may_held)
+                        && this.must_stored.equals(that.must_stored)
+                        && this.may_stored.equals(that.may_stored);
             }
             return false;
         }
 
         @Override
         public int hashCode() {
-            return must_held.hashCode() + may_held.hashCode() +
-                   must_stored.hashCode() + may_stored.hashCode();
+            return must_held.hashCode() + may_held.hashCode()
+                    + must_stored.hashCode() + may_stored.hashCode();
         }
     }
 
@@ -176,8 +174,11 @@ public class KeyChecker extends DataFlow<DataFlow.Item>
                 must_stored = must_stored.retainAll(must_held);
                 may_stored = may_stored.retainAll(may_held);
 
-                DataFlowItem newdf = new DataFlowItem(must_held, may_held,
-                                                      must_stored, may_stored);
+                DataFlowItem newdf =
+                        new DataFlowItem(must_held,
+                                         may_held,
+                                         must_stored,
+                                         may_stored);
 
                 if (Report.should_report(Topics.keycheck, 2)) {
                     Report.report(2, "flow(" + n + "):");
@@ -230,12 +231,12 @@ public class KeyChecker extends DataFlow<DataFlow.Item>
         Iterator<EdgeKey> j = itemKeys.iterator();
         while (i.hasNext() && j.hasNext()) {
             FlowGraph.EdgeKey key = j.next();
-            DataFlowItem item = (DataFlowItem)i.next();
+            DataFlowItem item = (DataFlowItem) i.next();
             if (key instanceof ExceptionEdgeKey) {
                 List<Item> l = excItemLists.get(key);
                 if (l == null) {
-                        l = new ArrayList<Item>();
-                        excItemLists.put((ExceptionEdgeKey) key, l);
+                    l = new ArrayList<Item>();
+                    excItemLists.put((ExceptionEdgeKey) key, l);
                 }
                 l.add(item);
             }
@@ -244,7 +245,8 @@ public class KeyChecker extends DataFlow<DataFlow.Item>
         Map<ExceptionEdgeKey, DataFlowItem> excItems =
                 new HashMap<ExceptionEdgeKey, DataFlowItem>(excItemLists.size());
         for (Entry<ExceptionEdgeKey, List<Item>> e : excItemLists.entrySet()) {
-            excItems.put(e.getKey(), confluence(e.getValue(), graph.root(), false, graph));
+            excItems.put(e.getKey(),
+                         confluence(e.getValue(), graph.root(), false, graph));
         }
         return new ExitTermItem(nonExc, excItems);
     }
@@ -258,8 +260,11 @@ public class KeyChecker extends DataFlow<DataFlow.Item>
             DataFlowItem df = (DataFlowItem) item;
 
             if (outItem == null) {
-                outItem = new DataFlowItem(df.must_held, df.may_held,
-                                           df.must_stored, df.may_stored);
+                outItem =
+                        new DataFlowItem(df.must_held,
+                                         df.may_held,
+                                         df.must_stored,
+                                         df.may_stored);
                 continue;
             }
 
@@ -269,7 +274,8 @@ public class KeyChecker extends DataFlow<DataFlow.Item>
             outItem.must_stored = outItem.must_stored.retainAll(df.must_stored);
             outItem.may_stored = outItem.may_stored.addAll(df.may_stored);
 
-            outItem.must_stored = outItem.must_stored.retainAll(outItem.must_held);
+            outItem.must_stored =
+                    outItem.must_stored.retainAll(outItem.must_held);
             outItem.may_stored = outItem.may_stored.retainAll(outItem.may_held);
         }
 
@@ -294,7 +300,7 @@ public class KeyChecker extends DataFlow<DataFlow.Item>
             Item inItem, Map<EdgeKey, Item> outItems) throws SemanticException {
         if (!entry) {
             if (graph.root().equals(n)) {
-                checkExitTerm(graph, (ExitTermItem)inItem);
+                checkExitTerm(graph, (ExitTermItem) inItem);
             }
             else {
                 DataFlowItem df = (DataFlowItem) inItem;
@@ -303,7 +309,8 @@ public class KeyChecker extends DataFlow<DataFlow.Item>
         }
     }
 
-    private void check(Term n, DataFlowItem df, boolean checkHeldKeys) throws SemanticException {
+    private void check(Term n, DataFlowItem df, boolean checkHeldKeys)
+            throws SemanticException {
         if (df == null) {
             return;
         }
@@ -313,16 +320,16 @@ public class KeyChecker extends DataFlow<DataFlow.Item>
             Report.report(2, "   " + df);
         }
 
-        if (! df.must_held.containsAll(df.may_held)) {
+        if (!df.must_held.containsAll(df.may_held)) {
             KeySet s = df.may_held.removeAll(df.must_held);
             throw new SemanticException("Keys " + s + " may not be held.",
                                         n.position());
         }
 
-        if (! df.must_stored.containsAll(df.may_stored)) {
+        if (!df.must_stored.containsAll(df.may_stored)) {
             KeySet s = df.may_stored.removeAll(df.must_stored);
-            throw new SemanticException("Keys " + s + " may not be saved" +
-                                        " in a local variable.", n.position());
+            throw new SemanticException("Keys " + s + " may not be saved"
+                    + " in a local variable.", n.position());
         }
 
         if (checkHeldKeys && n.ext() instanceof CofferExt) {
@@ -332,18 +339,18 @@ public class KeyChecker extends DataFlow<DataFlow.Item>
     }
 
     private void checkExitTerm(FlowGraph<Item> graph, ExitTermItem item)
-        throws SemanticException
-    {
+            throws SemanticException {
         check(graph.root(), item.nonExItem, true);
 
         List<TypeObject> excepts;
         ProcedureDeclExt_c ext = null;
-        
+
         if (graph.root() instanceof ProcedureDecl) {
-            ProcedureDecl pd = (ProcedureDecl)graph.root();
-            CofferProcedureInstance pi = (CofferProcedureInstance)pd.procedureInstance();
+            ProcedureDecl pd = (ProcedureDecl) graph.root();
+            CofferProcedureInstance pi =
+                    (CofferProcedureInstance) pd.procedureInstance();
             excepts = new ArrayList<TypeObject>(pi.throwConstraints());
-            ext = (ProcedureDeclExt_c)pd.ext();
+            ext = (ProcedureDeclExt_c) pd.ext();
         }
         else {
             excepts = new ArrayList<TypeObject>();
@@ -378,7 +385,9 @@ public class KeyChecker extends DataFlow<DataFlow.Item>
                 check(graph.root(), df, false);
 
                 if (ext != null && tc != null) {
-                    ext.checkHeldKeysThrowConstraint(tc, df.must_held, df.must_stored);
+                    ext.checkHeldKeysThrowConstraint(tc,
+                                                     df.must_held,
+                                                     df.must_stored);
                 }
 
             }

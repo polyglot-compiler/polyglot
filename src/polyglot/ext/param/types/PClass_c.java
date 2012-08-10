@@ -41,15 +41,17 @@ import polyglot.util.Position;
  * a ClassType that associates formal parameters with the class.
  * formals can be any type object.
  */
-public abstract class PClass_c<Formal extends Param, Actual extends TypeObject> extends TypeObject_c implements PClass<Formal, Actual> {
-    protected PClass_c() { }
+public abstract class PClass_c<Formal extends Param, Actual extends TypeObject>
+        extends TypeObject_c implements PClass<Formal, Actual> {
+    protected PClass_c() {
+    }
 
     public PClass_c(TypeSystem ts) {
         this(ts, null);
     }
 
     public PClass_c(TypeSystem ts, Position pos) {
-	super(ts, pos);
+        super(ts, pos);
     }
 
     @SuppressWarnings("unchecked")
@@ -62,36 +64,33 @@ public abstract class PClass_c<Formal extends Param, Actual extends TypeObject> 
     // Implement PClass
 
     @Override
-    public ClassType instantiate(Position pos, List<Actual> actuals) 
-        throws SemanticException
-    {
-	ParamTypeSystem<Formal, Actual> pts = typeSystem();
+    public ClassType instantiate(Position pos, List<Actual> actuals)
+            throws SemanticException {
+        ParamTypeSystem<Formal, Actual> pts = typeSystem();
         return pts.instantiate(pos, this, actuals);
     }
-    
-    
+
     /////////////////////////////////////////////////////////////////////////
     // Implement TypeObject
-    
+
     @Override
     public boolean isCanonical() {
         if (!clazz().isCanonical()) {
             return false;
-        } 
-     
+        }
+
         for (Param p : formals()) {
             if (!p.isCanonical()) {
                 return false;
             }
         }
-        
+
         return true;
     }
 
-    
     /////////////////////////////////////////////////////////////////////////
     // Implement Named
-   
+
     @Override
     public String name() {
         return clazz().name();
@@ -102,7 +101,6 @@ public abstract class PClass_c<Formal extends Param, Actual extends TypeObject> 
         return clazz().fullName();
     }
 
-    
     /////////////////////////////////////////////////////////////////////////
     // Implement Importable
 
@@ -110,5 +108,5 @@ public abstract class PClass_c<Formal extends Param, Actual extends TypeObject> 
     public Package package_() {
         return clazz().package_();
     }
-    
+
 }

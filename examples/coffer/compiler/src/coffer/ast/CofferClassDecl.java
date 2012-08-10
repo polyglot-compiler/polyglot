@@ -15,5 +15,6 @@ import polyglot.ast.ClassDecl;
  */
 public interface CofferClassDecl extends ClassDecl {
     KeyNode key();
+
     CofferClassDecl key(KeyNode key);
 }

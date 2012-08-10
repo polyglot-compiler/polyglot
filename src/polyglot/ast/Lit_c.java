@@ -33,10 +33,9 @@ import polyglot.visit.CFGBuilder;
 /**
  * <code>Lit</code> represents any Java literal.
  */
-public abstract class Lit_c extends Expr_c implements Lit
-{
+public abstract class Lit_c extends Expr_c implements Lit {
     public Lit_c(Position pos) {
-	super(pos);
+        super(pos);
     }
 
     /** Get the precedence of the expression. */
@@ -62,9 +61,9 @@ public abstract class Lit_c extends Expr_c implements Lit
 
     @Override
     public boolean isConstant() {
-	return true;
+        return true;
     }
-    
+
     @Override
     public abstract Object constantValue();
 }

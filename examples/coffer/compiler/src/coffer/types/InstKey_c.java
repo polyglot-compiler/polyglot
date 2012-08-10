@@ -11,8 +11,7 @@ import polyglot.types.TypeObject;
 import polyglot.types.TypeSystem;
 import polyglot.util.Position;
 
-public class InstKey_c extends Key_c implements InstKey
-{
+public class InstKey_c extends Key_c implements InstKey {
     public InstKey_c(TypeSystem ts, Position pos, String name) {
         super(ts, pos, name);
     }

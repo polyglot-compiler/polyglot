@@ -36,53 +36,52 @@ import polyglot.visit.CFGBuilder;
  * The class of the <code>Expr</code> returned by
  * <code>LocalAssign_c.left()</code>is guaranteed to be an <code>Local</code>.
  */
-public class LocalAssign_c extends Assign_c implements LocalAssign
-{
-  public LocalAssign_c(Position pos, Local left, Operator op, Expr right) {
-    super(pos, left, op, right);
-  }
-
-  @Override
-  public Assign left(Expr left) {
-      LocalAssign_c n = (LocalAssign_c)super.left(left);
-      n.assertLeftType();
-      return n;
-  }
-
-  private void assertLeftType() {
-      if (!(left() instanceof Local)) {
-          throw new InternalCompilerError("left expression of an LocalAssign must be a local");
-      }
-  }
-
-  @Override
-  public Term firstChild() {
-    if (operator() != Assign.ASSIGN) {
-      return left();
+public class LocalAssign_c extends Assign_c implements LocalAssign {
+    public LocalAssign_c(Position pos, Local left, Operator op, Expr right) {
+        super(pos, left, op, right);
     }
 
-    return right();
-  }
-  
-  @Override
-  protected void acceptCFGAssign(CFGBuilder<?> v) {
-	  // do not visit left()
-      // l = e: visit e -> (l = e)      
-      v.visitCFG(right(), this, EXIT);
-  }
-  
-  @Override
-  protected void acceptCFGOpAssign(CFGBuilder<?> v) {
-      /*
-      Local l = (Local)left();
-      
-      // l OP= e: visit l -> e -> (l OP= e)
-      v.visitThrow(l);
-      v.edge(l, right().entry());
-      v.visitCFG(right(), this);
-      */
-      
-      v.visitCFG(left(), right(), ENTRY);
-      v.visitCFG(right(), this, EXIT);
-  }
+    @Override
+    public Assign left(Expr left) {
+        LocalAssign_c n = (LocalAssign_c) super.left(left);
+        n.assertLeftType();
+        return n;
+    }
+
+    private void assertLeftType() {
+        if (!(left() instanceof Local)) {
+            throw new InternalCompilerError("left expression of an LocalAssign must be a local");
+        }
+    }
+
+    @Override
+    public Term firstChild() {
+        if (operator() != Assign.ASSIGN) {
+            return left();
+        }
+
+        return right();
+    }
+
+    @Override
+    protected void acceptCFGAssign(CFGBuilder<?> v) {
+        // do not visit left()
+        // l = e: visit e -> (l = e)      
+        v.visitCFG(right(), this, EXIT);
+    }
+
+    @Override
+    protected void acceptCFGOpAssign(CFGBuilder<?> v) {
+        /*
+        Local l = (Local)left();
+        
+        // l OP= e: visit l -> e -> (l OP= e)
+        v.visitThrow(l);
+        v.edge(l, right().entry());
+        v.visitCFG(right(), this);
+        */
+
+        v.visitCFG(left(), right(), ENTRY);
+        v.visitCFG(right(), this, EXIT);
+    }
 }

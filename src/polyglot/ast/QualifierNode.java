@@ -32,8 +32,7 @@ import polyglot.types.Qualifier;
  * qualifier (<code>polyglot.types.Qualifier</code>).  It can resolve to either
  * an enclosing type or can be a package.
  */
-public interface QualifierNode extends Prefix
-{
+public interface QualifierNode extends Prefix {
     /** The qualifier type object. */
     Qualifier qualifier();
 }

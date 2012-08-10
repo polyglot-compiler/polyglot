@@ -45,58 +45,56 @@ import polyglot.visit.TypeChecker;
  * statement. Such a statement contains a single <code>Expr</code> which
  * evaluates to the object being thrown.
  */
-public class Throw_c extends Stmt_c implements Throw
-{
+public class Throw_c extends Stmt_c implements Throw {
     protected Expr expr;
 
     public Throw_c(Position pos, Expr expr) {
-	super(pos);
-	assert(expr != null);
-	this.expr = expr;
+        super(pos);
+        assert (expr != null);
+        this.expr = expr;
     }
 
     /** Get the expression to throw. */
     @Override
     public Expr expr() {
-	return this.expr;
+        return this.expr;
     }
 
     /** Set the expression to throw. */
     @Override
     public Throw expr(Expr expr) {
-	Throw_c n = (Throw_c) copy();
-	n.expr = expr;
-	return n;
+        Throw_c n = (Throw_c) copy();
+        n.expr = expr;
+        return n;
     }
 
     /** Reconstruct the statement. */
     protected Throw_c reconstruct(Expr expr) {
-	if (expr != this.expr) {
-	    Throw_c n = (Throw_c) copy();
-	    n.expr = expr;
-	    return n;
-	}
+        if (expr != this.expr) {
+            Throw_c n = (Throw_c) copy();
+            n.expr = expr;
+            return n;
+        }
 
-	return this;
+        return this;
     }
 
     /** Visit the children of the statement. */
     @Override
     public Node visitChildren(NodeVisitor v) {
-	Expr expr = (Expr) visitChild(this.expr, v);
-	return reconstruct(expr);
+        Expr expr = (Expr) visitChild(this.expr, v);
+        return reconstruct(expr);
     }
 
     /** Type check the statement. */
     @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
-	if (! expr.type().isThrowable()) {
-	    throw new SemanticException(
-		"Can only throw subclasses of \"" +
-		tc.typeSystem().Throwable() + "\".", expr.position());
-	}
+        if (!expr.type().isThrowable()) {
+            throw new SemanticException("Can only throw subclasses of \""
+                    + tc.typeSystem().Throwable() + "\".", expr.position());
+        }
 
-	return this;
+        return this;
     }
 
     @Override
@@ -112,15 +110,15 @@ public class Throw_c extends Stmt_c implements Throw
 
     @Override
     public String toString() {
-	return "throw " + expr + ";";
+        return "throw " + expr + ";";
     }
 
     /** Write the statement to an output file. */
     @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
-	w.write("throw ");
-	print(expr, w, tr);
-	w.write(";");
+        w.write("throw ");
+        print(expr, w, tr);
+        w.write(";");
     }
 
     @Override
@@ -142,7 +140,7 @@ public class Throw_c extends Stmt_c implements Throw
         // then a NullPointerException will be thrown.
         return CollectionUtil.list(expr.type(), ts.NullPointerException());
     }
-    
+
     @Override
     public Node copy(NodeFactory nf) {
         return nf.Throw(this.position, this.expr);

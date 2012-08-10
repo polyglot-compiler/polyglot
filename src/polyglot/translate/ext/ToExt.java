@@ -10,6 +10,7 @@ public interface ToExt extends Ext {
 
     Node toExt(ExtensionRewriter extensionRewriter) throws SemanticException;
 
-    NodeVisitor toExtEnter(ExtensionRewriter extensionRewriter) throws SemanticException;
+    NodeVisitor toExtEnter(ExtensionRewriter extensionRewriter)
+            throws SemanticException;
 
 }

@@ -12,8 +12,8 @@ public class EnumConstantToJL_c extends EnumConstantToExt_c {
      */
     @Override
     public Node toExt(ExtensionRewriter rw) throws SemanticException {
-        EnumConstant ec = (EnumConstant) node();       
-        return  rw.to_nf().Field(ec.position(), ec.target(), ec.id());
+        EnumConstant ec = (EnumConstant) node();
+        return rw.to_nf().Field(ec.position(), ec.target(), ec.id());
     }
 
 }

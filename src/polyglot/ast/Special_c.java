@@ -44,68 +44,67 @@ import polyglot.visit.TypeChecker;
  * reference can be optionally qualified with a type such as 
  * <code>Foo.this</code>.
  */
-public class Special_c extends Expr_c implements Special
-{
+public class Special_c extends Expr_c implements Special {
     protected Special.Kind kind;
     protected TypeNode qualifier;
 
     public Special_c(Position pos, Special.Kind kind, TypeNode qualifier) {
-	super(pos);
-	assert(kind != null); // qualifier may be null
-	this.kind = kind;
-	this.qualifier = qualifier;
+        super(pos);
+        assert (kind != null); // qualifier may be null
+        this.kind = kind;
+        this.qualifier = qualifier;
     }
 
     /** Get the precedence of the expression. */
     @Override
     public Precedence precedence() {
-	return Precedence.LITERAL;
+        return Precedence.LITERAL;
     }
 
     /** Get the kind of the special expression, either this or super. */
     @Override
     public Special.Kind kind() {
-	return this.kind;
+        return this.kind;
     }
 
     /** Set the kind of the special expression, either this or super. */
     @Override
     public Special kind(Special.Kind kind) {
-	Special_c n = (Special_c) copy();
-	n.kind = kind;
-	return n;
+        Special_c n = (Special_c) copy();
+        n.kind = kind;
+        return n;
     }
 
     /** Get the qualifier of the special expression. */
     @Override
     public TypeNode qualifier() {
-	return this.qualifier;
+        return this.qualifier;
     }
 
     /** Set the qualifier of the special expression. */
     @Override
     public Special qualifier(TypeNode qualifier) {
-	Special_c n = (Special_c) copy();
-	n.qualifier = qualifier;
-	return n;
+        Special_c n = (Special_c) copy();
+        n.qualifier = qualifier;
+        return n;
     }
 
     /** Reconstruct the expression. */
     protected Special_c reconstruct(TypeNode qualifier) {
-	if (qualifier != this.qualifier) {
-	    Special_c n = (Special_c) copy();
-	    n.qualifier = qualifier;
-	    return n;
-	}
+        if (qualifier != this.qualifier) {
+            Special_c n = (Special_c) copy();
+            n.qualifier = qualifier;
+            return n;
+        }
 
-	return this;
+        return this;
     }
 
     /** Visit the children of the expression. */
     @Override
     public Node visitChildren(NodeVisitor v) {
-	TypeNode qualifier = (TypeNode) visitChild(this.qualifier, v);
-	return reconstruct(qualifier);
+        TypeNode qualifier = (TypeNode) visitChild(this.qualifier, v);
+        return reconstruct(qualifier);
     }
 
     /** Type check the expression. */
@@ -115,45 +114,49 @@ public class Special_c extends Expr_c implements Special
         Context c = tc.context();
 
         ClassType t = null;
-        
+
         if (qualifier == null) {
             // an unqualified "this" or "super"
             t = c.currentClass();
         }
         else {
-            if (! qualifier.isDisambiguated()) {
+            if (!qualifier.isDisambiguated()) {
                 return this;
             }
-            
+
             if (qualifier.type().isClass()) {
                 t = qualifier.type().toClass();
-                
+
                 if (!c.currentClass().hasEnclosingInstance(t)) {
-                    throw new SemanticException("The nested class \"" + 
-                                                c.currentClass() + "\" does not have " +
-                                                "an enclosing instance of type \"" +
-                                                t + "\".", qualifier.position());
+                    throw new SemanticException("The nested class \""
+                                                        + c.currentClass()
+                                                        + "\" does not have "
+                                                        + "an enclosing instance of type \""
+                                                        + t + "\".",
+                                                qualifier.position());
                 }
             }
             else {
-                throw new SemanticException("Invalid qualifier for \"this\" or \"super\".", qualifier.position());
+                throw new SemanticException("Invalid qualifier for \"this\" or \"super\".",
+                                            qualifier.position());
             }
         }
-        
-        if (t == null || (c.inStaticContext() && ts.equals(t, c.currentClass()))) {
+
+        if (t == null
+                || (c.inStaticContext() && ts.equals(t, c.currentClass()))) {
             // trying to access "this" or "super" from a static context.
-            throw new SemanticException("Cannot access a non-static " +
-                "field or method, or refer to \"this\" or \"super\" " + 
-                "from a static context.", this.position());
+            throw new SemanticException("Cannot access a non-static "
+                    + "field or method, or refer to \"this\" or \"super\" "
+                    + "from a static context.", this.position());
         }
-        
+
         if (kind == THIS) {
             return type(t);
         }
         else if (kind == SUPER) {
             return type(t.superType());
         }
-        
+
         return this;
     }
 
@@ -162,7 +165,7 @@ public class Special_c extends Expr_c implements Special
         if (qualifier != null) {
             return qualifier;
         }
-        
+
         return null;
     }
 
@@ -171,38 +174,39 @@ public class Special_c extends Expr_c implements Special
         if (qualifier != null) {
             v.visitCFG(qualifier, this, EXIT);
         }
-        
+
         return succs;
     }
 
     @Override
     public String toString() {
-	return (qualifier != null ? qualifier.type().toClass().name() + "." : "") + kind;
+        return (qualifier != null ? qualifier.type().toClass().name() + "."
+                : "") + kind;
     }
 
     /** Write the expression to an output file. */
     @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
-	if (qualifier != null) {
-	    w.write(qualifier.type().toClass().name());
-	    w.write(".");
-	}
+        if (qualifier != null) {
+            w.write(qualifier.type().toClass().name());
+            w.write(".");
+        }
 
-	w.write(kind.toString());
+        w.write(kind.toString());
     }
 
     @Override
     public void dump(CodeWriter w) {
-      super.dump(w);
+        super.dump(w);
 
-      if (kind != null) {
-        w.allowBreak(4, " ");
-        w.begin(0);
-        w.write("(kind " + kind + ")");
-        w.end();
-      }
+        if (kind != null) {
+            w.allowBreak(4, " ");
+            w.begin(0);
+            w.write("(kind " + kind + ")");
+            w.end();
+        }
     }
-    
+
     @Override
     public Node copy(NodeFactory nf) {
         return nf.Special(this.position, this.kind, this.qualifier);

@@ -27,16 +27,20 @@ import coffer.types.KeySet;
  */
 public interface CofferNodeFactory extends NodeFactory {
     Free Free(Position pos, Expr expr);
+
     TrackedTypeNode TrackedTypeNode(Position pos, KeyNode key, TypeNode base);
 
     AmbKeySetNode AmbKeySetNode(Position pos, List<KeyNode> keys);
+
     CanonicalKeySetNode CanonicalKeySetNode(Position pos, KeySet keys);
+
     KeyNode KeyNode(Position pos, Key key);
 
     New TrackedNew(Position pos, Expr outer, KeyNode key, TypeNode objectType,
             List<Expr> args, ClassBody body);
 
-    ThrowConstraintNode ThrowConstraintNode(Position pos, TypeNode tn, KeySetNode keys);
+    ThrowConstraintNode ThrowConstraintNode(Position pos, TypeNode tn,
+            KeySetNode keys);
 
     CofferMethodDecl CofferMethodDecl(Position pos, Flags flags,
             TypeNode returnType, Id name, List<Formal> formals,
@@ -45,11 +49,10 @@ public interface CofferNodeFactory extends NodeFactory {
 
     CofferConstructorDecl CofferConstructorDecl(Position pos, Flags flags,
             Id name, List<Formal> formals, KeySetNode entryKeys,
-            KeySetNode returnKeys, List<ThrowConstraintNode>
-                                              throwConstraints, Block body);
-
+            KeySetNode returnKeys, List<ThrowConstraintNode> throwConstraints,
+            Block body);
 
     CofferClassDecl CofferClassDecl(Position pos, Flags flags, Id name,
-            KeyNode key, TypeNode superClass, List<TypeNode>
-                                  interfaces, ClassBody body);
+            KeyNode key, TypeNode superClass, List<TypeNode> interfaces,
+            ClassBody body);
 }

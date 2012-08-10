@@ -46,10 +46,9 @@ public class TypeInputStream extends ObjectInputStream {
     protected boolean failed;
     protected boolean enableReplace;
     protected Set<Object> placeHoldersUsed;
-    
-    public TypeInputStream(InputStream in, TypeSystem ts, Map<Object, Object> cache)
-        throws IOException
-    {
+
+    public TypeInputStream(InputStream in, TypeSystem ts,
+            Map<Object, Object> cache) throws IOException {
         super(in);
 
         enableResolveObject(true);
@@ -60,7 +59,7 @@ public class TypeInputStream extends ObjectInputStream {
         this.enableReplace = true;
         this.placeHoldersUsed = new HashSet<Object>();
     }
-    
+
     public Set<Object> placeHoldersUsed() {
         return placeHoldersUsed;
     }
@@ -72,16 +71,17 @@ public class TypeInputStream extends ObjectInputStream {
     public TypeSystem getTypeSystem() {
         return ts;
     }
-    
+
     private final static Object UNRESOLVED = new Object();
-    
+
     public void installInPlaceHolderCache(PlaceHolder p, TypeObject t) {
         cache.put(p, t);
 
         if (t instanceof Named && p instanceof NamedPlaceHolder) {
             NamedPlaceHolder pp = (NamedPlaceHolder) p;
             if (Report.should_report(Report.serialize, 2))
-                Report.report(2, "Forcing " + pp.name() + " into system resolver"); 
+                Report.report(2, "Forcing " + pp.name()
+                        + " into system resolver");
             ts.systemResolver().install(pp.name(), (Named) t);
         }
 
@@ -94,20 +94,20 @@ public class TypeInputStream extends ObjectInputStream {
                 s = "<NullPointerException thrown>";
             }
         }
-        
+
         if (Report.should_report(Report.serialize, 2)) {
-            Report.report(2, "- Installing " + p
-                          + " -> " + s + " in place holder cache");         
+            Report.report(2, "- Installing " + p + " -> " + s
+                    + " in place holder cache");
         }
     }
-    
+
     public void enableReplace(boolean f) {
         this.enableReplace = f;
     }
 
     @Override
     protected Object resolveObject(Object o) {
-        if (! enableReplace) {
+        if (!enableReplace) {
             return o;
         }
         String s = "";
@@ -118,9 +118,9 @@ public class TypeInputStream extends ObjectInputStream {
             catch (NullPointerException e) {
                 s = "<NullPointerException thrown>";
             }
-        }	  
+        }
 
-        if (! enableReplace) {
+        if (!enableReplace) {
             return o;
         }
 
@@ -130,7 +130,7 @@ public class TypeInputStream extends ObjectInputStream {
             }
 
             placeHoldersUsed.add(o);
-            
+
             Object t = cache.get(o);
             if (t == UNRESOLVED) {
                 // A place holder lower in the call stack is trying to resolve
@@ -145,38 +145,42 @@ public class TypeInputStream extends ObjectInputStream {
                     cache.put(o, UNRESOLVED);
                     t = ((PlaceHolder) o).resolve(ts);
                     if (t == null) {
-                        throw new InternalCompilerError("Resolved " + s + " to null.");
+                        throw new InternalCompilerError("Resolved " + s
+                                + " to null.");
                     }
                     cache.put(o, t);
                     if (Report.should_report(Report.serialize, 2)) {
-                        Report.report(2, "- Resolving " + s + " : " + o.getClass()
-                                      + " to " + t + " : " + t.getClass());      	
+                        Report.report(2,
+                                      "- Resolving " + s + " : " + o.getClass()
+                                              + " to " + t + " : "
+                                              + t.getClass());
                     }
                 }
                 catch (CannotResolvePlaceHolderException e) {
-                    failed = true;              
+                    failed = true;
                     if (Report.should_report(Report.serialize, 2)) {
-                        Report.report(2, "- Resolving " + s + " : " + o.getClass()
-                                      + " to " + e);      	
+                        Report.report(2,
+                                      "- Resolving " + s + " : " + o.getClass()
+                                              + " to " + e);
                     }
                 }
             }
             else {
                 if (Report.should_report(Report.serialize, 2)) {
                     Report.report(2, "- Resolving " + s + " : " + o.getClass()
-                                  + " to (cached) " + t + " : " + t.getClass());      	
+                            + " to (cached) " + t + " : " + t.getClass());
                 }
             }
             return t;
         }
         else if (o instanceof Internable) {
-            if (Report.should_report(Report.serialize, 2)) {    
+            if (Report.should_report(Report.serialize, 2)) {
                 Report.report(2, "- Interning " + s + " : " + o.getClass());
             }
             return ((Internable) o).intern();
         }
         else {
-            if (Report.should_report(Report.serialize, 2)) {    
+            if (Report.should_report(Report.serialize, 2)) {
                 Report.report(2, "- " + s + " : " + o.getClass());
             }
 

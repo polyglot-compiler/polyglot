@@ -101,220 +101,223 @@ import polyglot.types.reflect.ClassFile;
  * is reported.
  */
 public class SourceClassResolver extends LoadedClassResolver {
-	protected Compiler compiler;
-	protected ExtensionInfo ext;
-	protected boolean compileCommandLineOnly;
-	protected boolean ignoreModTimes;
+    protected Compiler compiler;
+    protected ExtensionInfo ext;
+    protected boolean compileCommandLineOnly;
+    protected boolean ignoreModTimes;
 
-	/**
-	 * Create a loaded class resolver.
-	 * 
-	 * @param compiler
-	 *            The compiler.
-	 * @param ext
-	 *            The extension to load sources for.
-	 * @param allowRawClasses
-	 *            True if vanilla Java class files without Polyglot-embedded
-	 *            type information should be allowed.
-	 * @param compileCommandLineOnly
-	 *            TODO
-	 * @param ignoreModTimes
-	 *            TODO
-	 */
-	public SourceClassResolver(Compiler compiler, ExtensionInfo ext,
-			boolean allowRawClasses, boolean compileCommandLineOnly,
-			boolean ignoreModTimes) {
-		super(ext, allowRawClasses);
-		this.compiler = compiler;
-		this.ext = ext;
-		this.compileCommandLineOnly = compileCommandLineOnly;
-		this.ignoreModTimes = ignoreModTimes;
-	}
+    /**
+     * Create a loaded class resolver.
+     * 
+     * @param compiler
+     *            The compiler.
+     * @param ext
+     *            The extension to load sources for.
+     * @param allowRawClasses
+     *            True if vanilla Java class files without Polyglot-embedded
+     *            type information should be allowed.
+     * @param compileCommandLineOnly
+     *            TODO
+     * @param ignoreModTimes
+     *            TODO
+     */
+    public SourceClassResolver(Compiler compiler, ExtensionInfo ext,
+            boolean allowRawClasses, boolean compileCommandLineOnly,
+            boolean ignoreModTimes) {
+        super(ext, allowRawClasses);
+        this.compiler = compiler;
+        this.ext = ext;
+        this.compileCommandLineOnly = compileCommandLineOnly;
+        this.ignoreModTimes = ignoreModTimes;
+    }
 
-	@Override
+    @Override
     public boolean packageExists(String name) {
-		if (super.packageExists(name)) {
-			return true;
-		}
-		/*
-		 * if (ext.sourceLoader().packageExists(name)) { return true; }
-		 */
-		return false;
-	}
+        if (super.packageExists(name)) {
+            return true;
+        }
+        /*
+         * if (ext.sourceLoader().packageExists(name)) { return true; }
+         */
+        return false;
+    }
 
-	/**
-	 * Find a type by name.
-	 */
-	@Override
+    /**
+     * Find a type by name.
+     */
+    @Override
     public Named find(String name) throws SemanticException {
-		if (Report.should_report(report_topics, 3))
-			Report.report(3, "SourceCR.find(" + name + ")");
+        if (Report.should_report(report_topics, 3))
+            Report.report(3, "SourceCR.find(" + name + ")");
 
-		ClassFile clazz = null;
-		ClassFile encodedClazz = null;
-		FileSource source = null;
+        ClassFile clazz = null;
+        ClassFile encodedClazz = null;
+        FileSource source = null;
 
-		// First try the class file.
-		clazz = loadFile(name);
-		if (clazz != null) {
-			// Check for encoded type information.
-			if (clazz.encodedClassType(version.name()) != null) {
-				if (Report.should_report(report_topics, 4))
-					Report.report(4, "Class " + name + " has encoded type info");
-				encodedClazz = clazz;
-			}
-			if (encodedClazz != null
-					&& !name.replace(".", File.separator).equals(
-							encodedClazz.name())) {
-				if (Report.should_report(report_topics, 3))
-					Report.report(3, "Not using " + encodedClazz.name()
-							+ "(case-insensitive filesystem?)");
-				encodedClazz = null;
-				clazz = null;
-			}
-		}
-
-		// Now, try and find the source file.
-		source = ext.sourceLoader().classSource(name);
-        if (source != null) {
-                // Check if this is the actual source file we wanted...
-                String className = source.name();
-                int dot1 = className.lastIndexOf('.');
-                className = dot1 > 0 ? className.substring(0, dot1) : className;
-                int slash1 = className.lastIndexOf(File.separatorChar);
-                className = slash1 > 0 ? className.substring(slash1 + 1) : className;
-                int dot2 = name.lastIndexOf('.');
-                String clazzName = dot2 > 0 ? name.substring(dot2 + 1) : name;
-                if (!className.equals(clazzName))
-                        source = null;
+        // First try the class file.
+        clazz = loadFile(name);
+        if (clazz != null) {
+            // Check for encoded type information.
+            if (clazz.encodedClassType(version.name()) != null) {
+                if (Report.should_report(report_topics, 4))
+                    Report.report(4, "Class " + name + " has encoded type info");
+                encodedClazz = clazz;
+            }
+            if (encodedClazz != null
+                    && !name.replace(".", File.separator)
+                            .equals(encodedClazz.name())) {
+                if (Report.should_report(report_topics, 3))
+                    Report.report(3, "Not using " + encodedClazz.name()
+                            + "(case-insensitive filesystem?)");
+                encodedClazz = null;
+                clazz = null;
+            }
         }
 
-		// Check if a job for the source already exists.
-		if (ext.scheduler().sourceHasJob(source)) {
-			// the source has already been compiled; what are we doing here?
-			return getTypeFromSource(source, name);
-		}
+        // Now, try and find the source file.
+        source = ext.sourceLoader().classSource(name);
+        if (source != null) {
+            // Check if this is the actual source file we wanted...
+            String className = source.name();
+            int dot1 = className.lastIndexOf('.');
+            className = dot1 > 0 ? className.substring(0, dot1) : className;
+            int slash1 = className.lastIndexOf(File.separatorChar);
+            className =
+                    slash1 > 0 ? className.substring(slash1 + 1) : className;
+            int dot2 = name.lastIndexOf('.');
+            String clazzName = dot2 > 0 ? name.substring(dot2 + 1) : name;
+            if (!className.equals(clazzName)) source = null;
+        }
 
-		if (Report.should_report(report_topics, 4)) {
-			if (source == null)
-				Report.report(4, "Class " + name + " not found in source file");
-			else
-				Report.report(4, "Class " + name + " found in source " + source);
-		}
+        // Check if a job for the source already exists.
+        if (ext.scheduler().sourceHasJob(source)) {
+            // the source has already been compiled; what are we doing here?
+            return getTypeFromSource(source, name);
+        }
 
-		// Don't use the raw class if the source or encoded class is available.
-		if (encodedClazz != null || source != null) {
-			if (Report.should_report(report_topics, 4))
-				Report.report(4, "Not using raw class file for " + name);
-			clazz = null;
-		}
-		// If both the source and encoded class are available, we decide which
-		// to
-		// use based on compiler compatibility and modification times.
-		if (encodedClazz != null && source != null) {
-			long classModTime = encodedClazz.sourceLastModified(version.name());
-			long sourceModTime = source.getLastModified();
+        if (Report.should_report(report_topics, 4)) {
+            if (source == null)
+                Report.report(4, "Class " + name + " not found in source file");
+            else Report.report(4, "Class " + name + " found in source "
+                    + source);
+        }
 
-			int comp = checkCompilerVersion(encodedClazz
-					.compilerVersion(version.name()));
-			if (!ignoreModTimes && classModTime < sourceModTime) {
-				if (Report.should_report(report_topics, 3))
-					Report.report(3,
-							"Source file version is newer than compiled for "
-									+ name + ".");
-				encodedClazz = null;
-			} else if (comp != COMPATIBLE) {
-				// Incompatible or older version, so go with the source.
-				if (Report.should_report(report_topics, 3))
-					Report.report(3, "Incompatible source file version for "
-							+ name + ".");
-				encodedClazz = null;
-			}
-		}
+        // Don't use the raw class if the source or encoded class is available.
+        if (encodedClazz != null || source != null) {
+            if (Report.should_report(report_topics, 4))
+                Report.report(4, "Not using raw class file for " + name);
+            clazz = null;
+        }
+        // If both the source and encoded class are available, we decide which
+        // to
+        // use based on compiler compatibility and modification times.
+        if (encodedClazz != null && source != null) {
+            long classModTime = encodedClazz.sourceLastModified(version.name());
+            long sourceModTime = source.getLastModified();
 
-		Named result = null;
+            int comp =
+                    checkCompilerVersion(encodedClazz.compilerVersion(version.name()));
+            if (!ignoreModTimes && classModTime < sourceModTime) {
+                if (Report.should_report(report_topics, 3))
+                    Report.report(3,
+                                  "Source file version is newer than compiled for "
+                                          + name + ".");
+                encodedClazz = null;
+            }
+            else if (comp != COMPATIBLE) {
+                // Incompatible or older version, so go with the source.
+                if (Report.should_report(report_topics, 3))
+                    Report.report(3, "Incompatible source file version for "
+                            + name + ".");
+                encodedClazz = null;
+            }
+        }
 
-		if (encodedClazz != null) {
-			if (Report.should_report(report_topics, 4))
-				Report.report(4, "Using encoded class type for " + name);
-			try {
-				result = getEncodedType(encodedClazz, name);
-			} catch (BadSerializationException e) {
-				throw e;
-			} catch (SemanticException e) {
-				if (Report.should_report(report_topics, 4))
-					Report.report(4, "Could not load encoded class " + name);
-				encodedClazz = null;
-			}
-		}
+        Named result = null;
 
-		// At this point, at most one of clazz and source should be set.
-		if (result == null && clazz != null && this.allowRawClasses) {
-			if (Report.should_report(report_topics, 4))
-				Report.report(4, "Using raw class file for " + name);
-			result = ts.classFileLazyClassInitializer(clazz).type();
-		}
+        if (encodedClazz != null) {
+            if (Report.should_report(report_topics, 4))
+                Report.report(4, "Using encoded class type for " + name);
+            try {
+                result = getEncodedType(encodedClazz, name);
+            }
+            catch (BadSerializationException e) {
+                throw e;
+            }
+            catch (SemanticException e) {
+                if (Report.should_report(report_topics, 4))
+                    Report.report(4, "Could not load encoded class " + name);
+                encodedClazz = null;
+            }
+        }
 
-		if (result == null && source != null) {
-			if (Report.should_report(report_topics, 4))
-				Report.report(4, "Using source file for " + name);
-			result = getTypeFromSource(source, name);
-		}
+        // At this point, at most one of clazz and source should be set.
+        if (result == null && clazz != null && this.allowRawClasses) {
+            if (Report.should_report(report_topics, 4))
+                Report.report(4, "Using raw class file for " + name);
+            result = ts.classFileLazyClassInitializer(clazz).type();
+        }
 
-		// Verify that the type we loaded has the right name. This prevents,
-		// for example, requesting a type through its mangled (class file) name.
-		if (result != null) {
-			return result;
-			// if (name.equals(result.fullName())) {
-			// return result;
-			// }
-			// if (result instanceof ClassType &&
-			// name.equals(ts.getTransformedClassName((ClassType) result))) {
-			// return result;
-			// }
-		}
+        if (result == null && source != null) {
+            if (Report.should_report(report_topics, 4))
+                Report.report(4, "Using source file for " + name);
+            result = getTypeFromSource(source, name);
+        }
 
-		if (clazz != null && !this.allowRawClasses) {
-			// We have a raw class only. We do not have the source code,
-			// or encoded class information.
-			throw new SemanticException("Class \"" + name + "\" not found."
-					+ " A class file was found at " + clazz.getClassFileURI()
-					+ ", but it did not contain appropriate"
-					+ " information for the Polyglot-based compiler "
-					+ ext.compilerName() + ". Try using " + ext.compilerName()
-					+ " to recompile the source code.");
-		}
-		throw new NoClassException(name);
-	}
+        // Verify that the type we loaded has the right name. This prevents,
+        // for example, requesting a type through its mangled (class file) name.
+        if (result != null) {
+            return result;
+            // if (name.equals(result.fullName())) {
+            // return result;
+            // }
+            // if (result instanceof ClassType &&
+            // name.equals(ts.getTransformedClassName((ClassType) result))) {
+            // return result;
+            // }
+        }
 
-	/**
-	 * Get a type from a source file.
-	 */
-	protected Named getTypeFromSource(FileSource source, String name)
-			throws SemanticException {
-		Scheduler scheduler = ext.scheduler();
-		Job job = scheduler.loadSource(source, !compileCommandLineOnly);
+        if (clazz != null && !this.allowRawClasses) {
+            // We have a raw class only. We do not have the source code,
+            // or encoded class information.
+            throw new SemanticException("Class \"" + name + "\" not found."
+                    + " A class file was found at " + clazz.getClassFileURI()
+                    + ", but it did not contain appropriate"
+                    + " information for the Polyglot-based compiler "
+                    + ext.compilerName() + ". Try using " + ext.compilerName()
+                    + " to recompile the source code.");
+        }
+        throw new NoClassException(name);
+    }
 
-		if (Report.should_report("sourceloader", 3))
-			new Exception("loaded " + source).printStackTrace();
+    /**
+     * Get a type from a source file.
+     */
+    protected Named getTypeFromSource(FileSource source, String name)
+            throws SemanticException {
+        Scheduler scheduler = ext.scheduler();
+        Job job = scheduler.loadSource(source, !compileCommandLineOnly);
 
-		if (job != null) {
-			Named n = ts.systemResolver().check(name);
+        if (Report.should_report("sourceloader", 3))
+            new Exception("loaded " + source).printStackTrace();
 
-			if (n != null) {
-				return n;
-			}
+        if (job != null) {
+            Named n = ts.systemResolver().check(name);
 
-			Goal g = scheduler.TypesInitialized(job);
+            if (n != null) {
+                return n;
+            }
 
-			if (!scheduler.reached(g)) {
-				throw new MissingDependencyException(g);
-			}
-		}
+            Goal g = scheduler.TypesInitialized(job);
 
-		// The source has already been compiled, but the type was not created
-		// there.
-		throw new NoClassException(name, "Could not find \"" + name + "\" in "
-				+ source + ".");
-	}
+            if (!scheduler.reached(g)) {
+                throw new MissingDependencyException(g);
+            }
+        }
+
+        // The source has already been compiled, but the type was not created
+        // there.
+        throw new NoClassException(name, "Could not find \"" + name + "\" in "
+                + source + ".");
+    }
 }

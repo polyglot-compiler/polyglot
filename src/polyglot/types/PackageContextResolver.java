@@ -32,8 +32,7 @@ import polyglot.util.StringUtil;
  * A <code>PackageContextResolver</code> is responsible for looking up types
  * and packages in a package by name.
  */
-public class PackageContextResolver extends AbstractAccessControlResolver
-{
+public class PackageContextResolver extends AbstractAccessControlResolver {
     protected Package p;
 
     /**
@@ -43,7 +42,7 @@ public class PackageContextResolver extends AbstractAccessControlResolver
      */
     public PackageContextResolver(TypeSystem ts, Package p) {
         super(ts);
-	this.p = p;
+        this.p = p;
     }
 
     /**
@@ -65,37 +64,39 @@ public class PackageContextResolver extends AbstractAccessControlResolver
      */
     @Override
     public Named find(String name, ClassType accessor) throws SemanticException {
-	if (! StringUtil.isNameShort(name)) {
-	    throw new InternalCompilerError(
-		"Cannot lookup qualified name " + name);
-	}
-        
+        if (!StringUtil.isNameShort(name)) {
+            throw new InternalCompilerError("Cannot lookup qualified name "
+                    + name);
+        }
+
         Named n = null;
 
-	try {
-	    n = ts.systemResolver().find(p.fullName() + "." + name);
-	}
-	catch (NoClassException e) {
+        try {
+            n = ts.systemResolver().find(p.fullName() + "." + name);
+        }
+        catch (NoClassException e) {
             // Rethrow if some _other_ class or package was not found.
             if (!e.getClassName().equals(p.fullName() + "." + name)) {
                 throw e;
             }
-	}
+        }
 
         if (n == null) {
             n = ts.createPackage(p, name);
         }
-        
-        if (! canAccess(n, accessor)) {
-            throw new SemanticException("Cannot access " + n + " from " + accessor + ".");
+
+        if (!canAccess(n, accessor)) {
+            throw new SemanticException("Cannot access " + n + " from "
+                    + accessor + ".");
         }
-        
+
         return n;
     }
 
     protected boolean canAccess(Named n, ClassType accessor) {
         if (n instanceof ClassType) {
-            return accessor == null || ts.classAccessible((ClassType) n, accessor);
+            return accessor == null
+                    || ts.classAccessible((ClassType) n, accessor);
         }
         return true;
     }

@@ -46,8 +46,7 @@ import polyglot.types.TypeSystem;
     
     @see #ascribe
     */
-public class AscriptionVisitor extends ContextVisitor
-{
+public class AscriptionVisitor extends ContextVisitor {
     protected Type type;
     protected AscriptionVisitor outer;
 
@@ -127,7 +126,7 @@ public class AscriptionVisitor extends ContextVisitor
      */
     @Override
     public Node leaveCall(Node old, Node n, NodeVisitor v)
-        throws SemanticException {
+            throws SemanticException {
 
         if (n instanceof Expr) {
             Expr e = (Expr) n;
@@ -135,6 +134,6 @@ public class AscriptionVisitor extends ContextVisitor
             return ascribe(e, type);
         }
 
-	return n;
+        return n;
     }
 }

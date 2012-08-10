@@ -55,8 +55,7 @@ import polyglot.visit.FlowGraph.Peer;
 /**
  * Class used to construct a CFG.
  */
-public class CFGBuilder<FlowItem extends DataFlow.Item> implements Copy
-{
+public class CFGBuilder<FlowItem extends DataFlow.Item> implements Copy {
     /** The flowgraph under construction. */
     protected FlowGraph<FlowItem> graph;
 
@@ -135,7 +134,8 @@ public class CFGBuilder<FlowItem extends DataFlow.Item> implements Copy
      */
     protected boolean errorEdgesToExitNode;
 
-    public CFGBuilder(TypeSystem ts, FlowGraph<FlowItem> graph, DataFlow<FlowItem> df) {
+    public CFGBuilder(TypeSystem ts, FlowGraph<FlowItem> graph,
+            DataFlow<FlowItem> df) {
         this.ts = ts;
         this.graph = graph;
         this.df = df;
@@ -146,11 +146,25 @@ public class CFGBuilder<FlowItem extends DataFlow.Item> implements Copy
         this.errorEdgesToExitNode = false;
     }
 
-    public FlowGraph<FlowItem> graph() { return graph; }
-    public DataFlow<FlowItem> dataflow() { return df; }
-    public CFGBuilder<FlowItem> outer() { return outer; }
-    public Stmt innermostTarget() { return innermostTarget; }
-    public boolean skipInnermostCatches() { return skipInnermostCatches; }
+    public FlowGraph<FlowItem> graph() {
+        return graph;
+    }
+
+    public DataFlow<FlowItem> dataflow() {
+        return df;
+    }
+
+    public CFGBuilder<FlowItem> outer() {
+        return outer;
+    }
+
+    public Stmt innermostTarget() {
+        return innermostTarget;
+    }
+
+    public boolean skipInnermostCatches() {
+        return skipInnermostCatches;
+    }
 
     /** Get the type system. */
     public TypeSystem typeSystem() {
@@ -195,15 +209,20 @@ public class CFGBuilder<FlowItem extends DataFlow.Item> implements Copy
      * the loop, visiting any finally blocks encountered.
      */
     public void visitBranchTarget(Branch b) {
-        Peer<FlowItem> last_peer = graph.peer(b, this.path_to_finally, Term.EXIT);
+        Peer<FlowItem> last_peer =
+                graph.peer(b, this.path_to_finally, Term.EXIT);
 
         for (CFGBuilder<FlowItem> v = this; v != null; v = v.outer) {
             Term c = v.innermostTarget;
 
             if (c instanceof Try) {
                 Try tr = (Try) c;
-                if (tr.finallyBlock() != null) {                    
-                    last_peer = tryFinally(v, last_peer, last_peer.node == b, tr.finallyBlock());
+                if (tr.finallyBlock() != null) {
+                    last_peer =
+                            tryFinally(v,
+                                       last_peer,
+                                       last_peer.node == b,
+                                       tr.finallyBlock());
                 }
             }
 
@@ -212,18 +231,26 @@ public class CFGBuilder<FlowItem extends DataFlow.Item> implements Copy
                     Labeled l = (Labeled) c;
                     if (l.label().equals(b.label())) {
                         if (b.kind() == Branch.BREAK) {
-                            edge(last_peer, this.graph().peer(l, this.path_to_finally, Term.EXIT), FlowGraph.EDGE_KEY_OTHER);
+                            edge(last_peer,
+                                 this.graph().peer(l,
+                                                   this.path_to_finally,
+                                                   Term.EXIT),
+                                 FlowGraph.EDGE_KEY_OTHER);
                         }
                         else {
                             Stmt s = l.statement();
                             if (s instanceof Loop) {
                                 Loop loop = (Loop) s;
-                                edge(last_peer, this.graph().peer(loop.continueTarget(), this.path_to_finally, Term.ENTRY), 
+                                edge(last_peer,
+                                     this.graph().peer(loop.continueTarget(),
+                                                       this.path_to_finally,
+                                                       Term.ENTRY),
                                      FlowGraph.EDGE_KEY_OTHER);
                             }
                             else {
-                                throw new CFGBuildError("Target of continue statement must " +
-                                        "be a loop.", l.position());
+                                throw new CFGBuildError("Target of continue statement must "
+                                                                + "be a loop.",
+                                                        l.position());
                             }
                         }
 
@@ -235,17 +262,26 @@ public class CFGBuilder<FlowItem extends DataFlow.Item> implements Copy
                 if (c instanceof Loop) {
                     Loop l = (Loop) c;
                     if (b.kind() == Branch.CONTINUE) {
-                        edge(last_peer, this.graph().peer(l.continueTarget(), this.path_to_finally, Term.ENTRY), 
+                        edge(last_peer,
+                             this.graph().peer(l.continueTarget(),
+                                               this.path_to_finally,
+                                               Term.ENTRY),
                              FlowGraph.EDGE_KEY_OTHER);
                     }
                     else {
-                        edge(last_peer, this.graph().peer(l, this.path_to_finally, Term.EXIT), FlowGraph.EDGE_KEY_OTHER);
+                        edge(last_peer,
+                             this.graph().peer(l,
+                                               this.path_to_finally,
+                                               Term.EXIT),
+                             FlowGraph.EDGE_KEY_OTHER);
                     }
 
                     return;
                 }
                 else if (c instanceof Switch && b.kind() == Branch.BREAK) {
-                    edge(last_peer, this.graph().peer(c, this.path_to_finally, Term.EXIT), FlowGraph.EDGE_KEY_OTHER);
+                    edge(last_peer,
+                         this.graph().peer(c, this.path_to_finally, Term.EXIT),
+                         FlowGraph.EDGE_KEY_OTHER);
                     return;
                 }
             }
@@ -260,7 +296,8 @@ public class CFGBuilder<FlowItem extends DataFlow.Item> implements Copy
      * finally blocks encountered.
      */
     public void visitReturn(Return r) {
-        Peer<FlowItem> last_peer = this.graph().peer(r, this.path_to_finally, Term.EXIT);
+        Peer<FlowItem> last_peer =
+                this.graph().peer(r, this.path_to_finally, Term.EXIT);
 
         for (CFGBuilder<FlowItem> v = this; v != null; v = v.outer) {
             Term c = v.innermostTarget;
@@ -268,7 +305,11 @@ public class CFGBuilder<FlowItem extends DataFlow.Item> implements Copy
             if (c instanceof Try) {
                 Try tr = (Try) c;
                 if (tr.finallyBlock() != null) {
-                    last_peer = tryFinally(v, last_peer, last_peer.node == r, tr.finallyBlock());
+                    last_peer =
+                            tryFinally(v,
+                                       last_peer,
+                                       last_peer.node == r,
+                                       tr.finallyBlock());
                 }
             }
         }
@@ -287,16 +328,23 @@ public class CFGBuilder<FlowItem extends DataFlow.Item> implements Copy
         if (Report.should_report(Report.cfg, 2)) {
             String rootName = "";
             if (graph.root() instanceof CodeNode) {
-                CodeNode cd = (CodeNode)graph.root();
+                CodeNode cd = (CodeNode) graph.root();
                 rootName = cd.codeInstance().toString();
                 if (cd.codeInstance() instanceof MemberInstance) {
-                    rootName += " in " + ((MemberInstance) cd.codeInstance()).container().toString();
+                    rootName +=
+                            " in "
+                                    + ((MemberInstance) cd.codeInstance()).container()
+                                                                          .toString();
                 }
             }
 
             Report.report(2, "digraph CFGBuild" + name + " {");
-            Report.report(2, "  label=\"CFGBuilder: " + name + "\\n" + rootName +
-                    "\"; fontsize=20; center=true; ratio=auto; size = \"8.5,11\";");
+            Report.report(2,
+                          "  label=\"CFGBuilder: "
+                                  + name
+                                  + "\\n"
+                                  + rootName
+                                  + "\"; fontsize=20; center=true; ratio=auto; size = \"8.5,11\";");
         }
 
         // create peers for the entry and exit nodes.
@@ -305,24 +353,26 @@ public class CFGBuilder<FlowItem extends DataFlow.Item> implements Copy
 
         this.visitCFG(graph.root(), Collections.<EdgeKeyTermPair> emptyList());
 
-        if (Report.should_report(Report.cfg, 2))
-            Report.report(2, "}");
+        if (Report.should_report(Report.cfg, 2)) Report.report(2, "}");
     }
 
     /**
      * Utility method to get the peer for the entry of the flow graph.
      */
     protected Peer<FlowItem> entryPeer() {
-        return graph.peer(graph.root(), Collections.<Term> emptyList(), Term.ENTRY);
+        return graph.peer(graph.root(),
+                          Collections.<Term> emptyList(),
+                          Term.ENTRY);
     }
 
     /**
      * Utility method to get the peer for the exit of the flow graph.
      */
     protected Peer<FlowItem> exitPeer() {
-        return graph.peer(graph.root(), Collections.<Term> emptyList(), Term.EXIT);
+        return graph.peer(graph.root(),
+                          Collections.<Term> emptyList(),
+                          Term.EXIT);
     }
-
 
     /**
      * Utility function to visit all edges in a list.
@@ -331,7 +381,8 @@ public class CFGBuilder<FlowItem extends DataFlow.Item> implements Copy
      * <code>after</code>'s entry node; if it's Term.EXIT, it's 
      * <code>after</code>'s exit.
      */
-    public void visitCFGList(List<? extends Term> elements, Term after, int entry) {
+    public void visitCFGList(List<? extends Term> elements, Term after,
+            int entry) {
         Term prev = null;
 
         for (Term c : elements) {
@@ -369,7 +420,8 @@ public class CFGBuilder<FlowItem extends DataFlow.Item> implements Copy
      * entry node; if it's Term.EXIT, it's <code>succ</code>'s exit.
      */
     public void visitCFG(Term a, FlowGraph.EdgeKey edgeKey, Term succ, int entry) {
-        visitCFG(a, CollectionUtil.list(new EdgeKeyTermPair(edgeKey, succ, entry)));
+        visitCFG(a,
+                 CollectionUtil.list(new EdgeKeyTermPair(edgeKey, succ, entry)));
     }
 
     /**
@@ -380,10 +432,14 @@ public class CFGBuilder<FlowItem extends DataFlow.Item> implements Copy
      * <code>entry1</code> and <code>entry2</code> determine whether the
      * successors are entry or exit nodes. They can be Term.ENTRY or Term.EXIT.
      */
-    public void visitCFG(Term a, FlowGraph.EdgeKey edgeKey1, Term succ1, int entry1,
-                         FlowGraph.EdgeKey edgeKey2, Term succ2, int entry2) {
-        visitCFG(a, CollectionUtil.list(new EdgeKeyTermPair(edgeKey1, succ1, entry1), 
-                                        new EdgeKeyTermPair(edgeKey2, succ2, entry2)));
+    public void visitCFG(Term a, FlowGraph.EdgeKey edgeKey1, Term succ1,
+            int entry1, FlowGraph.EdgeKey edgeKey2, Term succ2, int entry2) {
+        visitCFG(a, CollectionUtil.list(new EdgeKeyTermPair(edgeKey1,
+                                                            succ1,
+                                                            entry1),
+                                        new EdgeKeyTermPair(edgeKey2,
+                                                            succ2,
+                                                            entry2)));
     }
 
     /**
@@ -394,8 +450,8 @@ public class CFGBuilder<FlowItem extends DataFlow.Item> implements Copy
      * treated as entry nodes; if it's Term.EXIT, they are treated as exit
      * nodes.
      */
-    public void visitCFG(Term a, FlowGraph.EdgeKey edgeKey, 
-                         List<Term> succ, int entry) {
+    public void visitCFG(Term a, FlowGraph.EdgeKey edgeKey, List<Term> succ,
+            int entry) {
         List<EdgeKeyTermPair> l = new ArrayList<EdgeKeyTermPair>(succ.size());
 
         for (Term t : succ) {
@@ -414,8 +470,8 @@ public class CFGBuilder<FlowItem extends DataFlow.Item> implements Copy
      * <code>succ</code>, and each corresponding element determines whether a
      * successor is an entry or exit node (using Term.ENTRY or Term.EXIT).
      */
-    public void visitCFG(Term a, FlowGraph.EdgeKey edgeKey, 
-                         List<Term> succ, List<Integer> entry) {
+    public void visitCFG(Term a, FlowGraph.EdgeKey edgeKey, List<Term> succ,
+            List<Integer> entry) {
         if (succ.size() != entry.size()) {
             throw new IllegalArgumentException();
         }
@@ -444,8 +500,8 @@ public class CFGBuilder<FlowItem extends DataFlow.Item> implements Copy
 
         @Override
         public String toString() {
-            return "{edgeKey=" + edgeKey + ",term=" + term + "," + 
-                    (entry == Term.ENTRY ? "entry" : "exit") + "}";
+            return "{edgeKey=" + edgeKey + ",term=" + term + ","
+                    + (entry == Term.ENTRY ? "entry" : "exit") + "}";
         }
 
     }
@@ -462,8 +518,14 @@ public class CFGBuilder<FlowItem extends DataFlow.Item> implements Copy
 
         if (child == null) {
             edge(this, a, Term.ENTRY, a, Term.EXIT, FlowGraph.EDGE_KEY_OTHER);
-        } else {
-            edge(this, a, Term.ENTRY, child, Term.ENTRY, FlowGraph.EDGE_KEY_OTHER);
+        }
+        else {
+            edge(this,
+                 a,
+                 Term.ENTRY,
+                 child,
+                 Term.ENTRY,
+                 FlowGraph.EDGE_KEY_OTHER);
         }
 
         if (Report.should_report(Report.cfg, 2))
@@ -485,8 +547,8 @@ public class CFGBuilder<FlowItem extends DataFlow.Item> implements Copy
 
         // Every statement can throw an error.
         // This is probably too inefficient.
-        if ((a instanceof Stmt && ! (a instanceof CompoundStmt)) ||
-                (a instanceof Block && ((Block) a).statements().isEmpty())) {
+        if ((a instanceof Stmt && !(a instanceof CompoundStmt))
+                || (a instanceof Block && ((Block) a).statements().isEmpty())) {
 
             visitThrow(a, Term.EXIT, ts.Error());
         }
@@ -496,7 +558,8 @@ public class CFGBuilder<FlowItem extends DataFlow.Item> implements Copy
      * Create edges for an exception thrown from term <code>t</code>.
      */
     public void visitThrow(Term t, int entry, Type type) {
-        Peer<FlowItem> last_peer = this.graph.peer(t, this.path_to_finally, entry);
+        Peer<FlowItem> last_peer =
+                this.graph.peer(t, this.path_to_finally, entry);
 
         for (CFGBuilder<FlowItem> v = this; v != null; v = v.outer) {
             Term c = v.innermostTarget;
@@ -504,31 +567,41 @@ public class CFGBuilder<FlowItem extends DataFlow.Item> implements Copy
             if (c instanceof Try) {
                 Try tr = (Try) c;
 
-                if (! v.skipInnermostCatches) {                    
+                if (!v.skipInnermostCatches) {
                     boolean definiteCatch = false;
 
                     for (Catch cb : tr.catchBlocks()) {
                         // definite catch
                         if (type.isImplicitCastValid(cb.catchType())) {
-                            edge(last_peer, this.graph.peer(cb, this.path_to_finally, Term.ENTRY), 
+                            edge(last_peer,
+                                 this.graph.peer(cb,
+                                                 this.path_to_finally,
+                                                 Term.ENTRY),
                                  new FlowGraph.ExceptionEdgeKey(type));
                             definiteCatch = true;
                         }
                         // possible catch
-                        else if (cb.catchType().isImplicitCastValid(type)) { 
-                            edge(last_peer, this.graph.peer(cb, this.path_to_finally, Term.ENTRY), 
+                        else if (cb.catchType().isImplicitCastValid(type)) {
+                            edge(last_peer,
+                                 this.graph.peer(cb,
+                                                 this.path_to_finally,
+                                                 Term.ENTRY),
                                  new FlowGraph.ExceptionEdgeKey(cb.catchType()));
                         }
                     }
                     if (definiteCatch) {
                         // the exception has definitely been caught.
                         // we can stop recursing to outer try-catch blocks
-                        return; 
+                        return;
                     }
                 }
 
                 if (tr.finallyBlock() != null) {
-                    last_peer = tryFinally(v, last_peer, last_peer.node == t, tr.finallyBlock());
+                    last_peer =
+                            tryFinally(v,
+                                       last_peer,
+                                       last_peer.node == t,
+                                       tr.finallyBlock());
                 }
             }
         }
@@ -548,17 +621,21 @@ public class CFGBuilder<FlowItem extends DataFlow.Item> implements Copy
      *        due to the (attempted) abrupt completion of the term <code>last.node</code>.
      * @param finallyBlock the finally block associated with a try finally block.
      */
-    protected static <FlowItem extends DataFlow.Item> Peer<FlowItem> tryFinally(CFGBuilder<FlowItem> v, Peer<FlowItem> last, boolean abruptCompletion, Block finallyBlock) {
+    protected static <FlowItem extends DataFlow.Item> Peer<FlowItem> tryFinally(
+            CFGBuilder<FlowItem> v, Peer<FlowItem> last,
+            boolean abruptCompletion, Block finallyBlock) {
         CFGBuilder<FlowItem> v_ = v.outer.enterFinally(last, abruptCompletion);
 
-        Peer<FlowItem> finallyBlockEntryPeer = v_.graph.peer(finallyBlock, v_.path_to_finally, Term.ENTRY);
+        Peer<FlowItem> finallyBlockEntryPeer =
+                v_.graph.peer(finallyBlock, v_.path_to_finally, Term.ENTRY);
         v_.edge(last, finallyBlockEntryPeer, FlowGraph.EDGE_KEY_OTHER);
 
         // visit the finally block.  
         v_.visitCFG(finallyBlock, Collections.<EdgeKeyTermPair> emptyList());
 
         // the ext peer for the finally block.
-        Peer<FlowItem> finallyBlockExitPeer = v_.graph.peer(finallyBlock, v_.path_to_finally, Term.EXIT);
+        Peer<FlowItem> finallyBlockExitPeer =
+                v_.graph.peer(finallyBlock, v_.path_to_finally, Term.EXIT);
         return finallyBlockExitPeer;
     }
 
@@ -573,21 +650,24 @@ public class CFGBuilder<FlowItem extends DataFlow.Item> implements Copy
      * <code>from.path_to_finally</code>.
      *  
      */
-    protected CFGBuilder<FlowItem> enterFinally(Peer<FlowItem> from, boolean abruptCompletion) {
+    protected CFGBuilder<FlowItem> enterFinally(Peer<FlowItem> from,
+            boolean abruptCompletion) {
         if (abruptCompletion) {
             CFGBuilder<FlowItem> v = this.copy();
-            v.path_to_finally = new ArrayList<Term>(from.path_to_finally.size()+1);
+            v.path_to_finally =
+                    new ArrayList<Term>(from.path_to_finally.size() + 1);
             v.path_to_finally.addAll(from.path_to_finally);
             v.path_to_finally.add(from.node);
             return v;
         }
         else {
-            if (CollectionUtil.equals(this.path_to_finally, from.path_to_finally)) {
+            if (CollectionUtil.equals(this.path_to_finally,
+                                      from.path_to_finally)) {
                 return this;
             }
             CFGBuilder<FlowItem> v = this.copy();
             v.path_to_finally = new ArrayList<Term>(from.path_to_finally);
-            return v;            
+            return v;
         }
     }
 
@@ -603,8 +683,7 @@ public class CFGBuilder<FlowItem extends DataFlow.Item> implements Copy
      * Add an edge to the CFG from the exit of <code>p</code> to either the
      * entry or exit of <code>q</code>.
      */
-    public void edge(Term p, Term q, int qEntry, 
-                     FlowGraph.EdgeKey edgeKey) {
+    public void edge(Term p, Term q, int qEntry, FlowGraph.EdgeKey edgeKey) {
         edge(this, p, q, qEntry, edgeKey);
     }
 
@@ -612,15 +691,16 @@ public class CFGBuilder<FlowItem extends DataFlow.Item> implements Copy
      * Add an edge to the CFG from the exit of <code>p</code> to either the
      * entry or exit of <code>q</code>.
      */
-    public void edge(CFGBuilder<FlowItem> p_visitor, Term p, 
-                     Term q, int qEntry, FlowGraph.EdgeKey edgeKey) {
+    public void edge(CFGBuilder<FlowItem> p_visitor, Term p, Term q,
+            int qEntry, FlowGraph.EdgeKey edgeKey) {
         edge(p_visitor, p, Term.EXIT, q, qEntry, edgeKey);
     }
 
     /**
      * Add an edge to the CFG from the exit of <code>p</code> to peer pq.
      */
-    public void edge(CFGBuilder<FlowItem> p_visitor, Term p, Peer<FlowItem> pq, FlowGraph.EdgeKey edgeKey) {
+    public void edge(CFGBuilder<FlowItem> p_visitor, Term p, Peer<FlowItem> pq,
+            FlowGraph.EdgeKey edgeKey) {
         Peer<FlowItem> pp = graph.peer(p, p_visitor.path_to_finally, Term.EXIT);
         edge(pp, pq, edgeKey);
     }
@@ -635,47 +715,53 @@ public class CFGBuilder<FlowItem extends DataFlow.Item> implements Copy
      * @param qEntry whether we are working with the entry or exit of q. Can be
      *      Term.ENTRY or Term.EXIT.
      */
-    public void edge(CFGBuilder<FlowItem> p_visitor, Term p, int pEntry, 
-                     Term q, int qEntry, FlowGraph.EdgeKey edgeKey) {
+    public void edge(CFGBuilder<FlowItem> p_visitor, Term p, int pEntry,
+            Term q, int qEntry, FlowGraph.EdgeKey edgeKey) {
 
         Peer<FlowItem> pp = graph.peer(p, p_visitor.path_to_finally, pEntry);
         Peer<FlowItem> pq = graph.peer(q, path_to_finally, qEntry);
         edge(pp, pq, edgeKey);
     }
-    protected void edge(Peer<FlowItem> pp, Peer<FlowItem> pq, FlowGraph.EdgeKey edgeKey) {        
+
+    protected void edge(Peer<FlowItem> pp, Peer<FlowItem> pq,
+            FlowGraph.EdgeKey edgeKey) {
         if (Report.should_report(Report.cfg, 2))
             Report.report(2, "//     edge " + pp.node() + " -> " + pq.node());
 
         if (Report.should_report(Report.cfg, 3)) {
             // at level 3, use Peer.toString() as the label for the nodes
             Report.report(2,
-                          pp.hashCode() + " [ label = \"" +
-                                  StringUtil.escape(pp.toString()) + "\" ];");
+                          pp.hashCode() + " [ label = \""
+                                  + StringUtil.escape(pp.toString()) + "\" ];");
             Report.report(2,
-                          pq.hashCode() + " [ label = \"" +
-                                  StringUtil.escape(pq.toString()) + "\" ];");
+                          pq.hashCode() + " [ label = \""
+                                  + StringUtil.escape(pq.toString()) + "\" ];");
         }
         else if (Report.should_report(Report.cfg, 2)) {
             // at level 2, use Node.toString() as the label for the nodes
             // which is more readable than Peer.toString(), but not as unique.
             Report.report(2,
-                          pp.hashCode() + " [ label = \"" +
-                                  StringUtil.escape(pp.node.toString()) + "\" ];");
+                          pp.hashCode() + " [ label = \""
+                                  + StringUtil.escape(pp.node.toString())
+                                  + "\" ];");
             Report.report(2,
-                          pq.hashCode() + " [ label = \"" +
-                                  StringUtil.escape(pq.node.toString()) + "\" ];");
+                          pq.hashCode() + " [ label = \""
+                                  + StringUtil.escape(pq.node.toString())
+                                  + "\" ];");
         }
 
         if (graph.forward()) {
             if (Report.should_report(Report.cfg, 2)) {
-                Report.report(2, pp.hashCode() + " -> " + pq.hashCode() + " [label=\"" + edgeKey + "\"];");
+                Report.report(2, pp.hashCode() + " -> " + pq.hashCode()
+                        + " [label=\"" + edgeKey + "\"];");
             }
             pp.succs.add(new Edge<FlowItem>(edgeKey, pq));
             pq.preds.add(new Edge<FlowItem>(edgeKey, pp));
         }
         else {
             if (Report.should_report(Report.cfg, 2)) {
-                Report.report(2, pq.hashCode() + " -> " + pp.hashCode() + " [label=\"" + edgeKey + "\"];");
+                Report.report(2, pq.hashCode() + " -> " + pp.hashCode()
+                        + " [label=\"" + edgeKey + "\"];");
             }
             pq.succs.add(new Edge<FlowItem>(edgeKey, pp));
             pp.preds.add(new Edge<FlowItem>(edgeKey, pq));

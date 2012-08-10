@@ -42,14 +42,13 @@ import polyglot.visit.TypeChecker;
  * A <code>TypeNode</code> represents the syntactic representation of a
  * <code>Type</code> within the abstract syntax tree.
  */
-public class ArrayTypeNode_c extends TypeNode_c implements ArrayTypeNode
-{
+public class ArrayTypeNode_c extends TypeNode_c implements ArrayTypeNode {
     protected TypeNode base;
 
     public ArrayTypeNode_c(Position pos, TypeNode base) {
-	super(pos);
-	assert(base != null);
-	this.base = base;
+        super(pos);
+        assert (base != null);
+        this.base = base;
     }
 
     @Override
@@ -60,66 +59,68 @@ public class ArrayTypeNode_c extends TypeNode_c implements ArrayTypeNode
     @Override
     public ArrayTypeNode base(TypeNode base) {
         ArrayTypeNode_c n = (ArrayTypeNode_c) copy();
-	n.base = base;
-	return n;
+        n.base = base;
+        return n;
     }
 
     protected ArrayTypeNode_c reconstruct(TypeNode base) {
         if (base != this.base) {
-	    ArrayTypeNode_c n = (ArrayTypeNode_c) copy();
-	    n.base = base;
-	    return n;
-	}
+            ArrayTypeNode_c n = (ArrayTypeNode_c) copy();
+            n.base = base;
+            return n;
+        }
 
-	return this;
+        return this;
     }
-    
+
     @Override
     public boolean isDisambiguated() {
         return false;
     }
-    
+
     @Override
     public Node visitChildren(NodeVisitor v) {
         TypeNode base = (TypeNode) visitChild(this.base, v);
-	return reconstruct(base);
+        return reconstruct(base);
     }
 
     @Override
     public Node buildTypes(TypeBuilder tb) throws SemanticException {
-	TypeSystem ts = tb.typeSystem();
+        TypeSystem ts = tb.typeSystem();
         return type(ts.arrayOf(position(), base.type()));
     }
 
     @Override
     public Node disambiguate(AmbiguityRemover ar) throws SemanticException {
-	TypeSystem ts = ar.typeSystem();
-	NodeFactory nf = ar.nodeFactory();
+        TypeSystem ts = ar.typeSystem();
+        NodeFactory nf = ar.nodeFactory();
 
-        if (! base.isDisambiguated()) {
+        if (!base.isDisambiguated()) {
             return this;
         }
 
         Type baseType = base.type();
 
-        if (! baseType.isCanonical()) {
+        if (!baseType.isCanonical()) {
             return this;
-	}
+        }
 
         return nf.CanonicalTypeNode(position(),
-		                    ts.arrayOf(position(), baseType));
+                                    ts.arrayOf(position(), baseType));
     }
 
     @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
-	throw new InternalCompilerError(position(),
-	    "Cannot type check ambiguous node " + this + ".");
+        throw new InternalCompilerError(position(),
+                                        "Cannot type check ambiguous node "
+                                                + this + ".");
     }
 
     @Override
     public Node exceptionCheck(ExceptionChecker ec) throws SemanticException {
-	throw new InternalCompilerError(position(),
-	    "Cannot exception check ambiguous node " + this + ".");
+        throw new InternalCompilerError(position(),
+                                        "Cannot exception check ambiguous node "
+                                                + this + ".");
     }
 
     @Override
@@ -132,6 +133,7 @@ public class ArrayTypeNode_c extends TypeNode_c implements ArrayTypeNode
     public String toString() {
         return base.toString() + "[]";
     }
+
     @Override
     public Node copy(NodeFactory nf) {
         return nf.ArrayTypeNode(this.position, this.base);

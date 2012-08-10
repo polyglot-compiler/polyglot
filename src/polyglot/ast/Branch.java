@@ -31,14 +31,15 @@ import polyglot.util.Enum;
  * A <code>Branch</code> is an immutable representation of a branch
  * statment in Java (a break or continue).
  */
-public interface Branch extends Stmt
-{
+public interface Branch extends Stmt {
     /** Branch kind: either break or continue. */
     public static class Kind extends Enum {
-        public Kind(String name) { super(name); }
+        public Kind(String name) {
+            super(name);
+        }
     }
 
-    public static final Kind BREAK    = new Kind("break");
+    public static final Kind BREAK = new Kind("break");
     public static final Kind CONTINUE = new Kind("continue");
 
     /**
@@ -50,12 +51,12 @@ public interface Branch extends Stmt
      * Set the kind of branch.
      */
     Branch kind(Kind kind);
-    
+
     /**
      * Target label of the branch.
      */
     Id labelNode();
-    
+
     /**
      * Set the target label of the branch.
      */

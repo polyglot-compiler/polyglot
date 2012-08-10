@@ -30,5 +30,6 @@ package polyglot.ast;
   * information. */
 public interface Id extends Node {
     String id();
+
     Id id(String id);
 }

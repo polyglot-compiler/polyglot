@@ -29,15 +29,17 @@ public class RemoveStaticImports extends ContextVisitor {
     }
 
     @Override
-    protected Node leaveCall(Node parent, Node old, Node n, NodeVisitor v) throws SemanticException {
+    protected Node leaveCall(Node parent, Node old, Node n, NodeVisitor v)
+            throws SemanticException {
         if (n instanceof SourceFile) {
             // remove the static imports
-            SourceFile sf = (SourceFile)n;
+            SourceFile sf = (SourceFile) n;
             List<Import> imports = new ArrayList<Import>(sf.imports());
             boolean changed = false;
-            for (Iterator<Import> iter = imports.iterator(); iter.hasNext(); ) {
+            for (Iterator<Import> iter = imports.iterator(); iter.hasNext();) {
                 Import imp = iter.next();
-                if (imp.kind() == JL5Import.SINGLE_STATIC_MEMBER || imp.kind() == JL5Import.STATIC_ON_DEMAND) {
+                if (imp.kind() == JL5Import.SINGLE_STATIC_MEMBER
+                        || imp.kind() == JL5Import.STATIC_ON_DEMAND) {
                     // a static import!
                     iter.remove();
                     changed = true;
@@ -49,7 +51,7 @@ public class RemoveStaticImports extends ContextVisitor {
         }
 
         if (n instanceof Field) {
-            Field f = (Field)n;
+            Field f = (Field) n;
             if (f.flags().isStatic() && f.isTargetImplicit()) {
                 // check if we need to make the target explicit
                 FieldInstance fi = f.fieldInstance();
@@ -61,7 +63,7 @@ public class RemoveStaticImports extends ContextVisitor {
             }
         }
         if (n instanceof Call) {
-            Call c = (Call)n;
+            Call c = (Call) n;
             MethodInstance mi = c.methodInstance();
             if (mi.flags().isStatic() && c.isTargetImplicit()) {
                 // check if we need to make the target explicit

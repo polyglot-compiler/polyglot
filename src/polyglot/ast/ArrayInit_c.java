@@ -48,46 +48,45 @@ import polyglot.visit.TypeChecker;
  * the elements of these array may be expressions of any type (e.g.,
  * <code>Call</code>).
  */
-public class ArrayInit_c extends Expr_c implements ArrayInit
-{
+public class ArrayInit_c extends Expr_c implements ArrayInit {
     protected List<Expr> elements;
 
     public ArrayInit_c(Position pos, List<Expr> elements) {
-	super(pos);
-	assert(elements != null);
-	this.elements = ListUtil.copy(elements, true);
+        super(pos);
+        assert (elements != null);
+        this.elements = ListUtil.copy(elements, true);
     }
 
     /** Get the elements of the initializer. */
     @Override
     public List<Expr> elements() {
-	return this.elements;
+        return this.elements;
     }
 
     /** Set the elements of the initializer. */
     @Override
     public ArrayInit elements(List<Expr> elements) {
-	ArrayInit_c n = (ArrayInit_c) copy();
-	n.elements = ListUtil.copy(elements, true);
-	return n;
+        ArrayInit_c n = (ArrayInit_c) copy();
+        n.elements = ListUtil.copy(elements, true);
+        return n;
     }
 
     /** Reconstruct the initializer. */
     protected ArrayInit_c reconstruct(List<Expr> elements) {
-	if (! CollectionUtil.equals(elements, this.elements)) {
-	    ArrayInit_c n = (ArrayInit_c) copy();
-	    n.elements = ListUtil.copy(elements, true);
-	    return n;
-	}
+        if (!CollectionUtil.equals(elements, this.elements)) {
+            ArrayInit_c n = (ArrayInit_c) copy();
+            n.elements = ListUtil.copy(elements, true);
+            return n;
+        }
 
-	return this;
+        return this;
     }
 
     /** Visit the children of the initializer. */
     @Override
     public Node visitChildren(NodeVisitor v) {
-	List<Expr> elements = visitList(this.elements, v);
-	return reconstruct(elements);
+        List<Expr> elements = visitList(this.elements, v);
+        return reconstruct(elements);
     }
 
     /** Type check the initializer. */
@@ -95,23 +94,23 @@ public class ArrayInit_c extends Expr_c implements ArrayInit
     public Node typeCheck(TypeChecker tc) throws SemanticException {
         TypeSystem ts = tc.typeSystem();
 
-	Type type = null;
+        Type type = null;
 
-	for (Expr e : elements) {
-	    if (type == null) {
-	        type = e.type();
-	    }
-	    else {
-	        type = ts.leastCommonAncestor(type, e.type());
-	    }
-	}
+        for (Expr e : elements) {
+            if (type == null) {
+                type = e.type();
+            }
+            else {
+                type = ts.leastCommonAncestor(type, e.type());
+            }
+        }
 
-	if (type == null) {
-	    return type(ts.Null());
-	}
-	else {
-	    return type(arrayOf(ts, type));
-	}
+        if (type == null) {
+            return type(ts.Null());
+        }
+        else {
+            return type(arrayOf(ts, type));
+        }
     }
 
     protected Type arrayOf(TypeSystem ts, Type baseType) {
@@ -126,16 +125,16 @@ public class ArrayInit_c extends Expr_c implements ArrayInit
 
         Type t = av.toType();
 
-        if (! t.isArray()) {
-            throw new InternalCompilerError("Type of array initializer must " +
-                                            "be an array.", position());
+        if (!t.isArray()) {
+            throw new InternalCompilerError("Type of array initializer must "
+                    + "be an array.", position());
         }
 
         t = t.toArray().base();
 
         TypeSystem ts = av.typeSystem();
 
-	for (Expr e : elements) {
+        for (Expr e : elements) {
             if (e == child) {
                 if (ts.numericConversionValid(t, e.constantValue())) {
                     return child.type();
@@ -153,9 +152,9 @@ public class ArrayInit_c extends Expr_c implements ArrayInit
     public void typeCheckElements(Type lhsType) throws SemanticException {
         TypeSystem ts = lhsType.typeSystem();
 
-        if (! lhsType.isArray()) {
-          throw new SemanticException("Cannot initialize " + lhsType +
-                                      " with " + type + ".", position());
+        if (!lhsType.isArray()) {
+            throw new SemanticException("Cannot initialize " + lhsType
+                    + " with " + type + ".", position());
         }
 
         // Check if we can assign each individual element.
@@ -169,36 +168,35 @@ public class ArrayInit_c extends Expr_c implements ArrayInit
                 continue;
             }
 
-            if (! ts.isImplicitCastValid(s, t) &&
-                ! ts.typeEquals(s, t) &&
-                ! ts.numericConversionValid(t, e.constantValue())) {
-                throw new SemanticException("Cannot assign " + s +
-                                            " to " + t + ".", e.position());
+            if (!ts.isImplicitCastValid(s, t) && !ts.typeEquals(s, t)
+                    && !ts.numericConversionValid(t, e.constantValue())) {
+                throw new SemanticException("Cannot assign " + s + " to " + t
+                        + ".", e.position());
             }
         }
     }
 
     @Override
     public String toString() {
-	return "{ ... }";
+        return "{ ... }";
     }
 
     /** Write the initializer to an output file. */
     @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
-	w.write("{ ");
+        w.write("{ ");
 
-	for (Iterator<Expr> i = elements.iterator(); i.hasNext(); ) {
-	    Expr e = i.next();
-	    print(e, w, tr);
+        for (Iterator<Expr> i = elements.iterator(); i.hasNext();) {
+            Expr e = i.next();
+            print(e, w, tr);
 
-	    if (i.hasNext()) {
-		w.write(",");
+            if (i.hasNext()) {
+                w.write(",");
                 w.allowBreak(0, " ");
-	    }
-	}
+            }
+        }
 
-	w.write(" }");
+        w.write(" }");
     }
 
     @Override
@@ -211,6 +209,7 @@ public class ArrayInit_c extends Expr_c implements ArrayInit
         v.visitCFGList(elements, this, EXIT);
         return succs;
     }
+
     @Override
     public Node copy(NodeFactory nf) {
         return nf.ArrayInit(this.position, this.elements);

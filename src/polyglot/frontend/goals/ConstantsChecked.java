@@ -36,7 +36,8 @@ import polyglot.types.TypeSystem;
 import polyglot.visit.ConstantChecker;
 
 public class ConstantsChecked extends VisitorGoal {
-    public static Goal create(Scheduler scheduler, Job job, TypeSystem ts, NodeFactory nf) {
+    public static Goal create(Scheduler scheduler, Job job, TypeSystem ts,
+            NodeFactory nf) {
         return scheduler.internGoal(new ConstantsChecked(job, ts, nf));
     }
 

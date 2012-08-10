@@ -59,7 +59,6 @@ import polyglot.util.ErrorQueue;
  */
 public class JLExtensionInfo extends ParserlessJLExtensionInfo {
 
-
     /**
      * Return a parser for <code>source</code> using the given
      * <code>reader</code>.
@@ -68,11 +67,10 @@ public class JLExtensionInfo extends ParserlessJLExtensionInfo {
     public Parser parser(Reader reader, FileSource source, ErrorQueue eq) {
         reader = new EscapedUnicodeReader(reader);
 
-	polyglot.lex.Lexer lexer = new Lexer_c(reader, source, eq);
-	polyglot.parse.BaseParser parser = new Grm(lexer, ts, nf, eq);
+        polyglot.lex.Lexer lexer = new Lexer_c(reader, source, eq);
+        polyglot.parse.BaseParser parser = new Grm(lexer, ts, nf, eq);
 
-	return new CupParser(parser, source, eq);
+        return new CupParser(parser, source, eq);
     }
-    
 
 }

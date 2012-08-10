@@ -25,28 +25,40 @@
 
 package polyglot.types;
 
-
 /**
  * An unknown type qualifier.  This is used as a place-holder until types
  * are disambiguated.
  */
-public class UnknownQualifier_c extends TypeObject_c implements UnknownQualifier
-{
+public class UnknownQualifier_c extends TypeObject_c implements
+        UnknownQualifier {
     public UnknownQualifier_c(TypeSystem ts) {
         super(ts);
     }
 
     @Override
-    public boolean isCanonical() { return false; }
-    @Override
-    public boolean isPackage() { return false; }
-    @Override
-    public boolean isType() { return false; }
+    public boolean isCanonical() {
+        return false;
+    }
 
     @Override
-    public Package toPackage() { return null; }
+    public boolean isPackage() {
+        return false;
+    }
+
     @Override
-    public Type toType() { return null; }
+    public boolean isType() {
+        return false;
+    }
+
+    @Override
+    public Package toPackage() {
+        return null;
+    }
+
+    @Override
+    public Type toType() {
+        return null;
+    }
 
     @Override
     public String toString() {

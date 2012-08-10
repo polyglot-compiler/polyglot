@@ -40,7 +40,8 @@ import polyglot.visit.AmbiguityRemover;
 import polyglot.visit.NodeVisitor;
 
 public class SupertypesDisambiguated extends VisitorGoal {
-    public static Goal create(Scheduler scheduler, Job job, TypeSystem ts, NodeFactory nf) {
+    public static Goal create(Scheduler scheduler, Job job, TypeSystem ts,
+            NodeFactory nf) {
         return scheduler.internGoal(new SupertypesDisambiguated(job, ts, nf));
     }
 

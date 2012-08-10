@@ -36,8 +36,7 @@ import polyglot.types.Type;
  * the elements of these array may be expressions of any type (e.g.,
  * <code>Call</code>).
  */
-public interface ArrayInit extends Expr
-{
+public interface ArrayInit extends Expr {
     /**
      * Get the initializer elements.
      * @return A list of {@link polyglot.ast.Expr Expr}.

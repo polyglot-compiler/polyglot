@@ -37,44 +37,42 @@ import polyglot.util.Position;
  * A <code>MethodInstance</code> represents the type information for a Java
  * method.
  */
-public class MethodInstance_c extends ProcedureInstance_c
-                                implements MethodInstance
-{
+public class MethodInstance_c extends ProcedureInstance_c implements
+        MethodInstance {
     protected String name;
     protected Type returnType;
 
     /** Used for deserializing types. */
-    protected MethodInstance_c() { }
+    protected MethodInstance_c() {
+    }
 
     public MethodInstance_c(TypeSystem ts, Position pos,
-	 		    ReferenceType container,
-	                    Flags flags, Type returnType, String name,
-			    List<? extends Type> formalTypes,
-			    List<? extends Type> excTypes) {
+            ReferenceType container, Flags flags, Type returnType, String name,
+            List<? extends Type> formalTypes, List<? extends Type> excTypes) {
         super(ts, pos, container, flags, formalTypes, excTypes);
-	this.returnType = returnType;
-	this.name = name;
+        this.returnType = returnType;
+        this.name = name;
 
         this.decl = this;
     }
-    
+
     protected MethodInstance decl;
-    
+
     @Override
     public Declaration declaration() {
         return decl;
     }
-    
+
     @Override
     public void setDeclaration(Declaration decl) {
-        this.decl = (MethodInstance) decl;        
+        this.decl = (MethodInstance) decl;
     }
- 
+
     @Override
     public MethodInstance orig() {
         return (MethodInstance) declaration();
     }
-    
+
     @Override
     public String name() {
         return name;
@@ -97,8 +95,8 @@ public class MethodInstance_c extends ProcedureInstance_c
 
     @Override
     public MethodInstance name(String name) {
-        if ((name != null && !name.equals(this.name)) ||
-            (name == null && name != this.name)) {
+        if ((name != null && !name.equals(this.name))
+                || (name == null && name != this.name)) {
             MethodInstance_c n = (MethodInstance_c) copy();
             n.setName(name);
             return n;
@@ -153,7 +151,7 @@ public class MethodInstance_c extends ProcedureInstance_c
     public void setName(String name) {
         this.name = name;
     }
-    
+
     /**
      * @param returnType The returnType to set.
      */
@@ -161,37 +159,38 @@ public class MethodInstance_c extends ProcedureInstance_c
     public void setReturnType(Type returnType) {
         this.returnType = returnType;
     }
-    
+
     @Override
     public int hashCode() {
         //return container.hashCode() + flags.hashCode() +
-	//       returnType.hashCode() + name.hashCode();
-	return flags.hashCode() + name.hashCode();
+        //       returnType.hashCode() + name.hashCode();
+        return flags.hashCode() + name.hashCode();
     }
 
     @Override
     public boolean equalsImpl(TypeObject o) {
         if (o instanceof MethodInstance) {
-	    MethodInstance i = (MethodInstance) o;
-	    return ts.equals(returnType, i.returnType())
-	        && name.equals(i.name())
-                && ts.equals(container, i.container())
-		&& super.equalsImpl(i);
-	}
+            MethodInstance i = (MethodInstance) o;
+            return ts.equals(returnType, i.returnType())
+                    && name.equals(i.name())
+                    && ts.equals(container, i.container())
+                    && super.equalsImpl(i);
+        }
 
-	return false;
+        return false;
     }
 
     @Override
     public String toString() {
-	String s = designator() + " " + flags.translate() + returnType + " " +
-                   container() + "." + signature();
+        String s =
+                designator() + " " + flags.translate() + returnType + " "
+                        + container() + "." + signature();
 
-	if (! throwTypes.isEmpty()) {
-	    s += " throws " + TypeSystem_c.listToString(throwTypes);
-	}
+        if (!throwTypes.isEmpty()) {
+            s += " throws " + TypeSystem_c.listToString(throwTypes);
+        }
 
-	return s;
+        return s;
     }
 
     @Override
@@ -218,19 +217,19 @@ public class MethodInstance_c extends ProcedureInstance_c
 
     @Override
     public boolean isCanonical() {
-	return container.isCanonical()
-	    && returnType.isCanonical()
-	    && listIsCanonical(formalTypes)
-	    && listIsCanonical(throwTypes);
+        return container.isCanonical() && returnType.isCanonical()
+                && listIsCanonical(formalTypes) && listIsCanonical(throwTypes);
     }
 
     @Override
-    public final boolean methodCallValid(String name, List<? extends Type> argTypes) {
+    public final boolean methodCallValid(String name,
+            List<? extends Type> argTypes) {
         return ts.methodCallValid(this, name, argTypes);
     }
 
     @Override
-    public boolean methodCallValidImpl(String name, List<? extends Type> argTypes) {
+    public boolean methodCallValidImpl(String name,
+            List<? extends Type> argTypes) {
         return name().equals(name) && ts.callValid(this, argTypes);
     }
 
@@ -251,11 +250,12 @@ public class MethodInstance_c extends ProcedureInstance_c
 
             ReferenceType sup = null;
             if (rt.superType() != null && rt.superType().isReference()) {
-                sup = (ReferenceType) rt.superType();    
+                sup = (ReferenceType) rt.superType();
             }
-            
+
             rt = sup;
-        };
+        }
+        ;
 
         return l;
     }
@@ -277,7 +277,7 @@ public class MethodInstance_c extends ProcedureInstance_c
     public final boolean canOverrideImpl(MethodInstance mj) {
         throw new RuntimeException("canOverrideImpl(MethodInstance mj) should not be called.");
     }
-        
+
     /**
      * @param quiet If true, then no Semantic Exceptions will be thrown, and the
      *              return value will be true or false. Otherwise, if the method
@@ -285,130 +285,152 @@ public class MethodInstance_c extends ProcedureInstance_c
      *              the method will return true.
      */
     @Override
-    public boolean canOverrideImpl(MethodInstance mj, boolean quiet) throws SemanticException {
+    public boolean canOverrideImpl(MethodInstance mj, boolean quiet)
+            throws SemanticException {
         MethodInstance mi = this;
 
         if (!(mi.name().equals(mj.name()) && mi.hasFormals(mj.formalTypes()))) {
             if (quiet) return false;
-            throw new SemanticException(mi.signature() + " in " + mi.container() +
-                                        " cannot override " + 
-                                        mj.signature() + " in " + mj.container() + 
-                                        "; incompatible " +
-                                        "parameter types",
-                                        mi.position());
+            throw new SemanticException(mi.signature() + " in "
+                    + mi.container() + " cannot override " + mj.signature()
+                    + " in " + mj.container() + "; incompatible "
+                    + "parameter types", mi.position());
         }
-        
+
         // HACK: Java5 allows return types to be covariant.  We'll allow covariant
         // return if we mj is defined in a class file.
         boolean allowCovariantReturn = false;
-        
+
         if (mj.container() instanceof ParsedClassType) {
             ParsedClassType ct = (ParsedClassType) mj.container();
             if (ct.initializer() instanceof LazyClassInitializer) {
-                LazyClassInitializer init = (LazyClassInitializer) ct.initializer();
+                LazyClassInitializer init =
+                        (LazyClassInitializer) ct.initializer();
                 if (init.fromClassFile()) {
                     allowCovariantReturn = true;
                 }
             }
         }
-        
-        if ((allowCovariantReturn && ! ts.isSubtype(mi.returnType(), mj.returnType())) ||
-            (! allowCovariantReturn && ! ts.typeEquals(mi.returnType(), mj.returnType()))) {
-            if (Report.should_report(Report.types, 3))
-                Report.report(3, "return type " + mi.returnType() +
-                              " != " + mj.returnType());
-            if (quiet) return false;
-            throw new SemanticException(mi.signature() + " in " + mi.container() +
-                                        " cannot override " + 
-                                        mj.signature() + " in " + mj.container() + 
-                                        "; attempting to use incompatible " +
-                                        "return type\n" +                                        
-                                        "found: " + mi.returnType() + "\n" +
-                                        "required: " + mj.returnType(), 
-                                        mi.position());
-        } 
 
-        if (! ts.throwsSubset(mi, mj)) {
+        if ((allowCovariantReturn && !ts.isSubtype(mi.returnType(),
+                                                   mj.returnType()))
+                || (!allowCovariantReturn && !ts.typeEquals(mi.returnType(),
+                                                            mj.returnType()))) {
             if (Report.should_report(Report.types, 3))
-                Report.report(3, mi.throwTypes() + " not subset of " +
-                              mj.throwTypes());
+                Report.report(3,
+                              "return type " + mi.returnType() + " != "
+                                      + mj.returnType());
             if (quiet) return false;
-            throw new SemanticException(mi.signature() + " in " + mi.container() +
-                                        " cannot override " + 
-                                        mj.signature() + " in " + mj.container() + 
-                                        "; the throw set " + mi.throwTypes() + " is not a subset of the " +
-                                        "overridden method's throw set " + mj.throwTypes() + ".", 
+            throw new SemanticException(mi.signature() + " in "
+                    + mi.container() + " cannot override " + mj.signature()
+                    + " in " + mj.container()
+                    + "; attempting to use incompatible " + "return type\n"
+                    + "found: " + mi.returnType() + "\n" + "required: "
+                    + mj.returnType(), mi.position());
+        }
+
+        if (!ts.throwsSubset(mi, mj)) {
+            if (Report.should_report(Report.types, 3))
+                Report.report(3,
+                              mi.throwTypes() + " not subset of "
+                                      + mj.throwTypes());
+            if (quiet) return false;
+            throw new SemanticException(mi.signature()
+                                                + " in "
+                                                + mi.container()
+                                                + " cannot override "
+                                                + mj.signature()
+                                                + " in "
+                                                + mj.container()
+                                                + "; the throw set "
+                                                + mi.throwTypes()
+                                                + " is not a subset of the "
+                                                + "overridden method's throw set "
+                                                + mj.throwTypes() + ".",
                                         mi.position());
-        }   
+        }
 
         if (mi.flags().moreRestrictiveThan(mj.flags())) {
             if (Report.should_report(Report.types, 3))
-                Report.report(3, mi.flags() + " more restrictive than " +
-                              mj.flags());
+                Report.report(3,
+                              mi.flags() + " more restrictive than "
+                                      + mj.flags());
             if (quiet) return false;
-            throw new SemanticException(mi.signature() + " in " + mi.container() +
-                                        " cannot override " + 
-                                        mj.signature() + " in " + mj.container() + 
-                                        "; attempting to assign weaker " + 
-                                        "access privileges", 
+            throw new SemanticException(mi.signature()
+                                                + " in "
+                                                + mi.container()
+                                                + " cannot override "
+                                                + mj.signature()
+                                                + " in "
+                                                + mj.container()
+                                                + "; attempting to assign weaker "
+                                                + "access privileges",
                                         mi.position());
         }
 
         if (mi.flags().isStatic() != mj.flags().isStatic()) {
             if (Report.should_report(Report.types, 3))
-                Report.report(3, mi.signature() + " is " + 
-                              (mi.flags().isStatic() ? "" : "not") + 
-                              " static but " + mj.signature() + " is " +
-                              (mj.flags().isStatic() ? "" : "not") + " static");
+                Report.report(3, mi.signature() + " is "
+                        + (mi.flags().isStatic() ? "" : "not") + " static but "
+                        + mj.signature() + " is "
+                        + (mj.flags().isStatic() ? "" : "not") + " static");
             if (quiet) return false;
-            throw new SemanticException(mi.signature() + " in " + mi.container() +
-                                        " cannot override " + 
-                                        mj.signature() + " in " + mj.container() + 
-                                        "; overridden method is " + 
-                                        (mj.flags().isStatic() ? "" : "not") +
-                                        "static", 
+            throw new SemanticException(mi.signature()
+                                                + " in "
+                                                + mi.container()
+                                                + " cannot override "
+                                                + mj.signature()
+                                                + " in "
+                                                + mj.container()
+                                                + "; overridden method is "
+                                                + (mj.flags().isStatic() ? ""
+                                                        : "not") + "static",
                                         mi.position());
         }
 
         if (mi != mj && !mi.equals(mj) && mj.flags().isFinal()) {
-	    // mi can "override" a final method mj if mi and mj are the same method instance.
+            // mi can "override" a final method mj if mi and mj are the same method instance.
             if (Report.should_report(Report.types, 3))
                 Report.report(3, mj.flags() + " final");
             if (quiet) return false;
-            throw new SemanticException(mi.signature() + " in " + mi.container() +
-                                        " cannot override " + 
-                                        mj.signature() + " in " + mj.container() + 
-                                        "; overridden method is final", 
+            throw new SemanticException(mi.signature()
+                                                + " in "
+                                                + mi.container()
+                                                + " cannot override "
+                                                + mj.signature()
+                                                + " in "
+                                                + mj.container()
+                                                + "; overridden method is final",
                                         mi.position());
         }
 
         return true;
     }
-    
+
     @Override
     public List<? extends MethodInstance> implemented() {
-	return ts.implemented(this);
+        return ts.implemented(this);
     }
 
     @Override
     public List<MethodInstance> implementedImpl(ReferenceType rt) {
-	if (rt == null) {
-	    return Collections.<MethodInstance> emptyList();
-	}
+        if (rt == null) {
+            return Collections.<MethodInstance> emptyList();
+        }
 
         List<MethodInstance> l = new LinkedList<MethodInstance>();
         l.addAll(rt.methods(name, formalTypes));
 
-	Type superType = rt.superType();
-	if (superType != null) {
-	    l.addAll(implementedImpl(superType.toReference())); 
-	}
-	
-	List<? extends ReferenceType> ints = rt.interfaces();
-	for (ReferenceType rt2 : ints) {
-	    l.addAll(implementedImpl(rt2));
-	}
-	
+        Type superType = rt.superType();
+        if (superType != null) {
+            l.addAll(implementedImpl(superType.toReference()));
+        }
+
+        List<? extends ReferenceType> ints = rt.interfaces();
+        for (ReferenceType rt2 : ints) {
+            l.addAll(implementedImpl(rt2));
+        }
+
         return l;
     }
 }

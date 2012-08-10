@@ -28,8 +28,7 @@ package polyglot.types;
 /**
  * An <code>ArrayType</code> represents an array of other types.
  */
-public interface ArrayType extends ReferenceType 
-{
+public interface ArrayType extends ReferenceType {
     /**
      * Base type of the array.
      */

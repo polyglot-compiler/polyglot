@@ -12,7 +12,11 @@ public class LocalToExt_c extends ToExt_c {
     public Node toExt(ExtensionRewriter rw) throws SemanticException {
         Local n = (Local) node();
         Type type = rw.to_ts().unknownType(n.position());
-        LocalInstance li = rw.to_ts().localInstance(n.position(), n.flags(), type, n.name());
+        LocalInstance li =
+                rw.to_ts().localInstance(n.position(),
+                                         n.flags(),
+                                         type,
+                                         n.name());
         Local to = rw.to_nf().Local(n.position(), n.id());
         return to.localInstance(li);
     }

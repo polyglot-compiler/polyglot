@@ -12,13 +12,14 @@ import polyglot.types.Type;
 import polyglot.util.Position;
 
 @SuppressWarnings("serial")
-public class JL5ConstructorInstance_c extends ConstructorInstance_c implements JL5ConstructorInstance {
+public class JL5ConstructorInstance_c extends ConstructorInstance_c implements
+        JL5ConstructorInstance {
     private List<TypeVariable> typeParams;
     private RetainedAnnotations retainedAnnotations;
 
-    public JL5ConstructorInstance_c(JL5TypeSystem_c ts,
-                                    Position pos, ClassType container, Flags flags, List<? extends Type> argTypes,
-                                    List<? extends Type> excTypes, List<TypeVariable> typeParams) {
+    public JL5ConstructorInstance_c(JL5TypeSystem_c ts, Position pos,
+            ClassType container, Flags flags, List<? extends Type> argTypes,
+            List<? extends Type> excTypes, List<TypeVariable> typeParams) {
         super(ts, pos, container, flags, argTypes, excTypes);
         this.typeParams = typeParams;
     }
@@ -56,8 +57,8 @@ public class JL5ConstructorInstance_c extends ConstructorInstance_c implements J
             }
             if (!formalTypes.hasNext() && this.isVariableArity()) {
                 // varible arity method, and this is the last arg.
-                ArrayType arr = (ArrayType) myFormalTypes.get(myFormalTypes
-                                                              .size() - 1);
+                ArrayType arr =
+                        (ArrayType) myFormalTypes.get(myFormalTypes.size() - 1);
                 formal = arr.base();
             }
             if (ts.isImplicitCastValid(actual, formal)) {
@@ -75,14 +76,15 @@ public class JL5ConstructorInstance_c extends ConstructorInstance_c implements J
                 // arguments.
                 // The last actual can be either the base type of the array,
                 // or the array type.
-                ArrayType arr = (ArrayType) myFormalTypes.get(myFormalTypes
-                                                              .size() - 1);
+                ArrayType arr =
+                        (ArrayType) myFormalTypes.get(myFormalTypes.size() - 1);
                 if (!ts.isImplicitCastValid(actual, arr)) {
                     // System.err.println("     3: failed " + actual +
                     // " to " +formal + " and " + actual + " to " + arr);
                     return false;
                 }
-            } else {
+            }
+            else {
                 // System.err.println("     4: failed " + actual + " to "
                 // +formal);
                 return false;
@@ -106,7 +108,7 @@ public class JL5ConstructorInstance_c extends ConstructorInstance_c implements J
     public List<TypeVariable> typeParams() {
         return Collections.unmodifiableList(this.typeParams);
     }
-    
+
     @Override
     public JL5Subst erasureSubst() {
         JL5TypeSystem ts = (JL5TypeSystem) this.typeSystem();

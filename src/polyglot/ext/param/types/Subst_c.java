@@ -52,8 +52,8 @@ import polyglot.util.TypeInputStream;
  * map.  Subclasses must define how the substititions are performed and
  * how to cache substituted types.
  */
-public class Subst_c<Formal extends Param, Actual extends TypeObject> implements Subst<Formal,Actual>
-{
+public class Subst_c<Formal extends Param, Actual extends TypeObject>
+        implements Subst<Formal, Actual> {
     /** Map from formal parameters (of type Param) to actuals. */
     protected Map<Formal, Actual> subst;
 
@@ -63,8 +63,7 @@ public class Subst_c<Formal extends Param, Actual extends TypeObject> implements
     protected transient ParamTypeSystem<Formal, Actual> ts;
 
     public Subst_c(ParamTypeSystem<Formal, Actual> ts,
-            Map<Formal, ? extends Actual> subst)
-    {
+            Map<Formal, ? extends Actual> subst) {
         this.ts = ts;
         this.subst = new HashMap<Formal, Actual>(subst);
         this.cache = new HashMap<CacheTypeWrapper, Type>();
@@ -112,7 +111,7 @@ public class Subst_c<Formal extends Param, Actual extends TypeObject> implements
             for (Entry<Formal, Actual> e : tsubst.entrySet()) {
                 Formal formal = e.getKey();
                 Actual actual = e.getValue();
-                
+
                 newSubst.put(formal, substSubstValue(actual));
             }
 
@@ -125,7 +124,6 @@ public class Subst_c<Formal extends Param, Actual extends TypeObject> implements
 
         return t;
     }
-
 
     /**
      * When adding a new substitution A-&gt;B to the map, we need to check if 
@@ -140,7 +138,7 @@ public class Subst_c<Formal extends Param, Actual extends TypeObject> implements
     protected Actual substSubstValue(Actual value) {
         return value;
     }
-    
+
     /** Perform substitutions on a class type. Substitutions are performed
      * lazily. */
     public ClassType substClassType(ClassType t) {
@@ -160,16 +158,16 @@ public class Subst_c<Formal extends Param, Actual extends TypeObject> implements
             cachePut(t, cached);
 
             if (Report.should_report(Topics.subst, 2))
-                Report.report(2, "substType(" +
-                              t + ": " + t.getClass().getName() + ") = " +
-                              cached + ": " + cached.getClass().getName());
+                Report.report(2, "substType(" + t + ": "
+                        + t.getClass().getName() + ") = " + cached + ": "
+                        + cached.getClass().getName());
         }
 
         return cached;
     }
 
     protected void cachePut(Type t, Type cached) {
-        cache.put(new CacheTypeWrapper(t), cached);        
+        cache.put(new CacheTypeWrapper(t), cached);
     }
 
     protected Type cacheGet(Type t) {
@@ -178,30 +176,35 @@ public class Subst_c<Formal extends Param, Actual extends TypeObject> implements
 
     class CacheTypeWrapper {
         final Type t;
-        CacheTypeWrapper(Type t) { this.t = t; }
-        
+
+        CacheTypeWrapper(Type t) {
+            this.t = t;
+        }
+
         @Override
         public boolean equals(Object o) {
             if (o instanceof Subst_c.CacheTypeWrapper) {
                 @SuppressWarnings("unchecked")
-                CacheTypeWrapper wrapper = (CacheTypeWrapper)o;
+                CacheTypeWrapper wrapper = (CacheTypeWrapper) o;
                 return Subst_c.this.cacheTypeEquality(t, wrapper.t);
             }
             if (o instanceof Type) {
-                return Subst_c.this.cacheTypeEquality(t, (Type)o);
+                return Subst_c.this.cacheTypeEquality(t, (Type) o);
             }
             return false;
         }
+
         @Override
         public String toString() {
             return String.valueOf(t);
         }
+
         @Override
         public int hashCode() {
-            return t==null?0:t.hashCode();           
+            return t == null ? 0 : t.hashCode();
         }
     }
-    
+
     /**
      * This method is used by the cache lookup to test type equality.
      * May be overridden by subclasses as appropriate.
@@ -213,12 +216,12 @@ public class Subst_c<Formal extends Param, Actual extends TypeObject> implements
     /** Perform substitution on a PClass. */
     @Override
     public PClass<Formal, Actual> substPClass(PClass<Formal, Actual> pclazz) {
-        MuPClass<Formal, Actual> newPclazz = ts.mutablePClass(pclazz.position());
+        MuPClass<Formal, Actual> newPclazz =
+                ts.mutablePClass(pclazz.position());
         newPclazz.formals(pclazz.formals());
         newPclazz.clazz((ClassType) substType(pclazz.clazz()));
         return newPclazz;
     }
-
 
     /** Perform substititions on a field. */
     @Override
@@ -251,7 +254,7 @@ public class Subst_c<Formal extends Param, Actual extends TypeObject> implements
         tmpMi.setFormalTypes(formalTypes);
         tmpMi.setThrowTypes(throwTypes);
         tmpMi.setContainer(ct);
-        
+
         return tmpMi;
     }
 
@@ -265,14 +268,13 @@ public class Subst_c<Formal extends Param, Actual extends TypeObject> implements
 
         List<? extends Type> throwTypes = ci.throwTypes();
         throwTypes = substTypeList(throwTypes);
-        
 
         @SuppressWarnings("unchecked")
         T tmpCi = (T) ci.copy();
         tmpCi.setFormalTypes(formalTypes);
         tmpCi.setThrowTypes(throwTypes);
         tmpCi.setContainer(ct);
-        
+
         return tmpCi;
     }
 
@@ -290,8 +292,10 @@ public class Subst_c<Formal extends Param, Actual extends TypeObject> implements
 
     /** Perform substititions on a list of <code>ConstructorInstance</code>. */
     @Override
-    public <T extends ConstructorInstance> List<T> substConstructorList(List<T> list) {
-        return new CachingTransformingList<T, T>(list, new ConstructorXform<T>());
+    public <T extends ConstructorInstance> List<T> substConstructorList(
+            List<T> list) {
+        return new CachingTransformingList<T, T>(list,
+                                                 new ConstructorXform<T>());
     }
 
     /** Perform substititions on a list of <code>FieldInstance</code>. */
@@ -314,7 +318,8 @@ public class Subst_c<Formal extends Param, Actual extends TypeObject> implements
     }
 
     /** Function object for transforming fields. */
-    public class FieldXform<T extends FieldInstance> implements Transformation<T,T> {
+    public class FieldXform<T extends FieldInstance> implements
+            Transformation<T, T> {
         @Override
         public T transform(T o) {
             return substField(o);
@@ -322,7 +327,8 @@ public class Subst_c<Formal extends Param, Actual extends TypeObject> implements
     }
 
     /** Function object for transforming methods. */
-    public class MethodXform<T extends MethodInstance> implements Transformation<T,T> {
+    public class MethodXform<T extends MethodInstance> implements
+            Transformation<T, T> {
         @Override
         public T transform(T o) {
             return substMethod(o);
@@ -330,7 +336,8 @@ public class Subst_c<Formal extends Param, Actual extends TypeObject> implements
     }
 
     /** Function object for transforming constructors. */
-    public class ConstructorXform<T extends ConstructorInstance> implements Transformation<T,T> {
+    public class ConstructorXform<T extends ConstructorInstance> implements
+            Transformation<T, T> {
         @Override
         public T transform(T o) {
             return substConstructor(o);
@@ -343,7 +350,7 @@ public class Subst_c<Formal extends Param, Actual extends TypeObject> implements
     @Override
     public boolean equals(Object o) {
         if (o instanceof Subst) {
-            return subst.equals(((Subst<?,?>) o).substitutions());
+            return subst.equals(((Subst<?, ?>) o).substitutions());
         }
 
         return false;
@@ -360,32 +367,28 @@ public class Subst_c<Formal extends Param, Actual extends TypeObject> implements
     @Override
     public String toString() {
         String str = "[";
-        for (Iterator<Entry<Formal, Actual>> iter =
-                subst.entrySet().iterator(); iter.hasNext();) {
+        for (Iterator<Entry<Formal, Actual>> iter = subst.entrySet().iterator(); iter.hasNext();) {
             Entry<Formal, ? extends Actual> entry = iter.next();
             str += "<" + entry.getKey() + ": " + entry.getValue() + ">";
-            if (iter.hasNext())
-                str += ", ";
-        }	
+            if (iter.hasNext()) str += ", ";
+        }
         return str + "]";
     }
 
-    private void writeObject(java.io.ObjectOutputStream out) 
-	throws IOException
-    {
+    private void writeObject(java.io.ObjectOutputStream out) throws IOException {
         out.defaultWriteObject();
     }
 
-    private void readObject(java.io.ObjectInputStream in) 
-	throws IOException, ClassNotFoundException
-    {
+    private void readObject(java.io.ObjectInputStream in) throws IOException,
+            ClassNotFoundException {
         if (in instanceof TypeInputStream) {
             @SuppressWarnings("unchecked")
-            ParamTypeSystem<Formal, Actual> ts = (ParamTypeSystem<Formal, Actual>) ((TypeInputStream) in).getTypeSystem();
+            ParamTypeSystem<Formal, Actual> ts =
+                    (ParamTypeSystem<Formal, Actual>) ((TypeInputStream) in).getTypeSystem();
             this.ts = ts;
         }
 
-	this.cache = new HashMap<CacheTypeWrapper, Type>();
+        this.cache = new HashMap<CacheTypeWrapper, Type>();
 
         in.defaultReadObject();
     }

@@ -43,79 +43,77 @@ import polyglot.visit.TypeChecker;
  * An immutable representation of a Java language <code>while</code>
  * statement.  It contains a statement to be executed and an expression
  * to be tested indicating whether to reexecute the statement.
- */ 
-public class While_c extends Loop_c implements While
-{
+ */
+public class While_c extends Loop_c implements While {
     protected Expr cond;
     protected Stmt body;
 
     public While_c(Position pos, Expr cond, Stmt body) {
-	super(pos);
-	assert(cond != null && body != null);
-	this.cond = cond;
-	this.body = body;
+        super(pos);
+        assert (cond != null && body != null);
+        this.cond = cond;
+        this.body = body;
     }
 
     /** Get the conditional of the statement. */
     @Override
     public Expr cond() {
-	return this.cond;
+        return this.cond;
     }
 
     /** Set the conditional of the statement. */
     @Override
     public While cond(Expr cond) {
-	While_c n = (While_c) copy();
-	n.cond = cond;
-	return n;
+        While_c n = (While_c) copy();
+        n.cond = cond;
+        return n;
     }
 
     /** Get the body of the statement. */
     @Override
     public Stmt body() {
-	return this.body;
+        return this.body;
     }
 
     /** Set the body of the statement. */
     @Override
     public While body(Stmt body) {
-	While_c n = (While_c) copy();
-	n.body = body;
-	return n;
+        While_c n = (While_c) copy();
+        n.body = body;
+        return n;
     }
 
     /** Reconstruct the statement. */
     protected While_c reconstruct(Expr cond, Stmt body) {
-	if (cond != this.cond || body != this.body) {
-	    While_c n = (While_c) copy();
-	    n.cond = cond;
-	    n.body = body;
-	    return n;
-	}
+        if (cond != this.cond || body != this.body) {
+            While_c n = (While_c) copy();
+            n.cond = cond;
+            n.body = body;
+            return n;
+        }
 
-	return this;
+        return this;
     }
 
     /** Visit the children of the statement. */
     @Override
     public Node visitChildren(NodeVisitor v) {
-	Expr cond = (Expr) visitChild(this.cond, v);
-	Stmt body = (Stmt) visitChild(this.body, v);
-	return reconstruct(cond, body);
+        Expr cond = (Expr) visitChild(this.cond, v);
+        Stmt body = (Stmt) visitChild(this.body, v);
+        return reconstruct(cond, body);
     }
 
     /** Type check the statement. */
     @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
-	TypeSystem ts = tc.typeSystem();
-	
-	if (! ts.isImplicitCastValid(cond.type(), ts.Boolean())) {
-	    throw new SemanticException(
-		"Condition of while statement must have boolean type.",
-		cond.position());
-	}
-	
-	return this;
+        TypeSystem ts = tc.typeSystem();
+
+        if (!ts.isImplicitCastValid(cond.type(), ts.Boolean())) {
+            throw new SemanticException("Condition of while statement must have boolean type.",
+                                        cond.position());
+        }
+
+        return this;
     }
 
     @Override
@@ -131,16 +129,16 @@ public class While_c extends Loop_c implements While
 
     @Override
     public String toString() {
-	return "while (" + cond + ") ...";
+        return "while (" + cond + ") ...";
     }
 
     /** Write the statement to an output file. */
     @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
-	w.write("while (");
-	printBlock(cond, w, tr);
-	w.write(")");
-	printSubStmt(body, w, tr);
+        w.write("while (");
+        printBlock(cond, w, tr);
+        w.write(")");
+        printSubStmt(body, w, tr);
     }
 
     @Override
@@ -154,8 +152,13 @@ public class While_c extends Loop_c implements While
             v.visitCFG(cond, body, ENTRY);
         }
         else {
-            v.visitCFG(cond, FlowGraph.EDGE_KEY_TRUE, body, ENTRY, 
-                             FlowGraph.EDGE_KEY_FALSE, this, EXIT);
+            v.visitCFG(cond,
+                       FlowGraph.EDGE_KEY_TRUE,
+                       body,
+                       ENTRY,
+                       FlowGraph.EDGE_KEY_FALSE,
+                       this,
+                       EXIT);
         }
 
         v.push(this).visitCFG(body, cond, ENTRY);
@@ -167,7 +170,7 @@ public class While_c extends Loop_c implements While
     public Term continueTarget() {
         return cond;
     }
-    
+
     @Override
     public Node copy(NodeFactory nf) {
         return nf.While(this.position, this.cond, this.body);

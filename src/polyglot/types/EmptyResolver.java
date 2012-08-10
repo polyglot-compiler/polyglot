@@ -25,7 +25,6 @@
 
 package polyglot.types;
 
-
 /**
  * An <code>EmptyResolver</code> is a resolver that always fails.
  */
@@ -45,7 +44,7 @@ public class EmptyResolver implements Resolver {
      */
     @Override
     public Named find(String name) throws SemanticException {
-        throw new SemanticException((kind != null ? (kind + " ") : "") +
-                                    "\"" + name + " not found.");
+        throw new SemanticException((kind != null ? (kind + " ") : "") + "\""
+                + name + " not found.");
     }
 }

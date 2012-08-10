@@ -40,47 +40,54 @@ import polyglot.util.Position;
  * can be accessed by later passes.
  */
 public class ParserPass extends AbstractPass {
-	protected Compiler compiler;
+    protected Compiler compiler;
 
-	public ParserPass(Compiler compiler, Goal goal) {
-		super(goal);
-		this.compiler = compiler;
-	}
+    public ParserPass(Compiler compiler, Goal goal) {
+        super(goal);
+        this.compiler = compiler;
+    }
 
-	@Override
+    @Override
     public boolean run() {
-		ErrorQueue eq = compiler.errorQueue();
+        ErrorQueue eq = compiler.errorQueue();
 
-		FileSource source = (FileSource) goal.job().source();
+        FileSource source = (FileSource) goal.job().source();
 
-		try {
-			Reader reader = source.openReader(false);
+        try {
+            Reader reader = source.openReader(false);
 
-			Parser p = goal.job().extensionInfo().parser(reader, source, eq);
+            Parser p = goal.job().extensionInfo().parser(reader, source, eq);
 
-			if (Report.should_report(Report.frontend, 2))
-				Report.report(2, "Using parser " + p);
+            if (Report.should_report(Report.frontend, 2))
+                Report.report(2, "Using parser " + p);
 
-			Node ast = p.parse();
+            Node ast = p.parse();
 
-			reader.close();
+            reader.close();
 
-			if (ast != null) {
-				goal.job().ast(ast);
-				return true;
-			}
+            if (ast != null) {
+                goal.job().ast(ast);
+                return true;
+            }
 
-			return false;
-		} catch (IOException e) {
-			eq.enqueue(ErrorInfo.IO_ERROR, e.getMessage(), new Position(goal
-					.job().source().path(), goal.job().source().name(), 1, 1, 1, 1));
+            return false;
+        }
+        catch (IOException e) {
+            eq.enqueue(ErrorInfo.IO_ERROR,
+                       e.getMessage(),
+                       new Position(goal.job().source().path(),
+                                    goal.job().source().name(),
+                                    1,
+                                    1,
+                                    1,
+                                    1));
 
-			return false;
-		}
-	}
+            return false;
+        }
+    }
 
-	@Override
+    @Override
     public String toString() {
-		return super.toString() + "(" + goal.job().source() + ")";
-	}
+        return super.toString() + "(" + goal.job().source() + ")";
+    }
 }

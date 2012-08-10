@@ -31,8 +31,7 @@ import polyglot.types.Type;
  * A <code>Catch</code> represents one half of a <code>try-catch</code>
  * statement.  Specifically, the second half.
  */
-public interface Catch extends CompoundStmt
-{
+public interface Catch extends CompoundStmt {
     /**
      * The type of the catch's formal.  This is the same as
      * formal().type().type().  May not be valid until after type-checking.

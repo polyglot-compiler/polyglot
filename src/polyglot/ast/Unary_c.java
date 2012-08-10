@@ -43,65 +43,67 @@ import polyglot.visit.TypeChecker;
  * A <code>Unary</code> represents a Java unary expression, an
  * immutable pair of an expression and an operator.
  */
-public class Unary_c extends Expr_c implements Unary
-{
+public class Unary_c extends Expr_c implements Unary {
     protected Unary.Operator op;
     protected Expr expr;
 
     public Unary_c(Position pos, Unary.Operator op, Expr expr) {
-	super(pos);
-	assert(op != null && expr != null);
-	this.op = op;
-	this.expr = expr;
+        super(pos);
+        assert (op != null && expr != null);
+        this.op = op;
+        this.expr = expr;
     }
 
     /** Get the precedence of the expression. */
     @Override
     public Precedence precedence() {
-	return Precedence.UNARY;
+        return Precedence.UNARY;
     }
 
     /** Get the sub-expression of the expression. */
     @Override
     public Expr expr() {
-	return this.expr;
+        return this.expr;
     }
 
     /** Set the sub-expression of the expression. */
     @Override
-    public Unary expr(Expr expr) { Unary_c n = (Unary_c) copy(); n.expr = expr;
-      return n; }
+    public Unary expr(Expr expr) {
+        Unary_c n = (Unary_c) copy();
+        n.expr = expr;
+        return n;
+    }
 
     /** Get the operator. */
     @Override
     public Unary.Operator operator() {
-	return this.op;
+        return this.op;
     }
 
     /** Set the operator. */
     @Override
     public Unary operator(Unary.Operator op) {
-	Unary_c n = (Unary_c) copy();
-	n.op = op;
-	return n;
+        Unary_c n = (Unary_c) copy();
+        n.op = op;
+        return n;
     }
 
     /** Reconstruct the expression. */
     protected Unary_c reconstruct(Expr expr) {
-	if (expr != this.expr) {
-	    Unary_c n = (Unary_c) copy();
-	    n.expr = expr;
-	    return n;
-	}
+        if (expr != this.expr) {
+            Unary_c n = (Unary_c) copy();
+            n.expr = expr;
+            return n;
+        }
 
-	return this;
+        return this;
     }
 
     /** Visit the children of the expression. */
     @Override
     public Node visitChildren(NodeVisitor v) {
-	Expr expr = (Expr) visitChild(this.expr, v);
-	return reconstruct(expr);
+        Expr expr = (Expr) visitChild(this.expr, v);
+        return reconstruct(expr);
     }
 
     /** Type check the expression. */
@@ -109,56 +111,56 @@ public class Unary_c extends Expr_c implements Unary
     public Node typeCheck(TypeChecker tc) throws SemanticException {
         TypeSystem ts = tc.typeSystem();
 
-	if (op == POST_INC || op == POST_DEC ||
-	    op == PRE_INC || op == PRE_DEC) {
+        if (op == POST_INC || op == POST_DEC || op == PRE_INC || op == PRE_DEC) {
 
-	    if (! expr.type().isNumeric()) {
-		throw new SemanticException("Operand of " + op +
-		    " operator must be numeric.", expr.position());
-	    }
-
-            if (! (expr instanceof Variable)) {
-		throw new SemanticException("Operand of " + op +
-		    " operator must be a variable.", expr.position());
+            if (!expr.type().isNumeric()) {
+                throw new SemanticException("Operand of " + op
+                        + " operator must be numeric.", expr.position());
             }
-            
+
+            if (!(expr instanceof Variable)) {
+                throw new SemanticException("Operand of " + op
+                        + " operator must be a variable.", expr.position());
+            }
+
             if (((Variable) expr).flags().isFinal()) {
-		throw new SemanticException("Operand of " + op +
-		    " operator must be a non-final variable.",
-                    expr.position());
+                throw new SemanticException("Operand of "
+                                                    + op
+                                                    + " operator must be a non-final variable.",
+                                            expr.position());
             }
 
-	    return type(expr.type());
-	}
+            return type(expr.type());
+        }
 
-	if (op == BIT_NOT) {
-	    if (! ts.isImplicitCastValid(expr.type(), ts.Long())) {
-		throw new SemanticException("Operand of " + op +
-		    " operator must be numeric.", expr.position());
-	    }
+        if (op == BIT_NOT) {
+            if (!ts.isImplicitCastValid(expr.type(), ts.Long())) {
+                throw new SemanticException("Operand of " + op
+                        + " operator must be numeric.", expr.position());
+            }
 
-	    return type(ts.promote(expr.type()));
-	}
+            return type(ts.promote(expr.type()));
+        }
 
-	if (op == NEG || op == POS) {
-	    if (! expr.type().isNumeric()) {
-		throw new SemanticException("Operand of " + op +
-		    " operator must be numeric.", expr.position());
-	    }
+        if (op == NEG || op == POS) {
+            if (!expr.type().isNumeric()) {
+                throw new SemanticException("Operand of " + op
+                        + " operator must be numeric.", expr.position());
+            }
 
-	    return type(ts.promote(expr.type()));
-	}
+            return type(ts.promote(expr.type()));
+        }
 
-	if (op == NOT) {
-	    if (! expr.type().isBoolean()) {
-		throw new SemanticException("Operand of " + op +
-		    " operator must be boolean.", expr.position());
-	    }
+        if (op == NOT) {
+            if (!expr.type().isBoolean()) {
+                throw new SemanticException("Operand of " + op
+                        + " operator must be boolean.", expr.position());
+            }
 
-	    return type(expr.type());
-	}
+            return type(expr.type());
+        }
 
-	return this;
+        return this;
     }
 
     @Override
@@ -167,8 +169,8 @@ public class Unary_c extends Expr_c implements Unary
 
         try {
             if (child == expr) {
-                if (op == POST_INC || op == POST_DEC ||
-                    op == PRE_INC || op == PRE_DEC) {
+                if (op == POST_INC || op == POST_DEC || op == PRE_INC
+                        || op == PRE_DEC) {
 
                     if (ts.isImplicitCastValid(child.type(), av.toType())) {
                         return ts.promote(child.type());
@@ -211,27 +213,27 @@ public class Unary_c extends Expr_c implements Unary
             return op.toString() + ((IntLit) expr).positiveToString();
         }
         else if (op.isPrefix()) {
-	    return op.toString() + expr.toString();
-	}
-	else {
-	    return expr.toString() + op.toString();
-	}
+            return op.toString() + expr.toString();
+        }
+        else {
+            return expr.toString() + op.toString();
+        }
     }
 
     @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
         if (op == NEG && expr instanceof IntLit && ((IntLit) expr).boundary()) {
-	    w.write(op.toString());
+            w.write(op.toString());
             w.write(((IntLit) expr).positiveToString());
         }
         else if (op.isPrefix()) {
-	    w.write(op.toString());
-	    printSubExpr(expr, false, w, tr);
-	}
-	else {
-	    printSubExpr(expr, false, w, tr);
-	    w.write(op.toString());
-	}
+            w.write(op.toString());
+            printSubExpr(expr, false, w, tr);
+        }
+        else {
+            printSubExpr(expr, false, w, tr);
+            w.write(op.toString());
+        }
     }
 
     @Override
@@ -242,36 +244,41 @@ public class Unary_c extends Expr_c implements Unary
     @Override
     public <T> List<T> acceptCFG(CFGBuilder<?> v, List<T> succs) {
         if (expr.type().isBoolean()) {
-            v.visitCFG(expr, FlowGraph.EDGE_KEY_TRUE, this, EXIT,
-                             FlowGraph.EDGE_KEY_FALSE, this, EXIT);
-        } else {
+            v.visitCFG(expr,
+                       FlowGraph.EDGE_KEY_TRUE,
+                       this,
+                       EXIT,
+                       FlowGraph.EDGE_KEY_FALSE,
+                       this,
+                       EXIT);
+        }
+        else {
             v.visitCFG(expr, this, EXIT);
         }
-        
+
         return succs;
     }
-    
+
     @Override
     public boolean constantValueSet() {
         return expr.constantValueSet();
     }
-    
+
     @Override
     public boolean isConstant() {
-	if (op == POST_INC || op == POST_DEC ||
-	    op == PRE_INC || op == PRE_DEC) {
+        if (op == POST_INC || op == POST_DEC || op == PRE_INC || op == PRE_DEC) {
             return false;
         }
-	return expr.isConstant();
+        return expr.isConstant();
     }
 
     @Override
     public Object constantValue() {
-        if (! isConstant()) {
-	    return null;
-	}
-	
-	Object v = expr.constantValue();
+        if (!isConstant()) {
+            return null;
+        }
+
+        Object v = expr.constantValue();
 
         if (v instanceof Boolean) {
             boolean vv = ((Boolean) v).booleanValue();
@@ -321,7 +328,7 @@ public class Unary_c extends Expr_c implements Unary
         // not a constant
         return null;
     }
-    
+
     @Override
     public Node copy(NodeFactory nf) {
         return nf.Unary(this.position, this.op, this.expr);

@@ -30,73 +30,74 @@ import polyglot.util.ErrorQueue;
  */
 public class ExtensionInfo extends JLExtensionInfo {
 
-	protected polyglot.frontend.ExtensionInfo outputExtensionInfo;
+    protected polyglot.frontend.ExtensionInfo outputExtensionInfo;
 
-	@Override
-	public String defaultFileExtension() {
-		return "jl5";
-	}
+    @Override
+    public String defaultFileExtension() {
+        return "jl5";
+    }
 
-	@Override
-	public String[] defaultFileExtensions() {
-		String ext = defaultFileExtension();
-		return new String[] { ext, "java" };
-	}
+    @Override
+    public String[] defaultFileExtensions() {
+        String ext = defaultFileExtension();
+        return new String[] { ext, "java" };
+    }
 
-	@Override
-	public String compilerName() {
-		return "jl5c";
-	}
+    @Override
+    public String compilerName() {
+        return "jl5c";
+    }
 
-	@Override
-	protected NodeFactory createNodeFactory() {
-		JL5Options opt = (JL5Options) getOptions();
-		if (!opt.removeJava5isms)
-			return new JL5NodeFactory_c(new JL5ExtFactory_c(), new JL5DelFactory_c());
-		else		
-			return new JL5NodeFactory_c(new JL5ExtFactory_c(new JL5ToJLExtFactory_c()), new JL5DelFactory_c());
-	}
+    @Override
+    protected NodeFactory createNodeFactory() {
+        JL5Options opt = (JL5Options) getOptions();
+        if (!opt.removeJava5isms)
+            return new JL5NodeFactory_c(new JL5ExtFactory_c(),
+                                        new JL5DelFactory_c());
+        else return new JL5NodeFactory_c(new JL5ExtFactory_c(new JL5ToJLExtFactory_c()),
+                                         new JL5DelFactory_c());
+    }
 
-	@Override
-	protected TypeSystem createTypeSystem() {
-		return new JL5TypeSystem_c();
-	}
-	
-	@Override
-	public Scheduler createScheduler() {
-		return new JL5Scheduler(this);
-	}
+    @Override
+    protected TypeSystem createTypeSystem() {
+        return new JL5TypeSystem_c();
+    }
 
-	@Override
-	protected Options createOptions() {
-		return new JL5Options(this);
-	}
+    @Override
+    public Scheduler createScheduler() {
+        return new JL5Scheduler(this);
+    }
 
-	@Override
-	public ClassFile createClassFile(FileObject classFileSource, byte[] code)
-			throws IOException {
-		return new JL5ClassFile(classFileSource, code, this);
-	}
+    @Override
+    protected Options createOptions() {
+        return new JL5Options(this);
+    }
 
-	/**
-	 * Return a parser for <code>source</code> using the given
-	 * <code>reader</code>.
-	 */
-	@Override
-        public Parser parser(Reader reader, FileSource source, ErrorQueue eq) {
-		reader = new polyglot.lex.EscapedUnicodeReader(reader);
+    @Override
+    public ClassFile createClassFile(FileObject classFileSource, byte[] code)
+            throws IOException {
+        return new JL5ClassFile(classFileSource, code, this);
+    }
 
-		polyglot.lex.Lexer lexer = new Lexer_c(reader, source, eq);
-		polyglot.parse.BaseParser parser = new Grm(lexer, ts, nf, eq);
+    /**
+     * Return a parser for <code>source</code> using the given
+     * <code>reader</code>.
+     */
+    @Override
+    public Parser parser(Reader reader, FileSource source, ErrorQueue eq) {
+        reader = new polyglot.lex.EscapedUnicodeReader(reader);
 
-		return new CupParser(parser, source, eq);
-	}
+        polyglot.lex.Lexer lexer = new Lexer_c(reader, source, eq);
+        polyglot.parse.BaseParser parser = new Grm(lexer, ts, nf, eq);
 
-	@Override
-	public polyglot.frontend.ExtensionInfo outputExtensionInfo() {
+        return new CupParser(parser, source, eq);
+    }
+
+    @Override
+    public polyglot.frontend.ExtensionInfo outputExtensionInfo() {
         if (this.outputExtensionInfo == null) {
             this.outputExtensionInfo = new JLOutputExtensionInfo(this);
         }
         return outputExtensionInfo;
-	}
+    }
 }

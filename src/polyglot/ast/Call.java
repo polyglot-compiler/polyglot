@@ -35,8 +35,7 @@ import polyglot.types.MethodInstance;
  * It may also have either a Type upon which the method is being
  * called or an expression upon which the method is being called.
  */
-public interface Call extends Expr, ProcedureCall
-{
+public interface Call extends Expr, ProcedureCall {
     /**
      * The call's target object.
      */
@@ -46,12 +45,12 @@ public interface Call extends Expr, ProcedureCall
      * Set the call's target.
      */
     Call target(Receiver target);
-    
+
     /**
      * The name of the method to call.
      */
     Id id();
-    
+
     /**
      * Set the name of the method to call.
      */
@@ -73,12 +72,12 @@ public interface Call extends Expr, ProcedureCall
      * @return boolean indicating if the target of this call is implicit
      */
     boolean isTargetImplicit();
-    
+
     /**
      * Set whether the target of this call is implicit.
      */
     Call targetImplicit(boolean targetImplicit);
-    
+
     /**
      * The call's actual arguments.
      * @return A list of {@link polyglot.ast.Expr Expr}.

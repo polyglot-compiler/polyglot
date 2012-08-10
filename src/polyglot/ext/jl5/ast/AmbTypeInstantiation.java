@@ -26,11 +26,14 @@ import polyglot.visit.AmbiguityRemover;
 import polyglot.visit.NodeVisitor;
 import polyglot.visit.PrettyPrinter;
 
-public class AmbTypeInstantiation extends TypeNode_c implements TypeNode, Ambiguous {
+public class AmbTypeInstantiation extends TypeNode_c implements TypeNode,
+        Ambiguous {
 
     private TypeNode base;
     private List<TypeNode> typeArguments;
-    public AmbTypeInstantiation(Position pos, TypeNode base, List<TypeNode> typeArguments) {
+
+    public AmbTypeInstantiation(Position pos, TypeNode base,
+            List<TypeNode> typeArguments) {
         super(pos);
         this.base = base;
         if (typeArguments == null) {
@@ -52,10 +55,10 @@ public class AmbTypeInstantiation extends TypeNode_c implements TypeNode, Ambigu
         for (TypeNode tn : typeArguments) {
             if (!tn.isDisambiguated()) {
                 return this;
-            }            
+            }
         }
 
-        JL5TypeSystem ts = (JL5TypeSystem)sc.typeSystem();
+        JL5TypeSystem ts = (JL5TypeSystem) sc.typeSystem();
         Type baseType = this.base.type();
 //        System.err.println("Base type is " + base);
 //        System.err.println("typeArguments is " + typeArguments);
@@ -66,9 +69,9 @@ public class AmbTypeInstantiation extends TypeNode_c implements TypeNode, Ambigu
 //            System.err.println("   base type instantiation is " + ((JL5SubstClassType)baseType).subst() + "  " + ((JL5SubstClassType)baseType).subst().getClass());
 //            System.err.println("   type args are is " + this.typeArguments);
 //        }
-        
+
         if (baseType instanceof ClassType) {
-            ClassType ct = (ClassType)baseType;
+            ClassType ct = (ClassType) baseType;
             if (ct.isInnerClass()) {
                 if (ct.outer() instanceof RawClass && !(ct instanceof RawClass)) {
                     // we are trying to create a "rare" class!
@@ -76,32 +79,38 @@ public class AmbTypeInstantiation extends TypeNode_c implements TypeNode, Ambigu
                     // trying to instantiate a member class of
                     // a raw class.
                     // See JLS 3rd ed. 4.8
-                    throw new SemanticException("\"Rare\" types are not allowed: cannot provide " +
-                    		"type arguments to member class " + ct.name() + 
-                    		" of raw class " + ct.outer() + ".", position);
+                    throw new SemanticException("\"Rare\" types are not allowed: cannot provide "
+                                                        + "type arguments to member class "
+                                                        + ct.name()
+                                                        + " of raw class "
+                                                        + ct.outer() + ".",
+                                                position);
                 }
             }
         }
-        
+
         JL5ParsedClassType pct;
-        Map<TypeVariable, ReferenceType> typeMap = new LinkedHashMap<TypeVariable, ReferenceType>();
+        Map<TypeVariable, ReferenceType> typeMap =
+                new LinkedHashMap<TypeVariable, ReferenceType>();
         if (baseType instanceof JL5ParsedClassType) {
-            pct = (JL5ParsedClassType)baseType;
+            pct = (JL5ParsedClassType) baseType;
         }
         else if (baseType instanceof RawClass) {
-            pct = ((RawClass)baseType).base();
+            pct = ((RawClass) baseType).base();
         }
         else if (baseType instanceof JL5SubstClassType) {
-            JL5SubstClassType sct = (JL5SubstClassType)baseType;
+            JL5SubstClassType sct = (JL5SubstClassType) baseType;
             pct = sct.base();
-            Iterator<Map.Entry<TypeVariable, ReferenceType>> iter = sct.subst().entries();
+            Iterator<Map.Entry<TypeVariable, ReferenceType>> iter =
+                    sct.subst().entries();
             while (iter.hasNext()) {
                 Map.Entry<TypeVariable, ReferenceType> e = iter.next();
                 typeMap.put(e.getKey(), e.getValue());
             }
         }
         else {
-            throw new InternalCompilerError("Don't know how to handle " + baseType, position);
+            throw new InternalCompilerError("Don't know how to handle "
+                    + baseType, position);
         }
 
         if ((pct.pclass() == null || pct.pclass().formals().isEmpty())) {
@@ -110,16 +119,18 @@ public class AmbTypeInstantiation extends TypeNode_c implements TypeNode, Ambigu
                 return base;
             }
         }
-        
+
         if (pct.pclass().formals().size() != this.typeArguments.size()) {
-            throw new SemanticException("Wrong number of type parameters for class " + pct, this.position);
+            throw new SemanticException("Wrong number of type parameters for class "
+                                                + pct,
+                                        this.position);
         }
 
-        
         // if subst is not null, check that subst does not already define the formal type variables
         if (!typeMap.isEmpty()) {
             if (typeMap.keySet().containsAll(pct.typeVariables())) {
-                throw new SemanticException("Cannot instantiate " + baseType + " with arguments " + typeArguments, this.position());
+                throw new SemanticException("Cannot instantiate " + baseType
+                        + " with arguments " + typeArguments, this.position());
             }
         }
 
@@ -129,7 +140,7 @@ public class AmbTypeInstantiation extends TypeNode_c implements TypeNode, Ambigu
             ReferenceType t = (ReferenceType) typeArguments.get(i).type();
             typeMap.put(formals.get(i), t);
         }
-        
+
 //        System.err.println("Instantiating " + pct + " with " + actuals);
         Type instantiated = ts.subst(pct, typeMap);
         return sc.nodeFactory().CanonicalTypeNode(this.position, instantiated);
@@ -140,8 +151,8 @@ public class AmbTypeInstantiation extends TypeNode_c implements TypeNode, Ambigu
         base.prettyPrint(w, tr);
         w.write("<");
         Iterator<TypeNode> iter = typeArguments.iterator();
-        while (iter.hasNext() ) {
-            TypeNode tn = iter.next();             
+        while (iter.hasNext()) {
+            TypeNode tn = iter.next();
             tn.prettyPrint(w, tr);
 
             if (iter.hasNext()) {
@@ -151,14 +162,13 @@ public class AmbTypeInstantiation extends TypeNode_c implements TypeNode, Ambigu
         }
         w.write(">");
     }
-    
+
     @Override
     public Node visitChildren(NodeVisitor v) {
-        TypeNode base = (TypeNode)visitChild(this.base, v);
+        TypeNode base = (TypeNode) visitChild(this.base, v);
         List<TypeNode> arguments = visitList(this.typeArguments, v);
         return this.base(base).typeArguments(arguments);
     }
-
 
     private AmbTypeInstantiation typeArguments(List<TypeNode> arguments) {
         if (this.typeArguments == arguments) {
@@ -168,7 +178,6 @@ public class AmbTypeInstantiation extends TypeNode_c implements TypeNode, Ambigu
         n.typeArguments = arguments;
         return n;
     }
-
 
     private AmbTypeInstantiation base(TypeNode b) {
         if (this.base == b) {

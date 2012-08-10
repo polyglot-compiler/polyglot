@@ -1,4 +1,3 @@
-
 package java_cup;
 
 /** This class represents a shift/reduce nonassociative error within the 
@@ -11,61 +10,55 @@ package java_cup;
  * @author  Frank Flannery
  */
 public class nonassoc_action extends parse_action {
- 
-  /*-----------------------------------------------------------*/
-  /*--- Constructor(s) ----------------------------------------*/
-  /*-----------------------------------------------------------*/
 
-  /** Simple constructor. 
-   */
-  public nonassoc_action() throws internal_error
-    {
-	/* don't need to set anything, since it signifies error */
+    /*-----------------------------------------------------------*/
+    /*--- Constructor(s) ----------------------------------------*/
+    /*-----------------------------------------------------------*/
+
+    /** Simple constructor. 
+     */
+    public nonassoc_action() throws internal_error {
+        /* don't need to set anything, since it signifies error */
     }
 
     /*-----------------------------------------------------------*/
-  /*--- General Methods ---------------------------------------*/
-  /*-----------------------------------------------------------*/
+    /*--- General Methods ---------------------------------------*/
+    /*-----------------------------------------------------------*/
 
-  /** Quick access to type of action. */
-  public int kind() {return NONASSOC;}
-
-  /*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . .*/
-
-  /** Equality test. */
-  public boolean equals(parse_action other)
-    {
-      return other != null && other.kind() == NONASSOC;
+    /** Quick access to type of action. */
+    public int kind() {
+        return NONASSOC;
     }
 
-  /*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . .*/
+    /*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . .*/
 
-  /** Generic equality test. */
-  public boolean equals(Object other)
-    {
-      if (other instanceof parse_action)
-	return equals((parse_action)other);
-      else
-       return false;
+    /** Equality test. */
+    public boolean equals(parse_action other) {
+        return other != null && other.kind() == NONASSOC;
     }
 
-  /*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . .*/
+    /*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . .*/
 
-  /** Compute a hash code. */
-  public int hashCode()
-    {
-      /* all objects of this class hash together */
-      return 0xCafe321;
+    /** Generic equality test. */
+    public boolean equals(Object other) {
+        if (other instanceof parse_action)
+            return equals((parse_action) other);
+        else return false;
     }
 
+    /*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . .*/
 
-
-  /** Convert to string. */
-  public String toString() 
-    {
-      return "NONASSOC";
+    /** Compute a hash code. */
+    public int hashCode() {
+        /* all objects of this class hash together */
+        return 0xCafe321;
     }
 
-  /*-----------------------------------------------------------*/
+    /** Convert to string. */
+    public String toString() {
+        return "NONASSOC";
+    }
+
+    /*-----------------------------------------------------------*/
 
 }

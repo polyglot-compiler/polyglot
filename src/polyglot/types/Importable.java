@@ -30,7 +30,6 @@ package polyglot.types;
  * type object.  An <code>Importable</code> is contained in a
  * <code>Package</code>.  
  */
-public interface Importable extends Named
-{
+public interface Importable extends Named {
     Package package_();
 }

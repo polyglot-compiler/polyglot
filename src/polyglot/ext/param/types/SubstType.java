@@ -34,16 +34,16 @@ import polyglot.types.TypeObject;
 /**
  * A type on which substitutions have been applied.
  */
-public interface SubstType<Formal extends Param, Actual extends TypeObject> extends Type
-{
-    /** The type on which substitutions are performed. */ 
+public interface SubstType<Formal extends Param, Actual extends TypeObject>
+        extends Type {
+    /** The type on which substitutions are performed. */
     Type base();
 
-    /** The substitution function. */ 
+    /** The substitution function. */
     Subst<Formal, Actual> subst();
 
     /** Entries of underlying substitution map.
      * @return An <code>Iterator</code> of <code>Map.Entry</code>.
-     */ 
+     */
     Iterator<Entry<Formal, Actual>> entries();
 }

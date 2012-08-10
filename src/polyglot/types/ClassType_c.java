@@ -38,10 +38,10 @@ import polyglot.util.Position;
  * A <code>ClassType</code> represents a class -- either loaded from a
  * classpath, parsed from a source file, or obtained from other source.
  */
-public abstract class ClassType_c extends ReferenceType_c implements ClassType
-{
+public abstract class ClassType_c extends ReferenceType_c implements ClassType {
     /** Used for deserializing types. */
-    protected ClassType_c() { }
+    protected ClassType_c() {
+    }
 
     public ClassType_c(TypeSystem ts) {
         this(ts, null);
@@ -51,38 +51,39 @@ public abstract class ClassType_c extends ReferenceType_c implements ClassType
         super(ts, pos);
         this.decl = this;
     }
-    
+
     protected transient Resolver memberCache;
-    
+
     @Override
     public Resolver resolver() {
         if (memberCache == null) {
-            memberCache = new CachingResolver(ts.createClassContextResolver(this));
+            memberCache =
+                    new CachingResolver(ts.createClassContextResolver(this));
         }
         return memberCache;
     }
-    
+
     @Override
     public ClassType_c copy() {
         ClassType_c n = (ClassType_c) super.copy();
         n.memberCache = null;
         return n;
     }
-    
+
     protected ClassType decl;
-    
+
     @Override
     public Declaration declaration() {
         return decl;
     }
-    
+
     @Override
     public void setDeclaration(Declaration decl) {
-        this.decl = (ClassType) decl;        
+        this.decl = (ClassType) decl;
     }
 
     public abstract Job job();
-    
+
     /** Get the class's kind. */
     @Override
     public abstract Kind kind();
@@ -91,17 +92,19 @@ public abstract class ClassType_c extends ReferenceType_c implements ClassType
     @Override
     public abstract ClassType outer();
 
-    /** Get the short name of the class, if possible. */ 
+    /** Get the short name of the class, if possible. */
     @Override
     public abstract String name();
 
     /** Get the container class if a member class. */
     @Override
     public ReferenceType container() {
-        if (! isMember())
-            throw new InternalCompilerError("Non-member class " + this + " cannot have container classes.");
+        if (!isMember())
+            throw new InternalCompilerError("Non-member class " + this
+                    + " cannot have container classes.");
         if (outer() == null)
-            throw new InternalCompilerError("Nested class " + this + " must have an outer class.");
+            throw new InternalCompilerError("Nested class " + this
+                    + " must have an outer class.");
         return outer();
     }
 
@@ -124,13 +127,24 @@ public abstract class ClassType_c extends ReferenceType_c implements ClassType
     }
 
     @Override
-    public boolean isTopLevel() { return kind() == TOP_LEVEL; }
+    public boolean isTopLevel() {
+        return kind() == TOP_LEVEL;
+    }
+
     @Override
-    public boolean isMember() { return kind() == MEMBER; }
+    public boolean isMember() {
+        return kind() == MEMBER;
+    }
+
     @Override
-    public boolean isLocal() { return kind() == LOCAL; }
+    public boolean isLocal() {
+        return kind() == LOCAL;
+    }
+
     @Override
-    public boolean isAnonymous() { return kind() == ANONYMOUS; }
+    public boolean isAnonymous() {
+        return kind() == ANONYMOUS;
+    }
 
     /**
     * @deprecated Was incorrectly defined. Use isNested for nested classes, 
@@ -148,20 +162,29 @@ public abstract class ClassType_c extends ReferenceType_c implements ClassType
         // extensions can add more kinds.
         return kind() == MEMBER || kind() == LOCAL || kind() == ANONYMOUS;
     }
-    
+
     @Override
     public boolean isInnerClass() {
         // it's an inner class if it is not an interface, it is a nested
         // class, and it is not explicitly or implicitly static. 
-        return !flags().isInterface() && isNested() && !flags().isStatic() && !inStaticContext();
+        return !flags().isInterface() && isNested() && !flags().isStatic()
+                && !inStaticContext();
     }
-    
+
     @Override
-    public boolean isCanonical() { return true; }
+    public boolean isCanonical() {
+        return true;
+    }
+
     @Override
-    public boolean isClass() { return true; }
+    public boolean isClass() {
+        return true;
+    }
+
     @Override
-    public ClassType toClass() { return this; }
+    public ClassType toClass() {
+        return this;
+    }
 
     /** Get the class's package. */
     @Override
@@ -194,7 +217,7 @@ public abstract class ClassType_c extends ReferenceType_c implements ClassType
     /** Get the class's super type. */
     @Override
     public abstract Type superType();
-    
+
     /** Get a list of all the class's MemberInstances. */
     @Override
     public List<? extends MemberInstance> members() {
@@ -210,29 +233,29 @@ public abstract class ClassType_c extends ReferenceType_c implements ClassType
     @Override
     public FieldInstance fieldNamed(String name) {
         for (FieldInstance fi : fields()) {
-	    if (fi.name().equals(name)) {
-	        return fi;
-	    }
-	}
+            if (fi.name().equals(name)) {
+                return fi;
+            }
+        }
 
-	return null;
+        return null;
     }
 
     /** Get a member class of the class by name. */
     @Override
     public ClassType memberClassNamed(String name) {
         for (ClassType t : memberClasses()) {
-	    if (t.name().equals(name)) {
-	        return t;
-	    }
-	}
+            if (t.name().equals(name)) {
+                return t;
+            }
+        }
 
-	return null;
+        return null;
     }
 
     @Override
     public boolean descendsFromImpl(Type ancestor) {
-        if (! ancestor.isCanonical()) {
+        if (!ancestor.isCanonical()) {
             return false;
         }
 
@@ -244,7 +267,7 @@ public abstract class ClassType_c extends ReferenceType_c implements ClassType
             return false;
         }
 
-        if (! ancestor.isReference()) {
+        if (!ancestor.isReference()) {
             return false;
         }
 
@@ -253,7 +276,7 @@ public abstract class ClassType_c extends ReferenceType_c implements ClassType
         }
 
         // Check subtype relation for classes.
-        if (! flags().isInterface()) {
+        if (!flags().isInterface()) {
             if (ts.typeEquals(this, ts.Object())) {
                 return false;
             }
@@ -297,7 +320,7 @@ public abstract class ClassType_c extends ReferenceType_c implements ClassType
 
     @Override
     public boolean isImplicitCastValidImpl(Type toType) {
-        if (! toType.isClass()) return false;
+        if (!toType.isClass()) return false;
         return ts.isSubtype(this, toType);
     }
 
@@ -309,56 +332,56 @@ public abstract class ClassType_c extends ReferenceType_c implements ClassType
      **/
     @Override
     public boolean isCastValidImpl(Type toType) {
-	if (! toType.isCanonical()) return false;
-	if (! toType.isReference()) return false;
+        if (!toType.isCanonical()) return false;
+        if (!toType.isReference()) return false;
 
-	if (toType.isArray()) {
-	    // From type is not an array, but to type is.  Check if the array
-	    // is a subtype of the from type.  This happens when from type
-	    // is java.lang.Object.
-	    return ts.isSubtype(toType, this);
-	}
+        if (toType.isArray()) {
+            // From type is not an array, but to type is.  Check if the array
+            // is a subtype of the from type.  This happens when from type
+            // is java.lang.Object.
+            return ts.isSubtype(toType, this);
+        }
 
-	// Both types should be classes now.
-	if (! toType.isClass()) return false;
+        // Both types should be classes now.
+        if (!toType.isClass()) return false;
 
-	// From and to are neither primitive nor an array. They are distinct.
-	boolean fromInterface = flags().isInterface();
-	boolean toInterface   = toType.toClass().flags().isInterface();
-	boolean fromFinal     = flags().isFinal();
-	boolean toFinal       = toType.toClass().flags().isFinal();
+        // From and to are neither primitive nor an array. They are distinct.
+        boolean fromInterface = flags().isInterface();
+        boolean toInterface = toType.toClass().flags().isInterface();
+        boolean fromFinal = flags().isFinal();
+        boolean toFinal = toType.toClass().flags().isFinal();
 
-	// This is taken from Section 5.5 of the JLS.
-	if (! fromInterface) {
-	    // From is not an interface.
-	    if (! toInterface) {
-		// Nether from nor to is an interface.
-		return ts.isSubtype(this, toType) || ts.isSubtype(toType, this);
-	    }
+        // This is taken from Section 5.5 of the JLS.
+        if (!fromInterface) {
+            // From is not an interface.
+            if (!toInterface) {
+                // Nether from nor to is an interface.
+                return ts.isSubtype(this, toType) || ts.isSubtype(toType, this);
+            }
 
-	    if (fromFinal) {
-		// From is a final class, and to is an interface
-		return ts.isSubtype(this, toType);
-	    }
+            if (fromFinal) {
+                // From is a final class, and to is an interface
+                return ts.isSubtype(this, toType);
+            }
 
-	    // From is a non-final class, and to is an interface.
-	    return true;
-	}
-	else {
-	    // From is an interface
-	    if (! toInterface && ! toFinal) {
-		// To is a non-final class.
-		return true;
-	    }
+            // From is a non-final class, and to is an interface.
+            return true;
+        }
+        else {
+            // From is an interface
+            if (!toInterface && !toFinal) {
+                // To is a non-final class.
+                return true;
+            }
 
-	    if (toFinal) {
-		// To is a final class.
-		return ts.isSubtype(toType, this);
-	    }
+            if (toFinal) {
+                // To is a final class.
+                return ts.isSubtype(toType, this);
+            }
 
-	    // To and From are both interfaces.
-	    return true;
-	}
+            // To and From are both interfaces.
+            return true;
+        }
     }
 
     @Override
@@ -443,29 +466,33 @@ public abstract class ClassType_c extends ReferenceType_c implements ClassType
             return "<unknown class>";
         }
     }
-    
+
     /** Pretty-print the name of this class to w. */
     @Override
     public void print(CodeWriter w) {
-	// XXX This code duplicates the logic of toString.
+        // XXX This code duplicates the logic of toString.
         if (isTopLevel()) {
             if (package_() != null) {
-		package_().print(w);
-		w.write(".");
-		w.allowBreak(2, 3, "", 0);
+                package_().print(w);
+                w.write(".");
+                w.allowBreak(2, 3, "", 0);
             }
             w.write(name());
-        } else if (isMember()) {
+        }
+        else if (isMember()) {
             container().print(w);
-	    w.write(".");
-	    w.allowBreak(2, 3, "", 0);
-	    w.write(name());
-        } else if (isLocal()) {
-	    w.write(name());
-        } else if (isAnonymous()) {
-	    w.write("<anonymous class>");
-        } else {
-	    w.write("<unknown class>");
+            w.write(".");
+            w.allowBreak(2, 3, "", 0);
+            w.write(name());
+        }
+        else if (isLocal()) {
+            w.write(name());
+        }
+        else if (isAnonymous()) {
+            w.write("<anonymous class>");
+        }
+        else {
+            w.write("<unknown class>");
         }
     }
 
@@ -474,11 +501,10 @@ public abstract class ClassType_c extends ReferenceType_c implements ClassType
         if (isTopLevel())
             return false;
         else if (outer() != null)
-            return outer().equals(maybe_outer) ||
-                  outer().isEnclosed(maybe_outer);
-        else
-            throw new InternalCompilerError("Non top-level classes " + 
-                    "must have outer classes.");
+            return outer().equals(maybe_outer)
+                    || outer().isEnclosed(maybe_outer);
+        else throw new InternalCompilerError("Non top-level classes "
+                + "must have outer classes.");
     }
 
     /** 
@@ -491,14 +517,14 @@ public abstract class ClassType_c extends ReferenceType_c implements ClassType
             // object o is the zeroth lexically enclosing instance of itself. 
             return true;
         }
-        
+
         if (!isInnerClass() || inStaticContext()) {
             // this class is not an inner class, or was declared in a static
             // context; it cannot have an enclosing
             // instance of anything. 
             return false;
         }
-        
+
         // see if the immediately lexically enclosing class has an 
         // appropriate enclosing instance
         return this.outer().hasEnclosingInstance(encl);

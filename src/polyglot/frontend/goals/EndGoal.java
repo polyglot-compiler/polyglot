@@ -25,7 +25,6 @@
 
 package polyglot.frontend.goals;
 
-
 /**
  * The <code>EndGoal</code> interface is used to tag the last goal for a
  * job.  When an EndGoal is reached, the job can be removed from the

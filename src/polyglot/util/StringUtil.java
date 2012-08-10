@@ -26,8 +26,7 @@
 package polyglot.util;
 
 /** String utilities. */
-public class StringUtil
-{
+public class StringUtil {
     /**
      * Given the name for a class, returns the portion which appears to
      * constitute the package -- i.e., all characters up to but not including
@@ -35,7 +34,7 @@ public class StringUtil
      **/
     public static String getPackageComponent(String fullName) {
         int lastDot = fullName.lastIndexOf('.');
-        return lastDot >= 0 ? fullName.substring(0,lastDot) : "";
+        return lastDot >= 0 ? fullName.substring(0, lastDot) : "";
     }
 
     /**
@@ -45,7 +44,7 @@ public class StringUtil
      **/
     public static String getShortNameComponent(String fullName) {
         int lastDot = fullName.lastIndexOf('.');
-        return lastDot >= 0 ? fullName.substring(lastDot+1) : fullName;
+        return lastDot >= 0 ? fullName.substring(lastDot + 1) : fullName;
     }
 
     /**
@@ -58,12 +57,12 @@ public class StringUtil
 
     public static String getFirstComponent(String fullName) {
         int firstDot = fullName.indexOf('.');
-        return firstDot >= 0 ? fullName.substring(0,firstDot) : fullName;
+        return firstDot >= 0 ? fullName.substring(0, firstDot) : fullName;
     }
 
     public static String removeFirstComponent(String fullName) {
         int firstDot = fullName.indexOf('.');
-        return firstDot >= 0 ? fullName.substring(firstDot+1) : "";
+        return firstDot >= 0 ? fullName.substring(firstDot + 1) : "";
     }
 
     public static String escape(String s) {
@@ -98,7 +97,7 @@ public class StringUtil
                 sb = new StringBuffer(s.length() + 10);
                 sb.append(s.substring(0, i));
             }
-            
+
             if (sb != null) {
                 if (t != null) {
                     sb.append(t);
@@ -122,7 +121,8 @@ public class StringUtil
             if (unicode) {
                 StringBuffer sb = new StringBuffer(8);
                 sb.append(Integer.toHexString(c));
-                while (sb.length() < 4) sb.insert(0, '0');
+                while (sb.length() < 4)
+                    sb.insert(0, '0');
                 sb.insert(0, "\\u");
                 return sb.toString();
             }
@@ -132,36 +132,42 @@ public class StringUtil
         }
 
         switch (c) {
-        case '\b': return ("\\b");
-        case '\t': return ("\\t");
-        case '\n': return ("\\n");
-        case '\f': return ("\\f");
-        case '\r': return ("\\r");
-        case '\"': return ("\\\""); // "\\\"";
-        case '\'': return ("\\\'"); // "\\\'";
-        case '\\': return ("\\\\"); // "\\\\";
+        case '\b':
+            return ("\\b");
+        case '\t':
+            return ("\\t");
+        case '\n':
+            return ("\\n");
+        case '\f':
+            return ("\\f");
+        case '\r':
+            return ("\\r");
+        case '\"':
+            return ("\\\""); // "\\\"";
+        case '\'':
+            return ("\\\'"); // "\\\'";
+        case '\\':
+            return ("\\\\"); // "\\\\";
         }
 
         if (c >= 0x20 && c < 0x7f) {
             return null;
         }
 
-        return ("\\" + (char) ('0' + c / 64)
-                  + (char) ('0' + (c & 63) / 8)
-                  + (char) ('0' + (c & 7)));
+        return ("\\" + (char) ('0' + c / 64) + (char) ('0' + (c & 63) / 8) + (char) ('0' + (c & 7)));
     }
 
     public static String nth(int n) {
         StringBuffer s = new StringBuffer(String.valueOf(n));
         if (s.length() > 1) {
-            if (s.charAt(s.length()-2) == '1') {
+            if (s.charAt(s.length() - 2) == '1') {
                 // all the teens end in "th", e.g. "11th"
                 s.append("th");
-                return s.toString();                
-            }            
+                return s.toString();
+            }
         }
 
-        char last = s.charAt(s.length()-1);
+        char last = s.charAt(s.length() - 1);
         switch (last) {
         case '1':
             s.append("st");

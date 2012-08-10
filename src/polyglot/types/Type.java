@@ -31,8 +31,7 @@ import polyglot.util.CodeWriter;
  * A <code>Type</code> is the base type of all classes which represent
  * types.
  */
-public interface Type extends Qualifier
-{
+public interface Type extends Qualifier {
     /**
      * Return a string into which to translate the type.
      * @param c A resolver in which to lookup this type to determine if
@@ -84,7 +83,7 @@ public interface Type extends Qualifier
      * @return True if this type is equivalent to t.
      */
     boolean typeEquals(Type t);
-    
+
     /**
      * Return true if this type is equivalent to t.
      * Usually this is the same as equalsImpl(TypeObject), but that
@@ -94,7 +93,7 @@ public interface Type extends Qualifier
      * @return True if this type is equivalent to t.
      */
     boolean typeEqualsImpl(Type t);
-    
+
     /**
      * Return true if this type is a subtype of <code>ancestor</code>.
      */

@@ -44,21 +44,21 @@ import polyglot.visit.TypeChecker;
  * A <code>Binary</code> represents a Java binary expression, an
  * immutable pair of expressions combined with an operator.
  */
-public class Binary_c extends Expr_c implements Binary
-{
+public class Binary_c extends Expr_c implements Binary {
     protected Expr left;
     protected Operator op;
     protected Expr right;
     protected Precedence precedence;
 
     public Binary_c(Position pos, Expr left, Operator op, Expr right) {
-	super(pos);
-	assert(left != null && op != null && right != null);
-	this.left = left;
-	this.op = op;
-	this.right = right;
-	this.precedence = op.precedence();
-        if (op == ADD && (left instanceof StringLit || right instanceof StringLit)) {
+        super(pos);
+        assert (left != null && op != null && right != null);
+        this.left = left;
+        this.op = op;
+        this.right = right;
+        this.precedence = op.precedence();
+        if (op == ADD
+                && (left instanceof StringLit || right instanceof StringLit)) {
             this.precedence = Precedence.STRING_ADD;
         }
     }
@@ -66,103 +66,103 @@ public class Binary_c extends Expr_c implements Binary
     /** Get the left operand of the expression. */
     @Override
     public Expr left() {
-	return this.left;
+        return this.left;
     }
 
     /** Set the left operand of the expression. */
     @Override
     public Binary left(Expr left) {
-	Binary_c n = (Binary_c) copy();
-	n.left = left;
-	return n;
+        Binary_c n = (Binary_c) copy();
+        n.left = left;
+        return n;
     }
 
     /** Get the operator of the expression. */
     @Override
     public Operator operator() {
-	return this.op;
+        return this.op;
     }
 
     /** Set the operator of the expression. */
     @Override
     public Binary operator(Operator op) {
-	Binary_c n = (Binary_c) copy();
-	n.op = op;
-	return n;
+        Binary_c n = (Binary_c) copy();
+        n.op = op;
+        return n;
     }
 
     /** Get the right operand of the expression. */
     @Override
     public Expr right() {
-	return this.right;
+        return this.right;
     }
 
     /** Set the right operand of the expression. */
     @Override
     public Binary right(Expr right) {
-	Binary_c n = (Binary_c) copy();
-	n.right = right;
-	return n;
+        Binary_c n = (Binary_c) copy();
+        n.right = right;
+        return n;
     }
 
     /** Get the precedence of the expression. */
     @Override
     public Precedence precedence() {
-	return this.precedence;
+        return this.precedence;
     }
 
     @Override
     public Binary precedence(Precedence precedence) {
-	Binary_c n = (Binary_c) copy();
-	n.precedence = precedence;
-	return n;
+        Binary_c n = (Binary_c) copy();
+        n.precedence = precedence;
+        return n;
     }
 
     /** Reconstruct the expression. */
     protected Binary_c reconstruct(Expr left, Expr right) {
-	if (left != this.left || right != this.right) {
-	    Binary_c n = (Binary_c) copy();
-	    n.left = left;
-	    n.right = right;
-	    return n;
-	}
+        if (left != this.left || right != this.right) {
+            Binary_c n = (Binary_c) copy();
+            n.left = left;
+            n.right = right;
+            return n;
+        }
 
-	return this;
+        return this;
     }
 
     /** Visit the children of the expression. */
     @Override
     public Node visitChildren(NodeVisitor v) {
-	Expr left = (Expr) visitChild(this.left, v);
-	Expr right = (Expr) visitChild(this.right, v);
-	return reconstruct(left, right);
+        Expr left = (Expr) visitChild(this.left, v);
+        Expr right = (Expr) visitChild(this.right, v);
+        return reconstruct(left, right);
     }
-    
+
     @Override
     public boolean constantValueSet() {
         return left.constantValueSet() && right.constantValueSet();
     }
-    
+
     @Override
     public boolean isConstant() {
         return left.isConstant() && right.isConstant();
     }
-    
+
     @Override
     public Object constantValue() {
-	if (! isConstant()) {
-	    return null;
-	}
+        if (!isConstant()) {
+            return null;
+        }
 
         Object lv = left.constantValue();
         Object rv = right.constantValue();
 
         if (op == ADD && (lv instanceof String || rv instanceof String)) {
             // toString() does what we want for String, Number, and Boolean
-	    if (lv == null) lv = "null";
-	    if (rv == null) rv = "null";
-            return lv.toString() + rv.toString();       
-	}
+            if (lv == null) lv = "null";
+            if (rv == null) rv = "null";
+            return lv.toString() + rv.toString();
+        }
 
         if (op == EQ && (lv instanceof String && rv instanceof String)) {
             return Boolean.valueOf(((String) lv).intern() == ((String) rv).intern());
@@ -294,137 +294,146 @@ public class Binary_c extends Expr_c implements Binary
     @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
         Type l = left.type();
-	Type r = right.type();
+        Type r = right.type();
 
-	TypeSystem ts = tc.typeSystem();
+        TypeSystem ts = tc.typeSystem();
 
-	if (op == GT || op == LT || op == GE || op == LE) {
-	    if (! l.isNumeric()) {
-		throw new SemanticException("The " + op +
-		    " operator must have numeric operands, not type " +
-                    l + ".", left.position());
-	    }
+        if (op == GT || op == LT || op == GE || op == LE) {
+            if (!l.isNumeric()) {
+                throw new SemanticException("The " + op
+                        + " operator must have numeric operands, not type " + l
+                        + ".", left.position());
+            }
 
-            if (! r.isNumeric()) {
-		throw new SemanticException("The " + op +
-		    " operator must have numeric operands, not type " +
-                    r + ".", right.position());
-	    }
+            if (!r.isNumeric()) {
+                throw new SemanticException("The " + op
+                        + " operator must have numeric operands, not type " + r
+                        + ".", right.position());
+            }
 
-	    return type(ts.Boolean());
-	}
+            return type(ts.Boolean());
+        }
 
-	if (op == EQ || op == NE) {
-            if (! ts.isCastValid(l, r) && ! ts.isCastValid(r, l)) {
-		throw new SemanticException("The " + op +
-		    " operator must have operands of similar type.",
-		    position());
-	    }
+        if (op == EQ || op == NE) {
+            if (!ts.isCastValid(l, r) && !ts.isCastValid(r, l)) {
+                throw new SemanticException("The "
+                                                    + op
+                                                    + " operator must have operands of similar type.",
+                                            position());
+            }
 
-	    return type(ts.Boolean());
-	}
+            return type(ts.Boolean());
+        }
 
-	if (op == COND_OR || op == COND_AND) {
-	    if (! l.isBoolean()) {
-		throw new SemanticException("The " + op +
-		    " operator must have boolean operands, not type " +
-                    l + ".", left.position());
-	    }
+        if (op == COND_OR || op == COND_AND) {
+            if (!l.isBoolean()) {
+                throw new SemanticException("The " + op
+                        + " operator must have boolean operands, not type " + l
+                        + ".", left.position());
+            }
 
-	    if (! r.isBoolean()) {
-		throw new SemanticException("The " + op +
-		    " operator must have boolean operands, not type " +
-                    r + ".", right.position());
-	    }
+            if (!r.isBoolean()) {
+                throw new SemanticException("The " + op
+                        + " operator must have boolean operands, not type " + r
+                        + ".", right.position());
+            }
 
-	    return type(ts.Boolean());
-	}
+            return type(ts.Boolean());
+        }
 
-	if (op == ADD) {
-	    if (ts.isSubtype(l, ts.String()) || ts.isSubtype(r, ts.String())) {
+        if (op == ADD) {
+            if (ts.isSubtype(l, ts.String()) || ts.isSubtype(r, ts.String())) {
                 if (!ts.canCoerceToString(r, tc.context())) {
-                    throw new SemanticException("Cannot coerce an expression " + 
-                                "of type " + r + " to a String.", 
-                                right.position());
+                    throw new SemanticException("Cannot coerce an expression "
+                                                        + "of type " + r
+                                                        + " to a String.",
+                                                right.position());
                 }
                 if (!ts.canCoerceToString(l, tc.context())) {
-                    throw new SemanticException("Cannot coerce an expression " + 
-                                "of type " + l + " to a String.", 
-                                left.position());
+                    throw new SemanticException("Cannot coerce an expression "
+                            + "of type " + l + " to a String.", left.position());
                 }
 
                 return precedence(Precedence.STRING_ADD).type(ts.String());
             }
-	}
+        }
 
-	if (op == BIT_AND || op == BIT_OR || op == BIT_XOR) {
-	    if (l.isBoolean() && r.isBoolean()) {
-		return type(ts.Boolean());
-	    }
-	}
+        if (op == BIT_AND || op == BIT_OR || op == BIT_XOR) {
+            if (l.isBoolean() && r.isBoolean()) {
+                return type(ts.Boolean());
+            }
+        }
 
         if (op == ADD) {
-            if (! l.isNumeric()) {
-                throw new SemanticException("The " + op +
-                    " operator must have numeric or String operands, not type " +
-                    l + ".", left.position());
+            if (!l.isNumeric()) {
+                throw new SemanticException("The "
+                                                    + op
+                                                    + " operator must have numeric or String operands, not type "
+                                                    + l + ".",
+                                            left.position());
             }
 
-            if (! r.isNumeric()) {
-                throw new SemanticException("The " + op +
-                    " operator must have numeric or String operands, not type " +
-                    r + ".", right.position());
+            if (!r.isNumeric()) {
+                throw new SemanticException("The "
+                                                    + op
+                                                    + " operator must have numeric or String operands, not type "
+                                                    + r + ".",
+                                            right.position());
             }
         }
 
         if (op == BIT_AND || op == BIT_OR || op == BIT_XOR) {
-            if (! ts.isImplicitCastValid(l, ts.Long())) {
-                throw new SemanticException("The " + op +
-                    " operator must have numeric or boolean operands, not type " +
-                    l + ".", left.position());
+            if (!ts.isImplicitCastValid(l, ts.Long())) {
+                throw new SemanticException("The "
+                                                    + op
+                                                    + " operator must have numeric or boolean operands, not type "
+                                                    + l + ".",
+                                            left.position());
             }
 
-            if (! ts.isImplicitCastValid(r, ts.Long())) {
-                throw new SemanticException("The " + op +
-                    " operator must have numeric or boolean operands, not type " +
-                    r + ".", right.position());
+            if (!ts.isImplicitCastValid(r, ts.Long())) {
+                throw new SemanticException("The "
+                                                    + op
+                                                    + " operator must have numeric or boolean operands, not type "
+                                                    + r + ".",
+                                            right.position());
             }
         }
 
         if (op == SUB || op == MUL || op == DIV || op == MOD) {
-            if (! l.isNumeric()) {
-                throw new SemanticException("The " + op +
-                    " operator must have numeric operands, not type " +
-                    l + ".", left.position());
+            if (!l.isNumeric()) {
+                throw new SemanticException("The " + op
+                        + " operator must have numeric operands, not type " + l
+                        + ".", left.position());
             }
 
-            if (! r.isNumeric()) {
-                throw new SemanticException("The " + op +
-                    " operator must have numeric operands, not type " +
-                    r + ".", right.position());
+            if (!r.isNumeric()) {
+                throw new SemanticException("The " + op
+                        + " operator must have numeric operands, not type " + r
+                        + ".", right.position());
             }
         }
 
         if (op == SHL || op == SHR || op == USHR) {
-            if (! ts.isImplicitCastValid(l, ts.Long())) {
-                throw new SemanticException("The " + op +
-                    " operator must have numeric operands, not type " +
-                    l + ".", left.position());
+            if (!ts.isImplicitCastValid(l, ts.Long())) {
+                throw new SemanticException("The " + op
+                        + " operator must have numeric operands, not type " + l
+                        + ".", left.position());
             }
 
-            if (! ts.isImplicitCastValid(r, ts.Long())) {
-                throw new SemanticException("The " + op +
-                    " operator must have numeric operands, not type " +
-                    r + ".", right.position());
+            if (!ts.isImplicitCastValid(r, ts.Long())) {
+                throw new SemanticException("The " + op
+                        + " operator must have numeric operands, not type " + r
+                        + ".", right.position());
             }
         }
 
-	if (op == SHL || op == SHR || op == USHR) {
-	    // For shift, only promote the left operand.
-	    return type(ts.promote(l));
-	}
+        if (op == SHL || op == SHR || op == USHR) {
+            // For shift, only promote the left operand.
+            return type(ts.promote(l));
+        }
 
-	return type(ts.promote(l, r));
+        return type(ts.promote(l, r));
     }
 
     @Override
@@ -446,8 +455,8 @@ public class Binary_c extends Expr_c implements Binary
         try {
             if (op == EQ || op == NE) {
                 // Coercion to compatible types.
-                if ((child.type().isReference() || child.type().isNull()) &&
-                    (other.type().isReference() || other.type().isNull())) {
+                if ((child.type().isReference() || child.type().isNull())
+                        && (other.type().isReference() || other.type().isNull())) {
                     return ts.leastCommonAncestor(child.type(), other.type());
                 }
 
@@ -541,107 +550,134 @@ public class Binary_c extends Expr_c implements Binary
     /** Get the throwsArithmeticException of the expression. */
     @Override
     public boolean throwsArithmeticException() {
-	// conservatively assume that any division or mod may throw
-	// ArithmeticException this is NOT true-- floats and doubles don't
-	// throw any exceptions ever...
-	return op == DIV || op == MOD;
+        // conservatively assume that any division or mod may throw
+        // ArithmeticException this is NOT true-- floats and doubles don't
+        // throw any exceptions ever...
+        return op == DIV || op == MOD;
     }
 
     @Override
     public String toString() {
-	return left + " " + op + " " + right;
+        return left + " " + op + " " + right;
     }
 
     /** Write the expression to an output file. */
     @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
-	printSubExpr(left, true, w, tr);
-	w.write(" ");
-	w.write(op.toString());
-	w.allowBreak(type() == null || type().isPrimitive() ? 2 : 0, " ");
-	printSubExpr(right, false, w, tr);
+        printSubExpr(left, true, w, tr);
+        w.write(" ");
+        w.write(op.toString());
+        w.allowBreak(type() == null || type().isPrimitive() ? 2 : 0, " ");
+        printSubExpr(right, false, w, tr);
     }
 
-  @Override
-  public void dump(CodeWriter w) {
-    super.dump(w);
+    @Override
+    public void dump(CodeWriter w) {
+        super.dump(w);
 
-    if (type != null) {
-      w.allowBreak(4, " ");
-      w.begin(0);
-      w.write("(type " + type + ")");
-      w.end();
+        if (type != null) {
+            w.allowBreak(4, " ");
+            w.begin(0);
+            w.write("(type " + type + ")");
+            w.end();
+        }
+
+        w.allowBreak(4, " ");
+        w.begin(0);
+        w.write("(operator " + op + ")");
+        w.end();
     }
 
-    w.allowBreak(4, " ");
-    w.begin(0);
-    w.write("(operator " + op + ")");
-    w.end();
-  }
+    @Override
+    public Term firstChild() {
+        return left;
+    }
 
-  @Override
-  public Term firstChild() {
-    return left;
-  }
-
-  @Override
-  public <T> List<T> acceptCFG(CFGBuilder<?> v, List<T> succs) {
-    if (op == COND_AND || op == COND_OR) {
-      // short-circuit
-      if (left instanceof BooleanLit) {
-        BooleanLit b = (BooleanLit) left;
-        if ((b.value() && op == COND_OR) || (! b.value() && op == COND_AND)) {
-          v.visitCFG(left, this, EXIT);
+    @Override
+    public <T> List<T> acceptCFG(CFGBuilder<?> v, List<T> succs) {
+        if (op == COND_AND || op == COND_OR) {
+            // short-circuit
+            if (left instanceof BooleanLit) {
+                BooleanLit b = (BooleanLit) left;
+                if ((b.value() && op == COND_OR)
+                        || (!b.value() && op == COND_AND)) {
+                    v.visitCFG(left, this, EXIT);
+                }
+                else {
+                    v.visitCFG(left, right, ENTRY);
+                    v.visitCFG(right, this, EXIT);
+                }
+            }
+            else {
+                if (op == COND_AND) {
+                    // AND operator
+                    // short circuit means that left is false
+                    v.visitCFG(left,
+                               FlowGraph.EDGE_KEY_TRUE,
+                               right,
+                               ENTRY,
+                               FlowGraph.EDGE_KEY_FALSE,
+                               this,
+                               EXIT);
+                }
+                else {
+                    // OR operator
+                    // short circuit means that left is true
+                    v.visitCFG(left,
+                               FlowGraph.EDGE_KEY_FALSE,
+                               right,
+                               ENTRY,
+                               FlowGraph.EDGE_KEY_TRUE,
+                               this,
+                               EXIT);
+                }
+                v.visitCFG(right,
+                           FlowGraph.EDGE_KEY_TRUE,
+                           this,
+                           EXIT,
+                           FlowGraph.EDGE_KEY_FALSE,
+                           this,
+                           EXIT);
+            }
         }
         else {
-          v.visitCFG(left, right, ENTRY);
-          v.visitCFG(right, this, EXIT);
+            if (left.type().isBoolean() && right.type().isBoolean()) {
+                v.visitCFG(left,
+                           FlowGraph.EDGE_KEY_TRUE,
+                           right,
+                           ENTRY,
+                           FlowGraph.EDGE_KEY_FALSE,
+                           right,
+                           ENTRY);
+                v.visitCFG(right,
+                           FlowGraph.EDGE_KEY_TRUE,
+                           this,
+                           EXIT,
+                           FlowGraph.EDGE_KEY_FALSE,
+                           this,
+                           EXIT);
+            }
+            else {
+                v.visitCFG(left, right, ENTRY);
+                v.visitCFG(right, this, EXIT);
+            }
         }
-      }
-      else {
-        if (op == COND_AND) {
-          // AND operator
-          // short circuit means that left is false
-          v.visitCFG(left, FlowGraph.EDGE_KEY_TRUE, right, ENTRY, 
-                           FlowGraph.EDGE_KEY_FALSE, this, EXIT);
-        }
-        else {
-          // OR operator
-          // short circuit means that left is true
-          v.visitCFG(left, FlowGraph.EDGE_KEY_FALSE, right, ENTRY, 
-                           FlowGraph.EDGE_KEY_TRUE, this, EXIT);
-        }
-        v.visitCFG(right, FlowGraph.EDGE_KEY_TRUE, this, EXIT,
-                          FlowGraph.EDGE_KEY_FALSE, this, EXIT);
-      }
-    }
-    else {
-      if (left.type().isBoolean() && right.type().isBoolean()) {        
-          v.visitCFG(left, FlowGraph.EDGE_KEY_TRUE, right, ENTRY,
-                           FlowGraph.EDGE_KEY_FALSE, right, ENTRY);
-          v.visitCFG(right, FlowGraph.EDGE_KEY_TRUE, this, EXIT,
-                            FlowGraph.EDGE_KEY_FALSE, this, EXIT);
-      }
-      else {
-          v.visitCFG(left, right, ENTRY);
-          v.visitCFG(right, this, EXIT);
-      }
+
+        return succs;
     }
 
-    return succs;
-  }
+    @Override
+    public List<Type> throwTypes(TypeSystem ts) {
+        if (throwsArithmeticException()) {
+            return Collections.singletonList((Type) ts.ArithmeticException());
+        }
 
-  @Override
-  public List<Type> throwTypes(TypeSystem ts) {
-    if (throwsArithmeticException()) {
-      return Collections.singletonList((Type) ts.ArithmeticException());
+        return Collections.<Type> emptyList();
     }
 
-    return Collections.<Type> emptyList();
-  }
-  @Override
-  public Node copy(NodeFactory nf) {
-      return nf.Binary(this.position, this.left, this.op, this.right);
-  }
-  
+    @Override
+    public Node copy(NodeFactory nf) {
+        return nf.Binary(this.position, this.left, this.op, this.right);
+    }
+
 }

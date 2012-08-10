@@ -34,8 +34,7 @@ import polyglot.types.InitializerInstance;
  * A <code>FieldDecl</code> is an immutable representation of the declaration
  * of a field of a class.
  */
-public interface FieldDecl extends ClassMember, VarInit, CodeNode
-{
+public interface FieldDecl extends ClassMember, VarInit, CodeNode {
     /** Get the type object for the declaration's type. */
     Type declType();
 
@@ -47,21 +46,25 @@ public interface FieldDecl extends ClassMember, VarInit, CodeNode
 
     /** Get the declaration's type. */
     TypeNode type();
+
     /** Set the declaration's type. */
     FieldDecl type(TypeNode type);
-    
+
     /** Get the declaration's name. */
     Id id();
+
     /** Set the declaration's name. */
     FieldDecl id(Id name);
 
     /** Get the declaration's name. */
     String name();
+
     /** Set the declaration's name. */
     FieldDecl name(String name);
 
     /** Get the declaration's initializer, or null. */
     Expr init();
+
     /** Set the declaration's initializer. */
     FieldDecl init(Expr init);
 
@@ -78,12 +81,12 @@ public interface FieldDecl extends ClassMember, VarInit, CodeNode
      * Get the type object for the initializer expression, or null.
      * We evaluate the initializer expression as if it were in an
      * initializer block (e.g., <code>{ }</code> or </code>static { }<code>).
-     */ 
+     */
     InitializerInstance initializerInstance();
 
     /** Set the type object for the initializer expression. */
     FieldDecl initializerInstance(InitializerInstance fi);
-    
+
     @Override
     boolean constantValueSet();
 }

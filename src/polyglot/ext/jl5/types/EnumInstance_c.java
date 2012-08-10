@@ -14,18 +14,21 @@ public class EnumInstance_c extends JL5FieldInstance_c implements EnumInstance {
     public EnumInstance_c(JL5TypeSystem ts, Position pos,
             ReferenceType container, Flags f, String name,
             ParsedClassType anonType, long ordinal) {
-        super(ts, pos, container, f.set(JL5Flags.STATIC).set(JL5Flags.PUBLIC)
-                .set(JL5Flags.FINAL).set(JL5Flags.ENUM), container, name);
+        super(ts, pos, container, f.set(JL5Flags.STATIC)
+                                   .set(JL5Flags.PUBLIC)
+                                   .set(JL5Flags.FINAL)
+                                   .set(JL5Flags.ENUM), container, name);
         if (anonType == null) {
             this.type = container;
-        } else {
+        }
+        else {
             this.type = anonType;
         }
         this.ordinal = ordinal;
     }
 
     @Override
-    public ParsedClassType type(){
+    public ParsedClassType type() {
         return (ParsedClassType) type;
     }
 
@@ -34,4 +37,3 @@ public class EnumInstance_c extends JL5FieldInstance_c implements EnumInstance {
         return ordinal;
     }
 }
-

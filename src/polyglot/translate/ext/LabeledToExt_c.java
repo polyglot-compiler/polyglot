@@ -8,7 +8,7 @@ import polyglot.types.SemanticException;
 public class LabeledToExt_c extends ToExt_c {
     @Override
     public Node toExt(ExtensionRewriter rw) throws SemanticException {
-        Labeled n = (Labeled)node();
+        Labeled n = (Labeled) node();
         return rw.to_nf().Labeled(n.position(), n.labelNode(), n.statement());
     }
 }

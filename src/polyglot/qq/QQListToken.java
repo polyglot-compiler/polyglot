@@ -34,17 +34,17 @@ import polyglot.util.Position;
 public class QQListToken extends Token {
     protected List<Object> list;
 
-  public QQListToken(Position position, List<Object> list, int sym) {
-      super(position, sym);
-      this.list = list;
-  }
+    public QQListToken(Position position, List<Object> list, int sym) {
+        super(position, sym);
+        this.list = list;
+    }
 
-  public List<Object> list() {
-      return list;
-  }
+    public List<Object> list() {
+        return list;
+    }
 
-  @Override
-public String toString() {
-      return "qq(" + list + ")";
-  }
+    @Override
+    public String toString() {
+        return "qq(" + list + ")";
+    }
 }

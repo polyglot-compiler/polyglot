@@ -54,19 +54,18 @@ import polyglot.visit.TypeChecker;
  * constructors.  Such a block can optionally be static, in which case
  * it is executed when the class is loaded.
  */
-public class Initializer_c extends Term_c implements Initializer
-{
+public class Initializer_c extends Term_c implements Initializer {
     protected Flags flags;
     protected Block body;
     protected InitializerInstance ii;
 
     public Initializer_c(Position pos, Flags flags, Block body) {
-	super(pos);
-	assert(flags != null && body != null);
-	this.flags = flags;
-	this.body = body;
+        super(pos);
+        assert (flags != null && body != null);
+        this.flags = flags;
+        this.body = body;
     }
-    
+
     @Override
     public boolean isDisambiguated() {
         return ii != null && ii.isCanonical() && super.isDisambiguated();
@@ -80,16 +79,16 @@ public class Initializer_c extends Term_c implements Initializer
     /** Get the flags of the initializer. */
     @Override
     public Flags flags() {
-	return this.flags;
+        return this.flags;
     }
 
     /** Set the flags of the initializer. */
     @Override
     public Initializer flags(Flags flags) {
         if (flags.equals(this.flags)) return this;
-	Initializer_c n = (Initializer_c) copy();
-	n.flags = flags;
-	return n;
+        Initializer_c n = (Initializer_c) copy();
+        n.flags = flags;
+        return n;
     }
 
     /** Get the initializer instance of the initializer. */
@@ -100,58 +99,58 @@ public class Initializer_c extends Term_c implements Initializer
 
     @Override
     public CodeInstance codeInstance() {
-	return initializerInstance();
+        return initializerInstance();
     }
 
     /** Set the initializer instance of the initializer. */
     @Override
     public Initializer initializerInstance(InitializerInstance ii) {
         if (ii == this.ii) return this;
-	Initializer_c n = (Initializer_c) copy();
-	n.ii = ii;
-	return n;
+        Initializer_c n = (Initializer_c) copy();
+        n.ii = ii;
+        return n;
     }
 
     @Override
     public Term codeBody() {
         return this.body;
     }
-    
+
     /** Get the body of the initializer. */
     @Override
     public Block body() {
-	return this.body;
+        return this.body;
     }
 
     /** Set the body of the initializer. */
     @Override
     public CodeBlock body(Block body) {
-	Initializer_c n = (Initializer_c) copy();
-	n.body = body;
-	return n;
+        Initializer_c n = (Initializer_c) copy();
+        n.body = body;
+        return n;
     }
 
     /** Reconstruct the initializer. */
     protected Initializer_c reconstruct(Block body) {
-	if (body != this.body) {
-	    Initializer_c n = (Initializer_c) copy();
-	    n.body = body;
-	    return n;
-	}
+        if (body != this.body) {
+            Initializer_c n = (Initializer_c) copy();
+            n.body = body;
+            return n;
+        }
 
-	return this;
+        return this;
     }
 
     /** Visit the children of the initializer. */
     @Override
     public Node visitChildren(NodeVisitor v) {
-	Block body = (Block) visitChild(this.body, v);
-	return reconstruct(body);
+        Block body = (Block) visitChild(this.body, v);
+        return reconstruct(body);
     }
 
     @Override
     public Context enterScope(Context c) {
-	return c.pushCode(ii);
+        return c.pushCode(ii);
     }
 
     @Override
@@ -186,34 +185,36 @@ public class Initializer_c extends Term_c implements Initializer
     /** Type check the initializer. */
     @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
-	TypeSystem ts = tc.typeSystem();
+        TypeSystem ts = tc.typeSystem();
 
-	try {
-	    ts.checkInitializerFlags(flags());
-	}
-	catch (SemanticException e) {
-	    throw new SemanticException(e.getMessage(), position());
-	}
-
-        // check that inner classes do not declare static initializers
-        if (flags().isStatic() &&
-              initializerInstance().container().toClass().isInnerClass()) {
-            // it's a static initializer in an inner class.
-            throw new SemanticException("Inner classes cannot declare " + 
-                    "static initializers.", this.position());             
+        try {
+            ts.checkInitializerFlags(flags());
+        }
+        catch (SemanticException e) {
+            throw new SemanticException(e.getMessage(), position());
         }
 
-	return this;
+        // check that inner classes do not declare static initializers
+        if (flags().isStatic()
+                && initializerInstance().container().toClass().isInnerClass()) {
+            // it's a static initializer in an inner class.
+            throw new SemanticException("Inner classes cannot declare "
+                    + "static initializers.", this.position());
+        }
+
+        return this;
     }
 
     @Override
-    public NodeVisitor exceptionCheckEnter(ExceptionChecker ec) throws SemanticException {
+    public NodeVisitor exceptionCheckEnter(ExceptionChecker ec)
+            throws SemanticException {
         if (initializerInstance().flags().isStatic()) {
             return ec.push(new ExceptionChecker.CodeTypeReporter("static initializer block"));
         }
-        
+
         if (!initializerInstance().container().toClass().isAnonymous()) {
-            ec = ec.push(new ExceptionChecker.CodeTypeReporter("instance initializer block"));
+            ec =
+                    ec.push(new ExceptionChecker.CodeTypeReporter("instance initializer block"));
 
             // An instance initializer of a named class may not throw
             // a checked exception unless that exception or one of its 
@@ -250,43 +251,41 @@ public class Initializer_c extends Term_c implements Initializer
             }
             // allowed is now an intersection of the throw types of all
             // constructors
-            
+
             ec = ec.push(allowed);
-            
-            
+
             return ec;
         }
 
         return ec.push();
     }
 
-
     /** Write the initializer to an output file. */
     @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
-	w.begin(0);
-	w.write(flags.translate());
-	print(body, w, tr);
-	w.end();
+        w.begin(0);
+        w.write(flags.translate());
+        print(body, w, tr);
+        w.end();
     }
 
     @Override
     public void dump(CodeWriter w) {
-	super.dump(w);
+        super.dump(w);
 
-	if (ii != null) {
-	    w.allowBreak(4, " ");
-	    w.begin(0);
-	    w.write("(instance " + ii + ")");
-	    w.end();
-	}
+        if (ii != null) {
+            w.allowBreak(4, " ");
+            w.begin(0);
+            w.write("(instance " + ii + ")");
+            w.end();
+        }
     }
 
     @Override
     public String toString() {
-	return flags.translate() + "{ ... }";
+        return flags.translate() + "{ ... }";
     }
-    
+
     @Override
     public Node copy(NodeFactory nf) {
         return nf.Initializer(this.position, this.flags, this.body);

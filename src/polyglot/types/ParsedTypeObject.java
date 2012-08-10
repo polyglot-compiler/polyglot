@@ -37,5 +37,6 @@ public interface ParsedTypeObject extends Named {
     Job job();
 
     LazyInitializer initializer();
+
     void setInitializer(LazyInitializer init);
 }

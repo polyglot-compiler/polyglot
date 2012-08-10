@@ -38,12 +38,11 @@ import polyglot.visit.ExceptionChecker;
  * A <code>Term</code> represents any Java expression or statement on which
  * dataflow can be performed.
  */
-public abstract class Term_c extends Node_c implements Term
-{
+public abstract class Term_c extends Node_c implements Term {
     public Term_c(Position pos) {
-	super(pos);
+        super(pos);
     }
-    
+
     protected boolean reachable;
 
     /**
@@ -71,31 +70,32 @@ public abstract class Term_c extends Node_c implements Term
         if (this.reachable == reachability) {
             return this;
         }
-        
+
         Term_c t = (Term_c) copy();
         t.reachable = reachability;
         return t;
     }
 
     /** Utility function to get the first entry of a list, or else alt. */
-    public static <T extends Term, U extends T, V extends T> T listChild(List<U> l, V alt) {
-        return CollectionUtil.<T,U,V> firstOrElse(l, alt);
+    public static <T extends Term, U extends T, V extends T> T listChild(
+            List<U> l, V alt) {
+        return CollectionUtil.<T, U, V> firstOrElse(l, alt);
     }
-    
+
     protected SubtypeSet exceptions;
-    
+
     @Override
     public SubtypeSet exceptions() {
         return exceptions;
     }
-    
+
     @Override
     public Term exceptions(SubtypeSet exceptions) {
         Term_c n = (Term_c) copy();
         n.exceptions = new SubtypeSet(exceptions);
         return n;
     }
-    
+
     @Override
     public Node exceptionCheck(ExceptionChecker ec) throws SemanticException {
         Term t = (Term) super.exceptionCheck(ec);

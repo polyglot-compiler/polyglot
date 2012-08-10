@@ -33,7 +33,6 @@ package polyglot.ast;
  * <code>ArrayAccessAssign.left()</code>is guaranteed to be an
  * <code>ArrayAccess</code>.
  */
-public interface ArrayAccessAssign extends Assign
-{
+public interface ArrayAccessAssign extends Assign {
     boolean throwsArrayStoreException();
 }

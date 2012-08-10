@@ -30,8 +30,7 @@ package polyglot.ast;
  * statement.  Contains a statement to be executed and an expression
  * to be tested indicating whether to reexecute the statement.
  */
-public interface Loop extends CompoundStmt 
-{    
+public interface Loop extends CompoundStmt {
     /** Loop condition */
     Expr cond();
 

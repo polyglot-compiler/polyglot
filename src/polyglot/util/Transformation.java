@@ -32,9 +32,8 @@ package polyglot.util;
  *     This interface provides a general means for transforming objects.
  *     The object 'NOTHING' should be returned if an object is to be removed.
  **/
-public interface Transformation<T, U> { 
-  public static final Object NOTHING = new Object();
-  public U transform(T o);  
+public interface Transformation<T, U> {
+    public static final Object NOTHING = new Object();
+
+    public U transform(T o);
 }
-
-

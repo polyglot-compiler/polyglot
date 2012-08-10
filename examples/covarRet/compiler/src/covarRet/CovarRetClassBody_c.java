@@ -21,8 +21,7 @@ import polyglot.visit.TypeChecker;
  * to allow the return type of a method to be a subclass of the return type
  * declared in a superclass.
  */
-public class CovarRetClassBody_c extends ClassBody_c
-{
+public class CovarRetClassBody_c extends ClassBody_c {
     public CovarRetClassBody_c(Position pos, List<ClassMember> members) {
         super(pos, members);
     }
@@ -39,32 +38,73 @@ public class CovarRetClassBody_c extends ClassBody_c
                 t = rt.superType();
 
                 for (MethodInstance mj : rt.methods()) {
-                    if (! mi.name().equals(mj.name()) ||
-                        ! mi.hasFormals(mj.formalTypes()) /*(qixin) ts.hasSameArguments(mi, mj) */ ||
-                        ! ts.isAccessible(mj, tc.context())) {
+                    if (!mi.name().equals(mj.name())
+                            || !mi.hasFormals(mj.formalTypes()) /*(qixin) ts.hasSameArguments(mi, mj) */
+                            || !ts.isAccessible(mj, tc.context())) {
 
                         continue;
                     }
 
                     // This condition is the only change from the superclass!
-                    if (! ts.isSubtype(mi.returnType(), mj.returnType())) {
-                        throw new SemanticException("Cannot override " + mj + " in " + rt + " with " + mi + " in " + type + "; overridden method returns " + mi.returnType() + ", which is not a subtype of " + mj.returnType() + ".", mi.position());
+                    if (!ts.isSubtype(mi.returnType(), mj.returnType())) {
+                        throw new SemanticException("Cannot override " + mj
+                                + " in " + rt + " with " + mi + " in " + type
+                                + "; overridden method returns "
+                                + mi.returnType()
+                                + ", which is not a subtype of "
+                                + mj.returnType() + ".", mi.position());
                     }
 
-                    if (! ts.throwsSubset(mi, mj)) {
-                        throw new SemanticException("Cannot override " + mj + " in " + rt + " with " + mi + " in " + type + "; throws more exceptions than overridden method.", mi.position());
+                    if (!ts.throwsSubset(mi, mj)) {
+                        throw new SemanticException("Cannot override "
+                                                            + mj
+                                                            + " in "
+                                                            + rt
+                                                            + " with "
+                                                            + mi
+                                                            + " in "
+                                                            + type
+                                                            + "; throws more exceptions than overridden method.",
+                                                    mi.position());
                     }
 
                     if (mi.flags().moreRestrictiveThan(mj.flags())) {
-                        throw new SemanticException("Cannot override " + mj + " in " + rt + " with " + mi + " in " + type + "; overridden method is more restrictive.", mi.position());
+                        throw new SemanticException("Cannot override "
+                                                            + mj
+                                                            + " in "
+                                                            + rt
+                                                            + " with "
+                                                            + mi
+                                                            + " in "
+                                                            + type
+                                                            + "; overridden method is more restrictive.",
+                                                    mi.position());
                     }
 
-                    if (! mi.flags().isStatic() && mj.flags().isStatic()) {
-                        throw new SemanticException("Cannot override " + mj + " in " + rt + " with " + mi + " in " + type + "; overridden method is static.", mi.position());
+                    if (!mi.flags().isStatic() && mj.flags().isStatic()) {
+                        throw new SemanticException("Cannot override "
+                                                            + mj
+                                                            + " in "
+                                                            + rt
+                                                            + " with "
+                                                            + mi
+                                                            + " in "
+                                                            + type
+                                                            + "; overridden method is static.",
+                                                    mi.position());
                     }
 
                     if (mj.flags().isFinal()) {
-                        throw new SemanticException("Cannot override " + mj + " in " + rt + " with " + mi + " in " + type + "; overridden method is final.", mi.position());
+                        throw new SemanticException("Cannot override "
+                                                            + mj
+                                                            + " in "
+                                                            + rt
+                                                            + " with "
+                                                            + mi
+                                                            + " in "
+                                                            + type
+                                                            + "; overridden method is final.",
+                                                    mi.position());
                     }
                 }
             }

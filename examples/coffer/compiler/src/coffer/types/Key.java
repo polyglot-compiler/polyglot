@@ -10,7 +10,6 @@ package coffer.types;
 import polyglot.ext.param.types.Param;
 import polyglot.types.TypeObject;
 
-public interface Key extends TypeObject, Param
-{
+public interface Key extends TypeObject, Param {
     String name();
 }

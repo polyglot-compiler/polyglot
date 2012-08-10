@@ -33,33 +33,32 @@ import polyglot.types.LocalInstance;
  * or constructor or to a catch block.  It consists of a type and a variable
  * identifier.
  */
-public interface Formal extends VarDecl
-{
+public interface Formal extends VarDecl {
     /** Get the flags of the formal. */
     @Override
     public Flags flags();
 
     /** Set the flags of the formal. */
     public Formal flags(Flags flags);
-    
+
     /** Get the type node of the formal. */
     @Override
     public TypeNode type();
 
     /** Set the type node of the formal. */
     public Formal type(TypeNode type);
-    
+
     /** Get the name of the formal. */
     @Override
     public Id id();
-    
+
     /** Set the name of the formal. */
     public Formal id(Id name);
 
     /** Get the name of the formal. */
     @Override
     public String name();
-    
+
     /** Set the name of the formal. */
     public Formal name(String name);
 

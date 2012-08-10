@@ -32,8 +32,7 @@ import java.util.List;
  * statement.  Contains a statement to be executed and an expression
  * to be tested indicating whether to reexecute the statement.
  */
-public interface For extends Loop 
-{    
+public interface For extends Loop {
     /** List of initialization statements.
      * @return A list of {@link polyglot.ast.ForInit ForInit}.
      */

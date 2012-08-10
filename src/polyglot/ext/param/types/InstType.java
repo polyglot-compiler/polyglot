@@ -33,8 +33,9 @@ import polyglot.types.TypeObject;
 /**
  * A parameterized type instantiated on actual arguments.
  */
-public interface InstType<Formal extends Param, Actual extends TypeObject> extends Type
-{
+public interface InstType<Formal extends Param, Actual extends TypeObject>
+        extends Type {
     PClass<Formal, Actual> instantiatedFrom();
+
     List<Actual> actuals();
 }

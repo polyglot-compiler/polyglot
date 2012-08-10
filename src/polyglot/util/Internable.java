@@ -25,9 +25,7 @@
 
 package polyglot.util;
 
-
 /** An Internable object.  intern() is called during deserialization. */
-public interface Internable
-{
+public interface Internable {
     public Object intern();
 }

@@ -15,8 +15,7 @@ import polyglot.ast.Ambiguous;
  * An ambiguous key set AST node.  This is essentially a list of possibly
  * ambiguous key nodes.
  */
-public interface AmbKeySetNode extends KeySetNode, Ambiguous
-{
+public interface AmbKeySetNode extends KeySetNode, Ambiguous {
     public List<KeyNode> keyNodes();
 
     public AmbKeySetNode keyNodes(List<KeyNode> keyNodes);

@@ -27,10 +27,11 @@ public class IntersectionType_c extends ClassType_c implements IntersectionType 
     protected List<ReferenceType> bounds;
 
 //    protected List<Type> concreteBounds;
-    
+
     protected TypeVariable boundOf_;
 
-    public IntersectionType_c(TypeSystem ts, Position pos, List<ReferenceType> bounds) {
+    public IntersectionType_c(TypeSystem ts, Position pos,
+            List<ReferenceType> bounds) {
         super(ts, pos);
         this.bounds = bounds;
         checkBounds();
@@ -38,7 +39,8 @@ public class IntersectionType_c extends ClassType_c implements IntersectionType 
 
     private void checkBounds() {
         if (this.bounds == null || this.bounds.size() < 2) {
-            throw new InternalCompilerError("Intersection type needs at least two elements: " + this.bounds);
+            throw new InternalCompilerError("Intersection type needs at least two elements: "
+                    + this.bounds);
         }
     }
 
@@ -57,8 +59,7 @@ public class IntersectionType_c extends ClassType_c implements IntersectionType 
         for (Iterator<ReferenceType> iter = bounds.iterator(); iter.hasNext();) {
             Type b = iter.next();
             sb.append(b.translate(c));
-            if (iter.hasNext())
-                sb.append(" & ");
+            if (iter.hasNext()) sb.append(" & ");
         }
         //sb.append(" ]");
         return sb.toString();
@@ -71,8 +72,7 @@ public class IntersectionType_c extends ClassType_c implements IntersectionType 
         for (Iterator<ReferenceType> iter = bounds.iterator(); iter.hasNext();) {
             Type b = iter.next();
             sb.append(b);
-            if (iter.hasNext())
-                sb.append(" & ");
+            if (iter.hasNext()) sb.append(" & ");
         }
         //sb.append(" ]");
         sb.append(" ) ");
@@ -96,7 +96,7 @@ public class IntersectionType_c extends ClassType_c implements IntersectionType 
             return t;
         }
         return ts.Object();
-        
+
 //        return getSyntheticClass().superType();
     }
 
@@ -237,12 +237,12 @@ public class IntersectionType_c extends ClassType_c implements IntersectionType 
     public TypeVariable boundOf() {
         return boundOf_;
     }
-    
+
     @Override
     public boolean equalsImpl(TypeObject other) {
         if (!super.equalsImpl(other)) {
             if (other instanceof IntersectionType) {
-                IntersectionType it = (IntersectionType)other;
+                IntersectionType it = (IntersectionType) other;
                 if (it.bounds().size() != this.bounds().size()) {
                     return false;
                 }
@@ -263,7 +263,7 @@ public class IntersectionType_c extends ClassType_c implements IntersectionType 
     public boolean typeEqualsImpl(Type other) {
         if (!super.typeEqualsImpl(other)) {
             if (other instanceof IntersectionType) {
-                IntersectionType it = (IntersectionType)other;
+                IntersectionType it = (IntersectionType) other;
                 if (it.bounds().size() != this.bounds().size()) {
                     return false;
                 }
@@ -287,7 +287,7 @@ public class IntersectionType_c extends ClassType_c implements IntersectionType 
 
     @Override
     public void setContainer(ReferenceType container) {
-        throw new UnsupportedOperationException();        
+        throw new UnsupportedOperationException();
     }
 
     @Override
@@ -297,7 +297,7 @@ public class IntersectionType_c extends ClassType_c implements IntersectionType 
 
     @Override
     public void setBounds(List<ReferenceType> newBounds) {
-        this.bounds = newBounds;        
+        this.bounds = newBounds;
         checkBounds();
     }
 

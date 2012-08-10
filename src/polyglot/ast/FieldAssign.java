@@ -32,6 +32,5 @@ package polyglot.ast;
  * The class of the <code>Expr</code> returned by
  * <code>FieldAssign.left()</code>is guaranteed to be a <code>Field</code>.
  */
-public interface FieldAssign extends Assign
-{
+public interface FieldAssign extends Assign {
 }

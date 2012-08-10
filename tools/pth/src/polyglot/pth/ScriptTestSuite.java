@@ -7,10 +7,6 @@ package polyglot.pth;
 import java.io.*;
 import java.util.List;
 
-
-
-
-
 /**
  * 
  */
@@ -18,23 +14,25 @@ public class ScriptTestSuite extends TestSuite {
     protected File scriptFile;
     protected boolean saveProblem = false;
     private boolean scriptLoaded = false;
-    
+
     public ScriptTestSuite(String scriptFilename) {
         super(scriptFilename);
         this.scriptFile = new File(scriptFilename);
-        this.loadResults();            
+        this.loadResults();
     }
+
     public ScriptTestSuite(File scriptFile) {
         super(scriptFile.getName());
         this.scriptFile = scriptFile;
-        this.loadResults();            
+        this.loadResults();
     }
-    
+
     protected boolean loadScript() {
         if (scriptLoaded) return true;
         scriptLoaded = true;
         if (!this.scriptFile.exists()) {
-            this.setFailureMessage("File " + scriptFile.getName() + " not found.");
+            this.setFailureMessage("File " + scriptFile.getName()
+                    + " not found.");
             return false;
         }
         else {
@@ -44,7 +42,7 @@ public class ScriptTestSuite extends TestSuite {
         }
         return true;
     }
-    
+
     @Override
     protected boolean runTest() {
         saveProblem = false;
@@ -53,23 +51,23 @@ public class ScriptTestSuite extends TestSuite {
         }
 
         this.setOutputController(output);
-        return super.runTest();            
+        return super.runTest();
     }
-        
+
     @Override
     protected void postIndividualTest() {
         if (!saveProblem) {
             this.saveProblem = !saveResults();
         }
     }
-    
+
     @Override
     protected void postRun() {
         super.postRun();
         this.saveResults();
     }
 
-    protected boolean parseScript() {        
+    protected boolean parseScript() {
         Grm grm = new Grm(this.scriptFile);
         try {
             @SuppressWarnings("unchecked")
@@ -82,36 +80,38 @@ public class ScriptTestSuite extends TestSuite {
         }
         return true;
     }
-    
+
     protected void loadResults() {
-        try {        
-            ObjectInputStream ois = 
-                 new ObjectInputStream(
-                          new FileInputStream(TestSuiteResult.getResultsFileName(this.scriptFile)));
-            TestResult tr = (TestResult)ois.readObject();
+        try {
+            ObjectInputStream ois =
+                    new ObjectInputStream(new FileInputStream(TestSuiteResult.getResultsFileName(this.scriptFile)));
+            TestResult tr = (TestResult) ois.readObject();
             this.setTestResult(tr);
             ois.close();
         }
-        catch (FileNotFoundException e) { 
+        catch (FileNotFoundException e) {
             // ignore, and fail silently
         }
-        catch (ClassNotFoundException e) { 
-            System.err.println("Unable to load results for test suite " + this.getName() + ": " + e.getMessage());
+        catch (ClassNotFoundException e) {
+            System.err.println("Unable to load results for test suite "
+                    + this.getName() + ": " + e.getMessage());
         }
         catch (IOException e) {
-            System.err.println("Unable to load results for test suite " + this.getName() + ": " + e.getMessage());
+            System.err.println("Unable to load results for test suite "
+                    + this.getName() + ": " + e.getMessage());
         }
     }
+
     protected boolean saveResults() {
-        try {        
-            ObjectOutputStream oos = 
-                 new ObjectOutputStream(
-                          new FileOutputStream(TestSuiteResult.getResultsFileName(this.scriptFile)));
-            oos.writeObject(this.getTestSuiteResult());    
+        try {
+            ObjectOutputStream oos =
+                    new ObjectOutputStream(new FileOutputStream(TestSuiteResult.getResultsFileName(this.scriptFile)));
+            oos.writeObject(this.getTestSuiteResult());
             oos.close();
         }
         catch (IOException e) {
-            System.err.println("Unable to save results for test suite " + this.getName());
+            System.err.println("Unable to save results for test suite "
+                    + this.getName());
             return false;
         }
         return true;

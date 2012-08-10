@@ -30,16 +30,16 @@ import polyglot.util.Position;
 /**
  * A <code>LocalInstance</code> contains type information for a local variable.
  */
-public class LocalInstance_c extends VarInstance_c implements LocalInstance
-{
+public class LocalInstance_c extends VarInstance_c implements LocalInstance {
     /** Used for deserializing types. */
-    protected LocalInstance_c() { }
+    protected LocalInstance_c() {
+    }
 
-    public LocalInstance_c(TypeSystem ts, Position pos,
-	  		   Flags flags, Type type, String name) {
+    public LocalInstance_c(TypeSystem ts, Position pos, Flags flags, Type type,
+            String name) {
         super(ts, pos, flags, type, name);
     }
-    
+
     @Override
     public LocalInstance orig() {
         return (LocalInstance) declaration();
@@ -57,15 +57,15 @@ public class LocalInstance_c extends VarInstance_c implements LocalInstance
 
     @Override
     public String toString() {
-        return "local " + flags.translate() + type + " " + name +
-	    (constantValue != null ? (" = " + constantValue) : "");
+        return "local " + flags.translate() + type + " " + name
+                + (constantValue != null ? (" = " + constantValue) : "");
     }
 
     @Override
     public boolean isCanonical() {
-	return type.isCanonical();
+        return type.isCanonical();
     }
-    
+
     @Override
     public LocalInstance flags(Flags flags) {
         if (!flags.equals(this.flags)) {
@@ -78,8 +78,8 @@ public class LocalInstance_c extends VarInstance_c implements LocalInstance
 
     @Override
     public LocalInstance name(String name) {
-        if ((name != null && !name.equals(this.name)) ||
-            (name == null && this.name != null)) {
+        if ((name != null && !name.equals(this.name))
+                || (name == null && this.name != null)) {
             LocalInstance n = (LocalInstance) copy();
             n.setName(name);
             return n;
@@ -99,8 +99,8 @@ public class LocalInstance_c extends VarInstance_c implements LocalInstance
 
     @Override
     public LocalInstance constantValue(Object constantValue) {
-        if ( ! constantValueSet ||
-                (constantValue != null && !constantValue.equals(this.constantValue))
+        if (!constantValueSet
+                || (constantValue != null && !constantValue.equals(this.constantValue))
                 || (constantValue == null && this.constantValue != null)) {
             LocalInstance copy = (LocalInstance) this.copy();
             copy.setConstantValue(constantValue);
@@ -108,10 +108,10 @@ public class LocalInstance_c extends VarInstance_c implements LocalInstance
         }
         return this;
     }
-    
+
     @Override
     public LocalInstance notConstant() {
-        if (! this.constantValueSet || this.isConstant) {
+        if (!this.constantValueSet || this.isConstant) {
             LocalInstance copy = (LocalInstance) this.copy();
             copy.setNotConstant();
             return copy;

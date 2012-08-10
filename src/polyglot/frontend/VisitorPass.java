@@ -33,12 +33,11 @@ import polyglot.util.InternalCompilerError;
 import polyglot.visit.NodeVisitor;
 
 /** A pass which runs a visitor. */
-public class VisitorPass extends AbstractPass
-{
+public class VisitorPass extends AbstractPass {
     protected NodeVisitor v;
 
     public VisitorPass(Goal goal) {
-	this(goal, null);
+        this(goal, null);
     }
 
     public VisitorPass(Goal goal, NodeVisitor v) {
@@ -47,26 +46,27 @@ public class VisitorPass extends AbstractPass
     }
 
     public void visitor(NodeVisitor v) {
-	this.v = v;
+        this.v = v;
     }
 
     public NodeVisitor visitor() {
-	return v;
+        return v;
     }
-  
+
     @Override
     public boolean run() {
-	Node ast = goal.job().ast();
+        Node ast = goal.job().ast();
 
-	if (ast == null) {
-	    throw new InternalCompilerError("Null AST for job " + goal.job() + ": did the parser run?");
-	}
+        if (ast == null) {
+            throw new InternalCompilerError("Null AST for job " + goal.job()
+                    + ": did the parser run?");
+        }
 
         NodeVisitor v_ = v.begin();
-        
+
         if (v_ != null) {
-	    ErrorQueue q = goal.job().compiler().errorQueue();
-	    int nErrsBefore = q.errorCount();
+            ErrorQueue q = goal.job().compiler().errorQueue();
+            int nErrsBefore = q.errorCount();
 
             if (Report.should_report(Report.frontend, 3))
                 Report.report(3, "Running " + v_ + " on " + ast);
@@ -83,18 +83,17 @@ public class VisitorPass extends AbstractPass
                 // so the run was successful.
                 return false;
             }
-           
+
             return true;
         }
 
         return false;
     }
-    
+
     @Override
     public String name() {
         if (v != null)
             return v.toString();
-        else 
-            return super.name();
+        else return super.name();
     }
 }

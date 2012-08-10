@@ -35,64 +35,63 @@ import coffer.types.Key;
  * An implementation of the <code>CofferClassDecl</code> interface.
  * <code>ClassDecl</code> is extended with a possibly-null key name.
  */
-public class CofferClassDecl_c extends ClassDecl_c implements CofferClassDecl
-{
+public class CofferClassDecl_c extends ClassDecl_c implements CofferClassDecl {
     protected KeyNode key;
 
-    public CofferClassDecl_c(Position pos, Flags flags, Id name,
- KeyNode key,
-            TypeNode superClass, List<TypeNode> interfaces,
-	    ClassBody body) {
-	super(pos, flags, name, superClass, interfaces, body);
+    public CofferClassDecl_c(Position pos, Flags flags, Id name, KeyNode key,
+            TypeNode superClass, List<TypeNode> interfaces, ClassBody body) {
+        super(pos, flags, name, superClass, interfaces, body);
         this.key = key;
     }
 
     @Override
     public KeyNode key() {
-	return this.key;
+        return this.key;
     }
 
     @Override
     public CofferClassDecl key(KeyNode key) {
-	CofferClassDecl_c n = (CofferClassDecl_c) copy();
-	n.key = key;
-	return n;
+        CofferClassDecl_c n = (CofferClassDecl_c) copy();
+        n.key = key;
+        return n;
     }
 
     protected CofferClassDecl_c reconstruct(Id name, KeyNode key,
             TypeNode superClass, List<TypeNode> interfaces, ClassBody body) {
         CofferClassDecl_c n = this;
 
-	if (this.key != key) {
-	    n = (CofferClassDecl_c) copy();
-	    n.key = key;
-	}
+        if (this.key != key) {
+            n = (CofferClassDecl_c) copy();
+            n.key = key;
+        }
 
-        return (CofferClassDecl_c) n.reconstruct(name, superClass, interfaces, body);
+        return (CofferClassDecl_c) n.reconstruct(name,
+                                                 superClass,
+                                                 interfaces,
+                                                 body);
     }
 
     @Override
     public Node visitChildren(NodeVisitor v) {
-	Id name = (Id) visitChild(this.name, v);
-	KeyNode key = (KeyNode) visitChild(this.key, v);
-	TypeNode superClass = (TypeNode) visitChild(this.superClass, v);
+        Id name = (Id) visitChild(this.name, v);
+        KeyNode key = (KeyNode) visitChild(this.key, v);
+        TypeNode superClass = (TypeNode) visitChild(this.superClass, v);
         List<TypeNode> interfaces = visitList(this.interfaces, v);
-	ClassBody body = (ClassBody) visitChild(this.body, v);
-	return reconstruct(name, key, superClass, interfaces, body);
+        ClassBody body = (ClassBody) visitChild(this.body, v);
+        return reconstruct(name, key, superClass, interfaces, body);
     }
-    
+
     @Override
     public Context enterChildScope(Node child, Context context) {
         CofferContext c = (CofferContext) context;
 
         CofferParsedClassType ct = (CofferParsedClassType) this.type;
         CofferClassType inst = ct;
-        
+
         if (child == this.body) {
             c = (CofferContext) c.pushClass(ct, inst);
-            
-            if (key != null)
-                c.addKey(key.key());
+
+            if (key != null) c.addKey(key.key());
         }
 
         return c;
@@ -146,7 +145,7 @@ public class CofferClassDecl_c extends ClassDecl_c implements CofferClassDecl
             print(superClass(), w, tr);
         }
 
-        if (! interfaces.isEmpty()) {
+        if (!interfaces.isEmpty()) {
             if (flags.isInterface()) {
                 w.write(" extends ");
             }
@@ -159,7 +158,7 @@ public class CofferClassDecl_c extends ClassDecl_c implements CofferClassDecl
                 print(tn, w, tr);
 
                 if (i.hasNext()) {
-                    w.write (", ");
+                    w.write(", ");
                 }
             }
         }

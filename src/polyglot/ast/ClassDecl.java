@@ -34,8 +34,7 @@ import polyglot.types.ParsedClassType;
  * A <code>ClassDecl</code> represents a top-level, member, or local class
  * declaration.
  */
-public interface ClassDecl extends Term, TopLevelDecl, ClassMember
-{
+public interface ClassDecl extends Term, TopLevelDecl, ClassMember {
     /**
      * The type of the class declaration.
      */
@@ -61,12 +60,12 @@ public interface ClassDecl extends Term, TopLevelDecl, ClassMember
      * The class declaration's name.
      */
     Id id();
-    
+
     /**
      * Set the class declaration's name.
      */
     ClassDecl id(Id name);
-    
+
     /**
      * The class declaration's name.
      */

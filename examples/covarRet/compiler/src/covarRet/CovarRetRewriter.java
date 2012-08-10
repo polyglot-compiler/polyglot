@@ -18,8 +18,7 @@ import polyglot.visit.NodeVisitor;
  * This visitor rewrites the AST to translate from Java with covariant returns
  * to standard Java.
  */
-public class CovarRetRewriter extends AscriptionVisitor
-{
+public class CovarRetRewriter extends AscriptionVisitor {
     public CovarRetRewriter(Job job, TypeSystem ts, NodeFactory nf) {
         super(job, ts, nf);
     }
@@ -36,8 +35,8 @@ public class CovarRetRewriter extends AscriptionVisitor
             MethodInstance mi = c.methodInstance();
             Type overridenRetType = getOverridenReturnType(mi);
 
-            if (overridenRetType != null &&
-                ! ts.isImplicitCastValid(overridenRetType, toType)) {
+            if (overridenRetType != null
+                    && !ts.isImplicitCastValid(overridenRetType, toType)) {
 
                 // The overriden return type cannot be implicitly cast to the
                 // expected type, so explicitly cast it.
@@ -51,12 +50,12 @@ public class CovarRetRewriter extends AscriptionVisitor
 
     @Override
     public Node leaveCall(Node old, Node n, NodeVisitor v)
-        throws SemanticException {
+            throws SemanticException {
 
         if (n instanceof MethodDecl) {
             // Change the return type of the overridden method
             // to be the same as the superclass's
-            MethodDecl md = (MethodDecl)n;
+            MethodDecl md = (MethodDecl) n;
             Position p = md.position();
 
             MethodInstance mi = md.methodInstance();
@@ -79,12 +78,12 @@ public class CovarRetRewriter extends AscriptionVisitor
         Type retType = null;
 
         for (MethodInstance mj : ts.overrides(mi)) {
-            if (! ts.isAccessible(mj, this.context)) {
+            if (!ts.isAccessible(mj, this.context)) {
                 break;
             }
 
-            if (ts.isSubtype(mi.returnType(), mj.returnType()) &&
-                !ts.equals(mi.returnType(), mj.returnType())) {
+            if (ts.isSubtype(mi.returnType(), mj.returnType())
+                    && !ts.equals(mi.returnType(), mj.returnType())) {
                 // mj.returnType() is the type to use!
                 retType = mj.returnType();
             }

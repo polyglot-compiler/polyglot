@@ -31,13 +31,13 @@ import java.util.List;
  * A <code>MethodInstance</code> represents the type information for a Java
  * method.
  */
-public interface MethodInstance extends FunctionInstance, MemberInstance, Declaration
-{
+public interface MethodInstance extends FunctionInstance, MemberInstance,
+        Declaration {
     /**
      * The method's name.
      */
     String name();
-    
+
     /**
      * Destructively set the method's name.
      * @param name
@@ -46,12 +46,17 @@ public interface MethodInstance extends FunctionInstance, MemberInstance, Declar
 
     /** Non-destructive updates. */
     MethodInstance flags(Flags flags);
+
     MethodInstance name(String name);
+
     MethodInstance returnType(Type returnType);
+
     MethodInstance formalTypes(List<? extends Type> l);
+
     MethodInstance throwTypes(List<? extends Type> l);
+
     MethodInstance container(ReferenceType container);
-    
+
     MethodInstance orig();
 
     /**
@@ -81,8 +86,8 @@ public interface MethodInstance extends FunctionInstance, MemberInstance, Declar
      * (i.e., they can form a tree).  
      * @return List[MethodInstance]
      */
-    List<? extends MethodInstance> implemented(); 
-    
+    List<? extends MethodInstance> implemented();
+
     /**
      * Return true if this method has the same signature as <code>mi</code>.
      */
@@ -116,7 +121,8 @@ public interface MethodInstance extends FunctionInstance, MemberInstance, Declar
      * false is returned; otherwise, if quiet is false and this method cannot 
      * override <code>mi</code>, then a SemanticException is thrown.
      */
-    boolean canOverrideImpl(MethodInstance mi, boolean quiet) throws SemanticException;
+    boolean canOverrideImpl(MethodInstance mi, boolean quiet)
+            throws SemanticException;
 
     /**
      * Get the set of methods in rt and its superinterfaces that
@@ -125,7 +131,7 @@ public interface MethodInstance extends FunctionInstance, MemberInstance, Declar
      * @param rt The point in the type hierarchy to begin looking for methods.
      */
     List<MethodInstance> implementedImpl(ReferenceType rt);
-    
+
     /**
      * Return true if this method has the same signature as <code>mi</code>.
      * This method should not be called except by <code>TypeSystem</code>

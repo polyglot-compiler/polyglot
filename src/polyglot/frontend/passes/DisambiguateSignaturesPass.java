@@ -29,12 +29,12 @@ import polyglot.frontend.Scheduler;
 import polyglot.frontend.goals.SignaturesResolved;
 import polyglot.types.ParsedClassType;
 
-
 public class DisambiguateSignaturesPass extends ClassFilePass {
     protected Scheduler scheduler;
     protected SignaturesResolved goal;
-    
-    public DisambiguateSignaturesPass(Scheduler scheduler, SignaturesResolved goal) {
+
+    public DisambiguateSignaturesPass(Scheduler scheduler,
+            SignaturesResolved goal) {
         super(goal);
         this.scheduler = scheduler;
         this.goal = goal;

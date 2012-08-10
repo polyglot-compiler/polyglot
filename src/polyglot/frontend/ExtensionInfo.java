@@ -48,102 +48,102 @@ import polyglot.util.ErrorQueue;
  * and other parameters of a language extension.
  */
 public interface ExtensionInfo {
-	/** The name of the compiler for usage messages */
-	String compilerName();
+    /** The name of the compiler for usage messages */
+    String compilerName();
 
-	/** Report the version of the extension. */
-	polyglot.main.Version version();
+    /** Report the version of the extension. */
+    polyglot.main.Version version();
 
-	/** Returns the pass scheduler. */
-	Scheduler scheduler();
+    /** Returns the pass scheduler. */
+    Scheduler scheduler();
 
-	/**
-	 * Return the goal for compiling a particular compilation unit. The goal may
-	 * have subgoals on which it depends.
-	 */
-	Goal getCompileGoal(Job job);
+    /**
+     * Return the goal for compiling a particular compilation unit. The goal may
+     * have subgoals on which it depends.
+     */
+    Goal getCompileGoal(Job job);
 
-	/**
-	 * Return an Options object, which will be given the command line to parse.
-	 */
-	Options getOptions();
+    /**
+     * Return an Options object, which will be given the command line to parse.
+     */
+    Options getOptions();
 
-	/**
-	 * Return a Stats object to accumulate and report statistics.
-	 */
-	Stats getStats();
+    /**
+     * Return a Stats object to accumulate and report statistics.
+     */
+    Stats getStats();
 
-	/**
-	 * Initialize the extension with a particular compiler. This must be called
-	 * after the compiler is initialized, but before the compiler starts work.
-	 */
-	void initCompiler(polyglot.frontend.Compiler compiler);
+    /**
+     * Initialize the extension with a particular compiler. This must be called
+     * after the compiler is initialized, but before the compiler starts work.
+     */
+    void initCompiler(polyglot.frontend.Compiler compiler);
 
-	Compiler compiler();
+    Compiler compiler();
 
-	/**
-	 * Get the file name extension of source files. This is either the language
-	 * extension's default file name extension or the string passed in with the
-	 * "-sx" command-line option.
-	 */
-	String[] fileExtensions();
+    /**
+     * Get the file name extension of source files. This is either the language
+     * extension's default file name extension or the string passed in with the
+     * "-sx" command-line option.
+     */
+    String[] fileExtensions();
 
-	/**
-	 * The default extensions that source files are expected to have. Defaults
-	 * to an array containing defaultFileExtension
-	 */
-	String[] defaultFileExtensions();
+    /**
+     * The default extensions that source files are expected to have. Defaults
+     * to an array containing defaultFileExtension
+     */
+    String[] defaultFileExtensions();
 
-	/** The default extension that source files are expected to have. */
-	String defaultFileExtension();
+    /** The default extension that source files are expected to have. */
+    String defaultFileExtension();
 
-	/** Produce a type system for this language extension. */
-	TypeSystem typeSystem();
+    /** Produce a type system for this language extension. */
+    TypeSystem typeSystem();
 
-	/** Produce a node factory for this language extension. */
-	NodeFactory nodeFactory();
+    /** Produce a node factory for this language extension. */
+    NodeFactory nodeFactory();
 
-	/** Get the source file loader for this extension. */
-	SourceLoader sourceLoader();
+    /** Get the source file loader for this extension. */
+    SourceLoader sourceLoader();
 
-	/**
-	 * Get the job extension for this language extension. The job extension is
-	 * used to extend the <code>Job</code> class without subtyping.
-	 */
-	JobExt jobExt();
+    /**
+     * Get the job extension for this language extension. The job extension is
+     * used to extend the <code>Job</code> class without subtyping.
+     */
+    JobExt jobExt();
 
-	/**
-	 * Produce a target factory for this language extension. The target factory
-	 * is responsible for naming and opening output files given a package name
-	 * and a class or source file name.
-	 */
-	TargetFactory targetFactory();
+    /**
+     * Produce a target factory for this language extension. The target factory
+     * is responsible for naming and opening output files given a package name
+     * and a class or source file name.
+     */
+    TargetFactory targetFactory();
 
-	/** Get a parser for this language extension. */
-	Parser parser(Reader reader, FileSource source, ErrorQueue eq);
+    /** Get a parser for this language extension. */
+    Parser parser(Reader reader, FileSource source, ErrorQueue eq);
 
-	/**
-	 * Get the ToExt extension object used for translating AST nodes to the
-	 * to_ext language.
-	 */
-	ToExt getToExt(ExtensionInfo to_ext, Node n);
+    /**
+     * Get the ToExt extension object used for translating AST nodes to the
+     * to_ext language.
+     */
+    ToExt getToExt(ExtensionInfo to_ext, Node n);
 
-	/** Get the extension file mananger used by this extension. */
-	FileManager extFileManager();
+    /** Get the extension file mananger used by this extension. */
+    FileManager extFileManager();
 
-	/** Create class file for a file object. */
-	ClassFile createClassFile(FileObject f, byte[] code) throws IOException;
+    /** Create class file for a file object. */
+    ClassFile createClassFile(FileObject f, byte[] code) throws IOException;
 
-	/** Create file source for a file object. */
-	FileSource createFileSource(FileObject fo, boolean userSpecified)
-			throws IOException;
+    /** Create file source for a file object. */
+    FileSource createFileSource(FileObject fo, boolean userSpecified)
+            throws IOException;
 
-	/** Produce a class factory for this language extension. */
-	ClassFileLoader classFileLoader();
-	
-	/**
-	 * Produce an extension info object for the output language this extension
-	 * translates to.
-	 */
-	ExtensionInfo outputExtensionInfo();
+    /** Produce a class factory for this language extension. */
+    ClassFileLoader classFileLoader();
+
+    /**
+     * Produce an extension info object for the output language this extension
+     * translates to.
+     */
+    ExtensionInfo outputExtensionInfo();
 }

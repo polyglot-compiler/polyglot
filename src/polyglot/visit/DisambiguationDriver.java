@@ -33,8 +33,7 @@ import polyglot.types.TypeSystem;
  * A visitor which traverses the AST and remove ambiguities found in fields,
  * method signatures and the code itself.
  */
-public class DisambiguationDriver extends ContextVisitor
-{
+public class DisambiguationDriver extends ContextVisitor {
     public DisambiguationDriver(Job job, TypeSystem ts, NodeFactory nf) {
         super(job, ts, nf);
     }

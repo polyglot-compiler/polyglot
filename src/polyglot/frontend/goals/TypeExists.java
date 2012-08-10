@@ -42,18 +42,18 @@ public class TypeExists extends AbstractGoal {
     }
 
     protected String typeName;
-    
+
     protected TypeExists(String name) {
         super(null);
         this.typeName = name;
     }
-    
+
     @Override
     public Pass createPass(ExtensionInfo extInfo) {
         TypeSystem ts = extInfo.typeSystem();
         return new TypeExistsPass(extInfo.scheduler(), ts, this);
     }
-    
+
     public String typeName() {
         return typeName;
     }
@@ -62,12 +62,14 @@ public class TypeExists extends AbstractGoal {
     public int hashCode() {
         return typeName.hashCode() + super.hashCode();
     }
-    
+
     @Override
     public boolean equals(Object o) {
-        return o instanceof TypeExists && ((TypeExists) o).typeName.equals(typeName) && super.equals(o);
+        return o instanceof TypeExists
+                && ((TypeExists) o).typeName.equals(typeName)
+                && super.equals(o);
     }
-    
+
     @Override
     public String toString() {
         return "TypeExists(" + typeName + ")";

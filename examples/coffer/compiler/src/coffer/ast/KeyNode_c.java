@@ -24,8 +24,7 @@ import coffer.types.Key;
 /**
  * An AST node for a <code>Key</code>.  The key may be ambiguous. 
  */
-public class KeyNode_c extends Node_c implements KeyNode
-{
+public class KeyNode_c extends Node_c implements KeyNode {
     protected Key key;
 
     public KeyNode_c(Position pos, Key key) {
@@ -61,7 +60,7 @@ public class KeyNode_c extends Node_c implements KeyNode
 
         Key key = this.key;
 
-        if (! key.isCanonical()) {
+        if (!key.isCanonical()) {
             CofferContext c = (CofferContext) sc.context();
 
             try {
@@ -76,7 +75,7 @@ public class KeyNode_c extends Node_c implements KeyNode
                 }
             }
 
-            if (! key.isCanonical()) {
+            if (!key.isCanonical()) {
                 return this;
             }
         }
@@ -99,8 +98,8 @@ public class KeyNode_c extends Node_c implements KeyNode
 
     @Override
     public void translate(CodeWriter w, Translator tr) {
-	throw new InternalCompilerError(position(),
-	    "Cannot translate key \"" + key + "\".");
+        throw new InternalCompilerError(position(), "Cannot translate key \""
+                + key + "\".");
     }
 
     @Override

@@ -66,11 +66,10 @@ public class FieldDecl_c extends Term_c implements FieldDecl {
     protected FieldInstance fi;
     protected InitializerInstance ii;
 
-    public FieldDecl_c(Position pos, Flags flags, TypeNode type,
-                       Id name, Expr init)
-    {
+    public FieldDecl_c(Position pos, Flags flags, TypeNode type, Id name,
+            Expr init) {
         super(pos);
-        assert(flags != null && type != null && name != null); // init may be null
+        assert (flags != null && type != null && name != null); // init may be null
         this.flags = flags;
         this.type = type;
         this.name = name;
@@ -79,9 +78,11 @@ public class FieldDecl_c extends Term_c implements FieldDecl {
 
     @Override
     public boolean isDisambiguated() {
-        return fi != null && fi.isCanonical() && (init == null || (ii != null && ii.isCanonical())) && super.isDisambiguated();
+        return fi != null && fi.isCanonical()
+                && (init == null || (ii != null && ii.isCanonical()))
+                && super.isDisambiguated();
     }
-    
+
     @Override
     public MemberInstance memberInstance() {
         return fi;
@@ -91,7 +92,7 @@ public class FieldDecl_c extends Term_c implements FieldDecl {
     public VarInstance varInstance() {
         return fi;
     }
-    
+
     @Override
     public CodeInstance codeInstance() {
         return ii;
@@ -146,13 +147,13 @@ public class FieldDecl_c extends Term_c implements FieldDecl {
         n.type = type;
         return n;
     }
-    
+
     /** Get the name of the declaration. */
     @Override
     public Id id() {
         return name;
     }
-    
+
     /** Set the name of the declaration. */
     @Override
     public FieldDecl id(Id name) {
@@ -172,7 +173,7 @@ public class FieldDecl_c extends Term_c implements FieldDecl {
     public FieldDecl name(String name) {
         return id(this.name.id(name));
     }
-    
+
     @Override
     public Term codeBody() {
         return init;
@@ -249,13 +250,13 @@ public class FieldDecl_c extends Term_c implements FieldDecl {
         if (ct.flags().isInterface()) {
             f = f.Public().Static().Final();
         }
-        
+
         FieldDecl n;
 
         if (init != null) {
             Flags iflags = f.isStatic() ? Flags.STATIC : Flags.NONE;
-            InitializerInstance ii = ts.initializerInstance(init.position(),
-                                                            ct, iflags);
+            InitializerInstance ii =
+                    ts.initializerInstance(init.position(), ct, iflags);
             n = initializerInstance(ii);
         }
         else {
@@ -263,8 +264,12 @@ public class FieldDecl_c extends Term_c implements FieldDecl {
         }
 
         // XXX: MutableFieldInstance
-        FieldInstance fi = ts.fieldInstance(position(), ct, f,
-                                            ts.unknownType(position()), name.id());
+        FieldInstance fi =
+                ts.fieldInstance(position(),
+                                 ct,
+                                 f,
+                                 ts.unknownType(position()),
+                                 name.id());
         ct.addField(fi);
 
         return n.flags(f).fieldInstance(fi);
@@ -280,7 +285,7 @@ public class FieldDecl_c extends Term_c implements FieldDecl {
         if (declType().isCanonical()) {
             this.fi.setType(declType());
         }
-        
+
         return this;
     }
 
@@ -291,24 +296,26 @@ public class FieldDecl_c extends Term_c implements FieldDecl {
         }
         return c;
     }
-   
+
     public static class AddDependenciesVisitor extends NodeVisitor {
         protected Scheduler scheduler;
         protected FieldInstance fi;
-        
+
         AddDependenciesVisitor(Scheduler scheduler, FieldInstance fi) {
             this.scheduler = scheduler;
             this.fi = fi;
         }
-        
+
         @Override
         public Node leave(Node old, Node n, NodeVisitor v) {
             if (n instanceof Field) {
                 Field f = (Field) n;
                 if (!f.fieldInstance().orig().constantValueSet()) {
-                    Goal newGoal = scheduler.FieldConstantsChecked(f.fieldInstance().orig());
+                    Goal newGoal =
+                            scheduler.FieldConstantsChecked(f.fieldInstance()
+                                                             .orig());
                     Goal myGoal = scheduler.FieldConstantsChecked(this.fi);
-                    
+
                     for (Goal g : newGoal.prerequisiteGoals(scheduler)) {
                         if (scheduler.prerequisiteDependsOn(g, myGoal)) {
                             this.fi.setNotConstant();
@@ -319,16 +326,16 @@ public class FieldDecl_c extends Term_c implements FieldDecl {
                 }
             }
             return n;
-        }   
+        }
     }
 
     @Override
     public Node checkConstants(ConstantChecker cc) throws SemanticException {
-        if (init == null || ! fi.flags().isFinal()) {
+        if (init == null || !fi.flags().isFinal()) {
             fi.setNotConstant();
             return this;
-        }        
-        if (! init.isConstant()) {
+        }
+        if (!init.isConstant()) {
             fi.setNotConstant();
         }
         else {
@@ -337,17 +344,18 @@ public class FieldDecl_c extends Term_c implements FieldDecl {
 
         return this;
     }
-    
+
     @Override
     public boolean constantValueSet() {
         return fi != null && fi.constantValueSet();
     }
 
     @Override
-    public Node typeCheckOverride(Node parent, TypeChecker tc) throws SemanticException {
+    public Node typeCheckOverride(Node parent, TypeChecker tc)
+            throws SemanticException {
         FieldDecl nn = this;
         FieldDecl old = this;
-        
+
         NodeVisitor childv = tc.enter(parent, this);
 
         if (childv instanceof PruningVisitor) {
@@ -364,12 +372,15 @@ public class FieldDecl_c extends Term_c implements FieldDecl {
         nn = (FieldDecl) nn.visitChildren(childtc);
         nn = (FieldDecl) tc.leave(parent, old, nn, childtc);
 
-        if (! constantValueSet) {
-            ConstantChecker cc = new ConstantChecker(tc.job(), tc.typeSystem(), tc.nodeFactory());
+        if (!constantValueSet) {
+            ConstantChecker cc =
+                    new ConstantChecker(tc.job(),
+                                        tc.typeSystem(),
+                                        tc.nodeFactory());
             cc = (ConstantChecker) cc.context(childtc.context());
             nn = (FieldDecl) nn.del().checkConstants(cc);
         }
-        
+
         return nn;
     }
 
@@ -381,7 +392,7 @@ public class FieldDecl_c extends Term_c implements FieldDecl {
         // Get the fi flags, not the node flags since the fi flags
         // account for being nested within an interface.
         Flags flags = fi.flags();
-        
+
         try {
             ts.checkFieldFlags(flags);
         }
@@ -401,16 +412,17 @@ public class FieldDecl_c extends Term_c implements FieldDecl {
                 ((ArrayInit) init).typeCheckElements(type.type());
             }
             else {
-                if (! ts.isImplicitCastValid(init.type(), type.type()) &&
-                    ! ts.typeEquals(init.type(), type.type()) &&
-                    ! ts.numericConversionValid(type.type(),
-                                                init.constantValue())) {
+                if (!ts.isImplicitCastValid(init.type(), type.type())
+                        && !ts.typeEquals(init.type(), type.type())
+                        && !ts.numericConversionValid(type.type(),
+                                                      init.constantValue())) {
 
-                    throw new SemanticException("The type of the variable " +
-                                                "initializer \"" + init.type() +
-                                                "\" does not match that of " +
-                                                "the declaration \"" +
-                                                type.type() + "\".",
+                    throw new SemanticException("The type of the variable "
+                                                        + "initializer \""
+                                                        + init.type()
+                                                        + "\" does not match that of "
+                                                        + "the declaration \""
+                                                        + type.type() + "\".",
                                                 init.position());
                 }
             }
@@ -418,13 +430,13 @@ public class FieldDecl_c extends Term_c implements FieldDecl {
 
         // check that inner classes do not declare static fields, unless they
         // are compile-time constants
-        if (flags().isStatic() &&
-              fieldInstance().container().toClass().isInnerClass()) {
+        if (flags().isStatic()
+                && fieldInstance().container().toClass().isInnerClass()) {
             // it's a static field in an inner class.
             if (!flags().isFinal() || init == null || !init.isConstant()) {
-                throw new SemanticException("Inner classes cannot declare " +
-                        "static fields, unless they are compile-time " +
-                        "constant fields.", this.position());
+                throw new SemanticException("Inner classes cannot declare "
+                        + "static fields, unless they are compile-time "
+                        + "constant fields.", this.position());
             }
 
         }
@@ -433,7 +445,8 @@ public class FieldDecl_c extends Term_c implements FieldDecl {
     }
 
     @Override
-    public NodeVisitor exceptionCheckEnter(ExceptionChecker ec) throws SemanticException {
+    public NodeVisitor exceptionCheckEnter(ExceptionChecker ec)
+            throws SemanticException {
         return ec.push(new ExceptionChecker.CodeTypeReporter("field initializer"));
     }
 
@@ -465,24 +478,25 @@ public class FieldDecl_c extends Term_c implements FieldDecl {
         if (init != null) {
             v.visitCFG(type, init, ENTRY);
             v.visitCFG(init, this, EXIT);
-        } else {
+        }
+        else {
             v.visitCFG(type, this, EXIT);
         }
-        
+
         return succs;
     }
 
-
     @Override
     public String toString() {
-        return flags.translate() + type + " " + name +
-                (init != null ? " = " + init : "");
+        return flags.translate() + type + " " + name
+                + (init != null ? " = " + init : "");
     }
 
     @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
-        boolean isInterface = fi != null && fi.container() != null &&
-                              fi.container().toClass().flags().isInterface();
+        boolean isInterface =
+                fi != null && fi.container() != null
+                        && fi.container().toClass().flags().isInterface();
 
         Flags f = flags;
 
@@ -494,7 +508,7 @@ public class FieldDecl_c extends Term_c implements FieldDecl {
 
         w.write(f.translate());
         print(type, w, tr);
-	w.allowBreak(2, 2, " ", 1);
+        w.allowBreak(2, 2, " ", 1);
         tr.print(this, name, w);
 
         if (init != null) {
@@ -517,14 +531,19 @@ public class FieldDecl_c extends Term_c implements FieldDecl {
             w.end();
         }
 
-	w.allowBreak(4, " ");
-	w.begin(0);
-	w.write("(name " + name + ")");
-	w.end();
+        w.allowBreak(4, " ");
+        w.begin(0);
+        w.write("(name " + name + ")");
+        w.end();
     }
+
     @Override
     public Node copy(NodeFactory nf) {
-        return nf.FieldDecl(this.position, this.flags, this.type, this.name, this.init);
+        return nf.FieldDecl(this.position,
+                            this.flags,
+                            this.type,
+                            this.name,
+                            this.init);
     }
 
 }

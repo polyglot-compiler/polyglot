@@ -29,9 +29,9 @@ package polyglot.ast;
  * A local class declaration statement.  The node is just a wrapper around
  * a class declaration.
  */
-public interface LocalClassDecl extends CompoundStmt
-{
+public interface LocalClassDecl extends CompoundStmt {
     /** The class declaration. */
     ClassDecl decl();
+
     LocalClassDecl decl(ClassDecl decl);
 }

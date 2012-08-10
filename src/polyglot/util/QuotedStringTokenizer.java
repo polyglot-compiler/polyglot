@@ -64,7 +64,8 @@ public class QuotedStringTokenizer extends StringTokenizer {
      * Quotes cannot be delimiters, and the escape character can be neither a
      * quote nor a delimiter.
      */
-    public QuotedStringTokenizer(String str, String delim, String quotes, char escape, boolean returnDelims) {
+    public QuotedStringTokenizer(String str, String delim, String quotes,
+            char escape, boolean returnDelims) {
         super(str, delim, returnDelims);
         this.str = str;
         this.len = str.length();
@@ -72,12 +73,15 @@ public class QuotedStringTokenizer extends StringTokenizer {
         this.quotes = quotes;
         for (int i = 0; i < quotes.length(); i++)
             if (delim.indexOf(quotes.charAt(i)) >= 0)
-                throw new IllegalArgumentException("Invalid quote character '"+quotes.charAt(i)+"'");
+                throw new IllegalArgumentException("Invalid quote character '"
+                        + quotes.charAt(i) + "'");
         this.escape = escape;
         if (delim.indexOf(escape) >= 0)
-            throw new IllegalArgumentException("Invalid escape character '"+escape+"'");
+            throw new IllegalArgumentException("Invalid escape character '"
+                    + escape + "'");
         if (quotes.indexOf(escape) >= 0)
-            throw new IllegalArgumentException("Invalid escape character '"+escape+"'");
+            throw new IllegalArgumentException("Invalid escape character '"
+                    + escape + "'");
         this.returnDelims = returnDelims;
     }
 
@@ -90,16 +94,16 @@ public class QuotedStringTokenizer extends StringTokenizer {
             pos++;
         return pos;
     }
- 
+
     private StringBuffer token;
+
     /**
      * Returns the position of the next delimiter character after the token.
      * If collect is true, collects the token into the StringBuffer.
      * Pre-condition: not on a delimiter.
      */
     private int skipToken(int pos, boolean collect) {
-        if (collect)
-            token = new StringBuffer();
+        if (collect) token = new StringBuffer();
         boolean quoted = false;
         char quote = '\000';
         boolean escaped = false;
@@ -118,8 +122,8 @@ public class QuotedStringTokenizer extends StringTokenizer {
                 if (curr == quote) { // closing quote
                     quoted = false;
                     quote = '\000';
-                } else
-                    if (collect) token.append(curr);
+                }
+                else if (collect) token.append(curr);
                 continue;
             }
             if (quotes.indexOf(curr) >= 0) { // opening quote
@@ -135,7 +139,7 @@ public class QuotedStringTokenizer extends StringTokenizer {
             throw new IllegalArgumentException("Unterminated quoted string");
         return pos;
     }
- 
+
     /**
      * Tests if there are more tokens available from this tokenizer's string.
      * Pre-condition: not inside a quoted string (token).
@@ -153,10 +157,8 @@ public class QuotedStringTokenizer extends StringTokenizer {
      */
     @Override
     public String nextToken() {
-        if (!returnDelims)
-            pos = skipDelim(pos);
-        if (pos >= len)
-            throw new NoSuchElementException();
+        if (!returnDelims) pos = skipDelim(pos);
+        if (pos >= len) throw new NoSuchElementException();
         if (returnDelims && delim.indexOf(str.charAt(pos)) >= 0)
             return str.substring(pos, ++pos);
         //int start = pos;
@@ -187,13 +189,13 @@ public class QuotedStringTokenizer extends StringTokenizer {
             if (delim.indexOf(str.charAt(curr)) >= 0) {
                 curr++;
                 dcount++;
-            } else {
+            }
+            else {
                 curr = skipToken(curr, false);
                 count++;
             }
         }
-        if (returnDelims)
-            return count + dcount;
+        if (returnDelims) return count + dcount;
         return count;
     }
 
@@ -201,13 +203,16 @@ public class QuotedStringTokenizer extends StringTokenizer {
      * Returns the same value as the hasMoreTokens method.
      */
     @Override
-    public boolean hasMoreElements() { return hasMoreTokens(); }
+    public boolean hasMoreElements() {
+        return hasMoreTokens();
+    }
 
     /**
      * Returns the same value as the nextToken method, except that its declared
      * return value is Object rather than String.
      */
     @Override
-    public Object nextElement() { return nextToken(); }
+    public Object nextElement() {
+        return nextToken();
+    }
 }
-

@@ -45,82 +45,80 @@ import polyglot.visit.TypeChecker;
 /**
  * An <code>Assert</code> is an assert statement.
  */
-public class Assert_c extends Stmt_c implements Assert
-{
+public class Assert_c extends Stmt_c implements Assert {
     protected Expr cond;
     protected Expr errorMessage;
 
     public Assert_c(Position pos, Expr cond, Expr errorMessage) {
-	super(pos);
-	assert(cond != null); // errorMessage may be null
-	this.cond = cond;
-	this.errorMessage = errorMessage;
+        super(pos);
+        assert (cond != null); // errorMessage may be null
+        this.cond = cond;
+        this.errorMessage = errorMessage;
     }
 
     /** Get the condition to check. */
     @Override
     public Expr cond() {
-	return this.cond;
+        return this.cond;
     }
 
     /** Set the condition to check. */
     @Override
     public Assert cond(Expr cond) {
-	Assert_c n = (Assert_c) copy();
-	n.cond = cond;
-	return n;
+        Assert_c n = (Assert_c) copy();
+        n.cond = cond;
+        return n;
     }
 
     /** Get the error message to report. */
     @Override
     public Expr errorMessage() {
-	return this.errorMessage;
+        return this.errorMessage;
     }
 
     /** Set the error message to report. */
     @Override
     public Assert errorMessage(Expr errorMessage) {
-	Assert_c n = (Assert_c) copy();
-	n.errorMessage = errorMessage;
-	return n;
+        Assert_c n = (Assert_c) copy();
+        n.errorMessage = errorMessage;
+        return n;
     }
 
     /** Reconstruct the statement. */
     protected Assert_c reconstruct(Expr cond, Expr errorMessage) {
-	if (cond != this.cond || errorMessage != this.errorMessage) {
-	    Assert_c n = (Assert_c) copy();
-	    n.cond = cond;
-	    n.errorMessage = errorMessage;
-	    return n;
-	}
+        if (cond != this.cond || errorMessage != this.errorMessage) {
+            Assert_c n = (Assert_c) copy();
+            n.cond = cond;
+            n.errorMessage = errorMessage;
+            return n;
+        }
 
-	return this;
+        return this;
     }
 
     @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
         TypeSystem ts = tc.typeSystem();
 
-        if (! Options.global.assertions) {
+        if (!Options.global.assertions) {
             ErrorQueue eq = tc.errorQueue();
             eq.enqueue(ErrorInfo.WARNING,
-                       "assert statements are disabled. Recompile " +
-                       "with -assert and ensure the post compiler supports " +
-                       "assert (e.g., -post \"javac -source 1.4\"). " +
-                       "Removing the statement and continuing.",
+                       "assert statements are disabled. Recompile "
+                               + "with -assert and ensure the post compiler supports "
+                               + "assert (e.g., -post \"javac -source 1.4\"). "
+                               + "Removing the statement and continuing.",
                        cond.position());
         }
 
-        if (! ts.typeEquals(cond.type(), ts.Boolean())) {
-            throw new SemanticException("Condition of assert statement " +
-                                        "must have boolean type.",
-                                        cond.position());
+        if (!ts.typeEquals(cond.type(), ts.Boolean())) {
+            throw new SemanticException("Condition of assert statement "
+                    + "must have boolean type.", cond.position());
         }
 
-        if (errorMessage != null && ts.typeEquals(errorMessage.type(), ts.Void())) {
-            throw new SemanticException("Error message in assert statement " +
-                                        "must have a value.",
-                                        errorMessage.position());
+        if (errorMessage != null
+                && ts.typeEquals(errorMessage.type(), ts.Void())) {
+            throw new SemanticException("Error message in assert statement "
+                    + "must have a value.", errorMessage.position());
         }
 
         return this;
@@ -146,23 +144,23 @@ public class Assert_c extends Stmt_c implements Assert
     /** Visit the children of the statement. */
     @Override
     public Node visitChildren(NodeVisitor v) {
-	Expr cond = (Expr) visitChild(this.cond, v);
-	Expr errorMessage = (Expr) visitChild(this.errorMessage, v);
-	return reconstruct(cond, errorMessage);
+        Expr cond = (Expr) visitChild(this.cond, v);
+        Expr errorMessage = (Expr) visitChild(this.errorMessage, v);
+        return reconstruct(cond, errorMessage);
     }
 
     @Override
     public String toString() {
-	return "assert " + cond.toString() +
-                (errorMessage != null
-                    ? ": " + errorMessage.toString() : "") + ";";
+        return "assert " + cond.toString()
+                + (errorMessage != null ? ": " + errorMessage.toString() : "")
+                + ";";
     }
 
     /** Write the statement to an output file. */
     @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
         w.write("assert ");
-	print(cond, w, tr);
+        print(cond, w, tr);
 
         if (errorMessage != null) {
             w.write(": ");
@@ -174,7 +172,7 @@ public class Assert_c extends Stmt_c implements Assert
 
     @Override
     public void translate(CodeWriter w, Translator tr) {
-        if (! Options.global.assertions) {
+        if (!Options.global.assertions) {
             w.write(";");
         }
         else {
@@ -199,6 +197,7 @@ public class Assert_c extends Stmt_c implements Assert
 
         return succs;
     }
+
     @Override
     public Node copy(NodeFactory nf) {
         return nf.Assert(this.position, this.cond, this.errorMessage);

@@ -18,8 +18,7 @@ import polyglot.types.Type;
 import polyglot.util.CachingTransformingList;
 import polyglot.util.Transformation;
 
-public class CofferSubst_c extends Subst_c<Key, Key> implements CofferSubst
-{
+public class CofferSubst_c extends Subst_c<Key, Key> implements CofferSubst {
     public CofferSubst_c(CofferTypeSystem ts, Map<Key, ? extends Key> subst) {
         super(ts, subst);
     }
@@ -40,12 +39,14 @@ public class CofferSubst_c extends Subst_c<Key, Key> implements CofferSubst
     @Override
     public ClassType substClassType(ClassType t) {
         // Don't bother trying to substitute into a non-Coffer class.
-        if (! (t instanceof CofferClassType)) {
+        if (!(t instanceof CofferClassType)) {
             return t;
         }
 
-        return new CofferSubstClassType_c((CofferTypeSystem) ts, t.position(),
-                                         (CofferClassType) t, this);
+        return new CofferSubstClassType_c((CofferTypeSystem) ts,
+                                          t.position(),
+                                          (CofferClassType) t,
+                                          this);
     }
 
     @Override
@@ -72,7 +73,8 @@ public class CofferSubst_c extends Subst_c<Key, Key> implements CofferSubst
         ci = super.substConstructor(ci);
 
         if (ci instanceof CofferConstructorInstance) {
-            CofferConstructorInstance vci = (CofferConstructorInstance) ci.copy();
+            CofferConstructorInstance vci =
+                    (CofferConstructorInstance) ci.copy();
 
             vci.setEntryKeys(substKeySet(vci.entryKeys()));
             vci.setReturnKeys(substKeySet(vci.returnKeys()));
@@ -134,22 +136,20 @@ public class CofferSubst_c extends Subst_c<Key, Key> implements CofferSubst
         KeySet newKeys = ts.emptyKeySet(keys.position());
         for (Key key : keys) {
             Key key2 = substKey(key);
-            if (key != key2)
-                changed = true;
+            if (key != key2) changed = true;
             newKeys = newKeys.add(substKey(key));
         }
 
-        if (! changed)
-            newKeys = keys;
+        if (!changed) newKeys = keys;
 
         return newKeys;
     }
 
     @Override
     public Key substKey(Key key) {
-	if (key == null) {
-	    return null;
-	}
+        if (key == null) {
+            return null;
+        }
 
         Key newKey = subst.get(key);
 

@@ -21,7 +21,7 @@ public class JL5Unary_c extends Unary_c implements JL5Unary {
     @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
         JL5TypeSystem ts = (JL5TypeSystem) tc.typeSystem();
-        
+
         if (!ts.isPrimitiveWrapper(expr.type())) {
             return super.typeCheck(tc);
         }
@@ -31,7 +31,7 @@ public class JL5Unary_c extends Unary_c implements JL5Unary {
             if (!expr.type().isNumeric()) {
                 if (!(ts.isPrimitiveWrapper(expr.type()) && (ts.primitiveTypeOfWrapper(expr.type()).isNumeric()))) {
                     throw new SemanticException("Operand of " + op
-                        + " operator must be numeric.", expr.position());
+                            + " operator must be numeric.", expr.position());
                 }
             }
 
@@ -41,9 +41,10 @@ public class JL5Unary_c extends Unary_c implements JL5Unary {
             }
 
             if (((Variable) expr).flags().isFinal()) {
-                throw new SemanticException("Operand of " + op
-                        + " operator must be a non-final variable.",
-                        expr.position());
+                throw new SemanticException("Operand of "
+                                                    + op
+                                                    + " operator must be a non-final variable.",
+                                            expr.position());
             }
 
             return type(expr.type());
@@ -57,7 +58,8 @@ public class JL5Unary_c extends Unary_c implements JL5Unary {
 
             if (ts.isPrimitiveWrapper(expr.type())) {
                 return type(ts.promote(ts.primitiveTypeOfWrapper(expr.type())));
-            } else {
+            }
+            else {
                 return type(ts.promote(expr.type()));
             }
         }
@@ -66,13 +68,14 @@ public class JL5Unary_c extends Unary_c implements JL5Unary {
             if (!expr.type().isNumeric()) {
                 if (!(ts.isPrimitiveWrapper(expr.type()) && (ts.primitiveTypeOfWrapper(expr.type()).isNumeric()))) {
                     throw new SemanticException("Operand of " + op
-                        + " operator must be numeric.", expr.position());
+                            + " operator must be numeric.", expr.position());
                 }
             }
 
             if (ts.isPrimitiveWrapper(expr.type())) {
                 return type(ts.promote(ts.primitiveTypeOfWrapper(expr.type())));
-            } else {
+            }
+            else {
                 return type(ts.promote(expr.type()));
             }
         }
@@ -98,31 +101,40 @@ public class JL5Unary_c extends Unary_c implements JL5Unary {
         try {
             if (child == expr) {
                 Type childType = child.type();
-                if (ts.isPrimitiveWrapper(childType)) childType = ts.primitiveTypeOfWrapper(childType);
+                if (ts.isPrimitiveWrapper(childType))
+                    childType = ts.primitiveTypeOfWrapper(childType);
                 if (op == POST_INC || op == POST_DEC || op == PRE_INC
                         || op == PRE_DEC) {
                     if (ts.isImplicitCastValid(childType, av.toType())) {
                         return ts.promote(childType);
-                    } else {
+                    }
+                    else {
                         return av.toType();
                     }
-                } else if (op == NEG || op == POS) {
+                }
+                else if (op == NEG || op == POS) {
                     if (ts.isImplicitCastValid(childType, av.toType())) {
                         return ts.promote(childType);
-                    } else {
+                    }
+                    else {
                         return av.toType();
                     }
-                } else if (op == BIT_NOT) {
+                }
+                else if (op == BIT_NOT) {
                     if (ts.isImplicitCastValid(childType, av.toType())) {
                         return ts.promote(childType);
-                    } else {
+                    }
+                    else {
                         return av.toType();
                     }
-                } else if (op == NOT) {
+                }
+                else if (op == NOT) {
                     return ts.Boolean();
                 }
             }
-        } catch (SemanticException e) {}
+        }
+        catch (SemanticException e) {
+        }
 
         return child.type();
     }

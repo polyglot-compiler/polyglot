@@ -14,35 +14,38 @@ import polyglot.util.StdErrorQueue;
 /**
  * 
  */
-public class VerboseOutputController extends OutputController{
+public class VerboseOutputController extends OutputController {
     private boolean alwaysShowErrorQ;
+
     public VerboseOutputController(PrintStream out, boolean alwaysShowErrorQ) {
         super(out);
         this.alwaysShowErrorQ = alwaysShowErrorQ;
     }
-     
+
     @Override
     protected void startScriptTestSuite(ScriptTestSuite sts) {
         out.println("Test script " + sts.getName());
         if (sts.getDescription() != null && sts.getDescription().length() > 0) {
             out.println("  Description : " + sts.getDescription());
         }
-        if (sts.getTestResult() != null) {            
-            out.println("  Last run    : " + getDateDisplay(sts.getTestResult().dateTestRun));
-            out.println("  Last success: " + getDateDisplay(sts.getTestResult().dateLastSuccess));
+        if (sts.getTestResult() != null) {
+            out.println("  Last run    : "
+                    + getDateDisplay(sts.getTestResult().dateTestRun));
+            out.println("  Last success: "
+                    + getDateDisplay(sts.getTestResult().dateLastSuccess));
         }
         out.println("==============================");
     }
+
     @Override
     protected void finishScriptTestSuite(ScriptTestSuite sts) {
         out.println("Test script " + sts.getName() + " finished");
         if (!sts.success() && sts.failureMessage != null) {
-            out.println(sts.failureMessage); 
+            out.println(sts.failureMessage);
         }
 
-        out.println("  " + 
-            sts.getSuccesfulTestCount() + " out of " + sts.getTotalTestCount() + 
-            " tests succeeded.");
+        out.println("  " + sts.getSuccesfulTestCount() + " out of "
+                + sts.getTotalTestCount() + " tests succeeded.");
     }
 
     @Override
@@ -51,12 +54,14 @@ public class VerboseOutputController extends OutputController{
         if (sft.getDescription() != null && sft.getDescription().length() > 0) {
             out.println("    Description : " + sft.getDescription());
         }
-        if (sft.getTestResult() != null) {            
-            out.println("    Last run    : " + getDateDisplay(sft.getTestResult().dateTestRun));
-            out.println("    Last success: " + getDateDisplay(sft.getTestResult().dateLastSuccess));
+        if (sft.getTestResult() != null) {
+            out.println("    Last run    : "
+                    + getDateDisplay(sft.getTestResult().dateTestRun));
+            out.println("    Last success: "
+                    + getDateDisplay(sft.getTestResult().dateLastSuccess));
         }
     }
-        
+
     @Override
     protected void finishSourceFileTest(SourceFileTest sft, ErrorQueue eq) {
         if (sft.success()) {
@@ -72,11 +77,10 @@ public class VerboseOutputController extends OutputController{
             }
         }
         if (alwaysShowErrorQ || !sft.success()) {
-            StdErrorQueue stdeq = new StdErrorQueue(out, 
-                         eq.errorCount() + 1, 
-                         sft.getName());
-                         
-            SilentErrorQueue seq = (SilentErrorQueue)eq;
+            StdErrorQueue stdeq =
+                    new StdErrorQueue(out, eq.errorCount() + 1, sft.getName());
+
+            SilentErrorQueue seq = (SilentErrorQueue) eq;
             for (ErrorInfo ei : seq.getErrors()) {
                 stdeq.enqueue(ei);
             }
@@ -86,7 +90,6 @@ public class VerboseOutputController extends OutputController{
             }
         }
     }
-    
 
     @Override
     public void displayTestSuiteResults(String suiteName, TestSuite ts) {
@@ -95,7 +98,7 @@ public class VerboseOutputController extends OutputController{
             out.println("No test results for " + suiteName);
             return;
         }
-    
+
         out.println("Test script " + tsr.testName);
         out.println("  Last run    : " + getDateDisplay(tsr.dateTestRun));
         out.println("  Last success: " + getDateDisplay(tsr.dateLastSuccess));
@@ -111,7 +114,8 @@ public class VerboseOutputController extends OutputController{
                 displayTestResults(tr, testName);
             }
             total++;
-            if (tr != null && tr.dateLastSuccess != null && tr.dateLastSuccess.equals(tr.dateTestRun)) {
+            if (tr != null && tr.dateLastSuccess != null
+                    && tr.dateLastSuccess.equals(tr.dateTestRun)) {
                 lastSuccess++;
             }
             if (tr == null || tr.dateTestRun == null) {
@@ -130,8 +134,10 @@ public class VerboseOutputController extends OutputController{
     @Override
     public void displayTestResults(TestResult tr, String testName) {
         out.println("    " + testName);
-        out.println("      Last run    : " + getDateDisplay(tr==null?null:tr.dateTestRun));
-        out.println("      Last success: " + getDateDisplay(tr==null?null:tr.dateLastSuccess));
+        out.println("      Last run    : "
+                + getDateDisplay(tr == null ? null : tr.dateTestRun));
+        out.println("      Last success: "
+                + getDateDisplay(tr == null ? null : tr.dateLastSuccess));
     }
 
     @Override

@@ -38,7 +38,8 @@ import polyglot.util.Position;
 /**
  * Type system for parameterized types.
  */
-public interface ParamTypeSystem<Formal extends Param, Actual extends TypeObject> extends TypeSystem {
+public interface ParamTypeSystem<Formal extends Param, Actual extends TypeObject>
+        extends TypeSystem {
     /**
      * Create a new mutable PClass.
      *
@@ -55,8 +56,8 @@ public interface ParamTypeSystem<Formal extends Param, Actual extends TypeObject
      *
      * @throws SemanticException when the actuals do not agree with the formals
      */
-    ClassType instantiate(Position pos, PClass<Formal, Actual> base, List<? extends Actual> actuals)
-        throws SemanticException;
+    ClassType instantiate(Position pos, PClass<Formal, Actual> base,
+            List<? extends Actual> actuals) throws SemanticException;
 
     /**
      * Apply a parameter substitution to a type.

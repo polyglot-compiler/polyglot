@@ -8,7 +8,11 @@ import polyglot.types.SemanticException;
 public class ForToExt_c extends ToExt_c {
     @Override
     public Node toExt(ExtensionRewriter rw) throws SemanticException {
-        For n = (For)node();
-        return rw.to_nf().For(n.position(), n.inits(), n.cond(), n.iters(), n.body());
+        For n = (For) node();
+        return rw.to_nf().For(n.position(),
+                              n.inits(),
+                              n.cond(),
+                              n.iters(),
+                              n.body());
     }
 }

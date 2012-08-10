@@ -13,11 +13,12 @@ public class AnyExpectedFailure extends ExpectedFailure {
     public AnyExpectedFailure() {
         super(-1);
     }
+
     @Override
     public boolean matches(ErrorInfo e) {
         return true;
     }
-    
+
     @Override
     public boolean equals(Object o) {
         if (o instanceof AnyExpectedFailure) {
@@ -25,10 +26,12 @@ public class AnyExpectedFailure extends ExpectedFailure {
         }
         return false;
     }
+
     @Override
     public int hashCode() {
         return (74298);
     }
+
     @Override
     public String toString() {
         return "(any remaining failures)";

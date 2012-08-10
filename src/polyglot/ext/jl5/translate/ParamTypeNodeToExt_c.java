@@ -11,7 +11,9 @@ import polyglot.types.SemanticException;
 public class ParamTypeNodeToExt_c extends ToExt_c implements ToExt {
     @Override
     public Node toExt(ExtensionRewriter rw) throws SemanticException {
-    	ParamTypeNode ptn = (ParamTypeNode) node();
-		return ((JL5NodeFactory) rw.to_nf()).ParamTypeNode(ptn.position(), ptn.bounds(), ptn.id());
+        ParamTypeNode ptn = (ParamTypeNode) node();
+        return ((JL5NodeFactory) rw.to_nf()).ParamTypeNode(ptn.position(),
+                                                           ptn.bounds(),
+                                                           ptn.id());
     }
 }

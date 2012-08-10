@@ -49,8 +49,7 @@ import polyglot.util.Position;
  * This class translates inner classes to static nested classes with a field
  * pointing to the enclosing instance.
  */
-public abstract class InnerClassAbstractRemover extends ContextVisitor
-{
+public abstract class InnerClassAbstractRemover extends ContextVisitor {
     public InnerClassAbstractRemover(Job job, TypeSystem ts, NodeFactory nf) {
         super(job, ts, nf);
     }
@@ -58,12 +57,12 @@ public abstract class InnerClassAbstractRemover extends ContextVisitor
     protected String namePrefix() {
         return "jl$";
     }
-    
+
     /**
      * Mangles the name of the given class.  Used to produce names of fields.
      */
     String mangleClassName(ClassType ct) {
-      return namePrefix() + ct.fullName().replace('.', '$');
+        return namePrefix() + ct.fullName().replace('.', '$');
     }
 
     /**
@@ -77,60 +76,65 @@ public abstract class InnerClassAbstractRemover extends ContextVisitor
      * </ul>
      */
     List<ClassType> env(ClassType ct, boolean includeSuper) {
-        if (ct == null || ! ct.isInnerClass()) {
+        if (ct == null || !ct.isInnerClass()) {
             return Collections.emptyList();
         }
-        
+
         List<ClassType> superEnv = Collections.emptyList();
         if (includeSuper) {
             superEnv = env((ClassType) ct.superType(), true);
         }
-        
+
         List<ClassType> env = new ArrayList<ClassType>();
-        
-        for (ClassType outer = ct.outer(); ; outer = outer.outer()) {
+
+        for (ClassType outer = ct.outer();; outer = outer.outer()) {
             env.add(outer);
-            if (! outer.isInnerClass()) {
+            if (!outer.isInnerClass()) {
                 break;
             }
         }
-        
+
         env.removeAll(superEnv);
-        
+
         if (env.isEmpty()) {
             return superEnv;
         }
-        
+
         if (superEnv.isEmpty()) {
             return env;
         }
-        
+
         List<ClassType> l = new ArrayList<ClassType>();
         l.addAll(env);
         l.addAll(superEnv);
         return l;
     }
-    
+
     List<ClassType> envAsFormalTypes(List<ClassType> env) {
         return env;
-     }
-    
+    }
+
     List<Formal> envAsFormals(List<ClassType> env) {
         List<Formal> formals = new ArrayList<Formal>();
         int arg = 1;
         for (ClassType ct : env) {
-            LocalInstance li = ts.localInstance(Position.compilerGenerated(),
-                                                Flags.FINAL, ct, "arg" + arg);
-            Formal f = nf.Formal(li.position(), li.flags(),
-                                 nf.CanonicalTypeNode(Position.compilerGenerated(),
-                                                      li.type()),
-                                 nf.Id(li.position(), li.name()));
+            LocalInstance li =
+                    ts.localInstance(Position.compilerGenerated(),
+                                     Flags.FINAL,
+                                     ct,
+                                     "arg" + arg);
+            Formal f =
+                    nf.Formal(li.position(),
+                              li.flags(),
+                              nf.CanonicalTypeNode(Position.compilerGenerated(),
+                                                   li.type()),
+                              nf.Id(li.position(), li.name()));
             f = f.localInstance(li);
             formals.add(f);
         }
         return formals;
     }
-    
+
     /**
      * Turns an inner class's environment into a list of actual arguments to be
      * used when constructing the inner class.
@@ -150,28 +154,32 @@ public abstract class InnerClassAbstractRemover extends ContextVisitor
                 actuals.add(qualifier);
                 continue;
             }
-            
+
             if (outer != null) {
-              // XXX Search "outer" for a field whose name and type matches "ct".
-              String name = mangleClassName(ct);
-              FieldInstance fi = outer.fieldNamed(name);
-              if (fi != null && fi.type().equals(ct)) {
-                // Use the field.
-                Special this_ =
-                  nf.Special(Position.compilerGenerated(), Special.THIS);
-                this_ = (Special) this_.type(ct);
-                Field field =
-                  nf.Field(Position.compilerGenerated(), this_, nf.Id(Position
-                      .compilerGenerated(), name));
-                field = field.fieldInstance(fi);
-                field = (Field) field.type(fi.type());
-                actuals.add(field);
-                continue;
-              }
+                // XXX Search "outer" for a field whose name and type matches "ct".
+                String name = mangleClassName(ct);
+                FieldInstance fi = outer.fieldNamed(name);
+                if (fi != null && fi.type().equals(ct)) {
+                    // Use the field.
+                    Special this_ =
+                            nf.Special(Position.compilerGenerated(),
+                                       Special.THIS);
+                    this_ = (Special) this_.type(ct);
+                    Field field =
+                            nf.Field(Position.compilerGenerated(),
+                                     this_,
+                                     nf.Id(Position.compilerGenerated(), name));
+                    field = field.fieldInstance(fi);
+                    field = (Field) field.type(fi.type());
+                    actuals.add(field);
+                    continue;
+                }
             }
-            
-            TypeNode tn = nf.CanonicalTypeNode(Position.compilerGenerated(), ct);
-            Special this_ = nf.Special(Position.compilerGenerated(), Special.THIS, tn);
+
+            TypeNode tn =
+                    nf.CanonicalTypeNode(Position.compilerGenerated(), ct);
+            Special this_ =
+                    nf.Special(Position.compilerGenerated(), Special.THIS, tn);
             this_ = (Special) this_.type(ct);
             actuals.add(this_);
         }

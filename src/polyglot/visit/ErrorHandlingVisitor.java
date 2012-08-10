@@ -42,8 +42,7 @@ import polyglot.util.Position;
 
 /**
  */
-public class ErrorHandlingVisitor extends HaltingVisitor
-{
+public class ErrorHandlingVisitor extends HaltingVisitor {
     protected boolean error;
     protected Job job;
     protected TypeSystem ts;
@@ -54,7 +53,7 @@ public class ErrorHandlingVisitor extends HaltingVisitor
         this.ts = ts;
         this.nf = nf;
     }
-    
+
     /** Returns the <code>Job</code> that this Visitor is part of.
      *
      * @see polyglot.frontend.Job
@@ -80,7 +79,7 @@ public class ErrorHandlingVisitor extends HaltingVisitor
     public ErrorQueue errorQueue() {
         return job().compiler().errorQueue();
     }
-    
+
     /**
      * Returns true if some errors have been reported, even if cleared.
      */
@@ -124,9 +123,9 @@ public class ErrorHandlingVisitor extends HaltingVisitor
       * used to visit the children of <code>n</code>.
      */
     protected NodeVisitor enterCall(Node parent, Node n)
-                throws SemanticException {
+            throws SemanticException {
         if (Report.should_report(Report.visit, 3))
-	    Report.report(3, "enter: " + parent + " -> " + n);
+            Report.report(3, "enter: " + parent + " -> " + n);
         return enterCall(n);
     }
 
@@ -146,7 +145,7 @@ public class ErrorHandlingVisitor extends HaltingVisitor
       * used to visit the childre of <code>n</code>.
       */
     protected NodeVisitor enterError(Node n) {
-	return this;
+        return this;
     }
 
     /** Contains all of the functionality that can be done in the <code> leave
@@ -166,31 +165,29 @@ public class ErrorHandlingVisitor extends HaltingVisitor
       * <code>n</code>.
       */
     protected Node leaveCall(Node parent, Node old, Node n, NodeVisitor v)
-        throws SemanticException {
+            throws SemanticException {
 
-	return leaveCall(old, n, v);
+        return leaveCall(old, n, v);
     }
-    
-    protected Node leaveCall(Node old, Node n, NodeVisitor v)
-        throws SemanticException {
 
-	return leaveCall(n);
+    protected Node leaveCall(Node old, Node n, NodeVisitor v)
+            throws SemanticException {
+
+        return leaveCall(n);
     }
 
     /**
      * @throws SemanticException  
      */
     protected Node leaveCall(Node n) throws SemanticException {
-	return n;
+        return n;
     }
 
     /** Return true if we should catch errors thrown when visiting the node. */
     protected boolean catchErrors(Node n) {
-	return n instanceof Stmt
-	    || n instanceof ClassMember
-	    || n instanceof ClassDecl
-	    || n instanceof Import
-	    || n instanceof SourceFile;
+        return n instanceof Stmt || n instanceof ClassMember
+                || n instanceof ClassDecl || n instanceof Import
+                || n instanceof SourceFile;
     }
 
     /**
@@ -214,7 +211,7 @@ public class ErrorHandlingVisitor extends HaltingVisitor
     @Override
     public NodeVisitor enter(Node parent, Node n) {
         if (Report.should_report(Report.visit, 5))
-	    Report.report(5, "enter(" + n + ")");
+            Report.report(5, "enter(" + n + ")");
 
         if (catchErrors(n)) {
             this.error = false;
@@ -224,7 +221,7 @@ public class ErrorHandlingVisitor extends HaltingVisitor
             // should copy the visitor
             return enterCall(parent, n);
         }
-	catch (SemanticException e) {
+        catch (SemanticException e) {
             if (e.getMessage() != null) {
                 Position position = e.position();
 
@@ -233,21 +230,21 @@ public class ErrorHandlingVisitor extends HaltingVisitor
                 }
 
                 errorQueue().enqueue(ErrorInfo.SEMANTIC_ERROR,
-                                    e.getMessage(), position);
+                                     e.getMessage(),
+                                     position);
             }
             else {
                 // silent error; these should be thrown only
                 // when the error has already been reported 
             }
 
-            if (! catchErrors(n)) {
+            if (!catchErrors(n)) {
                 this.error = true;
             }
 
-	    return enterError(n);
+            return enterError(n);
         }
     }
-
 
     /**
      * This method is called after all of the children of <code>n</code>
@@ -277,15 +274,15 @@ public class ErrorHandlingVisitor extends HaltingVisitor
      * @return The final result of the traversal of the tree rooted at
      * <code>n</code>.
      */
- 
+
     @Override
     public Node leave(Node parent, Node old, Node n, NodeVisitor v) {
         try {
-            if (v instanceof ErrorHandlingVisitor &&
-                ((ErrorHandlingVisitor) v).error) {
+            if (v instanceof ErrorHandlingVisitor
+                    && ((ErrorHandlingVisitor) v).error) {
 
                 if (Report.should_report(Report.visit, 5))
-		    Report.report(5, "leave(" + n + "): error below");
+                    Report.report(5, "leave(" + n + "): error below");
 
                 if (catchErrors(n)) {
                     this.error = false;
@@ -301,11 +298,11 @@ public class ErrorHandlingVisitor extends HaltingVisitor
             }
 
             if (Report.should_report(Report.visit, 5))
-		Report.report(5, "leave(" + n + "): calling leaveCall");
+                Report.report(5, "leave(" + n + "): calling leaveCall");
 
             return leaveCall(parent, old, n, v);
-	}
-	catch (SemanticException e) {
+        }
+        catch (SemanticException e) {
             if (e.getMessage() != null) {
                 Position position = e.position();
 
@@ -314,7 +311,8 @@ public class ErrorHandlingVisitor extends HaltingVisitor
                 }
 
                 errorQueue().enqueue(ErrorInfo.SEMANTIC_ERROR,
-                                    e.getMessage(), position);
+                                     e.getMessage(),
+                                     position);
             }
             else {
                 // silent error; these should be thrown only
@@ -334,4 +332,3 @@ public class ErrorHandlingVisitor extends HaltingVisitor
         }
     }
 }
-

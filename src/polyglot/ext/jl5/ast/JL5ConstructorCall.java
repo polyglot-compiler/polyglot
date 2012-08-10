@@ -7,7 +7,7 @@ import polyglot.ast.TypeNode;
 
 public interface JL5ConstructorCall extends ConstructorCall {
     List<TypeNode> typeArgs();
-    JL5ConstructorCall typeArgs(List<TypeNode> typeArgs);
 
+    JL5ConstructorCall typeArgs(List<TypeNode> typeArgs);
 
 }

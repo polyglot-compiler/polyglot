@@ -30,11 +30,10 @@ import polyglot.types.LocalInstance;
 /** 
  * A local variable expression.
  */
-public interface Local extends NamedVariable
-{
+public interface Local extends NamedVariable {
     /** Get the name of the local variable. */
     Id id();
-    
+
     /** Set the name of the local variable. */
     Local id(Id name);
 
@@ -50,6 +49,7 @@ public interface Local extends NamedVariable
      * after type checking.
      */
     LocalInstance localInstance();
+
     /** Set the type object for the local. */
     Local localInstance(LocalInstance li);
 }

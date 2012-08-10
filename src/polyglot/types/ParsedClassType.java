@@ -35,15 +35,14 @@ import polyglot.util.Position;
  * A <code>ParsedClassType</code> represents a class loaded from a source file.
  * <code>ParsedClassType</code>s are mutable.
  */
-public interface ParsedClassType extends ClassType, ParsedTypeObject
-{
+public interface ParsedClassType extends ClassType, ParsedTypeObject {
     void setJob(Job job);
-    
+
     /**
      * Position of the type's declaration.
      */
     void position(Position pos);
-    
+
     /**
      * The <code>Source</code> that this class type
      * was loaded from. Should be <code>null</code> if it was not loaded from
@@ -70,7 +69,7 @@ public interface ParsedClassType extends ClassType, ParsedTypeObject
      * Set the class's interfaces.
      */
     void setInterfaces(List<? extends ReferenceType> l);
-    
+
     /**
      * Add a field to the class.
      */
@@ -80,7 +79,7 @@ public interface ParsedClassType extends ClassType, ParsedTypeObject
      * Set the class's fields.
      */
     void setFields(List<? extends FieldInstance> l);
-    
+
     /**
      * Add a method to the class.
      */
@@ -100,7 +99,7 @@ public interface ParsedClassType extends ClassType, ParsedTypeObject
      * Set the class's constructors.
      */
     void setConstructors(List<? extends ConstructorInstance> l);
-    
+
     /**
      * Add a member class to the class.
      */
@@ -136,17 +135,24 @@ public interface ParsedClassType extends ClassType, ParsedTypeObject
      * Set whether the class was declared in a static context.
      */
     void inStaticContext(boolean inStaticContext);
-    
+
     boolean defaultConstructorNeeded();
-    
+
     boolean membersAdded();
+
     boolean supertypesResolved();
+
     boolean signaturesResolved();
+
     int numSignaturesUnresolved();
+
     void setMembersAdded(boolean flag);
+
     void setSupertypesResolved(boolean flag);
+
     void setSignaturesResolved(boolean flag);
-    
+
     boolean needSerialization();
+
     void needSerialization(boolean b);
 }

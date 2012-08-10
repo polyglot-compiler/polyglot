@@ -41,7 +41,7 @@ public class TableResolver implements TopLevelResolver {
      * Create a resolver.
      */
     public TableResolver() {
-	this.table = new HashMap<String, Named>();
+        this.table = new HashMap<String, Named>();
     }
 
     /**
@@ -59,8 +59,8 @@ public class TableResolver implements TopLevelResolver {
             throw new InternalCompilerError("Bad insertion into TableResolver");
         }
         if (Report.should_report(TOPICS, 3))
-	    Report.report(3, "TableCR.addNamed(" + name + ", " + type + ")");
-	table.put(name, type);
+            Report.report(3, "TableCR.addNamed(" + name + ", " + type + ")");
+        table.put(name, type);
     }
 
     @Override
@@ -69,14 +69,16 @@ public class TableResolver implements TopLevelResolver {
         for (Named type : table.values()) {
             if (type instanceof Importable) {
                 Importable im = (Importable) type;
-                if (im.package_() != null &&
-                    (im.package_().fullName().equals(name) ||
-                     im.package_().fullName().startsWith(name + "."))) {
+                if (im.package_() != null
+                        && (im.package_().fullName().equals(name) || im.package_()
+                                                                       .fullName()
+                                                                       .startsWith(name
+                                                                               + "."))) {
                     return true;
                 }
             }
         }
-      
+
         return false;
     }
 
@@ -86,22 +88,22 @@ public class TableResolver implements TopLevelResolver {
     @Override
     public Named find(String name) throws SemanticException {
         if (Report.should_report(TOPICS, 3))
-	    Report.report(3, "TableCR.find(" + name + ")");
+            Report.report(3, "TableCR.find(" + name + ")");
 
-	Named n = table.get(name);
+        Named n = table.get(name);
 
-	if (n != null) {
-	    return n;
-	}
+        if (n != null) {
+            return n;
+        }
 
-	throw new NoClassException(name);
+        throw new NoClassException(name);
     }
 
     @Override
     public String toString() {
         return "(table " + table + ")";
     }
-    
-    private static final Collection<String> TOPICS = 
-                CollectionUtil.list(Report.types, Report.resolver);
+
+    private static final Collection<String> TOPICS =
+            CollectionUtil.list(Report.types, Report.resolver);
 }

@@ -31,20 +31,20 @@ import polyglot.util.Position;
  * A <code>InitializerInstance</code> contains the type information for a
  * static or anonymous initializer.
  */
-public class InitializerInstance_c extends TypeObject_c
-                                implements InitializerInstance
-{
+public class InitializerInstance_c extends TypeObject_c implements
+        InitializerInstance {
     protected ClassType container;
     protected Flags flags;
 
     /** Used for deserializing types. */
-    protected InitializerInstance_c() { }
+    protected InitializerInstance_c() {
+    }
 
     public InitializerInstance_c(TypeSystem ts, Position pos,
-				 ClassType container, Flags flags) {
+            ClassType container, Flags flags) {
         super(ts, pos);
-	this.container = container;
-	this.flags = flags;
+        this.container = container;
+        this.flags = flags;
     }
 
     @Override
@@ -61,7 +61,7 @@ public class InitializerInstance_c extends TypeObject_c
         }
         return this;
     }
-    
+
     @Override
     public void setContainer(ReferenceType container) {
         this.container = (ClassType) container;
@@ -88,7 +88,7 @@ public class InitializerInstance_c extends TypeObject_c
     public void setContainer(ClassType container) {
         this.container = container;
     }
-    
+
     /**
      * @param flags The flags to set.
      */
@@ -96,7 +96,7 @@ public class InitializerInstance_c extends TypeObject_c
     public void setFlags(Flags flags) {
         this.flags = flags;
     }
-    
+
     @Override
     public int hashCode() {
         return container.hashCode() + flags.hashCode();
@@ -105,11 +105,12 @@ public class InitializerInstance_c extends TypeObject_c
     @Override
     public boolean equalsImpl(TypeObject o) {
         if (o instanceof InitializerInstance) {
-	    InitializerInstance i = (InitializerInstance) o;
-	    return flags.equals(i.flags()) && ts.equals(container, i.container());
-	}
+            InitializerInstance i = (InitializerInstance) o;
+            return flags.equals(i.flags())
+                    && ts.equals(container, i.container());
+        }
 
-	return false;
+        return false;
     }
 
     @Override
@@ -119,6 +120,6 @@ public class InitializerInstance_c extends TypeObject_c
 
     @Override
     public boolean isCanonical() {
-	return true;
+        return true;
     }
 }

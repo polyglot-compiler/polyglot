@@ -29,8 +29,7 @@ import coffer.types.KeySet;
 /**
  * Implementation of an ambiguous key set AST node.
  */
-public class AmbKeySetNode_c extends Node_c implements AmbKeySetNode
-{
+public class AmbKeySetNode_c extends Node_c implements AmbKeySetNode {
     protected List<KeyNode> keys;
     protected KeySet keySet;
 
@@ -57,7 +56,7 @@ public class AmbKeySetNode_c extends Node_c implements AmbKeySetNode
     }
 
     public AmbKeySetNode_c reconstruct(List<KeyNode> keys) {
-        if (! CollectionUtil.equals(this.keys, keys)) {
+        if (!CollectionUtil.equals(this.keys, keys)) {
             AmbKeySetNode_c n = (AmbKeySetNode_c) copy();
             n.keys = new ArrayList<KeyNode>(keys);
             return n;
@@ -87,7 +86,7 @@ public class AmbKeySetNode_c extends Node_c implements AmbKeySetNode
         n.keySet = s;
         return n;
     }
-        
+
     @Override
     public Node disambiguate(AmbiguityRemover sc) throws SemanticException {
         CofferTypeSystem ts = (CofferTypeSystem) sc.typeSystem();
@@ -96,7 +95,7 @@ public class AmbKeySetNode_c extends Node_c implements AmbKeySetNode
         KeySet s = ts.emptyKeySet(position());
 
         for (KeyNode key : keys) {
-            if (! key.key().isCanonical()) {
+            if (!key.key().isCanonical()) {
                 return this;
             }
             s = s.add(key.key());
@@ -111,7 +110,7 @@ public class AmbKeySetNode_c extends Node_c implements AmbKeySetNode
 
         w.begin(0);
 
-        for (Iterator<KeyNode> i = keys.iterator(); i.hasNext(); ) {
+        for (Iterator<KeyNode> i = keys.iterator(); i.hasNext();) {
             KeyNode key = i.next();
             print(key, w, tr);
             if (i.hasNext()) {
@@ -127,8 +126,9 @@ public class AmbKeySetNode_c extends Node_c implements AmbKeySetNode
 
     @Override
     public void translate(CodeWriter w, Translator tr) {
-	throw new InternalCompilerError(position(),
-	    "Cannot translate ambiguous key set " + this + ".");
+        throw new InternalCompilerError(position(),
+                                        "Cannot translate ambiguous key set "
+                                                + this + ".");
     }
 
     @Override
@@ -146,7 +146,7 @@ public class AmbKeySetNode_c extends Node_c implements AmbKeySetNode
         }
 
         s += "]";
-        
+
         return s;
     }
 }

@@ -49,16 +49,15 @@ import polyglot.util.InternalCompilerError;
  * 
  * @see polyglot.ast.AbstractExtFactory_c has a very similar structure. 
  */
-public abstract class AbstractDelFactory_c implements DelFactory
-{
+public abstract class AbstractDelFactory_c implements DelFactory {
     protected AbstractDelFactory_c() {
         this(null);
     }
-    
+
     protected AbstractDelFactory_c(DelFactory nextDelFactory) {
         this.nextDelFactory = nextDelFactory;
     }
-    
+
     /**
      * The next delFactory in the chain. Whenever an extension is instantiated,
      * the next delFactory should be called to see if it also has an extension,
@@ -70,6 +69,7 @@ public abstract class AbstractDelFactory_c implements DelFactory
     public DelFactory nextDelFactory() {
         return nextDelFactory;
     }
+
     /**
      * Compose two delegates together. Order is important: e1 gets added
      * at the end of e2's chain.
@@ -80,13 +80,13 @@ public abstract class AbstractDelFactory_c implements DelFactory
      * @return the result of adding e1 to the end of e2's chain of delegates.
      */
     protected JL composeDels(JL e1, JL e2) {
-        if (e1 == null) return e2;        
-        if (e2 == null) return e1;        
+        if (e1 == null) return e2;
+        if (e2 == null) return e1;
         throw new InternalCompilerError("Composition of delegates unimplemented.");
         // add e1 as e2's last extension, by recursing...
         //return e2.ext(composeDels(e1, e2.ext()));
     }
-    
+
     // ******************************************
     // Final methods that call the Impl methods to construct 
     // extensions, and then check with nextDelFactory to see if it
@@ -96,7 +96,7 @@ public abstract class AbstractDelFactory_c implements DelFactory
     @Override
     public final JL delId() {
         JL e = delIdImpl();
-        
+
         if (nextDelFactory != null) {
             JL e2 = nextDelFactory.delId();
             e = composeDels(e, e2);
@@ -426,14 +426,14 @@ public abstract class AbstractDelFactory_c implements DelFactory
     @Override
     public final JL delCompoundStmt() {
         JL e = delCompoundStmtImpl();
-        
+
         if (nextDelFactory != null) {
             JL e2 = nextDelFactory.delCompoundStmt();
             e = composeDels(e, e2);
         }
         return postDelCompoundStmt(e);
     }
-    
+
     @Override
     public final JL delConditional() {
         JL e = delConditionalImpl();
@@ -965,7 +965,7 @@ public abstract class AbstractDelFactory_c implements DelFactory
     // ********************************************
     // Impl methods
     // ********************************************
-    
+
     /**
      * Create the delegate for a <code>Name</code> AST node.
      * @return the delegate for a <code>Name</code> AST node.
@@ -973,7 +973,7 @@ public abstract class AbstractDelFactory_c implements DelFactory
     protected JL delIdImpl() {
         return delNodeImpl();
     }
-    
+
     /**
      * Create the delegate for a <code>AmbAssign</code> AST node.
      * @return the delegate for a <code>AmbAssign</code> AST node.
@@ -1085,6 +1085,7 @@ public abstract class AbstractDelFactory_c implements DelFactory
     protected JL delArrayAccessAssignImpl() {
         return delAssignImpl();
     }
+
     protected JL delBinaryImpl() {
         return delExprImpl();
     }
@@ -1720,7 +1721,7 @@ public abstract class AbstractDelFactory_c implements DelFactory
     protected JL postDelCompoundStmt(JL del) {
         return postDelStmt(del);
     }
-    
+
     protected JL postDelConditional(JL del) {
         return postDelExpr(del);
     }

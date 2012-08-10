@@ -25,72 +25,114 @@
 
 package polyglot.types;
 
-
 /**
  * An <code>PrimitiveType_c</code> represents a primitive type.
  */
-public class PrimitiveType_c extends Type_c implements PrimitiveType
-{
+public class PrimitiveType_c extends Type_c implements PrimitiveType {
     protected Kind kind;
 
     /** Used for deserializing types. */
-    protected PrimitiveType_c() { }
+    protected PrimitiveType_c() {
+    }
 
     public PrimitiveType_c(TypeSystem ts, Kind kind) {
-            super(ts);
-            this.kind = kind;
+        super(ts);
+        this.kind = kind;
     }
 
     @Override
     public Kind kind() {
-            return kind;
+        return kind;
     }
 
     @Override
     public String toString() {
-            return kind.toString();
+        return kind.toString();
     }
 
     @Override
     public String translate(Resolver c) {
-            return kind.toString();
+        return kind.toString();
     }
 
     @Override
-    public boolean isCanonical() { return true; }
-    @Override
-    public boolean isPrimitive() { return true; }
-    @Override
-    public PrimitiveType toPrimitive() { return this; }
+    public boolean isCanonical() {
+        return true;
+    }
 
     @Override
-    public boolean isVoid() { return kind == VOID; }
+    public boolean isPrimitive() {
+        return true;
+    }
+
     @Override
-    public boolean isBoolean() { return kind == BOOLEAN; }
+    public PrimitiveType toPrimitive() {
+        return this;
+    }
+
     @Override
-    public boolean isChar() { return kind == CHAR; }
+    public boolean isVoid() {
+        return kind == VOID;
+    }
+
     @Override
-    public boolean isByte() { return kind == BYTE; }
+    public boolean isBoolean() {
+        return kind == BOOLEAN;
+    }
+
     @Override
-    public boolean isShort() { return kind == SHORT; }
+    public boolean isChar() {
+        return kind == CHAR;
+    }
+
     @Override
-    public boolean isInt() { return kind == INT; }
+    public boolean isByte() {
+        return kind == BYTE;
+    }
+
     @Override
-    public boolean isLong() { return kind == LONG; }
+    public boolean isShort() {
+        return kind == SHORT;
+    }
+
     @Override
-    public boolean isFloat() { return kind == FLOAT; }
+    public boolean isInt() {
+        return kind == INT;
+    }
+
     @Override
-    public boolean isDouble() { return kind == DOUBLE; }
+    public boolean isLong() {
+        return kind == LONG;
+    }
+
     @Override
-    public boolean isIntOrLess() { return kind == CHAR || kind == BYTE || kind == SHORT || kind == INT; }
+    public boolean isFloat() {
+        return kind == FLOAT;
+    }
+
     @Override
-    public boolean isLongOrLess() { return isIntOrLess() || kind == LONG; }
+    public boolean isDouble() {
+        return kind == DOUBLE;
+    }
+
     @Override
-    public boolean isNumeric() { return isLongOrLess() || kind == FLOAT || kind == DOUBLE; }
+    public boolean isIntOrLess() {
+        return kind == CHAR || kind == BYTE || kind == SHORT || kind == INT;
+    }
+
+    @Override
+    public boolean isLongOrLess() {
+        return isIntOrLess() || kind == LONG;
+    }
+
+    @Override
+    public boolean isNumeric() {
+        return isLongOrLess() || kind == FLOAT || kind == DOUBLE;
+    }
 
     @Override
     public int hashCode() {
-            return kind.hashCode();
+        return kind.hashCode();
     }
 
     @Override
@@ -109,17 +151,17 @@ public class PrimitiveType_c extends Type_c implements PrimitiveType
 
     @Override
     public String wrapperTypeString(TypeSystem ts) {
-            return ts.wrapperTypeString(this);
+        return ts.wrapperTypeString(this);
     }
-    
+
     @Override
     public String name() {
-            return kind.toString();	
+        return kind.toString();
     }
-    
+
     @Override
     public String fullName() {
-            return name();
+        return name();
     }
 
     @Override
@@ -129,7 +171,7 @@ public class PrimitiveType_c extends Type_c implements PrimitiveType
 
     @Override
     public boolean isImplicitCastValidImpl(Type toType) {
-        if (! toType.isPrimitive()) return false;
+        if (!toType.isPrimitive()) return false;
 
         PrimitiveType t = toType.toPrimitive();
         PrimitiveType f = this;
@@ -142,7 +184,7 @@ public class PrimitiveType_c extends Type_c implements PrimitiveType
         if (t.isBoolean()) return f.isBoolean();
         if (f.isBoolean()) return false;
 
-        if (! f.isNumeric() || ! t.isNumeric()) return false;
+        if (!f.isNumeric() || !t.isNumeric()) return false;
 
         if (t.isDouble()) return true;
         if (f.isDouble()) return false;
@@ -176,9 +218,9 @@ public class PrimitiveType_c extends Type_c implements PrimitiveType
      **/
     @Override
     public boolean isCastValidImpl(Type toType) {
-	if (isVoid() || toType.isVoid()) return false;
+        if (isVoid() || toType.isVoid()) return false;
         if (ts.typeEquals(this, toType)) return true;
-	if (isNumeric() && toType.isNumeric()) return true;
+        if (isNumeric() && toType.isNumeric()) return true;
         return false;
     }
 
@@ -198,10 +240,8 @@ public class PrimitiveType_c extends Type_c implements PrimitiveType
      */
     @Override
     public boolean numericConversionValidImpl(Object value) {
-        if (value == null)
-            return false;
-        if (value instanceof Float || value instanceof Double)
-            return false;
+        if (value == null) return false;
+        if (value instanceof Float || value instanceof Double) return false;
 
         long v;
 
@@ -215,16 +255,12 @@ public class PrimitiveType_c extends Type_c implements PrimitiveType
             return false;
         }
 
-        if (isLong())
-            return true;
-        if (isInt())
-            return Integer.MIN_VALUE <= v && v <= Integer.MAX_VALUE;
+        if (isLong()) return true;
+        if (isInt()) return Integer.MIN_VALUE <= v && v <= Integer.MAX_VALUE;
         if (isChar())
             return Character.MIN_VALUE <= v && v <= Character.MAX_VALUE;
-        if (isShort())
-            return Short.MIN_VALUE <= v && v <= Short.MAX_VALUE;
-        if (isByte())
-            return Byte.MIN_VALUE <= v && v <= Byte.MAX_VALUE;
+        if (isShort()) return Short.MIN_VALUE <= v && v <= Short.MAX_VALUE;
+        if (isByte()) return Byte.MIN_VALUE <= v && v <= Byte.MAX_VALUE;
 
         return false;
     }

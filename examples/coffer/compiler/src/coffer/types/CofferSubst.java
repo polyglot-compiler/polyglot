@@ -11,15 +11,17 @@ import java.util.List;
 
 import polyglot.ext.param.types.Subst;
 
-public interface CofferSubst extends Subst<Key, Key>
-{
+public interface CofferSubst extends Subst<Key, Key> {
     public Key substKey(Key key);
+
     public KeySet substKeySet(KeySet key);
+
     public ThrowConstraint substThrowConstraint(ThrowConstraint c);
 
     public List<ThrowConstraint> substThrowConstraintList(
             List<ThrowConstraint> l);
 
     public Key get(Key formal);
+
     public void put(Key formal, Key actual);
 }

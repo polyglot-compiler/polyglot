@@ -15,22 +15,22 @@ public class JL5ClassBody_c extends ClassBody_c {
     public JL5ClassBody_c(Position pos, List<ClassMember> members) {
         super(pos, members);
     }
-    
+
     @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
         // check if we have any EnumConstantDecl
-        List<EnumConstantDecl> ecds = enumConstantDecls(); 
+        List<EnumConstantDecl> ecds = enumConstantDecls();
         if (ecds.isEmpty()) {
             super.prettyPrint(w, tr);
             return;
         }
-        
+
         if (!members.isEmpty()) {
             w.newline(4);
             w.begin(0);
             ClassMember prev = null;
 
-            for (Iterator<EnumConstantDecl> i = ecds.iterator(); i.hasNext(); ) {
+            for (Iterator<EnumConstantDecl> i = ecds.iterator(); i.hasNext();) {
                 EnumConstantDecl ecd = i.next();
                 prev = ecd;
                 print(ecd, w, tr);
@@ -38,18 +38,18 @@ public class JL5ClassBody_c extends ClassBody_c {
                 w.allowBreak(1);
             }
             if (!ecds.isEmpty()) {
-                w.newline(0);                
+                w.newline(0);
             }
-            
-            for (Iterator<ClassMember> i = members.iterator(); i.hasNext(); ) {
+
+            for (Iterator<ClassMember> i = members.iterator(); i.hasNext();) {
                 ClassMember member = i.next();
                 if (member instanceof EnumConstantDecl) {
                     // already printed it
                     continue;
                 }
 
-                if ((member instanceof polyglot.ast.CodeDecl) ||
-                        (prev instanceof polyglot.ast.CodeDecl)) {
+                if ((member instanceof polyglot.ast.CodeDecl)
+                        || (prev instanceof polyglot.ast.CodeDecl)) {
                     w.newline(0);
                 }
                 prev = member;
@@ -68,11 +68,10 @@ public class JL5ClassBody_c extends ClassBody_c {
         List<EnumConstantDecl> ecds = new ArrayList<EnumConstantDecl>();
         for (ClassMember m : this.members) {
             if (m instanceof EnumConstantDecl) {
-                ecds.add((EnumConstantDecl)m);
+                ecds.add((EnumConstantDecl) m);
             }
         }
         return ecds;
     }
-
 
 }

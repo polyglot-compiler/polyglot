@@ -41,8 +41,7 @@ import polyglot.visit.NodeVisitor;
  * of the node should copy the node, set the field in the copy, and then
  * return the copy.
  */
-public interface Node extends JL, Copy, Serializable
-{
+public interface Node extends JL, Copy, Serializable {
     /**
      * Set the delegate of the node.
      */
@@ -81,23 +80,24 @@ public interface Node extends JL, Copy, Serializable
 
     /** Create a copy of the node with a new position. */
     Node position(Position position);
-    
+
     /** Return true if there an error in this node or its children. */
     boolean error();
+
     Node error(boolean flag);
-    
+
     /**
      * @return true if the all type information for the node (but not necessarily
      * for the node's children) is unambiguous.
      */
     boolean isDisambiguated();
-    
+
     /**
      * @return true if all the type information for the node (but not necessarily
      * for the node's children) has been computed.
      */
     boolean isTypeChecked();
-    
+
     /**
      * Visit the node.  This method is equivalent to
      * <code>visitEdge(null, v)</code>.
@@ -159,7 +159,6 @@ public interface Node extends JL, Copy, Serializable
      */
     Type childExpectedType(Expr child, AscriptionVisitor av);
 
-    
     /**
      * Dump the AST node for debugging purposes.
      */

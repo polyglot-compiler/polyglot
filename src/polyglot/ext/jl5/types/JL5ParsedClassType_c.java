@@ -20,36 +20,38 @@ import polyglot.util.InternalCompilerError;
 import polyglot.util.ListUtil;
 
 @SuppressWarnings("serial")
-public class JL5ParsedClassType_c extends ParsedClassType_c implements JL5ParsedClassType {
+public class JL5ParsedClassType_c extends ParsedClassType_c implements
+        JL5ParsedClassType {
     protected PClass<TypeVariable, ReferenceType> pclass;
     protected List<TypeVariable> typeVars = Collections.emptyList();
     protected List<EnumInstance> enumConstants;
     protected List<AnnotationTypeElemInstance> annotationElems;
     protected RetainedAnnotations retainedAnnotations;
 
-    public JL5ParsedClassType_c( TypeSystem ts, LazyClassInitializer init, Source fromSource){
+    public JL5ParsedClassType_c(TypeSystem ts, LazyClassInitializer init,
+            Source fromSource) {
         super(ts, init, fromSource);
         annotationElems = new LinkedList<AnnotationTypeElemInstance>();
     }
 
     @Override
-    public void addEnumConstant(EnumInstance ei){
+    public void addEnumConstant(EnumInstance ei) {
         addField(ei);
         enumConstants().add(ei);
     }
 
     @Override
-    public List<EnumInstance> enumConstants(){
-        if (enumConstants == null){
+    public List<EnumInstance> enumConstants() {
+        if (enumConstants == null) {
             enumConstants = new LinkedList<EnumInstance>();
         }
         return enumConstants;
     }
 
     @Override
-    public EnumInstance enumConstantNamed(String name){
+    public EnumInstance enumConstantNamed(String name) {
         for (EnumInstance ei : enumConstants()) {
-            if (ei.name().equals(name)){
+            if (ei.name().equals(name)) {
                 return ei;
             }
         }
@@ -59,7 +61,7 @@ public class JL5ParsedClassType_c extends ParsedClassType_c implements JL5Parsed
     @Override
     public AnnotationTypeElemInstance annotationElemNamed(String name) {
         for (AnnotationTypeElemInstance ai : annotationElems()) {
-            if (ai.name().equals(name)){
+            if (ai.name().equals(name)) {
                 return ai;
             }
         }
@@ -67,7 +69,7 @@ public class JL5ParsedClassType_c extends ParsedClassType_c implements JL5Parsed
     }
 
     @Override
-    public void addAnnotationElem(AnnotationTypeElemInstance ai){
+    public void addAnnotationElem(AnnotationTypeElemInstance ai) {
         addMethod(ai);
         annotationElems.add(ai);
     }
@@ -78,7 +80,6 @@ public class JL5ParsedClassType_c extends ParsedClassType_c implements JL5Parsed
         ((JL5LazyClassInitializer) init).initAnnotationElems();
         return Collections.unmodifiableList(annotationElems);
     }
-
 
     // find methods with compatible name and formals as the given one
     @Override
@@ -96,7 +97,8 @@ public class JL5ParsedClassType_c extends ParsedClassType_c implements JL5Parsed
     @Override
     public List<JL5MethodInstance> methodsNamed(String name) {
         @SuppressWarnings("unchecked")
-        List<JL5MethodInstance> result = (List<JL5MethodInstance>) super.methodsNamed(name);
+        List<JL5MethodInstance> result =
+                (List<JL5MethodInstance>) super.methodsNamed(name);
         return result;
     }
 
@@ -104,8 +106,8 @@ public class JL5ParsedClassType_c extends ParsedClassType_c implements JL5Parsed
     public ClassType outer() {
         if (this.isMember() && !this.isInnerClass()) {
             if (!(super.outer() instanceof RawClass)) {
-                JL5TypeSystem ts = (JL5TypeSystem)this.typeSystem();
-                return (ClassType)ts.erasureType(super.outer());
+                JL5TypeSystem ts = (JL5TypeSystem) this.typeSystem();
+                return (ClassType) ts.erasureType(super.outer());
             }
         }
         return super.outer();
@@ -118,15 +120,14 @@ public class JL5ParsedClassType_c extends ParsedClassType_c implements JL5Parsed
         }
         // try it with the stripped out outer...
         if (outer() != null && super.outer() != this.outer()) {
-            return super.outer().equals(maybe_outer) ||
-                    super.outer().isEnclosed(maybe_outer);
+            return super.outer().equals(maybe_outer)
+                    || super.outer().isEnclosed(maybe_outer);
         }
         return false;
     }
 
-
     @Override
-    public boolean isCastValidImpl(Type toType){
+    public boolean isCastValidImpl(Type toType) {
         if (super.isCastValidImpl(toType)) {
             return true;
         }
@@ -134,13 +135,13 @@ public class JL5ParsedClassType_c extends ParsedClassType_c implements JL5Parsed
     }
 
     @Override
-    public boolean isImplicitCastValidImpl(Type toType){
+    public boolean isImplicitCastValidImpl(Type toType) {
         throw new InternalCompilerError("Should not be called in JL5");
     }
 
     @Override
     public LinkedList<Type> isImplicitCastValidChainImpl(Type toType) {
-        JL5TypeSystem ts = (JL5TypeSystem)this.ts;
+        JL5TypeSystem ts = (JL5TypeSystem) this.ts;
         LinkedList<Type> chain = null;
         if (ts.isSubtype(this, toType)) {
             chain = new LinkedList<Type>();
@@ -150,7 +151,9 @@ public class JL5ParsedClassType_c extends ParsedClassType_c implements JL5Parsed
         else if (toType.isPrimitive()) {
             // see if unboxing will let us cast to the primitive
             if (ts.primitiveTypeOfWrapper(this) != null) {
-                chain = ts.isImplicitCastValidChain(ts.primitiveTypeOfWrapper(this), toType);
+                chain =
+                        ts.isImplicitCastValidChain(ts.primitiveTypeOfWrapper(this),
+                                                    toType);
                 if (chain != null) {
                     chain.addFirst(this);
                 }
@@ -180,6 +183,7 @@ public class JL5ParsedClassType_c extends ParsedClassType_c implements JL5Parsed
             this.typeVars = ListUtil.copy(typeVars, true);
         }
     }
+
     @Override
     public List<TypeVariable> typeVariables() {
         return this.typeVars;
@@ -191,7 +195,6 @@ public class JL5ParsedClassType_c extends ParsedClassType_c implements JL5Parsed
         return ts.erasureSubst(this);
     }
 
-
     /** Pretty-print the name of this class to w. */
     @Override
     public void print(CodeWriter w) {
@@ -201,7 +204,7 @@ public class JL5ParsedClassType_c extends ParsedClassType_c implements JL5Parsed
             return;
         }
         w.write("<");
-        Iterator<TypeVariable> it =  this.typeVars.iterator();
+        Iterator<TypeVariable> it = this.typeVars.iterator();
         while (it.hasNext()) {
             TypeVariable act = it.next();
             w.write(act.name());
@@ -223,7 +226,6 @@ public class JL5ParsedClassType_c extends ParsedClassType_c implements JL5Parsed
         return super.toString();
     }
 
-
     @Override
     public String toString() {
         if (this.typeVars == null || this.typeVars.isEmpty()) {
@@ -231,7 +233,7 @@ public class JL5ParsedClassType_c extends ParsedClassType_c implements JL5Parsed
         }
         StringBuffer sb = new StringBuffer(super.toString());
         sb.append('<');
-        Iterator<TypeVariable> it =  this.typeVars.iterator();
+        Iterator<TypeVariable> it = this.typeVars.iterator();
         while (it.hasNext()) {
             TypeVariable act = it.next();
             sb.append(act);
@@ -247,6 +249,7 @@ public class JL5ParsedClassType_c extends ParsedClassType_c implements JL5Parsed
     public boolean isRawClass() {
         return false;
     }
+
     @Override
     public String translateAsReceiver(Resolver c) {
         return super.translate(c);
@@ -278,7 +281,7 @@ public class JL5ParsedClassType_c extends ParsedClassType_c implements JL5Parsed
         }
         if (!this.typeVariables().isEmpty()) {
             // check for raw class
-            JL5TypeSystem ts = (JL5TypeSystem)this.ts;
+            JL5TypeSystem ts = (JL5TypeSystem) this.ts;
             Type rawClass = ts.rawClass(this, this.position);
             if (ts.isSubtype(rawClass, ancestor)) {
                 return true;

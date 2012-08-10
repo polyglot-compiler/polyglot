@@ -33,22 +33,22 @@ import polyglot.util.CollectionUtil;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
 
-
 public class LubType_c extends ClassType_c implements LubType {
 
     protected List<ReferenceType> lubElems;
+
     public LubType_c(TypeSystem ts, Position pos, List<ReferenceType> lubElems) {
-        super(ts, pos);  
+        super(ts, pos);
         // replace any raw classes with the erased version of the raw class.
         List<ReferenceType> l = null;
         for (int i = 0; i < lubElems.size(); i++) {
             ReferenceType t = lubElems.get(i);
             if (t instanceof RawClass) {
-                t = ((RawClass)t).erased();
-               if (l == null) {
-                   l = new ArrayList<ReferenceType>(lubElems);                   
-               }
-               l.set(i, t);
+                t = ((RawClass) t).erased();
+                if (l == null) {
+                    l = new ArrayList<ReferenceType>(lubElems);
+                }
+                l.set(i, t);
             }
         }
         if (l == null) {
@@ -61,8 +61,9 @@ public class LubType_c extends ClassType_c implements LubType {
     public List<ReferenceType> lubElements() {
         return lubElems;
     }
-    
+
     protected Type lubCalculated = null;
+
     @Override
     public Type calculateLub() {
         if (lubCalculated == null) {
@@ -70,7 +71,7 @@ public class LubType_c extends ClassType_c implements LubType {
         }
         return lubCalculated;
     }
-    
+
 //    @Override
 //    public List<ReferenceType> bounds() {
 //        return calculateLub().bounds();
@@ -81,10 +82,9 @@ public class LubType_c extends ClassType_c implements LubType {
         return LUB;
     }
 
-    
     private ReferenceType lub(Type... a) {
         List<ReferenceType> l = new ArrayList<ReferenceType>();
-        JL5TypeSystem ts = (JL5TypeSystem)this.ts;
+        JL5TypeSystem ts = (JL5TypeSystem) this.ts;
         for (Type t : a) {
             l.add((ReferenceType) t);
         }
@@ -92,11 +92,12 @@ public class LubType_c extends ClassType_c implements LubType {
     }
 
     private Type lub_force() {
-        JL5TypeSystem ts = (JL5TypeSystem)this.ts;
+        JL5TypeSystem ts = (JL5TypeSystem) this.ts;
         Set<Type> st = new LinkedHashSet<Type>();
         Set<Type> est = null;
         for (Type u : lubElems) {
-            List<Type> u_supers = new ArrayList<Type>(ts.allAncestorsOf((ReferenceType) u));
+            List<Type> u_supers =
+                    new ArrayList<Type>(ts.allAncestorsOf((ReferenceType) u));
             st.addAll(u_supers);
             Set<Type> est_of_u = new LinkedHashSet<Type>();
             for (Type super_of_u : u_supers) {
@@ -117,7 +118,7 @@ public class LubType_c extends ClassType_c implements LubType {
         Set<Type> mec = new LinkedHashSet<Type>(est);
         for (Type e1 : est) {
             for (Type e2 : est) {
-                if (!ts.equals(e1,e2) && ts.isSubtype(e2, e1)) {
+                if (!ts.equals(e1, e2) && ts.isSubtype(e2, e1)) {
                     mec.remove(e1);
                     break;
                 }
@@ -127,8 +128,9 @@ public class LubType_c extends ClassType_c implements LubType {
         for (Type m : mec) {
             List<Type> inv = new ArrayList<Type>();
             for (Type t : st) {
-                if (ts.equals(m, t) || 
-                    ((t instanceof JL5SubstClassType) && ((JL5SubstClassType)t).base().equals(m) ) ) {
+                if (ts.equals(m, t)
+                        || ((t instanceof JL5SubstClassType) && ((JL5SubstClassType) t).base()
+                                                                                       .equals(m))) {
                     inv.add(t);
                 }
             }
@@ -138,15 +140,17 @@ public class LubType_c extends ClassType_c implements LubType {
             if (ts.checkIntersectionBounds(cand, true)) {
                 return ts.intersectionType(this.position, cand);
             }
-        } catch (SemanticException e) {
+        }
+        catch (SemanticException e) {
         }
         return ts.Object();
     }
 
     private Type lci(List<Type> inv) {
-        JL5TypeSystem ts = (JL5TypeSystem)this.ts;
+        JL5TypeSystem ts = (JL5TypeSystem) this.ts;
         Type first = inv.get(0);
-        if (inv.size() == 1 || first instanceof RawClass || first instanceof JL5ParsedClassType) {
+        if (inv.size() == 1 || first instanceof RawClass
+                || first instanceof JL5ParsedClassType) {
             return first;
         }
         JL5SubstClassType res = (JL5SubstClassType) first;
@@ -160,27 +164,34 @@ public class LubType_c extends ClassType_c implements LubType {
             for (int argi = 0; argi < res.actuals().size(); argi++) {
                 ReferenceType a1 = res.actuals().get(argi);
                 ReferenceType a2 = nextp.actuals().get(argi);
-                lcta_args.add(lcta(a1,a2));
+                lcta_args.add(lcta(a1, a2));
             }
             try {
-                res = (JL5SubstClassType)ts.instantiate(position, res.base(), lcta_args);
+                res =
+                        (JL5SubstClassType) ts.instantiate(position,
+                                                           res.base(),
+                                                           lcta_args);
             }
             catch (SemanticException e) {
-                throw new InternalCompilerError("Unexpected SemanticException", e);
+                throw new InternalCompilerError("Unexpected SemanticException",
+                                                e);
             }
         }
         return res;
     }
 
     private ReferenceType lcta(ReferenceType a1, ReferenceType a2) {
-        JL5TypeSystem ts = (JL5TypeSystem)this.ts;
+        JL5TypeSystem ts = (JL5TypeSystem) this.ts;
         if (a1 instanceof WildCardType) {
             WildCardType a1wc = (WildCardType) a1;
             if (a2 instanceof WildCardType) {
                 WildCardType a2wc = (WildCardType) a2;
                 // a1 and a2 are wild cards
                 if (a1wc.hasLowerBound() && a2wc.hasLowerBound()) {
-                    return ts.wildCardType(position, null, glb(a1wc.lowerBound(), a2wc.lowerBound()));
+                    return ts.wildCardType(position,
+                                           null,
+                                           glb(a1wc.lowerBound(),
+                                               a2wc.lowerBound()));
                 }
                 if (a1wc.hasLowerBound()) {
                     // a1 has lower bound, a2 does not
@@ -201,40 +212,55 @@ public class LubType_c extends ClassType_c implements LubType {
                     }
                 }
                 // neither a1 nor a2 has a lower bound
-                return ts.wildCardType(position, ts.lub(position, CollectionUtil.list(a1wc.upperBound(), a2wc.upperBound())), null);
+                return ts.wildCardType(position,
+                                       ts.lub(position,
+                                              CollectionUtil.list(a1wc.upperBound(),
+                                                                  a2wc.upperBound())),
+                                       null);
             }
             // a1 is a wildcard, a2 is not
             if (a1wc.hasLowerBound()) {
-                return ts.wildCardType(position, null, glb(a1wc.lowerBound(), a2));                
+                return ts.wildCardType(position,
+                                       null,
+                                       glb(a1wc.lowerBound(), a2));
             }
             else {
-                return ts.wildCardType(position, lub(a1wc.upperBound(), a2), null);                                
-            }                              
+                return ts.wildCardType(position,
+                                       lub(a1wc.upperBound(), a2),
+                                       null);
+            }
         }
         // a1 is not a wildcard
         if (a2 instanceof WildCardType) {
             WildCardType a2wc = (WildCardType) a2;
             // a1 is not a wildcard, a2 is a wildcard
             if (a2wc.hasLowerBound()) {
-                return ts.wildCardType(position, null, glb(a1, a2wc.lowerBound()));                
+                return ts.wildCardType(position,
+                                       null,
+                                       glb(a1, a2wc.lowerBound()));
             }
             else {
-                return ts.wildCardType(position, lub(a1, a2wc.upperBound()), null);                                
-            }                              
+                return ts.wildCardType(position,
+                                       lub(a1, a2wc.upperBound()),
+                                       null);
+            }
         }
-        
+
         // neither a1 nor a2 is a wildcard.
         if (ts.equals(a1, a2)) {
             return a1;
         }
         else {
-            return ts.wildCardType(position, ts.lub(position, CollectionUtil.list(a1, a2)), null);
+            return ts.wildCardType(position,
+                                   ts.lub(position, CollectionUtil.list(a1, a2)),
+                                   null);
         }
     }
 
     private ReferenceType glb(Type t1, Type t2) {
-        JL5TypeSystem ts = (JL5TypeSystem)this.ts;
-        List<ReferenceType> l = CollectionUtil.list((ReferenceType) t1, (ReferenceType) t2);
+        JL5TypeSystem ts = (JL5TypeSystem) this.ts;
+        List<ReferenceType> l =
+                CollectionUtil.list((ReferenceType) t1, (ReferenceType) t2);
         try {
             if (!ts.checkIntersectionBounds(l, true)) {
                 return ts.Object();
@@ -242,11 +268,12 @@ public class LubType_c extends ClassType_c implements LubType {
             else {
                 return ts.intersectionType(position, l);
             }
-        } catch (SemanticException e) {
+        }
+        catch (SemanticException e) {
             return ts.Object();
         }
     }
-    
+
     @Override
     public String toString() {
         StringBuffer sb = new StringBuffer("lub(");
@@ -268,7 +295,7 @@ public class LubType_c extends ClassType_c implements LubType {
         for (Type elem : lubElements()) {
             if (!ts.isImplicitCastValid(elem, toType)) return null;
         }
-        
+
         LinkedList<Type> chain = new LinkedList<Type>();
         chain.add(this);
         chain.add(toType);
@@ -310,7 +337,7 @@ public class LubType_c extends ClassType_c implements LubType {
 
     @Override
     public void setFlags(Flags flags) {
-        throw new UnsupportedOperationException();        
+        throw new UnsupportedOperationException();
     }
 
     @Override
@@ -321,7 +348,7 @@ public class LubType_c extends ClassType_c implements LubType {
     @Override
     public Job job() {
         throw new UnsupportedOperationException();
-   }
+    }
 
     @Override
     public polyglot.types.ClassType outer() {

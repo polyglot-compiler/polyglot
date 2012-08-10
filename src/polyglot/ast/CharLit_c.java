@@ -36,31 +36,30 @@ import polyglot.visit.TypeChecker;
  * An <code>CharLit</code> represents a literal in java of
  * <code>char</code> type.
  */
-public class CharLit_c extends NumLit_c implements CharLit
-{
+public class CharLit_c extends NumLit_c implements CharLit {
     public CharLit_c(Position pos, char value) {
-	super(pos, value);
+        super(pos, value);
     }
 
     /** Get the value of the expression. */
     @Override
     public char value() {
-	return (char) longValue();
+        return (char) longValue();
     }
 
     /** Set the value of the expression. */
     @Override
     public CharLit value(char value) {
-	CharLit_c n = (CharLit_c) copy();
-	n.value = value;
-	return n;
+        CharLit_c n = (CharLit_c) copy();
+        n.value = value;
+        return n;
     }
 
     /** Type check the expression. */
     @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
-	return type(tc.typeSystem().Char());
-    }  
+        return type(tc.typeSystem().Char());
+    }
 
     @Override
     public String toString() {
@@ -71,17 +70,18 @@ public class CharLit_c extends NumLit_c implements CharLit
     @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
         w.write("'");
-	w.write(StringUtil.escape((char) value));
+        w.write(StringUtil.escape((char) value));
         w.write("'");
     }
 
     @Override
     public Object constantValue() {
-      return new Character((char) value);
+        return new Character((char) value);
     }
+
     @Override
     public Node copy(NodeFactory nf) {
-        return nf.CharLit(this.position, (char)this.value);
+        return nf.CharLit(this.position, (char) this.value);
     }
 
 }

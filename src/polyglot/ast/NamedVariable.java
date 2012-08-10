@@ -32,8 +32,7 @@ import polyglot.types.VarInstance;
  * An interface representing a variable.  A Variable is any expression
  * that can appear on the left-hand-side of an assignment.
  */
-public interface NamedVariable extends Variable
-{
+public interface NamedVariable extends Variable {
     /** Return the access flags of the variable, or Flags.NONE */
     @Override
     public Flags flags();

@@ -31,8 +31,7 @@ import polyglot.types.Type;
  * <code>Typed</code> represents any node that has a type
  * associated with it.
  */
-public interface Typed
-{
+public interface Typed {
     /**
      * Return the type of this node, or null if no type has been
      * assigned yet.

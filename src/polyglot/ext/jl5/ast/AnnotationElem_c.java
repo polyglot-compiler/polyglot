@@ -38,20 +38,21 @@ public class AnnotationElem_c extends Expr_c implements AnnotationElem {
         this.typeName = typeName;
         this.elements = ListUtil.copy(elements, true);
     }
-    public AnnotationElem_c(Position pos, TypeNode typeName){
+
+    public AnnotationElem_c(Position pos, TypeNode typeName) {
         super(pos);
         this.typeName = typeName;
         this.elements = Collections.emptyList();
     }
 
     @Override
-    public TypeNode typeName(){
+    public TypeNode typeName() {
         return typeName;
     }
 
     @Override
-    public AnnotationElem typeName(TypeNode typeName){
-        if (!typeName.equals(this.typeName)){
+    public AnnotationElem typeName(TypeNode typeName) {
+        if (!typeName.equals(this.typeName)) {
             AnnotationElem_c n = (AnnotationElem_c) copy();
             n.typeName = typeName;
             return n;
@@ -73,8 +74,8 @@ public class AnnotationElem_c extends Expr_c implements AnnotationElem {
     }
 
     @Override
-    public Node visitChildren(NodeVisitor v){
-        TypeNode tn = (TypeNode)visitChild(this.typeName, v);
+    public Node visitChildren(NodeVisitor v) {
+        TypeNode tn = (TypeNode) visitChild(this.typeName, v);
         List<ElementValuePair> elements = visitList(this.elements, v);
 
         return reconstruct(tn, elements);
@@ -83,8 +84,10 @@ public class AnnotationElem_c extends Expr_c implements AnnotationElem {
     @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
         // only make annotation elements out of annotation types
-        if (!typeName.type().isClass() || !JL5Flags.isAnnotation(typeName.type().toClass().flags())) {
-            throw new SemanticException("Annotation: "+typeName+" must be an annotation type, ", position());
+        if (!typeName.type().isClass()
+                || !JL5Flags.isAnnotation(typeName.type().toClass().flags())) {
+            throw new SemanticException("Annotation: " + typeName
+                    + " must be an annotation type, ", position());
 
         }
         return type(typeName.type());
@@ -106,8 +109,7 @@ public class AnnotationElem_c extends Expr_c implements AnnotationElem {
         }
         else {
 
-            for (Iterator<ElementValuePair> it = elements().iterator(); it
-                    .hasNext();) {
+            for (Iterator<ElementValuePair> it = elements().iterator(); it.hasNext();) {
                 print(it.next(), w, pp);
                 if (it.hasNext()) {
                     w.write(", ");
@@ -132,8 +134,8 @@ public class AnnotationElem_c extends Expr_c implements AnnotationElem {
     }
 
     @Override
-    public String toString(){
-        return "Annotation Type: "+typeName();
+    public String toString() {
+        return "Annotation Type: " + typeName();
     }
 
     @Override
@@ -154,8 +156,7 @@ public class AnnotationElem_c extends Expr_c implements AnnotationElem {
     @Override
     public boolean isSingleElementAnnotation() {
         return elements().size() == 1
-                && elements().get(0).name()
-                        .equals("value");
+                && elements().get(0).name().equals("value");
     }
 
     @Override
@@ -178,20 +179,19 @@ public class AnnotationElem_c extends Expr_c implements AnnotationElem {
             for (Expr v : init.elements()) {
                 vals.add(toAnnotationElementValue(v, ts));
             }
-            return ts.AnnotationElementValueArray(value.position(),
-                                                  vals);
+            return ts.AnnotationElementValueArray(value.position(), vals);
         }
         if (value instanceof AnnotationElem) {
             AnnotationElem ae = (AnnotationElem) value;
             ts.AnnotationElementValueAnnotation(value.position(),
                                                 ae.type(),
-                    ae.toAnnotationElementValues(ts));
+                                                ae.toAnnotationElementValues(ts));
         }
         // Otherwise, it should be a constant value.
         ts.checkAnnotationValueConstant(value);
         Object constVal = value.constantValue();
         if (value instanceof ClassLit) {
-            constVal = ((ClassLit)value).typeNode().type();
+            constVal = ((ClassLit) value).typeNode().type();
         }
         return ts.AnnotationElementValueConstant(value.position(),
                                                  value.type(),

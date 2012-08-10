@@ -37,12 +37,11 @@ import polyglot.types.SemanticException;
 import polyglot.types.TypeSystem;
 
 /** Visitor which performs type checking on the AST. */
-public class ConstantChecker extends ContextVisitor
-{
+public class ConstantChecker extends ContextVisitor {
     public ConstantChecker(Job job, TypeSystem ts, NodeFactory nf) {
         super(job, ts, nf);
     }
-    
+
     /*
     protected NodeVisitor enterCall(Node n) throws SemanticException {
         if (Report.should_report(Report.visit, 2))
@@ -56,28 +55,30 @@ public class ConstantChecker extends ContextVisitor
         return v;
     }
     */
-    
+
     protected static class TypeCheckChecker extends NodeVisitor {
         public boolean checked = true;
+
         @Override
-        public Node override(Node n) {   
-            if (! n.isTypeChecked()) {
+        public Node override(Node n) {
+            if (!n.isTypeChecked()) {
                 checked = false;
             }
             return n;
         }
     }
-    
+
     @Override
-    protected Node leaveCall(Node old, Node n, NodeVisitor v) throws SemanticException {
+    protected Node leaveCall(Node old, Node n, NodeVisitor v)
+            throws SemanticException {
         if (Report.should_report(Report.visit, 2))
             Report.report(2, ">> " + this + "::leave " + n);
-        
+
         TypeCheckChecker tcc = new TypeCheckChecker();
-        
+
         if (n instanceof Expr) {
             Expr e = (Expr) n;
-            if (! e.isTypeChecked()) {
+            if (!e.isTypeChecked()) {
                 tcc.checked = false;
             }
         }
@@ -85,9 +86,9 @@ public class ConstantChecker extends ContextVisitor
         if (tcc.checked) {
             n.del().visitChildren(tcc);
         }
-        
+
         Node m = n;
-        
+
         if (tcc.checked) {
             m = m.del().checkConstants((ConstantChecker) v);
         }
@@ -96,10 +97,10 @@ public class ConstantChecker extends ContextVisitor
             Goal g = scheduler.TypeChecked(job());
             throw new MissingDependencyException(g);
         }
-            
+
         if (Report.should_report(Report.visit, 2))
             Report.report(2, "<< " + this + "::leave " + n + " -> " + m);
-        
+
         return m;
-    }   
+    }
 }

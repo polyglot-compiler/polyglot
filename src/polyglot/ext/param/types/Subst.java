@@ -40,8 +40,8 @@ import polyglot.types.TypeObject;
 /**
  * Utility class that performs substitutions on type objects.
  */
-public interface Subst<Formal extends Param, Actual extends TypeObject> extends Serializable
-{
+public interface Subst<Formal extends Param, Actual extends TypeObject> extends
+        Serializable {
     /** Entries of the underlying substitution map.
      * @return An <code>Iterator</code> of <code>Map.Entry</code>.
      */
@@ -75,7 +75,8 @@ public interface Subst<Formal extends Param, Actual extends TypeObject> extends 
     public <T extends MethodInstance> List<T> substMethodList(List<T> list);
 
     /** Perform substitutions on a list of constructors. */
-    public <T extends ConstructorInstance> List<T> substConstructorList(List<T> list);
+    public <T extends ConstructorInstance> List<T> substConstructorList(
+            List<T> list);
 
     /** Perform substitutions on a list of fields. */
     public <T extends FieldInstance> List<T> substFieldList(List<T> list);

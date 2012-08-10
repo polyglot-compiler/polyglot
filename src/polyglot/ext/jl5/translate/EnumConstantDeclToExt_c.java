@@ -12,7 +12,11 @@ public class EnumConstantDeclToExt_c extends ToExt_c implements ToExt {
     @Override
     public Node toExt(ExtensionRewriter rw) throws SemanticException {
         EnumConstantDecl cd = (EnumConstantDecl) node();
-		return ((JL5NodeFactory) rw.to_nf()).EnumConstantDecl(cd.position(),
-				cd.flags(), cd.annotationElems(), cd.name(), cd.args(), cd.body());
+        return ((JL5NodeFactory) rw.to_nf()).EnumConstantDecl(cd.position(),
+                                                              cd.flags(),
+                                                              cd.annotationElems(),
+                                                              cd.name(),
+                                                              cd.args(),
+                                                              cd.body());
     }
 }

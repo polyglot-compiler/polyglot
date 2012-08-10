@@ -31,12 +31,12 @@ public class UniqueID {
     private static int icount = 0;
 
     public static String newID(String s) {
-	String uid = s + "$" + count;
-	count++;
-	return uid;
+        String uid = s + "$" + count;
+        count++;
+        return uid;
     }
 
     public static int newIntID() {
-	return icount++;
+        return icount++;
     }
 }

@@ -13,19 +13,19 @@ import polyglot.util.StringBuilderWriter;
  */
 public class SourceObject extends SimpleJavaFileObject {
 
-	private final StringBuilderWriter sbw = new StringBuilderWriter();
+    private final StringBuilderWriter sbw = new StringBuilderWriter();
 
-	public SourceObject(URI u, Kind k) {
-		super(u, k);
-	}
+    public SourceObject(URI u, Kind k) {
+        super(u, k);
+    }
 
-	@Override
-	public Writer openWriter() throws IOException {
-		return sbw;
-	}
+    @Override
+    public Writer openWriter() throws IOException {
+        return sbw;
+    }
 
-	@Override
-	public CharSequence getCharContent(boolean ignoreEncodingErrors) {
-		return sbw.getBuilder();
-	}
+    @Override
+    public CharSequence getCharContent(boolean ignoreEncodingErrors) {
+        return sbw.getBuilder();
+    }
 }

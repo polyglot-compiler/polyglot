@@ -32,8 +32,7 @@ import java.util.List;
  * <code>catch</code> blocks, and an optional <code>finally</code> block.
  *
  */
-public interface Try extends CompoundStmt
-{
+public interface Try extends CompoundStmt {
     /** The block to "try". */
     Block tryBlock();
 

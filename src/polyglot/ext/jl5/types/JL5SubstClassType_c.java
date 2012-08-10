@@ -24,10 +24,11 @@ import polyglot.util.CodeWriter;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
 
-public class JL5SubstClassType_c extends SubstClassType_c<TypeVariable, ReferenceType> implements JL5SubstClassType
-{
+public class JL5SubstClassType_c extends
+        SubstClassType_c<TypeVariable, ReferenceType> implements
+        JL5SubstClassType {
     public JL5SubstClassType_c(JL5TypeSystem ts, Position pos,
-                                 JL5ParsedClassType base, JL5Subst subst) {
+            JL5ParsedClassType base, JL5Subst subst) {
         super(ts, pos, base, subst);
         this.setDeclaration(base);
     }
@@ -48,13 +49,12 @@ public class JL5SubstClassType_c extends SubstClassType_c<TypeVariable, Referenc
         return subst.substTypeList(pc.formals());
     }
 
-
     ////////////////////////////////////////////////////////////////
     // Implement methods of JL5ClassType
     @Override
     public EnumInstance enumConstantNamed(String name) {
-        for(EnumInstance ei : enumConstants()){
-            if (ei.name().equals(name)){
+        for (EnumInstance ei : enumConstants()) {
+            if (ei.name().equals(name)) {
                 return ei;
             }
         }
@@ -63,13 +63,13 @@ public class JL5SubstClassType_c extends SubstClassType_c<TypeVariable, Referenc
 
     @Override
     public List<EnumInstance> enumConstants() {
-        return subst.substFieldList(((JL5ClassType)base).enumConstants());
+        return subst.substFieldList(((JL5ClassType) base).enumConstants());
     }
-    
+
     @Override
     public AnnotationTypeElemInstance annotationElemNamed(String name) {
-        for(AnnotationTypeElemInstance ai : annotationElems()){
-            if (ai.name().equals(name)){
+        for (AnnotationTypeElemInstance ai : annotationElems()) {
+            if (ai.name().equals(name)) {
                 return ai;
             }
         }
@@ -78,9 +78,8 @@ public class JL5SubstClassType_c extends SubstClassType_c<TypeVariable, Referenc
 
     @Override
     public List<AnnotationTypeElemInstance> annotationElems() {
-        return ((JL5ClassType)this.base).annotationElems();
+        return ((JL5ClassType) this.base).annotationElems();
     }
-
 
     /** Pretty-print the name of this class to w. */
     @Override
@@ -90,7 +89,7 @@ public class JL5SubstClassType_c extends SubstClassType_c<TypeVariable, Referenc
     }
 
     @Override
-    public void printParams(CodeWriter w) {        
+    public void printParams(CodeWriter w) {
         JL5ParsedClassType ct = this.base();
         if (ct.typeVariables().isEmpty()) {
             return;
@@ -98,16 +97,16 @@ public class JL5SubstClassType_c extends SubstClassType_c<TypeVariable, Referenc
         w.write("<");
         Iterator<TypeVariable> it = ct.typeVariables().iterator();
         while (it.hasNext()) {
-            TypeVariable act = it.next();            
+            TypeVariable act = it.next();
             this.subst().substType(act).print(w);
             if (it.hasNext()) {
                 w.write(",");
                 w.allowBreak(0, " ");
             }
         }
-        w.write(">");                
+        w.write(">");
     }
-    
+
     @Override
     public String toString() {
         // really want to call ClassType_c.toString here, but we will copy code :(
@@ -137,10 +136,10 @@ public class JL5SubstClassType_c extends SubstClassType_c<TypeVariable, Referenc
             sb.append('<');
             Iterator<TypeVariable> iter = ct.typeVariables().iterator();
             while (iter.hasNext()) {
-                TypeVariable act = iter.next();            
+                TypeVariable act = iter.next();
                 sb.append(this.subst().substType(act));
                 if (iter.hasNext()) {
-                    sb.append(',');                    
+                    sb.append(',');
                 }
             }
             sb.append('>');
@@ -154,7 +153,7 @@ public class JL5SubstClassType_c extends SubstClassType_c<TypeVariable, Referenc
     }
 
     @Override
-    public boolean isCastValidImpl(Type toType){        
+    public boolean isCastValidImpl(Type toType) {
         if (super.isCastValidImpl(toType)) {
             return true;
         }
@@ -162,9 +161,10 @@ public class JL5SubstClassType_c extends SubstClassType_c<TypeVariable, Referenc
     }
 
     @Override
-    public boolean isImplicitCastValidImpl(Type toType){
+    public boolean isImplicitCastValidImpl(Type toType) {
         throw new InternalCompilerError("Should not be called in JL5");
     }
+
     @Override
     public LinkedList<Type> isImplicitCastValidChainImpl(Type toType) {
         LinkedList<Type> chain = null;
@@ -182,15 +182,15 @@ public class JL5SubstClassType_c extends SubstClassType_c<TypeVariable, Referenc
             return true;
         }
 
-        JL5TypeSystem ts = (JL5TypeSystem)this.ts;
-        
+        JL5TypeSystem ts = (JL5TypeSystem) this.ts;
+
 //        System.err.println("jl5substclasstype: descends from " + this + " <: " + ancestor);
 //        System.err.println("    superclass of  " + this + " is " + this.superType());
 //        System.err.println("    base class of  " + this + " is " + this.base());
 //        System.err.println("       super of " + this.base() + " is " + this.base().superType());
 //        System.err.println("    subst  of  " + this + " is " + this.subst());
 //        System.err.println("   applying subst " + subst.substType(this.base()) + " super " + ((ReferenceType)subst.substType(this.base())).superType());
-        
+
         // See JLS 3rd ed 4.10.2
         if (hasWildCardArg()) {
             Type captured = ts.applyCaptureConversion(this);
@@ -202,10 +202,10 @@ public class JL5SubstClassType_c extends SubstClassType_c<TypeVariable, Referenc
                 return true;
             }
         }
-        
+
         if (ancestor instanceof RawClass) {
             // it's a raw class! Is it our raw class?
-            RawClass rc = (RawClass)ancestor;
+            RawClass rc = (RawClass) ancestor;
             if (this.base().equals(rc.base())) {
                 // The raw type C is a direct supertype of C<X>
                 return true;
@@ -232,16 +232,16 @@ public class JL5SubstClassType_c extends SubstClassType_c<TypeVariable, Referenc
                 if (allContained) {
                     return true;
                 }
-                
+
             }
         }
-        
+
         return false;
     }
-    
+
     private boolean hasWildCardArg() {
         JL5ParsedClassType b = (JL5ParsedClassType) this.base;
-        
+
         for (TypeVariable t : b.typeVariables()) {
             if (subst.substType(t) instanceof WildCardType) {
                 return true;
@@ -254,7 +254,7 @@ public class JL5SubstClassType_c extends SubstClassType_c<TypeVariable, Referenc
     public JL5ParsedClassType base() {
         return (JL5ParsedClassType) this.base;
     }
-    
+
     @Override
     public String translate(Resolver c) {
         StringBuffer sb = new StringBuffer(this.translateAsReceiver(c));
@@ -265,10 +265,10 @@ public class JL5SubstClassType_c extends SubstClassType_c<TypeVariable, Referenc
         sb.append('<');
         Iterator<TypeVariable> iter = ct.typeVariables().iterator();
         while (iter.hasNext()) {
-            TypeVariable act = iter.next();            
+            TypeVariable act = iter.next();
             sb.append(this.subst().substType(act).translate(c));
             if (iter.hasNext()) {
-                sb.append(',');                    
+                sb.append(',');
             }
         }
         sb.append('>');
@@ -309,8 +309,8 @@ public class JL5SubstClassType_c extends SubstClassType_c<TypeVariable, Referenc
                 // if we are not an inner class (i.e., we are
                 // a static nested class), then make sure that we
                 // do not print out the parameters for our container.
-                JL5TypeSystem ts = (JL5TypeSystem)this.ts;
-                container = (ReferenceType)ts.erasureType(this.container());
+                JL5TypeSystem ts = (JL5TypeSystem) this.ts;
+                container = (ReferenceType) ts.erasureType(this.container());
             }
             return container.translate(c) + "." + name();
         }
@@ -326,13 +326,13 @@ public class JL5SubstClassType_c extends SubstClassType_c<TypeVariable, Referenc
     public ClassType outer() {
         if (this.isMember() && !this.isInnerClass()) {
             if (!(super.outer() instanceof RawClass)) {
-                JL5TypeSystem ts = (JL5TypeSystem)this.typeSystem();
-                return (ClassType)ts.erasureType(super.outer());
+                JL5TypeSystem ts = (JL5TypeSystem) this.typeSystem();
+                return (ClassType) ts.erasureType(super.outer());
             }
         }
         return super.outer();
     }
-    
+
     @Override
     public boolean isEnclosedImpl(ClassType maybe_outer) {
         if (super.isEnclosedImpl(maybe_outer)) {
@@ -340,16 +340,15 @@ public class JL5SubstClassType_c extends SubstClassType_c<TypeVariable, Referenc
         }
         // try it with the stripped out outer...
         if (outer() != null && super.outer() != this.outer()) {
-            return super.outer().equals(maybe_outer) ||
-                    super.outer().isEnclosed(maybe_outer);
+            return super.outer().equals(maybe_outer)
+                    || super.outer().isEnclosed(maybe_outer);
         }
         return false;
     }
-
 
     @Override
     public RetainedAnnotations retainedAnnotations() {
         return ((JL5TypeSystem) this.typeSystem()).NoRetainedAnnotations();
     }
-    
+
 }

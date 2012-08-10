@@ -30,6 +30,5 @@ package polyglot.ast;
  * just a tag.  These nodes should not appear after the disambiguate
  * pass.
  */
-public interface Ambiguous extends Node
-{
+public interface Ambiguous extends Node {
 }

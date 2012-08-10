@@ -31,15 +31,16 @@ import polyglot.util.Enum;
  * An <code>IntLit</code> represents a literal in Java of an integer
  * type.
  */
-public interface IntLit extends NumLit 
-{
+public interface IntLit extends NumLit {
     /** Integer literal kinds: int (e.g., 0) or long (e.g., 0L). */
     public static class Kind extends Enum {
-        public Kind(String name) { super(name); }
+        public Kind(String name) {
+            super(name);
+        }
     }
 
-    public static final Kind INT   = new Kind("int");
-    public static final Kind LONG  = new Kind("long");
+    public static final Kind INT = new Kind("int");
+    public static final Kind LONG = new Kind("long");
 
     /** Get the literal's value. */
     long value();

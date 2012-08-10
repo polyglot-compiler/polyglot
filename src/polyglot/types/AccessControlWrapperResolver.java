@@ -29,12 +29,13 @@ package polyglot.types;
 public class AccessControlWrapperResolver implements Resolver {
     protected AccessControlResolver inner;
     protected ClassType accessor;
-    
-    public AccessControlWrapperResolver(AccessControlResolver inner, ClassType accessor) {
+
+    public AccessControlWrapperResolver(AccessControlResolver inner,
+            ClassType accessor) {
         this.inner = inner;
         this.accessor = accessor;
     }
-    
+
     @Override
     public Named find(String name) throws SemanticException {
         return inner.find(name, accessor);

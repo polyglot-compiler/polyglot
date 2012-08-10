@@ -195,7 +195,8 @@ public class QQ {
     }
 
     /** Create a quasiquoting parser. */
-    protected QQParser parser(Lexer lexer, TypeSystem ts, NodeFactory nf, ErrorQueue eq) {
+    protected QQParser parser(Lexer lexer, TypeSystem ts, NodeFactory nf,
+            ErrorQueue eq) {
         return new polyglot.qq.Grm(lexer, ts, nf, eq);
     }
 
@@ -218,7 +219,7 @@ public class QQ {
                 @SuppressWarnings("unchecked")
                 List<Object> l = (List<Object>) o;
 
-                for (ListIterator<Object> j = l.listIterator(); j.hasNext(); ) {
+                for (ListIterator<Object> j = l.listIterator(); j.hasNext();) {
                     Object p = j.next();
 
                     if (p instanceof Type) {
@@ -242,40 +243,40 @@ public class QQ {
         QQParser grm = parser(lexer, ts, nf, eq);
 
         if (Report.should_report(polyglot.frontend.Topics.qq, 1)) {
-	    Report.report(1, "qq: " + fmt);
-	    Report.report(1, "subst: " + subst);
-	}
+            Report.report(1, "qq: " + fmt);
+            Report.report(1, "subst: " + subst);
+        }
 
         try {
             java_cup.runtime.Symbol sym;
 
             switch (kind) {
-                case EXPR:
-                    sym = grm.qq_expr();
-                    break;
-                case STMT:
-                    sym = grm.qq_stmt();
-                    break;
-                case TYPE:
-                    sym = grm.qq_type();
-                    break;
-                case MEMB:
-                    sym = grm.qq_member();
-                    break;
-                case DECL:
-                    sym = grm.qq_decl();
-                    break;
-                case FILE:
-                    sym = grm.qq_file();
-                    break;
-                default:
-                    throw new QQError("bad quasi-quoting kind: " + kind, pos);
+            case EXPR:
+                sym = grm.qq_expr();
+                break;
+            case STMT:
+                sym = grm.qq_stmt();
+                break;
+            case TYPE:
+                sym = grm.qq_type();
+                break;
+            case MEMB:
+                sym = grm.qq_member();
+                break;
+            case DECL:
+                sym = grm.qq_decl();
+                break;
+            case FILE:
+                sym = grm.qq_file();
+                break;
+            default:
+                throw new QQError("bad quasi-quoting kind: " + kind, pos);
             }
 
             if (sym != null && sym.value instanceof Node) {
                 Node n = (Node) sym.value;
                 if (Report.should_report(polyglot.frontend.Topics.qq, 1))
-		    Report.report(1, "result: " + n);
+                    Report.report(1, "result: " + n);
                 return n;
             }
 
@@ -289,8 +290,8 @@ public class QQ {
         }
         catch (Exception e) {
             // Used by cup to indicate a non-recoverable error.
-            throw new QQError("Unable to parse: \"" + fmt + "\"; " +
-                              e.getMessage(), pos);
+            throw new QQError("Unable to parse: \"" + fmt + "\"; "
+                    + e.getMessage(), pos);
         }
     }
 }

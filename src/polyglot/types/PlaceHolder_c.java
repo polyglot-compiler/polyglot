@@ -37,21 +37,21 @@ import polyglot.util.CannotResolvePlaceHolderException;
  * Placeholders are used to prevent serializing the class type information
  * for classes that <code>C</code> depends on.  
  */
-public class PlaceHolder_c implements NamedPlaceHolder
-{
+public class PlaceHolder_c implements NamedPlaceHolder {
     /**
      * The name of the place holder.
      */
     protected String name;
 
     /** Used for deserializing types. */
-    protected PlaceHolder_c() { }
-    
+    protected PlaceHolder_c() {
+    }
+
     /** Creates a place holder type for the type. */
     public PlaceHolder_c(Named t) {
         this(t.fullName());
     }
-    
+
     public PlaceHolder_c(String name) {
         this.name = name;
     }
@@ -65,12 +65,13 @@ public class PlaceHolder_c implements NamedPlaceHolder
     public int hashCode() {
         return name.hashCode();
     }
-    
+
     @Override
     public boolean equals(Object o) {
-        return o == this || (o instanceof PlaceHolder_c && name.equals(((PlaceHolder_c) o).name));
+        return o == this
+                || (o instanceof PlaceHolder_c && name.equals(((PlaceHolder_c) o).name));
     }
-    
+
     /**
      * Resolve the place holder into a TypeObject.  This method
      * should <strong>never</strong> throw a SchedulerException.
@@ -79,14 +80,16 @@ public class PlaceHolder_c implements NamedPlaceHolder
      * up the appropriate dependencies to reattempt the current goal.
      */
     @Override
-    public TypeObject resolve(TypeSystem ts) throws CannotResolvePlaceHolderException {
+    public TypeObject resolve(TypeSystem ts)
+            throws CannotResolvePlaceHolderException {
         return resolveUnsafe(ts);
     }
-    
-    public TypeObject resolveUnsafe(TypeSystem ts) throws CannotResolvePlaceHolderException {
+
+    public TypeObject resolveUnsafe(TypeSystem ts)
+            throws CannotResolvePlaceHolderException {
         Scheduler scheduler = ts.extensionInfo().scheduler();
         Goal g = scheduler.TypeExists(name);
-        
+
         try {
             return ts.systemResolver().find(name);
         }
@@ -110,9 +113,10 @@ public class PlaceHolder_c implements NamedPlaceHolder
             throw new CannotResolvePlaceHolderException(e);
         }
     }
-    
+
     /** A potentially safer alternative implementation of resolve. */
-    public TypeObject resolveSafe(TypeSystem ts) throws CannotResolvePlaceHolderException {
+    public TypeObject resolveSafe(TypeSystem ts)
+            throws CannotResolvePlaceHolderException {
         Named n = ts.systemResolver().check(name);
 
         if (n != null) {
@@ -129,9 +133,9 @@ public class PlaceHolder_c implements NamedPlaceHolder
 
         throw new CannotResolvePlaceHolderException("Could not resolve " + name);
     }
-    
+
     @Override
     public String toString() {
-	return "PlaceHolder(" + name + ")";
+        return "PlaceHolder(" + name + ")";
     }
 }

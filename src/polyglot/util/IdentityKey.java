@@ -28,8 +28,7 @@ package polyglot.util;
 /**
  * Class to be used for inserting objects in hashtables using pointer equality.
  */
-public class IdentityKey
-{
+public class IdentityKey {
     private Object obj;
 
     public IdentityKey(Object obj) {
@@ -47,8 +46,7 @@ public class IdentityKey
 
     @Override
     public boolean equals(Object other) {
-        return other instanceof IdentityKey
-            && ((IdentityKey) other).obj == obj;
+        return other instanceof IdentityKey && ((IdentityKey) other).obj == obj;
     }
 
     @Override
@@ -56,4 +54,3 @@ public class IdentityKey
         return "Id(" + obj + ")";
     }
 }
-

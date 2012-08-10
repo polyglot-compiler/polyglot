@@ -5,10 +5,11 @@ import java.util.List;
 import polyglot.types.MemberInstance;
 import polyglot.types.ProcedureInstance;
 
-public interface JL5ProcedureInstance extends ProcedureInstance, MemberInstance {    
-    boolean isVariableArity();    
-    
+public interface JL5ProcedureInstance extends ProcedureInstance, MemberInstance {
+    boolean isVariableArity();
+
     void setTypeParams(List<TypeVariable> typeParams);
+
     List<TypeVariable> typeParams();
 
     /**

@@ -12,11 +12,22 @@ package pao;
  */
 public class Version extends polyglot.main.Version {
     @Override
-    public String name() { return "pao"; }
+    public String name() {
+        return "pao";
+    }
+
     @Override
-    public int major() { return 0; }
+    public int major() {
+        return 0;
+    }
+
     @Override
-    public int minor() { return 1; }
+    public int minor() {
+        return 1;
+    }
+
     @Override
-    public int patch_level() { return 0; }
+    public int patch_level() {
+        return 0;
+    }
 }

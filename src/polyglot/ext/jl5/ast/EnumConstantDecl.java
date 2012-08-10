@@ -14,8 +14,7 @@ import polyglot.types.ParsedClassType;
 /**
  * Decalration of an enum constant.
  */
-public interface EnumConstantDecl extends ClassMember, AnnotatedElement
-{    
+public interface EnumConstantDecl extends ClassMember, AnnotatedElement {
     /** get args */
     List<Expr> args();
 
@@ -35,9 +34,11 @@ public interface EnumConstantDecl extends ClassMember, AnnotatedElement
     ClassBody body();
 
     ParsedClassType type();
+
     EnumConstantDecl type(ParsedClassType pct);
 
     ConstructorInstance constructorInstance();
+
     EnumConstantDecl constructorInstance(ConstructorInstance ci);
 
     EnumInstance enumInstance();

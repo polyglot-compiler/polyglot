@@ -29,8 +29,7 @@ package polyglot.types;
  * A <code>VarInstance</code> contains type information for a variable.  It may
  * be either a local or a field.
  */
-public interface VarInstance extends TypeObject, Declaration
-{
+public interface VarInstance extends TypeObject, Declaration {
     /**
      * The flags of the variable.
      */
@@ -40,6 +39,7 @@ public interface VarInstance extends TypeObject, Declaration
      * The name of the variable.
      */
     String name();
+
     void setName(String name);
 
     /**
@@ -51,7 +51,7 @@ public interface VarInstance extends TypeObject, Declaration
      * Whether the variable's constant value has been set yet.
      */
     boolean constantValueSet();
-    
+
     /**
      * The variable's constant value, or null.
      */
@@ -63,12 +63,12 @@ public interface VarInstance extends TypeObject, Declaration
      * Boolean, Byte, Short, Character, Integer, Long, Float, Double, or null.
      */
     void setConstantValue(Object value);
-    
+
     /**
      * Mark the variable as not a compile time constant.
      */
     void setNotConstant();
-    
+
     /**
      * Whether the variable has a constant value.
      */
@@ -79,7 +79,7 @@ public interface VarInstance extends TypeObject, Declaration
      * This method should be deprecated.
      */
     void setType(Type type); //destructive update   
-    
+
     /**
      * Destructively set the flags of the variable.
      */

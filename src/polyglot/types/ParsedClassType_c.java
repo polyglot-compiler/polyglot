@@ -47,8 +47,7 @@ import polyglot.util.TypeInputStream;
  * A ParsedClassType represents a information that has been parsed (but not
  * necessarily type checked) from a .java file.
  **/
-public class ParsedClassType_c extends ClassType_c implements ParsedClassType
-{
+public class ParsedClassType_c extends ClassType_c implements ParsedClassType {
     protected transient LazyClassInitializer init;
     protected transient Source fromSource;
     protected transient Job job;
@@ -73,19 +72,19 @@ public class ParsedClassType_c extends ClassType_c implements ParsedClassType
     public void setInit(LazyClassInitializer init) {
         this.init = init;
     }
-    
+
     /** Was the class declared in a static context? */
     protected boolean inStaticContext = false;
-    
+
     /** Wether we need to serialize this class. */
     protected boolean needSerialization = true;
 
     protected ParsedClassType_c() {
-	super();
+        super();
     }
 
-    public ParsedClassType_c(TypeSystem ts, LazyClassInitializer init, 
-                             Source fromSource) {
+    public ParsedClassType_c(TypeSystem ts, LazyClassInitializer init,
+            Source fromSource) {
         super(ts);
         this.fromSource = fromSource;
 
@@ -97,7 +96,7 @@ public class ParsedClassType_c extends ClassType_c implements ParsedClassType
         this.constructors = new LinkedList<ConstructorInstance>();
         this.memberClasses = new LinkedList<ClassType>();
     }
-     
+
     @Override
     public LazyInitializer initializer() {
         return this.init;
@@ -108,22 +107,22 @@ public class ParsedClassType_c extends ClassType_c implements ParsedClassType
         this.init = (LazyClassInitializer) init;
         ((LazyClassInitializer) init).setClass(this);
     }
-        
+
     @Override
     public Source fromSource() {
         return fromSource;
     }
-    
+
     @Override
     public Job job() {
         return job;
     }
-    
+
     @Override
     public void setJob(Job job) {
         this.job = job;
     }
-    
+
     @Override
     public Kind kind() {
         return kind;
@@ -138,14 +137,13 @@ public class ParsedClassType_c extends ClassType_c implements ParsedClassType
     public boolean inStaticContext() {
         return inStaticContext;
     }
-    
+
     @Override
     public ClassType outer() {
-        if (isTopLevel())
-            return null;
+        if (isTopLevel()) return null;
         if (outer == null)
             throw new InternalCompilerError("Nested classes must have outer classes.");
-            
+
         return outer;
     }
 
@@ -175,11 +173,10 @@ public class ParsedClassType_c extends ClassType_c implements ParsedClassType
     /** Get the class's flags. */
     @Override
     public Flags flags() {
-        if (isAnonymous())
-            return Flags.NONE;
+        if (isAnonymous()) return Flags.NONE;
         return flags;
     }
-    
+
     @Override
     public void setFlags(Flags flags) {
         this.flags = flags;
@@ -187,7 +184,7 @@ public class ParsedClassType_c extends ClassType_c implements ParsedClassType
 
     @Override
     public void flags(Flags flags) {
-	this.flags = flags;
+        this.flags = flags;
     }
 
     @Override
@@ -201,7 +198,7 @@ public class ParsedClassType_c extends ClassType_c implements ParsedClassType
             throw new InternalCompilerError("Top-level classes cannot have outer classes.");
         this.outer = outer;
     }
-    
+
     @Override
     public void setContainer(ReferenceType container) {
         if (container instanceof ClassType && isMember()) {
@@ -221,49 +218,49 @@ public class ParsedClassType_c extends ClassType_c implements ParsedClassType
 
     @Override
     public void position(Position pos) {
-	this.position = pos;
+        this.position = pos;
     }
 
     @Override
     public void package_(Package p) {
-	this.package_ = p;
+        this.package_ = p;
     }
 
     @Override
     public void superType(Type t) {
-	this.superType = t;
+        this.superType = t;
     }
 
     @Override
     public void addInterface(ReferenceType t) {
-	interfaces.add(t);
+        interfaces.add(t);
     }
 
     @Override
     public void addMethod(MethodInstance mi) {
-	methods.add(mi);
+        methods.add(mi);
     }
 
     @Override
     public void addConstructor(ConstructorInstance ci) {
-	constructors.add(ci);
+        constructors.add(ci);
     }
 
     @Override
     public void addField(FieldInstance fi) {
-	fields.add(fi);
+        fields.add(fi);
     }
 
     @Override
     public void addMemberClass(ClassType t) {
-	memberClasses.add(t);
+        memberClasses.add(t);
     }
-    
+
     @Override
     public void setInterfaces(List<? extends ReferenceType> l) {
         this.interfaces = new ArrayList<ReferenceType>(l);
     }
-    
+
     @Override
     public void setMethods(List<? extends MethodInstance> l) {
         this.methods = new ArrayList<MethodInstance>(l);
@@ -273,7 +270,7 @@ public class ParsedClassType_c extends ClassType_c implements ParsedClassType
     public void setFields(List<? extends FieldInstance> l) {
         this.fields = new ArrayList<FieldInstance>(l);
     }
-    
+
     @Override
     public void setConstructors(List<? extends ConstructorInstance> l) {
         this.constructors = new ArrayList<ConstructorInstance>(l);
@@ -283,7 +280,7 @@ public class ParsedClassType_c extends ClassType_c implements ParsedClassType
     public void setMemberClasses(List<? extends ClassType> l) {
         this.memberClasses = new ArrayList<ClassType>(l);
     }
-                                          
+
     @Override
     public boolean defaultConstructorNeeded() {
         init.initConstructors();
@@ -292,7 +289,7 @@ public class ParsedClassType_c extends ClassType_c implements ParsedClassType
         }
         return this.constructors.isEmpty();
     }
-    
+
     /** Return an immutable list of constructors */
     @Override
     public List<? extends ConstructorInstance> constructors() {
@@ -315,7 +312,7 @@ public class ParsedClassType_c extends ClassType_c implements ParsedClassType
         init.canonicalMethods();
         return Collections.unmodifiableList(methods);
     }
-    
+
     /** Return a list of all methods with the given name. */
     @Override
     public List<? extends MethodInstance> methodsNamed(String name) {
@@ -325,10 +322,10 @@ public class ParsedClassType_c extends ClassType_c implements ParsedClassType
         init.initMethods();
 
         List<MethodInstance> l = new LinkedList<MethodInstance>();
-        
+
         for (MethodInstance mi : methods) {
             if (mi.name().equals(name)) {
-                if (! mi.isCanonical()) {
+                if (!mi.isCanonical()) {
                     // Force an exception to get thrown.
                     init.canonicalMethods();
                 }
@@ -346,7 +343,7 @@ public class ParsedClassType_c extends ClassType_c implements ParsedClassType
         init.canonicalFields();
         return Collections.unmodifiableList(fields);
     }
-    
+
     /** Get a field of the class by name. */
     @Override
     public FieldInstance fieldNamed(String name) {
@@ -356,10 +353,10 @@ public class ParsedClassType_c extends ClassType_c implements ParsedClassType
         // during disambiguation of path-dependent types like
         // in Jx or Jif.
         init.initFields();
-        
+
         for (FieldInstance fi : fields) {
             if (fi.name().equals(name)) {
-                if (! fi.isCanonical()) {
+                if (!fi.isCanonical()) {
                     // Force an exception to get thrown.
                     init.canonicalFields();
                 }
@@ -376,7 +373,7 @@ public class ParsedClassType_c extends ClassType_c implements ParsedClassType
         init.initInterfaces();
         return Collections.unmodifiableList(interfaces);
     }
-    
+
     protected boolean membersAdded;
     protected boolean supertypesResolved;
     protected boolean signaturesResolved;
@@ -388,6 +385,7 @@ public class ParsedClassType_c extends ClassType_c implements ParsedClassType
     public boolean membersAdded() {
         return membersAdded;
     }
+
     /**
      * @param membersAdded The membersAdded to set.
      */
@@ -395,6 +393,7 @@ public class ParsedClassType_c extends ClassType_c implements ParsedClassType
     public void setMembersAdded(boolean membersAdded) {
         this.membersAdded = membersAdded;
     }
+
     /**
      * @param signaturesDisambiguated The signaturesDisambiguated to set.
      */
@@ -402,6 +401,7 @@ public class ParsedClassType_c extends ClassType_c implements ParsedClassType
     public void setSignaturesResolved(boolean signaturesDisambiguated) {
         this.signaturesResolved = signaturesDisambiguated;
     }
+
     /**
      * @return Returns the supertypesResolved.
      */
@@ -409,6 +409,7 @@ public class ParsedClassType_c extends ClassType_c implements ParsedClassType
     public boolean supertypesResolved() {
         return supertypesResolved;
     }
+
     /**
      * @param supertypesResolved The supertypesResolved to set.
      */
@@ -422,8 +423,8 @@ public class ParsedClassType_c extends ClassType_c implements ParsedClassType
         if (signaturesResolved) {
             return 0;
         }
-        
-        if (! membersAdded()) {
+
+        if (!membersAdded()) {
             return Integer.MAX_VALUE;
         }
 
@@ -435,26 +436,26 @@ public class ParsedClassType_c extends ClassType_c implements ParsedClassType
         l.addAll(fields);
         l.addAll(constructors);
         l.addAll(memberClasses);
-        
+
         int count = 0;
-        
+
         for (MemberInstance mi : l) {
-            if (! mi.isCanonical()) {
+            if (!mi.isCanonical()) {
                 count++;
             }
         }
-        
+
         if (count == 0) {
             signaturesResolved = true;
         }
-        
+
         return count;
     }
 
     @Override
     public boolean signaturesResolved() {
-        if (! signaturesResolved) {
-            if (! membersAdded()) {
+        if (!signaturesResolved) {
+            if (!membersAdded()) {
                 return false;
             }
 
@@ -466,22 +467,22 @@ public class ParsedClassType_c extends ClassType_c implements ParsedClassType
             l.addAll(fields);
             l.addAll(constructors);
             l.addAll(memberClasses);
-            
+
             int count = 0;
 
             for (MemberInstance mi : l) {
-                if (! mi.isCanonical()) {
+                if (!mi.isCanonical()) {
                     if (Report.should_report("ambcheck", 2))
                         Report.report(2, mi + " is ambiguous");
                     count++;
                 }
             }
-            
+
             if (count == 0) {
                 signaturesResolved = true;
             }
         }
-        
+
         return signaturesResolved;
     }
 
@@ -491,7 +492,7 @@ public class ParsedClassType_c extends ClassType_c implements ParsedClassType
             return "<unknown class " + name + ">";
         }
         if (isAnonymous()) {
-            if (interfaces != null && ! interfaces.isEmpty()) {
+            if (interfaces != null && !interfaces.isEmpty()) {
                 return "<anonymous subtype of " + interfaces.get(0) + ">";
             }
             if (superType != null) {
@@ -517,13 +518,14 @@ public class ParsedClassType_c extends ClassType_c implements ParsedClassType
         }
         out.defaultWriteObject();
     }
-    
-    private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
+
+    private void readObject(ObjectInputStream in) throws IOException,
+            ClassNotFoundException {
         if (in instanceof TypeInputStream) {
             TypeInputStream tin = (TypeInputStream) in;
 
             boolean b = tin.readBoolean();
-            
+
             if (b) {
                 tin.enableReplace(false);
                 PlaceHolder p = (PlaceHolder) tin.readObject();
@@ -533,10 +535,10 @@ public class ParsedClassType_c extends ClassType_c implements ParsedClassType
 
             fromSource = null;
             job = null;
-           
+
             init = tin.getTypeSystem().deserializedClassInitializer();
             init.setClass(this);
-            
+
             membersAdded = true;
             supertypesResolved = true;
             signaturesResolved = true;
@@ -550,7 +552,7 @@ public class ParsedClassType_c extends ClassType_c implements ParsedClassType
     public void needSerialization(boolean b) {
         needSerialization = b;
     }
-    
+
     @Override
     public boolean needSerialization() {
         return needSerialization;

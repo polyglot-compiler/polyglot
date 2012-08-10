@@ -12,28 +12,28 @@ import polyglot.types.reflect.Field;
 
 public class JL5Field extends Field {
     protected JL5Signature signature;
-    
+
     public JL5Field(DataInputStream in, ClassFile clazz) throws IOException {
         super(in, clazz);
     }
-    
+
     @Override
     public void initialize() throws IOException {
         modifiers = in.readUnsignedShort();
 
         name = in.readUnsignedShort();
         type = in.readUnsignedShort();
-        
+
         int numAttributes = in.readUnsignedShort();
-        
+
         attrs = new Attribute[numAttributes];
-        
+
         for (int i = 0; i < numAttributes; i++) {
             int nameIndex = in.readUnsignedShort();
             int length = in.readInt();
-            
+
             Constant name = clazz.getConstants()[nameIndex];
-            
+
             if (name != null) {
                 if ("ConstantValue".equals(name.value())) {
                     constantValue = new ConstantValue(in, nameIndex, length);
@@ -47,7 +47,7 @@ public class JL5Field extends Field {
                     attrs[i] = signature;
                 }
             }
-            
+
             if (attrs[i] == null) {
                 long n = in.skip(length);
                 if (n != length) {
@@ -57,7 +57,7 @@ public class JL5Field extends Field {
         }
         this.in = null; // RMF 7/23/2008 - Don't need the input stream any more, so don't hang onto it
     }
-    
+
     public JL5Signature getSignature() {
         return signature;
     }

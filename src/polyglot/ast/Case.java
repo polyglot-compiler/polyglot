@@ -29,8 +29,7 @@ package polyglot.ast;
  * A <code>Case</code> is a representation of a Java <code>case</code>
  * statement.  It can only be contained in a <code>Switch</code>.
  */
-public interface Case extends SwitchElement
-{
+public interface Case extends SwitchElement {
     /**
      * Get the case label.  This must should a constant expression.
      * The case label is null for the <code>default</code> case.

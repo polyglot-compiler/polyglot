@@ -32,8 +32,7 @@ import polyglot.util.Position;
  * A <code>VarInstance</code> contains type information for a variable.  It may
  * be either a local or a field.
  */
-public abstract class VarInstance_c extends TypeObject_c implements VarInstance
-{
+public abstract class VarInstance_c extends TypeObject_c implements VarInstance {
     protected Flags flags;
     protected Type type;
     protected String name;
@@ -42,46 +41,47 @@ public abstract class VarInstance_c extends TypeObject_c implements VarInstance
     protected boolean constantValueSet;
 
     /** Used for deserializing types. */
-    protected VarInstance_c() { }
-
-    public VarInstance_c(TypeSystem ts, Position pos,
-	                 Flags flags, Type type, String name) {
-        super(ts, pos);
-	this.flags = flags;
-	this.type = type;
-	this.name = name;
-    this.decl = this;
+    protected VarInstance_c() {
     }
-    
+
+    public VarInstance_c(TypeSystem ts, Position pos, Flags flags, Type type,
+            String name) {
+        super(ts, pos);
+        this.flags = flags;
+        this.type = type;
+        this.name = name;
+        this.decl = this;
+    }
+
     protected VarInstance decl;
-    
+
     @Override
     public Declaration declaration() {
         return decl;
     }
-    
+
     @Override
     public void setDeclaration(Declaration decl) {
-        this.decl = (VarInstance) decl;        
+        this.decl = (VarInstance) decl;
     }
-    
+
     @Override
     public boolean constantValueSet() {
         if (this != declaration()) {
             return ((VarInstance) declaration()).constantValueSet();
         }
-        
+
         return constantValueSet;
     }
-    
+
     @Override
     public boolean isConstant() {
         if (this != declaration()) {
             return ((VarInstance) declaration()).isConstant();
         }
-        
-        if (! constantValueSet) {
-            if (! flags.isFinal()) {
+
+        if (!constantValueSet) {
+            if (!flags.isFinal()) {
                 setNotConstant();
                 return isConstant;
             }
@@ -107,7 +107,7 @@ public abstract class VarInstance_c extends TypeObject_c implements VarInstance
     public Flags flags() {
         return flags;
     }
-    
+
     @Override
     public Type type() {
         return type;
@@ -126,18 +126,17 @@ public abstract class VarInstance_c extends TypeObject_c implements VarInstance
     @Override
     public boolean equalsImpl(TypeObject o) {
         if (o instanceof VarInstance) {
-	    VarInstance i = (VarInstance) o;
-	    return flags.equals(i.flags())
-	        && ts.equals(type, i.type())
-		&& name.equals(i.name());
-	}
+            VarInstance i = (VarInstance) o;
+            return flags.equals(i.flags()) && ts.equals(type, i.type())
+                    && name.equals(i.name());
+        }
 
-	return false;
+        return false;
     }
 
     @Override
     public boolean isCanonical() {
-	return true;
+        return true;
     }
 
     @Override
@@ -149,32 +148,30 @@ public abstract class VarInstance_c extends TypeObject_c implements VarInstance
     public void setFlags(Flags flags) {
         this.flags = flags;
     }
-    
+
     /** Destructive update of constant value. */
     @Override
     public void setConstantValue(Object constantValue) {
-        if (! (constantValue == null) &&
-                ! (constantValue instanceof Boolean) &&
-                ! (constantValue instanceof Number) &&
-                ! (constantValue instanceof Character) &&
-                ! (constantValue instanceof String)) {
-            
-            throw new InternalCompilerError(
-            "Can only set constant value to a primitive or String.");
+        if (!(constantValue == null) && !(constantValue instanceof Boolean)
+                && !(constantValue instanceof Number)
+                && !(constantValue instanceof Character)
+                && !(constantValue instanceof String)) {
+
+            throw new InternalCompilerError("Can only set constant value to a primitive or String.");
         }
 
         this.constantValue = constantValue;
         this.isConstant = true;
         this.constantValueSet = true;
     }
-    
+
     @Override
     public void setNotConstant() {
         this.constantValue = null;
         this.isConstant = false;
         this.constantValueSet = true;
     }
-    
+
     /**
      * @param name The name to set.
      */

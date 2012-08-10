@@ -24,9 +24,10 @@ public class SuperTypeConstraint extends Constraint {
 
     @Override
     public boolean canSimplify() {
-        return formal instanceof TypeVariable && !solver.isTargetTypeVariable(formal);
+        return formal instanceof TypeVariable
+                && !solver.isTargetTypeVariable(formal);
     }
-    
+
     @Override
     public String toString() {
         return actual + " :> " + formal;

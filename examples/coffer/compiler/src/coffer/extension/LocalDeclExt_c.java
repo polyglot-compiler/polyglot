@@ -30,18 +30,24 @@ public class LocalDeclExt_c extends CofferExt_c {
     }
 
     @Override
-    public void checkHeldKeys(KeySet held, KeySet stored) throws SemanticException {
+    public void checkHeldKeys(KeySet held, KeySet stored)
+            throws SemanticException {
         LocalDecl n = (LocalDecl) node();
 
         if (n.init() != null && n.init().type() instanceof CofferClassType) {
             CofferClassType t = (CofferClassType) n.init().type();
 
-            if (t.key() != null && ! held.contains(t.key())) {
-                throw new SemanticException("Cannot assign tracked value unless key \"" + t.key() + "\" held.", n.position());
+            if (t.key() != null && !held.contains(t.key())) {
+                throw new SemanticException("Cannot assign tracked value unless key \""
+                                                    + t.key() + "\" held.",
+                                            n.position());
             }
 
             if (t.key() != null && stored.contains(t.key())) {
-                throw new SemanticException("Cannot assign tracked value with key \"" + t.key() + "\" more than once.", n.position());
+                throw new SemanticException("Cannot assign tracked value with key \""
+                                                    + t.key()
+                                                    + "\" more than once.",
+                                            n.position());
             }
         }
     }

@@ -50,8 +50,7 @@ import polyglot.visit.TypeChecker;
  * of the node should copy the node, set the field in the copy, and then
  * return the copy.
  */
-public interface NodeOps
-{
+public interface NodeOps {
     /**
      * Visit the children of the node.
      *
@@ -141,7 +140,8 @@ public interface NodeOps
      *
      * @param ar The visitor which disambiguates.
      */
-    Node disambiguateOverride(Node parent, AmbiguityRemover ar) throws SemanticException;
+    Node disambiguateOverride(Node parent, AmbiguityRemover ar)
+            throws SemanticException;
 
     /**
      * Remove any remaining ambiguities from the AST.
@@ -206,7 +206,8 @@ public interface NodeOps
      *
      * @param tc The type checking visitor.
      */
-    Node typeCheckOverride(Node parent, TypeChecker tc) throws SemanticException;
+    Node typeCheckOverride(Node parent, TypeChecker tc)
+            throws SemanticException;
 
     /**
      * Type check the AST.
@@ -233,7 +234,7 @@ public interface NodeOps
      * @param cc The constant checking visitor.
      */
     Node checkConstants(ConstantChecker cc) throws SemanticException;
-    
+
     /**
      * Check that exceptions are properly propagated throughout the AST.
      *
@@ -246,7 +247,8 @@ public interface NodeOps
      *
      * @param ec The visitor.
      */
-    NodeVisitor exceptionCheckEnter(ExceptionChecker ec) throws SemanticException;
+    NodeVisitor exceptionCheckEnter(ExceptionChecker ec)
+            throws SemanticException;
 
     /**
      * Check that exceptions are properly propagated throughout the AST.
@@ -269,16 +271,16 @@ public interface NodeOps
 
     /** Dump the AST for debugging. */
     public void dump(OutputStream os);
-    
+
     /** Dump the AST for debugging. */
     public void dump(Writer w);
-    
+
     /** Pretty-print the AST for debugging. */
     public void prettyPrint(OutputStream os);
-    
+
     /** Pretty-print the AST for debugging. */
     public void prettyPrint(Writer w);
- 
+
     /**
      * Pretty-print the AST using the given code writer.
      *
@@ -294,11 +296,12 @@ public interface NodeOps
      * @param tr The translation pass.  This is <i>not</i> a visitor.
      */
     void translate(CodeWriter w, Translator tr);
-    
+
     /**
      * Produce a copy of this node using the given NodeFactory.
      */
     Node copy(NodeFactory nf);
+
     /**
      * Produce a copy of this node using the given ExtensionInfo.
      * This will typically be implemented by calling
@@ -307,6 +310,5 @@ public interface NodeOps
      * @throws SemanticException If the type information cannot be copied.
      */
     Node copy(ExtensionInfo extInfo) throws SemanticException;
-    
 
 }

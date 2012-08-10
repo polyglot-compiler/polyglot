@@ -34,8 +34,8 @@ import polyglot.util.Enum;
  * classpath, parsed from a source file, or obtained from other source.
  * A <code>ClassType</code> is not necessarily named.
  */
-public interface ClassType extends Importable, ReferenceType, MemberInstance, Declaration
-{
+public interface ClassType extends Importable, ReferenceType, MemberInstance,
+        Declaration {
     public static class Kind extends Enum {
         public Kind(String name) {
             super(name);
@@ -51,7 +51,7 @@ public interface ClassType extends Importable, ReferenceType, MemberInstance, De
      * A resolver to access member classes of the class.
      */
     Resolver resolver();
-    
+
     /** Get the class's kind. */
     Kind kind();
 
@@ -106,7 +106,7 @@ public interface ClassType extends Importable, ReferenceType, MemberInstance, De
      * Is used to determine if a nested class is implicitly static.
      */
     boolean inStaticContext();
-    
+
     /**
      * The class's constructors.
      * A list of <code>ConstructorInstance</code>.

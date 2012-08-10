@@ -38,26 +38,26 @@ public class ParamTypeNode_c extends TypeNode_c implements ParamTypeNode {
     }
 
     @Override
-	public ParamTypeNode id(Id id) {
+    public ParamTypeNode id(Id id) {
         ParamTypeNode_c n = (ParamTypeNode_c) copy();
         n.id = id;
         return n;
     }
 
     @Override
-	public Id id() {
+    public Id id() {
         return this.id;
     }
 
     @Override
-	public ParamTypeNode bounds(List<TypeNode> l) {
+    public ParamTypeNode bounds(List<TypeNode> l) {
         ParamTypeNode_c n = (ParamTypeNode_c) copy();
         n.bounds = l;
         return n;
     }
 
     @Override
-	public List<TypeNode> bounds() {
+    public List<TypeNode> bounds() {
         return bounds;
     }
 
@@ -71,19 +71,19 @@ public class ParamTypeNode_c extends TypeNode_c implements ParamTypeNode {
     }
 
     @Override
-	public Node visitChildren(NodeVisitor v) {
+    public Node visitChildren(NodeVisitor v) {
         List<TypeNode> bounds = visitList(this.bounds, v);
         return reconstruct(bounds);
     }
 
     @Override
-	public Context enterScope(Context c) {
+    public Context enterScope(Context c) {
         c = ((JL5Context) c).pushTypeVariable((TypeVariable) type());
         return super.enterScope(c);
     }
 
     @Override
-	public void addDecls(Context c) {
+    public void addDecls(Context c) {
         // we do not need to add the type variable to the scope
         // since that will be taken care of by the parent node.
         super.addDecls(c);
@@ -92,12 +92,13 @@ public class ParamTypeNode_c extends TypeNode_c implements ParamTypeNode {
     // nothing needed for buildTypesEnter - not a code block like methods
 
     @Override
-	public Node buildTypes(TypeBuilder tb) throws SemanticException {
+    public Node buildTypes(TypeBuilder tb) throws SemanticException {
         // makes a new TypeVariable with a list of bounds which
         // are unknown types
         JL5TypeSystem ts = (JL5TypeSystem) tb.typeSystem();
 
-        ArrayList<ReferenceType> typeList = new ArrayList<ReferenceType>(bounds.size());
+        ArrayList<ReferenceType> typeList =
+                new ArrayList<ReferenceType>(bounds.size());
         for (int i = 0; i < bounds.size(); i++) {
             typeList.add(ts.unknownReferenceType(position()));
         }
@@ -111,40 +112,42 @@ public class ParamTypeNode_c extends TypeNode_c implements ParamTypeNode {
 
     @Override
     public Node disambiguate(AmbiguityRemover ar) throws SemanticException {
-    	// all of the children (bounds list) will have already been 
-    	// disambiguated and should there for be actual types
-    	JL5TypeSystem ts = (JL5TypeSystem) ar.typeSystem();
+        // all of the children (bounds list) will have already been 
+        // disambiguated and should there for be actual types
+        JL5TypeSystem ts = (JL5TypeSystem) ar.typeSystem();
 
-    	boolean ambiguous = false;
-		ArrayList<Type> typeList = new ArrayList<Type>();
-		for (TypeNode tn : bounds) {
-			if (!tn.isDisambiguated()) {
-			    // not disambiguated yet
-			    ambiguous = true;
-			}
+        boolean ambiguous = false;
+        ArrayList<Type> typeList = new ArrayList<Type>();
+        for (TypeNode tn : bounds) {
+            if (!tn.isDisambiguated()) {
+                // not disambiguated yet
+                ambiguous = true;
+            }
 //			if (!tn.type().isReference()) {
 //			    throw new SemanticException("Cannot instantiate a type parameter with type " + tn.type());
 //			}
-			typeList.add(tn.type());
-    	}
-		if (!ambiguous) {
-		    TypeVariable tv = (TypeVariable) this.type();
-		    //		System.err.println("paramtypenode_c : dismab and setting bounds of " + tv + " to " + typeList);
-		    List<ReferenceType> refTypeList = new ArrayList<ReferenceType>();
-		    for (Type t : typeList) refTypeList.add((ReferenceType) t);
-		    tv.setUpperBound(ts.intersectionType(this.position(), refTypeList));
-		}
+            typeList.add(tn.type());
+        }
+        if (!ambiguous) {
+            TypeVariable tv = (TypeVariable) this.type();
+            //		System.err.println("paramtypenode_c : dismab and setting bounds of " + tv + " to " + typeList);
+            List<ReferenceType> refTypeList = new ArrayList<ReferenceType>();
+            for (Type t : typeList)
+                refTypeList.add((ReferenceType) t);
+            tv.setUpperBound(ts.intersectionType(this.position(), refTypeList));
+        }
         return this;
     }
 
     @Override
-	public Node typeCheck(TypeChecker tc) throws SemanticException {
+    public Node typeCheck(TypeChecker tc) throws SemanticException {
         for (int i = 0; i < bounds.size(); i++) {
             TypeNode ti = bounds.get(i);
             for (int j = i + 1; j < bounds.size(); j++) {
                 TypeNode tj = bounds.get(j);
                 if (tc.typeSystem().equals(ti.type(), tj.type())) {
-                    throw new SemanticException("Duplicate bound in type variable declaration", tj.position());
+                    throw new SemanticException("Duplicate bound in type variable declaration",
+                                                tj.position());
                 }
             }
         }
@@ -152,7 +155,8 @@ public class ParamTypeNode_c extends TypeNode_c implements ParamTypeNode {
         for (int i = 0; i < bounds.size(); i++) {
             TypeNode ti = bounds.get(i);
             if (ti.type() instanceof ArrayType) {
-                throw new SemanticException("Unexpected type bound in type variable declaration", ti.position());
+                throw new SemanticException("Unexpected type bound in type variable declaration",
+                                            ti.position());
             }
         }
 
@@ -160,7 +164,8 @@ public class ParamTypeNode_c extends TypeNode_c implements ParamTypeNode {
         for (int i = 0; i < bounds.size(); i++) {
             TypeNode tn = bounds.get(i);
             if (i > 0 && !tn.type().toClass().flags().isInterface()) {
-                throw new SemanticException("Interface expected here.", tn.position());
+                throw new SemanticException("Interface expected here.",
+                                            tn.position());
             }
         }
 
@@ -171,7 +176,7 @@ public class ParamTypeNode_c extends TypeNode_c implements ParamTypeNode {
     }
 
     @Override
-	public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
+    public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
         w.write(id.id());
         if (bounds() != null && !bounds().isEmpty()) {
             w.write(" extends ");
@@ -184,7 +189,7 @@ public class ParamTypeNode_c extends TypeNode_c implements ParamTypeNode {
             }
         }
     }
-    
+
     @Override
     public String name() {
         return id().toString();

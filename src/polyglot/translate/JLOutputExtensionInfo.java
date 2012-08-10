@@ -52,9 +52,10 @@ public class JLOutputExtensionInfo extends JLExtensionInfo {
         List<Arg<?>> arguments = parentOpts.filterArgs(opt.flags());
         try {
             opt.processArguments(arguments, Collections.<String> emptySet());
-        } catch (UsageError e) {
-            throw new InternalCompilerError(
-                    "Got usage error while configuring output extension", e);
+        }
+        catch (UsageError e) {
+            throw new InternalCompilerError("Got usage error while configuring output extension",
+                                            e);
         }
         return opt;
     }

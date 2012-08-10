@@ -52,175 +52,164 @@ import polyglot.util.CodeWriter;
  * a list of nodes and their parents. Then a second pass is made to randomly 
  * replace a branch of the tree with another suitable branch. 
  */
-public class NodeScrambler extends NodeVisitor
-{
-  public FirstPass fp;
+public class NodeScrambler extends NodeVisitor {
+    public FirstPass fp;
 
-  protected HashMap<Node, LinkedList<Node>> pairs;
-  protected LinkedList<Node> nodes;
-  protected LinkedList<Node> currentParents;
-  protected long seed;
-  protected Random ran;
-  protected boolean scrambled = false;
-  protected CodeWriter cw;
+    protected HashMap<Node, LinkedList<Node>> pairs;
+    protected LinkedList<Node> nodes;
+    protected LinkedList<Node> currentParents;
+    protected long seed;
+    protected Random ran;
+    protected boolean scrambled = false;
+    protected CodeWriter cw;
 
-  public NodeScrambler()
-  {
-    this(new Random().nextLong());
-  }
-
-  /**
-   * Create a new <code>NodeScrambler</code> with the given random number
-   * generator seed.
-   */
-  public NodeScrambler( long seed)
-  {
-    this.fp = new FirstPass();
-    
-    this.pairs = new HashMap<Node, LinkedList<Node>>();
-    this.nodes = new LinkedList<Node>();
-    this.currentParents = new LinkedList<Node>();
-    this.cw = Compiler.createCodeWriter(System.err, 72);
-    this.seed = seed;
-    
-    this.ran = new Random( seed);
-  }
-
-  /**
-   * Scans throught the AST, create a list of all nodes present, along with
-   * the set of parents for each node in the tree. <b>This visitor should be
-   * run before the main <code>NodeScrambler</code> visits the tree.</b>
-   */
-  public class FirstPass extends NodeVisitor 
-  {
-    @Override
-    public NodeVisitor enter( Node n)
-    {
-      @SuppressWarnings("unchecked")
-      LinkedList<Node> clone = (LinkedList<Node>) currentParents.clone();
-      pairs.put( n, clone);
-      nodes.add( n);
-      
-      currentParents.add( n);
-      return this;
+    public NodeScrambler() {
+        this(new Random().nextLong());
     }
-    
-    @Override
-    public Node leave( Node old, Node n, NodeVisitor v)
-    {
-      currentParents.remove( n);
-      return n;
+
+    /**
+     * Create a new <code>NodeScrambler</code> with the given random number
+     * generator seed.
+     */
+    public NodeScrambler(long seed) {
+        this.fp = new FirstPass();
+
+        this.pairs = new HashMap<Node, LinkedList<Node>>();
+        this.nodes = new LinkedList<Node>();
+        this.currentParents = new LinkedList<Node>();
+        this.cw = Compiler.createCodeWriter(System.err, 72);
+        this.seed = seed;
+
+        this.ran = new Random(seed);
     }
-  }
 
-  public long getSeed()
-  {
-    return seed;
-  }
+    /**
+     * Scans throught the AST, create a list of all nodes present, along with
+     * the set of parents for each node in the tree. <b>This visitor should be
+     * run before the main <code>NodeScrambler</code> visits the tree.</b>
+     */
+    public class FirstPass extends NodeVisitor {
+        @Override
+        public NodeVisitor enter(Node n) {
+            @SuppressWarnings("unchecked")
+            LinkedList<Node> clone = (LinkedList<Node>) currentParents.clone();
+            pairs.put(n, clone);
+            nodes.add(n);
 
-  @Override
-public Node override( Node n)
-  {
-    if( coinFlip()) {
-      Node m = potentialScramble( n);
-      if( m == null) {
-        /* No potential replacement. */
+            currentParents.add(n);
+            return this;
+        }
+
+        @Override
+        public Node leave(Node old, Node n, NodeVisitor v) {
+            currentParents.remove(n);
+            return n;
+        }
+    }
+
+    public long getSeed() {
+        return seed;
+    }
+
+    @Override
+    public Node override(Node n) {
+        if (coinFlip()) {
+            Node m = potentialScramble(n);
+            if (m == null) {
+                /* No potential replacement. */
+                return null;
+            }
+            else {
+                scrambled = true;
+
+                try {
+                    System.err.println("Replacing:");
+                    n.del().dump(System.err);
+                    System.err.println("With:");
+                    m.del().dump(System.err);
+                }
+                catch (Exception e) {
+                    e.printStackTrace();
+                    return null;
+                }
+                return m;
+            }
+        }
+        else {
+            return null;
+        }
+    }
+
+    protected boolean coinFlip() {
+        if (scrambled) {
+            return false;
+        }
+        else {
+            if (ran.nextDouble() > 0.9) {
+                return true;
+            }
+            else {
+                return false;
+            }
+        }
+    }
+
+    protected Node potentialScramble(Node n) {
+        Class<? extends Node> required = Node.class;
+
+        if (n instanceof SourceFile) {
+            return null;
+        }
+        if (n instanceof Import) {
+            required = Import.class;
+        }
+        else if (n instanceof TypeNode) {
+            required = TypeNode.class;
+        }
+        else if (n instanceof ClassDecl) {
+            required = ClassDecl.class;
+        }
+        else if (n instanceof ClassMember) {
+            required = ClassMember.class;
+        }
+        else if (n instanceof Formal) {
+            required = Formal.class;
+        }
+        else if (n instanceof Expr) {
+            required = Expr.class;
+        }
+        else if (n instanceof Block) {
+            required = Block.class;
+        }
+        else if (n instanceof Catch) {
+            required = Catch.class;
+        }
+        else if (n instanceof LocalDecl) {
+            required = LocalDecl.class;
+        }
+        else if (n instanceof Stmt) {
+            required = Stmt.class;
+        }
+
+        LinkedList<Node> parents = pairs.get(n);
+        boolean isParent;
+
+        for (Node m : nodes) {
+            if (required.isAssignableFrom(m.getClass())) {
+
+                isParent = false;
+                for (Node m2 : parents) {
+                    if (m == m2) {
+                        isParent = true;
+                    }
+                }
+
+                if (!isParent && m != n) {
+                    return m;
+                }
+            }
+        }
+
         return null;
-      }
-      else {
-        scrambled = true;
-
-        try {
-          System.err.println( "Replacing:");
-          n.del().dump(System.err);
-          System.err.println( "With:");
-          m.del().dump(System.err);
-        }
-        catch( Exception e)
-        {
-          e.printStackTrace();
-          return null;
-        }
-        return m;
-      }
     }
-    else {
-      return null;
-    }  
-  }
-
-  protected boolean coinFlip()
-  {
-    if( scrambled) {
-      return false;
-    }
-    else {
-      if( ran.nextDouble() > 0.9) {
-        return true;
-      }
-      else {
-        return false;
-      }
-    }
-  }
-
-  protected Node potentialScramble( Node n)
-  {
-    Class<? extends Node> required = Node.class;
-
-    if( n instanceof SourceFile) {
-      return null;
-    }
-    if( n instanceof Import) {
-      required = Import.class;
-    }
-    else if( n instanceof TypeNode) {
-      required = TypeNode.class;
-    }
-    else if( n instanceof ClassDecl) {
-      required = ClassDecl.class;
-    }
-    else if( n instanceof ClassMember) {
-      required = ClassMember.class;
-    }
-    else if( n instanceof Formal) {
-      required = Formal.class;
-    }
-    else if( n instanceof Expr) {
-      required = Expr.class;
-    }
-    else if( n instanceof Block) {
-      required = Block.class;
-    }
-    else if( n instanceof Catch) {
-      required = Catch.class;
-    }
-    else if( n instanceof LocalDecl) {
-      required = LocalDecl.class;
-    }
-    else if( n instanceof Stmt) {
-      required = Stmt.class;
-    }
-
-    LinkedList<Node> parents = pairs.get( n);
-    boolean isParent;
-
-    for (Node m : nodes) {
-      if( required.isAssignableFrom( m.getClass())) {
-
-        isParent = false;
-        for (Node m2 : parents) {
-          if( m == m2) {
-            isParent = true;
-          }
-        }
-
-        if( !isParent && m != n) {
-          return m;
-        }
-      }
-    }
-
-    return null;
-  }
 }

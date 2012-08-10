@@ -50,7 +50,7 @@ public class FinalLocalExtractor extends NodeVisitor {
 
     /** Set of LocalInstances declared final; these should not be made non-final. */
     protected Set<LocalInstance> isFinal;
-    
+
     /**
      * @param job
      * @param ts
@@ -65,12 +65,12 @@ public class FinalLocalExtractor extends NodeVisitor {
         isFinal = new HashSet<LocalInstance>();
         return super.begin();
     }
-    
+
     @Override
     public void finish() {
         isFinal = null;
     }
-    
+
     // TODO: handle locals that are not initialized when declared
     //
     // TODO: handle anonymous classes: this visitor assumes all LocalInstances
@@ -86,7 +86,7 @@ public class FinalLocalExtractor extends NodeVisitor {
         if (n instanceof Formal) {
             Formal d = (Formal) n;
             LocalInstance li = d.localInstance();
-            if (! li.flags().isFinal()) {
+            if (!li.flags().isFinal()) {
                 li.setFlags(li.flags().Final());
             }
             else {
@@ -96,7 +96,7 @@ public class FinalLocalExtractor extends NodeVisitor {
         if (n instanceof LocalDecl) {
             LocalDecl d = (LocalDecl) n;
             LocalInstance li = d.localInstance();
-            if (! li.flags().isFinal()) {
+            if (!li.flags().isFinal()) {
                 li.setFlags(li.flags().Final());
             }
             else {
@@ -108,9 +108,11 @@ public class FinalLocalExtractor extends NodeVisitor {
             if (u.expr() instanceof Local) {
                 Local l = (Local) u.expr();
                 LocalInstance li = l.localInstance().orig();
-                if (u.operator() == Unary.PRE_DEC || u.operator() == Unary.POST_DEC ||
-                    u.operator() == Unary.PRE_INC || u.operator() == Unary.POST_INC) {
-                    if (! isFinal.contains(li.orig())) {
+                if (u.operator() == Unary.PRE_DEC
+                        || u.operator() == Unary.POST_DEC
+                        || u.operator() == Unary.PRE_INC
+                        || u.operator() == Unary.POST_INC) {
+                    if (!isFinal.contains(li.orig())) {
                         li.setFlags(li.flags().clearFinal());
                     }
                 }
@@ -120,14 +122,14 @@ public class FinalLocalExtractor extends NodeVisitor {
             Assign a = (Assign) n;
             if (a.left() instanceof Local) {
                 LocalInstance li = ((Local) a.left()).localInstance().orig();
-                if (! isFinal.contains(li)) {
+                if (!isFinal.contains(li)) {
                     li.setFlags(li.flags().clearFinal());
                 }
             }
         }
         return super.enter(parent, n);
     }
-    
+
     protected static class LocalDeclFixer extends NodeVisitor {
         @Override
         public Node leave(Node old, Node n, NodeVisitor v) {
@@ -142,7 +144,7 @@ public class FinalLocalExtractor extends NodeVisitor {
             return n;
         }
     }
-    
+
     @Override
     public Node leave(Node old, Node n, NodeVisitor v) {
         // Revisit everything to ensure the local decls' flags agree with

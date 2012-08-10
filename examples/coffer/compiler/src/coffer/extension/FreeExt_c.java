@@ -20,7 +20,7 @@ public class FreeExt_c extends CofferExt_c {
 
         Type t = f.expr().type();
 
-        if (! (t instanceof CofferClassType)) {
+        if (!(t instanceof CofferClassType)) {
             return held_keys;
         }
 
@@ -30,22 +30,22 @@ public class FreeExt_c extends CofferExt_c {
     }
 
     @Override
-    public void checkHeldKeys(KeySet held, KeySet stored) throws SemanticException {
+    public void checkHeldKeys(KeySet held, KeySet stored)
+            throws SemanticException {
         Free f = (Free) node();
 
         Type t = f.expr().type();
 
-        if (! (t instanceof CofferClassType)) {
-            throw new SemanticException("Cannot free expression of " +
-                                        "non-tracked type \"" + t + "\".",
-                                        f.position());
+        if (!(t instanceof CofferClassType)) {
+            throw new SemanticException("Cannot free expression of "
+                    + "non-tracked type \"" + t + "\".", f.position());
         }
 
         CofferClassType ct = (CofferClassType) t;
 
-        if (! held.contains(ct.key())) {
-            throw new SemanticException("Key \"" + ct.key() +
-                                        "\" not held.", f.position());
+        if (!held.contains(ct.key())) {
+            throw new SemanticException("Key \"" + ct.key() + "\" not held.",
+                                        f.position());
         }
     }
 }

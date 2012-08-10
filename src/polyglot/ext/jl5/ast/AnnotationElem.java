@@ -17,6 +17,7 @@ import polyglot.types.SemanticException;
 public interface AnnotationElem extends Expr {
 
     TypeNode typeName();
+
     AnnotationElem typeName(TypeNode typeName);
 
     List<ElementValuePair> elements();

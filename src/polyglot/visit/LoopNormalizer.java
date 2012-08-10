@@ -78,7 +78,7 @@ public class LoopNormalizer extends NodeVisitor {
             Do s = (Do) n;
             return translateDo(s);
         }
-        
+
         if (n instanceof For) {
             For s = (For) n;
             return translateFor(s);
@@ -100,7 +100,7 @@ public class LoopNormalizer extends NodeVisitor {
     protected Block createBlock(List<Stmt> stmts) {
         return postCreate(nf.Block(Position.compilerGenerated(), stmts));
     }
-    
+
     protected Block createBlock() {
         return postCreate(nf.Block(Position.compilerGenerated()));
     }
@@ -111,23 +111,26 @@ public class LoopNormalizer extends NodeVisitor {
         w = postCreate(w);
         return w;
     }
-    
+
     protected LocalDecl createLoopVar(Loop source, Expr cond) {
         Position pos = source.position();
-        LocalInstance li = ts.localInstance(pos, Flags.NONE, ts.Boolean(), 
-            newId());
-        LocalDecl var = nf.LocalDecl(pos, Flags.NONE,
-            postCreate(nf.CanonicalTypeNode(pos, ts.Boolean())), 
-            postCreate(nf.Id(pos, li.name())), cond);
+        LocalInstance li =
+                ts.localInstance(pos, Flags.NONE, ts.Boolean(), newId());
+        LocalDecl var =
+                nf.LocalDecl(pos,
+                             Flags.NONE,
+                             postCreate(nf.CanonicalTypeNode(pos, ts.Boolean())),
+                             postCreate(nf.Id(pos, li.name())),
+                             cond);
         var = var.localInstance(li);
         var = postCreate(var);
         return var;
     }
-    
+
     protected LocalDecl createLoopVar(Loop source) {
         return createLoopVar(source, createBool(false));
     }
-    
+
     protected If createLoopIf(LocalDecl var, Stmt body) {
         Position pos = var.position();
         Local cond = createLocal(var.localInstance(), pos);
@@ -136,19 +139,21 @@ public class LoopNormalizer extends NodeVisitor {
         s = postCreate(s);
         return s;
     }
-    
+
     protected Eval createAssign(LocalDecl var, Expr right) {
         Position pos = var.position();
         Local left = createLocal(var.localInstance(), pos);
-        Eval a = nf.Eval(pos, postCreate(nf.Assign(pos, left, Assign.ASSIGN, right)));
+        Eval a =
+                nf.Eval(pos,
+                        postCreate(nf.Assign(pos, left, Assign.ASSIGN, right)));
         a = postCreate(a);
         return a;
     }
-    
+
     protected Eval createAssign(LocalDecl var) {
         return createAssign(var, createBool(true));
     }
-    
+
     protected If createInitIf(LocalDecl var, Expr cond) {
         Position pos = var.position();
         Local use = createLocal(var.localInstance(), pos);
@@ -156,28 +161,29 @@ public class LoopNormalizer extends NodeVisitor {
         s = postCreate(s);
         return s;
     }
-    
+
     protected If createIterIf(LocalDecl var, List<ForUpdate> iters) {
         Position pos = var.position();
         Local use = createLocal(var.localInstance(), pos);
         List<Stmt> stmts = new ArrayList<Stmt>(iters.size());
-        
+
         for (Stmt s : iters) {
             stmts.add(postCreate(s));
         }
-        
+
         If s = nf.If(pos, use, createBlock(stmts));
         s = postCreate(s);
         return s;
     }
+
     protected Local createLocal(LocalInstance li, Position pos) {
         Local l = nf.Local(pos, nf.Id(pos, li.name()));
         l = l.localInstance(li);
-        l = (Local)l.type(li.type());
+        l = (Local) l.type(li.type());
         l = postCreate(l);
         return l;
     }
-    
+
     protected void addInits(List<Stmt> stmts, For source) {
         for (Stmt s : source.inits()) {
             stmts.add(postCreate(s));
@@ -185,10 +191,10 @@ public class LoopNormalizer extends NodeVisitor {
     }
 
     protected BooleanLit createBool(boolean val) {
-        return (BooleanLit) nf.BooleanLit(Position.compilerGenerated(), 
-            val).type(ts.Boolean());
+        return (BooleanLit) nf.BooleanLit(Position.compilerGenerated(), val)
+                              .type(ts.Boolean());
     }
-    
+
     /* while (e) {...}
      * 
      * becomes
@@ -203,16 +209,17 @@ public class LoopNormalizer extends NodeVisitor {
      */
     protected Stmt translateWhile(While s) {
         Expr cond = s.cond();
-        
+
         // avoid unnecessary translations
         if (s.condIsConstantTrue()) {
             if (cond instanceof BooleanLit) {
                 return s;
-            } else {
+            }
+            else {
                 return s.cond(createBool(true));
             }
         }
-        
+
         // new loop
         While w = createLoop(s);
         LocalDecl var = createLoopVar(s, cond);
@@ -221,8 +228,8 @@ public class LoopNormalizer extends NodeVisitor {
         stmts.add(var);
         stmts.add(branch);
         w = w.body(((Block) w.body()).statements(stmts));
-        
-        return w;        
+
+        return w;
     }
 
     /* do {...} while (e);
@@ -243,7 +250,7 @@ public class LoopNormalizer extends NodeVisitor {
      */
     protected Stmt translateDo(Do s) {
         Expr cond = s.cond();
-        
+
         // new loop
         While w = createLoop(s);
         LocalDecl var = createLoopVar(s);
@@ -256,10 +263,10 @@ public class LoopNormalizer extends NodeVisitor {
         stmts = new ArrayList<Stmt>(2);
         stmts.add(var);
         stmts.add(w);
-        
-        return createBlock(stmts);        
+
+        return createBlock(stmts);
     }
-    
+
     /* for (int i = 0; i < 10; i++) {...}
      * 
      * becomes
@@ -299,7 +306,7 @@ public class LoopNormalizer extends NodeVisitor {
         addInits(stmts, s);
         stmts.add(var);
         stmts.add(w);
-        
-        return createBlock(stmts);        
+
+        return createBlock(stmts);
     }
 }

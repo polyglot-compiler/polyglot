@@ -33,8 +33,7 @@ import polyglot.util.Position;
  * a SemanticException, but is an error so it doesn't need to be declared
  * in the signature of Node.acceptCFG.
  */
-public class CFGBuildError extends InternalCompilerError
-{
+public class CFGBuildError extends InternalCompilerError {
     public CFGBuildError(String msg) {
         super(msg);
     }

@@ -7,5 +7,6 @@ import polyglot.ast.TypeNode;
 
 public interface JL5New extends New {
     List<TypeNode> typeArgs();
+
     JL5New typeArgs(List<TypeNode> typeArgs);
 }

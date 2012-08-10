@@ -41,28 +41,27 @@ import polyglot.visit.TypeChecker;
  * A <code>StringLit</code> represents an immutable instance of a 
  * <code>String</code> which corresponds to a literal string in Java code.
  */
-public class StringLit_c extends Lit_c implements StringLit
-{
+public class StringLit_c extends Lit_c implements StringLit {
     protected String value;
 
     public StringLit_c(Position pos, String value) {
-	super(pos);
-	assert(value != null);
-	this.value = value;
+        super(pos);
+        assert (value != null);
+        this.value = value;
     }
 
     /** Get the value of the expression. */
     @Override
     public String value() {
-	return this.value;
+        return this.value;
     }
 
     /** Set the value of the expression. */
     @Override
     public StringLit value(String value) {
-	StringLit_c n = (StringLit_c) copy();
-	n.value = value;
-	return n;
+        StringLit_c n = (StringLit_c) copy();
+        n.value = value;
+        return n;
     }
 
     /** Type check the expression. */
@@ -74,14 +73,15 @@ public class StringLit_c extends Lit_c implements StringLit
     @Override
     public String toString() {
         if (StringUtil.unicodeEscape(value).length() > 11) {
-            return "\"" + StringUtil.unicodeEscape(value).substring(0,8) + "...\"";
+            return "\"" + StringUtil.unicodeEscape(value).substring(0, 8)
+                    + "...\"";
         }
-                
-	return "\"" + StringUtil.unicodeEscape(value) + "\"";
+
+        return "\"" + StringUtil.unicodeEscape(value) + "\"";
     }
 
     protected int MAX_LENGTH = 60;
- 
+
     /** Write the expression to an output file. */
     @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
@@ -94,7 +94,7 @@ public class StringLit_c extends Lit_c implements StringLit
 
         w.begin(0);
 
-        for (Iterator<String> i = l.iterator(); i.hasNext(); ) {
+        for (Iterator<String> i = l.iterator(); i.hasNext();) {
             String s = i.next();
 
             w.write("\"");
@@ -144,7 +144,7 @@ public class StringLit_c extends Lit_c implements StringLit
 
         if (result.isEmpty()) {
             // This should only happen when value == "".
-            if (! value.equals("")) {
+            if (!value.equals("")) {
                 throw new InternalCompilerError("breakupString failed");
             }
             result.add(value);
@@ -152,12 +152,12 @@ public class StringLit_c extends Lit_c implements StringLit
 
         return result;
     }
-    
+
     @Override
     public Object constantValue() {
-	return value;
+        return value;
     }
-    
+
     @Override
     public Node copy(NodeFactory nf) {
         return nf.StringLit(this.position, this.value);

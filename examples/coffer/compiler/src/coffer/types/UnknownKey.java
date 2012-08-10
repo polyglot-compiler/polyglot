@@ -7,7 +7,5 @@
 
 package coffer.types;
 
-
-public interface UnknownKey extends Key
-{
+public interface UnknownKey extends Key {
 }

@@ -8,57 +8,58 @@ import javax.tools.FileObject;
 import javax.tools.ForwardingFileObject;
 
 public class Source_c extends ForwardingFileObject<FileObject> implements
-		FileSource {
-	protected boolean user_specified;
+        FileSource {
+    protected boolean user_specified;
 
-	protected Source_c(FileObject f, boolean userSpecified) {
-		super(f);
-		this.user_specified = userSpecified;
-	}
+    protected Source_c(FileObject f, boolean userSpecified) {
+        super(f);
+        this.user_specified = userSpecified;
+    }
 
-	@Override
+    @Override
     public void setUserSpecified(boolean userSpecified) {
-		this.user_specified = userSpecified;
-	}
+        this.user_specified = userSpecified;
+    }
 
-	@Override
+    @Override
     public boolean userSpecified() {
-		return user_specified;
-	}
-	
-	@Override
+        return user_specified;
+    }
+
+    @Override
     public String name() {
-		return getName();
-	}
-	
-	@Override
+        return getName();
+    }
+
+    @Override
     public String path() {
-		return toUri().getPath();
-	}
+        return toUri().getPath();
+    }
 
-	@Override
-	public Reader openReader(boolean ignoreEncodingErrors) throws IOException {
-		return new InputStreamReader(openInputStream());
-	}
+    @Override
+    public Reader openReader(boolean ignoreEncodingErrors) throws IOException {
+        return new InputStreamReader(openInputStream());
+    }
 
-	@Override
-	public String toString() {
-		return toUri().getPath();
-	}
+    @Override
+    public String toString() {
+        return toUri().getPath();
+    }
 
-	@Override
+    @Override
     public boolean equals(Object o) {
-		if (o instanceof FileObject) {
+        if (o instanceof FileObject) {
 
-			FileObject fo = (FileObject) o;
-			return toUri().equals(fo.toUri());
-		} else {
-			return false;
-		}
-	}
+            FileObject fo = (FileObject) o;
+            return toUri().equals(fo.toUri());
+        }
+        else {
+            return false;
+        }
+    }
 
-	@Override
+    @Override
     public int hashCode() {
-		return toUri().hashCode();
-	}
+        return toUri().hashCode();
+    }
 }

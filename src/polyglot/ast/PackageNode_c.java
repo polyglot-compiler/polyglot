@@ -38,19 +38,19 @@ import polyglot.visit.Translator;
  * A <code>PackageNode</code> is the syntactic representation of a 
  * Java package within the abstract syntax tree.
  */
-public class PackageNode_c extends Node_c implements PackageNode
-{
+public class PackageNode_c extends Node_c implements PackageNode {
     protected Package package_;
 
     public PackageNode_c(Position pos, Package package_) {
-	super(pos);
-	assert(package_ != null);
-	this.package_ = package_;
+        super(pos);
+        assert (package_ != null);
+        this.package_ = package_;
     }
-    
+
     @Override
     public boolean isDisambiguated() {
-        return package_ != null && package_.isCanonical() && super.isDisambiguated();
+        return package_ != null && package_.isCanonical()
+                && super.isDisambiguated();
     }
 
     /** Get the package as a qualifier. */
@@ -62,15 +62,15 @@ public class PackageNode_c extends Node_c implements PackageNode
     /** Get the package. */
     @Override
     public Package package_() {
-	return this.package_;
+        return this.package_;
     }
 
     /** Set the package. */
     @Override
     public PackageNode package_(Package package_) {
-	PackageNode_c n = (PackageNode_c) copy();
-	n.package_ = package_;
-	return n;
+        PackageNode_c n = (PackageNode_c) copy();
+        n.package_ = package_;
+        return n;
     }
 
     /** Write the package name to an output file. */
@@ -80,10 +80,10 @@ public class PackageNode_c extends Node_c implements PackageNode
             w.write("<unknown-package>");
         }
         else {
-	    package_.print(w);
+            package_.print(w);
         }
     }
-    
+
     @Override
     public void translate(CodeWriter w, Translator tr) {
         w.write(package_.translate(tr.context()));
@@ -93,19 +93,21 @@ public class PackageNode_c extends Node_c implements PackageNode
     public String toString() {
         return package_.toString();
     }
-    
+
     @Override
     public Node copy(NodeFactory nf) {
         return nf.PackageNode(this.position, this.package_);
     }
+
     @Override
     public Node copy(ExtensionInfo extInfo) throws SemanticException {
-        PackageNode pn = (PackageNode)this.del().copy(extInfo.nodeFactory());
+        PackageNode pn = (PackageNode) this.del().copy(extInfo.nodeFactory());
         if (pn.package_() != null) {
-            pn = pn.package_(extInfo.typeSystem().packageForName(pn.package_().fullName()));
+            pn =
+                    pn.package_(extInfo.typeSystem()
+                                       .packageForName(pn.package_().fullName()));
         }
         return pn;
     }
-
 
 }

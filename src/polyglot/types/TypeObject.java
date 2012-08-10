@@ -35,8 +35,7 @@ import polyglot.util.Position;
  * It is a static representation of a type that is not necessarily 
  * first-class.  It is similar to a compile-time meta-object.
  */
-public interface TypeObject extends Copy, Serializable
-{
+public interface TypeObject extends Copy, Serializable {
     /**
      * Return true if the type object contains no unknown/ambiguous types.
      */
@@ -51,7 +50,7 @@ public interface TypeObject extends Copy, Serializable
      * The object's position, or null.
      */
     Position position();
-    
+
     /**
      * Return true iff this type object is the same as <code>t</code>.
      * All Polyglot extensions should attempt to maintain pointer

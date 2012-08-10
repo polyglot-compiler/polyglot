@@ -11,9 +11,11 @@ import polyglot.types.Type;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
 
-public abstract class JL5ClassType_c extends ClassType_c implements JL5ClassType {
+public abstract class JL5ClassType_c extends ClassType_c implements
+        JL5ClassType {
 
-    protected JL5ClassType_c() { }
+    protected JL5ClassType_c() {
+    }
 
     public JL5ClassType_c(JL5TypeSystem ts) {
         this(ts, null);
@@ -25,11 +27,11 @@ public abstract class JL5ClassType_c extends ClassType_c implements JL5ClassType
 
     @Override
     public abstract List<EnumInstance> enumConstants();
-    
+
     @Override
-    public EnumInstance enumConstantNamed(String name){
-        for(EnumInstance ei : enumConstants()) {
-            if (ei.name().equals(name)){
+    public EnumInstance enumConstantNamed(String name) {
+        for (EnumInstance ei : enumConstants()) {
+            if (ei.name().equals(name)) {
                 return ei;
             }
         }
@@ -37,7 +39,7 @@ public abstract class JL5ClassType_c extends ClassType_c implements JL5ClassType
     }
 
     @Override
-    public boolean isCastValidImpl(Type toType){        
+    public boolean isCastValidImpl(Type toType) {
         if (super.isCastValidImpl(toType)) {
             return true;
         }
@@ -45,12 +47,13 @@ public abstract class JL5ClassType_c extends ClassType_c implements JL5ClassType
     }
 
     @Override
-    public boolean isImplicitCastValidImpl(Type toType){
+    public boolean isImplicitCastValidImpl(Type toType) {
         throw new InternalCompilerError("Should not be called in JL5");
     }
+
     @Override
-    public LinkedList<Type> isImplicitCastValidChainImpl(Type toType){
-        JL5TypeSystem ts = (JL5TypeSystem)this.ts;
+    public LinkedList<Type> isImplicitCastValidChainImpl(Type toType) {
+        JL5TypeSystem ts = (JL5TypeSystem) this.ts;
         LinkedList<Type> chain = null;
         if (super.isImplicitCastValidImpl(toType)) {
             chain = new LinkedList<Type>();
@@ -68,17 +71,19 @@ public abstract class JL5ClassType_c extends ClassType_c implements JL5ClassType
         }
         return chain;
     }
-    
+
     @Override
     public String translate(Resolver c) {
         // it is a nested class of a parameterized class, use the full name.
         if (isMember()) {
-            ClassType container = container().toClass(); 
+            ClassType container = container().toClass();
             if (container instanceof JL5SubstClassType) {
-                container = ((JL5SubstClassType)container).base();
+                container = ((JL5SubstClassType) container).base();
             }
-            if (container instanceof JL5ParsedClassType && !((JL5ParsedClassType)container).typeVariables().isEmpty()) {
-                return container().translate(c) + "." + name();                
+            if (container instanceof JL5ParsedClassType
+                    && !((JL5ParsedClassType) container).typeVariables()
+                                                        .isEmpty()) {
+                return container().translate(c) + "." + name();
             }
         }
         return super.translate(c);

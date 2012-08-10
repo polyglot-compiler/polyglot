@@ -4,31 +4,35 @@ import java.util.*;
 import ppg.atoms.*;
 import ppg.util.*;
 
-public class TransferCmd implements Command
-{
-	private Nonterminal nonterminal;
-	private Vector<Production> transferList;
-	
-	public TransferCmd(String nt, Vector<Production> tlist) {
-		nonterminal = new Nonterminal(nt);
-		transferList = tlist;
-	}
+public class TransferCmd implements Command {
+    private Nonterminal nonterminal;
+    private Vector<Production> transferList;
 
-	public Nonterminal getSource() { return nonterminal; }
-	public Vector<Production> getTransferList() { return transferList; }
-	
-	@Override
-	public void unparse(CodeWriter cw) {
-		//cw.begin(0);
-		cw.write("TransferCmd");
-		cw.allowBreak(2);
-		cw.write(nonterminal + " to ");
-		Production prod;
-		for (int i=0; i < transferList.size(); i++) {
-			prod = transferList.elementAt(i);
-			prod.unparse(cw);
-		}
-		//cw.end();
-	}
-	
+    public TransferCmd(String nt, Vector<Production> tlist) {
+        nonterminal = new Nonterminal(nt);
+        transferList = tlist;
+    }
+
+    public Nonterminal getSource() {
+        return nonterminal;
+    }
+
+    public Vector<Production> getTransferList() {
+        return transferList;
+    }
+
+    @Override
+    public void unparse(CodeWriter cw) {
+        //cw.begin(0);
+        cw.write("TransferCmd");
+        cw.allowBreak(2);
+        cw.write(nonterminal + " to ");
+        Production prod;
+        for (int i = 0; i < transferList.size(); i++) {
+            prod = transferList.elementAt(i);
+            prod.unparse(cw);
+        }
+        //cw.end();
+    }
+
 }

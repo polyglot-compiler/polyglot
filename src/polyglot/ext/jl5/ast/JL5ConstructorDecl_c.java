@@ -40,54 +40,64 @@ import polyglot.visit.PrettyPrinter;
 import polyglot.visit.TypeBuilder;
 import polyglot.visit.TypeChecker;
 
-public class JL5ConstructorDecl_c extends ConstructorDecl_c implements JL5ConstructorDecl {
+public class JL5ConstructorDecl_c extends ConstructorDecl_c implements
+        JL5ConstructorDecl {
 
     protected List<ParamTypeNode> typeParams;
     protected List<AnnotationElem> annotations;
 
-    public JL5ConstructorDecl_c(Position pos, Flags flags, List<AnnotationElem> annotations, Id name, List<Formal> formals, List<TypeNode> throwTypes, Block body) {
-        this(pos, flags, annotations, name, formals, throwTypes, body, new ArrayList<ParamTypeNode>());
+    public JL5ConstructorDecl_c(Position pos, Flags flags,
+            List<AnnotationElem> annotations, Id name, List<Formal> formals,
+            List<TypeNode> throwTypes, Block body) {
+        this(pos,
+             flags,
+             annotations,
+             name,
+             formals,
+             throwTypes,
+             body,
+             new ArrayList<ParamTypeNode>());
     }
 
-
-    public JL5ConstructorDecl_c(Position pos, Flags flags, List<AnnotationElem> annotations, Id name, List<Formal> formals, List<TypeNode> throwTypes, Block body, List<ParamTypeNode> typeParams){
+    public JL5ConstructorDecl_c(Position pos, Flags flags,
+            List<AnnotationElem> annotations, Id name, List<Formal> formals,
+            List<TypeNode> throwTypes, Block body,
+            List<ParamTypeNode> typeParams) {
         super(pos, flags, name, formals, throwTypes, body);
         this.typeParams = typeParams;
-        if (annotations == null){
+        if (annotations == null) {
             annotations = Collections.emptyList();
         }
         this.annotations = annotations;
     }
 
     @Override
-    public List<AnnotationElem> annotationElems(){
+    public List<AnnotationElem> annotationElems() {
         return this.annotations;
     }
 
-    public JL5ConstructorDecl annotations(List<AnnotationElem> annotations){
+    public JL5ConstructorDecl annotations(List<AnnotationElem> annotations) {
         JL5ConstructorDecl_c n = (JL5ConstructorDecl_c) copy();
         n.annotations = annotations;
         return n;
     }
 
     @Override
-    public List<ParamTypeNode> typeParams(){
+    public List<ParamTypeNode> typeParams() {
         return this.typeParams;
     }
 
     @Override
-    public JL5ConstructorDecl typeParams(List<ParamTypeNode> typeParams){
+    public JL5ConstructorDecl typeParams(List<ParamTypeNode> typeParams) {
         JL5ConstructorDecl_c n = (JL5ConstructorDecl_c) copy();
         n.typeParams = typeParams;
         return n;
     }
 
-
     protected JL5ConstructorDecl_c reconstruct(Id name, List<Formal> formals,
             List<TypeNode> throwTypes, Block body,
             List<AnnotationElem> annotations, List<ParamTypeNode> typeParams) {
-        if (!CollectionUtil.equals(formals, this.formals)
-                || name != this.name
+        if (!CollectionUtil.equals(formals, this.formals) || name != this.name
                 || !CollectionUtil.equals(throwTypes, this.throwTypes)
                 || body != this.body
                 || !CollectionUtil.equals(annotations, this.annotations)
@@ -106,15 +116,19 @@ public class JL5ConstructorDecl_c extends ConstructorDecl_c implements JL5Constr
     }
 
     @Override
-    public Node visitChildren(NodeVisitor v){
+    public Node visitChildren(NodeVisitor v) {
         List<AnnotationElem> annotations = visitList(this.annotations, v);
         List<ParamTypeNode> typeParams = visitList(this.typeParams, v);
         Id name = (Id) visitChild(this.name, v);
         List<Formal> formals = visitList(this.formals, v);
         List<TypeNode> throwTypes = visitList(this.throwTypes, v);
         Block body = (Block) visitChild(this.body, v);
-        return reconstruct(name, formals, throwTypes, body, annotations,
-                typeParams);
+        return reconstruct(name,
+                           formals,
+                           throwTypes,
+                           body,
+                           annotations,
+                           typeParams);
     }
 
     @Override
@@ -128,27 +142,33 @@ public class JL5ConstructorDecl_c extends ConstructorDecl_c implements JL5Constr
         }
 
         boolean vararg = false;
-        List<UnknownType> formalTypes = new ArrayList<UnknownType>(formals.size());
+        List<UnknownType> formalTypes =
+                new ArrayList<UnknownType>(formals.size());
         for (int i = 0; i < formals.size(); i++) {
             formalTypes.add(ts.unknownType(position()));
             JL5Formal f = (JL5Formal) formals.get(i);
-            if (f.isVarArg())
-                vararg = true;
+            if (f.isVarArg()) vararg = true;
         }
 
-        List<UnknownType> throwTypes = new ArrayList<UnknownType>(throwTypes().size());
+        List<UnknownType> throwTypes =
+                new ArrayList<UnknownType>(throwTypes().size());
         for (int i = 0; i < throwTypes().size(); i++) {
             throwTypes.add(ts.unknownType(position()));
         }
 
-        List<TypeVariable> typeParams = new ArrayList<TypeVariable>(typeParams().size());
+        List<TypeVariable> typeParams =
+                new ArrayList<TypeVariable>(typeParams().size());
         for (int i = 0; i < typeParams().size(); i++) {
             typeParams.add(ts.unknownTypeVariable(position()));
         }
-        if (vararg)
-            flags = JL5Flags.VARARGS.set(this.flags);
-        ConstructorInstance ci = ts.constructorInstance(position(), ct,
-                flags, formalTypes, throwTypes, typeParams);
+        if (vararg) flags = JL5Flags.VARARGS.set(this.flags);
+        ConstructorInstance ci =
+                ts.constructorInstance(position(),
+                                       ct,
+                                       flags,
+                                       formalTypes,
+                                       throwTypes,
+                                       typeParams);
         ct.addConstructor(ci);
 
         return constructorInstance(ci).flags(flags);
@@ -156,7 +176,7 @@ public class JL5ConstructorDecl_c extends ConstructorDecl_c implements JL5Constr
 
     @Override
     public Node disambiguate(AmbiguityRemover ar) throws SemanticException {
-        JL5ConstructorDecl_c n = (JL5ConstructorDecl_c)super.disambiguate(ar);
+        JL5ConstructorDecl_c n = (JL5ConstructorDecl_c) super.disambiguate(ar);
         List<TypeVariable> typeParams = new LinkedList<TypeVariable>();
 
         for (TypeNode tn : n.typeParams) {
@@ -164,13 +184,14 @@ public class JL5ConstructorDecl_c extends ConstructorDecl_c implements JL5Constr
 
                 return n;
             }
-            TypeVariable tv = (TypeVariable)tn.type();
+            TypeVariable tv = (TypeVariable) tn.type();
             typeParams.add(tv);
             tv.declaringProcedure((JL5ProcedureInstance) this.ci);
 
         }
         // now type nodes are disambiguated
-        JL5ConstructorInstance ci = (JL5ConstructorInstance)n.constructorInstance();
+        JL5ConstructorInstance ci =
+                (JL5ConstructorInstance) n.constructorInstance();
         ci.setTypeParams(typeParams);
         return n;
     }
@@ -179,14 +200,15 @@ public class JL5ConstructorDecl_c extends ConstructorDecl_c implements JL5Constr
     public Context enterScope(Context c) {
         c = super.enterScope(c);
         for (TypeNode pn : typeParams) {
-            ((JL5Context)c).addTypeVariable((TypeVariable)pn.type());
+            ((JL5Context) c).addTypeVariable((TypeVariable) pn.type());
         }
         return c;
     }
 
     @Override
-    public Node annotationCheck(AnnotationChecker annoCheck) throws SemanticException {
-        JL5TypeSystem ts = (JL5TypeSystem)annoCheck.typeSystem();
+    public Node annotationCheck(AnnotationChecker annoCheck)
+            throws SemanticException {
+        JL5TypeSystem ts = (JL5TypeSystem) annoCheck.typeSystem();
         for (AnnotationElem element : annotations) {
             ts.checkAnnotationApplicability(element, this.constructorInstance());
         }
@@ -209,12 +231,12 @@ public class JL5ConstructorDecl_c extends ConstructorDecl_c implements JL5Constr
         // type params
         boolean printTypeVars = true;
         if (tr instanceof JL5Translator) {
-            JL5Translator jl5tr = (JL5Translator)tr;
+            JL5Translator jl5tr = (JL5Translator) tr;
             printTypeVars = !jl5tr.removeJava5isms();
         }
         if (printTypeVars && !this.typeParams().isEmpty()) {
             w.write("<");
-            for (Iterator<ParamTypeNode> iter = this.typeParams().iterator(); iter.hasNext(); ) {
+            for (Iterator<ParamTypeNode> iter = this.typeParams().iterator(); iter.hasNext();) {
                 ParamTypeNode ptn = iter.next();
                 ptn.prettyPrint(w, tr);
                 if (iter.hasNext()) {
@@ -230,7 +252,7 @@ public class JL5ConstructorDecl_c extends ConstructorDecl_c implements JL5Constr
 
         w.begin(0);
 
-        for (Iterator<Formal> i = formals.iterator(); i.hasNext(); ) {
+        for (Iterator<Formal> i = formals.iterator(); i.hasNext();) {
             Formal f = i.next();
             print(f, w, tr);
 
@@ -242,11 +264,11 @@ public class JL5ConstructorDecl_c extends ConstructorDecl_c implements JL5Constr
         w.end();
         w.write(")");
 
-        if (! throwTypes().isEmpty()) {
+        if (!throwTypes().isEmpty()) {
             w.allowBreak(6);
             w.write("throws ");
 
-            for (Iterator<TypeNode> i = throwTypes().iterator(); i.hasNext(); ) {
+            for (Iterator<TypeNode> i = throwTypes().iterator(); i.hasNext();) {
                 TypeNode tn = i.next();
                 print(tn, w, tr);
 
@@ -268,11 +290,12 @@ public class JL5ConstructorDecl_c extends ConstructorDecl_c implements JL5Constr
         JL5TypeSystem ts = (JL5TypeSystem) ci.typeSystem();
 
         // check at most last formal is variable
-        for (int i = 0; i < formals.size(); i++){
-            JL5Formal f = (JL5Formal)formals.get(i);
-            if (f.isVarArg()){
-                if (i != formals.size()-1) {
-                    throw new SemanticException("Only last formal can be variable in constructor declaration.", f.position());
+        for (int i = 0; i < formals.size(); i++) {
+            JL5Formal f = (JL5Formal) formals.get(i);
+            if (f.isVarArg()) {
+                if (i != formals.size() - 1) {
+                    throw new SemanticException("Only last formal can be variable in constructor declaration.",
+                                                f.position());
                 }
                 else {
                     ci.setFlags(JL5Flags.setVarArgs(ci.flags()));
@@ -292,15 +315,15 @@ public class JL5ConstructorDecl_c extends ConstructorDecl_c implements JL5Constr
             if (ci.formalTypes().isEmpty()) {
                 throw new InternalCompilerError("Inconsistent var args flag with procedure type");
             }
-            Type last = ci.formalTypes().get(ci.formalTypes().size()-1);
-            if (!(last instanceof JL5ArrayType && ((JL5ArrayType)last).isVarArg())) {
+            Type last = ci.formalTypes().get(ci.formalTypes().size() - 1);
+            if (!(last instanceof JL5ArrayType && ((JL5ArrayType) last).isVarArg())) {
                 throw new InternalCompilerError("Inconsistent var args flag with procedure type");
             }
         }
 
         // set the retained annotations
-        ci.setRetainedAnnotations(ts.createRetainedAnnotations(this
-.annotationElems(), this.position()));
+        ci.setRetainedAnnotations(ts.createRetainedAnnotations(this.annotationElems(),
+                                                               this.position()));
 
         return super.typeCheck(tc);
     }

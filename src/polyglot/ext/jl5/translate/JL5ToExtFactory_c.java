@@ -8,216 +8,216 @@ import polyglot.translate.ext.ToExtFactory_c;
 
 public class JL5ToExtFactory_c extends ToExtFactory_c implements JL5ExtFactory {
 
-	public JL5ToExtFactory_c() {
-		super();
-	}
+    public JL5ToExtFactory_c() {
+        super();
+    }
 
-	public JL5ToExtFactory_c(JL5ExtFactory nextExtFactory) {
-		super(nextExtFactory);
-	}
+    public JL5ToExtFactory_c(JL5ExtFactory nextExtFactory) {
+        super(nextExtFactory);
+    }
 
-	@Override
-	public JL5ExtFactory nextExtFactory() {
-		return (JL5ExtFactory) super.nextExtFactory();
-	}
+    @Override
+    public JL5ExtFactory nextExtFactory() {
+        return (JL5ExtFactory) super.nextExtFactory();
+    }
 
-	@Override
-	public Ext extEnumDecl() {
-		Ext e = extEnumDeclImpl();
+    @Override
+    public Ext extEnumDecl() {
+        Ext e = extEnumDeclImpl();
 
-		if (nextExtFactory() != null) {
-			Ext e2 = nextExtFactory().extEnumDecl();
-			e = composeExts(e, e2);
-		}
-		return postExtEnumDecl(e);
-	}
+        if (nextExtFactory() != null) {
+            Ext e2 = nextExtFactory().extEnumDecl();
+            e = composeExts(e, e2);
+        }
+        return postExtEnumDecl(e);
+    }
 
-	@Override
-	public Ext extExtendedFor() {
-		Ext e = extExtendedForImpl();
+    @Override
+    public Ext extExtendedFor() {
+        Ext e = extExtendedForImpl();
 
-		if (nextExtFactory() != null) {
-			Ext e2 = nextExtFactory().extExtendedFor();
-			e = composeExts(e, e2);
-		}
-		return postExtExtendedFor(e);
-	}
+        if (nextExtFactory() != null) {
+            Ext e2 = nextExtFactory().extExtendedFor();
+            e = composeExts(e, e2);
+        }
+        return postExtExtendedFor(e);
+    }
 
-	@Override
-	public Ext extEnumConstantDecl() {
-		Ext e = extEnumConstantDeclImpl();
+    @Override
+    public Ext extEnumConstantDecl() {
+        Ext e = extEnumConstantDeclImpl();
 
-		if (nextExtFactory() != null) {
-			Ext e2 = nextExtFactory().extEnumConstantDecl();
-			e = composeExts(e, e2);
-		}
-		return postExtEnumConstantDecl(e);
-	}
+        if (nextExtFactory() != null) {
+            Ext e2 = nextExtFactory().extEnumConstantDecl();
+            e = composeExts(e, e2);
+        }
+        return postExtEnumConstantDecl(e);
+    }
 
-	@Override
-	public Ext extEnumConstant() {
-		Ext e = extEnumConstantImpl();
+    @Override
+    public Ext extEnumConstant() {
+        Ext e = extEnumConstantImpl();
 
-		if (nextExtFactory() != null) {
-			Ext e2 = nextExtFactory().extEnumConstant();
-			e = composeExts(e, e2);
-		}
-		return postExtEnumConstant(e);
-	}
+        if (nextExtFactory() != null) {
+            Ext e2 = nextExtFactory().extEnumConstant();
+            e = composeExts(e, e2);
+        }
+        return postExtEnumConstant(e);
+    }
 
-	@Override
-	public Ext extParamTypeNode() {
-		Ext e = extParamTypeNodeImpl();
+    @Override
+    public Ext extParamTypeNode() {
+        Ext e = extParamTypeNodeImpl();
 
-		if (nextExtFactory() != null) {
-			Ext e2 = nextExtFactory().extParamTypeNode();
-			e = composeExts(e, e2);
-		}
-		return postExtParamTypeNode(e);
-	}
+        if (nextExtFactory() != null) {
+            Ext e2 = nextExtFactory().extParamTypeNode();
+            e = composeExts(e, e2);
+        }
+        return postExtParamTypeNode(e);
+    }
 
-	@Override
-	public Ext extAnnotationElemDecl() {
-		Ext e = extAnnotationElemDeclImpl();
+    @Override
+    public Ext extAnnotationElemDecl() {
+        Ext e = extAnnotationElemDeclImpl();
 
-		if (nextExtFactory() != null) {
-			Ext e2 = nextExtFactory().extAnnotationElemDecl();
-			e = composeExts(e, e2);
-		}
-		return postExtAnnotationElemDecl(e);
-	}
+        if (nextExtFactory() != null) {
+            Ext e2 = nextExtFactory().extAnnotationElemDecl();
+            e = composeExts(e, e2);
+        }
+        return postExtAnnotationElemDecl(e);
+    }
 
-	@Override
-	public Ext extNormalAnnotationElem() {
-		Ext e = extNormalAnnotationElemImpl();
+    @Override
+    public Ext extNormalAnnotationElem() {
+        Ext e = extNormalAnnotationElemImpl();
 
-		if (nextExtFactory() != null) {
-			Ext e2 = nextExtFactory().extNormalAnnotationElem();
-			e = composeExts(e, e2);
-		}
-		return postExtNormalAnnotationElem(e);
-	}
+        if (nextExtFactory() != null) {
+            Ext e2 = nextExtFactory().extNormalAnnotationElem();
+            e = composeExts(e, e2);
+        }
+        return postExtNormalAnnotationElem(e);
+    }
 
-	@Override
-	public Ext extMarkerAnnotationElem() {
-		Ext e = extMarkerAnnotationElemImpl();
+    @Override
+    public Ext extMarkerAnnotationElem() {
+        Ext e = extMarkerAnnotationElemImpl();
 
-		if (nextExtFactory() != null) {
-			Ext e2 = nextExtFactory().extMarkerAnnotationElem();
-			e = composeExts(e, e2);
-		}
-		return postExtMarkerAnnotationElem(e);
-	}
+        if (nextExtFactory() != null) {
+            Ext e2 = nextExtFactory().extMarkerAnnotationElem();
+            e = composeExts(e, e2);
+        }
+        return postExtMarkerAnnotationElem(e);
+    }
 
-	@Override
-	public Ext extSingleElementAnnotationElem() {
-		Ext e = extSingleElementAnnotationElemImpl();
+    @Override
+    public Ext extSingleElementAnnotationElem() {
+        Ext e = extSingleElementAnnotationElemImpl();
 
-		if (nextExtFactory() != null) {
-			Ext e2 = nextExtFactory().extSingleElementAnnotationElem();
-			e = composeExts(e, e2);
-		}
-		return postExtSingleElementAnnotationElem(e);
-	}
+        if (nextExtFactory() != null) {
+            Ext e2 = nextExtFactory().extSingleElementAnnotationElem();
+            e = composeExts(e, e2);
+        }
+        return postExtSingleElementAnnotationElem(e);
+    }
 
-	@Override
-	public Ext extElementValuePair() {
-		Ext e = extElementValuePairImpl();
+    @Override
+    public Ext extElementValuePair() {
+        Ext e = extElementValuePairImpl();
 
-		if (nextExtFactory() != null) {
-			Ext e2 = nextExtFactory().extElementValuePair();
-			e = composeExts(e, e2);
-		}
-		return postExtElementValuePair(e);
-	}
+        if (nextExtFactory() != null) {
+            Ext e2 = nextExtFactory().extElementValuePair();
+            e = composeExts(e, e2);
+        }
+        return postExtElementValuePair(e);
+    }
 
     protected Ext extEnumDeclImpl() {
-    	return new EnumDeclToExt_c();
+        return new EnumDeclToExt_c();
     }
-    
+
     protected Ext extExtendedForImpl() {
         return new ExtendedForToExt_c();
     }
-    
+
     protected Ext extEnumConstantDeclImpl() {
         return new EnumConstantDeclToExt_c();
     }
-    
+
     protected Ext extEnumConstantImpl() {
         return new EnumConstantToExt_c();
     }
-    
+
     protected Ext extParamTypeNodeImpl() {
         return new ParamTypeNodeToExt_c();
     }
-    
-	@Override
-	protected Ext extAssignImpl() {
-		return new JL5AssignDel();
-	}
 
-	@Override
-	protected Ext extNodeImpl() {
-		return new JL5Del();
-	}
+    @Override
+    protected Ext extAssignImpl() {
+        return new JL5AssignDel();
+    }
 
-	public Ext postExtEnumDecl(Ext ext) {
-		return this.postExtClassDecl(ext);
-	}
+    @Override
+    protected Ext extNodeImpl() {
+        return new JL5Del();
+    }
 
-	public Ext postExtExtendedFor(Ext ext) {
-		return this.postExtLoop(ext);
-	}
+    public Ext postExtEnumDecl(Ext ext) {
+        return this.postExtClassDecl(ext);
+    }
 
-	public Ext postExtEnumConstantDecl(Ext ext) {
-		return this.postExtClassMember(ext);
-	}
+    public Ext postExtExtendedFor(Ext ext) {
+        return this.postExtLoop(ext);
+    }
 
-	public Ext postExtEnumConstant(Ext ext) {
-		return this.postExtField(ext);
-	}
+    public Ext postExtEnumConstantDecl(Ext ext) {
+        return this.postExtClassMember(ext);
+    }
 
-	public Ext postExtParamTypeNode(Ext ext) {
-		return this.postExtTypeNode(ext);
-	}
+    public Ext postExtEnumConstant(Ext ext) {
+        return this.postExtField(ext);
+    }
 
-	protected Ext extAnnotationElemDeclImpl() {
-		return this.extClassMemberImpl();
-	}
+    public Ext postExtParamTypeNode(Ext ext) {
+        return this.postExtTypeNode(ext);
+    }
 
-	protected Ext extNormalAnnotationElemImpl() {
-		return this.extExprImpl();
-	}
+    protected Ext extAnnotationElemDeclImpl() {
+        return this.extClassMemberImpl();
+    }
 
-	protected Ext extMarkerAnnotationElemImpl() {
-		return this.extNormalAnnotationElemImpl();
-	}
+    protected Ext extNormalAnnotationElemImpl() {
+        return this.extExprImpl();
+    }
 
-	protected Ext extSingleElementAnnotationElemImpl() {
-		return this.extNormalAnnotationElemImpl();
-	}
+    protected Ext extMarkerAnnotationElemImpl() {
+        return this.extNormalAnnotationElemImpl();
+    }
 
-	protected Ext extElementValuePairImpl() {
-		return this.extExprImpl();
-	}
+    protected Ext extSingleElementAnnotationElemImpl() {
+        return this.extNormalAnnotationElemImpl();
+    }
 
-	protected Ext postExtAnnotationElemDecl(Ext ext) {
-		return ext;
-	}
+    protected Ext extElementValuePairImpl() {
+        return this.extExprImpl();
+    }
 
-	protected Ext postExtNormalAnnotationElem(Ext ext) {
-		return ext;
-	}
+    protected Ext postExtAnnotationElemDecl(Ext ext) {
+        return ext;
+    }
 
-	protected Ext postExtMarkerAnnotationElem(Ext ext) {
-		return ext;
-	}
+    protected Ext postExtNormalAnnotationElem(Ext ext) {
+        return ext;
+    }
 
-	protected Ext postExtSingleElementAnnotationElem(Ext ext) {
-		return ext;
-	}
+    protected Ext postExtMarkerAnnotationElem(Ext ext) {
+        return ext;
+    }
 
-	protected Ext postExtElementValuePair(Ext ext) {
-		return ext;
-	}
+    protected Ext postExtSingleElementAnnotationElem(Ext ext) {
+        return ext;
+    }
+
+    protected Ext postExtElementValuePair(Ext ext) {
+        return ext;
+    }
 }

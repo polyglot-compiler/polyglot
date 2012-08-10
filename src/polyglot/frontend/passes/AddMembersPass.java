@@ -36,13 +36,13 @@ import polyglot.types.ParsedClassType;
 public class AddMembersPass extends ClassFilePass {
     protected Scheduler scheduler;
     protected MembersAdded goal;
-    
+
     public AddMembersPass(Scheduler scheduler, MembersAdded goal) {
         super(goal);
         this.scheduler = scheduler;
         this.goal = goal;
     }
-    
+
     @Override
     public boolean run() {
         ParsedClassType ct = goal.type();

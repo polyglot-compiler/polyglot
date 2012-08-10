@@ -41,59 +41,58 @@ import polyglot.visit.TypeChecker;
  * item being imported and the kind which is either indicating that a class
  * is being imported, or that an entire package is being imported.
  */
-public class Import_c extends Node_c implements Import
-{
+public class Import_c extends Node_c implements Import {
     protected Kind kind;
     protected String name;
 
     public Import_c(Position pos, Kind kind, String name) {
-	super(pos);
-	assert(kind != null && name != null);
-	this.name = name;
-	this.kind = kind;
+        super(pos);
+        assert (kind != null && name != null);
+        this.name = name;
+        this.kind = kind;
     }
 
     /** Get the name of the import. */
     @Override
     public String name() {
-	return this.name;
+        return this.name;
     }
 
     /** Set the name of the import. */
     @Override
     public Import name(String name) {
-	Import_c n = (Import_c) copy();
-	n.name = name;
-	return n;
+        Import_c n = (Import_c) copy();
+        n.name = name;
+        return n;
     }
 
     /** Get the kind of the import. */
     @Override
     public Kind kind() {
-	return this.kind;
+        return this.kind;
     }
 
     /** Set the kind of the import. */
     @Override
     public Import kind(Kind kind) {
-	Import_c n = (Import_c) copy();
-	n.kind = kind;
-	return n;
+        Import_c n = (Import_c) copy();
+        n.kind = kind;
+        return n;
     }
 
     /**
      * Build type objects for the import.
     public Node buildTypes(TypeBuilder tb) throws SemanticException {
-	ImportTable it = tb.importTable();
+    ImportTable it = tb.importTable();
 
-	if (kind == CLASS) {
-	    it.addClassImport(name);
-	}
-	else if (kind == PACKAGE) {
-	    it.addPackageImport(name);
-	}
+    if (kind == CLASS) {
+        it.addClassImport(name);
+    }
+    else if (kind == PACKAGE) {
+        it.addPackageImport(name);
+    }
 
-	return this;
+    return this;
     }
      */
 
@@ -109,9 +108,9 @@ public class Import_c extends Node_c implements Import
         // The first component of the type name must be a package.
         String pkgName = StringUtil.getFirstComponent(name);
 
-        if (! tc.typeSystem().packageExists(pkgName)) {
-            throw new SemanticException("Package \"" + pkgName +
-                "\" not found.", position());
+        if (!tc.typeSystem().packageExists(pkgName)) {
+            throw new SemanticException("Package \"" + pkgName
+                    + "\" not found.", position());
         }
 
         // The type must exist.
@@ -122,34 +121,35 @@ public class Import_c extends Node_c implements Import
             Type t = (Type) nt;
             if (t.isClass()) {
                 tc.typeSystem().classAccessibleFromPackage(t.toClass(),
-                    tc.context().package_());
+                                                           tc.context()
+                                                             .package_());
             }
         }
 
-	return this;
+        return this;
     }
 
     @Override
     public String toString() {
-	return "import " + name + (kind == PACKAGE ? ".*" : "");
+        return "import " + name + (kind == PACKAGE ? ".*" : "");
     }
 
     /** Write the import to an output file. */
     @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
-	if (! Options.global.fully_qualified_names) {
-	    w.write("import ");
-	    w.write(name);
+        if (!Options.global.fully_qualified_names) {
+            w.write("import ");
+            w.write(name);
 
-	    if (kind == PACKAGE) {
-	        w.write(".*");
-	    }
+            if (kind == PACKAGE) {
+                w.write(".*");
+            }
 
-	    w.write(";");
-	    w.newline(0);
-	}
+            w.write(";");
+            w.newline(0);
+        }
     }
-    
+
     @Override
     public Node copy(NodeFactory nf) {
         return nf.Import(this.position, this.kind, this.name);

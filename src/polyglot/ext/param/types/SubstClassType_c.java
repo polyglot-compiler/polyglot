@@ -48,8 +48,8 @@ import polyglot.util.Position;
  * map.  Subclasses must define how the substititions are performed and
  * how to cache substituted types.
  */
-public class SubstClassType_c<Formal extends Param, Actual extends TypeObject> extends ClassType_c implements SubstType<Formal, Actual>
-{
+public class SubstClassType_c<Formal extends Param, Actual extends TypeObject>
+        extends ClassType_c implements SubstType<Formal, Actual> {
     /** The class type we are substituting into. */
     protected ClassType base;
 
@@ -57,8 +57,7 @@ public class SubstClassType_c<Formal extends Param, Actual extends TypeObject> e
     protected Subst<Formal, Actual> subst;
 
     public SubstClassType_c(ParamTypeSystem<Formal, Actual> ts, Position pos,
-                            ClassType base, Subst<Formal, Actual> subst)
-    {
+            ClassType base, Subst<Formal, Actual> subst) {
         super(ts, pos);
         this.base = base;
         this.subst = subst;
@@ -188,7 +187,7 @@ public class SubstClassType_c<Formal extends Param, Actual extends TypeObject> e
         if (t instanceof SubstType) {
             @SuppressWarnings("unchecked")
             SubstType<Formal, Actual> x = (SubstType<Formal, Actual>) t;
-            return base.typeEquals(x.base()) && subst.equals(x.subst()); 
+            return base.typeEquals(x.base()) && subst.equals(x.subst());
         }
         return false;
     }
@@ -199,7 +198,7 @@ public class SubstClassType_c<Formal extends Param, Actual extends TypeObject> e
         if (t instanceof SubstType) {
             @SuppressWarnings("unchecked")
             SubstType<Formal, Actual> x = (SubstType<Formal, Actual>) t;
-            return base.equals(x.base()) && subst.equals(x.subst()); 
+            return base.equals(x.base()) && subst.equals(x.subst());
         }
         return false;
     }
@@ -214,7 +213,6 @@ public class SubstClassType_c<Formal extends Param, Actual extends TypeObject> e
     public String toString() {
         return base.toString() + subst.toString();
     }
-    
 
     @Override
     public Job job() {

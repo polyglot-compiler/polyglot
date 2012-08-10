@@ -17,8 +17,8 @@ public class JL5ClassLit_c extends ClassLit_c {
 
     @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
-        JL5TypeSystem ts = (JL5TypeSystem)tc.typeSystem();
+        JL5TypeSystem ts = (JL5TypeSystem) tc.typeSystem();
         return type(ts.Class(this.position(), (ReferenceType) typeNode().type()));
-      }
+    }
 
 }

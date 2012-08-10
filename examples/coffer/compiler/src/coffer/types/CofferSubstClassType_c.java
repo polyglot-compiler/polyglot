@@ -16,10 +16,9 @@ import polyglot.types.ClassType;
 import polyglot.util.Position;
 
 public class CofferSubstClassType_c extends SubstClassType_c<Key, Key>
-    implements CofferSubstType
-{
+        implements CofferSubstType {
     public CofferSubstClassType_c(CofferTypeSystem ts, Position pos,
-                                 ClassType base, CofferSubst subst) {
+            ClassType base, CofferSubst subst) {
         super(ts, pos, base, subst);
     }
 

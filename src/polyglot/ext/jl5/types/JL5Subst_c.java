@@ -14,7 +14,8 @@ import polyglot.types.ReferenceType;
 import polyglot.types.Type;
 import polyglot.util.InternalCompilerError;
 
-public class JL5Subst_c extends Subst_c<TypeVariable, ReferenceType> implements JL5Subst {
+public class JL5Subst_c extends Subst_c<TypeVariable, ReferenceType> implements
+        JL5Subst {
 
     public JL5Subst_c(ParamTypeSystem<TypeVariable, ReferenceType> ts,
             Map<TypeVariable, ? extends ReferenceType> subst) {
@@ -23,7 +24,7 @@ public class JL5Subst_c extends Subst_c<TypeVariable, ReferenceType> implements 
 //            Thread.dumpStack();
 //        }
     }
-    
+
     @Override
     public Type substType(Type t) {
         if (t instanceof TypeVariable) {
@@ -33,17 +34,18 @@ public class JL5Subst_c extends Subst_c<TypeVariable, ReferenceType> implements 
             return substWildCardTypeVariable((WildCardType) t);
         }
         if (t instanceof IntersectionType) {
-            return substIntersectionType((IntersectionType)t);
+            return substIntersectionType((IntersectionType) t);
         }
-            
+
         return super.substType(t);
     }
 
     // when substituting type variables that aren't in the subst map, 
     // keep track of which ones we have seen already, so that we don't go into 
     // an infinite loop as we subst on their upper bounds.
-    private LinkedList<TypeVariable> visitedTypeVars = new LinkedList<TypeVariable>();
-    
+    private LinkedList<TypeVariable> visitedTypeVars =
+            new LinkedList<TypeVariable>();
+
     public ReferenceType substTypeVariable(TypeVariable t) {
         if (subst.containsKey(t)) {
             return subst.get(t);
@@ -52,13 +54,13 @@ public class JL5Subst_c extends Subst_c<TypeVariable, ReferenceType> implements 
             return t;
         }
         for (TypeVariable k : subst.keySet()) {
-            if (((TypeVariable_c)k).uniqueIdentifier == ((TypeVariable_c)t).uniqueIdentifier) {
+            if (((TypeVariable_c) k).uniqueIdentifier == ((TypeVariable_c) t).uniqueIdentifier) {
                 return subst.get(k);
             }
         }
         visitedTypeVars.addLast(t);
         TypeVariable origT = t;
-        t = t.upperBound((ReferenceType)substType(t.upperBound()));        
+        t = t.upperBound((ReferenceType) substType(t.upperBound()));
 
         if (visitedTypeVars.removeLast() != origT) {
             throw new InternalCompilerError("Unexpected type variable was last on the list");
@@ -72,14 +74,13 @@ public class JL5Subst_c extends Subst_c<TypeVariable, ReferenceType> implements 
         n = n.lowerBound((ReferenceType) substType(t.lowerBound()));
         return n;
     }
-    
+
     public Type substIntersectionType(IntersectionType t) {
         List<ReferenceType> s = this.substTypeList(t.bounds());
-        t = (IntersectionType)t.copy();
+        t = (IntersectionType) t.copy();
         t.setBounds(s);
         return t;
     }
-
 
     @Override
     protected ReferenceType substSubstValue(ReferenceType value) {
@@ -89,7 +90,7 @@ public class JL5Subst_c extends Subst_c<TypeVariable, ReferenceType> implements 
     @Override
     public ClassType substClassType(ClassType t) {
         // Don't bother trying to substitute into a non-JL5 class.
-        if (! (t instanceof JL5ClassType)) {
+        if (!(t instanceof JL5ClassType)) {
             return t;
         }
 
@@ -101,11 +102,12 @@ public class JL5Subst_c extends Subst_c<TypeVariable, ReferenceType> implements 
             // this case should be impossible
             throw new InternalCompilerError("Should have no JL5SubstClassTypes");
         }
-        
+
         if (t instanceof JL5ParsedClassType) {
-            JL5ParsedClassType pct = (JL5ParsedClassType)t;
-            JL5TypeSystem ts = (JL5TypeSystem)this.ts;
-            List<TypeVariable> typeVars = ts.classAndEnclosingTypeVariables(pct);
+            JL5ParsedClassType pct = (JL5ParsedClassType) t;
+            JL5TypeSystem ts = (JL5TypeSystem) this.ts;
+            List<TypeVariable> typeVars =
+                    ts.classAndEnclosingTypeVariables(pct);
             // are the type variables of pct actually relevant to this subst? If not, then return the pct.
             boolean typeVarsRelevant = false;
             for (TypeVariable tv : typeVars) {
@@ -118,12 +120,12 @@ public class JL5Subst_c extends Subst_c<TypeVariable, ReferenceType> implements 
                 // no parameters to be instantiated!
                 return pct;
             }
-            
-            return new JL5SubstClassType_c(ts, t.position(),
-                                           pct, this);
+
+            return new JL5SubstClassType_c(ts, t.position(), pct, this);
         }
 
-        throw new InternalCompilerError("Don't know how to handle class type " + t.getClass());
+        throw new InternalCompilerError("Don't know how to handle class type "
+                + t.getClass());
 
     }
 
@@ -139,7 +141,7 @@ public class JL5Subst_c extends Subst_c<TypeVariable, ReferenceType> implements 
         }
         // subst the type params
         mj.setTypeParams(this.<TypeVariable> substTypeList(mj.typeParams()));
-        
+
         @SuppressWarnings("unchecked")
         T result = (T) mj;
         return result;
@@ -147,7 +149,8 @@ public class JL5Subst_c extends Subst_c<TypeVariable, ReferenceType> implements 
 
     @Override
     public <T extends ConstructorInstance> T substConstructor(T ci) {
-        JL5ConstructorInstance cj = (JL5ConstructorInstance) super.substConstructor(ci);
+        JL5ConstructorInstance cj =
+                (JL5ConstructorInstance) super.substConstructor(ci);
         if (cj.typeParams() != null && !cj.typeParams().isEmpty()) {
             // remove any type params we have replced.
             List<TypeVariable> l = new ArrayList<TypeVariable>(cj.typeParams());
@@ -155,17 +158,17 @@ public class JL5Subst_c extends Subst_c<TypeVariable, ReferenceType> implements 
             cj = (JL5ConstructorInstance) cj.copy();
             cj.setTypeParams(l);
         }
-        
+
         // subst the type params
         cj.setTypeParams(this.<TypeVariable> substTypeList(cj.typeParams()));
-        
+
         @SuppressWarnings("unchecked")
         T result = (T) cj;
         return result;
     }
 
     @Override
-    public JL5ProcedureInstance substProcedure(JL5ProcedureInstance mi) {        
+    public JL5ProcedureInstance substProcedure(JL5ProcedureInstance mi) {
         if (mi instanceof MethodInstance) {
             return (JL5ProcedureInstance) substMethod((MethodInstance) mi);
         }

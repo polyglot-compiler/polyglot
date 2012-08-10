@@ -12,11 +12,12 @@ import polyglot.ast.TypeNode;
 
 /** Type node for a class instantiated with a key.
  */
-public interface TrackedTypeNode extends TypeNode, Ambiguous
-{
+public interface TrackedTypeNode extends TypeNode, Ambiguous {
     TypeNode base();
+
     TrackedTypeNode base(TypeNode base);
 
     KeyNode key();
+
     TrackedTypeNode key(KeyNode key);
 }

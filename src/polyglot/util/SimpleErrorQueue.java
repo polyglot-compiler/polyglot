@@ -25,12 +25,10 @@
 
 package polyglot.util;
 
-
 /**
  * A <code>SimpleErrorQueue</code> handles outputing error messages.
  */
-public class SimpleErrorQueue extends AbstractErrorQueue
-{
+public class SimpleErrorQueue extends AbstractErrorQueue {
     public SimpleErrorQueue() {
         super(Integer.MAX_VALUE, null);
     }

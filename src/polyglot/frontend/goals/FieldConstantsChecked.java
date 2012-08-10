@@ -50,26 +50,26 @@ public class FieldConstantsChecked extends AbstractGoal {
 
     protected FieldInstance vi;
     protected ParsedClassType ct;
-    
+
     protected FieldConstantsChecked(FieldInstance fi) {
         super(null);
         this.vi = fi.orig();
-        
+
         ParsedClassType ct = findContainer();
         if (ct != null) {
             this.job = ct.job();
         }
         this.ct = ct;
-        
-        if (this.job == null && ! fi.constantValueSet()) {
+
+        if (this.job == null && !fi.constantValueSet()) {
             throw new InternalCompilerError(this + " is unreachable.");
         }
     }
-    
+
     public ParsedClassType container() {
         return ct;
     }
-    
+
     protected ParsedClassType findContainer() {
         if (vi.container() instanceof ParsedClassType) {
             return (ParsedClassType) vi.container();
@@ -81,7 +81,7 @@ public class FieldConstantsChecked extends AbstractGoal {
     public Pass createPass(ExtensionInfo extInfo) {
         return new CheckFieldConstantsPass(extInfo.scheduler(), this);
     }
-    
+
     @Override
     public Collection<Goal> prerequisiteGoals(Scheduler scheduler) {
         List<Goal> l = new ArrayList<Goal>();
@@ -101,23 +101,25 @@ public class FieldConstantsChecked extends AbstractGoal {
         l.addAll(super.corequisiteGoals(scheduler));
         return l;
     }
-    
+
     public FieldInstance var() {
         return vi;
     }
-    
+
     @Override
     public int hashCode() {
         return vi.hashCode() + super.hashCode();
     }
-    
+
     @Override
     public boolean equals(Object o) {
-        return o instanceof FieldConstantsChecked && ((FieldConstantsChecked) o).vi.equals(vi) && super.equals(o);
+        return o instanceof FieldConstantsChecked
+                && ((FieldConstantsChecked) o).vi.equals(vi) && super.equals(o);
     }
-    
+
     @Override
     public String toString() {
-        return StringUtil.getShortNameComponent(getClass().getName()) + "(" + vi + ")";
+        return StringUtil.getShortNameComponent(getClass().getName()) + "("
+                + vi + ")";
     }
 }

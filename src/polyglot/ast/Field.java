@@ -33,8 +33,7 @@ import polyglot.types.FieldInstance;
  * <code>Type</code> or an <code>Expr</code> containing the field being 
  * accessed.
  */
-public interface Field extends NamedVariable
-{
+public interface Field extends NamedVariable {
     /**
      * Get the type object for the field.  This field may not be valid until
      * after type checking.
@@ -59,20 +58,22 @@ public interface Field extends NamedVariable
      * explicitly provide a target. 
      */
     boolean isTargetImplicit();
-    
+
     /** 
      * Set whether the target of the field is implicit.
      */
     Field targetImplicit(boolean implicit);
-    
+
     /** Get the field's name. */
     Id id();
+
     /** Set the field's name. */
     Field id(Id name);
-    
+
     /** Get the field's name. */
     @Override
     String name();
+
     /** Set the field's name. */
     Field name(String name);
 }

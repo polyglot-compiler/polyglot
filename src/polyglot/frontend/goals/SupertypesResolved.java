@@ -51,16 +51,16 @@ public class SupertypesResolved extends ClassTypeGoal {
     protected SupertypesResolved(ParsedClassType ct) {
         super(ct);
     }
-    
+
     protected static class SupertypesResolvedPass extends AbstractPass {
         SupertypesResolvedPass(Goal goal) {
             super(goal);
         }
-        
+
         @Override
         public boolean run() {
             SupertypesResolved goal = (SupertypesResolved) this.goal;
-            if (! goal.type().supertypesResolved()) {
+            if (!goal.type().supertypesResolved()) {
                 throw new SchedulerException();
             }
             return true;
@@ -87,9 +87,10 @@ public class SupertypesResolved extends ClassTypeGoal {
     }
 
     protected boolean isGlobal(ClassType ct) {
-        return ct.isTopLevel() || (ct.isMember() && isGlobal((ClassType) ct.container()));
+        return ct.isTopLevel()
+                || (ct.isMember() && isGlobal((ClassType) ct.container()));
     }
-    
+
     @Override
     public Collection<Goal> corequisiteGoals(Scheduler scheduler) {
         List<Goal> l = new ArrayList<Goal>();
@@ -104,7 +105,7 @@ public class SupertypesResolved extends ClassTypeGoal {
         l.addAll(super.corequisiteGoals(scheduler));
         return l;
     }
-    
+
     @Override
     public boolean equals(Object o) {
         return o instanceof SupertypesResolved && super.equals(o);

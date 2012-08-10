@@ -8,13 +8,13 @@ import polyglot.visit.NodeVisitor;
 
 public class JL5ClassDeclToJL_c extends ClassDeclToExt_c {
 
-	@Override
-	public NodeVisitor toExtEnter(ExtensionRewriter rw)
-			throws SemanticException {
-		//Skip annotations and parameter nodes
-		JL5ClassDecl cd = (JL5ClassDecl) node();
-		rw = (ExtensionRewriter) rw.bypass(cd.annotationElems());
-		rw = (ExtensionRewriter) rw.bypass(cd.paramTypes());
-		return rw;
-	}
+    @Override
+    public NodeVisitor toExtEnter(ExtensionRewriter rw)
+            throws SemanticException {
+        //Skip annotations and parameter nodes
+        JL5ClassDecl cd = (JL5ClassDecl) node();
+        rw = (ExtensionRewriter) rw.bypass(cd.annotationElems());
+        rw = (ExtensionRewriter) rw.bypass(cd.paramTypes());
+        return rw;
+    }
 }

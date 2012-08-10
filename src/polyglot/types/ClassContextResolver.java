@@ -42,7 +42,7 @@ import polyglot.util.StringUtil;
  */
 public class ClassContextResolver extends AbstractAccessControlResolver {
     protected ClassType type;
-    
+
     /**
      * Construct a resolver.
      * @param ts The type system.
@@ -52,12 +52,12 @@ public class ClassContextResolver extends AbstractAccessControlResolver {
         super(ts);
         this.type = type;
     }
-    
+
     @Override
     public String toString() {
         return "(class-context " + type + ")";
     }
-    
+
     /**
      * Find a type object in the context of the class.
      * @param name The name to search for.
@@ -65,11 +65,11 @@ public class ClassContextResolver extends AbstractAccessControlResolver {
     @Override
     public Named find(String name, ClassType accessor) throws SemanticException {
         if (Report.should_report(TOPICS, 2))
-	    Report.report(2, "Looking for " + name + " in " + this);
+            Report.report(2, "Looking for " + name + " in " + this);
 
-        if (! StringUtil.isNameShort(name)) {
-            throw new InternalCompilerError(
-                "Cannot lookup qualified name " + name);
+        if (!StringUtil.isNameShort(name)) {
+            throw new InternalCompilerError("Cannot lookup qualified name "
+                    + name);
         }
 
         // Check if the name is for a member class.
@@ -117,29 +117,29 @@ public class ClassContextResolver extends AbstractAccessControlResolver {
         if (m instanceof ClassType) {
             mt = (ClassType) m;
 
-            if (! mt.isMember()) {
-                throw new SemanticException("Class " + mt +
-                                            " is not a member class, " +
-                                            " but was found in " + type + ".");
+            if (!mt.isMember()) {
+                throw new SemanticException("Class " + mt
+                        + " is not a member class, " + " but was found in "
+                        + type + ".");
             }
-            
+
             if (mt.outer().declaration() != type.declaration()) {
-                throw new SemanticException("Class " + mt +
-                                            " is not a member class " +
-                                            " of " + type + ".");
+                throw new SemanticException("Class " + mt
+                        + " is not a member class " + " of " + type + ".");
             }
-            
-            if (! canAccess(mt, accessor)) {
-                throw new SemanticException("Cannot access member type \"" + mt + "\".");
+
+            if (!canAccess(mt, accessor)) {
+                throw new SemanticException("Cannot access member type \"" + mt
+                        + "\".");
             }
 
             return mt;
         }
-        
+
         // Collect all members of the super types.
         // Use a Set to eliminate duplicates.
         Set<Named> acceptable = new HashSet<Named>();
-        
+
         if (type.superType() != null) {
             Type sup = type.superType();
             if (sup instanceof ClassType) {
@@ -152,7 +152,7 @@ public class ClassContextResolver extends AbstractAccessControlResolver {
                 }
             }
         }
-        
+
         for (Type sup : type.interfaces()) {
             if (sup instanceof ClassType) {
                 Resolver r = ts.classContextResolver((ClassType) sup, accessor);
@@ -164,57 +164,59 @@ public class ClassContextResolver extends AbstractAccessControlResolver {
                 }
             }
         }
-        
+
         if (acceptable.size() == 0) {
             throw new NoClassException(name, type);
         }
         else if (acceptable.size() > 1) {
-            Set<ReferenceType> containers = new HashSet<ReferenceType>(acceptable.size());
+            Set<ReferenceType> containers =
+                    new HashSet<ReferenceType>(acceptable.size());
             for (Named n : acceptable) {
                 if (n instanceof MemberInstance) {
                     MemberInstance mi = (MemberInstance) n;
                     containers.add(mi.container());
                 }
             }
-            
+
             if (containers.size() == 2) {
                 Iterator<ReferenceType> i = containers.iterator();
                 Type t1 = i.next();
                 Type t2 = i.next();
-                throw new SemanticException("Member \"" + name +
-                                            "\" of " + type + " is ambiguous; it is defined in both " +
-                                            t1 + " and " + t2 + ".");
+                throw new SemanticException("Member \"" + name + "\" of "
+                        + type + " is ambiguous; it is defined in both " + t1
+                        + " and " + t2 + ".");
             }
             else {
-                throw new SemanticException("Member \"" + name +
-                                            "\" of " + type + " is ambiguous; it is defined in " +
-                                            containers + ".");
+                throw new SemanticException("Member \"" + name + "\" of "
+                        + type + " is ambiguous; it is defined in "
+                        + containers + ".");
             }
         }
-        
+
         Named t = acceptable.iterator().next();
-        
+
         if (Report.should_report(TOPICS, 2))
             Report.report(2, "Found member class " + t);
-        
+
         return t;
     }
 
     protected boolean canAccess(Named n, ClassType accessor) {
         if (n instanceof MemberInstance) {
-            return accessor == null || ts.isAccessible((MemberInstance) n, accessor);
+            return accessor == null
+                    || ts.isAccessible((MemberInstance) n, accessor);
         }
         return true;
     }
-    
+
     /**
      * The class in whose context we look.
      */
     public ClassType classType() {
-	return type;
+        return type;
     }
 
-    private static final Collection<String> TOPICS = 
+    private static final Collection<String> TOPICS =
             CollectionUtil.list(Report.types, Report.resolver);
 
 }

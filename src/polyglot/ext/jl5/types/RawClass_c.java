@@ -20,9 +20,9 @@ public class RawClass_c extends JL5ClassType_c implements RawClass {
 
     private JL5ParsedClassType base;
     private transient JL5SubstClassType erased;
-    
+
     public RawClass_c(JL5ParsedClassType t, Position pos) {
-        super((JL5TypeSystem)t.typeSystem(), pos);
+        super((JL5TypeSystem) t.typeSystem(), pos);
         this.base = t;
         this.setDeclaration(base);
     }
@@ -39,11 +39,11 @@ public class RawClass_c extends JL5ClassType_c implements RawClass {
 
     @Override
     public JL5SubstClassType erased() {
-        if (this.erased == null) {            
-            JL5TypeSystem ts = (JL5TypeSystem)this.ts;
+        if (this.erased == null) {
+            JL5TypeSystem ts = (JL5TypeSystem) this.ts;
             JL5Subst es = ts.erasureSubst(this.base);
-            this.erased = new JL5SubstClassType_c(ts, base.position(),
-                                    base, es);
+            this.erased =
+                    new JL5SubstClassType_c(ts, base.position(), base, es);
         }
         return this.erased;
     }
@@ -69,9 +69,9 @@ public class RawClass_c extends JL5ClassType_c implements RawClass {
         if (t == null) {
             return t;
         }
-        JL5TypeSystem ts = (JL5TypeSystem)this.typeSystem();
-        
-        return (ClassType)ts.erasureType(this.erased().outer());
+        JL5TypeSystem ts = (JL5TypeSystem) this.typeSystem();
+
+        return (ClassType) ts.erasureType(this.erased().outer());
     }
 
     @Override
@@ -90,6 +90,7 @@ public class RawClass_c extends JL5ClassType_c implements RawClass {
     }
 
     private transient List<? extends ConstructorInstance> constructors = null;
+
     @Override
     public List<? extends ConstructorInstance> constructors() {
         if (constructors == null) {
@@ -99,6 +100,7 @@ public class RawClass_c extends JL5ClassType_c implements RawClass {
     }
 
     private transient List<? extends ClassType> memberClasses = null;
+
     @Override
     public List<? extends ClassType> memberClasses() {
         if (memberClasses == null) {
@@ -108,6 +110,7 @@ public class RawClass_c extends JL5ClassType_c implements RawClass {
     }
 
     private transient List<? extends MethodInstance> methods = null;
+
     @Override
     public List<? extends MethodInstance> methods() {
         if (methods == null) {
@@ -117,6 +120,7 @@ public class RawClass_c extends JL5ClassType_c implements RawClass {
     }
 
     private transient List<? extends FieldInstance> fields = null;
+
     @Override
     public List<? extends FieldInstance> fields() {
         if (fields == null) {
@@ -163,10 +167,10 @@ public class RawClass_c extends JL5ClassType_c implements RawClass {
     }
 
     @Override
-    public String translateAsReceiver(Resolver c) {        
+    public String translateAsReceiver(Resolver c) {
         return this.translate(c);
     }
-    
+
     @Override
     public boolean descendsFromImpl(Type ancestor) {
 //        System.err.println("   Raw class " + this + " descends from " + ancestor + " ?  interfaces is " + this.interfaces() + "  ::: " + super.descendsFromImpl(ancestor));
@@ -180,9 +184,7 @@ public class RawClass_c extends JL5ClassType_c implements RawClass {
 //        }
         return false;
     }
-    
-    
-    
+
     @Override
     protected Object clone() throws CloneNotSupportedException {
         // TODO Auto-generated method stub
@@ -201,7 +203,7 @@ public class RawClass_c extends JL5ClassType_c implements RawClass {
 
     @Override
     public void setContainer(ReferenceType container) {
-        throw new InternalCompilerError("Should never be called");        
+        throw new InternalCompilerError("Should never be called");
     }
 
     @Override
@@ -218,5 +220,5 @@ public class RawClass_c extends JL5ClassType_c implements RawClass {
     public RetainedAnnotations retainedAnnotations() {
         return ((JL5TypeSystem) this.typeSystem()).NoRetainedAnnotations();
     }
-    
+
 }

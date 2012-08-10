@@ -38,7 +38,6 @@ import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
 import polyglot.util.StringUtil;
 
-
 /**
  * An <code>ImportTable</code> is a type of <code>ClassResolver</code> that
  * corresponds to a particular source file.
@@ -46,8 +45,7 @@ import polyglot.util.StringUtil;
  * It has a set of package and class imports, which caches the results of
  * lookups for future reference.
  */
-public class ImportTable implements Resolver
-{
+public class ImportTable implements Resolver {
     protected TypeSystem ts;
     /** A list of all package imports. */
     protected List<String> packageImports;
@@ -109,7 +107,8 @@ public class ImportTable implements Resolver
         public String fullName() {
             // TODO Auto-generated method stub
             return null;
-        }};
+        }
+    };
 
     /**
      * Create an import table.
@@ -179,9 +178,9 @@ public class ImportTable implements Resolver
     public void addPackageImport(String pkgName) {
         // don't add the import if it is the same as the current package,
         // the same as a default import, or has already been imported
-        if ((pkg != null && pkg.fullName().equals(pkgName)) ||
-                ts.defaultPackageImports().contains(pkgName) ||
-                packageImports.contains(pkgName)) {
+        if ((pkg != null && pkg.fullName().equals(pkgName))
+                || ts.defaultPackageImports().contains(pkgName)
+                || packageImports.contains(pkgName)) {
             return;
         }
 
@@ -262,7 +261,8 @@ public class ImportTable implements Resolver
                 Named n = findInPkg(name, pkg.fullName());
                 if (n != null) {
                     if (Report.should_report(TOPICS, 3))
-                        Report.report(3, this + ".find(" + name + "): found in current package");
+                        Report.report(3, this + ".find(" + name
+                                + "): found in current package");
 
                     // Memoize the result.
                     map.put(name, n);
@@ -270,7 +270,8 @@ public class ImportTable implements Resolver
                 }
             }
 
-            List<String> imports = new ArrayList<String>(packageImports.size() + 5);
+            List<String> imports =
+                    new ArrayList<String>(packageImports.size() + 5);
 
             imports.addAll(ts.defaultPackageImports());
             imports.addAll(packageImports);
@@ -291,10 +292,10 @@ public class ImportTable implements Resolver
                         // This is the 2nd occurrence of name we've found
                         // in an imported package.
                         // That's bad.
-                        throw new SemanticException("Reference to \"" + 
-                                                    name + "\" is ambiguous; both " + 
-                                                    resolved.fullName() + " and " + n.fullName() + 
-                        " match.");
+                        throw new SemanticException("Reference to \"" + name
+                                + "\" is ambiguous; both "
+                                + resolved.fullName() + " and " + n.fullName()
+                                + " match.");
                     }
                 }
             }
@@ -312,7 +313,8 @@ public class ImportTable implements Resolver
 
             // Memoize the result.
             if (Report.should_report(TOPICS, 3))
-                Report.report(3, this + ".find(" + name + "): found as " + resolved.fullName());
+                Report.report(3, this + ".find(" + name + "): found as "
+                        + resolved.fullName());
             map.put(name, resolved);
             return resolved;
         }
@@ -325,7 +327,8 @@ public class ImportTable implements Resolver
         }
     }
 
-    protected Named findInPkg(String name, String pkgName) throws SemanticException {
+    protected Named findInPkg(String name, String pkgName)
+            throws SemanticException {
         String fullName = pkgName + "." + name;
 
         try {
@@ -363,17 +366,17 @@ public class ImportTable implements Resolver
      */
     protected boolean isVisibleFrom(Named n, String pkgName) {
         boolean isVisible = false;
-        boolean inSamePackage = this.pkg != null 
-        && this.pkg.fullName().equals(pkgName)
-        || this.pkg == null 
-        && pkgName.equals("");
+        boolean inSamePackage =
+                this.pkg != null && this.pkg.fullName().equals(pkgName)
+                        || this.pkg == null && pkgName.equals("");
         if (n instanceof Type) {
             Type t = (Type) n;
             //FIXME: Assume non-class types are always visible.
-            isVisible = !t.isClass() 
-            || t.toClass().flags().isPublic() 
-            || inSamePackage; 
-        } else {
+            isVisible =
+                    !t.isClass() || t.toClass().flags().isPublic()
+                            || inSamePackage;
+        }
+        else {
             //FIXME: Assume non-types are always visible.
             isVisible = true;
         }
@@ -423,7 +426,7 @@ public class ImportTable implements Resolver
         try {
             // first try finding the long name. If it works, great! It's nice and simple
             Named t = ts.systemResolver().find(longName);
-            String shortName = StringUtil.getShortNameComponent(longName);                    
+            String shortName = StringUtil.getShortNameComponent(longName);
             map.put(shortName, t);
             return;
         }
@@ -439,9 +442,10 @@ public class ImportTable implements Resolver
      * @param longName
      * @throws SemanticException
      */
-    protected void lazyImportLongNameStaticMember(String longName) throws SemanticException {
+    protected void lazyImportLongNameStaticMember(String longName)
+            throws SemanticException {
         // Try to find the shortest prefix of longName that is a class
-        
+
         StringTokenizer st = new StringTokenizer(longName, ".");
         StringBuffer name = new StringBuffer();
 
@@ -452,19 +456,19 @@ public class ImportTable implements Resolver
                 name.append(".");
             }
             name.append(s);
-            
+
             try {
                 t = cachedFind(name.toString());
             }
             catch (NoClassException e) {
-                if (! st.hasMoreTokens()) {
+                if (!st.hasMoreTokens()) {
                     // no more types to try to find.
                     throw e;
-                }    
+                }
             }
             if (t != null) {
                 // we found a type t!
-                if (! st.hasMoreTokens()) {
+                if (!st.hasMoreTokens()) {
                     // this is the one we were looking for!
                     break;
                 }
@@ -496,7 +500,8 @@ public class ImportTable implements Resolver
                     else {
                         // t, whatever it is, is further qualified, but 
                         // should be, at least in Java, a ClassType.
-                        throw new InternalCompilerError("Qualified type \"" + t + "\" is not a class type.", sourcePos);
+                        throw new InternalCompilerError("Qualified type \"" + t
+                                + "\" is not a class type.", sourcePos);
                     }
 
                 }
@@ -507,7 +512,7 @@ public class ImportTable implements Resolver
             // couldn't find it, so throw an exception be executing the find again.
             cachedFind(longName);
         }
-        
+
         // at this point, we found it, and it is in t!
         String shortName = StringUtil.getShortNameComponent(longName);
 
@@ -517,16 +522,17 @@ public class ImportTable implements Resolver
         if (map.containsKey(shortName)) {
             Named s = map.get(shortName);
 
-            if (! ts.equals(s, t)) {
-                throw new SemanticException("Class " + shortName +
-                                            " already defined as " + map.get(shortName),
+            if (!ts.equals(s, t)) {
+                throw new SemanticException("Class " + shortName
+                                                    + " already defined as "
+                                                    + map.get(shortName),
                                             sourcePos);
             }
         }
 
         // map.put(longName, t); // should already be in the cache
-        map.put(shortName, t);        
-    }        
+        map.put(shortName, t);
+    }
 
     @Override
     public String toString() {
@@ -538,7 +544,7 @@ public class ImportTable implements Resolver
         }
     }
 
-    private static final Collection<String> TOPICS = 
-        CollectionUtil.list(Report.types, Report.resolver, Report.imports);
+    private static final Collection<String> TOPICS =
+            CollectionUtil.list(Report.types, Report.resolver, Report.imports);
 
 }

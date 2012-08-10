@@ -36,7 +36,8 @@ import polyglot.types.TypeSystem;
 import polyglot.visit.FwdReferenceChecker;
 
 public class ForwardReferencesChecked extends VisitorGoal {
-    public static Goal create(Scheduler scheduler, Job job, TypeSystem ts, NodeFactory nf) {
+    public static Goal create(Scheduler scheduler, Job job, TypeSystem ts,
+            NodeFactory nf) {
         return scheduler.internGoal(new ForwardReferencesChecked(job, ts, nf));
     }
 

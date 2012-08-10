@@ -37,14 +37,13 @@ import polyglot.visit.TypeChecker;
  * An <code>IntLit</code> represents a literal in Java of an integer
  * type.
  */
-public class IntLit_c extends NumLit_c implements IntLit
-{
-    /** The kind of literal: INT or LONG. */ 
+public class IntLit_c extends NumLit_c implements IntLit {
+    /** The kind of literal: INT or LONG. */
     protected Kind kind;
 
     public IntLit_c(Position pos, Kind kind, long value) {
-	super(pos, value);
-	assert(kind != null);
+        super(pos, value);
+        assert (kind != null);
         this.kind = kind;
     }
 
@@ -55,7 +54,7 @@ public class IntLit_c extends NumLit_c implements IntLit
     @Override
     public boolean boundary() {
         return (kind == INT && (int) value == Integer.MIN_VALUE)
-            || (kind == LONG && value == Long.MIN_VALUE);
+                || (kind == LONG && value == Long.MIN_VALUE);
     }
 
     /** Get the value of the expression. */
@@ -68,8 +67,8 @@ public class IntLit_c extends NumLit_c implements IntLit
     @Override
     public IntLit value(long value) {
         IntLit_c n = (IntLit_c) copy();
-	n.value = value;
-	return n;
+        n.value = value;
+        return n;
     }
 
     /** Get the kind of the expression. */
@@ -81,9 +80,9 @@ public class IntLit_c extends NumLit_c implements IntLit
     /** Set the kind of the expression. */
     @Override
     public IntLit kind(IntLit.Kind kind) {
-	IntLit_c n = (IntLit_c) copy();
-	n.kind = kind;
-	return n;
+        IntLit_c n = (IntLit_c) copy();
+        n.kind = kind;
+        return n;
     }
 
     /** Type check the expression. */
@@ -91,22 +90,22 @@ public class IntLit_c extends NumLit_c implements IntLit
     public Node typeCheck(TypeChecker tc) throws SemanticException {
         TypeSystem ts = tc.typeSystem();
 
-	Kind kind = kind();
+        Kind kind = kind();
 
         if (kind == INT) {
-	    return type(ts.Int());
-	}
-	else if (kind == LONG) {
-	    return type(ts.Long());
-	}
-	else {
-	    throw new InternalCompilerError("Unrecognized IntLit kind " + kind);
-	}
+            return type(ts.Int());
+        }
+        else if (kind == LONG) {
+            return type(ts.Long());
+        }
+        else {
+            throw new InternalCompilerError("Unrecognized IntLit kind " + kind);
+        }
     }
 
     @Override
     public String positiveToString() {
-	if (kind() == LONG) {
+        if (kind() == LONG) {
             if (boundary()) {
                 // the literal is negative, but print it as positive.
                 return "9223372036854775808L";
@@ -117,8 +116,8 @@ public class IntLit_c extends NumLit_c implements IntLit
             else {
                 return Long.toString(value) + "L";
             }
-	}
-	else {
+        }
+        else {
             if (boundary()) {
                 // the literal is negative, but print it as positive.
                 return "2147483648";
@@ -129,17 +128,17 @@ public class IntLit_c extends NumLit_c implements IntLit
             else {
                 return Integer.toString((int) value);
             }
-	}
+        }
     }
 
     @Override
     public String toString() {
-	if (kind() == LONG) {
+        if (kind() == LONG) {
             return Long.toString(value) + "L";
-	}
-	else {
+        }
+        else {
             return Long.toString((int) value);
-	}
+        }
     }
 
     @Override
@@ -149,24 +148,24 @@ public class IntLit_c extends NumLit_c implements IntLit
 
     @Override
     public Object constantValue() {
-	if (kind() == LONG) {
+        if (kind() == LONG) {
             return new Long(value);
-	}
-	else {
+        }
+        else {
             return new Integer((int) value);
-	}
+        }
     }
 
     @Override
     public Precedence precedence() {
-        if (value < 0L && ! boundary()) {
+        if (value < 0L && !boundary()) {
             return Precedence.UNARY;
         }
         else {
             return Precedence.LITERAL;
         }
     }
-    
+
     @Override
     public Node copy(NodeFactory nf) {
         return nf.IntLit(this.position, this.kind, this.value);

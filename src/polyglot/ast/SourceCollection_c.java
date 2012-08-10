@@ -37,51 +37,50 @@ import polyglot.visit.PrettyPrinter;
 /**
  * A <code>SourceCollection</code> represents a collection of source files.
  */
-public class SourceCollection_c extends Node_c implements SourceCollection
-{
+public class SourceCollection_c extends Node_c implements SourceCollection {
     protected List<SourceFile> sources;
 
     public SourceCollection_c(Position pos, List<SourceFile> sources) {
-	super(pos);
-	assert(sources != null);
-	this.sources = ListUtil.copy(sources, true);
+        super(pos);
+        assert (sources != null);
+        this.sources = ListUtil.copy(sources, true);
     }
 
     @Override
     public String toString() {
-	return sources.toString();
+        return sources.toString();
     }
 
     /** Get the source files. */
     @Override
     public List<SourceFile> sources() {
-	return this.sources;
+        return this.sources;
     }
 
     /** Set the statements of the block. */
     @Override
     public SourceCollection sources(List<SourceFile> sources) {
-	SourceCollection_c n = (SourceCollection_c) copy();
-	n.sources = ListUtil.copy(sources, true);
-	return n;
+        SourceCollection_c n = (SourceCollection_c) copy();
+        n.sources = ListUtil.copy(sources, true);
+        return n;
     }
 
     /** Reconstruct the collection. */
     protected SourceCollection_c reconstruct(List<SourceFile> sources) {
-	if (! CollectionUtil.equals(sources, this.sources)) {
-	    SourceCollection_c n = (SourceCollection_c) copy();
-	    n.sources = ListUtil.copy(sources, true);
-	    return n;
-	}
+        if (!CollectionUtil.equals(sources, this.sources)) {
+            SourceCollection_c n = (SourceCollection_c) copy();
+            n.sources = ListUtil.copy(sources, true);
+            return n;
+        }
 
-	return this;
+        return this;
     }
 
     /** Visit the children of the block. */
     @Override
     public Node visitChildren(NodeVisitor v) {
         List<SourceFile> sources = visitList(this.sources, v);
-	return reconstruct(sources);
+        return reconstruct(sources);
     }
 
     /** Write the source files to an output file. */
@@ -92,7 +91,7 @@ public class SourceCollection_c extends Node_c implements SourceCollection
             w.newline(0);
         }
     }
-    
+
     @Override
     public Node copy(NodeFactory nf) {
         return nf.SourceCollection(this.position, this.sources);

@@ -43,42 +43,41 @@ import polyglot.types.TypeSystem;
  * call to remove <code>r</code> removes all <code>s</code> s.t. r is a 
  * a supertype of s.
  */
-public class SubtypeSet implements java.util.Set<Type>
-{
-    protected List<Type> v; 
+public class SubtypeSet implements java.util.Set<Type> {
+    protected List<Type> v;
     protected TypeSystem ts;
-    protected Type topType;  // Everything in the set must be a subtype of topType.
+    protected Type topType; // Everything in the set must be a subtype of topType.
 
     /**
      * Creates an empty SubtypeSet
      */
     public SubtypeSet(TypeSystem ts) {
-	this(ts.Object());
+        this(ts.Object());
     }
 
     public SubtypeSet(Type top) {
-	v = new ArrayList<Type>();
+        v = new ArrayList<Type>();
         this.ts = top.typeSystem();
-	this.topType = top;
+        this.topType = top;
     }
 
     /**
      * Creates a copy of the given SubtypeSet
      */
     public SubtypeSet(SubtypeSet s) {
-      v = new ArrayList<Type>(s.v);
-      ts = s.ts;
-      topType = s.topType;
+        v = new ArrayList<Type>(s.v);
+        ts = s.ts;
+        topType = s.topType;
     }
 
     public SubtypeSet(TypeSystem ts, Collection<? extends Type> c) {
-      this(ts);
-      addAll(c);
+        this(ts);
+        addAll(c);
     }
 
     public SubtypeSet(Type top, Collection<? extends Type> c) {
-      this(top);
-      addAll(c);
+        this(top);
+        addAll(c);
     }
 
     /**
@@ -91,34 +90,34 @@ public class SubtypeSet implements java.util.Set<Type>
     @Override
     public boolean add(Type type) {
         if (type == null) {
-	    return false;
-	}
+            return false;
+        }
 
         if (ts.isSubtype(type, topType)) {
             boolean haveToAdd = true;
-  
-            for (Iterator<Type> i = v.iterator(); i.hasNext(); ) {
+
+            for (Iterator<Type> i = v.iterator(); i.hasNext();) {
                 Type t = i.next();
-  
+
                 if (ts.descendsFrom(t, type)) {
                     i.remove();
                 }
-  
+
                 if (ts.isSubtype(type, t)) {
                     haveToAdd = false;
                     break;
                 }
             }
-  
+
             if (haveToAdd) {
                 v.add(type);
             }
-  
+
             return haveToAdd;
         }
-        
-        throw new InternalCompilerError(
-            "Can only add " + topType + "s to the set. Got a " + type);
+
+        throw new InternalCompilerError("Can only add " + topType
+                + "s to the set. Got a " + type);
     }
 
     /**
@@ -126,17 +125,17 @@ public class SubtypeSet implements java.util.Set<Type>
      */
     @Override
     public boolean addAll(Collection<? extends Type> c) {
-	if (c == null) {
-	    return false;
-	}
+        if (c == null) {
+            return false;
+        }
 
-	boolean changed = false;
+        boolean changed = false;
 
-	for (Type t : c) {
-	    changed |= add(t); 
-	}
+        for (Type t : c) {
+            changed |= add(t);
+        }
 
-	return changed;
+        return changed;
     }
 
     /**
@@ -144,7 +143,7 @@ public class SubtypeSet implements java.util.Set<Type>
      */
     @Override
     public void clear() {
-	v.clear();
+        v.clear();
     }
 
     /**
@@ -154,17 +153,17 @@ public class SubtypeSet implements java.util.Set<Type>
      */
     @Override
     public boolean contains(Object o) {
-	if (o instanceof Type) {
-	    Type type = (Type) o;
-	    
-	    for (Type t : v) {
-		if (ts.isSubtype(type, t)) {
-		    return true;
-		}
-	    }
-	}
+        if (o instanceof Type) {
+            Type type = (Type) o;
 
-	return false;
+            for (Type t : v) {
+                if (ts.isSubtype(type, t)) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 
     /**
@@ -173,11 +172,11 @@ public class SubtypeSet implements java.util.Set<Type>
      * one of the elements in the set.
      */
     public boolean containsSubtype(Type type) {
-	for (Type t : v) {
-	    if (ts.isSubtype(type, t) || ts.isSubtype(t, type)) return true;
-	}
+        for (Type t : v) {
+            if (ts.isSubtype(type, t) || ts.isSubtype(t, type)) return true;
+        }
 
-	return false;
+        return false;
     }
 
     /**
@@ -185,23 +184,23 @@ public class SubtypeSet implements java.util.Set<Type>
      */
     @Override
     public boolean containsAll(Collection<?> c) {
-	for (Object o : c) {
-	    if (! contains (o)) {
-		return false;
-	    }
-	}
+        for (Object o : c) {
+            if (!contains(o)) {
+                return false;
+            }
+        }
 
-	return true;
+        return true;
     }
 
     @Override
     public boolean isEmpty() {
-	return v.isEmpty();
+        return v.isEmpty();
     }
-    
+
     @Override
     public Iterator<Type> iterator() {
-	return v.iterator();
+        return v.iterator();
     }
 
     /**
@@ -212,55 +211,55 @@ public class SubtypeSet implements java.util.Set<Type>
      */
     @Override
     public boolean remove(Object o) {
-	Type type = (Type) o;
+        Type type = (Type) o;
 
-	boolean removed = false;
+        boolean removed = false;
 
-	for (Iterator<Type> i = v.iterator(); i.hasNext(); ) {
-	    Type t = i.next();
+        for (Iterator<Type> i = v.iterator(); i.hasNext();) {
+            Type t = i.next();
 
-	    if (ts.isSubtype(t, type)) {
-		removed = true;
-		i.remove(); 
-	    }
-	}
+            if (ts.isSubtype(t, type)) {
+                removed = true;
+                i.remove();
+            }
+        }
 
-	return removed;
+        return removed;
     }
-    
+
     @Override
     public boolean removeAll(Collection<?> c) {
         boolean changed = false;
 
-	for (Object o : c) {
-	    changed |= remove(o);
-	}
+        for (Object o : c) {
+            changed |= remove(o);
+        }
 
-	return changed;
+        return changed;
     }
 
     @Override
     public boolean retainAll(Collection<?> c) {
-	throw new UnsupportedOperationException("Not supported");
+        throw new UnsupportedOperationException("Not supported");
     }
 
     @Override
     public int size() {
-	return v.size();
+        return v.size();
     }
 
     @Override
     public Object[] toArray() {
-	return v.toArray();
+        return v.toArray();
     }
 
     @Override
     public <U> U[] toArray(U[] a) {
-	return v.toArray(a);
+        return v.toArray(a);
     }
 
     @Override
     public String toString() {
-	return v.toString();
+        return v.toString();
     }
 }

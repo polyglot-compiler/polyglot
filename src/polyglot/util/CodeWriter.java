@@ -38,8 +38,7 @@ import java.io.IOException;
  * Line breaks can have different levels, which is useful for implementing
  * things like "miser mode" layout.
  */
-public abstract class CodeWriter
-{
+public abstract class CodeWriter {
     /**
      * Print the string <code>s</code> verbatim on the output stream.
      * @param s the string to print.
@@ -60,9 +59,9 @@ public abstract class CodeWriter
     /**
      * Start a new block with a relative indentation of <code>n</code>
      * characters.
-     */         
+     */
     public abstract void begin(int n);
-        
+
     /**
      * Terminate the most recent outstanding <code>begin</code>.
      */
@@ -84,7 +83,7 @@ public abstract class CodeWriter
      *            output instead. Requires: alt != null
      * @param altlen
      *            the length of 'alt' in characters
-     */ 
+     */
     public abstract void allowBreak(int n, int level, String alt, int altlen);
 
     /**
@@ -115,9 +114,9 @@ public abstract class CodeWriter
      *            the indentation relative to the current block.
      */
     public void unifiedBreak(int n) {
-	unifiedBreak(n, 1, " ", 1);
+        unifiedBreak(n, 1, " ", 1);
     }
-    
+
     /**
      * The most common use of "allowBreak": level 1, with an alternative of a
      * single space. 
@@ -128,6 +127,7 @@ public abstract class CodeWriter
     public void allowBreak(int n) {
         allowBreak(n, 1, " ", 1);
     }
+
     public void allowBreak(int n, String alt) {
         allowBreak(n, 1, alt, 1);
     }
@@ -137,11 +137,17 @@ public abstract class CodeWriter
      * should be used sparingly; a call to allowBreak() gives the
      * pretty-printer much more flexibility to do a good job.
      */
-    public void newline() { newline(0, 1); }
+    public void newline() {
+        newline(0, 1);
+    }
+
     /**
      * Like newline(), but forces a newline with a specified indentation.
      */
-    public void newline(int n) { newline(n, 1); }
+    public void newline(int n) {
+        newline(n, 1);
+    }
+
     /**
      * newline with a specified indentation and level.
      */

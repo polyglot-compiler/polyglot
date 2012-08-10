@@ -10,8 +10,7 @@ package coffer.types;
 import polyglot.types.TypeSystem;
 import polyglot.util.Position;
 
-public class UnknownKey_c extends Key_c implements UnknownKey
-{
+public class UnknownKey_c extends Key_c implements UnknownKey {
     public UnknownKey_c(TypeSystem ts, Position pos, String name) {
         super(ts, pos, name);
     }

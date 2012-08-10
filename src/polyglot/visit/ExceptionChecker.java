@@ -41,10 +41,9 @@ import polyglot.util.Position;
 import polyglot.util.SubtypeSet;
 
 /** Visitor which checks if exceptions are caught or declared properly. */
-public class ExceptionChecker extends ErrorHandlingVisitor
-{
+public class ExceptionChecker extends ErrorHandlingVisitor {
     protected ExceptionChecker outer;
-    
+
     /**
      * Set of exceptions that can be caught. Combined with the outer
      * field, these sets form a stack of exceptions, representing
@@ -66,54 +65,56 @@ public class ExceptionChecker extends ErrorHandlingVisitor
      *     { A, B }
      */
     protected Set<Type> catchable;
-    
 
     /**
      * The throws set, calculated bottom up.
      */
     protected SubtypeSet throwsSet;
-    
+
     /**
      * Responsible for creating an appropriate exception.
      */
     protected UncaughtReporter reporter;
-    
+
     /**
      * Should the propogation of eceptions upwards go past this point?
      */
     protected boolean catchAllThrowable;
-    
+
     public ExceptionChecker(Job job, TypeSystem ts, NodeFactory nf) {
         super(job, ts, nf);
         this.outer = null;
         this.catchAllThrowable = false;
     }
-    
+
     public ExceptionChecker push(UncaughtReporter reporter) {
         ExceptionChecker ec = this.push();
         ec.reporter = reporter;
         ec.throwsSet = new SubtypeSet(ts.Throwable());
         return ec;
     }
+
     public ExceptionChecker push(Type catchableType) {
         ExceptionChecker ec = this.push();
         ec.catchable = Collections.singleton(catchableType);
         ec.throwsSet = new SubtypeSet(ts.Throwable());
         return ec;
     }
+
     public ExceptionChecker push(Collection<? extends Type> catchableTypes) {
         ExceptionChecker ec = this.push();
         ec.catchable = new HashSet<Type>(catchableTypes);
         ec.throwsSet = new SubtypeSet(ts.Throwable());
         return ec;
     }
+
     public ExceptionChecker pushCatchAllThrowable() {
         ExceptionChecker ec = this.push();
         ec.throwsSet = new SubtypeSet(ts.Throwable());
         ec.catchAllThrowable = true;
         return ec;
     }
-    
+
     public ExceptionChecker push() {
         throwsSet(); // force an instantiation of the throwsset.
         ExceptionChecker ec = (ExceptionChecker) this.visitChildren();
@@ -148,8 +149,8 @@ public class ExceptionChecker extends ErrorHandlingVisitor
      */
     @Override
     protected Node leaveCall(Node old, Node n, NodeVisitor v)
-	throws SemanticException {
-        
+            throws SemanticException {
+
         ExceptionChecker inner = (ExceptionChecker) v;
 
         {
@@ -166,9 +167,9 @@ public class ExceptionChecker extends ErrorHandlingVisitor
                 throw new InternalCompilerError("oops!");
             }
         }
-        
+
         // gather exceptions from this node.
-        return n.del().exceptionCheck(inner);        
+        return n.del().exceptionCheck(inner);
     }
 
     /**
@@ -182,7 +183,7 @@ public class ExceptionChecker extends ErrorHandlingVisitor
      * @throws SemanticException
      */
     public void throwsException(Type t, Position pos) throws SemanticException {
-        if (! t.isUncheckedException()) {            
+        if (!t.isUncheckedException()) {
             // go through the stack of catches and see if the exception
             // is caught.
             boolean exceptionCaught = false;
@@ -195,10 +196,10 @@ public class ExceptionChecker extends ErrorHandlingVisitor
                             break;
                         }
                     }
-                }           
+                }
                 if (!exceptionCaught && ec.throwsSet != null) {
                     // add t to ec's throwsSet.
-                    ec.throwsSet.add(t); 
+                    ec.throwsSet.add(t);
                 }
                 if (ec.catchAllThrowable) {
                     // stop the propagation
@@ -206,7 +207,7 @@ public class ExceptionChecker extends ErrorHandlingVisitor
                 }
                 ec = ec.pop();
             }
-            if (! exceptionCaught) {
+            if (!exceptionCaught) {
                 reportUncaughtException(t, pos);
             }
         }
@@ -218,8 +219,9 @@ public class ExceptionChecker extends ErrorHandlingVisitor
         }
         return this.throwsSet;
     }
-    
-    protected void reportUncaughtException(Type t, Position pos) throws SemanticException {
+
+    protected void reportUncaughtException(Type t, Position pos)
+            throws SemanticException {
         ExceptionChecker ec = this;
         UncaughtReporter ur = null;
         while (ec != null && ur == null) {
@@ -239,20 +241,23 @@ public class ExceptionChecker extends ErrorHandlingVisitor
          * @throws SemanticException 
          */
         void uncaughtType(Type t, Position pos) throws SemanticException {
-            throw new SemanticException("The exception \"" + t + 
-              "\" must either be caught or declared to be thrown.", pos);
+            throw new SemanticException("The exception \"" + t
+                    + "\" must either be caught or declared to be thrown.", pos);
         }
     }
+
     public static class CodeTypeReporter extends UncaughtReporter {
         public final String codeType;
+
         public CodeTypeReporter(String codeType) {
             this.codeType = codeType;
         }
+
         @Override
         void uncaughtType(Type t, Position pos) throws SemanticException {
-            throw new SemanticException("A " + codeType + " can not " +
-                        "throw a \"" + t + "\".", pos);
+            throw new SemanticException("A " + codeType + " can not "
+                    + "throw a \"" + t + "\".", pos);
         }
     }
-    
+
 }

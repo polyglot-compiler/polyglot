@@ -32,11 +32,11 @@ import polyglot.util.InternalCompilerError;
  * An unknown type.  This is used as a place-holder until types are
  * disambiguated.
  */
-public class UnknownPackage_c extends Package_c implements UnknownPackage
-{
+public class UnknownPackage_c extends Package_c implements UnknownPackage {
     /** Used for deserializing types. */
-    protected UnknownPackage_c() { }
-    
+    protected UnknownPackage_c() {
+    }
+
     /** Creates a new type in the given a TypeSystem. */
     public UnknownPackage_c(TypeSystem ts) {
         super(ts);
@@ -49,15 +49,16 @@ public class UnknownPackage_c extends Package_c implements UnknownPackage
 
     @Override
     public String translate(Resolver c) {
-	throw new InternalCompilerError("Cannot translate an unknown package.");
+        throw new InternalCompilerError("Cannot translate an unknown package.");
     }
 
     @Override
     public String toString() {
-	return "<unknown>";
+        return "<unknown>";
     }
+
     @Override
     public void print(CodeWriter w) {
-	w.write(toString());
+        w.write(toString());
     }
 }

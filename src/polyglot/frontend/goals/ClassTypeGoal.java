@@ -40,28 +40,30 @@ public abstract class ClassTypeGoal extends AbstractGoal {
         super(ct.job());
         this.ct = ct;
     }
-    
+
     protected ClassTypeGoal(ParsedClassType ct, String name) {
         super(ct.job(), name);
         this.ct = ct;
     }
-    
+
     public ParsedClassType type() {
         return ct;
     }
-    
+
     @Override
     public int hashCode() {
         return ct.hashCode() + super.hashCode();
     }
-    
+
     @Override
     public boolean equals(Object o) {
-        return o instanceof ClassTypeGoal && ((ClassTypeGoal) o).ct == ct && super.equals(o);
+        return o instanceof ClassTypeGoal && ((ClassTypeGoal) o).ct == ct
+                && super.equals(o);
     }
-    
+
     @Override
     public String toString() {
-        return StringUtil.getShortNameComponent(getClass().getName()) + "(" + ct + ")";
+        return StringUtil.getShortNameComponent(getClass().getName()) + "("
+                + ct + ")";
     }
 }

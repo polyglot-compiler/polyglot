@@ -31,25 +31,25 @@ import polyglot.util.InternalCompilerError;
  * A <code>NullType</code> represents the type of the Java keyword
  * <code>null</code>.
  */
-public class NullType_c extends Type_c implements NullType
-{
+public class NullType_c extends Type_c implements NullType {
     /** Used for deserializing types. */
-    protected NullType_c() { }
+    protected NullType_c() {
+    }
 
     public NullType_c(TypeSystem ts) {
-	super(ts);
+        super(ts);
     }
-    
+
     @Override
     public String translate(Resolver c) {
-	throw new InternalCompilerError("Cannot translate a null type.");
+        throw new InternalCompilerError("Cannot translate a null type.");
     }
 
     @Override
     public String toString() {
-	return "type(null)";
+        return "type(null)";
     }
-    
+
     @Override
     public boolean equalsImpl(TypeObject t) {
         return t instanceof NullType;
@@ -57,16 +57,23 @@ public class NullType_c extends Type_c implements NullType
 
     @Override
     public int hashCode() {
-	return 6060842;
+        return 6060842;
     }
 
     @Override
-    public boolean isCanonical() { return true; }
-    @Override
-    public boolean isNull() { return true; }
+    public boolean isCanonical() {
+        return true;
+    }
 
     @Override
-    public NullType toNull() { return this; }
+    public boolean isNull() {
+        return true;
+    }
+
+    @Override
+    public NullType toNull() {
+        return this;
+    }
 
     @Override
     public boolean descendsFromImpl(Type ancestor) {

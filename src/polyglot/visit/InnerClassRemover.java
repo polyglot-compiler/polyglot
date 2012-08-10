@@ -82,10 +82,12 @@ public class InnerClassRemover extends ContextVisitor {
         super(job, ts, nf);
     }
 
-    Map<ParsedClassType, FieldInstance> outerFieldInstance = new HashMap<ParsedClassType, FieldInstance>();
-    
+    Map<ParsedClassType, FieldInstance> outerFieldInstance =
+            new HashMap<ParsedClassType, FieldInstance>();
+
     /** Get a reference to the enclosing instance of the current class that is of type containerClass */
-    Expr getContainer(Position pos, Expr this_, ClassType currentClass, ClassType containerClass) {
+    Expr getContainer(Position pos, Expr this_, ClassType currentClass,
+            ClassType containerClass) {
         if (containerClass == currentClass) {
             return this_;
         }
@@ -96,39 +98,39 @@ public class InnerClassRemover extends ContextVisitor {
         f = f.targetImplicit(false);
         return getContainer(pos, f, currentClass.outer(), containerClass);
     }
-    
+
     protected ContextVisitor localClassRemover() {
-    	LocalClassRemover lcv = new LocalClassRemover(job, ts, nf);
-    	return lcv;
+        LocalClassRemover lcv = new LocalClassRemover(job, ts, nf);
+        return lcv;
     }
 
     @Override
     public Node override(Node parent, Node n) {
         if (n instanceof SourceFile) {
-        	ContextVisitor lcv = localClassRemover();
+            ContextVisitor lcv = localClassRemover();
             lcv = (ContextVisitor) lcv.begin();
             lcv = lcv.context(context);
 
             if (Report.should_report("innerremover", 1)) {
-            	System.out.println(">>> output ----------------------");
-            	n.prettyPrint(System.out);
-            	System.out.println("<<< output ----------------------");
+                System.out.println(">>> output ----------------------");
+                n.prettyPrint(System.out);
+                System.out.println("<<< output ----------------------");
             }
 
             n = n.visit(lcv);
 
             if (Report.should_report("innerremover", 1)) {
-            	System.out.println(">>> locals removed ----------------------");
-            	n.prettyPrint(System.out);
-            	System.out.println("<<< locals removed ----------------------");
+                System.out.println(">>> locals removed ----------------------");
+                n.prettyPrint(System.out);
+                System.out.println("<<< locals removed ----------------------");
             }
 
             n = this.visitEdgeNoOverride(parent, n);
 
             if (Report.should_report("innerremover", 1)) {
-            	System.out.println(">>> inners removed ----------------------");
-            	n.prettyPrint(System.out);
-            	System.out.println("<<< inners removed ----------------------");
+                System.out.println(">>> inners removed ----------------------");
+                n.prettyPrint(System.out);
+                System.out.println("<<< inners removed ----------------------");
             }
 
             return n;
@@ -144,24 +146,27 @@ public class InnerClassRemover extends ContextVisitor {
         Context context = this.context();
 
         Position pos = n.position();
-        
+
         if (n instanceof Special) {
             Special s = (Special) n;
-            if (s.qualifier() == null)
-                return s;
+            if (s.qualifier() == null) return s;
             assert s.qualifier().type().toClass() != null;
             if (s.qualifier().type().toClass().declaration() == context.currentClassScope())
                 return s;
-            Node ret = getContainer(pos, nf.This(pos).type(context.currentClass()), context.currentClass(), s.qualifier().type().toClass());
+            Node ret =
+                    getContainer(pos,
+                                 nf.This(pos).type(context.currentClass()),
+                                 context.currentClass(),
+                                 s.qualifier().type().toClass());
             return ret;
         }
-        
+
         // Add the qualifier as an argument to constructor calls.
         if (n instanceof New) {
             New neu = (New) n;
 
             Expr q = neu.qualifier();
-            
+
             if (q != null) {
                 neu = neu.qualifier(null);
                 ConstructorInstance ci = neu.constructorInstance();
@@ -173,7 +178,7 @@ public class InnerClassRemover extends ContextVisitor {
                     ci = ci.formalTypes(args);
                     neu = neu.constructorInstance(ci);
                 }
-                
+
                 List<Expr> args = new ArrayList<Expr>();
                 args.add(q);
                 args.addAll(neu.arguments());
@@ -182,41 +187,40 @@ public class InnerClassRemover extends ContextVisitor {
 
             return neu;
         }
-        
+
         if (n instanceof ConstructorCall) {
             ConstructorCall cc = (ConstructorCall) n;
-            
+
             if (cc.kind() != ConstructorCall.SUPER) {
                 return cc;
             }
-            
+
             ConstructorInstance ci = cc.constructorInstance();
-            
+
             // NOTE: we require that a constructor call to a non-static member have a qualifier.
             // We can't check for this now, though, since the type information may already have been
             // rewritten.
-            
-            
-            
+
 //            ClassType ct = ci.container().toClass();
-            
+
 //            // Add a qualifier to non-static member class super() calls if not present.
 //            if (ct.isMember() && ! ct.flags().isStatic()) {
 //                if (cc.qualifier() == null) {
 //                    cc = cc.qualifier(nf.This(pos).type(context.currentClass()));
 //                }
 //            }
-            
+
             if (cc.qualifier() == null) {
                 return cc;
             }
 
             Expr q = cc.qualifier();
             cc = cc.qualifier(null);
-            
+
             ConstructorInstance cidecl = (ConstructorInstance) ci.declaration();
-            boolean fixCI = cc.arguments().size()+1 != ci.formalTypes().size();
-            
+            boolean fixCI =
+                    cc.arguments().size() + 1 != ci.formalTypes().size();
+
 //            if (q == null) {
 //                if (ct.isMember() && ! ct.flags().isStatic()) {
 //                    q = getContainer(pos, nf.Special(pos, Special.THIS).type(context.currentClass()), context.currentClass(), ct);
@@ -237,7 +241,7 @@ public class InnerClassRemover extends ContextVisitor {
                 ci = ci.formalTypes(args);
                 cc = cc.constructorInstance(ci);
             }
-            
+
             List<Expr> args = new ArrayList<Expr>();
             args.add(q);
             args.addAll(cc.arguments());
@@ -248,23 +252,28 @@ public class InnerClassRemover extends ContextVisitor {
 
         if (n instanceof ClassDecl) {
             ClassDecl cd = (ClassDecl) n;
-            
-            if (cd.type().isMember() && ! cd.type().flags().isStatic()) {
+
+            if (cd.type().isMember() && !cd.type().flags().isStatic()) {
                 cd.type().flags(cd.type().flags().Static());
                 cd = cd.flags(cd.type().flags());
 
                 // Add a field for the enclosing class.
                 ClassType ct = (ClassType) cd.type().container();
                 FieldInstance fi = boxThis(cd.type(), ct);
-                
-                cd = addFieldsToClass(cd, Collections.singletonList(fi), ts, nf, true);
-                
+
+                cd =
+                        addFieldsToClass(cd,
+                                         Collections.singletonList(fi),
+                                         ts,
+                                         nf,
+                                         true);
+
                 cd = fixQualifiers(cd);
             }
-            
+
             return cd;
         }
-        
+
         if (n instanceof Field) {
             Field f = (Field) n;
             if (f.isTargetImplicit() && f.target() instanceof Field) {
@@ -283,10 +292,9 @@ public class InnerClassRemover extends ContextVisitor {
             return c;
         }
 
-        
         return n;
     }
-    
+
     public ClassDecl fixQualifiers(ClassDecl cd) {
         return (ClassDecl) cd.visitChildren(new NodeVisitor() {
             LocalInstance li;
@@ -296,11 +304,11 @@ public class InnerClassRemover extends ContextVisitor {
                 if (n instanceof ClassBody) {
                     return null;
                 }
-                
+
                 if (n instanceof ConstructorDecl) {
                     return null;
                 }
-                
+
                 if (parent instanceof ConstructorDecl && n instanceof Formal) {
                     Formal f = (Formal) n;
                     LocalInstance li = f.localInstance();
@@ -309,20 +317,19 @@ public class InnerClassRemover extends ContextVisitor {
                     }
                     return n;
                 }
-                
+
                 if (parent instanceof ConstructorDecl && n instanceof Block) {
                     return null;
                 }
-                
+
                 if (parent instanceof Block && n instanceof ConstructorCall) {
                     return null;
                 }
-                
-                
+
                 if (parent instanceof ConstructorCall) {
                     return null;
                 }
-                
+
                 return n;
 //
 //                if (n instanceof ClassMember) {
@@ -335,14 +342,15 @@ public class InnerClassRemover extends ContextVisitor {
 
             @Override
             public Node leave(Node parent, Node old, Node n, NodeVisitor v) {
-                if (parent instanceof ConstructorCall && li != null && n instanceof Expr) {
+                if (parent instanceof ConstructorCall && li != null
+                        && n instanceof Expr) {
                     return fixQualifier((Expr) n, li);
                 }
                 return n;
             }
         });
     }
-    
+
     public Expr fixQualifier(Expr e, final LocalInstance li) {
         return (Expr) e.visit(new NodeVisitor() {
             @Override
@@ -351,7 +359,8 @@ public class InnerClassRemover extends ContextVisitor {
                     Field f = (Field) n;
                     if (f.target() instanceof Special) {
                         Special s = (Special) f.target();
-                        if (s.kind() == Special.THIS && f.name().equals(OUTER_FIELD_NAME)) {
+                        if (s.kind() == Special.THIS
+                                && f.name().equals(OUTER_FIELD_NAME)) {
                             Local l = nf.Local(n.position(), f.id());
                             l = l.localInstance(li);
                             l = (Local) l.type(li.type());
@@ -363,19 +372,25 @@ public class InnerClassRemover extends ContextVisitor {
             }
         });
     }
-    
-    public static ClassDecl addFieldsToClass(ClassDecl cd, List<FieldInstance> newFields, TypeSystem ts, NodeFactory nf, boolean rewriteMembers) {
+
+    public static ClassDecl addFieldsToClass(ClassDecl cd,
+            List<FieldInstance> newFields, TypeSystem ts, NodeFactory nf,
+            boolean rewriteMembers) {
         if (newFields.isEmpty()) {
             return cd;
         }
 
         ClassBody b = cd.body();
-        
+
         // Add the new fields to the class.
         List<ClassMember> newMembers = new ArrayList<ClassMember>();
         for (FieldInstance fi : newFields) {
             Position pos = fi.position();
-            FieldDecl fd = nf.FieldDecl(pos, fi.flags(), nf.CanonicalTypeNode(pos, fi.type()), nf.Id(pos, fi.name()));
+            FieldDecl fd =
+                    nf.FieldDecl(pos,
+                                 fi.flags(),
+                                 nf.CanonicalTypeNode(pos, fi.type()),
+                                 nf.Id(pos, fi.name()));
             fd = fd.fieldInstance(fi);
             newMembers.add(fd);
         }
@@ -387,17 +402,25 @@ public class InnerClassRemover extends ContextVisitor {
                 // Create a list of formals to add to the constructor.
                 List<Formal> formals = new ArrayList<Formal>();
                 List<LocalInstance> locals = new ArrayList<LocalInstance>();
-                
+
                 for (FieldInstance fi : newFields) {
                     Position pos = fi.position();
-                    LocalInstance li = ts.localInstance(pos, Flags.FINAL, fi.type(), fi.name());
+                    LocalInstance li =
+                            ts.localInstance(pos,
+                                             Flags.FINAL,
+                                             fi.type(),
+                                             fi.name());
                     li.setNotConstant();
-                    Formal formal = nf.Formal(pos, li.flags(), nf.CanonicalTypeNode(pos, li.type()), nf.Id(pos, li.name()));
+                    Formal formal =
+                            nf.Formal(pos,
+                                      li.flags(),
+                                      nf.CanonicalTypeNode(pos, li.type()),
+                                      nf.Id(pos, li.name()));
                     formal = formal.localInstance(li);
                     formals.add(formal);
                     locals.add(li);
                 }
-                
+
                 List<Formal> newFormals = new ArrayList<Formal>();
                 newFormals.addAll(formals);
                 newFormals.addAll(td.formals());
@@ -412,7 +435,10 @@ public class InnerClassRemover extends ContextVisitor {
 
                     Position pos = fi.position();
 
-                    Field f = nf.Field(pos, nf.This(pos).type(fi.container()), nf.Id(pos, fi.name()));
+                    Field f =
+                            nf.Field(pos,
+                                     nf.This(pos).type(fi.container()),
+                                     nf.Id(pos, fi.name()));
                     f = (Field) f.type(fi.type());
                     f = f.fieldInstance(fi);
                     f = f.targetImplicit(false);
@@ -427,7 +453,7 @@ public class InnerClassRemover extends ContextVisitor {
                     Eval e = nf.Eval(pos, a);
                     statements.add(e);
                 }
-                
+
                 // Add the assignments to the constructor body after the super call.
                 // Or, add pass the locals to another constructor if a this call.
                 Block block = td.body();
@@ -444,11 +470,12 @@ public class InnerClassRemover extends ContextVisitor {
                                 Assign a = (Assign) e.expr();
                                 arguments.add(a.right());
                             }
-                            
+
                             // Modify the CI if it is a copy of the declaration CI.
                             // If not a copy, it will get modified at the declaration.
                             if (ci != ci.declaration()) {
-                                List<Type> newFormalTypes = new ArrayList<Type>();
+                                List<Type> newFormalTypes =
+                                        new ArrayList<Type>();
                                 for (int j = 0; j < newFields.size(); j++) {
                                     FieldInstance fi = newFields.get(j);
                                     newFormalTypes.add(fi.type());
@@ -456,19 +483,21 @@ public class InnerClassRemover extends ContextVisitor {
                                 newFormalTypes.addAll(ci.formalTypes());
                                 ci.setFormalTypes(newFormalTypes);
                             }
-                            
+
                             arguments.addAll(cc.arguments());
                             cc = (ConstructorCall) cc.arguments(arguments);
                         }
                         else {
                             // A super call.  Don't rewrite it here; the visitor will handle it elsewhere.
                         }
-                        
+
                         // prepend the super call
                         statements.add(0, cc);
                     }
-                    
-                    statements.addAll(block.statements().subList(1, block.statements().size()));
+
+                    statements.addAll(block.statements()
+                                           .subList(1,
+                                                    block.statements().size()));
                 }
                 else {
                     statements.addAll(block.statements());
@@ -483,10 +512,10 @@ public class InnerClassRemover extends ContextVisitor {
                 for (Formal f : newFormals) {
                     newFormalTypes.add(f.declType());
                 }
-                
+
                 ConstructorInstance ci = td.constructorInstance();
                 assert ci.declaration() == ci;
-                
+
                 ci.setFormalTypes(newFormalTypes);
             }
             else {
@@ -500,8 +529,7 @@ public class InnerClassRemover extends ContextVisitor {
 
     // Add local variables to the argument list until it matches the declaration.
     List<Expr> addArgs(ProcedureCall n, ConstructorInstance nci, Expr q) {
-        if (nci == null || q == null)
-            return n.arguments();
+        if (nci == null || q == null) return n.arguments();
         List<Expr> args = new ArrayList<Expr>();
         args.add(q);
         args.addAll(n.arguments());
@@ -513,15 +541,20 @@ public class InnerClassRemover extends ContextVisitor {
     private FieldInstance boxThis(ClassType currClass, ClassType outerClass) {
         FieldInstance fi = outerFieldInstance.get(currClass);
         if (fi != null) return fi;
-        
+
         Position pos = outerClass.position();
-        
-        fi = ts.fieldInstance(pos, currClass, Flags.FINAL.Private(), outerClass, OUTER_FIELD_NAME);
+
+        fi =
+                ts.fieldInstance(pos,
+                                 currClass,
+                                 Flags.FINAL.Private(),
+                                 outerClass,
+                                 OUTER_FIELD_NAME);
         fi.setNotConstant();
-        
+
         ParsedClassType currDecl = (ParsedClassType) currClass.declaration();
         currDecl.addField(fi);
-        
+
         outerFieldInstance.put(currDecl, fi);
         return fi;
     }

@@ -35,16 +35,15 @@ import polyglot.visit.PrettyPrinter;
 /**
  * <code>Empty</code> is the class for a empty statement <code>(;)</code>.
  */
-public class Empty_c extends Stmt_c implements Empty
-{
+public class Empty_c extends Stmt_c implements Empty {
     public Empty_c(Position pos) {
-	super(pos);
+        super(pos);
     }
 
     /** Write the statement to an output file. */
     @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
-	w.write(";");
+        w.write(";");
     }
 
     @Override
@@ -59,8 +58,9 @@ public class Empty_c extends Stmt_c implements Empty
 
     @Override
     public String toString() {
-	return ";";
+        return ";";
     }
+
     @Override
     public Node copy(NodeFactory nf) {
         return nf.Empty(this.position);

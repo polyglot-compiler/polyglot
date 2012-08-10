@@ -11,8 +11,7 @@ import polyglot.types.TypeObject;
 import polyglot.types.TypeSystem;
 import polyglot.util.Position;
 
-public class ParamKey_c extends Key_c implements ParamKey
-{
+public class ParamKey_c extends Key_c implements ParamKey {
     public ParamKey_c(TypeSystem ts, Position pos, String name) {
         super(ts, pos, name);
     }

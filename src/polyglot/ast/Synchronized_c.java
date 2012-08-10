@@ -43,78 +43,77 @@ import polyglot.visit.TypeChecker;
  * block. Contains an expression being tested and a statement to be executed
  * while the expression is <code>true</code>.
  */
-public class Synchronized_c extends Stmt_c implements Synchronized
-{
+public class Synchronized_c extends Stmt_c implements Synchronized {
     protected Expr expr;
     protected Block body;
 
     public Synchronized_c(Position pos, Expr expr, Block body) {
-	super(pos);
-	assert(expr != null && body != null);
-	this.expr = expr;
-	this.body = body;
+        super(pos);
+        assert (expr != null && body != null);
+        this.expr = expr;
+        this.body = body;
     }
 
     /** Get the expression to synchronize. */
     @Override
     public Expr expr() {
-	return this.expr;
+        return this.expr;
     }
 
     /** Set the expression to synchronize. */
     @Override
     public Synchronized expr(Expr expr) {
-	Synchronized_c n = (Synchronized_c) copy();
-	n.expr = expr;
-	return n;
+        Synchronized_c n = (Synchronized_c) copy();
+        n.expr = expr;
+        return n;
     }
 
     /** Get the body of the statement. */
     @Override
     public Block body() {
-	return this.body;
+        return this.body;
     }
 
     /** Set the body of the statement. */
     @Override
     public Synchronized body(Block body) {
-	Synchronized_c n = (Synchronized_c) copy();
-	n.body = body;
-	return n;
+        Synchronized_c n = (Synchronized_c) copy();
+        n.body = body;
+        return n;
     }
 
     /** Reconstruct the statement. */
     protected Synchronized_c reconstruct(Expr expr, Block body) {
-	if (expr != this.expr || body != this.body) {
-	    Synchronized_c n = (Synchronized_c) copy();
-	    n.expr = expr;
-	    n.body = body;
-	    return n;
-	}
+        if (expr != this.expr || body != this.body) {
+            Synchronized_c n = (Synchronized_c) copy();
+            n.expr = expr;
+            n.body = body;
+            return n;
+        }
 
-	return this;
+        return this;
     }
 
     /** Visit the children of the statement. */
     @Override
     public Node visitChildren(NodeVisitor v) {
-	Expr expr = (Expr) visitChild(this.expr, v);
-	Block body = (Block) visitChild(this.body, v);
-	return reconstruct(expr, body);
+        Expr expr = (Expr) visitChild(this.expr, v);
+        Block body = (Block) visitChild(this.body, v);
+        return reconstruct(expr, body);
     }
 
     /** Type check the statement. */
     @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
-	TypeSystem ts = tc.typeSystem();
+        TypeSystem ts = tc.typeSystem();
 
-	if (! ts.isSubtype(expr.type(), ts.Object()) ) {
-	     throw new SemanticException(
-		 "Cannot synchronize on an expression of type \"" +
-		 expr.type() + "\".", expr.position());
-	}
+        if (!ts.isSubtype(expr.type(), ts.Object())) {
+            throw new SemanticException("Cannot synchronize on an expression of type \""
+                                                + expr.type() + "\".",
+                                        expr.position());
+        }
 
-	return this;
+        return this;
     }
 
     @Override
@@ -130,16 +129,16 @@ public class Synchronized_c extends Stmt_c implements Synchronized
 
     @Override
     public String toString() {
-	return "synchronized (" + expr + ") { ... }";
+        return "synchronized (" + expr + ") { ... }";
     }
 
     /** Write the statement to an output file. */
     @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
-	w.write("synchronized (");
-	printBlock(expr, w, tr);
-	w.write(") ");
-	printSubStmt(body, w, tr);
+        w.write("synchronized (");
+        printBlock(expr, w, tr);
+        w.write(") ");
+        printSubStmt(body, w, tr);
     }
 
     @Override
@@ -153,7 +152,7 @@ public class Synchronized_c extends Stmt_c implements Synchronized
         v.visitCFG(body, this, EXIT);
         return succs;
     }
-    
+
     @Override
     public Node copy(NodeFactory nf) {
         return nf.Synchronized(this.position, this.expr, this.body);

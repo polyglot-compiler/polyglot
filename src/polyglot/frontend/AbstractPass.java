@@ -29,10 +29,9 @@ import polyglot.frontend.goals.Goal;
 import polyglot.util.StringUtil;
 
 /** The base class for most passes. */
-public abstract class AbstractPass implements Pass
-{
+public abstract class AbstractPass implements Pass {
     protected Goal goal;
-    
+
     /**
      * If the pass is running, the time that the pass started.
      * If the pass has completed, the time in ms the pass took to run,
@@ -50,7 +49,7 @@ public abstract class AbstractPass implements Pass
     public AbstractPass(Goal goal) {
         this.goal = goal;
     }
- 
+
     @Override
     public Goal goal() {
         return goal;
@@ -75,7 +74,7 @@ public abstract class AbstractPass implements Pass
         //  stop: time = T' - T = delta1
         // start: time = T'' - delta1 = T'' - T' + T
         //  stop: time = T''' - (T'' - T' + T) = delta2 + delta1
-        if (! exclusive_only) {
+        if (!exclusive_only) {
             inclusive_time = System.currentTimeMillis() - inclusive_time;
         }
         exclusive_time = System.currentTimeMillis() - exclusive_time;

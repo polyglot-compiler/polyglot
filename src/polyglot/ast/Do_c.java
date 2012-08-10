@@ -43,80 +43,77 @@ import polyglot.visit.TypeChecker;
  * A immutable representation of a Java language <code>do</code> statement. 
  * It contains a statement to be executed and an expression to be tested 
  * indicating whether to reexecute the statement.
- */ 
-public class Do_c extends Loop_c implements Do
-{
+ */
+public class Do_c extends Loop_c implements Do {
     protected Stmt body;
     protected Expr cond;
 
     public Do_c(Position pos, Stmt body, Expr cond) {
-	super(pos);
-	assert(body != null && cond != null);
-	this.body = body;
-	this.cond = cond;
+        super(pos);
+        assert (body != null && cond != null);
+        this.body = body;
+        this.cond = cond;
     }
 
     /** Get the body of the statement. */
     @Override
     public Stmt body() {
-	return this.body;
+        return this.body;
     }
 
     /** Set the body of the statement. */
     @Override
     public Do body(Stmt body) {
-	Do_c n = (Do_c) copy();
-	n.body = body;
-	return n;
+        Do_c n = (Do_c) copy();
+        n.body = body;
+        return n;
     }
 
     /** Get the conditional of the statement. */
     @Override
     public Expr cond() {
-	return this.cond;
+        return this.cond;
     }
 
     /** Set the conditional of the statement. */
     @Override
     public Do cond(Expr cond) {
-	Do_c n = (Do_c) copy();
-	n.cond = cond;
-	return n;
+        Do_c n = (Do_c) copy();
+        n.cond = cond;
+        return n;
     }
 
     /** Reconstruct the statement. */
     protected Do_c reconstruct(Stmt body, Expr cond) {
-	if (body != this.body || cond != this.cond) {
-	    Do_c n = (Do_c) copy();
-	    n.body = body;
-	    n.cond = cond;
-	    return n;
-	}
+        if (body != this.body || cond != this.cond) {
+            Do_c n = (Do_c) copy();
+            n.body = body;
+            n.cond = cond;
+            return n;
+        }
 
-	return this;
+        return this;
     }
 
     /** Visit the children of the statement. */
     @Override
     public Node visitChildren(NodeVisitor v) {
         Stmt body = (Stmt) visitChild(this.body, v);
-	Expr cond = (Expr) visitChild(this.cond, v);
-	return reconstruct(body, cond);
+        Expr cond = (Expr) visitChild(this.cond, v);
+        return reconstruct(body, cond);
     }
 
     /** Type check the statement. */
     @Override
-    public Node typeCheck(TypeChecker tc) throws SemanticException
-    {
+    public Node typeCheck(TypeChecker tc) throws SemanticException {
         TypeSystem ts = tc.typeSystem();
 
         if (!ts.isImplicitCastValid(cond.type(), ts.Boolean())) {
-	    throw new SemanticException(
-		"Condition of do statement must have boolean type.",
-		cond.position());
-	}
+            throw new SemanticException("Condition of do statement must have boolean type.",
+                                        cond.position());
+        }
 
-	return this;
+        return this;
     }
 
     @Override
@@ -132,20 +129,18 @@ public class Do_c extends Loop_c implements Do
 
     @Override
     public String toString() {
-	return "do { ... } while (" + cond + ")";
+        return "do { ... } while (" + cond + ")";
     }
 
     /** Write the statement to an output file. */
     @Override
-    public void prettyPrint(CodeWriter w, PrettyPrinter tr)
-    {
-	w.write("do ");
-	printSubStmt(body, w, tr);
-	w.write("while(");
-	printBlock(cond, w, tr);
-	w.write("); ");
+    public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
+        w.write("do ");
+        printSubStmt(body, w, tr);
+        w.write("while(");
+        printBlock(cond, w, tr);
+        w.write("); ");
     }
-
 
     @Override
     public Term firstChild() {
@@ -160,8 +155,13 @@ public class Do_c extends Loop_c implements Do
             v.visitCFG(cond, body, ENTRY);
         }
         else {
-            v.visitCFG(cond, FlowGraph.EDGE_KEY_TRUE, body, ENTRY, 
-                             FlowGraph.EDGE_KEY_FALSE, this, EXIT);
+            v.visitCFG(cond,
+                       FlowGraph.EDGE_KEY_TRUE,
+                       body,
+                       ENTRY,
+                       FlowGraph.EDGE_KEY_FALSE,
+                       this,
+                       EXIT);
         }
 
         return succs;
@@ -171,6 +171,7 @@ public class Do_c extends Loop_c implements Do
     public Term continueTarget() {
         return cond;
     }
+
     @Override
     public Node copy(NodeFactory nf) {
         return nf.Do(this.position, this.body, this.cond);

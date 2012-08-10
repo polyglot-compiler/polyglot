@@ -41,9 +41,8 @@ import polyglot.util.Position;
 /**
  * Implementation of type system for parameterized types.
  */
-public abstract class ParamTypeSystem_c<Formal extends Param, Actual extends TypeObject> extends TypeSystem_c
-    implements ParamTypeSystem<Formal, Actual>
-{
+public abstract class ParamTypeSystem_c<Formal extends Param, Actual extends TypeObject>
+        extends TypeSystem_c implements ParamTypeSystem<Formal, Actual> {
     /**
      * Create a new mutable PClass.
      *
@@ -84,9 +83,8 @@ public abstract class ParamTypeSystem_c<Formal extends Param, Actual extends Typ
             PClass<Formal, Actual> base, List<? extends Actual> actuals)
             throws SemanticException {
         if (base.formals().size() != actuals.size()) {
-            throw new SemanticException("Wrong number of actual parameters " +
-                                        "for instantiation of \"" +
-                                        base.clazz() + "\".", pos);
+            throw new SemanticException("Wrong number of actual parameters "
+                    + "for instantiation of \"" + base.clazz() + "\".", pos);
         }
     }
 
@@ -111,20 +109,21 @@ public abstract class ParamTypeSystem_c<Formal extends Param, Actual extends Typ
         }
 
         if (i.hasNext() || j.hasNext()) {
-            throw new InternalCompilerError("Wrong number of actual " +
-                "parameters for instantiation " + "of \"" + base + "\".", pos);
+            throw new InternalCompilerError("Wrong number of actual "
+                                                    + "parameters for instantiation "
+                                                    + "of \"" + base + "\".",
+                                            pos);
         }
 
         Type inst = subst(base.clazz(), substMap);
         if (!inst.isClass()) {
             throw new InternalCompilerError("Instantiating a PClass "
-                + "produced something other than a ClassType.", pos);
+                    + "produced something other than a ClassType.", pos);
         }
-        
+
         return inst.toClass();
     }
 
-    
     /**
      * Apply a parameter substitution to a type.
      *

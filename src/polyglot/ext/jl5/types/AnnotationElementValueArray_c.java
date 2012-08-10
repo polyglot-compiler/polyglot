@@ -10,8 +10,7 @@ public class AnnotationElementValueArray_c extends TypeObject_c implements
 
     private List<AnnotationElementValue> vals;
 
-    public AnnotationElementValueArray_c(JL5TypeSystem ts,
- Position pos,
+    public AnnotationElementValueArray_c(JL5TypeSystem ts, Position pos,
             List<AnnotationElementValue> vals) {
         super(ts, pos);
         this.vals = vals;

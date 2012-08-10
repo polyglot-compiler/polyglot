@@ -21,15 +21,14 @@ import coffer.extension.SpecialExt_c;
 
 /** An implementation of the <code>CofferNodeFactory</code> interface. 
  */
-public class CofferExtFactory_c extends AbstractExtFactory_c
-{
+public class CofferExtFactory_c extends AbstractExtFactory_c {
     public CofferExtFactory_c() {
         super();
     }
 
     public final Ext extCanonicalKeySetNode() {
-    Ext e = extCanonicalKeySetNodeImpl();
-    return e;
+        Ext e = extCanonicalKeySetNodeImpl();
+        return e;
     }
 
     public final Ext extFree() {
@@ -51,6 +50,7 @@ public class CofferExtFactory_c extends AbstractExtFactory_c
         Ext e = extTrackedTypeNodeImpl();
         return e;
     }
+
     public final Ext extAmbKeySetNode() {
         Ext e = extAmbKeySetNodeImpl();
         return e;
@@ -113,13 +113,15 @@ public class CofferExtFactory_c extends AbstractExtFactory_c
     }
 
     public Ext extKeyNodeImpl() {
-        return  extNodeImpl();
+        return extNodeImpl();
     }
+
     public Ext extTrackedTypeNodeImpl() {
-        return  extTypeNodeImpl();
+        return extTypeNodeImpl();
     }
+
     public Ext extThrowConstraintNodeImpl() {
-        return  extNodeImpl();
+        return extNodeImpl();
     }
 
     @Override

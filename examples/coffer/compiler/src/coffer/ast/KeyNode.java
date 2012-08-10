@@ -13,9 +13,10 @@ import coffer.types.Key;
 /**
  * An AST node for a <code>Key</code>.  The key may be ambiguous. 
  */
-public interface KeyNode extends Node
-{
+public interface KeyNode extends Node {
     public Key key();
+
     public String name();
+
     public KeyNode key(Key key);
 }

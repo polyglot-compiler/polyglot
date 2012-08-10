@@ -51,27 +51,34 @@ public class Serialized extends SourceFileGoal {
         return scheduler.internGoal(new Serialized(job));
     }
 
-    protected Serialized(Job job) { super(job); }
-    
+    protected Serialized(Job job) {
+        super(job);
+    }
+
     @Override
     public Pass createPass(ExtensionInfo extInfo) {
-		Compiler compiler = extInfo.compiler();
-		if (compiler.serializeClassInfo()) {
-			TypeSystem ts = extInfo.typeSystem();
-			NodeFactory nf = extInfo.nodeFactory();
-			return new VisitorPass(this, createSerializer(ts, nf, job()
-					.source().getLastModified(), compiler.errorQueue(),
-					extInfo.version()));
-		} else {
-			return new EmptyPass(this);
-		}
-	}
-    
+        Compiler compiler = extInfo.compiler();
+        if (compiler.serializeClassInfo()) {
+            TypeSystem ts = extInfo.typeSystem();
+            NodeFactory nf = extInfo.nodeFactory();
+            return new VisitorPass(this,
+                                   createSerializer(ts,
+                                                    nf,
+                                                    job().source()
+                                                         .getLastModified(),
+                                                    compiler.errorQueue(),
+                                                    extInfo.version()));
+        }
+        else {
+            return new EmptyPass(this);
+        }
+    }
+
     protected ClassSerializer createSerializer(TypeSystem ts, NodeFactory nf,
-			long lastModified, ErrorQueue eq, Version version) {
-		return new ClassSerializer(ts, nf, lastModified, eq, version);
-	}
-    
+            long lastModified, ErrorQueue eq, Version version) {
+        return new ClassSerializer(ts, nf, lastModified, eq, version);
+    }
+
     @Override
     public Collection<Goal> prerequisiteGoals(Scheduler scheduler) {
         List<Goal> l = new ArrayList<Goal>();

@@ -39,8 +39,7 @@ import polyglot.visit.SupertypeDisambiguator;
 import polyglot.visit.TypeBuilder;
 import polyglot.visit.TypeChecker;
 
-public class EnumConstantDecl_c extends Term_c implements EnumConstantDecl
-{
+public class EnumConstantDecl_c extends Term_c implements EnumConstantDecl {
     protected List<Expr> args;
     protected Id name;
     protected Flags flags;
@@ -51,8 +50,9 @@ public class EnumConstantDecl_c extends Term_c implements EnumConstantDecl
     protected long ordinal;
     protected List<AnnotationElem> annotations;
 
-
-    public EnumConstantDecl_c(Position pos, Flags flags, List<AnnotationElem> annotations, Id name, List<Expr> args, ClassBody body){
+    public EnumConstantDecl_c(Position pos, Flags flags,
+            List<AnnotationElem> annotations, Id name, List<Expr> args,
+            ClassBody body) {
         super(pos);
         this.name = name;
         this.args = args;
@@ -71,7 +71,7 @@ public class EnumConstantDecl_c extends Term_c implements EnumConstantDecl
 
     @Override
     public EnumConstantDecl ordinal(long ordinal) {
-        EnumConstantDecl_c n = (EnumConstantDecl_c)copy();
+        EnumConstantDecl_c n = (EnumConstantDecl_c) copy();
         n.ordinal = ordinal;
         return n;
     }
@@ -94,90 +94,91 @@ public class EnumConstantDecl_c extends Term_c implements EnumConstantDecl
 
     /** get args */
     @Override
-    public List<Expr> args(){
+    public List<Expr> args() {
         return args;
     }
 
     /** set args */
     @Override
-    public EnumConstantDecl args(List<Expr> args){
-        EnumConstantDecl_c n = (EnumConstantDecl_c)copy();
+    public EnumConstantDecl args(List<Expr> args) {
+        EnumConstantDecl_c n = (EnumConstantDecl_c) copy();
         n.args = args;
         return n;
     }
 
     /** set name */
     @Override
-    public EnumConstantDecl name(Id name){
-        EnumConstantDecl_c n = (EnumConstantDecl_c)copy();
+    public EnumConstantDecl name(Id name) {
+        EnumConstantDecl_c n = (EnumConstantDecl_c) copy();
         n.name = name;
         return n;
     }
 
     /** get name */
     @Override
-    public Id name(){
+    public Id name() {
         return name;
     }
 
     /** set body */
     @Override
-    public EnumConstantDecl body(ClassBody body){
-        EnumConstantDecl_c n = (EnumConstantDecl_c)copy();
+    public EnumConstantDecl body(ClassBody body) {
+        EnumConstantDecl_c n = (EnumConstantDecl_c) copy();
         n.body = body;
         return n;
     }
 
     /** get body */
     @Override
-    public ClassBody body(){
+    public ClassBody body() {
         return body;
     }
 
     @Override
-    public ParsedClassType type(){
+    public ParsedClassType type() {
         return type;
     }
 
     @Override
-    public Flags flags(){
+    public Flags flags() {
         return flags;
     }
 
     @Override
-    public EnumConstantDecl type(ParsedClassType pct){
+    public EnumConstantDecl type(ParsedClassType pct) {
         EnumConstantDecl_c n = (EnumConstantDecl_c) copy();
         n.type = pct;
         return n;
     }
 
     @Override
-    public EnumConstantDecl enumInstance(EnumInstance ei){
+    public EnumConstantDecl enumInstance(EnumInstance ei) {
         EnumConstantDecl_c n = (EnumConstantDecl_c) copy();
         n.enumInstance = ei;
         return n;
     }
 
     @Override
-    public EnumInstance enumInstance(){
+    public EnumInstance enumInstance() {
         return enumInstance;
     }
 
     @Override
-    public EnumConstantDecl constructorInstance(ConstructorInstance ci){
+    public EnumConstantDecl constructorInstance(ConstructorInstance ci) {
         EnumConstantDecl_c n = (EnumConstantDecl_c) copy();
         n.constructorInstance = ci;
         return n;
     }
 
     @Override
-    public ConstructorInstance constructorInstance(){
+    public ConstructorInstance constructorInstance() {
         return constructorInstance;
     }
 
-    protected EnumConstantDecl_c reconstruct(List<Expr> args, ClassBody body, List<AnnotationElem> annotations){
-        if (!CollectionUtil.equals(args, this.args) || body != this.body  ||
-                !CollectionUtil.equals(annotations, this.annotations)) {
+    protected EnumConstantDecl_c reconstruct(List<Expr> args, ClassBody body,
+            List<AnnotationElem> annotations) {
+        if (!CollectionUtil.equals(args, this.args) || body != this.body
+                || !CollectionUtil.equals(annotations, this.annotations)) {
             EnumConstantDecl_c n = (EnumConstantDecl_c) copy();
             n.args = ListUtil.<Expr> copy(args, true);
             n.body = body;
@@ -188,7 +189,7 @@ public class EnumConstantDecl_c extends Term_c implements EnumConstantDecl
     }
 
     @Override
-    public Node visitChildren(NodeVisitor v){
+    public Node visitChildren(NodeVisitor v) {
         List<Expr> args = visitList(this.args, v);
         ClassBody body = (ClassBody) visitChild(this.body, v);
         List<AnnotationElem> annotations = visitList(this.annotations, v);
@@ -197,7 +198,7 @@ public class EnumConstantDecl_c extends Term_c implements EnumConstantDecl
 
     @Override
     public Context enterChildScope(Node child, Context c) {
-        if (child == body && type != null && body != null){
+        if (child == body && type != null && body != null) {
             c = c.pushClass(type, type);
         }
         return super.enterChildScope(child, c);
@@ -205,23 +206,26 @@ public class EnumConstantDecl_c extends Term_c implements EnumConstantDecl
 
     @Override
     public NodeVisitor buildTypesEnter(TypeBuilder tb) throws SemanticException {
-        if(body() != null)
+        if (body() != null)
             return tb.pushCode().pushAnonClass(position());
-        else
-            return tb.pushCode();
+        else return tb.pushCode();
     }
 
     @Override
     public Node buildTypes(TypeBuilder tb) throws SemanticException {
-        JL5TypeSystem ts = (JL5TypeSystem)tb.typeSystem();
+        JL5TypeSystem ts = (JL5TypeSystem) tb.typeSystem();
 
         List<UnknownType> l = new ArrayList<UnknownType>(args().size());
-        for (int i = 0; i < args().size(); i++){
+        for (int i = 0; i < args().size(); i++) {
             l.add(ts.unknownType(position()));
         }
 
-        ConstructorInstance ci = ts.constructorInstance(position(),
-                ts.Object(), Flags.NONE, l, Collections.<Type> emptyList());
+        ConstructorInstance ci =
+                ts.constructorInstance(position(),
+                                       ts.Object(),
+                                       Flags.NONE,
+                                       l,
+                                       Collections.<Type> emptyList());
 
         EnumConstantDecl n = constructorInstance(ci);
         JL5ParsedClassType enumType = null;
@@ -229,9 +233,9 @@ public class EnumConstantDecl_c extends Term_c implements EnumConstantDecl
             ParsedClassType type = tb.currentClass();
             n = n.type(type);
             type.setMembersAdded(true);
-            enumType = (JL5ParsedClassType)tb.pop().currentClass();
+            enumType = (JL5ParsedClassType) tb.pop().currentClass();
 
-            if (! type.supertypesResolved()) {
+            if (!type.supertypesResolved()) {
                 type.superType(enumType);
                 type.setSupertypesResolved(true);
             }
@@ -239,23 +243,26 @@ public class EnumConstantDecl_c extends Term_c implements EnumConstantDecl
         }
         else {
             // this is not an anonymous class extending the enum
-            enumType = (JL5ParsedClassType)tb.currentClass();
+            enumType = (JL5ParsedClassType) tb.currentClass();
             n = n.type(enumType);
         }
-
-
 
         // now add the appropriate enum declaration to the containing class
         if (enumType == null) {
             return n;
         }
-        EnumInstance ei = ts.enumInstance(position(), enumType, Flags.NONE, name.id(), n.type(), ordinal);
+        EnumInstance ei =
+                ts.enumInstance(position(),
+                                enumType,
+                                Flags.NONE,
+                                name.id(),
+                                n.type(),
+                                ordinal);
         enumType.addEnumConstant(ei);
         n = n.enumInstance(ei);
 
         return n;
     }
-
 
     @Override
     public Node disambiguate(AmbiguityRemover ar) throws SemanticException {
@@ -264,7 +271,8 @@ public class EnumConstantDecl_c extends Term_c implements EnumConstantDecl
     }
 
     @Override
-    public Node disambiguateOverride(Node parent, AmbiguityRemover ar) throws SemanticException {
+    public Node disambiguateOverride(Node parent, AmbiguityRemover ar)
+            throws SemanticException {
         EnumConstantDecl nn = this;
         EnumConstantDecl old = nn;
 
@@ -282,11 +290,13 @@ public class EnumConstantDecl_c extends Term_c implements EnumConstantDecl
         if (childbd.hasErrors()) throw new SemanticException();
 
         if (nn.body() != null) {
-            SupertypeDisambiguator supDisamb = new SupertypeDisambiguator(childbd);
+            SupertypeDisambiguator supDisamb =
+                    new SupertypeDisambiguator(childbd);
             nn = nn.body((ClassBody) nn.visitChild(nn.body(), supDisamb));
             if (supDisamb.hasErrors()) throw new SemanticException();
 
-            SignatureDisambiguator sigDisamb = new SignatureDisambiguator(childbd);
+            SignatureDisambiguator sigDisamb =
+                    new SignatureDisambiguator(childbd);
             nn = nn.body((ClassBody) nn.visitChild(nn.body(), sigDisamb));
             if (sigDisamb.hasErrors()) throw new SemanticException();
 
@@ -299,9 +309,10 @@ public class EnumConstantDecl_c extends Term_c implements EnumConstantDecl
 
         return nn;
     }
+
     @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
-        JL5TypeSystem ts = (JL5TypeSystem)tc.typeSystem();
+        JL5TypeSystem ts = (JL5TypeSystem) tc.typeSystem();
         Context c = tc.context();
         JL5ParsedClassType ct = (JL5ParsedClassType) c.currentClass();
 
@@ -310,10 +321,12 @@ public class EnumConstantDecl_c extends Term_c implements EnumConstantDecl
             argTypes.add(e.type());
         }
 
-        ConstructorInstance ci = ts.findConstructor(ct, argTypes, c.currentClass());
-        EnumConstantDecl_c n = (EnumConstantDecl_c)this.constructorInstance(ci);
+        ConstructorInstance ci =
+                ts.findConstructor(ct, argTypes, c.currentClass());
+        EnumConstantDecl_c n =
+                (EnumConstantDecl_c) this.constructorInstance(ci);
 
-        if (n.flags() != Flags.NONE){
+        if (n.flags() != Flags.NONE) {
             throw new SemanticException("Cannot have modifier(s): " + flags
                     + " on enum constant declaration", this.position());
         }
@@ -328,27 +341,27 @@ public class EnumConstantDecl_c extends Term_c implements EnumConstantDecl
     }
 
     @Override
-    public String toString(){
+    public String toString() {
         return name + "(" + args + ")" + body != null ? "..." : "";
     }
 
     @Override
-    public void prettyPrint(CodeWriter w, PrettyPrinter tr){
+    public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
         w.write(name.id());
-        if (args != null && !args.isEmpty()){
+        if (args != null && !args.isEmpty()) {
             w.write(" ( ");
             Iterator<Expr> it = args.iterator();
-            while (it.hasNext()){
+            while (it.hasNext()) {
                 Expr e = it.next();
                 print(e, w, tr);
-                if (it.hasNext()){
+                if (it.hasNext()) {
                     w.write(", ");
                     w.allowBreak(0);
                 }
             }
             w.write(" )");
         }
-        if (body != null){
+        if (body != null) {
             w.write(" {");
             print(body, w, tr);
             w.write("}");
@@ -356,12 +369,12 @@ public class EnumConstantDecl_c extends Term_c implements EnumConstantDecl
     }
 
     @Override
-    public <T> List<T> acceptCFG(CFGBuilder<?> v, List<T> succs){
+    public <T> List<T> acceptCFG(CFGBuilder<?> v, List<T> succs) {
         return succs;
     }
 
     @Override
-    public Term firstChild(){
+    public Term firstChild() {
         return this;
     }
 

@@ -25,7 +25,6 @@
 
 package polyglot.types;
 
-
 /**
  * A LazyClassInitializer is responsible for initializing members of a class
  * after it has been created. Members are initialized lazily to correctly handle
@@ -35,11 +34,11 @@ public class DeserializedClassInitializer implements LazyClassInitializer {
     protected TypeSystem ts;
     protected ParsedClassType ct;
     protected boolean init;
-    
+
     public DeserializedClassInitializer(TypeSystem ts) {
         this.ts = ts;
     }
-    
+
     @Override
     public void setClass(ParsedClassType ct) {
         this.ct = ct;

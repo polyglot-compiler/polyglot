@@ -36,12 +36,11 @@ import polyglot.visit.TypeBuilder;
  * An <code>Expr</code> represents any Java expression.  All expressions
  * must be subtypes of Expr.
  */
-public abstract class Expr_c extends Term_c implements Expr
-{
+public abstract class Expr_c extends Term_c implements Expr {
     protected Type type;
 
     public Expr_c(Position pos) {
-	super(pos);
+        super(pos);
     }
 
     /**
@@ -51,34 +50,34 @@ public abstract class Expr_c extends Term_c implements Expr
      */
     @Override
     public Type type() {
-	return this.type;
+        return this.type;
     }
 
     /** Set the type of the expression. */
     @Override
     public Expr type(Type type) {
         if (type == this.type) return this;
-	Expr_c n = (Expr_c) copy();
-	n.type = type;
-	return n;
+        Expr_c n = (Expr_c) copy();
+        n.type = type;
+        return n;
     }
 
     @Override
     public void dump(CodeWriter w) {
         super.dump(w);
 
-	if (type != null) {
-	    w.allowBreak(4, " ");
-	    w.begin(0);
-	    w.write("(type " + type + ")");
-	    w.end();
-	}
+        if (type != null) {
+            w.allowBreak(4, " ");
+            w.begin(0);
+            w.write("(type " + type + ")");
+            w.end();
+        }
     }
 
     /** Get the precedence of the expression. */
     @Override
     public Precedence precedence() {
-	return Precedence.UNKNOWN;
+        return Precedence.UNKNOWN;
     }
 
     @Override
@@ -136,7 +135,7 @@ public abstract class Expr_c extends Term_c implements Expr
     public boolean isTypeChecked() {
         return super.isTypeChecked() && type != null && type.isCanonical();
     }
-    
+
     @Override
     public Node buildTypes(TypeBuilder tb) throws SemanticException {
         return type(tb.typeSystem().unknownType(position()));
@@ -174,14 +173,14 @@ public abstract class Expr_c extends Term_c implements Expr
      * @param pp The pretty printer.
      */
     @Override
-    public void printSubExpr(Expr expr, boolean associative,
-                             CodeWriter w, PrettyPrinter pp) {
-        if (! associative && precedence().equals(expr.precedence()) ||
-	    precedence().isTighter(expr.precedence())) {
-    		w.write("(");
-    		printBlock(expr, w, pp);
-    		w.write(")");
-	}
+    public void printSubExpr(Expr expr, boolean associative, CodeWriter w,
+            PrettyPrinter pp) {
+        if (!associative && precedence().equals(expr.precedence())
+                || precedence().isTighter(expr.precedence())) {
+            w.write("(");
+            printBlock(expr, w, pp);
+            w.write(")");
+        }
         else {
             print(expr, w, pp);
         }

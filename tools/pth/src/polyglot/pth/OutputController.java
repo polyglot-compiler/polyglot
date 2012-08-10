@@ -17,64 +17,77 @@ import polyglot.util.ErrorQueue;
  */
 public abstract class OutputController {
     protected final PrintStream out;
-    protected final Calendar today;    
+    protected final Calendar today;
     protected final Calendar week;
+
     public OutputController(PrintStream out) {
         this.out = out;
         today = Calendar.getInstance();
         week = Calendar.getInstance();
         Calendar now = Calendar.getInstance();
-         
+
         today.clear();
-        today.set(now.get(Calendar.YEAR), now.get(Calendar.MONTH), now.get(Calendar.DATE));
+        today.set(now.get(Calendar.YEAR),
+                  now.get(Calendar.MONTH),
+                  now.get(Calendar.DATE));
         week.setTimeInMillis(today.getTimeInMillis());
         week.add(Calendar.DATE, -6);
     }
-     
+
     public void startTest(Test t) {
         if (t instanceof ScriptTestSuite) {
-            startScriptTestSuite((ScriptTestSuite)t);
+            startScriptTestSuite((ScriptTestSuite) t);
         }
         else if (t instanceof SourceFileTest) {
-            startSourceFileTest((SourceFileTest)t);
+            startSourceFileTest((SourceFileTest) t);
         }
     }
+
     public void finishTest(Test t, ErrorQueue eq) {
         if (t instanceof ScriptTestSuite) {
-            finishScriptTestSuite((ScriptTestSuite)t);
+            finishScriptTestSuite((ScriptTestSuite) t);
         }
         else if (t instanceof SourceFileTest) {
-            finishSourceFileTest((SourceFileTest)t, eq);
+            finishSourceFileTest((SourceFileTest) t, eq);
         }
     }
-    
+
     protected abstract void startScriptTestSuite(ScriptTestSuite sts);
+
     protected abstract void startSourceFileTest(SourceFileTest sft);
+
     protected abstract void finishScriptTestSuite(ScriptTestSuite sts);
-    protected abstract void finishSourceFileTest(SourceFileTest sft, ErrorQueue eq);
-    
+
+    protected abstract void finishSourceFileTest(SourceFileTest sft,
+            ErrorQueue eq);
+
     public abstract void displayTestSuiteResults(String suiteName, TestSuite ts);
+
     public abstract void displayTestResults(TestResult tr, String testName);
-        
+
     protected DateFormat getDefaultDateFormat() {
         return new SimpleDateFormat("d-MMM-yy");
     }
+
     protected DateFormat getSameYearDateFormat() {
         return new SimpleDateFormat("d-MMM");
     }
+
     protected DateFormat getSameWeekDateFormat() {
         return new SimpleDateFormat("EEE k:mm");
     }
+
     protected DateFormat getTodayDateFormat() {
         return new SimpleDateFormat("k:mm");
     }
-    public String getDateDisplay(Date d) {
-        if (d == null) return "never";        
 
-        DateFormat df;                
+    public String getDateDisplay(Date d) {
+        if (d == null) return "never";
+
+        DateFormat df;
         Calendar dt = Calendar.getInstance();
         dt.setTime(d);
-        
+
         if (dt.after(today)) {
             df = getTodayDateFormat();
         }
@@ -86,9 +99,10 @@ public abstract class OutputController {
         }
         else {
             df = getDefaultDateFormat();
-        }            
+        }
 
         return df.format(d);
-    }    
-    public abstract void warning(String w);    
+    }
+
+    public abstract void warning(String w);
 }

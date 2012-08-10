@@ -34,8 +34,7 @@ import java.util.List;
  * language source file.  It consists of a package name, a list of 
  * <code>Import</code>s, and a list of <code>GlobalDecl</code>s.
  */
-public interface SourceFile extends Node
-{
+public interface SourceFile extends Node {
     /** Get the source's declared package. */
     PackageNode package_();
 
@@ -67,7 +66,7 @@ public interface SourceFile extends Node
 
     /** Set the source's import table. */
     SourceFile importTable(ImportTable importTable);
- 
+
     /** Get the source file. */
     Source source();
 

@@ -41,23 +41,28 @@ public class CachingResolver implements Resolver, Copy {
     protected Resolver inner;
     private Map<String, CachedResult> cache;
     private boolean cacheNotFound;
-    
+
     protected static class CachedResult {
-        protected static final class Success extends CachedResult{
+        protected static final class Success extends CachedResult {
             final Named named;
+
             Success(Named named) {
                 this.named = named;
             }
+
             @Override
             public String toString() {
                 return named.toString();
             }
         }
+
         protected static final class Error extends CachedResult {
             final NoClassException exc;
+
             Error(NoClassException exc) {
                 this.exc = exc;
             }
+
             @Override
             public String toString() {
                 return exc.toString();
@@ -70,9 +75,9 @@ public class CachingResolver implements Resolver, Copy {
      * @param inner The resolver whose results this resolver caches.
      */
     public CachingResolver(Resolver inner, boolean cacheNotFound) {
-	this.inner = inner;
+        this.inner = inner;
         this.cacheNotFound = cacheNotFound;
-	this.cache = new HashMap<String, CachedResult>();
+        this.cache = new HashMap<String, CachedResult>();
     }
 
     public CachingResolver(Resolver inner) {
@@ -80,8 +85,8 @@ public class CachingResolver implements Resolver, Copy {
     }
 
     protected boolean shouldReport(int level) {
-        return (Report.should_report("sysresolver", level) && this instanceof SystemResolver) ||
-               Report.should_report(TOPICS, level);
+        return (Report.should_report("sysresolver", level) && this instanceof SystemResolver)
+                || Report.should_report(TOPICS, level);
     }
 
     @Override
@@ -95,7 +100,7 @@ public class CachingResolver implements Resolver, Copy {
             throw new InternalCompilerError("clone failed");
         }
     }
-    
+
     /**
      * The resolver whose results this resolver caches.
      */
@@ -111,7 +116,7 @@ public class CachingResolver implements Resolver, Copy {
     protected Collection<CachedResult> cachedResults() {
         return cache.values();
     }
-    
+
     /**
      * Find a type object by name.
      * @param name The name to search for.
@@ -138,7 +143,8 @@ public class CachingResolver implements Resolver, Copy {
             catch (NoClassException e) {
                 if (shouldReport(3)) {
                     Report.report(3, "CachingResolver: " + e.getMessage());
-                    Report.report(3, "CachingResolver: installing " + name + "-> (not found) in resolver cache");
+                    Report.report(3, "CachingResolver: installing " + name
+                            + "-> (not found) in resolver cache");
                 }
                 if (cacheNotFound) {
                     cache.put(name, new CachedResult.Error(e));
@@ -150,13 +156,13 @@ public class CachingResolver implements Resolver, Copy {
 
             if (shouldReport(3))
                 Report.report(3, "CachingResolver: loaded: " + name);
-	}
+        }
         else {
             if (shouldReport(3))
                 Report.report(3, "CachingResolver: cached: " + name);
         }
 
-	return q;
+        return q;
     }
 
     /**
@@ -165,8 +171,7 @@ public class CachingResolver implements Resolver, Copy {
      */
     public Named check(String name) {
         CachedResult cached = cache.get(name);
-        if (!(cached instanceof CachedResult.Success))
-            return null;
+        if (!(cached instanceof CachedResult.Success)) return null;
         return ((CachedResult.Success) cached).named;
     }
 
@@ -177,9 +182,9 @@ public class CachingResolver implements Resolver, Copy {
      */
     public void install(String name, Named q) {
         if (shouldReport(3))
-            Report.report(3, "CachingResolver: installing " + name + "->" + q + " in resolver cache");
-        if (shouldReport(5))
-            new Exception().printStackTrace();
+            Report.report(3, "CachingResolver: installing " + name + "->" + q
+                    + " in resolver cache");
+        if (shouldReport(5)) new Exception().printStackTrace();
 
         cache.put(name, new CachedResult.Success(q));
     }
@@ -191,7 +196,7 @@ public class CachingResolver implements Resolver, Copy {
      * @throws SemanticException 
      */
     public void addNamed(String name, Named q) throws SemanticException {
-	install(name, q);
+        install(name, q);
     }
 
     public void dump() {
@@ -202,6 +207,5 @@ public class CachingResolver implements Resolver, Copy {
     }
 
     private static final Collection<String> TOPICS =
-                    CollectionUtil.list(Report.types,
-                                        Report.resolver);
+            CollectionUtil.list(Report.types, Report.resolver);
 }

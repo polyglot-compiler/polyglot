@@ -45,17 +45,25 @@ public class JL5ClassDecl_c extends ClassDecl_c implements JL5ClassDecl {
     protected List<ParamTypeNode> paramTypes;
     protected List<AnnotationElem> annotations;
 
-    public JL5ClassDecl_c(Position pos, Flags flags, List<AnnotationElem> annotations, Id name,
-            TypeNode superClass, List<TypeNode> interfaces, ClassBody body) {
-        this(pos, flags, annotations, name, superClass, interfaces, body,
-                new ArrayList<ParamTypeNode>());
+    public JL5ClassDecl_c(Position pos, Flags flags,
+            List<AnnotationElem> annotations, Id name, TypeNode superClass,
+            List<TypeNode> interfaces, ClassBody body) {
+        this(pos,
+             flags,
+             annotations,
+             name,
+             superClass,
+             interfaces,
+             body,
+             new ArrayList<ParamTypeNode>());
     }
 
-    public JL5ClassDecl_c(Position pos, Flags fl, List<AnnotationElem> annotations, Id name, TypeNode superType,
-            List<TypeNode> interfaces, ClassBody body, List<ParamTypeNode> paramTypes) {
+    public JL5ClassDecl_c(Position pos, Flags fl,
+            List<AnnotationElem> annotations, Id name, TypeNode superType,
+            List<TypeNode> interfaces, ClassBody body,
+            List<ParamTypeNode> paramTypes) {
         super(pos, fl, name, superType, interfaces, body);
-        if (paramTypes == null)
-            paramTypes = new ArrayList<ParamTypeNode>();
+        if (paramTypes == null) paramTypes = new ArrayList<ParamTypeNode>();
         this.paramTypes = paramTypes;
         if (pos == null) {
             this.position = Position.compilerGenerated();
@@ -63,7 +71,7 @@ public class JL5ClassDecl_c extends ClassDecl_c implements JL5ClassDecl {
         if (annotations == null) {
             annotations = Collections.emptyList();
         }
-        this.annotations = annotations;        
+        this.annotations = annotations;
     }
 
     @Override
@@ -76,21 +84,22 @@ public class JL5ClassDecl_c extends ClassDecl_c implements JL5ClassDecl {
         return this.annotations;
     }
 
-
     @Override
     public Node buildTypes(TypeBuilder tb) throws SemanticException {
-        JL5ClassDecl n = (JL5ClassDecl)super.buildTypes(tb);
-        JL5TypeSystem ts = (JL5TypeSystem)tb.typeSystem();
+        JL5ClassDecl n = (JL5ClassDecl) super.buildTypes(tb);
+        JL5TypeSystem ts = (JL5TypeSystem) tb.typeSystem();
         JL5ParsedClassType ct = (JL5ParsedClassType) n.type();
 
-        MuPClass<TypeVariable, ReferenceType> pc = ts.mutablePClass(ct.position());
+        MuPClass<TypeVariable, ReferenceType> pc =
+                ts.mutablePClass(ct.position());
         ct.setPClass(pc);
         pc.clazz(ct);
 
         if (paramTypes() != null && !paramTypes().isEmpty()) {
-            List<TypeVariable> typeVars = new ArrayList<TypeVariable>(this.paramTypes().size());
+            List<TypeVariable> typeVars =
+                    new ArrayList<TypeVariable>(this.paramTypes().size());
             for (ParamTypeNode ptn : this.paramTypes()) {
-                TypeVariable tv = (TypeVariable)ptn.type();
+                TypeVariable tv = (TypeVariable) ptn.type();
                 typeVars.add(tv);
                 tv.declaringClass(ct);
             }
@@ -143,8 +152,12 @@ public class JL5ClassDecl_c extends ClassDecl_c implements JL5ClassDecl {
         TypeNode superClass = (TypeNode) visitChild(this.superClass, v);
         List<TypeNode> interfaces = visitList(this.interfaces, v);
         ClassBody body = (ClassBody) visitChild(this.body, v);
-        return reconstruct(name, superClass, interfaces, body, paramTypes,
-                annotations);
+        return reconstruct(name,
+                           superClass,
+                           interfaces,
+                           body,
+                           paramTypes,
+                           annotations);
     }
 
     /*
@@ -162,7 +175,7 @@ public class JL5ClassDecl_c extends ClassDecl_c implements JL5ClassDecl {
             // Add this class to the context, but don't push a class scope.
             // This allows us to detect loops in the inheritance
             // hierarchy, but avoids an infinite loop.
-            c = ((JL5Context)c).pushExtendsClause(type);
+            c = ((JL5Context) c).pushExtendsClause(type);
             c.addNamed(this.type);
         }
         for (ParamTypeNode tn : paramTypes) {
@@ -186,7 +199,8 @@ public class JL5ClassDecl_c extends ClassDecl_c implements JL5ClassDecl {
         }
 
         if (JL5Flags.isAnnotation(flags()) && flags().isPrivate()) {
-            throw new SemanticException("Annotation types cannot have explicit private modifier", this.position());
+            throw new SemanticException("Annotation types cannot have explicit private modifier",
+                                        this.position());
         }
 
         ts.checkDuplicateAnnotations(annotations);
@@ -197,9 +211,8 @@ public class JL5ClassDecl_c extends ClassDecl_c implements JL5ClassDecl {
                 && ts.isSubtype(type().superType(), ts.Throwable())
                 && !paramTypes.isEmpty()) {
             // JLS 3rd ed. 8.1.2
-            throw new SemanticException(
-                    "Cannot subclass java.lang.Throwable or any of its subtypes with a generic class",
-                    superClass().position());
+            throw new SemanticException("Cannot subclass java.lang.Throwable or any of its subtypes with a generic class",
+                                        superClass().position());
         }
 
         // check duplicate type variable decls
@@ -208,23 +221,22 @@ public class JL5ClassDecl_c extends ClassDecl_c implements JL5ClassDecl {
             for (int j = i + 1; j < paramTypes.size(); j++) {
                 TypeNode tj = paramTypes.get(j);
                 if (ti.name().equals(tj.name())) {
-                    throw new SemanticException(
-                            "Duplicate type variable declaration.",
-                            tj.position());
+                    throw new SemanticException("Duplicate type variable declaration.",
+                                                tj.position());
                 }
             }
         }
-        
+
         // set the retained annotations
-        ((JL5ParsedClassType) type()).setRetainedAnnotations(ts
-                .createRetainedAnnotations(this.annotationElems(),
-                        this.position()));
+        ((JL5ParsedClassType) type()).setRetainedAnnotations(ts.createRetainedAnnotations(this.annotationElems(),
+                                                                                          this.position()));
 
         return super.typeCheck(tc);
     }
 
     @Override
-    public Node annotationCheck(AnnotationChecker annoCheck) throws SemanticException {
+    public Node annotationCheck(AnnotationChecker annoCheck)
+            throws SemanticException {
 
         // check proper used of predefined annotations
         JL5TypeSystem ts = (JL5TypeSystem) annoCheck.typeSystem();
@@ -237,12 +249,15 @@ public class JL5ClassDecl_c extends ClassDecl_c implements JL5ClassDecl {
             JL5ParsedClassType ct = (JL5ParsedClassType) type();
             for (AnnotationTypeElemInstance ai : ct.annotationElems()) {
                 if (ai.type() instanceof ClassType
-                        && ((ClassType) ((ClassType) ai.type()).superType()).fullName().equals("java.lang.annotation.Annotation")) {
+                        && ((ClassType) ((ClassType) ai.type()).superType()).fullName()
+                                                                            .equals("java.lang.annotation.Annotation")) {
                     JL5ParsedClassType other = (JL5ParsedClassType) ai.type();
                     for (Object element2 : other.annotationElems()) {
-                        AnnotationTypeElemInstance aj = (AnnotationTypeElemInstance) element2;
+                        AnnotationTypeElemInstance aj =
+                                (AnnotationTypeElemInstance) element2;
                         if (aj.type().equals(ct)) {
-                            throw new SemanticException("cyclic annotation element type", aj.position());
+                            throw new SemanticException("cyclic annotation element type",
+                                                        aj.position());
                         }
                     }
                 }
@@ -274,7 +289,8 @@ public class JL5ClassDecl_c extends ClassDecl_c implements JL5ClassDecl {
         }
         else if (JL5Flags.isEnum(flags)) {
             w.write("enum ");
-        } else {
+        }
+        else {
             w.write("class ");
         }
     }
@@ -284,7 +300,8 @@ public class JL5ClassDecl_c extends ClassDecl_c implements JL5ClassDecl {
     }
 
     public void prettyPrintHeaderRest(CodeWriter w, PrettyPrinter tr) {
-        if (superClass() != null && !JL5Flags.isEnum(type.flags()) && !JL5Flags.isAnnotation(type.flags())) {
+        if (superClass() != null && !JL5Flags.isEnum(type.flags())
+                && !JL5Flags.isAnnotation(type.flags())) {
             w.write(" extends ");
             print(superClass(), w, tr);
         }
@@ -292,7 +309,8 @@ public class JL5ClassDecl_c extends ClassDecl_c implements JL5ClassDecl {
         if (!interfaces.isEmpty() && !JL5Flags.isAnnotation(type.flags())) {
             if (flags.isInterface()) {
                 w.write(" extends ");
-            } else {
+            }
+            else {
                 w.write(" implements ");
             }
 
@@ -324,12 +342,12 @@ public class JL5ClassDecl_c extends ClassDecl_c implements JL5ClassDecl {
         // print type variables
         boolean printTypeVars = true;
         if (tr instanceof JL5Translator) {
-            JL5Translator jl5tr = (JL5Translator)tr;
+            JL5Translator jl5tr = (JL5Translator) tr;
             printTypeVars = !jl5tr.removeJava5isms();
         }
         if (printTypeVars && !this.paramTypes().isEmpty()) {
             w.write("<");
-            for (Iterator<ParamTypeNode> iter = this.paramTypes.iterator(); iter.hasNext(); ) {
+            for (Iterator<ParamTypeNode> iter = this.paramTypes.iterator(); iter.hasNext();) {
                 ParamTypeNode ptn = iter.next();
                 ptn.prettyPrint(w, tr);
                 if (iter.hasNext()) {

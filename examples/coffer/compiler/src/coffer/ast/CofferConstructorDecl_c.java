@@ -44,8 +44,8 @@ import coffer.types.ThrowConstraint;
 /** An implementation of the <code>CofferConstructorDecl</code> interface.
  * <code>ConstructorDecl</code> is extended with pre- and post-conditions.
  */
-public class CofferConstructorDecl_c extends ConstructorDecl_c implements CofferConstructorDecl
-{
+public class CofferConstructorDecl_c extends ConstructorDecl_c implements
+        CofferConstructorDecl {
     protected KeySetNode entryKeys;
     protected KeySetNode returnKeys;
     protected List<ThrowConstraintNode> throwConstraints;
@@ -59,7 +59,7 @@ public class CofferConstructorDecl_c extends ConstructorDecl_c implements Coffer
               formals,
               Collections.<TypeNode> emptyList(),
               body);
-	this.entryKeys = entryKeys;
+        this.entryKeys = entryKeys;
         this.returnKeys = returnKeys;
         this.throwConstraints =
                 new ArrayList<ThrowConstraintNode>(throwConstraints);
@@ -67,14 +67,14 @@ public class CofferConstructorDecl_c extends ConstructorDecl_c implements Coffer
 
     @Override
     public KeySetNode entryKeys() {
-	return this.entryKeys;
+        return this.entryKeys;
     }
 
     @Override
     public CofferConstructorDecl entryKeys(KeySetNode entryKeys) {
-	CofferConstructorDecl_c n = (CofferConstructorDecl_c) copy();
-	n.entryKeys = entryKeys;
-	return n;
+        CofferConstructorDecl_c n = (CofferConstructorDecl_c) copy();
+        n.entryKeys = entryKeys;
+        return n;
     }
 
     @Override
@@ -84,14 +84,14 @@ public class CofferConstructorDecl_c extends ConstructorDecl_c implements Coffer
 
     @Override
     public CofferConstructorDecl returnKeys(KeySetNode returnKeys) {
-	CofferConstructorDecl_c n = (CofferConstructorDecl_c) copy();
-	n.returnKeys = returnKeys;
-	return n;
+        CofferConstructorDecl_c n = (CofferConstructorDecl_c) copy();
+        n.returnKeys = returnKeys;
+        return n;
     }
 
     @Override
     public List<ThrowConstraintNode> throwConstraints() {
-	return this.throwConstraints;
+        return this.throwConstraints;
     }
 
     @Override
@@ -116,10 +116,10 @@ public class CofferConstructorDecl_c extends ConstructorDecl_c implements Coffer
     @Override
     public CofferConstructorDecl throwConstraints(
             List<ThrowConstraintNode> throwConstraints) {
-	CofferConstructorDecl_c n = (CofferConstructorDecl_c) copy();
+        CofferConstructorDecl_c n = (CofferConstructorDecl_c) copy();
         n.throwConstraints =
                 new ArrayList<ThrowConstraintNode>(throwConstraints);
-	return n;
+        return n;
     }
 
     /*
@@ -141,17 +141,20 @@ public class CofferConstructorDecl_c extends ConstructorDecl_c implements Coffer
     protected CofferConstructorDecl_c reconstruct(Id name,
             List<Formal> formals, KeySetNode entryKeys, KeySetNode returnKeys,
             List<ThrowConstraintNode> throwConstraints, Block body) {
-	if (entryKeys != this.entryKeys || returnKeys != this.returnKeys || !CollectionUtil.equals(throwConstraints, this.throwConstraints)) {
-	    CofferConstructorDecl_c n = (CofferConstructorDecl_c) copy();
-	    n.entryKeys = entryKeys;
-	    n.returnKeys = returnKeys;
+        if (entryKeys != this.entryKeys
+                || returnKeys != this.returnKeys
+                || !CollectionUtil.equals(throwConstraints,
+                                          this.throwConstraints)) {
+            CofferConstructorDecl_c n = (CofferConstructorDecl_c) copy();
+            n.entryKeys = entryKeys;
+            n.returnKeys = returnKeys;
             n.throwConstraints =
                     new ArrayList<ThrowConstraintNode>(throwConstraints);
             return (CofferConstructorDecl_c) n.reconstruct(name,
                                                            formals,
                                                            Collections.<TypeNode> emptyList(),
                                                            body);
-	}
+        }
 
         return (CofferConstructorDecl_c) super.reconstruct(name,
                                                            formals,
@@ -161,14 +164,19 @@ public class CofferConstructorDecl_c extends ConstructorDecl_c implements Coffer
 
     @Override
     public Node visitChildren(NodeVisitor v) {
-	Id name = (Id) visitChild(this.name, v);
+        Id name = (Id) visitChild(this.name, v);
         List<Formal> formals = visitList(this.formals, v);
         KeySetNode entryKeys = (KeySetNode) visitChild(this.entryKeys, v);
         KeySetNode returnKeys = (KeySetNode) visitChild(this.returnKeys, v);
         List<ThrowConstraintNode> throwConstraints =
                 visitList(this.throwConstraints, v);
-	Block body = (Block) visitChild(this.body, v);
-	return reconstruct(name, formals, entryKeys, returnKeys, throwConstraints, body);
+        Block body = (Block) visitChild(this.body, v);
+        return reconstruct(name,
+                           formals,
+                           entryKeys,
+                           returnKeys,
+                           throwConstraints,
+                           body);
     }
 
     @Override
@@ -176,16 +184,16 @@ public class CofferConstructorDecl_c extends ConstructorDecl_c implements Coffer
         CofferNodeFactory nf = (CofferNodeFactory) tb.nodeFactory();
         CofferConstructorDecl n = (CofferConstructorDecl) super.buildTypes(tb);
         CofferConstructorInstance ci =
-            (CofferConstructorInstance) n.constructorInstance();
+                (CofferConstructorInstance) n.constructorInstance();
 
         if (n.entryKeys() == null) {
-            n = n.entryKeys(nf.CanonicalKeySetNode(position(),
-                                                   ci.entryKeys()));
+            n = n.entryKeys(nf.CanonicalKeySetNode(position(), ci.entryKeys()));
         }
 
         if (n.returnKeys() == null) {
-            n = n.returnKeys(nf.CanonicalKeySetNode(position(),
-                                                    ci.returnKeys()));
+            n =
+                    n.returnKeys(nf.CanonicalKeySetNode(position(),
+                                                        ci.returnKeys()));
         }
 
         List<ThrowConstraintNode> l = new LinkedList<ThrowConstraintNode>();
@@ -202,33 +210,32 @@ public class CofferConstructorDecl_c extends ConstructorDecl_c implements Coffer
         if (changed) {
             n = n.throwConstraints(l);
         }
-        
+
         CofferTypeSystem vts = (CofferTypeSystem) tb.typeSystem();
         ClassType ct = tb.currentClass();
-        
+
         KeySet entryKeys;
         KeySet returnKeys;
-        
+
         if (n.entryKeys() == null) {
             entryKeys = vts.emptyKeySet(position());
         }
         else {
             entryKeys = n.entryKeys().keys();
         }
-        
+
         if (n.returnKeys() == null) {
             returnKeys = vts.emptyKeySet(position());
-            
+
             if (ct instanceof CofferClassType) {
                 CofferClassType vct = (CofferClassType) ct;
-                if (vct.key() != null)
-                    returnKeys = returnKeys.add(vct.key());
+                if (vct.key() != null) returnKeys = returnKeys.add(vct.key());
             }
         }
         else {
             returnKeys = n.returnKeys().keys();
         }
-        
+
         ci.setEntryKeys(entryKeys);
         ci.setReturnKeys(returnKeys);
 
@@ -240,19 +247,23 @@ public class CofferConstructorDecl_c extends ConstructorDecl_c implements Coffer
         CofferClassType ct = (CofferClassType) tc.context().currentClass();
 
         CofferConstructorInstance ci =
-            (CofferConstructorInstance) this.constructorInstance();
+                (CofferConstructorInstance) this.constructorInstance();
 
         if (ct.key() != null) {
             if (ci.entryKeys().contains(ct.key())) {
-                throw new SemanticException("Constructor cannot hold key \"" +
-                                            ct.key() + "\" (associated with " +
-                                            "this) on entry.", position());
+                throw new SemanticException("Constructor cannot hold key \""
+                                                    + ct.key()
+                                                    + "\" (associated with "
+                                                    + "this) on entry.",
+                                            position());
             }
 
-            if (! ci.returnKeys().contains(ct.key())) {
-                throw new SemanticException("Constructor must hold key \"" +
-                                            ct.key() + "\" (associated with " +
-                                            "this) on exit.", position());
+            if (!ci.returnKeys().contains(ct.key())) {
+                throw new SemanticException("Constructor must hold key \""
+                                                    + ct.key()
+                                                    + "\" (associated with "
+                                                    + "this) on exit.",
+                                            position());
             }
         }
 
@@ -264,44 +275,44 @@ public class CofferConstructorDecl_c extends ConstructorDecl_c implements Coffer
         if (this.ci.isCanonical()) {
             return this;
         }
-        
-        if (this.entryKeys != null && ! this.entryKeys.keys().isCanonical()) {
+
+        if (this.entryKeys != null && !this.entryKeys.keys().isCanonical()) {
             return this;
         }
 
-        if (this.returnKeys != null && ! this.returnKeys.keys().isCanonical()) {
+        if (this.returnKeys != null && !this.returnKeys.keys().isCanonical()) {
             return this;
         }
 
-        CofferConstructorDecl_c n = (CofferConstructorDecl_c) super.disambiguate(ar);
+        CofferConstructorDecl_c n =
+                (CofferConstructorDecl_c) super.disambiguate(ar);
 
-	CofferTypeSystem vts = (CofferTypeSystem) ar.typeSystem();
-	ClassType ct = ar.context().currentClass();
+        CofferTypeSystem vts = (CofferTypeSystem) ar.typeSystem();
+        ClassType ct = ar.context().currentClass();
 
         KeySet entryKeys;
         KeySet returnKeys;
 
-	if (n.entryKeys == null) {
+        if (n.entryKeys == null) {
             entryKeys = vts.emptyKeySet(position());
         }
         else {
             entryKeys = n.entryKeys.keys();
         }
 
-	if (n.returnKeys == null) {
+        if (n.returnKeys == null) {
             returnKeys = vts.emptyKeySet(position());
 
             if (ct instanceof CofferClassType) {
                 CofferClassType vct = (CofferClassType) ct;
-                if (vct.key() != null)
-                    returnKeys = returnKeys.add(vct.key());
+                if (vct.key() != null) returnKeys = returnKeys.add(vct.key());
             }
         }
         else {
             returnKeys = n.returnKeys.keys();
         }
 
-	CofferConstructorInstance ci = (CofferConstructorInstance) n.ci;
+        CofferConstructorInstance ci = (CofferConstructorInstance) n.ci;
         ci.setEntryKeys(entryKeys);
         ci.setReturnKeys(returnKeys);
 
@@ -316,63 +327,63 @@ public class CofferConstructorDecl_c extends ConstructorDecl_c implements Coffer
                 c.setKeys(entryKeys);
                 throwConstraints.add(c);
             }
-	}
+        }
 
-	ci.setThrowConstraints(throwConstraints);
-    
-	return n;
+        ci.setThrowConstraints(throwConstraints);
+
+        return n;
     }
 
     /** Write the constructor to an output file. */
     @Override
     public void prettyPrintHeader(CodeWriter w, PrettyPrinter tr) {
-	w.begin(0);
-	w.write(flags().translate());
+        w.begin(0);
+        w.write(flags().translate());
 
         print(name, w, tr);
-	w.write("(");
+        w.write("(");
 
-	w.begin(0);
+        w.begin(0);
 
         for (Iterator<Formal> i = formals.iterator(); i.hasNext();) {
             Formal f = i.next();
-	    print(f, w, tr);
+            print(f, w, tr);
 
-	    if (i.hasNext()) {
-		w.write(",");
-		w.allowBreak(0, " ");
-	    }
-	}
+            if (i.hasNext()) {
+                w.write(",");
+                w.allowBreak(0, " ");
+            }
+        }
 
-	w.end();
-	w.write(")");
-    
-	if (! (tr instanceof Translator)) {
-	    if (entryKeys != null) {
-	        w.allowBreak(6, " ");
-	        print(entryKeys, w, tr);
-	    }
-	    if (returnKeys != null) {
-	        w.write(" -> ");
-	        print(returnKeys, w, tr);
-	    }
-	}
+        w.end();
+        w.write(")");
 
-	if (! throwConstraints.isEmpty()) {
-	    w.allowBreak(6);
-	    w.write("throws ");
+        if (!(tr instanceof Translator)) {
+            if (entryKeys != null) {
+                w.allowBreak(6, " ");
+                print(entryKeys, w, tr);
+            }
+            if (returnKeys != null) {
+                w.write(" -> ");
+                print(returnKeys, w, tr);
+            }
+        }
+
+        if (!throwConstraints.isEmpty()) {
+            w.allowBreak(6);
+            w.write("throws ");
 
             for (Iterator<ThrowConstraintNode> i = throwConstraints.iterator(); i.hasNext();) {
                 ThrowConstraintNode cn = i.next();
-		print(cn, w, tr);
+                print(cn, w, tr);
 
-		if (i.hasNext()) {
-		    w.write(",");
-		    w.allowBreak(4, " ");
-		}
-	    }
-	}
+                if (i.hasNext()) {
+                    w.write(",");
+                    w.allowBreak(4, " ");
+                }
+            }
+        }
 
-	w.end();
+        w.end();
     }
 }

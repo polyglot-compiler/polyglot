@@ -47,16 +47,15 @@ package polyglot.ast;
  * 
  * @see polyglot.ast.AbstractDelFactory_c has a very similar structure. 
  */
-public abstract class AbstractExtFactory_c implements ExtFactory
-{
+public abstract class AbstractExtFactory_c implements ExtFactory {
     protected AbstractExtFactory_c() {
         this(null);
     }
-    
+
     protected AbstractExtFactory_c(ExtFactory nextExtFactory) {
         this.nextExtFactory = nextExtFactory;
     }
-    
+
     /**
      * The next extFactory in the chain. Whenever an extension is instantiated,
      * the next extFactory should be called to see if it also has an extension,
@@ -69,6 +68,7 @@ public abstract class AbstractExtFactory_c implements ExtFactory
     public ExtFactory nextExtFactory() {
         return nextExtFactory;
     }
+
     /**
      * Compose two extensions together. Order is important: e1 gets added
      * at the end of e2's chain of extensions.
@@ -79,12 +79,12 @@ public abstract class AbstractExtFactory_c implements ExtFactory
      * @return the result of adding e1 to the end of e2's chain of extensions.
      */
     protected Ext composeExts(Ext e1, Ext e2) {
-        if (e1 == null) return e2;        
-        if (e2 == null) return e1;        
+        if (e1 == null) return e2;
+        if (e2 == null) return e1;
         // add e1 as e2's last extension, by recursing...
         return e2.ext(composeExts(e1, e2.ext()));
     }
-    
+
     // ******************************************
     // Final methods that call the Impl methods to construct 
     // extensions, and then check with nextExtFactory to see if it
@@ -94,7 +94,7 @@ public abstract class AbstractExtFactory_c implements ExtFactory
     @Override
     public final Ext extId() {
         Ext e = extIdImpl();
-        
+
         if (nextExtFactory != null) {
             Ext e2 = nextExtFactory.extId();
             e = composeExts(e, e2);
@@ -420,11 +420,11 @@ public abstract class AbstractExtFactory_c implements ExtFactory
         }
         return postExtCodeDecl(e);
     }
-    
+
     @Override
     public final Ext extCompoundStmt() {
         Ext e = extCompoundStmtImpl();
-      
+
         if (nextExtFactory != null) {
             Ext e2 = nextExtFactory.extCompoundStmt();
             e = composeExts(e, e2);
@@ -717,11 +717,11 @@ public abstract class AbstractExtFactory_c implements ExtFactory
         }
         return postExtNode(e);
     }
-    
+
     @Override
     public final Ext extNodeList() {
         Ext e = extNodeListImpl();
-        
+
         if (nextExtFactory != null) {
             Ext e2 = nextExtFactory.extNode();
             e = composeExts(e, e2);
@@ -963,7 +963,7 @@ public abstract class AbstractExtFactory_c implements ExtFactory
     // ********************************************
     // Impl methods
     // ********************************************
-    
+
     /**
      * Create the <code>Ext</code> object for a <code>Name</code> AST node.
      * @return the <code>Ext</code> object for a <code>Name</code> AST node.
@@ -971,7 +971,7 @@ public abstract class AbstractExtFactory_c implements ExtFactory
     protected Ext extIdImpl() {
         return extNodeImpl();
     }
-    
+
     /**
      * Create the <code>Ext</code> object for a <code>AmbAssign</code> AST node.
      * @return the <code>Ext</code> object for a <code>AmbAssign</code> AST node.
@@ -1211,7 +1211,7 @@ public abstract class AbstractExtFactory_c implements ExtFactory
     protected Ext extCompoundStmtImpl() {
         return extStmtImpl();
     }
-    
+
     /**
      * Create the <code>Ext</code> object for a <code>Conditional</code> AST node.
      * @return the <code>Ext</code> object for a <code>Conditional</code> AST node.
@@ -1419,7 +1419,7 @@ public abstract class AbstractExtFactory_c implements ExtFactory
     protected Ext extNodeImpl() {
         return null;
     }
-    
+
     /**
      * Create the <code>Ext</code> object for a <code>NodeList</code> AST node.
      * @return the <code>Ext</code> object for a <code>NodeList</code> AST node.
@@ -1596,12 +1596,10 @@ public abstract class AbstractExtFactory_c implements ExtFactory
         return extLoopImpl();
     }
 
-
-
     // ********************************************
     // Post methods
     // ********************************************
-    
+
     protected Ext postExtId(Ext ext) {
         return postExtNode(ext);
     }
@@ -1721,7 +1719,7 @@ public abstract class AbstractExtFactory_c implements ExtFactory
     protected Ext postExtCodeDecl(Ext ext) {
         return postExtClassMember(ext);
     }
-    
+
     protected Ext postExtCompoundStmt(Ext ext) {
         return postExtStmt(ext);
     }
@@ -1829,7 +1827,7 @@ public abstract class AbstractExtFactory_c implements ExtFactory
     protected Ext postExtNode(Ext ext) {
         return ext;
     }
-    
+
     protected Ext postExtNodeList(Ext ext) {
         return postExtNode(ext);
     }

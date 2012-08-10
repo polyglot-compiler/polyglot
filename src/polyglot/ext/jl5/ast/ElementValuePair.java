@@ -6,6 +6,8 @@ import polyglot.ast.Term;
 
 public interface ElementValuePair extends Term {
     public String name();
+
     public Id id();
+
     public Expr value();
 }

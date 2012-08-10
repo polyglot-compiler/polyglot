@@ -37,8 +37,7 @@ import polyglot.util.CodeWriter;
  * To use:
  *     new PrettyPrinter().printAst(node, new CodeWriter(out));
  */
-public class PrettyPrinter
-{
+public class PrettyPrinter {
     protected boolean appendSemicolon = true;
     protected boolean printType = true;
 
@@ -56,7 +55,7 @@ public class PrettyPrinter
     public boolean appendSemicolon(boolean a) {
         boolean old = this.appendSemicolon;
         this.appendSemicolon = a;
-	return old;
+        return old;
     }
 
     /** Flag indicating whether to print the type in a local declaration.
@@ -70,7 +69,7 @@ public class PrettyPrinter
     public boolean printType(boolean a) {
         boolean old = this.printType;
         this.printType = a;
-	return old;
+        return old;
     }
 
     /** Print an AST node using the given code writer.  The

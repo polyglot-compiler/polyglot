@@ -18,25 +18,25 @@ import polyglot.types.Type;
  * <code>InstanceOf</code> AST node.
  */
 public class PaoInstanceofExt_c extends PaoExt_c {
-	/**
-	 * Rewrites <code>instanceof</code> checks where the comparison type is
-	 * a primitive type to use the boxed type instead. For example,
-	 * "e instanceof int" gets rewritten to 
-	 * "e instanceof pao.runtime.Integer".
-	 * 
-	 * @see PaoExt#rewrite(PaoTypeSystem, NodeFactory)
-	 */
+    /**
+     * Rewrites <code>instanceof</code> checks where the comparison type is
+     * a primitive type to use the boxed type instead. For example,
+     * "e instanceof int" gets rewritten to 
+     * "e instanceof pao.runtime.Integer".
+     * 
+     * @see PaoExt#rewrite(PaoTypeSystem, NodeFactory)
+     */
     @Override
     public Node rewrite(PaoTypeSystem ts, NodeFactory nf) {
-    	Instanceof n = (Instanceof) node();
-    	Type rtype = n.compareType().type();
+        Instanceof n = (Instanceof) node();
+        Type rtype = n.compareType().type();
 
-    	if (rtype.isPrimitive()) {
-    		Type t = ts.boxedType(rtype.toPrimitive());
-    		return n.compareType(nf.CanonicalTypeNode(n.compareType().position(),
-                                                    t));
-    	}
+        if (rtype.isPrimitive()) {
+            Type t = ts.boxedType(rtype.toPrimitive());
+            return n.compareType(nf.CanonicalTypeNode(n.compareType()
+                                                       .position(), t));
+        }
 
-    	return n;
+        return n;
     }
 }

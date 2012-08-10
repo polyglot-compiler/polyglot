@@ -27,13 +27,13 @@ public class TestSuite extends AbstractTest {
     public TestSuite(String name, List<Test> tests, boolean haltOnFirstFailure) {
         super(name);
         this.tests = tests;
-        this.haltOnFirstFailure = haltOnFirstFailure;        
+        this.haltOnFirstFailure = haltOnFirstFailure;
     }
-    
+
     public boolean getHaltOnFirstFailure() {
         return haltOnFirstFailure;
     }
-    
+
     @Override
     public void setOutputController(OutputController output) {
         super.setOutputController(output);
@@ -48,11 +48,12 @@ public class TestSuite extends AbstractTest {
 
         if (this.getTestSuiteResult() == null) {
             this.setTestResult(this.createTestResult(null));
-        }        
-        
-        Map<String, TestResult> oldTestResults = new HashMap<String, TestResult>(this.getTestSuiteResult().testResults);
+        }
+
+        Map<String, TestResult> oldTestResults =
+                new HashMap<String, TestResult>(this.getTestSuiteResult().testResults);
         Map<String, TestResult> newResults = new HashMap<String, TestResult>();
-        
+
         for (Test t : tests) {
             TestResult tr = oldTestResults.get(t.getUniqueId());
             if (executeTest(t.getName(), tr)) {
@@ -60,11 +61,11 @@ public class TestSuite extends AbstractTest {
                 if (tr != null) {
                     t.setTestResult(tr);
                 }
-                boolean result = t.run();            
+                boolean result = t.run();
                 okay = okay && result;
-                
+
                 tr = t.getTestResult();
-                
+
                 if (!result && haltOnFirstFailure) {
                     break;
                 }
@@ -75,43 +76,45 @@ public class TestSuite extends AbstractTest {
             this.getTestSuiteResult().testResults.put(t.getUniqueId(), tr);
             newResults.put(t.getUniqueId(), tr);
             this.postIndividualTest();
-        }        
+        }
         this.getTestSuiteResult().testResults.clear();
         this.getTestSuiteResult().testResults.putAll(newResults);
         return okay;
     }
-    
+
     protected void postIndividualTest() {
     }
 
     public int getTotalTestCount() {
         return totalTests;
     }
+
     public int getSuccesfulTestCount() {
         return successfulTests;
     }
+
     public int getFailedTestCount() {
         return totalTests - successfulTests;
     }
-    
+
     protected static boolean executeTest(String testName, TestResult tr) {
-        if (Main.options.testFilter != null &&
-            !Pattern.matches(Main.options.testFilter, testName)) {
+        if (Main.options.testFilter != null
+                && !Pattern.matches(Main.options.testFilter, testName)) {
             return false;
         }
-        
-        if (Main.options.testPreviouslyFailedOnly &&
-            tr != null && tr.dateLastSuccess != null &&
-            tr.dateLastSuccess.equals(tr.dateTestRun)) {
-                return false;
+
+        if (Main.options.testPreviouslyFailedOnly && tr != null
+                && tr.dateLastSuccess != null
+                && tr.dateLastSuccess.equals(tr.dateTestRun)) {
+            return false;
         }
         return true;
     }
 
     protected TestSuiteResult getTestSuiteResult() {
-        return (TestSuiteResult)this.getTestResult();
+        return (TestSuiteResult) this.getTestResult();
     }
-    
+
     public List<Test> getTests() {
         return Collections.unmodifiableList(this.tests);
     }
@@ -135,5 +138,5 @@ public class TestSuite extends AbstractTest {
     @Override
     public String getUniqueId() {
         return this.getName();
-    }    
+    }
 }

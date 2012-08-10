@@ -2,12 +2,12 @@ package ppg.atoms;
 
 import ppg.util.*;
 
-public class PrecedenceModifier
-    extends GrammarPart
-    implements Equatable
-{
+public class PrecedenceModifier extends GrammarPart implements Equatable {
     protected String terminalName;
-    public String getTerminalName() { return terminalName; }
+
+    public String getTerminalName() {
+        return terminalName;
+    }
 
     public PrecedenceModifier(String terminalName) {
         this.terminalName = terminalName;

@@ -35,8 +35,7 @@ import java.util.List;
  * dimensions of the array initializer must equal the number of additional "[]"
  * dimensions.
  */
-public interface NewArray extends Expr
-{
+public interface NewArray extends Expr {
     /** The array's base type. */
     TypeNode baseType();
 

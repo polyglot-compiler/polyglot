@@ -32,8 +32,7 @@ import polyglot.types.LocalInstance;
  * A local variable declaration statement: a type, a name and an optional
  * initializer.
  */
-public interface LocalDecl extends ForInit, VarDecl, VarInit
-{
+public interface LocalDecl extends ForInit, VarDecl, VarInit {
     /** Set the declaration's flags. */
     LocalDecl flags(Flags flags);
 
@@ -48,6 +47,7 @@ public interface LocalDecl extends ForInit, VarDecl, VarInit
 
     /** Get the declaration's initializer expression, or null. */
     Expr init();
+
     /** Set the declaration's initializer expression. */
     LocalDecl init(Expr init);
 
@@ -55,7 +55,7 @@ public interface LocalDecl extends ForInit, VarDecl, VarInit
      * Set the type object for the local we are declaring.
      */
     LocalDecl localInstance(LocalInstance li);
-    
+
     @Override
     boolean constantValueSet();
 }

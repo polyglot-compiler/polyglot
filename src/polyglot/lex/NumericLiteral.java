@@ -31,10 +31,16 @@ import polyglot.util.Position;
 public abstract class NumericLiteral extends Literal {
     protected Number val;
 
-  public NumericLiteral(Position position, int sym) { super(position, sym); }
+    public NumericLiteral(Position position, int sym) {
+        super(position, sym);
+    }
 
-  public Number getValue() { return val; }
+    public Number getValue() {
+        return val;
+    }
 
-  @Override
-public String toString() { return "numeric literal " + val.toString(); }
+    @Override
+    public String toString() {
+        return "numeric literal " + val.toString();
+    }
 }

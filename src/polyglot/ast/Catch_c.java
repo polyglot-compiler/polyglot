@@ -42,16 +42,15 @@ import polyglot.visit.TypeChecker;
  * A <code>Catch</code> represents one half of a <code>try-catch</code>
  * statement.  Specifically, the second half.
  */
-public class Catch_c extends Stmt_c implements Catch
-{
+public class Catch_c extends Stmt_c implements Catch {
     protected Formal formal;
     protected Block body;
 
     public Catch_c(Position pos, Formal formal, Block body) {
-	super(pos);
-	assert(formal != null && body != null);
-	this.formal = formal;
-	this.body = body;
+        super(pos);
+        assert (formal != null && body != null);
+        this.formal = formal;
+        this.body = body;
     }
 
     /** Get the catchType of the catch block. */
@@ -63,49 +62,49 @@ public class Catch_c extends Stmt_c implements Catch
     /** Get the formal of the catch block. */
     @Override
     public Formal formal() {
-	return this.formal;
+        return this.formal;
     }
 
     /** Set the formal of the catch block. */
     @Override
     public Catch formal(Formal formal) {
-	Catch_c n = (Catch_c) copy();
-	n.formal = formal;
-	return n;
+        Catch_c n = (Catch_c) copy();
+        n.formal = formal;
+        return n;
     }
 
     /** Get the body of the catch block. */
     @Override
     public Block body() {
-	return this.body;
+        return this.body;
     }
 
     /** Set the body of the catch block. */
     @Override
     public Catch body(Block body) {
-	Catch_c n = (Catch_c) copy();
-	n.body = body;
-	return n;
+        Catch_c n = (Catch_c) copy();
+        n.body = body;
+        return n;
     }
 
     /** Reconstruct the catch block. */
     protected Catch_c reconstruct(Formal formal, Block body) {
-	if (formal != this.formal || body != this.body) {
-	    Catch_c n = (Catch_c) copy();
-	    n.formal = formal;
-	    n.body = body;
-	    return n;
-	}
+        if (formal != this.formal || body != this.body) {
+            Catch_c n = (Catch_c) copy();
+            n.formal = formal;
+            n.body = body;
+            return n;
+        }
 
-	return this;
+        return this;
     }
 
     /** Visit the children of the catch block. */
     @Override
     public Node visitChildren(NodeVisitor v) {
-	Formal formal = (Formal) visitChild(this.formal, v);
-	Block body = (Block) visitChild(this.body, v);
-	return reconstruct(formal, body);
+        Formal formal = (Formal) visitChild(this.formal, v);
+        Block body = (Block) visitChild(this.body, v);
+        return reconstruct(formal, body);
     }
 
     @Override
@@ -118,28 +117,27 @@ public class Catch_c extends Stmt_c implements Catch
     public Node typeCheck(TypeChecker tc) throws SemanticException {
         TypeSystem ts = tc.typeSystem();
 
-	if (! catchType().isThrowable()) {
-	    throw new SemanticException(
-		"Can only throw subclasses of \"" +
-		ts.Throwable() + "\".", formal.position());
+        if (!catchType().isThrowable()) {
+            throw new SemanticException("Can only throw subclasses of \""
+                    + ts.Throwable() + "\".", formal.position());
 
-	}
+        }
 
-	return this;
+        return this;
     }
 
     @Override
     public String toString() {
-	return "catch (" + formal + ") " + body;
+        return "catch (" + formal + ") " + body;
     }
 
     /** Write the catch block to an output file. */
     @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
-	w.write("catch (");
-	printBlock(formal, w, tr);
-	w.write(")");
-	printSubStmt(body, w, tr);
+        w.write("catch (");
+        printBlock(formal, w, tr);
+        w.write(")");
+        printSubStmt(body, w, tr);
     }
 
     @Override
@@ -153,6 +151,7 @@ public class Catch_c extends Stmt_c implements Catch
         v.visitCFG(body, this, EXIT);
         return succs;
     }
+
     @Override
     public Node copy(NodeFactory nf) {
         return nf.Catch(this.position, this.formal, this.body);

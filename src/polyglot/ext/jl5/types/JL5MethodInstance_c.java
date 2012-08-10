@@ -20,13 +20,15 @@ import polyglot.types.Type;
 import polyglot.util.Position;
 
 @SuppressWarnings("serial")
-public class JL5MethodInstance_c extends MethodInstance_c implements JL5MethodInstance {
+public class JL5MethodInstance_c extends MethodInstance_c implements
+        JL5MethodInstance {
     private List<TypeVariable> typeParams;
     private RetainedAnnotations retainedAnnotations;
 
     public JL5MethodInstance_c(JL5TypeSystem ts, Position pos,
-                               ReferenceType container, Flags flags, Type returnType,
-                               String name, List<? extends Type> argTypes, List<? extends Type> excTypes, List<TypeVariable> typeParams) {
+            ReferenceType container, Flags flags, Type returnType, String name,
+            List<? extends Type> argTypes, List<? extends Type> excTypes,
+            List<TypeVariable> typeParams) {
         super(ts, pos, container, flags, returnType, name, argTypes, excTypes);
         this.typeParams = typeParams;
     }
@@ -40,62 +42,66 @@ public class JL5MethodInstance_c extends MethodInstance_c implements JL5MethodIn
     public List<MethodInstance> overridesImpl() {
         List<MethodInstance> l = new LinkedList<MethodInstance>();
         ReferenceType rt = container();
-        JL5TypeSystem ts = (JL5TypeSystem)this.typeSystem();
+        JL5TypeSystem ts = (JL5TypeSystem) this.typeSystem();
         while (rt != null) {
             // add any method with the same name and formalTypes from 
             // rt
             for (MethodInstance mj : rt.methodsNamed(name)) {
-                if (ts.areOverrideEquivalent(this, (JL5MethodInstance)mj)) {
+                if (ts.areOverrideEquivalent(this, (JL5MethodInstance) mj)) {
                     l.add(mj);
                 }
             }
 
             ReferenceType sup = null;
             if (rt.superType() != null && rt.superType().isReference()) {
-                sup = (ReferenceType) rt.superType();    
+                sup = (ReferenceType) rt.superType();
             }
 
             rt = sup;
-        };
+        }
+        ;
 
         return l;
     }
 
     @Override
     public boolean canOverrideImpl(MethodInstance mj_, boolean quiet)
-    throws SemanticException {
+            throws SemanticException {
         JL5MethodInstance mi = this;
         if (!(mj_ instanceof JL5MethodInstance)) {
             return false;
         }
-        JL5MethodInstance mj = (JL5MethodInstance)mj_;
-        
-        JL5TypeSystem ts = (JL5TypeSystem)this.typeSystem();
+        JL5MethodInstance mj = (JL5MethodInstance) mj_;
+
+        JL5TypeSystem ts = (JL5TypeSystem) this.typeSystem();
         if (!(ts.areOverrideEquivalent(mi, mj))) {
             if (quiet) return false;
-            throw new SemanticException(mi.signature() + " in " + mi.container() +
-                                        " cannot override " + 
-                                        mj.signature() + " in " + mj.container() + 
-                                        "; incompatible parameter types",
-                                        mi.position());
+            throw new SemanticException(mi.signature() + " in "
+                    + mi.container() + " cannot override " + mj.signature()
+                    + " in " + mj.container()
+                    + "; incompatible parameter types", mi.position());
         }
-        
+
         if (mi != mj && !mi.equals(mj) && mj.flags().isFinal()) {
             // mi can "override" a final method mj if mi and mj are the same method instance.
             if (Report.should_report(Report.types, 3))
                 Report.report(3, mj.flags() + " final");
             if (quiet) return false;
-            throw new SemanticException(mi.signature() + " in " + mi.container() +
-                                        " cannot override " + 
-                                        mj.signature() + " in " + mj.container() + 
-                                        "; overridden method is final", 
+            throw new SemanticException(mi.signature()
+                                                + " in "
+                                                + mi.container()
+                                                + " cannot override "
+                                                + mj.signature()
+                                                + " in "
+                                                + mj.container()
+                                                + "; overridden method is final",
                                         mi.position());
         }
 
-        
         // replace the type variables of mj with the type variables of mi
         if (!mi.typeParams().isEmpty()) {
-            Map<TypeVariable, ReferenceType> substm = new LinkedHashMap<TypeVariable, ReferenceType>();
+            Map<TypeVariable, ReferenceType> substm =
+                    new LinkedHashMap<TypeVariable, ReferenceType>();
             for (int i = 0; i < mi.typeParams().size(); i++) {
                 substm.put(mj.typeParams().get(i), mi.typeParams().get(i));
             }
@@ -103,64 +109,83 @@ public class JL5MethodInstance_c extends MethodInstance_c implements JL5MethodIn
             mj = subst.substMethod(mj);
         }
 
-
         Type miRet = mi.returnType();
         Type mjRet = mj.returnType();
 
         if (!ts.areReturnTypeSubstitutable(miRet, mjRet)) {
             if (Report.should_report(Report.types, 3))
-                Report.report(3, "return type " + miRet +
-                              " != " + mjRet);
+                Report.report(3, "return type " + miRet + " != " + mjRet);
             if (quiet) return false;
-            throw new SemanticException(mi.signature() + " in " + mi.container() +
-                                        " cannot override " + 
-                                        mj.signature() + " in " + mj.container() + 
-                                        "; attempting to use incompatible " +
-                                        "return type\n" +                                        
-                                        "found: " + miRet + "\n" +
-                                        "required: " + mjRet, 
+            throw new SemanticException(mi.signature()
+                                                + " in "
+                                                + mi.container()
+                                                + " cannot override "
+                                                + mj.signature()
+                                                + " in "
+                                                + mj.container()
+                                                + "; attempting to use incompatible "
+                                                + "return type\n" + "found: "
+                                                + miRet + "\n" + "required: "
+                                                + mjRet,
                                         mi.position());
-        } 
+        }
 
-        if (! ts.throwsSubset(mi, mj)) {
+        if (!ts.throwsSubset(mi, mj)) {
             if (Report.should_report(Report.types, 3))
-                Report.report(3, mi.throwTypes() + " not subset of " +
-                              mj.throwTypes());
+                Report.report(3,
+                              mi.throwTypes() + " not subset of "
+                                      + mj.throwTypes());
             if (quiet) return false;
-            throw new SemanticException(mi.signature() + " in " + mi.container() +
-                                        " cannot override " + 
-                                        mj.signature() + " in " + mj.container() + 
-                                        "; the throw set " + mi.throwTypes() + " is not a subset of the " +
-                                        "overridden method's throw set " + mj.throwTypes() + ".", 
+            throw new SemanticException(mi.signature()
+                                                + " in "
+                                                + mi.container()
+                                                + " cannot override "
+                                                + mj.signature()
+                                                + " in "
+                                                + mj.container()
+                                                + "; the throw set "
+                                                + mi.throwTypes()
+                                                + " is not a subset of the "
+                                                + "overridden method's throw set "
+                                                + mj.throwTypes() + ".",
                                         mi.position());
-        }   
+        }
 
         if (mi.flags().moreRestrictiveThan(mj.flags())) {
             if (Report.should_report(Report.types, 3))
-                Report.report(3, mi.flags() + " more restrictive than " +
-                              mj.flags());
+                Report.report(3,
+                              mi.flags() + " more restrictive than "
+                                      + mj.flags());
             if (quiet) return false;
-            throw new SemanticException(mi.signature() + " in " + mi.container() +
-                                        " cannot override " + 
-                                        mj.signature() + " in " + mj.container() + 
-                                        "; attempting to assign weaker " + 
-                                        "access privileges", 
+            throw new SemanticException(mi.signature()
+                                                + " in "
+                                                + mi.container()
+                                                + " cannot override "
+                                                + mj.signature()
+                                                + " in "
+                                                + mj.container()
+                                                + "; attempting to assign weaker "
+                                                + "access privileges",
                                         mi.position());
         }
 
         if (mi.flags().isStatic() != mj.flags().isStatic()) {
             if (Report.should_report(Report.types, 3))
-                Report.report(3, mi.signature() + " is " + 
-                              (mi.flags().isStatic() ? "" : "not") + 
-                              " static but " + mj.signature() + " is " +
-                              (mj.flags().isStatic() ? "" : "not") + " static");
+                Report.report(3, mi.signature() + " is "
+                        + (mi.flags().isStatic() ? "" : "not") + " static but "
+                        + mj.signature() + " is "
+                        + (mj.flags().isStatic() ? "" : "not") + " static");
             if (quiet) return false;
-            throw new SemanticException(mi.signature() + " in " + mi.container() +
-                                        " cannot override " + 
-                                        mj.signature() + " in " + mj.container() + 
-                                        "; overridden method is " + 
-                                        (mj.flags().isStatic() ? "" : "not") +
-                                        "static", 
+            throw new SemanticException(mi.signature()
+                                                + " in "
+                                                + mi.container()
+                                                + " cannot override "
+                                                + mj.signature()
+                                                + " in "
+                                                + mj.container()
+                                                + "; overridden method is "
+                                                + (mj.flags().isStatic() ? ""
+                                                        : "not") + "static",
                                         mi.position());
         }
 
@@ -177,7 +202,8 @@ public class JL5MethodInstance_c extends MethodInstance_c implements JL5MethodIn
             //            System.err.println("     1");
             return false;
         }
-        if (this.isVariableArity() && argTypes.size() < myFormalTypes.size()-1) {
+        if (this.isVariableArity()
+                && argTypes.size() < myFormalTypes.size() - 1) {
             // the last (variable) argument can consume 0 or more of the actual arguments. 
             //            System.err.println("     2");
             return false;
@@ -194,10 +220,11 @@ public class JL5MethodInstance_c extends MethodInstance_c implements JL5MethodIn
             }
             if (!formalTypes.hasNext() && this.isVariableArity()) {
                 // varible arity method, and this is the last arg.
-                ArrayType arr = (ArrayType) myFormalTypes.get(myFormalTypes.size() - 1);
+                ArrayType arr =
+                        (ArrayType) myFormalTypes.get(myFormalTypes.size() - 1);
                 formal = arr.base();
             }
-             
+
             if (ts.isImplicitCastValid(actual, formal)) {
                 // Yep, this type is OK. Try the next one.
                 continue;
@@ -213,12 +240,14 @@ public class JL5MethodInstance_c extends MethodInstance_c implements JL5MethodIn
                 // arguments.
                 // The last actual can be either the base type of the array,
                 // or the array type.
-                ArrayType arr = (ArrayType) myFormalTypes.get(myFormalTypes.size() - 1);
+                ArrayType arr =
+                        (ArrayType) myFormalTypes.get(myFormalTypes.size() - 1);
                 if (!ts.isImplicitCastValid(actual, arr)) {
                     //                         System.err.println("     3: failed " + actual + " to " +formal + " and " + actual + " to " + arr);
                     return false;
                 }
-            } else {
+            }
+            else {
                 //                     System.err.println("     4: failed " + actual + " to " +formal);
                 return false;
             }
@@ -227,14 +256,13 @@ public class JL5MethodInstance_c extends MethodInstance_c implements JL5MethodIn
         return true;
     }
 
-
     /**
      * See JLS 3rd ed. 15.12.2.5.
      */
     @Override
     public boolean moreSpecificImpl(ProcedureInstance p) {
         JL5MethodInstance p1 = this;
-        JL5MethodInstance p2 = (JL5MethodInstance)p;
+        JL5MethodInstance p2 = (JL5MethodInstance) p;
 
         return ts.callValid(p2, p1.formalTypes());
 
@@ -251,7 +279,7 @@ public class JL5MethodInstance_c extends MethodInstance_c implements JL5MethodIn
     }
 
     @Override
-    public List<TypeVariable> typeParams() {    
+    public List<TypeVariable> typeParams() {
         return Collections.unmodifiableList(this.typeParams);
     }
 
@@ -260,7 +288,6 @@ public class JL5MethodInstance_c extends MethodInstance_c implements JL5MethodIn
         JL5TypeSystem ts = (JL5TypeSystem) this.typeSystem();
         return ts.erasureSubst(this);
     }
-
 
     @Override
     public String toString() {
@@ -281,13 +308,13 @@ public class JL5MethodInstance_c extends MethodInstance_c implements JL5MethodIn
         sb.append(flags.translate());
         sb.append(returnType);
         sb.append(" ");
-        sb.append(container()); 
-        sb.append(" ");      
+        sb.append(container());
+        sb.append(" ");
         sb.append(signature());
 
-        if (! throwTypes.isEmpty()) {
+        if (!throwTypes.isEmpty()) {
             sb.append(" throws ");
-            for (Iterator<Type> i = throwTypes.iterator(); i.hasNext(); ) {
+            for (Iterator<Type> i = throwTypes.iterator(); i.hasNext();) {
                 Object o = i.next();
                 sb.append(o.toString());
 

@@ -38,22 +38,24 @@ import polyglot.util.Position;
  * a ClassType that associates formal parameters with the class.
  * formals can be any type object.
  */
-public interface PClass<Formal extends Param, Actual extends TypeObject> extends Importable {
+public interface PClass<Formal extends Param, Actual extends TypeObject>
+        extends Importable {
     /**
      * The formal type parameters associated with <code>this</code>.
      */
     List<Formal> formals();
-    
+
     /**
      * The class associated with <code>this</code>.  Note that
      * <code>this</code> should never be used as a first-class type.
      */
     ClassType clazz();
-    
+
     /**
      * Instantiate <code>this</code>.
      * @param pos The position of the instantiation
      * @param actuals The actual type parameters for the instantiation
      */
-    ClassType instantiate(Position pos, List<Actual> actuals) throws SemanticException;
+    ClassType instantiate(Position pos, List<Actual> actuals)
+            throws SemanticException;
 }

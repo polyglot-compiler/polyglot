@@ -28,8 +28,7 @@ import coffer.types.CofferClassType;
  * This statement revokes the key associated with a tracked expression.
  * The expression cannot be evaluated after this statement executes.
  */
-public class Free_c extends Stmt_c implements Free
-{
+public class Free_c extends Stmt_c implements Free {
     protected Expr expr;
 
     public Free_c(Position pos, Expr expr) {
@@ -68,8 +67,10 @@ public class Free_c extends Stmt_c implements Free
     public Node typeCheck(TypeChecker tc) throws SemanticException {
         Type t = expr.type();
 
-        if (! (t instanceof CofferClassType)) {
-            throw new SemanticException("Cannot free expression of non-tracked type \"" + t + "\".", position());
+        if (!(t instanceof CofferClassType)) {
+            throw new SemanticException("Cannot free expression of non-tracked type \""
+                                                + t + "\".",
+                                        position());
         }
 
         return this;

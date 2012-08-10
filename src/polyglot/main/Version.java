@@ -39,7 +39,7 @@ public abstract class Version {
      * incompatible and will not be used as source of class information.
      */
     public abstract int major();
-    
+
     /** 
      * Indicates a change in the compiler that does not affect the output
      * format.  Source files will be prefered over class files build by
@@ -58,6 +58,6 @@ public abstract class Version {
 
     @Override
     public String toString() {
-	return "" + major() + "." + minor() + "." + patch_level();
+        return "" + major() + "." + minor() + "." + patch_level();
     }
 }

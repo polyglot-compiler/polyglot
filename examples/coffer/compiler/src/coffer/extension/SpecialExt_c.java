@@ -15,7 +15,8 @@ import coffer.types.KeySet;
 
 public class SpecialExt_c extends CofferExt_c {
     @Override
-    public void checkHeldKeys(KeySet held, KeySet stored) throws SemanticException {
+    public void checkHeldKeys(KeySet held, KeySet stored)
+            throws SemanticException {
         Special e = (Special) node();
 
         if (e.kind() == Special.THIS) {
@@ -23,11 +24,13 @@ public class SpecialExt_c extends CofferExt_c {
                 Key key = ((CofferClassType) e.type()).key();
 
                 if (key != null) {
-                    if (! stored.contains(key)) {
-                        throw new SemanticException(
-                            "Can evaluate expression of type \"" +
-                            e.type() + "\" only if key \"" + key +
-                            "\" is held by \"this\".", e.position());
+                    if (!stored.contains(key)) {
+                        throw new SemanticException("Can evaluate expression of type \""
+                                                            + e.type()
+                                                            + "\" only if key \""
+                                                            + key
+                                                            + "\" is held by \"this\".",
+                                                    e.position());
 
                     }
                 }

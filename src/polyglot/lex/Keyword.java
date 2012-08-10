@@ -31,13 +31,13 @@ import polyglot.util.Position;
 public class Keyword extends Token {
     protected String keyword;
 
-  public Keyword(Position position, String s, int sym) {
-      super(position, sym);
-      keyword = s;
-  }
+    public Keyword(Position position, String s, int sym) {
+        super(position, sym);
+        keyword = s;
+    }
 
-  @Override
-public String toString() {
-      return keyword;
-  }
+    @Override
+    public String toString() {
+        return keyword;
+    }
 }

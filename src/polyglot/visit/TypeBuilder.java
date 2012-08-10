@@ -46,8 +46,7 @@ import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
 
 /** Visitor which traverses the AST constructing type objects. */
-public class TypeBuilder extends NodeVisitor
-{
+public class TypeBuilder extends NodeVisitor {
     protected ImportTable importTable;
     protected Job job;
     protected TypeSystem ts;
@@ -64,7 +63,7 @@ public class TypeBuilder extends NodeVisitor
         this.nf = nf;
         this.outer = null;
     }
-    
+
     public TypeBuilder push() {
         TypeBuilder tb = (TypeBuilder) this.copy();
         tb.outer = this;
@@ -74,11 +73,11 @@ public class TypeBuilder extends NodeVisitor
     public TypeBuilder pop() {
         return outer;
     }
-    
+
     public Job job() {
         return job;
     }
-    
+
     public ErrorQueue errorQueue() {
         return job().compiler().errorQueue();
     }
@@ -99,43 +98,45 @@ public class TypeBuilder extends NodeVisitor
     @Override
     public NodeVisitor enter(Node n) {
         try {
-	    return n.del().buildTypesEnter(this);
-	}
-	catch (SemanticException e) {
-	    Position position = e.position();
+            return n.del().buildTypesEnter(this);
+        }
+        catch (SemanticException e) {
+            Position position = e.position();
 
-	    if (position == null) {
-		position = n.position();
-	    }
+            if (position == null) {
+                position = n.position();
+            }
 
             if (e.getMessage() != null) {
                 errorQueue().enqueue(ErrorInfo.SEMANTIC_ERROR,
-                                    e.getMessage(), position);
+                                     e.getMessage(),
+                                     position);
             }
-                            
+
             return this;
-	}
+        }
     }
 
     @Override
     public Node leave(Node old, Node n, NodeVisitor v) {
-	try {
-	    return n.del().buildTypes((TypeBuilder) v);
-	}
-	catch (SemanticException e) {
-	    Position position = e.position();
+        try {
+            return n.del().buildTypes((TypeBuilder) v);
+        }
+        catch (SemanticException e) {
+            Position position = e.position();
 
-	    if (position == null) {
-		position = n.position();
-	    }
+            if (position == null) {
+                position = n.position();
+            }
 
             if (e.getMessage() != null) {
                 errorQueue().enqueue(ErrorInfo.SEMANTIC_ERROR,
-                                    e.getMessage(), position);
+                                     e.getMessage(),
+                                     position);
             }
 
-	    return n;
-	}
+            return n;
+        }
     }
 
     public TypeBuilder pushContext(Context c) throws SemanticException {
@@ -144,12 +145,12 @@ public class TypeBuilder extends NodeVisitor
             stack.addFirst(c);
             c = c.pop();
         }
-        
+
         TypeBuilder tb = this;
         boolean inCode = false;
         for (Context ctx : stack) {
             if (ctx.inCode()) {
-                if (! inCode) {
+                if (!inCode) {
                     // entering code
                     inCode = true;
                     tb = tb.pushCode();
@@ -160,8 +161,8 @@ public class TypeBuilder extends NodeVisitor
                     // entering class file
                     tb.setImportTable(ctx.importTable());
                 }
-                if (ctx.importTable() != null && ctx.package_() != null &&
-                    tb.currentPackage() == null) {
+                if (ctx.importTable() != null && ctx.package_() != null
+                        && tb.currentPackage() == null) {
                     // entering package context in source
                     tb = tb.pushPackage(ctx.package_());
                 }
@@ -171,13 +172,13 @@ public class TypeBuilder extends NodeVisitor
                 }
             }
         }
-        
+
         return tb;
     }
-        
+
     public TypeBuilder pushPackage(Package p) {
         if (Report.should_report(Report.visit, 4))
-	    Report.report(4, "TB pushing package " + p + ": " + context());
+            Report.report(4, "TB pushing package " + p + ": " + context());
         TypeBuilder tb = push();
         tb.inCode = false;
         tb.package_ = p;
@@ -186,7 +187,7 @@ public class TypeBuilder extends NodeVisitor
 
     public TypeBuilder pushCode() {
         if (Report.should_report(Report.visit, 4))
-	    Report.report(4, "TB pushing code: " + context());
+            Report.report(4, "TB pushing code: " + context());
         TypeBuilder tb = push();
         tb.inCode = true;
         tb.global = false;
@@ -196,64 +197,66 @@ public class TypeBuilder extends NodeVisitor
     /**
      * @throws SemanticException  
      */
-    protected TypeBuilder pushClass(ParsedClassType type) throws SemanticException {
+    protected TypeBuilder pushClass(ParsedClassType type)
+            throws SemanticException {
         if (Report.should_report(Report.visit, 4))
-	    Report.report(4, "TB pushing class " + type + ": " + context());
+            Report.report(4, "TB pushing class " + type + ": " + context());
 
         TypeBuilder tb = push();
         tb.type = type;
         tb.inCode = false;
 
-	// Make sure the import table finds this class.
+        // Make sure the import table finds this class.
         if (importTable() != null && type.isTopLevel()) {
-	    tb.importTable().addClassImport(type.fullName());
-	}
-        
+            tb.importTable().addClassImport(type.fullName());
+        }
+
         return tb;
     }
 
     protected ParsedClassType newClass(Position pos, Flags flags, String name)
-        throws SemanticException
-    {
-	TypeSystem ts = typeSystem();
+            throws SemanticException {
+        TypeSystem ts = typeSystem();
 
         ParsedClassType ct = ts.createClassType(job().source());
-        
+
         ct.position(pos);
         ct.flags(flags);
         ct.name(name);
-	    ct.setJob(job());
+        ct.setJob(job());
 //        ct.superType(ts.unknownType(pos));
 
-	if (inCode) {
+        if (inCode) {
             ct.kind(ClassType.LOCAL);
-	    ct.outer(currentClass());
+            ct.outer(currentClass());
 
-	    if (currentPackage() != null) {
-	      	ct.package_(currentPackage());
-	    }
+            if (currentPackage() != null) {
+                ct.package_(currentPackage());
+            }
 
-	    return ct;
-	}
-	else if (currentClass() != null) {
+            return ct;
+        }
+        else if (currentClass() != null) {
             ct.kind(ClassType.MEMBER);
-	    ct.outer(currentClass());
+            ct.outer(currentClass());
 
-	    currentClass().addMemberClass(ct);
+            currentClass().addMemberClass(ct);
 
-	    if (currentPackage() != null) {
-	      	ct.package_(currentPackage());
-	    }
+            if (currentPackage() != null) {
+                ct.package_(currentPackage());
+            }
 
             // if all the containing classes for this class are member
             // classes or top level classes, then add this class to the
             // parsed resolver.
             ClassType container = ct.outer();
-            boolean allMembers = (container.isMember() || container.isTopLevel());
+            boolean allMembers =
+                    (container.isMember() || container.isTopLevel());
             while (container.isMember()) {
                 container = container.outer();
-                allMembers = allMembers && 
-                        (container.isMember() || container.isTopLevel());
+                allMembers =
+                        allMembers
+                                && (container.isMember() || container.isTopLevel());
             }
 
             if (allMembers) {
@@ -265,38 +268,37 @@ public class TypeBuilder extends NodeVisitor
             }
 
             return ct;
-	}
-	else {
+        }
+        else {
             ct.kind(ClassType.TOP_LEVEL);
 
-	    if (currentPackage() != null) {
-	      	ct.package_(currentPackage());
-	    }
+            if (currentPackage() != null) {
+                ct.package_(currentPackage());
+            }
 
             Named dup = typeSystem().systemResolver().check(ct.fullName());
 
             if (dup != null && dup.fullName().equals(ct.fullName())) {
-                throw new SemanticException("Duplicate class \"" +
-                                            ct.fullName() + "\".", pos);
+                throw new SemanticException("Duplicate class \""
+                        + ct.fullName() + "\".", pos);
             }
 
             typeSystem().systemResolver().addNamed(ct.fullName(), ct);
 
-	    return ct;
-	}
-    
+            return ct;
+        }
+
     }
 
     public TypeBuilder pushAnonClass(Position pos) throws SemanticException {
         if (Report.should_report(Report.visit, 4))
-	    Report.report(4, "TB pushing anon class: " + this);
+            Report.report(4, "TB pushing anon class: " + this);
 
-        if (! inCode) {
-            throw new InternalCompilerError(
-                "Can only push an anonymous class within code.");
+        if (!inCode) {
+            throw new InternalCompilerError("Can only push an anonymous class within code.");
         }
 
-	TypeSystem ts = typeSystem();
+        TypeSystem ts = typeSystem();
 
         ParsedClassType ct = ts.createClassType(this.job().source());
         ct.kind(ClassType.ANONYMOUS);
@@ -307,14 +309,14 @@ public class TypeBuilder extends NodeVisitor
         if (currentPackage() != null) {
             ct.package_(currentPackage());
         }
-        
+
 //        ct.superType(ts.unknownType(pos));
 
         return pushClass(ct);
     }
 
     public TypeBuilder pushClass(Position pos, Flags flags, String name)
-    	throws SemanticException {
+            throws SemanticException {
 
         ParsedClassType t = newClass(pos, flags, name);
         return pushClass(t);
@@ -337,9 +339,8 @@ public class TypeBuilder extends NodeVisitor
     }
 
     public String context() {
-        return "(TB " + type +
-                (inCode ? " inCode" : "") +
-                (global ? " global" : "") +
-                (outer == null ? ")" : " " + outer.context() + ")");
+        return "(TB " + type + (inCode ? " inCode" : "")
+                + (global ? " global" : "")
+                + (outer == null ? ")" : " " + outer.context() + ")");
     }
 }

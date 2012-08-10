@@ -16,8 +16,7 @@ import coffer.types.KeySet;
 public class NewExt_c extends ProcedureCallExt_c {
     @Override
     public void checkHeldKeys(KeySet held, KeySet stored)
-        throws SemanticException
-    {
+            throws SemanticException {
         New n = (New) node();
 
         super.checkHeldKeys(held, stored);
@@ -27,10 +26,12 @@ public class NewExt_c extends ProcedureCallExt_c {
 
             if (key != null) {
                 if (held.contains(key) || stored.contains(key)) {
-                    throw new SemanticException(
-                        "Can evaluate \"new\" expression of type \"" +
-                        n.type() + "\" only if key \"" + key +
-                        "\" is not held.", n.position());
+                    throw new SemanticException("Can evaluate \"new\" expression of type \""
+                                                        + n.type()
+                                                        + "\" only if key \""
+                                                        + key
+                                                        + "\" is not held.",
+                                                n.position());
                 }
             }
         }

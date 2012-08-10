@@ -24,17 +24,17 @@ public class JL5Binary_c extends Binary_c implements JL5Binary {
         Type r = right.type();
 
         JL5TypeSystem ts = (JL5TypeSystem) tc.typeSystem();
-        
+
         if (!ts.isPrimitiveWrapper(l) && !ts.isPrimitiveWrapper(r)) {
             return super.typeCheck(tc);
-        } 
+        }
         // at least one of l or r is a primitive wrapper
         // If both of them are non null, then just use their primitive types
         if (!l.isNull() && !r.isNull()) {
             l = ts.isPrimitiveWrapper(l) ? ts.primitiveTypeOfWrapper(l) : l;
             r = ts.isPrimitiveWrapper(r) ? ts.primitiveTypeOfWrapper(r) : r;
         }
-        
+
         if (op == GT || op == LT || op == GE || op == LE) {
             if (!l.isNumeric()) {
                 throw new SemanticException("The " + op
@@ -53,9 +53,10 @@ public class JL5Binary_c extends Binary_c implements JL5Binary {
 
         if (op == EQ || op == NE) {
             if (!ts.isCastValid(l, r) && !ts.isCastValid(r, l)) {
-                throw new SemanticException("The " + op
-                        + " operator must have operands of similar type.",
-                        position());
+                throw new SemanticException("The "
+                                                    + op
+                                                    + " operator must have operands of similar type.",
+                                            position());
             }
 
             return type(ts.Boolean());
@@ -81,8 +82,9 @@ public class JL5Binary_c extends Binary_c implements JL5Binary {
             if (ts.isSubtype(l, ts.String()) || ts.isSubtype(r, ts.String())) {
                 if (!ts.canCoerceToString(r, tc.context())) {
                     throw new SemanticException("Cannot coerce an expression "
-                            + "of type " + r + " to a String.",
-                            right.position());
+                                                        + "of type " + r
+                                                        + " to a String.",
+                                                right.position());
                 }
                 if (!ts.canCoerceToString(l, tc.context())) {
                     throw new SemanticException("Cannot coerce an expression "
@@ -101,37 +103,37 @@ public class JL5Binary_c extends Binary_c implements JL5Binary {
 
         if (op == ADD) {
             if (!l.isNumeric()) {
-                throw new SemanticException(
-                        "The "
-                                + op
-                                + " operator must have numeric or String operands, not type "
-                                + l + ".", left.position());
+                throw new SemanticException("The "
+                                                    + op
+                                                    + " operator must have numeric or String operands, not type "
+                                                    + l + ".",
+                                            left.position());
             }
 
             if (!r.isNumeric()) {
-                throw new SemanticException(
-                        "The "
-                                + op
-                                + " operator must have numeric or String operands, not type "
-                                + r + ".", right.position());
+                throw new SemanticException("The "
+                                                    + op
+                                                    + " operator must have numeric or String operands, not type "
+                                                    + r + ".",
+                                            right.position());
             }
         }
 
         if (op == BIT_AND || op == BIT_OR || op == BIT_XOR) {
             if (!ts.isImplicitCastValid(l, ts.Long())) {
-                throw new SemanticException(
-                        "The "
-                                + op
-                                + " operator must have numeric or boolean operands, not type "
-                                + l + ".", left.position());
+                throw new SemanticException("The "
+                                                    + op
+                                                    + " operator must have numeric or boolean operands, not type "
+                                                    + l + ".",
+                                            left.position());
             }
 
             if (!ts.isImplicitCastValid(r, ts.Long())) {
-                throw new SemanticException(
-                        "The "
-                                + op
-                                + " operator must have numeric or boolean operands, not type "
-                                + r + ".", right.position());
+                throw new SemanticException("The "
+                                                    + op
+                                                    + " operator must have numeric or boolean operands, not type "
+                                                    + r + ".",
+                                            right.position());
             }
         }
 
@@ -177,17 +179,19 @@ public class JL5Binary_c extends Binary_c implements JL5Binary {
 
         if (child == left) {
             other = right;
-        } else if (child == right) {
+        }
+        else if (child == right) {
             other = left;
-        } else {
+        }
+        else {
             return child.type();
         }
-        
 
         JL5TypeSystem ts = (JL5TypeSystem) av.typeSystem();
-        
-        if (!ts.isPrimitiveWrapper(child.type()) && !ts.isPrimitiveWrapper(other.type())) {
-            return super.childExpectedType(child,av);
+
+        if (!ts.isPrimitiveWrapper(child.type())
+                && !ts.isPrimitiveWrapper(other.type())) {
+            return super.childExpectedType(child, av);
         }
 
         try {
@@ -204,12 +208,14 @@ public class JL5Binary_c extends Binary_c implements JL5Binary {
                 // Added case for unboxing
                 if (child.type().isBoolean()) {
                     Type otherType = ts.primitiveTypeOfWrapper(other.type());
-                    if ((otherType != null) && otherType.isBoolean()) return ts.Boolean();
+                    if ((otherType != null) && otherType.isBoolean())
+                        return ts.Boolean();
                 }
                 // Added case for unboxing
                 if (other.type().isBoolean()) {
                     Type childType = ts.primitiveTypeOfWrapper(child.type());
-                    if ((childType != null) && childType.isBoolean()) return ts.Boolean();
+                    if ((childType != null) && childType.isBoolean())
+                        return ts.Boolean();
                 }
 
                 if (child.type().isNumeric() && other.type().isNumeric()) {
@@ -218,14 +224,16 @@ public class JL5Binary_c extends Binary_c implements JL5Binary {
                 // Added case for unboxing
                 if (child.type().isNumeric()) {
                     Type otherType = ts.primitiveTypeOfWrapper(other.type());
-                    if ((otherType != null) && otherType.isNumeric()) return ts.promote(child.type(), otherType);
+                    if ((otherType != null) && otherType.isNumeric())
+                        return ts.promote(child.type(), otherType);
                 }
                 // Added case for unboxing
                 if (other.type().isNumeric()) {
                     Type childType = ts.primitiveTypeOfWrapper(child.type());
-                    if ((childType != null) && childType.isNumeric()) return ts.promote(childType, other.type());
+                    if ((childType != null) && childType.isNumeric())
+                        return ts.promote(childType, other.type());
                 }
-                
+
                 if (child.type().isImplicitCastValid(other.type())) {
                     return other.type();
                 }
@@ -245,21 +253,24 @@ public class JL5Binary_c extends Binary_c implements JL5Binary {
                 // Added case for unboxing
                 if (child.type().isNumeric()) {
                     Type otherType = ts.primitiveTypeOfWrapper(other.type());
-                    if ((otherType != null) && otherType.isNumeric()) return ts.promote(child.type(), otherType);
+                    if ((otherType != null) && otherType.isNumeric())
+                        return ts.promote(child.type(), otherType);
                 }
                 // Added case for unboxing
                 if (other.type().isNumeric()) {
                     Type childType = ts.primitiveTypeOfWrapper(child.type());
-                    if ((childType != null) && childType.isNumeric()) return ts.promote(childType, other.type());
+                    if ((childType != null) && childType.isNumeric())
+                        return ts.promote(childType, other.type());
                 }
-                
+
                 // Added case for unboxing, when both operands are wrappers
                 Type otherType = ts.primitiveTypeOfWrapper(other.type());
                 Type childType = ts.primitiveTypeOfWrapper(child.type());
-                if (otherType != null && childType != null && otherType.isNumeric() && childType.isNumeric()) {
+                if (otherType != null && childType != null
+                        && otherType.isNumeric() && childType.isNumeric()) {
                     return ts.promote(childType, otherType);
                 }
-                
+
                 return child.type();
             }
 
@@ -274,12 +285,14 @@ public class JL5Binary_c extends Binary_c implements JL5Binary {
                 // Added case for unboxing
                 if (child.type().isBoolean()) {
                     Type otherType = ts.primitiveTypeOfWrapper(other.type());
-                    if ((otherType != null) && otherType.isBoolean()) return ts.Boolean();
+                    if ((otherType != null) && otherType.isBoolean())
+                        return ts.Boolean();
                 }
                 // Added case for unboxing
                 if (other.type().isBoolean()) {
                     Type childType = ts.primitiveTypeOfWrapper(child.type());
-                    if ((childType != null) && childType.isBoolean()) return ts.Boolean();
+                    if ((childType != null) && childType.isBoolean())
+                        return ts.Boolean();
                 }
 
                 if (child.type().isNumeric() && other.type().isNumeric()) {
@@ -288,26 +301,29 @@ public class JL5Binary_c extends Binary_c implements JL5Binary {
                 // Added case for unboxing
                 if (child.type().isNumeric()) {
                     Type otherType = ts.primitiveTypeOfWrapper(other.type());
-                    if ((otherType != null) && otherType.isNumeric()) return ts.promote(child.type(), otherType);
+                    if ((otherType != null) && otherType.isNumeric())
+                        return ts.promote(child.type(), otherType);
                 }
                 // Added case for unboxing
                 if (other.type().isNumeric()) {
                     Type childType = ts.primitiveTypeOfWrapper(child.type());
-                    if ((childType != null) && childType.isNumeric()) return ts.promote(childType, other.type());
+                    if ((childType != null) && childType.isNumeric())
+                        return ts.promote(childType, other.type());
                 }
-                
+
                 // Added case for unboxing, when both operands are wrappers
                 Type otherType = ts.primitiveTypeOfWrapper(other.type());
                 Type childType = ts.primitiveTypeOfWrapper(child.type());
-                
-                if (otherType != null && childType != null && otherType.isBoolean() && childType.isBoolean()) {
+
+                if (otherType != null && childType != null
+                        && otherType.isBoolean() && childType.isBoolean()) {
                     return childType;
                 }
-                
-                if (otherType != null && childType != null && otherType.isNumeric() && childType.isNumeric()) {
+
+                if (otherType != null && childType != null
+                        && otherType.isNumeric() && childType.isNumeric()) {
                     return ts.promote(childType, otherType);
                 }
-                
 
                 return child.type();
             }
@@ -318,11 +334,12 @@ public class JL5Binary_c extends Binary_c implements JL5Binary {
 
                     if (ts.isImplicitCastValid(t, av.toType())) {
                         return t;
-                    } else {
+                    }
+                    else {
                         return av.toType();
                     }
                 }
-                
+
                 // Added case for unboxing
                 if (child.type().isNumeric()) {
                     Type otherType = ts.primitiveTypeOfWrapper(other.type());
@@ -330,7 +347,8 @@ public class JL5Binary_c extends Binary_c implements JL5Binary {
                         Type t = ts.promote(child.type(), otherType);
                         if (ts.isImplicitCastValid(t, av.toType())) {
                             return t;
-                        } else {
+                        }
+                        else {
                             return av.toType();
                         }
                     }
@@ -342,7 +360,8 @@ public class JL5Binary_c extends Binary_c implements JL5Binary {
                         Type t = ts.promote(childType, other.type());
                         if (ts.isImplicitCastValid(t, av.toType())) {
                             return t;
-                        } else {
+                        }
+                        else {
                             return av.toType();
                         }
                     }
@@ -350,16 +369,16 @@ public class JL5Binary_c extends Binary_c implements JL5Binary {
                 // Added case for unboxing, when both operands are wrappers
                 Type otherType = ts.primitiveTypeOfWrapper(other.type());
                 Type childType = ts.primitiveTypeOfWrapper(child.type());
-                if (otherType != null && childType != null && otherType.isNumeric() && childType.isNumeric()) {
+                if (otherType != null && childType != null
+                        && otherType.isNumeric() && childType.isNumeric()) {
                     Type t = ts.promote(childType, otherType);
                     if (ts.isImplicitCastValid(t, av.toType())) {
                         return t;
-                    } else {
+                    }
+                    else {
                         return av.toType();
                     }
                 }
-                
-                
 
                 return child.type();
             }
@@ -371,14 +390,16 @@ public class JL5Binary_c extends Binary_c implements JL5Binary {
 
                         if (ts.isImplicitCastValid(t, av.toType())) {
                             return t;
-                        } else {
+                        }
+                        else {
                             return av.toType();
                         }
-                    } else {
+                    }
+                    else {
                         return ts.promote(child.type());
                     }
                 }
-                
+
                 // Added case for unboxing
                 if (child.type().isNumeric()) {
                     Type otherType = ts.primitiveTypeOfWrapper(other.type());
@@ -387,10 +408,12 @@ public class JL5Binary_c extends Binary_c implements JL5Binary {
                             Type t = ts.promote(child.type(), otherType);
                             if (ts.isImplicitCastValid(t, av.toType())) {
                                 return t;
-                            } else {
+                            }
+                            else {
                                 return av.toType();
                             }
-                        } else {
+                        }
+                        else {
                             return ts.promote(child.type());
                         }
                     }
@@ -403,28 +426,32 @@ public class JL5Binary_c extends Binary_c implements JL5Binary {
                             Type t = ts.promote(childType, other.type());
                             if (ts.isImplicitCastValid(t, av.toType())) {
                                 return t;
-                            } else {
+                            }
+                            else {
                                 return av.toType();
                             }
-                        } else {
+                        }
+                        else {
                             return ts.promote(childType);
                         }
                     }
                 }
 
-                
                 // Added case for unboxing, when both operands are wrappers
                 Type otherType = ts.primitiveTypeOfWrapper(other.type());
                 Type childType = ts.primitiveTypeOfWrapper(child.type());
-                if (otherType != null && childType != null && otherType.isNumeric() && childType.isNumeric()) {
+                if (otherType != null && childType != null
+                        && otherType.isNumeric() && childType.isNumeric()) {
                     if (child == left) {
                         Type t = ts.promote(childType, otherType);
                         if (ts.isImplicitCastValid(t, av.toType())) {
                             return t;
-                        } else {
+                        }
+                        else {
                             return av.toType();
                         }
-                    } else {
+                    }
+                    else {
                         return ts.promote(childType);
                     }
                 }
@@ -433,7 +460,9 @@ public class JL5Binary_c extends Binary_c implements JL5Binary {
             }
 
             return child.type();
-        } catch (SemanticException e) {}
+        }
+        catch (SemanticException e) {
+        }
 
         return child.type();
     }

@@ -42,70 +42,69 @@ import polyglot.visit.TypeChecker;
  * An <code>Instanceof</code> is an immutable representation of
  * the use of the <code>instanceof</code> operator.
  */
-public class Instanceof_c extends Expr_c implements Instanceof
-{
+public class Instanceof_c extends Expr_c implements Instanceof {
     protected Expr expr;
     protected TypeNode compareType;
 
     public Instanceof_c(Position pos, Expr expr, TypeNode compareType) {
-	super(pos);
-	assert(expr != null && compareType != null);
-	this.expr = expr;
-	this.compareType = compareType;
+        super(pos);
+        assert (expr != null && compareType != null);
+        this.expr = expr;
+        this.compareType = compareType;
     }
 
     /** Get the precedence of the expression. */
     @Override
     public Precedence precedence() {
-	return Precedence.INSTANCEOF;
+        return Precedence.INSTANCEOF;
     }
 
     /** Get the expression to be tested. */
     @Override
     public Expr expr() {
-	return this.expr;
+        return this.expr;
     }
 
     /** Set the expression to be tested. */
     @Override
     public Instanceof expr(Expr expr) {
-	Instanceof_c n = (Instanceof_c) copy();
-	n.expr = expr;
-	return n;
+        Instanceof_c n = (Instanceof_c) copy();
+        n.expr = expr;
+        return n;
     }
 
     /** Get the type to be compared against. */
     @Override
     public TypeNode compareType() {
-	return this.compareType;
+        return this.compareType;
     }
 
     /** Set the type to be compared against. */
     @Override
     public Instanceof compareType(TypeNode compareType) {
-	Instanceof_c n = (Instanceof_c) copy();
-	n.compareType = compareType;
-	return n;
+        Instanceof_c n = (Instanceof_c) copy();
+        n.compareType = compareType;
+        return n;
     }
 
     /** Reconstruct the expression. */
     protected Instanceof_c reconstruct(Expr expr, TypeNode compareType) {
-	if (expr != this.expr || compareType != this.compareType) {
-	    Instanceof_c n = (Instanceof_c) copy();
-	    n.expr = expr;
-	    n.compareType = compareType;
-	    return n;
-	}
+        if (expr != this.expr || compareType != this.compareType) {
+            Instanceof_c n = (Instanceof_c) copy();
+            n.expr = expr;
+            n.compareType = compareType;
+            return n;
+        }
 
-	return this;
+        return this;
     }
 
     /** Visit the children of the expression. */
     @Override
     public Node visitChildren(NodeVisitor v) {
-	Expr expr = (Expr) visitChild(this.expr, v)  ;
-	TypeNode compareType = (TypeNode) visitChild(this.compareType, v);
-	return reconstruct(expr, compareType);
+        Expr expr = (Expr) visitChild(this.expr, v);
+        TypeNode compareType = (TypeNode) visitChild(this.compareType, v);
+        return reconstruct(expr, compareType);
     }
 
     /** Type check the expression. */
@@ -113,19 +112,18 @@ public class Instanceof_c extends Expr_c implements Instanceof
     public Node typeCheck(TypeChecker tc) throws SemanticException {
         TypeSystem ts = tc.typeSystem();
 
-        if (! compareType.type().isReference()) {
-	    throw new SemanticException(
-		"Type operand " + compareType.type() + " must be a reference type.",
-		compareType.position());
-	}
+        if (!compareType.type().isReference()) {
+            throw new SemanticException("Type operand " + compareType.type()
+                    + " must be a reference type.", compareType.position());
+        }
 
-	if (! ts.isCastValid(expr.type(), compareType.type())) {
-	    throw new SemanticException(
-		"Expression operand type " + expr.type() + " incompatible with type operand " + compareType.type() + ".",
-		expr.position());
-	}
+        if (!ts.isCastValid(expr.type(), compareType.type())) {
+            throw new SemanticException("Expression operand type "
+                    + expr.type() + " incompatible with type operand "
+                    + compareType.type() + ".", expr.position());
+        }
 
-	return type(ts.Boolean());
+        return type(ts.Boolean());
     }
 
     @Override
@@ -141,15 +139,15 @@ public class Instanceof_c extends Expr_c implements Instanceof
 
     @Override
     public String toString() {
-	return expr + " instanceof " + compareType;
+        return expr + " instanceof " + compareType;
     }
 
     /** Write the expression to an output file. */
     @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
-	printSubExpr(expr, w, tr);
-	w.write(" instanceof ");
-	print(compareType, w, tr);
+        printSubExpr(expr, w, tr);
+        w.write(" instanceof ");
+        print(compareType, w, tr);
     }
 
     @Override
@@ -163,7 +161,7 @@ public class Instanceof_c extends Expr_c implements Instanceof
         v.visitCFG(compareType, this, EXIT);
         return succs;
     }
-    
+
     @Override
     public Node copy(NodeFactory nf) {
         return nf.Instanceof(this.position, this.expr, this.compareType);

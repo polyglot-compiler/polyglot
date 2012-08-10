@@ -46,8 +46,7 @@ import polyglot.visit.ContextVisitor;
  * Utility class which is used to disambiguate ambiguous
  * AST nodes (Expr, Type, Receiver, Qualifier, Prefix).
  */
-public class Disamb_c implements Disamb
-{
+public class Disamb_c implements Disamb {
     protected ContextVisitor v;
     protected Position pos;
     protected Prefix prefix;
@@ -68,7 +67,7 @@ public class Disamb_c implements Disamb
             Prefix prefix, String name) throws SemanticException {
         return disambiguate(amb, v, pos, prefix, v.nodeFactory().Id(pos, name));
     }
-    
+
     /**
      * Disambiguate the prefix and name into a unambiguous node.
      * @return An unambiguous AST node, or null if disambiguation
@@ -89,12 +88,11 @@ public class Disamb_c implements Disamb
         c = v.context();
 
         if (prefix instanceof Ambiguous) {
-            throw new SemanticException(
-                "Cannot disambiguate node with ambiguous prefix.");
+            throw new SemanticException("Cannot disambiguate node with ambiguous prefix.");
         }
 
         Node result = null;
-        
+
         if (prefix instanceof PackageNode) {
             PackageNode pn = (PackageNode) prefix;
             result = disambiguatePackagePrefix(pn);
@@ -117,11 +115,12 @@ public class Disamb_c implements Disamb
     /**
      * @throws SemanticException  
      */
-    protected Node disambiguatePackagePrefix(PackageNode pn) throws SemanticException {
+    protected Node disambiguatePackagePrefix(PackageNode pn)
+            throws SemanticException {
         Resolver pc = ts.packageContextResolver(pn.package_());
 
         Named n;
-        
+
         try {
             n = pc.find(name.id());
         }
@@ -133,10 +132,11 @@ public class Disamb_c implements Disamb
 
         if (n instanceof Qualifier) {
             q = (Qualifier) n;
-        } else {
+        }
+        else {
             return null;
         }
-        
+
         if (q.isPackage() && packageOK()) {
             return nf.PackageNode(pos, q.toPackage());
         }
@@ -147,23 +147,27 @@ public class Disamb_c implements Disamb
         return null;
     }
 
-
-    protected Node disambiguateTypeNodePrefix(TypeNode tn) 
-        throws SemanticException 
-    {
+    protected Node disambiguateTypeNodePrefix(TypeNode tn)
+            throws SemanticException {
         // Try static fields.
         Type t = tn.type();
 
         if (t.isReference() && exprOK()) {
             try {
-                FieldInstance fi = ts.findField(t.toReference(), name.id(), c.currentClass());
-                return nf.Field(pos, tn, name).fieldInstance(fi).type(ts.unknownType(pos));
-            } catch (NoMemberException e) {
+                FieldInstance fi =
+                        ts.findField(t.toReference(),
+                                     name.id(),
+                                     c.currentClass());
+                return nf.Field(pos, tn, name)
+                         .fieldInstance(fi)
+                         .type(ts.unknownType(pos));
+            }
+            catch (NoMemberException e) {
                 if (e.getKind() != NoMemberException.FIELD) {
                     // something went wrong...
                     throw e;
                 }
-                
+
                 // ignore so we can check if we're a member class.
             }
         }
@@ -193,7 +197,7 @@ public class Disamb_c implements Disamb
     protected Node disambiguateExprPrefix(Expr e) throws SemanticException {
         // Must be a non-static field.
         if (exprOK()) {
-                return nf.Field(pos, e, name).type(ts.unknownType(pos));
+            return nf.Field(pos, e, name).type(ts.unknownType(pos));
         }
         return null;
     }
@@ -202,25 +206,28 @@ public class Disamb_c implements Disamb
         if (exprOK()) {
             // First try local variables and fields.
             VarInstance vi = c.findVariableSilent(name.id());
-            
+
             if (vi != null) {
                 Node n = disambiguateVarInstance(vi);
                 if (n != null) return n;
             }
         }
-        
+
         // no variable found. try types.
         if (typeOK()) {
             try {
                 Named n = c.find(name.id());
                 if (n instanceof Type) {
                     Type type = (Type) n;
-                    if (! type.isCanonical()) {
-                        throw new InternalCompilerError("Found an ambiguous type in the context: " + type, pos);
+                    if (!type.isCanonical()) {
+                        throw new InternalCompilerError("Found an ambiguous type in the context: "
+                                                                + type,
+                                                        pos);
                     }
                     return nf.CanonicalTypeNode(pos, type);
                 }
-            } catch (NoClassException e) {
+            }
+            catch (NoClassException e) {
                 if (!name.id().equals(e.getClassName())) {
                     // hmm, something else must have gone wrong
                     // rethrow the exception
@@ -240,24 +247,33 @@ public class Disamb_c implements Disamb
         return null;
     }
 
-    protected Node disambiguateVarInstance(VarInstance vi) throws SemanticException {
+    protected Node disambiguateVarInstance(VarInstance vi)
+            throws SemanticException {
         if (vi instanceof FieldInstance) {
             FieldInstance fi = (FieldInstance) vi;
             Receiver r = makeMissingFieldTarget(fi);
-            return nf.Field(pos, r, name).fieldInstance(fi).targetImplicit(true).type(ts.unknownType(pos));
-        } else if (vi instanceof LocalInstance) {
+            return nf.Field(pos, r, name)
+                     .fieldInstance(fi)
+                     .targetImplicit(true)
+                     .type(ts.unknownType(pos));
+        }
+        else if (vi instanceof LocalInstance) {
             LocalInstance li = (LocalInstance) vi;
-            return nf.Local(pos, name).localInstance(li).type(ts.unknownType(pos));
+            return nf.Local(pos, name)
+                     .localInstance(li)
+                     .type(ts.unknownType(pos));
         }
         return null;
     }
 
-    protected Receiver makeMissingFieldTarget(FieldInstance fi) throws SemanticException {
+    protected Receiver makeMissingFieldTarget(FieldInstance fi)
+            throws SemanticException {
         Receiver r;
 
         if (fi.flags().isStatic()) {
             r = nf.CanonicalTypeNode(pos, fi.container());
-        } else {
+        }
+        else {
             // The field is non-static, so we must prepend with
             // "this", but we need to determine if the "this"
             // should be qualified.  Get the enclosing class which
@@ -266,9 +282,10 @@ public class Disamb_c implements Disamb
             // type of the class we want.
             ClassType scope = c.findFieldScope(name.id());
 
-            if (! ts.equals(scope, c.currentClass())) {
+            if (!ts.equals(scope, c.currentClass())) {
                 r = nf.This(pos.startOf(), nf.CanonicalTypeNode(pos, scope));
-            } else {
+            }
+            else {
                 r = nf.This(pos.startOf());
             }
         }
@@ -277,24 +294,23 @@ public class Disamb_c implements Disamb
     }
 
     protected boolean typeOK() {
-        return ! (amb instanceof Expr) &&
-              (amb instanceof TypeNode || amb instanceof QualifierNode ||
-               amb instanceof Receiver || amb instanceof Prefix);
+        return !(amb instanceof Expr)
+                && (amb instanceof TypeNode || amb instanceof QualifierNode
+                        || amb instanceof Receiver || amb instanceof Prefix);
 
     }
 
     protected boolean packageOK() {
-        return ! (amb instanceof Receiver) &&
-              (amb instanceof QualifierNode || amb instanceof Prefix);
+        return !(amb instanceof Receiver)
+                && (amb instanceof QualifierNode || amb instanceof Prefix);
     }
 
     protected boolean exprOK() {
-        return ! (amb instanceof QualifierNode) &&
-               ! (amb instanceof TypeNode) &&
-              (amb instanceof Expr || amb instanceof Receiver ||
-               amb instanceof Prefix);
+        return !(amb instanceof QualifierNode)
+                && !(amb instanceof TypeNode)
+                && (amb instanceof Expr || amb instanceof Receiver || amb instanceof Prefix);
     }
-    
+
     @Override
     public String toString() {
         return "Disamb(" + amb.getClass().getName() + ": " + amb + ")";

@@ -4,6 +4,7 @@ import polyglot.ast.Field;
 import polyglot.ext.jl5.types.EnumInstance;
 
 public interface EnumConstant extends Field {
-	EnumInstance enumInstance();		
-	EnumConstant enumInstance(EnumInstance enumInstance);
+    EnumInstance enumInstance();
+
+    EnumConstant enumInstance(EnumInstance enumInstance);
 }

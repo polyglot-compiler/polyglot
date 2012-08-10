@@ -16,9 +16,11 @@ import polyglot.ast.MethodDecl;
  */
 public interface CofferMethodDecl extends MethodDecl {
     KeySetNode entryKeys();
+
     CofferMethodDecl entryKeys(KeySetNode entryKeys);
-    
+
     KeySetNode returnKeys();
+
     CofferMethodDecl returnKeys(KeySetNode returnKeys);
 
     List<ThrowConstraintNode> throwConstraints();

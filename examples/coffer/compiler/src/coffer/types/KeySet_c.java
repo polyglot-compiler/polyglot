@@ -15,8 +15,7 @@ import polyglot.types.TypeObject_c;
 import polyglot.types.TypeSystem;
 import polyglot.util.Position;
 
-public class KeySet_c extends TypeObject_c implements KeySet
-{
+public class KeySet_c extends TypeObject_c implements KeySet {
     HashSet<Key> set;
 
     public KeySet_c(TypeSystem ts, Position pos) {
@@ -50,7 +49,7 @@ public class KeySet_c extends TypeObject_c implements KeySet
 
     @Override
     public KeySet remove(Key key) {
-        if (! set.contains(key)) return this;
+        if (!set.contains(key)) return this;
         KeySet_c s = (KeySet_c) copy();
         s.set = new HashSet<Key>(set);
         s.set.remove(key);
@@ -107,8 +106,7 @@ public class KeySet_c extends TypeObject_c implements KeySet
     @Override
     public boolean isCanonical() {
         for (Key k : set) {
-            if (! k.isCanonical())
-                return false;
+            if (!k.isCanonical()) return false;
         }
         return true;
     }

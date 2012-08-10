@@ -5,12 +5,13 @@ import polyglot.types.Type;
 import polyglot.types.TypeSystem;
 
 @SuppressWarnings("serial")
-public class JL5PrimitiveType_c extends PrimitiveType_c implements JL5PrimitiveType {
-   
-    public JL5PrimitiveType_c(TypeSystem ts, Kind kind){
+public class JL5PrimitiveType_c extends PrimitiveType_c implements
+        JL5PrimitiveType {
+
+    public JL5PrimitiveType_c(TypeSystem ts, Kind kind) {
         super(ts, kind);
     }
-    
+
     @Override
     public boolean isImplicitCastValidImpl(Type toType) {
         if (super.isImplicitCastValidImpl(toType)) {
@@ -27,7 +28,7 @@ public class JL5PrimitiveType_c extends PrimitiveType_c implements JL5PrimitiveT
     }
 
     @Override
-    public boolean isCastValidImpl(Type toType){
+    public boolean isCastValidImpl(Type toType) {
         if (super.isCastValidImpl(toType)) {
             return true;
         }

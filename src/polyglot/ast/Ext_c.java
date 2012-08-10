@@ -70,7 +70,7 @@ public abstract class Ext_c implements Ext {
      */
     @Override
     public Node node() {
-	return node;
+        return node;
     }
 
     /**
@@ -123,6 +123,6 @@ public abstract class Ext_c implements Ext {
      */
     @Override
     public void dump(CodeWriter w) {
-      w.write(toString());
+        w.write(toString());
     }
 }

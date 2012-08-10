@@ -35,7 +35,7 @@ import polyglot.util.Position;
  */
 public class SourceLoadException extends NoClassException {
     protected Job job;
-    
+
     /**
      * @param className
      */
@@ -61,7 +61,7 @@ public class SourceLoadException extends NoClassException {
         super(className, position);
         this.job = job;
     }
-    
+
     public Job job() {
         return job;
     }

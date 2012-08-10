@@ -27,29 +27,30 @@ public class JL5FieldDecl_c extends FieldDecl_c implements FieldDecl,
 
     protected List<AnnotationElem> annotations;
 
-    public JL5FieldDecl_c(Position pos, Flags flags, List<AnnotationElem> annotations, 
-    		TypeNode type, Id name, Expr init) {
+    public JL5FieldDecl_c(Position pos, Flags flags,
+            List<AnnotationElem> annotations, TypeNode type, Id name, Expr init) {
         super(pos, flags, type, name, init);
         if (annotations == null) {
-        	annotations = Collections.emptyList();
+            annotations = Collections.emptyList();
         }
         this.annotations = annotations;
     }
 
     @Override
-    public List<AnnotationElem> annotationElems(){
+    public List<AnnotationElem> annotationElems() {
         return this.annotations;
     }
-    
-    public FieldDecl annotations(List<AnnotationElem> annotations){
+
+    public FieldDecl annotations(List<AnnotationElem> annotations) {
         JL5FieldDecl_c n = (JL5FieldDecl_c) copy();
         n.annotations = ListUtil.copy(annotations, true);
         return n;
     }
-    
-    protected FieldDecl_c reconstruct(TypeNode type, Expr init, List<AnnotationElem> annotations){
-        if( this.type() != type || this.init() != init 
-        		|| !CollectionUtil.equals(this.annotations, annotations)){
+
+    protected FieldDecl_c reconstruct(TypeNode type, Expr init,
+            List<AnnotationElem> annotations) {
+        if (this.type() != type || this.init() != init
+                || !CollectionUtil.equals(this.annotations, annotations)) {
             JL5FieldDecl_c n = (JL5FieldDecl_c) copy();
             n.type = type;
             n.init = init;
@@ -58,7 +59,7 @@ public class JL5FieldDecl_c extends FieldDecl_c implements FieldDecl,
         }
         return this;
     }
-    
+
     @Override
     public Node visitChildren(NodeVisitor v) {
         TypeNode type = (TypeNode) visitChild(this.type(), v);
@@ -66,24 +67,25 @@ public class JL5FieldDecl_c extends FieldDecl_c implements FieldDecl,
         List<AnnotationElem> annotations = visitList(this.annotations, v);
         return reconstruct(type, init, annotations);
     }
-    
+
     @Override
-    public Node annotationCheck(AnnotationChecker annoCheck) throws SemanticException {
-        JL5TypeSystem ts = (JL5TypeSystem)annoCheck.typeSystem();
+    public Node annotationCheck(AnnotationChecker annoCheck)
+            throws SemanticException {
+        JL5TypeSystem ts = (JL5TypeSystem) annoCheck.typeSystem();
         for (AnnotationElem elem : annotations) {
             ts.checkAnnotationApplicability(elem, this.fieldInstance());
         }
         return this;
-   }
-    
+    }
+
     @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
         JL5FieldDecl_c n = (JL5FieldDecl_c) super.typeCheck(tc);
         // set the retained annotations
         JL5FieldInstance fi = (JL5FieldInstance) n.fieldInstance();
         JL5TypeSystem ts = (JL5TypeSystem) fi.typeSystem();
-        fi.setRetainedAnnotations(ts.createRetainedAnnotations(this
-.annotationElems(), this.position()));
+        fi.setRetainedAnnotations(ts.createRetainedAnnotations(this.annotationElems(),
+                                                               this.position()));
         return n;
     }
 
@@ -93,7 +95,7 @@ public class JL5FieldDecl_c extends FieldDecl_c implements FieldDecl,
             ae.prettyPrint(w, tr);
             w.newline();
         }
-        
-        super.prettyPrint(w, tr);   
+
+        super.prettyPrint(w, tr);
     }
 }

@@ -12,7 +12,8 @@ public class EnumConstantToExt_c extends ToExt_c implements ToExt {
     @Override
     public Node toExt(ExtensionRewriter rw) throws SemanticException {
         EnumConstant ec = (EnumConstant) node();
-		return ((JL5NodeFactory) rw.to_nf()).EnumConstant(ec.position(),
-				ec.target(), ec.id());
+        return ((JL5NodeFactory) rw.to_nf()).EnumConstant(ec.position(),
+                                                          ec.target(),
+                                                          ec.id());
     }
 }

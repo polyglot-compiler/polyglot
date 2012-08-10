@@ -14,7 +14,7 @@ public interface ExtendedFor extends Loop {
     LocalDecl decl();
 
     Expr expr();
-    ExtendedFor expr(Expr expr);
 
+    ExtendedFor expr(Expr expr);
 
 }

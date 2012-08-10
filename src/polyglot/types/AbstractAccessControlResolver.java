@@ -37,13 +37,14 @@ package polyglot.types;
  *    accept; it is the responsibility of the user to make sure they
  *    have one whose behavior is reasonable.
  */
-public abstract class AbstractAccessControlResolver implements AccessControlResolver {
+public abstract class AbstractAccessControlResolver implements
+        AccessControlResolver {
     protected TypeSystem ts;
-    
+
     public AbstractAccessControlResolver(TypeSystem ts) {
         this.ts = ts;
     }
-    
+
     @Override
     public final Named find(String name) throws SemanticException {
         return find(name, null);

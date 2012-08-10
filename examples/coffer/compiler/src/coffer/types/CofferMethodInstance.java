@@ -12,6 +12,6 @@ import polyglot.types.MethodInstance;
 /** Coffer method instance. A wrapper of all the type information related to
  *  a method. 
  */
-public interface CofferMethodInstance extends MethodInstance, CofferProcedureInstance
-{
+public interface CofferMethodInstance extends MethodInstance,
+        CofferProcedureInstance {
 }

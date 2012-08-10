@@ -33,8 +33,7 @@ import polyglot.visit.ContextVisitor;
  * Utility class which is used to disambiguate ambiguous
  * AST nodes (Expr, Type, Receiver, Qualifier, Prefix).
  */
-public interface Disamb
-{
+public interface Disamb {
     /**
      * Disambiguate the prefix and name into a unambiguous node of the
      * appropriate type.
@@ -42,7 +41,7 @@ public interface Disamb
      */
     Node disambiguate(Ambiguous amb, ContextVisitor v, Position pos,
             Prefix prefix, Id name) throws SemanticException;
-    
+
     /**
      * Disambiguate the prefix and name into a unambiguous node of the
      * appropriate type.
@@ -51,5 +50,5 @@ public interface Disamb
      */
     @Deprecated
     Node disambiguate(Ambiguous amb, ContextVisitor v, Position pos,
-                      Prefix prefix, String name) throws SemanticException;
+            Prefix prefix, String name) throws SemanticException;
 }

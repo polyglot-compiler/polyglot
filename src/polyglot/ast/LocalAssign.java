@@ -32,6 +32,5 @@ package polyglot.ast;
  * The class of the <code>Expr</code> returned by
  * <code>LocalAssign.left()</code>is guaranteed to be an <code>Local</code>.
  */
-public interface LocalAssign extends Assign
-{
+public interface LocalAssign extends Assign {
 }

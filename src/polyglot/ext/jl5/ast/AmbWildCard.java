@@ -23,7 +23,9 @@ public class AmbWildCard extends TypeNode_c implements TypeNode, Ambiguous {
         constraint = null;
         isExtendsConstraint = true;
     }
-    public AmbWildCard(Position pos, TypeNode constraint, boolean isExtendsConstraint) {
+
+    public AmbWildCard(Position pos, TypeNode constraint,
+            boolean isExtendsConstraint) {
         super(pos);
         this.constraint = constraint;
         this.isExtendsConstraint = isExtendsConstraint;
@@ -33,8 +35,8 @@ public class AmbWildCard extends TypeNode_c implements TypeNode, Ambiguous {
     public Node disambiguate(AmbiguityRemover sc) throws SemanticException {
         if (this.constraint != null && !this.constraint.isDisambiguated()) {
             return this;
-        }     
-        JL5TypeSystem ts = (JL5TypeSystem)sc.typeSystem();
+        }
+        JL5TypeSystem ts = (JL5TypeSystem) sc.typeSystem();
         Type t;
         if (this.constraint == null) {
             t = ts.wildCardType(this.position());
@@ -43,10 +45,10 @@ public class AmbWildCard extends TypeNode_c implements TypeNode, Ambiguous {
             ReferenceType upperBound = null;
             ReferenceType lowerBound = null;
             if (this.isExtendsConstraint) {
-                upperBound = (ReferenceType) constraint.type();                
+                upperBound = (ReferenceType) constraint.type();
             }
             else {
-                lowerBound = (ReferenceType) constraint.type();                                
+                lowerBound = (ReferenceType) constraint.type();
             }
             t = ts.wildCardType(this.position(), upperBound, lowerBound);
         }
@@ -63,16 +65,15 @@ public class AmbWildCard extends TypeNode_c implements TypeNode, Ambiguous {
             constraint.prettyPrint(w, tr);
         }
     }
-    
+
     @Override
     public Node visitChildren(NodeVisitor v) {
         if (this.constraint != null) {
-            TypeNode c = (TypeNode)visitChild(this.constraint, v);
+            TypeNode c = (TypeNode) visitChild(this.constraint, v);
             return this.constraint(c);
         }
         return this;
     }
-
 
     private AmbWildCard constraint(TypeNode constraint) {
         if (this.constraint == constraint) {

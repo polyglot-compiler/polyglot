@@ -46,8 +46,7 @@ import polyglot.util.StringUtil;
  * @see polyglot.ast.Node#visit
  * @see polyglot.ast.Node
  */
-public abstract class NodeVisitor implements Copy
-{
+public abstract class NodeVisitor implements Copy {
     /**
      * Given a tree rooted at <code>n</code>, the visitor has the option of
      * overriding all traversal of the children of <code>n</code>. If no
@@ -92,7 +91,7 @@ public abstract class NodeVisitor implements Copy
      * is to continue.
      */
     public Node override(Node n) {
-	return null;
+        return null;
     }
 
     /**
@@ -208,9 +207,13 @@ public abstract class NodeVisitor implements Copy
      * This method allows the visitor to perform any last minute cleanup,
      * including flushing buffers and I/O connections.
      */
-    public void finish() { }
-    public void finish(Node ast) { this.finish(); }
-    
+    public void finish() {
+    }
+
+    public void finish(Node ast) {
+        this.finish();
+    }
+
     @Override
     public String toString() {
         return StringUtil.getShortNameComponent(getClass().getName());
@@ -238,7 +241,7 @@ public abstract class NodeVisitor implements Copy
             if (n == null) {
                 return visitEdgeNoOverride(parent, child);
             }
-            
+
             return n;
         }
         catch (InternalCompilerError e) {
@@ -265,30 +268,28 @@ public abstract class NodeVisitor implements Copy
         }
 
         NodeVisitor v_ = enter(parent, child);
-        
+
         if (v_ == null) {
             throw new InternalCompilerError("NodeVisitor.enter() returned null.");
         }
 
         @SuppressWarnings("unchecked")
         N n = (N) child.del().visitChildren(v_);
-	    
+
         if (n == null) {
             throw new InternalCompilerError("Node.visitChildren() returned null.");
         }
-        
+
         try {
             @SuppressWarnings("unchecked")
             N result = (N) this.leave(parent, child, n, v_);
             return result;
         }
         catch (InternalCompilerError e) {
-            if (e.position() == null && n != null)
-                e.setPosition(n.position());
+            if (e.position() == null && n != null) e.setPosition(n.position());
             throw e;
         }
     }
-    
 
     @Override
     public NodeVisitor copy() {

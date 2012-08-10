@@ -44,8 +44,8 @@ public class PaoTypeSystem_c extends TypeSystem_c implements PaoTypeSystem {
      * @see PaoParsedClassType_c
      */
     @Override
-    public ParsedClassType createClassType(LazyClassInitializer init, 
-                                           Source fromSource) {
+    public ParsedClassType createClassType(LazyClassInitializer init,
+            Source fromSource) {
         return new PaoParsedClassType_c(this, init, fromSource);
     }
 
@@ -91,9 +91,9 @@ public class PaoTypeSystem_c extends TypeSystem_c implements PaoTypeSystem {
     public MethodInstance getter(PrimitiveType t) {
         // The method instances could be cached for greater efficiency,
         // but we are not too worried about this.
-        
+
         String methodName = t.toString() + "Value";
-        
+
         // get the type used to represent boxed values of type t
         ReferenceType boxedType = boxedType(t);
 
@@ -113,11 +113,12 @@ public class PaoTypeSystem_c extends TypeSystem_c implements PaoTypeSystem {
         // The class types could be cached for greater efficiency,
         // but we are not too worried about this.
 
-        String name = RUNTIME_PACKAGE + "."
-                + wrapperTypeString(t).substring("java.lang.".length());
+        String name =
+                RUNTIME_PACKAGE + "."
+                        + wrapperTypeString(t).substring("java.lang.".length());
 
         try {
-            return ((Type)systemResolver().find(name)).toClass();
+            return ((Type) systemResolver().find(name)).toClass();
 
         }
         catch (SemanticException e) {

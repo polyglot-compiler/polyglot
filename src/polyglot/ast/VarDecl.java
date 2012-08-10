@@ -33,8 +33,7 @@ import polyglot.types.Type;
  * A <code>VarDecl</code> represents a local variable declaration, of either a formal
  * or a local variable.
  */
-public interface VarDecl extends Term
-{
+public interface VarDecl extends Term {
     /** Get the type object for the declaration's type. */
     Type declType();
 
@@ -46,7 +45,7 @@ public interface VarDecl extends Term
 
     /** Get the declaration's name. */
     Id id();
-    
+
     /** Get the declaration's name. */
     String name();
 

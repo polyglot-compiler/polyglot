@@ -21,29 +21,28 @@ public class SourceFileTest extends AbstractTest {
     protected List<String> mainExtraArgs;
     protected final SilentErrorQueue eq;
     protected String destDir;
-    
+
     protected List<ExpectedFailure> expectedFailures;
-    
+
     protected Set<String> undefinedEnvVars = new HashSet<String>();
-        
+
     public SourceFileTest(String filename) {
         super(new File(filename).getName());
         this.sourceFilenames = Collections.singletonList(filename);
-        this.eq = new SilentErrorQueue(100, this.getName()); 
+        this.eq = new SilentErrorQueue(100, this.getName());
 
     }
 
     public SourceFileTest(List<String> filenames) {
         super(filenames.toString());
         this.sourceFilenames = filenames;
-        this.eq = new SilentErrorQueue(100, this.getName()); 
+        this.eq = new SilentErrorQueue(100, this.getName());
     }
 
     public SourceFileTest(String[] filenames) {
         this(Arrays.asList(filenames).toString());
     }
-    
-    
+
     @Override
     public String getUniqueId() {
         StringBuffer sb = new StringBuffer();
@@ -61,7 +60,6 @@ public class SourceFileTest extends AbstractTest {
         return sb.toString();
     }
 
-    
     public void setExpectedFailures(List<ExpectedFailure> expectedFailures) {
         this.expectedFailures = expectedFailures;
     }
@@ -75,7 +73,7 @@ public class SourceFileTest extends AbstractTest {
                 return false;
             }
         }
-        
+
         // invoke the compiler on the file.
         try {
             if (JAVAC.equals(this.getExtensionClassname())) {
@@ -93,12 +91,12 @@ public class SourceFileTest extends AbstractTest {
             }
             else {
                 if (!eq.hasErrors()) {
-                    setFailureMessage("Failed to compile for unknown reasons: " + 
-                             e.toString());
+                    setFailureMessage("Failed to compile for unknown reasons: "
+                            + e.toString());
                     return false;
-                }                    
+                }
             }
-        }        
+        }
         catch (RuntimeException e) {
             if (e.getMessage() != null) {
                 setFailureMessage(e.getMessage());
@@ -110,10 +108,10 @@ public class SourceFileTest extends AbstractTest {
                 e.printStackTrace();
                 return false;
             }
-        }        
+        }
         return checkErrorQueue(eq);
     }
-    
+
     @Override
     protected void postRun() {
         output.finishTest(this, eq);
@@ -121,16 +119,16 @@ public class SourceFileTest extends AbstractTest {
 
     protected boolean checkErrorQueue(SilentErrorQueue eq) {
         List<ErrorInfo> errors = new ArrayList<ErrorInfo>(eq.getErrors());
-        
+
         boolean swallowRemainingFailures = false;
         for (ExpectedFailure f : expectedFailures) {
             if (f instanceof AnyExpectedFailure) {
                 swallowRemainingFailures = true;
                 continue;
             }
-            
+
             boolean found = false;
-            for (Iterator<ErrorInfo> j = errors.iterator(); j.hasNext(); ) {
+            for (Iterator<ErrorInfo> j = errors.iterator(); j.hasNext();) {
                 ErrorInfo e = j.next();
                 if (f.matches(e)) {
                     // this error info has been matched. remove it.
@@ -142,14 +140,14 @@ public class SourceFileTest extends AbstractTest {
             if (!found) {
                 setFailureMessage("Expected to see " + f.toString());
                 return false;
-            }            
+            }
         }
-        
+
         // are there any unaccounted for errors?
         if (!errors.isEmpty() && !swallowRemainingFailures) {
             StringBuffer sb = new StringBuffer();
-            for (Iterator<ErrorInfo> iter = errors.iterator(); iter.hasNext(); ) {
-                ErrorInfo err = iter.next();                        
+            for (Iterator<ErrorInfo> iter = errors.iterator(); iter.hasNext();) {
+                ErrorInfo err = iter.next();
                 sb.append(err.getMessage());
                 if (err.getPosition() != null) {
                     sb.append(" (");
@@ -159,17 +157,16 @@ public class SourceFileTest extends AbstractTest {
                 if (iter.hasNext()) sb.append("; ");
             }
             setFailureMessage(sb.toString());
-        }            
+        }
         return errors.isEmpty() || swallowRemainingFailures;
     }
-    
+
     protected String[] getSourceFileNames() {
         return sourceFilenames.toArray(new String[0]);
     }
-    
-    protected void invokePolyglot(String[] files) 
-        throws polyglot.main.Main.TerminationException 
-    {
+
+    protected void invokePolyglot(String[] files)
+            throws polyglot.main.Main.TerminationException {
         File tmpdir = new File("pthOutput");
 
         int i = 1;
@@ -181,7 +178,7 @@ public class SourceFileTest extends AbstractTest {
         tmpdir.mkdir();
 
         setDestDir(tmpdir.getPath());
-                
+
         String[] cmdLine = buildCmdLine(files);
         polyglot.main.Main polyglotMain = new polyglot.main.Main();
 
@@ -237,7 +234,7 @@ public class SourceFileTest extends AbstractTest {
                     list[i].deleteOnExit();
 //                    System.out.println("Failed to delete " + list[i]);
                 }
-                
+
             }
         }
         if (!dir.delete()) {
@@ -248,32 +245,32 @@ public class SourceFileTest extends AbstractTest {
 
     protected String[] buildCmdLine(String[] files) {
         ArrayList<String> args = new ArrayList<String>();
-        
+
         String s;
         String[] sa;
-        
+
         if ((s = getExtensionClassname()) != null && !s.equals(JAVAC)) {
             args.add("-extclass");
             args.add(s);
         }
-        
+
         if ((s = getAdditionalClasspath()) != null) {
             args.add("-cp");
-            args.add(s);                        
+            args.add(s);
         }
 
         if ((s = getDestDir()) != null) {
             args.add("-d");
-            args.add(s);                        
+            args.add(s);
         }
 
         if ((s = getSourceDir()) != null) {
             args.add("-sourcepath");
-            args.add(s);                        
+            args.add(s);
         }
 
         char pathSep = File.pathSeparatorChar;
-        
+
         if (mainExtraArgs == null && (s = Main.options.extraArgs) != null) {
             mainExtraArgs = new ArrayList<String>();
             sa = breakString(Main.options.extraArgs);
@@ -299,12 +296,12 @@ public class SourceFileTest extends AbstractTest {
                 args.add(sas);
             }
         }
-        
+
         args.addAll(Arrays.asList(files));
-        
+
         return args.toArray(new String[0]);
     }
-        
+
     /**
      * @param sas
      * @param pathSep
@@ -315,7 +312,8 @@ public class SourceFileTest extends AbstractTest {
         // system specific one
         StringBuffer sb = new StringBuffer();
         for (int j = 0; j < sas.length(); j++) {
-            if (sas.charAt(j) == '\\' && (j+1) < sas.length() && sas.charAt(j+1) == ':') {
+            if (sas.charAt(j) == '\\' && (j + 1) < sas.length()
+                    && sas.charAt(j + 1) == ':') {
                 // escaped ':'
                 j++;
                 sb.append(':');
@@ -330,30 +328,29 @@ public class SourceFileTest extends AbstractTest {
         return sb.toString();
     }
 
-    
     private String replaceEnvVariables(String sas) {
         int start;
         while ((start = sas.indexOf('$')) >= 0) {
             // we have an environment variable
-            int end = start+1;
-            while (end < sas.length() && 
-                    (Character.isUnicodeIdentifierStart(sas.charAt(end)) ||
-                    Character.isUnicodeIdentifierPart(sas.charAt(end)))) {
+            int end = start + 1;
+            while (end < sas.length()
+                    && (Character.isUnicodeIdentifierStart(sas.charAt(end)) || Character.isUnicodeIdentifierPart(sas.charAt(end)))) {
                 end++;
             }
             // the identifier is now from start+1 to end-1 inclusive.
-            
-            String var = sas.substring(start+1, end);
+
+            String var = sas.substring(start + 1, end);
             String v = System.getenv(var);
             if (v == null && !undefinedEnvVars.contains(var)) {
                 undefinedEnvVars.add(var);
                 output.warning("environment variable $" + var + " undefined.");
                 v = "";
             }
-            sas = sas.substring(0, start) + v + sas.substring(end); 
+            sas = sas.substring(0, start) + v + sas.substring(end);
         }
         return sas;
     }
+
     protected String getExtensionClassname() {
         return extensionClassname;
     }
@@ -361,18 +358,18 @@ public class SourceFileTest extends AbstractTest {
     protected void setExtensionClassname(String extClassname) {
         this.extensionClassname = extClassname;
     }
-    
+
     protected String[] getExtraCmdLineArgs() {
         return this.extraArgs;
     }
-    
-    protected static String[] breakString(String s) {        
+
+    protected static String[] breakString(String s) {
         ArrayList<String> l = new ArrayList<String>();
         int i = 0;
         String token = "";
         // if endChar != 0, then we are parsing a long token that may
         // include whitespace
-        char endChar = 0;  
+        char endChar = 0;
         while (i < s.length()) {
             char c = s.charAt(i);
             if (endChar != 0 && c == endChar) {
@@ -384,13 +381,13 @@ public class SourceFileTest extends AbstractTest {
                 c = s.charAt(++i);
                 token += c;
             }
-            else if (c =='\"' || c == '\'') {
+            else if (c == '\"' || c == '\'') {
                 // a quoted string, treat as a single token
-                endChar = c;           
+                endChar = c;
             }
             else if (endChar == 0 && Character.isWhitespace(c)) {
                 if (token.length() > 0) {
-                    l.add(token);                    
+                    l.add(token);
                 }
                 token = "";
             }
@@ -400,25 +397,30 @@ public class SourceFileTest extends AbstractTest {
             i++;
         }
         if (token.length() > 0) {
-            l.add(token);                    
+            l.add(token);
         }
 
         return l.toArray(new String[l.size()]);
     }
+
     protected void setExtraCmdLineArgs(String args) {
         if (args != null) {
             this.extraArgs = breakString(args);
-        } 
+        }
     }
+
     protected String getAdditionalClasspath() {
         return Main.options.classpath;
     }
+
     protected void setDestDir(String dir) {
         this.destDir = dir;
     }
+
     protected String getDestDir() {
         return destDir;
     }
+
     protected String getSourceDir() {
         return null;
     }

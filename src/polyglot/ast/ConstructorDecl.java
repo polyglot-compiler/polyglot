@@ -34,21 +34,20 @@ import polyglot.types.Flags;
  * A <code>ConstructorDecl</code> is an immutable representation of a
  * constructor declaration as part of a class body. 
  */
-public interface ConstructorDecl extends ProcedureDecl 
-{
+public interface ConstructorDecl extends ProcedureDecl {
     /** The constructor's flags. */
     @Override
     Flags flags();
 
     /** Set the constructor's flags. */
     ConstructorDecl flags(Flags flags);
-    
+
     /**
      * The constructor's name.  This should be the short name of the
      * containing class.
      */
     Id id();
-    
+
     /** Set the constructor's name. */
     ConstructorDecl id(Id name);
 

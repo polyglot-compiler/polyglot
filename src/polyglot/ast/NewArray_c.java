@@ -52,53 +52,53 @@ import polyglot.visit.TypeChecker;
  * dimensions of the array initializer must equal the number of additional "[]"
  * dimensions.
  */
-public class NewArray_c extends Expr_c implements NewArray
-{
+public class NewArray_c extends Expr_c implements NewArray {
     protected TypeNode baseType;
     protected List<Expr> dims;
     protected int addDims;
     protected ArrayInit init;
 
-    public NewArray_c(Position pos, TypeNode baseType, List<Expr> dims, int addDims, ArrayInit init) {
-	super(pos);
-	assert(baseType != null && dims != null); // init may be null
-	assert(addDims >= 0);
-	assert(! dims.isEmpty() || init != null); // dims may be empty only if there is an initializer
-	assert(addDims > 0 || init == null); // init may be non-null only if addDims > 0
-	assert(dims.size() + addDims > 0); // must allocate something
-	
-	this.baseType = baseType;
-	this.dims = ListUtil.copy(dims, true);
-	this.addDims = addDims;
-	this.init = init;
+    public NewArray_c(Position pos, TypeNode baseType, List<Expr> dims,
+            int addDims, ArrayInit init) {
+        super(pos);
+        assert (baseType != null && dims != null); // init may be null
+        assert (addDims >= 0);
+        assert (!dims.isEmpty() || init != null); // dims may be empty only if there is an initializer
+        assert (addDims > 0 || init == null); // init may be non-null only if addDims > 0
+        assert (dims.size() + addDims > 0); // must allocate something
+
+        this.baseType = baseType;
+        this.dims = ListUtil.copy(dims, true);
+        this.addDims = addDims;
+        this.init = init;
     }
 
     /** Get the base type node of the expression. */
     @Override
     public TypeNode baseType() {
-	return this.baseType;
+        return this.baseType;
     }
 
     /** Set the base type node of the expression. */
     @Override
     public NewArray baseType(TypeNode baseType) {
-	NewArray_c n = (NewArray_c) copy();
-	n.baseType = baseType;
-	return n;
+        NewArray_c n = (NewArray_c) copy();
+        n.baseType = baseType;
+        return n;
     }
 
     /** Get the dimension expressions of the expression. */
     @Override
     public List<Expr> dims() {
-	return Collections.unmodifiableList(this.dims);
+        return Collections.unmodifiableList(this.dims);
     }
 
     /** Set the dimension expressions of the expression. */
     @Override
     public NewArray dims(List<Expr> dims) {
-	NewArray_c n = (NewArray_c) copy();
-	n.dims = ListUtil.copy(dims, true);
-	return n;
+        NewArray_c n = (NewArray_c) copy();
+        n.dims = ListUtil.copy(dims, true);
+        return n;
     }
 
     /** Get the number of dimensions of the expression. */
@@ -110,51 +110,53 @@ public class NewArray_c extends Expr_c implements NewArray
     /** Get the number of additional dimensions of the expression. */
     @Override
     public int additionalDims() {
-	return this.addDims;
+        return this.addDims;
     }
 
     /** Set the number of additional dimensions of the expression. */
     @Override
     public NewArray additionalDims(int addDims) {
-	NewArray_c n = (NewArray_c) copy();
-	n.addDims = addDims;
-	return n;
+        NewArray_c n = (NewArray_c) copy();
+        n.addDims = addDims;
+        return n;
     }
 
     /** Get the initializer of the expression. */
     @Override
     public ArrayInit init() {
-	return this.init;
+        return this.init;
     }
 
     /** Set the initializer of the expression. */
     @Override
     public NewArray init(ArrayInit init) {
-	NewArray_c n = (NewArray_c) copy();
-	n.init = init;
-	return n;
+        NewArray_c n = (NewArray_c) copy();
+        n.init = init;
+        return n;
     }
 
     /** Reconstruct the expression. */
-    protected NewArray_c reconstruct(TypeNode baseType, List<Expr> dims, ArrayInit init) {
-	if (baseType != this.baseType || ! CollectionUtil.equals(dims, this.dims) || init != this.init) {
-	    NewArray_c n = (NewArray_c) copy();
-	    n.baseType = baseType;
-	    n.dims = ListUtil.copy(dims, true);
-	    n.init = init;
-	    return n;
-	}
+    protected NewArray_c reconstruct(TypeNode baseType, List<Expr> dims,
+            ArrayInit init) {
+        if (baseType != this.baseType
+                || !CollectionUtil.equals(dims, this.dims) || init != this.init) {
+            NewArray_c n = (NewArray_c) copy();
+            n.baseType = baseType;
+            n.dims = ListUtil.copy(dims, true);
+            n.init = init;
+            return n;
+        }
 
-	return this;
+        return this;
     }
 
     /** Visit the children of the expression. */
     @Override
     public Node visitChildren(NodeVisitor v) {
-	TypeNode baseType = (TypeNode) visitChild(this.baseType, v);
-	List<Expr> dims = visitList(this.dims, v);
-	ArrayInit init = (ArrayInit) visitChild(this.init, v);
-	return reconstruct(baseType, dims, init);
+        TypeNode baseType = (TypeNode) visitChild(this.baseType, v);
+        List<Expr> dims = visitList(this.dims, v);
+        ArrayInit init = (ArrayInit) visitChild(this.init, v);
+        return reconstruct(baseType, dims, init);
     }
 
     /** Type check the expression. */
@@ -163,19 +165,19 @@ public class NewArray_c extends Expr_c implements NewArray
         TypeSystem ts = tc.typeSystem();
 
         for (Expr expr : dims) {
-            if (! ts.isImplicitCastValid(expr.type(), ts.Int())) {
+            if (!ts.isImplicitCastValid(expr.type(), ts.Int())) {
                 throw new SemanticException("Array dimension must be an integer.",
-                        expr.position());
+                                            expr.position());
             }
         }
 
         ArrayType type = arrayOf(ts, baseType.type(), dims.size() + addDims);
 
-	if (init != null) {
+        if (init != null) {
             init.typeCheckElements(type);
-	}
+        }
 
-	return type(type);
+        return type(type);
     }
 
     protected ArrayType arrayOf(TypeSystem ts, Type baseType, int dims) {
@@ -193,30 +195,30 @@ public class NewArray_c extends Expr_c implements NewArray
 
     @Override
     public String toString() {
-	return "new " + baseType + "[...]";
+        return "new " + baseType + "[...]";
     }
 
     /** Write the expression to an output file. */
     @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
-	w.write("new ");
-	print(baseType, w, tr);
+        w.write("new ");
+        print(baseType, w, tr);
 
-	for (Iterator<Expr> i = dims.iterator(); i.hasNext();) {
-	  Expr e = i.next();
-	  w.write("[");
-	  printBlock(e, w, tr);
-	  w.write("]");
-	}
+        for (Iterator<Expr> i = dims.iterator(); i.hasNext();) {
+            Expr e = i.next();
+            w.write("[");
+            printBlock(e, w, tr);
+            w.write("]");
+        }
 
-	for (int i = 0; i < addDims; i++) {
-	    w.write("[]");
-	}
+        for (int i = 0; i < addDims; i++) {
+            w.write("[]");
+        }
 
-	if (init != null) {
-	    w.write(" ");
-	    print(init, w, tr);
-	}
+        if (init != null) {
+            w.write(" ");
+            print(init, w, tr);
+        }
     }
 
     @Override
@@ -230,14 +232,15 @@ public class NewArray_c extends Expr_c implements NewArray
             v.visitCFG(baseType, listChild(dims, init), ENTRY);
             v.visitCFGList(dims, init, ENTRY);
             v.visitCFG(init, this, EXIT);
-        } else {
+        }
+        else {
             v.visitCFG(baseType, listChild(dims, (Expr) null), ENTRY);
             v.visitCFGList(dims, this, EXIT);
         }
-        
+
         return succs;
     }
-    
+
     @Override
     public List<Type> throwTypes(TypeSystem ts) {
         if (dims != null && !dims.isEmpty()) {
@@ -247,15 +250,20 @@ public class NewArray_c extends Expr_c implements NewArray
                 return CollectionUtil.list(ts.typeForName("java.lang.NegativeArraySizeException"));
             }
             catch (SemanticException e) {
-                throw new InternalCompilerError("Cannot find class java.lang.NegativeArraySizeException", e);
+                throw new InternalCompilerError("Cannot find class java.lang.NegativeArraySizeException",
+                                                e);
             }
         }
         return Collections.<Type> emptyList();
     }
-    
+
     @Override
     public Node copy(NodeFactory nf) {
-        return nf.NewArray(this.position, this.baseType, this.dims, this.addDims, this.init);
+        return nf.NewArray(this.position,
+                           this.baseType,
+                           this.dims,
+                           this.addDims,
+                           this.init);
     }
 
 }

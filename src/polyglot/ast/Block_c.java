@@ -35,23 +35,23 @@ import polyglot.visit.PrettyPrinter;
  * A <code>Block</code> represents a Java block statement -- an immutable
  * sequence of statements.
  */
-public class Block_c extends AbstractBlock_c implements Block
-{
+public class Block_c extends AbstractBlock_c implements Block {
     public Block_c(Position pos, List<Stmt> statements) {
-	super(pos, statements);
+        super(pos, statements);
     }
 
     /** Write the block to an output file. */
     @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
-	w.write("{");
-	w.unifiedBreak(4, 1, " ", 1);
-	w.begin(0);
-	super.prettyPrint(w, tr);
-	w.end();
-	w.unifiedBreak(0, 1, " ", 1);
-	w.write("}");
+        w.write("{");
+        w.unifiedBreak(4, 1, " ", 1);
+        w.begin(0);
+        super.prettyPrint(w, tr);
+        w.end();
+        w.unifiedBreak(0, 1, " ", 1);
+        w.write("}");
     }
+
     @Override
     public Node copy(NodeFactory nf) {
         return nf.Block(this.position, this.statements);

@@ -7,8 +7,6 @@
 
 package coffer.types;
 
-
 /** Key used in an instantiation. */
-public interface InstKey extends Key
-{
+public interface InstKey extends Key {
 }

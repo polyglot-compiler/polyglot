@@ -33,10 +33,9 @@ import polyglot.frontend.passes.ConstantCheckPass;
 import polyglot.types.TypeSystem;
 import polyglot.visit.ConstantChecker;
 
-
 public class ConstantsCheckedForFile extends SourceFileGoal {
     protected boolean reached;
-    
+
     public ConstantsCheckedForFile(Job job) {
         super(job);
         this.reached = false;

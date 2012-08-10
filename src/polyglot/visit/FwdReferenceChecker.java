@@ -44,37 +44,36 @@ import polyglot.types.TypeSystem;
  *  This is an implementation of the rules of the Java Language Spec, 2nd
  * Edition, Section 8.3.2.3 
  */
-public class FwdReferenceChecker extends ContextVisitor
-{
+public class FwdReferenceChecker extends ContextVisitor {
     public FwdReferenceChecker(Job job, TypeSystem ts, NodeFactory nf) {
-	super(job, ts, nf);
+        super(job, ts, nf);
     }
 
     private boolean inInitialization = false;
     private boolean inStaticInit = false;
     private Field fieldAssignLHS = null;
     private Set<FieldInstance> declaredFields = new HashSet<FieldInstance>();
-    
+
     @Override
     protected NodeVisitor enterCall(Node n) throws SemanticException {
         if (n instanceof FieldDecl) {
-            FieldDecl fd = (FieldDecl)n;
+            FieldDecl fd = (FieldDecl) n;
             declaredFields.add(fd.fieldInstance());
-            
-            FwdReferenceChecker frc = (FwdReferenceChecker)this.copy();
+
+            FwdReferenceChecker frc = (FwdReferenceChecker) this.copy();
             frc.inInitialization = true;
             frc.inStaticInit = fd.flags().isStatic();
             return frc;
         }
         else if (n instanceof Initializer) {
-            FwdReferenceChecker frc = (FwdReferenceChecker)this.copy();
+            FwdReferenceChecker frc = (FwdReferenceChecker) this.copy();
             frc.inInitialization = true;
-            frc.inStaticInit = ((Initializer)n).flags().isStatic();
+            frc.inStaticInit = ((Initializer) n).flags().isStatic();
             return frc;
         }
         else if (n instanceof FieldAssign) {
-            FwdReferenceChecker frc = (FwdReferenceChecker)this.copy();
-            frc.fieldAssignLHS = (Field)((FieldAssign)n).left();
+            FwdReferenceChecker frc = (FwdReferenceChecker) this.copy();
+            frc.fieldAssignLHS = (Field) ((FieldAssign) n).left();
             return frc;
         }
         else if (n instanceof Field) {
@@ -85,8 +84,8 @@ public class FwdReferenceChecker extends ContextVisitor
             }
             else if (inInitialization) {
                 // we need to check if this is an illegal fwd reference.
-                Field f = (Field)n;
-                
+                Field f = (Field) n;
+
                 // an illegal fwd reference if a usage of an instance 
                 // (resp. static) field occurs in an instance (resp. static)
                 // initialization, and the innermost enclosing class or 
@@ -96,16 +95,16 @@ public class FwdReferenceChecker extends ContextVisitor
                 // In addition, if a field is not accessed as a simple name, 
                 // then all is ok
 
-                if (inStaticInit == f.fieldInstance().flags().isStatic() &&
-                    context().currentClass().equals(f.fieldInstance().container()) &&
-                   !declaredFields.contains(f.fieldInstance().orig()) &&
-                   f.isTargetImplicit()) {
-                    throw new SemanticException("Illegal forward reference", 
+                if (inStaticInit == f.fieldInstance().flags().isStatic()
+                        && context().currentClass().equals(f.fieldInstance()
+                                                            .container())
+                        && !declaredFields.contains(f.fieldInstance().orig())
+                        && f.isTargetImplicit()) {
+                    throw new SemanticException("Illegal forward reference",
                                                 f.position());
                 }
             }
         }
-        return this;        
+        return this;
     }
 }
-

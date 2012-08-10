@@ -16,16 +16,15 @@ public class JL5Special_c extends Special_c implements Special {
     }
 
     @Override
-    public Node typeCheckOverride(Node parent, TypeChecker tc) throws SemanticException {
-        Special n = (Special)visitChildren(tc);
+    public Node typeCheckOverride(Node parent, TypeChecker tc)
+            throws SemanticException {
+        Special n = (Special) visitChildren(tc);
         if (n.qualifier() != null && n.qualifier().type() instanceof RawClass) {
             // we got a raw class. Fix it up
-            RawClass rc = (RawClass)n.qualifier().type();
+            RawClass rc = (RawClass) n.qualifier().type();
             n = n.qualifier(n.qualifier().type(rc.base()));
         }
         return n.typeCheck(tc);
     }
-
-    
 
 }

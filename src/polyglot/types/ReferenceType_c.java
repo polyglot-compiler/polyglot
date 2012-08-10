@@ -36,24 +36,28 @@ import polyglot.util.Position;
  * a type on which contains methods and fields and is a subtype of
  * Object.
  */
-public abstract class ReferenceType_c extends Type_c implements ReferenceType
-{
+public abstract class ReferenceType_c extends Type_c implements ReferenceType {
     protected ReferenceType_c() {
-	super();
+        super();
     }
 
     public ReferenceType_c(TypeSystem ts) {
-	this(ts, null);
+        this(ts, null);
     }
 
     public ReferenceType_c(TypeSystem ts, Position pos) {
-	super(ts, pos);
+        super(ts, pos);
     }
 
     @Override
-    public boolean isReference() { return true; }
+    public boolean isReference() {
+        return true;
+    }
+
     @Override
-    public ReferenceType toReference() { return this; }
+    public ReferenceType toReference() {
+        return this;
+    }
 
     /** Get a list of all the type's MemberInstances. */
     @Override
@@ -111,7 +115,7 @@ public abstract class ReferenceType_c extends Type_c implements ReferenceType
 
     @Override
     public boolean descendsFromImpl(Type ancestor) {
-        if (! ancestor.isCanonical()) {
+        if (!ancestor.isCanonical()) {
             return false;
         }
 
@@ -123,7 +127,7 @@ public abstract class ReferenceType_c extends Type_c implements ReferenceType
             return false;
         }
 
-        if (! ancestor.isReference()) {
+        if (!ancestor.isReference()) {
             return false;
         }
 
@@ -160,7 +164,8 @@ public abstract class ReferenceType_c extends Type_c implements ReferenceType
     }
 
     @Override
-    public List<? extends MethodInstance> methods(String name, List<? extends Type> argTypes) {
+    public List<? extends MethodInstance> methods(String name,
+            List<? extends Type> argTypes) {
         List<MethodInstance> l = new LinkedList<MethodInstance>();
 
         for (MethodInstance mi : methodsNamed(name)) {
@@ -180,7 +185,7 @@ public abstract class ReferenceType_c extends Type_c implements ReferenceType
      **/
     @Override
     public boolean isCastValidImpl(Type toType) {
-        if (! toType.isReference()) return false;
+        if (!toType.isReference()) return false;
         return ts.isSubtype(this, toType) || ts.isSubtype(toType, this);
     }
 }

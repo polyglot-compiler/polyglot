@@ -65,12 +65,12 @@ public class JLScheduler extends Scheduler {
     public JLScheduler(ExtensionInfo extInfo) {
         super(extInfo);
     }
-    
+
     @Override
     public Goal TypeExists(String name) {
         return TypeExists.create(this, name);
     }
-    
+
     @Override
     public Goal MembersAdded(ParsedClassType ct) {
         Goal g = MembersAdded.create(this, ct);
@@ -94,12 +94,12 @@ public class JLScheduler extends Scheduler {
         Goal g = FieldConstantsChecked.create(this, fi);
         return g;
     }
-    
+
     @Override
     public Goal Parsed(Job job) {
         return Parsed.create(this, job);
     }
-    
+
     @Override
     public Goal TypesInitialized(Job job) {
         TypeSystem ts = extInfo.typeSystem();
@@ -107,12 +107,12 @@ public class JLScheduler extends Scheduler {
         Goal g = TypesInitialized.create(this, job, ts, nf);
         return g;
     }
-    
+
     @Override
     public Goal TypesInitializedForCommandLine() {
         return TypesInitializedForCommandLine.create(this);
     }
-    
+
     @Override
     public Goal ImportTableInitialized(Job job) {
         TypeSystem ts = extInfo.typeSystem();
@@ -120,7 +120,7 @@ public class JLScheduler extends Scheduler {
         Goal g = ImportTableInitialized.create(this, job, ts, nf);
         return g;
     }
-    
+
     @Override
     public Goal SignaturesDisambiguated(Job job) {
         TypeSystem ts = extInfo.typeSystem();
@@ -136,7 +136,7 @@ public class JLScheduler extends Scheduler {
         Goal g = SupertypesDisambiguated.create(this, job, ts, nf);
         return g;
     }
-    
+
     @Override
     public Goal Disambiguated(Job job) {
         TypeSystem ts = extInfo.typeSystem();
@@ -144,7 +144,7 @@ public class JLScheduler extends Scheduler {
         Goal g = Disambiguated.create(this, job, ts, nf);
         return g;
     }
-    
+
     @Override
     public Goal TypeChecked(Job job) {
         TypeSystem ts = extInfo.typeSystem();
@@ -152,7 +152,7 @@ public class JLScheduler extends Scheduler {
         Goal g = TypeChecked.create(this, job, ts, nf);
         return g;
     }
-    
+
     @Override
     public Goal ConstantsChecked(Job job) {
         TypeSystem ts = extInfo.typeSystem();
@@ -160,7 +160,7 @@ public class JLScheduler extends Scheduler {
         Goal g = ConstantsChecked.create(this, job, ts, nf);
         return g;
     }
-    
+
     @Override
     public Goal ReachabilityChecked(Job job) {
         TypeSystem ts = extInfo.typeSystem();
@@ -168,7 +168,7 @@ public class JLScheduler extends Scheduler {
         Goal g = ReachabilityChecked.create(this, job, ts, nf);
         return g;
     }
-    
+
     @Override
     public Goal ExceptionsChecked(Job job) {
         TypeSystem ts = extInfo.typeSystem();
@@ -176,7 +176,7 @@ public class JLScheduler extends Scheduler {
         Goal g = ExceptionsChecked.create(this, job, ts, nf);
         return g;
     }
-    
+
     @Override
     public Goal ExitPathsChecked(Job job) {
         TypeSystem ts = extInfo.typeSystem();
@@ -184,7 +184,7 @@ public class JLScheduler extends Scheduler {
         Goal g = ExitPathsChecked.create(this, job, ts, nf);
         return g;
     }
-    
+
     @Override
     public Goal InitializationsChecked(Job job) {
         TypeSystem ts = extInfo.typeSystem();
@@ -192,15 +192,15 @@ public class JLScheduler extends Scheduler {
         Goal g = InitializationsChecked.create(this, job, ts, nf);
         return g;
     }
-    
+
     @Override
     public Goal ConstructorCallsChecked(Job job) {
         TypeSystem ts = extInfo.typeSystem();
         NodeFactory nf = extInfo.nodeFactory();
         Goal g = ConstructorCallsChecked.create(this, job, ts, nf);
-        return g; 
+        return g;
     }
-    
+
     @Override
     public Goal ForwardReferencesChecked(Job job) {
         TypeSystem ts = extInfo.typeSystem();
@@ -208,13 +208,13 @@ public class JLScheduler extends Scheduler {
         Goal g = ForwardReferencesChecked.create(this, job, ts, nf);
         return g;
     }
-    
+
     @Override
     public Goal Serialized(Job job) {
         Goal g = Serialized.create(this, job);
         return g;
     }
-    
+
     @Override
     public Goal CodeGenerated(Job job) {
         Goal g = CodeGenerated.create(this, job);

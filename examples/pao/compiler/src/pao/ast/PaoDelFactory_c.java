@@ -18,11 +18,11 @@ import polyglot.ast.JL;
  */
 public class PaoDelFactory_c extends AbstractDelFactory_c {
 
-	/**
-	 * @see AbstractDelFactory_c#delInstanceofImpl()
-	 */
-	@Override
+    /**
+     * @see AbstractDelFactory_c#delInstanceofImpl()
+     */
+    @Override
     protected JL delInstanceofImpl() {
-		return new PaoInstanceofDel_c();
-	}
+        return new PaoInstanceofDel_c();
+    }
 }

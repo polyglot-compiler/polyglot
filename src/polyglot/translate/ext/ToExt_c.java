@@ -14,16 +14,18 @@ public class ToExt_c extends Ext_c implements ToExt {
         while (e != null && !(e instanceof ToExt)) {
             e = e.ext();
         }
-        return (ToExt)e;
+        return (ToExt) e;
     }
 
     @Override
-    public NodeVisitor toExtEnter(ExtensionRewriter rw) throws SemanticException {
+    public NodeVisitor toExtEnter(ExtensionRewriter rw)
+            throws SemanticException {
         return rw;
     }
 
     @Override
     public Node toExt(ExtensionRewriter rw) throws SemanticException {
-        throw new InternalCompilerError("Cannot transalate " + node() +":" + node().ext().getClass());
-    }    
+        throw new InternalCompilerError("Cannot transalate " + node() + ":"
+                + node().ext().getClass());
+    }
 }

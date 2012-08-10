@@ -7,8 +7,6 @@
 
 package coffer.types;
 
-
 /** Key used as a parameter. */
-public interface ParamKey extends Key
-{
+public interface ParamKey extends Key {
 }

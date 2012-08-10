@@ -38,38 +38,37 @@ import polyglot.visit.PrettyPrinter;
  * A <code>Branch</code> is an immutable representation of a branch
  * statment in Java (a break or continue).
  */
-public class Branch_c extends Stmt_c implements Branch
-{
+public class Branch_c extends Stmt_c implements Branch {
     protected Branch.Kind kind;
     protected Id label;
 
     public Branch_c(Position pos, Branch.Kind kind, Id label) {
-	super(pos);
-	assert(kind != null); // label may be null
-	this.kind = kind;
-	this.label = label;
+        super(pos);
+        assert (kind != null); // label may be null
+        this.kind = kind;
+        this.label = label;
     }
 
     /** Get the kind of the branch. */
     @Override
     public Branch.Kind kind() {
-	return this.kind;
+        return this.kind;
     }
 
     /** Set the kind of the branch. */
     @Override
     public Branch kind(Branch.Kind kind) {
-	Branch_c n = (Branch_c) copy();
-	n.kind = kind;
-	return n;
+        Branch_c n = (Branch_c) copy();
+        n.kind = kind;
+        return n;
     }
-    
+
     /** Get the target label of the branch. */
     @Override
     public Id labelNode() {
         return this.label;
     }
-    
+
     /** Set the target label of the branch. */
     @Override
     public Branch labelNode(Id label) {
@@ -97,10 +96,10 @@ public class Branch_c extends Stmt_c implements Branch
             n.label = label;
             return n;
         }
-        
+
         return this;
     }
-    
+
     /** Visit the children of the constructor. */
     @Override
     public Node visitChildren(NodeVisitor v) {
@@ -110,17 +109,17 @@ public class Branch_c extends Stmt_c implements Branch
 
     @Override
     public String toString() {
-	return kind.toString() + (label != null ? " " + label.toString() : "");
+        return kind.toString() + (label != null ? " " + label.toString() : "");
     }
 
     /** Write the expression to an output file. */
     @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
-	w.write(kind.toString());
-	if (label != null) {
-	    w.write(" " + label);
-	}
-	w.write(";");
+        w.write(kind.toString());
+        if (label != null) {
+            w.write(" " + label);
+        }
+        w.write(";");
     }
 
     /**
@@ -137,6 +136,7 @@ public class Branch_c extends Stmt_c implements Branch
         v.visitBranchTarget(this);
         return Collections.<T> emptyList();
     }
+
     @Override
     public Node copy(NodeFactory nf) {
         return nf.Branch(this.position, this.kind, this.label);

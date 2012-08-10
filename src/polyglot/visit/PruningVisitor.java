@@ -32,8 +32,7 @@ import polyglot.ast.Node;
  * particular node.  Returning a PruningVisitor from the
  * NodeVisitor.enter method ensures no children will be visited.
  */
-public class PruningVisitor extends NodeVisitor
-{
+public class PruningVisitor extends NodeVisitor {
     @Override
     public Node override(Node parent, Node n) {
         return n;

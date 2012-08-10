@@ -42,14 +42,13 @@ import polyglot.visit.TypeBuilder;
  * A <code>TypeNode</code> is the syntactic representation of a 
  * <code>Type</code> within the abstract syntax tree.
  */
-public abstract class TypeNode_c extends Term_c implements TypeNode
-{
+public abstract class TypeNode_c extends Term_c implements TypeNode {
     protected Type type;
 
     public TypeNode_c(Position pos) {
-	super(pos);
+        super(pos);
     }
-    
+
     @Override
     public boolean isDisambiguated() {
         return super.isDisambiguated() && type != null && type.isCanonical();
@@ -64,15 +63,15 @@ public abstract class TypeNode_c extends Term_c implements TypeNode
     /** Get the type this node encapsulates. */
     @Override
     public Type type() {
-	return this.type;
+        return this.type;
     }
 
     /** Set the type this node encapsulates. */
     @Override
     public TypeNode type(Type type) {
-	TypeNode_c n = (TypeNode_c) copy();
-	n.type = type;
-	return n;
+        TypeNode_c n = (TypeNode_c) copy();
+        n.type = type;
+        return n;
     }
 
     @Override
@@ -98,12 +97,12 @@ public abstract class TypeNode_c extends Term_c implements TypeNode
 
     @Override
     public String toString() {
-	if (type != null) {
-	    return type.toString();
-	}
-	else {
-	    return "<unknown type>";
-	}
+        if (type != null) {
+            return type.toString();
+        }
+        else {
+            return "<unknown type>";
+        }
     }
 
     @Override
@@ -111,9 +110,9 @@ public abstract class TypeNode_c extends Term_c implements TypeNode
 
     @Override
     public String name() {
-          if (type instanceof Named) {
-              return ((Named) type).name();
-          }
-          return null;
-      }
+        if (type instanceof Named) {
+            return ((Named) type).name();
+        }
+        return null;
+    }
 }

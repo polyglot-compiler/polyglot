@@ -150,9 +150,11 @@ public abstract class AbstractExtensionInfo implements ExtensionInfo {
     @Override
     public TargetFactory targetFactory() {
         if (target_factory == null) {
-            target_factory = new TargetFactory(extFileManager(),
-                    getOptions().source_output, getOptions().output_ext,
-                    getOptions().output_stdout);
+            target_factory =
+                    new TargetFactory(extFileManager(),
+                                      getOptions().source_output,
+                                      getOptions().output_ext,
+                                      getOptions().output_stdout);
         }
 
         return target_factory;
@@ -235,12 +237,13 @@ public abstract class AbstractExtensionInfo implements ExtensionInfo {
         try {
             extFM.setLocation(opt.source_path, opt.sourcepath_directories);
             extFM.setLocation(opt.source_output,
-                    Collections.singleton(opt.source_output_directory));
+                              Collections.singleton(opt.source_output_directory));
             extFM.setLocation(opt.class_output,
-                    Collections.singleton(opt.class_output_directory));
+                              Collections.singleton(opt.class_output_directory));
             extFM.setLocation(opt.bootclasspath, opt.bootclasspath_directories);
             extFM.setLocation(opt.classpath, opt.classpath_directories);
-        } catch (IOException e) {
+        }
+        catch (IOException e) {
             throw new InternalCompilerError(e.getMessage());
         }
     }

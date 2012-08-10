@@ -29,8 +29,8 @@ import polyglot.util.Position;
 
 /** A token class for float literals. */
 public class FloatLiteral extends NumericLiteral {
-  public FloatLiteral(Position position, float f, int sym) {
-      super(position, sym);
-      this.val = new Float(f);
-  }
+    public FloatLiteral(Position position, float f, int sym) {
+        super(position, sym);
+        this.val = new Float(f);
+    }
 }

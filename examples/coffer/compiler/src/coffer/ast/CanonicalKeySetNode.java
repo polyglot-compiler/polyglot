@@ -13,7 +13,6 @@ import coffer.types.KeySet;
  * A canonical key set AST node.  This is just an AST node
  * veneer around a <code>KeySet</code> type object.
  */
-public interface CanonicalKeySetNode extends KeySetNode
-{
+public interface CanonicalKeySetNode extends KeySetNode {
     public CanonicalKeySetNode keys(KeySet keys);
 }

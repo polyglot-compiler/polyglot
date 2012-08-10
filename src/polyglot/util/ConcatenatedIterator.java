@@ -39,65 +39,63 @@ import java.util.Iterator;
  **/
 public final class ConcatenatedIterator<T> implements Iterator<T> {
 
-  /**
-   * Constructs a new ConcatenatedIterator which yields every element, in
-   *  order, of every element of the array iters, in order.
-   **/
-  public ConcatenatedIterator(Iterator<T>... iters) {
-    this.backing_iterators = iters.clone();
-    findNextItem();
-  }
-
-  /**
-   * Constructs a new ConcatenatedIterator which yields every element, in
-   * order, of every element of the collection iters, in order.
-   **/
-  @SuppressWarnings("unchecked")
-  public ConcatenatedIterator(Collection<T> iters) {
-    this.backing_iterators = (Iterator<T>[]) iters.toArray();
-    findNextItem();
-  }
-
-  @Override
-public T next() {
-    T res = next_item;
-    if (res == null)
-      throw new java.util.NoSuchElementException();
-    findNextItem();
-    return res;
-  }
-
-  @Override
-public boolean hasNext() {
-    return next_item != null;
-  }
-  
-  @Override
-public void remove() {
-    throw new UnsupportedOperationException("ConcatenatedIterator.remove");
-  }
-
-  // Advances the internal iterator.
-  private void findNextItem() {
-    while(index < backing_iterators.length) {
-      Iterator<T> it = backing_iterators[index];
-      if (it.hasNext()) {
-	next_item = it.next();
-	return;
-      } else {
-	index++;
-      }
+    /**
+     * Constructs a new ConcatenatedIterator which yields every element, in
+     *  order, of every element of the array iters, in order.
+     **/
+    public ConcatenatedIterator(Iterator<T>... iters) {
+        this.backing_iterators = iters.clone();
+        findNextItem();
     }
-    next_item = null;
-  }
-  
-  // AF:  if next_item==null, this iterator has no more elts to yield.
-  //      otherwise, this iterator will yield next_item, followed by the 
-  //      remaining elements of backing_iterators[index], followed by the
-  //      elements of backing_iterators[index+1]...
-  protected T next_item;
-  protected Iterator<T>[] backing_iterators;
-  protected int index;
+
+    /**
+     * Constructs a new ConcatenatedIterator which yields every element, in
+     * order, of every element of the collection iters, in order.
+     **/
+    @SuppressWarnings("unchecked")
+    public ConcatenatedIterator(Collection<T> iters) {
+        this.backing_iterators = (Iterator<T>[]) iters.toArray();
+        findNextItem();
+    }
+
+    @Override
+    public T next() {
+        T res = next_item;
+        if (res == null) throw new java.util.NoSuchElementException();
+        findNextItem();
+        return res;
+    }
+
+    @Override
+    public boolean hasNext() {
+        return next_item != null;
+    }
+
+    @Override
+    public void remove() {
+        throw new UnsupportedOperationException("ConcatenatedIterator.remove");
+    }
+
+    // Advances the internal iterator.
+    private void findNextItem() {
+        while (index < backing_iterators.length) {
+            Iterator<T> it = backing_iterators[index];
+            if (it.hasNext()) {
+                next_item = it.next();
+                return;
+            }
+            else {
+                index++;
+            }
+        }
+        next_item = null;
+    }
+
+    // AF:  if next_item==null, this iterator has no more elts to yield.
+    //      otherwise, this iterator will yield next_item, followed by the 
+    //      remaining elements of backing_iterators[index], followed by the
+    //      elements of backing_iterators[index+1]...
+    protected T next_item;
+    protected Iterator<T>[] backing_iterators;
+    protected int index;
 }
-
-

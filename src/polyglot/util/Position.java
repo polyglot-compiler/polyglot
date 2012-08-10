@@ -33,22 +33,21 @@ import polyglot.main.Options;
  * where each AST node is located in a source file; this is used, for
  * example, for generating error messages.
  **/
-public class Position implements Serializable
-{
+public class Position implements Serializable {
     static final long serialVersionUID = -4588386982624074261L;
 
     private String path;
     private String file;
     private String info;
-    
+
     private int line;
     private int column;
-    
+
     private int endLine;
     private int endColumn;
 
     private boolean compilerGenerated = false;
-    
+
     // Position in characters from the beginning of the containing character
     // stream
     private int offset;
@@ -56,43 +55,47 @@ public class Position implements Serializable
 
     public static final int UNKNOWN = -1;
     public static final int END_UNUSED = -2;
-    public static final Position COMPILER_GENERATED = new Position("Compiler Generated", true);
-    
+    public static final Position COMPILER_GENERATED =
+            new Position("Compiler Generated", true);
+
     public static final int THIS_METHOD = 1;
     public static final int CALLER = THIS_METHOD + 1;
 
     /**
      * Get a compiler generated position using the caller at the given stack
      * depth.  Depth 1 is the caller.  Depth 2 is the caller's caller, etc.
-     */ 
+     */
     public static Position compilerGenerated(int depth) {
-    	if (! Options.global.precise_compiler_generated_positions)
+        if (!Options.global.precise_compiler_generated_positions)
             return COMPILER_GENERATED;
         StackTraceElement[] stack = new Exception().getStackTrace();
         if (depth < stack.length) {
-            return new Position(stack[depth].getFileName() + " (compiler generated)", stack[depth].getLineNumber(), true);
+            return new Position(stack[depth].getFileName()
+                                        + " (compiler generated)",
+                                stack[depth].getLineNumber(),
+                                true);
         }
         else {
             return COMPILER_GENERATED;
         }
     }
 
-    /** Get a compiler generated position. */ 
+    /** Get a compiler generated position. */
     public static Position compilerGenerated() {
         return compilerGenerated(CALLER);
     }
-    
+
     public static Position compilerGenerated(String info) {
-    	Position pos = compilerGenerated(CALLER);
-    	pos.setInfo(info);
-    	return pos;
+        Position pos = compilerGenerated(CALLER);
+        pos.setInfo(info);
+        return pos;
     }
-    
+
     public void setInfo(String info) {
-    	this.info = info;
+        this.info = info;
     }
-    
-    /** Get a compiler generated position. */ 
+
+    /** Get a compiler generated position. */
     public boolean isCompilerGenerated() {
         return compilerGenerated;
     }
@@ -108,7 +111,7 @@ public class Position implements Serializable
         this(null, desc, UNKNOWN, UNKNOWN);
         this.compilerGenerated = compilerGenerated;
     }
-    
+
     public Position(String desc, int line, boolean compilerGenerated) {
         this(null, desc, line, UNKNOWN);
         this.compilerGenerated = compilerGenerated;
@@ -125,12 +128,14 @@ public class Position implements Serializable
     public Position(String path, String file, int line, int column) {
         this(path, file, line, column, END_UNUSED, END_UNUSED);
     }
-    
-    public Position(String path, String file, int line, int column, int endLine, int endColumn) {
+
+    public Position(String path, String file, int line, int column,
+            int endLine, int endColumn) {
         this(path, file, line, column, endLine, endColumn, 0, 0);
     }
 
-    public Position(String path, String file, int line, int column, int endLine, int endColumn, int offset, int endOffset) {
+    public Position(String path, String file, int line, int column,
+            int endLine, int endColumn, int offset, int endOffset) {
         this.file = file;
         this.path = path;
         this.line = line;
@@ -142,50 +147,66 @@ public class Position implements Serializable
     }
 
     public Position(Position start, Position end) {
-        this(start.path(), start.file(), start.line, start.column, end.endLine, end.endColumn, start.offset, end.endOffset);
+        this(start.path(),
+             start.file(),
+             start.line,
+             start.column,
+             end.endLine,
+             end.endColumn,
+             start.offset,
+             end.endOffset);
     }
 
     public Position truncateEnd(int len) {
-    	if (this == COMPILER_GENERATED)
-    	    return this;
-    	
-	int eo = endOffset;
-	int el = endLine;
-	int ec = endColumn;
-	
-	if (eo >= offset + len)
-	    eo -= len;
-	else
-	    eo = offset;
-	
-	if (line == el) {
-	    if (ec >= column + len)
-		ec -= len;
-	    else
-		ec = column;
-	}
-	else {
-	    if (ec >= len)
-		ec -= len;
-	    else {
-		el = line;
-		ec = column;
-	    }
-	}
-	
-	return new Position(path, file, line, column, el, ec, offset, eo);
+        if (this == COMPILER_GENERATED) return this;
+
+        int eo = endOffset;
+        int el = endLine;
+        int ec = endColumn;
+
+        if (eo >= offset + len)
+            eo -= len;
+        else eo = offset;
+
+        if (line == el) {
+            if (ec >= column + len)
+                ec -= len;
+            else ec = column;
+        }
+        else {
+            if (ec >= len)
+                ec -= len;
+            else {
+                el = line;
+                ec = column;
+            }
+        }
+
+        return new Position(path, file, line, column, el, ec, offset, eo);
     }
-    
+
     public Position startOf() {
-    	if (this == COMPILER_GENERATED)
-    	    return this;
-        return new Position(path, file, line, column, line, column, offset, offset);
+        if (this == COMPILER_GENERATED) return this;
+        return new Position(path,
+                            file,
+                            line,
+                            column,
+                            line,
+                            column,
+                            offset,
+                            offset);
     }
 
     public Position endOf() {
-    	if (this == COMPILER_GENERATED)
-    	    return this;
-        return new Position(path, file, endLine, endColumn, endLine, endColumn, endOffset, endOffset);
+        if (this == COMPILER_GENERATED) return this;
+        return new Position(path,
+                            file,
+                            endLine,
+                            endColumn,
+                            endLine,
+                            endColumn,
+                            endOffset,
+                            endOffset);
     }
 
     public int line() {
@@ -204,7 +225,8 @@ public class Position implements Serializable
     }
 
     public int endColumn() {
-        if (endColumn == UNKNOWN || (column != UNKNOWN && endLine()==line() && endColumn < column)) {
+        if (endColumn == UNKNOWN
+                || (column != UNKNOWN && endLine() == line() && endColumn < column)) {
             return column;
         }
         return endColumn;
@@ -220,7 +242,7 @@ public class Position implements Serializable
         }
         return endOffset;
     }
-    
+
     public String file() {
         return file;
     }
@@ -240,19 +262,18 @@ public class Position implements Serializable
         if (s == null) {
             s = "unknown file";
         }
-        
+
         if (line != UNKNOWN) {
             s += ":" + line;
-            if (endLine != line &&
-                    endLine != UNKNOWN && endLine != END_UNUSED) {
+            if (endLine != line && endLine != UNKNOWN && endLine != END_UNUSED) {
                 s += "-" + endLine;
             }
         }
 
-        if(info != null) {
-        	s += " (" + info + ")";
+        if (info != null) {
+            s += " (" + info + ")";
         }
-        
+
         return s;
     }
 
@@ -270,24 +291,24 @@ public class Position implements Serializable
 
         if (line != UNKNOWN) {
             s += ":" + line;
-        
+
             if (column != UNKNOWN) {
                 s += "," + column;
-                if (line == endLine && 
-                  endColumn != UNKNOWN && endColumn != END_UNUSED) {
+                if (line == endLine && endColumn != UNKNOWN
+                        && endColumn != END_UNUSED) {
                     s += "-" + endColumn;
                 }
-                if (line != endLine && 
-                      endColumn != UNKNOWN && endColumn != END_UNUSED) {
+                if (line != endLine && endColumn != UNKNOWN
+                        && endColumn != END_UNUSED) {
                     s += "-" + endLine + "," + endColumn;
                 }
             }
         }
-        
-        if(info != null) {
-        	s += " (" + info + ")";
+
+        if (info != null) {
+            s += " (" + info + ")";
         }
-        
+
         return s;
     }
 }

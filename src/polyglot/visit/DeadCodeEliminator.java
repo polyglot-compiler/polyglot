@@ -69,255 +69,271 @@ import polyglot.visit.FlowGraph.Peer;
  * Visitor which performs dead code elimination.  (Note that "dead code" is not
  * unreachable code, but is actually code that has no effect.)
  */
-public class DeadCodeEliminator extends DataFlow<DeadCodeEliminator.DataFlowItem> {
+public class DeadCodeEliminator extends
+        DataFlow<DeadCodeEliminator.DataFlowItem> {
     public DeadCodeEliminator(Job job, TypeSystem ts, NodeFactory nf) {
-	super(job, ts, nf,
-	      false /* backward analysis */,
-	      true  /* perform dataflow on entry to CodeDecls */);
+        super(job, ts, nf, false /* backward analysis */, true /* perform dataflow on entry to CodeDecls */);
     }
 
     protected static class DataFlowItem extends polyglot.visit.DataFlow.Item {
-	// Set of LocalInstances of live variables.
-	private Set<LocalInstance> liveVars;
+        // Set of LocalInstances of live variables.
+        private Set<LocalInstance> liveVars;
 
-	// Set of LocalInstances of live declarations.  A LocalDecl is live if
-	// the declared local is ever live.
-	private Set<LocalInstance> liveDecls;
+        // Set of LocalInstances of live declarations.  A LocalDecl is live if
+        // the declared local is ever live.
+        private Set<LocalInstance> liveDecls;
 
-	/**
-	 * Constructor for creating an empty set.
-	 */
-	protected DataFlowItem() {
-	    this.liveVars = new HashSet<LocalInstance>();
-	    this.liveDecls = new HashSet<LocalInstance>();
-	}
+        /**
+         * Constructor for creating an empty set.
+         */
+        protected DataFlowItem() {
+            this.liveVars = new HashSet<LocalInstance>();
+            this.liveDecls = new HashSet<LocalInstance>();
+        }
 
-	/**
-	 * Deep copy constructor.
-	 */
-	protected DataFlowItem(DataFlowItem dfi) {
-	    liveVars = new HashSet<LocalInstance>(dfi.liveVars);
-	    liveDecls = new HashSet<LocalInstance>(dfi.liveDecls);
-	}
+        /**
+         * Deep copy constructor.
+         */
+        protected DataFlowItem(DataFlowItem dfi) {
+            liveVars = new HashSet<LocalInstance>(dfi.liveVars);
+            liveDecls = new HashSet<LocalInstance>(dfi.liveDecls);
+        }
 
-	public void add(LocalInstance li) {
-	    liveVars.add(li);
-	    liveDecls.add(li);
-	}
+        public void add(LocalInstance li) {
+            liveVars.add(li);
+            liveDecls.add(li);
+        }
 
-	public void addAll(Set<LocalInstance> lis) {
-	    liveVars.addAll(lis);
-	    liveDecls.addAll(lis);
-	}
+        public void addAll(Set<LocalInstance> lis) {
+            liveVars.addAll(lis);
+            liveDecls.addAll(lis);
+        }
 
-	public void remove(LocalInstance li) {
-	    liveVars.remove(li);
-	}
+        public void remove(LocalInstance li) {
+            liveVars.remove(li);
+        }
 
-	public void removeAll(Set<LocalInstance> lis) {
-	    liveVars.removeAll(lis);
-	}
+        public void removeAll(Set<LocalInstance> lis) {
+            liveVars.removeAll(lis);
+        }
 
-	public void removeDecl(LocalInstance li) {
-	    liveVars.remove(li);
-	    liveDecls.remove(li);
-	}
+        public void removeDecl(LocalInstance li) {
+            liveVars.remove(li);
+            liveDecls.remove(li);
+        }
 
-	public void union(DataFlowItem dfi) {
-	    liveVars.addAll(dfi.liveVars);
-	    liveDecls.addAll(dfi.liveDecls);
-	}
+        public void union(DataFlowItem dfi) {
+            liveVars.addAll(dfi.liveVars);
+            liveDecls.addAll(dfi.liveDecls);
+        }
 
-	protected boolean needDecl(LocalInstance li) {
-	    return liveDecls.contains(li);
-	}
+        protected boolean needDecl(LocalInstance li) {
+            return liveDecls.contains(li);
+        }
 
-	protected boolean needDef(LocalInstance li) {
-	    return liveVars.contains(li);
-	}
+        protected boolean needDef(LocalInstance li) {
+            return liveVars.contains(li);
+        }
 
-	@Override
-    public int hashCode() {
-	    int result = 0;
-	    for (LocalInstance li : liveVars) {
-		result = 31*result + li.hashCode();
-	    }
+        @Override
+        public int hashCode() {
+            int result = 0;
+            for (LocalInstance li : liveVars) {
+                result = 31 * result + li.hashCode();
+            }
 
-	    for (LocalInstance li : liveDecls) {
-		result = 31*result + li.hashCode();
-	    }
+            for (LocalInstance li : liveDecls) {
+                result = 31 * result + li.hashCode();
+            }
 
-	    return result;
-	}
+            return result;
+        }
 
-	@Override
-    public boolean equals(Object o) {
-	    if (!(o instanceof DataFlowItem)) return false;
+        @Override
+        public boolean equals(Object o) {
+            if (!(o instanceof DataFlowItem)) return false;
 
-	    DataFlowItem dfi = (DataFlowItem)o;
-	    return liveVars.equals(dfi.liveVars)
-		&& liveDecls.equals(dfi.liveDecls);
-	}
+            DataFlowItem dfi = (DataFlowItem) o;
+            return liveVars.equals(dfi.liveVars)
+                    && liveDecls.equals(dfi.liveDecls);
+        }
 
-	@Override
-    public String toString() {
-	    return "<vars=" + liveVars + " ; decls=" + liveDecls + ">";
-	}
+        @Override
+        public String toString() {
+            return "<vars=" + liveVars + " ; decls=" + liveDecls + ">";
+        }
     }
 
     @Override
-    public DataFlowItem createInitialItem(FlowGraph<DataFlowItem> graph, Term node, boolean entry) {
-	return new DataFlowItem();
+    public DataFlowItem createInitialItem(FlowGraph<DataFlowItem> graph,
+            Term node, boolean entry) {
+        return new DataFlowItem();
     }
 
     @Override
-    public DataFlowItem confluence(List<DataFlowItem> inItems, Term node, boolean entry, FlowGraph<DataFlowItem> graph) {
-	DataFlowItem result = null;
-	for (DataFlowItem inItem : inItems) {
-	    if (result == null) {
-		result = new DataFlowItem(inItem);
-	    } else {
-		result.union(inItem);
-	    }
-	}
+    public DataFlowItem confluence(List<DataFlowItem> inItems, Term node,
+            boolean entry, FlowGraph<DataFlowItem> graph) {
+        DataFlowItem result = null;
+        for (DataFlowItem inItem : inItems) {
+            if (result == null) {
+                result = new DataFlowItem(inItem);
+            }
+            else {
+                result.union(inItem);
+            }
+        }
 
-	return result;
-    }
-
-    @Override
-    public Map<EdgeKey, DataFlowItem> flow(DataFlowItem in, FlowGraph<DataFlowItem> graph, Term t, boolean entry, Set<EdgeKey> succEdgeKeys) {
-	return itemToMap(flow(in, graph, t, entry), succEdgeKeys);
-    }
-
-    protected DataFlowItem flow(DataFlowItem in, FlowGraph<DataFlowItem> graph, Term t, boolean entry) {
-	DataFlowItem result = new DataFlowItem(in);
-    
-    if (entry) {
         return result;
     }
 
-	Pair<Set<LocalInstance>, Set<LocalInstance>> du = null;
+    @Override
+    public Map<EdgeKey, DataFlowItem> flow(DataFlowItem in,
+            FlowGraph<DataFlowItem> graph, Term t, boolean entry,
+            Set<EdgeKey> succEdgeKeys) {
+        return itemToMap(flow(in, graph, t, entry), succEdgeKeys);
+    }
 
-	if (t instanceof LocalDecl) {
-	    LocalDecl n = (LocalDecl)t;
+    protected DataFlowItem flow(DataFlowItem in, FlowGraph<DataFlowItem> graph,
+            Term t, boolean entry) {
+        DataFlowItem result = new DataFlowItem(in);
 
-	    LocalInstance to = n.localInstance();
-	    result.removeDecl(to);
+        if (entry) {
+            return result;
+        }
 
-	    du = getDefUse(n.init());
-	} else if (t instanceof Stmt && !(t instanceof CompoundStmt)) {
-	    du = getDefUse(t);
-	} else if (t instanceof CompoundStmt) {
-	    if (t instanceof If) {
-		du = getDefUse(((If)t).cond());
-	    } else if (t instanceof Switch) {
-		du = getDefUse(((Switch)t).expr());
-	    } else if (t instanceof Do) {
-		du = getDefUse(((Do)t).cond());
-	    } else if (t instanceof For) {
-		du = getDefUse(((For)t).cond());
-	    } else if (t instanceof While) {
-		du = getDefUse(((While)t).cond());
-	    }
-	}
+        Pair<Set<LocalInstance>, Set<LocalInstance>> du = null;
 
-	if (du != null) {
-	    result.removeAll(du.part1());
-	    result.addAll(du.part2());
-	}
+        if (t instanceof LocalDecl) {
+            LocalDecl n = (LocalDecl) t;
 
-	return result;
+            LocalInstance to = n.localInstance();
+            result.removeDecl(to);
+
+            du = getDefUse(n.init());
+        }
+        else if (t instanceof Stmt && !(t instanceof CompoundStmt)) {
+            du = getDefUse(t);
+        }
+        else if (t instanceof CompoundStmt) {
+            if (t instanceof If) {
+                du = getDefUse(((If) t).cond());
+            }
+            else if (t instanceof Switch) {
+                du = getDefUse(((Switch) t).expr());
+            }
+            else if (t instanceof Do) {
+                du = getDefUse(((Do) t).cond());
+            }
+            else if (t instanceof For) {
+                du = getDefUse(((For) t).cond());
+            }
+            else if (t instanceof While) {
+                du = getDefUse(((While) t).cond());
+            }
+        }
+
+        if (du != null) {
+            result.removeAll(du.part1());
+            result.addAll(du.part2());
+        }
+
+        return result;
     }
 
     @Override
-    public void post(FlowGraph<DataFlowItem> graph, Term root) throws SemanticException {
-	// No need to do any checking.
-	if (Report.should_report(Report.cfg, 2)) {
-	    dumpFlowGraph(graph, root);
-	}
+    public void post(FlowGraph<DataFlowItem> graph, Term root)
+            throws SemanticException {
+        // No need to do any checking.
+        if (Report.should_report(Report.cfg, 2)) {
+            dumpFlowGraph(graph, root);
+        }
     }
 
     /**
      * @throws SemanticException  
      */
     @Override
-    public void check(FlowGraph<DataFlowItem> graph, Term n, boolean entry, DataFlowItem inItem, Map<EdgeKey, DataFlowItem> outItems)
-	throws SemanticException {
+    public void check(FlowGraph<DataFlowItem> graph, Term n, boolean entry,
+            DataFlowItem inItem, Map<EdgeKey, DataFlowItem> outItems)
+            throws SemanticException {
 
-	throw new InternalCompilerError("DeadCodeEliminator.check should "
-	    + "never be called.");
+        throw new InternalCompilerError("DeadCodeEliminator.check should "
+                + "never be called.");
     }
 
     private DataFlowItem getItem(Term n) {
-	FlowGraph<DataFlowItem> g = currentFlowGraph();
-	if (g == null) return null;
+        FlowGraph<DataFlowItem> g = currentFlowGraph();
+        if (g == null) return null;
 
-	Collection<Peer<DataFlowItem>> peers = g.peers(n, Term.EXIT);
-	if (peers == null || peers.isEmpty()) return null;
+        Collection<Peer<DataFlowItem>> peers = g.peers(n, Term.EXIT);
+        if (peers == null || peers.isEmpty()) return null;
 
-	List<DataFlowItem> items = new ArrayList<DataFlowItem>();
-	for (Peer<DataFlowItem> p : peers) {
-	    if (p.inItem() != null) items.add(p.inItem());
-	}
+        List<DataFlowItem> items = new ArrayList<DataFlowItem>();
+        for (Peer<DataFlowItem> p : peers) {
+            if (p.inItem() != null) items.add(p.inItem());
+        }
 
-	return confluence(items, n, false, g);
+        return confluence(items, n, false, g);
     }
 
     @Override
     public Node leaveCall(Node old, Node n, NodeVisitor v)
-	throws SemanticException {
+            throws SemanticException {
 
-	if (n instanceof LocalDecl) {
-	    LocalDecl ld = (LocalDecl)n;
-	    DataFlowItem in = getItem(ld);
-	    if (in == null || in.needDecl(ld.localInstance())) return n;
-	    return getEffects(ld.init());
-	}
+        if (n instanceof LocalDecl) {
+            LocalDecl ld = (LocalDecl) n;
+            DataFlowItem in = getItem(ld);
+            if (in == null || in.needDecl(ld.localInstance())) return n;
+            return getEffects(ld.init());
+        }
 
-	if (n instanceof Eval) {
-	    Eval eval = (Eval)n;
-	    Expr expr = eval.expr();
-	    Local local;
-	    Expr right = null;
+        if (n instanceof Eval) {
+            Eval eval = (Eval) n;
+            Expr expr = eval.expr();
+            Local local;
+            Expr right = null;
 
-	    if (expr instanceof Assign) {
-		Assign assign = (Assign)expr;
-		Expr left = assign.left();
-		right = assign.right();
+            if (expr instanceof Assign) {
+                Assign assign = (Assign) expr;
+                Expr left = assign.left();
+                right = assign.right();
 
-		if (!(left instanceof Local)) return n;
-		local = (Local)left;
-	    } else if (expr instanceof Unary) {
-		Unary unary = (Unary)expr;
-		expr = unary.expr();
-		if (!(expr instanceof Local)) return n;
-		local = (Local)expr;
-	    } else {
-		return n;
-	    }
+                if (!(left instanceof Local)) return n;
+                local = (Local) left;
+            }
+            else if (expr instanceof Unary) {
+                Unary unary = (Unary) expr;
+                expr = unary.expr();
+                if (!(expr instanceof Local)) return n;
+                local = (Local) expr;
+            }
+            else {
+                return n;
+            }
 
-	    DataFlowItem in = getItem(eval);
-	    if (in == null || in.needDef(local.localInstance().orig())) return n;
+            DataFlowItem in = getItem(eval);
+            if (in == null || in.needDef(local.localInstance().orig()))
+                return n;
 
-	    if (right != null) {
-		return getEffects(right);
-	    }
+            if (right != null) {
+                return getEffects(right);
+            }
 
-	    return nf.Empty(Position.compilerGenerated());
-	}
+            return nf.Empty(Position.compilerGenerated());
+        }
 
-	if (n instanceof Block) {
-	    // Get rid of empty statements.
-	    Block b = (Block)n;
-	    List<Stmt> stmts = new ArrayList<Stmt>(b.statements());
-	    for (Iterator<Stmt> it = stmts.iterator(); it.hasNext(); ) {
-		if (it.next() instanceof Empty) it.remove();
-	    }
+        if (n instanceof Block) {
+            // Get rid of empty statements.
+            Block b = (Block) n;
+            List<Stmt> stmts = new ArrayList<Stmt>(b.statements());
+            for (Iterator<Stmt> it = stmts.iterator(); it.hasNext();) {
+                if (it.next() instanceof Empty) it.remove();
+            }
 
-	    return b.statements(stmts);
-	}
+            return b.statements(stmts);
+        }
 
-	return n;
+        return n;
     }
 
     /**
@@ -326,51 +342,53 @@ public class DeadCodeEliminator extends DataFlow<DeadCodeEliminator.DataFlowItem
      * Element 1 is the set of local instances USEd by the node.
      */
     protected Pair<Set<LocalInstance>, Set<LocalInstance>> getDefUse(Node n) {
-	final Set<LocalInstance> def = new HashSet<LocalInstance>();
-	final Set<LocalInstance> use = new HashSet<LocalInstance>();
+        final Set<LocalInstance> def = new HashSet<LocalInstance>();
+        final Set<LocalInstance> use = new HashSet<LocalInstance>();
 
-	if (n != null) {
-	    n.visit(createDefUseFinder(def, use));
-	}
+        if (n != null) {
+            n.visit(createDefUseFinder(def, use));
+        }
 
-	return new Pair<Set<LocalInstance>, Set<LocalInstance>>(def, use);
+        return new Pair<Set<LocalInstance>, Set<LocalInstance>>(def, use);
     }
 
-    protected NodeVisitor createDefUseFinder(Set<LocalInstance> def, Set<LocalInstance> use) {
-	return new DefUseFinder(def, use);
+    protected NodeVisitor createDefUseFinder(Set<LocalInstance> def,
+            Set<LocalInstance> use) {
+        return new DefUseFinder(def, use);
     }
 
     protected static class DefUseFinder extends HaltingVisitor {
-	protected Set<LocalInstance> def;
-	protected Set<LocalInstance> use;
+        protected Set<LocalInstance> def;
+        protected Set<LocalInstance> use;
 
-	public DefUseFinder(Set<LocalInstance> def, Set<LocalInstance> use) {
-	    this.def = def;
-	    this.use = use;
-	}
+        public DefUseFinder(Set<LocalInstance> def, Set<LocalInstance> use) {
+            this.def = def;
+            this.use = use;
+        }
 
-	@Override
-    public NodeVisitor enter(Node n) {
-	    if (n instanceof LocalAssign) {
-		return bypass(((Assign)n).left());
-	    }
+        @Override
+        public NodeVisitor enter(Node n) {
+            if (n instanceof LocalAssign) {
+                return bypass(((Assign) n).left());
+            }
 
-	    return super.enter(n);
-	}
+            return super.enter(n);
+        }
 
-	@Override
-    public Node leave(Node old, Node n, NodeVisitor v) {
-	    if (n instanceof Local) {
-		use.add(((Local)n).localInstance().orig());
-	    } else if (n instanceof Assign) {
-		Expr left = ((Assign)n).left();
-		if (left instanceof Local) {
-		    def.add(((Local)left).localInstance().orig());
-		}
-	    }
+        @Override
+        public Node leave(Node old, Node n, NodeVisitor v) {
+            if (n instanceof Local) {
+                use.add(((Local) n).localInstance().orig());
+            }
+            else if (n instanceof Assign) {
+                Expr left = ((Assign) n).left();
+                if (left instanceof Local) {
+                    def.add(((Local) left).localInstance().orig());
+                }
+            }
 
-	    return n;
-	}
+            return n;
+        }
     }
 
     /**
@@ -378,57 +396,57 @@ public class DeadCodeEliminator extends DataFlow<DeadCodeEliminator.DataFlowItem
      * expression.
      */
     protected Stmt getEffects(Expr expr) {
-	Stmt empty = nf.Empty(Position.compilerGenerated());
-	if (expr == null) return empty;
+        Stmt empty = nf.Empty(Position.compilerGenerated());
+        if (expr == null) return empty;
 
-	final List<Stmt> result = new LinkedList<Stmt>();
-	final Position pos = Position.compilerGenerated();
+        final List<Stmt> result = new LinkedList<Stmt>();
+        final Position pos = Position.compilerGenerated();
 
-	NodeVisitor v = new HaltingVisitor() {
-	    @Override
-        public NodeVisitor enter(Node n) {
-		if (n instanceof Assign || n instanceof ProcedureCall) {
-		    return bypassChildren(n);
-		}
+        NodeVisitor v = new HaltingVisitor() {
+            @Override
+            public NodeVisitor enter(Node n) {
+                if (n instanceof Assign || n instanceof ProcedureCall) {
+                    return bypassChildren(n);
+                }
 
-		// XXX Cast
+                // XXX Cast
 
-		if (n instanceof Unary) {
-		    Unary.Operator op = ((Unary)n).operator();
-		    if (op == Unary.POST_INC || op == Unary.POST_DEC
-			|| op == Unary.PRE_INC || op == Unary.PRE_INC) {
+                if (n instanceof Unary) {
+                    Unary.Operator op = ((Unary) n).operator();
+                    if (op == Unary.POST_INC || op == Unary.POST_DEC
+                            || op == Unary.PRE_INC || op == Unary.PRE_INC) {
 
-			return bypassChildren(n);
-		    }
-		}
+                        return bypassChildren(n);
+                    }
+                }
 
-		return this;
-	    }
+                return this;
+            }
 
-	    @Override
-        public Node leave(Node old, Node n, NodeVisitor v) {
-		if (n instanceof Assign || n instanceof ProcedureCall) {
-		    result.add(nf.Eval(pos, (Expr)n));
-		} else if (n instanceof Unary) {
-		    Unary.Operator op = ((Unary)n).operator();
-		    if (op == Unary.POST_INC || op == Unary.POST_DEC
-			|| op == Unary.PRE_INC || op == Unary.PRE_INC) {
+            @Override
+            public Node leave(Node old, Node n, NodeVisitor v) {
+                if (n instanceof Assign || n instanceof ProcedureCall) {
+                    result.add(nf.Eval(pos, (Expr) n));
+                }
+                else if (n instanceof Unary) {
+                    Unary.Operator op = ((Unary) n).operator();
+                    if (op == Unary.POST_INC || op == Unary.POST_DEC
+                            || op == Unary.PRE_INC || op == Unary.PRE_INC) {
 
-			result.add(nf.Eval(pos, (Expr)n));
-		    }
-		}
+                        result.add(nf.Eval(pos, (Expr) n));
+                    }
+                }
 
-		// XXX Cast
+                // XXX Cast
 
-		return n;
-	    }
-	};
+                return n;
+            }
+        };
 
-	expr.visit(v);
+        expr.visit(v);
 
-	if (result.isEmpty()) return empty;
-	if (result.size() == 1) return result.get(0);
-	return nf.Block(Position.compilerGenerated(), result);
+        if (result.isEmpty()) return empty;
+        if (result.size() == 1) return result.get(0);
+        return nf.Block(Position.compilerGenerated(), result);
     }
 }
-

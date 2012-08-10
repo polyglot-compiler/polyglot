@@ -58,27 +58,27 @@ public interface Goal {
      * over both goals could access the same data.
      */
     public boolean conflictsWith(Goal goal);
-    
+
     /**
      * Create a pass that will attempt to reach the goal. Note that the goal may
      * not be reached even if the pass succeeds. In this case, the scheduler
      * will create another pass and try again.
      */
     public Pass createPass(ExtensionInfo extInfo);
-    
+
     /**
      * Goals on which this goal may mutually depend. If the passes for all
      * corequisite goals are run (possibly more than once) they should all
      * eventually be reached.
      */
     public Collection<Goal> corequisiteGoals(Scheduler scheduler);
-    
+
     /**
      * Goals that must be completed before attempting this goal. The graph of
      * dependencies between prerequisite goals should be acyclic.
      */
     public Collection<Goal> prerequisiteGoals(Scheduler scheduler);
-     
+
     /**
      * Add a new corequisite subgoal <code>g</code>.  <code>g</code> is a
      * goal on which this goal mutually depends.  The caller must be careful
@@ -86,7 +86,7 @@ public interface Goal {
      * <code>g</code> should be interned.
      */
     public void addCorequisiteGoal(Goal g, Scheduler scheduler);
-    
+
     /**
      * Add a new subgoal <code>g</code>.  <code>g</code> must be completed
      * before this goal is attempted.  <code>g</code> should be interned.
@@ -94,8 +94,9 @@ public interface Goal {
      * @throws CyclicDependencyException
      *             if a prerequisite of <code>g</code> is <code>this</code>
      */
-    public void addPrerequisiteGoal(Goal g, Scheduler scheduler) throws CyclicDependencyException;
-    
+    public void addPrerequisiteGoal(Goal g, Scheduler scheduler)
+            throws CyclicDependencyException;
+
     /** Return true if this goal is reachable. */
     public boolean isReachable();
 
@@ -104,15 +105,17 @@ public interface Goal {
 
     /** Mark the goal as reached or not reached. */
     public void setUnreachableThisRun();
+
     public void setState(int state);
+
     public int state();
-    
+
     /** Return true if this goal has been reached. */
     public boolean hasBeenReached();
-    
+
     /** Get the job associated with this goal, or null. */
     public Job job();
-    
+
     /** Get the name of the goal for debugging. */
     public String name();
 }

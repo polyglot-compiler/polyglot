@@ -15,18 +15,22 @@ import coffer.types.KeySet;
 
 public class LocalExt_c extends CofferExt_c {
     @Override
-    public void checkHeldKeys(KeySet held, KeySet stored) throws SemanticException {
+    public void checkHeldKeys(KeySet held, KeySet stored)
+            throws SemanticException {
         Local e = (Local) node();
 
         if (e.type() instanceof CofferClassType) {
             Key key = ((CofferClassType) e.type()).key();
 
             if (key != null) {
-                if (! stored.contains(key)) {
-                    throw new SemanticException(
-                        "Can evaluate expression of type \"" +
-                        e.type() + "\" only if key \"" + key +
-                        "\" is held by \"" + e.name() + "\".", e.position());
+                if (!stored.contains(key)) {
+                    throw new SemanticException("Can evaluate expression of type \""
+                                                        + e.type()
+                                                        + "\" only if key \""
+                                                        + key
+                                                        + "\" is held by \""
+                                                        + e.name() + "\".",
+                                                e.position());
 
                 }
             }

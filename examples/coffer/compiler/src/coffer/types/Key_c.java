@@ -12,8 +12,7 @@ import polyglot.types.TypeObject_c;
 import polyglot.types.TypeSystem;
 import polyglot.util.Position;
 
-public abstract class Key_c extends TypeObject_c implements Key
-{
+public abstract class Key_c extends TypeObject_c implements Key {
     protected String name;
 
     public Key_c(TypeSystem ts, Position pos, String name) {
@@ -27,9 +26,9 @@ public abstract class Key_c extends TypeObject_c implements Key
     }
 
     public Key name(String name) {
-	Key_c n = (Key_c) copy();
-	n.name = name;
-	return n;
+        Key_c n = (Key_c) copy();
+        n.name = name;
+        return n;
     }
 
     @Override

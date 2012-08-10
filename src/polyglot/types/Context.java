@@ -38,8 +38,7 @@ import polyglot.util.Copy;
  * scope is updated in place.  Names added to the context are added
  * in the current scope.
  */
-public interface Context extends Resolver, Copy
-{
+public interface Context extends Resolver, Copy {
     /** The type system. */
     TypeSystem typeSystem();
 
@@ -56,7 +55,8 @@ public interface Context extends Resolver, Copy
      * @param formalTypes A list of <code>Type</code>.
      * @see polyglot.types.Type
      */
-    MethodInstance findMethod(String name, List<? extends Type> formalTypes) throws SemanticException;
+    MethodInstance findMethod(String name, List<? extends Type> formalTypes)
+            throws SemanticException;
 
     /** Looks up a local variable or field in the current scope. */
     VarInstance findVariable(String name) throws SemanticException;
@@ -66,7 +66,7 @@ public interface Context extends Resolver, Copy
 
     /** Looks up a local variable in the current scope. */
     LocalInstance findLocal(String name) throws SemanticException;
-    
+
     /** Looks up a local variable in the current scope. */
     LocalInstance findLocalSilent(String name);
 
@@ -138,7 +138,7 @@ public interface Context extends Resolver, Copy
 
     /** Return the innermost class in scope. */
     ClassType currentClass();
- 
+
     /** Return the innermost class in scope. */
     ParsedClassType currentClassScope();
 

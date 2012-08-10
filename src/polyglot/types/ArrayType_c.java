@@ -35,19 +35,19 @@ import polyglot.util.Position;
 /**
  * An <code>ArrayType</code> represents an array of base java types.
  */
-public class ArrayType_c extends ReferenceType_c implements ArrayType
-{
+public class ArrayType_c extends ReferenceType_c implements ArrayType {
     protected Type base;
     protected List<FieldInstance> fields;
     protected List<MethodInstance> methods;
     protected List<ClassType> interfaces;
 
     /** Used for deserializing types. */
-    protected ArrayType_c() { }
+    protected ArrayType_c() {
+    }
 
     public ArrayType_c(TypeSystem ts, Position pos, Type base) {
-	super(ts, pos);
-	this.base = base;
+        super(ts, pos);
+        this.base = base;
 
         methods = null;
         fields = null;
@@ -77,23 +77,24 @@ public class ArrayType_c extends ReferenceType_c implements ArrayType
     }
 
     protected FieldInstance createLengthFieldInstance() {
-        FieldInstance fi = ts.fieldInstance(position(),
-                this,
-                ts.Public().Final(),
-                ts.Int(),
-                "length");
+        FieldInstance fi =
+                ts.fieldInstance(position(),
+                                 this,
+                                 ts.Public().Final(),
+                                 ts.Int(),
+                                 "length");
         fi.setNotConstant();
         return fi;
     }
 
     protected MethodInstance createCloneMethodInstance() {
         return ts.methodInstance(position(),
-                this,
-                ts.Public(),
-                ts.Object(),
-                "clone",
-                Collections.<Type> emptyList(),
-                Collections.<Type> emptyList());
+                                 this,
+                                 ts.Public(),
+                                 ts.Object(),
+                                 "clone",
+                                 Collections.<Type> emptyList(),
+                                 Collections.<Type> emptyList());
     }
 
     /** Get the base type of the array. */
@@ -105,11 +106,10 @@ public class ArrayType_c extends ReferenceType_c implements ArrayType
     /** Set the base type of the array. */
     @Override
     public ArrayType base(Type base) {
-        if (base == this.base)
-            return this;
-	ArrayType_c n = (ArrayType_c) copy();
-	n.base = base;
-	return n;
+        if (base == this.base) return this;
+        ArrayType_c n = (ArrayType_c) copy();
+        n.base = base;
+        return n;
     }
 
     /** Get the ulitimate base type of the array. */
@@ -134,45 +134,50 @@ public class ArrayType_c extends ReferenceType_c implements ArrayType
 
     @Override
     public void print(CodeWriter w) {
-	base().print(w);
-	w.write("[]");
+        base().print(w);
+        w.write("[]");
     }
 
     /** Translate the type. */
     @Override
     public String translate(Resolver c) {
-        return base().translate(c) + "[]"; 
+        return base().translate(c) + "[]";
     }
 
     /** Returns true iff the type is canonical. */
     @Override
     public boolean isCanonical() {
-	return base().isCanonical();
+        return base().isCanonical();
     }
 
     @Override
-    public boolean isArray() { return true; }
+    public boolean isArray() {
+        return true;
+    }
+
     @Override
-    public ArrayType toArray() { return this; }
+    public ArrayType toArray() {
+        return this;
+    }
 
     /** Get the methods implemented by the array type. */
     @Override
     public List<? extends MethodInstance> methods() {
         init();
-	return Collections.unmodifiableList(methods);
+        return Collections.unmodifiableList(methods);
     }
 
     /** Get the fields of the array type. */
     @Override
     public List<? extends FieldInstance> fields() {
         init();
-	return Collections.unmodifiableList(fields);
+        return Collections.unmodifiableList(fields);
     }
 
     /** Get the clone() method. */
     @Override
     public MethodInstance cloneMethod() {
-	return methods().get(0);
+        return methods().get(0);
     }
 
     /** Get a field of the type by name. */
@@ -185,25 +190,25 @@ public class ArrayType_c extends ReferenceType_c implements ArrayType
     /** Get the length field. */
     @Override
     public FieldInstance lengthField() {
-	return fields().get(0);
+        return fields().get(0);
     }
 
     /** Get the super type of the array type. */
     @Override
     public Type superType() {
-	return ts.Object();
+        return ts.Object();
     }
 
     /** Get the interfaces implemented by the array type. */
     @Override
     public List<? extends ReferenceType> interfaces() {
         init();
-	return Collections.unmodifiableList(interfaces);
+        return Collections.unmodifiableList(interfaces);
     }
 
     @Override
     public int hashCode() {
-	return base().hashCode() << 1;
+        return base().hashCode() << 1;
     }
 
     @Override
@@ -212,7 +217,7 @@ public class ArrayType_c extends ReferenceType_c implements ArrayType
             ArrayType a = (ArrayType) t;
             return ts.equals(base(), a.base());
         }
-	return false;
+        return false;
     }
 
     @Override
@@ -221,7 +226,7 @@ public class ArrayType_c extends ReferenceType_c implements ArrayType
             ArrayType a = (ArrayType) t;
             return ts.typeEquals(base(), a.base());
         }
-	return false;
+        return false;
     }
 
     @Override
@@ -249,21 +254,21 @@ public class ArrayType_c extends ReferenceType_c implements ArrayType
      **/
     @Override
     public boolean isCastValidImpl(Type toType) {
-        if (! toType.isReference()) return false;
+        if (!toType.isReference()) return false;
 
-	if (toType.isArray()) {
-	    Type fromBase = base();
-	    Type toBase = toType.toArray().base();
+        if (toType.isArray()) {
+            Type fromBase = base();
+            Type toBase = toType.toArray().base();
 
-	    if (fromBase.isPrimitive()) return ts.typeEquals(toBase, fromBase);
-	    if (toBase.isPrimitive()) return false;
+            if (fromBase.isPrimitive()) return ts.typeEquals(toBase, fromBase);
+            if (toBase.isPrimitive()) return false;
 
-	    if (fromBase.isNull()) return false;
-	    if (toBase.isNull()) return false;
+            if (fromBase.isNull()) return false;
+            if (toBase.isNull()) return false;
 
-	    // Both are reference types.
-	    return ts.isCastValid(fromBase, toBase);
-	}
+            // Both are reference types.
+            return ts.isCastValid(fromBase, toBase);
+        }
 
         // Ancestor is not an array, but child is.  Check if the array
         // is a subtype of the ancestor.  This happens when ancestor

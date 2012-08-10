@@ -24,17 +24,21 @@ public class JL5Field_c extends Field_c {
 
     @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
-        Field n = (Field)super.typeCheck(tc);
+        Field n = (Field) super.typeCheck(tc);
         if (n.fieldInstance() instanceof EnumInstance) {
             // it's an enum, so replace this with the appropriate AST node for enum constants.
-            JL5NodeFactory nf = (JL5NodeFactory)tc.nodeFactory();
-            EnumConstant ec = nf.EnumConstant(this.position(), this.target(), nf.Id(this.position, this.name()));
-            ec = (EnumConstant)ec.type(this.type);
-            ec = ec.enumInstance((EnumInstance)n.fieldInstance());
+            JL5NodeFactory nf = (JL5NodeFactory) tc.nodeFactory();
+            EnumConstant ec =
+                    nf.EnumConstant(this.position(),
+                                    this.target(),
+                                    nf.Id(this.position, this.name()));
+            ec = (EnumConstant) ec.type(this.type);
+            ec = ec.enumInstance((EnumInstance) n.fieldInstance());
             n = ec;
         }
-        return n;        
+        return n;
     }
+
     @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
         w.begin(0);
@@ -43,10 +47,11 @@ public class JL5Field_c extends Field_c {
             if (target instanceof Expr) {
                 printSubExpr((Expr) target, w, tr);
             }
-            else if (target instanceof TypeNode || target instanceof AmbReceiver) {
+            else if (target instanceof TypeNode
+                    || target instanceof AmbReceiver) {
                 if (tr instanceof JL5Translator) {
-                    JL5Translator jltr = (JL5Translator)tr;
-                    jltr.printReceiver(target, w);                    
+                    JL5Translator jltr = (JL5Translator) tr;
+                    jltr.printReceiver(target, w);
                 }
                 else {
                     print(target, w, tr);

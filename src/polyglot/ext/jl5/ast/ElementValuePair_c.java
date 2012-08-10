@@ -18,29 +18,29 @@ import polyglot.visit.Translator;
 import polyglot.visit.TypeChecker;
 
 public class ElementValuePair_c extends Term_c implements ElementValuePair {
-   
+
     protected Id name;
     protected Expr value;
-    
-    public ElementValuePair_c(Position pos, Id name, Expr value){
+
+    public ElementValuePair_c(Position pos, Id name, Expr value) {
         super(pos);
         this.name = name;
         this.value = value;
     }
 
     @Override
-    public String name(){
+    public String name() {
         return name.id();
     }
 
     @Override
-    public Id id(){
+    public Id id() {
         return name;
     }
 
-    public ElementValuePair name(String name){
-        if (!name.equals(this.name.id())){
-            ElementValuePair_c n = (ElementValuePair_c)copy();
+    public ElementValuePair name(String name) {
+        if (!name.equals(this.name.id())) {
+            ElementValuePair_c n = (ElementValuePair_c) copy();
             n.name = this.name.id(name);
             return n;
         }
@@ -48,49 +48,48 @@ public class ElementValuePair_c extends Term_c implements ElementValuePair {
     }
 
     @Override
-    public Expr value(){
+    public Expr value() {
         return value;
     }
 
-    public ElementValuePair value(Expr value){
-        if (!value.equals(this.value)){
-            ElementValuePair_c n = (ElementValuePair_c)copy();
+    public ElementValuePair value(Expr value) {
+        if (!value.equals(this.value)) {
+            ElementValuePair_c n = (ElementValuePair_c) copy();
             n.value = value;
             return n;
         }
         return this;
     }
 
-    
     @Override
-    public Node visitChildren(NodeVisitor v){
+    public Node visitChildren(NodeVisitor v) {
         Expr value = (Expr) visitChild(this.value, v);
         return value(value);
     }
 
     @Override
-    public Node typeCheck(TypeChecker tc) throws SemanticException{
-        JL5TypeSystem ts = (JL5TypeSystem)tc.typeSystem();
+    public Node typeCheck(TypeChecker tc) throws SemanticException {
+        JL5TypeSystem ts = (JL5TypeSystem) tc.typeSystem();
         ts.checkAnnotationValueConstant(value);
         return this;
     }
-    
+
     @Override
-	public void prettyPrint(CodeWriter w, PrettyPrinter pp) {
-        w.write(name+"=");
+    public void prettyPrint(CodeWriter w, PrettyPrinter pp) {
+        w.write(name + "=");
         print(value, w, pp);
     }
-    
+
     @Override
-    public void translate(CodeWriter w, Translator tr){
-        w.write(name+"=");
+    public void translate(CodeWriter w, Translator tr) {
+        w.write(name + "=");
         print(value, w, tr);
     }
-    
+
     public Term entry() {
         return this;
     }
-    
+
     @Override
     public <T> List<T> acceptCFG(CFGBuilder<?> v, List<T> succs) {
         v.visitCFG(value, this, EXIT);
@@ -101,5 +100,5 @@ public class ElementValuePair_c extends Term_c implements ElementValuePair {
     public Term firstChild() {
         return this.value;
     }
-        
+
 }

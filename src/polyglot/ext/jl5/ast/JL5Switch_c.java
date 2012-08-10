@@ -1,6 +1,5 @@
 package polyglot.ext.jl5.ast;
 
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,37 +14,41 @@ import polyglot.types.Type;
 import polyglot.util.Position;
 import polyglot.visit.TypeChecker;
 
-public class JL5Switch_c extends Switch_c implements JL5Switch  {
+public class JL5Switch_c extends Switch_c implements JL5Switch {
 
-    public JL5Switch_c(Position pos, Expr expr, List<SwitchElement> elements){
+    public JL5Switch_c(Position pos, Expr expr, List<SwitchElement> elements) {
         super(pos, expr, elements);
     }
 
     @Override
-	public Node typeCheck(TypeChecker tc) throws SemanticException {
+    public Node typeCheck(TypeChecker tc) throws SemanticException {
 
-        if (!isAcceptableSwitchType(expr.type())) { 
+        if (!isAcceptableSwitchType(expr.type())) {
             throw new SemanticException("Switch index must be of type char, byte, short, int, Character, Byte, Short, Integer, or an enum type.",
                                         position());
         }
-   
-        ArrayList<SwitchElement> newels = new ArrayList<SwitchElement>(elements.size());
+
+        ArrayList<SwitchElement> newels =
+                new ArrayList<SwitchElement>(elements.size());
         Type switchType = expr.type();
-        for(SwitchElement el : elements()) {
-        	if(el instanceof JL5Case) {
-        		el = (SwitchElement) ((JL5Case) el).resolveCaseLabel(tc, switchType);
-        	}
-        	newels.add(el);
+        for (SwitchElement el : elements()) {
+            if (el instanceof JL5Case) {
+                el =
+                        (SwitchElement) ((JL5Case) el).resolveCaseLabel(tc,
+                                                                        switchType);
+            }
+            newels.add(el);
         }
         return elements(newels);
     }
 
     protected boolean isAcceptableSwitchType(Type type) {
-        JL5TypeSystem ts = (JL5TypeSystem)type.typeSystem();
-        if (ts.Char().equals(type) || ts.Byte().equals(type) || ts.Short().equals(type) || ts.Int().equals(type)) {
+        JL5TypeSystem ts = (JL5TypeSystem) type.typeSystem();
+        if (ts.Char().equals(type) || ts.Byte().equals(type)
+                || ts.Short().equals(type) || ts.Int().equals(type)) {
             return true;
         }
-        if (ts.wrapperClassOfPrimitive(ts.Char()).equals(type) 
+        if (ts.wrapperClassOfPrimitive(ts.Char()).equals(type)
                 || ts.wrapperClassOfPrimitive(ts.Byte()).equals(type)
                 || ts.wrapperClassOfPrimitive(ts.Short()).equals(type)
                 || ts.wrapperClassOfPrimitive(ts.Int()).equals(type)) {

@@ -27,9 +27,8 @@ import polyglot.types.Type;
 import polyglot.util.CollectionUtil;
 import polyglot.util.Position;
 
-public class CofferTypeSystem_c extends ParamTypeSystem_c<Key, Key>
-                            implements CofferTypeSystem
-{
+public class CofferTypeSystem_c extends ParamTypeSystem_c<Key, Key> implements
+        CofferTypeSystem {
     @Override
     protected void initTypes() {
         // Do not initialize types.  This allows us to compile
@@ -37,10 +36,9 @@ public class CofferTypeSystem_c extends ParamTypeSystem_c<Key, Key>
     }
 
     @Override
-    public ParsedClassType createClassType(LazyClassInitializer init, 
-                                           Source fromSource)
-    {
-        if (! init.fromClassFile()) {
+    public ParsedClassType createClassType(LazyClassInitializer init,
+            Source fromSource) {
+        if (!init.fromClassFile()) {
             return new CofferParsedClassType_c(this, init, fromSource);
         }
         else {
@@ -59,9 +57,15 @@ public class CofferTypeSystem_c extends ParamTypeSystem_c<Key, Key>
             l.add(throwConstraint(t.position(), t, emptyKeySet(pos)));
         }
 
-        return cofferMethodInstance(pos, container, flags, returnType, name,
-                                   argTypes, emptyKeySet(pos),
-                                   emptyKeySet(pos), l);
+        return cofferMethodInstance(pos,
+                                    container,
+                                    flags,
+                                    returnType,
+                                    name,
+                                    argTypes,
+                                    emptyKeySet(pos),
+                                    emptyKeySet(pos),
+                                    l);
     }
 
     @Override
@@ -70,13 +74,17 @@ public class CofferTypeSystem_c extends ParamTypeSystem_c<Key, Key>
             List<? extends Type> argTypes, KeySet entryKeys, KeySet returnKeys,
             List<ThrowConstraint> throwConstraints) {
 
-        CofferMethodInstance mi = new CofferMethodInstance_c(this, pos,
-                                                           container, flags,
-                                                           returnType, name,
-                                                           argTypes,
-                                                           entryKeys,
-                                                           returnKeys,
-                                                           throwConstraints);
+        CofferMethodInstance mi =
+                new CofferMethodInstance_c(this,
+                                           pos,
+                                           container,
+                                           flags,
+                                           returnType,
+                                           name,
+                                           argTypes,
+                                           entryKeys,
+                                           returnKeys,
+                                           throwConstraints);
         return mi;
     }
 
@@ -91,9 +99,13 @@ public class CofferTypeSystem_c extends ParamTypeSystem_c<Key, Key>
             l.add(throwConstraint(t.position(), t, emptyKeySet(pos)));
         }
 
-        return cofferConstructorInstance(pos, container, flags,
-                                        argTypes, emptyKeySet(pos),
-                                        emptyKeySet(pos), l);
+        return cofferConstructorInstance(pos,
+                                         container,
+                                         flags,
+                                         argTypes,
+                                         emptyKeySet(pos),
+                                         emptyKeySet(pos),
+                                         l);
     }
 
     @Override
@@ -102,12 +114,15 @@ public class CofferTypeSystem_c extends ParamTypeSystem_c<Key, Key>
             KeySet entryKeys, KeySet returnKeys,
             List<ThrowConstraint> throwConstraints) {
 
-        CofferConstructorInstance ci = new CofferConstructorInstance_c(this, pos,
-                                                           container, flags,
-                                                           argTypes,
-                                                           entryKeys,
-                                                           returnKeys,
-                                                           throwConstraints);
+        CofferConstructorInstance ci =
+                new CofferConstructorInstance_c(this,
+                                                pos,
+                                                container,
+                                                flags,
+                                                argTypes,
+                                                entryKeys,
+                                                returnKeys,
+                                                throwConstraints);
         return ci;
     }
 

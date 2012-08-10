@@ -20,36 +20,37 @@ import coffer.types.ThrowConstraint;
  */
 public class ProcedureDeclExt_c extends CofferExt_c {
     @Override
-    public void checkHeldKeys(KeySet held, KeySet stored) throws SemanticException {
+    public void checkHeldKeys(KeySet held, KeySet stored)
+            throws SemanticException {
         ProcedureDecl n = (ProcedureDecl) node();
 
         CofferProcedureInstance pi =
-            (CofferProcedureInstance) n.procedureInstance();
-            
+                (CofferProcedureInstance) n.procedureInstance();
+
         checkHeldKeys(held, pi.returnKeys(), n.position());
 
     }
-    public void checkHeldKeysThrowConstraint(ThrowConstraint tc, KeySet held, KeySet stored) 
-    throws SemanticException {
+
+    public void checkHeldKeysThrowConstraint(ThrowConstraint tc, KeySet held,
+            KeySet stored) throws SemanticException {
         checkHeldKeys(held, tc.keys(), tc.throwType().position());
-        
+
     }
-    
-    private void checkHeldKeys(KeySet held, KeySet returnKeys, Position pos) throws SemanticException {
-        if (! held.equals(returnKeys)) {
+
+    private void checkHeldKeys(KeySet held, KeySet returnKeys, Position pos)
+            throws SemanticException {
+        if (!held.equals(returnKeys)) {
             KeySet too_much = held.removeAll(returnKeys);
             returnKeys.removeAll(held);
 
             if (too_much.size() == 1) {
                 too_much.iterator().next();
-                throw new SemanticException(KeysToString(too_much) +
-                                            " not freed at return.",
-                                            pos);
+                throw new SemanticException(KeysToString(too_much)
+                        + " not freed at return.", pos);
             }
-            else if (! too_much.isEmpty()) {
-                throw new SemanticException(KeysToString(too_much) +
-                                            " not freed at return.",
-                                            pos);
+            else if (!too_much.isEmpty()) {
+                throw new SemanticException(KeysToString(too_much)
+                        + " not freed at return.", pos);
             }
 
             /*
@@ -58,6 +59,6 @@ public class ProcedureDeclExt_c extends CofferExt_c {
                                             " not held at return.",
                                             n.position());
                                             */
-        }        
+        }
     }
 }

@@ -41,92 +41,92 @@ import polyglot.visit.CFGBuilder;
  * The class of the <code>Expr</code> returned by
  * <code>FieldAssign_c.left()</code>is guaranteed to be a <code>Field</code>.
  */
-public class FieldAssign_c extends Assign_c implements FieldAssign
-{
-  public FieldAssign_c(Position pos, Field left, Operator op, Expr right) {
-    super(pos, left, op, right);
-  }
+public class FieldAssign_c extends Assign_c implements FieldAssign {
+    public FieldAssign_c(Position pos, Field left, Operator op, Expr right) {
+        super(pos, left, op, right);
+    }
 
-  @Override
-  public Assign left(Expr left) {
-      FieldAssign_c n = (FieldAssign_c)super.left(left);
-      n.assertLeftType();
-      return n;
-  }
+    @Override
+    public Assign left(Expr left) {
+        FieldAssign_c n = (FieldAssign_c) super.left(left);
+        n.assertLeftType();
+        return n;
+    }
 
-  private void assertLeftType() {
-      if (!(left() instanceof Field)) {
-          throw new InternalCompilerError("left expression of an FieldAssign must be a field");
-      }
-  }
-  
-  @Override
-  public Term firstChild() {
-      Field f = (Field)left();
-      if (f.target() instanceof Expr) {
-          return ((Expr) f.target());
-      }
-      else {
-          if (operator() != Assign.ASSIGN) {
-              return f;
-          }
-          else {
-              return right();
-          }
-      }
-  }
-  
-  @Override
-  protected void acceptCFGAssign(CFGBuilder<?> v) {
-      Field f = (Field)left();
-      if (f.target() instanceof Expr) {
-          Expr o = (Expr) f.target();
+    private void assertLeftType() {
+        if (!(left() instanceof Field)) {
+            throw new InternalCompilerError("left expression of an FieldAssign must be a field");
+        }
+    }
 
-              //     o.f = e: visit o -> e -> (o.f = e)
-              v.visitCFG(o, right(), ENTRY);              
-              v.visitCFG(right(), this, EXIT);
-      }
-      else {
-              //       T.f = e: visit e -> (T.f OP= e)
-              v.visitCFG(right(), this, EXIT);
-      }
-      
-  }
-  @Override
-  protected void acceptCFGOpAssign(CFGBuilder<?> v) {
-      /*
-      Field f = (Field)left();
-      if (f.target() instanceof Expr) {
-          Expr o = (Expr) f.target();
+    @Override
+    public Term firstChild() {
+        Field f = (Field) left();
+        if (f.target() instanceof Expr) {
+            return ((Expr) f.target());
+        }
+        else {
+            if (operator() != Assign.ASSIGN) {
+                return f;
+            }
+            else {
+                return right();
+            }
+        }
+    }
 
-          // o.f OP= e: visit o -> o.f -> e -> (o.f OP= e)
-          v.visitCFG(o, f);
-          v.visitThrow(f);
-          v.edge(f, right().entry());
-          v.visitCFG(right(), this);
-      }
-      else {
-          // T.f OP= e: visit T.f -> e -> (T.f OP= e)
-          v.visitThrow(f);
-          v.edge(f, right().entry());
-          v.visitCFG(right(), this);
-      }
-      */
-      
-      v.visitCFG(left(), right(), ENTRY);
-      v.visitCFG(right(), this, EXIT);
-  }
+    @Override
+    protected void acceptCFGAssign(CFGBuilder<?> v) {
+        Field f = (Field) left();
+        if (f.target() instanceof Expr) {
+            Expr o = (Expr) f.target();
 
-  @Override
-  public List<Type> throwTypes(TypeSystem ts) {
-      List<Type> l = new ArrayList<Type>(super.throwTypes(ts));
+            //     o.f = e: visit o -> e -> (o.f = e)
+            v.visitCFG(o, right(), ENTRY);
+            v.visitCFG(right(), this, EXIT);
+        }
+        else {
+            //       T.f = e: visit e -> (T.f OP= e)
+            v.visitCFG(right(), this, EXIT);
+        }
 
-      Field f = (Field)left();
-      if (f.target() instanceof Expr) {
-          l.add(ts.NullPointerException());
-      }
+    }
 
-      return l;
-  }  
-  
+    @Override
+    protected void acceptCFGOpAssign(CFGBuilder<?> v) {
+        /*
+        Field f = (Field)left();
+        if (f.target() instanceof Expr) {
+            Expr o = (Expr) f.target();
+
+            // o.f OP= e: visit o -> o.f -> e -> (o.f OP= e)
+            v.visitCFG(o, f);
+            v.visitThrow(f);
+            v.edge(f, right().entry());
+            v.visitCFG(right(), this);
+        }
+        else {
+            // T.f OP= e: visit T.f -> e -> (T.f OP= e)
+            v.visitThrow(f);
+            v.edge(f, right().entry());
+            v.visitCFG(right(), this);
+        }
+        */
+
+        v.visitCFG(left(), right(), ENTRY);
+        v.visitCFG(right(), this, EXIT);
+    }
+
+    @Override
+    public List<Type> throwTypes(TypeSystem ts) {
+        List<Type> l = new ArrayList<Type>(super.throwTypes(ts));
+
+        Field f = (Field) left();
+        if (f.target() instanceof Expr) {
+            l.add(ts.NullPointerException());
+        }
+
+        return l;
+    }
+
 }

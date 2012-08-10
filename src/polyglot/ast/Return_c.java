@@ -51,104 +51,101 @@ import polyglot.visit.TypeChecker;
  * It may or may not return a value.  If not <code>expr()</code> should return
  * null.
  */
-public class Return_c extends Stmt_c implements Return
-{
+public class Return_c extends Stmt_c implements Return {
     protected Expr expr;
 
     public Return_c(Position pos, Expr expr) {
-	super(pos);
-	assert(true); // expr may be null
-	this.expr = expr;
+        super(pos);
+        assert (true); // expr may be null
+        this.expr = expr;
     }
 
     /** Get the expression to return, or null. */
     @Override
     public Expr expr() {
-	return this.expr;
+        return this.expr;
     }
 
     /** Set the expression to return, or null. */
     @Override
     public Return expr(Expr expr) {
-	Return_c n = (Return_c) copy();
-	n.expr = expr;
-	return n;
+        Return_c n = (Return_c) copy();
+        n.expr = expr;
+        return n;
     }
 
     /** Reconstruct the statement. */
     protected Return_c reconstruct(Expr expr) {
-	if (expr != this.expr) {
-	    Return_c n = (Return_c) copy();
-	    n.expr = expr;
-	    return n;
-	}
+        if (expr != this.expr) {
+            Return_c n = (Return_c) copy();
+            n.expr = expr;
+            return n;
+        }
 
-	return this;
+        return this;
     }
 
     /** Visit the children of the statement. */
     @Override
     public Node visitChildren(NodeVisitor v) {
-	Expr expr = (Expr) visitChild(this.expr, v);
-	return reconstruct(expr);
+        Expr expr = (Expr) visitChild(this.expr, v);
+        return reconstruct(expr);
     }
 
     /** Type check the statement. */
     @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
-	TypeSystem ts = tc.typeSystem();
-	Context c = tc.context();
+        TypeSystem ts = tc.typeSystem();
+        Context c = tc.context();
 
-	CodeInstance ci = c.currentCode();
+        CodeInstance ci = c.currentCode();
 
-	if (ci instanceof InitializerInstance) {
-	    throw new SemanticException(
-		"Cannot return from an initializer block.", position());
-	}
+        if (ci instanceof InitializerInstance) {
+            throw new SemanticException("Cannot return from an initializer block.",
+                                        position());
+        }
 
-	if (ci instanceof ConstructorInstance) {
-	    if (expr != null) {
-		throw new SemanticException(
-		    "Cannot return a value from " + ci + ".",
-		    position());
-	    }
+        if (ci instanceof ConstructorInstance) {
+            if (expr != null) {
+                throw new SemanticException("Cannot return a value from " + ci
+                        + ".", position());
+            }
 
-	    return this;
-	}
+            return this;
+        }
 
-	if (ci instanceof FunctionInstance) {
-	    FunctionInstance fi = (FunctionInstance) ci;
+        if (ci instanceof FunctionInstance) {
+            FunctionInstance fi = (FunctionInstance) ci;
 
-	    if (fi.returnType().isVoid()) {
+            if (fi.returnType().isVoid()) {
                 if (expr != null) {
-                    throw new SemanticException("Cannot return a value from " +
-                        fi + ".", position());
+                    throw new SemanticException("Cannot return a value from "
+                            + fi + ".", position());
                 }
                 else {
                     return this;
                 }
-	    }
+            }
             else if (expr == null) {
-                throw new SemanticException("Must return a value from " +
-                    fi + ".", position());
+                throw new SemanticException("Must return a value from " + fi
+                        + ".", position());
             }
 
-	    if (ts.isImplicitCastValid(expr.type(), fi.returnType())) {
-	        return this;
-	    }
-
-            if (ts.numericConversionValid(fi.returnType(),
-                                          expr.constantValue())) {
+            if (ts.isImplicitCastValid(expr.type(), fi.returnType())) {
                 return this;
             }
 
-	    throw new SemanticException("Cannot return expression of type " +
-		expr.type() + " from " + fi + ".", expr.position());
-	}
+            if (ts.numericConversionValid(fi.returnType(), expr.constantValue())) {
+                return this;
+            }
 
-	throw new InternalCompilerError("Unrecognized code type.");
+            throw new SemanticException("Cannot return expression of type "
+                    + expr.type() + " from " + fi + ".", expr.position());
+        }
+
+        throw new InternalCompilerError("Unrecognized code type.");
     }
-  
+
     @Override
     public Type childExpectedType(Expr child, AscriptionVisitor av) {
         if (child == expr) {
@@ -177,18 +174,18 @@ public class Return_c extends Stmt_c implements Return
 
     @Override
     public String toString() {
-	return "return" + (expr != null ? " " + expr : "") + ";";
+        return "return" + (expr != null ? " " + expr : "") + ";";
     }
 
     /** Write the statement to an output file. */
     @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
-	w.write("return") ;
-	if (expr != null) {
-	    w.write(" ");
-	    print(expr, w, tr);
-	}
-	w.write(";");
+        w.write("return");
+        if (expr != null) {
+            w.write(" ");
+            print(expr, w, tr);
+        }
+        w.write(";");
     }
 
     @Override
@@ -206,7 +203,7 @@ public class Return_c extends Stmt_c implements Return
         v.visitReturn(this);
         return Collections.<T> emptyList();
     }
-    
+
     @Override
     public Node copy(NodeFactory nf) {
         return nf.Return(this.position, this.expr);

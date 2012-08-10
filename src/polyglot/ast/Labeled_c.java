@@ -37,24 +37,23 @@ import polyglot.visit.PrettyPrinter;
  * Am immutable representation of a Java statement with a label.  A labeled
  * statement contains the statement being labelled and a string label.
  */
-public class Labeled_c extends Stmt_c implements Labeled
-{
+public class Labeled_c extends Stmt_c implements Labeled {
     protected Id label;
     protected Stmt statement;
 
     public Labeled_c(Position pos, Id label, Stmt statement) {
-	super(pos);
-	assert(label != null && statement != null);
-	this.label = label;
-	this.statement = statement;
+        super(pos);
+        assert (label != null && statement != null);
+        this.label = label;
+        this.statement = statement;
     }
-    
+
     /** Get the label of the statement. */
     @Override
     public Id labelNode() {
         return this.label;
     }
-    
+
     /** Set the label of the statement. */
     @Override
     public Labeled labelNode(Id label) {
@@ -66,59 +65,59 @@ public class Labeled_c extends Stmt_c implements Labeled
     /** Get the label of the statement. */
     @Override
     public String label() {
-	return this.label.id();
+        return this.label.id();
     }
 
     /** Set the label of the statement. */
     @Override
     public Labeled label(String label) {
-	return labelNode(this.label.id(label));
+        return labelNode(this.label.id(label));
     }
 
     /** Get the sub-statement of the statement. */
     @Override
     public Stmt statement() {
-	return this.statement;
+        return this.statement;
     }
 
     /** Set the sub-statement of the statement. */
     @Override
     public Labeled statement(Stmt statement) {
-	Labeled_c n = (Labeled_c) copy();
-	n.statement = statement;
-	return n;
+        Labeled_c n = (Labeled_c) copy();
+        n.statement = statement;
+        return n;
     }
 
     /** Reconstruct the statement. */
     protected Labeled_c reconstruct(Id label, Stmt statement) {
-	if (label != this.label || statement != this.statement) {
-	    Labeled_c n = (Labeled_c) copy();
+        if (label != this.label || statement != this.statement) {
+            Labeled_c n = (Labeled_c) copy();
             n.label = label;
-	    n.statement = statement;
-	    return n;
-	}
+            n.statement = statement;
+            return n;
+        }
 
-	return this;
+        return this;
     }
 
     /** Visit the children of the statement. */
     @Override
     public Node visitChildren(NodeVisitor v) {
         Id label = (Id) visitChild(this.label, v);
-	Node statement = visitChild(this.statement, v);
-	return reconstruct(label, (Stmt) statement);
+        Node statement = visitChild(this.statement, v);
+        return reconstruct(label, (Stmt) statement);
     }
 
     @Override
     public String toString() {
-	return label + ": " + statement;
+        return label + ": " + statement;
     }
 
     /** Write the statement to an output file. */
     @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
-	w.write(label + ": ");
-	print(statement, w, tr);
+        w.write(label + ": ");
+        print(statement, w, tr);
     }
 
     @Override
@@ -131,7 +130,7 @@ public class Labeled_c extends Stmt_c implements Labeled
         v.push(this).visitCFG(statement, this, EXIT);
         return succs;
     }
-    
+
     @Override
     public Node copy(NodeFactory nf) {
         return nf.Labeled(this.position, this.label, this.statement);

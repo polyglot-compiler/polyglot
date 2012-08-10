@@ -20,7 +20,7 @@ public class JL5ImportTable extends ImportTable {
 
     public int id = counter++;
     private static int counter = 0;
-    
+
     public JL5ImportTable(TypeSystem ts, polyglot.types.Package pkg, String src) {
         super(ts, pkg, src);
         this.singleStaticImports = new ArrayList<String>();
@@ -31,19 +31,19 @@ public class JL5ImportTable extends ImportTable {
         this(ts, pkg, null);
     }
 
-    public void addSingleStaticImport(String member, Position pos){
+    public void addSingleStaticImport(String member, Position pos) {
         singleStaticImports.add(member);
     }
 
-    public void addStaticOnDemandImport(String className, Position pos){
+    public void addStaticOnDemandImport(String className, Position pos) {
         staticOnDemandImports.add(className);
     }
 
-    public List<String> singleStaticImports(){
+    public List<String> singleStaticImports() {
         return singleStaticImports;
     }
 
-    public List<String> staticOnDemandImports(){
+    public List<String> staticOnDemandImports() {
         return staticOnDemandImports;
     }
 
@@ -53,38 +53,43 @@ public class JL5ImportTable extends ImportTable {
         // may be member in static import
         for (String next : singleStaticImports) {
             String id = StringUtil.getShortNameComponent(next);
-            if (name.equals(id)){
+            if (name.equals(id)) {
                 String className = StringUtil.getPackageComponent(next);
                 Named nt = ts.forName(className);
-                if (nt instanceof Type){
-                    Type t = (Type)nt;
+                if (nt instanceof Type) {
+                    Type t = (Type) nt;
                     try {
                         result = ts.findMemberClass(t.toClass(), name);
                     }
-                    catch (SemanticException e){
+                    catch (SemanticException e) {
                     }
-                    if (result != null && ((ClassType)result).flags().isStatic()) return result;
-                }                                    
+                    if (result != null
+                            && ((ClassType) result).flags().isStatic())
+                        return result;
+                }
             }
         }
 
         for (String next : staticOnDemandImports) {
             Named nt = ts.forName(next);
-            
-            if (nt instanceof Type){
-                Type t = (Type)nt;
+
+            if (nt instanceof Type) {
+                Type t = (Type) nt;
                 try {
                     result = ts.findMemberClass(t.toClass(), name);
                 }
-                catch(SemanticException e){
+                catch (SemanticException e) {
                 }
-                if (result != null && ((ClassType)result).flags().isStatic()) return result;
+                if (result != null && ((ClassType) result).flags().isStatic())
+                    return result;
             }
         }
 
         return super.find(name);
     }
-    public ReferenceType findTypeContainingMethodOrField(String name) throws SemanticException {
+
+    public ReferenceType findTypeContainingMethodOrField(String name)
+            throws SemanticException {
         for (String next : singleStaticImports) {
             String id = StringUtil.getShortNameComponent(next);
             if (name.equals(id)) {
@@ -92,20 +97,22 @@ public class JL5ImportTable extends ImportTable {
                 String className = StringUtil.getPackageComponent(next);
                 Named nt = ts.forName(className);
                 if (nt instanceof ReferenceType) {
-                    ReferenceType t = (ReferenceType)nt;
-                    if (!t.methodsNamed(name).isEmpty() || t.fieldNamed(name) != null) {
+                    ReferenceType t = (ReferenceType) nt;
+                    if (!t.methodsNamed(name).isEmpty()
+                            || t.fieldNamed(name) != null) {
                         return t;
                     }
-                }                                    
+                }
             }
         }
 
         for (String next : staticOnDemandImports) {
             Named nt = ts.forName(next);
-            
+
             if (nt instanceof ReferenceType) {
-                ReferenceType t = (ReferenceType)nt;
-                if (!t.methodsNamed(name).isEmpty() || t.fieldNamed(name) != null) {
+                ReferenceType t = (ReferenceType) nt;
+                if (!t.methodsNamed(name).isEmpty()
+                        || t.fieldNamed(name) != null) {
                     return t;
                 }
             }

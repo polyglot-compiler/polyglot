@@ -29,8 +29,7 @@ package polyglot.types;
  * A <code>Qualifier</code> can be used to qualify a type: it can be either
  * a package or a named class type.
  */
-public interface Qualifier extends TypeObject
-{
+public interface Qualifier extends TypeObject {
     /**
      * Return true if the qualifier is a package.
      */

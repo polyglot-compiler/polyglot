@@ -55,11 +55,11 @@ public class MembersAdded extends ClassTypeGoal {
         MembersAddedPass(Goal goal) {
             super(goal);
         }
-        
+
         @Override
         public boolean run() {
             MembersAdded goal = (MembersAdded) this.goal;
-            if (! goal.type().membersAdded()) {
+            if (!goal.type().membersAdded()) {
                 throw new SchedulerException();
             }
             return true;
@@ -73,7 +73,7 @@ public class MembersAdded extends ClassTypeGoal {
         }
         return new AddMembersPass(extInfo.scheduler(), this);
     }
-    
+
     @Override
     public Collection<Goal> prerequisiteGoals(Scheduler scheduler) {
         List<Goal> l = new ArrayList<Goal>();
@@ -93,7 +93,7 @@ public class MembersAdded extends ClassTypeGoal {
         l.addAll(super.corequisiteGoals(scheduler));
         return l;
     }
-    
+
     @Override
     public boolean equals(Object o) {
         return o instanceof MembersAdded && super.equals(o);

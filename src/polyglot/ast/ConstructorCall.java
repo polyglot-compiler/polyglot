@@ -34,15 +34,16 @@ import polyglot.util.Enum;
  * A <code>ConstructorCall</code> represents a direct call to a constructor.
  * For instance, <code>super(...)</code> or <code>this(...)</code>.
  */
-public interface ConstructorCall extends Stmt, ProcedureCall
-{
+public interface ConstructorCall extends Stmt, ProcedureCall {
     /** Constructor call kind: either "super" or "this". */
     public static class Kind extends Enum {
-        public Kind(String name) { super(name); }
+        public Kind(String name) {
+            super(name);
+        }
     }
 
     public static final Kind SUPER = new Kind("super");
-    public static final Kind THIS    = new Kind("this");
+    public static final Kind THIS = new Kind("this");
 
     /** The qualifier of the call, possibly null. */
     Expr qualifier();

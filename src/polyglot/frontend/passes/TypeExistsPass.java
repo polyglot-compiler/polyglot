@@ -34,19 +34,18 @@ import polyglot.types.TypeSystem;
 import polyglot.util.ErrorInfo;
 import polyglot.util.ErrorQueue;
 
-
 public class TypeExistsPass extends ClassFilePass {
     protected Scheduler scheduler;
     protected TypeExists goal;
     protected TypeSystem ts;
-    
+
     public TypeExistsPass(Scheduler scheduler, TypeSystem ts, TypeExists goal) {
         super(goal);
         this.scheduler = scheduler;
         this.ts = ts;
         this.goal = goal;
     }
-    
+
     @Override
     public boolean run() {
         String name = goal.typeName();

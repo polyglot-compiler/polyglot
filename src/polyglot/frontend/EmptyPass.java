@@ -30,10 +30,9 @@ import polyglot.frontend.goals.Goal;
 /**
  * An <code>EmptyPass</code> does nothing.
  */
-public class EmptyPass extends AbstractPass
-{
+public class EmptyPass extends AbstractPass {
     public EmptyPass(Goal goal) {
-      	super(goal);
+        super(goal);
     }
 
     @Override

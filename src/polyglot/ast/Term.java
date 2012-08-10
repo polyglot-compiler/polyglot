@@ -34,18 +34,17 @@ import polyglot.visit.CFGBuilder;
  * A <code>Term</code> represents any Java expression or statement on which
  * dataflow can be performed.
  */
-public interface Term extends Node
-{
+public interface Term extends Node {
     /**
      * Indicates to dataflow methods that we are looking at the entry of a term.
      */
     public static final int ENTRY = 1;
-    
+
     /**
      * Indicates to dataflow methods that we are looking at the exit of a term.
      */
     public static final int EXIT = 0;
-    
+
     /**
      * Return the first direct subterm performed when evaluating this term. If
      * this term has no subterms, this should return null.
@@ -61,7 +60,7 @@ public interface Term extends Node
      * if data flows on that edge.
      */
     public <T> List<T> acceptCFG(CFGBuilder<?> v, List<T> succs);
-    
+
     /**
      * Returns true if the term is reachable.  This attribute is not
      * guaranteed correct until after the reachability pass.
@@ -74,7 +73,7 @@ public interface Term extends Node
      * Set the reachability of this term.
      */
     public Term reachable(boolean reachability);
-    
+
     /**
      * List of Types with all exceptions possibly thrown by this term.
      * The list is not necessarily correct until after exception-checking.
@@ -82,5 +81,6 @@ public interface Term extends Node
      * are not propagated to the containing node.
      */
     public SubtypeSet exceptions();
+
     public Term exceptions(SubtypeSet exceptions);
 }

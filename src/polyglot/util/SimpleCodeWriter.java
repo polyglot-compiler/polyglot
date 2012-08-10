@@ -52,110 +52,116 @@ public class SimpleCodeWriter extends CodeWriter {
     }
 
     protected class State {
-	public int lmargin;
-	public boolean breakAll;
+        public int lmargin;
+        public boolean breakAll;
 
-	State(int m, boolean b) { lmargin = m; breakAll = b; }
+        State(int m, boolean b) {
+            lmargin = m;
+            breakAll = b;
+        }
     }
 
     public SimpleCodeWriter(PrintWriter o, int width_) {
         output = o;
         width = width_;
-	rmargin = width;
-	adjustRmargin();
-	breakAll = false;
-	pos = 0;
-	lmargins = new Stack<State>();
+        rmargin = width;
+        adjustRmargin();
+        breakAll = false;
+        pos = 0;
+        lmargins = new Stack<State>();
     }
 
     public SimpleCodeWriter(Writer o, int width_) {
         this(new PrintWriter(o), width_);
     }
-    
+
     private void adjustRmargin() {
-	rmargin -= 8;
-	if (rmargin < width/2) rmargin = width/2;
+        rmargin -= 8;
+        if (rmargin < width / 2) rmargin = width / 2;
     }
-        
+
     @Override
     public void write(String s) {
-       if (s == null)
-	    write("null", 4);
-       else if (s.length() > 0)
-	    write(s, s.length());
+        if (s == null)
+            write("null", 4);
+        else if (s.length() > 0) write(s, s.length());
     }
 
     @Override
     public void write(String s, int length) {
-	output.print(s);
-	pos += length;
+        output.print(s);
+        pos += length;
     }
 
     @Override
     public void begin(int n) {
-	lmargins.push(new State(lmargin, breakAll));
-	lmargin = pos + n;
+        lmargins.push(new State(lmargin, breakAll));
+        lmargin = pos + n;
     }
-        
+
     @Override
     public void end() {
-	State s = lmargins.pop();
-	lmargin = s.lmargin;
-	breakAll = s.breakAll;
+        State s = lmargins.pop();
+        lmargin = s.lmargin;
+        breakAll = s.breakAll;
     }
 
     @Override
     public void allowBreak(int n, int level, String alt, int altlen) {
-	if (pos > width) adjustRmargin();
-	if (breakAll || pos > rmargin) {
-	    newline(n, 1);
-	    breakAll = true;
-	} else {
-	    output.print(alt);
-	    pos += altlen;
-	}
+        if (pos > width) adjustRmargin();
+        if (breakAll || pos > rmargin) {
+            newline(n, 1);
+            breakAll = true;
+        }
+        else {
+            output.print(alt);
+            pos += altlen;
+        }
     }
+
     @Override
     public void unifiedBreak(int n, int level, String alt, int altlen) {
-	allowBreak(n, level, alt, altlen);
+        allowBreak(n, level, alt, altlen);
     }
 
     private void spaces(int n) {
-	for (int i = 0; i < n; i++) {
-	    output.print(' ');
-	}
+        for (int i = 0; i < n; i++) {
+            output.print(' ');
+        }
     }
+
     @Override
     public void newline() {
-	if (pos != lmargin) {
-	    output.println();
-	    pos = lmargin;
-	    spaces(lmargin);
-	}
+        if (pos != lmargin) {
+            output.println();
+            pos = lmargin;
+            spaces(lmargin);
+        }
     }
+
     @Override
     public void newline(int n, int level) {
-	newline();
-	spaces(n);
-	pos += n;
+        newline();
+        spaces(n);
+        pos += n;
     }
 
     @Override
     public boolean flush() throws IOException {
-	output.flush();
-	pos = 0;
-	return true;
+        output.flush();
+        pos = 0;
+        return true;
     }
 
     @Override
     public boolean flush(boolean format) throws IOException {
-	return flush();
+        return flush();
     }
 
     @Override
     public void close() throws IOException {
-	flush();
-	output.close();
+        flush();
+        output.close();
     }
 
     /**
@@ -163,7 +169,6 @@ public class SimpleCodeWriter extends CodeWriter {
      */
     @Override
     public String toString() {
-	return "<SimpleCodeWriter>";
+        return "<SimpleCodeWriter>";
     }
 }
-

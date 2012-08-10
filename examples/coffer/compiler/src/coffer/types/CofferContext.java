@@ -12,5 +12,6 @@ import polyglot.types.SemanticException;
 
 public interface CofferContext extends Context {
     void addKey(Key key);
+
     Key findKey(String name) throws SemanticException;
 }

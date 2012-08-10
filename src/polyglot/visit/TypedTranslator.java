@@ -44,26 +44,30 @@ import polyglot.util.InternalCompilerError;
  */
 public class TypedTranslator extends Translator {
 
-    public TypedTranslator(Job job, TypeSystem ts, NodeFactory nf, TargetFactory tf) {
+    public TypedTranslator(Job job, TypeSystem ts, NodeFactory nf,
+            TargetFactory tf) {
         super(job, ts, nf, tf);
     }
-    
+
     @Override
     public void print(Node parent, Node child, CodeWriter w) {
         if (context == null) {
-            throw new InternalCompilerError("Null context found during type-directed code generation.", child.position());
+            throw new InternalCompilerError("Null context found during type-directed code generation.",
+                                            child.position());
         }
-        
-        if (parent != null && 
-                (! parent.isDisambiguated() || ! parent.isTypeChecked())) {
-            throw new InternalCompilerError("Untyped AST node found during type-directed code generation.", parent.position());
+
+        if (parent != null
+                && (!parent.isDisambiguated() || !parent.isTypeChecked())) {
+            throw new InternalCompilerError("Untyped AST node found during type-directed code generation.",
+                                            parent.position());
         }
-        
-        if (child != null && 
-                (! child.isDisambiguated() || ! child.isTypeChecked())) {
-            throw new InternalCompilerError("Untyped AST node found during type-directed code generation.", child.position());
+
+        if (child != null
+                && (!child.isDisambiguated() || !child.isTypeChecked())) {
+            throw new InternalCompilerError("Untyped AST node found during type-directed code generation.",
+                                            child.position());
         }
-        
+
         super.print(parent, child, w); // XXX This won't work -- child is null (Findbugs)
     }
 }

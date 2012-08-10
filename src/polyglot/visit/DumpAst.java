@@ -33,10 +33,8 @@ import polyglot.ast.Node;
 import polyglot.frontend.Compiler;
 import polyglot.util.CodeWriter;
 
-
 /** Visitor which dumps the AST to a file. */
-public class DumpAst extends NodeVisitor
-{
+public class DumpAst extends NodeVisitor {
     protected PrintWriter fw;
     protected CodeWriter w;
 

@@ -34,7 +34,7 @@ package polyglot.frontend;
 public class SchedulerException extends RuntimeException {
     public SchedulerException() {
     }
-    
+
     /**
      * @param message An error message
      * @param cause The cause of this scheduler exception

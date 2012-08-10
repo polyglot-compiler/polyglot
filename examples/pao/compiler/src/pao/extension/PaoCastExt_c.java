@@ -33,7 +33,7 @@ public class PaoCastExt_c extends PaoExt_c {
      * @see PaoExt_c#rewrite(PaoTypeSystem, NodeFactory)
      * @see pao.visit.PaoBoxer
      */
-	@Override
+    @Override
     public Node rewrite(PaoTypeSystem ts, NodeFactory nf) {
 
         Cast c = (Cast) node();
@@ -41,18 +41,19 @@ public class PaoCastExt_c extends PaoExt_c {
         Type ltype = c.castType().type();
 
         if (ltype.isPrimitive() && rtype.isReference()) {
-        	// We have an expression with reference type being cast to
-        	// a primitive type, added by the PaoBoxer visitor. 
-        	// We need to unbox.
-        	
-        	// e.g., "(int)e", where e is of type Integer gets rewritten to
-        	// "((pao.runtime.Integer)e).getInt()"
+            // We have an expression with reference type being cast to
+            // a primitive type, added by the PaoBoxer visitor. 
+            // We need to unbox.
 
-        	MethodInstance mi = ts.getter(ltype.toPrimitive());
+            // e.g., "(int)e", where e is of type Integer gets rewritten to
+            // "((pao.runtime.Integer)e).getInt()"
 
-            Cast x = nf.Cast(c.position(),
-                             nf.CanonicalTypeNode(c.position(), mi.container()),
-                             c.expr());
+            MethodInstance mi = ts.getter(ltype.toPrimitive());
+
+            Cast x =
+                    nf.Cast(c.position(),
+                            nf.CanonicalTypeNode(c.position(), mi.container()),
+                            c.expr());
             x = (Cast) x.type(mi.container());
 
             Call y =
@@ -65,19 +66,20 @@ public class PaoCastExt_c extends PaoExt_c {
             return y.methodInstance(mi);
         }
         else if (ltype.isReference() && rtype.isPrimitive()) {
-        	// We have an expression with primitive type being cast to
-        	// a reference type, added by the PaoBoxer visitor. 
-        	// We need to box.
-        	
-        	// e.g., "(Integer)e", where e is of type int gets rewritten to
-        	// "new pao.runtime.Integer(e)"
+            // We have an expression with primitive type being cast to
+            // a reference type, added by the PaoBoxer visitor. 
+            // We need to box.
+
+            // e.g., "(Integer)e", where e is of type int gets rewritten to
+            // "new pao.runtime.Integer(e)"
 
             ConstructorInstance ci = ts.wrapper(rtype.toPrimitive());
 
             List<Expr> args = new ArrayList<Expr>(1);
             args.add(c.expr());
 
-            New x = nf.New(c.position(),
+            New x =
+                    nf.New(c.position(),
                            nf.CanonicalTypeNode(c.position(), ci.container()),
                            args);
             x = (New) x.type(ci.container());

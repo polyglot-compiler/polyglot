@@ -46,19 +46,17 @@ import polyglot.visit.TypeChecker;
  * A <code>Formal</code> represents a formal parameter for a procedure
  * or catch block.  It consists of a type and a variable identifier.
  */
-public class Formal_c extends Term_c implements Formal
-{
+public class Formal_c extends Term_c implements Formal {
     protected LocalInstance li;
     protected Flags flags;
     protected TypeNode type;
     protected Id name;
+
 //    protected boolean reachable;
 
-    public Formal_c(Position pos, Flags flags, TypeNode type,
-                    Id name)
-    {
-	super(pos);
-	assert(flags != null && type != null && name != null);
+    public Formal_c(Position pos, Flags flags, TypeNode type, Id name) {
+        super(pos);
+        assert (flags != null && type != null && name != null);
         this.flags = flags;
         this.type = type;
         this.name = name;
@@ -78,38 +76,38 @@ public class Formal_c extends Term_c implements Formal
     /** Get the flags of the formal. */
     @Override
     public Flags flags() {
-	return flags;
+        return flags;
     }
 
     /** Set the flags of the formal. */
     @Override
     public Formal flags(Flags flags) {
         if (flags.equals(this.flags)) return this;
-	Formal_c n = (Formal_c) copy();
-	n.flags = flags;
-	return n;
+        Formal_c n = (Formal_c) copy();
+        n.flags = flags;
+        return n;
     }
 
     /** Get the type node of the formal. */
     @Override
     public TypeNode type() {
-	return type;
+        return type;
     }
 
     /** Set the type node of the formal. */
     @Override
     public Formal type(TypeNode type) {
-	Formal_c n = (Formal_c) copy();
-	n.type = type;
-	return n;
+        Formal_c n = (Formal_c) copy();
+        n.type = type;
+        return n;
     }
-    
+
     /** Get the name of the formal. */
     @Override
     public Id id() {
         return name;
     }
-    
+
     /** Set the name of the formal. */
     @Override
     public Formal id(Id name) {
@@ -121,7 +119,7 @@ public class Formal_c extends Term_c implements Formal
     /** Get the name of the formal. */
     @Override
     public String name() {
-	return name.id();
+        return name.id();
     }
 
     /** Set the name of the formal. */
@@ -141,28 +139,28 @@ public class Formal_c extends Term_c implements Formal
     public Formal localInstance(LocalInstance li) {
         if (li == this.li) return this;
         Formal_c n = (Formal_c) copy();
-	n.li = li;
-	return n;
+        n.li = li;
+        return n;
     }
 
     /** Reconstruct the formal. */
     protected Formal_c reconstruct(TypeNode type, Id name) {
-	if (this.type != type) {
-	    Formal_c n = (Formal_c) copy();
-	    n.type = type;
+        if (this.type != type) {
+            Formal_c n = (Formal_c) copy();
+            n.type = type;
             n.name = name;
-	    return n;
-	}
+            return n;
+        }
 
-	return this;
+        return this;
     }
 
     /** Visit the children of the formal. */
     @Override
     public Node visitChildren(NodeVisitor v) {
-	TypeNode type = (TypeNode) visitChild(this.type, v);
+        TypeNode type = (TypeNode) visitChild(this.type, v);
         Id name = (Id) visitChild(this.name, v);
-	return reconstruct(type, name);
+        return reconstruct(type, name);
     }
 
     @Override
@@ -186,8 +184,11 @@ public class Formal_c extends Term_c implements Formal
 
         TypeSystem ts = tb.typeSystem();
 
-        LocalInstance li = ts.localInstance(position(), flags(),
-                                            ts.unknownType(position()), name());
+        LocalInstance li =
+                ts.localInstance(position(),
+                                 flags(),
+                                 ts.unknownType(position()),
+                                 name());
 
         return n.localInstance(li);
     }
@@ -214,22 +215,21 @@ public class Formal_c extends Term_c implements Formal
         LocalInstance outerLocal = c.findLocalSilent(li.name());
 
         if (outerLocal != null && outerLocal != li && c.isLocal(li.name())) {
-            throw new SemanticException(
-                "Local variable \"" + name + "\" multiply defined.  "
-                    + "Previous definition at " + outerLocal.position() + ".",
-                position());
+            throw new SemanticException("Local variable \"" + name
+                    + "\" multiply defined.  " + "Previous definition at "
+                    + outerLocal.position() + ".", position());
         }
 
-	TypeSystem ts = tc.typeSystem();
+        TypeSystem ts = tc.typeSystem();
 
-	try {
-	    ts.checkLocalFlags(flags());
-	}
-	catch (SemanticException e) {
-	    throw new SemanticException(e.getMessage(), position());
-	}
+        try {
+            ts.checkLocalFlags(flags());
+        }
+        catch (SemanticException e) {
+            throw new SemanticException(e.getMessage(), position());
+        }
 
-	return this;
+        return this;
     }
 
     @Override
@@ -239,31 +239,32 @@ public class Formal_c extends Term_c implements Formal
 
     @Override
     public <T> List<T> acceptCFG(CFGBuilder<?> v, List<T> succs) {
-        v.visitCFG(type, this, EXIT);        
+        v.visitCFG(type, this, EXIT);
         return succs;
     }
 
     @Override
     public void dump(CodeWriter w) {
-	super.dump(w);
+        super.dump(w);
 
-	if (li != null) {
-	    w.allowBreak(4, " ");
-	    w.begin(0);
-	    w.write("(instance " + li + ")");
-	    w.end();
-	}
+        if (li != null) {
+            w.allowBreak(4, " ");
+            w.begin(0);
+            w.write("(instance " + li + ")");
+            w.end();
+        }
 
-	w.allowBreak(4, " ");
-	w.begin(0);
-	w.write("(name " + name + ")");
-	w.end();
+        w.allowBreak(4, " ");
+        w.begin(0);
+        w.write("(name " + name + ")");
+        w.end();
     }
 
     @Override
     public String toString() {
         return flags.translate() + type + " " + name;
     }
+
     @Override
     public Node copy(NodeFactory nf) {
         return nf.Formal(this.position, this.flags, this.type, this.name);

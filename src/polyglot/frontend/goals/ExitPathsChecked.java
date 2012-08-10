@@ -36,7 +36,8 @@ import polyglot.types.TypeSystem;
 import polyglot.visit.ExitChecker;
 
 public class ExitPathsChecked extends VisitorGoal {
-    public static Goal create(Scheduler scheduler, Job job, TypeSystem ts, NodeFactory nf) {
+    public static Goal create(Scheduler scheduler, Job job, TypeSystem ts,
+            NodeFactory nf) {
         return scheduler.internGoal(new ExitPathsChecked(job, ts, nf));
     }
 

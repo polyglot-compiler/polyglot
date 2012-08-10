@@ -56,7 +56,7 @@ public class SchedulerClassInitializer implements LazyClassInitializer {
         this.ts = ts;
         this.scheduler = ts.extensionInfo().scheduler();
     }
-    
+
     @Override
     public void setClass(ParsedClassType ct) {
         this.ct = ct;
@@ -148,7 +148,7 @@ public class SchedulerClassInitializer implements LazyClassInitializer {
             }
         }
     }
-    
+
     @Override
     public void initConstructors() {
         if (!constructorsInitialized) {

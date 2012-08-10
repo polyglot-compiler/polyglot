@@ -43,21 +43,20 @@ import polyglot.visit.TypeChecker;
  * A <code>Case</code> is a representation of a Java <code>case</code>
  * statement.  It can only be contained in a <code>Switch</code>.
  */
-public class Case_c extends Stmt_c implements Case
-{
+public class Case_c extends Stmt_c implements Case {
     protected Expr expr;
     protected long value;
 
     public Case_c(Position pos, Expr expr) {
-	super(pos);
-	assert(true); // expr may be null for default case
-	this.expr = expr;
+        super(pos);
+        assert (true); // expr may be null for default case
+        this.expr = expr;
     }
 
     /** Returns true iff this is the default case. */
     @Override
     public boolean isDefault() {
-	return this.expr == null;
+        return this.expr == null;
     }
 
     /**
@@ -66,15 +65,15 @@ public class Case_c extends Stmt_c implements Case
      */
     @Override
     public Expr expr() {
-	return this.expr;
+        return this.expr;
     }
 
     /** Set the case label.  This must should a constant expression, or null. */
     @Override
     public Case expr(Expr expr) {
-	Case_c n = (Case_c) copy();
-	n.expr = expr;
-	return n;
+        Case_c n = (Case_c) copy();
+        n.expr = expr;
+        return n;
     }
 
     /**
@@ -83,26 +82,26 @@ public class Case_c extends Stmt_c implements Case
      */
     @Override
     public long value() {
-	return this.value;
+        return this.value;
     }
 
     /** Set the value of the case label. */
     @Override
     public Case value(long value) {
-	Case_c n = (Case_c) copy();
-	n.value = value;
-	return n;
+        Case_c n = (Case_c) copy();
+        n.value = value;
+        return n;
     }
 
     /** Reconstruct the statement. */
     protected Case_c reconstruct(Expr expr) {
-	if (expr != this.expr) {
-	    Case_c n = (Case_c) copy();
-	    n.expr = expr;
-	    return n;
-	}
+        if (expr != this.expr) {
+            Case_c n = (Case_c) copy();
+            n.expr = expr;
+            return n;
+        }
 
-	return this;
+        return this;
     }
 
     /** Visit the children of the statement. */
@@ -116,44 +115,43 @@ public class Case_c extends Stmt_c implements Case
     @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
         if (expr == null) {
-	    return this;
-	}
+            return this;
+        }
 
-	TypeSystem ts = tc.typeSystem();
+        TypeSystem ts = tc.typeSystem();
 
-	if (! ts.isImplicitCastValid(expr.type(), ts.Int())) {
-	    throw new SemanticException(
-		"Case label must be an byte, char, short, or int.",
-		position());
-	}
-    
-	return this;
+        if (!ts.isImplicitCastValid(expr.type(), ts.Int())) {
+            throw new SemanticException("Case label must be an byte, char, short, or int.",
+                                        position());
+        }
+
+        return this;
     }
-    
+
     @Override
     public Node checkConstants(ConstantChecker cc) throws SemanticException {
         if (expr == null) {
             return this;
         }
-        
-        if (! expr.constantValueSet()) {
+
+        if (!expr.constantValueSet()) {
             // Not ready yet; pass will get rerun.
             return this;
         }
-        
+
         if (expr.isConstant()) {
             Object o = expr.constantValue();
-            
-            if (o instanceof Number && ! (o instanceof Long) &&
-                    ! (o instanceof Float) && ! (o instanceof Double)) {
-                
+
+            if (o instanceof Number && !(o instanceof Long)
+                    && !(o instanceof Float) && !(o instanceof Double)) {
+
                 return value(((Number) o).longValue());
             }
             else if (o instanceof Character) {
                 return value(((Character) o).charValue());
             }
         }
-        
+
         throw new SemanticException("Case label must be an integral constant.",
                                     position());
     }
@@ -172,24 +170,24 @@ public class Case_c extends Stmt_c implements Case
     @Override
     public String toString() {
         if (expr == null) {
-	    return "default:";
-	}
-	else {
-	    return "case " + expr + ":";
-	}
+            return "default:";
+        }
+        else {
+            return "case " + expr + ":";
+        }
     }
 
     /** Write the statement to an output file. */
     @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
         if (expr == null) {
-	    w.write("default:");
-	}
-	else {
-	    w.write("case ");
-	    print(expr, w, tr);
-	    w.write(":");
-	}
+            w.write("default:");
+        }
+        else {
+            w.write("case ");
+            print(expr, w, tr);
+            w.write(":");
+        }
     }
 
     @Override
@@ -206,6 +204,7 @@ public class Case_c extends Stmt_c implements Case
 
         return succs;
     }
+
     @Override
     public Node copy(NodeFactory nf) {
         return nf.Case(this.position, this.expr).value(value);

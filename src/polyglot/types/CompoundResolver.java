@@ -25,7 +25,6 @@
 
 package polyglot.types;
 
-
 /**
  * An <code>CompoundResolver</code> resolves names using more than one
  * context.
@@ -40,21 +39,21 @@ public class CompoundResolver implements TopLevelResolver {
      * @param tail The second resolver to search.
      */
     public CompoundResolver(TopLevelResolver head, TopLevelResolver tail) {
-	this.head = head;
-	this.tail = tail;
+        this.head = head;
+        this.tail = tail;
     }
 
     @Override
     public String toString() {
         return "(compound " + head + " " + tail + ")";
     }
-    
+
     /**
      * Check if a package exists.
      */
     @Override
     public boolean packageExists(String name) {
-	return head.packageExists(name) || tail.packageExists(name);
+        return head.packageExists(name) || tail.packageExists(name);
     }
 
     /**
@@ -62,11 +61,11 @@ public class CompoundResolver implements TopLevelResolver {
      */
     @Override
     public Named find(String name) throws SemanticException {
-	try {
-	    return head.find(name);
-	}
-	catch (NoClassException e) {
-	    return tail.find(name);
-	}
+        try {
+            return head.find(name);
+        }
+        catch (NoClassException e) {
+            return tail.find(name);
+        }
     }
 }

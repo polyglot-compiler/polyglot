@@ -8,7 +8,7 @@ import polyglot.types.SemanticException;
 public class EvalToExt_c extends ToExt_c {
     @Override
     public Node toExt(ExtensionRewriter rw) throws SemanticException {
-        Eval n = (Eval)node();
+        Eval n = (Eval) node();
         return rw.to_nf().Eval(n.position(), n.expr());
     }
 }

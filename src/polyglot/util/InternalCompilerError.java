@@ -26,12 +26,11 @@
 package polyglot.util;
 
 /** Exception thrown when the compiler is confused. */
-public class InternalCompilerError extends RuntimeException
-{
+public class InternalCompilerError extends RuntimeException {
     protected Position pos;
 
     public InternalCompilerError(String msg) {
-        this(msg, (Position)null);
+        this(msg, (Position) null);
     }
 
     public InternalCompilerError(Throwable cause) {
@@ -43,32 +42,33 @@ public class InternalCompilerError extends RuntimeException
     }
 
     public InternalCompilerError(Position position, String msg) {
-	this(msg, position); 
+        this(msg, position);
     }
 
     public InternalCompilerError(String msg, Position position) {
-        super(msg); 
+        super(msg);
         pos = position;
     }
+
     public InternalCompilerError(String msg, Position position, Throwable cause) {
-        super(msg, cause); 
+        super(msg, cause);
         pos = position;
     }
 
     public void setPosition(Position pos) {
-	this.pos = pos;
+        this.pos = pos;
     }
 
     public Position position() {
-	return pos;
+        return pos;
     }
 
     public String message() {
-	return super.getMessage();
+        return super.getMessage();
     }
 
     @Override
     public String getMessage() {
-	return pos == null ? message() : pos + ": " + message();
+        return pos == null ? message() : pos + ": " + message();
     }
 }

@@ -35,8 +35,7 @@ public class CofferExt_c extends Ext_c implements CofferExt {
             String s = "eys [";
             for (Iterator<Key> i = set.iterator(); i.hasNext();) {
                 s += "\"" + i.next() + "\"";
-                if (i.hasNext())
-                    s += ", ";
+                if (i.hasNext()) s += ", ";
             }
             s += "]";
             return s;
@@ -44,31 +43,40 @@ public class CofferExt_c extends Ext_c implements CofferExt {
     }
 
     @Override
-    public KeySet keyFlow(KeySet held_keys, Type throwType) { return held_keys; }
-    @Override
-    public KeySet keyAlias(KeySet stored_keys, Type throwType) { return stored_keys; }
+    public KeySet keyFlow(KeySet held_keys, Type throwType) {
+        return held_keys;
+    }
 
     @Override
-    public void checkHeldKeys(KeySet held, KeySet stored) throws SemanticException {
+    public KeySet keyAlias(KeySet stored_keys, Type throwType) {
+        return stored_keys;
+    }
+
+    @Override
+    public void checkHeldKeys(KeySet held, KeySet stored)
+            throws SemanticException {
         if (node() instanceof Expr) {
             Expr e = (Expr) node();
-                
+
             if (e.type() instanceof CofferClassType) {
                 Key key = ((CofferClassType) e.type()).key();
 
                 if (key != null) {
-                    if (! held.contains(key)) {
-                        throw new SemanticException(
-                            "Can evaluate expression of type \"" +
-                            e.type() + "\" only if key \"" + key +
-                            "\" is held.", e.position());
+                    if (!held.contains(key)) {
+                        throw new SemanticException("Can evaluate expression of type \""
+                                                            + e.type()
+                                                            + "\" only if key \""
+                                                            + key
+                                                            + "\" is held.",
+                                                    e.position());
                     }
                     if (stored.contains(key)) {
-                        throw new SemanticException(
-                            "Can evaluate expression of type \"" +
-                            e.type() + "\" only if key \"" + key +
-                            "\" is not held in a variable.",
-                            e.position());
+                        throw new SemanticException("Can evaluate expression of type \""
+                                                            + e.type()
+                                                            + "\" only if key \""
+                                                            + key
+                                                            + "\" is not held in a variable.",
+                                                    e.position());
                     }
                 }
             }

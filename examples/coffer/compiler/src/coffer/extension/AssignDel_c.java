@@ -25,10 +25,12 @@ public class AssignDel_c extends JL_c {
             CofferClassType t = (CofferClassType) n.right().type();
 
             if (t.key() != null && n.left() instanceof Field) {
-                throw new SemanticException("Cannot assign tracked value into a field.", n.position());
+                throw new SemanticException("Cannot assign tracked value into a field.",
+                                            n.position());
             }
             if (t.key() != null && n.left() instanceof ArrayAccess) {
-                throw new SemanticException("Cannot assign tracked value into an array.", n.position());
+                throw new SemanticException("Cannot assign tracked value into an array.",
+                                            n.position());
             }
         }
 

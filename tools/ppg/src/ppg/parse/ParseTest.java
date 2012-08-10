@@ -9,52 +9,54 @@ import ppg.lex.Lexer;
 import ppg.spec.Spec;
 import ppg.util.CodeWriter;
 
-public class ParseTest
-{
-	private static final String HEADER = "ppg [parsetest]: ";
-	
-	private ParseTest() {}
+public class ParseTest {
+    private static final String HEADER = "ppg [parsetest]: ";
 
-	public static void main(String args[]) {
-		FileInputStream fileInput;
+    private ParseTest() {
+    }
 
-		String filename = null;
-		try {
-			filename = args[0];
-			fileInput = new FileInputStream(filename);
-		}
-		catch (FileNotFoundException e) {
-			System.err.println("Error: "+filename+" is not found.");
-			return;
-		}
-		catch (ArrayIndexOutOfBoundsException e) {
-			System.err.println(HEADER+"Error: No file name given.");
-			return;
-		}
+    public static void main(String args[]) {
+        FileInputStream fileInput;
 
-		File f = new File(filename);
-		String simpleName = f.getName();
+        String filename = null;
+        try {
+            filename = args[0];
+            fileInput = new FileInputStream(filename);
+        }
+        catch (FileNotFoundException e) {
+            System.err.println("Error: " + filename + " is not found.");
+            return;
+        }
+        catch (ArrayIndexOutOfBoundsException e) {
+            System.err.println(HEADER + "Error: No file name given.");
+            return;
+        }
 
-		Lexer lex = new Lexer(fileInput, simpleName);
-		
-		Parser parser = new Parser(filename, lex);
-		try {
-			parser.parse();
-		} catch (Exception e) {
-			System.err.println(HEADER+"Exception: "+e.getMessage());
-			return;
-		}
-		Spec spec = (Spec)Parser.getProgramNode();
-					
-		CodeWriter cw = new CodeWriter(System.out, 72); 
-		try {
-			spec.unparse(cw);
-			cw.flush();
-			fileInput.close();
-		} catch (IOException e) {
-			System.err.println(HEADER+"exception: "+e.getMessage());
-			return;
-		}
-	}
+        File f = new File(filename);
+        String simpleName = f.getName();
+
+        Lexer lex = new Lexer(fileInput, simpleName);
+
+        Parser parser = new Parser(filename, lex);
+        try {
+            parser.parse();
+        }
+        catch (Exception e) {
+            System.err.println(HEADER + "Exception: " + e.getMessage());
+            return;
+        }
+        Spec spec = (Spec) Parser.getProgramNode();
+
+        CodeWriter cw = new CodeWriter(System.out, 72);
+        try {
+            spec.unparse(cw);
+            cw.flush();
+            fileInput.close();
+        }
+        catch (IOException e) {
+            System.err.println(HEADER + "exception: " + e.getMessage());
+            return;
+        }
+    }
 
 }

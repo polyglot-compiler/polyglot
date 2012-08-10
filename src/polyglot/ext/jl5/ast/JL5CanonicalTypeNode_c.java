@@ -28,10 +28,11 @@ public class JL5CanonicalTypeNode_c extends polyglot.ast.CanonicalTypeNode_c {
 
     private static Type makeRawIfNeeded(Type type, Position pos) {
         if (type.isClass()) {
-            JL5TypeSystem ts = (JL5TypeSystem)type.typeSystem();
-            if (type instanceof JL5ParsedClassType && !((JL5ParsedClassType)type).typeVariables().isEmpty()) {
+            JL5TypeSystem ts = (JL5TypeSystem) type.typeSystem();
+            if (type instanceof JL5ParsedClassType
+                    && !((JL5ParsedClassType) type).typeVariables().isEmpty()) {
                 // needs to be a raw type
-                return ts.rawClass((JL5ParsedClassType)type, pos);
+                return ts.rawClass((JL5ParsedClassType) type, pos);
             }
             if (type.toClass().isInnerClass()) {
                 ClassType t = type.toClass();
@@ -57,7 +58,6 @@ public class JL5CanonicalTypeNode_c extends polyglot.ast.CanonicalTypeNode_c {
             JL5SubstClassType st = (JL5SubstClassType) t;
             JL5TypeSystem ts = (JL5TypeSystem) tc.typeSystem();
 
-            
             // Check for rare types: e.g., Outer<String>.Inner, where Inner has uninstantiated type variables
             // See JLS 3rd ed. 4.8
             if (st.isInnerClass() && !st.base().typeVariables().isEmpty()) {
@@ -65,42 +65,50 @@ public class JL5CanonicalTypeNode_c extends polyglot.ast.CanonicalTypeNode_c {
                 // these type variables are acutally instantiated
                 for (TypeVariable tv : st.base().typeVariables()) {
                     if (!st.subst().substitutions().keySet().contains(tv)) {
-                        throw new SemanticException("\"Rare\" types are not allowed: cannot " +
-                                "use raw class " + st.name() + 
-                                " when the outer class " + st.outer() + " has instantiated type variables.", position);
+                        throw new SemanticException("\"Rare\" types are not allowed: cannot "
+                                                            + "use raw class "
+                                                            + st.name()
+                                                            + " when the outer class "
+                                                            + st.outer()
+                                                            + " has instantiated type variables.",
+                                                    position);
                     }
                 }
-                
+
             }
-            if (!st.base().typeVariables().isEmpty()){
+            if (!st.base().typeVariables().isEmpty()) {
                 // check that arguments obey their bounds.
                 //first we must perform capture conversion. see beginning of JLS 4.5            
-                JL5SubstClassType capCT = (JL5SubstClassType) ts.applyCaptureConversion(st);
+                JL5SubstClassType capCT =
+                        (JL5SubstClassType) ts.applyCaptureConversion(st);
 
                 for (int i = 0; i < capCT.actuals().size(); i++) {
-                    TypeVariable ai = capCT.base().typeVariables().get(i);                
+                    TypeVariable ai = capCT.base().typeVariables().get(i);
                     Type xi = capCT.actuals().get(i);
 
-
                     //require that arguments obey their bounds
-                    if (!ts.isSubtype(xi, capCT.subst().substType(ai.upperBound()))) {
-                        throw new SemanticException("Type argument " + st.actuals().get(i) + 
-                                                    " is not a subtype of its declared bound " + ai.upperBound(), position());
+                    if (!ts.isSubtype(xi,
+                                      capCT.subst().substType(ai.upperBound()))) {
+                        throw new SemanticException("Type argument "
+                                + st.actuals().get(i)
+                                + " is not a subtype of its declared bound "
+                                + ai.upperBound(), position());
                     }
                 }
             }
         }
-        
+
         // check for uses of type variables in static contexts
-        if (tc.context().inStaticContext() && !((JL5Context) tc.context()).inCTORCall()) {
+        if (tc.context().inStaticContext()
+                && !((JL5Context) tc.context()).inCTORCall()) {
             for (TypeVariable tv : findInstanceTypeVariables(t)) {
-                throw new SemanticException("Type variable " + tv + 
-                                            " cannot be used in a static context", this.position);                
-                
+                throw new SemanticException("Type variable " + tv
+                        + " cannot be used in a static context", this.position);
+
             }
         }
         ClassType currentClass = tc.context().currentClass();
-        JL5Context jc = (JL5Context)tc.context();
+        JL5Context jc = (JL5Context) tc.context();
         if (jc.inExtendsClause()) {
             currentClass = jc.extendsClauseDeclaringClass();
         }
@@ -109,13 +117,18 @@ public class JL5CanonicalTypeNode_c extends polyglot.ast.CanonicalTypeNode_c {
                 // the current class is static.
                 for (TypeVariable tv : findInstanceTypeVariables(t)) {
                     if (!tv.declaringClass().equals(currentClass)) {
-                        throw new SemanticException("Type variable " + tv + " of class " + tv.declaringClass() + " cannot be used in a nested class", this.position);
+                        throw new SemanticException("Type variable "
+                                                            + tv
+                                                            + " of class "
+                                                            + tv.declaringClass()
+                                                            + " cannot be used in a nested class",
+                                                    this.position);
                     }
                 }
             }
 
         }
-        
+
         return super.typeCheck(tc);
     }
 
@@ -124,29 +137,30 @@ public class JL5CanonicalTypeNode_c extends polyglot.ast.CanonicalTypeNode_c {
         findInstanceTypeVariables(t, s);
         return s;
     }
+
     private void findInstanceTypeVariables(Type t, Set<TypeVariable> tvs) {
         if (t instanceof TypeVariable) {
-            TypeVariable tv = (TypeVariable)t;
+            TypeVariable tv = (TypeVariable) t;
             if (tv.declaredIn() == TypeVariable.TVarDecl.CLASS_TYPE_VARIABLE) {
                 tvs.add(tv);
             }
         }
         if (t instanceof ArrayType) {
-            ArrayType at = (ArrayType)t;
+            ArrayType at = (ArrayType) t;
             findInstanceTypeVariables(at.base(), tvs);
         }
         if (t instanceof WildCardType) {
-            WildCardType at = (WildCardType)t;
+            WildCardType at = (WildCardType) t;
             findInstanceTypeVariables(at.upperBound(), tvs);
         }
         if (t instanceof JL5SubstClassType) {
-            JL5SubstClassType ct = (JL5SubstClassType)t;
+            JL5SubstClassType ct = (JL5SubstClassType) t;
             for (ReferenceType at : ct.actuals()) {
                 findInstanceTypeVariables(at, tvs);
             }
         }
         if (t instanceof IntersectionType) {
-            IntersectionType it = (IntersectionType)t;
+            IntersectionType it = (IntersectionType) t;
             for (Type at : it.bounds()) {
                 findInstanceTypeVariables(at, tvs);
             }

@@ -143,7 +143,8 @@ public class ExtensionCleaner extends NodeVisitor {
                 return n;
             }
             else {
-                throw new InternalCompilerError("Unexpected Jx type: " + t + " found in rewritten AST.");
+                throw new InternalCompilerError("Unexpected Jx type: " + t
+                        + " found in rewritten AST.");
             }
         }
 
@@ -168,7 +169,7 @@ public class ExtensionCleaner extends NodeVisitor {
                 return nf.PackageNode(n.position(), p);
             }
         }
-                  
+
         return nf.PackageNode(n.position(), ts.createPackage(n.toString()));
     }
 }

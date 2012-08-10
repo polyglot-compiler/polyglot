@@ -14,18 +14,18 @@ import polyglot.util.InternalCompilerError;
 import polyglot.visit.InitChecker;
 import polyglot.visit.NodeVisitor;
 
-public class JL5InitChecker extends InitChecker
-{
+public class JL5InitChecker extends InitChecker {
     public JL5InitChecker(Job job, TypeSystem ts, NodeFactory nf) {
         super(job, ts, nf);
     }
-    
+
     @Override
-    protected NodeVisitor enterCall(Node parent, Node n) throws SemanticException {
+    protected NodeVisitor enterCall(Node parent, Node n)
+            throws SemanticException {
         if (n instanceof ClassBody) {
             // we are starting to process a class declaration, but have yet
             // to do any of the dataflow analysis.
-            
+
             // set up the new ClassBodyInfo, and make sure that it forms
             // a stack.
             ClassType ct = null;
@@ -39,11 +39,12 @@ public class JL5InitChecker extends InitChecker
                 ct = ((EnumConstantDecl) parent).type();
             }
             if (ct == null) {
-                throw new InternalCompilerError("ClassBody found but cannot find the class.", n.position());
+                throw new InternalCompilerError("ClassBody found but cannot find the class.",
+                                                n.position());
             }
-            setupClassBody(ct, (ClassBody)n);
+            setupClassBody(ct, (ClassBody) n);
         }
-      
+
         return super.enterCall(n);
     }
 

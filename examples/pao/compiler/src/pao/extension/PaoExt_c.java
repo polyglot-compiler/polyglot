@@ -16,12 +16,12 @@ import polyglot.ast.NodeFactory;
  * Default implementation of <code>PaoExt</code>.
  */
 public class PaoExt_c extends Ext_c implements PaoExt {
-	/**
-	 * Default implementation of <code>rewrite</code>, returns the node
-	 * unchanged.
-	 * 
-	 * @see PaoExt#rewrite(PaoTypeSystem, NodeFactory)
-	 */
+    /**
+     * Default implementation of <code>rewrite</code>, returns the node
+     * unchanged.
+     * 
+     * @see PaoExt#rewrite(PaoTypeSystem, NodeFactory)
+     */
     @Override
     public Node rewrite(PaoTypeSystem ts, NodeFactory nf) {
         return node();

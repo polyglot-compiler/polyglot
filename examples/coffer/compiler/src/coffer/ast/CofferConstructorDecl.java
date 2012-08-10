@@ -16,9 +16,11 @@ import polyglot.ast.ConstructorDecl;
  */
 public interface CofferConstructorDecl extends ConstructorDecl {
     KeySetNode entryKeys();
+
     CofferConstructorDecl entryKeys(KeySetNode entryKeys);
-    
+
     KeySetNode returnKeys();
+
     CofferConstructorDecl returnKeys(KeySetNode returnKeys);
 
     List<ThrowConstraintNode> throwConstraints();

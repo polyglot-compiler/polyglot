@@ -13,14 +13,15 @@ public interface JL5ClassType extends ClassType {
      * Is this class a Raw Class? See JLS 3rd ed., 4.8 
      */
     boolean isRawClass();
-    
+
     EnumInstance enumConstantNamed(String name);
+
     List<EnumInstance> enumConstants();
-    
+
     AnnotationTypeElemInstance annotationElemNamed(String name);
+
     List<AnnotationTypeElemInstance> annotationElems();
 
-    
     /**
      * Return a chain of types that show that this class can be implicitly cast
      * to toType.
@@ -37,7 +38,7 @@ public interface JL5ClassType extends ClassType {
      * @param context
      */
     String translateAsReceiver(Resolver resolver);
-   
+
     /**
      * Annotations on the declaration of this type such that the annotation type has
      * a retention policy of annotation.RetentionPolicy.CLASS or annotation.RetentionPolicy.RUNTIME.

@@ -25,8 +25,7 @@ import polyglot.util.Transformation;
 /** An implementation of the <code>CofferConstructorInstance</code> interface. 
  */
 public class CofferConstructorInstance_c extends ConstructorInstance_c
-				     implements CofferConstructorInstance
-{
+        implements CofferConstructorInstance {
     protected KeySet entryKeys;
     protected KeySet returnKeys;
     protected List<ThrowConstraint> throwConstraints;
@@ -49,34 +48,34 @@ public class CofferConstructorInstance_c extends ConstructorInstance_c
         if (entryKeys == null)
             throw new InternalCompilerError("null entry keys for " + this);
     }
-    
+
     @Override
     public boolean isCanonical() {
         for (ThrowConstraint c : throwConstraints) {
-            if (! c.isCanonical()) {
+            if (!c.isCanonical()) {
                 return false;
             }
         }
-        
-        if (! entryKeys.isCanonical()) {
+
+        if (!entryKeys.isCanonical()) {
             return false;
         }
-        
-        if (returnKeys != null && ! returnKeys.isCanonical()) {
+
+        if (returnKeys != null && !returnKeys.isCanonical()) {
             return false;
         }
-        
+
         return super.isCanonical();
     }
 
     @Override
     public KeySet entryKeys() {
-	return entryKeys;
+        return entryKeys;
     }
 
     @Override
     public KeySet returnKeys() {
-	return returnKeys;
+        return returnKeys;
     }
 
     @Override
@@ -140,7 +139,7 @@ public class CofferConstructorInstance_c extends ConstructorInstance_c
 
     @Override
     public String toString() {
-        return super.toString() + " " + entryKeys + "->" + returnKeys +
-                                  " throws " + throwConstraints;
+        return super.toString() + " " + entryKeys + "->" + returnKeys
+                + " throws " + throwConstraints;
     }
 }

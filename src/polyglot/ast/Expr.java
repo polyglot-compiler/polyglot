@@ -33,8 +33,7 @@ import polyglot.visit.PrettyPrinter;
  * An <code>Expr</code> represents any Java expression.  All expressions
  * must be subtypes of Expr.
  */
-public interface Expr extends Receiver, Term
-{
+public interface Expr extends Receiver, Term {
     /**
      * Return an equivalent expression, but with the type <code>type</code>.
      */
@@ -53,7 +52,7 @@ public interface Expr extends Receiver, Term
 
     /** Returns the constant value of the expression, if any. */
     Object constantValue();
-    
+
     /**
      * Correctly parenthesize the subexpression <code>expr<code>
      * based on its precedence and the precedence of this expression.
@@ -63,8 +62,8 @@ public interface Expr extends Receiver, Term
      * we parenthesis the right sub-expression of a left-associative
      * operator.
      */
-     void printSubExpr(Expr expr, boolean associative,
-                       CodeWriter w, PrettyPrinter pp);
+    void printSubExpr(Expr expr, boolean associative, CodeWriter w,
+            PrettyPrinter pp);
 
     /**
      * Correctly parenthesize the subexpression <code>expr<code>

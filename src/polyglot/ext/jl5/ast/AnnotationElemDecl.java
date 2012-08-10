@@ -9,8 +9,9 @@ import polyglot.types.Flags;
 public interface AnnotationElemDecl extends MethodDecl {
 
     AnnotationElemDecl type(TypeNode type);
+
     TypeNode type();
-    
+
     @Override
     AnnotationElemDecl flags(Flags flags);
 
@@ -18,13 +19,16 @@ public interface AnnotationElemDecl extends MethodDecl {
     Flags flags();
 
     AnnotationElemDecl defaultVal(Expr def);
+
     Expr defaultVal();
 
     @Override
     AnnotationElemDecl name(String name);
+
     @Override
     String name();
 
     AnnotationElemDecl annotationElemInstance(AnnotationTypeElemInstance ai);
+
     AnnotationTypeElemInstance annotationElemInstance();
 }

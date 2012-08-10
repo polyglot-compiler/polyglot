@@ -31,8 +31,7 @@ import java.util.List;
  * A <code>ReferenceType</code> represents a reference type: a type which
  * contains methods and fields and which is a subtype of Object.
  */
-public interface ReferenceType extends Type
-{ 
+public interface ReferenceType extends Type {
     /**
      * Return the type's super type.
      */
@@ -51,7 +50,7 @@ public interface ReferenceType extends Type
      * @see polyglot.types.MemberInstance
      */
     List<? extends MemberInstance> members();
-    
+
     /**
      * Return the type's fields.
      * @return A list of <code>FieldInstance</code>.
@@ -88,7 +87,8 @@ public interface ReferenceType extends Type
      * @see polyglot.types.Type
      * @see polyglot.types.MethodInstance
      */
-    List<? extends MethodInstance> methods(String name, List<? extends Type> argTypes);
+    List<? extends MethodInstance> methods(String name,
+            List<? extends Type> argTypes);
 
     /**
      * Return the true if the type has the given method.

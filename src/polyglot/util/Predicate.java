@@ -32,8 +32,6 @@ package polyglot.util;
  *     This interface provides a general means for describing predicates
  *     about objects.
  **/
-public interface Predicate<T> { 
-  public boolean isTrue(T o);  
+public interface Predicate<T> {
+    public boolean isTrue(T o);
 }
-
-

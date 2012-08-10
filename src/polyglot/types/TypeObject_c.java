@@ -36,24 +36,23 @@ import polyglot.util.TypeInputStream;
 /**
  * Abstract implementation of a type object.  Contains a reference to the
  * type system and to the object's position in the code.
- */  
-public abstract class TypeObject_c implements TypeObject
-{
+ */
+public abstract class TypeObject_c implements TypeObject {
     protected transient TypeSystem ts;
     protected Position position;
 
     /** Used for deserializing types. */
     protected TypeObject_c() {
     }
-    
+
     /** Creates a new type in the given a TypeSystem. */
     public TypeObject_c(TypeSystem ts) {
         this(ts, null);
     }
 
     public TypeObject_c(TypeSystem ts, Position pos) {
-	this.ts = ts;
-	this.position = pos;
+        this.ts = ts;
+        this.position = pos;
     }
 
     @Override
@@ -81,10 +80,10 @@ public abstract class TypeObject_c implements TypeObject
     }
 
     private void readObject(ObjectInputStream in) throws IOException,
-					       ClassNotFoundException {
-	if (in instanceof TypeInputStream) {
-	    ts = ((TypeInputStream) in).getTypeSystem();
-	}
+            ClassNotFoundException {
+        if (in instanceof TypeInputStream) {
+            ts = ((TypeInputStream) in).getTypeSystem();
+        }
 
         in.defaultReadObject();
     }
@@ -102,7 +101,7 @@ public abstract class TypeObject_c implements TypeObject
     public int hashCode() {
         return super.hashCode();
     }
-    
+
     /**
      * Default implementation is pointer equality.
      */
@@ -114,8 +113,13 @@ public abstract class TypeObject_c implements TypeObject
     /**
      * Overload equalsImpl to find inadvertent overriding errors.
      * Make package-scope and void to break callers.
-     */ 
-    final void equalsImpl(Object o) { }
-    final void typeEqualsImpl(Object o) { }
-    final void typeEqualsImpl(TypeObject o) { }
+     */
+    final void equalsImpl(Object o) {
+    }
+
+    final void typeEqualsImpl(Object o) {
+    }
+
+    final void typeEqualsImpl(TypeObject o) {
+    }
 }

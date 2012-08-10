@@ -37,11 +37,11 @@ import polyglot.frontend.goals.Goal;
 public class MissingDependencyException extends SchedulerException {
     protected Goal goal;
     protected boolean prerequisite;
-    
+
     public MissingDependencyException(Goal goal) {
         this(goal, false);
     }
-    
+
     public MissingDependencyException(Goal goal, boolean prerequisite) {
         super(goal.toString());
         this.goal = goal;
@@ -51,11 +51,11 @@ public class MissingDependencyException extends SchedulerException {
     public Goal goal() {
         return goal;
     }
-    
+
     public boolean prerequisite() {
         return prerequisite;
     }
-    
+
     @Override
     public void printStackTrace() {
         super.printStackTrace();

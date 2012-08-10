@@ -17,13 +17,18 @@ public interface JL5ParsedClassType extends ParsedClassType, JL5ClassType {
      * track of instantiated types.
      */
     PClass<TypeVariable, ReferenceType> pclass();
+
     void setPClass(PClass<TypeVariable, ReferenceType> pc);
+
     void setTypeVariables(List<TypeVariable> typeVars);
+
     List<TypeVariable> typeVariables();
 
     void addEnumConstant(EnumInstance ei);
+
     @Override
     List<EnumInstance> enumConstants();
+
     @Override
     EnumInstance enumConstantNamed(String name);
 
@@ -41,6 +46,7 @@ public interface JL5ParsedClassType extends ParsedClassType, JL5ClassType {
     JL5Subst erasureSubst();
 
     void printNoParams(CodeWriter w);
+
     String toStringNoParams();
 
     /**

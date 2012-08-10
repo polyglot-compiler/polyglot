@@ -30,6 +30,5 @@ package polyglot.frontend;
  * one source file.  It includes all information carried between phases
  * of the compiler.
  */
-public interface JobExt
-{
+public interface JobExt {
 }

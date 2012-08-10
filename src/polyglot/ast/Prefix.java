@@ -31,6 +31,5 @@ package polyglot.ast;
  * can either be an enclosing type or can be a package.  If the receiver is an
  * expression, its prefix can be either an expression or a type.
  */
-public interface Prefix extends Node
-{
+public interface Prefix extends Node {
 }

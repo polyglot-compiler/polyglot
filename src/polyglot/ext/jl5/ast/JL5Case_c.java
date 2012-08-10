@@ -26,18 +26,18 @@ public class JL5Case_c extends Case_c implements JL5Case {
 
     @Override
     public Node disambiguateOverride(Node parent, AmbiguityRemover ar)
-    throws SemanticException {
+            throws SemanticException {
         //We can't disambiguate unqualified names until the switch expression
         // is typed.
-        if(expr instanceof AmbExpr) {
+        if (expr instanceof AmbExpr) {
             return this;
         }
-        else
-            return null;
+        else return null;
     }
 
     @Override
-    public Node typeCheckOverride(Node parent, TypeChecker tc) throws SemanticException {
+    public Node typeCheckOverride(Node parent, TypeChecker tc)
+            throws SemanticException {
         if (this.expr == null || this.expr instanceof Lit) {
             return null;
         }
@@ -45,56 +45,67 @@ public class JL5Case_c extends Case_c implements JL5Case {
         return this;
     }
 
-
     @Override
     public Node resolveCaseLabel(TypeChecker tc, Type switchType)
-    throws SemanticException {
-        JL5TypeSystem ts = (JL5TypeSystem)tc.typeSystem();
+            throws SemanticException {
+        JL5TypeSystem ts = (JL5TypeSystem) tc.typeSystem();
         JL5NodeFactory nf = (JL5NodeFactory) tc.nodeFactory();
 
         if (expr == null) {
             return this;
-        } 
+        }
         else if (switchType.isClass() && !isNumericSwitchType(switchType, ts)) {
             // must be an enum...
             if (expr instanceof EnumConstant) {
                 // we have already resolved the expression
-                EnumConstant ec = (EnumConstant)expr;
+                EnumConstant ec = (EnumConstant) expr;
                 return this.value(ec.enumInstance().ordinal());
             }
             else if (expr instanceof AmbExpr) {
                 AmbExpr amb = (AmbExpr) expr;
-                EnumInstance ei = ts.findEnumConstant(switchType.toReference(), amb.name());
-                Receiver r = nf.CanonicalTypeNode(Position.compilerGenerated(), switchType);
-                EnumConstant e = nf.EnumConstant(expr.position(), r, amb.id()).enumInstance(ei);
+                EnumInstance ei =
+                        ts.findEnumConstant(switchType.toReference(),
+                                            amb.name());
+                Receiver r =
+                        nf.CanonicalTypeNode(Position.compilerGenerated(),
+                                             switchType);
+                EnumConstant e =
+                        nf.EnumConstant(expr.position(), r, amb.id())
+                          .enumInstance(ei);
                 e = (EnumConstant) e.type(ei.type());
                 return this.expr(e).value(ei.ordinal());
             }
             else {
                 throw new InternalCompilerError("Unexpected case label " + expr);
             }
-        } 
-        
+        }
+
         // switch type is not a class.
         JL5Case_c n = this;
-        
 
-        if(expr.isTypeChecked()) {
+        if (expr.isTypeChecked()) {
             // all good, nothing to do.
         }
         else if (expr instanceof AmbExpr) {
             AmbExpr amb = (AmbExpr) expr;
             //Disambiguate and typecheck
-            Expr e = (Expr) tc.nodeFactory().disamb().disambiguate(amb, tc, expr.position(), null, amb.id());
+            Expr e =
+                    (Expr) tc.nodeFactory()
+                             .disamb()
+                             .disambiguate(amb,
+                                           tc,
+                                           expr.position(),
+                                           null,
+                                           amb.id());
             e = (Expr) e.visit(tc);
             n = (JL5Case_c) expr(e);
         }
         else {
             // try type checking it
-            n = (JL5Case_c) this.expr((Expr)this.expr.visit(tc));
+            n = (JL5Case_c) this.expr((Expr) this.expr.visit(tc));
         }
 
-        if (! n.expr().constantValueSet()) {
+        if (!n.expr().constantValueSet()) {
             // Not ready yet; pass will get rerun.
             return n;
         }
@@ -103,7 +114,7 @@ public class JL5Case_c extends Case_c implements JL5Case {
             if (o instanceof Number && !(o instanceof Long)
                     && !(o instanceof Float) && !(o instanceof Double)) {
                 return n.value(((Number) o).longValue());
-            } 
+            }
             else if (o instanceof Character) {
                 return n.value(((Character) o).charValue());
             }
@@ -113,16 +124,20 @@ public class JL5Case_c extends Case_c implements JL5Case {
     }
 
     private boolean isNumericSwitchType(Type switchType, JL5TypeSystem ts) {
-        if (ts.Char().equals(switchType) || ts.wrapperClassOfPrimitive(ts.Char()).equals(switchType) ) {
+        if (ts.Char().equals(switchType)
+                || ts.wrapperClassOfPrimitive(ts.Char()).equals(switchType)) {
             return true;
         }
-        if (ts.Byte().equals(switchType) || ts.wrapperClassOfPrimitive(ts.Byte()).equals(switchType) ) {
+        if (ts.Byte().equals(switchType)
+                || ts.wrapperClassOfPrimitive(ts.Byte()).equals(switchType)) {
             return true;
         }
-        if (ts.Short().equals(switchType) || ts.wrapperClassOfPrimitive(ts.Short()).equals(switchType) ) {
+        if (ts.Short().equals(switchType)
+                || ts.wrapperClassOfPrimitive(ts.Short()).equals(switchType)) {
             return true;
         }
-        if (ts.Int().equals(switchType) || ts.wrapperClassOfPrimitive(ts.Int()).equals(switchType) ) {
+        if (ts.Int().equals(switchType)
+                || ts.wrapperClassOfPrimitive(ts.Int()).equals(switchType)) {
             return true;
         }
         return false;
@@ -135,10 +150,13 @@ public class JL5Case_c extends Case_c implements JL5Case {
         }
         else {
             w.write("case ");
-            JL5TypeSystem ts = expr.type() == null ? null : (JL5TypeSystem)expr.type().typeSystem();
-            if (ts != null && expr.type().isReference() && expr.type().isSubtype(ts.toRawType(ts.Enum()))) {
+            JL5TypeSystem ts =
+                    expr.type() == null ? null
+                            : (JL5TypeSystem) expr.type().typeSystem();
+            if (ts != null && expr.type().isReference()
+                    && expr.type().isSubtype(ts.toRawType(ts.Enum()))) {
                 // this is an enum	            
-                Field f = (Field)expr;
+                Field f = (Field) expr;
                 w.write(f.name());
             }
             else {

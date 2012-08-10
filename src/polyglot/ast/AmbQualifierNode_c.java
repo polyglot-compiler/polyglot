@@ -41,30 +41,29 @@ import polyglot.visit.TypeChecker;
  * An <code>AmbQualifierNode</code> is an ambiguous AST node composed of
  * dot-separated list of identifiers that must resolve to a type qualifier.
  */
-public class AmbQualifierNode_c extends Node_c implements AmbQualifierNode
-{
+public class AmbQualifierNode_c extends Node_c implements AmbQualifierNode {
     protected Qualifier qualifier;
     protected QualifierNode qual;
     protected Id name;
 
     public AmbQualifierNode_c(Position pos, QualifierNode qual, Id name) {
-	super(pos);
-	assert(name != null); // qual may be null
+        super(pos);
+        assert (name != null); // qual may be null
 
-	this.qual = qual;
-	this.name = name;
+        this.qual = qual;
+        this.name = name;
     }
-    
+
     @Override
     public Qualifier qualifier() {
-	return this.qualifier;
+        return this.qualifier;
     }
-    
+
     @Override
     public Id id() {
         return this.name;
     }
-    
+
     public AmbQualifierNode id(Id name) {
         AmbQualifierNode_c n = (AmbQualifierNode_c) copy();
         n.name = name;
@@ -73,7 +72,7 @@ public class AmbQualifierNode_c extends Node_c implements AmbQualifierNode
 
     @Override
     public String name() {
-	return this.name.id();
+        return this.name.id();
     }
 
     public AmbQualifierNode name(String name) {
@@ -82,37 +81,37 @@ public class AmbQualifierNode_c extends Node_c implements AmbQualifierNode
 
     @Override
     public QualifierNode qual() {
-	return this.qual;
+        return this.qual;
     }
 
     public AmbQualifierNode qual(QualifierNode qual) {
-	AmbQualifierNode_c n = (AmbQualifierNode_c) copy();
-	n.qual = qual;
-	return n;
+        AmbQualifierNode_c n = (AmbQualifierNode_c) copy();
+        n.qual = qual;
+        return n;
     }
 
     public AmbQualifierNode qualifier(Qualifier qualifier) {
-	AmbQualifierNode_c n = (AmbQualifierNode_c) copy();
-	n.qualifier = qualifier;
-	return n;
+        AmbQualifierNode_c n = (AmbQualifierNode_c) copy();
+        n.qualifier = qualifier;
+        return n;
     }
 
     protected AmbQualifierNode_c reconstruct(QualifierNode qual, Id name) {
-	if (qual != this.qual || name != this.name) {
-	    AmbQualifierNode_c n = (AmbQualifierNode_c) copy();
-	    n.qual = qual;
-	    n.name = name;
-	    return n;
-	}
+        if (qual != this.qual || name != this.name) {
+            AmbQualifierNode_c n = (AmbQualifierNode_c) copy();
+            n.qual = qual;
+            n.name = name;
+            return n;
+        }
 
-	return this;
+        return this;
     }
 
     @Override
     public Node visitChildren(NodeVisitor v) {
         Id name = (Id) visitChild(this.name, v);
-	QualifierNode qual = (QualifierNode) visitChild(this.qual, v);
-	return reconstruct(qual, name);
+        QualifierNode qual = (QualifierNode) visitChild(this.qual, v);
+        return reconstruct(qual, name);
     }
 
     @Override
@@ -122,19 +121,22 @@ public class AmbQualifierNode_c extends Node_c implements AmbQualifierNode
 
     @Override
     public Node disambiguate(AmbiguityRemover sc) throws SemanticException {
-        if (qual != null && ! qual.isDisambiguated()) {
+        if (qual != null && !qual.isDisambiguated()) {
             return this;
         }
-        
-	Node n = sc.nodeFactory().disamb().disambiguate(this, sc, position(), qual, name);
 
-	if (n instanceof QualifierNode) {
-	    return n;
-	}
+        Node n =
+                sc.nodeFactory()
+                  .disamb()
+                  .disambiguate(this, sc, position(), qual, name);
 
-	throw new SemanticException("Could not find type or package \"" +
-            (qual == null ? name.toString() : qual.toString() + "." + name.toString()) +
-	    "\".", position());
+        if (n instanceof QualifierNode) {
+            return n;
+        }
+
+        throw new SemanticException("Could not find type or package \""
+                + (qual == null ? name.toString() : qual.toString() + "."
+                        + name.toString()) + "\".", position());
     }
 
     @Override
@@ -142,30 +144,32 @@ public class AmbQualifierNode_c extends Node_c implements AmbQualifierNode
         // Didn't finish disambiguation; just return.
         return this;
     }
-    
+
     @Override
     public Node exceptionCheck(ExceptionChecker ec) throws SemanticException {
-	throw new InternalCompilerError(position(),
-	    "Cannot exception check ambiguous node " + this + ".");
-    } 
+        throw new InternalCompilerError(position(),
+                                        "Cannot exception check ambiguous node "
+                                                + this + ".");
+    }
 
     @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
-	if (qual != null) {
+        if (qual != null) {
             print(qual, w, tr);
             w.write(".");
-	    w.allowBreak(2, 3, "", 0);
+            w.allowBreak(2, 3, "", 0);
         }
-             
+
         tr.print(this, name, w);
     }
 
     @Override
     public String toString() {
-	return (qual == null
-		? name.toString()
-		: qual.toString() + "." + name.toString()) + "{amb}";
+        return (qual == null ? name.toString() : qual.toString() + "."
+                + name.toString())
+                + "{amb}";
     }
+
     @Override
     public Node copy(NodeFactory nf) {
         return nf.AmbQualifierNode(this.position, this.qual, this.name);

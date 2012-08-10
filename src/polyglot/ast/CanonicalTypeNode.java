@@ -28,6 +28,5 @@ package polyglot.ast;
 /**
  * A <code>CanonicalTypeNode</code> is a type node for a canonical type.
  */
-public interface CanonicalTypeNode extends TypeNode
-{
+public interface CanonicalTypeNode extends TypeNode {
 }

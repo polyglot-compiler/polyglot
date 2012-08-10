@@ -26,7 +26,7 @@ import java.util.Set;
  **/
 public final class NilMap<K, V> implements Map<K, V> {
     public static final NilMap<?, ?> EMPTY_MAP = new NilMap<Object, Object>();
-    
+
     @SuppressWarnings("unchecked")
     public static final <K, V> NilMap<K, V> emptyMap() {
         return (NilMap<K, V>) EMPTY_MAP;

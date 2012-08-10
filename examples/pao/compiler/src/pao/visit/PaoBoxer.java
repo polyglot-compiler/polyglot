@@ -28,8 +28,7 @@ import polyglot.visit.NodeVisitor;
  * method to rewrite these explicit casts into appropriate boxing and
  * unboxing code.
  */
-public class PaoBoxer extends AscriptionVisitor
-{
+public class PaoBoxer extends AscriptionVisitor {
     public PaoBoxer(Job job, TypeSystem ts, NodeFactory nf) {
         super(job, ts, nf);
     }
@@ -68,7 +67,8 @@ public class PaoBoxer extends AscriptionVisitor
      * <code>ascribe</code> method into correct boxing and unboxing code.
      */
     @Override
-    public Node leaveCall(Node old, Node n, NodeVisitor v) throws SemanticException {
+    public Node leaveCall(Node old, Node n, NodeVisitor v)
+            throws SemanticException {
         n = super.leaveCall(old, n, v);
 
         if (n.ext() instanceof PaoExt) {

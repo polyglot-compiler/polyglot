@@ -52,95 +52,99 @@ import polyglot.util.InternalCompilerError;
  */
 public abstract class ParserlessJLExtensionInfo extends AbstractExtensionInfo {
 
-	/**
-	 * The LoadedClassResolver to use when initializing the type system.
-	 * 
-	 * @see polyglot.frontend.ParserlessJLExtensionInfo#initTypeSystem()
-	 */
-	protected LoadedClassResolver makeLoadedClassResolver() {
-		return new SourceClassResolver(compiler, this, true,
-				getOptions().compile_command_line_only,
-				getOptions().ignore_mod_times);
-	}
+    /**
+     * The LoadedClassResolver to use when initializing the type system.
+     * 
+     * @see polyglot.frontend.ParserlessJLExtensionInfo#initTypeSystem()
+     */
+    protected LoadedClassResolver makeLoadedClassResolver() {
+        return new SourceClassResolver(compiler,
+                                       this,
+                                       true,
+                                       getOptions().compile_command_line_only,
+                                       getOptions().ignore_mod_times);
+    }
 
-	@Override
+    @Override
     protected void initTypeSystem() {
-		try {
-			LoadedClassResolver lr = makeLoadedClassResolver();
+        try {
+            LoadedClassResolver lr = makeLoadedClassResolver();
 
-			TopLevelResolver r = lr;
+            TopLevelResolver r = lr;
 
-			// Resolver to handle lookups of member classes.
-			if (TypeSystem.SERIALIZE_MEMBERS_WITH_CONTAINER) {
-				MemberClassResolver mcr = new MemberClassResolver(ts, lr, true);
-				r = mcr;
-			}
+            // Resolver to handle lookups of member classes.
+            if (TypeSystem.SERIALIZE_MEMBERS_WITH_CONTAINER) {
+                MemberClassResolver mcr = new MemberClassResolver(ts, lr, true);
+                r = mcr;
+            }
 
-			ts.initialize(r, this);
-		} catch (SemanticException e) {
-			throw new InternalCompilerError(
-					"Unable to initialize type system: " + e.getMessage(), e);
-		}
-	}
+            ts.initialize(r, this);
+        }
+        catch (SemanticException e) {
+            throw new InternalCompilerError("Unable to initialize type system: "
+                                                    + e.getMessage(),
+                                            e);
+        }
+    }
 
-	@Override
+    @Override
     protected polyglot.frontend.Scheduler createScheduler() {
-		return new JLScheduler(this);
-	}
+        return new JLScheduler(this);
+    }
 
-	@Override
+    @Override
     public String defaultFileExtension() {
-		return "jl";
-	}
+        return "jl";
+    }
 
-	@Override
+    @Override
     public String compilerName() {
-		return "jlc";
-	}
+        return "jlc";
+    }
 
-	@Override
+    @Override
     public Version version() {
-		return new JLVersion();
-	}
+        return new JLVersion();
+    }
 
-	/** Create the type system for this extension. */
-	@Override
+    /** Create the type system for this extension. */
+    @Override
     protected TypeSystem createTypeSystem() {
-		return new TypeSystem_c();
-	}
+        return new TypeSystem_c();
+    }
 
-	/** Create the node factory for this extension. */
-	@Override
+    /** Create the node factory for this extension. */
+    @Override
     protected NodeFactory createNodeFactory() {
-		return new NodeFactory_c();
-	}
+        return new NodeFactory_c();
+    }
 
-	@Override
+    @Override
     public JobExt jobExt() {
-		return null;
-	}
+        return null;
+    }
 
-	/**
-	 * Return a parser for <code>source</code> using the given
-	 * <code>reader</code>.
-	 */
-	@Override
+    /**
+     * Return a parser for <code>source</code> using the given
+     * <code>reader</code>.
+     */
+    @Override
     public abstract Parser parser(Reader reader, FileSource source,
-			ErrorQueue eq);
+            ErrorQueue eq);
 
-	/**
-	 * Return the <code>Goal</code> to compile the source file associated with
-	 * <code>job</code> to completion.
-	 */
-	@Override
+    /**
+     * Return the <code>Goal</code> to compile the source file associated with
+     * <code>job</code> to completion.
+     */
+    @Override
     public Goal getCompileGoal(Job job) {
-		return scheduler.CodeGenerated(job);
-	}
+        return scheduler.CodeGenerated(job);
+    }
 
-	static {
-	        // Force Topics to load.
-		@SuppressWarnings("unused")
-		Topics t = new Topics();
-	}
+    static {
+        // Force Topics to load.
+        @SuppressWarnings("unused")
+        Topics t = new Topics();
+    }
 
 }

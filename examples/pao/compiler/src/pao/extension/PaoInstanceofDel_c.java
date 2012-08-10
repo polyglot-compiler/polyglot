@@ -20,24 +20,23 @@ import polyglot.visit.TypeChecker;
  * {@link #typeCheck(TypeChecker) typeCheck(TypeChecker)} method.
  */
 public class PaoInstanceofDel_c extends JL_c {
-	/**
-	 * Removes the restriction that the compare type must be a 
-	 * <code>ReferenceType</code>. 
-	 * @see polyglot.ast.NodeOps#typeCheck(TypeChecker)
-	 * @see polyglot.ast.Instanceof_c#typeCheck(TypeChecker)
-	 */
-	@Override
+    /**
+     * Removes the restriction that the compare type must be a 
+     * <code>ReferenceType</code>. 
+     * @see polyglot.ast.NodeOps#typeCheck(TypeChecker)
+     * @see polyglot.ast.Instanceof_c#typeCheck(TypeChecker)
+     */
+    @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
-		Instanceof n = (Instanceof) node();
-		Type rtype = n.compareType().type();
-		Type ltype = n.expr().type();
-		
-		if (! tc.typeSystem().isCastValid(ltype, rtype)) {
-			throw new SemanticException(
-					"Left operand of \"instanceof\" must be castable to "
-					+ "the right operand.");
-		}
-		
-		return n.type(tc.typeSystem().Boolean());
-	}
+        Instanceof n = (Instanceof) node();
+        Type rtype = n.compareType().type();
+        Type ltype = n.expr().type();
+
+        if (!tc.typeSystem().isCastValid(ltype, rtype)) {
+            throw new SemanticException("Left operand of \"instanceof\" must be castable to "
+                    + "the right operand.");
+        }
+
+        return n.type(tc.typeSystem().Boolean());
+    }
 }

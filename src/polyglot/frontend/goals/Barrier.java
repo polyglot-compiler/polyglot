@@ -40,7 +40,7 @@ import polyglot.frontend.Scheduler;
  */
 public abstract class Barrier extends AbstractGoal {
     protected Scheduler scheduler;
-    
+
     protected Barrier(Scheduler scheduler) {
         super(null);
         this.scheduler = scheduler;
@@ -50,7 +50,7 @@ public abstract class Barrier extends AbstractGoal {
         super(null, name);
         this.scheduler = scheduler;
     }
-    
+
     public Collection<Job> jobs() {
         return scheduler.jobs();
     }
@@ -65,18 +65,18 @@ public abstract class Barrier extends AbstractGoal {
 
     protected static class BarrierPass extends AbstractPass {
         public Scheduler scheduler;
-        
+
         protected BarrierPass(Scheduler scheduler, Barrier barrier) {
             super(barrier);
             this.scheduler = scheduler;
         }
-                
+
         @Override
         public boolean run() {
             Barrier barrier = (Barrier) goal();
             for (Job job : barrier.jobs()) {
                 Goal subgoal = barrier.goalForJob(job);
-                if (! subgoal.hasBeenReached()) {
+                if (!subgoal.hasBeenReached()) {
                     scheduler.addDependencyAndEnqueue(barrier, subgoal, true);
                     barrier.setUnreachableThisRun();
                 }
@@ -85,7 +85,7 @@ public abstract class Barrier extends AbstractGoal {
         }
     }
 
-    public abstract Goal goalForJob(Job job); 
+    public abstract Goal goalForJob(Job job);
 
     @Override
     public String toString() {
@@ -94,7 +94,7 @@ public abstract class Barrier extends AbstractGoal {
         }
         return name;
     }
-    
+
     @Override
     public int hashCode() {
         if (name == null) {

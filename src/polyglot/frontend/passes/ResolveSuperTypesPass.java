@@ -35,13 +35,13 @@ import polyglot.types.ParsedClassType;
 public class ResolveSuperTypesPass extends ClassFilePass {
     protected Scheduler scheduler;
     protected SupertypesResolved goal;
-    
+
     public ResolveSuperTypesPass(Scheduler scheduler, SupertypesResolved goal) {
         super(goal);
         this.scheduler = scheduler;
         this.goal = goal;
     }
-    
+
     @Override
     public boolean run() {
         ParsedClassType ct = goal.type();

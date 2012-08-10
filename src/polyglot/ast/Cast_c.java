@@ -43,87 +43,85 @@ import polyglot.visit.TypeChecker;
  * A <code>Cast</code> is an immutable representation of a casting
  * operation.  It consists of an <code>Expr</code> being cast and a
  * <code>TypeNode</code> being cast to.
- */ 
-public class Cast_c extends Expr_c implements Cast
-{
+ */
+public class Cast_c extends Expr_c implements Cast {
     protected TypeNode castType;
     protected Expr expr;
 
     public Cast_c(Position pos, TypeNode castType, Expr expr) {
-	super(pos);
-	assert(castType != null && expr != null);
-	this.castType = castType;
-	this.expr = expr;
+        super(pos);
+        assert (castType != null && expr != null);
+        this.castType = castType;
+        this.expr = expr;
     }
 
     /** Get the precedence of the expression. */
     @Override
     public Precedence precedence() {
-	return Precedence.CAST;
+        return Precedence.CAST;
     }
 
     /** Get the cast type of the expression. */
     @Override
     public TypeNode castType() {
-	return this.castType;
+        return this.castType;
     }
 
     /** Set the cast type of the expression. */
     @Override
     public Cast castType(TypeNode castType) {
-	Cast_c n = (Cast_c) copy();
-	n.castType = castType;
-	return n;
+        Cast_c n = (Cast_c) copy();
+        n.castType = castType;
+        return n;
     }
 
     /** Get the expression being cast. */
     @Override
     public Expr expr() {
-	return this.expr;
+        return this.expr;
     }
 
     /** Set the expression being cast. */
     @Override
     public Cast expr(Expr expr) {
-	Cast_c n = (Cast_c) copy();
-	n.expr = expr;
-	return n;
+        Cast_c n = (Cast_c) copy();
+        n.expr = expr;
+        return n;
     }
 
     /** Reconstruct the expression. */
     protected Cast_c reconstruct(TypeNode castType, Expr expr) {
-	if (castType != this.castType || expr != this.expr) {
-	    Cast_c n = (Cast_c) copy();
-	    n.castType = castType;
-	    n.expr = expr;
-	    return n;
-	}
+        if (castType != this.castType || expr != this.expr) {
+            Cast_c n = (Cast_c) copy();
+            n.castType = castType;
+            n.expr = expr;
+            return n;
+        }
 
-	return this;
+        return this;
     }
 
     /** Visit the children of the expression. */
     @Override
     public Node visitChildren(NodeVisitor v) {
-	TypeNode castType = (TypeNode) visitChild(this.castType, v);
-	Expr expr = (Expr) visitChild(this.expr, v);
-	return reconstruct(castType, expr);
+        TypeNode castType = (TypeNode) visitChild(this.castType, v);
+        Expr expr = (Expr) visitChild(this.expr, v);
+        return reconstruct(castType, expr);
     }
 
     /** Type check the expression. */
     @Override
-    public Node typeCheck(TypeChecker tc) throws SemanticException
-    {
+    public Node typeCheck(TypeChecker tc) throws SemanticException {
         TypeSystem ts = tc.typeSystem();
 
-        if (! ts.isCastValid(expr.type(), castType.type())) {
-	    throw new SemanticException("Cannot cast the expression of type \"" 
-					+ expr.type() + "\" to type \"" 
-					+ castType.type() + "\".",
-				        position());
-	}
+        if (!ts.isCastValid(expr.type(), castType.type())) {
+            throw new SemanticException("Cannot cast the expression of type \""
+                                                + expr.type() + "\" to type \""
+                                                + castType.type() + "\".",
+                                        position());
+        }
 
-	return type(castType.type());
+        return type(castType.type());
     }
 
     @Override
@@ -144,23 +142,22 @@ public class Cast_c extends Expr_c implements Cast
 
         return child.type();
     }
-  
+
     @Override
     public String toString() {
-	return "(" + castType + ") " + expr;
+        return "(" + castType + ") " + expr;
     }
 
     /** Write the expression to an output file. */
     @Override
-    public void prettyPrint(CodeWriter w, PrettyPrinter tr)
-    {
-	w.begin(0);
-	w.write("(");
-	print(castType, w, tr);
-	w.write(")");
-	w.allowBreak(2, " ");
-	printSubExpr(expr, w, tr);
-	w.end();
+    public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
+        w.begin(0);
+        w.write("(");
+        print(castType, w, tr);
+        w.write(")");
+        w.allowBreak(2, " ");
+        printSubExpr(expr, w, tr);
+        w.end();
     }
 
     @Override
@@ -183,20 +180,20 @@ public class Cast_c extends Expr_c implements Cast
 
         return Collections.<Type> emptyList();
     }
-    
+
     @Override
     public boolean isConstant() {
-	return expr.isConstant() && castType.type().isPrimitive();
+        return expr.isConstant() && castType.type().isPrimitive();
     }
-    
+
     @Override
     public Object constantValue() {
         Object v = expr.constantValue();
 
-	if (v == null) {
-	    return null;
-	}
-	
+        if (v == null) {
+            return null;
+        }
+
         if (v instanceof Boolean) {
             if (castType.type().isBoolean()) return v;
         }
@@ -257,6 +254,7 @@ public class Cast_c extends Expr_c implements Cast
         // not a constant
         return null;
     }
+
     @Override
     public Node copy(NodeFactory nf) {
         return nf.Cast(this.position, this.castType, this.expr);

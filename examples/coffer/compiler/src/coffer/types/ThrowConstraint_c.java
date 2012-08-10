@@ -15,8 +15,8 @@ public class ThrowConstraint_c extends TypeObject_c implements ThrowConstraint {
     Type throwType;
     KeySet keys;
 
-    public ThrowConstraint_c(CofferTypeSystem ts, Position pos,
-                             Type throwType, KeySet keys) {
+    public ThrowConstraint_c(CofferTypeSystem ts, Position pos, Type throwType,
+            KeySet keys) {
         super(ts, pos);
         this.throwType = throwType;
         this.keys = keys;

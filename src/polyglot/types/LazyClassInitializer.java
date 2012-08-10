@@ -30,8 +30,7 @@ package polyglot.types;
  * a class after it has been created.  Members are initialized lazily
  * to correctly handle cyclic dependencies between classes.
  */
-public interface LazyClassInitializer extends LazyInitializer
-{
+public interface LazyClassInitializer extends LazyInitializer {
     /**
      * Return true if the class is from a class file.
      */
@@ -39,14 +38,14 @@ public interface LazyClassInitializer extends LazyInitializer
 
     /** Set the class type we're initializing. */
     public void setClass(ParsedClassType ct);
-    
+
     /**
      * Initialize <code>ct</code>'s superclass.
      * This method ensures the superclass of the class is initailized to a
      * canonical type, or throws a <code>MissingDependencyException</code>.
      */
     public void initSuperclass();
-   
+
     /**
      * Initialize <code>ct</code>'s constructors.
      * This method ensures the list of constructors is populated with

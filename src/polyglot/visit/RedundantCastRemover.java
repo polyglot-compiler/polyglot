@@ -44,14 +44,15 @@ public class RedundantCastRemover extends NodeVisitor {
     public RedundantCastRemover() {
         super();
     }
-    
+
     @Override
     public Node leave(Node old, Node n, NodeVisitor v) {
         if (n instanceof Cast) {
             Cast c = (Cast) n;
             Type castType = c.castType().type();
             Type exprType = c.expr().type();
-            if (exprType.isImplicitCastValid(castType) && !castType.isPrimitive()) {
+            if (exprType.isImplicitCastValid(castType)
+                    && !castType.isPrimitive()) {
                 // Redundant cast.
                 return c.expr();
             }
@@ -63,7 +64,8 @@ public class RedundantCastRemover extends NodeVisitor {
         if (n instanceof ProcedureCall) {
             ProcedureCall newCall = (ProcedureCall) n;
             ProcedureCall oldCall = (ProcedureCall) old;
-            List<Expr> newArgs = new ArrayList<Expr>(newCall.arguments().size());
+            List<Expr> newArgs =
+                    new ArrayList<Expr>(newCall.arguments().size());
             boolean changed = false;
             Iterator<Expr> i = newCall.arguments().iterator();
             Iterator<Expr> j = oldCall.arguments().iterator();

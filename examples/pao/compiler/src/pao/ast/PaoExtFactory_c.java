@@ -19,7 +19,7 @@ import polyglot.ast.Ext;
  * is responsible for creating <code>Ext</code> objects, and is
  * used only by the <code>NodeFactory</code>. 
  */
-public class PaoExtFactory_c extends AbstractExtFactory_c  {
+public class PaoExtFactory_c extends AbstractExtFactory_c {
     PaoExtFactory_c() {
         super();
     }

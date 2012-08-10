@@ -41,124 +41,126 @@ import polyglot.visit.TypeChecker;
  * dot-separated list of identifiers that must resolve to a type.
  */
 public class AmbTypeNode_c extends TypeNode_c implements AmbTypeNode {
-  protected QualifierNode qual;
-  protected Id name;
+    protected QualifierNode qual;
+    protected Id name;
 
-  public AmbTypeNode_c(Position pos, QualifierNode qual,
-                       Id name) {
-    super(pos);
-assert(name != null); // qual may be null
-    this.qual = qual;
-    this.name = name;
-  }
-
-  @Override
-  public Id id() {
-      return this.name;
-  }
-  
-  @Override
-  public AmbTypeNode id(Id name) {
-      AmbTypeNode_c n = (AmbTypeNode_c) copy();
-      n.name = name;
-      return n;
-  }
-  
-  @Override
-  public String name() {
-    return this.name.id();
-  }
-
-  @Override
-  public AmbTypeNode name(String name) {
-      return id(this.name.id(name));
-  }
-
-  @Override
-  public QualifierNode qual() {
-    return this.qual;
-  }
-
-  @Override
-  public AmbTypeNode qual(QualifierNode qual) {
-    AmbTypeNode_c n = (AmbTypeNode_c) copy();
-    n.qual = qual;
-    return n;
-  }
-
-  protected AmbTypeNode_c reconstruct(QualifierNode qual, Id name) {
-    if (qual != this.qual || name != this.name) {
-      AmbTypeNode_c n = (AmbTypeNode_c) copy();
-      n.qual = qual;
-      n.name = name;
-      return n;
+    public AmbTypeNode_c(Position pos, QualifierNode qual, Id name) {
+        super(pos);
+        assert (name != null); // qual may be null
+        this.qual = qual;
+        this.name = name;
     }
 
-    return this;
-  }
-
-  @Override
-  public Node buildTypes(TypeBuilder tb) throws SemanticException {
-    return type(tb.typeSystem().unknownType(position()));
-  }
-
-  @Override
-  public Node visitChildren(NodeVisitor v) {
-      QualifierNode qual = (QualifierNode) visitChild(this.qual, v);
-      Id name = (Id) visitChild(this.name, v);
-      return reconstruct(qual, name);
-  }
-
-  @Override
-  public Node disambiguate(AmbiguityRemover sc) throws SemanticException {
-      if (qual != null && ! qual.isDisambiguated()) {
-          return this;
-      }
-
-      Node n = sc.nodeFactory().disamb().disambiguate(this, sc, position(), qual,
-                                                      name);
-      
-      if (n instanceof TypeNode) {
-          return n;
-      }
-      
-      throw new SemanticException("Could not find type \"" +
-                                  (qual == null ? name.toString() : qual.toString() + "." + name.toString()) +
-                                  "\".", position());
-  }
-
-  @Override
-  public Node typeCheck(TypeChecker tc) throws SemanticException {
-      // Didn't finish disambiguation; just return.
-      return this;
-  }
-
-  @Override
-  public Node exceptionCheck(ExceptionChecker ec) throws SemanticException {
-    throw new InternalCompilerError(position(),
-                                    "Cannot exception check ambiguous node "
-                                    + this + ".");
-  } 
-
-  @Override
-  public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
-    if (qual != null) {
-        print(qual, w, tr);
-        w.write(".");
-	w.allowBreak(2, 3, "", 0);
+    @Override
+    public Id id() {
+        return this.name;
     }
-            
-    tr.print(this, name, w);
-  }
 
-  @Override
-  public String toString() {
-    return (qual == null
-            ? name.toString()
-            : qual.toString() + "." + name.toString()) + "{amb}";
-  }
-  @Override
-  public Node copy(NodeFactory nf) {
-      return nf.AmbTypeNode(this.position, this.qual, this.name);
-  }
+    @Override
+    public AmbTypeNode id(Id name) {
+        AmbTypeNode_c n = (AmbTypeNode_c) copy();
+        n.name = name;
+        return n;
+    }
+
+    @Override
+    public String name() {
+        return this.name.id();
+    }
+
+    @Override
+    public AmbTypeNode name(String name) {
+        return id(this.name.id(name));
+    }
+
+    @Override
+    public QualifierNode qual() {
+        return this.qual;
+    }
+
+    @Override
+    public AmbTypeNode qual(QualifierNode qual) {
+        AmbTypeNode_c n = (AmbTypeNode_c) copy();
+        n.qual = qual;
+        return n;
+    }
+
+    protected AmbTypeNode_c reconstruct(QualifierNode qual, Id name) {
+        if (qual != this.qual || name != this.name) {
+            AmbTypeNode_c n = (AmbTypeNode_c) copy();
+            n.qual = qual;
+            n.name = name;
+            return n;
+        }
+
+        return this;
+    }
+
+    @Override
+    public Node buildTypes(TypeBuilder tb) throws SemanticException {
+        return type(tb.typeSystem().unknownType(position()));
+    }
+
+    @Override
+    public Node visitChildren(NodeVisitor v) {
+        QualifierNode qual = (QualifierNode) visitChild(this.qual, v);
+        Id name = (Id) visitChild(this.name, v);
+        return reconstruct(qual, name);
+    }
+
+    @Override
+    public Node disambiguate(AmbiguityRemover sc) throws SemanticException {
+        if (qual != null && !qual.isDisambiguated()) {
+            return this;
+        }
+
+        Node n =
+                sc.nodeFactory()
+                  .disamb()
+                  .disambiguate(this, sc, position(), qual, name);
+
+        if (n instanceof TypeNode) {
+            return n;
+        }
+
+        throw new SemanticException("Could not find type \""
+                + (qual == null ? name.toString() : qual.toString() + "."
+                        + name.toString()) + "\".", position());
+    }
+
+    @Override
+    public Node typeCheck(TypeChecker tc) throws SemanticException {
+        // Didn't finish disambiguation; just return.
+        return this;
+    }
+
+    @Override
+    public Node exceptionCheck(ExceptionChecker ec) throws SemanticException {
+        throw new InternalCompilerError(position(),
+                                        "Cannot exception check ambiguous node "
+                                                + this + ".");
+    }
+
+    @Override
+    public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
+        if (qual != null) {
+            print(qual, w, tr);
+            w.write(".");
+            w.allowBreak(2, 3, "", 0);
+        }
+
+        tr.print(this, name, w);
+    }
+
+    @Override
+    public String toString() {
+        return (qual == null ? name.toString() : qual.toString() + "."
+                + name.toString())
+                + "{amb}";
+    }
+
+    @Override
+    public Node copy(NodeFactory nf) {
+        return nf.AmbTypeNode(this.position, this.qual, this.name);
+    }
 }

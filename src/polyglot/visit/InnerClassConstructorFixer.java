@@ -44,45 +44,49 @@ import polyglot.types.TypeSystem;
  * This class translates inner classes to static nested classes with a field
  * pointing to the enclosing instance.
  */
-public class InnerClassConstructorFixer extends InnerClassAbstractRemover
-{
+public class InnerClassConstructorFixer extends InnerClassAbstractRemover {
     public InnerClassConstructorFixer(Job job, TypeSystem ts, NodeFactory nf) {
         super(job, ts, nf);
     }
 
     @Override
-    protected Node leaveCall(Node old, Node n, NodeVisitor v) throws SemanticException {
+    protected Node leaveCall(Node old, Node n, NodeVisitor v)
+            throws SemanticException {
         if (n instanceof New) {
             New newExp = (New) n;
             ClassType ct = (ClassType) newExp.objectType().type();
-            
+
             // If instantiating an inner class, pass in the environment at
             // the class declaration.  env(ct) will be empty of the class
             // was not inner.
             List<Expr> newArgs = new ArrayList<Expr>(newExp.arguments());
-            newArgs.addAll(envAsActuals(env(ct, true), ct.outer(), newExp.qualifier()));
+            newArgs.addAll(envAsActuals(env(ct, true),
+                                        ct.outer(),
+                                        newExp.qualifier()));
             newExp = (New) newExp.arguments(newArgs);
-            
+
             // Remove the qualifier.
             // FIXME: should pass in with arguments.
             // FIXME: need a barrier after this pass.
             // FIXME: should rewrite "new" after the barrier.
             // or should pass in all enclosing classes
             newExp = newExp.qualifier(null);
-            
+
             n = newExp;
         }
-        
+
         if (n instanceof ConstructorCall) {
             ConstructorCall cc = (ConstructorCall) n;
-            
+
             ClassType ct = context.currentClass();
-            
+
             if (cc.kind() == ConstructorCall.THIS) {
                 List<Expr> newArgs = new ArrayList<Expr>();
                 newArgs.addAll(cc.arguments());
-                newArgs.addAll(envAsActuals(env(ct, true), ct.outer(), cc.qualifier()));
-                
+                newArgs.addAll(envAsActuals(env(ct, true),
+                                            ct.outer(),
+                                            cc.qualifier()));
+
                 ConstructorCall newCC = (ConstructorCall) cc.arguments(newArgs);
                 newCC = newCC.qualifier(null);
                 n = newCC;
@@ -93,19 +97,21 @@ public class InnerClassConstructorFixer extends InnerClassAbstractRemover
                 newArgs.addAll(cc.arguments());
                 ClassType sup = (ClassType) ct.superType();
                 if (sup.isInnerClass()) {
-                    newArgs.addAll(envAsActuals(env(sup, true), sup.outer(), cc.qualifier()));
+                    newArgs.addAll(envAsActuals(env(sup, true),
+                                                sup.outer(),
+                                                cc.qualifier()));
                 }
                 else {
                     newArgs.addAll(envAsActuals(env(sup, true), null, null));
                 }
-                
+
                 ConstructorCall newCC = (ConstructorCall) cc.arguments(newArgs);
                 newCC = newCC.qualifier(null);
                 n = newCC;
             }
         }
-              
-          n = super.leaveCall(old, n, v);
-          return n;
+
+        n = super.leaveCall(old, n, v);
+        return n;
     }
 }

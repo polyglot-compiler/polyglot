@@ -11,6 +11,6 @@ import polyglot.types.ConstructorInstance;
 
 /** Coffer constructor instance. 
  */
-public interface CofferConstructorInstance extends ConstructorInstance, CofferProcedureInstance
-{
+public interface CofferConstructorInstance extends ConstructorInstance,
+        CofferProcedureInstance {
 }

@@ -8,6 +8,7 @@ public class AnnotationElementValueConstant_c extends TypeObject_c implements
         AnnotationElementValueConstant {
     private Type type;
     private Object constVal;
+
     public AnnotationElementValueConstant_c(JL5TypeSystem ts, Position pos,
             Type type, Object constVal) {
         super(ts, pos);

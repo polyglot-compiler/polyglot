@@ -35,7 +35,8 @@ import polyglot.types.TypeObject;
  * a ClassType that associates formal parameters with the class.
  * formals can be any type object.
  */
-public interface MuPClass<Formal extends Param, Actual extends TypeObject> extends PClass<Formal, Actual> {
+public interface MuPClass<Formal extends Param, Actual extends TypeObject>
+        extends PClass<Formal, Actual> {
 
     /**
      * Destructively update the formals.

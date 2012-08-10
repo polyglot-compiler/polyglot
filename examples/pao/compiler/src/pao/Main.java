@@ -12,17 +12,16 @@ package pao;
  * It simply invokes Polyglot's main, passing in the extension's
  * ExtensionInfo.
  */
-public class Main
-{
-  public static void main(String[] args) {
-      polyglot.main.Main polyglotMain = new polyglot.main.Main();
+public class Main {
+    public static void main(String[] args) {
+        polyglot.main.Main polyglotMain = new polyglot.main.Main();
 
-      try {
-          polyglotMain.start(args, new pao.ExtensionInfo());
-      }
-      catch (polyglot.main.Main.TerminationException e) {
-          System.err.println(e.getMessage());
-          System.exit(1);
-      }
-  }
+        try {
+            polyglotMain.start(args, new pao.ExtensionInfo());
+        }
+        catch (polyglot.main.Main.TerminationException e) {
+            System.err.println(e.getMessage());
+            System.exit(1);
+        }
+    }
 }

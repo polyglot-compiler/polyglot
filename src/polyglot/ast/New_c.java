@@ -67,8 +67,7 @@ import polyglot.visit.TypeChecker;
  * list of arguments to be passed to the constructor of the object and an
  * optional <code>ClassBody</code> used to support anonymous classes.
  */
-public class New_c extends Expr_c implements New
-{
+public class New_c extends Expr_c implements New {
     protected Expr qualifier;
     protected TypeNode tn;
     protected List<Expr> arguments;
@@ -76,9 +75,10 @@ public class New_c extends Expr_c implements New
     protected ConstructorInstance ci;
     protected ParsedClassType anonType;
 
-    public New_c(Position pos, Expr qualifier, TypeNode tn, List<Expr> arguments, ClassBody body) {
+    public New_c(Position pos, Expr qualifier, TypeNode tn,
+            List<Expr> arguments, ClassBody body) {
         super(pos);
-        assert(tn != null && arguments != null); // qualifier and body may be null
+        assert (tn != null && arguments != null); // qualifier and body may be null
         this.qualifier = qualifier;
         this.tn = tn;
         this.arguments = ListUtil.copy(arguments, true);
@@ -169,8 +169,11 @@ public class New_c extends Expr_c implements New
     }
 
     /** Reconstruct the expression. */
-    protected New_c reconstruct(Expr qualifier, TypeNode tn, List<Expr> arguments, ClassBody body) {
-        if (qualifier != this.qualifier || tn != this.tn || ! CollectionUtil.equals(arguments, this.arguments) || body != this.body) {
+    protected New_c reconstruct(Expr qualifier, TypeNode tn,
+            List<Expr> arguments, ClassBody body) {
+        if (qualifier != this.qualifier || tn != this.tn
+                || !CollectionUtil.equals(arguments, this.arguments)
+                || body != this.body) {
             New_c n = (New_c) copy();
             n.tn = tn;
             n.qualifier = qualifier;
@@ -228,11 +231,12 @@ public class New_c extends Expr_c implements New
             l.add(ts.unknownType(position()));
         }
 
-        ConstructorInstance ci = ts.constructorInstance(position(), 
-                                                        tb.currentClass(),
-                                                        Flags.NONE, l,
-                                                        Collections
-                                                            .<Type> emptyList());
+        ConstructorInstance ci =
+                ts.constructorInstance(position(),
+                                       tb.currentClass(),
+                                       Flags.NONE,
+                                       l,
+                                       Collections.<Type> emptyList());
         n = (New_c) n.constructorInstance(ci);
 
         if (n.body() != null) {
@@ -259,7 +263,8 @@ public class New_c extends Expr_c implements New
     }
 
     @Override
-    public Node disambiguateOverride(Node parent, AmbiguityRemover ar) throws SemanticException {
+    public Node disambiguateOverride(Node parent, AmbiguityRemover ar)
+            throws SemanticException {
         New nn = this;
         New old = nn;
 
@@ -274,20 +279,24 @@ public class New_c extends Expr_c implements New
 
         // Disambiguate the qualifier and object type, if possible.
         if (nn.qualifier() == null) {
-            nn = nn.objectType((TypeNode) nn.visitChild(nn.objectType(), childbd));
+            nn =
+                    nn.objectType((TypeNode) nn.visitChild(nn.objectType(),
+                                                           childbd));
             if (childbd.hasErrors()) throw new SemanticException();
 
-            if (! nn.objectType().isDisambiguated()) {
+            if (!nn.objectType().isDisambiguated()) {
                 return nn;
             }
 
             if (nn.objectType().type().isClass()) {
                 ClassType ct = nn.objectType().type().toClass();
 
-                if (ct.isMember() && ! ct.flags().isStatic()) {
+                if (ct.isMember() && !ct.flags().isStatic()) {
                     nn = ((New_c) nn).findQualifier(ar, ct);
 
-                    nn = nn.qualifier((Expr) nn.visitChild(nn.qualifier(), childbd));
+                    nn =
+                            nn.qualifier((Expr) nn.visitChild(nn.qualifier(),
+                                                              childbd));
                     if (childbd.hasErrors()) throw new SemanticException();
                 }
             }
@@ -308,22 +317,27 @@ public class New_c extends Expr_c implements New
 
                 String name = nn.objectType().name();
 
-                if (nn.qualifier().isDisambiguated() && nn.qualifier().type() != null && nn.qualifier().type().isCanonical()) {
+                if (nn.qualifier().isDisambiguated()
+                        && nn.qualifier().type() != null
+                        && nn.qualifier().type().isCanonical()) {
                     TypeSystem ts = ar.typeSystem();
                     NodeFactory nf = ar.nodeFactory();
                     Context c = ar.context();
 
-                    if (! nn.qualifier().type().isClass()) {
-                        throw new SemanticException("Cannot instantiate member class of non-class type.", nn.position());
+                    if (!nn.qualifier().type().isClass()) {
+                        throw new SemanticException("Cannot instantiate member class of non-class type.",
+                                                    nn.position());
                     }
 
                     ClassType outer = nn.qualifier().type().toClass();
-                    ClassType ct = ts.findMemberClass(outer, name, c.currentClass());
-                    TypeNode tn = nf.CanonicalTypeNode(nn.objectType().position(), ct); 
+                    ClassType ct =
+                            ts.findMemberClass(outer, name, c.currentClass());
+                    TypeNode tn =
+                            nf.CanonicalTypeNode(nn.objectType().position(), ct);
                     nn = nn.objectType(tn);
                 }
             }
-            else if (! nn.objectType().isDisambiguated()) {
+            else if (!nn.objectType().isDisambiguated()) {
                 // not yet disambiguated.
                 return nn;
             }
@@ -337,7 +351,7 @@ public class New_c extends Expr_c implements New
         if (childbd.hasErrors()) throw new SemanticException();
 
         if (nn.body() != null) {
-            if (! nn.objectType().isDisambiguated()) {
+            if (!nn.objectType().isDisambiguated()) {
                 return nn;
             }
 
@@ -345,8 +359,8 @@ public class New_c extends Expr_c implements New
 
             ParsedClassType anonType = nn.anonType();
 
-            if (anonType != null && ! anonType.supertypesResolved()) {
-                if (! ct.flags().isInterface()) {
+            if (anonType != null && !anonType.supertypesResolved()) {
+                if (!ct.flags().isInterface()) {
                     anonType.superType(ct);
                 }
                 else {
@@ -357,11 +371,13 @@ public class New_c extends Expr_c implements New
                 anonType.setSupertypesResolved(true);
             }
 
-            SupertypeDisambiguator supDisamb = new SupertypeDisambiguator(childbd);
+            SupertypeDisambiguator supDisamb =
+                    new SupertypeDisambiguator(childbd);
             nn = nn.body((ClassBody) nn.visitChild(nn.body(), supDisamb));
             if (supDisamb.hasErrors()) throw new SemanticException();
 
-            SignatureDisambiguator sigDisamb = new SignatureDisambiguator(childbd);
+            SignatureDisambiguator sigDisamb =
+                    new SignatureDisambiguator(childbd);
             nn = nn.body((ClassBody) nn.visitChild(nn.body(), sigDisamb));
             if (sigDisamb.hasErrors()) throw new SemanticException();
 
@@ -386,7 +402,8 @@ public class New_c extends Expr_c implements New
      * @param ct
      * @throws SemanticException
      */
-    protected New findQualifier(AmbiguityRemover ar, ClassType ct) throws SemanticException {
+    protected New findQualifier(AmbiguityRemover ar, ClassType ct)
+            throws SemanticException {
         // If we're instantiating a non-static member class, add a "this"
         // qualifier.
         NodeFactory nf = ar.nodeFactory();
@@ -397,8 +414,9 @@ public class New_c extends Expr_c implements New
         Type outer = findEnclosingClass(c, ct);
 
         if (outer == null) {
-            throw new SemanticException("Could not find non-static member class \"" +
-                    ct.name() + "\".", position());
+            throw new SemanticException("Could not find non-static member class \""
+                                                + ct.name() + "\".",
+                                        position());
         }
 
         // Create the qualifier.
@@ -408,9 +426,9 @@ public class New_c extends Expr_c implements New
             q = nf.This(position().startOf());
         }
         else {
-            q = nf.This(position().startOf(),
-                        nf.CanonicalTypeNode(position(),
-                                             outer));
+            q =
+                    nf.This(position().startOf(),
+                            nf.CanonicalTypeNode(position(), outer));
         }
 
         q = q.type(outer);
@@ -428,7 +446,8 @@ public class New_c extends Expr_c implements New
         }
 
         if (!tn.type().isClass()) {
-            throw new SemanticException("Must have a class for a new expression.", this.position());
+            throw new SemanticException("Must have a class for a new expression.",
+                                        this.position());
         }
 
         typeCheckFlags(tc);
@@ -440,7 +459,7 @@ public class New_c extends Expr_c implements New
 
         ClassType ct = tn.type().toClass();
 
-        if (! ct.flags().isInterface()) {
+        if (!ct.flags().isInterface()) {
             Context c = tc.context();
             if (anonType != null) {
                 c = c.pushClass(anonType, anonType);
@@ -474,32 +493,35 @@ public class New_c extends Expr_c implements New
                 // Get the qualifier type first.
                 Type qt = qualifier.type();
 
-                if (! qt.isClass()) {
+                if (!qt.isClass()) {
                     throw new SemanticException("Cannot instantiate member class of a non-class type.",
                                                 qualifier.position());
                 }
                 qualifierClassType = qt.toClass();
             }
             else {
-                qualifierClassType = findEnclosingClass(tc.context(), ct);                
+                qualifierClassType = findEnclosingClass(tc.context(), ct);
             }
             if (qualifierClassType == null) {
-                throw new SemanticException("Could not find non-static member class \"" +
-                        ct.name() + "\".", position());
+                throw new SemanticException("Could not find non-static member class \""
+                                                    + ct.name() + "\".",
+                                            position());
             }
         }
         else {
             // ct is a nested class, not an inner class
             // mustn't have a qualifier
             if (qualifier != null) {
-                throw new SemanticException("Cannot provide a containing instance for non-inner class " +
-                        ct.fullName() + ".", qualifier.position());                
+                throw new SemanticException("Cannot provide a containing instance for non-inner class "
+                                                    + ct.fullName() + ".",
+                                            qualifier.position());
             }
             // make sure that all enclosing classes are static.
             for (ClassType t = ct; t.isMember(); t = t.outer()) {
-                if (! t.flags().isStatic()) {
-                    throw new SemanticException("Cannot allocate non-static member class \"" +
-                            t + "\".", position());
+                if (!t.flags().isStatic()) {
+                    throw new SemanticException("Cannot allocate non-static member class \""
+                                                        + t + "\".",
+                                                position());
                 }
             }
 
@@ -541,31 +563,30 @@ public class New_c extends Expr_c implements New
         }
     }
 
-    protected void typeCheckFlags(TypeChecker tc, Flags classFlags) throws SemanticException {
+    protected void typeCheckFlags(TypeChecker tc, Flags classFlags)
+            throws SemanticException {
 
         if (this.body == null) {
             if (classFlags.isInterface()) {
-                throw new SemanticException(
-                                            "Cannot instantiate an interface.", position());
+                throw new SemanticException("Cannot instantiate an interface.",
+                                            position());
             }
 
             if (classFlags.isAbstract()) {
-                throw new SemanticException(
-                                            "Cannot instantiate an abstract class.", position());
+                throw new SemanticException("Cannot instantiate an abstract class.",
+                                            position());
             }
         }
         else {
             if (classFlags.isFinal()) {
-                throw new SemanticException(
-                                            "Cannot create an anonymous subclass of a final class.",
+                throw new SemanticException("Cannot create an anonymous subclass of a final class.",
                                             position());
             }
 
-            if (classFlags.isInterface() && ! arguments.isEmpty()) {
-                throw new SemanticException(
-                                            "Cannot pass arguments to an anonymous class that " +
-                                                    "implements an interface.",
-                                                    arguments.get(0).position());
+            if (classFlags.isInterface() && !arguments.isEmpty()) {
+                throw new SemanticException("Cannot pass arguments to an anonymous class that "
+                                                    + "implements an interface.",
+                                            arguments.get(0).position());
             }
         }
     }
@@ -603,7 +624,7 @@ public class New_c extends Expr_c implements New
         // something didn't work in the type check phase, so just ignore it.
         if (ci == null) {
             throw new InternalCompilerError(position(),
-                    "Null constructor instance after type check.");
+                                            "Null constructor instance after type check.");
         }
 
         for (Type t : ci.throwTypes()) {
@@ -621,8 +642,8 @@ public class New_c extends Expr_c implements New
 
     @Override
     public String toString() {
-        return (qualifier != null ? (qualifier.toString() + ".") : "") +
-                "new " + tn + "(...)" + (body != null ? " " + body : "");
+        return (qualifier != null ? (qualifier.toString() + ".") : "") + "new "
+                + tn + "(...)" + (body != null ? " " + body : "");
     }
 
     protected void printQualifier(CodeWriter w, PrettyPrinter tr) {
@@ -696,11 +717,13 @@ public class New_c extends Expr_c implements New
             v.visitCFG(tn, listChild(arguments, body()), ENTRY);
             v.visitCFGList(arguments, body(), ENTRY);
             v.visitCFG(body(), this, EXIT);
-        } else {
+        }
+        else {
             if (!arguments.isEmpty()) {
                 v.visitCFG(tn, listChild(arguments, (Expr) null), ENTRY);
                 v.visitCFGList(arguments, this, EXIT);
-            } else {
+            }
+            else {
                 v.visitCFG(tn, this, EXIT);
             }
         }
@@ -721,7 +744,8 @@ public class New_c extends Expr_c implements New
      * @param tc
      */
     @Override
-    public Node typeCheckOverride(Node parent, TypeChecker tc) throws SemanticException {
+    public Node typeCheckOverride(Node parent, TypeChecker tc)
+            throws SemanticException {
         New nn = this;
         New old = nn;
 
@@ -738,7 +762,7 @@ public class New_c extends Expr_c implements New
             nn = nn.qualifier((Expr) nn.visitChild(nn.qualifier(), childtc));
             if (childtc.hasErrors()) throw new SemanticException();
 
-            if (! nn.qualifier().type().isCanonical()) {
+            if (!nn.qualifier().type().isCanonical()) {
                 return nn;
             }
 
@@ -746,7 +770,7 @@ public class New_c extends Expr_c implements New
             nn = bd.visitEdge(parent, nn);
             if (bd.hasErrors()) throw new SemanticException();
 
-            if (! nn.objectType().isDisambiguated()) {
+            if (!nn.objectType().isDisambiguated()) {
                 return nn;
             }
         }
@@ -755,7 +779,7 @@ public class New_c extends Expr_c implements New
         nn = nn.objectType((TypeNode) nn.visitChild(nn.objectType(), childtc));
         if (childtc.hasErrors()) throw new SemanticException();
 
-        if (! nn.objectType().type().isCanonical()) {
+        if (!nn.objectType().type().isCanonical()) {
             return nn;
         }
 
@@ -767,7 +791,8 @@ public class New_c extends Expr_c implements New
 
         nn = (New) tc.leave(parent, old, nn, childtc);
 
-        ConstantChecker cc = new ConstantChecker(tc.job(), tc.typeSystem(), tc.nodeFactory());
+        ConstantChecker cc =
+                new ConstantChecker(tc.job(), tc.typeSystem(), tc.nodeFactory());
         cc = (ConstantChecker) cc.context(childtc.context());
         nn = (New) nn.del().checkConstants(cc);
 
@@ -776,7 +801,11 @@ public class New_c extends Expr_c implements New
 
     @Override
     public Node copy(NodeFactory nf) {
-        return nf.New(this.position, this.qualifier, this.tn, this.arguments, this.body);
+        return nf.New(this.position,
+                      this.qualifier,
+                      this.tn,
+                      this.arguments,
+                      this.body);
     }
 
 }

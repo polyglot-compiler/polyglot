@@ -31,8 +31,7 @@ import polyglot.util.InternalCompilerError;
 import polyglot.visit.Translator;
 
 /** An output pass generates output code from the processed AST. */
-public class OutputPass extends AbstractPass
-{
+public class OutputPass extends AbstractPass {
     protected Translator translator;
 
     /**
@@ -40,7 +39,7 @@ public class OutputPass extends AbstractPass
      * whose names are added to the collection <code>outputFiles</code>.
      */
     public OutputPass(Goal goal, Translator translator) {
-	super(goal);
+        super(goal);
         this.translator = translator;
     }
 
@@ -55,7 +54,7 @@ public class OutputPass extends AbstractPass
         if (translator.translate(ast)) {
             return true;
         }
-        
+
         return false;
     }
 }

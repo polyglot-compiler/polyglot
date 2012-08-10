@@ -31,8 +31,7 @@ import java.util.List;
  * A <code>Block</code> represents a Java block statement -- an immutable
  * sequence of statements.
  */
-public interface Block extends CompoundStmt
-{
+public interface Block extends CompoundStmt {
     /**
      * Get the statements in the block.
      * @return A list of {@link polyglot.ast.Stmt Stmt}.

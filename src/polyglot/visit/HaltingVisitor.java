@@ -36,12 +36,11 @@ import polyglot.ast.Node;
  * particular node.  Clients can call <code>bypass(Node n) </code> to 
  * have the visitor skip n and its children when recursing through the AST.
  */
-public abstract class HaltingVisitor extends NodeVisitor
-{
+public abstract class HaltingVisitor extends NodeVisitor {
     protected Node bypassParent;
     protected Collection<Node> bypass;
 
-    /** Return a new visitor that will bypass all children of node n. */ 
+    /** Return a new visitor that will bypass all children of node n. */
     public HaltingVisitor bypassChildren(Node n) {
         HaltingVisitor v = (HaltingVisitor) copy();
         v.bypassParent = n;
@@ -68,7 +67,7 @@ public abstract class HaltingVisitor extends NodeVisitor
             v.bypass = Collections.singleton(n);
         }
         else {
-            v.bypass = new ArrayList<Node>(this.bypass.size()+1);
+            v.bypass = new ArrayList<Node>(this.bypass.size() + 1);
             v.bypass.addAll(bypass);
             v.bypass.add(n);
         }
@@ -88,7 +87,7 @@ public abstract class HaltingVisitor extends NodeVisitor
             v.bypass = new ArrayList<Node>(c);
         }
         else {
-            v.bypass = new ArrayList<Node>(this.bypass.size()+c.size());
+            v.bypass = new ArrayList<Node>(this.bypass.size() + c.size());
             v.bypass.addAll(bypass);
             v.bypass.addAll(c);
         }

@@ -26,9 +26,8 @@ import polyglot.util.Transformation;
 
 /** An implementation of the <code>CofferMethodInstance</code> interface. 
  */
-public class CofferMethodInstance_c extends MethodInstance_c
-                                implements CofferMethodInstance
-{
+public class CofferMethodInstance_c extends MethodInstance_c implements
+        CofferMethodInstance {
     protected KeySet entryKeys;
     protected KeySet returnKeys;
     protected List<ThrowConstraint> throwConstraints;
@@ -54,34 +53,34 @@ public class CofferMethodInstance_c extends MethodInstance_c
         if (entryKeys == null)
             throw new InternalCompilerError("null entry keys for " + this);
     }
-    
+
     @Override
     public boolean isCanonical() {
         for (ThrowConstraint c : throwConstraints) {
-            if (! c.isCanonical()) {
+            if (!c.isCanonical()) {
                 return false;
             }
         }
-        
-        if (! entryKeys.isCanonical()) {
+
+        if (!entryKeys.isCanonical()) {
             return false;
         }
-        
-        if (returnKeys != null && ! returnKeys.isCanonical()) {
+
+        if (returnKeys != null && !returnKeys.isCanonical()) {
             return false;
         }
-        
+
         return super.isCanonical();
     }
 
     @Override
     public KeySet entryKeys() {
-	return entryKeys;
+        return entryKeys;
     }
 
     @Override
     public KeySet returnKeys() {
-	return returnKeys;
+        return returnKeys;
     }
 
     @Override
@@ -144,7 +143,8 @@ public class CofferMethodInstance_c extends MethodInstance_c
     }
 
     @Override
-    public boolean canOverrideImpl(MethodInstance mj, boolean quiet) throws SemanticException {
+    public boolean canOverrideImpl(MethodInstance mj, boolean quiet)
+            throws SemanticException {
         CofferMethodInstance mi = this;
 
         KeySet e;
@@ -166,38 +166,32 @@ public class CofferMethodInstance_c extends MethodInstance_c
         // Can pass through more keys.
         KeySet newKeys = entryKeys.removeAll(e);
 
-        if (! returnKeys.equals(r.addAll(newKeys))) {
+        if (!returnKeys.equals(r.addAll(newKeys))) {
             if (quiet) return false;
-            throw new SemanticException(mi.signature() + " in " + mi.container() +
-                                        " cannot override " + 
-                                        mj.signature() + " in " + mj.container() + 
-                                        ";", 
-                                        mi.position());
+            throw new SemanticException(mi.signature() + " in "
+                    + mi.container() + " cannot override " + mj.signature()
+                    + " in " + mj.container() + ";", mi.position());
         }
 
-        CONSTRAINTS:
- for (ThrowConstraint c : throwConstraints) {
+        CONSTRAINTS: for (ThrowConstraint c : throwConstraints) {
             for (ThrowConstraint superC : l) {
                 if (superC.throwType().equals(c.throwType())) {
-                    if (! c.keys().equals(superC.keys().addAll(newKeys))) {
+                    if (!c.keys().equals(superC.keys().addAll(newKeys))) {
                         if (quiet) return false;
-                        throw new SemanticException(mi.signature() + " in " + mi.container() +
-                                " cannot override " + 
-                                mj.signature() + " in " + mj.container() + 
-                                ";", 
-                                mi.position());
+                        throw new SemanticException(mi.signature() + " in "
+                                + mi.container() + " cannot override "
+                                + mj.signature() + " in " + mj.container()
+                                + ";", mi.position());
                     }
                     continue CONSTRAINTS;
                 }
             }
 
-            if (! c.keys().equals(newKeys)) {
+            if (!c.keys().equals(newKeys)) {
                 if (quiet) return false;
-                throw new SemanticException(mi.signature() + " in " + mi.container() +
-                        " cannot override " + 
-                        mj.signature() + " in " + mj.container() + 
-                        ";", 
-                        mi.position());
+                throw new SemanticException(mi.signature() + " in "
+                        + mi.container() + " cannot override " + mj.signature()
+                        + " in " + mj.container() + ";", mi.position());
             }
         }
 
@@ -206,7 +200,7 @@ public class CofferMethodInstance_c extends MethodInstance_c
 
     @Override
     public String toString() {
-        return super.toString() + " " + entryKeys + "->" + returnKeys +
-                                  " throws " + throwConstraints;
+        return super.toString() + " " + entryKeys + "->" + returnKeys
+                + " throws " + throwConstraints;
     }
 }

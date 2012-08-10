@@ -36,40 +36,40 @@ import polyglot.types.SemanticException;
 import polyglot.types.TypeSystem;
 
 /** Visitor which traverses the AST constructing type objects. */
-public class InitImportsVisitor extends ErrorHandlingVisitor
-{
+public class InitImportsVisitor extends ErrorHandlingVisitor {
     protected ImportTable importTable;
-    
+
     public InitImportsVisitor(Job job, TypeSystem ts, NodeFactory nf) {
         super(job, ts, nf);
     }
-    
+
     @Override
     public NodeVisitor enterCall(Node n) throws SemanticException {
         if (n instanceof SourceFile) {
             SourceFile sf = (SourceFile) n;
-            
+
             PackageNode pn = sf.package_();
-            
+
             ImportTable it;
-            
+
             if (pn != null) {
                 it = ts.importTable(sf.source().name(), pn.package_());
             }
             else {
                 it = ts.importTable(sf.source().name(), null);
             }
-            
+
             InitImportsVisitor v = (InitImportsVisitor) copy();
             v.importTable = it;
             return v;
         }
-        
+
         return this;
     }
-    
+
     @Override
-    public Node leaveCall(Node old, Node n, NodeVisitor v) throws SemanticException {
+    public Node leaveCall(Node old, Node n, NodeVisitor v)
+            throws SemanticException {
         if (n instanceof SourceFile) {
             SourceFile sf = (SourceFile) n;
             InitImportsVisitor v_ = (InitImportsVisitor) v;
@@ -78,7 +78,7 @@ public class InitImportsVisitor extends ErrorHandlingVisitor
         }
         if (n instanceof Import) {
             Import im = (Import) n;
-            
+
             if (im.kind() == Import.CLASS) {
                 this.importTable.addClassImport(im.name(), im.position());
             }

@@ -33,12 +33,11 @@ import polyglot.util.Position;
 /**
  * A <code>SwitchBlock</code> is a list of statements within a switch.
  */
-public class SwitchBlock_c extends AbstractBlock_c implements SwitchBlock
-{
+public class SwitchBlock_c extends AbstractBlock_c implements SwitchBlock {
     public SwitchBlock_c(Position pos, List<Stmt> statements) {
-	super(pos, statements);
+        super(pos, statements);
     }
-    
+
     /**
      * A <code>SwitchBlock</code> differs from a normal block in that 
      * declarations made in the context of the switch block are in the scope 
@@ -57,7 +56,7 @@ public class SwitchBlock_c extends AbstractBlock_c implements SwitchBlock
     public Context enterScope(Context c) {
         return c;
     }
-    
+
     @Override
     public Node copy(NodeFactory nf) {
         return nf.SwitchBlock(this.position, statements);

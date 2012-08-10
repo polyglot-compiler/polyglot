@@ -11,7 +11,8 @@ import polyglot.types.Type;
 import polyglot.types.TypeSystem;
 import polyglot.types.UnknownType_c;
 
-public class UnknownReferenceType_c extends UnknownType_c implements UnknownReferenceType {
+public class UnknownReferenceType_c extends UnknownType_c implements
+        UnknownReferenceType {
 
     public UnknownReferenceType_c(TypeSystem ts) {
         super(ts);
@@ -53,7 +54,8 @@ public class UnknownReferenceType_c extends UnknownType_c implements UnknownRefe
     }
 
     @Override
-    public List<? extends MethodInstance> methods(String name, List<? extends Type> argTypes) {
+    public List<? extends MethodInstance> methods(String name,
+            List<? extends Type> argTypes) {
         return Collections.emptyList();
     }
 

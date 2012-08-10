@@ -49,8 +49,9 @@ public class Name {
     public Name(NodeFactory nf, TypeSystem ts, Position pos, Id name) {
         this(nf, ts, pos, null, name);
     }
-    
-    public Name(NodeFactory nf, TypeSystem ts, Position pos, Name prefix, Id name) {
+
+    public Name(NodeFactory nf, TypeSystem ts, Position pos, Name prefix,
+            Id name) {
         this.nf = nf;
         this.ts = ts;
         this.pos = pos != null ? pos : Position.compilerGenerated();
@@ -100,7 +101,9 @@ public class Name {
             return nf.PackageNode(pos, ts.createPackage(null, name.id()));
         }
         else {
-            return nf.PackageNode(pos, ts.createPackage(prefix.toPackage().package_(), name.id()));
+            return nf.PackageNode(pos, ts.createPackage(prefix.toPackage()
+                                                              .package_(),
+                                                        name.id()));
         }
     }
 

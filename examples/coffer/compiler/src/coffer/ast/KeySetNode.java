@@ -13,7 +13,6 @@ import coffer.types.KeySet;
 /**
  * An AST node for a <code>KeySet</code>.  The key set may be ambiguous. 
  */
-public interface KeySetNode extends Node
-{
+public interface KeySetNode extends Node {
     KeySet keys();
 }

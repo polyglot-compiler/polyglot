@@ -18,8 +18,11 @@ import polyglot.util.Position;
 
 public interface CofferTypeSystem extends ParamTypeSystem<Key, Key> {
     InstKey instKey(Position pos, String name);
+
     ParamKey paramKey(Position pos, String name);
+
     UnknownKey unknownKey(Position pos, String name);
+
     ThrowConstraint throwConstraint(Position pos, Type type, KeySet keys);
 
     KeySet emptyKeySet(Position pos);
