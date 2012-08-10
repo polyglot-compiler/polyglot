@@ -49,11 +49,13 @@
 	<property name="tmp" location="${basedir}/tmp" />
 
 	<!-- classpath to use when compiling polyglot -->
+	<property environment="env" />
 	<path id="standard.classpath">
 		<pathelement location="${classes}" />
 		<pathelement location="${lib}/java_cup.jar" />
 		<pathelement location="${lib}/JFlex.jar" />
 		<pathelement location="${lib}/ppg.jar" />
+		<pathelement location="${env.JAVA_HOME}/lib/tools.jar" />
 	</path>
 
         <fileset id="epl.excludes.src" dir="${src}" excludes="polyglot/parse/Grm.java,polyglot/parse/sym.java,polyglot/parse/Lexer_c.java,polyglot/qq/**,polyglot/ext/**,polyglot/frontend/JLExtensionInfo.java,polyglot/parse/BaseParser.java,polyglot/lex/EscapedUnicodeReader.java" />
