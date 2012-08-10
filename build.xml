@@ -500,6 +500,7 @@
 			</packageset>
 			<packageset dir="${ppg.src}" defaultexcludes="yes">
 				<include name="ppg/**" />
+				<exclude name="ppg/*/**" />
 			</packageset>
 			<packageset dir="${pth.src}" defaultexcludes="yes">
 				<include name="polyglot/pth/**" />
