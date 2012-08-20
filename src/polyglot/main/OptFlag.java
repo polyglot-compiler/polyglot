@@ -50,8 +50,7 @@ public abstract class OptFlag<T> implements Comparable<OptFlag<T>> {
      *        true if the id was found
      */
     public static OptFlag<?> lookupFlag(String id, Set<OptFlag<?>> flags) {
-        for (Iterator<OptFlag<?>> it = flags.iterator(); it.hasNext();) {
-            OptFlag<?> flag = it.next();
+        for (OptFlag<?> flag : flags) {
             if (flag.ids.contains(id)) {
                 return flag;
             }

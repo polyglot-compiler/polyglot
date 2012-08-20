@@ -21,6 +21,7 @@ import static java.io.File.pathSeparatorChar;
 import java.io.File;
 import java.io.PrintStream;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -525,7 +526,16 @@ public class Options {
             }
             else {
                 seen.add(arg.flag);
-                handleArg(arg);
+                try {
+                    handleArg(arg);
+                }
+                catch (UsageError e) {
+                    throw e;
+                }
+                catch (Throwable e) {
+                    throw new InternalCompilerError("Error while handling arg "
+                            + arg + " created by " + arg.flag().getClass(), e);
+                }
             }
         }
         for (OptFlag<?> flag : flags) {
@@ -565,9 +575,25 @@ public class Options {
     }
 
     /**
+     * Performs a shallow checked cast of parameterized collections
+     * @param in
+     * @return
+     */
+    protected <To extends Collection<Param>, Param> To sccast(Object in,
+            Class<Param> clazz) {
+        @SuppressWarnings("unchecked")
+        To out = (To) in;
+        for (Param p : out) {
+            if (!clazz.isInstance(p))
+                throw new ClassCastException("Expected " + clazz.getName()
+                        + " but " + p + " has type " + p.getClass().getName());
+        }
+        return out;
+    }
+
+    /**
      * Process the option specified by <code>arg</code>
      */
-    @SuppressWarnings("unchecked")
     protected void handleArg(Arg<?> arg) throws UsageError {
         assert (arg.flag != null);
 
@@ -580,17 +606,19 @@ public class Options {
 
         }
         else if (arg.flag().ids().contains("-classpath")) {
-            setClasspath((List<File>) arg.value());
+            setClasspath(this.<List<File>, File> sccast(arg.value(), File.class));
 
         }
         else if (arg.flag().ids().contains("-bootclasspath")) {
-            setBootclasspath((List<File>) arg.value());
+            setBootclasspath(this.<List<File>, File> sccast(arg.value(),
+                                                            File.class));
         }
         else if (arg.flag().ids().contains("-addbootcp")) {
-            addBootCP((List<File>) arg.value());
+            addBootCP(this.<List<File>, File> sccast(arg.value(), File.class));
         }
         else if (arg.flag().ids().contains("-sourcepath")) {
-            setSourcepath((List<File>) arg.value());
+            setSourcepath(this.<List<File>, File> sccast(arg.value(),
+                                                         File.class));
 
         }
         else if (arg.flag().ids().contains("-commandlineonly")) {
@@ -666,6 +694,7 @@ public class Options {
 
         }
         else if (arg.flag().ids().contains("-report")) {
+            @SuppressWarnings("unchecked")
             Pair<String, Integer> pair = (Pair<String, Integer>) arg.value();
             addReportTopic(pair.part1(), pair.part2());
 
