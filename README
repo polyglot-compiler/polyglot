@@ -51,8 +51,9 @@ Requirements
 
 Polyglot builds on Unix, Mac OS X, and on Windows using the Cygwin
 environment.  We recommend that you use JDK 1.5 or later.  You will
-experience problems with versions of the JDK older than 1.5.  You must
-ensure that java and javac are in your path.  Polyglot is compiled
+experience problems with versions of the JDK older than 1.5.  You must ensure
+that java and javac are in your path, and that the JAVA_HOME environment
+variable is set to the installation directory of the JDK.  Polyglot is compiled
 with the Ant build tool (http://jakarta.apache.org/ant).
 
 Polyglot uses the JFlex scanner generator.  The JFlex jar file is
