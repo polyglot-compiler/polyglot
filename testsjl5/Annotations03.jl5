@@ -1,0 +1,7 @@
+class C {
+}
+
+class D extends C {
+  @Override // incorrect
+  void m() { }
+}

@@ -1,0 +1,9 @@
+import java.lang.annotation.*;
+
+@Target({ElementType.METHOD})
+@interface MethodOnly { int value(); }
+
+class C {
+  @MethodOnly(7) // OK
+  void m() { }
+}
