@@ -334,6 +334,25 @@ public class JL5TypeSystem_c extends
         return findEnumConstant(container, name, (ClassType) null);
     }
 
+    @Override
+    public EnumInstance findEnumConstant(ReferenceType container, long ordinal)
+            throws SemanticException {
+        assert_(container);
+        if (container == null) {
+            throw new InternalCompilerError("Cannot access enum constant within a null container type.");
+        }
+        if (!container.isClass()) {
+            throw new InternalCompilerError("Cannot access enum constant within a non-class container type.");
+        }
+        JL5ClassType ct = (JL5ClassType) container;
+        for (EnumInstance ec : ct.enumConstants()) {
+            if (ec.ordinal() == ordinal) {
+                return ec;
+            }
+        }
+        return null;
+    }
+
     public Set<EnumInstance> findEnumConstants(ReferenceType container,
             String name) {
         assert_(container);
@@ -2253,54 +2272,72 @@ public class JL5TypeSystem_c extends
         // If annotationType specifies what kind of target it is meant to be applied to,
         // then check that.
 
-        RetainedAnnotations ra = annotationType.retainedAnnotations();
+        RetainedAnnotations ra =
+                annotationType.retainedAnnotations();
         if (ra != null) {
             for (Type at : ra.annotationTypes()) {
                 if (at.equals(TargetAnnotation())) {
                     // annotationType has a target annotation!
-                    EnumInstance ei = annotationElementTypeForDeclaration(decl);
-//                    if (ra.singleElement(at) instanceof EnumConstant) {
-//                        if (!ei.equals(ra.singleElement(at))) {
-//                            throw new SemanticException("Annotation "
-//                                    + annotation
-//                                    + " not applicable to declaration " + decl,
-//                                    annotation.position());
-//                        }
-//                    }
-//                    else if (ra.singleElement(at) instanceof )
+                    AnnotationElementValueArray targs =
+                            (AnnotationElementValueArray) ra.singleElement(at);
+                    Collection<EnumInstance> eis =
+                            annotationElementTypesForDeclaration(decl);
+                    // the array targs must contain at least one of the eis.
+                    boolean foundAppropriateTarget = false;
+                    requiredCheck: for (EnumInstance required : eis) {
+                        for (AnnotationElementValue found : targs.vals()) {
+                            AnnotationElementValueConstant c =
+                                    (AnnotationElementValueConstant) found;
+                            if (c.constantValueAsEnumInstance()
+                                 .equals(required)) {
+                                foundAppropriateTarget = true;
+                                break requiredCheck;
+                            }
+                        }
+                    }
 
+                    if (!foundAppropriateTarget) {
+                        throw new SemanticException("Annotation "
+                                                            + annotation
+                                                            + " not applicable to this kind of declaration.",
+                                                    annotation.position());
+                    }
                 }
             }
         }
     }
 
-    private EnumInstance annotationElementTypeForDeclaration(Declaration decl) {
+    private Collection<EnumInstance> annotationElementTypesForDeclaration(
+            Declaration decl) {
         ClassType aet = AnnotationElementType();
         if (decl instanceof MethodInstance) {
-            return (EnumInstance) aet.fieldNamed("METHOD");
+            return Collections.singleton((EnumInstance) aet.fieldNamed("METHOD"));
         }
         if (decl instanceof FieldInstance) {
-            return (EnumInstance) aet.fieldNamed("FIELD");
+            return Collections.singleton((EnumInstance) aet.fieldNamed("FIELD"));
         }
         if (decl instanceof LocalInstance) {
             // it's either a local instance or a formal
-            LocalInstance li = (LocalInstance) decl;
-            return (EnumInstance) aet.fieldNamed("LOCAL_VARIABLE");
+            // we're being a little lax here, and just assuming it it is a local variable
+            return Collections.singleton((EnumInstance) aet.fieldNamed("LOCAL_VARIABLE"));
             //return (EnumInstance) aet.fieldNamed("PARAMETER");
         }
         if (decl instanceof ClassType) {
-            return (EnumInstance) aet.fieldNamed("TYPE");
+            ClassType ct = (ClassType) decl;
+            if (ct.flags().isInterface() && JL5Flags.isAnnotation(ct.flags())) {
+                // it's an annotation
+                return Arrays.asList(new EnumInstance[] {
+                        (EnumInstance) aet.fieldNamed("TYPE"),
+                        (EnumInstance) aet.fieldNamed("ANNOTATION_TYPE") });
+            }
+            return Collections.singleton((EnumInstance) aet.fieldNamed("TYPE"));
         }
         if (decl instanceof ConstructorInstance) {
-            return (EnumInstance) aet.fieldNamed("CONSTRUCTOR");
+            return Collections.singleton((EnumInstance) aet.fieldNamed("CONSTRUCTOR"));
         }
         if (decl instanceof Package) {
-            return (EnumInstance) aet.fieldNamed("PACKAGE");
+            return Collections.singleton((EnumInstance) aet.fieldNamed("PACKAGE"));
         }
-
-//
-//    /** Annotation type declaration */
-//    ANNOTATION_TYPE,
 
         throw new InternalCompilerError("Don't know how to deal with " + decl);
     }
@@ -2323,54 +2360,6 @@ public class JL5TypeSystem_c extends
         }
     }
 
-//    //rdj-added from UCLA implementation. 
-//    private void appCheckValue(String val, Node n) throws SemanticException {
-//        if (val.equals("ANNOTATION_TYPE")) {
-//            if (!(n instanceof ClassDecl)
-//                    || !JL5Flags.isAnnotation(((ClassDecl) n).flags())) {
-//                throw new SemanticException(
-//                        "Annotation type not applicable to this kind of declaration",
-//                        n.position());
-//            }
-//        } else if (val.equals("CONSTRUCTOR")) {
-//            if (!(n instanceof ConstructorDecl)) {
-//                throw new SemanticException(
-//                        "Annotation type not applicable to this kind of declaration",
-//                        n.position());
-//            }
-//        } else if (val.equals("FIELD")) {
-//            if (!(n instanceof FieldDecl)) {
-//                throw new SemanticException(
-//                        "Annotation type not applicable to this kind of declaration",
-//                        n.position());
-//            }
-//        } else if (val.equals("LOCAL_VARIABLE")) {
-//            if (!(n instanceof LocalDecl)) {
-//                throw new SemanticException(
-//                        "Annotation type not applicable to this kind of declaration",
-//                        n.position());
-//            }
-//        } else if (val.equals("METHOD")) {
-//            if (!(n instanceof MethodDecl)) {
-//                throw new SemanticException(
-//                        "Annotation type not applicable to this kind of declaration",
-//                        n.position());
-//            }
-//        } else if (val.equals("PACKAGE")) {
-//        } else if (val.equals("PARAMETER")) {
-//            if (!(n instanceof Formal)) {
-//                throw new SemanticException(
-//                        "Annotation type not applicable to this kind of declaration",
-//                        n.position());
-//            }
-//        } else if (val.equals("TYPE")) {
-//            if (!(n instanceof ClassDecl)) {
-//                throw new SemanticException(
-//                        "Annotation type not applicable to this kind of declaration",
-//                        n.position());
-//            }
-//        }
-//    }
 
     protected void checkOverrideAnnotation(Declaration decl)
             throws SemanticException {
@@ -2384,7 +2373,7 @@ public class JL5TypeSystem_c extends
         overrides.remove(mi);
         if (overrides.isEmpty()) {
             throw new SemanticException("Method " + mi.signature()
-                    + " not override a method.", decl.position());
+                    + " does not override a method.", decl.position());
         }
     }
 
@@ -2548,7 +2537,7 @@ public class JL5TypeSystem_c extends
                 new LinkedHashMap<Type, Map<String, AnnotationElementValue>>();
         for (AnnotationElem ae : annotationElems) {
             Type annotationType = ae.typeName().type();
-            if (retainAnnotation(annotationType)) {
+            if (isRetainedAnnotation(annotationType)) {
                 m.put(annotationType, ae.toAnnotationElementValues(this));
             }
         }
@@ -2559,7 +2548,7 @@ public class JL5TypeSystem_c extends
      * Given an annotation of type annotationType, should the annotation
      * be retained in the binary? See JLS 3rd ed, 9.6.1.2
      */
-    protected boolean retainAnnotation(Type annotationType) {
+    protected boolean isRetainedAnnotation(Type annotationType) {
         if (annotationType.isClass()
                 && annotationType.toClass().isSubtype(this.Annotation())) {
             // well, it's an annotation type at least.
@@ -2576,9 +2565,16 @@ public class JL5TypeSystem_c extends
                 return true;
             }
             if (v instanceof AnnotationElementValueConstant) {
-                // XXX missing logic here
-                System.err.println("What do we do with " + v);
-                throw new UnsupportedOperationException("To implement...");
+                AnnotationElementValueConstant c =
+                        (AnnotationElementValueConstant) v;
+                EnumInstance ei = c.constantValueAsEnumInstance();
+                if (ei.name().equalsIgnoreCase("CLASS")
+                        || ei.name().equalsIgnoreCase("RUNTIME")) {
+                    return true;
+                }
+                else {
+                    return false;
+                }
             }
             return true;
         }
@@ -2587,7 +2583,8 @@ public class JL5TypeSystem_c extends
 
     @Override
     public RetainedAnnotations NoRetainedAnnotations() {
-        return new RetainedAnnotations_c(this, Position.compilerGenerated(1));
+        return new RetainedAnnotations_c(this,
+                                               Position.compilerGenerated(1));
     }
 
     @Override

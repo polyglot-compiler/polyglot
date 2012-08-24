@@ -1,5 +1,7 @@
 package polyglot.ext.jl5.types;
 
+import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 
 import polyglot.types.TypeObject_c;
@@ -19,6 +21,30 @@ public class AnnotationElementValueArray_c extends TypeObject_c implements
     @Override
     public boolean isCanonical() {
         return true;
+    }
+
+    @Override
+    public String toString() {
+        if (vals.isEmpty()) {
+            return "{ }";
+        }
+        StringBuffer sb = new StringBuffer();
+        sb.append('{');
+        for (Iterator<AnnotationElementValue> iter = vals.iterator(); iter.hasNext();) {
+            AnnotationElementValue v = iter.next();
+            sb.append(v);
+            if (iter.hasNext()) {
+                sb.append(", ");
+            }
+
+        }
+        sb.append('}');
+        return sb.toString();
+    }
+
+    @Override
+    public List<AnnotationElementValue> vals() {
+        return Collections.unmodifiableList(vals);
     }
 
 }

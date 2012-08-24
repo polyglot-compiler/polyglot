@@ -4,4 +4,6 @@ import polyglot.types.MemberInstance;
 
 public interface EnumInstance extends JL5FieldInstance, MemberInstance {
     long ordinal();
+
+    void setOrdinal(long ordinal);
 }

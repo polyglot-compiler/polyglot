@@ -9,14 +9,14 @@ import polyglot.util.Position;
 public class EnumInstance_c extends JL5FieldInstance_c implements EnumInstance {
 
     protected ParsedClassType anonType;
-    final long ordinal;
+    long ordinal;
 
     public EnumInstance_c(JL5TypeSystem ts, Position pos,
             ReferenceType container, Flags f, String name,
             ParsedClassType anonType, long ordinal) {
-        super(ts, pos, container, f.set(JL5Flags.STATIC)
-                                   .set(JL5Flags.PUBLIC)
-                                   .set(JL5Flags.FINAL)
+        super(ts, pos, container, f.set(Flags.STATIC)
+                                   .set(Flags.PUBLIC)
+                                   .set(Flags.FINAL)
                                    .set(JL5Flags.ENUM), container, name);
         if (anonType == null) {
             this.type = container;
@@ -35,5 +35,10 @@ public class EnumInstance_c extends JL5FieldInstance_c implements EnumInstance {
     @Override
     public long ordinal() {
         return ordinal;
+    }
+
+    @Override
+    public void setOrdinal(long ordinal) {
+        this.ordinal = ordinal;
     }
 }
