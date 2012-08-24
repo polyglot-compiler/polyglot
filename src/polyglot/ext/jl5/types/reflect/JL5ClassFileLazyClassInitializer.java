@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.StringTokenizer;
 
 import polyglot.ext.jl5.types.AnnotationTypeElemInstance;
+import polyglot.ext.jl5.types.EnumInstance;
 import polyglot.ext.jl5.types.JL5Flags;
 import polyglot.ext.jl5.types.JL5MethodInstance;
 import polyglot.ext.jl5.types.JL5ParsedClassType;
@@ -405,6 +406,47 @@ public class JL5ClassFileLazyClassInitializer extends
         }
 
         return fi;
+    }
+
+    @Override
+    public void initFields() {
+        if (fieldsInitialized) {
+            return;
+        }
+
+        List<EnumInstance> enumInstances = new ArrayList<EnumInstance>();
+        Field[] fields = clazz.getFields();
+        for (int i = 0; i < fields.length; i++) {
+            if (!fields[i].name().startsWith("jlc$")
+                    && !fields[i].isSynthetic()) {
+                FieldInstance fi = this.fieldInstance(fields[i], ct);
+                if (Report.should_report(verbose, 3))
+                    Report.report(3, "adding " + fi + " to " + ct);
+                if (JL5Flags.isEnum(fi.flags())) {
+                    EnumInstance ei = (EnumInstance) fi;
+                    enumInstances.add(ei);
+                    ((JL5ParsedClassType) ct).addEnumConstant(ei);
+                }
+                else {
+                    ct.addField(fi);
+                }
+            }
+        }
+
+        // if we added enums, we need to set their ordinals.
+        // TODO: XXX This is currently a hack. There is probably a better way to get the
+        // ordinals for the enum instances.
+        long ordinal = 0;
+        for (EnumInstance ei : enumInstances) {
+            ei.setOrdinal(ordinal);
+            ordinal++;
+        }
+
+        fieldsInitialized = true;
+
+        if (initialized()) {
+            clazz = null;
+        }
     }
 
     @Override
