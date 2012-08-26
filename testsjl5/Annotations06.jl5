@@ -4,6 +4,6 @@ import java.lang.annotation.*;
 @interface MethodOnly { int value(); }
 
 class C {
-  @MethodOnly(7) // BAD
+  @MethodOnly(7) // BAD, inappropriate target
   int f = 4;
 }

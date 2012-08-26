@@ -311,6 +311,7 @@ polyglot.ext.jl5.ExtensionInfo "-d out -classpath java-out -noserial -post \"jav
         Annotations04.jl5;
         Annotations05.jl5;
         Annotations06.jl5 (Semantic, "not applicable");
+        Annotations07.jl5 (Semantic, "not applicable");
         Call02.jl5;
         ClassLoad01.jl5;
         CovariantRet01.jl5;
@@ -604,6 +605,7 @@ polyglot.ext.jl5.ExtensionInfo "-d out -classpath java-out -removeJava5isms -enu
         Annotations04.jl5;
         Annotations05.jl5;
         Annotations06.jl5 (Semantic, "not applicable");
+        Annotations07.jl5 (Semantic, "not applicable");
         Call02.jl5;
         ClassLoad01.jl5;
         CovariantRet01.jl5;
