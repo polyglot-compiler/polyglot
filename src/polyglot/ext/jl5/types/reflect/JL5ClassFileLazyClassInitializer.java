@@ -1,15 +1,21 @@
 package polyglot.ext.jl5.types.reflect;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.StringTokenizer;
 
+import polyglot.ext.jl5.types.AnnotationElementValue;
 import polyglot.ext.jl5.types.AnnotationTypeElemInstance;
 import polyglot.ext.jl5.types.EnumInstance;
+import polyglot.ext.jl5.types.JL5ConstructorInstance;
+import polyglot.ext.jl5.types.JL5FieldInstance;
 import polyglot.ext.jl5.types.JL5Flags;
 import polyglot.ext.jl5.types.JL5MethodInstance;
 import polyglot.ext.jl5.types.JL5ParsedClassType;
 import polyglot.ext.jl5.types.JL5TypeSystem;
+import polyglot.ext.jl5.types.RetainedAnnotations;
 import polyglot.ext.jl5.types.TypeVariable;
 import polyglot.ext.param.types.MuPClass;
 import polyglot.main.Report;
@@ -40,7 +46,20 @@ import polyglot.util.StringUtil;
 public class JL5ClassFileLazyClassInitializer extends
         ClassFileLazyClassInitializer implements JL5LazyClassInitializer {
 
+    /**
+     * Have the annotation elems (i.e., the method-like accessors for
+     * values of annotations) been initialized?
+     */
+    protected boolean annotationElemsInitialized;
+
+    /**
+     * Have the annotation for the class been initialized?
+     */
     protected boolean annotationsInitialized;
+    /**
+     * Have the enum constants for the class been initialized?
+     */
+    protected boolean enumConstantsInitialized;
 
     public JL5ClassFileLazyClassInitializer(ClassFile file, TypeSystem ts) {
         super(file, ts);
@@ -48,7 +67,8 @@ public class JL5ClassFileLazyClassInitializer extends
 
     @Override
     protected boolean initialized() {
-        return super.initialized() & annotationsInitialized;
+        return super.initialized() && annotationElemsInitialized
+                && annotationsInitialized && enumConstantsInitialized;
     }
 
     /**
@@ -234,6 +254,8 @@ public class JL5ClassFileLazyClassInitializer extends
             }
         }
 
+        JL5TypeSystem ts = (JL5TypeSystem) this.ts;
+        JL5MethodInstance mi;
         if (signature != null) {
             signature.parseMethodSignature(ts, position(), ct);
 
@@ -253,14 +275,15 @@ public class JL5ClassFileLazyClassInitializer extends
              * +signature.methodSignature.typeVars);
              * System.err.println("    throwTypes " +excTypes);
              */
-            return ((JL5TypeSystem) ts).methodInstance(ct.position(),
-                                                       ct,
-                                                       ts.flagsForBits(method.getModifiers()),
-                                                       signature.methodSignature.returnType(),
-                                                       name,
-                                                       signature.methodSignature.formalTypes(),
-                                                       excTypes,
-                                                       signature.methodSignature.typeVars());
+            mi =
+                    ts.methodInstance(ct.position(),
+                                      ct,
+                                      ts.flagsForBits(method.getModifiers()),
+                                      signature.methodSignature.returnType(),
+                                      name,
+                                      signature.methodSignature.formalTypes(),
+                                      excTypes,
+                                      signature.methodSignature.typeVars());
         }
         else {
             // System.err.println("Method signature type for " + name +
@@ -274,14 +297,31 @@ public class JL5ClassFileLazyClassInitializer extends
             List<Type> argTypes = typeListForString(type.substring(1, index));
             Type returnType = typeForString(type.substring(index + 1));
 
-            return ((JL5TypeSystem) ts).methodInstance(ct.position(),
-                                                       ct,
-                                                       ts.flagsForBits(method.getModifiers()),
-                                                       returnType,
-                                                       name,
-                                                       argTypes,
-                                                       excTypes);
+            mi =
+                    (JL5MethodInstance) ts.methodInstance(ct.position(),
+                                                          ct,
+                                                          ts.flagsForBits(method.getModifiers()),
+                                                          returnType,
+                                                          name,
+                                                          argTypes,
+                                                          excTypes);
         }
+
+        Map<Type, Map<String, AnnotationElementValue>> annotationElems =
+                new LinkedHashMap<Type, Map<String, AnnotationElementValue>>();
+
+        if (method.getRuntimeVisibleAnnotations() != null) {
+            annotationElems.putAll(method.getRuntimeVisibleAnnotations()
+                                         .toAnnotationElems(this, ts));
+        }
+        if (method.getRuntimeInvisibleAnnotations() != null) {
+            annotationElems.putAll(method.getRuntimeInvisibleAnnotations()
+                                         .toAnnotationElems(this, ts));
+        }
+        RetainedAnnotations retAnn =
+                ts.createRetainedAnnotations(annotationElems, ct.position());
+        mi.setRetainedAnnotations(retAnn);
+        return mi;
     }
 
     @Override
@@ -304,8 +344,9 @@ public class JL5ClassFileLazyClassInitializer extends
     }
 
     @Override
-    protected ConstructorInstance constructorInstance(Method method,
+    protected ConstructorInstance constructorInstance(Method method_,
             ClassType ct, Field[] fields) {
+        JL5Method method = (JL5Method) method_;
         // Get a method instance for the <init> method.
         JL5MethodInstance mi = (JL5MethodInstance) methodInstance(method, ct);
 
@@ -331,12 +372,17 @@ public class JL5ClassFileLazyClassInitializer extends
             }
         }
 
-        return ((JL5TypeSystem) ts).constructorInstance(mi.position(),
-                                                        ct,
-                                                        mi.flags(),
-                                                        formals,
-                                                        mi.throwTypes(),
-                                                        mi.typeParams());
+        JL5ConstructorInstance ci =
+                ((JL5TypeSystem) ts).constructorInstance(mi.position(),
+                                                         ct,
+                                                         mi.flags(),
+                                                         formals,
+                                                         mi.throwTypes(),
+                                                         mi.typeParams());
+
+        ci.setRetainedAnnotations(mi.retainedAnnotations());
+
+        return ci;
     }
 
     @Override
@@ -346,7 +392,9 @@ public class JL5ClassFileLazyClassInitializer extends
         String name = (String) constants[field.getName()].value();
         String type = (String) constants[field.getType()].value();
 
-        FieldInstance fi = null;
+        JL5TypeSystem ts = ((JL5TypeSystem) this.ts);
+
+        JL5FieldInstance fi = null;
         JL5Signature signature = field.getSignature();
         Flags flags = ts.flagsForBits(field.getModifiers());
         Type fieldType;
@@ -359,15 +407,20 @@ public class JL5ClassFileLazyClassInitializer extends
         }
         if (JL5Flags.isEnum(flags)) {
             fi =
-                    ((JL5TypeSystem) ts).enumInstance(ct.position(),
-                                                      ct,
-                                                      flags,
-                                                      name,
-                                                      (ParsedClassType) fieldType,
-                                                      0);
+                    ts.enumInstance(ct.position(),
+                                    ct,
+                                    flags,
+                                    name,
+                                    (ParsedClassType) fieldType,
+                                    0);
         }
         else {
-            fi = ts.fieldInstance(ct.position(), ct, flags, fieldType, name);
+            fi =
+                    (JL5FieldInstance) ts.fieldInstance(ct.position(),
+                                                        ct,
+                                                        flags,
+                                                        fieldType,
+                                                        name);
         }
 
         if (field.isConstant()) {
@@ -405,31 +458,36 @@ public class JL5ClassFileLazyClassInitializer extends
             fi.setNotConstant();
         }
 
+        Map<Type, Map<String, AnnotationElementValue>> annotationElems =
+                new LinkedHashMap<Type, Map<String, AnnotationElementValue>>();
+        if (field.getRuntimeVisibleAnnotations() != null) {
+            annotationElems.putAll(field.getRuntimeVisibleAnnotations()
+                                        .toAnnotationElems(this, ts));
+        }
+        if (field.getRuntimeInvisibleAnnotations() != null) {
+            annotationElems.putAll(field.getRuntimeInvisibleAnnotations()
+                                        .toAnnotationElems(this, ts));
+        }
+        RetainedAnnotations retAnn =
+                ts.createRetainedAnnotations(annotationElems, ct.position());
+        fi.setRetainedAnnotations(retAnn);
+
         return fi;
     }
 
     @Override
-    public void initFields() {
-        if (fieldsInitialized) {
+    public void initEnumConstants() {
+        if (enumConstantsInitialized) {
             return;
         }
-
+        // initialize fields first
+        initFields();
         List<EnumInstance> enumInstances = new ArrayList<EnumInstance>();
-        Field[] fields = clazz.getFields();
-        for (int i = 0; i < fields.length; i++) {
-            if (!fields[i].name().startsWith("jlc$")
-                    && !fields[i].isSynthetic()) {
-                FieldInstance fi = this.fieldInstance(fields[i], ct);
-                if (Report.should_report(verbose, 3))
-                    Report.report(3, "adding " + fi + " to " + ct);
-                if (JL5Flags.isEnum(fi.flags())) {
-                    EnumInstance ei = (EnumInstance) fi;
-                    enumInstances.add(ei);
-                    ((JL5ParsedClassType) ct).addEnumConstant(ei);
-                }
-                else {
-                    ct.addField(fi);
-                }
+        for (FieldInstance fi : this.ct.fields()) {
+            if (JL5Flags.isEnum(fi.flags())) {
+                EnumInstance ei = (EnumInstance) fi;
+                enumInstances.add(ei);
+                ((JL5ParsedClassType) ct).addEnumConstant(ei);
             }
         }
 
@@ -442,8 +500,35 @@ public class JL5ClassFileLazyClassInitializer extends
             ordinal++;
         }
 
-        fieldsInitialized = true;
+        enumConstantsInitialized = true;
+        if (initialized()) {
+            clazz = null;
+        }
+    }
 
+    @Override
+    public void initAnnotations() {
+        if (annotationsInitialized) {
+            return;
+        }
+        JL5TypeSystem ts = (JL5TypeSystem) this.ts;
+        Map<Type, Map<String, AnnotationElementValue>> annotationElems =
+                new LinkedHashMap<Type, Map<String, AnnotationElementValue>>();
+        JL5ClassFile cls = (JL5ClassFile) clazz;
+        if (cls.getRuntimeVisibleAnnotations() != null) {
+            annotationElems.putAll(cls.getRuntimeVisibleAnnotations()
+                                      .toAnnotationElems(this, ts));
+        }
+        if (cls.getRuntimeInvisibleAnnotations() != null) {
+            annotationElems.putAll(cls.getRuntimeInvisibleAnnotations()
+                                      .toAnnotationElems(this, ts));
+        }
+
+        RetainedAnnotations retAnn =
+                ts.createRetainedAnnotations(annotationElems, ct.position());
+        ((JL5ParsedClassType) ct).setRetainedAnnotations(retAnn);
+
+        annotationsInitialized = true;
         if (initialized()) {
             clazz = null;
         }
@@ -451,7 +536,7 @@ public class JL5ClassFileLazyClassInitializer extends
 
     @Override
     public void initAnnotationElems() {
-        if (annotationsInitialized) {
+        if (annotationElemsInitialized) {
             return;
         }
 
@@ -470,7 +555,7 @@ public class JL5ClassFileLazyClassInitializer extends
             }
         }
 
-        annotationsInitialized = true;
+        annotationElemsInitialized = true;
 
         if (initialized()) {
             clazz = null;

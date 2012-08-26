@@ -36,12 +36,19 @@ public class JL5ParsedClassType_c extends ParsedClassType_c implements
 
     @Override
     public void addEnumConstant(EnumInstance ei) {
-        addField(ei);
-        enumConstants().add(ei);
+        if (!fields().contains(ei)) {
+            addField(ei);
+        }
+        if (enumConstants == null) {
+            enumConstants = new LinkedList<EnumInstance>();
+        }
+
+        enumConstants.add(ei);
     }
 
     @Override
     public List<EnumInstance> enumConstants() {
+        ((JL5LazyClassInitializer) init).initEnumConstants();
         if (enumConstants == null) {
             enumConstants = new LinkedList<EnumInstance>();
         }
@@ -76,7 +83,6 @@ public class JL5ParsedClassType_c extends ParsedClassType_c implements
 
     @Override
     public List<AnnotationTypeElemInstance> annotationElems() {
-
         ((JL5LazyClassInitializer) init).initAnnotationElems();
         return Collections.unmodifiableList(annotationElems);
     }
@@ -292,6 +298,7 @@ public class JL5ParsedClassType_c extends ParsedClassType_c implements
 
     @Override
     public RetainedAnnotations retainedAnnotations() {
+        ((JL5LazyClassInitializer) init).initAnnotations();
         return this.retainedAnnotations;
     }
 

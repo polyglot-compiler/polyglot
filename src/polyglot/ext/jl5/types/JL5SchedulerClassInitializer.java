@@ -12,13 +12,15 @@ public class JL5SchedulerClassInitializer extends SchedulerClassInitializer
         super(ts);
     }
 
-    protected boolean annotationsInitialized;
+    protected boolean annotationElemsInitialized;
+    protected boolean annotationInitialized;
+    protected boolean enumConstantsInitialized;
 
     @Override
     public void initAnnotationElems() {
-        if (!annotationsInitialized) {
+        if (!annotationElemsInitialized) {
             if (ct.membersAdded()) {
-                this.annotationsInitialized = true;
+                this.annotationElemsInitialized = true;
             }
             else {
                 throw new MissingDependencyException(scheduler.MembersAdded(ct));
@@ -26,4 +28,27 @@ public class JL5SchedulerClassInitializer extends SchedulerClassInitializer
         }
     }
 
+    @Override
+    public void initAnnotations() {
+        if (!annotationInitialized) {
+            if (ct.signaturesResolved()) {
+                this.annotationInitialized = true;
+            }
+            else {
+                throw new MissingDependencyException(scheduler.SignaturesResolved(ct));
+            }
+        }
+    }
+
+    @Override
+    public void initEnumConstants() {
+        if (!enumConstantsInitialized) {
+            if (ct.membersAdded()) {
+                this.enumConstantsInitialized = true;
+            }
+            else {
+                throw new MissingDependencyException(scheduler.MembersAdded(ct));
+            }
+        }
+    }
 }

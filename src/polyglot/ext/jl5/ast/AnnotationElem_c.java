@@ -18,6 +18,7 @@ import polyglot.ext.jl5.types.AnnotationElementValue;
 import polyglot.ext.jl5.types.JL5Flags;
 import polyglot.ext.jl5.types.JL5TypeSystem;
 import polyglot.types.SemanticException;
+import polyglot.types.Type;
 import polyglot.util.CodeWriter;
 import polyglot.util.CollectionUtil;
 import polyglot.util.ListUtil;
@@ -183,9 +184,9 @@ public class AnnotationElem_c extends Expr_c implements AnnotationElem {
         }
         if (value instanceof AnnotationElem) {
             AnnotationElem ae = (AnnotationElem) value;
-            ts.AnnotationElementValueAnnotation(value.position(),
-                                                ae.type(),
-                                                ae.toAnnotationElementValues(ts));
+            return ts.AnnotationElementValueAnnotation(value.position(),
+                                                       ae.type(),
+                                                       ae.toAnnotationElementValues(ts));
         }
         // Otherwise, it should be a constant value.
         ts.checkAnnotationValueConstant(value);
@@ -193,9 +194,22 @@ public class AnnotationElem_c extends Expr_c implements AnnotationElem {
         if (value instanceof ClassLit) {
             constVal = ((ClassLit) value).typeNode().type();
         }
-        return ts.AnnotationElementValueConstant(value.position(),
-                                                 value.type(),
-                                                 constVal);
-    }
+        Type valueType = value.type();
+        if (valueType.isArray()) {
+            valueType = valueType.toArray().base();
+        }
+        AnnotationElementValue c =
+                ts.AnnotationElementValueConstant(value.position(),
+                                                  valueType,
+                                                  constVal);
 
+        if (value.type().isArray()) {
+            // it's actually meant to be an array type, but a singleton was entered
+            return ts.AnnotationElementValueArray(value.position(),
+                                                  Collections.singletonList(c));
+        }
+        else {
+            return c;
+        }
+    }
 }

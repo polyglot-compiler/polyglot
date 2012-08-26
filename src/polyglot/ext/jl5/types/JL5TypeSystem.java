@@ -372,6 +372,10 @@ public interface JL5TypeSystem extends TypeSystem,
             List<AnnotationElem> annotationElems, Position pos)
             throws SemanticException;
 
+    RetainedAnnotations createRetainedAnnotations(
+            Map<Type, Map<String, AnnotationElementValue>> annotationElems,
+            Position position);
+
     /**
      * A special RetainedAnnotations that has no retained annotations.
      */
@@ -386,4 +390,5 @@ public interface JL5TypeSystem extends TypeSystem,
 
     AnnotationElementValue AnnotationElementValueConstant(Position pos,
             Type type, Object constVal);
+
 }

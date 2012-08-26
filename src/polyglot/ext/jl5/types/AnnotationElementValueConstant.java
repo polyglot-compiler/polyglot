@@ -6,7 +6,4 @@ package polyglot.ext.jl5.types;
  */
 public interface AnnotationElementValueConstant extends AnnotationElementValue {
     Object constantValue();
-
-    EnumInstance constantValueAsEnumInstance();
-
 }

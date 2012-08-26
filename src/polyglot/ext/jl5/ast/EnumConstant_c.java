@@ -26,7 +26,7 @@ public class EnumConstant_c extends Field_c implements EnumConstant {
 
     @Override
     public Object constantValue() {
-        return enumInstance().ordinal();
+        return enumInstance();
     }
 
     @Override

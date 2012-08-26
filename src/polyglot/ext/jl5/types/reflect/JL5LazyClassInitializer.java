@@ -4,4 +4,8 @@ import polyglot.types.LazyClassInitializer;
 
 public interface JL5LazyClassInitializer extends LazyClassInitializer {
     void initAnnotationElems();
+
+    void initAnnotations();
+
+    void initEnumConstants();
 }

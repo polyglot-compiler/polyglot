@@ -297,7 +297,7 @@ public class ClassFileLazyClassInitializer implements LazyClassInitializer {
      * @param str The type descriptor.
      * @return The corresponding type.
      */
-    protected Type typeForString(String str) {
+    public Type typeForString(String str) {
         List<Type> l = typeListForString(str);
 
         if (l.size() == 1) {
@@ -381,8 +381,8 @@ public class ClassFileLazyClassInitializer implements LazyClassInitializer {
         }
 
         int[] interfaces = clazz.getInterfaces();
-        for (int i = 0; i < interfaces.length; i++) {
-            String name = clazz.classNameCP(interfaces[i]);
+        for (int interface1 : interfaces) {
+            String name = clazz.classNameCP(interface1);
             ct.addInterface(quietTypeForName(name));
         }
 
@@ -568,8 +568,8 @@ public class ClassFileLazyClassInitializer implements LazyClassInitializer {
         Exceptions exceptions = method.getExceptions();
         if (exceptions != null) {
             int[] throwTypes = exceptions.getThrowTypes();
-            for (int i = 0; i < throwTypes.length; i++) {
-                String s = clazz.classNameCP(throwTypes[i]);
+            for (int throwType : throwTypes) {
+                String s = clazz.classNameCP(throwType);
                 excTypes.add(quietTypeForName(s));
             }
         }
@@ -604,8 +604,8 @@ public class ClassFileLazyClassInitializer implements LazyClassInitializer {
             // Count the number of synthetic fields.
             int numSynthetic = 0;
 
-            for (int i = 0; i < fields.length; i++) {
-                if (fields[i].isSynthetic()) {
+            for (Field field : fields) {
+                if (field.isSynthetic()) {
                     numSynthetic++;
                 }
             }

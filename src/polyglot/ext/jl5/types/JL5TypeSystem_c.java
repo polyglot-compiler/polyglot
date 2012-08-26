@@ -2266,45 +2266,52 @@ public class JL5TypeSystem_c extends
             Declaration decl) throws SemanticException {
         JL5ClassType annotationType =
                 (JL5ClassType) annotation.typeName().type().toClass();
+
         if (annotationType.equals(OverrideAnnotation())) {
             checkOverrideAnnotation(decl);
         }
+
         // If annotationType specifies what kind of target it is meant to be applied to,
         // then check that.
 
-        RetainedAnnotations ra =
-                annotationType.retainedAnnotations();
+        RetainedAnnotations ra = annotationType.retainedAnnotations();
         if (ra != null) {
             for (Type at : ra.annotationTypes()) {
                 if (at.equals(TargetAnnotation())) {
                     // annotationType has a target annotation!
-                    AnnotationElementValueArray targs =
-                            (AnnotationElementValueArray) ra.singleElement(at);
-                    Collection<EnumInstance> eis =
-                            annotationElementTypesForDeclaration(decl);
-                    // the array targs must contain at least one of the eis.
-                    boolean foundAppropriateTarget = false;
-                    requiredCheck: for (EnumInstance required : eis) {
-                        for (AnnotationElementValue found : targs.vals()) {
-                            AnnotationElementValueConstant c =
-                                    (AnnotationElementValueConstant) found;
-                            if (c.constantValueAsEnumInstance()
-                                 .equals(required)) {
-                                foundAppropriateTarget = true;
-                                break requiredCheck;
-                            }
-                        }
-                    }
-
-                    if (!foundAppropriateTarget) {
-                        throw new SemanticException("Annotation "
-                                                            + annotation
-                                                            + " not applicable to this kind of declaration.",
-                                                    annotation.position());
-                    }
+                    checkTargetMetaAnnotation((AnnotationElementValueArray) ra.singleElement(at),
+                                              annotation,
+                                              decl);
                 }
             }
         }
+    }
+
+    private void checkTargetMetaAnnotation(
+            AnnotationElementValueArray targetKinds, AnnotationElem annotation,
+            Declaration decl) throws SemanticException {
+        Collection<EnumInstance> eis =
+                annotationElementTypesForDeclaration(decl);
+        // the array targs must contain at least one of the eis.
+        boolean foundAppropriateTarget = false;
+        requiredCheck: for (EnumInstance required : eis) {
+            for (AnnotationElementValue found : targetKinds.vals()) {
+                AnnotationElementValueConstant c =
+                        (AnnotationElementValueConstant) found;
+                if (required.equals(c.constantValue())) {
+                    foundAppropriateTarget = true;
+                    break requiredCheck;
+                }
+            }
+        }
+
+        if (!foundAppropriateTarget) {
+            throw new SemanticException("Annotation "
+                                                + annotation
+                                                + " not applicable to this kind of declaration.",
+                                        annotation.position());
+        }
+
     }
 
     private Collection<EnumInstance> annotationElementTypesForDeclaration(
@@ -2359,7 +2366,6 @@ public class JL5TypeSystem_c extends
             }
         }
     }
-
 
     protected void checkOverrideAnnotation(Declaration decl)
             throws SemanticException {
@@ -2544,6 +2550,13 @@ public class JL5TypeSystem_c extends
         return new RetainedAnnotations_c(m, this, pos);
     }
 
+    @Override
+    public RetainedAnnotations createRetainedAnnotations(
+            Map<Type, Map<java.lang.String, AnnotationElementValue>> annotationElems,
+            Position pos) {
+        return new RetainedAnnotations_c(annotationElems, this, pos);
+    }
+
     /**
      * Given an annotation of type annotationType, should the annotation
      * be retained in the binary? See JLS 3rd ed, 9.6.1.2
@@ -2567,7 +2580,7 @@ public class JL5TypeSystem_c extends
             if (v instanceof AnnotationElementValueConstant) {
                 AnnotationElementValueConstant c =
                         (AnnotationElementValueConstant) v;
-                EnumInstance ei = c.constantValueAsEnumInstance();
+                EnumInstance ei = (EnumInstance) c.constantValue();
                 if (ei.name().equalsIgnoreCase("CLASS")
                         || ei.name().equalsIgnoreCase("RUNTIME")) {
                     return true;
@@ -2583,8 +2596,7 @@ public class JL5TypeSystem_c extends
 
     @Override
     public RetainedAnnotations NoRetainedAnnotations() {
-        return new RetainedAnnotations_c(this,
-                                               Position.compilerGenerated(1));
+        return new RetainedAnnotations_c(this, Position.compilerGenerated(1));
     }
 
     @Override
@@ -2608,4 +2620,5 @@ public class JL5TypeSystem_c extends
             Position pos, Type type, Object constVal) {
         return new AnnotationElementValueConstant_c(this, pos, type, constVal);
     }
+
 }

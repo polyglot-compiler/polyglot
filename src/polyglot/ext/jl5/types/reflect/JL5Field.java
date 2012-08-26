@@ -12,6 +12,8 @@ import polyglot.types.reflect.Field;
 
 public class JL5Field extends Field {
     protected JL5Signature signature;
+    protected Annotations runtimeVisibleAnnotations;
+    protected Annotations runtimeInvisibleAnnotations;
 
     public JL5Field(DataInputStream in, ClassFile clazz) throws IOException {
         super(in, clazz);
@@ -46,6 +48,16 @@ public class JL5Field extends Field {
                     signature = new JL5Signature(clazz, in, nameIndex, length);
                     attrs[i] = signature;
                 }
+                if ("RuntimeVisibleAnnotations".equals(name.value())) {
+                    runtimeVisibleAnnotations =
+                            new Annotations(clazz, in, nameIndex, length);
+                    attrs[i] = runtimeVisibleAnnotations;
+                }
+                if ("RuntimeInvisibleAnnotations".equals(name.value())) {
+                    runtimeVisibleAnnotations =
+                            new Annotations(clazz, in, nameIndex, length);
+                    attrs[i] = runtimeVisibleAnnotations;
+                }
             }
 
             if (attrs[i] == null) {
@@ -60,6 +72,14 @@ public class JL5Field extends Field {
 
     public JL5Signature getSignature() {
         return signature;
+    }
+
+    public Annotations getRuntimeVisibleAnnotations() {
+        return this.runtimeVisibleAnnotations;
+    }
+
+    public Annotations getRuntimeInvisibleAnnotations() {
+        return this.runtimeInvisibleAnnotations;
     }
 
 }

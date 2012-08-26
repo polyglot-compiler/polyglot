@@ -26,6 +26,6 @@ public interface JL5ProcedureInstance extends ProcedureInstance, MemberInstance 
      */
     RetainedAnnotations retainedAnnotations();
 
-    void setRetainedAnnotations(RetainedAnnotations createRetainedAnnotations);
+    void setRetainedAnnotations(RetainedAnnotations retainedAnnotations);
 
 }

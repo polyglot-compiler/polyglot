@@ -12,6 +12,9 @@ import polyglot.types.reflect.Method;
 
 public class JL5Method extends Method {
     protected JL5Signature signature;
+    protected Annotations runtimeVisibleAnnotations;
+    protected Annotations runtimeInvisibleAnnotations;
+
     /**
      * Record whether an annotation has a default value.
      */
@@ -56,6 +59,16 @@ public class JL5Method extends Method {
                     signature = new JL5Signature(clazz, in, nameIndex, length);
                     attrs[i] = signature;
                 }
+                if ("RuntimeVisibleAnnotations".equals(name.value())) {
+                    runtimeVisibleAnnotations =
+                            new Annotations(clazz, in, nameIndex, length);
+                    attrs[i] = runtimeVisibleAnnotations;
+                }
+                if ("RuntimeInvisibleAnnotations".equals(name.value())) {
+                    runtimeVisibleAnnotations =
+                            new Annotations(clazz, in, nameIndex, length);
+                    attrs[i] = runtimeVisibleAnnotations;
+                }
             }
 
             if (attrs[i] == null) {
@@ -77,4 +90,11 @@ public class JL5Method extends Method {
         return defaultVal;
     }
 
+    public Annotations getRuntimeVisibleAnnotations() {
+        return this.runtimeVisibleAnnotations;
+    }
+
+    public Annotations getRuntimeInvisibleAnnotations() {
+        return this.runtimeInvisibleAnnotations;
+    }
 }
