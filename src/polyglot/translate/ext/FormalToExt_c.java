@@ -13,10 +13,7 @@ public class FormalToExt_c extends ToExt_c {
         Formal n = (Formal) node();
 
         Formal to =
-                rw.nodeFactory().Formal(n.position(),
-                                        n.flags(),
-                                        n.type(),
-                                        n.id());
+                rw.to_nf().Formal(n.position(), n.flags(), n.type(), n.id());
         Type type = rw.to_ts().unknownType(n.position());
         LocalInstance li =
                 rw.to_ts().localInstance(n.position(),

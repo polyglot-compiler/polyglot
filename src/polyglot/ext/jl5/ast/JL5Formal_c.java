@@ -49,12 +49,15 @@ public class JL5Formal_c extends Formal_c implements JL5Formal {
         return isVarArg;
     }
 
-    protected Formal reconstruct(TypeNode type, List<AnnotationElem> annotations) {
+    protected Formal reconstruct(TypeNode type,
+            List<AnnotationElem> annotations, Id name) {
         if (this.type() != type
-                || !CollectionUtil.equals(annotations, this.annotations)) {
+                || !CollectionUtil.equals(annotations, this.annotations)
+                || this.id() != name) {
             JL5Formal_c n = (JL5Formal_c) copy();
             n.type = type;
             n.annotations = annotations;
+            n.name = name;
             return n;
         }
         return this;
@@ -63,8 +66,10 @@ public class JL5Formal_c extends Formal_c implements JL5Formal {
     @Override
     public Node visitChildren(NodeVisitor v) {
         TypeNode type = (TypeNode) visitChild(this.type(), v);
+        Id name = (Id) visitChild(this.id(), v);
         List<AnnotationElem> annots = visitList(this.annotations, v);
-        return reconstruct(type, annots);
+
+        return reconstruct(type, annots, name);
     }
 
     @Override

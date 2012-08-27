@@ -145,7 +145,7 @@ public class Formal_c extends Term_c implements Formal {
 
     /** Reconstruct the formal. */
     protected Formal_c reconstruct(TypeNode type, Id name) {
-        if (this.type != type) {
+        if (this.type != type || this.name != name) {
             Formal_c n = (Formal_c) copy();
             n.type = type;
             n.name = name;

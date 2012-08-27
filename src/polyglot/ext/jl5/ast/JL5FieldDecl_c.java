@@ -47,12 +47,13 @@ public class JL5FieldDecl_c extends FieldDecl_c implements FieldDecl,
         return n;
     }
 
-    protected FieldDecl_c reconstruct(TypeNode type, Expr init,
+    protected FieldDecl_c reconstruct(TypeNode type, Id name, Expr init,
             List<AnnotationElem> annotations) {
-        if (this.type() != type || this.init() != init
+        if (this.type() != type || this.id() != name || this.init() != init
                 || !CollectionUtil.equals(this.annotations, annotations)) {
             JL5FieldDecl_c n = (JL5FieldDecl_c) copy();
             n.type = type;
+            n.name = name;
             n.init = init;
             n.annotations = ListUtil.copy(annotations, true);
             return n;
@@ -63,9 +64,10 @@ public class JL5FieldDecl_c extends FieldDecl_c implements FieldDecl,
     @Override
     public Node visitChildren(NodeVisitor v) {
         TypeNode type = (TypeNode) visitChild(this.type(), v);
+        Id name = (Id) visitChild(this.id(), v);
         Expr init = (Expr) visitChild(this.init(), v);
         List<AnnotationElem> annotations = visitList(this.annotations, v);
-        return reconstruct(type, init, annotations);
+        return reconstruct(type, name, init, annotations);
     }
 
     @Override

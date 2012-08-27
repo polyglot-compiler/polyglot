@@ -68,13 +68,15 @@ public class JL5LocalDecl_c extends LocalDecl_c implements LocalDecl,
     }
 
     protected LocalDecl reconstruct(TypeNode type, Expr init,
-            List<AnnotationElem> annotations) {
+            List<AnnotationElem> annotations, Id name) {
         if (this.type() != type || this.init() != init
-                || !CollectionUtil.equals(annotations, this.annotations)) {
+                || !CollectionUtil.equals(annotations, this.annotations)
+                || this.id() != name) {
             JL5LocalDecl_c n = (JL5LocalDecl_c) copy();
             n.type = type;
             n.init = init;
             n.annotations = annotations;
+            n.name = name;
             return n;
         }
         return this;
@@ -83,9 +85,10 @@ public class JL5LocalDecl_c extends LocalDecl_c implements LocalDecl,
     @Override
     public Node visitChildren(NodeVisitor v) {
         TypeNode type = (TypeNode) visitChild(this.type(), v);
+        Id name = (Id) visitChild(this.id(), v);
         Expr init = (Expr) visitChild(this.init(), v);
         List<AnnotationElem> annots = visitList(this.annotations, v);
-        return reconstruct(type, init, annots);
+        return reconstruct(type, init, annots, name);
     }
 
     @Override
