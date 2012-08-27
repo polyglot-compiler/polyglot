@@ -31,27 +31,21 @@ public class JL5ParsedClassType_c extends ParsedClassType_c implements
     public JL5ParsedClassType_c(TypeSystem ts, LazyClassInitializer init,
             Source fromSource) {
         super(ts, init, fromSource);
-        annotationElems = new LinkedList<AnnotationTypeElemInstance>();
+        this.annotationElems = new LinkedList<AnnotationTypeElemInstance>();
+        this.enumConstants = new LinkedList<EnumInstance>();
     }
 
     @Override
     public void addEnumConstant(EnumInstance ei) {
-        if (!fields().contains(ei)) {
+        if (!this.fields.contains(ei)) {
             addField(ei);
         }
-        if (enumConstants == null) {
-            enumConstants = new LinkedList<EnumInstance>();
-        }
-
         enumConstants.add(ei);
     }
 
     @Override
     public List<EnumInstance> enumConstants() {
         ((JL5LazyClassInitializer) init).initEnumConstants();
-        if (enumConstants == null) {
-            enumConstants = new LinkedList<EnumInstance>();
-        }
         return enumConstants;
     }
 
