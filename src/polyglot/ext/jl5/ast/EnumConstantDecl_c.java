@@ -256,7 +256,6 @@ public class EnumConstantDecl_c extends Term_c implements EnumConstantDecl {
                                 enumType,
                                 Flags.NONE,
                                 name.id(),
-                                n.type(),
                                 ordinal);
         enumType.addEnumConstant(ei);
         n = n.enumInstance(ei);

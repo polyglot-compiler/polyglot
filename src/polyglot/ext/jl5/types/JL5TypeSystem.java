@@ -211,7 +211,7 @@ public interface JL5TypeSystem extends TypeSystem,
     boolean isPrimitiveWrapper(Type l);
 
     EnumInstance enumInstance(Position pos, ClassType container, Flags f,
-            String name, ParsedClassType anonType, long l);
+            String name, long ordinal);
 
     @Override
     Context createContext();

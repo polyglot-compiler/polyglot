@@ -375,9 +375,9 @@ public class JL5TypeSystem_c extends
 
     @Override
     public EnumInstance enumInstance(Position pos, ClassType ct, Flags f,
-            String name, ParsedClassType anonType, long ordinal) {
+            String name, long ordinal) {
         assert_(ct);
-        return new EnumInstance_c(this, pos, ct, f, name, anonType, ordinal);
+        return new EnumInstance_c(this, pos, ct, f, name, ordinal);
     }
 
     @Override

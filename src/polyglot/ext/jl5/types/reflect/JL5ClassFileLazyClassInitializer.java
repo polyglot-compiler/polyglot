@@ -406,13 +406,7 @@ public class JL5ClassFileLazyClassInitializer extends
             fieldType = typeForString(type);
         }
         if (JL5Flags.isEnum(flags)) {
-            fi =
-                    ts.enumInstance(ct.position(),
-                                    ct,
-                                    flags,
-                                    name,
-                                    (ParsedClassType) fieldType,
-                                    0);
+            fi = ts.enumInstance(ct.position(), ct, flags, name, 0);
         }
         else {
             fi =
