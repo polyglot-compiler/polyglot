@@ -19,7 +19,19 @@ import polyglot.util.Position;
 import polyglot.visit.ContextVisitor;
 import polyglot.visit.NodeVisitor;
 
-/** Visitor which performs rewriting on the AST. */
+/**
+ * The ExtensionRewriter translates AST nodes created by one extension's 
+ * NodeFactory to nodes created by a target extension's NodeFactory.  
+ * Extensions using this visitor should add the extension factory 
+ * ToExtFactory_c to their node factory.
+ * 
+ * After the AST of a source file is rewritten, a new job for the 
+ * translated AST is enqueued in the scheduler of the target extension.  
+ * Since this job has not been parsed from a source file, the usual 
+ * pattern is to subclass the target extension's scheduler in order to
+ * substitute an empty pass for the Parsed compiler goal. 
+ * @see JLOutputExtensionInfo for an example.
+ */
 public class ExtensionRewriter extends ContextVisitor {
     /** The ExtensionInfo of the source language */
     protected final ExtensionInfo from_ext;

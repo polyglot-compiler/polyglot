@@ -17,6 +17,14 @@ import polyglot.main.Options;
 import polyglot.main.UsageError;
 import polyglot.util.InternalCompilerError;
 
+/**
+ * A simple example of the output extension pattern.  This extension 
+ * uses a parent extension to set its options and expects all jobs 
+ * to be enqueued directly in its scheduler by an ExtensionRewriter.
+ * 
+ * It also provides a subclass of JLScheduler that does performs an 
+ * empty pass for the Parsed goal, since no files are actually parsed.
+ */
 public class JLOutputExtensionInfo extends JLExtensionInfo {
     final protected ExtensionInfo parent;
 
