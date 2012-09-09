@@ -63,8 +63,10 @@ import polyglot.frontend.Job;
 import polyglot.types.ArrayType;
 import polyglot.types.Flags;
 import polyglot.types.LocalInstance;
+import polyglot.types.NullType;
 import polyglot.types.Type;
 import polyglot.types.TypeSystem;
+import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
 import polyglot.util.UniqueID;
 
@@ -456,7 +458,18 @@ public class ExpressionFlattener extends NodeVisitor {
             // create new array expression 
             // if initializer is an arrayinit
             if (e instanceof ArrayInit) {
-                e = createNewArray((ArrayInit) e);
+                if (e.type() instanceof ArrayType) {
+                    ArrayType at = (ArrayType) e.type();
+                    e = createNewArray((ArrayInit) e, at.base(), at.dims());
+                }
+                else if (e.type() instanceof NullType) {
+                    ArrayType at = (ArrayType) d.type().type();
+                    e = createNewArray((ArrayInit) e, at.base(), at.dims());
+                }
+                else {
+                    throw new InternalCompilerError("Unexpected type for array init: "
+                            + e.type());
+                }
             }
             Local l = createLocal(d);
             n = createAssign(l, e);
@@ -468,12 +481,11 @@ public class ExpressionFlattener extends NodeVisitor {
      * Create a NewArray expression from an ArrayInit. Raw ArrayInits are only
      * allowed in declarations.
      */
-    private Expr createNewArray(ArrayInit e) {
+    private Expr createNewArray(ArrayInit e, Type t, int dims) {
         Position pos = e.position();
-        ArrayType at = (ArrayType) e.type();
-        TypeNode base = nf.CanonicalTypeNode(pos, at.base());
-        NewArray na = nf.NewArray(pos, base, at.dims(), e);
-        return na.type(at);
+        TypeNode base = nf.CanonicalTypeNode(pos, t);
+        NewArray na = nf.NewArray(pos, base, dims, e);
+        return na.type(ts.arrayOf(t));
     }
 
     /**
