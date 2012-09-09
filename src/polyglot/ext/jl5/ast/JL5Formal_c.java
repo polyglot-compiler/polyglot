@@ -56,6 +56,7 @@ public class JL5Formal_c extends Formal_c implements JL5Formal {
                 || this.id() != name) {
             JL5Formal_c n = (JL5Formal_c) copy();
             n.type = type;
+            n.name = name;
             n.annotations = annotations;
             n.name = name;
             return n;
