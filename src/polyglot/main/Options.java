@@ -719,7 +719,7 @@ public class Options {
             noOutputToFS = (Boolean) arg.value();
 
         }
-        else throw new UsageError("Unhandled argument: " + arg);
+        else throw new UnhandledArgument(arg);
     }
 
     /**

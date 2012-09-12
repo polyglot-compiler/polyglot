@@ -151,7 +151,7 @@ public abstract class OptFlag<T> implements Comparable<OptFlag<T>> {
      *            with help info.
      */
     public OptFlag(String id, String params, String usage, int defaultValue) {
-        this(id, params, usage, new Integer(defaultValue).toString());
+        this(id, params, usage, Integer.toString(defaultValue));
     }
 
     /**
@@ -201,7 +201,7 @@ public abstract class OptFlag<T> implements Comparable<OptFlag<T>> {
      *            with help info.
      */
     public OptFlag(String[] ids, String params, String usage, int defaultValue) {
-        this(ids, params, usage, new Integer(defaultValue).toString());
+        this(ids, params, usage, Integer.toString(defaultValue));
     }
 
     /**
@@ -252,7 +252,7 @@ public abstract class OptFlag<T> implements Comparable<OptFlag<T>> {
      */
     public OptFlag(Kind kind, String id, String params, String usage,
             int defaultValue) {
-        this(kind, id, params, usage, new Integer(defaultValue).toString());
+        this(kind, id, params, usage, Integer.toString(defaultValue));
     }
 
     /**
@@ -304,7 +304,7 @@ public abstract class OptFlag<T> implements Comparable<OptFlag<T>> {
      */
     public OptFlag(Kind kind, String[] ids, String params, String usage,
             int defaultValue) {
-        this(kind, ids, params, usage, new Integer(defaultValue).toString());
+        this(kind, ids, params, usage, Integer.toString(defaultValue));
     }
 
     /**
@@ -718,4 +718,62 @@ public abstract class OptFlag<T> implements Comparable<OptFlag<T>> {
         }
 
     }
+
+    /**
+     * A Flag that accepts a integer param.
+     * 
+     * @param <T>
+     */
+    public static class DoubleFlag extends OptFlag<Double> {
+        @Override
+        public Arg<Double> handle(String[] args, int index) {
+            return createArg(index + 1, Double.parseDouble(args[index]));
+        }
+
+        @Override
+        public Arg<Double> defaultArg() {
+            if (defaultValue == null) return null;
+            return createDefault(new Double(defaultValue));
+        }
+
+        public DoubleFlag(OptFlag.Kind kind, String id, String params,
+                String usage, double defaultValue) {
+            super(kind, id, params, usage, Double.toString(defaultValue));
+        }
+
+        public DoubleFlag(OptFlag.Kind kind, String id, String params,
+                String usage) {
+            super(kind, id, params, usage);
+        }
+
+        public DoubleFlag(OptFlag.Kind kind, String[] ids, String params,
+                String usage, double defaultValue) {
+            super(kind, ids, params, usage, Double.toString(defaultValue));
+        }
+
+        public DoubleFlag(OptFlag.Kind kind, String[] ids, String params,
+                String usage) {
+            super(kind, ids, params, usage);
+        }
+
+        public DoubleFlag(String id, String params, String usage,
+                double defaultValue) {
+            super(id, params, usage, Double.toString(defaultValue));
+        }
+
+        public DoubleFlag(String id, String params, String usage) {
+            super(id, params, usage);
+        }
+
+        public DoubleFlag(String[] ids, String params, String usage,
+                double defaultValue) {
+            super(ids, params, usage, Double.toString(defaultValue));
+        }
+
+        public DoubleFlag(String[] ids, String params, String usage) {
+            super(ids, params, usage);
+        }
+
+    }
+
 }
