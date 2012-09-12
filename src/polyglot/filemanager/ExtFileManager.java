@@ -148,8 +148,6 @@ public class ExtFileManager implements FileManager {
             String relativeName, FileObject sibling) throws IOException {
         Options options = extInfo.getOptions();
         Location sourceOutputLoc = options.outputLocation();
-        if (location == null || !sourceOutputLoc.equals(location)
-                || !javac_fm.hasLocation(sourceOutputLoc)) return null;
         if (!options.noOutputToFS)
             return javac_fm.getFileForOutput(location,
                                              packageName,
@@ -606,9 +604,7 @@ public class ExtFileManager implements FileManager {
         String[] exts = extInfo.fileExtensions();
         boolean ok = false;
 
-        for (int i = 0; i < exts.length; i++) {
-            String ext = exts[i];
-
+        for (String ext : exts) {
             if (fileName.endsWith("." + ext)) {
                 ok = true;
                 break;
@@ -679,10 +675,10 @@ public class ExtFileManager implements FileManager {
     protected FileSource checkForSource(Location location, String className) {
         /* Search the source path. */
         String[] exts = extInfo.fileExtensions();
-        for (int k = 0; k < exts.length; k++) {
+        for (String ext : exts) {
             String pkgName = StringUtil.getPackageComponent(className);
             String shortName = StringUtil.getShortNameComponent(className);
-            String fileName = shortName + "." + exts[k];
+            String fileName = shortName + "." + ext;
 
             String key = fileKey(location, pkgName, fileName);
             FileSource source = loadedSources.get(key);
@@ -769,11 +765,11 @@ public class ExtFileManager implements FileManager {
 
             File[] ls = dir.listFiles();
             if (ls != null) {
-                for (int i = 0; i < ls.length; i++) {
-                    if (f1.equals(ls[i])) {
+                for (File element : ls) {
+                    if (f1.equals(element)) {
                         f1Exists = true;
                     }
-                    if (f2.equals(ls[i])) {
+                    if (f2.equals(element)) {
                         f2Exists = true;
                     }
                 }
