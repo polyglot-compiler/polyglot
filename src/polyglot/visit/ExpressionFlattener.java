@@ -691,12 +691,20 @@ public class ExpressionFlattener extends NodeVisitor {
         }
 
         Expr e = u.expr();
-        Eval a =
-                createAssign(e,
-                             ((Binary) postCreate(nf.Binary(pos,
-                                                            (Expr) deepCopy(e),
-                                                            op,
-                                                            createInt(1)))).type(typeOf(e)));
+        Expr e2 = (Expr) deepCopy(e);
+        //XXX: ugh.  Special case for char. javac allows char++ but not char + 1;
+        if (e.type().isChar())
+            e2 =
+                    nf.Cast(pos, nf.CanonicalTypeNode(pos, ts.Int()), e2)
+                      .type(ts.Int());
+
+        Expr plus = nf.Binary(pos, e2, op, createInt(1)).type(typeOf(e2));
+        if (e.type().isChar())
+            plus =
+                    nf.Cast(pos, nf.CanonicalTypeNode(pos, ts.Char()), plus)
+                      .type(ts.Char());
+
+        Eval a = createAssign(e, ((Expr) postCreate(plus)).type(typeOf(e)));
         return a;
     }
 
