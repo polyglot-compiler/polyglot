@@ -1,7 +1,6 @@
 /*******************************************************************************
  * This file is part of the Polyglot extensible compiler framework.
  *
- * Copyright (c) 1997-2001 Purdue Research Foundation
  * Copyright (c) 2000-2012 Polyglot project group, Cornell University
  * Copyright (c) 2006-2012 IBM Corporation
  * All rights reserved.
@@ -17,8 +16,9 @@
  * 
  * The development of the Polyglot project has been supported by a
  * number of funding sources, including DARPA Contract F30602-99-1-0533,
- * monitored by USAF Rome Laboratory, ONR Grant N00014-01-1-0968, NSF
- * Grants CNS-0208642, CNS-0430161, and CCF-0133302, an Alfred P. Sloan
+ * monitored by USAF Rome Laboratory, ONR Grants N00014-01-1-0968 and
+ * N00014-09-1-0652, NSF Grants CNS-0208642, CNS-0430161, CCF-0133302,
+ * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan 
  * Research Fellowship, and an Intel Research Ph.D. Fellowship.
  *
  * See README for contributors.
