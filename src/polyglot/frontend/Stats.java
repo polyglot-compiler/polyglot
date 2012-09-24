@@ -77,14 +77,17 @@ public class Stats {
 
     /** Accumulate inclusive and exclusive times for a pass. */
     public void accumPassTimes(Object key, long in, long ex) {
-        Times t = passTimes.get(key);
-        if (t == null) {
-            keys.add(key);
-            t = new Times();
-            passTimes.put(key, t);
+        // don't hold references if we aren't reporting timing.
+        if (Report.should_report(Report.time, 1)) {
+            Times t = passTimes.get(key);
+            if (t == null) {
+                keys.add(key);
+                t = new Times();
+                passTimes.put(key, t);
+            }
+            t.inclusive += in;
+            t.exclusive += ex;
         }
-        t.inclusive += in;
-        t.exclusive += ex;
     }
 
     /** Report the stats. */
