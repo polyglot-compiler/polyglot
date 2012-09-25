@@ -147,4 +147,6 @@ public interface ExtensionInfo {
      * translates to.
      */
     ExtensionInfo outputExtensionInfo();
+
+    void cleanup();
 }

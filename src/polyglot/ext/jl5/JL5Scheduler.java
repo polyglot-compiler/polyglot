@@ -326,16 +326,27 @@ public class JL5Scheduler extends JLScheduler {
         Options opts = extInfo.getOptions();
         if (complete && ((JL5Options) opts).removeJava5isms) {
             ExtensionInfo outExtInfo = extInfo.outputExtensionInfo();
-            // Flush the outputfiles collection
-            extInfo.compiler().outputFiles().clear();
 
             // Create a goal to compile every source file.
             for (Job job : outExtInfo.scheduler().jobs()) {
-                outExtInfo.scheduler().addGoal(outExtInfo.getCompileGoal(job));
+                Job newJob =
+                        outExtInfo.scheduler().addJob(job.source(), job.ast());
+                outExtInfo.scheduler()
+                          .addGoal(outExtInfo.getCompileGoal(newJob));
             }
+            cleanup();
             return outExtInfo.scheduler().runToCompletion();
         }
         return complete;
+    }
+
+    protected void cleanup() {
+        extInfo.cleanup();
+        inWorklist.clear();
+        worklist.clear();
+        jobs.clear();
+        goals.clear();
+        runCount.clear();
     }
 
     private static class JL5CodeGenerated extends CodeGenerated {

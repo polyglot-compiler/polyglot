@@ -52,6 +52,7 @@ import polyglot.util.InternalCompilerError;
  * This is an abstract <code>ExtensionInfo</code>.
  */
 public abstract class AbstractExtensionInfo implements ExtensionInfo {
+
     protected Compiler compiler;
     private Options options;
     protected TypeSystem ts = null;
@@ -270,4 +271,10 @@ public abstract class AbstractExtensionInfo implements ExtensionInfo {
         return null;
     }
 
+    @Override
+    public void cleanup() {
+        // Flush the outputfiles collection
+        compiler().outputFiles().clear();
+        ts = null;
+    }
 }
