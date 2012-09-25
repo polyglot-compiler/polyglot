@@ -26,7 +26,6 @@
 
 package polyglot.main;
 
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -115,16 +114,6 @@ public class Report {
         return should_report(Collections.singletonList(topic), level);
     }
 
-    /**
-     * Return whether a message on <code>topics</code> of obscurity
-     * <code>level</code> should be reported, based on use of the
-     * -report command-line switches given by the user.
-     */
-    public static boolean should_report(String[] topics, int level) {
-        if (noReporting) return false;
-        return should_report(Arrays.asList(topics), level);
-    }
-
     public static void pushTopic(String topic) {
         should_report.push(topic);
     }
@@ -139,7 +128,8 @@ public class Report {
      * <code>level</code> should be reported, based on use of the
      * -report command-line switches given by the user.
      */
-    public static boolean should_report(Collection<String> topics, int level) {
+    public static <T extends Iterable<String>> boolean should_report(T topics,
+            int level) {
         if (noReporting) return false;
         synchronized (should_report) {
             for (String topic : should_report) {
