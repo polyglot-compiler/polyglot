@@ -99,12 +99,12 @@ To compile a language extension source file, do:
 
 For example:
 
-    $ jlc -ext pao src/polyglot/ext/pao/tests/Test.pao
+    $ jlc -ext jl5 testsjl5/Generics01.jl5
 
 or equivalently:
 
-    $ jlc -extclass polyglot.ext.pao.ExtensionInfo \
-          src/polyglot/ext/pao/tests/Test.pao
+    $ jlc -extclass polyglot.ext.jl5.ExtensionInfo \
+          testsjl5/Generics01.jl5
 
 The latter usage is convenient if the extension is not implemented as
 a subpackage in the polyglot source tree.
