@@ -28,8 +28,6 @@ package polyglot.frontend;
 
 import static java.io.File.separatorChar;
 
-import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.Writer;
@@ -63,12 +61,12 @@ public class TargetFactory {
 
     public CodeWriter outputCodeWriter(FileObject f, int width)
             throws IOException {
-        Writer w = f.openWriter();
+        Writer w = outputWriter(f);
         return Compiler.createCodeWriter(w, width);
     }
 
     /** Open a writer to the output file. */
-    public Writer outputWriter(File outputFile) throws IOException {
+    public Writer outputWriter(FileObject outputFile) throws IOException {
         if (Report.should_report(Report.frontend, 2))
             Report.report(2, "Opening " + outputFile + " for output.");
 
@@ -76,12 +74,7 @@ public class TargetFactory {
             return new UnicodeWriter(new PrintWriter(System.out));
         }
 
-        if (!outputFile.getParentFile().exists()) {
-            File parent = outputFile.getParentFile();
-            parent.mkdirs();
-        }
-
-        return new UnicodeWriter(new FileWriter(outputFile));
+        return new UnicodeWriter(outputFile.openWriter());
     }
 
     /**
