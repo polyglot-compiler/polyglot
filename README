@@ -1,4 +1,4 @@
-             Polyglot Extensible Compiler Framework (Version 2.5.0)
+             Polyglot Extensible Compiler Framework (Version 2.5.1)
              ------------------------------------------------------
 
 Overview
@@ -140,7 +140,7 @@ the command line option "-removeJava5isms", jl5c will translate Java
 1.5 code to Java 1.4. It will, however, translate enumerations using
 the class java.lang.Enum as the superclass of enumeration classes. The
 command line option "-enumImplClass <fully-qualified-class-name>"
-allows the user to specify a different class to user as the superclass
+allows the user to specify a different class to use as the superclass
 of enumeration classes. See $POLYGLOT/testsjl5/java-src/MyEnum.java
 for an example of a suitable class to use as the superclass of
 enumeration classes.
@@ -187,7 +187,8 @@ instructions earlier in this file for how to use the compiler.
 Credits and Acknowledgments
 ---------------------------
 
-Version 2.5 of Polyglot was prepared largely through the work of the following people:
+Version 2.5 of Polyglot was prepared largely through the work of the following
+people:
 
     Steve Chong (Harvard)
     Owen Arden (Cornell)
@@ -195,10 +196,12 @@ Version 2.5 of Polyglot was prepared largely through the work of the following p
     Samarth Lad (Cornell)
     Jed Liu (Cornell)
 
-The Polyglot project is jointly supervised by Prof. Andrew Myers (Cornell University),
-by Prof. Stephen Chong (Harvard University), and by Prof. Nathaniel Nystrom (U. Lugano).
+The Polyglot project is jointly supervised by Prof. Andrew Myers (Cornell
+University), by Prof. Stephen Chong (Harvard University), and by Prof.
+Nathaniel Nystrom (U. Lugano).
 
-Many people have contributed substantially to the development of Polyglot, including:
+Many people have contributed substantially to the development of Polyglot,
+including:
 
         Owen Arden              Michael Brukman
         Stephen Chong           Michael Clarkson
@@ -219,9 +222,10 @@ The code is used here and released under both LGPL and EPL by permission.
 The Base64 code (polyglot.util.Base64) is derived from public domain
 code by Robert Harder <rob@iharder.net>.  See http://iharder.net/base64.
 
-The JL5 extension was based on the "Polyglot for Java 5" project by 
-Milan Stanojevic and Todd Millstein (http://www.cs.ucla.edu/~todd/research/polyglot5.html), 
-with additional input from Vincent Cavé.
+The JL5 extension was based on the "Polyglot for Java 5" project by Milan
+Stanojevic and Todd Millstein
+(http://www.cs.ucla.edu/~todd/research/polyglot5.html), with additional input
+from Vincent Cavé.
 
 The following people have provided patches:
 
