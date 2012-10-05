@@ -1109,7 +1109,7 @@ public abstract class DataFlow<FlowItem extends DataFlow.Item> extends
     }
 
     /**
-     * This utility methods is for subclasses to convert a single Item into
+     * This utility method is for subclasses to convert a single Item into
      * a <code>Map</code>, to return from the
      * <code>flow</code> methods. This
      * method should be used when the same output <code>Item</code> from the
