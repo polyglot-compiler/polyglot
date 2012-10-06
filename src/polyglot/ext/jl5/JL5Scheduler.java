@@ -59,7 +59,7 @@ import polyglot.util.InternalCompilerError;
 
 public class JL5Scheduler extends JLScheduler {
 
-    JL5Scheduler(JLExtensionInfo extInfo) {
+    public JL5Scheduler(JLExtensionInfo extInfo) {
         super(extInfo);
     }
 
