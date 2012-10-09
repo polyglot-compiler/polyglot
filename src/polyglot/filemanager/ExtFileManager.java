@@ -25,7 +25,6 @@
  ******************************************************************************/
 package polyglot.filemanager;
 
-import static java.io.File.separator;
 import static java.io.File.separatorChar;
 
 import java.io.ByteArrayOutputStream;
@@ -36,11 +35,9 @@ import java.io.InputStream;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -49,6 +46,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
 import javax.tools.FileObject;
+import javax.tools.ForwardingJavaFileManager;
 import javax.tools.JavaFileObject;
 import javax.tools.JavaFileObject.Kind;
 import javax.tools.StandardJavaFileManager;
@@ -56,7 +54,6 @@ import javax.tools.ToolProvider;
 
 import polyglot.frontend.ExtensionInfo;
 import polyglot.frontend.FileSource;
-import polyglot.main.Options;
 import polyglot.main.Report;
 import polyglot.types.reflect.ClassFile;
 import polyglot.util.CollectionUtil;
@@ -68,11 +65,11 @@ import polyglot.util.StringUtil;
  * the local file system. (NOTE: Extensions may extend this implementation and
  * are not forced to use local file system for i/o.)
  */
-public class ExtFileManager implements FileManager {
+public class ExtFileManager extends
+        ForwardingJavaFileManager<StandardJavaFileManager> implements
+        FileManager {
 
     protected final ExtensionInfo extInfo;
-    /** JavacFileManager used by java compiler */
-    protected final StandardJavaFileManager javac_fm;
     /** Map of sources already loaded */
     protected final Map<String, FileSource> loadedSources;
     /** List of locations in which .class files are searched */
@@ -92,6 +89,7 @@ public class ExtFileManager implements FileManager {
             CollectionUtil.list(Report.types, Report.resolver, Report.loader);
 
     protected static final Set<Kind> ALL_KINDS = new HashSet<Kind>();
+
     static {
         ALL_KINDS.add(Kind.CLASS);
         ALL_KINDS.add(Kind.SOURCE);
@@ -102,280 +100,145 @@ public class ExtFileManager implements FileManager {
      * Map for storing in-memory FileObjects and associated fully qualified
      * names
      */
-    protected final Map<URI, JavaFileObject> absPathObjMap;
-    /**
-     * Map for storing fully qualified package names and contained
-     * JavaFileObjects
-     */
-    protected final Map<URI, Set<JavaFileObject>> pathObjectMap;
+    protected final Map<Location, Map<String, JavaFileObject>> objectMap;
+
     /**
      * Indicates if the file system is case-insensitive.
      */
-    private int caseInsensitive;
+    protected int caseInsensitive;
     /**
      * Indicates if the file system case-sensitivity is set
      */
-    private boolean caseInsensitivityComputed;
+    protected boolean caseInsensitivityComputed;
 
-    public static final String DEFAULT_PKG = "intermediate_output";
+    /**
+     * Indicates whether to keep output files in memory.
+     */
+    protected final boolean inMemory;
+
+//    public static final String DEFAULT_PKG = "intermediate_output";
 
     public ExtFileManager(ExtensionInfo extInfo) {
+        super(ToolProvider.getSystemJavaCompiler().getStandardFileManager(null,
+                                                                          null,
+                                                                          null));
         this.extInfo = extInfo;
-        javac_fm =
-                ToolProvider.getSystemJavaCompiler()
-                            .getStandardFileManager(null, null, null);
         loadedSources = new HashMap<String, FileSource>();
         locations = new ArrayList<Location>();
         packageCache = new HashMap<String, Boolean>();
         nocache = new HashSet<String>();
         zipCache = new HashMap<File, Object>();
-        absPathObjMap = new HashMap<URI, JavaFileObject>();
-        pathObjectMap = new HashMap<URI, Set<JavaFileObject>>();
-    }
-
-    @Override
-    public void close() throws IOException {
-        javac_fm.close();
-    }
-
-    @Override
-    public void flush() throws IOException {
-        javac_fm.flush();
-    }
-
-    @Override
-    public ClassLoader getClassLoader(Location location) {
-        return javac_fm.getClassLoader(location);
+        objectMap = new HashMap<Location, Map<String, JavaFileObject>>();
+        inMemory = extInfo.getOptions().noOutputToFS;
     }
 
     @Override
     public FileObject getFileForInput(Location location, String packageName,
             String relativeName) throws IOException {
-        Options options = extInfo.getOptions();
-        Location sourceOutputLoc = options.outputLocation();
-        if (sourceOutputLoc.equals(location)) {
-            String newName =
-                    packageName.equals("") ? ("" + relativeName)
-                            : (packageName.replace('.', separatorChar)
-                                    + separator + relativeName);
-            for (File f : javac_fm.getLocation(location)) {
-                URI u = new File(f, newName).toURI();
-                JavaFileObject jfo = absPathObjMap.get(u);
+        if (inMemory) {
+            Map<String, JavaFileObject> locMap = objectMap.get(location);
+            if (locMap != null) {
+                String key = fileKey(packageName, relativeName);
+                JavaFileObject jfo = locMap.get(key);
                 if (jfo != null) return jfo;
             }
-            return null;
         }
-        return javac_fm.getFileForInput(location, packageName, relativeName);
-    }
-
-    @Override
-    public FileObject getFileForOutput(Location location, String packageName,
-            String relativeName, FileObject sibling) throws IOException {
-        Options options = extInfo.getOptions();
-        Location sourceOutputLoc = options.outputLocation();
-        if (!options.noOutputToFS)
-            return javac_fm.getFileForOutput(location,
-                                             packageName,
-                                             relativeName,
-                                             sibling);
-        URI srcUri, srcParentUri;
-        Kind k;
-        if (relativeName.endsWith(".java"))
-            k = Kind.SOURCE;
-        else if (relativeName.endsWith(".class"))
-            k = Kind.CLASS;
-        else if (relativeName.endsWith(".html")
-                || relativeName.endsWith(".htm"))
-            k = Kind.HTML;
-        else k = Kind.OTHER;
-        if (sibling == null) {
-            File sourcedir = null;
-            for (File f : javac_fm.getLocation(sourceOutputLoc)) {
-                sourcedir = f;
-                break;
-            }
-            if (sourcedir == null)
-                throw new IOException("Source output directory is not set.");
-            String pkg =
-                    packageName.equals("") ? ""
-                            : (packageName.replace('.', separatorChar) + separator);
-            File sourcefile = new File(sourcedir, pkg + relativeName);
-            srcUri = sourcefile.toURI();
-            srcParentUri = sourcefile.getParentFile().toURI();
-        }
-        else {
-            File sourcedir = new File(sibling.toUri()).getParentFile();
-            File sourcefile =
-                    new File(sourcedir,
-                             relativeName.substring(relativeName.lastIndexOf(separatorChar) + 1));
-            srcUri = sourcefile.toURI();
-            srcParentUri = sourcefile.getParentFile().toURI();
-        }
-        JavaFileObject jfo = new SourceObject(srcUri, k);
-        absPathObjMap.put(srcUri, jfo);
-        if (pathObjectMap.containsKey(srcParentUri))
-            pathObjectMap.get(srcParentUri).add(jfo);
-        else {
-            Set<JavaFileObject> s = new HashSet<JavaFileObject>();
-            s.add(jfo);
-            pathObjectMap.put(srcParentUri, s);
-        }
-        return jfo;
+        return super.getFileForInput(location, packageName, relativeName);
     }
 
     @Override
     public JavaFileObject getJavaFileForInput(Location location,
             String className, Kind kind) throws IOException {
-        Options options = extInfo.getOptions();
-        Location sourceOutputLoc = options.outputLocation();
-        if (sourceOutputLoc.equals(location)) {
-            String clazz =
-                    className.replace('.', separatorChar) + kind.extension;
-            for (File f : javac_fm.getLocation(sourceOutputLoc)) {
-                URI u = new File(f, clazz).toURI();
-                JavaFileObject jfo = absPathObjMap.get(u);
-                if (jfo != null) return jfo;
+        String pkg = StringUtil.getPackageComponent(className);
+        String name = StringUtil.getShortNameComponent(className);
+        String relativeName = name + kind.extension;
+        return (JavaFileObject) getFileForInput(location, pkg, relativeName);
+    }
+
+    protected Kind kindFromExtension(String name) {
+        Kind k;
+        if (name.endsWith(".java"))
+            k = Kind.SOURCE;
+        else if (name.endsWith(".class"))
+            k = Kind.CLASS;
+        else if (name.endsWith(".html") || name.endsWith(".htm"))
+            k = Kind.HTML;
+        else k = Kind.OTHER;
+        return k;
+    }
+
+    @Override
+    public FileObject getFileForOutput(Location location, String packageName,
+            String relativeName, FileObject sibling) throws IOException {
+        if (inMemory) {
+            String key = fileKey(packageName, relativeName);
+            URI src = URI.create("file:///" + key);
+            JavaFileObject jfo =
+                    new ExtFileObject(src, kindFromExtension(relativeName));
+            Map<String, JavaFileObject> locMap = objectMap.get(location);
+            if (locMap == null) {
+                locMap = new HashMap<String, JavaFileObject>();
+                objectMap.put(location, locMap);
             }
-            return null;
+            locMap.put(key, jfo);
+            return jfo;
         }
-        return javac_fm.getJavaFileForInput(location, className, kind);
+        return super.getFileForOutput(location,
+                                      packageName,
+                                      relativeName,
+                                      sibling);
+    }
+
+    protected String fileKey(String packageName, String relativeName) {
+        if (!packageName.isEmpty())
+            packageName =
+                    packageName.replace('.', separatorChar) + separatorChar;
+        StringBuilder sb = new StringBuilder(packageName);
+        sb.append(relativeName);
+        return sb.toString();
     }
 
     @Override
     public JavaFileObject getJavaFileForOutput(Location location,
             String className, Kind kind, FileObject sibling) throws IOException {
-        Options options = extInfo.getOptions();
-        Location sourceOutputLoc = options.outputLocation();
-        Location classOutputLoc = options.classOutputDirectory();
-        if (kind.equals(Kind.SOURCE)) {
-            if (location == null || !sourceOutputLoc.equals(location)
-                    || !javac_fm.hasLocation(sourceOutputLoc))
-                throw new IllegalArgumentException("Unknown output location: "
-                        + location);
-            if (!options.noOutputToFS)
-                return javac_fm.getJavaFileForOutput(location,
-                                                     className,
-                                                     kind,
-                                                     sibling);
-            URI srcUri, srcParentUri;
-            if (sibling == null) {
-                File sourcedir = null;
-                for (File f : javac_fm.getLocation(sourceOutputLoc)) {
-                    sourcedir = f;
-                    break;
-                }
-                if (sourcedir == null)
-                    throw new IOException("Source output directory is not set.");
-                File sourcefile =
-                        new File(sourcedir, className.replace('.',
-                                                              separatorChar)
-                                + kind.extension);
-                srcUri = sourcefile.toURI();
-                srcParentUri = sourcefile.getParentFile().toURI();
-            }
-            else {
-                File sourcedir = new File(sibling.toUri()).getParentFile();
-                File sourcefile =
-                        new File(sourcedir,
-                                 className.substring(className.lastIndexOf('.') + 1)
-                                         + kind.extension);
-                srcUri = sourcefile.toURI();
-                srcParentUri = sourcefile.getParentFile().toURI();
-            }
-            JavaFileObject jfo = new SourceObject(srcUri, kind);
-            absPathObjMap.put(srcUri, jfo);
-            if (pathObjectMap.containsKey(srcParentUri))
-                pathObjectMap.get(srcParentUri).add(jfo);
-            else {
-                Set<JavaFileObject> s = new HashSet<JavaFileObject>();
-                s.add(jfo);
-                pathObjectMap.put(srcParentUri, s);
-            }
-            return jfo;
-        }
-        else if (kind.equals(Kind.CLASS)) {
-            if (location == null || !classOutputLoc.equals(location)
-                    || !javac_fm.hasLocation(classOutputLoc)) return null;
-            return javac_fm.getJavaFileForOutput(classOutputLoc,
-                                                 className,
-                                                 kind,
-                                                 sibling);
-        }
-        else {
-            throw new UnsupportedOperationException();
-        }
-    }
 
-    @Override
-    public boolean handleOption(String current, Iterator<String> remaining) {
-        return javac_fm.handleOption(current, remaining);
+        String pkg = StringUtil.getPackageComponent(className);
+        String name = StringUtil.getShortNameComponent(className);
+        String relativeName = name + kind.extension;
+        return (JavaFileObject) getFileForOutput(location,
+                                                 pkg,
+                                                 relativeName,
+                                                 sibling);
     }
 
     @Override
     public boolean hasLocation(Location location) {
-        return javac_fm.hasLocation(location);
+        return objectMap.get(location) != null || super.hasLocation(location);
     }
 
     @Override
     public String inferBinaryName(Location location, JavaFileObject file) {
-        if (file instanceof SourceObject) {
-            String className = ((SourceObject) file).getName();
+        if (file instanceof ExtFileObject) {
+            String className = ((ExtFileObject) file).getName();
             return className.substring(className.lastIndexOf('.') + 1);
         }
-        return javac_fm.inferBinaryName(location, file);
-    }
-
-    private void setFiller(URI parentUri, Set<Kind> kinds, Set<JavaFileObject> s) {
-        for (JavaFileObject fo : pathObjectMap.get(parentUri)) {
-            if (kinds.contains(Kind.SOURCE) && fo.getKind().equals(Kind.SOURCE))
-                s.add(fo);
-            else if (kinds.contains(Kind.CLASS)
-                    && fo.getKind().equals(Kind.CLASS))
-                s.add(fo);
-            else if (kinds.contains(Kind.HTML)
-                    && fo.getKind().equals(Kind.HTML))
-                s.add(fo);
-            else if (kinds.contains(Kind.OTHER)) s.add(fo);
-        }
+        return super.inferBinaryName(location, file);
     }
 
     @Override
     public Iterable<JavaFileObject> list(Location location, String packageName,
             Set<Kind> kinds, boolean recurse) throws IOException {
-        Options options = extInfo.getOptions();
-        Location sourceOutputLoc = options.outputLocation();
-        Location classOutputLoc = options.classOutputDirectory();
-        if (location == null) return new HashSet<JavaFileObject>();
-        if (sourceOutputLoc.equals(location)) {
-            Set<JavaFileObject> s = new HashSet<JavaFileObject>();
-            String pkg = packageName.replace('.', separatorChar);
-            for (File file : javac_fm.getLocation(sourceOutputLoc)) {
-                URI parentUri = new File(file, pkg).toURI();
-                if (pathObjectMap.containsKey(parentUri)) {
-                    setFiller(parentUri, kinds, s);
-                    if (recurse)
-                        for (URI u : pathObjectMap.keySet())
-                            if (u.getPath().startsWith(parentUri.getPath()))
-                                setFiller(u, kinds, s);
-                }
-            }
-            return s;
-        }
-        else if (classOutputLoc.equals(location))
-            return javac_fm.list(classOutputLoc, packageName, kinds, recurse);
-        else return javac_fm.list(location, packageName, kinds, recurse);
-    }
-
-    @Override
-    public int isSupportedOption(String option) {
-        return javac_fm.isSupportedOption(option);
+        Map<String, JavaFileObject> locMap = objectMap.get(location);
+        if (locMap != null)
+            return locMap.values();
+        else return super.list(location, packageName, kinds, recurse);
     }
 
     // Use this method for obtaining JavaFileObjects representing files on the
     // local file system
     @Override
     public Iterable<? extends JavaFileObject> getJavaFileObjects(File... files) {
-        return javac_fm.getJavaFileObjects(files);
+        return fileManager.getJavaFileObjects(files);
     }
 
     // Use this method for obtaining JavaFileObjects representing files on the
@@ -383,7 +246,7 @@ public class ExtFileManager implements FileManager {
     @Override
     public Iterable<? extends JavaFileObject> getJavaFileObjects(
             String... names) {
-        return javac_fm.getJavaFileObjects(names);
+        return fileManager.getJavaFileObjects(names);
     }
 
     // Use this method for obtaining JavaFileObjects representing files on the
@@ -391,7 +254,7 @@ public class ExtFileManager implements FileManager {
     @Override
     public Iterable<? extends JavaFileObject> getJavaFileObjectsFromFiles(
             Iterable<? extends File> files) {
-        return javac_fm.getJavaFileObjectsFromFiles(files);
+        return fileManager.getJavaFileObjectsFromFiles(files);
     }
 
     // Use this method for obtaining JavaFileObjects representing files on the
@@ -399,12 +262,12 @@ public class ExtFileManager implements FileManager {
     @Override
     public Iterable<? extends JavaFileObject> getJavaFileObjectsFromStrings(
             Iterable<String> names) {
-        return javac_fm.getJavaFileObjectsFromStrings(names);
+        return fileManager.getJavaFileObjectsFromStrings(names);
     }
 
     @Override
     public Iterable<? extends File> getLocation(Location location) {
-        return javac_fm.getLocation(location);
+        return fileManager.getLocation(location);
     }
 
     @Override
@@ -415,7 +278,7 @@ public class ExtFileManager implements FileManager {
     @Override
     public void setLocation(Location location, Iterable<? extends File> path)
             throws IOException {
-        javac_fm.setLocation(location, path);
+        fileManager.setLocation(location, path);
     }
 
     @Override
@@ -607,7 +470,7 @@ public class ExtFileManager implements FileManager {
             f = f.getAbsoluteFile();
             sourceFile = loadedSources.get(key);
             if (sourceFile != null) return sourceFile;
-            for (FileObject jfo : javac_fm.getJavaFileObjects(f)) {
+            for (FileObject jfo : fileManager.getJavaFileObjects(f)) {
                 if (fo != null)
                     throw new InternalCompilerError("Two files exist of the same name");
                 fo = jfo;
@@ -741,11 +604,6 @@ public class ExtFileManager implements FileManager {
             return location + "/" + packageName.toLowerCase() + "/"
                     + fileName.toLowerCase();
         return location + "/" + packageName + "/" + fileName;
-    }
-
-    @Override
-    public Map<URI, JavaFileObject> getAbsPathObjMap() {
-        return Collections.unmodifiableMap(absPathObjMap);
     }
 
     @Override
