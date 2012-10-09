@@ -7,7 +7,9 @@ doc/release-notes-<version>.
 
 October 15, 2012 : Polyglot 2.5.1
 ================================
-Changes to FileManager to remove some artificial limitations.
+Changes to FileManager to remove some artificial limitations. The method
+FileManager.getAbsPathObjMap() was removed from the FileManager API.  Access to
+in-memory files should be performed via the core API.
 
 August 10, 2012 : Polyglot 2.5.0
 ================================
