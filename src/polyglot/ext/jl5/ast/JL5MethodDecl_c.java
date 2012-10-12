@@ -103,7 +103,8 @@ public class JL5MethodDecl_c extends MethodDecl_c implements JL5MethodDecl {
         return this.annotations;
     }
 
-    public JL5MethodDecl annotations(List<AnnotationElem> annotations) {
+    @Override
+    public JL5MethodDecl annotationElems(List<AnnotationElem> annotations) {
         JL5MethodDecl_c n = (JL5MethodDecl_c) copy();
         n.annotations = annotations;
         return n;

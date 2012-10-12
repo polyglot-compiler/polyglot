@@ -38,5 +38,7 @@ import polyglot.types.SemanticException;
 public interface AnnotatedElement {
     List<AnnotationElem> annotationElems();
 
+    AnnotatedElement annotationElems(List<AnnotationElem> annotations);
+
     Node annotationCheck(AnnotationChecker ac) throws SemanticException;
 }

@@ -142,7 +142,8 @@ public class JL5ClassDecl_c extends ClassDecl_c implements JL5ClassDecl {
         return n;
     }
 
-    public JL5ClassDecl annotations(List<AnnotationElem> annotations) {
+    @Override
+    public JL5ClassDecl annotationElems(List<AnnotationElem> annotations) {
         JL5ClassDecl_c n = (JL5ClassDecl_c) copy();
         n.annotations = annotations;
         return n;

@@ -106,7 +106,8 @@ public class EnumConstantDecl_c extends Term_c implements EnumConstantDecl {
         return this.annotations;
     }
 
-    public EnumConstantDecl annotations(List<AnnotationElem> annotations) {
+    @Override
+    public EnumConstantDecl annotationElems(List<AnnotationElem> annotations) {
         EnumConstantDecl_c n = (EnumConstantDecl_c) copy();
         n.annotations = annotations;
         return n;

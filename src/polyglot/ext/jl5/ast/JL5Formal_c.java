@@ -111,6 +111,13 @@ public class JL5Formal_c extends Formal_c implements JL5Formal {
     }
 
     @Override
+    public JL5Formal annotationElems(List<AnnotationElem> annotations) {
+        JL5Formal_c n = (JL5Formal_c) copy();
+        n.annotations = annotations;
+        return n;
+    }
+
+    @Override
     public Node annotationCheck(AnnotationChecker annoCheck)
             throws SemanticException {
         JL5TypeSystem ts = (JL5TypeSystem) annoCheck.typeSystem();

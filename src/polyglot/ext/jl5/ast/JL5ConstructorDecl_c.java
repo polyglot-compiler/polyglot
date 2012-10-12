@@ -101,7 +101,8 @@ public class JL5ConstructorDecl_c extends ConstructorDecl_c implements
         return this.annotations;
     }
 
-    public JL5ConstructorDecl annotations(List<AnnotationElem> annotations) {
+    @Override
+    public JL5ConstructorDecl annotationElems(List<AnnotationElem> annotations) {
         JL5ConstructorDecl_c n = (JL5ConstructorDecl_c) copy();
         n.annotations = annotations;
         return n;

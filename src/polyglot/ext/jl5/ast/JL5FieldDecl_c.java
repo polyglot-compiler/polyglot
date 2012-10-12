@@ -66,7 +66,8 @@ public class JL5FieldDecl_c extends FieldDecl_c implements FieldDecl,
         return this.annotations;
     }
 
-    public FieldDecl annotations(List<AnnotationElem> annotations) {
+    @Override
+    public JL5FieldDecl_c annotationElems(List<AnnotationElem> annotations) {
         JL5FieldDecl_c n = (JL5FieldDecl_c) copy();
         n.annotations = ListUtil.copy(annotations, true);
         return n;
