@@ -26,6 +26,7 @@
 
 package polyglot.main;
 
+import static java.io.File.pathSeparator;
 import static java.io.File.pathSeparatorChar;
 
 import java.io.File;
@@ -1126,6 +1127,17 @@ public class Options {
             boot = sb.toString();
         }
         return boot;
+    }
+
+    public List<File> defaultPlatformClasspath() {
+        List<File> path = new ArrayList<File>();
+        StringTokenizer st =
+                new StringTokenizer(jvmbootclasspath(), pathSeparator);
+        while (st.hasMoreTokens()) {
+            File next = new File(st.nextToken());
+            path.add(next);
+        }
+        return path;
     }
 }
 // vim: ts=4

@@ -33,7 +33,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -72,8 +71,6 @@ public class ExtFileManager extends
     protected final ExtensionInfo extInfo;
     /** Map of sources already loaded */
     protected final Map<String, FileSource> loadedSources;
-    /** List of locations in which .class files are searched */
-    protected final List<Location> locations;
     /** A cache for package look ups */
     protected final Map<String, Boolean> packageCache;
     /** A cache for the class files that don't exist */
@@ -116,7 +113,7 @@ public class ExtFileManager extends
      */
     protected final boolean inMemory;
 
-//    public static final String DEFAULT_PKG = "intermediate_output";
+    protected List<Location> default_locations;
 
     public ExtFileManager(ExtensionInfo extInfo) {
         super(ToolProvider.getSystemJavaCompiler().getStandardFileManager(null,
@@ -124,12 +121,12 @@ public class ExtFileManager extends
                                                                           null));
         this.extInfo = extInfo;
         loadedSources = new HashMap<String, FileSource>();
-        locations = new ArrayList<Location>();
         packageCache = new HashMap<String, Boolean>();
         nocache = new HashSet<String>();
         zipCache = new HashMap<File, Object>();
         objectMap = new HashMap<Location, Map<String, JavaFileObject>>();
         inMemory = extInfo.getOptions().noOutputToFS;
+        default_locations = extInfo.defaultLocations();
     }
 
     @Override
@@ -286,8 +283,8 @@ public class ExtFileManager extends
         Boolean exists = packageCache.get(name);
         if (exists != null) return exists;
         exists = false;
-        for (int i = locations.size() - 1; i >= 0; i--) {
-            exists = packageExists(locations.get(i), name);
+        for (int i = default_locations.size() - 1; i >= 0; i--) {
+            exists = packageExists(default_locations.get(i), name);
             if (exists) break;
         }
         packageCache.put(name, exists);
@@ -368,8 +365,8 @@ public class ExtFileManager extends
     public ClassFile loadFile(String name) {
         if (nocache.contains(name)) return null;
         ClassFile clazz = null;
-        for (int i = locations.size() - 1; i >= 0; i--) {
-            clazz = loadFile(locations.get(i), name);
+        for (int i = default_locations.size() - 1; i >= 0; i--) {
+            clazz = loadFile(default_locations.get(i), name);
             if (clazz != null) break;
         }
         if (clazz == null) nocache.add(name);
@@ -410,17 +407,7 @@ public class ExtFileManager extends
             }
 
             if (jfo != null) {
-                ByteArrayOutputStream bos = new ByteArrayOutputStream();
-                InputStream is = jfo.openInputStream();
-                byte buf[] = new byte[BUF_SIZE];
-                int len;
-                while ((len = is.read(buf, 0, BUF_SIZE)) != -1)
-                    bos.write(buf, 0, len);
-
-                ClassFile clazz =
-                        extInfo.createClassFile(jfo, bos.toByteArray());
-
-                return clazz;
+                return extInfo.createClassFile(jfo, getBytes(jfo));
             }
         }
         catch (ClassFormatError e) {
@@ -432,11 +419,6 @@ public class ExtFileManager extends
                 Report.report(4, "Error loading class " + name);
         }
         return null;
-    }
-
-    @Override
-    public void addLocation(Location loc) {
-        locations.add(loc);
     }
 
     @Override
@@ -672,6 +654,25 @@ public class ExtFileManager extends
         else {
             caseInsensitive = -1;
         }
+    }
+
+    /**
+     * Convenience method for extracting bytes from a FileObject
+     */
+    public static byte[] getBytes(FileObject fo) throws IOException {
+        InputStream is = fo.openInputStream();
+        ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+
+        int nRead;
+        byte[] data = new byte[2048];
+
+        while ((nRead = is.read(data, 0, data.length)) != -1) {
+            buffer.write(data, 0, nRead);
+        }
+
+        buffer.flush();
+
+        return buffer.toByteArray();
     }
 
     protected static Collection<String> verbose;

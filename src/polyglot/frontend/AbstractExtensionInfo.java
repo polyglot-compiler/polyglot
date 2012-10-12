@@ -26,11 +26,17 @@
 
 package polyglot.frontend;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.Reader;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 
 import javax.tools.FileObject;
+import javax.tools.JavaFileManager;
+import javax.tools.JavaFileManager.Location;
+import javax.tools.StandardLocation;
 
 import polyglot.ast.Node;
 import polyglot.ast.NodeFactory;
@@ -62,6 +68,7 @@ public abstract class AbstractExtensionInfo implements ExtensionInfo {
     protected Scheduler scheduler;
     protected FileManager extFM;
     protected ClassFileLoader classFileLoader;
+    protected List<Location> default_locations;
 
     @Override
     public abstract Goal getCompileGoal(Job job);
@@ -222,10 +229,15 @@ public abstract class AbstractExtensionInfo implements ExtensionInfo {
     }
 
     @Override
-    public final FileManager extFileManager() {
+    public FileManager extFileManager() {
         if (extFM == null) {
             extFM = createFileManager();
-            configureFileManager();
+            try {
+                configureFileManager();
+            }
+            catch (IOException e) {
+                throw new InternalCompilerError(e);
+            }
         }
         return extFM;
     }
@@ -234,28 +246,49 @@ public abstract class AbstractExtensionInfo implements ExtensionInfo {
         return new ExtFileManager(this);
     }
 
-    protected void configureFileManager() {
+    protected void configureFileManager() throws IOException {
         Options opt = getOptions();
-        try {
-            extFM.setLocation(opt.source_path, opt.sourcepath_directories);
-            extFM.setLocation(opt.source_output,
-                              Collections.singleton(opt.source_output_directory));
-            extFM.setLocation(opt.class_output,
-                              Collections.singleton(opt.class_output_directory));
-            extFM.setLocation(opt.bootclasspath, opt.bootclasspath_directories);
-            extFM.setLocation(opt.classpath, opt.classpath_directories);
-        }
-        catch (IOException e) {
-            throw new InternalCompilerError(e.getMessage());
-        }
+        extFM.setLocation(opt.source_path, opt.sourcepath_directories);
+        extFM.setLocation(opt.source_output,
+                          Collections.singleton(opt.source_output_directory));
+        extFM.setLocation(opt.class_output,
+                          Collections.singleton(opt.class_output_directory));
+        extFM.setLocation(opt.bootclasspath, opt.bootclasspath_directories);
+        extFM.setLocation(opt.classpath, opt.classpath_directories);
+    }
+
+    /**
+     * Configure the file manager for the post-compiler. This implementation
+     * constructs a classpath from the source output directory, the current
+     * directory, the classpath, and the bootclasspath.
+     * 
+     * @return
+     */
+    @Override
+    public void configureFileManagerForPostCompiler() throws IOException {
+        Options opt = getOptions();
+
+        extFM.setLocation(StandardLocation.PLATFORM_CLASS_PATH,
+                          opt.defaultPlatformClasspath());
+
+        List<File> sourcepath =
+                Collections.singletonList(opt.source_output_directory);
+        extFM.setLocation(StandardLocation.SOURCE_PATH, sourcepath);
+
+        List<File> classpath = new ArrayList<File>();
+        classpath.addAll(opt.bootclasspath_directories);
+        classpath.addAll(opt.classpath_directories);
+        extFM.setLocation(StandardLocation.CLASS_PATH, classpath);
+
+        List<File> classout =
+                Collections.singletonList(opt.class_output_directory);
+        extFM.setLocation(StandardLocation.CLASS_OUTPUT, classout);
     }
 
     @Override
     public ClassFileLoader classFileLoader() {
         if (classFileLoader == null) {
             classFileLoader = extFileManager();
-            classFileLoader.addLocation(getOptions().bootclasspath);
-            classFileLoader.addLocation(getOptions().classpath);
         }
         return classFileLoader;
     }
@@ -277,4 +310,15 @@ public abstract class AbstractExtensionInfo implements ExtensionInfo {
         compiler().outputFiles().clear();
         ts = null;
     }
+
+    @Override
+    public List<Location> defaultLocations() {
+        if (default_locations == null) {
+            default_locations = new ArrayList<JavaFileManager.Location>();
+            default_locations.add(getOptions().bootclasspath);
+            default_locations.add(getOptions().classpath);
+        }
+        return default_locations;
+    }
+
 }

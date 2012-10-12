@@ -198,6 +198,8 @@ public class Main {
                         postCompilerArgs.add("-g");
                     ByteArrayOutputStream err = new ByteArrayOutputStream();
                     Writer javac_err = new OutputStreamWriter(err);
+                    compiler.sourceExtension()
+                            .configureFileManagerForPostCompiler();
                     JavaFileManager fileManager =
                             compiler.sourceExtension().extFileManager();
                     CompilationTask task =
@@ -253,8 +255,8 @@ public class Main {
                     }
                     if (Report.should_report(verbose, 1)) {
                         StringBuffer cmdStr = new StringBuffer();
-                        for (int i = 0; i < javacCmd.length; i++)
-                            cmdStr.append(javacCmd[i] + " ");
+                        for (String element : javacCmd)
+                            cmdStr.append(element + " ");
                         Report.report(1, "Executing post-compiler " + cmdStr);
                     }
 
@@ -306,10 +308,10 @@ public class Main {
             throws TerminationException {
         LinkedList<String> ll = new LinkedList<String>();
 
-        for (int i = 0; i < args.length; i++) {
+        for (String arg : args) {
             // special case for the @ command-line parameter
-            if (args[i].startsWith("@")) {
-                String fn = args[i].substring(1);
+            if (arg.startsWith("@")) {
+                String fn = arg.substring(1);
                 try {
                     BufferedReader lr = new BufferedReader(new FileReader(fn));
                     LinkedList<String> newArgs = new LinkedList<String>();
@@ -333,7 +335,7 @@ public class Main {
                 continue;
             }
 
-            ll.add(args[i]);
+            ll.add(arg);
         }
 
         return ll;

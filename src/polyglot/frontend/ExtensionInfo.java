@@ -28,8 +28,10 @@ package polyglot.frontend;
 
 import java.io.IOException;
 import java.io.Reader;
+import java.util.List;
 
 import javax.tools.FileObject;
+import javax.tools.JavaFileManager.Location;
 
 import polyglot.ast.Node;
 import polyglot.ast.NodeFactory;
@@ -132,6 +134,9 @@ public interface ExtensionInfo {
     /** Get the extension file mananger used by this extension. */
     FileManager extFileManager();
 
+    /** Configure the filemanger for the post-compilation phase. */
+    void configureFileManagerForPostCompiler() throws IOException;
+
     /** Create class file for a file object. */
     ClassFile createClassFile(FileObject f, byte[] code) throws IOException;
 
@@ -148,5 +153,16 @@ public interface ExtensionInfo {
      */
     ExtensionInfo outputExtensionInfo();
 
+    /**
+     * Delete cached types and source files to reduce memory footprint.
+     */
     void cleanup();
+
+    /**
+     * The set of locations to search for packages and class files when
+     * otherwise unspecified.  This provides some backward compatibility 
+     * for code written prior to the FileManager API
+     */
+    List<Location> defaultLocations();
+
 }

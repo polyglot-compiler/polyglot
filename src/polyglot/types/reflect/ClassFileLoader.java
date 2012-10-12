@@ -62,8 +62,4 @@ public interface ClassFileLoader {
      */
     ClassFile loadFile(Location location, String name);
 
-    /**
-     * @param loc A location to add to the ClassFileLoader
-     */
-    void addLocation(Location loc);
 }
