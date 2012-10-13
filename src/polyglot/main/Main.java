@@ -187,15 +187,21 @@ public class Main {
         }
     }
 
+    /**
+     * Returns a list of arguments to pass to the system java compiler.
+     */
+    protected List<String> getSystemJavacArgs(Options options) {
+        List<String> postCompilerArgs = new ArrayList<String>(1);
+        if (options.generate_debugging_info) postCompilerArgs.add("-g");
+        return postCompilerArgs;
+    }
+
     protected boolean invokePostCompiler(Options options, Compiler compiler,
             ErrorQueue eq) {
         if (!options.output_source_only && !options.output_stdout) {
             try {
                 if (options.post_compiler == null) {
-                    ArrayList<String> postCompilerArgs =
-                            new ArrayList<String>(1);
-                    if (options.generate_debugging_info)
-                        postCompilerArgs.add("-g");
+                    List<String> postCompilerArgs = getSystemJavacArgs(options);
                     ByteArrayOutputStream err = new ByteArrayOutputStream();
                     Writer javac_err = new OutputStreamWriter(err);
                     compiler.sourceExtension()
