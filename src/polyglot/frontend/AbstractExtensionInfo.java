@@ -250,11 +250,11 @@ public abstract class AbstractExtensionInfo implements ExtensionInfo {
         Options opt = getOptions();
         extFM.setLocation(opt.source_path, opt.sourcepath_directories);
         extFM.setLocation(opt.source_output,
-                          Collections.singleton(opt.source_output_directory));
+                          Collections.singleton(opt.sourceOutputDirectory()));
         extFM.setLocation(opt.class_output,
-                          Collections.singleton(opt.class_output_directory));
-        extFM.setLocation(opt.bootclasspath, opt.bootclasspath_directories);
-        extFM.setLocation(opt.classpath, opt.classpath_directories);
+                          Collections.singleton(opt.classOutputDirectory()));
+        extFM.setLocation(opt.bootclasspath, opt.bootclasspathDirectories());
+        extFM.setLocation(opt.classpath, opt.classpathDirectories());
     }
 
     /**
@@ -272,16 +272,16 @@ public abstract class AbstractExtensionInfo implements ExtensionInfo {
                           opt.defaultPlatformClasspath());
 
         List<File> sourcepath =
-                Collections.singletonList(opt.source_output_directory);
+                Collections.singletonList(opt.sourceOutputDirectory());
         extFM.setLocation(StandardLocation.SOURCE_PATH, sourcepath);
 
         List<File> classpath = new ArrayList<File>();
-        classpath.addAll(opt.bootclasspath_directories);
-        classpath.addAll(opt.classpath_directories);
+        classpath.addAll(opt.bootclasspathDirectories());
+        classpath.addAll(opt.classpathDirectories());
         extFM.setLocation(StandardLocation.CLASS_PATH, classpath);
 
         List<File> classout =
-                Collections.singletonList(opt.class_output_directory);
+                Collections.singletonList(opt.classOutputDirectory());
         extFM.setLocation(StandardLocation.CLASS_OUTPUT, classout);
     }
 

@@ -72,11 +72,11 @@ public class Options {
      * Fields for storing values for options.
      */
     public int error_count;
-    public File source_output_directory;
-    public File class_output_directory;
+    private File source_output_directory;
+    private File class_output_directory;
     public final List<File> sourcepath_directories = new ArrayList<File>();
-    public final List<File> classpath_directories = new ArrayList<File>();
-    public final List<File> bootclasspath_directories = new ArrayList<File>();
+    private final List<File> classpath_directories = new ArrayList<File>();
+    private final List<File> bootclasspath_directories = new ArrayList<File>();
 
     public JavaFileManager.Location source_path = StandardLocation.SOURCE_PATH;
     public JavaFileManager.Location source_output =
@@ -752,15 +752,15 @@ public class Options {
     }
 
     protected void setClasspath(List<File> value) {
-        classpath_directories.addAll(value);
+        classpathDirectories().addAll(value);
     }
 
     protected void setBootclasspath(List<File> value) {
-        bootclasspath_directories.addAll(value);
+        bootclasspathDirectories().addAll(value);
     }
 
     protected void addBootCP(List<File> value) {
-        bootclasspath_directories.addAll(value);
+        bootclasspathDirectories().addAll(value);
     }
 
     protected void setSourcepath(List<File> value) {
@@ -901,8 +901,12 @@ public class Options {
         return source_output;
     }
 
-    public Location classOutputDirectory() {
+    public Location classOutputLocation() {
         return class_output;
+    }
+
+    public File classOutputDirectory() {
+        return class_output_directory;
     }
 
     public void usageHeader(PrintStream out) {
@@ -1080,18 +1084,18 @@ public class Options {
     public String constructPostCompilerClasspath() {
         StringBuilder builder = new StringBuilder();
 
-        builder.append(source_output_directory.getAbsolutePath());
+        builder.append(sourceOutputDirectory().getAbsolutePath());
         builder.append(pathSeparatorChar);
 
         builder.append('.');
         builder.append(pathSeparatorChar);
 
-        for (File f : classpath_directories) {
+        for (File f : classpathDirectories()) {
             builder.append(f.getAbsolutePath());
             builder.append(pathSeparatorChar);
         }
 
-        for (File f : bootclasspath_directories) {
+        for (File f : bootclasspathDirectories()) {
             builder.append(f.getAbsolutePath());
             builder.append(pathSeparatorChar);
         }
@@ -1139,5 +1143,18 @@ public class Options {
         }
         return path;
     }
+
+    public List<File> classpathDirectories() {
+        return classpath_directories;
+    }
+
+    public List<File> bootclasspathDirectories() {
+        return bootclasspath_directories;
+    }
+
+    public File sourceOutputDirectory() {
+        return source_output_directory;
+    }
+
 }
 // vim: ts=4

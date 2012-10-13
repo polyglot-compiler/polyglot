@@ -46,10 +46,10 @@ import java.util.StringTokenizer;
 
 import javax.tools.FileObject;
 import javax.tools.JavaCompiler.CompilationTask;
-import javax.tools.JavaFileManager;
 import javax.tools.JavaFileObject;
 import javax.tools.ToolProvider;
 
+import polyglot.filemanager.FileManager;
 import polyglot.frontend.Compiler;
 import polyglot.frontend.ExtensionInfo;
 import polyglot.util.ErrorInfo;
@@ -200,7 +200,7 @@ public class Main {
                     Writer javac_err = new OutputStreamWriter(err);
                     compiler.sourceExtension()
                             .configureFileManagerForPostCompiler();
-                    JavaFileManager fileManager =
+                    FileManager fileManager =
                             compiler.sourceExtension().extFileManager();
                     CompilationTask task =
                             ToolProvider.getSystemJavaCompiler()
@@ -221,7 +221,7 @@ public class Main {
                             new QuotedStringTokenizer(options.post_compiler);
                     int pc_size = st.countTokens();
                     int options_size = 2;
-                    if (options.class_output_directory != null) {
+                    if (options.classOutputLocation() != null) {
                         options_size += 2;
                     }
                     if (options.generate_debugging_info) options_size++;
@@ -234,10 +234,10 @@ public class Main {
                     }
                     javacCmd[j++] = "-classpath";
                     javacCmd[j++] = options.constructPostCompilerClasspath();
-                    if (options.class_output_directory != null) {
+                    if (options.classOutputLocation() != null) {
                         javacCmd[j++] = "-d";
                         javacCmd[j++] =
-                                options.class_output_directory.getPath();
+                                options.classOutputDirectory().getPath();
                     }
                     if (options.generate_debugging_info) {
                         javacCmd[j++] = "-g";
