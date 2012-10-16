@@ -402,7 +402,6 @@ public class ImportTable implements Resolver {
                 lazyImportLongName(longName);
             }
             catch (SemanticException e) {
-                System.err.println("  foo " + e.getClass());
                 if (e.position == null) {
                     e.position = lazyImportPositions.get(i);
                 }
