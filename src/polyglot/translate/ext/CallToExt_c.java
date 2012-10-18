@@ -34,7 +34,9 @@ public class CallToExt_c extends ToExt_c {
     @Override
     public Node toExt(ExtensionRewriter rw) throws SemanticException {
         Call n = (Call) node();
-        n = rw.to_nf().Call(n.position(), n.target(), n.id(), n.arguments());
-        return n;
+        Call m = rw.to_nf().Call(n.position(), n.target(), n.id(), n.arguments());
+        m = m.targetImplicit(n.isTargetImplicit());
+
+        return m;
     }
 }

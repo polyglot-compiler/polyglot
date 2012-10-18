@@ -34,6 +34,8 @@ public class FieldToExt_c extends ToExt_c {
     @Override
     public Node toExt(ExtensionRewriter rw) throws SemanticException {
         Field n = (Field) node();
-        return rw.to_nf().Field(n.position(), n.target(), n.id());
+        Field m = rw.to_nf().Field(n.position(), n.target(), n.id());
+        m = m.targetImplicit(n.isTargetImplicit());
+        return m;
     }
 }
