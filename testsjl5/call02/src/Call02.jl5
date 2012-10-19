@@ -1,9 +1,0 @@
-import java.util.List;
-public class C {
-    public java.util.List<C> g() { return null; }
-    public void h(A a) { a.f(g()); }
-    public void i(B b) { b.f(g()); }
-    public void k(D d) { d.g(g(), g()); }
-    public void l(D d) { d.h(g(), g()); }
-    public void j(D d) { d.f(g(), g()); }
-}

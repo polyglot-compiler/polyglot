@@ -1,4 +1,4 @@
 import java.util.List;
-public class B {
+public class Call02B {
     public void f(List l) {}
 }

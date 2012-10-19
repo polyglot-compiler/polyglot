@@ -3,9 +3,9 @@
 import java.util.List;
 public class C {
     public java.util.List<C> g() { return null; }
-    public void h(A a) { a.f(g()); }
-    public void i(B b) { b.f(g()); }
-    public void k(D d) { d.g(g(), g()); }
-    public void l(D d) { d.h(g(), g()); }
-    public void j(D d) { d.f(g(), g()); }
+    public void h(Call02A a) { a.f(g()); }
+    public void i(Call02B b) { b.f(g()); }
+    public void k(Call02D d) { d.g(g(), g()); }
+    public void l(Call02D d) { d.h(g(), g()); }
+    public void j(Call02D d) { d.f(g(), g()); }
 }

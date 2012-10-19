@@ -34,6 +34,9 @@ javac "-d java-out -cp ." {
         java-src/MyMethodThrowing.java;
         java-src/MyEnum.java;
 	java-src/TestEnum.java;
+	java-src/Call02A.java;
+	java-src/Call02B.java;
+	java-src/Call02D.java;
 }
  
 polyglot.ext.jl5.ExtensionInfo "-d out -classpath java-out -noserial -post \"javac -source 1.5\" -morepermissiveinference" {
