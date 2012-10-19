@@ -163,6 +163,9 @@ public class MethodDecl_c extends Term_c implements MethodDecl {
     /** Get the exception types of the method. */
     @Override
     public List<TypeNode> throwTypes() {
+        if (this.throwTypes == null) {
+            return Collections.EMPTY_LIST;
+        }
         return Collections.unmodifiableList(this.throwTypes);
     }
 
