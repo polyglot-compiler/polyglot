@@ -33,6 +33,7 @@ import polyglot.ext.jl5.visit.AutoBoxer;
 import polyglot.ext.jl5.visit.JL5InitChecker;
 import polyglot.ext.jl5.visit.JL5InitImportsVisitor;
 import polyglot.ext.jl5.visit.JL5Translator;
+import polyglot.ext.jl5.visit.RemoveAnnotations;
 import polyglot.ext.jl5.visit.RemoveEnums;
 import polyglot.ext.jl5.visit.RemoveExtendedFors;
 import polyglot.ext.jl5.visit.RemoveStaticImports;
@@ -215,6 +216,22 @@ public class JL5Scheduler extends JLScheduler {
 
     }
 
+    public Goal RemoveAnnotations(Job job) {
+        TypeSystem ts = extInfo.typeSystem();
+        NodeFactory nf = extInfo.nodeFactory();
+        Goal g = new VisitorGoal(job, new RemoveAnnotations(job, ts, nf));
+        try {
+            g.addPrerequisiteGoal(TypeChecked(job), this);
+            g.addPrerequisiteGoal(AnnotationCheck(job), this);
+            g.addPrerequisiteGoal(RemoveStaticImports(job), this);
+        }
+        catch (CyclicDependencyException e) {
+            throw new InternalCompilerError(e);
+        }
+        return this.internGoal(g);
+
+    }
+
     public Goal RemoveJava5isms(Job job) {
         ExtensionInfo toExtInfo = extInfo.outputExtensionInfo();
         Goal g =
@@ -230,6 +247,7 @@ public class JL5Scheduler extends JLScheduler {
             g.addPrerequisiteGoal(RemoveVarArgsFlags(job), this);
             g.addPrerequisiteGoal(RemoveExtendedFors(job), this);
             g.addPrerequisiteGoal(RemoveStaticImports(job), this);
+            g.addPrerequisiteGoal(RemoveAnnotations(job), this);
         }
         catch (CyclicDependencyException e) {
             throw new InternalCompilerError(e);
