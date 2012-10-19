@@ -296,22 +296,23 @@ public class TVCaster extends AscriptionVisitor {
                 }
             }
         }
-        if (parent instanceof Call && old == ((Call) parent).target()) {
-            Call c = (Call) parent;
-            if (c.target() instanceof Expr
-                    && !(c.target() instanceof Special || c.target() instanceof Lit)) {
-                Expr e = (Expr) n;
-                if (e instanceof Cast) {
-                    e = ((Cast) e).expr();
-                }
-                // cast e to the type of the container
-                JL5TypeSystem ts = (JL5TypeSystem) this.ts;
-                Type t = c.methodInstance().container();
-                Type et = ts.erasureType(t);
-                return insertCast(e, et);
-            }
-
-        }
+        // SNC: we were always casting the receiver of a call to the appropriate type
+        // This does not seem to be required.
+//        if (parent instanceof Call && old == ((Call) parent).target()) {
+//            Call c = (Call) parent;
+//            if (c.target() instanceof Expr
+//                    && !(c.target() instanceof Special || c.target() instanceof Lit)) {
+//                Expr e = (Expr) n;
+//                if (e instanceof Cast) {
+//                    e = ((Cast) e).expr();
+//                }
+//                // cast e to the type of the container
+//                JL5TypeSystem ts = (JL5TypeSystem) this.ts;
+//                Type t = c.methodInstance().container();
+//                Type et = ts.erasureType(t);
+//                return insertCast(e, et);
+//            }
+//        }
         return ret;
     }
 
