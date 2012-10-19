@@ -1,0 +1,11 @@
+interface R {
+    void m();
+}
+interface Q {
+    void n();
+}
+class A {
+    <T extends Q & R> void f(T x) {
+	x.m();
+    }
+}
