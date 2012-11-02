@@ -63,7 +63,7 @@ while true; do
             verbose=1
             shift
             ;;
-        -classpath)
+        -classpath|-cp)
             shift
             extra_cp="$extra_cp:$1"
             shift

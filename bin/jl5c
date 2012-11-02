@@ -84,7 +84,7 @@ while true; do
             verbose=1
             shift
             ;;
-        -classpath)
+        -classpath|-cp)
             shift
             if [ -z "$extra_cp" ]; then
 	            extra_cp="`unixpath "$1"`"
