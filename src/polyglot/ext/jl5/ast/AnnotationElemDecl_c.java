@@ -51,6 +51,7 @@ import polyglot.types.SemanticException;
 import polyglot.util.CodeWriter;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
+import polyglot.util.SerialVersionUID;
 import polyglot.visit.AmbiguityRemover;
 import polyglot.visit.CFGBuilder;
 import polyglot.visit.NodeVisitor;
@@ -59,6 +60,7 @@ import polyglot.visit.TypeBuilder;
 import polyglot.visit.TypeChecker;
 
 public class AnnotationElemDecl_c extends Term_c implements AnnotationElemDecl {
+    private static final long serialVersionUID = SerialVersionUID.generate();
 
     protected TypeNode type;
     protected Flags flags;

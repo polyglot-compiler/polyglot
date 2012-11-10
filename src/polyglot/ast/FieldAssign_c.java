@@ -33,6 +33,7 @@ import polyglot.types.Type;
 import polyglot.types.TypeSystem;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
+import polyglot.util.SerialVersionUID;
 import polyglot.visit.CFGBuilder;
 
 /**
@@ -43,6 +44,8 @@ import polyglot.visit.CFGBuilder;
  * <code>FieldAssign_c.left()</code>is guaranteed to be a <code>Field</code>.
  */
 public class FieldAssign_c extends Assign_c implements FieldAssign {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     public FieldAssign_c(Position pos, Field left, Operator op, Expr right) {
         super(pos, left, op, right);
     }

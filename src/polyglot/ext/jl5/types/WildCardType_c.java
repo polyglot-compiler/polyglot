@@ -37,8 +37,11 @@ import polyglot.types.Type;
 import polyglot.types.TypeObject;
 import polyglot.types.TypeSystem;
 import polyglot.util.Position;
+import polyglot.util.SerialVersionUID;
 
 public class WildCardType_c extends ReferenceType_c implements WildCardType {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     private ReferenceType upperBound;
     private ReferenceType lowerBound;
 

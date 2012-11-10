@@ -35,12 +35,16 @@ import java.util.ListIterator;
 import java.util.Set;
 import java.util.TreeSet;
 
+import polyglot.util.SerialVersionUID;
+
 /**
  * <code>Flags</code> is an immutable set of class, method, or field modifiers.
  * We represent package scope as the absence of private, public and protected
  * scope modifiers.
  */
 public class Flags implements Serializable {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     protected Set<String> flags;
 
     protected static class FlagComparator implements Comparator<String> {

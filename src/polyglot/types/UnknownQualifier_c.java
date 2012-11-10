@@ -26,12 +26,16 @@
 
 package polyglot.types;
 
+import polyglot.util.SerialVersionUID;
+
 /**
  * An unknown type qualifier.  This is used as a place-holder until types
  * are disambiguated.
  */
 public class UnknownQualifier_c extends TypeObject_c implements
         UnknownQualifier {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     public UnknownQualifier_c(TypeSystem ts) {
         super(ts);
     }

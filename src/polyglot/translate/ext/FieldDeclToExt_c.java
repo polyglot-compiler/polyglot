@@ -30,8 +30,11 @@ import polyglot.ast.Node;
 import polyglot.translate.ExtensionRewriter;
 import polyglot.types.FieldInstance;
 import polyglot.types.SemanticException;
+import polyglot.util.SerialVersionUID;
 
 public class FieldDeclToExt_c extends ToExt_c {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     protected FieldInstance fi = null;
 
     @Override

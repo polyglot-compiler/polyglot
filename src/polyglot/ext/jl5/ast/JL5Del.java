@@ -28,9 +28,11 @@ package polyglot.ext.jl5.ast;
 import polyglot.ast.JL_c;
 import polyglot.ext.jl5.visit.JL5Translator;
 import polyglot.util.CodeWriter;
+import polyglot.util.SerialVersionUID;
 import polyglot.visit.Translator;
 
 public class JL5Del extends JL_c {
+    private static final long serialVersionUID = SerialVersionUID.generate();
 
     @Override
     public void translate(CodeWriter w, Translator tr) {

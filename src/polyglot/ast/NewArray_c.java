@@ -27,7 +27,6 @@
 package polyglot.ast;
 
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 
 import polyglot.types.ArrayType;
@@ -39,6 +38,7 @@ import polyglot.util.CollectionUtil;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.ListUtil;
 import polyglot.util.Position;
+import polyglot.util.SerialVersionUID;
 import polyglot.visit.AscriptionVisitor;
 import polyglot.visit.CFGBuilder;
 import polyglot.visit.NodeVisitor;
@@ -54,6 +54,8 @@ import polyglot.visit.TypeChecker;
  * dimensions.
  */
 public class NewArray_c extends Expr_c implements NewArray {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     protected TypeNode baseType;
     protected List<Expr> dims;
     protected int addDims;
@@ -205,8 +207,7 @@ public class NewArray_c extends Expr_c implements NewArray {
         w.write("new ");
         print(baseType, w, tr);
 
-        for (Iterator<Expr> i = dims.iterator(); i.hasNext();) {
-            Expr e = i.next();
+        for (Expr e : dims) {
             w.write("[");
             printBlock(e, w, tr);
             w.write("]");

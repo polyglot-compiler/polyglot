@@ -27,6 +27,7 @@
 package polyglot.ast;
 
 import polyglot.util.Position;
+import polyglot.util.SerialVersionUID;
 
 /**
  * An immutable representation of a Java language <code>while</code>
@@ -34,6 +35,8 @@ import polyglot.util.Position;
  * to be tested indicating whether to reexecute the statement.
  */
 public abstract class Loop_c extends Stmt_c implements Loop {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     public Loop_c(Position pos) {
         super(pos);
     }

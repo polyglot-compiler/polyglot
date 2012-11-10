@@ -33,6 +33,7 @@ import polyglot.types.Type;
 import polyglot.types.TypeSystem;
 import polyglot.util.CodeWriter;
 import polyglot.util.Position;
+import polyglot.util.SerialVersionUID;
 import polyglot.visit.AscriptionVisitor;
 import polyglot.visit.CFGBuilder;
 import polyglot.visit.FlowGraph;
@@ -45,6 +46,8 @@ import polyglot.visit.TypeChecker;
  * immutable pair of an expression and an operator.
  */
 public class Unary_c extends Expr_c implements Unary {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     protected Unary.Operator op;
     protected Expr expr;
 

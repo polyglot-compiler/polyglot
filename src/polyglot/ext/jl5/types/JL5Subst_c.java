@@ -38,9 +38,11 @@ import polyglot.types.MethodInstance;
 import polyglot.types.ReferenceType;
 import polyglot.types.Type;
 import polyglot.util.InternalCompilerError;
+import polyglot.util.SerialVersionUID;
 
 public class JL5Subst_c extends Subst_c<TypeVariable, ReferenceType> implements
         JL5Subst {
+    private static final long serialVersionUID = SerialVersionUID.generate();
 
     public JL5Subst_c(ParamTypeSystem<TypeVariable, ReferenceType> ts,
             Map<TypeVariable, ? extends ReferenceType> subst) {

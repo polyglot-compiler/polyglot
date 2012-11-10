@@ -40,6 +40,7 @@ import polyglot.util.CodeWriter;
 import polyglot.util.CollectionUtil;
 import polyglot.util.ListUtil;
 import polyglot.util.Position;
+import polyglot.util.SerialVersionUID;
 import polyglot.visit.AscriptionVisitor;
 import polyglot.visit.CFGBuilder;
 import polyglot.visit.ConstantChecker;
@@ -53,10 +54,12 @@ import polyglot.visit.TypeChecker;
  * <code>switch</code> statement.  Such a statement has an expression which
  * is evaluated to determine where to branch to, an a list of labels
  * and block statements which are conditionally evaluated.  One of the
- * labels, rather than having a constant expression, may be lablled
+ * labels, rather than having a constant expression, may be labelled
  * default.
  */
 public class Switch_c extends Stmt_c implements Switch {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     protected Expr expr;
     protected List<SwitchElement> elements;
 

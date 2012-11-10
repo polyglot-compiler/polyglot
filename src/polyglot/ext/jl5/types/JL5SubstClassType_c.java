@@ -42,10 +42,13 @@ import polyglot.types.Type;
 import polyglot.util.CodeWriter;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
+import polyglot.util.SerialVersionUID;
 
 public class JL5SubstClassType_c extends
         SubstClassType_c<TypeVariable, ReferenceType> implements
         JL5SubstClassType {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     public JL5SubstClassType_c(JL5TypeSystem ts, Position pos,
             JL5ParsedClassType base, JL5Subst subst) {
         super(ts, pos, base, subst);

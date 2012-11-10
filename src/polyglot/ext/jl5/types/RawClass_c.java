@@ -40,8 +40,10 @@ import polyglot.types.Type;
 import polyglot.types.TypeObject;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
+import polyglot.util.SerialVersionUID;
 
 public class RawClass_c extends JL5ClassType_c implements RawClass {
+    private static final long serialVersionUID = SerialVersionUID.generate();
 
     private JL5ParsedClassType base;
     private transient JL5SubstClassType erased;

@@ -28,11 +28,14 @@ package polyglot.qq;
 
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
+import polyglot.util.SerialVersionUID;
 
 /**
  * Signals an error in the quasiquoter.
  */
 public class QQError extends InternalCompilerError {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     public QQError(String msg, Position pos) {
         super(msg, pos);
     }

@@ -47,12 +47,14 @@ import polyglot.types.Type;
 import polyglot.util.CodeWriter;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
+import polyglot.util.SerialVersionUID;
 import polyglot.visit.AmbiguityRemover;
 import polyglot.visit.NodeVisitor;
 import polyglot.visit.PrettyPrinter;
 import polyglot.visit.TypeChecker;
 
 public class JL5New_c extends New_c implements JL5New {
+    private static final long serialVersionUID = SerialVersionUID.generate();
 
     private List<TypeNode> typeArgs;
 

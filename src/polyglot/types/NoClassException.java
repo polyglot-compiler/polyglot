@@ -27,12 +27,15 @@
 package polyglot.types;
 
 import polyglot.util.Position;
+import polyglot.util.SerialVersionUID;
 
 /**
  * Signals an error in the class resolver system. This exception is thrown
  * when a <code>ClassResolver</code> is unable to resolve a given class name.
  */
 public class NoClassException extends SemanticException {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     private String className;
 
     private static String message(String className, Named scope) {

@@ -44,6 +44,7 @@ import polyglot.types.Type;
 import polyglot.util.CodeWriter;
 import polyglot.util.CollectionUtil;
 import polyglot.util.Position;
+import polyglot.util.SerialVersionUID;
 import polyglot.visit.AmbiguityRemover;
 import polyglot.visit.NodeVisitor;
 import polyglot.visit.PrettyPrinter;
@@ -51,6 +52,7 @@ import polyglot.visit.TypeBuilder;
 import polyglot.visit.TypeChecker;
 
 public class ParamTypeNode_c extends TypeNode_c implements ParamTypeNode {
+    private static final long serialVersionUID = SerialVersionUID.generate();
 
     protected Id id;
 

@@ -44,6 +44,7 @@ import polyglot.types.TypeSystem;
 import polyglot.types.VarInstance;
 import polyglot.util.CodeWriter;
 import polyglot.util.Position;
+import polyglot.util.SerialVersionUID;
 import polyglot.visit.AmbiguityRemover;
 import polyglot.visit.AscriptionVisitor;
 import polyglot.visit.CFGBuilder;
@@ -60,6 +61,8 @@ import polyglot.visit.TypeChecker;
  * of a field of a class.
  */
 public class FieldDecl_c extends Term_c implements FieldDecl {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     protected Flags flags;
     protected TypeNode type;
     protected Id name;

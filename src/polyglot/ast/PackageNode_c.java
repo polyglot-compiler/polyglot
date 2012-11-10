@@ -32,6 +32,7 @@ import polyglot.types.Qualifier;
 import polyglot.types.SemanticException;
 import polyglot.util.CodeWriter;
 import polyglot.util.Position;
+import polyglot.util.SerialVersionUID;
 import polyglot.visit.PrettyPrinter;
 import polyglot.visit.Translator;
 
@@ -40,6 +41,8 @@ import polyglot.visit.Translator;
  * Java package within the abstract syntax tree.
  */
 public class PackageNode_c extends Node_c implements PackageNode {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     protected Package package_;
 
     public PackageNode_c(Position pos, Package package_) {

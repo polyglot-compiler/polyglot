@@ -29,8 +29,10 @@ import polyglot.ast.Node;
 import polyglot.ext.jl5.ast.EnumConstant;
 import polyglot.translate.ExtensionRewriter;
 import polyglot.types.SemanticException;
+import polyglot.util.SerialVersionUID;
 
 public class EnumConstantToJL_c extends EnumConstantToExt_c {
+    private static final long serialVersionUID = SerialVersionUID.generate();
 
     /**
      * Rewrite EnumConstants to Fields

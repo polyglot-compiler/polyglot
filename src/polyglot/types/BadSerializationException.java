@@ -27,6 +27,7 @@
 package polyglot.types;
 
 import polyglot.util.Position;
+import polyglot.util.SerialVersionUID;
 
 /**
  * Signals an error in the class resolver system. This exception is thrown
@@ -38,6 +39,8 @@ import polyglot.util.Position;
  * file, and recompile it from the source.
  */
 public class BadSerializationException extends SemanticException {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     private String className;
 
     private static String message(String className) {

@@ -30,6 +30,7 @@ import java.util.List;
 
 import polyglot.util.CollectionUtil;
 import polyglot.util.Position;
+import polyglot.util.SerialVersionUID;
 
 /**
  * A <code>ConstructorInstance</code> contains type information for a
@@ -37,6 +38,8 @@ import polyglot.util.Position;
  */
 public class ConstructorInstance_c extends ProcedureInstance_c implements
         ConstructorInstance {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     /** Used for deserializing types. */
     protected ConstructorInstance_c() {
     }

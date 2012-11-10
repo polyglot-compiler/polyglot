@@ -40,6 +40,7 @@ import polyglot.types.Type;
 import polyglot.types.TypeSystem;
 import polyglot.util.CodeWriter;
 import polyglot.util.Position;
+import polyglot.util.SerialVersionUID;
 import polyglot.util.SubtypeSet;
 import polyglot.visit.CFGBuilder;
 import polyglot.visit.ExceptionChecker;
@@ -56,6 +57,8 @@ import polyglot.visit.TypeChecker;
  * it is executed when the class is loaded.
  */
 public class Initializer_c extends Term_c implements Initializer {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     protected Flags flags;
     protected Block body;
     protected InitializerInstance ii;

@@ -29,9 +29,11 @@ import polyglot.ext.jl5.ast.JL5ClassDecl;
 import polyglot.translate.ExtensionRewriter;
 import polyglot.translate.ext.ClassDeclToExt_c;
 import polyglot.types.SemanticException;
+import polyglot.util.SerialVersionUID;
 import polyglot.visit.NodeVisitor;
 
 public class JL5ClassDeclToJL_c extends ClassDeclToExt_c {
+    private static final long serialVersionUID = SerialVersionUID.generate();
 
     @Override
     public NodeVisitor toExtEnter(ExtensionRewriter rw)

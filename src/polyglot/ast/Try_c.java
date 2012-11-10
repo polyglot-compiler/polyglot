@@ -38,6 +38,7 @@ import polyglot.util.CodeWriter;
 import polyglot.util.CollectionUtil;
 import polyglot.util.ListUtil;
 import polyglot.util.Position;
+import polyglot.util.SerialVersionUID;
 import polyglot.util.SubtypeSet;
 import polyglot.visit.CFGBuilder;
 import polyglot.visit.ExceptionChecker;
@@ -49,6 +50,8 @@ import polyglot.visit.PrettyPrinter;
  * <code>catch</code> blocks, and an optional <code>finally</code> block.
  */
 public class Try_c extends Stmt_c implements Try {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     protected Block tryBlock;
     protected List<Catch> catchBlocks;
     protected Block finallyBlock;

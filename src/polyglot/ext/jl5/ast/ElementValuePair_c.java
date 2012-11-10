@@ -36,6 +36,7 @@ import polyglot.ext.jl5.types.JL5TypeSystem;
 import polyglot.types.SemanticException;
 import polyglot.util.CodeWriter;
 import polyglot.util.Position;
+import polyglot.util.SerialVersionUID;
 import polyglot.visit.CFGBuilder;
 import polyglot.visit.NodeVisitor;
 import polyglot.visit.PrettyPrinter;
@@ -43,6 +44,7 @@ import polyglot.visit.Translator;
 import polyglot.visit.TypeChecker;
 
 public class ElementValuePair_c extends Term_c implements ElementValuePair {
+    private static final long serialVersionUID = SerialVersionUID.generate();
 
     protected Id name;
     protected Expr value;

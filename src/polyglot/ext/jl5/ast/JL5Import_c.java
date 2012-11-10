@@ -41,11 +41,13 @@ import polyglot.types.SemanticException;
 import polyglot.types.Type;
 import polyglot.util.CodeWriter;
 import polyglot.util.Position;
+import polyglot.util.SerialVersionUID;
 import polyglot.util.StringUtil;
 import polyglot.visit.PrettyPrinter;
 import polyglot.visit.TypeChecker;
 
 public class JL5Import_c extends Import_c implements JL5Import {
+    private static final long serialVersionUID = SerialVersionUID.generate();
 
     public JL5Import_c(Position pos, Import.Kind kind, String name) {
         super(pos, kind, name);

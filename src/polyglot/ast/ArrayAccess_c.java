@@ -35,6 +35,7 @@ import polyglot.types.TypeSystem;
 import polyglot.util.CodeWriter;
 import polyglot.util.CollectionUtil;
 import polyglot.util.Position;
+import polyglot.util.SerialVersionUID;
 import polyglot.visit.AscriptionVisitor;
 import polyglot.visit.CFGBuilder;
 import polyglot.visit.NodeVisitor;
@@ -46,6 +47,8 @@ import polyglot.visit.TypeChecker;
  * access of an array member.
  */
 public class ArrayAccess_c extends Expr_c implements ArrayAccess {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     protected Expr array;
     protected Expr index;
 

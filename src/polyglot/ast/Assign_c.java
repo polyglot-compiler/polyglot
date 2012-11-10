@@ -35,6 +35,7 @@ import polyglot.types.TypeSystem;
 import polyglot.util.CodeWriter;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
+import polyglot.util.SerialVersionUID;
 import polyglot.visit.AscriptionVisitor;
 import polyglot.visit.CFGBuilder;
 import polyglot.visit.NodeVisitor;
@@ -45,6 +46,8 @@ import polyglot.visit.TypeChecker;
  * An <code>Assign</code> represents a Java assignment expression.
  */
 public abstract class Assign_c extends Expr_c implements Assign {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     protected Expr left;
     protected Operator op;
     protected Expr right;

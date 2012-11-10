@@ -44,6 +44,7 @@ import polyglot.util.CodeWriter;
 import polyglot.util.CollectionUtil;
 import polyglot.util.ListUtil;
 import polyglot.util.Position;
+import polyglot.util.SerialVersionUID;
 import polyglot.visit.AscriptionVisitor;
 import polyglot.visit.CFGBuilder;
 import polyglot.visit.NodeVisitor;
@@ -56,6 +57,8 @@ import polyglot.visit.TypeChecker;
  * For instance, <code>super(...)</code> or <code>this(...)</code>.
  */
 public class ConstructorCall_c extends Stmt_c implements ConstructorCall {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     protected Kind kind;
     protected Expr qualifier;
     protected List<Expr> arguments;

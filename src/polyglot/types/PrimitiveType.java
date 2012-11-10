@@ -27,6 +27,7 @@
 package polyglot.types;
 
 import polyglot.util.Enum;
+import polyglot.util.SerialVersionUID;
 
 /**
  * A <code>PrimitiveType</code> represents a type which may not be directly 
@@ -38,6 +39,9 @@ import polyglot.util.Enum;
 public interface PrimitiveType extends Type, Named {
     /** The kind of the primitive type. */
     public static class Kind extends Enum {
+        private static final long serialVersionUID =
+                SerialVersionUID.generate();
+
         public Kind(String name) {
             super(name);
         }

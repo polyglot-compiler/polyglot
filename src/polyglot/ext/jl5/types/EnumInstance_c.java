@@ -28,9 +28,10 @@ package polyglot.ext.jl5.types;
 import polyglot.types.Flags;
 import polyglot.types.ReferenceType;
 import polyglot.util.Position;
+import polyglot.util.SerialVersionUID;
 
-@SuppressWarnings("serial")
 public class EnumInstance_c extends JL5FieldInstance_c implements EnumInstance {
+    private static final long serialVersionUID = SerialVersionUID.generate();
 
     long ordinal;
 

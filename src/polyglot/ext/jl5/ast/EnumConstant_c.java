@@ -30,8 +30,10 @@ import polyglot.ast.Id;
 import polyglot.ast.Receiver;
 import polyglot.ext.jl5.types.EnumInstance;
 import polyglot.util.Position;
+import polyglot.util.SerialVersionUID;
 
 public class EnumConstant_c extends Field_c implements EnumConstant {
+    private static final long serialVersionUID = SerialVersionUID.generate();
 
     //protected EnumInstance enumInstance;
 

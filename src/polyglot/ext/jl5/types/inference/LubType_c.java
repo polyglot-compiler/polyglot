@@ -57,8 +57,10 @@ import polyglot.types.TypeSystem;
 import polyglot.util.CollectionUtil;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
+import polyglot.util.SerialVersionUID;
 
 public class LubType_c extends ClassType_c implements LubType {
+    private static final long serialVersionUID = SerialVersionUID.generate();
 
     protected List<ReferenceType> lubElems;
 

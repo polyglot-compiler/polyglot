@@ -34,6 +34,7 @@ import polyglot.types.MethodInstance;
 import polyglot.types.ReferenceType;
 import polyglot.types.Type;
 import polyglot.util.CachingTransformingList;
+import polyglot.util.SerialVersionUID;
 import polyglot.util.Transformation;
 
 /**
@@ -42,6 +43,8 @@ import polyglot.util.Transformation;
  *
  */
 public class JL5RawSubst_c extends JL5Subst_c implements JL5Subst {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     private final JL5ParsedClassType base;
 
     public JL5RawSubst_c(JL5TypeSystem ts,

@@ -28,6 +28,7 @@ package polyglot.ast;
 
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
+import polyglot.util.SerialVersionUID;
 import polyglot.visit.CFGBuilder;
 
 /**
@@ -38,6 +39,8 @@ import polyglot.visit.CFGBuilder;
  * <code>LocalAssign_c.left()</code>is guaranteed to be an <code>Local</code>.
  */
 public class LocalAssign_c extends Assign_c implements LocalAssign {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     public LocalAssign_c(Position pos, Local left, Operator op, Expr right) {
         super(pos, left, op, right);
     }

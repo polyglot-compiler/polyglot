@@ -46,8 +46,10 @@ import polyglot.types.TypeObject;
 import polyglot.types.TypeSystem;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
+import polyglot.util.SerialVersionUID;
 
 public class IntersectionType_c extends ClassType_c implements IntersectionType {
+    private static final long serialVersionUID = SerialVersionUID.generate();
 
     protected List<ReferenceType> bounds;
 

@@ -32,6 +32,7 @@ import polyglot.types.TypeSystem;
 import polyglot.util.CodeWriter;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
+import polyglot.util.SerialVersionUID;
 import polyglot.visit.AmbiguityRemover;
 import polyglot.visit.ExceptionChecker;
 import polyglot.visit.NodeVisitor;
@@ -44,6 +45,8 @@ import polyglot.visit.TypeChecker;
  * <code>Type</code> within the abstract syntax tree.
  */
 public class ArrayTypeNode_c extends TypeNode_c implements ArrayTypeNode {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     protected TypeNode base;
 
     public ArrayTypeNode_c(Position pos, TypeNode base) {

@@ -29,12 +29,15 @@ package polyglot.ast;
 import java.util.List;
 
 import polyglot.util.Position;
+import polyglot.util.SerialVersionUID;
 import polyglot.visit.CFGBuilder;
 
 /**
  * <code>Lit</code> represents any Java literal.
  */
 public abstract class Lit_c extends Expr_c implements Lit {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     public Lit_c(Position pos) {
         super(pos);
     }

@@ -56,6 +56,7 @@ import polyglot.util.ErrorInfo;
 import polyglot.util.ErrorQueue;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.QuotedStringTokenizer;
+import polyglot.util.SerialVersionUID;
 import polyglot.util.StdErrorQueue;
 
 /**
@@ -408,6 +409,9 @@ public class Main {
      * framework.
      */
     public static class TerminationException extends RuntimeException {
+        private static final long serialVersionUID =
+                SerialVersionUID.generate();
+
         final public int exitCode;
 
         public TerminationException(String msg) {

@@ -31,9 +31,11 @@ import polyglot.types.Flags;
 import polyglot.types.ReferenceType;
 import polyglot.types.Type;
 import polyglot.util.Position;
+import polyglot.util.SerialVersionUID;
 
 public class AnnotationTypeElemInstance_c extends JL5MethodInstance_c implements
         AnnotationTypeElemInstance {
+    private static final long serialVersionUID = SerialVersionUID.generate();
 
     protected boolean hasDefault;
 

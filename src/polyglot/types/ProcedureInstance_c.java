@@ -32,6 +32,7 @@ import java.util.List;
 
 import polyglot.util.ListUtil;
 import polyglot.util.Position;
+import polyglot.util.SerialVersionUID;
 import polyglot.util.SubtypeSet;
 
 /**
@@ -40,6 +41,8 @@ import polyglot.util.SubtypeSet;
  */
 public abstract class ProcedureInstance_c extends TypeObject_c implements
         ProcedureInstance {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     protected ReferenceType container;
     protected Flags flags;
     protected List<Type> formalTypes;

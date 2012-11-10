@@ -46,6 +46,7 @@ import polyglot.types.SemanticException;
 import polyglot.types.Type;
 import polyglot.util.CodeWriter;
 import polyglot.util.Position;
+import polyglot.util.SerialVersionUID;
 import polyglot.visit.AmbiguityRemover;
 import polyglot.visit.NodeVisitor;
 import polyglot.visit.PrettyPrinter;
@@ -53,6 +54,8 @@ import polyglot.visit.TypeChecker;
 
 public class JL5ConstructorCall_c extends ConstructorCall_c implements
         JL5ConstructorCall {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     /**
      * Is this constructor call a super call to java.lang.Enum?
      */

@@ -39,6 +39,7 @@ import polyglot.frontend.Source;
 import polyglot.main.Report;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
+import polyglot.util.SerialVersionUID;
 import polyglot.util.TypeInputStream;
 
 /**
@@ -49,6 +50,8 @@ import polyglot.util.TypeInputStream;
  * necessarily type checked) from a .java file.
  **/
 public class ParsedClassType_c extends ClassType_c implements ParsedClassType {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     protected transient LazyClassInitializer init;
     protected transient Source fromSource;
     protected transient Job job;
@@ -503,12 +506,18 @@ public class ParsedClassType_c extends ClassType_c implements ParsedClassType {
         return super.toString();
     }
 
+    @SuppressWarnings("unused")
+    private static final long writeObjectVersionUID = 1L;
+
     /**
      * When serializing, write out the place holder as well as the object itself.
      * This should be done in TypeOutputStream, not here, but I couldn't get it working.
      * --Nate
      */
     private void writeObject(ObjectOutputStream out) throws IOException {
+        // If you update this method in an incompatible way, increment
+        // writeObjectVersionUID.
+
         Object o = ts.placeHolder(this);
         if (o instanceof PlaceHolder && o != this) {
             out.writeBoolean(true);
@@ -520,8 +529,14 @@ public class ParsedClassType_c extends ClassType_c implements ParsedClassType {
         out.defaultWriteObject();
     }
 
+    @SuppressWarnings("unused")
+    private static final long readObjectVersionUID = 1L;
+
     private void readObject(ObjectInputStream in) throws IOException,
             ClassNotFoundException {
+        // If you update this method in an incompatible way, increment
+        // readObjectVersionUID.
+
         if (in instanceof TypeInputStream) {
             TypeInputStream tin = (TypeInputStream) in;
 

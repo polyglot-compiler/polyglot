@@ -41,6 +41,7 @@ import polyglot.types.TypeSystem;
 import polyglot.util.CodeWriter;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
+import polyglot.util.SerialVersionUID;
 import polyglot.visit.AscriptionVisitor;
 import polyglot.visit.CFGBuilder;
 import polyglot.visit.NodeVisitor;
@@ -53,6 +54,8 @@ import polyglot.visit.TypeChecker;
  * null.
  */
 public class Return_c extends Stmt_c implements Return {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     protected Expr expr;
 
     public Return_c(Position pos, Expr expr) {

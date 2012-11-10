@@ -40,9 +40,10 @@ import polyglot.types.Type;
 import polyglot.types.TypeObject;
 import polyglot.types.TypeSystem;
 import polyglot.util.Position;
+import polyglot.util.SerialVersionUID;
 
-@SuppressWarnings("serial")
 public class TypeVariable_c extends ReferenceType_c implements TypeVariable {
+    private static final long serialVersionUID = SerialVersionUID.generate();
 
     private static int count = 0;
 

@@ -30,9 +30,12 @@ import polyglot.types.Flags;
 import polyglot.types.ReferenceType;
 import polyglot.types.Type;
 import polyglot.util.Position;
+import polyglot.util.SerialVersionUID;
 
 public class JL5FieldInstance_c extends FieldInstance_c implements
         JL5FieldInstance {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     protected RetainedAnnotations retainedAnnotations;
 
     public JL5FieldInstance_c(JL5TypeSystem ts, Position pos,

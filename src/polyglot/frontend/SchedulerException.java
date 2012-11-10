@@ -26,6 +26,8 @@
 
 package polyglot.frontend;
 
+import polyglot.util.SerialVersionUID;
+
 /**
  * A <code>SchedulerException</code> is a runtime exception that may abort
  * a running pass and return the scheduler to the scheduling loop.
@@ -33,6 +35,8 @@ package polyglot.frontend;
  * @author nystrom
  */
 public class SchedulerException extends RuntimeException {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     public SchedulerException() {
     }
 

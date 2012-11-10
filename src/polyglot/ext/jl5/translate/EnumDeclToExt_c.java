@@ -32,8 +32,11 @@ import polyglot.translate.ExtensionRewriter;
 import polyglot.translate.ext.ClassDeclToExt_c;
 import polyglot.translate.ext.ToExt;
 import polyglot.types.SemanticException;
+import polyglot.util.SerialVersionUID;
 
 public class EnumDeclToExt_c extends ClassDeclToExt_c implements ToExt {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     @Override
     public Node toExt(ExtensionRewriter rw) throws SemanticException {
         JL5EnumDecl cd = (JL5EnumDecl) node();

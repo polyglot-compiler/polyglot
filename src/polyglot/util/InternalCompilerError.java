@@ -28,6 +28,8 @@ package polyglot.util;
 
 /** Exception thrown when the compiler is confused. */
 public class InternalCompilerError extends RuntimeException {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     protected Position pos;
 
     public InternalCompilerError(String msg) {

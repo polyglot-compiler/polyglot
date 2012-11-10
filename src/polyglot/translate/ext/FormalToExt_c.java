@@ -31,8 +31,11 @@ import polyglot.translate.ExtensionRewriter;
 import polyglot.types.LocalInstance;
 import polyglot.types.SemanticException;
 import polyglot.types.Type;
+import polyglot.util.SerialVersionUID;
 
 public class FormalToExt_c extends ToExt_c {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     @Override
     public Node toExt(ExtensionRewriter rw) throws SemanticException {
         Formal n = (Formal) node();

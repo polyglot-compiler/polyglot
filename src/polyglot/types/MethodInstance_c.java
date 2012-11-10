@@ -33,6 +33,7 @@ import java.util.List;
 import polyglot.main.Report;
 import polyglot.util.CollectionUtil;
 import polyglot.util.Position;
+import polyglot.util.SerialVersionUID;
 
 /**
  * A <code>MethodInstance</code> represents the type information for a Java
@@ -40,6 +41,8 @@ import polyglot.util.Position;
  */
 public class MethodInstance_c extends ProcedureInstance_c implements
         MethodInstance {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     protected String name;
     protected Type returnType;
 

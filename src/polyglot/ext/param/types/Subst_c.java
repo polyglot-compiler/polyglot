@@ -45,6 +45,7 @@ import polyglot.types.ReferenceType;
 import polyglot.types.Type;
 import polyglot.types.TypeObject;
 import polyglot.util.CachingTransformingList;
+import polyglot.util.SerialVersionUID;
 import polyglot.util.Transformation;
 import polyglot.util.TypeInputStream;
 
@@ -55,6 +56,8 @@ import polyglot.util.TypeInputStream;
  */
 public class Subst_c<Formal extends Param, Actual extends TypeObject>
         implements Subst<Formal, Actual> {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     /** Map from formal parameters (of type Param) to actuals. */
     protected Map<Formal, Actual> subst;
 
@@ -377,11 +380,17 @@ public class Subst_c<Formal extends Param, Actual extends TypeObject>
     }
 
     private void writeObject(java.io.ObjectOutputStream out) throws IOException {
+        // If you update this method in an incompatible way, increment
+        // writeObjectVersionUID.
+
         out.defaultWriteObject();
     }
 
     private void readObject(java.io.ObjectInputStream in) throws IOException,
             ClassNotFoundException {
+        // If you update this method in an incompatible way, increment
+        // readObjectVersionUID.
+
         if (in instanceof TypeInputStream) {
             @SuppressWarnings("unchecked")
             ParamTypeSystem<Formal, Actual> ts =

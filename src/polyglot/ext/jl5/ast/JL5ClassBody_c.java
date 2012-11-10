@@ -33,9 +33,11 @@ import polyglot.ast.ClassBody_c;
 import polyglot.ast.ClassMember;
 import polyglot.util.CodeWriter;
 import polyglot.util.Position;
+import polyglot.util.SerialVersionUID;
 import polyglot.visit.PrettyPrinter;
 
 public class JL5ClassBody_c extends ClassBody_c {
+    private static final long serialVersionUID = SerialVersionUID.generate();
 
     public JL5ClassBody_c(Position pos, List<ClassMember> members) {
         super(pos, members);

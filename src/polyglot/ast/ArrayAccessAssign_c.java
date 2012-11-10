@@ -33,6 +33,7 @@ import polyglot.types.Type;
 import polyglot.types.TypeSystem;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
+import polyglot.util.SerialVersionUID;
 import polyglot.visit.CFGBuilder;
 
 /**
@@ -44,6 +45,8 @@ import polyglot.visit.CFGBuilder;
  * <code>ArrayAccess</code>.
  */
 public class ArrayAccessAssign_c extends Assign_c implements ArrayAccessAssign {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     public ArrayAccessAssign_c(Position pos, ArrayAccess left, Operator op,
             Expr right) {
         super(pos, left, op, right);

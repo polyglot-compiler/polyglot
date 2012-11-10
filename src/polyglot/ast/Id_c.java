@@ -28,6 +28,7 @@ package polyglot.ast;
 
 import polyglot.util.CodeWriter;
 import polyglot.util.Position;
+import polyglot.util.SerialVersionUID;
 import polyglot.util.StringUtil;
 import polyglot.visit.PrettyPrinter;
 
@@ -36,6 +37,8 @@ import polyglot.visit.PrettyPrinter;
  * identifier that must resolve to an expression.
  */
 public class Id_c extends Node_c implements Id {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     protected String id;
 
     public Id_c(Position pos, String id) {

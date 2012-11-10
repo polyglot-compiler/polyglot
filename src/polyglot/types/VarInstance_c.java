@@ -28,12 +28,15 @@ package polyglot.types;
 
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
+import polyglot.util.SerialVersionUID;
 
 /**
  * A <code>VarInstance</code> contains type information for a variable.  It may
  * be either a local or a field.
  */
 public abstract class VarInstance_c extends TypeObject_c implements VarInstance {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     protected Flags flags;
     protected Type type;
     protected String name;

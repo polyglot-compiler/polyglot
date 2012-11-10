@@ -35,9 +35,11 @@ import polyglot.types.ReferenceType;
 import polyglot.types.Type;
 import polyglot.types.TypeSystem;
 import polyglot.types.UnknownType_c;
+import polyglot.util.SerialVersionUID;
 
 public class UnknownReferenceType_c extends UnknownType_c implements
         UnknownReferenceType {
+    private static final long serialVersionUID = SerialVersionUID.generate();
 
     public UnknownReferenceType_c(TypeSystem ts) {
         super(ts);

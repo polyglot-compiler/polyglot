@@ -34,6 +34,7 @@ import polyglot.types.Type;
 import polyglot.types.TypeSystem;
 import polyglot.util.CodeWriter;
 import polyglot.util.Position;
+import polyglot.util.SerialVersionUID;
 import polyglot.visit.AscriptionVisitor;
 import polyglot.visit.CFGBuilder;
 import polyglot.visit.FlowGraph;
@@ -46,6 +47,8 @@ import polyglot.visit.TypeChecker;
  * immutable pair of expressions combined with an operator.
  */
 public class Binary_c extends Expr_c implements Binary {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     protected Expr left;
     protected Operator op;
     protected Expr right;

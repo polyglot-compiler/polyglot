@@ -32,6 +32,8 @@ import java.util.Map;
 
 /** An enumerated type.  Enums are interned and can be compared with ==. */
 public class Enum implements Internable, Serializable {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     /** The name of the enum.  Used for debugging and interning. */
     private String name;
 

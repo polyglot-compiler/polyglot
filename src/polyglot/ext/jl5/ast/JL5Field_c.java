@@ -38,10 +38,12 @@ import polyglot.ext.jl5.visit.JL5Translator;
 import polyglot.types.SemanticException;
 import polyglot.util.CodeWriter;
 import polyglot.util.Position;
+import polyglot.util.SerialVersionUID;
 import polyglot.visit.PrettyPrinter;
 import polyglot.visit.TypeChecker;
 
 public class JL5Field_c extends Field_c {
+    private static final long serialVersionUID = SerialVersionUID.generate();
 
     public JL5Field_c(Position pos, Receiver target, Id name) {
         super(pos, target, name);

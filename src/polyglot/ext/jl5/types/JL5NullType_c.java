@@ -27,9 +27,11 @@ package polyglot.ext.jl5.types;
 
 import polyglot.types.NullType_c;
 import polyglot.types.TypeSystem;
+import polyglot.util.SerialVersionUID;
 
-@SuppressWarnings("serial")
 public class JL5NullType_c extends NullType_c {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     protected JL5NullType_c() {
     }
 

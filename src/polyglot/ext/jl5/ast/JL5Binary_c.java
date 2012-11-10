@@ -33,10 +33,12 @@ import polyglot.ext.jl5.types.JL5TypeSystem;
 import polyglot.types.SemanticException;
 import polyglot.types.Type;
 import polyglot.util.Position;
+import polyglot.util.SerialVersionUID;
 import polyglot.visit.AscriptionVisitor;
 import polyglot.visit.TypeChecker;
 
 public class JL5Binary_c extends Binary_c implements JL5Binary {
+    private static final long serialVersionUID = SerialVersionUID.generate();
 
     public JL5Binary_c(Position pos, Expr left, Operator op, Expr right) {
         super(pos, left, op, right);

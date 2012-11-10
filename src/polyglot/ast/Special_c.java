@@ -34,6 +34,7 @@ import polyglot.types.SemanticException;
 import polyglot.types.TypeSystem;
 import polyglot.util.CodeWriter;
 import polyglot.util.Position;
+import polyglot.util.SerialVersionUID;
 import polyglot.visit.CFGBuilder;
 import polyglot.visit.NodeVisitor;
 import polyglot.visit.PrettyPrinter;
@@ -46,6 +47,8 @@ import polyglot.visit.TypeChecker;
  * <code>Foo.this</code>.
  */
 public class Special_c extends Expr_c implements Special {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     protected Special.Kind kind;
     protected TypeNode qualifier;
 

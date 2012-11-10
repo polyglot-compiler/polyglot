@@ -31,6 +31,7 @@ import java.util.List;
 import polyglot.types.SemanticException;
 import polyglot.util.CollectionUtil;
 import polyglot.util.Position;
+import polyglot.util.SerialVersionUID;
 import polyglot.util.SubtypeSet;
 import polyglot.visit.CFGBuilder;
 import polyglot.visit.ExceptionChecker;
@@ -40,6 +41,8 @@ import polyglot.visit.ExceptionChecker;
  * dataflow can be performed.
  */
 public abstract class Term_c extends Node_c implements Term {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     public Term_c(Position pos) {
         super(pos);
     }

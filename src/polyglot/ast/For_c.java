@@ -39,6 +39,7 @@ import polyglot.util.CollectionUtil;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.ListUtil;
 import polyglot.util.Position;
+import polyglot.util.SerialVersionUID;
 import polyglot.visit.AscriptionVisitor;
 import polyglot.visit.CFGBuilder;
 import polyglot.visit.FlowGraph;
@@ -52,6 +53,8 @@ import polyglot.visit.TypeChecker;
  * to be tested indicating whether to reexecute the statement.
  */
 public class For_c extends Loop_c implements For {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     protected List<ForInit> inits;
     protected Expr cond;
     protected List<ForUpdate> iters;

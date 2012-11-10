@@ -35,6 +35,7 @@ import polyglot.types.TypeObject;
 import polyglot.types.TypeObject_c;
 import polyglot.types.TypeSystem;
 import polyglot.util.Position;
+import polyglot.util.SerialVersionUID;
 
 /**
  * A base implementation for parametric classes.
@@ -44,6 +45,8 @@ import polyglot.util.Position;
  */
 public abstract class PClass_c<Formal extends Param, Actual extends TypeObject>
         extends TypeObject_c implements PClass<Formal, Actual> {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     protected PClass_c() {
     }
 

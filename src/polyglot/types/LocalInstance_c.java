@@ -27,11 +27,14 @@
 package polyglot.types;
 
 import polyglot.util.Position;
+import polyglot.util.SerialVersionUID;
 
 /**
  * A <code>LocalInstance</code> contains type information for a local variable.
  */
 public class LocalInstance_c extends VarInstance_c implements LocalInstance {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     /** Used for deserializing types. */
     protected LocalInstance_c() {
     }

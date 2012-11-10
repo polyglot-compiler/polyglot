@@ -26,10 +26,14 @@
 
 package polyglot.types;
 
+import polyglot.util.SerialVersionUID;
+
 /**
  * An <code>PrimitiveType_c</code> represents a primitive type.
  */
 public class PrimitiveType_c extends Type_c implements PrimitiveType {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     protected Kind kind;
 
     /** Used for deserializing types. */

@@ -26,11 +26,13 @@
 package polyglot.ext.jl5.types;
 
 import polyglot.types.Flags;
+import polyglot.util.SerialVersionUID;
 
 /**
  * Utility methods for manipulating JL5 Flags.
  */
 public abstract class JL5Flags extends Flags {
+    private static final long serialVersionUID = SerialVersionUID.generate();
 
     public static final int ENUM_MOD = 0x00004000; //java.lang.reflect.Modifier.ENUM;
     public static final int VARARGS_MOD = 0x00000080; //java.lang.reflect.Modifier.VARARGS;

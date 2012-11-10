@@ -31,9 +31,12 @@ import polyglot.ast.Node;
 import polyglot.translate.ExtensionRewriter;
 import polyglot.types.SemanticException;
 import polyglot.util.InternalCompilerError;
+import polyglot.util.SerialVersionUID;
 import polyglot.visit.NodeVisitor;
 
 public class ToExt_c extends Ext_c implements ToExt {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     public static ToExt ext(Node n) {
         Ext e = n.ext();
         while (e != null && !(e instanceof ToExt)) {

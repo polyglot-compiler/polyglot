@@ -33,10 +33,12 @@ import polyglot.ext.jl5.types.JL5TypeSystem;
 import polyglot.types.SemanticException;
 import polyglot.types.Type;
 import polyglot.util.Position;
+import polyglot.util.SerialVersionUID;
 import polyglot.visit.AscriptionVisitor;
 import polyglot.visit.TypeChecker;
 
 public class JL5Unary_c extends Unary_c implements JL5Unary {
+    private static final long serialVersionUID = SerialVersionUID.generate();
 
     public JL5Unary_c(Position pos, Operator op, Expr expr) {
         super(pos, op, expr);

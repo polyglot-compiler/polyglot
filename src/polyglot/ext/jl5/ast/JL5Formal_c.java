@@ -43,12 +43,14 @@ import polyglot.types.SemanticException;
 import polyglot.util.CodeWriter;
 import polyglot.util.CollectionUtil;
 import polyglot.util.Position;
+import polyglot.util.SerialVersionUID;
 import polyglot.visit.AmbiguityRemover;
 import polyglot.visit.NodeVisitor;
 import polyglot.visit.PrettyPrinter;
 import polyglot.visit.TypeChecker;
 
 public class JL5Formal_c extends Formal_c implements JL5Formal {
+    private static final long serialVersionUID = SerialVersionUID.generate();
 
     protected boolean isVarArg;
     protected List<AnnotationElem> annotations;

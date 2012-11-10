@@ -43,6 +43,7 @@ import polyglot.types.Resolver;
 import polyglot.types.Type;
 import polyglot.types.TypeObject;
 import polyglot.util.Position;
+import polyglot.util.SerialVersionUID;
 
 /**
  * Implementation of a ClassType that performs substitutions using a
@@ -51,6 +52,8 @@ import polyglot.util.Position;
  */
 public class SubstClassType_c<Formal extends Param, Actual extends TypeObject>
         extends ClassType_c implements SubstType<Formal, Actual> {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     /** The class type we are substituting into. */
     protected ClassType base;
 

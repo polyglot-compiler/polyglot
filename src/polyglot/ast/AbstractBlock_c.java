@@ -35,6 +35,7 @@ import polyglot.util.CodeWriter;
 import polyglot.util.CollectionUtil;
 import polyglot.util.ListUtil;
 import polyglot.util.Position;
+import polyglot.util.SerialVersionUID;
 import polyglot.visit.CFGBuilder;
 import polyglot.visit.NodeVisitor;
 import polyglot.visit.PrettyPrinter;
@@ -44,6 +45,8 @@ import polyglot.visit.PrettyPrinter;
  * sequence of statements.
  */
 public abstract class AbstractBlock_c extends Stmt_c implements Block {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     protected List<Stmt> statements;
 
     public AbstractBlock_c(Position pos, List<Stmt> statements) {

@@ -36,6 +36,7 @@ import polyglot.types.Type;
 import polyglot.types.TypeSystem;
 import polyglot.util.CodeWriter;
 import polyglot.util.Position;
+import polyglot.util.SerialVersionUID;
 import polyglot.visit.AmbiguityRemover;
 import polyglot.visit.CFGBuilder;
 import polyglot.visit.NodeVisitor;
@@ -48,6 +49,8 @@ import polyglot.visit.TypeChecker;
  * or catch block.  It consists of a type and a variable identifier.
  */
 public class Formal_c extends Term_c implements Formal {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     protected LocalInstance li;
     protected Flags flags;
     protected TypeNode type;

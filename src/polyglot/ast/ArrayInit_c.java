@@ -37,6 +37,7 @@ import polyglot.util.CollectionUtil;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.ListUtil;
 import polyglot.util.Position;
+import polyglot.util.SerialVersionUID;
 import polyglot.visit.AscriptionVisitor;
 import polyglot.visit.CFGBuilder;
 import polyglot.visit.NodeVisitor;
@@ -50,6 +51,8 @@ import polyglot.visit.TypeChecker;
  * <code>Call</code>).
  */
 public class ArrayInit_c extends Expr_c implements ArrayInit {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     protected List<Expr> elements;
 
     public ArrayInit_c(Position pos, List<Expr> elements) {

@@ -31,6 +31,7 @@ import polyglot.frontend.Scheduler;
 import polyglot.frontend.SchedulerException;
 import polyglot.frontend.goals.Goal;
 import polyglot.util.CannotResolvePlaceHolderException;
+import polyglot.util.SerialVersionUID;
 
 /**
  * A place holder type when serializing the Polylgot type information. 
@@ -39,6 +40,8 @@ import polyglot.util.CannotResolvePlaceHolderException;
  * for classes that <code>C</code> depends on.  
  */
 public class PlaceHolder_c implements NamedPlaceHolder {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     /**
      * The name of the place holder.
      */

@@ -32,6 +32,7 @@ import polyglot.types.Type;
 import polyglot.types.TypeSystem;
 import polyglot.util.CodeWriter;
 import polyglot.util.Position;
+import polyglot.util.SerialVersionUID;
 import polyglot.visit.AscriptionVisitor;
 import polyglot.visit.CFGBuilder;
 import polyglot.visit.NodeVisitor;
@@ -42,6 +43,8 @@ import polyglot.visit.PrettyPrinter;
  * a statement.
  */
 public class Eval_c extends Stmt_c implements Eval {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     protected Expr expr;
 
     public Eval_c(Position pos, Expr expr) {

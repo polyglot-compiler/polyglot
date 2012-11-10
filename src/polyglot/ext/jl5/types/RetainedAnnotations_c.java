@@ -32,9 +32,11 @@ import java.util.Set;
 import polyglot.types.Type;
 import polyglot.types.TypeObject_c;
 import polyglot.util.Position;
+import polyglot.util.SerialVersionUID;
 
 public class RetainedAnnotations_c extends TypeObject_c implements
         RetainedAnnotations {
+    private static final long serialVersionUID = SerialVersionUID.generate();
 
     private Map<Type, Map<String, AnnotationElementValue>> annotations;
 

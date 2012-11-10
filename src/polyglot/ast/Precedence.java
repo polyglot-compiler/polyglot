@@ -27,12 +27,15 @@
 package polyglot.ast;
 
 import polyglot.util.Enum;
+import polyglot.util.SerialVersionUID;
 
 /**
  * Constants defining the precedence of an expression.  Lower
  * values denote higher precedence (i.e., tighter binding).
  */
 public class Precedence extends Enum {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     private int value;
 
     public Precedence(String name, int value) {

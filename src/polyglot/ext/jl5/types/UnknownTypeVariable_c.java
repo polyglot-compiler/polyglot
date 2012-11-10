@@ -27,9 +27,11 @@ package polyglot.ext.jl5.types;
 
 import polyglot.types.TypeSystem;
 import polyglot.util.Position;
+import polyglot.util.SerialVersionUID;
 
 public class UnknownTypeVariable_c extends TypeVariable_c implements
         UnknownTypeVariable {
+    private static final long serialVersionUID = SerialVersionUID.generate();
 
     public UnknownTypeVariable_c(TypeSystem ts) {
         super(ts, Position.COMPILER_GENERATED, "<unknown>", null);

@@ -30,6 +30,7 @@ import java.util.List;
 
 import polyglot.util.CodeWriter;
 import polyglot.util.Position;
+import polyglot.util.SerialVersionUID;
 import polyglot.visit.CFGBuilder;
 import polyglot.visit.NodeVisitor;
 import polyglot.visit.PrettyPrinter;
@@ -39,6 +40,8 @@ import polyglot.visit.PrettyPrinter;
  * statement contains the statement being labelled and a string label.
  */
 public class Labeled_c extends Stmt_c implements Labeled {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     protected Id label;
     protected Stmt statement;
 

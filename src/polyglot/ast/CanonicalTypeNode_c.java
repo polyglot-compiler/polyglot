@@ -33,6 +33,7 @@ import polyglot.types.Type;
 import polyglot.types.TypeSystem;
 import polyglot.util.CodeWriter;
 import polyglot.util.Position;
+import polyglot.util.SerialVersionUID;
 import polyglot.visit.PrettyPrinter;
 import polyglot.visit.Translator;
 import polyglot.visit.TypeChecker;
@@ -42,6 +43,8 @@ import polyglot.visit.TypeChecker;
  */
 public class CanonicalTypeNode_c extends TypeNode_c implements
         CanonicalTypeNode {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     public CanonicalTypeNode_c(Position pos, Type type) {
         super(pos);
         assert (type != null);

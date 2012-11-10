@@ -34,6 +34,7 @@ import polyglot.types.Type;
 import polyglot.types.TypeSystem;
 import polyglot.util.CodeWriter;
 import polyglot.util.Position;
+import polyglot.util.SerialVersionUID;
 import polyglot.visit.CFGBuilder;
 import polyglot.visit.NodeVisitor;
 import polyglot.visit.PrettyPrinter;
@@ -44,6 +45,8 @@ import polyglot.visit.TypeChecker;
  * statement.  Specifically, the second half.
  */
 public class Catch_c extends Stmt_c implements Catch {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     protected Formal formal;
     protected Block body;
 

@@ -32,11 +32,14 @@ import java.util.List;
 
 import polyglot.util.CodeWriter;
 import polyglot.util.Position;
+import polyglot.util.SerialVersionUID;
 
 /**
  * An <code>ArrayType</code> represents an array of base java types.
  */
 public class ArrayType_c extends ReferenceType_c implements ArrayType {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     protected Type base;
     protected List<FieldInstance> fields;
     protected List<MethodInstance> methods;

@@ -29,12 +29,17 @@ import polyglot.ast.Call;
 import polyglot.ast.Node;
 import polyglot.translate.ExtensionRewriter;
 import polyglot.types.SemanticException;
+import polyglot.util.SerialVersionUID;
 
 public class CallToExt_c extends ToExt_c {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     @Override
     public Node toExt(ExtensionRewriter rw) throws SemanticException {
         Call n = (Call) node();
-        Call m = rw.to_nf().Call(n.position(), n.target(), n.id(), n.arguments());
+        Call m =
+                rw.to_nf()
+                  .Call(n.position(), n.target(), n.id(), n.arguments());
         m = m.targetImplicit(n.isTargetImplicit());
 
         return m;

@@ -27,6 +27,7 @@
 package polyglot.ast;
 
 import polyglot.util.Enum;
+import polyglot.util.SerialVersionUID;
 
 /**
  * A <code>Branch</code> is an immutable representation of a branch
@@ -35,6 +36,9 @@ import polyglot.util.Enum;
 public interface Branch extends Stmt {
     /** Branch kind: either break or continue. */
     public static class Kind extends Enum {
+        private static final long serialVersionUID =
+                SerialVersionUID.generate();
+
         public Kind(String name) {
             super(name);
         }

@@ -33,12 +33,15 @@ import polyglot.types.ClassType;
 import polyglot.types.TypeObject;
 import polyglot.types.TypeSystem;
 import polyglot.util.Position;
+import polyglot.util.SerialVersionUID;
 
 /**
  * A base implementation for mutable parametric classes.
  */
 public class MuPClass_c<Formal extends Param, Actual extends TypeObject>
         extends PClass_c<Formal, Actual> implements MuPClass<Formal, Actual> {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     protected List<Formal> formals;
     protected ClassType clazz;
 

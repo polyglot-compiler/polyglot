@@ -62,6 +62,9 @@ public final class Assert {
 
     // The error thrown.
     private static class AssertionFailedError extends Error {
+        private static final long serialVersionUID =
+                SerialVersionUID.generate();
+
         public AssertionFailedError(String s) {
             super(s);
         }

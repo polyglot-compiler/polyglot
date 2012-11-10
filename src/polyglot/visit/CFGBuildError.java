@@ -28,6 +28,7 @@ package polyglot.visit;
 
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
+import polyglot.util.SerialVersionUID;
 
 /**
  * Exception thrown when the CFG cannot be built.  This should be
@@ -35,6 +36,8 @@ import polyglot.util.Position;
  * in the signature of Node.acceptCFG.
  */
 public class CFGBuildError extends InternalCompilerError {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     public CFGBuildError(String msg) {
         super(msg);
     }

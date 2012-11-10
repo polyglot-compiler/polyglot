@@ -53,6 +53,7 @@ import polyglot.util.CodeWriter;
 import polyglot.util.CollectionUtil;
 import polyglot.util.ListUtil;
 import polyglot.util.Position;
+import polyglot.util.SerialVersionUID;
 import polyglot.visit.AmbiguityRemover;
 import polyglot.visit.BodyDisambiguator;
 import polyglot.visit.CFGBuilder;
@@ -65,6 +66,8 @@ import polyglot.visit.TypeBuilder;
 import polyglot.visit.TypeChecker;
 
 public class EnumConstantDecl_c extends Term_c implements EnumConstantDecl {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     protected List<Expr> args;
     protected Id name;
     protected Flags flags;

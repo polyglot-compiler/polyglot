@@ -31,8 +31,11 @@ import polyglot.translate.ExtensionRewriter;
 import polyglot.translate.ext.ToExt_c;
 import polyglot.types.SemanticException;
 import polyglot.util.InternalCompilerError;
+import polyglot.util.SerialVersionUID;
 
 public class CannotToExt_c extends ToExt_c implements Ext {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     @Override
     public Node toExt(ExtensionRewriter rw) throws SemanticException {
         throw new InternalCompilerError("Cannot transalate " + node() + ":"

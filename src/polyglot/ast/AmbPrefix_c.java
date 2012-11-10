@@ -30,6 +30,7 @@ import polyglot.types.SemanticException;
 import polyglot.util.CodeWriter;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
+import polyglot.util.SerialVersionUID;
 import polyglot.visit.AmbiguityRemover;
 import polyglot.visit.ExceptionChecker;
 import polyglot.visit.NodeVisitor;
@@ -41,6 +42,8 @@ import polyglot.visit.TypeChecker;
  * list of identifiers that must resolve to a prefix.
  */
 public class AmbPrefix_c extends Node_c implements AmbPrefix {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     protected Prefix prefix;
     protected Id name;
 

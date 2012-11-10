@@ -47,6 +47,7 @@ import polyglot.util.CodeWriter;
 import polyglot.util.CollectionUtil;
 import polyglot.util.ListUtil;
 import polyglot.util.Position;
+import polyglot.util.SerialVersionUID;
 import polyglot.visit.AmbiguityRemover;
 import polyglot.visit.CFGBuilder;
 import polyglot.visit.ExceptionChecker;
@@ -60,6 +61,8 @@ import polyglot.visit.TypeChecker;
  * constructor declaration as part of a class body.
  */
 public class ConstructorDecl_c extends Term_c implements ConstructorDecl {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     protected Flags flags;
     protected Id name;
     protected List<Formal> formals;

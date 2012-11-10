@@ -47,6 +47,7 @@ import polyglot.util.CollectionUtil;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.ListUtil;
 import polyglot.util.Position;
+import polyglot.util.SerialVersionUID;
 import polyglot.visit.AmbiguityRemover;
 import polyglot.visit.AscriptionVisitor;
 import polyglot.visit.BodyDisambiguator;
@@ -69,6 +70,8 @@ import polyglot.visit.TypeChecker;
  * optional <code>ClassBody</code> used to support anonymous classes.
  */
 public class New_c extends Expr_c implements New {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     protected Expr qualifier;
     protected TypeNode tn;
     protected List<Expr> arguments;

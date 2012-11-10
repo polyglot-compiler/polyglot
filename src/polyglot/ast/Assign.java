@@ -27,6 +27,7 @@
 package polyglot.ast;
 
 import polyglot.util.Enum;
+import polyglot.util.SerialVersionUID;
 
 /**
  * An <code>Assign</code> represents a Java assignment expression.
@@ -34,6 +35,9 @@ import polyglot.util.Enum;
 public interface Assign extends Expr {
     /** Assignment operator. */
     public static class Operator extends Enum {
+        private static final long serialVersionUID =
+                SerialVersionUID.generate();
+
         private final Binary.Operator binOp;
 
         public Operator(String name, Binary.Operator binOp) {

@@ -32,9 +32,11 @@ import polyglot.ast.TypeNode;
 import polyglot.ext.jl5.types.RawClass;
 import polyglot.types.SemanticException;
 import polyglot.util.Position;
+import polyglot.util.SerialVersionUID;
 import polyglot.visit.TypeChecker;
 
 public class JL5Special_c extends Special_c implements Special {
+    private static final long serialVersionUID = SerialVersionUID.generate();
 
     public JL5Special_c(Position pos, Kind kind, TypeNode qualifier) {
         super(pos, kind, qualifier);

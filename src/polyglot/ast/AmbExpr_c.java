@@ -32,6 +32,7 @@ import polyglot.types.SemanticException;
 import polyglot.util.CodeWriter;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
+import polyglot.util.SerialVersionUID;
 import polyglot.visit.AmbiguityRemover;
 import polyglot.visit.CFGBuilder;
 import polyglot.visit.ExceptionChecker;
@@ -44,6 +45,8 @@ import polyglot.visit.TypeChecker;
  * identifier that must resolve to an expression.
  */
 public class AmbExpr_c extends Expr_c implements AmbExpr {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     protected Id name;
 
     public AmbExpr_c(Position pos, Id name) {

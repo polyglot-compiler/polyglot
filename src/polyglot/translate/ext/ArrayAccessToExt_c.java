@@ -29,12 +29,15 @@ package polyglot.translate.ext;
 import polyglot.ast.ArrayAccess;
 import polyglot.ast.Node;
 import polyglot.translate.ExtensionRewriter;
+import polyglot.util.SerialVersionUID;
 
 /**
  * An <code>ArrayAccess</code> is an immutable representation of an
  * access of an array member.
  */
 public class ArrayAccessToExt_c extends ToExt_c implements ToExt {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     @Override
     public Node toExt(ExtensionRewriter rw) {
         ArrayAccess aa = (ArrayAccess) node();

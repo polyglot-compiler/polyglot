@@ -29,6 +29,7 @@ package polyglot.ast;
 import polyglot.types.SemanticException;
 import polyglot.util.CodeWriter;
 import polyglot.util.Position;
+import polyglot.util.SerialVersionUID;
 import polyglot.visit.PrettyPrinter;
 import polyglot.visit.TypeChecker;
 
@@ -36,6 +37,8 @@ import polyglot.visit.TypeChecker;
  * A <code>BooleanLit</code> represents a boolean literal expression.
  */
 public class BooleanLit_c extends Lit_c implements BooleanLit {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     protected boolean value;
 
     public BooleanLit_c(Position pos, boolean value) {

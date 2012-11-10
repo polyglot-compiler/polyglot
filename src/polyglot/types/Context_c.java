@@ -35,6 +35,7 @@ import polyglot.main.Report;
 import polyglot.util.CollectionUtil;
 import polyglot.util.Enum;
 import polyglot.util.InternalCompilerError;
+import polyglot.util.SerialVersionUID;
 
 /**
  * This class maintains a context for looking up named variables, types,
@@ -51,6 +52,9 @@ public class Context_c implements Context {
     protected TypeSystem ts;
 
     public static class Kind extends Enum {
+        private static final long serialVersionUID =
+                SerialVersionUID.generate();
+
         public Kind(String name) {
             super(name);
         }

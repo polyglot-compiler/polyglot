@@ -26,11 +26,11 @@
 
 package polyglot.util;
 
-import java.io.PrintWriter;
-import java.io.Writer;
+import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
-import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.Writer;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -292,6 +292,8 @@ public class OptimalCodeWriter extends CodeWriter {
  * formatting; otherwise, it occurred on a subsequent line.
  */
 class Overrun extends Exception {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     int amount;
     int type;
     final static int POS = 0;

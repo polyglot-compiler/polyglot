@@ -30,6 +30,7 @@ import polyglot.types.SemanticException;
 import polyglot.util.CodeWriter;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
+import polyglot.util.SerialVersionUID;
 import polyglot.visit.PrettyPrinter;
 import polyglot.visit.TypeChecker;
 
@@ -38,6 +39,8 @@ import polyglot.visit.TypeChecker;
  * <code>float</code> or <code>double</code>.
  */
 public class FloatLit_c extends Lit_c implements FloatLit {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     protected FloatLit.Kind kind;
     protected double value;
 

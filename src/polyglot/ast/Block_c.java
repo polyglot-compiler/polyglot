@@ -30,6 +30,7 @@ import java.util.List;
 
 import polyglot.util.CodeWriter;
 import polyglot.util.Position;
+import polyglot.util.SerialVersionUID;
 import polyglot.visit.PrettyPrinter;
 
 /**
@@ -37,6 +38,8 @@ import polyglot.visit.PrettyPrinter;
  * sequence of statements.
  */
 public class Block_c extends AbstractBlock_c implements Block {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     public Block_c(Position pos, List<Stmt> statements) {
         super(pos, statements);
     }

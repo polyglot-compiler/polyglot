@@ -33,6 +33,7 @@ import polyglot.types.Type;
 import polyglot.types.TypeSystem;
 import polyglot.util.CodeWriter;
 import polyglot.util.Position;
+import polyglot.util.SerialVersionUID;
 import polyglot.visit.AscriptionVisitor;
 import polyglot.visit.CFGBuilder;
 import polyglot.visit.FlowGraph;
@@ -46,6 +47,8 @@ import polyglot.visit.TypeChecker;
  * indicating whether to reexecute the statement.
  */
 public class Do_c extends Loop_c implements Do {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     protected Stmt body;
     protected Expr cond;
 

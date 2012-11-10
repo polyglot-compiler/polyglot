@@ -32,6 +32,7 @@ import polyglot.util.CodeWriter;
 import polyglot.util.CollectionUtil;
 import polyglot.util.ListUtil;
 import polyglot.util.Position;
+import polyglot.util.SerialVersionUID;
 import polyglot.visit.NodeVisitor;
 import polyglot.visit.PrettyPrinter;
 
@@ -39,6 +40,8 @@ import polyglot.visit.PrettyPrinter;
  * A <code>SourceCollection</code> represents a collection of source files.
  */
 public class SourceCollection_c extends Node_c implements SourceCollection {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     protected List<SourceFile> sources;
 
     public SourceCollection_c(Position pos, List<SourceFile> sources) {

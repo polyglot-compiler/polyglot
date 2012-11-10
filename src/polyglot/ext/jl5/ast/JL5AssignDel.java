@@ -33,9 +33,12 @@ import polyglot.types.SemanticException;
 import polyglot.types.Type;
 import polyglot.types.TypeSystem;
 import polyglot.util.InternalCompilerError;
+import polyglot.util.SerialVersionUID;
 import polyglot.visit.TypeChecker;
 
 public class JL5AssignDel extends JL5Del {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
         Assign a = (Assign) this.node();

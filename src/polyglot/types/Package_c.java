@@ -27,6 +27,7 @@
 package polyglot.types;
 
 import polyglot.util.CodeWriter;
+import polyglot.util.SerialVersionUID;
 
 /**
  * An <code>PackageType</code> represents a package type. It may or may
@@ -34,6 +35,8 @@ import polyglot.util.CodeWriter;
  * primitive.
  */
 public class Package_c extends TypeObject_c implements Package {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     protected Package prefix;
     protected String name;
     /**

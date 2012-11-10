@@ -35,10 +35,12 @@ import polyglot.types.ConstructorInstance_c;
 import polyglot.types.Flags;
 import polyglot.types.Type;
 import polyglot.util.Position;
+import polyglot.util.SerialVersionUID;
 
-@SuppressWarnings("serial")
 public class JL5ConstructorInstance_c extends ConstructorInstance_c implements
         JL5ConstructorInstance {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     private List<TypeVariable> typeParams;
     private RetainedAnnotations retainedAnnotations;
 

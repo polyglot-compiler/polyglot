@@ -27,6 +27,7 @@
 package polyglot.ast;
 
 import polyglot.util.Enum;
+import polyglot.util.SerialVersionUID;
 
 /**
  * An <code>Import</code> is an immutable representation of a Java
@@ -42,6 +43,9 @@ public interface Import extends Node {
      * is a class.  This puts the nested classes of p.C in scope.
      */
     public static class Kind extends Enum {
+        private static final long serialVersionUID =
+                SerialVersionUID.generate();
+
         public Kind(String name) {
             super(name);
         }

@@ -29,8 +29,11 @@ import polyglot.ast.If;
 import polyglot.ast.Node;
 import polyglot.translate.ExtensionRewriter;
 import polyglot.types.SemanticException;
+import polyglot.util.SerialVersionUID;
 
 public class IfToExt_c extends ToExt_c {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     @Override
     public Node toExt(ExtensionRewriter rw) throws SemanticException {
         If n = (If) node();

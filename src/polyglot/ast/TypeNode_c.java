@@ -35,6 +35,7 @@ import polyglot.types.Type;
 import polyglot.types.TypeSystem;
 import polyglot.util.CodeWriter;
 import polyglot.util.Position;
+import polyglot.util.SerialVersionUID;
 import polyglot.visit.CFGBuilder;
 import polyglot.visit.PrettyPrinter;
 import polyglot.visit.TypeBuilder;
@@ -44,6 +45,8 @@ import polyglot.visit.TypeBuilder;
  * <code>Type</code> within the abstract syntax tree.
  */
 public abstract class TypeNode_c extends Term_c implements TypeNode {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     protected Type type;
 
     public TypeNode_c(Position pos) {

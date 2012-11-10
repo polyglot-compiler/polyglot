@@ -33,6 +33,7 @@ import polyglot.types.Type;
 import polyglot.types.TypeSystem;
 import polyglot.util.CodeWriter;
 import polyglot.util.Position;
+import polyglot.util.SerialVersionUID;
 import polyglot.visit.AscriptionVisitor;
 import polyglot.visit.CFGBuilder;
 import polyglot.visit.ConstantChecker;
@@ -45,6 +46,8 @@ import polyglot.visit.TypeChecker;
  * statement.  It can only be contained in a <code>Switch</code>.
  */
 public class Case_c extends Stmt_c implements Case {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     protected Expr expr;
     protected long value;
 

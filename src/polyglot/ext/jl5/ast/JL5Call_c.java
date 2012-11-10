@@ -55,11 +55,13 @@ import polyglot.types.Type;
 import polyglot.types.TypeSystem;
 import polyglot.util.CodeWriter;
 import polyglot.util.Position;
+import polyglot.util.SerialVersionUID;
 import polyglot.visit.NodeVisitor;
 import polyglot.visit.PrettyPrinter;
 import polyglot.visit.TypeChecker;
 
 public class JL5Call_c extends Call_c implements JL5Call {
+    private static final long serialVersionUID = SerialVersionUID.generate();
 
     private List<TypeNode> typeArgs;
 

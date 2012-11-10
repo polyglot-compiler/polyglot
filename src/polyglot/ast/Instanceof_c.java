@@ -33,6 +33,7 @@ import polyglot.types.Type;
 import polyglot.types.TypeSystem;
 import polyglot.util.CodeWriter;
 import polyglot.util.Position;
+import polyglot.util.SerialVersionUID;
 import polyglot.visit.AscriptionVisitor;
 import polyglot.visit.CFGBuilder;
 import polyglot.visit.NodeVisitor;
@@ -44,6 +45,8 @@ import polyglot.visit.TypeChecker;
  * the use of the <code>instanceof</code> operator.
  */
 public class Instanceof_c extends Expr_c implements Instanceof {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     protected Expr expr;
     protected TypeNode compareType;
 

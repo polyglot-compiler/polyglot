@@ -27,8 +27,10 @@ package polyglot.ext.jl5.types;
 
 import polyglot.types.NoMemberException;
 import polyglot.util.Position;
+import polyglot.util.SerialVersionUID;
 
 public class JL5NoMemberException extends NoMemberException {
+    private static final long serialVersionUID = SerialVersionUID.generate();
 
     public static final int ENUM_CONSTANT = 4;
     public static final int ANNOTATION = 5;

@@ -36,6 +36,7 @@ import polyglot.util.CodeWriter;
 import polyglot.util.ErrorInfo;
 import polyglot.util.ErrorQueue;
 import polyglot.util.Position;
+import polyglot.util.SerialVersionUID;
 import polyglot.visit.AscriptionVisitor;
 import polyglot.visit.CFGBuilder;
 import polyglot.visit.NodeVisitor;
@@ -47,6 +48,8 @@ import polyglot.visit.TypeChecker;
  * An <code>Assert</code> is an assert statement.
  */
 public class Assert_c extends Stmt_c implements Assert {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     protected Expr cond;
     protected Expr errorMessage;
 

@@ -27,6 +27,7 @@
 package polyglot.ast;
 
 import polyglot.util.Enum;
+import polyglot.util.SerialVersionUID;
 
 /** 
  * An <code>IntLit</code> represents a literal in Java of an integer
@@ -35,6 +36,9 @@ import polyglot.util.Enum;
 public interface IntLit extends NumLit {
     /** Integer literal kinds: int (e.g., 0) or long (e.g., 0L). */
     public static class Kind extends Enum {
+        private static final long serialVersionUID =
+                SerialVersionUID.generate();
+
         public Kind(String name) {
             super(name);
         }

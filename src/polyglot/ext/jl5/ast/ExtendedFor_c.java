@@ -48,6 +48,7 @@ import polyglot.types.Type;
 import polyglot.util.CodeWriter;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
+import polyglot.util.SerialVersionUID;
 import polyglot.visit.CFGBuilder;
 import polyglot.visit.FlowGraph;
 import polyglot.visit.NodeVisitor;
@@ -55,6 +56,8 @@ import polyglot.visit.PrettyPrinter;
 import polyglot.visit.TypeChecker;
 
 public class ExtendedFor_c extends Loop_c implements ExtendedFor {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     /** Loop body */
     protected LocalDecl decl;
     protected Expr expr;

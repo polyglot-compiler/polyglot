@@ -59,6 +59,7 @@ import polyglot.util.CollectionUtil;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.ListUtil;
 import polyglot.util.Position;
+import polyglot.util.SerialVersionUID;
 import polyglot.visit.AmbiguityRemover;
 import polyglot.visit.NodeVisitor;
 import polyglot.visit.PrettyPrinter;
@@ -67,6 +68,7 @@ import polyglot.visit.TypeBuilder;
 import polyglot.visit.TypeChecker;
 
 public class JL5MethodDecl_c extends MethodDecl_c implements JL5MethodDecl {
+    private static final long serialVersionUID = SerialVersionUID.generate();
 
     protected boolean compilerGenerated;
     protected List<ParamTypeNode> typeParams;

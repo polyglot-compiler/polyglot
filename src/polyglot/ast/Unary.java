@@ -27,6 +27,7 @@
 package polyglot.ast;
 
 import polyglot.util.Enum;
+import polyglot.util.SerialVersionUID;
 
 /**
  * A <code>Unary</code> represents a Java unary expression, an
@@ -35,6 +36,9 @@ import polyglot.util.Enum;
 public interface Unary extends Expr {
     /** Unary expression operator. */
     public static class Operator extends Enum {
+        private static final long serialVersionUID =
+                SerialVersionUID.generate();
+
         protected boolean prefix;
         protected String name;
 

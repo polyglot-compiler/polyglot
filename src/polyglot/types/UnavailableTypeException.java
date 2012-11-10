@@ -29,6 +29,7 @@ package polyglot.types;
 import polyglot.frontend.Job;
 import polyglot.frontend.SchedulerException;
 import polyglot.util.Position;
+import polyglot.util.SerialVersionUID;
 
 /**
  * An <code>UnavailableTypeException</code> is an exception thrown when a type
@@ -37,6 +38,8 @@ import polyglot.util.Position;
  * @author nystrom
  */
 public class UnavailableTypeException extends SchedulerException {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     protected Job job;
     protected Position position;
 

@@ -30,11 +30,14 @@ import java.util.List;
 
 import polyglot.types.Context;
 import polyglot.util.Position;
+import polyglot.util.SerialVersionUID;
 
 /**
  * A <code>SwitchBlock</code> is a list of statements within a switch.
  */
 public class SwitchBlock_c extends AbstractBlock_c implements SwitchBlock {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     public SwitchBlock_c(Position pos, List<Stmt> statements) {
         super(pos, statements);
     }

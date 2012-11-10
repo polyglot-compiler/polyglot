@@ -33,9 +33,10 @@ import polyglot.types.MethodInstance;
 import polyglot.types.Type;
 import polyglot.types.TypeSystem;
 import polyglot.util.Position;
+import polyglot.util.SerialVersionUID;
 
-@SuppressWarnings("serial")
 public class JL5ArrayType_c extends ArrayType_c implements JL5ArrayType {
+    private static final long serialVersionUID = SerialVersionUID.generate();
 
     protected boolean isVarArg;
 

@@ -43,12 +43,14 @@ import polyglot.util.CodeWriter;
 import polyglot.util.CollectionUtil;
 import polyglot.util.ListUtil;
 import polyglot.util.Position;
+import polyglot.util.SerialVersionUID;
 import polyglot.visit.NodeVisitor;
 import polyglot.visit.PrettyPrinter;
 import polyglot.visit.TypeChecker;
 
 public class JL5FieldDecl_c extends FieldDecl_c implements FieldDecl,
         AnnotatedElement {
+    private static final long serialVersionUID = SerialVersionUID.generate();
 
     protected List<AnnotationElem> annotations;
 

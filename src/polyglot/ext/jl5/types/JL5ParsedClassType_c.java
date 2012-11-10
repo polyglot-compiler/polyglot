@@ -43,10 +43,12 @@ import polyglot.types.TypeSystem;
 import polyglot.util.CodeWriter;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.ListUtil;
+import polyglot.util.SerialVersionUID;
 
-@SuppressWarnings("serial")
 public class JL5ParsedClassType_c extends ParsedClassType_c implements
         JL5ParsedClassType {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     protected PClass<TypeVariable, ReferenceType> pclass;
     protected List<TypeVariable> typeVars = Collections.emptyList();
     protected List<EnumInstance> enumConstants;

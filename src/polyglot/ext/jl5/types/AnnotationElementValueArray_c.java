@@ -31,9 +31,11 @@ import java.util.List;
 
 import polyglot.types.TypeObject_c;
 import polyglot.util.Position;
+import polyglot.util.SerialVersionUID;
 
 public class AnnotationElementValueArray_c extends TypeObject_c implements
         AnnotationElementValueArray {
+    private static final long serialVersionUID = SerialVersionUID.generate();
 
     private List<AnnotationElementValue> vals;
 

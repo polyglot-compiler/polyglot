@@ -48,6 +48,7 @@ import polyglot.util.CodeWriter;
 import polyglot.util.CollectionUtil;
 import polyglot.util.ListUtil;
 import polyglot.util.Position;
+import polyglot.util.SerialVersionUID;
 import polyglot.visit.AmbiguityRemover;
 import polyglot.visit.CFGBuilder;
 import polyglot.visit.ExceptionChecker;
@@ -60,6 +61,8 @@ import polyglot.visit.TypeChecker;
  * A method declaration.
  */
 public class MethodDecl_c extends Term_c implements MethodDecl {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     protected Flags flags;
     protected TypeNode returnType;
     protected Id name;

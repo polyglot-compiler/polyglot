@@ -28,6 +28,7 @@ package polyglot.types;
 
 import polyglot.util.CodeWriter;
 import polyglot.util.Position;
+import polyglot.util.SerialVersionUID;
 
 /**
  * Abstract implementation of a <code>Type</code>.  This implements most of
@@ -35,6 +36,8 @@ import polyglot.util.Position;
  * the type system.
  */
 public abstract class Type_c extends TypeObject_c implements Type {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     /** Used for deserializing types. */
     protected Type_c() {
     }

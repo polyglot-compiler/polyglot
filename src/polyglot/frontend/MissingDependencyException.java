@@ -27,6 +27,7 @@
 package polyglot.frontend;
 
 import polyglot.frontend.goals.Goal;
+import polyglot.util.SerialVersionUID;
 
 /**
  * A <code>MissingDependencyException</code> is thrown when a goal cannot be
@@ -36,6 +37,8 @@ import polyglot.frontend.goals.Goal;
  * @author nystrom
  */
 public class MissingDependencyException extends SchedulerException {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     protected Goal goal;
     protected boolean prerequisite;
 

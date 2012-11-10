@@ -28,12 +28,15 @@ package polyglot.types;
 
 import polyglot.main.Report;
 import polyglot.util.Position;
+import polyglot.util.SerialVersionUID;
 
 /**
  * Thrown during any number of phases of the compiler during which a semantic
  * error may be detected.
  */
 public class SemanticException extends Exception {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     protected Position position;
 
     public SemanticException() {

@@ -31,6 +31,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import polyglot.util.Position;
+import polyglot.util.SerialVersionUID;
 
 /**
  * A <code>ReferenceType</code> represents a reference type --
@@ -38,6 +39,8 @@ import polyglot.util.Position;
  * Object.
  */
 public abstract class ReferenceType_c extends Type_c implements ReferenceType {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     protected ReferenceType_c() {
         super();
     }

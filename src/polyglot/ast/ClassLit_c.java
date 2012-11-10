@@ -31,6 +31,7 @@ import java.util.List;
 import polyglot.types.SemanticException;
 import polyglot.util.CodeWriter;
 import polyglot.util.Position;
+import polyglot.util.SerialVersionUID;
 import polyglot.visit.CFGBuilder;
 import polyglot.visit.NodeVisitor;
 import polyglot.visit.PrettyPrinter;
@@ -43,6 +44,8 @@ import polyglot.visit.TypeChecker;
  * and the token class. 
  */
 public class ClassLit_c extends Lit_c implements ClassLit {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     protected TypeNode typeNode;
 
     public ClassLit_c(Position pos, TypeNode typeNode) {

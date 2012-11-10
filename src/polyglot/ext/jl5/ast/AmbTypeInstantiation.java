@@ -47,12 +47,14 @@ import polyglot.types.Type;
 import polyglot.util.CodeWriter;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
+import polyglot.util.SerialVersionUID;
 import polyglot.visit.AmbiguityRemover;
 import polyglot.visit.NodeVisitor;
 import polyglot.visit.PrettyPrinter;
 
 public class AmbTypeInstantiation extends TypeNode_c implements TypeNode,
         Ambiguous {
+    private static final long serialVersionUID = SerialVersionUID.generate();
 
     private TypeNode base;
     private List<TypeNode> typeArguments;

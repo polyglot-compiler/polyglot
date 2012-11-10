@@ -28,10 +28,11 @@ package polyglot.ext.jl5.types;
 import polyglot.types.PrimitiveType_c;
 import polyglot.types.Type;
 import polyglot.types.TypeSystem;
+import polyglot.util.SerialVersionUID;
 
-@SuppressWarnings("serial")
 public class JL5PrimitiveType_c extends PrimitiveType_c implements
         JL5PrimitiveType {
+    private static final long serialVersionUID = SerialVersionUID.generate();
 
     public JL5PrimitiveType_c(TypeSystem ts, Kind kind) {
         super(ts, kind);

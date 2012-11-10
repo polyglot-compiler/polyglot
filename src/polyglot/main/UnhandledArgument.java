@@ -1,8 +1,11 @@
 package polyglot.main;
 
 import polyglot.main.OptFlag.Arg;
+import polyglot.util.SerialVersionUID;
 
 public class UnhandledArgument extends UsageError {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     final protected Arg<?> arg;
 
     public UnhandledArgument(Arg<?> arg) {

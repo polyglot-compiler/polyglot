@@ -30,6 +30,7 @@ import java.util.List;
 
 import polyglot.types.ConstructorInstance;
 import polyglot.util.Enum;
+import polyglot.util.SerialVersionUID;
 
 /**
  * A <code>ConstructorCall</code> represents a direct call to a constructor.
@@ -38,6 +39,9 @@ import polyglot.util.Enum;
 public interface ConstructorCall extends Stmt, ProcedureCall {
     /** Constructor call kind: either "super" or "this". */
     public static class Kind extends Enum {
+        private static final long serialVersionUID =
+                SerialVersionUID.generate();
+
         public Kind(String name) {
             super(name);
         }

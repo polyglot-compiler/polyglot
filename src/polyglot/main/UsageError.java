@@ -26,8 +26,12 @@
 
 package polyglot.main;
 
+import polyglot.util.SerialVersionUID;
+
 /** An exception used to indicate a command-line usage error. */
 public class UsageError extends Exception {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     protected final int exitCode;
 
     public UsageError(String s) {

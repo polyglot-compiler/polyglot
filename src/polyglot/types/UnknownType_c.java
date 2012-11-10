@@ -27,12 +27,15 @@
 package polyglot.types;
 
 import polyglot.util.InternalCompilerError;
+import polyglot.util.SerialVersionUID;
 
 /**
  * An unknown type.  This is used as a place-holder until types are
  * disambiguated.
  */
 public class UnknownType_c extends Type_c implements UnknownType {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     /** Used for deserializing types. */
     protected UnknownType_c() {
     }

@@ -35,9 +35,11 @@ import polyglot.types.SemanticException;
 import polyglot.types.Type;
 import polyglot.util.CollectionUtil;
 import polyglot.util.Position;
+import polyglot.util.SerialVersionUID;
 import polyglot.visit.TypeChecker;
 
 public class JL5Conditional_c extends Conditional_c {
+    private static final long serialVersionUID = SerialVersionUID.generate();
 
     public JL5Conditional_c(Position pos, Expr cond, Expr consequent,
             Expr alternative) {

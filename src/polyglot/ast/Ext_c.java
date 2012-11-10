@@ -28,6 +28,7 @@ package polyglot.ast;
 
 import polyglot.util.CodeWriter;
 import polyglot.util.InternalCompilerError;
+import polyglot.util.SerialVersionUID;
 import polyglot.util.StringUtil;
 
 /**
@@ -36,6 +37,8 @@ import polyglot.util.StringUtil;
  * pointer to another extension node. 
  */
 public abstract class Ext_c implements Ext {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     protected Node node;
     protected Ext ext;
 

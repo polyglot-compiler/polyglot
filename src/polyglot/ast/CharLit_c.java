@@ -29,6 +29,7 @@ package polyglot.ast;
 import polyglot.types.SemanticException;
 import polyglot.util.CodeWriter;
 import polyglot.util.Position;
+import polyglot.util.SerialVersionUID;
 import polyglot.util.StringUtil;
 import polyglot.visit.PrettyPrinter;
 import polyglot.visit.TypeChecker;
@@ -38,6 +39,8 @@ import polyglot.visit.TypeChecker;
  * <code>char</code> type.
  */
 public class CharLit_c extends NumLit_c implements CharLit {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     public CharLit_c(Position pos, char value) {
         super(pos, value);
     }

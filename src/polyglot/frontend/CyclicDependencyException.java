@@ -26,11 +26,15 @@
 
 package polyglot.frontend;
 
+import polyglot.util.SerialVersionUID;
+
 /**
  * Thrown during when the compiler tries to run a pass that is
  * already running.
  */
 public class CyclicDependencyException extends Exception {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     public CyclicDependencyException() {
         super();
     }

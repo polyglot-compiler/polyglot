@@ -37,9 +37,11 @@ import polyglot.ext.jl5.types.JL5TypeSystem;
 import polyglot.types.SemanticException;
 import polyglot.types.Type;
 import polyglot.util.Position;
+import polyglot.util.SerialVersionUID;
 import polyglot.visit.TypeChecker;
 
 public class JL5Switch_c extends Switch_c implements JL5Switch {
+    private static final long serialVersionUID = SerialVersionUID.generate();
 
     public JL5Switch_c(Position pos, Expr expr, List<SwitchElement> elements) {
         super(pos, expr, elements);

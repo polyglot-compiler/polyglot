@@ -28,6 +28,7 @@ package polyglot.ast;
 
 import polyglot.util.CodeWriter;
 import polyglot.util.Position;
+import polyglot.util.SerialVersionUID;
 import polyglot.visit.PrettyPrinter;
 import polyglot.visit.TypeChecker;
 
@@ -35,6 +36,8 @@ import polyglot.visit.TypeChecker;
  * The Java literal <code>null</code>.
  */
 public class NullLit_c extends Lit_c implements NullLit {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     public NullLit_c(Position pos) {
         super(pos);
     }

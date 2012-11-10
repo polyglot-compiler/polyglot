@@ -32,6 +32,7 @@ import polyglot.types.Context;
 import polyglot.util.CodeWriter;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
+import polyglot.util.SerialVersionUID;
 import polyglot.visit.CFGBuilder;
 import polyglot.visit.NodeVisitor;
 import polyglot.visit.PrettyPrinter;
@@ -41,6 +42,8 @@ import polyglot.visit.PrettyPrinter;
  * a class declaration.
  */
 public class LocalClassDecl_c extends Stmt_c implements LocalClassDecl {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     protected ClassDecl decl;
 
     public LocalClassDecl_c(Position pos, ClassDecl decl) {

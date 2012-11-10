@@ -27,6 +27,7 @@
 package polyglot.types;
 
 import polyglot.util.Position;
+import polyglot.util.SerialVersionUID;
 
 /**
  * A <code>InitializerInstance</code> contains the type information for a
@@ -34,6 +35,8 @@ import polyglot.util.Position;
  */
 public class InitializerInstance_c extends TypeObject_c implements
         InitializerInstance {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     protected ClassType container;
     protected Flags flags;
 

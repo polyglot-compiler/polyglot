@@ -28,6 +28,7 @@ package polyglot.types;
 
 import polyglot.frontend.Job;
 import polyglot.util.Position;
+import polyglot.util.SerialVersionUID;
 
 /**
  * Comment for <code>SourceLoadException</code>
@@ -35,6 +36,8 @@ import polyglot.util.Position;
  * @author nystrom
  */
 public class SourceLoadException extends NoClassException {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     protected Job job;
 
     /**

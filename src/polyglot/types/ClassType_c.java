@@ -34,12 +34,15 @@ import polyglot.main.Options;
 import polyglot.util.CodeWriter;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
+import polyglot.util.SerialVersionUID;
 
 /**
  * A <code>ClassType</code> represents a class -- either loaded from a
  * classpath, parsed from a source file, or obtained from other source.
  */
 public abstract class ClassType_c extends ReferenceType_c implements ClassType {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     /** Used for deserializing types. */
     protected ClassType_c() {
     }

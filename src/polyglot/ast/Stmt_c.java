@@ -27,12 +27,15 @@
 package polyglot.ast;
 
 import polyglot.util.Position;
+import polyglot.util.SerialVersionUID;
 
 /**
  * A <code>Stmt</code> represents any Java statement.  All statements must
  * be subtypes of Stmt.
  */
 public abstract class Stmt_c extends Term_c implements Stmt {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     public Stmt_c(Position pos) {
         super(pos);
     }

@@ -33,6 +33,7 @@ import polyglot.types.Type;
 import polyglot.types.TypeSystem;
 import polyglot.util.CodeWriter;
 import polyglot.util.Position;
+import polyglot.util.SerialVersionUID;
 import polyglot.visit.AscriptionVisitor;
 import polyglot.visit.CFGBuilder;
 import polyglot.visit.FlowGraph;
@@ -46,6 +47,8 @@ import polyglot.visit.TypeChecker;
  * (consequent), and optionally an ``else'' statement (alternate).
  */
 public class If_c extends Stmt_c implements If {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     protected Expr cond;
     protected Stmt consequent;
     protected Stmt alternative;

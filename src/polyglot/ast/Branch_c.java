@@ -31,6 +31,7 @@ import java.util.List;
 
 import polyglot.util.CodeWriter;
 import polyglot.util.Position;
+import polyglot.util.SerialVersionUID;
 import polyglot.visit.CFGBuilder;
 import polyglot.visit.NodeVisitor;
 import polyglot.visit.PrettyPrinter;
@@ -40,6 +41,8 @@ import polyglot.visit.PrettyPrinter;
  * statment in Java (a break or continue).
  */
 public class Branch_c extends Stmt_c implements Branch {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     protected Branch.Kind kind;
     protected Id label;
 

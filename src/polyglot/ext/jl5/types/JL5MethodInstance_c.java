@@ -43,10 +43,12 @@ import polyglot.types.ReferenceType;
 import polyglot.types.SemanticException;
 import polyglot.types.Type;
 import polyglot.util.Position;
+import polyglot.util.SerialVersionUID;
 
-@SuppressWarnings("serial")
 public class JL5MethodInstance_c extends MethodInstance_c implements
         JL5MethodInstance {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     private List<TypeVariable> typeParams;
     private RetainedAnnotations retainedAnnotations;
 

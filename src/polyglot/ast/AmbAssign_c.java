@@ -28,6 +28,7 @@ package polyglot.ast;
 
 import polyglot.types.SemanticException;
 import polyglot.util.Position;
+import polyglot.util.SerialVersionUID;
 import polyglot.visit.AmbiguityRemover;
 import polyglot.visit.CFGBuilder;
 import polyglot.visit.TypeChecker;
@@ -37,6 +38,8 @@ import polyglot.visit.TypeChecker;
  * an as yet unknown expression.
  */
 public class AmbAssign_c extends Assign_c implements AmbAssign {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     public AmbAssign_c(Position pos, Expr left, Operator op, Expr right) {
         super(pos, left, op, right);
     }

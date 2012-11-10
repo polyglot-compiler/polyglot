@@ -52,10 +52,12 @@ import polyglot.types.Type;
 import polyglot.types.TypeSystem;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
+import polyglot.util.SerialVersionUID;
 import polyglot.visit.NodeVisitor;
 import polyglot.visit.TypeChecker;
 
 public class JL5EnumDecl_c extends JL5ClassDecl_c implements JL5EnumDecl {
+    private static final long serialVersionUID = SerialVersionUID.generate();
 
     public JL5EnumDecl_c(Position pos, Flags flags,
             List<AnnotationElem> annotations, Id name, TypeNode superClass,

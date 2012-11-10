@@ -67,6 +67,7 @@ public class ImportTable implements Resolver {
     /** Our package */
     protected Package pkg;
 
+    @SuppressWarnings("serial")
     protected static final Named NOT_FOUND = new Named() {
         @Override
         public boolean isCanonical() {

@@ -33,6 +33,7 @@ import polyglot.types.Type;
 import polyglot.types.TypeSystem;
 import polyglot.util.CodeWriter;
 import polyglot.util.Position;
+import polyglot.util.SerialVersionUID;
 import polyglot.visit.AscriptionVisitor;
 import polyglot.visit.CFGBuilder;
 import polyglot.visit.FlowGraph;
@@ -45,6 +46,8 @@ import polyglot.visit.TypeChecker;
  * expression.  That is, <code>(cond ? consequent : alternative)</code>.
  */
 public class Conditional_c extends Expr_c implements Conditional {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     protected Expr cond;
     protected Expr consequent;
     protected Expr alternative;

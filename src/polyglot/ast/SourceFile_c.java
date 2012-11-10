@@ -41,6 +41,7 @@ import polyglot.util.CodeWriter;
 import polyglot.util.CollectionUtil;
 import polyglot.util.ListUtil;
 import polyglot.util.Position;
+import polyglot.util.SerialVersionUID;
 import polyglot.visit.AmbiguityRemover;
 import polyglot.visit.NodeVisitor;
 import polyglot.visit.PrettyPrinter;
@@ -53,6 +54,8 @@ import polyglot.visit.TypeChecker;
  * <code>Import</code>s, and a list of <code>GlobalDecl</code>s.
  */
 public class SourceFile_c extends Node_c implements SourceFile {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     protected PackageNode package_;
     protected List<Import> imports;
     protected List<TopLevelDecl> decls;

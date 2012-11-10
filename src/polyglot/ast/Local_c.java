@@ -36,6 +36,7 @@ import polyglot.types.TypeSystem;
 import polyglot.types.VarInstance;
 import polyglot.util.CodeWriter;
 import polyglot.util.Position;
+import polyglot.util.SerialVersionUID;
 import polyglot.visit.CFGBuilder;
 import polyglot.visit.NodeVisitor;
 import polyglot.visit.PrettyPrinter;
@@ -46,6 +47,8 @@ import polyglot.visit.TypeChecker;
  * A local variable expression.
  */
 public class Local_c extends Expr_c implements Local {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     protected Id name;
     protected LocalInstance li;
 

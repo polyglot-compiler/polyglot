@@ -48,12 +48,14 @@ import polyglot.util.CodeWriter;
 import polyglot.util.CollectionUtil;
 import polyglot.util.ListUtil;
 import polyglot.util.Position;
+import polyglot.util.SerialVersionUID;
 import polyglot.visit.CFGBuilder;
 import polyglot.visit.NodeVisitor;
 import polyglot.visit.PrettyPrinter;
 import polyglot.visit.TypeChecker;
 
 public class AnnotationElem_c extends Expr_c implements AnnotationElem {
+    private static final long serialVersionUID = SerialVersionUID.generate();
 
     protected TypeNode typeName;
     protected List<ElementValuePair> elements;

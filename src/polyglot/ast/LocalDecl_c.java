@@ -40,6 +40,7 @@ import polyglot.types.TypeSystem;
 import polyglot.types.VarInstance;
 import polyglot.util.CodeWriter;
 import polyglot.util.Position;
+import polyglot.util.SerialVersionUID;
 import polyglot.visit.AmbiguityRemover;
 import polyglot.visit.AscriptionVisitor;
 import polyglot.visit.CFGBuilder;
@@ -54,6 +55,8 @@ import polyglot.visit.TypeChecker;
  * of a local variable.
  */
 public class LocalDecl_c extends Stmt_c implements LocalDecl {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     protected Flags flags;
     protected TypeNode type;
     protected Id name;

@@ -30,6 +30,7 @@ import polyglot.types.SemanticException;
 import polyglot.types.Type;
 import polyglot.util.CodeWriter;
 import polyglot.util.Position;
+import polyglot.util.SerialVersionUID;
 import polyglot.visit.PrettyPrinter;
 import polyglot.visit.TypeBuilder;
 
@@ -38,6 +39,8 @@ import polyglot.visit.TypeBuilder;
  * must be subtypes of Expr.
  */
 public abstract class Expr_c extends Term_c implements Expr {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     protected Type type;
 
     public Expr_c(Position pos) {

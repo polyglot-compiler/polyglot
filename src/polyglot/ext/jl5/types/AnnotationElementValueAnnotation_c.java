@@ -30,9 +30,12 @@ import java.util.Map;
 import polyglot.types.Type;
 import polyglot.types.TypeObject_c;
 import polyglot.util.Position;
+import polyglot.util.SerialVersionUID;
 
 public class AnnotationElementValueAnnotation_c extends TypeObject_c implements
         AnnotationElementValueAnnotation {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     private Type annotationType;
     private Map<java.lang.String, AnnotationElementValue> annotationElementValues;
 

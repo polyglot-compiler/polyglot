@@ -34,6 +34,7 @@ import polyglot.types.SemanticException;
 import polyglot.util.CodeWriter;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
+import polyglot.util.SerialVersionUID;
 import polyglot.util.StringUtil;
 import polyglot.visit.PrettyPrinter;
 import polyglot.visit.TypeChecker;
@@ -43,6 +44,8 @@ import polyglot.visit.TypeChecker;
  * <code>String</code> which corresponds to a literal string in Java code.
  */
 public class StringLit_c extends Lit_c implements StringLit {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     protected String value;
 
     public StringLit_c(Position pos, String value) {

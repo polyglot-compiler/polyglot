@@ -40,6 +40,7 @@ import polyglot.util.CodeWriter;
 import polyglot.util.CollectionUtil;
 import polyglot.util.ListUtil;
 import polyglot.util.Position;
+import polyglot.util.SerialVersionUID;
 import polyglot.visit.AmbiguityRemover;
 import polyglot.visit.CFGBuilder;
 import polyglot.visit.ExceptionChecker;
@@ -52,6 +53,8 @@ import polyglot.visit.TypeChecker;
  * declaration or the body of an anonymous class.
  */
 public class ClassBody_c extends Term_c implements ClassBody {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     protected List<ClassMember> members;
 
     public ClassBody_c(Position pos, List<ClassMember> members) {

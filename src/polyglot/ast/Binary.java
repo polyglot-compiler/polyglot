@@ -27,6 +27,7 @@
 package polyglot.ast;
 
 import polyglot.util.Enum;
+import polyglot.util.SerialVersionUID;
 
 /**
  * A <code>Binary</code> represents a Java binary expression, an
@@ -35,6 +36,9 @@ import polyglot.util.Enum;
 public interface Binary extends Expr {
     /** Binary expression operator. */
     public static class Operator extends Enum {
+        private static final long serialVersionUID =
+                SerialVersionUID.generate();
+
         protected Precedence prec;
 
         public Operator(String name, Precedence prec) {

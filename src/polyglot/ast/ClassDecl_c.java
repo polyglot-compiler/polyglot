@@ -50,6 +50,7 @@ import polyglot.util.CollectionUtil;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.ListUtil;
 import polyglot.util.Position;
+import polyglot.util.SerialVersionUID;
 import polyglot.visit.AmbiguityRemover;
 import polyglot.visit.CFGBuilder;
 import polyglot.visit.NodeVisitor;
@@ -63,6 +64,8 @@ import polyglot.visit.TypeChecker;
  * named class, or an anonymous class.
  */
 public class ClassDecl_c extends Term_c implements ClassDecl {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     protected Flags flags;
     protected Id name;
     protected TypeNode superClass;

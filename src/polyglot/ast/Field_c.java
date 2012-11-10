@@ -39,6 +39,7 @@ import polyglot.types.VarInstance;
 import polyglot.util.CodeWriter;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
+import polyglot.util.SerialVersionUID;
 import polyglot.visit.AscriptionVisitor;
 import polyglot.visit.CFGBuilder;
 import polyglot.visit.ConstantChecker;
@@ -54,6 +55,8 @@ import polyglot.visit.TypeChecker;
  * accessed.
  */
 public class Field_c extends Expr_c implements Field {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     protected Receiver target;
     protected Id name;
     protected FieldInstance fi;

@@ -29,6 +29,7 @@ package polyglot.types;
 import java.util.List;
 
 import polyglot.util.Enum;
+import polyglot.util.SerialVersionUID;
 
 /**
  * A <code>ClassType</code> represents a class, either loaded from a
@@ -38,6 +39,9 @@ import polyglot.util.Enum;
 public interface ClassType extends Importable, ReferenceType, MemberInstance,
         Declaration {
     public static class Kind extends Enum {
+        private static final long serialVersionUID =
+                SerialVersionUID.generate();
+
         public Kind(String name) {
             super(name);
         }

@@ -28,9 +28,12 @@ package polyglot.ext.jl5.types;
 import polyglot.types.Type;
 import polyglot.types.TypeObject_c;
 import polyglot.util.Position;
+import polyglot.util.SerialVersionUID;
 
 public class AnnotationElementValueConstant_c extends TypeObject_c implements
         AnnotationElementValueConstant {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     private Type type;
     private Object constVal;
 

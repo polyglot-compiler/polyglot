@@ -31,6 +31,7 @@ import polyglot.types.TypeSystem;
 import polyglot.util.CodeWriter;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
+import polyglot.util.SerialVersionUID;
 import polyglot.visit.PrettyPrinter;
 import polyglot.visit.TypeChecker;
 
@@ -39,6 +40,8 @@ import polyglot.visit.TypeChecker;
  * type.
  */
 public class IntLit_c extends NumLit_c implements IntLit {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     /** The kind of literal: INT or LONG. */
     protected Kind kind;
 

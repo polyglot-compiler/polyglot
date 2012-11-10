@@ -44,12 +44,14 @@ import polyglot.types.Type;
 import polyglot.types.TypeSystem;
 import polyglot.util.CollectionUtil;
 import polyglot.util.Position;
+import polyglot.util.SerialVersionUID;
 import polyglot.visit.AscriptionVisitor;
 import polyglot.visit.NodeVisitor;
 import polyglot.visit.TypeChecker;
 
 public class JL5LocalDecl_c extends LocalDecl_c implements LocalDecl,
         AnnotatedElement {
+    private static final long serialVersionUID = SerialVersionUID.generate();
 
     protected List<AnnotationElem> annotations;
 

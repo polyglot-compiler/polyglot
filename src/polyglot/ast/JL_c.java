@@ -36,6 +36,7 @@ import polyglot.types.SemanticException;
 import polyglot.types.Type;
 import polyglot.types.TypeSystem;
 import polyglot.util.CodeWriter;
+import polyglot.util.SerialVersionUID;
 import polyglot.visit.AmbiguityRemover;
 import polyglot.visit.ConstantChecker;
 import polyglot.visit.ExceptionChecker;
@@ -54,6 +55,8 @@ import polyglot.visit.TypeChecker;
  * the <code>JL</code> interface.
  */
 public class JL_c extends Ext_c implements JL {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     public JL_c() {
     }
 

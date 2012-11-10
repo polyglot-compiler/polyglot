@@ -46,6 +46,7 @@ import polyglot.util.CollectionUtil;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.ListUtil;
 import polyglot.util.Position;
+import polyglot.util.SerialVersionUID;
 import polyglot.visit.AscriptionVisitor;
 import polyglot.visit.CFGBuilder;
 import polyglot.visit.ExceptionChecker;
@@ -61,6 +62,8 @@ import polyglot.visit.TypeChecker;
  * called or an expression upon which the method is being called.
  */
 public class Call_c extends Expr_c implements Call {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     protected Receiver target;
     protected Id name;
     protected List<Expr> arguments;

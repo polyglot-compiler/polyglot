@@ -43,9 +43,11 @@ import polyglot.types.ReferenceType;
 import polyglot.types.SemanticException;
 import polyglot.types.Type;
 import polyglot.util.Position;
+import polyglot.util.SerialVersionUID;
 import polyglot.visit.TypeChecker;
 
 public class JL5CanonicalTypeNode_c extends polyglot.ast.CanonicalTypeNode_c {
+    private static final long serialVersionUID = SerialVersionUID.generate();
 
     public JL5CanonicalTypeNode_c(Position pos, Type type) {
         super(pos, makeRawIfNeeded(type, pos));

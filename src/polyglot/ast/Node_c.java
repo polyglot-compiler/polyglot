@@ -41,6 +41,7 @@ import polyglot.types.TypeSystem;
 import polyglot.util.CodeWriter;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
+import polyglot.util.SerialVersionUID;
 import polyglot.util.StringUtil;
 import polyglot.visit.AmbiguityRemover;
 import polyglot.visit.AscriptionVisitor;
@@ -60,6 +61,8 @@ import polyglot.visit.TypeChecker;
  * return the copy.
  */
 public abstract class Node_c implements Node {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     protected Position position;
     protected JL del;
     protected Ext ext;

@@ -27,6 +27,7 @@
 package polyglot.ast;
 
 import polyglot.util.Enum;
+import polyglot.util.SerialVersionUID;
 
 /** 
  * A <code>FloatLit</code> represents a literal in java of type
@@ -35,6 +36,9 @@ import polyglot.util.Enum;
 public interface FloatLit extends Lit {
     /** Integer literal kinds: float (e.g., 0.0F) or double (e.g., 0.0). */
     public static class Kind extends Enum {
+        private static final long serialVersionUID =
+                SerialVersionUID.generate();
+
         public Kind(String name) {
             super(name);
         }

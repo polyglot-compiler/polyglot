@@ -27,6 +27,7 @@
 package polyglot.ast;
 
 import polyglot.util.Enum;
+import polyglot.util.SerialVersionUID;
 
 /**
  * A <code>Special</code> is an immutable representation of a
@@ -37,6 +38,9 @@ import polyglot.util.Enum;
 public interface Special extends Expr {
     /** Special expression kind: either "super" or "this". */
     public static class Kind extends Enum {
+        private static final long serialVersionUID =
+                SerialVersionUID.generate();
+
         public Kind(String name) {
             super(name);
         }

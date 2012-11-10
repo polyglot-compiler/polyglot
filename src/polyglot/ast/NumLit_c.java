@@ -28,11 +28,14 @@ package polyglot.ast;
 
 import polyglot.util.CodeWriter;
 import polyglot.util.Position;
+import polyglot.util.SerialVersionUID;
 
 /**
  * An integer literal: longs, ints, shorts, bytes, and chars.
  */
 public abstract class NumLit_c extends Lit_c implements NumLit {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     protected long value;
 
     public NumLit_c(Position pos, long value) {

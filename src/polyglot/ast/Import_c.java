@@ -32,6 +32,7 @@ import polyglot.types.SemanticException;
 import polyglot.types.Type;
 import polyglot.util.CodeWriter;
 import polyglot.util.Position;
+import polyglot.util.SerialVersionUID;
 import polyglot.util.StringUtil;
 import polyglot.visit.PrettyPrinter;
 import polyglot.visit.TypeChecker;
@@ -43,6 +44,8 @@ import polyglot.visit.TypeChecker;
  * is being imported, or that an entire package is being imported.
  */
 public class Import_c extends Node_c implements Import {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     protected Kind kind;
     protected String name;
 

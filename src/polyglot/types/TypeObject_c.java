@@ -32,6 +32,7 @@ import java.io.ObjectOutputStream;
 
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
+import polyglot.util.SerialVersionUID;
 import polyglot.util.TypeInputStream;
 
 /**
@@ -39,6 +40,8 @@ import polyglot.util.TypeInputStream;
  * type system and to the object's position in the code.
  */
 public abstract class TypeObject_c implements TypeObject {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     protected transient TypeSystem ts;
     protected Position position;
 
@@ -76,12 +79,24 @@ public abstract class TypeObject_c implements TypeObject {
         return position;
     }
 
+    @SuppressWarnings("unused")
+    private static final long writeObjectVersionUID = 1L;
+
     private void writeObject(ObjectOutputStream out) throws IOException {
+        // If you update this method in an incompatible way, increment
+        // writeObjectVersionUID.
+
         out.defaultWriteObject();
     }
 
+    @SuppressWarnings("unused")
+    private static final long readObjectVersionUID = 1L;
+
     private void readObject(ObjectInputStream in) throws IOException,
             ClassNotFoundException {
+        // If you update this method in an incompatible way, increment
+        // readObjectVersionUID.
+
         if (in instanceof TypeInputStream) {
             ts = ((TypeInputStream) in).getTypeSystem();
         }
