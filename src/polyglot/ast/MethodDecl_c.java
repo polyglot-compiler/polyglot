@@ -164,7 +164,7 @@ public class MethodDecl_c extends Term_c implements MethodDecl {
     @Override
     public List<TypeNode> throwTypes() {
         if (this.throwTypes == null) {
-            return Collections.EMPTY_LIST;
+            return Collections.emptyList();
         }
         return Collections.unmodifiableList(this.throwTypes);
     }

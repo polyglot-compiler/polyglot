@@ -31,6 +31,7 @@ import polyglot.ast.MethodDecl;
 import polyglot.ast.Node;
 import polyglot.ast.NodeFactory;
 import polyglot.ext.jl5.ast.AnnotatedElement;
+import polyglot.ext.jl5.ast.AnnotationElem;
 import polyglot.ext.jl5.ast.AnnotationElemDecl;
 import polyglot.ext.jl5.ast.JL5ClassDecl;
 import polyglot.ext.jl5.types.JL5Flags;
@@ -56,7 +57,7 @@ public class RemoveAnnotations extends ContextVisitor {
             JL5ClassDecl cd = (JL5ClassDecl) n;
             cd = (JL5ClassDecl) cd.flags(JL5Flags.clearAnnotation(cd.flags()));
             cd.type().flags(JL5Flags.clearAnnotation(cd.type().flags()));
-            cd = (JL5ClassDecl) cd.annotationElems(Collections.EMPTY_LIST);
+            cd = (JL5ClassDecl) cd.annotationElems(Collections.<AnnotationElem> emptyList());
             return cd;
         }
         if (n instanceof AnnotationElemDecl) {
@@ -64,7 +65,7 @@ public class RemoveAnnotations extends ContextVisitor {
         }
         if (n instanceof AnnotatedElement) {
             // remove the annotations
-            return (Node) ((AnnotatedElement) n).annotationElems(Collections.EMPTY_LIST);
+            return (Node) ((AnnotatedElement) n).annotationElems(Collections.<AnnotationElem> emptyList());
         }
         return n;
     }
