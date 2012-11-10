@@ -379,12 +379,18 @@ public class Subst_c<Formal extends Param, Actual extends TypeObject>
         return str + "]";
     }
 
+    @SuppressWarnings("unused")
+    private static final long writeObjectVersionUID = 1L;
+
     private void writeObject(java.io.ObjectOutputStream out) throws IOException {
         // If you update this method in an incompatible way, increment
         // writeObjectVersionUID.
 
         out.defaultWriteObject();
     }
+
+    @SuppressWarnings("unused")
+    private static final long readObjectVersionUID = 1L;
 
     private void readObject(java.io.ObjectInputStream in) throws IOException,
             ClassNotFoundException {
