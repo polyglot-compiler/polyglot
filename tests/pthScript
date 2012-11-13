@@ -26,6 +26,7 @@
 #                       compiler; is always enclosed in quotes.
 
 polyglot.frontend.JLExtensionInfo "-cp ." {
+        AnonymousClass.jl ;
         ArrayInit.jl ;
 #        Array01.jl ;
         BoolTest.jl ;
