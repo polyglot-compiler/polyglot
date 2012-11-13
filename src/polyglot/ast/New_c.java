@@ -78,12 +78,14 @@ public class New_c extends Expr_c implements New {
     protected ClassBody body;
     protected ConstructorInstance ci;
     protected ParsedClassType anonType;
+    protected boolean qualifierImplicit;
 
     public New_c(Position pos, Expr qualifier, TypeNode tn,
             List<Expr> arguments, ClassBody body) {
         super(pos);
         assert (tn != null && arguments != null); // qualifier and body may be null
         this.qualifier = qualifier;
+        this.qualifierImplicit = (qualifier == null);
         this.tn = tn;
         this.arguments = ListUtil.copy(arguments, true);
         this.body = body;
@@ -100,6 +102,18 @@ public class New_c extends Expr_c implements New {
     public New qualifier(Expr qualifier) {
         New_c n = (New_c) copy();
         n.qualifier = qualifier;
+        return n;
+    }
+
+    @Override
+    public boolean isQualifierImplicit() {
+        return this.qualifierImplicit;
+    }
+
+    @Override
+    public New qualifierImplicit(boolean implicit) {
+        New_c n = (New_c) copy();
+        n.qualifierImplicit = implicit;
         return n;
     }
 
@@ -301,6 +315,7 @@ public class New_c extends Expr_c implements New {
                     nn =
                             nn.qualifier((Expr) nn.visitChild(nn.qualifier(),
                                                               childbd));
+                    nn = nn.qualifierImplicit(true);
                     if (childbd.hasErrors()) throw new SemanticException();
                 }
             }
@@ -434,9 +449,13 @@ public class New_c extends Expr_c implements New {
                     nf.This(position().startOf(),
                             nf.CanonicalTypeNode(position(), outer));
         }
-
         q = q.type(outer);
-        return qualifier(q);
+        New n = qualifier(q);
+        if (this.qualifier == null) {
+            // we set a qualifier when there wasn't one already
+            n = n.qualifierImplicit(true);
+        }
+        return n;
     }
 
     @Override
@@ -651,8 +670,8 @@ public class New_c extends Expr_c implements New {
     }
 
     protected void printQualifier(CodeWriter w, PrettyPrinter tr) {
-        if (qualifier != null) {
-            print(qualifier, w, tr);
+        if (this.qualifier != null && !this.qualifierImplicit) {
+            print(this.qualifier, w, tr);
             w.write(".");
         }
     }

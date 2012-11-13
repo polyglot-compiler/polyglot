@@ -26,9 +26,10 @@
 
 package polyglot.ast;
 
+import java.util.List;
+
 import polyglot.types.ConstructorInstance;
 import polyglot.types.ParsedClassType;
-import java.util.List;
 
 /**
  * A <code>New</code> is an immutable representation of the use of the
@@ -82,4 +83,12 @@ public interface New extends Expr, ProcedureCall {
 
     /** Set the class body for anonymous classes. */
     New body(ClassBody b);
+
+    /** Is the qualifier implicit? */
+    boolean isQualifierImplicit();
+
+    /** 
+     * Set whether the qualifier of this New is implicit.
+     */
+    New qualifierImplicit(boolean implicit);
 }

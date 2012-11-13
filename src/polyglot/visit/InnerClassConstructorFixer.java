@@ -72,6 +72,7 @@ public class InnerClassConstructorFixer extends InnerClassAbstractRemover {
             // FIXME: should rewrite "new" after the barrier.
             // or should pass in all enclosing classes
             newExp = newExp.qualifier(null);
+            newExp = newExp.qualifierImplicit(true);
 
             n = newExp;
         }

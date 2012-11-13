@@ -170,6 +170,8 @@ public class InnerClassRemover extends ContextVisitor {
 
             if (q != null) {
                 neu = neu.qualifier(null);
+                neu = neu.qualifierImplicit(true);
+
                 ConstructorInstance ci = neu.constructorInstance();
                 // Fix the ci if a copy; otherwise, let the ci be modified at the declaration node.
                 if (ci != ci.declaration()) {

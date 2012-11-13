@@ -125,6 +125,7 @@ public class LocalClassRemover extends ContextVisitor {
                                                              theLocalClass.outer()))
                                   .type(theLocalClass.outer());
                         neu = neu.qualifier(q);
+                        neu = neu.qualifierImplicit(false);
                     }
                 }
                 return neu;
@@ -360,6 +361,7 @@ public class LocalClassRemover extends ContextVisitor {
 
             if (!flags.isStatic()) {
                 neu = neu.qualifier(nf.This(pos).type(context.currentClass()));
+                neu = neu.qualifierImplicit(false);
             }
 
             cd =
