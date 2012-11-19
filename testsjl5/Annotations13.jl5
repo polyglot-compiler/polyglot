@@ -1,0 +1,10 @@
+/* Check that the casting from single elements to arrays works correctly.
+ */
+import java.lang.annotation.*;
+
+@interface MethodOnly { String value(); }
+
+class C {
+    @MethodOnly(42) // bad, wrong type.
+    void m() { };
+}

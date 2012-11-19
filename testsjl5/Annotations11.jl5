@@ -1,0 +1,18 @@
+/* Check that the casting from single elements to arrays works correctly.
+ */
+import java.lang.annotation.*;
+
+@interface Name {
+        String first();
+        String last();
+    }
+/**
+* Indicates the author of the annotated program element. */
+@interface Author {
+  Name value();
+}
+
+class C {
+  @Author(17)
+    void m() { };
+}
