@@ -838,7 +838,7 @@ override cast_expression ::=
 			unary_expression_not_plus_minus:i
         {: AmbTypeNode bb = (AmbTypeNode)f;
            TypeNode tn = parser.nf.AmbTypeInstantiation(parser.pos(b, d), parser.exprToType(b.toExpr()),d);
-           RESULT = parser.nf.Cast(parser.pos(a, i, b), parser.array(parser.nf.AmbTypeNode(parser.pos(b, f), tn, bb.name()), g.intValue()), i); :}
+           RESULT = parser.nf.Cast(parser.pos(a, i, b), parser.array(parser.nf.AmbTypeNode(parser.pos(b, f), tn, bb.id()), g.intValue()), i); :}
 	;
 override relational_expression ::=
 		shift_expression:a
