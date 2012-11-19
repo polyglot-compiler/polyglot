@@ -39,7 +39,8 @@ javac "-d java-out -cp ." {
 	java-src/Call02D.java;
 }
  
-polyglot.ext.jl5.ExtensionInfo "-d out -classpath java-out -noserial -post \"javac -source 1.5\" -morepermissiveinference" {
+polyglot.ext.jl5.ExtensionInfo "-d out -classpath java-out -assert -noserial -post \"javac -source 1.5\" -morepermissiveinference" {
+        Assert01.jl5;
         HexFloatingPoint.jl5;
         Generics01.jl5;
         Generics02.jl5;
@@ -335,7 +336,8 @@ polyglot.ext.jl5.ExtensionInfo "-d out -classpath java-out -noserial -post \"jav
 
 # Now run the tests again removing the Java 5-isms.
 # This one uses 1.4 to suppress the warning about raw classes.
-polyglot.ext.jl5.ExtensionInfo "-d out -classpath java-out -removeJava5isms -enumImplClass MyEnum -noserial -post \"javac -source 1.4\" -morepermissiveinference" {
+polyglot.ext.jl5.ExtensionInfo "-d out -classpath java-out -removeJava5isms -enumImplClass MyEnum -assert -noserial -post \"javac -source 1.4\" -morepermissiveinference" {
+        Assert01.jl5;
         HexFloatingPoint.jl5;
         Generics01.jl5;
         Generics02.jl5;

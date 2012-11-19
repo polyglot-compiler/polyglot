@@ -1,0 +1,8 @@
+class C {
+  void m() {
+    Boolean b = true;
+    assert(5 > 4);
+    assert (b);
+    assert !b : "Error message";
+  }
+}
