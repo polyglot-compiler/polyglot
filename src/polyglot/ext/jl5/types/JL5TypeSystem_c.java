@@ -220,6 +220,8 @@ public class JL5TypeSystem_c extends
                 return this.Float();
             if (l.equals(this.typeForName("java.lang.Double")))
                 return this.Double();
+            if (l.equals(this.typeForName("java.lang.Void")))
+                return this.Void();
         }
         catch (SemanticException e) {
             throw new InternalCompilerError("Couldn't find wrapper class");
