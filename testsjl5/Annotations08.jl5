@@ -1,0 +1,15 @@
+/* Check that the casting from single elements to arrays works correctly.
+ */
+import java.lang.annotation.*;
+
+@Target({ElementType.METHOD})
+@interface MethodOnly { int[] value(); }
+
+@Target(ElementType.METHOD)
+@interface MethodOnlyTwo { int[] value(); }
+
+class C {
+    @MethodOnly(6) // OK, appropriate target
+	@MethodOnlyTwo({7}) // OK, appropriate target
+	void m() { };
+}
