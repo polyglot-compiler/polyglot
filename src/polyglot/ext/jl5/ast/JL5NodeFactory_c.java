@@ -30,6 +30,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import polyglot.ast.ArrayInit;
+import polyglot.ast.Assert;
 import polyglot.ast.Binary;
 import polyglot.ast.Block;
 import polyglot.ast.Call;
@@ -121,6 +122,14 @@ public class JL5NodeFactory_c extends NodeFactory_c implements JL5NodeFactory {
         n = (JL5EnumDecl) n.del(delFactory().delEnumDecl());
         return n;
 
+    }
+
+    @Override
+    public Assert Assert(Position pos, Expr cond, Expr errorMessage) {
+        Assert n = new JL5Assert_c(pos, cond, errorMessage);
+        n = (Assert) n.ext(extFactory().extAssert());
+        n = (Assert) n.del(delFactory().delAssert());
+        return n;
     }
 
     @Override

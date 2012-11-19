@@ -55,6 +55,11 @@ public class ToExtFactory_c extends AbstractExtFactory_c {
     }
 
     @Override
+    public final Ext extAssertImpl() {
+        return new AssertToExt_c();
+    }
+
+    @Override
     protected Ext extLocalAssignImpl() {
         return new LocalAssignToExt_c();
     }
