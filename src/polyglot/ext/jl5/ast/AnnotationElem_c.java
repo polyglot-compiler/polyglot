@@ -196,8 +196,6 @@ public class AnnotationElem_c extends Expr_c implements AnnotationElem {
         Map<String, AnnotationElementValue> m =
                 new LinkedHashMap<String, AnnotationElementValue>();
         for (ElementValuePair p : this.elements()) {
-            AnnotationElementValue v = toAnnotationElementValue(p.value(), ts);
-
             List<? extends MethodInstance> methods =
                     this.type().toClass().methodsNamed(p.name());
             if (methods.size() != 1) {
@@ -206,6 +204,10 @@ public class AnnotationElem_c extends Expr_c implements AnnotationElem {
             }
             MethodInstance mi = methods.get(0);
             Type intendedType = mi.returnType();
+
+            AnnotationElementValue v =
+                    toAnnotationElementValue(p.value(), intendedType, ts);
+
             if (intendedType.isArray()
                     && !(v instanceof AnnotationElementValueArray)) {
                 // it's actually meant to be an array type, but a singleton was entered
@@ -220,17 +222,36 @@ public class AnnotationElem_c extends Expr_c implements AnnotationElem {
     }
 
     private AnnotationElementValue toAnnotationElementValue(Expr value,
-            JL5TypeSystem ts) throws SemanticException {
+            Type intendedType, JL5TypeSystem ts) throws SemanticException {
+        Type intendedBaseType;
+        if (intendedType.isArray()) {
+            intendedBaseType = intendedType.toArray().base();
+        }
+        else {
+            intendedBaseType = intendedType;
+        }
+
         if (value instanceof ArrayInit) {
+            if (!intendedType.isArray()) {
+                throw new SemanticException("Array given when expected type is "
+                                                    + intendedType.toString(),
+                                            value.position());
+            }
             ArrayInit init = (ArrayInit) value;
             List<AnnotationElementValue> vals =
                     new ArrayList<AnnotationElementValue>();
             for (Expr v : init.elements()) {
-                vals.add(toAnnotationElementValue(v, ts));
+                vals.add(toAnnotationElementValue(v, intendedBaseType, ts));
             }
             return ts.AnnotationElementValueArray(value.position(), vals);
         }
         if (value instanceof AnnotationElem) {
+            // Check against intended type.
+            if (value.type().isCanonical()
+                    && !ts.isImplicitCastValid(value.type(), intendedBaseType)) {
+                throw new SemanticException("Expected a value of type "
+                        + intendedBaseType, value.position());
+            }
             AnnotationElem ae = (AnnotationElem) value;
             return ts.AnnotationElementValueAnnotation(value.position(),
                                                        ae.type(),
@@ -242,13 +263,15 @@ public class AnnotationElem_c extends Expr_c implements AnnotationElem {
         if (value instanceof ClassLit) {
             constVal = ((ClassLit) value).typeNode().type();
         }
-        Type valueType = value.type();
-        if (valueType.isArray()) {
-            valueType = valueType.toArray().base();
+        // Check against intended type
+        if (value.type().isCanonical()
+                && !ts.isImplicitCastValid(value.type(), intendedBaseType)) {
+            throw new SemanticException("Expected a value of type "
+                    + intendedBaseType, value.position());
         }
         AnnotationElementValue c =
                 ts.AnnotationElementValueConstant(value.position(),
-                                                  valueType,
+                                                  intendedBaseType,
                                                   constVal);
 
         return c;
