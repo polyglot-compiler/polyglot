@@ -29,6 +29,7 @@ import polyglot.ast.ClassLit_c;
 import polyglot.ast.Node;
 import polyglot.ast.TypeNode;
 import polyglot.ext.jl5.types.JL5TypeSystem;
+import polyglot.types.PrimitiveType;
 import polyglot.types.ReferenceType;
 import polyglot.types.SemanticException;
 import polyglot.util.Position;
@@ -45,7 +46,18 @@ public class JL5ClassLit_c extends ClassLit_c {
     @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
         JL5TypeSystem ts = (JL5TypeSystem) tc.typeSystem();
-        return type(ts.Class(this.position(), (ReferenceType) typeNode().type()));
+        ReferenceType rt;
+        if (typeNode().type().isReference()) {
+            rt = typeNode().type().toReference();
+        }
+        else if (typeNode().type().isPrimitive()) {
+            PrimitiveType pt = typeNode().type().toPrimitive();
+            rt = ts.wrapperClassOfPrimitive(pt);
+        }
+        else {
+            throw new SemanticException("Cannot access .class on type "
+                    + typeNode.type(), this.position());
+        }
+        return type(ts.Class(this.position(), rt));
     }
-
 }
