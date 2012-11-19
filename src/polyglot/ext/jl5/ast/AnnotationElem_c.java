@@ -40,12 +40,15 @@ import polyglot.ast.Node;
 import polyglot.ast.Term;
 import polyglot.ast.TypeNode;
 import polyglot.ext.jl5.types.AnnotationElementValue;
+import polyglot.ext.jl5.types.AnnotationElementValueArray;
 import polyglot.ext.jl5.types.JL5Flags;
 import polyglot.ext.jl5.types.JL5TypeSystem;
+import polyglot.types.MethodInstance;
 import polyglot.types.SemanticException;
 import polyglot.types.Type;
 import polyglot.util.CodeWriter;
 import polyglot.util.CollectionUtil;
+import polyglot.util.InternalCompilerError;
 import polyglot.util.ListUtil;
 import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
@@ -193,7 +196,25 @@ public class AnnotationElem_c extends Expr_c implements AnnotationElem {
         Map<String, AnnotationElementValue> m =
                 new LinkedHashMap<String, AnnotationElementValue>();
         for (ElementValuePair p : this.elements()) {
-            m.put(p.name(), toAnnotationElementValue(p.value(), ts));
+            AnnotationElementValue v = toAnnotationElementValue(p.value(), ts);
+
+            List<? extends MethodInstance> methods =
+                    this.type().toClass().methodsNamed(p.name());
+            if (methods.size() != 1) {
+                throw new InternalCompilerError("Annotation has more than one method named \""
+                        + p.name() + "\": " + methods);
+            }
+            MethodInstance mi = methods.get(0);
+            Type intendedType = mi.returnType();
+            if (intendedType.isArray()
+                    && !(v instanceof AnnotationElementValueArray)) {
+                // it's actually meant to be an array type, but a singleton was entered
+                v =
+                        ts.AnnotationElementValueArray(p.value().position(),
+                                                       Collections.singletonList(v));
+            }
+
+            m.put(p.name(), v);
         }
         return m;
     }
@@ -230,13 +251,6 @@ public class AnnotationElem_c extends Expr_c implements AnnotationElem {
                                                   valueType,
                                                   constVal);
 
-        if (value.type().isArray()) {
-            // it's actually meant to be an array type, but a singleton was entered
-            return ts.AnnotationElementValueArray(value.position(),
-                                                  Collections.singletonList(c));
-        }
-        else {
-            return c;
-        }
+        return c;
     }
 }
