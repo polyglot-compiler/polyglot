@@ -42,6 +42,7 @@ public class JL5ConstructorDeclToJL_c extends ConstructorDeclToExt_c implements
             throws SemanticException {
         //Skip annotations and parameter nodes
         JL5ConstructorDecl cd = (JL5ConstructorDecl) node();
+        rw = (ExtensionRewriter) rw.bypass(cd.annotationElems());
         return rw.bypass(cd.typeParams());
     }
 

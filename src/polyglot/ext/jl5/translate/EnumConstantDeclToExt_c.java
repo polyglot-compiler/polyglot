@@ -40,6 +40,7 @@ public class EnumConstantDeclToExt_c extends ToExt_c implements ToExt {
     @Override
     public Node toExt(ExtensionRewriter rw) throws SemanticException {
         EnumConstantDecl cd = (EnumConstantDecl) node();
+        rw = (ExtensionRewriter) rw.bypass(cd.annotationElems());
         return ((JL5NodeFactory) rw.to_nf()).EnumConstantDecl(cd.position(),
                                                               cd.flags(),
                                                               cd.annotationElems(),

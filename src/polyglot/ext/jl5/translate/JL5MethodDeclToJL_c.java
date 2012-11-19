@@ -41,6 +41,7 @@ public class JL5MethodDeclToJL_c extends MethodDeclToExt_c implements ToExt {
             throws SemanticException {
         //Skip annotations and parameter nodes
         JL5MethodDecl cd = (JL5MethodDecl) node();
+        rw = (ExtensionRewriter) rw.bypass(cd.annotationElems());
         return rw.bypass(cd.typeParams());
     }
 }
