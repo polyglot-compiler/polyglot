@@ -55,7 +55,11 @@ public class JL5Assert_c extends Assert_c {
             // The condition is a primitive wrapper. Unwrap it, and call the
             // superclass type check functionality.
             n = this.cond(this.cond().type(ts.primitiveTypeOfWrapper(c)));
-            return n.typeCheck(tc);
+            n = (Assert) n.typeCheck(tc);
+
+            // restore the type
+            n = n.cond(n.cond().type(c));
+            return n;
         }
         return super.typeCheck(tc);
     }
