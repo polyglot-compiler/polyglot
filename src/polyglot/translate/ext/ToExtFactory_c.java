@@ -205,6 +205,11 @@ public class ToExtFactory_c extends AbstractExtFactory_c {
     }
 
     @Override
+    protected Ext extLocalClassDeclImpl() {
+        return new LocalClassDeclToExt_c();
+    }
+
+    @Override
     protected Ext extLocalImpl() {
         return new LocalToExt_c();
     }
