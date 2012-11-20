@@ -1,0 +1,6 @@
+enum E {
+  ABC, DEF;
+}
+class C {
+  public static final E foo = E.ABC;
+}

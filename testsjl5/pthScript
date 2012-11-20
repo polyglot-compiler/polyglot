@@ -140,6 +140,7 @@ polyglot.ext.jl5.ExtensionInfo "-d out -classpath java-out -assert -noserial -po
         Conditional02.jl5;
         Conditional03.jl5;
         Conditional04.jl5;
+        Constant01.jl5;
         Array.jl5;
         Array2.jl5 (Semantic, "should be declared abstract");
         Array03.jl5;
@@ -444,6 +445,7 @@ polyglot.ext.jl5.ExtensionInfo "-d out -classpath java-out -removeJava5isms -enu
         Conditional02.jl5;
         Conditional03.jl5;
         Conditional04.jl5
+        Constant01.jl5;
         Array.jl5;
         Array2.jl5 (Semantic, "should be declared abstract");
         Array03.jl5;
