@@ -28,6 +28,7 @@ package polyglot.ext.jl5.translate;
 import polyglot.ast.Node;
 import polyglot.ext.jl5.ast.JL5EnumDecl;
 import polyglot.ext.jl5.ast.JL5NodeFactory;
+import polyglot.ext.jl5.types.JL5Flags;
 import polyglot.translate.ExtensionRewriter;
 import polyglot.translate.ext.ClassDeclToExt_c;
 import polyglot.translate.ext.ToExt;
@@ -41,7 +42,7 @@ public class EnumDeclToExt_c extends ClassDeclToExt_c implements ToExt {
     public Node toExt(ExtensionRewriter rw) throws SemanticException {
         JL5EnumDecl cd = (JL5EnumDecl) node();
         return ((JL5NodeFactory) rw.to_nf()).EnumDecl(cd.position(),
-                                                      cd.flags(),
+                                                      JL5Flags.clearAnnotation(JL5Flags.clearEnum(cd.flags())),
                                                       cd.annotationElems(),
                                                       cd.id(),
                                                       cd.superClass(),
