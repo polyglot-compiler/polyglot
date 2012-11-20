@@ -163,33 +163,60 @@ public class JL5EnumDecl_c extends JL5ClassDecl_c implements JL5EnumDecl {
     }
 
     private Node addEnumMethodsIfNeeded(TypeSystem ts, NodeFactory nf) {
-        if (enumMethodsNeeded()) {
-            return addEnumMethods(ts, nf);
+        JL5EnumDecl_c n = this;
+        if (n.valueOfMethodNeeded()) {
+            n = n.addValueOfMethod(ts, nf);
         }
-        return this;
+        if (n.valuesMethodNeeded()) {
+            n = n.addValuesMethod(ts, nf);
+        }
+        return n;
     }
 
-    private boolean enumMethodsNeeded() {
-        boolean valueOfMethodFound = false;
-        boolean valuesMethodFound = false;
-        // We added it to the type, check if it's in the class body.
+    private boolean valueOfMethodNeeded() {
         for (MemberInstance mi : this.type.members()) {
             if (mi instanceof MethodInstance) {
                 MethodInstance md = (MethodInstance) mi;
                 if (md.name().equals("valueOf")) {
-                    valueOfMethodFound = true;
-                }
-                if (md.name().equals("values")) {
-                    valuesMethodFound = true;
+                    return false;
                 }
             }
         }
 
-        return !(valueOfMethodFound && valuesMethodFound);
+        return true;
 
     }
 
-    protected Node addEnumMethods(TypeSystem ts, NodeFactory nf) {
+    private boolean valuesMethodNeeded() {
+        for (MemberInstance mi : this.type.members()) {
+            if (mi instanceof MethodInstance) {
+                MethodInstance md = (MethodInstance) mi;
+                if (md.name().equals("values")) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    protected JL5EnumDecl_c addValueOfMethod(TypeSystem ts, NodeFactory nf) {
+        Flags flags = Flags.PUBLIC.set(Flags.STATIC.set(Flags.FINAL));
+
+        // add valueOf method
+        JL5MethodInstance valueOfMI =
+                (JL5MethodInstance) ts.methodInstance(position(),
+                                                      this.type(),
+                                                      flags,
+                                                      this.type(),
+                                                      "valueOf",
+                                                      Collections.singletonList((Type) ts.String()),
+                                                      Collections.<Type> emptyList());
+        this.type.addMethod(valueOfMI);
+
+        return this;
+    }
+
+    protected JL5EnumDecl_c addValuesMethod(TypeSystem ts, NodeFactory nf) {
         Flags flags = Flags.PUBLIC.set(Flags.STATIC.set(Flags.FINAL));
 
         // add values method
@@ -202,17 +229,6 @@ public class JL5EnumDecl_c extends JL5ClassDecl_c implements JL5EnumDecl {
                                                       Collections.<Type> emptyList(),
                                                       Collections.<Type> emptyList());
         this.type.addMethod(valuesMI);
-
-        // add valueOf method
-        JL5MethodInstance valueOfMI =
-                (JL5MethodInstance) ts.methodInstance(position(),
-                                                      this.type(),
-                                                      flags,
-                                                      this.type(),
-                                                      "valueOf",
-                                                      Collections.singletonList((Type) ts.String()),
-                                                      Collections.<Type> emptyList());
-        this.type.addMethod(valueOfMI);
 
         return this;
     }
