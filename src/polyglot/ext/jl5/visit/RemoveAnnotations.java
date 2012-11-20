@@ -56,8 +56,8 @@ public class RemoveAnnotations extends ContextVisitor {
         if (n instanceof JL5ClassDecl) {
             JL5ClassDecl cd = (JL5ClassDecl) n;
             cd = (JL5ClassDecl) cd.flags(JL5Flags.clearAnnotation(cd.flags()));
-            cd.type().flags(JL5Flags.clearAnnotation(cd.type().flags()));
-            cd = (JL5ClassDecl) cd.annotationElems(Collections.<AnnotationElem> emptyList());
+            cd =
+                    (JL5ClassDecl) cd.annotationElems(Collections.<AnnotationElem> emptyList());
             return cd;
         }
         if (n instanceof AnnotationElemDecl) {
@@ -80,8 +80,6 @@ public class RemoveAnnotations extends ContextVisitor {
                                          n.formals(),
                                          n.throwTypes(),
                                          n.body());
-        n.methodInstance().flags(JL5Flags.clearAnnotation(n.methodInstance()
-                                                           .flags()));
         md = md.methodInstance(n.methodInstance());
         return md;
     }
