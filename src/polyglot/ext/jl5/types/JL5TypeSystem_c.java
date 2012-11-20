@@ -44,6 +44,7 @@ import polyglot.ast.ClassLit;
 import polyglot.ast.Expr;
 import polyglot.ast.NullLit;
 import polyglot.ext.jl5.ast.AnnotationElem;
+import polyglot.ext.jl5.ast.EnumConstant;
 import polyglot.ext.jl5.ast.JL5Field_c;
 import polyglot.ext.jl5.types.inference.InferenceSolver;
 import polyglot.ext.jl5.types.inference.InferenceSolver_c;
@@ -2277,6 +2278,10 @@ public class JL5TypeSystem_c extends
         }
         if (value.constantValueSet() && value.isConstant()) {
             // value is a constant
+            return true;
+        }
+        if (value instanceof EnumConstant) {
+            // Enum constants are constants for our purposes.
             return true;
         }
         if (!value.constantValueSet()) {

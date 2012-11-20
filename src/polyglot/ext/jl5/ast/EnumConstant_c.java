@@ -48,7 +48,8 @@ public class EnumConstant_c extends Field_c implements EnumConstant {
 
     @Override
     public boolean isConstant() {
-        return true;
+        // An enum constant is not a compile-time constant. See JLS 3rd edition 15.28.
+        return false;
     }
 
     @Override
