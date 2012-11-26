@@ -42,13 +42,12 @@ import polyglot.ast.Lit;
 import polyglot.ast.MethodDecl;
 import polyglot.ast.Node;
 import polyglot.ast.NodeFactory;
-import polyglot.ast.Stmt;
 import polyglot.ast.TypeNode;
 import polyglot.ext.jl5.types.JL5MethodInstance;
+import polyglot.ext.jl5.types.JL5ParsedClassType;
 import polyglot.ext.jl5.types.JL5TypeSystem;
 import polyglot.types.ConstructorInstance;
 import polyglot.types.Flags;
-import polyglot.types.MemberInstance;
 import polyglot.types.MethodInstance;
 import polyglot.types.SemanticException;
 import polyglot.types.Type;
@@ -73,8 +72,14 @@ public class JL5EnumDecl_c extends JL5ClassDecl_c implements JL5EnumDecl {
     public Node buildTypes(TypeBuilder tb) throws SemanticException {
         JL5EnumDecl_c n = (JL5EnumDecl_c) super.buildTypes(tb);
 
-        JL5TypeSystem ts = (JL5TypeSystem) tb.typeSystem();
-        return n.addEnumMethodTypesIfNeeded(ts);
+        try {
+            JL5TypeSystem ts = (JL5TypeSystem) tb.typeSystem();
+            return n.addEnumMethodTypesIfNeeded(ts);
+        }
+        catch (RuntimeException e) {
+            e.printStackTrace();
+            throw e;
+        }
     }
 
     @Override
@@ -134,15 +139,6 @@ public class JL5EnumDecl_c extends JL5ClassDecl_c implements JL5EnumDecl {
     }
 
     @Override
-    protected Node addDefaultConstructorIfNeeded(TypeSystem ts, NodeFactory nf)
-            throws SemanticException {
-        JL5EnumDecl_c n =
-                (JL5EnumDecl_c) super.addDefaultConstructorIfNeeded(ts, nf);
-        // Add AST nodes
-        return n.addEnumMethodsIfNeeded(ts, nf);
-    }
-
-    @Override
     protected Node addDefaultConstructor(TypeSystem ts, NodeFactory nf)
             throws SemanticException {
         ConstructorInstance ci = this.defaultCI;
@@ -176,52 +172,15 @@ public class JL5EnumDecl_c extends JL5ClassDecl_c implements JL5EnumDecl {
     }
 
     private Node addEnumMethodTypesIfNeeded(TypeSystem ts) {
+        JL5ParsedClassType ct = (JL5ParsedClassType) this.type();
         JL5EnumDecl_c n = this;
-        if (n.valueOfMethodTypeNeeded()) {
+        if (ct.enumValueOfMethodNeeded()) {
             n = n.addValueOfMethodType(ts);
         }
-        if (n.valuesMethodTypeNeeded()) {
+        if (ct.enumValuesMethodNeeded()) {
             n = n.addValuesMethodType(ts);
         }
         return n;
-    }
-
-    private Node addEnumMethodsIfNeeded(TypeSystem ts, NodeFactory nf)
-            throws SemanticException {
-        JL5EnumDecl_c n = this;
-        if (n.valueOfMethodNeeded()) {
-            n = n.addValueOfMethod(ts, nf);
-        }
-        if (n.valuesMethodNeeded()) {
-            n = n.addValuesMethod(ts, nf);
-        }
-        return n;
-    }
-
-    private boolean valueOfMethodTypeNeeded() {
-        for (MemberInstance mi : this.type.members()) {
-            if (mi instanceof MethodInstance) {
-                MethodInstance md = (MethodInstance) mi;
-                if (md.name().equals("valueOf")) {
-                    return false;
-                }
-            }
-        }
-
-        return true;
-
-    }
-
-    private boolean valuesMethodTypeNeeded() {
-        for (MemberInstance mi : this.type.members()) {
-            if (mi instanceof MethodInstance) {
-                MethodInstance md = (MethodInstance) mi;
-                if (md.name().equals("values")) {
-                    return false;
-                }
-            }
-        }
-        return true;
     }
 
     private boolean valueOfMethodNeeded() {
@@ -236,18 +195,6 @@ public class JL5EnumDecl_c extends JL5ClassDecl_c implements JL5EnumDecl {
 
         return true;
 
-    }
-
-    private boolean valuesMethodNeeded() {
-        for (ClassMember cm : this.body.members()) {
-            if (cm instanceof MethodDecl) {
-                MethodDecl md = (MethodDecl) cm;
-                if (md.name().equals("values")) {
-                    return false;
-                }
-            }
-        }
-        return true;
     }
 
     protected JL5EnumDecl_c addValueOfMethodType(TypeSystem ts) {
@@ -267,48 +214,6 @@ public class JL5EnumDecl_c extends JL5ClassDecl_c implements JL5EnumDecl {
         return this;
     }
 
-    protected JL5EnumDecl_c addValueOfMethod(TypeSystem ts, NodeFactory nf)
-            throws SemanticException {
-        Flags flags = Flags.PUBLIC.set(Flags.STATIC.set(Flags.FINAL));
-
-        // add valueOf method
-        Position pos = Position.compilerGenerated();
-        JL5MethodInstance valueOfMI =
-                (JL5MethodInstance) ts.findMethod(this.type(),
-                                                  "valueOf",
-                                                  Collections.singletonList((Type) ts.String()),
-                                                  this.type());
-
-        Formal formal =
-                nf.Formal(pos,
-                          Flags.NONE,
-                          nf.CanonicalTypeNode(pos, ts.String()),
-                          nf.Id(pos, "name"));
-
-        Stmt s =
-                nf.Return(pos,
-                          nf.Call(pos,
-                                  nf.Id(pos, "valueOf"),
-                                  nf.ClassLit(pos,
-                                              nf.CanonicalTypeNode(pos,
-                                                                   this.type)),
-                                  nf.Local(pos, nf.Id(pos, "name"))));
-
-        Block methBody = nf.Block(pos, s);
-
-        MethodDecl valueOfMethod =
-                nf.MethodDecl(Position.compilerGenerated(),
-                              flags,
-                              nf.CanonicalTypeNode(position, type),
-                              nf.Id(pos, "valueOf"),
-                              Collections.singletonList(formal),
-                              Collections.<TypeNode> emptyList(),
-                              methBody);
-
-        valueOfMethod = valueOfMethod.methodInstance(valueOfMI);
-        return (JL5EnumDecl_c) this.body(this.body.addMember(valueOfMethod));
-    }
-
     protected JL5EnumDecl_c addValuesMethodType(TypeSystem ts) {
         Flags flags = Flags.PUBLIC.set(Flags.STATIC.set(Flags.FINAL));
 
@@ -316,7 +221,7 @@ public class JL5EnumDecl_c extends JL5ClassDecl_c implements JL5EnumDecl {
         JL5MethodInstance valuesMI =
                 (JL5MethodInstance) ts.methodInstance(position(),
                                                       this.type(),
-                                                      flags,
+                                                      flags.set(Flags.NATIVE),
                                                       ts.arrayOf(this.type()),
                                                       "values",
                                                       Collections.<Type> emptyList(),
@@ -324,33 +229,6 @@ public class JL5EnumDecl_c extends JL5ClassDecl_c implements JL5EnumDecl {
         this.type.addMethod(valuesMI);
 
         return this;
-    }
-
-    protected JL5EnumDecl_c addValuesMethod(TypeSystem ts, NodeFactory nf)
-            throws SemanticException {
-        Flags flags =
-                Flags.PUBLIC.set(Flags.STATIC.set(Flags.FINAL))
-                            .set(Flags.NATIVE);
-
-        // add values method
-        Position pos = Position.compilerGenerated();
-        JL5MethodInstance valuesMI =
-                (JL5MethodInstance) ts.findMethod(this.type(),
-                                                  "values",
-                                                  Collections.<Type> emptyList(),
-                                                  this.type());
-
-        MethodDecl addValuesMethod =
-                nf.MethodDecl(Position.compilerGenerated(),
-                              flags,
-                              nf.CanonicalTypeNode(position, type),
-                              nf.Id(pos, "values"),
-                              Collections.<Formal> emptyList(),
-                              Collections.<TypeNode> emptyList(),
-                              null);
-
-        addValuesMethod = addValuesMethod.methodInstance(valuesMI);
-        return (JL5EnumDecl_c) this.body(this.body.addMember(addValuesMethod));
     }
 
 }
