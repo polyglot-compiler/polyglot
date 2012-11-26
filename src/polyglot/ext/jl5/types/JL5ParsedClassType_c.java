@@ -332,8 +332,11 @@ public class JL5ParsedClassType_c extends ParsedClassType_c implements
     @Override
     public boolean enumValueOfMethodNeeded() {
         for (MethodInstance mi : this.methods) {
-            if (mi.name().equals("valueOf")) {
-                return false;
+            if (mi.name().equals("valueOf") && mi.formalTypes().size() == 1) {
+                Type t = mi.formalTypes().get(0);
+                if (ts.String().equals(t)) {
+                    return false;
+                }
             }
         }
         return true;
@@ -342,7 +345,7 @@ public class JL5ParsedClassType_c extends ParsedClassType_c implements
     @Override
     public boolean enumValuesMethodNeeded() {
         for (MethodInstance mi : this.methods) {
-            if (mi.name().equals("values")) {
+            if (mi.name().equals("values") && mi.formalTypes().isEmpty()) {
                 return false;
             }
         }
