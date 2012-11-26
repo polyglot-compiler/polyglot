@@ -39,7 +39,6 @@ import polyglot.ast.Formal;
 import polyglot.ast.Id;
 import polyglot.ast.IntLit;
 import polyglot.ast.Lit;
-import polyglot.ast.MethodDecl;
 import polyglot.ast.Node;
 import polyglot.ast.NodeFactory;
 import polyglot.ast.TypeNode;
@@ -181,20 +180,6 @@ public class JL5EnumDecl_c extends JL5ClassDecl_c implements JL5EnumDecl {
             n = n.addValuesMethodType(ts);
         }
         return n;
-    }
-
-    private boolean valueOfMethodNeeded() {
-        for (ClassMember cm : this.body.members()) {
-            if (cm instanceof MethodDecl) {
-                MethodDecl md = (MethodDecl) cm;
-                if (md.name().equals("valueOf")) {
-                    return false;
-                }
-            }
-        }
-
-        return true;
-
     }
 
     protected JL5EnumDecl_c addValueOfMethodType(TypeSystem ts) {
