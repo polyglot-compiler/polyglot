@@ -82,4 +82,8 @@ public interface JL5ParsedClassType extends ParsedClassType, JL5ClassType {
 
     void setRetainedAnnotations(RetainedAnnotations createRetainedAnnotations);
 
+    boolean enumValueOfMethodNeeded();
+
+    boolean enumValuesMethodNeeded();
+
 }

@@ -35,6 +35,7 @@ import polyglot.ext.param.types.PClass;
 import polyglot.frontend.Source;
 import polyglot.types.ClassType;
 import polyglot.types.LazyClassInitializer;
+import polyglot.types.MethodInstance;
 import polyglot.types.ParsedClassType_c;
 import polyglot.types.ReferenceType;
 import polyglot.types.Resolver;
@@ -326,6 +327,26 @@ public class JL5ParsedClassType_c extends ParsedClassType_c implements
     @Override
     public void setRetainedAnnotations(RetainedAnnotations retainedAnnotations) {
         this.retainedAnnotations = retainedAnnotations;
+    }
+
+    @Override
+    public boolean enumValueOfMethodNeeded() {
+        for (MethodInstance mi : this.methods) {
+            if (mi.name().equals("valueOf")) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    @Override
+    public boolean enumValuesMethodNeeded() {
+        for (MethodInstance mi : this.methods) {
+            if (mi.name().equals("values")) {
+                return false;
+            }
+        }
+        return true;
     }
 
 }
