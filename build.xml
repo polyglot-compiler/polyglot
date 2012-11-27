@@ -230,9 +230,10 @@
 				<include name="polyglot/qq/sym.java" />
 				<include name="polyglot/qq/Lexer_c.java" />
 				<include name="polyglot/qq/qq_ppg.cup" />
-                <include name="polyglot/ext/jl5/parse/Grm.java" />
-                <include name="polyglot/ext/jl5/parse/sym.java" />
-                <include name="polyglot/ext/jl5/parse/Lexer_c.java" />
+                                <include name="polyglot/ext/jl5/parse/Grm.java" />
+                                <include name="polyglot/ext/jl5/parse/jl5_ppg.cup" />
+                                <include name="polyglot/ext/jl5/parse/sym.java" />
+                                <include name="polyglot/ext/jl5/parse/Lexer_c.java" />
 			</fileset>
 		</delete>
 		<delete>
@@ -462,6 +463,8 @@
             <param name="symbol.class" value="sym" />
         </antcall>
         <copy file="${src}/polyglot/parse/java12.cup" todir="${classes}/polyglot/ext/jl5/parse" />
+        <copy file="${src}/polyglot/ext/jl5/parse/jl5.ppg" todir="${classes}/polyglot/ext/jl5/parse" />
+        <copy file="${src}/polyglot/ext/jl5/parse/jl5_ppg.cup" todir="${classes}/polyglot/ext/jl5/parse" />		
         <javac source="1.5" target="1.5" srcdir="${src}" destdir="${classes}" debug="on" includes="polyglot/ext/jl5/parse/**"
                includeantruntime="false">
             <classpath refid="standard.classpath" />
