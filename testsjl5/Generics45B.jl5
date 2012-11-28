@@ -1,0 +1,10 @@
+class C<T> {
+    T m() { return null; }
+}
+
+class D {
+    void foo() {
+	C<generics45.Generics45A> x = new C<generics45.Generics45A>();
+	x.m().foo();
+    }
+}

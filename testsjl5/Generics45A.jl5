@@ -1,0 +1,9 @@
+package generics45;
+public final class Generics45A extends Generics45AImpl {
+}
+
+class Generics45AImpl {
+    public void foo() { }
+}
+
+
