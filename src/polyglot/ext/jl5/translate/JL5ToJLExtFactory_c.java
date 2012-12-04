@@ -30,6 +30,11 @@ import polyglot.ast.Ext;
 public class JL5ToJLExtFactory_c extends JL5ToExtFactory_c {
 
     @Override
+    protected Ext extCallImpl() {
+        return new JL5CallToJL_c();
+    }
+
+    @Override
     protected Ext extClassDeclImpl() {
         return new JL5ClassDeclToJL_c();
     }
