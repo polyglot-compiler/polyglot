@@ -113,7 +113,15 @@ public class TVCaster extends AscriptionVisitor {
         }
 
         if (ts.isCastValid(fromType, toType)) {
-            return insertCast(e, toType);
+            Type castType = toType;
+            if (toType.isClass()
+                    && !ts.classAccessible(toType.toClass(), this.context())) {
+                // the toType is not accessible.
+                //return e;
+                // Let's try using the fromType instead.
+                castType = fromType;
+            }
+            return insertCast(e, castType);
         }
         return e;
     }
