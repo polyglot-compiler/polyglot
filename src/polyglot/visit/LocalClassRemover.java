@@ -78,92 +78,6 @@ import polyglot.util.UniqueID;
 //Remove inner member
 
 public class LocalClassRemover extends ContextVisitor {
-    protected final class ConstructorCallRewriter extends NodeVisitor {
-        private final List<FieldInstance> newFields;
-        private final ClassType theLocalClass;
-        ParsedClassType curr;
-
-        protected ConstructorCallRewriter(List<FieldInstance> fields,
-                ClassType ct) {
-            this.newFields = fields;
-            this.theLocalClass = ct;
-        }
-
-        @Override
-        public NodeVisitor enter(Node n) {
-            if (n instanceof ClassDecl) {
-                ConstructorCallRewriter v = (ConstructorCallRewriter) copy();
-                v.curr = ((ClassDecl) n).type();
-                return v;
-            }
-            return this;
-        }
-
-        @Override
-        public Node leave(Node old, Node n, NodeVisitor v) {
-            if (n instanceof New) {
-                New neu = (New) n;
-                ConstructorInstance ci = neu.constructorInstance();
-                ConstructorInstance nci =
-                        (ConstructorInstance) ci.declaration();
-                if (nci.container().toClass().declaration() == theLocalClass.declaration()) {
-                    neu =
-                            (New) neu.arguments(addArgs(neu,
-                                                        nci,
-                                                        newFields,
-                                                        curr,
-                                                        theLocalClass));
-                    if (!theLocalClass.flags().isStatic()) {
-                        Expr q;
-                        if (theLocalClass.outer() == context.currentClass())
-                            q =
-                                    nf.This(neu.position())
-                                      .type(theLocalClass.outer());
-                        else q =
-                                nf.This(neu.position(),
-                                        nf.CanonicalTypeNode(neu.position(),
-                                                             theLocalClass.outer()))
-                                  .type(theLocalClass.outer());
-                        neu = neu.qualifier(q);
-                        neu = neu.qualifierImplicit(false);
-                    }
-                }
-                return neu;
-            }
-            if (n instanceof ConstructorCall) {
-                ConstructorCall neu = (ConstructorCall) n;
-                ConstructorInstance ci = neu.constructorInstance();
-                ConstructorInstance nci =
-                        (ConstructorInstance) ci.declaration();
-                if (nci.container().toClass().declaration() == theLocalClass.declaration()) {
-                    neu =
-                            (ConstructorCall) neu.arguments(addArgs(neu,
-                                                                    nci,
-                                                                    newFields,
-                                                                    curr,
-                                                                    theLocalClass));
-                    // This is wrong: we cannot refer to this in a super() call qualifier.
-                    // For now, let this pass and assume InnerClassRemover will fix it.
-                    if (!theLocalClass.flags().isStatic()) {
-                        Expr q;
-                        if (theLocalClass.outer() == context.currentClass())
-                            q =
-                                    nf.This(neu.position())
-                                      .type(theLocalClass.outer());
-                        else q =
-                                nf.This(neu.position(),
-                                        nf.CanonicalTypeNode(neu.position(),
-                                                             theLocalClass.outer()))
-                                  .type(theLocalClass.outer());
-                        neu = neu.qualifier(q);
-                    }
-                }
-                return neu;
-            }
-
-            return n;
-        }
-    }
 
     public LocalClassRemover(Job job, TypeSystem ts, NodeFactory nf) {
         super(job, ts, nf);
@@ -281,20 +195,9 @@ public class LocalClassRemover extends ContextVisitor {
 
         Position pos = n.position();
 
-        if (n instanceof Local && !inConstructorCall) {
+        if (n instanceof Local) {
             Local l = (Local) n;
-            if (!isLocal(context, l.name())) {
-                FieldInstance fi = boxLocal(l.localInstance());
-                if (fi != null) {
-                    Field f =
-                            nf.Field(pos,
-                                     makeMissingFieldTarget(fi, pos),
-                                     nf.Id(pos, fi.name()));
-                    f = f.fieldInstance(fi);
-                    f = (Field) f.type(fi.type());
-                    return f;
-                }
-            }
+            return processLocal(l, pos);
         }
 
         // Convert anonymous classes into member classes
@@ -364,12 +267,17 @@ public class LocalClassRemover extends ContextVisitor {
                 neu = neu.qualifierImplicit(false);
             }
 
+            // now check if this class decl has any orphans to add.
+            cd = addOrphans(cd);
+
             cd =
                     rewriteLocalClass(cd,
                                       hashGet(newFields,
                                               cd.type(),
                                               Collections.<FieldInstance> emptyList()));
+
             hashAdd(orphans, context.currentClassScope(), cd);
+
             neu = neu.objectType(nf.CanonicalTypeNode(pos, type)).body(null);
             neu =
                     (New) rewriteConstructorCalls(neu,
@@ -383,17 +291,43 @@ public class LocalClassRemover extends ContextVisitor {
         // Add any orphaned declarations created below to the class body
         if (n instanceof ClassDecl) {
             ClassDecl cd = (ClassDecl) n;
-            List<ClassDecl> o = orphans.get(cd.type());
-            if (o == null) return cd;
-            ClassBody b = cd.body();
-            List<ClassMember> members = new ArrayList<ClassMember>();
-            members.addAll(b.members());
-            members.addAll(o);
-            b = b.members(members);
-            return cd.body(b);
+            return addOrphans(cd);
         }
 
         return n;
+    }
+
+    protected Expr processLocal(Local l, Position pos) {
+        if (!inConstructorCall) {
+            if (!isLocal(context, l.name())) {
+                FieldInstance fi = boxLocal(l.localInstance());
+                if (fi != null) {
+                    Field f =
+                            nf.Field(pos,
+                                     makeMissingFieldTarget(fi, pos),
+                                     nf.Id(pos, fi.name()));
+                    f = f.fieldInstance(fi);
+                    f = (Field) f.type(fi.type());
+                    return f;
+                }
+            }
+        }
+        return l;
+    }
+
+    /**
+     * Get any orphans (i.e., class decls that have been created below this type) and add them here
+     */
+    protected ClassDecl addOrphans(ClassDecl cd) {
+        List<ClassDecl> o = orphans.get(cd.type());
+
+        if (o == null) return cd;
+        ClassBody b = cd.body();
+        List<ClassMember> members = new ArrayList<ClassMember>();
+        members.addAll(b.members());
+        members.addAll(o);
+        b = b.members(members);
+        return cd.body(b);
     }
 
     /**
@@ -492,52 +426,6 @@ public class LocalClassRemover extends ContextVisitor {
         return e;
     }
 
-    // Add local variables to the argument list until it matches the declaration.
-    List<Expr> addArgs(ProcedureCall n, ConstructorInstance nci,
-            List<FieldInstance> fields, ClassType curr, ClassType theLocalClass) {
-        if (nci == null || fields == null || fields.isEmpty()
-                || n.arguments().size() == nci.formalTypes().size())
-            return n.arguments();
-        List<Expr> args = new ArrayList<Expr>();
-        for (FieldInstance fi : fields) {
-            if (curr != null
-                    && theLocalClass != null
-                    && ts.isEnclosed((ClassType) curr.declaration(),
-                                     (ClassType) theLocalClass.declaration())) {
-                // If in the local class being rewritten, use the boxed local (i.e., field) instead of the local.
-                // This could generate a bad constructor call since the field will refer to 'this' before the superclass
-                // is initialized, but we'll patch this up later.
-                Position pos = fi.position();
-                Field f =
-                        nf.Field(pos,
-                                 makeMissingFieldTarget(fi, pos),
-                                 nf.Id(pos, fi.name()));
-                f = f.fieldInstance(fi);
-                f = (Field) f.type(fi.type());
-                args.add(f);
-            }
-            else {
-                LocalInstance li = localOfField.get(fi);
-                if (li != null) {
-                    Local l =
-                            nf.Local(li.position(),
-                                     nf.Id(li.position(), li.name()));
-                    l = l.localInstance(li);
-                    l = (Local) l.type(li.type());
-                    args.add(l);
-                }
-                else {
-                    throw new InternalCompilerError("field " + fi
-                            + " created with rev map to null", n.position());
-                }
-            }
-        }
-
-        args.addAll(n.arguments());
-        assert args.size() == nci.formalTypes().size();
-        return args;
-    }
-
     Map<FieldInstance, LocalInstance> localOfField =
             new HashMap<FieldInstance, LocalInstance>();
 
@@ -545,16 +433,19 @@ public class LocalClassRemover extends ContextVisitor {
     private FieldInstance boxLocal(LocalInstance li) {
         ClassType curr = currLocalClass();
 
-        if (curr == null)
-        // not defined in a local class
+        if (curr == null) {
+            // not defined in a local class
             return null;
+        }
 
         li = (LocalInstance) li.declaration();
 
         Pair<LocalInstance, ClassType> key =
                 new Pair<LocalInstance, ClassType>(li, curr);
         FieldInstance fi = fieldForLocal.get(key);
-        if (fi != null) return fi;
+        if (fi != null) {
+            return fi;
+        }
 
         Position pos = li.position();
 
@@ -634,4 +525,140 @@ public class LocalClassRemover extends ContextVisitor {
         }
         l.add(v);
     }
+
+    protected final class ConstructorCallRewriter extends NodeVisitor {
+        private final List<FieldInstance> newFields;
+        private final ClassType theLocalClass;
+        ParsedClassType curr;
+
+        protected ConstructorCallRewriter(List<FieldInstance> fields,
+                ClassType ct) {
+            this.newFields = fields;
+            this.theLocalClass = ct;
+        }
+
+        @Override
+        public NodeVisitor enter(Node n) {
+            if (n instanceof ClassDecl) {
+                ConstructorCallRewriter v = (ConstructorCallRewriter) copy();
+                v.curr = ((ClassDecl) n).type();
+                return v;
+            }
+            return this;
+        }
+
+        @Override
+        public Node leave(Node old, Node n, NodeVisitor v) {
+            if (n instanceof New) {
+                New neu = (New) n;
+                ConstructorInstance ci = neu.constructorInstance();
+                ConstructorInstance nci =
+                        (ConstructorInstance) ci.declaration();
+                if (nci.container().toClass().declaration() == theLocalClass.declaration()) {
+                    neu =
+                            (New) neu.arguments(addArgs(neu,
+                                                        nci,
+                                                        newFields,
+                                                        curr,
+                                                        theLocalClass));
+                    if (!theLocalClass.flags().isStatic()) {
+                        Expr q;
+                        if (theLocalClass.outer() == context.currentClass())
+                            q =
+                                    nf.This(neu.position())
+                                      .type(theLocalClass.outer());
+                        else q =
+                                nf.This(neu.position(),
+                                        nf.CanonicalTypeNode(neu.position(),
+                                                             theLocalClass.outer()))
+                                  .type(theLocalClass.outer());
+                        neu = neu.qualifier(q);
+                        neu = neu.qualifierImplicit(false);
+                    }
+                }
+                return neu;
+            }
+            if (n instanceof ConstructorCall) {
+                ConstructorCall neu = (ConstructorCall) n;
+                ConstructorInstance ci = neu.constructorInstance();
+                ConstructorInstance nci =
+                        (ConstructorInstance) ci.declaration();
+                if (nci.container().toClass().declaration() == theLocalClass.declaration()) {
+                    neu =
+                            (ConstructorCall) neu.arguments(addArgs(neu,
+                                                                    nci,
+                                                                    newFields,
+                                                                    curr,
+                                                                    theLocalClass));
+                    // This is wrong: we cannot refer to this in a super() call qualifier.
+                    // For now, let this pass and assume InnerClassRemover will fix it.
+                    if (!theLocalClass.flags().isStatic()) {
+                        Expr q;
+                        if (theLocalClass.outer() == context.currentClass())
+                            q =
+                                    nf.This(neu.position())
+                                      .type(theLocalClass.outer());
+                        else q =
+                                nf.This(neu.position(),
+                                        nf.CanonicalTypeNode(neu.position(),
+                                                             theLocalClass.outer()))
+                                  .type(theLocalClass.outer());
+                        neu = neu.qualifier(q);
+                    }
+                }
+                return neu;
+            }
+
+            return n;
+        }
+
+        // Add local variables to the argument list until it matches the declaration.
+        List<Expr> addArgs(ProcedureCall n, ConstructorInstance nci,
+                List<FieldInstance> fields, ClassType curr,
+                ClassType theLocalClass) {
+            if (nci == null || fields == null || fields.isEmpty()
+                    || n.arguments().size() == nci.formalTypes().size())
+                return n.arguments();
+            List<Expr> args = new ArrayList<Expr>();
+            for (FieldInstance fi : fields) {
+                if (curr != null
+                        && theLocalClass != null
+                        && ts.isEnclosed((ClassType) curr.declaration(),
+                                         (ClassType) theLocalClass.declaration())) {
+                    // If in the local class being rewritten, use the boxed local (i.e., field) instead of the local.
+                    // This could generate a bad constructor call since the field will refer to 'this' before the superclass
+                    // is initialized, but we'll patch this up later.
+                    Position pos = fi.position();
+                    Field f =
+                            nf.Field(pos,
+                                     makeMissingFieldTarget(fi, pos),
+                                     nf.Id(pos, fi.name()));
+                    f = f.fieldInstance(fi);
+                    f = (Field) f.type(fi.type());
+                    args.add(f);
+                }
+                else {
+                    LocalInstance li = localOfField.get(fi);
+                    if (li != null) {
+                        Local l =
+                                nf.Local(li.position(),
+                                         nf.Id(li.position(), li.name()));
+                        l = l.localInstance(li);
+                        l = (Local) l.type(li.type());
+                        args.add(processLocal(l, l.position()));
+                    }
+                    else {
+                        throw new InternalCompilerError("field " + fi
+                                + " created with rev map to null", n.position());
+                    }
+                }
+            }
+
+            args.addAll(n.arguments());
+            assert args.size() == nci.formalTypes().size();
+            return args;
+        }
+
+    }
+
 }
