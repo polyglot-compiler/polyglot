@@ -50,8 +50,9 @@ import polyglot.util.InternalCompilerError;
  *   v' = copy(v) with c' for c
  * n' = n.visitChildren(v')
  * v.leave(n, n', v')
- *   v.addDecls(n')
- *     n.addDecls(c)
+ *   v.addDecls(n, n')
+ *     v.addDecls(n')
+ *       n'.addDecls(c)
  * </pre>
  */
 public class ContextVisitor extends ErrorHandlingVisitor {
@@ -129,6 +130,15 @@ public class ContextVisitor extends ErrorHandlingVisitor {
 
     /**
      * Imperatively update the context with declarations to be added after
+     * visiting the node. Subclasses can decide whether to use the old node
+     * or the new node to add the declarations. The default is to use the new node.
+     */
+    protected void addDecls(Node old, Node n) {
+        addDecls(n);
+    }
+
+    /**
+     * Imperatively update the context with declarations to be added after
      * visiting the node.
      */
     protected void addDecls(Node n) {
@@ -199,7 +209,7 @@ public class ContextVisitor extends ErrorHandlingVisitor {
 
         try {
             Node m = super.leave(parent, old, n, v);
-            this.addDecls(m);
+            this.addDecls(old, m);
             return m;
         }
         catch (MissingDependencyException e) {
