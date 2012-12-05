@@ -120,6 +120,13 @@ public class ExtensionRewriter extends ContextVisitor {
     }
 
     @Override
+    protected void addDecls(Node old, Node n) {
+        // Use the old node to add the declarations, as the new node, n, doesn't
+        // have type information.
+        addDecls(old);
+    }
+
+    @Override
     public void finish(Node ast) {
         if (ast instanceof SourceCollection) {
             SourceCollection c = (SourceCollection) ast;
