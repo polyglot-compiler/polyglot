@@ -30,15 +30,42 @@ import polyglot.ast.Node;
 import polyglot.translate.ExtensionRewriter;
 import polyglot.types.SemanticException;
 import polyglot.util.SerialVersionUID;
+import polyglot.visit.NodeVisitor;
 
 public class FieldToExt_c extends ToExt_c {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
     @Override
+    public NodeVisitor toExtEnter(ExtensionRewriter rw)
+            throws SemanticException {
+        Field f = (Field) this.node();
+        if (translateTarget(f)) {
+            return super.toExtEnter(rw);
+        }
+
+        // don't translate the target
+        return rw.bypass(f.target());
+    }
+
+    @Override
     public Node toExt(ExtensionRewriter rw) throws SemanticException {
         Field n = (Field) node();
-        Field m = rw.to_nf().Field(n.position(), n.target(), n.id());
-        m = m.targetImplicit(n.isTargetImplicit());
-        return m;
+        if (translateTarget(n)) {
+            Field m = rw.to_nf().Field(n.position(), n.target(), n.id());
+            m = m.targetImplicit(n.isTargetImplicit());
+
+            return m;
+        }
+
+        // don't translate the target.
+        // Need to have an ambiguous expression that will be disambiguated later
+        return rw.to_nf().AmbExpr(n.position(), n.id());
+    }
+
+    /**
+     * Should the target of the field be translated?
+     */
+    protected boolean translateTarget(Field n) {
+        return !n.isTargetImplicit();
     }
 }

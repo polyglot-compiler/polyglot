@@ -27,21 +27,44 @@ package polyglot.translate.ext;
 
 import polyglot.ast.Call;
 import polyglot.ast.Node;
+import polyglot.ast.Receiver;
 import polyglot.translate.ExtensionRewriter;
 import polyglot.types.SemanticException;
 import polyglot.util.SerialVersionUID;
+import polyglot.visit.NodeVisitor;
 
 public class CallToExt_c extends ToExt_c {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
     @Override
+    public NodeVisitor toExtEnter(ExtensionRewriter rw)
+            throws SemanticException {
+        Call c = (Call) this.node();
+        if (translateTarget(c)) {
+            return super.toExtEnter(rw);
+        }
+
+        // don't translate the target
+        return rw.bypass(c.target());
+    }
+
+    @Override
     public Node toExt(ExtensionRewriter rw) throws SemanticException {
         Call n = (Call) node();
-        Call m =
-                rw.to_nf()
-                  .Call(n.position(), n.target(), n.id(), n.arguments());
+        Receiver target = n.target();
+        if (!translateTarget(n)) {
+            target = null;
+        }
+        Call m = rw.to_nf().Call(n.position(), target, n.id(), n.arguments());
         m = m.targetImplicit(n.isTargetImplicit());
 
         return m;
+    }
+
+    /**
+     * Should the target of the field be translated?
+     */
+    protected boolean translateTarget(Call n) {
+        return !n.isTargetImplicit();
     }
 }
