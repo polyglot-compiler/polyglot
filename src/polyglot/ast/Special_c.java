@@ -184,8 +184,19 @@ public class Special_c extends Expr_c implements Special {
 
     @Override
     public String toString() {
-        return (qualifier != null ? qualifier.type().toClass().name() + "."
-                : "") + kind;
+        if (qualifier != null) {
+            // we have a qualifier for the special
+            // The JLS requires that a qualified this contains just a simple class name, so try and extract it.
+            // (JLS 2nd ed 15.8.4)
+            if (qualifier.name() != null) {
+                return qualifier.name() + "." + kind;
+            }
+            else {
+                return qualifier + "." + kind;
+            }
+        }
+
+        return String.valueOf(kind);
     }
 
     /** Write the expression to an output file. */
