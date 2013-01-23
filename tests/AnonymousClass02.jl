@@ -1,0 +1,32 @@
+
+class C
+{
+
+    public C2 topLevel1() {
+        return null;
+    }
+
+    public C2 topLevel2() {
+        return new C2() {
+            C2 c2() { return topLevel1(); }
+
+//            C1 c1 = c2.m2(); //doesn't crash on this
+            
+            public C1 m2() {
+                return new C1() {
+                    C1 c1 = c2().m2(); // doesn't crash if this is commented out
+                };
+            }
+        };
+    }
+
+}
+interface C1 {
+
+}
+
+interface C2 {
+
+    C1 m2();
+}
+

@@ -27,6 +27,7 @@
 
 polyglot.frontend.JLExtensionInfo "-cp ." {
         AnonymousClass.jl ;
+        AnonymousClass02.jl ;
         ArrayInit.jl ;
 #        Array01.jl ;
         BoolTest.jl ;
