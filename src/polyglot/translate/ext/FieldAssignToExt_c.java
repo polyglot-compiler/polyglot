@@ -38,9 +38,17 @@ public class FieldAssignToExt_c extends ToExt_c {
     @Override
     public Node toExt(ExtensionRewriter rw) throws SemanticException {
         FieldAssign n = (FieldAssign) node();
-        return rw.to_nf().FieldAssign(n.position(),
-                                      (Field) n.left(),
-                                      n.operator(),
-                                      n.right());
+        if (n.left() instanceof Field) {
+            return rw.to_nf().FieldAssign(n.position(),
+                                          (Field) n.left(),
+                                          n.operator(),
+                                          n.right());
+        }
+        // n.left() is some none-field expression
+        return rw.to_nf().AmbAssign(n.position(),
+                                    n.left(),
+                                    n.operator(),
+                                    n.right());
+
     }
 }
