@@ -5,12 +5,15 @@ import polyglot.translate.ExtensionRewriter;
 import polyglot.translate.ext.FieldDeclToExt_c;
 import polyglot.translate.ext.ToExt;
 import polyglot.types.SemanticException;
+import polyglot.util.SerialVersionUID;
 import polyglot.visit.NodeVisitor;
 
 /**
  * Class used to translate field declarations from Java 5 to Java 4
  */
 public class JL5FieldDeclToExt_c extends FieldDeclToExt_c implements ToExt {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     @Override
     public NodeVisitor toExtEnter(ExtensionRewriter rw)
             throws SemanticException {
