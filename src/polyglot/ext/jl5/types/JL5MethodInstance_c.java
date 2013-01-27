@@ -36,6 +36,7 @@ import polyglot.ext.param.types.Subst;
 import polyglot.main.Report;
 import polyglot.types.ArrayType;
 import polyglot.types.Flags;
+import polyglot.types.MemberInstance;
 import polyglot.types.MethodInstance;
 import polyglot.types.MethodInstance_c;
 import polyglot.types.ProcedureInstance;
@@ -290,6 +291,30 @@ public class JL5MethodInstance_c extends MethodInstance_c implements
     public boolean moreSpecificImpl(ProcedureInstance p) {
         JL5MethodInstance p1 = this;
         JL5MethodInstance p2 = (JL5MethodInstance) p;
+
+        // Although the JLS 3rd edition doesn't say so, it seems that we need
+        // to ensure that t1 (the container of p1) can be converted to t2 (the container of p2)
+        // by method invocation conversion. At least, this is what happens in JLS 2nd edition,
+        // and handles the case where p1 overrides p2 (since otherwise, both p1 and p2 would be 
+        // maximally specific).
+        ReferenceType t1 = null;
+        ReferenceType t2 = null;
+
+        t1 = ((MemberInstance) p1.declaration()).container();
+        t2 = ((MemberInstance) p2.declaration()).container();
+
+        if (t1 != null && t2 != null) {
+            if (t1.isClass() && t2.isClass()) {
+                if (!t1.isSubtype(t2) && !t1.toClass().isEnclosed(t2.toClass())) {
+                    return false;
+                }
+            }
+            else {
+                if (!t1.isSubtype(t2)) {
+                    return false;
+                }
+            }
+        }
 
         return ts.callValid(p2, p1.formalTypes());
 
