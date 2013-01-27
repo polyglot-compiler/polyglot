@@ -1235,13 +1235,19 @@ public class TypeSystem_c implements TypeSystem {
         // The list of acceptable methods. These methods are accessible from
         // currClass, the method call is valid, and they are not overridden
         // by an unacceptable method (which can occur with protected methods
-        // only).
+        // only). They include methods that are inherited from super classes 
+        // and interfaces but not overridden.
         List<MethodInstance> acceptable = new ArrayList<MethodInstance>();
 
         // A list of unacceptable methods, where the method call is valid, but
         // the method is not accessible. This list is needed to make sure that
         // the acceptable methods are not overridden by an unacceptable method.
         List<MethodInstance> unacceptable = new ArrayList<MethodInstance>();
+
+        // A set of all the methods that methods in acceptable override.
+        // Used to make sure we don't mistakenly add in overridden methods
+        // (since overridden methods aren't inherited from superclasses).
+        Set<MethodInstance> overridden = new HashSet<MethodInstance>();
 
         Set<Type> visitedTypes = new HashSet<Type>();
 
@@ -1281,7 +1287,15 @@ public class TypeSystem_c implements TypeSystem {
                                     + mi.container());
                         }
 
-                        acceptable.add(mi);
+                        // Check that we it isn't overridden by something 
+                        // already accepted
+                        if (!overridden.contains(mi)) {
+                            // mi isn't overridden by something already in acceptable
+                            // so add mi to acceptable, and add all the methods it
+                            // overrides to the set overridden.
+                            acceptable.add(mi);
+                            overridden.addAll(mi.overrides());
+                        }
                     }
                     else {
                         // method call is valid, but the method is
