@@ -665,6 +665,13 @@ public class JL5TypeSystem_c extends
         // the acceptable methods are not overridden by an unacceptable method.
         List<MethodInstance> inaccessible = new ArrayList<MethodInstance>();
 
+        // A set of all the methods that methods in phase[123]methods override.
+        // Used to make sure we don't mistakenly add in overridden methods
+        // (since overridden methods aren't inherited from superclasses).
+        Set<MethodInstance> phase1overridden = new HashSet<MethodInstance>();
+        Set<MethodInstance> phase2overridden = new HashSet<MethodInstance>();
+        Set<MethodInstance> phase3overridden = new HashSet<MethodInstance>();
+
         Set<Type> visitedTypes = new HashSet<Type>();
 
         LinkedList<Type> typeQueue = new LinkedList<Type>();
@@ -714,11 +721,24 @@ public class JL5TypeSystem_c extends
                             Report.report(3, "->acceptable: " + mi + " in "
                                     + mi.container());
                         }
-                        if (varArgsRequired(mi))
-                            phase3methods.add(mi);
-                        else if (boxingRequired(mi, argTypes))
-                            phase2methods.add(mi);
-                        else phase1methods.add(mi);
+                        if (varArgsRequired(mi)) {
+                            if (!phase3overridden.contains(mi)) {
+                                phase3methods.add(mi);
+                                phase3overridden.addAll(mi.overrides());
+                            }
+                        }
+                        else if (boxingRequired(mi, argTypes)) {
+                            if (!phase2overridden.contains(mi)) {
+                                phase2methods.add(mi);
+                                phase2overridden.addAll(mi.overrides());
+                            }
+                        }
+                        else {
+                            if (!phase1overridden.contains(mi)) {
+                                phase1methods.add(mi);
+                                phase1overridden.addAll(mi.overrides());
+                            }
+                        }
                     }
                     else {
                         // method call is valid but the method is unaccessible
