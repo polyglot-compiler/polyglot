@@ -363,19 +363,24 @@ public class LocalClassRemover extends ContextVisitor {
 
         ConstructorInstance superCi =
                 typeSystem().findConstructor(superType, argTypes, cd.type());
-        for (int i = 0; i < argTypes.size(); i++) {
+        Position argpos = Position.compilerGenerated();
+        for (int i = 0; i < superCi.formalTypes().size(); i++) {
             Type at = superCi.formalTypes().get(i);
-            Position pos = neu.arguments().get(i).position();
-            Id name = nf.Id(pos, "a" + (i + 1));
+            if (i < neu.arguments().size()) {
+                // there is an actual argument for the ith formal arugment
+                // (may not be if superCi has a vararg formal)
+                argpos = neu.arguments().get(i).position();
+            }
+            Id name = nf.Id(argpos, "a" + (i + 1));
             Formal f =
-                    nf.Formal(pos,
+                    nf.Formal(argpos,
                               Flags.FINAL,
-                              nf.CanonicalTypeNode(pos, at),
+                              nf.CanonicalTypeNode(argpos, at),
                               name);
-            Local l = nf.Local(pos, name);
+            Local l = nf.Local(argpos, name);
 
             LocalInstance li =
-                    ts.localInstance(pos, f.flags(), f.declType(), name.id());
+                    ts.localInstance(argpos, f.flags(), f.declType(), name.id());
             li.setNotConstant();
             f = f.localInstance(li);
             l = l.localInstance(li);
