@@ -349,21 +349,28 @@ public class LocalClassRemover extends ContextVisitor {
     }
 
     // Create a new constructor for an anonymous class.
-    ConstructorDecl addConstructor(ClassDecl cd, New neu) {
+    ConstructorDecl addConstructor(ClassDecl cd, New neu)
+            throws SemanticException {
         // Build the list of formal parameters and list of arguments for the super call.
         List<Formal> formals = new ArrayList<Formal>();
         List<Expr> args = new ArrayList<Expr>();
         List<Type> argTypes = new ArrayList<Type>();
-        int i = 1;
 
+        ClassType superType = cd.type().superType().toClass();
         for (Expr e : neu.arguments()) {
-            Position pos = e.position();
-            Id name = nf.Id(pos, "a" + i);
-            i++;
+            argTypes.add(e.type());
+        }
+
+        ConstructorInstance superCi =
+                typeSystem().findConstructor(superType, argTypes, cd.type());
+        for (int i = 0; i < argTypes.size(); i++) {
+            Type at = superCi.formalTypes().get(i);
+            Position pos = neu.arguments().get(i).position();
+            Id name = nf.Id(pos, "a" + (i + 1));
             Formal f =
                     nf.Formal(pos,
                               Flags.FINAL,
-                              nf.CanonicalTypeNode(pos, e.type()),
+                              nf.CanonicalTypeNode(pos, at),
                               name);
             Local l = nf.Local(pos, name);
 
@@ -376,7 +383,6 @@ public class LocalClassRemover extends ContextVisitor {
 
             formals.add(f);
             args.add(l);
-            argTypes.add(li.type());
         }
 
         Position pos = cd.position();
