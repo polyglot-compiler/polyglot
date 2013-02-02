@@ -25,6 +25,7 @@
  ******************************************************************************/
 package polyglot.ext.jl5.visit;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import polyglot.ast.ArrayInit;
@@ -159,6 +160,21 @@ public class TVCaster extends AscriptionVisitor {
     }
 
     private boolean mayHaveParameterizedReturn(MethodInstance mi) {
+        // TODO fix this and document
+
+        List<MethodInstance> overrides = new ArrayList();
+        overrides.add(mi);
+        overrides.addAll(ts.overrides(mi));
+        overrides.addAll(ts.implemented(mi));
+        for (MethodInstance mj : overrides) {
+            if (mayHaveParameterizedReturnImpl(mj)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean mayHaveParameterizedReturnImpl(MethodInstance mi) {
         ReferenceType container = mi.container();
         JL5ParsedClassType pct;
         if (container.isArray()) {
