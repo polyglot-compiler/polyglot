@@ -357,6 +357,7 @@ public class LocalClassRemover extends ContextVisitor {
         List<Type> argTypes = new ArrayList<Type>();
 
         ClassType superType = cd.type().superType().toClass();
+
         for (Expr e : neu.arguments()) {
             argTypes.add(e.type());
         }
@@ -394,13 +395,13 @@ public class LocalClassRemover extends ContextVisitor {
 
         // Create the super call.
         ConstructorCall cc = nf.SuperCall(pos, args);
-        cc = cc.constructorInstance(neu.constructorInstance());
+        cc = cc.constructorInstance(superCi);
         cc = cc.qualifier(adjustQualifier(neu.qualifier()));
 
         List<Stmt> statements = new ArrayList<Stmt>();
         statements.add(cc);
 
-        // Build the list of throw types, copied from the new expression's constructor (now the superclass constructor).
+        // Build the list of throw types, copied from the new expression's constructor.
         List<TypeNode> throwTypeNodes = new ArrayList<TypeNode>();
         List<Type> throwTypes = new ArrayList<Type>();
         for (Type t : neu.constructorInstance().throwTypes()) {
