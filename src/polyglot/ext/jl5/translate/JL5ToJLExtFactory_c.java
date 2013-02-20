@@ -26,8 +26,17 @@
 package polyglot.ext.jl5.translate;
 
 import polyglot.ast.Ext;
+import polyglot.ext.jl5.ast.JL5ExtFactory;
 
 public class JL5ToJLExtFactory_c extends JL5ToExtFactory_c {
+
+    public JL5ToJLExtFactory_c() {
+        super();
+    }
+
+    public JL5ToJLExtFactory_c(JL5ExtFactory extFactory) {
+        super(extFactory);
+    }
 
     @Override
     protected Ext extCallImpl() {

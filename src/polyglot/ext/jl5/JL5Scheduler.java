@@ -50,7 +50,6 @@ import polyglot.frontend.Job;
 import polyglot.frontend.OutputPass;
 import polyglot.frontend.Pass;
 import polyglot.frontend.Scheduler;
-import polyglot.frontend.goals.Barrier;
 import polyglot.frontend.goals.CodeGenerated;
 import polyglot.frontend.goals.EmptyGoal;
 import polyglot.frontend.goals.Goal;
@@ -233,36 +232,6 @@ public class JL5Scheduler extends JLScheduler {
 
     }
 
-    private Goal beforeJava5Rewrite = new Barrier("beforeJava5Rewrite", this) {
-        @Override
-        public Goal goalForJob(Job job) {
-            Goal g = internGoal(new EmptyGoal(job));
-
-            try {
-                Scheduler s = extInfo.scheduler();
-                g.addPrerequisiteGoal(CastsInserted(job), s);
-                g.addPrerequisiteGoal(TypeErasureProcDecls(job), s);
-                g.addPrerequisiteGoal(RemoveVarArgs(job), s);
-                g.addPrerequisiteGoal(AutoBoxing(job), s);
-                g.addPrerequisiteGoal(RemoveEnums(job), s);
-                g.addPrerequisiteGoal(RemoveVarArgsFlags(job), s);
-                g.addPrerequisiteGoal(RemoveExtendedFors(job), s);
-                g.addPrerequisiteGoal(RemoveStaticImports(job), s);
-                g.addPrerequisiteGoal(RemoveAnnotations(job), s);
-            }
-            catch (CyclicDependencyException e) {
-                // Cannot happen.
-                throw new InternalCompilerError(e);
-            }
-
-            return g;
-        }
-    };
-
-    public Goal BeforeJava5RewriteBarrier() {
-        return beforeJava5Rewrite;
-    }
-
     public Goal RemoveJava5isms(Job job) {
         ExtensionInfo toExtInfo = extInfo.outputExtensionInfo();
         Goal g =
@@ -270,7 +239,16 @@ public class JL5Scheduler extends JLScheduler {
                                                                     extInfo,
                                                                     toExtInfo)));
         try {
-            g.addPrerequisiteGoal(BeforeJava5RewriteBarrier(), this);
+            g.addPrerequisiteGoal(CastsInserted(job), this);
+            g.addPrerequisiteGoal(TypeErasureProcDecls(job), this);
+            g.addPrerequisiteGoal(RemoveVarArgs(job), this);
+            g.addPrerequisiteGoal(AutoBoxing(job), this);
+            g.addPrerequisiteGoal(RemoveEnums(job), this);
+            g.addPrerequisiteGoal(RemoveVarArgsFlags(job), this);
+            g.addPrerequisiteGoal(RemoveExtendedFors(job), this);
+            g.addPrerequisiteGoal(RemoveStaticImports(job), this);
+            g.addPrerequisiteGoal(RemoveAnnotations(job), this);
+
         }
         catch (CyclicDependencyException e) {
             throw new InternalCompilerError(e);

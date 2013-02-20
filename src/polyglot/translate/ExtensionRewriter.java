@@ -74,6 +74,7 @@ public class ExtensionRewriter extends ContextVisitor {
         this.from_ext = from_ext;
         this.to_ext = to_ext;
         this.qq = new QQ(to_ext);
+        this.rethrowMissingDependencies = true;
     }
 
     @Override
