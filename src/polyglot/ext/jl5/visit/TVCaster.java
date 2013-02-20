@@ -54,7 +54,6 @@ import polyglot.ext.jl5.types.RawClass;
 import polyglot.ext.jl5.types.TypeVariable;
 import polyglot.frontend.Job;
 import polyglot.types.ArrayType;
-import polyglot.types.ClassType;
 import polyglot.types.FieldInstance;
 import polyglot.types.MethodInstance;
 import polyglot.types.ReferenceType;
@@ -204,12 +203,12 @@ public class TVCaster extends AscriptionVisitor {
     }
 
     private boolean mayHaveCovariantReturn(MethodInstance mi) {
-        if (mi.returnType().isClass()) {
+        if (mi.returnType().isReference()) {
             List<MethodInstance> overrides = ts.overrides(mi);
             overrides.addAll(ts.implemented(mi));
-            ClassType ret = mi.returnType().toClass();
+            ReferenceType ret = mi.returnType().toReference();
             for (MethodInstance ovr : overrides) {
-                ClassType supRet = ovr.returnType().toClass();
+                ReferenceType supRet = ovr.returnType().toReference();
                 if (!ts.equals(ret, supRet)) {
                     return true;
                 }

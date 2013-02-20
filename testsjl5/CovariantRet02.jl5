@@ -1,0 +1,13 @@
+class C {
+  public static void main(String[] args) {
+  }
+  void m(D x) {
+      char[] y = x.array(); // D.array() has a covariant return, and so translation to JL must insert a cast.
+  }
+}
+class E {
+  Object array() { return null; }
+}
+class D extends E {
+  char[] array() { return null; }
+}
