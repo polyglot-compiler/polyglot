@@ -204,43 +204,43 @@ public class JL5ExtFactory_c extends AbstractExtFactory_c implements
         return this.postExtTypeNode(ext);
     }
 
-    private Ext extAnnotationElemDeclImpl() {
+    protected Ext extAnnotationElemDeclImpl() {
         return this.extClassMemberImpl();
     }
 
-    private Ext extNormalAnnotationElemImpl() {
+    protected Ext extNormalAnnotationElemImpl() {
         return this.extExprImpl();
     }
 
-    private Ext extMarkerAnnotationElemImpl() {
+    protected Ext extMarkerAnnotationElemImpl() {
         return this.extNormalAnnotationElemImpl();
     }
 
-    private Ext extSingleElementAnnotationElemImpl() {
+    protected Ext extSingleElementAnnotationElemImpl() {
         return this.extNormalAnnotationElemImpl();
     }
 
-    private Ext extElementValuePairImpl() {
+    protected Ext extElementValuePairImpl() {
         return this.extExprImpl();
     }
 
-    private Ext postExtAnnotationElemDecl(Ext ext) {
+    protected Ext postExtAnnotationElemDecl(Ext ext) {
         return ext;
     }
 
-    private Ext postExtNormalAnnotationElem(Ext ext) {
+    protected Ext postExtNormalAnnotationElem(Ext ext) {
         return ext;
     }
 
-    private Ext postExtMarkerAnnotationElem(Ext ext) {
+    protected Ext postExtMarkerAnnotationElem(Ext ext) {
         return ext;
     }
 
-    private Ext postExtSingleElementAnnotationElem(Ext ext) {
+    protected Ext postExtSingleElementAnnotationElem(Ext ext) {
         return ext;
     }
 
-    private Ext postExtElementValuePair(Ext ext) {
+    protected Ext postExtElementValuePair(Ext ext) {
         return ext;
     }
 

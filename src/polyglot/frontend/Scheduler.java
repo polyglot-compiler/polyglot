@@ -259,7 +259,7 @@ public abstract class Scheduler {
     protected static class TheEndGoal extends AbstractGoal {
         protected Scheduler scheduler;
 
-        protected TheEndGoal(Scheduler scheduler) {
+        public TheEndGoal(Scheduler scheduler) {
             super(null);
             this.scheduler = scheduler;
         }
