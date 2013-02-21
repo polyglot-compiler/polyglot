@@ -59,7 +59,9 @@ public class JL5SchedulerClassInitializer extends SchedulerClassInitializer
     @Override
     public void initAnnotations() {
         if (!annotationInitialized) {
-            if (ct.fromSource() != null) {
+            JL5ParsedClassType pct = (JL5ParsedClassType) ct;
+            if (!pct.flags().contains(JL5Flags.ANNOTATION)
+                    && ct.fromSource() != null) {
                 Job job =
                         scheduler.loadSource((FileSource) ct.fromSource(), true);
                 Goal g = scheduler.TypeChecked(job);
