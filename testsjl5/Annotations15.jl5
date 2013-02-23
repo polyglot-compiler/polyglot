@@ -1,0 +1,13 @@
+@Circular
+@interface Circular {
+}
+
+
+@CircularB
+@interface CircularA {
+}
+
+
+@CircularA
+@interface CircularB {
+}
