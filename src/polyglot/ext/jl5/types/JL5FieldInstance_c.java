@@ -36,7 +36,7 @@ public class JL5FieldInstance_c extends FieldInstance_c implements
         JL5FieldInstance {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
-    protected RetainedAnnotations retainedAnnotations;
+    protected Annotations annotations;
 
     public JL5FieldInstance_c(JL5TypeSystem ts, Position pos,
             ReferenceType container, Flags flags, Type type, String name) {
@@ -44,13 +44,13 @@ public class JL5FieldInstance_c extends FieldInstance_c implements
     }
 
     @Override
-    public RetainedAnnotations retainedAnnotations() {
-        return this.retainedAnnotations;
+    public Annotations annotations() {
+        return this.annotations;
     }
 
     @Override
-    public void setRetainedAnnotations(RetainedAnnotations retainedAnnotations) {
-        this.retainedAnnotations = retainedAnnotations;
+    public void setAnnotations(Annotations annotations) {
+        this.annotations = annotations;
     }
 
 }

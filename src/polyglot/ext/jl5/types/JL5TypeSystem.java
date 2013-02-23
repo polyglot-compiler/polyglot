@@ -38,7 +38,6 @@ import polyglot.types.ArrayType;
 import polyglot.types.ClassType;
 import polyglot.types.ConstructorInstance;
 import polyglot.types.Context;
-import polyglot.types.Declaration;
 import polyglot.types.FieldInstance;
 import polyglot.types.Flags;
 import polyglot.types.LazyClassInitializer;
@@ -76,21 +75,6 @@ public interface JL5TypeSystem extends TypeSystem,
     ClassType RetentionAnnotation();
 
     ClassType AnnotationElementType();
-
-    /** 
-     * 
-     * Is the annotation element <code>annotation</code> applicable
-     * to Declaration decl? For example, if annotation is "@Override" then decl
-     * better be a methodInstance that overrides another method. If annotation's
-     * type itself has annotations describing which targets are appropriate,
-     * then decl must be an appropriate target.
-     * 
-     * @param annotation
-     * @param decl
-     * @throws SemanticException
-     */
-    void checkAnnotationApplicability(AnnotationElem annotation,
-            Declaration decl) throws SemanticException;
 
     boolean accessibleFromPackage(Flags flags, Package pkg1, Package pkg2);
 
@@ -387,24 +371,20 @@ public interface JL5TypeSystem extends TypeSystem,
      */
     UnknownTypeVariable unknownTypeVariable(Position position);
 
-    /**
-     * Given a list of annotation elements, create a RetainedAnnotations
-     * for the annotations that should survive in the binary (i.e., in the
-     * type information)
-     * @throws SemanticException 
-     */
-    RetainedAnnotations createRetainedAnnotations(
-            List<AnnotationElem> annotationElems, Position pos)
-            throws SemanticException;
-
-    RetainedAnnotations createRetainedAnnotations(
+    Annotations createAnnotations(
             Map<Type, Map<String, AnnotationElementValue>> annotationElems,
             Position position);
 
     /**
-     * A special RetainedAnnotations that has no retained annotations.
+     * Given an annotation of type annotationType, should the annotation
+     * be retained in the binary? See JLS 3rd ed, 9.6.1.2
      */
-    RetainedAnnotations NoRetainedAnnotations();
+    public boolean isRetainedAnnotation(Type annotationType);
+
+    /**
+     * A special Annotations that has no annotations.
+     */
+    Annotations NoAnnotations();
 
     AnnotationElementValue AnnotationElementValueArray(Position pos,
             List<AnnotationElementValue> vals);

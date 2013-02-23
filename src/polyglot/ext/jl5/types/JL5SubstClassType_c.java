@@ -369,8 +369,8 @@ public class JL5SubstClassType_c extends
     }
 
     @Override
-    public RetainedAnnotations retainedAnnotations() {
-        return ((JL5TypeSystem) this.typeSystem()).NoRetainedAnnotations();
+    public Annotations annotations() {
+        return ((JL5TypeSystem) this.typeSystem()).NoAnnotations();
     }
 
 }

@@ -128,4 +128,9 @@ public class ElementValuePair_c extends Term_c implements ElementValuePair {
         return this.value;
     }
 
+    @Override
+    public String toString() {
+        return name + "=" + value;
+    }
+
 }

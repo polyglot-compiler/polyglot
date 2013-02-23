@@ -38,6 +38,7 @@ import polyglot.ast.MethodDecl;
 import polyglot.ast.MethodDecl_c;
 import polyglot.ast.Node;
 import polyglot.ast.TypeNode;
+import polyglot.ext.jl5.types.Annotations;
 import polyglot.ext.jl5.types.JL5ArrayType;
 import polyglot.ext.jl5.types.JL5Context;
 import polyglot.ext.jl5.types.JL5Flags;
@@ -324,19 +325,21 @@ public class JL5MethodDecl_c extends MethodDecl_c implements JL5MethodDecl {
 
         overrideMethodCheck(tc);
 
-        // set the retained annotations
-        mi.setRetainedAnnotations(ts.createRetainedAnnotations(this.annotationElems(),
-                                                               this.position()));
-
         return md;
+    }
+
+    @Override
+    public void setAnnotations(Annotations annotations) {
+        JL5MethodInstance mi = (JL5MethodInstance) this.methodInstance();
+        mi.setAnnotations(annotations);
     }
 
     @Override
     public Node annotationCheck(AnnotationChecker annoCheck)
             throws SemanticException {
-        JL5TypeSystem ts = (JL5TypeSystem) annoCheck.typeSystem();
         for (AnnotationElem element : annotations) {
-            ts.checkAnnotationApplicability(element, this.methodInstance());
+            annoCheck.checkAnnotationApplicability(element,
+                                                   this.methodInstance());
         }
         return this;
     }

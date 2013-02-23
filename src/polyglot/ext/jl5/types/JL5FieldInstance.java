@@ -30,11 +30,12 @@ import polyglot.types.FieldInstance;
 public interface JL5FieldInstance extends FieldInstance {
 
     /**
-     * Annotations on the declaration of this type such that the annotation type has
+     * Annotations on the declaration of this type. For types loaded from
+     * class files, may contain only annotations such that the annotation type has
      * a retention policy of annotation.RetentionPolicy.CLASS or annotation.RetentionPolicy.RUNTIME.
      */
-    RetainedAnnotations retainedAnnotations();
+    Annotations annotations();
 
-    void setRetainedAnnotations(RetainedAnnotations createRetainedAnnotations);
+    void setAnnotations(Annotations annotations);
 
 }

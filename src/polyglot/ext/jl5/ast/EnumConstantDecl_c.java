@@ -37,6 +37,7 @@ import polyglot.ast.Id;
 import polyglot.ast.Node;
 import polyglot.ast.Term;
 import polyglot.ast.Term_c;
+import polyglot.ext.jl5.types.Annotations;
 import polyglot.ext.jl5.types.EnumInstance;
 import polyglot.ext.jl5.types.JL5ParsedClassType;
 import polyglot.ext.jl5.types.JL5TypeSystem;
@@ -408,10 +409,14 @@ public class EnumConstantDecl_c extends Term_c implements EnumConstantDecl {
 
     @Override
     public Node annotationCheck(AnnotationChecker ac) throws SemanticException {
-        JL5TypeSystem ts = (JL5TypeSystem) ac.typeSystem();
         for (AnnotationElem elem : annotations) {
-            ts.checkAnnotationApplicability(elem, this.enumInstance());
+            ac.checkAnnotationApplicability(elem, this.enumInstance());
         }
         return this;
+    }
+
+    @Override
+    public void setAnnotations(Annotations annotations) {
+        this.enumInstance.setAnnotations(annotations);
     }
 }

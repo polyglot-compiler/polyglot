@@ -33,6 +33,7 @@ import java.util.StringTokenizer;
 
 import polyglot.ext.jl5.types.AnnotationElementValue;
 import polyglot.ext.jl5.types.AnnotationTypeElemInstance;
+import polyglot.ext.jl5.types.Annotations;
 import polyglot.ext.jl5.types.EnumInstance;
 import polyglot.ext.jl5.types.JL5ConstructorInstance;
 import polyglot.ext.jl5.types.JL5FieldInstance;
@@ -40,7 +41,6 @@ import polyglot.ext.jl5.types.JL5Flags;
 import polyglot.ext.jl5.types.JL5MethodInstance;
 import polyglot.ext.jl5.types.JL5ParsedClassType;
 import polyglot.ext.jl5.types.JL5TypeSystem;
-import polyglot.ext.jl5.types.RetainedAnnotations;
 import polyglot.ext.jl5.types.TypeVariable;
 import polyglot.ext.param.types.MuPClass;
 import polyglot.main.Report;
@@ -343,9 +343,8 @@ public class JL5ClassFileLazyClassInitializer extends
             annotationElems.putAll(method.getRuntimeInvisibleAnnotations()
                                          .toAnnotationElems(this, ts));
         }
-        RetainedAnnotations retAnn =
-                ts.createRetainedAnnotations(annotationElems, ct.position());
-        mi.setRetainedAnnotations(retAnn);
+        Annotations ann = ts.createAnnotations(annotationElems, ct.position());
+        mi.setAnnotations(ann);
         return mi;
     }
 
@@ -405,7 +404,7 @@ public class JL5ClassFileLazyClassInitializer extends
                                                          mi.throwTypes(),
                                                          mi.typeParams());
 
-        ci.setRetainedAnnotations(mi.retainedAnnotations());
+        ci.setAnnotations(mi.annotations());
 
         return ci;
     }
@@ -487,9 +486,8 @@ public class JL5ClassFileLazyClassInitializer extends
             annotationElems.putAll(field.getRuntimeInvisibleAnnotations()
                                         .toAnnotationElems(this, ts));
         }
-        RetainedAnnotations retAnn =
-                ts.createRetainedAnnotations(annotationElems, ct.position());
-        fi.setRetainedAnnotations(retAnn);
+        Annotations ann = ts.createAnnotations(annotationElems, ct.position());
+        fi.setAnnotations(ann);
 
         return fi;
     }
@@ -543,9 +541,9 @@ public class JL5ClassFileLazyClassInitializer extends
                                       .toAnnotationElems(this, ts));
         }
 
-        RetainedAnnotations retAnn =
-                ts.createRetainedAnnotations(annotationElems, ct.position());
-        ((JL5ParsedClassType) ct).setRetainedAnnotations(retAnn);
+        Annotations retAnn =
+                ts.createAnnotations(annotationElems, ct.position());
+        ((JL5ParsedClassType) ct).setAnnotations(retAnn);
 
         annotationsInitialized = true;
         if (initialized()) {

@@ -33,8 +33,10 @@ import polyglot.ast.Formal_c;
 import polyglot.ast.Id;
 import polyglot.ast.Node;
 import polyglot.ast.TypeNode;
+import polyglot.ext.jl5.types.Annotations;
 import polyglot.ext.jl5.types.JL5ArrayType;
 import polyglot.ext.jl5.types.JL5Flags;
+import polyglot.ext.jl5.types.JL5LocalInstance;
 import polyglot.ext.jl5.types.JL5TypeSystem;
 import polyglot.ext.jl5.visit.AnnotationChecker;
 import polyglot.types.ArrayType;
@@ -122,9 +124,8 @@ public class JL5Formal_c extends Formal_c implements JL5Formal {
     @Override
     public Node annotationCheck(AnnotationChecker annoCheck)
             throws SemanticException {
-        JL5TypeSystem ts = (JL5TypeSystem) annoCheck.typeSystem();
         for (AnnotationElem elem : annotations) {
-            ts.checkAnnotationApplicability(elem, this.localInstance());
+            annoCheck.checkAnnotationApplicability(elem, this.localInstance());
         }
         return this;
     }
@@ -159,4 +160,11 @@ public class JL5Formal_c extends Formal_c implements JL5Formal {
     public List<AnnotationElem> annotationElems() {
         return this.annotations;
     }
+
+    @Override
+    public void setAnnotations(Annotations annotations) {
+        JL5LocalInstance li = (JL5LocalInstance) this.localInstance();
+        li.setAnnotations(annotations);
+    }
+
 }

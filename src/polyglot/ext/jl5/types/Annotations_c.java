@@ -26,6 +26,8 @@
 package polyglot.ext.jl5.types;
 
 import java.util.Collections;
+import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -34,18 +36,17 @@ import polyglot.types.TypeObject_c;
 import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
 
-public class RetainedAnnotations_c extends TypeObject_c implements
-        RetainedAnnotations {
+public class Annotations_c extends TypeObject_c implements Annotations {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
     private Map<Type, Map<String, AnnotationElementValue>> annotations;
 
-    public RetainedAnnotations_c(JL5TypeSystem ts, Position pos) {
+    public Annotations_c(JL5TypeSystem ts, Position pos) {
         super(ts, pos);
         this.annotations = Collections.emptyMap();
     }
 
-    public RetainedAnnotations_c(
+    public Annotations_c(
             Map<Type, Map<String, AnnotationElementValue>> annotations,
             JL5TypeSystem ts, Position pos) {
         super(ts, pos);
@@ -60,6 +61,19 @@ public class RetainedAnnotations_c extends TypeObject_c implements
     @Override
     public Set<Type> annotationTypes() {
         return Collections.unmodifiableSet(annotations.keySet());
+    }
+
+    @Override
+    public Set<Type> retainedAnnotationTypes() {
+        Set<Type> retAnnType = new LinkedHashSet<Type>(annotations.keySet());
+        JL5TypeSystem ts = (JL5TypeSystem) this.typeSystem();
+        for (Iterator<Type> iter = retAnnType.iterator(); iter.hasNext();) {
+            Type t = iter.next();
+            if (!ts.isRetainedAnnotation(t)) {
+                iter.remove();
+            }
+        }
+        return Collections.unmodifiableSet(retAnnType);
     }
 
     @Override

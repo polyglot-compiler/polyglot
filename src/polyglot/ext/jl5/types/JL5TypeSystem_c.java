@@ -60,7 +60,6 @@ import polyglot.types.ArrayType;
 import polyglot.types.ClassType;
 import polyglot.types.ConstructorInstance;
 import polyglot.types.Context;
-import polyglot.types.Declaration;
 import polyglot.types.FieldInstance;
 import polyglot.types.Flags;
 import polyglot.types.ImportTable;
@@ -492,6 +491,12 @@ public class JL5TypeSystem_c extends
                                             argTypes,
                                             excTypes,
                                             typeParams);
+    }
+
+    @Override
+    public LocalInstance localInstance(Position pos, Flags flags, Type type,
+            String name) {
+        return new JL5LocalInstance_c(this, pos, flags, type, name);
     }
 
     @Override
@@ -2314,94 +2319,6 @@ public class JL5TypeSystem_c extends
     }
 
     @Override
-    public void checkAnnotationApplicability(AnnotationElem annotation,
-            Declaration decl) throws SemanticException {
-        JL5ClassType annotationType =
-                (JL5ClassType) annotation.typeName().type().toClass();
-
-        if (annotationType.equals(OverrideAnnotation())) {
-            checkOverrideAnnotation(decl);
-        }
-
-        // If annotationType specifies what kind of target it is meant to be applied to,
-        // then check that.
-
-        RetainedAnnotations ra = annotationType.retainedAnnotations();
-        if (ra != null) {
-            for (Type at : ra.annotationTypes()) {
-                if (at.equals(TargetAnnotation())) {
-                    // annotationType has a target annotation!
-                    checkTargetMetaAnnotation((AnnotationElementValueArray) ra.singleElement(at),
-                                              annotation,
-                                              decl);
-                }
-            }
-        }
-    }
-
-    private void checkTargetMetaAnnotation(
-            AnnotationElementValueArray targetKinds, AnnotationElem annotation,
-            Declaration decl) throws SemanticException {
-        Collection<EnumInstance> eis =
-                annotationElementTypesForDeclaration(decl);
-        // the array targs must contain at least one of the eis.
-        boolean foundAppropriateTarget = false;
-        requiredCheck: for (EnumInstance required : eis) {
-            for (AnnotationElementValue found : targetKinds.vals()) {
-                AnnotationElementValueConstant c =
-                        (AnnotationElementValueConstant) found;
-                if (required.equals(c.constantValue())) {
-                    foundAppropriateTarget = true;
-                    break requiredCheck;
-                }
-            }
-        }
-
-        if (!foundAppropriateTarget) {
-            throw new SemanticException("Annotation "
-                                                + annotation
-                                                + " not applicable to this kind of declaration.",
-                                        annotation.position());
-        }
-
-    }
-
-    private Collection<EnumInstance> annotationElementTypesForDeclaration(
-            Declaration decl) {
-        ClassType aet = AnnotationElementType();
-        if (decl instanceof MethodInstance) {
-            return Collections.singleton((EnumInstance) aet.fieldNamed("METHOD"));
-        }
-        if (decl instanceof FieldInstance) {
-            return Collections.singleton((EnumInstance) aet.fieldNamed("FIELD"));
-        }
-        if (decl instanceof LocalInstance) {
-            // it's either a local instance or a formal
-            // we're being a little lax here, and just assuming it it is a local variable
-            return Collections.singleton((EnumInstance) aet.fieldNamed("LOCAL_VARIABLE"));
-            //return (EnumInstance) aet.fieldNamed("PARAMETER");
-        }
-        if (decl instanceof ClassType) {
-            ClassType ct = (ClassType) decl;
-            if (ct.flags().isInterface() && JL5Flags.isAnnotation(ct.flags())) {
-                // it's an annotation
-                return Arrays.asList(new EnumInstance[] {
-                        (EnumInstance) aet.fieldNamed("TYPE"),
-                        (EnumInstance) aet.fieldNamed("ANNOTATION_TYPE") });
-            }
-            return Collections.singleton((EnumInstance) aet.fieldNamed("TYPE"));
-        }
-        if (decl instanceof ConstructorInstance) {
-            return Collections.singleton((EnumInstance) aet.fieldNamed("CONSTRUCTOR"));
-        }
-        if (decl instanceof Package) {
-            return Collections.singleton((EnumInstance) aet.fieldNamed("PACKAGE"));
-        }
-
-        throw new InternalCompilerError("Don't know how to deal with " + decl);
-    }
-
-    @Override
     public void checkDuplicateAnnotations(List<AnnotationElem> annotations)
             throws SemanticException {
         // check no duplicate annotations used
@@ -2416,22 +2333,6 @@ public class JL5TypeSystem_c extends
                             + aj.typeName(), aj.position());
                 }
             }
-        }
-    }
-
-    protected void checkOverrideAnnotation(Declaration decl)
-            throws SemanticException {
-        if (!(decl instanceof MethodInstance)) {
-            throw new SemanticException("An override annotation can apply only to methods.",
-                                        decl.position());
-        }
-        MethodInstance mi = (MethodInstance) decl;
-        List<MethodInstance> overrides =
-                new LinkedList<MethodInstance>(this.overrides(mi));
-        overrides.remove(mi);
-        if (overrides.isEmpty()) {
-            throw new SemanticException("Method " + mi.signature()
-                    + " does not override a method.", decl.position());
         }
     }
 
@@ -2588,38 +2489,24 @@ public class JL5TypeSystem_c extends
     }
 
     @Override
-    public RetainedAnnotations createRetainedAnnotations(
-            List<AnnotationElem> annotationElems, Position pos)
-            throws SemanticException {
-        Map<Type, Map<String, AnnotationElementValue>> m =
-                new LinkedHashMap<Type, Map<String, AnnotationElementValue>>();
-        for (AnnotationElem ae : annotationElems) {
-            Type annotationType = ae.typeName().type();
-            if (isRetainedAnnotation(annotationType)) {
-                m.put(annotationType, ae.toAnnotationElementValues(this));
-            }
-        }
-        return new RetainedAnnotations_c(m, this, pos);
-    }
-
-    @Override
-    public RetainedAnnotations createRetainedAnnotations(
+    public Annotations createAnnotations(
             Map<Type, Map<java.lang.String, AnnotationElementValue>> annotationElems,
             Position pos) {
-        return new RetainedAnnotations_c(annotationElems, this, pos);
+        return new Annotations_c(annotationElems, this, pos);
     }
 
     /**
      * Given an annotation of type annotationType, should the annotation
      * be retained in the binary? See JLS 3rd ed, 9.6.1.2
      */
-    protected boolean isRetainedAnnotation(Type annotationType) {
+    @Override
+    public boolean isRetainedAnnotation(Type annotationType) {
         if (annotationType.isClass()
                 && annotationType.toClass().isSubtype(this.Annotation())) {
             // well, it's an annotation type at least.
             // check if there is a retention policy on it.
             JL5ClassType ct = (JL5ClassType) annotationType.toClass();
-            RetainedAnnotations ra = ct.retainedAnnotations();
+            Annotations ra = ct.annotations();
             if (ra == null) {
                 // by default, use RetentionPolicy.CLASS
                 return true;
@@ -2647,8 +2534,8 @@ public class JL5TypeSystem_c extends
     }
 
     @Override
-    public RetainedAnnotations NoRetainedAnnotations() {
-        return new RetainedAnnotations_c(this, Position.compilerGenerated(1));
+    public Annotations NoAnnotations() {
+        return new Annotations_c(this, Position.compilerGenerated(1));
     }
 
     @Override

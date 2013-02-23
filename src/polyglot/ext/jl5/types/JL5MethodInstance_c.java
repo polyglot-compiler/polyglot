@@ -50,7 +50,7 @@ public class JL5MethodInstance_c extends MethodInstance_c implements
     private static final long serialVersionUID = SerialVersionUID.generate();
 
     private List<TypeVariable> typeParams;
-    private RetainedAnnotations retainedAnnotations;
+    private Annotations annotations;
 
     public JL5MethodInstance_c(JL5TypeSystem ts, Position pos,
             ReferenceType container, Flags flags, Type returnType, String name,
@@ -355,12 +355,12 @@ public class JL5MethodInstance_c extends MethodInstance_c implements
     }
 
     @Override
-    public RetainedAnnotations retainedAnnotations() {
-        return this.retainedAnnotations;
+    public Annotations annotations() {
+        return this.annotations;
     }
 
     @Override
-    public void setRetainedAnnotations(RetainedAnnotations retainedAnnotations) {
-        this.retainedAnnotations = retainedAnnotations;
+    public void setAnnotations(Annotations annotations) {
+        this.annotations = annotations;
     }
 }

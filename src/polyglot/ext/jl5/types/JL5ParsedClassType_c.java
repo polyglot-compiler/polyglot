@@ -54,7 +54,8 @@ public class JL5ParsedClassType_c extends ParsedClassType_c implements
     protected List<TypeVariable> typeVars = Collections.emptyList();
     protected List<EnumInstance> enumConstants;
     protected List<AnnotationTypeElemInstance> annotationElems;
-    protected RetainedAnnotations retainedAnnotations;
+    protected boolean annotationsResolved = false;
+    protected Annotations annotations;
 
     public JL5ParsedClassType_c(TypeSystem ts, LazyClassInitializer init,
             Source fromSource) {
@@ -319,14 +320,14 @@ public class JL5ParsedClassType_c extends ParsedClassType_c implements
     }
 
     @Override
-    public RetainedAnnotations retainedAnnotations() {
+    public Annotations annotations() {
         ((JL5LazyClassInitializer) init).initAnnotations();
-        return this.retainedAnnotations;
+        return this.annotations;
     }
 
     @Override
-    public void setRetainedAnnotations(RetainedAnnotations retainedAnnotations) {
-        this.retainedAnnotations = retainedAnnotations;
+    public void setAnnotations(Annotations annotations) {
+        this.annotations = annotations;
     }
 
     @Override
@@ -350,6 +351,16 @@ public class JL5ParsedClassType_c extends ParsedClassType_c implements
             }
         }
         return true;
+    }
+
+    @Override
+    public boolean annotationsResolved() {
+        return this.annotationsResolved;
+    }
+
+    @Override
+    public void setAnnotationsResolved(boolean annotationsResolved) {
+        this.annotationsResolved = annotationsResolved;
     }
 
 }

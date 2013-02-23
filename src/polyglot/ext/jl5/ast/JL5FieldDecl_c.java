@@ -34,8 +34,8 @@ import polyglot.ast.FieldDecl_c;
 import polyglot.ast.Id;
 import polyglot.ast.Node;
 import polyglot.ast.TypeNode;
+import polyglot.ext.jl5.types.Annotations;
 import polyglot.ext.jl5.types.JL5FieldInstance;
-import polyglot.ext.jl5.types.JL5TypeSystem;
 import polyglot.ext.jl5.visit.AnnotationChecker;
 import polyglot.types.Flags;
 import polyglot.types.SemanticException;
@@ -46,7 +46,6 @@ import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
 import polyglot.visit.NodeVisitor;
 import polyglot.visit.PrettyPrinter;
-import polyglot.visit.TypeChecker;
 
 public class JL5FieldDecl_c extends FieldDecl_c implements FieldDecl,
         AnnotatedElement {
@@ -101,22 +100,16 @@ public class JL5FieldDecl_c extends FieldDecl_c implements FieldDecl,
     @Override
     public Node annotationCheck(AnnotationChecker annoCheck)
             throws SemanticException {
-        JL5TypeSystem ts = (JL5TypeSystem) annoCheck.typeSystem();
         for (AnnotationElem elem : annotations) {
-            ts.checkAnnotationApplicability(elem, this.fieldInstance());
+            annoCheck.checkAnnotationApplicability(elem, this.fieldInstance());
         }
         return this;
     }
 
     @Override
-    public Node typeCheck(TypeChecker tc) throws SemanticException {
-        JL5FieldDecl_c n = (JL5FieldDecl_c) super.typeCheck(tc);
-        // set the retained annotations
-        JL5FieldInstance fi = (JL5FieldInstance) n.fieldInstance();
-        JL5TypeSystem ts = (JL5TypeSystem) fi.typeSystem();
-        fi.setRetainedAnnotations(ts.createRetainedAnnotations(this.annotationElems(),
-                                                               this.position()));
-        return n;
+    public void setAnnotations(Annotations annotations) {
+        JL5FieldInstance fi = (JL5FieldInstance) this.fieldInstance();
+        fi.setAnnotations(annotations);
     }
 
     @Override

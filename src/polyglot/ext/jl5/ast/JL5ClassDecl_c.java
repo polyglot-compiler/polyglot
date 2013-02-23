@@ -37,6 +37,7 @@ import polyglot.ast.Id;
 import polyglot.ast.Node;
 import polyglot.ast.TypeNode;
 import polyglot.ext.jl5.types.AnnotationTypeElemInstance;
+import polyglot.ext.jl5.types.Annotations;
 import polyglot.ext.jl5.types.JL5Context;
 import polyglot.ext.jl5.types.JL5Flags;
 import polyglot.ext.jl5.types.JL5ParsedClassType;
@@ -255,10 +256,6 @@ public class JL5ClassDecl_c extends ClassDecl_c implements JL5ClassDecl {
             }
         }
 
-        // set the retained annotations
-        ((JL5ParsedClassType) type()).setRetainedAnnotations(ts.createRetainedAnnotations(this.annotationElems(),
-                                                                                          this.position()));
-
         return super.typeCheck(tc);
     }
 
@@ -267,9 +264,8 @@ public class JL5ClassDecl_c extends ClassDecl_c implements JL5ClassDecl {
             throws SemanticException {
 
         // check proper used of predefined annotations
-        JL5TypeSystem ts = (JL5TypeSystem) annoCheck.typeSystem();
         for (AnnotationElem element : annotations) {
-            ts.checkAnnotationApplicability(element, this.type());
+            annoCheck.checkAnnotationApplicability(element, this.type());
         }
 
         // check annotation circularity
@@ -386,5 +382,12 @@ public class JL5ClassDecl_c extends ClassDecl_c implements JL5ClassDecl {
         }
         prettyPrintHeaderRest(w, tr);
 
+    }
+
+    @Override
+    public void setAnnotations(Annotations annotations) {
+        JL5ParsedClassType pct = (JL5ParsedClassType) type();
+        pct.setAnnotations(annotations);
+        pct.setAnnotationsResolved(true);
     }
 }

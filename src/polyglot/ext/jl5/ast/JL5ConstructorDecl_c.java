@@ -38,6 +38,7 @@ import polyglot.ast.Formal;
 import polyglot.ast.Id;
 import polyglot.ast.Node;
 import polyglot.ast.TypeNode;
+import polyglot.ext.jl5.types.Annotations;
 import polyglot.ext.jl5.types.JL5ArrayType;
 import polyglot.ext.jl5.types.JL5ConstructorInstance;
 import polyglot.ext.jl5.types.JL5Context;
@@ -236,9 +237,9 @@ public class JL5ConstructorDecl_c extends ConstructorDecl_c implements
     @Override
     public Node annotationCheck(AnnotationChecker annoCheck)
             throws SemanticException {
-        JL5TypeSystem ts = (JL5TypeSystem) annoCheck.typeSystem();
         for (AnnotationElem element : annotations) {
-            ts.checkAnnotationApplicability(element, this.constructorInstance());
+            annoCheck.checkAnnotationApplicability(element,
+                                                   this.constructorInstance());
         }
         return this;
     }
@@ -315,7 +316,6 @@ public class JL5ConstructorDecl_c extends ConstructorDecl_c implements
         ConstructorDecl cd = this;
         JL5ConstructorInstance ci =
                 (JL5ConstructorInstance) this.constructorInstance();
-        JL5TypeSystem ts = (JL5TypeSystem) ci.typeSystem();
 
         // check at most last formal is variable
         for (int i = 0; i < formals.size(); i++) {
@@ -349,10 +349,14 @@ public class JL5ConstructorDecl_c extends ConstructorDecl_c implements
             }
         }
 
-        // set the retained annotations
-        ci.setRetainedAnnotations(ts.createRetainedAnnotations(this.annotationElems(),
-                                                               this.position()));
-
         return super.typeCheck(tc);
     }
+
+    @Override
+    public void setAnnotations(Annotations annotations) {
+        JL5ConstructorInstance ci =
+                (JL5ConstructorInstance) this.constructorInstance();
+        ci.setAnnotations(annotations);
+    }
+
 }

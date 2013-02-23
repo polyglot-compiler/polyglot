@@ -33,13 +33,13 @@ import java.util.List;
 import java.util.Set;
 
 import polyglot.ext.jl5.types.AnnotationTypeElemInstance;
+import polyglot.ext.jl5.types.Annotations;
 import polyglot.ext.jl5.types.EnumInstance;
 import polyglot.ext.jl5.types.JL5ParsedClassType;
 import polyglot.ext.jl5.types.JL5SubstClassType;
 import polyglot.ext.jl5.types.JL5TypeSystem;
 import polyglot.ext.jl5.types.JL5TypeSystem_c;
 import polyglot.ext.jl5.types.RawClass;
-import polyglot.ext.jl5.types.RetainedAnnotations;
 import polyglot.ext.jl5.types.WildCardType;
 import polyglot.frontend.Job;
 import polyglot.types.ClassType;
@@ -438,8 +438,8 @@ public class LubType_c extends ClassType_c implements LubType {
     }
 
     @Override
-    public RetainedAnnotations retainedAnnotations() {
-        return ((JL5TypeSystem) this.typeSystem()).NoRetainedAnnotations();
+    public Annotations annotations() {
+        return ((JL5TypeSystem) this.typeSystem()).NoAnnotations();
     }
 
 }

@@ -359,7 +359,7 @@ public class IntersectionType_c extends ClassType_c implements IntersectionType 
     }
 
     @Override
-    public RetainedAnnotations retainedAnnotations() {
-        return ((JL5TypeSystem) this.typeSystem()).NoRetainedAnnotations();
+    public Annotations annotations() {
+        return ((JL5TypeSystem) this.typeSystem()).NoAnnotations();
     }
 }

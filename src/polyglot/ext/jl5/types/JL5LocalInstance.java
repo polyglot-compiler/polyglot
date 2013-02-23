@@ -23,32 +23,19 @@
  *
  * See README for contributors.
  ******************************************************************************/
-package polyglot.ext.jl5.ast;
+package polyglot.ext.jl5.types;
 
-import java.util.List;
+import polyglot.types.LocalInstance;
 
-import polyglot.ast.Node;
-import polyglot.ext.jl5.types.Annotations;
-import polyglot.ext.jl5.visit.AnnotationChecker;
-import polyglot.types.SemanticException;
-
-/**
- * Interface for nodes that can have annotations, which, for example
- * include class declarations, field declarations, and method 
- * declarations.
- *
- */
-public interface AnnotatedElement {
-    List<AnnotationElem> annotationElems();
-
-    AnnotatedElement annotationElems(List<AnnotationElem> annotations);
-
-    Node annotationCheck(AnnotationChecker ac) throws SemanticException;
+public interface JL5LocalInstance extends LocalInstance {
 
     /**
-     * Set the annotations on the appropriate type object associated with
-     * this AnnotatedElement.
-     * @param annotations
+     * Annotations on the declaration of this type. For types loaded from
+     * class files, may contain only annotations such that the annotation type has
+     * a retention policy of annotation.RetentionPolicy.CLASS or annotation.RetentionPolicy.RUNTIME.
      */
+    Annotations annotations();
+
     void setAnnotations(Annotations annotations);
+
 }

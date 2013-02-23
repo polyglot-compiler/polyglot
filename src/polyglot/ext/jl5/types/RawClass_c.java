@@ -244,8 +244,8 @@ public class RawClass_c extends JL5ClassType_c implements RawClass {
     }
 
     @Override
-    public RetainedAnnotations retainedAnnotations() {
-        return ((JL5TypeSystem) this.typeSystem()).NoRetainedAnnotations();
+    public Annotations annotations() {
+        return ((JL5TypeSystem) this.typeSystem()).NoAnnotations();
     }
 
 }

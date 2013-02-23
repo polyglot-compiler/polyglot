@@ -55,6 +55,7 @@ import polyglot.frontend.goals.EmptyGoal;
 import polyglot.frontend.goals.Goal;
 import polyglot.frontend.goals.VisitorGoal;
 import polyglot.main.Options;
+import polyglot.types.ParsedClassType;
 import polyglot.types.TypeSystem;
 import polyglot.util.InternalCompilerError;
 
@@ -64,16 +65,16 @@ public class JL5Scheduler extends JLScheduler {
         super(extInfo);
     }
 
-//    @Override
-//	public Goal TypeChecked(Job job) {
-//    	Goal g = super.TypeChecked(job);
-//    	try {
-//        	g.addPrerequisiteGoal(CastsInserted(job),this);
-//        } catch (CyclicDependencyException e) {
-//            throw new InternalCompilerError(e);
-//        }
-//    	return g;
-//	}
+    public Goal AnnotationsResolved(ParsedClassType ct) {
+        Goal g = AnnotationsResolved.create(this, ct);
+        return this.internGoal(g);
+    }
+
+    public Goal AnnotationsResolved(Job job) {
+        Goal g = AnnotationsResolved.create(this, job);
+        return this.internGoal(g);
+    }
+
 
     public Goal CastsInserted(Job job) {
         TypeSystem ts = extInfo.typeSystem();
@@ -263,6 +264,7 @@ public class JL5Scheduler extends JLScheduler {
         Goal g = new VisitorGoal(job, new AnnotationChecker(job, ts, nf));
         try {
             g.addPrerequisiteGoal(TypeChecked(job), this);
+            g.addPrerequisiteGoal(AnnotationsResolved(job), this);
         }
         catch (CyclicDependencyException e) {
             throw new InternalCompilerError(e);

@@ -25,11 +25,9 @@
  ******************************************************************************/
 package polyglot.ext.jl5.types;
 
+import polyglot.ext.jl5.JL5Scheduler;
 import polyglot.ext.jl5.types.reflect.JL5LazyClassInitializer;
-import polyglot.frontend.FileSource;
-import polyglot.frontend.Job;
 import polyglot.frontend.MissingDependencyException;
-import polyglot.frontend.goals.Goal;
 import polyglot.types.SchedulerClassInitializer;
 import polyglot.types.TypeSystem;
 
@@ -60,27 +58,12 @@ public class JL5SchedulerClassInitializer extends SchedulerClassInitializer
     public void initAnnotations() {
         if (!annotationInitialized) {
             JL5ParsedClassType pct = (JL5ParsedClassType) ct;
-            if (!pct.flags().contains(JL5Flags.ANNOTATION)
-                    && ct.fromSource() != null) {
-                Job job =
-                        scheduler.loadSource((FileSource) ct.fromSource(), true);
-                Goal g = scheduler.TypeChecked(job);
-                if (!scheduler.reached(g)) {
-                    throw new MissingDependencyException(g);
-                }
-                else {
-                    this.annotationInitialized = true;
-                }
+            if (pct.annotationsResolved()) {
+                this.annotationInitialized = true;
             }
             else {
-                // types comming from class files will have everything
-                // set during signature resolution
-                if (ct.signaturesResolved()) {
-                    this.annotationInitialized = true;
-                }
-                else {
-                    throw new MissingDependencyException(scheduler.SignaturesResolved(ct));
-                }
+                JL5Scheduler scheduler = (JL5Scheduler) this.scheduler;
+                throw new MissingDependencyException(scheduler.AnnotationsResolved(ct));
             }
         }
     }

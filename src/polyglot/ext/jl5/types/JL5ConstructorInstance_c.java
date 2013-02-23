@@ -42,7 +42,7 @@ public class JL5ConstructorInstance_c extends ConstructorInstance_c implements
     private static final long serialVersionUID = SerialVersionUID.generate();
 
     private List<TypeVariable> typeParams;
-    private RetainedAnnotations retainedAnnotations;
+    private Annotations annotations;
 
     public JL5ConstructorInstance_c(JL5TypeSystem_c ts, Position pos,
             ClassType container, Flags flags, List<? extends Type> argTypes,
@@ -143,13 +143,13 @@ public class JL5ConstructorInstance_c extends ConstructorInstance_c implements
     }
 
     @Override
-    public RetainedAnnotations retainedAnnotations() {
-        return this.retainedAnnotations;
+    public Annotations annotations() {
+        return this.annotations;
     }
 
     @Override
-    public void setRetainedAnnotations(RetainedAnnotations retainedAnnotations) {
-        this.retainedAnnotations = retainedAnnotations;
+    public void setAnnotations(Annotations annotations) {
+        this.annotations = annotations;
     }
 
 }

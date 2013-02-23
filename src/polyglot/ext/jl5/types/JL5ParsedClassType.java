@@ -63,6 +63,13 @@ public interface JL5ParsedClassType extends ParsedClassType, JL5ClassType {
     //    boolean wasGeneric();
 
     /**
+     * Have the annotations for this class (and for declarations within this class) been resolved?
+     */
+    boolean annotationsResolved();
+
+    void setAnnotationsResolved(boolean annotationsResolved);
+
+    /**
      * Returns a subst suitable for the erased type: the subst
      * maps any type variables to their erasure. Will return null
      * if the substitution is empty.
@@ -80,7 +87,7 @@ public interface JL5ParsedClassType extends ParsedClassType, JL5ClassType {
      */
     void addAnnotationElem(AnnotationTypeElemInstance ai);
 
-    void setRetainedAnnotations(RetainedAnnotations createRetainedAnnotations);
+    void setAnnotations(Annotations annotations);
 
     boolean enumValueOfMethodNeeded();
 

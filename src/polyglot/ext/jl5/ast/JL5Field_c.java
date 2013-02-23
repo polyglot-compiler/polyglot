@@ -56,10 +56,10 @@ public class JL5Field_c extends Field_c {
             // it's an enum, so replace this with the appropriate AST node for enum constants.
             JL5NodeFactory nf = (JL5NodeFactory) tc.nodeFactory();
             EnumConstant ec =
-                    nf.EnumConstant(this.position(),
-                                    this.target(),
-                                    nf.Id(this.position, this.name()));
-            ec = (EnumConstant) ec.type(this.type);
+                    nf.EnumConstant(n.position(),
+                                    n.target(),
+                                    nf.Id(n.id().position(), n.name()));
+            ec = (EnumConstant) ec.type(n.type());
             ec = ec.enumInstance((EnumInstance) n.fieldInstance());
             n = ec;
         }

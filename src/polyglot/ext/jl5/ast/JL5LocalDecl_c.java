@@ -34,6 +34,8 @@ import polyglot.ast.LocalDecl;
 import polyglot.ast.LocalDecl_c;
 import polyglot.ast.Node;
 import polyglot.ast.TypeNode;
+import polyglot.ext.jl5.types.Annotations;
+import polyglot.ext.jl5.types.JL5LocalInstance;
 import polyglot.ext.jl5.types.JL5TypeSystem;
 import polyglot.ext.jl5.types.TypeVariable;
 import polyglot.ext.jl5.types.TypeVariable.TVarDecl;
@@ -139,11 +141,17 @@ public class JL5LocalDecl_c extends LocalDecl_c implements LocalDecl,
     }
 
     @Override
+    public void setAnnotations(Annotations annotations) {
+        JL5LocalInstance li = (JL5LocalInstance) this.localInstance();
+        li.setAnnotations(annotations);
+    }
+
+    @Override
     public Node annotationCheck(AnnotationChecker annoCheck)
             throws SemanticException {
-        JL5TypeSystem ts = (JL5TypeSystem) annoCheck.typeSystem();
         for (AnnotationElem element : annotations) {
-            ts.checkAnnotationApplicability(element, this.localInstance());
+            annoCheck.checkAnnotationApplicability(element,
+                                                   this.localInstance());
         }
         return this;
     }

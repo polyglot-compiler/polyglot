@@ -25,37 +25,32 @@
  ******************************************************************************/
 package polyglot.ext.jl5.types;
 
-import java.util.Map;
-import java.util.Set;
-
+import polyglot.types.Flags;
+import polyglot.types.LocalInstance_c;
 import polyglot.types.Type;
-import polyglot.types.TypeObject;
+import polyglot.types.TypeSystem;
+import polyglot.util.Position;
+import polyglot.util.SerialVersionUID;
 
-/**
- * An RetainedAnnotations object represents the annotations that should be
- * retained in the type information of a type object. This is a subset of the
- * annotations given on the type object's declaration. 
- * See JLS 3rd ed, 9.6.1.2, Retention.
- *
- */
-public interface RetainedAnnotations extends TypeObject {
-    /**
-     * The annotations that have been used.
-     */
-    Set<Type> annotationTypes();
+public class JL5LocalInstance_c extends LocalInstance_c implements
+        JL5LocalInstance {
+    private static final long serialVersionUID = SerialVersionUID.generate();
 
-    /**
-     * Get the element value pairs for the given annotation type.
-     * Returns null if there is no annotation for the annotation type.
-     */
-    Map<String, AnnotationElementValue> elementValuePairs(Type annotationType);
+    protected Annotations annotations;
 
-    boolean hasAnnotationType(Type annotationType);
+    public JL5LocalInstance_c(TypeSystem ts, Position pos, Flags flags,
+            Type type, String name) {
+        super(ts, pos, flags, type, name);
+    }
 
-    /**
-     * If annotationType is a single element annotation type,
-     * then return the element (or null if there is no
-     * annotation for this annotation type).
-     */
-    AnnotationElementValue singleElement(Type annotationType);
+    @Override
+    public Annotations annotations() {
+        return this.annotations;
+    }
+
+    @Override
+    public void setAnnotations(Annotations annotations) {
+        this.annotations = annotations;
+    }
+
 }

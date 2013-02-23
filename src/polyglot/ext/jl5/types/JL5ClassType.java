@@ -65,9 +65,8 @@ public interface JL5ClassType extends ClassType {
     String translateAsReceiver(Resolver resolver);
 
     /**
-     * Annotations on the declaration of this type such that the annotation type has
-     * a retention policy of annotation.RetentionPolicy.CLASS or annotation.RetentionPolicy.RUNTIME.
+     * Annotations on the declaration of this type. For types loaded from
+     * a class file, this may contain only the retained annotations.
      */
-    RetainedAnnotations retainedAnnotations();
-
+    Annotations annotations();
 }

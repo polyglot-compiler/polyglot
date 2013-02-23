@@ -25,12 +25,36 @@
  ******************************************************************************/
 package polyglot.ext.jl5.visit;
 
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
+
 import polyglot.ast.Node;
 import polyglot.ast.NodeFactory;
 import polyglot.ext.jl5.ast.AnnotatedElement;
+import polyglot.ext.jl5.ast.AnnotationElem;
+import polyglot.ext.jl5.types.AnnotationElementValue;
+import polyglot.ext.jl5.types.AnnotationElementValueArray;
+import polyglot.ext.jl5.types.AnnotationElementValueConstant;
+import polyglot.ext.jl5.types.Annotations;
+import polyglot.ext.jl5.types.EnumInstance;
+import polyglot.ext.jl5.types.JL5ClassType;
+import polyglot.ext.jl5.types.JL5Flags;
+import polyglot.ext.jl5.types.JL5TypeSystem;
 import polyglot.frontend.Job;
+import polyglot.types.ClassType;
+import polyglot.types.ConstructorInstance;
+import polyglot.types.Declaration;
+import polyglot.types.FieldInstance;
+import polyglot.types.LocalInstance;
+import polyglot.types.MethodInstance;
+import polyglot.types.Package;
 import polyglot.types.SemanticException;
+import polyglot.types.Type;
 import polyglot.types.TypeSystem;
+import polyglot.util.InternalCompilerError;
 import polyglot.visit.ContextVisitor;
 import polyglot.visit.NodeVisitor;
 
@@ -53,4 +77,126 @@ public class AnnotationChecker extends ContextVisitor {
         }
         return n;
     }
+
+    @Override
+    public JL5TypeSystem typeSystem() {
+        return (JL5TypeSystem) super.typeSystem();
+    }
+
+    /** 
+     * 
+     * Is the annotation element <code>annotation</code> applicable
+     * to Declaration decl? For example, if annotation is "@Override" then decl
+     * better be a methodInstance that overrides another method. If annotation's
+     * type itself has annotations describing which targets are appropriate,
+     * then decl must be an appropriate target.
+     * 
+     * @param annotation
+     * @param decl
+     * @throws SemanticException
+     */
+    public void checkAnnotationApplicability(AnnotationElem annotation,
+            Declaration decl) throws SemanticException {
+        JL5ClassType annotationType =
+                (JL5ClassType) annotation.typeName().type().toClass();
+
+        if (annotationType.equals(typeSystem().OverrideAnnotation())) {
+            checkOverrideAnnotation(decl);
+        }
+
+        // If annotationType specifies what kind of target it is meant to be applied to,
+        // then check that.
+
+        Annotations ra = annotationType.annotations();
+        if (ra != null) {
+            for (Type at : ra.annotationTypes()) {
+                if (at.equals(typeSystem().TargetAnnotation())) {
+                    // annotationType has a target annotation!
+                    checkTargetMetaAnnotation((AnnotationElementValueArray) ra.singleElement(at),
+                                              annotation,
+                                              decl);
+                }
+            }
+        }
+    }
+
+    protected void checkOverrideAnnotation(Declaration decl)
+            throws SemanticException {
+        if (!(decl instanceof MethodInstance)) {
+            throw new SemanticException("An override annotation can apply only to methods.",
+                                        decl.position());
+        }
+        MethodInstance mi = (MethodInstance) decl;
+        JL5TypeSystem ts = this.typeSystem();
+        List<MethodInstance> overrides =
+                new LinkedList<MethodInstance>(ts.overrides(mi));
+        overrides.remove(mi);
+        if (overrides.isEmpty()) {
+            throw new SemanticException("Method " + mi.signature()
+                    + " does not override a method.", decl.position());
+        }
+    }
+
+    protected void checkTargetMetaAnnotation(
+            AnnotationElementValueArray targetKinds, AnnotationElem annotation,
+            Declaration decl) throws SemanticException {
+        Collection<EnumInstance> eis =
+                annotationElementTypesForDeclaration(decl);
+        // the array targs must contain at least one of the eis.
+        boolean foundAppropriateTarget = false;
+        requiredCheck: for (EnumInstance required : eis) {
+            for (AnnotationElementValue found : targetKinds.vals()) {
+                AnnotationElementValueConstant c =
+                        (AnnotationElementValueConstant) found;
+                if (required.equals(c.constantValue())) {
+                    foundAppropriateTarget = true;
+                    break requiredCheck;
+                }
+            }
+        }
+
+        if (!foundAppropriateTarget) {
+            throw new SemanticException("Annotation "
+                                                + annotation
+                                                + " not applicable to this kind of declaration.",
+                                        annotation.position());
+        }
+
+    }
+
+    public Collection<EnumInstance> annotationElementTypesForDeclaration(
+            Declaration decl) {
+        ClassType aet = typeSystem().AnnotationElementType();
+        if (decl instanceof MethodInstance) {
+            return Collections.singleton((EnumInstance) aet.fieldNamed("METHOD"));
+        }
+        if (decl instanceof FieldInstance) {
+            return Collections.singleton((EnumInstance) aet.fieldNamed("FIELD"));
+        }
+        if (decl instanceof LocalInstance) {
+            // it's either a local instance or a formal
+            // we're being a little lax here, and just assuming it it is a local variable
+            return Collections.singleton((EnumInstance) aet.fieldNamed("LOCAL_VARIABLE"));
+            //return (EnumInstance) aet.fieldNamed("PARAMETER");
+        }
+        if (decl instanceof ClassType) {
+            ClassType ct = (ClassType) decl;
+            if (ct.flags().isInterface() && JL5Flags.isAnnotation(ct.flags())) {
+                // it's an annotation
+                return Arrays.asList(new EnumInstance[] {
+                        (EnumInstance) aet.fieldNamed("TYPE"),
+                        (EnumInstance) aet.fieldNamed("ANNOTATION_TYPE") });
+            }
+            return Collections.singleton((EnumInstance) aet.fieldNamed("TYPE"));
+        }
+        if (decl instanceof ConstructorInstance) {
+            return Collections.singleton((EnumInstance) aet.fieldNamed("CONSTRUCTOR"));
+        }
+        if (decl instanceof Package) {
+            return Collections.singleton((EnumInstance) aet.fieldNamed("PACKAGE"));
+        }
+
+        throw new InternalCompilerError("Don't know how to deal with " + decl);
+    }
+
 }
