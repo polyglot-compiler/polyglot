@@ -25,6 +25,7 @@
  ******************************************************************************/
 package polyglot.ext.jl5.types;
 
+import java.util.Collections;
 import java.util.Map;
 
 import polyglot.types.Type;
@@ -52,6 +53,11 @@ public class AnnotationElementValueAnnotation_c extends TypeObject_c implements
     @Override
     public boolean isCanonical() {
         return annotationType.isCanonical();
+    }
+
+    @Override
+    public Map<String, AnnotationElementValue> annotationElementValues() {
+        return Collections.unmodifiableMap(this.annotationElementValues);
     }
 
 }
