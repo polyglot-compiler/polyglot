@@ -161,7 +161,7 @@ public class TVCaster extends AscriptionVisitor {
     private boolean mayHaveParameterizedReturn(MethodInstance mi) {
         // TODO fix this and document
 
-        List<MethodInstance> overrides = new ArrayList();
+        List<MethodInstance> overrides = new ArrayList<MethodInstance>();
         overrides.add(mi);
         overrides.addAll(ts.overrides(mi));
         overrides.addAll(ts.implemented(mi));
