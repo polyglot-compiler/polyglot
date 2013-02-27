@@ -75,6 +75,12 @@ public class FlowGraph<FlowItem extends DataFlow.Item> {
      */
     protected boolean forward;
 
+    /**
+     * When a peer has no successor edge keys, should we add
+     * an OTHER edge key?
+     */
+    protected boolean alwaysHaveSuccEdgeKey = true;
+
     FlowGraph(Term root, boolean forward) {
         this.root = root;
         this.forward = forward;
@@ -192,7 +198,11 @@ public class FlowGraph<FlowItem extends DataFlow.Item> {
         Peer<FlowItem> p = pathMap.get(peerKey);
 
         if (p == null) {
-            p = new Peer<FlowItem>(n, peerKey.list, peerKey.entry);
+            p =
+                    new Peer<FlowItem>(n,
+                                       peerKey.list,
+                                       peerKey.entry,
+                                       this.alwaysHaveSuccEdgeKey);
             pathMap.put(peerKey, p);
         }
 
@@ -338,6 +348,7 @@ public class FlowGraph<FlowItem extends DataFlow.Item> {
         protected Term node; // The AST node that this peer is an occurrence of.
         protected List<Edge<FlowItem>> succs; // List of successor Edges 
         protected List<Edge<FlowItem>> preds; // List of predecessor Edges 
+        protected final boolean alwaysHaveSuccEdgeKey;
         /**
          * the path to the finally block that uniquely distinguishes this Peer
          * from the other Peers for the AST node. See documentation for CFGBuilder
@@ -354,7 +365,8 @@ public class FlowGraph<FlowItem extends DataFlow.Item> {
          */
         private Set<EdgeKey> succEdgeKeys;
 
-        public Peer(Term node, List<Term> path_to_finally, int entry) {
+        public Peer(Term node, List<Term> path_to_finally, int entry,
+                boolean alwaysHaveSuccEdgeKey) {
             this.node = node;
             this.path_to_finally = path_to_finally;
             this.inItem = null;
@@ -363,6 +375,7 @@ public class FlowGraph<FlowItem extends DataFlow.Item> {
             this.preds = new ArrayList<Edge<FlowItem>>();
             this.entry = entry;
             this.succEdgeKeys = null;
+            this.alwaysHaveSuccEdgeKey = alwaysHaveSuccEdgeKey;
         }
 
         /** The successor Edges. */
@@ -420,7 +433,7 @@ public class FlowGraph<FlowItem extends DataFlow.Item> {
                 for (Edge<FlowItem> e : this.succs) {
                     this.succEdgeKeys.add(e.getKey());
                 }
-                if (this.succEdgeKeys.isEmpty()) {
+                if (alwaysHaveSuccEdgeKey && this.succEdgeKeys.isEmpty()) {
                     // There are no successors for this node. Add in the OTHER
                     // edge key, so that there is something to map the output
                     // item from...
