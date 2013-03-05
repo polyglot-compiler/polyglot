@@ -931,7 +931,8 @@ public abstract class DataFlow<FlowItem extends DataFlow.Item> extends
                 // is an issue, maybe we should remove this check.
                 throw new InternalCompilerError("The flow only defined "
                         + "outputs for " + p.outItems.keySet() + "; needs to "
-                        + "define outputs for all of: " + p.succEdgeKeys());
+                        + "define outputs for all of: " + p.succEdgeKeys()
+                        + " for node " + p.node, p.node.position());
             }
 
             if (oldOutItems != p.outItems
