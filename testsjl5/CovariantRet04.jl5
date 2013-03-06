@@ -1,0 +1,12 @@
+class C implements I {
+    C foo() { return null; }
+}
+interface I {
+    I foo();
+}
+class D extends C implements I {
+    public D foo() { 
+	super.foo(); 
+	return null;
+    }
+}

@@ -333,6 +333,8 @@ polyglot.ext.jl5.ExtensionInfo "-d out -classpath java-out -assert -noserial -po
         ClassLoad01.jl5;
         CovariantRet01.jl5;
         CovariantRet02.jl5;
+        CovariantRet03.jl5;
+        CovariantRet04.jl5;
         EnumTest5.jl5;
         EnumTest8.jl5;
         Generics44.jl5;
@@ -642,6 +644,8 @@ polyglot.ext.jl5.ExtensionInfo "-d out -classpath java-out -removeJava5isms -enu
         ClassLoad01.jl5;
         CovariantRet01.jl5;
         CovariantRet02.jl5;
+        CovariantRet03.jl5; #Known bug!
+        CovariantRet04.jl5; #Known bug!
         EnumTest5.jl5;
         EnumTest8.jl5;
         Generics44.jl5;
