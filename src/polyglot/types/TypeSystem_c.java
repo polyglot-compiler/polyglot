@@ -1045,7 +1045,6 @@ public class TypeSystem_c implements TypeSystem {
                                                 + listToString(argTypes) + ")"
                                                 + " in " + container + ".");
         }
-
         Collection<? extends MethodInstance> maximal =
                 findMostSpecificProcedures(acceptable);
 
@@ -1158,7 +1157,6 @@ public class TypeSystem_c implements TypeSystem {
                 maximal.add(p);
             }
         }
-
         if (maximal.size() > 1) {
             // If exactly one method is not abstract, it is the most specific.
             List<Instance> notAbstract =
@@ -1212,8 +1210,16 @@ public class TypeSystem_c implements TypeSystem {
             implements Comparator<T> {
         @Override
         public int compare(T p1, T p2) {
-            if (p1.moreSpecific(p2)) return -1;
-            if (p2.moreSpecific(p1)) return 1;
+            // Implement the "strictly more specific" relation
+            // The JLS 2nd ed used only the "more specific" relation,
+            // but that is likely a shortcoming in the spec, as then the
+            // relation isn't anti-symmetric.
+            // The JLS 3rd edition defines the "strictly more specific"
+            // relation, which we will use here.
+            boolean p1beatsp2 = p1.moreSpecific(p2);
+            boolean p2beatsp1 = p2.moreSpecific(p1);
+            if (p1beatsp2 && !p2beatsp1) return -1;
+            if (p2beatsp1 && !p1beatsp2) return 1;
             return 0;
         }
     }
@@ -1294,7 +1300,7 @@ public class TypeSystem_c implements TypeSystem {
                             // so add mi to acceptable, and add all the methods it
                             // overrides to the set overridden.
                             acceptable.add(mi);
-                            overridden.addAll(mi.overrides());
+                            overridden.addAll(mi.implemented());
                         }
                     }
                     else {
