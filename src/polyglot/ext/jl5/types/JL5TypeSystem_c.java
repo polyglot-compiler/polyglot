@@ -718,7 +718,7 @@ public class JL5TypeSystem_c extends
                                         argTypes,
                                         actualTypeArgs,
                                         expectedReturnType);
-
+                JL5MethodInstance origMi = mi;
                 if (substMi != null) {
                     mi = substMi;
                     if (isAccessible(mi, container, currClass)) {
@@ -727,21 +727,24 @@ public class JL5TypeSystem_c extends
                                     + mi.container());
                         }
                         if (varArgsRequired(mi)) {
-                            if (!phase3overridden.contains(mi)) {
+                            if (!phase3overridden.contains(mi)
+                                    && !phase3overridden.contains(origMi)) {
                                 phase3methods.add(mi);
-                                phase3overridden.addAll(mi.overrides());
+                                phase3overridden.addAll(mi.implemented());
                             }
                         }
                         else if (boxingRequired(mi, argTypes)) {
-                            if (!phase2overridden.contains(mi)) {
+                            if (!phase2overridden.contains(mi)
+                                    && !phase2overridden.contains(origMi)) {
                                 phase2methods.add(mi);
-                                phase2overridden.addAll(mi.overrides());
+                                phase2overridden.addAll(mi.implemented());
                             }
                         }
                         else {
-                            if (!phase1overridden.contains(mi)) {
+                            if (!phase1overridden.contains(mi)
+                                    && !phase1overridden.contains(origMi)) {
                                 phase1methods.add(mi);
-                                phase1overridden.addAll(mi.overrides());
+                                phase1overridden.addAll(mi.implemented());
                             }
                         }
                     }
@@ -799,9 +802,13 @@ public class JL5TypeSystem_c extends
             phase3methods.removeAll(mi.overrides());
         }
 
-//        System.err.println("JL5ts_c: acceptable methods for " + name + argTypes + " is " + phase1methods);
+//        System.err.println("JL5ts_c: acceptable methods for " + name + argTypes
+//                + " is " + phase1methods);
 //        System.err.println("              " + phase2methods);
 //        System.err.println("              " + phase3methods);
+//        System.err.println("        phase1overridden is    " + phase1overridden);
+//        System.err.println("        phase2overridden is    " + phase2overridden);
+//        System.err.println("        phase3overridden is    " + phase3overridden);
         if (!phase1methods.isEmpty()) return phase1methods;
         if (!phase2methods.isEmpty()) return phase2methods;
         if (!phase3methods.isEmpty()) return phase3methods;
