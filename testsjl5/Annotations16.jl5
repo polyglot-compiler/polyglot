@@ -1,0 +1,17 @@
+interface Coll<E> {
+ <T> T[] toArray(T[] a);
+}
+
+interface Lst<E> extends Coll<E> {
+ @Override
+ <T> T[] toArray(T[] a);
+}
+
+
+class C {
+    void m() { 
+	Lst<Object> l = null;
+	Object[] arr = null;
+	l.toArray(arr);
+    }
+}

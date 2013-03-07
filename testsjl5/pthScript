@@ -329,6 +329,7 @@ polyglot.ext.jl5.ExtensionInfo "-d out -classpath java-out -assert -noserial -po
         Annotations13.jl5 (Semantic);
         Annotations14A.jl5 Annotations14B.jl5;
         Annotations15.jl5;
+        Annotations16.jl5;
         Call02.jl5;
         ClassLoad01.jl5;
         CovariantRet01.jl5;
@@ -640,6 +641,7 @@ polyglot.ext.jl5.ExtensionInfo "-d out -classpath java-out -removeJava5isms -enu
         Annotations13.jl5 (Semantic);
         Annotations14A.jl5 Annotations14B.jl5;
         Annotations15.jl5;
+        Annotations16.jl5;
         Call02.jl5;
         ClassLoad01.jl5;
         CovariantRet01.jl5;

@@ -1,12 +1,21 @@
-class C {
-    C foo() { return null; }
+class C implements I {
+    public C foo() { return null; }
 }
 interface I {
     I foo();
 }
-class D extends C implements I {
+
+interface J extends I {
+    I foo();
+}
+
+class D extends C implements J {
     public D foo() { 
 	super.foo(); 
 	return null;
+    }
+
+    void m(J j) { 
+	j.foo();
     }
 }
