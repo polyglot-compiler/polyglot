@@ -86,7 +86,35 @@ public class JL5MethodInstance_c extends MethodInstance_c implements
 
             rt = sup;
         }
-        ;
+
+        return l;
+    }
+
+    @Override
+    public List<MethodInstance> implementedImpl(ReferenceType rt) {
+        if (rt == null) {
+            return Collections.<MethodInstance> emptyList();
+        }
+        JL5TypeSystem ts = (JL5TypeSystem) this.typeSystem();
+
+        List<MethodInstance> l = new LinkedList<MethodInstance>();
+        // add any method with the same name and formalTypes from 
+        // rt
+        for (MethodInstance mj : rt.methodsNamed(name)) {
+            if (ts.areOverrideEquivalent(this, (JL5MethodInstance) mj)) {
+                l.add(mj);
+            }
+        }
+
+        Type superType = rt.superType();
+        if (superType != null) {
+            l.addAll(implementedImpl(superType.toReference()));
+        }
+
+        List<? extends ReferenceType> ints = rt.interfaces();
+        for (ReferenceType rt2 : ints) {
+            l.addAll(implementedImpl(rt2));
+        }
 
         return l;
     }
