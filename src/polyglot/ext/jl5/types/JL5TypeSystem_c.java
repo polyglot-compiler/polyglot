@@ -731,6 +731,7 @@ public class JL5TypeSystem_c extends
                                     && !phase3overridden.contains(origMi)) {
                                 phase3methods.add(mi);
                                 phase3overridden.addAll(mi.implemented());
+                                phase3overridden.addAll(origMi.implemented());
                             }
                         }
                         else if (boxingRequired(mi, argTypes)) {
@@ -738,6 +739,7 @@ public class JL5TypeSystem_c extends
                                     && !phase2overridden.contains(origMi)) {
                                 phase2methods.add(mi);
                                 phase2overridden.addAll(mi.implemented());
+                                phase2overridden.addAll(origMi.implemented());
                             }
                         }
                         else {
@@ -745,6 +747,7 @@ public class JL5TypeSystem_c extends
                                     && !phase1overridden.contains(origMi)) {
                                 phase1methods.add(mi);
                                 phase1overridden.addAll(mi.implemented());
+                                phase1overridden.addAll(origMi.implemented());
                             }
                         }
                     }
