@@ -56,6 +56,11 @@ public class AlphaRenamer extends NodeVisitor {
 
     protected Map<String, String> renamingMap;
 
+    /**
+     * Memoization holding {@link LocalInstance}s for renamed locals
+     */
+    protected Map<String, LocalInstance> localInstanceMemo;
+
     // Tracks the set of variables known to be fresh.
     protected Set<String> freshVars;
 
@@ -63,6 +68,11 @@ public class AlphaRenamer extends NodeVisitor {
      * Should we also alpha-rename catch formals?
      */
     protected boolean renameCatchFormals;
+
+    /**
+     * Should we create new local instances? (If not, we will imperatively update the old ones). 
+     */
+    protected boolean createNewLocalInstances;
 
     /**
      * Creates a visitor for alpha-renaming locals.
@@ -74,12 +84,19 @@ public class AlphaRenamer extends NodeVisitor {
     }
 
     public AlphaRenamer(NodeFactory nf, boolean renameCatchFormals) {
+        this(nf, renameCatchFormals, false);
+    }
+
+    public AlphaRenamer(NodeFactory nf, boolean renameCatchFormals,
+            boolean createNewLocalInstances) {
+
         this.nf = nf;
 
         this.setStack = new Stack<Set<String>>();
         this.setStack.push(new HashSet<String>());
 
         this.renamingMap = new HashMap<String, String>();
+        this.localInstanceMemo = new HashMap<String, LocalInstance>();
         this.freshVars = new HashSet<String>();
 
         this.renameCatchFormals = renameCatchFormals;
@@ -123,6 +140,7 @@ public class AlphaRenamer extends NodeVisitor {
             // entries from the renaming map.
             Set<String> s = setStack.pop();
             renamingMap.keySet().removeAll(s);
+            localInstanceMemo.keySet().removeAll(s);
             return n;
         }
 
@@ -138,7 +156,10 @@ public class AlphaRenamer extends NodeVisitor {
             // Update the local instance as necessary.
             String newName = renamingMap.get(name);
             LocalInstance li = l.localInstance();
-            if (li != null) li.setName(newName);
+            if (li != null) {
+                li = getNewLocalInstance(newName, li);
+                l = l.localInstance(li);
+            }
 
             return l.name(newName);
         }
@@ -160,7 +181,10 @@ public class AlphaRenamer extends NodeVisitor {
             // Update the local instance as necessary.
             String newName = renamingMap.get(name);
             LocalInstance li = l.localInstance();
-            if (li != null) li.setName(newName);
+            if (li != null) {
+                li = getNewLocalInstance(newName, li);
+                l = l.localInstance(li);
+            }
 
             return l.name(newName);
         }
@@ -182,11 +206,39 @@ public class AlphaRenamer extends NodeVisitor {
             // Update the local instance as necessary.
             String newName = renamingMap.get(name);
             LocalInstance li = c.formal().localInstance();
-            if (li != null) li.setName(newName);
+            if (li != null) {
+                li = getNewLocalInstance(newName, li);
+                c = c.formal(c.formal().localInstance(li));
+            }
 
             return c.formal(c.formal().name(newName));
         }
 
         return n;
+    }
+
+    /**
+     * Memoization for getting local instances for newly generated names
+     * 
+     * @param newName name of new local instance
+     * @param liOld the local instance before renaming
+     * @return A local instance with the new name
+     */
+    private LocalInstance getNewLocalInstance(String newName,
+            LocalInstance liOld) {
+        LocalInstance liNew = localInstanceMemo.get(newName);
+        if (liNew == null) {
+            if (createNewLocalInstances) {
+                // create a new local instance.
+                liNew = liOld.name(newName);
+            }
+            else {
+                // imperatively update the existing local instance.
+                liNew = liOld;
+                liNew.setName(newName);
+            }
+            localInstanceMemo.put(newName, liNew);
+        }
+        return liNew;
     }
 }
