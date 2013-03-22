@@ -20,8 +20,8 @@ public class JLVersion extends polyglot.main.Version {
     public int minor() { return 5; }
 
     @Override
-    public int patch_level() { return 1; }
+    public int patch_level() { return 2; }
 
     @Override
-    public String toString() { return "2.5.1 (2012-10-04 18:38:53)"; }
+    public String toString() { return "2.5.2 (2013-03-22 10:29:50)"; }
 }
