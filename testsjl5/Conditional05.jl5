@@ -1,0 +1,9 @@
+interface I { }
+interface J extends I { }
+
+class C {
+  public void test(int a) {
+    J[] foo = new J[1];
+    I[] bar = (a == 0) ? foo : new I[1];
+  }
+}
