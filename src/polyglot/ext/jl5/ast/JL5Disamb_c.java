@@ -85,7 +85,10 @@ public class JL5Disamb_c extends Disamb_c {
                         throw new InternalCompilerError("Expected to find member class "
                                 + name);
                     type = outer.toClass().memberClassNamed(name.id());
-                    outer = outer.superType().toClass();
+                    // only advance outer if we have to.
+                    if (type == null) {
+                        outer = outer.superType().toClass();
+                    }
                 }
                 if (type.isInnerClass()) {
                     // First, see if the inner class's container has substitutions
@@ -95,6 +98,7 @@ public class JL5Disamb_c extends Disamb_c {
                         type = (ClassType) sct.subst().substType(type);
                     }
                 }
+
                 return nf.CanonicalTypeNode(pos, type);
             }
         }

@@ -99,6 +99,8 @@ polyglot.ext.jl5.ExtensionInfo "-d out -classpath java-out -assert -noserial -po
         InnerClass06.jl5;
         InnerClass07.jl5;
         InnerClass08.jl5;
+        InnerClass09.jl5;
+        InnerClass10.jl5;
         Access01.jl5;
         Access02.jl5;
         Anonymous01.jl5;
@@ -340,7 +342,6 @@ polyglot.ext.jl5.ExtensionInfo "-d out -classpath java-out -assert -noserial -po
         EnumTest8.jl5;
         Generics44.jl5;
         Generics45A.jl5 Generics45B.jl5 ;
-        InnerClass09.jl5;
         Interface07.jl5;
         Iterator01.jl5;
         Negate01.jl5;
@@ -404,7 +405,7 @@ polyglot.ext.jl5.ExtensionInfo "-d out -classpath java-out -removeJava5isms -enu
         Boxing02.jl5;
         Boxing03.jl5;
         StaticInit01.jl5;
-             InnerClass01.jl5; 
+        InnerClass01.jl5; 
         InnerClass02.jl5;
         InnerClass03.jl5;
         InnerClass04.jl5;
@@ -412,6 +413,8 @@ polyglot.ext.jl5.ExtensionInfo "-d out -classpath java-out -removeJava5isms -enu
         InnerClass06.jl5;
         InnerClass07.jl5;
         InnerClass08.jl5;
+        InnerClass09.jl5;
+        InnerClass10.jl5;
         Access01.jl5;
         Access02.jl5;
         Anonymous01.jl5;
@@ -652,7 +655,6 @@ polyglot.ext.jl5.ExtensionInfo "-d out -classpath java-out -removeJava5isms -enu
         EnumTest8.jl5;
         Generics44.jl5;
         Generics45A.jl5 Generics45B.jl5 ;
-        InnerClass09.jl5;
         Interface07.jl5;
         Iterator01.jl5;
         Negate01.jl5;
