@@ -1,0 +1,4 @@
+interface I<T> { }
+class C implements I<C.Inner> {
+  public class Inner { }
+}
