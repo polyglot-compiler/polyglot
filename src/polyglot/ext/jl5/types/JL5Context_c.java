@@ -88,7 +88,7 @@ public class JL5Context_c extends Context_c implements JL5Context {
                             }
                             catch (SemanticException e) {
                             }
-                            if (vi != null) {
+                            if (vi != null && vi.flags().isStatic()) {
                                 return vi;
                             }
                         }
@@ -104,7 +104,9 @@ public class JL5Context_c extends Context_c implements JL5Context {
                             }
                             catch (SemanticException e) {
                             }
-                            if (vi != null) return vi;
+                            if (vi != null && vi.flags().isStatic()) {
+                                return vi;
+                            }
                         }
                     }
                 }
