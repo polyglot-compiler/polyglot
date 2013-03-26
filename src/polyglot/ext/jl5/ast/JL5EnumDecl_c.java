@@ -128,7 +128,6 @@ public class JL5EnumDecl_c extends JL5ClassDecl_c implements JL5EnumDecl {
 
         for (ClassMember m : this.body().members()) {
             if (m.memberInstance().flags().isAbstract()) {
-                n = this.flags(this.flags().Abstract());
                 n.type().flags(n.type().flags().Abstract());
                 break;
             }
