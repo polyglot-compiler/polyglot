@@ -156,7 +156,7 @@ public class JL5ImportTable extends ImportTable {
     }
 
     private boolean isStatic(MemberInstance mi) {
-        return mi.flags().isStatic();
+        return mi != null && mi.flags().isStatic();
     }
 
 }
