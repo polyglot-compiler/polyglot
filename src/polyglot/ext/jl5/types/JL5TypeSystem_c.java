@@ -729,25 +729,31 @@ public class JL5TypeSystem_c extends
                         if (varArgsRequired(mi)) {
                             if (!phase3overridden.contains(mi)
                                     && !phase3overridden.contains(origMi)) {
-                                phase3methods.add(mi);
                                 phase3overridden.addAll(mi.implemented());
                                 phase3overridden.addAll(origMi.implemented());
+                                phase3methods.removeAll(mi.implemented());
+                                phase3methods.removeAll(origMi.implemented());
+                                phase3methods.add(mi);
                             }
                         }
                         else if (boxingRequired(mi, argTypes)) {
                             if (!phase2overridden.contains(mi)
                                     && !phase2overridden.contains(origMi)) {
-                                phase2methods.add(mi);
                                 phase2overridden.addAll(mi.implemented());
                                 phase2overridden.addAll(origMi.implemented());
+                                phase2methods.removeAll(mi.implemented());
+                                phase2methods.removeAll(origMi.implemented());
+                                phase2methods.add(mi);
                             }
                         }
                         else {
                             if (!phase1overridden.contains(mi)
                                     && !phase1overridden.contains(origMi)) {
-                                phase1methods.add(mi);
                                 phase1overridden.addAll(mi.implemented());
                                 phase1overridden.addAll(origMi.implemented());
+                                phase1methods.removeAll(mi.implemented());
+                                phase1methods.removeAll(origMi.implemented());
+                                phase1methods.add(mi);
                             }
                         }
                     }
