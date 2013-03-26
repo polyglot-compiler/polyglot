@@ -2570,4 +2570,17 @@ public class JL5TypeSystem_c extends
         return new AnnotationElementValueConstant_c(this, pos, type, constVal);
     }
 
+    @Override
+    public Type leastCommonAncestor(Type type1, Type type2)
+            throws SemanticException {
+        if (type1.isPrimitive() && type2.isReference()) {
+            // box type1, i.e. promote to an object
+            return leastCommonAncestor(this.boxingConversion(type1), type2);
+        }
+        if (type2.isPrimitive() && type1.isReference()) {
+            // box type2, i.e. promote to an object
+            return leastCommonAncestor(type1, this.boxingConversion(type2));
+        }
+        return super.leastCommonAncestor(type1, type2);
+    }
 }
