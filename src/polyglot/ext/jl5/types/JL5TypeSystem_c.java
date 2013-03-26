@@ -1400,6 +1400,17 @@ public class JL5TypeSystem_c extends
                 }
             }
         }
+        if (t2 instanceof LubType) {
+            LubType lub = (LubType) t2;
+            // t2 is an upper bound of several types. If t1 is a subtype of any of them,
+            // then t2 is a subtype of lub.
+            for (ReferenceType upperBound : lub.lubElements()) {
+                if (isSubtype(t1, upperBound)) {
+                    return true;
+                }
+            }
+        }
+
         return false;
     }
 
