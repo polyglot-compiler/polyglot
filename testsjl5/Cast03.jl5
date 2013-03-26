@@ -1,0 +1,23 @@
+class D { }
+interface MyMap<K, V> { 
+    V get(K k);
+}
+abstract class AbstractMap<K,V> implements MyMap<K, V> { 
+    public V get(K k) { return null; }
+}
+final class AtMap extends AbstractMap<D, Object> { 
+}
+
+
+class C {
+    void m(Font font) {
+	AtMap bar = (AtMap)font.getAttributes();
+    }
+    
+}
+
+class Font {
+    MyMap<D, ?> getAttributes() {
+	return null;
+    }
+}

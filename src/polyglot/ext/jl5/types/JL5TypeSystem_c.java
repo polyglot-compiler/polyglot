@@ -1522,7 +1522,6 @@ public class JL5TypeSystem_c extends
                                                        x)) {
                             return false;
                         }
-
                     }
                     else {
                         // S is not a parameterized type or a raw type, and T is final
@@ -1533,6 +1532,7 @@ public class JL5TypeSystem_c extends
                         }
 
                     }
+                    return true;
 
                 }
                 else {
@@ -1548,7 +1548,8 @@ public class JL5TypeSystem_c extends
                         for (ReferenceType x : allX) {
                             if (x instanceof JL5SubstClassType
                                     && y instanceof JL5SubstClassType
-                                    && areProvablyDistinct(x, y)
+                                    && areProvablyDistinct((JL5SubstClassType) x,
+                                                           (JL5SubstClassType) y)
                                     && erasureType(x).equals(erasureType(y))) {
                                 return false;
                             }
@@ -1563,25 +1564,35 @@ public class JL5TypeSystem_c extends
         return false;
     }
 
-    private boolean areProvablyDistinct(ReferenceType s, ReferenceType t) {
-        if (s instanceof JL5SubstClassType && t instanceof JL5SubstClassType) {
-            JL5SubstClassType x = (JL5SubstClassType) s;
-            JL5SubstClassType y = (JL5SubstClassType) t;
-            if (!x.base().equals(y.base())) {
+    private boolean areProvablyDistinct(JL5SubstClassType s, JL5SubstClassType t) {
+        // See JLS 3rd ed 4.5
+        // Distinct if either (1) They are invocations of distinct generic type declarations.
+        // or (2) Any of their type arguments are provably distinct
+        JL5SubstClassType x = s;
+        JL5SubstClassType y = t;
+        if (!x.base().equals(y.base())) {
+            return true;
+        }
+        List<ReferenceType> xActuals = x.actuals();
+        List<ReferenceType> yActuals = y.actuals();
+        if (xActuals.size() != yActuals.size()) {
+            return true;
+        }
+        for (int i = 0; i < xActuals.size(); i++) {
+            if (areTypArgsProvablyDistinct(xActuals.get(i), xActuals.get(i))) {
                 return true;
-            }
-            List<ReferenceType> xActuals = x.actuals();
-            List<ReferenceType> yActuals = y.actuals();
-            if (xActuals.size() != yActuals.size()) {
-                return true;
-            }
-            for (int i = 0; i < xActuals.size(); i++) {
-                if (areProvablyDistinct(xActuals.get(i), xActuals.get(i))) {
-                    return true;
-                }
             }
         }
-        return !s.equals(t);
+        return false;
+    }
+
+    private boolean areTypArgsProvablyDistinct(ReferenceType s, ReferenceType t) {
+        // JLS 3rd ed 4.5. "Two type arguments are provably distinct if 
+        // neither of the arguments is a type variable or wildcard, and 
+        // the two arguments are not the same type."
+        return !(s instanceof TypeVariable) && !(t instanceof TypeVariable)
+                && !(s instanceof WildCardType) && !(t instanceof WildCardType)
+                && !s.equals(t);
     }
 
     @Override
