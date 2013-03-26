@@ -166,16 +166,39 @@ public class JL5Conditional_c extends Conditional_c {
             return type(ts.promote(t1, t2));
         }
 
-        //  Otherwise, the second and third operands are of types t1 and t2
+        // Otherwise, the second and third operands are of types t1 and t2
         // respectively. Let s1 be the type that results from applying boxing conversion to t1, 
         // and let s2 be the type that results from applying boxing conversion to t2. 
         // The type of the conditional expression is the result of applying capture conversion 
         // (�5.1.10) to lub(s1, s2) (�15.12.2.7).
-        ReferenceType s1 = (ReferenceType) ts.boxingConversion(t1);
-        ReferenceType s2 = (ReferenceType) ts.boxingConversion(t2);
-
-        LubType lub = ts.lub(this.position, CollectionUtil.list(s1, s2));
-        return type(ts.applyCaptureConversion(lub.calculateLub()));
+        //
+        // For compatibility with javac, if the second and third operands are of array types 
+        // with reference base types, we recursively apply the algorithm to the base types. 
+        // The type of the conditional expression is the array type with the resulting base type.
+        return type(find_lub(ts, t1, t2));
     }
 
+    private Type find_lub(JL5TypeSystem ts, Type t1, Type t2) {
+        if (t1.isArray() && t2.isArray() && t1.toArray().base().isReference()
+                && t2.toArray().base().isReference()) {
+            // The types are both array types and the base types are references.
+            // Call the algorithm recursively on the base types. The result is
+            // the array type with the resulting base type.
+            Type base_lub =
+                    find_lub(ts, t1.toArray().base(), t2.toArray().base());
+            return ts.arrayOf(base_lub);
+        }
+        else {
+            // Otherwise, the second and third operands are of types t1 and t2
+            // respectively. Let s1 be the type that results from applying boxing conversion to t1, 
+            // and let s2 be the type that results from applying boxing conversion to t2. 
+            // The type of the conditional expression is the result of applying capture conversion 
+            // (�5.1.10) to lub(s1, s2) (�15.12.2.7).
+            ReferenceType s1 = (ReferenceType) ts.boxingConversion(t1);
+            ReferenceType s2 = (ReferenceType) ts.boxingConversion(t2);
+
+            LubType lub = ts.lub(this.position, CollectionUtil.list(s1, s2));
+            return ts.applyCaptureConversion(lub.calculateLub());
+        }
+    }
 }

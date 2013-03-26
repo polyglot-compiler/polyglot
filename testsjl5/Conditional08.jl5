@@ -1,0 +1,9 @@
+interface I { }
+interface J extends I { }
+interface K extends I { }
+
+class C {
+  public void test(int a) {
+    I[][] bar = (a == 0) ? new J[1][] : new K[1][];
+  }
+}
