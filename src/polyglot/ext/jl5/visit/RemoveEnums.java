@@ -198,7 +198,7 @@ public class RemoveEnums extends ContextVisitor {
 
         ClassDecl classDecl =
                 nf.ClassDecl(enumDecl.position(),
-                             JL5Flags.clearEnum(enumDecl.flags()),
+                             JL5Flags.clearEnum(enumDecl.type().flags()),
                              enumDecl.id(),
                              nf.CanonicalTypeNode(enumDecl.position(),
                                                   ts.typeForName(this.enumImplClass)),
