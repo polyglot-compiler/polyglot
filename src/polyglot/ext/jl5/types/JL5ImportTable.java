@@ -30,6 +30,7 @@ import java.util.List;
 
 import polyglot.types.ClassType;
 import polyglot.types.ImportTable;
+import polyglot.types.MemberInstance;
 import polyglot.types.Named;
 import polyglot.types.ReferenceType;
 import polyglot.types.SemanticException;
@@ -123,8 +124,8 @@ public class JL5ImportTable extends ImportTable {
                 Named nt = ts.forName(className);
                 if (nt instanceof ReferenceType) {
                     ReferenceType t = (ReferenceType) nt;
-                    if (!t.methodsNamed(name).isEmpty()
-                            || t.fieldNamed(name) != null) {
+                    if (hasStatic(t.methodsNamed(name))
+                            || isStatic(t.fieldNamed(name))) {
                         return t;
                     }
                 }
@@ -136,13 +137,26 @@ public class JL5ImportTable extends ImportTable {
 
             if (nt instanceof ReferenceType) {
                 ReferenceType t = (ReferenceType) nt;
-                if (!t.methodsNamed(name).isEmpty()
-                        || t.fieldNamed(name) != null) {
+                if (hasStatic(t.methodsNamed(name))
+                        || isStatic(t.fieldNamed(name))) {
                     return t;
                 }
             }
         }
         return null;
+    }
+
+    private boolean hasStatic(List<? extends MemberInstance> members) {
+        for (MemberInstance mi : members) {
+            if (isStatic(mi)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean isStatic(MemberInstance mi) {
+        return mi.flags().isStatic();
     }
 
 }
