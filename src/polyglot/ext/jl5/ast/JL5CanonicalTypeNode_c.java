@@ -37,6 +37,9 @@ import polyglot.ext.jl5.types.JL5TypeSystem;
 import polyglot.ext.jl5.types.RawClass;
 import polyglot.ext.jl5.types.TypeVariable;
 import polyglot.ext.jl5.types.WildCardType;
+import polyglot.frontend.MissingDependencyException;
+import polyglot.frontend.Scheduler;
+import polyglot.frontend.goals.Goal;
 import polyglot.types.ArrayType;
 import polyglot.types.ClassType;
 import polyglot.types.ReferenceType;
@@ -112,7 +115,13 @@ public class JL5CanonicalTypeNode_c extends polyglot.ast.CanonicalTypeNode_c {
                 for (int i = 0; i < capCT.actuals().size(); i++) {
                     TypeVariable ai = capCT.base().typeVariables().get(i);
                     Type xi = capCT.actuals().get(i);
-
+                    if (!ai.upperBound().isCanonical()) {
+                        // need to disambiguate
+                        Scheduler scheduler =
+                                tc.job().extensionInfo().scheduler();
+                        Goal g = scheduler.SupertypesResolved(st.base());
+                        throw new MissingDependencyException(g);
+                    }
                     //require that arguments obey their bounds
                     if (!ts.isSubtype(xi,
                                       capCT.subst().substType(ai.upperBound()))) {
