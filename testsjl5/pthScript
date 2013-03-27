@@ -353,11 +353,13 @@ polyglot.ext.jl5.ExtensionInfo "-d out -classpath java-out -assert -noserial -po
         UnboxBooleans.jl5;
         VarArgs08.jl5;
         VarArgs09.jl5;
+	Conditional05.jl5;
 	Conditional06.jl5;
 	Conditional07.jl5 (Semantic, "does not match");
 	Conditional08.jl5;
 	Conditional09.jl5 (Semantic, "does not match");
 	Conditional10.jl5 (Semantic, "does not match");
+	Conditional11.jl5;
 }
 
 # Now run the tests again removing the Java 5-isms.
@@ -675,9 +677,12 @@ polyglot.ext.jl5.ExtensionInfo "-d out -classpath java-out -removeJava5isms -enu
         UnboxBooleans.jl5;
         VarArgs08.jl5;
         VarArgs09.jl5;
+	Conditional05.jl5;
 	Conditional06.jl5;
 	Conditional07.jl5 (Semantic, "does not match");
 	Conditional08.jl5;
 	Conditional09.jl5 (Semantic, "does not match");
 	Conditional10.jl5 (Semantic, "does not match");
+	Conditional11.jl5;
+
 }

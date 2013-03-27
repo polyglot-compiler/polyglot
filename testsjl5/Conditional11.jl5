@@ -1,0 +1,7 @@
+class C {
+    private void foo() {
+	Integer n = null;
+	m((n == null) ? '\0' : n);
+    }
+    void m(int x) { }
+}
