@@ -654,9 +654,14 @@ public class RemoveEnums extends ContextVisitor {
                                                                          ts.Object()),
                                          arg)
                                  .localInstance(argLI));
+        Flags methodFlags = Flags.PRIVATE;
+        if (this.context().currentClass().flags().isStatic()
+                || this.context().currentClass().isTopLevel()) {
+            methodFlags = methodFlags.Static();
+        }
         MethodDecl switchMethod =
                 nodeFactory().MethodDecl(pos,
-                                         Flags.PRIVATE.Static(),
+                                         methodFlags,
                                          nodeFactory().CanonicalTypeNode(pos,
                                                                          ts.Int()),
                                          methodName,
@@ -668,7 +673,7 @@ public class RemoveEnums extends ContextVisitor {
         MethodInstance mi =
                 ts.methodInstance(pos,
                                   container,
-                                  Flags.NONE,
+                                  methodFlags,
                                   ts.Int(),
                                   methodName.id(),
                                   Collections.singletonList((Type) ts.Object()),
