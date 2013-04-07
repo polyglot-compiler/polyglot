@@ -80,11 +80,11 @@ public class InitImportsVisitor extends ErrorHandlingVisitor {
         if (n instanceof Import) {
             Import im = (Import) n;
 
-            if (im.kind() == Import.CLASS) {
+            if (im.kind() == Import.SINGLE_TYPE) {
                 this.importTable.addClassImport(im.name(), im.position());
             }
-            else if (im.kind() == Import.PACKAGE) {
-                this.importTable.addPackageImport(im.name(), im.position());
+            else if (im.kind() == Import.TYPE_IMPORT_ON_DEMAND) {
+                this.importTable.addTypeOnDemandImport(im.name(), im.position());
             }
         }
 

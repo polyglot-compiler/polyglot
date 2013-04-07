@@ -48,8 +48,8 @@ import polyglot.util.StringUtil;
  */
 public class ImportTable implements Resolver {
     protected TypeSystem ts;
-    /** A list of all package imports. */
-    protected List<String> packageImports;
+    /** A list of all type import on demand imports. */
+    protected List<String> typeOnDemandImports;
     /** Map from names to classes found, or to the NOT_FOUND object. */
     protected Map<String, Named> map;
     /** List of class imports which will be lazily added to the table at the
@@ -59,7 +59,7 @@ public class ImportTable implements Resolver {
     protected List<Position> lazyImportPositions;
     /** List of explicitly imported classes added to the table or pending in
      * the lazyImports list. */
-    protected List<String> classImports;
+    protected List<String> singleTypeImports;
     /** Source name to use for debugging and error reporting */
     protected String sourceName;
     /** Position to use for error reporting */
@@ -134,10 +134,10 @@ public class ImportTable implements Resolver {
         this.pkg = pkg;
 
         this.map = new HashMap<String, Named>();
-        this.packageImports = new ArrayList<String>();
+        this.typeOnDemandImports = new ArrayList<String>();
         this.lazyImports = new ArrayList<String>();
         this.lazyImportPositions = new ArrayList<Position>();
-        this.classImports = new ArrayList<String>();
+        this.singleTypeImports = new ArrayList<String>();
     }
 
     /**
@@ -163,44 +163,44 @@ public class ImportTable implements Resolver {
 
         lazyImports.add(className);
         lazyImportPositions.add(pos);
-        classImports.add(className);
+        singleTypeImports.add(className);
     }
 
     /**
-     * Add a package import.
+     * Add a type import on deamnd.
      */
-    public void addPackageImport(String pkgName, Position pos) {
+    public void addTypeOnDemandImport(String pkgOrTypeName, Position pos) {
         // pos ignored since it's never used
-        addPackageImport(pkgName);
+        addTypeOnDemandImport(pkgOrTypeName);
     }
 
     /**
      * Add a package import.
      */
-    public void addPackageImport(String pkgName) {
+    public void addTypeOnDemandImport(String pkgOrTypeName) {
         // don't add the import if it is the same as the current package,
         // the same as a default import, or has already been imported
-        if ((pkg != null && pkg.fullName().equals(pkgName))
-                || ts.defaultPackageImports().contains(pkgName)
-                || packageImports.contains(pkgName)) {
+        if ((pkg != null && pkg.fullName().equals(pkgOrTypeName))
+                || ts.defaultPackageImports().contains(pkgOrTypeName)
+                || typeOnDemandImports.contains(pkgOrTypeName)) {
             return;
         }
 
-        packageImports.add(pkgName);
+        typeOnDemandImports.add(pkgOrTypeName);
     }
 
     /**
-     * List the packages we import from.
+     * List the type-on-demands we import from.
      */
-    public List<String> packageImports() {
-        return packageImports;
+    public List<String> typeOnDemandImports() {
+        return typeOnDemandImports;
     }
 
     /**
      * List the classes explicitly imported.
      */
-    public List<String> classImports() {
-        return classImports;
+    public List<String> singleTypeImports() {
+        return singleTypeImports;
     }
 
     /**
@@ -252,7 +252,6 @@ public class ImportTable implements Resolver {
             }
             return res;
         }
-
         try {
             if (pkg != null) {
                 // check if the current package defines it.
@@ -260,7 +259,7 @@ public class ImportTable implements Resolver {
                 // "type-import-on-demand" declarations as they are called in
                 // the JLS), so even if another package defines the same name,
                 // there is no conflict. See Section 6.5.2 of JLS, 2nd Ed.
-                Named n = findInPkg(name, pkg.fullName());
+                Named n = findInPkgOrType(name, pkg.fullName());
                 if (n != null) {
                     if (Report.should_report(TOPICS, 3))
                         Report.report(3, this + ".find(" + name
@@ -271,17 +270,16 @@ public class ImportTable implements Resolver {
                     return n;
                 }
             }
-
             List<String> imports =
-                    new ArrayList<String>(packageImports.size() + 5);
+                    new ArrayList<String>(typeOnDemandImports.size() + 5);
 
             imports.addAll(ts.defaultPackageImports());
-            imports.addAll(packageImports);
+            imports.addAll(typeOnDemandImports);
 
             // It wasn't a ClassImport.  Maybe it was a PackageImport?
             Named resolved = null;
-            for (String pkgName : imports) {
-                Named n = findInPkg(name, pkgName);
+            for (String pkgOrTypeName : imports) {
+                Named n = findInPkgOrType(name, pkgOrTypeName);
                 if (n != null) {
                     if (resolved == null) {
                         // This is the first occurrence of name we've found
@@ -329,15 +327,26 @@ public class ImportTable implements Resolver {
         }
     }
 
-    protected Named findInPkg(String name, String pkgName)
+    protected Named findInPkgOrType(String name, String pkgOrTypeName)
             throws SemanticException {
-        String fullName = pkgName + "." + name;
+        // in case pkgName is actually a class, we need to try loading it, to make sure
+        // all the nested classes are loaded
+        String actualPkg;
+        if (!this.ts.packageExists(pkgOrTypeName)) {
+            // try loading the class
+            ts.systemResolver().find(pkgOrTypeName);
+            actualPkg = StringUtil.getPackageComponent(pkgOrTypeName);
+        }
+        else {
+            // it really is a package
+            actualPkg = pkgOrTypeName;
+        }
 
+        String fullName = pkgOrTypeName + "." + name;
         try {
             Named n = ts.systemResolver().find(fullName);
-
-            // Check if the type is visible in this package.
-            if (isVisibleFrom(n, pkgName)) {
+            // Check if the type is visible in this pake or type.
+            if (isVisibleFrom(n, actualPkg)) {
                 return n;
             }
         }

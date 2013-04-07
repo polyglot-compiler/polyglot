@@ -103,7 +103,9 @@ public class Import_c extends Node_c implements Import {
     /** Check that imported classes and packages exist. */
     @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
-        if (kind == PACKAGE && tc.typeSystem().packageExists(name)) {
+        if (kind == TYPE_IMPORT_ON_DEMAND
+                && tc.typeSystem().packageExists(name)) {
+            // we're importing a package on demand.
             return this;
         }
 
@@ -135,7 +137,7 @@ public class Import_c extends Node_c implements Import {
 
     @Override
     public String toString() {
-        return "import " + name + (kind == PACKAGE ? ".*" : "");
+        return "import " + name + (kind == TYPE_IMPORT_ON_DEMAND ? ".*" : "");
     }
 
     /** Write the import to an output file. */
@@ -145,7 +147,7 @@ public class Import_c extends Node_c implements Import {
             w.write("import ");
             w.write(name);
 
-            if (kind == PACKAGE) {
+            if (kind == TYPE_IMPORT_ON_DEMAND) {
                 w.write(".*");
             }
 

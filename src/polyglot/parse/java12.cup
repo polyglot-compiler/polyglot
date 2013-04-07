@@ -489,12 +489,12 @@ import_declaration ::=
 single_type_import_declaration ::=
                     // Import
         IMPORT:a qualified_name:b SEMICOLON:c
-            {: RESULT = parser.nf.Import(parser.pos(a, c), Import.CLASS, b.toString()); :}
+            {: RESULT = parser.nf.Import(parser.pos(a, c), Import.SINGLE_TYPE, b.toString()); :}
     ;
 type_import_on_demand_declaration ::=
                     // Import
         IMPORT:a name:b DOT MULT SEMICOLON:c
-            {: RESULT = parser.nf.Import(parser.pos(a, c), Import.PACKAGE, b.toString()); :}
+            {: RESULT = parser.nf.Import(parser.pos(a, c), Import.TYPE_IMPORT_ON_DEMAND, b.toString()); :}
     ;
 type_declaration ::=
                     // ClassDecl

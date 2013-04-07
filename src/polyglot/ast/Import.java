@@ -51,8 +51,9 @@ public interface Import extends Node {
         }
     }
 
-    public static final Kind CLASS = new Kind("class");
-    public static final Kind PACKAGE = new Kind("package");
+    public static final Kind SINGLE_TYPE = new Kind("single type");
+    public static final Kind TYPE_IMPORT_ON_DEMAND =
+            new Kind("type import on demand");
 
     /** Get the name of the class or package to import. */
     String name();

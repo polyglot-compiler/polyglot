@@ -77,7 +77,7 @@ public class NodeFactory_c extends AbstractNodeFactory_c {
         o = Branch.BREAK;
         o = ConstructorCall.SUPER;
         o = FloatLit.FLOAT;
-        o = Import.CLASS;
+        o = Import.SINGLE_TYPE;
         o = IntLit.INT;
         o = Special.SUPER;
     }

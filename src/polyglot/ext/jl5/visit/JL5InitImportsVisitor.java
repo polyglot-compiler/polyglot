@@ -56,13 +56,13 @@ public class JL5InitImportsVisitor extends InitImportsVisitor {
 
             if (im.kind() == JL5Import.SINGLE_STATIC_MEMBER) {
                 String id = StringUtil.getShortNameComponent(im.name());
-                checkForConflicts(id, it.classImports(), im.position());
+                checkForConflicts(id, it.singleTypeImports(), im.position());
                 it.addSingleStaticImport(im.name(), im.position());
             }
             else if (im.kind() == JL5Import.STATIC_ON_DEMAND) {
                 it.addStaticOnDemandImport(im.name(), im.position());
             }
-            else if (im.kind() == Import.CLASS) {
+            else if (im.kind() == Import.SINGLE_TYPE) {
                 // just check for conflicts
                 String id = StringUtil.getShortNameComponent(im.name());
                 checkForConflicts(id, it.singleStaticImports(), im.position());
