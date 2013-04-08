@@ -88,7 +88,8 @@ public class InferenceSolver_c implements InferenceSolver {
         List<SuperTypeConstraint> supers = new ArrayList<SuperTypeConstraint>();
 //        System.err.println("**** inference solver:");
 //        System.err.println("      constraints : " + constraints);
-//        System.err.println("      use subs? : " + useSubtypeConstraints +  "   use sups? : " + useSupertypeConstraints);
+//        System.err.println("      use subs? : " + useSubtypeConstraints
+//                + "   use sups? : " + useSupertypeConstraints);
 //        System.err.println("      variables : " + typeVariablesToSolve());
 
         while (!constraints.isEmpty()) {
@@ -226,19 +227,7 @@ public class InferenceSolver_c implements InferenceSolver {
         }
 
         if (hasUnresolvedTypeArguments(solution)) {
-            // see if the return type is appropriate for inferring additional results
-            Type returnType = returnType(pi);
-            if (returnType != null && returnType.isReference()
-                    && !returnType.isVoid()) {
-                // See JLS 3rd ed, 15.12.2.8
-                if (expectedReturnType == null) {
-                    expectedReturnType = ts.Object();
-                }
-                solution =
-                        solveWithExpectedReturnType(solution,
-                                                    expectedReturnType,
-                                                    returnType);
-            }
+            solution = handleUnresolvedTypeArgs(solution, expectedReturnType);
         }
         else {
             // resolved all type arguments. Do we want to try to be more permissive?
@@ -278,16 +267,11 @@ public class InferenceSolver_c implements InferenceSolver {
         return m;
     }
 
-    private static Type returnType(JL5ProcedureInstance pi) {
-        if (pi instanceof MethodInstance) {
-            return ((MethodInstance) pi).returnType();
-        }
-        return null;
-    }
-
-    private Type[] solveWithExpectedReturnType(Type[] solution,
-            Type expectedReturnType, Type declaredReturnType) {
+    private Type[] handleUnresolvedTypeArgs(Type[] solution,
+            Type expectedReturnType) {
         List<Constraint> constraints = new ArrayList<Constraint>();
+        constraints.addAll(this.getInitialConstraints());
+
         // get the subsitution corresponding to the solution so far
         Map<TypeVariable, ReferenceType> m =
                 new LinkedHashMap<TypeVariable, ReferenceType>();
@@ -299,10 +283,21 @@ public class InferenceSolver_c implements InferenceSolver {
             m.put(typeVariablesToSolve().get(i), t);
         }
         Subst<TypeVariable, ReferenceType> subst = ts.subst(m);
-        Type rt = subst.substType(declaredReturnType);
-        constraints.add(new SuperConversionConstraint(expectedReturnType,
-                                                      rt,
-                                                      this));
+
+        // see if the return type is appropriate for inferring additional results
+        Type returnType = returnType(pi);
+        if (returnType != null && returnType.isReference()
+                && !returnType.isVoid()) {
+            // See JLS 3rd ed, 15.12.2.8
+            if (expectedReturnType == null) {
+                expectedReturnType = ts.Object();
+            }
+            Type rt = subst.substType(returnType);
+            constraints.add(new SuperConversionConstraint(expectedReturnType,
+                                                          rt,
+                                                          this));
+        }
+
         for (int i = 0; i < solution.length; i++) {
             TypeVariable ti = typeVariablesToSolve().get(i);
             Type bi = subst.substType(ti.upperBound());
@@ -310,12 +305,18 @@ public class InferenceSolver_c implements InferenceSolver {
         }
 
         return solve(constraints, false, true);
+    }
 
+    private static Type returnType(JL5ProcedureInstance pi) {
+        if (pi instanceof MethodInstance) {
+            return ((MethodInstance) pi).returnType();
+        }
+        return null;
     }
 
     private boolean hasUnresolvedTypeArguments(Type[] solution) {
-        for (int i = 0; i < solution.length; i++) {
-            if (solution[i] == null) {
+        for (Type element : solution) {
+            if (element == null) {
                 return true;
             }
         }
