@@ -119,6 +119,18 @@ public class JL5EnumDecl_c extends JL5ClassDecl_c implements JL5EnumDecl {
             }
         }
 
+        // set the supertype appropraitely
+        JL5TypeSystem ts = (JL5TypeSystem) tc.typeSystem();
+        if (ts.rawClass((JL5ParsedClassType) ts.Enum())
+              .equals(this.type().superType())) {
+            // the super class is currently a raw Enum.
+            // instantiate Enum to on this type.
+            this.type()
+                .superType(ts.instantiate(this.position(),
+                                          (JL5ParsedClassType) ts.Enum(),
+                                          Collections.singletonList(this.type())));
+        }
+
         ClassDecl n = (ClassDecl) super.typeCheck(tc);
         if (n.type().isMember()) {
             // it's a nested class
