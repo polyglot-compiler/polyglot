@@ -1,0 +1,9 @@
+class Foo<K extends Bar<K>> extends Baz<K> {
+    public void putAll(Baz<? extends K> m) {
+            Foo<? extends K> em =
+                (Foo<? extends K>)m;
+	}
+}
+
+class Bar<T extends Bar<T>> { }
+class Baz<U> { }

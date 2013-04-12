@@ -360,6 +360,7 @@ polyglot.ext.jl5.ExtensionInfo "-d out -classpath java-out -assert -noserial -po
 	Conditional09.jl5 (Semantic, "does not match");
 	Conditional10.jl5 (Semantic, "does not match");
 	Conditional11.jl5;
+	CaptureConversion01.jl5;
 }
 
 # Now run the tests again removing the Java 5-isms.
@@ -684,5 +685,5 @@ polyglot.ext.jl5.ExtensionInfo "-d out -classpath java-out -removeJava5isms -enu
 	Conditional09.jl5 (Semantic, "does not match");
 	Conditional10.jl5 (Semantic, "does not match");
 	Conditional11.jl5;
-
+	CaptureConversion01.jl5;
 }
