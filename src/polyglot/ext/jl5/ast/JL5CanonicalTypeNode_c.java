@@ -202,6 +202,8 @@ public class JL5CanonicalTypeNode_c extends polyglot.ast.CanonicalTypeNode_c {
                 findInstanceTypeVariables(at, tvs);
             }
         }
+        if (t.isClass() && t.toClass().isNested()) {
+            findInstanceTypeVariables(t.toClass().outer(), tvs);
+        }
     }
-
 }
