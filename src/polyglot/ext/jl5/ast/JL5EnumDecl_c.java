@@ -71,6 +71,12 @@ public class JL5EnumDecl_c extends JL5ClassDecl_c implements JL5EnumDecl {
     public Node buildTypes(TypeBuilder tb) throws SemanticException {
         JL5EnumDecl_c n = (JL5EnumDecl_c) super.buildTypes(tb);
 
+        if (n.type().isMember()) {
+            // it's a nested class
+            n = (JL5EnumDecl_c) n.flags(n.flags().Static());
+            n.type().flags(n.type().flags().Static());
+        }
+
         try {
             JL5TypeSystem ts = (JL5TypeSystem) tb.typeSystem();
             return n.addEnumMethodTypesIfNeeded(ts);
