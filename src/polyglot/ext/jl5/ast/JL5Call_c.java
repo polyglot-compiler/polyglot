@@ -241,7 +241,8 @@ public class JL5Call_c extends Call_c implements JL5Call {
         return call;
     }
 
-    private Type computeReturnType(JL5MethodInstance mi) {
+    private Type computeReturnType(JL5MethodInstance mi)
+            throws SemanticException {
         // See JLS 3rd ed 15.12.2.6
         JL5TypeSystem ts = (JL5TypeSystem) mi.typeSystem();
         // If the method being invoked is declared with a return type of void, then the result is void.

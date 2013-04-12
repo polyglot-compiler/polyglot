@@ -179,7 +179,8 @@ public class JL5Conditional_c extends Conditional_c {
         return type(find_lub(ts, t1, t2));
     }
 
-    private Type find_lub(JL5TypeSystem ts, Type t1, Type t2) {
+    private Type find_lub(JL5TypeSystem ts, Type t1, Type t2)
+            throws SemanticException {
         if (t1.isArray() && t2.isArray() && t1.toArray().base().isReference()
                 && t2.toArray().base().isReference()) {
             // The types are both array types and the base types are references.

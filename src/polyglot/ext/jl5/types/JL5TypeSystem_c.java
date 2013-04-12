@@ -78,6 +78,7 @@ import polyglot.types.SemanticException;
 import polyglot.types.Type;
 import polyglot.types.reflect.ClassFile;
 import polyglot.types.reflect.ClassFileLazyClassInitializer;
+import polyglot.util.CollectionUtil;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
 import polyglot.util.UniqueID;
@@ -1979,7 +1980,7 @@ public class JL5TypeSystem_c extends
     }
 
     @Override
-    public Type applyCaptureConversion(Type t) {
+    public Type applyCaptureConversion(Type t) throws SemanticException {
         if (!(t instanceof JL5SubstClassType_c)) {
             return t;
         }
@@ -2013,8 +2014,15 @@ public class JL5TypeSystem_c extends
                 WildCardType wti = (WildCardType) ti;
                 TypeVariable vsi = (TypeVariable) si;
                 if (wti.isExtendsConstraint()) {
-                    vsi.setUpperBound(this.glb(wti.upperBound(),
-                                               (ReferenceType) subst.substType(a.upperBound())));
+                    ReferenceType wub = wti.upperBound();
+                    ReferenceType substUpperBoundOfA =
+                            (ReferenceType) subst.substType(a.upperBound());
+                    vsi.setUpperBound(this.glb(wub, substUpperBoundOfA, false));
+                    // check that wub is a subtype of substUpperBoundOfA, or vice versa
+                    // JLS 3rd ed 5.1.10
+                    this.checkIntersectionBounds(CollectionUtil.list(wub,
+                                                                     substUpperBoundOfA),
+                                                 false);
                 }
                 else {
                     // wti is a super wildcard.
@@ -2163,20 +2171,31 @@ public class JL5TypeSystem_c extends
 
     @Override
     public ReferenceType glb(ReferenceType t1, ReferenceType t2) {
+        return this.glb(t1, t2, true);
+    }
+
+    protected ReferenceType glb(ReferenceType t1, ReferenceType t2,
+            boolean performIntersectionCheck) {
         List<ReferenceType> l = new ArrayList<ReferenceType>();
         l.add(t1);
         l.add(t2);
-        return glb(Position.compilerGenerated(), l);
+        return glb(Position.compilerGenerated(), l, performIntersectionCheck);
     }
 
     @Override
     public ReferenceType glb(Position pos, List<ReferenceType> bounds) {
+        return this.glb(pos, bounds, true);
+    }
+
+    protected ReferenceType glb(Position pos, List<ReferenceType> bounds,
+            boolean performIntersectionCheck) {
         if (bounds == null || bounds.isEmpty()) {
             return this.Object();
         }
         try {
             // XXX also need to check that does not have two classes that are not in a subclass relation?
-            if (!this.checkIntersectionBounds(bounds, true)) {
+            if (performIntersectionCheck
+                    && !this.checkIntersectionBounds(bounds, true)) {
                 return this.Object();
             }
             else {
