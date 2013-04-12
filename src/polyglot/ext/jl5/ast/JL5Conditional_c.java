@@ -200,7 +200,8 @@ public class JL5Conditional_c extends Conditional_c {
             ReferenceType s2 = (ReferenceType) ts.boxingConversion(t2);
 
             LubType lub = ts.lub(this.position, CollectionUtil.list(s1, s2));
-            return ts.applyCaptureConversion(lub.calculateLub());
+            return ts.applyCaptureConversion(lub.calculateLub(),
+                                             this.position());
         }
     }
 }

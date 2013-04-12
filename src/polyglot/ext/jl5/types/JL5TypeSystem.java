@@ -253,7 +253,7 @@ public interface JL5TypeSystem extends TypeSystem,
      * Apply capture conversion to t. See JLS 3rd ed 5.1.10
      * @throws SemanticException 
      */
-    Type applyCaptureConversion(Type t) throws SemanticException;
+    Type applyCaptureConversion(Type t, Position pos) throws SemanticException;
 
     @Override
     Flags flagsForBits(int bits);

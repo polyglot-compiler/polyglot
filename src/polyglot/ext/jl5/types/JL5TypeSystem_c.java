@@ -78,7 +78,6 @@ import polyglot.types.SemanticException;
 import polyglot.types.Type;
 import polyglot.types.reflect.ClassFile;
 import polyglot.types.reflect.ClassFileLazyClassInitializer;
-import polyglot.util.CollectionUtil;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
 import polyglot.util.UniqueID;
@@ -1980,7 +1979,8 @@ public class JL5TypeSystem_c extends
     }
 
     @Override
-    public Type applyCaptureConversion(Type t) throws SemanticException {
+    public Type applyCaptureConversion(Type t, Position pos)
+            throws SemanticException {
         if (!(t instanceof JL5SubstClassType_c)) {
             return t;
         }
@@ -2017,12 +2017,24 @@ public class JL5TypeSystem_c extends
                     ReferenceType wub = wti.upperBound();
                     ReferenceType substUpperBoundOfA =
                             (ReferenceType) subst.substType(a.upperBound());
-                    vsi.setUpperBound(this.glb(wub, substUpperBoundOfA, false));
-                    // check that wub is a subtype of substUpperBoundOfA, or vice versa
-                    // JLS 3rd ed 5.1.10
-                    this.checkIntersectionBounds(CollectionUtil.list(wub,
-                                                                     substUpperBoundOfA),
-                                                 false);
+                    ReferenceType glb =
+                            this.glb(wub, substUpperBoundOfA, false);
+                    vsi.setUpperBound(glb);
+                    if (wub.isClass()
+                            && !wub.toClass().flags().isInterface()
+                            && substUpperBoundOfA.isClass()
+                            && !substUpperBoundOfA.toClass()
+                                                  .flags()
+                                                  .isInterface()) {
+                        // check that wub is a subtype of substUpperBoundOfA, or vice versa
+                        // JLS 3rd ed 5.1.10
+                        if (!isSubtype(wub, substUpperBoundOfA)
+                                && !isSubtype(substUpperBoundOfA, wub)) {
+                            throw new SemanticException("Cannot capture convert "
+                                                                + t,
+                                                        pos);
+                        }
+                    }
                 }
                 else {
                     // wti is a super wildcard.

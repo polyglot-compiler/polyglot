@@ -217,7 +217,7 @@ public class JL5SubstClassType_c extends
         if (hasWildCardArg()) {
             Type captured;
             try {
-                captured = ts.applyCaptureConversion(this);
+                captured = ts.applyCaptureConversion(this, null);
                 // Note: we want descendsFrom, not isSubtype, since the direct ancestors of this class
                 // are the direct ancestors of captured, but not captured itself.
                 if (ts.descendsFrom(captured, ancestor)) {

@@ -259,7 +259,7 @@ public class JL5Call_c extends Call_c implements JL5Call {
         // --- mi has already had substitution applied, so it is covered by the following case.
 
         // Otherwise, the result type is obtained by applying capture conversion (�5.1.10) to the type given in the method declaration.
-        return ts.applyCaptureConversion(mi.returnType());
+        return ts.applyCaptureConversion(mi.returnType(), this.position());
     }
 
     @Override
