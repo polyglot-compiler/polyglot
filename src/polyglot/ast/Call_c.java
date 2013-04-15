@@ -181,9 +181,6 @@ public class Call_c extends Expr_c implements Call {
                 || !CollectionUtil.equals(arguments, this.arguments)) {
             Call_c n = (Call_c) copy();
 
-            // If the target changes, assume we want it to be an explicit target.
-            n.targetImplicit &= target == n.target;
-
             n.target = target;
             n.name = name;
             n.arguments = ListUtil.copy(arguments, true);
