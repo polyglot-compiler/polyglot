@@ -398,136 +398,147 @@ public class InnerClassRemover extends ContextVisitor {
             newMembers.add(fd);
         }
 
+        // Rewrite the constructors of the class to initialize the fields.
         for (ClassMember m : b.members()) {
             if (m instanceof ConstructorDecl) {
                 ConstructorDecl td = (ConstructorDecl) m;
-
-                // Create a list of formals to add to the constructor.
-                List<Formal> formals = new ArrayList<Formal>();
-                List<LocalInstance> locals = new ArrayList<LocalInstance>();
-
-                for (FieldInstance fi : newFields) {
-                    Position pos = fi.position();
-                    LocalInstance li =
-                            ts.localInstance(pos,
-                                             Flags.FINAL,
-                                             fi.type(),
-                                             fi.name());
-                    li.setNotConstant();
-                    Formal formal =
-                            nf.Formal(pos,
-                                      li.flags(),
-                                      nf.CanonicalTypeNode(pos, li.type()),
-                                      nf.Id(pos, li.name()));
-                    formal = formal.localInstance(li);
-                    formals.add(formal);
-                    locals.add(li);
-                }
-
-                List<Formal> newFormals = new ArrayList<Formal>();
-                newFormals.addAll(formals);
-                newFormals.addAll(td.formals());
-                td = td.formals(newFormals);
-
-                // Create a list of field assignments.
-                List<Stmt> statements = new ArrayList<Stmt>();
-
-                for (int j = 0; j < newFields.size(); j++) {
-                    FieldInstance fi = newFields.get(j);
-                    LocalInstance li = formals.get(j).localInstance();
-
-                    Position pos = fi.position();
-
-                    Field f =
-                            nf.Field(pos,
-                                     nf.This(pos).type(fi.container()),
-                                     nf.Id(pos, fi.name()));
-                    f = (Field) f.type(fi.type());
-                    f = f.fieldInstance(fi);
-                    f = f.targetImplicit(false);
-
-                    Local l = nf.Local(pos, nf.Id(pos, li.name()));
-                    l = (Local) l.type(li.type());
-                    l = l.localInstance(li);
-
-                    Assign a = nf.FieldAssign(pos, f, Assign.ASSIGN, l);
-                    a = (Assign) a.type(li.type());
-
-                    Eval e = nf.Eval(pos, a);
-                    statements.add(e);
-                }
-
-                // Add the assignments to the constructor body after the super call.
-                // Or, add pass the locals to another constructor if a this call.
-                Block block = td.body();
-                if (block.statements().size() > 0) {
-                    Stmt s0 = block.statements().get(0);
-                    if (s0 instanceof ConstructorCall) {
-                        ConstructorCall cc = (ConstructorCall) s0;
-                        ConstructorInstance ci = cc.constructorInstance();
-                        if (cc.kind() == ConstructorCall.THIS) {
-                            // Not a super call.  Pass the locals as arguments.
-                            List<Expr> arguments = new ArrayList<Expr>();
-                            for (Stmt si : statements) {
-                                Eval e = (Eval) si;
-                                Assign a = (Assign) e.expr();
-                                arguments.add(a.right());
-                            }
-
-                            // Modify the CI if it is a copy of the declaration CI.
-                            // If not a copy, it will get modified at the declaration.
-                            if (ci != ci.declaration()) {
-                                List<Type> newFormalTypes =
-                                        new ArrayList<Type>();
-                                for (int j = 0; j < newFields.size(); j++) {
-                                    FieldInstance fi = newFields.get(j);
-                                    newFormalTypes.add(fi.type());
-                                }
-                                newFormalTypes.addAll(ci.formalTypes());
-                                ci.setFormalTypes(newFormalTypes);
-                            }
-
-                            arguments.addAll(cc.arguments());
-                            cc = (ConstructorCall) cc.arguments(arguments);
-                        }
-                        else {
-                            // A super call.  Don't rewrite it here; the visitor will handle it elsewhere.
-                        }
-
-                        // prepend the super call
-                        statements.add(0, cc);
-                    }
-
-                    statements.addAll(block.statements()
-                                           .subList(1,
-                                                    block.statements().size()));
-                }
-                else {
-                    statements.addAll(block.statements());
-                }
-
-                block = block.statements(statements);
-                td = (ConstructorDecl) td.body(block);
-
-                newMembers.add(td);
-
-                List<Type> newFormalTypes = new ArrayList<Type>();
-                for (Formal f : newFormals) {
-                    newFormalTypes.add(f.declType());
-                }
-
-                ConstructorInstance ci = td.constructorInstance();
-                assert ci.declaration() == ci;
-
-                ci.setFormalTypes(newFormalTypes);
+                m = rewriteConstructorDeclForNewFields(td, newFields, ts, nf);
             }
-            else {
-                newMembers.add(m);
-            }
+            newMembers.add(m);
         }
 
         b = b.members(newMembers);
         return cd.body(b);
+    }
+
+    /**
+     * Rewrites the constructor decl to take additional arguments for the initial
+     * values of the new fields.
+     * @return
+     */
+    private static ConstructorDecl rewriteConstructorDeclForNewFields(
+            ConstructorDecl cd, List<FieldInstance> newFields, TypeSystem ts,
+            NodeFactory nf) {
+        // Create a list of formals to add to the constructor.
+        List<Formal> formals = new ArrayList<Formal>();
+        List<LocalInstance> localInstances = new ArrayList<LocalInstance>();
+        List<Local> localVars = new ArrayList<Local>();
+
+        for (FieldInstance fi : newFields) {
+            Position pos = fi.position();
+            LocalInstance li =
+                    ts.localInstance(pos, Flags.FINAL, fi.type(), fi.name());
+            li.setNotConstant();
+            Formal formal =
+                    nf.Formal(pos,
+                              li.flags(),
+                              nf.CanonicalTypeNode(pos, li.type()),
+                              nf.Id(pos, li.name()));
+            formal = formal.localInstance(li);
+            formals.add(formal);
+            localInstances.add(li);
+            // create a local variable that access the local.
+            Local l = nf.Local(pos, nf.Id(pos, li.name()));
+            l = (Local) l.type(li.type());
+            l = l.localInstance(li);
+            localVars.add(l);
+
+        }
+
+        List<Formal> newFormals = new ArrayList<Formal>();
+        newFormals.addAll(formals);
+        newFormals.addAll(cd.formals());
+        cd = cd.formals(newFormals);
+
+        // If the constructor call is a "this(...)" call, then
+        // add the new arguments to the this call.
+        Block block = cd.body();
+        ConstructorCall constructorCall = null;
+        boolean performFieldAssignments = true;
+        List<Stmt> remainingStatements = new ArrayList<Stmt>(); // any statements in the constructor decl other than the constructor call
+
+        if (block.statements().size() > 0) {
+            Stmt s0 = block.statements().get(0);
+            if (s0 instanceof ConstructorCall) {
+                remainingStatements.addAll(block.statements()
+                                                .subList(1,
+                                                         block.statements()
+                                                              .size()));
+                constructorCall = (ConstructorCall) s0;
+                ConstructorInstance ci = constructorCall.constructorInstance();
+                if (constructorCall.kind() == ConstructorCall.THIS) {
+                    // Not a super call.  Pass the locals as arguments.
+                    List<Expr> arguments = new ArrayList<Expr>(localVars);
+
+                    // Modify the CI if it is a copy of the declaration CI.
+                    // If not a copy, it will get modified at the declaration.
+                    if (ci != ci.declaration()) {
+                        List<Type> newFormalTypes = new ArrayList<Type>();
+                        for (int j = 0; j < newFields.size(); j++) {
+                            FieldInstance fi = newFields.get(j);
+                            newFormalTypes.add(fi.type());
+                        }
+                        newFormalTypes.addAll(ci.formalTypes());
+                        ci.setFormalTypes(newFormalTypes);
+                    }
+
+                    arguments.addAll(constructorCall.arguments());
+                    constructorCall =
+                            (ConstructorCall) constructorCall.arguments(arguments);
+
+                    performFieldAssignments = false;
+                }
+            }
+
+        }
+
+        List<Stmt> statements = new ArrayList<Stmt>();
+        if (constructorCall != null) {
+            // the original constructor decl had a constructor call. Let's add it.
+            statements.add(constructorCall);
+        }
+        if (performFieldAssignments) {
+            // we need to assign to the new fields.
+            // Create a list of field assignments.
+            for (int j = 0; j < newFields.size(); j++) {
+                FieldInstance fi = newFields.get(j);
+                LocalInstance li = formals.get(j).localInstance();
+                Local l = localVars.get(j);
+
+                Position pos = fi.position();
+
+                Field f =
+                        nf.Field(pos,
+                                 nf.This(pos).type(fi.container()),
+                                 nf.Id(pos, fi.name()));
+                f = (Field) f.type(fi.type());
+                f = f.fieldInstance(fi);
+                f = f.targetImplicit(false);
+
+                Assign a = nf.FieldAssign(pos, f, Assign.ASSIGN, l);
+                a = (Assign) a.type(li.type());
+
+                Eval e = nf.Eval(pos, a);
+                statements.add(e);
+            }
+        }
+        // add any remaining statements from the original constructor decl.
+        statements.addAll(remainingStatements);
+
+        block = block.statements(statements);
+        cd = (ConstructorDecl) cd.body(block);
+
+        List<Type> newFormalTypes = new ArrayList<Type>();
+        for (Formal f : newFormals) {
+            newFormalTypes.add(f.declType());
+        }
+
+        ConstructorInstance ci = cd.constructorInstance();
+        assert ci.declaration() == ci;
+
+        ci.setFormalTypes(newFormalTypes);
+
+        return cd;
     }
 
     // Add local variables to the argument list until it matches the declaration.
