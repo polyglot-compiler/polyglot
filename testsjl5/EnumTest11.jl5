@@ -1,0 +1,9 @@
+enum FinalFieldInEnum {
+  TRUE(true);
+
+  private final boolean b;
+  private FinalFieldInEnum(boolean b) {
+    this.b = b;
+  }
+  private FinalFieldInEnum() { this(false); }
+}
