@@ -75,7 +75,6 @@ import polyglot.types.SemanticException;
 import polyglot.types.Type;
 import polyglot.types.TypeSystem;
 import polyglot.util.CodeWriter;
-import polyglot.util.CollectionUtil;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
 import polyglot.visit.ContextVisitor;
@@ -149,7 +148,7 @@ public class RemoveEnums extends ContextVisitor {
             return translateEnumConstantDecl((EnumConstantDecl) n);
         }
         if (this.inEnumDecl && n instanceof ConstructorDecl) {
-            return tranlsateEnumConstructor((ConstructorDecl) n);
+            return translateEnumConstructor((ConstructorDecl) n);
         }
         if (n instanceof Switch) {
             return translateSwitch((Switch) n);
@@ -226,23 +225,36 @@ public class RemoveEnums extends ContextVisitor {
      * Addes two new arguments for the name and ordinal of the enum constant, and hands those to
      * the super class. 
      */
-    private Node tranlsateEnumConstructor(ConstructorDecl n) {
+    private Node translateEnumConstructor(ConstructorDecl n) {
         Position pos = Position.compilerGenerated();
         Id enumName = nodeFactory().Id(pos, "enum$name");
         Id enumOrdinal = nodeFactory().Id(pos, "enum$ordinal");
+
+        List<Stmt> oldStmts = new LinkedList<Stmt>(n.body().statements());
+        ConstructorCall existingCC = null;
+        if (oldStmts.get(0) instanceof ConstructorCall) {
+            existingCC = (ConstructorCall) oldStmts.remove(0);
+        }
+        else {
+            existingCC =
+                    nodeFactory().ConstructorCall(pos,
+                                                  ConstructorCall.SUPER,
+                                                  Collections.<Expr> emptyList());
+        }
 
         // add two new arguments to the constructor
         List<Formal> newFormals = new ArrayList<Formal>();
         LocalInstance enumNameLI =
                 ts.localInstance(pos, Flags.NONE, ts.String(), enumName.id());
-        LocalInstance enumOrdLI =
-                ts.localInstance(pos, Flags.NONE, ts.Int(), enumOrdinal.id());
         newFormals.add(nodeFactory().Formal(pos,
                                             Flags.NONE,
                                             nodeFactory().CanonicalTypeNode(pos,
                                                                             ts.String()),
                                             enumName)
                                     .localInstance(enumNameLI));
+
+        LocalInstance enumOrdLI =
+                ts.localInstance(pos, Flags.NONE, ts.Int(), enumOrdinal.id());
         newFormals.add(nodeFactory().Formal(pos,
                                             Flags.NONE,
                                             nodeFactory().CanonicalTypeNode(pos,
@@ -252,20 +264,18 @@ public class RemoveEnums extends ContextVisitor {
         newFormals.addAll(n.formals());
         n = n.formals(newFormals);
 
-        // use those arguments in the super call
-        List<Stmt> newStmts = new ArrayList<Stmt>();
-        newStmts.add(nodeFactory().ConstructorCall(pos,
-                                                   ConstructorCall.SUPER,
-                                                   CollectionUtil.list((Expr) nodeFactory().Local(pos,
-                                                                                                  enumName)
-                                                                                           .localInstance(enumNameLI),
-                                                                       nodeFactory().Local(pos,
-                                                                                           enumOrdinal)
-                                                                                    .localInstance(enumOrdLI))));
-        List<Stmt> oldStmts = new LinkedList<Stmt>(n.body().statements());
-        if (oldStmts.get(0) instanceof ConstructorCall) {
-            oldStmts.remove(0);
+        // use those arguments in the constructor call
+        List<Expr> constructorCallArgs = new ArrayList<Expr>();
+        constructorCallArgs.add(nodeFactory().Local(pos, enumName)
+                                             .localInstance(enumNameLI));
+        constructorCallArgs.add(nodeFactory().Local(pos, enumOrdinal)
+                                             .localInstance(enumOrdLI));
+        if (existingCC.kind() == ConstructorCall.THIS) {
+            constructorCallArgs.addAll(existingCC.arguments());
         }
+
+        List<Stmt> newStmts = new ArrayList<Stmt>();
+        newStmts.add((ConstructorCall) existingCC.arguments(constructorCallArgs));
         newStmts.addAll(oldStmts);
         n = (ConstructorDecl) n.body(nodeFactory().Block(pos, newStmts));
         return n;
