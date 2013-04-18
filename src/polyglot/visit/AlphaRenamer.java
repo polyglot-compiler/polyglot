@@ -100,6 +100,7 @@ public class AlphaRenamer extends NodeVisitor {
         this.freshVars = new HashSet<String>();
 
         this.renameCatchFormals = renameCatchFormals;
+        this.createNewLocalInstances = createNewLocalInstances;
     }
 
     @Override
