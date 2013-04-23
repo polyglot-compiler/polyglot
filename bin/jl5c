@@ -4,7 +4,7 @@ prg=`basename "$0"`
 dir=`dirname "$0"`/..
 
 usage() {
-  jl5c -h
+  compiler "--help"
   cat <<EOF
   -j <jvm-options>         pass options to the Java VM
   -J <jvm>                 use a different Java VM (default java in path)

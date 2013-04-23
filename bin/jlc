@@ -4,13 +4,20 @@ prg=`basename "$0"`
 dir=`dirname "$0"`/..
 
 usage() {
-  polyglot -h
+  compiler "-help"
   cat <<EOF
   -j <jvm-options>         pass options to the Java VM
   -J <jvm>                 use a different Java VM (default java in path)
   -V                       echo the java command
   -rdebug                  enable remote debugging
 EOF
+}
+
+compiler() {
+  eval "$java" "$vmargs" -classpath "'$classpath'" polyglot.main.Main "$@"
+}
+compilerprint() {
+  echo "$java" "$vmargs" -classpath "'$classpath'" polyglot.main.Main "$@"
 }
 
 fixclasspath() {
@@ -117,9 +124,10 @@ if [ "$usage" = 1 ]; then
   exit 0
 fi
 
+
 if [ "$verbose" = 1 ]; then
-  echo "$java" "$vmargs" -classpath "'$classpath'" polyglot.main.Main -classpath "'$classpath'" "$args"
+    compilerprint "$args"
 fi
 
-  eval "$java" "$vmargs" -classpath "'$classpath'" polyglot.main.Main -classpath "'$classpath'" "$args"
+compiler "$args"
 
