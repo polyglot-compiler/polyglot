@@ -491,7 +491,7 @@
 		<delete file="${classes}/MANIFEST.MF" failonerror="false" />
 	</target>
 
-	<target name="eclipse-plugin-jar" depends="bin-epl.jar" description="Build the ecplise plugin jar"/>
+	<target name="eclipse-plugin-jar" depends="bin-epl.jar" description="Build the Eclipse plugin jar"/>
 	
 	<target name="jar-epl-base" depends="bin-epl.jar" description="Build a jar file containing the EPL-licensed base compiler"/>
 
@@ -696,12 +696,10 @@
 		<copy file="doc/Overview.html" todir="${tmp}/doc" />
 		<copy file="doc/overview.css" todir="${tmp}/doc" />
 		<copy file="doc/ppg.html" todir="${tmp}/doc" />
-		<!--
 		<copy file="${lib}/polyglot.jar" todir="${tmp}/lib" />
 		<copy file="${lib}/pth.jar" todir="${tmp}/lib" />
 		<copy file="${lib}/ppg.jar" todir="${tmp}/lib" />
 		<copy file="${lib}/java_cup.jar" todir="${tmp}/lib" />
-		-->
 		<copy file="${lib}/JFlex.jar" todir="${tmp}/lib" />
 		<copy file="build.xml" todir="${tmp}" />
 		<copy file="build.properties" todir="${tmp}" />
@@ -812,7 +810,7 @@
 
 	<target name="rmdir-tmp">
 		<antcall target="rmdir">
-			<param name="dir" value="${tmp}" />
+		    <param name="dir" value="${tmp}" />
 		</antcall>
 	</target>
 
@@ -826,6 +824,7 @@
 
 
 	<target name="dist-checklist">
+		<echo>Checklist:</echo>
 		<echo>Builds and runs</echo>
 		<echo>Examples build and run</echo>
 		<echo>Regression tests successful</echo>
