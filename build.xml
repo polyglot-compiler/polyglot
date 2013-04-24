@@ -118,8 +118,8 @@
 
 	<!-- create appropriate executables in the bin directory -->
 	<target name="bin" depends="configure" unless="bin.up-to-date">
-        <chmod perm="+x" file="${bin}/jlc" />
-        <chmod perm="+x" file="${bin}/jl5c" />
+		<chmod perm="+x" file="${bin}/jlc" />
+		<chmod perm="+x" file="${bin}/jl5c" />
 		<chmod perm="+x" file="${bin}/pth" />
 		<property name="bin.up-to-date" value="true" />
 	</target>
@@ -710,7 +710,7 @@
 		<copy file="LICENSE.Eclipse" todir="${tmp}" />
 
 		<!-- these don't seem to work on Windows -->
-		<chmod perm="ug=rw,o=" dir="${tmp}" excludes="${bin}/jlc,${bin}/jl5c,${bin}/pth" verbose="true" />
+		<chmod perm="ug=rw,o=" dir="${tmp}" excludes="${bin}/jlc,${bin}/jl5c,${bin}/pth" verbose="true" maxparallel="100" />
 		<chmod perm="ug=rwx,o=" dir="${tmp}" includes="${bin}/jlc,${bin}/jl5c,${bin}/pth" />
 	</target>
 
@@ -735,7 +735,7 @@
 		<copy file="LICENSE.Eclipse" todir="${tmp}" />
 
 		<!-- these don't seem to work on Windows -->
-		<chmod perm="ug=rw,o=" dir="${tmp}" excludes="${bin}/jlc,${bin}/jl5c" verbose="true" />
+		<chmod perm="ug=rw,o=" dir="${tmp}" excludes="${bin}/jlc,${bin}/jl5c" verbose="true" maxparallel="100" />
 		<chmod perm="ug=rwx,o=" dir="${tmp}" includes="${bin}/jlc,${bin}/jl5c" />
 	</target>
 
