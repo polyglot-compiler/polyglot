@@ -9,6 +9,12 @@ April 25, 2013 : Polyglot 2.5.2
 ===============================
 Many bug fixes, and improved annotation support.
 
+Fields ImportTable.CLASS and ImportTable.PACKAGE renamed to
+ImportTable.SINGLE_TYPE and ImportTable.TYPE_IMPORT_ON_DEMAND
+respectively, to reflect both Java Language Specification terminology,
+and the actual semantics.
+	
+
 October 15, 2012 : Polyglot 2.5.1
 =================================
 Changes to FileManager to remove some artificial limitations. The method
