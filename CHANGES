@@ -5,7 +5,7 @@ This file documents changes between releases of Polyglot. More information
 about some releases may be found in the appropriate directory
 doc/release-notes-<version>.
 
-April 19, 2013 : Polyglot 2.5.2
+April 25, 2013 : Polyglot 2.5.2
 ===============================
 Many bug fixes, and improved annotation support.
 
