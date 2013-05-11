@@ -39,6 +39,7 @@ public class JL5Options extends Options {
     public String enumImplClass;
     public boolean removeJava5isms;
     public boolean morePermissiveInference;
+    public boolean morePermissiveCasts;
 
     public JL5Options(ExtensionInfo extension) {
         super(extension);
@@ -70,6 +71,9 @@ public class JL5Options extends Options {
         flags.add(new Switch(new String[] { "-morepermissiveinference",
                                      "--morepermissiveinference" },
                              "Use a more permissive algorithm for type inference. (Experimental)"));
+        flags.add(new Switch(new String[] { "-morepermissivecasts",
+                                     "--morepermissivecasts" },
+                             "Allow allow more permissive casts to and from numeric wrapper types. (Experimental)"));
     }
 
     @Override
@@ -85,6 +89,9 @@ public class JL5Options extends Options {
         }
         else if (arg.flag().ids().contains("-morepermissiveinference")) {
             this.morePermissiveInference = (Boolean) arg.value();
+        }
+        else if (arg.flag().ids().contains("-morepermissivecasts")) {
+            this.morePermissiveCasts = (Boolean) arg.value();
         }
         else super.handleArg(arg);
     }

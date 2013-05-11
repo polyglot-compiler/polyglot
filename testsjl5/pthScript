@@ -362,6 +362,22 @@ polyglot.ext.jl5.ExtensionInfo "-d out -classpath java-out -assert -noserial -po
 	Conditional10.jl5 (Semantic, "does not match");
 	Conditional11.jl5;
 	CaptureConversion01.jl5;
+        PermissiveCasts01.jl5 (Semantic, "does not match"),(Semantic, "does not match"),
+                              (Semantic, "Cannot cast"),(Semantic, "Cannot cast"),
+                              (Semantic, "Cannot cast"),(Semantic, "Cannot cast"),
+                              (Semantic, "Cannot cast"),(Semantic, "Cannot cast"),
+                              (Semantic, "Cannot cast"),(Semantic, "Cannot cast"),
+                              (Semantic, "Cannot cast"),(Semantic, "Cannot cast"),
+                              (Semantic, "Cannot cast"),(Semantic, "Cannot cast"),
+                              (Semantic, "Cannot cast"),(Semantic, "Cannot cast"),
+                              (Semantic, "Cannot cast"),(Semantic, "Cannot cast"),
+                              (Semantic, "Cannot cast"),(Semantic, "Cannot cast"),
+                              (Semantic, "Cannot cast"),(Semantic, "Cannot cast"),
+                              (Semantic, "Cannot cast"),(Semantic, "Cannot cast"),
+                              (Semantic, "Cannot cast"),(Semantic, "Cannot cast"),
+                              (Semantic, "Cannot cast"),(Semantic, "Cannot cast");
+        PermissiveCasts02.jl5 (Semantic, "does not match");
+        PermissiveCasts03.jl5 (Semantic, "Cannot cast");
 }
 
 # Now run the tests again removing the Java 5-isms.
@@ -688,4 +704,32 @@ polyglot.ext.jl5.ExtensionInfo "-d out -classpath java-out -removeJava5isms -enu
 	Conditional10.jl5 (Semantic, "does not match");
 	Conditional11.jl5;
 	CaptureConversion01.jl5;
+        PermissiveCasts01.jl5 (Semantic, "does not match"),(Semantic, "does not match"),
+                              (Semantic, "Cannot cast"),(Semantic, "Cannot cast"),
+                              (Semantic, "Cannot cast"),(Semantic, "Cannot cast"),
+                              (Semantic, "Cannot cast"),(Semantic, "Cannot cast"),
+                              (Semantic, "Cannot cast"),(Semantic, "Cannot cast"),
+                              (Semantic, "Cannot cast"),(Semantic, "Cannot cast"),
+                              (Semantic, "Cannot cast"),(Semantic, "Cannot cast"),
+                              (Semantic, "Cannot cast"),(Semantic, "Cannot cast"),
+                              (Semantic, "Cannot cast"),(Semantic, "Cannot cast"),
+                              (Semantic, "Cannot cast"),(Semantic, "Cannot cast"),
+                              (Semantic, "Cannot cast"),(Semantic, "Cannot cast"),
+                              (Semantic, "Cannot cast"),(Semantic, "Cannot cast"),
+                              (Semantic, "Cannot cast"),(Semantic, "Cannot cast"),
+                              (Semantic, "Cannot cast"),(Semantic, "Cannot cast");
+        PermissiveCasts02.jl5 (Semantic, "does not match");
+        PermissiveCasts03.jl5 (Semantic, "Cannot cast");
+}
+
+polyglot.ext.jl5.ExtensionInfo "-d out -classpath java-out -assert -noserial -post \"javac -source 1.5\" -morepermissivecasts" {
+        PermissiveCasts01.jl5;
+        PermissiveCasts02.jl5 (Semantic, "does not match");
+        PermissiveCasts03.jl5 (Semantic, "Cannot cast");
+}
+
+polyglot.ext.jl5.ExtensionInfo "-d out -classpath java-out -removeJava5isms -enumImplClass MyEnum -assert -noserial -post \"javac -source 1.4\" -morepermissivecasts" {
+        PermissiveCasts01.jl5;
+        PermissiveCasts02.jl5 (Semantic, "does not match");
+        PermissiveCasts03.jl5 (Semantic, "Cannot cast");
 }

@@ -1,0 +1,6 @@
+class C {
+    public static void main(String[] args) {
+        Integer i = 42;
+        Byte b = (byte)i;
+    }
+}

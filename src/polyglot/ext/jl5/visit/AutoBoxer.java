@@ -28,14 +28,17 @@ package polyglot.ext.jl5.visit;
 import java.util.Collections;
 
 import polyglot.ast.Call;
+import polyglot.ast.Cast;
 import polyglot.ast.Expr;
 import polyglot.ast.Id;
 import polyglot.ast.NodeFactory;
 import polyglot.ast.TypeNode;
+import polyglot.ext.jl5.JL5Options;
 import polyglot.ext.jl5.types.JL5TypeSystem;
 import polyglot.frontend.Job;
 import polyglot.types.ClassType;
 import polyglot.types.PrimitiveType;
+import polyglot.types.ReferenceType;
 import polyglot.types.SemanticException;
 import polyglot.types.Type;
 import polyglot.util.CollectionUtil;
@@ -58,17 +61,56 @@ public class AutoBoxer extends AscriptionVisitor {
                 && !fromType.isSubtype(ts.toRawType(ts.Enum()))) {
             // going from a wrapper object to a primitive type
             // translate e to e.XXXvalue() where XXX is int, long, double, etc.
+
+            if (((JL5Options) ts.extensionInfo().getOptions()).morePermissiveCasts) {
+                // Optional support for widening conversion after unboxing for compatibility
+                // with "javac -source 1.5"
+                if (ts.isPrimitiveWrapper(fromType)) {
+                    return fromWrapToPrim(fromType,
+                                          ts.primitiveTypeOfWrapper(fromType),
+                                          e);
+                }
+            }
             return fromWrapToPrim(fromType, toType.toPrimitive(), e);
         }
         else if (!toType.isPrimitive() && fromType.isPrimitive()
                 && !fromType.isVoid() && !ts.String().equals(toType)) {
             // going from a primitive value to a wrapper type.
             // translate e to XXX.valueOf(e), where XXX is the java.lang.Integer, java.lang.Double, etc.
-            return fromPrimToWrap(fromType.toPrimitive(), toType, e);
 
+            if (((JL5Options) ts.extensionInfo().getOptions()).morePermissiveCasts) {
+                // Optional support for allowing a boxing conversion when using a literal
+                // in an initializer for compatibility with with "javac -source 1.5"
+                return fromPrimToWrapWithWidening(fromType.toPrimitive(),
+                                                  (ReferenceType) toType,
+                                                  e);
+            }
+            return fromPrimToWrap(fromType.toPrimitive(), toType, e);
         }
 
         return super.ascribe(e, toType);
+    }
+
+    private Expr fromPrimToWrapWithWidening(PrimitiveType fromType,
+            ReferenceType toType, Expr e) throws SemanticException {
+        JL5TypeSystem ts = (JL5TypeSystem) this.ts;
+
+        PrimitiveType toTypePrim = ts.primitiveTypeOfWrapper(toType);
+
+        TypeNode toTypeNode = nf.CanonicalTypeNode(e.position(), toTypePrim);
+        Cast cast = nf.Cast(e.position(), toTypeNode, e);
+
+        String methodName = "valueOf";
+        TypeNode tn = nf.CanonicalTypeNode(e.position(), toType);
+        Id id = nodeFactory().Id(e.position(), methodName);
+        Call call = nf.Call(e.position(), tn, id, cast);
+        call = (Call) call.type(toType);
+        call =
+                call.methodInstance(ts.findMethod(toType,
+                                                  methodName,
+                                                  CollectionUtil.list((Type) toTypePrim),
+                                                  this.context().currentClass()));
+        return call;
     }
 
     private Expr fromPrimToWrap(PrimitiveType fromType, Type toType, Expr e)

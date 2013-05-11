@@ -43,6 +43,7 @@ import polyglot.ast.ArrayInit;
 import polyglot.ast.ClassLit;
 import polyglot.ast.Expr;
 import polyglot.ast.NullLit;
+import polyglot.ext.jl5.JL5Options;
 import polyglot.ext.jl5.ast.AnnotationElem;
 import polyglot.ext.jl5.ast.EnumConstant;
 import polyglot.ext.jl5.ast.JL5Field_c;
@@ -1477,10 +1478,51 @@ public class JL5TypeSystem_c extends
     }
 
     @Override
+    public boolean numericConversionValid(Type type, long value) {
+        // Optional support for allowing a boxing conversion when using a literal
+        // in an initializer for compatibility with with "javac -source 1.5"
+        JL5Options opts = (JL5Options) extInfo.getOptions();
+        if (opts.morePermissiveCasts && isPrimitiveWrapper(type)) {
+            return super.numericConversionValid(primitiveTypeOfWrapper(type),
+                                                value);
+        }
+        else {
+            return super.numericConversionValid(type, value);
+        }
+    }
+
+    @Override
+    public boolean numericConversionValid(Type type, Object value) {
+        // Optional support for allowing a boxing conversion when using a literal
+        // in an initializer for compatibility with with "javac -source 1.5"
+        JL5Options opts = (JL5Options) extInfo.getOptions();
+        if (opts.morePermissiveCasts && isPrimitiveWrapper(type)) {
+            return super.numericConversionValid(primitiveTypeOfWrapper(type),
+                                                value);
+        }
+        else {
+            return super.numericConversionValid(type, value);
+        }
+    }
+
+    @Override
     public boolean isCastValid(Type fromType, Type toType) {
         if (super.isCastValid(fromType, toType)) {
             return true;
         }
+
+        // Optional support for widening conversion after unboxing for compatibility
+        // with "javac -source 1.5"
+        JL5Options opts = (JL5Options) this.extensionInfo().getOptions();
+        if (opts.morePermissiveCasts) {
+            if (isPrimitiveWrapper(fromType) && toType.isPrimitive()) {
+                if (this.isImplicitCastValid(this.unboxingConversion(fromType),
+                                             toType)) {
+                    return true;
+                }
+            }
+        }
+
         // JLS 3rd ed. Section 5.5
         if (fromType.isClass()) {
             if (!fromType.toClass().flags().isInterface()) {

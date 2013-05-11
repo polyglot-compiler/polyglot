@@ -1,0 +1,52 @@
+class C {
+    public static void main(String[] args) {
+        Byte b = 0;
+        Character c = '!';
+        Short s = 0;
+        Integer i = 0;
+        Long l = 0L;
+        Float f = 0F;
+        Double d = 0D;
+
+        byte pb;
+        short ps;
+        char pc;
+        int pi;
+        long pl;
+        float pf;
+        double pd;
+
+        pb = (byte)b;
+        ps = (short)b;
+        pi = (int)b;
+        pl = (long)b;
+        pf = (float)b;
+        pd = (double)b;
+
+        ps = (short)s;
+        pi = (int)s;
+        pl = (long)s;
+        pf = (float)s;
+        pd = (double)s;
+
+        pc = (char)c;
+        pi = (int)c;
+        pl = (long)c;
+        pf = (float)c;
+        pd = (double)c;
+
+        pi = (int)i;
+        pl = (long)i;
+        pf = (float)i;
+        pd = (double)i;
+
+        pl = (long)l;
+        pf = (float)l;
+        pd = (double)l;
+
+        pf = (float)f;
+        pd = (double)f;
+
+        pd = (double)d;
+    }
+}
