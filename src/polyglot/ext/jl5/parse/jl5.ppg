@@ -1221,17 +1221,17 @@ annotation ::=
 
 
 marker_annotation ::=
-    AT:a simple_name:b
+    AT:a name:b
         {: RESULT = parser.nf.MarkerAnnotationElem(parser.pos(b), b.toType()); :}
 ;
 
 single_element_annotation ::=
-    AT:a simple_name:b LPAREN element_value:c RPAREN
+    AT:a name:b LPAREN element_value:c RPAREN
        {: RESULT = parser.nf.SingleElementAnnotationElem(parser.pos(b), b.toType(), c); :}
 ;
 
 normal_annotation ::=
-    AT:a simple_name:b LPAREN element_value_pairs_opt:c RPAREN
+    AT:a name:b LPAREN element_value_pairs_opt:c RPAREN
         {:RESULT = parser.nf.NormalAnnotationElem(parser.pos(b), b.toType(), c); :}
 ;
 
