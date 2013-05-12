@@ -1,0 +1,12 @@
+interface I {
+    enum E {
+        FOO,
+        BAR
+    }
+}
+
+class C implements I {}
+
+class D {
+    static I.E foo = C.E.FOO;
+}
