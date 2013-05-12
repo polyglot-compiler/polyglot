@@ -73,7 +73,7 @@ polyglot.frontend.JLExtensionInfo "-cp ." {
         FieldAccess5.jl (Semantic, "Field.*ambiguous");
         FieldClassConflict.jl ;
         FinalInit1.jl ; FinalInit2.jl ; FinalInit3.jl ; FinalInit4.jl ;
-        FinalInit5.jl ; FinalInit6.jl ; FinalInit7.jl ;
+        FinalInit5.jl ; FinalInit6.jl ; FinalInit7.jl ; FinalInit8.jl ;
         ForInit.jl ;
         ForwardRef.jl ; ForwardRef2.jl ; ForwardRef3.jl ;
         Import.jl ;
