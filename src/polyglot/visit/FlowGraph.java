@@ -79,12 +79,17 @@ public class FlowGraph<FlowItem extends DataFlow.Item> {
      * When a peer has no successor edge keys, should we add
      * an OTHER edge key?
      */
-    protected boolean alwaysHaveSuccEdgeKey = true;
+    protected final boolean alwaysHaveSuccEdgeKey;
 
     public FlowGraph(Term root, boolean forward) {
+        this(root, forward, true);
+    }
+
+    public FlowGraph(Term root, boolean forward, boolean alwaysHaveSuccEdgeKey) {
         this.root = root;
         this.forward = forward;
         this.peerMap = new HashMap<IdentityKey, Map<PeerKey, Peer<FlowItem>>>();
+        this.alwaysHaveSuccEdgeKey = alwaysHaveSuccEdgeKey;
     }
 
     public Term root() {
