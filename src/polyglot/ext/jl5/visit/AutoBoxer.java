@@ -81,9 +81,11 @@ public class AutoBoxer extends AscriptionVisitor {
             if (((JL5Options) ts.extensionInfo().getOptions()).morePermissiveCasts) {
                 // Optional support for allowing a boxing conversion when using a literal
                 // in an initializer for compatibility with with "javac -source 1.5"
-                return fromPrimToWrapWithWidening(fromType.toPrimitive(),
-                                                  (ReferenceType) toType,
-                                                  e);
+                if (ts.isPrimitiveWrapper(toType)) {
+                    return fromPrimToWrapWithWidening(fromType.toPrimitive(),
+                                                      (ReferenceType) toType,
+                                                      e);
+                }
             }
             return fromPrimToWrap(fromType.toPrimitive(), toType, e);
         }
