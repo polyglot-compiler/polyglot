@@ -127,6 +127,13 @@ public class InitChecker extends DataFlow<InitChecker.FlowItem> {
                 new ArrayList<ConstructorDecl>();
 
         /**
+         * Set of all constructors that cannot terminate normally. This is a subset
+         * of the complete list of constructors, i.e. of this.allConstructors.
+         */
+        public Set<ConstructorDecl> constructorsCannotTerminateNormally =
+                new HashSet<ConstructorDecl>();
+
+        /**
          * Map from ConstructorInstances to ConstructorInstances detailing
          * which constructors call which constructors.
          * This is used in checking the initialization of final fields.
@@ -316,9 +323,17 @@ public class InitChecker extends DataFlow<InitChecker.FlowItem> {
      */
     protected static class DataFlowItem extends FlowItem {
         public Map<VarInstance, MinMaxInitCount> initStatus; // map of VarInstances to MinMaxInitCount
+        public final boolean normalTermination;
 
         DataFlowItem(Map<VarInstance, MinMaxInitCount> m) {
             this.initStatus = Collections.unmodifiableMap(m);
+            this.normalTermination = true;
+        }
+
+        DataFlowItem(Map<VarInstance, MinMaxInitCount> m,
+                boolean canTerminateNormally) {
+            this.initStatus = Collections.unmodifiableMap(m);
+            this.normalTermination = canTerminateNormally;
         }
 
         @Override
@@ -527,7 +542,7 @@ public class InitChecker extends DataFlow<InitChecker.FlowItem> {
     protected void checkNonStaticFinalFieldsInit(ClassBody cb)
             throws SemanticException {
         // for each non-static final field instance, check that all 
-        // constructors intialize it exactly once, taking into account constructor calls.
+        // constructors intitalize it exactly once, taking into account constructor calls.
         for (FieldInstance fi : currCBI.currClassFinalFieldInitCounts.keySet()) {
             if (fi.flags().isFinal() && !fi.flags().isStatic()) {
                 // the field is final and not static
@@ -563,11 +578,18 @@ public class InitChecker extends DataFlow<InitChecker.FlowItem> {
                         ci = currCBI.constructorCalls.get(ci.orig());
                     }
                     if (!isInitialized) {
-                        throw new SemanticException("Final field \""
-                                                            + fi.name()
-                                                            + "\" might not have been initialized",
-                                                    ciStart.position());
-
+                        // check whether this constructor can terminate normally.
+                        if (!currCBI.constructorsCannotTerminateNormally.contains(cd)) {
+                            throw new SemanticException("Final field \""
+                                                                + fi.name()
+                                                                + "\" might not have been initialized",
+                                                        ciStart.position());
+                        }
+                        else {
+                            // Even though the final field may not be initialized, the constructor
+                            // cannot terminate normally. For compatibility with javac, we will
+                            // not protest.
+                        }
                     }
                 }
             }
@@ -623,7 +645,10 @@ public class InitChecker extends DataFlow<InitChecker.FlowItem> {
         if (node instanceof Initializer || node instanceof ConstructorDecl) {
             List<FlowItem> filtered = filterItemsNonException(items, itemKeys);
             if (filtered.isEmpty()) {
-                return createInitDFI();
+                // record the fact that this dataflow item was not produced for a node
+                // that can be reached by normal termination.
+                return new DataFlowItem(new HashMap<VarInstance, MinMaxInitCount>(currCBI.currClassFinalFieldInitCounts),
+                                        false);
             }
             else if (filtered.size() == 1) {
                 return filtered.get(0);
@@ -1049,7 +1074,7 @@ public class InitChecker extends DataFlow<InitChecker.FlowItem> {
         // for _normal_ termination of the constructor (see the
         // method confluence). This means that if dfOut says the min
         // count of the initialization for a final non-static field
-        // is one, and that is different from what is recoreded in
+        // is one, and that is different from what is recorded in
         // currCBI.currClassFinalFieldInitCounts (which is the counts
         // of the initializations performed by initializers), then
         // the constructor does indeed initialize the field.
@@ -1075,6 +1100,10 @@ public class InitChecker extends DataFlow<InitChecker.FlowItem> {
         }
         if (!s.isEmpty()) {
             currCBI.fieldsConstructorInitializes.put(ci.orig(), s);
+        }
+        if (!dfIn.normalTermination) {
+            // this ci cannot terminate normally. Record this fact.
+            currCBI.constructorsCannotTerminateNormally.add(cd);
         }
     }
 
