@@ -1,0 +1,8 @@
+import java.util.List;
+
+enum E {
+    FOO("foo"),
+    BAR("foo","bar");
+
+    E(String name, String... more) {}
+}
