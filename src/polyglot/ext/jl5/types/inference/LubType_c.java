@@ -66,22 +66,7 @@ public class LubType_c extends ClassType_c implements LubType {
 
     public LubType_c(TypeSystem ts, Position pos, List<ReferenceType> lubElems) {
         super(ts, pos);
-        // replace any raw classes with the erased version of the raw class.
-        List<ReferenceType> l = null;
-        for (int i = 0; i < lubElems.size(); i++) {
-            ReferenceType t = lubElems.get(i);
-            if (t instanceof RawClass) {
-                t = ((RawClass) t).erased();
-                if (l == null) {
-                    l = new ArrayList<ReferenceType>(lubElems);
-                }
-                l.set(i, t);
-            }
-        }
-        if (l == null) {
-            l = lubElems;
-        }
-        this.lubElems = l;
+        this.lubElems = lubElems;
     }
 
     @Override
@@ -99,11 +84,6 @@ public class LubType_c extends ClassType_c implements LubType {
         return lubCalculated;
     }
 
-//    @Override
-//    public List<ReferenceType> bounds() {
-//        return calculateLub().bounds();
-//    }
-
     @Override
     public Kind kind() {
         return LUB;
@@ -120,12 +100,29 @@ public class LubType_c extends ClassType_c implements LubType {
 
     private Type lub_force() {
         JL5TypeSystem ts = (JL5TypeSystem) this.ts;
+
+        // st is the set of all supertypes of the lubElems.        
         Set<Type> st = new LinkedHashSet<Type>();
+
+        // est is the intersection of all erased supertypes of lubElems.
+        // That is, during the loop below, it is the intersection of
+        // the sets of erased supertypes of elements considered so far.
+        // By the end of the loop it will be mec, the minimal erased 
+        // candidate set (JLS 3rd ed, 15.12.2, p 464.)
         Set<Type> est = null;
+
         for (Type u : lubElems) {
+            st.addAll(ts.allAncestorsOf((ReferenceType) u));
+
+            // iu is an instantiated version of u. That is,
+            // if u is raw, we need the erasure of u.
+            Type iu = u;
+            if (u instanceof RawClass) {
+                iu = ((RawClass) u).erased();
+            }
             List<Type> u_supers =
-                    new ArrayList<Type>(ts.allAncestorsOf((ReferenceType) u));
-            st.addAll(u_supers);
+                    new ArrayList<Type>(ts.allAncestorsOf((ReferenceType) iu));
+
             Set<Type> est_of_u = new LinkedHashSet<Type>();
             for (Type super_of_u : u_supers) {
                 if (super_of_u instanceof JL5SubstClassType) {
