@@ -359,16 +359,9 @@ public class LocalDecl_c extends Stmt_c implements LocalDecl {
     @Override
     public Type childExpectedType(Expr child, AscriptionVisitor av) {
         if (child == init) {
-            TypeSystem ts = av.typeSystem();
-
-            // If the RHS is an integral constant, we can relax the expected
-            // type to the type of the constant.
-            if (ts.numericConversionValid(type.type(), child.constantValue())) {
-                return child.type();
-            }
-            else {
-                return type.type();
-            }
+            // the expected type of the initializer is the type
+            // of the local.
+            return type.type();
         }
 
         return child.type();
