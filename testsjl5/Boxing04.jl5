@@ -1,0 +1,3 @@
+class Boxing04 {
+    Boolean[] array = { null, false, true };
+}
