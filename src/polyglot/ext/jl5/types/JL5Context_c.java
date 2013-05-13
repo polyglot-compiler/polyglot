@@ -68,12 +68,15 @@ public class JL5Context_c extends Context_c implements JL5Context {
     @Override
     public VarInstance findVariableSilent(String name) {
         VarInstance vi = findVariableInThisScope(name);
+        if (vi == null && outer != null) {
+            vi = outer.findVariableSilent(name);
+        }
         if (vi != null) {
             return vi;
         }
 
         try {
-            // might be static
+            // might be a static iport
             if (importTable() != null) {
                 JL5ImportTable jit = (JL5ImportTable) importTable();
                 for (String next : jit.singleStaticImports()) {
@@ -115,9 +118,6 @@ public class JL5Context_c extends Context_c implements JL5Context {
         catch (SemanticException e) {
         }
 
-        if (outer != null) {
-            return outer.findVariableSilent(name);
-        }
         return null;
     }
 
