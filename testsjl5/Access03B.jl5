@@ -1,0 +1,5 @@
+package testAccess03B;
+
+public class Access03B<T> {
+    protected static void foo() { }
+}

@@ -1,0 +1,15 @@
+package testAccess03;
+
+class Access03A {
+    // public static final testAccess03B.Access03B x = new testAccess03B.Access03B() {
+    // 	    void m() {
+    // 		foo();
+    // 	    }
+    // 	};
+
+    public static final testAccess03B.Access03B y = new testAccess03B.Access03B<Object>() {
+	    void m() {
+		foo();
+	    }
+	};
+}
