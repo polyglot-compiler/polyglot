@@ -2376,6 +2376,11 @@ public class JL5TypeSystem_c extends
                 return true;
             }
         }
+        // XXX More elegant way to check that t is a parameterized invocation of Class?
+        // See JLS 3rd ed. 9.6, clarified in JLS SE7 ed. 9.6.1
+        if (erasureType(Class()).equals(erasureType(t))) {
+            return true;
+        }
         if (t.isArray()) {
             return isValidAnnotationValueType(t.toArray().base());
         }
