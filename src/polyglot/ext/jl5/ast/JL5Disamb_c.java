@@ -25,6 +25,8 @@
  ******************************************************************************/
 package polyglot.ext.jl5.ast;
 
+import java.util.LinkedList;
+
 import polyglot.ast.Disamb_c;
 import polyglot.ast.Expr;
 import polyglot.ast.Node;
@@ -41,6 +43,7 @@ import polyglot.types.LocalInstance;
 import polyglot.types.Named;
 import polyglot.types.NoClassException;
 import polyglot.types.NoMemberException;
+import polyglot.types.ReferenceType;
 import polyglot.types.Resolver;
 import polyglot.types.SemanticException;
 import polyglot.types.Type;
@@ -78,17 +81,29 @@ public class JL5Disamb_c extends Disamb_c {
                 // we found a type that was named appropriately. Access it 
                 // through t in order to ensure that substitution is 
                 // applied correctly.
-                ClassType outer = t.toClass();
+                LinkedList<ClassType> typeQueue = new LinkedList<ClassType>();
+                typeQueue.addLast(t.toClass());
                 ClassType type = null;
-                while (type == null) {
-                    if (outer.equals(ts.Object()))
-                        throw new InternalCompilerError("Expected to find member class "
-                                + name);
-                    type = outer.toClass().memberClassNamed(name.id());
-                    // only advance outer if we have to.
-                    if (type == null) {
-                        outer = outer.superType().toClass();
+                while (!typeQueue.isEmpty()) {
+                    ClassType container = typeQueue.removeFirst();
+                    type = container.toClass().memberClassNamed(name.id());
+                    if (type != null) {
+                        break;
                     }
+                    // haven't found it yet...
+                    if (container.superType() != null
+                            && container.superType().isClass()) {
+                        typeQueue.addLast(container.superType().toClass());
+                    }
+                    for (ReferenceType inter : container.interfaces()) {
+                        if (inter.isClass()) {
+                            typeQueue.addLast(inter.toClass());
+                        }
+                    }
+                }
+                if (type == null) {
+                    throw new InternalCompilerError("Expected to find member class "
+                            + name);
                 }
                 if (type.isInnerClass()) {
                     // First, see if the inner class's container has substitutions
