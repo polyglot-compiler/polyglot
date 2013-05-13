@@ -1,0 +1,16 @@
+package testImport08;
+
+import static testImport08.Import08B.*;
+
+interface PropertyDescriptor<T extends Object> {
+
+	char multiValueDelimiter();
+}
+
+abstract class AbstractProperty<T> implements PropertyDescriptor<T> {
+	public char multiValueDelimiter() {
+		return DELIMITER;
+	}
+	private static final char DELIMITER = '|';
+}
+
