@@ -1,0 +1,26 @@
+import java.util.*;
+
+class Report {
+
+    private List<Report> errors;
+
+    public Iterator<Report> errors() {
+        return errors == null ? EmptyIterator.instance : errors.iterator();
+    }
+}
+
+class EmptyIterator<T extends Object> implements Iterator<T> {
+
+	public static final Iterator instance = new EmptyIterator();
+	
+	private EmptyIterator() {}
+	
+	public boolean hasNext() { return false; }
+
+	public T next() { return null;	}
+
+	public void remove() {	
+		throw new UnsupportedOperationException();
+	}
+}
+

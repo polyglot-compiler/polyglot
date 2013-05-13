@@ -349,6 +349,7 @@ polyglot.ext.jl5.ExtensionInfo "-d out -classpath java-out -assert -noserial -po
         EnumTest8.jl5;
         Generics44.jl5;
         Generics45A.jl5 Generics45B.jl5 ;
+        Generics46.jl5 ;
         Interface07.jl5;
         Iterator01.jl5;
         Negate01.jl5;
@@ -695,6 +696,7 @@ polyglot.ext.jl5.ExtensionInfo "-d out -classpath java-out -removeJava5isms -enu
         EnumTest8.jl5;
         Generics44.jl5;
         Generics45A.jl5 Generics45B.jl5 ;
+        Generics46.jl5 ;
         Interface07.jl5;
         Iterator01.jl5;
         Negate01.jl5;
