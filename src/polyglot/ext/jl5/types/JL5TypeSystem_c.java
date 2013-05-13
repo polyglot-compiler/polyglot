@@ -1897,7 +1897,7 @@ public class JL5TypeSystem_c extends
         assert_(mi);
 
         ReferenceType target;
-        // does container inhereit mi?
+        // does container inherit mi?
         if (container.descendsFrom(mi.container()) && mi.flags().isPublic()) {
             target = container;
         }
@@ -1966,14 +1966,17 @@ public class JL5TypeSystem_c extends
             // class body that extends/implements the target class, then
             // protected members can be accessed. Do this by
             // working up through contextClass's containers.
-            if (descendsFrom(contextClass, targetClass)) {
+            // Use the erasure types so that parameters don't matter.
+            if (descendsFrom(erasureType(contextClass),
+                             erasureType(targetClass))) {
                 return true;
             }
 
             ct = contextClass;
             while (!ct.isTopLevel()) {
                 ct = ct.outer();
-                if (descendsFrom(ct, targetClass)) {
+                if (descendsFrom(erasureType(ct),
+                                 erasureType(targetClass))) {
                     return true;
                 }
             }
