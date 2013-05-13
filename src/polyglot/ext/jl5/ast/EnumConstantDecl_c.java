@@ -212,7 +212,7 @@ public class EnumConstantDecl_c extends Term_c implements EnumConstantDecl {
             EnumConstantDecl_c n = (EnumConstantDecl_c) copy();
             n.args = ListUtil.<Expr> copy(args, true);
             n.body = body;
-            n.annotations = annotations;
+            n.annotations = ListUtil.copy(annotations, true);
             return n;
         }
         return this;
@@ -333,6 +333,11 @@ public class EnumConstantDecl_c extends Term_c implements EnumConstantDecl {
             nn = nn.body((ClassBody) nn.visitChild(nn.body(), childbd));
             if (childbd.hasErrors()) throw new SemanticException();
         }
+
+        // Now visit the annotations
+        nn =
+                (EnumConstantDecl) nn.annotationElems(nn.visitList(nn.annotationElems(),
+                                                                   childbd));
 
         nn = (EnumConstantDecl) bd.leave(parent, old, nn, childbd);
 
