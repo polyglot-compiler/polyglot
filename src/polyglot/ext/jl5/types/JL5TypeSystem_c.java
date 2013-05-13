@@ -1527,97 +1527,159 @@ public class JL5TypeSystem_c extends
         if (fromType.isClass()) {
             if (!fromType.toClass().flags().isInterface()) {
                 // fromType is class type
-                if (toType instanceof TypeVariable) {
-                    return this.isCastValid(fromType,
-                                            ((TypeVariable) toType).upperBound());
+                return isCastValidFromClass(fromType.toClass(), toType);
+            }
+            else {
+                return isCastValidFromInterface(fromType.toClass(), toType);
+                // fromType is an interface
+            }
+        }
+        else if (fromType instanceof TypeVariable) {
+            return isCastValid(((TypeVariable) fromType).upperBound(), toType);
+        }
+        else if (fromType.isArray()) {
+            return isCastValidFromArray(fromType.toArray(), toType);
+        }
+        return false;
+    }
+
+    protected boolean isCastValidFromClass(ClassType fromType, Type toType) {
+        if (toType instanceof TypeVariable) {
+            return this.isCastValid(fromType,
+                                    ((TypeVariable) toType).upperBound());
+        }
+        if (toType.isClass()) {
+            if (!toType.toClass().flags().isInterface()) {
+                // toType is a class type
+                Type erasedFrom = erasureType(fromType);
+                Type erasedTo = erasureType(toType);
+                return (erasedFrom != fromType || erasedTo != toType)
+                        && (erasedFrom.isSubtype(erasedTo) || erasedTo.isSubtype(erasedFrom));
+                // TODO: need to check whether there is a supertype X
+                // of this and Y of toType that have the same erasure 
+                // and are provably distinct.
+            }
+            else {
+                // toType is an interface
+                // TODO: need to check whether there is a supertype X
+                // of this and Y of toType that have the same erasure 
+                // and are provably distinct.
+            }
+        }
+        return false;
+    }
+
+    protected boolean isCastValidFromInterface(ClassType fromType, Type toType) {
+        // If T is an array type, then T must implement S, or a compile-time error occurs
+        // This is handled in the super class.
+
+        if (toType.isClass() && toType.toClass().flags().isFinal()) {
+            // toType is final.
+            if (fromType instanceof RawClass
+                    || fromType instanceof JL5SubstClassType) {
+                // S is either a parameterized type that is an invocation of some generic type declaration G, or a raw type corresponding to a generic type declaration G. 
+                // Then there must exist a supertype X of T, such that X is an invocation of G, or a compile-time error occurs.
+                JL5ParsedClassType baseClass;
+                if (fromType instanceof RawClass) {
+                    baseClass = ((RawClass) fromType).base();
                 }
-                if (toType.isClass()) {
-                    if (!toType.toClass().flags().isInterface()) {
-                        // toType is a class type
-                        Type erasedFrom = erasureType(fromType);
-                        Type erasedTo = erasureType(toType);
-                        return (erasedFrom != fromType || erasedTo != toType)
-                                && (erasedFrom.isSubtype(erasedTo) || erasedTo.isSubtype(erasedFrom));
-                        // TODO: need to check whether there is a supertype X
-                        // of this and Y of toType that have the same erasure 
-                        // and are provably distinct.
-                    }
-                    else {
-                        // toType is an interface
-                        // TODO: need to check whether there is a supertype X
-                        // of this and Y of toType that have the same erasure 
-                        // and are provably distinct.
-                    }
+                else {
+                    baseClass = ((JL5SubstClassType) fromType).base();
+                }
+                JL5SubstClassType x =
+                        findGenericSupertype(baseClass, toType.toReference());
+                if (x == null) {
+                    return false;
+                }
+
+                // Furthermore, if S and X are provably distinct parameterized types then a compile-time error occurs.
+                if (fromType instanceof JL5SubstClassType
+                        && areProvablyDistinct((JL5SubstClassType) fromType, x)) {
+                    return false;
                 }
             }
             else {
-                // fromType is an interface
-                // If T is an array type, then T must implement S, or a compile-time error occurs
-                // This is handled in the super class.
-
-                if (toType.isClass() && toType.toClass().flags().isFinal()) {
-                    // toType is final.
-                    if (fromType instanceof RawClass
-                            || fromType instanceof JL5SubstClassType) {
-                        // S is either a parameterized type that is an invocation of some generic type declaration G, or a raw type corresponding to a generic type declaration G. 
-                        // Then there must exist a supertype X of T, such that X is an invocation of G, or a compile-time error occurs.
-                        JL5ParsedClassType baseClass;
-                        if (fromType instanceof RawClass) {
-                            baseClass = ((RawClass) fromType).base();
-                        }
-                        else {
-                            baseClass = ((JL5SubstClassType) fromType).base();
-                        }
-                        JL5SubstClassType x =
-                                findGenericSupertype(baseClass,
-                                                     toType.toReference());
-                        if (x == null) {
-                            return false;
-                        }
-
-                        // Furthermore, if S and X are provably distinct parameterized types then a compile-time error occurs.
-                        if (fromType instanceof JL5SubstClassType
-                                && areProvablyDistinct((JL5SubstClassType) fromType,
-                                                       x)) {
-                            return false;
-                        }
-                    }
-                    else {
-                        // S is not a parameterized type or a raw type, and T is final
-                        // Then T must implement S, and the cast is statically known to be correct, or a compile-time error occurs.
-                        if (!isSubtype(toType, fromType)) {
-                            // XXX this takes care that T must implement S. Not sure why there is a requirement for the cast to statically known to be correct. That would seem to imply that fromType is a subtype of toType?!
-                            return false;
-                        }
-
-                    }
-                    return true;
-
+                // S is not a parameterized type or a raw type, and T is final
+                // Then T must implement S, and the cast is statically known to be correct, or a compile-time error occurs.
+                if (!isSubtype(toType, fromType)) {
+                    // XXX this takes care that T must implement S. Not sure why there is a requirement for the cast to statically known to be correct. That would seem to imply that fromType is a subtype of toType?!
+                    return false;
                 }
-                else {
-                    // T is a type that is not final (�8.1.1), and S is an interface
-                    // if there exists a supertype X of T, and a supertype Y of S, such that both X and Y are provably distinct parameterized types, 
-                    // and that the erasures of X and Y are the same, a compile-time error occurs.
-                    // Go through the supertypes of each.
-                    List<ReferenceType> allY =
-                            this.allAncestorsOf(fromType.toReference());
-                    List<ReferenceType> allX =
-                            this.allAncestorsOf(toType.toReference());
-                    for (ReferenceType y : allY) {
-                        for (ReferenceType x : allX) {
-                            if (x instanceof JL5SubstClassType
-                                    && y instanceof JL5SubstClassType
-                                    && areProvablyDistinct((JL5SubstClassType) x,
-                                                           (JL5SubstClassType) y)
-                                    && erasureType(x).equals(erasureType(y))) {
-                                return false;
-                            }
-                        }
-                    }
 
-                    // Otherwise, the cast is always legal at compile time (because even if T does not implement S, a subclass of T might).
-                    return true;
+            }
+            return true;
+
+        }
+        else {
+            // T is a type that is not final (�8.1.1), and S is an interface
+            // if there exists a supertype X of T, and a supertype Y of S, such that both X and Y are provably distinct parameterized types, 
+            // and that the erasures of X and Y are the same, a compile-time error occurs.
+            // Go through the supertypes of each.
+            List<ReferenceType> allY =
+                    this.allAncestorsOf(fromType.toReference());
+            List<ReferenceType> allX =
+                    this.allAncestorsOf(toType.toReference());
+            for (ReferenceType y : allY) {
+                for (ReferenceType x : allX) {
+                    if (x instanceof JL5SubstClassType
+                            && y instanceof JL5SubstClassType
+                            && areProvablyDistinct((JL5SubstClassType) x,
+                                                   (JL5SubstClassType) y)
+                            && erasureType(x).equals(erasureType(y))) {
+                        return false;
+                    }
                 }
+            }
+
+            // Otherwise, the cast is always legal at compile time (because even if T does not implement S, a subclass of T might).
+            return true;
+        }
+    }
+
+    protected boolean isCastValidFromArray(ArrayType arrayType, Type toType) {
+        if (toType.equals(Object()) || toType.equals(Serializable())
+                || toType.equals(Cloneable())) {
+            return true;
+        }
+        if (toType instanceof TypeVariable) {
+            TypeVariable tv = (TypeVariable) toType;
+            Type upperBound = tv.upperBound();
+            if (upperBound.equals(Object())
+                    || upperBound.equals(Serializable())
+                    || upperBound.equals(Cloneable())) {
+                return true;
+            }
+            if (upperBound.isArray()) {
+                return isCastValidFromArray(arrayType, upperBound);
+            }
+            if (upperBound instanceof TypeVariable) {
+                // should we do a recursive call? Check whether there are cycles in the type variables...
+                Set<TypeVariable> visited = new HashSet<TypeVariable>();
+                visited.add(tv);
+                while (upperBound instanceof TypeVariable) {
+                    if (!visited.add((TypeVariable) upperBound)) {
+                        break;
+                    }
+                    upperBound = ((TypeVariable) upperBound).upperBound();
+                }
+                if (!(upperBound instanceof TypeVariable)) {
+                    // no cycle in the upper bounds of type variables!
+                    return isCastValidFromArray(arrayType, upperBound);
+                }
+
+            }
+
+            return false;
+        }
+        if (toType.isArray()) {
+            ArrayType toArrayType = toType.toArray();
+            if (arrayType.base().isPrimitive()
+                    && arrayType.base().equals(toArrayType.base())) {
+                return true;
+            }
+            if (arrayType.base().isReference()
+                    && toArrayType.base().isReference()) {
+                return isCastValid(arrayType.base(), toArrayType.base());
             }
         }
         return false;
@@ -1975,8 +2037,7 @@ public class JL5TypeSystem_c extends
             ct = contextClass;
             while (!ct.isTopLevel()) {
                 ct = ct.outer();
-                if (descendsFrom(erasureType(ct),
-                                 erasureType(targetClass))) {
+                if (descendsFrom(erasureType(ct), erasureType(targetClass))) {
                     return true;
                 }
             }
