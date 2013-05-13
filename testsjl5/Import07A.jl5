@@ -1,0 +1,13 @@
+package testImport07;
+
+import static testImport07.Import07B.foo;
+import static testImport07.Import07B.CC.foo;
+
+public class Import07A {
+    public static void main(String[] args) { 
+        int a = 7;
+        foo(a);
+        long b = 7L;
+	foo(b);
+    }
+}

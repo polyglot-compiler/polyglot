@@ -1,0 +1,7 @@
+package testImport07;
+public class Import07B {
+    static void foo(int a) {}
+    static class CC {
+        static void foo(long a) {}
+    }
+}

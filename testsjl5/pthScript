@@ -119,6 +119,8 @@ polyglot.ext.jl5.ExtensionInfo "-d out -classpath java-out -assert -noserial -po
         Import03.jl5 (Semantic);
         Import04.jl5 (Semantic);
         Import05.jl5 (Semantic);
+        Import06.jl5;
+        Import07A.jl5 Import07B.jl5;
         Map01.jl5;
         ClassLoad02.jl5;
         Method01.jl5;
@@ -469,6 +471,8 @@ polyglot.ext.jl5.ExtensionInfo "-d out -classpath java-out -removeJava5isms -enu
         Import03.jl5 (Semantic);
         Import04.jl5 (Semantic);
         Import05.jl5 (Semantic);
+        Import06.jl5;
+        Import07A.jl5 Import07B.jl5;
         Map01.jl5;
         ClassLoad02.jl5;
         Method01.jl5;
