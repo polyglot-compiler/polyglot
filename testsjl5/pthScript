@@ -49,9 +49,9 @@ polyglot.ext.jl5.ExtensionInfo "-d out -classpath java-out -assert -noserial -po
         Generics05.jl5;
         Generics06.jl5;
         Generics07.jl5;
-        Generics08.jl5;
-        Generics09.jl5;
-        Generics10.jl5;
+        Generics08.jl5 (Post, "Xlint");
+        Generics09.jl5 (Post, "Xlint");
+        Generics10.jl5 (Post, "Xlint");
         Generics11.jl5;
         Generics12.jl5;
         Generics13.jl5;
@@ -59,7 +59,7 @@ polyglot.ext.jl5.ExtensionInfo "-d out -classpath java-out -assert -noserial -po
             Generics15.jl5;
         Generics16.jl5;
         Generics17.jl5;
-        Generics18.jl5;
+        Generics18.jl5 (Post, "Xlint");
         Generics19.jl5;
         Generics20.jl5 (Semantic);
         Generics21.jl5 (Semantic); 
@@ -71,10 +71,10 @@ polyglot.ext.jl5.ExtensionInfo "-d out -classpath java-out -assert -noserial -po
         Generics25.jl5 (Semantic);
         Generics26.jl5;
 #        Generics27.jl5; // UNCLEAR what to do for this program        
-        Generics28.jl5;
-        Generics29.jl5;
+        Generics28.jl5 (Post, "Xlint");
+        Generics29.jl5 (Post, "Xlint");
         Generics30.jl5 (Semantic);
-        Generics31.jl5;
+        Generics31.jl5 (Post, "Xlint");
         Generics32.jl5;
         Generics33.jl5 (Semantic);
         Generics34.jl5;
@@ -86,13 +86,13 @@ polyglot.ext.jl5.ExtensionInfo "-d out -classpath java-out -assert -noserial -po
         Generics40.jl5;
         Generics41.jl5;
         Generics42.jl5;
-        Generics43.jl5;
+        Generics43.jl5 (Post, "Xlint");
         Boxing01.jl5;
         Boxing02.jl5;
         Boxing03.jl5;
         StaticInit01.jl5;
         InnerClass01.jl5;
-        InnerClass02.jl5;
+        InnerClass02.jl5 (Post, "Xlint");
         InnerClass03.jl5;
         InnerClass04.jl5;
         InnerClass05.jl5 (Semantic);
@@ -103,15 +103,15 @@ polyglot.ext.jl5.ExtensionInfo "-d out -classpath java-out -assert -noserial -po
         InnerClass10.jl5;
         Access01.jl5;
         Access02.jl5;
-        Anonymous01.jl5;
+        Anonymous01.jl5 (Post, "Xlint");
         Anonymous02.jl5;
         Anonymous03.jl5;
         Interface01.jl5;
         Interface02.jl5;
         Interface03.jl5;
         Interface04.jl5;
-        Interface05.jl5;
-        Interface06.jl5;
+        Interface05.jl5 (Post, "Xlint");
+        Interface06.jl5 (Post, "Xlint");
         Intersect01.jl5;
         Intersect02.jl5;
         Import01.jl5;
@@ -131,14 +131,14 @@ polyglot.ext.jl5.ExtensionInfo "-d out -classpath java-out -assert -noserial -po
         VarArgs07.jl5;
         WildCard01.jl5;
         WildCard02.jl5 (Semantic, "does not match");
-        WildCard03.jl5;
+        WildCard03.jl5 (Post, "Xlint");
         WildCard04.jl5;
         WildCard05.jl5;
         TC195.jl5;
         TC12.jl5;
-        Call01.jl5;
+        Call01.jl5 (Post, "Xlint");
         ImplicitCast01.jl5;
-        Cast01.jl5;
+        Cast01.jl5 (Post, "Xlint");
         Cast02.jl5;
         Cast03.jl5;
         Conditional01.jl5;
@@ -151,7 +151,7 @@ polyglot.ext.jl5.ExtensionInfo "-d out -classpath java-out -assert -noserial -po
         Array03.jl5;
         Array04.jl5;
         Array05.jl5;
-        Array06.jl5;
+        Array06.jl5 (Post, "Xlint");
         Array07.jl5 (Semantic, "reifiable");
         Array08.jl5;
         ArrayInit01.jl5;
@@ -187,9 +187,9 @@ polyglot.ext.jl5.ExtensionInfo "-d out -classpath java-out -assert -noserial -po
         Throw02.jl5;
         JLS8.1.2.jl5;
         Lists1.jl5;
-        Lists2.jl5;
-        Lists3.jl5;
-        Lists4.jl5;
+        Lists2.jl5 (Post, "Xlint");
+        Lists3.jl5 (Post, "Xlint");
+        Lists4.jl5 (Post, "Xlint");
         Lists5.jl5;
         Lists6.jl5;
         Lists7.jl5 (Semantic);
@@ -210,9 +210,9 @@ polyglot.ext.jl5.ExtensionInfo "-d out -classpath java-out -assert -noserial -po
         error3c.jl5 (Semantic, "should be declared abstract");
         error3d.jl5;
         error3e.jl5 (Semantic, "type .* does not match");
-        error3f.jl5;
+        error3f.jl5 (Post, "Xlint");
         error3g.jl5;
-        error3h.jl5;
+        error3h.jl5 (Post, "Xlint");
         error4.jl5 (Semantic, "type .* does not match");
         error5.jl5 (Semantic, "type .* does not match");
         error6.jl5 (Semantic, "should be declared abstract");
@@ -241,7 +241,7 @@ polyglot.ext.jl5.ExtensionInfo "-d out -classpath java-out -assert -noserial -po
         raw5.jl5 (Semantic, "should be declared abstract");
         raw6.jl5  (Semantic, "should be declared abstract");
         raw7.jl5;
-        raw8.jl5;
+        raw8.jl5 (Post, "Xlint");
         raw9.jl5;
         simpleFBoundError.jl5 (Semantic);
         test1.jl5;
@@ -305,10 +305,10 @@ polyglot.ext.jl5.ExtensionInfo "-d out -classpath java-out -assert -noserial -po
         RawReturn02.jl5;
         RawReturn03.jl5 (Semantic);
         RawReturn04.jl5 (Semantic);
-        RawReturn05.jl5;
-        RawReturn06.jl5;
-        RawType01.jl5;
-        RawType02.jl5;
+        RawReturn05.jl5 (Post, "Xlint");
+        RawReturn06.jl5 (Post, "Xlint");
+        RawType01.jl5 (Post, "Xlint");
+        RawType02.jl5 (Post, "Xlint");
         RawType03.jl5 (Semantic);
         RawType04.jl5 (Semantic);
         EnumTest1.jl5;
@@ -348,15 +348,15 @@ polyglot.ext.jl5.ExtensionInfo "-d out -classpath java-out -assert -noserial -po
         CovariantRet04.jl5;
         EnumTest5.jl5;
         EnumTest8.jl5;
-        Generics44.jl5;
+        Generics44.jl5 (Post, "Xlint");
         Generics45A.jl5 Generics45B.jl5 ;
-        Generics46.jl5 ;
-        Interface07.jl5;
+        Generics46.jl5 (Post, "Xlint");
+        Interface07.jl5 (Post, "Xlint");
         Iterator01.jl5;
         Negate01.jl5;
         Throw01.jl5;
         UnboxBooleans.jl5;
-        VarArgs08.jl5;
+        VarArgs08.jl5 (Post, "Xlint");
         VarArgs09.jl5;
         VarArgs10.jl5;
 	Conditional05.jl5;
@@ -366,7 +366,7 @@ polyglot.ext.jl5.ExtensionInfo "-d out -classpath java-out -assert -noserial -po
 	Conditional09.jl5 (Semantic, "does not match");
 	Conditional10.jl5 (Semantic, "does not match");
 	Conditional11.jl5;
-	CaptureConversion01.jl5;
+	CaptureConversion01.jl5 (Post, "Xlint");
         PermissiveCasts01.jl5 (Semantic, "does not match"),(Semantic, "does not match"),
                               (Semantic, "Cannot cast"),(Semantic, "Cannot cast"),
                               (Semantic, "Cannot cast"),(Semantic, "Cannot cast"),
