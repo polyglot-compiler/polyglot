@@ -42,6 +42,7 @@ import polyglot.ast.Lit;
 import polyglot.ast.Node;
 import polyglot.ast.NodeFactory;
 import polyglot.ast.TypeNode;
+import polyglot.ext.jl5.types.JL5Flags;
 import polyglot.ext.jl5.types.JL5MethodInstance;
 import polyglot.ext.jl5.types.JL5ParsedClassType;
 import polyglot.ext.jl5.types.JL5TypeSystem;
@@ -116,7 +117,8 @@ public class JL5EnumDecl_c extends JL5ClassDecl_c implements JL5EnumDecl {
         }
 
         for (ConstructorInstance ci : type().constructors()) {
-            if (!ci.flags().clear(Flags.PRIVATE).equals(Flags.NONE)) {
+            if (!JL5Flags.clearVarArgs(ci.flags().clear(Flags.PRIVATE))
+                         .equals(Flags.NONE)) {
                 throw new SemanticException("Modifier "
                                                     + ci.flags()
                                                         .clear(Flags.PRIVATE)
