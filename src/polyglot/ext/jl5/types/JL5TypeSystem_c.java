@@ -2679,11 +2679,11 @@ public class JL5TypeSystem_c extends
     @Override
     public Type leastCommonAncestor(Type type1, Type type2)
             throws SemanticException {
-        if (type1.isPrimitive() && type2.isReference()) {
+        if (type1.isPrimitive() && (type2.isReference() || type2.isNull())) {
             // box type1, i.e. promote to an object
             return leastCommonAncestor(this.boxingConversion(type1), type2);
         }
-        if (type2.isPrimitive() && type1.isReference()) {
+        if (type2.isPrimitive() && (type1.isReference() || type1.isNull())) {
             // box type2, i.e. promote to an object
             return leastCommonAncestor(type1, this.boxingConversion(type2));
         }
