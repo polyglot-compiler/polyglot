@@ -1,0 +1,13 @@
+package testAccess04;
+
+import testAccess04B.Access04B;
+
+class Access04A extends Access04B {
+    void m() {
+	Object x = new Object() {
+		void n() {
+		    Object y = bugReporter;
+		}
+	    };
+    }
+}

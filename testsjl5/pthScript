@@ -105,6 +105,7 @@ polyglot.ext.jl5.ExtensionInfo "-d out -classpath java-out -assert -noserial -po
         Access01.jl5;
         Access02.jl5;
         Access03A.jl5  Access03B.jl5;
+        Access04A.jl5  Access04B.jl5;
         Anonymous01.jl5 (Post, "Xlint");
         Anonymous02.jl5;
         Anonymous03.jl5;
@@ -460,6 +461,7 @@ polyglot.ext.jl5.ExtensionInfo "-d out -classpath java-out -removeJava5isms -enu
         Access01.jl5;
         Access02.jl5;
         Access03A.jl5  Access03B.jl5;
+        Access04A.jl5  Access04B.jl5;
         Anonymous01.jl5;
         Anonymous02.jl5;
         Anonymous03.jl5;

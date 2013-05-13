@@ -1,0 +1,5 @@
+package testAccess04B;
+
+public class Access04B {
+    protected final Object bugReporter = null;
+}
