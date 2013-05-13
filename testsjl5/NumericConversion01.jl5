@@ -1,0 +1,13 @@
+class C {
+    public static final int BAR = 0;
+    Integer size = 0;
+    long a = 0;
+    int b = 0;
+    long c = 0L;
+    Byte e = (byte)0;
+    Byte f = (byte)foo();
+    byte g = 0;
+    Byte h = BAR;
+
+    int foo() { return 0; }
+}

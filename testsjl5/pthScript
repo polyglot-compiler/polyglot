@@ -163,6 +163,7 @@ polyglot.ext.jl5.ExtensionInfo "-d out -classpath java-out -assert -noserial -po
         ArrayInit01.jl5;
         ArrayInit02.jl5;
         ArrayInit03.jl5;
+        NumericConversion01.jl5;
         C.jl5;
         FBoundSub.jl5;
         FBoundSub2.jl5;
@@ -519,6 +520,7 @@ polyglot.ext.jl5.ExtensionInfo "-d out -classpath java-out -removeJava5isms -enu
         ArrayInit01.jl5;
         ArrayInit02.jl5;
         ArrayInit03.jl5;
+        NumericConversion01.jl5;
         C.jl5;
         FBoundSub.jl5;
         FBoundSub2.jl5;
