@@ -215,8 +215,7 @@ public class JL5Context_c extends Context_c implements JL5Context {
             // try static imports.
             JL5ImportTable it = (JL5ImportTable) this.importTable();
             if (it != null && this.currentClass() != null) {
-                ReferenceType rt = it.findTypeContainingMethodOrField(name);
-                if (rt != null) {
+                for (ReferenceType rt : it.findTypesContainingMethodOrField(name)) {
                     try {
                         return ts.findMethod(rt,
                                              name,
@@ -224,10 +223,13 @@ public class JL5Context_c extends Context_c implements JL5Context {
                                              this.currentClass());
                     }
                     catch (SemanticException f) {
-                        // ignore this exception and throw the previous one.
+                        // ignore this exception and 
+                        // try the next containing type.
                     }
                 }
             }
+            // couldn't find anything in the static imports.            
+            // throw the original exception.
             throw e;
         }
     }

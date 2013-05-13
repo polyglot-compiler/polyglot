@@ -114,8 +114,9 @@ public class JL5ImportTable extends ImportTable {
         return super.find(name);
     }
 
-    public ReferenceType findTypeContainingMethodOrField(String name)
+    public List<ReferenceType> findTypesContainingMethodOrField(String name)
             throws SemanticException {
+        List<ReferenceType> containingTypes = new ArrayList<ReferenceType>();
         for (String next : singleStaticImports) {
             String id = StringUtil.getShortNameComponent(next);
             if (name.equals(id)) {
@@ -126,7 +127,7 @@ public class JL5ImportTable extends ImportTable {
                     ReferenceType t = (ReferenceType) nt;
                     if (hasStatic(t.methodsNamed(name))
                             || isStatic(t.fieldNamed(name))) {
-                        return t;
+                        containingTypes.add(t);
                     }
                 }
             }
@@ -139,11 +140,11 @@ public class JL5ImportTable extends ImportTable {
                 ReferenceType t = (ReferenceType) nt;
                 if (hasStatic(t.methodsNamed(name))
                         || isStatic(t.fieldNamed(name))) {
-                    return t;
+                    containingTypes.add(t);
                 }
             }
         }
-        return null;
+        return containingTypes;
     }
 
     private boolean hasStatic(List<? extends MemberInstance> members) {
