@@ -39,6 +39,7 @@ import polyglot.ast.Formal;
 import polyglot.ast.Id;
 import polyglot.ast.IntLit;
 import polyglot.ast.Lit;
+import polyglot.ast.MethodDecl;
 import polyglot.ast.Node;
 import polyglot.ast.NodeFactory;
 import polyglot.ast.TypeNode;
@@ -147,7 +148,8 @@ public class JL5EnumDecl_c extends JL5ClassDecl_c implements JL5EnumDecl {
         }
 
         for (ClassMember m : this.body().members()) {
-            if (m.memberInstance().flags().isAbstract()) {
+            if (m.memberInstance().flags().isAbstract()
+                    && m instanceof MethodDecl) {
                 n.type().flags(n.type().flags().Abstract());
                 break;
             }
