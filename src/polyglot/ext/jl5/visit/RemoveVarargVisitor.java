@@ -38,6 +38,7 @@ import polyglot.ast.Node;
 import polyglot.ast.NodeFactory;
 import polyglot.ast.ProcedureCall;
 import polyglot.ast.ProcedureDecl;
+import polyglot.ext.jl5.ast.EnumConstantDecl;
 import polyglot.ext.jl5.ast.JL5Formal;
 import polyglot.ext.jl5.types.JL5ProcedureInstance;
 import polyglot.frontend.Job;
@@ -59,6 +60,9 @@ public class RemoveVarargVisitor extends ErrorHandlingVisitor {
     protected Node leaveCall(Node n) throws SemanticException {
         if (n instanceof ProcedureCall) {
             return rewriteCall((ProcedureCall) n);
+        }
+        else if (n instanceof EnumConstantDecl) {
+            return rewriteEnumConstantDecl((EnumConstantDecl) n);
         }
         else if (n instanceof ProcedureDecl) {
             return rewriteProcedureDecl((ProcedureDecl) n);
@@ -99,46 +103,49 @@ public class RemoveVarargVisitor extends ErrorHandlingVisitor {
         return n;
     }
 
+    private Node rewriteEnumConstantDecl(EnumConstantDecl n) {
+        JL5ProcedureInstance pi =
+                (JL5ProcedureInstance) n.constructorInstance();
+        return n.args(rewriteProcedureArgs(pi, n.args(), n.position()));
+
+    }
+
     private Node rewriteCall(ProcedureCall n) {
         JL5ProcedureInstance pi = (JL5ProcedureInstance) n.procedureInstance();
+        return n.arguments(rewriteProcedureArgs(pi, n.arguments(), n.position()));
+    }
+
+    private List<Expr> rewriteProcedureArgs(JL5ProcedureInstance pi,
+            List<Expr> args, Position pos) {
         if (pi.isVariableArity()) {
-            int numArgs = n.arguments().size();
-            int numStandardFormals =
-                    n.procedureInstance().formalTypes().size() - 1;
+            int numArgs = args.size();
+            int numStandardFormals = pi.formalTypes().size() - 1;
             ArrayType varArgArrayType =
-                    (ArrayType) n.procedureInstance()
-                                 .formalTypes()
-                                 .get(numStandardFormals);
+                    (ArrayType) pi.formalTypes().get(numStandardFormals);
 
             if (numStandardFormals == numArgs - 1) {
-                Type lastArgType = n.arguments().get(numStandardFormals).type();
+                Type lastArgType = args.get(numStandardFormals).type();
                 if (lastArgType.isImplicitCastValid(varArgArrayType)) {
-                    return n;
+                    return args;
                 }
             }
 
             List<Expr> standardArgs =
-                    new ArrayList<Expr>(n.arguments()
-                                         .subList(0, numStandardFormals));
+                    new ArrayList<Expr>(args.subList(0, numStandardFormals));
 
             ArrayInit initValues =
-                    nf.ArrayInit(Position.compilerGenerated(),
-                                 n.arguments().subList(numStandardFormals,
-                                                       numArgs));
+                    nf.ArrayInit(pos, args.subList(numStandardFormals, numArgs));
             initValues = (ArrayInit) initValues.type(varArgArrayType);
             NewArray varArgArray =
-                    nf.NewArray(Position.compilerGenerated(),
+                    nf.NewArray(pos,
                                 nf.CanonicalTypeNode(Position.compilerGenerated(),
                                                      varArgArrayType.base()),
                                 1,
                                 initValues);
             varArgArray = (NewArray) varArgArray.type(varArgArrayType);
             standardArgs.add(varArgArray);
-            n = n.arguments(standardArgs);
-            return n;
+            return standardArgs;
         }
-        else {
-            return n;
-        }
+        return args;
     }
 }
