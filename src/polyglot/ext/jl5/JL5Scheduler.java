@@ -75,7 +75,6 @@ public class JL5Scheduler extends JLScheduler {
         return this.internGoal(g);
     }
 
-
     public Goal CastsInserted(Job job) {
         TypeSystem ts = extInfo.typeSystem();
         NodeFactory nf = extInfo.nodeFactory();
@@ -167,6 +166,7 @@ public class JL5Scheduler extends JLScheduler {
             g.addPrerequisiteGoal(TypeChecked(job), this);
             g.addPrerequisiteGoal(AnnotationCheck(job), this);
             g.addPrerequisiteGoal(RemoveStaticImports(job), this);
+            g.addPrerequisiteGoal(RemoveVarArgs(job), this);
         }
         catch (CyclicDependencyException e) {
             throw new InternalCompilerError(e);
