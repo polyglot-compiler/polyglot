@@ -1,0 +1,10 @@
+class C {
+  void m() {
+    Integer i = 5;
+    int j = 4;
+    String s = "Hi" + i;
+    s = s + j;
+    s = "Sdf" + i*j;
+    int k = i*j;
+  }
+}

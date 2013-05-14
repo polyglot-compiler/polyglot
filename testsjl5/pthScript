@@ -144,6 +144,8 @@ polyglot.ext.jl5.ExtensionInfo "-d out -classpath java-out -assert -noserial -po
         TC12.jl5;
         Call01.jl5 (Post, "Xlint");
         ImplicitCast01.jl5;
+        Binary01.jl5;
+        Binary02.jl5 (Semantic);
         Cast01.jl5 (Post, "Xlint");
         Cast02.jl5;
         Cast03.jl5;
@@ -501,6 +503,8 @@ polyglot.ext.jl5.ExtensionInfo "-d out -classpath java-out -removeJava5isms -enu
         TC12.jl5;
         Call01.jl5;
         ImplicitCast01.jl5;
+        Binary01.jl5;
+        Binary02.jl5 (Semantic);
         Cast01.jl5;
         Cast02.jl5;
         Cast03.jl5;

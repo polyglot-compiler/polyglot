@@ -1,0 +1,7 @@
+class C {
+  void m() {
+    Integer i = 5;
+    int j = 4;
+    String s = i*j;
+  }
+}
