@@ -1,5 +1,5 @@
 class C implements I {
-    C foo() { return null; }
+    public C foo() { return null; }
 }
 interface I {
     I foo();
