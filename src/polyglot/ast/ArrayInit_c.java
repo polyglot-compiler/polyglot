@@ -140,12 +140,9 @@ public class ArrayInit_c extends Expr_c implements ArrayInit {
 
         for (Expr e : elements) {
             if (e == child) {
-                if (ts.numericConversionValid(t, e.constantValue())) {
-                    return child.type();
-                }
-                else {
-                    return t;
-                }
+                // the expected type of the array element is the base type
+                // of the array.
+                return t;
             }
         }
 
