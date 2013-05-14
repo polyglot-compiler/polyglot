@@ -216,56 +216,39 @@ public class JL5Binary_c extends Binary_c implements JL5Binary {
 
         JL5TypeSystem ts = (JL5TypeSystem) av.typeSystem();
 
-        if (!ts.isPrimitiveWrapper(child.type())
-                && !ts.isPrimitiveWrapper(other.type())) {
+        Type childType = child.type();
+        Type otherType = other.type();
+
+        if (!ts.isPrimitiveWrapper(childType)
+                && !ts.isPrimitiveWrapper(otherType)) {
             return super.childExpectedType(child, av);
         }
 
+        Type childUnboxedType = ts.unboxingConversion(childType);
+        Type otherUnboxedType = ts.unboxingConversion(otherType);
         try {
             if (op == EQ || op == NE) {
                 // Coercion to compatible types.
-                if ((child.type().isReference() || child.type().isNull())
-                        && (other.type().isReference() || other.type().isNull())) {
-                    return ts.leastCommonAncestor(child.type(), other.type());
+                if ((childType.isReference() || childType.isNull())
+                        && (otherType.isReference() || otherType.isNull())) {
+                    return ts.leastCommonAncestor(childType, otherType);
                 }
 
-                if (child.type().isBoolean() && other.type().isBoolean()) {
+                if (childUnboxedType.isBoolean()
+                        && otherUnboxedType.isBoolean()) {
                     return ts.Boolean();
                 }
-                // Added case for unboxing
-                if (child.type().isBoolean()) {
-                    Type otherType = ts.primitiveTypeOfWrapper(other.type());
-                    if ((otherType != null) && otherType.isBoolean())
-                        return ts.Boolean();
-                }
-                // Added case for unboxing
-                if (other.type().isBoolean()) {
-                    Type childType = ts.primitiveTypeOfWrapper(child.type());
-                    if ((childType != null) && childType.isBoolean())
-                        return ts.Boolean();
+
+                if (childUnboxedType.isNumeric()
+                        && otherUnboxedType.isNumeric()) {
+                    return ts.promote(childUnboxedType, otherUnboxedType);
                 }
 
-                if (child.type().isNumeric() && other.type().isNumeric()) {
-                    return ts.promote(child.type(), other.type());
-                }
-                // Added case for unboxing
-                if (child.type().isNumeric()) {
-                    Type otherType = ts.primitiveTypeOfWrapper(other.type());
-                    if ((otherType != null) && otherType.isNumeric())
-                        return ts.promote(child.type(), otherType);
-                }
-                // Added case for unboxing
-                if (other.type().isNumeric()) {
-                    Type childType = ts.primitiveTypeOfWrapper(child.type());
-                    if ((childType != null) && childType.isNumeric())
-                        return ts.promote(childType, other.type());
+                if (childType.isImplicitCastValid(otherType)) {
+                    return otherType;
                 }
 
-                if (child.type().isImplicitCastValid(other.type())) {
-                    return other.type();
-                }
-
-                return child.type();
+                return childType;
             }
 
             if (op == ADD && ts.typeEquals(type, ts.String())) {
@@ -274,31 +257,12 @@ public class JL5Binary_c extends Binary_c implements JL5Binary {
             }
 
             if (op == GT || op == LT || op == GE || op == LE) {
-                if (child.type().isNumeric() && other.type().isNumeric()) {
-                    return ts.promote(child.type(), other.type());
-                }
-                // Added case for unboxing
-                if (child.type().isNumeric()) {
-                    Type otherType = ts.primitiveTypeOfWrapper(other.type());
-                    if ((otherType != null) && otherType.isNumeric())
-                        return ts.promote(child.type(), otherType);
-                }
-                // Added case for unboxing
-                if (other.type().isNumeric()) {
-                    Type childType = ts.primitiveTypeOfWrapper(child.type());
-                    if ((childType != null) && childType.isNumeric())
-                        return ts.promote(childType, other.type());
+                if (childUnboxedType.isNumeric()
+                        && otherUnboxedType.isNumeric()) {
+                    return ts.promote(childUnboxedType, otherUnboxedType);
                 }
 
-                // Added case for unboxing, when both operands are wrappers
-                Type otherType = ts.primitiveTypeOfWrapper(other.type());
-                Type childType = ts.primitiveTypeOfWrapper(child.type());
-                if (otherType != null && childType != null
-                        && otherType.isNumeric() && childType.isNumeric()) {
-                    return ts.promote(childType, otherType);
-                }
-
-                return child.type();
+                return childType;
             }
 
             if (op == COND_OR || op == COND_AND) {
@@ -306,60 +270,24 @@ public class JL5Binary_c extends Binary_c implements JL5Binary {
             }
 
             if (op == BIT_AND || op == BIT_OR || op == BIT_XOR) {
-                if (other.type().isBoolean()) {
+                if (otherUnboxedType.isBoolean()) {
                     return ts.Boolean();
                 }
-                // Added case for unboxing
-                if (child.type().isBoolean()) {
-                    Type otherType = ts.primitiveTypeOfWrapper(other.type());
-                    if ((otherType != null) && otherType.isBoolean())
-                        return ts.Boolean();
-                }
-                // Added case for unboxing
-                if (other.type().isBoolean()) {
-                    Type childType = ts.primitiveTypeOfWrapper(child.type());
-                    if ((childType != null) && childType.isBoolean())
-                        return ts.Boolean();
+
+                if (childUnboxedType.isNumeric()
+                        && otherUnboxedType.isNumeric()) {
+                    return ts.promote(childUnboxedType, otherUnboxedType);
                 }
 
-                if (child.type().isNumeric() && other.type().isNumeric()) {
-                    return ts.promote(child.type(), other.type());
-                }
-                // Added case for unboxing
-                if (child.type().isNumeric()) {
-                    Type otherType = ts.primitiveTypeOfWrapper(other.type());
-                    if ((otherType != null) && otherType.isNumeric())
-                        return ts.promote(child.type(), otherType);
-                }
-                // Added case for unboxing
-                if (other.type().isNumeric()) {
-                    Type childType = ts.primitiveTypeOfWrapper(child.type());
-                    if ((childType != null) && childType.isNumeric())
-                        return ts.promote(childType, other.type());
-                }
-
-                // Added case for unboxing, when both operands are wrappers
-                Type otherType = ts.primitiveTypeOfWrapper(other.type());
-                Type childType = ts.primitiveTypeOfWrapper(child.type());
-
-                if (otherType != null && childType != null
-                        && otherType.isBoolean() && childType.isBoolean()) {
-                    return childType;
-                }
-
-                if (otherType != null && childType != null
-                        && otherType.isNumeric() && childType.isNumeric()) {
-                    return ts.promote(childType, otherType);
-                }
-
-                return child.type();
+                return childType;
             }
 
             if (op == ADD || op == SUB || op == MUL || op == DIV || op == MOD) {
-                if (child.type().isNumeric() && other.type().isNumeric()) {
-                    Type t = ts.promote(child.type(), other.type());
-
-                    if (ts.isImplicitCastValid(t, av.toType())) {
+                if (childUnboxedType.isNumeric()
+                        && otherUnboxedType.isNumeric()) {
+                    Type t = ts.promote(childUnboxedType, otherUnboxedType);
+                    if (ts.isImplicitCastValid(t, av.toType())
+                            || ts.String().equals(av.toType())) {
                         return t;
                     }
                     else {
@@ -367,55 +295,17 @@ public class JL5Binary_c extends Binary_c implements JL5Binary {
                     }
                 }
 
-                // Added case for unboxing
-                if (child.type().isNumeric()) {
-                    Type otherType = ts.primitiveTypeOfWrapper(other.type());
-                    if ((otherType != null) && otherType.isNumeric()) {
-                        Type t = ts.promote(child.type(), otherType);
-                        if (ts.isImplicitCastValid(t, av.toType())) {
-                            return t;
-                        }
-                        else {
-                            return av.toType();
-                        }
-                    }
-                }
-                // Added case for unboxing
-                if (other.type().isNumeric()) {
-                    Type childType = ts.primitiveTypeOfWrapper(child.type());
-                    if ((childType != null) && childType.isNumeric()) {
-                        Type t = ts.promote(childType, other.type());
-                        if (ts.isImplicitCastValid(t, av.toType())) {
-                            return t;
-                        }
-                        else {
-                            return av.toType();
-                        }
-                    }
-                }
-                // Added case for unboxing, when both operands are wrappers
-                Type otherType = ts.primitiveTypeOfWrapper(other.type());
-                Type childType = ts.primitiveTypeOfWrapper(child.type());
-                if (otherType != null && childType != null
-                        && otherType.isNumeric() && childType.isNumeric()) {
-                    Type t = ts.promote(childType, otherType);
-                    if (ts.isImplicitCastValid(t, av.toType())) {
-                        return t;
-                    }
-                    else {
-                        return av.toType();
-                    }
-                }
-
-                return child.type();
+                return childType;
             }
 
             if (op == SHL || op == SHR || op == USHR) {
-                if (child.type().isNumeric() && other.type().isNumeric()) {
+                if (childUnboxedType.isNumeric()
+                        && otherUnboxedType.isNumeric()) {
                     if (child == left) {
-                        Type t = ts.promote(child.type());
+                        Type t = ts.promote(childUnboxedType);
 
-                        if (ts.isImplicitCastValid(t, av.toType())) {
+                        if (ts.isImplicitCastValid(t, av.toType())
+                                || ts.String().equals(av.toType())) {
                             return t;
                         }
                         else {
@@ -423,75 +313,19 @@ public class JL5Binary_c extends Binary_c implements JL5Binary {
                         }
                     }
                     else {
-                        return ts.promote(child.type());
+                        return ts.promote(childUnboxedType);
                     }
                 }
 
-                // Added case for unboxing
-                if (child.type().isNumeric()) {
-                    Type otherType = ts.primitiveTypeOfWrapper(other.type());
-                    if ((otherType != null) && otherType.isNumeric()) {
-                        if (child == left) {
-                            Type t = ts.promote(child.type(), otherType);
-                            if (ts.isImplicitCastValid(t, av.toType())) {
-                                return t;
-                            }
-                            else {
-                                return av.toType();
-                            }
-                        }
-                        else {
-                            return ts.promote(child.type());
-                        }
-                    }
-                }
-                // Added case for unboxing
-                if (other.type().isNumeric()) {
-                    Type childType = ts.primitiveTypeOfWrapper(child.type());
-                    if ((childType != null) && childType.isNumeric()) {
-                        if (child == left) {
-                            Type t = ts.promote(childType, other.type());
-                            if (ts.isImplicitCastValid(t, av.toType())) {
-                                return t;
-                            }
-                            else {
-                                return av.toType();
-                            }
-                        }
-                        else {
-                            return ts.promote(childType);
-                        }
-                    }
-                }
-
-                // Added case for unboxing, when both operands are wrappers
-                Type otherType = ts.primitiveTypeOfWrapper(other.type());
-                Type childType = ts.primitiveTypeOfWrapper(child.type());
-                if (otherType != null && childType != null
-                        && otherType.isNumeric() && childType.isNumeric()) {
-                    if (child == left) {
-                        Type t = ts.promote(childType, otherType);
-                        if (ts.isImplicitCastValid(t, av.toType())) {
-                            return t;
-                        }
-                        else {
-                            return av.toType();
-                        }
-                    }
-                    else {
-                        return ts.promote(childType);
-                    }
-                }
-
-                return child.type();
+                return childType;
             }
 
-            return child.type();
+            return childType;
         }
         catch (SemanticException e) {
         }
 
-        return child.type();
+        return childType;
     }
 
 }
