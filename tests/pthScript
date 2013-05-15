@@ -142,7 +142,9 @@ polyglot.frontend.JLExtensionInfo "-cp ." {
         Narrowing.jl ;
         # Output.jl ;
         Prim.jl ;
-        Prec.jl ; Prec2.jl ;
+        Prec.jl ; 
+	Prec2.jl ;
+	Prec3.jl ;
         Return1.jl ; Return2.jl ; Return3.jl ;
         Return4.jl ;
         Return5.jl ;
