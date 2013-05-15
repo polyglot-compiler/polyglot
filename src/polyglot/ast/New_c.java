@@ -671,7 +671,7 @@ public class New_c extends Expr_c implements New {
 
     protected void printQualifier(CodeWriter w, PrettyPrinter tr) {
         if (this.qualifier != null && !this.qualifierImplicit) {
-            print(this.qualifier, w, tr);
+            printSubExpr(this.qualifier, w, tr);
             w.write(".");
         }
     }
