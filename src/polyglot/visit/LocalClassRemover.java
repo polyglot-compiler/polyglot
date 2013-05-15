@@ -112,8 +112,8 @@ public class LocalClassRemover extends ContextVisitor {
                     LocalClassDecl lcd = (LocalClassDecl) s;
                     ClassDecl cd = lcd.decl();
                     Flags flags =
-                            context.inStaticContext() ? Flags.PRIVATE.Static()
-                                    : Flags.PRIVATE;
+                            context.inStaticContext() ? Flags.PUBLIC.Static()
+                                    : Flags.PUBLIC;
                     cd = cd.flags(flags);
                     cd.type().flags(flags);
                     cd.type().kind(ClassType.MEMBER);
@@ -224,7 +224,7 @@ public class LocalClassRemover extends ContextVisitor {
             Id name = nf.Id(pos, UniqueID.newID("Anonymous"));
             ClassDecl cd =
                     nf.ClassDecl(pos,
-                                 Flags.PRIVATE,
+                                 Flags.PUBLIC,
                                  name,
                                  superClass,
                                  interfaces,
@@ -237,8 +237,8 @@ public class LocalClassRemover extends ContextVisitor {
             type.package_(context.package_());
 
             Flags flags =
-                    context.inStaticContext() ? Flags.PRIVATE.Static()
-                            : Flags.PRIVATE;
+                    context.inStaticContext() ? Flags.PUBLIC.Static()
+                            : Flags.PUBLIC;
             type.flags(flags);
 
             cd = cd.type(type);
