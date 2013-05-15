@@ -74,9 +74,27 @@ public class TypeErasureProcDecls extends ErrorHandlingVisitor {
             // doesn't implement anything
             return n;
         }
-        // get the last element, i.e., from the most superest class.
-        MethodInstance mj = implemented.get(implemented.size() - 1);
-        if (mj == mi) {
+
+        // get the last most element, ideally from a class...
+        MethodInstance mj = null;
+        for (int i = implemented.size() - 1; i >= 0; i--) {
+            MethodInstance mk = implemented.get(i);
+            if (mk == mi) {
+                // don't bother if mk is the same as mi
+                continue;
+            }
+            else if (mj == null) {
+                // best so far!
+                mj = mk;
+            }
+            else if (mk.container().isClass()
+                    && !mk.container().toClass().flags().isInterface()) {
+                // we found a class Let's prefer that.
+                mj = mk;
+                break;
+            }
+        }
+        if (mj == null) {
             // doesn't implement anything
             return n;
         }
@@ -116,19 +134,18 @@ public class TypeErasureProcDecls extends ErrorHandlingVisitor {
             Formal f = formals.next();
             TypeNode tn = f.type();
             TypeNode newTn = tn.type(ts.erasureType(tj));
-            changed = changed || (tn != newTn);
+            changed |= (tn != newTn);
             newFormals.add(f.type(newTn));
         }
 
         // also change the return type, so Java 1.4 won't complain
         TypeNode retType = n.returnType();
         TypeNode newRetType = retType.type(mjErased.returnType());
-        changed = changed || (retType != newRetType);
+        changed |= (retType != newRetType);
 
         if (!changed) {
             return n;
         }
         return n.formals(newFormals).returnType(newRetType);
     }
-
 }
