@@ -106,14 +106,14 @@ public class JL5MethodInstance_c extends MethodInstance_c implements
             }
         }
 
-        Type superType = rt.superType();
-        if (superType != null) {
-            l.addAll(implementedImpl(superType.toReference()));
-        }
-
         List<? extends ReferenceType> ints = rt.interfaces();
         for (ReferenceType rt2 : ints) {
             l.addAll(implementedImpl(rt2));
+        }
+
+        Type superType = rt.superType();
+        if (superType != null) {
+            l.addAll(implementedImpl(superType.toReference()));
         }
 
         return l;
