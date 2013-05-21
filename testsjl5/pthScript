@@ -376,6 +376,7 @@ polyglot.ext.jl5.ExtensionInfo "-d out -classpath java-out -assert -noserial -po
 	Conditional09.jl5 (Semantic, "does not match");
 	Conditional10.jl5 (Semantic, "does not match");
 	Conditional11.jl5;
+        Conditional12.jl5;
 	CaptureConversion01.jl5 (Post, "Xlint");
         PermissiveCasts01.jl5 (Semantic, "does not match"),(Semantic, "does not match"),
                               (Semantic, "Cannot cast"),(Semantic, "Cannot cast"),
@@ -398,7 +399,7 @@ polyglot.ext.jl5.ExtensionInfo "-d out -classpath java-out -assert -noserial -po
 
 # Now run the tests again removing the Java 5-isms.
 # This one uses 1.4 to suppress the warning about raw classes.
-polyglot.ext.jl5.ExtensionInfo "-d out -classpath java-out -removeJava5isms -enumImplClass MyEnum -assert -noserial -post \"javac -source 1.4\" -morepermissiveinference" {
+polyglot.ext.jl5.ExtensionInfo "-d out -classpath java-out -removeJava5isms -enumImplClass MyEnum -assert -noserial -post \"javac -source 1.4 -target 1.4\" -morepermissiveinference" {
         Assert01.jl5;
         HexFloatingPoint.jl5;
         Generics01.jl5;
@@ -734,6 +735,7 @@ polyglot.ext.jl5.ExtensionInfo "-d out -classpath java-out -removeJava5isms -enu
 	Conditional09.jl5 (Semantic, "does not match");
 	Conditional10.jl5 (Semantic, "does not match");
 	Conditional11.jl5;
+        Conditional12.jl5;
 	CaptureConversion01.jl5;
         PermissiveCasts01.jl5 (Semantic, "does not match"),(Semantic, "does not match"),
                               (Semantic, "Cannot cast"),(Semantic, "Cannot cast"),

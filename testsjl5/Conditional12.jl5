@@ -1,0 +1,7 @@
+class I<Foo> {}
+
+class D {
+    private I foo(I<D> x) {
+        return (x != null) ? x : new I() {};
+    }
+}

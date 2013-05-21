@@ -114,15 +114,14 @@ public class LubType_c extends ClassType_c implements LubType {
         for (Type u : lubElems) {
             st.addAll(ts.allAncestorsOf((ReferenceType) u));
 
-            // iu is an instantiated version of u. That is,
-            // if u is raw, we need the erasure of u.
-            Type iu = u;
-            if (u instanceof RawClass) {
-                iu = ((RawClass) u).erased();
+            List<ReferenceType> u_supers = new ArrayList<ReferenceType>();
+            for (ReferenceType u_super : ts.allAncestorsOf((ReferenceType) u)) {
+                if (u_super instanceof RawClass) {
+                    u_supers.add(((RawClass) u_super).erased());
+                }
+                else u_supers.add(u_super);
             }
-            List<Type> u_supers =
-                    new ArrayList<Type>(ts.allAncestorsOf((ReferenceType) iu));
-
+            
             Set<Type> est_of_u = new LinkedHashSet<Type>();
             for (Type super_of_u : u_supers) {
                 if (super_of_u instanceof JL5SubstClassType) {
@@ -154,7 +153,10 @@ public class LubType_c extends ClassType_c implements LubType {
             for (Type t : st) {
                 if (ts.equals(m, t)
                         || ((t instanceof JL5SubstClassType) && ((JL5SubstClassType) t).base()
-                                                                                       .equals(m))) {
+                                                                                       .equals(m))
+                        || ((t instanceof RawClass) && ((RawClass) t).erased()
+                                                                     .base()
+                                                                     .equals(m))) {
                     inv.add(t);
                 }
             }
