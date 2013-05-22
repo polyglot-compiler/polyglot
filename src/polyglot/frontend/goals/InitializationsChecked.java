@@ -34,7 +34,7 @@ import polyglot.ast.NodeFactory;
 import polyglot.frontend.Job;
 import polyglot.frontend.Scheduler;
 import polyglot.types.TypeSystem;
-import polyglot.visit.InitChecker;
+import polyglot.visit.DefiniteAssignmentChecker;
 
 public class InitializationsChecked extends VisitorGoal {
     public static Goal create(Scheduler scheduler, Job job, TypeSystem ts,
@@ -43,7 +43,7 @@ public class InitializationsChecked extends VisitorGoal {
     }
 
     protected InitializationsChecked(Job job, TypeSystem ts, NodeFactory nf) {
-        super(job, new InitChecker(job, ts, nf));
+        super(job, new DefiniteAssignmentChecker(job, ts, nf));
     }
 
     @Override

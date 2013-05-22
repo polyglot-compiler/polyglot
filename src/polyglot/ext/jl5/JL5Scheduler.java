@@ -30,7 +30,7 @@ import polyglot.ext.jl5.translate.JL5ToJLRewriter;
 import polyglot.ext.jl5.types.JL5TypeSystem;
 import polyglot.ext.jl5.visit.AnnotationChecker;
 import polyglot.ext.jl5.visit.AutoBoxer;
-import polyglot.ext.jl5.visit.JL5InitChecker;
+import polyglot.ext.jl5.visit.JL5DefiniteAssignmentChecker;
 import polyglot.ext.jl5.visit.JL5InitImportsVisitor;
 import polyglot.ext.jl5.visit.JL5Translator;
 import polyglot.ext.jl5.visit.RemoveAnnotations;
@@ -398,7 +398,10 @@ public class JL5Scheduler extends JLScheduler {
     public Goal InitializationsChecked(Job job) {
         TypeSystem ts = extInfo.typeSystem();
         NodeFactory nf = extInfo.nodeFactory();
-        Goal g = new VisitorGoal(job, new JL5InitChecker(job, ts, nf));
+        Goal g =
+                new VisitorGoal(job, new JL5DefiniteAssignmentChecker(job,
+                                                                      ts,
+                                                                      nf));
         try {
             g.addPrerequisiteGoal(ReachabilityChecked(job), this);
         }
