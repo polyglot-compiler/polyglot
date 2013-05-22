@@ -1,4 +1,4 @@
-public class BadFinalInit3 {
+class BadFinalInit3 {
     void foo() {
 	final int i;
 	if (false) {

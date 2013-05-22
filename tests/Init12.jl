@@ -25,7 +25,7 @@ class C {
       else {
 	  v = 0;
       }
-      
+      int a = u + v;
   }
 
 }

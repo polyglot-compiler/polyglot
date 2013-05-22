@@ -178,6 +178,8 @@ polyglot.frontend.JLExtensionInfo "-cp ." {
         BadFinalInit11.jl (Semantic, "Final field .* might already have been initialized");
         BadFinalInit12.jl (Semantic, "Cannot assign a value to final field");
         BadFinalInit14.jl (Semantic, "Cannot assign a value to final field");
+        BadFinalInit15.jl (Semantic, "Final variable .* might already have been initialized"); 
+        BadFinalInit16.jl (Semantic, "Local variable .* may not have been initialized"); 
         BadFinalInit2.jl (Semantic, "Final variable .* might already have been initialized");
         BadFinalInit3.jl (Semantic, "Final variable .* might already have been initialized");
         BadFinalInit4.jl (Semantic, "Final variable .* might already have been initialized");
