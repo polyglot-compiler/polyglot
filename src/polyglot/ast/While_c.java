@@ -155,6 +155,10 @@ public class While_c extends Loop_c implements While {
         if (condIsConstantTrue()) {
             v.visitCFG(cond, body, ENTRY);
         }
+        else if (condIsConstantFalse() && v.skipDeadLoopBodies()) {
+            v.visitCFG(cond, FlowGraph.EDGE_KEY_FALSE, this, EXIT);
+            return succs;
+        }
         else {
             v.visitCFG(cond,
                        FlowGraph.EDGE_KEY_TRUE,

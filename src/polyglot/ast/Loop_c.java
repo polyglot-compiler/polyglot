@@ -50,4 +50,9 @@ public abstract class Loop_c extends Stmt_c implements Loop {
     public boolean condIsConstantTrue() {
         return Boolean.TRUE.equals(cond().constantValue());
     }
+
+    @Override
+    public boolean condIsConstantFalse() {
+        return Boolean.FALSE.equals(cond().constantValue());
+    }
 }

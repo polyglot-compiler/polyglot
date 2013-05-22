@@ -286,6 +286,10 @@ public class For_c extends Loop_c implements For {
             if (condIsConstantTrue()) {
                 v.visitCFG(cond, body, ENTRY);
             }
+            else if (condIsConstantFalse() && v.skipDeadLoopBodies()) {
+                v.visitCFG(cond, FlowGraph.EDGE_KEY_FALSE, this, EXIT);
+                return succs;
+            }
             else {
                 v.visitCFG(cond,
                            FlowGraph.EDGE_KEY_TRUE,

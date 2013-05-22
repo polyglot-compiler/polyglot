@@ -601,10 +601,11 @@ public class Binary_c extends Expr_c implements Binary {
     public <T> List<T> acceptCFG(CFGBuilder<?> v, List<T> succs) {
         if (op == COND_AND || op == COND_OR) {
             // short-circuit
-            if (left instanceof BooleanLit) {
-                BooleanLit b = (BooleanLit) left;
-                if ((b.value() && op == COND_OR)
-                        || (!b.value() && op == COND_AND)) {
+            if (left.isConstant()) {
+                boolean leftConstantValue =
+                        ((Boolean) left.constantValue()).booleanValue();
+                if ((leftConstantValue && op == COND_OR)
+                        || (!leftConstantValue && op == COND_AND)) {
                     v.visitCFG(left, this, EXIT);
                 }
                 else {

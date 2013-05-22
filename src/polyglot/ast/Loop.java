@@ -41,6 +41,9 @@ public interface Loop extends CompoundStmt {
     /** Returns true if cond() is a constant that evaluates to true. */
     boolean condIsConstantTrue();
 
+    /** Returns true if cond() is a constant that evaluates to false. */
+    boolean condIsConstantFalse();
+
     /** Loop body. */
     Stmt body();
 

@@ -255,15 +255,34 @@ public class Conditional_c extends Expr_c implements Conditional {
 
     @Override
     public <T> List<T> acceptCFG(CFGBuilder<?> v, List<T> succs) {
-        v.visitCFG(cond,
-                   FlowGraph.EDGE_KEY_TRUE,
-                   consequent,
-                   ENTRY,
-                   FlowGraph.EDGE_KEY_FALSE,
-                   alternative,
-                   ENTRY);
-        v.visitCFG(consequent, this, EXIT);
-        v.visitCFG(alternative, this, EXIT);
+        if (this.cond.isConstant()) {
+            // the condition is a constant expression.
+            // That means that one branch is dead code
+            boolean condConstantValue =
+                    ((Boolean) cond.constantValue()).booleanValue();
+            if (condConstantValue) {
+                // Condition is constantly true, only the consequent will be executed
+                v.visitCFG(cond, FlowGraph.EDGE_KEY_TRUE, consequent, ENTRY);
+                v.visitCFG(consequent, this, EXIT);
+            }
+            else {
+                // Condition is constantly false, only the alternative will be executed
+                v.visitCFG(cond, FlowGraph.EDGE_KEY_FALSE, alternative, ENTRY);
+                v.visitCFG(alternative, this, EXIT);
+            }
+        }
+        else {
+            // not a constant condition
+            v.visitCFG(cond,
+                       FlowGraph.EDGE_KEY_TRUE,
+                       consequent,
+                       ENTRY,
+                       FlowGraph.EDGE_KEY_FALSE,
+                       alternative,
+                       ENTRY);
+            v.visitCFG(consequent, this, EXIT);
+            v.visitCFG(alternative, this, EXIT);
+        }
 
         return succs;
     }

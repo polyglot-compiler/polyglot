@@ -192,7 +192,36 @@ public class If_c extends Stmt_c implements If {
 
     @Override
     public <T> List<T> acceptCFG(CFGBuilder<?> v, List<T> succs) {
-        if (alternative == null) {
+        if (cond.isConstant() && v.skipDeadIfBranches()) {
+            // the condition is a constant expression.
+            // That means that one branch is dead code
+            boolean condConstantValue =
+                    ((Boolean) cond.constantValue()).booleanValue();
+            if (condConstantValue) {
+                // the condition is constantly true.
+                // the alternative won't be executed.
+                v.visitCFG(cond, FlowGraph.EDGE_KEY_TRUE, consequent, ENTRY);
+                v.visitCFG(consequent, this, EXIT);
+            }
+            else {
+                // the condition is constantly false.
+                // the consequent won't be executed.
+                if (alternative == null) {
+                    // there is no alternative
+                    v.visitCFG(cond, this, EXIT);
+                }
+                else {
+                    v.visitCFG(cond,
+                               FlowGraph.EDGE_KEY_FALSE,
+                               alternative,
+                               ENTRY);
+                    v.visitCFG(alternative, this, EXIT);
+                }
+            }
+        }
+        else if (alternative == null) {
+            // the alternative is null (but the condition is not constant, or we can't
+            // skip dead statements.)
             v.visitCFG(cond,
                        FlowGraph.EDGE_KEY_TRUE,
                        consequent,
@@ -203,6 +232,8 @@ public class If_c extends Stmt_c implements If {
             v.visitCFG(consequent, this, EXIT);
         }
         else {
+            // both consequent and alternative are present, and either the condition
+            // is not constant or we can't skip dead statements.
             v.visitCFG(cond,
                        FlowGraph.EDGE_KEY_TRUE,
                        consequent,

@@ -129,6 +129,18 @@ public class CFGBuilder<FlowItem extends DataFlow.Item> implements Copy {
     protected boolean skipInnermostCatches;
 
     /**
+     * True if we should skip dead if branches, such as S in "if (false) { S }".
+     * Different dataflow analyses have different requirements.
+     */
+    protected boolean skipDeadIfBranches = false;
+
+    /**
+     * True if we should skip dead loop bodies, such as S in "while (false) { S }".
+     * Different dataflow analyses have different requirements.
+     */
+    protected boolean skipDeadLoopBodies = false;
+
+    /**
      * True if we should add edges for uncaught Errors to the exit node of the
      * graph.  By default, we do not, but subclasses can change this behavior
      * if needed.
@@ -769,4 +781,39 @@ public class CFGBuilder<FlowItem extends DataFlow.Item> implements Copy {
         }
     }
 
+    /**
+     * Should the CFG construction skip dead if branches? (e.g., should statement s be
+     * skipped in the following: if (false) { S } ). Different dataflow analyses require 
+     * different behavior.
+     */
+    public boolean skipDeadIfBranches() {
+        return this.skipDeadIfBranches;
+    }
+
+    public CFGBuilder<FlowItem> skipDeadIfBranches(boolean b) {
+        if (b == this.skipDeadIfBranches) {
+            return this;
+        }
+        CFGBuilder<FlowItem> v = copy();
+        v.skipDeadIfBranches = b;
+        return v;
+    }
+
+    /**
+     * Should the CFG construction skip dead loop bodies? (e.g., should statement s be
+     * skipped in the following: while (false) { S } ). Different dataflow analyses require 
+     * different behavior.
+     */
+    public boolean skipDeadLoopBodies() {
+        return this.skipDeadLoopBodies;
+    }
+
+    public CFGBuilder<FlowItem> skipDeadLoopBodies(boolean b) {
+        if (b == this.skipDeadLoopBodies) {
+            return this;
+        }
+        CFGBuilder<FlowItem> v = copy();
+        v.skipDeadLoopBodies = b;
+        return v;
+    }
 }
