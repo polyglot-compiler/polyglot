@@ -109,6 +109,7 @@ polyglot.frontend.JLExtensionInfo "-cp ." {
         Init7.jl ; Init8.jl ; Init9.jl ;
 	Init10.jl; 
 	Init11.jl; 
+	Init12.jl; 
         InitializerType1.jl ;
         Initializer1.jl (Semantic, "Initializers must be able to complete normally");
         Initializer2.jl (Semantic, "Initializers must be able to complete normally");
@@ -253,6 +254,7 @@ polyglot.frontend.JLExtensionInfo "-cp ." {
 	Unreachable14.jl (Semantic, "Unreachable statement");
 	Unreachable15.jl (Semantic, "Unreachable statement");
 	Unreachable16.jl (Semantic, "Unreachable statement");
+	Unreachable17.jl (Semantic, "Unreachable statement"), (Semantic, "Unreachable statement");
 	Unreachable2.jl (Semantic, "Unreachable statement");
 	Unreachable3.jl (Semantic, "Unreachable statement");
 	Unreachable4.jl (Semantic, "Unreachable statement");
