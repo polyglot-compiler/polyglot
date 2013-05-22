@@ -54,6 +54,18 @@ public class ReachChecker extends DataFlow<ReachChecker.DataFlowItem> {
         super(job, ts, nf, true /* forward analysis */, true /* perform dataflow on entry to CodeDecls */);
     }
 
+    @Override
+    protected CFGBuilder<ReachChecker.DataFlowItem> createCFGBuilder(
+            TypeSystem ts, FlowGraph<ReachChecker.DataFlowItem> g) {
+        CFGBuilder<ReachChecker.DataFlowItem> v =
+                new CFGBuilder<ReachChecker.DataFlowItem>(ts, g, this);
+        // skip dead loop bodies (i.e., S is unreachable in "while (false) S".
+        // See JLS 2nd edition, Section 14.20.
+        v = v.skipDeadLoopBodies(true);
+        // Note that we do not skip dead if branches.
+        return v;
+    }
+
     protected static class DataFlowItem extends DataFlow.Item {
         public final boolean reachable;
         public final boolean normalReachable;
