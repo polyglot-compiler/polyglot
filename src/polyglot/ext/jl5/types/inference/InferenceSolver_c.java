@@ -162,6 +162,10 @@ public class InferenceSolver_c implements InferenceSolver {
                 else if (u.size() > 1) {
                     if (useSubtypeConstraints) {
                         solution[i] = ts.lub(Position.compilerGenerated(), u);
+                        // check that the bounds hold in the presence of lubs
+                        if (!solution[i].isSubtype(toSolve.upperBound())) {
+                            return null;
+                        }
                     }
                     else {
                         // supertype Constraints
