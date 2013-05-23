@@ -324,8 +324,15 @@ public class JL5ClassDecl_c extends ClassDecl_c implements JL5ClassDecl {
     }
 
     public void prettyPrintHeaderRest(CodeWriter w, PrettyPrinter tr) {
-        if (superClass() != null && !JL5Flags.isEnum(type.flags())
-                && !JL5Flags.isAnnotation(type.flags())) {
+        boolean removeJava5isms = false;
+        boolean translateEnums = false;
+        if (tr instanceof JL5Translator) {
+            JL5Translator jtr = (JL5Translator) tr;
+            removeJava5isms = jtr.removeJava5isms();
+            translateEnums = jtr.translateEnums();
+        }
+        if (superClass() != null
+                && ((!JL5Flags.isEnum(type.flags()) && !JL5Flags.isAnnotation(type.flags())) || removeJava5isms)) {
             w.write(" extends ");
             print(superClass(), w, tr);
         }
