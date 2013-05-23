@@ -157,41 +157,70 @@ public abstract class ProcedureInstance_c extends TypeObject_c implements
         ProcedureInstance p1 = this;
         ProcedureInstance p2 = p;
 
-        // rule 1:
-        ReferenceType t1 = null;
-        ReferenceType t2 = null;
+        /* In the the JLS 2nd edition, 15.12.2.2, there are two parts to
+         * determine whether one method is more specific than another.
+         * If declaration m is in class or interface T with formal types
+         * T1,...,Tn, and delcaration n is in class or interface U
+         * with formal tyles U1,...,Un, then m is more specifc than n if
+         * both:
+         *   1. T can be converted to U by method invocation conversion.
+         * and
+         *   2. Tj can be converted to Uj by method invocation conversion, 
+         *            for all j from 1 to n.
+         *            
+         * Rule 1 appears to be a bug in the specification, as it would make
+         * the following method call ambiguous,  since neither A2.visit(B1) 
+         * nor A1.visit(B2) is more specific than the other.
+         * 
+         *      new A2().visit(node);
+         *      class A1 { public void visit(B2 node) { } }
+         *      class A2 extends A1 { public void visit(B1 node) { } }
+         *      class B1 { }
+         *      class B2 extends B1 { }
+         *      
+         *  Indeed, in the third edition of the JLS the comparison of 
+         *  the containers is dropped from the definition of 
+         *  "more specific".
+         *  
+         *  Thus, in the following, the implementation of rule 1 is commented out
+         *  and we just check rule 2.
+         */
 
-        if (p1 instanceof MemberInstance) {
-            if (p1 instanceof Declaration) {
-                t1 =
-                        ((MemberInstance) ((Declaration) p1).declaration()).container();
-            }
-            else {
-                t1 = ((MemberInstance) p1).container();
-            }
-        }
-        if (p2 instanceof MemberInstance) {
-            if (p2 instanceof Declaration) {
-                t2 =
-                        ((MemberInstance) ((Declaration) p2).declaration()).container();
-            }
-            else {
-                t2 = ((MemberInstance) p2).container();
-            }
-        }
-
-        if (t1 != null && t2 != null) {
-            if (t1.isClass() && t2.isClass()) {
-                if (!t1.isSubtype(t2) && !t1.toClass().isEnclosed(t2.toClass())) {
-                    return false;
-                }
-            }
-            else {
-                if (!t1.isSubtype(t2)) {
-                    return false;
-                }
-            }
-        }
+//        // rule 1:
+//        ReferenceType t1 = null;
+//        ReferenceType t2 = null;
+//
+//        if (p1 instanceof MemberInstance) {
+//            if (p1 instanceof Declaration) {
+//                t1 =
+//                        ((MemberInstance) ((Declaration) p1).declaration()).container();
+//            }
+//            else {
+//                t1 = ((MemberInstance) p1).container();
+//            }
+//        }
+//        if (p2 instanceof MemberInstance) {
+//            if (p2 instanceof Declaration) {
+//                t2 =
+//                        ((MemberInstance) ((Declaration) p2).declaration()).container();
+//            }
+//            else {
+//                t2 = ((MemberInstance) p2).container();
+//            }
+//        }
+//
+//        if (t1 != null && t2 != null) {
+//            if (t1.isClass() && t2.isClass()) {
+//                if (!t1.isSubtype(t2) && !t1.toClass().isEnclosed(t2.toClass())) {
+//                    return false;
+//                }
+//            }
+//            else {
+//                if (!t1.isSubtype(t2)) {
+//                    return false;
+//                }
+//            }
+//        }
 
         // rule 2:
         return p2.callValid(p1.formalTypes());
