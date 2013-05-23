@@ -193,6 +193,10 @@ public class NewArray_c extends Expr_c implements NewArray {
             return this.type;
         }
 
+        if (this.dims() != null && this.dims().contains(child)) {
+            return av.typeSystem().Int();
+        }
+
         return child.type();
     }
 
