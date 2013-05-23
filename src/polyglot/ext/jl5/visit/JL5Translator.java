@@ -61,6 +61,10 @@ public class JL5Translator extends Translator {
         return this.removeJava5isms;
     }
 
+    public boolean translateEnums() {
+        return this.translateEnums;
+    }
+
     public void translateNode(Node n, CodeWriter w) {
         if (n instanceof ClassDecl) {
             if (removeJava5isms && translateEnums) {
