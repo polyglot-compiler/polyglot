@@ -217,6 +217,7 @@ polyglot.frontend.JLExtensionInfo "-cp ." {
 	BadStaticContext.jl (Semantic); 
         BadSwitch1.jl (Semantic, "Case label must be an integral constant");
 	BadSwitch2.jl (Semantic, "Duplicate case label");
+	Call01.jl;
 	Constants12.jl (Semantic, "Duplicate case label"),
                        (Semantic, "Duplicate case label"),
                        (Semantic, "Duplicate case label"),
