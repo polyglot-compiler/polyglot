@@ -47,7 +47,10 @@ public class JL5ToJLRewriter extends ExtensionRewriter {
     public TypeNode typeToJava(Type t, Position pos) throws SemanticException {
         // TODO: disentangle erasureType from translated type
         t = jl5ts.erasureType(t);
-        if (t instanceof LubType) t = ((LubType) t).calculateLub();
+        if (t instanceof LubType) {
+            t = ((LubType) t).calculateLub();
+            t = jl5ts.erasureType(t);
+        }
         return super.typeToJava(t, pos);
     }
 

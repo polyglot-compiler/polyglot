@@ -34,6 +34,7 @@ import polyglot.ext.jl5.JL5Options;
 import polyglot.ext.jl5.types.JL5ClassType;
 import polyglot.ext.jl5.types.JL5SubstClassType;
 import polyglot.ext.jl5.types.JL5TypeSystem;
+import polyglot.ext.jl5.types.inference.LubType;
 import polyglot.frontend.Job;
 import polyglot.frontend.TargetFactory;
 import polyglot.types.ArrayType;
@@ -88,6 +89,10 @@ public class JL5Translator extends Translator {
                 // Print out the erasure type
                 Type t = tn.type();
                 Type erastype = ((JL5TypeSystem) ts).erasureType(t);
+                if (erastype instanceof LubType) {
+                    erastype = ((LubType) erastype).calculateLub();
+                    erastype = ((JL5TypeSystem) ts).erasureType(erastype);
+                }
                 w.write(translateType(erastype));
                 return;
             }
