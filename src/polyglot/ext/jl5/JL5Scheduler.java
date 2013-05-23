@@ -238,10 +238,10 @@ public class JL5Scheduler extends JLScheduler {
         boolean typecheckResult =
                 !(opts instanceof JL5Options && ((JL5Options) opts).skip524checks);
         Goal g =
-                typecheckResult ? new VisitorGoal(job,
-                                                  new JL5ToJLRewriter(job,
-                                                                      extInfo,
-                                                                      extInfo.outputExtensionInfo()))
+                typecheckResult ? internGoal(new VisitorGoal(job,
+                                                             new JL5ToJLRewriter(job,
+                                                                                 extInfo,
+                                                                                 extInfo.outputExtensionInfo())))
                         : new EmptyGoal(job);
         try {
             g.addPrerequisiteGoal(CastsInserted(job), this);
@@ -259,7 +259,7 @@ public class JL5Scheduler extends JLScheduler {
             throw new InternalCompilerError(e);
         }
 
-        return this.internGoal(g);
+        return g;
     }
 
     public Goal AnnotationCheck(Job job) {
@@ -320,7 +320,7 @@ public class JL5Scheduler extends JLScheduler {
             catch (CyclicDependencyException e) {
                 throw new InternalCompilerError(e);
             }
-            return internGoal(g);
+            return g;
         }
         else return JL5CodeGenerated.create(this, job);
     }
