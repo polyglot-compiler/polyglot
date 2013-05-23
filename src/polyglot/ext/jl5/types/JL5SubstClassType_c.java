@@ -344,7 +344,9 @@ public class JL5SubstClassType_c extends
             return name();
         }
         else {
-            throw new InternalCompilerError("Cannot translate an anonymous class.");
+            throw new InternalCompilerError("Cannot translate an anonymous class: "
+                                                    + this,
+                                            this.position());
         }
     }
 

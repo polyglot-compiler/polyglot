@@ -445,7 +445,9 @@ public abstract class ClassType_c extends ReferenceType_c implements ClassType {
             return name();
         }
         else {
-            throw new InternalCompilerError("Cannot translate an anonymous class.");
+            throw new InternalCompilerError("Cannot translate an anonymous class: "
+                                                    + this,
+                                            this.position());
         }
     }
 
