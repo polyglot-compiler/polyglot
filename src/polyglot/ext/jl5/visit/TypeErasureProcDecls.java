@@ -89,8 +89,10 @@ public class TypeErasureProcDecls extends ErrorHandlingVisitor {
             }
             else if (mk.container().isClass()
                     && !mk.container().toClass().flags().isInterface()) {
-                // we found a class Let's prefer that.
-                mj = mk;
+                // we found a class Let's prefer that, unless mk overrides mj.
+                if (!ts.implemented(mk).contains(mj)) {
+                    mj = mk;
+                }
                 break;
             }
         }
