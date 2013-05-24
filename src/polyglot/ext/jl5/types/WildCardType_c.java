@@ -180,6 +180,13 @@ public class WildCardType_c extends ReferenceType_c implements WildCardType {
     }
 
     @Override
+    public int hashCode() {
+        return 723492
+                ^ (this.lowerBound == null ? 0 : this.lowerBound.hashCode())
+                ^ (this.upperBound == null ? 0 : this.upperBound.hashCode());
+    }
+
+    @Override
     public boolean isExtendsConstraint() {
         return !isSuperConstraint();
     }

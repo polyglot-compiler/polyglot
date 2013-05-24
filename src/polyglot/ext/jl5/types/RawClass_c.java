@@ -194,6 +194,11 @@ public class RawClass_c extends JL5ClassType_c implements RawClass {
     }
 
     @Override
+    public int hashCode() {
+        return this.base().hashCode();
+    }
+
+    @Override
     public String translateAsReceiver(Resolver c) {
         return this.translate(c);
     }

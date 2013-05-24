@@ -308,6 +308,11 @@ public class IntersectionType_c extends ClassType_c implements IntersectionType 
     }
 
     @Override
+    public int hashCode() {
+        return this.bounds().hashCode();
+    }
+
+    @Override
     public void setFlags(Flags flags) {
         throw new UnsupportedOperationException();
     }
