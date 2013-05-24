@@ -1,0 +1,10 @@
+// make sure that enums can implement interfaces
+interface I {
+    void m(I x);
+}
+enum Sortables implements I { 
+    FOO, BAR;
+    public void m(I x) {
+	m(this);
+    }
+}
