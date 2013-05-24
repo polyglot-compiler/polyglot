@@ -1,0 +1,23 @@
+class C<T> { }
+class D extends C<Object> { }
+
+class X {
+    void m(D x, int y) {  }
+}
+
+interface I<T> {
+    void m(T x, int y);
+}
+interface J<T extends C<Object>> {
+    void m(T x, int y);
+}
+interface K {
+    void m(D x, int y);
+}
+interface L<T extends C<Object>> {
+    void m(T x, int y);
+}
+
+class Y extends X implements I<D>, J<D>,K,L<D> {
+    public void m(D x, int y) {  }
+}
