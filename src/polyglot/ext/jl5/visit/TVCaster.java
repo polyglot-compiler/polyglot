@@ -268,15 +268,26 @@ public class TVCaster extends AscriptionVisitor {
         return false;
     }
 
-    private Expr insertCast(Expr e, Type toType) throws SemanticException {
+    private Expr insertCast(Expr e, Type toType) {
         if (toType.isClass()
                 && toType.toClass().fullName().equals("java.lang.Enum")) {
             // it's the enum type.
             // see if we want to replace it
             JL5Options opts = (JL5Options) job.extensionInfo().getOptions();
-            String enumImpl = opts.enumImplClass;
             if (opts.removeJava5isms) {
-                toType = ts.typeForName(enumImpl);
+                String enumImpl = opts.enumImplClass;
+                if (!"java.lang.Enum".equals(enumImpl)) {
+                    // we now have a difficult choice.
+                    // Do we leave it as java.lang.Enum, or cast it to enumImpl?
+                    // Let's cast it to the type of the expression instead... 
+                    Type eType = e.type();
+                    JL5TypeSystem ts = (JL5TypeSystem) this.ts;
+                    if (ts.erasureType(eType).equals(ts.erasureType(ts.Enum()))) {
+                        // the type of eType is already Enum. So let's just leave it and hope.
+                        return e;
+                    }
+                    toType = ts.erasureType(eType);
+                }
             }
         }
         TypeNode tn =
