@@ -41,6 +41,7 @@ public class JL5Options extends Options {
     public boolean morePermissiveInference;
     public boolean morePermissiveCasts;
     public boolean skip524checks;
+    public boolean leaveCovariantReturns;
 
     public JL5Options(ExtensionInfo extension) {
         super(extension);
@@ -71,6 +72,9 @@ public class JL5Options extends Options {
                              "Translate Java 5 language features to Java 1.4 features"));
         flags.add(new Switch(new String[] { "-skip524checks", "--skip524checks" },
                              "Don't type check the result of removeJava5isms"));
+        flags.add(new Switch(new String[] { "-leaveCovariantReturns",
+                                     "--leaveCovariantReturns" },
+                             "With removeJava5isms, does not translate away covariant returns"));
         flags.add(new Switch(new String[] { "-morepermissiveinference",
                                      "--morepermissiveinference" },
                              "Use a more permissive algorithm for type inference. (Experimental)"));
@@ -98,6 +102,9 @@ public class JL5Options extends Options {
         }
         else if (arg.flag().ids().contains("-skip524checks")) {
             this.skip524checks = (Boolean) arg.value();
+        }
+        else if (arg.flag().ids().contains("-leaveCovariantReturns")) {
+            this.leaveCovariantReturns = (Boolean) arg.value();
         }
         else super.handleArg(arg);
     }
