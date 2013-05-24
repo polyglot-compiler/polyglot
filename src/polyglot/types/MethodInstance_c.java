@@ -302,7 +302,7 @@ public class MethodInstance_c extends ProcedureInstance_c implements
         }
 
         // HACK: Java5 allows return types to be covariant.  We'll allow covariant
-        // return if we mj is defined in a class file.
+        // return if mj is defined in a class file.
         boolean allowCovariantReturn = false;
 
         if (mj.container() instanceof ParsedClassType) {
