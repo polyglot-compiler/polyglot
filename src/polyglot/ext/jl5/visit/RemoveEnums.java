@@ -201,7 +201,7 @@ public class RemoveEnums extends ContextVisitor {
                              enumDecl.id(),
                              nf.CanonicalTypeNode(enumDecl.position(),
                                                   ts.typeForName(this.enumImplClass)),
-                             Collections.<TypeNode> emptyList(),
+                             enumDecl.interfaces(),
                              body);
 
         // XXX type information. This is a little dodgy
