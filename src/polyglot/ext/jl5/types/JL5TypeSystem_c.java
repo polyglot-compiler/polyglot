@@ -2360,7 +2360,7 @@ public class JL5TypeSystem_c extends
                 return this.rawClass(ct, ct.position());
             }
             else {
-                // neither t nor it's containers has type variables
+                // neither t nor its containers has type variables
                 return t;
             }
         }
