@@ -30,6 +30,7 @@ import java.util.Set;
 import polyglot.frontend.ExtensionInfo;
 import polyglot.main.OptFlag;
 import polyglot.main.OptFlag.Arg;
+import polyglot.main.OptFlag.Kind;
 import polyglot.main.OptFlag.Switch;
 import polyglot.main.Options;
 import polyglot.main.UsageError;
@@ -70,9 +71,11 @@ public class JL5Options extends Options {
         flags.add(new Switch(new String[] { "-removeJava5isms",
                                      "--removeJava5isms" },
                              "Translate Java 5 language features to Java 1.4 features"));
-        flags.add(new Switch(new String[] { "-skip524checks", "--skip524checks" },
+        flags.add(new Switch(Kind.SECRET,
+                             new String[] { "-skip524checks", "--skip524checks" },
                              "Don't type check the result of removeJava5isms"));
-        flags.add(new Switch(new String[] { "-leaveCovariantReturns",
+        flags.add(new Switch(Kind.SECRET,
+                             new String[] { "-leaveCovariantReturns",
                                      "--leaveCovariantReturns" },
                              "With removeJava5isms, does not translate away covariant returns"));
         flags.add(new Switch(new String[] { "-morepermissiveinference",
