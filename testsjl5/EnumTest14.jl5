@@ -1,0 +1,9 @@
+class C {
+    public Object id(Object o) {
+	return o;
+    }
+    
+    public Object foo(Enum en, Object o) {
+	return id((o == null) ? null : en);
+    }
+}

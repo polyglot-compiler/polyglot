@@ -282,6 +282,11 @@ public class TVCaster extends AscriptionVisitor {
                     // Let's cast it to the type of the expression instead... 
                     Type eType = e.type();
                     JL5TypeSystem ts = (JL5TypeSystem) this.ts;
+                    if (eType.isNull()) {
+                        // the expression is 'null'. We shouldn't cast it because
+                        // casting to null is illegal...
+                        return e;
+                    }
                     if (ts.erasureType(eType).equals(ts.erasureType(ts.Enum()))) {
                         // the type of eType is already Enum. So let's just leave it and hope.
                         return e;
