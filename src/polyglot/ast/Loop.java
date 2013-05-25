@@ -27,7 +27,7 @@
 package polyglot.ast;
 
 /**
- * An immutable representation of a Java language <code>for</code>
+ * An immutable representation of a loop
  * statement.  Contains a statement to be executed and an expression
  * to be tested indicating whether to reexecute the statement.
  */
@@ -46,6 +46,8 @@ public interface Loop extends CompoundStmt {
 
     /** Loop body. */
     Stmt body();
+
+    Loop body(Stmt body);
 
     /** Target of a continue statement in the loop body. */
     Term continueTarget();
