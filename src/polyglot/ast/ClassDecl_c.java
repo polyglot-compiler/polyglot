@@ -478,7 +478,7 @@ public class ClassDecl_c extends Term_c implements ClassDecl {
         ConstructorDecl cd =
                 nf.ConstructorDecl(body().position().startOf(),
                                    Flags.PUBLIC,
-                                   name,
+                                   nf.Id(body().position().startOf(), name.id()),
                                    Collections.<Formal> emptyList(),
                                    Collections.<TypeNode> emptyList(),
                                    block);
