@@ -40,18 +40,18 @@ import polyglot.ast.Block;
 import polyglot.ast.BooleanLit;
 import polyglot.ast.Conditional;
 import polyglot.ast.ConstructorCall;
-import polyglot.ast.Do;
 import polyglot.ast.Empty;
 import polyglot.ast.Eval;
 import polyglot.ast.Expr;
 import polyglot.ast.FieldDecl;
-import polyglot.ast.For;
 import polyglot.ast.Id;
 import polyglot.ast.If;
 import polyglot.ast.IntLit;
+import polyglot.ast.Labeled;
 import polyglot.ast.Lit;
 import polyglot.ast.Local;
 import polyglot.ast.LocalDecl;
+import polyglot.ast.Loop;
 import polyglot.ast.NewArray;
 import polyglot.ast.Node;
 import polyglot.ast.NodeFactory;
@@ -59,7 +59,6 @@ import polyglot.ast.Special;
 import polyglot.ast.Stmt;
 import polyglot.ast.TypeNode;
 import polyglot.ast.Unary;
-import polyglot.ast.While;
 import polyglot.frontend.Job;
 import polyglot.types.ArrayType;
 import polyglot.types.Flags;
@@ -118,9 +117,7 @@ public class ExpressionFlattener extends NodeVisitor {
     protected final Set<Expr> dontFlatten = new HashSet<Expr>();
 
     /** Used to copy a whole AST subtree. */
-    protected final DeepCopier deepCopier = new DeepCopier();
-    /** Dummy value returned when there is no expression to return. */
-    protected final Local dummyLocal;
+    protected final DeepCopy deepCopier = new DeepCopy();
 
     /** Whether to move initializers of created localDecls to assignments */
     protected boolean flatten_all_decls;
@@ -134,9 +131,6 @@ public class ExpressionFlattener extends NodeVisitor {
         this.job = job;
         this.ts = ts;
         this.nf = nf;
-        this.dummyLocal =
-                nf.Local(Position.compilerGenerated(),
-                         nf.Id(Position.compilerGenerated(), "dummy"));
         this.flatten_all_decls = flatten_all_decls;
     }
 
@@ -159,28 +153,21 @@ public class ExpressionFlattener extends NodeVisitor {
             return visitEdgeNoOverride(parent, s);
         }
 
-        if (n instanceof While) {
-            While s = (While) n;
-            Stmt b = visitEdge(s, createBlock(s.body()));
-            s = s.body(b);
-            addStmt(s);
-            return s;
-        }
-
-        if (n instanceof Do) {
-            Do s = (Do) n;
-            Stmt b = visitEdge(s, createBlock(s.body()));
-            s = s.body(b);
-            addStmt(s);
-            return s;
-        }
-
-        if (n instanceof For) {
-            For s = (For) n;
-            Stmt b = visitEdge(s, createBlock(s.body()));
-            s = s.body(b);
-            addStmt(s);
-            return s;
+        if (n instanceof Loop) {
+            Loop lp = (Loop) n;
+            Stmt b = visitEdge(lp, createBlock(lp.body()));
+            lp = lp.body(b);
+            if (!(parent instanceof Labeled)) {
+                // we are not a labeled loop
+                // add lp to the stmt list.
+                addStmt(lp);
+            }
+            else {
+                // we are a labeled loop. Let the parent
+                // (i.e., the Labeled AST node) take
+                // care of adding us to stmt list.
+            }
+            return lp;
         }
 
         // short circuit boolean && and ||
@@ -342,7 +329,8 @@ public class ExpressionFlattener extends NodeVisitor {
                     return l;
                 }
                 else {
-                    return dummyLocal;
+                    return nf.Local(n.position().startOf(),
+                                    nf.Id(n.position().startOf(), "dummy"));
                 }
             }
 
@@ -780,15 +768,4 @@ public class ExpressionFlattener extends NodeVisitor {
     protected Type typeOf(LocalInstance li) {
         return li.type();
     }
-
-    /** Makes a deep copy of an AST node. */
-    protected class DeepCopier extends NodeVisitor {
-
-        @Override
-        public Node leave(Node old, Node n, NodeVisitor v) {
-            return (Node) n.copy();
-        }
-
-    }
-
 }
