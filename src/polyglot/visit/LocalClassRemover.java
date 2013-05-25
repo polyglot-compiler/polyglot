@@ -42,7 +42,6 @@ import polyglot.ast.ConstructorDecl;
 import polyglot.ast.Expr;
 import polyglot.ast.Field;
 import polyglot.ast.Formal;
-import polyglot.ast.Id;
 import polyglot.ast.Local;
 import polyglot.ast.LocalClassDecl;
 import polyglot.ast.New;
@@ -221,11 +220,11 @@ public class LocalClassRemover extends ContextVisitor {
                 }
             }
 
-            Id name = nf.Id(pos, UniqueID.newID("Anonymous"));
+            String name = UniqueID.newID("Anonymous");
             ClassDecl cd =
                     nf.ClassDecl(pos,
                                  Flags.PUBLIC,
-                                 name,
+                                 nf.Id(pos, name),
                                  superClass,
                                  interfaces,
                                  body);
@@ -372,16 +371,16 @@ public class LocalClassRemover extends ContextVisitor {
                 // (may not be if superCi has a vararg formal)
                 argpos = neu.arguments().get(i).position();
             }
-            Id name = nf.Id(argpos, "a" + (i + 1));
+            String name = "a" + (i + 1);
             Formal f =
                     nf.Formal(argpos,
                               Flags.FINAL,
                               nf.CanonicalTypeNode(argpos, at),
-                              name);
-            Local l = nf.Local(argpos, name);
+                              nf.Id(argpos, name));
+            Local l = nf.Local(argpos, nf.Id(argpos, name));
 
             LocalInstance li =
-                    ts.localInstance(argpos, f.flags(), f.declType(), name.id());
+                    ts.localInstance(argpos, f.flags(), f.declType(), name);
             li.setNotConstant();
             f = f.localInstance(li);
             l = l.localInstance(li);
@@ -413,7 +412,7 @@ public class LocalClassRemover extends ContextVisitor {
         ConstructorDecl td =
                 nf.ConstructorDecl(pos,
                                    Flags.PRIVATE,
-                                   cd.id(),
+                                   nf.Id(cd.position(), cd.name()),
                                    formals,
                                    throwTypeNodes,
                                    nf.Block(pos, statements));
