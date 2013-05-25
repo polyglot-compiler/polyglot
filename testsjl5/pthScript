@@ -359,6 +359,7 @@ polyglot.ext.jl5.ExtensionInfo "-d out -classpath java-out -assert -noserial -po
         CovariantRet02.jl5;
         CovariantRet03.jl5;
         CovariantRet04.jl5;
+	CovariantRet05.jl5;
         EnumTest5.jl5;
         EnumTest8.jl5;
         Generics44.jl5 (Post, "Xlint");
@@ -721,6 +722,7 @@ polyglot.ext.jl5.ExtensionInfo "-d out -classpath java-out -removeJava5isms -enu
         CovariantRet02.jl5;
         CovariantRet03.jl5; #Known bug!
         CovariantRet04.jl5; #Known bug!
+	CovariantRet05.jl5 (Semantic, "incompatible return");
         EnumTest5.jl5;
         EnumTest8.jl5;
         Generics44.jl5;
@@ -772,4 +774,13 @@ polyglot.ext.jl5.ExtensionInfo "-d out -classpath java-out -removeJava5isms -enu
         PermissiveCasts01.jl5;
         PermissiveCasts02.jl5 (Semantic, "does not match");
         PermissiveCasts03.jl5 (Semantic, "Cannot cast");
+}
+
+# Use source/target 1.5 since we're expecting CovariantReturn to be allowed
+polyglot.ext.jl5.ExtensionInfo "-d out -classpath java-out -removeJava5isms -leaveCovariantReturns -enumImplClass MyEnum -assert -noserial -post \"javac -source 1.5 -target 1.5\" -morepermissiveinference" {
+        CovariantRet01.jl5;
+        CovariantRet02.jl5;
+        CovariantRet03.jl5;
+        CovariantRet04.jl5;
+	CovariantRet05.jl5;
 }

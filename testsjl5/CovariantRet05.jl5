@@ -1,0 +1,11 @@
+class C {
+    public C m() { return null; }
+}
+
+interface I {
+    public D m();
+}
+
+class D extends C implements I {
+    public D m() { return null; }
+}

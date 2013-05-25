@@ -121,7 +121,13 @@ public class ExtensionInfo extends JLExtensionInfo {
     @Override
     public polyglot.frontend.ExtensionInfo outputExtensionInfo() {
         if (this.outputExtensionInfo == null) {
-            this.outputExtensionInfo = new JLOutputExtensionInfo(this);
+            if (((JL5Options) this.getOptions()).leaveCovariantReturns) {
+                this.outputExtensionInfo =
+                        new CovarRetOutputExtensionInfo(this);
+            }
+            else {
+                this.outputExtensionInfo = new JLOutputExtensionInfo(this);
+            }
         }
         return outputExtensionInfo;
     }
