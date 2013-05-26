@@ -27,7 +27,7 @@
 package polyglot.ast;
 
 import java.util.Collections;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -197,7 +197,7 @@ public class SourceFile_c extends Node_c implements SourceFile {
     /** Type check the source file. */
     @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
-        Set<String> names = new HashSet<String>();
+        Set<String> names = new LinkedHashSet<String>();
         boolean hasPublic = false;
 
         for (TopLevelDecl d : decls) {

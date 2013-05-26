@@ -29,8 +29,9 @@ package polyglot.frontend;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -108,10 +109,10 @@ public abstract class Scheduler {
     public Scheduler(ExtensionInfo extInfo) {
         this.extInfo = extInfo;
 
-        this.jobs = new HashMap<Source, Job>();
-        this.goals = new HashMap<Goal, Goal>();
-        this.runCount = new HashMap<Goal, Integer>();
-        this.inWorklist = new HashSet<Goal>();
+        this.jobs = new LinkedHashMap<Source, Job>();
+        this.goals = new LinkedHashMap<Goal, Goal>();
+        this.runCount = new LinkedHashMap<Goal, Integer>();
+        this.inWorklist = new LinkedHashSet<Goal>();
         this.worklist = new LinkedList<Goal>();
         this.currentPass = null;
     }
@@ -393,7 +394,7 @@ public abstract class Scheduler {
      *         there was no error, even if the goal was not reached.
      */
     public boolean attemptGoal(Goal goal) {
-        return attemptGoal(goal, new HashSet<Goal>());
+        return attemptGoal(goal, new LinkedHashSet<Goal>());
     }
 
     protected boolean attemptGoal(Goal goal, Set<Goal> above) {
@@ -422,7 +423,7 @@ public abstract class Scheduler {
 
         boolean progress = true;
 
-        Set<Goal> newAbove = new HashSet<Goal>();
+        Set<Goal> newAbove = new LinkedHashSet<Goal>();
         newAbove.addAll(above);
         newAbove.add(goal);
 
@@ -952,7 +953,7 @@ public abstract class Scheduler {
         Report.report(2,
                       "  fontsize=20; center=true; ratio=auto; size = \"8.5,11\";");
 
-        Set<Goal> print = new HashSet<Goal>();
+        Set<Goal> print = new LinkedHashSet<Goal>();
 
         for (Goal g : new ArrayList<Goal>(goals.keySet())) {
             g = internGoal(g);

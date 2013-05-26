@@ -28,7 +28,7 @@ package polyglot.ast;
 
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -139,7 +139,7 @@ public class Switch_c extends Stmt_c implements Switch {
 
     @Override
     public Node checkConstants(ConstantChecker cc) throws SemanticException {
-        Collection<Object> labels = new HashSet<Object>();
+        Collection<Object> labels = new LinkedHashSet<Object>();
 
         // Check for duplicate labels.
         for (SwitchElement s : elements) {

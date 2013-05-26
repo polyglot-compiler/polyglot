@@ -32,7 +32,7 @@ import java.io.OutputStream;
 import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 
 import javax.tools.JavaFileObject;
@@ -74,7 +74,7 @@ public class Compiler {
      * post-compiler (e.g., javac).
      */
     private Collection<JavaFileObject> outputFiles =
-            new HashSet<JavaFileObject>();
+            new LinkedHashSet<JavaFileObject>();
 
     /**
      * Initialize the compiler.

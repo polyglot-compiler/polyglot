@@ -36,6 +36,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.StringTokenizer;
@@ -148,11 +149,11 @@ public class Options {
 
     public Options(ExtensionInfo extension, boolean checkFlags) {
         this.extension = extension;
-        this.flags = new HashSet<OptFlag<?>>();
+        this.flags = new LinkedHashSet<OptFlag<?>>();
         this.arguments = new ArrayList<Arg<?>>();
         populateFlags(flags);
         if (checkFlags) {
-            Set<String> ids = new HashSet<String>();
+            Set<String> ids = new LinkedHashSet<String>();
             for (OptFlag<?> flag : flags) {
                 for (String id : flag.ids()) {
                     if (!ids.add(id)) {
@@ -530,7 +531,7 @@ public class Options {
      *          The set of source filenames provided on the command line.
      */
     final protected void applyArgs(Set<String> source) throws UsageError {
-        Set<OptFlag<?>> seen = new HashSet<OptFlag<?>>();
+        Set<OptFlag<?>> seen = new LinkedHashSet<OptFlag<?>>();
         for (Arg<?> arg : arguments) {
             if (arg.flag == null) {
                 handleSourceArg(arg, source);
@@ -567,7 +568,7 @@ public class Options {
      *          The set of source filenames provided on the command line.
      */
     public void printCommandLine(PrintStream out) {
-        Set<OptFlag<?>> seen = new HashSet<OptFlag<?>>();
+        Set<OptFlag<?>> seen = new LinkedHashSet<OptFlag<?>>();
         for (Arg<?> arg : arguments) {
             if (arg.flag != null) {
                 seen.add(arg.flag);
