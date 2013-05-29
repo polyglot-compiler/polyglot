@@ -63,6 +63,7 @@ import polyglot.ext.jl5.ast.EnumConstantDecl;
 import polyglot.ext.jl5.ast.JL5EnumDecl;
 import polyglot.ext.jl5.types.EnumInstance;
 import polyglot.ext.jl5.types.JL5Flags;
+import polyglot.ext.jl5.types.JL5TypeSystem;
 import polyglot.frontend.Job;
 import polyglot.qq.QQ;
 import polyglot.types.ClassType;
@@ -101,6 +102,9 @@ public class RemoveEnums extends ContextVisitor {
     private ClassType enumDeclType = null;
 
     private final String enumImplClass;
+    private final String enumSetImplClass;
+
+    private final boolean translateEnumSet;
 
     /**
      * ClassMembers to add at the closest surrounding class body.
@@ -115,6 +119,9 @@ public class RemoveEnums extends ContextVisitor {
 
         this.enumImplClass =
                 ((JL5Options) job.extensionInfo().getOptions()).enumImplClass;
+        this.enumSetImplClass =
+                ((JL5Options) job.extensionInfo().getOptions()).enumSetImplClass;
+        translateEnumSet = !enumSetImplClass.equals("java.util.EnumSet");
     }
 
     @Override
@@ -155,6 +162,9 @@ public class RemoveEnums extends ContextVisitor {
         }
         if (n instanceof Case) {
             return translateCase((Case) n);
+        }
+        if (n instanceof TypeNode) {
+            return translateTypeNode((TypeNode) n);
         }
         return n;
     }
@@ -739,6 +749,19 @@ public class RemoveEnums extends ContextVisitor {
                 n.expr(nodeFactory().IntLit(Position.compilerGenerated(),
                                             IntLit.INT,
                                             n.value()));
+        return n;
+    }
+
+    private Node translateTypeNode(TypeNode n) throws SemanticException {
+        if (!translateEnumSet) return n;
+
+        JL5TypeSystem jl5ts = (JL5TypeSystem) ts;
+
+        if (ts.typeEquals(jl5ts.erasureType(n.type()),
+                          jl5ts.erasureType(ts.typeForName("java.util.EnumSet")))) {
+            return nf.CanonicalTypeNode(n.position(),
+                                        ts.typeForName(enumSetImplClass));
+        }
         return n;
     }
 }

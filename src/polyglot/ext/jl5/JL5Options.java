@@ -38,6 +38,7 @@ import polyglot.main.UsageError;
 public class JL5Options extends Options {
     public boolean translateEnums;
     public String enumImplClass;
+    public String enumSetImplClass;
     public boolean removeJava5isms;
     public boolean morePermissiveInference;
     public boolean morePermissiveCasts;
@@ -68,6 +69,22 @@ public class JL5Options extends Options {
                 return createDefault("java.lang.Enum");
             }
         });
+        flags.add(new OptFlag<String>(new String[] { "-enumSetImplClass",
+                                              "--enumSetImplClass" },
+                                      "<classname>",
+                                      "Runtime class to implement EnumSet",
+                                      "java.util.EnumSet") {
+            @Override
+            public Arg<String> handle(String[] args, int index)
+                    throws UsageError {
+                return createArg(index + 1, args[index]);
+            }
+
+            @Override
+            public Arg<String> defaultArg() {
+                return createDefault("java.util.EnumSet");
+            }
+        });
         flags.add(new Switch(new String[] { "-removeJava5isms",
                                      "--removeJava5isms" },
                              "Translate Java 5 language features to Java 1.4 features"));
@@ -93,6 +110,9 @@ public class JL5Options extends Options {
             // if anything other than java.lang.Enum, we may need to
             // translate Enums to normal Java classes
             translateEnums = enumImplClass.equals("java.lang.Enum");
+        }
+        else if (arg.flag().ids().contains("-enumSetImplClass")) {
+            this.enumSetImplClass = (String) arg.value();
         }
         else if (arg.flag().ids().contains("-removeJava5isms")) {
             this.removeJava5isms = (Boolean) arg.value();
