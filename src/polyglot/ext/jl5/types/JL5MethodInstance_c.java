@@ -31,6 +31,7 @@ import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import polyglot.ext.param.types.Subst;
 import polyglot.main.Report;
@@ -111,9 +112,17 @@ public class JL5MethodInstance_c extends MethodInstance_c implements
             l.addAll(implementedImpl(rt2));
         }
 
-        Type superType = rt.superType();
-        if (superType != null) {
-            l.addAll(implementedImpl(superType.toReference()));
+        Set<? extends Type> supers;
+        if (rt.isClass()) {
+            supers = ((JL5ClassType) rt).superclasses();
+        }
+        else {
+            supers = Collections.singleton(rt.superType());
+        }
+        for (Type superType : supers) {
+            if (superType != null && superType.isReference()) {
+                l.addAll(implementedImpl(superType.toReference()));
+            }
         }
 
         return l;

@@ -28,8 +28,10 @@ package polyglot.ext.jl5.types;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 import polyglot.frontend.Job;
 import polyglot.types.ClassType;
@@ -366,5 +368,16 @@ public class IntersectionType_c extends ClassType_c implements IntersectionType 
     @Override
     public Annotations annotations() {
         return ((JL5TypeSystem) this.typeSystem()).NoAnnotations();
+    }
+
+    @Override
+    public Set<Type> superclasses() {
+        Set<Type> classes = new LinkedHashSet<Type>();
+        for (Type t : bounds) {
+            if (t.isClass() && !t.toClass().flags().isInterface()) {
+                classes.add(t);
+            }
+        }
+        return classes;
     }
 }

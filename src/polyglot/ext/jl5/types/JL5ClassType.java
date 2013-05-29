@@ -27,6 +27,7 @@ package polyglot.ext.jl5.types;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 import polyglot.types.ClassType;
 import polyglot.types.Resolver;
@@ -69,4 +70,13 @@ public interface JL5ClassType extends ClassType {
      * a class file, this may contain only the retained annotations.
      */
     Annotations annotations();
+
+    /**
+     * All direct superclasses of the class. In JL5, a class may have more than
+     * one direct superclass. For those classes that have just one
+     * superclass, this will be equivalent to the singleton set containing
+     * this.supertype(). Note that the superclasses of a class
+     * is not in general the same as the supertypes.
+     */
+    Set<? extends Type> superclasses();
 }

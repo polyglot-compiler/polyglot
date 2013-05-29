@@ -26,6 +26,7 @@
 package polyglot.ext.jl5.types;
 
 import java.util.List;
+import java.util.Set;
 
 import polyglot.frontend.Job;
 import polyglot.types.ClassType;
@@ -167,6 +168,11 @@ public class RawClass_c extends JL5ClassType_c implements RawClass {
     @Override
     public Type superType() {
         return this.erased().superType();
+    }
+
+    @Override
+    public Set<? extends Type> superclasses() {
+        return this.erased().superclasses();
     }
 
     @Override

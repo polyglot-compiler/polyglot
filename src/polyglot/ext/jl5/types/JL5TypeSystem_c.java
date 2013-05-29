@@ -788,8 +788,19 @@ public class JL5TypeSystem_c extends
                 }
             }
 
-            if (type.toReference().superType() != null) {
-                typeQueue.addLast(type.toReference().superType());
+            if (type instanceof JL5ClassType) {
+                for (Type superT : ((JL5ClassType) type).superclasses()) {
+                    if (superT != null && superT.isReference()) {
+                        typeQueue.addLast(superT.toReference());
+                    }
+                }
+            }
+            else {
+                Type superT = type.toReference().superType();
+                if (superT != null && superT.isReference()) {
+                    typeQueue.addLast(superT.toReference());
+                }
+
             }
 
             typeQueue.addAll(type.toReference().interfaces());
@@ -1031,10 +1042,18 @@ public class JL5TypeSystem_c extends
     public List<ReferenceType> allAncestorsOf(ReferenceType rt) {
         Set<ReferenceType> ancestors = new LinkedHashSet<ReferenceType>();
         ancestors.add(rt);
-        ReferenceType superT = (ReferenceType) rt.superType();
-        if (superT != null) {
-            ancestors.add(superT);
-            ancestors.addAll(allAncestorsOf(superT));
+        Set<? extends Type> superClasses;
+        if (rt.isClass()) {
+            superClasses = ((JL5ClassType) rt).superclasses();
+        }
+        else {
+            superClasses = Collections.singleton(rt.superType());
+        }
+        for (Type superT : superClasses) {
+            if (superT.isReference()) {
+                ancestors.add((ReferenceType) superT);
+                ancestors.addAll(allAncestorsOf((ReferenceType) superT));
+            }
         }
         for (ReferenceType inter : rt.interfaces()) {
             ancestors.add(inter);

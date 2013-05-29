@@ -26,9 +26,11 @@
 
 package polyglot.ext.jl5.types;
 
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 import polyglot.ext.param.types.PClass;
 import polyglot.ext.param.types.SubstClassType_c;
@@ -377,6 +379,14 @@ public class JL5SubstClassType_c extends
     @Override
     public Annotations annotations() {
         return ((JL5TypeSystem) this.typeSystem()).NoAnnotations();
+    }
+
+    @Override
+    public Set<Type> superclasses() {
+        if (this.superType() == null) {
+            return Collections.<Type>emptySet();
+        }
+        return Collections.singleton(this.superType());
     }
 
 }

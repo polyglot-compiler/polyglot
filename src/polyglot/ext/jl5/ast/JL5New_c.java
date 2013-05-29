@@ -35,6 +35,7 @@ import polyglot.ast.New_c;
 import polyglot.ast.Node;
 import polyglot.ast.Special;
 import polyglot.ast.TypeNode;
+import polyglot.ext.jl5.types.JL5ClassType;
 import polyglot.ext.jl5.types.JL5ParsedClassType;
 import polyglot.ext.jl5.types.JL5SubstClassType;
 import polyglot.ext.jl5.types.JL5TypeSystem;
@@ -264,8 +265,7 @@ public class JL5New_c extends New_c implements JL5New {
         if (mt != null) {
             return mt;
         }
-        if (t.superType() != null) {
-            Type sup = t.superType();
+        for (Type sup : ((JL5ClassType) t).superclasses()) {
             if (sup instanceof ClassType) {
                 mt = findMemberClass(name, sup.toClass());
                 if (mt != null) {

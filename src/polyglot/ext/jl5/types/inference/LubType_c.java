@@ -121,7 +121,7 @@ public class LubType_c extends ClassType_c implements LubType {
                 }
                 else u_supers.add(u_super);
             }
-            
+
             Set<Type> est_of_u = new LinkedHashSet<Type>();
             for (Type super_of_u : u_supers) {
                 if (super_of_u instanceof JL5SubstClassType) {
@@ -419,6 +419,11 @@ public class LubType_c extends ClassType_c implements LubType {
     @Override
     public List<? extends ReferenceType> interfaces() {
         return Collections.<ReferenceType> emptyList();
+    }
+
+    @Override
+    public Set<? extends Type> superclasses() {
+        return Collections.<Type> singleton(ts.Object());
     }
 
     @Override

@@ -29,6 +29,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 import polyglot.ext.jl5.types.reflect.JL5LazyClassInitializer;
 import polyglot.ext.param.types.PClass;
@@ -361,6 +362,14 @@ public class JL5ParsedClassType_c extends ParsedClassType_c implements
     @Override
     public void setAnnotationsResolved(boolean annotationsResolved) {
         this.annotationsResolved = annotationsResolved;
+    }
+
+    @Override
+    public Set<Type> superclasses() {
+        if (this.superType() == null) {
+            return Collections.<Type>emptySet();
+        }
+        return Collections.singleton(this.superType());
     }
 
 }
