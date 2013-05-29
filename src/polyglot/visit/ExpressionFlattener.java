@@ -38,6 +38,7 @@ import polyglot.ast.Binary;
 import polyglot.ast.Binary.Operator;
 import polyglot.ast.Block;
 import polyglot.ast.BooleanLit;
+import polyglot.ast.Cast;
 import polyglot.ast.Conditional;
 import polyglot.ast.ConstructorCall;
 import polyglot.ast.Empty;
@@ -64,6 +65,7 @@ import polyglot.types.ArrayType;
 import polyglot.types.Flags;
 import polyglot.types.LocalInstance;
 import polyglot.types.NullType;
+import polyglot.types.SemanticException;
 import polyglot.types.Type;
 import polyglot.types.TypeSystem;
 import polyglot.util.InternalCompilerError;
@@ -180,7 +182,7 @@ public class ExpressionFlattener extends NodeVisitor {
         if (n instanceof Conditional) {
             Conditional c = (Conditional) n;
             Expr cond = visitEdge(c, c.cond());
-            LocalDecl d = createDecl(c, null);
+            LocalDecl d = createDecl(c.type(), c.position(), null);
             addStmt(d);
 
             Local l = createLocal(d);
@@ -254,6 +256,14 @@ public class ExpressionFlattener extends NodeVisitor {
             }
         }
 
+        // don't flatten constant expressions
+        if (n instanceof Expr) {
+            Expr e = (Expr) n;
+            if (e.isConstant()) {
+                addDontFlatten(e);
+            }
+        }
+
         return this;
     }
 
@@ -291,85 +301,95 @@ public class ExpressionFlattener extends NodeVisitor {
         }
 
         if (n instanceof Expr) {
-            boolean flatten = !dontFlatten((Expr) old);
+            Expr e = (Expr) n;
+            Expr o = (Expr) old;
+            return flattenExpr(e, o);
+        }
 
-            // special handling of ++ and -- (postfix versions are a pain)
-            if (n instanceof Unary && isAssign((Unary) n)) {
-                Unary u = (Unary) n;
-                Block inc = createBlock(createIncDec(u));
-                Local l = null;
-                Eval a = null;
+        return n;
+    }
 
-                if (flatten) {
-                    Expr e = u.expr();
-                    LocalDecl d = createDecl(e, null);
-                    addStmt(d);
-                    l = createLocal(d);
-                    a = createAssign(l, e);
-                }
+    public Expr flattenExpr(Expr n, Expr old) {
+        boolean flatten = !dontFlatten(old);
 
-                if (u.operator().isPrefix()) {
-                    inc = visitEdge(n, inc);
-                    addStmt(inc);
+        Type t = n.type();
 
-                    if (flatten) {
-                        addStmt(a);
-                    }
-                }
-                else {
-                    if (flatten) {
-                        addStmt(a);
-                    }
+        // special handling of ++ and -- (postfix versions are a pain)
+        if (n instanceof Unary && isAssign(n)) {
+            Unary u = (Unary) n;
+            Block inc = createBlock(createIncDec(u));
+            Local l = null;
+            Eval a = null;
 
-                    inc = visitEdge(n, inc);
-                    addStmt(inc);
-                }
-
-                if (flatten) {
-                    return l;
-                }
-                else {
-                    return nf.Local(n.position().startOf(),
-                                    nf.Id(n.position().startOf(), "dummy"));
-                }
-            }
-
-            // break up compound assignments (+= etc)
-            if (n instanceof Assign && !isSimpleAssign((Assign) n)) {
-                Assign a = (Assign) n;
-                a = createSimpleAssign(a);
-
-                if (!flatten) {
-                    addDontFlatten(a);
-                }
-
-                return visitEdge(n, a);
-            }
-
-            // flatten all other expressions
             if (flatten) {
-                Expr e = (Expr) n;
-                Expr val = e;
+                Expr e = u.expr();
+                LocalDecl d = createDecl(t, e.position(), null);
+                addStmt(d);
+                l = createLocal(d);
+                a = createAssign(l, e);
+            }
 
-                // if e is an assign, new value comes from lhs
-                if (e instanceof Assign) {
-                    Assign a = (Assign) e;
-                    val = (Expr) deepCopy(a.left());
-                    Eval s = createEval(a);
-                    addStmt(s);
+            if (u.operator().isPrefix()) {
+                inc = visitEdge(n, inc);
+                addStmt(inc);
+
+                if (flatten) {
+                    addStmt(a);
+                }
+            }
+            else {
+                if (flatten) {
+                    addStmt(a);
                 }
 
-                // create a local temp for the expression
-                if (!flatten_all_decls) {
-                    return createDeclWithInit(e, val);
-                }
-                else {
-                    LocalDecl d = createDecl(val, null);
-                    addStmt(d);
-                    Local l = createLocal(d);
-                    addStmt(createAssign(l, val));
-                    return createLocal(d);
-                }
+                inc = visitEdge(n, inc);
+                addStmt(inc);
+            }
+
+            if (flatten) {
+                return l;
+            }
+            else {
+                return nf.Local(n.position().startOf(),
+                                nf.Id(n.position().startOf(), "dummy"));
+            }
+        }
+
+        // break up compound assignments (+= etc)
+        if (n instanceof Assign && !isSimpleAssign(n)) {
+            Assign a = (Assign) n;
+            a = createSimpleAssign(a);
+
+            if (!flatten) {
+                addDontFlatten(a);
+            }
+
+            return visitEdge(n, a);
+        }
+
+        // flatten all other expressions
+        if (flatten) {
+            Expr e = n;
+            Expr val = e;
+
+            // if e is an assign, new value comes from lhs
+            if (e instanceof Assign) {
+                Assign a = (Assign) e;
+                val = (Expr) deepCopy(a.left());
+                Eval s = createEval(a);
+                addStmt(s);
+            }
+
+            // create a local temp for the expression
+            if (!flatten_all_decls) {
+                return createDeclWithInit(t, e.position(), val);
+            }
+            else {
+                LocalDecl d = createDecl(t, val.position(), null);
+                addStmt(d);
+                Local l = createLocal(d);
+                addStmt(createAssign(l, val));
+                return createLocal(d);
             }
         }
 
@@ -398,7 +418,7 @@ public class ExpressionFlattener extends NodeVisitor {
                 }
             }
             else {
-                LocalDecl d = createDecl(b, null);
+                LocalDecl d = createDecl(ts.Boolean(), b.position(), null);
                 addStmt(d);
 
                 Local r = createLocal(d);
@@ -423,7 +443,7 @@ public class ExpressionFlattener extends NodeVisitor {
                 }
             }
             else {
-                LocalDecl d = createDecl(b, null);
+                LocalDecl d = createDecl(ts.Boolean(), b.position(), null);
                 addStmt(d);
 
                 Local r = createLocal(d);
@@ -442,18 +462,29 @@ public class ExpressionFlattener extends NodeVisitor {
         Expr e = d.init();
 
         if (e != null) {
-            d = d.init(null);
+            if (d.flags().isFinal()) {
+                d = d.init(null);
+            }
+            else {
+                d = d.init(defaultValue(d.declType(), d.position()));
+            }
             addStmt(d);
             // create new array expression 
             // if initializer is an arrayinit
             if (e instanceof ArrayInit) {
                 if (e.type() instanceof ArrayType) {
                     ArrayType at = (ArrayType) e.type();
-                    e = createNewArray((ArrayInit) e, at.base(), at.dims());
+                    e =
+                            createNewArray((ArrayInit) e,
+                                           at.ultimateBase(),
+                                           at.dims());
                 }
                 else if (e.type() instanceof NullType) {
                     ArrayType at = (ArrayType) d.type().type();
-                    e = createNewArray((ArrayInit) e, at.base(), at.dims());
+                    e =
+                            createNewArray((ArrayInit) e,
+                                           at.ultimateBase(),
+                                           at.dims());
                 }
                 else {
                     throw new InternalCompilerError("Unexpected type for array init: "
@@ -462,6 +493,10 @@ public class ExpressionFlattener extends NodeVisitor {
             }
             Local l = createLocal(d);
             n = createAssign(l, e);
+        }
+        else {
+            if (!d.flags().isFinal())
+                n = d.init(defaultValue(d.declType(), d.position()));
         }
         return n;
     }
@@ -479,11 +514,12 @@ public class ExpressionFlattener extends NodeVisitor {
 
     /**
      * Create a local declaration that can take a value of the
-     * same type as e, and initialize it to the expression val.
+     * type t, and initialize it to the expression val.
      * Return the new local that was declared.
+     * @throws SemanticException 
      */
-    protected Local createDeclWithInit(Expr e, Expr val) {
-        LocalDecl d = createDecl(e, val);
+    protected Local createDeclWithInit(Type t, Position pos, Expr val) {
+        LocalDecl d = createDecl(t, pos, val);
         addStmt(d);
         // return the local temp instead of the complex expression
         Local l = createLocal(d);
@@ -593,21 +629,35 @@ public class ExpressionFlattener extends NodeVisitor {
         return s;
     }
 
+    private Expr defaultValue(Type t, Position pos) {
+        // XXX is this factored out somewhere in the code base?
+        if (t.isPrimitive()) {
+            if (t.isBoolean())
+                return nf.BooleanLit(pos, false).type(ts.Boolean());
+            if (t.isNumeric()) return nf.IntLit(pos, IntLit.INT, 0).type(t);
+            throw new InternalCompilerError("Unexpected primitive type: " + t);
+        }
+        else {
+            return nf.NullLit(pos).type(ts.Null());
+        }
+    }
+
     /**
-     * Create a declaration for a local variable with
-     * the same type as the expression e, with initializing expression
-     * init. Return the LocalDecl produced. Do NOT add the local decl
+     * Create a declaration for a local variable with the type t at
+     * position pos, with initializing expression init. 
+     * Return the LocalDecl produced. Do NOT add the local decl
      * to the statements
      */
-    protected LocalDecl createDecl(Expr e, Expr init) {
+    protected LocalDecl createDecl(Type t, Position pos, Expr init) {
         String name = newId();
-        Position pos = e.position();
-        LocalInstance li = ts.localInstance(pos, Flags.NONE, typeOf(e), name);
+        LocalInstance li = ts.localInstance(pos, Flags.NONE, t, name);
+        if (init == null) {
+            init = defaultValue(t, pos);
+        }
         LocalDecl d =
                 nf.LocalDecl(pos,
                              Flags.NONE,
-                             (TypeNode) postCreate(nf.CanonicalTypeNode(pos,
-                                                                        typeOf(e))),
+                             (TypeNode) postCreate(nf.CanonicalTypeNode(pos, t)),
                              (Id) postCreate(nf.Id(pos, name)),
                              init);
         d = d.localInstance(li);
@@ -646,20 +696,36 @@ public class ExpressionFlattener extends NodeVisitor {
     }
 
     /**
-     * Convert an assignment "l op= r" to "l = l op r"
+     * Convert an assignment "l op= r" to "l = (L)(l op r)" where L is the type of l
      */
     protected Assign createSimpleAssign(Assign a) {
         Position pos = a.position();
         Operator op = a.operator().binaryOperator();
-        a =
-                (Assign) nf.Assign(pos,
-                                   a.left(),
-                                   Assign.ASSIGN,
-                                   ((Binary) postCreate(nf.Binary(pos,
-                                                                  (Expr) deepCopy(a.left()),
-                                                                  op,
-                                                                  a.right()))).type(typeOf(a)))
-                           .type(typeOf(a));
+
+        Binary b =
+                (Binary) postCreate(nf.Binary(pos,
+                                              (Expr) deepCopy(a.left()),
+                                              op,
+                                              a.right()));
+        if (typeOf(a.left()).isNumeric() && typeOf(a.right()).isNumeric()) {
+            try {
+                b =
+                        (Binary) b.type(ts.promote(typeOf(a.left()),
+                                                   typeOf(a.right())));
+            }
+            catch (SemanticException e) {
+                throw new InternalCompilerError(e);
+            }
+        }
+        else {
+            b = (Binary) b.type(a.left().type());
+        }
+        TypeNode tn =
+                (TypeNode) postCreate(nf.CanonicalTypeNode(pos, a.left().type()));
+        Cast c = (Cast) postCreate(nf.Cast(pos, tn, b));
+        c = (Cast) c.type(a.left().type());
+
+        a = (Assign) nf.Assign(pos, a.left(), Assign.ASSIGN, c).type(typeOf(a));
         a = (Assign) postCreate(a);
         return a;
     }
@@ -667,6 +733,7 @@ public class ExpressionFlattener extends NodeVisitor {
     /**
      * Convert an increment or decrement to an assignment,
      * e.g. "i++" to "i = i + 1"
+     * @throws SemanticException 
      */
     protected Eval createIncDec(Unary u) {
         Position pos = u.position();
@@ -687,11 +754,18 @@ public class ExpressionFlattener extends NodeVisitor {
                     nf.Cast(pos, nf.CanonicalTypeNode(pos, ts.Int()), e2)
                       .type(ts.Int());
 
-        Expr plus = nf.Binary(pos, e2, op, createInt(1)).type(typeOf(e2));
-        if (e.type().isChar())
+        Expr plus;
+        try {
             plus =
-                    nf.Cast(pos, nf.CanonicalTypeNode(pos, ts.Char()), plus)
-                      .type(ts.Char());
+                    nf.Binary(pos, e2, op, createInt(1))
+                      .type(ts.promote(typeOf(e2)));
+        }
+        catch (SemanticException se) {
+            throw new InternalCompilerError(se);
+        }
+        plus =
+                nf.Cast(pos, nf.CanonicalTypeNode(pos, e.type()), plus)
+                  .type(e.type());
 
         Eval a = createAssign(e, ((Expr) postCreate(plus)).type(typeOf(e)));
         return a;
