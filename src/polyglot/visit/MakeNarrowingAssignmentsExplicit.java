@@ -4,6 +4,7 @@ import polyglot.ast.Assign;
 import polyglot.ast.Cast;
 import polyglot.ast.Expr;
 import polyglot.ast.FieldDecl;
+import polyglot.ast.LocalDecl;
 import polyglot.ast.Node;
 import polyglot.ast.NodeFactory;
 import polyglot.types.Type;
@@ -41,6 +42,10 @@ public class MakeNarrowingAssignmentsExplicit extends NodeVisitor {
         if (n instanceof FieldDecl && ((FieldDecl) n).init() != null) {
             FieldDecl fd = (FieldDecl) n;
             return fd.init(rewriteRHS(fd.declType(), fd.init()));
+        }
+        if (n instanceof LocalDecl && ((LocalDecl) n).init() != null) {
+            LocalDecl ld = (LocalDecl) n;
+            return ld.init(rewriteRHS(ld.declType(), ld.init()));
         }
         if (n instanceof Assign
                 && Assign.ASSIGN.equals(((Assign) n).operator())) {
