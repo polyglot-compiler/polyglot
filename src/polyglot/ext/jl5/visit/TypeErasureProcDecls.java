@@ -309,7 +309,9 @@ public class TypeErasureProcDecls extends ErrorHandlingVisitor {
                 s = nodeFactory().Eval(pos, c);
             }
             else {
-                s = nodeFactory().Return(pos, c);
+                Cast cast = nodeFactory().Cast(pos, returnType, c);
+                cast = (Cast) cast.type(returnType.type());
+                s = nodeFactory().Return(pos, cast);
             }
             body = nodeFactory().Block(pos, s);
         }
