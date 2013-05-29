@@ -37,6 +37,7 @@ import polyglot.types.Type;
 import polyglot.types.TypeSystem;
 import polyglot.util.CodeWriter;
 import polyglot.visit.AmbiguityRemover;
+import polyglot.visit.AscriptionVisitor;
 import polyglot.visit.ConstantChecker;
 import polyglot.visit.ExceptionChecker;
 import polyglot.visit.NodeVisitor;
@@ -222,6 +223,21 @@ public interface NodeOps {
      * @param tc The type checking visitor.
      */
     Node typeCheck(TypeChecker tc) throws SemanticException;
+
+    /**
+     * Get the expected type of a child expression of <code>this</code>.
+     * The expected type is determined by the context in that the child occurs
+     * (e.g., for <code>x = e</code>, the expected type of <code>e</code> is
+     * the declared type of <code>x</code>.
+     *
+     * The expected type should impose the least constraints on the child's
+     * type that are allowed by the parent node.
+     *
+     * @param child A child expression of this node.
+     * @param av An ascription visitor.
+     * @return The expected type of <code>child</code>.
+     */
+    Type childExpectedType(Expr child, AscriptionVisitor av);
 
     /**
      * Check if the node is a compile-time constant.

@@ -26,6 +26,8 @@
 package polyglot.ext.jl5.ast;
 
 import polyglot.ast.Assign;
+import polyglot.ast.Assign.Operator;
+import polyglot.ast.Expr;
 import polyglot.ast.Node;
 import polyglot.ast.Variable;
 import polyglot.ext.jl5.types.JL5TypeSystem;
@@ -34,10 +36,69 @@ import polyglot.types.Type;
 import polyglot.types.TypeSystem;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.SerialVersionUID;
+import polyglot.visit.AscriptionVisitor;
 import polyglot.visit.TypeChecker;
 
 public class JL5AssignDel extends JL5Del {
     private static final long serialVersionUID = SerialVersionUID.generate();
+
+    @Override
+    public Type childExpectedType(Expr child, AscriptionVisitor av) {
+        Assign a = (Assign) this.node();
+        Expr left = a.left();
+        Expr right = a.right();
+        Operator op = a.operator();
+        if (child == left) {
+            return child.type();
+        }
+
+        // See JLS 2nd ed. 15.26.2
+        TypeSystem ts = av.typeSystem();
+        if (op == Assign.ASSIGN) {
+            return left.type();
+        }
+        if (op == Assign.ADD_ASSIGN) {
+            if (ts.typeEquals(ts.String(), left.type())) {
+                return child.type();
+            }
+        }
+        if (op == Assign.ADD_ASSIGN || op == Assign.SUB_ASSIGN
+                || op == Assign.MUL_ASSIGN || op == Assign.DIV_ASSIGN
+                || op == Assign.MOD_ASSIGN || op == Assign.SHL_ASSIGN
+                || op == Assign.SHR_ASSIGN || op == Assign.USHR_ASSIGN) {
+            if (isNumeric(left.type()) && isNumeric(right.type())) {
+                try {
+                    return ts.promote(numericType(left.type()),
+                                      numericType(child.type()));
+                }
+                catch (SemanticException e) {
+                    throw new InternalCompilerError(e);
+                }
+            }
+            // Assume the typechecker knew what it was doing
+            return child.type();
+        }
+        if (op == Assign.BIT_AND_ASSIGN || op == Assign.BIT_OR_ASSIGN
+                || op == Assign.BIT_XOR_ASSIGN) {
+            if (left.type().isBoolean()) {
+                return ts.Boolean();
+            }
+            if (isNumeric(left.type()) && isNumeric(right.type())) {
+                try {
+                    return ts.promote(numericType(left.type()),
+                                      numericType(child.type()));
+                }
+                catch (SemanticException e) {
+                    throw new InternalCompilerError(e);
+                }
+            }
+            // Assume the typechecker knew what it was doing
+            return child.type();
+        }
+
+        throw new InternalCompilerError("Unrecognized assignment operator "
+                + op + ".");
+    }
 
     @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {

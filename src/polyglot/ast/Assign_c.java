@@ -208,13 +208,52 @@ public abstract class Assign_c extends Expr_c implements Assign {
 
     @Override
     public Type childExpectedType(Expr child, AscriptionVisitor av) {
-        if (child == right) {
-            // the expected type of the RHS is the type
-            // of the LHS.
-            return left.type();
+        if (child == left) {
+            return child.type();
         }
 
-        return child.type();
+        // See JLS 2nd ed. 15.26.2
+        TypeSystem ts = av.typeSystem();
+        if (op == ASSIGN) {
+            return left.type();
+        }
+        if (op == ADD_ASSIGN) {
+            if (ts.typeEquals(ts.String(), left.type())) {
+                return child.type();
+            }
+        }
+        if (op == ADD_ASSIGN || op == SUB_ASSIGN || op == MUL_ASSIGN
+                || op == DIV_ASSIGN || op == MOD_ASSIGN || op == SHL_ASSIGN
+                || op == SHR_ASSIGN || op == USHR_ASSIGN) {
+            if (left.type().isNumeric() && right.type().isNumeric()) {
+                try {
+                    return ts.promote(left.type(), child.type());
+                }
+                catch (SemanticException e) {
+                    throw new InternalCompilerError(e);
+                }
+            }
+            // Assume the typechecker knew what it was doing
+            return child.type();
+        }
+        if (op == BIT_AND_ASSIGN || op == BIT_OR_ASSIGN || op == BIT_XOR_ASSIGN) {
+            if (left.type().isBoolean()) {
+                return ts.Boolean();
+            }
+            if (left.type().isNumeric() && right.type().isNumeric()) {
+                try {
+                    return ts.promote(left.type(), child.type());
+                }
+                catch (SemanticException e) {
+                    throw new InternalCompilerError(e);
+                }
+            }
+            // Assume the typechecker knew what it was doing
+            return child.type();
+        }
+
+        throw new InternalCompilerError("Unrecognized assignment operator "
+                + op + ".");
     }
 
     /** Get the throwsArithmeticException of the expression. */

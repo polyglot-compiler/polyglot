@@ -38,6 +38,7 @@ import polyglot.types.TypeSystem;
 import polyglot.util.CodeWriter;
 import polyglot.util.SerialVersionUID;
 import polyglot.visit.AmbiguityRemover;
+import polyglot.visit.AscriptionVisitor;
 import polyglot.visit.ConstantChecker;
 import polyglot.visit.ExceptionChecker;
 import polyglot.visit.NodeVisitor;
@@ -233,6 +234,24 @@ public class JL_c extends Ext_c implements JL {
     @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
         return jl().typeCheck(tc);
+    }
+
+    /**
+     * Get the expected type of a child expression of <code>this</code>.
+     * The expected type is determined by the context in that the child occurs
+     * (e.g., for <code>x = e</code>, the expected type of <code>e</code> is
+     * the declared type of <code>x</code>.
+     *
+     * The expected type should impose the least constraints on the child's
+     * type that are allowed by the parent node.
+     *
+     * @param child A child expression of this node.
+     * @param av An ascription visitor.
+     * @return The expected type of <code>child</code>.
+     */
+    @Override
+    public Type childExpectedType(Expr child, AscriptionVisitor av) {
+        return jl().childExpectedType(child, av);
     }
 
     @Override

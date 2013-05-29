@@ -88,7 +88,7 @@ public class AscriptionVisitor extends ContextVisitor {
         Type t = null;
 
         if (parent != null && n instanceof Expr) {
-            t = parent.childExpectedType((Expr) n, this);
+            t = parent.del().childExpectedType((Expr) n, this);
         }
 
         AscriptionVisitor v = (AscriptionVisitor) copy();

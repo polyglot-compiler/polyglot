@@ -510,14 +510,7 @@ public class Binary_c extends Expr_c implements Binary {
 
             if (op == ADD || op == SUB || op == MUL || op == DIV || op == MOD) {
                 if (child.type().isNumeric() && other.type().isNumeric()) {
-                    Type t = ts.promote(child.type(), other.type());
-
-                    if (ts.isImplicitCastValid(t, av.toType())) {
-                        return t;
-                    }
-                    else {
-                        return av.toType();
-                    }
+                    return ts.promote(child.type(), other.type());
                 }
 
                 return child.type();
@@ -525,19 +518,7 @@ public class Binary_c extends Expr_c implements Binary {
 
             if (op == SHL || op == SHR || op == USHR) {
                 if (child.type().isNumeric() && other.type().isNumeric()) {
-                    if (child == left) {
-                        Type t = ts.promote(child.type());
-
-                        if (ts.isImplicitCastValid(t, av.toType())) {
-                            return t;
-                        }
-                        else {
-                            return av.toType();
-                        }
-                    }
-                    else {
-                        return ts.promote(child.type());
-                    }
+                    return ts.promote(child.type());
                 }
 
                 return child.type();
