@@ -1029,7 +1029,7 @@ public class JL5TypeSystem_c extends
 
     @Override
     public List<ReferenceType> allAncestorsOf(ReferenceType rt) {
-        Set<ReferenceType> ancestors = new HashSet<ReferenceType>();
+        Set<ReferenceType> ancestors = new LinkedHashSet<ReferenceType>();
         ancestors.add(rt);
         ReferenceType superT = (ReferenceType) rt.superType();
         if (superT != null) {
