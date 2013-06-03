@@ -349,7 +349,8 @@ public class JL5TypeSystem_c extends
                     + ei.container() + " and " + ei2.container() + ".");
         }
 
-        if (currClass != null && !isAccessible(ei, currClass)) {
+        if (currClass != null && !isAccessible(ei, currClass)
+                && !isInherited(ei, currClass)) {
             throw new SemanticException("Cannot access " + ei + ".");
         }
 
@@ -2572,7 +2573,8 @@ public class JL5TypeSystem_c extends
                     + ai.container() + " and " + ai2.container() + ".");
         }
 
-        if (currClass != null && !isAccessible(ai, currClass)) {
+        if (currClass != null && !isAccessible(ai, currClass)
+                && !isInherited(ai, currClass)) {
             throw new SemanticException("Cannot access " + ai + ".");
         }
         return ai;
