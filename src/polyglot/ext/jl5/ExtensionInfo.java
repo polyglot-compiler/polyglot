@@ -45,6 +45,7 @@ import polyglot.frontend.JLExtensionInfo;
 import polyglot.frontend.Parser;
 import polyglot.frontend.Scheduler;
 import polyglot.main.Options;
+import polyglot.main.Version;
 import polyglot.translate.JLOutputExtensionInfo;
 import polyglot.types.TypeSystem;
 import polyglot.types.reflect.ClassFile;
@@ -131,4 +132,10 @@ public class ExtensionInfo extends JLExtensionInfo {
         }
         return outputExtensionInfo;
     }
+
+    @Override
+    public Version version() {
+        return new JL5Version();
+    }
+
 }
