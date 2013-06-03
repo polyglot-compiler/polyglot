@@ -28,7 +28,6 @@ package polyglot.ext.jl5.ast;
 import java.util.Collections;
 import java.util.List;
 
-import polyglot.ast.ArrayInit;
 import polyglot.ast.Block;
 import polyglot.ast.CodeBlock;
 import polyglot.ast.Expr;
@@ -48,6 +47,7 @@ import polyglot.types.MemberInstance;
 import polyglot.types.MethodInstance;
 import polyglot.types.ProcedureInstance;
 import polyglot.types.SemanticException;
+import polyglot.types.Type;
 import polyglot.util.CodeWriter;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
@@ -64,12 +64,12 @@ public class AnnotationElemDecl_c extends Term_c implements AnnotationElemDecl {
 
     protected TypeNode type;
     protected Flags flags;
-    protected Expr defaultVal;
+    protected Term defaultVal;
     protected Id name;
     protected AnnotationTypeElemInstance ai;
 
     public AnnotationElemDecl_c(Position pos, Flags flags, TypeNode type,
-            Id name, Expr defaultVal) {
+            Id name, Term defaultVal) {
         super(pos);
         this.type = type;
         this.flags = flags;
@@ -118,7 +118,7 @@ public class AnnotationElemDecl_c extends Term_c implements AnnotationElemDecl {
     }
 
     @Override
-    public Expr defaultVal() {
+    public Term defaultVal() {
         return defaultVal;
     }
 
@@ -243,17 +243,30 @@ public class AnnotationElemDecl_c extends Term_c implements AnnotationElemDecl {
 
         // check default value matches type
         if (defaultVal != null) {
-            if (defaultVal instanceof ArrayInit) {
-                ((ArrayInit) defaultVal).typeCheckElements(type.type());
+            Type defaultValType;
+            if (defaultVal instanceof Expr) {
+                defaultValType = ((Expr) defaultVal).type();
+            }
+            else if (defaultVal instanceof AnnotationElem) {
+                defaultValType =
+                        ((AnnotationElem) defaultVal).typeName().type();
             }
             else {
-                if (!ts.isImplicitCastValid(defaultVal.type(), type.type())
-                        && !ts.equals(defaultVal.type(), type.type())
-                        && !ts.numericConversionValid(type.type(),
-                                                      defaultVal.constantValue())
-                        && !ts.isBaseCastValid(defaultVal.type(), type.type())
-                        && !ts.numericConversionBaseValid(type.type(),
-                                                          defaultVal.constantValue())) {
+                throw new InternalCompilerError("Don't know how to deal with default value of kind "
+                                                        + defaultVal.getClass(),
+                                                defaultVal.position());
+            }
+            if (defaultVal instanceof ElementValueArrayInit) {
+                ((ElementValueArrayInit) defaultVal).typeCheckElements(type.type());
+            }
+            else {
+                if (!ts.isImplicitCastValid(defaultValType, type.type())
+                        && !ts.equals(defaultValType, type.type())
+                        && !(defaultVal instanceof Expr && ts.numericConversionValid(type.type(),
+                                                                                     ((Expr) defaultVal).constantValue()))
+                        && !ts.isBaseCastValid(defaultValType, type.type())
+                        && !(defaultVal instanceof Expr && ts.numericConversionBaseValid(type.type(),
+                                                                                         ((Expr) defaultVal).constantValue()))) {
                     throw new SemanticException("The type of the default value: "
                                                         + defaultVal
                                                         + " does not match the annotation element type: "

@@ -56,6 +56,9 @@ public class JL5CanonicalTypeNode_c extends polyglot.ast.CanonicalTypeNode_c {
         super(pos, makeRawIfNeeded(type, pos));
     }
 
+    /**
+     * Documentation needed
+     */
     private static Type makeRawIfNeeded(Type type, Position pos) {
         if (type.isClass()) {
             JL5TypeSystem ts = (JL5TypeSystem) type.typeSystem();

@@ -50,4 +50,6 @@ public interface JL5DelFactory extends DelFactory {
 
     JL delElementValuePair();
 
+    JL delElementValueArrayInit();
+
 }

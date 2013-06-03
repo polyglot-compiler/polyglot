@@ -59,6 +59,7 @@ import polyglot.ast.Special;
 import polyglot.ast.Stmt;
 import polyglot.ast.Switch;
 import polyglot.ast.SwitchElement;
+import polyglot.ast.Term;
 import polyglot.ast.TypeNode;
 import polyglot.ast.Unary;
 import polyglot.types.Flags;
@@ -134,7 +135,7 @@ public class JL5NodeFactory_c extends NodeFactory_c implements JL5NodeFactory {
 
     @Override
     public AnnotationElemDecl AnnotationElemDecl(Position pos, Flags flags,
-            TypeNode type, Id name, Expr defaultValue) {
+            TypeNode type, Id name, Term defaultValue) {
         AnnotationElemDecl n =
                 new AnnotationElemDecl_c(pos, flags, type, name, defaultValue);
         n = (AnnotationElemDecl) n.ext(extFactory().extAnnotationElemDecl());
@@ -159,14 +160,14 @@ public class JL5NodeFactory_c extends NodeFactory_c implements JL5NodeFactory {
 
     @Override
     public AnnotationElem SingleElementAnnotationElem(Position pos,
-            TypeNode name, Expr value) {
+            TypeNode name, Term value) {
         List<ElementValuePair> l = new LinkedList<ElementValuePair>();
         l.add(ElementValuePair(pos, this.Id(pos, "value"), value));
         return NormalAnnotationElem(pos, name, l);
     }
 
     @Override
-    public ElementValuePair ElementValuePair(Position pos, Id name, Expr value) {
+    public ElementValuePair ElementValuePair(Position pos, Id name, Term value) {
         ElementValuePair n = new ElementValuePair_c(pos, name, value);
         n = (ElementValuePair) n.ext(extFactory().extElementValuePair());
         n = (ElementValuePair) n.del(delFactory().delElementValuePair());
@@ -684,6 +685,23 @@ public class JL5NodeFactory_c extends NodeFactory_c implements JL5NodeFactory {
         n = (FieldDecl) n.ext(extFactory().extFieldDecl());
         n = (FieldDecl) n.del(delFactory().delFieldDecl());
         return n;
+    }
+
+    @Override
+    public ElementValueArrayInit ElementValueArrayInit(Position pos,
+            List<Term> elements) {
+        ElementValueArrayInit n = new ElementValueArrayInit_c(pos, elements);
+        n =
+                (ElementValueArrayInit) n.ext(extFactory().extElementValueArrayInit());
+        n =
+                (ElementValueArrayInit) n.del(delFactory().delElementValueArrayInit());
+        return n;
+    }
+
+    @Override
+    public ElementValueArrayInit ElementValueArrayInit(Position pos) {
+        return ElementValueArrayInit(pos, Collections.<Term> emptyList());
+
     }
 
 }

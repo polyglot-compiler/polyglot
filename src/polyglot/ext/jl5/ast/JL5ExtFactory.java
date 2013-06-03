@@ -50,4 +50,6 @@ public interface JL5ExtFactory extends ExtFactory {
 
     Ext extElementValuePair();
 
+    Ext extElementValueArrayInit();
+
 }

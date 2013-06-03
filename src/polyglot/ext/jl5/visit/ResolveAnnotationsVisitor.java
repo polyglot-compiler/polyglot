@@ -72,7 +72,7 @@ public class ResolveAnnotationsVisitor extends ContextVisitor {
 
                 tc = (TypeChecker) tc.context(this.context());
                 elem = (AnnotationElem) elem.visit(tc);
-                if (!elem.type().isCanonical()) {
+                if (!elem.typeName().type().isCanonical()) {
                     throw new InternalCompilerError("Couldn't type check "
                                                             + elem
                                                             + " during annotation resolution",

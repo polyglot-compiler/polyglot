@@ -154,6 +154,17 @@ public class JL5DelFactory_c extends AbstractDelFactory_c implements
         return postDelElementValuePair(e);
     }
 
+    @Override
+    public JL delElementValueArrayInit() {
+        JL e = delElementValueArrayInitImpl();
+
+        if (nextDelFactory() != null) {
+            JL e2 = nextDelFactory().delElementValueArrayInit();
+            e = composeDels(e, e2);
+        }
+        return postDelElementValueArrayInit(e);
+    }
+
     public JL delEnumDeclImpl() {
         return this.delClassDeclImpl();
     }
@@ -213,7 +224,7 @@ public class JL5DelFactory_c extends AbstractDelFactory_c implements
     }
 
     private JL delNormalAnnotationElemImpl() {
-        return this.delExprImpl();
+        return this.delTermImpl();
     }
 
     private JL delMarkerAnnotationElemImpl() {
@@ -225,7 +236,11 @@ public class JL5DelFactory_c extends AbstractDelFactory_c implements
     }
 
     private JL delElementValuePairImpl() {
-        return this.delExprImpl();
+        return this.delTermImpl();
+    }
+
+    private JL delElementValueArrayInitImpl() {
+        return this.delTermImpl();
     }
 
     private JL postDelNormalAnnotationElem(JL e) {
@@ -241,6 +256,10 @@ public class JL5DelFactory_c extends AbstractDelFactory_c implements
     }
 
     private JL postDelElementValuePair(JL e) {
+        return e;
+    }
+
+    private JL postDelElementValueArrayInit(JL e) {
         return e;
     }
 

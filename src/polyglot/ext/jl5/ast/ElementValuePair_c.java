@@ -27,7 +27,6 @@ package polyglot.ext.jl5.ast;
 
 import java.util.List;
 
-import polyglot.ast.Expr;
 import polyglot.ast.Id;
 import polyglot.ast.Node;
 import polyglot.ast.Term;
@@ -47,9 +46,9 @@ public class ElementValuePair_c extends Term_c implements ElementValuePair {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
     protected Id name;
-    protected Expr value;
+    protected Term value;
 
-    public ElementValuePair_c(Position pos, Id name, Expr value) {
+    public ElementValuePair_c(Position pos, Id name, Term value) {
         super(pos);
         this.name = name;
         this.value = value;
@@ -75,11 +74,11 @@ public class ElementValuePair_c extends Term_c implements ElementValuePair {
     }
 
     @Override
-    public Expr value() {
+    public Term value() {
         return value;
     }
 
-    public ElementValuePair value(Expr value) {
+    public ElementValuePair value(Term value) {
         if (!value.equals(this.value)) {
             ElementValuePair_c n = (ElementValuePair_c) copy();
             n.value = value;
@@ -90,7 +89,7 @@ public class ElementValuePair_c extends Term_c implements ElementValuePair {
 
     @Override
     public Node visitChildren(NodeVisitor v) {
-        Expr value = (Expr) visitChild(this.value, v);
+        Term value = (Term) visitChild(this.value, v);
         return value(value);
     }
 

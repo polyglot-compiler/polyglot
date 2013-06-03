@@ -23,15 +23,45 @@
  *
  * See README for contributors.
  ******************************************************************************/
+
 package polyglot.ext.jl5.ast;
 
-import polyglot.ast.Id;
+import java.util.List;
+
 import polyglot.ast.Term;
+import polyglot.types.SemanticException;
+import polyglot.types.Type;
 
-public interface ElementValuePair extends Term {
-    public String name();
+/**
+ * An <code>ArrayInit</code> is an immutable representation of
+ * an array initializer, such as { 3, 1, { 4, 1, 5 } }.  Note that
+ * the elements of these array may be expressions of any type (e.g.,
+ * <code>Call</code>).
+ */
+public interface ElementValueArrayInit extends Term {
+    /**
+     * Get the initializer elements.
+     * @return A list of {@link polyglot.ast.Term Term}. Are acutally either expressions of
+     * AnnotationElems.
+     */
+    List<Term> elements();
 
-    public Id id();
+    /**
+     * Set the initializer elements.
+     * @param elements A list of {@link polyglot.ast.Term Term}.
+     */
+    ElementValueArrayInit elements(List<Term> elements);
 
-    public Term value();
+    /**
+     * Type check the individual elements of the array initializer against the
+     * left-hand-side type.  Each element is checked to see if it can be
+     * assigned to a variable of type lhsType.
+     * @param lhsType Type to compare against.
+     * @exception SemanticException if there is a type error.
+     */
+    void typeCheckElements(Type lhsType) throws SemanticException;
+
+    Type type();
+
+    ElementValueArrayInit type(Type t);
 }

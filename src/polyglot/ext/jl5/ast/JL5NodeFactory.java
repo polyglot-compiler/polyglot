@@ -41,6 +41,7 @@ import polyglot.ast.New;
 import polyglot.ast.NodeFactory;
 import polyglot.ast.Receiver;
 import polyglot.ast.Stmt;
+import polyglot.ast.Term;
 import polyglot.ast.TypeNode;
 import polyglot.types.Flags;
 import polyglot.util.Position;
@@ -139,7 +140,7 @@ public interface JL5NodeFactory extends NodeFactory {
             List<TypeNode> typeArgs, Expr outer, List<Expr> args);
 
     AnnotationElemDecl AnnotationElemDecl(Position pos, Flags flags,
-            TypeNode type, Id name, Expr def);
+            TypeNode type, Id name, Term def);
 
     AnnotationElem NormalAnnotationElem(Position pos, TypeNode name,
             List<ElementValuePair> elements);
@@ -147,8 +148,13 @@ public interface JL5NodeFactory extends NodeFactory {
     AnnotationElem MarkerAnnotationElem(Position pos, TypeNode name);
 
     AnnotationElem SingleElementAnnotationElem(Position pos, TypeNode name,
-            Expr value);
+            Term value);
 
-    ElementValuePair ElementValuePair(Position pos, Id name, Expr value);
+    ElementValuePair ElementValuePair(Position pos, Id name, Term value);
+
+    ElementValueArrayInit ElementValueArrayInit(Position pos);
+
+    ElementValueArrayInit ElementValueArrayInit(Position pos,
+            List<Term> elements);
 
 }

@@ -39,14 +39,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import polyglot.ast.ArrayInit;
 import polyglot.ast.ClassLit;
 import polyglot.ast.Expr;
 import polyglot.ast.NullLit;
+import polyglot.ast.Term;
 import polyglot.ext.jl5.JL5Options;
 import polyglot.ext.jl5.ast.AnnotationElem;
+import polyglot.ext.jl5.ast.ElementValueArrayInit;
 import polyglot.ext.jl5.ast.EnumConstant;
-import polyglot.ext.jl5.ast.JL5Field_c;
 import polyglot.ext.jl5.types.inference.InferenceSolver;
 import polyglot.ext.jl5.types.inference.InferenceSolver_c;
 import polyglot.ext.jl5.types.inference.LubType;
@@ -2472,48 +2472,49 @@ public class JL5TypeSystem_c extends
     }
 
     @Override
-    public void checkAnnotationValueConstant(Expr value)
+    public void checkAnnotationValueConstant(Term value)
             throws SemanticException {
-        if (value instanceof ArrayInit) {
+        if (value instanceof ElementValueArrayInit) {
             // check elements
-            for (Expr next : ((ArrayInit) value).elements()) {
+            for (Term next : ((ElementValueArrayInit) value).elements()) {
                 if (!isAnnotationValueConstant(next)) {
                     throw new SemanticException("Annotation attribute value must be constant",
                                                 next.position());
                 }
             }
         }
+        else if (value instanceof AnnotationElem) {
+            return;
+        }
         else if (!isAnnotationValueConstant(value)) {
             throw new SemanticException("Annotation attribute value must be constant: "
-                                                + value.constantValueSet()
-                                                + " \'"
-                                                + ((JL5Field_c) value).fieldInstance()
-                                                                      .getClass()
-                                                + "\'",
+                                                + value,
                                         value.position());
         }
     }
 
-    protected boolean isAnnotationValueConstant(Expr value) {
+    protected boolean isAnnotationValueConstant(Term value) {
         if (value == null || value instanceof NullLit
                 || value instanceof ClassLit) {
             // for purposes of annotation elems class lits are constants
             // we're ok, try the next one.
             return true;
         }
-        if (value.constantValueSet() && value.isConstant()) {
-            // value is a constant
-            return true;
+        if (value instanceof Expr) {
+            Expr ev = (Expr) value;
+            if (ev.constantValueSet() && ev.isConstant()) {
+                // value is a constant
+                return true;
+            }
+            if (ev instanceof EnumConstant) {
+                // Enum constants are constants for our purposes.
+                return true;
+            }
+            if (!ev.constantValueSet()) {
+                // the constant value hasn't been set yet...
+                return true; // TODO: should this throw a missing dependency exception?
+            }
         }
-        if (value instanceof EnumConstant) {
-            // Enum constants are constants for our purposes.
-            return true;
-        }
-        if (!value.constantValueSet()) {
-            // the constant value hasn't been set yet...
-            return true; // TODO: should this throw a missing dependency exception?
-        }
-
         return false;
 
     }

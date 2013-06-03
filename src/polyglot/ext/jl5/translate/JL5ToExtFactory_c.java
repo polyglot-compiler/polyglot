@@ -156,6 +156,17 @@ public class JL5ToExtFactory_c extends ToExtFactory_c implements JL5ExtFactory {
         return postExtElementValuePair(e);
     }
 
+    @Override
+    public Ext extElementValueArrayInit() {
+        Ext e = extElementValueArrayInitImpl();
+
+        if (nextExtFactory() != null) {
+            Ext e2 = nextExtFactory().extElementValueArrayInit();
+            e = composeExts(e, e2);
+        }
+        return postExtElementValueArrayInit(e);
+    }
+
     protected Ext extEnumDeclImpl() {
         return new EnumDeclToExt_c();
     }
@@ -211,7 +222,7 @@ public class JL5ToExtFactory_c extends ToExtFactory_c implements JL5ExtFactory {
     }
 
     protected Ext extNormalAnnotationElemImpl() {
-        return this.extExprImpl();
+        return this.extTermImpl();
     }
 
     protected Ext extMarkerAnnotationElemImpl() {
@@ -223,7 +234,11 @@ public class JL5ToExtFactory_c extends ToExtFactory_c implements JL5ExtFactory {
     }
 
     protected Ext extElementValuePairImpl() {
-        return this.extExprImpl();
+        return this.extTermImpl();
+    }
+
+    protected Ext extElementValueArrayInitImpl() {
+        return this.extTermImpl();
     }
 
     protected Ext postExtAnnotationElemDecl(Ext ext) {
@@ -243,6 +258,10 @@ public class JL5ToExtFactory_c extends ToExtFactory_c implements JL5ExtFactory {
     }
 
     protected Ext postExtElementValuePair(Ext ext) {
+        return ext;
+    }
+
+    protected Ext postExtElementValueArrayInit(Ext ext) {
         return ext;
     }
 }

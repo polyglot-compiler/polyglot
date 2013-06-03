@@ -154,6 +154,17 @@ public class JL5ExtFactory_c extends AbstractExtFactory_c implements
         return postExtElementValuePair(e);
     }
 
+    @Override
+    public Ext extElementValueArrayInit() {
+        Ext e = extElementValueArrayInitImpl();
+
+        if (nextExtFactory() != null) {
+            Ext e2 = nextExtFactory().extElementValueArrayInit();
+            e = composeExts(e, e2);
+        }
+        return postExtElementValueArrayInit(e);
+    }
+
     protected Ext extEnumDeclImpl() {
         return this.extClassDeclImpl();
     }
@@ -209,7 +220,7 @@ public class JL5ExtFactory_c extends AbstractExtFactory_c implements
     }
 
     protected Ext extNormalAnnotationElemImpl() {
-        return this.extExprImpl();
+        return this.extTermImpl();
     }
 
     protected Ext extMarkerAnnotationElemImpl() {
@@ -221,7 +232,11 @@ public class JL5ExtFactory_c extends AbstractExtFactory_c implements
     }
 
     protected Ext extElementValuePairImpl() {
-        return this.extExprImpl();
+        return this.extTermImpl();
+    }
+
+    protected Ext extElementValueArrayInitImpl() {
+        return this.extTermImpl();
     }
 
     protected Ext postExtAnnotationElemDecl(Ext ext) {
@@ -241,6 +256,10 @@ public class JL5ExtFactory_c extends AbstractExtFactory_c implements
     }
 
     protected Ext postExtElementValuePair(Ext ext) {
+        return ext;
+    }
+
+    protected Ext postExtElementValueArrayInit(Ext ext) {
         return ext;
     }
 

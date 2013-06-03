@@ -32,12 +32,11 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import polyglot.ast.ArrayInit;
 import polyglot.ast.ClassLit;
 import polyglot.ast.Expr;
-import polyglot.ast.Expr_c;
 import polyglot.ast.Node;
 import polyglot.ast.Term;
+import polyglot.ast.Term_c;
 import polyglot.ast.TypeNode;
 import polyglot.ext.jl5.types.AnnotationElementValue;
 import polyglot.ext.jl5.types.AnnotationElementValueArray;
@@ -57,7 +56,7 @@ import polyglot.visit.NodeVisitor;
 import polyglot.visit.PrettyPrinter;
 import polyglot.visit.TypeChecker;
 
-public class AnnotationElem_c extends Expr_c implements AnnotationElem {
+public class AnnotationElem_c extends Term_c implements AnnotationElem {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
     protected TypeNode typeName;
@@ -121,7 +120,7 @@ public class AnnotationElem_c extends Expr_c implements AnnotationElem {
                     + " must be an annotation type, ", position());
 
         }
-        return type(typeName.type());
+        return this;
     }
 
     @Override
@@ -160,11 +159,6 @@ public class AnnotationElem_c extends Expr_c implements AnnotationElem {
     }
 
     @Override
-    public boolean isConstant() {
-        return true;
-    }
-
-    @Override
     public String toString() {
         return "Annotation Type: " + typeName();
     }
@@ -197,7 +191,7 @@ public class AnnotationElem_c extends Expr_c implements AnnotationElem {
                 new LinkedHashMap<String, AnnotationElementValue>();
         for (ElementValuePair p : this.elements()) {
             List<? extends MethodInstance> methods =
-                    this.type().toClass().methodsNamed(p.name());
+                    this.typeName().type().toClass().methodsNamed(p.name());
             if (methods.size() != 1) {
                 throw new InternalCompilerError("Annotation has more than one method named \""
                         + p.name() + "\": " + methods);
@@ -221,7 +215,7 @@ public class AnnotationElem_c extends Expr_c implements AnnotationElem {
         return m;
     }
 
-    private AnnotationElementValue toAnnotationElementValue(Expr value,
+    private AnnotationElementValue toAnnotationElementValue(Term value,
             Type intendedType, JL5TypeSystem ts) throws SemanticException {
         Type intendedBaseType;
         if (intendedType.isArray()) {
@@ -231,41 +225,47 @@ public class AnnotationElem_c extends Expr_c implements AnnotationElem {
             intendedBaseType = intendedType;
         }
 
-        if (value instanceof ArrayInit) {
+        if (value instanceof ElementValueArrayInit) {
             if (!intendedType.isArray()) {
                 throw new SemanticException("Array given when expected type is "
                                                     + intendedType.toString(),
                                             value.position());
             }
-            ArrayInit init = (ArrayInit) value;
+            ElementValueArrayInit init = (ElementValueArrayInit) value;
             List<AnnotationElementValue> vals =
                     new ArrayList<AnnotationElementValue>();
-            for (Expr v : init.elements()) {
+            for (Term v : init.elements()) {
                 vals.add(toAnnotationElementValue(v, intendedBaseType, ts));
             }
             return ts.AnnotationElementValueArray(value.position(), vals);
         }
         if (value instanceof AnnotationElem) {
+            AnnotationElem ae = (AnnotationElem) value;
+            Type aeType = ae.typeName().type();
             // Check against intended type.
-            if (value.type().isCanonical()
-                    && !ts.isImplicitCastValid(value.type(), intendedBaseType)) {
+            if (aeType.isCanonical()
+                    && !ts.isImplicitCastValid(aeType, intendedBaseType)) {
                 throw new SemanticException("Expected a value of type "
                         + intendedBaseType, value.position());
             }
-            AnnotationElem ae = (AnnotationElem) value;
             return ts.AnnotationElementValueAnnotation(value.position(),
-                                                       ae.type(),
+                                                       aeType,
                                                        ae.toAnnotationElementValues(ts));
         }
         // Otherwise, it should be a constant value.
-        ts.checkAnnotationValueConstant(value);
-        Object constVal = value.constantValue();
+        if (!(value instanceof Expr)) {
+            throw new InternalCompilerError("Unexpected node: " + value + " : "
+                    + value.getClass(), value.position());
+        }
+        Expr ev = (Expr) value;
+        ts.checkAnnotationValueConstant(ev);
+        Object constVal = ev.constantValue();
         if (value instanceof ClassLit) {
             constVal = ((ClassLit) value).typeNode().type();
         }
         // Check against intended type
-        if (value.type().isCanonical()
-                && !ts.isImplicitCastValid(value.type(), intendedBaseType)) {
+        if (ev.type().isCanonical()
+                && !ts.isImplicitCastValid(ev.type(), intendedBaseType)) {
             throw new SemanticException("Expected a value of type "
                     + intendedBaseType, value.position());
         }

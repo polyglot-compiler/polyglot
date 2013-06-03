@@ -209,14 +209,14 @@ non terminal ClassBody annotation_body; // ClassBody
 non terminal List annotation_type_element_declarations_opt; // List
 non terminal List annotation_type_element_declarations; // List
 non terminal List annotation_type_element_declaration; // List
-non terminal Expr element_value; // Expr
-non terminal Expr default_value_opt; // Expr
+non terminal Term element_value; // Term
+non terminal Term default_value_opt; // Term
 non terminal ElementValuePair element_value_pair; // ElementValuePair
 non terminal List element_value_pairs, element_value_pairs_opt; // List
 non terminal AnnotationElem marker_annotation, single_element_annotation, normal_annotation; // AnnotationElem
 non terminal FlagAnnotations modifiers_or_annotations; // FlagAnnotations
 non terminal FlagAnnotations modifiers_or_annotations_opt; // FlagAnnotations
-non terminal ArrayInit element_value_array_initializer; // ArrayInit
+non terminal ElementValueArrayInit element_value_array_initializer; // ArrayInit
 non terminal List element_values; // List
 
 start with goal;
@@ -1328,16 +1328,16 @@ element_values ::=
 
 element_value_array_initializer ::=
     LBRACE:n element_values:a COMMA RBRACE:d
-        {: RESULT = parser.nf.ArrayInit(parser.pos(n, d), a); :}
+        {: RESULT = parser.nf.ElementValueArrayInit(parser.pos(n, d), a); :}
     |
     LBRACE:n element_values:a RBRACE:d
-        {: RESULT = parser.nf.ArrayInit(parser.pos(n, d), a); :}
+        {: RESULT = parser.nf.ElementValueArrayInit(parser.pos(n, d), a); :}
     |
     LBRACE:n COMMA RBRACE:d
-        {: RESULT = parser.nf.ArrayInit(parser.pos(n, d)); :}
+        {: RESULT = parser.nf.ElementValueArrayInit(parser.pos(n, d)); :}
     |
     LBRACE:n RBRACE:d
-        {: RESULT = parser.nf.ArrayInit(parser.pos(n, d)); :}
+        {: RESULT = parser.nf.ElementValueArrayInit(parser.pos(n, d)); :}
 ;
 
 element_value ::=

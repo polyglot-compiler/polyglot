@@ -28,18 +28,17 @@ package polyglot.ext.jl5.ast;
 import java.util.List;
 import java.util.Map;
 
-import polyglot.ast.Expr;
+import polyglot.ast.Term;
 import polyglot.ast.TypeNode;
 import polyglot.ext.jl5.types.AnnotationElementValue;
 import polyglot.ext.jl5.types.JL5TypeSystem;
 import polyglot.types.SemanticException;
 
 /**
- * Represents an annotation on a declaration. It is a subclass of Expr instead of Term in order
- * to simplify its use as an element value.
+ * Represents an annotation on a declaration. 
  *
  */
-public interface AnnotationElem extends Expr {
+public interface AnnotationElem extends Term {
 
     TypeNode typeName();
 
