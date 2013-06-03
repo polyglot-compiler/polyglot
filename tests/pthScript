@@ -278,6 +278,7 @@ polyglot.frontend.JLExtensionInfo "-cp ." {
 	Protection3.jl package1/ProtClassPubMeth.jl package1/PubClassInheritMeth.jl ;
 	Protection4.jl;
 	Protection5.jl;
+	Protection6a.jl Protection6b.jl;
 
         // on the following file, javac produces an error, but we intentionally do not.
         //  BadFinalInit13.jl (Post); 
