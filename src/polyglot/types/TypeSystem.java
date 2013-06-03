@@ -301,6 +301,12 @@ public interface TypeSystem {
      */
     boolean hasEnclosingInstance(ClassType inner, ClassType encl);
 
+    /**
+     * Returns whether member mi is inherited by class type ct. See JLS 2nd edition
+     * section 8.2.
+     */
+    boolean isInherited(MemberInstance mi, ClassType ct);
+
     ////
     // Various one-type predicates.
     ////

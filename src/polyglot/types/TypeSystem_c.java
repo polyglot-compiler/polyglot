@@ -528,7 +528,7 @@ public class TypeSystem_c implements TypeSystem {
         Flags flags = mi.flags();
 
         ReferenceType target;
-        // does container inhereit mi?
+        // does container inherit mi?
         if (container.descendsFrom(mi.container()) && mi.flags().isPublic()) {
             target = container;
         }
@@ -823,11 +823,36 @@ public class TypeSystem_c implements TypeSystem {
                     + fi.container() + " and " + fi2.container() + ".");
         }
 
-        if (currClass != null && !isAccessible(fi, currClass)) {
-            throw new SemanticException("Cannot access " + fi + ".");
+        if (currClass != null) {
+            if (!isAccessible(fi, currClass) && !isInherited(fi, currClass)) {
+                // currClass neither inherits fi, nor can access it.
+                throw new SemanticException("Cannot access " + fi + ".");
+            }
         }
 
         return fi;
+    }
+
+    @Override
+    public boolean isInherited(MemberInstance mi, ClassType ct) {
+        if (mi.flags().isPrivate()) {
+            // private members are never inherited.
+            return false;
+        }
+        if (ct.descendsFrom(mi.container())) {
+            Package containerPackage = null;
+            if (mi.container().isClass()) {
+                containerPackage = mi.container().toClass().package_();
+            }
+
+            if (ct.package_().equals(containerPackage)) {
+                // ct and the container are in the same package.
+                return true;
+            }
+            // ct and the container are in different packages.
+            return mi.flags().isProtected() || mi.flags().isPublic();
+        }
+        return false;
     }
 
     /**
