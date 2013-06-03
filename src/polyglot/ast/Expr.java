@@ -43,11 +43,14 @@ public interface Expr extends Receiver, Term {
     /** Get the precedence of the expression. */
     Precedence precedence();
 
+    /** Has this expression had its constant value set? In particular, the value returned by
+     * isConstant() is only valid if constantValueSet() is true. */
     boolean constantValueSet();
 
     /**
      * Return whether the expression evaluates to a constant.
-     * This is not valid until after disambiguation.
+     * This is not valid until after disambiguation, and if 
+     * constantValueSet() is true.
      */
     boolean isConstant();
 
