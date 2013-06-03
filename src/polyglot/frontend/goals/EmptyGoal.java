@@ -40,6 +40,10 @@ public class EmptyGoal extends AbstractGoal {
         super(job);
     }
 
+    public EmptyGoal(Job job, String name) {
+        super(job, name);
+    }
+
     /*
      * (non-Javadoc)
      * 
