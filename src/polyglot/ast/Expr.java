@@ -31,49 +31,51 @@ import polyglot.util.CodeWriter;
 import polyglot.visit.PrettyPrinter;
 
 /**
- * An <code>Expr</code> represents any Java expression.  All expressions
+ * An {@code Expr} represents some Java expression.  All expressions
  * must be subtypes of Expr.
  */
 public interface Expr extends Receiver, Term {
     /**
-     * Return an equivalent expression, but with the type <code>type</code>.
+     * Return an equivalent expression, but with the type {@code type}.
      */
     Expr type(Type type);
 
     /** Get the precedence of the expression. */
     Precedence precedence();
 
-    /** Has this expression had its constant value set? In particular, the value returned by
-     * isConstant() is only valid if constantValueSet() is true. */
+    /** Return true iff the compiler has determined whether this expression has a
+     * constant value.  The value returned by {@code isConstant()} is valid only if
+     * {@code constantValueSet()} is true. */
     boolean constantValueSet();
 
     /**
      * Return whether the expression evaluates to a constant.
-     * This is not valid until after disambiguation, and if 
-     * constantValueSet() is true.
+     * Requires that disambiguation has been done, and that
+     * {@code constantValueSet()} is true.
      */
     boolean isConstant();
 
-    /** Returns the constant value of the expression, if any. */
+    /** Return the constant value of the expression, if any.
+     *  Requires that {@code isConstant()} is true.
+     */
     Object constantValue();
 
     /**
-     * Correctly parenthesize the subexpression <code>expr<code>
+     * Correctly parenthesize the subexpression {@code expr}
      * based on its precedence and the precedence of this expression.
      *
-     * If the sub-expression has the same precedence as this expression
-     * we parenthesize if the sub-expression does not associate; e.g.,
-     * we parenthesis the right sub-expression of a left-associative
-     * operator.
+     * If the subexpression has the same precedence as this expression we
+     * parenthesize if the subexpression does not associate. For example, we
+     * parenthesize the right subexpression of a left-associative operator.
      */
     void printSubExpr(Expr expr, boolean associative, CodeWriter w,
             PrettyPrinter pp);
 
     /**
-     * Correctly parenthesize the subexpression <code>expr<code>
+     * Correctly parenthesize the subexpression {@code expr}
      * based on its precedence and the precedence of this expression.
      *
-     * This is equivalent to <code>printSubexpr(expr, true, w, pp)</code>
+     * This is equivalent to {@code printSubexpr(expr, true, w, pp)}
      */
     void printSubExpr(Expr expr, CodeWriter w, PrettyPrinter pp);
 }
