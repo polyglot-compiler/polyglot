@@ -26,10 +26,13 @@
 
 package polyglot.util.typedump;
 
+import polyglot.frontend.Compiler;
 import polyglot.frontend.ExtensionInfo;
+import polyglot.main.Options;
 import polyglot.types.TypeSystem;
 import polyglot.util.CodeWriter;
 import polyglot.util.OptimalCodeWriter;
+import polyglot.util.StdErrorQueue;
 
 public class Main {
     public static void main(String args[]) {
@@ -79,6 +82,18 @@ public class Main {
         }
 
         try {
+            // now try to establish the type system correctly.
+            Options options = extInfo.getOptions();
+
+            Options.global = options;
+
+            configureOptions(options);
+
+            StdErrorQueue eq =
+                    new StdErrorQueue(System.err, 100, extInfo.compilerName());
+
+            Compiler compiler = new Compiler(extInfo, eq);
+
             TypeSystem ts = extInfo.typeSystem();
             TypeDumper t = TypeDumper.load(className, ts, extInfo.version());
 
@@ -110,5 +125,10 @@ public class Main {
             System.err.println("Security policy error.");
             System.err.println(exn.getMessage());
         }
+    }
+
+    private static void configureOptions(Options options) {
+        options.setDefaultValues();
+
     }
 }
