@@ -81,7 +81,7 @@ public class JL5Subst_c extends Subst_c<TypeVariable, ReferenceType> implements
             return t;
         }
         for (TypeVariable k : subst.keySet()) {
-            if (((TypeVariable_c) k).uniqueIdentifier == ((TypeVariable_c) t).uniqueIdentifier) {
+            if (k.equals(t)) {
                 return subst.get(k);
             }
         }

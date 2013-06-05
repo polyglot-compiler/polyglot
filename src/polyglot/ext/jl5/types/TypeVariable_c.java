@@ -45,14 +45,6 @@ import polyglot.util.SerialVersionUID;
 public class TypeVariable_c extends ReferenceType_c implements TypeVariable {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
-    private static int count = 0;
-
-    /**
-     * The unique identifier uniquely identifies a type variable within this invocation of the compiler.
-     * Object equality does not hold, since we may have two objects that represent the same type variable, that have had
-     * substitution applied to their upper bounds. 
-     */
-    public final transient int uniqueIdentifier = count++;
     protected String name;
 
     protected Flags flags;
@@ -114,14 +106,13 @@ public class TypeVariable_c extends ReferenceType_c implements TypeVariable {
 
     @Override
     public ClassType declaringClass() {
-        if (declaredIn.equals(TVarDecl.CLASS_TYPE_VARIABLE))
-            return declaringClass;
+        if (TVarDecl.CLASS_TYPE_VARIABLE == declaredIn) return declaringClass;
         return null;
     }
 
     @Override
     public JL5ProcedureInstance declaringProcedure() {
-        if (declaredIn.equals(TVarDecl.PROCEDURE_TYPE_VARIABLE))
+        if (declaredIn == TVarDecl.PROCEDURE_TYPE_VARIABLE)
             return declaringProcedure;
         return null;
     }
@@ -244,11 +235,6 @@ public class TypeVariable_c extends ReferenceType_c implements TypeVariable {
     }
 
     @Override
-    public int uniqueIdentifier() {
-        return uniqueIdentifier;
-    }
-
-    @Override
     public ReferenceType upperBound() {
         return upperBound;
     }
@@ -268,27 +254,40 @@ public class TypeVariable_c extends ReferenceType_c implements TypeVariable {
         return tv;
     }
 
+    /*
+     * Note that it is difficult to figure out if two type variables are the same. 
+     * Object equality does not hold, since we may have two objects that represent the same type variable, that have had
+     * substitution applied to their upper bounds. 
+     * So we require equality on where the type variable is declared, and depending on where it was declared, on the
+     * declaring class or procedure
+     * 
+     */
+
     @Override
     public boolean equalsImpl(TypeObject t) {
+        if (this == t) return true;
         if (t instanceof TypeVariable_c) {
             TypeVariable_c other = (TypeVariable_c) t;
-            return this.uniqueIdentifier == other.uniqueIdentifier;
+            return this.name().equals(other.name())
+                    && this.declaredIn == other.declaredIn
+                    // we don't use .equals on declaringClass and declaringProcedure to avoid infinite loops. 
+                    // there may be a better way to do this, but it's hard within the confines
+                    // of the equalsImpl/typeEqualsImpl methods.
+                    && (this.declaringClass == other.declaringClass)
+                    && (this.declaringProcedure == other.declaringProcedure);
+
         }
         return false;
     }
 
     @Override
     public boolean typeEqualsImpl(Type t) {
-        if (t instanceof TypeVariable_c) {
-            TypeVariable_c other = (TypeVariable_c) t;
-            return this.uniqueIdentifier == other.uniqueIdentifier;
-        }
-        return false;
+        return equalsImpl(t);
     }
 
     @Override
     public int hashCode() {
-        return this.uniqueIdentifier;
+        return this.name.hashCode();
     }
 
 }

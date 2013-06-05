@@ -45,8 +45,6 @@ public interface TypeVariable extends ReferenceType, Param {
 
     JL5ProcedureInstance declaringProcedure();
 
-    int uniqueIdentifier();
-
     void name(String name);
 
     String name();
