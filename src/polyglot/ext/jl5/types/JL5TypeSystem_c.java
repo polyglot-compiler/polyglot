@@ -2409,11 +2409,9 @@ public class JL5TypeSystem_c extends
         if (!ct.typeVariables().isEmpty()) {
             l.addAll(ct.typeVariables());
         }
-        if (ct.isNested() && !ct.isInnerClass()) {
-            // ct is a static nested class. Ignore any type variables contained in outer classes.
-            return;
-        }
-        if (ct.outer() == null) {
+        if (ct.isTopLevel() || !ct.isNested() || !ct.isInnerClass()) {
+            // either ct is top level, not nested, or it's a static nested.
+            // Ignore any type variables contained in outer classes.
             return;
         }
         if (ct.outer() instanceof JL5ParsedClassType) {
