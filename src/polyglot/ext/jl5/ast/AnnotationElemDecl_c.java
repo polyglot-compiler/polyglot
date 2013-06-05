@@ -247,12 +247,18 @@ public class AnnotationElemDecl_c extends Term_c implements AnnotationElemDecl {
             if (defaultVal instanceof Expr) {
                 defaultValType = ((Expr) defaultVal).type();
             }
+            else if (defaultVal instanceof ElementValueArrayInit) {
+                ElementValueArrayInit evai = (ElementValueArrayInit) defaultVal;
+                defaultValType = evai.type();
+            }
             else if (defaultVal instanceof AnnotationElem) {
                 defaultValType =
                         ((AnnotationElem) defaultVal).typeName().type();
             }
             else {
-                throw new InternalCompilerError("Don't know how to deal with default value of kind "
+                throw new InternalCompilerError("Don't know how to deal with default value ("
+                                                        + defaultVal
+                                                        + ") of kind "
                                                         + defaultVal.getClass(),
                                                 defaultVal.position());
             }
