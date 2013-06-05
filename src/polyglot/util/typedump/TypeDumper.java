@@ -31,17 +31,21 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import polyglot.frontend.ExtensionInfo;
 import polyglot.main.Version;
 import polyglot.types.SemanticException;
 import polyglot.types.TypeObject;
 import polyglot.types.TypeSystem;
+import polyglot.types.reflect.ClassFile;
 import polyglot.util.CodeWriter;
+import polyglot.util.Position;
 
 public class TypeDumper {
     static Set<Class<?>> dontExpand;
@@ -52,6 +56,9 @@ public class TypeDumper {
                         String.class, Character.class };
         dontExpand =
                 new java.util.HashSet<Class<?>>(java.util.Arrays.asList(primitiveLike));
+
+        dontExpand.add(Position.class);
+        dontExpand.add(Compiler.class);
     }
 
     TypeObject theType;
@@ -111,10 +118,10 @@ public class TypeDumper {
             w.allowBreak(0);
         }
         w.write(theType.toString());
-        w.allowBreak(4);
+        w.allowBreak(2);
         w.write("<" + theType.getClass().toString() + ">");
         w.allowBreak(0);
-        dumpObject(w, theType, cache);
+        dumpObjectFields(w, theType, cache);
         w.allowBreak(0);
         w.end();
         w.allowBreak(0);
@@ -122,10 +129,52 @@ public class TypeDumper {
         w.newline(0);
     }
 
-    protected void dumpObject(CodeWriter w, Object obj, TypeCache cache) {
-        w.write(" fields {");
-        w.allowBreak(2);
+    protected void dumpObject(CodeWriter w, Object o, TypeCache cache,
+            Field declaredField) {
         w.begin(0);
+        Class<?> rtType = o.getClass();
+        w.write("<" + rtType.toString() + ">:");
+        w.allowBreak(0);
+        w.write(o.toString());
+        if (!Object.class.equals(rtType)
+                && !(o instanceof TypeSystem)
+                && !(o instanceof ExtensionInfo)
+                && !(o instanceof ClassFile)
+                && !dontDump(rtType)
+                && !(dontDump(rtType.getName(), (declaredField == null ? null
+                        : declaredField.getName()))) && !rtType.isArray()
+                && !(cache.containsKey(o) && cache.get(o) == o)) {
+            w.allowBreak(2);
+            cache.put(o);
+            if (o instanceof List || o instanceof Set) {
+                Collection list = (Collection) o;
+                for (Object elem : list) {
+                    dumpObject(w, elem, cache, null);
+                    w.newline();
+                }
+            }
+            else if (o instanceof Map) {
+                Map map = (Map) o;
+                for (Object key : map.keySet()) {
+                    dumpObject(w, key, cache, null);
+                    w.allowBreak(0);
+                    w.write(" -> ");
+                    w.allowBreak(0);
+                    dumpObject(w, map.get(key), cache, null);
+                }
+            }
+            else {
+                dumpObjectFields(w, o, cache);
+            }
+        }
+        w.end();
+    }
+
+    protected void dumpObjectFields(CodeWriter w, Object obj, TypeCache cache) {
+        w.write(" fields {");
+        w.newline();
+        w.begin(4);
+        w.write("    ");
         try {
             List<Field> allFields = new ArrayList<Field>();
             Class objClass = obj.getClass();
@@ -139,23 +188,12 @@ public class TypeDumper {
                                                              true);
             for (Field declaredField : allFields) {
                 if (Modifier.isStatic(declaredField.getModifiers())) continue;
-                w.begin(4);
+                w.begin(2);
                 w.write(declaredField.getName() + ": ");
-                w.allowBreak(0);
                 try {
                     Object o = declaredField.get(obj);
                     if (o != null) {
-                        Class<?> rtType = o.getClass();
-                        w.write("<" + rtType.toString() + ">:");
-                        w.allowBreak(0);
-                        w.write(o.toString());
-                        w.allowBreak(4);
-                        if (!Object.class.equals(rtType) && !dontDump(rtType)
-                                && !rtType.isArray()
-                                && !(cache.containsKey(o) && cache.get(o) == o)) {
-                            cache.put(o);
-                            dumpObject(w, o, cache);
-                        }
+                        dumpObject(w, o, cache, declaredField);
                     }
                     else {
                         w.write("null");
@@ -165,7 +203,7 @@ public class TypeDumper {
                     w.write("##[" + exn.getMessage() + "]");
                 }
                 w.end();
-                w.allowBreak(0);
+                w.newline();
             }
         }
         catch (SecurityException exn) {
@@ -175,6 +213,13 @@ public class TypeDumper {
             w.allowBreak(0);
             w.write("}");
         }
+    }
+
+    private boolean dontDump(String className, String fieldName) {
+        if ("classFileSource".equals(fieldName)) {
+            return true;
+        }
+        return false;
     }
 
     static boolean dontDump(Class<?> c) {
