@@ -26,16 +26,22 @@
 
 package polyglot.util.typedump;
 
+import java.util.HashSet;
+
 import polyglot.frontend.Compiler;
 import polyglot.frontend.ExtensionInfo;
 import polyglot.main.Options;
+import polyglot.main.UsageError;
+import polyglot.types.SemanticException;
 import polyglot.types.TypeSystem;
 import polyglot.util.CodeWriter;
+import polyglot.util.InternalCompilerError;
 import polyglot.util.OptimalCodeWriter;
 import polyglot.util.StdErrorQueue;
 
 public class Main {
-    public static void main(String args[]) {
+    public static void main(String args[]) throws IllegalArgumentException,
+            SemanticException {
         String extension = "jl";
         String className;
         if (args.length == 3 && args[0].equals("-ext")) extension = args[1];
@@ -128,7 +134,15 @@ public class Main {
     }
 
     private static void configureOptions(Options options) {
-        options.setDefaultValues();
+        try {
+            options.parseCommandLine(new String[] { "-d", ".", "Dummy" },
+                                     new HashSet<String>());
+        }
+        catch (UsageError e) {
+            throw new InternalCompilerError(e);
+        }
+//        options.setSourceOutput(new File("."));
+//        options.setClassOutput(new File("."));
 
     }
 }

@@ -33,10 +33,10 @@ import java.util.Map;
 import java.util.Set;
 
 import polyglot.main.Version;
+import polyglot.types.SemanticException;
 import polyglot.types.TypeObject;
 import polyglot.types.TypeSystem;
 import polyglot.util.CodeWriter;
-import polyglot.util.TypeEncoder;
 
 class TypeDumper {
     static Set<Class<?>> dontExpand;
@@ -64,7 +64,8 @@ class TypeDumper {
 
     public static TypeDumper load(String name, TypeSystem ts, Version ver)
             throws ClassNotFoundException, NoSuchFieldException,
-            java.io.IOException, SecurityException {
+            java.io.IOException, SecurityException, IllegalArgumentException,
+            SemanticException {
         Class<?> c = Class.forName(name);
         try {
             String suffix = ver.name();
@@ -73,10 +74,8 @@ class TypeDumper {
             Field jlcTimestamp =
                     c.getDeclaredField("jlc$SourceLastModified$" + suffix);
             Field jlcType = c.getDeclaredField("jlc$ClassType$" + suffix);
-            String t = (String) jlcType.get(null);
-            TypeEncoder te = new TypeEncoder(ts);
             return new TypeDumper(name,
-                                  te.decode(t, name),
+                                  ts.typeForName(name),
                                   (String) jlcVersion.get(null),
                                   (Long) jlcTimestamp.get(null));
         }
