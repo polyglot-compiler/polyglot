@@ -26,9 +26,13 @@
 
 package polyglot.util.typedump;
 
+import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -44,7 +48,7 @@ class TypeDumper {
         Class<?>[] primitiveLike =
                 { Void.class, Boolean.class, Short.class, Integer.class,
                         Long.class, Float.class, Double.class, Class.class,
-                        String.class, };
+                        String.class, Character.class };
         dontExpand =
                 new java.util.HashSet<Class<?>>(java.util.Arrays.asList(primitiveLike));
     }
@@ -112,10 +116,17 @@ class TypeDumper {
         w.allowBreak(2);
         w.begin(0);
         try {
-            Field[] declaredFields = obj.getClass().getDeclaredFields();
-            java.lang.reflect.AccessibleObject.setAccessible(declaredFields,
+            List<Field> allFields = new ArrayList<Field>();
+            Class objClass = obj.getClass();
+            while (objClass != null) {
+                allFields.addAll(Arrays.asList(objClass.getDeclaredFields()));
+                java.lang.reflect.AccessibleObject.setAccessible(objClass.getDeclaredFields(),
+                                                                 true);
+                objClass = objClass.getSuperclass();
+            }
+            java.lang.reflect.AccessibleObject.setAccessible(allFields.toArray(new AccessibleObject[0]),
                                                              true);
-            for (Field declaredField : declaredFields) {
+            for (Field declaredField : allFields) {
                 if (Modifier.isStatic(declaredField.getModifiers())) continue;
                 w.begin(4);
                 w.write(declaredField.getName() + ": ");
@@ -131,6 +142,7 @@ class TypeDumper {
                         if (!Object.class.equals(rtType) && !dontDump(rtType)
                                 && !rtType.isArray()
                                 && !(cache.containsKey(o) && cache.get(o) == o)) {
+                            System.err.println("o is " + o.getClass());
                             cache.put(o, o);
                             dumpObject(w, o, cache);
                         }
