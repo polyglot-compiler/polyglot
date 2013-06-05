@@ -186,7 +186,7 @@ public class Package_c extends TypeObject_c implements Package {
 
     @Override
     public int hashCode() {
-        return name.hashCode();
+        return name != null ? name.hashCode() : -78642;
     }
 
     @Override
