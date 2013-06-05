@@ -79,12 +79,16 @@ class TypeDumper {
             Field jlcTimestamp =
                     c.getDeclaredField("jlc$SourceLastModified$" + suffix);
             Field jlcType = c.getDeclaredField("jlc$ClassType$" + suffix);
+            jlcVersion.setAccessible(true);
+            jlcTimestamp.setAccessible(true);
+            jlcType.setAccessible(true);
             return new TypeDumper(name,
                                   ts.typeForName(name),
                                   (String) jlcVersion.get(null),
                                   (Long) jlcTimestamp.get(null));
         }
         catch (IllegalAccessException exn) {
+            exn.printStackTrace();
             throw new SecurityException("illegal access: " + exn.getMessage());
         }
     }
