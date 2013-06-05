@@ -56,9 +56,16 @@ public class Main {
             extClass = Class.forName(extClassName);
         }
         catch (ClassNotFoundException e) {
-            System.err.println("Extension " + extension
-                    + " not found: could not find class " + extClassName + ".");
-            System.exit(1);
+            try {
+                extClass = Class.forName(extension);
+            }
+            catch (ClassNotFoundException e2) {
+                System.err.println("Extension " + extension
+                        + " not found: could not find class " + extClassName
+                        + ".");
+                System.err.println(e2.getMessage());
+                System.exit(1);
+            }
         }
 
         try {
@@ -73,7 +80,7 @@ public class Main {
 
         try {
             TypeSystem ts = extInfo.typeSystem();
-            TypeDumper t = TypeDumper.load(className, ts);
+            TypeDumper t = TypeDumper.load(className, ts, extInfo.version());
 
             CodeWriter cw = new OptimalCodeWriter(System.out, 72);
 

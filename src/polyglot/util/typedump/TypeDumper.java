@@ -32,6 +32,7 @@ import java.util.Date;
 import java.util.Map;
 import java.util.Set;
 
+import polyglot.main.Version;
 import polyglot.types.TypeObject;
 import polyglot.types.TypeSystem;
 import polyglot.util.CodeWriter;
@@ -61,14 +62,17 @@ class TypeDumper {
         this.timestamp = new Date(timestamp.longValue());
     }
 
-    public static TypeDumper load(String name, TypeSystem ts)
+    public static TypeDumper load(String name, TypeSystem ts, Version ver)
             throws ClassNotFoundException, NoSuchFieldException,
             java.io.IOException, SecurityException {
         Class<?> c = Class.forName(name);
         try {
-            Field jlcVersion = c.getDeclaredField("jlc$CompilerVersion");
-            Field jlcTimestamp = c.getDeclaredField("jlc$SourceLastModified");
-            Field jlcType = c.getDeclaredField("jlc$ClassType");
+            String suffix = ver.name();
+            Field jlcVersion =
+                    c.getDeclaredField("jlc$CompilerVersion$" + suffix);
+            Field jlcTimestamp =
+                    c.getDeclaredField("jlc$SourceLastModified$" + suffix);
+            Field jlcType = c.getDeclaredField("jlc$ClassType$" + suffix);
             String t = (String) jlcType.get(null);
             TypeEncoder te = new TypeEncoder(ts);
             return new TypeDumper(name,
@@ -112,14 +116,13 @@ class TypeDumper {
             Field[] declaredFields = obj.getClass().getDeclaredFields();
             java.lang.reflect.AccessibleObject.setAccessible(declaredFields,
                                                              true);
-            for (int i = 0; i < declaredFields.length; i++) {
-                if (Modifier.isStatic(declaredFields[i].getModifiers()))
-                    continue;
+            for (Field declaredField : declaredFields) {
+                if (Modifier.isStatic(declaredField.getModifiers())) continue;
                 w.begin(4);
-                w.write(declaredFields[i].getName() + ": ");
+                w.write(declaredField.getName() + ": ");
                 w.allowBreak(0);
                 try {
-                    Object o = declaredFields[i].get(obj);
+                    Object o = declaredField.get(obj);
                     if (o != null) {
                         Class<?> rtType = o.getClass();
                         w.write("<" + rtType.toString() + ">:");
