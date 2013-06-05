@@ -43,7 +43,7 @@ import polyglot.types.TypeObject;
 import polyglot.types.TypeSystem;
 import polyglot.util.CodeWriter;
 
-class TypeDumper {
+public class TypeDumper {
     static Set<Class<?>> dontExpand;
     static {
         Class<?>[] primitiveLike =
@@ -59,12 +59,17 @@ class TypeDumper {
     String compilerVersion;
     Date timestamp;
 
-    TypeDumper(String rawName, TypeObject t, String compilerVersion,
+    public TypeDumper(String rawName, TypeObject t, String compilerVersion,
             Long timestamp) {
         theType = t;
         this.rawName = rawName;
         this.compilerVersion = compilerVersion;
-        this.timestamp = new Date(timestamp.longValue());
+        if (timestamp != null) {
+            this.timestamp = new Date(timestamp.longValue());
+        }
+        else {
+            this.timestamp = null;
+        }
     }
 
     public static TypeDumper load(String name, TypeSystem ts, Version ver)
@@ -101,8 +106,10 @@ class TypeDumper {
         w.begin(0);
         w.write("Compiled with polyglot version " + compilerVersion + ".  ");
         w.allowBreak(0);
-        w.write("Last modified: " + timestamp.toString() + ".  ");
-        w.allowBreak(0);
+        if (timestamp != null) {
+            w.write("Last modified: " + timestamp.toString() + ".  ");
+            w.allowBreak(0);
+        }
         w.write(theType.toString());
         w.allowBreak(4);
         w.write("<" + theType.getClass().toString() + ">");
