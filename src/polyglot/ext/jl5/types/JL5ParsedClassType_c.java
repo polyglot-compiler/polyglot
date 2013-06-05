@@ -216,6 +216,9 @@ public class JL5ParsedClassType_c extends ParsedClassType_c implements
 
     @Override
     public List<TypeVariable> typeVariables() {
+        if (this.typeVars == null) {
+            return Collections.emptyList();
+        }
         return this.typeVars;
     }
 
@@ -367,7 +370,7 @@ public class JL5ParsedClassType_c extends ParsedClassType_c implements
     @Override
     public Set<Type> superclasses() {
         if (this.superType() == null) {
-            return Collections.<Type>emptySet();
+            return Collections.<Type> emptySet();
         }
         return Collections.singleton(this.superType());
     }
