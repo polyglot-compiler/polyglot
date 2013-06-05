@@ -108,7 +108,7 @@ public class AnnotationElemDecl_c extends Term_c implements AnnotationElemDecl {
     }
 
     @Override
-    public AnnotationElemDecl defaultVal(Expr def) {
+    public AnnotationElemDecl defaultVal(Term def) {
         if (!def.equals(this.defaultVal)) {
             AnnotationElemDecl_c n = (AnnotationElemDecl_c) copy();
             n.defaultVal = def;
@@ -150,7 +150,7 @@ public class AnnotationElemDecl_c extends Term_c implements AnnotationElemDecl {
         return ai;
     }
 
-    protected AnnotationElemDecl_c reconstruct(TypeNode type, Expr defaultVal) {
+    protected AnnotationElemDecl_c reconstruct(TypeNode type, Term defaultVal) {
         if (!type.equals(this.type) || this.defaultVal != defaultVal) {
             AnnotationElemDecl_c n = (AnnotationElemDecl_c) copy();
             n.type = type;
@@ -163,7 +163,7 @@ public class AnnotationElemDecl_c extends Term_c implements AnnotationElemDecl {
     @Override
     public Node visitChildren(NodeVisitor v) {
         TypeNode type = (TypeNode) visitChild(this.type, v);
-        Expr defVal = (Expr) visitChild(this.defaultVal, v);
+        Term defVal = (Term) visitChild(this.defaultVal, v);
         return reconstruct(type, defVal);
     }
 

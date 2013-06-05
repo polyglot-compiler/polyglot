@@ -25,7 +25,6 @@
  ******************************************************************************/
 package polyglot.ext.jl5.ast;
 
-import polyglot.ast.Expr;
 import polyglot.ast.MethodDecl;
 import polyglot.ast.Term;
 import polyglot.ast.TypeNode;
@@ -44,7 +43,7 @@ public interface AnnotationElemDecl extends MethodDecl {
     @Override
     Flags flags();
 
-    AnnotationElemDecl defaultVal(Expr def);
+    AnnotationElemDecl defaultVal(Term def);
 
     Term defaultVal();
 
