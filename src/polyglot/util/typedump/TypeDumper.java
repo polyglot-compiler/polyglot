@@ -32,6 +32,7 @@ import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -89,8 +90,8 @@ class TypeDumper {
     }
 
     public void dump(CodeWriter w) {
-        Map<Object, Object> cache = new java.util.HashMap<Object, Object>();
-        cache.put(theType, theType);
+        TypeCache cache = new TypeCache();
+        cache.put(theType);
         w.write("Type " + rawName + " {");
         w.allowBreak(2);
         w.begin(0);
@@ -110,8 +111,7 @@ class TypeDumper {
         w.newline(0);
     }
 
-    protected void dumpObject(CodeWriter w, Object obj,
-            Map<Object, Object> cache) {
+    protected void dumpObject(CodeWriter w, Object obj, TypeCache cache) {
         w.write(" fields {");
         w.allowBreak(2);
         w.begin(0);
@@ -142,8 +142,7 @@ class TypeDumper {
                         if (!Object.class.equals(rtType) && !dontDump(rtType)
                                 && !rtType.isArray()
                                 && !(cache.containsKey(o) && cache.get(o) == o)) {
-                            System.err.println("o is " + o.getClass());
-                            cache.put(o, o);
+                            cache.put(o);
                             dumpObject(w, o, cache);
                         }
                     }
@@ -169,6 +168,48 @@ class TypeDumper {
 
     static boolean dontDump(Class<?> c) {
         return dontExpand.contains(c);
+    }
+
+    public static class TypeCache {
+        private final Map<TypeSystem, Map<Object, Object>> c =
+                new HashMap<TypeSystem, Map<Object, Object>>();
+
+        public void put(Object o) {
+            TypeSystem ts = typeSystemFor(o);
+            Map<Object, Object> m = c.get(ts);
+            if (m == null) {
+                m = new HashMap<Object, Object>();
+                c.put(ts, m);
+            }
+            m.put(o, o);
+        }
+
+        private TypeSystem typeSystemFor(Object o) {
+            if (o instanceof TypeObject) {
+                TypeObject to = (TypeObject) o;
+                return to.typeSystem();
+            }
+            return null;
+        }
+
+        public Object get(Object o) {
+            TypeSystem ts = typeSystemFor(o);
+            Map<Object, Object> m = c.get(ts);
+            if (m != null) {
+                return m.get(o);
+            }
+            return null;
+        }
+
+        public boolean containsKey(Object o) {
+            TypeSystem ts = typeSystemFor(o);
+            Map<Object, Object> m = c.get(ts);
+            if (m != null) {
+                return m.containsKey(o);
+            }
+            return false;
+        }
+
     }
 
 }
