@@ -309,7 +309,8 @@ public class New_c extends Expr_c implements New {
             if (nn.objectType().type().isClass()) {
                 ClassType ct = nn.objectType().type().toClass();
 
-                if (ct.isMember() && !ct.flags().isStatic()) {
+                if (ct.isMember() && !ct.flags().isStatic()
+                        && !ct.flags().isInterface()) {
                     nn = ((New_c) nn).findQualifier(ar, ct);
 
                     nn =
@@ -434,7 +435,7 @@ public class New_c extends Expr_c implements New {
 
         if (outer == null) {
             throw new SemanticException("Could not find non-static member class \""
-                                                + ct.name() + "\".",
+                                                + ct.name() + "\".B" + this,
                                         position());
         }
 
@@ -527,7 +528,7 @@ public class New_c extends Expr_c implements New {
             }
             if (qualifierClassType == null) {
                 throw new SemanticException("Could not find non-static member class \""
-                                                    + ct.name() + "\".",
+                                                    + ct.name() + "\".A" + this,
                                             position());
             }
         }
