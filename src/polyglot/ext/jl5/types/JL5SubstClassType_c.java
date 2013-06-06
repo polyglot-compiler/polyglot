@@ -26,6 +26,8 @@
 
 package polyglot.ext.jl5.types;
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -45,6 +47,7 @@ import polyglot.util.CodeWriter;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
+import polyglot.util.TypeInputStream;
 
 public class JL5SubstClassType_c extends
         SubstClassType_c<TypeVariable, ReferenceType> implements
@@ -245,10 +248,9 @@ public class JL5SubstClassType_c extends
             if (this.base.equals(anc.base)) {
 //                System.err.println("      D");
                 // same base. check the params
-                JL5ParsedClassType base = (JL5ParsedClassType) this.base;
                 // go through each type variable, and check containment
                 boolean allContained = true;
-                for (TypeVariable tv : base.typeVariables()) {
+                for (TypeVariable tv : base().typeVariables()) {
                     Type ti = this.subst.substType(tv);
                     Type si = anc.subst.substType(tv);
 //                    System.err.println("      E " + ti + " contained in "+si+" ? " + ts.isContained(ti, si));
@@ -384,9 +386,34 @@ public class JL5SubstClassType_c extends
     @Override
     public Set<Type> superclasses() {
         if (this.superType() == null) {
-            return Collections.<Type>emptySet();
+            return Collections.<Type> emptySet();
         }
         return Collections.singleton(this.superType());
     }
 
+    @SuppressWarnings("unused")
+    private static final long readObjectVersionUID = 2L;
+
+    private void readObject(ObjectInputStream in) throws IOException,
+            ClassNotFoundException {
+        // If you update this method in an incompatible way, increment
+        // readObjectVersionUID.
+
+        if (in instanceof TypeInputStream) {
+            ts = ((TypeInputStream) in).getTypeSystem();
+        }
+
+        in.defaultReadObject();
+
+        if (this.base != null && !(this.base instanceof JL5ParsedClassType)) {
+            if (this.base instanceof RawClass) {
+                this.base = ((RawClass) this.base).base();
+            }
+            else {
+                throw new InternalCompilerError("Serialization problem with "
+                        + this.name() + " the base type is " + this.base + ":"
+                        + this.base.getClass(), this.position());
+            }
+        }
+    }
 }
