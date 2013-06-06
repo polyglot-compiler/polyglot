@@ -31,9 +31,7 @@ import java.util.Collections;
 import java.util.List;
 
 import polyglot.types.ClassType;
-import polyglot.types.ConstructorInstance;
 import polyglot.types.FieldInstance;
-import polyglot.types.Flags;
 import polyglot.types.MethodInstance;
 import polyglot.types.ReferenceType;
 import polyglot.types.ReferenceType_c;
@@ -52,15 +50,29 @@ public class TypeVariable_c extends ReferenceType_c implements TypeVariable {
 
     protected String name;
 
-    protected Flags flags;
-
+    /*
+     * A type variable is either declared as a parameter for a procedure, for a class,
+     * is a synthetic type variable (e.g., a closure), or we do not yet know what it is.
+     * Field declaredIn depicts what kind of type variable this is. It is null if
+     * we do not yet know what kind of variable it is. The declaredIn field may be set 
+     * at most once. If the type variable is declared as a parameter for a procedure
+     * or a class, then fields declaringClass and declaringProcedure must
+     * be set appropriately. For TypeVariables with declaredIn either null or equal to
+     * TVarDecl.SYNTHETIC_TYPE_VARIABLE, we use field syntheticUniqueId to distinguish
+     * them. For TypeVariables that belong to classes or procedures, syntheticUniqueId
+     * will be null.
+     */
     protected TVarDecl declaredIn;
 
     protected ClassType declaringClass;
     protected JL5ProcedureInstance declaringProcedure;
 
-//    private List<ReferenceType> bounds;
-    //private ParsedClassType syntheticClass; // SC: should probably combine with bounds, and have intersection classes...
+    /**
+     * Unique Id for type variables where declaredIn is either null or equal to
+     * TVarDecl.SYNTHETIC_TYPE_VARIABLE. Only valid for the duration of a compilation.
+     */
+    protected transient Long syntheticUniqueId;
+    private static long idCount = 1;
 
     /**
      * The upper bound of this type variable. Should always be non-null. 
@@ -68,7 +80,8 @@ public class TypeVariable_c extends ReferenceType_c implements TypeVariable {
     private ReferenceType upperBound;
 
     /**
-     * It is possible for type variables to have lower bounds. See JLS 3rd ed 4.10.2 and 5.1.10 
+     * It is possible for type variables to have lower bounds. See JLS 3rd ed 4.10.2 and 5.1.10.
+     * This field may be null.
      */
     private ReferenceType lowerBound = null;
 
@@ -80,47 +93,46 @@ public class TypeVariable_c extends ReferenceType_c implements TypeVariable {
             upperBound = ts.Object();
         }
         this.upperBound = upperBound;
+        this.syntheticUniqueId = Long.valueOf(idCount++);
     }
 
-    //    
-    //    public Job job() {
-    //        throw new InternalCompilerError("No job for a type variable");
-    //    }
-    //    
     @Override
     public void setDeclaringProcedure(JL5ProcedureInstance pi) {
-        if (declaredIn == TVarDecl.PROCEDURE_TYPE_VARIABLE
-                && declaringProcedure == pi) {
-            // nothing to do
+        if (this.declaredIn == TVarDecl.PROCEDURE_TYPE_VARIABLE
+                && this.declaringProcedure == pi) {
+            // nothing to do, the fields already match.
             return;
         }
-        if (declaredIn != null) {
+        if (this.declaredIn != null) {
             throw new InternalCompilerError("Can only set declaredIn once: was "
-                                                    + declaredIn
+                                                    + this.declaredIn
                                                     + "&"
                                                     + this.declaringProcedure
                                                     + " now wants to be Procedure&"
                                                     + pi + this,
                                             this.position);
         }
-        declaredIn = TVarDecl.PROCEDURE_TYPE_VARIABLE;
-        declaringProcedure = pi;
-        declaringClass = null;
+        this.declaredIn = TVarDecl.PROCEDURE_TYPE_VARIABLE;
+        this.declaringProcedure = pi;
+        this.declaringClass = null;
+        this.syntheticUniqueId = null;
     }
 
     @Override
     public void setDeclaringClass(ClassType ct) {
-        if (declaredIn == TVarDecl.CLASS_TYPE_VARIABLE && declaringClass == ct) {
+        if (this.declaredIn == TVarDecl.CLASS_TYPE_VARIABLE
+                && declaringClass == ct) {
             // nothing to do
             return;
         }
-        if (declaredIn != null) {
+        if (this.declaredIn != null) {
             throw new InternalCompilerError("Can only set declaredIn once",
                                             this.position);
         }
-        declaredIn = TVarDecl.CLASS_TYPE_VARIABLE;
-        declaringProcedure = null;
-        declaringClass = ct;
+        this.declaredIn = TVarDecl.CLASS_TYPE_VARIABLE;
+        this.declaringProcedure = null;
+        this.declaringClass = ct;
+        this.syntheticUniqueId = null;
     }
 
     @Override
@@ -133,67 +145,39 @@ public class TypeVariable_c extends ReferenceType_c implements TypeVariable {
             throw new InternalCompilerError("Can only set declaredIn once",
                                             this.position);
         }
-        declaredIn = TVarDecl.SYNTHETIC_TYPE_VARIABLE;
-        declaringProcedure = null;
-        declaringClass = null;
+        this.declaredIn = TVarDecl.SYNTHETIC_TYPE_VARIABLE;
+        this.declaringProcedure = null;
+        this.declaringClass = null;
 
     }
 
     @Override
     public TVarDecl declaredIn() {
-        return declaredIn;
+        return this.declaredIn;
     }
 
     @Override
     public ClassType declaringClass() {
-        if (TVarDecl.CLASS_TYPE_VARIABLE == declaredIn) return declaringClass;
+        if (this.declaredIn == TVarDecl.CLASS_TYPE_VARIABLE)
+            return this.declaringClass;
         return null;
     }
 
     @Override
     public JL5ProcedureInstance declaringProcedure() {
-        if (declaredIn == TVarDecl.PROCEDURE_TYPE_VARIABLE)
-            return declaringProcedure;
+        if (this.declaredIn == TVarDecl.PROCEDURE_TYPE_VARIABLE)
+            return this.declaringProcedure;
         return null;
     }
 
-    //
-    //    public ClassType outer() {
-    //        return null;
-    //    }
-    //
     @Override
     public String name() {
         return name;
     }
 
     @Override
-    public void name(String name) {
-        this.name = name;
-    }
-
-    @Override
     public boolean isCanonical() {
         return true;
-    }
-
-    public polyglot.types.Package package_() {
-        if (TVarDecl.CLASS_TYPE_VARIABLE.equals(declaredIn)) {
-            return declaringClass().package_();
-        }
-        if (TVarDecl.PROCEDURE_TYPE_VARIABLE.equals(declaredIn)) {
-            return declaringProcedure().container().toClass().package_();
-        }
-        return null;
-    }
-
-    public List<? extends ConstructorInstance> constructors() {
-        return Collections.emptyList();
-    }
-
-    public List<? extends ClassType> memberClasses() {
-        return Collections.emptyList();
-        //return getSyntheticClass().memberClasses();
     }
 
     @Override
@@ -299,7 +283,8 @@ public class TypeVariable_c extends ReferenceType_c implements TypeVariable {
      * Object equality does not hold, since we may have two objects that represent the same type variable, that have had
      * substitution applied to their upper bounds. 
      * So we require equality on where the type variable is declared, and depending on where it was declared, on the
-     * declaring class or procedure
+     * declaring class or procedure. For synthetic type variables,
+     * we require equality on the syntheticUniqueId field.
      * 
      */
 
@@ -310,6 +295,7 @@ public class TypeVariable_c extends ReferenceType_c implements TypeVariable {
             TypeVariable_c other = (TypeVariable_c) t;
             return this.name().equals(other.name())
                     && this.declaredIn == other.declaredIn
+                    && (this.syntheticUniqueId == other.syntheticUniqueId || (this.syntheticUniqueId != null && this.syntheticUniqueId.equals(other.syntheticUniqueId)))
                     // we don't use .equals on declaringClass and declaringProcedure to avoid infinite loops. 
                     // there may be a better way to do this, but it's hard within the confines
                     // of the equalsImpl/typeEqualsImpl methods.
@@ -327,7 +313,9 @@ public class TypeVariable_c extends ReferenceType_c implements TypeVariable {
 
     @Override
     public int hashCode() {
-        return this.name.hashCode();
+        return this.name.hashCode()
+                ^ (this.syntheticUniqueId == null ? 0
+                        : this.syntheticUniqueId.hashCode());
     }
 
     private void writeObject(ObjectOutputStream out) throws IOException {

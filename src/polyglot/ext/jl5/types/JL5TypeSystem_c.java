@@ -516,8 +516,6 @@ public class JL5TypeSystem_c extends
         return new TypeVariable_c(this, pos, name, upperBound);
     }
 
-    protected UnknownTypeVariable unknownTypeVar = null;
-
     @Override
     public UnknownTypeVariable unknownTypeVariable(Position position) {
         return new UnknownTypeVariable_c(this);

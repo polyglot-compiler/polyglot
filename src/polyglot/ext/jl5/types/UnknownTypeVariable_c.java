@@ -25,7 +25,6 @@
  ******************************************************************************/
 package polyglot.ext.jl5.types;
 
-import polyglot.types.TypeObject;
 import polyglot.types.TypeSystem;
 import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
@@ -36,10 +35,5 @@ public class UnknownTypeVariable_c extends TypeVariable_c implements
 
     public UnknownTypeVariable_c(TypeSystem ts) {
         super(ts, Position.COMPILER_GENERATED, "<unknown>", null);
-    }
-
-    @Override
-    public boolean equalsImpl(TypeObject t) {
-        return this == t;
     }
 }
