@@ -146,7 +146,8 @@ public class ParsedClassType_c extends ClassType_c implements ParsedClassType {
     public ClassType outer() {
         if (isTopLevel()) return null;
         if (outer == null)
-            throw new InternalCompilerError("Nested classes must have outer classes.");
+            throw new InternalCompilerError("Nested class " + this
+                    + " must have outer classes.");
 
         return outer;
     }
