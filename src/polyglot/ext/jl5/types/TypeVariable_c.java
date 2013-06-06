@@ -25,6 +25,8 @@
  ******************************************************************************/
 package polyglot.ext.jl5.types;
 
+import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.util.Collections;
 import java.util.List;
 
@@ -39,11 +41,14 @@ import polyglot.types.Resolver;
 import polyglot.types.Type;
 import polyglot.types.TypeObject;
 import polyglot.types.TypeSystem;
+import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
 
 public class TypeVariable_c extends ReferenceType_c implements TypeVariable {
     private static final long serialVersionUID = SerialVersionUID.generate();
+    @SuppressWarnings("unused")
+    private static final long writeObjectVersionUID = 2L;
 
     protected String name;
 
@@ -83,24 +88,59 @@ public class TypeVariable_c extends ReferenceType_c implements TypeVariable {
     //    }
     //    
     @Override
-    public void declaringProcedure(JL5ProcedureInstance pi) {
+    public void setDeclaringProcedure(JL5ProcedureInstance pi) {
+        if (declaredIn == TVarDecl.PROCEDURE_TYPE_VARIABLE
+                && declaringProcedure == pi) {
+            // nothing to do
+            return;
+        }
+        if (declaredIn != null) {
+            throw new InternalCompilerError("Can only set declaredIn once: was "
+                                                    + declaredIn
+                                                    + "&"
+                                                    + this.declaringProcedure
+                                                    + " now wants to be Procedure&"
+                                                    + pi + this,
+                                            this.position);
+        }
         declaredIn = TVarDecl.PROCEDURE_TYPE_VARIABLE;
         declaringProcedure = pi;
         declaringClass = null;
     }
 
     @Override
-    public void declaringClass(ClassType ct) {
+    public void setDeclaringClass(ClassType ct) {
+        if (declaredIn == TVarDecl.CLASS_TYPE_VARIABLE && declaringClass == ct) {
+            // nothing to do
+            return;
+        }
+        if (declaredIn != null) {
+            throw new InternalCompilerError("Can only set declaredIn once",
+                                            this.position);
+        }
         declaredIn = TVarDecl.CLASS_TYPE_VARIABLE;
         declaringProcedure = null;
         declaringClass = ct;
     }
 
     @Override
-    public TVarDecl declaredIn() {
-        if (declaredIn == null) {
-            declaredIn = TVarDecl.SYNTHETIC_TYPE_VARIABLE;
+    public void setSyntheticOrigin() {
+        if (declaredIn == TVarDecl.SYNTHETIC_TYPE_VARIABLE) {
+            // nothing to do
+            return;
         }
+        if (declaredIn != null) {
+            throw new InternalCompilerError("Can only set declaredIn once",
+                                            this.position);
+        }
+        declaredIn = TVarDecl.SYNTHETIC_TYPE_VARIABLE;
+        declaringProcedure = null;
+        declaringClass = null;
+
+    }
+
+    @Override
+    public TVarDecl declaredIn() {
         return declaredIn;
     }
 
@@ -288,6 +328,15 @@ public class TypeVariable_c extends ReferenceType_c implements TypeVariable {
     @Override
     public int hashCode() {
         return this.name.hashCode();
+    }
+
+    private void writeObject(ObjectOutputStream out) throws IOException {
+        if (this.declaredIn == null
+                || this.declaredIn == TVarDecl.SYNTHETIC_TYPE_VARIABLE) {
+            throw new InternalCompilerError("Shouldn't serialize unknown or synthetic type variables",
+                                            this.position());
+        }
+        out.defaultWriteObject();
     }
 
 }

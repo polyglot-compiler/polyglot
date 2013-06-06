@@ -211,6 +211,10 @@ public class JL5ParsedClassType_c extends ParsedClassType_c implements
         }
         else {
             this.typeVars = ListUtil.copy(typeVars, true);
+            // Go through and set the declaring class of the type variables.
+            for (TypeVariable tv : typeVars) {
+                tv.setDeclaringClass(this);
+            }
         }
     }
 

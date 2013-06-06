@@ -43,7 +43,6 @@ import polyglot.ext.jl5.types.JL5ArrayType;
 import polyglot.ext.jl5.types.JL5ConstructorInstance;
 import polyglot.ext.jl5.types.JL5Context;
 import polyglot.ext.jl5.types.JL5Flags;
-import polyglot.ext.jl5.types.JL5ProcedureInstance;
 import polyglot.ext.jl5.types.JL5TypeSystem;
 import polyglot.ext.jl5.types.TypeVariable;
 import polyglot.ext.jl5.visit.AnnotationChecker;
@@ -215,7 +214,6 @@ public class JL5ConstructorDecl_c extends ConstructorDecl_c implements
             }
             TypeVariable tv = (TypeVariable) tn.type();
             typeParams.add(tv);
-            tv.declaringProcedure((JL5ProcedureInstance) this.ci);
 
         }
         // now type nodes are disambiguated

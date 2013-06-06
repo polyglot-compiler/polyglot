@@ -520,9 +520,7 @@ public class JL5TypeSystem_c extends
 
     @Override
     public UnknownTypeVariable unknownTypeVariable(Position position) {
-        if (unknownTypeVar == null)
-            unknownTypeVar = new UnknownTypeVariable_c(this);
-        return unknownTypeVar;
+        return new UnknownTypeVariable_c(this);
     }
 
     @Override
@@ -2122,10 +2120,12 @@ public class JL5TypeSystem_c extends
             ReferenceType ti = (ReferenceType) ct.subst().substType(a);
             ReferenceType si = ti;
             if (ti instanceof WildCardType) {
-                si =
+                TypeVariable tv =
                         this.typeVariable(ti.position(),
                                           UniqueID.newID("captureConversionFresh"),
-                                          null); // we'll replace this unknown type soon.            
+                                          null); // we'll replace this unknown type soon.
+                tv.setSyntheticOrigin();
+                si = tv;
             }
             capturedActuals.add(si);
             substmap.put(a, si);

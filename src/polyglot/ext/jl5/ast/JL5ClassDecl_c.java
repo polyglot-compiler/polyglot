@@ -129,7 +129,7 @@ public class JL5ClassDecl_c extends ClassDecl_c implements JL5ClassDecl {
             for (ParamTypeNode ptn : this.paramTypes()) {
                 TypeVariable tv = (TypeVariable) ptn.type();
                 typeVars.add(tv);
-                tv.declaringClass(ct);
+                tv.setDeclaringClass(ct);
             }
             ct.setTypeVariables(typeVars);
             pc.formals(new ArrayList<TypeVariable>(typeVars));

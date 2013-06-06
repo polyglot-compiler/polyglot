@@ -49,6 +49,10 @@ public class JL5ConstructorInstance_c extends ConstructorInstance_c implements
             List<? extends Type> excTypes, List<TypeVariable> typeParams) {
         super(ts, pos, container, flags, argTypes, excTypes);
         this.typeParams = typeParams;
+        // Set the declaring procedure of the type vars
+        for (TypeVariable tv : typeParams) {
+            tv.setDeclaringProcedure((JL5ProcedureInstance) this.declaration());
+        }
     }
 
     @Override
@@ -129,6 +133,11 @@ public class JL5ConstructorInstance_c extends ConstructorInstance_c implements
     @Override
     public void setTypeParams(List<TypeVariable> typeParams) {
         this.typeParams = typeParams;
+        // Set the declaring procedure of the type vars
+        for (TypeVariable tv : typeParams) {
+            tv.setDeclaringProcedure((JL5ProcedureInstance) this.declaration());
+        }
+
     }
 
     @Override

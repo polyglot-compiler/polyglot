@@ -59,6 +59,11 @@ public class JL5MethodInstance_c extends MethodInstance_c implements
             List<TypeVariable> typeParams) {
         super(ts, pos, container, flags, returnType, name, argTypes, excTypes);
         this.typeParams = typeParams;
+        // Set the declaring procedure of the type vars
+        for (TypeVariable tv : typeParams) {
+            tv.setDeclaringProcedure((JL5ProcedureInstance) this.declaration());
+        }
+
     }
 
     @Override
@@ -340,6 +345,10 @@ public class JL5MethodInstance_c extends MethodInstance_c implements
     @Override
     public void setTypeParams(List<TypeVariable> typeParams) {
         this.typeParams = typeParams;
+        // Set the declaring procedure of the type vars
+        for (TypeVariable tv : typeParams) {
+            tv.setDeclaringProcedure((JL5ProcedureInstance) this.declaration());
+        }
     }
 
     @Override

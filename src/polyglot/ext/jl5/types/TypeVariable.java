@@ -37,9 +37,11 @@ public interface TypeVariable extends ReferenceType, Param {
 
     TVarDecl declaredIn();
 
-    void declaringProcedure(JL5ProcedureInstance pi);
+    void setSyntheticOrigin();
 
-    void declaringClass(ClassType ct);
+    void setDeclaringProcedure(JL5ProcedureInstance pi);
+
+    void setDeclaringClass(ClassType ct);
 
     ClassType declaringClass();
 

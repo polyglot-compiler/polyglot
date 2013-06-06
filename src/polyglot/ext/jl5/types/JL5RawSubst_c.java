@@ -124,7 +124,9 @@ public class JL5RawSubst_c extends JL5Subst_c implements JL5Subst {
         tmpMi.setThrowTypes(throwTypes);
         tmpMi.setContainer(ts.rawClass(base));
 
-        // subst the type params
+        // subst the type params (that is, the method may have some type params that mention in their bounds 
+        // type params from a containing class, which we will 
+        // substitute.)
         tmpMi.setTypeParams(this.<TypeVariable> substTypeList(tmpMi.typeParams()));
 
         // now erase the type params, if there are any
@@ -163,6 +165,15 @@ public class JL5RawSubst_c extends JL5Subst_c implements JL5Subst {
         tmpCi.setFormalTypes(formalTypes);
         tmpCi.setThrowTypes(throwTypes);
         tmpCi.setContainer(ts.rawClass(base));
+
+        for (Object o : tmpCi.typeParams()) {
+            if (!(o instanceof TypeVariable)) {
+                System.err.println("Pi is " + tmpCi + " and type params is "
+                        + tmpCi.typeParams() + " " + o + " " + o.getClass());
+                System.err.println("Subst is " + this);
+                Thread.dumpStack();
+            }
+        }
 
         // subst the type params
         tmpCi.setTypeParams(this.<TypeVariable> substTypeList(tmpCi.typeParams()));

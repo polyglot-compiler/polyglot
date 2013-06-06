@@ -43,7 +43,6 @@ import polyglot.ext.jl5.types.JL5ArrayType;
 import polyglot.ext.jl5.types.JL5Context;
 import polyglot.ext.jl5.types.JL5Flags;
 import polyglot.ext.jl5.types.JL5MethodInstance;
-import polyglot.ext.jl5.types.JL5ProcedureInstance;
 import polyglot.ext.jl5.types.JL5TypeSystem;
 import polyglot.ext.jl5.types.TypeVariable;
 import polyglot.ext.jl5.visit.AnnotationChecker;
@@ -208,7 +207,6 @@ public class JL5MethodDecl_c extends MethodDecl_c implements JL5MethodDecl {
             }
             TypeVariable tv = (TypeVariable) tn.type();
             typeParams.add(tv);
-            tv.declaringProcedure((JL5ProcedureInstance) mi);
         }
         // now type nodes are disambiguated
         JL5MethodInstance mi = (JL5MethodInstance) n.methodInstance();
