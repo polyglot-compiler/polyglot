@@ -140,14 +140,18 @@ public class AmbTypeInstantiation extends TypeNode_c implements TypeNode,
                     + baseType, position);
         }
 
+        int pctFormalSize = 0;
         if ((pct.pclass() == null || pct.pclass().formals().isEmpty())) {
             if (this.typeArguments.isEmpty()) {
                 // the base class has no formals, and no actuals were supplied.
                 return base;
             }
         }
+        else {
+            pctFormalSize = pct.pclass().formals().size();
+        }
 
-        if (pct.pclass().formals().size() != this.typeArguments.size()) {
+        if (pctFormalSize != this.typeArguments.size()) {
             throw new SemanticException("Wrong number of type parameters for class "
                                                 + pct,
                                         this.position);
