@@ -1,0 +1,10 @@
+
+public class Generics47 {
+    void m(java.util.Vector v) {
+	//void m(V v) {
+	java.util.Iterator<ClassX> it = v.iterator(); // what is the super type of the raw type Vector?
+    }
+}
+//class V<T> {
+//   java.util.Iterator<ClassX> iterator() { return null; }
+//}
