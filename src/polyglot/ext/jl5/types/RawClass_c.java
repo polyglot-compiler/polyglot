@@ -25,6 +25,8 @@
  ******************************************************************************/
 package polyglot.ext.jl5.types;
 
+import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -162,17 +164,41 @@ public class RawClass_c extends JL5ClassType_c implements RawClass {
 
     @Override
     public List<? extends ReferenceType> interfaces() {
-        return this.erased().interfaces();
+        List<? extends ReferenceType> origInts = this.erased().interfaces();
+        if (origInts == null || origInts.isEmpty()) {
+            return origInts;
+        }
+
+        List<ReferenceType> ints = new ArrayList<ReferenceType>();
+        JL5TypeSystem ts = (JL5TypeSystem) typeSystem();
+        for (ReferenceType rt : origInts) {
+            ints.add((ReferenceType) ts.erasureType(rt));
+        }
+        return ints;
     }
 
     @Override
     public Type superType() {
-        return this.erased().superType();
+        JL5TypeSystem ts = (JL5TypeSystem) typeSystem();
+        if (this.erased().superType() == null) {
+            return null;
+        }
+        return ts.erasureType(this.erased().superType());
     }
 
     @Override
     public Set<? extends Type> superclasses() {
-        return this.erased().superclasses();
+        Set<? extends Type> origInts = this.erased().superclasses();
+        if (origInts == null || origInts.isEmpty()) {
+            return origInts;
+        }
+
+        Set<Type> ints = new LinkedHashSet<Type>();
+        JL5TypeSystem ts = (JL5TypeSystem) typeSystem();
+        for (Type rt : origInts) {
+            ints.add(ts.erasureType(rt));
+        }
+        return ints;
     }
 
     @Override
