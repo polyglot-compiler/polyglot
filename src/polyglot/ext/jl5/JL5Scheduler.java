@@ -347,13 +347,6 @@ public class JL5Scheduler extends JLScheduler {
         return this.internGoal(g);
     }
 
-    //  public Goal GenericTypeHandled(Job job) {
-    //          TypeSystem ts = job.extensionInfo().typeSystem();
-    //          NodeFactory nf = job.extensionInfo().nodeFactory();
-    //          Goal g = new VisitorGoal(job, new JL5AmbiguityRemover(job, ts, nf));
-    //          return this.internGoal(g);
-    //  }
-
     @Override
     public boolean runToCompletion() {
         boolean complete = super.runToCompletion();
