@@ -293,7 +293,8 @@ public class TypeVariable_c extends ReferenceType_c implements TypeVariable {
         if (this == t) return true;
         if (t instanceof TypeVariable_c) {
             TypeVariable_c other = (TypeVariable_c) t;
-            return this.name().equals(other.name())
+            return (this.name == other.name || (this.name != null && this.name()
+                                                                         .equals(other.name())))
                     && this.declaredIn == other.declaredIn
                     && (this.syntheticUniqueId == other.syntheticUniqueId || (this.syntheticUniqueId != null && this.syntheticUniqueId.equals(other.syntheticUniqueId)))
                     // we don't use .equals on declaringClass and declaringProcedure to avoid infinite loops. 
@@ -313,7 +314,7 @@ public class TypeVariable_c extends ReferenceType_c implements TypeVariable {
 
     @Override
     public int hashCode() {
-        return this.name.hashCode()
+        return (this.name == null ? 0 : this.name.hashCode())
                 ^ (this.syntheticUniqueId == null ? 0
                         : this.syntheticUniqueId.hashCode());
     }
