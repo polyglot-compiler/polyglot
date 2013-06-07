@@ -1131,9 +1131,8 @@ public class DefiniteAssignmentChecker extends
 
         AssignmentStatus initCount = dfIn.assignmentStatus.get(li.orig());
 
-        if (li.flags().isFinal()
-                && initCount != null
-                && (!initCount.definitelyUnassigned || initCount.definitelyAssigned)) {
+        if (li.flags().isFinal() && initCount != null
+                && !initCount.definitelyUnassigned) {
             throw new SemanticException("Final variable \"" + li.name()
                     + "\" might already have been initialized", pos);
         }
@@ -1164,8 +1163,7 @@ public class DefiniteAssignmentChecker extends
                                                             + fi.name() + "\".",
                                                     a.position());
                 }
-                if (!initCount.definitelyUnassigned
-                        || initCount.definitelyAssigned) {
+                if (!initCount.definitelyUnassigned) {
                     throw new SemanticException("Final field \""
                                                         + fi.name()
                                                         + "\" might already have been initialized",
