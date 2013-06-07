@@ -38,8 +38,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import polyglot.ext.jl5.types.JL5ClassType;
 import polyglot.frontend.ExtensionInfo;
 import polyglot.main.Version;
+import polyglot.types.ClassType;
 import polyglot.types.SemanticException;
 import polyglot.types.TypeObject;
 import polyglot.types.TypeSystem;
@@ -76,6 +78,24 @@ public class TypeDumper {
         }
         else {
             this.timestamp = null;
+        }
+        initializeType(theType);
+    }
+
+    private void initializeType(TypeObject t) {
+        if (t instanceof ClassType) {
+            ClassType ct = (ClassType) t;
+            ct.methods();
+            ct.fields();
+            ct.interfaces();
+            ct.superType();
+            ct.container();
+            if (ct instanceof JL5ClassType) {
+                JL5ClassType jct = (JL5ClassType) ct;
+                jct.annotationElems();
+                jct.annotations();
+                jct.enumConstants();
+            }
         }
     }
 
@@ -131,6 +151,9 @@ public class TypeDumper {
 
     protected void dumpObject(CodeWriter w, Object o, TypeCache cache,
             Field declaredField) {
+        if (o instanceof TypeObject) {
+            initializeType((TypeObject) o);
+        }
         w.begin(0);
         Class<?> rtType = o.getClass();
         w.write("<" + rtType.toString() + ">:");
