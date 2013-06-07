@@ -193,6 +193,7 @@ polyglot.ext.jl5.ExtensionInfo "-d out -classpath java-out -assert -noserial -po
         GenericMethod12.jl5 (Semantic), (Semantic);
         GenericMethod13.jl5;
         GenericMethod14.jl5;
+        GenericMethod15.jl5;
         InfiniteLoop.jl5;
         Throw02.jl5;
         JLS8.1.2.jl5;
@@ -558,6 +559,7 @@ polyglot.ext.jl5.ExtensionInfo "-d out -classpath java-out -removeJava5isms -enu
         GenericMethod12.jl5 (Semantic), (Semantic);
         GenericMethod13.jl5;
         GenericMethod14.jl5;
+        GenericMethod15.jl5;
         InfiniteLoop.jl5;
         Throw02.jl5;
         JLS8.1.2.jl5;

@@ -1,0 +1,8 @@
+import java.lang.Thread.UncaughtExceptionHandler;
+
+class C {
+    void m() {
+	foo(java.util.Collections.<C> emptyList());
+    }
+    void foo(java.util.List<C> l) { }
+}
