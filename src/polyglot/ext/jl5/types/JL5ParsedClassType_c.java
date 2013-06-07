@@ -75,7 +75,9 @@ public class JL5ParsedClassType_c extends ParsedClassType_c implements
 
     @Override
     public List<EnumInstance> enumConstants() {
-        ((JL5LazyClassInitializer) init).initEnumConstants();
+        if (init instanceof JL5LazyClassInitializer) {
+            ((JL5LazyClassInitializer) init).initEnumConstants();
+        }
         return enumConstants;
     }
 
@@ -107,7 +109,9 @@ public class JL5ParsedClassType_c extends ParsedClassType_c implements
 
     @Override
     public List<AnnotationTypeElemInstance> annotationElems() {
-        ((JL5LazyClassInitializer) init).initAnnotationElems();
+        if (init instanceof JL5LazyClassInitializer) {
+            ((JL5LazyClassInitializer) init).initAnnotationElems();
+        }
         return Collections.unmodifiableList(annotationElems);
     }
 
@@ -329,7 +333,9 @@ public class JL5ParsedClassType_c extends ParsedClassType_c implements
 
     @Override
     public Annotations annotations() {
-        ((JL5LazyClassInitializer) init).initAnnotations();
+        if (init instanceof JL5LazyClassInitializer) {
+            ((JL5LazyClassInitializer) init).initAnnotations();
+        }
         return this.annotations;
     }
 
