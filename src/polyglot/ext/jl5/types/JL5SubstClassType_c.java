@@ -26,8 +26,6 @@
 
 package polyglot.ext.jl5.types;
 
-import java.io.IOException;
-import java.io.ObjectInputStream;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -47,7 +45,6 @@ import polyglot.util.CodeWriter;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
-import polyglot.util.TypeInputStream;
 
 public class JL5SubstClassType_c extends
         SubstClassType_c<TypeVariable, ReferenceType> implements
@@ -389,31 +386,5 @@ public class JL5SubstClassType_c extends
             return Collections.<Type> emptySet();
         }
         return Collections.singleton(this.superType());
-    }
-
-    @SuppressWarnings("unused")
-    private static final long readObjectVersionUID = 2L;
-
-    private void readObject(ObjectInputStream in) throws IOException,
-            ClassNotFoundException {
-        // If you update this method in an incompatible way, increment
-        // readObjectVersionUID.
-
-        if (in instanceof TypeInputStream) {
-            ts = ((TypeInputStream) in).getTypeSystem();
-        }
-
-        in.defaultReadObject();
-
-        if (this.base != null && !(this.base instanceof JL5ParsedClassType)) {
-            if (this.base instanceof RawClass) {
-                this.base = ((RawClass) this.base).base();
-            }
-            else {
-                throw new InternalCompilerError("Serialization problem with "
-                        + this.name() + " the base type is " + this.base + ":"
-                        + this.base.getClass(), this.position());
-            }
-        }
     }
 }
