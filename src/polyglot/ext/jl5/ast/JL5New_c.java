@@ -26,6 +26,7 @@
 package polyglot.ext.jl5.ast;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import polyglot.ast.ClassBody;
@@ -181,6 +182,21 @@ public class JL5New_c extends New_c implements JL5New {
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
         printQualifier(w, tr);
         w.write("new ");
+
+        if (typeArgs != null && !typeArgs.isEmpty()) {
+            w.write("<");
+            Iterator<TypeNode> it = typeArgs.iterator();
+            while (it.hasNext()) {
+                TypeNode tn = it.next();
+                print(tn, w, tr);
+                if (it.hasNext()) {
+                    w.write(",");
+                    w.allowBreak(0, " ");
+                }
+            }
+            w.write(">");
+            w.allowBreak(0, " ");
+        }
 
         // We need to be careful when pretty printing "new" expressions for
         // member classes.  For the expression "e.new C()" where "e" has

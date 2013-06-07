@@ -193,13 +193,21 @@ public class JL5Call_c extends Call_c implements JL5Call {
                                                   c.currentClass(),
                                                   this.expectedReturnType);
 
-//                System.err.println("\nJL5Call_c.typeCheck targettype is " + targetType);
-//                System.err.println("  JL5Call_c.typeCheck target is " + this.target);
-//                System.err.println("  JL5Call_c.typeCheck target is " + this.target.type());
-//                System.err.println("  JL5Call_c.expectedReturnType is " + this.expectedReturnType);
-//                System.err.println("  JL5Call_c.typeCheck arg types is " + argTypes);
-//                System.err.println("  JL5Call_c.typeCheck mi is " + mi + " return type is " + mi.returnType().getClass());
-//                System.err.println("  JL5Call_c.typeCheck mi is " + mi + " container is " + mi.container().getClass());
+//        System.err.println("\nJL5Call_c.typeCheck targettype is " + targetType);
+//        System.err.println("  JL5Call_c.typeCheck target is " + this.target);
+//        System.err.println("  JL5Call_c.typeCheck target type is "
+//                + this.target.type());
+//        if (this.target.type().isClass()) {
+//            System.err.println("  JL5Call_c.typeCheck target type super is "
+//                    + this.target.type().toClass().superType());
+//        }
+//        System.err.println("  JL5Call_c.expectedReturnType is "
+//                + this.expectedReturnType);
+//        System.err.println("  JL5Call_c.typeCheck arg types is " + argTypes);
+//        System.err.println("  JL5Call_c.typeCheck mi is " + mi
+//                + " return type is " + mi.returnType().getClass());
+//        System.err.println("  JL5Call_c.typeCheck mi is " + mi
+//                + " container is " + mi.container().getClass());
         /* This call is in a static context if and only if
          * the target (possibly implicit) is a type node.
          */
@@ -279,6 +287,21 @@ public class JL5Call_c extends Call_c implements JL5Call {
             }
             w.write(".");
             w.allowBreak(2, 3, "", 0);
+
+            if (typeArgs != null && !typeArgs.isEmpty()) {
+                w.write("<");
+                Iterator<TypeNode> it = typeArgs.iterator();
+                while (it.hasNext()) {
+                    TypeNode tn = it.next();
+                    print(tn, w, tr);
+                    if (it.hasNext()) {
+                        w.write(",");
+                        w.allowBreak(0, " ");
+                    }
+                }
+                w.write(">");
+                w.allowBreak(0, " ");
+            }
         }
 
         w.begin(0);

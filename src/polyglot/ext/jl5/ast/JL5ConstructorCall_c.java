@@ -26,6 +26,7 @@
 package polyglot.ext.jl5.ast;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -140,7 +141,45 @@ public class JL5ConstructorCall_c extends ConstructorCall_c implements
                 return;
             }
         }
-        super.prettyPrint(w, tr);
+
+        if (qualifier != null) {
+            print(qualifier, w, tr);
+            w.write(".");
+        }
+
+        w.write(kind.toString());
+        if (typeArgs != null && !typeArgs.isEmpty()) {
+            w.write("<");
+            Iterator<TypeNode> it = typeArgs.iterator();
+            while (it.hasNext()) {
+                TypeNode tn = it.next();
+                print(tn, w, tr);
+                if (it.hasNext()) {
+                    w.write(",");
+                    w.allowBreak(0, " ");
+                }
+            }
+            w.write(">");
+            w.allowBreak(0, " ");
+        }
+
+        w.write("(");
+
+        w.begin(0);
+
+        for (Iterator<Expr> i = arguments.iterator(); i.hasNext();) {
+            Expr e = i.next();
+            print(e, w, tr);
+
+            if (i.hasNext()) {
+                w.write(",");
+                w.allowBreak(0);
+            }
+        }
+
+        w.end();
+
+        w.write(");");
     }
 
     @Override
