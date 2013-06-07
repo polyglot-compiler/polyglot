@@ -322,6 +322,8 @@ polyglot.ext.jl5.ExtensionInfo "-d out -classpath java-out -assert -noserial -po
         RawType02.jl5 (Post, "Xlint");
         RawType03.jl5 (Semantic);
         RawType04.jl5 (Semantic);
+        RawType05.jl5;
+        RawType06.jl5 (Semantic);
         EnumTest1.jl5;
         EnumTest2.jl5;
         EnumTest3.jl5;
@@ -687,6 +689,8 @@ polyglot.ext.jl5.ExtensionInfo "-d out -classpath java-out -removeJava5isms -enu
         RawType02.jl5;
         RawType03.jl5 (Semantic);
         RawType04.jl5 (Semantic);
+        RawType05.jl5;
+        RawType06.jl5 (Semantic);
         EnumTest1.jl5;
         EnumTest2.jl5;
         EnumTest3.jl5;

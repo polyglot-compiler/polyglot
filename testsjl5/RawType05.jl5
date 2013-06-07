@@ -1,0 +1,10 @@
+class C<T> implements java.lang.Iterable<T> {
+  public java.util.Iterator<T> iterator() { return null; }
+}
+
+class D {
+    void m(C<String> x, C y) {
+	for (String s : x) { }
+	for (Object t : y) { }
+    }
+}
