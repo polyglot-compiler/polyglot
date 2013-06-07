@@ -42,6 +42,7 @@ import polyglot.ast.Term;
 import polyglot.ext.jl5.types.JL5ParsedClassType;
 import polyglot.ext.jl5.types.JL5SubstClassType;
 import polyglot.ext.jl5.types.JL5TypeSystem;
+import polyglot.ext.jl5.types.RawClass;
 import polyglot.types.Context;
 import polyglot.types.SemanticException;
 import polyglot.types.Type;
@@ -158,10 +159,19 @@ public class ExtendedFor_c extends Loop_c implements ExtendedFor {
         if (expr.type().isArray()) {
             elementType = expr.type().toArray().base();
         }
+        else if (t instanceof RawClass) {
+            // we have a raw class.
+            elementType = ts.Object();
+        }
         else {
             JL5SubstClassType iterableType =
                     ts.findGenericSupertype((JL5ParsedClassType) ts.Iterable(),
                                             t.toReference());
+            if (iterableType == null) {
+                throw new InternalCompilerError("Cannot find generic supertype of Iterable for "
+                                                        + t.toReference(),
+                                                this.position());
+            }
             elementType = iterableType.actuals().get(0);
         }
         if (!elementType.isImplicitCastValid(declType)) {
