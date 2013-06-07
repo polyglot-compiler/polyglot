@@ -245,7 +245,7 @@ public class SystemResolver extends CachingResolver implements TopLevelResolver 
     public void install(String name, Named q) {
         if (Report.should_report(TOPICS, 2) && check(name) == null)
             Report.report(2, (previous == null ? "root" : "non-root")
-                    + " SR installing " + name + "->" + q);
+                    + " SR installing " + name + "->" + q + " : " + q.getClass());
 
         super.install(name, q);
 
