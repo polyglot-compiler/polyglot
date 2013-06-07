@@ -137,17 +137,6 @@ public class JL5ParsedClassType_c extends ParsedClassType_c implements
     }
 
     @Override
-    public ClassType outer() {
-        if (this.isMember() && !this.isInnerClass()) {
-            if (!(super.outer() instanceof RawClass)) {
-                JL5TypeSystem ts = (JL5TypeSystem) this.typeSystem();
-                return (ClassType) ts.erasureType(super.outer());
-            }
-        }
-        return super.outer();
-    }
-
-    @Override
     public boolean isEnclosedImpl(ClassType maybe_outer) {
         if (super.isEnclosedImpl(maybe_outer)) {
             return true;
