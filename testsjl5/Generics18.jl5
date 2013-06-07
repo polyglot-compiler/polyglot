@@ -16,7 +16,7 @@ class Main {
 	//	String[] array = new String[3]; 
     	MyMap<String, String> env = new MyMap("asdf");
 	String s = env.get("hi");
-        String t = env.<String>put("asdf", "sdf");
+        String t = env.put("asdf", "sdf");
 	String u = env.def;
     }
 }
