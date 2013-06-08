@@ -179,7 +179,7 @@ public class SourceClassResolver extends LoadedClassResolver {
         source = ext.sourceLoader().classSource(name);
         if (source != null) {
             // Check if this is the actual source file we wanted...
-            String className = source.name();
+            String className = source.path();
             int dot1 = className.lastIndexOf('.');
             className = dot1 > 0 ? className.substring(0, dot1) : className;
             int slash1 = className.lastIndexOf(File.separatorChar);

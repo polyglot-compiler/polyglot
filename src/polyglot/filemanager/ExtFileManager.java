@@ -353,9 +353,16 @@ public class ExtFileManager extends
                 if (contains != null && contains) return true;
             }
             else {
-                File newFile =
-                        new File(f, name.replace('.', File.separatorChar));
-                if (newFile.exists() && newFile.isDirectory()) return true;
+                String filePath = name.replace('.', File.separatorChar);
+                File newFile = new File(f, filePath);
+                try {
+                    if (newFile.exists() && newFile.isDirectory()
+                            && newFile.getCanonicalPath().endsWith(filePath))
+                        return true;
+                }
+                catch (IOException e) {
+                    return false;
+                }
             }
         }
         return false;

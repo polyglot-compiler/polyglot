@@ -25,12 +25,15 @@
  ******************************************************************************/
 package polyglot.frontend;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
 
 import javax.tools.FileObject;
 import javax.tools.ForwardingFileObject;
+
+import polyglot.util.InternalCompilerError;
 
 public class Source_c extends ForwardingFileObject<FileObject> implements
         FileSource {
@@ -58,7 +61,12 @@ public class Source_c extends ForwardingFileObject<FileObject> implements
 
     @Override
     public String path() {
-        return toUri().getPath();
+        try {
+            return new File(toUri().getPath()).getCanonicalPath();
+        }
+        catch (IOException e) {
+            throw new InternalCompilerError(e);
+        }
     }
 
     @Override
@@ -68,7 +76,7 @@ public class Source_c extends ForwardingFileObject<FileObject> implements
 
     @Override
     public String toString() {
-        return toUri().getPath();
+        return path();
     }
 
     @Override
