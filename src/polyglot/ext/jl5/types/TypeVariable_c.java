@@ -89,6 +89,9 @@ public class TypeVariable_c extends ReferenceType_c implements TypeVariable {
             ReferenceType upperBound) {
         super(ts, pos);
         this.name = id;
+        if (this.name == null) {
+            throw new InternalCompilerError("TypeVariables must be given a name.");
+        }
         if (upperBound == null) {
             upperBound = ts.Object();
         }
