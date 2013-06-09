@@ -45,8 +45,6 @@ import polyglot.util.SerialVersionUID;
 
 public class TypeVariable_c extends ReferenceType_c implements TypeVariable {
     private static final long serialVersionUID = SerialVersionUID.generate();
-    @SuppressWarnings("unused")
-    private static final long writeObjectVersionUID = 2L;
 
     protected String name;
 
@@ -294,6 +292,9 @@ public class TypeVariable_c extends ReferenceType_c implements TypeVariable {
     @Override
     public boolean equalsImpl(TypeObject t) {
         if (this == t) return true;
+        if (this.name == null) {
+            return this == t;
+        }
         if (t instanceof TypeVariable_c) {
             TypeVariable_c other = (TypeVariable_c) t;
             return (this.name == other.name || (this.name != null && this.name()
@@ -317,10 +318,13 @@ public class TypeVariable_c extends ReferenceType_c implements TypeVariable {
 
     @Override
     public int hashCode() {
-        return (this.name.hashCode())
+        return (this.name == null ? 0 : this.name.hashCode())
                 ^ (this.syntheticUniqueId == null ? 0
                         : this.syntheticUniqueId.hashCode());
     }
+
+    @SuppressWarnings("unused")
+    private static final long writeObjectVersionUID = 2L;
 
     private void writeObject(ObjectOutputStream out) throws IOException {
         if (this.declaredIn == null
