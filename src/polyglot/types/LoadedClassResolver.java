@@ -202,9 +202,21 @@ public class LoadedClassResolver implements TopLevelResolver {
                 }
             }
             catch (InternalCompilerError e) {
+                if (Report.should_report(Report.serialize, 2)) {
+                    Report.report(2,
+                                  "Failing to deserialize: Internal compiler error: "
+                                          + e.getMessage());
+                }
+
                 throw e;
             }
             catch (InvalidClassException e) {
+                if (Report.should_report(Report.serialize, 2))
+                    Report.report(2,
+                                  "Failing to deserialize: Bad serialization: "
+                                          + clazz.name() + "@"
+                                          + clazz.getClassFileURI());
+
                 throw new BadSerializationException(clazz.name() + "@"
                         + clazz.getClassFileURI());
             }
@@ -312,9 +324,20 @@ public class LoadedClassResolver implements TopLevelResolver {
                 return ct;
             }
             else {
+                if (Report.should_report(Report.serialize, 2))
+                    Report.report(2, "Failing to deserialize: Class " + name
+                            + " not found in " + clazz.name() + ".");
                 throw new SemanticException("Class " + name + " not found in "
                         + clazz.name() + ".");
             }
+        }
+        catch (RuntimeException e) {
+            e.printStackTrace();
+            throw e;
+        }
+        catch (SemanticException e) {
+            e.printStackTrace();
+            throw e;
         }
         finally {
             recursive = oldRecursive;
@@ -328,12 +351,12 @@ public class LoadedClassResolver implements TopLevelResolver {
                 oldResolver.putAll(ts.systemResolver());
             }
             else {
-                if (Report.should_report(Report.serialize, 1))
-                    Report.report(1,
-                                  "Deserialization failed.  Restoring previous system resolver.");
-                if (Report.should_report(Report.serialize, 1))
+                if (Report.should_report(Report.serialize, 1)) {
+                    Report.report(1, "Deserialization failed for " + name
+                            + ".  Restoring previous system resolver.");
                     Report.report(1, "Discarding "
                             + ts.systemResolver().justAdded());
+                }
             }
 
             ts.restoreSystemResolver(oldResolver);
