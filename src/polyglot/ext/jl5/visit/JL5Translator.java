@@ -135,7 +135,8 @@ public class JL5Translator extends Translator {
             Type t = ((TypeNode) target).type();
             if (t instanceof JL5ClassType) {
                 JL5ClassType ct = (JL5ClassType) t;
-                ct.translateAsReceiver(this.context());
+                w.write(ct.translateAsReceiver(this.context()));
+                return;
             }
         }
         this.translateNode(target, w);
