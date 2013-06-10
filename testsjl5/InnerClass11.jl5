@@ -1,0 +1,11 @@
+class E {
+    void m(ClassX x) {
+	x.add(ClassX.Target.FOO, "asdF");
+    }
+}
+
+class ClassX<T> { // it's a container with a parameter! Make sure it gets printed correctly.
+    public static enum Target { FOO; }
+    void add(Target t, String s) { }
+    void foo(T x) { }
+}
