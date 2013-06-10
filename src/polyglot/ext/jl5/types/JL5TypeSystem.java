@@ -157,16 +157,8 @@ public interface JL5TypeSystem extends TypeSystem,
     /**
      * Returns the erased type of t.
      * See JLS 3rd ed. 4.6 
-     * Equivalent to erasureType(t, false);
      */
     Type erasureType(Type t);
-
-    /**
-     * Returns the erased type of t. For non-parameterized nested, non-inner classes,
-     * will also erase the container
-     * 
-     */
-    Type erasureType(Type t, boolean eraseContainingClasses);
 
     /**
      * Given a JL5ProcedureInstance, produce a JL5Subst that maps the

@@ -107,7 +107,7 @@ public class RawClass_c extends JL5ClassType_c implements RawClass {
         }
         JL5TypeSystem ts = (JL5TypeSystem) this.typeSystem();
 
-        return (ClassType) ts.erasureType(this.erased().outer(), true);
+        return (ClassType) ts.erasureType(this.erased().outer());
     }
 
     @Override

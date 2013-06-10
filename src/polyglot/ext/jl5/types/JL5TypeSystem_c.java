@@ -1218,24 +1218,14 @@ public class JL5TypeSystem_c extends
 
     @Override
     public Type erasureType(Type t) {
-        return erasureType(t, false);
+        return this.erasureType(t, new HashSet<TypeVariable>());
     }
 
-    @Override
-    public Type erasureType(Type t, boolean eraseContainingClasses) {
-        return this.erasureType(t,
-                                eraseContainingClasses,
-                                new HashSet<TypeVariable>());
-    }
-
-    protected Type erasureType(Type t, boolean eraseContainingClasses,
-            Set<TypeVariable> visitedTypeVariables) {
+    protected Type erasureType(Type t, Set<TypeVariable> visitedTypeVariables) {
 
         if (t.isArray()) {
             ArrayType at = t.toArray();
-            return at.base(this.erasureType(at.base(),
-                                            eraseContainingClasses,
-                                            visitedTypeVariables));
+            return at.base(this.erasureType(at.base(), visitedTypeVariables));
         }
         if (t instanceof TypeVariable) {
             TypeVariable tv = (TypeVariable) t;
@@ -1245,9 +1235,7 @@ public class JL5TypeSystem_c extends
                 return this.Object();
             }
 
-            return this.erasureType(tv.upperBound(),
-                                    eraseContainingClasses,
-                                    visitedTypeVariables);
+            return this.erasureType(tv.upperBound(), visitedTypeVariables);
         }
         if (t instanceof IntersectionType) {
             IntersectionType it = (IntersectionType) t;
@@ -1273,15 +1261,10 @@ public class JL5TypeSystem_c extends
                 }
             }
             // Return the most-specific class, if there is one
-            if (ct != null)
-                return erasureType(ct,
-                                   eraseContainingClasses,
-                                   visitedTypeVariables);
+            if (ct != null) return erasureType(ct, visitedTypeVariables);
             // Otherwise if the interfaces are all subtypes, return iface 
             if (subtypes && iface != null)
-                return erasureType(iface,
-                                   eraseContainingClasses,
-                                   visitedTypeVariables);
+                return erasureType(iface, visitedTypeVariables);
             return Object();
 
         }
@@ -1290,18 +1273,14 @@ public class JL5TypeSystem_c extends
             if (tv.upperBound() == null) {
                 return this.Object();
             }
-            return this.erasureType(tv.upperBound(),
-                                    eraseContainingClasses,
-                                    visitedTypeVariables);
+            return this.erasureType(tv.upperBound(), visitedTypeVariables);
         }
         if (t instanceof JL5SubstType) {
             JL5SubstType jst = (JL5SubstType) t;
-            return this.erasureType(jst.base(),
-                                    eraseContainingClasses,
-                                    visitedTypeVariables);
+            return this.erasureType(jst.base(), visitedTypeVariables);
         }
         if (t instanceof JL5ParsedClassType) {
-            return this.toRawType(t, eraseContainingClasses);
+            return this.toRawType(t);
         }
         return t;
     }
@@ -2387,11 +2366,6 @@ public class JL5TypeSystem_c extends
 
     @Override
     public Type toRawType(Type t) {
-        return toRawType(t, false);
-    }
-
-    public Type toRawType(Type t, boolean eraseContainingClasses) {
-
         if (!t.isReference()) {
             return t;
         }
@@ -2400,7 +2374,7 @@ public class JL5TypeSystem_c extends
         }
         if (t instanceof JL5ParsedClassType) {
             JL5ParsedClassType ct = (JL5ParsedClassType) t;
-            if (!classAndEnclosingTypeVariables(ct, eraseContainingClasses).isEmpty()) {
+            if (!classAndEnclosingTypeVariables(ct).isEmpty()) {
                 return this.rawClass(ct, ct.position());
             }
             else {
@@ -2410,7 +2384,7 @@ public class JL5TypeSystem_c extends
         }
         if (t instanceof ArrayType) {
             ArrayType at = t.toArray();
-            Type b = this.toRawType(at.base(), eraseContainingClasses);
+            Type b = this.toRawType(at.base());
             return at.base(b);
         }
         return t;
@@ -2422,29 +2396,23 @@ public class JL5TypeSystem_c extends
     @Override
     public List<TypeVariable> classAndEnclosingTypeVariables(
             JL5ParsedClassType ct) {
-        return classAndEnclosingTypeVariables(ct, false);
-    }
-
-    public List<TypeVariable> classAndEnclosingTypeVariables(
-            JL5ParsedClassType ct, boolean includeNonInnerContainers) {
         List<TypeVariable> l = new ArrayList<TypeVariable>();
-        classAndEnclosingTypeVariables(ct, l, includeNonInnerContainers);
+        classAndEnclosingTypeVariables(ct, l);
         return l;
     }
 
     protected void classAndEnclosingTypeVariables(JL5ParsedClassType ct,
-            List<TypeVariable> l, boolean includeNonInnerContainers) {
+            List<TypeVariable> l) {
 
         if (!ct.typeVariables().isEmpty()) {
             l.addAll(ct.typeVariables());
         }
-        if (ct.isInnerClass() || (ct.isNested() && includeNonInnerContainers)) {
+        if (!ct.isTopLevel() && ct.isNested() && ct.isInnerClass()) {
             // either we are an inner class, or we are a nested class, and we want to include the
             // container
             if (ct.outer() instanceof JL5ParsedClassType) {
                 classAndEnclosingTypeVariables((JL5ParsedClassType) ct.outer(),
-                                               l,
-                                               includeNonInnerContainers);
+                                               l);
             }
         }
     }

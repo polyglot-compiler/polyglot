@@ -116,16 +116,32 @@ public class AmbTypeInstantiation extends TypeNode_c implements TypeNode,
             }
         }
 
-        JL5ParsedClassType pct;
+        boolean handledBase = false;
+        JL5ParsedClassType pct = null;
         Map<TypeVariable, ReferenceType> typeMap =
                 new LinkedHashMap<TypeVariable, ReferenceType>();
         if (baseType instanceof JL5ParsedClassType) {
             pct = (JL5ParsedClassType) baseType;
+            handledBase = true;
         }
         else if (baseType instanceof RawClass) {
             pct = ((RawClass) baseType).base();
+            handledBase = true;
         }
-        else if (baseType instanceof JL5SubstClassType) {
+
+        if (handledBase && pct.isInnerClass()) {
+            // add self-instantiation if needed. i.e.,
+            // if we have class D<T>, and D is an inner class
+            // of C, and C itself has parameter S, then we need
+            // to self-instantiate C, i.e., we need C<S>.D<T>, as opposed
+            // to just C.D<T>
+            ClassType container =
+                    findSelfInstantiatedContainer((JL5ParsedClassType) pct.container(),
+                                                  ts);
+            baseType = container.memberClassNamed(pct.name());
+        }
+
+        if (baseType instanceof JL5SubstClassType) {
             JL5SubstClassType sct = (JL5SubstClassType) baseType;
             pct = sct.base();
             Iterator<Map.Entry<TypeVariable, ReferenceType>> iter =
@@ -134,8 +150,9 @@ public class AmbTypeInstantiation extends TypeNode_c implements TypeNode,
                 Map.Entry<TypeVariable, ReferenceType> e = iter.next();
                 typeMap.put(e.getKey(), e.getValue());
             }
+            handledBase = true;
         }
-        else {
+        if (!handledBase) {
             throw new InternalCompilerError("Don't know how to handle "
                     + baseType, position);
         }
@@ -172,9 +189,25 @@ public class AmbTypeInstantiation extends TypeNode_c implements TypeNode,
             typeMap.put(formals.get(i), t);
         }
 
-//        System.err.println("Instantiating " + pct + " with " + actuals);
+//        System.err.println("Instantiating " + pct + " with " + typeMap);
         Type instantiated = ts.subst(pct, typeMap);
         return sc.nodeFactory().CanonicalTypeNode(this.position, instantiated);
+    }
+
+    private ClassType findSelfInstantiatedContainer(
+            JL5ParsedClassType container, JL5TypeSystem ts) {
+        List<TypeVariable> l = ts.classAndEnclosingTypeVariables(container);
+        if (l.isEmpty()) {
+            return container;
+        }
+        // add a self instantiation.
+        Map<TypeVariable, TypeVariable> substMap =
+                new LinkedHashMap<TypeVariable, TypeVariable>();
+        for (TypeVariable tv : l) {
+            substMap.put(tv, tv);
+        }
+        // TODO Auto-generated method stub
+        return (ClassType) ts.subst(container, substMap);
     }
 
     @Override
