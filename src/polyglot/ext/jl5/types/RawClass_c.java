@@ -72,6 +72,12 @@ public class RawClass_c extends JL5ClassType_c implements RawClass {
         if (this.erased == null) {
             JL5TypeSystem ts = (JL5TypeSystem) this.ts;
             JL5Subst es = ts.erasureSubst(this.base);
+            if (es == null) {
+                throw new InternalCompilerError("Can't have a raw class for "
+                                                        + base
+                                                        + " unless it, or a container, has a type variable!",
+                                                this.position());
+            }
             this.erased =
                     new JL5SubstClassType_c(ts, base.position(), base, es);
         }
@@ -101,7 +107,7 @@ public class RawClass_c extends JL5ClassType_c implements RawClass {
         }
         JL5TypeSystem ts = (JL5TypeSystem) this.typeSystem();
 
-        return (ClassType) ts.erasureType(this.erased().outer());
+        return (ClassType) ts.erasureType(this.erased().outer(), true);
     }
 
     @Override

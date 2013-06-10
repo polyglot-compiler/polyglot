@@ -282,6 +282,14 @@ public class JL5ParsedClassType_c extends ParsedClassType_c implements
 
     @Override
     public String translateAsReceiver(Resolver c) {
+        // it is a nested class, but a receiver, then use the erased class.
+        if (isMember()) {
+            JL5TypeSystem ts = (JL5TypeSystem) this.typeSystem();
+            JL5ClassType erased = ((JL5ClassType) ts.erasureType(this, true));
+            if (erased != this) {
+                return erased.translateAsReceiver(c);
+            }
+        }
         return super.translate(c);
     }
 
