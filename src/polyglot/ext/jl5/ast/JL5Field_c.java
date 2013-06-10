@@ -52,7 +52,8 @@ public class JL5Field_c extends Field_c {
     @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
         Field n = (Field) super.typeCheck(tc);
-        if (n.fieldInstance() instanceof EnumInstance) {
+        if (n.fieldInstance() instanceof EnumInstance
+                && !(this instanceof EnumConstant)) {
             // it's an enum, so replace this with the appropriate AST node for enum constants.
             JL5NodeFactory nf = (JL5NodeFactory) tc.nodeFactory();
             EnumConstant ec =
