@@ -883,10 +883,12 @@ public class JL5TypeSystem_c extends
             //mj = (JL5MethodInstance) this.instantiate(mi.position(), mi, actualTypeArgs);
             mj = subst.substMethod(mi);
         }
-//        System.err.println("JL5TS methocall valid to " + mi + " with argtypes " + argTypes + " and actuals " + actualTypeArgs);
+//        System.err.println("JL5TS methocall valid to " + mi + " with argtypes "
+//                + argTypes + " and actuals " + actualTypeArgs);
 //        System.err.println("  subst is " + subst);
-//        System.err.println("  Call to mi " + mi + " after inference is " +  mj);
-//        System.err.println("  super.methodCallValid ? " +  super.methodCallValid(mj, name, argTypes));
+//        System.err.println("  Call to mi " + mi + " after inference is " + mj);
+//        System.err.println("  super.methodCallValid ? "
+//                + super.methodCallValid(mj, name, argTypes));
         if (super.methodCallValid(mj, name, argTypes)) {
             return mj;
         }
@@ -1273,8 +1275,6 @@ public class JL5TypeSystem_c extends
                 }
             }
             // Return the most-specific class, if there is one
-            System.err.println("erasure of " + t + " : " + iface + " subtypes "
-                    + subtypes);
             if (ct != null) return erasureType(ct, visitedTypeVariables);
             // Otherwise if the interfaces are all subtypes, return iface
 
@@ -1777,6 +1777,13 @@ public class JL5TypeSystem_c extends
             }
         }
         return superInterfaces;
+    }
+
+    @Override
+    public MethodInstance findMethod(ReferenceType container, String name,
+            List<? extends Type> argTypes, ClassType currClass)
+            throws SemanticException {
+        return this.findMethod(container, name, argTypes, null, currClass, null);
     }
 
     @Override
