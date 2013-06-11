@@ -1235,7 +1235,19 @@ public class JL5TypeSystem_c extends
                 return this.Object();
             }
 
-            return this.erasureType(tv.upperBound(), visitedTypeVariables);
+            ReferenceType upperBound = tv.upperBound();
+            if (upperBound instanceof IntersectionType) {
+                // if the type variable has an intersection type bound,
+                // then the erasure is the erasure of the left-most bound.
+                // See JLS 3rd ed, Section 4.4
+                IntersectionType it = (IntersectionType) upperBound;
+                return this.erasureType(it.bounds().get(0),
+                                        visitedTypeVariables);
+
+            }
+            else {
+                return this.erasureType(upperBound, visitedTypeVariables);
+            }
         }
         if (t instanceof IntersectionType) {
             IntersectionType it = (IntersectionType) t;
@@ -1261,10 +1273,14 @@ public class JL5TypeSystem_c extends
                 }
             }
             // Return the most-specific class, if there is one
+            System.err.println("erasure of " + t + " : " + iface + " subtypes "
+                    + subtypes);
             if (ct != null) return erasureType(ct, visitedTypeVariables);
-            // Otherwise if the interfaces are all subtypes, return iface 
-            if (subtypes && iface != null)
+            // Otherwise if the interfaces are all subtypes, return iface
+
+            if (subtypes && iface != null) {
                 return erasureType(iface, visitedTypeVariables);
+            }
             return Object();
 
         }
