@@ -26,9 +26,11 @@
 package polyglot.ext.jl5.visit;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import polyglot.ast.Block;
@@ -47,8 +49,10 @@ import polyglot.ast.TypeNode;
 import polyglot.ext.jl5.JL5Options;
 import polyglot.ext.jl5.types.JL5ClassType;
 import polyglot.ext.jl5.types.JL5ParsedClassType;
+import polyglot.ext.jl5.types.JL5ProcedureInstance;
 import polyglot.ext.jl5.types.JL5Subst;
 import polyglot.ext.jl5.types.JL5TypeSystem;
+import polyglot.ext.jl5.types.TypeVariable;
 import polyglot.frontend.Job;
 import polyglot.types.Flags;
 import polyglot.types.LocalInstance;
@@ -57,7 +61,6 @@ import polyglot.types.ReferenceType;
 import polyglot.types.SemanticException;
 import polyglot.types.Type;
 import polyglot.types.TypeSystem;
-import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
 import polyglot.visit.ErrorHandlingVisitor;
 import polyglot.visit.NodeVisitor;
@@ -149,7 +152,7 @@ public class TypeErasureProcDecls extends ErrorHandlingVisitor {
                 miFormalTypes = es.substTypeList(miFormalTypes);
             }
         }
-        MethodInstance mjErased = erasedMethodInstance(mj, miFormalTypes);
+        MethodInstance mjErased = erasedMethodInstance(mj);
 
         // we need to rewrite the method decl to have the same arguments as mjErased, the erased version of mj.
         List<? extends Type> mjErasedFormals = erase(mjErased.formalTypes());
@@ -186,8 +189,7 @@ public class TypeErasureProcDecls extends ErrorHandlingVisitor {
             // need to add a new method for it...
             for (MethodInstance mk : implemented) {
                 // do we have a method that overrides mk correctly?
-                MethodInstance mkErased =
-                        erasedMethodInstance(mk, miFormalTypes);
+                MethodInstance mkErased = erasedMethodInstance(mk);
                 List<? extends Type> mkErasedFormals =
                         erase(mkErased.formalTypes());
 
@@ -343,23 +345,32 @@ public class TypeErasureProcDecls extends ErrorHandlingVisitor {
         return nt;
     }
 
-    protected MethodInstance erasedMethodInstance(MethodInstance mj,
-            List<? extends Type> argTypes) {
+    /**
+     * Get an erased version of method instance mj.
+     * @param mj
+     * @return
+     */
+    protected MethodInstance erasedMethodInstance(MethodInstance mj) {
+        // we'll get the erasure substitutions for mj, and for mj.container(),
+        // and combine them, then erase mj.
         JL5TypeSystem ts = (JL5TypeSystem) this.ts;
-        ReferenceType erasedMjContainer =
-                (ReferenceType) ts.erasureType(mj.container());
-        try {
-            return ts.findMethod(erasedMjContainer,
-                                 mj.name(),
-                                 argTypes,
-                                 erasedMjContainer.toClass());
+        Map<TypeVariable, ReferenceType> subst =
+                new HashMap<TypeVariable, ReferenceType>();
+
+        JL5ParsedClassType containerBase =
+                (JL5ParsedClassType) ((JL5ClassType) mj.container()).declaration();
+        JL5Subst containerSubst = ts.erasureSubst(containerBase);
+        if (containerSubst != null) {
+            subst.putAll(containerSubst.substitutions());
         }
-        catch (SemanticException e) {
-            // hmmm couldn't find the correct method
-            throw new InternalCompilerError("Couldn't find erased version of "
-                    + mj + " in " + erasedMjContainer + " with name "
-                    + mj.name() + " and args " + argTypes + ". "
-                    + erasedMjContainer.methods(), e);
+        JL5Subst procedureSubst = ts.erasureSubst((JL5ProcedureInstance) mj);
+        if (procedureSubst != null) {
+            subst.putAll(procedureSubst.substitutions());
         }
+
+        if (subst.isEmpty()) {
+            return mj;
+        }
+        return ts.subst(subst).substMethod((MethodInstance) mj.declaration());
     }
 }
