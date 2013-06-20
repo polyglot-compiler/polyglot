@@ -829,7 +829,7 @@
 		<echo>Examples build and run</echo>
 		<echo>Regression tests successful</echo>
 		<echo>CHANGES file up-to-date</echo>
-		<echo>Version bump</echo>
+		<echo>Version bump (also check README)</echo>
 	</target>
 
 	<target name="dist" depends="source-tarball-stable,dist-checklist" />
