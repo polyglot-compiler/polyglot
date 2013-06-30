@@ -48,6 +48,10 @@ public interface Subst<Formal extends Param, Actual extends TypeObject> extends
      */
     public Iterator<Entry<Formal, Actual>> entries();
 
+    /** An Iterable that calls entries().
+     */
+	public Iterable<Entry<Formal, Actual>> is_entry();
+
     /** Type system */
     public ParamTypeSystem<Formal, Actual> typeSystem();
 

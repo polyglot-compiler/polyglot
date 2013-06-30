@@ -86,6 +86,14 @@ public class Subst_c<Formal extends Param, Actual extends TypeObject>
     public Iterator<Entry<Formal, Actual>> entries() {
         return substitutions().entrySet().iterator();
     }
+    @Override
+    public Iterable<Entry<Formal, Actual>> is_entry() {
+		return new Iterable<Entry<Formal, Actual>>() {
+			public Iterator<Entry<Formal, Actual>> iterator() {
+				return entries();
+			}
+		};
+    }
 
     /**
      * The underlying substitution map.
