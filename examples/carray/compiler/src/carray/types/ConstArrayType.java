@@ -1,4 +1,4 @@
-package polyglot.ext.carray.types;
+package carray.types;
 
 import polyglot.types.*;
 /**

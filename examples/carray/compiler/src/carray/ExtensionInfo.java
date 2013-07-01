@@ -1,36 +1,41 @@
-package polyglot.ext.carray;
+package carray;
 
-import polyglot.ext.carray.parse.Lexer_c;
-import polyglot.ext.carray.parse.Grm;
-import polyglot.ext.carray.ast.*;
-import polyglot.ext.carray.types.*;
+import java.io.Reader;
+
+import polyglot.ast.NodeFactory;
+import polyglot.frontend.CupParser;
+import polyglot.frontend.FileSource;
+import polyglot.frontend.Parser;
 import polyglot.lex.Lexer;
-import polyglot.ast.*;
-import polyglot.types.*;
-import polyglot.util.*;
-import polyglot.visit.*;
-import polyglot.frontend.*;
-
-import java.util.*;
-import java.io.*;
+import polyglot.parse.Grm;
+import polyglot.parse.Lexer_c;
+import polyglot.types.TypeSystem;
+import polyglot.util.ErrorQueue;
+import carray.ast.CarrayNodeFactory_c;
+import carray.types.CarrayTypeSystem;
 
 /**
  * Extension information for carray extension.
  */
-public class ExtensionInfo extends polyglot.ext.jl.ExtensionInfo {
+public class ExtensionInfo extends polyglot.frontend.JLExtensionInfo {
+    @Override
     public String defaultFileExtension() {
         return "jl";
     }
 
+    @Override
     public Parser parser(Reader reader, FileSource source, ErrorQueue eq) {
-        Lexer lexer = new Lexer_c(reader, source.name(), eq);
+        Lexer lexer = new Lexer_c(reader, source, eq);
         Grm grm = new Grm(lexer, ts, nf, eq);
         return new CupParser(grm, source, eq);
     }
 
+    @Override
     protected NodeFactory createNodeFactory() {
         return new CarrayNodeFactory_c();
     }
+
+    @Override
     protected TypeSystem createTypeSystem() {
         return new CarrayTypeSystem();
     }

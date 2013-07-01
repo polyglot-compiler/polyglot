@@ -1,4 +1,4 @@
-package polyglot.ext.carray.ast;
+package carray.ast;
 
 import polyglot.ast.*;
 

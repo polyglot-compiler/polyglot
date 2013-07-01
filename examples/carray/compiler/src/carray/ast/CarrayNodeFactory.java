@@ -1,13 +1,8 @@
-package polyglot.ext.carray.ast;
+package carray.ast;
 
-import polyglot.ast.*;
-import polyglot.ext.jl.ast.*;
-import polyglot.types.Flags;
-import polyglot.types.Package;
-import polyglot.types.Type;
-import polyglot.types.Qualifier;
-import polyglot.util.*;
-import java.util.*;
+import polyglot.ast.NodeFactory;
+import polyglot.ast.TypeNode;
+import polyglot.util.Position;
 
 /**
  * NodeFactory for carray extension.

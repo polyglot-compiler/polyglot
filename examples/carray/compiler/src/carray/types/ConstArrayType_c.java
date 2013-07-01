@@ -1,30 +1,35 @@
-package polyglot.ext.carray.types;
+package carray.types;
 
-import polyglot.types.*;
-import polyglot.util.*;
-import polyglot.ext.jl.types.*;
-import java.util.*;
+import polyglot.types.ArrayType;
+import polyglot.types.ArrayType_c;
+import polyglot.types.Type;
+import polyglot.types.TypeObject;
+import polyglot.types.TypeSystem;
+import polyglot.util.Position;
 
 /**
  * A <code>ConstArrayType</code> represents an array of base java types,
  * whose elements cannot change after initialization.
  */
-public class ConstArrayType_c extends ArrayType_c implements ConstArrayType
-{
+public class ConstArrayType_c extends ArrayType_c implements ConstArrayType {
     protected boolean isConst;
 
     /** Used for deserializing types. */
-    protected ConstArrayType_c() { }
+    protected ConstArrayType_c() {
+    }
 
-    public ConstArrayType_c(TypeSystem ts, Position pos, Type base, boolean isConst) {
+    public ConstArrayType_c(TypeSystem ts, Position pos, Type base,
+            boolean isConst) {
         super(ts, pos, base);
         this.isConst = isConst;
     }
 
+    @Override
     public String toString() {
         return base.toString() + (isConst ? " const" : "") + "[]";
     }
 
+    @Override
     public boolean equalsImpl(TypeObject o) {
         if (o instanceof ConstArrayType) {
             ConstArrayType t = (ConstArrayType) o;
@@ -33,26 +38,28 @@ public class ConstArrayType_c extends ArrayType_c implements ConstArrayType
 
         if (o instanceof ArrayType) {
             ArrayType t = (ArrayType) o;
-            return ! isConst && ts.equals(base, t.base());
+            return !isConst && ts.equals(base, t.base());
         }
 
         return false;
     }
 
+    @Override
     public boolean isConst() {
         return isConst;
     }
 
+    @Override
     public boolean isImplicitCastValidImpl(Type toType) {
-        if (toType instanceof ConstArrayType &&
-            ((ConstArrayType) toType).isConst()) {
+        if (toType instanceof ConstArrayType
+                && ((ConstArrayType) toType).isConst()) {
             // int const[] = int[] 
             return super.isImplicitCastValidImpl(toType);
         }
 
         // From this point, toType is not a const array
 
-        if (! isConst) {
+        if (!isConst) {
             if (toType.isArray()) {
                 // non-const arrays are invariant.
                 return ts.equals(this, toType);
