@@ -73,6 +73,21 @@ public class JL5ToJLExtFactory_c extends JL5ToExtFactory_c {
         return new EnumConstantToJL_c();
     }
 
+    @Override
+    protected Ext extFieldDeclImpl() {
+        return new JL5FieldDeclToJL_c();
+    }
+
+    @Override
+    protected Ext extFormalImpl() {
+        return new JL5FormalToJL_c();
+    }
+
+    @Override
+    protected Ext extLocalDeclImpl() {
+        return new JL5LocalDeclToJL_c();
+    }
+
     // The below nodes should have been removed 
     // by the time the ExtensionRewriter is called.
     @Override

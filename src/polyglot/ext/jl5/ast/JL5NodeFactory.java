@@ -157,4 +157,7 @@ public interface JL5NodeFactory extends NodeFactory {
     ElementValueArrayInit ElementValueArrayInit(Position pos,
             List<Term> elements);
 
+    TypeNode TypeNodeFromQualifiedName(Position pos, String qualifiedName,
+            List<TypeNode> typeArgs);
+
 }

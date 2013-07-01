@@ -241,6 +241,42 @@ public class JL5ToExtFactory_c extends ToExtFactory_c implements JL5ExtFactory {
         return this.extTermImpl();
     }
 
+    /* */
+    @Override
+    protected Ext extCallImpl() {
+        return new JL5CallToExt_c();
+    }
+
+    @Override
+    protected Ext extClassDeclImpl() {
+        return new JL5ClassDeclToExt_c();
+    }
+
+    @Override
+    protected Ext extConstructorDeclImpl() {
+        return new JL5ConstructorDeclToExt_c();
+    }
+
+    @Override
+    protected Ext extFieldDeclImpl() {
+        return new JL5FieldDeclToExt_c();
+    }
+
+    @Override
+    protected Ext extFormalImpl() {
+        return new JL5FormalToExt_c();
+    }
+
+    @Override
+    protected Ext extLocalDeclImpl() {
+        return new JL5LocalDeclToExt_c();
+    }
+
+    @Override
+    protected Ext extMethodDeclImpl() {
+        return new JL5MethodDeclToExt_c();
+    }
+
     protected Ext postExtAnnotationElemDecl(Ext ext) {
         return ext;
     }

@@ -688,6 +688,15 @@ public class JL5NodeFactory_c extends NodeFactory_c implements JL5NodeFactory {
     }
 
     @Override
+    public TypeNode TypeNodeFromQualifiedName(Position pos,
+            String qualifiedName, List<TypeNode> typeArguments) {
+        TypeNode base = super.TypeNodeFromQualifiedName(pos, qualifiedName);
+        if (typeArguments.isEmpty())
+            return base;
+        else return AmbTypeInstantiation(pos, base, typeArguments);
+    }
+
+    @Override
     public ElementValueArrayInit ElementValueArrayInit(Position pos,
             List<Term> elements) {
         ElementValueArrayInit n = new ElementValueArrayInit_c(pos, elements);
