@@ -201,6 +201,13 @@ public class QQ {
         return new polyglot.qq.Grm(lexer, ts, nf, eq);
     }
 
+    /** Return a position for a type object. Generate one if the type doesn't have one. */
+    protected Position type_position(polyglot.types.TypeObject t) {
+        Position p = t.position();
+        if (p == null) p = Position.compilerGenerated(0);
+        return p;
+    }
+
     /** Parse a string into an AST node of the given type,
      * applying substitutions. */
     protected Node parse(int kind, String fmt, Object... subst) {
@@ -214,7 +221,7 @@ public class QQ {
 
             if (o instanceof Type) {
                 Type t = (Type) o;
-                subst[i] = nf.CanonicalTypeNode(t.position(), t);
+                subst[i] = nf.CanonicalTypeNode(type_position(t), t);
             }
             else if (o instanceof List) {
                 @SuppressWarnings("unchecked")
@@ -225,7 +232,7 @@ public class QQ {
 
                     if (p instanceof Type) {
                         Type t = (Type) p;
-                        j.set(nf.CanonicalTypeNode(t.position(), t));
+                        j.set(nf.CanonicalTypeNode(type_position(t), t));
                     }
                 }
             }
