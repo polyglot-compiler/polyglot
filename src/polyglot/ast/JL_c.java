@@ -48,7 +48,7 @@ import polyglot.visit.TypeBuilder;
 import polyglot.visit.TypeChecker;
 
 /**
- * <code>JL_c</code> is the super class of JL node delegates objects.
+ * <code>JL_c</code> is the super class of JL node delegate objects.
  * It defines default implementations of the methods which implement compiler
  * passes, dispatching to the node to perform the actual work of the pass.
  * Language extensions may subclass <code>JL_c</code> for individual node
