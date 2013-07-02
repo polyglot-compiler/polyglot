@@ -39,7 +39,7 @@ javac "-d java-out -cp ." {
 	java-src/Call02D.java;
 }
  
-polyglot.ext.jl5.ExtensionInfo "-d out -classpath java-out -assert -noserial -post \"javac -source 1.5\" -morepermissiveinference" {
+polyglot.ext.jl5.ExtensionInfo "-d out -classpath java-out -assert -noserial -post \"javac -source 1.5 -Xlint:-options\" -morepermissiveinference" {
         Assert01.jl5;
         HexFloatingPoint.jl5;
         Generics01.jl5;
@@ -408,7 +408,7 @@ polyglot.ext.jl5.ExtensionInfo "-d out -classpath java-out -assert -noserial -po
 
 # Now run the tests again removing the Java 5-isms.
 # This one uses 1.4 to suppress the warning about raw classes.
-polyglot.ext.jl5.ExtensionInfo "-d out -classpath java-out -removeJava5isms -enumImplClass MyEnum -assert -noserial -post \"javac -source 1.4 -target 1.4\" -morepermissiveinference" {
+polyglot.ext.jl5.ExtensionInfo "-d out -classpath java-out -removeJava5isms -enumImplClass MyEnum -assert -noserial -post \"javac -Xlint:-options -source 1.4 -target 1.4\" -morepermissiveinference" {
         Assert01.jl5;
         HexFloatingPoint.jl5;
         Generics01.jl5;
@@ -774,20 +774,20 @@ polyglot.ext.jl5.ExtensionInfo "-d out -classpath java-out -removeJava5isms -enu
         FinalInit01.jl5;
 }
 
-polyglot.ext.jl5.ExtensionInfo "-d out -classpath java-out -assert -noserial -post \"javac -source 1.5\" -morepermissivecasts" {
+polyglot.ext.jl5.ExtensionInfo "-d out -classpath java-out -assert -noserial -post \"javac -Xlint:-options -source 1.5\" -morepermissivecasts" {
         PermissiveCasts01.jl5;
         PermissiveCasts02.jl5 (Semantic, "does not match");
         PermissiveCasts03.jl5 (Semantic, "Cannot cast");
 }
 
-polyglot.ext.jl5.ExtensionInfo "-d out -classpath java-out -removeJava5isms -enumImplClass MyEnum -assert -noserial -post \"javac -source 1.4\" -morepermissivecasts" {
+polyglot.ext.jl5.ExtensionInfo "-d out -classpath java-out -removeJava5isms -enumImplClass MyEnum -assert -noserial -post \"javac -Xlint:-options -source 1.4\" -morepermissivecasts" {
         PermissiveCasts01.jl5;
         PermissiveCasts02.jl5 (Semantic, "does not match");
         PermissiveCasts03.jl5 (Semantic, "Cannot cast");
 }
 
 # Use source/target 1.5 since we're expecting CovariantReturn to be allowed
-polyglot.ext.jl5.ExtensionInfo "-d out -classpath java-out -removeJava5isms -leaveCovariantReturns -enumImplClass MyEnum -assert -noserial -post \"javac -source 1.5 -target 1.5\" -morepermissiveinference" {
+polyglot.ext.jl5.ExtensionInfo "-d out -classpath java-out -removeJava5isms -leaveCovariantReturns -enumImplClass MyEnum -assert -noserial -post \"javac -Xlint:-options -source 1.5 -target 1.5\" -morepermissiveinference" {
         CovariantRet01.jl5;
         CovariantRet02.jl5;
         CovariantRet03.jl5;

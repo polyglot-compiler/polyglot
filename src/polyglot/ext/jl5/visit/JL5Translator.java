@@ -96,6 +96,10 @@ public class JL5Translator extends Translator {
                 w.write(translateType(erastype));
                 return;
             }
+            else if (!tn.isDisambiguated()) {
+                tn.del().prettyPrint(w, this);
+                return;
+            }
             else {
                 w.write(tn.type().translate(this.context()));
                 return;
