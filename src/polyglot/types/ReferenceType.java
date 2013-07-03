@@ -29,12 +29,13 @@ package polyglot.types;
 import java.util.List;
 
 /**
- * A <code>ReferenceType</code> represents a reference type: a type which
- * contains methods and fields and which is a subtype of Object.
+ * A <code>ReferenceType</code> represents a reference type: a type that
+ * contains methods and fields and is a subtype of Object. Both class
+ * types and array types are reference types.
  */
 public interface ReferenceType extends Type {
     /**
-     * Return the type's super type.
+     * Return the type's supertype.
      */
     Type superType();
 
@@ -46,7 +47,7 @@ public interface ReferenceType extends Type {
     List<? extends ReferenceType> interfaces();
 
     /**
-     * Return a list of a all the type's members.
+     * Return a list of all the type's members.
      * @return A list of <code>MemberInstance</code>.
      * @see polyglot.types.MemberInstance
      */
@@ -92,12 +93,12 @@ public interface ReferenceType extends Type {
             List<? extends Type> argTypes);
 
     /**
-     * Return the true if the type has the given method.
+     * Return true if the type has the given method.
      */
     boolean hasMethod(MethodInstance mi);
 
     /**
-     * Return the true if the type has the given method.
+     * Return true if the type has the given method.
      */
     boolean hasMethodImpl(MethodInstance mi);
 }
