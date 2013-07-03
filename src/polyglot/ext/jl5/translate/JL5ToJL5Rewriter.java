@@ -1,7 +1,6 @@
 package polyglot.ext.jl5.translate;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import polyglot.ast.TypeNode;
@@ -63,20 +62,23 @@ public class JL5ToJL5Rewriter extends ExtensionRewriter {
             TypeVariable tv = (TypeVariable) t;
             if (tv.hasLowerBound()) {
                 TypeNode superNode = typeToJava(tv.lowerBound(), pos);
-                return to_nf.ParamTypeNode(pos,
-                                           Collections.singletonList(superNode),
-                                           to_nf.Id(pos, tv.name()));
+                return to_nf.AmbTypeNode(pos, to_nf.Id(pos, tv.name()));
+//                return to_nf.ParamTypeNode(pos,
+//                                           Collections.singletonList(superNode),
+//                                           to_nf.Id(pos, tv.name()));
             }
             else if (tv.upperBound() != null) {
                 TypeNode extendsNode = typeToJava(tv.upperBound(), pos);
-                return to_nf.ParamTypeNode(pos,
-                                           Collections.singletonList(extendsNode),
-                                           to_nf.Id(pos, tv.name()));
+                return to_nf.AmbTypeNode(pos, to_nf.Id(pos, tv.name()));
+//                return to_nf.ParamTypeNode(pos,
+//                                           Collections.singletonList(extendsNode),
+//                                           to_nf.Id(pos, tv.name()));
             }
             else {
-                return to_nf.ParamTypeNode(pos,
-                                           Collections.<TypeNode> emptyList(),
-                                           to_nf.Id(pos, tv.name()));
+                return to_nf.AmbTypeNode(pos, to_nf.Id(pos, tv.name()));
+//                return to_nf.ParamTypeNode(pos,
+//                                           Collections.<TypeNode> emptyList(),
+//                                           to_nf.Id(pos, tv.name()));
             }
         }
 
