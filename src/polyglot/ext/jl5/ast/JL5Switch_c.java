@@ -51,7 +51,8 @@ public class JL5Switch_c extends Switch_c implements JL5Switch {
     public Node typeCheck(TypeChecker tc) throws SemanticException {
 
         if (!isAcceptableSwitchType(expr.type())) {
-            throw new SemanticException("Switch index must be of type char, byte, short, int, Character, Byte, Short, Integer, or an enum type.",
+            throw new SemanticException("Switch index must be of type char, byte,"
+                                                + " short, int, Character, Byte, Short, Integer, or an enum type.",
                                         position());
         }
 
@@ -59,11 +60,10 @@ public class JL5Switch_c extends Switch_c implements JL5Switch {
                 new ArrayList<SwitchElement>(elements.size());
         Type switchType = expr.type();
         for (SwitchElement el : elements()) {
-            if (el instanceof JL5Case) {
+            if (el instanceof JL5Case)
                 el =
                         (SwitchElement) ((JL5Case) el).resolveCaseLabel(tc,
                                                                         switchType);
-            }
             newels.add(el);
         }
         return elements(newels);

@@ -101,7 +101,7 @@ public class Method {
                 }
             }
 
-            if (0 != (modifiers & ACC_SYNTHETIC)) synthetic = true;
+            //if (0 != (modifiers & ACC_SYNTHETIC)) synthetic = true;
 
             if (attrs[i] == null) {
                 long n = in.skip(length);

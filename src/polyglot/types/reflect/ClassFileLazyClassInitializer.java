@@ -498,7 +498,8 @@ public class ClassFileLazyClassInitializer implements LazyClassInitializer {
         for (int i = 0; i < methods.length; i++) {
             if (!methods[i].name().equals("<init>")
                     && !methods[i].name().equals("<clinit>")
-                    && !methods[i].isSynthetic() && !methods[i].isBridge()) {
+                    && !methods[i].isSynthetic() //  && !methods[i].isBridge()
+                    ) {
                 MethodInstance mi = this.methodInstance(methods[i], ct);
                 if (Report.should_report(verbose, 3))
                     Report.report(3, "adding " + mi + " to " + ct);
