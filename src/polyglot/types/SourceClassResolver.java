@@ -40,7 +40,7 @@ import polyglot.types.reflect.ClassFile;
 
 /**
  * Loads class information from source files, class files, or serialized class
- * infomation from within class files. An outline of the steps is given below.
+ * information from within class files. An outline of the steps is given below.
  * 
  * <ol>
  * <li>When the polyglot translator looks for a class by the name "foo.bar.Quux"
@@ -76,14 +76,14 @@ import polyglot.types.reflect.ClassFile;
  * information, then the version number of translator used to translate the
  * source which created the given class file is compared against the version of
  * the current instantiation of the translator. If the versions are compatible,
- * then the jlc class type information is used as the desired definiton. If the
+ * then the jlc class type information is used as the desired definition. If the
  * versions are incompatible (see the documentation in Compiler.java) then an
  * error is reported. In either case, all remaining steps are skipped.
  * 
  * <li>If both a suitable source file and class are found then we have a choice.
  * If the class definition does not contain jlc class type information then the
  * source file is parsed as the definition found in this file is used as desired
- * definiton and we stop here. If the class does contain jlc class type
+ * definition and we stop here. If the class does contain jlc class type
  * information, then continue.
  * 
  * <li>(source and class with jlc info) Next the last modification date of the
@@ -92,7 +92,7 @@ import polyglot.types.reflect.ClassFile;
  * parsed as used as the desired definition and all remaining steps are skipped.
  * 
  * <li>(source and class with jlc info) Next the jlc version of the class and of
- * the current translator are compared (as in 7.). If the verisions are
+ * the current translator are compared (as in 7.). If the versions are
  * incompatible, then we use the definition from the parsed source file. If the
  * versions are compatible, then we use the definition given by the jlc class
  * type information.
