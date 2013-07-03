@@ -39,7 +39,6 @@
 	<property name="examples.dir" location="${basedir}/examples" />
 	<property name="pao.dir" location="${examples.dir}/pao" />
 	<property name="coffer.dir" location="${examples.dir}/coffer" />
-	<property name="carray.dir" location="${examples.dir}/carray" />
 
 	<!--
 	<property name="cvs.root" value=":pserver:anonymous@gforge.cis.cornell.edu:/cvsroot/polyglot" />
@@ -156,18 +155,16 @@
 	<!-- build all the jars -->
 	<target name="jar-all" depends="jar,jar-pth,jar-ppg,jar-examples" description="Build polyglot.jar ppg.jar pth.jar and examples" />
 
-	<!-- install the jars in the examples XXX shouldn't we just use the lib jars? -->
+	<!-- install the jars in the examples -->
 	<target name="install-jars-in-examples" depends="jar">
 		<copy file="${lib}/polyglot.jar" todir="${pao.dir}/lib" />
 		<copy file="${lib}/polyglot.jar" todir="${coffer.dir}/lib" />
-		<copy file="${lib}/polyglot.jar" todir="${carray.dir}/lib" />
 		<copy file="${lib}/java_cup.jar" todir="${pao.dir}/lib" />
 		<copy file="${lib}/java_cup.jar" todir="${coffer.dir}/lib" />
-		<copy file="${lib}/java_cup.jar" todir="${carray.dir}/lib" />
 	</target>
 
 	<!-- build the examples -->
-	<target name="examples" depends="pao,coffer,carray" description="Build the examples" />
+	<target name="examples" depends="pao,coffer" description="Build the examples" />
 
 	<target name="pao" depends="install-jars-in-examples" description="Build the pao example">
 		<ant inheritAll="false" antfile="${pao.dir}/build.xml" dir="${pao.dir}" target="compile-all" />
@@ -175,33 +172,26 @@
 	</target>
 
 	<target name="coffer" depends="install-jars-in-examples" description="Build the coffer example">
-		<ant inheritAll="false" antfile="${coffer.dir}/build.xml" dir="${coffer.dir}" target="examples.compile-all" />
+		<ant inheritAll="false" antfile="${coffer.dir}/build.xml" dir="${coffer.dir}" target="compile-all" />
 		<ant inheritAll="false" antfile="${coffer.dir}/build.xml" dir="${coffer.dir}" target="jar" />
-	</target>
-	<target name="carray" depends="install-jars-in-examples" description="Build the carray example">
-		<ant inheritAll="false" antfile="${carray.dir}/build.xml" dir="${carray.dir}" target="compile-all" />
-		<ant inheritAll="false" antfile="${carray.dir}/build.xml" dir="${carray.dir}" target="jar" />
 	</target>
 
 	<!-- clean the examples -->
 	<target name="clean-examples" description="Clean the examples">
 		<ant inheritAll="false" antfile="${pao.dir}/build.xml" dir="${pao.dir}" target="clean" />
 		<ant inheritAll="false" antfile="${coffer.dir}/build.xml" dir="${coffer.dir}" target="clean" />
-		<ant inheritAll="false" antfile="${carray.dir}/build.xml" dir="${carray.dir}" target="clean" />
 	</target>
 
 	<!-- clobber the examples -->
 	<target name="clobber-examples" description="Clobber the examples">
 		<ant inheritAll="false" antfile="${pao.dir}/build.xml" dir="${pao.dir}" target="clobber" />
 		<ant inheritAll="false" antfile="${coffer.dir}/build.xml" dir="${coffer.dir}" target="clobber" />
-		<ant inheritAll="false" antfile="${carray.dir}/build.xml" dir="${carray.dir}" target="clobber" />
 	</target>
 
 	<!-- jar the examples -->
-	<target name="jar-examples" description="Build jar files for the example extensions">
+	<target name="jar-examples" description="Build pao.jar and coffer.jar">
 		<ant inheritAll="false" antfile="${pao.dir}/build.xml" dir="${pao.dir}" target="jar" />
 		<ant inheritAll="false" antfile="${coffer.dir}/build.xml" dir="${coffer.dir}" target="jar" />
-		<ant inheritAll="false" antfile="${carray.dir}/build.xml" dir="${carray.dir}" target="jar" />
 	</target>
 
 	<target name="clean-all" depends="clean,clean-examples" description="Clean the base compiler and the examples" />
@@ -682,7 +672,7 @@
 		<mkdir dir="${tmp}/testsjl5/java-out" />
 
 		<copy todir="${tmp}/examples" includeEmptyDirs="true">
-                    <fileset dir="${examples.dir}" includes="pao/**,coffer/**,carray/**" />
+                    <fileset dir="${examples.dir}" includes="pao/**,coffer/**" />
 		</copy>
 
                 <copy file="META-INF/MANIFEST.MF" todir="${tmp}/META-INF" />
