@@ -31,4 +31,6 @@ import polyglot.ast.ClassDecl;
 
 public interface JL5ClassDecl extends ClassDecl, AnnotatedElement {
     List<ParamTypeNode> paramTypes();
+
+    JL5ClassDecl paramTypes(List<ParamTypeNode> types);
 }

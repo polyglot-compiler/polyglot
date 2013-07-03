@@ -139,6 +139,7 @@ public class JL5ClassDecl_c extends ClassDecl_c implements JL5ClassDecl {
 
     }
 
+    @Override
     public JL5ClassDecl paramTypes(List<ParamTypeNode> types) {
         JL5ClassDecl_c n = (JL5ClassDecl_c) copy();
         n.paramTypes = types;
