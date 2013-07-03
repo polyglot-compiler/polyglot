@@ -1,6 +1,7 @@
 package polyglot.ext.jl5.translate;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import polyglot.ast.TypeNode;
@@ -9,6 +10,8 @@ import polyglot.ext.jl5.types.IntersectionType;
 import polyglot.ext.jl5.types.JL5ParsedClassType;
 import polyglot.ext.jl5.types.JL5SubstClassType;
 import polyglot.ext.jl5.types.RawClass;
+import polyglot.ext.jl5.types.TypeVariable;
+import polyglot.ext.jl5.types.WildCardType;
 import polyglot.ext.jl5.types.inference.LubType;
 import polyglot.frontend.ExtensionInfo;
 import polyglot.frontend.Job;
@@ -28,27 +31,63 @@ public class JL5ToJL5Rewriter extends ExtensionRewriter {
 
     @Override
     public TypeNode typeToJava(Type t, Position pos) throws SemanticException {
+        JL5NodeFactory to_nf = (JL5NodeFactory) to_nf();
+        // JL5ToJL5Rewriter.typeToJava
+        if (t instanceof IntersectionType) {
+            IntersectionType ct = (IntersectionType) t.toClass();
+            List<TypeNode> bounds = new ArrayList<TypeNode>(ct.bounds().size());
+            for (ReferenceType rt : ct.bounds())
+                bounds.add(typeToJava(rt, pos));
+            return to_nf.ParamTypeNode(pos, bounds, to_nf.Id(pos, ct.name()));
+
+        }
+        else if (t instanceof LubType) {
+            throw new InternalCompilerError("I don't understand what to do here");
+
+        }
+        else if (t instanceof WildCardType) {
+            WildCardType wc = (WildCardType) t;
+            if (wc.isSuperConstraint()) {
+                TypeNode superNode = typeToJava(wc.lowerBound(), pos);
+                return to_nf.AmbWildCardSuper(pos, superNode);
+            }
+            else if (wc.isExtendsConstraint()) {
+                TypeNode extendsNode = typeToJava(wc.upperBound(), pos);
+                return to_nf.AmbWildCardSuper(pos, extendsNode);
+            }
+            else {
+                return to_nf.AmbWildCard(pos);
+            }
+        }
+        else if (t instanceof TypeVariable) {
+            TypeVariable tv = (TypeVariable) t;
+            if (tv.hasLowerBound()) {
+                TypeNode superNode = typeToJava(tv.lowerBound(), pos);
+                return to_nf.ParamTypeNode(pos,
+                                           Collections.singletonList(superNode),
+                                           to_nf.Id(pos, tv.name()));
+            }
+            else if (tv.upperBound() != null) {
+                TypeNode extendsNode = typeToJava(tv.upperBound(), pos);
+                return to_nf.ParamTypeNode(pos,
+                                           Collections.singletonList(extendsNode),
+                                           to_nf.Id(pos, tv.name()));
+            }
+            else {
+                return to_nf.ParamTypeNode(pos,
+                                           Collections.<TypeNode> emptyList(),
+                                           to_nf.Id(pos, tv.name()));
+            }
+        }
+
         if (t.isClass()) {
-            JL5NodeFactory to_nf = (JL5NodeFactory) to_nf();
             if (t instanceof JL5ParsedClassType) {
                 JL5ParsedClassType ct = (JL5ParsedClassType) t.toClass();
-//                List<TypeNode> typeArgs =
-//                        new ArrayList<TypeNode>(ct.typeVariables().size());
-//                for (TypeVariable tv : ct.typeVariables())
-//                    typeArgs.add(typeToJava(tv, pos));
-                if (!ct.typeVariables().isEmpty())
-                    throw new InternalCompilerError("I don't understand what to do here");
-                return to_nf.TypeNodeFromQualifiedName(pos, ct.fullName());
-            }
-            else if (t instanceof IntersectionType) {
-                IntersectionType ct = (IntersectionType) t.toClass();
-                List<TypeNode> bounds =
-                        new ArrayList<TypeNode>(ct.bounds().size());
-                for (ReferenceType rt : ct.bounds())
-                    bounds.add(typeToJava(rt, pos));
-                return to_nf.ParamTypeNode(pos,
-                                           bounds,
-                                           to_nf.Id(pos, ct.name()));
+                List<TypeNode> tvs =
+                        new ArrayList<TypeNode>(ct.typeVariables().size());
+                for (ReferenceType rt : ct.typeVariables())
+                    tvs.add(typeToJava(rt, pos));
+                return to_nf.TypeNodeFromQualifiedName(pos, ct.fullName(), tvs);
             }
             else if (t instanceof JL5SubstClassType) {
                 JL5SubstClassType ct = (JL5SubstClassType) t.toClass();
@@ -61,18 +100,17 @@ public class JL5ToJL5Rewriter extends ExtensionRewriter {
                                                        ct.fullName(),
                                                        actuals);
             }
-            else if (t instanceof LubType) {
-                throw new InternalCompilerError("I don't understand what to do here");
-            }
             else if (t instanceof RawClass) {
                 return to_nf.TypeNodeFromQualifiedName(pos, t.toClass()
                                                              .fullName());
+
             }
             else {
                 throw new InternalCompilerError("Unknown class type: "
                         + t.getClass());
             }
         }
+
         return super.typeToJava(t, pos);
     }
 }
