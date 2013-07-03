@@ -173,6 +173,8 @@ public class JL5Case_c extends Case_c implements JL5Case {
 
     @Override
     public Node checkConstants(ConstantChecker cc) throws SemanticException {
+        if (expr == null) return this; // default case
+
         if (!expr.constantValueSet()) return this; // Not ready yet; pass will be rerun.
 
         if (expr instanceof EnumConstant) return this;
