@@ -60,26 +60,7 @@ public class JL5ToJL5Rewriter extends ExtensionRewriter {
         }
         else if (t instanceof TypeVariable) {
             TypeVariable tv = (TypeVariable) t;
-            if (tv.hasLowerBound()) {
-                TypeNode superNode = typeToJava(tv.lowerBound(), pos);
-                return to_nf.AmbTypeNode(pos, to_nf.Id(pos, tv.name()));
-//                return to_nf.ParamTypeNode(pos,
-//                                           Collections.singletonList(superNode),
-//                                           to_nf.Id(pos, tv.name()));
-            }
-            else if (tv.upperBound() != null) {
-                TypeNode extendsNode = typeToJava(tv.upperBound(), pos);
-                return to_nf.AmbTypeNode(pos, to_nf.Id(pos, tv.name()));
-//                return to_nf.ParamTypeNode(pos,
-//                                           Collections.singletonList(extendsNode),
-//                                           to_nf.Id(pos, tv.name()));
-            }
-            else {
-                return to_nf.AmbTypeNode(pos, to_nf.Id(pos, tv.name()));
-//                return to_nf.ParamTypeNode(pos,
-//                                           Collections.<TypeNode> emptyList(),
-//                                           to_nf.Id(pos, tv.name()));
-            }
+            return to_nf.AmbTypeNode(pos, to_nf.Id(pos, tv.name()));
         }
 
         if (t.isClass()) {

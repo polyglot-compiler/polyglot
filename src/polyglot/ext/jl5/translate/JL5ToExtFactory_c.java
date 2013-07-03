@@ -26,8 +26,6 @@
 package polyglot.ext.jl5.translate;
 
 import polyglot.ast.Ext;
-import polyglot.ext.jl5.ast.JL5AssignDel;
-import polyglot.ext.jl5.ast.JL5Del;
 import polyglot.ext.jl5.ast.JL5ExtFactory;
 import polyglot.translate.ext.ToExtFactory_c;
 
@@ -187,15 +185,15 @@ public class JL5ToExtFactory_c extends ToExtFactory_c implements JL5ExtFactory {
         return new ParamTypeNodeToExt_c();
     }
 
-    @Override
-    protected Ext extAssignImpl() {
-        return new JL5AssignDel();
-    }
+//    @Override
+//    protected Ext extAssignImpl() {
+//        return new JL5T
+//    }
 
-    @Override
-    protected Ext extNodeImpl() {
-        return new JL5Del();
-    }
+//    @Override
+//    protected Ext extNodeImpl() {
+//        return new JL5Del();
+//    }
 
     public Ext postExtEnumDecl(Ext ext) {
         return this.postExtClassDecl(ext);
@@ -222,7 +220,7 @@ public class JL5ToExtFactory_c extends ToExtFactory_c implements JL5ExtFactory {
     }
 
     protected Ext extNormalAnnotationElemImpl() {
-        return this.extTermImpl();
+        return new AnnotationToExt_c();
     }
 
     protected Ext extMarkerAnnotationElemImpl() {
@@ -234,11 +232,11 @@ public class JL5ToExtFactory_c extends ToExtFactory_c implements JL5ExtFactory {
     }
 
     protected Ext extElementValuePairImpl() {
-        return this.extTermImpl();
+        return new ElementValuePairToExt_c();
     }
 
     protected Ext extElementValueArrayInitImpl() {
-        return this.extTermImpl();
+        return new ElementValuePairArrayInitToExt_c();
     }
 
     /* */
