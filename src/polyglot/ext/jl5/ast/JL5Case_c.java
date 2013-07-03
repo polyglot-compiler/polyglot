@@ -155,7 +155,7 @@ public class JL5Case_c extends Case_c implements JL5Case {
                 return n.value(((Character) o).charValue());
             }
         }
-        throw new SemanticException("Case label must be an integral constant.",
+        throw new SemanticException("Case label must be an integral constant or an unqualified enum value.",
                                     position());
     }
 
