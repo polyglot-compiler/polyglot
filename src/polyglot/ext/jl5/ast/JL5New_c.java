@@ -203,7 +203,7 @@ public class JL5New_c extends New_c implements JL5New {
         // static type "T", the TypeNode for "C" is actually the type "T.C".
         // But, if we print "T.C", the post compiler will try to lookup "T"
         // in "T".  Instead, we print just "C".
-        if (qualifier != null) {
+        if (qualifier != null && tn.type() != null) {
             ClassType ct = tn.type().toClass();
             w.write(ct.name());
             if (ct instanceof JL5SubstClassType) {
