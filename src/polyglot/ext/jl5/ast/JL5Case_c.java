@@ -84,10 +84,18 @@ public class JL5Case_c extends Case_c implements JL5Case {
         }
         else if (switchType.isClass() && !isNumericSwitchType(switchType, ts)) {
             // must be an enum...
-            if (expr instanceof EnumConstant) {
+            if (expr.type().isCanonical()) {
                 // we have already resolved the expression
                 EnumConstant ec = (EnumConstant) expr;
                 return this.value(ec.enumInstance().ordinal());
+            }
+            else if (expr instanceof EnumConstant) {
+                EnumConstant ec = (EnumConstant) expr;
+                EnumInstance ei =
+                        ts.findEnumConstant(switchType.toReference(), ec.name());
+                ec = ec.enumInstance(ei);
+                ec = (EnumConstant) ec.type(ei.type());
+                return this.expr(ec).value(ei.ordinal());
             }
             else if (expr instanceof AmbExpr) {
                 AmbExpr amb = (AmbExpr) expr;
