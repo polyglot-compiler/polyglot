@@ -41,6 +41,7 @@ import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
 import polyglot.visit.AmbiguityRemover;
+import polyglot.visit.ConstantChecker;
 import polyglot.visit.PrettyPrinter;
 import polyglot.visit.TypeChecker;
 
@@ -168,6 +169,15 @@ public class JL5Case_c extends Case_c implements JL5Case {
             return true;
         }
         return false;
+    }
+
+    @Override
+    public Node checkConstants(ConstantChecker cc) throws SemanticException {
+        if (!expr.constantValueSet()) return this; // Not ready yet; pass will be rerun.
+
+        if (expr instanceof EnumConstant) return this;
+
+        return super.checkConstants(cc);
     }
 
     @Override
