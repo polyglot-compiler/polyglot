@@ -43,7 +43,7 @@ import polyglot.types.SemanticException;
 
 /**
  * ClassFile represents a Java classfile as it is found on disk. The classfile
- * is modelled according to the Java Virtual Machine Specification. Methods are
+ * is modeled according to the Java Virtual Machine Specification. Methods are
  * provided to access the classfile at a very low level.
  * 
  * @see polyglot.types.reflect Attribute
@@ -55,7 +55,7 @@ import polyglot.types.SemanticException;
  */
 public class ClassFile_c implements ClassFile {
     protected Constant[] constants; // The constant pool
-    protected int modifiers; // This class's modifer bit field
+    protected int modifiers; // This class's modifier bit field
     protected int thisClass;
     protected int superClass;
     protected int[] interfaces;

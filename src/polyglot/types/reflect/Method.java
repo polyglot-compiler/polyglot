@@ -55,6 +55,11 @@ public class Method {
     protected Exceptions exceptions;
     protected boolean synthetic;
 
+    // From the VM spec. Unaccountably not exposed by Modifier class.
+    static final int ACC_BRIDGE = 0x0040;
+    static final int ACC_VARARGS = 0x0080;
+    static final int ACC_SYNTHETIC = 0x1000;
+
     /**
      * Constructor.  Read a method from a class file.
      *
@@ -96,6 +101,8 @@ public class Method {
                 }
             }
 
+            if (0 != (modifiers & ACC_SYNTHETIC)) synthetic = true;
+
             if (attrs[i] == null) {
                 long n = in.skip(length);
                 if (n != length) {
@@ -108,6 +115,10 @@ public class Method {
 
     public boolean isSynthetic() {
         return synthetic;
+    }
+
+    public boolean isBridge() {
+        return (0 != (modifiers & ACC_BRIDGE));
     }
 
     public Attribute[] getAttrs() {
