@@ -52,7 +52,7 @@ public class JL5ToJL5Rewriter extends ExtensionRewriter {
             }
             else if (wc.isExtendsConstraint()) {
                 TypeNode extendsNode = typeToJava(wc.upperBound(), pos);
-                return to_nf.AmbWildCardSuper(pos, extendsNode);
+                return to_nf.AmbWildCardExtends(pos, extendsNode);
             }
             else {
                 return to_nf.AmbWildCard(pos);
