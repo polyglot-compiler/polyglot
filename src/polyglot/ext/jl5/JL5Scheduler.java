@@ -269,7 +269,7 @@ public class JL5Scheduler extends JLScheduler {
             throw new InternalCompilerError(e);
         }
 
-        return g;
+        return internGoal(g);
     }
 
     public Goal AnnotationCheck(Job job) {
