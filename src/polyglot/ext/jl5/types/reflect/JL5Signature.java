@@ -379,10 +379,11 @@ public class JL5Signature extends Attribute {
             pos++;
             token = value.charAt(pos);
         }
+        List<ReferenceType> bounds = new ArrayList<ReferenceType>();
         Result<? extends ReferenceType> cres = classBound(value, pos);
         pos = cres.pos();
+        bounds.add(cres.result());
         Result<? extends ReferenceType> ires = null;
-        List<ReferenceType> bounds = new ArrayList<ReferenceType>();
         token = value.charAt(pos);
         while (token != RIGHT_ANGLE) {
             if (value.charAt(pos) != COLON) break;
