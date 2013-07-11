@@ -846,14 +846,23 @@ public class JL5Signature extends Attribute {
             }
         }
         //System.err.println("curClass " + curClass);
-        if (curClass != null && curClass instanceof JL5ParsedClassType) {
-            //System.err.println("### curClass is the right type");
-            if (((JL5ParsedClassType) curClass).typeVariables() != null) {
-                //System.err.println("### typeVariables is not null");
-                for (TypeVariable iType : ((JL5ParsedClassType) curClass).typeVariables()) {
-                    //System.err.println("### Checking against " + iType.name());
-                    if (iType.name().equals(next)) return iType;
+        if (curClass != null) {
+            /* If curClass is an inner class and the type variable is not found,
+             * need to examine the outer class.
+             */
+            for (ClassType ct = curClass; ct != null; ct = ct.outer()) {
+                //System.err.println("### ct is the right type");
+                if (ct instanceof JL5ParsedClassType) {
+                    JL5ParsedClassType pct = (JL5ParsedClassType) ct;
+                    if (pct.typeVariables() != null) {
+                        //System.err.println("### typeVariables is not null");
+                        for (TypeVariable iType : pct.typeVariables()) {
+                            //System.err.println("### Checking against " + iType.name());
+                            if (iType.name().equals(next)) return iType;
+                        }
+                    }
                 }
+                if (!ct.isInnerClass()) return null;
             }
         }
         return null;
