@@ -60,6 +60,7 @@ import polyglot.ast.Special;
 import polyglot.ast.Stmt;
 import polyglot.ast.TypeNode;
 import polyglot.ast.Unary;
+import polyglot.ext.jl5.types.JL5TypeSystem;
 import polyglot.frontend.Job;
 import polyglot.types.ArrayType;
 import polyglot.types.Flags;
@@ -182,7 +183,15 @@ public class ExpressionFlattener extends NodeVisitor {
         if (n instanceof Conditional) {
             Conditional c = (Conditional) n;
             Expr cond = visitEdge(c, c.cond());
-            LocalDecl d = createDecl(c.type(), c.position(), null);
+            Type type = c.type();
+            if (ts instanceof JL5TypeSystem) {
+                // Compute the erasure of possibly an intersection type
+                // XXX Don't really need the erasure, just a type
+                // that can be declared for a local.
+                JL5TypeSystem jl5ts = (JL5TypeSystem) ts;
+                type = jl5ts.erasureType(type);
+            }
+            LocalDecl d = createDecl(type, c.position(), null);
             addStmt(d);
 
             Local l = createLocal(d);
