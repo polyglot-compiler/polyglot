@@ -136,8 +136,6 @@ public class ArrayInit_c extends Expr_c implements ArrayInit {
 
         t = t.toArray().base();
 
-        TypeSystem ts = av.typeSystem();
-
         for (Expr e : elements) {
             if (e == child) {
                 // the expected type of the array element is the base type

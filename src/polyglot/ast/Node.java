@@ -29,11 +29,9 @@ package polyglot.ast;
 import java.io.Serializable;
 import java.util.List;
 
-import polyglot.types.Type;
 import polyglot.util.CodeWriter;
 import polyglot.util.Copy;
 import polyglot.util.Position;
-import polyglot.visit.AscriptionVisitor;
 import polyglot.visit.NodeVisitor;
 
 /**
@@ -144,21 +142,6 @@ public interface Node extends JL, Copy, Serializable {
      *         <code>null</code> is returned.
      */
     public <T extends Node> List<T> visitList(List<T> l, NodeVisitor v);
-
-    /**
-     * Get the expected type of a child expression of <code>this</code>.
-     * The expected type is determined by the context in that the child occurs
-     * (e.g., for <code>x = e</code>, the expected type of <code>e</code> is
-     * the declared type of <code>x</code>.
-     *
-     * The expected type should impose the least constraints on the child's
-     * type that are allowed by the parent node.
-     *
-     * @param child A child expression of this node.
-     * @param av An ascription visitor.
-     * @return The expected type of <code>child</code>.
-     */
-    Type childExpectedType(Expr child, AscriptionVisitor av);
 
     /**
      * Dump the AST node for debugging purposes.

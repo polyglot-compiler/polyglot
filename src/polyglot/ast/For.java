@@ -58,5 +58,6 @@ public interface For extends Loop {
     For iters(List<ForUpdate> iters);
 
     /** Set the loop body */
+    @Override
     For body(Stmt body);
 }

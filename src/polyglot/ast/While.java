@@ -36,5 +36,6 @@ public interface While extends Loop {
     While cond(Expr cond);
 
     /** Set the loop body. */
+    @Override
     While body(Stmt body);
 }

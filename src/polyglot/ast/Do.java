@@ -33,6 +33,7 @@ package polyglot.ast;
  */
 public interface Do extends Loop {
     /** Set the body of the do statement. */
+    @Override
     Do body(Stmt body);
 
     /** Set the condition of the do statement. */
