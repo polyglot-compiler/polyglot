@@ -414,6 +414,15 @@ public class ClassFileLazyClassInitializer implements LazyClassInitializer {
                             Report.report(3, "adding member " + t + " to " + ct);
 
                         ct.addMemberClass(t);
+
+                        // Set the access flags of the member class
+                        // using the modifier bits of the InnerClass attribute.
+                        // The flags in the class file for the member class are
+                        // not correct! Stupid Java.
+                        if (t instanceof ParsedClassType) {
+                            ParsedClassType pt = (ParsedClassType) t;
+                            pt.flags(ts.flagsForBits(c.modifiers));
+                        }
                     }
                     else {
                         throw new InternalCompilerError(name
