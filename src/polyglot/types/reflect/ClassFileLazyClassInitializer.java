@@ -112,7 +112,9 @@ public class ClassFileLazyClassInitializer implements LazyClassInitializer {
 
         // Create the ClassType.
         ParsedClassType ct = ts.createClassType(this);
-        ct.flags(ts.flagsForBits(clazz.getModifiers()));
+        // 0x0020 is rather ACC_SUPER class property flag, for backward
+        // compatibility.  This bit should be ignored.
+        ct.flags(ts.flagsForBits(clazz.getModifiers()).clearSynchronized());
         ct.position(position());
 
         // This is the "p.q" part.
@@ -126,60 +128,54 @@ public class ClassFileLazyClassInitializer implements LazyClassInitializer {
         // This is the "C$I$J" part.
         String className = StringUtil.getShortNameComponent(name);
 
-        String outerName; // This will be "p.q.C$I"
-        String innerName; // This will be "J"
-
-        outerName = name;
-        innerName = null;
-
-        while (true) {
-            int dollar = outerName.lastIndexOf('$');
-
-            if (dollar >= 0) {
-                outerName = name.substring(0, dollar);
-                innerName = name.substring(dollar + 1);
-            }
-            else {
-                outerName = name;
-                innerName = null;
-                break;
-            }
-
-            // Try loading the outer class.
-            // This will recursively load its outer class, if any.
-            try {
-                if (Report.should_report(verbose, 2))
-                    Report.report(2, "resolving " + outerName + " for " + name);
-                ct.outer(this.typeForName(outerName));
-                break;
-            }
-            catch (SemanticException e) {
-                // Failed. The class probably has a '$' in its name.
-                if (Report.should_report(verbose, 3))
-                    Report.report(2, "error resolving " + outerName);
-            }
-        }
-
         ClassType.Kind kind = ClassType.TOP_LEVEL;
 
-        if (innerName != null) {
-            // A nested class. Parse the class name to determine what kind.
-            StringTokenizer st = new StringTokenizer(className, "$");
+        // For member classes, set the proper access flags, which are the
+        // modifier bits found in the InnerClass attribute.
+        InnerClasses innerClasses = clazz.getInnerClasses();
+        if (innerClasses != null && className.lastIndexOf('$') >= 0) {
+            for (Info c : innerClasses.getClasses()) {
+                if (c.classIndex == clazz.getThisClass() && c.classIndex != 0) {
+                    ct.flags(ts.flagsForBits(c.modifiers));
 
-            while (st.hasMoreTokens()) {
-                String s = st.nextToken();
+                    // This will be "p.q.C$I"
+                    String outerName = clazz.classNameCP(c.outerClassIndex);
+                    int outerNameLen = outerName.length();
+                    if (!name.startsWith(outerName)
+                            || name.charAt(outerNameLen) != '$')
+                        throw new InternalCompilerError("Unexpected outer class: "
+                                + outerName);
+                    // This will be "J"
+                    className = name.substring(outerNameLen + 1);
 
-                if (Character.isDigit(s.charAt(0))) {
-                    // Example: C$1
-                    kind = ClassType.ANONYMOUS;
-                }
-                else if (kind == ClassType.ANONYMOUS) {
-                    // Example: C$1$D
-                    kind = ClassType.LOCAL;
-                }
-                else {
-                    // Example: C$D
-                    kind = ClassType.MEMBER;
+                    // Load the outer class.
+                    // This will recursively load its outer class, if any.
+                    if (Report.should_report(verbose, 2))
+                        Report.report(2, "resolving " + outerName + " for "
+                                + name);
+                    ct.outer(this.typeForName(outerName));
+
+                    // Parse the class name to determine what kind.
+                    StringTokenizer st = new StringTokenizer(className, "$");
+
+                    while (st.hasMoreTokens()) {
+                        String s = st.nextToken();
+
+                        if (Character.isDigit(s.charAt(0))) {
+                            // Example: C$1
+                            kind = ClassType.ANONYMOUS;
+                        }
+                        else if (kind == ClassType.ANONYMOUS) {
+                            // Example: C$1$D
+                            kind = ClassType.LOCAL;
+                        }
+                        else {
+                            // Example: C$D
+                            kind = ClassType.MEMBER;
+                        }
+                    }
+
+                    break;
                 }
             }
         }
@@ -187,14 +183,8 @@ public class ClassFileLazyClassInitializer implements LazyClassInitializer {
         if (Report.should_report(verbose, 3))
             Report.report(3, name + " is " + kind);
 
+        ct.name(className);
         ct.kind(kind);
-
-        if (ct.isTopLevel()) {
-            ct.name(className);
-        }
-        else if (ct.isMember() || ct.isLocal()) {
-            ct.name(innerName);
-        }
 
         // Add unresolved class into the cache to avoid circular resolving.
         ts.systemResolver().addNamed(name, ct);
@@ -424,15 +414,6 @@ public class ClassFileLazyClassInitializer implements LazyClassInitializer {
                             Report.report(3, "adding member " + t + " to " + ct);
 
                         ct.addMemberClass(t);
-
-                        // Set the access flags of the member class
-                        // using the modifier bits of the InnerClass attribute.
-                        // The flags in the class file for the member class are
-                        // not correct! Stupid Java.
-                        if (t instanceof ParsedClassType) {
-                            ParsedClassType pt = (ParsedClassType) t;
-                            pt.flags(ts.flagsForBits(c.modifiers));
-                        }
                     }
                     else {
                         throw new InternalCompilerError(name
@@ -499,7 +480,7 @@ public class ClassFileLazyClassInitializer implements LazyClassInitializer {
             if (!methods[i].name().equals("<init>")
                     && !methods[i].name().equals("<clinit>")
                     && !methods[i].isSynthetic() //  && !methods[i].isBridge()
-                    ) {
+            ) {
                 MethodInstance mi = this.methodInstance(methods[i], ct);
                 if (Report.should_report(verbose, 3))
                     Report.report(3, "adding " + mi + " to " + ct);

@@ -1,0 +1,7 @@
+import testpackage.MyNested01;
+
+class Nested01 {
+	void foo() {
+		MyNested01.Nested<Object, Object, Object, Object> o = new MyNested01.Nested<Object, Object, Object, Object>();
+	}
+}

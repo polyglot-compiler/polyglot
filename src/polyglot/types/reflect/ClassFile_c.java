@@ -118,22 +118,21 @@ public class ClassFile_c implements ClassFile {
         try {
             int mask = 0;
 
-            for (int i = 0; i < fields.length; i++) {
-                if (fields[i].name().equals("jlc$SourceLastModified$"
+            for (Field field : fields) {
+                if (field.name().equals("jlc$SourceLastModified$"
                         + typeSystemKey)) {
-                    jlc.sourceLastModified = fields[i].getLong();
+                    jlc.sourceLastModified = field.getLong();
                     mask |= 1;
                 }
-                else if (fields[i].name().equals("jlc$CompilerVersion$"
+                else if (field.name().equals("jlc$CompilerVersion$"
                         + typeSystemKey)) {
-                    jlc.compilerVersion = fields[i].getString();
+                    jlc.compilerVersion = field.getString();
                     mask |= 2;
                 }
-                else if (fields[i].name().equals("jlc$ClassType$"
-                        + typeSystemKey)) {
+                else if (field.name().equals("jlc$ClassType$" + typeSystemKey)) {
                     // there is encoded class type information.
                     StringBuffer encodedClassTypeInfo =
-                            new StringBuffer(fields[i].getString());
+                            new StringBuffer(field.getString());
                     // check to see if there are more fields.
                     int seeking = 1;
                     boolean found;
@@ -142,9 +141,9 @@ public class ClassFile_c implements ClassFile {
                         String suffix = ("$" + seeking);
                         String seekingFieldName =
                                 "jlc$ClassType$" + typeSystemKey + suffix;
-                        for (int j = 0; j < fields.length; j++) {
-                            if (fields[j].name().equals(seekingFieldName)) {
-                                encodedClassTypeInfo.append(fields[j].getString());
+                        for (Field field2 : fields) {
+                            if (field2.name().equals(seekingFieldName)) {
+                                encodedClassTypeInfo.append(field2.getString());
                                 found = true;
                                 seeking++;
                                 break;
@@ -331,10 +330,10 @@ public class ClassFile_c implements ClassFile {
         }
 
         @SuppressWarnings("unused")
-        int major = in.readUnsignedShort();
+        int minor = in.readUnsignedShort();
 
         @SuppressWarnings("unused")
-        int minor = in.readUnsignedShort();
+        int major = in.readUnsignedShort();
     }
 
     /**

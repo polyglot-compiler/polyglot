@@ -2132,63 +2132,68 @@ public class JL5TypeSystem_c extends
         JL5SubstClassType_c ct = (JL5SubstClassType_c) t;
         JL5ParsedClassType g = ct.base();
 
-        List<Type> capturedActuals =
-                new ArrayList<Type>(g.typeVariables().size());
         Map<TypeVariable, ReferenceType> substmap =
                 new LinkedHashMap<TypeVariable, ReferenceType>();
+        // If g is an inner class, need to examine the outer class.
         // first, set up a subst from the formals to the captured variables.
-        for (TypeVariable a : g.typeVariables()) {
-            ReferenceType ti = (ReferenceType) ct.subst().substType(a);
-            ReferenceType si = ti;
-            if (ti instanceof WildCardType) {
-                TypeVariable tv =
-                        this.typeVariable(ti.position(),
-                                          UniqueID.newID("captureConversionFresh"),
-                                          null); // we'll replace this unknown type soon.
-                tv.setSyntheticOrigin();
-                si = tv;
+        for (JL5ParsedClassType cur = g; cur != null; cur =
+                (JL5ParsedClassType) cur.outer()) {
+            for (TypeVariable a : cur.typeVariables()) {
+                ReferenceType ti = (ReferenceType) ct.subst().substType(a);
+                ReferenceType si = ti;
+                if (ti instanceof WildCardType) {
+                    TypeVariable tv =
+                            this.typeVariable(ti.position(),
+                                              UniqueID.newID("captureConversionFresh"),
+                                              null); // we'll replace this unknown type soon.
+                    tv.setSyntheticOrigin();
+                    si = tv;
+                }
+                substmap.put(a, si);
             }
-            capturedActuals.add(si);
-            substmap.put(a, si);
+            if (!cur.isInnerClass()) break;
         }
         JL5Subst subst = (JL5Subst) this.subst(substmap);
 
         // now go through and substitute the bounds if needed.
-        for (TypeVariable a : g.typeVariables()) {
-            Type ti = ct.subst().substType(a);
-            Type si = subst.substType(a);
-            if (ti instanceof WildCardType) {
-                WildCardType wti = (WildCardType) ti;
-                TypeVariable vsi = (TypeVariable) si;
-                if (wti.isExtendsConstraint()) {
-                    ReferenceType wub = wti.upperBound();
-                    ReferenceType substUpperBoundOfA =
-                            (ReferenceType) subst.substType(a.upperBound());
-                    ReferenceType glb =
-                            this.glb(wub, substUpperBoundOfA, false);
-                    vsi.setUpperBound(glb);
-                    if (wub.isClass()
-                            && !wub.toClass().flags().isInterface()
-                            && substUpperBoundOfA.isClass()
-                            && !substUpperBoundOfA.toClass()
-                                                  .flags()
-                                                  .isInterface()) {
-                        // check that wub is a subtype of substUpperBoundOfA, or vice versa
-                        // JLS 3rd ed 5.1.10
-                        if (!isSubtype(wub, substUpperBoundOfA)
-                                && !isSubtype(substUpperBoundOfA, wub)) {
-                            throw new SemanticException("Cannot capture convert "
-                                                                + t,
-                                                        pos);
+        for (JL5ParsedClassType cur = g; cur != null; cur =
+                (JL5ParsedClassType) cur.outer()) {
+            for (TypeVariable a : cur.typeVariables()) {
+                Type ti = ct.subst().substType(a);
+                Type si = subst.substType(a);
+                if (ti instanceof WildCardType) {
+                    WildCardType wti = (WildCardType) ti;
+                    TypeVariable vsi = (TypeVariable) si;
+                    if (wti.isExtendsConstraint()) {
+                        ReferenceType wub = wti.upperBound();
+                        ReferenceType substUpperBoundOfA =
+                                (ReferenceType) subst.substType(a.upperBound());
+                        ReferenceType glb =
+                                this.glb(wub, substUpperBoundOfA, false);
+                        vsi.setUpperBound(glb);
+                        if (wub.isClass()
+                                && !wub.toClass().flags().isInterface()
+                                && substUpperBoundOfA.isClass()
+                                && !substUpperBoundOfA.toClass()
+                                                      .flags()
+                                                      .isInterface()) {
+                            // check that wub is a subtype of substUpperBoundOfA, or vice versa
+                            // JLS 3rd ed 5.1.10
+                            if (!isSubtype(wub, substUpperBoundOfA)
+                                    && !isSubtype(substUpperBoundOfA, wub)) {
+                                throw new SemanticException("Cannot capture convert "
+                                                                    + t,
+                                                            pos);
+                            }
                         }
                     }
-                }
-                else {
-                    // wti is a super wildcard.
-                    vsi.setUpperBound((ReferenceType) subst.substType(a.upperBound()));
-                    vsi.setLowerBound(wti.lowerBound());
-                }
+                    else {
+                        // wti is a super wildcard.
+                        vsi.setUpperBound((ReferenceType) subst.substType(a.upperBound()));
+                        vsi.setLowerBound(wti.lowerBound());
+                    }
 
+                }
             }
         }
 

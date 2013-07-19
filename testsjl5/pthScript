@@ -33,6 +33,7 @@ javac "-d java-out -cp ." {
         java-src/MyMap.java;
         java-src/MyMethodThrowing.java;
         java-src/MyEnum.java;
+	java-src/MyNested01.java;
 	java-src/TestEnum.java;
 	java-src/Call02A.java;
 	java-src/Call02B.java;
@@ -404,6 +405,7 @@ polyglot.ext.jl5.ExtensionInfo "-d out -classpath java-out -assert -noserial -po
         PermissiveCasts02.jl5 (Semantic, "does not match");
         PermissiveCasts03.jl5 (Semantic, "Cannot cast");
         FinalInit01.jl5;
+        Nested01.jl5;
 }
 
 # Now run the tests again removing the Java 5-isms.
@@ -772,6 +774,7 @@ polyglot.ext.jl5.ExtensionInfo "-d out -classpath java-out -removeJava5isms -enu
         PermissiveCasts02.jl5 (Semantic, "does not match");
         PermissiveCasts03.jl5 (Semantic, "Cannot cast");
         FinalInit01.jl5;
+        Nested01.jl5;
 }
 
 polyglot.ext.jl5.ExtensionInfo "-d out -classpath java-out -assert -noserial -post \"javac -Xlint\\:-options -source 1.5\" -morepermissivecasts" {

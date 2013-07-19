@@ -165,8 +165,7 @@ public class SourceClassResolver extends LoadedClassResolver {
                 encodedClazz = clazz;
             }
             if (encodedClazz != null
-                    && !name.replace(".", File.separator)
-                            .equals(encodedClazz.name())) {
+                    && !name.replace(".", "/").equals(encodedClazz.name())) {
                 if (Report.should_report(report_topics, 3))
                     Report.report(3, "Not using " + encodedClazz.name()
                             + "(case-insensitive filesystem?)");
