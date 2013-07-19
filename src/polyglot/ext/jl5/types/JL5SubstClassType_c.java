@@ -284,8 +284,74 @@ public class JL5SubstClassType_c extends
 
     @Override
     public String translate(Resolver c) {
-        StringBuffer sb = new StringBuffer(translateNoParams(c));
-        JL5ParsedClassType ct = this.base();
+        return translate(this.base(), c);
+    }
+
+    private String translate(JL5ParsedClassType ct, Resolver c) {
+        StringBuffer sb = new StringBuffer();
+        if (ct.isTopLevel()) {
+            boolean done = false;
+            if (ct.package_() == null) {
+                sb.append(ct.name());
+                done = true;
+            }
+
+            // Use the short name if it is unique.
+            else if (c != null && !Options.global.fully_qualified_names) {
+                try {
+                    Named x = c.find(ct.name());
+
+                    if (ts.equals(ct, x)) {
+                        sb.append(ct.name());
+                        done = true;
+                    }
+                }
+                catch (SemanticException e) {
+                }
+            }
+
+            if (!done) sb.append(ct.package_().translate(c) + "." + ct.name());
+        }
+        else if (ct.isMember()) {
+            boolean done = false;
+            // Use only the short name if the outer class is anonymous.
+            if (ct.container().toClass().isAnonymous()) {
+                sb.append(ct.name());
+                done = true;
+            }
+
+            // Use the short name if it is unique.
+            else if (c != null && !Options.global.fully_qualified_names) {
+                try {
+                    Named x = c.find(ct.name());
+
+                    if (ts.equals(ct, x)) {
+                        sb.append(ct.name());
+                        done = true;
+                    }
+                }
+                catch (SemanticException e) {
+                }
+            }
+
+            if (!done) {
+                if (ct.isInnerClass()) {
+                    // If ct is inner class, need to translate this substitution on the outer class.
+                    sb.append(translate((JL5ParsedClassType) ct.outer(), c)
+                            + "." + ct.name());
+                }
+                else sb.append(ct.outer().translate(c) + "." + ct.name());
+            }
+        }
+        else if (isLocal()) {
+            sb.append(ct.name());
+        }
+        else {
+            throw new InternalCompilerError("Cannot translate an anonymous class: "
+                                                    + ct,
+                                            ct.position());
+        }
+
         if (ct.typeVariables().isEmpty()) {
             return sb.toString();
         }
@@ -300,58 +366,6 @@ public class JL5SubstClassType_c extends
         }
         sb.append('>');
         return sb.toString();
-    }
-
-    private String translateNoParams(Resolver c) {
-        if (isTopLevel()) {
-            if (package_() == null) {
-                return name();
-            }
-
-            // Use the short name if it is unique.
-            if (c != null && !Options.global.fully_qualified_names) {
-                try {
-                    Named x = c.find(name());
-
-                    if (ts.equals(this, x)) {
-                        return name();
-                    }
-                }
-                catch (SemanticException e) {
-                }
-            }
-
-            return package_().translate(c) + "." + name();
-        }
-        else if (isMember()) {
-            // Use only the short name if the outer class is anonymous.
-            if (container().toClass().isAnonymous()) {
-                return name();
-            }
-
-            // Use the short name if it is unique.
-            if (c != null && !Options.global.fully_qualified_names) {
-                try {
-                    Named x = c.find(name());
-
-                    if (ts.equals(this, x)) {
-                        return name();
-                    }
-                }
-                catch (SemanticException e) {
-                }
-            }
-
-            return container().translate(c) + "." + name();
-        }
-        else if (isLocal()) {
-            return name();
-        }
-        else {
-            throw new InternalCompilerError("Cannot translate an anonymous class: "
-                                                    + this,
-                                            this.position());
-        }
     }
 
     @Override
