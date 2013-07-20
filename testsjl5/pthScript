@@ -71,7 +71,7 @@ polyglot.ext.jl5.ExtensionInfo "-d out -classpath java-out -assert -noserial -po
                        (Semantic, "Wrong number of type parameters");
         Generics25.jl5 (Semantic);
         Generics26.jl5 (Post, "Xlint");
-#        Generics27.jl5; // UNCLEAR what to do for this program        
+        Generics27.jl5;        
         Generics28.jl5 (Post, "Xlint");
         Generics29.jl5 (Post, "Xlint");
         Generics30.jl5 (Semantic);
@@ -441,7 +441,7 @@ polyglot.ext.jl5.ExtensionInfo "-d out -classpath java-out -removeJava5isms -enu
                        (Semantic, "Wrong number of type parameters");
         Generics25.jl5 (Semantic);
         Generics26.jl5;
-#        Generics27.jl5; // UNCLEAR what to do for this program 
+        Generics27.jl5; 
         Generics28.jl5;
         Generics29.jl5;
         Generics30.jl5 (Semantic);

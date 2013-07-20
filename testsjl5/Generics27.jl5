@@ -1,6 +1,4 @@
-// from JLS 3rd ed., 8.1.2
-// It's unclear what the correct behavior is with respect to inner classes and type variables of the enclosing class.
-// This program does not compile with Sun's javac program.
+// from JLS Java SE 7 ed., Example 8.1.2-1
 class Seq<T> { 
     T head; 
     Seq<T> tail; 
@@ -16,11 +14,11 @@ class Seq<T> {
     }
     class Zipper<S> { 
 	Seq<Pair<T,S>> zip(Seq<S> that) { 
-	    if (Seq.this.isEmpty() || that.isEmpty())
+	    if (isEmpty() || that.isEmpty())
 		return new Seq<Pair<T,S>>(); 
 	    else 
 		return new Seq<Pair<T,S>>(new Pair<T,S>(Seq.this.head, that.head), 
-					  this.tail.zip(that.tail));
+					  tail.new Zipper<S>().zip(that.tail));
 	}
     }
 }

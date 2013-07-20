@@ -34,7 +34,7 @@ import java.io.Reader;
 import java.util.StringTokenizer;
 
 /**
- * A <code>StdErrorQueue</code> handles outputing error messages.
+ * A <code>StdErrorQueue</code> handles outputting error messages.
  */
 public class StdErrorQueue extends AbstractErrorQueue {
     private PrintStream err;
@@ -94,56 +94,73 @@ public class StdErrorQueue extends AbstractErrorQueue {
         // when generating the error.  We don't want to break Jif labels,
         // for instance.
 
-        int width = 0;
-        err.print(prefix + ":");
-        width += prefix.length() + 1;
-
         int lmargin = 4;
         int rmargin = 78;
 
+        StringBuffer sb = new StringBuffer(prefix + ": ");
+        sb.ensureCapacity(rmargin);
+        int width = 0;
+        width += prefix.length() + 2;
+
         StringTokenizer lines = new StringTokenizer(message, "\n", true);
         boolean needNewline = false;
+        boolean isPostCompilerError =
+                e.getErrorKind() == ErrorInfo.POST_COMPILER_ERROR;
+        boolean lineHasContent = false;
 
         while (lines.hasMoreTokens()) {
             String line = lines.nextToken();
 
-            if (line.indexOf("\n") < 0) {
-                StringTokenizer st = new StringTokenizer(line, " ");
+            if (line.charAt(0) != '\n') {
+                if (isPostCompilerError) {
+                    // Post-compiler errors are probably formatted already,
+                    // so print the message as is, but indent on new lines.
+                    sb.append(line);
+                    lineHasContent = true;
+                }
+                else {
+                    StringTokenizer st = new StringTokenizer(line, " ", true);
 
-                while (st.hasMoreTokens()) {
-                    String s = st.nextToken();
+                    while (st.hasMoreTokens()) {
+                        String s = st.nextToken();
 
-                    if (width + s.length() + 1 > rmargin) {
-                        err.println();
-                        for (int i = 0; i < lmargin; i++)
-                            err.print(" ");
-                        width = lmargin;
+                        if (width + s.length() + 1 > rmargin) {
+                            if (lineHasContent) {
+                                err.println(sb.toString());
+                                lineHasContent = false;
+                            }
+                            for (int i = 0; i < lmargin; i++)
+                                sb.setCharAt(i, ' ');
+                            sb.setLength(lmargin);
+                            width = lmargin;
+                        }
+
+                        if (s.charAt(0) != ' ') lineHasContent = true;
+
+                        sb.append(s);
+                        width += s.length();
                     }
-                    else {
-                        err.print(" ");
-                        width++;
-                    }
-
-                    err.print(s);
-
-                    width += s.length();
                 }
 
                 needNewline = true;
             }
             else {
-                err.println();
+                err.print(line);
                 needNewline = false;
             }
 
-            width = lmargin;
-
             if (lines.hasMoreTokens()) {
+                if (lineHasContent) {
+                    err.print(sb.toString());
+                    lineHasContent = false;
+                }
                 for (int i = 0; i < lmargin; i++)
-                    err.print(" ");
+                    sb.setCharAt(i, ' ');
+                sb.setLength(lmargin);
+                width = lmargin;
             }
             else if (needNewline) {
-                err.println();
+                err.println(sb.toString());
             }
         }
 
