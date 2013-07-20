@@ -250,15 +250,15 @@ class_or_interface ::=
         {: RESULT = a.toType(); :}
 	|	class_or_interface:a LT:b type_argument_list_1:c DOT:d name:e
 	   	 //Instantiating type arguments
-        {: TypeNode tn = parser.nf.AmbTypeInstantiation(parser.pos(a, c), a,c); 
-           RESULT = parser.nf.AmbTypeNode(parser.pos(a, e), tn, e.name); :}
+        {: TypeNode tn = parser.nf.AmbTypeInstantiation(parser.pos(a, c), a, c);
+           RESULT = ((JL5Name) e).toType(tn); :}
 	;
 override class_or_interface_type ::=
 		class_or_interface:a
         {: RESULT = a; :}
 	|	class_or_interface:a LT:b type_argument_list_1:c
    	 	// Instantiating type arguments
-        {: RESULT = parser.nf.AmbTypeInstantiation(parser.pos(a, c), a,c); :}
+        {: RESULT = parser.nf.AmbTypeInstantiation(parser.pos(a, c), a, c); :}
 	;
 
 
@@ -271,9 +271,8 @@ override array_type ::=	primitive_type:a dims:b
         {: RESULT = parser.array(a.toType(), b.intValue()); :}
 	|	class_or_interface:a LT type_argument_list_1:b DOT name:c dims:d
    	 	// Instantiating type arguments
-        {: 
-          TypeNode tn = parser.nf.AmbTypeInstantiation(parser.pos(a, b), a, b);
-           TypeNode aa = parser.nf.AmbTypeNode(parser.pos(a, c), tn, c.name);           
+        {: TypeNode tn = parser.nf.AmbTypeInstantiation(parser.pos(a, b), a, b);
+           TypeNode aa = ((JL5Name) c).toType(tn);
            RESULT = parser.array(aa, d.intValue()); :}
 	|	class_or_interface:a LT type_argument_list_1:b dims:c
    	 	// Instantiating type arguments

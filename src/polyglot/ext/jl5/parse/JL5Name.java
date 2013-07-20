@@ -26,11 +26,11 @@
 package polyglot.ext.jl5.parse;
 
 import polyglot.ast.Id;
-import polyglot.ast.NodeFactory;
+import polyglot.ast.QualifierNode;
+import polyglot.ast.TypeNode;
 import polyglot.ext.jl5.ast.JL5NodeFactory;
 import polyglot.ext.jl5.types.JL5TypeSystem;
 import polyglot.parse.Name;
-import polyglot.types.TypeSystem;
 import polyglot.util.Position;
 
 public class JL5Name extends Name {
@@ -38,12 +38,34 @@ public class JL5Name extends Name {
     public JL5NodeFactory nf;
     public JL5TypeSystem ts;
 
-    public JL5Name(NodeFactory nf, TypeSystem ts, Position pos, Id name) {
+    public JL5Name(JL5NodeFactory nf, JL5TypeSystem ts, Position pos, Id name) {
         super(nf, ts, pos, name);
+        this.nf = nf;
+        this.ts = ts;
     }
 
-    public JL5Name(NodeFactory nf, TypeSystem ts, Position pos, Name prefix,
-            Id name) {
+    public JL5Name(JL5NodeFactory nf, JL5TypeSystem ts, Position pos,
+            Name prefix, Id name) {
         super(nf, ts, pos, prefix, name);
+        this.nf = nf;
+        this.ts = ts;
+    }
+
+    public QualifierNode toQualifier(TypeNode outer) {
+        JL5Name prefix = (JL5Name) this.prefix;
+        if (prefix == null) {
+            return nf.AmbQualifierNode(pos, outer, name);
+        }
+
+        return nf.AmbQualifierNode(pos, prefix.toQualifier(outer), name);
+    }
+
+    public TypeNode toType(TypeNode outer) {
+        JL5Name prefix = (JL5Name) this.prefix;
+        if (prefix == null) {
+            return nf.AmbTypeNode(pos, outer, name);
+        }
+
+        return nf.AmbTypeNode(pos, prefix.toQualifier(outer), name);
     }
 }
