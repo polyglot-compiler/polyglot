@@ -30,7 +30,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
-import java.util.StringTokenizer;
 
 import polyglot.main.Report;
 import polyglot.types.ClassType;
@@ -138,41 +137,28 @@ public class ClassFileLazyClassInitializer implements LazyClassInitializer {
                 if (c.classIndex == clazz.getThisClass() && c.classIndex != 0) {
                     ct.flags(ts.flagsForBits(c.modifiers));
 
-                    // This will be "p.q.C$I"
-                    String outerName = clazz.classNameCP(c.outerClassIndex);
-                    int outerNameLen = outerName.length();
-                    if (!name.startsWith(outerName)
-                            || name.charAt(outerNameLen) != '$')
-                        throw new InternalCompilerError("Unexpected outer class: "
-                                + outerName);
-                    // This will be "J"
-                    className = name.substring(outerNameLen + 1);
+                    if (c.nameIndex == 0) {
+                        // anonymous class
+                        kind = ClassType.ANONYMOUS;
+                    }
+                    else {
+                        // This will be "p.q.C$I"
+                        String outerName = clazz.classNameCP(c.outerClassIndex);
+                        // This will be "J"
+                        className =
+                                (String) clazz.getConstants()[c.nameIndex].value();
 
-                    // Load the outer class.
-                    // This will recursively load its outer class, if any.
-                    if (Report.should_report(verbose, 2))
-                        Report.report(2, "resolving " + outerName + " for "
-                                + name);
-                    ct.outer(this.typeForName(outerName));
-
-                    // Parse the class name to determine what kind.
-                    StringTokenizer st = new StringTokenizer(className, "$");
-
-                    while (st.hasMoreTokens()) {
-                        String s = st.nextToken();
-
-                        if (Character.isDigit(s.charAt(0))) {
-                            // Example: C$1
-                            kind = ClassType.ANONYMOUS;
-                        }
-                        else if (kind == ClassType.ANONYMOUS) {
-                            // Example: C$1$D
+                        // Load the outer class.
+                        // This will recursively load its outer class, if any.
+                        if (Report.should_report(verbose, 2))
+                            Report.report(2, "resolving " + outerName + " for "
+                                    + name);
+                        ClassType outer = this.typeForName(outerName);
+                        ClassType.Kind outerKind = ct.kind();
+                        if (outerKind == ClassType.ANONYMOUS)
                             kind = ClassType.LOCAL;
-                        }
-                        else {
-                            // Example: C$D
-                            kind = ClassType.MEMBER;
-                        }
+                        else kind = ClassType.MEMBER;
+                        ct.outer(outer);
                     }
 
                     break;

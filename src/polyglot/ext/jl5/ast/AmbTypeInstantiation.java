@@ -72,14 +72,16 @@ public class AmbTypeInstantiation extends TypeNode_c implements TypeNode,
     @Override
     public String name() {
         StringBuffer sb = new StringBuffer(base.name());
-        sb.append("<");
-        Iterator<TypeNode> iter = typeArguments.iterator();
-        while (iter.hasNext()) {
-            TypeNode tn = iter.next();
-            sb.append(tn.name());
-            if (iter.hasNext()) sb.append(",");
+        if (!typeArguments.isEmpty()) {
+            sb.append("<");
+            Iterator<TypeNode> iter = typeArguments.iterator();
+            while (iter.hasNext()) {
+                TypeNode tn = iter.next();
+                sb.append(tn.name());
+                if (iter.hasNext()) sb.append(",");
+            }
+            sb.append(">");
         }
-        sb.append(">");
         return sb.toString();
     }
 
