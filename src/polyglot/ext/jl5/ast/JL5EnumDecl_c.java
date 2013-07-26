@@ -25,20 +25,15 @@
  ******************************************************************************/
 package polyglot.ext.jl5.ast;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import polyglot.ast.Block;
 import polyglot.ast.ClassBody;
 import polyglot.ast.ClassDecl;
 import polyglot.ast.ClassMember;
-import polyglot.ast.ConstructorCall;
 import polyglot.ast.ConstructorDecl;
 import polyglot.ast.Formal;
 import polyglot.ast.Id;
-import polyglot.ast.IntLit;
-import polyglot.ast.Lit;
 import polyglot.ast.MethodDecl;
 import polyglot.ast.Node;
 import polyglot.ast.NodeFactory;
@@ -166,18 +161,6 @@ public class JL5EnumDecl_c extends JL5ClassDecl_c implements JL5EnumDecl {
             throw new InternalCompilerError("addDefaultConstructor called without defaultCI set");
         }
 
-        // insert call to appropriate super constructor
-        List<Lit> args = new ArrayList<Lit>(2);
-        args.add(nf.NullLit(Position.compilerGenerated()));// XXX the right thing to do is change the type of java.lang.Enum instead of adding these dummy params
-        args.add(nf.IntLit(Position.compilerGenerated(), IntLit.INT, 0));
-        Block block =
-                nf.Block(position().startOf(),
-                         ((JL5NodeFactory) nf).ConstructorCall(position.startOf(),
-                                                               ConstructorCall.SUPER,
-                                                               null,
-                                                               args,
-                                                               true));
-
         //Default constructor of an enum is private 
         ConstructorDecl cd =
                 nf.ConstructorDecl(body().position().startOf(),
@@ -185,7 +168,7 @@ public class JL5EnumDecl_c extends JL5ClassDecl_c implements JL5EnumDecl {
                                    name,
                                    Collections.<Formal> emptyList(),
                                    Collections.<TypeNode> emptyList(),
-                                   block);
+                                   nf.Block(position().startOf()));
         cd = cd.constructorInstance(ci);
         return body(body.addMember(cd));
 

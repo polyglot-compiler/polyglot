@@ -1,0 +1,14 @@
+public enum EnumTest15 {
+	ZERO,
+	ONE,
+	TWO(2);
+	
+	public int x;
+	private EnumTest15() {
+		this(1);
+	}
+	
+	private EnumTest15(int x) {
+		this.x = x;
+	}
+}

@@ -242,7 +242,7 @@ public class RemoveEnums extends ContextVisitor {
 
         List<Stmt> oldStmts = new LinkedList<Stmt>(n.body().statements());
         ConstructorCall existingCC = null;
-        if (oldStmts.get(0) instanceof ConstructorCall) {
+        if (!oldStmts.isEmpty() && oldStmts.get(0) instanceof ConstructorCall) {
             existingCC = (ConstructorCall) oldStmts.remove(0);
         }
         else {

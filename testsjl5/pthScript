@@ -336,6 +336,7 @@ polyglot.ext.jl5.ExtensionInfo "-d out -classpath java-out -assert -noserial -po
         EnumTest12.jl5;
         EnumTest13.jl5;
         EnumTest14.jl5;
+        EnumTest15.jl5;
         enum1.jl5;
         enum2.jl5;
         ConstructorCall01.jl5;
@@ -705,6 +706,7 @@ polyglot.ext.jl5.ExtensionInfo "-d out -classpath java-out -removeJava5isms -enu
         EnumTest12.jl5;
         EnumTest13.jl5;
         EnumTest14.jl5;
+        EnumTest15.jl5;
         enum1.jl5;
         enum2.jl5;
         ConstructorCall01.jl5;

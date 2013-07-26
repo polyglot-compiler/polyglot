@@ -127,7 +127,7 @@ public class JL5ConstructorCall_c extends ConstructorCall_c implements
     @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
         // are we a super call within an enum const decl?
-        if (isEnumConstructorCall) {
+        if (isEnumConstructorCall && ci != null) {
             boolean translateEnums =
                     ((JL5Options) this.ci.typeSystem()
                                          .extensionInfo()
