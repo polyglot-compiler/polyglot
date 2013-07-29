@@ -106,7 +106,7 @@ public class StdErrorQueue extends AbstractErrorQueue {
         boolean needNewline = false;
         boolean isPostCompilerError =
                 e.getErrorKind() == ErrorInfo.POST_COMPILER_ERROR;
-        boolean lineHasContent = false;
+        boolean lineHasContent = prefix.length() > 0;
 
         while (lines.hasMoreTokens()) {
             String line = lines.nextToken();
