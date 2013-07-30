@@ -37,7 +37,7 @@ import polyglot.types.Flags;
 import polyglot.types.ParsedClassType;
 
 /**
- * Decalration of an enum constant.
+ * Declaration of an enum constant.
  */
 public interface EnumConstantDecl extends ClassMember, AnnotatedElement {
     /** get args */
