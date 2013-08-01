@@ -161,7 +161,6 @@ public class JL5Scheduler extends JLScheduler {
         Goal g = new VisitorGoal(job, new RemoveEnums(job, ts, nf));
         try {
             g.addPrerequisiteGoal(PreRemoveJava5isms(job), this);
-            g.addPrerequisiteGoal(CastsInserted(job), this);
             g.addPrerequisiteGoal(RemoveStaticImports(job), this);
             g.addPrerequisiteGoal(RemoveVarArgs(job), this);
         }
