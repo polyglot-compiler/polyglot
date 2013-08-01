@@ -26,7 +26,7 @@ C_COMMENT            = "/*" ~"*/"
 END_OF_LINE_COMMENT  = "//" ~{LINE_TERMINATOR}
 LINE_COMMENT         = "#" ~{LINE_TERMINATOR}
 
-IDENT                = [a-zA-Z0-9\:\.\$\/\\\-]*
+IDENT                = [a-zA-Z0-9_\:\.\$\/\\\-]*
 
 %state STRING_LIT
 
