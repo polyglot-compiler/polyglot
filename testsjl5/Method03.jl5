@@ -1,0 +1,17 @@
+public class Method03<E> extends C<E> {
+	static void foo() {
+	}
+
+	static void f() {
+		foo();
+	}
+}
+
+class C<E> {
+	static void foo() {
+	}
+
+	static void f() {
+		foo();
+	}
+}

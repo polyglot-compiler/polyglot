@@ -131,6 +131,7 @@ polyglot.ext.jl5.ExtensionInfo "-d out -classpath java-out -assert -noserial -po
         ClassLoad02.jl5 (Post, "Xlint");
         Method01.jl5;
         Method02.jl5;
+        Method03.jl5;
         VarArgs01.jl5;
         VarArgs02.jl5;
         VarArgs03.jl5;
@@ -502,6 +503,7 @@ polyglot.ext.jl5.ExtensionInfo "-d out -classpath java-out -removeJava5isms -enu
         ClassLoad02.jl5;
         Method01.jl5;
         Method02.jl5;
+        Method03.jl5;
         VarArgs01.jl5;
         VarArgs02.jl5;
         VarArgs03.jl5;

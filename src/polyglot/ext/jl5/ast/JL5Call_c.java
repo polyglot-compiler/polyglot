@@ -48,11 +48,9 @@ import polyglot.ext.jl5.visit.JL5Translator;
 import polyglot.types.CodeInstance;
 import polyglot.types.Context;
 import polyglot.types.FunctionInstance;
-import polyglot.types.MethodInstance;
 import polyglot.types.ReferenceType;
 import polyglot.types.SemanticException;
 import polyglot.types.Type;
-import polyglot.types.TypeSystem;
 import polyglot.util.CodeWriter;
 import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
@@ -324,12 +322,6 @@ public class JL5Call_c extends Call_c implements JL5Call {
         }
         w.write(")");
         w.end();
-    }
-
-    @Override
-    protected Type findContainer(TypeSystem ts, MethodInstance mi) {
-        JL5TypeSystem jts = (JL5TypeSystem) ts;
-        return jts.erasureType(mi.container());
     }
 
 }
