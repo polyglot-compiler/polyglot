@@ -104,6 +104,7 @@ polyglot.ext.jl5.ExtensionInfo "-d out -classpath java-out -assert -noserial -po
         InnerClass09.jl5;
         InnerClass10.jl5;
         InnerClass11.jl5;
+        InnerClass12.jl5;
         Access01.jl5;
         Access02.jl5;
         Access03A.jl5  Access03B.jl5;
@@ -132,6 +133,7 @@ polyglot.ext.jl5.ExtensionInfo "-d out -classpath java-out -assert -noserial -po
         Method01.jl5;
         Method02.jl5;
         Method03.jl5;
+        Method04.jl5;
         VarArgs01.jl5;
         VarArgs02.jl5;
         VarArgs03.jl5;
@@ -327,6 +329,7 @@ polyglot.ext.jl5.ExtensionInfo "-d out -classpath java-out -assert -noserial -po
         RawType04.jl5 (Semantic);
         RawType05.jl5;
         RawType06.jl5 (Semantic);
+        RawType07.jl5 (Semantic);
         EnumTest1.jl5;
         EnumTest2.jl5;
         EnumTest3.jl5;
@@ -476,6 +479,7 @@ polyglot.ext.jl5.ExtensionInfo "-d out -classpath java-out -removeJava5isms -enu
         InnerClass09.jl5;
         InnerClass10.jl5;
         InnerClass11.jl5;
+        InnerClass12.jl5;
         Access01.jl5;
         Access02.jl5;
         Access03A.jl5  Access03B.jl5;
@@ -504,6 +508,7 @@ polyglot.ext.jl5.ExtensionInfo "-d out -classpath java-out -removeJava5isms -enu
         Method01.jl5;
         Method02.jl5;
         Method03.jl5;
+        Method04.jl5;
         VarArgs01.jl5;
         VarArgs02.jl5;
         VarArgs03.jl5;
@@ -698,6 +703,7 @@ polyglot.ext.jl5.ExtensionInfo "-d out -classpath java-out -removeJava5isms -enu
         RawType04.jl5 (Semantic);
         RawType05.jl5;
         RawType06.jl5 (Semantic);
+        RawType07.jl5 (Semantic);
         EnumTest1.jl5;
         EnumTest2.jl5;
         EnumTest3.jl5;

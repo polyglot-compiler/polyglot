@@ -100,18 +100,24 @@ public class AmbTypeInstantiation extends TypeNode_c implements TypeNode,
         if (baseType instanceof ClassType) {
             ClassType ct = (ClassType) baseType;
             if (ct.isInnerClass()) {
-                if (ct.outer() instanceof RawClass && !(ct instanceof RawClass)) {
-                    // we are trying to create a "rare" class!
-                    // That is, we are
-                    // trying to instantiate a member class of
-                    // a raw class.
-                    // See JLS 3rd ed. 4.8
-                    throw new SemanticException("\"Rare\" types are not allowed: cannot provide "
-                                                        + "type arguments to member class "
-                                                        + ct.name()
-                                                        + " of raw class "
-                                                        + ct.outer() + ".",
-                                                position);
+                ClassType outer = ct.outer();
+                if (outer instanceof RawClass) {
+                    ClassType currentClass = sc.context().currentClass();
+                    ClassType outerBase = ((RawClass) outer).base();
+                    if (!ts.typeEquals(currentClass, outerBase)
+                            && !ts.isEnclosed(currentClass, outerBase)) {
+                        // we are trying to create a "rare" class!
+                        // That is, we are
+                        // trying to instantiate a member class of
+                        // a raw class.
+                        // See JLS 3rd ed. 4.8
+                        throw new SemanticException("\"Rare\" types are not allowed: cannot provide "
+                                                            + "type arguments to member class "
+                                                            + ct.name()
+                                                            + " of raw class "
+                                                            + ct.outer() + ".",
+                                                    position);
+                    }
                 }
             }
         }
@@ -127,18 +133,6 @@ public class AmbTypeInstantiation extends TypeNode_c implements TypeNode,
         else if (baseType instanceof RawClass) {
             pct = ((RawClass) baseType).base();
             handledBase = true;
-        }
-
-        if (handledBase && pct.isInnerClass()) {
-            // add self-instantiation if needed. i.e.,
-            // if we have class D<T>, and D is an inner class
-            // of C, and C itself has parameter S, then we need
-            // to self-instantiate C, i.e., we need C<S>.D<T>, as opposed
-            // to just C.D<T>
-            ClassType container =
-                    findSelfInstantiatedContainer((JL5ParsedClassType) pct.container(),
-                                                  ts);
-            baseType = container.memberClassNamed(pct.name());
         }
 
         if (baseType instanceof JL5SubstClassType) {
@@ -194,20 +188,21 @@ public class AmbTypeInstantiation extends TypeNode_c implements TypeNode,
         return sc.nodeFactory().CanonicalTypeNode(this.position, instantiated);
     }
 
-    private ClassType findSelfInstantiatedContainer(
-            JL5ParsedClassType container, JL5TypeSystem ts) {
-        List<TypeVariable> l = ts.classAndEnclosingTypeVariables(container);
-        if (l.isEmpty()) {
-            return container;
+    @Override
+    public String toString() {
+        StringBuffer sb = new StringBuffer();
+        sb.append(base);
+        sb.append("<");
+
+        Iterator<TypeNode> iter = typeArguments.iterator();
+        while (iter.hasNext()) {
+            TypeNode tn = iter.next();
+            sb.append(tn);
+
+            if (iter.hasNext()) sb.append(",");
         }
-        // add a self instantiation.
-        Map<TypeVariable, TypeVariable> substMap =
-                new LinkedHashMap<TypeVariable, TypeVariable>();
-        for (TypeVariable tv : l) {
-            substMap.put(tv, tv);
-        }
-        // TODO Auto-generated method stub
-        return (ClassType) ts.subst(container, substMap);
+        sb.append(">");
+        return sb.toString();
     }
 
     @Override

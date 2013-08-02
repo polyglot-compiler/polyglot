@@ -1,0 +1,43 @@
+class Seq { 
+	Object head; 
+	Seq tail; 
+	Seq() { 
+		this(null, null); 
+	} 
+	boolean isEmpty() { 
+		return tail == null; 
+	}
+	Seq(Object head, Seq tail) { 
+		this.head = head; 
+		this.tail = tail; 
+	}
+	class Zipper<S> { 
+		Seq zip(Seq that) { 
+			if (isEmpty() || that.isEmpty())
+				return new Seq(); 
+			else 
+				return new Seq(new Pair<Object,Object>(Seq.this.head, that.head), 
+						tail.new Zipper<S>().zip(that.tail));
+		}
+	}
+}
+class Pair<T, S> {
+	T fst; 
+	S snd;
+	Pair(T f, S s) {
+		fst = f; snd = s;
+	}
+}
+
+class Client {
+	Seq strs = 
+			new Seq("a", new Seq("b", 
+					new Seq()));
+	Seq nums = 
+			new Seq(new Integer(1), 
+					new Seq(new Double(1.5), 
+							new Seq()));
+	Seq.Zipper<Number> zipper = 
+			strs.new Zipper<Number>();
+	Seq combined = zipper.zip(nums);
+}

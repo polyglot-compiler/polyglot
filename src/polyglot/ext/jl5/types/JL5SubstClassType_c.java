@@ -320,8 +320,13 @@ public class JL5SubstClassType_c extends
                 done = true;
             }
 
-            // Use the short name if it is unique.
-            else if (c != null && !Options.global.fully_qualified_names) {
+            // Use the short name if it is unique and not an inner class
+            // whose outer class has a type substitution.
+            else if (c != null
+                    && (!ct.isInnerClass() || subst().substitutions()
+                                                     .keySet()
+                                                     .containsAll(ct.typeVariables()))
+                    && !Options.global.fully_qualified_names) {
                 try {
                     Named x = c.find(ct.name());
 

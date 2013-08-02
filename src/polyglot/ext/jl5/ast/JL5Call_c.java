@@ -44,13 +44,16 @@ import polyglot.ast.TypeNode;
 import polyglot.ext.jl5.types.JL5MethodInstance;
 import polyglot.ext.jl5.types.JL5ParsedClassType;
 import polyglot.ext.jl5.types.JL5TypeSystem;
+import polyglot.ext.jl5.types.RawClass;
 import polyglot.ext.jl5.visit.JL5Translator;
 import polyglot.types.CodeInstance;
 import polyglot.types.Context;
 import polyglot.types.FunctionInstance;
+import polyglot.types.MethodInstance;
 import polyglot.types.ReferenceType;
 import polyglot.types.SemanticException;
 import polyglot.types.Type;
+import polyglot.types.TypeSystem;
 import polyglot.util.CodeWriter;
 import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
@@ -183,6 +186,14 @@ public class JL5Call_c extends Call_c implements JL5Call {
 
         ReferenceType targetType = this.findTargetType();
 
+        /* This call is in a static context if and only if
+         * the target (possibly implicit) is a type node.
+         */
+        boolean staticContext = (this.target instanceof TypeNode);
+
+        if (staticContext && targetType instanceof RawClass)
+            targetType = ((RawClass) targetType).base();
+
         JL5MethodInstance mi =
                 (JL5MethodInstance) ts.findMethod(targetType,
                                                   this.name.id(),
@@ -206,11 +217,6 @@ public class JL5Call_c extends Call_c implements JL5Call {
 //                + " return type is " + mi.returnType().getClass());
 //        System.err.println("  JL5Call_c.typeCheck mi is " + mi
 //                + " container is " + mi.container().getClass());
-        /* This call is in a static context if and only if
-         * the target (possibly implicit) is a type node.
-         */
-        boolean staticContext = (this.target instanceof TypeNode);
-
         if (staticContext && !mi.flags().isStatic()) {
             throw new SemanticException("Cannot call non-static method "
                     + this.name.id() + " of " + target.type() + " in static "
@@ -322,6 +328,12 @@ public class JL5Call_c extends Call_c implements JL5Call {
         }
         w.write(")");
         w.end();
+    }
+
+    @Override
+    protected Type findContainer(TypeSystem ts, MethodInstance mi) {
+        JL5TypeSystem jts = (JL5TypeSystem) ts;
+        return jts.erasureType(mi.container());
     }
 
 }

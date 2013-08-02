@@ -27,7 +27,9 @@ package polyglot.ext.jl5.ast;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import polyglot.ast.ClassBody;
 import polyglot.ast.Expr;
@@ -40,9 +42,12 @@ import polyglot.ext.jl5.types.JL5ClassType;
 import polyglot.ext.jl5.types.JL5ParsedClassType;
 import polyglot.ext.jl5.types.JL5SubstClassType;
 import polyglot.ext.jl5.types.JL5TypeSystem;
+import polyglot.ext.jl5.types.RawClass;
+import polyglot.ext.jl5.types.TypeVariable;
 import polyglot.ext.jl5.visit.JL5Translator;
 import polyglot.types.ClassType;
 import polyglot.types.Context;
+import polyglot.types.ParsedClassType;
 import polyglot.types.ReferenceType;
 import polyglot.types.SemanticException;
 import polyglot.types.Type;
@@ -94,6 +99,47 @@ public class JL5New_c extends New_c implements JL5New {
         JL5New n = (JL5New) super.disambiguateOverride(parent, ar);
         // now do the type args
         return n.typeArgs(n.visitList(n.typeArgs(), ar));
+    }
+
+    @Override
+    protected TypeNode findQualifiedTypeNode(AmbiguityRemover ar,
+            ClassType outer, TypeNode objectType) throws SemanticException {
+        if (objectType instanceof AmbTypeInstantiation) {
+            JL5TypeSystem ts = (JL5TypeSystem) ar.typeSystem();
+            JL5NodeFactory nf = (JL5NodeFactory) ar.nodeFactory();
+            Context c = ar.context();
+
+            // Check for visibility of inner class, but ignore result
+            ts.findMemberClass(outer, objectType.name(), c.currentClass());
+
+            if (outer instanceof ParsedClassType) {
+                ParsedClassType opct = (ParsedClassType) outer;
+                c = c.pushClass(opct, opct);
+                objectType = (TypeNode) objectType.visit(ar.context(c));
+                return objectType;
+            }
+            else if (outer instanceof JL5SubstClassType) {
+                JL5SubstClassType osct = (JL5SubstClassType) outer;
+                c = c.pushClass(osct.base(), osct.base());
+                objectType = (TypeNode) objectType.visit(ar.context(c));
+                if (!objectType.isDisambiguated()) return objectType;
+
+                JL5SubstClassType tsct = (JL5SubstClassType) objectType.type();
+                Map<TypeVariable, ReferenceType> substMap =
+                        new LinkedHashMap<TypeVariable, ReferenceType>(tsct.subst()
+                                                                           .substitutions());
+                substMap.putAll(osct.subst().substitutions());
+                return nf.CanonicalTypeNode(tsct.position(),
+                                            ts.subst(tsct.base(), substMap));
+            }
+            else if (outer instanceof RawClass) {
+                throw new SemanticException("The member type " + outer + "."
+                        + objectType
+                        + " must be qualified with a parameterized type,"
+                        + " since it is not static");
+            }
+        }
+        return super.findQualifiedTypeNode(ar, outer, objectType);
     }
 
     @Override

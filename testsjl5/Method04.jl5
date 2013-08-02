@@ -1,9 +1,9 @@
-class Method03<E> extends C<E> {
+class Method04<E> extends C<E> {
 	static void foo() {
 	}
 
 	static void f() {
-		foo();
+		Method04.foo();
 	}
 }
 

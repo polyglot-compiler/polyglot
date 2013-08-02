@@ -325,24 +325,11 @@ public class New_c extends Expr_c implements New {
             nn = nn.qualifier((Expr) nn.visitChild(nn.qualifier(), childbd));
             if (childbd.hasErrors()) throw new SemanticException();
 
-            if (nn.objectType() instanceof Ambiguous) {
-
-                // We have to disambiguate the type node as if it were a member of the
-                // static type, outer, of the qualifier.  For Java this is simple: type
-                // nested type is just a name and we
-                // use that name to lookup a member of the outer class.  For some
-                // extensions (e.g., PolyJ), the type node may be more complex than
-                // just a name.  We'll just punt here and let the extensions handle
-                // this complexity.
-
-                String name = nn.objectType().name();
-
+            TypeNode objectType = nn.objectType();
+            if (objectType instanceof Ambiguous) {
                 if (nn.qualifier().isDisambiguated()
                         && nn.qualifier().type() != null
                         && nn.qualifier().type().isCanonical()) {
-                    TypeSystem ts = ar.typeSystem();
-                    NodeFactory nf = ar.nodeFactory();
-                    Context c = ar.context();
 
                     if (!nn.qualifier().type().isClass()) {
                         throw new SemanticException("Cannot instantiate member class of non-class type.",
@@ -350,14 +337,19 @@ public class New_c extends Expr_c implements New {
                     }
 
                     ClassType outer = nn.qualifier().type().toClass();
-                    ClassType ct =
-                            ts.findMemberClass(outer, name, c.currentClass());
-                    TypeNode tn =
-                            nf.CanonicalTypeNode(nn.objectType().position(), ct);
+
+                    // We have to disambiguate the type node as if it were a member of the
+                    // static type, outer, of the qualifier.  For Java this is simple: type
+                    // nested type is just a name and we
+                    // use that name to lookup a member of the outer class.  For some
+                    // extensions (e.g., PolyJ), the type node may be more complex than
+                    // just a name.  We'll just punt here and let the extensions handle
+                    // this complexity.
+                    TypeNode tn = findQualifiedTypeNode(ar, outer, objectType);
                     nn = nn.objectType(tn);
                 }
             }
-            else if (!nn.objectType().isDisambiguated()) {
+            else if (!objectType.isDisambiguated()) {
                 // not yet disambiguated.
                 return nn;
             }
@@ -409,6 +401,16 @@ public class New_c extends Expr_c implements New {
         nn = (New) bd.leave(parent, old, nn, childbd);
 
         return nn;
+    }
+
+    protected TypeNode findQualifiedTypeNode(AmbiguityRemover ar,
+            ClassType outer, TypeNode objectType) throws SemanticException {
+        TypeSystem ts = ar.typeSystem();
+        NodeFactory nf = ar.nodeFactory();
+        Context c = ar.context();
+        String name = objectType.name();
+        ClassType ct = ts.findMemberClass(outer, name, c.currentClass());
+        return nf.CanonicalTypeNode(objectType.position(), ct);
     }
 
     @Override
