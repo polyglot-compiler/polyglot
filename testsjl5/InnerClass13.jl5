@@ -1,0 +1,10 @@
+class C1<T1> {
+	class C2<T2> {
+		
+	}
+
+	static void m() {
+		C1<String> c = new C1<String>();
+		C1<String>.C2<Integer> cc = c.new C2<Integer>();
+	}
+}

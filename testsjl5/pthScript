@@ -105,6 +105,7 @@ polyglot.ext.jl5.ExtensionInfo "-d out -classpath java-out -assert -noserial -po
         InnerClass10.jl5;
         InnerClass11.jl5;
         InnerClass12.jl5;
+        InnerClass13.jl5;
         Access01.jl5;
         Access02.jl5;
         Access03A.jl5  Access03B.jl5;
@@ -480,6 +481,7 @@ polyglot.ext.jl5.ExtensionInfo "-d out -classpath java-out -removeJava5isms -enu
         InnerClass10.jl5;
         InnerClass11.jl5;
         InnerClass12.jl5;
+        InnerClass13.jl5;
         Access01.jl5;
         Access02.jl5;
         Access03A.jl5  Access03B.jl5;

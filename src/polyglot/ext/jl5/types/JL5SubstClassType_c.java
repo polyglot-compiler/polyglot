@@ -36,6 +36,7 @@ import polyglot.ext.param.types.PClass;
 import polyglot.ext.param.types.SubstClassType_c;
 import polyglot.main.Options;
 import polyglot.types.ClassType;
+import polyglot.types.Context;
 import polyglot.types.Named;
 import polyglot.types.ReferenceType;
 import polyglot.types.Resolver;
@@ -321,21 +322,32 @@ public class JL5SubstClassType_c extends
             }
 
             // Use the short name if it is unique and not an inner class
-            // whose outer class has a type substitution.
-            else if (c != null
-                    && (!ct.isInnerClass() || subst().substitutions()
-                                                     .keySet()
-                                                     .containsAll(ct.typeVariables()))
-                    && !Options.global.fully_qualified_names) {
-                try {
-                    Named x = c.find(ct.name());
-
-                    if (ts.equals(ct, x)) {
-                        sb.append(ct.name());
-                        done = true;
+            // whose containing class does not descend from outer class.
+            else if (c != null && !Options.global.fully_qualified_names) {
+                boolean toTry = true;
+                if (ct.isInnerClass() && c instanceof Context) {
+                    JL5TypeSystem ts = (JL5TypeSystem) typeSystem();
+                    Context ctx = (Context) c;
+                    ClassType currentClass = ctx.currentClass();
+                    ClassType outer = ct.outer();
+                    if (!ts.isSubtype(currentClass,
+                                      ts.subst(outer, subst().substitutions()))
+                            && !ts.isEnclosed(currentClass, outer)) {
+                        toTry = false;
                     }
                 }
-                catch (SemanticException e) {
+
+                if (toTry) {
+                    try {
+                        Named x = c.find(ct.name());
+
+                        if (ts.equals(ct, x)) {
+                            sb.append(ct.name());
+                            done = true;
+                        }
+                    }
+                    catch (SemanticException e) {
+                    }
                 }
             }
 
