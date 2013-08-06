@@ -206,9 +206,11 @@ public class JL5ClassFileLazyClassInitializer extends
              * System.err.println("    throwTypes " +excTypes);
              */
             mi =
-                    ts.methodInstance(ct.position(),
-                                      ct,
-                                      ts.flagsForBits(method.getModifiers()),
+                    ts.methodInstance(ct.position(), ct,
+                    // VarArg flag (0x0080) is also transient flag,
+                    // which should be cleared.
+                                      ts.flagsForBits(method.getModifiers())
+                                        .clearTransient(),
                                       signature.methodSignature.returnType(),
                                       name,
                                       signature.methodSignature.formalTypes(),
