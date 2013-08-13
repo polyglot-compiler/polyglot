@@ -2168,8 +2168,11 @@ public class JL5TypeSystem_c extends
                         ReferenceType wub = wti.upperBound();
                         ReferenceType substUpperBoundOfA =
                                 (ReferenceType) subst.substType(a.upperBound());
-                        ReferenceType glb =
-                                this.glb(wub, substUpperBoundOfA, false);
+                        ReferenceType glb;
+                        if (typeEquals(wub, substUpperBoundOfA))
+                            glb = wub;
+                        else
+                        glb = this.glb(wub, substUpperBoundOfA, false);
                         vsi.setUpperBound(glb);
                         if (wub.isClass()
                                 && !wub.toClass().flags().isInterface()

@@ -180,18 +180,18 @@ public class ExpressionFlattener extends NodeVisitor {
 
         // conditional ? :
         if (n instanceof Conditional) {
-          Conditional c = (Conditional) n;
-          Expr cond = visitEdge(c, c.cond());
-          LocalDecl d = createDecl(c.type(), c.position(), null);
-          addStmt(d);
+            Conditional c = (Conditional) n;
+            Expr cond = visitEdge(c, c.cond());
+            LocalDecl d = createDecl(c.type(), c.position(), null);
+            addStmt(d);
 
-          Local l = createLocal(d);
-          If s = createCondIf(cond, l, c.consequent(), c.alternative(), c);
-          s = visitEdge(c, s);
-          addStmt(s);
+            Local l = createLocal(d);
+            If s = createCondIf(cond, l, c.consequent(), c.alternative(), c);
+            s = visitEdge(c, s);
+            addStmt(s);
 
-          return l;
-      }
+            return l;
+        }
 
         // nothing we can do about constructor calls
         if (n instanceof ConstructorCall) {
@@ -312,7 +312,7 @@ public class ExpressionFlattener extends NodeVisitor {
     public Expr flattenExpr(Expr n, Expr old) {
         boolean flatten = !dontFlatten(old);
 
-        Type t = n.type();
+        Type t = declType(n.type());
 
         // special handling of ++ and -- (postfix versions are a pain)
         if (n instanceof Unary && isAssign(n)) {
@@ -394,6 +394,10 @@ public class ExpressionFlattener extends NodeVisitor {
         }
 
         return n;
+    }
+
+    protected Type declType(Type t) {
+        return t;
     }
 
     protected Node translateBinary(Binary b) {
