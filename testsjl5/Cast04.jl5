@@ -1,0 +1,11 @@
+class C<E> {
+	class D {
+	}
+	
+	static void foo() {
+		C<String> c = new C<String>();
+		Object o = c.new D();
+		// Java 6 javac cannot parse the following cast
+		C<String>.D d = (C<String>.D) o;
+	}
+}

@@ -124,13 +124,17 @@ public class JL5New_c extends New_c implements JL5New {
                 objectType = (TypeNode) objectType.visit(ar.context(c));
                 if (!objectType.isDisambiguated()) return objectType;
 
-                JL5SubstClassType tsct = (JL5SubstClassType) objectType.type();
                 Map<TypeVariable, ReferenceType> substMap =
-                        new LinkedHashMap<TypeVariable, ReferenceType>(tsct.subst()
+                        new LinkedHashMap<TypeVariable, ReferenceType>(osct.subst()
                                                                            .substitutions());
-                substMap.putAll(osct.subst().substitutions());
-                return nf.CanonicalTypeNode(tsct.position(),
-                                            ts.subst(tsct.base(), substMap));
+                Type type = objectType.type();
+                if (type instanceof JL5SubstClassType) {
+                    JL5SubstClassType tsct = (JL5SubstClassType) type;
+                    substMap.putAll(tsct.subst().substitutions());
+                    type = tsct.base();
+                }
+                return nf.CanonicalTypeNode(type.position(),
+                                            ts.subst(type, substMap));
             }
             else if (outer instanceof RawClass) {
                 throw new SemanticException("The member type " + outer + "."

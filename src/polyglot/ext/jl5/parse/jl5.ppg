@@ -833,11 +833,19 @@ override cast_expression ::=
           RESULT = parser.nf.Cast(parser.pos(a, g, b), parser.array(tn, e.intValue()), g); :}
 
 	|	LPAREN:a name:b LT:c type_argument_list_1:d DOT:e
-			class_or_interface_type:f dims_opt:g RPAREN:h
+			class_or_interface:f dims_opt:g RPAREN:h
 			unary_expression_not_plus_minus:i
         {: AmbTypeNode bb = (AmbTypeNode)f;
            TypeNode tn = parser.nf.AmbTypeInstantiation(parser.pos(b, d), parser.exprToType(b.toExpr()),d);
            RESULT = parser.nf.Cast(parser.pos(a, i, b), parser.array(parser.nf.AmbTypeNode(parser.pos(b, f), tn, bb.id()), g.intValue()), i); :}
+
+	|	LPAREN:a name:b LT:c type_argument_list_1:d DOT:e
+			class_or_interface:f LT:g type_argument_list_1:h dims_opt:j RPAREN:k
+			unary_expression_not_plus_minus:i
+        {: AmbTypeNode bb = (AmbTypeNode)f;
+           TypeNode tn = parser.nf.AmbTypeInstantiation(parser.pos(b, d), parser.exprToType(b.toExpr()), d);
+           tn = parser.nf.AmbTypeInstantiation(parser.pos(b, h), parser.nf.AmbTypeNode(parser.pos(b, f), tn, bb.id()), h);
+           RESULT = parser.nf.Cast(parser.pos(a, i, b), parser.array(tn, j.intValue()), i); :}
 	;
 override relational_expression ::=
 		shift_expression:a

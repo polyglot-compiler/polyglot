@@ -156,6 +156,8 @@ polyglot.ext.jl5.ExtensionInfo "-d out -classpath java-out -assert -noserial -po
         Cast01.jl5 (Post, "Xlint");
         Cast02.jl5;
         Cast03.jl5;
+        Cast04.jl5 (Post), (Post);
+        Cast05.jl5 (Post), (Post);
         Conditional01.jl5;
         Conditional02.jl5;
         Conditional03.jl5;
@@ -532,6 +534,8 @@ polyglot.ext.jl5.ExtensionInfo "-d out -classpath java-out -removeJava5isms -enu
         Cast01.jl5;
         Cast02.jl5;
         Cast03.jl5;
+        Cast04.jl5;
+        Cast05.jl5;
         Conditional01.jl5;
         Conditional02.jl5;
         Conditional03.jl5;
