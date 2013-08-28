@@ -121,6 +121,7 @@ polyglot.ext.jl5.ExtensionInfo "-d out -classpath java-out -assert -noserial -po
         Interface06.jl5 (Post, "Xlint");
         Intersect01.jl5;
         Intersect02.jl5;
+        Intersect03.jl5 (Semantic, "additional bound");
         Import01.jl5;
         Import02.jl5;
         Import03.jl5 (Semantic);
@@ -243,11 +244,11 @@ polyglot.ext.jl5.ExtensionInfo "-d out -classpath java-out -assert -noserial -po
         forloop1a.jl5;
         forloop1b.jl5 (Semantic, "Incompatible");
         forloop1c.jl5 (Semantic, "Incompatible");
-        forwardref1.jl5 (Semantic, "forward"), (Semantic, "forward");
+        forwardref1.jl5 (Semantic, "Circular");
         forwardref1a.jl5;
         forwardref1b.jl5 (Semantic);
-        forwardref2.jl5 (Semantic, "forward"), (Semantic, "forward"), (Semantic, "forward");
-        forwardref3.jl5 (Semantic, "forward"), (Semantic, "forward"), (Semantic, "forward");
+        forwardref2.jl5 (Semantic, "Circular");
+        forwardref3.jl5 (Semantic, "Circular");
         genmethod1.jl5 (Semantic);
         genmethod2.jl5;
         intersection.jl5 (Semantic, "inaccessible"), (Semantic, "inaccessible");
@@ -498,6 +499,7 @@ polyglot.ext.jl5.ExtensionInfo "-d out -classpath java-out -removeJava5isms -enu
         Interface06.jl5;
         Intersect01.jl5;
         Intersect02.jl5;
+        Intersect03.jl5 (Semantic, "additional bound");
         Import01.jl5;
         Import02.jl5;
         Import03.jl5 (Semantic);
@@ -620,11 +622,11 @@ polyglot.ext.jl5.ExtensionInfo "-d out -classpath java-out -removeJava5isms -enu
         forloop1a.jl5;
         forloop1b.jl5 (Semantic, "Incompatible");
         forloop1c.jl5 (Semantic, "Incompatible");
-        forwardref1.jl5 (Semantic, "forward"), (Semantic, "forward");
+        forwardref1.jl5 (Semantic, "Circular");
         forwardref1a.jl5;
         forwardref1b.jl5 (Semantic);
-        forwardref2.jl5 (Semantic, "forward"), (Semantic, "forward"), (Semantic, "forward");
-        forwardref3.jl5 (Semantic, "forward"), (Semantic, "forward"), (Semantic, "forward");
+        forwardref2.jl5 (Semantic, "Circular");
+        forwardref3.jl5 (Semantic, "Circular");
         genmethod1.jl5 (Semantic);
         genmethod2.jl5;
         intersection.jl5 (Semantic, "inaccessible"), (Semantic, "inaccessible");

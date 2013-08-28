@@ -1,6 +1,6 @@
 class A<X> {
 
-<T extends S, S> A(int i) {} //error
+<T extends S, S> A(int i) {} //error in Java 6's javac, but fine
 
 <T, S extends T> A(byte b) {} //fine
 
@@ -12,6 +12,6 @@ class A<X> {
 
 <T extends X> A(Integer a) {} //fine
 
-<T extends X, X> A() {} //error
+<T extends X, X> A() {} //error in Java 6's javac, but fine
 
 }

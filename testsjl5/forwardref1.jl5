@@ -1,4 +1,4 @@
-class A<T extends S, S> { T y; } //error
+class A<T extends S, S> { T y; } //error in Java 6's javac, but fine
 
 class B<T, S extends T> {} //fine
 

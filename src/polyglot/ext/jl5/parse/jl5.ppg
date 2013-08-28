@@ -5,12 +5,7 @@ package polyglot.ext.jl5.parse;
 
 import polyglot.ext.jl5.types.*;
 import polyglot.ext.jl5.ast.*;
-import polyglot.ast.*;
-import polyglot.lex.*;
-import polyglot.types.*;
-import polyglot.util.*;
 import polyglot.parse.*;
-import java.util.*;
 
 /* Java 1.5 (JSR-14 + JSR-201) parser for CUP.
  * (Well, Java 1.5 as of 28 Jul 2003; it may change before official release)
@@ -103,27 +98,27 @@ parser Grm extends polyglot.parse.Grm  {:
     nf = (JL5NodeFactory) n;
   }
 
-    public ParamTypeNode toParamType(Position pos, Id id, List bounds){
+    public ParamTypeNode toParamType(Position pos, Id id, List<TypeNode> bounds){
         if (bounds == null){
             bounds = new LinkedList<TypeNode>();
         }
         ParamTypeNode tn = nf.ParamTypeNode(pos, bounds, id);
         return tn;
     }
-    
-    public List variableDeclarators(TypeNode a, List b, Flags flags, List annotations)
+
+    public List<LocalDecl> variableDeclarators(TypeNode a, List<VarDeclarator> b, Flags flags, List<AnnotationElem> annotations)
     throws Exception
     {
-      List l = new LinkedList<LocalDecl>();
-      for (Iterator i = b.iterator(); i.hasNext(); ) {
-          VarDeclarator d = (VarDeclarator) i.next();
+      List<LocalDecl> l = new LinkedList<LocalDecl>();
+      for (Iterator<VarDeclarator> i = b.iterator(); i.hasNext(); ) {
+          VarDeclarator d = i.next();
           l.add(nf.LocalDecl(pos(d), flags, annotations, array(a, d.dims),
                                   d.name, d.init));
       }
       return l;
    }
-    
-                                                                
+
+
 :};
 
 // ellipsis token for varargs, new in Java 1.5 (JSR-201)

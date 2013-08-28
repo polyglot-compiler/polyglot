@@ -315,7 +315,8 @@ public class JL5ConstructorDecl_c extends ConstructorDecl_c implements
         ConstructorDecl cd = this;
         JL5ConstructorInstance ci =
                 (JL5ConstructorInstance) this.constructorInstance();
-        ts.checkIllegalForwardReferences(typeParams);
+        for (ParamTypeNode typeParam : typeParams)
+            ts.checkCycles(typeParam.type().toReference());
 
         // check at most last formal is variable
         for (int i = 0; i < formals.size(); i++) {

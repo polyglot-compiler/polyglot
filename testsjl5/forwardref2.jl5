@@ -1,6 +1,6 @@
 class A<X> {
 
-<T extends S, S> void m1() {} //error
+<T extends S, S> void m1() {} //error in Java 6's javac, but fine
 
 <T, S extends T> void m2() {} //fine
 
@@ -12,6 +12,5 @@ class A<X> {
 
 <T extends X> void m6() {} //fine
 
-<T extends X, X> void m7() {} //error
-
+<T extends X, X> void m7() {} //error in Java 6's javac, but fine
 }

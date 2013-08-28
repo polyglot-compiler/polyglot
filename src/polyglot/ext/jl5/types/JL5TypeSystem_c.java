@@ -43,12 +43,10 @@ import polyglot.ast.ClassLit;
 import polyglot.ast.Expr;
 import polyglot.ast.NullLit;
 import polyglot.ast.Term;
-import polyglot.ast.TypeNode;
 import polyglot.ext.jl5.JL5Options;
 import polyglot.ext.jl5.ast.AnnotationElem;
 import polyglot.ext.jl5.ast.ElementValueArrayInit;
 import polyglot.ext.jl5.ast.EnumConstant;
-import polyglot.ext.jl5.ast.ParamTypeNode;
 import polyglot.ext.jl5.types.inference.InferenceSolver;
 import polyglot.ext.jl5.types.inference.InferenceSolver_c;
 import polyglot.ext.jl5.types.inference.LubType;
@@ -277,6 +275,17 @@ public class JL5TypeSystem_c extends
         }
 
         checkAccessFlags(f);
+    }
+
+    @Override
+    protected void checkCycles(ReferenceType curr, ReferenceType goal)
+            throws SemanticException {
+        super.checkCycles(curr, goal);
+
+        if (curr instanceof TypeVariable) {
+            TypeVariable tv = (TypeVariable) curr;
+            checkCycles(tv.upperBound(), goal);
+        }
     }
 
     @Override
@@ -2316,7 +2325,7 @@ public class JL5TypeSystem_c extends
                                     + j5t1
                                     + " and "
                                     + j5t2
-                                    + "are instantinations of the same generic interface but with different type arguments");
+                                    + "are instantiations of the same generic interface but with different type arguments");
                         }
                         else {
                             return false;
@@ -2577,29 +2586,6 @@ public class JL5TypeSystem_c extends
                             + aj.typeName(), aj.position());
                 }
             }
-        }
-    }
-
-    @Override
-    public void checkIllegalForwardReferences(List<ParamTypeNode> paramTypes)
-            throws SemanticException {
-        Set<String> allParamTypes = new HashSet<String>();
-        for (ParamTypeNode paramType : paramTypes)
-            allParamTypes.add(paramType.id().id());
-        Set<String> declaredParamTypes = new HashSet<String>();
-        for (ParamTypeNode paramType : paramTypes) {
-            for (TypeNode bound : paramType.bounds()) {
-                Type bt = bound.type();
-                if (bt instanceof TypeVariable) {
-                    TypeVariable tv = (TypeVariable) bt;
-                    String name = tv.name();
-                    if (allParamTypes.contains(name)
-                            && !declaredParamTypes.contains(name))
-                        throw new SemanticException("Illegal forward reference",
-                                                    bound.position());
-                }
-            }
-            declaredParamTypes.add(paramType.id().id());
         }
     }
 

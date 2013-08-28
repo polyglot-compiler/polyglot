@@ -1,5 +1,5 @@
 class C<T> {
   void m() {
-    C<String>[] x = new C<String>[3]; // Error, new expresison is not reifiable.
+    C<String>[] x = new C<String>[3]; // Error, new expression is not reifiable.
   }
 }

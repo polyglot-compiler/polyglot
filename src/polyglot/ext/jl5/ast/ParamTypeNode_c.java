@@ -196,6 +196,12 @@ public class ParamTypeNode_c extends TypeNode_c implements ParamTypeNode {
             }
         }
 
+        // if first bound is a type variable, the type variable must be the only bound
+        if (bounds.size() > 1 && bounds.get(0).type() instanceof TypeVariable)
+            throw new SemanticException("Cannot specify any additional bound "
+                    + "when first bound is a type variable.", bounds.get(1)
+                                                                    .position());
+
         //XXX: are these checks necessary for us?
         //ts.checkIntersectionBounds(tv.bounds(), false);
 

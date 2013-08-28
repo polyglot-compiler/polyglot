@@ -257,7 +257,8 @@ public class JL5ClassDecl_c extends ClassDecl_c implements JL5ClassDecl {
             }
         }
 
-        ts.checkIllegalForwardReferences(paramTypes);
+        for (ParamTypeNode paramType : paramTypes)
+            ts.checkCycles(paramType.type().toReference());
 
         return super.typeCheck(tc);
     }
