@@ -174,7 +174,6 @@ polyglot.ext.jl5.ExtensionInfo "-d out -classpath java-out -assert -noserial -po
         ArrayInit01.jl5;
         ArrayInit02.jl5;
         ArrayInit03.jl5;
-        NumericConversion01.jl5;
         C.jl5;
         FBoundSub.jl5;
         FBoundSub2.jl5;
@@ -244,11 +243,11 @@ polyglot.ext.jl5.ExtensionInfo "-d out -classpath java-out -assert -noserial -po
         forloop1a.jl5;
         forloop1b.jl5 (Semantic, "Incompatible");
         forloop1c.jl5 (Semantic, "Incompatible");
-        forwardref1.jl5 (Semantic), (Semantic);
+        forwardref1.jl5 (Semantic, "forward"), (Semantic, "forward");
         forwardref1a.jl5;
         forwardref1b.jl5 (Semantic);
-        forwardref2.jl5;
-        forwardref3.jl5;
+        forwardref2.jl5 (Semantic, "forward"), (Semantic, "forward"), (Semantic, "forward");
+        forwardref3.jl5 (Semantic, "forward"), (Semantic, "forward"), (Semantic, "forward");
         genmethod1.jl5 (Semantic);
         genmethod2.jl5;
         intersection.jl5 (Semantic, "inaccessible"), (Semantic, "inaccessible");
@@ -294,9 +293,8 @@ polyglot.ext.jl5.ExtensionInfo "-d out -classpath java-out -assert -noserial -po
         wildcard7.jl5 (Semantic), (Semantic), (Semantic);
         wildcard7a.jl5;
         wildcard8.jl5 (Semantic);
-        wildcard9.jl5 (Semantic, "does not match"),(Semantic, "does not match"), (Semantic, "does not match"),(Semantic); 
-        wildcard10.jl5 (Semantic),(Semantic); 
-        wildcard11.jl5 (Semantic, "does not match"),(Semantic, "does not match"), (Semantic, "does not match"),(Semantic); 
+        wildcard10.jl5 (Semantic, "capture"), (Semantic, "capture"), (Semantic, "does not match"); 
+        wildcard11.jl5 (Semantic, "capture"), (Semantic, "capture"), (Semantic, "does not match"), (Semantic, "does not match"), (Semantic, "does not match"); 
         wildcard12a.jl5(Semantic); 
         wildcard12b.jl5(Semantic); 
         wildcard12c.jl5(Semantic); 
@@ -396,6 +394,7 @@ polyglot.ext.jl5.ExtensionInfo "-d out -classpath java-out -assert -noserial -po
 	Conditional11.jl5;
         Conditional12.jl5;
 	CaptureConversion01.jl5 (Post, "Xlint");
+        NumericConversion01.jl5 (Semantic, "does not match");
         PermissiveCasts01.jl5 (Semantic, "does not match"),(Semantic, "does not match"),
                               (Semantic, "Cannot cast"),(Semantic, "Cannot cast"),
                               (Semantic, "Cannot cast"),(Semantic, "Cannot cast"),
@@ -552,7 +551,6 @@ polyglot.ext.jl5.ExtensionInfo "-d out -classpath java-out -removeJava5isms -enu
         ArrayInit01.jl5;
         ArrayInit02.jl5;
         ArrayInit03.jl5;
-        NumericConversion01.jl5;
         C.jl5;
         FBoundSub.jl5;
         FBoundSub2.jl5;
@@ -622,11 +620,11 @@ polyglot.ext.jl5.ExtensionInfo "-d out -classpath java-out -removeJava5isms -enu
         forloop1a.jl5;
         forloop1b.jl5 (Semantic, "Incompatible");
         forloop1c.jl5 (Semantic, "Incompatible");
-        forwardref1.jl5 (Semantic), (Semantic);
+        forwardref1.jl5 (Semantic, "forward"), (Semantic, "forward");
         forwardref1a.jl5;
         forwardref1b.jl5 (Semantic);
-        forwardref2.jl5;
-        forwardref3.jl5;
+        forwardref2.jl5 (Semantic, "forward"), (Semantic, "forward"), (Semantic, "forward");
+        forwardref3.jl5 (Semantic, "forward"), (Semantic, "forward"), (Semantic, "forward");
         genmethod1.jl5 (Semantic);
         genmethod2.jl5;
         intersection.jl5 (Semantic, "inaccessible"), (Semantic, "inaccessible");
@@ -671,9 +669,8 @@ polyglot.ext.jl5.ExtensionInfo "-d out -classpath java-out -removeJava5isms -enu
         wildcard7.jl5 (Semantic), (Semantic), (Semantic);
         wildcard7a.jl5;
         wildcard8.jl5 (Semantic);
-        wildcard9.jl5 (Semantic, "does not match"),(Semantic, "does not match"), (Semantic, "does not match"),(Semantic); 
-        wildcard10.jl5 (Semantic),(Semantic); 
-        wildcard11.jl5 (Semantic, "does not match"),(Semantic, "does not match"), (Semantic, "does not match"),(Semantic); 
+        wildcard10.jl5 (Semantic, "capture"), (Semantic, "capture"), (Semantic, "does not match"); 
+        wildcard11.jl5 (Semantic, "capture"), (Semantic, "capture"), (Semantic, "does not match"), (Semantic, "does not match"), (Semantic, "does not match"); 
         wildcard12a.jl5(Semantic); 
         wildcard12b.jl5(Semantic); 
         wildcard12c.jl5(Semantic); 
@@ -773,6 +770,7 @@ polyglot.ext.jl5.ExtensionInfo "-d out -classpath java-out -removeJava5isms -enu
 	Conditional11.jl5;
         Conditional12.jl5;
 	CaptureConversion01.jl5;
+        NumericConversion01.jl5 (Semantic, "does not match");
         PermissiveCasts01.jl5 (Semantic, "does not match"),(Semantic, "does not match"),
                               (Semantic, "Cannot cast"),(Semantic, "Cannot cast"),
                               (Semantic, "Cannot cast"),(Semantic, "Cannot cast"),
@@ -794,12 +792,14 @@ polyglot.ext.jl5.ExtensionInfo "-d out -classpath java-out -removeJava5isms -enu
 }
 
 polyglot.ext.jl5.ExtensionInfo "-d out -classpath java-out -assert -noserial -post \"javac -Xlint\\:-options -source 1.5\" -morepermissivecasts" {
+        NumericConversion01.jl5;
         PermissiveCasts01.jl5;
         PermissiveCasts02.jl5 (Semantic, "does not match");
         PermissiveCasts03.jl5 (Semantic, "Cannot cast");
 }
 
 polyglot.ext.jl5.ExtensionInfo "-d out -classpath java-out -removeJava5isms -enumImplClass MyEnum -assert -noserial -post \"javac -Xlint\\:-options -source 1.4\" -morepermissivecasts" {
+        NumericConversion01.jl5;
         PermissiveCasts01.jl5;
         PermissiveCasts02.jl5 (Semantic, "does not match");
         PermissiveCasts03.jl5 (Semantic, "Cannot cast");

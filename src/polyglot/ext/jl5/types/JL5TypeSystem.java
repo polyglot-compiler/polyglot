@@ -31,6 +31,7 @@ import java.util.Map;
 
 import polyglot.ast.Term;
 import polyglot.ext.jl5.ast.AnnotationElem;
+import polyglot.ext.jl5.ast.ParamTypeNode;
 import polyglot.ext.jl5.types.inference.LubType;
 import polyglot.ext.param.types.ParamTypeSystem;
 import polyglot.frontend.Source;
@@ -348,6 +349,9 @@ public interface JL5TypeSystem extends TypeSystem,
             ClassType currentClass) throws SemanticException;
 
     void checkDuplicateAnnotations(List<AnnotationElem> annotations)
+            throws SemanticException;
+
+    void checkIllegalForwardReferences(List<ParamTypeNode> paramTypes)
             throws SemanticException;
 
     /**

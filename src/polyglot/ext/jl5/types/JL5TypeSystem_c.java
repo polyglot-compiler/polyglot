@@ -43,10 +43,12 @@ import polyglot.ast.ClassLit;
 import polyglot.ast.Expr;
 import polyglot.ast.NullLit;
 import polyglot.ast.Term;
+import polyglot.ast.TypeNode;
 import polyglot.ext.jl5.JL5Options;
 import polyglot.ext.jl5.ast.AnnotationElem;
 import polyglot.ext.jl5.ast.ElementValueArrayInit;
 import polyglot.ext.jl5.ast.EnumConstant;
+import polyglot.ext.jl5.ast.ParamTypeNode;
 import polyglot.ext.jl5.types.inference.InferenceSolver;
 import polyglot.ext.jl5.types.inference.InferenceSolver_c;
 import polyglot.ext.jl5.types.inference.LubType;
@@ -81,7 +83,6 @@ import polyglot.types.reflect.ClassFile;
 import polyglot.types.reflect.ClassFileLazyClassInitializer;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
-import polyglot.util.UniqueID;
 
 public class JL5TypeSystem_c extends
         ParamTypeSystem_c<TypeVariable, ReferenceType> implements JL5TypeSystem {
@@ -649,6 +650,19 @@ public class JL5TypeSystem_c extends
             Type expectedReturnType) throws SemanticException {
         assert_(container);
         assert_(argTypes);
+
+        // apply capture conversion to container and argTypes
+        container =
+                (ReferenceType) applyCaptureConversion(container,
+                                                       container.position());
+        List<Type> captureConvertedArgTypes =
+                new ArrayList<Type>(argTypes.size());
+        for (Type argType : argTypes) {
+            if (argType instanceof ReferenceType)
+                argType = applyCaptureConversion(argType, argType.position());
+            captureConvertedArgTypes.add(argType);
+        }
+        argTypes = captureConvertedArgTypes;
 
         SemanticException error = null;
 
@@ -2123,6 +2137,11 @@ public class JL5TypeSystem_c extends
         return new WildCardType_c(this, position, upperBound, lowerBound);
     }
 
+    public CaptureConvertedWildCardType captureConvertedWildCardType(
+            Position pos) {
+        return new CaptureConvertedWildCardType_c(this, pos);
+    }
+
     @Override
     public Type applyCaptureConversion(Type t, Position pos)
             throws SemanticException {
@@ -2142,10 +2161,8 @@ public class JL5TypeSystem_c extends
                 ReferenceType ti = (ReferenceType) ct.subst().substType(a);
                 ReferenceType si = ti;
                 if (ti instanceof WildCardType) {
-                    TypeVariable tv =
-                            this.typeVariable(ti.position(),
-                                              UniqueID.newID("captureConversionFresh"),
-                                              null); // we'll replace this unknown type soon.
+                    CaptureConvertedWildCardType tv =
+                            this.captureConvertedWildCardType(ti.position());
                     tv.setSyntheticOrigin();
                     si = tv;
                 }
@@ -2171,8 +2188,7 @@ public class JL5TypeSystem_c extends
                         ReferenceType glb;
                         if (typeEquals(wub, substUpperBoundOfA))
                             glb = wub;
-                        else
-                        glb = this.glb(wub, substUpperBoundOfA, false);
+                        else glb = this.glb(wub, substUpperBoundOfA, false);
                         vsi.setUpperBound(glb);
                         if (wub.isClass()
                                 && !wub.toClass().flags().isInterface()
@@ -2561,6 +2577,29 @@ public class JL5TypeSystem_c extends
                             + aj.typeName(), aj.position());
                 }
             }
+        }
+    }
+
+    @Override
+    public void checkIllegalForwardReferences(List<ParamTypeNode> paramTypes)
+            throws SemanticException {
+        Set<String> allParamTypes = new HashSet<String>();
+        for (ParamTypeNode paramType : paramTypes)
+            allParamTypes.add(paramType.id().id());
+        Set<String> declaredParamTypes = new HashSet<String>();
+        for (ParamTypeNode paramType : paramTypes) {
+            for (TypeNode bound : paramType.bounds()) {
+                Type bt = bound.type();
+                if (bt instanceof TypeVariable) {
+                    TypeVariable tv = (TypeVariable) bt;
+                    String name = tv.name();
+                    if (allParamTypes.contains(name)
+                            && !declaredParamTypes.contains(name))
+                        throw new SemanticException("Illegal forward reference",
+                                                    bound.position());
+                }
+            }
+            declaredParamTypes.add(paramType.id().id());
         }
     }
 

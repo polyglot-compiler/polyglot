@@ -311,9 +311,11 @@ public class JL5ConstructorDecl_c extends ConstructorDecl_c implements
 
     @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
+        JL5TypeSystem ts = (JL5TypeSystem) tc.typeSystem();
         ConstructorDecl cd = this;
         JL5ConstructorInstance ci =
                 (JL5ConstructorInstance) this.constructorInstance();
+        ts.checkIllegalForwardReferences(typeParams);
 
         // check at most last formal is variable
         for (int i = 0; i < formals.size(); i++) {

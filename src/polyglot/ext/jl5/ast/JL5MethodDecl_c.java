@@ -244,6 +244,7 @@ public class JL5MethodDecl_c extends MethodDecl_c implements JL5MethodDecl {
         MethodDecl md = this;
         JL5MethodInstance mi = (JL5MethodInstance) this.methodInstance();
         ts.checkDuplicateAnnotations(annotations);
+        ts.checkIllegalForwardReferences(typeParams);
 
         // check at most last formal is variable
         for (int i = 0; i < formals.size(); i++) {

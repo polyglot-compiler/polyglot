@@ -122,28 +122,31 @@ public class JL5Call_c extends Call_c implements JL5Call {
         if (parent instanceof Assign) {
             Assign a = (Assign) parent;
             if (this == a.right()) {
-                if (a.left().type() == null || !a.left().type().isCanonical()) {
+                Type type = a.left().type();
+                if (type == null || !type.isCanonical()) {
                     // not ready yet
                     return this;
                 }
-                setExpectedReturnType(a.left().type());
+                setExpectedReturnType(type);
             }
         }
         if (parent instanceof LocalDecl) {
             LocalDecl ld = (LocalDecl) parent;
-            if (ld.type().type() == null || !ld.type().type().isCanonical()) {
+            Type type = ld.type().type();
+            if (type == null || !type.isCanonical()) {
                 // not ready yet
                 return this;
             }
-            setExpectedReturnType(ld.type().type());
+            setExpectedReturnType(type);
         }
         if (parent instanceof FieldDecl) {
             FieldDecl fd = (FieldDecl) parent;
-            if (fd.type().type() == null || !fd.type().type().isCanonical()) {
+            Type type = fd.type().type();
+            if (type == null || !type.isCanonical()) {
                 // not ready yet
                 return this;
             }
-            setExpectedReturnType(fd.type().type());
+            setExpectedReturnType(type);
         }
 
         return null;

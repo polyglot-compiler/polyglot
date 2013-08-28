@@ -75,13 +75,13 @@ public class TypeVariable_c extends ReferenceType_c implements TypeVariable {
     /**
      * The upper bound of this type variable. Should always be non-null. 
      */
-    private ReferenceType upperBound;
+    protected ReferenceType upperBound;
 
     /**
      * It is possible for type variables to have lower bounds. See JLS 3rd ed 4.10.2 and 5.1.10.
      * This field may be null.
      */
-    private ReferenceType lowerBound = null;
+    protected ReferenceType lowerBound = null;
 
     public TypeVariable_c(TypeSystem ts, Position pos, String id,
             ReferenceType upperBound) {
