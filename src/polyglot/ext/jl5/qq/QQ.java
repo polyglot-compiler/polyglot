@@ -20,12 +20,6 @@ public class QQ extends polyglot.qq.QQ {
     }
 
     @Override
-    protected Node parse(int kind, String fmt, Object... subst) {
-        System.out.println("HERE");
-        return super.parse(kind, fmt, subst);
-    }
-
-    @Override
     protected QQParser parser(Lexer lexer, TypeSystem ts, NodeFactory nf,
             ErrorQueue eq) {
         return new polyglot.ext.jl5.qq.Grm(lexer, ts, nf, eq);
