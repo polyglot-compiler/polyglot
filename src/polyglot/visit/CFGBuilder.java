@@ -51,6 +51,7 @@ import polyglot.util.Copy;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.StringUtil;
 import polyglot.visit.FlowGraph.Edge;
+import polyglot.visit.FlowGraph.EdgeKey;
 import polyglot.visit.FlowGraph.Peer;
 
 /**
@@ -147,6 +148,14 @@ public class CFGBuilder<FlowItem extends DataFlow.Item> implements Copy {
      */
     protected boolean errorEdgesToExitNode;
 
+    /**
+     * Should we add exception edges into finally blocks? If true, then the edge from
+     * an AST node that throws an exception to a finally block will be labeled with the
+     * appropriate exception; if false, then the edge will be labeled OTHER. 
+     * For backwards compatibility, the default value is false.
+     */
+    protected boolean exceptionEdgesToFinally;
+
     public CFGBuilder(TypeSystem ts, FlowGraph<FlowItem> graph,
             DataFlow<FlowItem> df) {
         this.ts = ts;
@@ -157,6 +166,7 @@ public class CFGBuilder<FlowItem extends DataFlow.Item> implements Copy {
         this.innermostTarget = null;
         this.skipInnermostCatches = false;
         this.errorEdgesToExitNode = false;
+        this.exceptionEdgesToFinally = false;
     }
 
     public FlowGraph<FlowItem> graph() {
@@ -610,11 +620,21 @@ public class CFGBuilder<FlowItem extends DataFlow.Item> implements Copy {
                 }
 
                 if (tr.finallyBlock() != null) {
-                    last_peer =
-                            tryFinally(v,
-                                       last_peer,
-                                       last_peer.node == t,
-                                       tr.finallyBlock());
+                    if (exceptionEdgesToFinally) {
+                        last_peer =
+                                tryFinally(v,
+                                           last_peer,
+                                           last_peer.node == t,
+                                           new FlowGraph.ExceptionEdgeKey(type),
+                                           tr.finallyBlock());
+                    }
+                    else {
+                        last_peer =
+                                tryFinally(v,
+                                           last_peer,
+                                           last_peer.node == t,
+                                           tr.finallyBlock());
+                    }
                 }
             }
         }
@@ -632,24 +652,49 @@ public class CFGBuilder<FlowItem extends DataFlow.Item> implements Copy {
      * @param last is the last peer visited before the finally block is entered.
      * @param abruptCompletion is true if and only if the finally block is being entered
      *        due to the (attempted) abrupt completion of the term <code>last.node</code>.
+     * @param edgeKeyToFinally the EdgeKey to use for the edge going to the entry of the finally block. If null, then FlowGraph.EDGE_KEY_OTHER will be used.
+     * @param finallyBlock the finally block associated with a try finally block.
+     */
+    protected static <FlowItem extends DataFlow.Item> Peer<FlowItem> tryFinally(
+            CFGBuilder<FlowItem> v, Peer<FlowItem> last,
+            boolean abruptCompletion, EdgeKey edgeKeyToFinally,
+            Block finallyBlock) {
+        CFGBuilder<FlowItem> v_ = v.outer.enterFinally(last, abruptCompletion);
+
+        Peer<FlowItem> finallyBlockEntryPeer =
+                v_.graph.peer(finallyBlock, v_.path_to_finally, Term.ENTRY);
+
+        if (edgeKeyToFinally == null) {
+            edgeKeyToFinally = FlowGraph.EDGE_KEY_OTHER;
+        }
+        v_.edge(last, finallyBlockEntryPeer, edgeKeyToFinally);
+
+        // visit the finally block.  
+        v_.visitCFG(finallyBlock, Collections.<EdgeKeyTermPair> emptyList());
+
+        // the exit peer for the finally block.
+        Peer<FlowItem> finallyBlockExitPeer =
+                v_.graph.peer(finallyBlock, v_.path_to_finally, Term.EXIT);
+        return finallyBlockExitPeer;
+    }
+
+    /**
+     * Create edges for the finally block of a try-finally construct. 
+     * 
+     * @param v v.innermostTarget is the Try term that the finallyBlock is assoicated with.
+     * @param last is the last peer visited before the finally block is entered.
+     * @param abruptCompletion is true if and only if the finally block is being entered
+     *        due to the (attempted) abrupt completion of the term <code>last.node</code>.
      * @param finallyBlock the finally block associated with a try finally block.
      */
     protected static <FlowItem extends DataFlow.Item> Peer<FlowItem> tryFinally(
             CFGBuilder<FlowItem> v, Peer<FlowItem> last,
             boolean abruptCompletion, Block finallyBlock) {
-        CFGBuilder<FlowItem> v_ = v.outer.enterFinally(last, abruptCompletion);
-
-        Peer<FlowItem> finallyBlockEntryPeer =
-                v_.graph.peer(finallyBlock, v_.path_to_finally, Term.ENTRY);
-        v_.edge(last, finallyBlockEntryPeer, FlowGraph.EDGE_KEY_OTHER);
-
-        // visit the finally block.  
-        v_.visitCFG(finallyBlock, Collections.<EdgeKeyTermPair> emptyList());
-
-        // the ext peer for the finally block.
-        Peer<FlowItem> finallyBlockExitPeer =
-                v_.graph.peer(finallyBlock, v_.path_to_finally, Term.EXIT);
-        return finallyBlockExitPeer;
+        return tryFinally(v,
+                          last,
+                          abruptCompletion,
+                          FlowGraph.EDGE_KEY_OTHER,
+                          finallyBlock);
     }
 
     /** 
