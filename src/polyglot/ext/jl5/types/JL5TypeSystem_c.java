@@ -1276,21 +1276,35 @@ public class JL5TypeSystem_c extends
         }
         if (t instanceof IntersectionType) {
             IntersectionType it = (IntersectionType) t;
-            ClassType ct = null;
-            ClassType iface = null;
-            boolean subtypes = true;
+            ClassType ct = null; // most specific class type so far
+            ClassType iface = null; // most specific interface type so far
+            boolean subtypes = true; // are all the interfaces in a subtype relation?
             // Find the most specific class 
             for (ReferenceType rt : it.bounds()) {
+                ReferenceType origRt = rt;
+                if (rt instanceof TypeVariable) {
+                    rt = (ReferenceType) erasureType(rt, visitedTypeVariables);
+                }
+                if (!rt.isClass()) {
+                    throw new InternalCompilerError("Don't know how to deal with erasure of intersection type "
+                                                            + it
+                                                            + ", specifcally component "
+                                                            + origRt,
+                                                    t.position());
+                }
                 ClassType next = (ClassType) rt;
                 if (equals(Object(), next)) continue;
                 if (!next.toClass().flags().isInterface()) {
                     // Is next more specific than ct?
-                    if (ct == null || next.descendsFrom(ct)) ct = next;
+                    if (ct == null || next.descendsFrom(ct)) {
+                        ct = next;
+                    }
                 }
                 else if (subtypes) {
                     // Is next a more specific subtype than iface?
-                    if (iface == null || next.descendsFrom(iface))
+                    if (iface == null || next.descendsFrom(iface)) {
                         iface = next;
+                    }
                     // Is iface a subtype of next?
                     else if (!iface.descendsFrom(next)) {
                         subtypes = false;
@@ -1298,7 +1312,9 @@ public class JL5TypeSystem_c extends
                 }
             }
             // Return the most-specific class, if there is one
-            if (ct != null) return erasureType(ct, visitedTypeVariables);
+            if (ct != null) {
+                return erasureType(ct, visitedTypeVariables);
+            }
             // Otherwise if the interfaces are all subtypes, return iface
 
             if (subtypes && iface != null) {
