@@ -122,6 +122,7 @@ polyglot.ext.jl5.ExtensionInfo "-d out -classpath java-out -assert -noserial -po
         Intersect01.jl5;
         Intersect02.jl5;
         Intersect03.jl5 (Semantic, "additional bound");
+        Intersect04.jl5;
         Import01.jl5;
         Import02.jl5;
         Import03.jl5 (Semantic);
@@ -500,6 +501,7 @@ polyglot.ext.jl5.ExtensionInfo "-d out -classpath java-out -removeJava5isms -enu
         Intersect01.jl5;
         Intersect02.jl5;
         Intersect03.jl5 (Semantic, "additional bound");
+        Intersect04.jl5;
         Import01.jl5;
         Import02.jl5;
         Import03.jl5 (Semantic);

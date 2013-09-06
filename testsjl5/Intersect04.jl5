@@ -1,0 +1,17 @@
+class C {
+
+    public static void main(String[] args) {
+        C a = new C();
+        Integer[] is = new Integer[4];
+        a.bar(is);
+    }
+
+    public <T> T[] bar(T[] a) {
+        return C.foo(
+                (Class<? extends T[]>) a.getClass());
+    }
+
+    static <T> T[] foo(Class<? extends T[]> newType) {
+        return null;
+    }
+}
