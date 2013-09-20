@@ -368,10 +368,6 @@ public class JL5MethodDecl_c extends MethodDecl_c implements JL5MethodDecl {
     public void translate(CodeWriter w, Translator tr) {
         if (isCompilerGenerated()) return;
 
-        for (AnnotationElem element : annotations) {
-            print(element, w, tr);
-        }
-
         super.translate(w, tr);
     }
 
