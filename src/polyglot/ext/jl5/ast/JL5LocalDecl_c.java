@@ -42,10 +42,12 @@ import polyglot.ext.jl5.types.TypeVariable.TVarDecl;
 import polyglot.ext.jl5.visit.AnnotationChecker;
 import polyglot.types.Flags;
 import polyglot.types.SemanticException;
+import polyglot.util.CodeWriter;
 import polyglot.util.CollectionUtil;
 import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
 import polyglot.visit.NodeVisitor;
+import polyglot.visit.PrettyPrinter;
 import polyglot.visit.TypeChecker;
 
 public class JL5LocalDecl_c extends LocalDecl_c implements LocalDecl,
@@ -116,6 +118,16 @@ public class JL5LocalDecl_c extends LocalDecl_c implements LocalDecl,
         JL5TypeSystem ts = (JL5TypeSystem) tc.typeSystem();
         ts.checkDuplicateAnnotations(annotations);
         return super.typeCheck(tc);
+    }
+
+    @Override
+    public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
+        for (AnnotationElem ae : annotations) {
+            ae.prettyPrint(w, tr);
+            w.newline();
+        }
+
+        super.prettyPrint(w, tr);
     }
 
     @Override

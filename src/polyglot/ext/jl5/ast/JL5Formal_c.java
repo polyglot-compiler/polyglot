@@ -142,6 +142,11 @@ public class JL5Formal_c extends Formal_c implements JL5Formal {
 
     @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
+        for (AnnotationElem ae : annotations) {
+            ae.prettyPrint(w, tr);
+            w.newline();
+        }
+
         w.write(JL5Flags.clearVarArgs(flags).translate());
         if (isVarArg()) {
             w.write(((ArrayType) type.type()).base().toString());
