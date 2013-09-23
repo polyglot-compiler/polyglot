@@ -362,8 +362,7 @@ public class AnnotationElemDecl_c extends Term_c implements AnnotationElemDecl {
 
     @Override
     public List<TypeNode> throwTypes() {
-        // TODO Auto-generated method stub
-        return null;
+        return Collections.emptyList();
     }
 
     @Override
