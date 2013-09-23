@@ -256,12 +256,6 @@ public class RawClass_c extends JL5ClassType_c implements RawClass {
     }
 
     @Override
-    protected Object clone() throws CloneNotSupportedException {
-        // TODO Auto-generated method stub
-        return super.clone();
-    }
-
-    @Override
     public boolean inStaticContext() {
         return this.erased().inStaticContext();
     }
