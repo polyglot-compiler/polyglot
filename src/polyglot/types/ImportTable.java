@@ -71,43 +71,36 @@ public class ImportTable implements Resolver {
     protected static final Named NOT_FOUND = new Named() {
         @Override
         public boolean isCanonical() {
-            // TODO Auto-generated method stub
             return false;
         }
 
         @Override
         public TypeSystem typeSystem() {
-            // TODO Auto-generated method stub
             return null;
         }
 
         @Override
         public Position position() {
-            // TODO Auto-generated method stub
             return null;
         }
 
         @Override
         public boolean equalsImpl(TypeObject t) {
-            // TODO Auto-generated method stub
             return false;
         }
 
         @Override
         public Object copy() {
-            // TODO Auto-generated method stub
             return null;
         }
 
         @Override
         public String name() {
-            // TODO Auto-generated method stub
             return null;
         }
 
         @Override
         public String fullName() {
-            // TODO Auto-generated method stub
             return null;
         }
     };
