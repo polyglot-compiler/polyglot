@@ -1,0 +1,6 @@
+class StringTest01 {
+   public interface Foo<D extends java.util.List> { 
+       D foo (); 
+   }
+   public void bar (Foo<?> t) { String s = "" + t.foo(); }
+}

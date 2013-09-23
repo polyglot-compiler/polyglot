@@ -222,6 +222,7 @@ polyglot.ext.jl5.ExtensionInfo "-d out -classpath java-out -assert -noserial -po
         Simple.jl5;
         SimpleFBoundSub.jl5;
         StringTest.jl5;
+        StringTest01.jl5;
         VerySimple.jl5;
         Wildcard1.jl5;
         dotclass.jl5;
@@ -602,6 +603,7 @@ polyglot.ext.jl5.ExtensionInfo "-d out -classpath java-out -removeJava5isms -enu
         Simple.jl5;
         SimpleFBoundSub.jl5;
         StringTest.jl5;
+        StringTest01.jl5;
         VerySimple.jl5;
         Wildcard1.jl5;
         dotclass.jl5;
