@@ -335,6 +335,19 @@ public class TVCaster extends AscriptionVisitor {
                 }
             }
         }
+        if (parent instanceof Binary) {
+            Binary b = (Binary) parent;
+            if (b.type().equals(ts.String()) && ret instanceof Cast) {
+                Cast c = (Cast) ret;
+                if (c.castType().type().equals(ts.String())) {
+                    // we have a cast to a String for a binary +
+                    // e.g., "" + (String)o
+                    // Get rid of the cast.
+                    return c.expr();
+                }
+            }
+        }
+
         // SNC: we were always casting the receiver of a call to the appropriate type
         // This does not seem to be required.
 //        if (parent instanceof Call && old == ((Call) parent).target()) {
