@@ -642,7 +642,7 @@ override interface_declaration ::=
     | modifiers_or_annotations:a AT:b INTERFACE:c IDENTIFIER:d annotation_body:e
         {: List superints = new LinkedList<TypeNode>();
            superints.add(parser.nf.CanonicalTypeNode(parser.pos(b, e), parser.ts.Annotation()));
-           RESULT = parser.nf.ClassDecl(parser.pos(a, d), a.setFlag(Flags.INTERFACE.set(JL5Flags.ANNOTATION)).flags(), a.annotations(), parser.nf.Id(parser.pos(d), d.getIdentifier()), null, superints, e, null); :}
+           RESULT = parser.nf.ClassDecl(parser.pos(b, d), a.setFlag(Flags.INTERFACE.set(JL5Flags.ANNOTATION)).flags(), a.annotations(), parser.nf.Id(parser.pos(d), d.getIdentifier()), null, superints, e, null); :}
 	;
 	
 extend interface_member_declaration ::=
