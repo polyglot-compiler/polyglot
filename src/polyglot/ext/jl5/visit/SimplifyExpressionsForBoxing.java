@@ -135,7 +135,10 @@ public class SimplifyExpressionsForBoxing extends HaltingVisitor {
                                       : Binary.ADD,
                               nf.IntLit(u.position(), IntLit.INT, 1)
                                 .type(ts.Int()));
-            b = (Binary) b.type(primType.isLong() ? ts.Long() : ts.Int());
+
+            // JLS 3rd ed: 15.14.3:  The type of the postfix decrement expression is the type of the variable.
+            // We'll use the primitive type corresponding to the type of the variable.
+            b = (Binary) b.type(primType);
             return b;
 
         }
