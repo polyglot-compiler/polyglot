@@ -1,0 +1,8 @@
+import java.lang.annotation.*;
+class CustomAnnotations
+{
+   @Target(ElementType.PARAMETER) public @interface Foo {}
+   public void foo (@Foo Object obj) {}
+
+   public CustomAnnotations(@Foo Object obj) {}
+}
