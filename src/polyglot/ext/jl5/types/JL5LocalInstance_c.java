@@ -38,6 +38,8 @@ public class JL5LocalInstance_c extends LocalInstance_c implements
 
     protected Annotations annotations;
 
+    protected boolean isProcedureFormal = false;
+
     public JL5LocalInstance_c(TypeSystem ts, Position pos, Flags flags,
             Type type, String name) {
         super(ts, pos, flags, type, name);
@@ -51,6 +53,16 @@ public class JL5LocalInstance_c extends LocalInstance_c implements
     @Override
     public void setAnnotations(Annotations annotations) {
         this.annotations = annotations;
+    }
+
+    @Override
+    public boolean isProcedureFormal() {
+        return this.isProcedureFormal;
+    }
+
+    @Override
+    public void setProcedureFormal(boolean isProcedureFormal) {
+        this.isProcedureFormal = isProcedureFormal;
     }
 
 }

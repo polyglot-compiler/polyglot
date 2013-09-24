@@ -38,4 +38,15 @@ public interface JL5LocalInstance extends LocalInstance {
 
     void setAnnotations(Annotations annotations);
 
+    /**
+     * Does this local instance represent a formal argument of a procedure? 
+     * (e.g., method or constructor) 
+     */
+    boolean isProcedureFormal();
+
+    /**
+     * Set whether this local instance represent a formal argument of a procedure.
+     * (e.g., method or constructor) 
+     */
+    void setProcedureFormal(boolean isProcedureFormal);
 }

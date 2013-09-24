@@ -42,6 +42,7 @@ import polyglot.ext.jl5.types.Annotations;
 import polyglot.ext.jl5.types.JL5ArrayType;
 import polyglot.ext.jl5.types.JL5Context;
 import polyglot.ext.jl5.types.JL5Flags;
+import polyglot.ext.jl5.types.JL5LocalInstance;
 import polyglot.ext.jl5.types.JL5MethodInstance;
 import polyglot.ext.jl5.types.JL5TypeSystem;
 import polyglot.ext.jl5.types.TypeVariable;
@@ -246,6 +247,12 @@ public class JL5MethodDecl_c extends MethodDecl_c implements JL5MethodDecl {
         ts.checkDuplicateAnnotations(annotations);
         for (ParamTypeNode typeParam : typeParams)
             ts.checkCycles(typeParam.type().toReference());
+
+        // mark the formals as being procedure formals (since they are)
+        for (Formal f : formals) {
+            JL5LocalInstance li = (JL5LocalInstance) f.localInstance();
+            li.setProcedureFormal(true);
+        }
 
         // check at most last formal is variable
         for (int i = 0; i < formals.size(); i++) {

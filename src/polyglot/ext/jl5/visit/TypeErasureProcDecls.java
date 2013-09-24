@@ -48,6 +48,7 @@ import polyglot.ast.Stmt;
 import polyglot.ast.TypeNode;
 import polyglot.ext.jl5.JL5Options;
 import polyglot.ext.jl5.types.JL5ClassType;
+import polyglot.ext.jl5.types.JL5LocalInstance;
 import polyglot.ext.jl5.types.JL5ParsedClassType;
 import polyglot.ext.jl5.types.JL5ProcedureInstance;
 import polyglot.ext.jl5.types.JL5Subst;
@@ -256,9 +257,13 @@ public class TypeErasureProcDecls extends ErrorHandlingVisitor {
                                          nodeFactory().CanonicalTypeNode(pos,
                                                                          ft),
                                          nodeFactory().Id(pos, "arg" + (++i)));
-            f =
-                    f.localInstance(ts.localInstance(pos, Flags.NONE, ft, "arg"
-                            + i));
+            JL5LocalInstance li =
+                    (JL5LocalInstance) ts.localInstance(pos,
+                                                        Flags.NONE,
+                                                        ft,
+                                                        "arg" + i);
+            li.setProcedureFormal(true);
+            f = f.localInstance(li);
             formals.add(f);
         }
 

@@ -43,6 +43,7 @@ import polyglot.ext.jl5.types.JL5ArrayType;
 import polyglot.ext.jl5.types.JL5ConstructorInstance;
 import polyglot.ext.jl5.types.JL5Context;
 import polyglot.ext.jl5.types.JL5Flags;
+import polyglot.ext.jl5.types.JL5LocalInstance;
 import polyglot.ext.jl5.types.JL5TypeSystem;
 import polyglot.ext.jl5.types.TypeVariable;
 import polyglot.ext.jl5.visit.AnnotationChecker;
@@ -317,6 +318,12 @@ public class JL5ConstructorDecl_c extends ConstructorDecl_c implements
                 (JL5ConstructorInstance) this.constructorInstance();
         for (ParamTypeNode typeParam : typeParams)
             ts.checkCycles(typeParam.type().toReference());
+
+        // mark the formals as being procedure formals (since they are)
+        for (Formal f : formals) {
+            JL5LocalInstance li = (JL5LocalInstance) f.localInstance();
+            li.setProcedureFormal(true);
+        }
 
         // check at most last formal is variable
         for (int i = 0; i < formals.size(); i++) {

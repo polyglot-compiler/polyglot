@@ -63,6 +63,7 @@ import polyglot.ext.jl5.ast.EnumConstantDecl;
 import polyglot.ext.jl5.ast.JL5EnumDecl;
 import polyglot.ext.jl5.types.EnumInstance;
 import polyglot.ext.jl5.types.JL5Flags;
+import polyglot.ext.jl5.types.JL5LocalInstance;
 import polyglot.ext.jl5.types.JL5TypeSystem;
 import polyglot.frontend.Job;
 import polyglot.qq.QQ;
@@ -254,8 +255,12 @@ public class RemoveEnums extends ContextVisitor {
 
         // add two new arguments to the constructor
         List<Formal> newFormals = new ArrayList<Formal>();
-        LocalInstance enumNameLI =
-                ts.localInstance(pos, Flags.NONE, ts.String(), enumName.id());
+        JL5LocalInstance enumNameLI =
+                (JL5LocalInstance) ts.localInstance(pos,
+                                                    Flags.NONE,
+                                                    ts.String(),
+                                                    enumName.id());
+        enumNameLI.setProcedureFormal(true);
         newFormals.add(nodeFactory().Formal(pos,
                                             Flags.NONE,
                                             nodeFactory().CanonicalTypeNode(pos,
@@ -263,8 +268,12 @@ public class RemoveEnums extends ContextVisitor {
                                             enumName)
                                     .localInstance(enumNameLI));
 
-        LocalInstance enumOrdLI =
-                ts.localInstance(pos, Flags.NONE, ts.Int(), enumOrdinal.id());
+        JL5LocalInstance enumOrdLI =
+                (JL5LocalInstance) ts.localInstance(pos,
+                                                    Flags.NONE,
+                                                    ts.Int(),
+                                                    enumOrdinal.id());
+        enumOrdLI.setProcedureFormal(true);
         newFormals.add(nodeFactory().Formal(pos,
                                             Flags.NONE,
                                             nodeFactory().CanonicalTypeNode(pos,
