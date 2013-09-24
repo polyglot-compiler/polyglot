@@ -42,6 +42,7 @@ import polyglot.ext.jl5.types.Annotations;
 import polyglot.ext.jl5.types.EnumInstance;
 import polyglot.ext.jl5.types.JL5ClassType;
 import polyglot.ext.jl5.types.JL5Flags;
+import polyglot.ext.jl5.types.JL5LocalInstance;
 import polyglot.ext.jl5.types.JL5TypeSystem;
 import polyglot.frontend.Job;
 import polyglot.types.ClassType;
@@ -175,9 +176,14 @@ public class AnnotationChecker extends ContextVisitor {
         }
         if (decl instanceof LocalInstance) {
             // it's either a local instance or a formal
-            // we're being a little lax here, and just assuming it it is a local variable
-            return Collections.singleton((EnumInstance) aet.fieldNamed("LOCAL_VARIABLE"));
-            //return (EnumInstance) aet.fieldNamed("PARAMETER");
+            // Check the local instance info
+            JL5LocalInstance li = (JL5LocalInstance) decl;
+            if (li.isProcedureFormal()) {
+                return Collections.singleton((EnumInstance) aet.fieldNamed("PARAMETER"));
+            }
+            else {
+                return Collections.singleton((EnumInstance) aet.fieldNamed("LOCAL_VARIABLE"));
+            }
         }
         if (decl instanceof ClassType) {
             ClassType ct = (ClassType) decl;
@@ -198,5 +204,4 @@ public class AnnotationChecker extends ContextVisitor {
 
         throw new InternalCompilerError("Don't know how to deal with " + decl);
     }
-
 }
