@@ -219,7 +219,7 @@ public class RemoveExtendedFors extends ContextVisitor {
         Position pos = Position.compilerGenerated();
         Type iteratedType = n.decl().type().type();
         // translate "L1,...,Ln: for (C x: e) b" to 
-        // "{ C[] arr = e; int iter = 0;  L1,...,Ln: while (iter < arr.length)  { C x = arr[iter]; b ; iter = iter + 1; }"
+        // "{ C[] arr = e; int iter = 0;  L1,...,Ln: while (iter < arr.length)  { C x = arr[iter]; iter = iter + 1; b; }"
         List<Stmt> stmts = new ArrayList<Stmt>();
 
         // add the declaration of arr: "C[] arr = e"
@@ -322,7 +322,7 @@ public class RemoveExtendedFors extends ContextVisitor {
         {
             // Create a new loop body from the old body followed by the increment
             Block loopBody =
-                    nodeFactory().Block(pos, n.decl().init(init), n.body(), inc);
+                    nodeFactory().Block(pos, n.decl().init(init), inc, n.body());
             While loop = nodeFactory().While(pos, cond, loopBody);
             stmts.add(labelStmt(loop, labels));
         }
