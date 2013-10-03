@@ -1324,8 +1324,9 @@ public class TypeSystem_c implements TypeSystem {
                             // mi isn't overridden by something already in acceptable
                             // so add mi to acceptable, and add all the methods it
                             // overrides to the set overridden.
-                            acceptable.add(mi);
                             overridden.addAll(mi.implemented());
+                            acceptable.removeAll(mi.implemented()); // remove everything that mi overrides
+                            acceptable.add(mi);
                         }
                     }
                     else {
