@@ -1400,17 +1400,17 @@ public class JL5TypeSystem_c extends
                 toLowerBound = w.lowerBound();
             }
         }
-        if (toType instanceof CaptureConvertedWildCardType) {
-            isToTypeWildCard = true;
-            CaptureConvertedWildCardType w =
-                    (CaptureConvertedWildCardType) toType;
-            if (w.isExtendsConstraint()) {
-                toUpperBound = w.upperBound();
-            }
-            else if (w.isSuperConstraint()) {
-                toLowerBound = w.lowerBound();
-            }
-        }
+//        if (toType instanceof CaptureConvertedWildCardType) {
+//            isToTypeWildCard = true;
+//            CaptureConvertedWildCardType w =
+//                    (CaptureConvertedWildCardType) toType;
+//            if (w.isExtendsConstraint()) {
+//                toUpperBound = w.upperBound();
+//            }
+//            else if (w.isSuperConstraint()) {
+//                toLowerBound = w.lowerBound();
+//            }
+//        }
         if (fromType instanceof WildCardType) {
             isFromTypeWildCard = true;
             WildCardType w = (WildCardType) fromType;
