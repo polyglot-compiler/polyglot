@@ -64,6 +64,6 @@ public class Pair<T, U> {
     @Override
     public int hashCode() {
         return (part1 != null ? part1.hashCode() : 0)
-                ^ (part2 != null ? part2.hashCode() : 0);
+                ^ (part2 != null ? part2.hashCode() + 23457 : 31);
     }
 }
