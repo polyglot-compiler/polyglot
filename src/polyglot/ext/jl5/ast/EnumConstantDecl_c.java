@@ -56,6 +56,7 @@ import polyglot.util.ListUtil;
 import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
 import polyglot.visit.AmbiguityRemover;
+import polyglot.visit.AscriptionVisitor;
 import polyglot.visit.BodyDisambiguator;
 import polyglot.visit.CFGBuilder;
 import polyglot.visit.NodeVisitor;
@@ -372,6 +373,24 @@ public class EnumConstantDecl_c extends Term_c implements EnumConstantDecl {
         }
 
         return n;
+    }
+
+    @Override
+    public Type childExpectedType(Expr child, AscriptionVisitor av) {
+        Iterator<Expr> i = this.args().iterator();
+        Iterator<? extends Type> j =
+                constructorInstance().formalTypes().iterator();
+
+        while (i.hasNext() && j.hasNext()) {
+            Expr e = i.next();
+            Type t = j.next();
+
+            if (e == child) {
+                return t;
+            }
+        }
+
+        return child.type();
     }
 
     @Override
