@@ -1,0 +1,4 @@
+enum Foo {
+     BAR(1);
+     private Foo(Integer code) {}
+}
