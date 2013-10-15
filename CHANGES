@@ -5,6 +5,12 @@ This file documents changes between releases of Polyglot. More information
 about some releases may be found in the appropriate directory
 doc/release-notes-<version>.
 
+XXX, 2013 : Polyglot 2.5.4/2.6???
+===============================
+Changed signature of polyglot.visit.Dataflow to use Peer instead 
+of Node,boolean pairs. This change is not backward compatible.
+
+
 June 21, 2013 : Polyglot 2.5.3
 ===============================
 
