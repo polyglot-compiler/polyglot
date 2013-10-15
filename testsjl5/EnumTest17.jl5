@@ -1,0 +1,2 @@
+interface Foo<E extends Enum<E>> {}
+enum Bar implements Foo<Bar> {}

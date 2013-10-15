@@ -480,7 +480,11 @@ enum_declaration ::=
         {: RESULT = parser.nf.EnumDecl(
         		parser.pos(b, e), JL5Flags.setEnum(a.flags()), a.annotations(), 
                  parser.nf.Id(parser.pos(c), c.getIdentifier()), 
-                 parser.nf.CanonicalTypeNode(parser.pos(b, e), parser.ts.Enum()), d, e); :}
+                 parser.nf.AmbTypeInstantiation(parser.pos(b, e), 
+                   parser.nf.CanonicalTypeNode(parser.pos(b, e), parser.ts.Enum()), 
+                   Collections.<TypeNode>singletonList(
+                     parser.nf.AmbTypeNode(parser.pos(c), null, c.getIdentifier()))), 
+                 d, e); :}
 	;
 enum_body ::=
 		LBRACE:n enum_constants_opt:a enum_body_declarations_opt:b RBRACE:c

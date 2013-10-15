@@ -48,20 +48,24 @@ import polyglot.types.MethodInstance;
 import polyglot.types.SemanticException;
 import polyglot.types.Type;
 import polyglot.types.TypeSystem;
+import polyglot.util.CodeWriter;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
 import polyglot.visit.NodeVisitor;
+import polyglot.visit.PrettyPrinter;
 import polyglot.visit.TypeBuilder;
 import polyglot.visit.TypeChecker;
 
 public class JL5EnumDecl_c extends JL5ClassDecl_c implements JL5EnumDecl {
     private static final long serialVersionUID = SerialVersionUID.generate();
+    protected boolean hasEnumConstant;
 
     public JL5EnumDecl_c(Position pos, Flags flags,
             List<AnnotationElem> annotations, Id name, TypeNode superClass,
             List<TypeNode> interfaces, ClassBody body) {
         super(pos, flags, annotations, name, superClass, interfaces, body);
+        this.hasEnumConstant = false;
     }
 
     @Override
@@ -143,6 +147,13 @@ public class JL5EnumDecl_c extends JL5ClassDecl_c implements JL5EnumDecl {
         }
 
         for (ClassMember m : this.body().members()) {
+            if (m instanceof EnumConstantDecl) {
+                this.hasEnumConstant = true;
+                break;
+            }
+        }
+
+        for (ClassMember m : this.body().members()) {
             if (m.memberInstance().flags().isAbstract()
                     && m instanceof MethodDecl) {
                 n.type().flags(n.type().flags().Abstract());
@@ -218,6 +229,14 @@ public class JL5EnumDecl_c extends JL5ClassDecl_c implements JL5EnumDecl {
         this.type.addMethod(valuesMI);
 
         return this;
+    }
+
+    @Override
+    public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
+        prettyPrintHeader(w, tr);
+        if (!hasEnumConstant) w.write(";");
+        print(body(), w, tr);
+        prettyPrintFooter(w, tr);
     }
 
 }
