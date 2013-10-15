@@ -348,8 +348,13 @@ public class CopyPropagator extends DataFlow<CopyPropagator.DataFlowItem> {
     }
 
     @Override
-    public DataFlowItem confluence(List<DataFlowItem> inItems, Term node,
-            boolean entry, FlowGraph<DataFlowItem> graph) {
+    public DataFlowItem confluence(List<DataFlowItem> inItems,
+            Peer<DataFlowItem> peer, FlowGraph<DataFlowItem> graph) {
+        return confluence(inItems);
+    }
+
+    public DataFlowItem confluence(List<DataFlowItem> inItems) {
+
         DataFlowItem result = null;
         for (DataFlowItem inItem : inItems) {
             if (result == null) {
@@ -369,13 +374,16 @@ public class CopyPropagator extends DataFlow<CopyPropagator.DataFlowItem> {
         }
     }
 
-    protected DataFlowItem flow(DataFlowItem in, FlowGraph<DataFlowItem> graph,
-            Term t, boolean entry) {
+    @Override
+    protected Map<EdgeKey, DataFlowItem> flow(DataFlowItem in,
+            FlowGraph<DataFlowItem> graph, Peer<DataFlowItem> peer) {
         DataFlowItem result = new DataFlowItem(in);
 
-        if (entry) {
-            return result;
+        if (peer.isEntry()) {
+            return itemToMap(result, peer.succEdgeKeys());
         }
+
+        Term t = peer.node();
 
         if (t instanceof Assign) {
             Assign n = (Assign) t;
@@ -450,14 +458,7 @@ public class CopyPropagator extends DataFlow<CopyPropagator.DataFlowItem> {
             killDecl(result, n.alternative());
         }
 
-        return result;
-    }
-
-    @Override
-    public Map<EdgeKey, DataFlowItem> flow(DataFlowItem in,
-            FlowGraph<DataFlowItem> graph, Term t, boolean entry,
-            Set<EdgeKey> succEdgeKeys) {
-        return itemToMap(flow(in, graph, t, entry), succEdgeKeys);
+        return itemToMap(result, peer.succEdgeKeys());
     }
 
     @Override
@@ -495,7 +496,7 @@ public class CopyPropagator extends DataFlow<CopyPropagator.DataFlowItem> {
                 if (p.inItem() != null) items.add(p.inItem());
             }
 
-            DataFlowItem in = confluence(items, l, false, g);
+            DataFlowItem in = confluence(items);
             if (in == null) return n;
 
             LocalInstance root = in.getRoot(l.localInstance().orig());

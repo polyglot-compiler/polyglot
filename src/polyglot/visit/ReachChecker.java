@@ -122,8 +122,9 @@ public class ReachChecker extends DataFlow<ReachChecker.DataFlowItem> {
 
     @Override
     public Map<EdgeKey, DataFlowItem> flow(DataFlowItem in,
-            FlowGraph<DataFlowItem> graph, Term n, boolean entry,
-            Set<EdgeKey> succEdgeKeys) {
+            FlowGraph<DataFlowItem> graph, Peer<DataFlowItem> peer) {
+        Set<EdgeKey> succEdgeKeys = peer.succEdgeKeys();
+
         if (in == DataFlowItem.NOT_REACHABLE) {
             return itemToMap(in, succEdgeKeys);
         }
@@ -148,14 +149,14 @@ public class ReachChecker extends DataFlow<ReachChecker.DataFlowItem> {
     }
 
     @Override
-    public DataFlowItem confluence(List<DataFlowItem> inItems, Term node,
-            boolean entry, FlowGraph<DataFlowItem> graph) {
+    public DataFlowItem confluence(List<DataFlowItem> inItems,
+            Peer<DataFlowItem> peer, FlowGraph<DataFlowItem> graph) {
         throw new InternalCompilerError("Should never be called.");
     }
 
     @Override
     public DataFlowItem confluence(List<DataFlowItem> inItems,
-            List<EdgeKey> itemKeys, Term node, boolean entry,
+            List<EdgeKey> itemKeys, Peer<DataFlowItem> peer,
             FlowGraph<DataFlowItem> graph) {
         // if any predecessor is reachable, so is this one, and if any
         // predecessor is normal reachable, and the edge key is not an 

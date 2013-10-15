@@ -68,6 +68,7 @@ import polyglot.types.VarInstance;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
 import polyglot.visit.FlowGraph.EdgeKey;
+import polyglot.visit.FlowGraph.Peer;
 
 /**
  * Visitor which checks that all local variables must be defined before use, 
@@ -572,7 +573,8 @@ public class DefiniteAssignmentChecker extends
      */
     @Override
     protected FlowItem confluence(List<FlowItem> items, List<EdgeKey> itemKeys,
-            Term node, boolean entry, FlowGraph<FlowItem> graph) {
+            Peer<FlowItem> peer, FlowGraph<FlowItem> graph) {
+        Node node = peer.node();
         if (node instanceof Initializer || node instanceof ConstructorDecl) {
             List<FlowItem> filtered = filterItemsNonException(items, itemKeys);
             if (filtered.isEmpty()) {
@@ -585,10 +587,10 @@ public class DefiniteAssignmentChecker extends
                 return filtered.get(0);
             }
             else {
-                return confluence(filtered, node, entry, graph);
+                return confluence(filtered, peer, graph);
             }
         }
-        return confluence(items, node, entry, graph);
+        return confluence(items, peer, graph);
     }
 
     /**
@@ -599,8 +601,8 @@ public class DefiniteAssignmentChecker extends
      * minimum of all mins and the maximum of all maxs. 
      */
     @Override
-    public FlowItem confluence(List<FlowItem> inItems, Term node,
-            boolean entry, FlowGraph<FlowItem> graph) {
+    public FlowItem confluence(List<FlowItem> inItems, Peer<FlowItem> peer,
+            FlowGraph<FlowItem> graph) {
         // Resolve any conflicts pairwise.
         Map<VarInstance, AssignmentStatus> m = null;
         for (FlowItem itm : inItems) {
@@ -627,14 +629,9 @@ public class DefiniteAssignmentChecker extends
 
     @Override
     protected Map<EdgeKey, FlowItem> flow(List<FlowItem> inItems,
-            List<EdgeKey> inItemKeys, FlowGraph<FlowItem> graph, Term n,
-            boolean entry, Set<EdgeKey> edgeKeys) {
-        return this.flowToBooleanFlow(inItems,
-                                      inItemKeys,
-                                      graph,
-                                      n,
-                                      entry,
-                                      edgeKeys);
+            List<EdgeKey> inItemKeys, FlowGraph<FlowItem> graph,
+            Peer<FlowItem> peer) {
+        return this.flowToBooleanFlow(inItems, inItemKeys, graph, peer);
     }
 
     /**
@@ -653,8 +650,7 @@ public class DefiniteAssignmentChecker extends
      */
     @Override
     public Map<EdgeKey, FlowItem> flow(FlowItem trueItem, FlowItem falseItem,
-            FlowItem otherItem, FlowGraph<FlowItem> graph, Term n,
-            boolean entry, Set<EdgeKey> succEdgeKeys) {
+            FlowItem otherItem, FlowGraph<FlowItem> graph, Peer<FlowItem> peer) {
         FlowItem inItem =
                 safeConfluence(trueItem,
                                FlowGraph.EDGE_KEY_TRUE,
@@ -662,10 +658,11 @@ public class DefiniteAssignmentChecker extends
                                FlowGraph.EDGE_KEY_FALSE,
                                otherItem,
                                FlowGraph.EDGE_KEY_OTHER,
-                               n,
-                               entry,
+                               peer,
                                graph);
-        if (entry) {
+
+        Node n = peer.node();
+        if (peer.isEntry()) {
             if (n instanceof LocalDecl) {
                 LocalDecl ld = (LocalDecl) n;
                 if (inItem.assignmentStatus.containsKey(ld.localInstance())) {
@@ -676,22 +673,26 @@ public class DefiniteAssignmentChecker extends
                     inItem = new FlowItem(newAssStatus);
                 }
             }
-            return itemToMap(inItem, succEdgeKeys);
+            return itemToMap(inItem, peer.succEdgeKeys());
         }
 
         if (inItem == BOTTOM) {
-            return itemToMap(BOTTOM, succEdgeKeys);
+            return itemToMap(BOTTOM, peer.succEdgeKeys());
         }
 
         FlowItem inDFItem = inItem;
         Map<EdgeKey, FlowItem> ret = null;
         if (n instanceof Formal) {
             // formal argument declaration.
-            ret = flowFormal(inDFItem, graph, (Formal) n, succEdgeKeys);
+            ret = flowFormal(inDFItem, graph, (Formal) n, peer.succEdgeKeys());
         }
         else if (n instanceof LocalDecl) {
             // local variable declaration.
-            ret = flowLocalDecl(inDFItem, graph, (LocalDecl) n, succEdgeKeys);
+            ret =
+                    flowLocalDecl(inDFItem,
+                                  graph,
+                                  (LocalDecl) n,
+                                  peer.succEdgeKeys());
         }
         else if (n instanceof LocalAssign) {
             // assignment to a local variable
@@ -699,7 +700,7 @@ public class DefiniteAssignmentChecker extends
                     flowLocalAssign(inDFItem,
                                     graph,
                                     (LocalAssign) n,
-                                    succEdgeKeys);
+                                    peer.succEdgeKeys());
         }
         else if (n instanceof FieldAssign) {
             // assignment to a field
@@ -707,7 +708,7 @@ public class DefiniteAssignmentChecker extends
                     flowFieldAssign(inDFItem,
                                     graph,
                                     (FieldAssign) n,
-                                    succEdgeKeys);
+                                    peer.succEdgeKeys());
         }
         else if (n instanceof ConstructorCall) {
             // call to another constructor.
@@ -715,7 +716,7 @@ public class DefiniteAssignmentChecker extends
                     flowConstructorCall(inDFItem,
                                         graph,
                                         (ConstructorCall) n,
-                                        succEdgeKeys);
+                                        peer.succEdgeKeys());
         }
         else if (n instanceof Expr && ((Expr) n).type().isBoolean()
                 && (n instanceof Binary || n instanceof Unary)) {
@@ -726,14 +727,13 @@ public class DefiniteAssignmentChecker extends
                                           falseItem,
                                           inDFItem,
                                           graph,
-                                          (Expr) n,
-                                          succEdgeKeys);
+                                          peer);
         }
         else {
-            ret = flowOther(inDFItem, graph, n, succEdgeKeys);
+            ret = flowOther(inDFItem, graph, n, peer.succEdgeKeys());
         }
         if (ret == null) {
-            ret = itemToMap(inItem, succEdgeKeys);
+            ret = itemToMap(inItem, peer.succEdgeKeys());
         }
         if (n instanceof Expr) {
             Expr e = (Expr) n;

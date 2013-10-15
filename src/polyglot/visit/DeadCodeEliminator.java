@@ -172,8 +172,13 @@ public class DeadCodeEliminator extends
     }
 
     @Override
-    public DataFlowItem confluence(List<DataFlowItem> inItems, Term node,
-            boolean entry, FlowGraph<DataFlowItem> graph) {
+    public DataFlowItem confluence(List<DataFlowItem> inItems,
+            Peer<DataFlowItem> peer, FlowGraph<DataFlowItem> graph) {
+        return confluence(inItems);
+    }
+
+    public DataFlowItem confluence(List<DataFlowItem> inItems) {
+
         DataFlowItem result = null;
         for (DataFlowItem inItem : inItems) {
             if (result == null) {
@@ -189,18 +194,14 @@ public class DeadCodeEliminator extends
 
     @Override
     public Map<EdgeKey, DataFlowItem> flow(DataFlowItem in,
-            FlowGraph<DataFlowItem> graph, Term t, boolean entry,
-            Set<EdgeKey> succEdgeKeys) {
-        return itemToMap(flow(in, graph, t, entry), succEdgeKeys);
-    }
-
-    protected DataFlowItem flow(DataFlowItem in, FlowGraph<DataFlowItem> graph,
-            Term t, boolean entry) {
+            FlowGraph<DataFlowItem> graph, Peer<DataFlowItem> peer) {
         DataFlowItem result = new DataFlowItem(in);
 
-        if (entry) {
-            return result;
+        if (peer.isEntry()) {
+            return itemToMap(result, peer.succEdgeKeys());
         }
+
+        Term t = peer.node();
 
         Pair<Set<LocalInstance>, Set<LocalInstance>> du = null;
 
@@ -238,7 +239,7 @@ public class DeadCodeEliminator extends
             result.addAll(du.part2());
         }
 
-        return result;
+        return itemToMap(result, peer.succEdgeKeys());
     }
 
     @Override
@@ -274,7 +275,7 @@ public class DeadCodeEliminator extends
             if (p.inItem() != null) items.add(p.inItem());
         }
 
-        return confluence(items, n, false, g);
+        return confluence(items);
     }
 
     @Override

@@ -39,6 +39,7 @@ import polyglot.frontend.Job;
 import polyglot.types.SemanticException;
 import polyglot.types.TypeSystem;
 import polyglot.visit.FlowGraph.EdgeKey;
+import polyglot.visit.FlowGraph.Peer;
 
 /**
  * Visitor which checks that all (terminating) paths through a 
@@ -104,18 +105,19 @@ public class ExitChecker extends DataFlow<ExitChecker.DataFlowItem> {
 
     @Override
     public Map<EdgeKey, DataFlowItem> flow(DataFlowItem in,
-            FlowGraph<DataFlowItem> graph, Term n, boolean entry,
-            Set<EdgeKey> succEdgeKeys) {
+            FlowGraph<DataFlowItem> graph, Peer<DataFlowItem> peer) {
+        Term n = peer.node();
+        Set<EdgeKey> succEdgeKeys = peer.succEdgeKeys();
         // If every path from the exit node to the entry goes through a return,
         // we're okay.  So make the exit bit false at exit and true at every return;
         // the confluence operation is &&. 
         // We deal with exceptions specially, and assume that any exception
-        // edge to the exit node is OK.
+        // edge to the exit node is OK.        
         if (n instanceof Return) {
             return itemToMap(DataFlowItem.EXITS, succEdgeKeys);
         }
 
-        if (n == graph.root() && !entry) {
+        if (n == graph.root() && !peer.isEntry()) {
             // all exception edges to the exit node are regarded as exiting
             // correctly. Make sure non-exception edges have the
             // exit bit false.
@@ -138,8 +140,8 @@ public class ExitChecker extends DataFlow<ExitChecker.DataFlowItem> {
     }
 
     @Override
-    public DataFlowItem confluence(List<DataFlowItem> inItems, Term node,
-            boolean entry, FlowGraph<DataFlowItem> graph) {
+    public DataFlowItem confluence(List<DataFlowItem> inItems,
+            Peer<DataFlowItem> peer, FlowGraph<DataFlowItem> graph) {
         // all paths must have an exit
         for (DataFlowItem item : inItems) {
             if (!item.exits) {

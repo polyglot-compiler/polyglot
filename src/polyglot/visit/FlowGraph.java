@@ -148,6 +148,11 @@ public class FlowGraph<FlowItem extends DataFlow.Item> {
         return peer(n, Collections.<Term> emptyList(), entry);
     }
 
+    public Peer<FlowItem> peer(Term n, boolean isEntry) {
+        return peer(n, Collections.<Term> emptyList(), isEntry ? Term.ENTRY
+                : Term.EXIT);
+    }
+
     /**
      * Return a collection of all of the entry or exit <code>Peer</code>s for
      * the given <code>Term n</code>.

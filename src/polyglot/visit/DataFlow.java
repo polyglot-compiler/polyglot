@@ -184,29 +184,6 @@ public abstract class DataFlow<FlowItem extends DataFlow.Item> extends
 
     /**
      * Produce new <code>Item</code>s as appropriate for the
-     * <code>Term n</code> and the input <code>Item in</code>. 
-     * 
-     * @param in the Item flowing into the node. Note that if the Term n 
-     *           has many flows going into it, the Item in may be the result 
-     *           of a call to confluence(List, List, Term).
-     * @param graph the FlowGraph which the dataflow is operating on
-     * @param n the Term which this method must calculate the flow for.
-     * @param entry indicates whether we are looking at the entry or exit of n.
-     * @param edgeKeys a set of FlowGraph.EdgeKeys, being all the 
-     *          EdgeKeys of the edges leaving this node. The 
-     *          returned Map must have mappings for all objects in this set.
-     * @return a Map from FlowGraph.EdgeKeys to Items. The map must have 
-     *          entries for all EdgeKeys in edgeKeys. 
-     */
-    protected Map<EdgeKey, FlowItem> flow(FlowItem in,
-            FlowGraph<FlowItem> graph, Term n, boolean entry,
-            Set<EdgeKey> edgeKeys) {
-        throw new InternalCompilerError("Unimplemented: should be "
-                + "implemented by subclasses if " + "needed");
-    }
-
-    /**
-     * Produce new <code>Item</code>s as appropriate for the
      * <code>Peer</code> and the input <code>Item</code>s. 
      * 
      * @param inItems all the Items flowing into the node. 
@@ -216,15 +193,10 @@ public abstract class DataFlow<FlowItem extends DataFlow.Item> extends
      * @return a Map from FlowGraph.EdgeKeys to Items. The map must have 
      *          entries for all EdgeKeys in edgeKeys. 
      */
-    protected Map<EdgeKey, FlowItem> flow(List<FlowItem> inItems,
-            List<EdgeKey> inItemKeys, FlowGraph<FlowItem> graph,
-            Peer<FlowItem> peer) {
-        return this.flow(inItems,
-                         inItemKeys,
-                         graph,
-                         peer.node,
-                         peer.isEntry(),
-                         peer.succEdgeKeys());
+    protected Map<EdgeKey, FlowItem> flow(FlowItem in,
+            FlowGraph<FlowItem> graph, Peer<FlowItem> peer) {
+        throw new InternalCompilerError("Unimplemented: should be "
+                + "implemented by subclasses if " + "needed");
     }
 
     /**
@@ -306,12 +278,11 @@ public abstract class DataFlow<FlowItem extends DataFlow.Item> extends
      *          entries for all EdgeKeys in edgeKeys. 
      */
     protected Map<EdgeKey, FlowItem> flow(List<FlowItem> inItems,
-            List<EdgeKey> inItemKeys, FlowGraph<FlowItem> graph, Term n,
-            boolean entry, Set<EdgeKey> edgeKeys) {
-        FlowItem inItem =
-                this.safeConfluence(inItems, inItemKeys, n, entry, graph);
+            List<EdgeKey> inItemKeys, FlowGraph<FlowItem> graph,
+            Peer<FlowItem> peer) {
+        FlowItem inItem = this.safeConfluence(inItems, inItemKeys, peer, graph);
 
-        return this.flow(inItem, graph, n, entry, edgeKeys);
+        return this.flow(inItem, graph, peer);
     }
 
     /**
@@ -327,18 +298,13 @@ public abstract class DataFlow<FlowItem extends DataFlow.Item> extends
      * @param inItems all the Items flowing into the node. 
      * @param inItemKeys the FlowGraph.EdgeKeys for the items in the list inItems 
      * @param graph the FlowGraph which the dataflow is operating on
-     * @param n the Term which this method must calculate the flow for.
-     * @param entry indicates whether we are looking at the entry or exit of n.
-     * @param edgeKeys a set of FlowGraph.EdgeKeys, being all the 
-     *          EdgeKeys of the edges leaving this node. The 
-     *          returned Map must have mappings for all objects in this set.
+     * @param peer the Peer which this method must calculate the flow for.
      * @return a Map from FlowGraph.EdgeKeys to Items. The map must have 
      *          entries for all EdgeKeys in edgeKeys. 
      */
     protected final Map<EdgeKey, FlowItem> flowToBooleanFlow(
             List<FlowItem> inItems, List<EdgeKey> inItemKeys,
-            FlowGraph<FlowItem> graph, Term n, boolean entry,
-            Set<EdgeKey> edgeKeys) {
+            FlowGraph<FlowItem> graph, Peer<FlowItem> peer) {
         List<FlowItem> trueItems = new ArrayList<FlowItem>();
         List<EdgeKey> trueItemKeys = new ArrayList<EdgeKey>();
         List<FlowItem> falseItems = new ArrayList<FlowItem>();
@@ -369,36 +335,27 @@ public abstract class DataFlow<FlowItem extends DataFlow.Item> extends
         FlowItem trueItem =
                 trueItems.isEmpty() ? null : this.safeConfluence(trueItems,
                                                                  trueItemKeys,
-                                                                 n,
-                                                                 entry,
+                                                                 peer,
                                                                  graph);
         FlowItem falseItem =
                 falseItems.isEmpty() ? null
                         : this.safeConfluence(falseItems,
                                               falseItemKeys,
-                                              n,
-                                              entry,
+                                              peer,
                                               graph);
         FlowItem otherItem =
                 otherItems.isEmpty() ? null
                         : this.safeConfluence(otherItems,
                                               otherItemKeys,
-                                              n,
-                                              entry,
+                                              peer,
                                               graph);
 
-        return this.flow(trueItem,
-                         falseItem,
-                         otherItem,
-                         graph,
-                         n,
-                         entry,
-                         edgeKeys);
+        return this.flow(trueItem, falseItem, otherItem, graph, peer);
     }
 
     protected Map<EdgeKey, FlowItem> flow(FlowItem trueItem,
             FlowItem falseItem, FlowItem otherItem, FlowGraph<FlowItem> graph,
-            Term n, boolean entry, Set<EdgeKey> edgeKeys) {
+            Peer<FlowItem> peer) {
         throw new InternalCompilerError("Unimplemented: should be "
                 + "implemented by subclasses if " + "needed");
     }
@@ -408,15 +365,16 @@ public abstract class DataFlow<FlowItem extends DataFlow.Item> extends
      * @param trueItem The item for flows coming into n for true conditions. Cannot be null.
      * @param falseItem The item for flows coming into n for false conditions. Cannot be null.
      * @param otherItem The item for all other flows coming into n 
-     * @param n The boolean expression.
-     * @param edgeKeys The outgoing edges 
+     * @param peer The Peer for the boolean expression.
      * @return Map from edge keys to Items. Will return null if the binary
      *      operator was not one of !, &&, ||, & or |, to allow the calling
      *      method to determine which map to use.
      */
     protected Map<EdgeKey, FlowItem> flowBooleanConditions(FlowItem trueItem,
             FlowItem falseItem, FlowItem otherItem, FlowGraph<FlowItem> graph,
-            Expr n, Set<EdgeKey> edgeKeys) {
+            Peer<FlowItem> peer) {
+        Expr n = (Expr) peer.node();
+        Set<EdgeKey> edgeKeys = peer.succEdgeKeys();
         if (!n.type().isBoolean()
                 || !(n instanceof Binary || n instanceof Unary)) {
             throw new InternalCompilerError("This method only takes binary "
@@ -455,8 +413,7 @@ public abstract class DataFlow<FlowItem extends DataFlow.Item> extends
                                             FlowGraph.EDGE_KEY_TRUE,
                                             falseItem,
                                             FlowGraph.EDGE_KEY_FALSE,
-                                            n,
-                                            false,
+                                            peer,
                                             graph);
                 return itemsToMap(trueItem, bitANDFalse, otherItem, edgeKeys);
             }
@@ -469,8 +426,7 @@ public abstract class DataFlow<FlowItem extends DataFlow.Item> extends
                                             FlowGraph.EDGE_KEY_TRUE,
                                             falseItem,
                                             FlowGraph.EDGE_KEY_FALSE,
-                                            n,
-                                            false,
+                                            peer,
                                             graph);
                 return itemsToMap(bitORTrue, falseItem, otherItem, edgeKeys);
             }
@@ -486,14 +442,12 @@ public abstract class DataFlow<FlowItem extends DataFlow.Item> extends
      * @param items List of <code>Item</code>s that flow into <code>node</code>.
      *            this method will only be called if the list has at least 2
      *            elements.
-     * @param node <code>Term</code> for which the <code>items</code> are 
+     * @param peer <code>Peer</code> for which the <code>items</code> are 
      *          flowing into.
-     * @param entry indicates whether we are looking at the entry or exit of 
-     *          node.
      * @return a non-null Item.
      */
-    protected abstract FlowItem confluence(List<FlowItem> items, Term node,
-            boolean entry, FlowGraph<FlowItem> graph);
+    protected abstract FlowItem confluence(List<FlowItem> items,
+            Peer<FlowItem> peer, FlowGraph<FlowItem> graph);
 
     /**
      * The confluence operator for many flows. This method produces a single
@@ -506,15 +460,13 @@ public abstract class DataFlow<FlowItem extends DataFlow.Item> extends
      * @param itemKeys List of <code>FlowGraph.ExceptionEdgeKey</code>s for
      *              the edges that the corresponding <code>Item</code>s in
      *              <code>items</code> flowed from.
-     * @param node <code>Term</code> for which the <code>items</code> are 
+     * @param peer <code>Peer</code> for which the <code>items</code> are 
      *          flowing into.
-     * @param entry indicates whether we are looking at the entry or exit of
-     *          node.
      * @return a non-null Item.
      */
     protected FlowItem confluence(List<FlowItem> items, List<EdgeKey> itemKeys,
-            Term node, boolean entry, FlowGraph<FlowItem> graph) {
-        return confluence(items, node, entry, graph);
+            Peer<FlowItem> peer, FlowGraph<FlowItem> graph) {
+        return confluence(items, peer, graph);
     }
 
     /**
@@ -534,59 +486,24 @@ public abstract class DataFlow<FlowItem extends DataFlow.Item> extends
     protected FlowItem safeConfluence(List<FlowItem> items,
             List<EdgeKey> itemKeys, Peer<FlowItem> peer,
             FlowGraph<FlowItem> graph) {
-        return this.safeConfluence(items,
-                                   itemKeys,
-                                   peer.node(),
-                                   peer.isEntry(),
-                                   graph);
-    }
-
-    /**
-     * The confluence operator for many flows. This method produces a single
-     * Item from a List of Items, for the confluence just before flow enters 
-     * node.
-     * 
-     * @param items List of <code>Item</code>s that flow into <code>node</code>.
-     *               This method will only be called if the list has at least 2
-     *               elements.
-     * @param itemKeys List of <code>FlowGraph.ExceptionEdgeKey</code>s for
-     *              the edges that the corresponding <code>Item</code>s in
-     *              <code>items</code> flowed from.
-     * @param node <code>Term</code> for which the <code>items</code> are 
-     *          flowing into.
-     * @param entry indicates whether we are looking at the entry or exit of
-     *          node.
-     * @return a non-null Item.
-     */
-    protected FlowItem safeConfluence(List<FlowItem> items,
-            List<EdgeKey> itemKeys, Term node, boolean entry,
-            FlowGraph<FlowItem> graph) {
         if (items.isEmpty()) {
-            return this.createInitialItem(graph, node, entry);
+            return this.createInitialItem(graph, peer.node(), peer.isEntry());
         }
         if (items.size() == 1) {
             return items.get(0);
         }
-        return confluence(items, itemKeys, node, entry, graph);
+        return confluence(items, itemKeys, peer, graph);
     }
 
     protected FlowItem safeConfluence(FlowItem item1, FlowGraph.EdgeKey key1,
-            FlowItem item2, FlowGraph.EdgeKey key2, Term node, boolean entry,
+            FlowItem item2, FlowGraph.EdgeKey key2, Peer<FlowItem> peer,
             FlowGraph<FlowItem> graph) {
-        return safeConfluence(item1,
-                              key1,
-                              item2,
-                              key2,
-                              null,
-                              null,
-                              node,
-                              entry,
-                              graph);
+        return safeConfluence(item1, key1, item2, key2, null, null, peer, graph);
     }
 
     protected FlowItem safeConfluence(FlowItem item1, FlowGraph.EdgeKey key1,
             FlowItem item2, FlowGraph.EdgeKey key2, FlowItem item3,
-            FlowGraph.EdgeKey key3, Term node, boolean entry,
+            FlowGraph.EdgeKey key3, Peer<FlowItem> peer,
             FlowGraph<FlowItem> graph) {
         List<FlowItem> items = new ArrayList<FlowItem>(3);
         List<EdgeKey> itemKeys = new ArrayList<EdgeKey>(3);
@@ -603,7 +520,7 @@ public abstract class DataFlow<FlowItem extends DataFlow.Item> extends
             items.add(item3);
             itemKeys.add(key3);
         }
-        return safeConfluence(items, itemKeys, node, entry, graph);
+        return safeConfluence(items, itemKeys, peer, graph);
     }
 
     /**

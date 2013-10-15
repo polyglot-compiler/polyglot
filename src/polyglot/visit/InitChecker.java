@@ -68,6 +68,7 @@ import polyglot.types.VarInstance;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
 import polyglot.visit.FlowGraph.EdgeKey;
+import polyglot.visit.FlowGraph.Peer;
 
 /**
  * Visitor which checks that all local variables must be defined before use, 
@@ -641,7 +642,8 @@ public class InitChecker extends DataFlow<InitChecker.FlowItem> {
      */
     @Override
     protected FlowItem confluence(List<FlowItem> items, List<EdgeKey> itemKeys,
-            Term node, boolean entry, FlowGraph<FlowItem> graph) {
+            Peer<FlowItem> peer, FlowGraph<FlowItem> graph) {
+        Term node = peer.node();
         if (node instanceof Initializer || node instanceof ConstructorDecl) {
             List<FlowItem> filtered = filterItemsNonException(items, itemKeys);
             if (filtered.isEmpty()) {
@@ -654,10 +656,10 @@ public class InitChecker extends DataFlow<InitChecker.FlowItem> {
                 return filtered.get(0);
             }
             else {
-                return confluence(filtered, node, entry, graph);
+                return confluence(filtered, peer, graph);
             }
         }
-        return confluence(items, node, entry, graph);
+        return confluence(items, peer, graph);
     }
 
     /**
@@ -668,8 +670,8 @@ public class InitChecker extends DataFlow<InitChecker.FlowItem> {
      * minimum of all mins and the maximum of all maxs. 
      */
     @Override
-    public FlowItem confluence(List<FlowItem> inItems, Term node,
-            boolean entry, FlowGraph<FlowItem> graph) {
+    public FlowItem confluence(List<FlowItem> inItems, Peer<FlowItem> peer,
+            FlowGraph<FlowItem> graph) {
         // Resolve any conflicts pairwise.
         Map<VarInstance, MinMaxInitCount> m = null;
         for (FlowItem itm : inItems) {
@@ -697,14 +699,9 @@ public class InitChecker extends DataFlow<InitChecker.FlowItem> {
 
     @Override
     protected Map<EdgeKey, FlowItem> flow(List<FlowItem> inItems,
-            List<EdgeKey> inItemKeys, FlowGraph<FlowItem> graph, Term n,
-            boolean entry, Set<EdgeKey> edgeKeys) {
-        return this.flowToBooleanFlow(inItems,
-                                      inItemKeys,
-                                      graph,
-                                      n,
-                                      entry,
-                                      edgeKeys);
+            List<EdgeKey> inItemKeys, FlowGraph<FlowItem> graph,
+            Peer<FlowItem> peer) {
+        return this.flowToBooleanFlow(inItems, inItemKeys, graph, peer);
     }
 
     /**
@@ -723,8 +720,7 @@ public class InitChecker extends DataFlow<InitChecker.FlowItem> {
      */
     @Override
     public Map<EdgeKey, FlowItem> flow(FlowItem trueItem, FlowItem falseItem,
-            FlowItem otherItem, FlowGraph<FlowItem> graph, Term n,
-            boolean entry, Set<EdgeKey> succEdgeKeys) {
+            FlowItem otherItem, FlowGraph<FlowItem> graph, Peer<FlowItem> peer) {
         FlowItem inItem =
                 safeConfluence(trueItem,
                                FlowGraph.EDGE_KEY_TRUE,
@@ -732,10 +728,12 @@ public class InitChecker extends DataFlow<InitChecker.FlowItem> {
                                FlowGraph.EDGE_KEY_FALSE,
                                otherItem,
                                FlowGraph.EDGE_KEY_OTHER,
-                               n,
-                               entry,
+                               peer,
                                graph);
-        if (entry) {
+        Node n = peer.node();
+        Set<EdgeKey> succEdgeKeys = peer.succEdgeKeys();
+
+        if (peer.isEntry()) {
             return itemToMap(inItem, succEdgeKeys);
         }
 
@@ -786,8 +784,7 @@ public class InitChecker extends DataFlow<InitChecker.FlowItem> {
                                           falseItem,
                                           inDFItem,
                                           graph,
-                                          (Expr) n,
-                                          succEdgeKeys);
+                                          peer);
         }
         else {
             ret = flowOther(inDFItem, graph, n, succEdgeKeys);
