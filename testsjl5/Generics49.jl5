@@ -1,25 +1,20 @@
 class ScheduledThreadPoolExecutor {
     void m(MyCollection<? super MyRunnable> c,  DelayQueue<MyRunnableScheduledFuture> dq) {
-	dq.drainTo(c);
+        dq.drainTo(c);
     }
-
-    
 }
 
 class DelayQueue<E extends MyRunnable>{
-    public void  drainTo(MyCollection<? super E> c) {
+    public void drainTo(MyCollection<? super E> c) {
     }
 }
 
 
- interface MyRunnable {
-
+interface MyRunnable {
 }
 
-interface MyRunnableScheduledFuture extends MyRunnable {
+interface MyRunnableScheduledFuture<V> extends MyRunnable {
 }
 
 class MyCollection<E> {
-
 }
-

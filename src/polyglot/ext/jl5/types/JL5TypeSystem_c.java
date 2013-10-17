@@ -620,7 +620,7 @@ public class JL5TypeSystem_c extends
 
     /*@Override
     protected Collection findMostSpecificProcedures(List acceptable) throws SemanticException {
-    	throw new InternalCompilerError("Unimplemented");
+        throw new InternalCompilerError("Unimplemented");
     }*/
 
     /**
@@ -1377,87 +1377,30 @@ public class JL5TypeSystem_c extends
 
     @Override
     public boolean isContained(Type fromType, Type toType) {
-        // We implement the comparison from JLS 3rd ed 4.5.1.1,
-        // but we allow the to and from types to be either WildCardTypes
-        // or CaptureConvertedWildCardTypes. Unfortunately they two types
-        // don't have a common interface that's useful, so the logic is 
-        // not as clear as it should be.
-        boolean isToTypeWildCard = false; // is the toType either a wildCardType or a CaptureConvertedWildCardType
-        Type toLowerBound = null; // non-null only if the toType is a super constraint
-        Type toUpperBound = null; // non-null only if the toType is an extends constraint
-        boolean isFromTypeWildCard = false; // is the fromType either a wildCardType or a CaptureConvertedWildCardType
-        Type fromLowerBound = null; // non-null only if the fromType is a super constraint
-        Type fromUpperBound = null; // non-null only if the fromType is an extends constraint
-
-        // Fill in the above variables appropriately.
         if (toType instanceof WildCardType) {
-            isToTypeWildCard = true;
-            WildCardType w = (WildCardType) toType;
-            if (w.isExtendsConstraint()) {
-                toUpperBound = w.upperBound();
-            }
-            else if (w.isSuperConstraint()) {
-                toLowerBound = w.lowerBound();
-            }
-        }
-//        if (toType instanceof CaptureConvertedWildCardType) {
-//            isToTypeWildCard = true;
-//            CaptureConvertedWildCardType w =
-//                    (CaptureConvertedWildCardType) toType;
-//            if (w.isExtendsConstraint()) {
-//                toUpperBound = w.upperBound();
-//            }
-//            else if (w.isSuperConstraint()) {
-//                toLowerBound = w.lowerBound();
-//            }
-//        }
-        if (fromType instanceof WildCardType) {
-            isFromTypeWildCard = true;
-            WildCardType w = (WildCardType) fromType;
-            if (w.isExtendsConstraint()) {
-                fromUpperBound = w.upperBound();
-            }
-            else if (w.isSuperConstraint()) {
-                fromLowerBound = w.lowerBound();
-            }
-        }
-        if (fromType instanceof CaptureConvertedWildCardType) {
-            isFromTypeWildCard = true;
-            CaptureConvertedWildCardType w =
-                    (CaptureConvertedWildCardType) fromType;
-            if (w.isExtendsConstraint()) {
-                fromUpperBound = w.upperBound();
-            }
-            else if (w.isSuperConstraint()) {
-                fromLowerBound = w.lowerBound();
-            }
-        }
-
-        // Now we can implement the comparisons from JLS 3rd ed 4.5.1.1
-        if (isToTypeWildCard) {
-            if (isFromTypeWildCard) {
+            WildCardType wTo = (WildCardType) toType;
+            if (fromType instanceof WildCardType) {
+                WildCardType wFrom = (WildCardType) fromType;
                 // JLS 3rd ed 4.5.1.1
-                if (fromUpperBound != null && toUpperBound != null) {
-                    // they are both extends constraints
-                    if (isSubtype(fromUpperBound, toUpperBound)) {
+                if (wFrom.isExtendsConstraint() && wTo.isExtendsConstraint()) {
+                    if (isSubtype(wFrom.upperBound(), wTo.upperBound())) {
                         return true;
                     }
                 }
-                if (fromLowerBound != null && toLowerBound != null) {
-                    // they are both super constraints
-                    if (isSubtype(toLowerBound, fromLowerBound)) {
+                if (wFrom.isSuperConstraint() && wTo.isSuperConstraint()) {
+                    if (isSubtype(wTo.lowerBound(), wFrom.lowerBound())) {
                         return true;
                     }
                 }
 
             }
-            if (toLowerBound != null) {
-                if (isImplicitCastValid(toLowerBound, fromType)) {
+            if (wTo.isSuperConstraint()) {
+                if (isImplicitCastValid(wTo.lowerBound(), fromType)) {
                     return true;
                 }
             }
-            else if (toUpperBound != null) {
-                if (isImplicitCastValid(fromType, toUpperBound)) {
+            else if (wTo.isExtendsConstraint()) {
+                if (isImplicitCastValid(fromType, wTo.upperBound())) {
                     return true;
                 }
             }
