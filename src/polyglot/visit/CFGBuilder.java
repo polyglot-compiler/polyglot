@@ -146,7 +146,11 @@ public class CFGBuilder<FlowItem extends DataFlow.Item> implements Copy {
      * graph.  By default, we do not, but subclasses can change this behavior
      * if needed.
      */
-    protected boolean errorEdgesToExitNode;
+    protected boolean errorEdgesToExitNode = false;
+    /**
+     * True if we want to add implicit error edges from all statements
+     */
+    protected boolean trackImplicitErrors = false;
 
     /**
      * Should we add exception edges into finally blocks? If true, then the edge from
@@ -568,12 +572,15 @@ public class CFGBuilder<FlowItem extends DataFlow.Item> implements Copy {
             visitThrow(a, Term.EXIT, type);
         }
 
-        // Every statement can throw an error.
-        // This is probably too inefficient.
-        if ((a instanceof Stmt && !(a instanceof CompoundStmt))
-                || (a instanceof Block && ((Block) a).statements().isEmpty())) {
+        if (trackImplicitErrors) {
+            // Every statement can throw an error.
+            // This is probably too inefficient.
+            if ((a instanceof Stmt && !(a instanceof CompoundStmt))
+                    || (a instanceof Block && ((Block) a).statements()
+                                                         .isEmpty())) {
 
-            visitThrow(a, Term.EXIT, ts.Error());
+                visitThrow(a, Term.EXIT, ts.Error());
+            }
         }
     }
 
@@ -861,4 +868,32 @@ public class CFGBuilder<FlowItem extends DataFlow.Item> implements Copy {
         v.skipDeadLoopBodies = b;
         return v;
     }
+
+    public CFGBuilder<FlowItem> errorEdgesToExitNode(boolean b) {
+        if (b == this.errorEdgesToExitNode) {
+            return this;
+        }
+        CFGBuilder<FlowItem> v = copy();
+        v.errorEdgesToExitNode = b;
+        return v;
+    }
+
+    public CFGBuilder<FlowItem> exceptionEdgesToFinally(boolean b) {
+        if (b == this.exceptionEdgesToFinally) {
+            return this;
+        }
+        CFGBuilder<FlowItem> v = copy();
+        v.exceptionEdgesToFinally = b;
+        return v;
+    }
+
+    public CFGBuilder<FlowItem> trackImplicitErrors(boolean b) {
+        if (b == this.trackImplicitErrors) {
+            return this;
+        }
+        CFGBuilder<FlowItem> v = copy();
+        v.trackImplicitErrors = b;
+        return v;
+    }
+
 }
