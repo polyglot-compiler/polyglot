@@ -115,7 +115,7 @@ public class JL5FieldDecl_c extends FieldDecl_c implements FieldDecl,
     @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
         for (AnnotationElem ae : annotations) {
-            ae.prettyPrint(w, tr);
+            ae.del().prettyPrint(w, tr);
             w.newline();
         }
 

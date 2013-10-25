@@ -123,7 +123,7 @@ public class JL5LocalDecl_c extends LocalDecl_c implements LocalDecl,
     @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
         for (AnnotationElem ae : annotations) {
-            ae.prettyPrint(w, tr);
+            ae.del().prettyPrint(w, tr);
             w.newline();
         }
 

@@ -401,7 +401,7 @@ public class EnumConstantDecl_c extends Term_c implements EnumConstantDecl {
     @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
         for (AnnotationElem ae : annotations) {
-            ae.prettyPrint(w, tr);
+            ae.del().prettyPrint(w, tr);
             w.newline();
         }
 

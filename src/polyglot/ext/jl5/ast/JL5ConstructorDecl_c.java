@@ -249,7 +249,7 @@ public class JL5ConstructorDecl_c extends ConstructorDecl_c implements
 
         w.begin(0);
         for (AnnotationElem ae : annotations) {
-            ae.prettyPrint(w, tr);
+            ae.del().prettyPrint(w, tr);
             w.newline();
         }
         w.end();
@@ -266,7 +266,7 @@ public class JL5ConstructorDecl_c extends ConstructorDecl_c implements
             w.write("<");
             for (Iterator<ParamTypeNode> iter = this.typeParams().iterator(); iter.hasNext();) {
                 ParamTypeNode ptn = iter.next();
-                ptn.prettyPrint(w, tr);
+                ptn.del().prettyPrint(w, tr);
                 if (iter.hasNext()) {
                     w.write(",");
                     w.allowBreak(0, " ");

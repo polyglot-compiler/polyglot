@@ -360,7 +360,7 @@ public class JL5ClassDecl_c extends ClassDecl_c implements JL5ClassDecl {
 
         w.begin(0);
         for (AnnotationElem ae : annotations) {
-            ae.prettyPrint(w, tr);
+            ae.del().prettyPrint(w, tr);
             w.newline();
         }
         w.end();
@@ -377,7 +377,7 @@ public class JL5ClassDecl_c extends ClassDecl_c implements JL5ClassDecl {
             w.write("<");
             for (Iterator<ParamTypeNode> iter = this.paramTypes.iterator(); iter.hasNext();) {
                 ParamTypeNode ptn = iter.next();
-                ptn.prettyPrint(w, tr);
+                ptn.del().prettyPrint(w, tr);
                 if (iter.hasNext()) {
                     w.write(", ");
                 }

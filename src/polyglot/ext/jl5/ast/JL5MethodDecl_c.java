@@ -384,7 +384,7 @@ public class JL5MethodDecl_c extends MethodDecl_c implements JL5MethodDecl {
 
         w.begin(0);
         for (AnnotationElem ae : annotations) {
-            ae.prettyPrint(w, tr);
+            ae.del().prettyPrint(w, tr);
             w.newline();
         }
         w.end();

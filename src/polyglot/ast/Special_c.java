@@ -210,7 +210,7 @@ public class Special_c extends Expr_c implements Special {
                 w.write(qualifier.name());
             }
             else {
-                qualifier.prettyPrint(w, tr);
+                qualifier.del().prettyPrint(w, tr);
             }
             w.write(".");
         }

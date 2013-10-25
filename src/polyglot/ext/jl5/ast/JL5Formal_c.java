@@ -143,7 +143,7 @@ public class JL5Formal_c extends Formal_c implements JL5Formal {
     @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
         for (AnnotationElem ae : annotations) {
-            ae.prettyPrint(w, tr);
+            ae.del().prettyPrint(w, tr);
             w.newline();
         }
 
