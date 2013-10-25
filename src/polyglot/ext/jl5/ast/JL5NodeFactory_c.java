@@ -36,7 +36,6 @@ import polyglot.ast.CanonicalTypeNode;
 import polyglot.ast.Case;
 import polyglot.ast.ClassBody;
 import polyglot.ast.ClassDecl;
-import polyglot.ast.ClassMember;
 import polyglot.ast.ConstructorCall;
 import polyglot.ast.ConstructorCall.Kind;
 import polyglot.ast.Disamb;
@@ -190,15 +189,6 @@ public class JL5NodeFactory_c extends NodeFactory_c implements JL5NodeFactory {
                                    paramTypes);
         n = (JL5ClassDecl) n.ext(extFactory().extClassDecl());
         n = (JL5ClassDecl) n.del(delFactory().delClassDecl());
-        return n;
-    }
-
-    @Override
-    public ClassBody ClassBody(Position pos, List<ClassMember> members) {
-        ClassBody n =
-                new JL5ClassBody_c(pos, CollectionUtil.nonNullList(members));
-        n = (ClassBody) n.ext(extFactory().extClassBody());
-        n = (ClassBody) n.del(delFactory().delClassBody());
         return n;
     }
 
