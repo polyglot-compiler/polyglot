@@ -25,33 +25,37 @@
  ******************************************************************************/
 package polyglot.ext.jl5.ast;
 
+import polyglot.ast.Assert;
 import polyglot.ast.Node;
-import polyglot.ast.Special;
-import polyglot.ast.Special_c;
-import polyglot.ast.TypeNode;
-import polyglot.ext.jl5.types.RawClass;
+import polyglot.ext.jl5.types.JL5TypeSystem;
 import polyglot.types.SemanticException;
-import polyglot.util.Position;
+import polyglot.types.Type;
 import polyglot.util.SerialVersionUID;
 import polyglot.visit.TypeChecker;
 
-public class JL5Special_c extends Special_c implements Special {
+public class JL5AssertDel extends JL5Del {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
-    public JL5Special_c(Position pos, Kind kind, TypeNode qualifier) {
-        super(pos, kind, qualifier);
-    }
-
+    /** Type check the expression. */
     @Override
-    public Node typeCheckOverride(Node parent, TypeChecker tc)
-            throws SemanticException {
-        Special n = (Special) visitChildren(tc);
-        if (n.qualifier() != null && n.qualifier().type() instanceof RawClass) {
-            // we got a raw class. Fix it up
-            RawClass rc = (RawClass) n.qualifier().type();
-            n = n.qualifier(n.qualifier().type(rc.base()));
+    public Node typeCheck(TypeChecker tc) throws SemanticException {
+        Assert orig = (Assert) this.node();
+
+        Type c = orig.cond().type();
+        JL5TypeSystem ts = (JL5TypeSystem) tc.typeSystem();
+
+        if (ts.isPrimitiveWrapper(c)) {
+            // The condition is a primitive wrapper. Unwrap it, and call the
+            // superclass type check functionality.
+            Assert n =
+                    orig.cond(orig.cond().type(ts.primitiveTypeOfWrapper(c)));
+            n = (Assert) n.typeCheck(tc);
+
+            // restore the type
+            n = n.cond(n.cond().type(c));
+            return n;
         }
-        return n.typeCheck(tc);
+        return super.typeCheck(tc);
     }
 
 }

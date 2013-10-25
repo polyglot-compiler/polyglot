@@ -186,6 +186,11 @@ public class JL5DelFactory_c extends AbstractDelFactory_c implements
     }
 
     @Override
+    protected JL delAssertImpl() {
+        return new JL5AssertDel();
+    }
+
+    @Override
     protected JL delAssignImpl() {
         return new JL5AssignDel();
     }
@@ -196,8 +201,23 @@ public class JL5DelFactory_c extends AbstractDelFactory_c implements
     }
 
     @Override
+    protected JL delClassLitImpl() {
+        return new JL5ClassLitDel();
+    }
+
+    @Override
+    protected JL delConditionalImpl() {
+        return new JL5ConditionalDel();
+    }
+
+    @Override
     protected JL delNodeImpl() {
         return new JL5Del();
+    }
+
+    @Override
+    protected JL delSpecialImpl() {
+        return new JL5SpecialDel();
     }
 
     public JL postDelEnumDecl(JL del) {

@@ -30,16 +30,13 @@ import java.util.LinkedList;
 import java.util.List;
 
 import polyglot.ast.ArrayInit;
-import polyglot.ast.Assert;
 import polyglot.ast.Block;
 import polyglot.ast.Call;
 import polyglot.ast.CanonicalTypeNode;
 import polyglot.ast.Case;
 import polyglot.ast.ClassBody;
 import polyglot.ast.ClassDecl;
-import polyglot.ast.ClassLit;
 import polyglot.ast.ClassMember;
-import polyglot.ast.Conditional;
 import polyglot.ast.ConstructorCall;
 import polyglot.ast.ConstructorCall.Kind;
 import polyglot.ast.Disamb;
@@ -54,7 +51,6 @@ import polyglot.ast.New;
 import polyglot.ast.NewArray;
 import polyglot.ast.NodeFactory_c;
 import polyglot.ast.Receiver;
-import polyglot.ast.Special;
 import polyglot.ast.Stmt;
 import polyglot.ast.Switch;
 import polyglot.ast.SwitchElement;
@@ -122,14 +118,6 @@ public class JL5NodeFactory_c extends NodeFactory_c implements JL5NodeFactory {
         n = (JL5EnumDecl) n.del(delFactory().delEnumDecl());
         return n;
 
-    }
-
-    @Override
-    public Assert Assert(Position pos, Expr cond, Expr errorMessage) {
-        Assert n = new JL5Assert_c(pos, cond, errorMessage);
-        n = (Assert) n.ext(extFactory().extAssert());
-        n = (Assert) n.del(delFactory().delAssert());
-        return n;
     }
 
     @Override
@@ -259,14 +247,6 @@ public class JL5NodeFactory_c extends NodeFactory_c implements JL5NodeFactory {
         EnumConstant n = new EnumConstant_c(pos, target, name);
         n = (EnumConstant) n.ext(extFactory().extEnumConstant());
         n = (EnumConstant) n.del(delFactory().delEnumConstant());
-        return n;
-    }
-
-    @Override
-    public ClassLit ClassLit(Position pos, TypeNode typeNode) {
-        ClassLit n = new JL5ClassLit_c(pos, typeNode);
-        n = (ClassLit) n.ext(extFactory().extClassLit());
-        n = (ClassLit) n.del(delFactory().delClassLit());
         return n;
     }
 
@@ -476,24 +456,6 @@ public class JL5NodeFactory_c extends NodeFactory_c implements JL5NodeFactory {
         Switch n = new JL5Switch_c(pos, expr, elements);
         n = (Switch) n.ext(extFactory().extSwitch());
         n = (Switch) n.del(delFactory().delSwitch());
-        return n;
-    }
-
-    @Override
-    public Special Special(Position pos, Special.Kind kind, TypeNode outer) {
-        Special n = new JL5Special_c(pos, kind, outer);
-        n = (Special) n.ext(extFactory().extSpecial());
-        n = (Special) n.del(delFactory().delSpecial());
-        return n;
-    }
-
-    @Override
-    public Conditional Conditional(Position pos, Expr cond, Expr consequent,
-            Expr alternative) {
-        Conditional n =
-                new JL5Conditional_c(pos, cond, consequent, alternative);
-        n = (Conditional) n.ext(extFactory().extConditional());
-        n = (Conditional) n.del(delFactory().delConditional());
         return n;
     }
 

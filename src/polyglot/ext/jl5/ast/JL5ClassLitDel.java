@@ -25,39 +25,34 @@
  ******************************************************************************/
 package polyglot.ext.jl5.ast;
 
-import polyglot.ast.ClassLit_c;
+import polyglot.ast.ClassLit;
 import polyglot.ast.Node;
-import polyglot.ast.TypeNode;
 import polyglot.ext.jl5.types.JL5TypeSystem;
 import polyglot.types.PrimitiveType;
 import polyglot.types.ReferenceType;
 import polyglot.types.SemanticException;
-import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
 import polyglot.visit.TypeChecker;
 
-public class JL5ClassLit_c extends ClassLit_c {
+public class JL5ClassLitDel extends JL5Del {
     private static final long serialVersionUID = SerialVersionUID.generate();
-
-    public JL5ClassLit_c(Position pos, TypeNode typeNode) {
-        super(pos, typeNode);
-    }
 
     @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
+        ClassLit n = (ClassLit) this.node();
         JL5TypeSystem ts = (JL5TypeSystem) tc.typeSystem();
         ReferenceType rt;
-        if (typeNode().type().isReference()) {
-            rt = typeNode().type().toReference();
+        if (n.typeNode().type().isReference()) {
+            rt = n.typeNode().type().toReference();
         }
-        else if (typeNode().type().isPrimitive()) {
-            PrimitiveType pt = typeNode().type().toPrimitive();
+        else if (n.typeNode().type().isPrimitive()) {
+            PrimitiveType pt = n.typeNode().type().toPrimitive();
             rt = ts.wrapperClassOfPrimitive(pt);
         }
         else {
             throw new SemanticException("Cannot access .class on type "
-                    + typeNode.type(), this.position());
+                    + n.typeNode().type(), n.position());
         }
-        return type(ts.Class(this.position(), rt));
+        return n.type(ts.Class(n.position(), rt));
     }
 }
