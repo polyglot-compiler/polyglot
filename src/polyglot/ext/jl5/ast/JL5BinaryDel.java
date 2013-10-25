@@ -25,28 +25,29 @@
  ******************************************************************************/
 package polyglot.ext.jl5.ast;
 
-import polyglot.ast.Binary_c;
+import polyglot.ast.Binary;
 import polyglot.ast.Expr;
 import polyglot.ast.Node;
 import polyglot.ast.Precedence;
 import polyglot.ext.jl5.types.JL5TypeSystem;
 import polyglot.types.SemanticException;
 import polyglot.types.Type;
-import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
 import polyglot.visit.AscriptionVisitor;
 import polyglot.visit.TypeChecker;
 
-public class JL5Binary_c extends Binary_c implements JL5Binary {
+public class JL5BinaryDel extends JL5Del {
     private static final long serialVersionUID = SerialVersionUID.generate();
-
-    public JL5Binary_c(Position pos, Expr left, Operator op, Expr right) {
-        super(pos, left, op, right);
-    }
 
     /** Type check the expression. */
     @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
+        Binary b = (Binary) this.node();
+
+        Binary.Operator op = b.operator();
+        Expr left = b.left();
+        Expr right = b.right();
+
         Type l = left.type();
         Type r = right.type();
 
@@ -62,7 +63,8 @@ public class JL5Binary_c extends Binary_c implements JL5Binary {
             r = ts.isPrimitiveWrapper(r) ? ts.primitiveTypeOfWrapper(r) : r;
         }
 
-        if (op == GT || op == LT || op == GE || op == LE) {
+        if (op == Binary.GT || op == Binary.LT || op == Binary.GE
+                || op == Binary.LE) {
             if (!l.isNumeric()) {
                 throw new SemanticException("The " + op
                         + " operator must have numeric operands, not type " + l
@@ -75,21 +77,21 @@ public class JL5Binary_c extends Binary_c implements JL5Binary {
                         + ".", right.position());
             }
 
-            return type(ts.Boolean());
+            return b.type(ts.Boolean());
         }
 
-        if (op == EQ || op == NE) {
+        if (op == Binary.EQ || op == Binary.NE) {
             if (!ts.isCastValid(l, r) && !ts.isCastValid(r, l)) {
                 throw new SemanticException("The "
                                                     + op
                                                     + " operator must have operands of similar type.",
-                                            position());
+                                            b.position());
             }
 
-            return type(ts.Boolean());
+            return b.type(ts.Boolean());
         }
 
-        if (op == COND_OR || op == COND_AND) {
+        if (op == Binary.COND_OR || op == Binary.COND_AND) {
             if (!l.isBoolean()) {
                 throw new SemanticException("The " + op
                         + " operator must have boolean operands, not type " + l
@@ -102,10 +104,10 @@ public class JL5Binary_c extends Binary_c implements JL5Binary {
                         + ".", right.position());
             }
 
-            return type(ts.Boolean());
+            return b.type(ts.Boolean());
         }
 
-        if (op == ADD) {
+        if (op == Binary.ADD) {
             if (ts.isSubtype(l, ts.String()) || ts.isSubtype(r, ts.String())) {
                 if (!ts.canCoerceToString(r, tc.context())) {
                     throw new SemanticException("Cannot coerce an expression "
@@ -118,17 +120,17 @@ public class JL5Binary_c extends Binary_c implements JL5Binary {
                             + "of type " + l + " to a String.", left.position());
                 }
 
-                return precedence(Precedence.STRING_ADD).type(ts.String());
+                return b.precedence(Precedence.STRING_ADD).type(ts.String());
             }
         }
 
-        if (op == BIT_AND || op == BIT_OR || op == BIT_XOR) {
+        if (op == Binary.BIT_AND || op == Binary.BIT_OR || op == Binary.BIT_XOR) {
             if (l.isBoolean() && r.isBoolean()) {
-                return type(ts.Boolean());
+                return b.type(ts.Boolean());
             }
         }
 
-        if (op == ADD) {
+        if (op == Binary.ADD) {
             if (!l.isNumeric()) {
                 throw new SemanticException("The "
                                                     + op
@@ -146,7 +148,7 @@ public class JL5Binary_c extends Binary_c implements JL5Binary {
             }
         }
 
-        if (op == BIT_AND || op == BIT_OR || op == BIT_XOR) {
+        if (op == Binary.BIT_AND || op == Binary.BIT_OR || op == Binary.BIT_XOR) {
             if (!ts.isImplicitCastValid(l, ts.Long())) {
                 throw new SemanticException("The "
                                                     + op
@@ -164,7 +166,8 @@ public class JL5Binary_c extends Binary_c implements JL5Binary {
             }
         }
 
-        if (op == SUB || op == MUL || op == DIV || op == MOD) {
+        if (op == Binary.SUB || op == Binary.MUL || op == Binary.DIV
+                || op == Binary.MOD) {
             if (!l.isNumeric()) {
                 throw new SemanticException("The " + op
                         + " operator must have numeric operands, not type " + l
@@ -178,7 +181,7 @@ public class JL5Binary_c extends Binary_c implements JL5Binary {
             }
         }
 
-        if (op == SHL || op == SHR || op == USHR) {
+        if (op == Binary.SHL || op == Binary.SHR || op == Binary.USHR) {
             if (!ts.isImplicitCastValid(l, ts.Long())) {
                 throw new SemanticException("The " + op
                         + " operator must have numeric operands, not type " + l
@@ -192,16 +195,22 @@ public class JL5Binary_c extends Binary_c implements JL5Binary {
             }
         }
 
-        if (op == SHL || op == SHR || op == USHR) {
+        if (op == Binary.SHL || op == Binary.SHR || op == Binary.USHR) {
             // For shift, only promote the left operand.
-            return type(ts.promote(l));
+            return b.type(ts.promote(l));
         }
 
-        return type(ts.promote(l, r));
+        return b.type(ts.promote(l, r));
     }
 
     @Override
     public Type childExpectedType(Expr child, AscriptionVisitor av) {
+        Binary b = (Binary) this.node();
+        Binary.Operator op = b.operator();
+
+        Expr left = b.left();
+        Expr right = b.right();
+
         Expr other;
 
         if (child == left) {
@@ -227,7 +236,7 @@ public class JL5Binary_c extends Binary_c implements JL5Binary {
         Type childUnboxedType = ts.unboxingConversion(childType);
         Type otherUnboxedType = ts.unboxingConversion(otherType);
         try {
-            if (op == EQ || op == NE) {
+            if (op == Binary.EQ || op == Binary.NE) {
                 // Coercion to compatible types.
                 if ((childType.isReference() || childType.isNull())
                         && (otherType.isReference() || otherType.isNull())) {
@@ -251,12 +260,13 @@ public class JL5Binary_c extends Binary_c implements JL5Binary {
                 return childType;
             }
 
-            if (op == ADD && ts.typeEquals(type, ts.String())) {
+            if (op == Binary.ADD && ts.typeEquals(b.type(), ts.String())) {
                 // Implicit coercion to String.
                 return ts.String();
             }
 
-            if (op == GT || op == LT || op == GE || op == LE) {
+            if (op == Binary.GT || op == Binary.LT || op == Binary.GE
+                    || op == Binary.LE) {
                 if (childUnboxedType.isNumeric()
                         && otherUnboxedType.isNumeric()) {
                     return ts.promote(childUnboxedType, otherUnboxedType);
@@ -265,11 +275,12 @@ public class JL5Binary_c extends Binary_c implements JL5Binary {
                 return childType;
             }
 
-            if (op == COND_OR || op == COND_AND) {
+            if (op == Binary.COND_OR || op == Binary.COND_AND) {
                 return ts.Boolean();
             }
 
-            if (op == BIT_AND || op == BIT_OR || op == BIT_XOR) {
+            if (op == Binary.BIT_AND || op == Binary.BIT_OR
+                    || op == Binary.BIT_XOR) {
                 if (otherUnboxedType.isBoolean()) {
                     return ts.Boolean();
                 }
@@ -282,7 +293,8 @@ public class JL5Binary_c extends Binary_c implements JL5Binary {
                 return childType;
             }
 
-            if (op == ADD || op == SUB || op == MUL || op == DIV || op == MOD) {
+            if (op == Binary.ADD || op == Binary.SUB || op == Binary.MUL
+                    || op == Binary.DIV || op == Binary.MOD) {
                 if (childUnboxedType.isNumeric()
                         && otherUnboxedType.isNumeric()) {
                     Type t = ts.promote(childUnboxedType, otherUnboxedType);
@@ -298,7 +310,7 @@ public class JL5Binary_c extends Binary_c implements JL5Binary {
                 return childType;
             }
 
-            if (op == SHL || op == SHR || op == USHR) {
+            if (op == Binary.SHL || op == Binary.SHR || op == Binary.USHR) {
                 if (childUnboxedType.isNumeric()
                         && otherUnboxedType.isNumeric()) {
                     if (child == left) {

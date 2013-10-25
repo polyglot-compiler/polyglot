@@ -191,6 +191,11 @@ public class JL5DelFactory_c extends AbstractDelFactory_c implements
     }
 
     @Override
+    protected JL delBinaryImpl() {
+        return new JL5BinaryDel();
+    }
+
+    @Override
     protected JL delNodeImpl() {
         return new JL5Del();
     }

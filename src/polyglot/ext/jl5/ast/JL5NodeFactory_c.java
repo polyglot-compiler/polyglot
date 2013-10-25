@@ -31,7 +31,6 @@ import java.util.List;
 
 import polyglot.ast.ArrayInit;
 import polyglot.ast.Assert;
-import polyglot.ast.Binary;
 import polyglot.ast.Block;
 import polyglot.ast.Call;
 import polyglot.ast.CanonicalTypeNode;
@@ -260,14 +259,6 @@ public class JL5NodeFactory_c extends NodeFactory_c implements JL5NodeFactory {
         EnumConstant n = new EnumConstant_c(pos, target, name);
         n = (EnumConstant) n.ext(extFactory().extEnumConstant());
         n = (EnumConstant) n.del(delFactory().delEnumConstant());
-        return n;
-    }
-
-    @Override
-    public Binary Binary(Position pos, Expr left, Binary.Operator op, Expr right) {
-        Binary n = new JL5Binary_c(pos, left, op, right);
-        n = (Binary) n.ext(extFactory().extBinary());
-        n = (Binary) n.del(delFactory().delBinary());
         return n;
     }
 
