@@ -33,7 +33,6 @@ import polyglot.ast.ArrayInit;
 import polyglot.ast.Block;
 import polyglot.ast.Call;
 import polyglot.ast.CanonicalTypeNode;
-import polyglot.ast.Case;
 import polyglot.ast.ClassBody;
 import polyglot.ast.ClassDecl;
 import polyglot.ast.ConstructorCall;
@@ -51,11 +50,8 @@ import polyglot.ast.NewArray;
 import polyglot.ast.NodeFactory_c;
 import polyglot.ast.Receiver;
 import polyglot.ast.Stmt;
-import polyglot.ast.Switch;
-import polyglot.ast.SwitchElement;
 import polyglot.ast.Term;
 import polyglot.ast.TypeNode;
-import polyglot.ast.Unary;
 import polyglot.types.Flags;
 import polyglot.types.Type;
 import polyglot.util.CollectionUtil;
@@ -237,14 +233,6 @@ public class JL5NodeFactory_c extends NodeFactory_c implements JL5NodeFactory {
         EnumConstant n = new EnumConstant_c(pos, target, name);
         n = (EnumConstant) n.ext(extFactory().extEnumConstant());
         n = (EnumConstant) n.del(delFactory().delEnumConstant());
-        return n;
-    }
-
-    @Override
-    public Unary Unary(Position pos, Unary.Operator op, Expr expr) {
-        Unary n = new JL5Unary_c(pos, op, expr);
-        n = (Unary) n.ext(extFactory().extUnary());
-        n = (Unary) n.del(delFactory().delUnary());
         return n;
     }
 
@@ -438,22 +426,6 @@ public class JL5NodeFactory_c extends NodeFactory_c implements JL5NodeFactory {
                 new JL5Formal_c(pos, flags, annotations, type, name, varArgs);
         n = (Formal) n.ext(extFactory().extFormal());
         n = (Formal) n.del(delFactory().delFormal());
-        return n;
-    }
-
-    @Override
-    public Switch Switch(Position pos, Expr expr, List<SwitchElement> elements) {
-        Switch n = new JL5Switch_c(pos, expr, elements);
-        n = (Switch) n.ext(extFactory().extSwitch());
-        n = (Switch) n.del(delFactory().delSwitch());
-        return n;
-    }
-
-    @Override
-    public Case Case(Position pos, Expr expr) {
-        Case n = new JL5Case_c(pos, expr);
-        n = (Case) n.ext(extFactory().extCase());
-        n = (Case) n.del(delFactory().delCase());
         return n;
     }
 

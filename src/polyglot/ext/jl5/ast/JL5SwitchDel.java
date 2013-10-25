@@ -26,47 +26,44 @@
 package polyglot.ext.jl5.ast;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import polyglot.ast.Expr;
 import polyglot.ast.Node;
+import polyglot.ast.Switch;
 import polyglot.ast.SwitchElement;
-import polyglot.ast.Switch_c;
 import polyglot.ext.jl5.types.JL5Flags;
 import polyglot.ext.jl5.types.JL5TypeSystem;
 import polyglot.types.SemanticException;
 import polyglot.types.Type;
-import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
 import polyglot.visit.TypeChecker;
 
-public class JL5Switch_c extends Switch_c implements JL5Switch {
+public class JL5SwitchDel extends JL5Del {
     private static final long serialVersionUID = SerialVersionUID.generate();
-
-    public JL5Switch_c(Position pos, Expr expr, List<SwitchElement> elements) {
-        super(pos, expr, elements);
-    }
 
     @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
+        Switch s = (Switch) this.node();
+        Expr expr = s.expr();
 
         if (!isAcceptableSwitchType(expr.type())) {
             throw new SemanticException("Switch index must be of type char, byte,"
                                                 + " short, int, Character, Byte, Short, Integer, or an enum type.",
-                                        position());
+                                        s.position());
         }
 
         ArrayList<SwitchElement> newels =
-                new ArrayList<SwitchElement>(elements.size());
+                new ArrayList<SwitchElement>(s.elements().size());
         Type switchType = expr.type();
-        for (SwitchElement el : elements()) {
-            if (el instanceof JL5Case)
+        for (SwitchElement el : s.elements()) {
+            JL5Ext ext = JL5Ext.ext(el);
+            if (ext instanceof JL5CaseExt)
                 el =
-                        (SwitchElement) ((JL5Case) el).resolveCaseLabel(tc,
-                                                                        switchType);
+                        (SwitchElement) ((JL5CaseExt) ext).resolveCaseLabel(tc,
+                                                                            switchType);
             newels.add(el);
         }
-        return elements(newels);
+        return s.elements(newels);
     }
 
     protected boolean isAcceptableSwitchType(Type type) {

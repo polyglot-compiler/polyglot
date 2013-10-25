@@ -206,6 +206,16 @@ public class JL5DelFactory_c extends AbstractDelFactory_c implements
     }
 
     @Override
+    protected JL delCaseImpl() {
+        return new JL5CaseDel();
+    }
+
+    @Override
+    protected JL delSwitchImpl() {
+        return new JL5SwitchDel();
+    }
+
+    @Override
     protected JL delClassLitImpl() {
         return new JL5ClassLitDel();
     }
@@ -223,6 +233,11 @@ public class JL5DelFactory_c extends AbstractDelFactory_c implements
     @Override
     protected JL delSpecialImpl() {
         return new JL5SpecialDel();
+    }
+
+    @Override
+    protected JL delUnaryImpl() {
+        return new JL5UnaryDel();
     }
 
     public JL postDelEnumDecl(JL del) {

@@ -45,6 +45,11 @@ public class JL5ExtFactory_c extends AbstractExtFactory_c implements
     }
 
     @Override
+    protected Ext extCaseImpl() {
+        return new JL5CaseExt();
+    }
+
+    @Override
     public Ext extEnumDecl() {
         Ext e = extEnumDeclImpl();
 
@@ -186,13 +191,8 @@ public class JL5ExtFactory_c extends AbstractExtFactory_c implements
     }
 
     @Override
-    protected Ext extAssignImpl() {
-        return new JL5AssignDel();
-    }
-
-    @Override
     protected Ext extNodeImpl() {
-        return new JL5Del();
+        return new JL5Ext();
     }
 
     public Ext postExtEnumDecl(Ext ext) {

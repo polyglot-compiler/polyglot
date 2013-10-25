@@ -25,29 +25,37 @@
  ******************************************************************************/
 package polyglot.ext.jl5.ast;
 
+import static polyglot.ast.Unary.BIT_NOT;
+import static polyglot.ast.Unary.NEG;
+import static polyglot.ast.Unary.NOT;
+import static polyglot.ast.Unary.POS;
+import static polyglot.ast.Unary.POST_DEC;
+import static polyglot.ast.Unary.POST_INC;
+import static polyglot.ast.Unary.PRE_DEC;
+import static polyglot.ast.Unary.PRE_INC;
 import polyglot.ast.Expr;
 import polyglot.ast.Node;
-import polyglot.ast.Unary_c;
+import polyglot.ast.Unary;
+import polyglot.ast.Unary.Operator;
 import polyglot.ast.Variable;
 import polyglot.ext.jl5.types.JL5TypeSystem;
 import polyglot.types.SemanticException;
 import polyglot.types.Type;
-import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
 import polyglot.visit.AscriptionVisitor;
 import polyglot.visit.TypeChecker;
 
-public class JL5Unary_c extends Unary_c implements JL5Unary {
+public class JL5UnaryDel extends JL5Del {
     private static final long serialVersionUID = SerialVersionUID.generate();
-
-    public JL5Unary_c(Position pos, Operator op, Expr expr) {
-        super(pos, op, expr);
-    }
 
     /** Type check the expression. */
     @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
         JL5TypeSystem ts = (JL5TypeSystem) tc.typeSystem();
+
+        Unary u = (Unary) this.node();
+        Operator op = u.operator();
+        Expr expr = u.expr();
 
         if (!ts.isPrimitiveWrapper(expr.type())) {
             return super.typeCheck(tc);
@@ -74,7 +82,7 @@ public class JL5Unary_c extends Unary_c implements JL5Unary {
                                             expr.position());
             }
 
-            return type(expr.type());
+            return u.type(expr.type());
         }
 
         if (op == BIT_NOT) {
@@ -84,10 +92,10 @@ public class JL5Unary_c extends Unary_c implements JL5Unary {
             }
 
             if (ts.isPrimitiveWrapper(expr.type())) {
-                return type(ts.promote(ts.primitiveTypeOfWrapper(expr.type())));
+                return u.type(ts.promote(ts.primitiveTypeOfWrapper(expr.type())));
             }
             else {
-                return type(ts.promote(expr.type()));
+                return u.type(ts.promote(expr.type()));
             }
         }
 
@@ -100,10 +108,10 @@ public class JL5Unary_c extends Unary_c implements JL5Unary {
             }
 
             if (ts.isPrimitiveWrapper(expr.type())) {
-                return type(ts.promote(ts.primitiveTypeOfWrapper(expr.type())));
+                return u.type(ts.promote(ts.primitiveTypeOfWrapper(expr.type())));
             }
             else {
-                return type(ts.promote(expr.type()));
+                return u.type(ts.promote(expr.type()));
             }
         }
 
@@ -115,15 +123,19 @@ public class JL5Unary_c extends Unary_c implements JL5Unary {
                 }
             }
 
-            return type(ts.Boolean());
+            return u.type(ts.Boolean());
         }
 
-        return this;
+        return u;
     }
 
     @Override
     public Type childExpectedType(Expr child, AscriptionVisitor av) {
         JL5TypeSystem ts = (JL5TypeSystem) av.typeSystem();
+
+        Unary u = (Unary) this.node();
+        Operator op = u.operator();
+        Expr expr = u.expr();
 
         try {
             if (child == expr) {

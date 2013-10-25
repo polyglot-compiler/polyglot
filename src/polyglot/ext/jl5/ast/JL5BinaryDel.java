@@ -25,7 +25,27 @@
  ******************************************************************************/
 package polyglot.ext.jl5.ast;
 
+import static polyglot.ast.Binary.ADD;
+import static polyglot.ast.Binary.BIT_AND;
+import static polyglot.ast.Binary.BIT_OR;
+import static polyglot.ast.Binary.BIT_XOR;
+import static polyglot.ast.Binary.COND_AND;
+import static polyglot.ast.Binary.COND_OR;
+import static polyglot.ast.Binary.DIV;
+import static polyglot.ast.Binary.EQ;
+import static polyglot.ast.Binary.GE;
+import static polyglot.ast.Binary.GT;
+import static polyglot.ast.Binary.LE;
+import static polyglot.ast.Binary.LT;
+import static polyglot.ast.Binary.MOD;
+import static polyglot.ast.Binary.MUL;
+import static polyglot.ast.Binary.NE;
+import static polyglot.ast.Binary.SHL;
+import static polyglot.ast.Binary.SHR;
+import static polyglot.ast.Binary.SUB;
+import static polyglot.ast.Binary.USHR;
 import polyglot.ast.Binary;
+import polyglot.ast.Binary.Operator;
 import polyglot.ast.Expr;
 import polyglot.ast.Node;
 import polyglot.ast.Precedence;
@@ -44,7 +64,7 @@ public class JL5BinaryDel extends JL5Del {
     public Node typeCheck(TypeChecker tc) throws SemanticException {
         Binary b = (Binary) this.node();
 
-        Binary.Operator op = b.operator();
+        Operator op = b.operator();
         Expr left = b.left();
         Expr right = b.right();
 
@@ -63,8 +83,7 @@ public class JL5BinaryDel extends JL5Del {
             r = ts.isPrimitiveWrapper(r) ? ts.primitiveTypeOfWrapper(r) : r;
         }
 
-        if (op == Binary.GT || op == Binary.LT || op == Binary.GE
-                || op == Binary.LE) {
+        if (op == GT || op == LT || op == GE || op == LE) {
             if (!l.isNumeric()) {
                 throw new SemanticException("The " + op
                         + " operator must have numeric operands, not type " + l
@@ -80,7 +99,7 @@ public class JL5BinaryDel extends JL5Del {
             return b.type(ts.Boolean());
         }
 
-        if (op == Binary.EQ || op == Binary.NE) {
+        if (op == EQ || op == NE) {
             if (!ts.isCastValid(l, r) && !ts.isCastValid(r, l)) {
                 throw new SemanticException("The "
                                                     + op
@@ -91,7 +110,7 @@ public class JL5BinaryDel extends JL5Del {
             return b.type(ts.Boolean());
         }
 
-        if (op == Binary.COND_OR || op == Binary.COND_AND) {
+        if (op == COND_OR || op == COND_AND) {
             if (!l.isBoolean()) {
                 throw new SemanticException("The " + op
                         + " operator must have boolean operands, not type " + l
@@ -107,7 +126,7 @@ public class JL5BinaryDel extends JL5Del {
             return b.type(ts.Boolean());
         }
 
-        if (op == Binary.ADD) {
+        if (op == ADD) {
             if (ts.isSubtype(l, ts.String()) || ts.isSubtype(r, ts.String())) {
                 if (!ts.canCoerceToString(r, tc.context())) {
                     throw new SemanticException("Cannot coerce an expression "
@@ -124,13 +143,13 @@ public class JL5BinaryDel extends JL5Del {
             }
         }
 
-        if (op == Binary.BIT_AND || op == Binary.BIT_OR || op == Binary.BIT_XOR) {
+        if (op == BIT_AND || op == BIT_OR || op == BIT_XOR) {
             if (l.isBoolean() && r.isBoolean()) {
                 return b.type(ts.Boolean());
             }
         }
 
-        if (op == Binary.ADD) {
+        if (op == ADD) {
             if (!l.isNumeric()) {
                 throw new SemanticException("The "
                                                     + op
@@ -148,7 +167,7 @@ public class JL5BinaryDel extends JL5Del {
             }
         }
 
-        if (op == Binary.BIT_AND || op == Binary.BIT_OR || op == Binary.BIT_XOR) {
+        if (op == BIT_AND || op == BIT_OR || op == BIT_XOR) {
             if (!ts.isImplicitCastValid(l, ts.Long())) {
                 throw new SemanticException("The "
                                                     + op
@@ -166,8 +185,7 @@ public class JL5BinaryDel extends JL5Del {
             }
         }
 
-        if (op == Binary.SUB || op == Binary.MUL || op == Binary.DIV
-                || op == Binary.MOD) {
+        if (op == SUB || op == MUL || op == DIV || op == MOD) {
             if (!l.isNumeric()) {
                 throw new SemanticException("The " + op
                         + " operator must have numeric operands, not type " + l
@@ -181,7 +199,7 @@ public class JL5BinaryDel extends JL5Del {
             }
         }
 
-        if (op == Binary.SHL || op == Binary.SHR || op == Binary.USHR) {
+        if (op == SHL || op == SHR || op == USHR) {
             if (!ts.isImplicitCastValid(l, ts.Long())) {
                 throw new SemanticException("The " + op
                         + " operator must have numeric operands, not type " + l
@@ -195,7 +213,7 @@ public class JL5BinaryDel extends JL5Del {
             }
         }
 
-        if (op == Binary.SHL || op == Binary.SHR || op == Binary.USHR) {
+        if (op == SHL || op == SHR || op == USHR) {
             // For shift, only promote the left operand.
             return b.type(ts.promote(l));
         }
@@ -206,7 +224,7 @@ public class JL5BinaryDel extends JL5Del {
     @Override
     public Type childExpectedType(Expr child, AscriptionVisitor av) {
         Binary b = (Binary) this.node();
-        Binary.Operator op = b.operator();
+        Operator op = b.operator();
 
         Expr left = b.left();
         Expr right = b.right();
@@ -236,7 +254,7 @@ public class JL5BinaryDel extends JL5Del {
         Type childUnboxedType = ts.unboxingConversion(childType);
         Type otherUnboxedType = ts.unboxingConversion(otherType);
         try {
-            if (op == Binary.EQ || op == Binary.NE) {
+            if (op == EQ || op == NE) {
                 // Coercion to compatible types.
                 if ((childType.isReference() || childType.isNull())
                         && (otherType.isReference() || otherType.isNull())) {
@@ -260,13 +278,12 @@ public class JL5BinaryDel extends JL5Del {
                 return childType;
             }
 
-            if (op == Binary.ADD && ts.typeEquals(b.type(), ts.String())) {
+            if (op == ADD && ts.typeEquals(b.type(), ts.String())) {
                 // Implicit coercion to String.
                 return ts.String();
             }
 
-            if (op == Binary.GT || op == Binary.LT || op == Binary.GE
-                    || op == Binary.LE) {
+            if (op == GT || op == LT || op == GE || op == LE) {
                 if (childUnboxedType.isNumeric()
                         && otherUnboxedType.isNumeric()) {
                     return ts.promote(childUnboxedType, otherUnboxedType);
@@ -275,12 +292,11 @@ public class JL5BinaryDel extends JL5Del {
                 return childType;
             }
 
-            if (op == Binary.COND_OR || op == Binary.COND_AND) {
+            if (op == COND_OR || op == COND_AND) {
                 return ts.Boolean();
             }
 
-            if (op == Binary.BIT_AND || op == Binary.BIT_OR
-                    || op == Binary.BIT_XOR) {
+            if (op == BIT_AND || op == BIT_OR || op == BIT_XOR) {
                 if (otherUnboxedType.isBoolean()) {
                     return ts.Boolean();
                 }
@@ -293,8 +309,7 @@ public class JL5BinaryDel extends JL5Del {
                 return childType;
             }
 
-            if (op == Binary.ADD || op == Binary.SUB || op == Binary.MUL
-                    || op == Binary.DIV || op == Binary.MOD) {
+            if (op == ADD || op == SUB || op == MUL || op == DIV || op == MOD) {
                 if (childUnboxedType.isNumeric()
                         && otherUnboxedType.isNumeric()) {
                     Type t = ts.promote(childUnboxedType, otherUnboxedType);
@@ -310,7 +325,7 @@ public class JL5BinaryDel extends JL5Del {
                 return childType;
             }
 
-            if (op == Binary.SHL || op == Binary.SHR || op == Binary.USHR) {
+            if (op == SHL || op == SHR || op == USHR) {
                 if (childUnboxedType.isNumeric()
                         && otherUnboxedType.isNumeric()) {
                     if (child == left) {
