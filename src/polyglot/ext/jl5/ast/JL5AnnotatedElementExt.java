@@ -23,30 +23,52 @@
  *
  * See README for contributors.
  ******************************************************************************/
-package polyglot.ext.jl5.translate;
+package polyglot.ext.jl5.ast;
 
-import polyglot.ast.ConstructorDecl;
-import polyglot.ext.jl5.ast.JL5ConstructorDeclExt;
-import polyglot.ext.jl5.ast.JL5Ext;
-import polyglot.translate.ExtensionRewriter;
-import polyglot.translate.ext.ConstructorDeclToExt_c;
-import polyglot.translate.ext.ToExt;
+import java.util.List;
+
+import polyglot.ast.Node;
+import polyglot.ext.jl5.types.Annotations;
+import polyglot.ext.jl5.visit.AnnotationChecker;
+import polyglot.types.Declaration;
 import polyglot.types.SemanticException;
 import polyglot.util.SerialVersionUID;
-import polyglot.visit.NodeVisitor;
 
-public class JL5ConstructorDeclToJL_c extends ConstructorDeclToExt_c implements
-        ToExt {
+public abstract class JL5AnnotatedElementExt extends JL5Ext implements
+        AnnotatedElement {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
+    protected List<AnnotationElem> annotations;
+
     @Override
-    public NodeVisitor toExtEnter(ExtensionRewriter rw)
-            throws SemanticException {
-        //Skip annotations and parameter nodes
-        ConstructorDecl cd = (ConstructorDecl) node();
-        JL5ConstructorDeclExt ext = (JL5ConstructorDeclExt) JL5Ext.ext(cd);
-        rw = (ExtensionRewriter) rw.bypass(ext.annotationElems());
-        return rw.bypass(ext.typeParams());
+    public Node annotationElems(List<AnnotationElem> annotations) {
+        Node n = (Node) this.node().copy();
+        JL5AnnotatedElementExt ext = (JL5AnnotatedElementExt) JL5Ext.ext(n);
+        ext.annotations = annotations;
+        return n;
     }
+
+    @Override
+    public Node annotationCheck(AnnotationChecker annoCheck)
+            throws SemanticException {
+        Node n = this.node();
+        for (AnnotationElem elem : annotations) {
+            annoCheck.checkAnnotationApplicability(elem, this.declaration());
+        }
+        return n;
+    }
+
+    /**
+     * Return the Declaration associated with this AST node.
+     */
+    protected abstract Declaration declaration();
+
+    @Override
+    public List<AnnotationElem> annotationElems() {
+        return this.annotations;
+    }
+
+    @Override
+    public abstract void setAnnotations(Annotations annotations);
 
 }

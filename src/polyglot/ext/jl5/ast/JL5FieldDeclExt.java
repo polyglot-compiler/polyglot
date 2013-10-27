@@ -23,30 +23,28 @@
  *
  * See README for contributors.
  ******************************************************************************/
-package polyglot.ext.jl5.translate;
+package polyglot.ext.jl5.ast;
 
-import polyglot.ast.ConstructorDecl;
-import polyglot.ext.jl5.ast.JL5ConstructorDeclExt;
-import polyglot.ext.jl5.ast.JL5Ext;
-import polyglot.translate.ExtensionRewriter;
-import polyglot.translate.ext.ConstructorDeclToExt_c;
-import polyglot.translate.ext.ToExt;
-import polyglot.types.SemanticException;
+import polyglot.ast.FieldDecl;
+import polyglot.ext.jl5.types.Annotations;
+import polyglot.ext.jl5.types.JL5FieldInstance;
+import polyglot.types.Declaration;
 import polyglot.util.SerialVersionUID;
-import polyglot.visit.NodeVisitor;
 
-public class JL5ConstructorDeclToJL_c extends ConstructorDeclToExt_c implements
-        ToExt {
+public class JL5FieldDeclExt extends JL5AnnotatedElementExt {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
     @Override
-    public NodeVisitor toExtEnter(ExtensionRewriter rw)
-            throws SemanticException {
-        //Skip annotations and parameter nodes
-        ConstructorDecl cd = (ConstructorDecl) node();
-        JL5ConstructorDeclExt ext = (JL5ConstructorDeclExt) JL5Ext.ext(cd);
-        rw = (ExtensionRewriter) rw.bypass(ext.annotationElems());
-        return rw.bypass(ext.typeParams());
+    public void setAnnotations(Annotations annotations) {
+        FieldDecl fd = (FieldDecl) this.node();
+        JL5FieldInstance fi = (JL5FieldInstance) fd.fieldInstance();
+        fi.setAnnotations(annotations);
+    }
+
+    @Override
+    protected Declaration declaration() {
+        FieldDecl fd = (FieldDecl) this.node();
+        return fd.fieldInstance();
     }
 
 }

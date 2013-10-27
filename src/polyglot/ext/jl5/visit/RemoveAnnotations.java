@@ -27,13 +27,15 @@ package polyglot.ext.jl5.visit;
 
 import java.util.Collections;
 
+import polyglot.ast.ClassDecl;
 import polyglot.ast.MethodDecl;
 import polyglot.ast.Node;
 import polyglot.ast.NodeFactory;
 import polyglot.ext.jl5.ast.AnnotatedElement;
 import polyglot.ext.jl5.ast.AnnotationElem;
 import polyglot.ext.jl5.ast.AnnotationElemDecl;
-import polyglot.ext.jl5.ast.JL5ClassDecl;
+import polyglot.ext.jl5.ast.JL5ClassDeclExt;
+import polyglot.ext.jl5.ast.JL5Ext;
 import polyglot.ext.jl5.types.JL5Flags;
 import polyglot.frontend.Job;
 import polyglot.types.Flags;
@@ -53,19 +55,21 @@ public class RemoveAnnotations extends ContextVisitor {
     @Override
     protected Node leaveCall(Node parent, Node old, Node n, NodeVisitor v)
             throws SemanticException {
-        if (n instanceof JL5ClassDecl) {
-            JL5ClassDecl cd = (JL5ClassDecl) n;
-            cd = (JL5ClassDecl) cd.flags(JL5Flags.clearAnnotation(cd.flags()));
+        if (n instanceof ClassDecl) {
+            ClassDecl cd = (ClassDecl) n;
+            JL5ClassDeclExt ext = (JL5ClassDeclExt) JL5Ext.ext(n);
+            cd = cd.flags(JL5Flags.clearAnnotation(cd.flags()));
             cd =
-                    (JL5ClassDecl) cd.annotationElems(Collections.<AnnotationElem> emptyList());
+                    (ClassDecl) ext.annotationElems(Collections.<AnnotationElem> emptyList());
             return cd;
         }
         if (n instanceof AnnotationElemDecl) {
             return translateAnnotationElemDecl((AnnotationElemDecl) n);
         }
-        if (n instanceof AnnotatedElement) {
+        JL5Ext ext = JL5Ext.ext(n);
+        if (ext instanceof AnnotatedElement) {
             // remove the annotations
-            return (Node) ((AnnotatedElement) n).annotationElems(Collections.<AnnotationElem> emptyList());
+            return ((AnnotatedElement) ext).annotationElems(Collections.<AnnotationElem> emptyList());
         }
         return n;
     }

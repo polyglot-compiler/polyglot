@@ -26,19 +26,17 @@
 package polyglot.ext.jl5.ast;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
-import polyglot.ast.Block;
 import polyglot.ast.Formal;
-import polyglot.ast.Id;
 import polyglot.ast.MethodDecl;
 import polyglot.ast.MethodDecl_c;
 import polyglot.ast.Node;
+import polyglot.ast.Node_c;
+import polyglot.ast.ProcedureDeclOps;
 import polyglot.ast.TypeNode;
-import polyglot.ext.jl5.types.Annotations;
 import polyglot.ext.jl5.types.JL5ArrayType;
 import polyglot.ext.jl5.types.JL5Context;
 import polyglot.ext.jl5.types.JL5Flags;
@@ -46,7 +44,6 @@ import polyglot.ext.jl5.types.JL5LocalInstance;
 import polyglot.ext.jl5.types.JL5MethodInstance;
 import polyglot.ext.jl5.types.JL5TypeSystem;
 import polyglot.ext.jl5.types.TypeVariable;
-import polyglot.ext.jl5.visit.AnnotationChecker;
 import polyglot.ext.jl5.visit.JL5Translator;
 import polyglot.types.Context;
 import polyglot.types.Flags;
@@ -58,8 +55,6 @@ import polyglot.types.UnknownType;
 import polyglot.util.CodeWriter;
 import polyglot.util.CollectionUtil;
 import polyglot.util.InternalCompilerError;
-import polyglot.util.ListUtil;
-import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
 import polyglot.visit.AmbiguityRemover;
 import polyglot.visit.NodeVisitor;
@@ -68,106 +63,40 @@ import polyglot.visit.Translator;
 import polyglot.visit.TypeBuilder;
 import polyglot.visit.TypeChecker;
 
-public class JL5MethodDecl_c extends MethodDecl_c implements JL5MethodDecl {
+public class JL5MethodDeclDel extends JL5AnnotatedElementDel implements
+        ProcedureDeclOps {
     private static final long serialVersionUID = SerialVersionUID.generate();
-
-    protected boolean compilerGenerated;
-    protected List<ParamTypeNode> typeParams;
-    protected List<AnnotationElem> annotations;
-
-    public JL5MethodDecl_c(Position pos, Flags flags,
-            List<AnnotationElem> annotations, TypeNode returnType, Id name,
-            List<Formal> formals, List<TypeNode> throwTypes, Block body) {
-        this(pos,
-             flags,
-             annotations,
-             returnType,
-             name,
-             formals,
-             throwTypes,
-             body,
-             new ArrayList<ParamTypeNode>());
-    }
-
-    public JL5MethodDecl_c(Position pos, Flags flags,
-            List<AnnotationElem> annotations, TypeNode returnType, Id name,
-            List<Formal> formals, List<TypeNode> throwTypes, Block body,
-            List<ParamTypeNode> typeParams) {
-        super(pos, flags, returnType, name, formals, throwTypes, body);
-        this.typeParams = typeParams;
-        if (annotations == null) {
-            annotations = Collections.emptyList();
-        }
-        this.annotations = annotations;
-    }
-
-    @Override
-    public List<AnnotationElem> annotationElems() {
-        return this.annotations;
-    }
-
-    @Override
-    public JL5MethodDecl annotationElems(List<AnnotationElem> annotations) {
-        JL5MethodDecl_c n = (JL5MethodDecl_c) copy();
-        n.annotations = annotations;
-        return n;
-    }
-
-    public boolean isGeneric() {
-        if (!typeParams.isEmpty()) return true;
-        return false;
-    }
-
-    @Override
-    public boolean isCompilerGenerated() {
-        return compilerGenerated;
-    }
-
-    @Override
-    public JL5MethodDecl setCompilerGenerated(boolean val) {
-        JL5MethodDecl_c n = (JL5MethodDecl_c) copy();
-        n.compilerGenerated = val;
-        return n;
-    }
-
-    @Override
-    public List<ParamTypeNode> typeParams() {
-        return this.typeParams;
-    }
-
-    @Override
-    public JL5MethodDecl typeParams(List<ParamTypeNode> typeParams) {
-        JL5MethodDecl_c n = (JL5MethodDecl_c) copy();
-        n.typeParams = typeParams;
-        return n;
-    }
 
     @Override
     public Node buildTypes(TypeBuilder tb) throws SemanticException {
+        MethodDecl md = (MethodDecl) this.node();
+        JL5MethodDeclExt ext = (JL5MethodDeclExt) JL5Ext.ext(md);
+
         JL5TypeSystem ts = (JL5TypeSystem) tb.typeSystem();
 
         ParsedClassType ct = tb.currentClass();
 
         if (ct == null) {
-            return this;
+            return md;
         }
 
         boolean isVarArgs = false;
         List<UnknownType> formalTypes =
-                new ArrayList<UnknownType>(formals.size());
-        for (int i = 0; i < formals.size(); i++) {
-            formalTypes.add(ts.unknownType(position()));
-            JL5Formal f = (JL5Formal) formals.get(i);
-            isVarArgs |= f.isVarArg();
+                new ArrayList<UnknownType>(md.formals().size());
+        for (int i = 0; i < md.formals().size(); i++) {
+            formalTypes.add(ts.unknownType(md.position()));
+            Formal f = md.formals().get(i);
+            JL5FormalExt fext = (JL5FormalExt) JL5Ext.ext(f);
+            isVarArgs |= fext.isVarArg();
         }
 
         List<UnknownType> throwTypes =
-                new ArrayList<UnknownType>(throwTypes().size());
-        for (int i = 0; i < throwTypes().size(); i++) {
-            throwTypes.add(ts.unknownType(position()));
+                new ArrayList<UnknownType>(md.throwTypes().size());
+        for (int i = 0; i < md.throwTypes().size(); i++) {
+            throwTypes.add(ts.unknownType(md.position()));
         }
 
-        Flags f = this.flags;
+        Flags f = md.flags();
 
         if (ct.flags().isInterface()) {
             f = f.Public().Abstract();
@@ -178,30 +107,31 @@ public class JL5MethodDecl_c extends MethodDecl_c implements JL5MethodDecl {
         }
 
         List<TypeVariable> typeParams =
-                new ArrayList<TypeVariable>(typeParams().size());
-        for (int i = 0; i < typeParams().size(); i++) {
-            typeParams.add(ts.unknownTypeVariable(position()));
+                new ArrayList<TypeVariable>(ext.typeParams().size());
+        for (int i = 0; i < ext.typeParams().size(); i++) {
+            typeParams.add(ts.unknownTypeVariable(md.position()));
         }
 
         MethodInstance mi =
-                ts.methodInstance(position(),
+                ts.methodInstance(md.position(),
                                   ct,
                                   f,
-                                  ts.unknownType(position()),
-                                  name.id(),
+                                  ts.unknownType(md.position()),
+                                  md.name(),
                                   formalTypes,
                                   throwTypes,
                                   typeParams);
         ct.addMethod(mi);
-        return methodInstance(mi);
+        return md.methodInstance(mi);
     }
 
     @Override
     public Node disambiguate(AmbiguityRemover ar) throws SemanticException {
-        JL5MethodDecl_c n = (JL5MethodDecl_c) super.disambiguate(ar);
+        MethodDecl n = (MethodDecl) super.disambiguate(ar);
+        JL5MethodDeclExt ext = (JL5MethodDeclExt) JL5Ext.ext(n);
         List<TypeVariable> typeParams = new LinkedList<TypeVariable>();
 
-        for (TypeNode tn : n.typeParams) {
+        for (TypeNode tn : ext.typeParams()) {
             if (!tn.isDisambiguated()) {
 
                 return n;
@@ -215,50 +145,30 @@ public class JL5MethodDecl_c extends MethodDecl_c implements JL5MethodDecl {
         return n;
     }
 
-    protected MethodDecl_c reconstruct(TypeNode returnType, Id name,
-            List<Formal> formals, List<TypeNode> throwTypes, Block body,
-            List<AnnotationElem> annotations, List<ParamTypeNode> paramTypes) {
-        if (returnType != this.returnType || name != this.name
-                || !CollectionUtil.equals(formals, this.formals)
-                || !CollectionUtil.equals(throwTypes, this.throwTypes)
-                || body != this.body
-                || !CollectionUtil.equals(annotations, this.annotations)
-                || !CollectionUtil.equals(paramTypes, this.typeParams)) {
-            JL5MethodDecl_c n = (JL5MethodDecl_c) copy();
-            n.name = name;
-            n.returnType = returnType;
-            n.formals = ListUtil.copy(formals, true);
-            n.throwTypes = ListUtil.copy(throwTypes, true);
-            n.body = body;
-            n.annotations = ListUtil.copy(annotations, true);
-            n.typeParams = paramTypes;
-            return n;
-        }
-        return this;
-
-    }
-
     @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
         // check no duplicate annotations used
         JL5TypeSystem ts = (JL5TypeSystem) tc.typeSystem();
-        MethodDecl md = this;
-        JL5MethodInstance mi = (JL5MethodInstance) this.methodInstance();
-        ts.checkDuplicateAnnotations(annotations);
-        for (ParamTypeNode typeParam : typeParams)
+        MethodDecl md = (MethodDecl) this.node();
+        JL5MethodDeclExt ext = (JL5MethodDeclExt) JL5Ext.ext(md);
+
+        JL5MethodInstance mi = (JL5MethodInstance) md.methodInstance();
+        ts.checkDuplicateAnnotations(ext.annotations);
+        for (ParamTypeNode typeParam : ext.typeParams)
             ts.checkCycles(typeParam.type().toReference());
 
         // mark the formals as being procedure formals (since they are)
-        for (Formal f : formals) {
+        for (Formal f : md.formals()) {
             JL5LocalInstance li = (JL5LocalInstance) f.localInstance();
             li.setProcedureFormal(true);
         }
 
         // check at most last formal is variable
-        for (int i = 0; i < formals.size(); i++) {
-            JL5Formal f = (JL5Formal) formals.get(i);
-            if (f.isVarArg()) {
-                if (i != formals.size() - 1) {
+        for (int i = 0; i < md.formals().size(); i++) {
+            Formal f = md.formals().get(i);
+            JL5FormalExt fext = (JL5FormalExt) JL5Ext.ext(f);
+            if (fext.isVarArg()) {
+                if (i != md.formals().size() - 1) {
                     throw new SemanticException("Only last formal can be variable in method declaration.",
                                                 f.position());
                 }
@@ -275,7 +185,7 @@ public class JL5MethodDecl_c extends MethodDecl_c implements JL5MethodDecl {
         if (tc.context().currentClass().flags().isInterface()) {
             if (flags.isProtected() || flags.isPrivate()) {
                 throw new SemanticException("Interface methods must be public.",
-                                            position());
+                                            md.position());
             }
         }
 
@@ -283,35 +193,36 @@ public class JL5MethodDecl_c extends MethodDecl_c implements JL5MethodDecl {
             ts.checkMethodFlags(flags);
         }
         catch (SemanticException e) {
-            throw new SemanticException(e.getMessage(), position());
+            throw new SemanticException(e.getMessage(), md.position());
         }
 
-        if (body == null && !(flags.isAbstract() || flags.isNative())) {
-            throw new SemanticException("Missing method body.", position());
+        if (md.body() == null && !(flags.isAbstract() || flags.isNative())) {
+            throw new SemanticException("Missing method body.", md.position());
         }
 
-        if (body != null && flags.isAbstract()) {
+        if (md.body() != null && flags.isAbstract()) {
             throw new SemanticException("An abstract method cannot have a body.",
-                                        position());
+                                        md.position());
         }
 
-        if (body != null && flags.isNative()) {
+        if (md.body() != null && flags.isNative()) {
             throw new SemanticException("A native method cannot have a body.",
-                                        position());
+                                        md.position());
         }
 
-        throwsCheck(tc);
+        ((MethodDecl_c) md).throwsCheck(tc);
 
         // check that inner classes do not declare static methods
         // unless class is enum
         if (flags.isStatic()
-                && !JL5Flags.isEnum(methodInstance().container()
-                                                    .toClass()
-                                                    .flags())
-                && methodInstance().container().toClass().isInnerClass()) {
+                && !JL5Flags.isEnum(md.methodInstance()
+                                      .container()
+                                      .toClass()
+                                      .flags())
+                && md.methodInstance().container().toClass().isInnerClass()) {
             // it's a static method in an inner class.
             throw new SemanticException("Inner classes cannot declare "
-                    + "static methods.", this.position());
+                    + "static methods.", md.position());
         }
 
         // check that the varargs flag is consistent with the type of the last argument.
@@ -330,60 +241,62 @@ public class JL5MethodDecl_c extends MethodDecl_c implements JL5MethodDecl {
             }
         }
 
-        overrideMethodCheck(tc);
+        ((MethodDecl_c) md).overrideMethodCheck(tc);
 
         return md;
     }
 
     @Override
-    public void setAnnotations(Annotations annotations) {
-        JL5MethodInstance mi = (JL5MethodInstance) this.methodInstance();
-        mi.setAnnotations(annotations);
-    }
-
-    @Override
-    public Node annotationCheck(AnnotationChecker annoCheck)
-            throws SemanticException {
-        for (AnnotationElem element : annotations) {
-            annoCheck.checkAnnotationApplicability(element,
-                                                   this.methodInstance());
-        }
-        return this;
-    }
-
-    @Override
     public Node visitChildren(NodeVisitor v) {
+        JL5MethodDeclExt ext = (JL5MethodDeclExt) JL5Ext.ext(this.node());
 
-        List<ParamTypeNode> paramTypes = visitList(this.typeParams, v);
-        List<AnnotationElem> annotations = visitList(this.annotations, v);
-        Id name = (Id) visitChild(this.name, v);
-        List<Formal> formals = visitList(this.formals, v);
-        TypeNode returnType = (TypeNode) visitChild(this.returnType, v);
-        List<TypeNode> throwTypes = visitList(this.throwTypes, v);
-        Block body = (Block) visitChild(this.body, v);
+        List<ParamTypeNode> paramTypes =
+                this.node().visitList(ext.typeParams(), v);
 
-        return reconstruct(returnType,
-                           name,
-                           formals,
-                           throwTypes,
-                           body,
-                           annotations,
-                           paramTypes);
+        List<AnnotationElem> annots =
+                this.node().visitList(ext.annotationElems(), v);
+
+        Node newN = super.visitChildren(v);
+        JL5MethodDeclExt newext = (JL5MethodDeclExt) JL5Ext.ext(newN);
+
+        if (!CollectionUtil.equals(annots, newext.annotationElems())
+                || !CollectionUtil.equals(paramTypes, newext.typeParams())) {
+            // the annotations or param thypes changed! Let's update the node.
+            if (newN == this.node()) {
+                // we need to create a copy.
+                newN = (Node) newN.copy();
+                newext = (JL5MethodDeclExt) JL5Ext.ext(newN);
+            }
+            else {
+                // the call to super.visitChildren(v) already
+                // created a copy of the node (and thus of its extension).
+            }
+            newext.annotations = annots;
+            newext.typeParams = paramTypes;
+        }
+        return newN;
+
     }
 
     @Override
     public void translate(CodeWriter w, Translator tr) {
-        if (isCompilerGenerated()) return;
+        MethodDecl md = (MethodDecl) this.node();
+        JL5MethodDeclExt ext = (JL5MethodDeclExt) JL5Ext.ext(md);
+
+        if (ext.isCompilerGenerated()) return;
 
         super.translate(w, tr);
     }
 
     @Override
     public void prettyPrintHeader(Flags flags, CodeWriter w, PrettyPrinter tr) {
+        MethodDecl n = (MethodDecl) this.node();
+        JL5MethodDeclExt ext = (JL5MethodDeclExt) JL5Ext.ext(n);
+
         w.begin(0);
 
         w.begin(0);
-        for (AnnotationElem ae : annotations) {
+        for (AnnotationElem ae : ext.annotationElems()) {
             ae.del().prettyPrint(w, tr);
             w.newline();
         }
@@ -397,9 +310,9 @@ public class JL5MethodDecl_c extends MethodDecl_c implements JL5MethodDecl {
             JL5Translator jl5tr = (JL5Translator) tr;
             printTypeVars = !jl5tr.removeJava5isms();
         }
-        if (printTypeVars && !this.typeParams().isEmpty()) {
+        if (printTypeVars && !ext.typeParams().isEmpty()) {
             w.write("<");
-            for (Iterator<ParamTypeNode> iter = this.typeParams().iterator(); iter.hasNext();) {
+            for (Iterator<ParamTypeNode> iter = ext.typeParams().iterator(); iter.hasNext();) {
                 ParamTypeNode ptn = iter.next();
                 ptn.prettyPrint(w, tr);
                 if (iter.hasNext()) {
@@ -410,13 +323,13 @@ public class JL5MethodDecl_c extends MethodDecl_c implements JL5MethodDecl {
             w.write("> ");
         }
 
-        print(returnType, w, tr);
-        w.write(" " + name + "(");
+        ((Node_c) n).print(n.returnType(), w, tr);
+        w.write(" " + n.name() + "(");
         w.begin(0);
 
-        for (Iterator<Formal> i = formals.iterator(); i.hasNext();) {
+        for (Iterator<Formal> i = n.formals().iterator(); i.hasNext();) {
             Formal f = i.next();
-            print(f, w, tr);
+            ((Node_c) n).print(f, w, tr);
 
             if (i.hasNext()) {
                 w.write(",");
@@ -427,13 +340,13 @@ public class JL5MethodDecl_c extends MethodDecl_c implements JL5MethodDecl {
         w.end();
         w.write(")");
 
-        if (!throwTypes().isEmpty()) {
+        if (!n.throwTypes().isEmpty()) {
             w.allowBreak(6);
             w.write("throws ");
 
-            for (Iterator<TypeNode> i = throwTypes().iterator(); i.hasNext();) {
+            for (Iterator<TypeNode> i = n.throwTypes().iterator(); i.hasNext();) {
                 TypeNode tn = i.next();
-                print(tn, w, tr);
+                ((Node_c) n).print(tn, w, tr);
 
                 if (i.hasNext()) {
                     w.write(",");
@@ -447,8 +360,10 @@ public class JL5MethodDecl_c extends MethodDecl_c implements JL5MethodDecl {
 
     @Override
     public Context enterScope(Context c) {
+        MethodDecl md = (MethodDecl) this.node();
+        JL5MethodDeclExt ext = (JL5MethodDeclExt) JL5Ext.ext(md);
         c = super.enterScope(c);
-        for (ParamTypeNode pn : typeParams) {
+        for (ParamTypeNode pn : ext.typeParams()) {
             ((JL5Context) c).addTypeVariable((TypeVariable) pn.type());
         }
         return c;

@@ -25,14 +25,28 @@
  ******************************************************************************/
 package polyglot.ext.jl5.ast;
 
-import java.util.List;
+import polyglot.ext.jl5.types.Annotations;
+import polyglot.types.Declaration;
+import polyglot.util.SerialVersionUID;
 
-import polyglot.ast.Call;
-import polyglot.ast.TypeNode;
+/**
+ * This class mainly exists so that EnumConstantDecls can be indentified as
+ * being Annotated Elements by examining their JL5Ext.
+ *
+ */
+public class EnumConstantDeclExt extends JL5AnnotatedElementExt {
+    private static final long serialVersionUID = SerialVersionUID.generate();
 
-public interface JL5Call extends Call {
+    @Override
+    protected Declaration declaration() {
+        EnumConstantDecl ecd = (EnumConstantDecl) this.node();
+        return ecd.enumInstance();
+    }
 
-    List<TypeNode> typeArgs();
+    @Override
+    public void setAnnotations(Annotations annotations) {
+        EnumConstantDecl ecd = (EnumConstantDecl) this.node();
+        ecd.enumInstance().setAnnotations(annotations);
+    }
 
-    JL5Call typeArgs(List<TypeNode> typeArgs);
 }

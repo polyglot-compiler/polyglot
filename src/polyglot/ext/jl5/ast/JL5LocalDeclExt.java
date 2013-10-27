@@ -25,12 +25,26 @@
  ******************************************************************************/
 package polyglot.ext.jl5.ast;
 
-import java.util.List;
+import polyglot.ast.LocalDecl;
+import polyglot.ext.jl5.types.Annotations;
+import polyglot.ext.jl5.types.JL5LocalInstance;
+import polyglot.types.Declaration;
+import polyglot.util.SerialVersionUID;
 
-import polyglot.ast.ConstructorDecl;
+public class JL5LocalDeclExt extends JL5AnnotatedElementExt {
+    private static final long serialVersionUID = SerialVersionUID.generate();
 
-public interface JL5ConstructorDecl extends ConstructorDecl, AnnotatedElement {
-    public List<ParamTypeNode> typeParams();
+    @Override
+    public void setAnnotations(Annotations annotations) {
+        LocalDecl n = (LocalDecl) this.node();
+        JL5LocalInstance li = (JL5LocalInstance) n.localInstance();
+        li.setAnnotations(annotations);
+    }
 
-    public JL5ConstructorDecl typeParams(List<ParamTypeNode> typeParams);
+    @Override
+    protected Declaration declaration() {
+        LocalDecl n = (LocalDecl) this.node();
+        return n.localInstance();
+    }
+
 }

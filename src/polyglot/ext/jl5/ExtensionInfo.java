@@ -77,11 +77,14 @@ public class ExtensionInfo extends JLExtensionInfo {
     @Override
     protected NodeFactory createNodeFactory() {
         JL5Options opt = (JL5Options) getOptions();
-        if (!opt.removeJava5isms)
+        if (!opt.removeJava5isms) {
             return new JL5NodeFactory_c(new JL5ExtFactory_c(),
                                         new JL5DelFactory_c());
-        else return new JL5NodeFactory_c(new JL5ExtFactory_c(new JL5ToJLExtFactory_c()),
-                                         new JL5DelFactory_c());
+        }
+        else {
+            return new JL5NodeFactory_c(new JL5ExtFactory_c(new JL5ToJLExtFactory_c()),
+                                        new JL5DelFactory_c());
+        }
     }
 
     @Override

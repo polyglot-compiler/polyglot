@@ -26,61 +26,50 @@
 package polyglot.ext.jl5.ast;
 
 import java.util.Collections;
-import java.util.List;
 
-import polyglot.ast.ClassBody;
 import polyglot.ast.ClassDecl;
+import polyglot.ast.ClassDecl_c;
 import polyglot.ast.ClassMember;
 import polyglot.ast.ConstructorDecl;
 import polyglot.ast.Formal;
-import polyglot.ast.Id;
 import polyglot.ast.MethodDecl;
 import polyglot.ast.Node;
 import polyglot.ast.NodeFactory;
+import polyglot.ast.Node_c;
 import polyglot.ast.TypeNode;
 import polyglot.ext.jl5.types.JL5Flags;
-import polyglot.ext.jl5.types.JL5MethodInstance;
 import polyglot.ext.jl5.types.JL5ParsedClassType;
 import polyglot.ext.jl5.types.JL5TypeSystem;
 import polyglot.types.ConstructorInstance;
 import polyglot.types.Flags;
 import polyglot.types.MethodInstance;
 import polyglot.types.SemanticException;
-import polyglot.types.Type;
 import polyglot.types.TypeSystem;
 import polyglot.util.CodeWriter;
 import polyglot.util.InternalCompilerError;
-import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
 import polyglot.visit.NodeVisitor;
 import polyglot.visit.PrettyPrinter;
 import polyglot.visit.TypeBuilder;
 import polyglot.visit.TypeChecker;
 
-public class JL5EnumDecl_c extends JL5ClassDecl_c implements JL5EnumDecl {
+public class JL5EnumDeclDel extends JL5ClassDeclDel {
     private static final long serialVersionUID = SerialVersionUID.generate();
-    protected boolean hasEnumConstant;
-
-    public JL5EnumDecl_c(Position pos, Flags flags,
-            List<AnnotationElem> annotations, Id name, TypeNode superClass,
-            List<TypeNode> interfaces, ClassBody body) {
-        super(pos, flags, annotations, name, superClass, interfaces, body);
-        this.hasEnumConstant = false;
-    }
 
     @Override
     public Node buildTypes(TypeBuilder tb) throws SemanticException {
-        JL5EnumDecl_c n = (JL5EnumDecl_c) super.buildTypes(tb);
+        ClassDecl n = (ClassDecl) super.buildTypes(tb);
+        JL5EnumDeclExt ext = (JL5EnumDeclExt) JL5Ext.ext(n);
 
         if (n.type().isMember()) {
             // it's a nested class
-            n = (JL5EnumDecl_c) n.flags(n.flags().Static());
+            n = n.flags(n.flags().Static());
             n.type().flags(n.type().flags().Static());
         }
 
         try {
             JL5TypeSystem ts = (JL5TypeSystem) tb.typeSystem();
-            return n.addEnumMethodTypesIfNeeded(ts);
+            return ext.addEnumMethodTypesIfNeeded(ts);
         }
         catch (RuntimeException e) {
             e.printStackTrace();
@@ -90,33 +79,35 @@ public class JL5EnumDecl_c extends JL5ClassDecl_c implements JL5EnumDecl {
 
     @Override
     public NodeVisitor typeCheckEnter(TypeChecker tc) throws SemanticException {
+        ClassDecl n = (ClassDecl) this.node();
         // figure out if this should be an abstract type.
         // need to do this before any anonymous subclasses are typechecked.
-        for (MethodInstance mi : type().methods()) {
+        for (MethodInstance mi : n.type().methods()) {
             if (!mi.flags().isAbstract()) continue;
 
             // mi is abstract! First, mark the class as abstract.
-            type().setFlags(type().flags().Abstract());
+            n.type().setFlags(n.type().flags().Abstract());
         }
         return super.typeCheckEnter(tc);
     }
 
     @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
-        if (flags().isAbstract()) {
+        ClassDecl n = (ClassDecl) this.node();
+        if (n.flags().isAbstract()) {
             throw new SemanticException("Enum types cannot have abstract modifier",
-                                        this.position());
+                                        n.position());
         }
-        if (flags().isPrivate() && !type().isNested()) {
+        if (n.flags().isPrivate() && !n.type().isNested()) {
             throw new SemanticException("Top level enum types cannot have private modifier",
-                                        this.position());
+                                        n.position());
         }
-        if (flags().isFinal()) {
+        if (n.flags().isFinal()) {
             throw new SemanticException("Enum types cannot have final modifier",
-                                        this.position());
+                                        n.position());
         }
 
-        for (ConstructorInstance ci : type().constructors()) {
+        for (ConstructorInstance ci : n.type().constructors()) {
             if (!JL5Flags.clearVarArgs(ci.flags().clear(Flags.PRIVATE))
                          .equals(Flags.NONE)) {
                 throw new SemanticException("Modifier "
@@ -129,31 +120,24 @@ public class JL5EnumDecl_c extends JL5ClassDecl_c implements JL5EnumDecl {
 
         // set the supertype appropraitely
         JL5TypeSystem ts = (JL5TypeSystem) tc.typeSystem();
-        if (ts.rawClass((JL5ParsedClassType) ts.Enum())
-              .equals(this.type().superType())) {
+        if (ts.rawClass((JL5ParsedClassType) ts.Enum()).equals(n.type()
+                                                                .superType())) {
             // the super class is currently a raw Enum.
             // instantiate Enum to on this type.
-            this.type()
-                .superType(ts.instantiate(this.position(),
-                                          (JL5ParsedClassType) ts.Enum(),
-                                          Collections.singletonList(this.type())));
+            n.type()
+             .superType(ts.instantiate(n.position(),
+                                       (JL5ParsedClassType) ts.Enum(),
+                                       Collections.singletonList(n.type())));
         }
 
-        ClassDecl n = (ClassDecl) super.typeCheck(tc);
+        n = (ClassDecl) super.typeCheck(tc);
         if (n.type().isMember()) {
             // it's a nested class
-            n = this.flags(this.flags().Static());
+            n = n.flags(n.flags().Static());
             n.type().flags(n.type().flags().Static());
         }
 
-        for (ClassMember m : this.body().members()) {
-            if (m instanceof EnumConstantDecl) {
-                this.hasEnumConstant = true;
-                break;
-            }
-        }
-
-        for (ClassMember m : this.body().members()) {
+        for (ClassMember m : n.body().members()) {
             if (m.memberInstance().flags().isAbstract()
                     && m instanceof MethodDecl) {
                 n.type().flags(n.type().flags().Abstract());
@@ -165,78 +149,43 @@ public class JL5EnumDecl_c extends JL5ClassDecl_c implements JL5EnumDecl {
     }
 
     @Override
-    protected Node addDefaultConstructor(TypeSystem ts, NodeFactory nf)
-            throws SemanticException {
-        ConstructorInstance ci = this.defaultCI;
+    public Node addDefaultConstructor(TypeSystem ts, NodeFactory nf,
+            ConstructorInstance defaultCI) throws SemanticException {
+        ClassDecl n = (ClassDecl) this.node();
+        ConstructorInstance ci = defaultCI;
         if (ci == null) {
             throw new InternalCompilerError("addDefaultConstructor called without defaultCI set");
         }
 
         //Default constructor of an enum is private 
         ConstructorDecl cd =
-                nf.ConstructorDecl(body().position().startOf(),
+                nf.ConstructorDecl(n.body().position().startOf(),
                                    Flags.PRIVATE,
-                                   name,
+                                   n.name(),
                                    Collections.<Formal> emptyList(),
                                    Collections.<TypeNode> emptyList(),
-                                   nf.Block(position().startOf()));
+                                   nf.Block(n.position().startOf()));
         cd = cd.constructorInstance(ci);
-        return body(body.addMember(cd));
+        return n.body(n.body().addMember(cd));
 
-    }
-
-    private Node addEnumMethodTypesIfNeeded(TypeSystem ts) {
-        JL5ParsedClassType ct = (JL5ParsedClassType) this.type();
-        JL5EnumDecl_c n = this;
-        if (ct.enumValueOfMethodNeeded()) {
-            n = n.addValueOfMethodType(ts);
-        }
-        if (ct.enumValuesMethodNeeded()) {
-            n = n.addValuesMethodType(ts);
-        }
-        return n;
-    }
-
-    protected JL5EnumDecl_c addValueOfMethodType(TypeSystem ts) {
-        Flags flags = Flags.PUBLIC.set(Flags.STATIC.set(Flags.FINAL));
-
-        // add valueOf method
-        JL5MethodInstance valueOfMI =
-                (JL5MethodInstance) ts.methodInstance(position(),
-                                                      this.type(),
-                                                      flags,
-                                                      this.type(),
-                                                      "valueOf",
-                                                      Collections.singletonList((Type) ts.String()),
-                                                      Collections.<Type> emptyList());
-        this.type.addMethod(valueOfMI);
-
-        return this;
-    }
-
-    protected JL5EnumDecl_c addValuesMethodType(TypeSystem ts) {
-        Flags flags = Flags.PUBLIC.set(Flags.STATIC.set(Flags.FINAL));
-
-        // add values method
-        JL5MethodInstance valuesMI =
-                (JL5MethodInstance) ts.methodInstance(position(),
-                                                      this.type(),
-                                                      flags.set(Flags.NATIVE),
-                                                      ts.arrayOf(this.type()),
-                                                      "values",
-                                                      Collections.<Type> emptyList(),
-                                                      Collections.<Type> emptyList());
-        this.type.addMethod(valuesMI);
-
-        return this;
     }
 
     @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
+        ClassDecl n = (ClassDecl) this.node();
         prettyPrintHeader(w, tr);
+
+        boolean hasEnumConstant = false;
+        for (ClassMember m : n.body().members()) {
+            if (m instanceof EnumConstantDecl) {
+                hasEnumConstant = true;
+                break;
+            }
+        }
+
         if (!hasEnumConstant) w.write(";");
-        print(body(), w, tr);
-        prettyPrintFooter(w, tr);
+        ((Node_c) n).print(n.body(), w, tr);
+        ((ClassDecl_c) n).prettyPrintFooter(w, tr);
     }
 
 }

@@ -239,10 +239,14 @@ public class JL5ToExtFactory_c extends ToExtFactory_c implements JL5ExtFactory {
         return new ElementValuePairArrayInitToExt_c();
     }
 
-    /* */
     @Override
     protected Ext extCallImpl() {
         return new JL5CallToExt_c();
+    }
+
+    @Override
+    protected Ext extConstructorCallImpl() {
+        return new JL5ConstructorCallToExt_c();
     }
 
     @Override

@@ -23,36 +23,60 @@
  *
  * See README for contributors.
  ******************************************************************************/
-package polyglot.ext.jl5.translate;
+package polyglot.ext.jl5.ast;
+
+import java.util.List;
 
 import polyglot.ast.MethodDecl;
-import polyglot.ast.Node;
-import polyglot.ext.jl5.ast.JL5Ext;
-import polyglot.ext.jl5.ast.JL5MethodDeclExt;
-import polyglot.ext.jl5.ast.JL5NodeFactory;
-import polyglot.translate.ExtensionRewriter;
-import polyglot.translate.ext.MethodDeclToExt_c;
-import polyglot.translate.ext.ToExt;
-import polyglot.types.SemanticException;
+import polyglot.ext.jl5.types.Annotations;
+import polyglot.ext.jl5.types.JL5MethodInstance;
+import polyglot.types.Declaration;
 import polyglot.util.SerialVersionUID;
 
-public class JL5MethodDeclToExt_c extends MethodDeclToExt_c implements ToExt {
+public class JL5MethodDeclExt extends JL5AnnotatedElementExt {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
-    @Override
-    public Node toExt(ExtensionRewriter rw) throws SemanticException {
-        MethodDecl n = (MethodDecl) node();
+    protected boolean compilerGenerated;
+    protected List<ParamTypeNode> typeParams;
+
+    public boolean isGeneric() {
+        if (!typeParams.isEmpty()) return true;
+        return false;
+    }
+
+    public boolean isCompilerGenerated() {
+        return compilerGenerated;
+    }
+
+    public MethodDecl setCompilerGenerated(boolean val) {
+        MethodDecl n = (MethodDecl) copy();
         JL5MethodDeclExt ext = (JL5MethodDeclExt) JL5Ext.ext(n);
-        JL5NodeFactory to_nf = (JL5NodeFactory) rw.to_nf();
-        return to_nf.MethodDecl(n.position(),
-                                n.flags(),
-                                ext.annotationElems(),
-                                n.returnType(),
-                                n.id(),
-                                n.formals(),
-                                n.throwTypes(),
-                                n.body(),
-                                ext.typeParams());
+        ext.compilerGenerated = val;
+        return n;
+    }
+
+    public List<ParamTypeNode> typeParams() {
+        return this.typeParams;
+    }
+
+    public MethodDecl typeParams(List<ParamTypeNode> typeParams) {
+        MethodDecl n = (MethodDecl) copy();
+        JL5MethodDeclExt ext = (JL5MethodDeclExt) JL5Ext.ext(n);
+        ext.typeParams = typeParams;
+        return n;
+    }
+
+    @Override
+    protected Declaration declaration() {
+        MethodDecl n = (MethodDecl) this.node();
+        return n.methodInstance();
+
+    }
+
+    @Override
+    public void setAnnotations(Annotations annotations) {
+        MethodDecl n = (MethodDecl) this.node();
+        ((JL5MethodInstance) n.methodInstance()).setAnnotations(annotations);
     }
 
 }

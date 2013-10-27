@@ -39,7 +39,7 @@ import polyglot.types.ParsedClassType;
 /**
  * Declaration of an enum constant.
  */
-public interface EnumConstantDecl extends ClassMember, AnnotatedElement {
+public interface EnumConstantDecl extends ClassMember {
     /** get args */
     List<Expr> args();
 

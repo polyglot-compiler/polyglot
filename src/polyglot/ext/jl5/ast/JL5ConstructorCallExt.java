@@ -25,6 +25,37 @@
  ******************************************************************************/
 package polyglot.ext.jl5.ast;
 
-public interface JL5EnumDecl extends JL5ClassDecl {
+import java.util.List;
 
+import polyglot.ast.ConstructorCall;
+import polyglot.ast.TypeNode;
+import polyglot.util.SerialVersionUID;
+
+public class JL5ConstructorCallExt extends JL5Ext {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
+    /**
+     * Is this constructor call a super call to java.lang.Enum?
+     */
+    protected boolean isEnumConstructorCall;
+
+    protected List<TypeNode> typeArgs;
+
+    public List<TypeNode> typeArgs() {
+        return this.typeArgs;
+    }
+
+    public ConstructorCall typeArgs(List<TypeNode> typeArgs) {
+        if (this.typeArgs == typeArgs) {
+            return (ConstructorCall) this.node();
+        }
+        ConstructorCall n = (ConstructorCall) this.node().copy();
+        JL5ConstructorCallExt ext = (JL5ConstructorCallExt) JL5Ext.ext(n);
+        ext.typeArgs = typeArgs;
+        return n;
+    }
+
+    public boolean isEnumConstructorCall() {
+        return this.isEnumConstructorCall;
+    }
 }

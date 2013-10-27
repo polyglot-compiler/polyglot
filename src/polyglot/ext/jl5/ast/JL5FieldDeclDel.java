@@ -25,8 +25,23 @@
  ******************************************************************************/
 package polyglot.ext.jl5.ast;
 
-import polyglot.ast.Formal;
+import polyglot.util.CodeWriter;
+import polyglot.util.SerialVersionUID;
+import polyglot.visit.PrettyPrinter;
 
-public interface JL5Formal extends Formal, AnnotatedElement {
-    boolean isVarArg();
+public class JL5FieldDeclDel extends JL5AnnotatedElementDel {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
+    @Override
+    public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
+        JL5AnnotatedElementExt ext =
+                (JL5AnnotatedElementExt) JL5Ext.ext(this.node());
+        for (AnnotationElem ae : ext.annotationElems()) {
+            ae.del().prettyPrint(w, tr);
+            w.newline();
+        }
+
+        super.prettyPrint(w, tr);
+    }
+
 }

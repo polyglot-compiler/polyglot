@@ -1,6 +1,8 @@
 package polyglot.ext.jl5.translate;
 
-import polyglot.ext.jl5.ast.JL5LocalDecl_c;
+import polyglot.ast.LocalDecl;
+import polyglot.ext.jl5.ast.JL5Ext;
+import polyglot.ext.jl5.ast.JL5LocalDeclExt;
 import polyglot.translate.ExtensionRewriter;
 import polyglot.translate.ext.LocalDeclToExt_c;
 import polyglot.translate.ext.ToExt;
@@ -18,7 +20,8 @@ public class JL5LocalDeclToJL_c extends LocalDeclToExt_c implements ToExt {
     public NodeVisitor toExtEnter(ExtensionRewriter rw)
             throws SemanticException {
         // Skip annotations
-        JL5LocalDecl_c cd = (JL5LocalDecl_c) node();
-        return rw.bypass(cd.annotationElems());
+        LocalDecl n = (LocalDecl) node();
+        JL5LocalDeclExt ext = (JL5LocalDeclExt) JL5Ext.ext(n);
+        return rw.bypass(ext.annotationElems());
     }
 }

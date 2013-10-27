@@ -35,6 +35,7 @@ import polyglot.ast.Node;
 import polyglot.ast.NodeFactory;
 import polyglot.ext.jl5.ast.AnnotatedElement;
 import polyglot.ext.jl5.ast.AnnotationElem;
+import polyglot.ext.jl5.ast.JL5Ext;
 import polyglot.ext.jl5.types.AnnotationElementValue;
 import polyglot.ext.jl5.types.AnnotationElementValueArray;
 import polyglot.ext.jl5.types.AnnotationElementValueConstant;
@@ -72,8 +73,9 @@ public class AnnotationChecker extends ContextVisitor {
     @Override
     protected Node leaveCall(Node old, Node n, NodeVisitor v)
             throws SemanticException {
-        if (n instanceof AnnotatedElement) {
-            AnnotatedElement ae = (AnnotatedElement) n;
+        JL5Ext ext = JL5Ext.ext(n);
+        if (ext instanceof AnnotatedElement) {
+            AnnotatedElement ae = (AnnotatedElement) ext;
             return ae.annotationCheck((AnnotationChecker) v);
         }
         return n;

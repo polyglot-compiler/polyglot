@@ -50,6 +50,46 @@ public class JL5ExtFactory_c extends AbstractExtFactory_c implements
     }
 
     @Override
+    protected Ext extConstructorCallImpl() {
+        return new JL5ConstructorCallExt();
+    }
+
+    @Override
+    protected Ext extFormalImpl() {
+        return new JL5FormalExt();
+    }
+
+    @Override
+    protected Ext extCallImpl() {
+        return new JL5CallExt();
+    }
+
+    @Override
+    protected Ext extFieldDeclImpl() {
+        return new JL5FieldDeclExt();
+    }
+
+    @Override
+    protected Ext extLocalDeclImpl() {
+        return new JL5LocalDeclExt();
+    }
+
+    @Override
+    protected Ext extClassDeclImpl() {
+        return new JL5ClassDeclExt();
+    }
+
+    @Override
+    protected Ext extConstructorDeclImpl() {
+        return new JL5ConstructorDeclExt();
+    }
+
+    @Override
+    protected Ext extMethodDeclImpl() {
+        return new JL5MethodDeclExt();
+    }
+
+    @Override
     public Ext extEnumDecl() {
         Ext e = extEnumDeclImpl();
 
@@ -171,7 +211,7 @@ public class JL5ExtFactory_c extends AbstractExtFactory_c implements
     }
 
     protected Ext extEnumDeclImpl() {
-        return this.extClassDeclImpl();
+        return new JL5EnumDeclExt();
     }
 
     protected Ext extExtendedForImpl() {
@@ -179,7 +219,7 @@ public class JL5ExtFactory_c extends AbstractExtFactory_c implements
     }
 
     protected Ext extEnumConstantDeclImpl() {
-        return this.extClassMemberImpl();
+        return new EnumConstantDeclExt();
     }
 
     protected Ext extEnumConstantImpl() {

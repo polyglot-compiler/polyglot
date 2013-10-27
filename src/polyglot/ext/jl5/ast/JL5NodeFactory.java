@@ -30,13 +30,16 @@ import java.util.List;
 import polyglot.ast.Block;
 import polyglot.ast.Call;
 import polyglot.ast.ClassBody;
+import polyglot.ast.ClassDecl;
 import polyglot.ast.ConstructorCall;
 import polyglot.ast.ConstructorCall.Kind;
+import polyglot.ast.ConstructorDecl;
 import polyglot.ast.Expr;
 import polyglot.ast.FieldDecl;
 import polyglot.ast.Formal;
 import polyglot.ast.Id;
 import polyglot.ast.LocalDecl;
+import polyglot.ast.MethodDecl;
 import polyglot.ast.New;
 import polyglot.ast.NodeFactory;
 import polyglot.ast.Receiver;
@@ -50,7 +53,7 @@ import polyglot.util.Position;
  * NodeFactory for jl5 extension.
  */
 public interface JL5NodeFactory extends NodeFactory {
-    JL5EnumDecl EnumDecl(Position pos, Flags flags,
+    ClassDecl EnumDecl(Position pos, Flags flags,
             List<AnnotationElem> annotations, Id name, TypeNode superType,
             List<TypeNode> interfaces, ClassBody body);
 
@@ -63,17 +66,17 @@ public interface JL5NodeFactory extends NodeFactory {
 
     ParamTypeNode ParamTypeNode(Position pos, List<TypeNode> bounds, Id id);
 
-    JL5ClassDecl ClassDecl(Position pos, Flags flags,
+    ClassDecl ClassDecl(Position pos, Flags flags,
             List<AnnotationElem> annotations, Id name, TypeNode superType,
             List<TypeNode> interfaces, ClassBody body,
             List<ParamTypeNode> paramTypes);
 
-    JL5ConstructorDecl ConstructorDecl(Position pos, Flags flags,
+    ConstructorDecl ConstructorDecl(Position pos, Flags flags,
             List<AnnotationElem> annotations, Id name, List<Formal> formals,
             List<TypeNode> throwTypes, Block body,
             List<ParamTypeNode> typeParams);
 
-    JL5MethodDecl MethodDecl(Position pos, Flags flags,
+    MethodDecl MethodDecl(Position pos, Flags flags,
             List<AnnotationElem> annotations, TypeNode returnType, Id name,
             List<Formal> formals, List<TypeNode> throwTypes, Block body,
             List<ParamTypeNode> typeParams);
@@ -119,7 +122,11 @@ public interface JL5NodeFactory extends NodeFactory {
             TypeNode objectType, List<Expr> args, ClassBody body);
 
     ConstructorCall ConstructorCall(Position pos, Kind kind, Expr outer,
-            List<? extends Expr> args, boolean isEnumSuperCall);
+            List<Expr> args, boolean isEnumSuperCall);
+
+    ConstructorCall ConstructorCall(Position pos, Kind kind,
+            List<TypeNode> typeArgs, Expr outer, List<Expr> args,
+            boolean isEnumSuperCall);
 
     ConstructorCall ThisCall(Position pos, List<TypeNode> typeArgs,
             List<Expr> args);

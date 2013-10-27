@@ -60,7 +60,8 @@ import polyglot.visit.TypeChecker;
 /**
  * A method declaration.
  */
-public class MethodDecl_c extends Term_c implements MethodDecl {
+public class MethodDecl_c extends Term_c implements MethodDecl,
+        ProcedureDeclOps {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
     protected Flags flags;
@@ -396,7 +397,7 @@ public class MethodDecl_c extends Term_c implements MethodDecl {
         return this;
     }
 
-    protected void throwsCheck(TypeChecker tc) throws SemanticException {
+    public void throwsCheck(TypeChecker tc) throws SemanticException {
         TypeSystem ts = tc.typeSystem();
         for (TypeNode tn : throwTypes()) {
             Type t = tn.type();
@@ -410,7 +411,7 @@ public class MethodDecl_c extends Term_c implements MethodDecl {
         }
     }
 
-    protected void overrideMethodCheck(TypeChecker tc) throws SemanticException {
+    public void overrideMethodCheck(TypeChecker tc) throws SemanticException {
         TypeSystem ts = tc.typeSystem();
 
         for (MethodInstance mj : mi.implemented()) {
@@ -435,6 +436,7 @@ public class MethodDecl_c extends Term_c implements MethodDecl {
     }
 
     /** Write the method to an output file. */
+    @Override
     public void prettyPrintHeader(Flags flags, CodeWriter w, PrettyPrinter tr) {
         w.begin(0);
         w.write(flags.translate());
@@ -478,7 +480,7 @@ public class MethodDecl_c extends Term_c implements MethodDecl {
 
     @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
-        prettyPrintHeader(flags(), w, tr);
+        ((ProcedureDeclOps) del()).prettyPrintHeader(flags(), w, tr);
 
         if (body != null) {
             printSubStmt(body, w, tr);

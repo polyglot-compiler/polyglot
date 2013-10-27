@@ -60,7 +60,9 @@ import polyglot.ast.Switch;
 import polyglot.ast.TypeNode;
 import polyglot.ext.jl5.JL5Options;
 import polyglot.ext.jl5.ast.EnumConstantDecl;
-import polyglot.ext.jl5.ast.JL5EnumDecl;
+import polyglot.ext.jl5.ast.JL5ClassDeclExt;
+import polyglot.ext.jl5.ast.JL5EnumDeclExt;
+import polyglot.ext.jl5.ast.JL5Ext;
 import polyglot.ext.jl5.types.EnumInstance;
 import polyglot.ext.jl5.types.JL5Flags;
 import polyglot.ext.jl5.types.JL5LocalInstance;
@@ -130,8 +132,11 @@ public class RemoveEnums extends ContextVisitor {
         if (n instanceof ClassBody) {
             this.classMembersToAdd.push(new ArrayList<ClassMember>());
         }
-        if (n instanceof JL5EnumDecl) {
-            return this.inEnumDecl(((JL5EnumDecl) n).type());
+        if (n instanceof ClassDecl) {
+            JL5ClassDeclExt ext = (JL5ClassDeclExt) JL5Ext.ext(n);
+            if (ext instanceof JL5EnumDeclExt) {
+                return this.inEnumDecl(((ClassDecl) n).type());
+            }
         }
         return super.enterCall(n);
 
@@ -149,8 +154,8 @@ public class RemoveEnums extends ContextVisitor {
         if (n instanceof ClassBody) {
             n = addWaitingClassMembers((ClassBody) n);
         }
-        if (n instanceof JL5EnumDecl) {
-            return translateEnumDecl((JL5EnumDecl) n);
+        if (n instanceof ClassDecl && JL5Ext.ext(n) instanceof JL5EnumDeclExt) {
+            return translateEnumDecl((ClassDecl) n);
         }
         if (n instanceof EnumConstantDecl) {
             return translateEnumConstantDecl((EnumConstantDecl) n);
@@ -200,8 +205,7 @@ public class RemoveEnums extends ContextVisitor {
      * Translate an enum declaration to java 1.4 features.
      * Creates a new ClassDecl. 
      */
-    private Node translateEnumDecl(JL5EnumDecl enumDecl)
-            throws SemanticException {
+    private Node translateEnumDecl(ClassDecl enumDecl) throws SemanticException {
         ClassBody body = enumDecl.body();
 
         body = addEnumUtilityMembers(body, enumDecl.type());

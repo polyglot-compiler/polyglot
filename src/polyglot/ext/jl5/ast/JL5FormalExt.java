@@ -25,18 +25,33 @@
  ******************************************************************************/
 package polyglot.ext.jl5.ast;
 
-import java.util.List;
+import polyglot.ast.Formal;
+import polyglot.ext.jl5.types.Annotations;
+import polyglot.ext.jl5.types.JL5LocalInstance;
+import polyglot.types.Declaration;
+import polyglot.util.SerialVersionUID;
 
-import polyglot.ast.MethodDecl;
+public class JL5FormalExt extends JL5AnnotatedElementExt implements
+        AnnotatedElement {
+    private static final long serialVersionUID = SerialVersionUID.generate();
 
-public interface JL5MethodDecl extends MethodDecl, AnnotatedElement {
+    protected boolean isVarArg = false;
 
-    public boolean isCompilerGenerated();
+    public boolean isVarArg() {
+        return isVarArg;
+    }
 
-    public JL5MethodDecl setCompilerGenerated(boolean val);
+    @Override
+    public void setAnnotations(Annotations annotations) {
+        Formal f = (Formal) this.node();
+        JL5LocalInstance li = (JL5LocalInstance) f.localInstance();
+        li.setAnnotations(annotations);
+    }
 
-    public List<ParamTypeNode> typeParams();
-
-    public JL5MethodDecl typeParams(List<ParamTypeNode> typeParams);
+    @Override
+    protected Declaration declaration() {
+        Formal f = (Formal) this.node();
+        return f.localInstance();
+    }
 
 }

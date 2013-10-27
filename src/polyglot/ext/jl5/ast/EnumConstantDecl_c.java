@@ -37,11 +37,9 @@ import polyglot.ast.Id;
 import polyglot.ast.Node;
 import polyglot.ast.Term;
 import polyglot.ast.Term_c;
-import polyglot.ext.jl5.types.Annotations;
 import polyglot.ext.jl5.types.EnumInstance;
 import polyglot.ext.jl5.types.JL5ParsedClassType;
 import polyglot.ext.jl5.types.JL5TypeSystem;
-import polyglot.ext.jl5.visit.AnnotationChecker;
 import polyglot.types.ConstructorInstance;
 import polyglot.types.Context;
 import polyglot.types.Flags;
@@ -78,20 +76,14 @@ public class EnumConstantDecl_c extends Term_c implements EnumConstantDecl {
     protected ConstructorInstance constructorInstance;
     protected ParsedClassType type;
     protected long ordinal;
-    protected List<AnnotationElem> annotations;
 
-    public EnumConstantDecl_c(Position pos, Flags flags,
-            List<AnnotationElem> annotations, Id name, List<Expr> args,
-            ClassBody body) {
+    public EnumConstantDecl_c(Position pos, Flags flags, Id name,
+            List<Expr> args, ClassBody body) {
         super(pos);
         this.name = name;
         this.args = args;
         this.body = body;
         this.flags = flags;
-        if (annotations == null) {
-            annotations = Collections.emptyList();
-        }
-        this.annotations = annotations;
     }
 
     @Override
@@ -103,18 +95,6 @@ public class EnumConstantDecl_c extends Term_c implements EnumConstantDecl {
     public EnumConstantDecl ordinal(long ordinal) {
         EnumConstantDecl_c n = (EnumConstantDecl_c) copy();
         n.ordinal = ordinal;
-        return n;
-    }
-
-    @Override
-    public List<AnnotationElem> annotationElems() {
-        return this.annotations;
-    }
-
-    @Override
-    public EnumConstantDecl annotationElems(List<AnnotationElem> annotations) {
-        EnumConstantDecl_c n = (EnumConstantDecl_c) copy();
-        n.annotations = annotations;
         return n;
     }
 
@@ -208,12 +188,14 @@ public class EnumConstantDecl_c extends Term_c implements EnumConstantDecl {
 
     protected EnumConstantDecl_c reconstruct(List<Expr> args, ClassBody body,
             List<AnnotationElem> annotations) {
+        EnumConstantDeclExt ext = (EnumConstantDeclExt) JL5Ext.ext(this);
         if (!CollectionUtil.equals(args, this.args) || body != this.body
-                || !CollectionUtil.equals(annotations, this.annotations)) {
+                || !CollectionUtil.equals(annotations, ext.annotationElems())) {
             EnumConstantDecl_c n = (EnumConstantDecl_c) copy();
+            EnumConstantDeclExt newext = (EnumConstantDeclExt) JL5Ext.ext(this);
             n.args = ListUtil.<Expr> copy(args, true);
             n.body = body;
-            n.annotations = ListUtil.copy(annotations, true);
+            newext.annotations = ListUtil.copy(annotations, true);
             return n;
         }
         return this;
@@ -221,9 +203,10 @@ public class EnumConstantDecl_c extends Term_c implements EnumConstantDecl {
 
     @Override
     public Node visitChildren(NodeVisitor v) {
+        EnumConstantDeclExt ext = (EnumConstantDeclExt) JL5Ext.ext(this);
         List<Expr> args = visitList(this.args, v);
         ClassBody body = (ClassBody) visitChild(this.body, v);
-        List<AnnotationElem> annotations = visitList(this.annotations, v);
+        List<AnnotationElem> annotations = visitList(ext.annotations, v);
         return reconstruct(args, body, annotations);
     }
 
@@ -336,9 +319,10 @@ public class EnumConstantDecl_c extends Term_c implements EnumConstantDecl {
         }
 
         // Now visit the annotations
+        EnumConstantDeclExt ext = (EnumConstantDeclExt) JL5Ext.ext(nn);
         nn =
-                (EnumConstantDecl) nn.annotationElems(nn.visitList(nn.annotationElems(),
-                                                                   childbd));
+                (EnumConstantDecl) ext.annotationElems(nn.visitList(ext.annotationElems(),
+                                                                    childbd));
 
         nn = (EnumConstantDecl) bd.leave(parent, old, nn, childbd);
 
@@ -366,7 +350,8 @@ public class EnumConstantDecl_c extends Term_c implements EnumConstantDecl {
                     + " on enum constant declaration", this.position());
         }
 
-        ts.checkDuplicateAnnotations(n.annotationElems());
+        EnumConstantDeclExt ext = (EnumConstantDeclExt) JL5Ext.ext(n);
+        ts.checkDuplicateAnnotations(ext.annotationElems());
 
         if (this.body != null) {
             ts.checkClassConformance(type);
@@ -400,7 +385,8 @@ public class EnumConstantDecl_c extends Term_c implements EnumConstantDecl {
 
     @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
-        for (AnnotationElem ae : annotations) {
+        EnumConstantDeclExt ext = (EnumConstantDeclExt) JL5Ext.ext(this);
+        for (AnnotationElem ae : ext.annotationElems()) {
             ae.del().prettyPrint(w, tr);
             w.newline();
         }
@@ -436,16 +422,4 @@ public class EnumConstantDecl_c extends Term_c implements EnumConstantDecl {
         return this;
     }
 
-    @Override
-    public Node annotationCheck(AnnotationChecker ac) throws SemanticException {
-        for (AnnotationElem elem : annotations) {
-            ac.checkAnnotationApplicability(elem, this.enumInstance());
-        }
-        return this;
-    }
-
-    @Override
-    public void setAnnotations(Annotations annotations) {
-        this.enumInstance.setAnnotations(annotations);
-    }
 }

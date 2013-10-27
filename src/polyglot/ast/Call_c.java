@@ -61,7 +61,7 @@ import polyglot.visit.TypeChecker;
  * It may also have either a Type upon which the method is being
  * called or an expression upon which the method is being called.
  */
-public class Call_c extends Expr_c implements Call {
+public class Call_c extends Expr_c implements Call, CallOps {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
     protected Receiver target;
@@ -227,7 +227,8 @@ public class Call_c extends Expr_c implements Call {
      * 
      * @param argTypes list of <code>Type</code>s of the arguments
      */
-    protected Node typeCheckNullTarget(TypeChecker tc, List<Type> argTypes)
+    @Override
+    public Node typeCheckNullTarget(TypeChecker tc, List<Type> argTypes)
             throws SemanticException {
         TypeSystem ts = tc.typeSystem();
         NodeFactory nf = tc.nodeFactory();
@@ -241,7 +242,7 @@ public class Call_c extends Expr_c implements Call {
 
         Receiver r;
         if (mi.flags().isStatic()) {
-            Type container = findContainer(ts, mi);
+            Type container = ((CallOps) del()).findContainer(ts, mi);
             r =
                     nf.CanonicalTypeNode(position().startOf(), container)
                       .type(container);
@@ -275,7 +276,8 @@ public class Call_c extends Expr_c implements Call {
      * Should return the container of the method instance. 
      * 
      */
-    protected Type findContainer(TypeSystem ts, MethodInstance mi) {
+    @Override
+    public Type findContainer(TypeSystem ts, MethodInstance mi) {
         return ts.staticTarget(mi.container());
     }
 
@@ -295,14 +297,14 @@ public class Call_c extends Expr_c implements Call {
         }
 
         if (this.target == null) {
-            return this.typeCheckNullTarget(tc, argTypes);
+            return ((CallOps) del()).typeCheckNullTarget(tc, argTypes);
         }
 
         if (!this.target.type().isCanonical()) {
             return this;
         }
 
-        ReferenceType targetType = this.findTargetType();
+        ReferenceType targetType = ((CallOps) del()).findTargetType();
         MethodInstance mi =
                 ts.findMethod(targetType,
                               this.name.id(),
@@ -337,7 +339,8 @@ public class Call_c extends Expr_c implements Call {
         return call;
     }
 
-    protected ReferenceType findTargetType() throws SemanticException {
+    @Override
+    public ReferenceType findTargetType() throws SemanticException {
         Type t = target.type();
         if (t.isReference()) {
             return t.toReference();

@@ -23,43 +23,54 @@
  *
  * See README for contributors.
  ******************************************************************************/
-package polyglot.ext.jl5.translate;
+package polyglot.ext.jl5.ast;
 
-import polyglot.ast.ClassDecl;
+import java.util.List;
+
 import polyglot.ast.Node;
-import polyglot.ext.jl5.ast.JL5ClassDeclExt;
-import polyglot.ext.jl5.ast.JL5Ext;
-import polyglot.ext.jl5.types.JL5Flags;
-import polyglot.translate.ExtensionRewriter;
-import polyglot.translate.ext.ClassDeclToExt_c;
+import polyglot.ext.jl5.types.JL5TypeSystem;
 import polyglot.types.SemanticException;
+import polyglot.util.CollectionUtil;
 import polyglot.util.SerialVersionUID;
 import polyglot.visit.NodeVisitor;
+import polyglot.visit.TypeChecker;
 
-public class JL5ClassDeclToJL_c extends ClassDeclToExt_c {
+public abstract class JL5AnnotatedElementDel extends JL5Del {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
     @Override
-    public NodeVisitor toExtEnter(ExtensionRewriter rw)
-            throws SemanticException {
-        //Skip annotations and parameter nodes
-        ClassDecl cd = (ClassDecl) node();
-        JL5ClassDeclExt ext = (JL5ClassDeclExt) JL5Ext.ext(cd);
-        rw = (ExtensionRewriter) rw.bypass(ext.annotationElems());
-        rw = (ExtensionRewriter) rw.bypass(ext.paramTypes());
-        return rw;
+    public Node visitChildren(NodeVisitor v) {
+        Node newN = super.visitChildren(v);
+        JL5AnnotatedElementExt newext =
+                (JL5AnnotatedElementExt) JL5Ext.ext(newN);
+
+        List<AnnotationElem> annots =
+                newN.visitList(newext.annotationElems(), v);
+
+        if (!CollectionUtil.equals(annots, newext.annotationElems())) {
+            // the annotations changed! Let's update the node.
+            if (newN == this.node()) {
+                // we need to create a copy.
+                newN = (Node) newN.copy();
+                newext = (JL5AnnotatedElementExt) JL5Ext.ext(newN);
+            }
+            else {
+                // the call to super.visitChildren(v) already
+                // created a copy of the node (and thus of its extension).
+            }
+            newext.annotations = annots;
+        }
+        return newN;
     }
 
     @Override
-    public Node toExt(ExtensionRewriter rw) throws SemanticException {
-        ClassDecl cd = (ClassDecl) node();
-        return rw.to_nf()
-                 .ClassDecl(cd.position(),
-                            JL5Flags.clearAnnotation(JL5Flags.clearEnum(cd.flags())),
-                            cd.id(),
-                            cd.superClass(),
-                            cd.interfaces(),
-                            cd.body());
-    }
+    public Node typeCheck(TypeChecker tc) throws SemanticException {
+        JL5AnnotatedElementExt ext =
+                (JL5AnnotatedElementExt) JL5Ext.ext(this.node());
 
+        JL5TypeSystem ts = (JL5TypeSystem) tc.typeSystem();
+        ts.checkDuplicateAnnotations(ext.annotationElems());
+        return super.typeCheck(tc);
+
+    }
 }

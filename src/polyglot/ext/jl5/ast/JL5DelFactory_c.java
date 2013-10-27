@@ -166,7 +166,7 @@ public class JL5DelFactory_c extends AbstractDelFactory_c implements
     }
 
     public JL delEnumDeclImpl() {
-        return this.delClassDeclImpl();
+        return new JL5EnumDeclDel();
     }
 
     public JL delExtendedForImpl() {
@@ -211,6 +211,16 @@ public class JL5DelFactory_c extends AbstractDelFactory_c implements
     }
 
     @Override
+    protected JL delConstructorCallImpl() {
+        return new JL5ConstructorCallDel();
+    }
+
+    @Override
+    protected JL delCallImpl() {
+        return new JL5CallDel();
+    }
+
+    @Override
     protected JL delSwitchImpl() {
         return new JL5SwitchDel();
     }
@@ -223,6 +233,36 @@ public class JL5DelFactory_c extends AbstractDelFactory_c implements
     @Override
     protected JL delConditionalImpl() {
         return new JL5ConditionalDel();
+    }
+
+    @Override
+    protected JL delFormalImpl() {
+        return new JL5FormalDel();
+    }
+
+    @Override
+    protected JL delFieldDeclImpl() {
+        return new JL5FieldDeclDel();
+    }
+
+    @Override
+    protected JL delLocalDeclImpl() {
+        return new JL5LocalDeclDel();
+    }
+
+    @Override
+    protected JL delClassDeclImpl() {
+        return new JL5ClassDeclDel();
+    }
+
+    @Override
+    protected JL delMethodDeclImpl() {
+        return new JL5MethodDeclDel();
+    }
+
+    @Override
+    protected JL delConstructorDeclImpl() {
+        return new JL5ConstructorDeclDel();
     }
 
     @Override

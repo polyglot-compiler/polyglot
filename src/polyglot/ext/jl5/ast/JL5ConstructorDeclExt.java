@@ -27,12 +27,41 @@ package polyglot.ext.jl5.ast;
 
 import java.util.List;
 
-import polyglot.ast.ConstructorCall;
-import polyglot.ast.TypeNode;
+import polyglot.ast.ConstructorDecl;
+import polyglot.ext.jl5.types.Annotations;
+import polyglot.ext.jl5.types.JL5ConstructorInstance;
+import polyglot.types.Declaration;
+import polyglot.util.SerialVersionUID;
 
-public interface JL5ConstructorCall extends ConstructorCall {
-    List<TypeNode> typeArgs();
+public class JL5ConstructorDeclExt extends JL5AnnotatedElementExt {
+    private static final long serialVersionUID = SerialVersionUID.generate();
 
-    JL5ConstructorCall typeArgs(List<TypeNode> typeArgs);
+    protected List<ParamTypeNode> typeParams;
+
+    public List<ParamTypeNode> typeParams() {
+        return this.typeParams;
+    }
+
+    public ConstructorDecl typeParams(List<ParamTypeNode> typeParams) {
+
+        ConstructorDecl n = (ConstructorDecl) this.node().copy();
+        JL5ConstructorDeclExt ext = (JL5ConstructorDeclExt) JL5Ext.ext(n);
+        ext.typeParams = typeParams;
+        return n;
+    }
+
+    @Override
+    public void setAnnotations(Annotations annotations) {
+        ConstructorDecl cd = (ConstructorDecl) this.node();
+        JL5ConstructorInstance ci =
+                (JL5ConstructorInstance) cd.constructorInstance();
+        ci.setAnnotations(annotations);
+    }
+
+    @Override
+    protected Declaration declaration() {
+        ConstructorDecl cd = (ConstructorDecl) this.node();
+        return cd.constructorInstance();
+    }
 
 }

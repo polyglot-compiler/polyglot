@@ -27,10 +27,42 @@ package polyglot.ext.jl5.ast;
 
 import java.util.List;
 
-import polyglot.ast.ClassDecl;
+import polyglot.ast.Call;
+import polyglot.ast.TypeNode;
+import polyglot.types.Type;
+import polyglot.util.SerialVersionUID;
 
-public interface JL5ClassDecl extends ClassDecl, AnnotatedElement {
-    List<ParamTypeNode> paramTypes();
+public class JL5CallExt extends JL5Ext {
+    private static final long serialVersionUID = SerialVersionUID.generate();
 
-    JL5ClassDecl paramTypes(List<ParamTypeNode> types);
+    protected List<TypeNode> typeArgs;
+
+    public List<TypeNode> typeArgs() {
+        return this.typeArgs;
+    }
+
+    public Call typeArgs(List<TypeNode> typeArgs) {
+        if (this.typeArgs == typeArgs) {
+            return (Call) this.node();
+        }
+        Call n = (Call) this.node().copy();
+        JL5CallExt ext = (JL5CallExt) JL5Ext.ext(n);
+        ext.typeArgs = typeArgs;
+        return n;
+    }
+
+    private transient Type expectedReturnType = null;
+
+    protected Type expectedReturnType() {
+        return this.expectedReturnType;
+    }
+
+    protected void setExpectedReturnType(Type type) {
+        if (type == null || !type.isCanonical()) {
+            expectedReturnType = null;
+            return;
+        }
+        expectedReturnType = type;
+    }
+
 }

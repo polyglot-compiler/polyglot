@@ -25,7 +25,9 @@
  ******************************************************************************/
 package polyglot.ext.jl5.translate;
 
-import polyglot.ext.jl5.ast.JL5MethodDecl;
+import polyglot.ast.MethodDecl;
+import polyglot.ext.jl5.ast.JL5Ext;
+import polyglot.ext.jl5.ast.JL5MethodDeclExt;
 import polyglot.translate.ExtensionRewriter;
 import polyglot.translate.ext.MethodDeclToExt_c;
 import polyglot.translate.ext.ToExt;
@@ -40,8 +42,9 @@ public class JL5MethodDeclToJL_c extends MethodDeclToExt_c implements ToExt {
     public NodeVisitor toExtEnter(ExtensionRewriter rw)
             throws SemanticException {
         //Skip annotations and parameter nodes
-        JL5MethodDecl cd = (JL5MethodDecl) node();
-        rw = (ExtensionRewriter) rw.bypass(cd.annotationElems());
-        return rw.bypass(cd.typeParams());
+        MethodDecl cd = (MethodDecl) node();
+        JL5MethodDeclExt ext = (JL5MethodDeclExt) JL5Ext.ext(cd);
+        rw = (ExtensionRewriter) rw.bypass(ext.annotationElems());
+        return rw.bypass(ext.typeParams());
     }
 }

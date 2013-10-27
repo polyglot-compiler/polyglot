@@ -33,6 +33,7 @@ import java.util.Map;
 import polyglot.ast.Node;
 import polyglot.ext.jl5.ast.AnnotatedElement;
 import polyglot.ext.jl5.ast.AnnotationElem;
+import polyglot.ext.jl5.ast.JL5Ext;
 import polyglot.ext.jl5.types.AnnotationElementValue;
 import polyglot.ext.jl5.types.Annotations;
 import polyglot.ext.jl5.types.JL5TypeSystem;
@@ -59,11 +60,12 @@ public class ResolveAnnotationsVisitor extends ContextVisitor {
     @Override
     protected Node leaveCall(Node old, Node n, NodeVisitor v)
             throws SemanticException {
-        if (n instanceof AnnotatedElement) {
-            AnnotatedElement ae = (AnnotatedElement) n;
+        JL5Ext ext = JL5Ext.ext(n);
+        if (ext instanceof AnnotatedElement) {
+            AnnotatedElement aext = (AnnotatedElement) ext;
             List<AnnotationElem> newElems =
-                    new ArrayList<AnnotationElem>(ae.annotationElems().size());
-            for (AnnotationElem elem : ae.annotationElems()) {
+                    new ArrayList<AnnotationElem>(aext.annotationElems().size());
+            for (AnnotationElem elem : aext.annotationElems()) {
                 // type check elem
                 TypeChecker tc =
                         new TypeChecker(this.job(),
@@ -81,9 +83,9 @@ public class ResolveAnnotationsVisitor extends ContextVisitor {
                 }
                 newElems.add(elem);
             }
-            ae = ae.annotationElems(newElems);
-            ae.setAnnotations(createAnnotations(newElems, n.position()));
-            return (Node) ae;
+            n = aext.annotationElems(newElems);
+            aext.setAnnotations(createAnnotations(newElems, n.position()));
+            return n;
         }
         return n;
     }

@@ -63,7 +63,7 @@ import polyglot.visit.TypeChecker;
  * or interface. It may be a public or other top-level class, or an inner
  * named class, or an anonymous class.
  */
-public class ClassDecl_c extends Term_c implements ClassDecl {
+public class ClassDecl_c extends Term_c implements ClassDecl, ClassDeclOps {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
     protected Flags flags;
@@ -427,7 +427,9 @@ public class ClassDecl_c extends Term_c implements ClassDecl {
     protected Node addDefaultConstructorIfNeeded(TypeSystem ts, NodeFactory nf)
             throws SemanticException {
         if (defaultConstructorNeeded()) {
-            return addDefaultConstructor(ts, nf);
+            return ((ClassDeclOps) del()).addDefaultConstructor(ts,
+                                                                nf,
+                                                                defaultCI);
         }
         return this;
     }
@@ -452,9 +454,10 @@ public class ClassDecl_c extends Term_c implements ClassDecl {
         return true;
     }
 
-    protected Node addDefaultConstructor(TypeSystem ts, NodeFactory nf)
-            throws SemanticException {
-        ConstructorInstance ci = this.defaultCI;
+    @Override
+    public Node addDefaultConstructor(TypeSystem ts, NodeFactory nf,
+            ConstructorInstance defaultCI) throws SemanticException {
+        ConstructorInstance ci = defaultCI;
         if (ci == null) {
             throw new InternalCompilerError("addDefaultConstructor called without defaultCI set");
         }
@@ -621,6 +624,7 @@ public class ClassDecl_c extends Term_c implements ClassDecl {
                 + body;
     }
 
+    @Override
     public void prettyPrintHeader(CodeWriter w, PrettyPrinter tr) {
         w.begin(0);
         if (flags.isInterface()) {
@@ -671,6 +675,7 @@ public class ClassDecl_c extends Term_c implements ClassDecl {
         w.write("{");
     }
 
+    @Override
     public void prettyPrintFooter(CodeWriter w, PrettyPrinter tr) {
         w.write("}");
         w.newline(0);
@@ -678,9 +683,9 @@ public class ClassDecl_c extends Term_c implements ClassDecl {
 
     @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
-        prettyPrintHeader(w, tr);
+        ((ClassDeclOps) this.del()).prettyPrintHeader(w, tr);
         print(body(), w, tr);
-        prettyPrintFooter(w, tr);
+        ((ClassDeclOps) this.del()).prettyPrintFooter(w, tr);
     }
 
     @Override
@@ -753,5 +758,4 @@ public class ClassDecl_c extends Term_c implements ClassDecl {
                             this.interfaces,
                             this.body);
     }
-
 }

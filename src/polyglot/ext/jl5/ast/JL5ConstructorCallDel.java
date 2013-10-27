@@ -25,15 +25,19 @@
  ******************************************************************************/
 package polyglot.ext.jl5.ast;
 
+import static polyglot.ast.ConstructorCall.SUPER;
+
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
+import polyglot.ast.ConstructorCall;
 import polyglot.ast.ConstructorCall_c;
 import polyglot.ast.Expr;
 import polyglot.ast.IntLit;
 import polyglot.ast.Node;
+import polyglot.ast.Node_c;
 import polyglot.ast.TypeNode;
 import polyglot.ext.jl5.JL5Options;
 import polyglot.ext.jl5.types.JL5Context;
@@ -46,6 +50,7 @@ import polyglot.types.ReferenceType;
 import polyglot.types.SemanticException;
 import polyglot.types.Type;
 import polyglot.util.CodeWriter;
+import polyglot.util.CollectionUtil;
 import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
 import polyglot.visit.AmbiguityRemover;
@@ -53,39 +58,8 @@ import polyglot.visit.NodeVisitor;
 import polyglot.visit.PrettyPrinter;
 import polyglot.visit.TypeChecker;
 
-public class JL5ConstructorCall_c extends ConstructorCall_c implements
-        JL5ConstructorCall {
+public class JL5ConstructorCallDel extends JL5Del {
     private static final long serialVersionUID = SerialVersionUID.generate();
-
-    /**
-     * Is this constructor call a super call to java.lang.Enum?
-     */
-    private boolean isEnumConstructorCall;
-
-    private List<TypeNode> typeArgs;
-
-    public JL5ConstructorCall_c(Position pos, Kind kind,
-            List<TypeNode> typeArgs, Expr qualifier,
-            List<? extends Expr> arguments, boolean isEnumConstructorCall) {
-        super(pos, kind, qualifier, arguments);
-        this.isEnumConstructorCall = isEnumConstructorCall;
-        this.typeArgs = typeArgs;
-    }
-
-    @Override
-    public List<TypeNode> typeArgs() {
-        return this.typeArgs;
-    }
-
-    @Override
-    public JL5ConstructorCall typeArgs(List<TypeNode> typeArgs) {
-        if (this.typeArgs == typeArgs) {
-            return this;
-        }
-        JL5ConstructorCall_c n = (JL5ConstructorCall_c) this.copy();
-        n.typeArgs = typeArgs;
-        return n;
-    }
 
     /**
      * An explicit constructor call is *like* a static context. References to
@@ -98,16 +72,37 @@ public class JL5ConstructorCall_c extends ConstructorCall_c implements
 
     @Override
     public Node visitChildren(NodeVisitor v) {
-        JL5ConstructorCall_c n = (JL5ConstructorCall_c) super.visitChildren(v);
-        List<TypeNode> targs = visitList(n.typeArgs, v);
-        return n.typeArgs(targs);
+        JL5ConstructorCallExt ext =
+                (JL5ConstructorCallExt) JL5Ext.ext(this.node());
+
+        List<TypeNode> typeArgs = this.node().visitList(ext.typeArgs(), v);
+
+        Node newN = super.visitChildren(v);
+        JL5ConstructorCallExt newext = (JL5ConstructorCallExt) JL5Ext.ext(newN);
+
+        if (!CollectionUtil.equals(typeArgs, newext.typeArgs())) {
+            // the type args changed! Let's update the node.
+            if (newN == this.node()) {
+                // we need to create a copy.
+                newN = (Node) newN.copy();
+                newext = (JL5ConstructorCallExt) JL5Ext.ext(newN);
+            }
+            else {
+                // the call to super.visitChildren(v) already
+                // created a copy of the node (and thus of its extension).
+            }
+            newext.typeArgs = typeArgs;
+        }
+        return newN;
     }
 
     @Override
     public Node disambiguate(AmbiguityRemover ar) throws SemanticException {
+        ConstructorCall cc = (ConstructorCall) this.node();
+        JL5ConstructorCallExt ext = (JL5ConstructorCallExt) JL5Ext.ext(cc);
         ClassType ct = ar.context().currentClass();
         if (ct != null && JL5Flags.isEnum(ct.flags())) {
-            if (this.arguments().isEmpty()) {
+            if (cc.arguments().isEmpty()) {
                 // this is an enum decl, so we need to replace a call to the default
                 // constructor with a call to java.lang.Enum.Enum(String, int)
                 List<Expr> args = new ArrayList<Expr>(2);// XXX the right thing to do is change the type of java.lang.Enum instead of adding these dummy params
@@ -115,10 +110,10 @@ public class JL5ConstructorCall_c extends ConstructorCall_c implements
                 args.add(ar.nodeFactory().IntLit(Position.compilerGenerated(),
                                                  IntLit.INT,
                                                  0));
-                JL5ConstructorCall_c n =
-                        (JL5ConstructorCall_c) this.arguments(args);
-                n.isEnumConstructorCall = true;
-                return n.disambiguate(ar);
+                cc = (ConstructorCall) cc.arguments(args);
+                ext = (JL5ConstructorCallExt) JL5Ext.ext(cc);
+                ext.isEnumConstructorCall = true;
+                return cc.disambiguate(ar);
             }
         }
         return super.disambiguate(ar);
@@ -126,34 +121,39 @@ public class JL5ConstructorCall_c extends ConstructorCall_c implements
 
     @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
+        ConstructorCall cc = (ConstructorCall) this.node();
+        JL5ConstructorCallExt ext = (JL5ConstructorCallExt) JL5Ext.ext(cc);
+
         // are we a super call within an enum const decl?
-        if (isEnumConstructorCall && ci != null) {
+        if (ext.isEnumConstructorCall() && cc.constructorInstance() != null) {
             boolean translateEnums =
-                    ((JL5Options) this.ci.typeSystem()
-                                         .extensionInfo()
-                                         .getOptions()).translateEnums;
+                    ((JL5Options) cc.constructorInstance()
+                                    .typeSystem()
+                                    .extensionInfo()
+                                    .getOptions()).translateEnums;
             boolean removeJava5isms =
-                    ((JL5Options) this.ci.typeSystem()
-                                         .extensionInfo()
-                                         .getOptions()).removeJava5isms;
+                    ((JL5Options) cc.constructorInstance()
+                                    .typeSystem()
+                                    .extensionInfo()
+                                    .getOptions()).removeJava5isms;
             if (!removeJava5isms && translateEnums) {
                 // we don't print an explicit call to super
                 return;
             }
         }
 
-        if (qualifier != null) {
-            print(qualifier, w, tr);
+        if (cc.qualifier() != null) {
+            ((Node_c) cc).print(cc.qualifier(), w, tr);
             w.write(".");
         }
 
-        w.write(kind.toString());
-        if (typeArgs != null && !typeArgs.isEmpty()) {
+        w.write(cc.kind().toString());
+        if (ext.typeArgs() != null && !ext.typeArgs().isEmpty()) {
             w.write("<");
-            Iterator<TypeNode> it = typeArgs.iterator();
+            Iterator<TypeNode> it = ext.typeArgs().iterator();
             while (it.hasNext()) {
                 TypeNode tn = it.next();
-                print(tn, w, tr);
+                ((Node_c) cc).print(tn, w, tr);
                 if (it.hasNext()) {
                     w.write(",");
                     w.allowBreak(0, " ");
@@ -167,9 +167,9 @@ public class JL5ConstructorCall_c extends ConstructorCall_c implements
 
         w.begin(0);
 
-        for (Iterator<Expr> i = arguments.iterator(); i.hasNext();) {
+        for (Iterator<Expr> i = cc.arguments().iterator(); i.hasNext();) {
             Expr e = i.next();
-            print(e, w, tr);
+            ((Node_c) cc).print(e, w, tr);
 
             if (i.hasNext()) {
                 w.write(",");
@@ -184,7 +184,8 @@ public class JL5ConstructorCall_c extends ConstructorCall_c implements
 
     @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
-        ConstructorCall_c n = this;
+        ConstructorCall_c n = (ConstructorCall_c) this.node();
+        JL5ConstructorCallExt ext = (JL5ConstructorCallExt) JL5Ext.ext(n);
 
         JL5TypeSystem ts = (JL5TypeSystem) tc.typeSystem();
         Context c = tc.context();
@@ -193,12 +194,13 @@ public class JL5ConstructorCall_c extends ConstructorCall_c implements
         Type superType = ct.superType();
 
         Expr qualifier = n.qualifier();
-        Kind kind = n.kind();
+        ConstructorCall.Kind kind = n.kind();
 
         List<ReferenceType> actualTypeArgs = null;
-        if (this.typeArgs != null) {
-            actualTypeArgs = new ArrayList<ReferenceType>(this.typeArgs.size());
-            for (TypeNode tn : this.typeArgs) {
+        if (ext.typeArgs() != null) {
+            actualTypeArgs =
+                    new ArrayList<ReferenceType>(ext.typeArgs().size());
+            for (TypeNode tn : ext.typeArgs()) {
                 actualTypeArgs.add((ReferenceType) tn.type());
             }
         }
@@ -223,7 +225,7 @@ public class JL5ConstructorCall_c extends ConstructorCall_c implements
 
             if (kind != SUPER) {
                 throw new SemanticException("Can only qualify a \"super\""
-                        + "constructor invocation.", position());
+                        + "constructor invocation.", n.position());
             }
 
             if (!superType.isClass() || !superType.toClass().isInnerClass()
@@ -234,7 +236,7 @@ public class JL5ConstructorCall_c extends ConstructorCall_c implements
                                                     + " is not an inner class, or was declared in a static "
                                                     + "context; a qualified constructor invocation cannot "
                                                     + "be used.",
-                                            position());
+                                            n.position());
             }
 
             Type qt = qualifier.type();
@@ -254,7 +256,7 @@ public class JL5ConstructorCall_c extends ConstructorCall_c implements
         if (kind == SUPER) {
             if (!superType.isClass()) {
                 throw new SemanticException("Super type of " + ct
-                        + " is not a class.", position());
+                        + " is not a class.", n.position());
             }
 
             Expr q = qualifier;
@@ -284,7 +286,7 @@ public class JL5ConstructorCall_c extends ConstructorCall_c implements
                                                         + " must have an enclosing instance"
                                                         + " that is a subtype of "
                                                         + superContainer,
-                                                position());
+                                                n.position());
                 }
                 if (e == ct) {
                     throw new SemanticException(ct
@@ -293,7 +295,7 @@ public class JL5ConstructorCall_c extends ConstructorCall_c implements
                                                         + "; an enclosing instance that is a subtype of "
                                                         + superContainer
                                                         + " must be specified in the super constructor call.",
-                                                position());
+                                                n.position());
                 }
             }
 
@@ -304,7 +306,7 @@ public class JL5ConstructorCall_c extends ConstructorCall_c implements
 
         for (Expr e : n.arguments()) {
             if (!e.isDisambiguated()) {
-                return this;
+                return n;
             }
             argTypes.add(e.type());
         }

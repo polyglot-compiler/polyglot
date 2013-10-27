@@ -60,7 +60,8 @@ import polyglot.visit.TypeChecker;
  * A <code>ConstructorDecl</code> is an immutable representation of a
  * constructor declaration as part of a class body.
  */
-public class ConstructorDecl_c extends Term_c implements ConstructorDecl {
+public class ConstructorDecl_c extends Term_c implements ConstructorDecl,
+        ProcedureDeclOps {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
     protected Flags flags;
@@ -372,9 +373,10 @@ public class ConstructorDecl_c extends Term_c implements ConstructorDecl {
     }
 
     /** Write the constructor to an output file. */
-    public void prettyPrintHeader(CodeWriter w, PrettyPrinter tr) {
+    @Override
+    public void prettyPrintHeader(Flags flags, CodeWriter w, PrettyPrinter tr) {
         w.begin(0);
-        w.write(flags().translate());
+        w.write(flags.translate());
 
         tr.print(this, name, w);
         w.write("(");
@@ -414,7 +416,7 @@ public class ConstructorDecl_c extends Term_c implements ConstructorDecl {
 
     @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
-        prettyPrintHeader(w, tr);
+        ((ProcedureDeclOps) del()).prettyPrintHeader(flags(), w, tr);
 
         if (body != null) {
             printSubStmt(body, w, tr);

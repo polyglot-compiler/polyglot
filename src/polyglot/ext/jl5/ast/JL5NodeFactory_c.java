@@ -35,8 +35,10 @@ import polyglot.ast.Call;
 import polyglot.ast.CanonicalTypeNode;
 import polyglot.ast.ClassBody;
 import polyglot.ast.ClassDecl;
+import polyglot.ast.ClassDecl_c;
 import polyglot.ast.ConstructorCall;
 import polyglot.ast.ConstructorCall.Kind;
+import polyglot.ast.ConstructorDecl;
 import polyglot.ast.Disamb;
 import polyglot.ast.Expr;
 import polyglot.ast.Field;
@@ -45,6 +47,7 @@ import polyglot.ast.Formal;
 import polyglot.ast.Id;
 import polyglot.ast.Import;
 import polyglot.ast.LocalDecl;
+import polyglot.ast.MethodDecl;
 import polyglot.ast.New;
 import polyglot.ast.NewArray;
 import polyglot.ast.NodeFactory_c;
@@ -98,19 +101,15 @@ public class JL5NodeFactory_c extends NodeFactory_c implements JL5NodeFactory {
     }
 
     @Override
-    public JL5EnumDecl EnumDecl(Position pos, Flags flags,
+    public ClassDecl EnumDecl(Position pos, Flags flags,
             List<AnnotationElem> annotations, Id name, TypeNode superType,
             List<TypeNode> interfaces, ClassBody body) {
-        JL5EnumDecl n =
-                new JL5EnumDecl_c(pos,
-                                  flags,
-                                  annotations,
-                                  name,
-                                  superType,
-                                  interfaces,
-                                  body);
-        n = (JL5EnumDecl) n.ext(extFactory().extEnumDecl());
-        n = (JL5EnumDecl) n.del(delFactory().delEnumDecl());
+        ClassDecl n =
+                new ClassDecl_c(pos, flags, name, superType, interfaces, body);
+        n = (ClassDecl) n.ext(extFactory().extEnumDecl());
+        n = (ClassDecl) n.del(delFactory().delEnumDecl());
+        JL5EnumDeclExt ext = (JL5EnumDeclExt) JL5Ext.ext(n);
+        ext.annotations = CollectionUtil.nonNullList(annotations);
         return n;
 
     }
@@ -170,21 +169,17 @@ public class JL5NodeFactory_c extends NodeFactory_c implements JL5NodeFactory {
     }
 
     @Override
-    public JL5ClassDecl ClassDecl(Position pos, Flags flags,
+    public ClassDecl ClassDecl(Position pos, Flags flags,
             List<AnnotationElem> annotations, Id name, TypeNode superType,
             List<TypeNode> interfaces, ClassBody body,
             List<ParamTypeNode> paramTypes) {
-        JL5ClassDecl n =
-                new JL5ClassDecl_c(pos,
-                                   flags,
-                                   annotations,
-                                   name,
-                                   superType,
-                                   interfaces,
-                                   body,
-                                   paramTypes);
-        n = (JL5ClassDecl) n.ext(extFactory().extClassDecl());
-        n = (JL5ClassDecl) n.del(delFactory().delClassDecl());
+        ClassDecl n =
+                super.ClassDecl(pos, flags, name, superType, interfaces, body);
+        JL5ClassDeclExt ext = (JL5ClassDeclExt) JL5Ext.ext(n);
+        ext.paramTypes =
+                (paramTypes == null ? Collections.<ParamTypeNode> emptyList()
+                        : paramTypes);
+        ext.annotations = CollectionUtil.nonNullList(annotations);
         return n;
     }
 
@@ -202,30 +197,18 @@ public class JL5NodeFactory_c extends NodeFactory_c implements JL5NodeFactory {
             List<AnnotationElem> annotations, Id name, List<Expr> args,
             ClassBody body) {
         EnumConstantDecl n =
-                new EnumConstantDecl_c(pos,
-                                       flags,
-                                       annotations,
-                                       name,
-                                       args,
-                                       body);
+                new EnumConstantDecl_c(pos, flags, name, args, body);
         n = (EnumConstantDecl) n.ext(extFactory().extEnumConstantDecl());
         n = (EnumConstantDecl) n.del(delFactory().delEnumConstantDecl());
+        EnumConstantDeclExt ext = (EnumConstantDeclExt) JL5Ext.ext(n);
+        ext.annotations = CollectionUtil.nonNullList(annotations);
         return n;
     }
 
     @Override
     public EnumConstantDecl EnumConstantDecl(Position pos, Flags flags,
             List<AnnotationElem> annotations, Id name, List<Expr> args) {
-        EnumConstantDecl n =
-                new EnumConstantDecl_c(pos,
-                                       flags,
-                                       annotations,
-                                       name,
-                                       args,
-                                       null);
-        n = (EnumConstantDecl) n.ext(extFactory().extEnumConstantDecl());
-        n = (EnumConstantDecl) n.del(delFactory().delEnumConstantDecl());
-        return n;
+        return EnumConstantDecl(pos, flags, annotations, name, args, null);
     }
 
     @Override
@@ -244,7 +227,7 @@ public class JL5NodeFactory_c extends NodeFactory_c implements JL5NodeFactory {
 
     @Override
     public ConstructorCall ConstructorCall(Position pos, Kind kind, Expr outer,
-            List<? extends Expr> args, boolean isEnumConstructorCall) {
+            List<Expr> args, boolean isEnumConstructorCall) {
         return ConstructorCall(pos,
                                kind,
                                null,
@@ -253,19 +236,15 @@ public class JL5NodeFactory_c extends NodeFactory_c implements JL5NodeFactory {
                                isEnumConstructorCall);
     }
 
-    protected ConstructorCall ConstructorCall(Position pos, Kind kind,
-            List<TypeNode> typeArgs, Expr outer, List<? extends Expr> args,
+    @Override
+    public ConstructorCall ConstructorCall(Position pos, Kind kind,
+            List<TypeNode> typeArgs, Expr outer, List<Expr> args,
             boolean isEnumConstructorCall) {
 
-        ConstructorCall n =
-                new JL5ConstructorCall_c(pos,
-                                         kind,
-                                         typeArgs,
-                                         outer,
-                                         args,
-                                         isEnumConstructorCall);
-        n = (ConstructorCall) n.ext(extFactory().extConstructorCall());
-        n = (ConstructorCall) n.del(delFactory().delConstructorCall());
+        ConstructorCall n = super.ConstructorCall(pos, kind, outer, args);
+        JL5ConstructorCallExt ext = (JL5ConstructorCallExt) JL5Ext.ext(n);
+        ext.typeArgs = typeArgs;
+        ext.isEnumConstructorCall = isEnumConstructorCall;
         return n;
     }
 
@@ -276,9 +255,9 @@ public class JL5NodeFactory_c extends NodeFactory_c implements JL5NodeFactory {
     }
 
     @Override
-    public JL5ConstructorDecl ConstructorDecl(Position pos, Flags flags,
-            Id name, List<Formal> formals, List<TypeNode> throwTypes, Block body) {
-        JL5ConstructorDecl n =
+    public ConstructorDecl ConstructorDecl(Position pos, Flags flags, Id name,
+            List<Formal> formals, List<TypeNode> throwTypes, Block body) {
+        ConstructorDecl n =
                 ConstructorDecl(pos,
                                 flags,
                                 null,
@@ -291,34 +270,22 @@ public class JL5NodeFactory_c extends NodeFactory_c implements JL5NodeFactory {
     }
 
     @Override
-    public JL5ConstructorDecl ConstructorDecl(Position pos, Flags flags,
+    public ConstructorDecl ConstructorDecl(Position pos, Flags flags,
             List<AnnotationElem> annotations, Id name, List<Formal> formals,
             List<TypeNode> throwTypes, Block body,
             List<ParamTypeNode> typeParams) {
-        JL5ConstructorDecl n;
-        if (typeParams == null) {
-            n =
-                    new JL5ConstructorDecl_c(pos,
-                                             flags,
-                                             annotations,
-                                             name,
-                                             formals,
-                                             throwTypes,
-                                             body);
-        }
-        else {
-            n =
-                    new JL5ConstructorDecl_c(pos,
-                                             flags,
-                                             annotations,
-                                             name,
-                                             formals,
-                                             throwTypes,
-                                             body,
-                                             typeParams);
-        }
-        n = (JL5ConstructorDecl) n.ext(extFactory().extConstructorDecl());
-        n = (JL5ConstructorDecl) n.del(delFactory().delConstructorDecl());
+        ConstructorDecl n =
+                super.ConstructorDecl(pos,
+                                      flags,
+                                      name,
+                                      formals,
+                                      throwTypes,
+                                      body);
+        JL5ConstructorDeclExt ext = (JL5ConstructorDeclExt) JL5Ext.ext(n);
+        ext.typeParams =
+                (typeParams == null ? Collections.<ParamTypeNode> emptyList()
+                        : typeParams);
+        ext.annotations = CollectionUtil.nonNullList(annotations);
         return n;
     }
 
@@ -329,10 +296,10 @@ public class JL5NodeFactory_c extends NodeFactory_c implements JL5NodeFactory {
     }
 
     @Override
-    public JL5MethodDecl MethodDecl(Position pos, Flags flags,
+    public MethodDecl MethodDecl(Position pos, Flags flags,
             TypeNode returnType, Id name, List<Formal> formals,
             List<TypeNode> throwTypes, Block body) {
-        JL5MethodDecl n =
+        MethodDecl n =
                 MethodDecl(pos,
                            flags,
                            null,
@@ -346,36 +313,23 @@ public class JL5NodeFactory_c extends NodeFactory_c implements JL5NodeFactory {
     }
 
     @Override
-    public JL5MethodDecl MethodDecl(Position pos, Flags flags,
+    public MethodDecl MethodDecl(Position pos, Flags flags,
             List<AnnotationElem> annotations, TypeNode returnType, Id name,
             List<Formal> formals, List<TypeNode> throwTypes, Block body,
             List<ParamTypeNode> typeParams) {
-        JL5MethodDecl n;
-        if (typeParams == null) {
-            n =
-                    new JL5MethodDecl_c(pos,
-                                        flags,
-                                        annotations,
-                                        returnType,
-                                        name,
-                                        formals,
-                                        throwTypes,
-                                        body);
-        }
-        else {
-            n =
-                    new JL5MethodDecl_c(pos,
-                                        flags,
-                                        annotations,
-                                        returnType,
-                                        name,
-                                        formals,
-                                        throwTypes,
-                                        body,
-                                        typeParams);
-        }
-        n = (JL5MethodDecl) n.ext(extFactory().extMethodDecl());
-        n = (JL5MethodDecl) n.del(delFactory().delMethodDecl());
+        MethodDecl n =
+                super.MethodDecl(pos,
+                                 flags,
+                                 returnType,
+                                 name,
+                                 formals,
+                                 throwTypes,
+                                 body);
+        JL5MethodDeclExt ext = (JL5MethodDeclExt) JL5Ext.ext(n);
+        ext.typeParams =
+                (typeParams == null ? Collections.<ParamTypeNode> emptyList()
+                        : typeParams);
+        ext.annotations = CollectionUtil.nonNullList(annotations);
         return n;
     }
 
@@ -412,21 +366,18 @@ public class JL5NodeFactory_c extends NodeFactory_c implements JL5NodeFactory {
     @Override
     public Formal Formal(Position pos, Flags flags,
             List<AnnotationElem> annotations, TypeNode type, Id name) {
-        Formal n = Formal(pos, flags, annotations, type, name, false);
-        n = (Formal) n.ext(extFactory().extFormal());
-        n = (Formal) n.del(delFactory().delFormal());
-        return n;
+        return Formal(pos, flags, annotations, type, name, false);
     }
 
     @Override
-    public Formal Formal(Position pos, Flags flags,
+    public polyglot.ast.Formal Formal(Position pos, Flags flags,
             List<AnnotationElem> annotations, TypeNode type, Id name,
-            boolean varArgs) {
-        Formal n =
-                new JL5Formal_c(pos, flags, annotations, type, name, varArgs);
-        n = (Formal) n.ext(extFactory().extFormal());
-        n = (Formal) n.del(delFactory().delFormal());
-        return n;
+            boolean var_args) {
+        Formal f = super.Formal(pos, flags, type, name);
+        JL5FormalExt ext = (JL5FormalExt) JL5Ext.ext(f);
+        ext.isVarArg = var_args;
+        ext.annotations = CollectionUtil.nonNullList(annotations);
+        return f;
     }
 
     @Override
@@ -449,23 +400,16 @@ public class JL5NodeFactory_c extends NodeFactory_c implements JL5NodeFactory {
 
     @Override
     public Call Call(Position pos, Receiver target, Id name, List<Expr> args) {
-        Call n = Call(pos, target, null, name, args);
-        n = (Call) n.ext(extFactory().extCall());
-        n = (Call) n.del(delFactory().delCall());
-        return n;
+        return Call(pos, target, null, name, args);
     }
 
     @Override
     public Call Call(Position pos, Receiver target, List<TypeNode> typeArgs,
             Id name, List<Expr> args) {
         Call n =
-                new JL5Call_c(pos,
-                              target,
-                              CollectionUtil.nonNullList(typeArgs),
-                              name,
-                              CollectionUtil.nonNullList(args));
-        n = (Call) n.ext(extFactory().extCall());
-        n = (Call) n.del(delFactory().delCall());
+                super.Call(pos, target, name, CollectionUtil.nonNullList(args));
+        JL5CallExt ext = (JL5CallExt) JL5Ext.ext(n);
+        ext.typeArgs = CollectionUtil.nonNullList(typeArgs);
         return n;
     }
 
@@ -567,10 +511,9 @@ public class JL5NodeFactory_c extends NodeFactory_c implements JL5NodeFactory {
     @Override
     public LocalDecl LocalDecl(Position pos, Flags flags,
             List<AnnotationElem> annotations, TypeNode type, Id name, Expr init) {
-        LocalDecl n =
-                new JL5LocalDecl_c(pos, flags, annotations, type, name, init);
-        n = (LocalDecl) n.ext(extFactory().extLocalDecl());
-        n = (LocalDecl) n.del(delFactory().delLocalDecl());
+        LocalDecl n = super.LocalDecl(pos, flags, type, name, init);
+        JL5LocalDeclExt ext = (JL5LocalDeclExt) JL5Ext.ext(n);
+        ext.annotations = CollectionUtil.nonNullList(annotations);
         return n;
     }
 
@@ -595,10 +538,9 @@ public class JL5NodeFactory_c extends NodeFactory_c implements JL5NodeFactory {
     @Override
     public FieldDecl FieldDecl(Position pos, Flags flags,
             List<AnnotationElem> annotations, TypeNode type, Id name, Expr init) {
-        FieldDecl n =
-                new JL5FieldDecl_c(pos, flags, annotations, type, name, init);
-        n = (FieldDecl) n.ext(extFactory().extFieldDecl());
-        n = (FieldDecl) n.del(delFactory().delFieldDecl());
+        FieldDecl n = super.FieldDecl(pos, flags, type, name, init);
+        JL5FieldDeclExt ext = (JL5FieldDeclExt) JL5Ext.ext(n);
+        ext.annotations = CollectionUtil.nonNullList(annotations);
         return n;
     }
 
@@ -627,5 +569,4 @@ public class JL5NodeFactory_c extends NodeFactory_c implements JL5NodeFactory {
         return ElementValueArrayInit(pos, Collections.<Term> emptyList());
 
     }
-
 }

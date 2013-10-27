@@ -39,7 +39,8 @@ import polyglot.ast.NodeFactory;
 import polyglot.ast.ProcedureCall;
 import polyglot.ast.ProcedureDecl;
 import polyglot.ext.jl5.ast.EnumConstantDecl;
-import polyglot.ext.jl5.ast.JL5Formal;
+import polyglot.ext.jl5.ast.JL5Ext;
+import polyglot.ext.jl5.ast.JL5FormalExt;
 import polyglot.ext.jl5.types.JL5ProcedureInstance;
 import polyglot.frontend.Job;
 import polyglot.types.ArrayType;
@@ -76,8 +77,11 @@ public class RemoveVarargVisitor extends ErrorHandlingVisitor {
         List<Formal> formals = new ArrayList<Formal>(n.formals());
         if (formals.size() > 0) {
             int varArgIndex = formals.size() - 1;
-            JL5Formal varArgFormal = (JL5Formal) formals.get(varArgIndex);
-            if (varArgFormal.isVarArg()) {
+            Formal varArgFormal = formals.get(varArgIndex);
+            JL5FormalExt varArgFormalExt =
+                    (JL5FormalExt) JL5Ext.ext(varArgFormal);
+
+            if (varArgFormalExt.isVarArg()) {
                 Formal newFormal =
                         nf.Formal(varArgFormal.position(),
                                   varArgFormal.flags(),
