@@ -307,7 +307,7 @@ public class JL5ClassDeclDel extends JL5AnnotatedElementDel implements
             ((ClassDeclOps) jl).prettyPrintFooter(w, tr);
         }
         else {
-            throw new InternalCompilerError("jl() should imple,ent ClassDeclOps");
+            throw new InternalCompilerError("jl() should implement ClassDeclOps");
         }
     }
 
@@ -322,7 +322,7 @@ public class JL5ClassDeclDel extends JL5AnnotatedElementDel implements
                                                              defaultConstructorInstance);
         }
         else {
-            throw new InternalCompilerError("jl() should imple,ent ClassDeclOps");
+            throw new InternalCompilerError("jl() should implement ClassDeclOps");
         }
     }
 
