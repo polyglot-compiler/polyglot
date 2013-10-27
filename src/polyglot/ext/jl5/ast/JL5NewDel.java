@@ -31,11 +31,11 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import polyglot.ast.ClassBody;
 import polyglot.ast.Expr;
 import polyglot.ast.New;
-import polyglot.ast.New_c;
+import polyglot.ast.NewOps;
 import polyglot.ast.Node;
+import polyglot.ast.Node_c;
 import polyglot.ast.Special;
 import polyglot.ast.TypeNode;
 import polyglot.ext.jl5.types.JL5ClassType;
@@ -46,64 +46,61 @@ import polyglot.ext.jl5.types.RawClass;
 import polyglot.ext.jl5.types.TypeVariable;
 import polyglot.ext.jl5.visit.JL5Translator;
 import polyglot.types.ClassType;
+import polyglot.types.ConstructorInstance;
 import polyglot.types.Context;
 import polyglot.types.ParsedClassType;
 import polyglot.types.ReferenceType;
 import polyglot.types.SemanticException;
 import polyglot.types.Type;
 import polyglot.util.CodeWriter;
+import polyglot.util.CollectionUtil;
 import polyglot.util.InternalCompilerError;
-import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
 import polyglot.visit.AmbiguityRemover;
 import polyglot.visit.NodeVisitor;
 import polyglot.visit.PrettyPrinter;
 import polyglot.visit.TypeChecker;
 
-public class JL5New_c extends New_c implements JL5New {
+public class JL5NewDel extends JL5Del implements NewOps {
     private static final long serialVersionUID = SerialVersionUID.generate();
-
-    private List<TypeNode> typeArgs;
-
-    public JL5New_c(Position pos, Expr outer, List<TypeNode> typeArgs,
-            TypeNode objectType, List<Expr> args, ClassBody body) {
-        super(pos, outer, objectType, args, body);
-        this.typeArgs = typeArgs;
-    }
-
-    @Override
-    public List<TypeNode> typeArgs() {
-        return this.typeArgs;
-    }
-
-    @Override
-    public JL5New typeArgs(List<TypeNode> typeArgs) {
-        if (this.typeArgs == typeArgs) {
-            return this;
-        }
-        JL5New_c n = (JL5New_c) this.copy();
-        n.typeArgs = typeArgs;
-        return n;
-    }
 
     @Override
     public Node visitChildren(NodeVisitor v) {
-        JL5New_c n = (JL5New_c) super.visitChildren(v);
-        List<TypeNode> targs = visitList(n.typeArgs, v);
-        return n.typeArgs(targs);
+        JL5NewExt ext = (JL5NewExt) JL5Ext.ext(this.node());
+
+        List<TypeNode> typeArgs = this.node().visitList(ext.typeArgs(), v);
+
+        Node newN = super.visitChildren(v);
+        JL5NewExt newext = (JL5NewExt) JL5Ext.ext(newN);
+
+        if (!CollectionUtil.equals(typeArgs, newext.typeArgs())) {
+            // the type args changed! Let's update the node.
+            if (newN == this.node()) {
+                // we need to create a copy.
+                newN = (Node) newN.copy();
+                newext = (JL5NewExt) JL5Ext.ext(newN);
+            }
+            else {
+                // the call to super.visitChildren(v) already
+                // created a copy of the node (and thus of its extension).
+            }
+            newext.typeArgs = typeArgs;
+        }
+        return newN;
     }
 
     @Override
     public Node disambiguateOverride(Node parent, AmbiguityRemover ar)
             throws SemanticException {
-        JL5New n = (JL5New) super.disambiguateOverride(parent, ar);
+        New n = (New) super.disambiguateOverride(parent, ar);
+        JL5NewExt ext = (JL5NewExt) JL5Ext.ext(n);
         // now do the type args
-        return n.typeArgs(n.visitList(n.typeArgs(), ar));
+        return ext.typeArgs(n.visitList(ext.typeArgs(), ar));
     }
 
     @Override
-    protected TypeNode findQualifiedTypeNode(AmbiguityRemover ar,
-            ClassType outer, TypeNode objectType) throws SemanticException {
+    public TypeNode findQualifiedTypeNode(AmbiguityRemover ar, ClassType outer,
+            TypeNode objectType) throws SemanticException {
         if (objectType instanceof AmbTypeInstantiation) {
             JL5TypeSystem ts = (JL5TypeSystem) ar.typeSystem();
             JL5NodeFactory nf = (JL5NodeFactory) ar.nodeFactory();
@@ -143,48 +140,50 @@ public class JL5New_c extends New_c implements JL5New {
                         + " since it is not static");
             }
         }
-        return super.findQualifiedTypeNode(ar, outer, objectType);
+        return ((NewOps) jl()).findQualifiedTypeNode(ar, outer, objectType);
     }
 
     @Override
-    protected New findQualifier(AmbiguityRemover ar, ClassType ct)
+    public New findQualifier(AmbiguityRemover ar, ClassType ct)
             throws SemanticException {
         // Call super.findQualifier in order to perform its checks, but throw away the
-        // qualifier that it finds. That is, just return this. Do not attempt to infer 
+        // qualifier that it finds. That is, just return this node. Do not attempt to infer 
         // a qualifier if one is missing.
-        super.findQualifier(ar, ct);
-        return this;
+        ((NewOps) jl()).findQualifier(ar, ct);
+        return (New) this.node();
     }
 
     @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
+        New n = (New) this.node();
+        JL5NewExt ext = (JL5NewExt) JL5Ext.ext(n);
         JL5TypeSystem ts = (JL5TypeSystem) tc.typeSystem();
 
-        if (!tn.type().isClass()) {
+        if (!n.objectType().type().isClass()) {
             throw new SemanticException("Must have a class for a new expression.",
-                                        this.position());
+                                        n.position());
         }
 
-        List<Type> argTypes = new ArrayList<Type>(arguments.size());
+        List<Type> argTypes = new ArrayList<Type>(n.arguments().size());
 
-        for (Expr e : this.arguments) {
+        for (Expr e : n.arguments()) {
             argTypes.add(e.type());
         }
 
         List<ReferenceType> actualTypeArgs =
-                new ArrayList<ReferenceType>(typeArgs.size());
-        for (TypeNode tn : this.typeArgs) {
+                new ArrayList<ReferenceType>(ext.typeArgs().size());
+        for (TypeNode tn : ext.typeArgs()) {
             actualTypeArgs.add((ReferenceType) tn.type());
         }
 
-        typeCheckFlags(tc);
-        typeCheckNested(tc);
+        ((NewOps) jl()).typeCheckFlags(tc);
+        ((NewOps) jl()).typeCheckNested(tc);
 
-        if (this.body != null) {
-            ts.checkClassConformance(anonType);
+        if (n.body() != null) {
+            ts.checkClassConformance(n.anonType());
         }
 
-        ClassType ct = tn.type().toClass();
+        ClassType ct = n.objectType().type().toClass();
 
         if (ct.isInnerClass()) {
             ClassType outer = ct.outer();
@@ -193,20 +192,22 @@ public class JL5New_c extends New_c implements JL5New {
                 JL5SubstClassType sct = (JL5SubstClassType) outer;
                 ct = (ClassType) sct.subst().substType(ct);
             }
-            else if (qualifier == null
-                    || (qualifier instanceof Special && ((Special) qualifier).kind() == Special.THIS)) {
+            else if (n.qualifier() == null
+                    || (n.qualifier() instanceof Special && ((Special) n.qualifier()).kind() == Special.THIS)) {
                 ct = ts5.instantiateInnerClassFromContext(tc.context(), ct);
             }
-            else if (qualifier.type() instanceof JL5SubstClassType) {
-                JL5SubstClassType sct = (JL5SubstClassType) qualifier().type();
+            else if (n.qualifier().type() instanceof JL5SubstClassType) {
+                JL5SubstClassType sct =
+                        (JL5SubstClassType) n.qualifier().type();
                 ct = (ClassType) sct.subst().substType(ct);
             }
         }
 
+        ConstructorInstance ci;
         if (!ct.flags().isInterface()) {
             Context c = tc.context();
-            if (anonType != null) {
-                c = c.pushClass(anonType, anonType);
+            if (n.anonType() != null) {
+                c = c.pushClass(n.anonType(), n.anonType());
             }
             ci =
                     ts.findConstructor(ct,
@@ -215,14 +216,14 @@ public class JL5New_c extends New_c implements JL5New {
                                        c.currentClass());
         }
         else {
-            ci = ts.defaultConstructor(this.position(), ct);
+            ci = ts.defaultConstructor(n.position(), ct);
         }
 
-        New n = this.constructorInstance(ci);
+        n = n.constructorInstance(ci);
 
-        if (anonType != null) {
+        if (n.anonType() != null) {
             // The type of the new expression is the anonymous type, not the base type.
-            ct = anonType;
+            ct = n.anonType();
         }
 
         return n.type(ct);
@@ -230,15 +231,18 @@ public class JL5New_c extends New_c implements JL5New {
 
     @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
-        printQualifier(w, tr);
+        New n = (New) this.node();
+        JL5NewExt ext = (JL5NewExt) JL5Ext.ext(n);
+
+        ((NewOps) jl()).printQualifier(w, tr);
         w.write("new ");
 
-        if (typeArgs != null && !typeArgs.isEmpty()) {
+        if (ext.typeArgs() != null && !ext.typeArgs().isEmpty()) {
             w.write("<");
-            Iterator<TypeNode> it = typeArgs.iterator();
+            Iterator<TypeNode> it = ext.typeArgs().iterator();
             while (it.hasNext()) {
                 TypeNode tn = it.next();
-                print(tn, w, tr);
+                ((Node_c) n).print(tn, w, tr);
                 if (it.hasNext()) {
                     w.write(",");
                     w.allowBreak(0, " ");
@@ -253,9 +257,9 @@ public class JL5New_c extends New_c implements JL5New {
         // static type "T", the TypeNode for "C" is actually the type "T.C".
         // But, if we print "T.C", the post compiler will try to lookup "T"
         // in "T".  Instead, we print just "C".
-        if (qualifier != null && tn.type() != null) {
-            w.write(tn.name());
-            ClassType ct = tn.type().toClass();
+        if (n.qualifier() != null && n.objectType().type() != null) {
+            w.write(n.objectType().name());
+            ClassType ct = n.objectType().type().toClass();
             if (ct instanceof JL5SubstClassType) {
                 boolean printParams = true;
                 if (tr instanceof JL5Translator) {
@@ -269,16 +273,19 @@ public class JL5New_c extends New_c implements JL5New {
             }
         }
         else {
-            print(tn, w, tr);
+            ((Node_c) n).print(n.objectType(), w, tr);
         }
 
-        printArgs(w, tr);
-        printBody(w, tr);
+        ((NewOps) jl()).printArgs(w, tr);
+        ((NewOps) jl()).printBody(w, tr);
     }
 
     @Override
-    protected ClassType findEnclosingClass(Context c, ClassType ct) {
-        if (ct == anonType) {
+    public ClassType findEnclosingClass(Context c, ClassType ct) {
+        New n = (New) this.node();
+        JL5NewExt ext = (JL5NewExt) JL5Ext.ext(n);
+
+        if (ct == n.anonType()) {
             // we need to find ct, is an anonymous class, and so 
             // the enclosing class is the current class.
             return c.currentClass();
@@ -349,6 +356,32 @@ public class JL5New_c extends New_c implements JL5New {
             }
         }
         return null;
+    }
+
+    @Override
+    public void typeCheckFlags(TypeChecker tc) throws SemanticException {
+        ((NewOps) jl()).typeCheckFlags(tc);
+    }
+
+    @Override
+    public void typeCheckNested(TypeChecker tc) throws SemanticException {
+        ((NewOps) jl()).typeCheckNested(tc);
+
+    }
+
+    @Override
+    public void printQualifier(CodeWriter w, PrettyPrinter tr) {
+        ((NewOps) jl()).printQualifier(w, tr);
+    }
+
+    @Override
+    public void printArgs(CodeWriter w, PrettyPrinter tr) {
+        ((NewOps) jl()).printArgs(w, tr);
+    }
+
+    @Override
+    public void printBody(CodeWriter w, PrettyPrinter tr) {
+        ((NewOps) jl()).printBody(w, tr);
     }
 
 }

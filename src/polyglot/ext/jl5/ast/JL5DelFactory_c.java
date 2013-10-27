@@ -68,7 +68,7 @@ public class JL5DelFactory_c extends AbstractDelFactory_c implements
 
     @Override
     public JL delEnumConstantDecl() {
-        JL e = delEnumConstantImpl();
+        JL e = delEnumConstantDeclImpl();
 
         if (nextDelFactory() != null) {
             JL e2 = nextDelFactory().delEnumConstant();
@@ -216,6 +216,11 @@ public class JL5DelFactory_c extends AbstractDelFactory_c implements
     }
 
     @Override
+    protected JL delCanonicalTypeNodeImpl() {
+        return new JL5CanonicalTypeNodeDel();
+    }
+
+    @Override
     protected JL delCallImpl() {
         return new JL5CallDel();
     }
@@ -236,8 +241,18 @@ public class JL5DelFactory_c extends AbstractDelFactory_c implements
     }
 
     @Override
+    protected JL delFieldImpl() {
+        return new JL5FieldDel();
+    }
+
+    @Override
     protected JL delFormalImpl() {
         return new JL5FormalDel();
+    }
+
+    @Override
+    protected JL delImportImpl() {
+        return new JL5ImportDel();
     }
 
     @Override
@@ -268,6 +283,16 @@ public class JL5DelFactory_c extends AbstractDelFactory_c implements
     @Override
     protected JL delNodeImpl() {
         return new JL5Del();
+    }
+
+    @Override
+    protected JL delNewImpl() {
+        return new JL5NewDel();
+    }
+
+    @Override
+    protected JL delNewArrayImpl() {
+        return new JL5NewArrayDel();
     }
 
     @Override

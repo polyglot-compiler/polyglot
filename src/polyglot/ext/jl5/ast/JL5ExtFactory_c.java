@@ -90,6 +90,11 @@ public class JL5ExtFactory_c extends AbstractExtFactory_c implements
     }
 
     @Override
+    protected Ext extNewImpl() {
+        return new JL5NewExt();
+    }
+
+    @Override
     public Ext extEnumDecl() {
         Ext e = extEnumDeclImpl();
 

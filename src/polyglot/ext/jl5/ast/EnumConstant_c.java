@@ -25,13 +25,14 @@
  ******************************************************************************/
 package polyglot.ext.jl5.ast;
 
+import polyglot.ast.Field_c;
 import polyglot.ast.Id;
 import polyglot.ast.Receiver;
 import polyglot.ext.jl5.types.EnumInstance;
 import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
 
-public class EnumConstant_c extends JL5Field_c implements EnumConstant {
+public class EnumConstant_c extends Field_c implements EnumConstant {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
     //protected EnumInstance enumInstance;

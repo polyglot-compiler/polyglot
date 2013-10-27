@@ -69,11 +69,11 @@ import polyglot.visit.TypeChecker;
  * list of arguments to be passed to the constructor of the object and an
  * optional <code>ClassBody</code> used to support anonymous classes.
  */
-public class New_c extends Expr_c implements New {
+public class New_c extends Expr_c implements New, NewOps {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
     protected Expr qualifier;
-    protected TypeNode tn;
+    protected TypeNode objectType;
     protected List<Expr> arguments;
     protected ClassBody body;
     protected ConstructorInstance ci;
@@ -86,7 +86,7 @@ public class New_c extends Expr_c implements New {
         assert (tn != null && arguments != null); // qualifier and body may be null
         this.qualifier = qualifier;
         this.qualifierImplicit = (qualifier == null);
-        this.tn = tn;
+        this.objectType = tn;
         this.arguments = ListUtil.copy(arguments, true);
         this.body = body;
     }
@@ -120,14 +120,14 @@ public class New_c extends Expr_c implements New {
     /** Get the type we are instantiating. */
     @Override
     public TypeNode objectType() {
-        return this.tn;
+        return this.objectType;
     }
 
     /** Set the type we are instantiating. */
     @Override
-    public New objectType(TypeNode tn) {
+    public New objectType(TypeNode objectType) {
         New_c n = (New_c) copy();
-        n.tn = tn;
+        n.objectType = objectType;
         return n;
     }
 
@@ -189,11 +189,11 @@ public class New_c extends Expr_c implements New {
     /** Reconstruct the expression. */
     protected New_c reconstruct(Expr qualifier, TypeNode tn,
             List<Expr> arguments, ClassBody body) {
-        if (qualifier != this.qualifier || tn != this.tn
+        if (qualifier != this.qualifier || tn != this.objectType
                 || !CollectionUtil.equals(arguments, this.arguments)
                 || body != this.body) {
             New_c n = (New_c) copy();
-            n.tn = tn;
+            n.objectType = tn;
             n.qualifier = qualifier;
             n.arguments = ListUtil.copy(arguments, true);
             n.body = body;
@@ -207,7 +207,7 @@ public class New_c extends Expr_c implements New {
     @Override
     public Node visitChildren(NodeVisitor v) {
         Expr qualifier = (Expr) visitChild(this.qualifier, v);
-        TypeNode tn = (TypeNode) visitChild(this.tn, v);
+        TypeNode tn = (TypeNode) visitChild(this.objectType, v);
         List<Expr> arguments = visitList(this.arguments, v);
         ClassBody body = (ClassBody) visitChild(this.body, v);
         return reconstruct(qualifier, tn, arguments, body);
@@ -311,7 +311,7 @@ public class New_c extends Expr_c implements New {
 
                 if (ct.isMember() && !ct.flags().isStatic()
                         && !ct.flags().isInterface()) {
-                    nn = ((New_c) nn).findQualifier(ar, ct);
+                    nn = ((NewOps) nn.del()).findQualifier(ar, ct);
 
                     nn =
                             nn.qualifier((Expr) nn.visitChild(nn.qualifier(),
@@ -345,7 +345,10 @@ public class New_c extends Expr_c implements New {
                     // extensions (e.g., PolyJ), the type node may be more complex than
                     // just a name.  We'll just punt here and let the extensions handle
                     // this complexity.
-                    TypeNode tn = findQualifiedTypeNode(ar, outer, objectType);
+                    TypeNode tn =
+                            ((NewOps) del()).findQualifiedTypeNode(ar,
+                                                                   outer,
+                                                                   objectType);
                     nn = nn.objectType(tn);
                 }
             }
@@ -403,8 +406,9 @@ public class New_c extends Expr_c implements New {
         return nn;
     }
 
-    protected TypeNode findQualifiedTypeNode(AmbiguityRemover ar,
-            ClassType outer, TypeNode objectType) throws SemanticException {
+    @Override
+    public TypeNode findQualifiedTypeNode(AmbiguityRemover ar, ClassType outer,
+            TypeNode objectType) throws SemanticException {
         TypeSystem ts = ar.typeSystem();
         NodeFactory nf = ar.nodeFactory();
         Context c = ar.context();
@@ -424,7 +428,8 @@ public class New_c extends Expr_c implements New {
      * @param ct
      * @throws SemanticException
      */
-    protected New findQualifier(AmbiguityRemover ar, ClassType ct)
+    @Override
+    public New findQualifier(AmbiguityRemover ar, ClassType ct)
             throws SemanticException {
         // If we're instantiating a non-static member class, add a "this"
         // qualifier.
@@ -433,7 +438,7 @@ public class New_c extends Expr_c implements New {
 
         // Search for the outer class of the member.  The outer class is
         // not just ct.outer(); it may be a subclass of ct.outer().
-        Type outer = findEnclosingClass(c, ct);
+        Type outer = ((NewOps) del()).findEnclosingClass(c, ct);
 
         if (outer == null) {
             throw new SemanticException("Could not find non-static member class \""
@@ -471,19 +476,19 @@ public class New_c extends Expr_c implements New {
             argTypes.add(e.type());
         }
 
-        if (!tn.type().isClass()) {
+        if (!objectType.type().isClass()) {
             throw new SemanticException("Must have a class for a new expression.",
                                         this.position());
         }
 
-        typeCheckFlags(tc);
-        typeCheckNested(tc);
+        ((NewOps) del()).typeCheckFlags(tc);
+        ((NewOps) del()).typeCheckNested(tc);
 
         if (this.body != null) {
             ts.checkClassConformance(anonType);
         }
 
-        ClassType ct = tn.type().toClass();
+        ClassType ct = objectType.type().toClass();
 
         if (!ct.flags().isInterface()) {
             Context c = tc.context();
@@ -506,8 +511,9 @@ public class New_c extends Expr_c implements New {
         return n.type(ct);
     }
 
-    protected void typeCheckNested(TypeChecker tc) throws SemanticException {
-        ClassType ct = tn.type().toClass();
+    @Override
+    public void typeCheckNested(TypeChecker tc) throws SemanticException {
+        ClassType ct = objectType.type().toClass();
         if (!ct.isMember()) {
             return;
         }
@@ -526,7 +532,8 @@ public class New_c extends Expr_c implements New {
                 qualifierClassType = qt.toClass();
             }
             else {
-                qualifierClassType = findEnclosingClass(tc.context(), ct);
+                qualifierClassType =
+                        ((NewOps) del()).findEnclosingClass(tc.context(), ct);
             }
             if (qualifierClassType == null) {
                 throw new SemanticException("Could not find non-static member class \""
@@ -554,7 +561,8 @@ public class New_c extends Expr_c implements New {
         }
     }
 
-    protected ClassType findEnclosingClass(Context c, ClassType ct) {
+    @Override
+    public ClassType findEnclosingClass(Context c, ClassType ct) {
         if (ct == anonType) {
             // we need to find ct, is an anonymous class, and so 
             // the enclosing class is the current class.
@@ -583,9 +591,10 @@ public class New_c extends Expr_c implements New {
         return null;
     }
 
-    protected void typeCheckFlags(TypeChecker tc) throws SemanticException {
-        if (tn.type().isClass()) {
-            typeCheckFlags(tc, tn.type().toClass().flags());
+    @Override
+    public void typeCheckFlags(TypeChecker tc) throws SemanticException {
+        if (objectType.type().isClass()) {
+            typeCheckFlags(tc, objectType.type().toClass().flags());
         }
     }
 
@@ -669,17 +678,19 @@ public class New_c extends Expr_c implements New {
     @Override
     public String toString() {
         return (qualifier != null ? (qualifier.toString() + ".") : "") + "new "
-                + tn + "(...)" + (body != null ? " " + body : "");
+                + objectType + "(...)" + (body != null ? " " + body : "");
     }
 
-    protected void printQualifier(CodeWriter w, PrettyPrinter tr) {
+    @Override
+    public void printQualifier(CodeWriter w, PrettyPrinter tr) {
         if (this.qualifier != null && !this.qualifierImplicit) {
             printSubExpr(this.qualifier, w, tr);
             w.write(".");
         }
     }
 
-    protected void printArgs(CodeWriter w, PrettyPrinter tr) {
+    @Override
+    public void printArgs(CodeWriter w, PrettyPrinter tr) {
         w.write("(");
         w.allowBreak(2, 2, "", 0);
         w.begin(0);
@@ -699,7 +710,8 @@ public class New_c extends Expr_c implements New {
         w.write(")");
     }
 
-    protected void printBody(CodeWriter w, PrettyPrinter tr) {
+    @Override
+    public void printBody(CodeWriter w, PrettyPrinter tr) {
         if (body != null) {
             w.write(" {");
             print(body, w, tr);
@@ -709,7 +721,7 @@ public class New_c extends Expr_c implements New {
 
     @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
-        printQualifier(w, tr);
+        ((NewOps) del()).printQualifier(w, tr);
         w.write("new ");
 
         // We need to be careful when pretty printing "new" expressions for
@@ -718,39 +730,39 @@ public class New_c extends Expr_c implements New {
         // But, if we print "T.C", the post compiler will try to lookup "T"
         // in "T".  Instead, we print just "C".
         if (qualifier != null) {
-            w.write(tn.name());
+            w.write(objectType.name());
         }
         else {
-            print(tn, w, tr);
+            print(objectType, w, tr);
         }
 
-        printArgs(w, tr);
-        printBody(w, tr);
+        ((NewOps) del()).printArgs(w, tr);
+        ((NewOps) del()).printBody(w, tr);
     }
 
     @Override
     public Term firstChild() {
-        return qualifier != null ? (Term) qualifier : tn;
+        return qualifier != null ? (Term) qualifier : objectType;
     }
 
     @Override
     public <T> List<T> acceptCFG(CFGBuilder<?> v, List<T> succs) {
         if (qualifier != null) {
-            v.visitCFG(qualifier, tn, ENTRY);
+            v.visitCFG(qualifier, objectType, ENTRY);
         }
 
         if (body() != null) {
-            v.visitCFG(tn, listChild(arguments, body()), ENTRY);
+            v.visitCFG(objectType, listChild(arguments, body()), ENTRY);
             v.visitCFGList(arguments, body(), ENTRY);
             v.visitCFG(body(), this, EXIT);
         }
         else {
             if (!arguments.isEmpty()) {
-                v.visitCFG(tn, listChild(arguments, (Expr) null), ENTRY);
+                v.visitCFG(objectType, listChild(arguments, (Expr) null), ENTRY);
                 v.visitCFGList(arguments, this, EXIT);
             }
             else {
-                v.visitCFG(tn, this, EXIT);
+                v.visitCFG(objectType, this, EXIT);
             }
         }
 
@@ -829,7 +841,7 @@ public class New_c extends Expr_c implements New {
     public Node copy(NodeFactory nf) {
         return nf.New(this.position,
                       this.qualifier,
-                      this.tn,
+                      this.objectType,
                       this.arguments,
                       this.body);
     }

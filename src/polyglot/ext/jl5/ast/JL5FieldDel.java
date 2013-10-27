@@ -28,26 +28,19 @@ package polyglot.ext.jl5.ast;
 import polyglot.ast.AmbReceiver;
 import polyglot.ast.Expr;
 import polyglot.ast.Field;
-import polyglot.ast.Field_c;
-import polyglot.ast.Id;
 import polyglot.ast.Node;
-import polyglot.ast.Receiver;
+import polyglot.ast.Node_c;
 import polyglot.ast.TypeNode;
 import polyglot.ext.jl5.types.EnumInstance;
 import polyglot.ext.jl5.visit.JL5Translator;
 import polyglot.types.SemanticException;
 import polyglot.util.CodeWriter;
-import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
 import polyglot.visit.PrettyPrinter;
 import polyglot.visit.TypeChecker;
 
-public class JL5Field_c extends Field_c {
+public class JL5FieldDel extends JL5Del {
     private static final long serialVersionUID = SerialVersionUID.generate();
-
-    public JL5Field_c(Position pos, Receiver target, Id name) {
-        super(pos, target, name);
-    }
 
     @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
@@ -69,27 +62,28 @@ public class JL5Field_c extends Field_c {
 
     @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
+        Field n = (Field) this.node();
         w.begin(0);
-        if (!targetImplicit) {
+        if (!n.isTargetImplicit()) {
             // explicit target.
-            if (target instanceof Expr) {
-                printSubExpr((Expr) target, w, tr);
+            if (n.target() instanceof Expr) {
+                n.printSubExpr((Expr) n.target(), w, tr);
             }
-            else if (target instanceof TypeNode
-                    || target instanceof AmbReceiver) {
+            else if (n.target() instanceof TypeNode
+                    || n.target() instanceof AmbReceiver) {
                 if (tr instanceof JL5Translator) {
                     JL5Translator jltr = (JL5Translator) tr;
-                    jltr.printReceiver(target, w);
+                    jltr.printReceiver(n.target(), w);
                 }
                 else {
-                    print(target, w, tr);
+                    ((Node_c) n).print(n.target(), w, tr);
                 }
             }
 
             w.write(".");
             w.allowBreak(2, 3, "", 0);
         }
-        tr.print(this, name, w);
+        tr.print(n, n.id(), w);
         w.end();
     }
 }

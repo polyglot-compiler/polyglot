@@ -29,7 +29,6 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
-import polyglot.ast.ArrayInit;
 import polyglot.ast.Block;
 import polyglot.ast.Call;
 import polyglot.ast.CanonicalTypeNode;
@@ -41,15 +40,12 @@ import polyglot.ast.ConstructorCall.Kind;
 import polyglot.ast.ConstructorDecl;
 import polyglot.ast.Disamb;
 import polyglot.ast.Expr;
-import polyglot.ast.Field;
 import polyglot.ast.FieldDecl;
 import polyglot.ast.Formal;
 import polyglot.ast.Id;
-import polyglot.ast.Import;
 import polyglot.ast.LocalDecl;
 import polyglot.ast.MethodDecl;
 import polyglot.ast.New;
-import polyglot.ast.NewArray;
 import polyglot.ast.NodeFactory_c;
 import polyglot.ast.Receiver;
 import polyglot.ast.Stmt;
@@ -94,10 +90,9 @@ public class JL5NodeFactory_c extends NodeFactory_c implements JL5NodeFactory {
                     + "type node for a non-canonical type.");
         }
 
-        CanonicalTypeNode n = new JL5CanonicalTypeNode_c(pos, type);
-        n = (CanonicalTypeNode) n.ext(extFactory().extCanonicalTypeNode());
-        n = (CanonicalTypeNode) n.del(delFactory().delCanonicalTypeNode());
-        return n;
+        return super.CanonicalTypeNode(pos,
+                                       JL5CanonicalTypeNodeDel.makeRawIfNeeded(type,
+                                                                               pos));
     }
 
     @Override
@@ -351,14 +346,6 @@ public class JL5NodeFactory_c extends NodeFactory_c implements JL5NodeFactory {
     }
 
     @Override
-    public JL5Import Import(Position pos, Import.Kind kind, String name) {
-        JL5Import n = new JL5Import_c(pos, kind, name);
-        n = (JL5Import) n.ext(extFactory().extImport());
-        n = (JL5Import) n.del(delFactory().delImport());
-        return n;
-    }
-
-    @Override
     public Formal Formal(Position pos, Flags flags, TypeNode type, Id name) {
         return Formal(pos, flags, null, type, name);
     }
@@ -416,56 +403,27 @@ public class JL5NodeFactory_c extends NodeFactory_c implements JL5NodeFactory {
     @Override
     public New New(Position pos, List<TypeNode> typeArgs, TypeNode type,
             List<Expr> args, ClassBody body) {
-        New n = this.New(pos, null, typeArgs, type, args, body);
-        n = (New) n.ext(extFactory().extNew());
-        n = (New) n.del(delFactory().delNew());
-        return n;
+        return this.New(pos, null, typeArgs, type, args, body);
     }
 
     @Override
     public New New(Position pos, Expr outer, List<TypeNode> typeArgs,
             TypeNode objectType, List<Expr> args, ClassBody body) {
         New n =
-                new JL5New_c(pos,
-                             outer,
-                             CollectionUtil.nonNullList(typeArgs),
-                             objectType,
-                             CollectionUtil.nonNullList(args),
-                             body);
-        n = (New) n.ext(extFactory().extNew());
-        n = (New) n.del(delFactory().delNew());
+                super.New(pos,
+                          outer,
+                          objectType,
+                          CollectionUtil.nonNullList(args),
+                          body);
+        JL5NewExt ext = (JL5NewExt) JL5Ext.ext(n);
+        ext.typeArgs = CollectionUtil.nonNullList(typeArgs);
         return n;
     }
 
     @Override
     public New New(Position pos, Expr outer, TypeNode objectType,
             List<Expr> args, ClassBody body) {
-        New n = this.New(pos, outer, null, objectType, args, body);
-        n = (New) n.ext(extFactory().extNew());
-        n = (New) n.del(delFactory().delNew());
-        return n;
-    }
-
-    @Override
-    public NewArray NewArray(Position pos, TypeNode base, List<Expr> dims,
-            int addDims, ArrayInit init) {
-        NewArray n =
-                new JL5NewArray_c(pos,
-                                  base,
-                                  CollectionUtil.nonNullList(dims),
-                                  addDims,
-                                  init);
-        n = (NewArray) n.ext(extFactory().extNewArray());
-        n = (NewArray) n.del(delFactory().delNewArray());
-        return n;
-    }
-
-    @Override
-    public Field Field(Position pos, Receiver target, Id name) {
-        Field n = new JL5Field_c(pos, target, name);
-        n = (Field) n.ext(extFactory().extField());
-        n = (Field) n.del(delFactory().delField());
-        return n;
+        return New(pos, outer, null, objectType, args, body);
     }
 
     @Override

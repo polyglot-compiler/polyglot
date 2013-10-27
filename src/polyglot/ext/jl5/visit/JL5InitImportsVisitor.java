@@ -51,7 +51,7 @@ public class JL5InitImportsVisitor extends InitImportsVisitor {
             throws SemanticException {
         Node r = super.leaveCall(old, n, v);
         if (r instanceof Import) {
-            JL5Import im = (JL5Import) n;
+            Import im = (Import) n;
             JL5ImportTable it = (JL5ImportTable) this.importTable;
 
             if (im.kind() == JL5Import.SINGLE_STATIC_MEMBER) {

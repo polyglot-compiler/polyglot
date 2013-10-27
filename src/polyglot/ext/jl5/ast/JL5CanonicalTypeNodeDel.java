@@ -28,6 +28,7 @@ package polyglot.ext.jl5.ast;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
+import polyglot.ast.CanonicalTypeNode;
 import polyglot.ast.Node;
 import polyglot.ext.jl5.types.IntersectionType;
 import polyglot.ext.jl5.types.JL5Context;
@@ -49,17 +50,18 @@ import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
 import polyglot.visit.TypeChecker;
 
-public class JL5CanonicalTypeNode_c extends polyglot.ast.CanonicalTypeNode_c {
+public class JL5CanonicalTypeNodeDel extends JL5Del {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
-    public JL5CanonicalTypeNode_c(Position pos, Type type) {
-        super(pos, makeRawIfNeeded(type, pos));
-    }
-
     /**
-     * Documentation needed
+     * This method takes a type, and, if that type 
+     * is a class with type parameters, then
+     * make it a raw class. Also, if the type is a 
+     * class with no type variables, but is an inner
+     * class of a raw class, then the class should 
+     * be a raw class (i.e., the erasure of the type).
      */
-    private static Type makeRawIfNeeded(Type type, Position pos) {
+    public static Type makeRawIfNeeded(Type type, Position pos) {
         if (type.isClass()) {
             JL5TypeSystem ts = (JL5TypeSystem) type.typeSystem();
             if (type instanceof JL5ParsedClassType
@@ -77,7 +79,6 @@ public class JL5CanonicalTypeNode_c extends polyglot.ast.CanonicalTypeNode_c {
                     }
                     t = outer;
                     outer = outer.outer();
-
                 }
             }
         }
@@ -86,7 +87,8 @@ public class JL5CanonicalTypeNode_c extends polyglot.ast.CanonicalTypeNode_c {
 
     @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
-        Type t = this.type();
+        CanonicalTypeNode n = (CanonicalTypeNode) this.node();
+        Type t = n.type();
         if (t instanceof JL5SubstClassType) {
             JL5SubstClassType st = (JL5SubstClassType) t;
             JL5TypeSystem ts = (JL5TypeSystem) tc.typeSystem();
@@ -104,17 +106,17 @@ public class JL5CanonicalTypeNode_c extends polyglot.ast.CanonicalTypeNode_c {
                                                             + " when the outer class "
                                                             + st.outer()
                                                             + " has instantiated type variables.",
-                                                    position);
+                                                    n.position());
                     }
                 }
 
             }
             if (!st.base().typeVariables().isEmpty()) {
                 // check that arguments obey their bounds.
-                //first we must perform capture conversion. see beginning of JLS 4.5            
+                // first we must perform capture conversion. see beginning of JLS 4.5            
                 JL5SubstClassType capCT =
                         (JL5SubstClassType) ts.applyCaptureConversion(st,
-                                                                      this.position);
+                                                                      n.position());
 
                 for (int i = 0; i < capCT.actuals().size(); i++) {
                     TypeVariable ai = capCT.base().typeVariables().get(i);
@@ -132,7 +134,7 @@ public class JL5CanonicalTypeNode_c extends polyglot.ast.CanonicalTypeNode_c {
                         throw new SemanticException("Type argument "
                                 + st.actuals().get(i)
                                 + " is not a subtype of its declared bound "
-                                + ai.upperBound(), position());
+                                + ai.upperBound(), n.position());
                     }
                 }
             }
@@ -143,7 +145,7 @@ public class JL5CanonicalTypeNode_c extends polyglot.ast.CanonicalTypeNode_c {
                 && !((JL5Context) tc.context()).inCTORCall()) {
             for (TypeVariable tv : findInstanceTypeVariables(t)) {
                 throw new SemanticException("Type variable " + tv
-                        + " cannot be used in a static context", this.position);
+                        + " cannot be used in a static context", n.position());
 
             }
         }
@@ -162,7 +164,7 @@ public class JL5CanonicalTypeNode_c extends polyglot.ast.CanonicalTypeNode_c {
                                                             + " of class "
                                                             + tv.declaringClass()
                                                             + " cannot be used in a nested class",
-                                                    this.position);
+                                                    n.position());
                     }
                 }
             }

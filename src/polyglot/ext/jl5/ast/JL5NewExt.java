@@ -29,9 +29,25 @@ import java.util.List;
 
 import polyglot.ast.New;
 import polyglot.ast.TypeNode;
+import polyglot.util.SerialVersionUID;
 
-public interface JL5New extends New {
-    List<TypeNode> typeArgs();
+public class JL5NewExt extends JL5Ext {
+    private static final long serialVersionUID = SerialVersionUID.generate();
 
-    JL5New typeArgs(List<TypeNode> typeArgs);
+    protected List<TypeNode> typeArgs;
+
+    public List<TypeNode> typeArgs() {
+        return this.typeArgs;
+    }
+
+    public New typeArgs(List<TypeNode> typeArgs) {
+        if (this.typeArgs == typeArgs) {
+            return (New) this.node();
+        }
+        New n = (New) this.node().copy();
+        JL5NewExt ext = (JL5NewExt) JL5Ext.ext(n);
+        ext.typeArgs = typeArgs;
+        return n;
+    }
+
 }
