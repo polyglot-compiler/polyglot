@@ -105,7 +105,9 @@ public class LocalClassDecl_c extends Stmt_c implements LocalClassDecl {
     @Override
     public void addDecls(Context c) {
         // We should now be back in the scope of the enclosing block.
-        // Add the type.
+        // Add the type, if any.
+        if (decl.type() == null) return;
+
         if (!decl.type().toClass().isLocal())
             throw new InternalCompilerError("Non-local " + decl.type()
                     + " found in method body.");
