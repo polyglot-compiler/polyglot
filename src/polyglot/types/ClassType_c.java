@@ -122,12 +122,15 @@ public abstract class ClassType_c extends ReferenceType_c implements ClassType {
         if (isTopLevel() && package_() != null) {
             return package_().fullName() + "." + name;
         }
-        else if (isMember() && container() instanceof Named) {
-            return ((Named) container()).fullName() + "." + name;
-        }
-        else {
-            return name;
-        }
+
+        if (!isMember()) return name;
+
+        ReferenceType container = container();
+        if (!(container instanceof Named)) return name;
+        if ((container instanceof ClassType)
+                && ((ClassType) container).isAnonymous()) return name;
+
+        return ((Named) container).fullName() + "." + name;
     }
 
     @Override
