@@ -64,13 +64,13 @@ public interface Subst<Formal extends Param, Actual extends TypeObject> extends
     /** Perform substitutions on a PClass. */
     public PClass<Formal, Actual> substPClass(PClass<Formal, Actual> pc);
 
-    /** Perform substititions on a field. */
+    /** Perform substitutions on a field. */
     public <T extends FieldInstance> T substField(T fi);
 
-    /** Perform substititions on a method. */
+    /** Perform substitutions on a method. */
     public <T extends MethodInstance> T substMethod(T mi);
 
-    /** Perform substititions on a constructor. */
+    /** Perform substitutions on a constructor. */
     public <T extends ConstructorInstance> T substConstructor(T ci);
 
     /** Perform substitutions on a list of types. */
