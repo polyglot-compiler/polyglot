@@ -82,7 +82,7 @@ public abstract class JL5ClassType_c extends ClassType_c implements
     public LinkedList<Type> isImplicitCastValidChainImpl(Type toType) {
         JL5TypeSystem ts = (JL5TypeSystem) this.ts;
         LinkedList<Type> chain = null;
-        if (super.isImplicitCastValidImpl(toType)) {
+        if (ts.isSubtype(this, toType)) {
             chain = new LinkedList<Type>();
             chain.add(this);
             chain.add(toType);

@@ -27,7 +27,6 @@ package polyglot.ext.jl5.types;
 
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
@@ -240,17 +239,6 @@ public class RawClass_c extends JL5ClassType_c implements RawClass {
     @Override
     public String translateAsReceiver(Resolver c) {
         return this.translate(c);
-    }
-
-    @Override
-    public LinkedList<Type> isImplicitCastValidChainImpl(Type toType) {
-        LinkedList<Type> chain = null;
-        if (ts.isSubtype(this, toType)) {
-            chain = new LinkedList<Type>();
-            chain.add(this);
-            chain.add(toType);
-        }
-        return chain;
     }
 
     @Override
