@@ -35,7 +35,8 @@ import polyglot.types.SemanticException;
 /**
  * Interface for nodes that can have annotations, which, for example
  * include class declarations, field declarations, and method 
- * declarations.
+ * declarations. This interface is implemented by the JL5 extensions of
+ * these nodes.
  *
  */
 public interface AnnotatedElement {

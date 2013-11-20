@@ -29,10 +29,14 @@ import java.util.List;
 
 import polyglot.ast.Node;
 import polyglot.ext.jl5.types.Annotations;
+import polyglot.ext.jl5.types.JL5TypeSystem;
 import polyglot.ext.jl5.visit.AnnotationChecker;
 import polyglot.types.Declaration;
 import polyglot.types.SemanticException;
+import polyglot.util.CollectionUtil;
 import polyglot.util.SerialVersionUID;
+import polyglot.visit.NodeVisitor;
+import polyglot.visit.TypeChecker;
 
 public abstract class JL5AnnotatedElementExt extends JL5Ext implements
         AnnotatedElement {
@@ -56,6 +60,40 @@ public abstract class JL5AnnotatedElementExt extends JL5Ext implements
             annoCheck.checkAnnotationApplicability(elem, this.declaration());
         }
         return n;
+    }
+
+    public Node visitChildren(NodeVisitor v) {
+        Node newN = this.node().visitChildren(v);
+        JL5AnnotatedElementExt newext =
+                (JL5AnnotatedElementExt) JL5Ext.ext(newN);
+
+        List<AnnotationElem> annots =
+                newN.visitList(newext.annotationElems(), v);
+
+        if (!CollectionUtil.equals(annots, newext.annotationElems())) {
+            // the annotations changed! Let's update the node.
+            if (newN == this.node()) {
+                // we need to create a copy.
+                newN = (Node) newN.copy();
+                newext = (JL5AnnotatedElementExt) JL5Ext.ext(newN);
+            }
+            else {
+                // the call to super.visitChildren(v) already
+                // created a copy of the node (and thus of its extension).
+            }
+            newext.annotations = annots;
+        }
+        return newN;
+    }
+
+    public Node typeCheck(TypeChecker tc) throws SemanticException {
+        JL5AnnotatedElementExt ext =
+                (JL5AnnotatedElementExt) JL5Ext.ext(this.node());
+
+        JL5TypeSystem ts = (JL5TypeSystem) tc.typeSystem();
+        ts.checkDuplicateAnnotations(ext.annotationElems());
+        return this.node().typeCheck(tc);
+
     }
 
     /**

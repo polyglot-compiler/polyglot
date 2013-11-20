@@ -50,6 +50,16 @@ public class JL5ExtFactory_c extends AbstractExtFactory_c implements
     }
 
     @Override
+    protected Ext extAssertImpl() {
+        return new JL5AssertExt();
+    }
+
+    @Override
+    protected Ext extAssignImpl() {
+        return new JL5AssignExt();
+    }
+
+    @Override
     protected Ext extConstructorCallImpl() {
         return new JL5ConstructorCallExt();
     }

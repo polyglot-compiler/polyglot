@@ -25,26 +25,35 @@
  ******************************************************************************/
 package polyglot.ext.jl5.ast;
 
+import polyglot.ast.Assert;
 import polyglot.ast.Node;
+import polyglot.ext.jl5.types.JL5TypeSystem;
 import polyglot.types.SemanticException;
+import polyglot.types.Type;
 import polyglot.util.SerialVersionUID;
-import polyglot.visit.NodeVisitor;
 import polyglot.visit.TypeChecker;
 
-public abstract class JL5AnnotatedElementDel extends JL5Del {
+public class JL5AssertExt extends JL5Ext {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
-    @Override
-    public Node visitChildren(NodeVisitor v) {
-        JL5AnnotatedElementExt ext =
-                (JL5AnnotatedElementExt) JL5Ext.ext(this.node());
-        return ext.visitChildren(v);
+    public Node typeCheck(TypeChecker tc) throws SemanticException {
+        Assert orig = (Assert) this.node();
+
+        Type c = orig.cond().type();
+        JL5TypeSystem ts = (JL5TypeSystem) tc.typeSystem();
+
+        if (ts.isPrimitiveWrapper(c)) {
+            // The condition is a primitive wrapper. Unwrap it, and call the
+            // superclass type check functionality.
+            Assert n =
+                    orig.cond(orig.cond().type(ts.primitiveTypeOfWrapper(c)));
+            n = (Assert) n.typeCheck(tc);
+
+            // restore the type
+            n = n.cond(n.cond().type(c));
+            return n;
+        }
+        return this.node().typeCheck(tc);
     }
 
-    @Override
-    public Node typeCheck(TypeChecker tc) throws SemanticException {
-        JL5AnnotatedElementExt ext =
-                (JL5AnnotatedElementExt) JL5Ext.ext(this.node());
-        return ext.typeCheck(tc);
-    }
 }
