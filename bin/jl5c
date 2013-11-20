@@ -134,7 +134,7 @@ if [ "$usage" = 1 ]; then
   exit 0
 fi
 
-args="-extclass polyglot.ext.jl5.ExtensionInfo $args"
+args="-extclass polyglot.ext.jl5.JL5ExtensionInfo $args"
 
 if [ "$verbose" = 1 ]; then
     compilerprint "$args"
