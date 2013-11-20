@@ -56,7 +56,7 @@ unixpath() {
 
 extra_cp=
 args=
-vmargs=
+vmargs=-ea
 classpath=
 java=java
 
@@ -121,7 +121,7 @@ if [ "$usage" = 1 ]; then
 fi
 
 if [ "$verbose" = 1 ]; then
-  echo "$java" "$vmargs" -classpath "'$classpath'" polyglot.main.Main "$@"
+  echo "$java" "$vmargs" -classpath "'$classpath'" polyglot.main.Main "$args"
 fi
 
 polyglot "$args"
