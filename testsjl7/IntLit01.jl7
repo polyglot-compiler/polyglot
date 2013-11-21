@@ -1,0 +1,3 @@
+class C {
+  int x = 5_2;
+}

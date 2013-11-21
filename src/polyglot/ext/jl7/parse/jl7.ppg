@@ -1,0 +1,18 @@
+// Assumes polyglot.jar is in classpath
+include "polyglot/ext/jl5/parse/jl5.ppg"
+
+package polyglot.ext.jl7.parse;
+
+import polyglot.parse.*;
+import polyglot.ext.jl5.parse.*;
+
+
+parser Grm extends polyglot.ext.jl5.parse.Grm  {:
+  
+  public Grm(Lexer l, TypeSystem t, NodeFactory n, ErrorQueue q) {
+    super(l, t, n, q);
+  }
+
+:};
+
+start with goal;
