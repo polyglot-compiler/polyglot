@@ -1,3 +1,31 @@
 class C {
-  int x = 5_2;
+    void m() {	
+	int x;
+	
+	// binary literals
+	x = 0b1001010;
+	x = 0B1001010;
+	x = 0B1011111;
+
+	// underscores decimal
+	x = 5_2;
+	x = 5_32;
+	x = 54_2;
+	x = 55_345_45;
+
+	// underscores hex
+	x = 0xa3_23_3e;
+	x = 0Xa3_23_3e;
+
+	// underscores octal
+	x = 07363_47;
+	x = 0342_2;
+	x = 0_342;
+
+	// underscores binary
+	x = 0b0010_1010_0000_1010;
+	x = 0B0010_1010_0000_1010;
+
+
+    }
 }

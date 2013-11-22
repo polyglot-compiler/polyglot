@@ -1,0 +1,10 @@
+class C {
+    void m() {	
+	int x;
+	
+	// Bad underscores
+	// underscores binary
+	x = 0b_0010_1010_0000_1010;
+
+    }
+}

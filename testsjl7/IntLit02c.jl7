@@ -1,0 +1,12 @@
+class C {
+    void m() {	
+	int x;
+	
+	// Bad underscores
+	// underscores hex
+	x = 0x_a3_23_3e;
+
+
+
+    }
+}

@@ -1,0 +1,14 @@
+class C {
+    void m() {	
+	int x;
+	
+	// Bad underscores
+	// underscores decimal
+	x = _52;
+
+	// underscores octal
+	x = _0736347;
+
+
+    }
+}

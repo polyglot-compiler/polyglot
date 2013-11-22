@@ -1,0 +1,20 @@
+class C {
+    void m() {	
+	int x;
+	
+	// Bad underscores
+	// underscores decimal
+	x = 55_;
+
+	// underscores hex
+	x = 0Xa3_23_3e_;
+
+	// underscores octal
+	x = 03422_;
+
+	// underscores binary
+	x = 0B0010_1010_0000_1010_;
+
+
+    }
+}
