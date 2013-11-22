@@ -138,8 +138,13 @@ import java.math.BigInteger;
         return new Identifier(pos(), yytext(), sym.IDENTIFIER);
     }
 
+    private String removeUnderscores(String s) {
+        return s.replaceAll("_", "");
+    }
+    
     private Token int_lit(String s, int radix) {
-        BigInteger x = new BigInteger(s.replaceAll("_", ""), radix);
+        s = removeUnderscores(s);
+        BigInteger x = new BigInteger(s, radix);
         boolean boundary = (radix == 10 && s.equals("2147483648"));
         int bits = radix == 10 ? 31 : 32;
         if (x.bitLength() > bits && ! boundary) {
@@ -151,6 +156,7 @@ import java.math.BigInteger;
     }
 
     private Token long_lit(String s, int radix) {
+        s = removeUnderscores(s);
         BigInteger x = new BigInteger(s, radix);
         boolean boundary = (radix == 10 && s.equals("9223372036854775808"));
         int bits = radix == 10 ? 63 : 64;
@@ -164,6 +170,7 @@ import java.math.BigInteger;
 
     private Token float_lit(String s) {
         try {
+            s = removeUnderscores(s);
             Float x = Float.valueOf(s);
             boolean zero = true;
             for (int i = 0; i < s.length(); i++) {
@@ -190,6 +197,7 @@ import java.math.BigInteger;
 
     private Token double_lit(String s) {
         try {
+            s = removeUnderscores(s);
             Double x = Double.valueOf(s);
             boolean zero = true;
             for (int i = 0; i < s.length(); i++) {
@@ -296,7 +304,7 @@ OctalDigit = [0-7]
 OctalDigitAndUnderscore = {OctalDigit} | "_"
 
 
-BinaryNumeral = 0 [xX] {BinaryDigits}
+BinaryNumeral = 0 [bB] {BinaryDigits}
 BinaryDigits = {BinaryDigit} | {BinaryDigit} {BinaryDigitAndUnderscore}* {BinaryDigit}
 BinaryDigit = [01]
 BinaryDigitAndUnderscore = {BinaryDigit} | "_"
@@ -409,6 +417,7 @@ OctalEscape = \\ [0-7]
     /* 3.10.1 Integer Literals */
     {OctalNumeral} [lL]          { return long_lit(chop(), 8); }
     {HexNumeral} [lL]            { return long_lit(chop(2,1), 16); }
+    {BinaryNumeral} [lL]        { return long_lit(chop(2,1), 2); }
     {DecimalNumeral} [lL]        { return long_lit(chop(), 10); }
     {OctalNumeral}               { return int_lit(yytext(), 8); }
     {HexNumeral}                 { return int_lit(chop(2,0), 16); }
