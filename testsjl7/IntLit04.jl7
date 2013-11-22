@@ -4,6 +4,8 @@ class C {
 	
 	x = 2147483649;  // int too big
 	x = 2147483648;  // int too big	
+	x = 214748_3649;  // int too big
+	x = 21474_83648;  // int too big	
 
 	x = 0xffff_ffff_f; // too many bits
 	x = 377_7777_7777_1; // too many bits
@@ -13,6 +15,9 @@ class C {
 
 	y = 9223372036854775808L; // long too big
 	y = 9223372036854775809L; // long too big
+
+	y = 922337_2036854775808L; // long too big
+	y = 922337203_6854775809L; // long too big
 
     }
 }

@@ -35,9 +35,13 @@ polyglot.ext.jl7.JL7ExtensionInfo "-d out -classpath java-out -assert -noserial 
         IntLit01.jl7;
         IntLit02.jl7 (Syntax), (Syntax),(Syntax),(Syntax);
         IntLit02a.jl7 (Syntax);
-        IntLit02b.jl7 (), (); // 2 errors
+        IntLit02b.jl7 ("Could not find") , ("Could not find"); // 2 errors
         IntLit02c.jl7 (Syntax);
         IntLit03.jl7;
-        IntLit04.jl7 (), (),(),(),(), (),(); // 7 errors
+        IntLit04.jl7 ("out of range"),("unexpected .* literal"), 
+                     ("out of range"),("unexpected .* literal"), 
+                     ("out of range"),("out of range"),("out of range"),
+                     ("out of range"),("unexpected .* literal"), 
+                     ("out of range"),("unexpected .* literal"); // 11 errors
         FloatLit01.jl7;
 }

@@ -1,7 +1,11 @@
 class C {
     void m() {	
-	int z = -2147483648;  // OK
-	long y = -9223372036854775808L; // OK
+	int z;
+	z = -2147483648;  // OK
+	z = -2147_483648;  // OK
+	long y;
+	y = -9223372036854775808L; // OK
+	y = -9223_37203685_4775808L; // OK
 
 	// largest ints
 	z = 0x7fff_ffff;
