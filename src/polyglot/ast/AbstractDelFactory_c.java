@@ -26,8 +26,6 @@
 
 package polyglot.ast;
 
-import polyglot.util.InternalCompilerError;
-
 /**
  * This abstract implementation of <code>DelFactory</code> provides
  * a way of chaining together DelFactories, and default implementations
@@ -72,20 +70,17 @@ public abstract class AbstractDelFactory_c implements DelFactory {
     }
 
     /**
-     * Compose two delegates together. Order is important: e1 gets added
-     * at the end of e2's chain.
-     * @param e1 the <code>JL</code> object to add to the end of e2's 
-     *             chain of delegates. 
-     * @param e2 the second <code>JL</code> object that will have e1 added to 
-     *             its chain of delegates.
-     * @return the result of adding e1 to the end of e2's chain of delegates.
+     * Compose two delegates together. This operation is extension specific,
+     * and so in this class it throws an UnsupportedOperationException. 
+     * A typical use of this method would be to add e2 as the "superclass" delegate
+     * to e1.
+     * 
+     * @param e1 a <code>JL</code> object created by this DelFactory.
+     * @param e2 a  <code>JL</code> object created by this.nextDelFactory
+     * @return the result of composing e1 and e2.
      */
     protected JL composeDels(JL e1, JL e2) {
-        if (e1 == null) return e2;
-        if (e2 == null) return e1;
-        throw new InternalCompilerError("Composition of delegates unimplemented.");
-        // add e1 as e2's last extension, by recursing...
-        //return e2.ext(composeDels(e1, e2.ext()));
+        throw new UnsupportedOperationException("Composition of delegates unimplemented.");
     }
 
     // ******************************************
