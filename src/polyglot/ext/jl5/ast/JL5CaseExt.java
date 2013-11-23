@@ -139,7 +139,7 @@ public class JL5CaseExt extends JL5Ext implements JL5CaseOps {
                                     this.node().position());
     }
 
-    private boolean isNumericSwitchType(Type switchType, JL5TypeSystem ts) {
+    public boolean isNumericSwitchType(Type switchType, JL5TypeSystem ts) {
         if (ts.Char().equals(switchType)
                 || ts.wrapperClassOfPrimitive(ts.Char()).equals(switchType)) {
             return true;
