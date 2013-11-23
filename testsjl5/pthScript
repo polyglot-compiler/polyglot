@@ -425,6 +425,9 @@ polyglot.ext.jl5.ExtensionInfo "-d out -classpath java-out -assert -noserial -po
         PermissiveCasts03.jl5 (Semantic, "Cannot cast");
         FinalInit01.jl5;
         Nested01.jl5;
+        Switch01.jl5;
+        Switch02.jl5 ();
+        Switch03.jl5 ();
 }
 
 # Now run the tests again removing the Java 5-isms.
@@ -813,6 +816,9 @@ polyglot.ext.jl5.ExtensionInfo "-d out -classpath java-out -removeJava5isms -enu
         PermissiveCasts03.jl5 (Semantic, "Cannot cast");
         FinalInit01.jl5;
         Nested01.jl5;
+        Switch01.jl5;
+        Switch02.jl5 ();
+        Switch03.jl5 ();
 }
 
 polyglot.ext.jl5.ExtensionInfo "-d out -classpath java-out -assert -noserial -post \"javac -Xlint\\:-options -source 1.5\" -morepermissivecasts" {
