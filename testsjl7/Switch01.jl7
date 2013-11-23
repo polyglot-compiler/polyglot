@@ -1,0 +1,8 @@
+class C {
+    void m(String s) {
+	switch (s) {
+	case "Hello":
+	    ;
+	}
+    }
+}

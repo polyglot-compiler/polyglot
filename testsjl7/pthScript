@@ -44,4 +44,5 @@ polyglot.ext.jl7.JL7ExtensionInfo "-d out -classpath java-out -assert -noserial 
                      ("out of range"),("unexpected .* literal"), 
                      ("out of range"),("unexpected .* literal"); // 11 errors
         FloatLit01.jl7;
+	Switch01.jl7;
 }
