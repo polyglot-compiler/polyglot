@@ -60,8 +60,38 @@ public class JL5ExtFactory_c extends AbstractExtFactory_c implements
     }
 
     @Override
+    protected Ext extBinaryImpl() {
+        return new JL5BinaryExt();
+    }
+
+    @Override
+    protected Ext extCanonicalTypeNodeImpl() {
+        return new JL5CanonicalTypeNodeExt();
+    }
+
+    @Override
+    protected Ext extClassBodyImpl() {
+        return new JL5ClassBodyExt();
+    }
+
+    @Override
+    protected Ext extClassLitImpl() {
+        return new JL5ClassLitExt();
+    }
+
+    @Override
+    protected Ext extConditionalImpl() {
+        return new JL5ConditionalExt();
+    }
+
+    @Override
     protected Ext extConstructorCallImpl() {
         return new JL5ConstructorCallExt();
+    }
+
+    @Override
+    protected Ext extFieldImpl() {
+        return new JL5FieldExt();
     }
 
     @Override
@@ -72,6 +102,21 @@ public class JL5ExtFactory_c extends AbstractExtFactory_c implements
     @Override
     protected Ext extCallImpl() {
         return new JL5CallExt();
+    }
+
+    @Override
+    protected Ext extSpecialImpl() {
+        return new JL5SpecialExt();
+    }
+
+    @Override
+    protected Ext extSwitchImpl() {
+        return new JL5SwitchExt();
+    }
+
+    @Override
+    protected Ext extUnaryImpl() {
+        return new JL5UnaryExt();
     }
 
     @Override
@@ -95,6 +140,11 @@ public class JL5ExtFactory_c extends AbstractExtFactory_c implements
     }
 
     @Override
+    protected Ext extImportImpl() {
+        return new JL5ImportExt();
+    }
+
+    @Override
     protected Ext extMethodDeclImpl() {
         return new JL5MethodDeclExt();
     }
@@ -102,6 +152,11 @@ public class JL5ExtFactory_c extends AbstractExtFactory_c implements
     @Override
     protected Ext extNewImpl() {
         return new JL5NewExt();
+    }
+
+    @Override
+    protected Ext extNewArrayImpl() {
+        return new JL5NewArrayExt();
     }
 
     @Override

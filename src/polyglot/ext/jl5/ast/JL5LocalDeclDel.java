@@ -25,11 +25,7 @@
  ******************************************************************************/
 package polyglot.ext.jl5.ast;
 
-import polyglot.ast.LocalDecl;
 import polyglot.ast.Node;
-import polyglot.ext.jl5.types.TypeVariable;
-import polyglot.ext.jl5.types.TypeVariable.TVarDecl;
-import polyglot.types.Flags;
 import polyglot.types.SemanticException;
 import polyglot.util.CodeWriter;
 import polyglot.util.SerialVersionUID;
@@ -41,32 +37,12 @@ public class JL5LocalDeclDel extends JL5AnnotatedElementDel {
 
     @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
-        LocalDecl n = (LocalDecl) this.node();
-        if (!n.flags().clear(Flags.FINAL).equals(Flags.NONE)) {
-            throw new SemanticException("Modifier: " + n.flags().clearFinal()
-                    + " not allowed here.", n.position());
-        }
-        if (n.type().type() instanceof TypeVariable
-                && tc.context().inStaticContext()) {
-            if (((TypeVariable) n.type().type()).declaredIn()
-                                                .equals(TVarDecl.CLASS_TYPE_VARIABLE))
-                throw new SemanticException("Cannot access non-static type: "
-                        + ((TypeVariable) n.type().type()).name()
-                        + " in a static context.", n.position());
-        }
-        return super.typeCheck(tc);
+        return ((JL5LocalDeclExt) JL5Ext.ext(this.node())).typeCheck(tc);
     }
 
     @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
-        JL5AnnotatedElementExt ext =
-                (JL5AnnotatedElementExt) JL5Ext.ext(this.node());
-        for (AnnotationElem ae : ext.annotationElems()) {
-            ae.del().prettyPrint(w, tr);
-            w.newline();
-        }
-
-        super.prettyPrint(w, tr);
+        ((JL5LocalDeclExt) JL5Ext.ext(this.node())).prettyPrint(w, tr);
     }
 
 }

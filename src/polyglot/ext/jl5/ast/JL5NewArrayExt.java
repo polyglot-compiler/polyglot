@@ -25,16 +25,23 @@
  ******************************************************************************/
 package polyglot.ext.jl5.ast;
 
+import polyglot.ast.NewArray;
 import polyglot.ast.Node;
+import polyglot.ext.jl5.types.JL5TypeSystem;
 import polyglot.types.SemanticException;
 import polyglot.util.SerialVersionUID;
 import polyglot.visit.TypeChecker;
 
-public class JL5NewArrayDel extends JL5Del {
+public class JL5NewArrayExt extends JL5Ext {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
-    @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
-        return ((JL5NewArrayExt) JL5Ext.ext(this.node())).typeCheck(tc);
+        NewArray n = (NewArray) this.superDel().typeCheck(tc);
+        JL5TypeSystem ts = (JL5TypeSystem) tc.typeSystem();
+        if (!ts.isReifiable(n.type())) {
+            throw new SemanticException("The base type of an array must be reifiable.",
+                                        n.position());
+        }
+        return n;
     }
 }

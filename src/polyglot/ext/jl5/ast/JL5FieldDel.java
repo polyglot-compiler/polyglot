@@ -25,14 +25,7 @@
  ******************************************************************************/
 package polyglot.ext.jl5.ast;
 
-import polyglot.ast.AmbReceiver;
-import polyglot.ast.Expr;
-import polyglot.ast.Field;
 import polyglot.ast.Node;
-import polyglot.ast.Node_c;
-import polyglot.ast.TypeNode;
-import polyglot.ext.jl5.types.EnumInstance;
-import polyglot.ext.jl5.visit.JL5Translator;
 import polyglot.types.SemanticException;
 import polyglot.util.CodeWriter;
 import polyglot.util.SerialVersionUID;
@@ -44,46 +37,11 @@ public class JL5FieldDel extends JL5Del {
 
     @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
-        Field n = (Field) super.typeCheck(tc);
-        if (n.fieldInstance() instanceof EnumInstance
-                && !(this instanceof EnumConstant)) {
-            // it's an enum, so replace this with the appropriate AST node for enum constants.
-            JL5NodeFactory nf = (JL5NodeFactory) tc.nodeFactory();
-            EnumConstant ec =
-                    nf.EnumConstant(n.position(),
-                                    n.target(),
-                                    nf.Id(n.id().position(), n.name()));
-            ec = (EnumConstant) ec.type(n.type());
-            ec = ec.enumInstance((EnumInstance) n.fieldInstance());
-            n = ec;
-        }
-        return n;
+        return ((JL5FieldExt) JL5Ext.ext(this.node())).typeCheck(tc);
     }
 
     @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
-        Field n = (Field) this.node();
-        w.begin(0);
-        if (!n.isTargetImplicit()) {
-            // explicit target.
-            if (n.target() instanceof Expr) {
-                n.printSubExpr((Expr) n.target(), w, tr);
-            }
-            else if (n.target() instanceof TypeNode
-                    || n.target() instanceof AmbReceiver) {
-                if (tr instanceof JL5Translator) {
-                    JL5Translator jltr = (JL5Translator) tr;
-                    jltr.printReceiver(n.target(), w);
-                }
-                else {
-                    ((Node_c) n).print(n.target(), w, tr);
-                }
-            }
-
-            w.write(".");
-            w.allowBreak(2, 3, "", 0);
-        }
-        tr.print(n, n.id(), w);
-        w.end();
+        ((JL5FieldExt) JL5Ext.ext(this.node())).prettyPrint(w, tr);
     }
 }

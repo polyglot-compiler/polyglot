@@ -25,14 +25,7 @@
  ******************************************************************************/
 package polyglot.ext.jl5.ast;
 
-import polyglot.ast.AmbExpr;
-import polyglot.ast.Case;
-import polyglot.ast.Expr;
-import polyglot.ast.Field;
-import polyglot.ast.Lit;
 import polyglot.ast.Node;
-import polyglot.ast.Node_c;
-import polyglot.ext.jl5.types.JL5TypeSystem;
 import polyglot.types.SemanticException;
 import polyglot.util.CodeWriter;
 import polyglot.util.SerialVersionUID;
@@ -47,66 +40,27 @@ public class JL5CaseDel extends JL5Del {
     @Override
     public Node disambiguateOverride(Node parent, AmbiguityRemover ar)
             throws SemanticException {
-        Case c = (Case) this.node();
-        Expr expr = c.expr();
-        // We can't disambiguate unqualified names until the switch expression
-        // is typed.
-        if (expr instanceof AmbExpr) {
-            return c;
-        }
-        else {
-            return null;
-        }
+        JL5CaseExt ext = (JL5CaseExt) JL5Ext.ext(this.node());
+        return ext.disambiguateOverride(parent, ar);
     }
 
     @Override
     public Node typeCheckOverride(Node parent, TypeChecker tc)
             throws SemanticException {
-        Case c = (Case) this.node();
-        Expr expr = c.expr();
-        if (expr == null || expr instanceof Lit) {
-            return null;
-        }
-        // We will do type checking vis the resolveCaseLabel method
-        return c;
+        JL5CaseExt ext = (JL5CaseExt) JL5Ext.ext(this.node());
+        return ext.typeCheckOverride(parent, tc);
     }
 
     @Override
     public Node checkConstants(ConstantChecker cc) throws SemanticException {
-        Case c = (Case) this.node();
-        Expr expr = c.expr();
-        if (expr == null) return c; // default case
-
-        if (!expr.constantValueSet()) return c; // Not ready yet; pass will be rerun.
-
-        if (expr instanceof EnumConstant) return c;
-
-        return super.checkConstants(cc);
+        JL5CaseExt ext = (JL5CaseExt) JL5Ext.ext(this.node());
+        return ext.checkConstants(cc);
     }
 
     @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
-        Case c = (Case) this.node();
-        Expr expr = c.expr();
-        if (expr == null) {
-            w.write("default:");
-        }
-        else {
-            w.write("case ");
-            JL5TypeSystem ts =
-                    expr.type() == null ? null
-                            : (JL5TypeSystem) expr.type().typeSystem();
-            if (ts != null && expr.type().isReference()
-                    && expr.type().isSubtype(ts.toRawType(ts.Enum()))) {
-                // this is an enum	            
-                Field f = (Field) expr;
-                w.write(f.name());
-            }
-            else {
-                ((Node_c) c).print(expr, w, tr);
-            }
-            w.write(":");
-        }
+        JL5CaseExt ext = (JL5CaseExt) JL5Ext.ext(this.node());
+        ext.prettyPrint(w, tr);
     }
 
 }

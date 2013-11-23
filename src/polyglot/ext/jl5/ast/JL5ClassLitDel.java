@@ -25,11 +25,7 @@
  ******************************************************************************/
 package polyglot.ext.jl5.ast;
 
-import polyglot.ast.ClassLit;
 import polyglot.ast.Node;
-import polyglot.ext.jl5.types.JL5TypeSystem;
-import polyglot.types.PrimitiveType;
-import polyglot.types.ReferenceType;
 import polyglot.types.SemanticException;
 import polyglot.util.SerialVersionUID;
 import polyglot.visit.TypeChecker;
@@ -39,20 +35,6 @@ public class JL5ClassLitDel extends JL5Del {
 
     @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
-        ClassLit n = (ClassLit) this.node();
-        JL5TypeSystem ts = (JL5TypeSystem) tc.typeSystem();
-        ReferenceType rt;
-        if (n.typeNode().type().isReference()) {
-            rt = n.typeNode().type().toReference();
-        }
-        else if (n.typeNode().type().isPrimitive()) {
-            PrimitiveType pt = n.typeNode().type().toPrimitive();
-            rt = ts.wrapperClassOfPrimitive(pt);
-        }
-        else {
-            throw new SemanticException("Cannot access .class on type "
-                    + n.typeNode().type(), n.position());
-        }
-        return n.type(ts.Class(n.position(), rt));
+        return ((JL5ClassLitExt) JL5Ext.ext(this.node())).typeCheck(tc);
     }
 }

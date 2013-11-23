@@ -26,15 +26,23 @@
 package polyglot.ext.jl5.ast;
 
 import polyglot.ast.Node;
+import polyglot.ast.Special;
+import polyglot.ext.jl5.types.RawClass;
 import polyglot.types.SemanticException;
 import polyglot.util.SerialVersionUID;
 import polyglot.visit.TypeChecker;
 
-public class JL5NewArrayDel extends JL5Del {
+public class JL5SpecialExt extends JL5Ext {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
-    @Override
-    public Node typeCheck(TypeChecker tc) throws SemanticException {
-        return ((JL5NewArrayExt) JL5Ext.ext(this.node())).typeCheck(tc);
+    public Node typeCheckOverride(Node parent, TypeChecker tc)
+            throws SemanticException {
+        Special n = (Special) this.node().del().visitChildren(tc);
+        if (n.qualifier() != null && n.qualifier().type() instanceof RawClass) {
+            // we got a raw class. Fix it up
+            RawClass rc = (RawClass) n.qualifier().type();
+            n = n.qualifier(n.qualifier().type(rc.base()));
+        }
+        return n.typeCheck(tc);
     }
 }

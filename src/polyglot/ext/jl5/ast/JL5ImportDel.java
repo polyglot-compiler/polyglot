@@ -25,25 +25,10 @@
  ******************************************************************************/
 package polyglot.ext.jl5.ast;
 
-import static polyglot.ext.jl5.ast.JL5Import.SINGLE_STATIC_MEMBER;
-import static polyglot.ext.jl5.ast.JL5Import.STATIC_ON_DEMAND;
-
-import java.util.List;
-
-import polyglot.ast.Import;
 import polyglot.ast.Node;
-import polyglot.ast.SourceFile;
-import polyglot.ast.TopLevelDecl;
-import polyglot.ext.jl5.types.JL5TypeSystem;
-import polyglot.types.ClassType;
-import polyglot.types.FieldInstance;
-import polyglot.types.MethodInstance;
-import polyglot.types.Package;
 import polyglot.types.SemanticException;
-import polyglot.types.Type;
 import polyglot.util.CodeWriter;
 import polyglot.util.SerialVersionUID;
-import polyglot.util.StringUtil;
 import polyglot.visit.PrettyPrinter;
 import polyglot.visit.TypeChecker;
 
@@ -52,101 +37,11 @@ public class JL5ImportDel extends JL5Del {
 
     @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
-        Import n = (Import) this.node();
-        // check class is exists and is accessible
-        if (n.kind() == JL5Import.SINGLE_STATIC_MEMBER) {
-            Type nt =
-                    (Type) tc.typeSystem()
-                             .forName(StringUtil.getPackageComponent(n.name()));
-            String id = StringUtil.getShortNameComponent(n.name());
-            if (!isIdStaticMember(nt.toClass(),
-                                  id,
-                                  (JL5TypeSystem) tc.typeSystem(),
-                                  tc.context().package_())) {
-                throw new SemanticException("Cannot find static member " + id
-                        + " in class: " + nt, n.position());
-            }
-            // check whether there is a top level type called id.
-            if (tc.job().ast() instanceof SourceFile) {
-                SourceFile sf = (SourceFile) tc.job().ast();
-                List<TopLevelDecl> decls = sf.decls();
-                for (TopLevelDecl tld : decls) {
-                    if (id.equals(tld.name())) {
-                        throw new SemanticException("Static import conflicts with top level declaration "
-                                                            + id,
-                                                    n.position());
-                    }
-                }
-            }
-            return n;
-        }
-        else {
-            return super.typeCheck(tc);
-        }
-    }
-
-    private boolean isIdStaticMember(ClassType t, String id, JL5TypeSystem ts,
-            Package package_) {
-        if (!ts.classAccessibleFromPackage(t.toClass(), package_)) {
-            return false;
-        }
-
-        try {
-            FieldInstance fi = ts.findField(t, id);
-            if (fi != null
-                    && fi.flags().isStatic()
-                    && ts.accessibleFromPackage(fi.flags(),
-                                                t.package_(),
-                                                package_)) {
-                return true;
-            }
-        }
-        catch (SemanticException e) {
-        }
-
-        if (ts.hasMethodNamed(t, id)) {
-            List<? extends MethodInstance> meths = t.methodsNamed(id);
-            boolean anyAccessible = false;
-            for (MethodInstance mi : meths) {
-                if (ts.accessibleFromPackage(mi.flags(), t.package_(), package_)) {
-                    anyAccessible = true;
-                    break;
-                }
-            }
-            return anyAccessible;
-        }
-
-        try {
-            ClassType ct = ts.findMemberClass(t, id);
-            if (ct != null
-                    && ct.flags().isStatic()
-                    && ts.accessibleFromPackage(ct.flags(),
-                                                t.package_(),
-                                                package_)) {
-                return true;
-            }
-        }
-        catch (SemanticException e) {
-        }
-
-        return false;
+        return ((JL5ImportExt) JL5Ext.ext(this.node())).typeCheck(tc);
     }
 
     @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
-        Import n = (Import) this.node();
-        if (n.kind() == SINGLE_STATIC_MEMBER || n.kind() == STATIC_ON_DEMAND) {
-            w.write("import static ");
-            w.write(n.name());
-
-            if (n.kind() == STATIC_ON_DEMAND) {
-                w.write(".*");
-            }
-
-            w.write(";");
-            w.newline(0);
-        }
-        else super.prettyPrint(w, tr);
-
+        ((JL5ImportExt) JL5Ext.ext(this.node())).prettyPrint(w, tr);
     }
 }

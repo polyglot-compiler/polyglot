@@ -25,16 +25,8 @@
  ******************************************************************************/
 package polyglot.ext.jl5.ast;
 
-import java.util.ArrayList;
-
-import polyglot.ast.Expr;
 import polyglot.ast.Node;
-import polyglot.ast.Switch;
-import polyglot.ast.SwitchElement;
-import polyglot.ext.jl5.types.JL5Flags;
-import polyglot.ext.jl5.types.JL5TypeSystem;
 import polyglot.types.SemanticException;
-import polyglot.types.Type;
 import polyglot.util.SerialVersionUID;
 import polyglot.visit.TypeChecker;
 
@@ -43,45 +35,7 @@ public class JL5SwitchDel extends JL5Del {
 
     @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
-        Switch s = (Switch) this.node();
-        Expr expr = s.expr();
-
-        if (!isAcceptableSwitchType(expr.type())) {
-            throw new SemanticException("Switch index must be of type char, byte,"
-                                                + " short, int, Character, Byte, Short, Integer, or an enum type.",
-                                        s.position());
-        }
-
-        ArrayList<SwitchElement> newels =
-                new ArrayList<SwitchElement>(s.elements().size());
-        Type switchType = expr.type();
-        for (SwitchElement el : s.elements()) {
-            JL5Ext ext = JL5Ext.ext(el);
-            if (ext instanceof JL5CaseExt)
-                el =
-                        (SwitchElement) ((JL5CaseExt) ext).resolveCaseLabel(tc,
-                                                                            switchType);
-            newels.add(el);
-        }
-        return s.elements(newels);
-    }
-
-    protected boolean isAcceptableSwitchType(Type type) {
-        JL5TypeSystem ts = (JL5TypeSystem) type.typeSystem();
-        if (ts.Char().equals(type) || ts.Byte().equals(type)
-                || ts.Short().equals(type) || ts.Int().equals(type)) {
-            return true;
-        }
-        if (ts.wrapperClassOfPrimitive(ts.Char()).equals(type)
-                || ts.wrapperClassOfPrimitive(ts.Byte()).equals(type)
-                || ts.wrapperClassOfPrimitive(ts.Short()).equals(type)
-                || ts.wrapperClassOfPrimitive(ts.Int()).equals(type)) {
-            return true;
-        }
-        if (type.isClass() && JL5Flags.isEnum(type.toClass().flags())) {
-            return true;
-        }
-        return false;
+        return ((JL5SwitchExt) JL5Ext.ext(this.node())).typeCheck(tc);
     }
 
 }

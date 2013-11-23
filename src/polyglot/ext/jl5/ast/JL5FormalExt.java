@@ -26,10 +26,21 @@
 package polyglot.ext.jl5.ast;
 
 import polyglot.ast.Formal;
+import polyglot.ast.Node;
+import polyglot.ast.Node_c;
 import polyglot.ext.jl5.types.Annotations;
+import polyglot.ext.jl5.types.JL5ArrayType;
+import polyglot.ext.jl5.types.JL5Flags;
 import polyglot.ext.jl5.types.JL5LocalInstance;
+import polyglot.types.ArrayType;
 import polyglot.types.Declaration;
+import polyglot.types.Flags;
+import polyglot.types.SemanticException;
+import polyglot.util.CodeWriter;
 import polyglot.util.SerialVersionUID;
+import polyglot.visit.AmbiguityRemover;
+import polyglot.visit.PrettyPrinter;
+import polyglot.visit.TypeChecker;
 
 public class JL5FormalExt extends JL5AnnotatedElementExt implements
         AnnotatedElement {
@@ -52,6 +63,51 @@ public class JL5FormalExt extends JL5AnnotatedElementExt implements
     protected Declaration declaration() {
         Formal f = (Formal) this.node();
         return f.localInstance();
+    }
+
+    @Override
+    public Node typeCheck(TypeChecker tc) throws SemanticException {
+        Formal f = (Formal) this.node();
+
+        if (!f.flags().clear(Flags.FINAL).equals(Flags.NONE)) {
+            throw new SemanticException("Modifier: " + f.flags().clearFinal()
+                    + " not allowed here.", f.position());
+        }
+        return super.typeCheck(tc);
+
+    }
+
+    public Node disambiguate(AmbiguityRemover ar) throws SemanticException {
+        Formal f = (Formal) this.node();
+        JL5FormalExt ext = (JL5FormalExt) JL5Ext.ext(f);
+
+        if (ext.isVarArg()) {
+            ((JL5ArrayType) f.type().type()).setVarArg();
+        }
+        return this.superDel().disambiguate(ar);
+    }
+
+    public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
+        Formal f = (Formal) this.node();
+        JL5FormalExt ext = (JL5FormalExt) JL5Ext.ext(f);
+
+        for (AnnotationElem ae : ext.annotationElems()) {
+            ae.del().prettyPrint(w, tr);
+            w.newline();
+        }
+
+        w.write(JL5Flags.clearVarArgs(f.flags()).translate());
+        if (ext.isVarArg()) {
+            w.write(((ArrayType) f.type().type()).base().toString());
+            //print(type, w, tr);
+            w.write(" ...");
+        }
+        else {
+            ((Node_c) f).print(f.type(), w, tr);
+        }
+        w.write(" ");
+        w.write(f.name());
+
     }
 
 }

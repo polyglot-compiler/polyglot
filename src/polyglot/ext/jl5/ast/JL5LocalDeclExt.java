@@ -26,10 +26,18 @@
 package polyglot.ext.jl5.ast;
 
 import polyglot.ast.LocalDecl;
+import polyglot.ast.Node;
 import polyglot.ext.jl5.types.Annotations;
 import polyglot.ext.jl5.types.JL5LocalInstance;
+import polyglot.ext.jl5.types.TypeVariable;
+import polyglot.ext.jl5.types.TypeVariable.TVarDecl;
 import polyglot.types.Declaration;
+import polyglot.types.Flags;
+import polyglot.types.SemanticException;
+import polyglot.util.CodeWriter;
 import polyglot.util.SerialVersionUID;
+import polyglot.visit.PrettyPrinter;
+import polyglot.visit.TypeChecker;
 
 public class JL5LocalDeclExt extends JL5AnnotatedElementExt {
     private static final long serialVersionUID = SerialVersionUID.generate();
@@ -45,6 +53,35 @@ public class JL5LocalDeclExt extends JL5AnnotatedElementExt {
     protected Declaration declaration() {
         LocalDecl n = (LocalDecl) this.node();
         return n.localInstance();
+    }
+
+    @Override
+    public Node typeCheck(TypeChecker tc) throws SemanticException {
+        LocalDecl n = (LocalDecl) this.node();
+        if (!n.flags().clear(Flags.FINAL).equals(Flags.NONE)) {
+            throw new SemanticException("Modifier: " + n.flags().clearFinal()
+                    + " not allowed here.", n.position());
+        }
+        if (n.type().type() instanceof TypeVariable
+                && tc.context().inStaticContext()) {
+            if (((TypeVariable) n.type().type()).declaredIn()
+                                                .equals(TVarDecl.CLASS_TYPE_VARIABLE))
+                throw new SemanticException("Cannot access non-static type: "
+                        + ((TypeVariable) n.type().type()).name()
+                        + " in a static context.", n.position());
+        }
+        return super.typeCheck(tc);
+    }
+
+    public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
+        JL5AnnotatedElementExt ext =
+                (JL5AnnotatedElementExt) JL5Ext.ext(this.node());
+        for (AnnotationElem ae : ext.annotationElems()) {
+            ae.del().prettyPrint(w, tr);
+            w.newline();
+        }
+
+        this.superDel().prettyPrint(w, tr);
     }
 
 }

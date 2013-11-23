@@ -29,7 +29,9 @@ import polyglot.ast.FieldDecl;
 import polyglot.ext.jl5.types.Annotations;
 import polyglot.ext.jl5.types.JL5FieldInstance;
 import polyglot.types.Declaration;
+import polyglot.util.CodeWriter;
 import polyglot.util.SerialVersionUID;
+import polyglot.visit.PrettyPrinter;
 
 public class JL5FieldDeclExt extends JL5AnnotatedElementExt {
     private static final long serialVersionUID = SerialVersionUID.generate();
@@ -45,6 +47,17 @@ public class JL5FieldDeclExt extends JL5AnnotatedElementExt {
     protected Declaration declaration() {
         FieldDecl fd = (FieldDecl) this.node();
         return fd.fieldInstance();
+    }
+
+    public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
+        JL5AnnotatedElementExt ext =
+                (JL5AnnotatedElementExt) JL5Ext.ext(this.node());
+        for (AnnotationElem ae : ext.annotationElems()) {
+            ae.del().prettyPrint(w, tr);
+            w.newline();
+        }
+
+        this.superDel().prettyPrint(w, tr);
     }
 
 }

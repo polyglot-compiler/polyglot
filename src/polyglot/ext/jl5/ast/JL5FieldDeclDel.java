@@ -34,14 +34,7 @@ public class JL5FieldDeclDel extends JL5AnnotatedElementDel {
 
     @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
-        JL5AnnotatedElementExt ext =
-                (JL5AnnotatedElementExt) JL5Ext.ext(this.node());
-        for (AnnotationElem ae : ext.annotationElems()) {
-            ae.del().prettyPrint(w, tr);
-            w.newline();
-        }
-
-        super.prettyPrint(w, tr);
+        ((JL5FieldDeclExt) JL5Ext.ext(this.node())).prettyPrint(w, tr);
     }
 
 }

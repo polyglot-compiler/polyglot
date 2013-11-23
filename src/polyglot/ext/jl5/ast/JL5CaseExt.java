@@ -28,20 +28,29 @@ package polyglot.ext.jl5.ast;
 import polyglot.ast.AmbExpr;
 import polyglot.ast.Case;
 import polyglot.ast.Expr;
+import polyglot.ast.Field;
+import polyglot.ast.Lit;
 import polyglot.ast.Node;
+import polyglot.ast.Node_c;
 import polyglot.ast.Receiver;
 import polyglot.ext.jl5.types.EnumInstance;
 import polyglot.ext.jl5.types.JL5TypeSystem;
 import polyglot.types.SemanticException;
 import polyglot.types.Type;
+import polyglot.util.CodeWriter;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
+import polyglot.visit.AmbiguityRemover;
+import polyglot.visit.ConstantChecker;
+import polyglot.visit.PrettyPrinter;
 import polyglot.visit.TypeChecker;
 
-public class JL5CaseExt extends JL5Ext {
+public class JL5CaseExt extends JL5Ext implements JL5CaseOps {
     private static final long serialVersionUID = SerialVersionUID.generate();
+    protected JL5CaseOps del;
 
+    @Override
     public Node resolveCaseLabel(TypeChecker tc, Type switchType)
             throws SemanticException {
         JL5TypeSystem ts = (JL5TypeSystem) tc.typeSystem();
@@ -148,5 +157,77 @@ public class JL5CaseExt extends JL5Ext {
             return true;
         }
         return false;
+    }
+
+    public Node disambiguateOverride(Node parent, AmbiguityRemover ar)
+            throws SemanticException {
+        Case c = (Case) this.node();
+        Expr expr = c.expr();
+        // We can't disambiguate unqualified names until the switch expression
+        // is typed.
+        if (expr instanceof AmbExpr) {
+            return c;
+        }
+        else {
+            return null;
+        }
+    }
+
+    public Node typeCheckOverride(Node parent, TypeChecker tc)
+            throws SemanticException {
+        Case c = (Case) this.node();
+        Expr expr = c.expr();
+        if (expr == null || expr instanceof Lit) {
+            return null;
+        }
+        // We will do type checking vis the resolveCaseLabel method
+        return c;
+    }
+
+    public Node checkConstants(ConstantChecker cc) throws SemanticException {
+        Case c = (Case) this.node();
+        Expr expr = c.expr();
+        if (expr == null) return c; // default case
+
+        if (!expr.constantValueSet()) return c; // Not ready yet; pass will be rerun.
+
+        if (expr instanceof EnumConstant) return c;
+
+        return this.superDel().checkConstants(cc);
+    }
+
+    public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
+        Case c = (Case) this.node();
+        Expr expr = c.expr();
+        if (expr == null) {
+            w.write("default:");
+        }
+        else {
+            w.write("case ");
+            JL5TypeSystem ts =
+                    expr.type() == null ? null
+                            : (JL5TypeSystem) expr.type().typeSystem();
+            if (ts != null && expr.type().isReference()
+                    && expr.type().isSubtype(ts.toRawType(ts.Enum()))) {
+                // this is an enum                  
+                Field f = (Field) expr;
+                w.write(f.name());
+            }
+            else {
+                ((Node_c) c).print(expr, w, tr);
+            }
+            w.write(":");
+        }
+    }
+
+    /**
+     * The delegate for JL5CaseOps. By default it is this object, but this can be overridden
+     */
+    public JL5CaseOps del() {
+        return this.del == null ? this : this.del;
+    }
+
+    public void setDel(JL5CaseOps del) {
+        this.del = del;
     }
 }

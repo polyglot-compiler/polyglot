@@ -91,7 +91,7 @@ public class JL5NodeFactory_c extends NodeFactory_c implements JL5NodeFactory {
         }
 
         return super.CanonicalTypeNode(pos,
-                                       JL5CanonicalTypeNodeDel.makeRawIfNeeded(type,
+                                       JL5CanonicalTypeNodeExt.makeRawIfNeeded(type,
                                                                                pos));
     }
 
