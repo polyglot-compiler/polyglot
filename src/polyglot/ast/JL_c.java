@@ -37,6 +37,7 @@ import polyglot.types.Type;
 import polyglot.types.TypeSystem;
 import polyglot.util.CodeWriter;
 import polyglot.util.SerialVersionUID;
+import polyglot.util.InternalCompilerError;
 import polyglot.visit.AmbiguityRemover;
 import polyglot.visit.AscriptionVisitor;
 import polyglot.visit.ConstantChecker;
@@ -55,9 +56,13 @@ import polyglot.visit.TypeChecker;
  * classes or may reimplement all compiler passes in a new class implementing
  * the <code>JL</code> interface.
  */
-public class JL_c extends Ext_c implements JL {
+public class JL_c implements JL {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
+	Node node;
+
+    /** Create an uninitialized delegate. It must be initialized using the init() method.
+	 */
     public JL_c() {
     }
 
@@ -65,8 +70,25 @@ public class JL_c extends Ext_c implements JL {
      * itself, but possibly another delegate.
      */
     public JL jl() {
-        return node();
+        return node;
     }
+
+	public void init(Node n) {
+		assert node == null;
+		node = n;
+	}
+
+	public Node node() {
+		return this.node;
+	}
+
+	public Object copy() {
+		try {
+			return this.clone();
+		} catch (CloneNotSupportedException e) {
+            throw new InternalCompilerError("Unable to clone a delegate");
+		}
+	}
 
     /**
      * Visit the children of the node.

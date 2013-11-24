@@ -113,7 +113,7 @@ public abstract class Ext_c implements Ext {
             return copy;
         }
         catch (CloneNotSupportedException e) {
-            throw new InternalCompilerError("Java clone() weirdness.");
+            throw new InternalCompilerError("Unable to clone an extension object.");
         }
     }
 
