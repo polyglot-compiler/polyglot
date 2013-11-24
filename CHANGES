@@ -8,7 +8,23 @@ doc/release-notes-<version>.
 XXX, 2013 : Polyglot 2.5.4/2.6???
 ===============================
 Changed signature of polyglot.visit.Dataflow to use Peer instead 
-of Node,boolean pairs. This change is not backward compatible.
+of (Node,boolean) pairs. This change is not backward compatible. 
+For example, the signature of flow changed from
+    flow(FlowItem in, FlowGraph<FlowItem> graph, Term n, boolean entry, Set<EdgeKey> edgeKeys)
+to
+    flow(FlowItem in, FlowGraph<FlowItem> graph, Peer<FlowItem> peer)
+and the signature of confluence changed from
+    confluence(List<FlowItem> items, List<EdgeKey> itemKeys, Term node, boolean entry, FlowGraph<FlowItem> graph)
+to
+    confluence(List<FlowItem> items, List<EdgeKey> itemKeys, Peer<FlowItem> peer, FlowGraph<FlowItem> graph).
+From a Peer object p, the AST node can be obtained with p.node() and the 
+boolean indicating whether the dataflow is for entry or exit to the node 
+can be obtained with p.isEntry(). Edge keys for edges to successor nodes
+is available via p.succEdgeKeys(). 
+
+
+polyglot.ast.JL_c (the base class for JL delegate objects) no longer
+extends polyglot.ast.Ext_c.
 
 
 June 21, 2013 : Polyglot 2.5.3
