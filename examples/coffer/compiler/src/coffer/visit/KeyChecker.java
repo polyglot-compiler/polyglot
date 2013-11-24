@@ -13,8 +13,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Set;
 
+import polyglot.ast.Node;
 import polyglot.ast.NodeFactory;
 import polyglot.ast.ProcedureDecl;
 import polyglot.ast.Term;
@@ -30,6 +30,7 @@ import polyglot.visit.DataFlow;
 import polyglot.visit.FlowGraph;
 import polyglot.visit.FlowGraph.EdgeKey;
 import polyglot.visit.FlowGraph.ExceptionEdgeKey;
+import polyglot.visit.FlowGraph.Peer;
 import coffer.Topics;
 import coffer.extension.CofferExt;
 import coffer.extension.ProcedureDeclExt_c;
@@ -145,21 +146,21 @@ public class KeyChecker extends DataFlow<DataFlow.Item> {
     }
 
     @Override
-    public Map<EdgeKey, Item> flow(Item in, FlowGraph<Item> graph, Term n,
-            boolean entry, Set<EdgeKey> succEdgeKeys) {
-        if (entry) return itemToMap(in, succEdgeKeys);
+    public Map<EdgeKey, Item> flow(Item in, FlowGraph<Item> graph,
+            Peer<Item> peer) {
+        if (peer.isEntry()) return itemToMap(in, peer.succEdgeKeys());
         if (in instanceof ExitTermItem) {
-            return itemToMap(in, succEdgeKeys);
+            return itemToMap(in, peer.succEdgeKeys());
         }
 
         DataFlowItem df = (DataFlowItem) in;
-
+        Node n = peer.node();
         if (n.ext() instanceof CofferExt) {
             CofferExt ext = (CofferExt) n.ext();
 
             Map<EdgeKey, Item> m = new HashMap<EdgeKey, Item>();
 
-            for (EdgeKey e : succEdgeKeys) {
+            for (EdgeKey e : peer.succEdgeKeys()) {
                 Type t = null;
 
                 if (e instanceof FlowGraph.ExceptionEdgeKey) {
@@ -192,25 +193,25 @@ public class KeyChecker extends DataFlow<DataFlow.Item> {
             return m;
         }
 
-        return itemToMap(in, succEdgeKeys);
+        return itemToMap(in, peer.succEdgeKeys());
     }
 
     @Override
     protected Item safeConfluence(List<Item> items, List<EdgeKey> itemKeys,
-            Term node, boolean entry, FlowGraph<Item> graph) {
-        if (!entry && graph.root().equals(node)) {
+            Peer<Item> peer, FlowGraph<Item> graph) {
+        if (!peer.isEntry() && graph.root().equals(peer.node())) {
             return confluenceExitTerm(items, itemKeys, graph);
         }
-        return super.safeConfluence(items, itemKeys, node, entry, graph);
+        return super.safeConfluence(items, itemKeys, peer, graph);
     }
 
     @Override
     protected Item confluence(List<Item> items, List<EdgeKey> itemKeys,
-            Term node, boolean entry, FlowGraph<Item> graph) {
-        if (!entry && graph.root().equals(node)) {
+            Peer<Item> peer, FlowGraph<Item> graph) {
+        if (!peer.isEntry() && graph.root().equals(peer.node())) {
             return confluenceExitTerm(items, itemKeys, graph);
         }
-        return confluence(items, node, entry, graph);
+        return confluence(items, peer, graph);
     }
 
     protected Item confluenceExitTerm(List<Item> items, List<EdgeKey> itemKeys,
@@ -222,7 +223,10 @@ public class KeyChecker extends DataFlow<DataFlow.Item> {
             nonExc = new DataFlowItem();
         }
         else {
-            nonExc = confluence(nonExcItems, graph.root(), false, graph);
+            nonExc =
+                    confluence(nonExcItems,
+                               graph.peer(graph.root(), false),
+                               graph);
         }
 
         Map<ExceptionEdgeKey, List<Item>> excItemLists =
@@ -246,14 +250,16 @@ public class KeyChecker extends DataFlow<DataFlow.Item> {
                 new HashMap<ExceptionEdgeKey, DataFlowItem>(excItemLists.size());
         for (Entry<ExceptionEdgeKey, List<Item>> e : excItemLists.entrySet()) {
             excItems.put(e.getKey(),
-                         confluence(e.getValue(), graph.root(), false, graph));
+                         confluence(e.getValue(),
+                                    graph.peer(graph.root(), false),
+                                    graph));
         }
         return new ExitTermItem(nonExc, excItems);
     }
 
     @Override
-    protected DataFlowItem confluence(List<Item> inItems, Term node,
-            boolean entry, FlowGraph<Item> graph) {
+    protected DataFlowItem confluence(List<Item> inItems, Peer<Item> peer,
+            FlowGraph<Item> graph) {
         DataFlowItem outItem = null;
 
         for (Item item : inItems) {
@@ -283,7 +289,7 @@ public class KeyChecker extends DataFlow<DataFlow.Item> {
             throw new InternalCompilerError("confluence called with insufficient input items.");
 
         if (Report.should_report(Topics.keycheck, 2)) {
-            Report.report(2, "confluence(" + node + "):");
+            Report.report(2, "confluence(" + peer.node() + "):");
 
             for (Item df : inItems) {
                 Report.report(2, "   " + df);
@@ -381,7 +387,9 @@ public class KeyChecker extends DataFlow<DataFlow.Item> {
                     filterItemsExceptionSubclass(excItems, excKeys, excType);
             if (!matchingExc.isEmpty()) {
                 DataFlowItem df =
-                        confluence(matchingExc, graph.root(), false, graph);
+                        confluence(matchingExc,
+                                   graph.peer(graph.root(), false),
+                                   graph);
                 check(graph.root(), df, false);
 
                 if (ext != null && tc != null) {

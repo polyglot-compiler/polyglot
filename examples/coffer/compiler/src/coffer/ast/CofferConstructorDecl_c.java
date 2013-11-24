@@ -336,9 +336,9 @@ public class CofferConstructorDecl_c extends ConstructorDecl_c implements
 
     /** Write the constructor to an output file. */
     @Override
-    public void prettyPrintHeader(CodeWriter w, PrettyPrinter tr) {
+    public void prettyPrintHeader(Flags flags, CodeWriter w, PrettyPrinter tr) {
         w.begin(0);
-        w.write(flags().translate());
+        w.write(flags.translate());
 
         print(name, w, tr);
         w.write("(");
