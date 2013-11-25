@@ -1,5 +1,7 @@
 package polyglot.ext.jl7.types;
 
-public interface JL7TypeSystem {
+import polyglot.ext.jl5.types.JL5TypeSystem;
+
+public interface JL7TypeSystem extends JL5TypeSystem {
 
 }

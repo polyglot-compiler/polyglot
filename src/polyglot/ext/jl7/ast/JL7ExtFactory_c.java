@@ -27,4 +27,23 @@ public class JL7ExtFactory_c extends JL5ExtFactory_c implements JL7ExtFactory {
         return new JL7SwitchExt();
     }
 
+    @Override
+    public Ext extMultiCatch() {
+        Ext e = extMultiCatchImpl();
+
+        if (nextExtFactory() != null) {
+            Ext e2 = nextExtFactory().extEnumDecl();
+            e = composeExts(e, e2);
+        }
+        return postExtMultiCatch(e);
+    }
+
+    protected Ext extMultiCatchImpl() {
+        return extCatchImpl();
+    }
+
+    protected Ext postExtMultiCatch(Ext e) {
+        return postExtCatch(e);
+    }
+
 }

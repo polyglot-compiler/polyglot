@@ -13,12 +13,18 @@ import polyglot.ext.jl5.ast.*;
 import polyglot.parse.*;
 import polyglot.parse.*;
 import polyglot.ext.jl5.parse.*;
+import polyglot.ext.jl7.ast.*;
+import polyglot.ext.jl7.types.*;
 
 parser Grm extends polyglot.ext.jl5.parse.Grm {:
 
-  
+  public final JL7TypeSystem ts;
+  public final JL7NodeFactory nf;
+    
   public Grm(Lexer l, TypeSystem t, NodeFactory n, ErrorQueue q) {
     super(l, t, n, q);
+    ts = (JL7TypeSystem) t;
+    nf = (JL7NodeFactory) n;
   }
 
 
@@ -262,6 +268,7 @@ non terminal FlagAnnotations modifiers_or_annotations;
 non terminal FlagAnnotations modifiers_or_annotations_opt;
 non terminal ElementValueArrayInit element_value_array_initializer;
 non terminal List element_values;
+non terminal LinkedList catch_type;
 
 
 start with goal;
@@ -1155,9 +1162,17 @@ catches ::=
                a.add(b);  :};
 
 catch_clause ::=
-    CATCH:n LPAREN formal_parameter:a RPAREN block:b {:
-                                                     RESULT = parser.nf.Catch(parser.pos(n, b), a, b); 
-                                                     :};
+    CATCH:n LPAREN modifiers_or_annotations_opt:a catch_type:b IDENTIFIER:c RPAREN block:d {:
+                                                                                           Formal f = parser.nf.Formal(parser.pos(b, c, c), a.flags(), a.annotations(),
+                        parser.nf.AmbUnionType(parser.pos(b), b), parser.nf.Id(parser.pos(c), c.getIdentifier()));
+               if (b.size() > 1) { 
+                  RESULT = parser.nf.MultiCatch(parser.pos(n, d), f, b, d); 
+               }
+               else {              
+                  RESULT = parser.nf.Catch(parser.pos(n, d), f, d); 
+               }
+            
+                                                                                           :};
 
 finally ::=
     FINALLY block:a {:  RESULT = a;  :};
@@ -2246,5 +2261,13 @@ element_value ::=
     element_value_array_initializer:a {:  RESULT = a;  :}
  |  conditional_expression:a {:  RESULT = a;  :}
  |  annotation:a {:  RESULT = a;  :};
+
+catch_type ::=
+    name:a {:
+           LinkedList l = new LinkedList<Type>();
+           l.add(a.toType());
+           RESULT = l; 
+           :}
+ |  name:a OR catch_type:as {:  as.addFirst(a.toType()); RESULT = as;  :};
 
 
