@@ -27,6 +27,7 @@ package polyglot.ext.jl5.ast;
 
 import polyglot.ast.Node;
 import polyglot.types.SemanticException;
+import polyglot.types.Type;
 import polyglot.util.CodeWriter;
 import polyglot.util.SerialVersionUID;
 import polyglot.visit.AmbiguityRemover;
@@ -34,7 +35,7 @@ import polyglot.visit.ConstantChecker;
 import polyglot.visit.PrettyPrinter;
 import polyglot.visit.TypeChecker;
 
-public class JL5CaseDel extends JL5Del {
+public class JL5CaseDel extends JL5Del implements JL5CaseOps {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
     @Override
@@ -61,6 +62,13 @@ public class JL5CaseDel extends JL5Del {
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
         JL5CaseExt ext = (JL5CaseExt) JL5Ext.ext(this.node());
         ext.prettyPrint(w, tr);
+    }
+
+    @Override
+    public Node resolveCaseLabel(TypeChecker tc, Type switchType)
+            throws SemanticException {
+        JL5CaseExt ext = (JL5CaseExt) JL5Ext.ext(this.node());
+        return ext.resolveCaseLabel(tc, switchType);
     }
 
 }

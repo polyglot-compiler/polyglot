@@ -27,15 +27,21 @@ package polyglot.ext.jl5.ast;
 
 import polyglot.ast.Node;
 import polyglot.types.SemanticException;
+import polyglot.types.Type;
 import polyglot.util.SerialVersionUID;
 import polyglot.visit.TypeChecker;
 
-public class JL5SwitchDel extends JL5Del {
+public class JL5SwitchDel extends JL5Del implements JL5SwitchOps {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
     @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
         return ((JL5SwitchExt) JL5Ext.ext(this.node())).typeCheck(tc);
+    }
+
+    @Override
+    public boolean isAcceptableSwitchType(Type type) {
+        return ((JL5SwitchExt) JL5Ext.ext(this.node())).isAcceptableSwitchType(type);
     }
 
 }

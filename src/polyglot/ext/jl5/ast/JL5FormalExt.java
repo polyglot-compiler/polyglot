@@ -48,8 +48,18 @@ public class JL5FormalExt extends JL5AnnotatedElementExt implements
 
     protected boolean isVarArg = false;
 
+    protected boolean isCatchFormal = false;
+
     public boolean isVarArg() {
         return isVarArg;
+    }
+
+    public boolean isCatchFormal() {
+        return isCatchFormal;
+    }
+
+    public void setIsCatchFormal(boolean isCatchFormal) {
+        this.isCatchFormal = isCatchFormal;
     }
 
     @Override

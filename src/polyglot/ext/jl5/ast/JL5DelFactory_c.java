@@ -211,6 +211,11 @@ public class JL5DelFactory_c extends AbstractDelFactory_c implements
     }
 
     @Override
+    protected JL delCatchImpl() {
+        return new JL5CatchDel();
+    }
+
+    @Override
     protected JL delConstructorCallImpl() {
         return new JL5ConstructorCallDel();
     }

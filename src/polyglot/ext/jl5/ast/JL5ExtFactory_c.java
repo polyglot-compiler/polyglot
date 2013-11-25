@@ -27,6 +27,7 @@ package polyglot.ext.jl5.ast;
 
 import polyglot.ast.AbstractExtFactory_c;
 import polyglot.ast.Ext;
+import polyglot.ast.ExtFactory;
 
 public class JL5ExtFactory_c extends AbstractExtFactory_c implements
         JL5ExtFactory {
@@ -35,18 +36,18 @@ public class JL5ExtFactory_c extends AbstractExtFactory_c implements
         super();
     }
 
-    public JL5ExtFactory_c(JL5ExtFactory extFactory) {
-        super(extFactory);
-    }
-
-    @Override
-    public JL5ExtFactory nextExtFactory() {
-        return (JL5ExtFactory) super.nextExtFactory();
+    public JL5ExtFactory_c(ExtFactory nextExtFactory) {
+        super(nextExtFactory);
     }
 
     @Override
     protected Ext extCaseImpl() {
         return new JL5CaseExt();
+    }
+
+    @Override
+    protected Ext extCatchImpl() {
+        return new JL5CatchExt();
     }
 
     @Override
@@ -164,7 +165,13 @@ public class JL5ExtFactory_c extends AbstractExtFactory_c implements
         Ext e = extEnumDeclImpl();
 
         if (nextExtFactory() != null) {
-            Ext e2 = nextExtFactory().extEnumDecl();
+            Ext e2;
+            if (nextExtFactory() instanceof JL5ExtFactory) {
+                e2 = ((JL5ExtFactory) nextExtFactory()).extEnumDecl();
+            }
+            else {
+                e2 = nextExtFactory().extClassDecl();
+            }
             e = composeExts(e, e2);
         }
         return postExtEnumDecl(e);
@@ -175,7 +182,13 @@ public class JL5ExtFactory_c extends AbstractExtFactory_c implements
         Ext e = extExtendedForImpl();
 
         if (nextExtFactory() != null) {
-            Ext e2 = nextExtFactory().extExtendedFor();
+            Ext e2;
+            if (nextExtFactory() instanceof JL5ExtFactory) {
+                e2 = ((JL5ExtFactory) nextExtFactory()).extExtendedFor();
+            }
+            else {
+                e2 = nextExtFactory().extLoop();
+            }
             e = composeExts(e, e2);
         }
         return postExtExtendedFor(e);
@@ -186,7 +199,13 @@ public class JL5ExtFactory_c extends AbstractExtFactory_c implements
         Ext e = extEnumConstantDeclImpl();
 
         if (nextExtFactory() != null) {
-            Ext e2 = nextExtFactory().extEnumConstantDecl();
+            Ext e2;
+            if (nextExtFactory() instanceof JL5ExtFactory) {
+                e2 = ((JL5ExtFactory) nextExtFactory()).extEnumConstantDecl();
+            }
+            else {
+                e2 = nextExtFactory().extClassMember();
+            }
             e = composeExts(e, e2);
         }
         return postExtEnumConstantDecl(e);
@@ -197,7 +216,13 @@ public class JL5ExtFactory_c extends AbstractExtFactory_c implements
         Ext e = extEnumConstantImpl();
 
         if (nextExtFactory() != null) {
-            Ext e2 = nextExtFactory().extEnumConstant();
+            Ext e2;
+            if (nextExtFactory() instanceof JL5ExtFactory) {
+                e2 = ((JL5ExtFactory) nextExtFactory()).extEnumConstant();
+            }
+            else {
+                e2 = nextExtFactory().extField();
+            }
             e = composeExts(e, e2);
         }
         return postExtEnumConstant(e);
@@ -208,7 +233,13 @@ public class JL5ExtFactory_c extends AbstractExtFactory_c implements
         Ext e = extParamTypeNodeImpl();
 
         if (nextExtFactory() != null) {
-            Ext e2 = nextExtFactory().extParamTypeNode();
+            Ext e2;
+            if (nextExtFactory() instanceof JL5ExtFactory) {
+                e2 = ((JL5ExtFactory) nextExtFactory()).extParamTypeNode();
+            }
+            else {
+                e2 = nextExtFactory().extTypeNode();
+            }
             e = composeExts(e, e2);
         }
         return postExtParamTypeNode(e);
@@ -219,7 +250,13 @@ public class JL5ExtFactory_c extends AbstractExtFactory_c implements
         Ext e = extAnnotationElemDeclImpl();
 
         if (nextExtFactory() != null) {
-            Ext e2 = nextExtFactory().extAnnotationElemDecl();
+            Ext e2;
+            if (nextExtFactory() instanceof JL5ExtFactory) {
+                e2 = ((JL5ExtFactory) nextExtFactory()).extAnnotationElemDecl();
+            }
+            else {
+                e2 = nextExtFactory().extMethodDecl();
+            }
             e = composeExts(e, e2);
         }
         return postExtAnnotationElemDecl(e);
@@ -230,7 +267,14 @@ public class JL5ExtFactory_c extends AbstractExtFactory_c implements
         Ext e = extNormalAnnotationElemImpl();
 
         if (nextExtFactory() != null) {
-            Ext e2 = nextExtFactory().extNormalAnnotationElem();
+            Ext e2;
+            if (nextExtFactory() instanceof JL5ExtFactory) {
+                e2 =
+                        ((JL5ExtFactory) nextExtFactory()).extNormalAnnotationElem();
+            }
+            else {
+                e2 = nextExtFactory().extTerm();
+            }
             e = composeExts(e, e2);
         }
         return postExtNormalAnnotationElem(e);
@@ -241,7 +285,14 @@ public class JL5ExtFactory_c extends AbstractExtFactory_c implements
         Ext e = extMarkerAnnotationElemImpl();
 
         if (nextExtFactory() != null) {
-            Ext e2 = nextExtFactory().extMarkerAnnotationElem();
+            Ext e2;
+            if (nextExtFactory() instanceof JL5ExtFactory) {
+                e2 =
+                        ((JL5ExtFactory) nextExtFactory()).extMarkerAnnotationElem();
+            }
+            else {
+                e2 = nextExtFactory().extTerm();
+            }
             e = composeExts(e, e2);
         }
         return postExtMarkerAnnotationElem(e);
@@ -252,7 +303,14 @@ public class JL5ExtFactory_c extends AbstractExtFactory_c implements
         Ext e = extSingleElementAnnotationElemImpl();
 
         if (nextExtFactory() != null) {
-            Ext e2 = nextExtFactory().extSingleElementAnnotationElem();
+            Ext e2;
+            if (nextExtFactory() instanceof JL5ExtFactory) {
+                e2 =
+                        ((JL5ExtFactory) nextExtFactory()).extSingleElementAnnotationElem();
+            }
+            else {
+                e2 = nextExtFactory().extTerm();
+            }
             e = composeExts(e, e2);
         }
         return postExtSingleElementAnnotationElem(e);
@@ -263,7 +321,13 @@ public class JL5ExtFactory_c extends AbstractExtFactory_c implements
         Ext e = extElementValuePairImpl();
 
         if (nextExtFactory() != null) {
-            Ext e2 = nextExtFactory().extElementValuePair();
+            Ext e2;
+            if (nextExtFactory() instanceof JL5ExtFactory) {
+                e2 = ((JL5ExtFactory) nextExtFactory()).extElementValuePair();
+            }
+            else {
+                e2 = nextExtFactory().extTerm();
+            }
             e = composeExts(e, e2);
         }
         return postExtElementValuePair(e);
@@ -274,7 +338,14 @@ public class JL5ExtFactory_c extends AbstractExtFactory_c implements
         Ext e = extElementValueArrayInitImpl();
 
         if (nextExtFactory() != null) {
-            Ext e2 = nextExtFactory().extElementValueArrayInit();
+            Ext e2;
+            if (nextExtFactory() instanceof JL5ExtFactory) {
+                e2 =
+                        ((JL5ExtFactory) nextExtFactory()).extElementValueArrayInit();
+            }
+            else {
+                e2 = nextExtFactory().extTerm();
+            }
             e = composeExts(e, e2);
         }
         return postExtElementValueArrayInit(e);

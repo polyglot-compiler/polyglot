@@ -45,8 +45,20 @@ public interface JL5LocalInstance extends LocalInstance {
     boolean isProcedureFormal();
 
     /**
-     * Set whether this local instance represent a formal argument of a procedure.
+     * Set whether this local instance represents a formal argument of a procedure.
      * (e.g., method or constructor) 
      */
     void setProcedureFormal(boolean isProcedureFormal);
+
+    /**
+     * Does this local instance represent a formal of a catch block? 
+     */
+    boolean isCatchFormal();
+
+    /**
+     * Set whether this local instance represents a formal argument of a catch block.
+     * (e.g., method or constructor) 
+     */
+    void setCatchFormal(boolean isCatchFormal);
+
 }

@@ -27,6 +27,7 @@ package polyglot.ext.jl5.ast;
 
 import java.util.ArrayList;
 
+import polyglot.ast.Case;
 import polyglot.ast.Expr;
 import polyglot.ast.Node;
 import polyglot.ast.Switch;
@@ -45,7 +46,7 @@ public class JL5SwitchExt extends JL5Ext {
         Switch s = (Switch) this.node();
         Expr expr = s.expr();
 
-        if (!isAcceptableSwitchType(expr.type())) {
+        if (!((JL5SwitchOps) s.del()).isAcceptableSwitchType(expr.type())) {
             throw new SemanticException("Switch index must be of type char, byte,"
                                                 + " short, int, Character, Byte, Short, Integer, or an enum type.",
                                         s.position());
@@ -55,18 +56,18 @@ public class JL5SwitchExt extends JL5Ext {
                 new ArrayList<SwitchElement>(s.elements().size());
         Type switchType = expr.type();
         for (SwitchElement el : s.elements()) {
-            JL5Ext ext = JL5Ext.ext(el);
-            if (ext instanceof JL5CaseExt)
+            if (el instanceof Case) {
                 el =
-                        (SwitchElement) ((JL5CaseExt) ext).del()
-                                                          .resolveCaseLabel(tc,
-                                                                            switchType);
+                        (SwitchElement) ((JL5CaseOps) el.del()).resolveCaseLabel(tc,
+                                                                                 switchType);
+            }
+
             newels.add(el);
         }
         return s.elements(newels);
     }
 
-    protected boolean isAcceptableSwitchType(Type type) {
+    public boolean isAcceptableSwitchType(Type type) {
         JL5TypeSystem ts = (JL5TypeSystem) type.typeSystem();
         if (ts.Char().equals(type) || ts.Byte().equals(type)
                 || ts.Short().equals(type) || ts.Int().equals(type)) {

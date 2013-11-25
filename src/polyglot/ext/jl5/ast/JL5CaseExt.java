@@ -48,7 +48,6 @@ import polyglot.visit.TypeChecker;
 
 public class JL5CaseExt extends JL5Ext implements JL5CaseOps {
     private static final long serialVersionUID = SerialVersionUID.generate();
-    protected JL5CaseOps del;
 
     @Override
     public Node resolveCaseLabel(TypeChecker tc, Type switchType)
@@ -218,16 +217,5 @@ public class JL5CaseExt extends JL5Ext implements JL5CaseOps {
             }
             w.write(":");
         }
-    }
-
-    /**
-     * The delegate for JL5CaseOps. By default it is this object, but this can be overridden
-     */
-    public JL5CaseOps del() {
-        return this.del == null ? this : this.del;
-    }
-
-    public void setDel(JL5CaseOps del) {
-        this.del = del;
     }
 }

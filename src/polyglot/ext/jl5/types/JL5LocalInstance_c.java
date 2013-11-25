@@ -40,6 +40,8 @@ public class JL5LocalInstance_c extends LocalInstance_c implements
 
     protected boolean isProcedureFormal = false;
 
+    protected boolean isCatchFormal = false;
+
     public JL5LocalInstance_c(TypeSystem ts, Position pos, Flags flags,
             Type type, String name) {
         super(ts, pos, flags, type, name);
@@ -63,6 +65,16 @@ public class JL5LocalInstance_c extends LocalInstance_c implements
     @Override
     public void setProcedureFormal(boolean isProcedureFormal) {
         this.isProcedureFormal = isProcedureFormal;
+    }
+
+    @Override
+    public boolean isCatchFormal() {
+        return this.isCatchFormal;
+    }
+
+    @Override
+    public void setCatchFormal(boolean isCatchFormal) {
+        this.isCatchFormal = isCatchFormal;
     }
 
 }
