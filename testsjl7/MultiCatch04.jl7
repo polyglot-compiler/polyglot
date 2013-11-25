@@ -1,0 +1,12 @@
+class C {
+    void m() {
+	try {
+	    foo();
+	}
+	catch (NullPointerException|ArithmeticException e) { 
+	    e = null; // bad, multicatch is implicitly final
+	}
+    }
+
+    void foo() { }
+}

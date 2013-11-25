@@ -1,0 +1,16 @@
+class C {
+    void m() {
+	try {
+	    foo();
+	}
+	catch (NullPointerException|ArrayIndexOutOfBoundsException e) {
+	}
+	try {
+	    foo();
+	}
+	catch (java.lang.NullPointerException|java.lang.ArrayIndexOutOfBoundsException|ArithmeticException e) {
+	}
+    }
+
+    void foo() { }
+}

@@ -1,0 +1,11 @@
+class C {
+    void m() {
+	try {
+	    foo();
+	}
+	catch (NullPointerException|C e) { // bad, C is not a Throwable
+	}
+    }
+
+    void foo() { }
+}

@@ -1,0 +1,11 @@
+class C {
+    void m() {
+	try {
+	    foo();
+	}
+	catch (NullPointerException|RuntimeException e) { // bad, one is a subclass of the other
+	}
+    }
+
+    void foo() { }
+}
