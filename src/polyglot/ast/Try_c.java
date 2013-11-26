@@ -49,7 +49,7 @@ import polyglot.visit.PrettyPrinter;
  * An immutable representation of a <code>try</code> block, one or more
  * <code>catch</code> blocks, and an optional <code>finally</code> block.
  */
-public class Try_c extends Stmt_c implements Try {
+public class Try_c extends Stmt_c implements Try, TryOps {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
     protected Block tryBlock;
@@ -156,20 +156,55 @@ public class Try_c extends Stmt_c implements Try {
      */
     @Override
     public Node exceptionCheck(ExceptionChecker ec) throws SemanticException {
-        TypeSystem ts = ec.typeSystem();
-        ExceptionChecker origEC = ec;
-
+        ExceptionChecker ecTryBlockEntry = ec;
         if (this.finallyBlock != null && !this.finallyBlock.reachable()) {
             // the finally block cannot terminate normally.
             // This implies that exceptions thrown in the try and catch
-            // blocks will not propogate upwards.
+            // blocks will not propagate upwards.
             // Prevent exceptions from propagation upwards past the finally
             // block. (The original exception checker will be used
             // for checking the finally block).
-            ec = ec.pushCatchAllThrowable();
+            ecTryBlockEntry = ecTryBlockEntry.pushCatchAllThrowable();
         }
 
+        ExceptionChecker ecTryBlock =
+                constructTryBlockExceptionChecker(ecTryBlockEntry);
+
+        Try_c n = this;
+        // Visit the try block.
+        Block tryBlock = ((TryOps) n.del()).exceptionCheckTryBlock(ecTryBlock);
+        n = (Try_c) n.tryBlock(tryBlock);
+
+        List<Catch> catchBlocks =
+                ((TryOps) n.del()).exceptionCheckCatchBlocks(ecTryBlockEntry);
+        n = (Try_c) n.catchBlocks(catchBlocks);
+
+        Block finallyBlock = ((TryOps) n.del()).exceptionCheckFinallyBlock(ec);
+        n = (Try_c) n.finallyBlock(finallyBlock);
+
+        for (Type exc : n.del().throwTypes(ec.typeSystem())) {
+            ec.throwsException(exc, position());
+        }
+        n = (Try_c) n.exceptions(ec.throwsSet());
+
+        return n;
+    }
+
+    @Override
+    public Block exceptionCheckTryBlock(ExceptionChecker ec) {
+        return (Block) this.visitChild(this.tryBlock,
+                                       ((TryOps) this.del()).constructTryBlockExceptionChecker(ec));
+    }
+
+    @Override
+    public ExceptionChecker constructTryBlockExceptionChecker(
+            ExceptionChecker ec) {
+
         ExceptionChecker newec = ec.push();
+
+        // go through the catch blocks, from the end to the beginning, and push
+        // an ExceptionChecker indicating that they catch exceptions of the appropriate
+        // type.
         for (ListIterator<Catch> i =
                 this.catchBlocks.listIterator(this.catchBlocks.size()); i.hasPrevious();) {
             Catch cb = i.previous();
@@ -177,14 +212,15 @@ public class Try_c extends Stmt_c implements Try {
 
             newec = newec.push(catchType);
         }
+        return newec;
+    }
 
-        // Visit the try block.
-        Block tryBlock = (Block) this.visitChild(this.tryBlock, newec);
-
-        SubtypeSet caught = new SubtypeSet(ts.Throwable());
-
+    @Override
+    public List<Catch> exceptionCheckCatchBlocks(ExceptionChecker ec)
+            throws SemanticException {
         // Walk through our catch blocks, making sure that they each can 
         // catch something.
+        SubtypeSet caught = new SubtypeSet(ec.typeSystem().Throwable());
         for (Catch cb : this.catchBlocks) {
             Type catchType = cb.catchType();
 
@@ -203,35 +239,29 @@ public class Try_c extends Stmt_c implements Try {
         List<Catch> catchBlocks = new ArrayList<Catch>(this.catchBlocks.size());
 
         for (Catch cb : this.catchBlocks) {
-            ec = ec.push();
-            cb = (Catch) this.visitChild(cb, ec);
+            cb = (Catch) this.visitChild(cb, ec.push());
             catchBlocks.add(cb);
-            ec = ec.pop();
         }
 
-        Block finallyBlock = null;
+        return catchBlocks;
+    }
 
-        if (this.finallyBlock != null) {
-            ec = origEC;
+    @Override
+    public Block exceptionCheckFinallyBlock(ExceptionChecker ec) {
+        if (this.finallyBlock == null) {
+            return null;
+        }
+        Block fb = (Block) this.visitChild(this.finallyBlock, ec.push());
 
-            finallyBlock = (Block) this.visitChild(this.finallyBlock, ec);
-
-            if (!this.finallyBlock.reachable()) {
-                // warn the user
+        if (!this.finallyBlock.reachable()) {
+            // warn the user
 //              ###Don't warn, some versions of javac don't.              
 //              ec.errorQueue().enqueue(ErrorInfo.WARNING,
 //              "The finally block cannot complete normally", 
 //              finallyBlock.position());
-            }
-
-            ec = ec.pop();
         }
-        // now that all the exceptions have been added to the exception checker,
-        // call the super method, which should set the exceptions field of 
-        // Term_c.
-        Try_c t = (Try_c) super.exceptionCheck(ec);
 
-        return t.reconstruct(tryBlock, catchBlocks, finallyBlock);
+        return fb;
     }
 
     @Override

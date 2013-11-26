@@ -236,6 +236,11 @@ public class JL5DelFactory_c extends AbstractDelFactory_c implements
     }
 
     @Override
+    protected JL delTryImpl() {
+        return new JL5TryDel();
+    }
+
+    @Override
     protected JL delClassLitImpl() {
         return new JL5ClassLitDel();
     }
