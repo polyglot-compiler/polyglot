@@ -49,4 +49,7 @@ polyglot.ext.jl7.JL7ExtensionInfo "-d out -classpath java-out -assert -noserial 
 	MultiCatch02.jl7 (Semantic);
 	MultiCatch03.jl7 (Semantic);
 	MultiCatch04.jl7 (Semantic);
+	Rethrow01.jl7;
+	Rethrow02.jl7;
+	Rethrow03.jl7 (Semantic);
 }

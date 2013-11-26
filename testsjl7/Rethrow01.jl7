@@ -1,0 +1,15 @@
+import java.io.IOException;
+class C {
+    public void rethrowException(String foo) throws IOException {
+	try {
+	    if (foo.equals("First")) {
+		throw new IOException();
+	    } 
+	    // else {
+	    //         throw new SecondException();
+	    //       }
+	} catch (Exception e) {
+	    throw e;
+	}
+    }
+}

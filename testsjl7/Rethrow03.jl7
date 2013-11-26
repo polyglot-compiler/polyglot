@@ -1,0 +1,19 @@
+class C {
+    public void rethrowException(String foo) throws Ex1a {
+	try {
+	    if (foo.equals("First")) {
+		throw new Ex1a();
+	    } 
+	} catch (Ex1 e) {
+	    e = e;
+	    // e is not effectively final
+	    throw e;
+	}
+    }
+
+    class Ex1 extends Exception { }
+    class Ex2 extends Exception { }
+    class Ex1a extends Ex1 { }
+    class Ex2a extends Ex2 { }
+}
+
