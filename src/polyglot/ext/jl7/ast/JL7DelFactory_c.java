@@ -11,6 +11,21 @@ public class JL7DelFactory_c extends JL5DelFactory_c implements JL7DelFactory {
     }
 
     @Override
+    protected JL delSwitchImpl() {
+        return new JL7SwitchDel();
+    }
+
+    @Override
+    protected JL delThrowImpl() {
+        return new JL7ThrowDel();
+    }
+
+    @Override
+    protected JL delTryImpl() {
+        return new JL7TryDel();
+    }
+
+    @Override
     public JL delMultiCatch() {
         JL e = delMultiCatchImpl();
 

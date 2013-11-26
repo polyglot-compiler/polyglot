@@ -25,33 +25,19 @@
  ******************************************************************************/
 package polyglot.ext.jl7.ast;
 
-import polyglot.ast.Node;
-import polyglot.ext.jl5.ast.JL5CaseDel;
-import polyglot.ext.jl5.ast.JL5CaseOps;
-import polyglot.types.SemanticException;
-import polyglot.types.Type;
-import polyglot.util.SerialVersionUID;
-import polyglot.visit.ConstantChecker;
-import polyglot.visit.TypeChecker;
+import java.util.List;
 
-public class JL7CaseDel extends JL5CaseDel implements JL5CaseOps {
+import polyglot.ext.jl5.ast.JL5Del;
+import polyglot.types.Type;
+import polyglot.types.TypeSystem;
+import polyglot.util.SerialVersionUID;
+
+public class JL7ThrowDel extends JL5Del {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
     @Override
-    public Node typeCheck(TypeChecker tc) throws SemanticException {
-        return ((JL7CaseExt) JL7Ext.ext(this.node())).typeCheck(tc);
+    public List<Type> throwTypes(TypeSystem ts) {
+        return ((JL7ThrowExt) JL7Ext.ext(this.node())).throwTypes(ts);
     }
 
-    @Override
-    public Node checkConstants(ConstantChecker cc) throws SemanticException {
-        return ((JL7CaseExt) JL7Ext.ext(this.node())).checkConstants(cc);
-    }
-
-    @Override
-    public Node resolveCaseLabel(TypeChecker tc, Type switchType)
-            throws SemanticException {
-        return ((JL7CaseExt) JL7Ext.ext(this.node())).resolveCaseLabel(tc,
-                                                                       switchType);
-
-    }
 }
