@@ -48,8 +48,8 @@ public class ExceptionChecker extends ErrorHandlingVisitor {
     /**
      * Set of exceptions that can be caught. Combined with the outer
      * field, these sets form a stack of exceptions, representing
-     * all and only the exceptions that may be thrown at this point in
-     * the code.
+     * all and only the exceptions that are permitted to be thrown 
+     * at this point in the code.
      * 
      * Note: Consider the following code, where A,B,C,D are Exception subclasses.
      *    void m() throws A, B {
@@ -68,17 +68,20 @@ public class ExceptionChecker extends ErrorHandlingVisitor {
     protected Set<Type> catchable;
 
     /**
-     * The throws set, calculated bottom up.
+     * The throws set, calculated bottom up. That is, what exceptions
+     * can be thrown by the AST node that is being analyzed by this
+     * ExceptionChecker?
      */
     protected SubtypeSet throwsSet;
 
     /**
-     * Responsible for creating an appropriate exception.
+     * Responsible for creating an appropriate SemanticException
+     * to report an uncaught exception.
      */
     protected UncaughtReporter reporter;
 
     /**
-     * Should the propogation of eceptions upwards go past this point?
+     * Should the propagation of exceptions upwards go past this point?
      */
     protected boolean catchAllThrowable;
 
@@ -117,7 +120,7 @@ public class ExceptionChecker extends ErrorHandlingVisitor {
     }
 
     public ExceptionChecker push() {
-        throwsSet(); // force an instantiation of the throwsset.
+        throwsSet(); // force an instantiation of the throwsSet.
         ExceptionChecker ec = (ExceptionChecker) this.visitChildren();
         ec.outer = this;
         ec.catchable = null;
@@ -174,7 +177,7 @@ public class ExceptionChecker extends ErrorHandlingVisitor {
     }
 
     /**
-     * The ast nodes will use this callback to notify us that they throw an
+     * The AST nodes will use this callback to notify us that they throw an
      * exception of type t. This method will throw a SemanticException if the
      * type t is not allowed to be thrown at this point; the exception t will be
      * added to the throwsSet of all exception checkers in the stack, up to (and
@@ -260,5 +263,4 @@ public class ExceptionChecker extends ErrorHandlingVisitor {
                     + "throw a \"" + t + "\".", pos);
         }
     }
-
 }
