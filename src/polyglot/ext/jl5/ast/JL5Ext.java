@@ -29,6 +29,23 @@ public class JL5Ext extends Ext_c {
         return (JL5Ext) e;
     }
 
+    @Override
+    public void init(Node node) {
+        super.init(node);
+        if (superDel != null) {
+            superDel.init(node);
+        }
+    }
+
+    @Override
+    public Object copy() {
+        JL5Ext copy = (JL5Ext) super.copy();
+        if (superDel != null) {
+            copy.superDel = (JL) superDel.copy();
+        }
+        return copy;
+    }
+
     public JL superDel() {
         if (this.superDel == null) {
             return this.node();
