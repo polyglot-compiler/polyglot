@@ -66,7 +66,7 @@ public class JL5Options extends Options {
 
             @Override
             public Arg<String> defaultArg() {
-                return createDefault("java.lang.Enum");
+                return createDefault(this.defaultValue);
             }
         });
         flags.add(new OptFlag<String>(new String[] { "-enumSetImplClass",
@@ -82,7 +82,7 @@ public class JL5Options extends Options {
 
             @Override
             public Arg<String> defaultArg() {
-                return createDefault("java.util.EnumSet");
+                return createDefault(this.defaultValue);
             }
         });
         flags.add(new Switch(new String[] { "-removeJava5isms",
