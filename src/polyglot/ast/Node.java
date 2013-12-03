@@ -40,16 +40,16 @@ import polyglot.visit.NodeVisitor;
  * of the node should copy the node, set the field in the copy, and then
  * return the copy.
  */
-public interface Node extends JL, Copy, Serializable {
+public interface Node extends JLDel, Copy, Serializable {
     /**
      * Set the delegate of the node.
      */
-    Node del(JL del);
+    Node del(JLDel del);
 
     /**
      * Get the node's delegate.
      */
-    JL del();
+    JLDel del();
 
     /**
      * Set the extension of the node.

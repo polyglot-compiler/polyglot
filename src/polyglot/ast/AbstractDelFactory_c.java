@@ -79,7 +79,7 @@ public abstract class AbstractDelFactory_c implements DelFactory {
      * @param e2 a  <code>JL</code> object created by this.nextDelFactory
      * @return the result of composing e1 and e2.
      */
-    protected JL composeDels(JL e1, JL e2) {
+    protected JLDel composeDels(JLDel e1, JLDel e2) {
         throw new UnsupportedOperationException("Composition of delegates unimplemented.");
     }
 
@@ -90,869 +90,869 @@ public abstract class AbstractDelFactory_c implements DelFactory {
     // to allow subclasses to perform operations on the construction Exts
     // ******************************************
     @Override
-    public final JL delId() {
-        JL e = delIdImpl();
+    public final JLDel delId() {
+        JLDel e = delIdImpl();
 
         if (nextDelFactory != null) {
-            JL e2 = nextDelFactory.delId();
+            JLDel e2 = nextDelFactory.delId();
             e = composeDels(e, e2);
         }
         return postDelId(e);
     }
 
     @Override
-    public final JL delAmbAssign() {
-        JL e = delAmbAssignImpl();
+    public final JLDel delAmbAssign() {
+        JLDel e = delAmbAssignImpl();
 
         if (nextDelFactory != null) {
-            JL e2 = nextDelFactory.delAmbAssign();
+            JLDel e2 = nextDelFactory.delAmbAssign();
             e = composeDels(e, e2);
         }
         return postDelAmbAssign(e);
     }
 
     @Override
-    public final JL delAmbExpr() {
-        JL e = delAmbExprImpl();
+    public final JLDel delAmbExpr() {
+        JLDel e = delAmbExprImpl();
 
         if (nextDelFactory != null) {
-            JL e2 = nextDelFactory.delAmbExpr();
+            JLDel e2 = nextDelFactory.delAmbExpr();
             e = composeDels(e, e2);
         }
         return postDelAmbExpr(e);
     }
 
     @Override
-    public final JL delAmbPrefix() {
-        JL e = delAmbPrefixImpl();
+    public final JLDel delAmbPrefix() {
+        JLDel e = delAmbPrefixImpl();
 
         if (nextDelFactory != null) {
-            JL e2 = nextDelFactory.delAmbPrefix();
+            JLDel e2 = nextDelFactory.delAmbPrefix();
             e = composeDels(e, e2);
         }
         return postDelAmbPrefix(e);
     }
 
     @Override
-    public final JL delAmbQualifierNode() {
-        JL e = delAmbQualifierNodeImpl();
+    public final JLDel delAmbQualifierNode() {
+        JLDel e = delAmbQualifierNodeImpl();
 
         if (nextDelFactory != null) {
-            JL e2 = nextDelFactory.delAmbQualifierNode();
+            JLDel e2 = nextDelFactory.delAmbQualifierNode();
             e = composeDels(e, e2);
         }
         return postDelAmbQualifierNode(e);
     }
 
     @Override
-    public final JL delAmbReceiver() {
-        JL e = delAmbReceiverImpl();
+    public final JLDel delAmbReceiver() {
+        JLDel e = delAmbReceiverImpl();
 
         if (nextDelFactory != null) {
-            JL e2 = nextDelFactory.delAmbReceiver();
+            JLDel e2 = nextDelFactory.delAmbReceiver();
             e = composeDels(e, e2);
         }
         return postDelAmbReceiver(e);
     }
 
     @Override
-    public final JL delAmbTypeNode() {
-        JL e = delAmbTypeNodeImpl();
+    public final JLDel delAmbTypeNode() {
+        JLDel e = delAmbTypeNodeImpl();
 
         if (nextDelFactory != null) {
-            JL e2 = nextDelFactory.delAmbTypeNode();
+            JLDel e2 = nextDelFactory.delAmbTypeNode();
             e = composeDels(e, e2);
         }
         return postDelAmbTypeNode(e);
     }
 
     @Override
-    public final JL delArrayAccess() {
-        JL e = delArrayAccessImpl();
+    public final JLDel delArrayAccess() {
+        JLDel e = delArrayAccessImpl();
 
         if (nextDelFactory != null) {
-            JL e2 = nextDelFactory.delArrayAccess();
+            JLDel e2 = nextDelFactory.delArrayAccess();
             e = composeDels(e, e2);
         }
         return postDelArrayAccess(e);
     }
 
     @Override
-    public final JL delArrayInit() {
-        JL e = delArrayInitImpl();
+    public final JLDel delArrayInit() {
+        JLDel e = delArrayInitImpl();
 
         if (nextDelFactory != null) {
-            JL e2 = nextDelFactory.delArrayInit();
+            JLDel e2 = nextDelFactory.delArrayInit();
             e = composeDels(e, e2);
         }
         return postDelArrayInit(e);
     }
 
     @Override
-    public final JL delArrayTypeNode() {
-        JL e = delArrayTypeNodeImpl();
+    public final JLDel delArrayTypeNode() {
+        JLDel e = delArrayTypeNodeImpl();
 
         if (nextDelFactory != null) {
-            JL e2 = nextDelFactory.delArrayTypeNode();
+            JLDel e2 = nextDelFactory.delArrayTypeNode();
             e = composeDels(e, e2);
         }
         return postDelArrayTypeNode(e);
     }
 
     @Override
-    public final JL delAssert() {
-        JL e = delAssertImpl();
+    public final JLDel delAssert() {
+        JLDel e = delAssertImpl();
 
         if (nextDelFactory != null) {
-            JL e2 = nextDelFactory.delAssert();
+            JLDel e2 = nextDelFactory.delAssert();
             e = composeDels(e, e2);
         }
         return postDelAssert(e);
     }
 
     @Override
-    public final JL delAssign() {
-        JL e = delAssignImpl();
+    public final JLDel delAssign() {
+        JLDel e = delAssignImpl();
 
         if (nextDelFactory != null) {
-            JL e2 = nextDelFactory.delAssign();
+            JLDel e2 = nextDelFactory.delAssign();
             e = composeDels(e, e2);
         }
         return postDelAssign(e);
     }
 
     @Override
-    public final JL delLocalAssign() {
-        JL e = delLocalAssignImpl();
+    public final JLDel delLocalAssign() {
+        JLDel e = delLocalAssignImpl();
 
         if (nextDelFactory != null) {
-            JL e2 = nextDelFactory.delLocalAssign();
+            JLDel e2 = nextDelFactory.delLocalAssign();
             e = composeDels(e, e2);
         }
         return postDelLocalAssign(e);
     }
 
     @Override
-    public final JL delFieldAssign() {
-        JL e = delFieldAssignImpl();
+    public final JLDel delFieldAssign() {
+        JLDel e = delFieldAssignImpl();
 
         if (nextDelFactory != null) {
-            JL e2 = nextDelFactory.delFieldAssign();
+            JLDel e2 = nextDelFactory.delFieldAssign();
             e = composeDels(e, e2);
         }
         return postDelFieldAssign(e);
     }
 
     @Override
-    public final JL delArrayAccessAssign() {
-        JL e = delArrayAccessAssignImpl();
+    public final JLDel delArrayAccessAssign() {
+        JLDel e = delArrayAccessAssignImpl();
 
         if (nextDelFactory != null) {
-            JL e2 = nextDelFactory.delArrayAccessAssign();
+            JLDel e2 = nextDelFactory.delArrayAccessAssign();
             e = composeDels(e, e2);
         }
         return postDelArrayAccessAssign(e);
     }
 
     @Override
-    public final JL delBinary() {
-        JL e = delBinaryImpl();
+    public final JLDel delBinary() {
+        JLDel e = delBinaryImpl();
 
         if (nextDelFactory != null) {
-            JL e2 = nextDelFactory.delBinary();
+            JLDel e2 = nextDelFactory.delBinary();
             e = composeDels(e, e2);
         }
         return postDelBinary(e);
     }
 
     @Override
-    public final JL delBlock() {
-        JL e = delBlockImpl();
+    public final JLDel delBlock() {
+        JLDel e = delBlockImpl();
 
         if (nextDelFactory != null) {
-            JL e2 = nextDelFactory.delBlock();
+            JLDel e2 = nextDelFactory.delBlock();
             e = composeDels(e, e2);
         }
         return postDelBlock(e);
     }
 
     @Override
-    public final JL delBooleanLit() {
-        JL e = delBooleanLitImpl();
+    public final JLDel delBooleanLit() {
+        JLDel e = delBooleanLitImpl();
 
         if (nextDelFactory != null) {
-            JL e2 = nextDelFactory.delBooleanLit();
+            JLDel e2 = nextDelFactory.delBooleanLit();
             e = composeDels(e, e2);
         }
         return postDelBooleanLit(e);
     }
 
     @Override
-    public final JL delBranch() {
-        JL e = delBranchImpl();
+    public final JLDel delBranch() {
+        JLDel e = delBranchImpl();
 
         if (nextDelFactory != null) {
-            JL e2 = nextDelFactory.delBranch();
+            JLDel e2 = nextDelFactory.delBranch();
             e = composeDels(e, e2);
         }
         return postDelBranch(e);
     }
 
     @Override
-    public final JL delCall() {
-        JL e = delCallImpl();
+    public final JLDel delCall() {
+        JLDel e = delCallImpl();
 
         if (nextDelFactory != null) {
-            JL e2 = nextDelFactory.delCall();
+            JLDel e2 = nextDelFactory.delCall();
             e = composeDels(e, e2);
         }
         return postDelCall(e);
     }
 
     @Override
-    public final JL delCanonicalTypeNode() {
-        JL e = delCanonicalTypeNodeImpl();
+    public final JLDel delCanonicalTypeNode() {
+        JLDel e = delCanonicalTypeNodeImpl();
 
         if (nextDelFactory != null) {
-            JL e2 = nextDelFactory.delCanonicalTypeNode();
+            JLDel e2 = nextDelFactory.delCanonicalTypeNode();
             e = composeDels(e, e2);
         }
         return postDelCanonicalTypeNode(e);
     }
 
     @Override
-    public final JL delCase() {
-        JL e = delCaseImpl();
+    public final JLDel delCase() {
+        JLDel e = delCaseImpl();
 
         if (nextDelFactory != null) {
-            JL e2 = nextDelFactory.delCase();
+            JLDel e2 = nextDelFactory.delCase();
             e = composeDels(e, e2);
         }
         return postDelCase(e);
     }
 
     @Override
-    public final JL delCast() {
-        JL e = delCastImpl();
+    public final JLDel delCast() {
+        JLDel e = delCastImpl();
 
         if (nextDelFactory != null) {
-            JL e2 = nextDelFactory.delCast();
+            JLDel e2 = nextDelFactory.delCast();
             e = composeDels(e, e2);
         }
         return postDelCast(e);
     }
 
     @Override
-    public final JL delCatch() {
-        JL e = delCatchImpl();
+    public final JLDel delCatch() {
+        JLDel e = delCatchImpl();
 
         if (nextDelFactory != null) {
-            JL e2 = nextDelFactory.delCatch();
+            JLDel e2 = nextDelFactory.delCatch();
             e = composeDels(e, e2);
         }
         return postDelCatch(e);
     }
 
     @Override
-    public final JL delCharLit() {
-        JL e = delCharLitImpl();
+    public final JLDel delCharLit() {
+        JLDel e = delCharLitImpl();
 
         if (nextDelFactory != null) {
-            JL e2 = nextDelFactory.delCharLit();
+            JLDel e2 = nextDelFactory.delCharLit();
             e = composeDels(e, e2);
         }
         return postDelCharLit(e);
     }
 
     @Override
-    public final JL delClassBody() {
-        JL e = delClassBodyImpl();
+    public final JLDel delClassBody() {
+        JLDel e = delClassBodyImpl();
 
         if (nextDelFactory != null) {
-            JL e2 = nextDelFactory.delClassBody();
+            JLDel e2 = nextDelFactory.delClassBody();
             e = composeDels(e, e2);
         }
         return postDelClassBody(e);
     }
 
     @Override
-    public final JL delClassDecl() {
-        JL e = delClassDeclImpl();
+    public final JLDel delClassDecl() {
+        JLDel e = delClassDeclImpl();
 
         if (nextDelFactory != null) {
-            JL e2 = nextDelFactory.delClassDecl();
+            JLDel e2 = nextDelFactory.delClassDecl();
             e = composeDels(e, e2);
         }
         return postDelClassDecl(e);
     }
 
     @Override
-    public final JL delClassLit() {
-        JL e = delClassLitImpl();
+    public final JLDel delClassLit() {
+        JLDel e = delClassLitImpl();
 
         if (nextDelFactory != null) {
-            JL e2 = nextDelFactory.delClassLit();
+            JLDel e2 = nextDelFactory.delClassLit();
             e = composeDels(e, e2);
         }
         return postDelClassLit(e);
     }
 
     @Override
-    public final JL delClassMember() {
-        JL e = delClassMemberImpl();
+    public final JLDel delClassMember() {
+        JLDel e = delClassMemberImpl();
 
         if (nextDelFactory != null) {
-            JL e2 = nextDelFactory.delClassMember();
+            JLDel e2 = nextDelFactory.delClassMember();
             e = composeDels(e, e2);
         }
         return postDelClassMember(e);
     }
 
     @Override
-    public final JL delCodeDecl() {
-        JL e = delCodeDeclImpl();
+    public final JLDel delCodeDecl() {
+        JLDel e = delCodeDeclImpl();
 
         if (nextDelFactory != null) {
-            JL e2 = nextDelFactory.delCodeDecl();
+            JLDel e2 = nextDelFactory.delCodeDecl();
             e = composeDels(e, e2);
         }
         return postDelCodeDecl(e);
     }
 
     @Override
-    public final JL delCompoundStmt() {
-        JL e = delCompoundStmtImpl();
+    public final JLDel delCompoundStmt() {
+        JLDel e = delCompoundStmtImpl();
 
         if (nextDelFactory != null) {
-            JL e2 = nextDelFactory.delCompoundStmt();
+            JLDel e2 = nextDelFactory.delCompoundStmt();
             e = composeDels(e, e2);
         }
         return postDelCompoundStmt(e);
     }
 
     @Override
-    public final JL delConditional() {
-        JL e = delConditionalImpl();
+    public final JLDel delConditional() {
+        JLDel e = delConditionalImpl();
 
         if (nextDelFactory != null) {
-            JL e2 = nextDelFactory.delConditional();
+            JLDel e2 = nextDelFactory.delConditional();
             e = composeDels(e, e2);
         }
         return postDelConditional(e);
     }
 
     @Override
-    public final JL delConstructorCall() {
-        JL e = delConstructorCallImpl();
+    public final JLDel delConstructorCall() {
+        JLDel e = delConstructorCallImpl();
 
         if (nextDelFactory != null) {
-            JL e2 = nextDelFactory.delConstructorCall();
+            JLDel e2 = nextDelFactory.delConstructorCall();
             e = composeDels(e, e2);
         }
         return postDelConstructorCall(e);
     }
 
     @Override
-    public final JL delConstructorDecl() {
-        JL e = delConstructorDeclImpl();
+    public final JLDel delConstructorDecl() {
+        JLDel e = delConstructorDeclImpl();
 
         if (nextDelFactory != null) {
-            JL e2 = nextDelFactory.delConstructorDecl();
+            JLDel e2 = nextDelFactory.delConstructorDecl();
             e = composeDels(e, e2);
         }
         return postDelConstructorDecl(e);
     }
 
     @Override
-    public final JL delDo() {
-        JL e = delDoImpl();
+    public final JLDel delDo() {
+        JLDel e = delDoImpl();
 
         if (nextDelFactory != null) {
-            JL e2 = nextDelFactory.delDo();
+            JLDel e2 = nextDelFactory.delDo();
             e = composeDels(e, e2);
         }
         return postDelDo(e);
     }
 
     @Override
-    public final JL delEmpty() {
-        JL e = delEmptyImpl();
+    public final JLDel delEmpty() {
+        JLDel e = delEmptyImpl();
 
         if (nextDelFactory != null) {
-            JL e2 = nextDelFactory.delEmpty();
+            JLDel e2 = nextDelFactory.delEmpty();
             e = composeDels(e, e2);
         }
         return postDelEmpty(e);
     }
 
     @Override
-    public final JL delEval() {
-        JL e = delEvalImpl();
+    public final JLDel delEval() {
+        JLDel e = delEvalImpl();
 
         if (nextDelFactory != null) {
-            JL e2 = nextDelFactory.delEval();
+            JLDel e2 = nextDelFactory.delEval();
             e = composeDels(e, e2);
         }
         return postDelEval(e);
     }
 
     @Override
-    public final JL delExpr() {
-        JL e = delExprImpl();
+    public final JLDel delExpr() {
+        JLDel e = delExprImpl();
 
         if (nextDelFactory != null) {
-            JL e2 = nextDelFactory.delExpr();
+            JLDel e2 = nextDelFactory.delExpr();
             e = composeDels(e, e2);
         }
         return postDelExpr(e);
     }
 
     @Override
-    public final JL delField() {
-        JL e = delFieldImpl();
+    public final JLDel delField() {
+        JLDel e = delFieldImpl();
 
         if (nextDelFactory != null) {
-            JL e2 = nextDelFactory.delField();
+            JLDel e2 = nextDelFactory.delField();
             e = composeDels(e, e2);
         }
         return postDelField(e);
     }
 
     @Override
-    public final JL delFieldDecl() {
-        JL e = delFieldDeclImpl();
+    public final JLDel delFieldDecl() {
+        JLDel e = delFieldDeclImpl();
 
         if (nextDelFactory != null) {
-            JL e2 = nextDelFactory.delFieldDecl();
+            JLDel e2 = nextDelFactory.delFieldDecl();
             e = composeDels(e, e2);
         }
         return postDelFieldDecl(e);
     }
 
     @Override
-    public final JL delFloatLit() {
-        JL e = delFloatLitImpl();
+    public final JLDel delFloatLit() {
+        JLDel e = delFloatLitImpl();
 
         if (nextDelFactory != null) {
-            JL e2 = nextDelFactory.delFloatLit();
+            JLDel e2 = nextDelFactory.delFloatLit();
             e = composeDels(e, e2);
         }
         return postDelFloatLit(e);
     }
 
     @Override
-    public final JL delFor() {
-        JL e = delForImpl();
+    public final JLDel delFor() {
+        JLDel e = delForImpl();
 
         if (nextDelFactory != null) {
-            JL e2 = nextDelFactory.delFor();
+            JLDel e2 = nextDelFactory.delFor();
             e = composeDels(e, e2);
         }
         return postDelFor(e);
     }
 
     @Override
-    public final JL delFormal() {
-        JL e = delFormalImpl();
+    public final JLDel delFormal() {
+        JLDel e = delFormalImpl();
 
         if (nextDelFactory != null) {
-            JL e2 = nextDelFactory.delFormal();
+            JLDel e2 = nextDelFactory.delFormal();
             e = composeDels(e, e2);
         }
         return postDelFormal(e);
     }
 
     @Override
-    public final JL delIf() {
-        JL e = delIfImpl();
+    public final JLDel delIf() {
+        JLDel e = delIfImpl();
 
         if (nextDelFactory != null) {
-            JL e2 = nextDelFactory.delIf();
+            JLDel e2 = nextDelFactory.delIf();
             e = composeDels(e, e2);
         }
         return postDelIf(e);
     }
 
     @Override
-    public final JL delImport() {
-        JL e = delImportImpl();
+    public final JLDel delImport() {
+        JLDel e = delImportImpl();
 
         if (nextDelFactory != null) {
-            JL e2 = nextDelFactory.delImport();
+            JLDel e2 = nextDelFactory.delImport();
             e = composeDels(e, e2);
         }
         return postDelImport(e);
     }
 
     @Override
-    public final JL delInitializer() {
-        JL e = delInitializerImpl();
+    public final JLDel delInitializer() {
+        JLDel e = delInitializerImpl();
 
         if (nextDelFactory != null) {
-            JL e2 = nextDelFactory.delInitializer();
+            JLDel e2 = nextDelFactory.delInitializer();
             e = composeDels(e, e2);
         }
         return postDelInitializer(e);
     }
 
     @Override
-    public final JL delInstanceof() {
-        JL e = delInstanceofImpl();
+    public final JLDel delInstanceof() {
+        JLDel e = delInstanceofImpl();
 
         if (nextDelFactory != null) {
-            JL e2 = nextDelFactory.delInstanceof();
+            JLDel e2 = nextDelFactory.delInstanceof();
             e = composeDels(e, e2);
         }
         return postDelInstanceof(e);
     }
 
     @Override
-    public final JL delIntLit() {
-        JL e = delIntLitImpl();
+    public final JLDel delIntLit() {
+        JLDel e = delIntLitImpl();
 
         if (nextDelFactory != null) {
-            JL e2 = nextDelFactory.delIntLit();
+            JLDel e2 = nextDelFactory.delIntLit();
             e = composeDels(e, e2);
         }
         return postDelIntLit(e);
     }
 
     @Override
-    public final JL delLabeled() {
-        JL e = delLabeledImpl();
+    public final JLDel delLabeled() {
+        JLDel e = delLabeledImpl();
 
         if (nextDelFactory != null) {
-            JL e2 = nextDelFactory.delLabeled();
+            JLDel e2 = nextDelFactory.delLabeled();
             e = composeDels(e, e2);
         }
         return postDelLabeled(e);
     }
 
     @Override
-    public final JL delLit() {
-        JL e = delLitImpl();
+    public final JLDel delLit() {
+        JLDel e = delLitImpl();
 
         if (nextDelFactory != null) {
-            JL e2 = nextDelFactory.delLit();
+            JLDel e2 = nextDelFactory.delLit();
             e = composeDels(e, e2);
         }
         return postDelLit(e);
     }
 
     @Override
-    public final JL delLocal() {
-        JL e = delLocalImpl();
+    public final JLDel delLocal() {
+        JLDel e = delLocalImpl();
 
         if (nextDelFactory != null) {
-            JL e2 = nextDelFactory.delLocal();
+            JLDel e2 = nextDelFactory.delLocal();
             e = composeDels(e, e2);
         }
         return postDelLocal(e);
     }
 
     @Override
-    public final JL delLocalClassDecl() {
-        JL e = delLocalClassDeclImpl();
+    public final JLDel delLocalClassDecl() {
+        JLDel e = delLocalClassDeclImpl();
 
         if (nextDelFactory != null) {
-            JL e2 = nextDelFactory.delLocalClassDecl();
+            JLDel e2 = nextDelFactory.delLocalClassDecl();
             e = composeDels(e, e2);
         }
         return postDelLocalClassDecl(e);
     }
 
     @Override
-    public final JL delLocalDecl() {
-        JL e = delLocalDeclImpl();
+    public final JLDel delLocalDecl() {
+        JLDel e = delLocalDeclImpl();
 
         if (nextDelFactory != null) {
-            JL e2 = nextDelFactory.delLocalDecl();
+            JLDel e2 = nextDelFactory.delLocalDecl();
             e = composeDels(e, e2);
         }
         return postDelLocalDecl(e);
     }
 
     @Override
-    public final JL delLoop() {
-        JL e = delLoopImpl();
+    public final JLDel delLoop() {
+        JLDel e = delLoopImpl();
 
         if (nextDelFactory != null) {
-            JL e2 = nextDelFactory.delLoop();
+            JLDel e2 = nextDelFactory.delLoop();
             e = composeDels(e, e2);
         }
         return postDelLoop(e);
     }
 
     @Override
-    public final JL delMethodDecl() {
-        JL e = delMethodDeclImpl();
+    public final JLDel delMethodDecl() {
+        JLDel e = delMethodDeclImpl();
 
         if (nextDelFactory != null) {
-            JL e2 = nextDelFactory.delMethodDecl();
+            JLDel e2 = nextDelFactory.delMethodDecl();
             e = composeDels(e, e2);
         }
         return postDelMethodDecl(e);
     }
 
     @Override
-    public final JL delNewArray() {
-        JL e = delNewArrayImpl();
+    public final JLDel delNewArray() {
+        JLDel e = delNewArrayImpl();
 
         if (nextDelFactory != null) {
-            JL e2 = nextDelFactory.delNewArray();
+            JLDel e2 = nextDelFactory.delNewArray();
             e = composeDels(e, e2);
         }
         return postDelNewArray(e);
     }
 
     @Override
-    public final JL delNode() {
-        JL e = delNodeImpl();
+    public final JLDel delNode() {
+        JLDel e = delNodeImpl();
 
         if (nextDelFactory != null) {
-            JL e2 = nextDelFactory.delNode();
+            JLDel e2 = nextDelFactory.delNode();
             e = composeDels(e, e2);
         }
         return postDelNode(e);
     }
 
     @Override
-    public final JL delNodeList() {
-        JL e = delNodeListImpl();
+    public final JLDel delNodeList() {
+        JLDel e = delNodeListImpl();
 
         if (nextDelFactory != null) {
-            JL e2 = nextDelFactory.delNode();
+            JLDel e2 = nextDelFactory.delNode();
             e = composeDels(e, e2);
         }
         return postDelNodeList(e);
     }
 
     @Override
-    public final JL delNew() {
-        JL e = delNewImpl();
+    public final JLDel delNew() {
+        JLDel e = delNewImpl();
 
         if (nextDelFactory != null) {
-            JL e2 = nextDelFactory.delNew();
+            JLDel e2 = nextDelFactory.delNew();
             e = composeDels(e, e2);
         }
         return postDelNew(e);
     }
 
     @Override
-    public final JL delNullLit() {
-        JL e = delNullLitImpl();
+    public final JLDel delNullLit() {
+        JLDel e = delNullLitImpl();
 
         if (nextDelFactory != null) {
-            JL e2 = nextDelFactory.delNullLit();
+            JLDel e2 = nextDelFactory.delNullLit();
             e = composeDels(e, e2);
         }
         return postDelNullLit(e);
     }
 
     @Override
-    public final JL delNumLit() {
-        JL e = delNumLitImpl();
+    public final JLDel delNumLit() {
+        JLDel e = delNumLitImpl();
 
         if (nextDelFactory != null) {
-            JL e2 = nextDelFactory.delNumLit();
+            JLDel e2 = nextDelFactory.delNumLit();
             e = composeDels(e, e2);
         }
         return postDelNumLit(e);
     }
 
     @Override
-    public final JL delPackageNode() {
-        JL e = delPackageNodeImpl();
+    public final JLDel delPackageNode() {
+        JLDel e = delPackageNodeImpl();
 
         if (nextDelFactory != null) {
-            JL e2 = nextDelFactory.delPackageNode();
+            JLDel e2 = nextDelFactory.delPackageNode();
             e = composeDels(e, e2);
         }
         return postDelPackageNode(e);
     }
 
     @Override
-    public final JL delProcedureDecl() {
-        JL e = delProcedureDeclImpl();
+    public final JLDel delProcedureDecl() {
+        JLDel e = delProcedureDeclImpl();
 
         if (nextDelFactory != null) {
-            JL e2 = nextDelFactory.delProcedureDecl();
+            JLDel e2 = nextDelFactory.delProcedureDecl();
             e = composeDels(e, e2);
         }
         return postDelProcedureDecl(e);
     }
 
     @Override
-    public final JL delReturn() {
-        JL e = delReturnImpl();
+    public final JLDel delReturn() {
+        JLDel e = delReturnImpl();
 
         if (nextDelFactory != null) {
-            JL e2 = nextDelFactory.delReturn();
+            JLDel e2 = nextDelFactory.delReturn();
             e = composeDels(e, e2);
         }
         return postDelReturn(e);
     }
 
     @Override
-    public final JL delSourceCollection() {
-        JL e = delSourceCollectionImpl();
+    public final JLDel delSourceCollection() {
+        JLDel e = delSourceCollectionImpl();
 
         if (nextDelFactory != null) {
-            JL e2 = nextDelFactory.delSourceCollection();
+            JLDel e2 = nextDelFactory.delSourceCollection();
             e = composeDels(e, e2);
         }
         return postDelSourceCollection(e);
     }
 
     @Override
-    public final JL delSourceFile() {
-        JL e = delSourceFileImpl();
+    public final JLDel delSourceFile() {
+        JLDel e = delSourceFileImpl();
 
         if (nextDelFactory != null) {
-            JL e2 = nextDelFactory.delSourceFile();
+            JLDel e2 = nextDelFactory.delSourceFile();
             e = composeDels(e, e2);
         }
         return postDelSourceFile(e);
     }
 
     @Override
-    public final JL delSpecial() {
-        JL e = delSpecialImpl();
+    public final JLDel delSpecial() {
+        JLDel e = delSpecialImpl();
 
         if (nextDelFactory != null) {
-            JL e2 = nextDelFactory.delSpecial();
+            JLDel e2 = nextDelFactory.delSpecial();
             e = composeDels(e, e2);
         }
         return postDelSpecial(e);
     }
 
     @Override
-    public final JL delStmt() {
-        JL e = delStmtImpl();
+    public final JLDel delStmt() {
+        JLDel e = delStmtImpl();
 
         if (nextDelFactory != null) {
-            JL e2 = nextDelFactory.delStmt();
+            JLDel e2 = nextDelFactory.delStmt();
             e = composeDels(e, e2);
         }
         return postDelStmt(e);
     }
 
     @Override
-    public final JL delStringLit() {
-        JL e = delStringLitImpl();
+    public final JLDel delStringLit() {
+        JLDel e = delStringLitImpl();
 
         if (nextDelFactory != null) {
-            JL e2 = nextDelFactory.delStringLit();
+            JLDel e2 = nextDelFactory.delStringLit();
             e = composeDels(e, e2);
         }
         return postDelStringLit(e);
     }
 
     @Override
-    public final JL delSwitchBlock() {
-        JL e = delSwitchBlockImpl();
+    public final JLDel delSwitchBlock() {
+        JLDel e = delSwitchBlockImpl();
 
         if (nextDelFactory != null) {
-            JL e2 = nextDelFactory.delSwitchBlock();
+            JLDel e2 = nextDelFactory.delSwitchBlock();
             e = composeDels(e, e2);
         }
         return postDelSwitchBlock(e);
     }
 
     @Override
-    public final JL delSwitchElement() {
-        JL e = delSwitchElementImpl();
+    public final JLDel delSwitchElement() {
+        JLDel e = delSwitchElementImpl();
 
         if (nextDelFactory != null) {
-            JL e2 = nextDelFactory.delSwitchElement();
+            JLDel e2 = nextDelFactory.delSwitchElement();
             e = composeDels(e, e2);
         }
         return postDelSwitchElement(e);
     }
 
     @Override
-    public final JL delSwitch() {
-        JL e = delSwitchImpl();
+    public final JLDel delSwitch() {
+        JLDel e = delSwitchImpl();
 
         if (nextDelFactory != null) {
-            JL e2 = nextDelFactory.delSwitch();
+            JLDel e2 = nextDelFactory.delSwitch();
             e = composeDels(e, e2);
         }
         return postDelSwitch(e);
     }
 
     @Override
-    public final JL delSynchronized() {
-        JL e = delSynchronizedImpl();
+    public final JLDel delSynchronized() {
+        JLDel e = delSynchronizedImpl();
 
         if (nextDelFactory != null) {
-            JL e2 = nextDelFactory.delSynchronized();
+            JLDel e2 = nextDelFactory.delSynchronized();
             e = composeDels(e, e2);
         }
         return postDelSynchronized(e);
     }
 
     @Override
-    public final JL delTerm() {
-        JL e = delTermImpl();
+    public final JLDel delTerm() {
+        JLDel e = delTermImpl();
 
         if (nextDelFactory != null) {
-            JL e2 = nextDelFactory.delTerm();
+            JLDel e2 = nextDelFactory.delTerm();
             e = composeDels(e, e2);
         }
         return postDelTerm(e);
     }
 
     @Override
-    public final JL delThrow() {
-        JL e = delThrowImpl();
+    public final JLDel delThrow() {
+        JLDel e = delThrowImpl();
 
         if (nextDelFactory != null) {
-            JL e2 = nextDelFactory.delThrow();
+            JLDel e2 = nextDelFactory.delThrow();
             e = composeDels(e, e2);
         }
         return postDelThrow(e);
     }
 
     @Override
-    public final JL delTry() {
-        JL e = delTryImpl();
+    public final JLDel delTry() {
+        JLDel e = delTryImpl();
 
         if (nextDelFactory != null) {
-            JL e2 = nextDelFactory.delTry();
+            JLDel e2 = nextDelFactory.delTry();
             e = composeDels(e, e2);
         }
         return postDelTry(e);
     }
 
     @Override
-    public final JL delTypeNode() {
-        JL e = delTypeNodeImpl();
+    public final JLDel delTypeNode() {
+        JLDel e = delTypeNodeImpl();
 
         if (nextDelFactory != null) {
-            JL e2 = nextDelFactory.delTypeNode();
+            JLDel e2 = nextDelFactory.delTypeNode();
             e = composeDels(e, e2);
         }
         return postDelTypeNode(e);
     }
 
     @Override
-    public final JL delUnary() {
-        JL e = delUnaryImpl();
+    public final JLDel delUnary() {
+        JLDel e = delUnaryImpl();
 
         if (nextDelFactory != null) {
-            JL e2 = nextDelFactory.delUnary();
+            JLDel e2 = nextDelFactory.delUnary();
             e = composeDels(e, e2);
         }
         return postDelUnary(e);
     }
 
     @Override
-    public final JL delWhile() {
-        JL e = delWhileImpl();
+    public final JLDel delWhile() {
+        JLDel e = delWhileImpl();
 
         if (nextDelFactory != null) {
-            JL e2 = nextDelFactory.delWhile();
+            JLDel e2 = nextDelFactory.delWhile();
             e = composeDels(e, e2);
         }
         return postDelWhile(e);
@@ -966,7 +966,7 @@ public abstract class AbstractDelFactory_c implements DelFactory {
      * Create the delegate for a <code>Name</code> AST node.
      * @return the delegate for a <code>Name</code> AST node.
      */
-    protected JL delIdImpl() {
+    protected JLDel delIdImpl() {
         return delNodeImpl();
     }
 
@@ -974,7 +974,7 @@ public abstract class AbstractDelFactory_c implements DelFactory {
      * Create the delegate for a <code>AmbAssign</code> AST node.
      * @return the delegate for a <code>AmbAssign</code> AST node.
      */
-    protected JL delAmbAssignImpl() {
+    protected JLDel delAmbAssignImpl() {
         return delAssignImpl();
     }
 
@@ -982,7 +982,7 @@ public abstract class AbstractDelFactory_c implements DelFactory {
      * Create the delegate for a <code>AmbExpr</code> AST node.
      * @return the delegate for a <code>AmbExpr</code> AST node.
      */
-    protected JL delAmbExprImpl() {
+    protected JLDel delAmbExprImpl() {
         return delExprImpl();
     }
 
@@ -990,7 +990,7 @@ public abstract class AbstractDelFactory_c implements DelFactory {
      * Create the delegate for a <code>AmbPrefix</code> AST node.
      * @return the delegate for a <code>AmbPrefix</code> AST node.
      */
-    protected JL delAmbPrefixImpl() {
+    protected JLDel delAmbPrefixImpl() {
         return delNodeImpl();
     }
 
@@ -998,7 +998,7 @@ public abstract class AbstractDelFactory_c implements DelFactory {
      * Create the delegate for a <code>AmbQualifierNode</code> AST node.
      * @return the delegate for a <code>AmbQualifierNode</code> AST node.
      */
-    protected JL delAmbQualifierNodeImpl() {
+    protected JLDel delAmbQualifierNodeImpl() {
         return delNodeImpl();
     }
 
@@ -1006,7 +1006,7 @@ public abstract class AbstractDelFactory_c implements DelFactory {
      * Create the delegate for a <code>AmbReceiver</code> AST node.
      * @return the delegate for a <code>AmbReceiver</code> AST node.
      */
-    protected JL delAmbReceiverImpl() {
+    protected JLDel delAmbReceiverImpl() {
         return delNodeImpl();
     }
 
@@ -1014,7 +1014,7 @@ public abstract class AbstractDelFactory_c implements DelFactory {
      * Create the delegate for a <code>AmbTypeNode</code> AST node.
      * @return the delegate for a <code>AmbTypeNode</code> AST node.
      */
-    protected JL delAmbTypeNodeImpl() {
+    protected JLDel delAmbTypeNodeImpl() {
         return delTypeNodeImpl();
     }
 
@@ -1022,7 +1022,7 @@ public abstract class AbstractDelFactory_c implements DelFactory {
      * Create the delegate for a <code>ArrayAccess</code> AST node.
      * @return the delegate for a <code>ArrayAccess</code> AST node.
      */
-    protected JL delArrayAccessImpl() {
+    protected JLDel delArrayAccessImpl() {
         return delExprImpl();
     }
 
@@ -1030,7 +1030,7 @@ public abstract class AbstractDelFactory_c implements DelFactory {
      * Create the delegate for a <code>ArrayInit</code> AST node.
      * @return the delegate for a <code>ArrayInit</code> AST node.
      */
-    protected JL delArrayInitImpl() {
+    protected JLDel delArrayInitImpl() {
         return delExprImpl();
     }
 
@@ -1038,7 +1038,7 @@ public abstract class AbstractDelFactory_c implements DelFactory {
      * Create the delegate for a <code>ArrayTypeNode</code> AST node.
      * @return the delegate for a <code>ArrayTypeNode</code> AST node.
      */
-    protected JL delArrayTypeNodeImpl() {
+    protected JLDel delArrayTypeNodeImpl() {
         return delTypeNodeImpl();
     }
 
@@ -1046,7 +1046,7 @@ public abstract class AbstractDelFactory_c implements DelFactory {
      * Create the delegate for a <code>Assert</code> AST node.
      * @return the delegate for a <code>Assert</code> AST node.
      */
-    protected JL delAssertImpl() {
+    protected JLDel delAssertImpl() {
         return delStmtImpl();
     }
 
@@ -1054,7 +1054,7 @@ public abstract class AbstractDelFactory_c implements DelFactory {
      * Create the delegate for a <code>Assign</code> AST node.
      * @return the delegate for a <code>Assign</code> AST node.
      */
-    protected JL delAssignImpl() {
+    protected JLDel delAssignImpl() {
         return delExprImpl();
     }
 
@@ -1062,7 +1062,7 @@ public abstract class AbstractDelFactory_c implements DelFactory {
      * Create the delegate for a <code>LocalAssign</code> AST node.
      * @return the delegate for a <code>LocalAssign</code> AST node.
      */
-    protected JL delLocalAssignImpl() {
+    protected JLDel delLocalAssignImpl() {
         return delAssignImpl();
     }
 
@@ -1070,7 +1070,7 @@ public abstract class AbstractDelFactory_c implements DelFactory {
      * Create the delegate for a <code>FieldAssign</code> AST node.
      * @return the delegate for a <code>FieldAssign</code> AST node.
      */
-    protected JL delFieldAssignImpl() {
+    protected JLDel delFieldAssignImpl() {
         return delAssignImpl();
     }
 
@@ -1078,11 +1078,11 @@ public abstract class AbstractDelFactory_c implements DelFactory {
      * Create the delegate for a <code>ArrayAccessAssign</code> AST node.
      * @return the delegate for a <code>ArrayAccessAssign</code> AST node.
      */
-    protected JL delArrayAccessAssignImpl() {
+    protected JLDel delArrayAccessAssignImpl() {
         return delAssignImpl();
     }
 
-    protected JL delBinaryImpl() {
+    protected JLDel delBinaryImpl() {
         return delExprImpl();
     }
 
@@ -1090,7 +1090,7 @@ public abstract class AbstractDelFactory_c implements DelFactory {
      * Create the delegate for a <code>Block</code> AST node.
      * @return the delegate for a <code>Block</code> AST node.
      */
-    protected JL delBlockImpl() {
+    protected JLDel delBlockImpl() {
         return delCompoundStmtImpl();
     }
 
@@ -1098,7 +1098,7 @@ public abstract class AbstractDelFactory_c implements DelFactory {
      * Create the delegate for a <code>BooleanLit</code> AST node.
      * @return the delegate for a <code>BooleanLit</code> AST node.
      */
-    protected JL delBooleanLitImpl() {
+    protected JLDel delBooleanLitImpl() {
         return delLitImpl();
     }
 
@@ -1106,7 +1106,7 @@ public abstract class AbstractDelFactory_c implements DelFactory {
      * Create the delegate for a <code>Branch</code> AST node.
      * @return the delegate for a <code>Branch</code> AST node.
      */
-    protected JL delBranchImpl() {
+    protected JLDel delBranchImpl() {
         return delStmtImpl();
     }
 
@@ -1114,7 +1114,7 @@ public abstract class AbstractDelFactory_c implements DelFactory {
      * Create the delegate for a <code>Call</code> AST node.
      * @return the delegate for a <code>Call</code> AST node.
      */
-    protected JL delCallImpl() {
+    protected JLDel delCallImpl() {
         return delExprImpl();
     }
 
@@ -1122,7 +1122,7 @@ public abstract class AbstractDelFactory_c implements DelFactory {
      * Create the delegate for a <code>CanonicalTypeNode</code> AST node.
      * @return the delegate for a <code>CanonicalTypeNode</code> AST node.
      */
-    protected JL delCanonicalTypeNodeImpl() {
+    protected JLDel delCanonicalTypeNodeImpl() {
         return delTypeNodeImpl();
     }
 
@@ -1130,7 +1130,7 @@ public abstract class AbstractDelFactory_c implements DelFactory {
      * Create the delegate for a <code>Case</code> AST node.
      * @return the delegate for a <code>Case</code> AST node.
      */
-    protected JL delCaseImpl() {
+    protected JLDel delCaseImpl() {
         return delSwitchElementImpl();
     }
 
@@ -1138,7 +1138,7 @@ public abstract class AbstractDelFactory_c implements DelFactory {
      * Create the delegate for a <code>Cast</code> AST node.
      * @return the delegate for a <code>Cast</code> AST node.
      */
-    protected JL delCastImpl() {
+    protected JLDel delCastImpl() {
         return delExprImpl();
     }
 
@@ -1146,7 +1146,7 @@ public abstract class AbstractDelFactory_c implements DelFactory {
      * Create the delegate for a <code>Catch</code> AST node.
      * @return the delegate for a <code>Catch</code> AST node.
      */
-    protected JL delCatchImpl() {
+    protected JLDel delCatchImpl() {
         return delCompoundStmtImpl();
     }
 
@@ -1154,7 +1154,7 @@ public abstract class AbstractDelFactory_c implements DelFactory {
      * Create the delegate for a <code>CharLit</code> AST node.
      * @return the delegate for a <code>CharLit</code> AST node.
      */
-    protected JL delCharLitImpl() {
+    protected JLDel delCharLitImpl() {
         return delNumLitImpl();
     }
 
@@ -1162,7 +1162,7 @@ public abstract class AbstractDelFactory_c implements DelFactory {
      * Create the delegate for a <code>ClassBody</code> AST node.
      * @return the delegate for a <code>ClassBody</code> AST node.
      */
-    protected JL delClassBodyImpl() {
+    protected JLDel delClassBodyImpl() {
         return delTermImpl();
     }
 
@@ -1170,7 +1170,7 @@ public abstract class AbstractDelFactory_c implements DelFactory {
      * Create the delegate for a <code>ClassDecl</code> AST node.
      * @return the delegate for a <code>ClassDecl</code> AST node.
      */
-    protected JL delClassDeclImpl() {
+    protected JLDel delClassDeclImpl() {
         return delTermImpl();
     }
 
@@ -1178,7 +1178,7 @@ public abstract class AbstractDelFactory_c implements DelFactory {
      * Create the delegate for a <code>ClassLit</code> AST node.
      * @return the delegate for a <code>ClassLit</code> AST node.
      */
-    protected JL delClassLitImpl() {
+    protected JLDel delClassLitImpl() {
         return delLitImpl();
     }
 
@@ -1186,7 +1186,7 @@ public abstract class AbstractDelFactory_c implements DelFactory {
      * Create the delegate for a <code>ClassMember</code> AST node.
      * @return the delegate for a <code>ClassMember</code> AST node.
      */
-    protected JL delClassMemberImpl() {
+    protected JLDel delClassMemberImpl() {
         return delTermImpl();
     }
 
@@ -1194,7 +1194,7 @@ public abstract class AbstractDelFactory_c implements DelFactory {
      * Create the delegate for a <code>CodeDecl</code> AST node.
      * @return the delegate for a <code>CodeDecl</code> AST node.
      */
-    protected JL delCodeDeclImpl() {
+    protected JLDel delCodeDeclImpl() {
         return delClassMemberImpl();
     }
 
@@ -1202,7 +1202,7 @@ public abstract class AbstractDelFactory_c implements DelFactory {
      * Create the delegate for a <code>CompoundStmt</code> AST node.
      * @return the delegate for a <code>CompoundStmt</code> AST node.
      */
-    protected JL delCompoundStmtImpl() {
+    protected JLDel delCompoundStmtImpl() {
         return delStmtImpl();
     }
 
@@ -1210,7 +1210,7 @@ public abstract class AbstractDelFactory_c implements DelFactory {
      * Create the delegate for a <code>Conditional</code> AST node.
      * @return the delegate for a <code>Conditional</code> AST node.
      */
-    protected JL delConditionalImpl() {
+    protected JLDel delConditionalImpl() {
         return delExprImpl();
     }
 
@@ -1218,7 +1218,7 @@ public abstract class AbstractDelFactory_c implements DelFactory {
      * Create the delegate for a <code>ConstructorCall</code> AST node.
      * @return the delegate for a <code>ConstructorCall</code> AST node.
      */
-    protected JL delConstructorCallImpl() {
+    protected JLDel delConstructorCallImpl() {
         return delStmtImpl();
     }
 
@@ -1226,7 +1226,7 @@ public abstract class AbstractDelFactory_c implements DelFactory {
      * Create the delegate for a <code>ConstructorDecl</code> AST node.
      * @return the delegate for a <code>ConstructorDecl</code> AST node.
      */
-    protected JL delConstructorDeclImpl() {
+    protected JLDel delConstructorDeclImpl() {
         return delProcedureDeclImpl();
     }
 
@@ -1234,7 +1234,7 @@ public abstract class AbstractDelFactory_c implements DelFactory {
      * Create the delegate for a <code>Do</code> AST node.
      * @return the delegate for a <code>Do</code> AST node.
      */
-    protected JL delDoImpl() {
+    protected JLDel delDoImpl() {
         return delLoopImpl();
     }
 
@@ -1242,7 +1242,7 @@ public abstract class AbstractDelFactory_c implements DelFactory {
      * Create the delegate for a <code>Empty</code> AST node.
      * @return the delegate for a <code>Empty</code> AST node.
      */
-    protected JL delEmptyImpl() {
+    protected JLDel delEmptyImpl() {
         return delStmtImpl();
     }
 
@@ -1250,7 +1250,7 @@ public abstract class AbstractDelFactory_c implements DelFactory {
      * Create the delegate for a <code>Eval</code> AST node.
      * @return the delegate for a <code>Eval</code> AST node.
      */
-    protected JL delEvalImpl() {
+    protected JLDel delEvalImpl() {
         return delStmtImpl();
     }
 
@@ -1258,7 +1258,7 @@ public abstract class AbstractDelFactory_c implements DelFactory {
      * Create the delegate for a <code>Expr</code> AST node.
      * @return the delegate for a <code>Expr</code> AST node.
      */
-    protected JL delExprImpl() {
+    protected JLDel delExprImpl() {
         return delTermImpl();
     }
 
@@ -1266,7 +1266,7 @@ public abstract class AbstractDelFactory_c implements DelFactory {
      * Create the delegate for a <code>Field</code> AST node.
      * @return the delegate for a <code>Field</code> AST node.
      */
-    protected JL delFieldImpl() {
+    protected JLDel delFieldImpl() {
         return delExprImpl();
     }
 
@@ -1274,7 +1274,7 @@ public abstract class AbstractDelFactory_c implements DelFactory {
      * Create the delegate for a <code>FieldDecl</code> AST node.
      * @return the delegate for a <code>FieldDecl</code> AST node.
      */
-    protected JL delFieldDeclImpl() {
+    protected JLDel delFieldDeclImpl() {
         return delClassMemberImpl();
     }
 
@@ -1282,7 +1282,7 @@ public abstract class AbstractDelFactory_c implements DelFactory {
      * Create the delegate for a <code>FloatLit</code> AST node.
      * @return the delegate for a <code>FloatLit</code> AST node.
      */
-    protected JL delFloatLitImpl() {
+    protected JLDel delFloatLitImpl() {
         return delLitImpl();
     }
 
@@ -1290,7 +1290,7 @@ public abstract class AbstractDelFactory_c implements DelFactory {
      * Create the delegate for a <code>For</code> AST node.
      * @return the delegate for a <code>For</code> AST node.
      */
-    protected JL delForImpl() {
+    protected JLDel delForImpl() {
         return delLoopImpl();
     }
 
@@ -1298,7 +1298,7 @@ public abstract class AbstractDelFactory_c implements DelFactory {
      * Create the delegate for a <code>Formal</code> AST node.
      * @return the delegate for a <code>Formal</code> AST node.
      */
-    protected JL delFormalImpl() {
+    protected JLDel delFormalImpl() {
         return delTermImpl();
     }
 
@@ -1306,7 +1306,7 @@ public abstract class AbstractDelFactory_c implements DelFactory {
      * Create the delegate for a <code>If</code> AST node.
      * @return the delegate for a <code>If</code> AST node.
      */
-    protected JL delIfImpl() {
+    protected JLDel delIfImpl() {
         return delCompoundStmtImpl();
     }
 
@@ -1314,7 +1314,7 @@ public abstract class AbstractDelFactory_c implements DelFactory {
      * Create the delegate for a <code>Import</code> AST node.
      * @return the delegate for a <code>Import</code> AST node.
      */
-    protected JL delImportImpl() {
+    protected JLDel delImportImpl() {
         return delNodeImpl();
     }
 
@@ -1322,7 +1322,7 @@ public abstract class AbstractDelFactory_c implements DelFactory {
      * Create the delegate for a <code>Initializer</code> AST node.
      * @return the delegate for a <code>Initializer</code> AST node.
      */
-    protected JL delInitializerImpl() {
+    protected JLDel delInitializerImpl() {
         return delCodeDeclImpl();
     }
 
@@ -1330,7 +1330,7 @@ public abstract class AbstractDelFactory_c implements DelFactory {
      * Create the delegate for a <code>Instanceof</code> AST node.
      * @return the delegate for a <code>Instanceof</code> AST node.
      */
-    protected JL delInstanceofImpl() {
+    protected JLDel delInstanceofImpl() {
         return delExprImpl();
     }
 
@@ -1338,7 +1338,7 @@ public abstract class AbstractDelFactory_c implements DelFactory {
      * Create the delegate for a <code>IntLit</code> AST node.
      * @return the delegate for a <code>IntLit</code> AST node.
      */
-    protected JL delIntLitImpl() {
+    protected JLDel delIntLitImpl() {
         return delNumLitImpl();
     }
 
@@ -1346,7 +1346,7 @@ public abstract class AbstractDelFactory_c implements DelFactory {
      * Create the delegate for a <code>Labeled</code> AST node.
      * @return the delegate for a <code>Labeled</code> AST node.
      */
-    protected JL delLabeledImpl() {
+    protected JLDel delLabeledImpl() {
         return delCompoundStmtImpl();
     }
 
@@ -1354,7 +1354,7 @@ public abstract class AbstractDelFactory_c implements DelFactory {
      * Create the delegate for a <code>Lit</code> AST node.
      * @return the delegate for a <code>Lit</code> AST node.
      */
-    protected JL delLitImpl() {
+    protected JLDel delLitImpl() {
         return delExprImpl();
     }
 
@@ -1362,7 +1362,7 @@ public abstract class AbstractDelFactory_c implements DelFactory {
      * Create the delegate for a <code>Local</code> AST node.
      * @return the delegate for a <code>Local</code> AST node.
      */
-    protected JL delLocalImpl() {
+    protected JLDel delLocalImpl() {
         return delExprImpl();
     }
 
@@ -1370,7 +1370,7 @@ public abstract class AbstractDelFactory_c implements DelFactory {
      * Create the delegate for a <code>LocalClassDecl</code> AST node.
      * @return the delegate for a <code>LocalClassDecl</code> AST node.
      */
-    protected JL delLocalClassDeclImpl() {
+    protected JLDel delLocalClassDeclImpl() {
         return delCompoundStmtImpl();
     }
 
@@ -1378,7 +1378,7 @@ public abstract class AbstractDelFactory_c implements DelFactory {
      * Create the delegate for a <code>LocalDecl</code> AST node.
      * @return the delegate for a <code>LocalDecl</code> AST node.
      */
-    protected JL delLocalDeclImpl() {
+    protected JLDel delLocalDeclImpl() {
         return delStmtImpl();
     }
 
@@ -1386,7 +1386,7 @@ public abstract class AbstractDelFactory_c implements DelFactory {
      * Create the delegate for a <code>Loop</code> AST node.
      * @return the delegate for a <code>Loop</code> AST node.
      */
-    protected JL delLoopImpl() {
+    protected JLDel delLoopImpl() {
         return delCompoundStmtImpl();
     }
 
@@ -1394,7 +1394,7 @@ public abstract class AbstractDelFactory_c implements DelFactory {
      * Create the delegate for a <code>MethodDecl</code> AST node.
      * @return the delegate for a <code>MethodDecl</code> AST node.
      */
-    protected JL delMethodDeclImpl() {
+    protected JLDel delMethodDeclImpl() {
         return delProcedureDeclImpl();
     }
 
@@ -1402,7 +1402,7 @@ public abstract class AbstractDelFactory_c implements DelFactory {
      * Create the delegate for a <code>NewArray</code> AST node.
      * @return the delegate for a <code>NewArray</code> AST node.
      */
-    protected JL delNewArrayImpl() {
+    protected JLDel delNewArrayImpl() {
         return delExprImpl();
     }
 
@@ -1410,7 +1410,7 @@ public abstract class AbstractDelFactory_c implements DelFactory {
      * Create the delegate for a <code>Node</code> AST node.
      * @return the delegate for a <code>Node</code> AST node.
      */
-    protected JL delNodeImpl() {
+    protected JLDel delNodeImpl() {
         return null;
     }
 
@@ -1418,7 +1418,7 @@ public abstract class AbstractDelFactory_c implements DelFactory {
      * Create the delegate for a <code>NodeList</code> AST node.
      * @return the delegate for a <code>NodeList</code> AST node.
      */
-    protected JL delNodeListImpl() {
+    protected JLDel delNodeListImpl() {
         return delNodeImpl();
     }
 
@@ -1426,7 +1426,7 @@ public abstract class AbstractDelFactory_c implements DelFactory {
      * Create the delegate for a <code>New</code> AST node.
      * @return the delegate for a <code>New</code> AST node.
      */
-    protected JL delNewImpl() {
+    protected JLDel delNewImpl() {
         return delExprImpl();
     }
 
@@ -1434,7 +1434,7 @@ public abstract class AbstractDelFactory_c implements DelFactory {
      * Create the delegate for a <code>NullLit</code> AST node.
      * @return the delegate for a <code>NullLit</code> AST node.
      */
-    protected JL delNullLitImpl() {
+    protected JLDel delNullLitImpl() {
         return delLitImpl();
     }
 
@@ -1442,7 +1442,7 @@ public abstract class AbstractDelFactory_c implements DelFactory {
      * Create the delegate for a <code>NumLit</code> AST node.
      * @return the delegate for a <code>NumLit</code> AST node.
      */
-    protected JL delNumLitImpl() {
+    protected JLDel delNumLitImpl() {
         return delLitImpl();
     }
 
@@ -1450,7 +1450,7 @@ public abstract class AbstractDelFactory_c implements DelFactory {
      * Create the delegate for a <code>PackageNode</code> AST node.
      * @return the delegate for a <code>PackageNode</code> AST node.
      */
-    protected JL delPackageNodeImpl() {
+    protected JLDel delPackageNodeImpl() {
         return delNodeImpl();
     }
 
@@ -1458,7 +1458,7 @@ public abstract class AbstractDelFactory_c implements DelFactory {
      * Create the delegate for a <code>ProcedureDecl</code> AST node.
      * @return the delegate for a <code>ProcedureDecl</code> AST node.
      */
-    protected JL delProcedureDeclImpl() {
+    protected JLDel delProcedureDeclImpl() {
         return delCodeDeclImpl();
     }
 
@@ -1466,7 +1466,7 @@ public abstract class AbstractDelFactory_c implements DelFactory {
      * Create the delegate for a <code>Return</code> AST node.
      * @return the delegate for a <code>Return</code> AST node.
      */
-    protected JL delReturnImpl() {
+    protected JLDel delReturnImpl() {
         return delStmtImpl();
     }
 
@@ -1474,7 +1474,7 @@ public abstract class AbstractDelFactory_c implements DelFactory {
      * Create the delegate for a <code>SourceCollection</code> AST node.
      * @return the delegate for a <code>SourceCollection</code> AST node.
      */
-    protected JL delSourceCollectionImpl() {
+    protected JLDel delSourceCollectionImpl() {
         return delNodeImpl();
     }
 
@@ -1482,7 +1482,7 @@ public abstract class AbstractDelFactory_c implements DelFactory {
      * Create the delegate for a <code>SourceFile</code> AST node.
      * @return the delegate for a <code>SourceFile</code> AST node.
      */
-    protected JL delSourceFileImpl() {
+    protected JLDel delSourceFileImpl() {
         return delNodeImpl();
     }
 
@@ -1490,7 +1490,7 @@ public abstract class AbstractDelFactory_c implements DelFactory {
      * Create the delegate for a <code>Special</code> AST node.
      * @return the delegate for a <code>Special</code> AST node.
      */
-    protected JL delSpecialImpl() {
+    protected JLDel delSpecialImpl() {
         return delExprImpl();
     }
 
@@ -1498,7 +1498,7 @@ public abstract class AbstractDelFactory_c implements DelFactory {
      * Create the delegate for a <code>Stmt</code> AST node.
      * @return the delegate for a <code>Stmt</code> AST node.
      */
-    protected JL delStmtImpl() {
+    protected JLDel delStmtImpl() {
         return delTermImpl();
     }
 
@@ -1506,7 +1506,7 @@ public abstract class AbstractDelFactory_c implements DelFactory {
      * Create the delegate for a <code>StringLit</code> AST node.
      * @return the delegate for a <code>StringLit</code> AST node.
      */
-    protected JL delStringLitImpl() {
+    protected JLDel delStringLitImpl() {
         return delLitImpl();
     }
 
@@ -1514,7 +1514,7 @@ public abstract class AbstractDelFactory_c implements DelFactory {
      * Create the delegate for a <code>SwitchBlock</code> AST node.
      * @return the delegate for a <code>SwitchBlock</code> AST node.
      */
-    protected JL delSwitchBlockImpl() {
+    protected JLDel delSwitchBlockImpl() {
         return delSwitchElementImpl();
     }
 
@@ -1522,7 +1522,7 @@ public abstract class AbstractDelFactory_c implements DelFactory {
      * Create the delegate for a <code>SwitchElement</code> AST node.
      * @return the delegate for a <code>SwitchElement</code> AST node.
      */
-    protected JL delSwitchElementImpl() {
+    protected JLDel delSwitchElementImpl() {
         return delStmtImpl();
     }
 
@@ -1530,7 +1530,7 @@ public abstract class AbstractDelFactory_c implements DelFactory {
      * Create the delegate for a <code>Switch</code> AST node.
      * @return the delegate for a <code>Switch</code> AST node.
      */
-    protected JL delSwitchImpl() {
+    protected JLDel delSwitchImpl() {
         return delCompoundStmtImpl();
     }
 
@@ -1538,7 +1538,7 @@ public abstract class AbstractDelFactory_c implements DelFactory {
      * Create the delegate for a <code>Synchronized</code> AST node.
      * @return the delegate for a <code>Synchronized</code> AST node.
      */
-    protected JL delSynchronizedImpl() {
+    protected JLDel delSynchronizedImpl() {
         return delCompoundStmtImpl();
     }
 
@@ -1546,7 +1546,7 @@ public abstract class AbstractDelFactory_c implements DelFactory {
      * Create the delegate for a <code>Term</code> AST node.
      * @return the delegate for a <code>Term</code> AST node.
      */
-    protected JL delTermImpl() {
+    protected JLDel delTermImpl() {
         return delNodeImpl();
     }
 
@@ -1554,7 +1554,7 @@ public abstract class AbstractDelFactory_c implements DelFactory {
      * Create the delegate for a <code>Throw</code> AST node.
      * @return the delegate for a <code>Throw</code> AST node.
      */
-    protected JL delThrowImpl() {
+    protected JLDel delThrowImpl() {
         return delStmtImpl();
     }
 
@@ -1562,7 +1562,7 @@ public abstract class AbstractDelFactory_c implements DelFactory {
      * Create the delegate for a <code>Try</code> AST node.
      * @return the delegate for a <code>Try</code> AST node.
      */
-    protected JL delTryImpl() {
+    protected JLDel delTryImpl() {
         return delCompoundStmtImpl();
     }
 
@@ -1570,7 +1570,7 @@ public abstract class AbstractDelFactory_c implements DelFactory {
      * Create the delegate for a <code>TypeNode</code> AST node.
      * @return the delegate for a <code>TypeNode</code> AST node.
      */
-    protected JL delTypeNodeImpl() {
+    protected JLDel delTypeNodeImpl() {
         return delTermImpl();
     }
 
@@ -1578,7 +1578,7 @@ public abstract class AbstractDelFactory_c implements DelFactory {
      * Create the delegate for a <code>Unary</code> AST node.
      * @return the delegate for a <code>Unary</code> AST node.
      */
-    protected JL delUnaryImpl() {
+    protected JLDel delUnaryImpl() {
         return delExprImpl();
     }
 
@@ -1586,7 +1586,7 @@ public abstract class AbstractDelFactory_c implements DelFactory {
      * Create the delegate for a <code>While</code> AST node.
      * @return the delegate for a <code>While</code> AST node.
      */
-    protected JL delWhileImpl() {
+    protected JLDel delWhileImpl() {
         return delLoopImpl();
     }
 
@@ -1594,319 +1594,319 @@ public abstract class AbstractDelFactory_c implements DelFactory {
     // Post methods
     // ********************************************
 
-    protected JL postDelId(JL del) {
+    protected JLDel postDelId(JLDel del) {
         return postDelNode(del);
     }
 
-    protected JL postDelAmbAssign(JL del) {
+    protected JLDel postDelAmbAssign(JLDel del) {
         return postDelAssign(del);
     }
 
-    protected JL postDelAmbExpr(JL del) {
+    protected JLDel postDelAmbExpr(JLDel del) {
         return postDelExpr(del);
     }
 
-    protected JL postDelAmbPrefix(JL del) {
+    protected JLDel postDelAmbPrefix(JLDel del) {
         return postDelNode(del);
     }
 
-    protected JL postDelAmbQualifierNode(JL del) {
+    protected JLDel postDelAmbQualifierNode(JLDel del) {
         return postDelNode(del);
     }
 
-    protected JL postDelAmbReceiver(JL del) {
+    protected JLDel postDelAmbReceiver(JLDel del) {
         return postDelNode(del);
     }
 
-    protected JL postDelAmbTypeNode(JL del) {
+    protected JLDel postDelAmbTypeNode(JLDel del) {
         return postDelTypeNode(del);
     }
 
-    protected JL postDelArrayAccess(JL del) {
+    protected JLDel postDelArrayAccess(JLDel del) {
         return postDelExpr(del);
     }
 
-    protected JL postDelArrayInit(JL del) {
+    protected JLDel postDelArrayInit(JLDel del) {
         return postDelExpr(del);
     }
 
-    protected JL postDelArrayTypeNode(JL del) {
+    protected JLDel postDelArrayTypeNode(JLDel del) {
         return postDelTypeNode(del);
     }
 
-    protected JL postDelAssert(JL del) {
+    protected JLDel postDelAssert(JLDel del) {
         return postDelStmt(del);
     }
 
-    protected JL postDelAssign(JL del) {
+    protected JLDel postDelAssign(JLDel del) {
         return postDelExpr(del);
     }
 
-    protected JL postDelLocalAssign(JL del) {
+    protected JLDel postDelLocalAssign(JLDel del) {
         return postDelAssign(del);
     }
 
-    protected JL postDelFieldAssign(JL del) {
+    protected JLDel postDelFieldAssign(JLDel del) {
         return postDelAssign(del);
     }
 
-    protected JL postDelArrayAccessAssign(JL del) {
+    protected JLDel postDelArrayAccessAssign(JLDel del) {
         return postDelAssign(del);
     }
 
-    protected JL postDelBinary(JL del) {
+    protected JLDel postDelBinary(JLDel del) {
         return postDelExpr(del);
     }
 
-    protected JL postDelBlock(JL del) {
+    protected JLDel postDelBlock(JLDel del) {
         return postDelCompoundStmt(del);
     }
 
-    protected JL postDelBooleanLit(JL del) {
+    protected JLDel postDelBooleanLit(JLDel del) {
         return postDelLit(del);
     }
 
-    protected JL postDelBranch(JL del) {
+    protected JLDel postDelBranch(JLDel del) {
         return postDelStmt(del);
     }
 
-    protected JL postDelCall(JL del) {
+    protected JLDel postDelCall(JLDel del) {
         return postDelExpr(del);
     }
 
-    protected JL postDelCanonicalTypeNode(JL del) {
+    protected JLDel postDelCanonicalTypeNode(JLDel del) {
         return postDelTypeNode(del);
     }
 
-    protected JL postDelCase(JL del) {
+    protected JLDel postDelCase(JLDel del) {
         return postDelSwitchElement(del);
     }
 
-    protected JL postDelCast(JL del) {
+    protected JLDel postDelCast(JLDel del) {
         return postDelExpr(del);
     }
 
-    protected JL postDelCatch(JL del) {
+    protected JLDel postDelCatch(JLDel del) {
         return postDelCompoundStmt(del);
     }
 
-    protected JL postDelCharLit(JL del) {
+    protected JLDel postDelCharLit(JLDel del) {
         return postDelNumLit(del);
     }
 
-    protected JL postDelClassBody(JL del) {
+    protected JLDel postDelClassBody(JLDel del) {
         return postDelTerm(del);
     }
 
-    protected JL postDelClassDecl(JL del) {
+    protected JLDel postDelClassDecl(JLDel del) {
         return postDelTerm(del);
     }
 
-    protected JL postDelClassLit(JL del) {
+    protected JLDel postDelClassLit(JLDel del) {
         return postDelLit(del);
     }
 
-    protected JL postDelClassMember(JL del) {
+    protected JLDel postDelClassMember(JLDel del) {
         return postDelTerm(del);
     }
 
-    protected JL postDelCodeDecl(JL del) {
+    protected JLDel postDelCodeDecl(JLDel del) {
         return postDelClassMember(del);
     }
 
-    protected JL postDelCompoundStmt(JL del) {
+    protected JLDel postDelCompoundStmt(JLDel del) {
         return postDelStmt(del);
     }
 
-    protected JL postDelConditional(JL del) {
+    protected JLDel postDelConditional(JLDel del) {
         return postDelExpr(del);
     }
 
-    protected JL postDelConstructorCall(JL del) {
+    protected JLDel postDelConstructorCall(JLDel del) {
         return postDelStmt(del);
     }
 
-    protected JL postDelConstructorDecl(JL del) {
+    protected JLDel postDelConstructorDecl(JLDel del) {
         return postDelProcedureDecl(del);
     }
 
-    protected JL postDelDo(JL del) {
+    protected JLDel postDelDo(JLDel del) {
         return postDelLoop(del);
     }
 
-    protected JL postDelEmpty(JL del) {
+    protected JLDel postDelEmpty(JLDel del) {
         return postDelStmt(del);
     }
 
-    protected JL postDelEval(JL del) {
+    protected JLDel postDelEval(JLDel del) {
         return postDelStmt(del);
     }
 
-    protected JL postDelExpr(JL del) {
+    protected JLDel postDelExpr(JLDel del) {
         return postDelTerm(del);
     }
 
-    protected JL postDelField(JL del) {
+    protected JLDel postDelField(JLDel del) {
         return postDelExpr(del);
     }
 
-    protected JL postDelFieldDecl(JL del) {
+    protected JLDel postDelFieldDecl(JLDel del) {
         return postDelClassMember(del);
     }
 
-    protected JL postDelFloatLit(JL del) {
+    protected JLDel postDelFloatLit(JLDel del) {
         return postDelLit(del);
     }
 
-    protected JL postDelFor(JL del) {
+    protected JLDel postDelFor(JLDel del) {
         return postDelLoop(del);
     }
 
-    protected JL postDelFormal(JL del) {
+    protected JLDel postDelFormal(JLDel del) {
         return postDelTerm(del);
     }
 
-    protected JL postDelIf(JL del) {
+    protected JLDel postDelIf(JLDel del) {
         return postDelCompoundStmt(del);
     }
 
-    protected JL postDelImport(JL del) {
+    protected JLDel postDelImport(JLDel del) {
         return postDelNode(del);
     }
 
-    protected JL postDelInitializer(JL del) {
+    protected JLDel postDelInitializer(JLDel del) {
         return postDelCodeDecl(del);
     }
 
-    protected JL postDelInstanceof(JL del) {
+    protected JLDel postDelInstanceof(JLDel del) {
         return postDelExpr(del);
     }
 
-    protected JL postDelIntLit(JL del) {
+    protected JLDel postDelIntLit(JLDel del) {
         return postDelNumLit(del);
     }
 
-    protected JL postDelLabeled(JL del) {
+    protected JLDel postDelLabeled(JLDel del) {
         return postDelCompoundStmt(del);
     }
 
-    protected JL postDelLit(JL del) {
+    protected JLDel postDelLit(JLDel del) {
         return postDelExpr(del);
     }
 
-    protected JL postDelLocal(JL del) {
+    protected JLDel postDelLocal(JLDel del) {
         return postDelExpr(del);
     }
 
-    protected JL postDelLocalClassDecl(JL del) {
+    protected JLDel postDelLocalClassDecl(JLDel del) {
         return postDelCompoundStmt(del);
     }
 
-    protected JL postDelLocalDecl(JL del) {
+    protected JLDel postDelLocalDecl(JLDel del) {
         return postDelStmt(del);
     }
 
-    protected JL postDelLoop(JL del) {
+    protected JLDel postDelLoop(JLDel del) {
         return postDelCompoundStmt(del);
     }
 
-    protected JL postDelMethodDecl(JL del) {
+    protected JLDel postDelMethodDecl(JLDel del) {
         return postDelProcedureDecl(del);
     }
 
-    protected JL postDelNewArray(JL del) {
+    protected JLDel postDelNewArray(JLDel del) {
         return postDelExpr(del);
     }
 
-    protected JL postDelNode(JL del) {
+    protected JLDel postDelNode(JLDel del) {
         return del;
     }
 
-    protected JL postDelNodeList(JL del) {
+    protected JLDel postDelNodeList(JLDel del) {
         return postDelNode(del);
     }
 
-    protected JL postDelNew(JL del) {
+    protected JLDel postDelNew(JLDel del) {
         return postDelExpr(del);
     }
 
-    protected JL postDelNullLit(JL del) {
+    protected JLDel postDelNullLit(JLDel del) {
         return postDelLit(del);
     }
 
-    protected JL postDelNumLit(JL del) {
+    protected JLDel postDelNumLit(JLDel del) {
         return postDelLit(del);
     }
 
-    protected JL postDelPackageNode(JL del) {
+    protected JLDel postDelPackageNode(JLDel del) {
         return postDelNode(del);
     }
 
-    protected JL postDelProcedureDecl(JL del) {
+    protected JLDel postDelProcedureDecl(JLDel del) {
         return postDelCodeDecl(del);
     }
 
-    protected JL postDelReturn(JL del) {
+    protected JLDel postDelReturn(JLDel del) {
         return postDelStmt(del);
     }
 
-    protected JL postDelSourceCollection(JL del) {
+    protected JLDel postDelSourceCollection(JLDel del) {
         return postDelNode(del);
     }
 
-    protected JL postDelSourceFile(JL del) {
+    protected JLDel postDelSourceFile(JLDel del) {
         return postDelNode(del);
     }
 
-    protected JL postDelSpecial(JL del) {
+    protected JLDel postDelSpecial(JLDel del) {
         return postDelExpr(del);
     }
 
-    protected JL postDelStmt(JL del) {
+    protected JLDel postDelStmt(JLDel del) {
         return postDelTerm(del);
     }
 
-    protected JL postDelStringLit(JL del) {
+    protected JLDel postDelStringLit(JLDel del) {
         return postDelLit(del);
     }
 
-    protected JL postDelSwitchBlock(JL del) {
+    protected JLDel postDelSwitchBlock(JLDel del) {
         return postDelSwitchElement(del);
     }
 
-    protected JL postDelSwitchElement(JL del) {
+    protected JLDel postDelSwitchElement(JLDel del) {
         return postDelStmt(del);
     }
 
-    protected JL postDelSwitch(JL del) {
+    protected JLDel postDelSwitch(JLDel del) {
         return postDelCompoundStmt(del);
     }
 
-    protected JL postDelSynchronized(JL del) {
+    protected JLDel postDelSynchronized(JLDel del) {
         return postDelCompoundStmt(del);
     }
 
-    protected JL postDelTerm(JL del) {
+    protected JLDel postDelTerm(JLDel del) {
         return postDelNode(del);
     }
 
-    protected JL postDelThrow(JL del) {
+    protected JLDel postDelThrow(JLDel del) {
         return postDelStmt(del);
     }
 
-    protected JL postDelTry(JL del) {
+    protected JLDel postDelTry(JLDel del) {
         return postDelCompoundStmt(del);
     }
 
-    protected JL postDelTypeNode(JL del) {
+    protected JLDel postDelTypeNode(JLDel del) {
         return postDelTerm(del);
     }
 
-    protected JL postDelUnary(JL del) {
+    protected JLDel postDelUnary(JLDel del) {
         return postDelExpr(del);
     }
 
-    protected JL postDelWhile(JL del) {
+    protected JLDel postDelWhile(JLDel del) {
         return postDelLoop(del);
     }
 

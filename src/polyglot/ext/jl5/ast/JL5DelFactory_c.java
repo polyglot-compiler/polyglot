@@ -26,7 +26,7 @@
 package polyglot.ext.jl5.ast;
 
 import polyglot.ast.AbstractDelFactory_c;
-import polyglot.ast.JL;
+import polyglot.ast.JLDel;
 
 public class JL5DelFactory_c extends AbstractDelFactory_c implements
         JL5DelFactory {
@@ -45,341 +45,341 @@ public class JL5DelFactory_c extends AbstractDelFactory_c implements
     }
 
     @Override
-    public JL delEnumDecl() {
-        JL e = delEnumDeclImpl();
+    public JLDel delEnumDecl() {
+        JLDel e = delEnumDeclImpl();
 
         if (nextDelFactory() != null) {
-            JL e2 = nextDelFactory().delEnumDecl();
+            JLDel e2 = nextDelFactory().delEnumDecl();
             e = composeDels(e, e2);
         }
         return postDelEnumDecl(e);
     }
 
     @Override
-    public JL delExtendedFor() {
-        JL e = delExtendedForImpl();
+    public JLDel delExtendedFor() {
+        JLDel e = delExtendedForImpl();
 
         if (nextDelFactory() != null) {
-            JL e2 = nextDelFactory().delExtendedFor();
+            JLDel e2 = nextDelFactory().delExtendedFor();
             e = composeDels(e, e2);
         }
         return postDelExtendedFor(e);
     }
 
     @Override
-    public JL delEnumConstantDecl() {
-        JL e = delEnumConstantDeclImpl();
+    public JLDel delEnumConstantDecl() {
+        JLDel e = delEnumConstantDeclImpl();
 
         if (nextDelFactory() != null) {
-            JL e2 = nextDelFactory().delEnumConstant();
+            JLDel e2 = nextDelFactory().delEnumConstant();
             e = composeDels(e, e2);
         }
         return postDelEnumConstant(e);
     }
 
     @Override
-    public JL delEnumConstant() {
-        JL e = delEnumConstantImpl();
+    public JLDel delEnumConstant() {
+        JLDel e = delEnumConstantImpl();
 
         if (nextDelFactory() != null) {
-            JL e2 = nextDelFactory().delEnumConstant();
+            JLDel e2 = nextDelFactory().delEnumConstant();
             e = composeDels(e, e2);
         }
         return postDelEnumConstant(e);
     }
 
     @Override
-    public JL delParamTypeNode() {
-        JL e = delParamTypeNodeImpl();
+    public JLDel delParamTypeNode() {
+        JLDel e = delParamTypeNodeImpl();
 
         if (nextDelFactory() != null) {
-            JL e2 = nextDelFactory().delParamTypeNode();
+            JLDel e2 = nextDelFactory().delParamTypeNode();
             e = composeDels(e, e2);
         }
         return postDelParamTypeNode(e);
     }
 
     @Override
-    public JL delAnnotationElemDecl() {
-        JL e = delAnnotationElemDeclImpl();
+    public JLDel delAnnotationElemDecl() {
+        JLDel e = delAnnotationElemDeclImpl();
 
         if (nextDelFactory() != null) {
-            JL e2 = nextDelFactory().delAnnotationElemDecl();
+            JLDel e2 = nextDelFactory().delAnnotationElemDecl();
             e = composeDels(e, e2);
         }
         return postDelAnnotationElemDecl(e);
     }
 
     @Override
-    public JL delNormalAnnotationElem() {
-        JL e = delNormalAnnotationElemImpl();
+    public JLDel delNormalAnnotationElem() {
+        JLDel e = delNormalAnnotationElemImpl();
 
         if (nextDelFactory() != null) {
-            JL e2 = nextDelFactory().delNormalAnnotationElem();
+            JLDel e2 = nextDelFactory().delNormalAnnotationElem();
             e = composeDels(e, e2);
         }
         return postDelNormalAnnotationElem(e);
     }
 
     @Override
-    public JL delMarkerAnnotationElem() {
-        JL e = delMarkerAnnotationElemImpl();
+    public JLDel delMarkerAnnotationElem() {
+        JLDel e = delMarkerAnnotationElemImpl();
 
         if (nextDelFactory() != null) {
-            JL e2 = nextDelFactory().delMarkerAnnotationElem();
+            JLDel e2 = nextDelFactory().delMarkerAnnotationElem();
             e = composeDels(e, e2);
         }
         return postDelMarkerAnnotationElem(e);
     }
 
     @Override
-    public JL delSingleElementAnnotationElem() {
-        JL e = delSingleElementAnnotationElemImpl();
+    public JLDel delSingleElementAnnotationElem() {
+        JLDel e = delSingleElementAnnotationElemImpl();
 
         if (nextDelFactory() != null) {
-            JL e2 = nextDelFactory().delSingleElementAnnotationElem();
+            JLDel e2 = nextDelFactory().delSingleElementAnnotationElem();
             e = composeDels(e, e2);
         }
         return postDelSingleElementAnnotationElem(e);
     }
 
     @Override
-    public JL delElementValuePair() {
-        JL e = delElementValuePairImpl();
+    public JLDel delElementValuePair() {
+        JLDel e = delElementValuePairImpl();
 
         if (nextDelFactory() != null) {
-            JL e2 = nextDelFactory().delElementValuePair();
+            JLDel e2 = nextDelFactory().delElementValuePair();
             e = composeDels(e, e2);
         }
         return postDelElementValuePair(e);
     }
 
     @Override
-    public JL delElementValueArrayInit() {
-        JL e = delElementValueArrayInitImpl();
+    public JLDel delElementValueArrayInit() {
+        JLDel e = delElementValueArrayInitImpl();
 
         if (nextDelFactory() != null) {
-            JL e2 = nextDelFactory().delElementValueArrayInit();
+            JLDel e2 = nextDelFactory().delElementValueArrayInit();
             e = composeDels(e, e2);
         }
         return postDelElementValueArrayInit(e);
     }
 
-    public JL delEnumDeclImpl() {
+    public JLDel delEnumDeclImpl() {
         return new JL5EnumDeclDel();
     }
 
-    public JL delExtendedForImpl() {
+    public JLDel delExtendedForImpl() {
         return this.delLoopImpl();
     }
 
-    public JL delEnumConstantDeclImpl() {
+    public JLDel delEnumConstantDeclImpl() {
         return this.delClassMemberImpl();
     }
 
-    public JL delEnumConstantImpl() {
+    public JLDel delEnumConstantImpl() {
         return this.delFieldImpl();
     }
 
-    public JL delParamTypeNodeImpl() {
+    public JLDel delParamTypeNodeImpl() {
         return this.delTypeNodeImpl();
     }
 
     @Override
-    protected JL delAssertImpl() {
+    protected JLDel delAssertImpl() {
         return new JL5AssertDel();
     }
 
     @Override
-    protected JL delAssignImpl() {
+    protected JLDel delAssignImpl() {
         return new JL5AssignDel();
     }
 
     @Override
-    protected JL delBinaryImpl() {
+    protected JLDel delBinaryImpl() {
         return new JL5BinaryDel();
     }
 
     @Override
-    protected JL delClassBodyImpl() {
+    protected JLDel delClassBodyImpl() {
         return new JL5ClassBodyDel();
     }
 
     @Override
-    protected JL delCaseImpl() {
+    protected JLDel delCaseImpl() {
         return new JL5CaseDel();
     }
 
     @Override
-    protected JL delCatchImpl() {
+    protected JLDel delCatchImpl() {
         return new JL5CatchDel();
     }
 
     @Override
-    protected JL delConstructorCallImpl() {
+    protected JLDel delConstructorCallImpl() {
         return new JL5ConstructorCallDel();
     }
 
     @Override
-    protected JL delCanonicalTypeNodeImpl() {
+    protected JLDel delCanonicalTypeNodeImpl() {
         return new JL5CanonicalTypeNodeDel();
     }
 
     @Override
-    protected JL delCallImpl() {
+    protected JLDel delCallImpl() {
         return new JL5CallDel();
     }
 
     @Override
-    protected JL delSwitchImpl() {
+    protected JLDel delSwitchImpl() {
         return new JL5SwitchDel();
     }
 
     @Override
-    protected JL delTryImpl() {
+    protected JLDel delTryImpl() {
         return new JL5TryDel();
     }
 
     @Override
-    protected JL delClassLitImpl() {
+    protected JLDel delClassLitImpl() {
         return new JL5ClassLitDel();
     }
 
     @Override
-    protected JL delConditionalImpl() {
+    protected JLDel delConditionalImpl() {
         return new JL5ConditionalDel();
     }
 
     @Override
-    protected JL delFieldImpl() {
+    protected JLDel delFieldImpl() {
         return new JL5FieldDel();
     }
 
     @Override
-    protected JL delFormalImpl() {
+    protected JLDel delFormalImpl() {
         return new JL5FormalDel();
     }
 
     @Override
-    protected JL delImportImpl() {
+    protected JLDel delImportImpl() {
         return new JL5ImportDel();
     }
 
     @Override
-    protected JL delFieldDeclImpl() {
+    protected JLDel delFieldDeclImpl() {
         return new JL5FieldDeclDel();
     }
 
     @Override
-    protected JL delLocalDeclImpl() {
+    protected JLDel delLocalDeclImpl() {
         return new JL5LocalDeclDel();
     }
 
     @Override
-    protected JL delClassDeclImpl() {
+    protected JLDel delClassDeclImpl() {
         return new JL5ClassDeclDel();
     }
 
     @Override
-    protected JL delMethodDeclImpl() {
+    protected JLDel delMethodDeclImpl() {
         return new JL5MethodDeclDel();
     }
 
     @Override
-    protected JL delConstructorDeclImpl() {
+    protected JLDel delConstructorDeclImpl() {
         return new JL5ConstructorDeclDel();
     }
 
     @Override
-    protected JL delNodeImpl() {
+    protected JLDel delNodeImpl() {
         return new JL5Del();
     }
 
     @Override
-    protected JL delNewImpl() {
+    protected JLDel delNewImpl() {
         return new JL5NewDel();
     }
 
     @Override
-    protected JL delNewArrayImpl() {
+    protected JLDel delNewArrayImpl() {
         return new JL5NewArrayDel();
     }
 
     @Override
-    protected JL delSpecialImpl() {
+    protected JLDel delSpecialImpl() {
         return new JL5SpecialDel();
     }
 
     @Override
-    protected JL delUnaryImpl() {
+    protected JLDel delUnaryImpl() {
         return new JL5UnaryDel();
     }
 
-    public JL postDelEnumDecl(JL del) {
+    public JLDel postDelEnumDecl(JLDel del) {
         return this.postDelClassDecl(del);
     }
 
-    public JL postDelExtendedFor(JL del) {
+    public JLDel postDelExtendedFor(JLDel del) {
         return this.postDelLoop(del);
     }
 
-    public JL postDelEnumConstantDecl(JL del) {
+    public JLDel postDelEnumConstantDecl(JLDel del) {
         return this.postDelClassMember(del);
     }
 
-    public JL postDelEnumConstant(JL del) {
+    public JLDel postDelEnumConstant(JLDel del) {
         return this.postDelField(del);
     }
 
-    public JL postDelParamTypeNode(JL del) {
+    public JLDel postDelParamTypeNode(JLDel del) {
         return this.postDelTypeNode(del);
     }
 
-    private JL postDelAnnotationElemDecl(JL e) {
+    private JLDel postDelAnnotationElemDecl(JLDel e) {
         return e;
     }
 
-    private JL delAnnotationElemDeclImpl() {
+    private JLDel delAnnotationElemDeclImpl() {
         return this.delClassMemberImpl();
     }
 
-    private JL delNormalAnnotationElemImpl() {
+    private JLDel delNormalAnnotationElemImpl() {
         return this.delTermImpl();
     }
 
-    private JL delMarkerAnnotationElemImpl() {
+    private JLDel delMarkerAnnotationElemImpl() {
         return this.delNormalAnnotationElemImpl();
     }
 
-    private JL delSingleElementAnnotationElemImpl() {
+    private JLDel delSingleElementAnnotationElemImpl() {
         return this.delNormalAnnotationElemImpl();
     }
 
-    private JL delElementValuePairImpl() {
+    private JLDel delElementValuePairImpl() {
         return this.delTermImpl();
     }
 
-    private JL delElementValueArrayInitImpl() {
+    private JLDel delElementValueArrayInitImpl() {
         return this.delTermImpl();
     }
 
-    private JL postDelNormalAnnotationElem(JL e) {
+    private JLDel postDelNormalAnnotationElem(JLDel e) {
         return e;
     }
 
-    private JL postDelMarkerAnnotationElem(JL e) {
+    private JLDel postDelMarkerAnnotationElem(JLDel e) {
         return e;
     }
 
-    private JL postDelSingleElementAnnotationElem(JL e) {
+    private JLDel postDelSingleElementAnnotationElem(JLDel e) {
         return e;
     }
 
-    private JL postDelElementValuePair(JL e) {
+    private JLDel postDelElementValuePair(JLDel e) {
         return e;
     }
 
-    private JL postDelElementValueArrayInit(JL e) {
+    private JLDel postDelElementValueArrayInit(JLDel e) {
         return e;
     }
 

@@ -25,13 +25,13 @@
  ******************************************************************************/
 package polyglot.ext.jl5.ast;
 
-import polyglot.ast.JL_c;
+import polyglot.ast.JLDel_c;
 import polyglot.ext.jl5.visit.JL5Translator;
 import polyglot.util.CodeWriter;
 import polyglot.util.SerialVersionUID;
 import polyglot.visit.Translator;
 
-public class JL5Del extends JL_c {
+public class JL5Del extends JLDel_c {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
     @Override

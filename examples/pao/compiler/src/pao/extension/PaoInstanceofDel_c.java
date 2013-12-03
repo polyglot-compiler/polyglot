@@ -8,7 +8,7 @@
 package pao.extension;
 
 import polyglot.ast.Instanceof;
-import polyglot.ast.JL_c;
+import polyglot.ast.JLDel_c;
 import polyglot.ast.Node;
 import polyglot.types.SemanticException;
 import polyglot.types.Type;
@@ -19,7 +19,7 @@ import polyglot.visit.TypeChecker;
  * <code>InstanceOf</code> AST node. Overrides the 
  * {@link #typeCheck(TypeChecker) typeCheck(TypeChecker)} method.
  */
-public class PaoInstanceofDel_c extends JL_c {
+public class PaoInstanceofDel_c extends JLDel_c {
     /**
      * Removes the restriction that the compare type must be a 
      * <code>ReferenceType</code>. 

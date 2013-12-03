@@ -26,7 +26,7 @@
 package polyglot.ext.jl5.ast;
 
 import polyglot.ast.ClassDeclOps;
-import polyglot.ast.JL;
+import polyglot.ast.JLDel;
 import polyglot.ast.Node;
 import polyglot.ast.NodeFactory;
 import polyglot.types.ConstructorInstance;
@@ -82,7 +82,7 @@ public class JL5ClassDeclDel extends JL5AnnotatedElementDel implements
 
     @Override
     public void prettyPrintFooter(CodeWriter w, PrettyPrinter tr) {
-        JL jl = this.jl();
+        JLDel jl = this.jl();
         if (jl instanceof ClassDeclOps) {
             ((ClassDeclOps) jl).prettyPrintFooter(w, tr);
         }
@@ -95,7 +95,7 @@ public class JL5ClassDeclDel extends JL5AnnotatedElementDel implements
     public Node addDefaultConstructor(TypeSystem ts, NodeFactory nf,
             ConstructorInstance defaultConstructorInstance)
             throws SemanticException {
-        JL jl = this.jl();
+        JLDel jl = this.jl();
         if (jl instanceof ClassDeclOps) {
             return ((ClassDeclOps) jl).addDefaultConstructor(ts,
                                                              nf,

@@ -26,30 +26,30 @@
 package polyglot.ext.jl5.ast;
 
 import polyglot.ast.DelFactory;
-import polyglot.ast.JL;
+import polyglot.ast.JLDel;
 
 public interface JL5DelFactory extends DelFactory {
 
-    JL delEnumDecl();
+    JLDel delEnumDecl();
 
-    JL delExtendedFor();
+    JLDel delExtendedFor();
 
-    JL delEnumConstantDecl();
+    JLDel delEnumConstantDecl();
 
-    JL delEnumConstant();
+    JLDel delEnumConstant();
 
-    JL delParamTypeNode();
+    JLDel delParamTypeNode();
 
-    JL delAnnotationElemDecl();
+    JLDel delAnnotationElemDecl();
 
-    JL delNormalAnnotationElem();
+    JLDel delNormalAnnotationElem();
 
-    JL delMarkerAnnotationElem();
+    JLDel delMarkerAnnotationElem();
 
-    JL delSingleElementAnnotationElem();
+    JLDel delSingleElementAnnotationElem();
 
-    JL delElementValuePair();
+    JLDel delElementValuePair();
 
-    JL delElementValueArrayInit();
+    JLDel delElementValueArrayInit();
 
 }

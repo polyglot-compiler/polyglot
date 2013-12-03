@@ -36,161 +36,161 @@ public interface DelFactory {
     // Factory Methods
     //////////////////////////////////////////////////////////////////
 
-    JL delId();
+    JLDel delId();
 
-    JL delAmbAssign();
+    JLDel delAmbAssign();
 
-    JL delAmbExpr();
+    JLDel delAmbExpr();
 
-    JL delAmbPrefix();
+    JLDel delAmbPrefix();
 
-    JL delAmbQualifierNode();
+    JLDel delAmbQualifierNode();
 
-    JL delAmbReceiver();
+    JLDel delAmbReceiver();
 
-    JL delAmbTypeNode();
+    JLDel delAmbTypeNode();
 
-    JL delArrayAccess();
+    JLDel delArrayAccess();
 
-    JL delArrayInit();
+    JLDel delArrayInit();
 
-    JL delArrayTypeNode();
+    JLDel delArrayTypeNode();
 
-    JL delAssert();
+    JLDel delAssert();
 
-    JL delAssign();
+    JLDel delAssign();
 
-    JL delLocalAssign();
+    JLDel delLocalAssign();
 
-    JL delFieldAssign();
+    JLDel delFieldAssign();
 
-    JL delArrayAccessAssign();
+    JLDel delArrayAccessAssign();
 
-    JL delBinary();
+    JLDel delBinary();
 
-    JL delBlock();
+    JLDel delBlock();
 
-    JL delBooleanLit();
+    JLDel delBooleanLit();
 
-    JL delBranch();
+    JLDel delBranch();
 
-    JL delCall();
+    JLDel delCall();
 
-    JL delCanonicalTypeNode();
+    JLDel delCanonicalTypeNode();
 
-    JL delCase();
+    JLDel delCase();
 
-    JL delCast();
+    JLDel delCast();
 
-    JL delCatch();
+    JLDel delCatch();
 
-    JL delCharLit();
+    JLDel delCharLit();
 
-    JL delClassBody();
+    JLDel delClassBody();
 
-    JL delClassDecl();
+    JLDel delClassDecl();
 
-    JL delClassLit();
+    JLDel delClassLit();
 
-    JL delClassMember();
+    JLDel delClassMember();
 
-    JL delCodeDecl();
+    JLDel delCodeDecl();
 
-    JL delCompoundStmt();
+    JLDel delCompoundStmt();
 
-    JL delConditional();
+    JLDel delConditional();
 
-    JL delConstructorCall();
+    JLDel delConstructorCall();
 
-    JL delConstructorDecl();
+    JLDel delConstructorDecl();
 
-    JL delDo();
+    JLDel delDo();
 
-    JL delEmpty();
+    JLDel delEmpty();
 
-    JL delEval();
+    JLDel delEval();
 
-    JL delExpr();
+    JLDel delExpr();
 
-    JL delField();
+    JLDel delField();
 
-    JL delFieldDecl();
+    JLDel delFieldDecl();
 
-    JL delFloatLit();
+    JLDel delFloatLit();
 
-    JL delFor();
+    JLDel delFor();
 
-    JL delFormal();
+    JLDel delFormal();
 
-    JL delIf();
+    JLDel delIf();
 
-    JL delImport();
+    JLDel delImport();
 
-    JL delInitializer();
+    JLDel delInitializer();
 
-    JL delInstanceof();
+    JLDel delInstanceof();
 
-    JL delIntLit();
+    JLDel delIntLit();
 
-    JL delLabeled();
+    JLDel delLabeled();
 
-    JL delLit();
+    JLDel delLit();
 
-    JL delLocal();
+    JLDel delLocal();
 
-    JL delLocalClassDecl();
+    JLDel delLocalClassDecl();
 
-    JL delLocalDecl();
+    JLDel delLocalDecl();
 
-    JL delLoop();
+    JLDel delLoop();
 
-    JL delMethodDecl();
+    JLDel delMethodDecl();
 
-    JL delNewArray();
+    JLDel delNewArray();
 
-    JL delNode();
+    JLDel delNode();
 
-    JL delNodeList();
+    JLDel delNodeList();
 
-    JL delNew();
+    JLDel delNew();
 
-    JL delNullLit();
+    JLDel delNullLit();
 
-    JL delNumLit();
+    JLDel delNumLit();
 
-    JL delPackageNode();
+    JLDel delPackageNode();
 
-    JL delProcedureDecl();
+    JLDel delProcedureDecl();
 
-    JL delReturn();
+    JLDel delReturn();
 
-    JL delSourceCollection();
+    JLDel delSourceCollection();
 
-    JL delSourceFile();
+    JLDel delSourceFile();
 
-    JL delSpecial();
+    JLDel delSpecial();
 
-    JL delStmt();
+    JLDel delStmt();
 
-    JL delStringLit();
+    JLDel delStringLit();
 
-    JL delSwitchBlock();
+    JLDel delSwitchBlock();
 
-    JL delSwitchElement();
+    JLDel delSwitchElement();
 
-    JL delSwitch();
+    JLDel delSwitch();
 
-    JL delSynchronized();
+    JLDel delSynchronized();
 
-    JL delTerm();
+    JLDel delTerm();
 
-    JL delThrow();
+    JLDel delThrow();
 
-    JL delTry();
+    JLDel delTry();
 
-    JL delTypeNode();
+    JLDel delTypeNode();
 
-    JL delUnary();
+    JLDel delUnary();
 
-    JL delWhile();
+    JLDel delWhile();
 }

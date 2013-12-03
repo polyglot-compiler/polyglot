@@ -58,20 +58,20 @@ import polyglot.visit.TypeChecker;
  * classes or may reimplement all compiler passes in a new class implementing
  * the <code>JL</code> interface.
  */
-public class JL_c implements JL, Copy, Serializable {
+public class JLDel_c implements JLDel, Copy, Serializable {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
     Node node;
 
     /** Create an uninitialized delegate. It must be initialized using the init() method.
      */
-    public JL_c() {
+    public JLDel_c() {
     }
 
     /** The <code>JL</code> object we dispatch to, by default, the node
      * itself, but possibly another delegate.
      */
-    public JL jl() {
+    public JLDel jl() {
         return node();
     }
 
@@ -89,7 +89,7 @@ public class JL_c implements JL, Copy, Serializable {
     @Override
     public Object copy() {
         try {
-            JL_c copy = (JL_c) super.clone();
+            JLDel_c copy = (JLDel_c) super.clone();
             copy.node = null; // uninitialize
             return copy;
         }

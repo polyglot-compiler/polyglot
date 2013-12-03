@@ -1,46 +1,46 @@
 package polyglot.ext.jl7.ast;
 
-import polyglot.ast.JL;
+import polyglot.ast.JLDel;
 import polyglot.ext.jl5.ast.JL5DelFactory_c;
 
 public class JL7DelFactory_c extends JL5DelFactory_c implements JL7DelFactory {
 
     @Override
-    protected JL delCaseImpl() {
+    protected JLDel delCaseImpl() {
         return new JL7CaseDel();
     }
 
     @Override
-    protected JL delSwitchImpl() {
+    protected JLDel delSwitchImpl() {
         return new JL7SwitchDel();
     }
 
     @Override
-    protected JL delThrowImpl() {
+    protected JLDel delThrowImpl() {
         return new JL7ThrowDel();
     }
 
     @Override
-    protected JL delTryImpl() {
+    protected JLDel delTryImpl() {
         return new JL7TryDel();
     }
 
     @Override
-    public JL delMultiCatch() {
-        JL e = delMultiCatchImpl();
+    public JLDel delMultiCatch() {
+        JLDel e = delMultiCatchImpl();
 
         if (nextDelFactory() != null) {
-            JL e2 = nextDelFactory().delEnumDecl();
+            JLDel e2 = nextDelFactory().delEnumDecl();
             e = composeDels(e, e2);
         }
         return postDelMultiCatch(e);
     }
 
-    protected JL delMultiCatchImpl() {
+    protected JLDel delMultiCatchImpl() {
         return delCatchImpl();
     }
 
-    protected JL postDelMultiCatch(JL e) {
+    protected JLDel postDelMultiCatch(JLDel e) {
         return postDelCatch(e);
     }
 

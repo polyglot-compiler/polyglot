@@ -10,13 +10,13 @@ package coffer.extension;
 import polyglot.ast.ArrayAccess;
 import polyglot.ast.Assign;
 import polyglot.ast.Field;
-import polyglot.ast.JL_c;
+import polyglot.ast.JLDel_c;
 import polyglot.ast.Node;
 import polyglot.types.SemanticException;
 import polyglot.visit.TypeChecker;
 import coffer.types.CofferClassType;
 
-public class AssignDel_c extends JL_c {
+public class AssignDel_c extends JLDel_c {
     @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
         Assign n = (Assign) super.typeCheck(tc);

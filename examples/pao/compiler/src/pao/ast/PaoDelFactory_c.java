@@ -9,7 +9,7 @@ package pao.ast;
 
 import pao.extension.PaoInstanceofDel_c;
 import polyglot.ast.AbstractDelFactory_c;
-import polyglot.ast.JL;
+import polyglot.ast.JLDel;
 
 /**
  * Delegate factory for the pao extension. The delegate factory 
@@ -22,7 +22,7 @@ public class PaoDelFactory_c extends AbstractDelFactory_c {
      * @see AbstractDelFactory_c#delInstanceofImpl()
      */
     @Override
-    protected JL delInstanceofImpl() {
+    protected JLDel delInstanceofImpl() {
         return new PaoInstanceofDel_c();
     }
 }

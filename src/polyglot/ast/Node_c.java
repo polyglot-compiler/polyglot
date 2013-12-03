@@ -64,7 +64,7 @@ public abstract class Node_c implements Node {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
     protected Position position;
-    protected JL del;
+    protected JLDel del;
     protected Ext ext;
     protected boolean error;
 
@@ -87,17 +87,17 @@ public abstract class Node_c implements Node {
     }
 
     @Override
-    public JL del() {
+    public JLDel del() {
         return del != null ? del : this;
     }
 
     @Override
-    public Node del(JL del) {
+    public Node del(JLDel del) {
         if (this.del == del) {
             return this;
         }
 
-        JL old = this.del;
+        JLDel old = this.del;
         this.del = null;
 
         Node_c n = (Node_c) copy();
@@ -164,7 +164,7 @@ public abstract class Node_c implements Node {
             Node_c n = (Node_c) super.clone();
 
             if (this.del != null) {
-                n.del = (JL) this.del.copy();
+                n.del = (JLDel) this.del.copy();
                 n.del.init(n);
             }
 

@@ -2,7 +2,7 @@ package polyglot.ext.jl7.ast;
 
 import polyglot.ast.Ext;
 import polyglot.ast.Ext_c;
-import polyglot.ast.JL;
+import polyglot.ast.JLDel;
 import polyglot.ast.Node;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.SerialVersionUID;
@@ -15,7 +15,7 @@ public class JL7Ext extends Ext_c {
      * If null, this superclass functionality will by default be delegated
      * to the node. However, extensions to JL5 can override this if needed.
      */
-    protected JL superDel = null;
+    protected JLDel superDel = null;
 
     public static JL7Ext ext(Node n) {
         Ext e = n.ext();
@@ -29,7 +29,7 @@ public class JL7Ext extends Ext_c {
         return (JL7Ext) e;
     }
 
-    public JL superDel() {
+    public JLDel superDel() {
         if (this.superDel == null) {
             return this.node();
         }
@@ -48,12 +48,12 @@ public class JL7Ext extends Ext_c {
     public Object copy() {
         JL7Ext copy = (JL7Ext) super.copy();
         if (superDel != null) {
-            copy.superDel = (JL) superDel.copy();
+            copy.superDel = (JLDel) superDel.copy();
         }
         return copy;
     }
 
-    public void setSuperDel(JL superDel) {
+    public void setSuperDel(JLDel superDel) {
         this.superDel = superDel;
     }
 }
