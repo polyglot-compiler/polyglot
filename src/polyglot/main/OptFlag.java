@@ -391,10 +391,11 @@ public abstract class OptFlag<T> implements Comparable<OptFlag<T>> {
     }
 
     public Arg<T> defaultArg() {
-        if (defaultValue != null)
+        if (defaultValue != null) {
             throw new UnsupportedOperationException("Usage for "
                     + ids()
                     + " specifies a default value, but flag does not implement one.");
+        }
         return null;
     }
 
@@ -640,6 +641,13 @@ public abstract class OptFlag<T> implements Comparable<OptFlag<T>> {
      * @param <T>
      */
     public static class Switch extends OptFlag<Boolean> {
+        /**
+         * Does this switch turn something on or off?
+         * For example a switch for flag "-doSomething" would
+         * have on == true. A switch for flag "--dontDoSomething"
+         * would have on == false. In both cases, the Boolean argument
+         * produced by this Swtich would represent whether we do something.
+         */
         protected final boolean on;
 
         @Override
