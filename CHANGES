@@ -22,9 +22,12 @@ boolean indicating whether the dataflow is for entry or exit to the node
 can be obtained with p.isEntry(). Edge keys for edges to successor nodes
 is available via p.succEdgeKeys(). 
 
+polyglot.ast.JL renamed to polyglot.ast.JLDel and polyglot.ast.JL_c renamed 
+to polyglot.ast.JLDel_c. This is intended to clarify the use of the 
+delegate pattern in Polyglot.
 
-polyglot.ast.JL_c (the base class for JL delegate objects) no longer
-extends polyglot.ast.Ext_c.
+polyglot.ast.JLDel_c (the base class for JL delegate objects, formerly
+polyglot.ast.JL_c) no longer extends polyglot.ast.Ext_c.
 
 
 June 21, 2013 : Polyglot 2.5.3
