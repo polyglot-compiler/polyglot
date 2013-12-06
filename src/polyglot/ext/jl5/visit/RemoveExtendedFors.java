@@ -120,10 +120,10 @@ public class RemoveExtendedFors extends ContextVisitor {
         // "{ Iterator iter = e.iterator(); L1,...,Ln: while (iter.hasNext();)  { C x = (C)iter.next(); b }"
 
         // Create the iter declaration "Iterator iter = e.iterator()"
-        Id iterName = freshName("iter");
+        String iterName = freshName("iter");
         LocalDecl iterDecl;
         LocalInstance iterLI =
-                ts.localInstance(pos, Flags.NONE, iterType, iterName.id());
+                ts.localInstance(pos, Flags.NONE, iterType, iterName);
         {
             Id id = nodeFactory().Id(pos, "iterator");
             Call iterator = nodeFactory().Call(pos, n.expr(), id);
@@ -142,7 +142,7 @@ public class RemoveExtendedFors extends ContextVisitor {
                                             Flags.NONE,
                                             nodeFactory().CanonicalTypeNode(pos,
                                                                             iterType),
-                                            iterName,
+                                            nodeFactory().Id(pos, iterName),
                                             iterator);
             iterDecl = iterDecl.localInstance(iterLI);
         }
@@ -154,7 +154,8 @@ public class RemoveExtendedFors extends ContextVisitor {
             Call call =
                     nodeFactory().Call(pos,
                                        ((Local) nodeFactory().Local(pos,
-                                                                    iterName)
+                                                                    nodeFactory().Id(pos,
+                                                                                     iterName))
                                                              .type(iterType)).localInstance(iterDecl.localInstance()),
                                        id);
             call = (Call) call.type(ts.Object());
@@ -183,7 +184,8 @@ public class RemoveExtendedFors extends ContextVisitor {
             Call cond =
                     nodeFactory().Call(pos,
                                        ((Local) nodeFactory().Local(pos,
-                                                                    iterName)
+                                                                    nodeFactory().Id(pos,
+                                                                                     iterName))
                                                              .type(iterType)).localInstance(iterDecl.localInstance()),
                                        id);
             cond = (Call) cond.type(ts.Boolean());
@@ -203,18 +205,16 @@ public class RemoveExtendedFors extends ContextVisitor {
         return nodeFactory().Block(pos, iterDecl, labelStmt(loop, labels));
     }
 
-    private Id freshName(String desc) {
+    protected String freshName(String desc) {
         int count = varCount.removeLast();
         varCount.addLast(count + 1);
         if (count == 0) {
-            return nodeFactory().Id(Position.compilerGenerated(),
-                                    "extfor$" + desc);
+            return "extfor$" + desc;
         }
-        return nodeFactory().Id(Position.compilerGenerated(),
-                                "extfor$" + desc + "$" + count);
+        return "extfor$" + desc + "$" + count;
     }
 
-    private Node translateExtForArray(ExtendedFor n, List<String> labels)
+    protected Node translateExtForArray(ExtendedFor n, List<String> labels)
             throws SemanticException {
         Position pos = Position.compilerGenerated();
         Type iteratedType = n.decl().type().type();
@@ -223,32 +223,32 @@ public class RemoveExtendedFors extends ContextVisitor {
         List<Stmt> stmts = new ArrayList<Stmt>();
 
         // add the declaration of arr: "C[] arr = e"
-        Id arrID = freshName("arr");
+        String arrID = freshName("arr");
         LocalInstance arrLI =
-                ts.localInstance(pos, Flags.NONE, n.expr().type(), arrID.id());
+                ts.localInstance(pos, Flags.NONE, n.expr().type(), arrID);
         {
             LocalDecl ld =
                     nodeFactory().LocalDecl(pos,
                                             Flags.NONE,
                                             nodeFactory().CanonicalTypeNode(pos,
                                                                             arrLI.type()),
-                                            arrID);
+                                            nodeFactory().Id(pos, arrID));
             ld = ld.localInstance(arrLI);
             ld = ld.init(n.expr());
             stmts.add(ld);
         }
 
         // add the declaration of iterator: "int iter = 0"
-        Id iterID = freshName("iter");
+        String iterID = freshName("iter");
         LocalInstance iterLI =
-                ts.localInstance(pos, Flags.NONE, ts.Int(), iterID.id());
+                ts.localInstance(pos, Flags.NONE, ts.Int(), iterID);
         {
             LocalDecl ld =
                     nodeFactory().LocalDecl(pos,
                                             Flags.NONE,
                                             nodeFactory().CanonicalTypeNode(pos,
                                                                             iterLI.type()),
-                                            iterID);
+                                            nodeFactory().Id(pos, iterID));
             ld = ld.localInstance(iterLI);
             ld =
                     ld.init(nodeFactory().IntLit(pos, IntLit.INT, 0)
@@ -259,52 +259,37 @@ public class RemoveExtendedFors extends ContextVisitor {
         // build the conditional "iter < arr.length"
         Expr cond;
         {
-            Local iterLocal =
-                    (Local) nodeFactory().Local(pos, iterID)
-                                         .localInstance(iterLI)
-                                         .type(ts.Int());
-            Local arrLocal =
-                    (Local) nodeFactory().Local(pos, arrID)
-                                         .localInstance(arrLI)
-                                         .type(arrLI.type());
             Id id = nodeFactory().Id(pos, "length");
             Field field =
-                    (Field) nodeFactory().Field(pos, arrLocal, id)
+                    (Field) nodeFactory().Field(pos, makeLocal(pos, arrLI), id)
                                          .type(ts.Int());
             field =
                     field.fieldInstance(ts.findField(arrLI.type().toReference(),
                                                      "length"));
 
             cond =
-                    nodeFactory().Binary(pos, iterLocal, Binary.LT, field)
-                                 .type(ts.Boolean());
+                    nodeFactory().Binary(pos,
+                                         makeLocal(pos, iterLI),
+                                         Binary.LT,
+                                         field).type(ts.Boolean());
         }
 
         // build the initlizer for the local decl: arr[iter]
         Expr init;
         {
-            Local iterLocal =
-                    (Local) nodeFactory().Local(pos, iterID)
-                                         .localInstance(iterLI)
-                                         .type(ts.Int());
-            Local arrLocal =
-                    (Local) nodeFactory().Local(pos, arrID)
-                                         .localInstance(arrLI)
-                                         .type(arrLI.type());
-            init = nodeFactory().ArrayAccess(pos, arrLocal, iterLocal);
+            init =
+                    nodeFactory().ArrayAccess(pos,
+                                              makeLocal(pos, arrLI),
+                                              makeLocal(pos, iterLI));
             init = init.type(iteratedType);
         }
 
         // build the increment for iter (iter = iter + 1;)
         Stmt inc;
         {
-            Local iterLocal =
-                    (Local) nodeFactory().Local(pos, iterID)
-                                         .localInstance(iterLI)
-                                         .type(ts.Int());
             Expr incExpr =
                     nodeFactory().Binary(pos,
-                                         iterLocal.type(ts.Int()),
+                                         makeLocal(pos, iterLI),
                                          Binary.ADD,
                                          nodeFactory().IntLit(pos,
                                                               IntLit.INT,
@@ -312,7 +297,7 @@ public class RemoveExtendedFors extends ContextVisitor {
                                  .type(ts.Int());
             Assign incStore =
                     (Assign) nodeFactory().Assign(pos,
-                                                  iterLocal,
+                                                  makeLocal(pos, iterLI),
                                                   Assign.ASSIGN,
                                                   incExpr).type(ts.Int());
             inc = nodeFactory().Eval(pos, incStore);
@@ -327,6 +312,16 @@ public class RemoveExtendedFors extends ContextVisitor {
             stmts.add(labelStmt(loop, labels));
         }
         return nodeFactory().Block(pos, stmts);
+    }
+
+    protected Expr makeLocal(Position pos, LocalInstance li) {
+        Local l =
+                (Local) nodeFactory().Local(pos,
+                                            nodeFactory().Id(pos, li.name()))
+                                     .localInstance(li)
+                                     .type(li.type());
+
+        return l;
     }
 
     /**
