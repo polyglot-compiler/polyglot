@@ -28,10 +28,13 @@ package polyglot.pth;
 import java.io.Serializable;
 import java.util.Date;
 
+import polyglot.util.SerialVersionUID;
+
 /**
  * 
  */
 public class TestResult implements Serializable {
+    private static final long serialVersionUID = SerialVersionUID.generate();
     public final String testName;
     public final String testUniqueID;
     public final Date dateTestRun;

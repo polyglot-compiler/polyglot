@@ -25,6 +25,7 @@
  ******************************************************************************/
 package ppg.parse;
 
+import polyglot.util.SerialVersionUID;
 import ppg.lex.Token;
 
 /** 
@@ -34,6 +35,8 @@ import ppg.lex.Token;
  * depending on nature of the error
  */
 public class ParserError extends Exception {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     /**
      * This contains the errorMessage for that caused the exception 
      */

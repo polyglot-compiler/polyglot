@@ -115,10 +115,6 @@ public class Main {
                 System.err.println(exn.getMessage());
             }
         }
-        catch (java.io.IOException exn) {
-            System.err.println("IO errors.");
-            System.err.println(exn.getMessage());
-        }
         catch (ClassNotFoundException exn) {
             System.err.println("Could not load .class: " + className);
             System.err.println(exn.getMessage());

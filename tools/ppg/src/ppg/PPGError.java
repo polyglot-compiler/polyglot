@@ -25,7 +25,10 @@
  ******************************************************************************/
 package ppg;
 
+import polyglot.util.SerialVersionUID;
+
 public class PPGError extends Throwable {
+    private static final long serialVersionUID = SerialVersionUID.generate();
     private String filename, error;
     private int line;
 

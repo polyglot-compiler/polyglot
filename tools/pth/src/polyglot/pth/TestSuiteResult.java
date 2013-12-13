@@ -29,10 +29,13 @@ import java.io.File;
 import java.util.Date;
 import java.util.Map;
 
+import polyglot.util.SerialVersionUID;
+
 /**
  * 
  */
 public final class TestSuiteResult extends TestResult {
+    private static final long serialVersionUID = SerialVersionUID.generate();
     private static final String RESULT_FILE_SUFFIX = ".results";
     private static final String RESULT_FILE_PREFIX = "";
 

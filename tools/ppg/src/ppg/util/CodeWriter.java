@@ -35,6 +35,8 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 
+import polyglot.util.SerialVersionUID;
+
 /** 
  * A <code>CodeWriter</code> is a pretty-printing engine.
  * It formats structured text onto an output stream <code>o</code> in the
@@ -180,6 +182,7 @@ public class CodeWriter {
  * margin was exceeded by at least <code>amount</code> chars.
  */
 class Overrun extends Exception {
+    private static final long serialVersionUID = SerialVersionUID.generate();
     int amount;
 
     Overrun(int amount_) {
