@@ -43,20 +43,9 @@ public class JLDel_c implements JLDel, Serializable {
 
     public static final JLDel instance = new JLDel_c();
 
-//    Node node;
-//
-//    /** Create an uninitialized delegate. It must be initialized using the init() method.
-//     */
     protected JLDel_c() {
     }
 
-//    /** The <code>JL</code> object we dispatch to, by default, the node
-//     * itself, but possibly another delegate.
-//     */
-//    public JLDel jl() {
-//        return node();
-//    }
-//
     @Override
     public NodeOps NodeOps(Node n) {
         return n;
@@ -86,27 +75,4 @@ public class JLDel_c implements JLDel, Serializable {
     public TryOps TryOps(Node n) {
         return (TryOps) n;
     }
-
-//    @Override
-//    public void init(Node n) {
-//        assert (this.node == null);
-//        this.node = n;
-//    }
-//
-//    @Override
-//    public Node node() {
-//        return this.node;
-//    }
-//
-//    @Override
-//    public Object copy() {
-//        try {
-//            JLDel_c copy = (JLDel_c) super.clone();
-//            copy.node = null; // uninitialize
-//            return copy;
-//        }
-//        catch (CloneNotSupportedException e) {
-//            throw new InternalCompilerError("Unable to clone a delegate");
-//        }
-//    }
 }

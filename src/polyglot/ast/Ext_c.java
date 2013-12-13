@@ -86,9 +86,6 @@ public abstract class Ext_c implements Ext {
         if (this.ext != null) {
             this.ext.init(node);
         }
-//        if (superDel != null) {
-//            superDel.init(node);
-//        }
     }
 
     /**
@@ -118,9 +115,6 @@ public abstract class Ext_c implements Ext {
 
         this.ext = old;
 
-//        if (superDel != null) {
-//            copy.superDel = (JLDel) superDel.copy();
-//        }
         return copy;
     }
 
@@ -128,7 +122,6 @@ public abstract class Ext_c implements Ext {
     public JLDel superDel() {
         if (this.superDel == null) {
             return JLDel_c.instance;
-//            return this.node();
         }
         return this.superDel;
     }

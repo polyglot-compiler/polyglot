@@ -44,14 +44,11 @@ public class NodeFactory_c extends AbstractNodeFactory_c {
     private final ExtFactory extFactory;
     protected final JLDel del;
 
-    // use an empty implementation of AbstractExtFactory_c and
-    // AbstractDelFactory_c, so we don't need to do null checks
+    // use an empty implementation of AbstractExtFactory_c,
+    // so we don't need to do null checks
     protected static class EmptyExtFactory extends AbstractExtFactory_c {
     }
 
-//    protected static class EmptyDelFactory extends AbstractDelFactory_c {
-//    }
-//
     public NodeFactory_c() {
         this(new EmptyExtFactory(), JLDel_c.instance);
     }
@@ -86,10 +83,6 @@ public class NodeFactory_c extends AbstractNodeFactory_c {
         return this.extFactory;
     }
 
-//    protected DelFactory delFactory() {
-//        return this.del;
-//    }
-//
     /**
      * Utility method to find an instance of an Extension Factory
      */

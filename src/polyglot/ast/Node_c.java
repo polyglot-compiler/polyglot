@@ -92,20 +92,11 @@ public abstract class Node_c implements Node {
 
         n.del = del != this ? del : null;
 
-//        if (n.del != null) {
-//            n.del.init(n);
-//        }
-//
         this.del = old;
 
         return n;
     }
 
-//    @Override
-//    public final JLDel superDel() {
-//        return null;
-//    }
-//
     @Override
     public Ext ext(int n) {
         if (n < 1) throw new InternalCompilerError("n must be >= 1");
@@ -156,11 +147,6 @@ public abstract class Node_c implements Node {
         try {
             Node_c n = (Node_c) super.clone();
 
-//            if (this.del != null) {
-//                n.del = (JLDel) this.del.copy();
-//                n.del.init(n);
-//            }
-//
             if (this.ext != null) {
                 n.ext = (Ext) this.ext.copy();
                 n.ext.init(n);

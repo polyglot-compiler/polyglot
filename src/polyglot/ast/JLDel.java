@@ -31,17 +31,6 @@ package polyglot.ast;
  * AST nodes and delegates for AST nodes must implement this interface.
  */
 public interface JLDel {
-//    /** Pointer back to the node we are delegating for, possibly this. */
-//    Node node();
-//
-//    /** Initialize the back pointer to the node. */
-//    void init(Node node);
-//
-//    /**
-//     * Get the node's extension associated with this delegate, or {@code null}.
-//     */
-//    Ext ext();
-//
     NodeOps NodeOps(Node n);
 
     CallOps CallOps(Node n);
