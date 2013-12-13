@@ -89,7 +89,7 @@ public class Translator extends PrettyPrinter implements Copy {
      * whose names are added to the collection <code>outputFiles</code>.
      */
     public Translator(Job job, TypeSystem ts, NodeFactory nf, TargetFactory tf) {
-        super();
+        super(nf.lang());
         this.job = job;
         this.nf = nf;
         this.tf = tf;
@@ -156,14 +156,14 @@ public class Translator extends PrettyPrinter implements Copy {
         if (context != null) {
             if (child.isDisambiguated() && child.isTypeChecked()) {
                 if (parent == null) {
-                    Context c = child.del().NodeOps(child).enterScope(context);
+                    Context c = lang().NodeOps(child).enterScope(context);
                     tr = this.context(c);
                 }
                 else if (parent.isDisambiguated() && parent.isTypeChecked()) {
                     Context c =
-                            parent.del()
-                                  .NodeOps(parent)
-                                  .enterChildScope(child, context);
+                            lang().NodeOps(parent).enterChildScope(lang(),
+                                                                   child,
+                                                                   context);
                     tr = this.context(c);
                 }
                 else {
@@ -175,11 +175,11 @@ public class Translator extends PrettyPrinter implements Copy {
             }
         }
 
-        child.del().NodeOps(child).translate(w, tr);
+        lang().NodeOps(child).translate(w, tr);
 
         if (context != null) {
             if (child.isDisambiguated() && child.isTypeChecked()) {
-                child.del().NodeOps(child).addDecls(context);
+                lang().NodeOps(child).addDecls(context);
             }
         }
     }
@@ -295,20 +295,20 @@ public class Translator extends PrettyPrinter implements Copy {
             TopLevelDecl decl) {
         Translator tr;
         if (source.isDisambiguated() && source.isTypeChecked()) {
-            Context c = source.del().NodeOps(source).enterScope(context);
+            Context c = lang().NodeOps(source).enterScope(context);
             tr = this.context(c);
         }
         else {
             tr = this.context(null);
         }
-        decl.del().NodeOps(decl).translate(w, tr);
+        lang().NodeOps(decl).translate(w, tr);
     }
 
     /** Write the package and import declarations for a source file. */
     protected void writeHeader(SourceFile sfn, CodeWriter w) {
         if (sfn.package_() != null) {
             w.write("package ");
-            sfn.package_().del().NodeOps(sfn.package_()).translate(w, this);
+            lang().NodeOps(sfn.package_()).translate(w, this);
             w.write(";");
             w.newline(0);
             w.newline(0);
@@ -317,7 +317,7 @@ public class Translator extends PrettyPrinter implements Copy {
         boolean newline = false;
 
         for (Import imp : sfn.imports()) {
-            imp.del().NodeOps(imp).translate(w, this);
+            lang().NodeOps(imp).translate(w, this);
             newline = true;
         }
 

@@ -47,8 +47,8 @@ public class JL5SwitchExt extends JL5Ext implements JL5SwitchOps {
         Switch s = (Switch) this.node();
         Expr expr = s.expr();
 
-        if (!((JL5Del) s.del()).SwitchOps(s)
-                               .isAcceptableSwitchType(expr.type())) {
+        if (!((JL5Del) tc.lang()).SwitchOps(s)
+                                 .isAcceptableSwitchType(expr.type())) {
             throw new SemanticException("Switch index must be of type char, byte,"
                                                 + " short, int, Character, Byte, Short, Integer, or an enum type.",
                                         s.position());
@@ -60,9 +60,9 @@ public class JL5SwitchExt extends JL5Ext implements JL5SwitchOps {
         for (SwitchElement el : s.elements()) {
             if (el instanceof Case) {
                 el =
-                        (SwitchElement) ((JL5Del) el.del()).CaseOps(el)
-                                                           .resolveCaseLabel(tc,
-                                                                             switchType);
+                        (SwitchElement) ((JL5Del) tc.lang()).CaseOps(el)
+                                                            .resolveCaseLabel(tc,
+                                                                              switchType);
             }
 
             newels.add(el);

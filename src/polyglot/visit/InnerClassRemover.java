@@ -114,7 +114,7 @@ public class InnerClassRemover extends ContextVisitor {
 
             if (Report.should_report("innerremover", 1)) {
                 System.out.println(">>> output ----------------------");
-                n.prettyPrint(System.out);
+                lang().NodeOps(n).prettyPrint(lang(), System.out);
                 System.out.println("<<< output ----------------------");
             }
 
@@ -122,7 +122,7 @@ public class InnerClassRemover extends ContextVisitor {
 
             if (Report.should_report("innerremover", 1)) {
                 System.out.println(">>> locals removed ----------------------");
-                n.prettyPrint(System.out);
+                lang().NodeOps(n).prettyPrint(lang(), System.out);
                 System.out.println("<<< locals removed ----------------------");
             }
 
@@ -130,7 +130,7 @@ public class InnerClassRemover extends ContextVisitor {
 
             if (Report.should_report("innerremover", 1)) {
                 System.out.println(">>> inners removed ----------------------");
-                n.prettyPrint(System.out);
+                lang().NodeOps(n).prettyPrint(lang(), System.out);
                 System.out.println("<<< inners removed ----------------------");
             }
 
@@ -299,7 +299,7 @@ public class InnerClassRemover extends ContextVisitor {
     }
 
     public ClassDecl fixQualifiers(ClassDecl cd) {
-        return (ClassDecl) cd.visitChildren(new NodeVisitor() {
+        return (ClassDecl) cd.visitChildren(new NodeVisitor(lang()) {
             LocalInstance li;
 
             @Override
@@ -355,7 +355,7 @@ public class InnerClassRemover extends ContextVisitor {
     }
 
     public Expr fixQualifier(Expr e, final LocalInstance li) {
-        return (Expr) e.visit(new NodeVisitor() {
+        return (Expr) e.visit(new NodeVisitor(lang()) {
             @Override
             public Node leave(Node old, Node n, NodeVisitor v) {
                 if (n instanceof Field) {

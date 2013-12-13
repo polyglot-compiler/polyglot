@@ -41,6 +41,11 @@ import polyglot.util.Position;
 public interface NodeFactory {
 
     /**
+     * Returns the language associated with this NodeFactory.
+     */
+    JLDel lang();
+
+    /**
      * Returns a disambiguator for nodes from this factory.
      */
     Disamb disamb();

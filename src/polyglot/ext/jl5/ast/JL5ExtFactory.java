@@ -30,6 +30,10 @@ import polyglot.ast.ExtFactory;
 
 public interface JL5ExtFactory extends ExtFactory {
 
+    Ext extAmbTypeInstantiation();
+
+    Ext extAmbWildCard();
+
     Ext extEnumDecl();
 
     Ext extExtendedFor();

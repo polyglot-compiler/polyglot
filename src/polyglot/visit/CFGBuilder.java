@@ -35,6 +35,7 @@ import polyglot.ast.Branch;
 import polyglot.ast.Catch;
 import polyglot.ast.CodeNode;
 import polyglot.ast.CompoundStmt;
+import polyglot.ast.JLDel;
 import polyglot.ast.Labeled;
 import polyglot.ast.Loop;
 import polyglot.ast.Return;
@@ -58,6 +59,9 @@ import polyglot.visit.FlowGraph.Peer;
  * Class used to construct a CFG.
  */
 public class CFGBuilder<FlowItem extends DataFlow.Item> implements Copy {
+    /** The language this CFGBuilder operates on. */
+    private final JLDel lang;
+
     /** The flowgraph under construction. */
     protected FlowGraph<FlowItem> graph;
 
@@ -160,8 +164,9 @@ public class CFGBuilder<FlowItem extends DataFlow.Item> implements Copy {
      */
     protected boolean exceptionEdgesToFinally;
 
-    public CFGBuilder(TypeSystem ts, FlowGraph<FlowItem> graph,
+    public CFGBuilder(JLDel lang, TypeSystem ts, FlowGraph<FlowItem> graph,
             DataFlow<FlowItem> df) {
+        this.lang = lang;
         this.ts = ts;
         this.graph = graph;
         this.df = df;
@@ -171,6 +176,10 @@ public class CFGBuilder<FlowItem extends DataFlow.Item> implements Copy {
         this.skipInnermostCatches = false;
         this.errorEdgesToExitNode = false;
         this.exceptionEdgesToFinally = false;
+    }
+
+    public JLDel lang() {
+        return this.lang;
     }
 
     public FlowGraph<FlowItem> graph() {
@@ -568,7 +577,7 @@ public class CFGBuilder<FlowItem extends DataFlow.Item> implements Copy {
     }
 
     public void visitThrow(Term a) {
-        for (Type type : a.del().NodeOps(a).throwTypes(ts)) {
+        for (Type type : lang().NodeOps(a).throwTypes(ts)) {
             visitThrow(a, Term.EXIT, type);
         }
 

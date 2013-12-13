@@ -227,7 +227,7 @@ public class JL5ConstructorDeclExt extends JL5AnnotatedElementExt implements
 
         w.begin(0);
         for (AnnotationElem ae : ext.annotationElems()) {
-            ae.del().NodeOps(ae).prettyPrint(w, tr);
+            tr.lang().NodeOps(ae).prettyPrint(w, tr);
             w.newline();
         }
         w.end();
@@ -244,7 +244,7 @@ public class JL5ConstructorDeclExt extends JL5AnnotatedElementExt implements
             w.write("<");
             for (Iterator<ParamTypeNode> iter = ext.typeParams().iterator(); iter.hasNext();) {
                 ParamTypeNode ptn = iter.next();
-                ptn.del().NodeOps(ptn).prettyPrint(w, tr);
+                tr.lang().NodeOps(ptn).prettyPrint(w, tr);
                 if (iter.hasNext()) {
                     w.write(",");
                     w.allowBreak(0, " ");

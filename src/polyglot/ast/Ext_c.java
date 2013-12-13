@@ -186,19 +186,9 @@ public abstract class Ext_c implements Ext {
         return node().enterScope(c);
     }
 
-    /**
-     * Push a new scope for visiting the child node <code>child</code>. 
-     * The default behavior is to delegate the call to the child node, and let
-     * it add appropriate declarations that should be in scope. However,
-     * this method gives parent nodes have the ability to modify this behavior.
-     * @param child the child node about to be entered.
-     * @param c the current <code>Context</code>
-     * @return the <code>Context</code> to be used for visiting node 
-     *           <code>child</code>
-     */
     @Override
-    public Context enterChildScope(Node child, Context c) {
-        return node().enterChildScope(child, c);
+    public Context enterChildScope(JLDel lang, Node child, Context c) {
+        return node().enterChildScope(lang, child, c);
     }
 
     /**
@@ -397,26 +387,26 @@ public abstract class Ext_c implements Ext {
 
     /** Dump the AST for debugging. */
     @Override
-    public void dump(OutputStream os) {
-        node().dump(os);
+    public void dump(JLDel lang, OutputStream os) {
+        node().dump(lang, os);
     }
 
     /** Dump the AST for debugging. */
     @Override
-    public void dump(Writer w) {
-        node().dump(w);
+    public void dump(JLDel lang, Writer w) {
+        node().dump(lang, w);
     }
 
     /** Pretty-print the AST for debugging. */
     @Override
-    public void prettyPrint(OutputStream os) {
-        node().prettyPrint(os);
+    public void prettyPrint(JLDel lang, OutputStream os) {
+        node().prettyPrint(lang, os);
     }
 
     /** Pretty-print the AST for debugging. */
     @Override
-    public void prettyPrint(Writer w) {
-        node().prettyPrint(w);
+    public void prettyPrint(JLDel lang, Writer w) {
+        node().prettyPrint(lang, w);
     }
 
     /**

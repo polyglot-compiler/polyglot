@@ -42,16 +42,6 @@ import polyglot.visit.NodeVisitor;
  */
 public interface Node extends NodeOps, Copy, Serializable {
     /**
-     * Set the delegate of the node.
-     */
-    Node del(JLDel del);
-
-    /**
-     * Get the node's delegate.
-     */
-    JLDel del();
-
-    /**
      * Set the extension of the node.
      */
     Node ext(Ext ext);

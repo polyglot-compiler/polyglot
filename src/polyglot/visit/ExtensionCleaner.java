@@ -60,6 +60,7 @@ public class ExtensionCleaner extends NodeVisitor {
     protected ExtensionInfo javaExt;
 
     public ExtensionCleaner(ExtensionInfo javaExt) {
+        super(javaExt.nodeFactory().lang());
         this.javaExt = javaExt;
         this.nf = javaExt.nodeFactory();
         this.ts = javaExt.typeSystem();
@@ -68,7 +69,6 @@ public class ExtensionCleaner extends NodeVisitor {
     @Override
     public Node leave(Node old, Node n, NodeVisitor v) {
         n = n.ext(null);
-        n = n.del(null);
         n = strip(n);
         return n;
     }

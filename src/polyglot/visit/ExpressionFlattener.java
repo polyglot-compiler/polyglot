@@ -119,7 +119,7 @@ public class ExpressionFlattener extends NodeVisitor {
     protected final Set<Expr> dontFlatten = new HashSet<Expr>();
 
     /** Used to copy a whole AST subtree. */
-    protected final DeepCopy deepCopier = new DeepCopy();
+    protected final DeepCopy deepCopier;
 
     /** Whether to move initializers of created localDecls to assignments */
     protected boolean flatten_all_decls;
@@ -130,9 +130,11 @@ public class ExpressionFlattener extends NodeVisitor {
 
     public ExpressionFlattener(Job job, TypeSystem ts, NodeFactory nf,
             boolean flatten_all_decls) {
+        super(nf.lang());
         this.job = job;
         this.ts = ts;
         this.nf = nf;
+        this.deepCopier = new DeepCopy(nf.lang());
         this.flatten_all_decls = flatten_all_decls;
     }
 

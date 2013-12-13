@@ -92,7 +92,7 @@ public class AmbDiamondTypeNode extends TypeNode_c implements TypeNode,
 
     @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
-        base.del().NodeOps(base).prettyPrint(w, tr);
+        tr.lang().NodeOps(base).prettyPrint(w, tr);
         w.write("<>");
     }
 }

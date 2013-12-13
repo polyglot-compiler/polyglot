@@ -291,7 +291,8 @@ public class JL5Scheduler extends JLScheduler {
     public Goal TypeClosure(Job job) {
         Goal g =
                 internGoal(new VisitorGoal(job,
-                                           new polyglot.visit.TypeClosure()));
+                                           new polyglot.visit.TypeClosure(extInfo.nodeFactory()
+                                                                                 .lang())));
         try {
             g.addPrerequisiteGoal(TypeChecked(job), this);
         }

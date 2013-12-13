@@ -43,6 +43,7 @@ import polyglot.ast.FieldAssign;
 import polyglot.ast.FieldDecl;
 import polyglot.ast.Formal;
 import polyglot.ast.Id;
+import polyglot.ast.JLDel;
 import polyglot.ast.Local;
 import polyglot.ast.Node;
 import polyglot.ast.NodeFactory;
@@ -106,8 +107,9 @@ public class InnerClassRewriter extends InnerClassAbstractRemover {
         Map<ClassType, FieldInstance> fieldMap;
         Context outerContext;
 
-        ClassBodyTranslator(ParsedClassType ct,
+        ClassBodyTranslator(JLDel lang, ParsedClassType ct,
                 Map<ClassType, FieldInstance> fieldMap, Context context) {
+            super(lang);
             this.ct = ct;
             this.fieldMap = fieldMap;
             this.outerContext = context;
@@ -254,9 +256,9 @@ public class InnerClassRewriter extends InnerClassAbstractRemover {
                 // Translate the class body if any supertype (including ct itself)
                 // is an inner class.
                 Context innerContext =
-                        cd.del()
-                          .NodeOps(cd)
-                          .enterChildScope(cd.body(), context);
+                        lang().NodeOps(cd).enterChildScope(lang(),
+                                                           cd.body(),
+                                                           context);
                 cd = cd.body(translateClassBody(ct, cd.body(), innerContext));
             }
 
@@ -303,7 +305,8 @@ public class InnerClassRewriter extends InnerClassAbstractRemover {
         body = body.members(members);
 
         // Rewrite the class body.
-        ClassBodyTranslator v = new ClassBodyTranslator(ct, fieldMap, context);
+        ClassBodyTranslator v =
+                new ClassBodyTranslator(lang(), ct, fieldMap, context);
         v = (ClassBodyTranslator) v.begin();
         body = (ClassBody) body.visit(v);
 

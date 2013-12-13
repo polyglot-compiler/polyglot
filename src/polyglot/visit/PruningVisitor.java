@@ -26,6 +26,7 @@
 
 package polyglot.visit;
 
+import polyglot.ast.JLDel;
 import polyglot.ast.Node;
 
 /**
@@ -34,6 +35,10 @@ import polyglot.ast.Node;
  * NodeVisitor.enter method ensures no children will be visited.
  */
 public class PruningVisitor extends NodeVisitor {
+    public PruningVisitor(JLDel lang) {
+        super(lang);
+    }
+
     @Override
     public Node override(Node parent, Node n) {
         return n;

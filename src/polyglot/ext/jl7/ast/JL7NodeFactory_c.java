@@ -27,19 +27,23 @@ public class JL7NodeFactory_c extends JL5NodeFactory_c implements
         return (JL7ExtFactory) super.extFactory();
     }
 
-//    @Override
-//    public JL7DelFactory delFactory() {
-//        return (JL7DelFactory) super.delFactory();
-//    }
-//
+    @Override
+    public JL7Del lang() {
+        return (JL7Del) super.lang();
+    }
+
     @Override
     public AmbDiamondTypeNode AmbDiamondTypeNode(Position pos, TypeNode base) {
-        return new AmbDiamondTypeNode(pos, base);
+        AmbDiamondTypeNode n = new AmbDiamondTypeNode(pos, base);
+        n = (AmbDiamondTypeNode) n.ext(extFactory().extAmbDiamondTypeNode());
+        return n;
     }
 
     @Override
     public TypeNode AmbUnionType(Position pos, List<TypeNode> alternatives) {
-        return new AmbUnionType(pos, alternatives);
+        AmbUnionType n = new AmbUnionType(pos, alternatives);
+        n = (AmbUnionType) n.ext(extFactory().extAmbUnionType());
+        return n;
     }
 
     @Override
@@ -47,7 +51,6 @@ public class JL7NodeFactory_c extends JL5NodeFactory_c implements
             List<TypeNode> alternatives, Block body) {
         MultiCatch n = new MultiCatch_c(pos, formal, alternatives, body);
         n = (MultiCatch) n.ext(extFactory().extMultiCatch());
-        n = (MultiCatch) n.del(del);
         return n;
     }
 

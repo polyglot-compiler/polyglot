@@ -18,7 +18,7 @@ public class MakeNarrowingAssignmentsExplicit extends NodeVisitor {
     private NodeFactory nf;
 
     public MakeNarrowingAssignmentsExplicit(NodeFactory nf) {
-        super();
+        super(nf.lang());
         this.nf = nf;
     }
 

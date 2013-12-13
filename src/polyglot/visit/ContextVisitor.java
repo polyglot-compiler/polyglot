@@ -122,10 +122,10 @@ public class ContextVisitor extends ErrorHandlingVisitor {
      */
     protected Context enterScope(Node parent, Node n) {
         if (parent != null) {
-            return parent.del().NodeOps(parent).enterChildScope(n, context);
+            return lang().NodeOps(parent).enterChildScope(lang(), n, context);
         }
         // no parent node yet.
-        return n.del().NodeOps(n).enterScope(context);
+        return lang().NodeOps(n).enterScope(context);
     }
 
     /**
@@ -142,7 +142,7 @@ public class ContextVisitor extends ErrorHandlingVisitor {
      * visiting the node.
      */
     protected void addDecls(Node n) {
-        n.del().NodeOps(n).addDecls(context);
+        lang().NodeOps(n).addDecls(context);
     }
 
     @Override
@@ -156,7 +156,7 @@ public class ContextVisitor extends ErrorHandlingVisitor {
             Report.report(5, "enter(" + n + ")");
 
         if (prune) {
-            return new PruningVisitor();
+            return new PruningVisitor(lang());
         }
 
         try {
@@ -189,7 +189,7 @@ public class ContextVisitor extends ErrorHandlingVisitor {
             if (this.rethrowMissingDependencies) {
                 throw e;
             }
-            return new PruningVisitor();
+            return new PruningVisitor(lang());
         }
     }
 

@@ -720,7 +720,7 @@ public abstract class Scheduler {
                 System.err.println("Pretty-printing AST for " + job + " after "
                         + pass.name());
 
-                job.ast().prettyPrint(System.err);
+                job.ast().prettyPrint(extInfo.nodeFactory().lang(), System.err);
             }
 
             // dump this pass if we need to.
@@ -731,7 +731,7 @@ public abstract class Scheduler {
                 System.err.println("Dumping AST for " + job + " after "
                         + pass.name());
 
-                job.ast().dump(System.err);
+                job.ast().dump(extInfo.nodeFactory().lang(), System.err);
             }
 
             // This seems to work around a VM bug on linux with JDK

@@ -78,11 +78,11 @@ public class JL5NodeFactory_c extends NodeFactory_c implements JL5NodeFactory {
         return (JL5ExtFactory) super.extFactory();
     }
 
-//    @Override
-//    public JL5DelFactory delFactory() {
-//        return (JL5DelFactory) super.delFactory();
-//    }
-//
+    @Override
+    public JL5Del lang() {
+        return (JL5Del) super.lang();
+    }
+
     @Override
     public CanonicalTypeNode CanonicalTypeNode(Position pos, Type type) {
         if (!type.isCanonical()) {
@@ -102,7 +102,6 @@ public class JL5NodeFactory_c extends NodeFactory_c implements JL5NodeFactory {
         ClassDecl n =
                 new ClassDecl_c(pos, flags, name, superType, interfaces, body);
         n = (ClassDecl) n.ext(extFactory().extEnumDecl());
-        n = (ClassDecl) n.del(del);
         JL5EnumDeclExt ext = (JL5EnumDeclExt) JL5Ext.ext(n);
         ext.annotations = CollectionUtil.nonNullList(annotations);
         return n;
@@ -115,7 +114,6 @@ public class JL5NodeFactory_c extends NodeFactory_c implements JL5NodeFactory {
         AnnotationElemDecl n =
                 new AnnotationElemDecl_c(pos, flags, type, name, defaultValue);
         n = (AnnotationElemDecl) n.ext(extFactory().extAnnotationElemDecl());
-        n = (AnnotationElemDecl) n.del(del);
         return n;
     }
 
@@ -124,7 +122,6 @@ public class JL5NodeFactory_c extends NodeFactory_c implements JL5NodeFactory {
             List<ElementValuePair> elements) {
         AnnotationElem n = new AnnotationElem_c(pos, name, elements);
         n = (AnnotationElem) n.ext(extFactory().extNormalAnnotationElem());
-        n = (AnnotationElem) n.del(del);
         return n;
     }
 
@@ -146,7 +143,6 @@ public class JL5NodeFactory_c extends NodeFactory_c implements JL5NodeFactory {
     public ElementValuePair ElementValuePair(Position pos, Id name, Term value) {
         ElementValuePair n = new ElementValuePair_c(pos, name, value);
         n = (ElementValuePair) n.ext(extFactory().extElementValuePair());
-        n = (ElementValuePair) n.del(del);
         return n;
     }
 
@@ -183,7 +179,6 @@ public class JL5NodeFactory_c extends NodeFactory_c implements JL5NodeFactory {
             Stmt stmt) {
         ExtendedFor n = new ExtendedFor_c(pos, decl, expr, stmt);
         n = (ExtendedFor) n.ext(extFactory().extExtendedFor());
-        n = (ExtendedFor) n.del(del);
         return n;
     }
 
@@ -194,7 +189,6 @@ public class JL5NodeFactory_c extends NodeFactory_c implements JL5NodeFactory {
         EnumConstantDecl n =
                 new EnumConstantDecl_c(pos, flags, name, args, body);
         n = (EnumConstantDecl) n.ext(extFactory().extEnumConstantDecl());
-        n = (EnumConstantDecl) n.del(del);
         EnumConstantDeclExt ext = (EnumConstantDeclExt) JL5Ext.ext(n);
         ext.annotations = CollectionUtil.nonNullList(annotations);
         return n;
@@ -210,7 +204,6 @@ public class JL5NodeFactory_c extends NodeFactory_c implements JL5NodeFactory {
     public EnumConstant EnumConstant(Position pos, Receiver target, Id name) {
         EnumConstant n = new EnumConstant_c(pos, target, name);
         n = (EnumConstant) n.ext(extFactory().extEnumConstant());
-        n = (EnumConstant) n.del(del);
         return n;
     }
 
@@ -333,7 +326,6 @@ public class JL5NodeFactory_c extends NodeFactory_c implements JL5NodeFactory {
             Id id) {
         ParamTypeNode n = new ParamTypeNode_c(pos, bounds, id);
         n = (ParamTypeNode) n.ext(extFactory().extParamTypeNode());
-        n = (ParamTypeNode) n.del(del);
         return n;
     }
 
@@ -342,6 +334,8 @@ public class JL5NodeFactory_c extends NodeFactory_c implements JL5NodeFactory {
             TypeNode base, List<TypeNode> typeArguments) {
         AmbTypeInstantiation n =
                 new AmbTypeInstantiation(pos, base, typeArguments);
+        n =
+                (AmbTypeInstantiation) n.ext(extFactory().extAmbTypeInstantiation());
         return n;
     }
 
@@ -370,18 +364,21 @@ public class JL5NodeFactory_c extends NodeFactory_c implements JL5NodeFactory {
     @Override
     public AmbWildCard AmbWildCard(Position pos) {
         AmbWildCard n = new AmbWildCard(pos);
+        n = (AmbWildCard) n.ext(extFactory().extAmbWildCard());
         return n;
     }
 
     @Override
     public AmbWildCard AmbWildCardExtends(Position pos, TypeNode extendsNode) {
         AmbWildCard n = new AmbWildCard(pos, extendsNode, true);
+        n = (AmbWildCard) n.ext(extFactory().extAmbWildCard());
         return n;
     }
 
     @Override
     public AmbWildCard AmbWildCardSuper(Position pos, TypeNode superNode) {
         AmbWildCard n = new AmbWildCard(pos, superNode, false);
+        n = (AmbWildCard) n.ext(extFactory().extAmbWildCard());
         return n;
     }
 
@@ -517,7 +514,6 @@ public class JL5NodeFactory_c extends NodeFactory_c implements JL5NodeFactory {
         ElementValueArrayInit n = new ElementValueArrayInit_c(pos, elements);
         n =
                 (ElementValueArrayInit) n.ext(extFactory().extElementValueArrayInit());
-        n = (ElementValueArrayInit) n.del(del);
         return n;
     }
 

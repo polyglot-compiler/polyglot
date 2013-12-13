@@ -50,6 +50,7 @@ public class ErrorHandlingVisitor extends HaltingVisitor {
     protected NodeFactory nf;
 
     public ErrorHandlingVisitor(Job job, TypeSystem ts, NodeFactory nf) {
+        super(nf.lang());
         this.job = job;
         this.ts = ts;
         this.nf = nf;

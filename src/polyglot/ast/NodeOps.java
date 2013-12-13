@@ -77,12 +77,13 @@ public interface NodeOps {
      * The default behavior is to delegate the call to the child node, and let
      * it add appropriate declarations that should be in scope. However,
      * this method gives parent nodes have the ability to modify this behavior.
+     * @param lang The language the visitor operates on.
      * @param child The child node about to be entered.
      * @param c The current <code>Context</code>
      * @return the <code>Context</code> to be used for visiting node 
      *           <code>child</code>
      */
-    public Context enterChildScope(Node child, Context c);
+    public Context enterChildScope(JLDel lang, Node child, Context c);
 
     /**
      * Add any declarations to the context that should be in scope when
@@ -287,16 +288,16 @@ public interface NodeOps {
     List<Type> throwTypes(TypeSystem ts);
 
     /** Dump the AST for debugging. */
-    public void dump(OutputStream os);
+    public void dump(JLDel lang, OutputStream os);
 
     /** Dump the AST for debugging. */
-    public void dump(Writer w);
+    public void dump(JLDel lang, Writer w);
 
     /** Pretty-print the AST for debugging. */
-    public void prettyPrint(OutputStream os);
+    public void prettyPrint(JLDel lang, OutputStream os);
 
     /** Pretty-print the AST for debugging. */
-    public void prettyPrint(Writer w);
+    public void prettyPrint(JLDel lang, Writer w);
 
     /**
      * Pretty-print the AST using the given code writer.

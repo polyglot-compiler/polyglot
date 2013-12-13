@@ -904,7 +904,7 @@ public abstract class DataFlow<FlowItem extends DataFlow.Item> extends
      */
     protected CFGBuilder<FlowItem> createCFGBuilder(TypeSystem ts,
             FlowGraph<FlowItem> g) {
-        return new CFGBuilder<FlowItem>(ts, g, this);
+        return new CFGBuilder<FlowItem>(lang(), ts, g, this);
     }
 
     /**

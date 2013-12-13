@@ -54,7 +54,7 @@ public class JL5FieldDeclExt extends JL5AnnotatedElementExt {
         JL5AnnotatedElementExt ext =
                 (JL5AnnotatedElementExt) JL5Ext.ext(this.node());
         for (AnnotationElem ae : ext.annotationElems()) {
-            ae.del().NodeOps(ae).prettyPrint(w, tr);
+            tr.lang().NodeOps(ae).prettyPrint(w, tr);
             w.newline();
         }
 

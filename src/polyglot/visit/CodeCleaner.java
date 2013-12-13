@@ -57,6 +57,7 @@ public class CodeCleaner extends NodeVisitor {
      * @param nf  The node factory to be used when generating new nodes.
      **/
     public CodeCleaner(NodeFactory nf) {
+        super(nf.lang());
         this.nf = nf;
         this.alphaRen = new AlphaRenamer(nf);
     }
@@ -148,7 +149,7 @@ public class CodeCleaner extends NodeVisitor {
      **/
     protected Set<String> labelRefs(Block b) {
         final Set<String> result = new HashSet<String>();
-        b.visit(new NodeVisitor() {
+        b.visit(new NodeVisitor(lang()) {
             @Override
             public Node leave(Node old, Node n, NodeVisitor v) {
                 if (n instanceof Branch) {

@@ -41,6 +41,41 @@ public abstract class JL5AbstractExtFactory_c extends AbstractExtFactory_c
     }
 
     @Override
+    public final Ext extAmbTypeInstantiation() {
+        Ext e = extAmbTypeInstantiationImpl();
+
+        if (nextExtFactory() != null) {
+            Ext e2;
+            if (nextExtFactory() instanceof JL5ExtFactory) {
+                e2 =
+                        ((JL5ExtFactory) nextExtFactory()).extAmbTypeInstantiation();
+            }
+            else {
+                e2 = nextExtFactory().extTypeNode();
+            }
+            e = composeExts(e, e2);
+        }
+        return postExtAmbTypeInstantiation(e);
+    }
+
+    @Override
+    public final Ext extAmbWildCard() {
+        Ext e = extAmbWildCardImpl();
+
+        if (nextExtFactory() != null) {
+            Ext e2;
+            if (nextExtFactory() instanceof JL5ExtFactory) {
+                e2 = ((JL5ExtFactory) nextExtFactory()).extAmbWildCard();
+            }
+            else {
+                e2 = nextExtFactory().extTypeNode();
+            }
+            e = composeExts(e, e2);
+        }
+        return postExtAmbWildCard(e);
+    }
+
+    @Override
     public final Ext extEnumDecl() {
         Ext e = extEnumDeclImpl();
 
@@ -235,6 +270,10 @@ public abstract class JL5AbstractExtFactory_c extends AbstractExtFactory_c
         return this.extTypeNodeImpl();
     }
 
+    protected Ext extAmbWildCardImpl() {
+        return this.extTypeNodeImpl();
+    }
+
     protected Ext extEnumDeclImpl() {
         return new JL5EnumDeclExt();
     }
@@ -256,6 +295,10 @@ public abstract class JL5AbstractExtFactory_c extends AbstractExtFactory_c
     }
 
     public Ext postExtAmbTypeInstantiation(Ext ext) {
+        return this.postExtTypeNode(ext);
+    }
+
+    public Ext postExtAmbWildCard(Ext ext) {
         return this.postExtTypeNode(ext);
     }
 

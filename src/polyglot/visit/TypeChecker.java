@@ -26,6 +26,7 @@
 
 package polyglot.visit;
 
+import polyglot.ast.JLDel;
 import polyglot.ast.Node;
 import polyglot.ast.NodeFactory;
 import polyglot.frontend.Job;
@@ -56,7 +57,7 @@ public class TypeChecker extends DisambiguationDriver {
             if (Report.should_report(Report.visit, 2))
                 Report.report(2, ">> " + this + "::override " + n);
 
-            Node m = n.del().NodeOps(n).typeCheckOverride(parent, this);
+            Node m = lang().NodeOps(n).typeCheckOverride(parent, this);
 
             if (Report.should_report(Report.visit, 2))
                 Report.report(2, "<< " + this + "::override " + n + " -> " + m);
@@ -100,7 +101,7 @@ public class TypeChecker extends DisambiguationDriver {
         if (Report.should_report(Report.visit, 2))
             Report.report(2, ">> " + this + "::enter " + n);
 
-        TypeChecker v = (TypeChecker) n.del().NodeOps(n).typeCheckEnter(this);
+        TypeChecker v = (TypeChecker) lang().NodeOps(n).typeCheckEnter(this);
 
         if (Report.should_report(Report.visit, 2))
             Report.report(2, "<< " + this + "::enter " + n + " -> " + v);
@@ -110,6 +111,10 @@ public class TypeChecker extends DisambiguationDriver {
 
     protected static class AmbChecker extends NodeVisitor {
         public boolean amb;
+
+        public AmbChecker(JLDel lang) {
+            super(lang);
+        }
 
         @Override
         public Node override(Node n) {
@@ -129,20 +134,20 @@ public class TypeChecker extends DisambiguationDriver {
         if (Report.should_report(Report.visit, 2))
             Report.report(2, ">> " + this + "::leave " + n);
 
-        AmbChecker ac = new AmbChecker();
-        n.del().NodeOps(n).visitChildren(ac);
+        AmbChecker ac = new AmbChecker(lang());
+        lang().NodeOps(n).visitChildren(ac);
 
         Node m = n;
 
         if (!ac.amb && m.isDisambiguated()) {
 //          System.out.println("running typeCheck for " + m);
             TypeChecker childTc = (TypeChecker) v;
-            m = m.del().NodeOps(m).typeCheck(childTc);
+            m = lang().NodeOps(m).typeCheck(childTc);
 
             if (checkConstants) {
                 ConstantChecker cc = new ConstantChecker(job, ts, nf);
                 cc = (ConstantChecker) cc.context(childTc.context());
-                m = m.del().NodeOps(m).checkConstants(cc);
+                m = lang().NodeOps(m).checkConstants(cc);
             }
 
 //            if (! m.isTypeChecked()) {

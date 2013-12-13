@@ -26,6 +26,7 @@
 
 package polyglot.visit;
 
+import polyglot.ast.JLDel;
 import polyglot.ast.Node;
 import polyglot.util.Copy;
 import polyglot.util.InternalCompilerError;
@@ -48,6 +49,17 @@ import polyglot.util.StringUtil;
  * @see polyglot.ast.Node
  */
 public abstract class NodeVisitor implements Copy {
+    /** The language this NodeVisitor operates on. */
+    private final JLDel lang;
+
+    protected NodeVisitor(JLDel lang) {
+        this.lang = lang;
+    }
+
+    public JLDel lang() {
+        return this.lang;
+    }
+
     /**
      * Given a tree rooted at <code>n</code>, the visitor has the option of
      * overriding all traversal of the children of <code>n</code>. If no
@@ -275,7 +287,7 @@ public abstract class NodeVisitor implements Copy {
         }
 
         @SuppressWarnings("unchecked")
-        N n = (N) child.del().NodeOps(child).visitChildren(v_);
+        N n = (N) lang().NodeOps(child).visitChildren(v_);
 
         if (n == null) {
             throw new InternalCompilerError("Node.visitChildren() returned null.");

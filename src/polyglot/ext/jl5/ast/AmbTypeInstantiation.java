@@ -207,12 +207,12 @@ public class AmbTypeInstantiation extends TypeNode_c implements TypeNode,
 
     @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
-        base.del().NodeOps(base).prettyPrint(w, tr);
+        tr.lang().NodeOps(base).prettyPrint(w, tr);
         w.write("<");
         Iterator<TypeNode> iter = typeArguments.iterator();
         while (iter.hasNext()) {
             TypeNode tn = iter.next();
-            tn.del().NodeOps(tn).prettyPrint(w, tr);
+            tr.lang().NodeOps(tn).prettyPrint(w, tr);
 
             if (iter.hasNext()) {
                 w.write(",");

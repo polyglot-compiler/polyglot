@@ -314,6 +314,7 @@ public class InnerTranslator extends NodeVisitor {
     }
 
     public InnerTranslator(TypeSystem ts, NodeFactory nf) {
+        super(nf.lang());
         this.ts = ts;
         this.nf = nf;
         classContext = new Stack<ClassInfo>();

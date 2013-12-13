@@ -31,6 +31,7 @@ import java.util.List;
 
 import polyglot.ast.ClassDecl;
 import polyglot.ast.ClassDeclOps;
+import polyglot.ast.JLDel;
 import polyglot.ast.Node;
 import polyglot.ast.NodeFactory;
 import polyglot.ast.Node_c;
@@ -188,7 +189,7 @@ public class JL5ClassDeclExt extends JL5AnnotatedElementExt implements
      * @see polyglot.ast.NodeOps#enterScope(polyglot.types.Context)
      */
     @Override
-    public Context enterChildScope(Node child, Context c) {
+    public Context enterChildScope(JLDel lang, Node child, Context c) {
         ClassDecl n = (ClassDecl) this.node();
         JL5ClassDeclExt ext = (JL5ClassDeclExt) JL5Ext.ext(n);
 
@@ -206,7 +207,7 @@ public class JL5ClassDeclExt extends JL5AnnotatedElementExt implements
         for (ParamTypeNode tn : ext.paramTypes()) {
             ((JL5Context) c).addTypeVariable((TypeVariable) tn.type());
         }
-        return child.del().NodeOps(child).enterScope(c);
+        return lang.NodeOps(child).enterScope(c);
     }
 
     @Override
@@ -332,7 +333,7 @@ public class JL5ClassDeclExt extends JL5AnnotatedElementExt implements
 
         w.begin(0);
         for (AnnotationElem ae : ext.annotationElems()) {
-            ae.del().NodeOps(ae).prettyPrint(w, tr);
+            tr.lang().NodeOps(ae).prettyPrint(w, tr);
             w.newline();
         }
         w.end();
@@ -349,7 +350,7 @@ public class JL5ClassDeclExt extends JL5AnnotatedElementExt implements
             w.write("<");
             for (Iterator<ParamTypeNode> iter = ext.paramTypes.iterator(); iter.hasNext();) {
                 ParamTypeNode ptn = iter.next();
-                ptn.del().NodeOps(ptn).prettyPrint(w, tr);
+                tr.lang().NodeOps(ptn).prettyPrint(w, tr);
                 if (iter.hasNext()) {
                     w.write(", ");
                 }

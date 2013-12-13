@@ -37,6 +37,7 @@ import polyglot.ast.ClassMember;
 import polyglot.ast.Expr;
 import polyglot.ast.Formal;
 import polyglot.ast.Import;
+import polyglot.ast.JLDel;
 import polyglot.ast.LocalDecl;
 import polyglot.ast.Node;
 import polyglot.ast.SourceFile;
@@ -64,16 +65,17 @@ public class NodeScrambler extends NodeVisitor {
     protected boolean scrambled = false;
     protected CodeWriter cw;
 
-    public NodeScrambler() {
-        this(new Random().nextLong());
+    public NodeScrambler(JLDel lang) {
+        this(lang, new Random().nextLong());
     }
 
     /**
      * Create a new <code>NodeScrambler</code> with the given random number
      * generator seed.
      */
-    public NodeScrambler(long seed) {
-        this.fp = new FirstPass();
+    public NodeScrambler(JLDel lang, long seed) {
+        super(lang);
+        this.fp = new FirstPass(lang);
 
         this.pairs = new HashMap<Node, LinkedList<Node>>();
         this.nodes = new LinkedList<Node>();
@@ -90,6 +92,10 @@ public class NodeScrambler extends NodeVisitor {
      * run before the main <code>NodeScrambler</code> visits the tree.</b>
      */
     public class FirstPass extends NodeVisitor {
+        public FirstPass(JLDel lang) {
+            super(lang);
+        }
+
         @Override
         public NodeVisitor enter(Node n) {
             @SuppressWarnings("unchecked")
@@ -125,9 +131,9 @@ public class NodeScrambler extends NodeVisitor {
 
                 try {
                     System.err.println("Replacing:");
-                    n.del().NodeOps(n).dump(System.err);
+                    lang().NodeOps(n).dump(lang(), System.err);
                     System.err.println("With:");
-                    m.del().NodeOps(m).dump(System.err);
+                    lang().NodeOps(m).dump(lang(), System.err);
                 }
                 catch (Exception e) {
                     e.printStackTrace();

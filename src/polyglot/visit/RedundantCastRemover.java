@@ -32,6 +32,7 @@ import java.util.List;
 
 import polyglot.ast.Cast;
 import polyglot.ast.Expr;
+import polyglot.ast.JLDel;
 import polyglot.ast.Node;
 import polyglot.ast.ProcedureCall;
 import polyglot.types.Type;
@@ -42,8 +43,8 @@ import polyglot.types.Type;
  * The AST must be type-checked before using this visitor.
  */
 public class RedundantCastRemover extends NodeVisitor {
-    public RedundantCastRemover() {
-        super();
+    public RedundantCastRemover(JLDel lang) {
+        super(lang);
     }
 
     @Override

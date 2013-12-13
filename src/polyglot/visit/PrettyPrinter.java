@@ -28,6 +28,7 @@ package polyglot.visit;
 
 import java.io.IOException;
 
+import polyglot.ast.JLDel;
 import polyglot.ast.Node;
 import polyglot.util.CodeWriter;
 
@@ -39,10 +40,16 @@ import polyglot.util.CodeWriter;
  *     new PrettyPrinter().printAst(node, new CodeWriter(out));
  */
 public class PrettyPrinter {
+    private final JLDel lang;
     protected boolean appendSemicolon = true;
     protected boolean printType = true;
 
-    public PrettyPrinter() {
+    public PrettyPrinter(JLDel lang) {
+        this.lang = lang;
+    }
+
+    public JLDel lang() {
+        return this.lang;
     }
 
     /** Flag indicating whether to print a ';' after certain statements.
@@ -81,7 +88,7 @@ public class PrettyPrinter {
      */
     public void print(Node parent, Node child, CodeWriter w) {
         if (child != null) {
-            child.del().NodeOps(child).prettyPrint(w, this);
+            lang().NodeOps(child).prettyPrint(w, this);
         }
     }
 

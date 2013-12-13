@@ -63,6 +63,7 @@ public class LoopNormalizer extends NodeVisitor {
     protected final NodeFactory nf;
 
     public LoopNormalizer(Job job, TypeSystem ts, NodeFactory nf) {
+        super(nf.lang());
         this.job = job;
         this.ts = ts;
         this.nf = nf;

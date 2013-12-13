@@ -47,9 +47,7 @@ public class AmbWildCard extends TypeNode_c implements TypeNode, Ambiguous {
     private boolean isExtendsConstraint;
 
     public AmbWildCard(Position pos) {
-        super(pos);
-        constraint = null;
-        isExtendsConstraint = true;
+        this(pos, null, true);
     }
 
     public AmbWildCard(Position pos, TypeNode constraint,
@@ -90,7 +88,7 @@ public class AmbWildCard extends TypeNode_c implements TypeNode, Ambiguous {
             w.write(" ");
             w.write(this.isExtendsConstraint ? "extends" : "super");
             w.write(" ");
-            constraint.del().NodeOps(constraint).prettyPrint(w, tr);
+            tr.lang().NodeOps(constraint).prettyPrint(w, tr);
         }
     }
 

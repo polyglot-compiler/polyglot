@@ -25,14 +25,15 @@
  ******************************************************************************/
 package polyglot.visit;
 
+import polyglot.ast.JLDel;
 import polyglot.ast.Node;
 
 /**
  * Returns a deep copy of the AST.
  */
 public class DeepCopy extends HaltingVisitor {
-    public DeepCopy() {
-        super();
+    public DeepCopy(JLDel lang) {
+        super(lang);
     }
 
     @Override

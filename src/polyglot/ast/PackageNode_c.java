@@ -106,9 +106,10 @@ public class PackageNode_c extends Node_c implements PackageNode {
     @Override
     public Node copy(ExtensionInfo extInfo) throws SemanticException {
         PackageNode pn =
-                (PackageNode) this.del()
-                                  .NodeOps(this)
-                                  .copy(extInfo.nodeFactory());
+                (PackageNode) extInfo.nodeFactory()
+                                     .lang()
+                                     .NodeOps(this)
+                                     .copy(extInfo.nodeFactory());
         if (pn.package_() != null) {
             pn =
                     pn.package_(extInfo.typeSystem()

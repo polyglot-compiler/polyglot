@@ -38,11 +38,7 @@ public class JL5SpecialExt extends JL5Ext {
     @Override
     public Node typeCheckOverride(Node parent, TypeChecker tc)
             throws SemanticException {
-        Special n =
-                (Special) this.node()
-                              .del()
-                              .NodeOps(this.node())
-                              .visitChildren(tc);
+        Special n = (Special) tc.lang().NodeOps(this.node()).visitChildren(tc);
         if (n.qualifier() != null && n.qualifier().type() instanceof RawClass) {
             // we got a raw class. Fix it up
             RawClass rc = (RawClass) n.qualifier().type();

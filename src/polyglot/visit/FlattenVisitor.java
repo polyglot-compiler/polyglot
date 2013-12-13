@@ -65,6 +65,7 @@ public class FlattenVisitor extends NodeVisitor {
     protected LinkedList<List<Stmt>> stack;
 
     public FlattenVisitor(TypeSystem ts, NodeFactory nf) {
+        super(nf.lang());
         this.ts = ts;
         this.nf = nf;
         stack = new LinkedList<List<Stmt>>();

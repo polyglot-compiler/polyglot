@@ -75,29 +75,6 @@ public abstract class Node_c implements Node {
     }
 
     @Override
-    public JLDel del() {
-        return del != null ? del : JLDel_c.instance;
-    }
-
-    @Override
-    public Node del(JLDel del) {
-        if (this.del == del) {
-            return this;
-        }
-
-        JLDel old = this.del;
-        this.del = null;
-
-        Node_c n = (Node_c) copy();
-
-        n.del = del != this ? del : null;
-
-        this.del = old;
-
-        return n;
-    }
-
-    @Override
     public Ext ext(int n) {
         if (n < 1) throw new InternalCompilerError("n must be >= 1");
         if (n == 1) return ext();
@@ -222,7 +199,7 @@ public abstract class Node_c implements Node {
                 throw new InternalCompilerError("NodeVisitor.enter() returned null.");
             }
 
-            n = this.del().NodeOps(this).visitChildren(v_);
+            n = v.lang().NodeOps(this).visitChildren(v_);
 
             if (n == null) {
                 throw new InternalCompilerError("Node_c.visitChildren() returned null.");
@@ -298,8 +275,8 @@ public abstract class Node_c implements Node {
      *           <code>child</code>
      */
     @Override
-    public Context enterChildScope(Node child, Context c) {
-        return child.del().NodeOps(child).enterScope(c);
+    public Context enterChildScope(JLDel lang, Node child, Context c) {
+        return lang.NodeOps(child).enterScope(c);
     }
 
     /**
@@ -376,7 +353,7 @@ public abstract class Node_c implements Node {
     @Override
     public Node exceptionCheck(ExceptionChecker ec) throws SemanticException {
         List<? extends Type> l =
-                this.del().NodeOps(this).throwTypes(ec.typeSystem());
+                ec.lang().NodeOps(this).throwTypes(ec.typeSystem());
         for (Type exc : l) {
             ec.throwsException(exc, position());
         }
@@ -390,9 +367,9 @@ public abstract class Node_c implements Node {
 
     /** Dump the AST for debugging. */
     @Override
-    public void dump(OutputStream os) {
+    public void dump(JLDel lang, OutputStream os) {
         CodeWriter cw = Compiler.createCodeWriter(os);
-        NodeVisitor dumper = new DumpAst(cw);
+        NodeVisitor dumper = new DumpAst(lang, cw);
         dumper = dumper.begin();
         this.visit(dumper);
         cw.newline();
@@ -401,9 +378,9 @@ public abstract class Node_c implements Node {
 
     /** Dump the AST for debugging. */
     @Override
-    public void dump(Writer w) {
+    public void dump(JLDel lang, Writer w) {
         CodeWriter cw = Compiler.createCodeWriter(w);
-        NodeVisitor dumper = new DumpAst(cw);
+        NodeVisitor dumper = new DumpAst(lang, cw);
         dumper = dumper.begin();
         this.visit(dumper);
         cw.newline();
@@ -412,10 +389,10 @@ public abstract class Node_c implements Node {
 
     /** Pretty-print the AST for debugging. */
     @Override
-    public void prettyPrint(OutputStream os) {
+    public void prettyPrint(JLDel lang, OutputStream os) {
         try {
             CodeWriter cw = Compiler.createCodeWriter(os);
-            this.del().NodeOps(this).prettyPrint(cw, new PrettyPrinter());
+            lang.NodeOps(this).prettyPrint(cw, new PrettyPrinter(lang));
             cw.flush();
         }
         catch (java.io.IOException e) {
@@ -424,10 +401,10 @@ public abstract class Node_c implements Node {
 
     /** Pretty-print the AST for debugging. */
     @Override
-    public void prettyPrint(Writer w) {
+    public void prettyPrint(JLDel lang, Writer w) {
         try {
             CodeWriter cw = Compiler.createCodeWriter(w);
-            this.del().NodeOps(this).prettyPrint(cw, new PrettyPrinter());
+            lang.NodeOps(this).prettyPrint(cw, new PrettyPrinter(lang));
             cw.flush();
         }
         catch (java.io.IOException e) {
@@ -464,21 +441,12 @@ public abstract class Node_c implements Node {
     @Override
     public void translate(CodeWriter w, Translator tr) {
         // By default, just rely on the pretty printer.
-        this.del().NodeOps(this).prettyPrint(w, tr);
+        tr.lang().NodeOps(this).prettyPrint(w, tr);
     }
 
     @Override
     public void dump(CodeWriter w) {
         w.write(StringUtil.getShortNameComponent(getClass().getName()));
-
-        w.allowBreak(4, " ");
-        w.begin(0);
-        w.write("(del ");
-        if (del() == this)
-            w.write("*");
-        else w.write(del().toString());
-        w.write(")");
-        w.end();
 
         Ext ext = ext();
         while (true) {
@@ -527,7 +495,10 @@ public abstract class Node_c implements Node {
 
     @Override
     public Node copy(ExtensionInfo extInfo) throws SemanticException {
-        return this.del().NodeOps(this).copy(extInfo.nodeFactory());
+        return extInfo.nodeFactory()
+                      .lang()
+                      .NodeOps(this)
+                      .copy(extInfo.nodeFactory());
     }
 
 }

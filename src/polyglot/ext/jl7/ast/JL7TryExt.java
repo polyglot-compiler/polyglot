@@ -5,6 +5,7 @@ import java.util.List;
 
 import polyglot.ast.Block;
 import polyglot.ast.Catch;
+import polyglot.ast.JLDel;
 import polyglot.ast.Local;
 import polyglot.ast.LocalAssign;
 import polyglot.ast.Node;
@@ -28,8 +29,8 @@ public class JL7TryExt extends JL7Ext implements JL7TryOps {
         Block b =
                 this.superDel().TryOps(this.node()).exceptionCheckTryBlock(ec);
 
-        ((JL7Del) this.node().del()).TryOps(this.node())
-                                    .checkPreciseRethrows(ec.typeSystem(), b);
+        ((JL7Del) ec.lang()).TryOps(this.node())
+                            .checkPreciseRethrows(ec.lang(), ec.typeSystem(), b);
 
         return b;
     }
@@ -59,7 +60,7 @@ public class JL7TryExt extends JL7Ext implements JL7TryOps {
     }
 
     @Override
-    public void checkPreciseRethrows(TypeSystem ts, Block tryBlock) {
+    public void checkPreciseRethrows(JLDel lang, TypeSystem ts, Block tryBlock) {
         Try n = (Try) this.node();
 
         // For each catch block, identify which exceptions can get to it.
@@ -74,9 +75,8 @@ public class JL7TryExt extends JL7Ext implements JL7TryOps {
             // The exceptions that can reach cb are the exceptions in thrown
             // that may be assignable to catchType.
 
-            ((JL7Del) this.node().del()).TryOps(this.node())
-                                        .preciseRethrowsForCatchBlock(cb,
-                                                                      thrown);
+            ((JL7Del) lang).TryOps(this.node())
+                           .preciseRethrowsForCatchBlock(lang, cb, thrown);
 
             thrown.remove(catchType);
         }
@@ -84,7 +84,8 @@ public class JL7TryExt extends JL7Ext implements JL7TryOps {
     }
 
     @Override
-    public void preciseRethrowsForCatchBlock(Catch cb, SubtypeSet reaching) {
+    public void preciseRethrowsForCatchBlock(JLDel lang, Catch cb,
+            SubtypeSet reaching) {
         List<Type> s = new ArrayList<Type>();
         for (Type t : reaching) {
             if (cb.catchType().isSubtype(t)) {
@@ -98,12 +99,12 @@ public class JL7TryExt extends JL7Ext implements JL7TryOps {
         }
         // now, if cb.formal() is final, or effectively final, then
         // set the throwsSet of any rethrow.
-        if (isFinalFormal(cb)) {
-            setThrowsTypes(cb.formal().localInstance(), s, cb.body());
+        if (isFinalFormal(lang, cb)) {
+            setThrowsTypes(lang, cb.formal().localInstance(), s, cb.body());
         }
     }
 
-    protected boolean isFinalFormal(Catch cb) {
+    protected boolean isFinalFormal(JLDel lang, Catch cb) {
         if (cb.formal().localInstance().flags().isFinal()
                 || cb instanceof MultiCatch) {
             // explcitly final
@@ -111,7 +112,7 @@ public class JL7TryExt extends JL7Ext implements JL7TryOps {
         }
         // Check to see if the local is effectively final.
         EffectivelyFinalVisitor v =
-                new EffectivelyFinalVisitor(cb.formal().localInstance());
+                new EffectivelyFinalVisitor(lang, cb.formal().localInstance());
         cb.body().visit(v);
 
         return v.isEffectivelyFinal();
@@ -121,7 +122,8 @@ public class JL7TryExt extends JL7Ext implements JL7TryOps {
         boolean isEffectivelyFinal;
         LocalInstance li;
 
-        public EffectivelyFinalVisitor(LocalInstance li) {
+        public EffectivelyFinalVisitor(JLDel lang, LocalInstance li) {
+            super(lang);
             this.li = li;
             this.isEffectivelyFinal = true;
         }
@@ -143,9 +145,9 @@ public class JL7TryExt extends JL7Ext implements JL7TryOps {
 
     }
 
-    protected void setThrowsTypes(LocalInstance localInstance, List<Type> s,
-            Block b) {
-        SetThrowSetVisitor v = new SetThrowSetVisitor(localInstance, s);
+    protected void setThrowsTypes(JLDel lang, LocalInstance localInstance,
+            List<Type> s, Block b) {
+        SetThrowSetVisitor v = new SetThrowSetVisitor(lang, localInstance, s);
         b.visit(v);
 
     }
@@ -154,7 +156,8 @@ public class JL7TryExt extends JL7Ext implements JL7TryOps {
         LocalInstance li;
         List<Type> s;
 
-        public SetThrowSetVisitor(LocalInstance li, List<Type> s) {
+        public SetThrowSetVisitor(JLDel lang, LocalInstance li, List<Type> s) {
+            super(lang);
             this.li = li;
             this.s = s;
         }

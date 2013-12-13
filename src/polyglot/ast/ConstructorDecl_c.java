@@ -416,7 +416,7 @@ public class ConstructorDecl_c extends Term_c implements ConstructorDecl,
 
     @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
-        del().ProcedureDeclOps(this).prettyPrintHeader(flags(), w, tr);
+        tr.lang().ProcedureDeclOps(this).prettyPrintHeader(flags(), w, tr);
 
         if (body != null) {
             printSubStmt(body, w, tr);

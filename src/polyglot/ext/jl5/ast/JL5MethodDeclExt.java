@@ -345,7 +345,7 @@ public class JL5MethodDeclExt extends JL5AnnotatedElementExt implements
 
         w.begin(0);
         for (AnnotationElem ae : ext.annotationElems()) {
-            ae.del().NodeOps(ae).prettyPrint(w, tr);
+            tr.lang().NodeOps(ae).prettyPrint(w, tr);
             w.newline();
         }
         w.end();

@@ -555,7 +555,7 @@ public class DefiniteAssignmentChecker extends
     @Override
     protected CFGBuilder<FlowItem> createCFGBuilder(TypeSystem ts,
             FlowGraph<FlowItem> g) {
-        CFGBuilder<FlowItem> v = new CFGBuilder<FlowItem>(ts, g, this);
+        CFGBuilder<FlowItem> v = new CFGBuilder<FlowItem>(lang(), ts, g, this);
         // skip dead loops bodies and dead if branches. See JLS 2nd edition, Section 16.
 //        v = v.skipDeadIfBranches(true);
 //        v = v.skipDeadLoopBodies(true);

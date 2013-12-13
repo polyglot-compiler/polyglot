@@ -41,6 +41,7 @@ public class ConstantFolder extends NodeVisitor {
     protected NodeFactory nf;
 
     public ConstantFolder(TypeSystem ts, NodeFactory nf) {
+        super(nf.lang());
         this.ts = ts;
         this.nf = nf;
     }

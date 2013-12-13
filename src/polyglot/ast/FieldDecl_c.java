@@ -305,7 +305,8 @@ public class FieldDecl_c extends Term_c implements FieldDecl {
         protected Scheduler scheduler;
         protected FieldInstance fi;
 
-        AddDependenciesVisitor(Scheduler scheduler, FieldInstance fi) {
+        AddDependenciesVisitor(JLDel lang, Scheduler scheduler, FieldInstance fi) {
+            super(lang);
             this.scheduler = scheduler;
             this.fi = fi;
         }
@@ -382,7 +383,7 @@ public class FieldDecl_c extends Term_c implements FieldDecl {
                                         tc.typeSystem(),
                                         tc.nodeFactory());
             cc = (ConstantChecker) cc.context(childtc.context());
-            nn = (FieldDecl) nn.del().NodeOps(nn).checkConstants(cc);
+            nn = (FieldDecl) tc.lang().NodeOps(nn).checkConstants(cc);
         }
 
         return nn;

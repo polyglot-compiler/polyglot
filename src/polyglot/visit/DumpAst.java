@@ -30,6 +30,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 
+import polyglot.ast.JLDel;
 import polyglot.ast.Node;
 import polyglot.frontend.Compiler;
 import polyglot.util.CodeWriter;
@@ -41,12 +42,14 @@ public class DumpAst extends NodeVisitor {
 
     /** @deprecated Use the other constructor. */
     @Deprecated
-    public DumpAst(String name, int width) throws IOException {
+    public DumpAst(JLDel lang, String name, int width) throws IOException {
+        super(lang);
         this.fw = new PrintWriter(new FileWriter(name));
         this.w = Compiler.createCodeWriter(fw, width);
     }
 
-    public DumpAst(CodeWriter w) {
+    public DumpAst(JLDel lang, CodeWriter w) {
+        super(lang);
         this.w = w;
     }
 

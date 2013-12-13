@@ -280,7 +280,7 @@ public class ClassDecl_c extends Term_c implements ClassDecl, ClassDeclOps {
     }
 
     @Override
-    public Context enterChildScope(Node child, Context c) {
+    public Context enterChildScope(JLDel lang, Node child, Context c) {
         if (child == this.body) {
             TypeSystem ts = c.typeSystem();
             c = c.pushClass(type, ts.staticTarget(type).toClass());
@@ -292,7 +292,7 @@ public class ClassDecl_c extends Term_c implements ClassDecl, ClassDeclOps {
             c = c.pushBlock();
             c.addNamed(this.type);
         }
-        return super.enterChildScope(child, c);
+        return super.enterChildScope(lang, child, c);
     }
 
     @Override
@@ -427,9 +427,9 @@ public class ClassDecl_c extends Term_c implements ClassDecl, ClassDeclOps {
     protected Node addDefaultConstructorIfNeeded(TypeSystem ts, NodeFactory nf)
             throws SemanticException {
         if (defaultConstructorNeeded()) {
-            return del().ClassDeclOps(this).addDefaultConstructor(ts,
-                                                                  nf,
-                                                                  defaultCI);
+            return nf.lang()
+                     .ClassDeclOps(this)
+                     .addDefaultConstructor(ts, nf, defaultCI);
         }
         return this;
     }
@@ -683,9 +683,9 @@ public class ClassDecl_c extends Term_c implements ClassDecl, ClassDeclOps {
 
     @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
-        del().ClassDeclOps(this).prettyPrintHeader(w, tr);
+        tr.lang().ClassDeclOps(this).prettyPrintHeader(w, tr);
         print(body(), w, tr);
-        del().ClassDeclOps(this).prettyPrintFooter(w, tr);
+        tr.lang().ClassDeclOps(this).prettyPrintFooter(w, tr);
     }
 
     @Override

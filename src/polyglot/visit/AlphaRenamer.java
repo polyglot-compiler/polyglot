@@ -89,7 +89,7 @@ public class AlphaRenamer extends NodeVisitor {
 
     public AlphaRenamer(NodeFactory nf, boolean renameCatchFormals,
             boolean createNewLocalInstances) {
-
+        super(nf.lang());
         this.nf = nf;
 
         this.setStack = new Stack<Set<String>>();
