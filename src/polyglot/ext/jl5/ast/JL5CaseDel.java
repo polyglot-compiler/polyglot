@@ -28,41 +28,11 @@ package polyglot.ext.jl5.ast;
 import polyglot.ast.Node;
 import polyglot.types.SemanticException;
 import polyglot.types.Type;
-import polyglot.util.CodeWriter;
 import polyglot.util.SerialVersionUID;
-import polyglot.visit.AmbiguityRemover;
-import polyglot.visit.ConstantChecker;
-import polyglot.visit.PrettyPrinter;
 import polyglot.visit.TypeChecker;
 
 public class JL5CaseDel extends JL5Del implements JL5CaseOps {
     private static final long serialVersionUID = SerialVersionUID.generate();
-
-    @Override
-    public Node disambiguateOverride(Node parent, AmbiguityRemover ar)
-            throws SemanticException {
-        JL5CaseExt ext = (JL5CaseExt) JL5Ext.ext(this.node());
-        return ext.disambiguateOverride(parent, ar);
-    }
-
-    @Override
-    public Node typeCheckOverride(Node parent, TypeChecker tc)
-            throws SemanticException {
-        JL5CaseExt ext = (JL5CaseExt) JL5Ext.ext(this.node());
-        return ext.typeCheckOverride(parent, tc);
-    }
-
-    @Override
-    public Node checkConstants(ConstantChecker cc) throws SemanticException {
-        JL5CaseExt ext = (JL5CaseExt) JL5Ext.ext(this.node());
-        return ext.checkConstants(cc);
-    }
-
-    @Override
-    public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
-        JL5CaseExt ext = (JL5CaseExt) JL5Ext.ext(this.node());
-        ext.prettyPrint(w, tr);
-    }
 
     @Override
     public Node resolveCaseLabel(TypeChecker tc, Type switchType)

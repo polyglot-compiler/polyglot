@@ -34,6 +34,7 @@ import polyglot.ast.ConstructorDecl;
 import polyglot.ast.Formal;
 import polyglot.ast.Node;
 import polyglot.ast.Node_c;
+import polyglot.ast.ProcedureDeclOps;
 import polyglot.ast.TypeNode;
 import polyglot.ext.jl5.types.Annotations;
 import polyglot.ext.jl5.types.JL5ArrayType;
@@ -62,7 +63,8 @@ import polyglot.visit.PrettyPrinter;
 import polyglot.visit.TypeBuilder;
 import polyglot.visit.TypeChecker;
 
-public class JL5ConstructorDeclExt extends JL5AnnotatedElementExt {
+public class JL5ConstructorDeclExt extends JL5AnnotatedElementExt implements
+        ProcedureDeclOps {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
     protected List<ParamTypeNode> typeParams;
@@ -126,6 +128,7 @@ public class JL5ConstructorDeclExt extends JL5AnnotatedElementExt {
 
     }
 
+    @Override
     public Node buildTypes(TypeBuilder tb) throws SemanticException {
 
         JL5TypeSystem ts = (JL5TypeSystem) tb.typeSystem();
@@ -177,8 +180,12 @@ public class JL5ConstructorDeclExt extends JL5AnnotatedElementExt {
         return cd.constructorInstance(ci).flags(flags);
     }
 
+    @Override
     public Node disambiguate(AmbiguityRemover ar) throws SemanticException {
-        ConstructorDecl n = (ConstructorDecl) this.superDel().disambiguate(ar);
+        ConstructorDecl n =
+                (ConstructorDecl) this.superDel()
+                                      .NodeOps(this.node())
+                                      .disambiguate(ar);
         JL5ConstructorDeclExt ext = (JL5ConstructorDeclExt) JL5Ext.ext(n);
 
         List<TypeVariable> typeParams = new LinkedList<TypeVariable>();
@@ -199,8 +206,9 @@ public class JL5ConstructorDeclExt extends JL5AnnotatedElementExt {
         return n;
     }
 
+    @Override
     public Context enterScope(Context c) {
-        c = this.superDel().enterScope(c);
+        c = this.superDel().NodeOps(this.node()).enterScope(c);
         JL5ConstructorDeclExt ext =
                 (JL5ConstructorDeclExt) JL5Ext.ext(this.node());
 
@@ -210,6 +218,7 @@ public class JL5ConstructorDeclExt extends JL5AnnotatedElementExt {
         return c;
     }
 
+    @Override
     public void prettyPrintHeader(Flags flags, CodeWriter w, PrettyPrinter tr) {
         ConstructorDecl n = (ConstructorDecl) this.node();
         JL5ConstructorDeclExt ext = (JL5ConstructorDeclExt) JL5Ext.ext(n);
@@ -218,7 +227,7 @@ public class JL5ConstructorDeclExt extends JL5AnnotatedElementExt {
 
         w.begin(0);
         for (AnnotationElem ae : ext.annotationElems()) {
-            ae.del().prettyPrint(w, tr);
+            ae.del().NodeOps(ae).prettyPrint(w, tr);
             w.newline();
         }
         w.end();
@@ -235,7 +244,7 @@ public class JL5ConstructorDeclExt extends JL5AnnotatedElementExt {
             w.write("<");
             for (Iterator<ParamTypeNode> iter = ext.typeParams().iterator(); iter.hasNext();) {
                 ParamTypeNode ptn = iter.next();
-                ptn.del().prettyPrint(w, tr);
+                ptn.del().NodeOps(ptn).prettyPrint(w, tr);
                 if (iter.hasNext()) {
                     w.write(",");
                     w.allowBreak(0, " ");

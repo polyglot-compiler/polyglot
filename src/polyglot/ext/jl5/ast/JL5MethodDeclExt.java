@@ -35,6 +35,7 @@ import polyglot.ast.MethodDecl;
 import polyglot.ast.MethodDecl_c;
 import polyglot.ast.Node;
 import polyglot.ast.Node_c;
+import polyglot.ast.ProcedureDeclOps;
 import polyglot.ast.TypeNode;
 import polyglot.ext.jl5.types.Annotations;
 import polyglot.ext.jl5.types.JL5ArrayType;
@@ -64,7 +65,8 @@ import polyglot.visit.Translator;
 import polyglot.visit.TypeBuilder;
 import polyglot.visit.TypeChecker;
 
-public class JL5MethodDeclExt extends JL5AnnotatedElementExt {
+public class JL5MethodDeclExt extends JL5AnnotatedElementExt implements
+        ProcedureDeclOps {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
     protected boolean compilerGenerated;
@@ -110,6 +112,7 @@ public class JL5MethodDeclExt extends JL5AnnotatedElementExt {
         ((JL5MethodInstance) n.methodInstance()).setAnnotations(annotations);
     }
 
+    @Override
     public Node buildTypes(TypeBuilder tb) throws SemanticException {
         MethodDecl md = (MethodDecl) this.node();
         JL5MethodDeclExt ext = (JL5MethodDeclExt) JL5Ext.ext(md);
@@ -167,8 +170,12 @@ public class JL5MethodDeclExt extends JL5AnnotatedElementExt {
         return md.methodInstance(mi);
     }
 
+    @Override
     public Node disambiguate(AmbiguityRemover ar) throws SemanticException {
-        MethodDecl n = (MethodDecl) this.superDel().disambiguate(ar);
+        MethodDecl n =
+                (MethodDecl) this.superDel()
+                                 .NodeOps(this.node())
+                                 .disambiguate(ar);
         JL5MethodDeclExt ext = (JL5MethodDeclExt) JL5Ext.ext(n);
         List<TypeVariable> typeParams = new LinkedList<TypeVariable>();
 
@@ -319,15 +326,17 @@ public class JL5MethodDeclExt extends JL5AnnotatedElementExt {
 
     }
 
+    @Override
     public void translate(CodeWriter w, Translator tr) {
         MethodDecl md = (MethodDecl) this.node();
         JL5MethodDeclExt ext = (JL5MethodDeclExt) JL5Ext.ext(md);
 
         if (ext.isCompilerGenerated()) return;
 
-        this.superDel().translate(w, tr);
+        this.superDel().NodeOps(this.node()).translate(w, tr);
     }
 
+    @Override
     public void prettyPrintHeader(Flags flags, CodeWriter w, PrettyPrinter tr) {
         MethodDecl n = (MethodDecl) this.node();
         JL5MethodDeclExt ext = (JL5MethodDeclExt) JL5Ext.ext(n);
@@ -336,7 +345,7 @@ public class JL5MethodDeclExt extends JL5AnnotatedElementExt {
 
         w.begin(0);
         for (AnnotationElem ae : ext.annotationElems()) {
-            ae.del().prettyPrint(w, tr);
+            ae.del().NodeOps(ae).prettyPrint(w, tr);
             w.newline();
         }
         w.end();
@@ -397,10 +406,11 @@ public class JL5MethodDeclExt extends JL5AnnotatedElementExt {
         w.end();
     }
 
+    @Override
     public Context enterScope(Context c) {
         MethodDecl md = (MethodDecl) this.node();
         JL5MethodDeclExt ext = (JL5MethodDeclExt) JL5Ext.ext(md);
-        c = this.superDel().enterScope(c);
+        c = this.superDel().NodeOps(this.node()).enterScope(c);
         for (ParamTypeNode pn : ext.typeParams()) {
             ((JL5Context) c).addTypeVariable((TypeVariable) pn.type());
         }

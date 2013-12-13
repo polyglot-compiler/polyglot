@@ -11,15 +11,15 @@ import polyglot.util.Position;
 public class JL7NodeFactory_c extends JL5NodeFactory_c implements
         JL7NodeFactory {
     public JL7NodeFactory_c() {
-        super(new JL7ExtFactory_c(), new JL7DelFactory_c());
+        super(new JL7ExtFactory_c(), JL7Del.instance);
     }
 
     public JL7NodeFactory_c(JL7ExtFactory extFactory) {
-        super(extFactory, new JL7DelFactory_c());
+        super(extFactory, JL7Del.instance);
     }
 
-    public JL7NodeFactory_c(JL7ExtFactory extFactory, JL7DelFactory delFactory) {
-        super(extFactory, delFactory);
+    public JL7NodeFactory_c(JL7ExtFactory extFactory, JL7Del del) {
+        super(extFactory, del);
     }
 
     @Override
@@ -27,9 +27,14 @@ public class JL7NodeFactory_c extends JL5NodeFactory_c implements
         return (JL7ExtFactory) super.extFactory();
     }
 
+//    @Override
+//    public JL7DelFactory delFactory() {
+//        return (JL7DelFactory) super.delFactory();
+//    }
+//
     @Override
-    public JL7DelFactory delFactory() {
-        return (JL7DelFactory) super.delFactory();
+    public AmbDiamondTypeNode AmbDiamondTypeNode(Position pos, TypeNode base) {
+        return new AmbDiamondTypeNode(pos, base);
     }
 
     @Override
@@ -42,7 +47,7 @@ public class JL7NodeFactory_c extends JL5NodeFactory_c implements
             List<TypeNode> alternatives, Block body) {
         MultiCatch n = new MultiCatch_c(pos, formal, alternatives, body);
         n = (MultiCatch) n.ext(extFactory().extMultiCatch());
-        n = (MultiCatch) n.del(delFactory().delMultiCatch());
+        n = (MultiCatch) n.del(del);
         return n;
     }
 

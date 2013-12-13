@@ -13,22 +13,24 @@ import polyglot.visit.TypeChecker;
 public class JL5CatchExt extends JL5Ext implements Ext {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
+    @Override
     public Node buildTypes(TypeBuilder tb) throws SemanticException {
 
         Catch c = (Catch) this.node();
         JL5FormalExt formalExt = (JL5FormalExt) JL5Ext.ext(c.formal());
         formalExt.setIsCatchFormal(true);
 
-        return this.superDel().buildTypes(tb);
+        return this.superDel().NodeOps(this.node()).buildTypes(tb);
     }
 
+    @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
         Catch c = (Catch) this.node();
         Formal f = c.formal();
         JL5LocalInstance li = (JL5LocalInstance) f.localInstance();
         li.setProcedureFormal(true);
 
-        return this.superDel().typeCheck(tc);
+        return this.superDel().NodeOps(this.node()).typeCheck(tc);
     }
 
 }

@@ -35,9 +35,14 @@ import polyglot.visit.TypeChecker;
 public class JL5SpecialExt extends JL5Ext {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
+    @Override
     public Node typeCheckOverride(Node parent, TypeChecker tc)
             throws SemanticException {
-        Special n = (Special) this.node().del().visitChildren(tc);
+        Special n =
+                (Special) this.node()
+                              .del()
+                              .NodeOps(this.node())
+                              .visitChildren(tc);
         if (n.qualifier() != null && n.qualifier().type() instanceof RawClass) {
             // we got a raw class. Fix it up
             RawClass rc = (RawClass) n.qualifier().type();

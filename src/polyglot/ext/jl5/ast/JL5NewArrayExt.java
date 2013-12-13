@@ -35,8 +35,10 @@ import polyglot.visit.TypeChecker;
 public class JL5NewArrayExt extends JL5Ext {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
+    @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
-        NewArray n = (NewArray) this.superDel().typeCheck(tc);
+        NewArray n =
+                (NewArray) this.superDel().NodeOps(this.node()).typeCheck(tc);
         JL5TypeSystem ts = (JL5TypeSystem) tc.typeSystem();
         if (!ts.isReifiable(n.type())) {
             throw new SemanticException("The base type of an array must be reifiable.",

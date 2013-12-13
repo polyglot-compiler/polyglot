@@ -85,6 +85,7 @@ public class JL5CanonicalTypeNodeExt extends JL5Ext {
         return type;
     }
 
+    @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
         CanonicalTypeNode n = (CanonicalTypeNode) this.node();
         Type t = n.type();
@@ -170,7 +171,7 @@ public class JL5CanonicalTypeNodeExt extends JL5Ext {
 
         }
 
-        return this.superDel().typeCheck(tc);
+        return this.superDel().NodeOps(this.node()).typeCheck(tc);
     }
 
     private Set<TypeVariable> findInstanceTypeVariables(Type t) {

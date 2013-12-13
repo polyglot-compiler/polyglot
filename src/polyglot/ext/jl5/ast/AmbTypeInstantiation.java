@@ -25,7 +25,6 @@
  ******************************************************************************/
 package polyglot.ext.jl5.ast;
 
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -56,16 +55,14 @@ public class AmbTypeInstantiation extends TypeNode_c implements TypeNode,
         Ambiguous {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
-    private TypeNode base;
-    private List<TypeNode> typeArguments;
+    protected TypeNode base;
+    protected List<TypeNode> typeArguments;
 
     public AmbTypeInstantiation(Position pos, TypeNode base,
             List<TypeNode> typeArguments) {
         super(pos);
+        assert (typeArguments != null);
         this.base = base;
-        if (typeArguments == null) {
-            typeArguments = Collections.emptyList();
-        }
         this.typeArguments = typeArguments;
     }
 
@@ -76,16 +73,14 @@ public class AmbTypeInstantiation extends TypeNode_c implements TypeNode,
 
     @Override
     public Node disambiguate(AmbiguityRemover sc) throws SemanticException {
-        if (!this.base.isDisambiguated()) {
-            return this;
-        }
-        for (TypeNode tn : typeArguments) {
-            if (!tn.isDisambiguated()) {
-                return this;
-            }
-        }
+        if (!shouldDisambiguate()) return this;
 
-        JL5TypeSystem ts = (JL5TypeSystem) sc.typeSystem();
+        checkRareType(sc);
+
+        Map<TypeVariable, ReferenceType> typeMap =
+                new LinkedHashMap<TypeVariable, ReferenceType>();
+        JL5ParsedClassType pct = handleBase(typeMap);
+
         Type baseType = this.base.type();
 //        System.err.println("Base type is " + base);
 //        System.err.println("typeArguments is " + typeArguments);
@@ -97,12 +92,57 @@ public class AmbTypeInstantiation extends TypeNode_c implements TypeNode,
 //            System.err.println("   type args are is " + this.typeArguments);
 //        }
 
+        if ((pct.pclass() == null || pct.pclass().formals().isEmpty())) {
+            // The base class has no formals.
+            // Then this node should not be created in the first place.
+            throw new SemanticException("Cannot instantiate " + baseType
+                    + " because it has no formals", this.position);
+        }
+
+        checkParamSize(pct);
+
+        // if subst is not null, check that subst does not already define the formal type variables
+        if (!typeMap.isEmpty()) {
+            if (typeMap.keySet().containsAll(pct.typeVariables())) {
+                throw new SemanticException("Cannot instantiate " + baseType
+                        + " with arguments " + typeArguments, this.position());
+            }
+        }
+
+        // add the new mappings 
+        List<TypeVariable> formals = pct.typeVariables();
+        for (int i = 0; i < typeArguments.size(); i++) {
+            ReferenceType t = (ReferenceType) typeArguments.get(i).type();
+            typeMap.put(formals.get(i), t);
+        }
+
+//        System.err.println("Instantiating " + pct + " with " + typeMap);
+        JL5TypeSystem ts = (JL5TypeSystem) sc.typeSystem();
+        Type instantiated = ts.subst(pct, typeMap);
+        return sc.nodeFactory().CanonicalTypeNode(this.position, instantiated);
+    }
+
+    protected boolean shouldDisambiguate() {
+        if (!this.base.isDisambiguated()) {
+            return false;
+        }
+        for (TypeNode tn : typeArguments) {
+            if (!tn.isDisambiguated()) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    protected void checkRareType(AmbiguityRemover ar) throws SemanticException {
+        JL5TypeSystem ts = (JL5TypeSystem) ar.typeSystem();
+        Type baseType = this.base.type();
         if (baseType instanceof ClassType) {
             ClassType ct = (ClassType) baseType;
             if (ct.isInnerClass()) {
                 ClassType outer = ct.outer();
                 if (outer instanceof RawClass) {
-                    ClassType currentClass = sc.context().currentClass();
+                    ClassType currentClass = ar.context().currentClass();
                     ClassType outerBase = ((RawClass) outer).base();
                     if (!ts.typeEquals(currentClass, outerBase)
                             && !ts.isEnclosed(currentClass, outerBase)) {
@@ -121,71 +161,31 @@ public class AmbTypeInstantiation extends TypeNode_c implements TypeNode,
                 }
             }
         }
+    }
 
-        boolean handledBase = false;
-        JL5ParsedClassType pct = null;
-        Map<TypeVariable, ReferenceType> typeMap =
-                new LinkedHashMap<TypeVariable, ReferenceType>();
-        if (baseType instanceof JL5ParsedClassType) {
-            pct = (JL5ParsedClassType) baseType;
-            handledBase = true;
-        }
-        else if (baseType instanceof RawClass) {
-            pct = ((RawClass) baseType).base();
-            handledBase = true;
-        }
-
+    protected JL5ParsedClassType handleBase(
+            Map<TypeVariable, ReferenceType> typeMap) {
+        Type baseType = this.base.type();
+        if (baseType instanceof JL5ParsedClassType)
+            return (JL5ParsedClassType) baseType;
+        if (baseType instanceof RawClass) return ((RawClass) baseType).base();
         if (baseType instanceof JL5SubstClassType) {
             JL5SubstClassType sct = (JL5SubstClassType) baseType;
-            pct = sct.base();
-            Iterator<Map.Entry<TypeVariable, ReferenceType>> iter =
-                    sct.subst().entries();
-            while (iter.hasNext()) {
-                Map.Entry<TypeVariable, ReferenceType> e = iter.next();
-                typeMap.put(e.getKey(), e.getValue());
-            }
-            handledBase = true;
+            typeMap.putAll(sct.subst().substitutions());
+            return sct.base();
         }
-        if (!handledBase) {
-            throw new InternalCompilerError("Don't know how to handle "
-                    + baseType, position);
-        }
+        throw new InternalCompilerError("Don't know how to handle " + baseType,
+                                        position);
+    }
 
-        int pctFormalSize = 0;
-        if ((pct.pclass() == null || pct.pclass().formals().isEmpty())) {
-            if (this.typeArguments.isEmpty()) {
-                // the base class has no formals, and no actuals were supplied.
-                return base;
-            }
-        }
-        else {
-            pctFormalSize = pct.pclass().formals().size();
-        }
-
+    protected void checkParamSize(JL5ParsedClassType pct)
+            throws SemanticException {
+        int pctFormalSize = pct.pclass().formals().size();
         if (pctFormalSize != this.typeArguments.size()) {
             throw new SemanticException("Wrong number of type parameters for class "
                                                 + pct,
                                         this.position);
         }
-
-        // if subst is not null, check that subst does not already define the formal type variables
-        if (!typeMap.isEmpty()) {
-            if (typeMap.keySet().containsAll(pct.typeVariables())) {
-                throw new SemanticException("Cannot instantiate " + baseType
-                        + " with arguments " + typeArguments, this.position());
-            }
-        }
-
-        // add the new mappings 
-        List<TypeVariable> formals = pct.typeVariables();
-        for (int i = 0; i < formals.size(); i++) {
-            ReferenceType t = (ReferenceType) typeArguments.get(i).type();
-            typeMap.put(formals.get(i), t);
-        }
-
-//        System.err.println("Instantiating " + pct + " with " + typeMap);
-        Type instantiated = ts.subst(pct, typeMap);
-        return sc.nodeFactory().CanonicalTypeNode(this.position, instantiated);
     }
 
     @Override
@@ -199,7 +199,7 @@ public class AmbTypeInstantiation extends TypeNode_c implements TypeNode,
             TypeNode tn = iter.next();
             sb.append(tn);
 
-            if (iter.hasNext()) sb.append(",");
+            if (iter.hasNext()) sb.append(", ");
         }
         sb.append(">");
         return sb.toString();
@@ -207,12 +207,12 @@ public class AmbTypeInstantiation extends TypeNode_c implements TypeNode,
 
     @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
-        base.del().prettyPrint(w, tr);
+        base.del().NodeOps(base).prettyPrint(w, tr);
         w.write("<");
         Iterator<TypeNode> iter = typeArguments.iterator();
         while (iter.hasNext()) {
             TypeNode tn = iter.next();
-            tn.del().prettyPrint(w, tr);
+            tn.del().NodeOps(tn).prettyPrint(w, tr);
 
             if (iter.hasNext()) {
                 w.write(",");

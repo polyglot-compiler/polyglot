@@ -1,12 +1,12 @@
 package polyglot.ext.jl7.ast;
 
-import polyglot.ast.DelFactory;
 import polyglot.ast.Ext;
 import polyglot.ast.ExtFactory;
-import polyglot.ext.jl5.ast.JL5ExtFactory_c;
+import polyglot.ast.JLDel;
 
-public class JL7ExtFactory_c extends JL5ExtFactory_c implements JL7ExtFactory {
-    protected DelFactory superDelFactory = null;
+public final class JL7ExtFactory_c extends JL7AbstractExtFactory_c implements
+        JL7ExtFactory {
+    protected JLDel superDel = null;
 
     public JL7ExtFactory_c() {
         super();
@@ -16,60 +16,50 @@ public class JL7ExtFactory_c extends JL5ExtFactory_c implements JL7ExtFactory {
         super(nextExtFactory);
     }
 
-    public JL7ExtFactory_c(ExtFactory nextExtFactory, DelFactory superDelFactory) {
+    public JL7ExtFactory_c(ExtFactory nextExtFactory, JLDel superDel) {
         super(nextExtFactory);
-        this.superDelFactory = superDelFactory;
+        this.superDel = superDel;
+    }
+
+    @Override
+    protected Ext extNodeImpl() {
+        JL7Ext ext = new JL7Ext();
+        ext.superDel(this.superDel);
+        return ext;
     }
 
     @Override
     protected Ext extCaseImpl() {
         JL7CaseExt ext = new JL7CaseExt();
-        ext.setSuperDel(this.superDelFactory.delCase());
+        ext.superDel(this.superDel);
+        return ext;
+    }
+
+    @Override
+    protected Ext extNewImpl() {
+        JL7NewExt ext = new JL7NewExt();
+        ext.superDel(this.superDel);
         return ext;
     }
 
     @Override
     protected Ext extSwitchImpl() {
         JL7SwitchExt ext = new JL7SwitchExt();
-        ext.setSuperDel(this.superDelFactory.delSwitch());
+        ext.superDel(this.superDel);
         return ext;
     }
 
     @Override
     protected Ext extThrowImpl() {
         JL7ThrowExt ext = new JL7ThrowExt();
-        ext.setSuperDel(this.superDelFactory.delThrow());
+        ext.superDel(this.superDel);
         return ext;
     }
 
     @Override
     protected Ext extTryImpl() {
-        return new JL7TryExt();
+        JL7TryExt ext = new JL7TryExt();
+        ext.superDel(this.superDel);
+        return ext;
     }
-
-    @Override
-    public Ext extMultiCatch() {
-        Ext e = extMultiCatchImpl();
-
-        if (nextExtFactory() != null) {
-            Ext e2;
-            if (nextExtFactory() instanceof JL7ExtFactory) {
-                e2 = ((JL7ExtFactory) nextExtFactory()).extMultiCatch();
-            }
-            else {
-                e2 = nextExtFactory().extCatch();
-            }
-            e = composeExts(e, e2);
-        }
-        return postExtMultiCatch(e);
-    }
-
-    protected Ext extMultiCatchImpl() {
-        return extCatchImpl();
-    }
-
-    protected Ext postExtMultiCatch(Ext e) {
-        return postExtCatch(e);
-    }
-
 }

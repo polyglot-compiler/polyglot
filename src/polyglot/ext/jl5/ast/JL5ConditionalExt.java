@@ -40,6 +40,7 @@ import polyglot.visit.TypeChecker;
 public class JL5ConditionalExt extends JL5Ext {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
+    @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
         JL5TypeSystem ts = (JL5TypeSystem) tc.typeSystem();
         Conditional c = (Conditional) this.node();

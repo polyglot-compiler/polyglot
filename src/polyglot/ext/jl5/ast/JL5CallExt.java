@@ -61,7 +61,7 @@ import polyglot.visit.NodeVisitor;
 import polyglot.visit.PrettyPrinter;
 import polyglot.visit.TypeChecker;
 
-public class JL5CallExt extends JL5Ext {
+public class JL5CallExt extends JL5Ext implements CallOps {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
     protected List<TypeNode> typeArgs;
@@ -94,6 +94,7 @@ public class JL5CallExt extends JL5Ext {
         expectedReturnType = type;
     }
 
+    @Override
     public Node visitChildren(NodeVisitor v) {
         JL5CallExt ext = (JL5CallExt) JL5Ext.ext(this.node());
 
@@ -118,6 +119,7 @@ public class JL5CallExt extends JL5Ext {
         return newN;
     }
 
+    @Override
     public Node typeCheckOverride(Node parent, TypeChecker tc)
             throws SemanticException {
         JL5CallExt ext = (JL5CallExt) JL5Ext.ext(this.node());
@@ -160,6 +162,7 @@ public class JL5CallExt extends JL5Ext {
         return null;
     }
 
+    @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
         JL5TypeSystem ts = (JL5TypeSystem) tc.typeSystem();
         Context c = tc.context();
@@ -177,7 +180,7 @@ public class JL5CallExt extends JL5Ext {
         }
 
         if (n.target() == null) {
-            return ((CallOps) n.del()).typeCheckNullTarget(tc, argTypes);
+            return n.del().CallOps(n).typeCheckNullTarget(tc, argTypes);
         }
 
         if (!n.target().type().isCanonical()) {
@@ -189,7 +192,7 @@ public class JL5CallExt extends JL5Ext {
             actualTypeArgs.add((ReferenceType) tn.type());
         }
 
-        ReferenceType targetType = ((CallOps) n.del()).findTargetType();
+        ReferenceType targetType = n.del().CallOps(n).findTargetType();
 
         /* This call is in a static context if and only if
          * the target (possibly implicit) is a type node.
@@ -282,6 +285,7 @@ public class JL5CallExt extends JL5Ext {
                                                               .position());
     }
 
+    @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
         Call n = (Call) this.node();
         JL5CallExt ext = (JL5CallExt) JL5Ext.ext(n);
@@ -340,15 +344,18 @@ public class JL5CallExt extends JL5Ext {
         w.end();
     }
 
+    @Override
     public Type findContainer(TypeSystem ts, MethodInstance mi) {
         JL5TypeSystem jts = (JL5TypeSystem) ts;
         return jts.erasureType(mi.container());
     }
 
+    @Override
     public ReferenceType findTargetType() throws SemanticException {
         return ((CallOps) node()).findTargetType();
     }
 
+    @Override
     public Node typeCheckNullTarget(TypeChecker tc, List<Type> argTypes)
             throws SemanticException {
         return ((CallOps) node()).typeCheckNullTarget(tc, argTypes);

@@ -26,16 +26,31 @@
 
 package polyglot.ast;
 
-import polyglot.util.Copy;
-
 /**
  * <code>JL</code> contains all methods implemented by an AST node.
  * AST nodes and delegates for AST nodes must implement this interface.
  */
-public interface JLDel extends NodeOps, Copy {
-    /** Pointer back to the node we are delegating for, possibly this. */
-    public Node node();
+public interface JLDel {
+//    /** Pointer back to the node we are delegating for, possibly this. */
+//    Node node();
+//
+//    /** Initialize the back pointer to the node. */
+//    void init(Node node);
+//
+//    /**
+//     * Get the node's extension associated with this delegate, or {@code null}.
+//     */
+//    Ext ext();
+//
+    NodeOps NodeOps(Node n);
 
-    /** Initialize the back pointer to the node. */
-    public void init(Node node);
+    CallOps CallOps(Node n);
+
+    ClassDeclOps ClassDeclOps(Node n);
+
+    NewOps NewOps(Node n);
+
+    ProcedureDeclOps ProcedureDeclOps(Node n);
+
+    TryOps TryOps(Node n);
 }

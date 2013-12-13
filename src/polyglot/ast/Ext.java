@@ -36,7 +36,7 @@ import polyglot.util.Copy;
  * It contains a pointer back to the node it is extending and a possibly-null
  * pointer to another extension node.
  */
-public interface Ext extends Copy, Serializable {
+public interface Ext extends NodeOps, Copy, Serializable {
     /** The node that we are extending. */
     Node node();
 
@@ -52,6 +52,13 @@ public interface Ext extends Copy, Serializable {
 
     /** Set the extension of this extension. */
     Ext ext(Ext ext);
+
+    /**
+     * The delegate object to invoke "superclass" functionality.
+     * If null, this superclass functionality will by default be delegated
+     * to the node. However, extensions to JL can override this if needed.
+     */
+    JLDel superDel();
 
     /**
      * Dump the AST node for debugging purposes.

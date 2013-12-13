@@ -34,39 +34,11 @@ import polyglot.types.ReferenceType;
 import polyglot.types.SemanticException;
 import polyglot.types.Type;
 import polyglot.types.TypeSystem;
-import polyglot.util.CodeWriter;
 import polyglot.util.SerialVersionUID;
-import polyglot.visit.NodeVisitor;
-import polyglot.visit.PrettyPrinter;
 import polyglot.visit.TypeChecker;
 
 public class JL5CallDel extends JL5Del implements CallOps {
     private static final long serialVersionUID = SerialVersionUID.generate();
-
-    @Override
-    public Node visitChildren(NodeVisitor v) {
-        JL5CallExt ext = (JL5CallExt) JL5Ext.ext(this.node());
-        return ext.visitChildren(v);
-    }
-
-    @Override
-    public Node typeCheckOverride(Node parent, TypeChecker tc)
-            throws SemanticException {
-        JL5CallExt ext = (JL5CallExt) JL5Ext.ext(this.node());
-        return ext.typeCheckOverride(parent, tc);
-    }
-
-    @Override
-    public Node typeCheck(TypeChecker tc) throws SemanticException {
-        JL5CallExt ext = (JL5CallExt) JL5Ext.ext(this.node());
-        return ext.typeCheck(tc);
-    }
-
-    @Override
-    public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
-        JL5CallExt ext = (JL5CallExt) JL5Ext.ext(this.node());
-        ext.prettyPrint(w, tr);
-    }
 
     @Override
     public Type findContainer(TypeSystem ts, MethodInstance mi) {

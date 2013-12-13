@@ -38,7 +38,7 @@ public class CannotToExt_c extends ToExt_c implements Ext {
 
     @Override
     public Node toExt(ExtensionRewriter rw) throws SemanticException {
-        throw new InternalCompilerError("Cannot transalate " + node() + ":"
+        throw new InternalCompilerError("Cannot translate " + node() + ":"
                 + node().getClass());
     }
 }

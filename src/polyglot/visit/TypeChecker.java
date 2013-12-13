@@ -56,7 +56,7 @@ public class TypeChecker extends DisambiguationDriver {
             if (Report.should_report(Report.visit, 2))
                 Report.report(2, ">> " + this + "::override " + n);
 
-            Node m = n.del().typeCheckOverride(parent, this);
+            Node m = n.del().NodeOps(n).typeCheckOverride(parent, this);
 
             if (Report.should_report(Report.visit, 2))
                 Report.report(2, "<< " + this + "::override " + n + " -> " + m);
@@ -100,7 +100,7 @@ public class TypeChecker extends DisambiguationDriver {
         if (Report.should_report(Report.visit, 2))
             Report.report(2, ">> " + this + "::enter " + n);
 
-        TypeChecker v = (TypeChecker) n.del().typeCheckEnter(this);
+        TypeChecker v = (TypeChecker) n.del().NodeOps(n).typeCheckEnter(this);
 
         if (Report.should_report(Report.visit, 2))
             Report.report(2, "<< " + this + "::enter " + n + " -> " + v);
@@ -130,19 +130,19 @@ public class TypeChecker extends DisambiguationDriver {
             Report.report(2, ">> " + this + "::leave " + n);
 
         AmbChecker ac = new AmbChecker();
-        n.del().visitChildren(ac);
+        n.del().NodeOps(n).visitChildren(ac);
 
         Node m = n;
 
         if (!ac.amb && m.isDisambiguated()) {
 //          System.out.println("running typeCheck for " + m);
             TypeChecker childTc = (TypeChecker) v;
-            m = m.del().typeCheck(childTc);
+            m = m.del().NodeOps(m).typeCheck(childTc);
 
             if (checkConstants) {
                 ConstantChecker cc = new ConstantChecker(job, ts, nf);
                 cc = (ConstantChecker) cc.context(childTc.context());
-                m = m.del().checkConstants(cc);
+                m = m.del().NodeOps(m).checkConstants(cc);
             }
 
 //            if (! m.isTypeChecked()) {

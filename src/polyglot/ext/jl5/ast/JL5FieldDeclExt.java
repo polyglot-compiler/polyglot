@@ -49,15 +49,16 @@ public class JL5FieldDeclExt extends JL5AnnotatedElementExt {
         return fd.fieldInstance();
     }
 
+    @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
         JL5AnnotatedElementExt ext =
                 (JL5AnnotatedElementExt) JL5Ext.ext(this.node());
         for (AnnotationElem ae : ext.annotationElems()) {
-            ae.del().prettyPrint(w, tr);
+            ae.del().NodeOps(ae).prettyPrint(w, tr);
             w.newline();
         }
 
-        this.superDel().prettyPrint(w, tr);
+        this.superDel().NodeOps(this.node()).prettyPrint(w, tr);
     }
 
 }

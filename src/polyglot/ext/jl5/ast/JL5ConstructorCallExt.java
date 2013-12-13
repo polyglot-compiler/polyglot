@@ -86,17 +86,19 @@ public class JL5ConstructorCallExt extends JL5Ext {
         return this.isEnumConstructorCall;
     }
 
+    @Override
     public Context enterScope(Context c) {
         return ((JL5Context) c).pushCTORCall();
     }
 
+    @Override
     public Node visitChildren(NodeVisitor v) {
         JL5ConstructorCallExt ext =
                 (JL5ConstructorCallExt) JL5Ext.ext(this.node());
 
         List<TypeNode> typeArgs = this.node().visitList(ext.typeArgs(), v);
 
-        Node newN = this.superDel().visitChildren(v);
+        Node newN = this.superDel().NodeOps(this.node()).visitChildren(v);
         JL5ConstructorCallExt newext = (JL5ConstructorCallExt) JL5Ext.ext(newN);
 
         if (!CollectionUtil.equals(typeArgs, newext.typeArgs())) {
@@ -115,6 +117,7 @@ public class JL5ConstructorCallExt extends JL5Ext {
         return newN;
     }
 
+    @Override
     public Node disambiguate(AmbiguityRemover ar) throws SemanticException {
         ConstructorCall cc = (ConstructorCall) this.node();
         JL5ConstructorCallExt ext = (JL5ConstructorCallExt) JL5Ext.ext(cc);
@@ -134,9 +137,10 @@ public class JL5ConstructorCallExt extends JL5Ext {
                 return cc.disambiguate(ar);
             }
         }
-        return this.superDel().disambiguate(ar);
+        return this.superDel().NodeOps(this.node()).disambiguate(ar);
     }
 
+    @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
         ConstructorCall cc = (ConstructorCall) this.node();
         JL5ConstructorCallExt ext = (JL5ConstructorCallExt) JL5Ext.ext(cc);
@@ -199,6 +203,7 @@ public class JL5ConstructorCallExt extends JL5Ext {
         w.write(");");
     }
 
+    @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
         ConstructorCall_c n = (ConstructorCall_c) this.node();
         JL5ConstructorCallExt ext = (JL5ConstructorCallExt) JL5Ext.ext(n);

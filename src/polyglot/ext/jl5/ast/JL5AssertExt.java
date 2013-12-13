@@ -36,6 +36,7 @@ import polyglot.visit.TypeChecker;
 public class JL5AssertExt extends JL5Ext {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
+    @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
         Assert orig = (Assert) this.node();
 

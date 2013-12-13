@@ -25,52 +25,20 @@
  ******************************************************************************/
 package polyglot.ext.jl5.ast;
 
-import polyglot.ast.Node;
 import polyglot.ast.ProcedureDeclOps;
-import polyglot.types.Context;
 import polyglot.types.Flags;
-import polyglot.types.SemanticException;
 import polyglot.util.CodeWriter;
 import polyglot.util.SerialVersionUID;
-import polyglot.visit.AmbiguityRemover;
-import polyglot.visit.NodeVisitor;
 import polyglot.visit.PrettyPrinter;
-import polyglot.visit.TypeBuilder;
-import polyglot.visit.TypeChecker;
 
 public class JL5ConstructorDeclDel extends JL5AnnotatedElementDel implements
         ProcedureDeclOps {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
     @Override
-    public Node visitChildren(NodeVisitor v) {
-        return ((JL5ConstructorDeclExt) JL5Ext.ext(this.node())).visitChildren(v);
-    }
-
-    @Override
-    public Node buildTypes(TypeBuilder tb) throws SemanticException {
-        return ((JL5ConstructorDeclExt) JL5Ext.ext(this.node())).buildTypes(tb);
-    }
-
-    @Override
-    public Node disambiguate(AmbiguityRemover ar) throws SemanticException {
-        return ((JL5ConstructorDeclExt) JL5Ext.ext(this.node())).disambiguate(ar);
-    }
-
-    @Override
-    public Context enterScope(Context c) {
-        return ((JL5ConstructorDeclExt) JL5Ext.ext(this.node())).enterScope(c);
-    }
-
-    @Override
     public void prettyPrintHeader(Flags flags, CodeWriter w, PrettyPrinter tr) {
         ((JL5ConstructorDeclExt) JL5Ext.ext(this.node())).prettyPrintHeader(flags,
                                                                             w,
                                                                             tr);
-    }
-
-    @Override
-    public Node typeCheck(TypeChecker tc) throws SemanticException {
-        return ((JL5ConstructorDeclExt) JL5Ext.ext(this.node())).typeCheck(tc);
     }
 }

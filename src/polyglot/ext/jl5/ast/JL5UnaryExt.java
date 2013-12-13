@@ -49,6 +49,7 @@ public class JL5UnaryExt extends JL5Ext {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
     /** Type check the expression. */
+    @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
         JL5TypeSystem ts = (JL5TypeSystem) tc.typeSystem();
 
@@ -57,7 +58,7 @@ public class JL5UnaryExt extends JL5Ext {
         Expr expr = u.expr();
 
         if (!ts.isPrimitiveWrapper(expr.type())) {
-            return this.superDel().typeCheck(tc);
+            return this.superDel().NodeOps(this.node()).typeCheck(tc);
         }
 
         if (op == POST_INC || op == POST_DEC || op == PRE_INC || op == PRE_DEC) {
@@ -128,6 +129,7 @@ public class JL5UnaryExt extends JL5Ext {
         return u;
     }
 
+    @Override
     public Type childExpectedType(Expr child, AscriptionVisitor av) {
         JL5TypeSystem ts = (JL5TypeSystem) av.typeSystem();
 

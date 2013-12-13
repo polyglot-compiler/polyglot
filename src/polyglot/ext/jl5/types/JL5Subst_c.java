@@ -179,7 +179,7 @@ public class JL5Subst_c extends Subst_c<TypeVariable, ReferenceType> implements
         JL5ConstructorInstance cj =
                 (JL5ConstructorInstance) super.substConstructor(ci);
         if (cj.typeParams() != null && !cj.typeParams().isEmpty()) {
-            // remove any type params we have replced.
+            // remove any type params we have replaced.
             List<TypeVariable> l = new ArrayList<TypeVariable>(cj.typeParams());
             l.removeAll(this.subst.keySet());
             cj = (JL5ConstructorInstance) cj.copy();

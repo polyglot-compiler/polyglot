@@ -387,7 +387,7 @@ public class EnumConstantDecl_c extends Term_c implements EnumConstantDecl {
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
         EnumConstantDeclExt ext = (EnumConstantDeclExt) JL5Ext.ext(this);
         for (AnnotationElem ae : ext.annotationElems()) {
-            ae.del().prettyPrint(w, tr);
+            ae.del().NodeOps(ae).prettyPrint(w, tr);
             w.newline();
         }
 

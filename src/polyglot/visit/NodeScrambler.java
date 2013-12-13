@@ -125,9 +125,9 @@ public class NodeScrambler extends NodeVisitor {
 
                 try {
                     System.err.println("Replacing:");
-                    n.del().dump(System.err);
+                    n.del().NodeOps(n).dump(System.err);
                     System.err.println("With:");
-                    m.del().dump(System.err);
+                    m.del().NodeOps(m).dump(System.err);
                 }
                 catch (Exception e) {
                     e.printStackTrace();

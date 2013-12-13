@@ -27,7 +27,6 @@ package polyglot.ext.jl5.ast;
 
 import polyglot.ast.New;
 import polyglot.ast.NewOps;
-import polyglot.ast.Node;
 import polyglot.ast.TypeNode;
 import polyglot.types.ClassType;
 import polyglot.types.Context;
@@ -35,25 +34,11 @@ import polyglot.types.SemanticException;
 import polyglot.util.CodeWriter;
 import polyglot.util.SerialVersionUID;
 import polyglot.visit.AmbiguityRemover;
-import polyglot.visit.NodeVisitor;
 import polyglot.visit.PrettyPrinter;
 import polyglot.visit.TypeChecker;
 
 public class JL5NewDel extends JL5Del implements NewOps {
     private static final long serialVersionUID = SerialVersionUID.generate();
-
-    @Override
-    public Node visitChildren(NodeVisitor v) {
-        JL5NewExt ext = (JL5NewExt) JL5Ext.ext(this.node());
-        return ext.visitChildren(v);
-    }
-
-    @Override
-    public Node disambiguateOverride(Node parent, AmbiguityRemover ar)
-            throws SemanticException {
-        JL5NewExt ext = (JL5NewExt) JL5Ext.ext(this.node());
-        return ext.disambiguateOverride(parent, ar);
-    }
 
     @Override
     public TypeNode findQualifiedTypeNode(AmbiguityRemover ar, ClassType outer,
@@ -70,18 +55,6 @@ public class JL5NewDel extends JL5Del implements NewOps {
     }
 
     @Override
-    public Node typeCheck(TypeChecker tc) throws SemanticException {
-        JL5NewExt ext = (JL5NewExt) JL5Ext.ext(this.node());
-        return ext.typeCheck(tc);
-    }
-
-    @Override
-    public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
-        JL5NewExt ext = (JL5NewExt) JL5Ext.ext(this.node());
-        ext.prettyPrint(w, tr);
-    }
-
-    @Override
     public ClassType findEnclosingClass(Context c, ClassType ct) {
         JL5NewExt ext = (JL5NewExt) JL5Ext.ext(this.node());
         return ext.findEnclosingClass(c, ct);
@@ -89,28 +62,32 @@ public class JL5NewDel extends JL5Del implements NewOps {
 
     @Override
     public void typeCheckFlags(TypeChecker tc) throws SemanticException {
-        ((NewOps) jl()).typeCheckFlags(tc);
+        JL5NewExt ext = (JL5NewExt) JL5Ext.ext(this.node());
+        ext.typeCheckFlags(tc);
     }
 
     @Override
     public void typeCheckNested(TypeChecker tc) throws SemanticException {
-        ((NewOps) jl()).typeCheckNested(tc);
-
+        JL5NewExt ext = (JL5NewExt) JL5Ext.ext(this.node());
+        ext.typeCheckNested(tc);
     }
 
     @Override
     public void printQualifier(CodeWriter w, PrettyPrinter tr) {
-        ((NewOps) jl()).printQualifier(w, tr);
+        JL5NewExt ext = (JL5NewExt) JL5Ext.ext(this.node());
+        ext.printQualifier(w, tr);
     }
 
     @Override
     public void printArgs(CodeWriter w, PrettyPrinter tr) {
-        ((NewOps) jl()).printArgs(w, tr);
+        JL5NewExt ext = (JL5NewExt) JL5Ext.ext(this.node());
+        ext.printArgs(w, tr);
     }
 
     @Override
     public void printBody(CodeWriter w, PrettyPrinter tr) {
-        ((NewOps) jl()).printBody(w, tr);
+        JL5NewExt ext = (JL5NewExt) JL5Ext.ext(this.node());
+        ext.printBody(w, tr);
     }
 
 }

@@ -748,12 +748,20 @@ override class_instance_creation_expression ::=
 	|	NEW:a type_arguments:b class_or_interface_type:c LPAREN:d argument_list_opt:e RPAREN:f class_body_opt:g
 	    // Instantiating type arguments    
         {: RESULT = parser.nf.New(parser.pos(a), b, c, e, g); :}
-	|	primary:a DOT:b NEW:c type_arguments_opt:d IDENTIFIER:e type_arguments_opt:f LPAREN:g argument_list_opt:h RPAREN:i class_body_opt:j
+	|	primary:a DOT:b NEW:c type_arguments_opt:d IDENTIFIER:e LPAREN:g argument_list_opt:h RPAREN:i class_body_opt:j
+        // Instantiating type arguments    
+        {: TypeNode aa = (new JL5Name(parser.nf, parser.ts, parser.pos(e), parser.nf.Id(parser.pos(e), e.getIdentifier()))).toType();
+           RESULT = parser.nf.New(parser.pos(a), a, d, aa, h, j); :}
+	|	name:a DOT:b NEW:c type_arguments_opt:d IDENTIFIER:e LPAREN:g argument_list_opt:h RPAREN:i class_body_opt:j
+	    // Instantiating type arguments    
+        {: TypeNode aa = (new JL5Name(parser.nf, parser.ts, parser.pos(e), parser.nf.Id(parser.pos(e), e.getIdentifier()))).toType();
+           RESULT = parser.nf.New(parser.pos(a), a.toExpr(), d, aa, h, j); :}
+	|	primary:a DOT:b NEW:c type_arguments_opt:d IDENTIFIER:e type_arguments:f LPAREN:g argument_list_opt:h RPAREN:i class_body_opt:j
         // Instantiating type arguments    
         {: TypeNode aa = (new JL5Name(parser.nf, parser.ts, parser.pos(e), parser.nf.Id(parser.pos(e), e.getIdentifier()))).toType();
            TypeNode tn = parser.nf.AmbTypeInstantiation(parser.pos(e, f), aa, f); 
            RESULT = parser.nf.New(parser.pos(a), a, d, tn, h, j); :}
-	|	name:a DOT:b NEW:c type_arguments_opt:d IDENTIFIER:e type_arguments_opt:f LPAREN:g argument_list_opt:h RPAREN:i class_body_opt:j
+	|	name:a DOT:b NEW:c type_arguments_opt:d IDENTIFIER:e type_arguments:f LPAREN:g argument_list_opt:h RPAREN:i class_body_opt:j
 	    // Instantiating type arguments    
         {: TypeNode aa = (new JL5Name(parser.nf, parser.ts, parser.pos(e), parser.nf.Id(parser.pos(e), e.getIdentifier()))).toType();
            TypeNode tn = parser.nf.AmbTypeInstantiation(parser.pos(e, f), aa, f);

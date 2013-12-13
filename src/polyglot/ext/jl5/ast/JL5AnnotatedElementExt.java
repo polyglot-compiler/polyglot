@@ -62,6 +62,7 @@ public abstract class JL5AnnotatedElementExt extends JL5Ext implements
         return n;
     }
 
+    @Override
     public Node visitChildren(NodeVisitor v) {
         Node newN = this.node().visitChildren(v);
         JL5AnnotatedElementExt newext =
@@ -86,6 +87,7 @@ public abstract class JL5AnnotatedElementExt extends JL5Ext implements
         return newN;
     }
 
+    @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
         JL5AnnotatedElementExt ext =
                 (JL5AnnotatedElementExt) JL5Ext.ext(this.node());

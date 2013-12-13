@@ -85,13 +85,13 @@ public class ConstantChecker extends ContextVisitor {
         }
 
         if (tcc.checked) {
-            n.del().visitChildren(tcc);
+            n.del().NodeOps(n).visitChildren(tcc);
         }
 
         Node m = n;
 
         if (tcc.checked) {
-            m = m.del().checkConstants((ConstantChecker) v);
+            m = m.del().NodeOps(m).checkConstants((ConstantChecker) v);
         }
         else {
             Scheduler scheduler = job().extensionInfo().scheduler();

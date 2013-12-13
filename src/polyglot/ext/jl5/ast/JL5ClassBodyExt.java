@@ -39,13 +39,14 @@ import polyglot.visit.PrettyPrinter;
 public class JL5ClassBodyExt extends JL5Ext {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
+    @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
         ClassBody cb = (ClassBody) this.node();
 
         // check if we have any EnumConstantDecl
         List<EnumConstantDecl> ecds = enumConstantDecls();
         if (ecds.isEmpty()) {
-            this.superDel().prettyPrint(w, tr);
+            this.superDel().NodeOps(this.node()).prettyPrint(w, tr);
             return;
         }
 

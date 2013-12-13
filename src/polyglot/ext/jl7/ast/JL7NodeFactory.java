@@ -10,6 +10,8 @@ import polyglot.util.Position;
 
 public interface JL7NodeFactory extends JL5NodeFactory {
 
+    AmbDiamondTypeNode AmbDiamondTypeNode(Position pos, TypeNode base);
+
     TypeNode AmbUnionType(Position pos, List<TypeNode> alternatives);
 
     MultiCatch MultiCatch(Position pos, Formal formal,

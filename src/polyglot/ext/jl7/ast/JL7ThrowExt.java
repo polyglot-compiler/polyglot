@@ -14,6 +14,7 @@ public class JL7ThrowExt extends JL7Ext {
 
     protected List<Type> throwSet = null;
 
+    @Override
     public List<Type> throwTypes(TypeSystem ts) {
         Throw n = (Throw) this.node();
         if (n.expr() instanceof Local) {
@@ -27,7 +28,7 @@ public class JL7ThrowExt extends JL7Ext {
                 return this.throwSet;
             }
         }
-        return this.superDel().throwTypes(ts);
+        return this.superDel().NodeOps(this.node()).throwTypes(ts);
     }
 
 }

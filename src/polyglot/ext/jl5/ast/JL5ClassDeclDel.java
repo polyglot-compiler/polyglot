@@ -26,53 +26,18 @@
 package polyglot.ext.jl5.ast;
 
 import polyglot.ast.ClassDeclOps;
-import polyglot.ast.JLDel;
 import polyglot.ast.Node;
 import polyglot.ast.NodeFactory;
 import polyglot.types.ConstructorInstance;
-import polyglot.types.Context;
 import polyglot.types.SemanticException;
 import polyglot.types.TypeSystem;
 import polyglot.util.CodeWriter;
-import polyglot.util.InternalCompilerError;
 import polyglot.util.SerialVersionUID;
-import polyglot.visit.NodeVisitor;
 import polyglot.visit.PrettyPrinter;
-import polyglot.visit.TypeBuilder;
-import polyglot.visit.TypeChecker;
 
 public class JL5ClassDeclDel extends JL5AnnotatedElementDel implements
         ClassDeclOps {
     private static final long serialVersionUID = SerialVersionUID.generate();
-
-    @Override
-    public Node buildTypes(TypeBuilder tb) throws SemanticException {
-        JL5ClassDeclExt ext = (JL5ClassDeclExt) JL5Ext.ext(this.node());
-        return ext.buildTypes(tb);
-    }
-
-    @Override
-    public Node visitChildren(NodeVisitor v) {
-        JL5ClassDeclExt ext = (JL5ClassDeclExt) JL5Ext.ext(this.node());
-        return ext.visitChildren(v);
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see polyglot.ast.NodeOps#enterScope(polyglot.types.Context)
-     */
-    @Override
-    public Context enterChildScope(Node child, Context c) {
-        JL5ClassDeclExt ext = (JL5ClassDeclExt) JL5Ext.ext(this.node());
-        return ext.enterChildScope(child, c);
-    }
-
-    @Override
-    public Node typeCheck(TypeChecker tc) throws SemanticException {
-        JL5ClassDeclExt ext = (JL5ClassDeclExt) JL5Ext.ext(this.node());
-        return ext.typeCheck(tc);
-    }
 
     @Override
     public void prettyPrintHeader(CodeWriter w, PrettyPrinter tr) {
@@ -82,28 +47,16 @@ public class JL5ClassDeclDel extends JL5AnnotatedElementDel implements
 
     @Override
     public void prettyPrintFooter(CodeWriter w, PrettyPrinter tr) {
-        JLDel jl = this.jl();
-        if (jl instanceof ClassDeclOps) {
-            ((ClassDeclOps) jl).prettyPrintFooter(w, tr);
-        }
-        else {
-            throw new InternalCompilerError("jl() should implement ClassDeclOps");
-        }
+        JL5ClassDeclExt ext = (JL5ClassDeclExt) JL5Ext.ext(this.node());
+        ext.prettyPrintFooter(w, tr);
     }
 
     @Override
     public Node addDefaultConstructor(TypeSystem ts, NodeFactory nf,
             ConstructorInstance defaultConstructorInstance)
             throws SemanticException {
-        JLDel jl = this.jl();
-        if (jl instanceof ClassDeclOps) {
-            return ((ClassDeclOps) jl).addDefaultConstructor(ts,
-                                                             nf,
-                                                             defaultConstructorInstance);
-        }
-        else {
-            throw new InternalCompilerError("jl() should implement ClassDeclOps");
-        }
+        JL5ClassDeclExt ext = (JL5ClassDeclExt) JL5Ext.ext(this.node());
+        return ext.addDefaultConstructor(ts, nf, defaultConstructorInstance);
     }
 
 }

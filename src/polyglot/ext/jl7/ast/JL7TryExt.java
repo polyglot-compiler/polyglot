@@ -10,7 +10,6 @@ import polyglot.ast.LocalAssign;
 import polyglot.ast.Node;
 import polyglot.ast.Throw;
 import polyglot.ast.Try;
-import polyglot.ast.TryOps;
 import polyglot.types.LocalInstance;
 import polyglot.types.SemanticException;
 import polyglot.types.Type;
@@ -20,18 +19,46 @@ import polyglot.util.SubtypeSet;
 import polyglot.visit.ExceptionChecker;
 import polyglot.visit.NodeVisitor;
 
-public class JL7TryExt extends JL7Ext {
+public class JL7TryExt extends JL7Ext implements JL7TryOps {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
+    @Override
     public Block exceptionCheckTryBlock(ExceptionChecker ec)
             throws SemanticException {
-        Block b = ((TryOps) this.superDel()).exceptionCheckTryBlock(ec);
+        Block b =
+                this.superDel().TryOps(this.node()).exceptionCheckTryBlock(ec);
 
-        ((JL7TryOps) this.node().del()).checkPreciseRethrows(ec.typeSystem(), b);
+        ((JL7Del) this.node().del()).TryOps(this.node())
+                                    .checkPreciseRethrows(ec.typeSystem(), b);
 
         return b;
     }
 
+    @Override
+    public ExceptionChecker constructTryBlockExceptionChecker(
+            ExceptionChecker ec) {
+        return this.superDel()
+                   .TryOps(this.node())
+                   .constructTryBlockExceptionChecker(ec);
+    }
+
+    @Override
+    public List<Catch> exceptionCheckCatchBlocks(ExceptionChecker ec)
+            throws SemanticException {
+        return this.superDel()
+                   .TryOps(this.node())
+                   .exceptionCheckCatchBlocks(ec);
+    }
+
+    @Override
+    public Block exceptionCheckFinallyBlock(ExceptionChecker ec)
+            throws SemanticException {
+        return this.superDel()
+                   .TryOps(this.node())
+                   .exceptionCheckFinallyBlock(ec);
+    }
+
+    @Override
     public void checkPreciseRethrows(TypeSystem ts, Block tryBlock) {
         Try n = (Try) this.node();
 
@@ -47,14 +74,16 @@ public class JL7TryExt extends JL7Ext {
             // The exceptions that can reach cb are the exceptions in thrown
             // that may be assignable to catchType.
 
-            ((JL7TryOps) this.node().del()).preciseRethrowsForCatchBlock(cb,
-                                                                         thrown);
+            ((JL7Del) this.node().del()).TryOps(this.node())
+                                        .preciseRethrowsForCatchBlock(cb,
+                                                                      thrown);
 
             thrown.remove(catchType);
         }
 
     }
 
+    @Override
     public void preciseRethrowsForCatchBlock(Catch cb, SubtypeSet reaching) {
         List<Type> s = new ArrayList<Type>();
         for (Type t : reaching) {
@@ -146,5 +175,4 @@ public class JL7TryExt extends JL7Ext {
             return n;
         }
     }
-
 }

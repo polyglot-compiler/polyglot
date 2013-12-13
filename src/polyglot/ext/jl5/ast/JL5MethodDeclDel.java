@@ -25,48 +25,15 @@
  ******************************************************************************/
 package polyglot.ext.jl5.ast;
 
-import polyglot.ast.Node;
 import polyglot.ast.ProcedureDeclOps;
-import polyglot.types.Context;
 import polyglot.types.Flags;
-import polyglot.types.SemanticException;
 import polyglot.util.CodeWriter;
 import polyglot.util.SerialVersionUID;
-import polyglot.visit.AmbiguityRemover;
-import polyglot.visit.NodeVisitor;
 import polyglot.visit.PrettyPrinter;
-import polyglot.visit.Translator;
-import polyglot.visit.TypeBuilder;
-import polyglot.visit.TypeChecker;
 
 public class JL5MethodDeclDel extends JL5AnnotatedElementDel implements
         ProcedureDeclOps {
     private static final long serialVersionUID = SerialVersionUID.generate();
-
-    @Override
-    public Node buildTypes(TypeBuilder tb) throws SemanticException {
-        return ((JL5MethodDeclExt) JL5Ext.ext(this.node())).buildTypes(tb);
-    }
-
-    @Override
-    public Node disambiguate(AmbiguityRemover ar) throws SemanticException {
-        return ((JL5MethodDeclExt) JL5Ext.ext(this.node())).disambiguate(ar);
-    }
-
-    @Override
-    public Node typeCheck(TypeChecker tc) throws SemanticException {
-        return ((JL5MethodDeclExt) JL5Ext.ext(this.node())).typeCheck(tc);
-    }
-
-    @Override
-    public Node visitChildren(NodeVisitor v) {
-        return ((JL5MethodDeclExt) JL5Ext.ext(this.node())).visitChildren(v);
-    }
-
-    @Override
-    public void translate(CodeWriter w, Translator tr) {
-        ((JL5MethodDeclExt) JL5Ext.ext(this.node())).translate(w, tr);
-    }
 
     @Override
     public void prettyPrintHeader(Flags flags, CodeWriter w, PrettyPrinter tr) {
@@ -74,10 +41,4 @@ public class JL5MethodDeclDel extends JL5AnnotatedElementDel implements
                                                                        w,
                                                                        tr);
     }
-
-    @Override
-    public Context enterScope(Context c) {
-        return ((JL5MethodDeclExt) JL5Ext.ext(this.node())).enterScope(c);
-    }
-
 }

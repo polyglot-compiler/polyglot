@@ -37,9 +37,10 @@ import polyglot.util.SerialVersionUID;
 import polyglot.visit.ConstantChecker;
 import polyglot.visit.TypeChecker;
 
-public class JL7CaseExt extends JL7Ext {
+public class JL7CaseExt extends JL7Ext implements JL5CaseOps {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
+    @Override
     public Node resolveCaseLabel(TypeChecker tc, Type switchType)
             throws SemanticException {
         JL5TypeSystem ts = (JL5TypeSystem) tc.typeSystem();
@@ -52,6 +53,7 @@ public class JL7CaseExt extends JL7Ext {
         return ((JL5CaseOps) this.superDel()).resolveCaseLabel(tc, switchType);
     }
 
+    @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
         Case c = (Case) this.node();
         TypeSystem ts = tc.typeSystem();
@@ -60,9 +62,10 @@ public class JL7CaseExt extends JL7Ext {
             return c;
         }
 
-        return this.superDel().typeCheck(tc);
+        return this.superDel().NodeOps(this.node()).typeCheck(tc);
     }
 
+    @Override
     public Node checkConstants(ConstantChecker cc) throws SemanticException {
         Case c = (Case) this.node();
         Expr expr = c.expr();
@@ -72,7 +75,7 @@ public class JL7CaseExt extends JL7Ext {
             return c; // OK, it's a string.
         }
 
-        return superDel().checkConstants(cc);
+        return superDel().NodeOps(this.node()).checkConstants(cc);
 
     }
 }

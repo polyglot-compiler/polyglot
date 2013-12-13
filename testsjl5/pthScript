@@ -68,7 +68,7 @@ polyglot.ext.jl5.ExtensionInfo "-d out -classpath java-out -assert -noserial -po
         Generics23.jl5 (Semantic);
         Generics24.jl5 (Semantic, "Wrong number of type parameters"),
                           (Semantic, "Wrong number of type parameters"),
-                       (Semantic, "Wrong number of type parameters");
+                       (Semantic, "Cannot instantiate .* because it has no formals");
         Generics25.jl5 (Semantic);
         Generics26.jl5 (Post, "Xlint");
         Generics27.jl5;        
@@ -460,7 +460,7 @@ polyglot.ext.jl5.ExtensionInfo "-d out -classpath java-out -removeJava5isms -enu
         Generics23.jl5 (Semantic);
         Generics24.jl5 (Semantic, "Wrong number of type parameters"),
                        (Semantic, "Wrong number of type parameters"),
-                       (Semantic, "Wrong number of type parameters");
+                       (Semantic, "Cannot instantiate .* because it has no formals");
         Generics25.jl5 (Semantic);
         Generics26.jl5;
         Generics27.jl5; 

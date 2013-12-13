@@ -134,7 +134,7 @@ public class ExceptionChecker extends ErrorHandlingVisitor {
 
     @Override
     protected NodeVisitor enterCall(Node n) throws SemanticException {
-        return n.del().exceptionCheckEnter(this);
+        return n.del().NodeOps(n).exceptionCheckEnter(this);
     }
 
     @Override
@@ -173,7 +173,7 @@ public class ExceptionChecker extends ErrorHandlingVisitor {
         }
 
         // gather exceptions from this node.
-        return n.del().exceptionCheck(inner);
+        return n.del().NodeOps(n).exceptionCheck(inner);
     }
 
     /**

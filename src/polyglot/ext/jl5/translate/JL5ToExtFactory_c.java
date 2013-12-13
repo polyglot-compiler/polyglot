@@ -165,6 +165,10 @@ public class JL5ToExtFactory_c extends ToExtFactory_c implements JL5ExtFactory {
         return postExtElementValueArrayInit(e);
     }
 
+    protected Ext extAmbTypeInstantiationImpl() {
+        return new CannotToExt_c();
+    }
+
     protected Ext extEnumDeclImpl() {
         return new EnumDeclToExt_c();
     }
@@ -194,6 +198,10 @@ public class JL5ToExtFactory_c extends ToExtFactory_c implements JL5ExtFactory {
 //    protected Ext extNodeImpl() {
 //        return new JL5Del();
 //    }
+
+    public Ext postExtAmbTypeInstantiation(Ext ext) {
+        return this.postExtTypeNode(ext);
+    }
 
     public Ext postExtEnumDecl(Ext ext) {
         return this.postExtClassDecl(ext);

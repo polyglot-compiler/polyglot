@@ -39,14 +39,16 @@ import polyglot.types.Type;
 import polyglot.util.SerialVersionUID;
 import polyglot.visit.TypeChecker;
 
-public class JL5SwitchExt extends JL5Ext {
+public class JL5SwitchExt extends JL5Ext implements JL5SwitchOps {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
+    @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
         Switch s = (Switch) this.node();
         Expr expr = s.expr();
 
-        if (!((JL5SwitchOps) s.del()).isAcceptableSwitchType(expr.type())) {
+        if (!((JL5Del) s.del()).SwitchOps(s)
+                               .isAcceptableSwitchType(expr.type())) {
             throw new SemanticException("Switch index must be of type char, byte,"
                                                 + " short, int, Character, Byte, Short, Integer, or an enum type.",
                                         s.position());
@@ -58,8 +60,9 @@ public class JL5SwitchExt extends JL5Ext {
         for (SwitchElement el : s.elements()) {
             if (el instanceof Case) {
                 el =
-                        (SwitchElement) ((JL5CaseOps) el.del()).resolveCaseLabel(tc,
-                                                                                 switchType);
+                        (SwitchElement) ((JL5Del) el.del()).CaseOps(el)
+                                                           .resolveCaseLabel(tc,
+                                                                             switchType);
             }
 
             newels.add(el);
@@ -67,6 +70,7 @@ public class JL5SwitchExt extends JL5Ext {
         return s.elements(newels);
     }
 
+    @Override
     public boolean isAcceptableSwitchType(Type type) {
         JL5TypeSystem ts = (JL5TypeSystem) type.typeSystem();
         if (ts.Char().equals(type) || ts.Byte().equals(type)

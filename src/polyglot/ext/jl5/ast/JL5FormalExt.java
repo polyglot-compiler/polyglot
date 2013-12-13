@@ -87,6 +87,7 @@ public class JL5FormalExt extends JL5AnnotatedElementExt implements
 
     }
 
+    @Override
     public Node disambiguate(AmbiguityRemover ar) throws SemanticException {
         Formal f = (Formal) this.node();
         JL5FormalExt ext = (JL5FormalExt) JL5Ext.ext(f);
@@ -94,15 +95,16 @@ public class JL5FormalExt extends JL5AnnotatedElementExt implements
         if (ext.isVarArg()) {
             ((JL5ArrayType) f.type().type()).setVarArg();
         }
-        return this.superDel().disambiguate(ar);
+        return this.superDel().NodeOps(this.node()).disambiguate(ar);
     }
 
+    @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
         Formal f = (Formal) this.node();
         JL5FormalExt ext = (JL5FormalExt) JL5Ext.ext(f);
 
         for (AnnotationElem ae : ext.annotationElems()) {
-            ae.del().prettyPrint(w, tr);
+            ae.del().NodeOps(ae).prettyPrint(w, tr);
             w.newline();
         }
 

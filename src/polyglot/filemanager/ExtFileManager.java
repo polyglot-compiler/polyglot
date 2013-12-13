@@ -46,6 +46,7 @@ import java.util.zip.ZipFile;
 
 import javax.tools.FileObject;
 import javax.tools.ForwardingJavaFileManager;
+import javax.tools.JavaCompiler;
 import javax.tools.JavaFileObject;
 import javax.tools.JavaFileObject.Kind;
 import javax.tools.StandardJavaFileManager;
@@ -116,9 +117,7 @@ public class ExtFileManager extends
     protected List<Location> default_locations;
 
     public ExtFileManager(ExtensionInfo extInfo) {
-        super(ToolProvider.getSystemJavaCompiler().getStandardFileManager(null,
-                                                                          null,
-                                                                          null));
+        super(javaCompiler().getStandardFileManager(null, null, null));
         this.extInfo = extInfo;
         loadedSources = new HashMap<String, FileSource>();
         packageCache = new HashMap<String, Boolean>();
@@ -127,6 +126,14 @@ public class ExtFileManager extends
         objectMap = new HashMap<Location, Map<String, JavaFileObject>>();
         inMemory = extInfo.getOptions().noOutputToFS;
         default_locations = extInfo.defaultLocations();
+    }
+
+    private static JavaCompiler javaCompiler() {
+        JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
+        if (compiler == null)
+            throw new InternalCompilerError("Java compiler not found.  "
+                    + "Does java that runs Polyglot have javac along with it?");
+        return compiler;
     }
 
     @Override

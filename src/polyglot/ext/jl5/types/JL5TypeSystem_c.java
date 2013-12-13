@@ -973,7 +973,7 @@ public class JL5TypeSystem_c extends
      * @param argTypes
      * @return
      */
-    private JL5Subst inferTypeArgs(JL5ProcedureInstance mi,
+    protected JL5Subst inferTypeArgs(JL5ProcedureInstance mi,
             List<? extends Type> argTypes, Type expectedReturnType) {
         InferenceSolver s = new InferenceSolver_c(mi, argTypes, this);
         Map<TypeVariable, ReferenceType> m = s.solve(expectedReturnType);
@@ -1032,7 +1032,7 @@ public class JL5TypeSystem_c extends
         return ret;
     }
 
-    private boolean boxingRequired(JL5ProcedureInstance pi,
+    protected boolean boxingRequired(JL5ProcedureInstance pi,
             List<? extends Type> paramTypes) {
         int numFormals = pi.formalTypes().size();
         for (int i = 0; i < numFormals - 1; i++) {
@@ -1056,7 +1056,7 @@ public class JL5TypeSystem_c extends
         return false;
     }
 
-    private boolean varArgsRequired(JL5ProcedureInstance pi) {
+    protected boolean varArgsRequired(JL5ProcedureInstance pi) {
         return pi.isVariableArity();
     }
 

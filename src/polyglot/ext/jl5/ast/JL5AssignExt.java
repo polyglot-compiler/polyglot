@@ -42,6 +42,7 @@ import polyglot.visit.TypeChecker;
 public class JL5AssignExt extends JL5Ext {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
+    @Override
     public Type childExpectedType(Expr child, AscriptionVisitor av) {
         Assign a = (Assign) this.node();
         Expr left = a.left();
@@ -99,6 +100,7 @@ public class JL5AssignExt extends JL5Ext {
                 + op + ".");
     }
 
+    @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
         Assign a = (Assign) this.node();
         Type t = a.left().type();

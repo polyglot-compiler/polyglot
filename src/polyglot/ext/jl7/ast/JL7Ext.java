@@ -1,21 +1,20 @@
 package polyglot.ext.jl7.ast;
 
+import java.util.List;
+
 import polyglot.ast.Ext;
 import polyglot.ast.Ext_c;
-import polyglot.ast.JLDel;
 import polyglot.ast.Node;
+import polyglot.types.SemanticException;
+import polyglot.types.Type;
+import polyglot.types.TypeSystem;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.SerialVersionUID;
+import polyglot.visit.ConstantChecker;
+import polyglot.visit.TypeChecker;
 
 public class JL7Ext extends Ext_c {
     private static final long serialVersionUID = SerialVersionUID.generate();
-
-    /**
-     * The delegate object to invoke "superclass" functionality.
-     * If null, this superclass functionality will by default be delegated
-     * to the node. However, extensions to JL5 can override this if needed.
-     */
-    protected JLDel superDel = null;
 
     public static JL7Ext ext(Node n) {
         Ext e = n.ext();
@@ -29,31 +28,19 @@ public class JL7Ext extends Ext_c {
         return (JL7Ext) e;
     }
 
-    public JLDel superDel() {
-        if (this.superDel == null) {
-            return this.node();
-        }
-        return this.superDel;
+    /** Type check the expression. */
+    @Override
+    public Node typeCheck(TypeChecker tc) throws SemanticException {
+        return this.superDel().NodeOps(this.node()).typeCheck(tc);
     }
 
     @Override
-    public void init(Node node) {
-        super.init(node);
-        if (superDel != null) {
-            superDel.init(node);
-        }
+    public Node checkConstants(ConstantChecker cc) throws SemanticException {
+        return this.superDel().NodeOps(this.node()).checkConstants(cc);
     }
 
     @Override
-    public Object copy() {
-        JL7Ext copy = (JL7Ext) super.copy();
-        if (superDel != null) {
-            copy.superDel = (JLDel) superDel.copy();
-        }
-        return copy;
-    }
-
-    public void setSuperDel(JLDel superDel) {
-        this.superDel = superDel;
+    public List<Type> throwTypes(TypeSystem ts) {
+        return this.superDel().NodeOps(this.node()).throwTypes(ts);
     }
 }

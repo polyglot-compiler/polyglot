@@ -50,6 +50,7 @@ import polyglot.visit.TypeChecker;
 public class JL5ImportExt extends JL5Ext {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
+    @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
         Import n = (Import) this.node();
         // check class is exists and is accessible
@@ -80,7 +81,7 @@ public class JL5ImportExt extends JL5Ext {
             return n;
         }
         else {
-            return this.superDel().typeCheck(tc);
+            return this.superDel().NodeOps(this.node()).typeCheck(tc);
         }
     }
 
@@ -131,6 +132,7 @@ public class JL5ImportExt extends JL5Ext {
         return false;
     }
 
+    @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
         Import n = (Import) this.node();
         if (n.kind() == SINGLE_STATIC_MEMBER || n.kind() == STATIC_ON_DEMAND) {
@@ -144,7 +146,7 @@ public class JL5ImportExt extends JL5Ext {
             w.write(";");
             w.newline(0);
         }
-        else this.superDel().prettyPrint(w, tr);
+        else this.superDel().NodeOps(this.node()).prettyPrint(w, tr);
 
     }
 }

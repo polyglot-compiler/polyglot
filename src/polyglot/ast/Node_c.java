@@ -75,20 +75,8 @@ public abstract class Node_c implements Node {
     }
 
     @Override
-    public void init(Node node) {
-        if (node != this) {
-            throw new InternalCompilerError("Cannot use a Node as a delegate or extension.");
-        }
-    }
-
-    @Override
-    public Node node() {
-        return this;
-    }
-
-    @Override
     public JLDel del() {
-        return del != null ? del : this;
+        return del != null ? del : JLDel_c.instance;
     }
 
     @Override
@@ -104,15 +92,20 @@ public abstract class Node_c implements Node {
 
         n.del = del != this ? del : null;
 
-        if (n.del != null) {
-            n.del.init(n);
-        }
-
+//        if (n.del != null) {
+//            n.del.init(n);
+//        }
+//
         this.del = old;
 
         return n;
     }
 
+//    @Override
+//    public final JLDel superDel() {
+//        return null;
+//    }
+//
     @Override
     public Ext ext(int n) {
         if (n < 1) throw new InternalCompilerError("n must be >= 1");
@@ -163,11 +156,11 @@ public abstract class Node_c implements Node {
         try {
             Node_c n = (Node_c) super.clone();
 
-            if (this.del != null) {
-                n.del = (JLDel) this.del.copy();
-                n.del.init(n);
-            }
-
+//            if (this.del != null) {
+//                n.del = (JLDel) this.del.copy();
+//                n.del.init(n);
+//            }
+//
             if (this.ext != null) {
                 n.ext = (Ext) this.ext.copy();
                 n.ext.init(n);
@@ -243,7 +236,7 @@ public abstract class Node_c implements Node {
                 throw new InternalCompilerError("NodeVisitor.enter() returned null.");
             }
 
-            n = this.del().visitChildren(v_);
+            n = this.del().NodeOps(this).visitChildren(v_);
 
             if (n == null) {
                 throw new InternalCompilerError("Node_c.visitChildren() returned null.");
@@ -320,7 +313,7 @@ public abstract class Node_c implements Node {
      */
     @Override
     public Context enterChildScope(Node child, Context c) {
-        return child.del().enterScope(c);
+        return child.del().NodeOps(child).enterScope(c);
     }
 
     /**
@@ -396,7 +389,8 @@ public abstract class Node_c implements Node {
 
     @Override
     public Node exceptionCheck(ExceptionChecker ec) throws SemanticException {
-        List<? extends Type> l = this.del().throwTypes(ec.typeSystem());
+        List<? extends Type> l =
+                this.del().NodeOps(this).throwTypes(ec.typeSystem());
         for (Type exc : l) {
             ec.throwsException(exc, position());
         }
@@ -435,7 +429,7 @@ public abstract class Node_c implements Node {
     public void prettyPrint(OutputStream os) {
         try {
             CodeWriter cw = Compiler.createCodeWriter(os);
-            this.del().prettyPrint(cw, new PrettyPrinter());
+            this.del().NodeOps(this).prettyPrint(cw, new PrettyPrinter());
             cw.flush();
         }
         catch (java.io.IOException e) {
@@ -447,7 +441,7 @@ public abstract class Node_c implements Node {
     public void prettyPrint(Writer w) {
         try {
             CodeWriter cw = Compiler.createCodeWriter(w);
-            this.del().prettyPrint(cw, new PrettyPrinter());
+            this.del().NodeOps(this).prettyPrint(cw, new PrettyPrinter());
             cw.flush();
         }
         catch (java.io.IOException e) {
@@ -484,7 +478,7 @@ public abstract class Node_c implements Node {
     @Override
     public void translate(CodeWriter w, Translator tr) {
         // By default, just rely on the pretty printer.
-        this.del().prettyPrint(w, tr);
+        this.del().NodeOps(this).prettyPrint(w, tr);
     }
 
     @Override
@@ -547,7 +541,7 @@ public abstract class Node_c implements Node {
 
     @Override
     public Node copy(ExtensionInfo extInfo) throws SemanticException {
-        return this.del().copy(extInfo.nodeFactory());
+        return this.del().NodeOps(this).copy(extInfo.nodeFactory());
     }
 
 }

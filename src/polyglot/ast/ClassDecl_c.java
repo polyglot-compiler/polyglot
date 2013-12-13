@@ -427,9 +427,9 @@ public class ClassDecl_c extends Term_c implements ClassDecl, ClassDeclOps {
     protected Node addDefaultConstructorIfNeeded(TypeSystem ts, NodeFactory nf)
             throws SemanticException {
         if (defaultConstructorNeeded()) {
-            return ((ClassDeclOps) del()).addDefaultConstructor(ts,
-                                                                nf,
-                                                                defaultCI);
+            return del().ClassDeclOps(this).addDefaultConstructor(ts,
+                                                                  nf,
+                                                                  defaultCI);
         }
         return this;
     }
@@ -683,9 +683,9 @@ public class ClassDecl_c extends Term_c implements ClassDecl, ClassDeclOps {
 
     @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
-        ((ClassDeclOps) this.del()).prettyPrintHeader(w, tr);
+        del().ClassDeclOps(this).prettyPrintHeader(w, tr);
         print(body(), w, tr);
-        ((ClassDeclOps) this.del()).prettyPrintFooter(w, tr);
+        del().ClassDeclOps(this).prettyPrintFooter(w, tr);
     }
 
     @Override

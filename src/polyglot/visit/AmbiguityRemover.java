@@ -85,7 +85,7 @@ public class AmbiguityRemover extends DisambiguationDriver {
                 Report.report(2, ">> " + this + "::override " + n + " ("
                         + n.getClass().getName() + ")");
 
-            Node m = n.del().disambiguateOverride(parent, this);
+            Node m = n.del().NodeOps(n).disambiguateOverride(parent, this);
 
             if (Report.should_report(Report.visit, 2))
                 Report.report(2, "<< "
@@ -137,7 +137,8 @@ public class AmbiguityRemover extends DisambiguationDriver {
             Report.report(2, ">> " + this + "::enter " + n + " ("
                     + n.getClass().getName() + ")");
 
-        AmbiguityRemover v = (AmbiguityRemover) n.del().disambiguateEnter(this);
+        AmbiguityRemover v =
+                (AmbiguityRemover) n.del().NodeOps(n).disambiguateEnter(this);
 
         if (Report.should_report(Report.visit, 2))
             Report.report(2, "<< " + this + "::enter " + n + " ("
@@ -173,7 +174,7 @@ public class AmbiguityRemover extends DisambiguationDriver {
 //            return n;
 //        }
 
-        Node m = n.del().disambiguate((AmbiguityRemover) v);
+        Node m = n.del().NodeOps(n).disambiguate((AmbiguityRemover) v);
 
         if (Report.should_report(Report.visit, 2))
             Report.report(2, "<< " + this + "::leave " + n + " -> " + m

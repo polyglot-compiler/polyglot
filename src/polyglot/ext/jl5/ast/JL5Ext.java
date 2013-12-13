@@ -1,21 +1,27 @@
 package polyglot.ext.jl5.ast;
 
+import polyglot.ast.Expr;
 import polyglot.ast.Ext;
 import polyglot.ast.Ext_c;
-import polyglot.ast.JLDel;
 import polyglot.ast.Node;
+import polyglot.ext.jl5.visit.JL5Translator;
+import polyglot.types.Context;
+import polyglot.types.SemanticException;
+import polyglot.types.Type;
+import polyglot.util.CodeWriter;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.SerialVersionUID;
+import polyglot.visit.AmbiguityRemover;
+import polyglot.visit.AscriptionVisitor;
+import polyglot.visit.ConstantChecker;
+import polyglot.visit.NodeVisitor;
+import polyglot.visit.PrettyPrinter;
+import polyglot.visit.Translator;
+import polyglot.visit.TypeBuilder;
+import polyglot.visit.TypeChecker;
 
 public class JL5Ext extends Ext_c {
     private static final long serialVersionUID = SerialVersionUID.generate();
-
-    /**
-     * The delegate object to invoke "superclass" functionality.
-     * If null, this superclass functionality will by default be delegated
-     * to the node. However, extensions to JL5 can override this if needed.
-     */
-    protected JLDel superDel = null;
 
     public static JL5Ext ext(Node n) {
         Ext e = n.ext();
@@ -30,30 +36,78 @@ public class JL5Ext extends Ext_c {
     }
 
     @Override
-    public void init(Node node) {
-        super.init(node);
-        if (superDel != null) {
-            superDel.init(node);
-        }
+    public Node visitChildren(NodeVisitor v) {
+        return this.superDel().NodeOps(this.node()).visitChildren(v);
     }
 
     @Override
-    public Object copy() {
-        JL5Ext copy = (JL5Ext) super.copy();
-        if (superDel != null) {
-            copy.superDel = (JLDel) superDel.copy();
-        }
-        return copy;
+    public Context enterScope(Context c) {
+        return this.superDel().NodeOps(this.node()).enterScope(c);
     }
 
-    public JLDel superDel() {
-        if (this.superDel == null) {
-            return this.node();
-        }
-        return this.superDel;
+    @Override
+    public Context enterChildScope(Node child, Context c) {
+        return this.superDel().NodeOps(this.node()).enterChildScope(child, c);
     }
 
-    public void setSuperDel(JLDel superDel) {
-        this.superDel = superDel;
+    @Override
+    public Node buildTypes(TypeBuilder tb) throws SemanticException {
+        return this.superDel().NodeOps(this.node()).buildTypes(tb);
+    }
+
+    @Override
+    public Node disambiguateOverride(Node parent, AmbiguityRemover ar)
+            throws SemanticException {
+        return this.superDel()
+                   .NodeOps(this.node())
+                   .disambiguateOverride(parent, ar);
+    }
+
+    @Override
+    public Node disambiguate(AmbiguityRemover ar) throws SemanticException {
+        return this.superDel().NodeOps(this.node()).disambiguate(ar);
+    }
+
+    @Override
+    public Node typeCheckOverride(Node parent, TypeChecker tc)
+            throws SemanticException {
+        return this.superDel()
+                   .NodeOps(this.node())
+                   .typeCheckOverride(parent, tc);
+    }
+
+    @Override
+    public NodeVisitor typeCheckEnter(TypeChecker tc) throws SemanticException {
+        return this.superDel().NodeOps(this.node()).typeCheckEnter(tc);
+    }
+
+    /** Type check the expression. */
+    @Override
+    public Node typeCheck(TypeChecker tc) throws SemanticException {
+        return this.superDel().NodeOps(this.node()).typeCheck(tc);
+    }
+
+    @Override
+    public Type childExpectedType(Expr child, AscriptionVisitor av) {
+        return this.superDel()
+                   .NodeOps(this.node())
+                   .childExpectedType(child, av);
+    }
+
+    @Override
+    public Node checkConstants(ConstantChecker cc) throws SemanticException {
+        return this.superDel().NodeOps(this.node()).checkConstants(cc);
+    }
+
+    @Override
+    public void prettyPrint(CodeWriter w, PrettyPrinter pp) {
+        this.superDel().NodeOps(this.node()).prettyPrint(w, pp);
+    }
+
+    @Override
+    public void translate(CodeWriter w, Translator tr) {
+        if (tr instanceof JL5Translator)
+            ((JL5Translator) tr).translateNode(this.node(), w);
+        else this.superDel().NodeOps(this.node()).translate(w, tr);
     }
 }

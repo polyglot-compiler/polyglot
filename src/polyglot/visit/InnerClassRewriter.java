@@ -254,7 +254,9 @@ public class InnerClassRewriter extends InnerClassAbstractRemover {
                 // Translate the class body if any supertype (including ct itself)
                 // is an inner class.
                 Context innerContext =
-                        cd.del().enterChildScope(cd.body(), context);
+                        cd.del()
+                          .NodeOps(cd)
+                          .enterChildScope(cd.body(), context);
                 cd = cd.body(translateClassBody(ct, cd.body(), innerContext));
             }
 

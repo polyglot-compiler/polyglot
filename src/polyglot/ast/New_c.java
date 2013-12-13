@@ -311,7 +311,7 @@ public class New_c extends Expr_c implements New, NewOps {
 
                 if (ct.isMember() && !ct.flags().isStatic()
                         && !ct.flags().isInterface()) {
-                    nn = ((NewOps) nn.del()).findQualifier(ar, ct);
+                    nn = nn.del().NewOps(nn).findQualifier(ar, ct);
 
                     nn =
                             nn.qualifier((Expr) nn.visitChild(nn.qualifier(),
@@ -346,9 +346,8 @@ public class New_c extends Expr_c implements New, NewOps {
                     // just a name.  We'll just punt here and let the extensions handle
                     // this complexity.
                     TypeNode tn =
-                            ((NewOps) del()).findQualifiedTypeNode(ar,
-                                                                   outer,
-                                                                   objectType);
+                            del().NewOps(this)
+                                 .findQualifiedTypeNode(ar, outer, objectType);
                     nn = nn.objectType(tn);
                 }
             }
@@ -438,7 +437,7 @@ public class New_c extends Expr_c implements New, NewOps {
 
         // Search for the outer class of the member.  The outer class is
         // not just ct.outer(); it may be a subclass of ct.outer().
-        Type outer = ((NewOps) del()).findEnclosingClass(c, ct);
+        Type outer = del().NewOps(this).findEnclosingClass(c, ct);
 
         if (outer == null) {
             throw new SemanticException("Could not find non-static member class \""
@@ -481,8 +480,8 @@ public class New_c extends Expr_c implements New, NewOps {
                                         this.position());
         }
 
-        ((NewOps) del()).typeCheckFlags(tc);
-        ((NewOps) del()).typeCheckNested(tc);
+        del().NewOps(this).typeCheckFlags(tc);
+        del().NewOps(this).typeCheckNested(tc);
 
         if (this.body != null) {
             ts.checkClassConformance(anonType);
@@ -533,7 +532,7 @@ public class New_c extends Expr_c implements New, NewOps {
             }
             else {
                 qualifierClassType =
-                        ((NewOps) del()).findEnclosingClass(tc.context(), ct);
+                        del().NewOps(this).findEnclosingClass(tc.context(), ct);
             }
             if (qualifierClassType == null) {
                 throw new SemanticException("Could not find non-static member class \""
@@ -721,7 +720,7 @@ public class New_c extends Expr_c implements New, NewOps {
 
     @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
-        ((NewOps) del()).printQualifier(w, tr);
+        del().NewOps(this).printQualifier(w, tr);
         w.write("new ");
 
         // We need to be careful when pretty printing "new" expressions for
@@ -736,8 +735,8 @@ public class New_c extends Expr_c implements New, NewOps {
             print(objectType, w, tr);
         }
 
-        ((NewOps) del()).printArgs(w, tr);
-        ((NewOps) del()).printBody(w, tr);
+        del().NewOps(this).printArgs(w, tr);
+        del().NewOps(this).printBody(w, tr);
     }
 
     @Override
@@ -832,7 +831,7 @@ public class New_c extends Expr_c implements New, NewOps {
         ConstantChecker cc =
                 new ConstantChecker(tc.job(), tc.typeSystem(), tc.nodeFactory());
         cc = (ConstantChecker) cc.context(childtc.context());
-        nn = (New) nn.del().checkConstants(cc);
+        nn = (New) nn.del().NodeOps(nn).checkConstants(cc);
 
         return nn;
     }

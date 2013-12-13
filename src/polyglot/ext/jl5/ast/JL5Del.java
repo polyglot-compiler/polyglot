@@ -25,23 +25,124 @@
  ******************************************************************************/
 package polyglot.ext.jl5.ast;
 
+import polyglot.ast.CallOps;
+import polyglot.ast.ClassDeclOps;
 import polyglot.ast.JLDel_c;
-import polyglot.ext.jl5.visit.JL5Translator;
-import polyglot.util.CodeWriter;
+import polyglot.ast.NewOps;
+import polyglot.ast.Node;
+import polyglot.ast.NodeOps;
+import polyglot.ast.ProcedureDeclOps;
 import polyglot.util.SerialVersionUID;
-import polyglot.visit.Translator;
 
 public class JL5Del extends JLDel_c {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
-    @Override
-    public void translate(CodeWriter w, Translator tr) {
-        if (tr instanceof JL5Translator) {
-            ((JL5Translator) tr).translateNode(this.node(), w);
-        }
-        else {
-            super.translate(w, tr);
-        }
+    public static final JL5Del instance = new JL5Del();
+
+    protected JL5Del() {
     }
 
+    public JL5Ext jl5ext(Node n) {
+        return JL5Ext.ext(n);
+    }
+
+    @Override
+    public NodeOps NodeOps(Node n) {
+        return jl5ext(n);
+    }
+
+    @Override
+    public CallOps CallOps(Node n) {
+        return (CallOps) jl5ext(n);
+    }
+
+    @Override
+    public ClassDeclOps ClassDeclOps(Node n) {
+        return (ClassDeclOps) jl5ext(n);
+    }
+
+    @Override
+    public NewOps NewOps(Node n) {
+        return (NewOps) jl5ext(n);
+    }
+
+    @Override
+    public ProcedureDeclOps ProcedureDeclOps(Node n) {
+        return (ProcedureDeclOps) jl5ext(n);
+    }
+
+    public JL5CaseOps CaseOps(Node n) {
+        return (JL5CaseOps) jl5ext(n);
+    }
+
+    public JL5SwitchOps SwitchOps(Node n) {
+        return (JL5SwitchOps) jl5ext(n);
+    }
+//
+//    @Override
+//    public Node visitChildren(NodeVisitor v) {
+//        return jl5ext().visitChildren(v);
+//    }
+//
+//    @Override
+//    public Context enterScope(Context c) {
+//        return jl5ext().enterScope(c);
+//    }
+//
+//    @Override
+//    public Context enterChildScope(Node child, Context c) {
+//        return jl5ext().enterChildScope(child, c);
+//    }
+//
+//    @Override
+//    public Node buildTypes(TypeBuilder tb) throws SemanticException {
+//        return jl5ext().buildTypes(tb);
+//    }
+//
+//    @Override
+//    public Node disambiguateOverride(Node parent, AmbiguityRemover ar)
+//            throws SemanticException {
+//        return jl5ext().disambiguateOverride(parent, ar);
+//    }
+//
+//    @Override
+//    public Node disambiguate(AmbiguityRemover ar) throws SemanticException {
+//        return jl5ext().disambiguate(ar);
+//    }
+//
+//    @Override
+//    public Node typeCheckOverride(Node parent, TypeChecker tc)
+//            throws SemanticException {
+//        return jl5ext().typeCheckOverride(parent, tc);
+//    }
+//
+//    @Override
+//    public NodeVisitor typeCheckEnter(TypeChecker tc) throws SemanticException {
+//        return jl5ext().typeCheckEnter(tc);
+//    }
+//
+//    @Override
+//    public Node typeCheck(TypeChecker tc) throws SemanticException {
+//        return jl5ext().typeCheck(tc);
+//    }
+//
+//    @Override
+//    public Type childExpectedType(Expr child, AscriptionVisitor av) {
+//        return jl5ext().childExpectedType(child, av);
+//    }
+//
+//    @Override
+//    public Node checkConstants(ConstantChecker cc) throws SemanticException {
+//        return jl5ext().checkConstants(cc);
+//    }
+//
+//    @Override
+//    public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
+//        jl5ext().prettyPrint(w, tr);
+//    }
+//
+//    @Override
+//    public void translate(CodeWriter w, Translator tr) {
+//        jl5ext().translate(w, tr);
+//    }
 }

@@ -158,6 +158,7 @@ public class JL5CaseExt extends JL5Ext implements JL5CaseOps {
         return false;
     }
 
+    @Override
     public Node disambiguateOverride(Node parent, AmbiguityRemover ar)
             throws SemanticException {
         Case c = (Case) this.node();
@@ -172,6 +173,7 @@ public class JL5CaseExt extends JL5Ext implements JL5CaseOps {
         }
     }
 
+    @Override
     public Node typeCheckOverride(Node parent, TypeChecker tc)
             throws SemanticException {
         Case c = (Case) this.node();
@@ -183,6 +185,7 @@ public class JL5CaseExt extends JL5Ext implements JL5CaseOps {
         return c;
     }
 
+    @Override
     public Node checkConstants(ConstantChecker cc) throws SemanticException {
         Case c = (Case) this.node();
         Expr expr = c.expr();
@@ -192,9 +195,10 @@ public class JL5CaseExt extends JL5Ext implements JL5CaseOps {
 
         if (expr instanceof EnumConstant) return c;
 
-        return this.superDel().checkConstants(cc);
+        return this.superDel().NodeOps(this.node()).checkConstants(cc);
     }
 
+    @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
         Case c = (Case) this.node();
         Expr expr = c.expr();

@@ -24,12 +24,14 @@ import polyglot.types.Type;
 import polyglot.types.TypeSystem;
 import polyglot.util.CodeWriter;
 import polyglot.util.InternalCompilerError;
+import polyglot.util.SerialVersionUID;
 import polyglot.visit.NodeVisitor;
 import polyglot.visit.PrettyPrinter;
 import polyglot.visit.TypeBuilder;
 import polyglot.visit.TypeChecker;
 
 public class JL5EnumDeclExt extends JL5ClassDeclExt {
+    private static final long serialVersionUID = SerialVersionUID.generate();
 
     public ClassDecl addValueOfMethodType(TypeSystem ts) {
         ClassDecl n = (ClassDecl) this.node();
@@ -102,6 +104,7 @@ public class JL5EnumDeclExt extends JL5ClassDeclExt {
         }
     }
 
+    @Override
     public NodeVisitor typeCheckEnter(TypeChecker tc) throws SemanticException {
         ClassDecl n = (ClassDecl) this.node();
         // figure out if this should be an abstract type.
@@ -112,7 +115,7 @@ public class JL5EnumDeclExt extends JL5ClassDeclExt {
             // mi is abstract! First, mark the class as abstract.
             n.type().setFlags(n.type().flags().Abstract());
         }
-        return this.superDel().typeCheckEnter(tc);
+        return this.superDel().NodeOps(this.node()).typeCheckEnter(tc);
     }
 
     @Override
@@ -172,6 +175,7 @@ public class JL5EnumDeclExt extends JL5ClassDeclExt {
         return n;
     }
 
+    @Override
     public Node addDefaultConstructor(TypeSystem ts, NodeFactory nf,
             ConstructorInstance defaultCI) throws SemanticException {
         ClassDecl n = (ClassDecl) this.node();
@@ -184,7 +188,7 @@ public class JL5EnumDeclExt extends JL5ClassDeclExt {
         ConstructorDecl cd =
                 nf.ConstructorDecl(n.body().position().startOf(),
                                    Flags.PRIVATE,
-                                   n.name(),
+                                   n.id(),
                                    Collections.<Formal> emptyList(),
                                    Collections.<TypeNode> emptyList(),
                                    nf.Block(n.position().startOf()));
@@ -193,6 +197,7 @@ public class JL5EnumDeclExt extends JL5ClassDeclExt {
 
     }
 
+    @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
         ClassDecl n = (ClassDecl) this.node();
         prettyPrintHeader(w, tr);

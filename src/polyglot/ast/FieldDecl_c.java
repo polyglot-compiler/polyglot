@@ -382,7 +382,7 @@ public class FieldDecl_c extends Term_c implements FieldDecl {
                                         tc.typeSystem(),
                                         tc.nodeFactory());
             cc = (ConstantChecker) cc.context(childtc.context());
-            nn = (FieldDecl) nn.del().checkConstants(cc);
+            nn = (FieldDecl) nn.del().NodeOps(nn).checkConstants(cc);
         }
 
         return nn;

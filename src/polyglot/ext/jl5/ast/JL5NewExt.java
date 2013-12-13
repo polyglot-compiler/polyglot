@@ -61,7 +61,7 @@ import polyglot.visit.NodeVisitor;
 import polyglot.visit.PrettyPrinter;
 import polyglot.visit.TypeChecker;
 
-public class JL5NewExt extends JL5Ext {
+public class JL5NewExt extends JL5Ext implements NewOps {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
     protected List<TypeNode> typeArgs;
@@ -80,6 +80,7 @@ public class JL5NewExt extends JL5Ext {
         return n;
     }
 
+    @Override
     public Node visitChildren(NodeVisitor v) {
         JL5NewExt ext = (JL5NewExt) JL5Ext.ext(this.node());
 
@@ -104,6 +105,7 @@ public class JL5NewExt extends JL5Ext {
         return newN;
     }
 
+    @Override
     public Node disambiguateOverride(Node parent, AmbiguityRemover ar)
             throws SemanticException {
         New n = (New) this.node().disambiguateOverride(parent, ar);
@@ -112,6 +114,7 @@ public class JL5NewExt extends JL5Ext {
         return ext.typeArgs(n.visitList(ext.typeArgs(), ar));
     }
 
+    @Override
     public TypeNode findQualifiedTypeNode(AmbiguityRemover ar, ClassType outer,
             TypeNode objectType) throws SemanticException {
         if (objectType instanceof AmbTypeInstantiation) {
@@ -158,6 +161,7 @@ public class JL5NewExt extends JL5Ext {
                                                             objectType);
     }
 
+    @Override
     public New findQualifier(AmbiguityRemover ar, ClassType ct)
             throws SemanticException {
         // Call super.findQualifier in order to perform its checks, but throw away the
@@ -167,6 +171,7 @@ public class JL5NewExt extends JL5Ext {
         return (New) this.node();
     }
 
+    @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
         New n = (New) this.node();
         JL5NewExt ext = (JL5NewExt) JL5Ext.ext(n);
@@ -242,6 +247,7 @@ public class JL5NewExt extends JL5Ext {
         return n.type(ct);
     }
 
+    @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
         New n = (New) this.node();
         JL5NewExt ext = (JL5NewExt) JL5Ext.ext(n);
@@ -292,6 +298,7 @@ public class JL5NewExt extends JL5Ext {
         ((NewOps) this.node()).printBody(w, tr);
     }
 
+    @Override
     public ClassType findEnclosingClass(Context c, ClassType ct) {
         New n = (New) this.node();
         JL5NewExt ext = (JL5NewExt) JL5Ext.ext(n);
@@ -367,5 +374,30 @@ public class JL5NewExt extends JL5Ext {
             }
         }
         return null;
+    }
+
+    @Override
+    public void typeCheckFlags(TypeChecker tc) throws SemanticException {
+        this.superDel().NewOps(this.node()).typeCheckFlags(tc);
+    }
+
+    @Override
+    public void typeCheckNested(TypeChecker tc) throws SemanticException {
+        this.superDel().NewOps(this.node()).typeCheckNested(tc);
+    }
+
+    @Override
+    public void printQualifier(CodeWriter w, PrettyPrinter tr) {
+        this.superDel().NewOps(this.node()).printQualifier(w, tr);
+    }
+
+    @Override
+    public void printArgs(CodeWriter w, PrettyPrinter tr) {
+        this.superDel().NewOps(this.node()).printArgs(w, tr);
+    }
+
+    @Override
+    public void printBody(CodeWriter w, PrettyPrinter tr) {
+        this.superDel().NewOps(this.node()).printBody(w, tr);
     }
 }

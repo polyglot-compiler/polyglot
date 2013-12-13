@@ -116,7 +116,8 @@ public class CanonicalTypeNode_c extends TypeNode_c implements
 
     @Override
     public Node copy(ExtensionInfo extInfo) throws SemanticException {
-        TypeNode tn = (TypeNode) this.del().copy(extInfo.nodeFactory());
+        TypeNode tn =
+                (TypeNode) this.del().NodeOps(this).copy(extInfo.nodeFactory());
         Type t = tn.type();
         if (t != null) {
             // try to copy over type information

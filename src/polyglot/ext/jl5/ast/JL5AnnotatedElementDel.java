@@ -25,26 +25,8 @@
  ******************************************************************************/
 package polyglot.ext.jl5.ast;
 
-import polyglot.ast.Node;
-import polyglot.types.SemanticException;
 import polyglot.util.SerialVersionUID;
-import polyglot.visit.NodeVisitor;
-import polyglot.visit.TypeChecker;
 
 public abstract class JL5AnnotatedElementDel extends JL5Del {
     private static final long serialVersionUID = SerialVersionUID.generate();
-
-    @Override
-    public Node visitChildren(NodeVisitor v) {
-        JL5AnnotatedElementExt ext =
-                (JL5AnnotatedElementExt) JL5Ext.ext(this.node());
-        return ext.visitChildren(v);
-    }
-
-    @Override
-    public Node typeCheck(TypeChecker tc) throws SemanticException {
-        JL5AnnotatedElementExt ext =
-                (JL5AnnotatedElementExt) JL5Ext.ext(this.node());
-        return ext.typeCheck(tc);
-    }
 }

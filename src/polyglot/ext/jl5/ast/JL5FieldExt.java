@@ -42,8 +42,9 @@ import polyglot.visit.TypeChecker;
 public class JL5FieldExt extends JL5Ext {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
+    @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
-        Field n = (Field) this.superDel().typeCheck(tc);
+        Field n = (Field) this.superDel().NodeOps(this.node()).typeCheck(tc);
         if (n.fieldInstance() instanceof EnumInstance
                 && !(this instanceof EnumConstant)) {
             // it's an enum, so replace this with the appropriate AST node for enum constants.
@@ -59,6 +60,7 @@ public class JL5FieldExt extends JL5Ext {
         return n;
     }
 
+    @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
         Field n = (Field) this.node();
         w.begin(0);
