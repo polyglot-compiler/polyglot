@@ -480,7 +480,7 @@ public class MethodDecl_c extends Term_c implements MethodDecl,
 
     @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
-        tr.lang().ProcedureDeclOps(this).prettyPrintHeader(flags(), w, tr);
+        tr.lang().prettyPrintHeader(this, flags(), w, tr);
 
         if (body != null) {
             printSubStmt(body, w, tr);

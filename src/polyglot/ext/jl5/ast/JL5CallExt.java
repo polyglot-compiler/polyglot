@@ -180,7 +180,7 @@ public class JL5CallExt extends JL5Ext implements CallOps {
         }
 
         if (n.target() == null) {
-            return tc.lang().CallOps(n).typeCheckNullTarget(tc, argTypes);
+            return tc.lang().typeCheckNullTarget(n, tc, argTypes);
         }
 
         if (!n.target().type().isCanonical()) {
@@ -192,7 +192,7 @@ public class JL5CallExt extends JL5Ext implements CallOps {
             actualTypeArgs.add((ReferenceType) tn.type());
         }
 
-        ReferenceType targetType = tc.lang().CallOps(n).findTargetType();
+        ReferenceType targetType = tc.lang().findTargetType(n);
 
         /* This call is in a static context if and only if
          * the target (possibly implicit) is a type node.

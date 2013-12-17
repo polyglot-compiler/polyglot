@@ -20,7 +20,7 @@ public class JL5CatchExt extends JL5Ext implements Ext {
         JL5FormalExt formalExt = (JL5FormalExt) JL5Ext.ext(c.formal());
         formalExt.setIsCatchFormal(true);
 
-        return this.superDel().NodeOps(this.node()).buildTypes(tb);
+        return this.superDel().buildTypes(this.node(), tb);
     }
 
     @Override
@@ -30,7 +30,7 @@ public class JL5CatchExt extends JL5Ext implements Ext {
         JL5LocalInstance li = (JL5LocalInstance) f.localInstance();
         li.setProcedureFormal(true);
 
-        return this.superDel().NodeOps(this.node()).typeCheck(tc);
+        return this.superDel().typeCheck(this.node(), tc);
     }
 
 }

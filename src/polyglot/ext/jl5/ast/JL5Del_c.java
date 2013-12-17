@@ -25,25 +25,75 @@
  ******************************************************************************/
 package polyglot.ext.jl5.ast;
 
+import polyglot.ast.CallOps;
+import polyglot.ast.ClassDeclOps;
+import polyglot.ast.JLDel_c;
+import polyglot.ast.NewOps;
 import polyglot.ast.Node;
-import polyglot.ast.Special;
-import polyglot.ext.jl5.types.RawClass;
+import polyglot.ast.NodeOps;
+import polyglot.ast.ProcedureDeclOps;
 import polyglot.types.SemanticException;
+import polyglot.types.Type;
 import polyglot.util.SerialVersionUID;
 import polyglot.visit.TypeChecker;
 
-public class JL5SpecialExt extends JL5Ext {
+public class JL5Del_c extends JLDel_c implements JL5Del {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
+    public static final JL5Del_c instance = new JL5Del_c();
+
+    protected JL5Del_c() {
+    }
+
+    protected JL5Ext jl5ext(Node n) {
+        return JL5Ext.ext(n);
+    }
+
     @Override
-    public Node typeCheckOverride(Node parent, TypeChecker tc)
+    protected NodeOps NodeOps(Node n) {
+        return jl5ext(n);
+    }
+
+    @Override
+    protected CallOps CallOps(Node n) {
+        return (CallOps) jl5ext(n);
+    }
+
+    @Override
+    protected ClassDeclOps ClassDeclOps(Node n) {
+        return (ClassDeclOps) jl5ext(n);
+    }
+
+    @Override
+    protected NewOps NewOps(Node n) {
+        return (NewOps) jl5ext(n);
+    }
+
+    @Override
+    protected ProcedureDeclOps ProcedureDeclOps(Node n) {
+        return (ProcedureDeclOps) jl5ext(n);
+    }
+
+    protected JL5CaseOps JL5CaseOps(Node n) {
+        return (JL5CaseOps) jl5ext(n);
+    }
+
+    protected JL5SwitchOps JL5SwitchOps(Node n) {
+        return (JL5SwitchOps) jl5ext(n);
+    }
+
+    // JL5SwitchOps
+
+    @Override
+    public boolean isAcceptableSwitchType(Node n, Type type) {
+        return JL5SwitchOps(n).isAcceptableSwitchType(type);
+    }
+
+    // JL5CaseOps
+
+    @Override
+    public Node resolveCaseLabel(Node n, TypeChecker tc, Type switchType)
             throws SemanticException {
-        Special n = (Special) tc.lang().visitChildren(this.node(), tc);
-        if (n.qualifier() != null && n.qualifier().type() instanceof RawClass) {
-            // we got a raw class. Fix it up
-            RawClass rc = (RawClass) n.qualifier().type();
-            n = n.qualifier(n.qualifier().type(rc.base()));
-        }
-        return n.typeCheck(tc);
+        return JL5CaseOps(n).resolveCaseLabel(tc, switchType);
     }
 }

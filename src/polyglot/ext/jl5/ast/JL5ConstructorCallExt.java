@@ -98,7 +98,7 @@ public class JL5ConstructorCallExt extends JL5Ext {
 
         List<TypeNode> typeArgs = this.node().visitList(ext.typeArgs(), v);
 
-        Node newN = this.superDel().NodeOps(this.node()).visitChildren(v);
+        Node newN = this.superDel().visitChildren(this.node(), v);
         JL5ConstructorCallExt newext = (JL5ConstructorCallExt) JL5Ext.ext(newN);
 
         if (!CollectionUtil.equals(typeArgs, newext.typeArgs())) {
@@ -137,7 +137,7 @@ public class JL5ConstructorCallExt extends JL5Ext {
                 return cc.disambiguate(ar);
             }
         }
-        return this.superDel().NodeOps(this.node()).disambiguate(ar);
+        return this.superDel().disambiguate(this.node(), ar);
     }
 
     @Override

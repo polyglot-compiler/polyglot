@@ -69,7 +69,7 @@ public class FindSharedASTVisitor extends NodeVisitor {
     protected void alreadySeenNode(Node n, NodeStack stack1, NodeStack stack2) {
         Node m = findCommonParent(stack1, stack2);
         if (m != null) {
-            lang().NodeOps(m).prettyPrint(lang(), System.err);
+            lang().prettyPrint(m, lang(), System.err);
         }
 
         throw new InternalCompilerError("Already seen node " + n + " ("

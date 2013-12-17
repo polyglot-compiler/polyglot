@@ -88,7 +88,7 @@ public class AmbWildCard extends TypeNode_c implements TypeNode, Ambiguous {
             w.write(" ");
             w.write(this.isExtendsConstraint ? "extends" : "super");
             w.write(" ");
-            tr.lang().NodeOps(constraint).prettyPrint(w, tr);
+            tr.lang().prettyPrint(constraint, w, tr);
         }
     }
 

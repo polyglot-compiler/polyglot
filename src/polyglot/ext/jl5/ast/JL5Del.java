@@ -25,57 +25,19 @@
  ******************************************************************************/
 package polyglot.ext.jl5.ast;
 
-import polyglot.ast.CallOps;
-import polyglot.ast.ClassDeclOps;
-import polyglot.ast.JLDel_c;
-import polyglot.ast.NewOps;
+import polyglot.ast.JLDel;
 import polyglot.ast.Node;
-import polyglot.ast.NodeOps;
-import polyglot.ast.ProcedureDeclOps;
-import polyglot.util.SerialVersionUID;
+import polyglot.types.SemanticException;
+import polyglot.types.Type;
+import polyglot.visit.TypeChecker;
 
-public class JL5Del extends JLDel_c {
-    private static final long serialVersionUID = SerialVersionUID.generate();
+public interface JL5Del extends JLDel {
+    // JL5SwitchOps
 
-    public static final JL5Del instance = new JL5Del();
+    boolean isAcceptableSwitchType(Node n, Type type);
 
-    protected JL5Del() {
-    }
+    // JL5CaseOps
 
-    public JL5Ext jl5ext(Node n) {
-        return JL5Ext.ext(n);
-    }
-
-    @Override
-    public NodeOps NodeOps(Node n) {
-        return jl5ext(n);
-    }
-
-    @Override
-    public CallOps CallOps(Node n) {
-        return (CallOps) jl5ext(n);
-    }
-
-    @Override
-    public ClassDeclOps ClassDeclOps(Node n) {
-        return (ClassDeclOps) jl5ext(n);
-    }
-
-    @Override
-    public NewOps NewOps(Node n) {
-        return (NewOps) jl5ext(n);
-    }
-
-    @Override
-    public ProcedureDeclOps ProcedureDeclOps(Node n) {
-        return (ProcedureDeclOps) jl5ext(n);
-    }
-
-    public JL5CaseOps CaseOps(Node n) {
-        return (JL5CaseOps) jl5ext(n);
-    }
-
-    public JL5SwitchOps SwitchOps(Node n) {
-        return (JL5SwitchOps) jl5ext(n);
-    }
+    Node resolveCaseLabel(Node n, TypeChecker tc, Type switchType)
+            throws SemanticException;
 }

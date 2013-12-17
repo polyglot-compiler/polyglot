@@ -62,7 +62,7 @@ public class JL7CaseExt extends JL7Ext implements JL5CaseOps {
             return c;
         }
 
-        return this.superDel().NodeOps(this.node()).typeCheck(tc);
+        return this.superDel().typeCheck(this.node(), tc);
     }
 
     @Override
@@ -75,7 +75,7 @@ public class JL7CaseExt extends JL7Ext implements JL5CaseOps {
             return c; // OK, it's a string.
         }
 
-        return superDel().NodeOps(this.node()).checkConstants(cc);
+        return superDel().checkConstants(this.node(), cc);
 
     }
 }

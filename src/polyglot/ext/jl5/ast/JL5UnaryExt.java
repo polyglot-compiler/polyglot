@@ -58,7 +58,7 @@ public class JL5UnaryExt extends JL5Ext {
         Expr expr = u.expr();
 
         if (!ts.isPrimitiveWrapper(expr.type())) {
-            return this.superDel().NodeOps(this.node()).typeCheck(tc);
+            return this.superDel().typeCheck(this.node(), tc);
         }
 
         if (op == POST_INC || op == POST_DEC || op == PRE_INC || op == PRE_DEC) {

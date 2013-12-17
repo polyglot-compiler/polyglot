@@ -114,7 +114,7 @@ public class InnerClassRemover extends ContextVisitor {
 
             if (Report.should_report("innerremover", 1)) {
                 System.out.println(">>> output ----------------------");
-                lang().NodeOps(n).prettyPrint(lang(), System.out);
+                lang().prettyPrint(n, lang(), System.out);
                 System.out.println("<<< output ----------------------");
             }
 
@@ -122,7 +122,7 @@ public class InnerClassRemover extends ContextVisitor {
 
             if (Report.should_report("innerremover", 1)) {
                 System.out.println(">>> locals removed ----------------------");
-                lang().NodeOps(n).prettyPrint(lang(), System.out);
+                lang().prettyPrint(n, lang(), System.out);
                 System.out.println("<<< locals removed ----------------------");
             }
 
@@ -130,7 +130,7 @@ public class InnerClassRemover extends ContextVisitor {
 
             if (Report.should_report("innerremover", 1)) {
                 System.out.println(">>> inners removed ----------------------");
-                lang().NodeOps(n).prettyPrint(lang(), System.out);
+                lang().prettyPrint(n, lang(), System.out);
                 System.out.println("<<< inners removed ----------------------");
             }
 

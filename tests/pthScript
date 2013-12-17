@@ -25,7 +25,7 @@
 #      CmdLineArgs  :   additional command line args for the Polyglot 
 #                       compiler; is always enclosed in quotes.
 
-polyglot.frontend.JLExtensionInfo "-cp ." {
+polyglot.frontend.JLExtensionInfo "-d out -cp ." {
         AnonymousClass.jl ;
         AnonymousClass02.jl ;
         ArrayInit.jl ;
@@ -299,7 +299,7 @@ polyglot.frontend.JLExtensionInfo "-cp ." {
 		       (Semantic, "Illegal forward ref"); 
 }
 
-polyglot.frontend.JLExtensionInfo {
+polyglot.frontend.JLExtensionInfo "-d out" {
 	package3/name/ClassPackConflict.jl;
 }
 

@@ -242,7 +242,7 @@ public class Call_c extends Expr_c implements Call, CallOps {
 
         Receiver r;
         if (mi.flags().isStatic()) {
-            Type container = tc.lang().CallOps(this).findContainer(ts, mi);
+            Type container = tc.lang().findContainer(this, ts, mi);
             r =
                     nf.CanonicalTypeNode(position().startOf(), container)
                       .type(container);
@@ -297,14 +297,14 @@ public class Call_c extends Expr_c implements Call, CallOps {
         }
 
         if (this.target == null) {
-            return tc.lang().CallOps(this).typeCheckNullTarget(tc, argTypes);
+            return tc.lang().typeCheckNullTarget(this, tc, argTypes);
         }
 
         if (!this.target.type().isCanonical()) {
             return this;
         }
 
-        ReferenceType targetType = tc.lang().CallOps(this).findTargetType();
+        ReferenceType targetType = tc.lang().findTargetType(this);
         MethodInstance mi =
                 ts.findMethod(targetType,
                               this.name.id(),

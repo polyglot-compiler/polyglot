@@ -88,7 +88,7 @@ public class PrettyPrinter {
      */
     public void print(Node parent, Node child, CodeWriter w) {
         if (child != null) {
-            lang().NodeOps(child).prettyPrint(w, this);
+            lang().prettyPrint(child, w, this);
         }
     }
 

@@ -577,7 +577,7 @@ public class CFGBuilder<FlowItem extends DataFlow.Item> implements Copy {
     }
 
     public void visitThrow(Term a) {
-        for (Type type : lang().NodeOps(a).throwTypes(ts)) {
+        for (Type type : lang().throwTypes(a, ts)) {
             visitThrow(a, Term.EXIT, type);
         }
 

@@ -287,7 +287,7 @@ public abstract class NodeVisitor implements Copy {
         }
 
         @SuppressWarnings("unchecked")
-        N n = (N) lang().NodeOps(child).visitChildren(v_);
+        N n = (N) lang().visitChildren(child, v_);
 
         if (n == null) {
             throw new InternalCompilerError("Node.visitChildren() returned null.");

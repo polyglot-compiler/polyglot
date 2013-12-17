@@ -46,7 +46,7 @@ public class JL5ClassBodyExt extends JL5Ext {
         // check if we have any EnumConstantDecl
         List<EnumConstantDecl> ecds = enumConstantDecls();
         if (ecds.isEmpty()) {
-            this.superDel().NodeOps(this.node()).prettyPrint(w, tr);
+            this.superDel().prettyPrint(this.node(), w, tr);
             return;
         }
 

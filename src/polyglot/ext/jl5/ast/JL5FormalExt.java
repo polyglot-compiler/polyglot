@@ -95,7 +95,7 @@ public class JL5FormalExt extends JL5AnnotatedElementExt implements
         if (ext.isVarArg()) {
             ((JL5ArrayType) f.type().type()).setVarArg();
         }
-        return this.superDel().NodeOps(this.node()).disambiguate(ar);
+        return this.superDel().disambiguate(this.node(), ar);
     }
 
     @Override
@@ -104,7 +104,7 @@ public class JL5FormalExt extends JL5AnnotatedElementExt implements
         JL5FormalExt ext = (JL5FormalExt) JL5Ext.ext(f);
 
         for (AnnotationElem ae : ext.annotationElems()) {
-            tr.lang().NodeOps(ae).prettyPrint(w, tr);
+            tr.lang().prettyPrint(ae, w, tr);
             w.newline();
         }
 

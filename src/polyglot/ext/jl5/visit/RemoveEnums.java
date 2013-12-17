@@ -588,7 +588,7 @@ public class RemoveEnums extends ContextVisitor {
                 Iterator<Expr> iter = newArgs.iterator();
                 while (iter.hasNext()) {
                     Expr e = iter.next();
-                    tr.lang().NodeOps(e).prettyPrint(w, tr);
+                    tr.lang().prettyPrint(e, w, tr);
                     if (iter.hasNext()) {
                         w.write(",");
                         w.allowBreak(1, " ");
@@ -599,7 +599,7 @@ public class RemoveEnums extends ContextVisitor {
 
             if (ne.body() != null) {
                 w.write(" {");
-                tr.lang().NodeOps(ne.body()).prettyPrint(w, tr);
+                tr.lang().prettyPrint(ne.body(), w, tr);
                 w.write("}");
             }
 
@@ -633,7 +633,7 @@ public class RemoveEnums extends ContextVisitor {
 
         Block newBody = cd.body().statements(newStmts);
         cd = (ConstructorDecl) cd.body(newBody);
-        tr.lang().NodeOps(cd).prettyPrint(w, tr);
+        tr.lang().prettyPrint(cd, w, tr);
     }
 
     private Node translateSwitch(Switch n) {

@@ -124,8 +124,7 @@ public class JL5ClassDeclExt extends JL5AnnotatedElementExt implements
 
     @Override
     public Node buildTypes(TypeBuilder tb) throws SemanticException {
-        ClassDecl n =
-                (ClassDecl) this.superDel().NodeOps(this.node()).buildTypes(tb);
+        ClassDecl n = (ClassDecl) this.superDel().buildTypes(this.node(), tb);
         JL5ClassDeclExt ext = (JL5ClassDeclExt) JL5Ext.ext(n);
 
         JL5TypeSystem ts = (JL5TypeSystem) tb.typeSystem();
@@ -207,7 +206,7 @@ public class JL5ClassDeclExt extends JL5AnnotatedElementExt implements
         for (ParamTypeNode tn : ext.paramTypes()) {
             ((JL5Context) c).addTypeVariable((TypeVariable) tn.type());
         }
-        return lang.NodeOps(child).enterScope(c);
+        return lang.enterScope(child, c);
     }
 
     @Override
@@ -333,7 +332,7 @@ public class JL5ClassDeclExt extends JL5AnnotatedElementExt implements
 
         w.begin(0);
         for (AnnotationElem ae : ext.annotationElems()) {
-            tr.lang().NodeOps(ae).prettyPrint(w, tr);
+            tr.lang().prettyPrint(ae, w, tr);
             w.newline();
         }
         w.end();
@@ -350,7 +349,7 @@ public class JL5ClassDeclExt extends JL5AnnotatedElementExt implements
             w.write("<");
             for (Iterator<ParamTypeNode> iter = ext.paramTypes.iterator(); iter.hasNext();) {
                 ParamTypeNode ptn = iter.next();
-                tr.lang().NodeOps(ptn).prettyPrint(w, tr);
+                tr.lang().prettyPrint(ptn, w, tr);
                 if (iter.hasNext()) {
                     w.write(", ");
                 }
@@ -363,7 +362,7 @@ public class JL5ClassDeclExt extends JL5AnnotatedElementExt implements
 
     @Override
     public void prettyPrintFooter(CodeWriter w, PrettyPrinter tr) {
-        this.superDel().ClassDeclOps(this.node()).prettyPrintFooter(w, tr);
+        this.superDel().prettyPrintFooter(this.node(), w, tr);
     }
 
     @Override
@@ -371,7 +370,9 @@ public class JL5ClassDeclExt extends JL5AnnotatedElementExt implements
             ConstructorInstance defaultConstructorInstance)
             throws SemanticException {
         return this.superDel()
-                   .ClassDeclOps(this.node())
-                   .addDefaultConstructor(ts, nf, defaultConstructorInstance);
+                   .addDefaultConstructor(this.node(),
+                                          ts,
+                                          nf,
+                                          defaultConstructorInstance);
     }
 }

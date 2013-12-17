@@ -180,7 +180,7 @@ public class Assert_c extends Stmt_c implements Assert {
             w.write(";");
         }
         else {
-            tr.lang().NodeOps(this).prettyPrint(w, tr);
+            tr.lang().prettyPrint(this, w, tr);
         }
     }
 

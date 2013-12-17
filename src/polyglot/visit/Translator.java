@@ -156,14 +156,15 @@ public class Translator extends PrettyPrinter implements Copy {
         if (context != null) {
             if (child.isDisambiguated() && child.isTypeChecked()) {
                 if (parent == null) {
-                    Context c = lang().NodeOps(child).enterScope(context);
+                    Context c = lang().enterScope(child, context);
                     tr = this.context(c);
                 }
                 else if (parent.isDisambiguated() && parent.isTypeChecked()) {
                     Context c =
-                            lang().NodeOps(parent).enterChildScope(lang(),
-                                                                   child,
-                                                                   context);
+                            lang().enterChildScope(parent,
+                                                   lang(),
+                                                   child,
+                                                   context);
                     tr = this.context(c);
                 }
                 else {
@@ -175,11 +176,11 @@ public class Translator extends PrettyPrinter implements Copy {
             }
         }
 
-        lang().NodeOps(child).translate(w, tr);
+        lang().translate(child, w, tr);
 
         if (context != null) {
             if (child.isDisambiguated() && child.isTypeChecked()) {
-                lang().NodeOps(child).addDecls(context);
+                lang().addDecls(child, context);
             }
         }
     }
@@ -295,20 +296,20 @@ public class Translator extends PrettyPrinter implements Copy {
             TopLevelDecl decl) {
         Translator tr;
         if (source.isDisambiguated() && source.isTypeChecked()) {
-            Context c = lang().NodeOps(source).enterScope(context);
+            Context c = lang().enterScope(source, context);
             tr = this.context(c);
         }
         else {
             tr = this.context(null);
         }
-        lang().NodeOps(decl).translate(w, tr);
+        lang().translate(decl, w, tr);
     }
 
     /** Write the package and import declarations for a source file. */
     protected void writeHeader(SourceFile sfn, CodeWriter w) {
         if (sfn.package_() != null) {
             w.write("package ");
-            lang().NodeOps(sfn.package_()).translate(w, this);
+            lang().translate(sfn.package_(), w, this);
             w.write(";");
             w.newline(0);
             w.newline(0);
@@ -317,7 +318,7 @@ public class Translator extends PrettyPrinter implements Copy {
         boolean newline = false;
 
         for (Import imp : sfn.imports()) {
-            lang().NodeOps(imp).translate(w, this);
+            lang().translate(imp, w, this);
             newline = true;
         }
 

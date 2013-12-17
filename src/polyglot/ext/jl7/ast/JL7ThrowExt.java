@@ -28,7 +28,7 @@ public class JL7ThrowExt extends JL7Ext {
                 return this.throwSet;
             }
         }
-        return this.superDel().NodeOps(this.node()).throwTypes(ts);
+        return this.superDel().throwTypes(this.node(), ts);
     }
 
 }

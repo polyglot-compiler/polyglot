@@ -81,7 +81,7 @@ public class JL5ImportExt extends JL5Ext {
             return n;
         }
         else {
-            return this.superDel().NodeOps(this.node()).typeCheck(tc);
+            return this.superDel().typeCheck(this.node(), tc);
         }
     }
 
@@ -146,7 +146,7 @@ public class JL5ImportExt extends JL5Ext {
             w.write(";");
             w.newline(0);
         }
-        else this.superDel().NodeOps(this.node()).prettyPrint(w, tr);
+        else this.superDel().prettyPrint(this.node(), w, tr);
 
     }
 }

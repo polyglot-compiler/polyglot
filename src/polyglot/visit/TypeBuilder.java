@@ -100,7 +100,7 @@ public class TypeBuilder extends NodeVisitor {
     @Override
     public NodeVisitor enter(Node n) {
         try {
-            return lang().NodeOps(n).buildTypesEnter(this);
+            return lang().buildTypesEnter(n, this);
         }
         catch (SemanticException e) {
             Position position = e.position();
@@ -122,7 +122,7 @@ public class TypeBuilder extends NodeVisitor {
     @Override
     public Node leave(Node old, Node n, NodeVisitor v) {
         try {
-            return lang().NodeOps(n).buildTypes((TypeBuilder) v);
+            return lang().buildTypes(n, (TypeBuilder) v);
         }
         catch (SemanticException e) {
             Position position = e.position();

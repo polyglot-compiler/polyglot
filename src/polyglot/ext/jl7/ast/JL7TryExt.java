@@ -26,11 +26,12 @@ public class JL7TryExt extends JL7Ext implements JL7TryOps {
     @Override
     public Block exceptionCheckTryBlock(ExceptionChecker ec)
             throws SemanticException {
-        Block b =
-                this.superDel().TryOps(this.node()).exceptionCheckTryBlock(ec);
+        Block b = this.superDel().exceptionCheckTryBlock(this.node(), ec);
 
-        ((JL7Del) ec.lang()).TryOps(this.node())
-                            .checkPreciseRethrows(ec.lang(), ec.typeSystem(), b);
+        ((JL7Del) ec.lang()).checkPreciseRethrows(this.node(),
+                                                  ec.lang(),
+                                                  ec.typeSystem(),
+                                                  b);
 
         return b;
     }
@@ -38,25 +39,20 @@ public class JL7TryExt extends JL7Ext implements JL7TryOps {
     @Override
     public ExceptionChecker constructTryBlockExceptionChecker(
             ExceptionChecker ec) {
-        return this.superDel()
-                   .TryOps(this.node())
-                   .constructTryBlockExceptionChecker(ec);
+        return this.superDel().constructTryBlockExceptionChecker(this.node(),
+                                                                 ec);
     }
 
     @Override
     public List<Catch> exceptionCheckCatchBlocks(ExceptionChecker ec)
             throws SemanticException {
-        return this.superDel()
-                   .TryOps(this.node())
-                   .exceptionCheckCatchBlocks(ec);
+        return this.superDel().exceptionCheckCatchBlocks(this.node(), ec);
     }
 
     @Override
     public Block exceptionCheckFinallyBlock(ExceptionChecker ec)
             throws SemanticException {
-        return this.superDel()
-                   .TryOps(this.node())
-                   .exceptionCheckFinallyBlock(ec);
+        return this.superDel().exceptionCheckFinallyBlock(this.node(), ec);
     }
 
     @Override
@@ -75,8 +71,10 @@ public class JL7TryExt extends JL7Ext implements JL7TryOps {
             // The exceptions that can reach cb are the exceptions in thrown
             // that may be assignable to catchType.
 
-            ((JL7Del) lang).TryOps(this.node())
-                           .preciseRethrowsForCatchBlock(lang, cb, thrown);
+            ((JL7Del) lang).preciseRethrowsForCatchBlock(this.node(),
+                                                         lang,
+                                                         cb,
+                                                         thrown);
 
             thrown.remove(catchType);
         }

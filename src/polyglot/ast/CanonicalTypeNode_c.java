@@ -119,8 +119,7 @@ public class CanonicalTypeNode_c extends TypeNode_c implements
         TypeNode tn =
                 (TypeNode) extInfo.nodeFactory()
                                   .lang()
-                                  .NodeOps(this)
-                                  .copy(extInfo.nodeFactory());
+                                  .copy(this, extInfo.nodeFactory());
         Type t = tn.type();
         if (t != null) {
             // try to copy over type information

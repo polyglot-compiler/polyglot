@@ -108,8 +108,7 @@ public class PackageNode_c extends Node_c implements PackageNode {
         PackageNode pn =
                 (PackageNode) extInfo.nodeFactory()
                                      .lang()
-                                     .NodeOps(this)
-                                     .copy(extInfo.nodeFactory());
+                                     .copy(this, extInfo.nodeFactory());
         if (pn.package_() != null) {
             pn =
                     pn.package_(extInfo.typeSystem()

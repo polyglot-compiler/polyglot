@@ -88,7 +88,7 @@ public class AscriptionVisitor extends ContextVisitor {
         Type t = null;
 
         if (parent != null && n instanceof Expr) {
-            t = lang().NodeOps(parent).childExpectedType((Expr) n, this);
+            t = lang().childExpectedType(parent, (Expr) n, this);
         }
 
         AscriptionVisitor v = (AscriptionVisitor) copy();

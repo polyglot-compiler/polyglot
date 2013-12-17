@@ -183,9 +183,7 @@ public class JL5ConstructorDeclExt extends JL5AnnotatedElementExt implements
     @Override
     public Node disambiguate(AmbiguityRemover ar) throws SemanticException {
         ConstructorDecl n =
-                (ConstructorDecl) this.superDel()
-                                      .NodeOps(this.node())
-                                      .disambiguate(ar);
+                (ConstructorDecl) this.superDel().disambiguate(this.node(), ar);
         JL5ConstructorDeclExt ext = (JL5ConstructorDeclExt) JL5Ext.ext(n);
 
         List<TypeVariable> typeParams = new LinkedList<TypeVariable>();
@@ -208,7 +206,7 @@ public class JL5ConstructorDeclExt extends JL5AnnotatedElementExt implements
 
     @Override
     public Context enterScope(Context c) {
-        c = this.superDel().NodeOps(this.node()).enterScope(c);
+        c = this.superDel().enterScope(this.node(), c);
         JL5ConstructorDeclExt ext =
                 (JL5ConstructorDeclExt) JL5Ext.ext(this.node());
 
@@ -227,7 +225,7 @@ public class JL5ConstructorDeclExt extends JL5AnnotatedElementExt implements
 
         w.begin(0);
         for (AnnotationElem ae : ext.annotationElems()) {
-            tr.lang().NodeOps(ae).prettyPrint(w, tr);
+            tr.lang().prettyPrint(ae, w, tr);
             w.newline();
         }
         w.end();
@@ -244,7 +242,7 @@ public class JL5ConstructorDeclExt extends JL5AnnotatedElementExt implements
             w.write("<");
             for (Iterator<ParamTypeNode> iter = ext.typeParams().iterator(); iter.hasNext();) {
                 ParamTypeNode ptn = iter.next();
-                tr.lang().NodeOps(ptn).prettyPrint(w, tr);
+                tr.lang().prettyPrint(ptn, w, tr);
                 if (iter.hasNext()) {
                     w.write(",");
                     w.allowBreak(0, " ");

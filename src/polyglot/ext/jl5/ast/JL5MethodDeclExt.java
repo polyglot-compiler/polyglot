@@ -173,9 +173,7 @@ public class JL5MethodDeclExt extends JL5AnnotatedElementExt implements
     @Override
     public Node disambiguate(AmbiguityRemover ar) throws SemanticException {
         MethodDecl n =
-                (MethodDecl) this.superDel()
-                                 .NodeOps(this.node())
-                                 .disambiguate(ar);
+                (MethodDecl) this.superDel().disambiguate(this.node(), ar);
         JL5MethodDeclExt ext = (JL5MethodDeclExt) JL5Ext.ext(n);
         List<TypeVariable> typeParams = new LinkedList<TypeVariable>();
 
@@ -333,7 +331,7 @@ public class JL5MethodDeclExt extends JL5AnnotatedElementExt implements
 
         if (ext.isCompilerGenerated()) return;
 
-        this.superDel().NodeOps(this.node()).translate(w, tr);
+        this.superDel().translate(this.node(), w, tr);
     }
 
     @Override
@@ -345,7 +343,7 @@ public class JL5MethodDeclExt extends JL5AnnotatedElementExt implements
 
         w.begin(0);
         for (AnnotationElem ae : ext.annotationElems()) {
-            tr.lang().NodeOps(ae).prettyPrint(w, tr);
+            tr.lang().prettyPrint(ae, w, tr);
             w.newline();
         }
         w.end();
@@ -410,7 +408,7 @@ public class JL5MethodDeclExt extends JL5AnnotatedElementExt implements
     public Context enterScope(Context c) {
         MethodDecl md = (MethodDecl) this.node();
         JL5MethodDeclExt ext = (JL5MethodDeclExt) JL5Ext.ext(md);
-        c = this.superDel().NodeOps(this.node()).enterScope(c);
+        c = this.superDel().enterScope(this.node(), c);
         for (ParamTypeNode pn : ext.typeParams()) {
             ((JL5Context) c).addTypeVariable((TypeVariable) pn.type());
         }

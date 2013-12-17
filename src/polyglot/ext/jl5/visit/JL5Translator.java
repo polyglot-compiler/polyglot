@@ -97,7 +97,7 @@ public class JL5Translator extends Translator {
                 return;
             }
             else if (!tn.isDisambiguated()) {
-                lang().NodeOps(tn).prettyPrint(w, this);
+                lang().prettyPrint(tn, w, this);
                 return;
             }
             else {
@@ -113,7 +113,7 @@ public class JL5Translator extends Translator {
 //            return;
 //        }
 
-        lang().NodeOps(n).prettyPrint(w, this);
+        lang().prettyPrint(n, w, this);
     }
 
     private String translateType(Type t) {

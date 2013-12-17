@@ -172,17 +172,17 @@ public class Try_c extends Stmt_c implements Try, TryOps {
 
         Try_c n = this;
         // Visit the try block.
-        Block tryBlock = ec.lang().TryOps(n).exceptionCheckTryBlock(ecTryBlock);
+        Block tryBlock = ec.lang().exceptionCheckTryBlock(n, ecTryBlock);
         n = (Try_c) n.tryBlock(tryBlock);
 
         List<Catch> catchBlocks =
-                ec.lang().TryOps(n).exceptionCheckCatchBlocks(ecTryBlockEntry);
+                ec.lang().exceptionCheckCatchBlocks(n, ecTryBlockEntry);
         n = (Try_c) n.catchBlocks(catchBlocks);
 
-        Block finallyBlock = ec.lang().TryOps(n).exceptionCheckFinallyBlock(ec);
+        Block finallyBlock = ec.lang().exceptionCheckFinallyBlock(n, ec);
         n = (Try_c) n.finallyBlock(finallyBlock);
 
-        for (Type exc : ec.lang().NodeOps(n).throwTypes(ec.typeSystem())) {
+        for (Type exc : ec.lang().throwTypes(n, ec.typeSystem())) {
             ec.throwsException(exc, position());
         }
         n = (Try_c) n.exceptions(ec.throwsSet());
@@ -194,8 +194,8 @@ public class Try_c extends Stmt_c implements Try, TryOps {
     public Block exceptionCheckTryBlock(ExceptionChecker ec) {
         return (Block) this.visitChild(this.tryBlock,
                                        ec.lang()
-                                         .TryOps(this)
-                                         .constructTryBlockExceptionChecker(ec));
+                                         .constructTryBlockExceptionChecker(this,
+                                                                            ec));
     }
 
     @Override

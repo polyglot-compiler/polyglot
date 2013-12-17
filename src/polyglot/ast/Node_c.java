@@ -199,7 +199,7 @@ public abstract class Node_c implements Node {
                 throw new InternalCompilerError("NodeVisitor.enter() returned null.");
             }
 
-            n = v.lang().NodeOps(this).visitChildren(v_);
+            n = v.lang().visitChildren(this, v_);
 
             if (n == null) {
                 throw new InternalCompilerError("Node_c.visitChildren() returned null.");
@@ -276,7 +276,7 @@ public abstract class Node_c implements Node {
      */
     @Override
     public Context enterChildScope(JLDel lang, Node child, Context c) {
-        return lang.NodeOps(child).enterScope(c);
+        return lang.enterScope(child, c);
     }
 
     /**
@@ -352,8 +352,7 @@ public abstract class Node_c implements Node {
 
     @Override
     public Node exceptionCheck(ExceptionChecker ec) throws SemanticException {
-        List<? extends Type> l =
-                ec.lang().NodeOps(this).throwTypes(ec.typeSystem());
+        List<? extends Type> l = ec.lang().throwTypes(this, ec.typeSystem());
         for (Type exc : l) {
             ec.throwsException(exc, position());
         }
@@ -392,7 +391,7 @@ public abstract class Node_c implements Node {
     public void prettyPrint(JLDel lang, OutputStream os) {
         try {
             CodeWriter cw = Compiler.createCodeWriter(os);
-            lang.NodeOps(this).prettyPrint(cw, new PrettyPrinter(lang));
+            lang.prettyPrint(this, cw, new PrettyPrinter(lang));
             cw.flush();
         }
         catch (java.io.IOException e) {
@@ -404,7 +403,7 @@ public abstract class Node_c implements Node {
     public void prettyPrint(JLDel lang, Writer w) {
         try {
             CodeWriter cw = Compiler.createCodeWriter(w);
-            lang.NodeOps(this).prettyPrint(cw, new PrettyPrinter(lang));
+            lang.prettyPrint(this, cw, new PrettyPrinter(lang));
             cw.flush();
         }
         catch (java.io.IOException e) {
@@ -441,7 +440,7 @@ public abstract class Node_c implements Node {
     @Override
     public void translate(CodeWriter w, Translator tr) {
         // By default, just rely on the pretty printer.
-        tr.lang().NodeOps(this).prettyPrint(w, tr);
+        tr.lang().prettyPrint(this, w, tr);
     }
 
     @Override
@@ -495,10 +494,7 @@ public abstract class Node_c implements Node {
 
     @Override
     public Node copy(ExtensionInfo extInfo) throws SemanticException {
-        return extInfo.nodeFactory()
-                      .lang()
-                      .NodeOps(this)
-                      .copy(extInfo.nodeFactory());
+        return extInfo.nodeFactory().lang().copy(this, extInfo.nodeFactory());
     }
 
 }

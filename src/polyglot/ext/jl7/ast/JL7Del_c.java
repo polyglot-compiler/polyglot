@@ -29,16 +29,56 @@ import polyglot.ast.Block;
 import polyglot.ast.Catch;
 import polyglot.ast.JLDel;
 import polyglot.ast.Node;
-import polyglot.ext.jl5.ast.JL5Del;
+import polyglot.ast.NodeOps;
+import polyglot.ext.jl5.ast.JL5CaseOps;
+import polyglot.ext.jl5.ast.JL5Del_c;
+import polyglot.ext.jl5.ast.JL5SwitchOps;
 import polyglot.types.TypeSystem;
+import polyglot.util.SerialVersionUID;
 import polyglot.util.SubtypeSet;
 
-public interface JL7Del extends JL5Del {
+public class JL7Del_c extends JL5Del_c implements JL7Del {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+    public static final JL7Del_c instance = new JL7Del_c();
+
+    protected JL7Del_c() {
+    }
+
+    public JL7Ext jl7ext(Node n) {
+        return JL7Ext.ext(n);
+    }
+
+    @Override
+    protected NodeOps NodeOps(Node n) {
+        return jl7ext(n);
+    }
+
+    @Override
+    protected JL7TryOps TryOps(Node n) {
+        return (JL7TryOps) jl7ext(n);
+    }
+
+    @Override
+    protected JL5CaseOps JL5CaseOps(Node n) {
+        return (JL5CaseOps) jl7ext(n);
+    }
+
+    @Override
+    protected JL5SwitchOps JL5SwitchOps(Node n) {
+        return (JL5SwitchOps) jl7ext(n);
+    }
 
     // JL7TryOps
 
-    void checkPreciseRethrows(Node n, JLDel lang, TypeSystem typeSystem, Block b);
+    @Override
+    public void checkPreciseRethrows(Node n, JLDel lang, TypeSystem typeSystem,
+            Block b) {
+        TryOps(n).checkPreciseRethrows(lang, typeSystem, b);
+    }
 
-    void preciseRethrowsForCatchBlock(Node n, JLDel lang, Catch cb,
-            SubtypeSet thrown);
+    @Override
+    public void preciseRethrowsForCatchBlock(Node n, JLDel lang, Catch cb,
+            SubtypeSet thrown) {
+        TryOps(n).preciseRethrowsForCatchBlock(lang, cb, thrown);
+    }
 }
