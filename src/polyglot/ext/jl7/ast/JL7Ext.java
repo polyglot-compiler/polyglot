@@ -31,16 +31,16 @@ public class JL7Ext extends Ext_c {
     /** Type check the expression. */
     @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
-        return this.superDel().typeCheck(this.node(), tc);
+        return this.superLang().typeCheck(this.node(), tc);
     }
 
     @Override
     public Node checkConstants(ConstantChecker cc) throws SemanticException {
-        return this.superDel().checkConstants(this.node(), cc);
+        return this.superLang().checkConstants(this.node(), cc);
     }
 
     @Override
     public List<Type> throwTypes(TypeSystem ts) {
-        return this.superDel().throwTypes(this.node(), ts);
+        return this.superLang().throwTypes(this.node(), ts);
     }
 }

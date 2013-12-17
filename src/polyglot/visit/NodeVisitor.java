@@ -26,7 +26,8 @@
 
 package polyglot.visit;
 
-import polyglot.ast.JLDel;
+import polyglot.ast.JLang;
+import polyglot.ast.JLangToJLDel;
 import polyglot.ast.Node;
 import polyglot.util.Copy;
 import polyglot.util.InternalCompilerError;
@@ -50,13 +51,18 @@ import polyglot.util.StringUtil;
  */
 public abstract class NodeVisitor implements Copy {
     /** The language this NodeVisitor operates on. */
-    private final JLDel lang;
+    private final JLang lang;
 
-    protected NodeVisitor(JLDel lang) {
+    @Deprecated
+    protected NodeVisitor() {
+        this(JLangToJLDel.instance);
+    }
+
+    protected NodeVisitor(JLang lang) {
         this.lang = lang;
     }
 
-    public JLDel lang() {
+    public JLang lang() {
         return this.lang;
     }
 

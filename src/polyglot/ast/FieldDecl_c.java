@@ -305,7 +305,7 @@ public class FieldDecl_c extends Term_c implements FieldDecl {
         protected Scheduler scheduler;
         protected FieldInstance fi;
 
-        AddDependenciesVisitor(JLDel lang, Scheduler scheduler, FieldInstance fi) {
+        AddDependenciesVisitor(JLang lang, Scheduler scheduler, FieldInstance fi) {
             super(lang);
             this.scheduler = scheduler;
             this.fi = fi;

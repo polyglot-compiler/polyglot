@@ -43,7 +43,7 @@ public interface NodeFactory {
     /**
      * Returns the language associated with this NodeFactory.
      */
-    JLDel lang();
+    JLang lang();
 
     /**
      * Returns a disambiguator for nodes from this factory.

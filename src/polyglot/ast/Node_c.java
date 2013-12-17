@@ -64,6 +64,7 @@ public abstract class Node_c implements Node {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
     protected Position position;
+    @Deprecated
     protected JLDel del;
     protected Ext ext;
     protected boolean error;
@@ -72,6 +73,35 @@ public abstract class Node_c implements Node {
         assert (pos != null);
         this.position = pos;
         this.error = false;
+    }
+
+    @Deprecated
+    @Override
+    public JLDel del() {
+        return del != null ? del : JLDel_c.instance;
+    }
+
+    @Deprecated
+    @Override
+    public Node del(JLDel del) {
+        if (this.del == del) {
+            return this;
+        }
+
+        JLDel old = this.del;
+        this.del = null;
+
+        Node_c n = (Node_c) copy();
+
+        n.del = del != this ? del : null;
+
+        if (n.del != null) {
+            n.del.init(n);
+        }
+
+        this.del = old;
+
+        return n;
     }
 
     @Override
@@ -123,6 +153,12 @@ public abstract class Node_c implements Node {
     public Object copy() {
         try {
             Node_c n = (Node_c) super.clone();
+
+            // XXX Deprecated
+            if (this.del != null) {
+                n.del = (JLDel) this.del.copy();
+                n.del.init(n);
+            }
 
             if (this.ext != null) {
                 n.ext = (Ext) this.ext.copy();
@@ -264,18 +300,14 @@ public abstract class Node_c implements Node {
         return c;
     }
 
-    /**
-     * Push a new scope for visiting the child node <code>child</code>. 
-     * The default behavior is to delegate the call to the child node, and let
-     * it add appropriate declarations that should be in scope. However,
-     * this method gives parent nodes have the ability to modify this behavior.
-     * @param child the child node about to be entered.
-     * @param c the current <code>Context</code>
-     * @return the <code>Context</code> to be used for visiting node 
-     *           <code>child</code>
-     */
+    @Deprecated
     @Override
-    public Context enterChildScope(JLDel lang, Node child, Context c) {
+    public Context enterChildScope(Node child, Context c) {
+        return enterChildScope(JLangToJLDel.instance, child, c);
+    }
+
+    @Override
+    public Context enterChildScope(JLang lang, Node child, Context c) {
         return lang.enterScope(child, c);
     }
 
@@ -364,9 +396,19 @@ public abstract class Node_c implements Node {
         return Collections.emptyList();
     }
 
-    /** Dump the AST for debugging. */
+    @Deprecated
     @Override
-    public void dump(JLDel lang, OutputStream os) {
+    public void dump(OutputStream os) {
+        CodeWriter cw = Compiler.createCodeWriter(os);
+        NodeVisitor dumper = new DumpAst(cw);
+        dumper = dumper.begin();
+        this.visit(dumper);
+        cw.newline();
+        dumper.finish();
+    }
+
+    @Override
+    public void dump(JLang lang, OutputStream os) {
         CodeWriter cw = Compiler.createCodeWriter(os);
         NodeVisitor dumper = new DumpAst(lang, cw);
         dumper = dumper.begin();
@@ -375,9 +417,19 @@ public abstract class Node_c implements Node {
         dumper.finish();
     }
 
-    /** Dump the AST for debugging. */
+    @Deprecated
     @Override
-    public void dump(JLDel lang, Writer w) {
+    public void dump(Writer w) {
+        CodeWriter cw = Compiler.createCodeWriter(w);
+        NodeVisitor dumper = new DumpAst(cw);
+        dumper = dumper.begin();
+        this.visit(dumper);
+        cw.newline();
+        dumper.finish();
+    }
+
+    @Override
+    public void dump(JLang lang, Writer w) {
         CodeWriter cw = Compiler.createCodeWriter(w);
         NodeVisitor dumper = new DumpAst(lang, cw);
         dumper = dumper.begin();
@@ -386,9 +438,20 @@ public abstract class Node_c implements Node {
         dumper.finish();
     }
 
-    /** Pretty-print the AST for debugging. */
+    @Deprecated
     @Override
-    public void prettyPrint(JLDel lang, OutputStream os) {
+    public void prettyPrint(OutputStream os) {
+        try {
+            CodeWriter cw = Compiler.createCodeWriter(os);
+            this.del().prettyPrint(cw, new PrettyPrinter());
+            cw.flush();
+        }
+        catch (java.io.IOException e) {
+        }
+    }
+
+    @Override
+    public void prettyPrint(JLang lang, OutputStream os) {
         try {
             CodeWriter cw = Compiler.createCodeWriter(os);
             lang.prettyPrint(this, cw, new PrettyPrinter(lang));
@@ -398,9 +461,20 @@ public abstract class Node_c implements Node {
         }
     }
 
-    /** Pretty-print the AST for debugging. */
+    @Deprecated
     @Override
-    public void prettyPrint(JLDel lang, Writer w) {
+    public void prettyPrint(Writer w) {
+        try {
+            CodeWriter cw = Compiler.createCodeWriter(w);
+            this.del().prettyPrint(cw, new PrettyPrinter());
+            cw.flush();
+        }
+        catch (java.io.IOException e) {
+        }
+    }
+
+    @Override
+    public void prettyPrint(JLang lang, Writer w) {
         try {
             CodeWriter cw = Compiler.createCodeWriter(w);
             lang.prettyPrint(this, cw, new PrettyPrinter(lang));
@@ -446,6 +520,16 @@ public abstract class Node_c implements Node {
     @Override
     public void dump(CodeWriter w) {
         w.write(StringUtil.getShortNameComponent(getClass().getName()));
+
+        // XXX Deprecated
+        w.allowBreak(4, " ");
+        w.begin(0);
+        w.write("(del ");
+        if (del() == this)
+            w.write("*");
+        else w.write(del().toString());
+        w.write(")");
+        w.end();
 
         Ext ext = ext();
         while (true) {

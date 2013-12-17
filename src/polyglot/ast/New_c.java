@@ -214,7 +214,7 @@ public class New_c extends Expr_c implements New, NewOps {
     }
 
     @Override
-    public Context enterChildScope(JLDel lang, Node child, Context c) {
+    public Context enterChildScope(JLang lang, Node child, Context c) {
         if (child == body && anonType != null && body != null) {
             c = c.pushClass(anonType, anonType);
         }

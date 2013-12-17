@@ -95,7 +95,7 @@ public class JL5FormalExt extends JL5AnnotatedElementExt implements
         if (ext.isVarArg()) {
             ((JL5ArrayType) f.type().type()).setVarArg();
         }
-        return this.superDel().disambiguate(this.node(), ar);
+        return this.superLang().disambiguate(this.node(), ar);
     }
 
     @Override

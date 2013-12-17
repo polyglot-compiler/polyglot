@@ -31,7 +31,12 @@ import java.io.Writer;
 import java.util.List;
 
 import polyglot.frontend.ExtensionInfo;
+import polyglot.types.ClassType;
+import polyglot.types.ConstructorInstance;
 import polyglot.types.Context;
+import polyglot.types.Flags;
+import polyglot.types.MethodInstance;
+import polyglot.types.ReferenceType;
 import polyglot.types.SemanticException;
 import polyglot.types.Type;
 import polyglot.types.TypeSystem;
@@ -47,19 +52,17 @@ import polyglot.visit.TypeBuilder;
 import polyglot.visit.TypeChecker;
 
 /**
- * A <code>Node</code> represents an AST node.  All AST nodes must implement
- * this interface.  Nodes should be immutable: methods which set fields
- * of the node should copy the node, set the field in the copy, and then
- * return the copy.
+ * <code>JL</code> contains all methods implemented by an AST node.
+ * AST nodes and delegates for AST nodes must implement this interface.
  */
-public interface NodeOps {
+public interface JLang {
     /**
      * Visit the children of the node.
      *
      * @param v The visitor that will traverse/rewrite the AST.
      * @return A new AST if a change was made, or <code>this</code>.
      */
-    Node visitChildren(NodeVisitor v);
+    Node visitChildren(Node n, NodeVisitor v);
 
     /**
      * Push a new scope upon entering this node, and add any declarations to the
@@ -70,20 +73,7 @@ public interface NodeOps {
      * @param c the current <code>Context</code>
      * @return the <code>Context</code> to be used for visiting this node. 
      */
-    public Context enterScope(Context c);
-
-    /**
-     * Push a new scope for visiting the child node <code>child</code>. 
-     * The default behavior is to delegate the call to the child node, and let
-     * it add appropriate declarations that should be in scope. However,
-     * this method gives parent nodes have the ability to modify this behavior.
-     * @param child The child node about to be entered.
-     * @param c The current <code>Context</code>
-     * @return the <code>Context</code> to be used for visiting node 
-     *           <code>child</code>
-     */
-    @Deprecated
-    public Context enterChildScope(Node child, Context c);
+    public Context enterScope(Node n, Context c);
 
     /**
      * Push a new scope for visiting the child node <code>child</code>. 
@@ -96,14 +86,14 @@ public interface NodeOps {
      * @return the <code>Context</code> to be used for visiting node 
      *           <code>child</code>
      */
-    public Context enterChildScope(JLang lang, Node child, Context c);
+    public Context enterChildScope(Node n, JLang lang, Node child, Context c);
 
     /**
      * Add any declarations to the context that should be in scope when
      * visiting later sibling nodes.
      * @param c The context to which to add declarations.
      */
-    void addDecls(Context c);
+    void addDecls(Node n, Context c);
 
     /**
      * Collects classes, methods, and fields from the AST rooted at this node
@@ -120,7 +110,8 @@ public interface NodeOps {
      * @param tb The visitor which adds new type objects to the
      * <code>TypeSystem</code>.
      */
-    NodeVisitor buildTypesEnter(TypeBuilder tb) throws SemanticException;
+    NodeVisitor buildTypesEnter(Node n, TypeBuilder tb)
+            throws SemanticException;
 
     /**
      * Collects classes, methods, and fields from the AST rooted at this node
@@ -136,7 +127,7 @@ public interface NodeOps {
      * @param tb The visitor which adds new type objects to the
      * <code>TypeSystem</code>.
      */
-    Node buildTypes(TypeBuilder tb) throws SemanticException;
+    Node buildTypes(Node n, TypeBuilder tb) throws SemanticException;
 
     /**
      * Disambiguate the AST.
@@ -156,7 +147,7 @@ public interface NodeOps {
      *
      * @param ar The visitor which disambiguates.
      */
-    Node disambiguateOverride(Node parent, AmbiguityRemover ar)
+    Node disambiguateOverride(Node n, Node parent, AmbiguityRemover ar)
             throws SemanticException;
 
     /**
@@ -171,7 +162,8 @@ public interface NodeOps {
      *
      * @param ar The visitor which disambiguates.
      */
-    NodeVisitor disambiguateEnter(AmbiguityRemover ar) throws SemanticException;
+    NodeVisitor disambiguateEnter(Node n, AmbiguityRemover ar)
+            throws SemanticException;
 
     /**
      * Remove any remaining ambiguities from the AST.
@@ -188,7 +180,7 @@ public interface NodeOps {
      *
      * @param ar The visitor which disambiguates.
      */
-    Node disambiguate(AmbiguityRemover ar) throws SemanticException;
+    Node disambiguate(Node n, AmbiguityRemover ar) throws SemanticException;
 
     /**
      * Type check the AST.
@@ -202,7 +194,7 @@ public interface NodeOps {
      *
      * @param tc The type checking visitor.
      */
-    NodeVisitor typeCheckEnter(TypeChecker tc) throws SemanticException;
+    NodeVisitor typeCheckEnter(Node n, TypeChecker tc) throws SemanticException;
 
     /**
      * Type check the AST.
@@ -222,7 +214,7 @@ public interface NodeOps {
      *
      * @param tc The type checking visitor.
      */
-    Node typeCheckOverride(Node parent, TypeChecker tc)
+    Node typeCheckOverride(Node n, Node parent, TypeChecker tc)
             throws SemanticException;
 
     /**
@@ -236,7 +228,7 @@ public interface NodeOps {
      *
      * @param tc The type checking visitor.
      */
-    Node typeCheck(TypeChecker tc) throws SemanticException;
+    Node typeCheck(Node n, TypeChecker tc) throws SemanticException;
 
     /**
      * Get the expected type of a child expression of <code>this</code>.
@@ -251,7 +243,7 @@ public interface NodeOps {
      * @param av An ascription visitor.
      * @return The expected type of <code>child</code>.
      */
-    Type childExpectedType(Expr child, AscriptionVisitor av);
+    Type childExpectedType(Node n, Expr child, AscriptionVisitor av);
 
     /**
      * Check if the node is a compile-time constant.
@@ -264,7 +256,7 @@ public interface NodeOps {
      *
      * @param cc The constant checking visitor.
      */
-    Node checkConstants(ConstantChecker cc) throws SemanticException;
+    Node checkConstants(Node n, ConstantChecker cc) throws SemanticException;
 
     /**
      * Check that exceptions are properly propagated throughout the AST.
@@ -278,7 +270,7 @@ public interface NodeOps {
      *
      * @param ec The visitor.
      */
-    NodeVisitor exceptionCheckEnter(ExceptionChecker ec)
+    NodeVisitor exceptionCheckEnter(Node n, ExceptionChecker ec)
             throws SemanticException;
 
     /**
@@ -292,41 +284,25 @@ public interface NodeOps {
      *
      * @param ec The visitor.
      */
-    Node exceptionCheck(ExceptionChecker ec) throws SemanticException;
+    Node exceptionCheck(Node n, ExceptionChecker ec) throws SemanticException;
 
     /** 
      * List of Types of exceptions that might get thrown.  The result is
      * not necessarily correct until after type checking. 
      */
-    List<Type> throwTypes(TypeSystem ts);
+    List<Type> throwTypes(Node n, TypeSystem ts);
 
     /** Dump the AST for debugging. */
-    @Deprecated
-    public void dump(OutputStream os);
+    public void dump(Node n, JLang lang, OutputStream os);
 
     /** Dump the AST for debugging. */
-    public void dump(JLang lang, OutputStream os);
-
-    /** Dump the AST for debugging. */
-    @Deprecated
-    public void dump(Writer w);
-
-    /** Dump the AST for debugging. */
-    public void dump(JLang lang, Writer w);
+    public void dump(Node n, JLang lang, Writer w);
 
     /** Pretty-print the AST for debugging. */
-    @Deprecated
-    public void prettyPrint(OutputStream os);
+    public void prettyPrint(Node n, JLang lang, OutputStream os);
 
     /** Pretty-print the AST for debugging. */
-    public void prettyPrint(JLang lang, OutputStream os);
-
-    /** Pretty-print the AST for debugging. */
-    @Deprecated
-    public void prettyPrint(Writer w);
-
-    /** Pretty-print the AST for debugging. */
-    public void prettyPrint(JLang lang, Writer w);
+    public void prettyPrint(Node n, JLang lang, Writer w);
 
     /**
      * Pretty-print the AST using the given code writer.
@@ -334,7 +310,7 @@ public interface NodeOps {
      * @param w The code writer to which to write.
      * @param pp The pretty printer.  This is <i>not</i> a visitor.
      */
-    void prettyPrint(CodeWriter w, PrettyPrinter pp);
+    void prettyPrint(Node n, CodeWriter w, PrettyPrinter pp);
 
     /**
      * Translate the AST using the given code writer.
@@ -342,12 +318,12 @@ public interface NodeOps {
      * @param w The code writer to which to write.
      * @param tr The translation pass.  This is <i>not</i> a visitor.
      */
-    void translate(CodeWriter w, Translator tr);
+    void translate(Node n, CodeWriter w, Translator tr);
 
     /**
      * Produce a copy of this node using the given NodeFactory.
      */
-    Node copy(NodeFactory nf);
+    Node copy(Node n, NodeFactory nf);
 
     /**
      * Produce a copy of this node using the given ExtensionInfo.
@@ -356,6 +332,103 @@ public interface NodeOps {
      * type information.
      * @throws SemanticException If the type information cannot be copied.
      */
-    Node copy(ExtensionInfo extInfo) throws SemanticException;
+    Node copy(Node n, ExtensionInfo extInfo) throws SemanticException;
 
+    // ClassDeclOps
+
+    void prettyPrintHeader(Node n, CodeWriter w, PrettyPrinter tr);
+
+    void prettyPrintFooter(Node n, CodeWriter w, PrettyPrinter tr);
+
+    Node addDefaultConstructor(Node n, TypeSystem ts, NodeFactory nf,
+            ConstructorInstance defaultConstructorInstance)
+            throws SemanticException;
+
+    // ProcedureDeclOps
+
+    void prettyPrintHeader(Node n, Flags flags, CodeWriter w, PrettyPrinter tr);
+
+    // CallOps
+
+    /**
+     * Used to find the missing static target of a static method call.
+     * Should return the container of the method instance. 
+     * 
+     */
+    Type findContainer(Node n, TypeSystem ts, MethodInstance mi);
+
+    ReferenceType findTargetType(Node n) throws SemanticException;
+
+    /**
+    * Typecheck the Call when the target is null. This method finds
+    * an appropriate target, and then type checks accordingly.
+    * 
+    * @param argTypes list of <code>Type</code>s of the arguments
+     * @throws SemanticException 
+    */
+    Node typeCheckNullTarget(Node n, TypeChecker tc, List<Type> argTypes)
+            throws SemanticException;
+
+    // NewOps
+
+    TypeNode findQualifiedTypeNode(Node n, AmbiguityRemover ar,
+            ClassType outer, TypeNode objectType) throws SemanticException;
+
+    New findQualifier(Node n, AmbiguityRemover ar, ClassType ct)
+            throws SemanticException;
+
+    void typeCheckFlags(Node n, TypeChecker tc) throws SemanticException;
+
+    void typeCheckNested(Node n, TypeChecker tc) throws SemanticException;
+
+    void printQualifier(Node n, CodeWriter w, PrettyPrinter tr);
+
+    void printArgs(Node n, CodeWriter w, PrettyPrinter tr);
+
+    void printBody(Node n, CodeWriter w, PrettyPrinter tr);
+
+    ClassType findEnclosingClass(Node n, Context c, ClassType ct);
+
+    // TryOps
+
+    /**
+     * Construct an ExceptionChecker that is suitable for checking the try block of 
+     * a try-catch-finally AST node. 
+     * @param ec The exception checker immediately prior to the try block.
+     * @return
+     */
+    ExceptionChecker constructTryBlockExceptionChecker(Node n,
+            ExceptionChecker ec);
+
+    /**
+     * Perform exception checking of the try block of a try-catch-finally
+     * AST node, using the supplied exception checker.
+     * @param ec
+     * @return
+     * @throws SemanticException
+     */
+    Block exceptionCheckTryBlock(Node n, ExceptionChecker ec)
+            throws SemanticException;
+
+    /**
+     * Perform exception checking of the catch blocks of a try-catch-finally
+     * AST node, using the supplied exception checker.
+     * 
+     * @param ec
+     * @return
+     * @throws SemanticException
+     */
+    List<Catch> exceptionCheckCatchBlocks(Node n, ExceptionChecker ec)
+            throws SemanticException;
+
+    /**
+     * Perform exception checking of the finally block of a try-catch-finally
+     * AST node (if there is one), using the supplied exception checker.
+     * 
+     * @param ec
+     * @return
+     * @throws SemanticException
+     */
+    Block exceptionCheckFinallyBlock(Node n, ExceptionChecker ec)
+            throws SemanticException;
 }

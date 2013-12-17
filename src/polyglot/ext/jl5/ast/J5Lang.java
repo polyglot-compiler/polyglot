@@ -23,45 +23,21 @@
  *
  * See README for contributors.
  ******************************************************************************/
+package polyglot.ext.jl5.ast;
 
-package polyglot.ast;
+import polyglot.ast.JLang;
+import polyglot.ast.Node;
+import polyglot.types.SemanticException;
+import polyglot.types.Type;
+import polyglot.visit.TypeChecker;
 
-import java.io.Serializable;
+public interface J5Lang extends JLang {
+    // JL5SwitchOps
 
-import polyglot.util.CodeWriter;
-import polyglot.util.Copy;
+    boolean isAcceptableSwitchType(Node n, Type type);
 
-/**
- * <code>Ext</code> is the super type of all node extension objects.
- * It contains a pointer back to the node it is extending and a possibly-null
- * pointer to another extension node.
- */
-public interface Ext extends NodeOps, Copy, Serializable {
-    /** The node that we are extending. */
-    Node node();
+    // JL5CaseOps
 
-    /**
-     * Initialize the extension object's pointer back to the node.
-     * This also initializes the back pointers for all extensions of
-     * the extension.
-     */
-    void init(Node node);
-
-    /** An extension of this extension, or null. */
-    Ext ext();
-
-    /** Set the extension of this extension. */
-    Ext ext(Ext ext);
-
-    /**
-     * The delegate object to invoke "superclass" functionality.
-     * If null, this superclass functionality will by default be delegated
-     * to the node. However, extensions to JL can override this if needed.
-     */
-    JLang superLang();
-
-    /**
-     * Dump the AST node for debugging purposes.
-     */
-    void dump(CodeWriter w);
+    Node resolveCaseLabel(Node n, TypeChecker tc, Type switchType)
+            throws SemanticException;
 }

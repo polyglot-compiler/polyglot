@@ -2,12 +2,12 @@ package polyglot.ext.jl7.ast;
 
 import polyglot.ast.Ext;
 import polyglot.ast.ExtFactory;
-import polyglot.ast.JLDel;
+import polyglot.ast.JLang;
 import polyglot.ext.jl5.ast.JL5AbstractExtFactory_c;
 
 public abstract class JL7AbstractExtFactory_c extends JL5AbstractExtFactory_c
         implements JL7ExtFactory {
-    protected JLDel superDel = null;
+    protected JLang superDel = null;
 
     public JL7AbstractExtFactory_c() {
         super();
@@ -17,7 +17,7 @@ public abstract class JL7AbstractExtFactory_c extends JL5AbstractExtFactory_c
         super(nextExtFactory);
     }
 
-    public JL7AbstractExtFactory_c(ExtFactory nextExtFactory, JLDel superDel) {
+    public JL7AbstractExtFactory_c(ExtFactory nextExtFactory, JLang superDel) {
         super(nextExtFactory);
         this.superDel = superDel;
     }

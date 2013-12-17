@@ -59,7 +59,7 @@ public abstract class Ext_c implements Ext {
 
     protected Node node;
     protected Ext ext;
-    protected JLDel superDel = null;
+    protected JLang superLang = null;
 
     public Ext_c(Ext ext) {
         this.node = null;
@@ -119,15 +119,15 @@ public abstract class Ext_c implements Ext {
     }
 
     @Override
-    public JLDel superDel() {
-        if (this.superDel == null) {
-            return JLDel_c.instance;
+    public JLang superLang() {
+        if (this.superLang == null) {
+            return JLang_c.instance;
         }
-        return this.superDel;
+        return this.superLang;
     }
 
-    public void superDel(JLDel superDel) {
-        this.superDel = superDel;
+    public void superLang(JLang superLang) {
+        this.superLang = superLang;
     }
 
     /**
@@ -186,8 +186,14 @@ public abstract class Ext_c implements Ext {
         return node().enterScope(c);
     }
 
+    @Deprecated
     @Override
-    public Context enterChildScope(JLDel lang, Node child, Context c) {
+    public Context enterChildScope(Node child, Context c) {
+        return node().enterChildScope(child, c);
+    }
+
+    @Override
+    public Context enterChildScope(JLang lang, Node child, Context c) {
         return node().enterChildScope(lang, child, c);
     }
 
@@ -385,27 +391,47 @@ public abstract class Ext_c implements Ext {
         return node().throwTypes(ts);
     }
 
-    /** Dump the AST for debugging. */
+    @Deprecated
     @Override
-    public void dump(JLDel lang, OutputStream os) {
+    public void dump(OutputStream os) {
+        node().del().dump(os);
+    }
+
+    @Override
+    public void dump(JLang lang, OutputStream os) {
         node().dump(lang, os);
     }
 
-    /** Dump the AST for debugging. */
+    @Deprecated
     @Override
-    public void dump(JLDel lang, Writer w) {
+    public void dump(Writer w) {
+        node().del().dump(w);
+    }
+
+    @Override
+    public void dump(JLang lang, Writer w) {
         node().dump(lang, w);
     }
 
-    /** Pretty-print the AST for debugging. */
+    @Deprecated
     @Override
-    public void prettyPrint(JLDel lang, OutputStream os) {
+    public void prettyPrint(OutputStream os) {
+        node().del().prettyPrint(os);
+    }
+
+    @Override
+    public void prettyPrint(JLang lang, OutputStream os) {
         node().prettyPrint(lang, os);
     }
 
-    /** Pretty-print the AST for debugging. */
+    @Deprecated
     @Override
-    public void prettyPrint(JLDel lang, Writer w) {
+    public void prettyPrint(Writer w) {
+        node().del().prettyPrint(w);
+    }
+
+    @Override
+    public void prettyPrint(JLang lang, Writer w) {
         node().prettyPrint(lang, w);
     }
 

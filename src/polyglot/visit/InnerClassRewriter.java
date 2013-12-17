@@ -43,7 +43,7 @@ import polyglot.ast.FieldAssign;
 import polyglot.ast.FieldDecl;
 import polyglot.ast.Formal;
 import polyglot.ast.Id;
-import polyglot.ast.JLDel;
+import polyglot.ast.JLang;
 import polyglot.ast.Local;
 import polyglot.ast.Node;
 import polyglot.ast.NodeFactory;
@@ -107,7 +107,7 @@ public class InnerClassRewriter extends InnerClassAbstractRemover {
         Map<ClassType, FieldInstance> fieldMap;
         Context outerContext;
 
-        ClassBodyTranslator(JLDel lang, ParsedClassType ct,
+        ClassBodyTranslator(JLang lang, ParsedClassType ct,
                 Map<ClassType, FieldInstance> fieldMap, Context context) {
             super(lang);
             this.ct = ct;

@@ -30,9 +30,9 @@ import java.io.Reader;
 import polyglot.ast.NodeFactory;
 import polyglot.ext.jl5.JL5ExtensionInfo;
 import polyglot.ext.jl5.JL5Options;
-import polyglot.ext.jl5.ast.JL5Del_c;
+import polyglot.ext.jl5.ast.J5Lang_c;
 import polyglot.ext.jl5.ast.JL5ExtFactory_c;
-import polyglot.ext.jl7.ast.JL7Del_c;
+import polyglot.ext.jl7.ast.J7Lang_c;
 import polyglot.ext.jl7.ast.JL7ExtFactory_c;
 import polyglot.ext.jl7.ast.JL7NodeFactory_c;
 import polyglot.ext.jl7.parse.Grm;
@@ -69,12 +69,12 @@ public class JL7ExtensionInfo extends JL5ExtensionInfo {
         JL5Options opt = (JL5Options) getOptions();
         if (!opt.removeJava5isms) {
             return new JL7NodeFactory_c(new JL7ExtFactory_c(new JL5ExtFactory_c(),
-                                                            JL5Del_c.instance),
-                                        JL7Del_c.instance);
+                                                            J5Lang_c.instance),
+                                        J7Lang_c.instance);
         }
         else {
             return new JL7NodeFactory_c(new JL7ExtFactory_c(new JL7ToJLExtFactory_c()),
-                                        JL7Del_c.instance);
+                                        J7Lang_c.instance);
         }
     }
 

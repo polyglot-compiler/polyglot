@@ -26,7 +26,7 @@
 
 package polyglot.visit;
 
-import polyglot.ast.JLDel;
+import polyglot.ast.JLang;
 import polyglot.ast.Node;
 import polyglot.ast.NodeFactory;
 import polyglot.frontend.Job;
@@ -112,7 +112,7 @@ public class TypeChecker extends DisambiguationDriver {
     protected static class AmbChecker extends NodeVisitor {
         public boolean amb;
 
-        public AmbChecker(JLDel lang) {
+        public AmbChecker(JLang lang) {
             super(lang);
         }
 

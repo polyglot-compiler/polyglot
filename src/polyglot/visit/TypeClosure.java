@@ -27,12 +27,12 @@ package polyglot.visit;
 
 import polyglot.ast.Call;
 import polyglot.ast.Field;
-import polyglot.ast.JLDel;
+import polyglot.ast.JLang;
 import polyglot.ast.New;
 import polyglot.ast.Node;
 
 public class TypeClosure extends NodeVisitor {
-    public TypeClosure(JLDel lang) {
+    public TypeClosure(JLang lang) {
         super(lang);
     }
 

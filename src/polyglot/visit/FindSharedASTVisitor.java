@@ -31,7 +31,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import polyglot.ast.JLDel;
+import polyglot.ast.JLang;
 import polyglot.ast.Node;
 import polyglot.util.InternalCompilerError;
 
@@ -44,7 +44,7 @@ public class FindSharedASTVisitor extends NodeVisitor {
             new HashMap<Node, FindSharedASTVisitor.NodeStack>();
     private NodeStack currentStack;
 
-    public FindSharedASTVisitor(JLDel lang) {
+    public FindSharedASTVisitor(JLang lang) {
         super(lang);
     }
 

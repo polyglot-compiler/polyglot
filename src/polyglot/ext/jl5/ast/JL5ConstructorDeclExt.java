@@ -183,7 +183,7 @@ public class JL5ConstructorDeclExt extends JL5AnnotatedElementExt implements
     @Override
     public Node disambiguate(AmbiguityRemover ar) throws SemanticException {
         ConstructorDecl n =
-                (ConstructorDecl) this.superDel().disambiguate(this.node(), ar);
+                (ConstructorDecl) this.superLang().disambiguate(this.node(), ar);
         JL5ConstructorDeclExt ext = (JL5ConstructorDeclExt) JL5Ext.ext(n);
 
         List<TypeVariable> typeParams = new LinkedList<TypeVariable>();
@@ -206,7 +206,7 @@ public class JL5ConstructorDeclExt extends JL5AnnotatedElementExt implements
 
     @Override
     public Context enterScope(Context c) {
-        c = this.superDel().enterScope(this.node(), c);
+        c = this.superLang().enterScope(this.node(), c);
         JL5ConstructorDeclExt ext =
                 (JL5ConstructorDeclExt) JL5Ext.ext(this.node());
 

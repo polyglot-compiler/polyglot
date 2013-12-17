@@ -28,7 +28,8 @@ package polyglot.visit;
 
 import java.io.IOException;
 
-import polyglot.ast.JLDel;
+import polyglot.ast.JLang;
+import polyglot.ast.JLangToJLDel;
 import polyglot.ast.Node;
 import polyglot.util.CodeWriter;
 
@@ -40,15 +41,20 @@ import polyglot.util.CodeWriter;
  *     new PrettyPrinter().printAst(node, new CodeWriter(out));
  */
 public class PrettyPrinter {
-    private final JLDel lang;
+    private final JLang lang;
     protected boolean appendSemicolon = true;
     protected boolean printType = true;
 
-    public PrettyPrinter(JLDel lang) {
+    @Deprecated
+    public PrettyPrinter() {
+        this(JLangToJLDel.instance);
+    }
+
+    public PrettyPrinter(JLang lang) {
         this.lang = lang;
     }
 
-    public JLDel lang() {
+    public JLang lang() {
         return this.lang;
     }
 

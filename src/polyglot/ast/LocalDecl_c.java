@@ -202,7 +202,7 @@ public class LocalDecl_c extends Stmt_c implements LocalDecl {
      * initializer
      */
     @Override
-    public Context enterChildScope(JLDel lang, Node child, Context c) {
+    public Context enterChildScope(JLang lang, Node child, Context c) {
         if (child == init) {
             c.addVariable(li);
         }
@@ -305,7 +305,7 @@ public class LocalDecl_c extends Stmt_c implements LocalDecl {
         protected ConstantChecker cc;
         protected LocalInstance li;
 
-        AddDependenciesVisitor(JLDel lang, ConstantChecker cc, LocalInstance li) {
+        AddDependenciesVisitor(JLang lang, ConstantChecker cc, LocalInstance li) {
             super(lang);
             this.cc = cc;
             this.li = li;

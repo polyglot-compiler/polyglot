@@ -31,7 +31,7 @@ import java.util.Set;
 
 import polyglot.ast.Assign;
 import polyglot.ast.Formal;
-import polyglot.ast.JLDel;
+import polyglot.ast.JLang;
 import polyglot.ast.Local;
 import polyglot.ast.LocalDecl;
 import polyglot.ast.Node;
@@ -133,7 +133,7 @@ public class FinalLocalExtractor extends NodeVisitor {
     }
 
     protected static class LocalDeclFixer extends NodeVisitor {
-        public LocalDeclFixer(JLDel lang) {
+        public LocalDeclFixer(JLang lang) {
             super(lang);
         }
 

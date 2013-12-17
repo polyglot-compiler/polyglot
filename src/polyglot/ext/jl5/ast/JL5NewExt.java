@@ -378,26 +378,26 @@ public class JL5NewExt extends JL5Ext implements NewOps {
 
     @Override
     public void typeCheckFlags(TypeChecker tc) throws SemanticException {
-        this.superDel().typeCheckFlags(this.node(), tc);
+        this.superLang().typeCheckFlags(this.node(), tc);
     }
 
     @Override
     public void typeCheckNested(TypeChecker tc) throws SemanticException {
-        this.superDel().typeCheckNested(this.node(), tc);
+        this.superLang().typeCheckNested(this.node(), tc);
     }
 
     @Override
     public void printQualifier(CodeWriter w, PrettyPrinter tr) {
-        this.superDel().printQualifier(this.node(), w, tr);
+        this.superLang().printQualifier(this.node(), w, tr);
     }
 
     @Override
     public void printArgs(CodeWriter w, PrettyPrinter tr) {
-        this.superDel().printArgs(this.node(), w, tr);
+        this.superLang().printArgs(this.node(), w, tr);
     }
 
     @Override
     public void printBody(CodeWriter w, PrettyPrinter tr) {
-        this.superDel().printBody(this.node(), w, tr);
+        this.superLang().printBody(this.node(), w, tr);
     }
 }

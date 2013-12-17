@@ -33,7 +33,7 @@ import polyglot.ast.ClassDecl;
 import polyglot.ast.ClassMember;
 import polyglot.ast.CodeDecl;
 import polyglot.ast.FieldDecl;
-import polyglot.ast.JLDel;
+import polyglot.ast.JLang;
 import polyglot.ast.New;
 import polyglot.ast.Node;
 import polyglot.ast.NodeFactory;
@@ -151,7 +151,7 @@ public class AmbiguityRemover extends DisambiguationDriver {
     protected static class AmbChecker2 extends NodeVisitor {
         public boolean amb;
 
-        public AmbChecker2(JLDel lang) {
+        public AmbChecker2(JLang lang) {
             super(lang);
         }
 
@@ -216,7 +216,7 @@ public class AmbiguityRemover extends DisambiguationDriver {
     protected static class AmbChecker extends NodeVisitor {
         public int notOkCount;
 
-        public AmbChecker(JLDel lang) {
+        public AmbChecker(JLang lang) {
             super(lang);
         }
 
@@ -243,7 +243,7 @@ public class AmbiguityRemover extends DisambiguationDriver {
         }
     }
 
-    public static int astAmbiguityCount(JLDel lang, Node n) {
+    public static int astAmbiguityCount(JLang lang, Node n) {
         AmbChecker ac = new AmbChecker(lang);
         n.visit(ac);
         return ac.notOkCount;

@@ -37,7 +37,7 @@ import polyglot.ast.ClassMember;
 import polyglot.ast.Expr;
 import polyglot.ast.Formal;
 import polyglot.ast.Import;
-import polyglot.ast.JLDel;
+import polyglot.ast.JLang;
 import polyglot.ast.LocalDecl;
 import polyglot.ast.Node;
 import polyglot.ast.SourceFile;
@@ -65,7 +65,7 @@ public class NodeScrambler extends NodeVisitor {
     protected boolean scrambled = false;
     protected CodeWriter cw;
 
-    public NodeScrambler(JLDel lang) {
+    public NodeScrambler(JLang lang) {
         this(lang, new Random().nextLong());
     }
 
@@ -73,7 +73,7 @@ public class NodeScrambler extends NodeVisitor {
      * Create a new <code>NodeScrambler</code> with the given random number
      * generator seed.
      */
-    public NodeScrambler(JLDel lang, long seed) {
+    public NodeScrambler(JLang lang, long seed) {
         super(lang);
         this.fp = new FirstPass(lang);
 
@@ -92,7 +92,7 @@ public class NodeScrambler extends NodeVisitor {
      * run before the main <code>NodeScrambler</code> visits the tree.</b>
      */
     public class FirstPass extends NodeVisitor {
-        public FirstPass(JLDel lang) {
+        public FirstPass(JLang lang) {
             super(lang);
         }
 

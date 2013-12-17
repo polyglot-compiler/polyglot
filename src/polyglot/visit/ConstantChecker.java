@@ -27,7 +27,7 @@
 package polyglot.visit;
 
 import polyglot.ast.Expr;
-import polyglot.ast.JLDel;
+import polyglot.ast.JLang;
 import polyglot.ast.Node;
 import polyglot.ast.NodeFactory;
 import polyglot.frontend.Job;
@@ -61,7 +61,7 @@ public class ConstantChecker extends ContextVisitor {
     protected static class TypeCheckChecker extends NodeVisitor {
         public boolean checked = true;
 
-        public TypeCheckChecker(JLDel lang) {
+        public TypeCheckChecker(JLang lang) {
             super(lang);
         }
 

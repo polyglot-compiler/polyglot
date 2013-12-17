@@ -23,62 +23,52 @@
  *
  * See README for contributors.
  ******************************************************************************/
-package polyglot.ext.jl7.ast;
 
-import polyglot.ast.Block;
-import polyglot.ast.Catch;
-import polyglot.ast.JLDel;
-import polyglot.ast.Node;
-import polyglot.ast.NodeOps;
-import polyglot.ext.jl5.ast.JL5CaseOps;
-import polyglot.ext.jl5.ast.JL5Del_c;
-import polyglot.ext.jl5.ast.JL5SwitchOps;
-import polyglot.types.TypeSystem;
+package polyglot.ast;
+
 import polyglot.util.SerialVersionUID;
-import polyglot.util.SubtypeSet;
 
-public class JL7Del_c extends JL5Del_c implements JL7Del {
+/**
+ * <code>JLangToDel_c</code> is a bridge class that provides backward
+ * compatibility with the Polyglot's old architecture that uses delegate
+ * objects.  It forwards operations to the node's delegate object.
+ */
+@SuppressWarnings("deprecation")
+public class JLangToJLDel extends JLang_c {
     private static final long serialVersionUID = SerialVersionUID.generate();
-    public static final JL7Del_c instance = new JL7Del_c();
 
-    protected JL7Del_c() {
-    }
+    public static final JLang instance = new JLangToJLDel();
 
-    public JL7Ext jl7ext(Node n) {
-        return JL7Ext.ext(n);
+    protected JLangToJLDel() {
     }
 
     @Override
     protected NodeOps NodeOps(Node n) {
-        return jl7ext(n);
+        return n.del();
     }
 
     @Override
-    protected JL7TryOps TryOps(Node n) {
-        return (JL7TryOps) jl7ext(n);
+    protected CallOps CallOps(Node n) {
+        return (CallOps) n.del();
     }
 
     @Override
-    protected JL5CaseOps JL5CaseOps(Node n) {
-        return (JL5CaseOps) jl7ext(n);
+    protected ClassDeclOps ClassDeclOps(Node n) {
+        return (ClassDeclOps) n.del();
     }
 
     @Override
-    protected JL5SwitchOps JL5SwitchOps(Node n) {
-        return (JL5SwitchOps) jl7ext(n);
-    }
-
-    // JL7TryOps
-
-    @Override
-    public void checkPreciseRethrows(Node n, JLDel lang, TypeSystem typeSystem,
-            Block b) {
-        TryOps(n).checkPreciseRethrows(lang, typeSystem, b);
+    protected NewOps NewOps(Node n) {
+        return (NewOps) n.del();
     }
 
     @Override
-    public void preciseRethrowsForCatchBlock(Node n, JLDel lang, Catch cb,
-            SubtypeSet thrown) {
-        TryOps(n).preciseRethrowsForCatchBlock(lang, cb, thrown);
+    protected ProcedureDeclOps ProcedureDeclOps(Node n) {
+        return (ProcedureDeclOps) n.del();
+    }
+
+    @Override
+    protected TryOps TryOps(Node n) {
+        return (TryOps) n.del();
     }
 }

@@ -173,7 +173,7 @@ public class JL5MethodDeclExt extends JL5AnnotatedElementExt implements
     @Override
     public Node disambiguate(AmbiguityRemover ar) throws SemanticException {
         MethodDecl n =
-                (MethodDecl) this.superDel().disambiguate(this.node(), ar);
+                (MethodDecl) this.superLang().disambiguate(this.node(), ar);
         JL5MethodDeclExt ext = (JL5MethodDeclExt) JL5Ext.ext(n);
         List<TypeVariable> typeParams = new LinkedList<TypeVariable>();
 
@@ -331,7 +331,7 @@ public class JL5MethodDeclExt extends JL5AnnotatedElementExt implements
 
         if (ext.isCompilerGenerated()) return;
 
-        this.superDel().translate(this.node(), w, tr);
+        this.superLang().translate(this.node(), w, tr);
     }
 
     @Override
@@ -408,7 +408,7 @@ public class JL5MethodDeclExt extends JL5AnnotatedElementExt implements
     public Context enterScope(Context c) {
         MethodDecl md = (MethodDecl) this.node();
         JL5MethodDeclExt ext = (JL5MethodDeclExt) JL5Ext.ext(md);
-        c = this.superDel().enterScope(this.node(), c);
+        c = this.superLang().enterScope(this.node(), c);
         for (ParamTypeNode pn : ext.typeParams()) {
             ((JL5Context) c).addTypeVariable((TypeVariable) pn.type());
         }

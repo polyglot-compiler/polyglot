@@ -31,7 +31,7 @@ import java.io.Reader;
 import javax.tools.FileObject;
 
 import polyglot.ast.NodeFactory;
-import polyglot.ext.jl5.ast.JL5Del_c;
+import polyglot.ext.jl5.ast.J5Lang_c;
 import polyglot.ext.jl5.ast.JL5ExtFactory_c;
 import polyglot.ext.jl5.ast.JL5NodeFactory_c;
 import polyglot.ext.jl5.parse.Grm;
@@ -79,11 +79,11 @@ public class JL5ExtensionInfo extends JLExtensionInfo {
         JL5Options opt = (JL5Options) getOptions();
         if (!opt.removeJava5isms) {
             return new JL5NodeFactory_c(new JL5ExtFactory_c(),
-                                        JL5Del_c.instance);
+                                        J5Lang_c.instance);
         }
         else {
             return new JL5NodeFactory_c(new JL5ExtFactory_c(new JL5ToJLExtFactory_c()),
-                                        JL5Del_c.instance);
+                                        J5Lang_c.instance);
         }
     }
 

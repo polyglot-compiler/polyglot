@@ -50,7 +50,7 @@ public class JL7CaseExt extends JL7Ext implements JL5CaseOps {
         if (switchType.isClass() && ts.String().equals(switchType)) {
             return c;
         }
-        return ((JL5CaseOps) this.superDel()).resolveCaseLabel(tc, switchType);
+        return ((JL5CaseOps) this.superLang()).resolveCaseLabel(tc, switchType);
     }
 
     @Override
@@ -62,7 +62,7 @@ public class JL7CaseExt extends JL7Ext implements JL5CaseOps {
             return c;
         }
 
-        return this.superDel().typeCheck(this.node(), tc);
+        return this.superLang().typeCheck(this.node(), tc);
     }
 
     @Override
@@ -75,7 +75,7 @@ public class JL7CaseExt extends JL7Ext implements JL5CaseOps {
             return c; // OK, it's a string.
         }
 
-        return superDel().checkConstants(this.node(), cc);
+        return superLang().checkConstants(this.node(), cc);
 
     }
 }

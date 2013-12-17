@@ -42,7 +42,7 @@ import polyglot.ast.ConstructorDecl;
 import polyglot.ast.Expr;
 import polyglot.ast.Field;
 import polyglot.ast.Formal;
-import polyglot.ast.JLDel;
+import polyglot.ast.JLang;
 import polyglot.ast.Local;
 import polyglot.ast.LocalClassDecl;
 import polyglot.ast.New;
@@ -543,7 +543,7 @@ public class LocalClassRemover extends ContextVisitor {
         private final ClassType theLocalClass;
         ParsedClassType curr;
 
-        protected ConstructorCallRewriter(JLDel lang,
+        protected ConstructorCallRewriter(JLang lang,
                 List<FieldInstance> fields, ClassType ct) {
             super(lang);
             this.newFields = fields;

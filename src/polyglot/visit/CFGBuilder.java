@@ -35,7 +35,7 @@ import polyglot.ast.Branch;
 import polyglot.ast.Catch;
 import polyglot.ast.CodeNode;
 import polyglot.ast.CompoundStmt;
-import polyglot.ast.JLDel;
+import polyglot.ast.JLang;
 import polyglot.ast.Labeled;
 import polyglot.ast.Loop;
 import polyglot.ast.Return;
@@ -60,7 +60,7 @@ import polyglot.visit.FlowGraph.Peer;
  */
 public class CFGBuilder<FlowItem extends DataFlow.Item> implements Copy {
     /** The language this CFGBuilder operates on. */
-    private final JLDel lang;
+    private final JLang lang;
 
     /** The flowgraph under construction. */
     protected FlowGraph<FlowItem> graph;
@@ -164,7 +164,7 @@ public class CFGBuilder<FlowItem extends DataFlow.Item> implements Copy {
      */
     protected boolean exceptionEdgesToFinally;
 
-    public CFGBuilder(JLDel lang, TypeSystem ts, FlowGraph<FlowItem> graph,
+    public CFGBuilder(JLang lang, TypeSystem ts, FlowGraph<FlowItem> graph,
             DataFlow<FlowItem> df) {
         this.lang = lang;
         this.ts = ts;
@@ -178,7 +178,7 @@ public class CFGBuilder<FlowItem extends DataFlow.Item> implements Copy {
         this.exceptionEdgesToFinally = false;
     }
 
-    public JLDel lang() {
+    public JLang lang() {
         return this.lang;
     }
 

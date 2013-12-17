@@ -280,7 +280,7 @@ public class ClassDecl_c extends Term_c implements ClassDecl, ClassDeclOps {
     }
 
     @Override
-    public Context enterChildScope(JLDel lang, Node child, Context c) {
+    public Context enterChildScope(JLang lang, Node child, Context c) {
         if (child == this.body) {
             TypeSystem ts = c.typeSystem();
             c = c.pushClass(type, ts.staticTarget(type).toClass());

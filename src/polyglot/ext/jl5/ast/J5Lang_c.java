@@ -27,7 +27,7 @@ package polyglot.ext.jl5.ast;
 
 import polyglot.ast.CallOps;
 import polyglot.ast.ClassDeclOps;
-import polyglot.ast.JLDel_c;
+import polyglot.ast.JLang_c;
 import polyglot.ast.NewOps;
 import polyglot.ast.Node;
 import polyglot.ast.NodeOps;
@@ -37,12 +37,12 @@ import polyglot.types.Type;
 import polyglot.util.SerialVersionUID;
 import polyglot.visit.TypeChecker;
 
-public class JL5Del_c extends JLDel_c implements JL5Del {
+public class J5Lang_c extends JLang_c implements J5Lang {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
-    public static final JL5Del_c instance = new JL5Del_c();
+    public static final J5Lang_c instance = new J5Lang_c();
 
-    protected JL5Del_c() {
+    protected J5Lang_c() {
     }
 
     protected JL5Ext jl5ext(Node n) {

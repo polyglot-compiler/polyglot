@@ -23,21 +23,22 @@
  *
  * See README for contributors.
  ******************************************************************************/
-package polyglot.ext.jl5.ast;
+package polyglot.ext.jl7.ast;
 
-import polyglot.ast.JLDel;
+import polyglot.ast.Block;
+import polyglot.ast.Catch;
+import polyglot.ast.JLang;
 import polyglot.ast.Node;
-import polyglot.types.SemanticException;
-import polyglot.types.Type;
-import polyglot.visit.TypeChecker;
+import polyglot.ext.jl5.ast.J5Lang;
+import polyglot.types.TypeSystem;
+import polyglot.util.SubtypeSet;
 
-public interface JL5Del extends JLDel {
-    // JL5SwitchOps
+public interface J7Lang extends J5Lang {
 
-    boolean isAcceptableSwitchType(Node n, Type type);
+    // JL7TryOps
 
-    // JL5CaseOps
+    void checkPreciseRethrows(Node n, JLang lang, TypeSystem typeSystem, Block b);
 
-    Node resolveCaseLabel(Node n, TypeChecker tc, Type switchType)
-            throws SemanticException;
+    void preciseRethrowsForCatchBlock(Node n, JLang lang, Catch cb,
+            SubtypeSet thrown);
 }

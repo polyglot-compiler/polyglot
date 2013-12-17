@@ -44,7 +44,7 @@ import polyglot.ast.Eval;
 import polyglot.ast.Expr;
 import polyglot.ast.For;
 import polyglot.ast.If;
-import polyglot.ast.JLDel;
+import polyglot.ast.JLang;
 import polyglot.ast.Local;
 import polyglot.ast.LocalAssign;
 import polyglot.ast.LocalDecl;
@@ -364,7 +364,7 @@ public class DeadCodeEliminator extends
         protected Set<LocalInstance> def;
         protected Set<LocalInstance> use;
 
-        public DefUseFinder(JLDel lang, Set<LocalInstance> def,
+        public DefUseFinder(JLang lang, Set<LocalInstance> def,
                 Set<LocalInstance> use) {
             super(lang);
             this.def = def;

@@ -39,7 +39,7 @@ public class JL7SwitchExt extends JL7Ext implements JL5SwitchOps {
         if (ts.String().equals(type)) {
             return true;
         }
-        return ((JL5SwitchOps) this.superDel()).isAcceptableSwitchType(type);
+        return ((JL5SwitchOps) this.superLang()).isAcceptableSwitchType(type);
     }
 
 }

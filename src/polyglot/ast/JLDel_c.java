@@ -32,16 +32,13 @@ import java.io.Writer;
 import java.util.List;
 
 import polyglot.frontend.ExtensionInfo;
-import polyglot.types.ClassType;
-import polyglot.types.ConstructorInstance;
 import polyglot.types.Context;
-import polyglot.types.Flags;
-import polyglot.types.MethodInstance;
-import polyglot.types.ReferenceType;
 import polyglot.types.SemanticException;
 import polyglot.types.Type;
 import polyglot.types.TypeSystem;
 import polyglot.util.CodeWriter;
+import polyglot.util.Copy;
+import polyglot.util.InternalCompilerError;
 import polyglot.util.SerialVersionUID;
 import polyglot.visit.AmbiguityRemover;
 import polyglot.visit.AscriptionVisitor;
@@ -61,294 +58,357 @@ import polyglot.visit.TypeChecker;
  * classes or may reimplement all compiler passes in a new class implementing
  * the <code>JL</code> interface.
  */
-public class JLDel_c implements JLDel, Serializable {
+@Deprecated
+public class JLDel_c implements JLDel, Copy, Serializable {
     private static final long serialVersionUID = SerialVersionUID.generate();
-
     public static final JLDel instance = new JLDel_c();
 
-    protected JLDel_c() {
+    Node node;
+
+    /** Create an uninitialized delegate. It must be initialized using the init() method.
+     */
+    public JLDel_c() {
     }
 
-    protected NodeOps NodeOps(Node n) {
-        return n;
-    }
-
-    protected CallOps CallOps(Node n) {
-        return (CallOps) n;
-    }
-
-    protected ClassDeclOps ClassDeclOps(Node n) {
-        return (ClassDeclOps) n;
-    }
-
-    protected NewOps NewOps(Node n) {
-        return (NewOps) n;
-    }
-
-    protected ProcedureDeclOps ProcedureDeclOps(Node n) {
-        return (ProcedureDeclOps) n;
-    }
-
-    protected TryOps TryOps(Node n) {
-        return (TryOps) n;
-    }
-
-    // NodeOps
-
-    @Override
-    public final Node visitChildren(Node n, NodeVisitor v) {
-        return NodeOps(n).visitChildren(v);
+    /** The <code>NodeOps</code> object we dispatch to, by default, the node
+     * itself, but possibly another delegate.
+     */
+    public NodeOps jl() {
+        return node();
     }
 
     @Override
-    public final Context enterScope(Node n, Context c) {
-        return NodeOps(n).enterScope(c);
+    public void init(Node n) {
+        assert (this.node == null);
+        this.node = n;
     }
 
     @Override
-    public final Context enterChildScope(Node n, JLDel lang, Node child,
-            Context c) {
-        return NodeOps(n).enterChildScope(lang, child, c);
+    public Node node() {
+        return this.node;
     }
 
     @Override
-    public final void addDecls(Node n, Context c) {
-        NodeOps(n).addDecls(c);
+    public Object copy() {
+        try {
+            JLDel_c copy = (JLDel_c) super.clone();
+            copy.node = null; // uninitialize
+            return copy;
+        }
+        catch (CloneNotSupportedException e) {
+            throw new InternalCompilerError("Unable to clone a delegate");
+        }
+    }
+
+    /**
+     * Visit the children of the node.
+     *
+     * @param v The visitor that will traverse/rewrite the AST.
+     * @return A new AST if a change was made, or <code>this</code>.
+     */
+    @Override
+    public Node visitChildren(NodeVisitor v) {
+        return jl().visitChildren(v);
+    }
+
+    /**
+     * Push a new scope upon entering this node, and add any declarations to the
+     * context that should be in scope when visiting children of this node.
+     * This should <i>not</i> update the old context
+     * imperatively.  Use <code>addDecls</code> when leaving the node
+     * for that.
+     * @param c the current <code>Context</code>
+     * @return the <code>Context</code> to be used for visiting this node. 
+     */
+    @Override
+    public Context enterScope(Context c) {
+        return jl().enterScope(c);
+    }
+
+    /**
+     * Push a new scope for visiting the child node <code>child</code>. 
+     * The default behavior is to delegate the call to the child node, and let
+     * it add appropriate declarations that should be in scope. However,
+     * this method gives parent nodes have the ability to modify this behavior.
+     * @param child the child node about to be entered.
+     * @param c the current <code>Context</code>
+     * @return the <code>Context</code> to be used for visiting node 
+     *           <code>child</code>
+     */
+    @Deprecated
+    @Override
+    public Context enterChildScope(Node child, Context c) {
+        return jl().enterChildScope(child, c);
     }
 
     @Override
-    public final NodeVisitor buildTypesEnter(Node n, TypeBuilder tb)
+    public Context enterChildScope(JLang lang, Node child, Context c) {
+        return null;
+    }
+
+    /**
+     * Add any declarations to the context that should be in scope when
+     * visiting later sibling nodes.
+     * @param c The context to which to add declarations.
+     */
+    @Override
+    public void addDecls(Context c) {
+        jl().addDecls(c);
+    }
+
+    /**
+     * Collects classes, methods, and fields from the AST rooted at this node
+     * and constructs type objects for these.  These type objects may be
+     * ambiguous.  Inserts classes into the <code>TypeSystem</code>.
+     *
+     * This method is called by the <code>enter()</code> method of the
+     * visitor.  The * method should perform work that should be done
+     * before visiting the children of the node.  The method may return
+     * <code>this</code> or a new copy of the node on which
+     * <code>visitChildren()</code> and <code>leave()</code> will be
+     * invoked.
+     *
+     * @param tb The visitor which adds new type objects to the
+     * <code>TypeSystem</code>.
+     */
+    @Override
+    public NodeVisitor buildTypesEnter(TypeBuilder tb) throws SemanticException {
+        return jl().buildTypesEnter(tb);
+    }
+
+    /**
+     * Collects classes, methods, and fields from the AST rooted at this node
+     * and constructs type objects for these.  These type objects may be
+     * ambiguous.  Inserts classes into the <code>TypeSystem</code>.
+     *
+     * This method is called by the <code>leave()</code> method of the
+     * visitor.  The method should perform work that should be done
+     * after visiting the children of the node.  The method may return
+     * <code>this</code> or a new copy of the node which will be
+     * installed as a child of the node's parent.
+     *
+     * @param tb The visitor which adds new type objects to the
+     * <code>TypeSystem</code>.
+     */
+    @Override
+    public Node buildTypes(TypeBuilder tb) throws SemanticException {
+        return jl().buildTypes(tb);
+    }
+
+    /**
+     * Remove any remaining ambiguities from the AST.
+     *
+     * This method is called by the <code>enter()</code> method of the
+     * visitor.  The * method should perform work that should be done
+     * before visiting the children of the node.  The method may return
+     * <code>this</code> or a new copy of the node on which
+     * <code>visitChildren()</code> and <code>leave()</code> will be
+     * invoked.
+     *
+     * @param ar The visitor which disambiguates.
+     */
+    @Override
+    public Node disambiguateOverride(Node parent, AmbiguityRemover ar)
             throws SemanticException {
-        return NodeOps(n).buildTypesEnter(tb);
+        return jl().disambiguateOverride(parent, ar);
     }
 
     @Override
-    public final Node buildTypes(Node n, TypeBuilder tb)
+    public NodeVisitor disambiguateEnter(AmbiguityRemover ar)
             throws SemanticException {
-        return NodeOps(n).buildTypes(tb);
+        return jl().disambiguateEnter(ar);
     }
 
+    /**
+     * Remove any remaining ambiguities from the AST.
+     *
+     * This method is called by the <code>leave()</code> method of the
+     * visitor.  The method should perform work that should be done
+     * after visiting the children of the node.  The method may return
+     * <code>this</code> or a new copy of the node which will be
+     * installed as a child of the node's parent.
+     *
+     * @param ar The visitor which disambiguates.
+     */
     @Override
-    public final Node disambiguateOverride(Node n, Node parent,
-            AmbiguityRemover ar) throws SemanticException {
-        return NodeOps(n).disambiguateOverride(parent, ar);
+    public Node disambiguate(AmbiguityRemover ar) throws SemanticException {
+        return jl().disambiguate(ar);
     }
 
+    /**
+     * Type check the AST.
+     *
+     * This method is called by the <code>enter()</code> method of the
+     * visitor.  The * method should perform work that should be done
+     * before visiting the children of the node.  The method may return
+     * <code>this</code> or a new copy of the node on which
+     * <code>visitChildren()</code> and <code>leave()</code> will be
+     * invoked.
+     *
+     * @param tc The type checking visitor.
+     */
     @Override
-    public final NodeVisitor disambiguateEnter(Node n, AmbiguityRemover ar)
+    public Node typeCheckOverride(Node parent, TypeChecker tc)
             throws SemanticException {
-        return NodeOps(n).disambiguateEnter(ar);
+        return jl().typeCheckOverride(parent, tc);
     }
 
     @Override
-    public final Node disambiguate(Node n, AmbiguityRemover ar)
+    public NodeVisitor typeCheckEnter(TypeChecker tc) throws SemanticException {
+        return jl().typeCheckEnter(tc);
+    }
+
+    /**
+     * Type check the AST.
+     *
+     * This method is called by the <code>leave()</code> method of the
+     * visitor.  The method should perform work that should be done
+     * after visiting the children of the node.  The method may return
+     * <code>this</code> or a new copy of the node which will be
+     * installed as a child of the node's parent.
+     *
+     * @param tc The type checking visitor.
+     */
+    @Override
+    public Node typeCheck(TypeChecker tc) throws SemanticException {
+        return jl().typeCheck(tc);
+    }
+
+    /**
+     * Get the expected type of a child expression of <code>this</code>.
+     * The expected type is determined by the context in that the child occurs
+     * (e.g., for <code>x = e</code>, the expected type of <code>e</code> is
+     * the declared type of <code>x</code>.
+     *
+     * The expected type should impose the least constraints on the child's
+     * type that are allowed by the parent node.
+     *
+     * @param child A child expression of this node.
+     * @param av An ascription visitor.
+     * @return The expected type of <code>child</code>.
+     */
+    @Override
+    public Type childExpectedType(Expr child, AscriptionVisitor av) {
+        return jl().childExpectedType(child, av);
+    }
+
+    @Override
+    public Node checkConstants(ConstantChecker cc) throws SemanticException {
+        return jl().checkConstants(cc);
+    }
+
+    /**
+     * Check that exceptions are properly propagated throughout the AST.
+     *
+     * This method is called by the <code>enter()</code> method of the
+     * visitor.  The * method should perform work that should be done
+     * before visiting the children of the node.  The method may return
+     * <code>this</code> or a new copy of the node on which
+     * <code>visitChildren()</code> and <code>leave()</code> will be
+     * invoked.
+     *
+     * @param ec The visitor.
+     */
+    @Override
+    public NodeVisitor exceptionCheckEnter(ExceptionChecker ec)
             throws SemanticException {
-        return NodeOps(n).disambiguate(ar);
+        return jl().exceptionCheckEnter(ec);
+    }
+
+    /**
+     * Check that exceptions are properly propagated throughout the AST.
+     *
+     * This method is called by the <code>leave()</code> method of the
+     * visitor.  The method should perform work that should be done
+     * after visiting the children of the node.  The method may return
+     * <code>this</code> or a new copy of the node which will be
+     * installed as a child of the node's parent.
+     *
+     * @param ec The visitor.
+     */
+    @Override
+    public Node exceptionCheck(ExceptionChecker ec) throws SemanticException {
+        return jl().exceptionCheck(ec);
+    }
+
+    /** 
+     * List of Types of exceptions that might get thrown.  The result is
+     * not necessarily correct until after type checking. 
+     */
+    @Override
+    public List<Type> throwTypes(TypeSystem ts) {
+        return jl().throwTypes(ts);
+    }
+
+    @Deprecated
+    @Override
+    public void dump(OutputStream os) {
+        jl().dump(os);
     }
 
     @Override
-    public final NodeVisitor typeCheckEnter(Node n, TypeChecker tc)
-            throws SemanticException {
-        return NodeOps(n).typeCheckEnter(tc);
+    public void dump(JLang lang, OutputStream os) {
+    }
+
+    @Deprecated
+    @Override
+    public void dump(Writer w) {
+        jl().dump(w);
     }
 
     @Override
-    public final Node typeCheckOverride(Node n, Node parent, TypeChecker tc)
-            throws SemanticException {
-        return NodeOps(n).typeCheckOverride(parent, tc);
+    public void dump(JLang lang, Writer w) {
+    }
+
+    @Deprecated
+    @Override
+    public void prettyPrint(OutputStream os) {
+        jl().prettyPrint(os);
     }
 
     @Override
-    public final Node typeCheck(Node n, TypeChecker tc)
-            throws SemanticException {
-        return NodeOps(n).typeCheck(tc);
+    public void prettyPrint(JLang lang, OutputStream os) {
+    }
+
+    @Deprecated
+    @Override
+    public void prettyPrint(Writer w) {
+        jl().prettyPrint(w);
     }
 
     @Override
-    public final Type childExpectedType(Node n, Expr child, AscriptionVisitor av) {
-        return NodeOps(n).childExpectedType(child, av);
+    public void prettyPrint(JLang lang, Writer w) {
+    }
+
+    /**
+     * Pretty-print the AST using the given code writer.
+     *
+     * @param w The code writer to which to write.
+     * @param pp The pretty printer.  This is <i>not</i> a visitor.
+     */
+    @Override
+    public void prettyPrint(CodeWriter w, PrettyPrinter pp) {
+        jl().prettyPrint(w, pp);
+    }
+
+    /**
+     * Translate the AST using the given code writer.
+     *
+     * @param w The code writer to which to write.
+     * @param tr The translation pass.  This is <i>not</i> a visitor.
+     */
+    @Override
+    public void translate(CodeWriter w, Translator tr) {
+        jl().translate(w, tr);
     }
 
     @Override
-    public final Node checkConstants(Node n, ConstantChecker cc)
-            throws SemanticException {
-        return NodeOps(n).checkConstants(cc);
+    public Node copy(NodeFactory nf) {
+        return jl().copy(nf);
     }
 
     @Override
-    public final NodeVisitor exceptionCheckEnter(Node n, ExceptionChecker ec)
-            throws SemanticException {
-        return NodeOps(n).exceptionCheckEnter(ec);
-    }
-
-    @Override
-    public final Node exceptionCheck(Node n, ExceptionChecker ec)
-            throws SemanticException {
-        return NodeOps(n).exceptionCheck(ec);
-    }
-
-    @Override
-    public final List<Type> throwTypes(Node n, TypeSystem ts) {
-        return NodeOps(n).throwTypes(ts);
-    }
-
-    @Override
-    public final void dump(Node n, JLDel lang, OutputStream os) {
-        NodeOps(n).dump(lang, os);
-    }
-
-    @Override
-    public final void dump(Node n, JLDel lang, Writer w) {
-        NodeOps(n).dump(lang, w);
-    }
-
-    @Override
-    public final void prettyPrint(Node n, JLDel lang, OutputStream os) {
-        NodeOps(n).prettyPrint(lang, os);
-    }
-
-    @Override
-    public final void prettyPrint(Node n, JLDel lang, Writer w) {
-        NodeOps(n).prettyPrint(lang, w);
-    }
-
-    @Override
-    public final void prettyPrint(Node n, CodeWriter w, PrettyPrinter pp) {
-        NodeOps(n).prettyPrint(w, pp);
-    }
-
-    @Override
-    public final void translate(Node n, CodeWriter w, Translator tr) {
-        NodeOps(n).translate(w, tr);
-    }
-
-    @Override
-    public final Node copy(Node n, NodeFactory nf) {
-        return NodeOps(n).copy(nf);
-    }
-
-    @Override
-    public final Node copy(Node n, ExtensionInfo extInfo)
-            throws SemanticException {
-        return NodeOps(n).copy(extInfo);
-    }
-
-    // ClassDeclOps
-
-    @Override
-    public final void prettyPrintHeader(Node n, CodeWriter w, PrettyPrinter tr) {
-        ClassDeclOps(n).prettyPrintHeader(w, tr);
-    }
-
-    @Override
-    public final void prettyPrintFooter(Node n, CodeWriter w, PrettyPrinter tr) {
-        ClassDeclOps(n).prettyPrintFooter(w, tr);
-    }
-
-    @Override
-    public final Node addDefaultConstructor(Node n, TypeSystem ts,
-            NodeFactory nf, ConstructorInstance defaultConstructorInstance)
-            throws SemanticException {
-        return ClassDeclOps(n).addDefaultConstructor(ts,
-                                                     nf,
-                                                     defaultConstructorInstance);
-    }
-
-    // ProcedureDeclOps
-
-    @Override
-    public final void prettyPrintHeader(Node n, Flags flags, CodeWriter w,
-            PrettyPrinter tr) {
-        ProcedureDeclOps(n).prettyPrintHeader(flags, w, tr);
-    }
-
-    // CallOps
-
-    @Override
-    public final Type findContainer(Node n, TypeSystem ts, MethodInstance mi) {
-        return CallOps(n).findContainer(ts, mi);
-    }
-
-    @Override
-    public final ReferenceType findTargetType(Node n) throws SemanticException {
-        return CallOps(n).findTargetType();
-    }
-
-    @Override
-    public final Node typeCheckNullTarget(Node n, TypeChecker tc,
-            List<Type> argTypes) throws SemanticException {
-        return CallOps(n).typeCheckNullTarget(tc, argTypes);
-    }
-
-    // NewOps
-
-    @Override
-    public final TypeNode findQualifiedTypeNode(Node n, AmbiguityRemover ar,
-            ClassType outer, TypeNode objectType) throws SemanticException {
-        return NewOps(n).findQualifiedTypeNode(ar, outer, objectType);
-    }
-
-    @Override
-    public final New findQualifier(Node n, AmbiguityRemover ar, ClassType ct)
-            throws SemanticException {
-        return NewOps(n).findQualifier(ar, ct);
-    }
-
-    @Override
-    public final void typeCheckFlags(Node n, TypeChecker tc)
-            throws SemanticException {
-        NewOps(n).typeCheckFlags(tc);
-    }
-
-    @Override
-    public final void typeCheckNested(Node n, TypeChecker tc)
-            throws SemanticException {
-        NewOps(n).typeCheckNested(tc);
-    }
-
-    @Override
-    public final void printQualifier(Node n, CodeWriter w, PrettyPrinter tr) {
-        NewOps(n).printQualifier(w, tr);
-    }
-
-    @Override
-    public final void printArgs(Node n, CodeWriter w, PrettyPrinter tr) {
-        NewOps(n).printArgs(w, tr);
-    }
-
-    @Override
-    public final void printBody(Node n, CodeWriter w, PrettyPrinter tr) {
-        NewOps(n).printBody(w, tr);
-    }
-
-    @Override
-    public final ClassType findEnclosingClass(Node n, Context c, ClassType ct) {
-        return NewOps(n).findEnclosingClass(c, ct);
-    }
-
-    // TryOps
-
-    @Override
-    public final ExceptionChecker constructTryBlockExceptionChecker(Node n,
-            ExceptionChecker ec) {
-        return TryOps(n).constructTryBlockExceptionChecker(ec);
-    }
-
-    @Override
-    public final Block exceptionCheckTryBlock(Node n, ExceptionChecker ec)
-            throws SemanticException {
-        return TryOps(n).exceptionCheckTryBlock(ec);
-    }
-
-    @Override
-    public final List<Catch> exceptionCheckCatchBlocks(Node n,
-            ExceptionChecker ec) throws SemanticException {
-        return TryOps(n).exceptionCheckCatchBlocks(ec);
-    }
-
-    @Override
-    public final Block exceptionCheckFinallyBlock(Node n, ExceptionChecker ec)
-            throws SemanticException {
-        return TryOps(n).exceptionCheckFinallyBlock(ec);
+    public Node copy(ExtensionInfo extInfo) throws SemanticException {
+        return jl().copy(extInfo);
     }
 }

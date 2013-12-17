@@ -115,7 +115,7 @@ public class JL5EnumDeclExt extends JL5ClassDeclExt {
             // mi is abstract! First, mark the class as abstract.
             n.type().setFlags(n.type().flags().Abstract());
         }
-        return this.superDel().typeCheckEnter(this.node(), tc);
+        return this.superLang().typeCheckEnter(this.node(), tc);
     }
 
     @Override
