@@ -29,7 +29,7 @@ package polyglot.main;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Stack;
 
@@ -42,7 +42,7 @@ import polyglot.util.SimpleErrorQueue;
 public class Report {
     /** A collection of string names of topics which can be used with the
         -report command-line switch */
-    public final static Collection<String> topics = new HashSet<String>();
+    public final static Collection<String> topics = new LinkedHashSet<String>();
 
     /** A collection of string names of topics which we should always check
         if we should report. */
