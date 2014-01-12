@@ -7,6 +7,7 @@ import polyglot.ast.TypeNode;
 import polyglot.types.SemanticException;
 import polyglot.types.Type;
 import polyglot.util.Position;
+import polyglot.util.SerialVersionUID;
 import polyglot.visit.AmbiguityRemover;
 import polyglot.visit.TypeBuilder;
 import carray.types.CarrayTypeSystem;
@@ -17,6 +18,8 @@ import carray.types.CarrayTypeSystem;
  */
 public class ConstArrayTypeNode_c extends ArrayTypeNode_c implements
         ConstArrayTypeNode {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     public ConstArrayTypeNode_c(Position pos, TypeNode base) {
         super(pos, base);
     }
@@ -32,11 +35,14 @@ public class ConstArrayTypeNode_c extends ArrayTypeNode_c implements
         CarrayTypeSystem ts = (CarrayTypeSystem) ar.typeSystem();
         NodeFactory nf = ar.nodeFactory();
 
+        if (!base.isDisambiguated()) {
+            return this;
+        }
+
         Type baseType = base.type();
 
         if (!baseType.isCanonical()) {
-            throw new SemanticException("Base type " + baseType
-                    + " of array could not be resolved.", base.position());
+            return this;
         }
 
         return nf.CanonicalTypeNode(position(),

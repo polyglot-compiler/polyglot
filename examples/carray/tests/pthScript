@@ -1,0 +1,12 @@
+carray.ExtensionInfo "-d out -assert" {
+	TestA.jl;
+	TestB.jl (Semantic, "const array");
+	TestC.jl;
+	TestD.jl;
+	TestE.jl;
+	TestF.jl (Semantic, "arguments");
+	TestG.jl;
+	TestH.jl;
+	TestI.jl;
+	TestJ.jl (Semantic, "Cannot assign");
+}

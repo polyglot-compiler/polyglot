@@ -5,10 +5,9 @@ import polyglot.ast.ArrayAccessAssign_c;
 import polyglot.ast.Expr;
 import polyglot.ast.Node;
 import polyglot.types.SemanticException;
-import polyglot.types.Type;
 import polyglot.util.Position;
+import polyglot.util.SerialVersionUID;
 import polyglot.visit.TypeChecker;
-import carray.types.CarrayTypeSystem;
 import carray.types.ConstArrayType;
 
 /**
@@ -17,6 +16,8 @@ import carray.types.ConstArrayType;
  * elements of a const array cannot be modified.
  */
 public class CarrayAssign_c extends ArrayAccessAssign_c {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     public CarrayAssign_c(Position pos, ArrayAccess left, Operator op,
             Expr right) {
         super(pos, left, op, right);
@@ -29,10 +30,6 @@ public class CarrayAssign_c extends ArrayAccessAssign_c {
      */
     @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
-        CarrayTypeSystem ts = (CarrayTypeSystem) tc.typeSystem();
-
-        Type t = left.type();
-
         // check that the left is an assignable location.
         if (left instanceof ArrayAccess) {
             ArrayAccess a = (ArrayAccess) left;
