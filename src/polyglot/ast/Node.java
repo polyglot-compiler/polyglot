@@ -51,7 +51,7 @@ public interface Node extends NodeOps, Copy, Serializable {
      * Get the node's delegate.
      */
     @Deprecated
-    JLDel del();
+    NodeOps del();
 
     /**
      * Set the extension of the node.

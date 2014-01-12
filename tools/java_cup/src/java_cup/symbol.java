@@ -105,6 +105,7 @@ public abstract class symbol {
     /*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . .*/
 
     /** Convert to a string. */
+    @Override
     public String toString() {
         return name();
     }

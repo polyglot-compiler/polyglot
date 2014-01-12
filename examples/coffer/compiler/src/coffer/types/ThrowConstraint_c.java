@@ -10,8 +10,11 @@ package coffer.types;
 import polyglot.types.Type;
 import polyglot.types.TypeObject_c;
 import polyglot.util.Position;
+import polyglot.util.SerialVersionUID;
 
 public class ThrowConstraint_c extends TypeObject_c implements ThrowConstraint {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     Type throwType;
     KeySet keys;
 

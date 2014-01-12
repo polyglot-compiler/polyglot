@@ -15,10 +15,9 @@ import polyglot.ast.NodeFactory_c;
  */
 public class PaoNodeFactory_c extends NodeFactory_c {
     public PaoNodeFactory_c() {
-        // Set the ExtFactory to be PaoExtFactory_c, 
-        // and the DelFactory to be PaoDelFactory_c.
-        // this will ensure that the correct Ext and Del
+        // Set the ExtFactory to be PaoExtFactory_c.
+        // this will ensure that the correct Ext
         // objects are created for the pao extension.
-        super(new PaoExtFactory_c(), new PaoDelFactory_c());
+        super(new PaoExtFactory_c(), PaoLang.instance);
     }
 }

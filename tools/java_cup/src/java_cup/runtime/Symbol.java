@@ -91,9 +91,15 @@ public class Symbol {
     public int left, right;
     public Object value;
 
+    @SuppressWarnings("unchecked")
+    public <T> T value() {
+        return (T) value;
+    }
+
     /*****************************
       Printing this token out. (Override for pretty-print).
       ****************************/
+    @Override
     public String toString() {
         return "#" + sym;
     }

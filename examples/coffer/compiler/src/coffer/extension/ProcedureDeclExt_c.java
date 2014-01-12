@@ -10,6 +10,7 @@ package coffer.extension;
 import polyglot.ast.ProcedureDecl;
 import polyglot.types.SemanticException;
 import polyglot.util.Position;
+import polyglot.util.SerialVersionUID;
 import coffer.types.CofferProcedureInstance;
 import coffer.types.KeySet;
 import coffer.types.ThrowConstraint;
@@ -19,6 +20,8 @@ import coffer.types.ThrowConstraint;
  *  @see polyglot.ast.ProcedureDecl
  */
 public class ProcedureDeclExt_c extends CofferExt_c {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     @Override
     public void checkHeldKeys(KeySet held, KeySet stored)
             throws SemanticException {

@@ -1,15 +1,13 @@
 package java_cup;
 
-import java.util.Hashtable;
-import java.util.Enumeration;
-import java.util.Stack;
-import java.util.LinkedList;
-import java.util.HashSet;
-import java.util.ListIterator;
-import java.util.Iterator;
-
-import java.io.PrintStream;
 import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
+import java.util.Enumeration;
+import java.util.HashSet;
+import java.util.Hashtable;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.Stack;
 
 /** This class represents a state in the LALR viable prefix recognition machine.
  *  A state consists of an LALR item set and a set of transitions to other 
@@ -86,10 +84,11 @@ public class lalr_state {
     /*-----------------------------------------------------------*/
 
     /** Collection of all states. */
-    protected static Hashtable _all = new Hashtable();
+    protected static Hashtable<lalr_item_set, lalr_state> _all =
+            new Hashtable<lalr_item_set, lalr_state>();
 
     /** Collection of all states. */
-    public static Enumeration all() {
+    public static Enumeration<lalr_state> all() {
         return _all.elements();
     }
 
@@ -106,7 +105,8 @@ public class lalr_state {
      *  unclosed, set of items -- which uniquely define the state).  This table 
      *  stores state objects using (a copy of) their kernel item sets as keys. 
      */
-    protected static Hashtable _all_kernels = new Hashtable();
+    protected static Hashtable<lalr_item_set, lalr_state> _all_kernels =
+            new Hashtable<lalr_item_set, lalr_state>();
 
     /*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . .*/
 
@@ -120,7 +120,7 @@ public class lalr_state {
     public static lalr_state find_state(lalr_item_set itms) {
         if (itms == null)
             return null;
-        else return (lalr_state) _all.get(itms);
+        else return _all.get(itms);
     }
 
     /*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . .*/
@@ -179,8 +179,8 @@ public class lalr_state {
 
         System.out.println("lalr_state [" + st.index() + "] {");
         itms = st.items();
-        for (Enumeration e = itms.all(); e.hasMoreElements();) {
-            itm = (lalr_item) e.nextElement();
+        for (Enumeration<lalr_item> e = itms.all(); e.hasMoreElements();) {
+            itm = e.nextElement();
             System.out.print("  [");
             System.out.print(itm.the_production().lhs().the_symbol().name());
             System.out.print(" ::= ");
@@ -209,9 +209,9 @@ public class lalr_state {
      */
     protected static void propagate_all_lookaheads() throws internal_error {
         /* iterate across all states */
-        for (Enumeration st = all(); st.hasMoreElements();) {
+        for (Enumeration<lalr_state> st = all(); st.hasMoreElements();) {
             /* propagate lookaheads out of that state */
-            ((lalr_state) st.nextElement()).propagate_lookaheads();
+            st.nextElement().propagate_lookaheads();
         }
     }
 
@@ -282,12 +282,11 @@ public class lalr_state {
         lalr_item_set new_items;
         lalr_item_set linked_items;
         lalr_item_set kernel;
-        Stack work_stack = new Stack();
+        Stack<lalr_state> work_stack = new Stack<lalr_state>();
         lalr_state st, new_st;
         symbol_set outgoing;
         lalr_item itm, new_itm, existing, fix_itm;
         symbol sym, sym2;
-        Enumeration i, s, fix;
 
         /* sanity check */
         if (start_prod == null)
@@ -317,12 +316,12 @@ public class lalr_state {
         /* continue looking at new states until we have no more work to do */
         while (!work_stack.empty()) {
             /* remove a state from the work set */
-            st = (lalr_state) work_stack.pop();
+            st = work_stack.pop();
 
             /* gather up all the symbols that appear before dots */
             outgoing = new symbol_set();
-            for (i = st.items().all(); i.hasMoreElements();) {
-                itm = (lalr_item) i.nextElement();
+            for (Enumeration<lalr_item> i = st.items().all(); i.hasMoreElements();) {
+                itm = i.nextElement();
 
                 /* add the symbol before the dot (if any) to our collection */
                 sym = itm.symbol_after_dot();
@@ -330,8 +329,8 @@ public class lalr_state {
             }
 
             /* now create a transition out for each individual symbol */
-            for (s = outgoing.all(); s.hasMoreElements();) {
-                sym = (symbol) s.nextElement();
+            for (Enumeration<symbol> s = outgoing.all(); s.hasMoreElements();) {
+                sym = s.nextElement();
 
                 /* will be keeping the set of items with propagate links */
                 linked_items = new lalr_item_set();
@@ -339,8 +338,8 @@ public class lalr_state {
                 /* gather up shifted versions of all the items that have this
                 symbol before the dot */
                 new_items = new lalr_item_set();
-                for (i = st.items().all(); i.hasMoreElements();) {
-                    itm = (lalr_item) i.nextElement();
+                for (Enumeration<lalr_item> i = st.items().all(); i.hasMoreElements();) {
+                    itm = i.nextElement();
 
                     /* if this is the symbol we are working on now, add to set */
                     sym2 = itm.symbol_after_dot();
@@ -357,7 +356,7 @@ public class lalr_state {
                 kernel = new lalr_item_set(new_items);
 
                 /* have we seen this one already? */
-                new_st = (lalr_state) _all_kernels.get(kernel);
+                new_st = _all_kernels.get(kernel);
 
                 /* if we haven't, build a new state out of the item set */
                 if (new_st == null) {
@@ -376,15 +375,13 @@ public class lalr_state {
                 /* otherwise relink propagation to items in existing state */
                 else {
                     /* walk through the items that have links to the new state */
-                    for (fix = linked_items.all(); fix.hasMoreElements();) {
-                        fix_itm = (lalr_item) fix.nextElement();
+                    for (Enumeration<lalr_item> fix = linked_items.all(); fix.hasMoreElements();) {
+                        fix_itm = fix.nextElement();
 
                         /* look at each propagate link out of that item */
                         for (int l = 0; l < fix_itm.propagate_items().size(); l++) {
                             /* pull out item linked to in the new state */
-                            new_itm =
-                                    (lalr_item) fix_itm.propagate_items()
-                                                       .elementAt(l);
+                            new_itm = fix_itm.propagate_items().elementAt(l);
 
                             /* find corresponding item in the existing state */
                             existing = new_st.items().find(new_itm);
@@ -418,8 +415,8 @@ public class lalr_state {
      */
     protected void propagate_lookaheads() throws internal_error {
         /* recursively propagate out from each item in the state */
-        for (Enumeration itm = items().all(); itm.hasMoreElements();)
-            ((lalr_item) itm.nextElement()).propagate_lookaheads(null);
+        for (Enumeration<lalr_item> itm = items().all(); itm.hasMoreElements();)
+            itm.nextElement().propagate_lookaheads(null);
     }
 
     /*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . .*/
@@ -459,8 +456,8 @@ public class lalr_state {
         our_red_row = reduce_table.under_state[index()];
 
         /* consider each item in our state */
-        for (Enumeration i = items().all(); i.hasMoreElements();) {
-            itm = (lalr_item) i.nextElement();
+        for (Enumeration<lalr_item> i = items().all(); i.hasMoreElements();) {
+            itm = i.nextElement();
 
             /* if its completed (dot at end) then reduce under the lookahead */
             if (itm.dot_at_end()) {
@@ -670,13 +667,12 @@ public class lalr_state {
     protected void report_conflicts(terminal_set conflict_set)
             throws internal_error {
         lalr_item itm, compare;
-        symbol shift_sym;
 
         boolean after_itm;
 
         /* consider each element */
-        for (Enumeration itms = items().all(); itms.hasMoreElements();) {
-            itm = (lalr_item) itms.nextElement();
+        for (Enumeration<lalr_item> itms = items().all(); itms.hasMoreElements();) {
+            itm = itms.nextElement();
 
             /* clear the S/R conflict set for this item */
 
@@ -686,8 +682,8 @@ public class lalr_state {
                 after_itm = false;
 
                 /* compare this item against all others looking for conflicts */
-                for (Enumeration comps = items().all(); comps.hasMoreElements();) {
-                    compare = (lalr_item) comps.nextElement();
+                for (Enumeration<lalr_item> comps = items().all(); comps.hasMoreElements();) {
+                    compare = comps.nextElement();
 
                     /* if this is the item, next one is after it */
                     if (itm == compare) after_itm = true;
@@ -814,8 +810,8 @@ public class lalr_state {
         /* end ACM extension */
 
         /* find and report on all items that shift under our conflict symbol */
-        for (Enumeration itms = items().all(); itms.hasMoreElements();) {
-            itm = (lalr_item) itms.nextElement();
+        for (Enumeration<lalr_item> itms = items().all(); itms.hasMoreElements();) {
+            itm = itms.nextElement();
 
             /* only look if its not the same item and not a reduce */
             if (itm != red_itm && !itm.dot_at_end()) {
@@ -859,7 +855,7 @@ public class lalr_state {
      *  items in the same state represented explicitly.
      */
     private class Path {
-        Path(LinkedList t, StateItem si) {
+        Path(LinkedList<?> t, StateItem si) {
             steps = t;
             last = si;
         }
@@ -867,7 +863,7 @@ public class lalr_state {
         /** steps is a linked list of lalr_transition _or_ production.
              * The latter are found in the path when a "push" occurs to work
              * on a new production. */
-        LinkedList steps;
+        LinkedList<?> steps;
         /** last is the last state and item reached on the path. */
         StateItem last;
     }
@@ -881,11 +877,13 @@ public class lalr_state {
             item = i;
         }
 
+        @Override
         public boolean equals(Object o) {
             StateItem si2 = (StateItem) o;
             return (state.equals(si2.state) && item.equals(si2.item));
         }
 
+        @Override
         public int hashCode() {
             return state.hashCode() + item.hashCode();
         }
@@ -901,9 +899,8 @@ public class lalr_state {
     protected void report_shortest_path(lalr_item itm, PrintStream example_s,
             PrintStream derivation_s) throws internal_error {
         Path p = shortest_path(itm);
-        production current = null;
         boolean first = true;
-        for (Iterator i = p.steps.listIterator(); i.hasNext();) {
+        for (Iterator<?> i = p.steps.listIterator(); i.hasNext();) {
             Object o = i.next();
             if (o instanceof lalr_transition) {
                 lalr_transition tr = (lalr_transition) o;
@@ -933,14 +930,14 @@ public class lalr_state {
      * path.
      */
     protected Path shortest_path(lalr_item itm) throws internal_error {
-        HashSet visited = new HashSet(); /* of StateItem */
-        LinkedList active = new LinkedList(); /* of paths */
+        HashSet<StateItem> visited = new HashSet<StateItem>(); /* of StateItem */
+        LinkedList<Path> active = new LinkedList<Path>(); /* of paths */
         StateItem start = new StateItem(start_state, start_itm);
 
-        Path p = new Path(new LinkedList(), start);
+        Path p = new Path(new LinkedList<Object>(), start);
         active.add(p);
         while (!active.isEmpty()) {
-            Path p1 = (Path) active.removeFirst();
+            Path p1 = active.removeFirst();
             StateItem si = p1.last;
             if (visited.contains(si)) continue; /* saw it already */
             visited.add(si);
@@ -955,7 +952,7 @@ public class lalr_state {
                     tr.next()) {
                 if (tr.on_symbol().equals(i.symbol_after_dot())) {
                     lalr_item i2 = i.shift();
-                    LinkedList newt = new LinkedList(p1.steps);
+                    LinkedList<Object> newt = new LinkedList<Object>(p1.steps);
                     newt.add(tr);
                     Path p2 = new Path(newt, new StateItem(tr.to_state(), i2));
                     active.add(p2);
@@ -964,15 +961,14 @@ public class lalr_state {
             /* try changing the production (one step of closure) */
             non_terminal nt = i.dot_before_nt();
             if (nt != null) {
-                for (Enumeration pi = nt.productions(); pi.hasMoreElements();) {
+                for (Enumeration<production> pi = nt.productions(); pi.hasMoreElements();) {
                     terminal_set new_lookaheads =
                             i.calc_lookahead(i.lookahead());
-                    boolean need_prop = i.lookahead_visible();
-                    production prod = (production) pi.nextElement();
+                    production prod = pi.nextElement();
                     lalr_item i2 =
                             new lalr_item(prod,
                                           new terminal_set(new_lookaheads));
-                    LinkedList newt = new LinkedList(p1.steps);
+                    LinkedList<Object> newt = new LinkedList<Object>(p1.steps);
                     newt.add(prod);
                     Path p2 = new Path(newt, new StateItem(s, i2));
                     active.add(p2);
@@ -1009,6 +1005,7 @@ public class lalr_state {
     /*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . .*/
 
     /** Generic equality comparison. */
+    @Override
     public boolean equals(Object other) {
         if (!(other instanceof lalr_state))
             return false;
@@ -1018,6 +1015,7 @@ public class lalr_state {
     /*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . .*/
 
     /** Produce a hash code. */
+    @Override
     public int hashCode() {
         /* just use the item set hash code */
         return items().hashCode();
@@ -1026,6 +1024,7 @@ public class lalr_state {
     /*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . .*/
 
     /** Convert to a string. */
+    @Override
     public String toString() {
         String result;
         lalr_transition tr;

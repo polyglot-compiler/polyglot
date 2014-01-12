@@ -18,6 +18,7 @@ import polyglot.util.CodeWriter;
 import polyglot.util.CollectionUtil;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
+import polyglot.util.SerialVersionUID;
 import polyglot.visit.AmbiguityRemover;
 import polyglot.visit.NodeVisitor;
 import polyglot.visit.PrettyPrinter;
@@ -30,6 +31,8 @@ import coffer.types.KeySet;
  * Implementation of an ambiguous key set AST node.
  */
 public class AmbKeySetNode_c extends Node_c implements AmbKeySetNode {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     protected List<KeyNode> keys;
     protected KeySet keySet;
 

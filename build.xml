@@ -39,6 +39,7 @@
 	<property name="examples.dir" location="${basedir}/examples" />
 	<property name="pao.dir" location="${examples.dir}/pao" />
 	<property name="coffer.dir" location="${examples.dir}/coffer" />
+	<property name="carray.dir" location="${examples.dir}/carray" />
 
 	<!--
 	<property name="cvs.root" value=":pserver:anonymous@gforge.cis.cornell.edu:/cvsroot/polyglot" />
@@ -64,6 +65,7 @@
 
 	<!-- classpath to use when bootstrapping java_cup.jar -->
 	<path id="cup.jar.classpath">
+		<pathelement location="${classes}" />
 		<pathelement location="${cup.dir}/lib/java_cup.jar" />
 	</path>
 
@@ -160,12 +162,22 @@
 	<target name="install-jars-in-examples" depends="jar">
 		<copy file="${lib}/polyglot.jar" todir="${pao.dir}/lib" />
 		<copy file="${lib}/polyglot.jar" todir="${coffer.dir}/lib" />
+		<copy file="${lib}/polyglot.jar" todir="${covarRet.dir}/lib" />
+		<copy file="${lib}/polyglot.jar" todir="${carray.dir}/lib" />
 		<copy file="${lib}/java_cup.jar" todir="${pao.dir}/lib" />
 		<copy file="${lib}/java_cup.jar" todir="${coffer.dir}/lib" />
+		<copy file="${lib}/java_cup.jar" todir="${covarRet.dir}/lib" />
+		<copy file="${lib}/java_cup.jar" todir="${carray.dir}/lib" />
+	</target>
+
+	<target name="serialuid" description="Build polyglot.util.SerialVersionUID">
+        <javac source="1.5" target="1.5" srcdir="${src}" destdir="${classes}" debug="on" includes="polyglot/util/SerialVersionUID.java" includeAntRuntime="false">
+            <classpath refid="standard.classpath" />
+        </javac>
 	</target>
 
 	<!-- build the examples -->
-	<target name="examples" depends="pao,coffer" description="Build the examples" />
+	<target name="examples" depends="pao,coffer,carray" description="Build the examples" />
 
 	<target name="pao" depends="install-jars-in-examples" description="Build the pao example">
 		<ant inheritAll="false" antfile="${pao.dir}/build.xml" dir="${pao.dir}" target="compile-all" />
@@ -177,22 +189,30 @@
 		<ant inheritAll="false" antfile="${coffer.dir}/build.xml" dir="${coffer.dir}" target="jar" />
 	</target>
 
+	<target name="carray" depends="install-jars-in-examples" description="Build the carray example">
+		<ant inheritAll="false" antfile="${carray.dir}/build.xml" dir="${carray.dir}" target="compile-all" />
+		<ant inheritAll="false" antfile="${carray.dir}/build.xml" dir="${carray.dir}" target="jar" />
+	</target>
+
 	<!-- clean the examples -->
 	<target name="clean-examples" description="Clean the examples">
 		<ant inheritAll="false" antfile="${pao.dir}/build.xml" dir="${pao.dir}" target="clean" />
 		<ant inheritAll="false" antfile="${coffer.dir}/build.xml" dir="${coffer.dir}" target="clean" />
+		<ant inheritAll="false" antfile="${carray.dir}/build.xml" dir="${carray.dir}" target="clean" />
 	</target>
 
 	<!-- clobber the examples -->
 	<target name="clobber-examples" description="Clobber the examples">
 		<ant inheritAll="false" antfile="${pao.dir}/build.xml" dir="${pao.dir}" target="clobber" />
 		<ant inheritAll="false" antfile="${coffer.dir}/build.xml" dir="${coffer.dir}" target="clobber" />
+		<ant inheritAll="false" antfile="${carray.dir}/build.xml" dir="${carray.dir}" target="clobber" />
 	</target>
 
 	<!-- jar the examples -->
 	<target name="jar-examples" description="Build pao.jar and coffer.jar">
 		<ant inheritAll="false" antfile="${pao.dir}/build.xml" dir="${pao.dir}" target="jar" />
 		<ant inheritAll="false" antfile="${coffer.dir}/build.xml" dir="${coffer.dir}" target="jar" />
+		<ant inheritAll="false" antfile="${carray.dir}/build.xml" dir="${carray.dir}" target="jar" />
 	</target>
 
 	<target name="clean-all" depends="clean,clean-examples" description="Clean the base compiler and the examples" />
@@ -259,6 +279,12 @@
 				<include name="ppg/lex/Lexer.java" />
 			</fileset>
 		</delete>
+		<delete>
+			<fileset dir="${cup.src}">
+				<include name="java_cup/parser.java" />
+				<include name="java_cup/sym.java" />
+			</fileset>
+		</delete>
 	</target>
 
 	<!-- compile the base compiler except for the quasiquoter and generated parser -->
@@ -268,12 +294,12 @@
             <classpath refid="standard.classpath" />
         </javac>
 		<!-- Compile the JL5 code -->
-        <javac source="1.5" target="1.5" srcdir="${src}" destdir="${classes}" debug="on" includes="polyglot/ext/jl5/**" includeAntRuntime="true" excludes="polyglot/ext/jl5/parse/Lexer_c.java,polyglot/ext/jl5/parse/sym.java,polyglot/ext/jl5/parse/Grm.java"
+        <javac source="1.5" target="1.5" srcdir="${src}" destdir="${classes}" debug="on" includes="polyglot/ext/jl5/**" excludes="polyglot/ext/jl5/parse/Lexer_c.java,polyglot/ext/jl5/parse/sym.java,polyglot/ext/jl5/parse/Grm.java"
                includeantruntime="false">
             <classpath refid="standard.classpath" />
         </javac>
 		<!-- Compile the JL7 code -->
-        <javac source="1.5" target="1.5" srcdir="${src}" destdir="${classes}" debug="on" includes="polyglot/ext/jl7/**" includeAntRuntime="true" excludes="polyglot/ext/jl7/parse/Lexer_c.java,polyglot/ext/jl7/parse/sym.java,polyglot/ext/jl7/parse/Grm.java"
+        <javac source="1.5" target="1.5" srcdir="${src}" destdir="${classes}" debug="on" includes="polyglot/ext/jl7/**" excludes="polyglot/ext/jl7/parse/Lexer_c.java,polyglot/ext/jl7/parse/sym.java,polyglot/ext/jl7/parse/Grm.java"
                includeantruntime="false">
             <classpath refid="standard.classpath" />
         </javac>
@@ -309,7 +335,7 @@
        @param symbol.class  The name to be passed to CUP with -symbols.
        @param cup.file      The name of the CUP file.
    -->
-	<target name="cup-parser" depends="cup,cup-parser-deps" unless="cup-parser.up-to-date">
+	<target name="cup-parser" depends="cup,cup-parser-deps,serialuid" unless="cup-parser.up-to-date">
 		<java classname="java_cup.Main" fork="true" dir="${parser.dir}" failonerror="true">
 			<classpath refid="standard.classpath" />
 			<arg value="-max_actions" />
@@ -320,20 +346,12 @@
 			<arg value="${symbol.class}" />
 			<arg value="${cup.file}" />
 		</java>
-		<!-- Hack to suppress warnings in parser. -->
-		<replaceregexp
-		  file="${parser.dir}/${parser.class}.java"
-		  match="^(public )?class"
-		  replace="@SuppressWarnings(&quot;all&quot;) \1class"
-		  flags="g"
-		  byline="yes"
-		/>
 	</target>
 
 	<!-- The following target builds a cup parser using the version of
        cup already sitting in the java_cup.jar file. This is needed to
        bootstrap the build of cup. -->
-	<target name="cup-parser-using-jar" depends="cup-parser-deps" unless="cup-parser.up-to-date">
+	<target name="cup-parser-using-jar" depends="cup-parser-deps,serialuid" unless="cup-parser.up-to-date">
 		<java classname="java_cup.Main" fork="true" dir="${parser.dir}" failonerror="true">
 			<classpath refid="cup.jar.classpath" />
 			<arg value="-parser" />
@@ -342,6 +360,14 @@
 			<arg value="${symbol.class}" />
 			<arg value="${cup.file}" />
 		</java>
+		<!-- Hack to suppress warnings in parser. -->
+		<replaceregexp
+		  file="${parser.dir}/${parser.class}.java"
+		  match="^(public )?class"
+		  replace="@SuppressWarnings(&quot;all&quot;)${line.separator}\1class"
+		  flags="g"
+		  byline="true"
+		/>
 	</target>
 
 	<!-- Set the property cup-parser.up-to-date if the parser is in fact
@@ -371,7 +397,7 @@
            @param parser.class  The name to be passed to CUP with -parser.
            @param symbol.class  The name to be passed to CUP with -symbols.
        -->
-	<target name="ppg-parser" depends="ppg-parser.deps" unless="ppg-parser.up-to-date">
+	<target name="ppg-parser" depends="ppg-parser.deps,serialuid" unless="ppg-parser.up-to-date">
 		<java classname="ppg.PPG" fork="true" failonerror="true">
 			<classpath refid="standard.classpath" />
 			<arg value="${parser.dir}/${ppg.file}" />
@@ -725,7 +751,7 @@
 		<mkdir dir="${tmp}/testsjl7/java-out" />
 
 		<copy todir="${tmp}/examples" includeEmptyDirs="true">
-                    <fileset dir="${examples.dir}" includes="pao/**,coffer/**" />
+                    <fileset dir="${examples.dir}" includes="pao/**,coffer/**,covarRet/**,carray/**" />
 		</copy>
 
                 <copy file="META-INF/MANIFEST.MF" todir="${tmp}/META-INF" />

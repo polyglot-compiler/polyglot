@@ -16,10 +16,11 @@ public class Character extends Integer {
     }
 
     public char charValue() {
-        return (char)value;
+        return (char) value;
     }
 
+    @Override
     public String toString() {
-        return "" + (char)value;
+        return "" + (char) value;
     }
 }

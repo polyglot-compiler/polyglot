@@ -83,6 +83,7 @@ public class lalr_transition {
     /*-----------------------------------------------------------*/
 
     /** Convert to a string. */
+    @Override
     public String toString() {
         String result;
 

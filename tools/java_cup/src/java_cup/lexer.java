@@ -1,7 +1,8 @@
 package java_cup;
 
-import java_cup.runtime.Symbol;
 import java.util.Hashtable;
+
+import java_cup.runtime.Symbol;
 
 /** This class implements a small scanner (aka lexical analyzer or lexer) for
  *  the JavaCup specification.  This scanner reads characters from standard 
@@ -20,6 +21,7 @@ import java.util.Hashtable;
  *    "left"        LEFT		  "right"       RIGHT
  *    "nonassoc"    NONASSOC		  "%prec        PRECENT_PREC  
  *      [           LBRACK                  ]           RBRACK
+ *      <           LT                      >           GT
  *      ;           SEMI 
  *      ,           COMMA                   *           STAR 
  *      .           DOT                     :           COLON
@@ -78,7 +80,8 @@ public class lexer {
      *  they match one of the keywords.  The string of the name is the key here,
      *  which indexes Integer objects holding the symbol number. 
      */
-    protected static Hashtable keywords = new Hashtable(23);
+    protected static Hashtable<String, Integer> keywords =
+            new Hashtable<String, Integer>(23);
 
     /*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . .*/
 
@@ -88,7 +91,8 @@ public class lexer {
      *  appropriate char (currently Character objects have a bug which precludes
      *  their use in tables).
      */
-    protected static Hashtable char_symbols = new Hashtable(11);
+    protected static Hashtable<Integer, Integer> char_symbols =
+            new Hashtable<Integer, Integer>(11);
 
     /*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . .*/
 
@@ -151,6 +155,9 @@ public class lexer {
         char_symbols.put(new Integer('|'), new Integer(sym.BAR));
         char_symbols.put(new Integer('['), new Integer(sym.LBRACK));
         char_symbols.put(new Integer(']'), new Integer(sym.RBRACK));
+        char_symbols.put(new Integer('<'), new Integer(sym.LT));
+        char_symbols.put(new Integer('>'), new Integer(sym.GT));
+        char_symbols.put(new Integer('?'), new Integer(sym.QUESTION));
 
         /* read two characters of lookahead */
         next_char = System.in.read();
@@ -276,7 +283,7 @@ public class lexer {
     protected static int find_single_char(int ch) {
         Integer result;
 
-        result = (Integer) char_symbols.get(new Integer((char) ch));
+        result = char_symbols.get(new Integer((char) ch));
         if (result == null)
             return -1;
         else return result.intValue();
@@ -396,7 +403,7 @@ public class lexer {
 
         /* extract a string and try to look it up as a keyword */
         result_str = result.toString();
-        keyword_num = (Integer) keywords.get(result_str);
+        keyword_num = keywords.get(result_str);
 
         /* if we found something, return that keyword */
         if (keyword_num != null) return new Symbol(keyword_num.intValue());

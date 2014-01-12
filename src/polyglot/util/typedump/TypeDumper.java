@@ -169,14 +169,16 @@ public class TypeDumper {
             w.allowBreak(2);
             cache.put(o);
             if (o instanceof List || o instanceof Set) {
-                Collection<Object> list = (Collection) o;
+                @SuppressWarnings("unchecked")
+                Collection<Object> list = (Collection<Object>) o;
                 for (Object elem : list) {
                     dumpObject(w, elem, cache, null);
                     w.newline();
                 }
             }
             else if (o instanceof Map) {
-                Map<Object, Object> map = (Map) o;
+                @SuppressWarnings("unchecked")
+                Map<Object, Object> map = (Map<Object, Object>) o;
                 for (Object key : map.keySet()) {
                     dumpObject(w, key, cache, null);
                     w.allowBreak(0);

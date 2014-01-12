@@ -77,8 +77,8 @@ public abstract class Node_c implements Node {
 
     @Deprecated
     @Override
-    public JLDel del() {
-        return del != null ? del : JLDel_c.instance;
+    public NodeOps del() {
+        return del != null ? del : this;
     }
 
     @Deprecated
@@ -149,6 +149,7 @@ public abstract class Node_c implements Node {
         return n;
     }
 
+    @SuppressWarnings("deprecation")
     @Override
     public Object copy() {
         try {

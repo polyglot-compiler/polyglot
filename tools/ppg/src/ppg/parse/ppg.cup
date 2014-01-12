@@ -1,9 +1,7 @@
 package ppg.parse;
 
-import java.io.*;
 import java.util.*;
 import java_cup.runtime.Symbol; 
-import ppg.*;
 import ppg.atoms.*;
 import ppg.cmds.*;
 import ppg.code.*;
@@ -22,7 +20,8 @@ parser Parser {:
         lexer = lex;
     } 
 
-    public void syntax_error (Symbol cur_token)
+    @Override
+    public void syntax_error(Symbol cur_token)
     {
 	Token tok = (Token) cur_token.value;
 	report_error (tok.getFilename () + ":" +
@@ -32,7 +31,8 @@ parser Parser {:
 	System.exit (1);
     }
 
-    public void report_fatal_error (String message, Object info) { 
+    @Override
+    public void report_fatal_error(String message, Object info) { 
         // stop parsing 
         done_parsing(); 
 
@@ -66,6 +66,7 @@ terminal
 	TERMINAL, NONTERMINAL,
 	PERCENT_PREC, DOT,	
 	LBRACK, RBRACK,
+	LT, GT, QUESTION,
 	
 	/* CUP-only */
 	PACKAGE, IMPORT, CODE, ACTION, PARSER, NON, INIT, SCAN, WITH, 
@@ -75,35 +76,38 @@ terminal
 
 terminal Token STRING_CONST, ID, CODE_STR, EXTEND, OVERRIDE;
 
-nonterminal
   /* PPG nonterminals */
-  prod_modifier_opt, 
+nonterminal String prod_modifier_opt;
   
   /* Common */
-  prod_part, rhs, opt_semi,
+nonterminal GrammarPart prod_part;
+nonterminal Vector<GrammarPart> rhs;
+nonterminal opt_semi;
   
   /* CUP nonterminals */
-  action_code_part, 
-  code_part, non_terminal,
+nonterminal Code action_code_part, code_part,
   parser_code_part,
-  init_code, scan_code,  
-  preced
-  ;
+  init_code, scan_code;
+nonterminal non_terminal;
+nonterminal Precedence preced;
 
 nonterminal Spec spec, ppg_spec, cup_spec;
 
 /* PPG */
 nonterminal String id, include_spec, extendsimpls,
 	    code_str;
-nonterminal Vector command_list_opt, prod_part_list, rhs_list, transfer_list,
-					ppg_precedence_list,
-					ppg_start_spec, ppg_start_spec_elt, ppg_start_spec_list,
+nonterminal Vector<Command> command_list_opt;
+nonterminal Vector<GrammarPart> prod_part_list;
+nonterminal Vector<Vector<GrammarPart>> rhs_list;
+nonterminal Vector<Production> transfer_list;
+nonterminal Vector<Precedence> ppg_precedence_list;
+nonterminal Vector<String> ppg_start_spec, ppg_start_spec_elt, ppg_start_spec_list,
 					nt_id_list;
 nonterminal Command command;
 
 /* Common */
 nonterminal Production production;
-nonterminal Vector production_list;
+nonterminal Vector<Production> production_list;
 nonterminal String nt_id, symbol_id, label_id, opt_label, terminal_id,
 					term_id, robust_id;
 
@@ -111,10 +115,12 @@ nonterminal String nt_id, symbol_id, label_id, opt_label, terminal_id,
 nonterminal String package_spec, import_id, import_spec,
 					multipart_id, start_spec, type_id, new_non_term_id, 
 					new_term_id;
-nonterminal Vector non_term_name_list, import_list, term_name_list,
-					symbol_list, symbol_list_opt, code_parts, 
-					terminal_list, precedence_l, precedence_list, 
-					declares_term, declares_non_term;
+nonterminal Vector<String> non_term_name_list, import_list, term_name_list;
+nonterminal Vector<SymbolList> symbol_list, symbol_list_opt;
+nonterminal Vector<Code> code_parts; 
+nonterminal Vector<GrammarSymbol> terminal_list;
+nonterminal Vector<Precedence> precedence_l, precedence_list;
+nonterminal Vector<String> declares_term, declares_non_term;
 nonterminal SymbolList symbol;
 					
 start with spec;
@@ -166,7 +172,7 @@ ppg_precedence_list ::=
 
 ppg_start_spec ::=
 	START WITH nt_id:start SEMI {: 
-		Vector v = new Vector();
+		Vector<String> v = new Vector<String>();
 		v.addElement(start);
 		RESULT = v;
 	:}	
@@ -183,7 +189,7 @@ ppg_start_spec_list ::=
 
 ppg_start_spec_elt ::=
 	START WITH id:start id:method SEMI {:
-		Vector m = new Vector();
+		Vector<String> m = new Vector<String>();
 		m.addElement(start);
 		m.addElement(method);
 		RESULT = m;
@@ -197,7 +203,7 @@ command_list_opt ::=
 		b.addElement(a);
 		RESULT = b;
 	:}
-|	{: RESULT = new Vector(); :}
+|	{: RESULT = new Vector<Command>(); :}
 ;
 
 command ::=
@@ -227,7 +233,7 @@ nt_id_list ::=
 		RESULT = list;
 	:}
 |	nt_id:id {:
-		Vector list = new Vector();
+		Vector<String> list = new Vector<String>();
 		list.addElement(id);
 		RESULT = list;
 	:}
@@ -246,7 +252,7 @@ transfer_list ::=
 		RESULT = tl;
 	:}
 |	TO nt_id:nt LBRACE rhs_list:rhs RBRACE {:
-		Vector v = new Vector();
+		Vector<Production> v = new Vector<Production>();
 		Production p = new Production(new Nonterminal(nt), rhs);
 		v.addElement(p);
 		RESULT = v;
@@ -263,7 +269,7 @@ production_list ::=
 		RESULT = p_list;
 	:}
 |	production:p {:
-		Vector p_list = new Vector();
+		Vector<Production> p_list = new Vector<Production>();
 		p_list.addElement(p);
 		RESULT = p_list;
 	:}
@@ -289,7 +295,7 @@ rhs_list ::=
 		RESULT = r_list;
 	:}
 |	rhs:r {:
-		Vector r_list = new Vector();
+		Vector<Vector<GrammarPart>> r_list = new Vector<Vector<GrammarPart>>();
 		r_list.addElement(r);
 		RESULT = r_list;
 	:}
@@ -309,7 +315,7 @@ prod_part_list ::=
 		/* Vector a, (non)terminal/code b */
 		a.addElement(b); RESULT = a;
 	:}
-|	/* empty */ {: RESULT = new Vector(); :};
+|	/* empty */ {: RESULT = new Vector<GrammarPart>(); :};
 
 prod_part ::=
 	symbol_id:symid opt_label:labid
@@ -361,7 +367,7 @@ import_list ::=
 		i_list.addElement(i);
 		RESULT = i_list;
 	:}
-|	/* empty */ {: RESULT = new Vector(); :}
+|	/* empty */ {: RESULT = new Vector<String>(); :}
 ;
 
 import_spec ::=
@@ -375,7 +381,7 @@ code_parts ::=
 		c_parts.addElement(c);
 		RESULT = c_parts;
 	:}
-|	/* empty */ {: RESULT = new Vector(); :}
+|	/* empty */ {: RESULT = new Vector<Code>(); :}
 ;
 
 code_part ::=
@@ -426,7 +432,7 @@ symbol_list ::=
 		RESULT = s_list;
 	:}
 |	symbol:s {: 
-		Vector s_list = new Vector();
+		Vector<SymbolList> s_list = new Vector<SymbolList>();
 		s_list.addElement(s);
 		RESULT = s_list;
 	:}
@@ -459,7 +465,7 @@ term_name_list ::=
 		RESULT = tn_list;
 	:}
 |	new_term_id:n_id {:
-		Vector tn_list = new Vector();
+		Vector<String> tn_list = new Vector<String>();
 		tn_list.addElement(n_id);
 		RESULT = tn_list;
 	:}
@@ -471,7 +477,7 @@ non_term_name_list ::=
 		RESULT = ntn_list;
 	:}
 |	new_non_term_id:n_id {: 
-		Vector nnt_list = new Vector();
+		Vector<String> nnt_list = new Vector<String>();
 		nnt_list.addElement(n_id);
 		RESULT = nnt_list; 
 	:}
@@ -479,7 +485,7 @@ non_term_name_list ::=
 
 precedence_list ::=
 	precedence_l:p_l {: RESULT = p_l; :}
-|	/* empty */ {: RESULT = new Vector(); :}
+|	/* empty */ {: RESULT = new Vector<Precedence>(); :}
 ;
 
 precedence_l ::= 
@@ -488,7 +494,7 @@ precedence_l ::=
 		RESULT = p_l;
 	:}
 |	preced:p {: 
-		Vector p_l = new Vector();
+		Vector<Precedence> p_l = new Vector<Precedence>();
 		p_l.addElement(p);
 		RESULT = p_l;
 	:}
@@ -508,12 +514,12 @@ preced ::=
 
 terminal_list ::=
 	terminal_list:t_list COMMA terminal_id:t {:
-		t_list.addElement(t);
+		t_list.addElement(new Terminal(t));
 		RESULT = t_list;
 	:}
 |	terminal_id:t {:
-		Vector t_list = new Vector();
-		t_list.addElement(t);
+		Vector<GrammarSymbol> t_list = new Vector<GrammarSymbol>();
+		t_list.addElement(new Terminal(t));
 		RESULT = t_list;
 	:}
 ;
@@ -542,6 +548,8 @@ import_id ::=
 type_id ::=
 	multipart_id:m_id {: RESULT = m_id; :}
 |	type_id:t_id LBRACK RBRACK {: RESULT = t_id + "[]"; :}
+|	multipart_id:t_id LT type_id:p_id GT {: RESULT = t_id + "<" + p_id + ">"; :}
+|	multipart_id:t_id LT QUESTION EXTENDS type_id:p_id GT {: RESULT = t_id + "<? extends " + p_id + ">"; :}
 ;
 
 new_term_id ::= 

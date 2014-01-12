@@ -10,8 +10,11 @@ package coffer.types;
 import polyglot.types.TypeObject;
 import polyglot.types.TypeSystem;
 import polyglot.util.Position;
+import polyglot.util.SerialVersionUID;
 
 public class InstKey_c extends Key_c implements InstKey {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     public InstKey_c(TypeSystem ts, Position pos, String name) {
         super(ts, pos, name);
     }

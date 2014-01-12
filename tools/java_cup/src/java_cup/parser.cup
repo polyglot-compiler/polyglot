@@ -89,7 +89,6 @@
 /*================================================================*/ 
 
 package java_cup;
-import java_cup.runtime.*;
 import java.util.Hashtable;
 
 /*----------------------------------------------------------------*/ 
@@ -216,7 +215,7 @@ scan with {: return lexer.next_token(); :};
 terminal
   PACKAGE, IMPORT, CODE, ACTION, PARSER, TERMINAL, NON, INIT, SCAN, WITH, 
   START, SEMI, COMMA, STAR, DOT, COLON, COLON_COLON_EQUALS, BAR, PRECEDENCE,
-  LEFT, RIGHT, NONASSOC, PERCENT_PREC, LBRACK, RBRACK, NONTERMINAL,
+  LEFT, RIGHT, NONASSOC, PERCENT_PREC, LBRACK, RBRACK, LT, GT, QUESTION, NONTERMINAL,
   EXTENDS, IMPLEMENTS /* ACM extension */
   ;
 
@@ -226,14 +225,14 @@ non terminal
   spec, package_spec, import_list, action_code_part, 
   code_parts, code_part, opt_semi, non_terminal,
   parser_code_part, symbol_list, start_spec, production_list, 
-  multipart_id, import_spec, import_id, init_code, scan_code, symbol, 
-  type_id, term_name_list, non_term_name_list, production, prod_part_list, 
+  import_spec, import_id, init_code, scan_code, symbol, 
+  term_name_list, non_term_name_list, production, prod_part_list, 
   prod_part, new_term_id, new_non_term_id, rhs_list, rhs, empty,
   precedence_list, preced, terminal_list, precedence_l, declares_term, 
   declares_non_term;
 
 non terminal String  nt_id, symbol_id, label_id, opt_label, terminal_id,
-                     term_id, robust_id;
+                     term_id, robust_id, multipart_id, type_id;
 
 non terminal String qualified_identifier, extendsimpls; /* ACM extension */
 
@@ -738,11 +737,15 @@ opt_label ::=
 /*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . */ 
 
 multipart_id ::=
-	multipart_id DOT robust_id:another_id
-	{: append_multipart(another_id); :}
+	multipart_id:a DOT robust_id:another_id {:
+	  append_multipart(another_id);
+	  RESULT = a.concat(".").concat(another_id);
+	:}
 	|
-	robust_id:an_id
-	{: append_multipart(an_id); :}
+	robust_id:an_id {:
+	  append_multipart(an_id);
+	  RESULT = an_id;
+	:}
 	;
 
 /*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . */ 
@@ -756,9 +759,13 @@ import_id ::=
 
 /*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . */ 
 
-type_id ::= multipart_id
-	| type_id LBRACK RBRACK
-	{: multipart_name = multipart_name.concat("[]"); :}
+type_id ::= multipart_id:a {: RESULT = a; :}
+	| type_id:a LBRACK RBRACK
+	{: RESULT = multipart_name = a.concat("[]"); :}
+	| multipart_id:a LT type_id:b GT
+	{: RESULT = multipart_name = a.concat("<").concat(b).concat(">"); :}
+	| multipart_id:a LT QUESTION EXTENDS type_id:b GT
+	{: RESULT = multipart_name = a.concat("<? extends ").concat(b).concat(">"); :}
 	;
 
 /*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . */ 

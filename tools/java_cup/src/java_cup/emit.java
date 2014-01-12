@@ -1,9 +1,9 @@
 package java_cup;
 
 import java.io.PrintWriter;
-import java.util.Stack;
-import java.util.Enumeration;
 import java.util.Date;
+import java.util.Enumeration;
+import java.util.Stack;
 
 /** 
  * This class handles emitting generated code for the resulting parser.
@@ -164,7 +164,7 @@ public class emit {
     /*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . .*/
 
     /** List of imports (Strings containing class names) to go with actions. */
-    public static Stack import_list = new Stack();
+    public static Stack<String> import_list = new Stack<String>();
 
     /*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . .*/
 
@@ -284,8 +284,8 @@ public class emit {
         out.println("  /* terminals */");
 
         /* walk over the terminals *//* later might sort these */
-        for (Enumeration e = terminal.all(); e.hasMoreElements();) {
-            term = (terminal) e.nextElement();
+        for (Enumeration<terminal> e = terminal.all(); e.hasMoreElements();) {
+            term = e.nextElement();
 
             /* output a constant decl for the terminal */
             out.println("  public static final int " + term.name() + " = "
@@ -298,8 +298,8 @@ public class emit {
             out.println("  /* non terminals */");
 
             /* walk over the non terminals *//* later might sort these */
-            for (Enumeration e = non_terminal.all(); e.hasMoreElements();) {
-                nt = (non_terminal) e.nextElement();
+            for (Enumeration<non_terminal> e = non_terminal.all(); e.hasMoreElements();) {
+                nt = e.nextElement();
 
                 /* output a constant decl for the terminal */
                 out.println("  static final int " + nt.name() + " = "
@@ -323,13 +323,13 @@ public class emit {
      */
     protected static void emit_action_code(PrintWriter out,
             production start_prod, int max_actions) throws internal_error {
-        production prod;
 
         long start_time = System.currentTimeMillis();
 
         /* class header */
         out.println();
         out.println("/** Cup generated class to encapsulate user supplied action code.*/");
+        out.println("@SuppressWarnings(\"unused\")");
         out.println("class " + pre("actions") + " {");
 
         /* user supplied code */
@@ -379,8 +379,7 @@ public class emit {
         action_code_time = System.currentTimeMillis() - start_time;
     }
 
-    protected static void emit_do_action_call(PrintWriter out, String suffix)
-            throws internal_error {
+    protected static void emit_do_action_call(PrintWriter out, String suffix) {
         /* action method head */
         out.print(pre("do_action" + suffix) + "(");
         out.print(pre("act_num,"));
@@ -389,8 +388,7 @@ public class emit {
         out.print(pre("top)"));
     }
 
-    protected static void emit_do_action_header(PrintWriter out, String suffix)
-            throws internal_error {
+    protected static void emit_do_action_header(PrintWriter out, String suffix) {
         /* action method head */
         out.println();
         out.println("  /** Method with the actual generated action code. */");
@@ -398,7 +396,8 @@ public class emit {
                 + pre("do_action" + suffix) + "(");
         out.println("    int                        " + pre("act_num,"));
         out.println("    java_cup.runtime.lr_parser " + pre("parser,"));
-        out.println("    java.util.Stack            " + pre("stack,"));
+        out.println("    java.util.Stack<java_cup.runtime.Symbol> "
+                + pre("stack,"));
         out.println("    int                        " + pre("top)"));
         out.println("    throws java.lang.Exception");
         out.println("    {");
@@ -454,8 +453,8 @@ public class emit {
         out.println("        {");
 
         /* emit action code for each production as a separate case */
-        for (Enumeration p = production.all(); p.hasMoreElements();) {
-            prod = (production) p.nextElement();
+        for (Enumeration<production> p = production.all(); p.hasMoreElements();) {
+            prod = p.nextElement();
 
             if (prod.index() < lo || prod.index() > hi) continue;
 
@@ -514,15 +513,12 @@ public class emit {
             int index = prod.rhs_length() - i - 1; // last rhs is on top.
             out.println("              " + "// propagate RESULT from "
                     + s.name());
-            out.println("              " + "if ( "
-                    + "((java_cup.runtime.Symbol) " + emit.pre("stack")
+            out.println("              " + "if ( " + emit.pre("stack")
                     + ".elementAt(" + emit.pre("top") + "-" + index
-                    + ")).value != null )");
-            out.println("                " + "RESULT = " + "("
-                    + prod.lhs().the_symbol().stack_type() + ") "
-                    + "((java_cup.runtime.Symbol) " + emit.pre("stack")
-                    + ".elementAt(" + emit.pre("top") + "-" + index
-                    + ")).value;");
+                    + ").value != null )");
+            out.println("                " + "RESULT = " + emit.pre("stack")
+                    + ".elementAt(" + emit.pre("top") + "-" + index + ").<"
+                    + prod.lhs().the_symbol().stack_type() + "> value();");
         }
 
         /* if there is an action string, emit it */
@@ -541,17 +537,15 @@ public class emit {
             String leftstring, rightstring;
             int roffset = 0;
             rightstring =
-                    "((java_cup.runtime.Symbol)" + emit.pre("stack")
-                            + ".elementAt(" + emit.pre("top") + "-" + roffset
-                            + ")).right";
+                    emit.pre("stack") + ".elementAt(" + emit.pre("top") + "-"
+                            + roffset + ").right";
             if (prod.rhs_length() == 0)
                 leftstring = rightstring;
             else {
                 loffset = prod.rhs_length() - 1;
                 leftstring =
-                        "((java_cup.runtime.Symbol)" + emit.pre("stack")
-                                + ".elementAt(" + emit.pre("top") + "-"
-                                + loffset + ")).left";
+                        emit.pre("stack") + ".elementAt(" + emit.pre("top")
+                                + "-" + loffset + ").left";
             }
             out.println("              " + pre("result")
                     + " = new java_cup.runtime.Symbol("
@@ -593,8 +587,8 @@ public class emit {
 
         /* collect up the productions in order */
         all_prods = new production[production.number()];
-        for (Enumeration p = production.all(); p.hasMoreElements();) {
-            prod = (production) p.nextElement();
+        for (Enumeration<production> p = production.all(); p.hasMoreElements();) {
+            prod = p.nextElement();
             all_prods[prod.index()] = prod;
         }
 
@@ -617,8 +611,9 @@ public class emit {
         /* do the public accessor method */
         out.println();
         out.println("  /** Access to production table. */");
+        out.println("  @Override");
         out.println("  public short[][] production_table() "
-                + "{return _production_table;}");
+                + "{ return _production_table; }");
 
         production_table_time = System.currentTimeMillis() - start_time;
     }
@@ -653,11 +648,11 @@ public class emit {
             else row.default_reduce = -1;
 
             /* make temporary table for the row. */
-            short[] temp_table = new short[2 * row.size()];
+            short[] temp_table = new short[2 * parse_action_row.size()];
             int nentries = 0;
 
             /* do each column */
-            for (int j = 0; j < row.size(); j++) {
+            for (int j = 0; j < parse_action_row.size(); j++) {
                 /* extract the action from the table */
                 act = row.under_term[j];
 
@@ -716,7 +711,8 @@ public class emit {
         /* do the public accessor method */
         out.println();
         out.println("  /** Access to parse-action table. */");
-        out.println("  public short[][] action_table() {return _action_table;}");
+        out.println("  @Override");
+        out.println("  public short[][] action_table() { return _action_table; }");
 
         action_table_time = System.currentTimeMillis() - start_time;
     }
@@ -730,7 +726,6 @@ public class emit {
     protected static void do_reduce_table(PrintWriter out,
             parse_reduce_table red_tab) {
         lalr_state goto_st;
-        parse_action act;
 
         long start_time = System.currentTimeMillis();
 
@@ -739,10 +734,10 @@ public class emit {
         /* do each row of the reduce-goto table */
         for (int i = 0; i < red_tab.num_states(); i++) {
             /* make temporary table for the row. */
-            short[] temp_table = new short[2 * red_tab.under_state[i].size()];
+            short[] temp_table = new short[2 * parse_reduce_row.size()];
             int nentries = 0;
             /* do each entry in the row */
-            for (int j = 0; j < red_tab.under_state[i].size(); j++) {
+            for (int j = 0; j < parse_reduce_row.size(); j++) {
                 /* get the entry */
                 goto_st = red_tab.under_state[i].under_non_term[j];
 
@@ -773,7 +768,8 @@ public class emit {
         /* do the public accessor method */
         out.println();
         out.println("  /** Access to <code>reduce_goto</code> table. */");
-        out.println("  public short[][] reduce_table() {return _reduce_table;}");
+        out.println("  @Override");
+        out.println("  public short[][] reduce_table() { return _reduce_table; }");
         out.println();
 
         goto_table_time = System.currentTimeMillis() - start_time;
@@ -790,17 +786,17 @@ public class emit {
         nbytes += do_escaped(out, (char) (sa.length & 0xFFFF));
         nchar = do_newline(out, nchar, nbytes);
         if (nbytes > max_string_size) nbytes = 0;
-        for (int i = 0; i < sa.length; i++) {
-            nbytes += do_escaped(out, (char) (sa[i].length >> 16));
+        for (short[] element : sa) {
+            nbytes += do_escaped(out, (char) (element.length >> 16));
             nchar = do_newline(out, nchar, nbytes);
             if (nbytes > max_string_size) nbytes = 0;
-            nbytes += do_escaped(out, (char) (sa[i].length & 0xFFFF));
+            nbytes += do_escaped(out, (char) (element.length & 0xFFFF));
             nchar = do_newline(out, nchar, nbytes);
             if (nbytes > max_string_size) nbytes = 0;
-            for (int j = 0; j < sa[i].length; j++) {
+            for (short element2 : element) {
                 // contents of string are (value+2) to allow for common -1, 0 cases
                 // (UTF-8 encoding is most efficient for 0<c<0x80)
-                nbytes += do_escaped(out, (char) (2 + sa[i][j]));
+                nbytes += do_escaped(out, (char) (2 + element2));
                 nchar = do_newline(out, nchar, nbytes);
                 if (nbytes > max_string_size) nbytes = 0;
             }
@@ -914,6 +910,7 @@ public class emit {
 
         /* action object initializer */
         out.println("  /** Action encapsulation object initializer. */");
+        out.println("  @Override");
         out.println("  protected void init_actions()");
         out.println("    {");
         out.println("      action_obj = new " + pre("actions") + "(this);");
@@ -922,10 +919,11 @@ public class emit {
 
         /* access to action code */
         out.println("  /** Invoke a user supplied parse action. */");
+        out.println("  @Override");
         out.println("  public java_cup.runtime.Symbol do_action(");
         out.println("    int                        act_num,");
         out.println("    java_cup.runtime.lr_parser parser,");
-        out.println("    java.util.Stack            stack,");
+        out.println("    java.util.Stack<java_cup.runtime.Symbol> stack,");
         out.println("    int                        top)");
         out.println("    throws java.lang.Exception");
         out.println("  {");
@@ -937,20 +935,24 @@ public class emit {
 
         /* method to tell the parser about the start state */
         out.println("  /** Indicates start state. */");
+        out.println("  @Override");
         out.println("  public int start_state() {return " + start_st + ";}");
 
         /* method to indicate start production */
         out.println("  /** Indicates start production. */");
+        out.println("  @Override");
         out.println("  public int start_production() {return "
                 + start_production.index() + ";}");
         out.println();
 
         /* methods to indicate EOF and error symbol indexes */
         out.println("  /** <code>EOF</code> Symbol index. */");
+        out.println("  @Override");
         out.println("  public int EOF_sym() {return " + terminal.EOF.index()
                 + ";}");
         out.println();
         out.println("  /** <code>error</code> Symbol index. */");
+        out.println("  @Override");
         out.println("  public int error_sym() {return "
                 + terminal.error.index() + ";}");
         out.println();
@@ -969,6 +971,7 @@ public class emit {
         if (scan_code != null) {
             out.println();
             out.println("  /** Scan to get the next Symbol. */");
+            out.println("  @Override");
             out.println("  public java_cup.runtime.Symbol scan()");
             out.println("    throws java.lang.Exception");
             out.println("    {");

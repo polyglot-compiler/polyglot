@@ -27,6 +27,7 @@ import polyglot.util.CodeWriter;
 import polyglot.util.CollectionUtil;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
+import polyglot.util.SerialVersionUID;
 import polyglot.util.Transformation;
 import polyglot.visit.AmbiguityRemover;
 import polyglot.visit.NodeVisitor;
@@ -45,6 +46,8 @@ import coffer.types.ThrowConstraint;
  */
 public class CofferMethodDecl_c extends MethodDecl_c implements
         CofferMethodDecl {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     protected KeySetNode entryKeys;
     protected KeySetNode returnKeys;
     protected List<ThrowConstraintNode> throwConstraints;

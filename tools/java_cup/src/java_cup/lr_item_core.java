@@ -30,7 +30,6 @@ public class lr_item_core {
      * @param pos  position of the "dot" within the item.
      */
     public lr_item_core(production prod, int pos) throws internal_error {
-        symbol after_dot = null;
         production_part part;
 
         if (prod == null)
@@ -166,6 +165,7 @@ public class lr_item_core {
     /*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . .*/
 
     /** Generic equality comparison. */
+    @Override
     public boolean equals(Object other) {
         if (!(other instanceof lr_item_core))
             return false;
@@ -182,6 +182,7 @@ public class lr_item_core {
     /*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . .*/
 
     /** Hash code for the item. */
+    @Override
     public int hashCode() {
         return _core_hash_cache;
     }
@@ -242,6 +243,7 @@ public class lr_item_core {
     /*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . .*/
 
     /** Convert to a string */
+    @Override
     public String toString() {
         /* can't throw here since super class doesn't, so we crash instead */
         try {

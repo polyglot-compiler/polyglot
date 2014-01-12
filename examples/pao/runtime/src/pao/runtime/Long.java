@@ -21,20 +21,23 @@ public class Long extends Primitive {
         return value;
     }
 
+    @Override
     public int hashCode() {
-        return (int)value;
+        return (int) value;
     }
 
+    @Override
     public boolean equals(Object o) {
         if (o instanceof Long) {
-            return ((Long)o).value == value;
+            return ((Long) o).value == value;
         }
         if (o instanceof Double) {
-            return ((Double)o).value == value;
+            return ((Double) o).value == value;
         }
         return false;
     }
 
+    @Override
     public String toString() {
         return "" + value;
     }

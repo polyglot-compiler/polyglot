@@ -190,15 +190,16 @@ public class JL5RawSubst_c extends JL5Subst_c implements JL5Subst {
     }
 
     public List<Type> eraseTypeList(List<? extends Type> list) {
-        return new CachingTransformingList<Type, Type>(list, new TypeErase());
+        return new CachingTransformingList<Type, Type>(list, TypeErase);
     }
 
     /** Function object for transforming types. */
-    private class TypeErase implements Transformation<Type, Type> {
-        @Override
-        public Type transform(Type o) {
-            return ((JL5TypeSystem) ts).erasureType(o);
-        }
-    }
+    private final Transformation<Type, Type> TypeErase =
+            new Transformation<Type, Type>() {
+                @Override
+                public Type transform(Type o) {
+                    return ((JL5TypeSystem) typeSystem()).erasureType(o);
+                }
+            };
 
 }

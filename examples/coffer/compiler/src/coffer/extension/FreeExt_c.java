@@ -9,11 +9,14 @@ package coffer.extension;
 
 import polyglot.types.SemanticException;
 import polyglot.types.Type;
+import polyglot.util.SerialVersionUID;
 import coffer.ast.Free;
 import coffer.types.CofferClassType;
 import coffer.types.KeySet;
 
 public class FreeExt_c extends CofferExt_c {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     @Override
     public KeySet keyFlow(KeySet held_keys, Type throwType) {
         Free f = (Free) node();

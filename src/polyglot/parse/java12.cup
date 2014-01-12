@@ -23,8 +23,6 @@ package polyglot.parse;
 
 import java.util.*;
 
-import java_cup.runtime.*;
-
 import polyglot.ast.*;
 import polyglot.lex.*;
 import polyglot.util.*;
@@ -42,7 +40,8 @@ parser Grm extends BaseParser {:
   /**
    * Override the default CUP routine.
    */
-  public void syntax_error (java_cup.runtime.Symbol current)
+  @Override
+  public void syntax_error(java_cup.runtime.Symbol current)
   {
     Position p = ((Token) current.value).getPosition ();
     report_error ("Syntax error: unexpected " + current.value + ".", p);
@@ -51,7 +50,8 @@ parser Grm extends BaseParser {:
   /**
    * Override the default CUP routine.
    */
-  public void report_error (String message, Object info)
+  @Override
+  public void report_error(String message, Object info)
   {
     if (info instanceof Position)
 	eq.enqueue (ErrorInfo.SYNTAX_ERROR, message, (Position) info);
@@ -59,6 +59,7 @@ parser Grm extends BaseParser {:
 	eq.enqueue (ErrorInfo.SYNTAX_ERROR, message);
   }
 
+  @Override
   protected Position posForObject(Object o) {
       if (o instanceof Name) {
           return pos ((Name) o);
@@ -66,17 +67,16 @@ parser Grm extends BaseParser {:
       return super.posForObject(o);
   }
 
-  public Position pos (Name n) {
+  public Position pos(Name n) {
     if (n == null) return null;
     else return n.pos;
   }
 
-  public List variableDeclarators(TypeNode a, List b, Flags flags)
+  public List<LocalDecl> variableDeclarators(TypeNode a, List<VarDeclarator> b, Flags flags)
     throws Exception
   {
-    List l = new LinkedList<LocalDecl>();
-    for (Iterator i = b.iterator(); i.hasNext(); ) {
-	VarDeclarator d = (VarDeclarator) i.next();
+    List<LocalDecl> l = new LinkedList<LocalDecl>();
+    for (VarDeclarator d : b) {
 	l.add(nf.LocalDecl(pos(d), flags, array(a, d.dims),
 				  d.name, d.init));
     }
@@ -172,8 +172,8 @@ non terminal Name name, simple_name, qualified_name;
 // 19.6) Packages
 non terminal SourceFile compilation_unit;
 non terminal PackageNode package_declaration_opt, package_declaration;
-non terminal List import_declarations_opt, import_declarations;
-non terminal List type_declarations_opt, type_declarations;
+non terminal List<Import> import_declarations_opt, import_declarations;
+non terminal List<TopLevelDecl> type_declarations_opt, type_declarations;
 non terminal Import import_declaration;
 non terminal Import single_type_import_declaration;
 non terminal Import type_import_on_demand_declaration;
@@ -183,22 +183,22 @@ non terminal Flags modifiers_opt, modifiers, modifier;
 // 19.8.1) Class Declaration
 non terminal ClassDecl class_declaration;
 non terminal TypeNode super, super_opt;
-non terminal List interfaces, interfaces_opt, interface_type_list;
+non terminal List<TypeNode> interfaces, interfaces_opt, interface_type_list;
 non terminal ClassBody class_body;
-non terminal List class_body_declarations, class_body_declarations_opt;
-non terminal List class_body_declaration, class_member_declaration;
+non terminal List<ClassMember> class_body_declarations, class_body_declarations_opt;
+non terminal List<ClassMember> class_body_declaration, class_member_declaration;
 // 19.8.2) Field Declarations
-non terminal List field_declaration;
-non terminal List variable_declarators;
+non terminal List<ClassMember> field_declaration;
+non terminal List<VarDeclarator> variable_declarators;
 non terminal VarDeclarator variable_declarator;
 non terminal VarDeclarator variable_declarator_id;
 non terminal Expr variable_initializer;
 // 19.8.3) Method Declarations
 non terminal MethodDecl method_declaration, method_header;
-non terminal List formal_parameter_list_opt, formal_parameter_list;
+non terminal List<Formal> formal_parameter_list_opt, formal_parameter_list;
 non terminal Formal formal_parameter;
-non terminal List throws_opt, throws;
-non terminal List class_type_list;
+non terminal List<TypeNode> throws_opt, throws;
+non terminal List<TypeNode> class_type_list;
 non terminal Block method_body;
 // 19.8.4) Static Initializers
 non terminal Block static_initializer;
@@ -208,21 +208,21 @@ non terminal Block constructor_body;
 non terminal ConstructorCall explicit_constructor_invocation;
 // 19.9.1) Interface Declarations
 non terminal ClassDecl interface_declaration;
-non terminal List extends_interfaces_opt, extends_interfaces;
+non terminal List<TypeNode> extends_interfaces_opt, extends_interfaces;
 non terminal ClassBody interface_body;
-non terminal List interface_member_declarations_opt, interface_member_declarations;
-non terminal List interface_member_declaration;
-non terminal List constant_declaration;
+non terminal List<ClassMember> interface_member_declarations_opt, interface_member_declarations;
+non terminal List<ClassMember> interface_member_declaration;
+non terminal List<ClassMember> constant_declaration;
 non terminal MethodDecl abstract_method_declaration;
 // 19.10) Arrays
 non terminal ArrayInit array_initializer;
-non terminal List variable_initializers;
+non terminal List<Expr> variable_initializers;
 // 19.11) Blocks and Statements
 non terminal Block block;
-non terminal List block_statements_opt, block_statements;
-non terminal List block_statement;
-non terminal List local_variable_declaration_statement;
-non terminal List local_variable_declaration;
+non terminal List<Stmt> block_statements_opt, block_statements;
+non terminal List<Stmt> block_statement;
+non terminal List<LocalDecl> local_variable_declaration_statement;
+non terminal List<LocalDecl> local_variable_declaration;
 non terminal Stmt statement, statement_no_short_if;
 non terminal Stmt statement_without_trailing_substatement;
 non terminal Empty empty_statement;
@@ -232,31 +232,31 @@ non terminal Expr statement_expression;
 non terminal If if_then_statement;
 non terminal If if_then_else_statement, if_then_else_statement_no_short_if;
 non terminal Switch switch_statement;
-non terminal List switch_block, switch_block_statement_groups;
-non terminal List switch_block_statement_group, switch_labels;
+non terminal List<SwitchElement> switch_block, switch_block_statement_groups;
+non terminal List<SwitchElement> switch_block_statement_group, switch_labels;
 non terminal Case switch_label;
 non terminal While while_statement, while_statement_no_short_if;
 non terminal Do do_statement;
 non terminal For for_statement, for_statement_no_short_if;
-non terminal List for_init_opt, for_init;
-non terminal List for_update_opt, for_update;
-non terminal List statement_expression_list;
+non terminal List<ForInit> for_init_opt, for_init;
+non terminal List<ForUpdate> for_update_opt, for_update;
+non terminal List<Eval> statement_expression_list;
 non terminal Name identifier_opt;
 non terminal Branch break_statement, continue_statement;
 non terminal Return return_statement;
 non terminal Throw throw_statement;
 non terminal Synchronized synchronized_statement;
 non terminal Try try_statement;
-non terminal List catches_opt, catches;
+non terminal List<Catch> catches_opt, catches;
 non terminal Catch catch_clause;
 non terminal Block finally;
 non terminal Assert assert_statement;
 // 19.12) Expressions
 non terminal Expr primary, primary_no_new_array;
 non terminal Expr class_instance_creation_expression;
-non terminal List argument_list_opt, argument_list;
+non terminal List<Expr> argument_list_opt, argument_list;
 non terminal NewArray array_creation_expression;
-non terminal List dim_exprs;
+non terminal List<Expr> dim_exprs;
 non terminal Expr dim_expr;
 non terminal Integer dims_opt, dims;
 non terminal Field field_access;
@@ -428,7 +428,7 @@ compilation_unit ::=
     |   error
         type_declarations_opt:c
             {: RESULT = parser.nf.SourceFile(new Position(parser.lexer.path(), parser.lexer.file()),
-					     null, Collections.EMPTY_LIST, c);
+					     null, Collections.<Import> emptyList(), c);
 	    :}
         ;
 package_declaration_opt ::=
@@ -455,7 +455,7 @@ type_declarations_opt   ::=
 import_declarations ::=
                     // List of Import
         import_declaration:a
-            {: List l = new LinkedList<Import>();
+            {: List<Import> l = new LinkedList<Import>();
                l.add(a);
                RESULT = l; :}
     |   import_declarations:a import_declaration:b
@@ -465,7 +465,7 @@ import_declarations ::=
 type_declarations ::=
                     // List of TopLevelDecl
         type_declaration:a
-            {: List l = new LinkedList<TopLevelDecl>();
+            {: List<TopLevelDecl> l = new LinkedList<TopLevelDecl>();
                if (a != null)
                    l.add(a);
                RESULT = l; :}
@@ -580,7 +580,7 @@ interfaces_opt::=
 interface_type_list ::=
                     // List of TypeNode
         interface_type:a
-            {: List l = new LinkedList<TypeNode>();
+            {: List<TypeNode> l = new LinkedList<TypeNode>();
                l.add(a);
                RESULT = l; :}
     |   interface_type_list:a COMMA interface_type:b
@@ -611,25 +611,25 @@ class_body_declaration ::=
         class_member_declaration:a
             {: RESULT = a; :}
     |   static_initializer:a
-            {: List l = new LinkedList<ClassMember>();
+            {: List<ClassMember> l = new LinkedList<ClassMember>();
                l.add(parser.nf.Initializer(parser.pos(a), Flags.STATIC, a));
                RESULT = l; :}
     |   constructor_declaration:a
-            {: List l = new LinkedList<ClassMember>();
+            {: List<ClassMember> l = new LinkedList<ClassMember>();
                l.add(a);
                RESULT = l; :}
     |   block:a
-            {: List l = new LinkedList<ClassMember>();
+            {: List<ClassMember> l = new LinkedList<ClassMember>();
                l.add(parser.nf.Initializer(parser.pos(a), Flags.NONE, a));
                RESULT = l; :}
     |   SEMICOLON
-            {: List l = new LinkedList<ClassMember>();
+            {: List<ClassMember> l = new LinkedList<ClassMember>();
                RESULT = l; :}
     |   error SEMICOLON:a
-            {: List l = new LinkedList<ClassMember>();
+            {: List<ClassMember> l = new LinkedList<ClassMember>();
                RESULT = l; :}
     |   error LBRACE:a
-            {: List l = new LinkedList<ClassMember>();
+            {: List<ClassMember> l = new LinkedList<ClassMember>();
                RESULT = l; :}
     ;
 class_member_declaration ::=
@@ -637,18 +637,18 @@ class_member_declaration ::=
         field_declaration:a
             {: RESULT = a; :}
     |   method_declaration:a
-            {: List l = new LinkedList<ClassMember>();
+            {: List<ClassMember> l = new LinkedList<ClassMember>();
                l.add(a);
                RESULT = l; :}
         /* repeat the prod for 'class_declaration' here: */
     |   modifiers_opt:a CLASS:n IDENTIFIER:b
                     super_opt:c interfaces_opt:d class_body:e
-            {: List l = new LinkedList<ClassMember>();
+            {: List<ClassMember> l = new LinkedList<ClassMember>();
                l.add(parser.nf.ClassDecl(parser.pos(n, e),
                         a, parser.nf.Id(parser.pos(b), b.getIdentifier()), c, d, e));
                RESULT = l; :}
     |   interface_declaration:a
-            {: List l = new LinkedList<ClassMember>();
+            {: List<ClassMember> l = new LinkedList<ClassMember>();
                l.add(a);
                RESULT = l; :}
     ;
@@ -657,9 +657,8 @@ class_member_declaration ::=
 field_declaration ::=
                     // List of ClassMember
         modifiers_opt:a type:b variable_declarators:c SEMICOLON:e
-            {: List l = new LinkedList<ClassMember>();
-               for (Iterator i = c.iterator(); i.hasNext(); ) {
-                   VarDeclarator d = (VarDeclarator) i.next();
+            {: List<ClassMember> l = new LinkedList<ClassMember>();
+               for (VarDeclarator d : c) {
                    l.add(parser.nf.FieldDecl(parser.pos(b, e),
                                              a, parser.array(b, d.dims),
                                              d.name, d.init));
@@ -669,7 +668,7 @@ field_declaration ::=
 variable_declarators ::=
                     // List of VarDeclarator
         variable_declarator:a
-            {: List l = new LinkedList<VarDeclarator>();
+            {: List<VarDeclarator> l = new LinkedList<VarDeclarator>();
                l.add(a);
                RESULT = l; :}
     |   variable_declarators:a COMMA variable_declarator:b
@@ -729,7 +728,7 @@ formal_parameter_list_opt ::=
 formal_parameter_list ::=
                     // List of Formal
         formal_parameter:a
-            {: List l = new LinkedList<Formal>();
+            {: List<Formal> l = new LinkedList<Formal>();
                l.add(a);
                RESULT = l; :}
     |   formal_parameter_list:a COMMA formal_parameter:b
@@ -759,7 +758,7 @@ throws ::=
 class_type_list ::=
                     // List of TypeNode
         class_type:a
-            {: List l = new LinkedList<TypeNode>();
+            {: List<TypeNode> l = new LinkedList<TypeNode>();
                l.add(a);
                RESULT = l; :}
     |   class_type_list:a COMMA class_type:b
@@ -792,7 +791,7 @@ constructor_declaration ::=
 constructor_body ::=
                     // Block
         LBRACE:n explicit_constructor_invocation:a block_statements:b RBRACE:d
-            {: List l = new LinkedList<Stmt>();
+            {: List<Stmt> l = new LinkedList<Stmt>();
                l.add(a);
                l.addAll(b);
                RESULT = parser.nf.Block(parser.pos(n, d), l); :}
@@ -800,12 +799,12 @@ constructor_body ::=
             {: RESULT = parser.nf.Block(parser.pos(n, d), a); :}
     |   LBRACE:n block_statements:a RBRACE:d
             {: a.add(0, parser.nf.SuperCall(parser.pos(n, d),
-                Collections.EMPTY_LIST));
+                Collections.<Expr> emptyList()));
                RESULT = parser.nf.Block(parser.pos(n, d), a); :}
     |   LBRACE:n RBRACE:d
             {: RESULT = parser.nf.Block(parser.pos(n, d),
                 parser.nf.SuperCall(parser.pos(n, d),
-                Collections.EMPTY_LIST)); :}
+                Collections.<Expr> emptyList())); :}
     ;
 explicit_constructor_invocation ::=
                     // ConstructorCall
@@ -839,7 +838,7 @@ extends_interfaces_opt ::=
 extends_interfaces ::=
                     // List of TypeNode
         EXTENDS interface_type:a
-            {: List l = new LinkedList<TypeNode>();
+            {: List<TypeNode> l = new LinkedList<TypeNode>();
                l.add(a);
                RESULT = l; :}
     |   extends_interfaces:a COMMA interface_type:b
@@ -870,19 +869,19 @@ interface_member_declaration ::=
         constant_declaration:a
             {: RESULT = a; :}
     |   abstract_method_declaration:a
-            {: List l = new LinkedList<ClassMember>();
+            {: List<ClassMember> l = new LinkedList<ClassMember>();
                l.add(a);
                RESULT = l; :}
     |   class_declaration:a
-            {: List l = new LinkedList<ClassMember>();
+            {: List<ClassMember> l = new LinkedList<ClassMember>();
                l.add(a);
                RESULT = l; :}
     |   interface_declaration:a
-            {: List l = new LinkedList<ClassMember>();
+            {: List<ClassMember> l = new LinkedList<ClassMember>();
                l.add(a);
                RESULT = l; :}
     |   SEMICOLON
-            {: RESULT = Collections.EMPTY_LIST; :}
+            {: RESULT = Collections.<ClassMember> emptyList(); :}
     ;
 constant_declaration ::=
                     // List of ClassMember
@@ -910,7 +909,7 @@ array_initializer ::=
 variable_initializers ::=
                     // List of Expr
         variable_initializer:a
-            {: List l = new LinkedList<Expr>();
+            {: List<Expr> l = new LinkedList<Expr>();
            l.add(a);
            RESULT = l; :}
     |   variable_initializers:a COMMA variable_initializer:b
@@ -925,7 +924,7 @@ block ::=
     |
         error RBRACE:d
             {: RESULT = parser.nf.Block(parser.pos(d),
-                                        Collections.EMPTY_LIST); :}
+                                        Collections.<Stmt> emptyList()); :}
     ;
 block_statements_opt ::=
                     // List of Stmt
@@ -936,7 +935,7 @@ block_statements_opt ::=
 block_statements ::=
                     // List of Stmt
         block_statement:a
-            {: List l = new LinkedList<Stmt>();
+            {: List<Stmt> l = new LinkedList<Stmt>();
                l.addAll(a);
                RESULT = l; :}
     |   block_statements:a block_statement:b
@@ -946,13 +945,13 @@ block_statements ::=
 block_statement ::=
                     // List of Stmt
         local_variable_declaration_statement:a
-            {: RESULT = a; :}
+            {: RESULT = new LinkedList<Stmt>(a); :}
     |   statement:a
-            {: List l = new LinkedList<Stmt>();
+            {: List<Stmt> l = new LinkedList<Stmt>();
                l.add(a);
                RESULT = l; :}
     |   class_declaration:a
-            {: List l = new LinkedList<Stmt>();
+            {: List<Stmt> l = new LinkedList<Stmt>();
                l.add(parser.nf.LocalClassDecl(parser.pos(a), a));
                RESULT = l; :}
     ;
@@ -1113,15 +1112,15 @@ switch_block_statement_groups ::=
 switch_block_statement_group ::=
                     // List of SwitchElement
         switch_labels:a block_statements:b
-            {: List l = new LinkedList<SwitchElement>();
+            {: List<SwitchElement> l = new LinkedList<SwitchElement>();
                l.addAll(a);
                l.add(parser.nf.SwitchBlock(parser.pos(a, b), b));
                RESULT = l; :}
     ;
 switch_labels ::=
-                    // List of Case
+                    // List of SwitchElement (Case)
         switch_label:a
-            {: List l = new LinkedList<Case>();
+            {: List<SwitchElement> l = new LinkedList<SwitchElement>();
                l.add(a);
                RESULT = l; :}
     |   switch_labels:a switch_label:b
@@ -1172,9 +1171,9 @@ for_init_opt ::=
 for_init ::=
                     // List of ForInit
         statement_expression_list:a
-            {: RESULT = a; :}
+            {: RESULT = new LinkedList<ForInit>(a); :}
     |   local_variable_declaration:a
-            {: List l = new LinkedList<ForInit>();
+            {: List<ForInit> l = new LinkedList<ForInit>();
                l.addAll(a);
                RESULT = l; :}
     ;
@@ -1187,12 +1186,12 @@ for_update_opt ::=
 for_update ::=
                     // List of ForUpdate
         statement_expression_list:a
-            {: RESULT = a; :}
+            {: RESULT = new LinkedList<ForUpdate>(a); :}
     ;
 statement_expression_list ::=
                     // List of Stmt
         statement_expression:a
-            {: List l = new LinkedList<Eval>();
+            {: List<Eval> l = new LinkedList<Eval>();
                l.add(parser.nf.Eval(parser.pos(a), a));
                RESULT = l; :}
     |   statement_expression_list:a COMMA statement_expression:b
@@ -1256,7 +1255,7 @@ catches_opt ::=
 catches ::=
                     // List of Catch
         catch_clause:a
-            {: List l = new LinkedList<Catch>();
+            {: List<Catch> l = new LinkedList<Catch>();
                l.add(a);
                RESULT = l; :}
     |   catches:a catch_clause:b
@@ -1347,7 +1346,7 @@ argument_list_opt ::=
 argument_list ::=
                     // List of Expr
         expression:a
-            {: List l = new LinkedList<Expr>();
+            {: List<Expr> l = new LinkedList<Expr>();
                l.add(a);
                RESULT = l; :}
     |   argument_list:a COMMA expression:b
@@ -1372,7 +1371,7 @@ array_creation_expression ::=
 dim_exprs ::=
                     // List of Expr
         dim_expr:a
-            {: List l = new LinkedList<Expr>();
+            {: List<Expr> l = new LinkedList<Expr>();
                l.add(a);
                RESULT = l; :}
     |   dim_exprs:a dim_expr:b

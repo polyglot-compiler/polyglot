@@ -10,12 +10,15 @@ package pao.types;
 import polyglot.types.PrimitiveType_c;
 import polyglot.types.Type;
 import polyglot.types.TypeSystem;
+import polyglot.util.SerialVersionUID;
 
 /**
  * A PAO primitive type.  In the PAO extension, primitives are considered a 
  * subtype of <code>Object</code>.
  */
 public class PaoPrimitiveType_c extends PrimitiveType_c {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     protected PaoPrimitiveType_c() {
         super();
     }

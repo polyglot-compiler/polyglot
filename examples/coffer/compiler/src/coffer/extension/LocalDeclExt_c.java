@@ -10,10 +10,13 @@ package coffer.extension;
 import polyglot.ast.LocalDecl;
 import polyglot.types.SemanticException;
 import polyglot.types.Type;
+import polyglot.util.SerialVersionUID;
 import coffer.types.CofferClassType;
 import coffer.types.KeySet;
 
 public class LocalDeclExt_c extends CofferExt_c {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     @Override
     public KeySet keyAlias(KeySet stored_keys, Type throwType) {
         LocalDecl n = (LocalDecl) node();

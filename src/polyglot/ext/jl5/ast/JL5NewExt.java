@@ -301,7 +301,6 @@ public class JL5NewExt extends JL5Ext implements NewOps {
     @Override
     public ClassType findEnclosingClass(Context c, ClassType ct) {
         New n = (New) this.node();
-        JL5NewExt ext = (JL5NewExt) JL5Ext.ext(n);
 
         if (ct == n.anonType()) {
             // we need to find ct, is an anonymous class, and so 

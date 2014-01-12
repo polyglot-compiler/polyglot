@@ -98,7 +98,7 @@ public class Main {
             StdErrorQueue eq =
                     new StdErrorQueue(System.err, 100, extInfo.compilerName());
 
-            Compiler compiler = new Compiler(extInfo, eq);
+            new Compiler(extInfo, eq);
 
             TypeSystem ts = extInfo.typeSystem();
             TypeDumper t = TypeDumper.load(className, ts, extInfo.version());

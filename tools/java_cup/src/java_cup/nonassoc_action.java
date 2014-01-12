@@ -17,7 +17,7 @@ public class nonassoc_action extends parse_action {
 
     /** Simple constructor. 
      */
-    public nonassoc_action() throws internal_error {
+    public nonassoc_action() {
         /* don't need to set anything, since it signifies error */
     }
 
@@ -26,6 +26,7 @@ public class nonassoc_action extends parse_action {
     /*-----------------------------------------------------------*/
 
     /** Quick access to type of action. */
+    @Override
     public int kind() {
         return NONASSOC;
     }
@@ -33,6 +34,7 @@ public class nonassoc_action extends parse_action {
     /*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . .*/
 
     /** Equality test. */
+    @Override
     public boolean equals(parse_action other) {
         return other != null && other.kind() == NONASSOC;
     }
@@ -40,6 +42,7 @@ public class nonassoc_action extends parse_action {
     /*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . .*/
 
     /** Generic equality test. */
+    @Override
     public boolean equals(Object other) {
         if (other instanceof parse_action)
             return equals((parse_action) other);
@@ -49,12 +52,14 @@ public class nonassoc_action extends parse_action {
     /*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . .*/
 
     /** Compute a hash code. */
+    @Override
     public int hashCode() {
         /* all objects of this class hash together */
         return 0xCafe321;
     }
 
     /** Convert to string. */
+    @Override
     public String toString() {
         return "NONASSOC";
     }

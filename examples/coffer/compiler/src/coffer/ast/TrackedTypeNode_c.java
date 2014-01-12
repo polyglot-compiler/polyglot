@@ -18,6 +18,7 @@ import polyglot.types.Type;
 import polyglot.util.CodeWriter;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
+import polyglot.util.SerialVersionUID;
 import polyglot.visit.AmbiguityRemover;
 import polyglot.visit.ExceptionChecker;
 import polyglot.visit.NodeVisitor;
@@ -32,6 +33,8 @@ import coffer.types.Key;
  * a type node for a class instantiated with a key.
  */
 public class TrackedTypeNode_c extends TypeNode_c implements TrackedTypeNode {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     protected TypeNode base;
     protected KeyNode key;
 

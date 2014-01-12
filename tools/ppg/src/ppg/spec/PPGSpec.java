@@ -25,16 +25,31 @@
  ******************************************************************************/
 package ppg.spec;
 
-import java.io.*;
-import java.util.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
+import java.util.Vector;
 
-import ppg.*;
-import ppg.atoms.*;
-import ppg.cmds.*;
-import ppg.code.*;
-import ppg.lex.*;
-import ppg.parse.*;
-import ppg.util.*;
+import ppg.PPG;
+import ppg.PPGError;
+import ppg.atoms.GrammarPart;
+import ppg.atoms.Nonterminal;
+import ppg.atoms.Precedence;
+import ppg.atoms.Production;
+import ppg.atoms.SemanticAction;
+import ppg.atoms.SymbolList;
+import ppg.cmds.Command;
+import ppg.cmds.DropCmd;
+import ppg.cmds.ExtendCmd;
+import ppg.cmds.NewProdCmd;
+import ppg.cmds.OverrideCmd;
+import ppg.cmds.TransferCmd;
+import ppg.code.Code;
+import ppg.code.ScanCode;
+import ppg.lex.Lexer;
+import ppg.parse.Parser;
+import ppg.util.CodeWriter;
 
 public class PPGSpec extends Spec {
     private String include;
@@ -140,10 +155,11 @@ public class PPGSpec extends Spec {
             method = startSyms.elementAt(i + 1);
             token = tokens.elementAt(i / 2); //startSyms.elementAt(i+2);
             parseCode +=
-                    "public Symbol " + method + " () throws Exception {\n"
-                            + "\t" + currSymbolName + " = " + "new Symbol("
-                            + PPG.SYMBOL_CLASS_NAME + "." + token + ")" + ";\n"
-                            + "\t" + "return parse();\n}\n\n";
+                    "@Override\n" + "public Symbol " + method
+                            + "() throws Exception {\n" + "\t" + currSymbolName
+                            + " = " + "new Symbol(" + PPG.SYMBOL_CLASS_NAME
+                            + "." + token + ")" + ";\n" + "\t"
+                            + "return parse();\n}\n\n";
         }
         // append parseCode to the actual parse code
         cupSpec.parserCode.append(parseCode);

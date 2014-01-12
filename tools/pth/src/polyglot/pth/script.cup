@@ -51,17 +51,17 @@ terminal LBRACE, RBRACE;
 terminal SEMICOLON, COMMA;
 terminal PLUS;
 
-non terminal List goal;                    // List of SourceFileTest
-non terminal List compilertest_list;           // List of SourceFileTest
-non terminal List compilertest;           // List of SourceFileTest
-non terminal String command_line_args_opt;         
-non terminal List filetest_list;           // List of SourceFileTest
+non terminal List<SourceFileTest> goal;
+non terminal List<SourceFileTest> compilertest_list;
+non terminal List<SourceFileTest> compilertest;
+non terminal String command_line_args_opt;
+non terminal List<SourceFileTest> filetest_list;
 non terminal SourceFileTest filetest;
-non terminal List filename_list;           // List of String
+non terminal List<String> filename_list;
 non terminal String description_opt;
-non terminal List failure_set_opt;         // List of ExpectedFailure
-non terminal List failure_set;             // List of ExpectedFailure
-non terminal String sentence;        
+non terminal List<ExpectedFailure> failure_set_opt;
+non terminal List<ExpectedFailure> failure_set;
+non terminal String sentence;
 non terminal ExpectedFailure failure;
 
 start with goal;
@@ -84,8 +84,7 @@ compilertest ::=
         IDENT:a command_line_args_opt:b LBRACE filetest_list:c RBRACE
             {: String extClassName = a;
                
-		        for (Iterator iter = c.iterator(); iter.hasNext(); ) {
-		            SourceFileTest sft = (SourceFileTest)iter.next();
+		        for (SourceFileTest sft : c) {
 		            sft.setExtensionClassname(extClassName);
 		            sft.setExtraCmdLineArgs(b);
 		        }
@@ -101,12 +100,12 @@ command_line_args_opt ::=
     
 filetest_list ::=
         filetest:a
-            {: List list = new LinkedList();
+            {: List<SourceFileTest> list = new LinkedList<SourceFileTest>();
                list.add(a);
                RESULT = list;
             :}
     |   filetest:a SEMICOLON
-            {: List list = new LinkedList();
+            {: List<SourceFileTest> list = new LinkedList<SourceFileTest>();
                list.add(a);
                RESULT = list;
             :}
@@ -118,7 +117,7 @@ filetest ::=
         filename_list:a description_opt:b failure_set_opt:d
             {: SourceFileTest sft = null;
                if (a.size() == 1) {
-                   sft = new SourceFileTest((String)a.get(0));
+                   sft = new SourceFileTest(a.get(0));
                }
                else {
                    sft = new SourceFileTest(a);
@@ -131,7 +130,7 @@ filetest ::=
 
 filename_list ::=
         IDENT:a
-            {: List list = new LinkedList();
+            {: List<String> list = new LinkedList<String>();
                list.add(a);
                RESULT = list;
             :}
@@ -157,7 +156,7 @@ sentence ::=
     ;
 
 failure_set_opt ::=
-            {: List l = new ArrayList();
+            {: List<ExpectedFailure> l = new ArrayList<ExpectedFailure>();
                RESULT = l;
             :}
     | failure_set:a
@@ -166,7 +165,7 @@ failure_set_opt ::=
     
 failure_set ::=
         failure:a
-            {: List l = new ArrayList();
+            {: List<ExpectedFailure> l = new ArrayList<ExpectedFailure>();
                l.add(a);
                RESULT = l;
             :}

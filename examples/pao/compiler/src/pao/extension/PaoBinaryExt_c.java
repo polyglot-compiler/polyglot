@@ -16,12 +16,15 @@ import polyglot.ast.NodeFactory;
 import polyglot.ast.TypeNode;
 import polyglot.ast.Unary;
 import polyglot.types.MethodInstance;
+import polyglot.util.SerialVersionUID;
 
 /**
  * The <code>PaoExt</code> implementation for the 
  * <code>Binary</code> AST node.
  */
 public class PaoBinaryExt_c extends PaoExt_c {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     /**
      * Rewrite the binary operators <code>==</code> and <code>&excl;=</code> to 
      * invoke <code>Primitive.equals(o, p)</code>.

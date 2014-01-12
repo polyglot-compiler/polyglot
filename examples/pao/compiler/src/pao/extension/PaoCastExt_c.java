@@ -21,12 +21,15 @@ import polyglot.ast.NodeFactory;
 import polyglot.types.ConstructorInstance;
 import polyglot.types.MethodInstance;
 import polyglot.types.Type;
+import polyglot.util.SerialVersionUID;
 
 /**
  * The <code>PaoExt</code> implementation for the 
  * <code>Cast</code> AST node.
  */
 public class PaoCastExt_c extends PaoExt_c {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     /**
      * Insert boxing and unboxing code for the casts inserted by the
      * <code>PaoBoxer</code>. 

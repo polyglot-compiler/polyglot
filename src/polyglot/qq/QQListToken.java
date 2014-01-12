@@ -40,8 +40,9 @@ public class QQListToken extends Token {
         this.list = list;
     }
 
-    public List<Object> list() {
-        return list;
+    @SuppressWarnings("unchecked")
+    public <E> List<E> list() {
+        return (List<E>) list;
     }
 
     @Override

@@ -1,7 +1,12 @@
 package java_cup;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.PrintWriter;
 import java.util.Enumeration;
-import java.io.*;
 
 /** This class serves as the main driver for the JavaCup system.
  *  It accepts user options and coordinates overall control flow.
@@ -491,8 +496,8 @@ public class Main {
         non_terminal nt;
 
         /* check for unused terminals */
-        for (Enumeration t = terminal.all(); t.hasMoreElements();) {
-            term = (terminal) t.nextElement();
+        for (Enumeration<terminal> t = terminal.all(); t.hasMoreElements();) {
+            term = t.nextElement();
 
             /* don't issue a message for EOF */
             if (term == terminal.EOF) continue;
@@ -513,8 +518,8 @@ public class Main {
         }
 
         /* check for unused non terminals */
-        for (Enumeration n = non_terminal.all(); n.hasMoreElements();) {
-            nt = (non_terminal) n.nextElement();
+        for (Enumeration<non_terminal> n = non_terminal.all(); n.hasMoreElements();) {
+            nt = n.nextElement();
 
             /* is this one unused */
             if (nt.use_count() == 0) {
@@ -581,8 +586,8 @@ public class Main {
             System.err.println("  Filling in tables...");
         action_table = new parse_action_table();
         reduce_table = new parse_reduce_table();
-        for (Enumeration st = lalr_state.all(); st.hasMoreElements();) {
-            lalr_state lst = (lalr_state) st.nextElement();
+        for (Enumeration<lalr_state> st = lalr_state.all(); st.hasMoreElements();) {
+            lalr_state lst = st.nextElement();
             lst.build_table_entries(action_table, reduce_table);
         }
 
@@ -838,8 +843,8 @@ public class Main {
         lalr_state ordered[] = new lalr_state[lalr_state.number()];
 
         /* put the states in sorted order for a nicer display */
-        for (Enumeration s = lalr_state.all(); s.hasMoreElements();) {
-            lalr_state st = (lalr_state) s.nextElement();
+        for (Enumeration<lalr_state> s = lalr_state.all(); s.hasMoreElements();) {
+            lalr_state st = s.nextElement();
             ordered[st.index()] = st;
         }
 

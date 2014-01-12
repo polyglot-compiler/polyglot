@@ -113,6 +113,10 @@ public class Token /* extends Symbol */implements LexerResult {
             return "LBRACK";
         case Constant.RBRACK:
             return "RBRACK";
+        case Constant.LT:
+            return "LT";
+        case Constant.GT:
+            return "GT";
 
         case Constant.ID:
             return "ID";

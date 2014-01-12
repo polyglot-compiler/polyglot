@@ -1,0 +1,31 @@
+include "polyglot/parse/java12.cup"
+
+package pao.parse;
+
+import pao.types.PaoTypeSystem;
+import polyglot.parse.Name;
+import polyglot.parse.VarDeclarator;
+/**
+ * Parser for the PAO extension.
+ */
+parser Grm extends polyglot.parse.Grm {:
+	public final PaoTypeSystem ts;
+	public final NodeFactory nf;
+
+	public Grm(Lexer l, TypeSystem t, NodeFactory n, ErrorQueue q) {
+                super(l,t,n,q);
+		ts = (PaoTypeSystem) t;
+		nf = n;
+	}
+:};
+
+start with goal;
+
+extend relational_expression ::=
+	relational_expression:a INSTANCEOF type:b
+	{: RESULT = parser.nf.Instanceof(parser.pos(a), a, b); :}
+	;
+	
+drop { relational_expression ::=
+	relational_expression:a INSTANCEOF reference_type:b; }
+	

@@ -143,7 +143,7 @@ public class JLDel_c implements JLDel, Copy, Serializable {
 
     @Override
     public Context enterChildScope(JLang lang, Node child, Context c) {
-        return null;
+        return jl().enterChildScope(lang, child, c);
     }
 
     /**

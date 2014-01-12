@@ -1,7 +1,7 @@
 package java_cup;
 
-import java.util.Hashtable;
 import java.util.Enumeration;
+import java.util.Hashtable;
 
 /** This class represents a production in the grammar.  It contains
  *  a LHS non terminal, and an array of RHS symbols.  As various 
@@ -194,16 +194,17 @@ public class production {
     /** Table of all productions.  Elements are stored using their index as 
      *  the key.
      */
-    protected static Hashtable _all = new Hashtable();
+    protected static Hashtable<Integer, production> _all =
+            new Hashtable<Integer, production>();
 
     /** Access to all productions. */
-    public static Enumeration all() {
+    public static Enumeration<production> all() {
         return _all.elements();
     }
 
     /** Lookup a production by index. */
     public static production find(int indx) {
-        return (production) _all.get(new Integer(indx));
+        return _all.get(new Integer(indx));
     }
 
     /*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . .*/
@@ -383,22 +384,17 @@ public class production {
         /* Put in the left/right value labels */
         if (emit.lr_values())
             ret =
-                    "\t\tint " + labelname
-                            + "left = ((java_cup.runtime.Symbol)"
+                    "\t\tint " + labelname + "left = " + emit.pre("stack")
+                            + ".elementAt(" + emit.pre("top") + "-" + offset
+                            + ").left;\n" + "\t\tint " + labelname + "right = "
                             + emit.pre("stack") + ".elementAt("
-                            + emit.pre("top") + "-" + offset + ")).left;\n"
-                            + "\t\tint " + labelname
-                            + "right = ((java_cup.runtime.Symbol)"
-                            + emit.pre("stack") + ".elementAt("
-                            + emit.pre("top") + "-" + offset + ")).right;\n";
+                            + emit.pre("top") + "-" + offset + ").right;\n";
         else ret = "";
 
         /* otherwise, just declare label. */
-        return ret + "\t\t" + stack_type + " " + labelname + " = ("
-                + stack_type + ")((" + "java_cup.runtime.Symbol) "
+        return ret + "\t\t" + stack_type + " " + labelname + " = "
                 + emit.pre("stack") + ".elementAt(" + emit.pre("top") + "-"
-                + offset + ")).value;\n";
-
+                + offset + ").<" + stack_type + "> value();\n";
     }
 
     /*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . .*/
@@ -414,7 +410,6 @@ public class production {
         String declaration = "";
 
         symbol_part part;
-        action_part act_part;
         int pos;
 
         /* walk down the parts and extract the labels */
@@ -531,7 +526,6 @@ public class production {
 
     ) throws internal_error {
         non_terminal new_nt;
-        production new_prod;
         String declare_str;
 
         /* walk over the production and process each action */
@@ -544,13 +538,8 @@ public class production {
                 new_nt.is_embedded_action = true; /* 24-Mar-1998, CSA */
 
                 /* create a new production with just the action */
-                new_prod =
-                        new action_production(this,
-                                              new_nt,
-                                              null,
-                                              0,
-                                              declare_str
-                                                      + ((action_part) rhs(act_loc)).code_string());
+                new action_production(this, new_nt, null, 0, declare_str
+                        + ((action_part) rhs(act_loc)).code_string());
 
                 /* replace the action with the generated non terminal */
                 _rhs[act_loc] = new symbol_part(new_nt);
@@ -656,6 +645,7 @@ public class production {
     /*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . .*/
 
     /** Generic equality comparison. */
+    @Override
     public boolean equals(Object other) {
         if (!(other instanceof production))
             return false;
@@ -665,6 +655,7 @@ public class production {
     /*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . .*/
 
     /** Produce a hash code. */
+    @Override
     public int hashCode() {
         /* just use a simple function of the index */
         return _index * 13;
@@ -673,6 +664,7 @@ public class production {
     /*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . .*/
 
     /** Convert to a string. */
+    @Override
     public String toString() {
         String result;
 

@@ -10,14 +10,36 @@ package coffer.extension;
 import java.util.Iterator;
 
 import polyglot.ast.Expr;
+import polyglot.ast.Ext;
 import polyglot.ast.Ext_c;
+import polyglot.ast.Node;
 import polyglot.types.SemanticException;
 import polyglot.types.Type;
+import polyglot.util.InternalCompilerError;
+import polyglot.util.SerialVersionUID;
 import coffer.types.CofferClassType;
 import coffer.types.Key;
 import coffer.types.KeySet;
 
 public class CofferExt_c extends Ext_c implements CofferExt {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
+    public static CofferExt ext(Node n) {
+        Ext e = n.ext();
+        while (e != null && !(e instanceof CofferExt)) {
+            e = e.ext();
+        }
+        if (e == null) {
+            throw new InternalCompilerError("No Coffer extension object for node "
+                                                    + n
+                                                    + " ("
+                                                    + n.getClass()
+                                                    + ")",
+                                            n.position());
+        }
+        return (CofferExt) e;
+    }
+
     public String KeysToString(KeySet set) {
         return "K" + eysToString(set);
     }

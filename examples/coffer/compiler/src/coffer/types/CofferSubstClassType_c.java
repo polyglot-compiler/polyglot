@@ -14,9 +14,12 @@ import polyglot.ext.param.types.PClass;
 import polyglot.ext.param.types.SubstClassType_c;
 import polyglot.types.ClassType;
 import polyglot.util.Position;
+import polyglot.util.SerialVersionUID;
 
 public class CofferSubstClassType_c extends SubstClassType_c<Key, Key>
         implements CofferSubstType {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     public CofferSubstClassType_c(CofferTypeSystem ts, Position pos,
             ClassType base, CofferSubst subst) {
         super(ts, pos, base, subst);

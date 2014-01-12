@@ -955,7 +955,7 @@ public abstract class DataFlow<FlowItem extends DataFlow.Item> extends
             }
             else if (dataflowOnEntry && !flowgraphStack.isEmpty()) {
                 FlowGraphSource<FlowItem> fgs = flowgraphStack.getFirst();
-                if (fgs.source.equals(old)) {
+                if (fgs.source().equals(old)) {
                     // we are leaving the code decl that pushed this flowgraph 
                     // on the stack. pop tbe stack.
                     flowgraphStack.removeFirst();
@@ -1023,7 +1023,7 @@ public abstract class DataFlow<FlowItem extends DataFlow.Item> extends
         if (flowgraphStack.isEmpty()) {
             return null;
         }
-        return flowgraphStack.getFirst().flowgraph;
+        return flowgraphStack.getFirst().flowGraph();
     }
 
     /**
@@ -1304,8 +1304,8 @@ public abstract class DataFlow<FlowItem extends DataFlow.Item> extends
                 navigator.navigate(booleanCond, startingItem);
 
         Map<EdgeKey, FlowItem> m = new HashMap<EdgeKey, FlowItem>();
-        m.put(FlowGraph.EDGE_KEY_TRUE, results.trueItem);
-        m.put(FlowGraph.EDGE_KEY_FALSE, results.falseItem);
+        m.put(FlowGraph.EDGE_KEY_TRUE, results.trueItem());
+        m.put(FlowGraph.EDGE_KEY_FALSE, results.falseItem());
 
         // put the starting item in the map for any EdgeKeys other than
         // FlowGraph.EDGE_KEY_TRUE and FlowGraph.EDGE_KEY_FALSE
@@ -1392,7 +1392,7 @@ public abstract class DataFlow<FlowItem extends DataFlow.Item> extends
                             // due to short circuiting, if the right
                             // branch is evaluated, the starting item is
                             // in fact the true part of the left result
-                            rightResStart = leftRes.trueItem;
+                            rightResStart = leftRes.trueItem();
                         }
                         BoolItem<FlowItem> rightRes =
                                 navigate(b.right(), rightResStart);
@@ -1408,7 +1408,7 @@ public abstract class DataFlow<FlowItem extends DataFlow.Item> extends
                             // due to short circuiting, if the right
                             // branch is evaluated, the starting item is
                             // in fact the false part of the left result
-                            rightResStart = leftRes.falseItem;
+                            rightResStart = leftRes.falseItem();
                         }
                         BoolItem<FlowItem> rightRes =
                                 navigate(b.right(), rightResStart);
@@ -1437,7 +1437,8 @@ public abstract class DataFlow<FlowItem extends DataFlow.Item> extends
          */
         public BoolItem<FlowItem> andResults(BoolItem<FlowItem> left,
                 BoolItem<FlowItem> right, FlowItem startingItem) {
-            return new BoolItem<FlowItem>(combine(left.trueItem, right.trueItem),
+            return new BoolItem<FlowItem>(combine(left.trueItem(),
+                                                  right.trueItem()),
                                           startingItem);
         }
 
@@ -1448,8 +1449,8 @@ public abstract class DataFlow<FlowItem extends DataFlow.Item> extends
         public BoolItem<FlowItem> orResults(BoolItem<FlowItem> left,
                 BoolItem<FlowItem> right, FlowItem startingItem) {
             return new BoolItem<FlowItem>(startingItem,
-                                          combine(left.falseItem,
-                                                  right.falseItem));
+                                          combine(left.falseItem(),
+                                                  right.falseItem()));
         }
 
         /**
@@ -1457,7 +1458,8 @@ public abstract class DataFlow<FlowItem extends DataFlow.Item> extends
          * a NEGATION boolean operator (a !).
          */
         public BoolItem<FlowItem> notResult(BoolItem<FlowItem> results) {
-            return new BoolItem<FlowItem>(results.falseItem, results.trueItem);
+            return new BoolItem<FlowItem>(results.falseItem(),
+                                          results.trueItem());
         }
 
         /**

@@ -107,6 +107,9 @@ string_lit_slash={string_lit}\\
 <YYINITIAL> "}"             { return t(Constant.RBRACE); }
 <YYINITIAL> "["             { return t(Constant.LBRACK); }
 <YYINITIAL> "]"             { return t(Constant.RBRACK); }
+<YYINITIAL> "<"             { return t(Constant.LT); }
+<YYINITIAL> ">"             { return t(Constant.GT); }
+<YYINITIAL> "?"             { return t(Constant.QUESTION); }
 <YYINITIAL> "|"             { return t(Constant.BAR); }
 <YYINITIAL> ":"             { return t(Constant.COLON); }
 <YYINITIAL> "*"             { return t(Constant.STAR); }

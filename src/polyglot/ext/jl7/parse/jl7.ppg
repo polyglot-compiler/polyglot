@@ -23,7 +23,7 @@ parser Grm extends polyglot.ext.jl5.parse.Grm  {:
 :};
 
 
-non terminal List catch_type; // List<TypeNode>
+non terminal List<TypeNode> catch_type;
 
 start with goal;
 

@@ -188,6 +188,7 @@ public class terminal_set {
     /*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . .*/
 
     /** Generic equality comparison. */
+    @Override
     public boolean equals(Object other) {
         if (!(other instanceof terminal_set))
             return false;
@@ -197,6 +198,7 @@ public class terminal_set {
     /*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . .*/
 
     /** Convert to string. */
+    @Override
     public String toString() {
         String result;
         boolean comma_flag;

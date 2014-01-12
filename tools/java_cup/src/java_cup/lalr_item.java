@@ -1,7 +1,6 @@
 package java_cup;
 
 import java.util.Stack;
-import java.util.Enumeration;
 
 /** This class represents an LALR item. Each LALR item consists of 
  *  a production, a "dot" at a position within that production, and
@@ -44,7 +43,7 @@ public class lalr_item extends lr_item_core {
             throws internal_error {
         super(prod, pos);
         _lookahead = look;
-        _propagate_items = new Stack();
+        _propagate_items = new Stack<lalr_item>();
         needs_propagation = true;
     }
 
@@ -82,10 +81,10 @@ public class lalr_item extends lr_item_core {
     /*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . .*/
 
     /** Links to items that the lookahead needs to be propagated to. */
-    protected Stack _propagate_items;
+    protected Stack<lalr_item> _propagate_items;
 
     /** Links to items that the lookahead needs to be propagated to */
-    public Stack propagate_items() {
+    public Stack<lalr_item> propagate_items() {
         return _propagate_items;
     }
 
@@ -133,7 +132,8 @@ public class lalr_item extends lr_item_core {
 
             /* propagate our lookahead into each item we are linked to */
             for (int i = 0; i < propagate_items().size(); i++)
-                ((lalr_item) propagate_items().elementAt(i)).propagate_lookaheads(lookahead());
+                propagate_items().elementAt(i)
+                                 .propagate_lookaheads(lookahead());
         }
     }
 
@@ -262,6 +262,7 @@ public class lalr_item extends lr_item_core {
     /*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . .*/
 
     /** Generic equality comparison. */
+    @Override
     public boolean equals(Object other) {
         if (!(other instanceof lalr_item))
             return false;
@@ -273,6 +274,7 @@ public class lalr_item extends lr_item_core {
     /** Return a hash code -- here we only hash the core since we only test core
      *  matching in LALR items. 
      */
+    @Override
     public int hashCode() {
         return super.hashCode();
     }
@@ -280,6 +282,7 @@ public class lalr_item extends lr_item_core {
     /*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . .*/
 
     /** Convert to string. */
+    @Override
     public String toString() {
         String result = "";
 
