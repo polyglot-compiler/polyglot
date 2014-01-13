@@ -37,7 +37,7 @@
     <property name="bin.dir" location="${basedir}/bin" />
 
     <!-- directory for shared libraries -->
-    <property name="lib.dir" location="${polyglot.dir}/lib" />
+    <property name="lib.dir" location="${basedir}/lib" />
 
     <!-- runtime source directory -->
     <property name="runtime.src" location="${basedir}/runtime/src" />
@@ -63,12 +63,15 @@
         <pathelement location="${compiler.classes}" />
         <pathelement location="${runtime.classes}" />
 
-      <!-- jar files in the lib directory -->
-  		<pathelement location="${lib.dir}/polyglot.jar" />
-  		<pathelement location="${lib.dir}/java_cup.jar" />
-  		<pathelement location="${lib.dir}/JFlex.jar" />
-  		<pathelement location="${lib.dir}/ppg.jar" />
-  		<pathelement location="${env.JAVA_HOME}/lib/tools.jar" />
+        <!-- the java classpath -->
+        <pathelement path="${java.class.path}" />
+
+        <!-- jar files in the lib directory, excluding generated jars -->
+        <fileset dir="${lib.dir}">
+            <include name="*.jar" />
+            <exclude name="${package}.jar" />
+            <exclude name="${package}-rt.jar" />
+        </fileset>
     </path>
 
 

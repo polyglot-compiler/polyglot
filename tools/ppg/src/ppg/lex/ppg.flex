@@ -3,18 +3,12 @@ package ppg.lex;
 import java.io.InputStream;
 import ppg.parse.*;
 
-@SuppressWarnings("all")
+@SuppressWarnings({"unused", "fallthrough"})
 %%
-
-%init{
-    lineSeparator = System.getProperty("line.separator", "\n");
-%init}
 
 %{
 
-    private int lastId = -1;
     private String filename = "";
-    private String lineSeparator;
 /*
     private Position pos() {
         return new Position(filename, yyline+1, yycolumn);
@@ -30,7 +24,6 @@ import ppg.parse.*;
     }
 
     private Token t(int id, Object value) {
-        lastId = id;
         return new Token(id, filename, yyline + 1, yychar, yychar + yylength(), value);
     }
 

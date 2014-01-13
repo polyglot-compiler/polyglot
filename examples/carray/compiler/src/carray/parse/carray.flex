@@ -12,6 +12,7 @@ import polyglot.util.ErrorInfo;
 import polyglot.frontend.FileSource;
 import java.util.HashMap;
 
+@SuppressWarnings({"unused", "fallthrough", "all"})
 %%
 
 %public
@@ -297,7 +298,7 @@ OctalEscape = \\ [0-7]
 
     /* 3.9 Keywords */
     /* 3.8 Identifiers */
-    {Identifier}   { Integer i = (Integer) keywords.get(yytext());
+    {Identifier}   { Integer i = keywords.get(yytext());
                     if (i == null) return id();
                     else return key(i.intValue()); }
 

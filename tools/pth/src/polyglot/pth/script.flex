@@ -3,7 +3,7 @@ package polyglot.pth;
 import java_cup.runtime.ComplexSymbolFactory;
 import java_cup.runtime.Symbol;
 
-@SuppressWarnings("all")
+@SuppressWarnings({"unused", "fallthrough", "all"})
 %%
 %cup
 %public

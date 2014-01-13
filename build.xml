@@ -167,8 +167,13 @@
 		<copy file="${lib}/polyglot.jar" todir="${carray.dir}/lib" />
 		<copy file="${lib}/java_cup.jar" todir="${pao.dir}/lib" />
 		<copy file="${lib}/java_cup.jar" todir="${coffer.dir}/lib" />
-		<copy file="${lib}/java_cup.jar" todir="${covarRet.dir}/lib" />
 		<copy file="${lib}/java_cup.jar" todir="${carray.dir}/lib" />
+		<copy file="${lib}/JFlex.jar" todir="${pao.dir}/lib" />
+		<copy file="${lib}/JFlex.jar" todir="${coffer.dir}/lib" />
+		<copy file="${lib}/JFlex.jar" todir="${carray.dir}/lib" />
+		<copy file="${lib}/ppg.jar" todir="${pao.dir}/lib" />
+		<copy file="${lib}/ppg.jar" todir="${coffer.dir}/lib" />
+		<copy file="${lib}/ppg.jar" todir="${carray.dir}/lib" />
 	</target>
 
 	<target name="serialuid" description="Build polyglot.util.SerialVersionUID">

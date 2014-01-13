@@ -33,9 +33,9 @@ import polyglot.util.Position;
 
 /** A token class for int literals. */
 public class QQListToken extends Token {
-    protected List<Object> list;
+    protected List<? extends Object> list;
 
-    public QQListToken(Position position, List<Object> list, int sym) {
+    public QQListToken(Position position, List<? extends Object> list, int sym) {
         super(position, sym);
         this.list = list;
     }

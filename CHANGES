@@ -5,8 +5,34 @@ This file documents changes between releases of Polyglot. More information
 about some releases may be found in the appropriate directory
 doc/release-notes-<version>.
 
+XXX, 2014 : Polyglot ???
+===============================
+
+Delegate objects and delegate factories are now deprecated.  AST nodes in
+an extension need not be attached with delegate objects.  Rather, an instance of
+type polyglot.ast.Lang, alongside extension objects, defines appropriate
+dispatching mechanisms for all AST nodes.  Any class implementing Lang should be
+singleton; multiple instances of the same Lang implementation are unnecessary.
+
+Because AST nodes can represent multiple languages, NodeVisitor now requires an
+instance of Lang to determine the appropriate language to work on.
+
+Changed the return type of polyglot.ast.Node_c:del() from JLDel to NodeOps
+because Node no longer extends JLDel.  Both extend NodeOps, however, which is
+essentially what we need to dispatch to compiler operations.
+
+Updated JFlex to version 1.4.3 and CUP to a variant of version 0.11a beta
+20060608.  Note that the JFlex jar distribution usually contains
+java_cup.runtime.* classes.  These need to be removed to avoid conflicts with
+our customized CUP parser.
+
+Deprecated features should still work with this version, with the exception of
+any overriding of del() method described above.
+
+
 XXX, 2013 : Polyglot 2.5.4/2.6???
 ===============================
+
 Changed signature of polyglot.visit.Dataflow to use Peer instead 
 of (Node,boolean) pairs. This change is not backward compatible. 
 For example, the signature of flow changed from
@@ -38,21 +64,25 @@ Many bug fixes, especially for generics.
 One non-backward compatible change: Annotation elements are no longer Exprs.
 This fixes issues with constant folding.
 
+
 April 25, 2013 : Polyglot 2.5.2
 ===============================
+
 Many bug fixes, and improved annotation support.
 
 Fields ImportTable.CLASS and ImportTable.PACKAGE renamed to
 ImportTable.SINGLE_TYPE and ImportTable.TYPE_IMPORT_ON_DEMAND
 respectively, to reflect both Java Language Specification terminology,
 and the actual semantics.
-	
+
 
 October 15, 2012 : Polyglot 2.5.1
 =================================
+
 Changes to FileManager to remove some artificial limitations. The method
 FileManager.getAbsPathObjMap() was removed from the FileManager API.  Access to
 in-memory files should be performed via the core API.
+
 
 August 10, 2012 : Polyglot 2.5.0
 ================================
@@ -92,6 +122,7 @@ widening operator.
 
 Many miscellaneous bug fixes were made.
 
+
 Aug 14, 2008: Polyglot 2.4.0
 ============================
 
@@ -107,6 +138,7 @@ Added visitor InnerClassRemover to remove inner classes.
 
 Miscellaneous bug fixes.
 
+
 Oct 5, 2007: Polyglot 2.3
 =========================
 
@@ -118,15 +150,18 @@ Contributed by Xin Zheng.
 
 Miscellaneous bug fixes.
 
+
 Jul 27, 2007: Polyglot 2.2.3
 ============================
 
 Miscellaneous bug fixes.
 
+
 Jun 5, 2007: Polyglot 2.2.2
 ===========================
 
 Miscellaneous bug fixes.
+
 
 May 11, 2007: Polyglot 2.2.1
 ============================
@@ -137,6 +172,7 @@ Added copy(NodeFactory) method to Node interface to generate a new
 version of a node with a different node factory.
 
 Miscellaneous bug fixes.
+
 
 Feb 23, 2007: Polyglot 2.2.0
 ============================
@@ -155,6 +191,7 @@ Added FunctionInstance interface: procedures with return types that are
 not methods.
 
 Miscellaneous bug fixes.  Patch from Bob Fuhrer (rfuhrer@us.ibm.com).
+
 
 Feb 8, 2007: Polyglot 2.1.0
 ===========================
@@ -181,6 +218,7 @@ Cleaned up build.xml
 Added TypeBuilder.pushContext.
 
 Miscellaneous bug fixes.
+
 
 Dec 22, 2006: Polyglot 2.0.1
 ============================
@@ -211,6 +249,7 @@ Don't assume String is final in Binary (patch from Bob Fuhrer).
 
 Numerous bug fixes.
 
+
 Jun 8, 2006: Polyglot 2.0rc1
 ============================
 
@@ -221,6 +260,7 @@ Moved classes in polyglot.ext.jl.* to polyglot.*.
 Renamed polyglot.ext.jl.ExtensionInfo to polyglot.frontend.JLExtensionInfo.
 Renamed polyglot.ext.jl.Version to polyglot.frontend.JLVersion.
 Renamed polyglot.ext.jl.JLScheduler to polyglot.frontend.JLScheduler.
+
 
 Feb 2, 2006: Polyglot 2.0alpha4
 ================================
@@ -235,6 +275,7 @@ polyglot.types.reflect.ClassFile (thanks to Jennifer Lhotak
 for the patch).
 
 Miscellaneous minor bug fixes.
+
 
 Nov 25, 2005: Polyglot 2.0alpha3
 ================================
@@ -405,7 +446,6 @@ Added some accessors for private/protected fields.  Made some
 package-scoped fields protected.
 
 
-
 Nov 19, 2003: Polyglot 1.1.0
 ============================
 
@@ -490,7 +530,6 @@ The signature for the class polyglot.types.TypeSystem has changed.
   method signatures.
 
 
-
 Aug 18, 2003: Polyglot 1.0.1
 ============================
 
@@ -504,7 +543,6 @@ Bug fixes:
   classes.
 - Renamed some protected methods in Context_c to avoid some
   confusion.
-
 
 
 Jul 8, 2003: Polyglot 1.0.0
