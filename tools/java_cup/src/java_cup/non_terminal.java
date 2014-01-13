@@ -61,6 +61,14 @@ public class non_terminal extends symbol {
     protected static Hashtable<String, non_terminal> _all =
             new Hashtable<String, non_terminal>();
 
+    //Hm Added clear  to clear all static fields
+    public static void clear() {
+        _all.clear();
+        _all_by_index.clear();
+        next_index = 0;
+        next_nt = 0;
+    }
+
     /** Access to all non-terminals. */
     public static Enumeration<non_terminal> all() {
         return _all.elements();
@@ -122,8 +130,7 @@ public class non_terminal extends symbol {
      * @param prefix base name to construct unique name from. 
      */
     static non_terminal create_new(String prefix) {
-        if (prefix == null) prefix = "NT$";
-        return new non_terminal(prefix + next_nt++);
+        return create_new(prefix, null); // TUM 20060608 embedded actions patch
     }
 
     /*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . .*/
@@ -131,6 +138,14 @@ public class non_terminal extends symbol {
     /** static routine for creating a new uniquely named hidden non-terminal */
     static non_terminal create_new() {
         return create_new(null);
+    }
+
+    /**
+     * TUM 20060608 bugfix for embedded action codes
+     */
+    static non_terminal create_new(String prefix, String type) {
+        if (prefix == null) prefix = "NT$";
+        return new non_terminal(prefix + next_nt++, type);
     }
 
     /*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . .*/

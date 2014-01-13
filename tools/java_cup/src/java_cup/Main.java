@@ -8,6 +8,8 @@ import java.io.FileOutputStream;
 import java.io.PrintWriter;
 import java.util.Enumeration;
 
+import java_cup.runtime.ComplexSymbolFactory;
+
 /** This class serves as the main driver for the JavaCup system.
  *  It accepts user options and coordinates overall control flow.
  *  The main flow of control includes the following activities: 
@@ -85,7 +87,7 @@ public class Main {
     /* Options set by the user */
     /*-------------------------*/
     /** User option -- do we print progress messages. */
-    protected static boolean print_progress = true;
+    protected static boolean print_progress = false;
     /** User option -- do we produce a dump of the state machine */
     protected static boolean opt_dump_states = false;
     /** User option -- do we produce a dump of the parse tables */
@@ -109,7 +111,7 @@ public class Main {
     /** User option -- number of conflicts to expect */
     protected static int expect_conflicts = 0;
     /** Whether to report counterexamples when conflicts are found.
-      * (ACM extension) */
+     * (ACM extension) */
     public static boolean report_counterexamples = true;
 
     /* frankf added this 6/18/96 */
@@ -168,6 +170,16 @@ public class Main {
 
         start_time = System.currentTimeMillis();
 
+        /** clean all static members, that contain remaining stuff from earlier calls */
+        terminal.clear();
+        production.clear();
+        production.clear();
+        emit.clear();
+        non_terminal.clear();
+        parse_reduce_row.clear();
+        parse_action_row.clear();
+        lalr_state.clear();
+
         /* process user options and arguments */
         parse_args(argv);
 
@@ -189,7 +201,7 @@ public class Main {
         parse_end = System.currentTimeMillis();
 
         /* don't proceed unless we are error free */
-        if (lexer.error_count == 0) {
+        if (ErrorManager.getManager().getErrorCount() == 0) {
             /* check for unused bits */
             if (print_progress)
                 System.err.println("Checking specification...");
@@ -204,7 +216,7 @@ public class Main {
             build_end = System.currentTimeMillis();
 
             /* output the generated code, if # of conflicts permits */
-            if (lexer.error_count != 0) {
+            if (ErrorManager.getManager().getErrorCount() != 0) {
                 // conflicts! don't emit code, don't dump tables.
                 opt_dump_tables = false;
             }
@@ -234,7 +246,7 @@ public class Main {
 
         /* If there were errors during the run,
          * exit with non-zero status (makefile-friendliness). --CSA */
-        if (lexer.error_count != 0) System.exit(100);
+        if (ErrorManager.getManager().getErrorCount() != 0) System.exit(100);
     }
 
     /*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . .*/
@@ -253,7 +265,9 @@ public class Main {
                 + "  and expects a specification file on standard input if no filename is given.\n"
                 + "  Legal options include:\n"
                 + "    -package name  specify package generated classes go in [default none]\n"
+                + "    -destdir name  specify the destination directory, to store the generated files in\n"
                 + "    -parser name   specify parser class name [default \"parser\"]\n"
+                + "    -typearg args  specify type arguments for parser class\n"
                 + "    -symbols name  specify name for symbol constant class [default \"sym\"]\n"
                 + "    -interface     put symbols in an interface, rather than a class\n"
                 + "    -nonterms      put non terminals in symbol constant class\n"
@@ -297,6 +311,14 @@ public class Main {
 
                 /* record the name */
                 emit.package_name = argv[i];
+            }
+            else if (argv[i].equals("-destdir")) {
+                /* must have an arg */
+                if (++i >= len || argv[i].startsWith("-")
+                        || argv[i].endsWith(".cup"))
+                    usage("-destdir must have a name argument");
+                /* record the name */
+                Main.dest_dir = new java.io.File(argv[i]);
             }
             else if (argv[i].equals("-parser")) {
                 /* must have an arg */
@@ -384,6 +406,16 @@ public class Main {
                 System.out.println(version.title_str);
                 System.exit(1);
             }
+            /* TUM changes; suggested by Henning Niss 20050628*/
+            else if (argv[i].equals("-typearg")) {
+                if (++i >= len || argv[i].startsWith("-")
+                        || argv[i].endsWith(".cup"))
+                    usage("-symbols must have a name argument");
+
+                /* record the typearg */
+                emit.class_type_argument = argv[i];
+            }
+
             /* CSA 24-Jul-1999; suggestion by Jean Vaucher */
             else if (!argv[i].startsWith("-") && i == len - 1) {
                 /* use input from file. */
@@ -415,6 +447,9 @@ public class Main {
     /** Output file for the symbol constant class. */
     protected static PrintWriter symbol_class_file;
 
+    /** Output directory. */
+    protected static File dest_dir = null;
+
     /*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . .*/
 
     /** Open various files used by the system. */
@@ -426,7 +461,7 @@ public class Main {
 
         /* parser class */
         out_name = emit.parser_class_name + ".java";
-        fil = new File(out_name);
+        fil = new File(dest_dir, out_name);
         try {
             parser_class_file =
                     new PrintWriter(new BufferedOutputStream(new FileOutputStream(fil),
@@ -439,7 +474,7 @@ public class Main {
 
         /* symbol constants class */
         out_name = emit.symbol_const_class_name + ".java";
-        fil = new File(out_name);
+        fil = new File(dest_dir, out_name);
         try {
             symbol_class_file =
                     new PrintWriter(new BufferedOutputStream(new FileOutputStream(fil),
@@ -472,7 +507,8 @@ public class Main {
         parser parser_obj;
 
         /* create a parser and parse with it */
-        parser_obj = new parser();
+        ComplexSymbolFactory csf = new ComplexSymbolFactory();
+        parser_obj = new parser(new Lexer(csf), csf);
         try {
             if (opt_do_debug)
                 parser_obj.debug_parse();
@@ -481,7 +517,8 @@ public class Main {
         catch (Exception e) {
             /* something threw an exception.  catch it and emit a message so we 
                have a line number to work with, then re-throw it */
-            lexer.emit_error("Internal error: Unexpected exception");
+            ErrorManager.getManager()
+                        .emit_error("Internal error: Unexpected exception");
             throw e;
         }
     }
@@ -510,9 +547,8 @@ public class Main {
                 /* count it and warn if we are doing warnings */
                 emit.unused_term++;
                 if (!emit.nowarn) {
-                    System.err.println("Warning: Terminal \"" + term.name()
-                            + "\" was declared but never used");
-                    lexer.warning_count++;
+                    ErrorManager.getManager().emit_warning("Terminal \""
+                            + term.name() + "\" was declared but never used");
                 }
             }
         }
@@ -526,9 +562,8 @@ public class Main {
                 /* count and warn if we are doing warnings */
                 emit.unused_term++;
                 if (!emit.nowarn) {
-                    System.err.println("Warning: Non terminal \"" + nt.name()
-                            + "\" was declared but never used");
-                    lexer.warning_count++;
+                    ErrorManager.getManager().emit_warning("Non terminal \""
+                            + nt.name() + "\" was declared but never used");
                 }
             }
         }
@@ -602,9 +637,10 @@ public class Main {
 
         /* if we have more conflicts than we expected issue a message and die */
         if (emit.num_conflicts > expect_conflicts) {
-            System.err.println("*** More conflicts encountered than expected "
-                    + "-- parser generation aborted");
-            lexer.error_count++; // indicate the problem.
+            ErrorManager.getManager()
+                        .emit_error("*** More conflicts encountered than expected "
+                                + "-- parser generation aborted");
+            // indicate the problem.
             // we'll die on return, after clean up.
         }
     }
@@ -652,9 +688,11 @@ public class Main {
                 + " Parser Generation Summary -------");
 
         /* error and warning count */
-        System.err.println("  " + lexer.error_count + " error"
-                + plural(lexer.error_count) + " and " + lexer.warning_count
-                + " warning" + plural(lexer.warning_count));
+        System.err.println("  " + ErrorManager.getManager().getErrorCount()
+                + " error" + plural(ErrorManager.getManager().getErrorCount())
+                + " and " + ErrorManager.getManager().getWarningCount()
+                + " warning"
+                + plural(ErrorManager.getManager().getWarningCount()));
 
         /* basic stats */
         System.err.print("  " + terminal.number() + " terminal"

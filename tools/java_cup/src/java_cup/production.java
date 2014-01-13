@@ -207,6 +207,12 @@ public class production {
         return _all.get(new Integer(indx));
     }
 
+    //Hm Added clear  to clear all static fields
+    public static void clear() {
+        _all.clear();
+        next_index = 0;
+    }
+
     /*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . .*/
 
     /** Total number of productions. */
@@ -384,17 +390,40 @@ public class production {
         /* Put in the left/right value labels */
         if (emit.lr_values())
             ret =
-                    "\t\tint " + labelname + "left = " + emit.pre("stack")
-                            + ".elementAt(" + emit.pre("top") + "-" + offset
-                            + ").left;\n" + "\t\tint " + labelname + "right = "
-                            + emit.pre("stack") + ".elementAt("
-                            + emit.pre("top") + "-" + offset + ").right;\n";
+                    "\t\tint "
+                            + labelname
+                            + "left = "
+                            + emit.pre("stack")
+                            +
+                            // TUM 20050917
+                            ((offset == 0) ? ".peek()" : (".elementAt("
+                                    + emit.pre("top") + "-" + offset + ")"))
+                            + ".left;\n"
+                            + "\t\tint "
+                            + labelname
+                            + "right = "
+                            + emit.pre("stack")
+                            +
+                            // TUM 20050917
+                            ((offset == 0) ? ".peek()" : (".elementAt("
+                                    + emit.pre("top") + "-" + offset + ")"))
+                            + ".right;\n";
         else ret = "";
 
         /* otherwise, just declare label. */
-        return ret + "\t\t" + stack_type + " " + labelname + " = "
-                + emit.pre("stack") + ".elementAt(" + emit.pre("top") + "-"
-                + offset + ").<" + stack_type + "> value();\n";
+        return ret
+                + "\t\t"
+                + stack_type
+                + " "
+                + labelname
+                + " = "
+                + emit.pre("stack")
+                +
+                // TUM 20050917
+                ((offset == 0) ? ".peek()" : (".elementAt(" + emit.pre("top")
+                        + "-" + offset + ")")) + ".<" + stack_type
+                + "> value();\n";
+
     }
 
     /*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . .*/
@@ -527,22 +556,31 @@ public class production {
     ) throws internal_error {
         non_terminal new_nt;
         String declare_str;
-
+        int lastLocation = -1;
         /* walk over the production and process each action */
         for (int act_loc = 0; act_loc < rhs_length(); act_loc++)
             if (rhs(act_loc).is_action()) {
 
                 declare_str = declare_labels(_rhs, act_loc, "");
                 /* create a new non terminal for the action production */
-                new_nt = non_terminal.create_new();
+                new_nt =
+                        non_terminal.create_new(null, lhs().the_symbol()
+                                                           .stack_type()); // TUM 20060608 embedded actions patch
                 new_nt.is_embedded_action = true; /* 24-Mar-1998, CSA */
 
                 /* create a new production with just the action */
-                new action_production(this, new_nt, null, 0, declare_str
-                        + ((action_part) rhs(act_loc)).code_string());
+                new action_production(this,
+                                      new_nt,
+                                      null,
+                                      0,
+                                      declare_str
+                                              + ((action_part) rhs(act_loc)).code_string(),
+                                      (lastLocation == -1) ? -1
+                                              : (act_loc - lastLocation));
 
                 /* replace the action with the generated non terminal */
                 _rhs[act_loc] = new symbol_part(new_nt);
+                lastLocation = act_loc;
             }
     }
 

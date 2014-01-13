@@ -82,6 +82,15 @@ public class terminal extends symbol {
     protected static Hashtable<String, terminal> _all =
             new Hashtable<String, terminal>();
 
+    //Hm Added clear  to clear all static fields
+    public static void clear() {
+        _all.clear();
+        _all_by_index.clear();
+        next_index = 0;
+        EOF = new terminal("EOF");
+        error = new terminal("error");
+    }
+
     /** Access to all terminals. */
     public static Enumeration<terminal> all() {
         return _all.elements();
@@ -122,12 +131,12 @@ public class terminal extends symbol {
     /*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . .*/
 
     /** Special terminal for end of input. */
-    public static final terminal EOF = new terminal("EOF");
+    public static terminal EOF = new terminal("EOF");
 
     /*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . .*/
 
     /** special terminal used for error recovery */
-    public static final terminal error = new terminal("error");
+    public static terminal error = new terminal("error");
 
     /*-----------------------------------------------------------*/
     /*--- General Methods ---------------------------------------*/

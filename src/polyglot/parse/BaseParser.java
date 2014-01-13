@@ -76,7 +76,7 @@ public abstract class BaseParser extends java_cup.runtime.lr_parser {
         // use two positions, since the parser does one token lookahead
         position = prev_pos;
         prev_pos = t.getPosition();
-        return new Symbol(t.symbol(), t);
+        return getSymbolFactory().newSymbol(t.toString(), t.symbol(), t);
     }
 
     public Position position() {

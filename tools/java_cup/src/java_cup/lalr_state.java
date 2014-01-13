@@ -92,6 +92,13 @@ public class lalr_state {
         return _all.elements();
     }
 
+    //Hm Added clear  to clear all static fields
+    public static void clear() {
+        _all.clear();
+        _all_kernels.clear();
+        next_index = 0;
+    }
+
     /*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . .*/
 
     /** Indicate total number of states there are. */
@@ -709,12 +716,12 @@ public class lalr_state {
         }
     }
 
-    private void errOutput(ByteArrayOutputStream s) {
+    private void errOutput(StringBuffer sb, ByteArrayOutputStream s) {
         try {
-            System.err.print(s.toString("UTF-8"));
+            sb.append(s.toString("UTF-8"));
         }
         catch (java.io.UnsupportedEncodingException e) {
-            System.err.print("<UNENCODABLE>");
+            sb.append("<UNENCODABLE>");
         }
     }
 
@@ -729,52 +736,52 @@ public class lalr_state {
             throws internal_error {
         boolean comma_flag = false;
 
-        System.err.println("*** Reduce/Reduce conflict found in state #"
-                + index());
-        System.err.print("  between ");
-        System.err.println(itm1.to_simple_string());
+        StringBuffer message =
+                new StringBuffer("*** Reduce/Reduce conflict found in state #");
+        message.append(index());
+        message.append("\n  between ");
+        message.append(itm1.to_simple_string());
+        message.append("\n");
         /* ACM extension */
         ByteArrayOutputStream ds = new ByteArrayOutputStream();
         if (Main.report_counterexamples) {
-            System.err.print("    Example:    ");
-            report_shortest_path(itm1, System.err, new PrintStream(ds));
-            System.err.println(" (*)");
-            System.err.print("    Derivation: ");
-            errOutput(ds);
-            System.err.println(" ] (*)\n");
+            message.append("    Example:    ");
+            report_shortest_path(itm1, message, new PrintStream(ds));
+            message.append(" (*)\n    Derivation: ");
+            errOutput(message, ds);
+            message.append(" ] (*)\n\n");
         }
         /* End ACM extension */
-        System.err.print("  and     ");
-        System.err.println(itm2.to_simple_string());
+        message.append("  and     ");
+        message.append(itm2.to_simple_string());
+        message.append("\n");
         /* ACM extension */
         ds.reset();
         if (Main.report_counterexamples) {
-            System.err.print("    Example:    ");
-            report_shortest_path(itm2, System.err, new PrintStream(ds));
-            System.err.println(" (*)");
-            System.err.print("    Derivation: ");
-            errOutput(ds);
-            System.err.println(" ] (*)\n");
+            message.append("    Example:    ");
+            report_shortest_path(itm2, message, new PrintStream(ds));
+            message.append(" (*)\n    Derivation: ");
+            errOutput(message, ds);
+            message.append(" ] (*)\n");
         }
         /* End ACM extension */
-        System.err.print("  under symbols: {");
+        message.append("  under symbols: {");
         for (int t = 0; t < terminal.number(); t++) {
             if (itm1.lookahead().contains(t) && itm2.lookahead().contains(t)) {
                 if (comma_flag)
-                    System.err.print(", ");
+                    message.append(", ");
                 else comma_flag = true;
-                System.err.print(terminal.find(t).name());
+                message.append(terminal.find(t).name());
             }
         }
-        System.err.println("}");
-        System.err.print("  Resolved in favor of ");
+        message.append("}\n  Resolved in favor of ");
         if (itm1.the_production().index() < itm2.the_production().index())
-            System.err.println("the first production.\n");
-        else System.err.println("the second production.\n");
+            message.append("the first production.\n");
+        else message.append("the second production.\n");
 
         /* count the conflict */
         emit.num_conflicts++;
-        lexer.warning_count++;
+        ErrorManager.getManager().emit_warning(message.toString());
     }
 
     /*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . .*/
@@ -790,22 +797,24 @@ public class lalr_state {
         symbol shift_sym;
 
         /* emit top part of message including the reduce item */
-        System.err.println("*** Shift/Reduce conflict found in state #"
-                + index());
-        System.err.print("  between reduction on ");
-        System.err.println(red_itm.to_simple_string());
+        StringBuffer message =
+                new StringBuffer("*** Shift/Reduce conflict found in state #");
+        message.append(index());
+        message.append("\n  between reduction on ");
+        message.append(red_itm.to_simple_string());
+        message.append("\n");
         /* ACM extension */
         ByteArrayOutputStream ds = new ByteArrayOutputStream();
         if (Main.report_counterexamples) {
-            System.err.print("    Example:    ");
-            report_shortest_path(red_itm, System.err, new PrintStream(ds));
-            System.err.print(" (*) ");
-            System.err.println(terminal.find(conflict_sym).name());
-            System.err.print("    Derivation: ");
-            errOutput(ds);
-            System.err.print(" ] (*) ");
-            System.err.println(terminal.find(conflict_sym).name());
-            System.err.println("");
+            message.append("    Example:    ");
+            report_shortest_path(red_itm, message, new PrintStream(ds));
+            message.append(" (*) ");
+            message.append(terminal.find(conflict_sym).name());
+            message.append("\n    Derivation: ");
+            errOutput(message, ds);
+            message.append(" ] (*) ");
+            message.append(terminal.find(conflict_sym).name());
+            message.append("\n\n");
         }
         /* end ACM extension */
 
@@ -820,34 +829,33 @@ public class lalr_state {
                 if (!shift_sym.is_non_term()
                         && shift_sym.index() == conflict_sym) {
                     /* yes, report on it */
-                    System.err.println("  and shift on "
-                            + itm.to_simple_string());
+                    message.append("  and shift on ");
+                    message.append(itm.to_simple_string());
+                    message.append("\n");
                     /* ACM extension */
                     if (Main.report_counterexamples) {
                         ds.reset();
-                        System.err.print("    Example:    ");
-                        report_shortest_path(itm,
-                                             System.err,
-                                             new PrintStream(ds));
-                        System.err.print(" (*) ");
-                        System.err.println(right_of_dot(itm));
-                        System.err.print("    Derivation: ");
-                        errOutput(ds);
-                        System.err.print(" (*) ");
-                        System.err.println(right_of_dot(itm));
-                        System.err.println("");
+                        message.append("    Example:    ");
+                        report_shortest_path(itm, message, new PrintStream(ds));
+                        message.append(" (*) ");
+                        message.append(right_of_dot(itm));
+                        message.append("\n    Derivation: ");
+                        errOutput(message, ds);
+                        message.append(" (*) ");
+                        message.append(right_of_dot(itm));
+                        message.append("\n\n");
                     }
                     /* end ACM extension */
                 }
             }
         }
-        System.err.println("  under symbol "
-                + terminal.find(conflict_sym).name());
-        System.err.println("  Resolved in favor of shifting.\n");
+        message.append("  under symbol ");
+        message.append(terminal.find(conflict_sym).name());
+        message.append("\n  Resolved in favor of shifting.\n");
 
         /* count the conflict */
         emit.num_conflicts++;
-        lexer.warning_count++;
+        ErrorManager.getManager().emit_warning(message.toString());
     }
 
     /* ACM extension */
@@ -896,7 +904,7 @@ public class lalr_state {
      * textual description including derivation information.
      * This output is useful for diagnosing conflicts in the grammar.
      */
-    protected void report_shortest_path(lalr_item itm, PrintStream example_s,
+    protected void report_shortest_path(lalr_item itm, StringBuffer example_s,
             PrintStream derivation_s) throws internal_error {
         Path p = shortest_path(itm);
         boolean first = true;
@@ -907,9 +915,9 @@ public class lalr_state {
                 String name = tr.on_symbol().name();
                 if (!first) {
                     derivation_s.print(" ");
-                    example_s.print(" ");
+                    example_s.append(" ");
                 }
-                example_s.print(name);
+                example_s.append(name);
                 derivation_s.print(name);
             }
             else if (o instanceof production) {

@@ -157,8 +157,9 @@ public class PPGSpec extends Spec {
             parseCode +=
                     "@Override\n" + "public Symbol " + method
                             + "() throws Exception {\n" + "\t" + currSymbolName
-                            + " = " + "new Symbol(" + PPG.SYMBOL_CLASS_NAME
-                            + "." + token + ")" + ";\n" + "\t"
+                            + " = " + "getSymbolFactory().newSymbol(\""
+                            + method + "\", " + PPG.SYMBOL_CLASS_NAME + "."
+                            + token + ")" + ";\n" + "\t"
                             + "return parse();\n}\n\n";
         }
         // append parseCode to the actual parse code

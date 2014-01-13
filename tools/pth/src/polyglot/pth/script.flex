@@ -1,5 +1,6 @@
 package polyglot.pth;
 
+import java_cup.runtime.ComplexSymbolFactory;
 import java_cup.runtime.Symbol;
 
 @SuppressWarnings("all")
@@ -9,11 +10,20 @@ import java_cup.runtime.Symbol;
 %class Lexer_c
 
 %{
-   StringBuffer string = new StringBuffer();
+  private static ComplexSymbolFactory csf = new ComplexSymbolFactory();
+  StringBuffer string = new StringBuffer();
+
+  private Symbol sym(String name, int id) {
+    return csf.newSymbol(name, id);
+  }
+
+  private Symbol sym(String name, int id, Object o) {
+    return csf.newSymbol(name, id, o);
+  }
 %}
 
 %eofval{
-return (new Symbol(sym.EOF));
+return (sym("EOF", sym.EOF));
 %eofval}
 
 LINE_TERMINATOR = [\r]|[\n]|[\r\n]
@@ -33,7 +43,7 @@ IDENT                = [a-zA-Z0-9_\:\.\$\/\\\-]*
 %%
 <YYINITIAL> {
    /* identifiers */
-   {IDENT}                     { return new Symbol(sym.IDENT, yytext()); }
+   {IDENT}                     { return sym("ID", sym.IDENT, yytext()); }
 
    /* literals */
    \"                             { string.setLength(0); yybegin(STRING_LIT); }
@@ -45,20 +55,20 @@ IDENT                = [a-zA-Z0-9_\:\.\$\/\\\-]*
    {WHITE_SPACE}                  { /* ignore white space. */ }
 
    /* symbols */
-   "+"                            { return new Symbol(sym.PLUS); }
-   ";"                            { return new Symbol(sym.SEMICOLON); }
-   ","                            { return new Symbol(sym.COMMA); }
-   "("                            { return new Symbol(sym.LPAREN); }
-   ")"                            { return new Symbol(sym.RPAREN); }
-   "["                            { return new Symbol(sym.LBRACK); }
-   "]"                            { return new Symbol(sym.RBRACK); }
-   "{"                            { return new Symbol(sym.LBRACE); }
-   "}"                            { return new Symbol(sym.RBRACE); }
+   "+"                            { return sym("+", sym.PLUS); }
+   ";"                            { return sym(";", sym.SEMICOLON); }
+   ","                            { return sym(",", sym.COMMA); }
+   "("                            { return sym("(", sym.LPAREN); }
+   ")"                            { return sym(")", sym.RPAREN); }
+   "["                            { return sym("[", sym.LBRACK); }
+   "]"                            { return sym("]", sym.RBRACK); }
+   "{"                            { return sym("{", sym.LBRACE); }
+   "}"                            { return sym("}", sym.RBRACE); }
 }
 
 <STRING_LIT> {
    \"                             { yybegin(YYINITIAL);
-                                    return new Symbol(sym.STRING_LITERAL,
+                                    return sym("STRING", sym.STRING_LITERAL,
                                     string.toString()); }
    [^\n\r\"\\]+                   { string.append( yytext() ); }
    \\t                            { string.append('\t'); }
@@ -69,7 +79,7 @@ IDENT                = [a-zA-Z0-9_\:\.\$\/\\\-]*
    \\                             { string.append('\\'); }
 }
 
-\^Cd   { return new Symbol(sym.EOF); }
+\^Cd   { return sym("EOF", sym.EOF); }
 
 /* error fallback */
 .|\n                             { throw new Error("Illegal character <"+

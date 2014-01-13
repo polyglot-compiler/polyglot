@@ -40,6 +40,7 @@
 	<property name="pao.dir" location="${examples.dir}/pao" />
 	<property name="coffer.dir" location="${examples.dir}/coffer" />
 	<property name="carray.dir" location="${examples.dir}/carray" />
+	<property name="covarRet.dir" location="${examples.dir}/covarRet" />
 
 	<!--
 	<property name="cvs.root" value=":pserver:anonymous@gforge.cis.cornell.edu:/cvsroot/polyglot" />
@@ -313,6 +314,11 @@
 	</target>
 
 	<target name="cup" depends="init" description="Builds the extended CUP parser generator">
+		<antcall target="jflex-lexer">
+			<param name="lexer.dir" value="${cup.src}/java_cup" />
+			<param name="lexer.class" value="Lexer" />
+			<param name="jflex.file" value="Lexer.jflex" />
+		</antcall>
 		<antcall target="cup-parser-using-jar">
 			<param name="parser.dir" value="${cup.src}/java_cup" />
 			<param name="cup.file" value="parser.cup" />
