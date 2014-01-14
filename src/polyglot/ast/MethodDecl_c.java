@@ -480,7 +480,7 @@ public class MethodDecl_c extends Term_c implements MethodDecl,
 
     @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
-        tr.lang().prettyPrintHeader(this, flags(), w, tr);
+        ((JLang) tr.lang()).prettyPrintHeader(this, flags(), w, tr);
 
         if (body != null) {
             printSubStmt(body, w, tr);

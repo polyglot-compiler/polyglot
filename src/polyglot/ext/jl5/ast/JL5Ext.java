@@ -3,7 +3,7 @@ package polyglot.ext.jl5.ast;
 import polyglot.ast.Expr;
 import polyglot.ast.Ext;
 import polyglot.ast.Ext_c;
-import polyglot.ast.JLang;
+import polyglot.ast.Lang;
 import polyglot.ast.Node;
 import polyglot.ext.jl5.visit.JL5Translator;
 import polyglot.types.Context;
@@ -47,7 +47,7 @@ public class JL5Ext extends Ext_c {
     }
 
     @Override
-    public Context enterChildScope(JLang lang, Node child, Context c) {
+    public Context enterChildScope(Lang lang, Node child, Context c) {
         return this.superLang().enterChildScope(this.node(), lang, child, c);
     }
 

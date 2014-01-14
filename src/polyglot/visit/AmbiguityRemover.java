@@ -68,6 +68,11 @@ public class AmbiguityRemover extends DisambiguationDriver {
     }
 
     @Override
+    public JLang lang() {
+        return (JLang) super.lang();
+    }
+
+    @Override
     public Node override(Node parent, Node n) {
         if (!visitSigs && n instanceof ClassMember && !(n instanceof ClassDecl)) {
             return n;

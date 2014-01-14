@@ -47,6 +47,11 @@ public class TypeChecker extends DisambiguationDriver {
         super(job, ts, nf);
     }
 
+    @Override
+    public JLang lang() {
+        return (JLang) super.lang();
+    }
+
     public void setCheckConstants(boolean check) {
         this.checkConstants = check;
     }

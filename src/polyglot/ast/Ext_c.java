@@ -193,7 +193,7 @@ public abstract class Ext_c implements Ext {
     }
 
     @Override
-    public Context enterChildScope(JLang lang, Node child, Context c) {
+    public Context enterChildScope(Lang lang, Node child, Context c) {
         return node().enterChildScope(lang, child, c);
     }
 
@@ -398,7 +398,7 @@ public abstract class Ext_c implements Ext {
     }
 
     @Override
-    public void dump(JLang lang, OutputStream os) {
+    public void dump(Lang lang, OutputStream os) {
         node().dump(lang, os);
     }
 
@@ -409,7 +409,7 @@ public abstract class Ext_c implements Ext {
     }
 
     @Override
-    public void dump(JLang lang, Writer w) {
+    public void dump(Lang lang, Writer w) {
         node().dump(lang, w);
     }
 
@@ -420,7 +420,7 @@ public abstract class Ext_c implements Ext {
     }
 
     @Override
-    public void prettyPrint(JLang lang, OutputStream os) {
+    public void prettyPrint(Lang lang, OutputStream os) {
         node().prettyPrint(lang, os);
     }
 
@@ -431,7 +431,7 @@ public abstract class Ext_c implements Ext {
     }
 
     @Override
-    public void prettyPrint(JLang lang, Writer w) {
+    public void prettyPrint(Lang lang, Writer w) {
         node().prettyPrint(lang, w);
     }
 

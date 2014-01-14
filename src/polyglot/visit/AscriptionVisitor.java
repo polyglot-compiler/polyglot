@@ -27,6 +27,7 @@
 package polyglot.visit;
 
 import polyglot.ast.Expr;
+import polyglot.ast.JLang;
 import polyglot.ast.Node;
 import polyglot.ast.NodeFactory;
 import polyglot.frontend.Job;
@@ -40,7 +41,7 @@ import polyglot.types.TypeSystem;
     The major advantage of this visitor is the new <code>ascribe()</code>
     method, which allows AST translations based on the expression
     and also the type that is expected. For the base translation (standard
-    Java), the type of the expression and the type that is expceted 
+    Java), the type of the expression and the type that is expected 
     are the same. Language extensions however may not have this property, 
     and can take advantage of the <code>ascribe</code> method to transform
     the AST into a different form that will pass Java type-checking.
@@ -61,6 +62,11 @@ public class AscriptionVisitor extends ContextVisitor {
         super(job, ts, nf);
         type = null;
         outer = null;
+    }
+
+    @Override
+    public JLang lang() {
+        return (JLang) super.lang();
     }
 
     // FIXME: what does this do?

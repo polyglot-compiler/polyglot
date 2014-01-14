@@ -28,6 +28,7 @@ package polyglot.visit;
 
 import polyglot.ast.Expr;
 import polyglot.ast.JLang;
+import polyglot.ast.Lang;
 import polyglot.ast.Node;
 import polyglot.ast.NodeFactory;
 import polyglot.frontend.Job;
@@ -42,6 +43,11 @@ import polyglot.types.TypeSystem;
 public class ConstantChecker extends ContextVisitor {
     public ConstantChecker(Job job, TypeSystem ts, NodeFactory nf) {
         super(job, ts, nf);
+    }
+
+    @Override
+    public JLang lang() {
+        return (JLang) super.lang();
     }
 
     /*
@@ -61,7 +67,7 @@ public class ConstantChecker extends ContextVisitor {
     protected static class TypeCheckChecker extends NodeVisitor {
         public boolean checked = true;
 
-        public TypeCheckChecker(JLang lang) {
+        public TypeCheckChecker(Lang lang) {
             super(lang);
         }
 

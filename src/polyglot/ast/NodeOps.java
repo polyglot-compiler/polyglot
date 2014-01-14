@@ -96,7 +96,7 @@ public interface NodeOps {
      * @return the <code>Context</code> to be used for visiting node 
      *           <code>child</code>
      */
-    public Context enterChildScope(JLang lang, Node child, Context c);
+    public Context enterChildScope(Lang lang, Node child, Context c);
 
     /**
      * Add any declarations to the context that should be in scope when
@@ -305,28 +305,28 @@ public interface NodeOps {
     public void dump(OutputStream os);
 
     /** Dump the AST for debugging. */
-    public void dump(JLang lang, OutputStream os);
+    public void dump(Lang lang, OutputStream os);
 
     /** Dump the AST for debugging. */
     @Deprecated
     public void dump(Writer w);
 
     /** Dump the AST for debugging. */
-    public void dump(JLang lang, Writer w);
+    public void dump(Lang lang, Writer w);
 
     /** Pretty-print the AST for debugging. */
     @Deprecated
     public void prettyPrint(OutputStream os);
 
     /** Pretty-print the AST for debugging. */
-    public void prettyPrint(JLang lang, OutputStream os);
+    public void prettyPrint(Lang lang, OutputStream os);
 
     /** Pretty-print the AST for debugging. */
     @Deprecated
     public void prettyPrint(Writer w);
 
     /** Pretty-print the AST for debugging. */
-    public void prettyPrint(JLang lang, Writer w);
+    public void prettyPrint(Lang lang, Writer w);
 
     /**
      * Pretty-print the AST using the given code writer.

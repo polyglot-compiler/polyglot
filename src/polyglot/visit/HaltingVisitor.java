@@ -30,7 +30,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 
-import polyglot.ast.JLang;
+import polyglot.ast.Lang;
 import polyglot.ast.Node;
 
 /**
@@ -42,7 +42,7 @@ public abstract class HaltingVisitor extends NodeVisitor {
     protected Node bypassParent;
     protected Collection<Node> bypass;
 
-    protected HaltingVisitor(JLang lang) {
+    protected HaltingVisitor(Lang lang) {
         super(lang);
     }
 

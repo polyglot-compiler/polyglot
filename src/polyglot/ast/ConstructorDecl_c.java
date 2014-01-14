@@ -416,7 +416,7 @@ public class ConstructorDecl_c extends Term_c implements ConstructorDecl,
 
     @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
-        tr.lang().prettyPrintHeader(this, flags(), w, tr);
+        ((JLang) tr.lang()).prettyPrintHeader(this, flags(), w, tr);
 
         if (body != null) {
             printSubStmt(body, w, tr);

@@ -54,12 +54,10 @@ import polyglot.visit.TypeBuilder;
 import polyglot.visit.TypeChecker;
 
 /**
- * <code>JL_c</code> is the super class of JL node delegate objects.
- * It defines default implementations of the methods which implement compiler
- * passes, dispatching to the node to perform the actual work of the pass.
- * Language extensions may subclass <code>JL_c</code> for individual node
- * classes or may reimplement all compiler passes in a new class implementing
- * the <code>JL</code> interface.
+ * {@code JLang_c} defines the dispatching mechanism to methods which implement
+ * Java compiler operations.  Language extensions may override methods that
+ * determine the appropriate object which implements AST operations (such as
+ * NodeOps) to redirect dispatching to appropriate extension code.
  */
 public class JLang_c implements JLang, Serializable {
     private static final long serialVersionUID = SerialVersionUID.generate();
@@ -106,7 +104,7 @@ public class JLang_c implements JLang, Serializable {
     }
 
     @Override
-    public final Context enterChildScope(Node n, JLang lang, Node child,
+    public final Context enterChildScope(Node n, Lang lang, Node child,
             Context c) {
         return NodeOps(n).enterChildScope(lang, child, c);
     }
@@ -193,22 +191,22 @@ public class JLang_c implements JLang, Serializable {
     }
 
     @Override
-    public final void dump(Node n, JLang lang, OutputStream os) {
+    public final void dump(Node n, Lang lang, OutputStream os) {
         NodeOps(n).dump(lang, os);
     }
 
     @Override
-    public final void dump(Node n, JLang lang, Writer w) {
+    public final void dump(Node n, Lang lang, Writer w) {
         NodeOps(n).dump(lang, w);
     }
 
     @Override
-    public final void prettyPrint(Node n, JLang lang, OutputStream os) {
+    public final void prettyPrint(Node n, Lang lang, OutputStream os) {
         NodeOps(n).prettyPrint(lang, os);
     }
 
     @Override
-    public final void prettyPrint(Node n, JLang lang, Writer w) {
+    public final void prettyPrint(Node n, Lang lang, Writer w) {
         NodeOps(n).prettyPrint(lang, w);
     }
 

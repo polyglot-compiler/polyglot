@@ -31,6 +31,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
+import polyglot.ast.JLang;
 import polyglot.ast.Node;
 import polyglot.ast.NodeFactory;
 import polyglot.frontend.Job;
@@ -89,6 +90,11 @@ public class ExceptionChecker extends ErrorHandlingVisitor {
         super(job, ts, nf);
         this.outer = null;
         this.catchAllThrowable = false;
+    }
+
+    @Override
+    public JLang lang() {
+        return (JLang) super.lang();
     }
 
     public ExceptionChecker push(UncaughtReporter reporter) {

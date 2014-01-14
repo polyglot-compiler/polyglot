@@ -142,7 +142,7 @@ public class JLDel_c implements JLDel, Copy, Serializable {
     }
 
     @Override
-    public Context enterChildScope(JLang lang, Node child, Context c) {
+    public Context enterChildScope(Lang lang, Node child, Context c) {
         return jl().enterChildScope(lang, child, c);
     }
 
@@ -347,7 +347,8 @@ public class JLDel_c implements JLDel, Copy, Serializable {
     }
 
     @Override
-    public void dump(JLang lang, OutputStream os) {
+    public void dump(Lang lang, OutputStream os) {
+        jl().dump(lang, os);
     }
 
     @Deprecated
@@ -357,7 +358,8 @@ public class JLDel_c implements JLDel, Copy, Serializable {
     }
 
     @Override
-    public void dump(JLang lang, Writer w) {
+    public void dump(Lang lang, Writer w) {
+        jl().dump(lang, w);
     }
 
     @Deprecated
@@ -367,7 +369,8 @@ public class JLDel_c implements JLDel, Copy, Serializable {
     }
 
     @Override
-    public void prettyPrint(JLang lang, OutputStream os) {
+    public void prettyPrint(Lang lang, OutputStream os) {
+        jl().prettyPrint(lang, os);
     }
 
     @Deprecated
@@ -377,7 +380,8 @@ public class JLDel_c implements JLDel, Copy, Serializable {
     }
 
     @Override
-    public void prettyPrint(JLang lang, Writer w) {
+    public void prettyPrint(Lang lang, Writer w) {
+        jl().prettyPrint(lang, w);
     }
 
     /**

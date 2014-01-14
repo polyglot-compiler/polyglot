@@ -40,6 +40,7 @@ import polyglot.ast.Binary;
 import polyglot.ast.CodeDecl;
 import polyglot.ast.CodeNode;
 import polyglot.ast.Expr;
+import polyglot.ast.JLang;
 import polyglot.ast.Node;
 import polyglot.ast.NodeFactory;
 import polyglot.ast.Term;
@@ -150,6 +151,11 @@ public abstract class DataFlow<FlowItem extends DataFlow.Item> extends
         if (dataflowOnEntry)
             this.flowgraphStack = new LinkedList<FlowGraphSource<FlowItem>>();
         else this.flowgraphStack = null;
+    }
+
+    @Override
+    public JLang lang() {
+        return (JLang) super.lang();
     }
 
     /**

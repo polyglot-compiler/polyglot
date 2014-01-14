@@ -280,7 +280,7 @@ public class ClassDecl_c extends Term_c implements ClassDecl, ClassDeclOps {
     }
 
     @Override
-    public Context enterChildScope(JLang lang, Node child, Context c) {
+    public Context enterChildScope(Lang lang, Node child, Context c) {
         if (child == this.body) {
             TypeSystem ts = c.typeSystem();
             c = c.pushClass(type, ts.staticTarget(type).toClass());
@@ -681,9 +681,9 @@ public class ClassDecl_c extends Term_c implements ClassDecl, ClassDeclOps {
 
     @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
-        tr.lang().prettyPrintHeader(this, w, tr);
+        ((JLang) tr.lang()).prettyPrintHeader(this, w, tr);
         print(body(), w, tr);
-        tr.lang().prettyPrintFooter(this, w, tr);
+        ((JLang) tr.lang()).prettyPrintFooter(this, w, tr);
     }
 
     @Override

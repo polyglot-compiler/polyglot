@@ -214,7 +214,7 @@ public class New_c extends Expr_c implements New, NewOps {
     }
 
     @Override
-    public Context enterChildScope(JLang lang, Node child, Context c) {
+    public Context enterChildScope(Lang lang, Node child, Context c) {
         if (child == body && anonType != null && body != null) {
             c = c.pushClass(anonType, anonType);
         }
@@ -722,7 +722,7 @@ public class New_c extends Expr_c implements New, NewOps {
 
     @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
-        tr.lang().printQualifier(this, w, tr);
+        ((JLang) tr.lang()).printQualifier(this, w, tr);
         w.write("new ");
 
         // We need to be careful when pretty printing "new" expressions for
@@ -737,8 +737,8 @@ public class New_c extends Expr_c implements New, NewOps {
             print(objectType, w, tr);
         }
 
-        tr.lang().printArgs(this, w, tr);
-        tr.lang().printBody(this, w, tr);
+        ((JLang) tr.lang()).printArgs(this, w, tr);
+        ((JLang) tr.lang()).printBody(this, w, tr);
     }
 
     @Override

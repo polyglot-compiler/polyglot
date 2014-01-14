@@ -308,7 +308,7 @@ public abstract class Node_c implements Node {
     }
 
     @Override
-    public Context enterChildScope(JLang lang, Node child, Context c) {
+    public Context enterChildScope(Lang lang, Node child, Context c) {
         return lang.enterScope(child, c);
     }
 
@@ -409,7 +409,7 @@ public abstract class Node_c implements Node {
     }
 
     @Override
-    public void dump(JLang lang, OutputStream os) {
+    public void dump(Lang lang, OutputStream os) {
         CodeWriter cw = Compiler.createCodeWriter(os);
         NodeVisitor dumper = new DumpAst(lang, cw);
         dumper = dumper.begin();
@@ -430,7 +430,7 @@ public abstract class Node_c implements Node {
     }
 
     @Override
-    public void dump(JLang lang, Writer w) {
+    public void dump(Lang lang, Writer w) {
         CodeWriter cw = Compiler.createCodeWriter(w);
         NodeVisitor dumper = new DumpAst(lang, cw);
         dumper = dumper.begin();
@@ -452,7 +452,7 @@ public abstract class Node_c implements Node {
     }
 
     @Override
-    public void prettyPrint(JLang lang, OutputStream os) {
+    public void prettyPrint(Lang lang, OutputStream os) {
         try {
             CodeWriter cw = Compiler.createCodeWriter(os);
             lang.prettyPrint(this, cw, new PrettyPrinter(lang));
@@ -475,7 +475,7 @@ public abstract class Node_c implements Node {
     }
 
     @Override
-    public void prettyPrint(JLang lang, Writer w) {
+    public void prettyPrint(Lang lang, Writer w) {
         try {
             CodeWriter cw = Compiler.createCodeWriter(w);
             lang.prettyPrint(this, cw, new PrettyPrinter(lang));

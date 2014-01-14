@@ -31,7 +31,7 @@ import java.util.List;
 
 import polyglot.ast.ClassDecl;
 import polyglot.ast.ClassDeclOps;
-import polyglot.ast.JLang;
+import polyglot.ast.Lang;
 import polyglot.ast.Node;
 import polyglot.ast.NodeFactory;
 import polyglot.ast.Node_c;
@@ -188,7 +188,7 @@ public class JL5ClassDeclExt extends JL5AnnotatedElementExt implements
      * @see polyglot.ast.NodeOps#enterScope(polyglot.types.Context)
      */
     @Override
-    public Context enterChildScope(JLang lang, Node child, Context c) {
+    public Context enterChildScope(Lang lang, Node child, Context c) {
         ClassDecl n = (ClassDecl) this.node();
         JL5ClassDeclExt ext = (JL5ClassDeclExt) JL5Ext.ext(n);
 
