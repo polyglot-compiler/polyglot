@@ -104,9 +104,8 @@ public class JLang_c implements JLang, Serializable {
     }
 
     @Override
-    public final Context enterChildScope(Node n, Lang lang, Node child,
-            Context c) {
-        return NodeOps(n).enterChildScope(lang, child, c);
+    public final Context enterChildScope(Node n, Node child, Context c) {
+        return NodeOps(n).enterChildScope(child, c);
     }
 
     @Override

@@ -82,7 +82,7 @@ public class JL5LocalDeclExt extends JL5AnnotatedElementExt {
             w.newline();
         }
 
-        this.superLang().prettyPrint(this.node(), w, tr);
+        superLang().prettyPrint(this.node(), w, tr);
     }
 
 }

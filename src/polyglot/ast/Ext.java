@@ -54,13 +54,6 @@ public interface Ext extends NodeOps, Copy, Serializable {
     Ext ext(Ext ext);
 
     /**
-     * The delegate object to invoke "superclass" functionality.
-     * If null, this superclass functionality will by default be delegated
-     * to the node. However, extensions to JL can override this if needed.
-     */
-    JLang superLang();
-
-    /**
      * Dump the AST node for debugging purposes.
      */
     void dump(CodeWriter w);

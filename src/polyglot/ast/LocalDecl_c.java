@@ -202,11 +202,11 @@ public class LocalDecl_c extends Stmt_c implements LocalDecl {
      * initializer
      */
     @Override
-    public Context enterChildScope(Lang lang, Node child, Context c) {
+    public Context enterChildScope(Node child, Context c) {
         if (child == init) {
             c.addVariable(li);
         }
-        return super.enterChildScope(lang, child, c);
+        return super.enterChildScope(child, c);
     }
 
     @Override

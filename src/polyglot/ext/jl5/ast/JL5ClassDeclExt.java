@@ -31,7 +31,6 @@ import java.util.List;
 
 import polyglot.ast.ClassDecl;
 import polyglot.ast.ClassDeclOps;
-import polyglot.ast.Lang;
 import polyglot.ast.Node;
 import polyglot.ast.NodeFactory;
 import polyglot.ast.Node_c;
@@ -124,7 +123,8 @@ public class JL5ClassDeclExt extends JL5AnnotatedElementExt implements
 
     @Override
     public Node buildTypes(TypeBuilder tb) throws SemanticException {
-        ClassDecl n = (ClassDecl) this.superLang().buildTypes(this.node(), tb);
+        ClassDecl n =
+                (ClassDecl) JL5Ext.superLang().buildTypes(this.node(), tb);
         JL5ClassDeclExt ext = (JL5ClassDeclExt) JL5Ext.ext(n);
 
         JL5TypeSystem ts = (JL5TypeSystem) tb.typeSystem();
@@ -188,7 +188,7 @@ public class JL5ClassDeclExt extends JL5AnnotatedElementExt implements
      * @see polyglot.ast.NodeOps#enterScope(polyglot.types.Context)
      */
     @Override
-    public Context enterChildScope(Lang lang, Node child, Context c) {
+    public Context enterChildScope(Node child, Context c) {
         ClassDecl n = (ClassDecl) this.node();
         JL5ClassDeclExt ext = (JL5ClassDeclExt) JL5Ext.ext(n);
 
@@ -206,7 +206,7 @@ public class JL5ClassDeclExt extends JL5AnnotatedElementExt implements
         for (ParamTypeNode tn : ext.paramTypes()) {
             ((JL5Context) c).addTypeVariable((TypeVariable) tn.type());
         }
-        return lang.enterScope(child, c);
+        return c.lang().enterScope(child, c);
     }
 
     @Override
@@ -362,17 +362,16 @@ public class JL5ClassDeclExt extends JL5AnnotatedElementExt implements
 
     @Override
     public void prettyPrintFooter(CodeWriter w, PrettyPrinter tr) {
-        this.superLang().prettyPrintFooter(this.node(), w, tr);
+        superLang().prettyPrintFooter(this.node(), w, tr);
     }
 
     @Override
     public Node addDefaultConstructor(TypeSystem ts, NodeFactory nf,
             ConstructorInstance defaultConstructorInstance)
             throws SemanticException {
-        return this.superLang()
-                   .addDefaultConstructor(this.node(),
-                                          ts,
-                                          nf,
-                                          defaultConstructorInstance);
+        return superLang().addDefaultConstructor(this.node(),
+                                                 ts,
+                                                 nf,
+                                                 defaultConstructorInstance);
     }
 }

@@ -135,15 +135,9 @@ public class JLDel_c implements JLDel, Copy, Serializable {
      * @return the <code>Context</code> to be used for visiting node 
      *           <code>child</code>
      */
-    @Deprecated
     @Override
     public Context enterChildScope(Node child, Context c) {
         return jl().enterChildScope(child, c);
-    }
-
-    @Override
-    public Context enterChildScope(Lang lang, Node child, Context c) {
-        return jl().enterChildScope(lang, child, c);
     }
 
     /**

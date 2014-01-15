@@ -301,15 +301,9 @@ public abstract class Node_c implements Node {
         return c;
     }
 
-    @Deprecated
     @Override
     public Context enterChildScope(Node child, Context c) {
-        return enterChildScope(JLangToJLDel.instance, child, c);
-    }
-
-    @Override
-    public Context enterChildScope(Lang lang, Node child, Context c) {
-        return lang.enterScope(child, c);
+        return c.lang().enterScope(child, c);
     }
 
     /**

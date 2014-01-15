@@ -58,7 +58,7 @@ public class JL5FieldDeclExt extends JL5AnnotatedElementExt {
             w.newline();
         }
 
-        this.superLang().prettyPrint(this.node(), w, tr);
+        superLang().prettyPrint(this.node(), w, tr);
     }
 
 }

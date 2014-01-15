@@ -171,7 +171,7 @@ public class JL5CanonicalTypeNodeExt extends JL5Ext {
 
         }
 
-        return this.superLang().typeCheck(this.node(), tc);
+        return superLang().typeCheck(this.node(), tc);
     }
 
     private Set<TypeVariable> findInstanceTypeVariables(Type t) {

@@ -10,6 +10,8 @@ package pao.extension;
 import pao.types.PaoTypeSystem;
 import polyglot.ast.Ext;
 import polyglot.ast.Ext_c;
+import polyglot.ast.JLang;
+import polyglot.ast.JLang_c;
 import polyglot.ast.Node;
 import polyglot.ast.NodeFactory;
 import polyglot.types.SemanticException;
@@ -35,9 +37,13 @@ public class PaoExt_c extends Ext_c implements PaoExt {
         return (PaoExt) e;
     }
 
+    protected static JLang superLang() {
+        return JLang_c.instance;
+    }
+
     @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
-        return this.superLang().typeCheck(this.node(), tc);
+        return superLang().typeCheck(this.node(), tc);
     }
 
     /**

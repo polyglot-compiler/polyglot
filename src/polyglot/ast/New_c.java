@@ -214,11 +214,11 @@ public class New_c extends Expr_c implements New, NewOps {
     }
 
     @Override
-    public Context enterChildScope(Lang lang, Node child, Context c) {
+    public Context enterChildScope(Node child, Context c) {
         if (child == body && anonType != null && body != null) {
             c = c.pushClass(anonType, anonType);
         }
-        return super.enterChildScope(lang, child, c);
+        return super.enterChildScope(child, c);
     }
 
     @Override

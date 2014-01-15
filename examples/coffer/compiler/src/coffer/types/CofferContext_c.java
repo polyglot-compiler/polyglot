@@ -10,6 +10,7 @@ package coffer.types;
 import java.util.HashMap;
 import java.util.Map;
 
+import polyglot.ast.Lang;
 import polyglot.types.Context_c;
 import polyglot.types.SemanticException;
 import polyglot.types.TypeSystem;
@@ -17,8 +18,8 @@ import polyglot.types.TypeSystem;
 public class CofferContext_c extends Context_c implements CofferContext {
     protected Map<String, Key> keys;
 
-    public CofferContext_c(TypeSystem ts) {
-        super(ts);
+    public CofferContext_c(Lang lang, TypeSystem ts) {
+        super(lang, ts);
     }
 
     @Override

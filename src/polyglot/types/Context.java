@@ -28,6 +28,7 @@ package polyglot.types;
 
 import java.util.List;
 
+import polyglot.ast.Lang;
 import polyglot.util.Copy;
 
 /**
@@ -40,6 +41,9 @@ import polyglot.util.Copy;
  * in the current scope.
  */
 public interface Context extends Resolver, Copy {
+    /** The language this context represents. */
+    Lang lang();
+
     /** The type system. */
     TypeSystem typeSystem();
 

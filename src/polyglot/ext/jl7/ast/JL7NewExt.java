@@ -120,7 +120,7 @@ public class JL7NewExt extends JL7Ext {
         New n = (New) this.node();
         TypeNode objectType = n.objectType();
         if (!(objectType instanceof Ambiguous))
-            return this.superLang().typeCheck(this.node(), tc);
+            return superLang().typeCheck(this.node(), tc);
 
         JL5NewExt ext5 = (JL5NewExt) JL5Ext.ext(n);
         JL7TypeSystem ts = (JL7TypeSystem) tc.typeSystem();

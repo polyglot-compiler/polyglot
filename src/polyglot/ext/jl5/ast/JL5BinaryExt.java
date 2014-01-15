@@ -74,7 +74,7 @@ public class JL5BinaryExt extends JL5Ext {
         JL5TypeSystem ts = (JL5TypeSystem) tc.typeSystem();
 
         if (!ts.isPrimitiveWrapper(l) && !ts.isPrimitiveWrapper(r)) {
-            return this.superLang().typeCheck(this.node(), tc);
+            return superLang().typeCheck(this.node(), tc);
         }
         // at least one of l or r is a primitive wrapper
         // If both of them are non null, then just use their primitive types
@@ -248,7 +248,7 @@ public class JL5BinaryExt extends JL5Ext {
 
         if (!ts.isPrimitiveWrapper(childType)
                 && !ts.isPrimitiveWrapper(otherType)) {
-            return this.superLang().childExpectedType(this.node(), child, av);
+            return superLang().childExpectedType(this.node(), child, av);
         }
 
         Type childUnboxedType = ts.unboxingConversion(childType);

@@ -85,7 +85,7 @@ public class ContextVisitor extends ErrorHandlingVisitor {
 
     @Override
     public NodeVisitor begin() {
-        context = ts.createContext();
+        context = ts.createContext(lang());
         outer = null;
         return super.begin();
     }
@@ -122,7 +122,7 @@ public class ContextVisitor extends ErrorHandlingVisitor {
      */
     protected Context enterScope(Node parent, Node n) {
         if (parent != null) {
-            return lang().enterChildScope(parent, lang(), n, context);
+            return lang().enterChildScope(parent, n, context);
         }
         // no parent node yet.
         return lang().enterScope(n, context);

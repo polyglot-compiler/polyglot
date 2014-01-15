@@ -195,7 +195,7 @@ public class JL5CaseExt extends JL5Ext implements JL5CaseOps {
 
         if (expr instanceof EnumConstant) return c;
 
-        return this.superLang().checkConstants(this.node(), cc);
+        return superLang().checkConstants(this.node(), cc);
     }
 
     @Override

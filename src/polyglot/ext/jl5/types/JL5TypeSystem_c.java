@@ -41,6 +41,7 @@ import java.util.Set;
 
 import polyglot.ast.ClassLit;
 import polyglot.ast.Expr;
+import polyglot.ast.Lang;
 import polyglot.ast.NullLit;
 import polyglot.ast.Term;
 import polyglot.ext.jl5.JL5Options;
@@ -420,8 +421,8 @@ public class JL5TypeSystem_c extends
     }
 
     @Override
-    public Context createContext() {
-        return new JL5Context_c(this);
+    public Context createContext(Lang lang) {
+        return new JL5Context_c(lang, this);
     }
 
     @Override

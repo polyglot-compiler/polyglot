@@ -31,6 +31,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import polyglot.ast.JLangToJLDel;
+import polyglot.ast.Lang;
 import polyglot.main.Report;
 import polyglot.util.CollectionUtil;
 import polyglot.util.Enum;
@@ -49,6 +51,7 @@ import polyglot.util.SerialVersionUID;
  */
 public class Context_c implements Context {
     protected Context outer;
+    private final Lang lang;
     protected TypeSystem ts;
 
     public static class Kind extends Enum {
@@ -66,7 +69,13 @@ public class Context_c implements Context {
     public static final Kind OUTER = new Kind("outer");
     public static final Kind SOURCE = new Kind("source");
 
+    @Deprecated
     public Context_c(TypeSystem ts) {
+        this(JLangToJLDel.instance, ts);
+    }
+
+    public Context_c(Lang lang, TypeSystem ts) {
+        this.lang = lang;
         this.ts = ts;
         this.outer = null;
         this.kind = OUTER;
@@ -90,6 +99,11 @@ public class Context_c implements Context {
 
     public boolean isSource() {
         return kind == SOURCE;
+    }
+
+    @Override
+    public Lang lang() {
+        return lang;
     }
 
     @Override

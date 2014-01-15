@@ -26,7 +26,7 @@ public class JL7TryExt extends JL7Ext implements JL7TryOps {
     @Override
     public Block exceptionCheckTryBlock(ExceptionChecker ec)
             throws SemanticException {
-        Block b = this.superLang().exceptionCheckTryBlock(this.node(), ec);
+        Block b = superLang().exceptionCheckTryBlock(this.node(), ec);
 
         ((J7Lang) ec.lang()).checkPreciseRethrows(this.node(),
                                                   ec.lang(),
@@ -39,20 +39,19 @@ public class JL7TryExt extends JL7Ext implements JL7TryOps {
     @Override
     public ExceptionChecker constructTryBlockExceptionChecker(
             ExceptionChecker ec) {
-        return this.superLang().constructTryBlockExceptionChecker(this.node(),
-                                                                 ec);
+        return superLang().constructTryBlockExceptionChecker(this.node(), ec);
     }
 
     @Override
     public List<Catch> exceptionCheckCatchBlocks(ExceptionChecker ec)
             throws SemanticException {
-        return this.superLang().exceptionCheckCatchBlocks(this.node(), ec);
+        return superLang().exceptionCheckCatchBlocks(this.node(), ec);
     }
 
     @Override
     public Block exceptionCheckFinallyBlock(ExceptionChecker ec)
             throws SemanticException {
-        return this.superLang().exceptionCheckFinallyBlock(this.node(), ec);
+        return superLang().exceptionCheckFinallyBlock(this.node(), ec);
     }
 
     @Override

@@ -221,9 +221,6 @@ public interface JL5TypeSystem extends TypeSystem,
     EnumInstance enumInstance(Position pos, ClassType container, Flags f,
             String name, long ordinal);
 
-    @Override
-    Context createContext();
-
     EnumInstance findEnumConstant(ReferenceType container, long ordinal)
             throws SemanticException;
 

@@ -3,7 +3,8 @@ package polyglot.ext.jl5.ast;
 import polyglot.ast.Expr;
 import polyglot.ast.Ext;
 import polyglot.ast.Ext_c;
-import polyglot.ast.Lang;
+import polyglot.ast.JLang;
+import polyglot.ast.JLang_c;
 import polyglot.ast.Node;
 import polyglot.ext.jl5.visit.JL5Translator;
 import polyglot.types.Context;
@@ -36,73 +37,77 @@ public class JL5Ext extends Ext_c {
         return (JL5Ext) e;
     }
 
+    protected static JLang superLang() {
+        return JLang_c.instance;
+    }
+
     @Override
     public Node visitChildren(NodeVisitor v) {
-        return this.superLang().visitChildren(this.node(), v);
+        return superLang().visitChildren(this.node(), v);
     }
 
     @Override
     public Context enterScope(Context c) {
-        return this.superLang().enterScope(this.node(), c);
+        return superLang().enterScope(this.node(), c);
     }
 
     @Override
-    public Context enterChildScope(Lang lang, Node child, Context c) {
-        return this.superLang().enterChildScope(this.node(), lang, child, c);
+    public Context enterChildScope(Node child, Context c) {
+        return superLang().enterChildScope(this.node(), child, c);
     }
 
     @Override
     public Node buildTypes(TypeBuilder tb) throws SemanticException {
-        return this.superLang().buildTypes(this.node(), tb);
+        return superLang().buildTypes(this.node(), tb);
     }
 
     @Override
     public Node disambiguateOverride(Node parent, AmbiguityRemover ar)
             throws SemanticException {
-        return this.superLang().disambiguateOverride(this.node(), parent, ar);
+        return superLang().disambiguateOverride(this.node(), parent, ar);
     }
 
     @Override
     public Node disambiguate(AmbiguityRemover ar) throws SemanticException {
-        return this.superLang().disambiguate(this.node(), ar);
+        return superLang().disambiguate(this.node(), ar);
     }
 
     @Override
     public Node typeCheckOverride(Node parent, TypeChecker tc)
             throws SemanticException {
-        return this.superLang().typeCheckOverride(this.node(), parent, tc);
+        return superLang().typeCheckOverride(this.node(), parent, tc);
     }
 
     @Override
     public NodeVisitor typeCheckEnter(TypeChecker tc) throws SemanticException {
-        return this.superLang().typeCheckEnter(this.node(), tc);
+        return superLang().typeCheckEnter(this.node(), tc);
     }
 
     /** Type check the expression. */
     @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
-        return this.superLang().typeCheck(this.node(), tc);
+        return superLang().typeCheck(this.node(), tc);
     }
 
     @Override
     public Type childExpectedType(Expr child, AscriptionVisitor av) {
-        return this.superLang().childExpectedType(this.node(), child, av);
+        return superLang().childExpectedType(this.node(), child, av);
     }
 
     @Override
     public Node checkConstants(ConstantChecker cc) throws SemanticException {
-        return this.superLang().checkConstants(this.node(), cc);
+        return superLang().checkConstants(this.node(), cc);
     }
 
     @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter pp) {
-        this.superLang().prettyPrint(this.node(), w, pp);
+        superLang().prettyPrint(this.node(), w, pp);
     }
 
     @Override
     public void translate(CodeWriter w, Translator tr) {
         if (tr instanceof JL5Translator)
             ((JL5Translator) tr).translateNode(this.node(), w);
-        else this.superLang().translate(this.node(), w, tr);
+        else superLang().translate(this.node(), w, tr);
     }
 }

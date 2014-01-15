@@ -59,7 +59,6 @@ public abstract class Ext_c implements Ext {
 
     protected Node node;
     protected Ext ext;
-    protected JLang superLang = null;
 
     public Ext_c(Ext ext) {
         this.node = null;
@@ -118,18 +117,6 @@ public abstract class Ext_c implements Ext {
         return copy;
     }
 
-    @Override
-    public JLang superLang() {
-        if (this.superLang == null) {
-            return JLang_c.instance;
-        }
-        return this.superLang;
-    }
-
-    public void superLang(JLang superLang) {
-        this.superLang = superLang;
-    }
-
     /**
      * Copy the extension.
      */
@@ -186,15 +173,9 @@ public abstract class Ext_c implements Ext {
         return node().enterScope(c);
     }
 
-    @Deprecated
     @Override
     public Context enterChildScope(Node child, Context c) {
         return node().enterChildScope(child, c);
-    }
-
-    @Override
-    public Context enterChildScope(Lang lang, Node child, Context c) {
-        return node().enterChildScope(lang, child, c);
     }
 
     /**

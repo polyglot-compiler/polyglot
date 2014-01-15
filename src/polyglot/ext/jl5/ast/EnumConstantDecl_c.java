@@ -34,7 +34,6 @@ import java.util.List;
 import polyglot.ast.ClassBody;
 import polyglot.ast.Expr;
 import polyglot.ast.Id;
-import polyglot.ast.Lang;
 import polyglot.ast.Node;
 import polyglot.ast.Term;
 import polyglot.ast.Term_c;
@@ -212,11 +211,11 @@ public class EnumConstantDecl_c extends Term_c implements EnumConstantDecl {
     }
 
     @Override
-    public Context enterChildScope(Lang lang, Node child, Context c) {
+    public Context enterChildScope(Node child, Context c) {
         if (child == body && type != null && body != null) {
             c = c.pushClass(type, type);
         }
-        return super.enterChildScope(lang, child, c);
+        return super.enterChildScope(child, c);
     }
 
     @Override

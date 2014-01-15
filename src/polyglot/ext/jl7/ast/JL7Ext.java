@@ -5,6 +5,8 @@ import java.util.List;
 import polyglot.ast.Ext;
 import polyglot.ast.Ext_c;
 import polyglot.ast.Node;
+import polyglot.ext.jl5.ast.J5Lang;
+import polyglot.ext.jl5.ast.J5Lang_c;
 import polyglot.types.SemanticException;
 import polyglot.types.Type;
 import polyglot.types.TypeSystem;
@@ -28,19 +30,23 @@ public class JL7Ext extends Ext_c {
         return (JL7Ext) e;
     }
 
+    protected static J5Lang superLang() {
+        return J5Lang_c.instance;
+    }
+
     /** Type check the expression. */
     @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
-        return this.superLang().typeCheck(this.node(), tc);
+        return superLang().typeCheck(this.node(), tc);
     }
 
     @Override
     public Node checkConstants(ConstantChecker cc) throws SemanticException {
-        return this.superLang().checkConstants(this.node(), cc);
+        return superLang().checkConstants(this.node(), cc);
     }
 
     @Override
     public List<Type> throwTypes(TypeSystem ts) {
-        return this.superLang().throwTypes(this.node(), ts);
+        return superLang().throwTypes(this.node(), ts);
     }
 }

@@ -94,7 +94,7 @@ public class Translator extends PrettyPrinter implements Copy {
         this.nf = nf;
         this.tf = tf;
         this.ts = ts;
-        this.context = ts.createContext();
+        this.context = ts.createContext(lang());
     }
 
     /**
@@ -160,11 +160,7 @@ public class Translator extends PrettyPrinter implements Copy {
                     tr = this.context(c);
                 }
                 else if (parent.isDisambiguated() && parent.isTypeChecked()) {
-                    Context c =
-                            lang().enterChildScope(parent,
-                                                   lang(),
-                                                   child,
-                                                   context);
+                    Context c = lang().enterChildScope(parent, child, context);
                     tr = this.context(c);
                 }
                 else {

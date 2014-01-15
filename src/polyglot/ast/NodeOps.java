@@ -82,21 +82,7 @@ public interface NodeOps {
      * @return the <code>Context</code> to be used for visiting node 
      *           <code>child</code>
      */
-    @Deprecated
     public Context enterChildScope(Node child, Context c);
-
-    /**
-     * Push a new scope for visiting the child node <code>child</code>. 
-     * The default behavior is to delegate the call to the child node, and let
-     * it add appropriate declarations that should be in scope. However,
-     * this method gives parent nodes have the ability to modify this behavior.
-     * @param lang The language the visitor operates on.
-     * @param child The child node about to be entered.
-     * @param c The current <code>Context</code>
-     * @return the <code>Context</code> to be used for visiting node 
-     *           <code>child</code>
-     */
-    public Context enterChildScope(Lang lang, Node child, Context c);
 
     /**
      * Add any declarations to the context that should be in scope when

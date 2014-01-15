@@ -12,6 +12,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import polyglot.ast.Lang;
 import polyglot.ext.param.types.ParamTypeSystem_c;
 import polyglot.ext.param.types.Subst;
 import polyglot.frontend.Source;
@@ -162,8 +163,8 @@ public class CofferTypeSystem_c extends ParamTypeSystem_c<Key, Key> implements
     }
 
     @Override
-    public Context createContext() {
-        return new CofferContext_c(this);
+    public Context createContext(Lang lang) {
+        return new CofferContext_c(lang, this);
     }
 
     @Override
