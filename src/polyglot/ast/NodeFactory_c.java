@@ -57,43 +57,13 @@ public class NodeFactory_c extends AbstractNodeFactory_c {
             };
 
     @Deprecated
-    private static class JLangForJLDel extends JLang_c {
+    private static class JLangToJLDelWithFactory extends JLangToJLDel {
         private static final long serialVersionUID =
                 SerialVersionUID.generate();
         protected final DelFactory delFactory;
 
-        public JLangForJLDel(DelFactory delFactory) {
+        public JLangToJLDelWithFactory(DelFactory delFactory) {
             this.delFactory = delFactory;
-        }
-
-        @Override
-        protected NodeOps NodeOps(Node n) {
-            return n.del();
-        }
-
-        @Override
-        protected CallOps CallOps(Node n) {
-            return (CallOps) n.del();
-        }
-
-        @Override
-        protected ClassDeclOps ClassDeclOps(Node n) {
-            return (ClassDeclOps) n.del();
-        }
-
-        @Override
-        protected NewOps NewOps(Node n) {
-            return (NewOps) n.del();
-        }
-
-        @Override
-        protected ProcedureDeclOps ProcedureDeclOps(Node n) {
-            return (ProcedureDeclOps) n.del();
-        }
-
-        @Override
-        protected TryOps TryOps(Node n) {
-            return (TryOps) n.del();
         }
     }
 
@@ -114,7 +84,7 @@ public class NodeFactory_c extends AbstractNodeFactory_c {
     @Deprecated
     public NodeFactory_c(ExtFactory extFactory, DelFactory delFactory) {
         this.extFactory = extFactory;
-        this.lang = new JLangForJLDel(delFactory);
+        this.lang = new JLangToJLDelWithFactory(delFactory);
         initEnums();
     }
 
@@ -145,8 +115,8 @@ public class NodeFactory_c extends AbstractNodeFactory_c {
 
     @Deprecated
     protected DelFactory delFactory() {
-        if (lang instanceof JLangForJLDel)
-            return ((JLangForJLDel) lang).delFactory;
+        if (lang instanceof JLangToJLDelWithFactory)
+            return ((JLangToJLDelWithFactory) lang).delFactory;
         return emptyDelFactory;
     }
 

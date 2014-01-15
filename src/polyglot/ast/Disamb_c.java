@@ -62,7 +62,9 @@ public class Disamb_c implements Disamb {
      * Disambiguate the prefix and name into a unambiguous node.
      * @return An unambiguous AST node, or null if disambiguation
      *         fails.
+     * @deprecated
      */
+    @Deprecated
     @Override
     public Node disambiguate(Ambiguous amb, ContextVisitor v, Position pos,
             Prefix prefix, String name) throws SemanticException {

@@ -13,6 +13,7 @@ import java.util.List;
 import polyglot.ast.ClassBody;
 import polyglot.ast.ClassDecl_c;
 import polyglot.ast.Id;
+import polyglot.ast.Lang;
 import polyglot.ast.Node;
 import polyglot.ast.TypeNode;
 import polyglot.ext.param.types.MuPClass;
@@ -84,7 +85,7 @@ public class CofferClassDecl_c extends ClassDecl_c implements CofferClassDecl {
     }
 
     @Override
-    public Context enterChildScope(Node child, Context context) {
+    public Context enterChildScope(Lang lang, Node child, Context context) {
         CofferContext c = (CofferContext) context;
 
         CofferParsedClassType ct = (CofferParsedClassType) this.type;
