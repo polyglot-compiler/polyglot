@@ -18,6 +18,6 @@ public class PaoNodeFactory_c extends NodeFactory_c {
         // Set the ExtFactory to be PaoExtFactory_c.
         // this will ensure that the correct Ext
         // objects are created for the pao extension.
-        super(new PaoExtFactory_c(), PaoLang.instance);
+        super(PaoLang.instance, new PaoExtFactory_c());
     }
 }

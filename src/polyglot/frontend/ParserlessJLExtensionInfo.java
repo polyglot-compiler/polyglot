@@ -28,6 +28,7 @@ package polyglot.frontend;
 
 import java.io.Reader;
 
+import polyglot.ast.JLang_c;
 import polyglot.ast.NodeFactory;
 import polyglot.ast.NodeFactory_c;
 import polyglot.frontend.goals.Goal;
@@ -117,7 +118,7 @@ public abstract class ParserlessJLExtensionInfo extends AbstractExtensionInfo {
     /** Create the node factory for this extension. */
     @Override
     protected NodeFactory createNodeFactory() {
-        return new NodeFactory_c();
+        return new NodeFactory_c(JLang_c.instance);
     }
 
     @Override

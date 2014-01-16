@@ -32,11 +32,11 @@ import coffer.types.KeySet;
 public class CofferNodeFactory_c extends NodeFactory_c implements
         CofferNodeFactory {
     public CofferNodeFactory_c() {
-        super(new CofferExtFactory_c(), CofferLang.instance);
+        super(CofferLang.instance, new CofferExtFactory_c());
     }
 
     protected CofferNodeFactory_c(ExtFactory extFact) {
-        super(extFact, CofferLang.instance);
+        super(CofferLang.instance, extFact);
     }
 
     @Override

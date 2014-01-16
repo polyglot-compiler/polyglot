@@ -11,15 +11,15 @@ import polyglot.util.Position;
 public class JL7NodeFactory_c extends JL5NodeFactory_c implements
         JL7NodeFactory {
     public JL7NodeFactory_c() {
-        super(new JL7ExtFactory_c(), J7Lang_c.instance);
+        this(J7Lang_c.instance);
     }
 
-    public JL7NodeFactory_c(JL7ExtFactory extFactory) {
-        super(extFactory, J7Lang_c.instance);
+    public JL7NodeFactory_c(J7Lang lang) {
+        super(lang);
     }
 
-    public JL7NodeFactory_c(JL7ExtFactory extFactory, J7Lang del) {
-        super(extFactory, del);
+    public JL7NodeFactory_c(J7Lang lang, JL7ExtFactory extFactory) {
+        super(lang, extFactory);
     }
 
     @Override

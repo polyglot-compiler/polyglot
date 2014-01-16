@@ -62,15 +62,15 @@ import polyglot.util.Position;
  */
 public class JL5NodeFactory_c extends NodeFactory_c implements JL5NodeFactory {
     public JL5NodeFactory_c() {
-        super(new JL5ExtFactory_c(), J5Lang_c.instance);
+        this(J5Lang_c.instance);
     }
 
-    public JL5NodeFactory_c(JL5ExtFactory extFactory) {
-        super(extFactory, J5Lang_c.instance);
+    public JL5NodeFactory_c(J5Lang lang) {
+        super(lang);
     }
 
-    public JL5NodeFactory_c(JL5ExtFactory extFactory, J5Lang del) {
-        super(extFactory, del);
+    public JL5NodeFactory_c(J5Lang lang, JL5ExtFactory extFactory) {
+        super(lang, extFactory);
     }
 
     @Override

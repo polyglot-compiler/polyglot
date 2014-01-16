@@ -30,7 +30,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
-import polyglot.ast.Lang;
 import polyglot.frontend.ExtensionInfo;
 import polyglot.frontend.Source;
 import polyglot.types.reflect.ClassFile;
@@ -666,13 +665,10 @@ public interface TypeSystem {
      */
     Package createPackage(Package prefix, String name);
 
-    @Deprecated
-    Context createContext();
-
     /**
      * Create a new context object for looking up variables, types, etc.
      */
-    Context createContext(Lang lang);
+    Context createContext();
 
     /** Get a resolver for looking up a type in a package. */
     Resolver packageContextResolver(Package pkg, ClassType accessor);

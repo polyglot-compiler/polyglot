@@ -12,7 +12,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import polyglot.ast.Lang;
 import polyglot.ext.param.types.ParamTypeSystem_c;
 import polyglot.ext.param.types.Subst;
 import polyglot.frontend.Source;
@@ -27,6 +26,7 @@ import polyglot.types.ReferenceType;
 import polyglot.types.Type;
 import polyglot.util.CollectionUtil;
 import polyglot.util.Position;
+import coffer.ast.CofferLang;
 
 public class CofferTypeSystem_c extends ParamTypeSystem_c<Key, Key> implements
         CofferTypeSystem {
@@ -163,8 +163,8 @@ public class CofferTypeSystem_c extends ParamTypeSystem_c<Key, Key> implements
     }
 
     @Override
-    public Context createContext(Lang lang) {
-        return new CofferContext_c(lang, this);
+    public Context createContext() {
+        return new CofferContext_c(CofferLang.instance, this);
     }
 
     @Override

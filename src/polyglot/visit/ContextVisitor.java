@@ -85,7 +85,7 @@ public class ContextVisitor extends ErrorHandlingVisitor {
 
     @Override
     public NodeVisitor begin() {
-        context = ts.createContext(lang());
+        context = ts.createContext();
         outer = null;
         return super.begin();
     }

@@ -41,13 +41,13 @@ import java.util.Set;
 
 import polyglot.ast.ClassLit;
 import polyglot.ast.Expr;
-import polyglot.ast.Lang;
 import polyglot.ast.NullLit;
 import polyglot.ast.Term;
 import polyglot.ext.jl5.JL5Options;
 import polyglot.ext.jl5.ast.AnnotationElem;
 import polyglot.ext.jl5.ast.ElementValueArrayInit;
 import polyglot.ext.jl5.ast.EnumConstant;
+import polyglot.ext.jl5.ast.J5Lang_c;
 import polyglot.ext.jl5.types.inference.InferenceSolver;
 import polyglot.ext.jl5.types.inference.InferenceSolver_c;
 import polyglot.ext.jl5.types.inference.LubType;
@@ -421,8 +421,8 @@ public class JL5TypeSystem_c extends
     }
 
     @Override
-    public Context createContext(Lang lang) {
-        return new JL5Context_c(lang, this);
+    public Context createContext() {
+        return new JL5Context_c(J5Lang_c.instance, this);
     }
 
     @Override

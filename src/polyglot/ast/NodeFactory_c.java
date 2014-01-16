@@ -49,8 +49,9 @@ public class NodeFactory_c extends AbstractNodeFactory_c {
 
     // use an empty implementation of AbstractExtFactory_c,
     // so we don't need to do null checks
-    protected static class EmptyExtFactory extends AbstractExtFactory_c {
-    }
+    protected static final ExtFactory emptyExtFactory =
+            new AbstractExtFactory_c() {
+            };
 
     protected static final DelFactory emptyDelFactory =
             new AbstractDelFactory_c() {
@@ -67,24 +68,30 @@ public class NodeFactory_c extends AbstractNodeFactory_c {
         }
     }
 
+    @Deprecated
     public NodeFactory_c() {
-        this(new EmptyExtFactory(), JLang_c.instance);
+        this(emptyExtFactory, emptyDelFactory);
     }
 
+    @Deprecated
     public NodeFactory_c(ExtFactory extFactory) {
-        this(extFactory, JLang_c.instance);
-    }
-
-    public NodeFactory_c(ExtFactory extFactory, JLang lang) {
-        this.extFactory = extFactory;
-        this.lang = lang;
-        initEnums();
+        this(extFactory, emptyDelFactory);
     }
 
     @Deprecated
     public NodeFactory_c(ExtFactory extFactory, DelFactory delFactory) {
         this.extFactory = extFactory;
         this.lang = new JLangToJLDelWithFactory(delFactory);
+        initEnums();
+    }
+
+    public NodeFactory_c(JLang lang) {
+        this(lang, emptyExtFactory);
+    }
+
+    public NodeFactory_c(JLang lang, ExtFactory extFactory) {
+        this.lang = lang;
+        this.extFactory = extFactory;
         initEnums();
     }
 

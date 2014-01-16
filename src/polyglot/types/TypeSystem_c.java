@@ -39,7 +39,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import polyglot.ast.Lang;
+import polyglot.ast.JLang_c;
 import polyglot.frontend.ExtensionInfo;
 import polyglot.frontend.Source;
 import polyglot.main.Report;
@@ -253,15 +253,9 @@ public class TypeSystem_c implements TypeSystem {
         throw new InternalCompilerError("Unrecognized primitive type.");
     }
 
-    @Deprecated
     @Override
     public Context createContext() {
-        return new Context_c(this);
-    }
-
-    @Override
-    public Context createContext(Lang lang) {
-        return new Context_c(lang, this);
+        return new Context_c(JLang_c.instance, this);
     }
 
     /** @deprecated */

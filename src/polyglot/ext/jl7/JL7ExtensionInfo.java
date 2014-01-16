@@ -67,12 +67,12 @@ public class JL7ExtensionInfo extends JL5ExtensionInfo {
     protected NodeFactory createNodeFactory() {
         JL5Options opt = (JL5Options) getOptions();
         if (!opt.removeJava5isms) {
-            return new JL7NodeFactory_c(new JL7ExtFactory_c(new JL5ExtFactory_c()),
-                                        J7Lang_c.instance);
+            return new JL7NodeFactory_c(J7Lang_c.instance,
+                                        new JL7ExtFactory_c(new JL5ExtFactory_c()));
         }
         else {
-            return new JL7NodeFactory_c(new JL7ExtFactory_c(new JL7ToJLExtFactory_c()),
-                                        J7Lang_c.instance);
+            return new JL7NodeFactory_c(J7Lang_c.instance,
+                                        new JL7ExtFactory_c(new JL7ToJLExtFactory_c()));
         }
     }
 
