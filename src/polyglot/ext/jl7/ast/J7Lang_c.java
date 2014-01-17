@@ -27,11 +27,10 @@ package polyglot.ext.jl7.ast;
 
 import polyglot.ast.Block;
 import polyglot.ast.Catch;
-import polyglot.ast.JLang;
 import polyglot.ast.Node;
 import polyglot.ast.NodeOps;
-import polyglot.ext.jl5.ast.JL5CaseOps;
 import polyglot.ext.jl5.ast.J5Lang_c;
+import polyglot.ext.jl5.ast.JL5CaseOps;
 import polyglot.ext.jl5.ast.JL5SwitchOps;
 import polyglot.types.TypeSystem;
 import polyglot.util.SerialVersionUID;
@@ -71,14 +70,14 @@ public class J7Lang_c extends J5Lang_c implements J7Lang {
     // JL7TryOps
 
     @Override
-    public void checkPreciseRethrows(Node n, JLang lang, TypeSystem typeSystem,
-            Block b) {
+    public final void checkPreciseRethrows(Node n, J7Lang lang,
+            TypeSystem typeSystem, Block b) {
         TryOps(n).checkPreciseRethrows(lang, typeSystem, b);
     }
 
     @Override
-    public void preciseRethrowsForCatchBlock(Node n, JLang lang, Catch cb,
-            SubtypeSet thrown) {
+    public final void preciseRethrowsForCatchBlock(Node n, J7Lang lang,
+            Catch cb, SubtypeSet thrown) {
         TryOps(n).preciseRethrowsForCatchBlock(lang, cb, thrown);
     }
 }

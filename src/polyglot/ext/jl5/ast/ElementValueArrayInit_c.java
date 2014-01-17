@@ -125,7 +125,7 @@ public class ElementValueArrayInit_c extends Term_c implements
         }
     }
 
-    private Type typeOf(Term e) {
+    private static Type typeOf(Term e) {
         if (e instanceof Expr) {
             return ((Expr) e).type();
         }

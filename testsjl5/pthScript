@@ -123,7 +123,7 @@ polyglot.ext.jl5.JL5ExtensionInfo "-d out -classpath java-out -assert -noserial 
         Intersect01.jl5;
         Intersect02.jl5;
         Intersect03.jl5 (Semantic, "additional bound");
-        Intersect04.jl5;
+        Intersect04.jl5 (Post, "Xlint");
         Import01.jl5;
         Import02.jl5;
         Import03.jl5 (Semantic);

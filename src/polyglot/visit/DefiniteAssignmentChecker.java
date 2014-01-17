@@ -757,8 +757,8 @@ public class DefiniteAssignmentChecker extends
         return ret;
     }
 
-    private Map<EdgeKey, FlowItem> remap(Map<EdgeKey, FlowItem> m, EdgeKey ek,
-            AssignmentStatus assStatus) {
+    private static Map<EdgeKey, FlowItem> remap(Map<EdgeKey, FlowItem> m,
+            EdgeKey ek, AssignmentStatus assStatus) {
         FlowItem fi = m.get(ek);
         if (fi == null) {
             return m;

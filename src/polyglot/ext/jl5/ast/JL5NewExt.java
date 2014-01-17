@@ -86,7 +86,7 @@ public class JL5NewExt extends JL5Ext implements NewOps {
 
         List<TypeNode> typeArgs = this.node().visitList(ext.typeArgs(), v);
 
-        Node newN = this.node().visitChildren(v);
+        Node newN = superLang().visitChildren(this.node(), v);
         JL5NewExt newext = (JL5NewExt) JL5Ext.ext(newN);
 
         if (!CollectionUtil.equals(typeArgs, newext.typeArgs())) {
@@ -108,7 +108,7 @@ public class JL5NewExt extends JL5Ext implements NewOps {
     @Override
     public Node disambiguateOverride(Node parent, AmbiguityRemover ar)
             throws SemanticException {
-        New n = (New) this.node().disambiguateOverride(parent, ar);
+        New n = (New) superLang().disambiguateOverride(this.node(), parent, ar);
         JL5NewExt ext = (JL5NewExt) JL5Ext.ext(n);
         // now do the type args
         return ext.typeArgs(n.visitList(ext.typeArgs(), ar));
@@ -156,9 +156,10 @@ public class JL5NewExt extends JL5Ext implements NewOps {
                         + " since it is not static");
             }
         }
-        return ((NewOps) this.node()).findQualifiedTypeNode(ar,
-                                                            outer,
-                                                            objectType);
+        return superLang().findQualifiedTypeNode(this.node(),
+                                                 ar,
+                                                 outer,
+                                                 objectType);
     }
 
     @Override
@@ -167,7 +168,7 @@ public class JL5NewExt extends JL5Ext implements NewOps {
         // Call super.findQualifier in order to perform its checks, but throw away the
         // qualifier that it finds. That is, just return this node. Do not attempt to infer 
         // a qualifier if one is missing.
-        ((NewOps) this.node()).findQualifier(ar, ct);
+        superLang().findQualifier(this.node(), ar, ct);
         return (New) this.node();
     }
 
@@ -194,8 +195,8 @@ public class JL5NewExt extends JL5Ext implements NewOps {
             actualTypeArgs.add((ReferenceType) tn.type());
         }
 
-        ((NewOps) this.node()).typeCheckFlags(tc);
-        ((NewOps) this.node()).typeCheckNested(tc);
+        superLang().typeCheckFlags(this.node(), tc);
+        superLang().typeCheckNested(this.node(), tc);
 
         if (n.body() != null) {
             ts.checkClassConformance(n.anonType());
@@ -252,7 +253,7 @@ public class JL5NewExt extends JL5Ext implements NewOps {
         New n = (New) this.node();
         JL5NewExt ext = (JL5NewExt) JL5Ext.ext(n);
 
-        ((NewOps) this.node()).printQualifier(w, tr);
+        superLang().printQualifier(this.node(), w, tr);
         w.write("new ");
 
         if (ext.typeArgs() != null && !ext.typeArgs().isEmpty()) {
@@ -294,8 +295,8 @@ public class JL5NewExt extends JL5Ext implements NewOps {
             ((Node_c) n).print(n.objectType(), w, tr);
         }
 
-        ((NewOps) this.node()).printArgs(w, tr);
-        ((NewOps) this.node()).printBody(w, tr);
+        superLang().printArgs(this.node(), w, tr);
+        superLang().printBody(this.node(), w, tr);
     }
 
     @Override

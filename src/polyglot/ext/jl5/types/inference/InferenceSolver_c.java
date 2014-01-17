@@ -318,7 +318,7 @@ public class InferenceSolver_c implements InferenceSolver {
         return null;
     }
 
-    private boolean hasUnresolvedTypeArguments(Type[] solution) {
+    private static boolean hasUnresolvedTypeArguments(Type[] solution) {
         for (Type element : solution) {
             if (element == null) {
                 return true;

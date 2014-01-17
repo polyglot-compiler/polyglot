@@ -29,7 +29,7 @@ public class JL7TryExt extends JL7Ext implements JL7TryOps {
         Block b = superLang().exceptionCheckTryBlock(this.node(), ec);
 
         ((J7Lang) ec.lang()).checkPreciseRethrows(this.node(),
-                                                  ec.lang(),
+                                                  (J7Lang) ec.lang(),
                                                   ec.typeSystem(),
                                                   b);
 
@@ -55,13 +55,13 @@ public class JL7TryExt extends JL7Ext implements JL7TryOps {
     }
 
     @Override
-    public void checkPreciseRethrows(JLang lang, TypeSystem ts, Block tryBlock) {
+    public void checkPreciseRethrows(J7Lang lang, TypeSystem ts, Block tryBlock) {
         Try n = (Try) this.node();
 
         // For each catch block, identify which exceptions can get to it.
         // First, get the set of all exceptions that the try block can throw
         SubtypeSet thrown =
-                new SubtypeSet(ts.Throwable(), tryBlock.throwTypes(ts));
+                new SubtypeSet(ts.Throwable(), lang.throwTypes(tryBlock, ts));
 
         // Second, go through the catch blocks, and see what exceptions can actually reach them.
         for (Catch cb : n.catchBlocks()) {
@@ -70,18 +70,14 @@ public class JL7TryExt extends JL7Ext implements JL7TryOps {
             // The exceptions that can reach cb are the exceptions in thrown
             // that may be assignable to catchType.
 
-            ((J7Lang) lang).preciseRethrowsForCatchBlock(this.node(),
-                                                         lang,
-                                                         cb,
-                                                         thrown);
+            lang.preciseRethrowsForCatchBlock(this.node(), lang, cb, thrown);
 
             thrown.remove(catchType);
         }
-
     }
 
     @Override
-    public void preciseRethrowsForCatchBlock(JLang lang, Catch cb,
+    public void preciseRethrowsForCatchBlock(J7Lang lang, Catch cb,
             SubtypeSet reaching) {
         List<Type> s = new ArrayList<Type>();
         for (Type t : reaching) {
@@ -139,14 +135,12 @@ public class JL7TryExt extends JL7Ext implements JL7TryOps {
             }
             return n;
         }
-
     }
 
     protected void setThrowsTypes(JLang lang, LocalInstance localInstance,
             List<Type> s, Block b) {
         SetThrowSetVisitor v = new SetThrowSetVisitor(lang, localInstance, s);
         b.visit(v);
-
     }
 
     public class SetThrowSetVisitor extends NodeVisitor {

@@ -374,7 +374,7 @@ public class FieldDecl_c extends Term_c implements FieldDecl {
         }
 
         TypeChecker childtc = (TypeChecker) childv;
-        nn = (FieldDecl) nn.visitChildren(childtc);
+        nn = (FieldDecl) tc.lang().visitChildren(nn, childtc);
         nn = (FieldDecl) tc.leave(parent, old, nn, childtc);
 
         if (!constantValueSet) {

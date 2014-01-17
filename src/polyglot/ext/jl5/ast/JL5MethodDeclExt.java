@@ -172,8 +172,7 @@ public class JL5MethodDeclExt extends JL5AnnotatedElementExt implements
 
     @Override
     public Node disambiguate(AmbiguityRemover ar) throws SemanticException {
-        MethodDecl n =
-                (MethodDecl) superLang().disambiguate(this.node(), ar);
+        MethodDecl n = (MethodDecl) superLang().disambiguate(this.node(), ar);
         JL5MethodDeclExt ext = (JL5MethodDeclExt) JL5Ext.ext(n);
         List<TypeVariable> typeParams = new LinkedList<TypeVariable>();
 
@@ -360,7 +359,7 @@ public class JL5MethodDeclExt extends JL5AnnotatedElementExt implements
             w.write("<");
             for (Iterator<ParamTypeNode> iter = ext.typeParams().iterator(); iter.hasNext();) {
                 ParamTypeNode ptn = iter.next();
-                ptn.prettyPrint(w, tr);
+                tr.lang().prettyPrint(ptn, w, tr);
                 if (iter.hasNext()) {
                     w.write(",");
                     w.allowBreak(0, " ");

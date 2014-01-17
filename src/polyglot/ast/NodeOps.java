@@ -179,20 +179,6 @@ public interface NodeOps {
     /**
      * Type check the AST.
      *
-     * This method is called by the <code>enter()</code> method of the
-     * visitor.  The * method should perform work that should be done
-     * before visiting the children of the node.  The method may return
-     * <code>this</code> or a new copy of the node on which
-     * <code>visitChildren()</code> and <code>leave()</code> will be
-     * invoked.
-     *
-     * @param tc The type checking visitor.
-     */
-    NodeVisitor typeCheckEnter(TypeChecker tc) throws SemanticException;
-
-    /**
-     * Type check the AST.
-     *
      * This method is called by the <code>override()</code> method of the
      * visitor.  If this method returns non-null, the node's children
      * will not be visited automatically.  Thus, the method should check
@@ -210,6 +196,20 @@ public interface NodeOps {
      */
     Node typeCheckOverride(Node parent, TypeChecker tc)
             throws SemanticException;
+
+    /**
+     * Type check the AST.
+     *
+     * This method is called by the <code>enter()</code> method of the
+     * visitor.  The * method should perform work that should be done
+     * before visiting the children of the node.  The method may return
+     * <code>this</code> or a new copy of the node on which
+     * <code>visitChildren()</code> and <code>leave()</code> will be
+     * invoked.
+     *
+     * @param tc The type checking visitor.
+     */
+    NodeVisitor typeCheckEnter(TypeChecker tc) throws SemanticException;
 
     /**
      * Type check the AST.
@@ -288,31 +288,31 @@ public interface NodeOps {
 
     /** Dump the AST for debugging. */
     @Deprecated
-    public void dump(OutputStream os);
+    void dump(OutputStream os);
 
     /** Dump the AST for debugging. */
-    public void dump(Lang lang, OutputStream os);
+    void dump(Lang lang, OutputStream os);
 
     /** Dump the AST for debugging. */
     @Deprecated
-    public void dump(Writer w);
+    void dump(Writer w);
 
     /** Dump the AST for debugging. */
-    public void dump(Lang lang, Writer w);
+    void dump(Lang lang, Writer w);
 
     /** Pretty-print the AST for debugging. */
     @Deprecated
-    public void prettyPrint(OutputStream os);
+    void prettyPrint(OutputStream os);
 
     /** Pretty-print the AST for debugging. */
-    public void prettyPrint(Lang lang, OutputStream os);
+    void prettyPrint(Lang lang, OutputStream os);
 
     /** Pretty-print the AST for debugging. */
     @Deprecated
-    public void prettyPrint(Writer w);
+    void prettyPrint(Writer w);
 
     /** Pretty-print the AST for debugging. */
-    public void prettyPrint(Lang lang, Writer w);
+    void prettyPrint(Lang lang, Writer w);
 
     /**
      * Pretty-print the AST using the given code writer.

@@ -85,8 +85,8 @@ public class JL5ImportExt extends JL5Ext {
         }
     }
 
-    private boolean isIdStaticMember(ClassType t, String id, JL5TypeSystem ts,
-            Package package_) {
+    private static boolean isIdStaticMember(ClassType t, String id,
+            JL5TypeSystem ts, Package package_) {
         if (!ts.classAccessibleFromPackage(t.toClass(), package_)) {
             return false;
         }

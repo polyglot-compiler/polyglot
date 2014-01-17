@@ -168,7 +168,8 @@ public class Try_c extends Stmt_c implements Try, TryOps {
         }
 
         ExceptionChecker ecTryBlock =
-                constructTryBlockExceptionChecker(ecTryBlockEntry);
+                ec.lang().constructTryBlockExceptionChecker(this,
+                                                            ecTryBlockEntry);
 
         Try_c n = this;
         // Visit the try block.

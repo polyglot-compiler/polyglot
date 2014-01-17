@@ -44,8 +44,8 @@ import polyglot.util.SerialVersionUID;
 // XXX Backward compatible with Polyglot 2.5.3
 @SuppressWarnings("deprecation")
 public class NodeFactory_c extends AbstractNodeFactory_c {
-    private final ExtFactory extFactory;
     private final JLang lang;
+    private final ExtFactory extFactory;
 
     // use an empty implementation of AbstractExtFactory_c,
     // so we don't need to do null checks
@@ -80,9 +80,7 @@ public class NodeFactory_c extends AbstractNodeFactory_c {
 
     @Deprecated
     public NodeFactory_c(ExtFactory extFactory, DelFactory delFactory) {
-        this.extFactory = extFactory;
-        this.lang = new JLangToJLDelWithFactory(delFactory);
-        initEnums();
+        this(new JLangToJLDelWithFactory(delFactory), extFactory);
     }
 
     public NodeFactory_c(JLang lang) {

@@ -542,7 +542,7 @@ public abstract class OptFlag<T> implements Comparable<OptFlag<T>> {
         out.println();
     }
 
-    private void printSpaces(PrintStream out, int n) {
+    private static void printSpaces(PrintStream out, int n) {
         while (n-- > 0)
             out.print(' ');
     }

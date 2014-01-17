@@ -311,7 +311,7 @@ public class Main {
         return true;
     }
 
-    private List<String> explodeOptions(String[] args)
+    private static List<String> explodeOptions(String[] args)
             throws TerminationException {
         LinkedList<String> ll = new LinkedList<String>();
 

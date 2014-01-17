@@ -85,14 +85,14 @@ public class J5Lang_c extends JLang_c implements J5Lang {
     // JL5SwitchOps
 
     @Override
-    public boolean isAcceptableSwitchType(Node n, Type type) {
+    public final boolean isAcceptableSwitchType(Node n, Type type) {
         return JL5SwitchOps(n).isAcceptableSwitchType(type);
     }
 
     // JL5CaseOps
 
     @Override
-    public Node resolveCaseLabel(Node n, TypeChecker tc, Type switchType)
+    public final Node resolveCaseLabel(Node n, TypeChecker tc, Type switchType)
             throws SemanticException {
         return JL5CaseOps(n).resolveCaseLabel(tc, switchType);
     }

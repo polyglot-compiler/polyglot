@@ -34,7 +34,6 @@ import polyglot.ast.Expr;
 import polyglot.ast.FieldDecl;
 import polyglot.ast.LocalDecl;
 import polyglot.ast.New;
-import polyglot.ast.NewOps;
 import polyglot.ast.Node;
 import polyglot.ast.Return;
 import polyglot.ast.Special;
@@ -142,8 +141,8 @@ public class JL7NewExt extends JL7Ext {
             actualTypeArgs.add((ReferenceType) tn.type());
         }
 
-        ((NewOps) this.node()).typeCheckFlags(tc);
-        ((NewOps) this.node()).typeCheckNested(tc);
+        superLang().typeCheckFlags(this.node(), tc);
+        superLang().typeCheckNested(this.node(), tc);
 
         if (n.body() != null) {
             ts.checkClassConformance(n.anonType());

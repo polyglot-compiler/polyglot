@@ -299,7 +299,7 @@ public class InnerClassRemover extends ContextVisitor {
     }
 
     public ClassDecl fixQualifiers(ClassDecl cd) {
-        return (ClassDecl) cd.visitChildren(new NodeVisitor(lang()) {
+        return (ClassDecl) lang().visitChildren(cd, new NodeVisitor(lang()) {
             LocalInstance li;
 
             @Override

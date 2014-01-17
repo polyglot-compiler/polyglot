@@ -100,7 +100,7 @@ public class JL5CallExt extends JL5Ext implements CallOps {
 
         List<TypeNode> typeArgs = this.node().visitList(ext.typeArgs(), v);
 
-        Node newN = this.node().visitChildren(v);
+        Node newN = superLang().visitChildren(this.node(), v);
         JL5CallExt newext = (JL5CallExt) JL5Ext.ext(newN);
 
         if (!CollectionUtil.equals(typeArgs, newext.typeArgs())) {
@@ -352,13 +352,13 @@ public class JL5CallExt extends JL5Ext implements CallOps {
 
     @Override
     public ReferenceType findTargetType() throws SemanticException {
-        return ((CallOps) node()).findTargetType();
+        return superLang().findTargetType(node());
     }
 
     @Override
     public Node typeCheckNullTarget(TypeChecker tc, List<Type> argTypes)
             throws SemanticException {
-        return ((CallOps) node()).typeCheckNullTarget(tc, argTypes);
+        return superLang().typeCheckNullTarget(node(), tc, argTypes);
     }
 
 }

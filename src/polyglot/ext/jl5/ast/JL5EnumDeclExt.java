@@ -3,10 +3,10 @@ package polyglot.ext.jl5.ast;
 import java.util.Collections;
 
 import polyglot.ast.ClassDecl;
-import polyglot.ast.ClassDecl_c;
 import polyglot.ast.ClassMember;
 import polyglot.ast.ConstructorDecl;
 import polyglot.ast.Formal;
+import polyglot.ast.JLang;
 import polyglot.ast.MethodDecl;
 import polyglot.ast.Node;
 import polyglot.ast.NodeFactory;
@@ -200,7 +200,7 @@ public class JL5EnumDeclExt extends JL5ClassDeclExt {
     @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
         ClassDecl n = (ClassDecl) this.node();
-        prettyPrintHeader(w, tr);
+        ((JLang) tr.lang()).prettyPrintHeader(n, w, tr);
 
         boolean hasEnumConstant = false;
         for (ClassMember m : n.body().members()) {
@@ -212,7 +212,7 @@ public class JL5EnumDeclExt extends JL5ClassDeclExt {
 
         if (!hasEnumConstant) w.write(";");
         ((Node_c) n).print(n.body(), w, tr);
-        ((ClassDecl_c) n).prettyPrintFooter(w, tr);
+        ((JLang) tr.lang()).prettyPrintFooter(n, w, tr);
     }
 
 }

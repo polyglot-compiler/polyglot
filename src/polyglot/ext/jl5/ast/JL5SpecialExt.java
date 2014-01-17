@@ -44,6 +44,6 @@ public class JL5SpecialExt extends JL5Ext {
             RawClass rc = (RawClass) n.qualifier().type();
             n = n.qualifier(n.qualifier().type(rc.base()));
         }
-        return n.typeCheck(tc);
+        return superLang().typeCheck(n, tc);
     }
 }

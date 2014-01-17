@@ -82,7 +82,7 @@ public class TypeDumper {
         initializeType(theType);
     }
 
-    private void initializeType(TypeObject t) {
+    private static void initializeType(TypeObject t) {
         if (t instanceof ClassType) {
             ClassType ct = (ClassType) t;
             ct.methods();
@@ -239,7 +239,7 @@ public class TypeDumper {
         }
     }
 
-    private boolean dontDump(String className, String fieldName) {
+    private static boolean dontDump(String className, String fieldName) {
         if ("classFileSource".equals(fieldName)) {
             return true;
         }
@@ -264,7 +264,7 @@ public class TypeDumper {
             m.put(o, o);
         }
 
-        private TypeSystem typeSystemFor(Object o) {
+        private static TypeSystem typeSystemFor(Object o) {
             if (o instanceof TypeObject) {
                 TypeObject to = (TypeObject) o;
                 return to.typeSystem();

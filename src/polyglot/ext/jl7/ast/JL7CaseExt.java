@@ -50,7 +50,7 @@ public class JL7CaseExt extends JL7Ext implements JL5CaseOps {
         if (switchType.isClass() && ts.String().equals(switchType)) {
             return c;
         }
-        return ((JL5CaseOps) superLang()).resolveCaseLabel(tc, switchType);
+        return superLang().resolveCaseLabel(c, tc, switchType);
     }
 
     @Override

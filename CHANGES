@@ -15,9 +15,10 @@ dispatching mechanisms for all AST nodes.  Any class implementing Lang should be
 singleton; multiple instances of the same Lang implementation are unnecessary.
 
 Because AST nodes can represent multiple languages, NodeVisitor now requires an
-instance of Lang to determine the appropriate language to work on.
+instance of Lang to determine the appropriate language to work on.  Similarly,
+Context now requires an instance of Lang.
 
-Changed the return type of polyglot.ast.Node_c:del() from JLDel to NodeOps
+The return type of polyglot.ast.Node_c:del() is changed from JLDel to NodeOps
 because Node no longer extends JLDel.  Both extend NodeOps, however, which is
 essentially what we need to dispatch to compiler operations.
 
@@ -30,8 +31,8 @@ Deprecated features should still work with this version, with the exception of
 any overriding of del() method described above.
 
 
-XXX, 2013 : Polyglot 2.5.4/2.6???
-===============================
+December 3, 2013 : Polyglot 2.5.4rc1
+====================================
 
 Changed signature of polyglot.visit.Dataflow to use Peer instead 
 of (Node,boolean) pairs. This change is not backward compatible. 

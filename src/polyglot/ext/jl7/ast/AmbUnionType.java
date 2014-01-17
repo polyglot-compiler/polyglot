@@ -56,7 +56,7 @@ public class AmbUnionType extends TypeNode_c implements TypeNode, Ambiguous {
         Iterator<TypeNode> i = this.alternatives.iterator();
         while (i.hasNext()) {
             TypeNode a = i.next();
-            a.prettyPrint(w, tr);
+            tr.lang().prettyPrint(a, w, tr);
             if (i.hasNext()) {
                 w.write("|");
             }

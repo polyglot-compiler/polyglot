@@ -134,7 +134,7 @@ public class JL5ConstructorCallExt extends JL5Ext {
                 cc = (ConstructorCall) cc.arguments(args);
                 ext = (JL5ConstructorCallExt) JL5Ext.ext(cc);
                 ext.isEnumConstructorCall = true;
-                return cc.disambiguate(ar);
+                return superLang().disambiguate(cc, ar);
             }
         }
         return superLang().disambiguate(this.node(), ar);

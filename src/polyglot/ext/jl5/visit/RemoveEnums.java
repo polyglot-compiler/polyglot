@@ -731,7 +731,8 @@ public class RemoveEnums extends ContextVisitor {
         list.add(switchMethod);
     }
 
-    private int findEnumConstIndex(ClassType enumType, FieldInstance field) {
+    private static int findEnumConstIndex(ClassType enumType,
+            FieldInstance field) {
         List<FieldInstance> l = enumConstantFieldInstances(enumType);
         for (int i = 0; i < l.size(); i++) {
             if (l.get(i) == field) {
@@ -742,7 +743,8 @@ public class RemoveEnums extends ContextVisitor {
                 + enumType + " as an enum constant");
     }
 
-    private List<FieldInstance> enumConstantFieldInstances(ClassType enumType) {
+    private static List<FieldInstance> enumConstantFieldInstances(
+            ClassType enumType) {
         List<FieldInstance> l = new ArrayList<FieldInstance>();
         for (FieldInstance f : enumType.fields()) {
             if (f.flags().isStatic() && f.type() == enumType) {

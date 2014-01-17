@@ -64,7 +64,7 @@ public abstract class JL5AnnotatedElementExt extends JL5Ext implements
 
     @Override
     public Node visitChildren(NodeVisitor v) {
-        Node newN = this.node().visitChildren(v);
+        Node newN = superLang().visitChildren(this.node(), v);
         JL5AnnotatedElementExt newext =
                 (JL5AnnotatedElementExt) JL5Ext.ext(newN);
 
@@ -94,7 +94,7 @@ public abstract class JL5AnnotatedElementExt extends JL5Ext implements
 
         JL5TypeSystem ts = (JL5TypeSystem) tc.typeSystem();
         ts.checkDuplicateAnnotations(ext.annotationElems());
-        return this.node().typeCheck(tc);
+        return superLang().typeCheck(this.node(), tc);
 
     }
 

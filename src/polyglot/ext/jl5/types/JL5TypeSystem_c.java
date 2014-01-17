@@ -1757,7 +1757,8 @@ public class JL5TypeSystem_c extends
         return false;
     }
 
-    private boolean areProvablyDistinct(JL5SubstClassType s, JL5SubstClassType t) {
+    private static boolean areProvablyDistinct(JL5SubstClassType s,
+            JL5SubstClassType t) {
         // See JLS 3rd ed 4.5
         // Distinct if either (1) They are invocations of distinct generic type declarations.
         // or (2) Any of their type arguments are provably distinct
@@ -1779,7 +1780,8 @@ public class JL5TypeSystem_c extends
         return false;
     }
 
-    private boolean areTypArgsProvablyDistinct(ReferenceType s, ReferenceType t) {
+    private static boolean areTypArgsProvablyDistinct(ReferenceType s,
+            ReferenceType t) {
         // JLS 3rd ed 4.5. "Two type arguments are provably distinct if 
         // neither of the arguments is a type variable or wildcard, and 
         // the two arguments are not the same type."
