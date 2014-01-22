@@ -167,13 +167,13 @@ public class CofferConstructorDecl_c extends ConstructorDecl_c implements
 
     @Override
     public Node visitChildren(NodeVisitor v) {
-        Id name = (Id) visitChild(this.name, v);
+        Id name = visitChild(this.name, v);
         List<Formal> formals = visitList(this.formals, v);
-        KeySetNode entryKeys = (KeySetNode) visitChild(this.entryKeys, v);
-        KeySetNode returnKeys = (KeySetNode) visitChild(this.returnKeys, v);
+        KeySetNode entryKeys = visitChild(this.entryKeys, v);
+        KeySetNode returnKeys = visitChild(this.returnKeys, v);
         List<ThrowConstraintNode> throwConstraints =
                 visitList(this.throwConstraints, v);
-        Block body = (Block) visitChild(this.body, v);
+        Block body = visitChild(this.body, v);
         return reconstruct(name,
                            formals,
                            entryKeys,

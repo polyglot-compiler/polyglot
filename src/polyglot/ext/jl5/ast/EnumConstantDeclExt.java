@@ -25,9 +25,21 @@
  ******************************************************************************/
 package polyglot.ext.jl5.ast;
 
+import polyglot.ast.Node;
 import polyglot.ext.jl5.types.Annotations;
+import polyglot.ext.jl5.types.JL5TypeSystem;
 import polyglot.types.Declaration;
+import polyglot.types.SemanticException;
+import polyglot.util.CodeWriter;
 import polyglot.util.SerialVersionUID;
+import polyglot.visit.AmbiguityRemover;
+import polyglot.visit.BodyDisambiguator;
+import polyglot.visit.NodeVisitor;
+import polyglot.visit.PrettyPrinter;
+import polyglot.visit.PruningVisitor;
+import polyglot.visit.SignatureDisambiguator;
+import polyglot.visit.SupertypeDisambiguator;
+import polyglot.visit.TypeChecker;
 
 /**
  * This class mainly exists so that EnumConstantDecls can be indentified as
@@ -36,6 +48,70 @@ import polyglot.util.SerialVersionUID;
  */
 public class EnumConstantDeclExt extends JL5AnnotatedElementExt {
     private static final long serialVersionUID = SerialVersionUID.generate();
+
+    @Override
+    public Node disambiguateOverride(Node parent, AmbiguityRemover ar)
+            throws SemanticException {
+        EnumConstantDecl nn = (EnumConstantDecl) this.node();
+
+        BodyDisambiguator bd = new BodyDisambiguator(ar);
+        NodeVisitor childv = bd.enter(parent, nn);
+
+        if (childv instanceof PruningVisitor) {
+            return nn;
+        }
+
+        BodyDisambiguator childbd = (BodyDisambiguator) childv;
+        EnumConstantDecl old = nn;
+
+        // Now disambiguate the actuals.
+        nn = nn.args(nn.visitList(nn.args(), childbd));
+        if (childbd.hasErrors()) throw new SemanticException();
+
+        if (nn.body() != null) {
+            SupertypeDisambiguator supDisamb =
+                    new SupertypeDisambiguator(childbd);
+            nn = nn.body(nn.visitChild(nn.body(), supDisamb));
+            if (supDisamb.hasErrors()) throw new SemanticException();
+
+            SignatureDisambiguator sigDisamb =
+                    new SignatureDisambiguator(childbd);
+            nn = nn.body(nn.visitChild(nn.body(), sigDisamb));
+            if (sigDisamb.hasErrors()) throw new SemanticException();
+
+            // Now visit the body.
+            nn = nn.body(nn.visitChild(nn.body(), childbd));
+            if (childbd.hasErrors()) throw new SemanticException();
+        }
+
+        // Now visit the annotations
+        nn =
+                (EnumConstantDecl) annotationElems(nn,
+                                                   nn.visitList(annotationElems(nn),
+                                                                childbd));
+
+        nn = (EnumConstantDecl) bd.leave(parent, old, nn, childbd);
+
+        return nn;
+    }
+
+    @Override
+    public Node typeCheck(TypeChecker tc) throws SemanticException {
+        Node n = superLang().typeCheck(this.node(), tc);
+        JL5TypeSystem ts = (JL5TypeSystem) tc.typeSystem();
+        ts.checkDuplicateAnnotations(annotationElems(n));
+        return n;
+    }
+
+    @Override
+    public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
+        Node n = this.node();
+        for (AnnotationElem ae : annotationElems(n)) {
+            tr.lang().prettyPrint(ae, w, tr);
+            w.newline();
+        }
+        superLang().prettyPrint(n, w, tr);
+    }
 
     @Override
     protected Declaration declaration() {

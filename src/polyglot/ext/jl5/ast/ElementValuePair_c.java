@@ -89,7 +89,7 @@ public class ElementValuePair_c extends Term_c implements ElementValuePair {
 
     @Override
     public Node visitChildren(NodeVisitor v) {
-        Term value = (Term) visitChild(this.value, v);
+        Term value = visitChild(this.value, v);
         return value(value);
     }
 

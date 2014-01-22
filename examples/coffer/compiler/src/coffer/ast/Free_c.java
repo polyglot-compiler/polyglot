@@ -62,7 +62,7 @@ public class Free_c extends Stmt_c implements Free {
 
     @Override
     public Node visitChildren(NodeVisitor v) {
-        Expr expr = (Expr) visitChild(this.expr, v);
+        Expr expr = visitChild(this.expr, v);
         return reconstruct(expr);
     }
 

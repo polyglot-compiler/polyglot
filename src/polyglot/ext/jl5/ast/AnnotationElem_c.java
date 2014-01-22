@@ -97,7 +97,6 @@ public class AnnotationElem_c extends Term_c implements AnnotationElem {
             AnnotationElem_c n = (AnnotationElem_c) copy();
             n.typeName = typeName;
             n.elements = ListUtil.copy(elements, true);
-
             return n;
         }
         return this;
@@ -105,9 +104,8 @@ public class AnnotationElem_c extends Term_c implements AnnotationElem {
 
     @Override
     public Node visitChildren(NodeVisitor v) {
-        TypeNode tn = (TypeNode) visitChild(this.typeName, v);
+        TypeNode tn = visitChild(this.typeName, v);
         List<ElementValuePair> elements = visitList(this.elements, v);
-
         return reconstruct(tn, elements);
     }
 

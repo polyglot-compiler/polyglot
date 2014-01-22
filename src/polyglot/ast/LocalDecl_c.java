@@ -191,9 +191,9 @@ public class LocalDecl_c extends Stmt_c implements LocalDecl {
     /** Visit the children of the declaration. */
     @Override
     public Node visitChildren(NodeVisitor v) {
-        TypeNode type = (TypeNode) visitChild(this.type, v);
-        Id name = (Id) visitChild(this.name, v);
-        Expr init = (Expr) visitChild(this.init, v);
+        TypeNode type = visitChild(this.type, v);
+        Id name = visitChild(this.name, v);
+        Expr init = visitChild(this.init, v);
         return reconstruct(type, name, init);
     }
 

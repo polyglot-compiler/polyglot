@@ -75,11 +75,11 @@ public class CofferClassDecl_c extends ClassDecl_c implements CofferClassDecl {
 
     @Override
     public Node visitChildren(NodeVisitor v) {
-        Id name = (Id) visitChild(this.name, v);
-        KeyNode key = (KeyNode) visitChild(this.key, v);
-        TypeNode superClass = (TypeNode) visitChild(this.superClass, v);
+        Id name = visitChild(this.name, v);
+        KeyNode key = visitChild(this.key, v);
+        TypeNode superClass = visitChild(this.superClass, v);
         List<TypeNode> interfaces = visitList(this.interfaces, v);
-        ClassBody body = (ClassBody) visitChild(this.body, v);
+        ClassBody body = visitChild(this.body, v);
         return reconstruct(name, key, superClass, interfaces, body);
     }
 

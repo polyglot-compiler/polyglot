@@ -224,7 +224,7 @@ public class AmbTypeInstantiation extends TypeNode_c implements TypeNode,
 
     @Override
     public Node visitChildren(NodeVisitor v) {
-        TypeNode base = (TypeNode) visitChild(this.base, v);
+        TypeNode base = visitChild(this.base, v);
         List<TypeNode> arguments = visitList(this.typeArguments, v);
         return this.base(base).typeArguments(arguments);
     }

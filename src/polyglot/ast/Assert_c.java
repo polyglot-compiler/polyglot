@@ -148,8 +148,8 @@ public class Assert_c extends Stmt_c implements Assert {
     /** Visit the children of the statement. */
     @Override
     public Node visitChildren(NodeVisitor v) {
-        Expr cond = (Expr) visitChild(this.cond, v);
-        Expr errorMessage = (Expr) visitChild(this.errorMessage, v);
+        Expr cond = visitChild(this.cond, v);
+        Expr errorMessage = visitChild(this.errorMessage, v);
         return reconstruct(cond, errorMessage);
     }
 

@@ -107,8 +107,8 @@ public class AmbTypeNode_c extends TypeNode_c implements AmbTypeNode {
 
     @Override
     public Node visitChildren(NodeVisitor v) {
-        QualifierNode qual = (QualifierNode) visitChild(this.qual, v);
-        Id name = (Id) visitChild(this.name, v);
+        QualifierNode qual = visitChild(this.qual, v);
+        Id name = visitChild(this.name, v);
         return reconstruct(qual, name);
     }
 

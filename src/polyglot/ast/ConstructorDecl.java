@@ -41,6 +41,7 @@ public interface ConstructorDecl extends ProcedureDecl {
     Flags flags();
 
     /** Set the constructor's flags. */
+    @Override
     ConstructorDecl flags(Flags flags);
 
     /**

@@ -111,8 +111,8 @@ public class ThrowConstraintNode_c extends Node_c implements
 
     @Override
     public Node visitChildren(NodeVisitor v) {
-        TypeNode tn = (TypeNode) visitChild(this.tn, v);
-        KeySetNode keys = (KeySetNode) visitChild(this.keys, v);
+        TypeNode tn = visitChild(this.tn, v);
+        KeySetNode keys = visitChild(this.keys, v);
         return reconstruct(tn, keys);
     }
 

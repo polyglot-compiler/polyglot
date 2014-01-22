@@ -206,10 +206,10 @@ public class New_c extends Expr_c implements New, NewOps {
     /** Visit the children of the expression. */
     @Override
     public Node visitChildren(NodeVisitor v) {
-        Expr qualifier = (Expr) visitChild(this.qualifier, v);
-        TypeNode tn = (TypeNode) visitChild(this.objectType, v);
+        Expr qualifier = visitChild(this.qualifier, v);
+        TypeNode tn = visitChild(this.objectType, v);
         List<Expr> arguments = visitList(this.arguments, v);
-        ClassBody body = (ClassBody) visitChild(this.body, v);
+        ClassBody body = visitChild(this.body, v);
         return reconstruct(qualifier, tn, arguments, body);
     }
 
@@ -297,9 +297,7 @@ public class New_c extends Expr_c implements New, NewOps {
 
         // Disambiguate the qualifier and object type, if possible.
         if (nn.qualifier() == null) {
-            nn =
-                    nn.objectType((TypeNode) nn.visitChild(nn.objectType(),
-                                                           childbd));
+            nn = nn.objectType(nn.visitChild(nn.objectType(), childbd));
             if (childbd.hasErrors()) throw new SemanticException();
 
             if (!nn.objectType().isDisambiguated()) {
@@ -313,16 +311,14 @@ public class New_c extends Expr_c implements New, NewOps {
                         && !ct.flags().isInterface()) {
                     nn = ar.lang().findQualifier(nn, ar, ct);
 
-                    nn =
-                            nn.qualifier((Expr) nn.visitChild(nn.qualifier(),
-                                                              childbd));
+                    nn = nn.qualifier(nn.visitChild(nn.qualifier(), childbd));
                     nn = nn.qualifierImplicit(true);
                     if (childbd.hasErrors()) throw new SemanticException();
                 }
             }
         }
         else {
-            nn = nn.qualifier((Expr) nn.visitChild(nn.qualifier(), childbd));
+            nn = nn.qualifier(nn.visitChild(nn.qualifier(), childbd));
             if (childbd.hasErrors()) throw new SemanticException();
 
             TypeNode objectType = nn.objectType();
@@ -389,16 +385,16 @@ public class New_c extends Expr_c implements New, NewOps {
 
             SupertypeDisambiguator supDisamb =
                     new SupertypeDisambiguator(childbd);
-            nn = nn.body((ClassBody) nn.visitChild(nn.body(), supDisamb));
+            nn = nn.body(nn.visitChild(nn.body(), supDisamb));
             if (supDisamb.hasErrors()) throw new SemanticException();
 
             SignatureDisambiguator sigDisamb =
                     new SignatureDisambiguator(childbd);
-            nn = nn.body((ClassBody) nn.visitChild(nn.body(), sigDisamb));
+            nn = nn.body(nn.visitChild(nn.body(), sigDisamb));
             if (sigDisamb.hasErrors()) throw new SemanticException();
 
             // Now visit the body.
-            nn = nn.body((ClassBody) nn.visitChild(nn.body(), childbd));
+            nn = nn.body(nn.visitChild(nn.body(), childbd));
             if (childbd.hasErrors()) throw new SemanticException();
         }
 
@@ -798,7 +794,7 @@ public class New_c extends Expr_c implements New, NewOps {
         TypeChecker childtc = (TypeChecker) childv;
 
         if (nn.qualifier() != null) {
-            nn = nn.qualifier((Expr) nn.visitChild(nn.qualifier(), childtc));
+            nn = nn.qualifier(nn.visitChild(nn.qualifier(), childtc));
             if (childtc.hasErrors()) throw new SemanticException();
 
             if (!nn.qualifier().type().isCanonical()) {
@@ -815,7 +811,7 @@ public class New_c extends Expr_c implements New, NewOps {
         }
 
         // Now type check the rest of the children.
-        nn = nn.objectType((TypeNode) nn.visitChild(nn.objectType(), childtc));
+        nn = nn.objectType(nn.visitChild(nn.objectType(), childtc));
         if (childtc.hasErrors()) throw new SemanticException();
 
         if (!nn.objectType().type().isCanonical()) {
@@ -825,7 +821,7 @@ public class New_c extends Expr_c implements New, NewOps {
         nn = (New) nn.arguments(nn.visitList(nn.arguments(), childtc));
         if (childtc.hasErrors()) throw new SemanticException();
 
-        nn = nn.body((ClassBody) nn.visitChild(nn.body(), childtc));
+        nn = nn.body(nn.visitChild(nn.body(), childtc));
         if (childtc.hasErrors()) throw new SemanticException();
 
         nn = (New) tc.leave(parent, old, nn, childtc);

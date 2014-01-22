@@ -228,9 +228,9 @@ public class FieldDecl_c extends Term_c implements FieldDecl {
     /** Visit the children of the declaration. */
     @Override
     public Node visitChildren(NodeVisitor v) {
-        TypeNode type = (TypeNode) visitChild(this.type, v);
-        Id name = (Id) visitChild(this.name, v);
-        Expr init = (Expr) visitChild(this.init, v);
+        TypeNode type = visitChild(this.type, v);
+        Id name = visitChild(this.name, v);
+        Expr init = visitChild(this.init, v);
         return reconstruct(type, name, init);
     }
 

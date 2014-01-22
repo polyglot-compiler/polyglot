@@ -107,7 +107,7 @@ public class LocalClassRemover extends ContextVisitor {
             for (int i = 0; i < ss.size(); i++) {
                 Stmt s = ss.get(i);
                 if (s instanceof LocalClassDecl) {
-                    s = (Stmt) n.visitChild(s, this);
+                    s = n.visitChild(s, this);
 
                     LocalClassDecl lcd = (LocalClassDecl) s;
                     ClassDecl cd = lcd.decl();
@@ -151,7 +151,7 @@ public class LocalClassRemover extends ContextVisitor {
                     i--;
                 }
                 else {
-                    s = (Stmt) n.visitChild(s, this);
+                    s = n.visitChild(s, this);
                     ss.set(i, s);
                 }
             }

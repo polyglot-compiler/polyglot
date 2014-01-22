@@ -217,10 +217,10 @@ public class ClassDecl_c extends Term_c implements ClassDecl, ClassDeclOps {
 
     @Override
     public Node visitChildren(NodeVisitor v) {
-        Id name = (Id) visitChild(this.name, v);
-        TypeNode superClass = (TypeNode) visitChild(this.superClass, v);
+        Id name = visitChild(this.name, v);
+        TypeNode superClass = visitChild(this.superClass, v);
         List<TypeNode> interfaces = visitList(this.interfaces, v);
-        ClassBody body = (ClassBody) visitChild(this.body, v);
+        ClassBody body = visitChild(this.body, v);
         return reconstruct(name, superClass, interfaces, body);
     }
 

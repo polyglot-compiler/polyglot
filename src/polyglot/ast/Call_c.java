@@ -193,8 +193,8 @@ public class Call_c extends Expr_c implements Call, CallOps {
     /** Visit the children of the call. */
     @Override
     public Node visitChildren(NodeVisitor v) {
-        Receiver target = (Receiver) visitChild(this.target, v);
-        Id name = (Id) visitChild(this.name, v);
+        Receiver target = visitChild(this.target, v);
+        Id name = visitChild(this.name, v);
         List<Expr> arguments = visitList(this.arguments, v);
         return reconstruct(target, name, arguments);
     }

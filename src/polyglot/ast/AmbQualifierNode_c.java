@@ -113,8 +113,8 @@ public class AmbQualifierNode_c extends Node_c implements AmbQualifierNode {
 
     @Override
     public Node visitChildren(NodeVisitor v) {
-        Id name = (Id) visitChild(this.name, v);
-        QualifierNode qual = (QualifierNode) visitChild(this.qual, v);
+        Id name = visitChild(this.name, v);
+        QualifierNode qual = visitChild(this.qual, v);
         return reconstruct(qual, name);
     }
 

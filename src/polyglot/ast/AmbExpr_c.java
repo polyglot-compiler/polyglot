@@ -100,7 +100,7 @@ public class AmbExpr_c extends Expr_c implements AmbExpr {
     /** Visit the children of the constructor. */
     @Override
     public Node visitChildren(NodeVisitor v) {
-        Id name = (Id) visitChild(this.name, v);
+        Id name = visitChild(this.name, v);
         return reconstruct(name);
     }
 

@@ -148,7 +148,7 @@ public class Initializer_c extends Term_c implements Initializer {
     /** Visit the children of the initializer. */
     @Override
     public Node visitChildren(NodeVisitor v) {
-        Block body = (Block) visitChild(this.body, v);
+        Block body = visitChild(this.body, v);
         return reconstruct(body);
     }
 

@@ -165,7 +165,7 @@ public class SourceFile_c extends Node_c implements SourceFile {
     /** Visit the children of the source file. */
     @Override
     public Node visitChildren(NodeVisitor v) {
-        PackageNode package_ = (PackageNode) visitChild(this.package_, v);
+        PackageNode package_ = visitChild(this.package_, v);
         List<Import> imports = visitList(this.imports, v);
         List<TopLevelDecl> decls = visitList(this.decls, v);
         return reconstruct(package_, imports, decls);

@@ -119,7 +119,7 @@ public class Switch_c extends Stmt_c implements Switch {
     /** Visit the children of the statement. */
     @Override
     public Node visitChildren(NodeVisitor v) {
-        Expr expr = (Expr) visitChild(this.expr, v);
+        Expr expr = visitChild(this.expr, v);
         List<SwitchElement> elements = visitList(this.elements, v);
         return reconstruct(expr, elements);
     }

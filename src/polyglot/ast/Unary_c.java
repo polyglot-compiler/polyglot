@@ -106,7 +106,7 @@ public class Unary_c extends Expr_c implements Unary {
     /** Visit the children of the expression. */
     @Override
     public Node visitChildren(NodeVisitor v) {
-        Expr expr = (Expr) visitChild(this.expr, v);
+        Expr expr = visitChild(this.expr, v);
         return reconstruct(expr);
     }
 

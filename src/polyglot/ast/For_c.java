@@ -147,9 +147,9 @@ public class For_c extends Loop_c implements For {
     @Override
     public Node visitChildren(NodeVisitor v) {
         List<ForInit> inits = visitList(this.inits, v);
-        Expr cond = (Expr) visitChild(this.cond, v);
+        Expr cond = visitChild(this.cond, v);
         List<ForUpdate> iters = visitList(this.iters, v);
-        Stmt body = (Stmt) visitChild(this.body, v);
+        Stmt body = visitChild(this.body, v);
         return reconstruct(inits, cond, iters, body);
     }
 

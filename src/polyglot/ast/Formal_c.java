@@ -162,8 +162,8 @@ public class Formal_c extends Term_c implements Formal {
     /** Visit the children of the formal. */
     @Override
     public Node visitChildren(NodeVisitor v) {
-        TypeNode type = (TypeNode) visitChild(this.type, v);
-        Id name = (Id) visitChild(this.name, v);
+        TypeNode type = visitChild(this.type, v);
+        Id name = visitChild(this.name, v);
         return reconstruct(type, name);
     }
 

@@ -89,7 +89,7 @@ public class ClassLit_c extends Lit_c implements ClassLit {
 
     @Override
     public Node visitChildren(NodeVisitor v) {
-        TypeNode tn = (TypeNode) visitChild(this.typeNode, v);
+        TypeNode tn = visitChild(this.typeNode, v);
         return this.typeNode(tn);
     }
 

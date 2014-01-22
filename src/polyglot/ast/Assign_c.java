@@ -123,8 +123,8 @@ public abstract class Assign_c extends Expr_c implements Assign {
     /** Visit the children of the expression. */
     @Override
     public Node visitChildren(NodeVisitor v) {
-        Expr left = (Expr) visitChild(this.left, v);
-        Expr right = (Expr) visitChild(this.right, v);
+        Expr left = visitChild(this.left, v);
+        Expr right = visitChild(this.right, v);
         return reconstruct(left, right);
     }
 

@@ -39,6 +39,9 @@ public interface ProcedureDecl extends CodeDecl {
     /** The procedure's flags. */
     Flags flags();
 
+    /** Set the procedure's flags. */
+    ProcedureDecl flags(Flags flags);
+
     /** The procedure's name. */
     String name();
 

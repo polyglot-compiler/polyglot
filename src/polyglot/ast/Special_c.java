@@ -107,7 +107,7 @@ public class Special_c extends Expr_c implements Special {
     /** Visit the children of the expression. */
     @Override
     public Node visitChildren(NodeVisitor v) {
-        TypeNode qualifier = (TypeNode) visitChild(this.qualifier, v);
+        TypeNode qualifier = visitChild(this.qualifier, v);
         return reconstruct(qualifier);
     }
 

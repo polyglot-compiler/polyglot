@@ -156,9 +156,9 @@ public class NewArray_c extends Expr_c implements NewArray {
     /** Visit the children of the expression. */
     @Override
     public Node visitChildren(NodeVisitor v) {
-        TypeNode baseType = (TypeNode) visitChild(this.baseType, v);
+        TypeNode baseType = visitChild(this.baseType, v);
         List<Expr> dims = visitList(this.dims, v);
-        ArrayInit init = (ArrayInit) visitChild(this.init, v);
+        ArrayInit init = visitChild(this.init, v);
         return reconstruct(baseType, dims, init);
     }
 

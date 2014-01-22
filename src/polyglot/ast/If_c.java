@@ -120,7 +120,7 @@ public class If_c extends Stmt_c implements If {
     /** Visit the children of the statement. */
     @Override
     public Node visitChildren(NodeVisitor v) {
-        Expr cond = (Expr) visitChild(this.cond, v);
+        Expr cond = visitChild(this.cond, v);
         Node consequent = visitChild(this.consequent, v);
         Node alternative = visitChild(this.alternative, v);
         return reconstruct(cond, (Stmt) consequent, (Stmt) alternative);

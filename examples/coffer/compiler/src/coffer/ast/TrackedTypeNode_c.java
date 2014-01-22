@@ -81,8 +81,8 @@ public class TrackedTypeNode_c extends TypeNode_c implements TrackedTypeNode {
 
     @Override
     public Node visitChildren(NodeVisitor v) {
-        TypeNode base = (TypeNode) visitChild(this.base, v);
-        KeyNode key = (KeyNode) visitChild(this.key, v);
+        TypeNode base = visitChild(this.base, v);
+        KeyNode key = visitChild(this.key, v);
         return reconstruct(base, key);
     }
 

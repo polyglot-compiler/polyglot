@@ -125,9 +125,9 @@ public class ExtendedFor_c extends Loop_c implements ExtendedFor {
     /** Visit the children of the statement. */
     @Override
     public Node visitChildren(NodeVisitor v) {
-        LocalDecl decl = (LocalDecl) visitChild(this.decl, v);
-        Expr expr = (Expr) visitChild(this.expr, v);
-        Stmt body = (Stmt) visitChild(this.body, v);
+        LocalDecl decl = visitChild(this.decl, v);
+        Expr expr = visitChild(this.expr, v);
+        Stmt body = visitChild(this.body, v);
         return reconstruct(decl, expr, body);
     }
 

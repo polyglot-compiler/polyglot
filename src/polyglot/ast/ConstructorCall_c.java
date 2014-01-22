@@ -160,7 +160,7 @@ public class ConstructorCall_c extends Stmt_c implements ConstructorCall {
     /** Visit the children of the call. */
     @Override
     public Node visitChildren(NodeVisitor v) {
-        Expr qualifier = (Expr) visitChild(this.qualifier, v);
+        Expr qualifier = visitChild(this.qualifier, v);
         List<Expr> arguments = visitList(this.arguments, v);
         return reconstruct(qualifier, arguments);
     }

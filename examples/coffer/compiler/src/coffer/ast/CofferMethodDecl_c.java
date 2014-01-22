@@ -170,14 +170,14 @@ public class CofferMethodDecl_c extends MethodDecl_c implements
 
     @Override
     public Node visitChildren(NodeVisitor v) {
-        TypeNode returnType = (TypeNode) visitChild(this.returnType, v);
-        Id name = (Id) visitChild(this.name, v);
+        TypeNode returnType = visitChild(this.returnType, v);
+        Id name = visitChild(this.name, v);
         List<Formal> formals = visitList(this.formals, v);
-        KeySetNode entryKeys = (KeySetNode) visitChild(this.entryKeys, v);
-        KeySetNode returnKeys = (KeySetNode) visitChild(this.returnKeys, v);
+        KeySetNode entryKeys = visitChild(this.entryKeys, v);
+        KeySetNode returnKeys = visitChild(this.returnKeys, v);
         List<ThrowConstraintNode> throwConstraints =
                 visitList(this.throwConstraints, v);
-        Block body = (Block) visitChild(this.body, v);
+        Block body = visitChild(this.body, v);
         return reconstruct(returnType,
                            name,
                            formals,

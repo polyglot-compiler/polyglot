@@ -125,10 +125,11 @@ public class JL5NodeFactory_c extends NodeFactory_c implements JL5NodeFactory {
         return n;
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public AnnotationElem MarkerAnnotationElem(Position pos, TypeNode name) {
-        return NormalAnnotationElem(pos, name, Collections.EMPTY_LIST);
+        return NormalAnnotationElem(pos,
+                                    name,
+                                    Collections.<ElementValuePair> emptyList());
     }
 
     @Override

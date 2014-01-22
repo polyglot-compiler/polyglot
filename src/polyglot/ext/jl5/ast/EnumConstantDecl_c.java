@@ -53,15 +53,10 @@ import polyglot.util.CollectionUtil;
 import polyglot.util.ListUtil;
 import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
-import polyglot.visit.AmbiguityRemover;
 import polyglot.visit.AscriptionVisitor;
-import polyglot.visit.BodyDisambiguator;
 import polyglot.visit.CFGBuilder;
 import polyglot.visit.NodeVisitor;
 import polyglot.visit.PrettyPrinter;
-import polyglot.visit.PruningVisitor;
-import polyglot.visit.SignatureDisambiguator;
-import polyglot.visit.SupertypeDisambiguator;
 import polyglot.visit.TypeBuilder;
 import polyglot.visit.TypeChecker;
 
@@ -186,16 +181,11 @@ public class EnumConstantDecl_c extends Term_c implements EnumConstantDecl {
         return constructorInstance;
     }
 
-    protected EnumConstantDecl_c reconstruct(List<Expr> args, ClassBody body,
-            List<AnnotationElem> annotations) {
-        EnumConstantDeclExt ext = (EnumConstantDeclExt) JL5Ext.ext(this);
-        if (!CollectionUtil.equals(args, this.args) || body != this.body
-                || !CollectionUtil.equals(annotations, ext.annotationElems())) {
+    protected EnumConstantDecl_c reconstruct(List<Expr> args, ClassBody body) {
+        if (!CollectionUtil.equals(args, this.args) || body != this.body) {
             EnumConstantDecl_c n = (EnumConstantDecl_c) copy();
-            EnumConstantDeclExt newext = (EnumConstantDeclExt) JL5Ext.ext(this);
             n.args = ListUtil.<Expr> copy(args, true);
             n.body = body;
-            newext.annotations = ListUtil.copy(annotations, true);
             return n;
         }
         return this;
@@ -203,11 +193,9 @@ public class EnumConstantDecl_c extends Term_c implements EnumConstantDecl {
 
     @Override
     public Node visitChildren(NodeVisitor v) {
-        EnumConstantDeclExt ext = (EnumConstantDeclExt) JL5Ext.ext(this);
         List<Expr> args = visitList(this.args, v);
-        ClassBody body = (ClassBody) visitChild(this.body, v);
-        List<AnnotationElem> annotations = visitList(ext.annotations, v);
-        return reconstruct(args, body, annotations);
+        ClassBody body = visitChild(this.body, v);
+        return reconstruct(args, body);
     }
 
     @Override
@@ -278,58 +266,6 @@ public class EnumConstantDecl_c extends Term_c implements EnumConstantDecl {
     }
 
     @Override
-    public Node disambiguate(AmbiguityRemover ar) throws SemanticException {
-        // Everything is done in disambiguateOverride.
-        return this;
-    }
-
-    @Override
-    public Node disambiguateOverride(Node parent, AmbiguityRemover ar)
-            throws SemanticException {
-        EnumConstantDecl nn = this;
-        EnumConstantDecl old = nn;
-
-        BodyDisambiguator bd = new BodyDisambiguator(ar);
-        NodeVisitor childv = bd.enter(parent, this);
-
-        if (childv instanceof PruningVisitor) {
-            return nn;
-        }
-
-        BodyDisambiguator childbd = (BodyDisambiguator) childv;
-
-        // Now disambiguate the actuals.
-        nn = nn.args(nn.visitList(nn.args(), childbd));
-        if (childbd.hasErrors()) throw new SemanticException();
-
-        if (nn.body() != null) {
-            SupertypeDisambiguator supDisamb =
-                    new SupertypeDisambiguator(childbd);
-            nn = nn.body((ClassBody) nn.visitChild(nn.body(), supDisamb));
-            if (supDisamb.hasErrors()) throw new SemanticException();
-
-            SignatureDisambiguator sigDisamb =
-                    new SignatureDisambiguator(childbd);
-            nn = nn.body((ClassBody) nn.visitChild(nn.body(), sigDisamb));
-            if (sigDisamb.hasErrors()) throw new SemanticException();
-
-            // Now visit the body.
-            nn = nn.body((ClassBody) nn.visitChild(nn.body(), childbd));
-            if (childbd.hasErrors()) throw new SemanticException();
-        }
-
-        // Now visit the annotations
-        EnumConstantDeclExt ext = (EnumConstantDeclExt) JL5Ext.ext(nn);
-        nn =
-                (EnumConstantDecl) ext.annotationElems(nn.visitList(ext.annotationElems(),
-                                                                    childbd));
-
-        nn = (EnumConstantDecl) bd.leave(parent, old, nn, childbd);
-
-        return nn;
-    }
-
-    @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
         JL5TypeSystem ts = (JL5TypeSystem) tc.typeSystem();
         Context c = tc.context();
@@ -349,9 +285,6 @@ public class EnumConstantDecl_c extends Term_c implements EnumConstantDecl {
             throw new SemanticException("Cannot have modifier(s): " + flags
                     + " on enum constant declaration", this.position());
         }
-
-        EnumConstantDeclExt ext = (EnumConstantDeclExt) JL5Ext.ext(n);
-        ts.checkDuplicateAnnotations(ext.annotationElems());
 
         if (this.body != null) {
             ts.checkClassConformance(type);
@@ -385,12 +318,6 @@ public class EnumConstantDecl_c extends Term_c implements EnumConstantDecl {
 
     @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
-        EnumConstantDeclExt ext = (EnumConstantDeclExt) JL5Ext.ext(this);
-        for (AnnotationElem ae : ext.annotationElems()) {
-            tr.lang().prettyPrint(ae, w, tr);
-            w.newline();
-        }
-
         w.write(name.id());
         if (args != null && !args.isEmpty()) {
             w.write(" ( ");

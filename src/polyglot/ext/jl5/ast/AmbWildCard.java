@@ -92,21 +92,18 @@ public class AmbWildCard extends TypeNode_c implements TypeNode, Ambiguous {
         }
     }
 
-    @Override
-    public Node visitChildren(NodeVisitor v) {
-        if (this.constraint != null) {
-            TypeNode c = (TypeNode) visitChild(this.constraint, v);
-            return this.constraint(c);
+    protected AmbWildCard reconstruct(TypeNode constraint) {
+        if (this.constraint != constraint) {
+            AmbWildCard n = (AmbWildCard) this.copy();
+            n.constraint = constraint;
+            return n;
         }
         return this;
     }
 
-    private AmbWildCard constraint(TypeNode constraint) {
-        if (this.constraint == constraint) {
-            return this;
-        }
-        AmbWildCard n = (AmbWildCard) this.copy();
-        n.constraint = constraint;
-        return n;
+    @Override
+    public Node visitChildren(NodeVisitor v) {
+        TypeNode c = visitChild(this.constraint, v);
+        return reconstruct(c);
     }
 }

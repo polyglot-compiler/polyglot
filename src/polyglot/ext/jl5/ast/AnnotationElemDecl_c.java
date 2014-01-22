@@ -162,8 +162,8 @@ public class AnnotationElemDecl_c extends Term_c implements AnnotationElemDecl {
 
     @Override
     public Node visitChildren(NodeVisitor v) {
-        TypeNode type = (TypeNode) visitChild(this.type, v);
-        Term defVal = (Term) visitChild(this.defaultVal, v);
+        TypeNode type = visitChild(this.type, v);
+        Term defVal = visitChild(this.defaultVal, v);
         return reconstruct(type, defVal);
     }
 

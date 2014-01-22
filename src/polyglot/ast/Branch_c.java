@@ -107,7 +107,7 @@ public class Branch_c extends Stmt_c implements Branch {
     /** Visit the children of the constructor. */
     @Override
     public Node visitChildren(NodeVisitor v) {
-        Id label = (Id) visitChild(this.label, v);
+        Id label = visitChild(this.label, v);
         return reconstruct(label);
     }
 

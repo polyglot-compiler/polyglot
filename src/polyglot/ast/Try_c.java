@@ -127,9 +127,9 @@ public class Try_c extends Stmt_c implements Try, TryOps {
     /** Visit the children of the statement. */
     @Override
     public Node visitChildren(NodeVisitor v) {
-        Block tryBlock = (Block) visitChild(this.tryBlock, v);
+        Block tryBlock = visitChild(this.tryBlock, v);
         List<Catch> catchBlocks = visitList(this.catchBlocks, v);
-        Block finallyBlock = (Block) visitChild(this.finallyBlock, v);
+        Block finallyBlock = visitChild(this.finallyBlock, v);
         return reconstruct(tryBlock, catchBlocks, finallyBlock);
     }
 
@@ -193,10 +193,9 @@ public class Try_c extends Stmt_c implements Try, TryOps {
 
     @Override
     public Block exceptionCheckTryBlock(ExceptionChecker ec) {
-        return (Block) this.visitChild(this.tryBlock,
-                                       ec.lang()
-                                         .constructTryBlockExceptionChecker(this,
-                                                                            ec));
+        return this.visitChild(this.tryBlock,
+                               ec.lang()
+                                 .constructTryBlockExceptionChecker(this, ec));
     }
 
     @Override
@@ -242,7 +241,7 @@ public class Try_c extends Stmt_c implements Try, TryOps {
         List<Catch> catchBlocks = new ArrayList<Catch>(this.catchBlocks.size());
 
         for (Catch cb : this.catchBlocks) {
-            cb = (Catch) this.visitChild(cb, ec.push());
+            cb = this.visitChild(cb, ec.push());
             catchBlocks.add(cb);
         }
 
@@ -254,7 +253,7 @@ public class Try_c extends Stmt_c implements Try, TryOps {
         if (this.finallyBlock == null) {
             return null;
         }
-        Block fb = (Block) this.visitChild(this.finallyBlock, ec.push());
+        Block fb = this.visitChild(this.finallyBlock, ec.push());
 
         if (!this.finallyBlock.reachable()) {
             // warn the user

@@ -226,10 +226,10 @@ public class ConstructorDecl_c extends Term_c implements ConstructorDecl,
     /** Visit the children of the constructor. */
     @Override
     public Node visitChildren(NodeVisitor v) {
-        Id name = (Id) visitChild(this.name, v);
+        Id name = visitChild(this.name, v);
         List<Formal> formals = visitList(this.formals, v);
         List<TypeNode> throwTypes = visitList(this.throwTypes, v);
-        Block body = (Block) visitChild(this.body, v);
+        Block body = visitChild(this.body, v);
         return reconstruct(name, formals, throwTypes, body);
     }
 

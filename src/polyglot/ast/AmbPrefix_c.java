@@ -106,8 +106,8 @@ public class AmbPrefix_c extends Node_c implements AmbPrefix {
     /** Visit the children of the prefix. */
     @Override
     public Node visitChildren(NodeVisitor v) {
-        Prefix prefix = (Prefix) visitChild(this.prefix, v);
-        Id name = (Id) visitChild(this.name, v);
+        Prefix prefix = visitChild(this.prefix, v);
+        Id name = visitChild(this.name, v);
         return reconstruct(prefix, name);
     }
 

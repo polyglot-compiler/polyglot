@@ -53,19 +53,19 @@ public class AmbDiamondTypeNode extends TypeNode_c implements TypeNode,
         this.base = base;
     }
 
-    private AmbDiamondTypeNode base(TypeNode b) {
-        if (this.base == b) {
-            return this;
+    protected AmbDiamondTypeNode reconstruct(TypeNode base) {
+        if (this.base != base) {
+            AmbDiamondTypeNode n = (AmbDiamondTypeNode) this.copy();
+            n.base = base;
+            return n;
         }
-        AmbDiamondTypeNode n = (AmbDiamondTypeNode) this.copy();
-        n.base = b;
-        return n;
+        return this;
     }
 
     @Override
     public Node visitChildren(NodeVisitor v) {
-        TypeNode base = (TypeNode) visitChild(this.base, v);
-        return this.base(base);
+        TypeNode base = visitChild(this.base, v);
+        return reconstruct(base);
     }
 
     @Override

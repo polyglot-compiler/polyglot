@@ -55,6 +55,7 @@ import polyglot.types.SemanticException;
 import polyglot.types.TypeSystem;
 import polyglot.util.CodeWriter;
 import polyglot.util.CollectionUtil;
+import polyglot.util.ListUtil;
 import polyglot.util.SerialVersionUID;
 import polyglot.visit.NodeVisitor;
 import polyglot.visit.PrettyPrinter;
@@ -69,6 +70,11 @@ public class JL5ClassDeclExt extends JL5AnnotatedElementExt implements
 
     public List<ParamTypeNode> paramTypes() {
         return this.paramTypes;
+    }
+
+    public static List<ParamTypeNode> paramTypes(Node n) {
+        JL5ClassDeclExt ext = (JL5ClassDeclExt) JL5Ext.ext(n);
+        return ext.paramTypes;
     }
 
     public ClassDecl paramTypes(List<ParamTypeNode> types) {
@@ -121,11 +127,27 @@ public class JL5ClassDeclExt extends JL5AnnotatedElementExt implements
         return n.type();
     }
 
+    private Node reconstruct(Node n, List<ParamTypeNode> paramTypes) {
+        if (!CollectionUtil.equals(paramTypes, paramTypes(n))) {
+            if (n == this.node()) n = (Node) n.copy();
+            JL5ClassDeclExt ext = (JL5ClassDeclExt) JL5Ext.ext(n);
+            ext.paramTypes = ListUtil.copy(paramTypes, true);
+        }
+        return n;
+    }
+
+    @Override
+    public Node visitChildren(NodeVisitor v) {
+        Node n = this.node();
+        List<ParamTypeNode> typeParams = n.visitList(paramTypes(n), v);
+        n = super.visitChildren(v);
+        return reconstruct(n, typeParams);
+    }
+
     @Override
     public Node buildTypes(TypeBuilder tb) throws SemanticException {
         ClassDecl n =
                 (ClassDecl) JL5Ext.superLang().buildTypes(this.node(), tb);
-        JL5ClassDeclExt ext = (JL5ClassDeclExt) JL5Ext.ext(n);
 
         JL5TypeSystem ts = (JL5TypeSystem) tb.typeSystem();
         JL5ParsedClassType ct = (JL5ParsedClassType) n.type();
@@ -135,10 +157,10 @@ public class JL5ClassDeclExt extends JL5AnnotatedElementExt implements
         ct.setPClass(pc);
         pc.clazz(ct);
 
-        if (ext.paramTypes() != null && !ext.paramTypes().isEmpty()) {
+        if (paramTypes(n) != null && !paramTypes(n).isEmpty()) {
             List<TypeVariable> typeVars =
-                    new ArrayList<TypeVariable>(ext.paramTypes().size());
-            for (ParamTypeNode ptn : ext.paramTypes()) {
+                    new ArrayList<TypeVariable>(paramTypes(n).size());
+            for (ParamTypeNode ptn : paramTypes(n)) {
                 TypeVariable tv = (TypeVariable) ptn.type();
                 typeVars.add(tv);
                 tv.setDeclaringClass(ct);
@@ -151,37 +173,6 @@ public class JL5ClassDeclExt extends JL5AnnotatedElementExt implements
 
     }
 
-    @Override
-    public Node visitChildren(NodeVisitor v) {
-        JL5ClassDeclExt ext = (JL5ClassDeclExt) JL5Ext.ext(this.node());
-
-        List<AnnotationElem> annots =
-                this.node().visitList(ext.annotationElems(), v);
-
-        List<ParamTypeNode> paramTypes =
-                this.node().visitList(ext.paramTypes(), v);
-
-        Node newN = super.visitChildren(v);
-        JL5ClassDeclExt newext = (JL5ClassDeclExt) JL5Ext.ext(newN);
-
-        if (!CollectionUtil.equals(annots, newext.annotationElems())
-                || !CollectionUtil.equals(paramTypes, newext.paramTypes())) {
-            // the annotations or param thypes changed! Let's update the node.
-            if (newN == this.node()) {
-                // we need to create a copy.
-                newN = (Node) newN.copy();
-                newext = (JL5ClassDeclExt) JL5Ext.ext(newN);
-            }
-            else {
-                // the call to super.visitChildren(v) already
-                // created a copy of the node (and thus of its extension).
-            }
-            newext.annotations = annots;
-            newext.paramTypes = paramTypes;
-        }
-        return newN;
-    }
-
     /*
      * (non-Javadoc)
      * 
@@ -190,7 +181,6 @@ public class JL5ClassDeclExt extends JL5AnnotatedElementExt implements
     @Override
     public Context enterChildScope(Node child, Context c) {
         ClassDecl n = (ClassDecl) this.node();
-        JL5ClassDeclExt ext = (JL5ClassDeclExt) JL5Ext.ext(n);
 
         if (child == n.body()) {
             TypeSystem ts = c.typeSystem();
@@ -203,7 +193,7 @@ public class JL5ClassDeclExt extends JL5AnnotatedElementExt implements
             c = ((JL5Context) c).pushExtendsClause(n.type());
             c.addNamed(n.type());
         }
-        for (ParamTypeNode tn : ext.paramTypes()) {
+        for (ParamTypeNode tn : paramTypes(n)) {
             ((JL5Context) c).addTypeVariable((TypeVariable) tn.type());
         }
         return c.lang().enterScope(child, c);
@@ -328,10 +318,9 @@ public class JL5ClassDeclExt extends JL5AnnotatedElementExt implements
     @Override
     public void prettyPrintHeader(CodeWriter w, PrettyPrinter tr) {
         ClassDecl n = (ClassDecl) this.node();
-        JL5ClassDeclExt ext = (JL5ClassDeclExt) JL5Ext.ext(n);
 
         w.begin(0);
-        for (AnnotationElem ae : ext.annotationElems()) {
+        for (AnnotationElem ae : annotationElems(n)) {
             tr.lang().prettyPrint(ae, w, tr);
             w.newline();
         }
@@ -345,9 +334,9 @@ public class JL5ClassDeclExt extends JL5AnnotatedElementExt implements
             JL5Translator jl5tr = (JL5Translator) tr;
             printTypeVars = !jl5tr.removeJava5isms();
         }
-        if (printTypeVars && !ext.paramTypes().isEmpty()) {
+        if (printTypeVars && !paramTypes(n).isEmpty()) {
             w.write("<");
-            for (Iterator<ParamTypeNode> iter = ext.paramTypes.iterator(); iter.hasNext();) {
+            for (Iterator<ParamTypeNode> iter = paramTypes(n).iterator(); iter.hasNext();) {
                 ParamTypeNode ptn = iter.next();
                 tr.lang().prettyPrint(ptn, w, tr);
                 if (iter.hasNext()) {

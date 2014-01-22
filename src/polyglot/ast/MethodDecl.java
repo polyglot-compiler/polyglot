@@ -26,9 +26,10 @@
 
 package polyglot.ast;
 
-import polyglot.types.MethodInstance;
-import polyglot.types.Flags;
 import java.util.List;
+
+import polyglot.types.Flags;
+import polyglot.types.MethodInstance;
 
 /**
  * A method declaration.
@@ -39,6 +40,7 @@ public interface MethodDecl extends ProcedureDecl {
     Flags flags();
 
     /** Set the method's flags. */
+    @Override
     MethodDecl flags(Flags flags);
 
     /** The method's return type.  */

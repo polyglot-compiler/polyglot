@@ -98,7 +98,7 @@ public class LocalClassDecl_c extends Stmt_c implements LocalClassDecl {
     /** Visit the children of the statement. */
     @Override
     public Node visitChildren(NodeVisitor v) {
-        ClassDecl decl = (ClassDecl) visitChild(this.decl, v);
+        ClassDecl decl = visitChild(this.decl, v);
         return reconstruct(decl);
     }
 

@@ -29,7 +29,6 @@ package polyglot.visit;
 import java.util.ArrayList;
 import java.util.List;
 
-import polyglot.ast.ClassBody;
 import polyglot.ast.ClassDecl;
 import polyglot.ast.ClassMember;
 import polyglot.ast.Expr;
@@ -66,12 +65,12 @@ public class SupertypeDisambiguator extends Disambiguator {
                     (SupertypeDisambiguator) enter(parent, cd);
 
             // Now visit the supertypes only.
-            cd = cd.superClass((TypeNode) cd.visitChild(cd.superClass(), v));
+            cd = cd.superClass(cd.visitChild(cd.superClass(), v));
             if (v.hasErrors()) return cd;
 
             List<TypeNode> newInterfaces = new ArrayList<TypeNode>();
             for (TypeNode tn : cd.interfaces()) {
-                newInterfaces.add((TypeNode) cd.visitChild(tn, v));
+                newInterfaces.add(cd.visitChild(tn, v));
                 if (v.hasErrors()) return cd;
             }
             cd = cd.interfaces(newInterfaces);
@@ -81,7 +80,7 @@ public class SupertypeDisambiguator extends Disambiguator {
             if (this.hasErrors()) return cd;
 
             // Now visit the class body.
-            cd = cd.body((ClassBody) cd.visitChild(cd.body(), v));
+            cd = cd.body(cd.visitChild(cd.body(), v));
             if (v.hasErrors()) return cd;
 
             // Finally, rebulid the node again.

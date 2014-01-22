@@ -92,7 +92,7 @@ public class Eval_c extends Stmt_c implements Eval {
     /** Visit the children of the statement. */
     @Override
     public Node visitChildren(NodeVisitor v) {
-        Expr expr = (Expr) visitChild(this.expr, v);
+        Expr expr = visitChild(this.expr, v);
         return reconstruct(expr);
     }
 

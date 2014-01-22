@@ -102,8 +102,8 @@ public class While_c extends Loop_c implements While {
     /** Visit the children of the statement. */
     @Override
     public Node visitChildren(NodeVisitor v) {
-        Expr cond = (Expr) visitChild(this.cond, v);
-        Stmt body = (Stmt) visitChild(this.body, v);
+        Expr cond = visitChild(this.cond, v);
+        Stmt body = visitChild(this.body, v);
         return reconstruct(cond, body);
     }
 

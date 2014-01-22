@@ -594,13 +594,11 @@ public class ClassFileLazyClassInitializer implements LazyClassInitializer {
             }
         }
 
-        @SuppressWarnings("unchecked")
-        List<Type> throwTypes = (List<Type>) mi.throwTypes();
         return ts.constructorInstance(mi.position(),
                                       ct,
                                       mi.flags(),
                                       formals,
-                                      throwTypes);
+                                      mi.throwTypes());
     }
 
     /**

@@ -13,6 +13,7 @@ import polyglot.types.ReferenceType;
 import polyglot.types.SemanticException;
 import polyglot.types.Type;
 import polyglot.util.CodeWriter;
+import polyglot.util.CollectionUtil;
 import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
 import polyglot.visit.AmbiguityRemover;
@@ -27,6 +28,25 @@ public class AmbUnionType extends TypeNode_c implements TypeNode, Ambiguous {
     public AmbUnionType(Position pos, List<TypeNode> alternatives) {
         super(pos);
         this.alternatives = alternatives;
+    }
+
+    protected AmbUnionType reconstruct(List<TypeNode> alternatives) {
+        if (!CollectionUtil.equals(alternatives, this.alternatives)) {
+            AmbUnionType aut = (AmbUnionType) this.copy();
+            aut.alternatives = alternatives;
+            return aut;
+        }
+        return this;
+    }
+
+    @Override
+    public Node visitChildren(NodeVisitor v) {
+        List<TypeNode> alternatives =
+                new ArrayList<TypeNode>(this.alternatives.size());
+        for (TypeNode tn : this.alternatives) {
+            alternatives.add(visitChild(tn, v));
+        }
+        return reconstruct(alternatives);
     }
 
     @Override
@@ -62,21 +82,4 @@ public class AmbUnionType extends TypeNode_c implements TypeNode, Ambiguous {
             }
         }
     }
-
-    @Override
-    public Node visitChildren(NodeVisitor v) {
-        List<TypeNode> newAlts =
-                new ArrayList<TypeNode>(this.alternatives.size());
-        for (TypeNode tn : this.alternatives) {
-            newAlts.add((TypeNode) visitChild(tn, v));
-        }
-        return this.alternatives(newAlts);
-    }
-
-    public Node alternatives(List<TypeNode> alternatives) {
-        AmbUnionType aut = (AmbUnionType) this.copy();
-        aut.alternatives = alternatives;
-        return aut;
-    }
-
 }

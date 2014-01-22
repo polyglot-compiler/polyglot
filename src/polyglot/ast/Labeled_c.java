@@ -107,9 +107,9 @@ public class Labeled_c extends Stmt_c implements Labeled {
     /** Visit the children of the statement. */
     @Override
     public Node visitChildren(NodeVisitor v) {
-        Id label = (Id) visitChild(this.label, v);
-        Node statement = visitChild(this.statement, v);
-        return reconstruct(label, (Stmt) statement);
+        Id label = visitChild(this.label, v);
+        Stmt statement = visitChild(this.statement, v);
+        return reconstruct(label, statement);
     }
 
     @Override

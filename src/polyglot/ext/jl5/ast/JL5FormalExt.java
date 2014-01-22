@@ -42,8 +42,7 @@ import polyglot.visit.AmbiguityRemover;
 import polyglot.visit.PrettyPrinter;
 import polyglot.visit.TypeChecker;
 
-public class JL5FormalExt extends JL5AnnotatedElementExt implements
-        AnnotatedElement {
+public class JL5FormalExt extends JL5AnnotatedElementExt {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
     protected boolean isVarArg = false;
@@ -52,6 +51,11 @@ public class JL5FormalExt extends JL5AnnotatedElementExt implements
 
     public boolean isVarArg() {
         return isVarArg;
+    }
+
+    public static boolean isVarArg(Node n) {
+        JL5FormalExt ext = (JL5FormalExt) JL5Ext.ext(n);
+        return ext.isVarArg;
     }
 
     public boolean isCatchFormal() {
@@ -90,9 +94,8 @@ public class JL5FormalExt extends JL5AnnotatedElementExt implements
     @Override
     public Node disambiguate(AmbiguityRemover ar) throws SemanticException {
         Formal f = (Formal) this.node();
-        JL5FormalExt ext = (JL5FormalExt) JL5Ext.ext(f);
 
-        if (ext.isVarArg()) {
+        if (isVarArg(f)) {
             ((JL5ArrayType) f.type().type()).setVarArg();
         }
         return superLang().disambiguate(this.node(), ar);
@@ -101,15 +104,14 @@ public class JL5FormalExt extends JL5AnnotatedElementExt implements
     @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
         Formal f = (Formal) this.node();
-        JL5FormalExt ext = (JL5FormalExt) JL5Ext.ext(f);
 
-        for (AnnotationElem ae : ext.annotationElems()) {
+        for (AnnotationElem ae : annotationElems(f)) {
             tr.lang().prettyPrint(ae, w, tr);
             w.newline();
         }
 
         w.write(JL5Flags.clearVarArgs(f.flags()).translate());
-        if (ext.isVarArg()) {
+        if (isVarArg(f)) {
             w.write(((ArrayType) f.type().type()).base().toString());
             //print(type, w, tr);
             w.write(" ...");

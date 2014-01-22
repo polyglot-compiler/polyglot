@@ -176,8 +176,8 @@ public class Field_c extends Expr_c implements Field {
     /** Visit the children of the field. */
     @Override
     public Node visitChildren(NodeVisitor v) {
-        Receiver target = (Receiver) visitChild(this.target, v);
-        Id name = (Id) visitChild(this.name, v);
+        Receiver target = visitChild(this.target, v);
+        Id name = visitChild(this.name, v);
         return reconstruct(target, name);
     }
 

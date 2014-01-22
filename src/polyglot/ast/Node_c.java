@@ -208,7 +208,7 @@ public abstract class Node_c implements Node {
     }
 
     @Override
-    public Node visitChild(Node n, NodeVisitor v) {
+    public <T extends Node> T visitChild(T n, NodeVisitor v) {
         if (n == null) {
             return null;
         }
@@ -271,13 +271,12 @@ public abstract class Node_c implements Node {
         List<T> vl = new ArrayList<T>(l.size());
 
         for (T n : l) {
-            Node m = visitChild(n, v);
+            T m = visitChild(n, v);
             if (n != m) {
                 result = vl;
             }
             if (m != null) {
-                @SuppressWarnings("unchecked")
-                T t = (T) m;
+                T t = m;
                 vl.add(t);
             }
         }

@@ -75,14 +75,13 @@ public class JL5LocalDeclExt extends JL5AnnotatedElementExt {
 
     @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
-        JL5AnnotatedElementExt ext =
-                (JL5AnnotatedElementExt) JL5Ext.ext(this.node());
-        for (AnnotationElem ae : ext.annotationElems()) {
+        Node n = this.node();
+        for (AnnotationElem ae : annotationElems(n)) {
             tr.lang().prettyPrint(ae, w, tr);
             w.newline();
         }
 
-        superLang().prettyPrint(this.node(), w, tr);
+        superLang().prettyPrint(n, w, tr);
     }
 
 }

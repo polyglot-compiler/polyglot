@@ -108,8 +108,8 @@ public class Cast_c extends Expr_c implements Cast {
     /** Visit the children of the expression. */
     @Override
     public Node visitChildren(NodeVisitor v) {
-        TypeNode castType = (TypeNode) visitChild(this.castType, v);
-        Expr expr = (Expr) visitChild(this.expr, v);
+        TypeNode castType = visitChild(this.castType, v);
+        Expr expr = visitChild(this.expr, v);
         return reconstruct(castType, expr);
     }
 
