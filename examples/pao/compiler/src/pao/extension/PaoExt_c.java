@@ -37,7 +37,8 @@ public class PaoExt_c extends Ext_c implements PaoExt {
         return (PaoExt) e;
     }
 
-    protected static JLang superLang() {
+    @Override
+    protected JLang superLang() {
         return JLang_c.instance;
     }
 

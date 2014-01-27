@@ -146,8 +146,7 @@ public class JL5ClassDeclExt extends JL5AnnotatedElementExt implements
 
     @Override
     public Node buildTypes(TypeBuilder tb) throws SemanticException {
-        ClassDecl n =
-                (ClassDecl) JL5Ext.superLang().buildTypes(this.node(), tb);
+        ClassDecl n = (ClassDecl) superLang().buildTypes(this.node(), tb);
 
         JL5TypeSystem ts = (JL5TypeSystem) tb.typeSystem();
         JL5ParsedClassType ct = (JL5ParsedClassType) n.type();

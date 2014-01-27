@@ -40,13 +40,8 @@ public final class JL5ExtFactory_c extends JL5AbstractExtFactory_c implements
     }
 
     @Override
-    protected Ext extCaseImpl() {
-        return new JL5CaseExt();
-    }
-
-    @Override
-    protected Ext extCatchImpl() {
-        return new JL5CatchExt();
+    protected Ext extNodeImpl() {
+        return new JL5Ext();
     }
 
     @Override
@@ -65,13 +60,33 @@ public final class JL5ExtFactory_c extends JL5AbstractExtFactory_c implements
     }
 
     @Override
+    protected Ext extCallImpl() {
+        return new JL5CallExt();
+    }
+
+    @Override
     protected Ext extCanonicalTypeNodeImpl() {
         return new JL5CanonicalTypeNodeExt();
     }
 
     @Override
+    protected Ext extCaseImpl() {
+        return new JL5CaseExt();
+    }
+
+    @Override
+    protected Ext extCatchImpl() {
+        return new JL5CatchExt();
+    }
+
+    @Override
     protected Ext extClassBodyImpl() {
         return new JL5ClassBodyExt();
+    }
+
+    @Override
+    protected Ext extClassDeclImpl() {
+        return new JL5ClassDeclExt();
     }
 
     @Override
@@ -85,6 +100,21 @@ public final class JL5ExtFactory_c extends JL5AbstractExtFactory_c implements
     }
 
     @Override
+    protected Ext extConstructorDeclImpl() {
+        return new JL5ConstructorDeclExt();
+    }
+
+    @Override
+    protected Ext extEnumConstantDeclImpl() {
+        return new EnumConstantDeclExt();
+    }
+
+    @Override
+    protected Ext extEnumDeclImpl() {
+        return new JL5EnumDeclExt();
+    }
+
+    @Override
     protected Ext extConstructorCallImpl() {
         return new JL5ConstructorCallExt();
     }
@@ -95,53 +125,23 @@ public final class JL5ExtFactory_c extends JL5AbstractExtFactory_c implements
     }
 
     @Override
-    protected Ext extFormalImpl() {
-        return new JL5FormalExt();
-    }
-
-    @Override
-    protected Ext extCallImpl() {
-        return new JL5CallExt();
-    }
-
-    @Override
-    protected Ext extSpecialImpl() {
-        return new JL5SpecialExt();
-    }
-
-    @Override
-    protected Ext extSwitchImpl() {
-        return new JL5SwitchExt();
-    }
-
-    @Override
-    protected Ext extUnaryImpl() {
-        return new JL5UnaryExt();
-    }
-
-    @Override
     protected Ext extFieldDeclImpl() {
         return new JL5FieldDeclExt();
     }
 
     @Override
-    protected Ext extLocalDeclImpl() {
-        return new JL5LocalDeclExt();
-    }
-
-    @Override
-    protected Ext extClassDeclImpl() {
-        return new JL5ClassDeclExt();
-    }
-
-    @Override
-    protected Ext extConstructorDeclImpl() {
-        return new JL5ConstructorDeclExt();
+    protected Ext extFormalImpl() {
+        return new JL5FormalExt();
     }
 
     @Override
     protected Ext extImportImpl() {
         return new JL5ImportExt();
+    }
+
+    @Override
+    protected Ext extLocalDeclImpl() {
+        return new JL5LocalDeclExt();
     }
 
     @Override
@@ -160,7 +160,17 @@ public final class JL5ExtFactory_c extends JL5AbstractExtFactory_c implements
     }
 
     @Override
-    protected Ext extNodeImpl() {
-        return new JL5Ext();
+    protected Ext extSpecialImpl() {
+        return new JL5SpecialExt();
+    }
+
+    @Override
+    protected Ext extSwitchImpl() {
+        return new JL5SwitchExt();
+    }
+
+    @Override
+    protected Ext extUnaryImpl() {
+        return new JL5UnaryExt();
     }
 }

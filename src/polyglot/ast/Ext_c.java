@@ -60,14 +60,17 @@ public abstract class Ext_c implements Ext {
     protected Node node;
     protected Ext ext;
 
+    public Ext_c() {
+        this(null);
+    }
+
     public Ext_c(Ext ext) {
         this.node = null;
         this.ext = ext;
     }
 
-    public Ext_c() {
-        this(null);
-        this.node = null;
+    protected JLang superLang() {
+        return JLang_c.instance;
     }
 
     /** Initialize the extension object's pointer back to the node.
@@ -156,7 +159,7 @@ public abstract class Ext_c implements Ext {
      */
     @Override
     public Node visitChildren(NodeVisitor v) {
-        return node().visitChildren(v);
+        return superLang().visitChildren(node(), v);
     }
 
     /**
@@ -170,12 +173,12 @@ public abstract class Ext_c implements Ext {
      */
     @Override
     public Context enterScope(Context c) {
-        return node().enterScope(c);
+        return superLang().enterScope(node(), c);
     }
 
     @Override
     public Context enterChildScope(Node child, Context c) {
-        return node().enterChildScope(child, c);
+        return superLang().enterChildScope(node(), child, c);
     }
 
     /**
@@ -185,7 +188,7 @@ public abstract class Ext_c implements Ext {
      */
     @Override
     public void addDecls(Context c) {
-        node().addDecls(c);
+        superLang().addDecls(node(), c);
     }
 
     /**
@@ -205,7 +208,7 @@ public abstract class Ext_c implements Ext {
      */
     @Override
     public NodeVisitor buildTypesEnter(TypeBuilder tb) throws SemanticException {
-        return node().buildTypesEnter(tb);
+        return superLang().buildTypesEnter(node(), tb);
     }
 
     /**
@@ -224,7 +227,7 @@ public abstract class Ext_c implements Ext {
      */
     @Override
     public Node buildTypes(TypeBuilder tb) throws SemanticException {
-        return node().buildTypes(tb);
+        return superLang().buildTypes(node(), tb);
     }
 
     /**
@@ -242,13 +245,13 @@ public abstract class Ext_c implements Ext {
     @Override
     public Node disambiguateOverride(Node parent, AmbiguityRemover ar)
             throws SemanticException {
-        return node().disambiguateOverride(parent, ar);
+        return superLang().disambiguateOverride(node(), parent, ar);
     }
 
     @Override
     public NodeVisitor disambiguateEnter(AmbiguityRemover ar)
             throws SemanticException {
-        return node().disambiguateEnter(ar);
+        return superLang().disambiguateEnter(node(), ar);
     }
 
     /**
@@ -264,7 +267,7 @@ public abstract class Ext_c implements Ext {
      */
     @Override
     public Node disambiguate(AmbiguityRemover ar) throws SemanticException {
-        return node().disambiguate(ar);
+        return superLang().disambiguate(node(), ar);
     }
 
     /**
@@ -282,12 +285,12 @@ public abstract class Ext_c implements Ext {
     @Override
     public Node typeCheckOverride(Node parent, TypeChecker tc)
             throws SemanticException {
-        return node().typeCheckOverride(parent, tc);
+        return superLang().typeCheckOverride(node(), parent, tc);
     }
 
     @Override
     public NodeVisitor typeCheckEnter(TypeChecker tc) throws SemanticException {
-        return node().typeCheckEnter(tc);
+        return superLang().typeCheckEnter(node(), tc);
     }
 
     /**
@@ -303,7 +306,7 @@ public abstract class Ext_c implements Ext {
      */
     @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
-        return node().typeCheck(tc);
+        return superLang().typeCheck(node(), tc);
     }
 
     /**
@@ -321,12 +324,12 @@ public abstract class Ext_c implements Ext {
      */
     @Override
     public Type childExpectedType(Expr child, AscriptionVisitor av) {
-        return node().childExpectedType(child, av);
+        return superLang().childExpectedType(node(), child, av);
     }
 
     @Override
     public Node checkConstants(ConstantChecker cc) throws SemanticException {
-        return node().checkConstants(cc);
+        return superLang().checkConstants(node(), cc);
     }
 
     /**
@@ -344,7 +347,7 @@ public abstract class Ext_c implements Ext {
     @Override
     public NodeVisitor exceptionCheckEnter(ExceptionChecker ec)
             throws SemanticException {
-        return node().exceptionCheckEnter(ec);
+        return superLang().exceptionCheckEnter(node(), ec);
     }
 
     /**
@@ -360,7 +363,7 @@ public abstract class Ext_c implements Ext {
      */
     @Override
     public Node exceptionCheck(ExceptionChecker ec) throws SemanticException {
-        return node().exceptionCheck(ec);
+        return superLang().exceptionCheck(node(), ec);
     }
 
     /** 
@@ -369,7 +372,7 @@ public abstract class Ext_c implements Ext {
      */
     @Override
     public List<Type> throwTypes(TypeSystem ts) {
-        return node().throwTypes(ts);
+        return superLang().throwTypes(node(), ts);
     }
 
     @Deprecated
@@ -380,7 +383,7 @@ public abstract class Ext_c implements Ext {
 
     @Override
     public void dump(Lang lang, OutputStream os) {
-        node().dump(lang, os);
+        superLang().dump(node(), lang, os);
     }
 
     @Deprecated
@@ -391,7 +394,7 @@ public abstract class Ext_c implements Ext {
 
     @Override
     public void dump(Lang lang, Writer w) {
-        node().dump(lang, w);
+        superLang().dump(node(), lang, w);
     }
 
     @Deprecated
@@ -402,7 +405,7 @@ public abstract class Ext_c implements Ext {
 
     @Override
     public void prettyPrint(Lang lang, OutputStream os) {
-        node().prettyPrint(lang, os);
+        superLang().prettyPrint(node(), lang, os);
     }
 
     @Deprecated
@@ -413,7 +416,7 @@ public abstract class Ext_c implements Ext {
 
     @Override
     public void prettyPrint(Lang lang, Writer w) {
-        node().prettyPrint(lang, w);
+        superLang().prettyPrint(node(), lang, w);
     }
 
     /**
@@ -424,7 +427,7 @@ public abstract class Ext_c implements Ext {
      */
     @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter pp) {
-        node().prettyPrint(w, pp);
+        superLang().prettyPrint(node(), w, pp);
     }
 
     /**
@@ -435,16 +438,16 @@ public abstract class Ext_c implements Ext {
      */
     @Override
     public void translate(CodeWriter w, Translator tr) {
-        node().translate(w, tr);
+        superLang().translate(node(), w, tr);
     }
 
     @Override
     public Node copy(NodeFactory nf) {
-        return node().copy(nf);
+        return superLang().copy(node(), nf);
     }
 
     @Override
     public Node copy(ExtensionInfo extInfo) throws SemanticException {
-        return node().copy(extInfo);
+        return superLang().copy(node(), extInfo);
     }
 }

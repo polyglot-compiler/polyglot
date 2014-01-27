@@ -27,7 +27,6 @@ package polyglot.ext.jl5.ast;
 
 import polyglot.ast.Node;
 import polyglot.ext.jl5.types.Annotations;
-import polyglot.ext.jl5.types.JL5TypeSystem;
 import polyglot.types.Declaration;
 import polyglot.types.SemanticException;
 import polyglot.util.CodeWriter;
@@ -39,7 +38,6 @@ import polyglot.visit.PrettyPrinter;
 import polyglot.visit.PruningVisitor;
 import polyglot.visit.SignatureDisambiguator;
 import polyglot.visit.SupertypeDisambiguator;
-import polyglot.visit.TypeChecker;
 
 /**
  * This class mainly exists so that EnumConstantDecls can be indentified as
@@ -93,14 +91,6 @@ public class EnumConstantDeclExt extends JL5AnnotatedElementExt {
         nn = (EnumConstantDecl) bd.leave(parent, old, nn, childbd);
 
         return nn;
-    }
-
-    @Override
-    public Node typeCheck(TypeChecker tc) throws SemanticException {
-        Node n = superLang().typeCheck(this.node(), tc);
-        JL5TypeSystem ts = (JL5TypeSystem) tc.typeSystem();
-        ts.checkDuplicateAnnotations(annotationElems(n));
-        return n;
     }
 
     @Override

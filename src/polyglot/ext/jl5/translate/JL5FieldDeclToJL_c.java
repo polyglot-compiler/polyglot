@@ -1,8 +1,7 @@
 package polyglot.ext.jl5.translate;
 
 import polyglot.ast.FieldDecl;
-import polyglot.ext.jl5.ast.JL5Ext;
-import polyglot.ext.jl5.ast.JL5FieldDeclExt;
+import polyglot.ext.jl5.ast.JL5AnnotatedElementExt;
 import polyglot.translate.ExtensionRewriter;
 import polyglot.translate.ext.FieldDeclToExt_c;
 import polyglot.translate.ext.ToExt;
@@ -21,7 +20,6 @@ public class JL5FieldDeclToJL_c extends FieldDeclToExt_c implements ToExt {
             throws SemanticException {
         // Skip annotations
         FieldDecl n = (FieldDecl) this.node();
-        JL5FieldDeclExt ext = (JL5FieldDeclExt) JL5Ext.ext(n);
-        return rw.bypass(ext.annotationElems());
+        return rw.bypass(JL5AnnotatedElementExt.annotationElems(n));
     }
 }

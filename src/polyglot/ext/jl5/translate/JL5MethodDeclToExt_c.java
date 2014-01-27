@@ -27,9 +27,9 @@ package polyglot.ext.jl5.translate;
 
 import polyglot.ast.MethodDecl;
 import polyglot.ast.Node;
-import polyglot.ext.jl5.ast.JL5Ext;
-import polyglot.ext.jl5.ast.JL5MethodDeclExt;
+import polyglot.ext.jl5.ast.JL5AnnotatedElementExt;
 import polyglot.ext.jl5.ast.JL5NodeFactory;
+import polyglot.ext.jl5.ast.JL5ProcedureDeclExt;
 import polyglot.translate.ExtensionRewriter;
 import polyglot.translate.ext.MethodDeclToExt_c;
 import polyglot.translate.ext.ToExt;
@@ -42,17 +42,16 @@ public class JL5MethodDeclToExt_c extends MethodDeclToExt_c implements ToExt {
     @Override
     public Node toExt(ExtensionRewriter rw) throws SemanticException {
         MethodDecl n = (MethodDecl) node();
-        JL5MethodDeclExt ext = (JL5MethodDeclExt) JL5Ext.ext(n);
         JL5NodeFactory to_nf = (JL5NodeFactory) rw.to_nf();
         return to_nf.MethodDecl(n.position(),
                                 n.flags(),
-                                ext.annotationElems(),
+                                JL5AnnotatedElementExt.annotationElems(n),
                                 n.returnType(),
                                 n.id(),
                                 n.formals(),
                                 n.throwTypes(),
                                 n.body(),
-                                ext.typeParams());
+                                JL5ProcedureDeclExt.typeParams(n));
     }
 
 }

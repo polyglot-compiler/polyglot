@@ -275,7 +275,7 @@ public abstract class JL5AbstractExtFactory_c extends AbstractExtFactory_c
     }
 
     protected Ext extEnumDeclImpl() {
-        return new JL5EnumDeclExt();
+        return this.extClassDeclImpl();
     }
 
     protected Ext extExtendedForImpl() {
@@ -283,7 +283,7 @@ public abstract class JL5AbstractExtFactory_c extends AbstractExtFactory_c
     }
 
     protected Ext extEnumConstantDeclImpl() {
-        return new EnumConstantDeclExt();
+        return this.extTermImpl();
     }
 
     protected Ext extEnumConstantImpl() {

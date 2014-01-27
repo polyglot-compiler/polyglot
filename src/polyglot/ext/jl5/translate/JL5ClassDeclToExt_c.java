@@ -27,8 +27,8 @@ package polyglot.ext.jl5.translate;
 
 import polyglot.ast.ClassDecl;
 import polyglot.ast.Node;
+import polyglot.ext.jl5.ast.JL5AnnotatedElementExt;
 import polyglot.ext.jl5.ast.JL5ClassDeclExt;
-import polyglot.ext.jl5.ast.JL5Ext;
 import polyglot.ext.jl5.ast.JL5NodeFactory;
 import polyglot.translate.ExtensionRewriter;
 import polyglot.translate.ext.ClassDeclToExt_c;
@@ -41,15 +41,14 @@ public class JL5ClassDeclToExt_c extends ClassDeclToExt_c {
     @Override
     public Node toExt(ExtensionRewriter rw) throws SemanticException {
         ClassDecl cd = (ClassDecl) node();
-        JL5ClassDeclExt ext = (JL5ClassDeclExt) JL5Ext.ext(cd);
         JL5NodeFactory to_nf = (JL5NodeFactory) rw.to_nf();
         return to_nf.ClassDecl(cd.position(),
                                cd.flags(),
-                               ext.annotationElems(),
+                               JL5AnnotatedElementExt.annotationElems(cd),
                                cd.id(),
                                cd.superClass(),
                                cd.interfaces(),
                                cd.body(),
-                               ext.paramTypes());
+                               JL5ClassDeclExt.paramTypes(cd));
     }
 }
