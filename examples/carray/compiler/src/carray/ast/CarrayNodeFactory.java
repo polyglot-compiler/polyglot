@@ -1,5 +1,6 @@
 package carray.ast;
 
+import polyglot.ast.ArrayTypeNode;
 import polyglot.ast.NodeFactory;
 import polyglot.ast.TypeNode;
 import polyglot.util.Position;
@@ -9,5 +10,5 @@ import polyglot.util.Position;
  *
  */
 public interface CarrayNodeFactory extends NodeFactory {
-    public ConstArrayTypeNode ConstArrayTypeNode(Position pos, TypeNode base);
+    public ArrayTypeNode ConstArrayTypeNode(Position pos, TypeNode base);
 }

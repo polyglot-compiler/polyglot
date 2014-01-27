@@ -45,7 +45,7 @@ public class J5Lang_c extends JLang_c implements J5Lang {
     protected J5Lang_c() {
     }
 
-    protected JL5Ext jl5ext(Node n) {
+    protected static JL5Ext jl5ext(Node n) {
         return JL5Ext.ext(n);
     }
 

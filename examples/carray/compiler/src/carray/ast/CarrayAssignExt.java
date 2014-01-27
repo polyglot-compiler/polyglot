@@ -1,11 +1,10 @@
 package carray.ast;
 
 import polyglot.ast.ArrayAccess;
-import polyglot.ast.ArrayAccessAssign_c;
+import polyglot.ast.ArrayAccessAssign;
 import polyglot.ast.Expr;
 import polyglot.ast.Node;
 import polyglot.types.SemanticException;
-import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
 import polyglot.visit.TypeChecker;
 import carray.types.ConstArrayType;
@@ -15,13 +14,8 @@ import carray.types.ConstArrayType;
  * This class extends Assign_c to implement the restriction that
  * elements of a const array cannot be modified.
  */
-public class CarrayAssign_c extends ArrayAccessAssign_c {
+public class CarrayAssignExt extends CarrayExt {
     private static final long serialVersionUID = SerialVersionUID.generate();
-
-    public CarrayAssign_c(Position pos, ArrayAccess left, Operator op,
-            Expr right) {
-        super(pos, left, op, right);
-    }
 
     /**
      * Type check the expression.
@@ -30,6 +24,8 @@ public class CarrayAssign_c extends ArrayAccessAssign_c {
      */
     @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
+        ArrayAccessAssign n = (ArrayAccessAssign) this.node();
+        Expr left = n.left();
         // check that the left is an assignable location.
         if (left instanceof ArrayAccess) {
             ArrayAccess a = (ArrayAccess) left;
@@ -37,11 +33,11 @@ public class CarrayAssign_c extends ArrayAccessAssign_c {
                     && ((ConstArrayType) a.array().type()).isConst()) {
                 throw new SemanticException("Cannot assign a value to an element "
                                                     + "of a const array.",
-                                            position());
+                                            n.position());
             }
         }
 
         // let the super class deal with the rest.
-        return super.typeCheck(tc);
+        return superLang().typeCheck(n, tc);
     }
 }

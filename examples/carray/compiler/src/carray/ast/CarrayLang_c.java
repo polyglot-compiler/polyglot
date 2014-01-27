@@ -23,61 +23,26 @@
  *
  * See README for contributors.
  ******************************************************************************/
-package polyglot.ext.jl7.ast;
+package carray.ast;
 
-import polyglot.ast.Block;
-import polyglot.ast.Catch;
+import polyglot.ast.JLang_c;
 import polyglot.ast.Node;
 import polyglot.ast.NodeOps;
-import polyglot.ext.jl5.ast.J5Lang_c;
-import polyglot.ext.jl5.ast.JL5CaseOps;
-import polyglot.ext.jl5.ast.JL5SwitchOps;
-import polyglot.types.TypeSystem;
 import polyglot.util.SerialVersionUID;
-import polyglot.util.SubtypeSet;
 
-public class J7Lang_c extends J5Lang_c implements J7Lang {
+public class CarrayLang_c extends JLang_c {
     private static final long serialVersionUID = SerialVersionUID.generate();
-    public static final J7Lang_c instance = new J7Lang_c();
+    public static final CarrayLang_c instance = new CarrayLang_c();
 
-    protected J7Lang_c() {
+    protected CarrayLang_c() {
     }
 
-    protected static JL7Ext jl7ext(Node n) {
-        return JL7Ext.ext(n);
+    protected static CarrayExt carrayExt(Node n) {
+        return CarrayExt.ext(n);
     }
 
     @Override
     protected NodeOps NodeOps(Node n) {
-        return jl7ext(n);
-    }
-
-    @Override
-    protected JL7TryOps TryOps(Node n) {
-        return (JL7TryOps) jl7ext(n);
-    }
-
-    @Override
-    protected JL5CaseOps JL5CaseOps(Node n) {
-        return (JL5CaseOps) jl7ext(n);
-    }
-
-    @Override
-    protected JL5SwitchOps JL5SwitchOps(Node n) {
-        return (JL5SwitchOps) jl7ext(n);
-    }
-
-    // JL7TryOps
-
-    @Override
-    public final void checkPreciseRethrows(Node n, J7Lang lang,
-            TypeSystem typeSystem, Block b) {
-        TryOps(n).checkPreciseRethrows(lang, typeSystem, b);
-    }
-
-    @Override
-    public final void preciseRethrowsForCatchBlock(Node n, J7Lang lang,
-            Catch cb, SubtypeSet thrown) {
-        TryOps(n).preciseRethrowsForCatchBlock(lang, cb, thrown);
+        return carrayExt(n);
     }
 }
