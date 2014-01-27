@@ -33,11 +33,9 @@ import polyglot.ext.jl5.ast.J5Lang_c;
 import polyglot.ext.jl5.ast.JL5CaseOps;
 import polyglot.ext.jl5.ast.JL5SwitchOps;
 import polyglot.types.TypeSystem;
-import polyglot.util.SerialVersionUID;
 import polyglot.util.SubtypeSet;
 
 public class J7Lang_c extends J5Lang_c implements J7Lang {
-    private static final long serialVersionUID = SerialVersionUID.generate();
     public static final J7Lang_c instance = new J7Lang_c();
 
     protected J7Lang_c() {

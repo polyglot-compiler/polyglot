@@ -30,11 +30,8 @@ import pao.extension.PaoExt_c;
 import polyglot.ast.JLang_c;
 import polyglot.ast.Node;
 import polyglot.ast.NodeOps;
-import polyglot.util.SerialVersionUID;
 
 public class PaoLang extends JLang_c {
-    private static final long serialVersionUID = SerialVersionUID.generate();
-
     public static final PaoLang instance = new PaoLang();
 
     protected PaoLang() {

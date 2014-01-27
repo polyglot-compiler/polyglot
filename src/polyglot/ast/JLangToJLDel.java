@@ -26,7 +26,6 @@
 
 package polyglot.ast;
 
-import polyglot.util.SerialVersionUID;
 
 /**
  * <code>JLangToDel_c</code> is a bridge class that provides backward
@@ -35,8 +34,6 @@ import polyglot.util.SerialVersionUID;
  */
 @SuppressWarnings("deprecation")
 public class JLangToJLDel extends JLang_c {
-    private static final long serialVersionUID = SerialVersionUID.generate();
-
     public static final JLang instance = new JLangToJLDel();
 
     protected JLangToJLDel() {

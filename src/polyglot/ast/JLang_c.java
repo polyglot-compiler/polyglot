@@ -27,7 +27,6 @@
 package polyglot.ast;
 
 import java.io.OutputStream;
-import java.io.Serializable;
 import java.io.Writer;
 import java.util.List;
 
@@ -42,7 +41,6 @@ import polyglot.types.SemanticException;
 import polyglot.types.Type;
 import polyglot.types.TypeSystem;
 import polyglot.util.CodeWriter;
-import polyglot.util.SerialVersionUID;
 import polyglot.visit.AmbiguityRemover;
 import polyglot.visit.AscriptionVisitor;
 import polyglot.visit.ConstantChecker;
@@ -59,9 +57,7 @@ import polyglot.visit.TypeChecker;
  * determine the appropriate object which implements AST operations (such as
  * NodeOps) to redirect dispatching to appropriate extension code.
  */
-public class JLang_c implements JLang, Serializable {
-    private static final long serialVersionUID = SerialVersionUID.generate();
-
+public class JLang_c implements JLang {
     public static final JLang instance = new JLang_c();
 
     protected JLang_c() {

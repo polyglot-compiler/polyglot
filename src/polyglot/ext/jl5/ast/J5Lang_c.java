@@ -34,12 +34,9 @@ import polyglot.ast.NodeOps;
 import polyglot.ast.ProcedureDeclOps;
 import polyglot.types.SemanticException;
 import polyglot.types.Type;
-import polyglot.util.SerialVersionUID;
 import polyglot.visit.TypeChecker;
 
 public class J5Lang_c extends JLang_c implements J5Lang {
-    private static final long serialVersionUID = SerialVersionUID.generate();
-
     public static final J5Lang_c instance = new J5Lang_c();
 
     protected J5Lang_c() {

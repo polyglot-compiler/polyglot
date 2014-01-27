@@ -34,7 +34,6 @@ import polyglot.types.Type;
 import polyglot.util.CollectionUtil;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
-import polyglot.util.SerialVersionUID;
 
 /**
  * A <code>NodeFactory</code> constructs AST nodes.  All node construction
@@ -59,8 +58,6 @@ public class NodeFactory_c extends AbstractNodeFactory_c {
 
     @Deprecated
     private static class JLangToJLDelWithFactory extends JLangToJLDel {
-        private static final long serialVersionUID =
-                SerialVersionUID.generate();
         protected final DelFactory delFactory;
 
         public JLangToJLDelWithFactory(DelFactory delFactory) {
