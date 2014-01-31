@@ -58,14 +58,17 @@ public class SourceFileTest extends AbstractTest {
 
     public SourceFileTest(String filename) {
         super(new File(filename).getName());
-        this.sourceFilenames = Collections.singletonList(filename);
+        this.sourceFilenames =
+                Collections.singletonList(prependTestPath(filename));
         this.eq = new SilentErrorQueue(100, this.getName());
 
     }
 
     public SourceFileTest(List<String> filenames) {
         super(filenames.toString());
-        this.sourceFilenames = filenames;
+        this.sourceFilenames = new ArrayList<String>(filenames.size());
+        for (String filename : filenames)
+            this.sourceFilenames.add(prependTestPath(filename));
         this.eq = new SilentErrorQueue(100, this.getName());
     }
 
@@ -287,7 +290,7 @@ public class SourceFileTest extends AbstractTest {
 
         if ((s = getAdditionalClasspath()) != null) {
             args.add("-cp");
-            args.add(s);
+            args.add(prependTestPath(s));
         }
 
         if ((s = getDestDir()) != null) {
@@ -318,8 +321,17 @@ public class SourceFileTest extends AbstractTest {
         }
 
         if ((sa = getExtraCmdLineArgs()) != null) {
+            List<String> appendFlags =
+                    Arrays.asList(new String[] { "-d", "-cp", "-classpath",
+                            "-sourcepath" });
+            boolean appendFlag = false;
             for (String element : sa) {
                 String sas = element;
+                if (appendFlag) {
+                    sas = prependTestPath(sas);
+                    appendFlag = false;
+                }
+                else if (appendFlags.contains(element)) appendFlag = true;
                 if (pathSep != ':' && sas.indexOf(':') >= 0) {
                     sas = replacePathSep(sas, pathSep);
                 }
@@ -449,10 +461,23 @@ public class SourceFileTest extends AbstractTest {
     }
 
     protected String getDestDir() {
-        return destDir;
+        return prependTestPath(destDir);
     }
 
     protected String getSourceDir() {
-        return null;
+        return getTestDir();
+    }
+
+    protected String getTestDir() {
+        return Main.options.testpath;
+    }
+
+    protected String prependTestPath(String filename) {
+        String testpath = getTestDir();
+        if (testpath != null) {
+            if (filename != null) return testpath + filename;
+            return testpath;
+        }
+        return filename;
     }
 }

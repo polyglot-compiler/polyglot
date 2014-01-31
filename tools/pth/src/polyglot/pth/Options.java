@@ -45,6 +45,9 @@ public class Options {
     // classpath for the compiler.
     protected String classpath = null;
 
+    // path for the test directory.
+    protected String testpath = null;
+
     // Extra command line args for the compiler
     protected String extraArgs = null;
 
@@ -120,6 +123,16 @@ public class Options {
                             return index + 1;
                         }
                     },
+                    new CommandLineOption(new String[] { "testpath" },
+                                          "path",
+                                          "where to find test files.") {
+                        @Override
+                        protected int invoke(int index, String[] args) {
+                            testpath = getStringArg(++index, args);
+                            if (!testpath.endsWith("/")) testpath += "/";
+                            return index + 1;
+                        }
+                    },
                     new CommandLineOption(new String[] { "args" },
                                           "extraArgs",
                                           "provide additional command line arguments to the Polyglot compiler.") {
@@ -156,8 +169,8 @@ public class Options {
         out.println("Usage: pth [options] scriptFile ...");
         out.println("where options include: ");
 
-        for (int i = 0; i < commandLineOpts.length; i++) {
-            usageForSwitch(out, commandLineOpts[i]);
+        for (CommandLineOption commandLineOpt : commandLineOpts) {
+            usageForSwitch(out, commandLineOpt);
         }
     }
 
@@ -284,8 +297,8 @@ abstract class CommandLineOption {
                 s = s.substring(1);
             }
 
-            for (int i = 0; i < this.switches.length; i++) {
-                if (this.switches[i].equals(s)) {
+            for (String switche : this.switches) {
+                if (switche.equals(s)) {
                     // the command line matches.
                     currOpt = currentInd;
                     return invoke(currentInd, args);

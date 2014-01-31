@@ -142,8 +142,10 @@ public abstract class OptFlag<T> implements Comparable<OptFlag<T>> {
     @Override
     public int compareTo(OptFlag<T> flag) {
         for (String id1 : ids) {
-            for (String id2 : flag.ids())
-                return id1.compareTo(id2);
+            for (String id2 : flag.ids()) {
+                int cmp = id1.compareToIgnoreCase(id2);
+                return cmp == 0 ? id1.compareTo(id2) : cmp;
+            }
         }
         throw new InternalCompilerError("Empty ids!");
     }

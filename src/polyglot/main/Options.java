@@ -99,6 +99,7 @@ public class Options {
     public boolean output_stdout; // whether to output to stdout
 
     public String post_compiler;
+    public String post_compiler_opts;
 
     public int output_width;
     public boolean fully_qualified_names;
@@ -340,9 +341,19 @@ public class Options {
                               "set the maximum width of the .java output files",
                               80));
 
-        flags.add(new OptFlag<String>("-post",
+        flags.add(new OptFlag<String>("-postcompiler",
                                       "<compiler>",
                                       "run javac-like compiler after translation") {
+            @Override
+            public Arg<String> handle(String[] args, int index)
+                    throws UsageError {
+                return createArg(index + 1, args[index]);
+            }
+        });
+
+        flags.add(new OptFlag<String>("-postopts",
+                                      "<options>",
+                                      "options to pass to the compiler after translation") {
             @Override
             public Arg<String> handle(String[] args, int index)
                     throws UsageError {
@@ -665,8 +676,12 @@ public class Options {
             setOutputWidth((Integer) arg.value());
 
         }
-        else if (arg.flag().ids().contains("-post")) {
+        else if (arg.flag().ids().contains("-postcompiler")) {
             setPostCompiler((String) arg.value());
+
+        }
+        else if (arg.flag().ids().contains("-postopts")) {
+            setPostCompilerOpts((String) arg.value());
 
         }
         else if (arg.flag().ids().contains("-stdout")) {
@@ -802,6 +817,10 @@ public class Options {
 
     protected void setPostCompiler(String value) {
         post_compiler = value;
+    }
+
+    protected void setPostCompilerOpts(String value) {
+        post_compiler_opts = value;
     }
 
     protected void setOutputStdOut(boolean value) {
