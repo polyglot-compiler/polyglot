@@ -33,7 +33,7 @@ import polyglot.util.Copy;
  * AST nodes and delegates for AST nodes must implement this interface.
  */
 @Deprecated
-public interface JLDel extends NodeOps, Copy {
+public interface JLDel extends NodeOps, Copy<JLDel> {
     /** Pointer back to the node we are delegating for, possibly this. */
     public Node node();
 

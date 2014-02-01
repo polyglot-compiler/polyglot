@@ -129,7 +129,7 @@ public class JL5ClassDeclExt extends JL5AnnotatedElementExt implements
 
     private Node reconstruct(Node n, List<ParamTypeNode> paramTypes) {
         if (!CollectionUtil.equals(paramTypes, paramTypes(n))) {
-            if (n == this.node()) n = (Node) n.copy();
+            if (n == this.node()) n = n.copy();
             JL5ClassDeclExt ext = (JL5ClassDeclExt) JL5Ext.ext(n);
             ext.paramTypes = ListUtil.copy(paramTypes, true);
         }

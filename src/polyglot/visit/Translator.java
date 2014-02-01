@@ -72,7 +72,7 @@ import polyglot.util.InternalCompilerError;
  * 
  * The <code>ast</code> must be either a SourceFile or a SourceCollection.
  */
-public class Translator extends PrettyPrinter implements Copy {
+public class Translator extends PrettyPrinter implements Copy<Translator> {
     protected Job job;
     protected NodeFactory nf;
     protected TargetFactory tf;

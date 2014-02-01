@@ -36,7 +36,7 @@ import polyglot.util.Position;
  * It is a static representation of a type that is not necessarily 
  * first-class.  It is similar to a compile-time meta-object.
  */
-public interface TypeObject extends Copy, Serializable {
+public interface TypeObject extends Copy<TypeObject>, Serializable {
     /**
      * Return true if the type object contains no unknown/ambiguous types.
      */

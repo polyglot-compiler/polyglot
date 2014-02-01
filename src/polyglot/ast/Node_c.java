@@ -93,7 +93,7 @@ public abstract class Node_c implements Node {
 
         Node_c n = (Node_c) copy();
 
-        n.del = del != this ? del : null;
+        n.del = del;
 
         if (n.del != null) {
             n.del.init(n);
@@ -151,18 +151,18 @@ public abstract class Node_c implements Node {
 
     @SuppressWarnings("deprecation")
     @Override
-    public Object copy() {
+    public Node copy() {
         try {
             Node_c n = (Node_c) super.clone();
 
             // XXX Deprecated
             if (this.del != null) {
-                n.del = (JLDel) this.del.copy();
+                n.del = this.del.copy();
                 n.del.init(n);
             }
 
             if (this.ext != null) {
-                n.ext = (Ext) this.ext.copy();
+                n.ext = this.ext.copy();
                 n.ext.init(n);
             }
 

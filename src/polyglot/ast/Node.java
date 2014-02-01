@@ -40,7 +40,7 @@ import polyglot.visit.NodeVisitor;
  * of the node should copy the node, set the field in the copy, and then
  * return the copy.
  */
-public interface Node extends NodeOps, Copy, Serializable {
+public interface Node extends NodeOps, Copy<Node>, Serializable {
     /**
      * Set the delegate of the node.
      */

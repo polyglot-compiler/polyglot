@@ -38,6 +38,6 @@ public class DeepCopy extends HaltingVisitor {
 
     @Override
     public Node leave(Node old, Node n, NodeVisitor v) {
-        return (Node) n.copy();
+        return n.copy();
     }
 }

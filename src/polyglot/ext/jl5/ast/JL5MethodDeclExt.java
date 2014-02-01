@@ -63,7 +63,7 @@ public class JL5MethodDeclExt extends JL5ProcedureDeclExt implements
     }
 
     public MethodDecl setCompilerGenerated(boolean val) {
-        MethodDecl n = (MethodDecl) copy();
+        MethodDecl n = (MethodDecl) node().copy();
         JL5MethodDeclExt ext = (JL5MethodDeclExt) JL5Ext.ext(n);
         ext.compilerGenerated = val;
         return n;

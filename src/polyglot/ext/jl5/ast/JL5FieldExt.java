@@ -46,7 +46,7 @@ public class JL5FieldExt extends JL5Ext {
     public Node typeCheck(TypeChecker tc) throws SemanticException {
         Field n = (Field) superLang().typeCheck(this.node(), tc);
         if (n.fieldInstance() instanceof EnumInstance
-                && !(this instanceof EnumConstant)) {
+                && !(n instanceof EnumConstant)) {
             // it's an enum, so replace this with the appropriate AST node for enum constants.
             JL5NodeFactory nf = (JL5NodeFactory) tc.nodeFactory();
             EnumConstant ec =

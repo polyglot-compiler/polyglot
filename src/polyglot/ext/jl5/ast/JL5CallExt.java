@@ -107,7 +107,7 @@ public class JL5CallExt extends JL5Ext implements CallOps {
             // the type args changed! Let's update the node.
             if (newN == this.node()) {
                 // we need to create a copy.
-                newN = (Node) newN.copy();
+                newN = newN.copy();
                 newext = (JL5CallExt) JL5Ext.ext(newN);
             }
             else {

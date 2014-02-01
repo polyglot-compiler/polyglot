@@ -77,7 +77,7 @@ public abstract class JL5ProcedureDeclExt extends JL5AnnotatedElementExt
     }
 
     public ProcedureDecl typeParams(List<ParamTypeNode> typeParams) {
-        ProcedureDecl n = (ProcedureDecl) copy();
+        ProcedureDecl n = (ProcedureDecl) node().copy();
         JL5ProcedureDeclExt ext = (JL5ProcedureDeclExt) JL5Ext.ext(n);
         ext.typeParams = typeParams;
         return n;
@@ -92,7 +92,7 @@ public abstract class JL5ProcedureDeclExt extends JL5AnnotatedElementExt
 
     private Node reconstruct(Node n, List<ParamTypeNode> typeParams) {
         if (!CollectionUtil.equals(typeParams, typeParams(n))) {
-            if (n == this.node()) n = (Node) n.copy();
+            if (n == this.node()) n = n.copy();
             JL5ProcedureDeclExt ext = (JL5ProcedureDeclExt) JL5Ext.ext(n);
             ext.typeParams = ListUtil.copy(typeParams, true);
         }

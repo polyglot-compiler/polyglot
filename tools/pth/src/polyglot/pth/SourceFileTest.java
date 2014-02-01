@@ -45,6 +45,8 @@ import polyglot.util.SilentErrorQueue;
  */
 public class SourceFileTest extends AbstractTest {
     private static final String JAVAC = "javac";
+    private static final JavaCompiler javaCompiler =
+            ToolProvider.getSystemJavaCompiler();
     protected final List<String> sourceFilenames;
     protected String extensionClassname = null;
     protected String[] extraArgs;
@@ -243,8 +245,7 @@ public class SourceFileTest extends AbstractTest {
         String[] cmdLine = buildCmdLine(files);
 
         try {
-            JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
-            compiler.run(null, null, null, cmdLine);
+            javaCompiler.run(null, null, null, cmdLine);
         }
         finally {
             if (Main.options.deleteOutputFiles) {

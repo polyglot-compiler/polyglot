@@ -58,7 +58,8 @@ import polyglot.visit.FlowGraph.Peer;
 /**
  * Class used to construct a CFG.
  */
-public class CFGBuilder<FlowItem extends DataFlow.Item> implements Copy {
+public class CFGBuilder<FlowItem extends DataFlow.Item> implements
+        Copy<CFGBuilder<FlowItem>> {
     /** The language this CFGBuilder operates on. */
     private final JLang lang;
 

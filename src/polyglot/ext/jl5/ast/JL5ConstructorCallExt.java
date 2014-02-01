@@ -105,7 +105,7 @@ public class JL5ConstructorCallExt extends JL5Ext {
             // the type args changed! Let's update the node.
             if (newN == this.node()) {
                 // we need to create a copy.
-                newN = (Node) newN.copy();
+                newN = newN.copy();
                 newext = (JL5ConstructorCallExt) JL5Ext.ext(newN);
             }
             else {

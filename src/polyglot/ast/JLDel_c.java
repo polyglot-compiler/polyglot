@@ -37,7 +37,6 @@ import polyglot.types.SemanticException;
 import polyglot.types.Type;
 import polyglot.types.TypeSystem;
 import polyglot.util.CodeWriter;
-import polyglot.util.Copy;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.SerialVersionUID;
 import polyglot.visit.AmbiguityRemover;
@@ -59,7 +58,7 @@ import polyglot.visit.TypeChecker;
  * the <code>JL</code> interface.
  */
 @Deprecated
-public class JLDel_c implements JLDel, Copy, Serializable {
+public class JLDel_c implements JLDel, Serializable {
     private static final long serialVersionUID = SerialVersionUID.generate();
     public static final JLDel instance = new JLDel_c();
 
@@ -89,7 +88,7 @@ public class JLDel_c implements JLDel, Copy, Serializable {
     }
 
     @Override
-    public Object copy() {
+    public JLDel copy() {
         try {
             JLDel_c copy = (JLDel_c) super.clone();
             copy.node = null; // uninitialize

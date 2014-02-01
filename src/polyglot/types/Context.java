@@ -40,7 +40,7 @@ import polyglot.util.Copy;
  * scope is updated in place.  Names added to the context are added
  * in the current scope.
  */
-public interface Context extends Resolver, Copy {
+public interface Context extends Resolver, Copy<Context> {
     /** The language this context represents. */
     Lang lang();
 

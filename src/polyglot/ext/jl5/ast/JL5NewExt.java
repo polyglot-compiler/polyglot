@@ -93,7 +93,7 @@ public class JL5NewExt extends JL5Ext implements NewOps {
             // the type args changed! Let's update the node.
             if (newN == this.node()) {
                 // we need to create a copy.
-                newN = (Node) newN.copy();
+                newN = newN.copy();
                 newext = (JL5NewExt) JL5Ext.ext(newN);
             }
             else {

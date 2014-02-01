@@ -112,9 +112,9 @@ public class Context_c implements Context {
     }
 
     @Override
-    public Object copy() {
+    public Context copy() {
         try {
-            return super.clone();
+            return (Context) super.clone();
         }
         catch (CloneNotSupportedException e) {
             throw new InternalCompilerError("Java clone() weirdness.");

@@ -49,7 +49,7 @@ import polyglot.util.StringUtil;
  * @see polyglot.ast.Node#visit
  * @see polyglot.ast.Node
  */
-public abstract class NodeVisitor implements Copy {
+public abstract class NodeVisitor implements Copy<NodeVisitor> {
     /** The language this NodeVisitor operates on. */
     private final Lang lang;
 

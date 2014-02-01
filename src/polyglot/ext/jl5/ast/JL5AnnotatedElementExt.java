@@ -57,14 +57,14 @@ public abstract class JL5AnnotatedElementExt extends JL5Ext implements
 
     @Override
     public Node annotationElems(List<AnnotationElem> annotations) {
-        Node n = (Node) this.node().copy();
+        Node n = this.node().copy();
         JL5AnnotatedElementExt ext = (JL5AnnotatedElementExt) JL5Ext.ext(n);
         ext.annotations = annotations;
         return n;
     }
 
     public static Node annotationElems(Node n, List<AnnotationElem> annotations) {
-        n = (Node) n.copy();
+        n = n.copy();
         JL5AnnotatedElementExt ext = (JL5AnnotatedElementExt) JL5Ext.ext(n);
         ext.annotations = annotations;
         return n;
@@ -82,7 +82,7 @@ public abstract class JL5AnnotatedElementExt extends JL5Ext implements
 
     private Node reconstruct(Node n, List<AnnotationElem> annotations) {
         if (!CollectionUtil.equals(annotations, annotationElems(n))) {
-            if (n == this.node()) n = (Node) n.copy();
+            if (n == this.node()) n = n.copy();
             JL5AnnotatedElementExt ext = (JL5AnnotatedElementExt) JL5Ext.ext(n);
             ext.annotations = ListUtil.copy(annotations, true);
         }

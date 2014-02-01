@@ -111,7 +111,7 @@ public abstract class Ext_c implements Ext {
         Ext old = this.ext;
         this.ext = null;
 
-        Ext_c copy = (Ext_c) copy();
+        Ext_c copy = copy();
 
         copy.ext = ext;
 
@@ -124,11 +124,11 @@ public abstract class Ext_c implements Ext {
      * Copy the extension.
      */
     @Override
-    public Object copy() {
+    public Ext_c copy() {
         try {
             Ext_c copy = (Ext_c) super.clone();
             if (ext != null) {
-                copy.ext = (Ext) ext.copy();
+                copy.ext = ext.copy();
             }
             copy.node = null; // uninitialize
             return copy;

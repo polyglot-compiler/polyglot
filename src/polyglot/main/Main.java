@@ -195,12 +195,16 @@ public class Main {
      * Returns a list of arguments to pass to the system java compiler.
      */
     protected List<String> getSystemJavacArgs(Options options) {
-        QuotedStringTokenizer st =
-                new QuotedStringTokenizer(options.post_compiler_opts);
-        int pc_size = st.countTokens();
-        List<String> postCompilerArgs = new ArrayList<String>(pc_size + 1);
-        while (st.hasMoreTokens())
-            postCompilerArgs.add(st.nextToken());
+        List<String> postCompilerArgs;
+        if (options.post_compiler_opts != null) {
+            QuotedStringTokenizer st =
+                    new QuotedStringTokenizer(options.post_compiler_opts);
+            int pc_size = st.countTokens();
+            postCompilerArgs = new ArrayList<String>(pc_size + 1);
+            while (st.hasMoreTokens())
+                postCompilerArgs.add(st.nextToken());
+        }
+        else postCompilerArgs = new ArrayList<String>(1);
         if (options.generate_debugging_info) postCompilerArgs.add("-g");
         return postCompilerArgs;
     }

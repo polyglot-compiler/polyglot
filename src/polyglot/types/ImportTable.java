@@ -90,7 +90,7 @@ public class ImportTable implements Resolver {
         }
 
         @Override
-        public Object copy() {
+        public TypeObject copy() {
             return null;
         }
 
