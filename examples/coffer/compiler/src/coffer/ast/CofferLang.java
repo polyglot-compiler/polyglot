@@ -28,13 +28,10 @@ package coffer.ast;
 import polyglot.ast.JLang_c;
 import polyglot.ast.Node;
 import polyglot.ast.NodeOps;
-import polyglot.util.SerialVersionUID;
 import coffer.extension.CofferExt;
 import coffer.extension.CofferExt_c;
 
 public class CofferLang extends JLang_c {
-    private static final long serialVersionUID = SerialVersionUID.generate();
-
     public static final CofferLang instance = new CofferLang();
 
     protected CofferLang() {

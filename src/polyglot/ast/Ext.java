@@ -40,11 +40,23 @@ public interface Ext extends NodeOps, Copy<Ext>, Serializable {
     /** The node that we are extending. */
     Node node();
 
+    /** The parent of this extension. */
+    NodeOps pred();
+
+    /**
+     * Initialize the extension object's pointers back to the node and the parent.
+     * This also initializes the back pointers for all extensions of
+     * the extension.
+     */
+    void init(Node node, NodeOps pred);
+
     /**
      * Initialize the extension object's pointer back to the node.
      * This also initializes the back pointers for all extensions of
      * the extension.
+     * @deprecated
      */
+    @Deprecated
     void init(Node node);
 
     /** An extension of this extension, or null. */

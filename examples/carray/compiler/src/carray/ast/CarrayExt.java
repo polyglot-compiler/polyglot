@@ -2,8 +2,6 @@ package carray.ast;
 
 import polyglot.ast.Ext;
 import polyglot.ast.Ext_c;
-import polyglot.ast.JLang;
-import polyglot.ast.JLang_c;
 import polyglot.ast.Node;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.SerialVersionUID;
@@ -28,7 +26,7 @@ public class CarrayExt extends Ext_c {
     }
 
     @Override
-    protected final JLang superLang() {
-        return JLang_c.instance;
+    public final CarrayLang_c lang() {
+        return CarrayLang_c.instance;
     }
 }

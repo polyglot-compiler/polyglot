@@ -53,6 +53,9 @@ import polyglot.visit.TypeChecker;
  * return the copy.
  */
 public interface NodeOps {
+    /** The language defined by this NodeOps implementation. */
+    Lang lang();
+
     /**
      * Visit the children of the node.
      *

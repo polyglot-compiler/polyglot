@@ -58,6 +58,7 @@ public abstract class Ext_c implements Ext {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
     protected Node node;
+    protected NodeOps pred;
     protected Ext ext;
 
     public Ext_c() {
@@ -69,14 +70,48 @@ public abstract class Ext_c implements Ext {
         this.ext = ext;
     }
 
+    @Override
+    public Lang lang() {
+        throw new InternalCompilerError("Unexpected invocation from extension object.");
+    }
+
     protected JLang superLang() {
-        return JLang_c.instance;
+        return (JLang) pred.lang();
+    }
+
+    /**
+     * Return the node we ultimately extend.
+     */
+    @Override
+    public Node node() {
+        return node;
+    }
+
+    @Override
+    public NodeOps pred() {
+        return pred;
+    }
+
+    @Override
+    public void init(Node node, NodeOps pred) {
+        if (this.node != null) {
+            throw new InternalCompilerError("Already initialized.");
+        }
+
+        this.node = node;
+        this.pred = pred;
+
+        if (this.ext != null) {
+            this.ext.init(node, this);
+        }
     }
 
     /** Initialize the extension object's pointer back to the node.
      * This also initializes the back pointers for all extensions of
      * the extension.
+     * @deprecated
      */
+    @Deprecated
     @Override
     public void init(Node node) {
         if (this.node != null) {
@@ -88,14 +123,6 @@ public abstract class Ext_c implements Ext {
         if (this.ext != null) {
             this.ext.init(node);
         }
-    }
-
-    /**
-     * Return the node we ultimately extend.
-     */
-    @Override
-    public Node node() {
-        return node;
     }
 
     /**

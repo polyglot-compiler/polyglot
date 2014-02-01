@@ -1,7 +1,6 @@
 package polyglot.ext.jl5.ast;
 
 import polyglot.ast.Catch;
-import polyglot.ast.Ext;
 import polyglot.ast.Formal;
 import polyglot.ast.Node;
 import polyglot.ext.jl5.types.JL5LocalInstance;
@@ -10,7 +9,7 @@ import polyglot.util.SerialVersionUID;
 import polyglot.visit.TypeBuilder;
 import polyglot.visit.TypeChecker;
 
-public class JL5CatchExt extends JL5Ext implements Ext {
+public class JL5CatchExt extends JL5Ext {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
     @Override

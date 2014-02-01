@@ -4,7 +4,6 @@ import polyglot.ast.Ext;
 import polyglot.ast.Ext_c;
 import polyglot.ast.Node;
 import polyglot.ext.jl5.ast.J5Lang;
-import polyglot.ext.jl5.ast.J5Lang_c;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.SerialVersionUID;
 
@@ -24,7 +23,12 @@ public class JL7Ext extends Ext_c {
     }
 
     @Override
-    protected final J5Lang superLang() {
-        return J5Lang_c.instance;
+    public final J7Lang lang() {
+        return J7Lang_c.instance;
+    }
+
+    @Override
+    protected J5Lang superLang() {
+        return (J5Lang) super.superLang();
     }
 }

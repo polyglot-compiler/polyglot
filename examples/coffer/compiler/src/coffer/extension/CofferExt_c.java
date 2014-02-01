@@ -17,6 +17,7 @@ import polyglot.types.SemanticException;
 import polyglot.types.Type;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.SerialVersionUID;
+import coffer.ast.CofferLang;
 import coffer.types.CofferClassType;
 import coffer.types.Key;
 import coffer.types.KeySet;
@@ -38,6 +39,11 @@ public class CofferExt_c extends Ext_c implements CofferExt {
                                             n.position());
         }
         return (CofferExt) e;
+    }
+
+    @Override
+    public final CofferLang lang() {
+        return CofferLang.instance;
     }
 
     public String KeysToString(KeySet set) {

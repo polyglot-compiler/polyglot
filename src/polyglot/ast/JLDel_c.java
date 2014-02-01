@@ -99,6 +99,11 @@ public class JLDel_c implements JLDel, Serializable {
         }
     }
 
+    @Override
+    public final JLang lang() {
+        throw new InternalCompilerError("Unsupported method lang() for delegates");
+    }
+
     /**
      * Visit the children of the node.
      *

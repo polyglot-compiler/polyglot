@@ -141,7 +141,7 @@ public abstract class Node_c implements Node {
         n.ext = ext;
 
         if (n.ext != null) {
-            n.ext.init(n);
+            n.ext.init(n, n);
         }
 
         this.ext = old;
@@ -282,6 +282,11 @@ public abstract class Node_c implements Node {
         }
 
         return result;
+    }
+
+    @Override
+    public final JLang lang() {
+        return JLang_c.instance;
     }
 
     @Override
