@@ -25,30 +25,39 @@
  ******************************************************************************/
 package polyglot.translate.ext;
 
+import polyglot.ast.Expr;
 import polyglot.ast.Field;
 import polyglot.ast.FieldAssign;
 import polyglot.ast.Node;
 import polyglot.translate.ExtensionRewriter;
 import polyglot.types.SemanticException;
 import polyglot.util.SerialVersionUID;
+import polyglot.visit.NodeVisitor;
 
 public class FieldAssignToExt_c extends ToExt_c {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
     @Override
+    public NodeVisitor toExtEnter(ExtensionRewriter rw)
+            throws SemanticException {
+        FieldAssign n = (FieldAssign) node();
+        return rw.bypass(n.left());
+    }
+
+    @Override
     public Node toExt(ExtensionRewriter rw) throws SemanticException {
         FieldAssign n = (FieldAssign) node();
-        if (n.left() instanceof Field) {
-            return rw.to_nf().FieldAssign(n.position(),
-                                          (Field) n.left(),
-                                          n.operator(),
-                                          n.right());
+        Expr left = n.visitChild(n.left(), rw);
+        if (!left.isDisambiguated()) {
+            // Need to have an ambiguous assignment
+            return rw.nodeFactory().AmbAssign(n.position(),
+                                              left,
+                                              n.operator(),
+                                              n.right());
         }
-        // n.left() is some none-field expression
-        return rw.to_nf().AmbAssign(n.position(),
-                                    n.left(),
-                                    n.operator(),
-                                    n.right());
-
+        return rw.to_nf().FieldAssign(n.position(),
+                                      (Field) left,
+                                      n.operator(),
+                                      n.right());
     }
 }

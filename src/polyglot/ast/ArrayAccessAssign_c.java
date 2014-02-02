@@ -53,14 +53,18 @@ public class ArrayAccessAssign_c extends Assign_c implements ArrayAccessAssign {
     }
 
     @Override
-    public Assign left(Expr left) {
-        ArrayAccessAssign_c n = (ArrayAccessAssign_c) super.left(left);
-        n.assertLeftType();
-        return n;
+    public ArrayAccess left() {
+        return (ArrayAccess) super.left();
     }
 
-    private void assertLeftType() {
-        if (!(left() instanceof ArrayAccess)) {
+    @Override
+    public Assign left(Expr left) {
+        assertLeftType(left);
+        return super.left(left);
+    }
+
+    private void assertLeftType(Expr left) {
+        if (!(left instanceof ArrayAccess)) {
             throw new InternalCompilerError("left expression of an ArrayAccessAssign must be an array access");
         }
     }
@@ -68,7 +72,7 @@ public class ArrayAccessAssign_c extends Assign_c implements ArrayAccessAssign {
     @Override
     public Term firstChild() {
         if (operator() == ASSIGN) {
-            return ((ArrayAccess) left()).array();
+            return left().array();
         }
         else {
             return left();
@@ -77,7 +81,7 @@ public class ArrayAccessAssign_c extends Assign_c implements ArrayAccessAssign {
 
     @Override
     protected void acceptCFGAssign(CFGBuilder<?> v) {
-        ArrayAccess a = (ArrayAccess) left();
+        ArrayAccess a = left();
 
         //    a[i] = e: visit a -> i -> e -> (a[i] = e)
         v.visitCFG(a.array(), a.index(), ENTRY);

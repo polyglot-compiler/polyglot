@@ -31,6 +31,7 @@ import java.util.List;
 import polyglot.frontend.MissingDependencyException;
 import polyglot.frontend.Scheduler;
 import polyglot.frontend.goals.Goal;
+import polyglot.translate.ExtensionRewriter;
 import polyglot.types.Context;
 import polyglot.types.Flags;
 import polyglot.types.LocalInstance;
@@ -366,6 +367,12 @@ public class LocalDecl_c extends Stmt_c implements LocalDecl {
         }
 
         return child.type();
+    }
+
+    @Override
+    public Node extRewrite(ExtensionRewriter rw) throws SemanticException {
+        LocalDecl n = (LocalDecl) super.extRewrite(rw);
+        return n.localInstance(null);
     }
 
     @Override

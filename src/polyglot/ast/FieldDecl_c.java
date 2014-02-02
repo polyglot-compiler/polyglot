@@ -31,6 +31,7 @@ import java.util.List;
 import polyglot.frontend.MissingDependencyException;
 import polyglot.frontend.Scheduler;
 import polyglot.frontend.goals.Goal;
+import polyglot.translate.ExtensionRewriter;
 import polyglot.types.CodeInstance;
 import polyglot.types.Context;
 import polyglot.types.FieldInstance;
@@ -464,6 +465,12 @@ public class FieldDecl_c extends Term_c implements FieldDecl {
         }
 
         return child.type();
+    }
+
+    @Override
+    public Node extRewrite(ExtensionRewriter rw) throws SemanticException {
+        FieldDecl n = (FieldDecl) super.extRewrite(rw);
+        return n.fieldInstance(null).initializerInstance(null);
     }
 
     @Override

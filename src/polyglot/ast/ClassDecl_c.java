@@ -34,6 +34,7 @@ import polyglot.frontend.MissingDependencyException;
 import polyglot.frontend.Scheduler;
 import polyglot.frontend.goals.Goal;
 import polyglot.main.Report;
+import polyglot.translate.ExtensionRewriter;
 import polyglot.types.ClassType;
 import polyglot.types.ConstructorInstance;
 import polyglot.types.Context;
@@ -613,6 +614,14 @@ public class ClassDecl_c extends Term_c implements ClassDecl, ClassDeclOps {
         ts.checkClassConformance(type);
 
         return this;
+    }
+
+    @Override
+    public Node extRewrite(ExtensionRewriter rw) throws SemanticException {
+        ClassDecl_c n = (ClassDecl_c) super.extRewrite(rw);
+        if (n == this) n = (ClassDecl_c) copy();
+        n.defaultCI = null;
+        return n;
     }
 
     @Override

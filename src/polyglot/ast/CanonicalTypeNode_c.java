@@ -27,6 +27,7 @@
 package polyglot.ast;
 
 import polyglot.frontend.ExtensionInfo;
+import polyglot.translate.ExtensionRewriter;
 import polyglot.types.ClassType;
 import polyglot.types.SemanticException;
 import polyglot.types.Type;
@@ -68,6 +69,11 @@ public class CanonicalTypeNode_c extends TypeNode_c implements
         }
 
         return this;
+    }
+
+    @Override
+    public Node extRewrite(ExtensionRewriter rw) throws SemanticException {
+        return rw.typeToJava(type(), position());
     }
 
     @Override

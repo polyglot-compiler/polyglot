@@ -26,6 +26,7 @@
 
 package polyglot.ast;
 
+import polyglot.translate.ExtensionRewriter;
 import polyglot.types.SemanticException;
 import polyglot.types.Type;
 import polyglot.util.CodeWriter;
@@ -35,7 +36,7 @@ import polyglot.visit.PrettyPrinter;
 import polyglot.visit.TypeBuilder;
 
 /**
- * An <code>Expr</code> represents any Java expression.  All expressions
+ * An {@code Expr} represents any Java expression.  All expressions
  * must be subtypes of Expr.
  */
 public abstract class Expr_c extends Term_c implements Expr {
@@ -49,7 +50,7 @@ public abstract class Expr_c extends Term_c implements Expr {
 
     /**
      * Get the type of the expression.  This may return an
-     * <code>UnknownType</code> before type-checking, but should return the
+     * {@code UnknownType} before type-checking, but should return the
      * correct type after type-checking.
      */
     @Override
@@ -145,9 +146,15 @@ public abstract class Expr_c extends Term_c implements Expr {
         return type(tb.typeSystem().unknownType(position()));
     }
 
+    @Override
+    public Node extRewrite(ExtensionRewriter rw) throws SemanticException {
+        Expr n = (Expr) super.extRewrite(rw);
+        return n.type(null);
+    }
+
     /**
-     * Correctly parenthesize the subexpression <code>expr<code> given
-     * the its precendence and the precedence of the current expression.
+     * Correctly parenthesize the subexpression {@code expr} given
+     * the its precedence and the precedence of the current expression.
      *
      * If the sub-expression has the same precedence as this expression
      * we do not parenthesize.
@@ -162,8 +169,8 @@ public abstract class Expr_c extends Term_c implements Expr {
     }
 
     /**
-     * Correctly parenthesize the subexpression <code>expr<code> given
-     * the its precendence and the precedence of the current expression.
+     * Correctly parenthesize the subexpression {@code expr} given
+     * the its precedence and the precedence of the current expression.
      *
      * If the sub-expression has the same precedence as this expression
      * we parenthesize if the sub-expression does not associate; e.g.,

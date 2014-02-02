@@ -31,6 +31,7 @@ import java.io.Writer;
 import java.util.List;
 
 import polyglot.frontend.ExtensionInfo;
+import polyglot.translate.ExtensionRewriter;
 import polyglot.types.Context;
 import polyglot.types.SemanticException;
 import polyglot.types.Type;
@@ -400,6 +401,17 @@ public abstract class Ext_c implements Ext {
     @Override
     public List<Type> throwTypes(TypeSystem ts) {
         return superLang().throwTypes(node(), ts);
+    }
+
+    @Override
+    public NodeVisitor extRewriteEnter(ExtensionRewriter rw)
+            throws SemanticException {
+        return superLang().extRewriteEnter(node(), rw);
+    }
+
+    @Override
+    public Node extRewrite(ExtensionRewriter rw) throws SemanticException {
+        return superLang().extRewrite(node(), rw);
     }
 
     @Deprecated

@@ -32,6 +32,8 @@ import java.io.Writer;
 import java.util.List;
 
 import polyglot.frontend.ExtensionInfo;
+import polyglot.translate.ExtensionRewriter;
+import polyglot.translate.ext.ToExt;
 import polyglot.types.Context;
 import polyglot.types.SemanticException;
 import polyglot.types.Type;
@@ -336,6 +338,19 @@ public class JLDel_c implements JLDel, Serializable {
     @Override
     public List<Type> throwTypes(TypeSystem ts) {
         return jl().throwTypes(ts);
+    }
+
+    @Override
+    public NodeVisitor extRewriteEnter(ExtensionRewriter rw)
+            throws SemanticException {
+        ToExt ext = rw.from_ext().getToExt(rw.to_ext(), node());
+        return ext.toExtEnter(rw);
+    }
+
+    @Override
+    public Node extRewrite(ExtensionRewriter rw) throws SemanticException {
+        ToExt ext = rw.from_ext().getToExt(rw.to_ext(), node());
+        return ext.toExt(rw);
     }
 
     @Deprecated

@@ -27,6 +27,7 @@
 package polyglot.ast;
 
 import polyglot.frontend.ExtensionInfo;
+import polyglot.translate.ExtensionRewriter;
 import polyglot.types.Package;
 import polyglot.types.Qualifier;
 import polyglot.types.SemanticException;
@@ -91,6 +92,14 @@ public class PackageNode_c extends Node_c implements PackageNode {
     @Override
     public void translate(CodeWriter w, Translator tr) {
         w.write(package_.translate(tr.context()));
+    }
+
+    @Override
+    public Node extRewrite(ExtensionRewriter rw) throws SemanticException {
+        PackageNode n = (PackageNode) super.extRewrite(rw);
+        Package p = package_();
+        p = rw.to_ts().packageForName(p.fullName());
+        return n.package_(p);
     }
 
     @Override

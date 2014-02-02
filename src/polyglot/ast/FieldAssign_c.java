@@ -29,12 +29,15 @@ package polyglot.ast;
 import java.util.ArrayList;
 import java.util.List;
 
+import polyglot.translate.ExtensionRewriter;
+import polyglot.types.SemanticException;
 import polyglot.types.Type;
 import polyglot.types.TypeSystem;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
 import polyglot.visit.CFGBuilder;
+import polyglot.visit.NodeVisitor;
 
 /**
  * A <code>FieldAssign_c</code> represents a Java assignment expression to
@@ -51,21 +54,25 @@ public class FieldAssign_c extends Assign_c implements FieldAssign {
     }
 
     @Override
-    public Assign left(Expr left) {
-        FieldAssign_c n = (FieldAssign_c) super.left(left);
-        n.assertLeftType();
-        return n;
+    public Field left() {
+        return (Field) super.left();
     }
 
-    private void assertLeftType() {
-        if (!(left() instanceof Field)) {
+    @Override
+    public Assign left(Expr left) {
+        assertLeftType(left);
+        return super.left(left);
+    }
+
+    private static void assertLeftType(Expr left) {
+        if (!(left instanceof Field)) {
             throw new InternalCompilerError("left expression of an FieldAssign must be a field");
         }
     }
 
     @Override
     public Term firstChild() {
-        Field f = (Field) left();
+        Field f = left();
         if (f.target() instanceof Expr) {
             return ((Expr) f.target());
         }
@@ -81,7 +88,7 @@ public class FieldAssign_c extends Assign_c implements FieldAssign {
 
     @Override
     protected void acceptCFGAssign(CFGBuilder<?> v) {
-        Field f = (Field) left();
+        Field f = left();
         if (f.target() instanceof Expr) {
             Expr o = (Expr) f.target();
 
@@ -125,7 +132,7 @@ public class FieldAssign_c extends Assign_c implements FieldAssign {
     public List<Type> throwTypes(TypeSystem ts) {
         List<Type> l = new ArrayList<Type>(super.throwTypes(ts));
 
-        Field f = (Field) left();
+        Field f = left();
         if (f.target() instanceof Expr) {
             l.add(ts.NullPointerException());
         }
@@ -133,4 +140,23 @@ public class FieldAssign_c extends Assign_c implements FieldAssign {
         return l;
     }
 
+    @Override
+    public NodeVisitor extRewriteEnter(ExtensionRewriter rw)
+            throws SemanticException {
+        return rw.bypass(left());
+    }
+
+    @Override
+    public Node extRewrite(ExtensionRewriter rw) throws SemanticException {
+        FieldAssign n = (FieldAssign) super.extRewrite(rw);
+        Expr left = n.visitChild(n.left(), rw);
+        if (!left.isDisambiguated()) {
+            // Need to have an ambiguous assignment
+            return rw.nodeFactory().AmbAssign(n.position(),
+                                              left,
+                                              n.operator(),
+                                              n.right());
+        }
+        return n.left(left);
+    }
 }

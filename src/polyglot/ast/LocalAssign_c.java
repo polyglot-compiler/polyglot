@@ -46,14 +46,18 @@ public class LocalAssign_c extends Assign_c implements LocalAssign {
     }
 
     @Override
-    public Assign left(Expr left) {
-        LocalAssign_c n = (LocalAssign_c) super.left(left);
-        n.assertLeftType();
-        return n;
+    public Local left() {
+        return (Local) super.left();
     }
 
-    private void assertLeftType() {
-        if (!(left() instanceof Local)) {
+    @Override
+    public Assign left(Expr left) {
+        assertLeftType(left);
+        return super.left(left);
+    }
+
+    private static void assertLeftType(Expr left) {
+        if (!(left instanceof Local)) {
             throw new InternalCompilerError("left expression of an LocalAssign must be a local");
         }
     }

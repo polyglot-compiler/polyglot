@@ -34,6 +34,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import polyglot.main.Report;
+import polyglot.translate.ExtensionRewriter;
 import polyglot.types.CodeInstance;
 import polyglot.types.Context;
 import polyglot.types.Flags;
@@ -428,6 +429,12 @@ public class MethodDecl_c extends Term_c implements MethodDecl,
     public NodeVisitor exceptionCheckEnter(ExceptionChecker ec)
             throws SemanticException {
         return ec.push(methodInstance().throwTypes());
+    }
+
+    @Override
+    public Node extRewrite(ExtensionRewriter rw) throws SemanticException {
+        MethodDecl n = (MethodDecl) super.extRewrite(rw);
+        return n.methodInstance(null);
     }
 
     @Override

@@ -28,6 +28,7 @@ package polyglot.ast;
 
 import java.util.List;
 
+import polyglot.translate.ExtensionRewriter;
 import polyglot.types.ClassType;
 import polyglot.types.CodeInstance;
 import polyglot.types.ConstructorInstance;
@@ -262,6 +263,12 @@ public class Initializer_c extends Term_c implements Initializer {
         }
 
         return ec.push();
+    }
+
+    @Override
+    public Node extRewrite(ExtensionRewriter rw) throws SemanticException {
+        Initializer n = (Initializer) super.extRewrite(rw);
+        return n.initializerInstance(null);
     }
 
     /** Write the initializer to an output file. */

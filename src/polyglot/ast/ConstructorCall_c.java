@@ -32,6 +32,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
+import polyglot.translate.ExtensionRewriter;
 import polyglot.types.ClassType;
 import polyglot.types.ConstructorInstance;
 import polyglot.types.Context;
@@ -348,6 +349,12 @@ public class ConstructorCall_c extends Stmt_c implements ConstructorCall {
         }
 
         return child.type();
+    }
+
+    @Override
+    public Node extRewrite(ExtensionRewriter rw) throws SemanticException {
+        ConstructorCall n = (ConstructorCall) super.extRewrite(rw);
+        return n.constructorInstance(null);
     }
 
     @Override

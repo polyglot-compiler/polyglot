@@ -32,6 +32,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
+import polyglot.translate.ExtensionRewriter;
 import polyglot.types.ClassType;
 import polyglot.types.CodeInstance;
 import polyglot.types.ConstructorInstance;
@@ -365,6 +366,12 @@ public class ConstructorDecl_c extends Term_c implements ConstructorDecl,
     public NodeVisitor exceptionCheckEnter(ExceptionChecker ec)
             throws SemanticException {
         return ec.push(constructorInstance().throwTypes());
+    }
+
+    @Override
+    public Node extRewrite(ExtensionRewriter rw) throws SemanticException {
+        ConstructorDecl n = (ConstructorDecl) super.extRewrite(rw);
+        return n.constructorInstance(null);
     }
 
     @Override

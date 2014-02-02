@@ -28,6 +28,7 @@ package polyglot.ast;
 
 import java.util.List;
 
+import polyglot.translate.ExtensionRewriter;
 import polyglot.types.Context;
 import polyglot.types.Flags;
 import polyglot.types.LocalInstance;
@@ -234,6 +235,12 @@ public class Formal_c extends Term_c implements Formal {
         }
 
         return this;
+    }
+
+    @Override
+    public Node extRewrite(ExtensionRewriter rw) throws SemanticException {
+        Formal n = (Formal) super.extRewrite(rw);
+        return n.localInstance(null);
     }
 
     @Override

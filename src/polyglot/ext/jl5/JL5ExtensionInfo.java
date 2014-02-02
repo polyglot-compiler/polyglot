@@ -36,7 +36,6 @@ import polyglot.ext.jl5.ast.JL5ExtFactory_c;
 import polyglot.ext.jl5.ast.JL5NodeFactory_c;
 import polyglot.ext.jl5.parse.Grm;
 import polyglot.ext.jl5.parse.Lexer_c;
-import polyglot.ext.jl5.translate.JL5ToJLExtFactory_c;
 import polyglot.ext.jl5.types.JL5TypeSystem_c;
 import polyglot.ext.jl5.types.reflect.JL5ClassFile;
 import polyglot.frontend.CupParser;
@@ -76,15 +75,7 @@ public class JL5ExtensionInfo extends JLExtensionInfo {
 
     @Override
     protected NodeFactory createNodeFactory() {
-        JL5Options opt = (JL5Options) getOptions();
-        if (!opt.removeJava5isms) {
-            return new JL5NodeFactory_c(J5Lang_c.instance,
-                                        new JL5ExtFactory_c());
-        }
-        else {
-            return new JL5NodeFactory_c(J5Lang_c.instance,
-                                        new JL5ExtFactory_c(new JL5ToJLExtFactory_c()));
-        }
+        return new JL5NodeFactory_c(J5Lang_c.instance, new JL5ExtFactory_c());
     }
 
     @Override

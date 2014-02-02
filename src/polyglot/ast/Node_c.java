@@ -34,6 +34,7 @@ import java.util.List;
 
 import polyglot.frontend.Compiler;
 import polyglot.frontend.ExtensionInfo;
+import polyglot.translate.ExtensionRewriter;
 import polyglot.types.Context;
 import polyglot.types.SemanticException;
 import polyglot.types.Type;
@@ -393,6 +394,17 @@ public abstract class Node_c implements Node {
     @Override
     public List<Type> throwTypes(TypeSystem ts) {
         return Collections.emptyList();
+    }
+
+    @Override
+    public NodeVisitor extRewriteEnter(ExtensionRewriter rw)
+            throws SemanticException {
+        return rw;
+    }
+
+    @Override
+    public Node extRewrite(ExtensionRewriter rw) throws SemanticException {
+        return this;
     }
 
     @Deprecated

@@ -31,6 +31,7 @@ import java.io.Writer;
 import java.util.List;
 
 import polyglot.frontend.ExtensionInfo;
+import polyglot.translate.ExtensionRewriter;
 import polyglot.types.ClassType;
 import polyglot.types.ConstructorInstance;
 import polyglot.types.Context;
@@ -183,6 +184,18 @@ public class JLang_c implements JLang {
     @Override
     public final List<Type> throwTypes(Node n, TypeSystem ts) {
         return NodeOps(n).throwTypes(ts);
+    }
+
+    @Override
+    public NodeVisitor extRewriteEnter(Node n, ExtensionRewriter rw)
+            throws SemanticException {
+        return NodeOps(n).extRewriteEnter(rw);
+    }
+
+    @Override
+    public Node extRewrite(Node n, ExtensionRewriter rw)
+            throws SemanticException {
+        return NodeOps(n).extRewrite(rw);
     }
 
     @Override

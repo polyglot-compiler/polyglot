@@ -129,7 +129,7 @@ public class JL7TryExt extends JL7Ext implements JL7TryOps {
         public Node leave(Node old, Node n, NodeVisitor v) {
             if (n instanceof LocalAssign) {
                 LocalAssign la = (LocalAssign) n;
-                if (((Local) la.left()).localInstance().equals(li)) {
+                if (la.left().localInstance().equals(li)) {
                     this.isEffectivelyFinal = false;
                 }
             }

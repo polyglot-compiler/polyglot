@@ -31,6 +31,7 @@ import java.io.Writer;
 import java.util.List;
 
 import polyglot.frontend.ExtensionInfo;
+import polyglot.translate.ExtensionRewriter;
 import polyglot.types.Context;
 import polyglot.types.SemanticException;
 import polyglot.types.Type;
@@ -47,7 +48,7 @@ import polyglot.visit.TypeBuilder;
 import polyglot.visit.TypeChecker;
 
 /**
- * A <code>Node</code> represents an AST node.  All AST nodes must implement
+ * A {@code Node} represents an AST node.  All AST nodes must implement
  * this interface.  Nodes should be immutable: methods which set fields
  * of the node should copy the node, set the field in the copy, and then
  * return the copy.
@@ -60,7 +61,7 @@ public interface NodeOps {
      * Visit the children of the node.
      *
      * @param v The visitor that will traverse/rewrite the AST.
-     * @return A new AST if a change was made, or <code>this</code>.
+     * @return A new AST if a change was made, or {@code this}.
      */
     Node visitChildren(NodeVisitor v);
 
@@ -68,22 +69,22 @@ public interface NodeOps {
      * Push a new scope upon entering this node, and add any declarations to the
      * context that should be in scope when visiting children of this node.
      * This should <i>not</i> update the old context
-     * imperatively.  Use <code>addDecls</code> when leaving the node
+     * imperatively.  Use {@code addDecls} when leaving the node
      * for that.
-     * @param c the current <code>Context</code>
-     * @return the <code>Context</code> to be used for visiting this node. 
+     * @param c the current {@code Context}
+     * @return the {@code Context} to be used for visiting this node. 
      */
     public Context enterScope(Context c);
 
     /**
-     * Push a new scope for visiting the child node <code>child</code>. 
+     * Push a new scope for visiting the child node {@code child}. 
      * The default behavior is to delegate the call to the child node, and let
      * it add appropriate declarations that should be in scope. However,
      * this method gives parent nodes have the ability to modify this behavior.
      * @param child The child node about to be entered.
-     * @param c The current <code>Context</code>
-     * @return the <code>Context</code> to be used for visiting node 
-     *           <code>child</code>
+     * @param c The current {@code Context}
+     * @return the {@code Context} to be used for visiting node 
+     *           {@code child}
      */
     public Context enterChildScope(Node child, Context c);
 
@@ -97,50 +98,50 @@ public interface NodeOps {
     /**
      * Collects classes, methods, and fields from the AST rooted at this node
      * and constructs type objects for these.  These type objects may be
-     * ambiguous.  Inserts classes into the <code>TypeSystem</code>.
+     * ambiguous.  Inserts classes into the {@code TypeSystem}.
      *
-     * This method is called by the <code>enter()</code> method of the
+     * This method is called by the {@code enter()} method of the
      * visitor.  The * method should perform work that should be done
      * before visiting the children of the node.  The method may return
-     * <code>this</code> or a new copy of the node on which
-     * <code>visitChildren()</code> and <code>leave()</code> will be
+     * {@code this} or a new copy of the node on which
+     * {@code visitChildren()} and {@code leave()} will be
      * invoked.
      *
      * @param tb The visitor which adds new type objects to the
-     * <code>TypeSystem</code>.
+     * {@code TypeSystem}.
      */
     NodeVisitor buildTypesEnter(TypeBuilder tb) throws SemanticException;
 
     /**
      * Collects classes, methods, and fields from the AST rooted at this node
      * and constructs type objects for these.  These type objects may be
-     * ambiguous.  Inserts classes into the <code>TypeSystem</code>.
+     * ambiguous.  Inserts classes into the {@code TypeSystem}.
      *
-     * This method is called by the <code>leave()</code> method of the
+     * This method is called by the {@code leave()} method of the
      * visitor.  The method should perform work that should be done
      * after visiting the children of the node.  The method may return
-     * <code>this</code> or a new copy of the node which will be
+     * {@code this} or a new copy of the node which will be
      * installed as a child of the node's parent.
      *
      * @param tb The visitor which adds new type objects to the
-     * <code>TypeSystem</code>.
+     * {@code TypeSystem}.
      */
     Node buildTypes(TypeBuilder tb) throws SemanticException;
 
     /**
      * Disambiguate the AST.
      *
-     * This method is called by the <code>override()</code> method of the
+     * This method is called by the {@code override()} method of the
      * visitor.  If this method returns non-null, the node's children
      * will not be visited automatically.  Thus, the method should check
-     * both the node <code>this</code> and it's children, usually by
-     * invoking <code>visitChildren</code> with <code>tc</code> or
+     * both the node {@code this} and it's children, usually by
+     * invoking {@code visitChildren} with {@code tc} or
      * with another visitor, returning a non-null node.  OR, the method
-     * should do nothing and simply return <code>null</code> to allow
-     * <code>enter</code>, <code>visitChildren</code>, and <code>leave</code>
+     * should do nothing and simply return {@code null} to allow
+     * {@code enter}, {@code visitChildren}, and {@code leave}
      * to be invoked on the node.
      *
-     * The default implementation returns <code>null</code>.
+     * The default implementation returns {@code null}.
      * Overriding of this method is discouraged, but sometimes necessary.
      *
      * @param ar The visitor which disambiguates.
@@ -151,11 +152,11 @@ public interface NodeOps {
     /**
      * Remove any remaining ambiguities from the AST.
      *
-     * This method is called by the <code>enter()</code> method of the
+     * This method is called by the {@code enter()} method of the
      * visitor.  The * method should perform work that should be done
      * before visiting the children of the node.  The method may return
-     * <code>this</code> or a new copy of the node on which
-     * <code>visitChildren()</code> and <code>leave()</code> will be
+     * {@code this} or a new copy of the node on which
+     * {@code visitChildren()} and {@code leave()} will be
      * invoked.
      *
      * @param ar The visitor which disambiguates.
@@ -165,15 +166,15 @@ public interface NodeOps {
     /**
      * Remove any remaining ambiguities from the AST.
      *
-     * This method is called by the <code>leave()</code> method of the
+     * This method is called by the {@code leave()} method of the
      * visitor.  The method should perform work that should be done
      * after visiting the children of the node.  The method may return
-     * <code>this</code> or a new copy of the node which will be
+     * {@code this} or a new copy of the node which will be
      * installed as a child of the node's parent.
      *
      * The node should not assume that its children have been disambiguated.
      * If it depends on a child being disambiguated,
-     * it may just return <code>this</code> without doing any work.
+     * it may just return {@code this} without doing any work.
      *
      * @param ar The visitor which disambiguates.
      */
@@ -182,17 +183,17 @@ public interface NodeOps {
     /**
      * Type check the AST.
      *
-     * This method is called by the <code>override()</code> method of the
+     * This method is called by the {@code override()} method of the
      * visitor.  If this method returns non-null, the node's children
      * will not be visited automatically.  Thus, the method should check
-     * both the node <code>this</code> and it's children, usually by
-     * invoking <code>visitChildren</code> with <code>tc</code> or
+     * both the node {@code this} and it's children, usually by
+     * invoking {@code visitChildren} with {@code tc} or
      * with another visitor, returning a non-null node.  OR, the method
-     * should do nothing and simply return <code>null</code> to allow
-     * <code>enter</code>, <code>visitChildren</code>, and <code>leave</code>
+     * should do nothing and simply return {@code null} to allow
+     * {@code enter}, {@code visitChildren}, and {@code leave}
      * to be invoked on the node.
      *
-     * The default implementation returns <code>null</code>.
+     * The default implementation returns {@code null}.
      * Overriding of this method is discouraged, but sometimes necessary.
      *
      * @param tc The type checking visitor.
@@ -203,11 +204,11 @@ public interface NodeOps {
     /**
      * Type check the AST.
      *
-     * This method is called by the <code>enter()</code> method of the
+     * This method is called by the {@code enter()} method of the
      * visitor.  The * method should perform work that should be done
      * before visiting the children of the node.  The method may return
-     * <code>this</code> or a new copy of the node on which
-     * <code>visitChildren()</code> and <code>leave()</code> will be
+     * {@code this} or a new copy of the node on which
+     * {@code visitChildren()} and {@code leave()} will be
      * invoked.
      *
      * @param tc The type checking visitor.
@@ -217,10 +218,10 @@ public interface NodeOps {
     /**
      * Type check the AST.
      *
-     * This method is called by the <code>leave()</code> method of the
+     * This method is called by the {@code leave()} method of the
      * visitor.  The method should perform work that should be done
      * after visiting the children of the node.  The method may return
-     * <code>this</code> or a new copy of the node which will be
+     * {@code this} or a new copy of the node which will be
      * installed as a child of the node's parent.
      *
      * @param tc The type checking visitor.
@@ -228,27 +229,27 @@ public interface NodeOps {
     Node typeCheck(TypeChecker tc) throws SemanticException;
 
     /**
-     * Get the expected type of a child expression of <code>this</code>.
+     * Get the expected type of a child expression of {@code this}.
      * The expected type is determined by the context in that the child occurs
-     * (e.g., for <code>x = e</code>, the expected type of <code>e</code> is
-     * the declared type of <code>x</code>.
+     * (e.g., for <code>x = e</code>, the expected type of {@code e} is
+     * the declared type of {@code x}.
      *
      * The expected type should impose the least constraints on the child's
      * type that are allowed by the parent node.
      *
      * @param child A child expression of this node.
      * @param av An ascription visitor.
-     * @return The expected type of <code>child</code>.
+     * @return The expected type of {@code child}.
      */
     Type childExpectedType(Expr child, AscriptionVisitor av);
 
     /**
      * Check if the node is a compile-time constant.
      *
-     * This method is called by the <code>leave()</code> method of the
+     * This method is called by the {@code leave()} method of the
      * visitor.  The method should perform work that should be done
      * after visiting the children of the node.  The method may return
-     * <code>this</code> or a new copy of the node which will be
+     * {@code this} or a new copy of the node which will be
      * installed as a child of the node's parent.
      *
      * @param cc The constant checking visitor.
@@ -258,11 +259,11 @@ public interface NodeOps {
     /**
      * Check that exceptions are properly propagated throughout the AST.
      *
-     * This method is called by the <code>enter()</code> method of the
+     * This method is called by the {@code enter()} method of the
      * visitor.  The * method should perform work that should be done
      * before visiting the children of the node.  The method may return
-     * <code>this</code> or a new copy of the node on which
-     * <code>visitChildren()</code> and <code>leave()</code> will be
+     * {@code this} or a new copy of the node on which
+     * {@code visitChildren()} and {@code leave()} will be
      * invoked.
      *
      * @param ec The visitor.
@@ -273,10 +274,10 @@ public interface NodeOps {
     /**
      * Check that exceptions are properly propagated throughout the AST.
      *
-     * This method is called by the <code>leave()</code> method of the
+     * This method is called by the {@code leave()} method of the
      * visitor.  The method should perform work that should be done
      * after visiting the children of the node.  The method may return
-     * <code>this</code> or a new copy of the node which will be
+     * {@code this} or a new copy of the node which will be
      * installed as a child of the node's parent.
      *
      * @param ec The visitor.
@@ -288,6 +289,33 @@ public interface NodeOps {
      * not necessarily correct until after type checking. 
      */
     List<Type> throwTypes(TypeSystem ts);
+
+    /**
+     * Rewrite the AST for the compilation in this language.
+     *
+     * This method is called by the {@code enter()} method of the
+     * visitor.  The method should perform work that should be done
+     * before visiting the children of the node.  The method may return
+     * {@code this} or a new copy of the node on which
+     * {@code visitChildren()} and {@code leave()} will be
+     * invoked.
+     *
+     * @param rw The visitor.
+     */
+    NodeVisitor extRewriteEnter(ExtensionRewriter rw) throws SemanticException;
+
+    /**
+     * Rewrite the AST for the compilation in this language.
+     *
+     * This method is called by the {@code leave()} method of the
+     * visitor.  The method should perform work that should be done
+     * after visiting the children of the node.  The method may return
+     * {@code this} or a new copy of the node which will be
+     * installed as a child of the node's parent.
+     *
+     * @param rw The visitor.
+     */
+    Node extRewrite(ExtensionRewriter rw) throws SemanticException;
 
     /** Dump the AST for debugging. */
     @Deprecated
@@ -346,5 +374,4 @@ public interface NodeOps {
      * @throws SemanticException If the type information cannot be copied.
      */
     Node copy(ExtensionInfo extInfo) throws SemanticException;
-
 }

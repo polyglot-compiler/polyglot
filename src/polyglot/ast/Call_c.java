@@ -32,6 +32,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
+import polyglot.translate.ExtensionRewriter;
 import polyglot.types.ClassType;
 import polyglot.types.Context;
 import polyglot.types.Flags;
@@ -529,6 +530,26 @@ public class Call_c extends Expr_c implements Call, CallOps {
         }
 
         return l;
+    }
+
+    @Override
+    public NodeVisitor extRewriteEnter(ExtensionRewriter rw)
+            throws SemanticException {
+        if (isTargetImplicit()) {
+            // don't translate the target
+            return rw.bypass(target());
+        }
+        return super.extRewriteEnter(rw);
+    }
+
+    @Override
+    public Node extRewrite(ExtensionRewriter rw) throws SemanticException {
+        Call c = (Call) super.extRewrite(rw);
+        c = c.methodInstance(null);
+        if (isTargetImplicit()) {
+            return c.target(null);
+        }
+        return c;
     }
 
     // check that the implicit target setting is correct.

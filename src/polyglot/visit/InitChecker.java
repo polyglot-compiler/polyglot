@@ -856,7 +856,7 @@ public class InitChecker extends DataFlow<InitChecker.FlowItem> {
      */
     protected Map<EdgeKey, FlowItem> flowLocalAssign(DataFlowItem inItem,
             FlowGraph<FlowItem> graph, LocalAssign a, Set<EdgeKey> succEdgeKeys) {
-        Local l = (Local) a.left();
+        Local l = a.left();
         Map<VarInstance, MinMaxInitCount> m =
                 new HashMap<VarInstance, MinMaxInitCount>(inItem.initStatus);
         MinMaxInitCount initCount = m.get(l.localInstance().orig());
@@ -881,7 +881,7 @@ public class InitChecker extends DataFlow<InitChecker.FlowItem> {
      */
     protected Map<EdgeKey, FlowItem> flowFieldAssign(DataFlowItem inItem,
             FlowGraph<FlowItem> graph, FieldAssign a, Set<EdgeKey> succEdgeKeys) {
-        Field f = (Field) a.left();
+        Field f = a.left();
         FieldInstance fi = f.fieldInstance();
 
         if (fi.flags().isFinal() && isFieldsTargetAppropriate(f)) {
@@ -1149,7 +1149,7 @@ public class InitChecker extends DataFlow<InitChecker.FlowItem> {
      */
     protected void checkLocalAssign(FlowGraph<FlowItem> graph, LocalAssign a,
             DataFlowItem dfIn, DataFlowItem dfOut) throws SemanticException {
-        LocalInstance li = ((Local) a.left()).localInstance();
+        LocalInstance li = a.left().localInstance();
         if (!currCBI.localDeclarations.contains(li.orig())) {
             throw new SemanticException("Final local variable \""
                                                 + li.name()
@@ -1171,7 +1171,7 @@ public class InitChecker extends DataFlow<InitChecker.FlowItem> {
     protected void checkFieldAssign(FlowGraph<FlowItem> graph, FieldAssign a,
             DataFlowItem dfIn, DataFlowItem dfOut) throws SemanticException {
 
-        Field f = (Field) a.left();
+        Field f = a.left();
         FieldInstance fi = f.fieldInstance();
         if (fi.flags().isFinal()) {
             if ((currCBI.currCodeDecl instanceof ConstructorDecl || currCBI.currCodeDecl instanceof Initializer)

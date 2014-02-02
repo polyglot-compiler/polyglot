@@ -36,6 +36,7 @@ import polyglot.ast.TypeNode_c;
 import polyglot.ext.jl5.types.JL5Context;
 import polyglot.ext.jl5.types.JL5TypeSystem;
 import polyglot.ext.jl5.types.TypeVariable;
+import polyglot.translate.ExtensionRewriter;
 import polyglot.types.ArrayType;
 import polyglot.types.Context;
 import polyglot.types.ReferenceType;
@@ -206,6 +207,11 @@ public class ParamTypeNode_c extends TypeNode_c implements ParamTypeNode {
         //ts.checkIntersectionBounds(tv.bounds(), false);
 
         return super.typeCheck(tc);
+    }
+
+    @Override
+    public Node extRewrite(ExtensionRewriter rw) throws SemanticException {
+        return rw.typeToJava(type(), position());
     }
 
     @Override

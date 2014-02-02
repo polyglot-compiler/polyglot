@@ -28,6 +28,7 @@ package polyglot.ast;
 
 import java.util.List;
 
+import polyglot.translate.ExtensionRewriter;
 import polyglot.types.SemanticException;
 import polyglot.util.CollectionUtil;
 import polyglot.util.Position;
@@ -105,5 +106,11 @@ public abstract class Term_c extends Node_c implements Term {
         Term t = (Term) super.exceptionCheck(ec);
         //System.out.println("exceptions for " + t + " = " + ec.throwsSet());
         return t.exceptions(ec.throwsSet());
+    }
+
+    @Override
+    public Node extRewrite(ExtensionRewriter rw) throws SemanticException {
+        Term t = (Term) super.extRewrite(rw);
+        return t.reachable(false);
     }
 }

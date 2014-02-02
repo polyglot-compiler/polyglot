@@ -29,6 +29,7 @@ package polyglot.ast;
 import java.util.Collections;
 import java.util.List;
 
+import polyglot.translate.ExtensionRewriter;
 import polyglot.types.Context;
 import polyglot.types.FieldInstance;
 import polyglot.types.Flags;
@@ -321,6 +322,27 @@ public class Field_c extends Expr_c implements Field {
         }
 
         return Collections.<Type> emptyList();
+    }
+
+    @Override
+    public NodeVisitor extRewriteEnter(ExtensionRewriter rw)
+            throws SemanticException {
+        if (isTargetImplicit()) {
+            // don't translate the target
+            return rw.bypass(target());
+        }
+        return super.extRewriteEnter(rw);
+    }
+
+    @Override
+    public Node extRewrite(ExtensionRewriter rw) throws SemanticException {
+        Field n = (Field) super.extRewrite(rw);
+        if (n.isTargetImplicit()) {
+            // don't translate the target.
+            // Need to have an ambiguous expression that will be disambiguated later
+            return rw.nodeFactory().AmbExpr(n.position(), n.id());
+        }
+        return n.fieldInstance(null);
     }
 
     @Override

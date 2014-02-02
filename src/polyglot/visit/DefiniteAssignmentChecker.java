@@ -835,7 +835,7 @@ public class DefiniteAssignmentChecker extends
      */
     protected Map<EdgeKey, FlowItem> flowLocalAssign(FlowItem inItem,
             FlowGraph<FlowItem> graph, LocalAssign a, Set<EdgeKey> succEdgeKeys) {
-        Local l = (Local) a.left();
+        Local l = a.left();
         Map<VarInstance, AssignmentStatus> m =
                 new HashMap<VarInstance, AssignmentStatus>(inItem.assignmentStatus);
         AssignmentStatus initCount = m.get(l.localInstance().orig());
@@ -851,7 +851,7 @@ public class DefiniteAssignmentChecker extends
      */
     protected Map<EdgeKey, FlowItem> flowFieldAssign(FlowItem inItem,
             FlowGraph<FlowItem> graph, FieldAssign a, Set<EdgeKey> succEdgeKeys) {
-        Field f = (Field) a.left();
+        Field f = a.left();
         FieldInstance fi = f.fieldInstance();
 
         if (fi.flags().isFinal() && isFieldsTargetAppropriate(f)) {
@@ -964,7 +964,7 @@ public class DefiniteAssignmentChecker extends
             }
             else if (n instanceof LocalAssign) {
                 checkLocalAssign(graph,
-                                 ((Local) ((LocalAssign) n).left()).localInstance(),
+                                 ((LocalAssign) n).left().localInstance(),
                                  n.position(),
                                  dfIn);
             }
@@ -1144,7 +1144,7 @@ public class DefiniteAssignmentChecker extends
     protected void checkFieldAssign(FlowGraph<FlowItem> graph, FieldAssign a,
             FlowItem dfIn) throws SemanticException {
 
-        Field f = (Field) a.left();
+        Field f = a.left();
         FieldInstance fi = f.fieldInstance();
         if (fi.flags().isFinal()) {
             if ((currCBI.currCodeDecl instanceof ConstructorDecl || currCBI.currCodeDecl instanceof Initializer)

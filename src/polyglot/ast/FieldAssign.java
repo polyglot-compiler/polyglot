@@ -34,4 +34,6 @@ package polyglot.ast;
  * <code>FieldAssign.left()</code>is guaranteed to be a <code>Field</code>.
  */
 public interface FieldAssign extends Assign {
+    @Override
+    Field left();
 }

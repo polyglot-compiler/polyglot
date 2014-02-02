@@ -32,6 +32,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
+import polyglot.translate.ExtensionRewriter;
 import polyglot.types.ClassType;
 import polyglot.types.ConstructorInstance;
 import polyglot.types.Context;
@@ -664,6 +665,26 @@ public class New_c extends Expr_c implements New, NewOps {
         }
 
         return super.exceptionCheck(ec);
+    }
+
+    @Override
+    public NodeVisitor extRewriteEnter(ExtensionRewriter rw)
+            throws SemanticException {
+        if (isQualifierImplicit()) {
+            // don't translate the qualifier
+            return rw.bypass(qualifier());
+        }
+        return super.extRewriteEnter(rw);
+    }
+
+    @Override
+    public Node extRewrite(ExtensionRewriter rw) throws SemanticException {
+        New n = (New) super.extRewrite(rw);
+        n = n.constructorInstance(null).anonType(null);
+        if (isQualifierImplicit()) {
+            return n.qualifier(null);
+        }
+        return n;
     }
 
     /** Get the precedence of the expression. */

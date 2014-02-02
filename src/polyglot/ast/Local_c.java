@@ -28,6 +28,7 @@ package polyglot.ast;
 
 import java.util.List;
 
+import polyglot.translate.ExtensionRewriter;
 import polyglot.types.Context;
 import polyglot.types.Flags;
 import polyglot.types.LocalInstance;
@@ -168,6 +169,12 @@ public class Local_c extends Expr_c implements Local {
         }
 
         return localInstance(li).type(li.type());
+    }
+
+    @Override
+    public Node extRewrite(ExtensionRewriter rw) throws SemanticException {
+        Local n = (Local) super.extRewrite(rw);
+        return n.localInstance(null);
     }
 
     @Override

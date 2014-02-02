@@ -40,6 +40,7 @@ import polyglot.ast.Term_c;
 import polyglot.ext.jl5.types.EnumInstance;
 import polyglot.ext.jl5.types.JL5ParsedClassType;
 import polyglot.ext.jl5.types.JL5TypeSystem;
+import polyglot.translate.ExtensionRewriter;
 import polyglot.types.ConstructorInstance;
 import polyglot.types.Context;
 import polyglot.types.Flags;
@@ -309,6 +310,12 @@ public class EnumConstantDecl_c extends Term_c implements EnumConstantDecl {
         }
 
         return child.type();
+    }
+
+    @Override
+    public Node extRewrite(ExtensionRewriter rw) throws SemanticException {
+        EnumConstantDecl n = (EnumConstantDecl) super.extRewrite(rw);
+        return n.enumInstance(null).constructorInstance(null).type(null);
     }
 
     @Override

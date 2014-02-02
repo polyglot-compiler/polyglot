@@ -30,6 +30,7 @@ import java.io.OutputStream;
 import java.io.Writer;
 
 import polyglot.frontend.ExtensionInfo;
+import polyglot.translate.ExtensionRewriter;
 import polyglot.types.Context;
 import polyglot.types.SemanticException;
 import polyglot.util.CodeWriter;
@@ -162,6 +163,34 @@ public interface Lang {
      * @param tc The type checking visitor.
      */
     Node typeCheck(Node n, TypeChecker tc) throws SemanticException;
+
+    /**
+     * Rewrite the AST for the compilation in this language.
+     *
+     * This method is called by the {@code enter()} method of the
+     * visitor.  The method should perform work that should be done
+     * before visiting the children of the node.  The method may return
+     * {@code this} or a new copy of the node on which
+     * {@code visitChildren()} and {@code leave()} will be
+     * invoked.
+     *
+     * @param rw The visitor.
+     */
+    NodeVisitor extRewriteEnter(Node n, ExtensionRewriter rw)
+            throws SemanticException;
+
+    /**
+     * Rewrite the AST for the compilation in this language.
+     *
+     * This method is called by the {@code leave()} method of the
+     * visitor.  The method should perform work that should be done
+     * after visiting the children of the node.  The method may return
+     * {@code this} or a new copy of the node which will be
+     * installed as a child of the node's parent.
+     *
+     * @param rw The visitor.
+     */
+    Node extRewrite(Node n, ExtensionRewriter rw) throws SemanticException;
 
     /** Dump the AST for debugging. */
     void dump(Node n, Lang lang, OutputStream os);

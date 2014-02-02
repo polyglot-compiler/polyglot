@@ -34,4 +34,6 @@ package polyglot.ast;
  * <code>LocalAssign.left()</code>is guaranteed to be an <code>Local</code>.
  */
 public interface LocalAssign extends Assign {
+    @Override
+    Local left();
 }

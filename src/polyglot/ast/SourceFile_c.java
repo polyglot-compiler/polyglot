@@ -32,6 +32,7 @@ import java.util.List;
 import java.util.Set;
 
 import polyglot.frontend.Source;
+import polyglot.translate.ExtensionRewriter;
 import polyglot.types.Context;
 import polyglot.types.ImportTable;
 import polyglot.types.Package;
@@ -221,6 +222,12 @@ public class SourceFile_c extends Node_c implements SourceFile {
         }
 
         return this;
+    }
+
+    @Override
+    public Node extRewrite(ExtensionRewriter rw) throws SemanticException {
+        SourceFile n = (SourceFile) super.extRewrite(rw);
+        return n.importTable(null);
     }
 
     @Override
