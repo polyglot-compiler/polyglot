@@ -58,7 +58,7 @@ import polyglot.visit.TypeBuilder;
 import polyglot.visit.TypeChecker;
 
 /**
- * A <code>FieldDecl</code> is an immutable representation of the declaration
+ * A {@code FieldDecl} is an immutable representation of the declaration
  * of a field of a class.
  */
 public class FieldDecl_c extends Term_c implements FieldDecl {
@@ -103,13 +103,11 @@ public class FieldDecl_c extends Term_c implements FieldDecl {
         return ii;
     }
 
-    /** Get the initializer instance of the initializer. */
     @Override
     public InitializerInstance initializerInstance() {
         return ii;
     }
 
-    /** Set the initializer instance of the initializer. */
     @Override
     public FieldDecl initializerInstance(InitializerInstance ii) {
         if (ii == this.ii) return this;
@@ -118,19 +116,16 @@ public class FieldDecl_c extends Term_c implements FieldDecl {
         return n;
     }
 
-    /** Get the type of the declaration. */
     @Override
     public Type declType() {
         return type.type();
     }
 
-    /** Get the flags of the declaration. */
     @Override
     public Flags flags() {
         return flags;
     }
 
-    /** Set the flags of the declaration. */
     @Override
     public FieldDecl flags(Flags flags) {
         if (flags.equals(this.flags)) return this;
@@ -139,13 +134,11 @@ public class FieldDecl_c extends Term_c implements FieldDecl {
         return n;
     }
 
-    /** Get the type node of the declaration. */
     @Override
     public TypeNode type() {
         return type;
     }
 
-    /** Set the type of the declaration. */
     @Override
     public FieldDecl type(TypeNode type) {
         FieldDecl_c n = (FieldDecl_c) copy();
@@ -153,13 +146,11 @@ public class FieldDecl_c extends Term_c implements FieldDecl {
         return n;
     }
 
-    /** Get the name of the declaration. */
     @Override
     public Id id() {
         return name;
     }
 
-    /** Set the name of the declaration. */
     @Override
     public FieldDecl id(Id name) {
         FieldDecl_c n = (FieldDecl_c) copy();
@@ -167,13 +158,11 @@ public class FieldDecl_c extends Term_c implements FieldDecl {
         return n;
     }
 
-    /** Get the name of the declaration. */
     @Override
     public String name() {
         return name.id();
     }
 
-    /** Set the name of the declaration. */
     @Override
     public FieldDecl name(String name) {
         return id(this.name.id(name));
@@ -184,13 +173,11 @@ public class FieldDecl_c extends Term_c implements FieldDecl {
         return init;
     }
 
-    /** Get the initializer of the declaration. */
     @Override
     public Expr init() {
         return init;
     }
 
-    /** Set the initializer of the declaration. */
     @Override
     public FieldDecl init(Expr init) {
         FieldDecl_c n = (FieldDecl_c) copy();
@@ -198,7 +185,6 @@ public class FieldDecl_c extends Term_c implements FieldDecl {
         return n;
     }
 
-    /** Set the field instance of the declaration. */
     @Override
     public FieldDecl fieldInstance(FieldInstance fi) {
         if (fi == this.fi) return this;
@@ -207,7 +193,6 @@ public class FieldDecl_c extends Term_c implements FieldDecl {
         return n;
     }
 
-    /** Get the field instance of the declaration. */
     @Override
     public FieldInstance fieldInstance() {
         return fi;
@@ -226,7 +211,6 @@ public class FieldDecl_c extends Term_c implements FieldDecl {
         return this;
     }
 
-    /** Visit the children of the declaration. */
     @Override
     public Node visitChildren(NodeVisitor v) {
         TypeNode type = visitChild(this.type, v);
@@ -390,7 +374,6 @@ public class FieldDecl_c extends Term_c implements FieldDecl {
         return nn;
     }
 
-    /** Type check the declaration. */
     @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
         TypeSystem ts = tc.typeSystem();

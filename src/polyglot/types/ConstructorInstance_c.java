@@ -33,7 +33,7 @@ import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
 
 /**
- * A <code>ConstructorInstance</code> contains type information for a
+ * A {@code ConstructorInstance} contains type information for a
  * constructor.
  */
 public class ConstructorInstance_c extends ProcedureInstance_c implements

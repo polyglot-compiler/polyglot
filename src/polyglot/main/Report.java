@@ -61,7 +61,7 @@ public class Report {
     /**
      * Indicates if there is no reporting at all.
      * The normal case is that we do not report anything, so for efficiency 
-     * reasons, since <code>should_report</code> is called so often, we'll use
+     * reasons, since {@code should_report} is called so often, we'll use
      * this flag to bypass a lot of the checking. When the options are processed,
      * this flag should be changed.
      */
@@ -105,8 +105,8 @@ public class Report {
     }
 
     /**
-     * Return whether a message on <code>topic</code> of obscurity
-     * <code>level</code> should be reported, based on use of the
+     * Return whether a message on {@code topic} of obscurity
+     * {@code level} should be reported, based on use of the
      * -report command-line switches given by the user.
      */
     public static boolean should_report(String topic, int level) {
@@ -115,8 +115,8 @@ public class Report {
     }
 
     /**
-     * Return whether a message on <code>topics</code> of obscurity
-     * <code>level</code> should be reported, based on use of the
+     * Return whether a message on {@code topics} of obscurity
+     * {@code level} should be reported, based on use of the
      * -report command-line switches given by the user.
      */
     public static boolean should_report(String[] topics, int level) {
@@ -144,8 +144,8 @@ public class Report {
     }
 
     /**
-     * Return whether a message on <code>topics</code> of obscurity
-     * <code>level</code> should be reported, based on use of the
+     * Return whether a message on {@code topics} of obscurity
+     * {@code level} should be reported, based on use of the
      * -report command-line switches given by the user.
      */
     public static boolean should_report(Collection<String> topics, int level) {

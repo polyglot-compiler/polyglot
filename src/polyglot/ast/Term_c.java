@@ -38,7 +38,7 @@ import polyglot.visit.CFGBuilder;
 import polyglot.visit.ExceptionChecker;
 
 /**
- * A <code>Term</code> represents any Java expression or statement on which
+ * A {@code Term} represents any Java expression or statement on which
  * dataflow can be performed.
  */
 public abstract class Term_c extends Node_c implements Term {
@@ -50,26 +50,14 @@ public abstract class Term_c extends Node_c implements Term {
 
     protected boolean reachable;
 
-    /**
-     * Visit this term in evaluation order.
-     */
     @Override
     public abstract <T> List<T> acceptCFG(CFGBuilder<?> v, List<T> succs);
 
-    /**
-     * Return true if this term is eachable.  This attribute is not
-     * guaranteed correct until after the reachability pass
-     *
-     * @see polyglot.visit.ReachChecker
-     */
     @Override
     public boolean reachable() {
         return reachable;
     }
 
-    /**
-     * Set the reachability of this term.
-     */
     @Override
     public Term reachable(boolean reachability) {
         if (this.reachable == reachability) {

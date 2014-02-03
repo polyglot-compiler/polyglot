@@ -54,17 +54,17 @@ public interface JLang extends Lang {
     /**
      * Disambiguate the AST.
      *
-     * This method is called by the <code>override()</code> method of the
+     * This method is called by the {@code override()} method of the
      * visitor.  If this method returns non-null, the node's children
      * will not be visited automatically.  Thus, the method should check
-     * both the node <code>this</code> and it's children, usually by
-     * invoking <code>visitChildren</code> with <code>tc</code> or
+     * both the node {@code this} and it's children, usually by
+     * invoking {@code visitChildren} with {@code tc} or
      * with another visitor, returning a non-null node.  OR, the method
-     * should do nothing and simply return <code>null</code> to allow
-     * <code>enter</code>, <code>visitChildren</code>, and <code>leave</code>
+     * should do nothing and simply return {@code null} to allow
+     * {@code enter}, {@code visitChildren}, and {@code leave}
      * to be invoked on the node.
      *
-     * The default implementation returns <code>null</code>.
+     * The default implementation returns {@code null}.
      * Overriding of this method is discouraged, but sometimes necessary.
      *
      * @param ar The visitor which disambiguates.
@@ -75,11 +75,11 @@ public interface JLang extends Lang {
     /**
      * Remove any remaining ambiguities from the AST.
      *
-     * This method is called by the <code>enter()</code> method of the
+     * This method is called by the {@code enter()} method of the
      * visitor.  The * method should perform work that should be done
      * before visiting the children of the node.  The method may return
-     * <code>this</code> or a new copy of the node on which
-     * <code>visitChildren()</code> and <code>leave()</code> will be
+     * {@code this} or a new copy of the node on which
+     * {@code visitChildren()} and {@code leave()} will be
      * invoked.
      *
      * @param ar The visitor which disambiguates.
@@ -90,42 +90,42 @@ public interface JLang extends Lang {
     /**
      * Remove any remaining ambiguities from the AST.
      *
-     * This method is called by the <code>leave()</code> method of the
+     * This method is called by the {@code leave()} method of the
      * visitor.  The method should perform work that should be done
      * after visiting the children of the node.  The method may return
-     * <code>this</code> or a new copy of the node which will be
+     * {@code this} or a new copy of the node which will be
      * installed as a child of the node's parent.
      *
      * The node should not assume that its children have been disambiguated.
      * If it depends on a child being disambiguated,
-     * it may just return <code>this</code> without doing any work.
+     * it may just return {@code this} without doing any work.
      *
      * @param ar The visitor which disambiguates.
      */
     Node disambiguate(Node n, AmbiguityRemover ar) throws SemanticException;
 
     /**
-     * Get the expected type of a child expression of <code>this</code>.
+     * Get the expected type of a child expression of {@code this}.
      * The expected type is determined by the context in that the child occurs
-     * (e.g., for <code>x = e</code>, the expected type of <code>e</code> is
-     * the declared type of <code>x</code>.
+     * (e.g., for {@code x = e}, the expected type of {@code e} is
+     * the declared type of {@code x}.
      *
      * The expected type should impose the least constraints on the child's
      * type that are allowed by the parent node.
      *
      * @param child A child expression of this node.
      * @param av An ascription visitor.
-     * @return The expected type of <code>child</code>.
+     * @return The expected type of {@code child}.
      */
     Type childExpectedType(Node n, Expr child, AscriptionVisitor av);
 
     /**
      * Check if the node is a compile-time constant.
      *
-     * This method is called by the <code>leave()</code> method of the
+     * This method is called by the {@code leave()} method of the
      * visitor.  The method should perform work that should be done
      * after visiting the children of the node.  The method may return
-     * <code>this</code> or a new copy of the node which will be
+     * {@code this} or a new copy of the node which will be
      * installed as a child of the node's parent.
      *
      * @param cc The constant checking visitor.
@@ -135,11 +135,11 @@ public interface JLang extends Lang {
     /**
      * Check that exceptions are properly propagated throughout the AST.
      *
-     * This method is called by the <code>enter()</code> method of the
+     * This method is called by the {@code enter()} method of the
      * visitor.  The * method should perform work that should be done
      * before visiting the children of the node.  The method may return
-     * <code>this</code> or a new copy of the node on which
-     * <code>visitChildren()</code> and <code>leave()</code> will be
+     * {@code this} or a new copy of the node on which
+     * {@code visitChildren()} and {@code leave()} will be
      * invoked.
      *
      * @param ec The visitor.
@@ -150,10 +150,10 @@ public interface JLang extends Lang {
     /**
      * Check that exceptions are properly propagated throughout the AST.
      *
-     * This method is called by the <code>leave()</code> method of the
+     * This method is called by the {@code leave()} method of the
      * visitor.  The method should perform work that should be done
      * after visiting the children of the node.  The method may return
-     * <code>this</code> or a new copy of the node which will be
+     * {@code this} or a new copy of the node which will be
      * installed as a child of the node's parent.
      *
      * @param ec The visitor.
@@ -195,7 +195,7 @@ public interface JLang extends Lang {
     * Typecheck the Call when the target is null. This method finds
     * an appropriate target, and then type checks accordingly.
     * 
-    * @param argTypes list of <code>Type</code>s of the arguments
+    * @param argTypes list of {@code Type}s of the arguments
      * @throws SemanticException 
     */
     Node typeCheckNullTarget(Node n, TypeChecker tc, List<Type> argTypes)

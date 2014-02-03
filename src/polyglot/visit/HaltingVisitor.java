@@ -35,7 +35,7 @@ import polyglot.ast.Node;
 
 /**
  * A HaltingVisitor is used to prune the traversal of the AST at a
- * particular node.  Clients can call <code>bypass(Node n) </code> to 
+ * particular node.  Clients can call {@code bypass(Node n)} to 
  * have the visitor skip n and its children when recursing through the AST.
  */
 public abstract class HaltingVisitor extends NodeVisitor {

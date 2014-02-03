@@ -51,7 +51,7 @@ import polyglot.visit.TypeBuilder;
 import polyglot.visit.TypeChecker;
 
 /**
- * <code>Ext</code> is the super type of all node extension objects.
+ * {@code Ext} is the super type of all node extension objects.
  * It contains a pointer back to the node it is extending and a possibly-null
  * pointer to another extension node. 
  */
@@ -171,34 +171,16 @@ public abstract class Ext_c implements Ext {
         return StringUtil.getShortNameComponent(getClass().getName());
     }
 
-    /**
-     * Dump the AST node for debugging purposes.
-     */
     @Override
     public void dump(CodeWriter w) {
         w.write(toString());
     }
 
-    /**
-     * Visit the children of the node.
-     *
-     * @param v The visitor that will traverse/rewrite the AST.
-     * @return A new AST if a change was made, or <code>this</code>.
-     */
     @Override
     public Node visitChildren(NodeVisitor v) {
         return superLang().visitChildren(node(), v);
     }
 
-    /**
-     * Push a new scope upon entering this node, and add any declarations to the
-     * context that should be in scope when visiting children of this node.
-     * This should <i>not</i> update the old context
-     * imperatively.  Use <code>addDecls</code> when leaving the node
-     * for that.
-     * @param c the current <code>Context</code>
-     * @return the <code>Context</code> to be used for visiting this node. 
-     */
     @Override
     public Context enterScope(Context c) {
         return superLang().enterScope(node(), c);
@@ -209,67 +191,21 @@ public abstract class Ext_c implements Ext {
         return superLang().enterChildScope(node(), child, c);
     }
 
-    /**
-     * Add any declarations to the context that should be in scope when
-     * visiting later sibling nodes.
-     * @param c The context to which to add declarations.
-     */
     @Override
     public void addDecls(Context c) {
         superLang().addDecls(node(), c);
     }
 
-    /**
-     * Collects classes, methods, and fields from the AST rooted at this node
-     * and constructs type objects for these.  These type objects may be
-     * ambiguous.  Inserts classes into the <code>TypeSystem</code>.
-     *
-     * This method is called by the <code>enter()</code> method of the
-     * visitor.  The * method should perform work that should be done
-     * before visiting the children of the node.  The method may return
-     * <code>this</code> or a new copy of the node on which
-     * <code>visitChildren()</code> and <code>leave()</code> will be
-     * invoked.
-     *
-     * @param tb The visitor which adds new type objects to the
-     * <code>TypeSystem</code>.
-     */
     @Override
     public NodeVisitor buildTypesEnter(TypeBuilder tb) throws SemanticException {
         return superLang().buildTypesEnter(node(), tb);
     }
 
-    /**
-     * Collects classes, methods, and fields from the AST rooted at this node
-     * and constructs type objects for these.  These type objects may be
-     * ambiguous.  Inserts classes into the <code>TypeSystem</code>.
-     *
-     * This method is called by the <code>leave()</code> method of the
-     * visitor.  The method should perform work that should be done
-     * after visiting the children of the node.  The method may return
-     * <code>this</code> or a new copy of the node which will be
-     * installed as a child of the node's parent.
-     *
-     * @param tb The visitor which adds new type objects to the
-     * <code>TypeSystem</code>.
-     */
     @Override
     public Node buildTypes(TypeBuilder tb) throws SemanticException {
         return superLang().buildTypes(node(), tb);
     }
 
-    /**
-     * Remove any remaining ambiguities from the AST.
-     *
-     * This method is called by the <code>enter()</code> method of the
-     * visitor.  The * method should perform work that should be done
-     * before visiting the children of the node.  The method may return
-     * <code>this</code> or a new copy of the node on which
-     * <code>visitChildren()</code> and <code>leave()</code> will be
-     * invoked.
-     *
-     * @param ar The visitor which disambiguates.
-     */
     @Override
     public Node disambiguateOverride(Node parent, AmbiguityRemover ar)
             throws SemanticException {
@@ -282,34 +218,11 @@ public abstract class Ext_c implements Ext {
         return superLang().disambiguateEnter(node(), ar);
     }
 
-    /**
-     * Remove any remaining ambiguities from the AST.
-     *
-     * This method is called by the <code>leave()</code> method of the
-     * visitor.  The method should perform work that should be done
-     * after visiting the children of the node.  The method may return
-     * <code>this</code> or a new copy of the node which will be
-     * installed as a child of the node's parent.
-     *
-     * @param ar The visitor which disambiguates.
-     */
     @Override
     public Node disambiguate(AmbiguityRemover ar) throws SemanticException {
         return superLang().disambiguate(node(), ar);
     }
 
-    /**
-     * Type check the AST.
-     *
-     * This method is called by the <code>enter()</code> method of the
-     * visitor.  The * method should perform work that should be done
-     * before visiting the children of the node.  The method may return
-     * <code>this</code> or a new copy of the node on which
-     * <code>visitChildren()</code> and <code>leave()</code> will be
-     * invoked.
-     *
-     * @param tc The type checking visitor.
-     */
     @Override
     public Node typeCheckOverride(Node parent, TypeChecker tc)
             throws SemanticException {
@@ -321,35 +234,11 @@ public abstract class Ext_c implements Ext {
         return superLang().typeCheckEnter(node(), tc);
     }
 
-    /**
-     * Type check the AST.
-     *
-     * This method is called by the <code>leave()</code> method of the
-     * visitor.  The method should perform work that should be done
-     * after visiting the children of the node.  The method may return
-     * <code>this</code> or a new copy of the node which will be
-     * installed as a child of the node's parent.
-     *
-     * @param tc The type checking visitor.
-     */
     @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
         return superLang().typeCheck(node(), tc);
     }
 
-    /**
-     * Get the expected type of a child expression of <code>this</code>.
-     * The expected type is determined by the context in that the child occurs
-     * (e.g., for <code>x = e</code>, the expected type of <code>e</code> is
-     * the declared type of <code>x</code>.
-     *
-     * The expected type should impose the least constraints on the child's
-     * type that are allowed by the parent node.
-     *
-     * @param child A child expression of this node.
-     * @param av An ascription visitor.
-     * @return The expected type of <code>child</code>.
-     */
     @Override
     public Type childExpectedType(Expr child, AscriptionVisitor av) {
         return superLang().childExpectedType(node(), child, av);
@@ -360,44 +249,17 @@ public abstract class Ext_c implements Ext {
         return superLang().checkConstants(node(), cc);
     }
 
-    /**
-     * Check that exceptions are properly propagated throughout the AST.
-     *
-     * This method is called by the <code>enter()</code> method of the
-     * visitor.  The * method should perform work that should be done
-     * before visiting the children of the node.  The method may return
-     * <code>this</code> or a new copy of the node on which
-     * <code>visitChildren()</code> and <code>leave()</code> will be
-     * invoked.
-     *
-     * @param ec The visitor.
-     */
     @Override
     public NodeVisitor exceptionCheckEnter(ExceptionChecker ec)
             throws SemanticException {
         return superLang().exceptionCheckEnter(node(), ec);
     }
 
-    /**
-     * Check that exceptions are properly propagated throughout the AST.
-     *
-     * This method is called by the <code>leave()</code> method of the
-     * visitor.  The method should perform work that should be done
-     * after visiting the children of the node.  The method may return
-     * <code>this</code> or a new copy of the node which will be
-     * installed as a child of the node's parent.
-     *
-     * @param ec The visitor.
-     */
     @Override
     public Node exceptionCheck(ExceptionChecker ec) throws SemanticException {
         return superLang().exceptionCheck(node(), ec);
     }
 
-    /** 
-     * List of Types of exceptions that might get thrown.  The result is
-     * not necessarily correct until after type checking. 
-     */
     @Override
     public List<Type> throwTypes(TypeSystem ts) {
         return superLang().throwTypes(node(), ts);
@@ -458,23 +320,11 @@ public abstract class Ext_c implements Ext {
         superLang().prettyPrint(node(), lang, w);
     }
 
-    /**
-     * Pretty-print the AST using the given code writer.
-     *
-     * @param w The code writer to which to write.
-     * @param pp The pretty printer.  This is <i>not</i> a visitor.
-     */
     @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter pp) {
         superLang().prettyPrint(node(), w, pp);
     }
 
-    /**
-     * Translate the AST using the given code writer.
-     *
-     * @param w The code writer to which to write.
-     * @param tr The translation pass.  This is <i>not</i> a visitor.
-     */
     @Override
     public void translate(CodeWriter w, Translator tr) {
         superLang().translate(node(), w, tr);

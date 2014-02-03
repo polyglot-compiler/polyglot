@@ -27,7 +27,7 @@
 package polyglot.ast;
 
 /**
- * A <code>BooleanLit</code> represents a boolean literal expression.
+ * A {@code BooleanLit} represents a boolean literal expression.
  */
 public interface BooleanLit extends Lit {
     /**

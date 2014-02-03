@@ -38,15 +38,15 @@ import java.io.Writer;
 import polyglot.util.SerialVersionUID;
 
 /** 
- * A <code>CodeWriter</code> is a pretty-printing engine.
- * It formats structured text onto an output stream <code>o</code> in the
+ * A {@code CodeWriter} is a pretty-printing engine.
+ * It formats structured text onto an output stream {@code o} in the
  * minimum number of lines, while keeping the width of the output
- * within <code>width</code> characters if possible.
+ * within {@code width} characters if possible.
  */
 public class CodeWriter {
     /**
-     * Create a CodeWriter object with output stream <code>o</code>
-     * and width <code>width_</code>.
+     * Create a CodeWriter object with output stream {@code o}
+     * and width {@code width_}.
      */
 
     public CodeWriter(OutputStream o, int width_) {
@@ -56,8 +56,8 @@ public class CodeWriter {
     }
 
     /**
-     * Create a CodeWriter object with output <code>w</code> and
-     * width <code>width_</code>.
+     * Create a CodeWriter object with output {@code w} and
+     * width {@code width_}.
      */
     public CodeWriter(Writer w, int width_) {
         output = w;
@@ -65,7 +65,7 @@ public class CodeWriter {
         current = input = new Block(null, 0);
     }
 
-    /** Print the string <code>s</code> verbatim on the output stream. */
+    /** Print the string {@code s} verbatim on the output stream. */
     public void write(String s) {
         if (s.length() > 0) current.add(new StringItem(s));
     }
@@ -76,21 +76,21 @@ public class CodeWriter {
     }
 
     /**
-     * Start a new block with a relative indentation of <code>n</code>
+     * Start a new block with a relative indentation of {@code n}
      * characters.
      * <br>
      * A block is a formatting unit. The formatting algorithm will try
      * to put the whole block in one line unless
      * <ul>
-     * <li>there is a <code>newline</code> item in the block.</li>
+     * <li>there is a {@code newline} item in the block.</li>
      * <li>the block cannot fit in one line.</li>
      * </ul>
      * If either of the two conditions is satisfied, the
      * formatting algorithm will break the block into lines: every
-     * <code>allowBreak</code> will cause a line change, the first line
-     * is printed at the current cursor position <code>pos</code>,
+     * {@code allowBreak} will cause a line change, the first line
+     * is printed at the current cursor position {@code pos},
      * all the following lines are printed at the position
-     * <code>pos+n</code>.
+     * {@code pos+n}.
      * 
      * @param n the number of characters increased on indentation (relative
      * to the current position) for all lines in the block.
@@ -102,7 +102,7 @@ public class CodeWriter {
     }
 
     /** 
-     * Terminate the most recent outstanding <code>begin</code>. 
+     * Terminate the most recent outstanding {@code begin}. 
      */
     public void end() {
         current = current.parent;
@@ -125,7 +125,7 @@ public class CodeWriter {
      *
      * @param n the amount of increase in indentation if
      *  the newline is inserted.
-     * @param alt if no newline is inserted, the string <code>alt</code> is
+     * @param alt if no newline is inserted, the string {@code alt} is
      *  output instead.   
      */
     public void allowBreak(int n, String alt) {
@@ -134,7 +134,7 @@ public class CodeWriter {
 
     /**
      * Force a newline. Indentation will be preserved.  This method
-     * should be used sparingly; usually a call to <code>allowBreak</code> is
+     * should be used sparingly; usually a call to {@code allowBreak} is
      * preferable because forcing a newline also causes all breaks
      * in containing blocks to be broken.
      *
@@ -146,7 +146,7 @@ public class CodeWriter {
 
     /**
      * Send out the current batch of text to be formatted. All
-     * outstanding <code>begin</code>'s are closed and the current
+     * outstanding {@code begin}'s are closed and the current
      * indentation level is reset to 0. Returns true if formatting
      * was completely successful (the margins were obeyed).
      */
@@ -178,8 +178,8 @@ public class CodeWriter {
 }
 
 /**
- * An <code>Overrun</code> represents a formatting that failed because the right
- * margin was exceeded by at least <code>amount</code> chars.
+ * An {@code Overrun} represents a formatting that failed because the right
+ * margin was exceeded by at least {@code amount} chars.
  */
 class Overrun extends Exception {
     private static final long serialVersionUID = SerialVersionUID.generate();
@@ -191,7 +191,7 @@ class Overrun extends Exception {
 }
 
 /**
- * An <code>Item</code> is a piece of input handed to the formatter. It
+ * An {@code Item} is a piece of input handed to the formatter. It
  * contains a reference to a possibly empty list of items that follow it.
  */
 abstract class Item {
@@ -203,9 +203,9 @@ abstract class Item {
 
     /** 
      * Try to format this item and subsequent items. The current cursor
-     * position is <code>pos</code>, left and right margins are as
-     * specified. Returns the final position, which must be <code>&lt;
-     * fin</code>. If breaks may be broken, <code>can_break</code> is
+     * position is {@code pos}, left and right margins are as
+     * specified. Returns the final position, which must be {@code < fin}.
+     * If breaks may be broken, {@code can_break} is
      * set. Return the new cursor position (which may overrun rmargin,
      * fin, or both, and set any contained breaks accordingly.  (It is
      * important that formatN not necessarily convert overruns in its
@@ -222,7 +222,7 @@ abstract class Item {
             boolean can_break, boolean nofail) throws Overrun;
 
     /**
-     * Send the output associated with this item to <code>o</code>, using the
+     * Send the output associated with this item to {@code o}, using the
      * current break settings.
      */
     abstract int sendOutput(Writer o, int lmargin, int pos) throws IOException;
@@ -239,7 +239,7 @@ abstract class Item {
     /**
      * Try to format a whole sequence of items in the manner of formatN.
      * The initial position may be an overrun (this is the only way
-     * that overruns are checked!) <code>it</code> may be also null,
+     * that overruns are checked!) {@code it} may be also null,
      * signifying an empty list.
      */
     static int format(Item it, int lmargin, int pos, int rmargin, int fin,

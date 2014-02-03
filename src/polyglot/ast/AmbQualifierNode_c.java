@@ -40,7 +40,7 @@ import polyglot.visit.TypeBuilder;
 import polyglot.visit.TypeChecker;
 
 /**
- * An <code>AmbQualifierNode</code> is an ambiguous AST node composed of
+ * An {@code AmbQualifierNode} is an ambiguous AST node composed of
  * dot-separated list of identifiers that must resolve to a type qualifier.
  */
 public class AmbQualifierNode_c extends Node_c implements AmbQualifierNode {
@@ -68,6 +68,7 @@ public class AmbQualifierNode_c extends Node_c implements AmbQualifierNode {
         return this.name;
     }
 
+    /** Set the name of the qualifier. */
     public AmbQualifierNode id(Id name) {
         AmbQualifierNode_c n = (AmbQualifierNode_c) copy();
         n.name = name;
@@ -79,6 +80,7 @@ public class AmbQualifierNode_c extends Node_c implements AmbQualifierNode {
         return this.name.id();
     }
 
+    /** Set the name of the qualifier. */
     public AmbQualifierNode name(String name) {
         return id(this.name.id(name));
     }
@@ -88,6 +90,7 @@ public class AmbQualifierNode_c extends Node_c implements AmbQualifierNode {
         return this.qual;
     }
 
+    /** Set the qualifier of the qualifier. */
     public AmbQualifierNode qual(QualifierNode qual) {
         AmbQualifierNode_c n = (AmbQualifierNode_c) copy();
         n.qual = qual;

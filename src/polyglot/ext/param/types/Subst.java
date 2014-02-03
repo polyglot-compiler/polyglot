@@ -43,19 +43,19 @@ import polyglot.types.TypeObject;
  */
 public interface Subst<Formal extends Param, Actual extends TypeObject> extends
         Serializable {
-    /** Entries of the underlying substitution map.
-     * @return An <code>Iterator</code> of <code>Map.Entry</code>.
+    /**
+     * Entries of the underlying substitution map.
+     * @return An {@code Iterator} of {@code Map.Entry}.
      */
     public Iterator<Entry<Formal, Actual>> entries();
 
-    /** An Iterable that calls entries().
-     */
-	public Iterable<Entry<Formal, Actual>> is_entry();
+    /** An Iterable that calls entries(). */
+    public Iterable<Entry<Formal, Actual>> is_entry();
 
     /** Type system */
     public ParamTypeSystem<Formal, Actual> typeSystem();
 
-    /** Get the map of formals to actuals. */
+    /** The map of formals to actuals. */
     public Map<Formal, Actual> substitutions();
 
     /** Perform substitutions on a type. */
@@ -73,16 +73,16 @@ public interface Subst<Formal extends Param, Actual extends TypeObject> extends
     /** Perform substitutions on a constructor. */
     public <T extends ConstructorInstance> T substConstructor(T ci);
 
-    /** Perform substitutions on a list of types. */
+    /** Perform substitutions on a list of {@code Type}s. */
     public <T extends Type> List<T> substTypeList(List<? extends Type> list);
 
-    /** Perform substitutions on a list of methods. */
+    /** Perform substitutions on a list of {@code MethodInstance}s. */
     public <T extends MethodInstance> List<T> substMethodList(List<T> list);
 
-    /** Perform substitutions on a list of constructors. */
+    /** Perform substitutions on a list of {@code ConstructorInstance}s. */
     public <T extends ConstructorInstance> List<T> substConstructorList(
             List<T> list);
 
-    /** Perform substitutions on a list of fields. */
+    /** Perform substitutions on a list of {@code FieldInstance}s. */
     public <T extends FieldInstance> List<T> substFieldList(List<T> list);
 }

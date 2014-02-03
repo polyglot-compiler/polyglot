@@ -420,7 +420,7 @@ public class Main {
 
     /**
      * This exception signals termination of the compiler. It should be used
-     * instead of <code>System.exit</code> to allow Polyglot to be called within
+     * instead of {@code System.exit} to allow Polyglot to be called within
      * a JVM that wasn't started specifically for Polyglot, e.g. the Apache ANT
      * framework.
      */

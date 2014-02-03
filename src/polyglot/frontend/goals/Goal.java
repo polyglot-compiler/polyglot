@@ -41,7 +41,7 @@ import polyglot.frontend.Scheduler;
  * also be corequisites (mutually dependent).
  * 
  * Once all the prerequisites of a goal are reached, the goal's
- * <code>Pass</code> is run. It keeps trying until it is successful or
+ * {@code Pass} is run. It keeps trying until it is successful or
  * it fails and the compiler quits with an error.
  *
  * @author nystrom
@@ -81,19 +81,19 @@ public interface Goal {
     public Collection<Goal> prerequisiteGoals(Scheduler scheduler);
 
     /**
-     * Add a new corequisite subgoal <code>g</code>.  <code>g</code> is a
+     * Add a new corequisite subgoal {@code g}.  {@code g} is a
      * goal on which this goal mutually depends.  The caller must be careful
      * to ensure that all corequisite goals can be eventually reached.
-     * <code>g</code> should be interned.
+     * {@code g} should be interned.
      */
     public void addCorequisiteGoal(Goal g, Scheduler scheduler);
 
     /**
-     * Add a new subgoal <code>g</code>.  <code>g</code> must be completed
-     * before this goal is attempted.  <code>g</code> should be interned.
+     * Add a new subgoal {@code g}.  {@code g} must be completed
+     * before this goal is attempted.  {@code g} should be interned.
      * 
      * @throws CyclicDependencyException
-     *             if a prerequisite of <code>g</code> is <code>this</code>
+     *             if a prerequisite of {@code g} is {@code this}
      */
     public void addPrerequisiteGoal(Goal g, Scheduler scheduler)
             throws CyclicDependencyException;

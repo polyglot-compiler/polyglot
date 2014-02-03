@@ -27,7 +27,7 @@
 package polyglot.types;
 
 /**
- * A <code>VarInstance</code> contains type information for a variable.  It may
+ * A {@code VarInstance} contains type information for a variable.  It may
  * be either a local or a field.
  */
 public interface VarInstance extends TypeObject, Declaration {
@@ -41,6 +41,10 @@ public interface VarInstance extends TypeObject, Declaration {
      */
     String name();
 
+    /**
+     * Set the name of the variable.
+     * @param name The name to set.
+     */
     void setName(String name);
 
     /**

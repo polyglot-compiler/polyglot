@@ -36,9 +36,9 @@ import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
 
 /**
- * A <code>NodeFactory</code> constructs AST nodes.  All node construction
- * should go through this factory or by done with the <code>copy()</code>
- * method of <code>Node</code>.
+ * A {@code NodeFactory} constructs AST nodes.  All node construction
+ * should go through this factory or by done with the {@code copy()}
+ * method of {@code Node}.
  */
 // XXX Backward compatible with Polyglot 2.5.3
 @SuppressWarnings("deprecation")

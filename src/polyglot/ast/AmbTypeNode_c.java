@@ -39,7 +39,7 @@ import polyglot.visit.TypeBuilder;
 import polyglot.visit.TypeChecker;
 
 /**
- * An <code>AmbTypeNode</code> is an ambiguous AST node composed of
+ * An {@code AmbTypeNode} is an ambiguous AST node composed of
  * dot-separated list of identifiers that must resolve to a type.
  */
 public class AmbTypeNode_c extends TypeNode_c implements AmbTypeNode {

@@ -31,7 +31,7 @@ import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
 
 /**
- * Abstract implementation of a <code>Type</code>.  This implements most of
+ * Abstract implementation of a {@code Type}.  This implements most of
  * the "isa" and "cast" methods of the type and methods which just dispatch to
  * the type system.
  */
@@ -52,11 +52,6 @@ public abstract class Type_c extends TypeObject_c implements Type {
         super(ts, pos);
     }
 
-    /**
-     * Return a string into which to translate the type.
-     * @param c A resolver in which to lookup this type to determine if
-     * the type is unique in the given resolver.
-     */
     @Override
     public abstract String translate(Resolver c);
 
@@ -171,63 +166,46 @@ public abstract class Type_c extends TypeObject_c implements Type {
         return false;
     }
 
-    /**
-     * Return true if a subclass of Throwable.
-     */
     @Override
     public boolean isThrowable() {
         return false;
     }
 
-    /**
-     * Return true if an unchecked exception.
-     */
     @Override
     public boolean isUncheckedException() {
         return false;
     }
 
-    /** Returns a non-null iff isClass() returns true. */
     @Override
     public ClassType toClass() {
         return null;
     }
 
-    /** Returns a non-null iff isNull() returns true. */
     @Override
     public NullType toNull() {
         return null;
     }
 
-    /** Returns a non-null iff isReference() returns true. */
     @Override
     public ReferenceType toReference() {
         return null;
     }
 
-    /** Returns a non-null iff isPrimitive() returns true. */
     @Override
     public PrimitiveType toPrimitive() {
         return null;
     }
 
-    /** Returns a non-null iff isArray() returns true. */
     @Override
     public ArrayType toArray() {
         return null;
     }
 
-    /**
-     * Return a <code>dims</code>-array of this type.
-     */
     @Override
     public ArrayType arrayOf(int dims) {
         return ts.arrayOf(this, dims);
     }
 
-    /**
-     * Return an array of this type.
-     */
     @Override
     public ArrayType arrayOf() {
         return ts.arrayOf(this);
@@ -243,110 +221,66 @@ public abstract class Type_c extends TypeObject_c implements Type {
         return this == t;
     }
 
-    /**
-     * Return true if this type is a subtype of <code>ancestor</code>.
-     */
     @Override
-    public final boolean isSubtype(Type t) {
-        return ts.isSubtype(this, t);
+    public final boolean isSubtype(Type ancestor) {
+        return ts.isSubtype(this, ancestor);
     }
 
-    /**
-     * Return true if this type is a subtype of <code>ancestor</code>.
-     */
     @Override
-    public boolean isSubtypeImpl(Type t) {
-        return ts.typeEquals(this, t) || ts.descendsFrom(this, t);
+    public boolean isSubtypeImpl(Type ancestor) {
+        return ts.typeEquals(this, ancestor) || ts.descendsFrom(this, ancestor);
     }
 
-    /**
-     * Return true if this type descends from <code>ancestor</code>.
-     */
     @Override
-    public final boolean descendsFrom(Type t) {
-        return ts.descendsFrom(this, t);
+    public final boolean descendsFrom(Type ancestor) {
+        return ts.descendsFrom(this, ancestor);
     }
 
-    /**
-     * Return true if this type descends from <code>ancestor</code>.
-     */
     @Override
-    public boolean descendsFromImpl(Type t) {
+    public boolean descendsFromImpl(Type ancestor) {
         return false;
     }
 
-    /**
-     * Return true if this type can be cast to <code>toType</code>.
-     */
     @Override
     public final boolean isCastValid(Type toType) {
         return ts.isCastValid(this, toType);
     }
 
-    /**
-     * Return true if this type can be cast to <code>toType</code>.
-     */
     @Override
     public boolean isCastValidImpl(Type toType) {
         return false;
     }
 
-    /**
-     * Return true if a value of this type can be assigned to a variable of
-     * type <code>toType</code>.
-     */
     @Override
     public final boolean isImplicitCastValid(Type toType) {
         return ts.isImplicitCastValid(this, toType);
     }
 
-    /**
-     * Return true if a value of this type can be assigned to a variable of
-     * type <code>toType</code>.
-     */
     @Override
     public boolean isImplicitCastValidImpl(Type toType) {
         return false;
     }
 
-    /**
-     * Return true if a literal <code>value</code> can be converted to this type.
-     * This method should be removed.  It is kept for backward compatibility.
-     */
     @Override
     public final boolean numericConversionValid(long value) {
         return ts.numericConversionValid(this, value);
     }
 
-    /**
-     * Return true if a literal <code>value</code> can be converted to this type.
-     * This method should be removed.  It is kept for backward compatibility.
-     */
     @Override
     public boolean numericConversionValidImpl(long value) {
         return false;
     }
 
-    /**
-     * Return true if a literal <code>value</code> can be converted to this type.
-     */
     @Override
     public final boolean numericConversionValid(Object value) {
         return ts.numericConversionValid(this, value);
     }
 
-    /**
-     * Return true if a literal <code>value</code> can be converted to this type.
-     */
     @Override
     public boolean numericConversionValidImpl(Object value) {
         return false;
     }
 
-    /**
-     * Return true if the types can be compared; that is, if they have
-     * the same type system.
-     */
     @Override
     public boolean isComparable(Type t) {
         return t.typeSystem() == ts;
@@ -356,11 +290,11 @@ public abstract class Type_c extends TypeObject_c implements Type {
     public abstract String toString();
 
     /**
-     * Output a compilable representation of this type to <code>w</code>.
+     * Output a compilable representation of this type to {@code w}.
      * This implementation generates whatever representation is produced
-     * by <code>toString()</code>. To satisfy the specification of
-     * <code>Type.toString()</code>, this implementation needs to be overridden
-     * if <code>toString</code> does not produce a compilable representation.
+     * by {@code toString()}. To satisfy the specification of
+     * {@code Type.toString()}, this implementation needs to be overridden
+     * if {@code toString} does not produce a compilable representation.
      */
     @Override
     public void print(CodeWriter w) {

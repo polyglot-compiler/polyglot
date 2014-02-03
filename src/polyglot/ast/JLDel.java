@@ -29,7 +29,7 @@ package polyglot.ast;
 import polyglot.util.Copy;
 
 /**
- * <code>JL</code> contains all methods implemented by an AST node.
+ * {@code JL} contains all methods implemented by an AST node.
  * AST nodes and delegates for AST nodes must implement this interface.
  */
 @Deprecated

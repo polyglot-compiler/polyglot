@@ -44,7 +44,7 @@ import polyglot.util.ErrorQueue;
 import polyglot.visit.ClassSerializer;
 
 /**
- * The <code>Serialized</code> goal is reached after typing information is serialized
+ * The {@code Serialized} goal is reached after typing information is serialized
  * into the compiled code. 
  */
 public class Serialized extends SourceFileGoal {

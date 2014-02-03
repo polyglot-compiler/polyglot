@@ -30,8 +30,8 @@ import polyglot.util.InternalCompilerError;
 import polyglot.util.SerialVersionUID;
 
 /**
- * A <code>NullType</code> represents the type of the Java keyword
- * <code>null</code>.
+ * A {@code NullType} represents the type of the Java keyword
+ * {@code null}.
  */
 public class NullType_c extends Type_c implements NullType {
     private static final long serialVersionUID = SerialVersionUID.generate();

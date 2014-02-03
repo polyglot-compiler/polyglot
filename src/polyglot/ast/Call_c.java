@@ -57,7 +57,7 @@ import polyglot.visit.TypeBuilder;
 import polyglot.visit.TypeChecker;
 
 /**
- * A <code>Call</code> is an immutable representation of a Java
+ * A {@code Call} is an immutable representation of a Java
  * method call.  It consists of a method name and a list of arguments.
  * It may also have either a Type upon which the method is being
  * called or an expression upon which the method is being called.
@@ -80,19 +80,16 @@ public class Call_c extends Expr_c implements Call, CallOps {
         this.targetImplicit = (target == null);
     }
 
-    /** Get the precedence of the call. */
     @Override
     public Precedence precedence() {
         return Precedence.LITERAL;
     }
 
-    /** Get the target object or type of the call. */
     @Override
     public Receiver target() {
         return this.target;
     }
 
-    /** Set the target object or type of the call. */
     @Override
     public Call target(Receiver target) {
         Call_c n = (Call_c) copy();
@@ -100,13 +97,11 @@ public class Call_c extends Expr_c implements Call, CallOps {
         return n;
     }
 
-    /** Get the name of the call. */
     @Override
     public Id id() {
         return this.name;
     }
 
-    /** Set the name of the call. */
     @Override
     public Call id(Id name) {
         Call_c n = (Call_c) copy();
@@ -114,13 +109,11 @@ public class Call_c extends Expr_c implements Call, CallOps {
         return n;
     }
 
-    /** Get the name of the call. */
     @Override
     public String name() {
         return this.name.id();
     }
 
-    /** Set the name of the call. */
     @Override
     public Call name(String name) {
         return id(this.name.id(name));
@@ -131,13 +124,11 @@ public class Call_c extends Expr_c implements Call, CallOps {
         return methodInstance();
     }
 
-    /** Get the method instance of the call. */
     @Override
     public MethodInstance methodInstance() {
         return this.mi;
     }
 
-    /** Set the method instance of the call. */
     @Override
     public Call methodInstance(MethodInstance mi) {
         if (mi == this.mi) return this;
@@ -162,13 +153,11 @@ public class Call_c extends Expr_c implements Call, CallOps {
         return n;
     }
 
-    /** Get the actual arguments of the call. */
     @Override
     public List<Expr> arguments() {
         return this.arguments;
     }
 
-    /** Set the actual arguments of the call. */
     @Override
     public ProcedureCall arguments(List<Expr> arguments) {
         Call_c n = (Call_c) copy();
@@ -191,7 +180,6 @@ public class Call_c extends Expr_c implements Call, CallOps {
         return this;
     }
 
-    /** Visit the children of the call. */
     @Override
     public Node visitChildren(NodeVisitor v) {
         Receiver target = visitChild(this.target, v);
@@ -222,12 +210,6 @@ public class Call_c extends Expr_c implements Call, CallOps {
         return n.methodInstance(mi);
     }
 
-    /**
-     * Typecheck the Call when the target is null. This method finds
-     * an appropriate target, and then type checks accordingly.
-     * 
-     * @param argTypes list of <code>Type</code>s of the arguments
-     */
     @Override
     public Node typeCheckNullTarget(TypeChecker tc, List<Type> argTypes)
             throws SemanticException {
@@ -272,17 +254,11 @@ public class Call_c extends Expr_c implements Call, CallOps {
         return call.visit(tc.rethrowMissingDependencies(true));
     }
 
-    /**
-     * Used to find the missing static target of a static method call.
-     * Should return the container of the method instance. 
-     * 
-     */
     @Override
     public Type findContainer(TypeSystem ts, MethodInstance mi) {
         return ts.staticTarget(mi.container());
     }
 
-    /** Type check the call. */
     @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
         TypeSystem ts = tc.typeSystem();
@@ -414,7 +390,6 @@ public class Call_c extends Expr_c implements Call, CallOps {
         return sb.toString();
     }
 
-    /** Write the expression to an output file. */
     @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
         if (!targetImplicit) {
@@ -450,7 +425,6 @@ public class Call_c extends Expr_c implements Call, CallOps {
         w.end();
     }
 
-    /** Dumps the AST. */
     @Override
     public void dump(CodeWriter w) {
         super.dump(w);
@@ -506,7 +480,6 @@ public class Call_c extends Expr_c implements Call, CallOps {
         return succs;
     }
 
-    /** Check exceptions thrown by the call. */
     @Override
     public Node exceptionCheck(ExceptionChecker ec) throws SemanticException {
         if (mi == null) {
@@ -552,7 +525,7 @@ public class Call_c extends Expr_c implements Call, CallOps {
         return c;
     }
 
-    // check that the implicit target setting is correct.
+    /** Check that the implicit target setting is correct. */
     protected void checkConsistency(Context c) throws SemanticException {
         if (targetImplicit) {
             // the target is implicit. Check that the

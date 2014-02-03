@@ -60,7 +60,7 @@ import polyglot.visit.TypeBuilder;
 import polyglot.visit.TypeChecker;
 
 /**
- * A <code>ClassDecl</code> is the definition of a class, abstract class,
+ * A {@code ClassDecl} is the definition of a class, abstract class,
  * or interface. It may be a public or other top-level class, or an inner
  * named class, or an anonymous class.
  */
@@ -198,18 +198,11 @@ public class ClassDecl_c extends Term_c implements ClassDecl, ClassDeclOps {
         return this;
     }
 
-    /**
-     * Return the first (sub)term performed when evaluating this
-     * term.
-     */
     @Override
     public Term firstChild() {
         return body();
     }
 
-    /**
-     * Visit this term in evaluation order.
-     */
     @Override
     public <T> List<T> acceptCFG(CFGBuilder<?> v, List<T> succs) {
         v.visitCFG(this.body(), this, EXIT);
@@ -712,10 +705,6 @@ public class ClassDecl_c extends Term_c implements ClassDecl, ClassDeclOps {
         }
     }
 
-    /**
-     * @param parent
-     * @param ar
-     */
     @Override
     public Node disambiguateOverride(Node parent, AmbiguityRemover ar)
             throws SemanticException {

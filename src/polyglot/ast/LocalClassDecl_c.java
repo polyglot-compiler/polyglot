@@ -52,13 +52,11 @@ public class LocalClassDecl_c extends Stmt_c implements LocalClassDecl {
         this.decl = decl;
     }
 
-    /** Get the class declaration. */
     @Override
     public ClassDecl decl() {
         return this.decl;
     }
 
-    /** Set the class declaration. */
     @Override
     public LocalClassDecl decl(ClassDecl decl) {
         LocalClassDecl_c n = (LocalClassDecl_c) copy();
@@ -77,25 +75,17 @@ public class LocalClassDecl_c extends Stmt_c implements LocalClassDecl {
         return this;
     }
 
-    /**
-     * Return the first (sub)term performed when evaluating this
-     * term.
-     */
     @Override
     public Term firstChild() {
         return decl();
     }
 
-    /**
-     * Visit this term in evaluation order.
-     */
     @Override
     public <T> List<T> acceptCFG(CFGBuilder<?> v, List<T> succs) {
         v.visitCFG(decl(), this, EXIT);
         return succs;
     }
 
-    /** Visit the children of the statement. */
     @Override
     public Node visitChildren(NodeVisitor v) {
         ClassDecl decl = visitChild(this.decl, v);
@@ -119,7 +109,6 @@ public class LocalClassDecl_c extends Stmt_c implements LocalClassDecl {
         return decl.toString();
     }
 
-    /** Write the statement to an output file. */
     @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
         printBlock(decl, w, tr);

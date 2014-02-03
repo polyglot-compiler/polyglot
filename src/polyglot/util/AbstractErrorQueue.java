@@ -27,7 +27,7 @@
 package polyglot.util;
 
 /**
- * A <code>StdErrorQueue</code> handles outputing error messages.
+ * A {@code StdErrorQueue} handles outputting error messages.
  */
 public abstract class AbstractErrorQueue implements ErrorQueue {
     protected boolean flushed;

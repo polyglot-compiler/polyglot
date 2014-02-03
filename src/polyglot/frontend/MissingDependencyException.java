@@ -30,7 +30,7 @@ import polyglot.frontend.goals.Goal;
 import polyglot.util.SerialVersionUID;
 
 /**
- * A <code>MissingDependencyException</code> is thrown when a goal cannot be
+ * A {@code MissingDependencyException} is thrown when a goal cannot be
  * reached (yet) because the it is dependent on another, often just discovered,
  * goal.
  *

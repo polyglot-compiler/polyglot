@@ -41,8 +41,8 @@ import polyglot.visit.PrettyPrinter;
 import polyglot.visit.TypeBuilder;
 
 /**
- * A <code>TypeNode</code> is the syntactic representation of a 
- * <code>Type</code> within the abstract syntax tree.
+ * A {@code TypeNode} is the syntactic representation of a 
+ * {@code Type} within the abstract syntax tree.
  */
 public abstract class TypeNode_c extends Term_c implements TypeNode {
     private static final long serialVersionUID = SerialVersionUID.generate();
@@ -64,13 +64,11 @@ public abstract class TypeNode_c extends Term_c implements TypeNode {
         return type();
     }
 
-    /** Get the type this node encapsulates. */
     @Override
     public Type type() {
         return this.type;
     }
 
-    /** Set the type this node encapsulates. */
     @Override
     public TypeNode type(Type type) {
         TypeNode_c n = (TypeNode_c) copy();

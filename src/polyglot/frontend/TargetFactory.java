@@ -44,7 +44,7 @@ import polyglot.util.CodeWriter;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.UnicodeWriter;
 
-/** A <code>TargetFactory</code> is responsible for opening output files. */
+/** A {@code TargetFactory} is responsible for opening output files. */
 public class TargetFactory {
     protected FileManager fileManager = null;
     protected JavaFileManager.Location outputLocation = null;

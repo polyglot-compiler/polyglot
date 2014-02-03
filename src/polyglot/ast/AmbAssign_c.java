@@ -34,8 +34,8 @@ import polyglot.visit.CFGBuilder;
 import polyglot.visit.TypeChecker;
 
 /**
- * A <code>AmbAssign</code> represents a Java assignment expression to
- * an as yet unknown expression.
+ * A {@code AmbAssign} represents a Java assignment expression to
+ * an ambiguous expression.
  */
 public class AmbAssign_c extends Assign_c implements AmbAssign {
     private static final long serialVersionUID = SerialVersionUID.generate();

@@ -208,8 +208,8 @@ public abstract class BaseParser extends java_cup.runtime.lr_parser {
     }
 
     /**
-     * Return a TypeNode representing a <code>dims</code>-dimensional
-     * array of <code>n</code>.
+     * Return a TypeNode representing a {@code dims}-dimensional
+     * array of {@code n}.
      */
     public TypeNode array(TypeNode n, int dims) throws Exception {
         if (dims > 0) {
@@ -309,7 +309,7 @@ public abstract class BaseParser extends java_cup.runtime.lr_parser {
     }
 
     /**
-     * Convert <code>e</code> into a type, yielding a <code>TypeNode</code>.
+     * Convert {@code e} into a type, yielding a {@code TypeNode}.
      * This is used by the cast_expression production.
      */
     public TypeNode exprToType(Expr e) throws Exception {

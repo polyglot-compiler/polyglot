@@ -30,11 +30,11 @@ import polyglot.util.Enum;
 import polyglot.util.SerialVersionUID;
 
 /**
- * A <code>PrimitiveType</code> represents a type which may not be directly 
+ * A {@code PrimitiveType} represents a type which may not be directly 
  * coerced to java.lang.Object (under the standard Java type system).    
  * <p>
  * This class should never be instantiated directly. Instead, you should
- * use the <code>TypeSystem.get*</code> methods.
+ * use the {@code TypeSystem.get*} methods.
  */
 public interface PrimitiveType extends Type, Named {
     /** The kind of the primitive type. */

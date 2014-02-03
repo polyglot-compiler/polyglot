@@ -301,9 +301,9 @@ public class Base64 {
      *     <i>Note: Technically, this makes your encoding non-compliant.</i>
      * </pre>
      * <p>
-     * Example: <code>encodeObject( myObj, Base64.GZIP )</code> or
+     * Example: {@code encodeObject(myObj, Base64.GZIP)} or
      * <p>
-     * Example: <code>encodeObject( myObj, Base64.GZIP | Base64.DONT_BREAK_LINES )</code>
+     * Example: {@code encodeObject(myObj, Base64.GZIP | Base64.DONT_BREAK_LINES)}
      *
      * @param serializableObject The object to encode
      * @param options Specified options
@@ -395,9 +395,9 @@ public class Base64 {
      *     <i>Note: Technically, this makes your encoding non-compliant.</i>
      * </pre>
      * <p>
-     * Example: <code>encodeBytes( myData, Base64.GZIP )</code> or
+     * Example: {@code encodeBytes(myData, Base64.GZIP)} or
      * <p>
-     * Example: <code>encodeBytes( myData, Base64.GZIP | Base64.DONT_BREAK_LINES )</code>
+     * Example: {@code encodeBytes(myData, Base64.GZIP | Base64.DONT_BREAK_LINES)}
      *
      *
      * @param source The data to convert
@@ -432,9 +432,9 @@ public class Base64 {
      *     <i>Note: Technically, this makes your encoding non-compliant.</i>
      * </pre>
      * <p>
-     * Example: <code>encodeBytes( myData, Base64.GZIP )</code> or
+     * Example: {@code encodeBytes(myData, Base64.GZIP)} or
      * <p>
-     * Example: <code>encodeBytes( myData, Base64.GZIP | Base64.DONT_BREAK_LINES )</code>
+     * Example: {@code encodeBytes(myData, Base64.GZIP | Base64.DONT_BREAK_LINES)}
      *
      *
      * @param source The data to convert
@@ -695,7 +695,7 @@ public class Base64 {
         catch (java.io.UnsupportedEncodingException uee) {
             bytes = s.getBytes();
         } // end catch
-        //</change>
+          //</change>
 
         // Decode
         bytes = decode(bytes, 0, bytes.length);
@@ -1032,10 +1032,10 @@ public class Base64 {
          *     <i>Note: Technically, this makes your encoding non-compliant.</i>
          * </pre>
          * <p>
-         * Example: <code>new Base64.InputStream( in, Base64.DECODE )</code>
+         * Example: {@code new Base64.InputStream(in, Base64.DECODE)}
          *
          *
-         * @param in the <tt>java.io.InputStream</tt> from which to read data.
+         * @param in the {@code java.io.InputStream} from which to read data.
          * @param options Specified options
          * @see Base64#ENCODE
          * @see Base64#DECODE
@@ -1231,9 +1231,9 @@ public class Base64 {
          *     <i>Note: Technically, this makes your encoding non-compliant.</i>
          * </pre>
          * <p>
-         * Example: <code>new Base64.OutputStream( out, Base64.ENCODE )</code>
+         * Example: {@code new Base64.OutputStream(out, Base64.ENCODE)}
          *
-         * @param out the <tt>java.io.OutputStream</tt> to which data will be written.
+         * @param out the {@code java.io.OutputStream} to which data will be written.
          * @param options Specified options.
          * @see Base64#ENCODE
          * @see Base64#DECODE

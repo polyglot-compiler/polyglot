@@ -40,7 +40,7 @@ import polyglot.visit.Translator;
 import polyglot.visit.TypeChecker;
 
 /**
- * A <code>CanonicalTypeNode</code> is a type node for a canonical type.
+ * A {@code CanonicalTypeNode} is a type node for a canonical type.
  */
 public class CanonicalTypeNode_c extends TypeNode_c implements
         CanonicalTypeNode {
@@ -89,7 +89,7 @@ public class CanonicalTypeNode_c extends TypeNode_c implements
     /**
      * Translate the type.
      * If the "use-fully-qualified-class-names" options is used, then the
-     * fully qualified names is written out (<code>java.lang.Object</code>).
+     * fully qualified names is written out ({@code java.lang.Object}).
      * Otherwise, the string that originally represented the type in the
      * source file is used.
      */

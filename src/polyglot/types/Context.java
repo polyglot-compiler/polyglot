@@ -33,9 +33,9 @@ import polyglot.util.Copy;
 
 /**
  * A context represents a stack of scopes used for looking up types, methods,
- * and variables.  To push a new scope call one of the <code>push*</code>
+ * and variables.  To push a new scope call one of the {@code push*}
  * methods to return a new context.  The old context may still be used
- * and may be accessed directly through a call to <code>pop()</code>.
+ * and may be accessed directly through a call to {@code pop()}.
  * While the stack of scopes is treated functionally, each individual
  * scope is updated in place.  Names added to the context are added
  * in the current scope.
@@ -57,7 +57,7 @@ public interface Context extends Resolver, Copy<Context> {
     void addNamed(Named t);
 
     /** Looks up a method in the current scope.
-     * @param formalTypes A list of <code>Type</code>.
+     * @param formalTypes A list of {@code Type}.
      * @see polyglot.types.Type
      */
     MethodInstance findMethod(String name, List<? extends Type> formalTypes)
@@ -80,13 +80,13 @@ public interface Context extends Resolver, Copy<Context> {
 
     /**
      * Finds the class which added a field to the scope.
-     * This is usually a subclass of <code>findField(name).container()</code>.
+     * This is usually a subclass of {@code findField(name).container()}.
      */
     ClassType findFieldScope(String name) throws SemanticException;
 
     /**
      * Finds the class which added a method to the scope.
-     * This is usually a subclass of <code>findMethod(name).container()</code>.
+     * This is usually a subclass of {@code findMethod(name).container()}.
      */
     ClassType findMethodScope(String name) throws SemanticException;
 

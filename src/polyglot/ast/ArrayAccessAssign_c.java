@@ -37,12 +37,12 @@ import polyglot.util.SerialVersionUID;
 import polyglot.visit.CFGBuilder;
 
 /**
- * A <code>ArrayAccessAssign_c</code> represents a Java assignment expression
- * to an array element.  For instance, <code>A[3] = e</code>.
+ * A {@code ArrayAccessAssign_c} represents a Java assignment expression
+ * to an array element.  For instance, {@code A[3] = e}.
  * 
- * The class of the <code>Expr</code> returned by
- * <code>ArrayAccessAssign_c.left()</code>is guaranteed to be an
- * <code>ArrayAccess</code>.
+ * The class of the {@code Expr} returned by
+ * {@code ArrayAccessAssign_c.left()}is guaranteed to be an
+ * {@code ArrayAccess}.
  */
 public class ArrayAccessAssign_c extends Assign_c implements ArrayAccessAssign {
     private static final long serialVersionUID = SerialVersionUID.generate();
@@ -120,7 +120,6 @@ public class ArrayAccessAssign_c extends Assign_c implements ArrayAccessAssign {
         return l;
     }
 
-    /** Get the throwsArrayStoreException of the expression. */
     @Override
     public boolean throwsArrayStoreException() {
         return op == ASSIGN && left.type().isReference();

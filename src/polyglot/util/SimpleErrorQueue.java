@@ -27,7 +27,7 @@
 package polyglot.util;
 
 /**
- * A <code>SimpleErrorQueue</code> handles outputing error messages.
+ * A {@code SimpleErrorQueue} handles outputting error messages.
  */
 public class SimpleErrorQueue extends AbstractErrorQueue {
     public SimpleErrorQueue() {

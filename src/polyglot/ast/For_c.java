@@ -48,7 +48,7 @@ import polyglot.visit.PrettyPrinter;
 import polyglot.visit.TypeChecker;
 
 /**
- * An immutable representation of a Java language <code>for</code>
+ * An immutable representation of a Java language {@code for}
  * statement.  Contains a statement to be executed and an expression
  * to be tested indicating whether to reexecute the statement.
  */
@@ -70,13 +70,11 @@ public class For_c extends Loop_c implements For {
         this.body = body;
     }
 
-    /** List of initialization statements */
     @Override
     public List<ForInit> inits() {
         return Collections.unmodifiableList(this.inits);
     }
 
-    /** Set the inits of the statement. */
     @Override
     public For inits(List<ForInit> inits) {
         For_c n = (For_c) copy();
@@ -84,13 +82,11 @@ public class For_c extends Loop_c implements For {
         return n;
     }
 
-    /** Loop condition */
     @Override
     public Expr cond() {
         return this.cond;
     }
 
-    /** Set the conditional of the statement. */
     @Override
     public For cond(Expr cond) {
         For_c n = (For_c) copy();
@@ -98,13 +94,11 @@ public class For_c extends Loop_c implements For {
         return n;
     }
 
-    /** List of iterator expressions. */
     @Override
     public List<ForUpdate> iters() {
         return Collections.unmodifiableList(this.iters);
     }
 
-    /** Set the iterator expressions of the statement. */
     @Override
     public For iters(List<ForUpdate> iters) {
         For_c n = (For_c) copy();
@@ -112,13 +106,11 @@ public class For_c extends Loop_c implements For {
         return n;
     }
 
-    /** Loop body */
     @Override
     public Stmt body() {
         return this.body;
     }
 
-    /** Set the body of the statement. */
     @Override
     public For body(Stmt body) {
         For_c n = (For_c) copy();
@@ -143,7 +135,6 @@ public class For_c extends Loop_c implements For {
         return this;
     }
 
-    /** Visit the children of the statement. */
     @Override
     public Node visitChildren(NodeVisitor v) {
         List<ForInit> inits = visitList(this.inits, v);
@@ -158,7 +149,6 @@ public class For_c extends Loop_c implements For {
         return c.pushBlock();
     }
 
-    /** Type check the statement. */
     @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
         TypeSystem ts = tc.typeSystem();
@@ -205,7 +195,6 @@ public class For_c extends Loop_c implements For {
         return child.type();
     }
 
-    /** Write the statement to an output file. */
     @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
         w.write("for (");

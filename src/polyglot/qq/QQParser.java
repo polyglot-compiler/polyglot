@@ -31,21 +31,21 @@ import java_cup.runtime.Symbol;
 /** Quasiquoting parser.  Interface to the parser with new start rules
   to enable quasiquoting. */
 public interface QQParser {
-    /** Parse the input as an <code>Expr</code>. */
+    /** Parse the input as an {@code Expr}. */
     public Symbol qq_expr() throws Exception;
 
-    /** Parse the input as an <code>Stmt</code>. */
+    /** Parse the input as an {@code Stmt}. */
     public Symbol qq_stmt() throws Exception;
 
-    /** Parse the input as an <code>TypeNode</code>. */
+    /** Parse the input as an {@code TypeNode}. */
     public Symbol qq_type() throws Exception;
 
-    /** Parse the input as an <code>ClassDecl</code>. */
+    /** Parse the input as an {@code ClassDecl}. */
     public Symbol qq_decl() throws Exception;
 
-    /** Parse the input as an <code>SourceFile</code>. */
+    /** Parse the input as an {@code SourceFile}. */
     public Symbol qq_file() throws Exception;
 
-    /** Parse the input as an <code>ClassMember</code>. */
+    /** Parse the input as an {@code ClassMember}. */
     public Symbol qq_member() throws Exception;
 }

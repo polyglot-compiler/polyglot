@@ -43,8 +43,8 @@ import polyglot.visit.PrettyPrinter;
 import polyglot.visit.TypeChecker;
 
 /**
- * A <code>Throw</code> is an immutable representation of a <code>throw</code>
- * statement. Such a statement contains a single <code>Expr</code> which
+ * A {@code Throw} is an immutable representation of a {@code throw}
+ * statement. Such a statement contains a single {@code Expr} which
  * evaluates to the object being thrown.
  */
 public class Throw_c extends Stmt_c implements Throw {
@@ -58,13 +58,11 @@ public class Throw_c extends Stmt_c implements Throw {
         this.expr = expr;
     }
 
-    /** Get the expression to throw. */
     @Override
     public Expr expr() {
         return this.expr;
     }
 
-    /** Set the expression to throw. */
     @Override
     public Throw expr(Expr expr) {
         Throw_c n = (Throw_c) copy();
@@ -83,14 +81,12 @@ public class Throw_c extends Stmt_c implements Throw {
         return this;
     }
 
-    /** Visit the children of the statement. */
     @Override
     public Node visitChildren(NodeVisitor v) {
         Expr expr = visitChild(this.expr, v);
         return reconstruct(expr);
     }
 
-    /** Type check the statement. */
     @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
         if (!expr.type().isThrowable()) {
@@ -117,7 +113,6 @@ public class Throw_c extends Stmt_c implements Throw {
         return "throw " + expr + ";";
     }
 
-    /** Write the statement to an output file. */
     @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
         w.write("throw ");

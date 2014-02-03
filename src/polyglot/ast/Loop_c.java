@@ -30,7 +30,7 @@ import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
 
 /**
- * An immutable representation of a Java language <code>while</code>
+ * An immutable representation of a loop
  * statement.  It contains a statement to be executed and an expression
  * to be tested indicating whether to reexecute the statement.
  */

@@ -51,32 +51,32 @@ import polyglot.util.Position;
   into ASTs.
 
   <p>
-  To use the class, invoke one of the <code>parseT</code> methods to create a
-  <code>Node</code> of type <code>T</code>.
+  To use the class, invoke one of the {@code parseT} methods to create a
+  {@code Node} of type {@code T}.
 
   <p>
-  Each <code>parseT</code> method takes a format string as its first argument
-  and some additional <code>Object</code> arguments.  Each pattern in the
-  format string is matched with its corresponding <code>Object</code>.
+  Each {@code parseT} method takes a format string as its first argument
+  and some additional {@code Object} arguments.  Each pattern in the
+  format string is matched with its corresponding {@code Object}.
 
   <p>
   The format string may contain the following patterns:
   <ul>
-    <li> <code>%s</code> matches <code>String</code> (parsed as an identifier)
+    <li> {@code %s} matches {@code String} (parsed as an identifier)
 
-    <li> <code>%T</code> matches <code>Type</code> or <code>TypeNode></code>
-    <li> <code>%E</code> matches <code>Expr</code>
-    <li> <code>%S</code> matches <code>Stmt</code>
-    <li> <code>%D</code> matches <code>ClassDecl</code>
-    <li> <code>%M</code> matches <code>ClassMember</code>
-    <li> <code>%F</code> matches <code>Formal</code>
+    <li> {@code %T} matches {@code Type} or {@code TypeNode}
+    <li> {@code %E} matches {@code Expr}
+    <li> {@code %S} matches {@code Stmt}
+    <li> {@code %D} matches {@code ClassDecl}
+    <li> {@code %M} matches {@code ClassMember}
+    <li> {@code %F} matches {@code Formal}
 
-    <li> <code>%LT</code> matches <code>List&lt;Type&gt;</code> or <code>List&lt;TypeNode&gt;</code>
-    <li> <code>%LE</code> matches <code>List&lt;Expr&gt;</code>
-    <li> <code>%LS</code> matches <code>List&lt;Stmt&gt;</code>
-    <li> <code>%LD</code> matches <code>List&lt;ClassDecl&gt;</code>
-    <li> <code>%LM</code> matches <code>List&lt;ClassMember&gt;</code>
-    <li> <code>%LF</code> matches <code>List&lt;Formal&gt;</code>
+    <li> {@code %LT} matches {@code List<Type>} or {@code List<TypeNode>}
+    <li> {@code %LE} matches {@code List<Expr>}
+    <li> {@code %LS} matches {@code List<Stmt>}
+    <li> {@code %LD} matches {@code List<ClassDecl>}
+    <li> {@code %LM} matches {@code List<ClassMember>}
+    <li> {@code %LF} matches {@code List<Formal>}
   </ul>
   These patterns are recognized as tokens by the lexer--surrounding the token
   with whitespace or parens may be needed to parse the string.
@@ -107,7 +107,7 @@ public class QQ {
     }
 
     /** Create a new quasiquoter to create AST nodes of the given
-      language extension, using <code>pos</code> for the position
+      language extension, using {@code pos} for the position
       of the nodes created. */
     public QQ(ExtensionInfo ext, Position pos) {
         this.ext = ext;
@@ -115,7 +115,7 @@ public class QQ {
     }
 
     /**
-     * Parse a string into a <code>SourceFile</code> AST node,
+     * Parse a string into a {@code SourceFile} AST node,
      * applying substitutions.
      */
     public SourceFile parseFile(String fmt, Object... os) {
@@ -123,74 +123,74 @@ public class QQ {
     }
 
     /**
-     * Parse a string into a <code>SourceFile</code> AST node,
+     * Parse a string into a {@code SourceFile} AST node,
      * applying substitutions.
      */
     public SourceFile parseFile(String fmt, List<?> subst) {
         return (SourceFile) parse(FILE, fmt, subst.toArray());
     }
 
-    /** Parse a string into a <code>ClassDecl</code> AST node,
+    /** Parse a string into a {@code ClassDecl} AST node,
      * applying substitutions. */
     public ClassDecl parseDecl(String fmt, Object... os) {
         return (ClassDecl) parse(DECL, fmt, os);
     }
 
-    /** Parse a string into a <code>ClassDecl</code> AST node,
+    /** Parse a string into a {@code ClassDecl} AST node,
      * applying substitutions. */
     public ClassDecl parseDecl(String fmt, List<?> subst) {
         return (ClassDecl) parse(DECL, fmt, subst.toArray());
     }
 
-    /** Parse a string into a <code>ClassMember</code> AST node,
+    /** Parse a string into a {@code ClassMember} AST node,
      * applying substitutions. */
     public ClassMember parseMember(String fmt, Object... os) {
         return (ClassMember) parse(MEMB, fmt, os);
     }
 
-    /** Parse a string into a <code>ClassMember</code> AST node,
+    /** Parse a string into a {@code ClassMember} AST node,
      * applying substitutions. */
     public ClassMember parseMember(String fmt, List<?> subst) {
         return (ClassMember) parse(MEMB, fmt, subst.toArray());
     }
 
-    /** Parse a string into a <code>Expr</code> AST node,
+    /** Parse a string into a {@code Expr} AST node,
      * applying substitutions. */
     public Expr parseExpr(String fmt, Object... os) {
         return (Expr) parse(EXPR, fmt, os);
     }
 
-    /** Parse a string into a <code>Expr</code> AST node,
+    /** Parse a string into a {@code Expr} AST node,
      * applying substitutions. */
     public Expr parseExpr(String fmt, List<?> subst) {
         return (Expr) parse(EXPR, fmt, subst.toArray());
     }
 
-    /** Parse a string into a <code>Stmt</code> AST node,
+    /** Parse a string into a {@code Stmt} AST node,
      * applying substitutions. */
     public Stmt parseStmt(String fmt, Object... os) {
         return (Stmt) parse(STMT, fmt, os);
     }
 
-    /** Parse a string into a <code>Stmt</code> AST node,
+    /** Parse a string into a {@code Stmt} AST node,
      * applying substitutions. */
     public Stmt parseStmt(String fmt, List<?> subst) {
         return (Stmt) parse(STMT, fmt, subst.toArray());
     }
 
-    /** Parse a string into a <code>TypeNode</code> AST node,
+    /** Parse a string into a {@code TypeNode} AST node,
      * applying substitutions. */
     public TypeNode parseType(String fmt, Object... os) {
         return (TypeNode) parse(TYPE, fmt, os);
     }
 
-    /** Parse a string into a <code>TypeNode</code> AST node,
+    /** Parse a string into a {@code TypeNode} AST node,
      * applying substitutions. */
     public TypeNode parseType(String fmt, List<?> subst) {
         return (TypeNode) parse(TYPE, fmt, subst.toArray());
     }
 
-    /** Create a lexer that performs the substitutions in <code>subst</code>. */
+    /** Create a lexer that performs the substitutions in {@code subst}. */
     protected Lexer lexer(String fmt, Position pos, Object... subst) {
         return new polyglot.qq.Lexer_c(fmt, pos, subst);
     }

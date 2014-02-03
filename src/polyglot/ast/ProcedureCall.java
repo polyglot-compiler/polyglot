@@ -26,11 +26,12 @@
 
 package polyglot.ast;
 
-import polyglot.types.ProcedureInstance;
 import java.util.List;
 
+import polyglot.types.ProcedureInstance;
+
 /**
- * A <code>ProcedureCall</code> is an interface representing a
+ * A {@code ProcedureCall} is an interface representing a
  * method or constructor call.
  */
 public interface ProcedureCall extends Term {
@@ -47,7 +48,7 @@ public interface ProcedureCall extends Term {
     ProcedureCall arguments(List<Expr> arguments);
 
     /**
-     * The type object of the method we are calling.  This is, generally, only
+     * The type object of the procedure we are calling.  This is, generally, only
      * valid after the type-checking pass.
      */
     ProcedureInstance procedureInstance();

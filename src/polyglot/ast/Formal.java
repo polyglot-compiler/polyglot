@@ -30,7 +30,7 @@ import polyglot.types.Flags;
 import polyglot.types.LocalInstance;
 
 /**
- * A <code>Formal</code> represents a formal parameter to a method
+ * A {@code Formal} represents a formal parameter to a method
  * or constructor or to a catch block.  It consists of a type and a variable
  * identifier.
  */

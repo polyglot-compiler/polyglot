@@ -59,19 +59,16 @@ public class Local_c extends Expr_c implements Local {
         this.name = name;
     }
 
-    /** Get the precedence of the local. */
     @Override
     public Precedence precedence() {
         return Precedence.LITERAL;
     }
 
-    /** Get the name of the local. */
     @Override
     public Id id() {
         return this.name;
     }
 
-    /** Set the name of the local. */
     @Override
     public Local id(Id name) {
         Local_c n = (Local_c) copy();
@@ -79,37 +76,31 @@ public class Local_c extends Expr_c implements Local {
         return n;
     }
 
-    /** Get the name of the local. */
     @Override
     public String name() {
         return this.name.id();
     }
 
-    /** Set the name of the local. */
     @Override
     public Local name(String name) {
         return id(this.name.id(name));
     }
 
-    /** Return the access flags of the variable. */
     @Override
     public Flags flags() {
         return li.flags();
     }
 
-    /** Get the local instance of the local. */
     @Override
     public VarInstance varInstance() {
         return li;
     }
 
-    /** Get the local instance of the local. */
     @Override
     public LocalInstance localInstance() {
         return li;
     }
 
-    /** Set the local instance of the local. */
     @Override
     public Local localInstance(LocalInstance li) {
         if (li == this.li) return this;
@@ -129,7 +120,6 @@ public class Local_c extends Expr_c implements Local {
         return this;
     }
 
-    /** Visit the children of the constructor. */
     @Override
     public Node visitChildren(NodeVisitor v) {
         Id name = visitChild(this.name, v);
@@ -150,7 +140,6 @@ public class Local_c extends Expr_c implements Local {
         return n.localInstance(li);
     }
 
-    /** Type check the local. */
     @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
         Context c = tc.context();
@@ -192,13 +181,11 @@ public class Local_c extends Expr_c implements Local {
         return name.toString();
     }
 
-    /** Write the local to an output file. */
     @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
         tr.print(this, name, w);
     }
 
-    /** Dumps the AST. */
     @Override
     public void dump(CodeWriter w) {
         super.dump(w);

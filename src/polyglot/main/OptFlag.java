@@ -561,7 +561,7 @@ public abstract class OptFlag<T> implements Comparable<OptFlag<T>> {
          * @param entry
          *      an entry of the path string
          * @return 
-         *      the value corresponding to the path entry or <code>null</code> to skip this entry.
+         *      the value corresponding to the path entry or {@code null} to skip this entry.
          */
         public abstract T handlePathEntry(String entry);
 

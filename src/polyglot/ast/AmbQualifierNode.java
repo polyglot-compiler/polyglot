@@ -27,19 +27,16 @@
 package polyglot.ast;
 
 /**
- * An <code>AmbQualifierNode</code> is an ambiguous AST node composed of
+ * An {@code AmbQualifierNode} is an ambiguous AST node composed of
  * dot-separated list of identifiers that must resolve to a type qualifier.
  */
 public interface AmbQualifierNode extends Ambiguous, QualifierNode {
-    /**
-     * Qualifier of the qualifier.
-     */
+    /** Get the qualifier of the qualifier. */
     QualifierNode qual();
 
-    /**
-     * Ambiguous name.
-     */
+    /** Get the name of the qualifier. */
     String name();
 
+    /** Get the name of the qualifier. */
     Id id();
 }

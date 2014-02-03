@@ -32,7 +32,7 @@ import polyglot.types.ConstructorInstance;
 import polyglot.types.Flags;
 
 /**
- * A <code>ConstructorDecl</code> is an immutable representation of a
+ * A {@code ConstructorDecl} is an immutable representation of a
  * constructor declaration as part of a class body. 
  */
 public interface ConstructorDecl extends ProcedureDecl {
@@ -86,7 +86,7 @@ public interface ConstructorDecl extends ProcedureDecl {
     ConstructorDecl throwTypes(List<TypeNode> throwTypes);
 
     /**
-     * The constructor type object.  This field may not be valid until
+     * The constructor's type object.  This field may not be valid until
      * after signature disambiguation.
      */
     ConstructorInstance constructorInstance();

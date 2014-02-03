@@ -88,7 +88,7 @@ public class AnnotationChecker extends ContextVisitor {
 
     /** 
      * 
-     * Is the annotation element <code>annotation</code> applicable
+     * Is the annotation element {@code annotation} applicable
      * to Declaration decl? For example, if annotation is "@Override" then decl
      * better be a methodInstance that overrides another method. If annotation's
      * type itself has annotations describing which targets are appropriate,

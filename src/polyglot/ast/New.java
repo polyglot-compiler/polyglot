@@ -32,11 +32,11 @@ import polyglot.types.ConstructorInstance;
 import polyglot.types.ParsedClassType;
 
 /**
- * A <code>New</code> is an immutable representation of the use of the
- * <code>new</code> operator to create a new instance of a class.  In
- * addition to the type of the class being created, a <code>New</code> has a
+ * A {@code New} is an immutable representation of the use of the
+ * {@code new} operator to create a new instance of a class.  In
+ * addition to the type of the class being created, a {@code New} has a
  * list of arguments to be passed to the constructor of the object and an
- * optional <code>ClassBody</code> used to support anonymous classes.
+ * optional {@code ClassBody} used to support anonymous classes.
  */
 public interface New extends Expr, ProcedureCall {
     /** The type object for anonymous classes, or null. */

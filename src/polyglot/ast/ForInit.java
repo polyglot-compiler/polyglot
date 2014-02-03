@@ -27,8 +27,8 @@
 package polyglot.ast;
 
 /**
- * A <code>ForInit</code> represents a statement that can be used as a
- * initializer in a "for" statement.
+ * A {@code ForInit} represents a statement that can be used as a
+ * initializer in a {@code for} statement.
  */
 public interface ForInit extends Stmt {
 }

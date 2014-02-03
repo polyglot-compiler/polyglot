@@ -52,7 +52,7 @@ import polyglot.util.InternalCompilerError;
 
 /**
  * A Translator generates output code from the processed AST. Output is sent to
- * one or more java file in the directory <code>Options.output_directory</code>.
+ * one or more java file in the directory {@code Options.output_directory}.
  * Each SourceFile in the AST is output to exactly one java file. The name of
  * that file is determined as follows:
  * <ul>
@@ -70,7 +70,7 @@ import polyglot.util.InternalCompilerError;
  * new Translator(job, ts, nf, tf).translate(ast);
  * </pre>
  * 
- * The <code>ast</code> must be either a SourceFile or a SourceCollection.
+ * The {@code ast} must be either a SourceFile or a SourceCollection.
  */
 public class Translator extends PrettyPrinter implements Copy<Translator> {
     protected Job job;
@@ -86,7 +86,7 @@ public class Translator extends PrettyPrinter implements Copy<Translator> {
 
     /**
      * Create a Translator. The output of the visitor is a collection of files
-     * whose names are added to the collection <code>outputFiles</code>.
+     * whose names are added to the collection {@code outputFiles}.
      */
     public Translator(Job job, TypeSystem ts, NodeFactory nf, TargetFactory tf) {
         super(nf.lang());
@@ -131,8 +131,8 @@ public class Translator extends PrettyPrinter implements Copy<Translator> {
     }
 
     /**
-     * Create a new <code>Translator</code> identical to <code>this</code> but
-     * with new context <code>c</code>
+     * Create a new {@code Translator} identical to {@code this} but
+     * with new context {@code c}
      */
     public Translator context(Context c) {
         if (c == this.context) {
@@ -146,7 +146,7 @@ public class Translator extends PrettyPrinter implements Copy<Translator> {
     /**
      * Print an ast node using the given code writer. This method should not be
      * called directly to translate a source file AST; use
-     * <code>translate(Node)</code> instead. This method should only be called
+     * {@code translate(Node)} instead. This method should only be called
      * by nodes to print their children.
      */
     @Override
@@ -281,8 +281,8 @@ public class Translator extends PrettyPrinter implements Copy<Translator> {
     }
 
     /**
-     * Translate a top-level declaration <code>decl</code> of source file
-     * <code>source</code>.
+     * Translate a top-level declaration {@code decl} of source file
+     * {@code source}.
      * 
      * @param w
      * @param source

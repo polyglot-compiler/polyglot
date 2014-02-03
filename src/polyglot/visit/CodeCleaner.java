@@ -43,7 +43,7 @@ import polyglot.ast.Throw;
 import polyglot.util.Position;
 
 /**
- * The <code>CodeCleaner</code> runs over the AST and performs some trivial
+ * The {@code CodeCleaner} runs over the AST and performs some trivial
  * dead code elimination, while flattening blocks wherever possible.
  **/
 public class CodeCleaner extends NodeVisitor {

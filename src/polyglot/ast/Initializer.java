@@ -26,11 +26,11 @@
 
 package polyglot.ast;
 
-import polyglot.types.InitializerInstance;
 import polyglot.types.Flags;
+import polyglot.types.InitializerInstance;
 
 /**
- * An <code>Initializer</code> is an immutable representation of an
+ * An {@code Initializer} is an immutable representation of an
  * initializer block in a Java class (which appears outside of any
  * method).  Such a block is executed before the code for any of the
  * constructors.  Such a block can optionally be static, in which case

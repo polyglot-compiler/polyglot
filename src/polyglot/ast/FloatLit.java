@@ -30,8 +30,8 @@ import polyglot.util.Enum;
 import polyglot.util.SerialVersionUID;
 
 /** 
- * A <code>FloatLit</code> represents a literal in java of type
- * <code>float</code> or <code>double</code>.
+ * A {@code FloatLit} represents a literal in java of type
+ * {@code float} or {@code double}.
  */
 public interface FloatLit extends Lit {
     /** Integer literal kinds: float (e.g., 0.0F) or double (e.g., 0.0). */

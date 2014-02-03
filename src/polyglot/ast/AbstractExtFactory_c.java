@@ -27,24 +27,24 @@
 package polyglot.ast;
 
 /**
- * This abstract implementation of <code>ExtFactory</code> provides
+ * This abstract implementation of {@code ExtFactory} provides
  * a way of chaining together ExtFactories, and default implementations
  * of factory methods for each node.
  * 
  * <p>
- * For a given type of AST node <code>N</code>, there are three methods:
- * <code>extN()</code>,  <code>extNImpl()</code> and <code>postExtN(Ext)</code>. 
- * The method <code>extN()</code> calls <code>extNImpl()</code> to create
- * an appropriate extension object, and if other <code>ExtFactory</code>s are 
- * chained onto this one, it will also call <code>extN()</code> on the next 
- * <code>ExtFactory</code>. The method <code>extN()</code> will then 
- * call <code>postExtN</code>, passing in the newly created extension object.
+ * For a given type of AST node {@code N}, there are three methods:
+ * {@code extN()},  {@code extNImpl()} and {@code postExtN(Ext)}. 
+ * The method {@code extN()} calls {@code extNImpl()} to create
+ * an appropriate extension object, and if other {@code ExtFactory}s are 
+ * chained onto this one, it will also call {@code extN()} on the next 
+ * {@code ExtFactory}. The method {@code extN()} will then 
+ * call {@code postExtN}, passing in the newly created extension object.
  * 
  * <p>
- * The default implementation of <code>extNImpl()</code> is to simply call
- * <code>extMImpl()</code>, where <code>M</code> is the immediate 
- * superclass of <code>N</code>. Similarly, the default implementation of
- * <code>postExtN(Ext)</code> is to call <code>postExtM(Ext)</code>.
+ * The default implementation of {@code extNImpl()} is to simply call
+ * {@code extMImpl()}, where {@code M} is the immediate 
+ * superclass of {@code N}. Similarly, the default implementation of
+ * {@code postExtN(Ext)} is to call {@code postExtM(Ext)}.
  * 
  * @see polyglot.ast.AbstractDelFactory_c has a very similar structure. 
  */
@@ -61,7 +61,7 @@ public abstract class AbstractExtFactory_c implements ExtFactory {
      * The next extFactory in the chain. Whenever an extension is instantiated,
      * the next extFactory should be called to see if it also has an extension,
      * and if so, the extensions should be joined together using the method
-     * <code>composeExts</code>
+     * {@code composeExts}
      */
     private ExtFactory nextExtFactory;
 
@@ -73,9 +73,9 @@ public abstract class AbstractExtFactory_c implements ExtFactory {
     /**
      * Compose two extensions together. Order is important: e1 gets added
      * at the end of e2's chain of extensions.
-     * @param e1 the <code>Ext</code> object to add to the end of e2's 
+     * @param e1 the {@code Ext} object to add to the end of e2's 
      *             chain of extensions. 
-     * @param e2 the second <code>Ext</code> object that will have e1 added to 
+     * @param e2 the second {@code Ext} object that will have e1 added to 
      *             its chain of extensions.
      * @return the result of adding e1 to the end of e2's chain of extensions.
      */
@@ -966,632 +966,632 @@ public abstract class AbstractExtFactory_c implements ExtFactory {
     // ********************************************
 
     /**
-     * Create the <code>Ext</code> object for a <code>Name</code> AST node.
-     * @return the <code>Ext</code> object for a <code>Name</code> AST node.
+     * Create the {@code Ext} object for a {@code Name} AST node.
+     * @return the {@code Ext} object for a {@code Name} AST node.
      */
     protected Ext extIdImpl() {
         return extNodeImpl();
     }
 
     /**
-     * Create the <code>Ext</code> object for a <code>AmbAssign</code> AST node.
-     * @return the <code>Ext</code> object for a <code>AmbAssign</code> AST node.
+     * Create the {@code Ext} object for a {@code AmbAssign} AST node.
+     * @return the {@code Ext} object for a {@code AmbAssign} AST node.
      */
     protected Ext extAmbAssignImpl() {
         return extAssignImpl();
     }
 
     /**
-     * Create the <code>Ext</code> object for a <code>AmbExpr</code> AST node.
-     * @return the <code>Ext</code> object for a <code>AmbExpr</code> AST node.
+     * Create the {@code Ext} object for a {@code AmbExpr} AST node.
+     * @return the {@code Ext} object for a {@code AmbExpr} AST node.
      */
     protected Ext extAmbExprImpl() {
         return extExprImpl();
     }
 
     /**
-     * Create the <code>Ext</code> object for a <code>AmbPrefix</code> AST node.
-     * @return the <code>Ext</code> object for a <code>AmbPrefix</code> AST node.
+     * Create the {@code Ext} object for a {@code AmbPrefix} AST node.
+     * @return the {@code Ext} object for a {@code AmbPrefix} AST node.
      */
     protected Ext extAmbPrefixImpl() {
         return extNodeImpl();
     }
 
     /**
-     * Create the <code>Ext</code> object for a <code>AmbQualifierNode</code> AST node.
-     * @return the <code>Ext</code> object for a <code>AmbQualifierNode</code> AST node.
+     * Create the {@code Ext} object for a {@code AmbQualifierNode} AST node.
+     * @return the {@code Ext} object for a {@code AmbQualifierNode} AST node.
      */
     protected Ext extAmbQualifierNodeImpl() {
         return extNodeImpl();
     }
 
     /**
-     * Create the <code>Ext</code> object for a <code>AmbReceiver</code> AST node.
-     * @return the <code>Ext</code> object for a <code>AmbReceiver</code> AST node.
+     * Create the {@code Ext} object for a {@code AmbReceiver} AST node.
+     * @return the {@code Ext} object for a {@code AmbReceiver} AST node.
      */
     protected Ext extAmbReceiverImpl() {
         return extNodeImpl();
     }
 
     /**
-     * Create the <code>Ext</code> object for a <code>AmbTypeNode</code> AST node.
-     * @return the <code>Ext</code> object for a <code>AmbTypeNode</code> AST node.
+     * Create the {@code Ext} object for a {@code AmbTypeNode} AST node.
+     * @return the {@code Ext} object for a {@code AmbTypeNode} AST node.
      */
     protected Ext extAmbTypeNodeImpl() {
         return extTypeNodeImpl();
     }
 
     /**
-     * Create the <code>Ext</code> object for a <code>ArrayAccess</code> AST node.
-     * @return the <code>Ext</code> object for a <code>ArrayAccess</code> AST node.
+     * Create the {@code Ext} object for a {@code ArrayAccess} AST node.
+     * @return the {@code Ext} object for a {@code ArrayAccess} AST node.
      */
     protected Ext extArrayAccessImpl() {
         return extExprImpl();
     }
 
     /**
-     * Create the <code>Ext</code> object for a <code>ArrayInit</code> AST node.
-     * @return the <code>Ext</code> object for a <code>ArrayInit</code> AST node.
+     * Create the {@code Ext} object for a {@code ArrayInit} AST node.
+     * @return the {@code Ext} object for a {@code ArrayInit} AST node.
      */
     protected Ext extArrayInitImpl() {
         return extExprImpl();
     }
 
     /**
-     * Create the <code>Ext</code> object for a <code>ArrayTypeNode</code> AST node.
-     * @return the <code>Ext</code> object for a <code>ArrayTypeNode</code> AST node.
+     * Create the {@code Ext} object for a {@code ArrayTypeNode} AST node.
+     * @return the {@code Ext} object for a {@code ArrayTypeNode} AST node.
      */
     protected Ext extArrayTypeNodeImpl() {
         return extTypeNodeImpl();
     }
 
     /**
-     * Create the <code>Ext</code> object for a <code>Assert</code> AST node.
-     * @return the <code>Ext</code> object for a <code>Assert</code> AST node.
+     * Create the {@code Ext} object for a {@code Assert} AST node.
+     * @return the {@code Ext} object for a {@code Assert} AST node.
      */
     protected Ext extAssertImpl() {
         return extStmtImpl();
     }
 
     /**
-     * Create the <code>Ext</code> object for a <code>Assign</code> AST node.
-     * @return the <code>Ext</code> object for a <code>Assign</code> AST node.
+     * Create the {@code Ext} object for a {@code Assign} AST node.
+     * @return the {@code Ext} object for a {@code Assign} AST node.
      */
     protected Ext extAssignImpl() {
         return extExprImpl();
     }
 
     /**
-     * Create the <code>Ext</code> object for a <code>LocalAssign</code> AST node.
-     * @return the <code>Ext</code> object for a <code>LocalAssign</code> AST node.
+     * Create the {@code Ext} object for a {@code LocalAssign} AST node.
+     * @return the {@code Ext} object for a {@code LocalAssign} AST node.
      */
     protected Ext extLocalAssignImpl() {
         return extAssignImpl();
     }
 
     /**
-     * Create the <code>Ext</code> object for a <code>FieldAssign</code> AST node.
-     * @return the <code>Ext</code> object for a <code>FieldAssign</code> AST node.
+     * Create the {@code Ext} object for a {@code FieldAssign} AST node.
+     * @return the {@code Ext} object for a {@code FieldAssign} AST node.
      */
     protected Ext extFieldAssignImpl() {
         return extAssignImpl();
     }
 
     /**
-     * Create the <code>Ext</code> object for a <code>ArrayAccessAssign</code> AST node.
-     * @return the <code>Ext</code> object for a <code>ArrayAccessAssign</code> AST node.
+     * Create the {@code Ext} object for a {@code ArrayAccessAssign} AST node.
+     * @return the {@code Ext} object for a {@code ArrayAccessAssign} AST node.
      */
     protected Ext extArrayAccessAssignImpl() {
         return extAssignImpl();
     }
 
     /**
-     * Create the <code>Ext</code> object for a <code>Binary</code> AST node.
-     * @return the <code>Ext</code> object for a <code>Binary</code> AST node.
+     * Create the {@code Ext} object for a {@code Binary} AST node.
+     * @return the {@code Ext} object for a {@code Binary} AST node.
      */
     protected Ext extBinaryImpl() {
         return extExprImpl();
     }
 
     /**
-     * Create the <code>Ext</code> object for a <code>Block</code> AST node.
-     * @return the <code>Ext</code> object for a <code>Block</code> AST node.
+     * Create the {@code Ext} object for a {@code Block} AST node.
+     * @return the {@code Ext} object for a {@code Block} AST node.
      */
     protected Ext extBlockImpl() {
         return extCompoundStmtImpl();
     }
 
     /**
-     * Create the <code>Ext</code> object for a <code>BooleanLit</code> AST node.
-     * @return the <code>Ext</code> object for a <code>BooleanLit</code> AST node.
+     * Create the {@code Ext} object for a {@code BooleanLit} AST node.
+     * @return the {@code Ext} object for a {@code BooleanLit} AST node.
      */
     protected Ext extBooleanLitImpl() {
         return extLitImpl();
     }
 
     /**
-     * Create the <code>Ext</code> object for a <code>Branch</code> AST node.
-     * @return the <code>Ext</code> object for a <code>Branch</code> AST node.
+     * Create the {@code Ext} object for a {@code Branch} AST node.
+     * @return the {@code Ext} object for a {@code Branch} AST node.
      */
     protected Ext extBranchImpl() {
         return extStmtImpl();
     }
 
     /**
-     * Create the <code>Ext</code> object for a <code>Call</code> AST node.
-     * @return the <code>Ext</code> object for a <code>Call</code> AST node.
+     * Create the {@code Ext} object for a {@code Call} AST node.
+     * @return the {@code Ext} object for a {@code Call} AST node.
      */
     protected Ext extCallImpl() {
         return extExprImpl();
     }
 
     /**
-     * Create the <code>Ext</code> object for a <code>CanonicalTypeNode</code> AST node.
-     * @return the <code>Ext</code> object for a <code>CanonicalTypeNode</code> AST node.
+     * Create the {@code Ext} object for a {@code CanonicalTypeNode} AST node.
+     * @return the {@code Ext} object for a {@code CanonicalTypeNode} AST node.
      */
     protected Ext extCanonicalTypeNodeImpl() {
         return extTypeNodeImpl();
     }
 
     /**
-     * Create the <code>Ext</code> object for a <code>Case</code> AST node.
-     * @return the <code>Ext</code> object for a <code>Case</code> AST node.
+     * Create the {@code Ext} object for a {@code Case} AST node.
+     * @return the {@code Ext} object for a {@code Case} AST node.
      */
     protected Ext extCaseImpl() {
         return extSwitchElementImpl();
     }
 
     /**
-     * Create the <code>Ext</code> object for a <code>Cast</code> AST node.
-     * @return the <code>Ext</code> object for a <code>Cast</code> AST node.
+     * Create the {@code Ext} object for a {@code Cast} AST node.
+     * @return the {@code Ext} object for a {@code Cast} AST node.
      */
     protected Ext extCastImpl() {
         return extExprImpl();
     }
 
     /**
-     * Create the <code>Ext</code> object for a <code>Catch</code> AST node.
-     * @return the <code>Ext</code> object for a <code>Catch</code> AST node.
+     * Create the {@code Ext} object for a {@code Catch} AST node.
+     * @return the {@code Ext} object for a {@code Catch} AST node.
      */
     protected Ext extCatchImpl() {
         return extCompoundStmtImpl();
     }
 
     /**
-     * Create the <code>Ext</code> object for a <code>CharLit</code> AST node.
-     * @return the <code>Ext</code> object for a <code>CharLit</code> AST node.
+     * Create the {@code Ext} object for a {@code CharLit} AST node.
+     * @return the {@code Ext} object for a {@code CharLit} AST node.
      */
     protected Ext extCharLitImpl() {
         return extNumLitImpl();
     }
 
     /**
-     * Create the <code>Ext</code> object for a <code>ClassBody</code> AST node.
-     * @return the <code>Ext</code> object for a <code>ClassBody</code> AST node.
+     * Create the {@code Ext} object for a {@code ClassBody} AST node.
+     * @return the {@code Ext} object for a {@code ClassBody} AST node.
      */
     protected Ext extClassBodyImpl() {
         return extTermImpl();
     }
 
     /**
-     * Create the <code>Ext</code> object for a <code>ClassDecl</code> AST node.
-     * @return the <code>Ext</code> object for a <code>ClassDecl</code> AST node.
+     * Create the {@code Ext} object for a {@code ClassDecl} AST node.
+     * @return the {@code Ext} object for a {@code ClassDecl} AST node.
      */
     protected Ext extClassDeclImpl() {
         return extTermImpl();
     }
 
     /**
-     * Create the <code>Ext</code> object for a <code>ClassLit</code> AST node.
-     * @return the <code>Ext</code> object for a <code>ClassLit</code> AST node.
+     * Create the {@code Ext} object for a {@code ClassLit} AST node.
+     * @return the {@code Ext} object for a {@code ClassLit} AST node.
      */
     protected Ext extClassLitImpl() {
         return extLitImpl();
     }
 
     /**
-     * Create the <code>Ext</code> object for a <code>ClassMember</code> AST node.
-     * @return the <code>Ext</code> object for a <code>ClassMember</code> AST node.
+     * Create the {@code Ext} object for a {@code ClassMember} AST node.
+     * @return the {@code Ext} object for a {@code ClassMember} AST node.
      */
     protected Ext extClassMemberImpl() {
         return extTermImpl();
     }
 
     /**
-     * Create the <code>Ext</code> object for a <code>CodeDecl</code> AST node.
-     * @return the <code>Ext</code> object for a <code>CodeDecl</code> AST node.
+     * Create the {@code Ext} object for a {@code CodeDecl} AST node.
+     * @return the {@code Ext} object for a {@code CodeDecl} AST node.
      */
     protected Ext extCodeDeclImpl() {
         return extClassMemberImpl();
     }
 
     /**
-     * Create the <code>Ext</code> object for a <code>CompoundStmt</code> AST node.
-     * @return the <code>Ext</code> object for a <code>CompoundStmt</code> AST node.
+     * Create the {@code Ext} object for a {@code CompoundStmt} AST node.
+     * @return the {@code Ext} object for a {@code CompoundStmt} AST node.
      */
     protected Ext extCompoundStmtImpl() {
         return extStmtImpl();
     }
 
     /**
-     * Create the <code>Ext</code> object for a <code>Conditional</code> AST node.
-     * @return the <code>Ext</code> object for a <code>Conditional</code> AST node.
+     * Create the {@code Ext} object for a {@code Conditional} AST node.
+     * @return the {@code Ext} object for a {@code Conditional} AST node.
      */
     protected Ext extConditionalImpl() {
         return extExprImpl();
     }
 
     /**
-     * Create the <code>Ext</code> object for a <code>ConstructorCall</code> AST node.
-     * @return the <code>Ext</code> object for a <code>ConstructorCall</code> AST node.
+     * Create the {@code Ext} object for a {@code ConstructorCall} AST node.
+     * @return the {@code Ext} object for a {@code ConstructorCall} AST node.
      */
     protected Ext extConstructorCallImpl() {
         return extStmtImpl();
     }
 
     /**
-     * Create the <code>Ext</code> object for a <code>ConstructorDecl</code> AST node.
-     * @return the <code>Ext</code> object for a <code>ConstructorDecl</code> AST node.
+     * Create the {@code Ext} object for a {@code ConstructorDecl} AST node.
+     * @return the {@code Ext} object for a {@code ConstructorDecl} AST node.
      */
     protected Ext extConstructorDeclImpl() {
         return extProcedureDeclImpl();
     }
 
     /**
-     * Create the <code>Ext</code> object for a <code>Do</code> AST node.
-     * @return the <code>Ext</code> object for a <code>Do</code> AST node.
+     * Create the {@code Ext} object for a {@code Do} AST node.
+     * @return the {@code Ext} object for a {@code Do} AST node.
      */
     protected Ext extDoImpl() {
         return extLoopImpl();
     }
 
     /**
-     * Create the <code>Ext</code> object for a <code>Empty</code> AST node.
-     * @return the <code>Ext</code> object for a <code>Empty</code> AST node.
+     * Create the {@code Ext} object for a {@code Empty} AST node.
+     * @return the {@code Ext} object for a {@code Empty} AST node.
      */
     protected Ext extEmptyImpl() {
         return extStmtImpl();
     }
 
     /**
-     * Create the <code>Ext</code> object for a <code>Eval</code> AST node.
-     * @return the <code>Ext</code> object for a <code>Eval</code> AST node.
+     * Create the {@code Ext} object for a {@code Eval} AST node.
+     * @return the {@code Ext} object for a {@code Eval} AST node.
      */
     protected Ext extEvalImpl() {
         return extStmtImpl();
     }
 
     /**
-     * Create the <code>Ext</code> object for a <code>Expr</code> AST node.
-     * @return the <code>Ext</code> object for a <code>Expr</code> AST node.
+     * Create the {@code Ext} object for a {@code Expr} AST node.
+     * @return the {@code Ext} object for a {@code Expr} AST node.
      */
     protected Ext extExprImpl() {
         return extTermImpl();
     }
 
     /**
-     * Create the <code>Ext</code> object for a <code>Field</code> AST node.
-     * @return the <code>Ext</code> object for a <code>Field</code> AST node.
+     * Create the {@code Ext} object for a {@code Field} AST node.
+     * @return the {@code Ext} object for a {@code Field} AST node.
      */
     protected Ext extFieldImpl() {
         return extExprImpl();
     }
 
     /**
-     * Create the <code>Ext</code> object for a <code>FieldDecl</code> AST node.
-     * @return the <code>Ext</code> object for a <code>FieldDecl</code> AST node.
+     * Create the {@code Ext} object for a {@code FieldDecl} AST node.
+     * @return the {@code Ext} object for a {@code FieldDecl} AST node.
      */
     protected Ext extFieldDeclImpl() {
         return extClassMemberImpl();
     }
 
     /**
-     * Create the <code>Ext</code> object for a <code>FloatLit</code> AST node.
-     * @return the <code>Ext</code> object for a <code>FloatLit</code> AST node.
+     * Create the {@code Ext} object for a {@code FloatLit} AST node.
+     * @return the {@code Ext} object for a {@code FloatLit} AST node.
      */
     protected Ext extFloatLitImpl() {
         return extLitImpl();
     }
 
     /**
-     * Create the <code>Ext</code> object for a <code>For</code> AST node.
-     * @return the <code>Ext</code> object for a <code>For</code> AST node.
+     * Create the {@code Ext} object for a {@code For} AST node.
+     * @return the {@code Ext} object for a {@code For} AST node.
      */
     protected Ext extForImpl() {
         return extLoopImpl();
     }
 
     /**
-     * Create the <code>Ext</code> object for a <code>Formal</code> AST node.
-     * @return the <code>Ext</code> object for a <code>Formal</code> AST node.
+     * Create the {@code Ext} object for a {@code Formal} AST node.
+     * @return the {@code Ext} object for a {@code Formal} AST node.
      */
     protected Ext extFormalImpl() {
         return extTermImpl();
     }
 
     /**
-     * Create the <code>Ext</code> object for a <code>If</code> AST node.
-     * @return the <code>Ext</code> object for a <code>If</code> AST node.
+     * Create the {@code Ext} object for a {@code If} AST node.
+     * @return the {@code Ext} object for a {@code If} AST node.
      */
     protected Ext extIfImpl() {
         return extCompoundStmtImpl();
     }
 
     /**
-     * Create the <code>Ext</code> object for a <code>Import</code> AST node.
-     * @return the <code>Ext</code> object for a <code>Import</code> AST node.
+     * Create the {@code Ext} object for a {@code Import} AST node.
+     * @return the {@code Ext} object for a {@code Import} AST node.
      */
     protected Ext extImportImpl() {
         return extNodeImpl();
     }
 
     /**
-     * Create the <code>Ext</code> object for a <code>Initializer</code> AST node.
-     * @return the <code>Ext</code> object for a <code>Initializer</code> AST node.
+     * Create the {@code Ext} object for a {@code Initializer} AST node.
+     * @return the {@code Ext} object for a {@code Initializer} AST node.
      */
     protected Ext extInitializerImpl() {
         return extCodeDeclImpl();
     }
 
     /**
-     * Create the <code>Ext</code> object for a <code>Instanceof</code> AST node.
-     * @return the <code>Ext</code> object for a <code>Instanceof</code> AST node.
+     * Create the {@code Ext} object for a {@code Instanceof} AST node.
+     * @return the {@code Ext} object for a {@code Instanceof} AST node.
      */
     protected Ext extInstanceofImpl() {
         return extExprImpl();
     }
 
     /**
-     * Create the <code>Ext</code> object for a <code>IntLit</code> AST node.
-     * @return the <code>Ext</code> object for a <code>IntLit</code> AST node.
+     * Create the {@code Ext} object for a {@code IntLit} AST node.
+     * @return the {@code Ext} object for a {@code IntLit} AST node.
      */
     protected Ext extIntLitImpl() {
         return extNumLitImpl();
     }
 
     /**
-     * Create the <code>Ext</code> object for a <code>Labeled</code> AST node.
-     * @return the <code>Ext</code> object for a <code>Labeled</code> AST node.
+     * Create the {@code Ext} object for a {@code Labeled} AST node.
+     * @return the {@code Ext} object for a {@code Labeled} AST node.
      */
     protected Ext extLabeledImpl() {
         return extCompoundStmtImpl();
     }
 
     /**
-     * Create the <code>Ext</code> object for a <code>Lit</code> AST node.
-     * @return the <code>Ext</code> object for a <code>Lit</code> AST node.
+     * Create the {@code Ext} object for a {@code Lit} AST node.
+     * @return the {@code Ext} object for a {@code Lit} AST node.
      */
     protected Ext extLitImpl() {
         return extExprImpl();
     }
 
     /**
-     * Create the <code>Ext</code> object for a <code>Local</code> AST node.
-     * @return the <code>Ext</code> object for a <code>Local</code> AST node.
+     * Create the {@code Ext} object for a {@code Local} AST node.
+     * @return the {@code Ext} object for a {@code Local} AST node.
      */
     protected Ext extLocalImpl() {
         return extExprImpl();
     }
 
     /**
-     * Create the <code>Ext</code> object for a <code>LocalClassDecl</code> AST node.
-     * @return the <code>Ext</code> object for a <code>LocalClassDecl</code> AST node.
+     * Create the {@code Ext} object for a {@code LocalClassDecl} AST node.
+     * @return the {@code Ext} object for a {@code LocalClassDecl} AST node.
      */
     protected Ext extLocalClassDeclImpl() {
         return extCompoundStmtImpl();
     }
 
     /**
-     * Create the <code>Ext</code> object for a <code>LocalDecl</code> AST node.
-     * @return the <code>Ext</code> object for a <code>LocalDecl</code> AST node.
+     * Create the {@code Ext} object for a {@code LocalDecl} AST node.
+     * @return the {@code Ext} object for a {@code LocalDecl} AST node.
      */
     protected Ext extLocalDeclImpl() {
         return extStmtImpl();
     }
 
     /**
-     * Create the <code>Ext</code> object for a <code>Loop</code> AST node.
-     * @return the <code>Ext</code> object for a <code>Loop</code> AST node.
+     * Create the {@code Ext} object for a {@code Loop} AST node.
+     * @return the {@code Ext} object for a {@code Loop} AST node.
      */
     protected Ext extLoopImpl() {
         return extCompoundStmtImpl();
     }
 
     /**
-     * Create the <code>Ext</code> object for a <code>MethodDecl</code> AST node.
-     * @return the <code>Ext</code> object for a <code>MethodDecl</code> AST node.
+     * Create the {@code Ext} object for a {@code MethodDecl} AST node.
+     * @return the {@code Ext} object for a {@code MethodDecl} AST node.
      */
     protected Ext extMethodDeclImpl() {
         return extProcedureDeclImpl();
     }
 
     /**
-     * Create the <code>Ext</code> object for a <code>NewArray</code> AST node.
-     * @return the <code>Ext</code> object for a <code>NewArray</code> AST node.
+     * Create the {@code Ext} object for a {@code NewArray} AST node.
+     * @return the {@code Ext} object for a {@code NewArray} AST node.
      */
     protected Ext extNewArrayImpl() {
         return extExprImpl();
     }
 
     /**
-     * Create the <code>Ext</code> object for a <code>Node</code> AST node.
-     * @return the <code>Ext</code> object for a <code>Node</code> AST node.
+     * Create the {@code Ext} object for a {@code Node} AST node.
+     * @return the {@code Ext} object for a {@code Node} AST node.
      */
     protected Ext extNodeImpl() {
         return null;
     }
 
     /**
-     * Create the <code>Ext</code> object for a <code>NodeList</code> AST node.
-     * @return the <code>Ext</code> object for a <code>NodeList</code> AST node.
+     * Create the {@code Ext} object for a {@code NodeList} AST node.
+     * @return the {@code Ext} object for a {@code NodeList} AST node.
      */
     protected Ext extNodeListImpl() {
         return extNodeImpl();
     }
 
     /**
-     * Create the <code>Ext</code> object for a <code>New</code> AST node.
-     * @return the <code>Ext</code> object for a <code>New</code> AST node.
+     * Create the {@code Ext} object for a {@code New} AST node.
+     * @return the {@code Ext} object for a {@code New} AST node.
      */
     protected Ext extNewImpl() {
         return extExprImpl();
     }
 
     /**
-     * Create the <code>Ext</code> object for a <code>NullLit</code> AST node.
-     * @return the <code>Ext</code> object for a <code>NullLit</code> AST node.
+     * Create the {@code Ext} object for a {@code NullLit} AST node.
+     * @return the {@code Ext} object for a {@code NullLit} AST node.
      */
     protected Ext extNullLitImpl() {
         return extLitImpl();
     }
 
     /**
-     * Create the <code>Ext</code> object for a <code>NumLit</code> AST node.
-     * @return the <code>Ext</code> object for a <code>NumLit</code> AST node.
+     * Create the {@code Ext} object for a {@code NumLit} AST node.
+     * @return the {@code Ext} object for a {@code NumLit} AST node.
      */
     protected Ext extNumLitImpl() {
         return extLitImpl();
     }
 
     /**
-     * Create the <code>Ext</code> object for a <code>PackageNode</code> AST node.
-     * @return the <code>Ext</code> object for a <code>PackageNode</code> AST node.
+     * Create the {@code Ext} object for a {@code PackageNode} AST node.
+     * @return the {@code Ext} object for a {@code PackageNode} AST node.
      */
     protected Ext extPackageNodeImpl() {
         return extNodeImpl();
     }
 
     /**
-     * Create the <code>Ext</code> object for a <code>ProcedureDecl</code> AST node.
-     * @return the <code>Ext</code> object for a <code>ProcedureDecl</code> AST node.
+     * Create the {@code Ext} object for a {@code ProcedureDecl} AST node.
+     * @return the {@code Ext} object for a {@code ProcedureDecl} AST node.
      */
     protected Ext extProcedureDeclImpl() {
         return extCodeDeclImpl();
     }
 
     /**
-     * Create the <code>Ext</code> object for a <code>Return</code> AST node.
-     * @return the <code>Ext</code> object for a <code>Return</code> AST node.
+     * Create the {@code Ext} object for a {@code Return} AST node.
+     * @return the {@code Ext} object for a {@code Return} AST node.
      */
     protected Ext extReturnImpl() {
         return extStmtImpl();
     }
 
     /**
-     * Create the <code>Ext</code> object for a <code>SourceCollection</code> AST node.
-     * @return the <code>Ext</code> object for a <code>SourceCollection</code> AST node.
+     * Create the {@code Ext} object for a {@code SourceCollection} AST node.
+     * @return the {@code Ext} object for a {@code SourceCollection} AST node.
      */
     protected Ext extSourceCollectionImpl() {
         return extNodeImpl();
     }
 
     /**
-     * Create the <code>Ext</code> object for a <code>SourceFile</code> AST node.
-     * @return the <code>Ext</code> object for a <code>SourceFile</code> AST node.
+     * Create the {@code Ext} object for a {@code SourceFile} AST node.
+     * @return the {@code Ext} object for a {@code SourceFile} AST node.
      */
     protected Ext extSourceFileImpl() {
         return extNodeImpl();
     }
 
     /**
-     * Create the <code>Ext</code> object for a <code>Special</code> AST node.
-     * @return the <code>Ext</code> object for a <code>Special</code> AST node.
+     * Create the {@code Ext} object for a {@code Special} AST node.
+     * @return the {@code Ext} object for a {@code Special} AST node.
      */
     protected Ext extSpecialImpl() {
         return extExprImpl();
     }
 
     /**
-     * Create the <code>Ext</code> object for a <code>Stmt</code> AST node.
-     * @return the <code>Ext</code> object for a <code>Stmt</code> AST node.
+     * Create the {@code Ext} object for a {@code Stmt} AST node.
+     * @return the {@code Ext} object for a {@code Stmt} AST node.
      */
     protected Ext extStmtImpl() {
         return extTermImpl();
     }
 
     /**
-     * Create the <code>Ext</code> object for a <code>StringLit</code> AST node.
-     * @return the <code>Ext</code> object for a <code>StringLit</code> AST node.
+     * Create the {@code Ext} object for a {@code StringLit} AST node.
+     * @return the {@code Ext} object for a {@code StringLit} AST node.
      */
     protected Ext extStringLitImpl() {
         return extLitImpl();
     }
 
     /**
-     * Create the <code>Ext</code> object for a <code>SwitchBlock</code> AST node.
-     * @return the <code>Ext</code> object for a <code>SwitchBlock</code> AST node.
+     * Create the {@code Ext} object for a {@code SwitchBlock} AST node.
+     * @return the {@code Ext} object for a {@code SwitchBlock} AST node.
      */
     protected Ext extSwitchBlockImpl() {
         return extSwitchElementImpl();
     }
 
     /**
-     * Create the <code>Ext</code> object for a <code>SwitchElement</code> AST node.
-     * @return the <code>Ext</code> object for a <code>SwitchElement</code> AST node.
+     * Create the {@code Ext} object for a {@code SwitchElement} AST node.
+     * @return the {@code Ext} object for a {@code SwitchElement} AST node.
      */
     protected Ext extSwitchElementImpl() {
         return extStmtImpl();
     }
 
     /**
-     * Create the <code>Ext</code> object for a <code>Switch</code> AST node.
-     * @return the <code>Ext</code> object for a <code>Switch</code> AST node.
+     * Create the {@code Ext} object for a {@code Switch} AST node.
+     * @return the {@code Ext} object for a {@code Switch} AST node.
      */
     protected Ext extSwitchImpl() {
         return extCompoundStmtImpl();
     }
 
     /**
-     * Create the <code>Ext</code> object for a <code>Synchronized</code> AST node.
-     * @return the <code>Ext</code> object for a <code>Synchronized</code> AST node.
+     * Create the {@code Ext} object for a {@code Synchronized} AST node.
+     * @return the {@code Ext} object for a {@code Synchronized} AST node.
      */
     protected Ext extSynchronizedImpl() {
         return extCompoundStmtImpl();
     }
 
     /**
-     * Create the <code>Ext</code> object for a <code>Term</code> AST node.
-     * @return the <code>Ext</code> object for a <code>Term</code> AST node.
+     * Create the {@code Ext} object for a {@code Term} AST node.
+     * @return the {@code Ext} object for a {@code Term} AST node.
      */
     protected Ext extTermImpl() {
         return extNodeImpl();
     }
 
     /**
-     * Create the <code>Ext</code> object for a <code>Throw</code> AST node.
-     * @return the <code>Ext</code> object for a <code>Throw</code> AST node.
+     * Create the {@code Ext} object for a {@code Throw} AST node.
+     * @return the {@code Ext} object for a {@code Throw} AST node.
      */
     protected Ext extThrowImpl() {
         return extStmtImpl();
     }
 
     /**
-     * Create the <code>Ext</code> object for a <code>Try</code> AST node.
-     * @return the <code>Ext</code> object for a <code>Try</code> AST node.
+     * Create the {@code Ext} object for a {@code Try} AST node.
+     * @return the {@code Ext} object for a {@code Try} AST node.
      */
     protected Ext extTryImpl() {
         return extCompoundStmtImpl();
     }
 
     /**
-     * Create the <code>Ext</code> object for a <code>TypeNode</code> AST node.
-     * @return the <code>Ext</code> object for a <code>TypeNode</code> AST node.
+     * Create the {@code Ext} object for a {@code TypeNode} AST node.
+     * @return the {@code Ext} object for a {@code TypeNode} AST node.
      */
     protected Ext extTypeNodeImpl() {
         return extTermImpl();
     }
 
     /**
-     * Create the <code>Ext</code> object for a <code>Unary</code> AST node.
-     * @return the <code>Ext</code> object for a <code>Unary</code> AST node.
+     * Create the {@code Ext} object for a {@code Unary} AST node.
+     * @return the {@code Ext} object for a {@code Unary} AST node.
      */
     protected Ext extUnaryImpl() {
         return extExprImpl();
     }
 
     /**
-     * Create the <code>Ext</code> object for a <code>While</code> AST node.
-     * @return the <code>Ext</code> object for a <code>While</code> AST node.
+     * Create the {@code Ext} object for a {@code While} AST node.
+     * @return the {@code Ext} object for a {@code While} AST node.
      */
     protected Ext extWhileImpl() {
         return extLoopImpl();

@@ -27,7 +27,8 @@
 package polyglot.ast;
 
 /**
- * An immutable representation of a <code>assert</code> statement.
+ * An {@code Assert} is an immutable representation of an {@code assert}
+ * statement.
  */
 public interface Assert extends Stmt {
     /** The condition to check. */

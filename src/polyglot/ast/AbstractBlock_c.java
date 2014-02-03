@@ -41,7 +41,7 @@ import polyglot.visit.NodeVisitor;
 import polyglot.visit.PrettyPrinter;
 
 /**
- * A <code>Block</code> represents a Java block statement -- an immutable
+ * A {@code Block} represents a Java block statement -- an immutable
  * sequence of statements.
  */
 public abstract class AbstractBlock_c extends Stmt_c implements Block {
@@ -55,13 +55,11 @@ public abstract class AbstractBlock_c extends Stmt_c implements Block {
         this.statements = ListUtil.copy(statements, true);
     }
 
-    /** Get the statements of the block. */
     @Override
     public List<Stmt> statements() {
         return this.statements;
     }
 
-    /** Set the statements of the block. */
     @Override
     public Block statements(List<Stmt> statements) {
         AbstractBlock_c n = (AbstractBlock_c) copy();
@@ -69,7 +67,6 @@ public abstract class AbstractBlock_c extends Stmt_c implements Block {
         return n;
     }
 
-    /** Append a statement to the block. */
     @Override
     public Block append(Stmt stmt) {
         List<Stmt> l = new ArrayList<Stmt>(statements.size() + 1);
@@ -78,7 +75,6 @@ public abstract class AbstractBlock_c extends Stmt_c implements Block {
         return statements(l);
     }
 
-    /** Prepend a statement to the block. */
     @Override
     public Block prepend(Stmt stmt) {
         List<Stmt> l = new ArrayList<Stmt>(statements.size() + 1);
@@ -98,7 +94,6 @@ public abstract class AbstractBlock_c extends Stmt_c implements Block {
         return this;
     }
 
-    /** Visit the children of the block. */
     @Override
     public Node visitChildren(NodeVisitor v) {
         List<Stmt> statements = visitList(this.statements, v);
@@ -110,7 +105,6 @@ public abstract class AbstractBlock_c extends Stmt_c implements Block {
         return c.pushBlock();
     }
 
-    /** Write the block to an output file. */
     @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
         w.begin(0);

@@ -36,7 +36,7 @@ import polyglot.visit.PrettyPrinter;
 import polyglot.visit.TypeChecker;
 
 /**
- * An <code>IntLit</code> represents a literal in Java of an integer
+ * An {@code IntLit} represents a literal in Java of an integer
  * type.
  */
 public class IntLit_c extends NumLit_c implements IntLit {
@@ -51,23 +51,17 @@ public class IntLit_c extends NumLit_c implements IntLit {
         this.kind = kind;
     }
 
-    /**
-     * @return True if this is a boundary case: the literal can only appear
-     * as the operand of a unary minus.
-     */
     @Override
     public boolean boundary() {
         return (kind == INT && (int) value == Integer.MIN_VALUE)
                 || (kind == LONG && value == Long.MIN_VALUE);
     }
 
-    /** Get the value of the expression. */
     @Override
     public long value() {
         return longValue();
     }
 
-    /** Set the value of the expression. */
     @Override
     public IntLit value(long value) {
         IntLit_c n = (IntLit_c) copy();
@@ -75,13 +69,11 @@ public class IntLit_c extends NumLit_c implements IntLit {
         return n;
     }
 
-    /** Get the kind of the expression. */
     @Override
     public IntLit.Kind kind() {
         return kind;
     }
 
-    /** Set the kind of the expression. */
     @Override
     public IntLit kind(IntLit.Kind kind) {
         IntLit_c n = (IntLit_c) copy();
@@ -89,7 +81,6 @@ public class IntLit_c extends NumLit_c implements IntLit {
         return n;
     }
 
-    /** Type check the expression. */
     @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
         TypeSystem ts = tc.typeSystem();

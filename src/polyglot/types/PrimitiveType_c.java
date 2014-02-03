@@ -29,7 +29,11 @@ package polyglot.types;
 import polyglot.util.SerialVersionUID;
 
 /**
- * An <code>PrimitiveType_c</code> represents a primitive type.
+ * A {@code PrimitiveType} represents a type which may not be directly 
+ * coerced to java.lang.Object (under the standard Java type system).    
+ * <p>
+ * This class should never be instantiated directly. Instead, you should
+ * use the {@code TypeSystem.get*} methods.
  */
 public class PrimitiveType_c extends Type_c implements PrimitiveType {
     private static final long serialVersionUID = SerialVersionUID.generate();
@@ -229,20 +233,11 @@ public class PrimitiveType_c extends Type_c implements PrimitiveType {
         return false;
     }
 
-    /**
-     * Returns true if literal value <code>value</code> can be converted to
-     * this primitive type.  This method should be removed.  It is kept
-     * for backward compatibility.
-     */
     @Override
     public boolean numericConversionValidImpl(long value) {
         return numericConversionValidImpl(new Long(value));
     }
 
-    /**
-     * Returns true if literal value <code>value</code> can be converted to
-     * this primitive type.
-     */
     @Override
     public boolean numericConversionValidImpl(Object value) {
         if (value == null) return false;

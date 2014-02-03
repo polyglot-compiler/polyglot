@@ -30,8 +30,8 @@ import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
 
 /**
- * A <code>Stmt</code> represents any Java statement.  All statements must
- * be subtypes of Stmt.
+ * A {@code Stmt} represents any Java statement.  All statements must
+ * be subtypes of {@code Stmt}.
  */
 public abstract class Stmt_c extends Term_c implements Stmt {
     private static final long serialVersionUID = SerialVersionUID.generate();

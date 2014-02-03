@@ -37,7 +37,10 @@ import polyglot.visit.NodeVisitor;
 import polyglot.visit.PrettyPrinter;
 
 /**
- * A <code>SourceCollection</code> represents a collection of source files.
+ * A {@code SourceCollection} represents a collection of source files.
+ * This node should be used only during AST rewriting, just before code
+ * generation in order to generate multiple target files from a single
+ * AST.
  */
 public class SourceCollection_c extends Node_c implements SourceCollection {
     private static final long serialVersionUID = SerialVersionUID.generate();
@@ -55,13 +58,11 @@ public class SourceCollection_c extends Node_c implements SourceCollection {
         return sources.toString();
     }
 
-    /** Get the source files. */
     @Override
     public List<SourceFile> sources() {
         return this.sources;
     }
 
-    /** Set the statements of the block. */
     @Override
     public SourceCollection sources(List<SourceFile> sources) {
         SourceCollection_c n = (SourceCollection_c) copy();
@@ -80,14 +81,12 @@ public class SourceCollection_c extends Node_c implements SourceCollection {
         return this;
     }
 
-    /** Visit the children of the block. */
     @Override
     public Node visitChildren(NodeVisitor v) {
         List<SourceFile> sources = visitList(this.sources, v);
         return reconstruct(sources);
     }
 
-    /** Write the source files to an output file. */
     @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
         for (SourceFile s : sources) {

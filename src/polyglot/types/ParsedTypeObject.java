@@ -29,7 +29,7 @@ package polyglot.types;
 import polyglot.frontend.Job;
 
 /**
- * Comment for <code>ParsedTypeObject</code>
+ * Comment for {@code ParsedTypeObject}
  *
  * @author nystrom
  */

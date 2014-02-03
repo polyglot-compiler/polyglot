@@ -31,7 +31,7 @@ import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
 
 /**
- * Comment for <code>SourceLoadException</code>
+ * Comment for {@code SourceLoadException}
  *
  * @author nystrom
  */

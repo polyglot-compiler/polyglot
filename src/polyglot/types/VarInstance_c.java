@@ -31,7 +31,7 @@ import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
 
 /**
- * A <code>VarInstance</code> contains type information for a variable.  It may
+ * A {@code VarInstance} contains type information for a variable.  It may
  * be either a local or a field.
  */
 public abstract class VarInstance_c extends TypeObject_c implements VarInstance {
@@ -153,7 +153,6 @@ public abstract class VarInstance_c extends TypeObject_c implements VarInstance 
         this.flags = flags;
     }
 
-    /** Destructive update of constant value. */
     @Override
     public void setConstantValue(Object constantValue) {
         if (!(constantValue == null) && !(constantValue instanceof Boolean)
@@ -176,9 +175,6 @@ public abstract class VarInstance_c extends TypeObject_c implements VarInstance 
         this.constantValueSet = true;
     }
 
-    /**
-     * @param name The name to set.
-     */
     @Override
     public void setName(String name) {
         this.name = name;

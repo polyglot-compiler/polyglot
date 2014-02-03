@@ -29,63 +29,66 @@ package polyglot.types;
 import java.util.List;
 
 /**
- * A <code>ReferenceType</code> represents a reference type: a type that
+ * A {@code ReferenceType} represents a reference type: a type that
  * contains methods and fields and is a subtype of Object. Both class
  * types and array types are reference types.
  */
 public interface ReferenceType extends Type {
-    /**
-     * Return the type's supertype.
+    /** 
+     * Returns the supertype of this type.  For every class except Object,
+     * this is non-null.
      */
     Type superType();
 
     /**
-     * Return the type's interfaces.
-     * @return A list of <code>Type</code>.
+     * Returns a list of all the type's interfaces.
+     * @return A list of {@code Type}.
      * @see polyglot.types.Type
      */
     List<? extends ReferenceType> interfaces();
 
     /**
      * Return a list of all the type's members.
-     * @return A list of <code>MemberInstance</code>.
+     * @return A list of {@code MemberInstance}.
      * @see polyglot.types.MemberInstance
      */
     List<? extends MemberInstance> members();
 
     /**
-     * Return the type's fields.
-     * @return A list of <code>FieldInstance</code>.
+     * Returns a list of fields declared in this type.
+     * It does not return fields declared in supertypes.
+     * @return A list of {@code FieldInstance}.
      * @see polyglot.types.FieldInstance
      */
     List<? extends FieldInstance> fields();
 
     /**
-     * Return the type's methods.
-     * @return A list of <code>MethodInstance</code>.
+     * Returns a list of methods declared in this type.
+     * It does not return methods declared in supertypes.
+     * @return A list of {@code MethodInstance}.
      * @see polyglot.types.MethodInstance
      */
     List<? extends MethodInstance> methods();
 
     /**
-     * Return the field named <code>name</code>, or null.
+     * Return the field named {@code name}, or null.
      */
     FieldInstance fieldNamed(String name);
 
     /**
-     * Return the methods named <code>name</code>, if any.
+     * Return the methods named {@code name}, if any.
      * @param name Name of the method to search for.
-     * @return A list of <code>MethodInstance</code>.
+     * @return A list of {@code MethodInstance}.
      * @see polyglot.types.MethodInstance
      */
     List<? extends MethodInstance> methodsNamed(String name);
 
     /**
-     * Return the methods named <code>name</code> with the given formal
+     * Return the methods named {@code name} with the given formal
      * parameter types, if any.
      * @param name Name of the method to search for.
-     * @param argTypes A list of <code>Type</code>.
-     * @return A list of <code>MethodInstance</code>.
+     * @param argTypes A list of {@code Type}.
+     * @return A list of {@code MethodInstance}.
      * @see polyglot.types.Type
      * @see polyglot.types.MethodInstance
      */

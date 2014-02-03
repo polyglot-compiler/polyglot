@@ -40,8 +40,8 @@ import polyglot.visit.PrettyPrinter;
 import polyglot.visit.TypeChecker;
 
 /** 
- * A <code>StringLit</code> represents an immutable instance of a 
- * <code>String</code> which corresponds to a literal string in Java code.
+ * A {@code StringLit} represents an immutable instance of a 
+ * {@code String} which corresponds to a literal string in Java code.
  */
 public class StringLit_c extends Lit_c implements StringLit {
     private static final long serialVersionUID = SerialVersionUID.generate();
@@ -54,13 +54,11 @@ public class StringLit_c extends Lit_c implements StringLit {
         this.value = value;
     }
 
-    /** Get the value of the expression. */
     @Override
     public String value() {
         return this.value;
     }
 
-    /** Set the value of the expression. */
     @Override
     public StringLit value(String value) {
         StringLit_c n = (StringLit_c) copy();
@@ -68,7 +66,6 @@ public class StringLit_c extends Lit_c implements StringLit {
         return n;
     }
 
-    /** Type check the expression. */
     @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
         return type(tc.typeSystem().String());
@@ -86,7 +83,6 @@ public class StringLit_c extends Lit_c implements StringLit {
 
     protected int MAX_LENGTH = 60;
 
-    /** Write the expression to an output file. */
     @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
         List<String> l = breakupString();

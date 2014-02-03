@@ -41,8 +41,8 @@ import polyglot.visit.PrettyPrinter;
 import polyglot.visit.TypeChecker;
 
 /**
- * An <code>Instanceof</code> is an immutable representation of
- * the use of the <code>instanceof</code> operator.
+ * An {@code Instanceof} is an immutable representation of
+ * the use of the {@code instanceof} operator.
  */
 public class Instanceof_c extends Expr_c implements Instanceof {
     private static final long serialVersionUID = SerialVersionUID.generate();
@@ -57,19 +57,16 @@ public class Instanceof_c extends Expr_c implements Instanceof {
         this.compareType = compareType;
     }
 
-    /** Get the precedence of the expression. */
     @Override
     public Precedence precedence() {
         return Precedence.INSTANCEOF;
     }
 
-    /** Get the expression to be tested. */
     @Override
     public Expr expr() {
         return this.expr;
     }
 
-    /** Set the expression to be tested. */
     @Override
     public Instanceof expr(Expr expr) {
         Instanceof_c n = (Instanceof_c) copy();
@@ -77,13 +74,11 @@ public class Instanceof_c extends Expr_c implements Instanceof {
         return n;
     }
 
-    /** Get the type to be compared against. */
     @Override
     public TypeNode compareType() {
         return this.compareType;
     }
 
-    /** Set the type to be compared against. */
     @Override
     public Instanceof compareType(TypeNode compareType) {
         Instanceof_c n = (Instanceof_c) copy();
@@ -103,7 +98,6 @@ public class Instanceof_c extends Expr_c implements Instanceof {
         return this;
     }
 
-    /** Visit the children of the expression. */
     @Override
     public Node visitChildren(NodeVisitor v) {
         Expr expr = visitChild(this.expr, v);
@@ -111,7 +105,6 @@ public class Instanceof_c extends Expr_c implements Instanceof {
         return reconstruct(expr, compareType);
     }
 
-    /** Type check the expression. */
     @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
         TypeSystem ts = tc.typeSystem();
@@ -146,7 +139,6 @@ public class Instanceof_c extends Expr_c implements Instanceof {
         return expr + " instanceof " + compareType;
     }
 
-    /** Write the expression to an output file. */
     @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
         printSubExpr(expr, w, tr);

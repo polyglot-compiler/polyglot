@@ -28,12 +28,12 @@ package polyglot.ast;
 
 /**
  * A code node.  A "code" is the supertype of methods,
- * constructors, and initalizers.
+ * constructors, and initializers.
  */
 public interface CodeBlock extends CodeNode {
     /** The body of the method, constructor, or initializer. */
     Block body();
 
-    /** Set the body. */
+    /** Set the body of the method, constructor, or initializer. */
     CodeBlock body(Block body);
 }

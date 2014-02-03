@@ -46,12 +46,12 @@ import polyglot.visit.PrettyPrinter;
 import polyglot.visit.TypeChecker;
 
 /**
- * A <code>NewArray</code> represents a new array expression such as <code>new
- * File[8][] { null }</code>.  It consists of an element type (e.g.,
- * <code>File</code>), a list of dimension expressions (e.g., 8), 0 or more
- * additional dimensions (e.g., 1 for []), and an array initializer.  The
- * dimensions of the array initializer must equal the number of additional "[]"
- * dimensions.
+ * A {@code NewArray} represents a new array expression such as
+ * {@code new File[8][] { null }}.  It consists of an element type (e.g.,
+ * {@code File}), a list of dimension expressions (e.g., 8), 0 or more
+ * additional dimensions (e.g., 1 for {@code []}), and an array initializer.
+ * The dimensions of the array initializer must equal the number of additional
+ * {@code []} dimensions.
  */
 public class NewArray_c extends Expr_c implements NewArray {
     private static final long serialVersionUID = SerialVersionUID.generate();
@@ -76,13 +76,11 @@ public class NewArray_c extends Expr_c implements NewArray {
         this.init = init;
     }
 
-    /** Get the base type node of the expression. */
     @Override
     public TypeNode baseType() {
         return this.baseType;
     }
 
-    /** Set the base type node of the expression. */
     @Override
     public NewArray baseType(TypeNode baseType) {
         NewArray_c n = (NewArray_c) copy();
@@ -90,13 +88,11 @@ public class NewArray_c extends Expr_c implements NewArray {
         return n;
     }
 
-    /** Get the dimension expressions of the expression. */
     @Override
     public List<Expr> dims() {
         return Collections.unmodifiableList(this.dims);
     }
 
-    /** Set the dimension expressions of the expression. */
     @Override
     public NewArray dims(List<Expr> dims) {
         NewArray_c n = (NewArray_c) copy();
@@ -104,19 +100,16 @@ public class NewArray_c extends Expr_c implements NewArray {
         return n;
     }
 
-    /** Get the number of dimensions of the expression. */
     @Override
     public int numDims() {
         return dims.size() + addDims;
     }
 
-    /** Get the number of additional dimensions of the expression. */
     @Override
     public int additionalDims() {
         return this.addDims;
     }
 
-    /** Set the number of additional dimensions of the expression. */
     @Override
     public NewArray additionalDims(int addDims) {
         NewArray_c n = (NewArray_c) copy();
@@ -124,13 +117,11 @@ public class NewArray_c extends Expr_c implements NewArray {
         return n;
     }
 
-    /** Get the initializer of the expression. */
     @Override
     public ArrayInit init() {
         return this.init;
     }
 
-    /** Set the initializer of the expression. */
     @Override
     public NewArray init(ArrayInit init) {
         NewArray_c n = (NewArray_c) copy();
@@ -153,7 +144,6 @@ public class NewArray_c extends Expr_c implements NewArray {
         return this;
     }
 
-    /** Visit the children of the expression. */
     @Override
     public Node visitChildren(NodeVisitor v) {
         TypeNode baseType = visitChild(this.baseType, v);
@@ -162,7 +152,6 @@ public class NewArray_c extends Expr_c implements NewArray {
         return reconstruct(baseType, dims, init);
     }
 
-    /** Type check the expression. */
     @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
         TypeSystem ts = tc.typeSystem();
@@ -205,7 +194,6 @@ public class NewArray_c extends Expr_c implements NewArray {
         return "new " + baseType + "[...]";
     }
 
-    /** Write the expression to an output file. */
     @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
         w.write("new ");

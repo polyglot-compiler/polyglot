@@ -42,7 +42,7 @@ import polyglot.visit.PrettyPrinter;
 import polyglot.visit.TypeChecker;
 
 /**
- * A <code>Unary</code> represents a Java unary expression, an
+ * A {@code Unary} represents a Java unary expression, an
  * immutable pair of an expression and an operator.
  */
 public class Unary_c extends Expr_c implements Unary {
@@ -58,19 +58,16 @@ public class Unary_c extends Expr_c implements Unary {
         this.expr = expr;
     }
 
-    /** Get the precedence of the expression. */
     @Override
     public Precedence precedence() {
         return Precedence.UNARY;
     }
 
-    /** Get the sub-expression of the expression. */
     @Override
     public Expr expr() {
         return this.expr;
     }
 
-    /** Set the sub-expression of the expression. */
     @Override
     public Unary expr(Expr expr) {
         Unary_c n = (Unary_c) copy();
@@ -78,13 +75,11 @@ public class Unary_c extends Expr_c implements Unary {
         return n;
     }
 
-    /** Get the operator. */
     @Override
     public Unary.Operator operator() {
         return this.op;
     }
 
-    /** Set the operator. */
     @Override
     public Unary operator(Unary.Operator op) {
         Unary_c n = (Unary_c) copy();
@@ -103,14 +98,12 @@ public class Unary_c extends Expr_c implements Unary {
         return this;
     }
 
-    /** Visit the children of the expression. */
     @Override
     public Node visitChildren(NodeVisitor v) {
         Expr expr = visitChild(this.expr, v);
         return reconstruct(expr);
     }
 
-    /** Type check the expression. */
     @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
         TypeSystem ts = tc.typeSystem();
@@ -210,7 +203,6 @@ public class Unary_c extends Expr_c implements Unary {
         return child.type();
     }
 
-    /** Check exceptions thrown by the statement. */
     @Override
     public String toString() {
         if (op == NEG && expr instanceof IntLit && ((IntLit) expr).boundary()) {

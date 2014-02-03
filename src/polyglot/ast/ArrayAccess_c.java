@@ -43,7 +43,7 @@ import polyglot.visit.PrettyPrinter;
 import polyglot.visit.TypeChecker;
 
 /**
- * An <code>ArrayAccess</code> is an immutable representation of an
+ * An {@code ArrayAccess} is an immutable representation of an
  * access of an array member.
  */
 public class ArrayAccess_c extends Expr_c implements ArrayAccess {
@@ -59,19 +59,16 @@ public class ArrayAccess_c extends Expr_c implements ArrayAccess {
         this.index = index;
     }
 
-    /** Get the precedence of the expression. */
     @Override
     public Precedence precedence() {
         return Precedence.LITERAL;
     }
 
-    /** Get the array of the expression. */
     @Override
     public Expr array() {
         return this.array;
     }
 
-    /** Set the array of the expression. */
     @Override
     public ArrayAccess array(Expr array) {
         ArrayAccess_c n = (ArrayAccess_c) copy();
@@ -79,13 +76,11 @@ public class ArrayAccess_c extends Expr_c implements ArrayAccess {
         return n;
     }
 
-    /** Get the index of the expression. */
     @Override
     public Expr index() {
         return this.index;
     }
 
-    /** Set the index of the expression. */
     @Override
     public ArrayAccess index(Expr index) {
         ArrayAccess_c n = (ArrayAccess_c) copy();
@@ -93,7 +88,6 @@ public class ArrayAccess_c extends Expr_c implements ArrayAccess {
         return n;
     }
 
-    /** Return the access flags of the variable. */
     @Override
     public Flags flags() {
         return Flags.NONE;
@@ -111,7 +105,6 @@ public class ArrayAccess_c extends Expr_c implements ArrayAccess {
         return this;
     }
 
-    /** Visit the children of the expression. */
     @Override
     public Node visitChildren(NodeVisitor v) {
         Expr array = visitChild(this.array, v);
@@ -119,7 +112,6 @@ public class ArrayAccess_c extends Expr_c implements ArrayAccess {
         return reconstruct(array, index);
     }
 
-    /** Type check the expression. */
     @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
         TypeSystem ts = tc.typeSystem();
@@ -157,7 +149,6 @@ public class ArrayAccess_c extends Expr_c implements ArrayAccess {
         return array + "[" + index + "]";
     }
 
-    /** Write the expression to an output file. */
     @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
         printSubExpr(array, w, tr);

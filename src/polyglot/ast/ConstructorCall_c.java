@@ -54,8 +54,8 @@ import polyglot.visit.TypeBuilder;
 import polyglot.visit.TypeChecker;
 
 /**
- * A <code>ConstructorCall_c</code> represents a direct call to a constructor.
- * For instance, <code>super(...)</code> or <code>this(...)</code>.
+ * A {@code ConstructorCall} represents a direct call to a constructor.
+ * For instance, {@code super(...)} or {@code this(...)}.
  */
 public class ConstructorCall_c extends Stmt_c implements ConstructorCall {
     private static final long serialVersionUID = SerialVersionUID.generate();
@@ -74,13 +74,11 @@ public class ConstructorCall_c extends Stmt_c implements ConstructorCall {
         this.arguments = ListUtil.copy(arguments, true);
     }
 
-    /** Get the qualifier of the constructor call. */
     @Override
     public Expr qualifier() {
         return this.qualifier;
     }
 
-    /** Set the qualifier of the constructor call. */
     @Override
     public ConstructorCall qualifier(Expr qualifier) {
         ConstructorCall_c n = (ConstructorCall_c) copy();
@@ -88,13 +86,11 @@ public class ConstructorCall_c extends Stmt_c implements ConstructorCall {
         return n;
     }
 
-    /** Get the kind of the constructor call. */
     @Override
     public Kind kind() {
         return this.kind;
     }
 
-    /** Set the kind of the constructor call. */
     @Override
     public ConstructorCall kind(Kind kind) {
         ConstructorCall_c n = (ConstructorCall_c) copy();
@@ -102,13 +98,11 @@ public class ConstructorCall_c extends Stmt_c implements ConstructorCall {
         return n;
     }
 
-    /** Get the actual arguments of the constructor call. */
     @Override
     public List<Expr> arguments() {
         return Collections.unmodifiableList(this.arguments);
     }
 
-    /** Set the actual arguments of the constructor call. */
     @Override
     public ProcedureCall arguments(List<Expr> arguments) {
         ConstructorCall_c n = (ConstructorCall_c) copy();
@@ -121,13 +115,11 @@ public class ConstructorCall_c extends Stmt_c implements ConstructorCall {
         return constructorInstance();
     }
 
-    /** Get the constructor we are calling. */
     @Override
     public ConstructorInstance constructorInstance() {
         return ci;
     }
 
-    /** Set the constructor we are calling. */
     @Override
     public ConstructorCall constructorInstance(ConstructorInstance ci) {
         if (ci == this.ci) return this;
@@ -158,7 +150,6 @@ public class ConstructorCall_c extends Stmt_c implements ConstructorCall {
         return this;
     }
 
-    /** Visit the children of the call. */
     @Override
     public Node visitChildren(NodeVisitor v) {
         Expr qualifier = visitChild(this.qualifier, v);
@@ -194,7 +185,6 @@ public class ConstructorCall_c extends Stmt_c implements ConstructorCall {
         return n.constructorInstance(ci);
     }
 
-    /** Type check the call. */
     @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
         ConstructorCall_c n = this;
@@ -362,7 +352,6 @@ public class ConstructorCall_c extends Stmt_c implements ConstructorCall {
         return (qualifier != null ? qualifier + "." : "") + kind + "(...)";
     }
 
-    /** Write the call to an output file. */
     @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
         if (qualifier != null) {

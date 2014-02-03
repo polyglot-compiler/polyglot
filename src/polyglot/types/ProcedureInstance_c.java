@@ -36,7 +36,7 @@ import polyglot.util.SerialVersionUID;
 import polyglot.util.SubtypeSet;
 
 /**
- * A <code>ProcedureInstance_c</code> contains the type information for a Java
+ * A {@code ProcedureInstance_c} contains the type information for a Java
  * procedure (either a method or a constructor).
  */
 public abstract class ProcedureInstance_c extends TypeObject_c implements
@@ -95,17 +95,11 @@ public abstract class ProcedureInstance_c extends TypeObject_c implements
         this.flags = flags;
     }
 
-    /**
-     * @param formalTypes The formalTypes to set.
-     */
     @Override
     public void setFormalTypes(List<? extends Type> formalTypes) {
         this.formalTypes = ListUtil.copy(formalTypes, true);
     }
 
-    /**
-     * @param throwTypes The throwTypes to set.
-     */
     @Override
     public void setThrowTypes(List<? extends Type> throwTypes) {
         this.throwTypes = ListUtil.copy(throwTypes, true);
@@ -144,8 +138,8 @@ public abstract class ProcedureInstance_c extends TypeObject_c implements
     }
 
     /**
-     * Returns whether <code>this</code> is <i>more specific</i> than
-     * <code>p</code>, where <i>more specific</i> is defined as JLS
+     * Returns whether {@code this} is <i>more specific</i> than
+     * {@code p}, where <i>more specific</i> is defined as JLS
      * 15.12.2.2.
      *<p>
      * <b>Note:</b> There is a fair amount of guesswork since the JLS
@@ -226,13 +220,11 @@ public abstract class ProcedureInstance_c extends TypeObject_c implements
         return p2.callValid(p1.formalTypes());
     }
 
-    /** Returns true if the procedure has the given formal parameter types. */
     @Override
     public final boolean hasFormals(List<? extends Type> formalTypes) {
         return ts.hasFormals(this, formalTypes);
     }
 
-    /** Returns true if the procedure has the given formal parameter types. */
     @Override
     public boolean hasFormalsImpl(List<? extends Type> formalTypes) {
         List<? extends Type> l1 = this.formalTypes();
@@ -253,22 +245,18 @@ public abstract class ProcedureInstance_c extends TypeObject_c implements
         return !(i1.hasNext() || i2.hasNext());
     }
 
-    /** Returns true iff <code>this</code> throws fewer exceptions than
-     * <code>p</code>. */
     @Override
-    public final boolean throwsSubset(ProcedureInstance p) {
-        return ts.throwsSubset(this, p);
+    public final boolean throwsSubset(ProcedureInstance pi) {
+        return ts.throwsSubset(this, pi);
     }
 
-    /** Returns true iff <code>this</code> throws fewer exceptions than
-     * <code>p</code>. */
     @Override
-    public boolean throwsSubsetImpl(ProcedureInstance p) {
+    public boolean throwsSubsetImpl(ProcedureInstance pi) {
         SubtypeSet s1 = new SubtypeSet(ts.Throwable());
         SubtypeSet s2 = new SubtypeSet(ts.Throwable());
 
         s1.addAll(this.throwTypes());
-        s2.addAll(p.throwTypes());
+        s2.addAll(pi.throwTypes());
 
         for (Type t : s1) {
             if (!ts.isUncheckedException(t) && !s2.contains(t)) {
@@ -279,13 +267,11 @@ public abstract class ProcedureInstance_c extends TypeObject_c implements
         return true;
     }
 
-    /** Returns true if a call can be made with the given argument types. */
     @Override
     public final boolean callValid(List<? extends Type> argTypes) {
         return ts.callValid(this, argTypes);
     }
 
-    /** Returns true if a call can be made with the given argument types. */
     @Override
     public boolean callValidImpl(List<? extends Type> argTypes) {
         List<? extends Type> l1 = this.formalTypes();

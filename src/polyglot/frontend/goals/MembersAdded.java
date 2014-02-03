@@ -39,7 +39,7 @@ import polyglot.frontend.passes.AddMembersPass;
 import polyglot.types.ParsedClassType;
 
 /**
- * Comment for <code>MembersAdded</code>
+ * Comment for {@code MembersAdded}
  *
  * @author nystrom
  */

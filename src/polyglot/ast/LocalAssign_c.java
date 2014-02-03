@@ -32,11 +32,11 @@ import polyglot.util.SerialVersionUID;
 import polyglot.visit.CFGBuilder;
 
 /**
- * A <code>LocalAssign_c</code> represents a Java assignment expression
- * to a local variable.  For instance, <code>x = e</code>.
+ * A {@code LocalAssign} represents a Java assignment expression
+ * to a local variable.  For instance, {@code x = e}.
  * 
- * The class of the <code>Expr</code> returned by
- * <code>LocalAssign_c.left()</code>is guaranteed to be an <code>Local</code>.
+ * The class of the {@code Expr} returned by
+ * {@code LocalAssign_c.left()}is guaranteed to be an {@code Local}.
  */
 public class LocalAssign_c extends Assign_c implements LocalAssign {
     private static final long serialVersionUID = SerialVersionUID.generate();

@@ -42,7 +42,7 @@ import polyglot.visit.PrettyPrinter;
 import polyglot.visit.TypeChecker;
 
 /**
- * An immutable representation of a Java language <code>while</code>
+ * An immutable representation of a Java language {@code while}
  * statement.  It contains a statement to be executed and an expression
  * to be tested indicating whether to reexecute the statement.
  */
@@ -59,13 +59,11 @@ public class While_c extends Loop_c implements While {
         this.body = body;
     }
 
-    /** Get the conditional of the statement. */
     @Override
     public Expr cond() {
         return this.cond;
     }
 
-    /** Set the conditional of the statement. */
     @Override
     public While cond(Expr cond) {
         While_c n = (While_c) copy();
@@ -73,13 +71,11 @@ public class While_c extends Loop_c implements While {
         return n;
     }
 
-    /** Get the body of the statement. */
     @Override
     public Stmt body() {
         return this.body;
     }
 
-    /** Set the body of the statement. */
     @Override
     public While body(Stmt body) {
         While_c n = (While_c) copy();
@@ -99,7 +95,6 @@ public class While_c extends Loop_c implements While {
         return this;
     }
 
-    /** Visit the children of the statement. */
     @Override
     public Node visitChildren(NodeVisitor v) {
         Expr cond = visitChild(this.cond, v);
@@ -107,7 +102,6 @@ public class While_c extends Loop_c implements While {
         return reconstruct(cond, body);
     }
 
-    /** Type check the statement. */
     @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
         TypeSystem ts = tc.typeSystem();
@@ -136,7 +130,6 @@ public class While_c extends Loop_c implements While {
         return "while (" + cond + ") ...";
     }
 
-    /** Write the statement to an output file. */
     @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
         w.write("while (");

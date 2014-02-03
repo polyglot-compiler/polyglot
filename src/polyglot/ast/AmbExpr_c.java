@@ -41,7 +41,7 @@ import polyglot.visit.PrettyPrinter;
 import polyglot.visit.TypeChecker;
 
 /**
- * An <code>AmbExpr</code> is an ambiguous AST node composed of a single
+ * An {@code AmbExpr} is an ambiguous AST node composed of a single
  * identifier that must resolve to an expression.
  */
 public class AmbExpr_c extends Expr_c implements AmbExpr {
@@ -55,19 +55,16 @@ public class AmbExpr_c extends Expr_c implements AmbExpr {
         this.name = name;
     }
 
-    /** Get the precedence of the field. */
     @Override
     public Precedence precedence() {
         return Precedence.LITERAL;
     }
 
-    /** Get the name of the expression. */
     @Override
     public Id id() {
         return this.name;
     }
 
-    /** Set the name of the expression. */
     @Override
     public AmbExpr id(Id id) {
         AmbExpr_c n = (AmbExpr_c) copy();
@@ -75,13 +72,11 @@ public class AmbExpr_c extends Expr_c implements AmbExpr {
         return n;
     }
 
-    /** Get the name of the expression. */
     @Override
     public String name() {
         return this.name.id();
     }
 
-    /** Set the name of the expression. */
     @Override
     public AmbExpr name(String name) {
         return id(this.name.id(name));
@@ -97,14 +92,12 @@ public class AmbExpr_c extends Expr_c implements AmbExpr {
         return this;
     }
 
-    /** Visit the children of the constructor. */
     @Override
     public Node visitChildren(NodeVisitor v) {
         Id name = visitChild(this.name, v);
         return reconstruct(name);
     }
 
-    /** Disambiguate the expression. */
     @Override
     public Node disambiguate(AmbiguityRemover ar) throws SemanticException {
         Node n =
@@ -126,7 +119,6 @@ public class AmbExpr_c extends Expr_c implements AmbExpr {
         return this;
     }
 
-    /** Check exceptions thrown by the expression. */
     @Override
     public Node exceptionCheck(ExceptionChecker ec) throws SemanticException {
         throw new InternalCompilerError(position(),
@@ -134,7 +126,6 @@ public class AmbExpr_c extends Expr_c implements AmbExpr {
                                                 + this + ".");
     }
 
-    /** Write the expression to an output file. */
     @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
         tr.print(this, name, w);
@@ -145,18 +136,11 @@ public class AmbExpr_c extends Expr_c implements AmbExpr {
         return name.toString() + "{amb}";
     }
 
-    /**
-     * Return the first (sub)term performed when evaluating this
-     * term.
-     */
     @Override
     public Term firstChild() {
         return null;
     }
 
-    /**
-     * Visit this term in evaluation order.
-     */
     @Override
     public <T> List<T> acceptCFG(CFGBuilder<?> v, List<T> succs) {
         return succs;

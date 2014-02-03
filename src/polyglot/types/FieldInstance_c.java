@@ -33,7 +33,7 @@ import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
 
 /**
- * A <code>FieldInstance</code> contains type information for a field.
+ * A {@code FieldInstance} contains type information for a field.
  */
 public class FieldInstance_c extends VarInstance_c implements FieldInstance {
     private static final long serialVersionUID = SerialVersionUID.generate();
@@ -146,9 +146,6 @@ public class FieldInstance_c extends VarInstance_c implements FieldInstance {
         return isConstant;
     }
 
-    /**
-     * @param container The container to set.
-     */
     @Override
     public void setContainer(ReferenceType container) {
         this.container = container;

@@ -58,7 +58,7 @@ import polyglot.visit.TypeBuilder;
 import polyglot.visit.TypeChecker;
 
 /**
- * A <code>ConstructorDecl</code> is an immutable representation of a
+ * A {@code ConstructorDecl} is an immutable representation of a
  * constructor declaration as part of a class body.
  */
 public class ConstructorDecl_c extends Term_c implements ConstructorDecl,
@@ -93,13 +93,11 @@ public class ConstructorDecl_c extends Term_c implements ConstructorDecl,
         return ci;
     }
 
-    /** Get the flags of the constructor. */
     @Override
     public Flags flags() {
         return this.flags;
     }
 
-    /** Set the flags of the constructor. */
     @Override
     public ConstructorDecl flags(Flags flags) {
         if (flags.equals(this.flags)) return this;
@@ -108,13 +106,11 @@ public class ConstructorDecl_c extends Term_c implements ConstructorDecl,
         return n;
     }
 
-    /** Get the name of the constructor. */
     @Override
     public Id id() {
         return this.name;
     }
 
-    /** Set the name of the constructor. */
     @Override
     public ConstructorDecl id(Id name) {
         ConstructorDecl_c n = (ConstructorDecl_c) copy();
@@ -122,25 +118,21 @@ public class ConstructorDecl_c extends Term_c implements ConstructorDecl,
         return n;
     }
 
-    /** Get the name of the constructor. */
     @Override
     public String name() {
         return this.name.id();
     }
 
-    /** Set the name of the constructor. */
     @Override
     public ConstructorDecl name(String name) {
         return id(this.name.id(name));
     }
 
-    /** Get the formals of the constructor. */
     @Override
     public List<Formal> formals() {
         return Collections.unmodifiableList(this.formals);
     }
 
-    /** Set the formals of the constructor. */
     @Override
     public ConstructorDecl formals(List<Formal> formals) {
         ConstructorDecl_c n = (ConstructorDecl_c) copy();
@@ -148,13 +140,11 @@ public class ConstructorDecl_c extends Term_c implements ConstructorDecl,
         return n;
     }
 
-    /** Get the throwTypes of the constructor. */
     @Override
     public List<TypeNode> throwTypes() {
         return Collections.unmodifiableList(this.throwTypes);
     }
 
-    /** Set the throwTypes of the constructor. */
     @Override
     public ConstructorDecl throwTypes(List<TypeNode> throwTypes) {
         ConstructorDecl_c n = (ConstructorDecl_c) copy();
@@ -167,13 +157,11 @@ public class ConstructorDecl_c extends Term_c implements ConstructorDecl,
         return this.body;
     }
 
-    /** Get the body of the constructor. */
     @Override
     public Block body() {
         return this.body;
     }
 
-    /** Set the body of the constructor. */
     @Override
     public CodeBlock body(Block body) {
         ConstructorDecl_c n = (ConstructorDecl_c) copy();
@@ -181,13 +169,11 @@ public class ConstructorDecl_c extends Term_c implements ConstructorDecl,
         return n;
     }
 
-    /** Get the constructorInstance of the constructor. */
     @Override
     public ConstructorInstance constructorInstance() {
         return ci;
     }
 
-    /** Get the procedureInstance of the constructor. */
     @Override
     public ProcedureInstance procedureInstance() {
         return ci;
@@ -198,7 +184,6 @@ public class ConstructorDecl_c extends Term_c implements ConstructorDecl,
         return procedureInstance();
     }
 
-    /** Set the constructorInstance of the constructor. */
     @Override
     public ConstructorDecl constructorInstance(ConstructorInstance ci) {
         if (ci == this.ci) return this;
@@ -224,7 +209,6 @@ public class ConstructorDecl_c extends Term_c implements ConstructorDecl,
         return this;
     }
 
-    /** Visit the children of the constructor. */
     @Override
     public Node visitChildren(NodeVisitor v) {
         Id name = visitChild(this.name, v);
@@ -306,7 +290,6 @@ public class ConstructorDecl_c extends Term_c implements ConstructorDecl,
         return c.pushCode(ci);
     }
 
-    /** Type check the constructor. */
     @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
         Context c = tc.context();
@@ -379,7 +362,6 @@ public class ConstructorDecl_c extends Term_c implements ConstructorDecl,
         return flags.translate() + name + "(...)";
     }
 
-    /** Write the constructor to an output file. */
     @Override
     public void prettyPrintHeader(Flags flags, CodeWriter w, PrettyPrinter tr) {
         w.begin(0);

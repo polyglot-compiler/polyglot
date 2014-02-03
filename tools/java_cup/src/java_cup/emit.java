@@ -842,7 +842,7 @@ public class emit {
 
         /* emit the table. */
         out.println();
-        out.println("  /** <code>reduce_goto</code> table. */");
+        out.println("  /** {@code reduce_goto} table. */");
         out.println("  protected static final short[][] _reduce_table = ");
         out.print("    unpackFromStrings(");
         do_table_as_string(out, reduce_goto_table);
@@ -850,7 +850,7 @@ public class emit {
 
         /* do the public accessor method */
         out.println();
-        out.println("  /** Access to <code>reduce_goto</code> table. */");
+        out.println("  /** Access to {@code reduce_goto} table. */");
         out.println("  @Override");
         out.println("  public short[][] reduce_table() {return _reduce_table;}");
         out.println();
@@ -1039,12 +1039,12 @@ public class emit {
         out.println();
 
         /* methods to indicate EOF and error symbol indexes */
-        out.println("  /** <code>EOF</code> Symbol index. */");
+        out.println("  /** {@code EOF} Symbol index. */");
         out.println("  @Override");
         out.println("  public int EOF_sym() {return " + terminal.EOF.index()
                 + ";}");
         out.println();
-        out.println("  /** <code>error</code> Symbol index. */");
+        out.println("  /** {@code error} Symbol index. */");
         out.println("  @Override");
         out.println("  public int error_sym() {return "
                 + terminal.error.index() + ";}");

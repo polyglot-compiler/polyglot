@@ -46,8 +46,8 @@ import polyglot.visit.NodeVisitor;
 import polyglot.visit.PrettyPrinter;
 
 /**
- * An immutable representation of a <code>try</code> block, one or more
- * <code>catch</code> blocks, and an optional <code>finally</code> block.
+ * An immutable representation of a {@code try} block, one or more
+ * {@code catch} blocks, and an optional {@code finally} block.
  */
 public class Try_c extends Stmt_c implements Try, TryOps {
     private static final long serialVersionUID = SerialVersionUID.generate();
@@ -66,13 +66,11 @@ public class Try_c extends Stmt_c implements Try, TryOps {
         this.finallyBlock = finallyBlock;
     }
 
-    /** Get the try block of the statement. */
     @Override
     public Block tryBlock() {
         return this.tryBlock;
     }
 
-    /** Set the try block of the statement. */
     @Override
     public Try tryBlock(Block tryBlock) {
         Try_c n = (Try_c) copy();
@@ -80,13 +78,11 @@ public class Try_c extends Stmt_c implements Try, TryOps {
         return n;
     }
 
-    /** Get the catch blocks of the statement. */
     @Override
     public List<Catch> catchBlocks() {
         return Collections.unmodifiableList(this.catchBlocks);
     }
 
-    /** Set the catch blocks of the statement. */
     @Override
     public Try catchBlocks(List<Catch> catchBlocks) {
         Try_c n = (Try_c) copy();
@@ -94,13 +90,11 @@ public class Try_c extends Stmt_c implements Try, TryOps {
         return n;
     }
 
-    /** Get the finally block of the statement. */
     @Override
     public Block finallyBlock() {
         return this.finallyBlock;
     }
 
-    /** Set the finally block of the statement. */
     @Override
     public Try finallyBlock(Block finallyBlock) {
         Try_c n = (Try_c) copy();
@@ -124,7 +118,6 @@ public class Try_c extends Stmt_c implements Try, TryOps {
         return this;
     }
 
-    /** Visit the children of the statement. */
     @Override
     public Node visitChildren(NodeVisitor v) {
         Block tryBlock = visitChild(this.tryBlock, v);
@@ -134,7 +127,7 @@ public class Try_c extends Stmt_c implements Try, TryOps {
     }
 
     /**
-     * Bypass all children when peforming an exception check.
+     * Bypass all children when performing an exception check.
      * exceptionCheck(), called from ExceptionChecker.leave(),
      * will handle visiting children.
      */
@@ -147,7 +140,7 @@ public class Try_c extends Stmt_c implements Try, TryOps {
 
     /**
      * Performs exceptionChecking. This is a special method that is called
-     * via the exceptionChecker's override method (i.e, doesn't follow the
+     * via the exceptionChecker's override method (i.e., doesn't follow the
      * standard model for visitation.  
      *
      * @param ec The ExceptionChecker that was run against the 

@@ -169,8 +169,8 @@ public class AnnotationElemDecl_c extends Term_c implements AnnotationElemDecl {
 
     @Override
     public NodeVisitor buildTypesEnter(TypeBuilder tb) throws SemanticException {
-        // this may not be neccessary - I think this is for scopes for
-        // symbol checking? - in fields and meths there many anon inner 
+        // this may not be necessary - I think this is for scopes for
+        // symbol checking? - in fields and methods there many anon inner 
         // classes and thus a scope is needed - but in annots there 
         // cannot be ???
         return tb.pushCode();

@@ -38,7 +38,7 @@ import polyglot.ast.ProcedureCall;
 import polyglot.types.Type;
 
 /**
- * <code>RedundantCastRemover</code> removes redundant casts.  It's typically
+ * {@code RedundantCastRemover} removes redundant casts.  It's typically
  * used to clean up inefficient translations from the source language to Java.
  * The AST must be type-checked before using this visitor.
  */

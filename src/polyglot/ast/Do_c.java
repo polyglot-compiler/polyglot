@@ -42,7 +42,7 @@ import polyglot.visit.PrettyPrinter;
 import polyglot.visit.TypeChecker;
 
 /**
- * A immutable representation of a Java language <code>do</code> statement. 
+ * A immutable representation of a Java language {@code do} statement. 
  * It contains a statement to be executed and an expression to be tested 
  * indicating whether to reexecute the statement.
  */
@@ -59,13 +59,11 @@ public class Do_c extends Loop_c implements Do {
         this.cond = cond;
     }
 
-    /** Get the body of the statement. */
     @Override
     public Stmt body() {
         return this.body;
     }
 
-    /** Set the body of the statement. */
     @Override
     public Do body(Stmt body) {
         Do_c n = (Do_c) copy();
@@ -73,13 +71,11 @@ public class Do_c extends Loop_c implements Do {
         return n;
     }
 
-    /** Get the conditional of the statement. */
     @Override
     public Expr cond() {
         return this.cond;
     }
 
-    /** Set the conditional of the statement. */
     @Override
     public Do cond(Expr cond) {
         Do_c n = (Do_c) copy();
@@ -99,7 +95,6 @@ public class Do_c extends Loop_c implements Do {
         return this;
     }
 
-    /** Visit the children of the statement. */
     @Override
     public Node visitChildren(NodeVisitor v) {
         Stmt body = visitChild(this.body, v);
@@ -107,7 +102,6 @@ public class Do_c extends Loop_c implements Do {
         return reconstruct(body, cond);
     }
 
-    /** Type check the statement. */
     @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
         TypeSystem ts = tc.typeSystem();
@@ -136,7 +130,6 @@ public class Do_c extends Loop_c implements Do {
         return "do { ... } while (" + cond + ")";
     }
 
-    /** Write the statement to an output file. */
     @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
         w.write("do ");

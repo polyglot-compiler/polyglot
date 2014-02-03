@@ -27,7 +27,8 @@
 package polyglot.ast;
 
 /**
- * An <code>Assign</code> represents a Java assignment expression.
+ * A {@code AmbAssign} represents a Java assignment expression to
+ * an ambiguous expression.
  */
 public interface AmbAssign extends Assign, Ambiguous {
 }

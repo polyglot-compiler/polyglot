@@ -96,13 +96,11 @@ public class MethodDecl_c extends Term_c implements MethodDecl,
         return mi;
     }
 
-    /** Get the flags of the method. */
     @Override
     public Flags flags() {
         return this.flags;
     }
 
-    /** Set the flags of the method. */
     @Override
     public MethodDecl flags(Flags flags) {
         if (flags.equals(this.flags)) return this;
@@ -111,13 +109,11 @@ public class MethodDecl_c extends Term_c implements MethodDecl,
         return n;
     }
 
-    /** Get the return type of the method. */
     @Override
     public TypeNode returnType() {
         return this.returnType;
     }
 
-    /** Set the return type of the method. */
     @Override
     public MethodDecl returnType(TypeNode returnType) {
         MethodDecl_c n = (MethodDecl_c) copy();
@@ -125,13 +121,11 @@ public class MethodDecl_c extends Term_c implements MethodDecl,
         return n;
     }
 
-    /** Get the name of the method. */
     @Override
     public Id id() {
         return this.name;
     }
 
-    /** Set the name of the method. */
     @Override
     public MethodDecl id(Id name) {
         MethodDecl_c n = (MethodDecl_c) copy();
@@ -139,25 +133,21 @@ public class MethodDecl_c extends Term_c implements MethodDecl,
         return n;
     }
 
-    /** Get the name of the method. */
     @Override
     public String name() {
         return this.name.id();
     }
 
-    /** Set the name of the method. */
     @Override
     public MethodDecl name(String name) {
         return id(this.name.id(name));
     }
 
-    /** Get the formals of the method. */
     @Override
     public List<Formal> formals() {
         return Collections.unmodifiableList(this.formals);
     }
 
-    /** Set the formals of the method. */
     @Override
     public MethodDecl formals(List<Formal> formals) {
         MethodDecl_c n = (MethodDecl_c) copy();
@@ -165,7 +155,6 @@ public class MethodDecl_c extends Term_c implements MethodDecl,
         return n;
     }
 
-    /** Get the exception types of the method. */
     @Override
     public List<TypeNode> throwTypes() {
         if (this.throwTypes == null) {
@@ -174,7 +163,6 @@ public class MethodDecl_c extends Term_c implements MethodDecl,
         return Collections.unmodifiableList(this.throwTypes);
     }
 
-    /** Set the exception types of the method. */
     @Override
     public MethodDecl throwTypes(List<TypeNode> throwTypes) {
         MethodDecl_c n = (MethodDecl_c) copy();
@@ -187,13 +175,11 @@ public class MethodDecl_c extends Term_c implements MethodDecl,
         return this.body;
     }
 
-    /** Get the body of the method. */
     @Override
     public Block body() {
         return this.body;
     }
 
-    /** Set the body of the method. */
     @Override
     public CodeBlock body(Block body) {
         MethodDecl_c n = (MethodDecl_c) copy();
@@ -201,13 +187,11 @@ public class MethodDecl_c extends Term_c implements MethodDecl,
         return n;
     }
 
-    /** Get the method instance of the method. */
     @Override
     public MethodInstance methodInstance() {
         return mi;
     }
 
-    /** Set the method instance of the method. */
     @Override
     public MethodDecl methodInstance(MethodInstance mi) {
         if (mi == this.mi) return this;
@@ -221,7 +205,6 @@ public class MethodDecl_c extends Term_c implements MethodDecl,
         return procedureInstance();
     }
 
-    /** Get the procedure instance of the method. */
     @Override
     public ProcedureInstance procedureInstance() {
         return mi;
@@ -246,7 +229,6 @@ public class MethodDecl_c extends Term_c implements MethodDecl,
         return this;
     }
 
-    /** Visit the children of the method. */
     @Override
     public Node visitChildren(NodeVisitor v) {
         Id name = visitChild(this.name, v);
@@ -345,7 +327,6 @@ public class MethodDecl_c extends Term_c implements MethodDecl,
         return c;
     }
 
-    /** Type check the method. */
     @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
         TypeSystem ts = tc.typeSystem();
@@ -442,7 +423,6 @@ public class MethodDecl_c extends Term_c implements MethodDecl,
         return flags.translate() + returnType + " " + name + "(...)";
     }
 
-    /** Write the method to an output file. */
     @Override
     public void prettyPrintHeader(Flags flags, CodeWriter w, PrettyPrinter tr) {
         w.begin(0);

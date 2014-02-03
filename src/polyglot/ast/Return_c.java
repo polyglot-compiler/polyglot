@@ -49,8 +49,8 @@ import polyglot.visit.PrettyPrinter;
 import polyglot.visit.TypeChecker;
 
 /**
- * A <code>Return</code> represents a <code>return</code> statement in Java.
- * It may or may not return a value.  If not <code>expr()</code> should return
+ * A {@code Return} represents a {@code return} statement in Java.
+ * It may or may not return a value.  If not {@code expr()} should return
  * null.
  */
 public class Return_c extends Stmt_c implements Return {
@@ -64,13 +64,11 @@ public class Return_c extends Stmt_c implements Return {
         this.expr = expr;
     }
 
-    /** Get the expression to return, or null. */
     @Override
     public Expr expr() {
         return this.expr;
     }
 
-    /** Set the expression to return, or null. */
     @Override
     public Return expr(Expr expr) {
         Return_c n = (Return_c) copy();
@@ -89,14 +87,12 @@ public class Return_c extends Stmt_c implements Return {
         return this;
     }
 
-    /** Visit the children of the statement. */
     @Override
     public Node visitChildren(NodeVisitor v) {
         Expr expr = visitChild(this.expr, v);
         return reconstruct(expr);
     }
 
-    /** Type check the statement. */
     @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
         TypeSystem ts = tc.typeSystem();
@@ -171,7 +167,6 @@ public class Return_c extends Stmt_c implements Return {
         return "return" + (expr != null ? " " + expr : "") + ";";
     }
 
-    /** Write the statement to an output file. */
     @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
         w.write("return");

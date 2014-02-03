@@ -38,7 +38,7 @@ import polyglot.visit.PrettyPrinter;
 import polyglot.visit.Translator;
 
 /**
- * A <code>PackageNode</code> is the syntactic representation of a 
+ * A {@code PackageNode} is the syntactic representation of a 
  * Java package within the abstract syntax tree.
  */
 public class PackageNode_c extends Node_c implements PackageNode {
@@ -64,13 +64,11 @@ public class PackageNode_c extends Node_c implements PackageNode {
         return this.package_;
     }
 
-    /** Get the package. */
     @Override
     public Package package_() {
         return this.package_;
     }
 
-    /** Set the package. */
     @Override
     public PackageNode package_(Package package_) {
         PackageNode_c n = (PackageNode_c) copy();
@@ -78,7 +76,6 @@ public class PackageNode_c extends Node_c implements PackageNode {
         return n;
     }
 
-    /** Write the package name to an output file. */
     @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
         if (package_ == null) {

@@ -33,7 +33,7 @@ import polyglot.visit.PrettyPrinter;
 import polyglot.visit.TypeChecker;
 
 /**
- * The Java literal <code>null</code>.
+ * The Java literal {@code null}.
  */
 public class NullLit_c extends Lit_c implements NullLit {
     private static final long serialVersionUID = SerialVersionUID.generate();
@@ -42,7 +42,6 @@ public class NullLit_c extends Lit_c implements NullLit {
         super(pos);
     }
 
-    /** Type check the expression. */
     @Override
     public Node typeCheck(TypeChecker tc) {
         return type(tc.typeSystem().Null());
@@ -58,7 +57,6 @@ public class NullLit_c extends Lit_c implements NullLit {
         return "null";
     }
 
-    /** Write the expression to an output file. */
     @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
         w.write("null");

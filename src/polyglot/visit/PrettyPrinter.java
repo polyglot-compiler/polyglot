@@ -87,8 +87,8 @@ public class PrettyPrinter {
     }
 
     /** Print an AST node using the given code writer.  The
-     * <code>CodeWriter.flush()</code> method must be called after this method
-     * to ensure code is output.  Use <code>printAst</code> rather than this
+     * {@code CodeWriter.flush()} method must be called after this method
+     * to ensure code is output.  Use {@code printAst} rather than this
      * method to print the entire AST; this method should only be called by
      * nodes to print their children.
      */

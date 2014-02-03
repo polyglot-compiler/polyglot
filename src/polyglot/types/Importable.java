@@ -27,9 +27,9 @@
 package polyglot.types;
 
 /**
- * An <code>Importable</code> is a type object that can be imported by another
- * type object.  An <code>Importable</code> is contained in a
- * <code>Package</code>.  
+ * An {@code Importable} is a type object that can be imported by another
+ * type object.  An {@code Importable} is contained in a
+ * {@code Package}.  
  */
 public interface Importable extends Named {
     Package package_();

@@ -42,8 +42,8 @@ import polyglot.visit.PrettyPrinter;
 import polyglot.visit.TypeChecker;
 
 /**
- * A <code>Conditional</code> is a representation of a Java ternary
- * expression.  That is, <code>(cond ? consequent : alternative)</code>.
+ * A {@code Conditional} is a representation of a Java ternary
+ * expression.  That is, {@code (cond ? consequent : alternative)}.
  */
 public class Conditional_c extends Expr_c implements Conditional {
     private static final long serialVersionUID = SerialVersionUID.generate();
@@ -61,19 +61,16 @@ public class Conditional_c extends Expr_c implements Conditional {
         this.alternative = alternative;
     }
 
-    /** Get the precedence of the expression. */
     @Override
     public Precedence precedence() {
         return Precedence.CONDITIONAL;
     }
 
-    /** Get the conditional of the expression. */
     @Override
     public Expr cond() {
         return this.cond;
     }
 
-    /** Set the conditional of the expression. */
     @Override
     public Conditional cond(Expr cond) {
         Conditional_c n = (Conditional_c) copy();
@@ -81,13 +78,11 @@ public class Conditional_c extends Expr_c implements Conditional {
         return n;
     }
 
-    /** Get the consequent of the expression. */
     @Override
     public Expr consequent() {
         return this.consequent;
     }
 
-    /** Set the consequent of the expression. */
     @Override
     public Conditional consequent(Expr consequent) {
         Conditional_c n = (Conditional_c) copy();
@@ -95,13 +90,11 @@ public class Conditional_c extends Expr_c implements Conditional {
         return n;
     }
 
-    /** Get the alternative of the expression. */
     @Override
     public Expr alternative() {
         return this.alternative;
     }
 
-    /** Set the alternative of the expression. */
     @Override
     public Conditional alternative(Expr alternative) {
         Conditional_c n = (Conditional_c) copy();
@@ -124,7 +117,6 @@ public class Conditional_c extends Expr_c implements Conditional {
         return this;
     }
 
-    /** Visit the children of the expression. */
     @Override
     public Node visitChildren(NodeVisitor v) {
         Expr cond = visitChild(this.cond, v);
@@ -133,7 +125,6 @@ public class Conditional_c extends Expr_c implements Conditional {
         return reconstruct(cond, consequent, alternative);
     }
 
-    /** Type check the expression. */
     @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
         TypeSystem ts = tc.typeSystem();
@@ -236,7 +227,6 @@ public class Conditional_c extends Expr_c implements Conditional {
         return cond + " ? " + consequent + " : " + alternative;
     }
 
-    /** Write the expression to an output file. */
     @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
         printSubExpr(cond, false, w, tr);

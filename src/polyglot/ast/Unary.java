@@ -30,7 +30,7 @@ import polyglot.util.Enum;
 import polyglot.util.SerialVersionUID;
 
 /**
- * A <code>Unary</code> represents a Java unary expression, an
+ * A {@code Unary} represents a Java unary expression, an
  * immutable pair of an expression and an an operator.
  */
 public interface Unary extends Expr {
@@ -69,10 +69,10 @@ public interface Unary extends Expr {
     public static final Operator POS = new Operator("+", true);
     public static final Operator NOT = new Operator("!", true);
 
-    /** The sub-expression on that to apply the operator. */
+    /** The sub-expression on which to apply the operator. */
     Expr expr();
 
-    /** Set the sub-expression on that to apply the operator. */
+    /** Set the sub-expression on which to apply the operator. */
     Unary expr(Expr e);
 
     /** The operator to apply on the sub-expression. */

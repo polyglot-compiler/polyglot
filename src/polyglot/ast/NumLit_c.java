@@ -43,7 +43,6 @@ public abstract class NumLit_c extends Lit_c implements NumLit {
         this.value = value;
     }
 
-    /** Get the value of the expression. */
     @Override
     public long longValue() {
         return this.value;

@@ -35,8 +35,8 @@ import polyglot.visit.PrettyPrinter;
 import polyglot.visit.TypeChecker;
 
 /** 
- * A <code>FloatLit</code> represents a literal in java of type
- * <code>float</code> or <code>double</code>.
+ * A {@code FloatLit} represents a literal in java of type
+ * {@code float} or {@code double}.
  */
 public class FloatLit_c extends Lit_c implements FloatLit {
     private static final long serialVersionUID = SerialVersionUID.generate();
@@ -51,13 +51,11 @@ public class FloatLit_c extends Lit_c implements FloatLit {
         this.value = value;
     }
 
-    /** Get the kind of the literal. */
     @Override
     public FloatLit.Kind kind() {
         return this.kind;
     }
 
-    /** Set the kind of the literal. */
     @Override
     public FloatLit kind(FloatLit.Kind kind) {
         FloatLit_c n = (FloatLit_c) copy();
@@ -65,13 +63,11 @@ public class FloatLit_c extends Lit_c implements FloatLit {
         return n;
     }
 
-    /** Get the value of the expression. */
     @Override
     public double value() {
         return this.value;
     }
 
-    /** Set the value of the expression. */
     @Override
     public FloatLit value(double value) {
         FloatLit_c n = (FloatLit_c) copy();
@@ -79,7 +75,6 @@ public class FloatLit_c extends Lit_c implements FloatLit {
         return n;
     }
 
-    /** Type check the expression. */
     @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
         if (kind == FLOAT) {
@@ -99,7 +94,6 @@ public class FloatLit_c extends Lit_c implements FloatLit {
         return Double.toString(value);
     }
 
-    /** Write the expression to an output file. */
     @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
         if (kind == FLOAT) {

@@ -41,8 +41,8 @@ import polyglot.visit.TypeBuilder;
 import polyglot.visit.TypeChecker;
 
 /**
- * A <code>TypeNode</code> represents the syntactic representation of a
- * <code>Type</code> within the abstract syntax tree.
+ * An {@code ArrayTypeNode} is a type node for a non-canonical
+ * array type.
  */
 public class ArrayTypeNode_c extends TypeNode_c implements ArrayTypeNode {
     private static final long serialVersionUID = SerialVersionUID.generate();

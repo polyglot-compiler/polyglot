@@ -33,15 +33,15 @@ import polyglot.types.SemanticException;
 import polyglot.types.Type;
 
 /**
- * An <code>ArrayInit</code> is an immutable representation of
+ * An {@code ArrayInit} is an immutable representation of
  * an array initializer, such as { 3, 1, { 4, 1, 5 } }.  Note that
  * the elements of these array may be expressions of any type (e.g.,
- * <code>Call</code>).
+ * {@code Call}).
  */
 public interface ElementValueArrayInit extends Term {
     /**
      * Get the initializer elements.
-     * @return A list of {@link polyglot.ast.Term Term}. Are acutally either expressions of
+     * @return A list of {@link polyglot.ast.Term Term}. Are actually either expressions of
      * AnnotationElems.
      */
     List<Term> elements();

@@ -50,9 +50,9 @@ import polyglot.visit.TypeBuilder;
 import polyglot.visit.TypeChecker;
 
 /**
- * A <code>Field</code> is an immutable representation of a Java field
+ * A {@code Field} is an immutable representation of a Java field
  * access.  It consists of field name and may also have either a 
- * <code>Type</code> or an <code>Expr</code> containing the field being 
+ * {@code Type} or an {@code Expr} containing the field being 
  * accessed.
  */
 public class Field_c extends Expr_c implements Field {
@@ -77,19 +77,16 @@ public class Field_c extends Expr_c implements Field {
         }
     }
 
-    /** Get the precedence of the field. */
     @Override
     public Precedence precedence() {
         return Precedence.LITERAL;
     }
 
-    /** Get the target of the field. */
     @Override
     public Receiver target() {
         return this.target;
     }
 
-    /** Set the target of the field. */
     @Override
     public Field target(Receiver target) {
         Field_c n = (Field_c) copy();
@@ -97,13 +94,11 @@ public class Field_c extends Expr_c implements Field {
         return n;
     }
 
-    /** Get the name of the field. */
     @Override
     public Id id() {
         return this.name;
     }
 
-    /** Set the name of the field. */
     @Override
     public Field id(Id name) {
         Field_c n = (Field_c) copy();
@@ -111,37 +106,31 @@ public class Field_c extends Expr_c implements Field {
         return n;
     }
 
-    /** Get the name of the field. */
     @Override
     public String name() {
         return this.name.id();
     }
 
-    /** Set the name of the field. */
     @Override
     public Field name(String name) {
         return id(this.name.id(name));
     }
 
-    /** Return the access flags of the variable. */
     @Override
     public Flags flags() {
         return fi.flags();
     }
 
-    /** Get the field instance of the field. */
     @Override
     public VarInstance varInstance() {
         return fi;
     }
 
-    /** Get the field instance of the field. */
     @Override
     public FieldInstance fieldInstance() {
         return fi;
     }
 
-    /** Set the field instance of the field. */
     @Override
     public Field fieldInstance(FieldInstance fi) {
         if (fi == this.fi) return this;
@@ -174,7 +163,6 @@ public class Field_c extends Expr_c implements Field {
         return this;
     }
 
-    /** Visit the children of the field. */
     @Override
     public Node visitChildren(NodeVisitor v) {
         Receiver target = visitChild(this.target, v);
@@ -197,7 +185,6 @@ public class Field_c extends Expr_c implements Field {
         return n.fieldInstance(fi);
     }
 
-    /** Type check the field. */
     @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
         Context c = tc.context();
@@ -254,7 +241,6 @@ public class Field_c extends Expr_c implements Field {
         return child.type();
     }
 
-    /** Write the field to an output file. */
     @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
         w.begin(0);

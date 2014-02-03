@@ -64,11 +64,11 @@ import polyglot.visit.TypeBuilder;
 import polyglot.visit.TypeChecker;
 
 /**
- * A <code>New</code> is an immutable representation of the use of the
- * <code>new</code> operator to create a new instance of a class.  In
- * addition to the type of the class being created, a <code>New</code> has a
+ * A {@code New} is an immutable representation of the use of the
+ * {@code new} operator to create a new instance of a class.  In
+ * addition to the type of the class being created, a {@code New} has a
  * list of arguments to be passed to the constructor of the object and an
- * optional <code>ClassBody</code> used to support anonymous classes.
+ * optional {@code ClassBody} used to support anonymous classes.
  */
 public class New_c extends Expr_c implements New, NewOps {
     private static final long serialVersionUID = SerialVersionUID.generate();
@@ -92,13 +92,11 @@ public class New_c extends Expr_c implements New, NewOps {
         this.body = body;
     }
 
-    /** Get the qualifier expression of the allocation. */
     @Override
     public Expr qualifier() {
         return this.qualifier;
     }
 
-    /** Set the qualifier expression of the allocation. */
     @Override
     public New qualifier(Expr qualifier) {
         New_c n = (New_c) copy();
@@ -118,13 +116,11 @@ public class New_c extends Expr_c implements New, NewOps {
         return n;
     }
 
-    /** Get the type we are instantiating. */
     @Override
     public TypeNode objectType() {
         return this.objectType;
     }
 
-    /** Set the type we are instantiating. */
     @Override
     public New objectType(TypeNode objectType) {
         New_c n = (New_c) copy();
@@ -204,7 +200,6 @@ public class New_c extends Expr_c implements New, NewOps {
         return this;
     }
 
-    /** Visit the children of the expression. */
     @Override
     public Node visitChildren(NodeVisitor v) {
         Expr qualifier = visitChild(this.qualifier, v);
@@ -421,11 +416,6 @@ public class New_c extends Expr_c implements New, NewOps {
         return this;
     }
 
-    /**
-     * @param ar
-     * @param ct
-     * @throws SemanticException
-     */
     @Override
     public New findQualifier(AmbiguityRemover ar, ClassType ct)
             throws SemanticException {
@@ -687,7 +677,6 @@ public class New_c extends Expr_c implements New, NewOps {
         return n;
     }
 
-    /** Get the precedence of the expression. */
     @Override
     public Precedence precedence() {
         return Precedence.LITERAL;
@@ -795,10 +784,6 @@ public class New_c extends Expr_c implements New, NewOps {
         return l;
     }
 
-    /**
-     * @param parent
-     * @param tc
-     */
     @Override
     public Node typeCheckOverride(Node parent, TypeChecker tc)
             throws SemanticException {

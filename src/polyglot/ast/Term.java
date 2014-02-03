@@ -32,7 +32,7 @@ import polyglot.util.SubtypeSet;
 import polyglot.visit.CFGBuilder;
 
 /**
- * A <code>Term</code> represents any Java expression or statement on which
+ * A {@code Term} represents any Java expression or statement on which
  * dataflow can be performed.
  */
 public interface Term extends Node {
@@ -57,8 +57,8 @@ public interface Term extends Node {
     public Term firstChild();
 
     /**
-     * Visit this node, calling calling v.edge() for each successor in succs,
-     * if data flows on that edge.
+     * Visit this term in evaluation order, calling v.edge() for each successor
+     * in succs, if data flows on that edge.
      */
     public <T> List<T> acceptCFG(CFGBuilder<?> v, List<T> succs);
 
@@ -78,7 +78,7 @@ public interface Term extends Node {
     /**
      * List of Types with all exceptions possibly thrown by this term.
      * The list is not necessarily correct until after exception-checking.
-     * <code>polyglot.ast.NodeOps.throwTypes()</code> is similar, but exceptions
+     * {@code polyglot.ast.NodeOps.throwTypes()} is similar, but exceptions
      * are not propagated to the containing node.
      */
     public SubtypeSet exceptions();

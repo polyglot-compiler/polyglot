@@ -40,7 +40,7 @@ import polyglot.types.ClassType;
 import polyglot.types.ParsedClassType;
 
 /**
- * Comment for <code>SuperTypesResolved</code>
+ * Comment for {@code SuperTypesResolved}
  *
  * @author nystrom
  */

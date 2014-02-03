@@ -35,13 +35,13 @@ import polyglot.types.Type;
 import polyglot.types.TypeSystem;
 
 /**
- * Class to implement sets containing <code>polyglot.types.Type </code>.  
+ * Class to implement sets containing {@code polyglot.types.Type}.  
  * Set membership is based on the subtype relationships.  Thus, if 
- * <code>S</code> is a supertype of <code>A</code> and <code>B</code>, then
- * { <code>S</code> } union { <code>A</code>,<code>B</code> } = 
- * { <code>S</code> }.  Similarily, we remove elements from the set such 
- * that if <code>s</code> is an element of a set <code>S</code>, then a
- * call to remove <code>r</code> removes all <code>s</code> s.t. r is a 
+ * {@code S} is a supertype of {@code A} and {@code B}, then
+ * { {@code S} } union { {@code A}, {@code B} } = 
+ * { {@code S} }.  Similarly, we remove elements from the set such 
+ * that if {@code s} is an element of a set {@code S}, then a
+ * call to remove {@code r} removes all {@code s} s.t. r is a 
  * a supertype of s.
  */
 public class SubtypeSet implements java.util.Set<Type> {
@@ -82,9 +82,9 @@ public class SubtypeSet implements java.util.Set<Type> {
     }
 
     /**
-     * Add an element of type <code>polyglot.types.Type</code> to the set
+     * Add an element of type {@code polyglot.types.Type} to the set
      * only if it has no supertypes already in the set. If we do add it, 
-     * remove any subtypes of <code>o</code>
+     * remove any subtypes of {@code o}
      * 
      * @param type The element to add.
      */
@@ -148,8 +148,8 @@ public class SubtypeSet implements java.util.Set<Type> {
     }
 
     /**
-     * Check whether object <code>o</code> is in the set. Because of the 
-     * semantics of the subtype set, <code>o</code> is in the set iff
+     * Check whether object {@code o} is in the set. Because of the 
+     * semantics of the subtype set, {@code o} is in the set iff
      * it descends from (or is equal to) one of the elements in the set.
      */
     @Override
@@ -168,7 +168,7 @@ public class SubtypeSet implements java.util.Set<Type> {
     }
 
     /**
-     * Check whether the type <code>t</code> or a subtype is in the set.
+     * Check whether the type {@code t} or a subtype is in the set.
      * Returns true iff it descends from, is equal to, or is a super type of
      * one of the elements in the set.
      */
@@ -205,8 +205,8 @@ public class SubtypeSet implements java.util.Set<Type> {
     }
 
     /**
-     * Removes all elements <code>s</code> in the set such that 
-     * <code>s</code> decends from <code>o</code>
+     * Removes all elements {@code s} in the set such that 
+     * {@code s} decends from {@code o}
      *
      * @return whether or not an element was removed.
      */

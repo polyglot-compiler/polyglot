@@ -14,9 +14,9 @@ import org.apache.tools.ant.util.SourceFileScanner;
 import polyglot.main.Main.TerminationException;
 
 /**
- * An ANT <code>Task</code> to facilitate the building of
+ * An ANT {@code Task} to facilitate the building of
  * of code written in language extensions within the ANT framework. This task
- * can be used similarly way to the <code>JavaC</code> task. 
+ * can be used similarly way to the {@code JavaC} task. 
  * 
  * <p> This class can
  * optionally be subclassed by extensions (to provide compilation for 
@@ -34,16 +34,16 @@ import polyglot.main.Main.TerminationException;
  */
 public class PolyglotAntTask extends MatchingTask {
     /**
-     * Name of the extension, like the <code>-ext</code> command line option.
+     * Name of the extension, like the {@code -ext} command line option.
      */
     protected String extensionName;
     /**
-     * Class of the extension, like the <code>-extclass</code> command line 
+     * Class of the extension, like the {@code -extclass} command line 
      * option.
      */
     protected Class extensionClass;
     /**
-     * Destination directory, like the <code>-d</code> command line option.
+     * Destination directory, like the {@code -d} command line option.
      */
     protected File destDir;
     /**
@@ -52,68 +52,68 @@ public class PolyglotAntTask extends MatchingTask {
     protected Path src;
     
     /**
-     * Bootclasspath, like the <code>-bootclasspath</code> command line option.
+     * Bootclasspath, like the {@code -bootclasspath} command line option.
      */
     protected Path bootclasspath;
     /**
-     * The file extension for sourcefiles, like the <code>-sx</code>
+     * The file extension for sourcefiles, like the {@code -sx}
      * command line option.
      */
     protected String srcExt;
     /**
-     * The file extensions for output files, like the <code>-ox</code>
+     * The file extensions for output files, like the {@code -ox}
      * command line option.
      */
     protected String outputExt;
     /**
      * A file containing additional command line options to parse, like
-     * the <code>@&lt;file$gt;</code> command line option.
+     * the {@code <file>} command line option.
      */
     protected File optionsFile;
     
     /**
-     * The post compiler to invoke, like the <code>-post</code>
+     * The post compiler to invoke, like the {@code -post}
      * command line option.
      */
     protected String post;
     /**
      * Indiciates if the Polyglot compiler should produce serialized type
-     * information in the output files, like the <code>-noserial</code>
+     * information in the output files, like the {@code -noserial}
      * command line option.
      */
     protected boolean noSerial;
     /**
      * Indiciates if the Polyglot compiler should delete the output files
-     * after compilation, like the <code>-nooutput</code> command line option.
+     * after compilation, like the {@code -nooutput} command line option.
      */
     protected boolean noOutput;
     /**
      * Indiciates if the Polyglot compiler should use fully qualified
-     * class names, like the <code>-fqcn</code>
+     * class names, like the {@code -fqcn}
      * command line option.
      */
     protected boolean fqcn;
     /**
      * Indiciates if the Polyglot compiler should use only compile to the 
-     * output files, like the <code>-c</code>
+     * output files, like the {@code -c}
      * command line option.
      */
     protected boolean onlyToJava;
     
     /**
-     * A <code>List</code> of {@link org.apache.tools.ant.types.Commandline.Arguments 
+     * A {@code List} of {@link org.apache.tools.ant.types.Commandline.Arguments 
      * Commandline.Arguments}, to allow the user to specify command line 
      * options that we do not deal with explicitly.
      */
     protected List additionalArgs; 
     
     /**
-     * The classpath to be used for compilation, like the <code>-classpath</code>
+     * The classpath to be used for compilation, like the {@code -classpath}
      * command line option.
      */
     protected Path compileClasspath;
     /**
-     * The path for finding source files, like the <code>-sourcepath</code>
+     * The path for finding source files, like the {@code -sourcepath}
      * command line option.
      */
     protected Path compileSourcepath;

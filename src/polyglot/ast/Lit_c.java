@@ -33,7 +33,7 @@ import polyglot.util.SerialVersionUID;
 import polyglot.visit.CFGBuilder;
 
 /**
- * <code>Lit</code> represents any Java literal.
+ * {@code Lit} represents any Java literal.
  */
 public abstract class Lit_c extends Expr_c implements Lit {
     private static final long serialVersionUID = SerialVersionUID.generate();
@@ -42,7 +42,6 @@ public abstract class Lit_c extends Expr_c implements Lit {
         super(pos);
     }
 
-    /** Get the precedence of the expression. */
     @Override
     public Precedence precedence() {
         return Precedence.LITERAL;

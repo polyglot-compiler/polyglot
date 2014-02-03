@@ -34,7 +34,7 @@ import polyglot.parse.Lexer_c;
 import polyglot.util.ErrorQueue;
 
 /**
- * This is the default <code>ExtensionInfo</code> for the Java language.
+ * This is the default {@code ExtensionInfo} for the Java language.
  *
  * Compilation passes and visitors:
  * <ol>
@@ -61,8 +61,8 @@ import polyglot.util.ErrorQueue;
 public class JLExtensionInfo extends ParserlessJLExtensionInfo {
 
     /**
-     * Return a parser for <code>source</code> using the given
-     * <code>reader</code>.
+     * Return a parser for {@code source} using the given
+     * {@code reader}.
      */
     @Override
     public Parser parser(Reader reader, FileSource source, ErrorQueue eq) {

@@ -45,7 +45,8 @@ import polyglot.visit.Translator;
 import polyglot.visit.TypeChecker;
 
 /**
- * An <code>Assert</code> is an assert statement.
+ * An {@code Assert} is an immutable representation of an {@code assert}
+ * statement.
  */
 public class Assert_c extends Stmt_c implements Assert {
     private static final long serialVersionUID = SerialVersionUID.generate();
@@ -60,13 +61,11 @@ public class Assert_c extends Stmt_c implements Assert {
         this.errorMessage = errorMessage;
     }
 
-    /** Get the condition to check. */
     @Override
     public Expr cond() {
         return this.cond;
     }
 
-    /** Set the condition to check. */
     @Override
     public Assert cond(Expr cond) {
         Assert_c n = (Assert_c) copy();
@@ -74,13 +73,11 @@ public class Assert_c extends Stmt_c implements Assert {
         return n;
     }
 
-    /** Get the error message to report. */
     @Override
     public Expr errorMessage() {
         return this.errorMessage;
     }
 
-    /** Set the error message to report. */
     @Override
     public Assert errorMessage(Expr errorMessage) {
         Assert_c n = (Assert_c) copy();
@@ -145,7 +142,6 @@ public class Assert_c extends Stmt_c implements Assert {
         return child.type();
     }
 
-    /** Visit the children of the statement. */
     @Override
     public Node visitChildren(NodeVisitor v) {
         Expr cond = visitChild(this.cond, v);
@@ -160,7 +156,6 @@ public class Assert_c extends Stmt_c implements Assert {
                 + ";";
     }
 
-    /** Write the statement to an output file. */
     @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
         w.write("assert ");

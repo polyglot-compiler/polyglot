@@ -42,9 +42,9 @@ import polyglot.visit.PrettyPrinter;
 import polyglot.visit.TypeChecker;
 
 /**
- * A <code>Cast</code> is an immutable representation of a casting
- * operation.  It consists of an <code>Expr</code> being cast and a
- * <code>TypeNode</code> being cast to.
+ * A {@code Cast} is an immutable representation of a casting
+ * operation.  It consists of an {@code Expr} being cast and a
+ * {@code TypeNode} being cast to.
  */
 public class Cast_c extends Expr_c implements Cast {
     private static final long serialVersionUID = SerialVersionUID.generate();
@@ -59,19 +59,16 @@ public class Cast_c extends Expr_c implements Cast {
         this.expr = expr;
     }
 
-    /** Get the precedence of the expression. */
     @Override
     public Precedence precedence() {
         return Precedence.CAST;
     }
 
-    /** Get the cast type of the expression. */
     @Override
     public TypeNode castType() {
         return this.castType;
     }
 
-    /** Set the cast type of the expression. */
     @Override
     public Cast castType(TypeNode castType) {
         Cast_c n = (Cast_c) copy();
@@ -79,13 +76,11 @@ public class Cast_c extends Expr_c implements Cast {
         return n;
     }
 
-    /** Get the expression being cast. */
     @Override
     public Expr expr() {
         return this.expr;
     }
 
-    /** Set the expression being cast. */
     @Override
     public Cast expr(Expr expr) {
         Cast_c n = (Cast_c) copy();
@@ -105,7 +100,6 @@ public class Cast_c extends Expr_c implements Cast {
         return this;
     }
 
-    /** Visit the children of the expression. */
     @Override
     public Node visitChildren(NodeVisitor v) {
         TypeNode castType = visitChild(this.castType, v);
@@ -113,7 +107,6 @@ public class Cast_c extends Expr_c implements Cast {
         return reconstruct(castType, expr);
     }
 
-    /** Type check the expression. */
     @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
         TypeSystem ts = tc.typeSystem();
@@ -152,7 +145,6 @@ public class Cast_c extends Expr_c implements Cast {
         return "(" + castType + ") " + expr;
     }
 
-    /** Write the expression to an output file. */
     @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
         w.begin(0);

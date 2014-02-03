@@ -82,23 +82,23 @@ public abstract class DataFlow<FlowItem extends DataFlow.Item> extends
 
     /**
      * Indicates whether the dataflow should be performed on entering a
-     * <code>CodeNode</code>, or on leaving a <code>CodeNode</code>.
+     * {@code CodeNode}, or on leaving a {@code CodeNode}.
      * If dataflow is performed on entry, then the control flow graph
      * will be available when visiting children of the
-     * <code>CodeNode</code>, via the <code>currentFlowGraph</code>
+     * {@code CodeNode}, via the {@code currentFlowGraph}
      * method. If dataflow is performed on leaving, then the control
      * flow graph will not be available, but nested
-     * <code>CodeNode</code>s will have already been processed.
+     * {@code CodeNode}s will have already been processed.
      */
     protected final boolean dataflowOnEntry;
 
     /**
-     * A stack of <code>FlowGraphSource</code>. The flow graph is constructed 
+     * A stack of {@code FlowGraphSource}. The flow graph is constructed 
      * upon entering a CodeNode AST node, and dataflow performed on that flow 
      * graph immediately. The flow graph is available during the visiting of 
      * children of the CodeNode, if subclasses want to use this information
      * to update AST nodes. The stack is maintained only if 
-     * <code>dataflowOnEntry</code> is true.
+     * {@code dataflowOnEntry} is true.
      */
     protected LinkedList<FlowGraphSource<FlowItem>> flowgraphStack;
 
@@ -159,14 +159,14 @@ public abstract class DataFlow<FlowItem extends DataFlow.Item> extends
     }
 
     /**
-     * An <code>Item</code> contains the data which flows during dataflow
+     * An {@code Item} contains the data which flows during dataflow
      * analysis. Each node in the flow graph has two items associated with it:
      * the input item, and the output item, which results from calling
-     * <code>flow</code> with the input item. The input item may itself be the
+     * {@code flow} with the input item. The input item may itself be the
      * result of a call to the confluence method, if many paths flow into the
      * same node.
      * 
-     * NOTE: the <code>equals(Item)</code> method and <code>hashCode()</code>
+     * NOTE: the {@code equals(Item)} method and {@code hashCode()}
      * methods must be implemented to ensure that the dataflow algorithm works
      * correctly.
      */
@@ -189,8 +189,8 @@ public abstract class DataFlow<FlowItem extends DataFlow.Item> extends
             Term node, boolean entry);
 
     /**
-     * Produce new <code>Item</code>s as appropriate for the
-     * <code>Peer</code> and the input <code>Item</code>s. 
+     * Produce new {@code Item}s as appropriate for the
+     * {@code Peer} and the input {@code Item}s. 
      * 
      * @param inItems all the Items flowing into the node. 
      * @param inItemKeys the FlowGraph.EdgeKeys for the items in the list inItems 
@@ -206,8 +206,8 @@ public abstract class DataFlow<FlowItem extends DataFlow.Item> extends
     }
 
     /**
-     * Produce new <code>Item</code>s as appropriate for the
-     * <code>Peer</code> and the input <code>Item</code>s.
+     * Produce new {@code Item}s as appropriate for the
+     * {@code Peer} and the input {@code Item}s.
      * Subclasses should override if flow behavior needs to distinguish
      * between source peers.
      * 
@@ -264,13 +264,13 @@ public abstract class DataFlow<FlowItem extends DataFlow.Item> extends
     }
 
     /**
-     * Produce new <code>Item</code>s as appropriate for the
-     * <code>Term n</code> and the input <code>Item</code>s. The default
-     * implementation of this method is simply to call <code>confluence</code> 
+     * Produce new {@code Item}s as appropriate for the peer's node
+     * and the input {@code Item}s. The default
+     * implementation of this method is simply to call {@code confluence} 
      * for the list of inItems, and pass the result to flow(Item, FlowGraph,
      * Term, Set). Subclasses may want to override this method if a finer-grained
      * dataflow is required. Some subclasses may wish to override this method
-     * to call <code>flowToBooleanFlow</code>.
+     * to call {@code flowToBooleanFlow}.
      * 
      * @param inItems all the Items flowing into the node. 
      * @param inItemKeys the FlowGraph.EdgeKeys for the items in the list inItems 
@@ -294,7 +294,7 @@ public abstract class DataFlow<FlowItem extends DataFlow.Item> extends
     /**
      * A utility method that simply collects together all the 
      * TRUE items, FALSE items, and all other items (including ExceptionEdgeKey
-     * items), calls <code>confluence</code> on each of these three collections
+     * items), calls {@code confluence} on each of these three collections
      * as necessary, and passes the results to 
      * flow(Item, Item, Item, FlowGraph, Term, Set). It is expected that 
      * this method will typically be called by subclasses overriding the
@@ -445,10 +445,10 @@ public abstract class DataFlow<FlowItem extends DataFlow.Item> extends
      * Item from a List of Items, for the confluence just before flow enters 
      * node.
      * 
-     * @param items List of <code>Item</code>s that flow into <code>node</code>.
+     * @param items List of {@code Item}s that flow into {@code node}.
      *            this method will only be called if the list has at least 2
      *            elements.
-     * @param peer <code>Peer</code> for which the <code>items</code> are 
+     * @param peer {@code Peer} for which the {@code items} are 
      *          flowing into.
      * @return a non-null Item.
      */
@@ -460,13 +460,13 @@ public abstract class DataFlow<FlowItem extends DataFlow.Item> extends
      * Item from a List of Items, for the confluence just before flow enters 
      * node.
      * 
-     * @param items List of <code>Item</code>s that flow into <code>node</code>.
+     * @param items List of {@code Item}s that flow into {@code node}.
      *               This method will only be called if the list has at least 2
      *               elements.
-     * @param itemKeys List of <code>FlowGraph.ExceptionEdgeKey</code>s for
-     *              the edges that the corresponding <code>Item</code>s in
-     *              <code>items</code> flowed from.
-     * @param peer <code>Peer</code> for which the <code>items</code> are 
+     * @param itemKeys List of {@code FlowGraph.ExceptionEdgeKey}s for
+     *              the edges that the corresponding {@code Item}s in
+     *              {@code items} flowed from.
+     * @param peer {@code Peer} for which the {@code items} are 
      *          flowing into.
      * @return a non-null Item.
      */
@@ -480,13 +480,13 @@ public abstract class DataFlow<FlowItem extends DataFlow.Item> extends
      * Item from a List of Items, for the confluence just before flow enters 
      * node.
      * 
-     * @param items List of <code>Item</code>s that flow into <code>node</code>.
+     * @param items List of {@code Item}s that flow into {@code node}.
      *               This method will only be called if the list has at least 2
      *               elements.
-     * @param itemKeys List of <code>FlowGraph.ExceptionEdgeKey</code>s for
-     *              the edges that the corresponding <code>Item</code>s in
-     *              <code>items</code> flowed from.
-     * @param peer <code>Peer</code> for which the <code>items</code> are 
+     * @param itemKeys List of {@code FlowGraph.ExceptionEdgeKey}s for
+     *              the edges that the corresponding {@code Item}s in
+     *              {@code items} flowed from.
+     * @param peer {@code Peer} for which the {@code items} are 
      *          flowing into.
      */
     protected FlowItem safeConfluence(List<FlowItem> items,
@@ -558,12 +558,12 @@ public abstract class DataFlow<FlowItem extends DataFlow.Item> extends
     }
 
     /**
-     * Construct a flow graph for the <code>CodeNode</code> provided, and call 
-     * <code>dataflow(FlowGraph)</code>. Is also responsible for calling 
-     * <code>post(FlowGraph, Block)</code> after
-     * <code>dataflow(FlowGraph)</code> has been called, and for pushing
-     * the <code>FlowGraph</code> onto the stack of <code>FlowGraph</code>s if
-     * dataflow analysis is performed on entry to <code>CodeNode</code> nodes.
+     * Construct a flow graph for the {@code CodeNode} provided, and call 
+     * {@code dataflow(FlowGraph)}. Is also responsible for calling 
+     * {@code post(FlowGraph, Block)} after
+     * {@code dataflow(FlowGraph)} has been called, and for pushing
+     * the {@code FlowGraph} onto the stack of {@code FlowGraph}s if
+     * dataflow analysis is performed on entry to {@code CodeNode} nodes.
      */
     protected void dataflow(CodeDecl cd) throws SemanticException {
         this.dataflow((CodeNode) cd);
@@ -744,16 +744,16 @@ public abstract class DataFlow<FlowItem extends DataFlow.Item> extends
     }
 
     /**
-     * Map from <code>Peer</code>s to <code>Integer</code>s that contains a post-ordering
-     * of <code>Peer</code>s if <code>this.detectBackEdges</code> is true.
+     * Map from {@code Peer}s to {@code Integer}s that contains a post-ordering
+     * of {@code Peer}s if {@code this.detectBackEdges} is true.
      */
     protected Map<Peer<FlowItem>, Integer> postordering = null;
 
     /**
-     * Create a postorder on <code>Peer p</code> and all <code>Peer</code>s 
-     * reachable from p (that are reachable without going through any 
-     * peer in the set <code>visited</code>). The postorder will start from 
-     * <code>count</code>.
+     * Create a postorder on {@code Peer p} and all {@code Peer}s 
+     * reachable from {@code p} (that are reachable without going through any 
+     * peer in the set {@code visited}). The postorder will start from 
+     * {@code count}.
      * 
      * @param p
      * @param count
@@ -779,7 +779,7 @@ public abstract class DataFlow<FlowItem extends DataFlow.Item> extends
     }
 
     /**
-     * Perform the dataflow on flowgraph <code>graph</code>.
+     * Perform the dataflow on flow graph {@code graph}.
      */
     protected void dataflow(FlowGraph<FlowItem> graph) {
         if (Report.should_report(Report.dataflow, 1)) {
@@ -878,24 +878,24 @@ public abstract class DataFlow<FlowItem extends DataFlow.Item> extends
     }
 
     /**
-     * Initialize the <code>FlowGraph</code> to be used in the dataflow
+     * Initialize the {@code FlowGraph} to be used in the dataflow
      * analysis.
      *
      * @return null if no dataflow analysis should be performed for this
      *         code declaration; otherwise, an appropriately initialized
-     *         <code>FlowGraph.</code>
+     *         {@code FlowGraph.}
      */
     protected FlowGraph<FlowItem> initGraph(CodeNode code, Term root) {
         return new FlowGraph<FlowItem>(root, forward);
     }
 
     /**
-     * Initialize the <code>FlowGraph</code> to be used in the dataflow
+     * Initialize the {@code FlowGraph} to be used in the dataflow
      * analysis.
      *
      * @return null if no dataflow analysis should be performed for this
      *         code declaration; otherwise, an appropriately initialized
-     *         <code>FlowGraph.</code>
+     *         {@code FlowGraph.}
      */
     protected FlowGraph<FlowItem> initGraph(CodeDecl code, Term root) {
         return initGraph((CodeNode) code, root);
@@ -928,8 +928,8 @@ public abstract class DataFlow<FlowItem extends DataFlow.Item> extends
 
     /**
      * Overridden superclass method, to make sure that if a subclass has changed
-     * a Term, that we update the peermaps appropriately, since they are based
-     * on <code>IdentityKey</code>s.
+     * a Term, that we update the peer maps appropriately, since they are based
+     * on {@code IdentityKey}s.
      */
     @Override
     public Node leave(Node parent, Node old, Node n, NodeVisitor v) {
@@ -950,7 +950,7 @@ public abstract class DataFlow<FlowItem extends DataFlow.Item> extends
 
     /**
      * Overridden superclass method, to pop from the stack of
-     * <code>FlowGraph</code>s if necessary.
+     * {@code FlowGraph}s if necessary.
      */
     @Override
     protected Node leaveCall(Node old, Node n, NodeVisitor v)
@@ -1011,15 +1011,15 @@ public abstract class DataFlow<FlowItem extends DataFlow.Item> extends
     }
 
     /**
-     * Return the <code>FlowGraph</code> at the top of the stack. This method
+     * Return the {@code FlowGraph} at the top of the stack. This method
      * should not be called if dataflow is not being performed on entry to
-     * the <code>CodeNode</code>s, as the stack is not maintained in that case.
+     * the {@code CodeNode}s, as the stack is not maintained in that case.
      * If this 
-     * method is called by a subclass from the <code>enterCall</code> 
-     * or <code>leaveCall</code> methods, for an AST node that is a child
-     * of a <code>CodeNode</code>, then the <code>FlowGraph</code> returned 
-     * should be the <code>FlowGraph</code> for the dataflow for innermost
-     * <code>CodeNode</code>.
+     * method is called by a subclass from the {@code enterCall} 
+     * or {@code leaveCall} methods, for an AST node that is a child
+     * of a {@code CodeNode}, then the {@code FlowGraph} returned 
+     * should be the {@code FlowGraph} for the dataflow for innermost
+     * {@code CodeNode}.
      */
     protected FlowGraph<FlowItem> currentFlowGraph() {
         if (!dataflowOnEntry) {
@@ -1034,19 +1034,19 @@ public abstract class DataFlow<FlowItem extends DataFlow.Item> extends
 
     /**
      * This utility method is for subclasses to convert a single Item into
-     * a <code>Map</code>, to return from the
-     * <code>flow</code> methods. This
-     * method should be used when the same output <code>Item</code> from the
+     * a {@code Map}, to return from the
+     * {@code flow} methods. This
+     * method should be used when the same output {@code Item} from the
      * flow is to be used for all edges leaving the node.
      * 
-     * @param i the <code>Item</code> to be placed in the returned
-     *          <code>Map</code> as the value for every <code>EdgeKey</code> in
-     *          <code>edgeKeys.</code>
-     * @param edgeKeys the <code>Set</code> of <code>EdgeKey</code>s to be used
-     *           as keys in the returned <code>Map</code>.
-     * @return a <code>Map</code> containing a mapping from every
-     *           <code>EdgeKey</code> in <code>edgeKeys</code> to the
-     *           <code>Item i</code>.
+     * @param i the {@code Item} to be placed in the returned
+     *          {@code Map} as the value for every {@code EdgeKey} in
+     *          {@code edgeKeys.}
+     * @param edgeKeys the {@code Set} of {@code EdgeKey}s to be used
+     *           as keys in the returned {@code Map}.
+     * @return a {@code Map} containing a mapping from every
+     *           {@code EdgeKey} in {@code edgeKeys} to the
+     *           {@code Item i}.
      */
     public static final <FlowItem> Map<EdgeKey, FlowItem> itemToMap(FlowItem i,
             Set<EdgeKey> edgeKeys) {
@@ -1059,28 +1059,28 @@ public abstract class DataFlow<FlowItem extends DataFlow.Item> extends
 
     /**
      * This utility method is for subclasses to convert Items into
-     * a <code>Map</code>, to return from the
-     * <code>flow</code> methods. 
+     * a {@code Map}, to return from the
+     * {@code flow} methods. 
      * 
-     * @param trueItem the <code>Item</code> to be placed in the returned
-     *          <code>Map</code> as the value for the 
-     *          <code>FlowGraph.EDGE_KEY_TRUE</code>, if that key is present in
-     *          <code>edgeKeys.</code>
-     * @param falseItem the <code>Item</code> to be placed in the returned
-     *          <code>Map</code> as the value for the 
-     *          <code>FlowGraph.EDGE_KEY_FALSE</code>, if that key is present in
-     *          <code>edgeKeys.</code>
-     * @param remainingItem the <code>Item</code> to be placed in the returned
-     *          <code>Map</code> as the value for any edge key other than 
-     *          <code>FlowGraph.EDGE_KEY_TRUE</code> or 
-     *          <code>FlowGraph.EDGE_KEY_FALSE</code>, if any happen to be 
+     * @param trueItem the {@code Item} to be placed in the returned
+     *          {@code Map} as the value for the 
+     *          {@code FlowGraph.EDGE_KEY_TRUE}, if that key is present in
+     *          {@code edgeKeys.}
+     * @param falseItem the {@code Item} to be placed in the returned
+     *          {@code Map} as the value for the 
+     *          {@code FlowGraph.EDGE_KEY_FALSE}, if that key is present in
+     *          {@code edgeKeys.}
+     * @param remainingItem the {@code Item} to be placed in the returned
+     *          {@code Map} as the value for any edge key other than 
+     *          {@code FlowGraph.EDGE_KEY_TRUE} or 
+     *          {@code FlowGraph.EDGE_KEY_FALSE}, if any happen to be 
      *          present in
-     *          <code>edgeKeys.</code>
-     * @param edgeKeys the <code>Set</code> of <code>EdgeKey</code>s to be used
-     *           as keys in the returned <code>Map</code>.
-     * @return a <code>Map</code> containing a mapping from every
-     *           <code>EdgeKey</code> in <code>edgeKeys</code> to the
-     *           <code>Item i</code>.
+     *          {@code edgeKeys.}
+     * @param edgeKeys the {@code Set} of {@code EdgeKey}s to be used
+     *           as keys in the returned {@code Map}.
+     * @return a {@code Map} containing a mapping from every
+     *           {@code EdgeKey} in {@code edgeKeys} to the
+     *           {@code Item i}.
      */
     protected static final <FlowItem> Map<EdgeKey, FlowItem> itemsToMap(
             FlowItem trueItem, FlowItem falseItem, FlowItem remainingItem,
@@ -1102,18 +1102,18 @@ public abstract class DataFlow<FlowItem extends DataFlow.Item> extends
     }
 
     /**
-     * Filter a list of <code>Item</code>s to contain only <code>Item</code>s
+     * Filter a list of {@code Item}s to contain only {@code Item}s
      * that are not associated with error flows, that is, only 
-     * <code>Item</code>s whose associated <code>EdgeKey</code>s are not 
-     * <code>FlowGraph.ExceptionEdgeKey</code>s with a type that is a subclass
-     * of <code>TypeSystem.Error()</code>.
+     * {@code Item}s whose associated {@code EdgeKey}s are not 
+     * {@code FlowGraph.ExceptionEdgeKey}s with a type that is a subclass
+     * of {@code TypeSystem.Error()}.
      * 
      * @param items List of Items to filter
-     * @param itemKeys List of <code>EdgeKey</code>s corresponding
-     *            to the edge keys for the <code>Item</code>s in <code>items</code>.
+     * @param itemKeys List of {@code EdgeKey}s corresponding
+     *            to the edge keys for the {@code Item}s in {@code items}.
      * @return a filtered list of items, containing only those whose edge keys
-     *            are not <code>FlowGraph.ExceptionEdgeKey</code>s with 
-     *            whose exception types are <code>Error</code>s.
+     *            are not {@code FlowGraph.ExceptionEdgeKey}s with 
+     *            whose exception types are {@code Error}s.
      */
     protected final List<FlowItem> filterItemsNonError(List<FlowItem> items,
             List<EdgeKey> itemKeys) {
@@ -1140,16 +1140,16 @@ public abstract class DataFlow<FlowItem extends DataFlow.Item> extends
     }
 
     /**
-     * Filter a list of <code>Item</code>s to contain only <code>Item</code>s
+     * Filter a list of {@code Item}s to contain only {@code Item}s
      * that are not associated with exception flows, that is, only 
-     * <code>Item</code>s whose associated <code>EdgeKey</code>s are not 
-     * <code>FlowGraph.ExceptionEdgeKey</code>s.
+     * {@code Item}s whose associated {@code EdgeKey}s are not 
+     * {@code FlowGraph.ExceptionEdgeKey}s.
      * 
      * @param items List of Items to filter
-     * @param itemKeys List of <code>EdgeKey</code>s corresponding
-     *            to the edge keys for the <code>Item</code>s in <code>items</code>.
+     * @param itemKeys List of {@code EdgeKey}s corresponding
+     *            to the edge keys for the {@code Item}s in {@code items}.
      * @return a filtered list of items, containing only those whose edge keys
-     *            are not <code>FlowGraph.ExceptionEdgeKey</code>s.
+     *            are not {@code FlowGraph.ExceptionEdgeKey}s.
      */
     protected final List<FlowItem> filterItemsNonException(
             List<FlowItem> items, List<EdgeKey> itemKeys) {
@@ -1175,19 +1175,19 @@ public abstract class DataFlow<FlowItem extends DataFlow.Item> extends
     }
 
     /**
-     * Filter a list of <code>Item</code>s to contain only <code>Item</code>s
+     * Filter a list of {@code Item}s to contain only {@code Item}s
      * that are associated with exception flows, whose exception is a subclass
-     * of <code>excType</code>. That is, only 
-     * <code>Item</code>s whose associated <code>EdgeKey</code>s are  
-     * <code>FlowGraph.ExceptionEdgeKey</code>s, with the type a subclass
-     * of <code>excType</code>.
+     * of {@code excType}. That is, only 
+     * {@code Item}s whose associated {@code EdgeKey}s are  
+     * {@code FlowGraph.ExceptionEdgeKey}s, with the type a subclass
+     * of {@code excType}.
      * 
      * @param items List of Items to filter
-     * @param itemKeys List of <code>EdgeKey</code>s corresponding
-     *            to the edge keys for the <code>Item</code>s in <code>items</code>.
-     * @param excType an Exception <code>Type</code>.
+     * @param itemKeys List of {@code EdgeKey}s corresponding
+     *            to the edge keys for the {@code Item}s in {@code items}.
+     * @param excType an Exception {@code Type}.
      * @return a filtered list of items, containing only those whose edge keys
-     *            are not <code>FlowGraph.ExceptionEdgeKey</code>s.
+     *            are not {@code FlowGraph.ExceptionEdgeKey}s.
      */
     protected final List<FlowItem> filterItemsExceptionSubclass(
             List<FlowItem> items, List<EdgeKey> itemKeys, Type excType) {
@@ -1216,15 +1216,15 @@ public abstract class DataFlow<FlowItem extends DataFlow.Item> extends
     }
 
     /**
-     * Filter a list of <code>Item</code>s to contain only <code>Item</code>s
-     * that are associated with the given <code>EdgeKey</code>.
+     * Filter a list of {@code Item}s to contain only {@code Item}s
+     * that are associated with the given {@code EdgeKey}.
      * 
      * @param items List of Items to filter
-     * @param itemKeys List of <code>EdgeKey</code>s corresponding
-     *            to the edge keys for the <code>Item</code>s in <code>items</code>.
-     * @param filterEdgeKey the <code>EdgeKey</code> to use as a filter.
+     * @param itemKeys List of {@code EdgeKey}s corresponding
+     *            to the edge keys for the {@code Item}s in {@code items}.
+     * @param filterEdgeKey the {@code EdgeKey} to use as a filter.
      * @return a filtered list of items, containing only those whose edge keys
-     *            are the same as <code>filterEdgeKey</code>s.
+     *            are the same as {@code filterEdgeKey}s.
      */
     protected final List<FlowItem> filterItems(List<FlowItem> items,
             List<EdgeKey> itemKeys, FlowGraph.EdgeKey filterEdgeKey) {
@@ -1253,14 +1253,14 @@ public abstract class DataFlow<FlowItem extends DataFlow.Item> extends
      * This utility method is for subclasses to determine if the node currently
      * under consideration has both true and false edges leaving it.  That is,
      * the flow graph at this node has successor edges with the
-     * <code>EdgeKey</code>s <code>Edge_KEY_TRUE</code> and
-     * <code>Edge_KEY_FALSE</code>.
+     * {@code EdgeKey}s {@code Edge_KEY_TRUE} and
+     * {@code Edge_KEY_FALSE}.
      * 
-     * @param edgeKeys the <code>Set</code> of <code>EdgeKey</code>s of the
+     * @param edgeKeys the {@code Set} of {@code EdgeKey}s of the
      * successor edges of a given node.
-     * @return true if the <code>edgeKeys</code> contains both
-     * <code>Edge_KEY_TRUE</code> and
-     * <code>Edge_KEY_FALSE</code>
+     * @return true if the {@code edgeKeys} contains both
+     * {@code Edge_KEY_TRUE} and
+     * {@code Edge_KEY_FALSE}
      */
     protected static final boolean hasTrueFalseBranches(Set<EdgeKey> edgeKeys) {
         return edgeKeys.contains(FlowGraph.EDGE_KEY_FALSE)
@@ -1269,29 +1269,29 @@ public abstract class DataFlow<FlowItem extends DataFlow.Item> extends
 
     /**
      * This utility method is meant to be used by subclasses to help them
-     * produce appropriate <code>Item</code>s for the
-     * <code>FlowGraph.EDGE_KEY_TRUE</code> and
-     * <code>FlowGraph.EDGE_KEY_FALSE</code> edges from a boolean condition.
+     * produce appropriate {@code Item}s for the
+     * {@code FlowGraph.EDGE_KEY_TRUE} and
+     * {@code FlowGraph.EDGE_KEY_FALSE} edges from a boolean condition.
      * 
      * @param booleanCond the boolean condition that is used to branch on. The
      *              type of the expression must be boolean.
-     * @param startingItem the <code>Item</code> at the start of the flow for
-     *              the expression <code>booleanCond</code>. 
-     * @param succEdgeKeys the set of <code>EdgeKeys</code> of the successor
+     * @param startingItem the {@code Item} at the start of the flow for
+     *              the expression {@code booleanCond}. 
+     * @param succEdgeKeys the set of {@code EdgeKeys} of the successor
      *              nodes of the current node. Must contain both
-     *              <code>FlowGraph.EDGE_KEY_TRUE</code>
-     *              and <code>FlowGraph.EDGE_KEY_FALSE</code>.
-     * @param navigator an instance of <code>ConditionNavigator</code> to be
-     *              used to generate appropriate <code>Item</code>s from the
+     *              {@code FlowGraph.EDGE_KEY_TRUE}
+     *              and {@code FlowGraph.EDGE_KEY_FALSE}.
+     * @param navigator an instance of {@code ConditionNavigator} to be
+     *              used to generate appropriate {@code Item}s from the
      *              boolean condition.
-     * @return a <code>Map</code> containing mappings for all entries in
-     *              <code>succEdgeKeys</code>.
-     *              <code>FlowGraph.EDGE_KEY_TRUE</code> and
-     *              <code>FlowGraph.EDGE_KEY_FALSE</code> 
-     *              map to <code>Item</code>s calculated for them using
+     * @return a {@code Map} containing mappings for all entries in
+     *              {@code succEdgeKeys}.
+     *              {@code FlowGraph.EDGE_KEY_TRUE} and
+     *              {@code FlowGraph.EDGE_KEY_FALSE} 
+     *              map to {@code Item}s calculated for them using
      *              navigator, and all other objects in
-     *              <code>succEdgeKeys</code> are mapped to
-     *              <code>startingItem</code>.
+     *              {@code succEdgeKeys} are mapped to
+     *              {@code startingItem}.
      * @deprecated
      */
     @Deprecated
@@ -1326,10 +1326,10 @@ public abstract class DataFlow<FlowItem extends DataFlow.Item> extends
     }
 
     /**
-     * This class contains two <code>Item</code>s, one being the 
-     * <code>Item</code> that is used when an expression is true, the
+     * This class contains two {@code Item}s, one being the 
+     * {@code Item} that is used when an expression is true, the
      * other being the one that is used when an expression is false. It is used
-     * by the <code>ConditionNavigator</code>.
+     * by the {@code ConditionNavigator}.
      * @deprecated Use flowBooleanConditions
      */
     @Deprecated
@@ -1358,17 +1358,17 @@ public abstract class DataFlow<FlowItem extends DataFlow.Item> extends
     }
 
     /**
-     * A <code>ConditionNavigator</code> is used to traverse boolean
+     * A {@code ConditionNavigator} is used to traverse boolean
      * expressions that are
      * used as conditions, such as in if statements, while statements, 
-     * left branches of && and ||. The <code>ConditionNavigator</code> is used
+     * left branches of && and ||. The {@code ConditionNavigator} is used
      * to generate
      * a finer-grained analysis, so that the branching flows from a 
      * condition can take into account the fact that the condition is true or
-     * false. For example, in the statement <code>if (cond) s1 else s2</code>,
-     * dataflow for <code>s1</code> can continue in the knowledge that 
-     * <code>cond</code> evaluated to true, and similarly, <code>s2</code>
-     * can be analyzed using the knowledge that <code>cond</code> evaluated to
+     * false. For example, in the statement {@code if (cond) s1 else s2},
+     * dataflow for {@code s1} can continue in the knowledge that 
+     * {@code cond} evaluated to true, and similarly, {@code s2}
+     * can be analyzed using the knowledge that {@code cond} evaluated to
      * false.
      * 
      * @deprecated
@@ -1376,12 +1376,12 @@ public abstract class DataFlow<FlowItem extends DataFlow.Item> extends
     @Deprecated
     protected abstract static class ConditionNavigator<FlowItem extends Item> {
         /**
-         * Navigate the expression <code>expr</code>, where the 
-         * <code>Item</code> at the start of evaluating the expression is 
-         * <code>startingItem</code>.
+         * Navigate the expression {@code expr}, where the 
+         * {@code Item} at the start of evaluating the expression is 
+         * {@code startingItem}.
          * 
-         * A <code>BoolItem</code> is returned, containing the 
-         * <code>Item</code>s that are appropriate when <code>expr</code>
+         * A {@code BoolItem} is returned, containing the 
+         * {@code Item}s that are appropriate when {@code expr}
          * evaluates to true and false.
          */
         public BoolItem<FlowItem> navigate(Expr expr, FlowItem startingItem) {
@@ -1469,16 +1469,16 @@ public abstract class DataFlow<FlowItem extends DataFlow.Item> extends
         }
 
         /**
-         * Combine two <code>Item</code>s together, when the information 
+         * Combine two {@code Item}s together, when the information 
          * contained in both items is true. Thus, for example, in a not-null
-         * analysis, where <code>Item</code>s are sets of not-null variables,
+         * analysis, where {@code Item}s are sets of not-null variables,
          * combining them corresponds to unioning the sets. Note that this
          * could be a different operation to the confluence operation.
          */
         public abstract FlowItem combine(FlowItem item1, FlowItem item2);
 
         /**
-         * Produce a <code>BoolItem</code> for an expression that is not
+         * Produce a {@code BoolItem} for an expression that is not
          * a boolean operator, such as &&, &, ||, | or !.
          */
         public abstract BoolItem<FlowItem> handleExpression(Expr expr,

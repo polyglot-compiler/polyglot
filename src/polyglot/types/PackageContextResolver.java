@@ -30,7 +30,7 @@ import polyglot.util.InternalCompilerError;
 import polyglot.util.StringUtil;
 
 /**
- * A <code>PackageContextResolver</code> is responsible for looking up types
+ * A {@code PackageContextResolver} is responsible for looking up types
  * and packages in a package by name.
  */
 public class PackageContextResolver extends AbstractAccessControlResolver {

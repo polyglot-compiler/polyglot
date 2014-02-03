@@ -26,9 +26,8 @@
 
 package polyglot.ast;
 
-
 /**
- * <code>JLangToDel_c</code> is a bridge class that provides backward
+ * {@code JLangToDel_c} is a bridge class that provides backward
  * compatibility with the Polyglot's old architecture that uses delegate
  * objects.  It forwards operations to the node's delegate object.
  */

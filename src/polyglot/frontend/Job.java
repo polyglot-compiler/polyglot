@@ -30,8 +30,8 @@ import polyglot.ast.Node;
 import polyglot.util.CodeWriter;
 
 /**
- * A <code>Job</code> encapsulates work done by the compiler for a single
- * compilation unit. A <code>Job</code> contains all information for a
+ * A {@code Job} encapsulates work done by the compiler for a single
+ * compilation unit. A {@code Job} contains all information for a
  * particular compilation unit carried between phases of the compiler.
  * Only one pass should be run over a job at a time.
  * 
@@ -59,7 +59,7 @@ public class Job {
     /** True if the the job has reported an error. */
     protected boolean reportedErrors;
 
-    /** The <code>Source</code> that this <code>Job</code> represents. */
+    /** The {@code Source} that this {@code Job} represents. */
     protected Source source;
 
     /**
@@ -133,8 +133,8 @@ public class Job {
     }
 
     /**
-     * Return the <code>Source</code> associated with the 
-     * <code>SourceJob</code> returned by <code>sourceJob</code>.
+     * Return the {@code Source} associated with the 
+     * {@code SourceJob} returned by {@code sourceJob}.
      */
     public Source source() {
         return this.source;

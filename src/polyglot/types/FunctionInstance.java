@@ -27,7 +27,7 @@
 package polyglot.types;
 
 /**
- * A <code>FunctionInstance</code> represents the type information for a
+ * A {@code FunctionInstance} represents the type information for a
  * function.
  */
 public interface FunctionInstance extends ProcedureInstance {
@@ -38,7 +38,7 @@ public interface FunctionInstance extends ProcedureInstance {
 
     /**
      * Destructively set the functions's return type.
-     * @param type
+     * @param type the return type to set
      */
     void setReturnType(Type type);
 }

@@ -99,13 +99,11 @@ public class EnumConstantDecl_c extends Term_c implements EnumConstantDecl {
         return enumInstance;
     }
 
-    /** get args */
     @Override
     public List<Expr> args() {
         return args;
     }
 
-    /** set args */
     @Override
     public EnumConstantDecl args(List<Expr> args) {
         EnumConstantDecl_c n = (EnumConstantDecl_c) copy();
@@ -113,7 +111,11 @@ public class EnumConstantDecl_c extends Term_c implements EnumConstantDecl {
         return n;
     }
 
-    /** set name */
+    @Override
+    public Id name() {
+        return name;
+    }
+
     @Override
     public EnumConstantDecl name(Id name) {
         EnumConstantDecl_c n = (EnumConstantDecl_c) copy();
@@ -121,24 +123,16 @@ public class EnumConstantDecl_c extends Term_c implements EnumConstantDecl {
         return n;
     }
 
-    /** get name */
     @Override
-    public Id name() {
-        return name;
+    public ClassBody body() {
+        return body;
     }
 
-    /** set body */
     @Override
     public EnumConstantDecl body(ClassBody body) {
         EnumConstantDecl_c n = (EnumConstantDecl_c) copy();
         n.body = body;
         return n;
-    }
-
-    /** get body */
-    @Override
-    public ClassBody body() {
-        return body;
     }
 
     @Override

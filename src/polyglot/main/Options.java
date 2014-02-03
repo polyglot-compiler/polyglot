@@ -536,7 +536,7 @@ public class Options {
 
     /**
      * Iterates over arguments parsed from the command line and applies them to
-     * this object. Any source arguments are added to <code>source</code>.
+     * this object. Any source arguments are added to {@code source}.
      * 
      * @param source
      *          The set of source filenames provided on the command line.
@@ -573,7 +573,7 @@ public class Options {
 
     /**
      * Iterates over arguments parsed from the command line and applies them to
-     * this object. Any source arguments are added to <code>source</code>.
+     * this object. Any source arguments are added to {@code source}.
      * 
      * @param source
      *          The set of source filenames provided on the command line.
@@ -615,7 +615,7 @@ public class Options {
     }
 
     /**
-     * Process the option specified by <code>arg</code>
+     * Process the option specified by {@code arg}
      */
     protected void handleArg(Arg<?> arg) throws UsageError {
         assert (arg.flag != null);
@@ -963,17 +963,17 @@ public class Options {
 
     /**
      * The maximum width of a line when printing usage information. Used by
-     * <code>usageForFlag</code> and <code>usageSubsection</code>.
+     * {@code usageForFlag} and {@code usageSubsection}.
      */
     protected int USAGE_SCREEN_WIDTH = 76;
     /**
      * The number of spaces from the left that the descriptions for flags will
-     * be displayed. Used by <code>usageForFlag</code>.
+     * be displayed. Used by {@code usageForFlag}.
      */
     protected int USAGE_FLAG_WIDTH = 27;
     /**
      * The number of spaces to indent a subsection of usage information. Used by
-     * <code>usageSubsection</code>.
+     * {@code usageSubsection}.
      */
     protected int USAGE_SUBSECTION_INDENT = 8;
 
@@ -1040,7 +1040,7 @@ public class Options {
     /**
      * Output a section of text for usage information. This text will be
      * displayed indented a certain amount from the left, controlled by the
-     * field <code>USAGE_SUBSECTION_INDENT</code>
+     * field {@code USAGE_SUBSECTION_INDENT}
      * 
      * @param out
      *            the output PrintStream

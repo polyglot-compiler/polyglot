@@ -43,7 +43,7 @@ import polyglot.visit.PrettyPrinter;
 import polyglot.visit.TypeChecker;
 
 /**
- * An <code>Assign</code> represents a Java assignment expression.
+ * An {@code Assign} represents a Java assignment expression.
  */
 public abstract class Assign_c extends Expr_c implements Assign {
     private static final long serialVersionUID = SerialVersionUID.generate();
@@ -60,19 +60,16 @@ public abstract class Assign_c extends Expr_c implements Assign {
         this.right = right;
     }
 
-    /** Get the precedence of the expression. */
     @Override
     public Precedence precedence() {
         return Precedence.ASSIGN;
     }
 
-    /** Get the left operand of the expression. */
     @Override
     public Expr left() {
         return this.left;
     }
 
-    /** Set the left operand of the expression. */
     @Override
     public Assign left(Expr left) {
         Assign_c n = (Assign_c) copy();
@@ -80,13 +77,11 @@ public abstract class Assign_c extends Expr_c implements Assign {
         return n;
     }
 
-    /** Get the operator of the expression. */
     @Override
     public Operator operator() {
         return this.op;
     }
 
-    /** Set the operator of the expression. */
     @Override
     public Assign operator(Operator op) {
         Assign_c n = (Assign_c) copy();
@@ -94,13 +89,11 @@ public abstract class Assign_c extends Expr_c implements Assign {
         return n;
     }
 
-    /** Get the right operand of the expression. */
     @Override
     public Expr right() {
         return this.right;
     }
 
-    /** Set the right operand of the expression. */
     @Override
     public Assign right(Expr right) {
         Assign_c n = (Assign_c) copy();
@@ -120,7 +113,6 @@ public abstract class Assign_c extends Expr_c implements Assign {
         return this;
     }
 
-    /** Visit the children of the expression. */
     @Override
     public Node visitChildren(NodeVisitor v) {
         Expr left = visitChild(this.left, v);
@@ -128,7 +120,6 @@ public abstract class Assign_c extends Expr_c implements Assign {
         return reconstruct(left, right);
     }
 
-    /** Type check the expression. */
     @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
         Type t = left.type();
@@ -256,7 +247,6 @@ public abstract class Assign_c extends Expr_c implements Assign {
                 + op + ".");
     }
 
-    /** Get the throwsArithmeticException of the expression. */
     @Override
     public boolean throwsArithmeticException() {
         // conservatively assume that any division or mod may throw
@@ -270,7 +260,6 @@ public abstract class Assign_c extends Expr_c implements Assign {
         return left + " " + op + " " + right;
     }
 
-    /** Write the expression to an output file. */
     @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
         printSubExpr(left, true, w, tr);
@@ -282,7 +271,6 @@ public abstract class Assign_c extends Expr_c implements Assign {
         w.end();
     }
 
-    /** Dumps the AST. */
     @Override
     public void dump(CodeWriter w) {
         super.dump(w);

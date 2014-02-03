@@ -42,7 +42,7 @@ import polyglot.visit.PrettyPrinter;
 import polyglot.visit.TypeChecker;
 
 /**
- * An immutable representation of a Java language <code>if</code> statement.
+ * An immutable representation of a Java language {@code if} statement.
  * Contains an expression whose value is tested, a ``then'' statement 
  * (consequent), and optionally an ``else'' statement (alternate).
  */
@@ -61,13 +61,11 @@ public class If_c extends Stmt_c implements If {
         this.alternative = alternative;
     }
 
-    /** Get the conditional of the statement. */
     @Override
     public Expr cond() {
         return this.cond;
     }
 
-    /** Set the conditional of the statement. */
     @Override
     public If cond(Expr cond) {
         If_c n = (If_c) copy();
@@ -75,13 +73,11 @@ public class If_c extends Stmt_c implements If {
         return n;
     }
 
-    /** Get the consequent of the statement. */
     @Override
     public Stmt consequent() {
         return this.consequent;
     }
 
-    /** Set the consequent of the statement. */
     @Override
     public If consequent(Stmt consequent) {
         If_c n = (If_c) copy();
@@ -89,13 +85,11 @@ public class If_c extends Stmt_c implements If {
         return n;
     }
 
-    /** Get the alternative of the statement. */
     @Override
     public Stmt alternative() {
         return this.alternative;
     }
 
-    /** Set the alternative of the statement. */
     @Override
     public If alternative(Stmt alternative) {
         If_c n = (If_c) copy();
@@ -117,7 +111,6 @@ public class If_c extends Stmt_c implements If {
         return this;
     }
 
-    /** Visit the children of the statement. */
     @Override
     public Node visitChildren(NodeVisitor v) {
         Expr cond = visitChild(this.cond, v);
@@ -126,7 +119,6 @@ public class If_c extends Stmt_c implements If {
         return reconstruct(cond, (Stmt) consequent, (Stmt) alternative);
     }
 
-    /** Type check the statement. */
     @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
         TypeSystem ts = tc.typeSystem();
@@ -156,7 +148,6 @@ public class If_c extends Stmt_c implements If {
                 + (alternative != null ? " else " + alternative : "");
     }
 
-    /** Write the statement to an output file. */
     @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
         w.write("if (");

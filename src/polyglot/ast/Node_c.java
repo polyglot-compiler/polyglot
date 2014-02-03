@@ -56,7 +56,7 @@ import polyglot.visit.TypeBuilder;
 import polyglot.visit.TypeChecker;
 
 /**
- * A <code>Node</code> represents an AST node.  All AST nodes must implement
+ * A {@code Node} represents an AST node.  All AST nodes must implement
  * this interface.  Nodes should be immutable: methods which set fields
  * of the node should copy the node, set the field in the copy, and then
  * return the copy.
@@ -259,8 +259,8 @@ public abstract class Node_c implements Node {
      * @param v The visitor to use.
      * @return A new list with each element from the old list
      *         replaced by the result of visiting that element.
-     *         If <code>l</code> is <code>null</code>,
-     *         <code>null</code> is returned.
+     *         If {@code l} is {@code null},
+     *         {@code null} is returned.
      */
     @Override
     public <T extends Node> List<T> visitList(List<T> l, NodeVisitor v) {
@@ -298,8 +298,8 @@ public abstract class Node_c implements Node {
     /**
      * Push a new scope upon entering this node, and add any declarations to the
      * context that should be in scope when visiting children of this node.
-     * @param c the current <code>Context</code>
-     * @return the <code>Context</code> to be used for visiting this node. 
+     * @param c the current {@code Context}
+     * @return the {@code Context} to be used for visiting this node. 
      */
     @Override
     public Context enterScope(Context c) {
@@ -495,7 +495,7 @@ public abstract class Node_c implements Node {
         }
     }
 
-    /** Pretty-print the AST using the given <code>CodeWriter</code>. */
+    /** Pretty-print the AST using the given {@code CodeWriter}. */
     @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter pp) {
     }
@@ -521,7 +521,6 @@ public abstract class Node_c implements Node {
         pp.print(this, child, w);
     }
 
-    /** Translate the AST using the given <code>CodeWriter</code>. */
     @Override
     public void translate(CodeWriter w, Translator tr) {
         // By default, just rely on the pretty printer.

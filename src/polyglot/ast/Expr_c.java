@@ -58,7 +58,6 @@ public abstract class Expr_c extends Term_c implements Expr {
         return this.type;
     }
 
-    /** Set the type of the expression. */
     @Override
     public Expr type(Type type) {
         if (type == this.type) return this;
@@ -79,7 +78,6 @@ public abstract class Expr_c extends Term_c implements Expr {
         }
     }
 
-    /** Get the precedence of the expression. */
     @Override
     public Precedence precedence() {
         return Precedence.UNKNOWN;
@@ -152,37 +150,11 @@ public abstract class Expr_c extends Term_c implements Expr {
         return n.type(null);
     }
 
-    /**
-     * Correctly parenthesize the subexpression {@code expr} given
-     * the its precedence and the precedence of the current expression.
-     *
-     * If the sub-expression has the same precedence as this expression
-     * we do not parenthesize.
-     *
-     * @param expr The subexpression.
-     * @param w The output writer.
-     * @param pp The pretty printer.
-     */
     @Override
     public void printSubExpr(Expr expr, CodeWriter w, PrettyPrinter pp) {
         printSubExpr(expr, true, w, pp);
     }
 
-    /**
-     * Correctly parenthesize the subexpression {@code expr} given
-     * the its precedence and the precedence of the current expression.
-     *
-     * If the sub-expression has the same precedence as this expression
-     * we parenthesize if the sub-expression does not associate; e.g.,
-     * we parenthesis the right sub-expression of a left-associative
-     * operator.
-     *
-     * @param expr The subexpression.
-     * @param associative Whether expr is the left (right) child of a left-
-     * (right-) associative operator.
-     * @param w The output writer.
-     * @param pp The pretty printer.
-     */
     @Override
     public void printSubExpr(Expr expr, boolean associative, CodeWriter w,
             PrettyPrinter pp) {

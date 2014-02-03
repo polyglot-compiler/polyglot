@@ -27,12 +27,11 @@
 package polyglot.ast;
 
 /**
- * A Java language <code>do</code> statement. 
+ * A Java language {@code do} statement. 
  * It contains a statement to be executed and an expression to be tested 
  * indicating whether to reexecute the statement.
  */
 public interface Do extends Loop {
-    /** Set the body of the do statement. */
     @Override
     Do body(Stmt body);
 

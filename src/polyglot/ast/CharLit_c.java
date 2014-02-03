@@ -35,8 +35,7 @@ import polyglot.visit.PrettyPrinter;
 import polyglot.visit.TypeChecker;
 
 /** 
- * An <code>CharLit</code> represents a literal in java of
- * <code>char</code> type.
+ * A {@code CharLit} represents a literal in java of {@code char} type.
  */
 public class CharLit_c extends NumLit_c implements CharLit {
     private static final long serialVersionUID = SerialVersionUID.generate();
@@ -45,13 +44,11 @@ public class CharLit_c extends NumLit_c implements CharLit {
         super(pos, value);
     }
 
-    /** Get the value of the expression. */
     @Override
     public char value() {
         return (char) longValue();
     }
 
-    /** Set the value of the expression. */
     @Override
     public CharLit value(char value) {
         CharLit_c n = (CharLit_c) copy();
@@ -59,7 +56,6 @@ public class CharLit_c extends NumLit_c implements CharLit {
         return n;
     }
 
-    /** Type check the expression. */
     @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
         return type(tc.typeSystem().Char());
@@ -70,7 +66,6 @@ public class CharLit_c extends NumLit_c implements CharLit {
         return "'" + StringUtil.escape((char) value) + "'";
     }
 
-    /** Write the expression to an output file. */
     @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
         w.write("'");

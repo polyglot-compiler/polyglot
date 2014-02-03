@@ -45,10 +45,10 @@ import polyglot.visit.PrettyPrinter;
 import polyglot.visit.TypeChecker;
 
 /**
- * An <code>ArrayInit</code> is an immutable representation of
+ * An {@code ArrayInit} is an immutable representation of
  * an array initializer, such as { 3, 1, { 4, 1, 5 } }.  Note that
  * the elements of these array may be expressions of any type (e.g.,
- * <code>Call</code>).
+ * {@code Call}).
  */
 public class ArrayInit_c extends Expr_c implements ArrayInit {
     private static final long serialVersionUID = SerialVersionUID.generate();
@@ -61,13 +61,11 @@ public class ArrayInit_c extends Expr_c implements ArrayInit {
         this.elements = ListUtil.copy(elements, true);
     }
 
-    /** Get the elements of the initializer. */
     @Override
     public List<Expr> elements() {
         return this.elements;
     }
 
-    /** Set the elements of the initializer. */
     @Override
     public ArrayInit elements(List<Expr> elements) {
         ArrayInit_c n = (ArrayInit_c) copy();
@@ -86,14 +84,12 @@ public class ArrayInit_c extends Expr_c implements ArrayInit {
         return this;
     }
 
-    /** Visit the children of the initializer. */
     @Override
     public Node visitChildren(NodeVisitor v) {
         List<Expr> elements = visitList(this.elements, v);
         return reconstruct(elements);
     }
 
-    /** Type check the initializer. */
     @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
         TypeSystem ts = tc.typeSystem();
@@ -180,7 +176,6 @@ public class ArrayInit_c extends Expr_c implements ArrayInit {
         return "{ ... }";
     }
 
-    /** Write the initializer to an output file. */
     @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
         w.write("{ ");

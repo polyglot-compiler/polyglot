@@ -30,7 +30,7 @@ import polyglot.util.Enum;
 import polyglot.util.SerialVersionUID;
 
 /**
- * A <code>Binary</code> represents a Java binary expression, an
+ * A {@code Binary} represents a Java binary expression, an
  * immutable pair of expressions combined with an operator.
  */
 public interface Binary extends Expr {

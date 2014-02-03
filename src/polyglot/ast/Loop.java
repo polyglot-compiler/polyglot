@@ -47,6 +47,7 @@ public interface Loop extends CompoundStmt {
     /** Loop body. */
     Stmt body();
 
+    /** Set the loop body. */
     Loop body(Stmt body);
 
     /** Target of a continue statement in the loop body. */

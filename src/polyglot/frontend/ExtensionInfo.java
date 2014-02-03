@@ -45,8 +45,8 @@ import polyglot.types.reflect.ClassFileLoader;
 import polyglot.util.ErrorQueue;
 
 /**
- * <code>ExtensionInfo</code> is the main interface for defining language
- * extensions. The frontend will load the <code>ExtensionInfo</code> specified
+ * {@code ExtensionInfo} is the main interface for defining language
+ * extensions. The frontend will load the {@code ExtensionInfo} specified
  * on the command-line. It defines the type system, AST node factory, parser,
  * and other parameters of a language extension.
  */
@@ -111,7 +111,7 @@ public interface ExtensionInfo {
 
     /**
      * Get the job extension for this language extension. The job extension is
-     * used to extend the <code>Job</code> class without subtyping.
+     * used to extend the {@code Job} class without subtyping.
      */
     JobExt jobExt();
 

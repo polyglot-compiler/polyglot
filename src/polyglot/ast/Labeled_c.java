@@ -37,7 +37,7 @@ import polyglot.visit.PrettyPrinter;
 
 /**
  * Am immutable representation of a Java statement with a label.  A labeled
- * statement contains the statement being labelled and a string label.
+ * statement contains the statement being labeled and a string label.
  */
 public class Labeled_c extends Stmt_c implements Labeled {
     private static final long serialVersionUID = SerialVersionUID.generate();
@@ -52,13 +52,11 @@ public class Labeled_c extends Stmt_c implements Labeled {
         this.statement = statement;
     }
 
-    /** Get the label of the statement. */
     @Override
     public Id labelNode() {
         return this.label;
     }
 
-    /** Set the label of the statement. */
     @Override
     public Labeled labelNode(Id label) {
         Labeled_c n = (Labeled_c) copy();
@@ -66,25 +64,21 @@ public class Labeled_c extends Stmt_c implements Labeled {
         return n;
     }
 
-    /** Get the label of the statement. */
     @Override
     public String label() {
         return this.label.id();
     }
 
-    /** Set the label of the statement. */
     @Override
     public Labeled label(String label) {
         return labelNode(this.label.id(label));
     }
 
-    /** Get the sub-statement of the statement. */
     @Override
     public Stmt statement() {
         return this.statement;
     }
 
-    /** Set the sub-statement of the statement. */
     @Override
     public Labeled statement(Stmt statement) {
         Labeled_c n = (Labeled_c) copy();
@@ -104,7 +98,6 @@ public class Labeled_c extends Stmt_c implements Labeled {
         return this;
     }
 
-    /** Visit the children of the statement. */
     @Override
     public Node visitChildren(NodeVisitor v) {
         Id label = visitChild(this.label, v);
@@ -117,7 +110,6 @@ public class Labeled_c extends Stmt_c implements Labeled {
         return label + ": " + statement;
     }
 
-    /** Write the statement to an output file. */
     @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
         w.write(label + ": ");

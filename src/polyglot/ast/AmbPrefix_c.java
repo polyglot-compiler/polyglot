@@ -38,7 +38,7 @@ import polyglot.visit.PrettyPrinter;
 import polyglot.visit.TypeChecker;
 
 /**
- * An <code>AmbPrefix</code> is an ambiguous AST node composed of dot-separated
+ * An {@code AmbPrefix} is an ambiguous AST node composed of dot-separated
  * list of identifiers that must resolve to a prefix.
  */
 public class AmbPrefix_c extends Node_c implements AmbPrefix {
@@ -54,7 +54,6 @@ public class AmbPrefix_c extends Node_c implements AmbPrefix {
         this.name = name;
     }
 
-    /** Get the name of the prefix. */
     @Override
     public Id nameNode() {
         return this.name;
@@ -67,7 +66,6 @@ public class AmbPrefix_c extends Node_c implements AmbPrefix {
         return n;
     }
 
-    /** Get the name of the prefix. */
     @Override
     public String name() {
         return this.name.id();
@@ -78,7 +76,6 @@ public class AmbPrefix_c extends Node_c implements AmbPrefix {
         return id(this.name.id(name));
     }
 
-    /** Get the prefix of the prefix. */
     @Override
     public Prefix prefix() {
         return this.prefix;
@@ -103,7 +100,6 @@ public class AmbPrefix_c extends Node_c implements AmbPrefix {
         return this;
     }
 
-    /** Visit the children of the prefix. */
     @Override
     public Node visitChildren(NodeVisitor v) {
         Prefix prefix = visitChild(this.prefix, v);
@@ -111,7 +107,6 @@ public class AmbPrefix_c extends Node_c implements AmbPrefix {
         return reconstruct(prefix, name);
     }
 
-    /** Disambiguate the prefix. */
     @Override
     public Node disambiguate(AmbiguityRemover ar) throws SemanticException {
         if (prefix != null && !prefix.isDisambiguated()) {
@@ -129,7 +124,6 @@ public class AmbPrefix_c extends Node_c implements AmbPrefix {
         return this;
     }
 
-    /** Check exceptions thrown by the prefix. */
     @Override
     public Node exceptionCheck(ExceptionChecker ec) throws SemanticException {
         throw new InternalCompilerError(position(),
@@ -137,7 +131,6 @@ public class AmbPrefix_c extends Node_c implements AmbPrefix {
                                                 + this + ".");
     }
 
-    /** Write the prefix to an output file. */
     @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
         if (prefix != null) {

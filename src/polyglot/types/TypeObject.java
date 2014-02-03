@@ -32,7 +32,7 @@ import polyglot.util.Copy;
 import polyglot.util.Position;
 
 /**
- * A <code>TypeObject</code> is a compile-time value created by the type system.
+ * A {@code TypeObject} is a compile-time value created by the type system.
  * It is a static representation of a type that is not necessarily 
  * first-class.  It is similar to a compile-time meta-object.
  */
@@ -53,7 +53,7 @@ public interface TypeObject extends Copy<TypeObject>, Serializable {
     Position position();
 
     /**
-     * Return true iff this type object is the same as <code>t</code>.
+     * Return true iff this type object is the same as {@code t}.
      * All Polyglot extensions should attempt to maintain pointer
      * equality between equal TypeObjects.  If this cannot be done,
      * extensions can override TypeObject_c.equalsImpl(), and

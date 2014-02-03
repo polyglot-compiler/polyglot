@@ -27,7 +27,7 @@
 package polyglot.types;
 
 /**
- * An <code>CompoundResolver</code> resolves names using more than one
+ * An {@code CompoundResolver} resolves names using more than one
  * context.
  */
 public class CompoundResolver implements TopLevelResolver {

@@ -51,7 +51,7 @@ import polyglot.util.TypeInputStream;
 
 /**
  * Utility class that performs substitutions on type objects using a
- * map.  Subclasses must define how the substititions are performed and
+ * map.  Subclasses must define how the substitutions are performed and
  * how to cache substituted types.
  */
 public class Subst_c<Formal extends Param, Actual extends TypeObject>
@@ -78,10 +78,6 @@ public class Subst_c<Formal extends Param, Actual extends TypeObject>
         return ts;
     }
 
-    /**
-     * Entries of the underlying substitution map.
-     * @return an <code>Iterator</code> of <code>Map.Entry</code>.
-     */
     @Override
     public Iterator<Entry<Formal, Actual>> entries() {
         return substitutions().entrySet().iterator();
@@ -97,9 +93,6 @@ public class Subst_c<Formal extends Param, Actual extends TypeObject>
         };
     }
 
-    /**
-     * The underlying substitution map.
-     */
     @Override
     public Map<Formal, Actual> substitutions() {
         return Collections.unmodifiableMap(subst);
@@ -159,7 +152,6 @@ public class Subst_c<Formal extends Param, Actual extends TypeObject>
         return new SubstClassType_c<Formal, Actual>(ts, t.position(), t, this);
     }
 
-    /** Perform substitutions on a type. */
     @Override
     public Type substType(Type t) {
         if (t == null || t == this) // XXX comparison t == this can't succeed! (Findbugs)
@@ -227,7 +219,6 @@ public class Subst_c<Formal extends Param, Actual extends TypeObject>
         return ts.equals(t1, t2);
     }
 
-    /** Perform substitution on a PClass. */
     @Override
     public PClass<Formal, Actual> substPClass(PClass<Formal, Actual> pclazz) {
         MuPClass<Formal, Actual> newPclazz =
@@ -237,7 +228,6 @@ public class Subst_c<Formal extends Param, Actual extends TypeObject>
         return newPclazz;
     }
 
-    /** Perform substititions on a field. */
     @Override
     public <T extends FieldInstance> T substField(T fi) {
         ReferenceType ct = (ReferenceType) substType(fi.container());
@@ -249,7 +239,6 @@ public class Subst_c<Formal extends Param, Actual extends TypeObject>
         return newFI;
     }
 
-    /** Perform substititions on a method. */
     @Override
     public <T extends MethodInstance> T substMethod(T mi) {
         ReferenceType ct = (ReferenceType) substType(mi.container());
@@ -272,7 +261,6 @@ public class Subst_c<Formal extends Param, Actual extends TypeObject>
         return tmpMi;
     }
 
-    /** Perform substititions on a constructor. */
     @Override
     public <T extends ConstructorInstance> T substConstructor(T ci) {
         ClassType ct = (ClassType) substType(ci.container());
@@ -292,19 +280,16 @@ public class Subst_c<Formal extends Param, Actual extends TypeObject>
         return tmpCi;
     }
 
-    /** Perform substititions on a list of <code>Type</code>. */
     @Override
     public <T extends Type> List<T> substTypeList(List<? extends Type> list) {
         return new CachingTransformingList<Type, T>(list, new TypeXform<T>());
     }
 
-    /** Perform substititions on a list of <code>MethodInstance</code>. */
     @Override
     public <T extends MethodInstance> List<T> substMethodList(List<T> list) {
         return new CachingTransformingList<T, T>(list, new MethodXform<T>());
     }
 
-    /** Perform substititions on a list of <code>ConstructorInstance</code>. */
     @Override
     public <T extends ConstructorInstance> List<T> substConstructorList(
             List<T> list) {
@@ -312,7 +297,6 @@ public class Subst_c<Formal extends Param, Actual extends TypeObject>
                                                  new ConstructorXform<T>());
     }
 
-    /** Perform substititions on a list of <code>FieldInstance</code>. */
     @Override
     public <T extends FieldInstance> List<T> substFieldList(List<T> list) {
         return new CachingTransformingList<T, T>(list, new FieldXform<T>());

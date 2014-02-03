@@ -43,7 +43,7 @@ import polyglot.visit.PrettyPrinter;
 import polyglot.visit.TypeChecker;
 
 /**
- * A <code>Binary</code> represents a Java binary expression, an
+ * A {@code Binary} represents a Java binary expression, an
  * immutable pair of expressions combined with an operator.
  */
 public class Binary_c extends Expr_c implements Binary {
@@ -67,13 +67,11 @@ public class Binary_c extends Expr_c implements Binary {
         }
     }
 
-    /** Get the left operand of the expression. */
     @Override
     public Expr left() {
         return this.left;
     }
 
-    /** Set the left operand of the expression. */
     @Override
     public Binary left(Expr left) {
         Binary_c n = (Binary_c) copy();
@@ -81,13 +79,11 @@ public class Binary_c extends Expr_c implements Binary {
         return n;
     }
 
-    /** Get the operator of the expression. */
     @Override
     public Operator operator() {
         return this.op;
     }
 
-    /** Set the operator of the expression. */
     @Override
     public Binary operator(Operator op) {
         Binary_c n = (Binary_c) copy();
@@ -95,13 +91,11 @@ public class Binary_c extends Expr_c implements Binary {
         return n;
     }
 
-    /** Get the right operand of the expression. */
     @Override
     public Expr right() {
         return this.right;
     }
 
-    /** Set the right operand of the expression. */
     @Override
     public Binary right(Expr right) {
         Binary_c n = (Binary_c) copy();
@@ -109,7 +103,6 @@ public class Binary_c extends Expr_c implements Binary {
         return n;
     }
 
-    /** Get the precedence of the expression. */
     @Override
     public Precedence precedence() {
         return this.precedence;
@@ -134,7 +127,6 @@ public class Binary_c extends Expr_c implements Binary {
         return this;
     }
 
-    /** Visit the children of the expression. */
     @Override
     public Node visitChildren(NodeVisitor v) {
         Expr left = visitChild(this.left, v);
@@ -294,7 +286,6 @@ public class Binary_c extends Expr_c implements Binary {
         return null;
     }
 
-    /** Type check the expression. */
     @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
         Type l = left.type();
@@ -532,7 +523,6 @@ public class Binary_c extends Expr_c implements Binary {
         return child.type();
     }
 
-    /** Get the throwsArithmeticException of the expression. */
     @Override
     public boolean throwsArithmeticException() {
         // conservatively assume that any division or mod may throw
@@ -546,7 +536,6 @@ public class Binary_c extends Expr_c implements Binary {
         return left + " " + op + " " + right;
     }
 
-    /** Write the expression to an output file. */
     @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
         printSubExpr(left, true, w, tr);

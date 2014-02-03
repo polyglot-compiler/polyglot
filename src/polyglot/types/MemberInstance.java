@@ -27,7 +27,7 @@
 package polyglot.types;
 
 /**
- * A <code>MemberInstance</code> is an entity that can be a member of
+ * A {@code MemberInstance} is an entity that can be a member of
  * a class.
  */
 public interface MemberInstance extends TypeObject {
@@ -38,7 +38,7 @@ public interface MemberInstance extends TypeObject {
 
     /**
      * Destructively set the member's flags.
-     * @param flags
+     * @param flags the flags to set
      */
     void setFlags(Flags flags);
 
@@ -49,7 +49,7 @@ public interface MemberInstance extends TypeObject {
 
     /**
      * Destructively set the member's container.
-     * @param container
+     * @param container the container to set
      */
     void setContainer(ReferenceType container);
 }

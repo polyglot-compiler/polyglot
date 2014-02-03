@@ -78,12 +78,12 @@ import polyglot.visit.FlowGraph.Peer;
  * and check(FlowGraph, Term, Item, Item).
  * 
  * If language extensions have new constructs that use local variables, they can
- * override the method <code>checkOther</code> to check that the uses of these
+ * override the method {@code checkOther} to check that the uses of these
  * local variables are correctly initialized. (The implementation of the method will
  * probably call checkLocalInstanceInit to see if the local used is initialized).
  * 
  * If language extensions have new constructs that assign to local variables,
- * they can override the method <code>flowOther</code> to capture the way 
+ * they can override the method {@code flowOther} to capture the way 
  * the new construct's initialization behavior.
  * 
  */
@@ -103,7 +103,7 @@ public class DefiniteAssignmentChecker extends
      */
     protected static class ClassBodyInfo {
         /** 
-         * The info for the outer ClassBody. The <code>ClassBodyInfo</code>s
+         * The info for the outer ClassBody. The {@code ClassBodyInfo}s
          * form a stack. 
          */
         public ClassBodyInfo outer = null;
@@ -154,14 +154,14 @@ public class DefiniteAssignmentChecker extends
         /**
          * Set of LocalInstances from the outer class body that were used
          * during the declaration of this class. We need to track this
-         * in order to correctly populate <code>localsUsedInClassBodies</code>
+         * in order to correctly populate {@code localsUsedInClassBodies}
          */
         public Set<LocalInstance> outerLocalsUsed =
                 new HashSet<LocalInstance>();
 
         /**
-         * Map from <code>ClassBody</code>s to <code>Set</code>s of 
-         * <code>LocalInstance</code>s. If localsUsedInClassBodies(C) = S, then
+         * Map from {@code ClassBody}s to {@code Set}s of 
+         * {@code LocalInstance}s. If localsUsedInClassBodies(C) = S, then
          * the class body C is an inner class declared in the current code 
          * declaration, and S is the set of LocalInstances that are defined
          * in the current code declaration, but are used in the declaration
@@ -297,9 +297,9 @@ public class DefiniteAssignmentChecker extends
             new FlowItem(Collections.<VarInstance, AssignmentStatus> emptyMap());
 
     /**
-     * Initialise the FlowGraph to be used in the dataflow analysis.
+     * Initialize the FlowGraph to be used in the dataflow analysis.
      * @return null if no dataflow analysis should be performed for this
-     *         code declaration; otherwise, an apropriately initialized
+     *         code declaration; otherwise, an appropriately initialized
      *         FlowGraph.
      */
     @Override
@@ -519,10 +519,10 @@ public class DefiniteAssignmentChecker extends
     }
 
     /**
-     * Construct a flow graph for the <code>Expr</code> provided, and call 
-     * <code>dataflow(FlowGraph)</code>. Is also responsible for calling 
-     * <code>post(FlowGraph, Term)</code> after
-     * <code>dataflow(FlowGraph)</code> has been called.
+     * Construct a flow graph for the {@code Expr} provided, and call 
+     * {@code dataflow(FlowGraph)}. Is also responsible for calling 
+     * {@code post(FlowGraph, Term)} after
+     * {@code dataflow(FlowGraph)} has been called.
      * There is no need to push a CFG onto the stack, as dataflow is not
      * performed on entry in this analysis. 
      */
@@ -563,13 +563,13 @@ public class DefiniteAssignmentChecker extends
     }
 
     /**
-     * The confluence operator for <code>Initializer</code>s and 
-     * <code>Constructor</code>s needs to be a 
+     * The confluence operator for {@code Initializer}s and 
+     * {@code Constructor}s needs to be a 
      * little special, as we are only concerned with non-exceptional flows in 
      * these cases.
      * This method ensures that a slightly different confluence is performed
-     * for these <code>Term</code>s, otherwise 
-     * <code>confluence(List, Term)</code> is called instead. 
+     * for these {@code Term}s, otherwise 
+     * {@code confluence(List, Term)} is called instead. 
      */
     @Override
     protected FlowItem confluence(List<FlowItem> items, List<EdgeKey> itemKeys,
@@ -1007,7 +1007,7 @@ public class DefiniteAssignmentChecker extends
 
     /**
      * Perform necessary actions upon seeing the Initializer 
-     * <code>initializer</code>.
+     * {@code initializer}.
      */
     protected void finishInitializer(FlowGraph<FlowItem> graph,
             Initializer initializer, FlowItem dfIn, FlowItem dfOut) {
@@ -1031,7 +1031,7 @@ public class DefiniteAssignmentChecker extends
 
     /**
      * Perform necessary actions upon seeing the ConstructorDecl 
-     * <code>cd</code>.
+     * {@code cd}.
      */
     protected void finishConstructorDecl(FlowGraph<FlowItem> graph,
             ConstructorDecl cd, FlowItem dfIn, FlowItem dfOut) {
@@ -1079,7 +1079,7 @@ public class DefiniteAssignmentChecker extends
     }
 
     /**
-     * Check that the local variable <code>l</code> is used correctly.
+     * Check that the local variable {@code l} is used correctly.
      */
     protected void checkLocal(FlowGraph<FlowItem> graph, Local l, FlowItem dfIn)
             throws SemanticException {
@@ -1182,9 +1182,9 @@ public class DefiniteAssignmentChecker extends
     }
 
     /**
-     * Check that the set of <code>LocalInstance</code>s 
-     * <code>localsUsed</code>, which is the set of locals used in the inner 
-     * class declared by <code>cb</code>
+     * Check that the set of {@code LocalInstance}s 
+     * {@code localsUsed}, which is the set of locals used in the inner 
+     * class declared by {@code cb}
      * are initialized before the class declaration.
      * @throws SemanticException
      */
@@ -1200,9 +1200,9 @@ public class DefiniteAssignmentChecker extends
     }
 
     /**
-     * Check that the set of <code>LocalInstance</code>s 
-     * <code>localsUsed</code>, which is the set of locals used in the inner 
-     * class declared by <code>cb</code>
+     * Check that the set of {@code LocalInstance}s 
+     * {@code localsUsed}, which is the set of locals used in the inner 
+     * class declared by {@code cb}
      * are initialized before the class declaration.
      */
     protected void checkLocalsUsedByInnerClass(FlowGraph<FlowItem> graph,

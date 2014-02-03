@@ -42,18 +42,18 @@ import polyglot.util.Position;
 public interface PClass<Formal extends Param, Actual extends TypeObject>
         extends Importable {
     /**
-     * The formal type parameters associated with <code>this</code>.
+     * The formal type parameters associated with {@code this}.
      */
     List<Formal> formals();
 
     /**
-     * The class associated with <code>this</code>.  Note that
-     * <code>this</code> should never be used as a first-class type.
+     * The class associated with {@code this}.  Note that
+     * {@code this} should never be used as a first-class type.
      */
     ClassType clazz();
 
     /**
-     * Instantiate <code>this</code>.
+     * Instantiate {@code this}.
      * @param pos The position of the instantiation
      * @param actuals The actual type parameters for the instantiation
      */

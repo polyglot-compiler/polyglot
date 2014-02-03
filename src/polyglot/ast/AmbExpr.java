@@ -27,18 +27,19 @@
 package polyglot.ast;
 
 /**
- * An <code>AmbExpr</code> is an ambiguous AST node composed of a single
+ * An {@code AmbExpr} is an ambiguous AST node composed of a single
  * identifier that must resolve to an expression.
  */
 public interface AmbExpr extends Expr, Ambiguous {
-    /**
-     * Ambiguous name.
-     */
+    /** Get the name of the expression. */
     Id id();
 
+    /** Set the name of the expression. */
     AmbExpr id(Id name);
 
+    /** Get the name of the expression. */
     String name();
 
+    /** Set the name of the expression. */
     AmbExpr name(String name);
 }

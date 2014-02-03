@@ -35,7 +35,7 @@ import polyglot.visit.TypeBuilder;
 import polyglot.visit.TypeChecker;
 
 /**
- * An <code>AmbReceiver</code> is an ambiguous AST node composed of
+ * An {@code AmbReceiver} is an ambiguous AST node composed of
  * dot-separated list of identifiers that must resolve to a receiver.
  */
 public class AmbReceiver_c extends AmbPrefix_c implements AmbReceiver {

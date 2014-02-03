@@ -35,7 +35,7 @@ import polyglot.frontend.Pass;
 import polyglot.frontend.Scheduler;
 
 /**
- * A <code>Barrier</code> goal synchronizes all the jobs to reach the same goal. 
+ * A {@code Barrier} goal synchronizes all the jobs to reach the same goal. 
  *
  * @author nystrom
  */

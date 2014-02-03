@@ -38,7 +38,7 @@ public class PrettyPrintPass extends AbstractPass {
 
     /**
      * Create a PrettyPrinter.  The output of the visitor is a collection of files
-     * whose names are added to the collection <code>outputFiles</code>.
+     * whose names are added to the collection {@code outputFiles}.
      */
     public PrettyPrintPass(Goal goal, CodeWriter w, PrettyPrinter pp) {
         super(goal);

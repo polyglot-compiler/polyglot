@@ -27,8 +27,8 @@
 package polyglot.util;
 
 /**
- * Interface used to copy objects.  Similar to Cloneable except that
- * <code>copy()</code> must be public not protected as <code>clone()</code> is.
+ * Interface used to copy objects.  Similar to {@code Cloneable}, except that
+ * {@code copy()} must be public, not protected as {@code clone()} is.
  */
 public interface Copy<T> extends Cloneable {
     public T copy();

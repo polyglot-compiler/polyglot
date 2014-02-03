@@ -29,9 +29,9 @@ package polyglot.ast;
 import polyglot.types.Flags;
 import polyglot.types.LocalInstance;
 
-/** 
- * A local variable declaration statement: a type, a name and an optional
- * initializer.
+/**
+ * A {@code LocalDecl} is an immutable representation of a local variable
+ * declaration statement: a type, a name and an optional initializer.
  */
 public interface LocalDecl extends ForInit, VarDecl, VarInit {
     /** Set the declaration's flags. */
@@ -53,7 +53,7 @@ public interface LocalDecl extends ForInit, VarDecl, VarInit {
     LocalDecl init(Expr init);
 
     /**
-     * Set the type object for the local we are declaring.
+     * Set the type object for the local declaration.
      */
     LocalDecl localInstance(LocalInstance li);
 

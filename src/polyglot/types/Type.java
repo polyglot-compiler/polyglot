@@ -29,7 +29,7 @@ package polyglot.types;
 import polyglot.util.CodeWriter;
 
 /**
- * A <code>Type</code> is the base type of all classes which represent
+ * A {@code Type} is the base type of all classes which represent
  * types.
  */
 public interface Type extends Qualifier {
@@ -46,32 +46,37 @@ public interface Type extends Qualifier {
     ArrayType arrayOf();
 
     /**
-     * Return a <code>dims</code>-array of this type.
+     * Return a {@code dims}-array of this type.
      */
     ArrayType arrayOf(int dims);
 
     /**
      * Cast the type to a class type, or null.
+     * @return a non-null iff {@code isClass()} returns true.
      */
     ClassType toClass();
 
     /**
      * Cast the type to a null type, or null.
+     * @return a non-null iff {@code isNull()} returns true.
      */
     NullType toNull();
 
     /**
      * Cast the type to a reference type, or null.
+     * @return a non-null iff {@code isReference()} returns true.
      */
     ReferenceType toReference();
 
     /**
      * Cast the type to a primitive type, or null.
+     * @return a non-null iff {@code isPrimitive()} returns true.
      */
     PrimitiveType toPrimitive();
 
     /**
      * Cast the type to an array type, or null.
+     * @return a non-null iff {@code isArray()} returns true.
      */
     ArrayType toArray();
 
@@ -96,64 +101,65 @@ public interface Type extends Qualifier {
     boolean typeEqualsImpl(Type t);
 
     /**
-     * Return true if this type is a subtype of <code>ancestor</code>.
+     * Return true if this type is a subtype of {@code ancestor}.
      */
     boolean isSubtype(Type ancestor);
 
     /**
-     * Return true if this type descends from <code>ancestor</code>.
+     * Return true if this type descends from {@code ancestor}.
      */
     boolean descendsFrom(Type ancestor);
 
     /**
-     * Return true if this type can be cast to <code>toType</code>.
+     * Return true if this type can be cast to {@code toType}.
      */
     boolean isCastValid(Type toType);
 
     /**
      * Return true if a value of this type can be assigned to a variable of
-     * type <code>toType</code>.
+     * type {@code toType}.
      */
     boolean isImplicitCastValid(Type toType);
 
     /**
-     * Return true a literal <code>value</code> can be converted to this type.
+     * Return true a literal {@code value} can be converted to this type.
      */
     boolean numericConversionValid(Object value);
 
     /**
-     * Return true a literal <code>value</code> can be converted to this type.
+     * Return true a literal {@code value} can be converted to this type.
+     * This method should be removed.  It is kept for backward compatibility.
      */
     boolean numericConversionValid(long value);
 
     /**
-     * Return true if this type is a subtype of <code>ancestor</code>.
+     * Return true if this type is a subtype of {@code ancestor}.
      */
-    boolean isSubtypeImpl(Type t);
+    boolean isSubtypeImpl(Type ancestor);
 
     /**
-     * Return true if this type descends from <code>ancestor</code>.
+     * Return true if this type descends from {@code ancestor}.
      */
-    boolean descendsFromImpl(Type t);
+    boolean descendsFromImpl(Type ancestor);
 
     /**
-     * Return true if this type can be cast to <code>toType</code>.
+     * Return true if this type can be cast to {@code toType}.
      */
-    boolean isCastValidImpl(Type t);
+    boolean isCastValidImpl(Type toType);
 
     /**
      * Return true if a value of this type can be assigned to a variable of
-     * type <code>toType</code>.
+     * type {@code toType}.
      */
-    boolean isImplicitCastValidImpl(Type t);
+    boolean isImplicitCastValidImpl(Type toType);
 
     /**
-     * Return true a literal <code>value</code> can be converted to this type.
+     * Return true a literal {@code value} can be converted to this type.
      */
     boolean numericConversionValidImpl(Object value);
 
     /**
-     * Return true a literal <code>value</code> can be converted to this type.
+     * Return true a literal {@code value} can be converted to this type.
      * This method should be removed.  It is kept for backward compatibility.
      */
     boolean numericConversionValidImpl(long value);
@@ -244,7 +250,7 @@ public interface Type extends Qualifier {
     boolean isClass();
 
     /**
-     * Return true if a subclass of Throwable.
+     * Return true if a subclass of {@code Throwable}.
      */
     boolean isThrowable();
 
@@ -275,7 +281,7 @@ public interface Type extends Qualifier {
     String toString();
 
     /**
-     * Output a compilable representation of this type to w.
+     * Output a compilable representation of this type to {@code w}.
      * For generated output, this method should be used
      * rather than toString().  It is suggested, but not
      * required, that it be an easily human-readable

@@ -36,7 +36,7 @@ import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
 
 /**
- * A <code>MethodInstance</code> represents the type information for a Java
+ * A {@code MethodInstance} represents the type information for a Java
  * method.
  */
 public class MethodInstance_c extends ProcedureInstance_c implements
@@ -148,17 +148,11 @@ public class MethodInstance_c extends ProcedureInstance_c implements
         return this;
     }
 
-    /**
-     * @param name The name to set.
-     */
     @Override
     public void setName(String name) {
         this.name = name;
     }
 
-    /**
-     * @param returnType The returnType to set.
-     */
     @Override
     public void setReturnType(Type returnType) {
         this.returnType = returnType;
@@ -207,16 +201,14 @@ public class MethodInstance_c extends ProcedureInstance_c implements
         return "method";
     }
 
-    /** Returns true iff <this> is the same method as <m> */
     @Override
-    public final boolean isSameMethod(MethodInstance m) {
-        return ts.isSameMethod(this, m);
+    public final boolean isSameMethod(MethodInstance mi) {
+        return ts.isSameMethod(this, mi);
     }
 
-    /** Returns true iff <this> is the same method as <m> */
     @Override
-    public boolean isSameMethodImpl(MethodInstance m) {
-        return this.name().equals(m.name()) && hasFormals(m.formalTypes());
+    public boolean isSameMethodImpl(MethodInstance mi) {
+        return this.name().equals(mi.name()) && hasFormals(mi.formalTypes());
     }
 
     @Override
@@ -282,12 +274,6 @@ public class MethodInstance_c extends ProcedureInstance_c implements
         throw new RuntimeException("canOverrideImpl(MethodInstance mj) should not be called.");
     }
 
-    /**
-     * @param quiet If true, then no Semantic Exceptions will be thrown, and the
-     *              return value will be true or false. Otherwise, if the method
-     *              cannot override, then a SemanticException will be thrown, else
-     *              the method will return true.
-     */
     @Override
     public boolean canOverrideImpl(MethodInstance mj, boolean quiet)
             throws SemanticException {

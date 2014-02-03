@@ -38,7 +38,7 @@ import polyglot.visit.PrettyPrinter;
 import polyglot.visit.TypeChecker;
 
 /**
- * A <code>ClassLit</code> represents a class literal expression. 
+ * A {@code ClassLit} represents a class literal expression. 
  * A class literal expressions is an expression consisting of the 
  * name of a class, interface, array, or primitive type followed by a period (.) 
  * and the token class. 
@@ -93,7 +93,6 @@ public class ClassLit_c extends Lit_c implements ClassLit {
         return this.typeNode(tn);
     }
 
-    /** Type check the expression. */
     @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
         return type(tc.typeSystem().Class());
@@ -104,7 +103,6 @@ public class ClassLit_c extends Lit_c implements ClassLit {
         return typeNode.toString() + ".class";
     }
 
-    /** Write the expression to an output file. */
     @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
         w.begin(0);

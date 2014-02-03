@@ -32,10 +32,9 @@ import polyglot.util.SerialVersionUID;
 import polyglot.util.StringUtil;
 import polyglot.visit.PrettyPrinter;
 
-/**
- * An <code>AmbExpr</code> is an ambiguous AST node composed of a single
- * identifier that must resolve to an expression.
- */
+/** An {@code Id} represents a simple identifier in the AST. Because it is a
+ * full-fledged node, extensions have the opportunity to attach additional
+ * information. */
 public class Id_c extends Node_c implements Id {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
@@ -52,13 +51,11 @@ public class Id_c extends Node_c implements Id {
     public final void equals(String s) {
     }
 
-    /** Get the name of the expression. */
     @Override
     public String id() {
         return this.id;
     }
 
-    /** Set the name of the expression. */
     @Override
     public Id id(String id) {
         Id_c n = (Id_c) copy();
@@ -66,7 +63,6 @@ public class Id_c extends Node_c implements Id {
         return n;
     }
 
-    /** Write the name to an output file. */
     @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
         w.write(id);

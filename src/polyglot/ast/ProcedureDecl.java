@@ -56,7 +56,7 @@ public interface ProcedureDecl extends CodeDecl {
     List<TypeNode> throwTypes();
 
     /**
-     * The procedure type object.  This field may not be valid until
+     * The procedure's type object.  This field may not be valid until
      * after signature disambiguation.
      */
     ProcedureInstance procedureInstance();

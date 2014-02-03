@@ -30,7 +30,7 @@ import polyglot.util.Enum;
 import polyglot.util.SerialVersionUID;
 
 /**
- * A <code>Branch</code> is an immutable representation of a branch
+ * A {@code Branch} is an immutable representation of a branch
  * statment in Java (a break or continue).
  */
 public interface Branch extends Stmt {
@@ -48,12 +48,12 @@ public interface Branch extends Stmt {
     public static final Kind CONTINUE = new Kind("continue");
 
     /**
-     * The kind of branch.
+     * The kind of the branch.
      */
     Kind kind();
 
     /**
-     * Set the kind of branch.
+     * Set the kind of the branch.
      */
     Branch kind(Kind kind);
 

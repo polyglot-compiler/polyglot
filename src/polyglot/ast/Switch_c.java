@@ -50,8 +50,8 @@ import polyglot.visit.PrettyPrinter;
 import polyglot.visit.TypeChecker;
 
 /**
- * A <code>Switch</code> is an immutable representation of a Java
- * <code>switch</code> statement.  Such a statement has an expression which
+ * A {@code Switch} is an immutable representation of a Java
+ * {@code switch} statement.  Such a statement has an expression which
  * is evaluated to determine where to branch to, an a list of labels
  * and block statements which are conditionally evaluated.  One of the
  * labels, rather than having a constant expression, may be labelled
@@ -70,13 +70,11 @@ public class Switch_c extends Stmt_c implements Switch {
         this.elements = ListUtil.copy(elements, true);
     }
 
-    /** Get the expression to switch on. */
     @Override
     public Expr expr() {
         return this.expr;
     }
 
-    /** Set the expression to switch on. */
     @Override
     public Switch expr(Expr expr) {
         Switch_c n = (Switch_c) copy();
@@ -84,13 +82,11 @@ public class Switch_c extends Stmt_c implements Switch {
         return n;
     }
 
-    /** Get the switch elements of the statement. */
     @Override
     public List<SwitchElement> elements() {
         return Collections.unmodifiableList(this.elements);
     }
 
-    /** Set the switch elements of the statement. */
     @Override
     public Switch elements(List<SwitchElement> elements) {
         Switch_c n = (Switch_c) copy();
@@ -116,7 +112,6 @@ public class Switch_c extends Stmt_c implements Switch {
         return c.pushBlock();
     }
 
-    /** Visit the children of the statement. */
     @Override
     public Node visitChildren(NodeVisitor v) {
         Expr expr = visitChild(this.expr, v);
@@ -124,7 +119,6 @@ public class Switch_c extends Stmt_c implements Switch {
         return reconstruct(expr, elements);
     }
 
-    /** Type check the statement. */
     @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
         TypeSystem ts = tc.typeSystem();
@@ -192,7 +186,6 @@ public class Switch_c extends Stmt_c implements Switch {
         return "switch (" + expr + ") { ... }";
     }
 
-    /** Write the statement to an output file. */
     @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
         w.write("switch (");

@@ -29,7 +29,7 @@ package polyglot.ast;
 import java.util.List;
 
 /**
- * An immutable representation of a Java language <code>for</code>
+ * An immutable representation of a Java language {@code for}
  * statement.  Contains a statement to be executed and an expression
  * to be tested indicating whether to reexecute the statement.
  */

@@ -30,7 +30,7 @@ import polyglot.util.CodeWriter;
 import polyglot.util.SerialVersionUID;
 
 /**
- * An <code>PackageType</code> represents a package type. It may or may
+ * An {@code PackageType} represents a package type. It may or may
  * not be fully qualified. Package types are never canonical and never
  * primitive.
  */

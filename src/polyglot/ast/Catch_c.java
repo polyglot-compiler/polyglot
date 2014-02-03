@@ -41,7 +41,7 @@ import polyglot.visit.PrettyPrinter;
 import polyglot.visit.TypeChecker;
 
 /**
- * A <code>Catch</code> represents one half of a <code>try-catch</code>
+ * A {@code Catch} represents one half of a {@code try-catch}
  * statement.  Specifically, the second half.
  */
 public class Catch_c extends Stmt_c implements Catch {
@@ -57,19 +57,16 @@ public class Catch_c extends Stmt_c implements Catch {
         this.body = body;
     }
 
-    /** Get the catchType of the catch block. */
     @Override
     public Type catchType() {
         return formal.declType();
     }
 
-    /** Get the formal of the catch block. */
     @Override
     public Formal formal() {
         return this.formal;
     }
 
-    /** Set the formal of the catch block. */
     @Override
     public Catch formal(Formal formal) {
         Catch_c n = (Catch_c) copy();
@@ -77,13 +74,11 @@ public class Catch_c extends Stmt_c implements Catch {
         return n;
     }
 
-    /** Get the body of the catch block. */
     @Override
     public Block body() {
         return this.body;
     }
 
-    /** Set the body of the catch block. */
     @Override
     public Catch body(Block body) {
         Catch_c n = (Catch_c) copy();
@@ -103,7 +98,6 @@ public class Catch_c extends Stmt_c implements Catch {
         return this;
     }
 
-    /** Visit the children of the catch block. */
     @Override
     public Node visitChildren(NodeVisitor v) {
         Formal formal = visitChild(this.formal, v);
@@ -116,7 +110,6 @@ public class Catch_c extends Stmt_c implements Catch {
         return c.pushBlock();
     }
 
-    /** Type check the catch block. */
     @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
         TypeSystem ts = tc.typeSystem();
@@ -135,7 +128,6 @@ public class Catch_c extends Stmt_c implements Catch {
         return "catch (" + formal + ") " + body;
     }
 
-    /** Write the catch block to an output file. */
     @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
         w.write("catch (");

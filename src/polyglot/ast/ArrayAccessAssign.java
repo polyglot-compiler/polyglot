@@ -27,13 +27,14 @@
 package polyglot.ast;
 
 /**
- * A <code>ArrayAccessAssign</code> represents a Java assignment expression
- * to an array element.  For instance, <code>A[3] = e</code>.
+ * A {@code ArrayAccessAssign} represents a Java assignment expression
+ * to an array element.  For instance, {@code A[3] = e}.
  * 
- * The class of the <code>Expr</code> returned by
- * <code>ArrayAccessAssign.left()</code>is guaranteed to be an
- * <code>ArrayAccess</code>.
+ * The class of the {@code Expr} returned by
+ * {@code ArrayAccessAssign.left()}is guaranteed to be an
+ * {@code ArrayAccess}.
  */
 public interface ArrayAccessAssign extends Assign {
+    /** Get the throwsArrayStoreException of the expression. */
     boolean throwsArrayStoreException();
 }

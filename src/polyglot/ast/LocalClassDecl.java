@@ -34,5 +34,6 @@ public interface LocalClassDecl extends CompoundStmt {
     /** The class declaration. */
     ClassDecl decl();
 
+    /** Set the class declaration. */
     LocalClassDecl decl(ClassDecl decl);
 }

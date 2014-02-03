@@ -32,7 +32,7 @@ import polyglot.util.CodeWriter;
 import polyglot.util.Copy;
 
 /**
- * <code>Ext</code> is the super type of all node extension objects.
+ * {@code Ext} is the super type of all node extension objects.
  * It contains a pointer back to the node it is extending and a possibly-null
  * pointer to another extension node.
  */

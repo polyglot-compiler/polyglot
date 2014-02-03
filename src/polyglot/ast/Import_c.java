@@ -38,8 +38,8 @@ import polyglot.visit.PrettyPrinter;
 import polyglot.visit.TypeChecker;
 
 /**
- * An <code>Import</code> is an immutable representation of a Java
- * <code>import</code> statement.  It consists of the string representing the
+ * An {@code Import} is an immutable representation of a Java
+ * {@code import} statement.  It consists of the string representing the
  * item being imported and the kind which is either indicating that a class
  * is being imported, or that an entire package is being imported.
  */
@@ -56,13 +56,11 @@ public class Import_c extends Node_c implements Import {
         this.kind = kind;
     }
 
-    /** Get the name of the import. */
     @Override
     public String name() {
         return this.name;
     }
 
-    /** Set the name of the import. */
     @Override
     public Import name(String name) {
         Import_c n = (Import_c) copy();
@@ -70,35 +68,17 @@ public class Import_c extends Node_c implements Import {
         return n;
     }
 
-    /** Get the kind of the import. */
     @Override
     public Kind kind() {
         return this.kind;
     }
 
-    /** Set the kind of the import. */
     @Override
     public Import kind(Kind kind) {
         Import_c n = (Import_c) copy();
         n.kind = kind;
         return n;
     }
-
-    /**
-     * Build type objects for the import.
-    public Node buildTypes(TypeBuilder tb) throws SemanticException {
-    ImportTable it = tb.importTable();
-
-    if (kind == CLASS) {
-        it.addClassImport(name);
-    }
-    else if (kind == PACKAGE) {
-        it.addPackageImport(name);
-    }
-
-    return this;
-    }
-     */
 
     /** Check that imported classes and packages exist. */
     @Override
@@ -140,7 +120,6 @@ public class Import_c extends Node_c implements Import {
         return "import " + name + (kind == TYPE_IMPORT_ON_DEMAND ? ".*" : "");
     }
 
-    /** Write the import to an output file. */
     @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
         if (!Options.global.fully_qualified_names) {

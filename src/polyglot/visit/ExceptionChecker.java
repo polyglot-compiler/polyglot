@@ -153,9 +153,9 @@ public class ExceptionChecker extends ErrorHandlingVisitor {
      *
      * @param old The original state of root of the current subtree.
      * @param n The current state of the root of the current subtree.
-     * @param v The <code>NodeVisitor</code> object used to visit the children.
+     * @param v The {@code NodeVisitor} object used to visit the children.
      * @return The final result of the traversal of the tree rooted at 
-     *  <code>n</code>.
+     *  {@code n}.
      */
     @Override
     protected Node leaveCall(Node old, Node n, NodeVisitor v)

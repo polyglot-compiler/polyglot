@@ -47,8 +47,8 @@ import java.util.Map;
  */
 public class OptimalCodeWriter extends CodeWriter {
     /**
-     * Create a OptimalCodeWriter object with output stream <code>o</code>
-     * and width <code>width_</code>.
+     * Create a OptimalCodeWriter object with output stream {@code o}
+     * and width {@code width_}.
      * @param o the writer to write to. Must be non-null.
      * @param width_ the formatting width. Must be positive.
      */
@@ -93,7 +93,7 @@ public class OptimalCodeWriter extends CodeWriter {
     }
 
     /**
-     * Start a new block with a relative indentation of <code>n</code>
+     * Start a new block with a relative indentation of {@code n}
      * characters.
      * <p>
      * A block is a formatting unit. The formatting algorithm will try to put
@@ -106,8 +106,8 @@ public class OptimalCodeWriter extends CodeWriter {
      * If either of the two conditions is satisfied, the formatting algorithm
      * will break the block into lines by generating newlines for some of the
      * inserted breaks. The first line is printed at the current cursor
-     * position <code>pos</code>, all the following lines are printed at the
-     * position <code>pos+n</code>.
+     * position {@code pos}, all the following lines are printed at the
+     * position {@code pos+n}.
      * 
      * @param n
      *            the number of characters increased on indentation (relative
@@ -126,7 +126,7 @@ public class OptimalCodeWriter extends CodeWriter {
     }
 
     /**
-     * Terminate the most recent outstanding <code>begin</code>.
+     * Terminate the most recent outstanding {@code begin}.
      */
     @Override
     public void end() {
@@ -158,7 +158,7 @@ public class OptimalCodeWriter extends CodeWriter {
 
     /**
      * This method should be used sparingly; usually a call to
-     * <code>allowBreak</code> is preferable because forcing a newline also
+     * {@code allowBreak} is preferable because forcing a newline also
      * causes all breaks in containing blocks to be broken.
      */
     @Override
@@ -179,7 +179,7 @@ public class OptimalCodeWriter extends CodeWriter {
 
     /**
      * Send out the current batch of text to be formatted. All outstanding
-     * <code>begin</code>'s are closed and the current indentation level is
+     * {@code begin}'s are closed and the current indentation level is
      * reset to 0. Returns true if formatting was completely successful (the
      * margins were obeyed).
      */
@@ -188,7 +188,7 @@ public class OptimalCodeWriter extends CodeWriter {
         return flush(true);
     }
 
-    /** Like <code>flush</code>, but passing <code>format=false</code>
+    /** Like {@code flush}, but passing {@code format=false}
      * causes output to be generated in the fastest way possible, with
      * all breaks broken.
      * @param format whether to pretty-print the output
@@ -286,8 +286,8 @@ public class OptimalCodeWriter extends CodeWriter {
 }
 
 /**
- * An <code>Overrun</code> represents a formatting that failed because the
- * right margin was exceeded by at least <code>amount</code> chars. If
+ * An {@code Overrun} represents a formatting that failed because the
+ * right margin was exceeded by at least {@code amount} chars. If
  * sameLine, the overrun occurred on the first line of the requested
  * formatting; otherwise, it occurred on a subsequent line.
  */
@@ -356,7 +356,7 @@ class Overrun extends Exception {
 }
 
 /**
- * An <code>Item</code> is a piece of input handed to the formatter. It
+ * An {@code Item} is a piece of input handed to the formatter. It
  * contains a reference to a possibly empty list of items that follow it.
  */
 abstract class Item {
@@ -424,10 +424,10 @@ abstract class Item {
      * When a break is broken in a nested block, it means that all equal or
      * higher-level breaks in containing blocks must be broken. However, these
      * breaks may be encountered after the nested block. The parameter
-     * <code>minLevel</code> is used to communicate the level of breaks broken
+     * {@code minLevel} is used to communicate the level of breaks broken
      * in nested blocks (and earlier in the current block). Any break of level
-     * <= minLevel <em>must</em> be broken. The parameter <code>
-     * minLevelUnified</code> is the minimum level at which unified breaks must
+     * <= minLevel <em>must</em> be broken. The parameter
+     * {@code minLevelUnified} is the minimum level at which unified breaks must
      * be broken.  minLevelUnified is equal to either minLevel or minLevel+1.
      * </p>
      * 
@@ -453,7 +453,7 @@ abstract class Item {
             MaxLevels m, int minLevel, int minLevelUnified) throws Overrun;
 
     /**
-     * Send the output associated with this item to <code>o</code>, using the
+     * Send the output associated with this item to {@code o}, using the
      * current break settings.
      * 
      * @param success
@@ -471,7 +471,7 @@ abstract class Item {
     /**
      * Try to format a whole sequence of items in the manner of formatN. Unlike
      * for formatN, The initial position may be an overrun (this is the only
-     * way that overruns are checked!). The item <code>it</code> may be also
+     * way that overruns are checked!). The item {@code it} may be also
      * null, signifying an empty list. Requires: lmargin &lt; rmargin, pos &le;
      * rmargin, lmargin &ge; 0.
      * 

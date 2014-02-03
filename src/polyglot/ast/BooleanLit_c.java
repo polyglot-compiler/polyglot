@@ -34,7 +34,7 @@ import polyglot.visit.PrettyPrinter;
 import polyglot.visit.TypeChecker;
 
 /**
- * A <code>BooleanLit</code> represents a boolean literal expression.
+ * A {@code BooleanLit} represents a boolean literal expression.
  */
 public class BooleanLit_c extends Lit_c implements BooleanLit {
     private static final long serialVersionUID = SerialVersionUID.generate();
@@ -46,13 +46,11 @@ public class BooleanLit_c extends Lit_c implements BooleanLit {
         this.value = value;
     }
 
-    /** Get the value of the expression. */
     @Override
     public boolean value() {
         return this.value;
     }
 
-    /** Set the value of the expression. */
     @Override
     public BooleanLit value(boolean value) {
         BooleanLit_c n = (BooleanLit_c) copy();
@@ -60,7 +58,6 @@ public class BooleanLit_c extends Lit_c implements BooleanLit {
         return n;
     }
 
-    /** Type check the expression. */
     @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
         return type(tc.typeSystem().Boolean());
@@ -71,13 +68,11 @@ public class BooleanLit_c extends Lit_c implements BooleanLit {
         return String.valueOf(value);
     }
 
-    /** Write the expression to an output file. */
     @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
         w.write(String.valueOf(value));
     }
 
-    /** Dumps the AST. */
     @Override
     public void dump(CodeWriter w) {
         super.dump(w);

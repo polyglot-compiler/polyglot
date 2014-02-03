@@ -43,7 +43,7 @@ import polyglot.util.InternalCompilerError;
 import polyglot.util.UniqueID;
 
 /**
- * The <code>AlphaRenamer</code> runs over the AST and alpha-renames any local
+ * The {@code AlphaRenamer} runs over the AST and alpha-renames any local
  * variable declarations that it encounters.
  **/
 public class AlphaRenamer extends NodeVisitor {

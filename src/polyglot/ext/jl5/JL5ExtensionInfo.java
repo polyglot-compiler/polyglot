@@ -100,8 +100,8 @@ public class JL5ExtensionInfo extends JLExtensionInfo {
     }
 
     /**
-     * Return a parser for <code>source</code> using the given
-     * <code>reader</code>.
+     * Return a parser for {@code source} using the given
+     * {@code reader}.
      */
     @Override
     public Parser parser(Reader reader, FileSource source, ErrorQueue eq) {

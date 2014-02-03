@@ -37,7 +37,7 @@ import polyglot.visit.NodeVisitor;
 import polyglot.visit.PrettyPrinter;
 
 /**
- * A <code>Branch</code> is an immutable representation of a branch
+ * A {@code Branch} is an immutable representation of a branch
  * statment in Java (a break or continue).
  */
 public class Branch_c extends Stmt_c implements Branch {
@@ -53,13 +53,11 @@ public class Branch_c extends Stmt_c implements Branch {
         this.label = label;
     }
 
-    /** Get the kind of the branch. */
     @Override
     public Branch.Kind kind() {
         return this.kind;
     }
 
-    /** Set the kind of the branch. */
     @Override
     public Branch kind(Branch.Kind kind) {
         Branch_c n = (Branch_c) copy();
@@ -67,13 +65,11 @@ public class Branch_c extends Stmt_c implements Branch {
         return n;
     }
 
-    /** Get the target label of the branch. */
     @Override
     public Id labelNode() {
         return this.label;
     }
 
-    /** Set the target label of the branch. */
     @Override
     public Branch labelNode(Id label) {
         Branch_c n = (Branch_c) copy();
@@ -81,13 +77,11 @@ public class Branch_c extends Stmt_c implements Branch {
         return n;
     }
 
-    /** Get the target label of the branch. */
     @Override
     public String label() {
         return this.label != null ? this.label.id() : null;
     }
 
-    /** Set the target label of the branch. */
     @Override
     public Branch label(String label) {
         return labelNode(this.label.id(label));
@@ -104,7 +98,6 @@ public class Branch_c extends Stmt_c implements Branch {
         return this;
     }
 
-    /** Visit the children of the constructor. */
     @Override
     public Node visitChildren(NodeVisitor v) {
         Id label = visitChild(this.label, v);
@@ -116,7 +109,6 @@ public class Branch_c extends Stmt_c implements Branch {
         return kind.toString() + (label != null ? " " + label.toString() : "");
     }
 
-    /** Write the expression to an output file. */
     @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
         w.write(kind.toString());
@@ -126,10 +118,6 @@ public class Branch_c extends Stmt_c implements Branch {
         w.write(";");
     }
 
-    /**
-     * Return the first (sub)term performed when evaluating this
-     * term.
-     */
     @Override
     public Term firstChild() {
         return null;

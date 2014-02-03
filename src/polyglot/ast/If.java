@@ -27,7 +27,7 @@
 package polyglot.ast;
 
 /**
- * An immutable representation of a Java language <code>if</code> statement.
+ * An immutable representation of a Java language {@code if} statement.
  * Contains an expression whose value is tested, a "then" statement 
  * (consequent), and optionally an "else" statement (alternate).
  */

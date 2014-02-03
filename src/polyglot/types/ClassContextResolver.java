@@ -37,7 +37,7 @@ import polyglot.util.InternalCompilerError;
 import polyglot.util.StringUtil;
 
 /**
- * A <code>ClassContextResolver</code> looks up type names qualified with a class name.
+ * A {@code ClassContextResolver} looks up type names qualified with a class name.
  * For example, if the class is "A.B", the class context will return the class
  * for member class "A.B.C" (if it exists) when asked for "C".
  */

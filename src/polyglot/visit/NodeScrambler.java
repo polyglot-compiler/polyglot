@@ -47,9 +47,9 @@ import polyglot.frontend.Compiler;
 import polyglot.util.CodeWriter;
 
 /**
- * The <code>NodeScrambler</code> is test case generator of sorts. Since it
- * is ofter useful to introduce ``random'' errors into source code, this
- * class provides a way of doing so in a semi-structed manner. The process
+ * The {@code NodeScrambler} is test case generator of sorts. Since it
+ * is often useful to introduce ``random'' errors into source code, this
+ * class provides a way of doing so in a semi-structured manner. The process
  * takes place in two phases. First, a "FirstPass" is made to collect 
  * a list of nodes and their parents. Then a second pass is made to randomly 
  * replace a branch of the tree with another suitable branch. 
@@ -70,7 +70,7 @@ public class NodeScrambler extends NodeVisitor {
     }
 
     /**
-     * Create a new <code>NodeScrambler</code> with the given random number
+     * Create a new {@code NodeScrambler} with the given random number
      * generator seed.
      */
     public NodeScrambler(JLang lang, long seed) {
@@ -87,9 +87,9 @@ public class NodeScrambler extends NodeVisitor {
     }
 
     /**
-     * Scans throught the AST, create a list of all nodes present, along with
+     * Scans through the AST, create a list of all nodes present, along with
      * the set of parents for each node in the tree. <b>This visitor should be
-     * run before the main <code>NodeScrambler</code> visits the tree.</b>
+     * run before the main {@code NodeScrambler} visits the tree.</b>
      */
     public class FirstPass extends NodeVisitor {
         public FirstPass(JLang lang) {

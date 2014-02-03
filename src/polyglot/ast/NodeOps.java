@@ -81,8 +81,8 @@ public interface NodeOps {
      * The default behavior is to delegate the call to the child node, and let
      * it add appropriate declarations that should be in scope. However,
      * this method gives parent nodes have the ability to modify this behavior.
-     * @param child The child node about to be entered.
-     * @param c The current {@code Context}
+     * @param child the child node about to be entered.
+     * @param c the current {@code Context}
      * @return the {@code Context} to be used for visiting node 
      *           {@code child}
      */
@@ -231,7 +231,7 @@ public interface NodeOps {
     /**
      * Get the expected type of a child expression of {@code this}.
      * The expected type is determined by the context in that the child occurs
-     * (e.g., for <code>x = e</code>, the expected type of {@code e} is
+     * (e.g., for {@code x = e}, the expected type of {@code e} is
      * the declared type of {@code x}.
      *
      * The expected type should impose the least constraints on the child's
@@ -346,7 +346,7 @@ public interface NodeOps {
     void prettyPrint(Lang lang, Writer w);
 
     /**
-     * Pretty-print the AST using the given code writer.
+     * Pretty-print the AST using the given {@code CodeWriter}.
      *
      * @param w The code writer to which to write.
      * @param pp The pretty printer.  This is <i>not</i> a visitor.
@@ -354,7 +354,7 @@ public interface NodeOps {
     void prettyPrint(CodeWriter w, PrettyPrinter pp);
 
     /**
-     * Translate the AST using the given code writer.
+     * Translate the AST using the given {@code CodeWriter}.
      *
      * @param w The code writer to which to write.
      * @param tr The translation pass.  This is <i>not</i> a visitor.

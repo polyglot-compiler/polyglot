@@ -52,8 +52,8 @@ import polyglot.visit.TypeBuilder;
 import polyglot.visit.TypeChecker;
 
 /**
- * A <code>LocalDecl</code> is an immutable representation of the declaration
- * of a local variable.
+ * A {@code LocalDecl} is an immutable representation of a local variable
+ * declaration statement: a type, a name and an optional initializer.
  */
 public class LocalDecl_c extends Stmt_c implements LocalDecl {
     private static final long serialVersionUID = SerialVersionUID.generate();
@@ -79,19 +79,16 @@ public class LocalDecl_c extends Stmt_c implements LocalDecl {
         return li != null && li.isCanonical() && super.isDisambiguated();
     }
 
-    /** Get the type of the declaration. */
     @Override
     public Type declType() {
         return type.type();
     }
 
-    /** Get the flags of the declaration. */
     @Override
     public Flags flags() {
         return flags;
     }
 
-    /** Set the flags of the declaration. */
     @Override
     public LocalDecl flags(Flags flags) {
         if (flags.equals(this.flags)) return this;
@@ -100,13 +97,11 @@ public class LocalDecl_c extends Stmt_c implements LocalDecl {
         return n;
     }
 
-    /** Get the type node of the declaration. */
     @Override
     public TypeNode type() {
         return type;
     }
 
-    /** Set the type of the declaration. */
     @Override
     public LocalDecl type(TypeNode type) {
         if (type == this.type) return this;
@@ -115,13 +110,11 @@ public class LocalDecl_c extends Stmt_c implements LocalDecl {
         return n;
     }
 
-    /** Get the name of the declaration. */
     @Override
     public Id id() {
         return name;
     }
 
-    /** Set the name of the declaration. */
     @Override
     public LocalDecl id(Id name) {
         LocalDecl_c n = (LocalDecl_c) copy();
@@ -129,25 +122,21 @@ public class LocalDecl_c extends Stmt_c implements LocalDecl {
         return n;
     }
 
-    /** Get the name of the declaration. */
     @Override
     public String name() {
         return name.id();
     }
 
-    /** Set the name of the declaration. */
     @Override
     public LocalDecl name(String name) {
         return id(this.name.id(name));
     }
 
-    /** Get the initializer of the declaration. */
     @Override
     public Expr init() {
         return init;
     }
 
-    /** Set the initializer of the declaration. */
     @Override
     public LocalDecl init(Expr init) {
         if (init == this.init) return this;
@@ -156,19 +145,17 @@ public class LocalDecl_c extends Stmt_c implements LocalDecl {
         return n;
     }
 
-    /** Set the local instance of the declaration. */
+    @Override
+    public LocalInstance localInstance() {
+        return li;
+    }
+
     @Override
     public LocalDecl localInstance(LocalInstance li) {
         if (li == this.li) return this;
         LocalDecl_c n = (LocalDecl_c) copy();
         n.li = li;
         return n;
-    }
-
-    /** Get the local instance of the declaration. */
-    @Override
-    public LocalInstance localInstance() {
-        return li;
     }
 
     @Override
@@ -189,7 +176,6 @@ public class LocalDecl_c extends Stmt_c implements LocalDecl {
         return this;
     }
 
-    /** Visit the children of the declaration. */
     @Override
     public Node visitChildren(NodeVisitor v) {
         TypeNode type = visitChild(this.type, v);
@@ -243,7 +229,7 @@ public class LocalDecl_c extends Stmt_c implements LocalDecl {
     }
 
     /**
-     * Override superclass behaviour to check if the variable is multiply
+     * Override superclass behavior to check if the variable is multiply
      * defined.
      */
     @Override
@@ -265,7 +251,6 @@ public class LocalDecl_c extends Stmt_c implements LocalDecl {
         return super.typeCheckEnter(tc);
     }
 
-    /** Type check the declaration. */
     @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
         TypeSystem ts = tc.typeSystem();

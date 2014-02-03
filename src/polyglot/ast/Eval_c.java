@@ -39,8 +39,8 @@ import polyglot.visit.NodeVisitor;
 import polyglot.visit.PrettyPrinter;
 
 /**
- * An <code>Eval</code> is a wrapper for an expression in the context of
- * a statement.
+ * An {@code Eval} wraps an expression in the context of a statement.
+ * It evaluates the expression and then discards the result.
  */
 public class Eval_c extends Stmt_c implements Eval {
     private static final long serialVersionUID = SerialVersionUID.generate();
@@ -53,13 +53,11 @@ public class Eval_c extends Stmt_c implements Eval {
         this.expr = expr;
     }
 
-    /** Get the expression of the statement. */
     @Override
     public Expr expr() {
         return this.expr;
     }
 
-    /** Set the expression of the statement. */
     @Override
     public Eval expr(Expr expr) {
         Eval_c n = (Eval_c) copy();
@@ -89,7 +87,6 @@ public class Eval_c extends Stmt_c implements Eval {
         return child.type();
     }
 
-    /** Visit the children of the statement. */
     @Override
     public Node visitChildren(NodeVisitor v) {
         Expr expr = visitChild(this.expr, v);
@@ -101,7 +98,6 @@ public class Eval_c extends Stmt_c implements Eval {
         return "eval(" + expr.toString() + ");";
     }
 
-    /** Write the statement to an output file. */
     @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
         boolean semi = tr.appendSemicolon(true);

@@ -43,8 +43,9 @@ public interface SubstType<Formal extends Param, Actual extends TypeObject>
     /** The substitution function. */
     Subst<Formal, Actual> subst();
 
-    /** Entries of underlying substitution map.
-     * @return An <code>Iterator</code> of <code>Map.Entry</code>.
+    /**
+     * Entries of underlying substitution map.
+     * @return An {@code Iterator} of {@code Map.Entry}.
      */
     Iterator<Entry<Formal, Actual>> entries();
 }

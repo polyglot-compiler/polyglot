@@ -40,11 +40,11 @@ import polyglot.visit.CFGBuilder;
 import polyglot.visit.NodeVisitor;
 
 /**
- * A <code>FieldAssign_c</code> represents a Java assignment expression to
- * a field.  For instance, <code>this.x = e</code>.
+ * A {@code FieldAssign} represents a Java assignment expression to
+ * a field.  For instance, {@code this.x = e}.
  * 
- * The class of the <code>Expr</code> returned by
- * <code>FieldAssign_c.left()</code>is guaranteed to be a <code>Field</code>.
+ * The class of the {@code Expr} returned by
+ * {@code FieldAssign_c.left()}is guaranteed to be a {@code Field}.
  */
 public class FieldAssign_c extends Assign_c implements FieldAssign {
     private static final long serialVersionUID = SerialVersionUID.generate();

@@ -49,7 +49,7 @@ import polyglot.visit.PrettyPrinter;
 import polyglot.visit.TypeChecker;
 
 /**
- * A <code>ClassBody</code> represents the body of a class or interface
+ * A {@code ClassBody} represents the body of a class or interface
  * declaration or the body of an anonymous class.
  */
 public class ClassBody_c extends Term_c implements ClassBody {
@@ -241,19 +241,12 @@ public class ClassBody_c extends Term_c implements ClassBody {
         }
     }
 
-    /**
-     * Return the first (sub)term performed when evaluating this
-     * term.
-     */
     @Override
     public Term firstChild() {
         // Do _not_ visit class members.
         return null;
     }
 
-    /**
-     * Visit this term in evaluation order.
-     */
     @Override
     public <T> List<T> acceptCFG(CFGBuilder<?> v, List<T> succs) {
         return succs;

@@ -27,20 +27,20 @@
 package polyglot.ast;
 
 /**
- * An immutable representation of a Java language <code>synchronized</code>
+ * An immutable representation of a Java language {@code synchronized}
  * block. Contains an expression being tested and a statement to be executed
- * while the expression is <code>true</code>.
+ * while the expression is {@code true}.
  */
 public interface Synchronized extends CompoundStmt {
-    /** The expression to lock. */
+    /** The expression to synchronize. */
     Expr expr();
 
-    /** Set the expression to lock. */
+    /** Set the expression to synchronize. */
     Synchronized expr(Expr expr);
 
-    /** The body in that the lock is held. */
+    /** The body of the {@code synchronized} block. */
     Block body();
 
-    /** Set the body in that the lock is held. */
+    /** Set the body of the {@code synchronized} block. */
     Synchronized body(Block body);
 }

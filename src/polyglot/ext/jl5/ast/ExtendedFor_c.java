@@ -76,7 +76,6 @@ public class ExtendedFor_c extends Loop_c implements ExtendedFor {
         return this.body;
     }
 
-    /** Set the body of the statement. */
     @Override
     public ExtendedFor body(Stmt body) {
         ExtendedFor_c n = (ExtendedFor_c) copy();
@@ -89,7 +88,6 @@ public class ExtendedFor_c extends Loop_c implements ExtendedFor {
         return this.decl;
     }
 
-    /** Set the body of the statement. */
     @Override
     public ExtendedFor decl(LocalDecl decl) {
         ExtendedFor_c n = (ExtendedFor_c) copy();
@@ -122,7 +120,6 @@ public class ExtendedFor_c extends Loop_c implements ExtendedFor {
         return this;
     }
 
-    /** Visit the children of the statement. */
     @Override
     public Node visitChildren(NodeVisitor v) {
         LocalDecl decl = visitChild(this.decl, v);
@@ -136,7 +133,6 @@ public class ExtendedFor_c extends Loop_c implements ExtendedFor {
         return c.pushBlock();
     }
 
-    /** Type check the statement. */
     @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
         JL5TypeSystem ts = (JL5TypeSystem) tc.typeSystem();
@@ -255,7 +251,6 @@ public class ExtendedFor_c extends Loop_c implements ExtendedFor {
         return body;
     }
 
-    /** Write the statement to an output file. */
     @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
         w.write("for (");

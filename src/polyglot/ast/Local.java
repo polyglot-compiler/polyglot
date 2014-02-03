@@ -32,15 +32,8 @@ import polyglot.types.LocalInstance;
  * A local variable expression.
  */
 public interface Local extends NamedVariable {
-    /** Get the name of the local variable. */
-    Id id();
-
     /** Set the name of the local variable. */
     Local id(Id name);
-
-    /** Get the name of the local variable. */
-    @Override
-    String name();
 
     /** Set the name of the local variable. */
     Local name(String name);

@@ -31,7 +31,7 @@ import polyglot.types.LocalInstance;
 import polyglot.types.Type;
 
 /**
- * A <code>VarDecl</code> represents a local variable declaration, of either a formal
+ * A {@code VarDecl} represents a local variable declaration, of either a formal
  * or a local variable.
  */
 public interface VarDecl extends Term {
@@ -51,7 +51,7 @@ public interface VarDecl extends Term {
     String name();
 
     /**
-     * Get the type object for the local we are declaring.  This field may
+     * Get the type object for the variable declaration.  This field may
      * not be valid until after signature disambiguation.
      */
     LocalInstance localInstance();

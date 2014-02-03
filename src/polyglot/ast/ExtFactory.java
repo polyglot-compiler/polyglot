@@ -27,8 +27,8 @@
 package polyglot.ast;
 
 /**
- * An <code>ExtFactory</code> constructs extensions. It is only used by
- * a <code>NodeFactory</code>, during the creation of AST nodes. ExtFactories
+ * An {@code ExtFactory} constructs extensions. It is only used by
+ * a {@code NodeFactory}, during the creation of AST nodes. ExtFactories
  * may be chained together (see AbstractExtFactory_c) to allow extensions to be
  * composed.
  */

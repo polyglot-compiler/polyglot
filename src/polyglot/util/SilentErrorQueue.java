@@ -30,7 +30,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * A <code>SilentErrorQueue</code> records but does not output error messages.
+ * A {@code SilentErrorQueue} records but does not output error messages.
  */
 public class SilentErrorQueue extends AbstractErrorQueue {
     private List<ErrorInfo> errors;
