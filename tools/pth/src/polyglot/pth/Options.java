@@ -60,7 +60,7 @@ public class Options {
     // test only the ones that failed last time
     protected boolean testPreviouslyFailedOnly = false;
 
-    // test only the ones that failed last time
+    // delete output files after test
     protected boolean deleteOutputFiles = true;
 
     // array of the possible command line options.

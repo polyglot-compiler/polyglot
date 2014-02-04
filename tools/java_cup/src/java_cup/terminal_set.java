@@ -195,6 +195,11 @@ public class terminal_set {
         else return equals((terminal_set) other);
     }
 
+    @Override
+    public int hashCode() {
+        return _elements.hashCode();
+    }
+
     /*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . .*/
 
     /** Convert to string. */

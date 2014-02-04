@@ -70,8 +70,15 @@ public class Main {
     private Set<String> source;
 
     public final static String verbose = "verbose";
-    private static final JavaCompiler javaCompiler =
-            ToolProvider.getSystemJavaCompiler();
+    private static final JavaCompiler javaCompiler = javaCompiler();
+
+    public static JavaCompiler javaCompiler() {
+        JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
+        if (compiler == null)
+            throw new InternalCompilerError("Java compiler not found.  "
+                    + "Does java that runs Polyglot have javac along with it?");
+        return compiler;
+    }
 
     /* modifies args */
     protected ExtensionInfo getExtensionInfo(List<String> args)

@@ -115,13 +115,7 @@ filetest_list ::=
 
 filetest ::=
         filename_list:a description_opt:b failure_set_opt:d
-            {: SourceFileTest sft = null;
-               if (a.size() == 1) {
-                   sft = new SourceFileTest(a.get(0));
-               }
-               else {
-                   sft = new SourceFileTest(a);
-               }
+            {: SourceFileTest sft = new SourceFileTest(a);
                sft.setDescription(b);
                sft.setExpectedFailures(d);
                RESULT = sft; :}

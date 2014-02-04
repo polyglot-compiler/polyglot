@@ -52,4 +52,9 @@ public class Terminal extends GrammarSymbol {
         }
         return false;
     }
+
+    @Override
+    public int hashCode() {
+        return name.hashCode();
+    }
 }

@@ -22,13 +22,17 @@ The return type of polyglot.ast.Node_c:del() is changed from JLDel to NodeOps
 because Node no longer extends JLDel.  Both extend NodeOps, however, which is
 essentially what we need to dispatch to compiler operations.
 
+Interface polyglot.util.Copy is now generic to customize the return type of
+copy().  Classes implementing Copy<T> should have T, instead of Object, as the
+return type of copy().
+
 Updated JFlex to version 1.4.3 and CUP to a variant of version 0.11a beta
 20060608.  Note that the JFlex jar distribution usually contains
 java_cup.runtime.* classes.  These need to be removed to avoid conflicts with
 our customized CUP parser.
 
 Deprecated features should still work with this version, with the exception of
-any overriding of del() method described above.
+any overriding of del() and copy() methods described above.
 
 
 December 3, 2013 : Polyglot 2.5.4rc1

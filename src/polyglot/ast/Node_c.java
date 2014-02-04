@@ -142,7 +142,8 @@ public abstract class Node_c implements Node {
         n.ext = ext;
 
         if (n.ext != null) {
-            n.ext.init(n, n);
+            n.ext.init(n);
+            n.ext.initPred(n);
         }
 
         this.ext = old;
@@ -165,6 +166,7 @@ public abstract class Node_c implements Node {
             if (this.ext != null) {
                 n.ext = this.ext.copy();
                 n.ext.init(n);
+                n.ext.initPred(n);
             }
 
             return n;

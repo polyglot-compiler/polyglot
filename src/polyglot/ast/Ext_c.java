@@ -80,9 +80,6 @@ public abstract class Ext_c implements Ext {
         return (JLang) pred.lang();
     }
 
-    /**
-     * Return the node we ultimately extend.
-     */
     @Override
     public Node node() {
         return node;
@@ -93,26 +90,6 @@ public abstract class Ext_c implements Ext {
         return pred;
     }
 
-    @Override
-    public void init(Node node, NodeOps pred) {
-        if (this.node != null) {
-            throw new InternalCompilerError("Already initialized.");
-        }
-
-        this.node = node;
-        this.pred = pred;
-
-        if (this.ext != null) {
-            this.ext.init(node, this);
-        }
-    }
-
-    /** Initialize the extension object's pointer back to the node.
-     * This also initializes the back pointers for all extensions of
-     * the extension.
-     * @deprecated
-     */
-    @Deprecated
     @Override
     public void init(Node node) {
         if (this.node != null) {
@@ -126,9 +103,14 @@ public abstract class Ext_c implements Ext {
         }
     }
 
-    /**
-     * Return our extension object, or null.
-     */
+    @Override
+    public void initPred(NodeOps pred) {
+        if (this.pred != null)
+            throw new InternalCompilerError("Already initialized.");
+        this.pred = pred;
+        if (this.ext != null) this.ext.initPred(this);
+    }
+
     @Override
     public Ext ext() {
         return ext;
@@ -139,7 +121,7 @@ public abstract class Ext_c implements Ext {
         Ext old = this.ext;
         this.ext = null;
 
-        Ext_c copy = copy();
+        Ext_c copy = (Ext_c) copy();
 
         copy.ext = ext;
 
@@ -148,17 +130,15 @@ public abstract class Ext_c implements Ext {
         return copy;
     }
 
-    /**
-     * Copy the extension.
-     */
     @Override
-    public Ext_c copy() {
+    public Ext copy() {
         try {
             Ext_c copy = (Ext_c) super.clone();
             if (ext != null) {
                 copy.ext = ext.copy();
             }
             copy.node = null; // uninitialize
+            copy.pred = null; // uninitialize
             return copy;
         }
         catch (CloneNotSupportedException e) {

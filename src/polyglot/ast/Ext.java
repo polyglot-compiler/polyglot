@@ -37,27 +37,25 @@ import polyglot.util.Copy;
  * pointer to another extension node.
  */
 public interface Ext extends NodeOps, Copy<Ext>, Serializable {
-    /** The node that we are extending. */
+    /** The node we ultimately extend. */
     Node node();
 
     /** The parent of this extension. */
     NodeOps pred();
 
     /**
-     * Initialize the extension object's pointers back to the node and the parent.
-     * This also initializes the back pointers for all extensions of
-     * the extension.
-     */
-    void init(Node node, NodeOps pred);
-
-    /**
      * Initialize the extension object's pointer back to the node.
      * This also initializes the back pointers for all extensions of
      * the extension.
-     * @deprecated
      */
-    @Deprecated
     void init(Node node);
+
+    /**
+     * Initialize the extension object's pointer back to the parent.
+     * This also initializes the back pointers for all extensions of
+     * the extension.
+     */
+    void initPred(NodeOps pred);
 
     /** An extension of this extension, or null. */
     Ext ext();

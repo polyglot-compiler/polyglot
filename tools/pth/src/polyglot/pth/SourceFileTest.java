@@ -28,14 +28,12 @@ package polyglot.pth;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
 import javax.tools.JavaCompiler;
-import javax.tools.ToolProvider;
 
 import polyglot.util.ErrorInfo;
 import polyglot.util.SilentErrorQueue;
@@ -46,7 +44,7 @@ import polyglot.util.SilentErrorQueue;
 public class SourceFileTest extends AbstractTest {
     private static final String JAVAC = "javac";
     private static final JavaCompiler javaCompiler =
-            ToolProvider.getSystemJavaCompiler();
+            polyglot.main.Main.javaCompiler();
     protected final List<String> sourceFilenames;
     protected String extensionClassname = null;
     protected String[] extraArgs;
@@ -58,24 +56,17 @@ public class SourceFileTest extends AbstractTest {
 
     protected Set<String> undefinedEnvVars = new HashSet<String>();
 
-    public SourceFileTest(String filename) {
-        super(new File(filename).getName());
-        this.sourceFilenames =
-                Collections.singletonList(prependTestPath(filename));
-        this.eq = new SilentErrorQueue(100, this.getName());
-
-    }
-
     public SourceFileTest(List<String> filenames) {
-        super(filenames.toString());
+        super(testName(filenames));
         this.sourceFilenames = new ArrayList<String>(filenames.size());
         for (String filename : filenames)
             this.sourceFilenames.add(prependTestPath(filename));
         this.eq = new SilentErrorQueue(100, this.getName());
     }
 
-    public SourceFileTest(String[] filenames) {
-        this(Arrays.asList(filenames).toString());
+    private static String testName(List<String> filenames) {
+        if (filenames.size() == 1) return new File(filenames.get(0)).getName();
+        return filenames.toString();
     }
 
     @Override
@@ -109,14 +100,29 @@ public class SourceFileTest extends AbstractTest {
             }
         }
 
+        String[] cmdLine = buildCmdLine(getSourceFileNames());
+
+        File destDir;
+        String s = getDestDir();
+        if (s != null)
+            destDir = new File(s);
+        else {
+            destDir = new File("pthOutput");
+
+            for (int i = 1; destDir.exists(); i++)
+                destDir = new File("pthOutput." + i);
+
+            destDir.mkdir();
+        }
+
         // invoke the compiler on the file.
         try {
             if (JAVAC.equals(this.getExtensionClassname())) {
                 // invoke javac on the program
-                invokeJavac(getSourceFileNames());
+                invokeJavac(cmdLine);
             }
             else {
-                invokePolyglot(getSourceFileNames());
+                invokePolyglot(cmdLine);
             }
         }
         catch (polyglot.main.Main.TerminationException e) {
@@ -142,6 +148,11 @@ public class SourceFileTest extends AbstractTest {
                 setFailureMessage("Uncaught " + e.getClass().getName());
                 e.printStackTrace();
                 return false;
+            }
+        }
+        finally {
+            if (Main.options.deleteOutputFiles) {
+                deleteDir(destDir);
             }
         }
         return checkErrorQueue(eq);
@@ -200,76 +211,28 @@ public class SourceFileTest extends AbstractTest {
         return sourceFilenames.toArray(new String[0]);
     }
 
-    protected void invokePolyglot(String[] files)
+    protected void invokePolyglot(String[] cmdLine)
             throws polyglot.main.Main.TerminationException {
-        File tmpdir = new File("pthOutput");
-
-        int i = 1;
-        while (tmpdir.exists()) {
-            tmpdir = new File("pthOutput." + i);
-            i++;
-        }
-
-        tmpdir.mkdir();
-
-        setDestDir(tmpdir.getPath());
-
-        String[] cmdLine = buildCmdLine(files);
         polyglot.main.Main polyglotMain = new polyglot.main.Main();
-
-        try {
-            polyglotMain.start(cmdLine, eq);
-        }
-        finally {
-            if (Main.options.deleteOutputFiles) {
-                deleteDir(tmpdir);
-            }
-
-            setDestDir(null);
-        }
+        polyglotMain.start(cmdLine, eq);
     }
 
-    protected void invokeJavac(String[] files) {
-        File tmpdir = new File("pthOutput");
-
-        int i = 1;
-        while (tmpdir.exists()) {
-            tmpdir = new File("pthOutput." + i);
-            i++;
-        }
-
-        tmpdir.mkdir();
-
-        setDestDir(tmpdir.getPath());
-
-        String[] cmdLine = buildCmdLine(files);
-
-        try {
-            javaCompiler.run(null, null, null, cmdLine);
-        }
-        finally {
-            if (Main.options.deleteOutputFiles) {
-                deleteDir(tmpdir);
-            }
-
-            setDestDir(null);
-        }
+    protected static void invokeJavac(String[] cmdLine) {
+        javaCompiler.run(null, null, null, cmdLine);
     }
 
-    protected void deleteDir(File dir) {
+    protected static void deleteDir(File dir) {
 //        System.out.println("Deleting " + dir.toString());
-        File[] list = dir.listFiles();
-        for (int i = 0; i < list.length; i++) {
-//            System.out.println("  containing " + list[i]);
-            if (list[i].isDirectory()) {
-                deleteDir(list[i]);
+        for (File f : dir.listFiles()) {
+//          System.out.println("  containing " + f);
+            if (f.isDirectory()) {
+                deleteDir(f);
             }
             else {
-                if (!list[i].delete()) {
-                    list[i].deleteOnExit();
-//                    System.out.println("Failed to delete " + list[i]);
+                if (!f.delete()) {
+                    f.deleteOnExit();
+//                    System.out.println("Failed to delete " + f);
                 }
-
             }
         }
         if (!dir.delete()) {
@@ -326,6 +289,7 @@ public class SourceFileTest extends AbstractTest {
                     Arrays.asList(new String[] { "-d", "-cp", "-classpath",
                             "-sourcepath" });
             boolean appendFlag = false;
+            boolean setDestDir = false;
             for (String element : sa) {
                 String sas = element;
                 if (appendFlag) {
@@ -333,6 +297,11 @@ public class SourceFileTest extends AbstractTest {
                     appendFlag = false;
                 }
                 else if (appendFlags.contains(element)) appendFlag = true;
+                if (setDestDir) {
+                    setDestDir(sas);
+                    setDestDir = false;
+                }
+                else if (element.equals("-d")) setDestDir = true;
                 if (pathSep != ':' && sas.indexOf(':') >= 0) {
                     sas = replacePathSep(sas, pathSep);
                 }
@@ -351,7 +320,7 @@ public class SourceFileTest extends AbstractTest {
      * @param pathSep
      * @return
      */
-    private String replacePathSep(String sas, char pathSep) {
+    private static String replacePathSep(String sas, char pathSep) {
         // replace path separater ':' with appropriate 
         // system specific one
         StringBuffer sb = new StringBuffer();
