@@ -1,0 +1,59 @@
+include "../../../../../../src/polyglot/ext/jl5/parse/jl5.ppg"
+
+package carray_jl5.parse;
+
+import carray_jl5.types.CarrayJL5TypeSystem;
+import carray_jl5.ast.CarrayJL5NodeFactory;
+import polyglot.ext.jl5.parse.*;
+
+parser Grm extends polyglot.ext.jl5.parse.Grm {:
+    final CarrayJL5TypeSystem ts;
+    final CarrayJL5NodeFactory nf;
+
+    public Grm(Lexer l, TypeSystem t, NodeFactory n, ErrorQueue q) {
+        super(l, t, n, q);
+        ts = (CarrayJL5TypeSystem) t;
+        nf = (CarrayJL5NodeFactory) n;
+    }
+
+    /**
+      * Return a TypeNode representing a <code>dims</code>-dimensional
+      * const array of <code>n</code>.
+      */
+    public TypeNode constArray(TypeNode n, int dims) throws Exception {
+        if (dims > 0) {
+            if (n instanceof CanonicalTypeNode) {
+                Type t = ((CanonicalTypeNode) n).type();
+                return nf.CanonicalTypeNode(n.position(),
+                                            ts.constArrayOf(n.position(),
+                                                            t, dims));
+            }
+            return nf.ConstArrayTypeNode(n.position(), constArray(n, dims-1));
+        }
+        else {
+            return n;
+        }
+    }
+:};
+
+start with goal;
+
+
+extend array_type ::=
+                    // TypeNode
+        primitive_type:a CONST dims:b
+            {: RESULT = parser.constArray(a, b.intValue()); :}
+    |   name:a CONST dims:b
+            {: RESULT = parser.constArray(a.toType(), b.intValue()); :}
+	|	class_or_interface:a LT type_argument_list_1:b DOT name:c CONST dims:d
+   	 	// Instantiating type arguments
+        {: TypeNode tn = parser.nf.AmbTypeInstantiation(parser.pos(a, b), a, b);
+           TypeNode aa = ((JL5Name) c).toType(tn);
+           RESULT = parser.constArray(aa, d.intValue()); :}
+	|	class_or_interface:a LT type_argument_list_1:b CONST dims:c
+   	 	// Instantiating type arguments
+        {: 
+            RESULT = parser.constArray(parser.nf.AmbTypeInstantiation(parser.pos(a, b), a, b), c.intValue()); :}
+    ;
+
+
