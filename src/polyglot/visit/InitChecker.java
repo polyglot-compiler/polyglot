@@ -221,7 +221,7 @@ public class InitChecker extends DataFlow<InitChecker.FlowItem> {
             else if (count == 2) {
                 return "many";
             }
-            throw new RuntimeException("Unexpected value for count");
+            throw new InternalCompilerError("Unexpected value for count");
         }
 
         public InitCount increment() {

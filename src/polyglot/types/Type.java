@@ -128,8 +128,9 @@ public interface Type extends Qualifier {
 
     /**
      * Return true a literal {@code value} can be converted to this type.
-     * This method should be removed.  It is kept for backward compatibility.
+     * @deprecated Use {@link #numericConversionValid(Object)} instead.
      */
+    @Deprecated
     boolean numericConversionValid(long value);
 
     /**
@@ -160,8 +161,9 @@ public interface Type extends Qualifier {
 
     /**
      * Return true a literal {@code value} can be converted to this type.
-     * This method should be removed.  It is kept for backward compatibility.
+     * @deprecated Use {@link #numericConversionValidImpl(Object)} instead.
      */
+    @Deprecated
     boolean numericConversionValidImpl(long value);
 
     /**

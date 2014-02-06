@@ -98,8 +98,7 @@ public class NodeScrambler extends NodeVisitor {
 
         @Override
         public NodeVisitor enter(Node n) {
-            @SuppressWarnings("unchecked")
-            LinkedList<Node> clone = (LinkedList<Node>) currentParents.clone();
+            LinkedList<Node> clone = new LinkedList<Node>(currentParents);
             pairs.put(n, clone);
             nodes.add(n);
 

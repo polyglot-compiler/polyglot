@@ -254,9 +254,10 @@ public interface TypeSystem {
 
     /**
      * Returns true if {@code value} can be implicitly cast to primitive type
-     * {@code t}.  This method should be removed.  It is kept for backward
-     * compatibility.
+     * {@code t}.
+     * @deprecated Use {@link #numericConversionValid(Type, Object)} instead.
      */
+    @Deprecated
     boolean numericConversionValid(Type t, long value);
 
     /**

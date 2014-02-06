@@ -12,7 +12,7 @@ import polyglot.util.ErrorQueue;
 import carray.ast.CarrayNodeFactory_c;
 import carray.parse.Grm;
 import carray.parse.Lexer_c;
-import carray.types.CarrayTypeSystem;
+import carray.types.CarrayTypeSystem_c;
 
 /**
  * Extension information for carray extension.
@@ -37,7 +37,7 @@ public class ExtensionInfo extends polyglot.frontend.JLExtensionInfo {
 
     @Override
     protected TypeSystem createTypeSystem() {
-        return new CarrayTypeSystem();
+        return new CarrayTypeSystem_c();
     }
 
 }

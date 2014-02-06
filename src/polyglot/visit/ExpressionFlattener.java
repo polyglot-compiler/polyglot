@@ -45,7 +45,6 @@ import polyglot.ast.Empty;
 import polyglot.ast.Eval;
 import polyglot.ast.Expr;
 import polyglot.ast.FieldDecl;
-import polyglot.ast.Id;
 import polyglot.ast.If;
 import polyglot.ast.IntLit;
 import polyglot.ast.Labeled;
@@ -402,14 +401,14 @@ public class ExpressionFlattener extends NodeVisitor {
         return t;
     }
 
-    protected Node translateBinary(Binary b) {
+    protected Expr translateBinary(Binary b) {
         if (neverFlatten(b)) {
             return b;
         }
         return translateShortCircuitBinary(b);
     }
 
-    protected Node translateShortCircuitBinary(Binary b) {
+    protected Expr translateShortCircuitBinary(Binary b) {
         if (b.operator() == Binary.COND_AND) {
             Expr left = visitEdge(b, b.left());
 
@@ -463,8 +462,8 @@ public class ExpressionFlattener extends NodeVisitor {
         return null;
     }
 
-    protected Node translateLocalDecl(LocalDecl d) {
-        Node n = d;
+    protected Stmt translateLocalDecl(LocalDecl d) {
+        Stmt n = d;
         Expr e = d.init();
 
         if (e != null) {
@@ -575,7 +574,7 @@ public class ExpressionFlattener extends NodeVisitor {
 
     /** Whenever a new node is created, this method is called and should do
       * additional processing of the node as needed. */
-    protected Node postCreate(Node n) {
+    protected <N extends Node> N postCreate(N n) {
         return n;
     }
 
@@ -619,19 +618,19 @@ public class ExpressionFlattener extends NodeVisitor {
         }
 
         Block b = nf.Block(s.position(), s);
-        b = (Block) postCreate(b);
+        b = postCreate(b);
         return b;
     }
 
     protected Empty createEmpty() {
         Empty s = nf.Empty(Position.compilerGenerated());
-        s = (Empty) postCreate(s);
+        s = postCreate(s);
         return s;
     }
 
     protected Eval createEval(Expr e) {
         Eval s = nf.Eval(e.position(), e);
-        s = (Eval) postCreate(s);
+        s = postCreate(s);
         return s;
     }
 
@@ -663,11 +662,11 @@ public class ExpressionFlattener extends NodeVisitor {
         LocalDecl d =
                 nf.LocalDecl(pos,
                              Flags.NONE,
-                             (TypeNode) postCreate(nf.CanonicalTypeNode(pos, t)),
-                             (Id) postCreate(nf.Id(pos, name)),
+                             postCreate(nf.CanonicalTypeNode(pos, t)),
+                             postCreate(nf.Id(pos, name)),
                              init);
         d = d.localInstance(li);
-        d = (LocalDecl) postCreate(d);
+        d = postCreate(d);
         return d;
     }
 
@@ -678,10 +677,10 @@ public class ExpressionFlattener extends NodeVisitor {
         Position pos = d.position();
         LocalInstance li = d.localInstance();
         Local l =
-                (Local) nf.Local(pos, (Id) postCreate(nf.Id(pos, d.name())))
+                (Local) nf.Local(pos, postCreate(nf.Id(pos, d.name())))
                           .type(typeOf(li));
         l = l.localInstance(li);
-        l = (Local) postCreate(l);
+        l = postCreate(l);
         return l;
     }
 
@@ -696,8 +695,8 @@ public class ExpressionFlattener extends NodeVisitor {
         l = (Expr) deepCopy(l);
         Eval a =
                 nf.Eval(pos,
-                        ((Assign) postCreate(nf.Assign(pos, l, Assign.ASSIGN, r))).type(typeOf(l)));
-        a = (Eval) postCreate(a);
+                        postCreate(nf.Assign(pos, l, Assign.ASSIGN, r)).type(typeOf(l)));
+        a = postCreate(a);
         return a;
     }
 
@@ -709,10 +708,10 @@ public class ExpressionFlattener extends NodeVisitor {
         Operator op = a.operator().binaryOperator();
 
         Binary b =
-                (Binary) postCreate(nf.Binary(pos,
-                                              (Expr) deepCopy(a.left()),
-                                              op,
-                                              a.right()));
+                postCreate(nf.Binary(pos,
+                                     (Expr) deepCopy(a.left()),
+                                     op,
+                                     a.right()));
         if (typeOf(a.left()).isNumeric() && typeOf(a.right()).isNumeric()) {
             try {
                 b =
@@ -726,13 +725,12 @@ public class ExpressionFlattener extends NodeVisitor {
         else {
             b = (Binary) b.type(a.left().type());
         }
-        TypeNode tn =
-                (TypeNode) postCreate(nf.CanonicalTypeNode(pos, a.left().type()));
-        Cast c = (Cast) postCreate(nf.Cast(pos, tn, b));
+        TypeNode tn = postCreate(nf.CanonicalTypeNode(pos, a.left().type()));
+        Cast c = postCreate(nf.Cast(pos, tn, b));
         c = (Cast) c.type(a.left().type());
 
         a = (Assign) nf.Assign(pos, a.left(), Assign.ASSIGN, c).type(typeOf(a));
-        a = (Assign) postCreate(a);
+        a = postCreate(a);
         return a;
     }
 
@@ -773,7 +771,7 @@ public class ExpressionFlattener extends NodeVisitor {
                 nf.Cast(pos, nf.CanonicalTypeNode(pos, e.type()), plus)
                   .type(e.type());
 
-        Eval a = createAssign(e, ((Expr) postCreate(plus)).type(typeOf(e)));
+        Eval a = createAssign(e, postCreate(plus).type(typeOf(e)));
         return a;
     }
 
@@ -790,7 +788,7 @@ public class ExpressionFlattener extends NodeVisitor {
                       cond,
                       createAssign(l, e),
                       createAssign(l, createBool(false)));
-        s = (If) postCreate(s);
+        s = postCreate(s);
         return s;
     }
 
@@ -807,7 +805,7 @@ public class ExpressionFlattener extends NodeVisitor {
                       cond,
                       createAssign(l, createBool(true)),
                       createAssign(l, e));
-        s = (If) postCreate(s);
+        s = postCreate(s);
         return s;
     }
 
@@ -820,7 +818,7 @@ public class ExpressionFlattener extends NodeVisitor {
             Conditional original) {
         Position pos = l.position();
         If s = nf.If(pos, cond, createAssign(l, e1), createAssign(l, e2));
-        s = (If) postCreate(s);
+        s = postCreate(s);
         return s;
     }
 
@@ -828,17 +826,17 @@ public class ExpressionFlattener extends NodeVisitor {
      * Create a boolean literal
      */
     protected BooleanLit createBool(boolean val) {
-        return (BooleanLit) ((BooleanLit) postCreate(nf.BooleanLit(Position.compilerGenerated(),
-                                                                   val))).type(ts.Boolean());
+        return (BooleanLit) postCreate(nf.BooleanLit(Position.compilerGenerated(),
+                                                     val)).type(ts.Boolean());
     }
 
     /**
      * Create an int literal
      */
     protected IntLit createInt(int val) {
-        return (IntLit) ((IntLit) postCreate(nf.IntLit(Position.compilerGenerated(),
-                                                       IntLit.INT,
-                                                       val))).type(ts.Int());
+        return (IntLit) postCreate(nf.IntLit(Position.compilerGenerated(),
+                                             IntLit.INT,
+                                             val)).type(ts.Int());
     }
 
     protected Type typeOf(Expr e) {

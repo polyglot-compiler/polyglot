@@ -32,6 +32,7 @@ import java.util.List;
 
 import polyglot.main.Report;
 import polyglot.util.CollectionUtil;
+import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
 
@@ -270,8 +271,9 @@ public class MethodInstance_c extends ProcedureInstance_c implements
      * Leave this method in for historic reasons, to make sure that extensions
      * modify their code correctly.
      */
+    @Deprecated
     public final boolean canOverrideImpl(MethodInstance mj) {
-        throw new RuntimeException("canOverrideImpl(MethodInstance mj) should not be called.");
+        throw new InternalCompilerError("canOverrideImpl(MethodInstance mj) should not be called.");
     }
 
     @Override
@@ -373,9 +375,9 @@ public class MethodInstance_c extends ProcedureInstance_c implements
                                                 + " in "
                                                 + mj.container()
                                                 + "; overridden method is "
-                                                + (mj.flags().isStatic() ? ""
-                                                        : "not") + "static",
-                                        mi.position());
+                                                + (mj.flags().isStatic()
+                                                        ? "" : "not")
+                                                + "static", mi.position());
         }
 
         if (mi != mj && !mi.equals(mj) && mj.flags().isFinal()) {

@@ -234,11 +234,6 @@ public class PrimitiveType_c extends Type_c implements PrimitiveType {
     }
 
     @Override
-    public boolean numericConversionValidImpl(long value) {
-        return numericConversionValidImpl(new Long(value));
-    }
-
-    @Override
     public boolean numericConversionValidImpl(Object value) {
         if (value == null) return false;
         if (value instanceof Float || value instanceof Double) return false;

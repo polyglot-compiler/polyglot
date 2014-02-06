@@ -30,6 +30,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
@@ -50,6 +51,7 @@ public class SourceFileTest extends AbstractTest {
     protected String[] extraArgs;
     protected List<String> mainExtraArgs;
     protected final SilentErrorQueue eq;
+    protected String testDir;
     protected String destDir;
 
     protected List<ExpectedFailure> expectedFailures;
@@ -58,9 +60,7 @@ public class SourceFileTest extends AbstractTest {
 
     public SourceFileTest(List<String> filenames) {
         super(testName(filenames));
-        this.sourceFilenames = new ArrayList<String>(filenames.size());
-        for (String filename : filenames)
-            this.sourceFilenames.add(prependTestPath(filename));
+        this.sourceFilenames = filenames;
         this.eq = new SilentErrorQueue(100, this.getName());
     }
 
@@ -93,14 +93,14 @@ public class SourceFileTest extends AbstractTest {
     @Override
     protected boolean runTest() {
         for (String filename : sourceFilenames) {
-            File sourceFile = new File(filename);
+            File sourceFile = new File(prependTestPath(filename));
             if (!sourceFile.exists()) {
                 setFailureMessage("File not found.");
                 return false;
             }
         }
 
-        String[] cmdLine = buildCmdLine(getSourceFileNames());
+        List<String> cmdLine = buildCmdLine(getSourceFileNames());
 
         File destDir;
         String s = getDestDir();
@@ -113,6 +113,9 @@ public class SourceFileTest extends AbstractTest {
                 destDir = new File("pthOutput." + i);
 
             destDir.mkdir();
+
+            cmdLine.add("-d");
+            cmdLine.add(prependTestPath(destDir.getName()));
         }
 
         // invoke the compiler on the file.
@@ -207,18 +210,24 @@ public class SourceFileTest extends AbstractTest {
         return errors.isEmpty() || swallowRemainingFailures;
     }
 
-    protected String[] getSourceFileNames() {
-        return sourceFilenames.toArray(new String[0]);
+    protected List<String> getSourceFileNames() {
+        List<String> sf = new ArrayList<String>(sourceFilenames.size());
+        for (String f : sourceFilenames)
+            sf.add(prependTestPath(f));
+        return sf;
     }
 
-    protected void invokePolyglot(String[] cmdLine)
+    protected void invokePolyglot(List<String> cmdLine)
             throws polyglot.main.Main.TerminationException {
         polyglot.main.Main polyglotMain = new polyglot.main.Main();
-        polyglotMain.start(cmdLine, eq);
+        polyglotMain.start(cmdLine.toArray(new String[cmdLine.size()]), eq);
     }
 
-    protected static void invokeJavac(String[] cmdLine) {
-        javaCompiler.run(null, null, null, cmdLine);
+    protected static void invokeJavac(List<String> cmdLine) {
+        javaCompiler.run(null,
+                         null,
+                         null,
+                         cmdLine.toArray(new String[cmdLine.size()]));
     }
 
     protected static void deleteDir(File dir) {
@@ -241,8 +250,8 @@ public class SourceFileTest extends AbstractTest {
         }
     }
 
-    protected String[] buildCmdLine(String[] files) {
-        ArrayList<String> args = new ArrayList<String>();
+    protected List<String> buildCmdLine(List<String> files) {
+        List<String> args = new LinkedList<String>();
 
         String s;
         String[] sa;
@@ -270,7 +279,7 @@ public class SourceFileTest extends AbstractTest {
         char pathSep = File.pathSeparatorChar;
 
         if (mainExtraArgs == null && (s = Main.options.extraArgs) != null) {
-            mainExtraArgs = new ArrayList<String>();
+            mainExtraArgs = new LinkedList<String>();
             sa = breakString(Main.options.extraArgs);
             for (String element : sa) {
                 String sas = element;
@@ -310,9 +319,9 @@ public class SourceFileTest extends AbstractTest {
             }
         }
 
-        args.addAll(Arrays.asList(files));
+        args.addAll(files);
 
-        return args.toArray(new String[0]);
+        return args;
     }
 
     /**
@@ -377,7 +386,7 @@ public class SourceFileTest extends AbstractTest {
     }
 
     protected static String[] breakString(String s) {
-        ArrayList<String> l = new ArrayList<String>();
+        List<String> l = new LinkedList<String>();
         int i = 0;
         String token = "";
         // if endChar != 0, then we are parsing a long token that may
@@ -438,8 +447,14 @@ public class SourceFileTest extends AbstractTest {
         return getTestDir();
     }
 
+    protected void setTestDir(String dir) {
+        this.testDir =
+                Main.options.testpath == null ? dir : Main.options.testpath
+                        + dir;
+    }
+
     protected String getTestDir() {
-        return Main.options.testpath;
+        return testDir;
     }
 
     protected String prependTestPath(String filename) {

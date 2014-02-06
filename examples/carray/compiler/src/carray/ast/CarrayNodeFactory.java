@@ -10,5 +10,5 @@ import polyglot.util.Position;
  *
  */
 public interface CarrayNodeFactory extends NodeFactory {
-    public ArrayTypeNode ConstArrayTypeNode(Position pos, TypeNode base);
+    ArrayTypeNode ConstArrayTypeNode(Position pos, TypeNode base);
 }

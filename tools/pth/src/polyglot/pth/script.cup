@@ -54,6 +54,7 @@ terminal PLUS;
 non terminal List<SourceFileTest> goal;
 non terminal List<SourceFileTest> compilertest_list;
 non terminal List<SourceFileTest> compilertest;
+non terminal String testpath_opt;
 non terminal String command_line_args_opt;
 non terminal List<SourceFileTest> filetest_list;
 non terminal SourceFileTest filetest;
@@ -81,15 +82,22 @@ compilertest_list ::=
     ;
 
 compilertest ::=
-        IDENT:a command_line_args_opt:b LBRACE filetest_list:c RBRACE
+        IDENT:a testpath_opt:b command_line_args_opt:c LBRACE filetest_list:d RBRACE
             {: String extClassName = a;
                
-		        for (SourceFileTest sft : c) {
+		        for (SourceFileTest sft : d) {
+		            sft.setTestDir(b);
 		            sft.setExtensionClassname(extClassName);
-		            sft.setExtraCmdLineArgs(b);
+		            sft.setExtraCmdLineArgs(c);
 		        }
-               RESULT = c; :}
+               RESULT = d; :}
 	    
+    ;
+
+testpath_opt ::=
+        LBRACK sentence:a RBRACK
+            {: RESULT = a; :}
+    | {: RESULT = ""; :}
     ;
 
 command_line_args_opt ::=

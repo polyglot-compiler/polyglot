@@ -211,7 +211,7 @@ public abstract class Node_c implements Node {
     }
 
     @Override
-    public <T extends Node> T visitChild(T n, NodeVisitor v) {
+    public <N extends Node> N visitChild(N n, NodeVisitor v) {
         if (n == null) {
             return null;
         }

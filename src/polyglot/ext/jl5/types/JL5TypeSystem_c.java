@@ -1550,20 +1550,6 @@ public class JL5TypeSystem_c extends
     }
 
     @Override
-    public boolean numericConversionValid(Type type, long value) {
-        // Optional support for allowing a boxing conversion when using a literal
-        // in an initializer for compatibility with with "javac -source 1.5"
-        JL5Options opts = (JL5Options) extInfo.getOptions();
-        if (opts.morePermissiveCasts && isPrimitiveWrapper(type)) {
-            return super.numericConversionValid(primitiveTypeOfWrapper(type),
-                                                value);
-        }
-        else {
-            return super.numericConversionValid(type, value);
-        }
-    }
-
-    @Override
     public boolean numericConversionValid(Type type, Object value) {
         // Optional support for allowing a boxing conversion when using a literal
         // in an initializer for compatibility with with "javac -source 1.5"

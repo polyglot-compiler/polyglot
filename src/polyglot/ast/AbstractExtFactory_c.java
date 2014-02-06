@@ -79,7 +79,7 @@ public abstract class AbstractExtFactory_c implements ExtFactory {
      *             its chain of extensions.
      * @return the result of adding e1 to the end of e2's chain of extensions.
      */
-    protected Ext composeExts(Ext e1, Ext e2) {
+    protected static Ext composeExts(Ext e1, Ext e2) {
         if (e1 == null) return e2;
         if (e2 == null) return e1;
         // add e1 as e2's last extension, by recursing...
@@ -959,6 +959,322 @@ public abstract class AbstractExtFactory_c implements ExtFactory {
             e = composeExts(e, e2);
         }
         return postExtWhile(e);
+    }
+
+    protected static final Ext extId(ExtFactory extFactory) {
+        return ((AbstractExtFactory_c) extFactory).extIdImpl();
+    }
+
+    protected static final Ext extAmbAssign(ExtFactory extFactory) {
+        return ((AbstractExtFactory_c) extFactory).extAmbAssignImpl();
+    }
+
+    protected static final Ext extAmbExpr(ExtFactory extFactory) {
+        return ((AbstractExtFactory_c) extFactory).extAmbExprImpl();
+    }
+
+    protected static final Ext extAmbPrefix(ExtFactory extFactory) {
+        return ((AbstractExtFactory_c) extFactory).extAmbPrefixImpl();
+    }
+
+    protected static final Ext extAmbQualifierNode(ExtFactory extFactory) {
+        return ((AbstractExtFactory_c) extFactory).extAmbQualifierNodeImpl();
+    }
+
+    protected static final Ext extAmbReceiver(ExtFactory extFactory) {
+        return ((AbstractExtFactory_c) extFactory).extAmbReceiverImpl();
+    }
+
+    protected static final Ext extAmbTypeNode(ExtFactory extFactory) {
+        return ((AbstractExtFactory_c) extFactory).extAmbTypeNodeImpl();
+    }
+
+    protected static final Ext extArrayAccess(ExtFactory extFactory) {
+        return ((AbstractExtFactory_c) extFactory).extArrayAccessImpl();
+    }
+
+    protected static final Ext extArrayInit(ExtFactory extFactory) {
+        return ((AbstractExtFactory_c) extFactory).extArrayInitImpl();
+    }
+
+    protected static final Ext extArrayTypeNode(ExtFactory extFactory) {
+        return ((AbstractExtFactory_c) extFactory).extArrayTypeNodeImpl();
+    }
+
+    protected static final Ext extAssert(ExtFactory extFactory) {
+        return ((AbstractExtFactory_c) extFactory).extAssertImpl();
+    }
+
+    protected static final Ext extAssign(ExtFactory extFactory) {
+        return ((AbstractExtFactory_c) extFactory).extAssignImpl();
+    }
+
+    protected static final Ext extLocalAssign(ExtFactory extFactory) {
+        return ((AbstractExtFactory_c) extFactory).extLocalAssignImpl();
+    }
+
+    protected static final Ext extFieldAssign(ExtFactory extFactory) {
+        return ((AbstractExtFactory_c) extFactory).extFieldAssignImpl();
+    }
+
+    protected static final Ext extArrayAccessAssign(ExtFactory extFactory) {
+        return ((AbstractExtFactory_c) extFactory).extArrayAccessAssignImpl();
+    }
+
+    protected static final Ext extBinary(ExtFactory extFactory) {
+        return ((AbstractExtFactory_c) extFactory).extBinaryImpl();
+    }
+
+    protected static final Ext extBlock(ExtFactory extFactory) {
+        return ((AbstractExtFactory_c) extFactory).extBlockImpl();
+    }
+
+    protected static final Ext extBooleanLit(ExtFactory extFactory) {
+        return ((AbstractExtFactory_c) extFactory).extBooleanLitImpl();
+    }
+
+    protected static final Ext extBranch(ExtFactory extFactory) {
+        return ((AbstractExtFactory_c) extFactory).extBranchImpl();
+    }
+
+    protected static final Ext extCall(ExtFactory extFactory) {
+        return ((AbstractExtFactory_c) extFactory).extCallImpl();
+    }
+
+    protected static final Ext extCanonicalTypeNode(ExtFactory extFactory) {
+        return ((AbstractExtFactory_c) extFactory).extCanonicalTypeNodeImpl();
+    }
+
+    protected static final Ext extCase(ExtFactory extFactory) {
+        return ((AbstractExtFactory_c) extFactory).extCaseImpl();
+    }
+
+    protected static final Ext extCast(ExtFactory extFactory) {
+        return ((AbstractExtFactory_c) extFactory).extCastImpl();
+    }
+
+    protected static final Ext extCatch(ExtFactory extFactory) {
+        return ((AbstractExtFactory_c) extFactory).extCatchImpl();
+    }
+
+    protected static final Ext extCharLit(ExtFactory extFactory) {
+        return ((AbstractExtFactory_c) extFactory).extCharLitImpl();
+    }
+
+    protected static final Ext extClassBody(ExtFactory extFactory) {
+        return ((AbstractExtFactory_c) extFactory).extClassBodyImpl();
+    }
+
+    protected static final Ext extClassDecl(ExtFactory extFactory) {
+        return ((AbstractExtFactory_c) extFactory).extClassDeclImpl();
+    }
+
+    protected static final Ext extClassLit(ExtFactory extFactory) {
+        return ((AbstractExtFactory_c) extFactory).extClassLitImpl();
+    }
+
+    protected static final Ext extClassMember(ExtFactory extFactory) {
+        return ((AbstractExtFactory_c) extFactory).extClassMemberImpl();
+    }
+
+    protected static final Ext extCodeDecl(ExtFactory extFactory) {
+        return ((AbstractExtFactory_c) extFactory).extCodeDeclImpl();
+    }
+
+    protected static final Ext extCompoundStmt(ExtFactory extFactory) {
+        return ((AbstractExtFactory_c) extFactory).extCompoundStmtImpl();
+    }
+
+    protected static final Ext extConditional(ExtFactory extFactory) {
+        return ((AbstractExtFactory_c) extFactory).extConditionalImpl();
+    }
+
+    protected static final Ext extConstructorCall(ExtFactory extFactory) {
+        return ((AbstractExtFactory_c) extFactory).extConstructorCallImpl();
+    }
+
+    protected static final Ext extConstructorDecl(ExtFactory extFactory) {
+        return ((AbstractExtFactory_c) extFactory).extConstructorDeclImpl();
+    }
+
+    protected static final Ext extDo(ExtFactory extFactory) {
+        return ((AbstractExtFactory_c) extFactory).extDoImpl();
+    }
+
+    protected static final Ext extEmpty(ExtFactory extFactory) {
+        return ((AbstractExtFactory_c) extFactory).extEmptyImpl();
+    }
+
+    protected static final Ext extEval(ExtFactory extFactory) {
+        return ((AbstractExtFactory_c) extFactory).extEvalImpl();
+    }
+
+    protected static final Ext extExpr(ExtFactory extFactory) {
+        return ((AbstractExtFactory_c) extFactory).extExprImpl();
+    }
+
+    protected static final Ext extField(ExtFactory extFactory) {
+        return ((AbstractExtFactory_c) extFactory).extFieldImpl();
+    }
+
+    protected static final Ext extFieldDecl(ExtFactory extFactory) {
+        return ((AbstractExtFactory_c) extFactory).extFieldDeclImpl();
+    }
+
+    protected static final Ext extFloatLit(ExtFactory extFactory) {
+        return ((AbstractExtFactory_c) extFactory).extFloatLitImpl();
+    }
+
+    protected static final Ext extFor(ExtFactory extFactory) {
+        return ((AbstractExtFactory_c) extFactory).extForImpl();
+    }
+
+    protected static final Ext extFormal(ExtFactory extFactory) {
+        return ((AbstractExtFactory_c) extFactory).extFormalImpl();
+    }
+
+    protected static final Ext extIf(ExtFactory extFactory) {
+        return ((AbstractExtFactory_c) extFactory).extIfImpl();
+    }
+
+    protected static final Ext extImport(ExtFactory extFactory) {
+        return ((AbstractExtFactory_c) extFactory).extImportImpl();
+    }
+
+    protected static final Ext extInitializer(ExtFactory extFactory) {
+        return ((AbstractExtFactory_c) extFactory).extInitializerImpl();
+    }
+
+    protected static final Ext extInstanceof(ExtFactory extFactory) {
+        return ((AbstractExtFactory_c) extFactory).extInstanceofImpl();
+    }
+
+    protected static final Ext extIntLit(ExtFactory extFactory) {
+        return ((AbstractExtFactory_c) extFactory).extIntLitImpl();
+    }
+
+    protected static final Ext extLabeled(ExtFactory extFactory) {
+        return ((AbstractExtFactory_c) extFactory).extLabeledImpl();
+    }
+
+    protected static final Ext extLit(ExtFactory extFactory) {
+        return ((AbstractExtFactory_c) extFactory).extLitImpl();
+    }
+
+    protected static final Ext extLocal(ExtFactory extFactory) {
+        return ((AbstractExtFactory_c) extFactory).extLocalImpl();
+    }
+
+    protected static final Ext extLocalClassDecl(ExtFactory extFactory) {
+        return ((AbstractExtFactory_c) extFactory).extLocalClassDeclImpl();
+    }
+
+    protected static final Ext extLocalDecl(ExtFactory extFactory) {
+        return ((AbstractExtFactory_c) extFactory).extLocalDeclImpl();
+    }
+
+    protected static final Ext extLoop(ExtFactory extFactory) {
+        return ((AbstractExtFactory_c) extFactory).extLoopImpl();
+    }
+
+    protected static final Ext extMethodDecl(ExtFactory extFactory) {
+        return ((AbstractExtFactory_c) extFactory).extMethodDeclImpl();
+    }
+
+    protected static final Ext extNewArray(ExtFactory extFactory) {
+        return ((AbstractExtFactory_c) extFactory).extNewArrayImpl();
+    }
+
+    protected static final Ext extNode(ExtFactory extFactory) {
+        return ((AbstractExtFactory_c) extFactory).extNodeImpl();
+    }
+
+    protected static final Ext extNodeList(ExtFactory extFactory) {
+        return ((AbstractExtFactory_c) extFactory).extNodeListImpl();
+    }
+
+    protected static final Ext extNew(ExtFactory extFactory) {
+        return ((AbstractExtFactory_c) extFactory).extNewImpl();
+    }
+
+    protected static final Ext extNullLit(ExtFactory extFactory) {
+        return ((AbstractExtFactory_c) extFactory).extNullLitImpl();
+    }
+
+    protected static final Ext extNumLit(ExtFactory extFactory) {
+        return ((AbstractExtFactory_c) extFactory).extNumLitImpl();
+    }
+
+    protected static final Ext extPackageNode(ExtFactory extFactory) {
+        return ((AbstractExtFactory_c) extFactory).extPackageNodeImpl();
+    }
+
+    protected static final Ext extProcedureDecl(ExtFactory extFactory) {
+        return ((AbstractExtFactory_c) extFactory).extProcedureDeclImpl();
+    }
+
+    protected static final Ext extReturn(ExtFactory extFactory) {
+        return ((AbstractExtFactory_c) extFactory).extReturnImpl();
+    }
+
+    protected static final Ext extSourceCollection(ExtFactory extFactory) {
+        return ((AbstractExtFactory_c) extFactory).extSourceCollectionImpl();
+    }
+
+    protected static final Ext extSourceFile(ExtFactory extFactory) {
+        return ((AbstractExtFactory_c) extFactory).extSourceFileImpl();
+    }
+
+    protected static final Ext extSpecial(ExtFactory extFactory) {
+        return ((AbstractExtFactory_c) extFactory).extSpecialImpl();
+    }
+
+    protected static final Ext extStmt(ExtFactory extFactory) {
+        return ((AbstractExtFactory_c) extFactory).extStmtImpl();
+    }
+
+    protected static final Ext extStringLit(ExtFactory extFactory) {
+        return ((AbstractExtFactory_c) extFactory).extStringLitImpl();
+    }
+
+    protected static final Ext extSwitchBlock(ExtFactory extFactory) {
+        return ((AbstractExtFactory_c) extFactory).extSwitchBlockImpl();
+    }
+
+    protected static final Ext extSwitchElement(ExtFactory extFactory) {
+        return ((AbstractExtFactory_c) extFactory).extSwitchElementImpl();
+    }
+
+    protected static final Ext extSwitch(ExtFactory extFactory) {
+        return ((AbstractExtFactory_c) extFactory).extSwitchImpl();
+    }
+
+    protected static final Ext extSynchronized(ExtFactory extFactory) {
+        return ((AbstractExtFactory_c) extFactory).extSynchronizedImpl();
+    }
+
+    protected static final Ext extTerm(ExtFactory extFactory) {
+        return ((AbstractExtFactory_c) extFactory).extTermImpl();
+    }
+
+    protected static final Ext extThrow(ExtFactory extFactory) {
+        return ((AbstractExtFactory_c) extFactory).extThrowImpl();
+    }
+
+    protected static final Ext extTry(ExtFactory extFactory) {
+        return ((AbstractExtFactory_c) extFactory).extTryImpl();
+    }
+
+    protected static final Ext extTypeNode(ExtFactory extFactory) {
+        return ((AbstractExtFactory_c) extFactory).extTypeNodeImpl();
+    }
+
+    protected static final Ext extUnary(ExtFactory extFactory) {
+        return ((AbstractExtFactory_c) extFactory).extUnaryImpl();
+    }
+
+    protected static final Ext extWhile(ExtFactory extFactory) {
+        return ((AbstractExtFactory_c) extFactory).extWhileImpl();
     }
 
     // ********************************************
@@ -1916,5 +2232,4 @@ public abstract class AbstractExtFactory_c implements ExtFactory {
     protected Ext postExtWhile(Ext ext) {
         return postExtLoop(ext);
     }
-
 }

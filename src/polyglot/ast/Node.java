@@ -132,7 +132,7 @@ public interface Node extends NodeOps, Copy<Node>, Serializable {
      * @return The result of {@code child.visit(v)}, or {@code null}
      * if {@code child} was {@code null}.
      */
-    <T extends Node> T visitChild(T child, NodeVisitor v);
+    <N extends Node> N visitChild(N child, NodeVisitor v);
 
     /**
      * Visit all the elements of a list.
@@ -143,7 +143,7 @@ public interface Node extends NodeOps, Copy<Node>, Serializable {
      *         If {@code l} is {@code null},
      *         {@code null} is returned.
      */
-    <T extends Node> List<T> visitList(List<T> l, NodeVisitor v);
+    <N extends Node> List<N> visitList(List<N> l, NodeVisitor v);
 
     /**
      * Dump the AST node for debugging purposes.

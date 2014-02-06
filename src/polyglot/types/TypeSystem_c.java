@@ -429,10 +429,10 @@ public class TypeSystem_c implements TypeSystem {
         return t.numericConversionValidImpl(value);
     }
 
+    @Deprecated
     @Override
     public boolean numericConversionValid(Type t, long value) {
-        assert_(t);
-        return t.numericConversionValidImpl(value);
+        return numericConversionValid(t, new Long(value));
     }
 
     ////
@@ -2235,9 +2235,8 @@ public class TypeSystem_c implements TypeSystem {
         List<ReferenceType> superInterfaces = new LinkedList<ReferenceType>();
         superInterfaces.add(rt);
 
-        @SuppressWarnings("unchecked")
-        List<ClassType> interfaces = (List<ClassType>) rt.interfaces();
-        for (ClassType interf : interfaces) {
+        List<? extends ReferenceType> interfaces = rt.interfaces();
+        for (ReferenceType interf : interfaces) {
             superInterfaces.addAll(abstractSuperInterfaces(interf));
         }
 
