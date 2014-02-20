@@ -15,7 +15,7 @@ import polyglot.qq.*;
 import polyglot.lex.Lexer;
 import polyglot.ext.jl5.parse.*;
 
-parser Grm extends polyglot.qq.Grm implements QQParser {:
+parser Grm extends polyglot.qq.Grm {:
     public final JL5TypeSystem ts;
     public final JL5NodeFactory nf;
    /**

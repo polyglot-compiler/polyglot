@@ -449,8 +449,10 @@ public class SourceFileTest extends AbstractTest {
 
     protected void setTestDir(String dir) {
         this.testDir =
-                Main.options.testpath == null ? dir : Main.options.testpath
-                        + dir;
+                Main.options.testpath == null
+                        ? (dir == null ? null : dir) : (dir == null
+                                ? Main.options.testpath : Main.options.testpath
+                                        + dir);
     }
 
     protected String getTestDir() {

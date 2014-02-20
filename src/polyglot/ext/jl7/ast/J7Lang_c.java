@@ -27,16 +27,30 @@ package polyglot.ext.jl7.ast;
 
 import polyglot.ast.Block;
 import polyglot.ast.Catch;
+import polyglot.ast.Ext;
+import polyglot.ast.Lang;
 import polyglot.ast.Node;
 import polyglot.ast.NodeOps;
 import polyglot.ext.jl5.ast.J5Lang_c;
 import polyglot.ext.jl5.ast.JL5CaseOps;
 import polyglot.ext.jl5.ast.JL5SwitchOps;
 import polyglot.types.TypeSystem;
+import polyglot.util.InternalCompilerError;
 import polyglot.util.SubtypeSet;
 
 public class J7Lang_c extends J5Lang_c implements J7Lang {
     public static final J7Lang_c instance = new J7Lang_c();
+
+    public static J7Lang lang(NodeOps n) {
+        while (n != null) {
+            Lang lang = n.lang();
+            if (lang instanceof J7Lang) return (J7Lang) lang;
+            if (n instanceof Ext)
+                n = ((Ext) n).pred();
+            else return null;
+        }
+        throw new InternalCompilerError("Impossible to reach");
+    }
 
     protected J7Lang_c() {
     }

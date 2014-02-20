@@ -32,11 +32,10 @@ import polyglot.ext.jl5.ast.JL5NodeFactory;
 import polyglot.ext.jl5.ast.JL5ProcedureDeclExt;
 import polyglot.translate.ExtensionRewriter;
 import polyglot.translate.ext.MethodDeclToExt_c;
-import polyglot.translate.ext.ToExt;
 import polyglot.types.SemanticException;
 import polyglot.util.SerialVersionUID;
 
-public class JL5MethodDeclToExt_c extends MethodDeclToExt_c implements ToExt {
+public class JL5MethodDeclToExt_c extends MethodDeclToExt_c {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
     @Override

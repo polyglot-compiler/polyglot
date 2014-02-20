@@ -31,7 +31,7 @@ import polyglot.ast.Node;
 import polyglot.translate.ExtensionRewriter;
 import polyglot.util.SerialVersionUID;
 
-public class ArrayAccessToExt_c extends ToExt_c implements ToExt {
+public class ArrayAccessToExt_c extends ToExt_c {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
     @Override

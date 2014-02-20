@@ -25,6 +25,7 @@
  ******************************************************************************/
 package polyglot.ext.jl7.ast;
 
+import polyglot.ext.jl5.ast.J5Lang_c;
 import polyglot.ext.jl5.ast.JL5SwitchOps;
 import polyglot.ext.jl5.types.JL5TypeSystem;
 import polyglot.types.Type;
@@ -39,7 +40,7 @@ public class JL7SwitchExt extends JL7Ext implements JL5SwitchOps {
         if (ts.String().equals(type)) {
             return true;
         }
-        return superLang().isAcceptableSwitchType(this.node(), type);
+        return J5Lang_c.lang(pred()).isAcceptableSwitchType(this.node(), type);
     }
 
 }

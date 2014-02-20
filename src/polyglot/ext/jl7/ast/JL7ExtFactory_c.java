@@ -3,8 +3,7 @@ package polyglot.ext.jl7.ast;
 import polyglot.ast.Ext;
 import polyglot.ast.ExtFactory;
 
-public final class JL7ExtFactory_c extends JL7AbstractExtFactory_c implements
-        JL7ExtFactory {
+public final class JL7ExtFactory_c extends JL7AbstractExtFactory_c {
 
     public JL7ExtFactory_c() {
         super();

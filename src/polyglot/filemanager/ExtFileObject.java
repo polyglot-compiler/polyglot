@@ -36,14 +36,12 @@ import java.io.Reader;
 import java.io.Writer;
 import java.net.URI;
 
-import javax.tools.JavaFileObject;
 import javax.tools.SimpleJavaFileObject;
 
 /**
  * This class represents a source object to be kept in memory.
  */
-public class ExtFileObject extends SimpleJavaFileObject implements
-        JavaFileObject {
+public class ExtFileObject extends SimpleJavaFileObject {
 
     final protected ByteArrayOutputStream baos;
 

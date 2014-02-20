@@ -19,6 +19,12 @@ import carray_jl5.types.CarrayJL5TypeSystem_c;
  */
 public class ExtensionInfo extends polyglot.ext.jl5.JL5ExtensionInfo {
     @Override
+    public String[] defaultFileExtensions() {
+        String ext = defaultFileExtension();
+        return new String[] { ext, "jl" };
+    }
+
+    @Override
     public Parser parser(Reader reader, FileSource source, ErrorQueue eq) {
         Lexer lexer = new Lexer_c(reader, source, eq);
         Grm grm = new Grm(lexer, ts, nf, eq);

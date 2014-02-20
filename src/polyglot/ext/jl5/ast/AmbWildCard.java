@@ -40,7 +40,7 @@ import polyglot.visit.AmbiguityRemover;
 import polyglot.visit.NodeVisitor;
 import polyglot.visit.PrettyPrinter;
 
-public class AmbWildCard extends TypeNode_c implements TypeNode, Ambiguous {
+public class AmbWildCard extends TypeNode_c implements Ambiguous {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
     private TypeNode constraint;

@@ -27,17 +27,31 @@ package polyglot.ext.jl5.ast;
 
 import polyglot.ast.CallOps;
 import polyglot.ast.ClassDeclOps;
+import polyglot.ast.Ext;
 import polyglot.ast.JLang_c;
+import polyglot.ast.Lang;
 import polyglot.ast.NewOps;
 import polyglot.ast.Node;
 import polyglot.ast.NodeOps;
 import polyglot.ast.ProcedureDeclOps;
 import polyglot.types.SemanticException;
 import polyglot.types.Type;
+import polyglot.util.InternalCompilerError;
 import polyglot.visit.TypeChecker;
 
 public class J5Lang_c extends JLang_c implements J5Lang {
     public static final J5Lang_c instance = new J5Lang_c();
+
+    public static J5Lang lang(NodeOps n) {
+        while (n != null) {
+            Lang lang = n.lang();
+            if (lang instanceof J5Lang) return (J5Lang) lang;
+            if (n instanceof Ext)
+                n = ((Ext) n).pred();
+            else return null;
+        }
+        throw new InternalCompilerError("Impossible to reach");
+    }
 
     protected J5Lang_c() {
     }

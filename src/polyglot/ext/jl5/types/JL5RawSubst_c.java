@@ -42,7 +42,7 @@ import polyglot.util.Transformation;
  * Some substitution behavior differs for raw types.
  *
  */
-public class JL5RawSubst_c extends JL5Subst_c implements JL5Subst {
+public class JL5RawSubst_c extends JL5Subst_c {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
     private final JL5ParsedClassType base;

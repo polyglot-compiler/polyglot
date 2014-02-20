@@ -1,14 +1,14 @@
-carray_jl5.ExtensionInfo "-d out -assert" {
-	TestA.jl5;
-	TestB.jl5 (Semantic, "const array");
-	TestC.jl5;
-	TestD.jl5;
-	TestE.jl5;
-	TestF.jl5 (Semantic, "arguments");
-	TestG.jl5;
-	TestH.jl5;
-	TestI.jl5;
-	TestJ.jl5 (Semantic, "Cannot assign");
+carray_jl5.ExtensionInfo ["../../carray/tests/"] "-d out -assert" {
+	TestA.jl;
+	TestB.jl (Semantic, "const array");
+	TestC.jl;
+	TestD.jl;
+	TestE.jl;
+	TestF.jl (Semantic, "arguments");
+	TestG.jl;
+	TestH.jl;
+	TestI.jl;
+	TestJ.jl (Semantic, "Cannot assign");
 }
 
 carray_jl5.ExtensionInfo ["../../../testsjl5/"] "-d out -classpath java-out -assert -noserial -postopts \"-source 1.5 -Xlint\\:-options\" -morepermissiveinference" {

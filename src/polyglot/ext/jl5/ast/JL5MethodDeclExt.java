@@ -30,7 +30,6 @@ import java.util.List;
 import polyglot.ast.MethodDecl;
 import polyglot.ast.MethodDecl_c;
 import polyglot.ast.Node;
-import polyglot.ast.ProcedureDeclOps;
 import polyglot.ext.jl5.types.JL5Flags;
 import polyglot.ext.jl5.types.JL5MethodInstance;
 import polyglot.ext.jl5.types.JL5TypeSystem;
@@ -47,8 +46,7 @@ import polyglot.visit.PrettyPrinter;
 import polyglot.visit.Translator;
 import polyglot.visit.TypeChecker;
 
-public class JL5MethodDeclExt extends JL5ProcedureDeclExt implements
-        ProcedureDeclOps {
+public class JL5MethodDeclExt extends JL5ProcedureDeclExt {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
     protected boolean compilerGenerated;

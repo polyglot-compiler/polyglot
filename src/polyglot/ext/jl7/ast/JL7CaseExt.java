@@ -28,6 +28,7 @@ package polyglot.ext.jl7.ast;
 import polyglot.ast.Case;
 import polyglot.ast.Expr;
 import polyglot.ast.Node;
+import polyglot.ext.jl5.ast.J5Lang_c;
 import polyglot.ext.jl5.ast.JL5CaseOps;
 import polyglot.ext.jl5.types.JL5TypeSystem;
 import polyglot.types.SemanticException;
@@ -50,7 +51,7 @@ public class JL7CaseExt extends JL7Ext implements JL5CaseOps {
         if (switchType.isClass() && ts.String().equals(switchType)) {
             return c;
         }
-        return superLang().resolveCaseLabel(c, tc, switchType);
+        return J5Lang_c.lang(pred()).resolveCaseLabel(c, tc, switchType);
     }
 
     @Override

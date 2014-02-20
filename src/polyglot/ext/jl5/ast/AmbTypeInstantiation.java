@@ -51,8 +51,7 @@ import polyglot.visit.AmbiguityRemover;
 import polyglot.visit.NodeVisitor;
 import polyglot.visit.PrettyPrinter;
 
-public class AmbTypeInstantiation extends TypeNode_c implements TypeNode,
-        Ambiguous {
+public class AmbTypeInstantiation extends TypeNode_c implements Ambiguous {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
     protected TypeNode base;

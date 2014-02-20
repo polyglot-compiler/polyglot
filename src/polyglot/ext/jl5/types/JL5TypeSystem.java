@@ -49,10 +49,9 @@ import polyglot.types.ReferenceType;
 import polyglot.types.SemanticException;
 import polyglot.types.Type;
 import polyglot.types.TypeObject;
-import polyglot.types.TypeSystem;
 import polyglot.util.Position;
 
-public interface JL5TypeSystem extends TypeSystem,
+public interface JL5TypeSystem extends
         ParamTypeSystem<TypeVariable, ReferenceType> {
     @Override
     ParsedClassType createClassType(LazyClassInitializer init, Source fromSource);

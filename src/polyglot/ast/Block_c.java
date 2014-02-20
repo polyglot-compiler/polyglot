@@ -37,7 +37,7 @@ import polyglot.visit.PrettyPrinter;
  * A {@code Block} represents a Java block statement -- an immutable
  * sequence of statements.
  */
-public class Block_c extends AbstractBlock_c implements Block {
+public class Block_c extends AbstractBlock_c {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
     public Block_c(Position pos, List<Stmt> statements) {

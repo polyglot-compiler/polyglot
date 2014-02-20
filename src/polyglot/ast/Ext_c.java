@@ -76,7 +76,7 @@ public abstract class Ext_c implements Ext {
         throw new InternalCompilerError("Unexpected invocation from extension object.");
     }
 
-    protected JLang superLang() {
+    protected final JLang superLang() {
         return (JLang) pred.lang();
     }
 

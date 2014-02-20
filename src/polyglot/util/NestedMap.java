@@ -46,7 +46,7 @@ import java.util.Set;
  * It is used to implement nested namespaces, such as those which store
  * local-variable bindings.
  **/
-public class NestedMap<K, V> extends AbstractMap<K, V> implements Map<K, V> {
+public class NestedMap<K, V> extends AbstractMap<K, V> {
     /**
      * Creates a new nested map, which defers to <containing>.  If containing
      * is null, it defaults to a NilMap.

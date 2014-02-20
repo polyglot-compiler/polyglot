@@ -97,7 +97,7 @@ compilertest ::=
 testpath_opt ::=
         LBRACK sentence:a RBRACK
             {: RESULT = a; :}
-    | {: RESULT = ""; :}
+    | {: RESULT = null; :}
     ;
 
 command_line_args_opt ::=

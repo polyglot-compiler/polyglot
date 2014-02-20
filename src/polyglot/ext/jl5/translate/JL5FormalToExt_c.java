@@ -7,7 +7,6 @@ import polyglot.ext.jl5.ast.JL5FormalExt;
 import polyglot.ext.jl5.ast.JL5NodeFactory;
 import polyglot.translate.ExtensionRewriter;
 import polyglot.translate.ext.FormalToExt_c;
-import polyglot.translate.ext.ToExt;
 import polyglot.types.LocalInstance;
 import polyglot.types.SemanticException;
 import polyglot.types.Type;
@@ -17,7 +16,7 @@ import polyglot.visit.NodeVisitor;
 /**
  * Class used to translate formals from Java 5 to Java 4
  */
-public class JL5FormalToExt_c extends FormalToExt_c implements ToExt {
+public class JL5FormalToExt_c extends FormalToExt_c {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
     @Override
