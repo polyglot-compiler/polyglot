@@ -57,7 +57,8 @@ import polyglot.visit.TypeChecker;
  * A {@code ConstructorCall} represents a direct call to a constructor.
  * For instance, {@code super(...)} or {@code this(...)}.
  */
-public class ConstructorCall_c extends Stmt_c implements ConstructorCall {
+public class ConstructorCall_c extends Stmt_c implements ConstructorCall,
+        ProcedureCallOps {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
     protected Kind kind;
@@ -359,12 +360,20 @@ public class ConstructorCall_c extends Stmt_c implements ConstructorCall {
             w.write(".");
         }
 
-        w.write(kind + "(");
+        w.write(kind.toString());
+        printArgs(w, tr);
+        w.write(";");
+    }
 
+    @Override
+    public void printArgs(CodeWriter w, PrettyPrinter tr) {
+        w.write("(");
+        w.allowBreak(2, 2, "", 0);
         w.begin(0);
 
         for (Iterator<Expr> i = arguments.iterator(); i.hasNext();) {
             Expr e = i.next();
+
             print(e, w, tr);
 
             if (i.hasNext()) {
@@ -374,8 +383,7 @@ public class ConstructorCall_c extends Stmt_c implements ConstructorCall {
         }
 
         w.end();
-
-        w.write(");");
+        w.write(")");
     }
 
     @Override

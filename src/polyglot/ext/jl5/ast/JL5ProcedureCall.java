@@ -25,21 +25,13 @@
  ******************************************************************************/
 package polyglot.ext.jl5.ast;
 
-import polyglot.ast.Case;
-import polyglot.ast.JLang;
-import polyglot.ast.Node;
-import polyglot.ast.Switch;
-import polyglot.types.SemanticException;
-import polyglot.types.Type;
-import polyglot.visit.TypeChecker;
+import java.util.List;
 
-public interface J5Lang extends JLang {
-    // JL5CaseOps
+import polyglot.ast.ProcedureCall;
+import polyglot.ast.TypeNode;
 
-    Node resolveCaseLabel(Case n, TypeChecker tc, Type switchType)
-            throws SemanticException;
+public interface JL5ProcedureCall {
+    List<TypeNode> typeArgs();
 
-    // JL5SwitchOps
-
-    boolean isAcceptableSwitchType(Switch n, Type type);
+    ProcedureCall typeArgs(List<TypeNode> typeArgs);
 }

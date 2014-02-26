@@ -54,13 +54,13 @@ public interface Term extends Node {
      * recursively drill down to the innermost subterm. The direct child visited
      * first in this term's dataflow should be returned.
      */
-    public Term firstChild();
+    Term firstChild();
 
     /**
      * Visit this term in evaluation order, calling v.edge() for each successor
      * in succs, if data flows on that edge.
      */
-    public <T> List<T> acceptCFG(CFGBuilder<?> v, List<T> succs);
+    <T> List<T> acceptCFG(CFGBuilder<?> v, List<T> succs);
 
     /**
      * Returns true if the term is reachable.  This attribute is not
@@ -68,12 +68,12 @@ public interface Term extends Node {
      *
      * @see polyglot.visit.ReachChecker
      */
-    public boolean reachable();
+    boolean reachable();
 
     /**
      * Set the reachability of this term.
      */
-    public Term reachable(boolean reachability);
+    Term reachable(boolean reachability);
 
     /**
      * List of Types with all exceptions possibly thrown by this term.
@@ -81,7 +81,7 @@ public interface Term extends Node {
      * {@code polyglot.ast.NodeOps.throwTypes()} is similar, but exceptions
      * are not propagated to the containing node.
      */
-    public SubtypeSet exceptions();
+    SubtypeSet exceptions();
 
-    public Term exceptions(SubtypeSet exceptions);
+    Term exceptions(SubtypeSet exceptions);
 }

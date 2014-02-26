@@ -68,6 +68,11 @@ public class JL5ClassDeclExt extends JL5AnnotatedElementExt implements
 
     protected List<ParamTypeNode> paramTypes = new ArrayList<ParamTypeNode>();
 
+    @Override
+    public ClassDecl node() {
+        return (ClassDecl) super.node();
+    }
+
     public List<ParamTypeNode> paramTypes() {
         return this.paramTypes;
     }
@@ -89,7 +94,7 @@ public class JL5ClassDeclExt extends JL5AnnotatedElementExt implements
             throws SemanticException {
         super.annotationCheck(annoCheck);
 
-        ClassDecl n = (ClassDecl) this.node();
+        ClassDecl n = this.node();
 
         // check annotation circularity
         if (JL5Flags.isAnnotation(n.flags())) {
@@ -115,7 +120,7 @@ public class JL5ClassDeclExt extends JL5AnnotatedElementExt implements
 
     @Override
     public void setAnnotations(Annotations annotations) {
-        ClassDecl n = (ClassDecl) this.node();
+        ClassDecl n = this.node();
         JL5ParsedClassType pct = (JL5ParsedClassType) n.type();
         pct.setAnnotations(annotations);
         pct.setAnnotationsResolved(true);
@@ -123,7 +128,7 @@ public class JL5ClassDeclExt extends JL5AnnotatedElementExt implements
 
     @Override
     protected Declaration declaration() {
-        ClassDecl n = (ClassDecl) this.node();
+        ClassDecl n = this.node();
         return n.type();
     }
 
@@ -179,7 +184,7 @@ public class JL5ClassDeclExt extends JL5AnnotatedElementExt implements
      */
     @Override
     public Context enterChildScope(Node child, Context c) {
-        ClassDecl n = (ClassDecl) this.node();
+        ClassDecl n = this.node();
 
         if (child == n.body()) {
             TypeSystem ts = c.typeSystem();
@@ -200,7 +205,7 @@ public class JL5ClassDeclExt extends JL5AnnotatedElementExt implements
 
     @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
-        ClassDecl n = (ClassDecl) this.node();
+        ClassDecl n = this.node();
         JL5ClassDeclExt ext = (JL5ClassDeclExt) JL5Ext.ext(n);
 
         JL5TypeSystem ts = (JL5TypeSystem) tc.typeSystem();
@@ -251,7 +256,7 @@ public class JL5ClassDeclExt extends JL5AnnotatedElementExt implements
     }
 
     public void prettyPrintModifiers(CodeWriter w, PrettyPrinter tr) {
-        ClassDecl n = (ClassDecl) this.node();
+        ClassDecl n = this.node();
         Flags f = n.flags();
         if (f.isInterface()) {
             f = f.clearInterface().clearAbstract();
@@ -281,12 +286,12 @@ public class JL5ClassDeclExt extends JL5AnnotatedElementExt implements
     }
 
     public void prettyPrintName(CodeWriter w, PrettyPrinter tr) {
-        ClassDecl n = (ClassDecl) this.node();
+        ClassDecl n = this.node();
         w.write(n.id().id());
     }
 
     public void prettyPrintHeaderRest(CodeWriter w, PrettyPrinter tr) {
-        ClassDecl n = (ClassDecl) this.node();
+        ClassDecl n = this.node();
         if (n.superClass() != null
                 && ((!JL5Flags.isEnum(n.flags()) && !JL5Flags.isAnnotation(n.flags())))) {
             w.write(" extends ");
@@ -316,7 +321,7 @@ public class JL5ClassDeclExt extends JL5AnnotatedElementExt implements
 
     @Override
     public void prettyPrintHeader(CodeWriter w, PrettyPrinter tr) {
-        ClassDecl n = (ClassDecl) this.node();
+        ClassDecl n = this.node();
 
         w.begin(0);
         for (AnnotationElem ae : annotationElems(n)) {

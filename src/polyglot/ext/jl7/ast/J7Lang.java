@@ -27,7 +27,7 @@ package polyglot.ext.jl7.ast;
 
 import polyglot.ast.Block;
 import polyglot.ast.Catch;
-import polyglot.ast.Node;
+import polyglot.ast.Try;
 import polyglot.ext.jl5.ast.J5Lang;
 import polyglot.types.TypeSystem;
 import polyglot.util.SubtypeSet;
@@ -36,9 +36,8 @@ public interface J7Lang extends J5Lang {
 
     // JL7TryOps
 
-    void checkPreciseRethrows(Node n, J7Lang lang, TypeSystem typeSystem,
-            Block b);
+    void checkPreciseRethrows(Try n, J7Lang lang, TypeSystem typeSystem, Block b);
 
-    void preciseRethrowsForCatchBlock(Node n, J7Lang lang, Catch cb,
+    void preciseRethrowsForCatchBlock(Try n, J7Lang lang, Catch cb,
             SubtypeSet thrown);
 }

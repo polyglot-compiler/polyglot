@@ -27,7 +27,6 @@ package polyglot.ext.jl5.ast;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 
 import polyglot.ast.Assign;
@@ -55,29 +54,16 @@ import polyglot.types.SemanticException;
 import polyglot.types.Type;
 import polyglot.types.TypeSystem;
 import polyglot.util.CodeWriter;
-import polyglot.util.CollectionUtil;
 import polyglot.util.SerialVersionUID;
-import polyglot.visit.NodeVisitor;
 import polyglot.visit.PrettyPrinter;
 import polyglot.visit.TypeChecker;
 
-public class JL5CallExt extends JL5Ext implements CallOps {
+public class JL5CallExt extends JL5ProcedureCallExt implements CallOps {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
-    protected List<TypeNode> typeArgs;
-
-    public List<TypeNode> typeArgs() {
-        return this.typeArgs;
-    }
-
-    public Call typeArgs(List<TypeNode> typeArgs) {
-        if (this.typeArgs == typeArgs) {
-            return (Call) this.node();
-        }
-        Call n = (Call) this.node().copy();
-        JL5CallExt ext = (JL5CallExt) JL5Ext.ext(n);
-        ext.typeArgs = typeArgs;
-        return n;
+    @Override
+    public Call node() {
+        return (Call) super.node();
     }
 
     private transient Type expectedReturnType = null;
@@ -92,31 +78,6 @@ public class JL5CallExt extends JL5Ext implements CallOps {
             return;
         }
         expectedReturnType = type;
-    }
-
-    @Override
-    public Node visitChildren(NodeVisitor v) {
-        JL5CallExt ext = (JL5CallExt) JL5Ext.ext(this.node());
-
-        List<TypeNode> typeArgs = this.node().visitList(ext.typeArgs(), v);
-
-        Node newN = superLang().visitChildren(this.node(), v);
-        JL5CallExt newext = (JL5CallExt) JL5Ext.ext(newN);
-
-        if (!CollectionUtil.equals(typeArgs, newext.typeArgs())) {
-            // the type args changed! Let's update the node.
-            if (newN == this.node()) {
-                // we need to create a copy.
-                newN = newN.copy();
-                newext = (JL5CallExt) JL5Ext.ext(newN);
-            }
-            else {
-                // the call to super.visitChildren(v) already
-                // created a copy of the node (and thus of its extension).
-            }
-            newext.typeArgs = typeArgs;
-        }
-        return newN;
     }
 
     @Override
@@ -167,7 +128,7 @@ public class JL5CallExt extends JL5Ext implements CallOps {
         JL5TypeSystem ts = (JL5TypeSystem) tc.typeSystem();
         Context c = tc.context();
 
-        Call n = (Call) this.node();
+        Call n = this.node();
         JL5CallExt ext = (JL5CallExt) JL5Ext.ext(n);
 
         List<Type> argTypes = new ArrayList<Type>(n.arguments().size());
@@ -186,11 +147,8 @@ public class JL5CallExt extends JL5Ext implements CallOps {
         if (!n.target().type().isCanonical()) {
             return n;
         }
-        List<ReferenceType> actualTypeArgs =
-                new ArrayList<ReferenceType>(ext.typeArgs().size());
-        for (TypeNode tn : ext.typeArgs()) {
-            actualTypeArgs.add((ReferenceType) tn.type());
-        }
+
+        List<ReferenceType> actualTypeArgs = actualTypeArgs();
 
         ReferenceType targetType = tc.lang().findTargetType(n);
 
@@ -287,8 +245,7 @@ public class JL5CallExt extends JL5Ext implements CallOps {
 
     @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
-        Call n = (Call) this.node();
-        JL5CallExt ext = (JL5CallExt) JL5Ext.ext(n);
+        Call n = this.node();
 
         if (!n.isTargetImplicit()) {
             if (n.target() instanceof Expr) {
@@ -306,41 +263,12 @@ public class JL5CallExt extends JL5Ext implements CallOps {
             w.write(".");
             w.allowBreak(2, 3, "", 0);
 
-            if (ext.typeArgs() != null && !ext.typeArgs().isEmpty()) {
-                w.write("<");
-                Iterator<TypeNode> it = ext.typeArgs().iterator();
-                while (it.hasNext()) {
-                    TypeNode tn = it.next();
-                    ((Node_c) n).print(tn, w, tr);
-                    if (it.hasNext()) {
-                        w.write(",");
-                        w.allowBreak(0, " ");
-                    }
-                }
-                w.write(">");
-                w.allowBreak(0, " ");
-            }
+            super.prettyPrint(w, tr);
         }
 
         w.begin(0);
-        w.write(n.name() + "(");
-        if (n.arguments().size() > 0) {
-            w.allowBreak(2, 2, "", 0); // miser mode
-            w.begin(0);
-
-            for (Iterator<Expr> i = n.arguments().iterator(); i.hasNext();) {
-                Expr e = i.next();
-                ((Node_c) n).print(e, w, tr);
-
-                if (i.hasNext()) {
-                    w.write(",");
-                    w.allowBreak(0, " ");
-                }
-            }
-
-            w.end();
-        }
-        w.write(")");
+        w.write(n.name());
+        printArgs(w, tr);
         w.end();
     }
 

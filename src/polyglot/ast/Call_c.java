@@ -404,25 +404,30 @@ public class Call_c extends Expr_c implements Call, CallOps {
         }
 
         w.begin(0);
-        w.write(name + "(");
-        if (arguments.size() > 0) {
-            w.allowBreak(2, 2, "", 0); // miser mode
-            w.begin(0);
-
-            for (Iterator<Expr> i = arguments.iterator(); i.hasNext();) {
-                Expr e = i.next();
-                print(e, w, tr);
-
-                if (i.hasNext()) {
-                    w.write(",");
-                    w.allowBreak(0, " ");
-                }
-            }
-
-            w.end();
-        }
-        w.write(")");
+        w.write(name.id());
+        printArgs(w, tr);
         w.end();
+    }
+
+    @Override
+    public void printArgs(CodeWriter w, PrettyPrinter tr) {
+        w.write("(");
+        w.allowBreak(2, 2, "", 0);
+        w.begin(0);
+
+        for (Iterator<Expr> i = arguments.iterator(); i.hasNext();) {
+            Expr e = i.next();
+
+            print(e, w, tr);
+
+            if (i.hasNext()) {
+                w.write(",");
+                w.allowBreak(0);
+            }
+        }
+
+        w.end();
+        w.write(")");
     }
 
     @Override

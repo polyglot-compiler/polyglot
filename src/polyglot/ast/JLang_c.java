@@ -68,23 +68,27 @@ public class JLang_c implements JLang {
         return n;
     }
 
-    protected CallOps CallOps(Node n) {
+    protected CallOps CallOps(Call n) {
         return (CallOps) n;
     }
 
-    protected ClassDeclOps ClassDeclOps(Node n) {
+    protected ClassDeclOps ClassDeclOps(ClassDecl n) {
         return (ClassDeclOps) n;
     }
 
-    protected NewOps NewOps(Node n) {
+    protected NewOps NewOps(New n) {
         return (NewOps) n;
     }
 
-    protected ProcedureDeclOps ProcedureDeclOps(Node n) {
+    protected ProcedureCallOps ProcedureCallOps(ProcedureCall n) {
+        return (ProcedureCallOps) n;
+    }
+
+    protected ProcedureDeclOps ProcedureDeclOps(ProcedureDecl n) {
         return (ProcedureDeclOps) n;
     }
 
-    protected TryOps TryOps(Node n) {
+    protected TryOps TryOps(Try n) {
         return (TryOps) n;
     }
 
@@ -239,20 +243,40 @@ public class JLang_c implements JLang {
         return NodeOps(n).copy(extInfo);
     }
 
+    // CallOps
+
+    @Override
+    public final Type findContainer(Call n, TypeSystem ts, MethodInstance mi) {
+        return CallOps(n).findContainer(ts, mi);
+    }
+
+    @Override
+    public final ReferenceType findTargetType(Call n) throws SemanticException {
+        return CallOps(n).findTargetType();
+    }
+
+    @Override
+    public final Node typeCheckNullTarget(Call n, TypeChecker tc,
+            List<Type> argTypes) throws SemanticException {
+        return CallOps(n).typeCheckNullTarget(tc, argTypes);
+    }
+
     // ClassDeclOps
 
     @Override
-    public final void prettyPrintHeader(Node n, CodeWriter w, PrettyPrinter tr) {
+    public final void prettyPrintHeader(ClassDecl n, CodeWriter w,
+            PrettyPrinter tr) {
         ClassDeclOps(n).prettyPrintHeader(w, tr);
     }
 
     @Override
-    public final void prettyPrintFooter(Node n, CodeWriter w, PrettyPrinter tr) {
+    public final void prettyPrintFooter(ClassDecl n, CodeWriter w,
+            PrettyPrinter tr) {
         ClassDeclOps(n).prettyPrintFooter(w, tr);
     }
 
     @Override
-    public final Node addDefaultConstructor(Node n, TypeSystem ts,
+    public final Node addDefaultConstructor(ClassDecl n, TypeSystem ts,
             NodeFactory nf, ConstructorInstance defaultConstructorInstance)
             throws SemanticException {
         return ClassDeclOps(n).addDefaultConstructor(ts,
@@ -260,100 +284,84 @@ public class JLang_c implements JLang {
                                                      defaultConstructorInstance);
     }
 
-    // ProcedureDeclOps
-
-    @Override
-    public final void prettyPrintHeader(Node n, Flags flags, CodeWriter w,
-            PrettyPrinter tr) {
-        ProcedureDeclOps(n).prettyPrintHeader(flags, w, tr);
-    }
-
-    // CallOps
-
-    @Override
-    public final Type findContainer(Node n, TypeSystem ts, MethodInstance mi) {
-        return CallOps(n).findContainer(ts, mi);
-    }
-
-    @Override
-    public final ReferenceType findTargetType(Node n) throws SemanticException {
-        return CallOps(n).findTargetType();
-    }
-
-    @Override
-    public final Node typeCheckNullTarget(Node n, TypeChecker tc,
-            List<Type> argTypes) throws SemanticException {
-        return CallOps(n).typeCheckNullTarget(tc, argTypes);
-    }
-
     // NewOps
 
     @Override
-    public final TypeNode findQualifiedTypeNode(Node n, AmbiguityRemover ar,
+    public final TypeNode findQualifiedTypeNode(New n, AmbiguityRemover ar,
             ClassType outer, TypeNode objectType) throws SemanticException {
         return NewOps(n).findQualifiedTypeNode(ar, outer, objectType);
     }
 
     @Override
-    public final New findQualifier(Node n, AmbiguityRemover ar, ClassType ct)
+    public final New findQualifier(New n, AmbiguityRemover ar, ClassType ct)
             throws SemanticException {
         return NewOps(n).findQualifier(ar, ct);
     }
 
     @Override
-    public final void typeCheckFlags(Node n, TypeChecker tc)
+    public final void typeCheckFlags(New n, TypeChecker tc)
             throws SemanticException {
         NewOps(n).typeCheckFlags(tc);
     }
 
     @Override
-    public final void typeCheckNested(Node n, TypeChecker tc)
+    public final void typeCheckNested(New n, TypeChecker tc)
             throws SemanticException {
         NewOps(n).typeCheckNested(tc);
     }
 
     @Override
-    public final void printQualifier(Node n, CodeWriter w, PrettyPrinter tr) {
+    public final void printQualifier(New n, CodeWriter w, PrettyPrinter tr) {
         NewOps(n).printQualifier(w, tr);
     }
 
     @Override
-    public final void printArgs(Node n, CodeWriter w, PrettyPrinter tr) {
-        NewOps(n).printArgs(w, tr);
-    }
-
-    @Override
-    public final void printBody(Node n, CodeWriter w, PrettyPrinter tr) {
+    public final void printBody(New n, CodeWriter w, PrettyPrinter tr) {
         NewOps(n).printBody(w, tr);
     }
 
     @Override
-    public final ClassType findEnclosingClass(Node n, Context c, ClassType ct) {
+    public final ClassType findEnclosingClass(New n, Context c, ClassType ct) {
         return NewOps(n).findEnclosingClass(c, ct);
+    }
+
+    // ProcedureCallOps
+
+    @Override
+    public final void printArgs(ProcedureCall n, CodeWriter w, PrettyPrinter tr) {
+        ProcedureCallOps(n).printArgs(w, tr);
+    }
+
+    // ProcedureDeclOps
+
+    @Override
+    public final void prettyPrintHeader(ProcedureDecl n, Flags flags,
+            CodeWriter w, PrettyPrinter tr) {
+        ProcedureDeclOps(n).prettyPrintHeader(flags, w, tr);
     }
 
     // TryOps
 
     @Override
-    public final ExceptionChecker constructTryBlockExceptionChecker(Node n,
+    public final ExceptionChecker constructTryBlockExceptionChecker(Try n,
             ExceptionChecker ec) {
         return TryOps(n).constructTryBlockExceptionChecker(ec);
     }
 
     @Override
-    public final Block exceptionCheckTryBlock(Node n, ExceptionChecker ec)
+    public final Block exceptionCheckTryBlock(Try n, ExceptionChecker ec)
             throws SemanticException {
         return TryOps(n).exceptionCheckTryBlock(ec);
     }
 
     @Override
-    public final List<Catch> exceptionCheckCatchBlocks(Node n,
+    public final List<Catch> exceptionCheckCatchBlocks(Try n,
             ExceptionChecker ec) throws SemanticException {
         return TryOps(n).exceptionCheckCatchBlocks(ec);
     }
 
     @Override
-    public final Block exceptionCheckFinallyBlock(Node n, ExceptionChecker ec)
+    public final Block exceptionCheckFinallyBlock(Try n, ExceptionChecker ec)
             throws SemanticException {
         return TryOps(n).exceptionCheckFinallyBlock(ec);
     }

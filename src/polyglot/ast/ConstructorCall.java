@@ -26,8 +26,6 @@
 
 package polyglot.ast;
 
-import java.util.List;
-
 import polyglot.types.ConstructorInstance;
 import polyglot.util.Enum;
 import polyglot.util.SerialVersionUID;
@@ -61,20 +59,6 @@ public interface ConstructorCall extends Stmt, ProcedureCall {
 
     /** Set the kind of the call: THIS or SUPER. */
     ConstructorCall kind(Kind kind);
-
-    /**
-     * Actual arguments of the constructor call.
-     * @return A list of {@link polyglot.ast.Expr Expr}.
-     */
-    @Override
-    List<Expr> arguments();
-
-    /**
-     * Set the actual arguments of the constructor call.
-     * @param arguments A list of {@link polyglot.ast.Expr Expr}.
-     */
-    @Override
-    ProcedureCall arguments(List<Expr> arguments);
 
     /**
      * The type object of the constructor to call.  This field may not

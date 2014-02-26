@@ -50,12 +50,17 @@ public class JL5CaseExt extends JL5Ext implements JL5CaseOps {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
     @Override
+    public Case node() {
+        return (Case) super.node();
+    }
+
+    @Override
     public Node resolveCaseLabel(TypeChecker tc, Type switchType)
             throws SemanticException {
         JL5TypeSystem ts = (JL5TypeSystem) tc.typeSystem();
         JL5NodeFactory nf = (JL5NodeFactory) tc.nodeFactory();
 
-        Case c = (Case) this.node();
+        Case c = this.node();
         Expr expr = c.expr();
 
         if (expr == null) {
@@ -161,7 +166,7 @@ public class JL5CaseExt extends JL5Ext implements JL5CaseOps {
     @Override
     public Node disambiguateOverride(Node parent, AmbiguityRemover ar)
             throws SemanticException {
-        Case c = (Case) this.node();
+        Case c = this.node();
         Expr expr = c.expr();
         // We can't disambiguate unqualified names until the switch expression
         // is typed.
@@ -176,7 +181,7 @@ public class JL5CaseExt extends JL5Ext implements JL5CaseOps {
     @Override
     public Node typeCheckOverride(Node parent, TypeChecker tc)
             throws SemanticException {
-        Case c = (Case) this.node();
+        Case c = this.node();
         Expr expr = c.expr();
         if (expr == null || expr instanceof Lit) {
             return null;
@@ -187,7 +192,7 @@ public class JL5CaseExt extends JL5Ext implements JL5CaseOps {
 
     @Override
     public Node checkConstants(ConstantChecker cc) throws SemanticException {
-        Case c = (Case) this.node();
+        Case c = this.node();
         Expr expr = c.expr();
         if (expr == null) return c; // default case
 
@@ -200,7 +205,7 @@ public class JL5CaseExt extends JL5Ext implements JL5CaseOps {
 
     @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
-        Case c = (Case) this.node();
+        Case c = this.node();
         Expr expr = c.expr();
         if (expr == null) {
             w.write("default:");
@@ -208,8 +213,8 @@ public class JL5CaseExt extends JL5Ext implements JL5CaseOps {
         else {
             w.write("case ");
             JL5TypeSystem ts =
-                    expr.type() == null ? null
-                            : (JL5TypeSystem) expr.type().typeSystem();
+                    expr.type() == null
+                            ? null : (JL5TypeSystem) expr.type().typeSystem();
             if (ts != null && expr.type().isReference()
                     && expr.type().isSubtype(ts.toRawType(ts.Enum()))) {
                 // this is an enum                  

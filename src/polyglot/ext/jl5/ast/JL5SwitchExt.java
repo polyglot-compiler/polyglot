@@ -43,8 +43,13 @@ public class JL5SwitchExt extends JL5Ext implements JL5SwitchOps {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
     @Override
+    public Switch node() {
+        return (Switch) super.node();
+    }
+
+    @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
-        Switch s = (Switch) this.node();
+        Switch s = this.node();
         Expr expr = s.expr();
 
         if (!((J5Lang) tc.lang()).isAcceptableSwitchType(s, expr.type())) {
@@ -59,7 +64,7 @@ public class JL5SwitchExt extends JL5Ext implements JL5SwitchOps {
         for (SwitchElement el : s.elements()) {
             if (el instanceof Case) {
                 el =
-                        (SwitchElement) ((J5Lang) tc.lang()).resolveCaseLabel(el,
+                        (SwitchElement) ((J5Lang) tc.lang()).resolveCaseLabel((Case) el,
                                                                               tc,
                                                                               switchType);
             }

@@ -169,8 +169,8 @@ public class JL5NodeFactory_c extends NodeFactory_c implements JL5NodeFactory {
                 super.ClassDecl(pos, flags, name, superType, interfaces, body);
         JL5ClassDeclExt ext = (JL5ClassDeclExt) JL5Ext.ext(n);
         ext.paramTypes =
-                (paramTypes == null ? Collections.<ParamTypeNode> emptyList()
-                        : paramTypes);
+                (paramTypes == null
+                        ? Collections.<ParamTypeNode> emptyList() : paramTypes);
         ext.annotations = CollectionUtil.nonNullList(annotations);
         return n;
     }
@@ -232,7 +232,7 @@ public class JL5NodeFactory_c extends NodeFactory_c implements JL5NodeFactory {
 
         ConstructorCall n = super.ConstructorCall(pos, kind, outer, args);
         JL5ConstructorCallExt ext = (JL5ConstructorCallExt) JL5Ext.ext(n);
-        ext.typeArgs = typeArgs;
+        ext.typeArgs = CollectionUtil.nonNullList(typeArgs);
         ext.isEnumConstructorCall = isEnumConstructorCall;
         return n;
     }
@@ -272,8 +272,8 @@ public class JL5NodeFactory_c extends NodeFactory_c implements JL5NodeFactory {
                                       body);
         JL5ConstructorDeclExt ext = (JL5ConstructorDeclExt) JL5Ext.ext(n);
         ext.typeParams =
-                (typeParams == null ? Collections.<ParamTypeNode> emptyList()
-                        : typeParams);
+                (typeParams == null
+                        ? Collections.<ParamTypeNode> emptyList() : typeParams);
         ext.annotations = CollectionUtil.nonNullList(annotations);
         return n;
     }
@@ -316,8 +316,8 @@ public class JL5NodeFactory_c extends NodeFactory_c implements JL5NodeFactory {
                                  body);
         JL5MethodDeclExt ext = (JL5MethodDeclExt) JL5Ext.ext(n);
         ext.typeParams =
-                (typeParams == null ? Collections.<ParamTypeNode> emptyList()
-                        : typeParams);
+                (typeParams == null
+                        ? Collections.<ParamTypeNode> emptyList() : typeParams);
         ext.annotations = CollectionUtil.nonNullList(annotations);
         return n;
     }

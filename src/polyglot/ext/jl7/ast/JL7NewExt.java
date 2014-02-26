@@ -59,6 +59,11 @@ public class JL7NewExt extends JL7Ext {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
     @Override
+    public New node() {
+        return (New) super.node();
+    }
+
+    @Override
     public Node typeCheckOverride(Node parent, TypeChecker tc) {
         JL7NewExt ext = (JL7NewExt) JL7Ext.ext(this.node());
         if (parent instanceof Return) {
@@ -116,7 +121,7 @@ public class JL7NewExt extends JL7Ext {
 
     @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
-        New n = (New) this.node();
+        New n = this.node();
         TypeNode objectType = n.objectType();
         if (!(objectType instanceof Ambiguous))
             return superLang().typeCheck(this.node(), tc);

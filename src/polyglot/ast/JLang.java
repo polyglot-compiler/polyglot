@@ -168,17 +168,18 @@ public interface JLang extends Lang {
 
     // ClassDeclOps
 
-    void prettyPrintHeader(Node n, CodeWriter w, PrettyPrinter tr);
+    void prettyPrintHeader(ClassDecl n, CodeWriter w, PrettyPrinter tr);
 
-    void prettyPrintFooter(Node n, CodeWriter w, PrettyPrinter tr);
+    void prettyPrintFooter(ClassDecl n, CodeWriter w, PrettyPrinter tr);
 
-    Node addDefaultConstructor(Node n, TypeSystem ts, NodeFactory nf,
+    Node addDefaultConstructor(ClassDecl n, TypeSystem ts, NodeFactory nf,
             ConstructorInstance defaultConstructorInstance)
             throws SemanticException;
 
     // ProcedureDeclOps
 
-    void prettyPrintHeader(Node n, Flags flags, CodeWriter w, PrettyPrinter tr);
+    void prettyPrintHeader(ProcedureDecl n, Flags flags, CodeWriter w,
+            PrettyPrinter tr);
 
     // CallOps
 
@@ -187,9 +188,9 @@ public interface JLang extends Lang {
      * Should return the container of the method instance. 
      * 
      */
-    Type findContainer(Node n, TypeSystem ts, MethodInstance mi);
+    Type findContainer(Call n, TypeSystem ts, MethodInstance mi);
 
-    ReferenceType findTargetType(Node n) throws SemanticException;
+    ReferenceType findTargetType(Call n) throws SemanticException;
 
     /**
     * Typecheck the Call when the target is null. This method finds
@@ -198,28 +199,30 @@ public interface JLang extends Lang {
     * @param argTypes list of {@code Type}s of the arguments
      * @throws SemanticException 
     */
-    Node typeCheckNullTarget(Node n, TypeChecker tc, List<Type> argTypes)
+    Node typeCheckNullTarget(Call n, TypeChecker tc, List<Type> argTypes)
             throws SemanticException;
 
     // NewOps
 
-    TypeNode findQualifiedTypeNode(Node n, AmbiguityRemover ar,
-            ClassType outer, TypeNode objectType) throws SemanticException;
+    TypeNode findQualifiedTypeNode(New n, AmbiguityRemover ar, ClassType outer,
+            TypeNode objectType) throws SemanticException;
 
-    New findQualifier(Node n, AmbiguityRemover ar, ClassType ct)
+    New findQualifier(New n, AmbiguityRemover ar, ClassType ct)
             throws SemanticException;
 
-    void typeCheckFlags(Node n, TypeChecker tc) throws SemanticException;
+    void typeCheckFlags(New n, TypeChecker tc) throws SemanticException;
 
-    void typeCheckNested(Node n, TypeChecker tc) throws SemanticException;
+    void typeCheckNested(New n, TypeChecker tc) throws SemanticException;
 
-    void printQualifier(Node n, CodeWriter w, PrettyPrinter tr);
+    void printQualifier(New n, CodeWriter w, PrettyPrinter tr);
 
-    void printArgs(Node n, CodeWriter w, PrettyPrinter tr);
+    void printBody(New n, CodeWriter w, PrettyPrinter tr);
 
-    void printBody(Node n, CodeWriter w, PrettyPrinter tr);
+    ClassType findEnclosingClass(New n, Context c, ClassType ct);
 
-    ClassType findEnclosingClass(Node n, Context c, ClassType ct);
+    // ProcedureCallOps
+
+    void printArgs(ProcedureCall n, CodeWriter w, PrettyPrinter tr);
 
     // TryOps
 
@@ -229,7 +232,7 @@ public interface JLang extends Lang {
      * @param ec The exception checker immediately prior to the try block.
      * @return
      */
-    ExceptionChecker constructTryBlockExceptionChecker(Node n,
+    ExceptionChecker constructTryBlockExceptionChecker(Try n,
             ExceptionChecker ec);
 
     /**
@@ -239,7 +242,7 @@ public interface JLang extends Lang {
      * @return
      * @throws SemanticException
      */
-    Block exceptionCheckTryBlock(Node n, ExceptionChecker ec)
+    Block exceptionCheckTryBlock(Try n, ExceptionChecker ec)
             throws SemanticException;
 
     /**
@@ -250,7 +253,7 @@ public interface JLang extends Lang {
      * @return
      * @throws SemanticException
      */
-    List<Catch> exceptionCheckCatchBlocks(Node n, ExceptionChecker ec)
+    List<Catch> exceptionCheckCatchBlocks(Try n, ExceptionChecker ec)
             throws SemanticException;
 
     /**
@@ -261,6 +264,6 @@ public interface JLang extends Lang {
      * @return
      * @throws SemanticException
      */
-    Block exceptionCheckFinallyBlock(Node n, ExceptionChecker ec)
+    Block exceptionCheckFinallyBlock(Try n, ExceptionChecker ec)
             throws SemanticException;
 }

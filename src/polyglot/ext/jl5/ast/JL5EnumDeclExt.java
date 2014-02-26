@@ -34,7 +34,7 @@ public class JL5EnumDeclExt extends JL5ClassDeclExt {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
     public ClassDecl addValueOfMethodType(TypeSystem ts) {
-        ClassDecl n = (ClassDecl) this.node();
+        ClassDecl n = this.node();
         Flags flags = Flags.PUBLIC.set(Flags.STATIC.set(Flags.FINAL));
 
         // add valueOf method
@@ -52,7 +52,7 @@ public class JL5EnumDeclExt extends JL5ClassDeclExt {
     }
 
     public ClassDecl addValuesMethodType(TypeSystem ts) {
-        ClassDecl n = (ClassDecl) this.node();
+        ClassDecl n = this.node();
         Flags flags = Flags.PUBLIC.set(Flags.STATIC.set(Flags.FINAL));
 
         // add values method
@@ -70,7 +70,7 @@ public class JL5EnumDeclExt extends JL5ClassDeclExt {
     }
 
     public Node addEnumMethodTypesIfNeeded(TypeSystem ts) {
-        ClassDecl n = (ClassDecl) this.node();
+        ClassDecl n = this.node();
         JL5EnumDeclExt ext = (JL5EnumDeclExt) JL5Ext.ext(n);
 
         JL5ParsedClassType ct = (JL5ParsedClassType) n.type();
@@ -106,7 +106,7 @@ public class JL5EnumDeclExt extends JL5ClassDeclExt {
 
     @Override
     public NodeVisitor typeCheckEnter(TypeChecker tc) throws SemanticException {
-        ClassDecl n = (ClassDecl) this.node();
+        ClassDecl n = this.node();
         // figure out if this should be an abstract type.
         // need to do this before any anonymous subclasses are typechecked.
         for (MethodInstance mi : n.type().methods()) {
@@ -120,7 +120,7 @@ public class JL5EnumDeclExt extends JL5ClassDeclExt {
 
     @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
-        ClassDecl n = (ClassDecl) this.node();
+        ClassDecl n = this.node();
         if (n.flags().isAbstract()) {
             throw new SemanticException("Enum types cannot have abstract modifier",
                                         n.position());
@@ -178,7 +178,7 @@ public class JL5EnumDeclExt extends JL5ClassDeclExt {
     @Override
     public Node addDefaultConstructor(TypeSystem ts, NodeFactory nf,
             ConstructorInstance defaultCI) throws SemanticException {
-        ClassDecl n = (ClassDecl) this.node();
+        ClassDecl n = this.node();
         ConstructorInstance ci = defaultCI;
         if (ci == null) {
             throw new InternalCompilerError("addDefaultConstructor called without defaultCI set");
@@ -199,7 +199,7 @@ public class JL5EnumDeclExt extends JL5ClassDeclExt {
 
     @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
-        ClassDecl n = (ClassDecl) this.node();
+        ClassDecl n = this.node();
         ((JLang) tr.lang()).prettyPrintHeader(n, w, tr);
 
         boolean hasEnumConstant = false;

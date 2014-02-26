@@ -44,27 +44,27 @@ public class JLangToJLDel extends JLang_c {
     }
 
     @Override
-    protected CallOps CallOps(Node n) {
+    protected CallOps CallOps(Call n) {
         return (CallOps) n.del();
     }
 
     @Override
-    protected ClassDeclOps ClassDeclOps(Node n) {
+    protected ClassDeclOps ClassDeclOps(ClassDecl n) {
         return (ClassDeclOps) n.del();
     }
 
     @Override
-    protected NewOps NewOps(Node n) {
+    protected NewOps NewOps(New n) {
         return (NewOps) n.del();
     }
 
     @Override
-    protected ProcedureDeclOps ProcedureDeclOps(Node n) {
+    protected ProcedureDeclOps ProcedureDeclOps(ProcedureDecl n) {
         return (ProcedureDeclOps) n.del();
     }
 
     @Override
-    protected TryOps TryOps(Node n) {
+    protected TryOps TryOps(Try n) {
         return (TryOps) n.del();
     }
 }

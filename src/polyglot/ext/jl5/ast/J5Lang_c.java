@@ -25,15 +25,21 @@
  ******************************************************************************/
 package polyglot.ext.jl5.ast;
 
+import polyglot.ast.Call;
 import polyglot.ast.CallOps;
+import polyglot.ast.Case;
+import polyglot.ast.ClassDecl;
 import polyglot.ast.ClassDeclOps;
 import polyglot.ast.Ext;
 import polyglot.ast.JLang_c;
 import polyglot.ast.Lang;
+import polyglot.ast.New;
 import polyglot.ast.NewOps;
 import polyglot.ast.Node;
 import polyglot.ast.NodeOps;
+import polyglot.ast.ProcedureDecl;
 import polyglot.ast.ProcedureDeclOps;
+import polyglot.ast.Switch;
 import polyglot.types.SemanticException;
 import polyglot.types.Type;
 import polyglot.util.InternalCompilerError;
@@ -66,45 +72,45 @@ public class J5Lang_c extends JLang_c implements J5Lang {
     }
 
     @Override
-    protected CallOps CallOps(Node n) {
+    protected CallOps CallOps(Call n) {
         return (CallOps) jl5ext(n);
     }
 
     @Override
-    protected ClassDeclOps ClassDeclOps(Node n) {
+    protected ClassDeclOps ClassDeclOps(ClassDecl n) {
         return (ClassDeclOps) jl5ext(n);
     }
 
     @Override
-    protected NewOps NewOps(Node n) {
+    protected NewOps NewOps(New n) {
         return (NewOps) jl5ext(n);
     }
 
     @Override
-    protected ProcedureDeclOps ProcedureDeclOps(Node n) {
+    protected ProcedureDeclOps ProcedureDeclOps(ProcedureDecl n) {
         return (ProcedureDeclOps) jl5ext(n);
     }
 
-    protected JL5CaseOps JL5CaseOps(Node n) {
+    protected JL5CaseOps JL5CaseOps(Case n) {
         return (JL5CaseOps) jl5ext(n);
     }
 
-    protected JL5SwitchOps JL5SwitchOps(Node n) {
+    protected JL5SwitchOps JL5SwitchOps(Switch n) {
         return (JL5SwitchOps) jl5ext(n);
-    }
-
-    // JL5SwitchOps
-
-    @Override
-    public final boolean isAcceptableSwitchType(Node n, Type type) {
-        return JL5SwitchOps(n).isAcceptableSwitchType(type);
     }
 
     // JL5CaseOps
 
     @Override
-    public final Node resolveCaseLabel(Node n, TypeChecker tc, Type switchType)
+    public final Node resolveCaseLabel(Case n, TypeChecker tc, Type switchType)
             throws SemanticException {
         return JL5CaseOps(n).resolveCaseLabel(tc, switchType);
+    }
+
+    // JL5SwitchOps
+
+    @Override
+    public final boolean isAcceptableSwitchType(Switch n, Type type) {
+        return JL5SwitchOps(n).isAcceptableSwitchType(type);
     }
 }

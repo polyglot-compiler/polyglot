@@ -24,6 +24,11 @@ public class JL7TryExt extends JL7Ext implements JL7TryOps {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
     @Override
+    public Try node() {
+        return (Try) super.node();
+    }
+
+    @Override
     public Block exceptionCheckTryBlock(ExceptionChecker ec)
             throws SemanticException {
         Block b = superLang().exceptionCheckTryBlock(this.node(), ec);
@@ -56,7 +61,7 @@ public class JL7TryExt extends JL7Ext implements JL7TryOps {
 
     @Override
     public void checkPreciseRethrows(J7Lang lang, TypeSystem ts, Block tryBlock) {
-        Try n = (Try) this.node();
+        Try n = this.node();
 
         // For each catch block, identify which exceptions can get to it.
         // First, get the set of all exceptions that the try block can throw

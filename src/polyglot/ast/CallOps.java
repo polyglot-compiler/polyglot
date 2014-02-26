@@ -13,7 +13,7 @@ import polyglot.visit.TypeChecker;
  * This interface allows extension delegates both to override and reuse functionality in Call_c.
  *
  */
-public interface CallOps {
+public interface CallOps extends ProcedureCallOps {
 
     /**
      * Used to find the missing static target of a static method call.
