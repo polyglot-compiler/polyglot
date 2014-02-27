@@ -185,7 +185,7 @@ public class InnerClassRemover extends ContextVisitor {
                 List<Expr> args = new ArrayList<Expr>();
                 args.add(q);
                 args.addAll(neu.arguments());
-                neu = (New) neu.arguments(args);
+                neu = neu.arguments(args);
             }
 
             return neu;

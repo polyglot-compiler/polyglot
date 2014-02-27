@@ -32,6 +32,7 @@ import polyglot.types.SemanticException;
 import polyglot.types.Type;
 import polyglot.types.TypeSystem;
 import polyglot.util.CodeWriter;
+import polyglot.util.Copy;
 import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
 import polyglot.visit.AscriptionVisitor;
@@ -68,7 +69,12 @@ public class If_c extends Stmt_c implements If {
 
     @Override
     public If cond(Expr cond) {
-        If_c n = (If_c) copy();
+        return cond(this, cond);
+    }
+
+    protected <N extends If_c> N cond(N n, Expr cond) {
+        if (n.cond == cond) return n;
+        if (n == this) n = Copy.Util.copy(n);
         n.cond = cond;
         return n;
     }
@@ -80,7 +86,12 @@ public class If_c extends Stmt_c implements If {
 
     @Override
     public If consequent(Stmt consequent) {
-        If_c n = (If_c) copy();
+        return consequent(this, consequent);
+    }
+
+    protected <N extends If_c> N consequent(N n, Stmt consequent) {
+        if (n.consequent == consequent) return n;
+        if (n == this) n = Copy.Util.copy(n);
         n.consequent = consequent;
         return n;
     }
@@ -92,23 +103,23 @@ public class If_c extends Stmt_c implements If {
 
     @Override
     public If alternative(Stmt alternative) {
-        If_c n = (If_c) copy();
+        return alternative(this, alternative);
+    }
+
+    protected <N extends If_c> N alternative(N n, Stmt alternative) {
+        if (n.alternative == alternative) return n;
+        if (n == this) n = Copy.Util.copy(n);
         n.alternative = alternative;
         return n;
     }
 
     /** Reconstruct the statement. */
     protected If_c reconstruct(Expr cond, Stmt consequent, Stmt alternative) {
-        if (cond != this.cond || consequent != this.consequent
-                || alternative != this.alternative) {
-            If_c n = (If_c) copy();
-            n.cond = cond;
-            n.consequent = consequent;
-            n.alternative = alternative;
-            return n;
-        }
-
-        return this;
+        If_c n = this;
+        n = cond(n, cond);
+        n = consequent(n, consequent);
+        n = alternative(n, alternative);
+        return n;
     }
 
     @Override

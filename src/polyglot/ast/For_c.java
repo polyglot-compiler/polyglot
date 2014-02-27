@@ -26,7 +26,6 @@
 
 package polyglot.ast;
 
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
@@ -36,6 +35,7 @@ import polyglot.types.Type;
 import polyglot.types.TypeSystem;
 import polyglot.util.CodeWriter;
 import polyglot.util.CollectionUtil;
+import polyglot.util.Copy;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.ListUtil;
 import polyglot.util.Position;
@@ -72,12 +72,17 @@ public class For_c extends Loop_c implements For {
 
     @Override
     public List<ForInit> inits() {
-        return Collections.unmodifiableList(this.inits);
+        return this.inits;
     }
 
     @Override
     public For inits(List<ForInit> inits) {
-        For_c n = (For_c) copy();
+        return inits(this, inits);
+    }
+
+    protected <N extends For_c> N inits(N n, List<ForInit> inits) {
+        if (CollectionUtil.equals(n.inits, inits)) return n;
+        if (n == this) n = Copy.Util.copy(n);
         n.inits = ListUtil.copy(inits, true);
         return n;
     }
@@ -89,19 +94,29 @@ public class For_c extends Loop_c implements For {
 
     @Override
     public For cond(Expr cond) {
-        For_c n = (For_c) copy();
+        return cond(this, cond);
+    }
+
+    protected <N extends For_c> N cond(N n, Expr cond) {
+        if (n.cond == cond) return n;
+        if (n == this) n = Copy.Util.copy(n);
         n.cond = cond;
         return n;
     }
 
     @Override
     public List<ForUpdate> iters() {
-        return Collections.unmodifiableList(this.iters);
+        return this.iters;
     }
 
     @Override
     public For iters(List<ForUpdate> iters) {
-        For_c n = (For_c) copy();
+        return iters(this, iters);
+    }
+
+    protected <N extends For_c> N iters(N n, List<ForUpdate> iters) {
+        if (CollectionUtil.equals(n.iters, iters)) return n;
+        if (n == this) n = Copy.Util.copy(n);
         n.iters = ListUtil.copy(iters, true);
         return n;
     }
@@ -113,7 +128,12 @@ public class For_c extends Loop_c implements For {
 
     @Override
     public For body(Stmt body) {
-        For_c n = (For_c) copy();
+        return body(this, body);
+    }
+
+    protected <N extends For_c> N body(N n, Stmt body) {
+        if (n.body == body) return n;
+        if (n == this) n = Copy.Util.copy(n);
         n.body = body;
         return n;
     }
@@ -121,18 +141,12 @@ public class For_c extends Loop_c implements For {
     /** Reconstruct the statement. */
     protected For_c reconstruct(List<ForInit> inits, Expr cond,
             List<ForUpdate> iters, Stmt body) {
-        if (!CollectionUtil.equals(inits, this.inits) || cond != this.cond
-                || !CollectionUtil.equals(iters, this.iters)
-                || body != this.body) {
-            For_c n = (For_c) copy();
-            n.inits = ListUtil.copy(inits, true);
-            n.cond = cond;
-            n.iters = ListUtil.copy(iters, true);
-            n.body = body;
-            return n;
-        }
-
-        return this;
+        For_c n = this;
+        n = inits(n, inits);
+        n = cond(n, cond);
+        n = iters(n, iters);
+        n = body(n, body);
+        return n;
     }
 
     @Override

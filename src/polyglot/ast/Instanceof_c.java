@@ -32,6 +32,7 @@ import polyglot.types.SemanticException;
 import polyglot.types.Type;
 import polyglot.types.TypeSystem;
 import polyglot.util.CodeWriter;
+import polyglot.util.Copy;
 import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
 import polyglot.visit.AscriptionVisitor;
@@ -69,7 +70,12 @@ public class Instanceof_c extends Expr_c implements Instanceof {
 
     @Override
     public Instanceof expr(Expr expr) {
-        Instanceof_c n = (Instanceof_c) copy();
+        return expr(this, expr);
+    }
+
+    protected <N extends Instanceof_c> N expr(N n, Expr expr) {
+        if (n.expr == expr) return n;
+        if (n == this) n = Copy.Util.copy(n);
         n.expr = expr;
         return n;
     }
@@ -81,21 +87,22 @@ public class Instanceof_c extends Expr_c implements Instanceof {
 
     @Override
     public Instanceof compareType(TypeNode compareType) {
-        Instanceof_c n = (Instanceof_c) copy();
+        return compareType(this, compareType);
+    }
+
+    protected <N extends Instanceof_c> N compareType(N n, TypeNode compareType) {
+        if (n.compareType == compareType) return n;
+        if (n == this) n = Copy.Util.copy(n);
         n.compareType = compareType;
         return n;
     }
 
     /** Reconstruct the expression. */
     protected Instanceof_c reconstruct(Expr expr, TypeNode compareType) {
-        if (expr != this.expr || compareType != this.compareType) {
-            Instanceof_c n = (Instanceof_c) copy();
-            n.expr = expr;
-            n.compareType = compareType;
-            return n;
-        }
-
-        return this;
+        Instanceof_c n = this;
+        n = expr(n, expr);
+        n = compareType(n, compareType);
+        return n;
     }
 
     @Override

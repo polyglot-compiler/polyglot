@@ -27,7 +27,6 @@
 package polyglot.ast;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.ListIterator;
 
@@ -36,6 +35,7 @@ import polyglot.types.Type;
 import polyglot.types.TypeSystem;
 import polyglot.util.CodeWriter;
 import polyglot.util.CollectionUtil;
+import polyglot.util.Copy;
 import polyglot.util.ListUtil;
 import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
@@ -73,19 +73,29 @@ public class Try_c extends Stmt_c implements Try, TryOps {
 
     @Override
     public Try tryBlock(Block tryBlock) {
-        Try_c n = (Try_c) copy();
+        return tryBlock(this, tryBlock);
+    }
+
+    protected <N extends Try_c> N tryBlock(N n, Block tryBlock) {
+        if (n.tryBlock == tryBlock) return n;
+        if (n == this) n = Copy.Util.copy(n);
         n.tryBlock = tryBlock;
         return n;
     }
 
     @Override
     public List<Catch> catchBlocks() {
-        return Collections.unmodifiableList(this.catchBlocks);
+        return this.catchBlocks;
     }
 
     @Override
     public Try catchBlocks(List<Catch> catchBlocks) {
-        Try_c n = (Try_c) copy();
+        return catchBlocks(this, catchBlocks);
+    }
+
+    protected <N extends Try_c> N catchBlocks(N n, List<Catch> catchBlocks) {
+        if (CollectionUtil.equals(n.catchBlocks, catchBlocks)) return n;
+        if (n == this) n = Copy.Util.copy(n);
         n.catchBlocks = ListUtil.copy(catchBlocks, true);
         return n;
     }
@@ -97,7 +107,12 @@ public class Try_c extends Stmt_c implements Try, TryOps {
 
     @Override
     public Try finallyBlock(Block finallyBlock) {
-        Try_c n = (Try_c) copy();
+        return finallyBlock(this, finallyBlock);
+    }
+
+    protected <N extends Try_c> N finallyBlock(N n, Block finallyBlock) {
+        if (n.finallyBlock == finallyBlock) return n;
+        if (n == this) n = Copy.Util.copy(n);
         n.finallyBlock = finallyBlock;
         return n;
     }
@@ -105,17 +120,11 @@ public class Try_c extends Stmt_c implements Try, TryOps {
     /** Reconstruct the statement. */
     protected Try_c reconstruct(Block tryBlock, List<Catch> catchBlocks,
             Block finallyBlock) {
-        if (tryBlock != this.tryBlock
-                || !CollectionUtil.equals(catchBlocks, this.catchBlocks)
-                || finallyBlock != this.finallyBlock) {
-            Try_c n = (Try_c) copy();
-            n.tryBlock = tryBlock;
-            n.catchBlocks = ListUtil.copy(catchBlocks, true);
-            n.finallyBlock = finallyBlock;
-            return n;
-        }
-
-        return this;
+        Try_c n = this;
+        n = tryBlock(n, tryBlock);
+        n = catchBlocks(n, catchBlocks);
+        n = finallyBlock(n, finallyBlock);
+        return n;
     }
 
     @Override
@@ -167,19 +176,19 @@ public class Try_c extends Stmt_c implements Try, TryOps {
         Try_c n = this;
         // Visit the try block.
         Block tryBlock = ec.lang().exceptionCheckTryBlock(n, ecTryBlock);
-        n = (Try_c) n.tryBlock(tryBlock);
+        n = tryBlock(n, tryBlock);
 
         List<Catch> catchBlocks =
                 ec.lang().exceptionCheckCatchBlocks(n, ecTryBlockEntry);
-        n = (Try_c) n.catchBlocks(catchBlocks);
+        n = catchBlocks(n, catchBlocks);
 
         Block finallyBlock = ec.lang().exceptionCheckFinallyBlock(n, ec);
-        n = (Try_c) n.finallyBlock(finallyBlock);
+        n = finallyBlock(n, finallyBlock);
 
         for (Type exc : ec.lang().throwTypes(n, ec.typeSystem())) {
             ec.throwsException(exc, position());
         }
-        n = (Try_c) n.exceptions(ec.throwsSet());
+        n = exceptions(n, ec.throwsSet());
 
         return n;
     }

@@ -32,6 +32,7 @@ import polyglot.types.SemanticException;
 import polyglot.types.Type;
 import polyglot.types.TypeSystem;
 import polyglot.util.CodeWriter;
+import polyglot.util.Copy;
 import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
 import polyglot.visit.AscriptionVisitor;
@@ -66,7 +67,12 @@ public class While_c extends Loop_c implements While {
 
     @Override
     public While cond(Expr cond) {
-        While_c n = (While_c) copy();
+        return cond(this, cond);
+    }
+
+    protected <N extends While_c> N cond(N n, Expr cond) {
+        if (n.cond == cond) return n;
+        if (n == this) n = Copy.Util.copy(n);
         n.cond = cond;
         return n;
     }
@@ -78,21 +84,22 @@ public class While_c extends Loop_c implements While {
 
     @Override
     public While body(Stmt body) {
-        While_c n = (While_c) copy();
+        return body(this, body);
+    }
+
+    protected <N extends While_c> N body(N n, Stmt body) {
+        if (n.body == body) return n;
+        if (n == this) n = Copy.Util.copy(n);
         n.body = body;
         return n;
     }
 
     /** Reconstruct the statement. */
     protected While_c reconstruct(Expr cond, Stmt body) {
-        if (cond != this.cond || body != this.body) {
-            While_c n = (While_c) copy();
-            n.cond = cond;
-            n.body = body;
-            return n;
-        }
-
-        return this;
+        While_c n = this;
+        n = cond(n, cond);
+        n = body(n, body);
+        return n;
     }
 
     @Override

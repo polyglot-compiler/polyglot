@@ -31,6 +31,7 @@ import java.util.List;
 import polyglot.types.Type;
 import polyglot.types.TypeSystem;
 import polyglot.util.CodeWriter;
+import polyglot.util.Copy;
 import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
 import polyglot.visit.AscriptionVisitor;
@@ -60,20 +61,21 @@ public class Eval_c extends Stmt_c implements Eval {
 
     @Override
     public Eval expr(Expr expr) {
-        Eval_c n = (Eval_c) copy();
+        return expr(this, expr);
+    }
+
+    protected <N extends Eval_c> N expr(N n, Expr expr) {
+        if (n.expr == expr) return n;
+        if (n == this) n = Copy.Util.copy(n);
         n.expr = expr;
         return n;
     }
 
     /** Reconstruct the statement. */
     protected Eval_c reconstruct(Expr expr) {
-        if (expr != this.expr) {
-            Eval_c n = (Eval_c) copy();
-            n.expr = expr;
-            return n;
-        }
-
-        return this;
+        Eval_c n = this;
+        n = expr(n, expr);
+        return n;
     }
 
     @Override

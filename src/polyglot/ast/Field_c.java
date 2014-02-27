@@ -38,6 +38,7 @@ import polyglot.types.Type;
 import polyglot.types.TypeSystem;
 import polyglot.types.VarInstance;
 import polyglot.util.CodeWriter;
+import polyglot.util.Copy;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
@@ -89,7 +90,12 @@ public class Field_c extends Expr_c implements Field {
 
     @Override
     public Field target(Receiver target) {
-        Field_c n = (Field_c) copy();
+        return target(this, target);
+    }
+
+    protected <N extends Field_c> N target(N n, Receiver target) {
+        if (n.target == target) return n;
+        if (n == this) n = Copy.Util.copy(n);
         n.target = target;
         return n;
     }
@@ -101,7 +107,12 @@ public class Field_c extends Expr_c implements Field {
 
     @Override
     public Field id(Id name) {
-        Field_c n = (Field_c) copy();
+        return id(this, name);
+    }
+
+    protected <N extends Field_c> N id(N n, Id name) {
+        if (n.name == name) return n;
+        if (n == this) n = Copy.Util.copy(n);
         n.name = name;
         return n;
     }
@@ -123,7 +134,7 @@ public class Field_c extends Expr_c implements Field {
 
     @Override
     public VarInstance varInstance() {
-        return fi;
+        return fieldInstance();
     }
 
     @Override
@@ -133,8 +144,12 @@ public class Field_c extends Expr_c implements Field {
 
     @Override
     public Field fieldInstance(FieldInstance fi) {
-        if (fi == this.fi) return this;
-        Field_c n = (Field_c) copy();
+        return fieldInstance(this, fi);
+    }
+
+    protected <N extends Field_c> N fieldInstance(N n, FieldInstance fi) {
+        if (n.fi == fi) return n;
+        if (n == this) n = Copy.Util.copy(n);
         n.fi = fi;
         return n;
     }
@@ -145,22 +160,23 @@ public class Field_c extends Expr_c implements Field {
     }
 
     @Override
-    public Field targetImplicit(boolean implicit) {
-        Field_c n = (Field_c) copy();
-        n.targetImplicit = implicit;
+    public Field targetImplicit(boolean targetImplicit) {
+        return targetImplicit(this, targetImplicit);
+    }
+
+    protected <N extends Field_c> N targetImplicit(N n, boolean targetImplicit) {
+        if (n.targetImplicit == targetImplicit) return n;
+        if (n == this) n = Copy.Util.copy(n);
+        n.targetImplicit = targetImplicit;
         return n;
     }
 
     /** Reconstruct the field. */
     protected Field_c reconstruct(Receiver target, Id name) {
-        if (target != this.target || name != this.name) {
-            Field_c n = (Field_c) copy();
-            n.target = target;
-            n.name = name;
-            return n;
-        }
-
-        return this;
+        Field_c n = this;
+        n = target(n, target);
+        n = id(n, name);
+        return n;
     }
 
     @Override
@@ -182,7 +198,8 @@ public class Field_c extends Expr_c implements Field {
                                  Flags.NONE,
                                  ts.unknownType(position()),
                                  name.id());
-        return n.fieldInstance(fi);
+        n = fieldInstance(n, fi);
+        return n;
     }
 
     @Override
@@ -201,7 +218,9 @@ public class Field_c extends Expr_c implements Field {
                         + target.getClass().getName() + ".");
             }
 
-            Field_c f = (Field_c) fieldInstance(fi).type(fi.type());
+            Field_c f = this;
+            f = fieldInstance(f, fi);
+            f = type(f, fi.type());
             f.checkConsistency(c);
 
             if (!fi.flags().isStatic() && target instanceof TypeNode) {
@@ -217,8 +236,8 @@ public class Field_c extends Expr_c implements Field {
         throw new SemanticException("Cannot access field \""
                                             + name.id()
                                             + "\" "
-                                            + (target instanceof Expr ? "on an expression "
-                                                    : "")
+                                            + (target instanceof Expr
+                                                    ? "on an expression " : "")
                                             + "of non-reference type \""
                                             + target.type() + "\".",
                                     target.position());
@@ -322,13 +341,14 @@ public class Field_c extends Expr_c implements Field {
 
     @Override
     public Node extRewrite(ExtensionRewriter rw) throws SemanticException {
-        Field n = (Field) super.extRewrite(rw);
+        Field_c n = (Field_c) super.extRewrite(rw);
         if (n.isTargetImplicit()) {
             // don't translate the target.
             // Need to have an ambiguous expression that will be disambiguated later
             return rw.nodeFactory().AmbExpr(n.position(), n.id());
         }
-        return n.fieldInstance(null);
+        n = fieldInstance(n, null);
+        return n;
     }
 
     @Override

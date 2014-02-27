@@ -31,6 +31,7 @@ import java.util.List;
 import polyglot.translate.ExtensionRewriter;
 import polyglot.types.SemanticException;
 import polyglot.util.CollectionUtil;
+import polyglot.util.Copy;
 import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
 import polyglot.util.SubtypeSet;
@@ -60,13 +61,14 @@ public abstract class Term_c extends Node_c implements Term {
 
     @Override
     public Term reachable(boolean reachability) {
-        if (this.reachable == reachability) {
-            return this;
-        }
+        return reachable(this, reachability);
+    }
 
-        Term_c t = (Term_c) copy();
-        t.reachable = reachability;
-        return t;
+    protected <N extends Term_c> N reachable(N n, boolean reachability) {
+        if (n.reachable == reachability) return n;
+        if (n == this) n = Copy.Util.copy(n);
+        n.reachable = reachability;
+        return n;
     }
 
     /** Utility function to get the first entry of a list, or else alt. */
@@ -84,21 +86,28 @@ public abstract class Term_c extends Node_c implements Term {
 
     @Override
     public Term exceptions(SubtypeSet exceptions) {
-        Term_c n = (Term_c) copy();
+        return exceptions(this, exceptions);
+    }
+
+    protected <N extends Term_c> N exceptions(N n, SubtypeSet exceptions) {
+        if (n.exceptions == exceptions) return n;
+        if (n == this) n = Copy.Util.copy(n);
         n.exceptions = new SubtypeSet(exceptions);
         return n;
     }
 
     @Override
     public Node exceptionCheck(ExceptionChecker ec) throws SemanticException {
-        Term t = (Term) super.exceptionCheck(ec);
+        Term_c t = (Term_c) super.exceptionCheck(ec);
+        t = exceptions(t, ec.throwsSet());
         //System.out.println("exceptions for " + t + " = " + ec.throwsSet());
-        return t.exceptions(ec.throwsSet());
+        return t;
     }
 
     @Override
     public Node extRewrite(ExtensionRewriter rw) throws SemanticException {
-        Term t = (Term) super.extRewrite(rw);
-        return t.reachable(false);
+        Term_c t = (Term_c) super.extRewrite(rw);
+        t = reachable(t, false);
+        return t;
     }
 }

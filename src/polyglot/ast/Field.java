@@ -63,7 +63,7 @@ public interface Field extends NamedVariable {
     /** 
      * Set whether the target of the field is implicit.
      */
-    Field targetImplicit(boolean implicit);
+    Field targetImplicit(boolean targetImplicit);
 
     /** Set the field's name. */
     Field id(Id name);

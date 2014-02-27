@@ -32,6 +32,7 @@ import polyglot.types.SemanticException;
 import polyglot.types.Type;
 import polyglot.types.TypeSystem;
 import polyglot.util.CodeWriter;
+import polyglot.util.Copy;
 import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
 import polyglot.visit.AscriptionVisitor;
@@ -66,7 +67,12 @@ public class Do_c extends Loop_c implements Do {
 
     @Override
     public Do body(Stmt body) {
-        Do_c n = (Do_c) copy();
+        return body(this, body);
+    }
+
+    protected <N extends Do_c> N body(N n, Stmt body) {
+        if (n.body == body) return n;
+        if (n == this) n = Copy.Util.copy(n);
         n.body = body;
         return n;
     }
@@ -78,21 +84,22 @@ public class Do_c extends Loop_c implements Do {
 
     @Override
     public Do cond(Expr cond) {
-        Do_c n = (Do_c) copy();
+        return cond(this, cond);
+    }
+
+    protected <N extends Do_c> N cond(N n, Expr cond) {
+        if (n.cond == cond) return n;
+        if (n == this) n = Copy.Util.copy(n);
         n.cond = cond;
         return n;
     }
 
     /** Reconstruct the statement. */
     protected Do_c reconstruct(Stmt body, Expr cond) {
-        if (body != this.body || cond != this.cond) {
-            Do_c n = (Do_c) copy();
-            n.body = body;
-            n.cond = cond;
-            return n;
-        }
-
-        return this;
+        Do_c n = this;
+        n = body(n, body);
+        n = cond(n, cond);
+        return n;
     }
 
     @Override

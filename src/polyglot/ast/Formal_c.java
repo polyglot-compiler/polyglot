@@ -36,6 +36,7 @@ import polyglot.types.SemanticException;
 import polyglot.types.Type;
 import polyglot.types.TypeSystem;
 import polyglot.util.CodeWriter;
+import polyglot.util.Copy;
 import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
 import polyglot.visit.AmbiguityRemover;
@@ -82,8 +83,12 @@ public class Formal_c extends Term_c implements Formal {
 
     @Override
     public Formal flags(Flags flags) {
-        if (flags.equals(this.flags)) return this;
-        Formal_c n = (Formal_c) copy();
+        return flags(this, flags);
+    }
+
+    protected <N extends Formal_c> N flags(N n, Flags flags) {
+        if (n.flags.equals(flags)) return n;
+        if (n == this) n = Copy.Util.copy(n);
         n.flags = flags;
         return n;
     }
@@ -95,7 +100,12 @@ public class Formal_c extends Term_c implements Formal {
 
     @Override
     public Formal type(TypeNode type) {
-        Formal_c n = (Formal_c) copy();
+        return type(this, type);
+    }
+
+    protected <N extends Formal_c> N type(N n, TypeNode type) {
+        if (n.type == type) return n;
+        if (n == this) n = Copy.Util.copy(n);
         n.type = type;
         return n;
     }
@@ -107,7 +117,12 @@ public class Formal_c extends Term_c implements Formal {
 
     @Override
     public Formal id(Id name) {
-        Formal_c n = (Formal_c) copy();
+        return id(this, name);
+    }
+
+    protected <N extends Formal_c> N id(N n, Id name) {
+        if (n.name == name) return n;
+        if (n == this) n = Copy.Util.copy(n);
         n.name = name;
         return n;
     }
@@ -129,22 +144,22 @@ public class Formal_c extends Term_c implements Formal {
 
     @Override
     public Formal localInstance(LocalInstance li) {
-        if (li == this.li) return this;
-        Formal_c n = (Formal_c) copy();
+        return localInstance(this, li);
+    }
+
+    protected <N extends Formal_c> N localInstance(N n, LocalInstance li) {
+        if (n.li == li) return n;
+        if (n == this) n = Copy.Util.copy(n);
         n.li = li;
         return n;
     }
 
     /** Reconstruct the formal. */
     protected Formal_c reconstruct(TypeNode type, Id name) {
-        if (this.type != type || this.name != name) {
-            Formal_c n = (Formal_c) copy();
-            n.type = type;
-            n.name = name;
-            return n;
-        }
-
-        return this;
+        Formal_c n = this;
+        n = type(n, type);
+        n = id(n, name);
+        return n;
     }
 
     @Override
@@ -179,7 +194,8 @@ public class Formal_c extends Term_c implements Formal {
                                  ts.unknownType(position()),
                                  name());
 
-        return n.localInstance(li);
+        n = localInstance(n, li);
+        return n;
     }
 
     @Override
@@ -222,8 +238,9 @@ public class Formal_c extends Term_c implements Formal {
 
     @Override
     public Node extRewrite(ExtensionRewriter rw) throws SemanticException {
-        Formal n = (Formal) super.extRewrite(rw);
-        return n.localInstance(null);
+        Formal_c n = (Formal_c) super.extRewrite(rw);
+        n = localInstance(n, null);
+        return n;
     }
 
     @Override

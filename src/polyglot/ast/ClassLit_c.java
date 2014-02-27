@@ -30,6 +30,7 @@ import java.util.List;
 
 import polyglot.types.SemanticException;
 import polyglot.util.CodeWriter;
+import polyglot.util.Copy;
 import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
 import polyglot.visit.CFGBuilder;
@@ -60,10 +61,12 @@ public class ClassLit_c extends Lit_c implements ClassLit {
     }
 
     public ClassLit typeNode(TypeNode typeNode) {
-        if (this.typeNode == typeNode) {
-            return this;
-        }
-        ClassLit_c n = (ClassLit_c) copy();
+        return typeNode(this, typeNode);
+    }
+
+    protected <N extends ClassLit_c> N typeNode(N n, TypeNode typeNode) {
+        if (n.typeNode == typeNode) return n;
+        if (n == this) n = Copy.Util.copy(n);
         n.typeNode = typeNode;
         return n;
     }
@@ -87,10 +90,16 @@ public class ClassLit_c extends Lit_c implements ClassLit {
         return succs;
     }
 
+    protected ClassLit_c reconstruct(TypeNode typeNode) {
+        ClassLit_c n = this;
+        n = typeNode(n, typeNode);
+        return n;
+    }
+
     @Override
     public Node visitChildren(NodeVisitor v) {
         TypeNode tn = visitChild(this.typeNode, v);
-        return this.typeNode(tn);
+        return reconstruct(tn);
     }
 
     @Override

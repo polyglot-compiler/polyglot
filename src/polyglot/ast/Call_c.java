@@ -44,6 +44,7 @@ import polyglot.types.Type;
 import polyglot.types.TypeSystem;
 import polyglot.util.CodeWriter;
 import polyglot.util.CollectionUtil;
+import polyglot.util.Copy;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.ListUtil;
 import polyglot.util.Position;
@@ -92,7 +93,12 @@ public class Call_c extends Expr_c implements Call, CallOps {
 
     @Override
     public Call target(Receiver target) {
-        Call_c n = (Call_c) copy();
+        return target(this, target);
+    }
+
+    protected <N extends Call_c> N target(N n, Receiver target) {
+        if (n.target == target) return n;
+        if (n == this) n = Copy.Util.copy(n);
         n.target = target;
         return n;
     }
@@ -104,7 +110,12 @@ public class Call_c extends Expr_c implements Call, CallOps {
 
     @Override
     public Call id(Id name) {
-        Call_c n = (Call_c) copy();
+        return id(this, name);
+    }
+
+    protected <N extends Call_c> N id(N n, Id name) {
+        if (n.name == name) return n;
+        if (n == this) n = Copy.Util.copy(n);
         n.name = name;
         return n;
     }
@@ -131,8 +142,12 @@ public class Call_c extends Expr_c implements Call, CallOps {
 
     @Override
     public Call methodInstance(MethodInstance mi) {
-        if (mi == this.mi) return this;
-        Call_c n = (Call_c) copy();
+        return methodInstance(this, mi);
+    }
+
+    protected <N extends Call_c> N methodInstance(N n, MethodInstance mi) {
+        if (n.mi == mi) return n;
+        if (n == this) n = Copy.Util.copy(n);
         n.mi = mi;
         return n;
     }
@@ -144,11 +159,12 @@ public class Call_c extends Expr_c implements Call, CallOps {
 
     @Override
     public Call targetImplicit(boolean targetImplicit) {
-        if (targetImplicit == this.targetImplicit) {
-            return this;
-        }
+        return targetImplicit(this, targetImplicit);
+    }
 
-        Call_c n = (Call_c) copy();
+    protected <N extends Call_c> N targetImplicit(N n, boolean targetImplicit) {
+        if (n.targetImplicit == targetImplicit) return n;
+        if (n == this) n = Copy.Util.copy(n);
         n.targetImplicit = targetImplicit;
         return n;
     }
@@ -160,24 +176,23 @@ public class Call_c extends Expr_c implements Call, CallOps {
 
     @Override
     public ProcedureCall arguments(List<Expr> arguments) {
-        Call_c n = (Call_c) copy();
+        return arguments(this, arguments);
+    }
+
+    protected <N extends Call_c> N arguments(N n, List<Expr> arguments) {
+        if (CollectionUtil.equals(n.arguments, arguments)) return n;
+        if (n == this) n = Copy.Util.copy(n);
         n.arguments = ListUtil.copy(arguments, true);
         return n;
     }
 
     /** Reconstruct the call. */
     protected Call_c reconstruct(Receiver target, Id name, List<Expr> arguments) {
-        if (target != this.target || name != this.name
-                || !CollectionUtil.equals(arguments, this.arguments)) {
-            Call_c n = (Call_c) copy();
-
-            n.target = target;
-            n.name = name;
-            n.arguments = ListUtil.copy(arguments, true);
-            return n;
-        }
-
-        return this;
+        Call_c n = this;
+        n = target(n, target);
+        n = id(n, name);
+        n = arguments(n, arguments);
+        return n;
     }
 
     @Override
@@ -207,7 +222,7 @@ public class Call_c extends Expr_c implements Call, CallOps {
                                   name.id(),
                                   l,
                                   Collections.<Type> emptyList());
-        return n.methodInstance(mi);
+        return methodInstance(n, mi);
     }
 
     @Override
@@ -249,8 +264,10 @@ public class Call_c extends Expr_c implements Call, CallOps {
             }
         }
 
-        // we call computeTypes on the reciever too.
-        Call_c call = (Call_c) this.targetImplicit(true).target(r);
+        // we call computeTypes on the receiver too.
+        Call_c call = this;
+        call = targetImplicit(call, true);
+        call = target(call, r);
         return call.visit(tc.rethrowMissingDependencies(true));
     }
 
@@ -307,7 +324,9 @@ public class Call_c extends Expr_c implements Call, CallOps {
                     + "of the super class", this.position());
         }
 
-        Call_c call = (Call_c) this.methodInstance(mi).type(mi.returnType());
+        Call_c call = this;
+        call = methodInstance(call, mi);
+        call = type(call, mi.returnType());
 
         // If we found a method, the call must type check, so no need to check
         // the arguments here.
@@ -522,10 +541,10 @@ public class Call_c extends Expr_c implements Call, CallOps {
 
     @Override
     public Node extRewrite(ExtensionRewriter rw) throws SemanticException {
-        Call c = (Call) super.extRewrite(rw);
-        c = c.methodInstance(null);
+        Call_c c = (Call_c) super.extRewrite(rw);
+        c = methodInstance(c, null);
         if (isTargetImplicit()) {
-            return c.target(null);
+            c = target(c, null);
         }
         return c;
     }

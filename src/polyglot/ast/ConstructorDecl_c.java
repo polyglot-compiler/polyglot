@@ -27,7 +27,6 @@
 package polyglot.ast;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -46,6 +45,7 @@ import polyglot.types.Type;
 import polyglot.types.TypeSystem;
 import polyglot.util.CodeWriter;
 import polyglot.util.CollectionUtil;
+import polyglot.util.Copy;
 import polyglot.util.ListUtil;
 import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
@@ -100,8 +100,12 @@ public class ConstructorDecl_c extends Term_c implements ConstructorDecl,
 
     @Override
     public ConstructorDecl flags(Flags flags) {
-        if (flags.equals(this.flags)) return this;
-        ConstructorDecl_c n = (ConstructorDecl_c) copy();
+        return flags(this, flags);
+    }
+
+    protected <N extends ConstructorDecl_c> N flags(N n, Flags flags) {
+        if (n.flags.equals(flags)) return n;
+        if (n == this) n = Copy.Util.copy(n);
         n.flags = flags;
         return n;
     }
@@ -113,7 +117,12 @@ public class ConstructorDecl_c extends Term_c implements ConstructorDecl,
 
     @Override
     public ConstructorDecl id(Id name) {
-        ConstructorDecl_c n = (ConstructorDecl_c) copy();
+        return id(this, name);
+    }
+
+    protected <N extends ConstructorDecl_c> N id(N n, Id name) {
+        if (n.name == name) return n;
+        if (n == this) n = Copy.Util.copy(n);
         n.name = name;
         return n;
     }
@@ -130,24 +139,35 @@ public class ConstructorDecl_c extends Term_c implements ConstructorDecl,
 
     @Override
     public List<Formal> formals() {
-        return Collections.unmodifiableList(this.formals);
+        return this.formals;
     }
 
     @Override
     public ConstructorDecl formals(List<Formal> formals) {
-        ConstructorDecl_c n = (ConstructorDecl_c) copy();
+        return formals(this, formals);
+    }
+
+    protected <N extends ConstructorDecl_c> N formals(N n, List<Formal> formals) {
+        if (CollectionUtil.equals(n.formals, formals)) return n;
+        if (n == this) n = Copy.Util.copy(n);
         n.formals = ListUtil.copy(formals, true);
         return n;
     }
 
     @Override
     public List<TypeNode> throwTypes() {
-        return Collections.unmodifiableList(this.throwTypes);
+        return this.throwTypes;
     }
 
     @Override
     public ConstructorDecl throwTypes(List<TypeNode> throwTypes) {
-        ConstructorDecl_c n = (ConstructorDecl_c) copy();
+        return throwTypes(this, throwTypes);
+    }
+
+    protected <N extends ConstructorDecl_c> N throwTypes(N n,
+            List<TypeNode> throwTypes) {
+        if (CollectionUtil.equals(n.throwTypes, throwTypes)) return n;
+        if (n == this) n = Copy.Util.copy(n);
         n.throwTypes = ListUtil.copy(throwTypes, true);
         return n;
     }
@@ -164,19 +184,14 @@ public class ConstructorDecl_c extends Term_c implements ConstructorDecl,
 
     @Override
     public CodeBlock body(Block body) {
-        ConstructorDecl_c n = (ConstructorDecl_c) copy();
+        return body(this, body);
+    }
+
+    protected <N extends ConstructorDecl_c> N body(N n, Block body) {
+        if (n.body == body) return n;
+        if (n == this) n = Copy.Util.copy(n);
         n.body = body;
         return n;
-    }
-
-    @Override
-    public ConstructorInstance constructorInstance() {
-        return ci;
-    }
-
-    @Override
-    public ProcedureInstance procedureInstance() {
-        return ci;
     }
 
     @Override
@@ -185,9 +200,24 @@ public class ConstructorDecl_c extends Term_c implements ConstructorDecl,
     }
 
     @Override
+    public ProcedureInstance procedureInstance() {
+        return constructorInstance();
+    }
+
+    @Override
+    public ConstructorInstance constructorInstance() {
+        return ci;
+    }
+
+    @Override
     public ConstructorDecl constructorInstance(ConstructorInstance ci) {
-        if (ci == this.ci) return this;
-        ConstructorDecl_c n = (ConstructorDecl_c) copy();
+        return constructorInstance(this, ci);
+    }
+
+    protected <N extends ConstructorDecl_c> N constructorInstance(N n,
+            ConstructorInstance ci) {
+        if (n.ci == ci) return n;
+        if (n == this) n = Copy.Util.copy(n);
         n.ci = ci;
         return n;
     }
@@ -195,18 +225,12 @@ public class ConstructorDecl_c extends Term_c implements ConstructorDecl,
     /** Reconstruct the constructor. */
     protected ConstructorDecl_c reconstruct(Id name, List<Formal> formals,
             List<TypeNode> throwTypes, Block body) {
-        if (name != this.name || !CollectionUtil.equals(formals, this.formals)
-                || !CollectionUtil.equals(throwTypes, this.throwTypes)
-                || body != this.body) {
-            ConstructorDecl_c n = (ConstructorDecl_c) copy();
-            n.name = name;
-            n.formals = ListUtil.copy(formals, true);
-            n.throwTypes = ListUtil.copy(throwTypes, true);
-            n.body = body;
-            return n;
-        }
-
-        return this;
+        ConstructorDecl_c n = this;
+        n = id(n, name);
+        n = formals(n, formals);
+        n = throwTypes(n, throwTypes);
+        n = body(n, body);
+        return n;
     }
 
     @Override
@@ -353,8 +377,9 @@ public class ConstructorDecl_c extends Term_c implements ConstructorDecl,
 
     @Override
     public Node extRewrite(ExtensionRewriter rw) throws SemanticException {
-        ConstructorDecl n = (ConstructorDecl) super.extRewrite(rw);
-        return n.constructorInstance(null);
+        ConstructorDecl_c n = (ConstructorDecl_c) super.extRewrite(rw);
+        n = constructorInstance(n, null);
+        return n;
     }
 
     @Override

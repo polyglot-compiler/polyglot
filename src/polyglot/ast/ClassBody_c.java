@@ -38,6 +38,7 @@ import polyglot.types.SemanticException;
 import polyglot.types.TypeSystem;
 import polyglot.util.CodeWriter;
 import polyglot.util.CollectionUtil;
+import polyglot.util.Copy;
 import polyglot.util.ListUtil;
 import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
@@ -70,30 +71,29 @@ public class ClassBody_c extends Term_c implements ClassBody {
 
     @Override
     public ClassBody members(List<ClassMember> members) {
-        ClassBody_c n = (ClassBody_c) copy();
+        return members(this, members);
+    }
+
+    protected <N extends ClassBody_c> N members(N n, List<ClassMember> members) {
+        if (CollectionUtil.equals(n.members, members)) return n;
+        if (n == this) n = Copy.Util.copy(n);
         n.members = ListUtil.copy(members, true);
         return n;
     }
 
     @Override
     public ClassBody addMember(ClassMember member) {
-        ClassBody_c n = (ClassBody_c) copy();
         List<ClassMember> l =
                 new ArrayList<ClassMember>(this.members.size() + 1);
         l.addAll(this.members);
         l.add(member);
-        n.members = ListUtil.copy(l, true);
-        return n;
+        return members(l);
     }
 
     protected ClassBody_c reconstruct(List<ClassMember> members) {
-        if (!CollectionUtil.equals(members, this.members)) {
-            ClassBody_c n = (ClassBody_c) copy();
-            n.members = ListUtil.copy(members, true);
-            return n;
-        }
-
-        return this;
+        ClassBody_c n = this;
+        n = members(n, members);
+        return n;
     }
 
     @Override

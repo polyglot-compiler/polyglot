@@ -26,7 +26,6 @@
 
 package polyglot.ast;
 
-import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -40,6 +39,7 @@ import polyglot.types.SemanticException;
 import polyglot.types.TypeSystem;
 import polyglot.util.CodeWriter;
 import polyglot.util.CollectionUtil;
+import polyglot.util.Copy;
 import polyglot.util.ListUtil;
 import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
@@ -84,7 +84,12 @@ public class SourceFile_c extends Node_c implements SourceFile {
 
     @Override
     public SourceFile source(Source source) {
-        SourceFile_c n = (SourceFile_c) copy();
+        return source(this, source);
+    }
+
+    protected <N extends SourceFile_c> N source(N n, Source source) {
+        if (n.source == source) return n;
+        if (n == this) n = Copy.Util.copy(n);
         n.source = source;
         return n;
     }
@@ -96,31 +101,46 @@ public class SourceFile_c extends Node_c implements SourceFile {
 
     @Override
     public SourceFile package_(PackageNode package_) {
-        SourceFile_c n = (SourceFile_c) copy();
+        return package_(this, package_);
+    }
+
+    protected <N extends SourceFile_c> N package_(N n, PackageNode package_) {
+        if (n.package_ == package_) return n;
+        if (n == this) n = Copy.Util.copy(n);
         n.package_ = package_;
         return n;
     }
 
     @Override
     public List<Import> imports() {
-        return Collections.unmodifiableList(this.imports);
+        return this.imports;
     }
 
     @Override
     public SourceFile imports(List<Import> imports) {
-        SourceFile_c n = (SourceFile_c) copy();
+        return imports(this, imports);
+    }
+
+    protected <N extends SourceFile_c> N imports(N n, List<Import> imports) {
+        if (CollectionUtil.equals(n.imports, imports)) return n;
+        if (n == this) n = Copy.Util.copy(n);
         n.imports = ListUtil.copy(imports, true);
         return n;
     }
 
     @Override
     public List<TopLevelDecl> decls() {
-        return Collections.unmodifiableList(this.decls);
+        return this.decls;
     }
 
     @Override
     public SourceFile decls(List<TopLevelDecl> decls) {
-        SourceFile_c n = (SourceFile_c) copy();
+        return decls(this, decls);
+    }
+
+    protected <N extends SourceFile_c> N decls(N n, List<TopLevelDecl> decls) {
+        if (CollectionUtil.equals(n.decls, decls)) return n;
+        if (n == this) n = Copy.Util.copy(n);
         n.decls = ListUtil.copy(decls, true);
         return n;
     }
@@ -132,7 +152,13 @@ public class SourceFile_c extends Node_c implements SourceFile {
 
     @Override
     public SourceFile importTable(ImportTable importTable) {
-        SourceFile_c n = (SourceFile_c) copy();
+        return importTable(this, importTable);
+    }
+
+    protected <N extends SourceFile_c> N importTable(N n,
+            ImportTable importTable) {
+        if (n.importTable == importTable) return n;
+        if (n == this) n = Copy.Util.copy(n);
         n.importTable = importTable;
         return n;
     }
@@ -140,17 +166,11 @@ public class SourceFile_c extends Node_c implements SourceFile {
     /** Reconstruct the source file. */
     protected SourceFile_c reconstruct(PackageNode package_,
             List<Import> imports, List<TopLevelDecl> decls) {
-        if (package_ != this.package_
-                || !CollectionUtil.equals(imports, this.imports)
-                || !CollectionUtil.equals(decls, this.decls)) {
-            SourceFile_c n = (SourceFile_c) copy();
-            n.package_ = package_;
-            n.imports = ListUtil.copy(imports, true);
-            n.decls = ListUtil.copy(decls, true);
-            return n;
-        }
-
-        return this;
+        SourceFile_c n = this;
+        n = package_(n, package_);
+        n = imports(n, imports);
+        n = decls(n, decls);
+        return n;
     }
 
     @Override
@@ -214,8 +234,9 @@ public class SourceFile_c extends Node_c implements SourceFile {
 
     @Override
     public Node extRewrite(ExtensionRewriter rw) throws SemanticException {
-        SourceFile n = (SourceFile) super.extRewrite(rw);
-        return n.importTable(null);
+        SourceFile_c n = (SourceFile_c) super.extRewrite(rw);
+        n = importTable(n, null);
+        return n;
     }
 
     @Override

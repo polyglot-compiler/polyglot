@@ -44,6 +44,7 @@ import polyglot.types.Type;
 import polyglot.types.TypeSystem;
 import polyglot.types.VarInstance;
 import polyglot.util.CodeWriter;
+import polyglot.util.Copy;
 import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
 import polyglot.visit.AmbiguityRemover;
@@ -90,17 +91,17 @@ public class FieldDecl_c extends Term_c implements FieldDecl {
 
     @Override
     public MemberInstance memberInstance() {
-        return fi;
+        return fieldInstance();
     }
 
     @Override
     public VarInstance varInstance() {
-        return fi;
+        return fieldInstance();
     }
 
     @Override
     public CodeInstance codeInstance() {
-        return ii;
+        return initializerInstance();
     }
 
     @Override
@@ -110,8 +111,13 @@ public class FieldDecl_c extends Term_c implements FieldDecl {
 
     @Override
     public FieldDecl initializerInstance(InitializerInstance ii) {
-        if (ii == this.ii) return this;
-        FieldDecl_c n = (FieldDecl_c) copy();
+        return initializerInstance(this, ii);
+    }
+
+    protected <N extends FieldDecl_c> N initializerInstance(N n,
+            InitializerInstance ii) {
+        if (n.ii == ii) return n;
+        if (n == this) n = Copy.Util.copy(n);
         n.ii = ii;
         return n;
     }
@@ -128,8 +134,12 @@ public class FieldDecl_c extends Term_c implements FieldDecl {
 
     @Override
     public FieldDecl flags(Flags flags) {
-        if (flags.equals(this.flags)) return this;
-        FieldDecl_c n = (FieldDecl_c) copy();
+        return flags(this, flags);
+    }
+
+    protected <N extends FieldDecl_c> N flags(N n, Flags flags) {
+        if (n.flags.equals(flags)) return n;
+        if (n == this) n = Copy.Util.copy(n);
         n.flags = flags;
         return n;
     }
@@ -141,7 +151,12 @@ public class FieldDecl_c extends Term_c implements FieldDecl {
 
     @Override
     public FieldDecl type(TypeNode type) {
-        FieldDecl_c n = (FieldDecl_c) copy();
+        return type(this, type);
+    }
+
+    protected <N extends FieldDecl_c> N type(N n, TypeNode type) {
+        if (n.type == type) return n;
+        if (n == this) n = Copy.Util.copy(n);
         n.type = type;
         return n;
     }
@@ -153,7 +168,12 @@ public class FieldDecl_c extends Term_c implements FieldDecl {
 
     @Override
     public FieldDecl id(Id name) {
-        FieldDecl_c n = (FieldDecl_c) copy();
+        return id(this, name);
+    }
+
+    protected <N extends FieldDecl_c> N id(N n, Id name) {
+        if (n.name == name) return n;
+        if (n == this) n = Copy.Util.copy(n);
         n.name = name;
         return n;
     }
@@ -170,7 +190,7 @@ public class FieldDecl_c extends Term_c implements FieldDecl {
 
     @Override
     public Term codeBody() {
-        return init;
+        return init();
     }
 
     @Override
@@ -180,16 +200,13 @@ public class FieldDecl_c extends Term_c implements FieldDecl {
 
     @Override
     public FieldDecl init(Expr init) {
-        FieldDecl_c n = (FieldDecl_c) copy();
-        n.init = init;
-        return n;
+        return init(this, init);
     }
 
-    @Override
-    public FieldDecl fieldInstance(FieldInstance fi) {
-        if (fi == this.fi) return this;
-        FieldDecl_c n = (FieldDecl_c) copy();
-        n.fi = fi;
+    protected <N extends FieldDecl_c> N init(N n, Expr init) {
+        if (n.init == init) return n;
+        if (n == this) n = Copy.Util.copy(n);
+        n.init = init;
         return n;
     }
 
@@ -198,17 +215,25 @@ public class FieldDecl_c extends Term_c implements FieldDecl {
         return fi;
     }
 
+    @Override
+    public FieldDecl fieldInstance(FieldInstance fi) {
+        return fieldInstance(this, fi);
+    }
+
+    protected <N extends FieldDecl_c> N fieldInstance(N n, FieldInstance fi) {
+        if (n.fi == fi) return n;
+        if (n == this) n = Copy.Util.copy(n);
+        n.fi = fi;
+        return n;
+    }
+
     /** Reconstruct the declaration. */
     protected FieldDecl_c reconstruct(TypeNode type, Id name, Expr init) {
-        if (this.type != type || this.name != name || this.init != init) {
-            FieldDecl_c n = (FieldDecl_c) copy();
-            n.type = type;
-            n.name = name;
-            n.init = init;
-            return n;
-        }
-
-        return this;
+        FieldDecl_c n = this;
+        n = type(n, type);
+        n = id(n, name);
+        n = init(n, init);
+        return n;
     }
 
     @Override
@@ -240,16 +265,13 @@ public class FieldDecl_c extends Term_c implements FieldDecl {
             f = f.Public().Static().Final();
         }
 
-        FieldDecl n;
+        FieldDecl_c n = this;
 
         if (init != null) {
             Flags iflags = f.isStatic() ? Flags.STATIC : Flags.NONE;
             InitializerInstance ii =
                     ts.initializerInstance(init.position(), ct, iflags);
-            n = initializerInstance(ii);
-        }
-        else {
-            n = this;
+            n = initializerInstance(n, ii);
         }
 
         // XXX: MutableFieldInstance
@@ -261,7 +283,9 @@ public class FieldDecl_c extends Term_c implements FieldDecl {
                                  name.id());
         ct.addField(fi);
 
-        return n.flags(f).fieldInstance(fi);
+        n = flags(n, f);
+        n = fieldInstance(n, fi);
+        return n;
     }
 
     @Override
@@ -452,8 +476,10 @@ public class FieldDecl_c extends Term_c implements FieldDecl {
 
     @Override
     public Node extRewrite(ExtensionRewriter rw) throws SemanticException {
-        FieldDecl n = (FieldDecl) super.extRewrite(rw);
-        return n.fieldInstance(null).initializerInstance(null);
+        FieldDecl_c n = (FieldDecl_c) super.extRewrite(rw);
+        n = fieldInstance(n, null);
+        n = initializerInstance(n, null);
+        return n;
     }
 
     @Override

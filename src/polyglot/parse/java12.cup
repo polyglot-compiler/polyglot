@@ -571,7 +571,7 @@ interfaces ::=
         IMPLEMENTS interface_type_list:a
             {: RESULT = a; :}
     ;
-interfaces_opt::=
+interfaces_opt ::=
                     // List of TypeNode
             {: RESULT = new LinkedList<TypeNode>(); :}
     |   interfaces:a

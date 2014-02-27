@@ -32,6 +32,7 @@ import polyglot.types.SemanticException;
 import polyglot.types.Type;
 import polyglot.types.TypeSystem;
 import polyglot.util.CodeWriter;
+import polyglot.util.Copy;
 import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
 import polyglot.visit.AscriptionVisitor;
@@ -65,7 +66,12 @@ public class Synchronized_c extends Stmt_c implements Synchronized {
 
     @Override
     public Synchronized expr(Expr expr) {
-        Synchronized_c n = (Synchronized_c) copy();
+        return expr(this, expr);
+    }
+
+    protected <N extends Synchronized_c> N expr(N n, Expr expr) {
+        if (n.expr == expr) return n;
+        if (n == this) n = Copy.Util.copy(n);
         n.expr = expr;
         return n;
     }
@@ -77,21 +83,22 @@ public class Synchronized_c extends Stmt_c implements Synchronized {
 
     @Override
     public Synchronized body(Block body) {
-        Synchronized_c n = (Synchronized_c) copy();
+        return body(this, body);
+    }
+
+    protected <N extends Synchronized_c> N body(N n, Block body) {
+        if (n.body == body) return n;
+        if (n == this) n = Copy.Util.copy(n);
         n.body = body;
         return n;
     }
 
     /** Reconstruct the statement. */
     protected Synchronized_c reconstruct(Expr expr, Block body) {
-        if (expr != this.expr || body != this.body) {
-            Synchronized_c n = (Synchronized_c) copy();
-            n.expr = expr;
-            n.body = body;
-            return n;
-        }
-
-        return this;
+        Synchronized_c n = this;
+        n = expr(n, expr);
+        n = body(n, body);
+        return n;
     }
 
     @Override

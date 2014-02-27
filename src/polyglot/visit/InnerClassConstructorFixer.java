@@ -64,7 +64,7 @@ public class InnerClassConstructorFixer extends InnerClassAbstractRemover {
             newArgs.addAll(envAsActuals(env(ct, true),
                                         ct.outer(),
                                         newExp.qualifier()));
-            newExp = (New) newExp.arguments(newArgs);
+            newExp = newExp.arguments(newArgs);
 
             // Remove the qualifier.
             // FIXME: should pass in with arguments.

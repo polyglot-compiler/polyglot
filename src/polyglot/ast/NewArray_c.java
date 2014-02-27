@@ -35,6 +35,7 @@ import polyglot.types.Type;
 import polyglot.types.TypeSystem;
 import polyglot.util.CodeWriter;
 import polyglot.util.CollectionUtil;
+import polyglot.util.Copy;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.ListUtil;
 import polyglot.util.Position;
@@ -83,19 +84,29 @@ public class NewArray_c extends Expr_c implements NewArray {
 
     @Override
     public NewArray baseType(TypeNode baseType) {
-        NewArray_c n = (NewArray_c) copy();
+        return baseType(this, baseType);
+    }
+
+    protected <N extends NewArray_c> N baseType(N n, TypeNode baseType) {
+        if (n.baseType == baseType) return n;
+        if (n == this) n = Copy.Util.copy(n);
         n.baseType = baseType;
         return n;
     }
 
     @Override
     public List<Expr> dims() {
-        return Collections.unmodifiableList(this.dims);
+        return this.dims;
     }
 
     @Override
     public NewArray dims(List<Expr> dims) {
-        NewArray_c n = (NewArray_c) copy();
+        return dims(this, dims);
+    }
+
+    protected <N extends NewArray_c> N dims(N n, List<Expr> dims) {
+        if (CollectionUtil.equals(n.dims, dims)) return n;
+        if (n == this) n = Copy.Util.copy(n);
         n.dims = ListUtil.copy(dims, true);
         return n;
     }
@@ -112,7 +123,12 @@ public class NewArray_c extends Expr_c implements NewArray {
 
     @Override
     public NewArray additionalDims(int addDims) {
-        NewArray_c n = (NewArray_c) copy();
+        return additionalDims(this, addDims);
+    }
+
+    protected <N extends NewArray_c> N additionalDims(N n, int addDims) {
+        if (n.addDims == addDims) return n;
+        if (n == this) n = Copy.Util.copy(n);
         n.addDims = addDims;
         return n;
     }
@@ -124,7 +140,12 @@ public class NewArray_c extends Expr_c implements NewArray {
 
     @Override
     public NewArray init(ArrayInit init) {
-        NewArray_c n = (NewArray_c) copy();
+        return init(this, init);
+    }
+
+    protected <N extends NewArray_c> N init(N n, ArrayInit init) {
+        if (n.init == init) return n;
+        if (n == this) n = Copy.Util.copy(n);
         n.init = init;
         return n;
     }
@@ -132,16 +153,11 @@ public class NewArray_c extends Expr_c implements NewArray {
     /** Reconstruct the expression. */
     protected NewArray_c reconstruct(TypeNode baseType, List<Expr> dims,
             ArrayInit init) {
-        if (baseType != this.baseType
-                || !CollectionUtil.equals(dims, this.dims) || init != this.init) {
-            NewArray_c n = (NewArray_c) copy();
-            n.baseType = baseType;
-            n.dims = ListUtil.copy(dims, true);
-            n.init = init;
-            return n;
-        }
-
-        return this;
+        NewArray_c n = this;
+        n = baseType(n, baseType);
+        n = dims(n, dims);
+        n = init(n, init);
+        return n;
     }
 
     @Override

@@ -30,6 +30,7 @@ import java.util.Collections;
 import java.util.List;
 
 import polyglot.util.CodeWriter;
+import polyglot.util.Copy;
 import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
 import polyglot.visit.CFGBuilder;
@@ -60,7 +61,12 @@ public class Branch_c extends Stmt_c implements Branch {
 
     @Override
     public Branch kind(Branch.Kind kind) {
-        Branch_c n = (Branch_c) copy();
+        return kind(this, kind);
+    }
+
+    protected <N extends Branch_c> N kind(N n, Branch.Kind kind) {
+        if (n.kind == kind) return n;
+        if (n == this) n = Copy.Util.copy(n);
         n.kind = kind;
         return n;
     }
@@ -72,7 +78,12 @@ public class Branch_c extends Stmt_c implements Branch {
 
     @Override
     public Branch labelNode(Id label) {
-        Branch_c n = (Branch_c) copy();
+        return labelNode(this, label);
+    }
+
+    protected <N extends Branch_c> N labelNode(N n, Id label) {
+        if (n.label == label) return n;
+        if (n == this) n = Copy.Util.copy(n);
         n.label = label;
         return n;
     }
@@ -89,13 +100,9 @@ public class Branch_c extends Stmt_c implements Branch {
 
     /** Reconstruct the expression. */
     protected Branch_c reconstruct(Id label) {
-        if (label != this.label) {
-            Branch_c n = (Branch_c) copy();
-            n.label = label;
-            return n;
-        }
-
-        return this;
+        Branch_c n = this;
+        n = labelNode(n, label);
+        return n;
     }
 
     @Override

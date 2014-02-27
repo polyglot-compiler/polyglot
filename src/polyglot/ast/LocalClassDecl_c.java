@@ -30,6 +30,7 @@ import java.util.List;
 
 import polyglot.types.Context;
 import polyglot.util.CodeWriter;
+import polyglot.util.Copy;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
@@ -59,20 +60,21 @@ public class LocalClassDecl_c extends Stmt_c implements LocalClassDecl {
 
     @Override
     public LocalClassDecl decl(ClassDecl decl) {
-        LocalClassDecl_c n = (LocalClassDecl_c) copy();
+        return decl(this, decl);
+    }
+
+    protected <N extends LocalClassDecl_c> N decl(N n, ClassDecl decl) {
+        if (n.decl == decl) return n;
+        if (n == this) n = Copy.Util.copy(n);
         n.decl = decl;
         return n;
     }
 
     /** Reconstruct the statement. */
     protected LocalClassDecl_c reconstruct(ClassDecl decl) {
-        if (decl != this.decl) {
-            LocalClassDecl_c n = (LocalClassDecl_c) copy();
-            n.decl = decl;
-            return n;
-        }
-
-        return this;
+        LocalClassDecl_c n = this;
+        n = decl(n, decl);
+        return n;
     }
 
     @Override

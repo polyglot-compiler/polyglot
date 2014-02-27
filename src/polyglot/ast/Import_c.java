@@ -31,6 +31,7 @@ import polyglot.types.Named;
 import polyglot.types.SemanticException;
 import polyglot.types.Type;
 import polyglot.util.CodeWriter;
+import polyglot.util.Copy;
 import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
 import polyglot.util.StringUtil;
@@ -63,7 +64,12 @@ public class Import_c extends Node_c implements Import {
 
     @Override
     public Import name(String name) {
-        Import_c n = (Import_c) copy();
+        return name(this, name);
+    }
+
+    protected <N extends Import_c> N name(N n, String name) {
+        if (n.name == name) return n;
+        if (n == this) n = Copy.Util.copy(n);
         n.name = name;
         return n;
     }
@@ -75,7 +81,12 @@ public class Import_c extends Node_c implements Import {
 
     @Override
     public Import kind(Kind kind) {
-        Import_c n = (Import_c) copy();
+        return kind(this, kind);
+    }
+
+    protected <N extends Import_c> N kind(N n, Kind kind) {
+        if (n.kind == kind) return n;
+        if (n == this) n = Copy.Util.copy(n);
         n.kind = kind;
         return n;
     }

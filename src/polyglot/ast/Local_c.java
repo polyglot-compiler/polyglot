@@ -36,6 +36,7 @@ import polyglot.types.SemanticException;
 import polyglot.types.TypeSystem;
 import polyglot.types.VarInstance;
 import polyglot.util.CodeWriter;
+import polyglot.util.Copy;
 import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
 import polyglot.visit.CFGBuilder;
@@ -71,7 +72,12 @@ public class Local_c extends Expr_c implements Local {
 
     @Override
     public Local id(Id name) {
-        Local_c n = (Local_c) copy();
+        return id(this, name);
+    }
+
+    protected <N extends Local_c> N id(N n, Id name) {
+        if (n.name == name) return n;
+        if (n == this) n = Copy.Util.copy(n);
         n.name = name;
         return n;
     }
@@ -93,7 +99,7 @@ public class Local_c extends Expr_c implements Local {
 
     @Override
     public VarInstance varInstance() {
-        return li;
+        return localInstance();
     }
 
     @Override
@@ -103,21 +109,21 @@ public class Local_c extends Expr_c implements Local {
 
     @Override
     public Local localInstance(LocalInstance li) {
-        if (li == this.li) return this;
-        Local_c n = (Local_c) copy();
+        return localInstance(this, li);
+    }
+
+    protected <N extends Local_c> N localInstance(N n, LocalInstance li) {
+        if (n.li == li) return n;
+        if (n == this) n = Copy.Util.copy(n);
         n.li = li;
         return n;
     }
 
     /** Reconstruct the expression. */
     protected Local_c reconstruct(Id name) {
-        if (name != this.name) {
-            Local_c n = (Local_c) copy();
-            n.name = name;
-            return n;
-        }
-
-        return this;
+        Local_c n = this;
+        n = id(n, name);
+        return n;
     }
 
     @Override
@@ -137,7 +143,8 @@ public class Local_c extends Expr_c implements Local {
                                  Flags.NONE,
                                  ts.unknownType(position()),
                                  name.id());
-        return n.localInstance(li);
+        n = localInstance(n, li);
+        return n;
     }
 
     @Override
@@ -157,13 +164,17 @@ public class Local_c extends Expr_c implements Local {
             }
         }
 
-        return localInstance(li).type(li.type());
+        Local_c n = this;
+        n = localInstance(n, li);
+        n = type(n, li.type());
+        return n;
     }
 
     @Override
     public Node extRewrite(ExtensionRewriter rw) throws SemanticException {
-        Local n = (Local) super.extRewrite(rw);
-        return n.localInstance(null);
+        Local_c n = (Local_c) super.extRewrite(rw);
+        n = localInstance(n, null);
+        return n;
     }
 
     @Override

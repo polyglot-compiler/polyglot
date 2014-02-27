@@ -32,4 +32,11 @@ package polyglot.util;
  */
 public interface Copy<T> extends Cloneable {
     public T copy();
+
+    class Util {
+        @SuppressWarnings("unchecked")
+        public static <T extends Copy<? super T>> T copy(T o) {
+            return (T) o.copy();
+        }
+    }
 }

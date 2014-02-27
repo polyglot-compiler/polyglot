@@ -40,6 +40,7 @@ import polyglot.types.SemanticException;
 import polyglot.types.Type;
 import polyglot.types.TypeSystem;
 import polyglot.util.CodeWriter;
+import polyglot.util.Copy;
 import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
 import polyglot.util.SubtypeSet;
@@ -77,19 +78,18 @@ public class Initializer_c extends Term_c implements Initializer {
     }
 
     @Override
-    public MemberInstance memberInstance() {
-        return ii;
-    }
-
-    @Override
     public Flags flags() {
         return this.flags;
     }
 
     @Override
     public Initializer flags(Flags flags) {
-        if (flags.equals(this.flags)) return this;
-        Initializer_c n = (Initializer_c) copy();
+        return flags(this, flags);
+    }
+
+    protected <N extends Initializer_c> N flags(N n, Flags flags) {
+        if (n.flags.equals(flags)) return n;
+        if (n == this) n = Copy.Util.copy(n);
         n.flags = flags;
         return n;
     }
@@ -100,21 +100,31 @@ public class Initializer_c extends Term_c implements Initializer {
     }
 
     @Override
+    public MemberInstance memberInstance() {
+        return initializerInstance();
+    }
+
+    @Override
     public InitializerInstance initializerInstance() {
         return ii;
     }
 
     @Override
     public Initializer initializerInstance(InitializerInstance ii) {
-        if (ii == this.ii) return this;
-        Initializer_c n = (Initializer_c) copy();
+        return initializerInstance(this, ii);
+    }
+
+    protected <N extends Initializer_c> N initializerInstance(N n,
+            InitializerInstance ii) {
+        if (n.ii == ii) return n;
+        if (n == this) n = Copy.Util.copy(n);
         n.ii = ii;
         return n;
     }
 
     @Override
     public Term codeBody() {
-        return this.body;
+        return body();
     }
 
     @Override
@@ -124,20 +134,21 @@ public class Initializer_c extends Term_c implements Initializer {
 
     @Override
     public CodeBlock body(Block body) {
-        Initializer_c n = (Initializer_c) copy();
+        return body(this, body);
+    }
+
+    protected <N extends Initializer_c> N body(N n, Block body) {
+        if (n.body == body) return n;
+        if (n == this) n = Copy.Util.copy(n);
         n.body = body;
         return n;
     }
 
     /** Reconstruct the initializer. */
     protected Initializer_c reconstruct(Block body) {
-        if (body != this.body) {
-            Initializer_c n = (Initializer_c) copy();
-            n.body = body;
-            return n;
-        }
-
-        return this;
+        Initializer_c n = this;
+        n = body(n, body);
+        return n;
     }
 
     @Override
@@ -243,8 +254,9 @@ public class Initializer_c extends Term_c implements Initializer {
 
     @Override
     public Node extRewrite(ExtensionRewriter rw) throws SemanticException {
-        Initializer n = (Initializer) super.extRewrite(rw);
-        return n.initializerInstance(null);
+        Initializer_c n = (Initializer_c) super.extRewrite(rw);
+        n = initializerInstance(n, null);
+        return n;
     }
 
     @Override

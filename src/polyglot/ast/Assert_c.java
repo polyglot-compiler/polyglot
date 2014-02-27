@@ -33,6 +33,7 @@ import polyglot.types.SemanticException;
 import polyglot.types.Type;
 import polyglot.types.TypeSystem;
 import polyglot.util.CodeWriter;
+import polyglot.util.Copy;
 import polyglot.util.ErrorInfo;
 import polyglot.util.ErrorQueue;
 import polyglot.util.Position;
@@ -68,7 +69,12 @@ public class Assert_c extends Stmt_c implements Assert {
 
     @Override
     public Assert cond(Expr cond) {
-        Assert_c n = (Assert_c) copy();
+        return cond(this, cond);
+    }
+
+    protected <N extends Assert_c> N cond(N n, Expr cond) {
+        if (n.cond == cond) return n;
+        if (n == this) n = Copy.Util.copy(n);
         n.cond = cond;
         return n;
     }
@@ -80,21 +86,22 @@ public class Assert_c extends Stmt_c implements Assert {
 
     @Override
     public Assert errorMessage(Expr errorMessage) {
-        Assert_c n = (Assert_c) copy();
+        return errorMessage(this, errorMessage);
+    }
+
+    protected <N extends Assert_c> N errorMessage(N n, Expr errorMessage) {
+        if (n.errorMessage == errorMessage) return n;
+        if (n == this) n = Copy.Util.copy(n);
         n.errorMessage = errorMessage;
         return n;
     }
 
     /** Reconstruct the statement. */
     protected Assert_c reconstruct(Expr cond, Expr errorMessage) {
-        if (cond != this.cond || errorMessage != this.errorMessage) {
-            Assert_c n = (Assert_c) copy();
-            n.cond = cond;
-            n.errorMessage = errorMessage;
-            return n;
-        }
-
-        return this;
+        Assert_c n = this;
+        n = cond(n, cond);
+        n = errorMessage(n, errorMessage);
+        return n;
     }
 
     @Override

@@ -59,7 +59,6 @@ import polyglot.visit.TypeChecker;
 public class JL5BinaryExt extends JL5Ext {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
-    /** Type check the expression. */
     @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
         Binary b = (Binary) this.node();

@@ -27,7 +27,6 @@
 package polyglot.ast;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -38,6 +37,7 @@ import polyglot.types.Type;
 import polyglot.types.TypeSystem;
 import polyglot.util.CodeWriter;
 import polyglot.util.CollectionUtil;
+import polyglot.util.Copy;
 import polyglot.util.ListUtil;
 import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
@@ -77,34 +77,39 @@ public class Switch_c extends Stmt_c implements Switch {
 
     @Override
     public Switch expr(Expr expr) {
-        Switch_c n = (Switch_c) copy();
+        return expr(this, expr);
+    }
+
+    protected <N extends Switch_c> N expr(N n, Expr expr) {
+        if (n.expr == expr) return n;
+        if (n == this) n = Copy.Util.copy(n);
         n.expr = expr;
         return n;
     }
 
     @Override
     public List<SwitchElement> elements() {
-        return Collections.unmodifiableList(this.elements);
+        return this.elements;
     }
 
     @Override
     public Switch elements(List<SwitchElement> elements) {
-        Switch_c n = (Switch_c) copy();
+        return elements(this, elements);
+    }
+
+    protected <N extends Switch_c> N elements(N n, List<SwitchElement> elements) {
+        if (CollectionUtil.equals(n.elements, elements)) return n;
+        if (n == this) n = Copy.Util.copy(n);
         n.elements = ListUtil.copy(elements, true);
         return n;
     }
 
     /** Reconstruct the statement. */
     protected Switch_c reconstruct(Expr expr, List<SwitchElement> elements) {
-        if (expr != this.expr
-                || !CollectionUtil.equals(elements, this.elements)) {
-            Switch_c n = (Switch_c) copy();
-            n.expr = expr;
-            n.elements = ListUtil.copy(elements, true);
-            return n;
-        }
-
-        return this;
+        Switch_c n = this;
+        n = expr(n, expr);
+        n = elements(n, elements);
+        return n;
     }
 
     @Override

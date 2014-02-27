@@ -33,6 +33,7 @@ import polyglot.types.SemanticException;
 import polyglot.types.Type;
 import polyglot.types.TypeSystem;
 import polyglot.util.CodeWriter;
+import polyglot.util.Copy;
 import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
 import polyglot.visit.AscriptionVisitor;
@@ -74,7 +75,12 @@ public class Binary_c extends Expr_c implements Binary {
 
     @Override
     public Binary left(Expr left) {
-        Binary_c n = (Binary_c) copy();
+        return left(this, left);
+    }
+
+    protected <N extends Binary_c> N left(N n, Expr left) {
+        if (n.left == left) return n;
+        if (n == this) n = Copy.Util.copy(n);
         n.left = left;
         return n;
     }
@@ -86,7 +92,12 @@ public class Binary_c extends Expr_c implements Binary {
 
     @Override
     public Binary operator(Operator op) {
-        Binary_c n = (Binary_c) copy();
+        return operator(this, op);
+    }
+
+    protected <N extends Binary_c> N operator(N n, Operator op) {
+        if (n.op == op) return n;
+        if (n == this) n = Copy.Util.copy(n);
         n.op = op;
         return n;
     }
@@ -98,7 +109,12 @@ public class Binary_c extends Expr_c implements Binary {
 
     @Override
     public Binary right(Expr right) {
-        Binary_c n = (Binary_c) copy();
+        return right(this, right);
+    }
+
+    protected <N extends Binary_c> N right(N n, Expr right) {
+        if (n.right == right) return n;
+        if (n == this) n = Copy.Util.copy(n);
         n.right = right;
         return n;
     }
@@ -110,21 +126,22 @@ public class Binary_c extends Expr_c implements Binary {
 
     @Override
     public Binary precedence(Precedence precedence) {
-        Binary_c n = (Binary_c) copy();
+        return precedence(this, precedence);
+    }
+
+    protected <N extends Binary_c> N precedence(N n, Precedence precedence) {
+        if (n.precedence == precedence) return n;
+        if (n == this) n = Copy.Util.copy(n);
         n.precedence = precedence;
         return n;
     }
 
     /** Reconstruct the expression. */
     protected Binary_c reconstruct(Expr left, Expr right) {
-        if (left != this.left || right != this.right) {
-            Binary_c n = (Binary_c) copy();
-            n.left = left;
-            n.right = right;
-            return n;
-        }
-
-        return this;
+        Binary_c n = this;
+        n = left(n, left);
+        n = right(n, right);
+        return n;
     }
 
     @Override
@@ -349,7 +366,10 @@ public class Binary_c extends Expr_c implements Binary {
                             + "of type " + l + " to a String.", left.position());
                 }
 
-                return precedence(Precedence.STRING_ADD).type(ts.String());
+                Binary_c n = this;
+                n = precedence(n, Precedence.STRING_ADD);
+                n = type(n, ts.String());
+                return n;
             }
         }
 

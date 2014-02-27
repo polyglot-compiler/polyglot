@@ -1004,7 +1004,7 @@ public class InnerTranslator extends NodeVisitor {
                 ftypes.add(f.type().type());
             }
 
-            New nExpr = (New) newExpr.arguments(args);
+            New nExpr = newExpr.arguments(args);
             ci.setFormalTypes(ftypes);
             if (newExpr.anonType() != null) {
                 ci.setContainer(newExpr.anonType());
@@ -1039,7 +1039,7 @@ public class InnerTranslator extends NodeVisitor {
                 ftypes.add(classContext.peek().classType());
             }
             ci.setFormalTypes(ftypes);
-            New nExpr = (New) newExpr.arguments(args);
+            New nExpr = newExpr.arguments(args);
             nExpr = nExpr.qualifier(null);
             nExpr = nExpr.constructorInstance(ci);
             return nExpr;

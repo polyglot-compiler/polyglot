@@ -32,6 +32,7 @@ import polyglot.types.Package;
 import polyglot.types.Qualifier;
 import polyglot.types.SemanticException;
 import polyglot.util.CodeWriter;
+import polyglot.util.Copy;
 import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
 import polyglot.visit.PrettyPrinter;
@@ -61,7 +62,7 @@ public class PackageNode_c extends Node_c implements PackageNode {
     /** Get the package as a qualifier. */
     @Override
     public Qualifier qualifier() {
-        return this.package_;
+        return package_();
     }
 
     @Override
@@ -71,7 +72,12 @@ public class PackageNode_c extends Node_c implements PackageNode {
 
     @Override
     public PackageNode package_(Package package_) {
-        PackageNode_c n = (PackageNode_c) copy();
+        return package_(this, package_);
+    }
+
+    protected <N extends PackageNode_c> N package_(N n, Package package_) {
+        if (n.package_ == package_) return n;
+        if (n == this) n = Copy.Util.copy(n);
         n.package_ = package_;
         return n;
     }
@@ -93,10 +99,11 @@ public class PackageNode_c extends Node_c implements PackageNode {
 
     @Override
     public Node extRewrite(ExtensionRewriter rw) throws SemanticException {
-        PackageNode n = (PackageNode) super.extRewrite(rw);
+        PackageNode_c n = (PackageNode_c) super.extRewrite(rw);
         Package p = package_();
         p = rw.to_ts().packageForName(p.fullName());
-        return n.package_(p);
+        n = package_(n, p);
+        return n;
     }
 
     @Override
@@ -111,14 +118,15 @@ public class PackageNode_c extends Node_c implements PackageNode {
 
     @Override
     public Node copy(ExtensionInfo extInfo) throws SemanticException {
-        PackageNode pn =
-                (PackageNode) extInfo.nodeFactory()
-                                     .lang()
-                                     .copy(this, extInfo.nodeFactory());
+        PackageNode_c pn =
+                (PackageNode_c) extInfo.nodeFactory()
+                                       .lang()
+                                       .copy(this, extInfo.nodeFactory());
         if (pn.package_() != null) {
             pn =
-                    pn.package_(extInfo.typeSystem()
-                                       .packageForName(pn.package_().fullName()));
+                    package_(pn,
+                             extInfo.typeSystem().packageForName(pn.package_()
+                                                                   .fullName()));
         }
         return pn;
     }

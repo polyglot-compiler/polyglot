@@ -28,6 +28,7 @@ package polyglot.ast;
 
 import polyglot.types.SemanticException;
 import polyglot.types.Type;
+import polyglot.util.Copy;
 import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
 import polyglot.visit.AmbiguityRemover;
@@ -54,7 +55,12 @@ public class AmbReceiver_c extends AmbPrefix_c implements AmbReceiver {
     }
 
     public AmbReceiver type(Type type) {
-        AmbReceiver_c n = (AmbReceiver_c) copy();
+        return type(this, type);
+    }
+
+    protected <N extends AmbReceiver_c> N type(N n, Type type) {
+        if (n.type == type) return n;
+        if (n == this) n = Copy.Util.copy(n);
         n.type = type;
         return n;
     }

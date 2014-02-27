@@ -33,6 +33,7 @@ import polyglot.types.Context;
 import polyglot.types.SemanticException;
 import polyglot.types.TypeSystem;
 import polyglot.util.CodeWriter;
+import polyglot.util.Copy;
 import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
 import polyglot.visit.CFGBuilder;
@@ -71,7 +72,12 @@ public class Special_c extends Expr_c implements Special {
 
     @Override
     public Special kind(Special.Kind kind) {
-        Special_c n = (Special_c) copy();
+        return kind(this, kind);
+    }
+
+    protected <N extends Special_c> N kind(N n, Special.Kind kind) {
+        if (n.kind == kind) return n;
+        if (n == this) n = Copy.Util.copy(n);
         n.kind = kind;
         return n;
     }
@@ -83,20 +89,21 @@ public class Special_c extends Expr_c implements Special {
 
     @Override
     public Special qualifier(TypeNode qualifier) {
-        Special_c n = (Special_c) copy();
+        return qualifier(this, qualifier);
+    }
+
+    protected <N extends Special_c> N qualifier(N n, TypeNode qualifier) {
+        if (n.qualifier == qualifier) return n;
+        if (n == this) n = Copy.Util.copy(n);
         n.qualifier = qualifier;
         return n;
     }
 
     /** Reconstruct the expression. */
     protected Special_c reconstruct(TypeNode qualifier) {
-        if (qualifier != this.qualifier) {
-            Special_c n = (Special_c) copy();
-            n.qualifier = qualifier;
-            return n;
-        }
-
-        return this;
+        Special_c n = this;
+        n = qualifier(n, qualifier);
+        return n;
     }
 
     @Override

@@ -112,8 +112,8 @@ public class LocalClassRemover extends ContextVisitor {
                     LocalClassDecl lcd = (LocalClassDecl) s;
                     ClassDecl cd = lcd.decl();
                     Flags flags =
-                            context.inStaticContext() ? Flags.PUBLIC.Static()
-                                    : Flags.PUBLIC;
+                            context.inStaticContext()
+                                    ? Flags.PUBLIC.Static() : Flags.PUBLIC;
                     cd = cd.flags(flags);
                     cd.type().flags(flags);
                     cd.type().kind(ClassType.MEMBER);
@@ -237,8 +237,8 @@ public class LocalClassRemover extends ContextVisitor {
             type.package_(context.package_());
 
             Flags flags =
-                    context.inStaticContext() ? Flags.PUBLIC.Static()
-                            : Flags.PUBLIC;
+                    context.inStaticContext()
+                            ? Flags.PUBLIC.Static() : Flags.PUBLIC;
             type.flags(flags);
 
             cd = cd.type(type);
@@ -569,11 +569,11 @@ public class LocalClassRemover extends ContextVisitor {
                         (ConstructorInstance) ci.declaration();
                 if (nci.container().toClass().declaration() == theLocalClass.declaration()) {
                     neu =
-                            (New) neu.arguments(addArgs(neu,
-                                                        nci,
-                                                        newFields,
-                                                        curr,
-                                                        theLocalClass));
+                            neu.arguments(addArgs(neu,
+                                                  nci,
+                                                  newFields,
+                                                  curr,
+                                                  theLocalClass));
                     if (!theLocalClass.flags().isStatic()) {
                         Expr q;
                         if (theLocalClass.outer() == context.currentClass())

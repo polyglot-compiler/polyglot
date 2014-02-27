@@ -40,6 +40,7 @@ import polyglot.types.Type;
 import polyglot.types.TypeSystem;
 import polyglot.types.VarInstance;
 import polyglot.util.CodeWriter;
+import polyglot.util.Copy;
 import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
 import polyglot.visit.AmbiguityRemover;
@@ -91,8 +92,12 @@ public class LocalDecl_c extends Stmt_c implements LocalDecl {
 
     @Override
     public LocalDecl flags(Flags flags) {
-        if (flags.equals(this.flags)) return this;
-        LocalDecl_c n = (LocalDecl_c) copy();
+        return flags(this, flags);
+    }
+
+    protected <N extends LocalDecl_c> N flags(N n, Flags flags) {
+        if (n.flags.equals(flags)) return n;
+        if (n == this) n = Copy.Util.copy(n);
         n.flags = flags;
         return n;
     }
@@ -104,8 +109,12 @@ public class LocalDecl_c extends Stmt_c implements LocalDecl {
 
     @Override
     public LocalDecl type(TypeNode type) {
-        if (type == this.type) return this;
-        LocalDecl_c n = (LocalDecl_c) copy();
+        return type(this, type);
+    }
+
+    protected <N extends LocalDecl_c> N type(N n, TypeNode type) {
+        if (n.type == type) return n;
+        if (n == this) n = Copy.Util.copy(n);
         n.type = type;
         return n;
     }
@@ -117,7 +126,12 @@ public class LocalDecl_c extends Stmt_c implements LocalDecl {
 
     @Override
     public LocalDecl id(Id name) {
-        LocalDecl_c n = (LocalDecl_c) copy();
+        return id(this, name);
+    }
+
+    protected <N extends LocalDecl_c> N id(N n, Id name) {
+        if (n.name == name) return n;
+        if (n == this) n = Copy.Util.copy(n);
         n.name = name;
         return n;
     }
@@ -139,10 +153,19 @@ public class LocalDecl_c extends Stmt_c implements LocalDecl {
 
     @Override
     public LocalDecl init(Expr init) {
-        if (init == this.init) return this;
-        LocalDecl_c n = (LocalDecl_c) copy();
+        return init(this, init);
+    }
+
+    protected <N extends LocalDecl_c> N init(N n, Expr init) {
+        if (n.init == init) return n;
+        if (n == this) n = Copy.Util.copy(n);
         n.init = init;
         return n;
+    }
+
+    @Override
+    public VarInstance varInstance() {
+        return localInstance();
     }
 
     @Override
@@ -152,28 +175,23 @@ public class LocalDecl_c extends Stmt_c implements LocalDecl {
 
     @Override
     public LocalDecl localInstance(LocalInstance li) {
-        if (li == this.li) return this;
-        LocalDecl_c n = (LocalDecl_c) copy();
+        return localInstance(this, li);
+    }
+
+    protected <N extends LocalDecl_c> N localInstance(N n, LocalInstance li) {
+        if (n.li == li) return n;
+        if (n == this) n = Copy.Util.copy(n);
         n.li = li;
         return n;
     }
 
-    @Override
-    public VarInstance varInstance() {
-        return li;
-    }
-
     /** Reconstruct the declaration. */
     protected LocalDecl_c reconstruct(TypeNode type, Id name, Expr init) {
-        if (this.type != type || this.name != name || this.init != init) {
-            LocalDecl_c n = (LocalDecl_c) copy();
-            n.type = type;
-            n.name = name;
-            n.init = init;
-            return n;
-        }
-
-        return this;
+        LocalDecl_c n = this;
+        n = type(n, type);
+        n = id(n, name);
+        n = init(n, init);
+        return n;
     }
 
     @Override
@@ -214,7 +232,8 @@ public class LocalDecl_c extends Stmt_c implements LocalDecl {
                                  flags(),
                                  ts.unknownType(position()),
                                  name());
-        return n.localInstance(li);
+        n = localInstance(n, li);
+        return n;
     }
 
     @Override
@@ -356,8 +375,9 @@ public class LocalDecl_c extends Stmt_c implements LocalDecl {
 
     @Override
     public Node extRewrite(ExtensionRewriter rw) throws SemanticException {
-        LocalDecl n = (LocalDecl) super.extRewrite(rw);
-        return n.localInstance(null);
+        LocalDecl_c n = (LocalDecl_c) super.extRewrite(rw);
+        n = localInstance(n, null);
+        return n;
     }
 
     @Override

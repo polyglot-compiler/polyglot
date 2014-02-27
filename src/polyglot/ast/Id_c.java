@@ -27,6 +27,7 @@
 package polyglot.ast;
 
 import polyglot.util.CodeWriter;
+import polyglot.util.Copy;
 import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
 import polyglot.util.StringUtil;
@@ -58,7 +59,12 @@ public class Id_c extends Node_c implements Id {
 
     @Override
     public Id id(String id) {
-        Id_c n = (Id_c) copy();
+        return id(this, id);
+    }
+
+    protected <N extends Id_c> N id(N n, String id) {
+        if (n.id == id) return n;
+        if (n == this) n = Copy.Util.copy(n);
         n.id = id;
         return n;
     }

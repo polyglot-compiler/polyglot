@@ -56,7 +56,4 @@ public interface LocalDecl extends ForInit, VarDecl, VarInit {
      * Set the type object for the local declaration.
      */
     LocalDecl localInstance(LocalInstance li);
-
-    @Override
-    boolean constantValueSet();
 }

@@ -39,6 +39,7 @@ import polyglot.types.SemanticException;
 import polyglot.types.Type;
 import polyglot.types.TypeSystem;
 import polyglot.util.CodeWriter;
+import polyglot.util.Copy;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
@@ -71,20 +72,21 @@ public class Return_c extends Stmt_c implements Return {
 
     @Override
     public Return expr(Expr expr) {
-        Return_c n = (Return_c) copy();
+        return expr(this, expr);
+    }
+
+    protected <N extends Return_c> N expr(N n, Expr expr) {
+        if (n.expr == expr) return n;
+        if (n == this) n = Copy.Util.copy(n);
         n.expr = expr;
         return n;
     }
 
     /** Reconstruct the statement. */
     protected Return_c reconstruct(Expr expr) {
-        if (expr != this.expr) {
-            Return_c n = (Return_c) copy();
-            n.expr = expr;
-            return n;
-        }
-
-        return this;
+        Return_c n = this;
+        n = expr(n, expr);
+        return n;
     }
 
     @Override

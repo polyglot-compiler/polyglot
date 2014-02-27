@@ -48,6 +48,7 @@ import polyglot.types.Type;
 import polyglot.types.TypeSystem;
 import polyglot.util.CodeWriter;
 import polyglot.util.CollectionUtil;
+import polyglot.util.Copy;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.ListUtil;
 import polyglot.util.Position;
@@ -105,8 +106,12 @@ public class ClassDecl_c extends Term_c implements ClassDecl, ClassDeclOps {
 
     @Override
     public ClassDecl type(ParsedClassType type) {
-        if (type == this.type) return this;
-        ClassDecl_c n = (ClassDecl_c) copy();
+        return type(this, type);
+    }
+
+    protected <N extends ClassDecl_c> N type(N n, ParsedClassType type) {
+        if (n.type == type) return n;
+        if (n == this) n = Copy.Util.copy(n);
         n.type = type;
         return n;
     }
@@ -118,8 +123,12 @@ public class ClassDecl_c extends Term_c implements ClassDecl, ClassDeclOps {
 
     @Override
     public ClassDecl flags(Flags flags) {
-        if (flags.equals(this.flags)) return this;
-        ClassDecl_c n = (ClassDecl_c) copy();
+        return flags(this, flags);
+    }
+
+    protected <N extends ClassDecl_c> N flags(N n, Flags flags) {
+        if (n.flags.equals(flags)) return n;
+        if (n == this) n = Copy.Util.copy(n);
         n.flags = flags;
         return n;
     }
@@ -131,7 +140,12 @@ public class ClassDecl_c extends Term_c implements ClassDecl, ClassDeclOps {
 
     @Override
     public ClassDecl id(Id name) {
-        ClassDecl_c n = (ClassDecl_c) copy();
+        return id(this, name);
+    }
+
+    protected <N extends ClassDecl_c> N id(N n, Id name) {
+        if (n.name == name) return n;
+        if (n == this) n = Copy.Util.copy(n);
         n.name = name;
         return n;
     }
@@ -153,7 +167,12 @@ public class ClassDecl_c extends Term_c implements ClassDecl, ClassDeclOps {
 
     @Override
     public ClassDecl superClass(TypeNode superClass) {
-        ClassDecl_c n = (ClassDecl_c) copy();
+        return superClass(this, superClass);
+    }
+
+    protected <N extends ClassDecl_c> N superClass(N n, TypeNode superClass) {
+        if (n.superClass == superClass) return n;
+        if (n == this) n = Copy.Util.copy(n);
         n.superClass = superClass;
         return n;
     }
@@ -165,7 +184,13 @@ public class ClassDecl_c extends Term_c implements ClassDecl, ClassDeclOps {
 
     @Override
     public ClassDecl interfaces(List<TypeNode> interfaces) {
-        ClassDecl_c n = (ClassDecl_c) copy();
+        return interfaces(this, interfaces);
+    }
+
+    protected <N extends ClassDecl_c> N interfaces(N n,
+            List<TypeNode> interfaces) {
+        if (CollectionUtil.equals(n.interfaces, interfaces)) return n;
+        if (n == this) n = Copy.Util.copy(n);
         n.interfaces = ListUtil.copy(interfaces, true);
         return n;
     }
@@ -177,25 +202,24 @@ public class ClassDecl_c extends Term_c implements ClassDecl, ClassDeclOps {
 
     @Override
     public ClassDecl body(ClassBody body) {
-        ClassDecl_c n = (ClassDecl_c) copy();
+        return body(this, body);
+    }
+
+    protected <N extends ClassDecl_c> N body(N n, ClassBody body) {
+        if (n.body == body) return n;
+        if (n == this) n = Copy.Util.copy(n);
         n.body = body;
         return n;
     }
 
     protected ClassDecl_c reconstruct(Id name, TypeNode superClass,
             List<TypeNode> interfaces, ClassBody body) {
-        if (name != this.name || superClass != this.superClass
-                || !CollectionUtil.equals(interfaces, this.interfaces)
-                || body != this.body) {
-            ClassDecl_c n = (ClassDecl_c) copy();
-            n.name = name;
-            n.superClass = superClass;
-            n.interfaces = ListUtil.copy(interfaces, true);
-            n.body = body;
-            return n;
-        }
-
-        return this;
+        ClassDecl_c n = this;
+        n = id(n, name);
+        n = superClass(n, superClass);
+        n = interfaces(n, interfaces);
+        n = body(n, body);
+        return n;
     }
 
     @Override
@@ -266,11 +290,13 @@ public class ClassDecl_c extends Term_c implements ClassDecl, ClassDeclOps {
         ClassDecl_c n = this;
 
         if (n.defaultCI != ci) {
-            n = (ClassDecl_c) copy();
+            n = Copy.Util.copy(n);
             n.defaultCI = ci;
         }
 
-        return n.type(type).flags(type.flags());
+        n = type(n, type);
+        n = flags(n, type.flags());
+        return n;
     }
 
     @Override
@@ -350,9 +376,8 @@ public class ClassDecl_c extends Term_c implements ClassDecl, ClassDeclOps {
         if (type.superType() != null) {
             if (!type.superType().isReference()) {
                 throw new SemanticException("Cannot extend type "
-                                                    + type.superType() + ".",
-                                            superClass != null ? superClass.position()
-                                                    : position());
+                        + type.superType() + ".", superClass != null
+                        ? superClass.position() : position());
             }
             ReferenceType t = (ReferenceType) type.superType();
             ts.checkCycles(t);
@@ -612,7 +637,7 @@ public class ClassDecl_c extends Term_c implements ClassDecl, ClassDeclOps {
     @Override
     public Node extRewrite(ExtensionRewriter rw) throws SemanticException {
         ClassDecl_c n = (ClassDecl_c) super.extRewrite(rw);
-        if (n == this) n = (ClassDecl_c) copy();
+        if (n == this) n = Copy.Util.copy(n);
         n.defaultCI = null;
         return n;
     }

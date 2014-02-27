@@ -33,6 +33,7 @@ import polyglot.types.SemanticException;
 import polyglot.types.Type;
 import polyglot.types.TypeSystem;
 import polyglot.util.CodeWriter;
+import polyglot.util.Copy;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
@@ -72,7 +73,12 @@ public abstract class Assign_c extends Expr_c implements Assign {
 
     @Override
     public Assign left(Expr left) {
-        Assign_c n = (Assign_c) copy();
+        return left(this, left);
+    }
+
+    protected <N extends Assign_c> N left(N n, Expr left) {
+        if (n.left == left) return n;
+        if (n == this) n = Copy.Util.copy(n);
         n.left = left;
         return n;
     }
@@ -84,7 +90,12 @@ public abstract class Assign_c extends Expr_c implements Assign {
 
     @Override
     public Assign operator(Operator op) {
-        Assign_c n = (Assign_c) copy();
+        return operator(this, op);
+    }
+
+    protected <N extends Assign_c> N operator(N n, Operator op) {
+        if (n.op == op) return n;
+        if (n == this) n = Copy.Util.copy(n);
         n.op = op;
         return n;
     }
@@ -96,21 +107,22 @@ public abstract class Assign_c extends Expr_c implements Assign {
 
     @Override
     public Assign right(Expr right) {
-        Assign_c n = (Assign_c) copy();
+        return right(this, right);
+    }
+
+    protected <N extends Assign_c> N right(N n, Expr right) {
+        if (n.right == right) return n;
+        if (n == this) n = Copy.Util.copy(n);
         n.right = right;
         return n;
     }
 
     /** Reconstruct the expression. */
     protected Assign_c reconstruct(Expr left, Expr right) {
-        if (left != this.left || right != this.right) {
-            Assign_c n = (Assign_c) copy();
-            n.left = left;
-            n.right = right;
-            return n;
-        }
-
-        return this;
+        Assign_c n = this;
+        n = left(n, left);
+        n = right(n, right);
+        return n;
     }
 
     @Override

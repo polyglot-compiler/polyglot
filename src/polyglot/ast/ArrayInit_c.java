@@ -34,6 +34,7 @@ import polyglot.types.Type;
 import polyglot.types.TypeSystem;
 import polyglot.util.CodeWriter;
 import polyglot.util.CollectionUtil;
+import polyglot.util.Copy;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.ListUtil;
 import polyglot.util.Position;
@@ -68,20 +69,21 @@ public class ArrayInit_c extends Expr_c implements ArrayInit {
 
     @Override
     public ArrayInit elements(List<Expr> elements) {
-        ArrayInit_c n = (ArrayInit_c) copy();
+        return elements(this, elements);
+    }
+
+    protected <N extends ArrayInit_c> N elements(N n, List<Expr> elements) {
+        if (CollectionUtil.equals(n.elements, elements)) return n;
+        if (n == this) n = Copy.Util.copy(n);
         n.elements = ListUtil.copy(elements, true);
         return n;
     }
 
     /** Reconstruct the initializer. */
     protected ArrayInit_c reconstruct(List<Expr> elements) {
-        if (!CollectionUtil.equals(elements, this.elements)) {
-            ArrayInit_c n = (ArrayInit_c) copy();
-            n.elements = ListUtil.copy(elements, true);
-            return n;
-        }
-
-        return this;
+        ArrayInit_c n = this;
+        n = elements(n, elements);
+        return n;
     }
 
     @Override

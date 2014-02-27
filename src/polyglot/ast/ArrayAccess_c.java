@@ -34,6 +34,7 @@ import polyglot.types.Type;
 import polyglot.types.TypeSystem;
 import polyglot.util.CodeWriter;
 import polyglot.util.CollectionUtil;
+import polyglot.util.Copy;
 import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
 import polyglot.visit.AscriptionVisitor;
@@ -71,7 +72,12 @@ public class ArrayAccess_c extends Expr_c implements ArrayAccess {
 
     @Override
     public ArrayAccess array(Expr array) {
-        ArrayAccess_c n = (ArrayAccess_c) copy();
+        return array(this, array);
+    }
+
+    protected <N extends ArrayAccess_c> N array(N n, Expr array) {
+        if (n.array == array) return n;
+        if (n == this) n = Copy.Util.copy(n);
         n.array = array;
         return n;
     }
@@ -83,7 +89,12 @@ public class ArrayAccess_c extends Expr_c implements ArrayAccess {
 
     @Override
     public ArrayAccess index(Expr index) {
-        ArrayAccess_c n = (ArrayAccess_c) copy();
+        return index(this, index);
+    }
+
+    protected <N extends ArrayAccess_c> N index(N n, Expr index) {
+        if (n.index == index) return n;
+        if (n == this) n = Copy.Util.copy(n);
         n.index = index;
         return n;
     }
@@ -95,14 +106,10 @@ public class ArrayAccess_c extends Expr_c implements ArrayAccess {
 
     /** Reconstruct the expression. */
     protected ArrayAccess_c reconstruct(Expr array, Expr index) {
-        if (array != this.array || index != this.index) {
-            ArrayAccess_c n = (ArrayAccess_c) copy();
-            n.array = array;
-            n.index = index;
-            return n;
-        }
-
-        return this;
+        ArrayAccess_c n = this;
+        n = array(n, array);
+        n = index(n, index);
+        return n;
     }
 
     @Override

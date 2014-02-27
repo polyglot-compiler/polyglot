@@ -148,7 +148,7 @@ public class FieldAssign_c extends Assign_c implements FieldAssign {
 
     @Override
     public Node extRewrite(ExtensionRewriter rw) throws SemanticException {
-        FieldAssign n = (FieldAssign) super.extRewrite(rw);
+        FieldAssign_c n = (FieldAssign_c) super.extRewrite(rw);
         Expr left = n.visitChild(n.left(), rw);
         if (!left.isDisambiguated()) {
             // Need to have an ambiguous assignment
@@ -157,6 +157,7 @@ public class FieldAssign_c extends Assign_c implements FieldAssign {
                                               n.operator(),
                                               n.right());
         }
-        return n.left(left);
+        n = left(n, left);
+        return n;
     }
 }

@@ -28,6 +28,7 @@ package polyglot.ast;
 
 import polyglot.types.SemanticException;
 import polyglot.util.CodeWriter;
+import polyglot.util.Copy;
 import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
 import polyglot.util.StringUtil;
@@ -51,7 +52,12 @@ public class CharLit_c extends NumLit_c implements CharLit {
 
     @Override
     public CharLit value(char value) {
-        CharLit_c n = (CharLit_c) copy();
+        return value(this, value);
+    }
+
+    protected <N extends CharLit_c> N value(N n, char value) {
+        if (n.value == value) return n;
+        if (n == this) n = Copy.Util.copy(n);
         n.value = value;
         return n;
     }

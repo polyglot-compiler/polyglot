@@ -28,6 +28,7 @@ package polyglot.ast;
 
 import polyglot.types.SemanticException;
 import polyglot.util.CodeWriter;
+import polyglot.util.Copy;
 import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
 import polyglot.visit.PrettyPrinter;
@@ -53,7 +54,12 @@ public class BooleanLit_c extends Lit_c implements BooleanLit {
 
     @Override
     public BooleanLit value(boolean value) {
-        BooleanLit_c n = (BooleanLit_c) copy();
+        return value(this, value);
+    }
+
+    protected <N extends BooleanLit_c> N value(N n, boolean value) {
+        if (n.value == value) return n;
+        if (n == this) n = Copy.Util.copy(n);
         n.value = value;
         return n;
     }

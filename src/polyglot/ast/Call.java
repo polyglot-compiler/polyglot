@@ -26,8 +26,6 @@
 
 package polyglot.ast;
 
-import java.util.List;
-
 import polyglot.types.MethodInstance;
 
 /**
@@ -78,20 +76,6 @@ public interface Call extends Expr, ProcedureCall {
      * Set whether the target of this call is implicit.
      */
     Call targetImplicit(boolean targetImplicit);
-
-    /**
-     * The call's actual arguments.
-     * @return A list of {@link polyglot.ast.Expr Expr}.
-     */
-    @Override
-    List<Expr> arguments();
-
-    /**
-     * Set the call's actual arguments.
-     * @param arguments A list of {@link polyglot.ast.Expr Expr}.
-     */
-    @Override
-    ProcedureCall arguments(List<Expr> arguments);
 
     /**
      * The method instance of the method to call.  This is, generally, only

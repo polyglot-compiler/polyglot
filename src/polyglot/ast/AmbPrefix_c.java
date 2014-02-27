@@ -28,6 +28,7 @@ package polyglot.ast;
 
 import polyglot.types.SemanticException;
 import polyglot.util.CodeWriter;
+import polyglot.util.Copy;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
@@ -61,7 +62,12 @@ public class AmbPrefix_c extends Node_c implements AmbPrefix {
 
     /** Set the name of the prefix. */
     public AmbPrefix id(Id name) {
-        AmbPrefix_c n = (AmbPrefix_c) copy();
+        return id(this, name);
+    }
+
+    protected <N extends AmbPrefix_c> N id(N n, Id name) {
+        if (n.name == name) return n;
+        if (n == this) n = Copy.Util.copy(n);
         n.name = name;
         return n;
     }
@@ -83,21 +89,22 @@ public class AmbPrefix_c extends Node_c implements AmbPrefix {
 
     /** Set the prefix of the prefix. */
     public AmbPrefix prefix(Prefix prefix) {
-        AmbPrefix_c n = (AmbPrefix_c) copy();
+        return prefix(this, prefix);
+    }
+
+    protected <N extends AmbPrefix_c> N prefix(N n, Prefix prefix) {
+        if (n.prefix == prefix) return n;
+        if (n == this) n = Copy.Util.copy(n);
         n.prefix = prefix;
         return n;
     }
 
     /** Reconstruct the prefix. */
     protected AmbPrefix_c reconstruct(Prefix prefix, Id name) {
-        if (prefix != this.prefix || name != this.name) {
-            AmbPrefix_c n = (AmbPrefix_c) copy();
-            n.prefix = prefix;
-            n.name = name;
-            return n;
-        }
-
-        return this;
+        AmbPrefix_c n = this;
+        n = prefix(n, prefix);
+        n = id(n, name);
+        return n;
     }
 
     @Override

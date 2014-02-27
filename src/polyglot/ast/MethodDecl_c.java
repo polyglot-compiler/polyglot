@@ -28,7 +28,6 @@ package polyglot.ast;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -47,6 +46,7 @@ import polyglot.types.Type;
 import polyglot.types.TypeSystem;
 import polyglot.util.CodeWriter;
 import polyglot.util.CollectionUtil;
+import polyglot.util.Copy;
 import polyglot.util.ListUtil;
 import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
@@ -103,8 +103,12 @@ public class MethodDecl_c extends Term_c implements MethodDecl,
 
     @Override
     public MethodDecl flags(Flags flags) {
-        if (flags.equals(this.flags)) return this;
-        MethodDecl_c n = (MethodDecl_c) copy();
+        return flags(this, flags);
+    }
+
+    protected <N extends MethodDecl_c> N flags(N n, Flags flags) {
+        if (n.flags.equals(flags)) return n;
+        if (n == this) n = Copy.Util.copy(n);
         n.flags = flags;
         return n;
     }
@@ -116,7 +120,12 @@ public class MethodDecl_c extends Term_c implements MethodDecl,
 
     @Override
     public MethodDecl returnType(TypeNode returnType) {
-        MethodDecl_c n = (MethodDecl_c) copy();
+        return returnType(this, returnType);
+    }
+
+    protected <N extends MethodDecl_c> N returnType(N n, TypeNode returnType) {
+        if (n.returnType == returnType) return n;
+        if (n == this) n = Copy.Util.copy(n);
         n.returnType = returnType;
         return n;
     }
@@ -128,7 +137,12 @@ public class MethodDecl_c extends Term_c implements MethodDecl,
 
     @Override
     public MethodDecl id(Id name) {
-        MethodDecl_c n = (MethodDecl_c) copy();
+        return id(this, name);
+    }
+
+    protected <N extends MethodDecl_c> N id(N n, Id name) {
+        if (n.name == name) return n;
+        if (n == this) n = Copy.Util.copy(n);
         n.name = name;
         return n;
     }
@@ -145,34 +159,42 @@ public class MethodDecl_c extends Term_c implements MethodDecl,
 
     @Override
     public List<Formal> formals() {
-        return Collections.unmodifiableList(this.formals);
+        return this.formals;
     }
 
     @Override
     public MethodDecl formals(List<Formal> formals) {
-        MethodDecl_c n = (MethodDecl_c) copy();
+        return formals(this, formals);
+    }
+
+    protected <N extends MethodDecl_c> N formals(N n, List<Formal> formals) {
+        if (CollectionUtil.equals(n.formals, formals)) return n;
+        if (n == this) n = Copy.Util.copy(n);
         n.formals = ListUtil.copy(formals, true);
         return n;
     }
 
     @Override
     public List<TypeNode> throwTypes() {
-        if (this.throwTypes == null) {
-            return Collections.emptyList();
-        }
-        return Collections.unmodifiableList(this.throwTypes);
+        return this.throwTypes;
     }
 
     @Override
     public MethodDecl throwTypes(List<TypeNode> throwTypes) {
-        MethodDecl_c n = (MethodDecl_c) copy();
+        return throwTypes(this, throwTypes);
+    }
+
+    protected <N extends MethodDecl_c> N throwTypes(N n,
+            List<TypeNode> throwTypes) {
+        if (CollectionUtil.equals(n.throwTypes, throwTypes)) return n;
+        if (n == this) n = Copy.Util.copy(n);
         n.throwTypes = ListUtil.copy(throwTypes, true);
         return n;
     }
 
     @Override
     public Term codeBody() {
-        return this.body;
+        return body();
     }
 
     @Override
@@ -181,22 +203,14 @@ public class MethodDecl_c extends Term_c implements MethodDecl,
     }
 
     @Override
-    public CodeBlock body(Block body) {
-        MethodDecl_c n = (MethodDecl_c) copy();
+    public MethodDecl body(Block body) {
+        return body(this, body);
+    }
+
+    protected <N extends MethodDecl_c> N body(N n, Block body) {
+        if (n.body == body) return n;
+        if (n == this) n = Copy.Util.copy(n);
         n.body = body;
-        return n;
-    }
-
-    @Override
-    public MethodInstance methodInstance() {
-        return mi;
-    }
-
-    @Override
-    public MethodDecl methodInstance(MethodInstance mi) {
-        if (mi == this.mi) return this;
-        MethodDecl_c n = (MethodDecl_c) copy();
-        n.mi = mi;
         return n;
     }
 
@@ -207,26 +221,36 @@ public class MethodDecl_c extends Term_c implements MethodDecl,
 
     @Override
     public ProcedureInstance procedureInstance() {
+        return methodInstance();
+    }
+
+    @Override
+    public MethodInstance methodInstance() {
         return mi;
+    }
+
+    @Override
+    public MethodDecl methodInstance(MethodInstance mi) {
+        return methodInstance(this, mi);
+    }
+
+    protected <N extends MethodDecl_c> N methodInstance(N n, MethodInstance mi) {
+        if (n.mi == mi) return n;
+        if (n == this) n = Copy.Util.copy(n);
+        n.mi = mi;
+        return n;
     }
 
     /** Reconstruct the method. */
     protected MethodDecl_c reconstruct(TypeNode returnType, Id name,
             List<Formal> formals, List<TypeNode> throwTypes, Block body) {
-        if (returnType != this.returnType || name != this.name
-                || !CollectionUtil.equals(formals, this.formals)
-                || !CollectionUtil.equals(throwTypes, this.throwTypes)
-                || body != this.body) {
-            MethodDecl_c n = (MethodDecl_c) copy();
-            n.returnType = returnType;
-            n.name = name;
-            n.formals = ListUtil.copy(formals, true);
-            n.throwTypes = ListUtil.copy(throwTypes, true);
-            n.body = body;
-            return n;
-        }
-
-        return this;
+        MethodDecl_c n = this;
+        n = returnType(n, returnType);
+        n = id(n, name);
+        n = formals(n, formals);
+        n = throwTypes(n, throwTypes);
+        n = body(n, body);
+        return n;
     }
 
     @Override
@@ -414,8 +438,9 @@ public class MethodDecl_c extends Term_c implements MethodDecl,
 
     @Override
     public Node extRewrite(ExtensionRewriter rw) throws SemanticException {
-        MethodDecl n = (MethodDecl) super.extRewrite(rw);
-        return n.methodInstance(null);
+        MethodDecl_c n = (MethodDecl_c) super.extRewrite(rw);
+        n = methodInstance(n, null);
+        return n;
     }
 
     @Override

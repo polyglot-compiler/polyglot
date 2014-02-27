@@ -29,6 +29,7 @@ package polyglot.ast;
 import java.util.List;
 
 import polyglot.util.CodeWriter;
+import polyglot.util.Copy;
 import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
 import polyglot.visit.CFGBuilder;
@@ -59,7 +60,12 @@ public class Labeled_c extends Stmt_c implements Labeled {
 
     @Override
     public Labeled labelNode(Id label) {
-        Labeled_c n = (Labeled_c) copy();
+        return labelNode(this, label);
+    }
+
+    protected <N extends Labeled_c> N labelNode(N n, Id label) {
+        if (n.label == label) return n;
+        if (n == this) n = Copy.Util.copy(n);
         n.label = label;
         return n;
     }
@@ -81,21 +87,22 @@ public class Labeled_c extends Stmt_c implements Labeled {
 
     @Override
     public Labeled statement(Stmt statement) {
-        Labeled_c n = (Labeled_c) copy();
+        return statement(this, statement);
+    }
+
+    protected <N extends Labeled_c> N statement(N n, Stmt statement) {
+        if (n.statement == statement) return n;
+        if (n == this) n = Copy.Util.copy(n);
         n.statement = statement;
         return n;
     }
 
     /** Reconstruct the statement. */
     protected Labeled_c reconstruct(Id label, Stmt statement) {
-        if (label != this.label || statement != this.statement) {
-            Labeled_c n = (Labeled_c) copy();
-            n.label = label;
-            n.statement = statement;
-            return n;
-        }
-
-        return this;
+        Labeled_c n = this;
+        n = labelNode(n, label);
+        n = statement(n, statement);
+        return n;
     }
 
     @Override

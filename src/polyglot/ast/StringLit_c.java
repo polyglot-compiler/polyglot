@@ -32,6 +32,7 @@ import java.util.List;
 
 import polyglot.types.SemanticException;
 import polyglot.util.CodeWriter;
+import polyglot.util.Copy;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
@@ -61,7 +62,12 @@ public class StringLit_c extends Lit_c implements StringLit {
 
     @Override
     public StringLit value(String value) {
-        StringLit_c n = (StringLit_c) copy();
+        return value(this, value);
+    }
+
+    protected <N extends StringLit_c> N value(N n, String value) {
+        if (n.value == value) return n;
+        if (n == this) n = Copy.Util.copy(n);
         n.value = value;
         return n;
     }

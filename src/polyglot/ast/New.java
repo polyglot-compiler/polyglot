@@ -76,7 +76,7 @@ public interface New extends Expr, ProcedureCall {
      * @param arguments A list of {@link polyglot.ast.Expr Expr}.
      */
     @Override
-    ProcedureCall arguments(List<Expr> arguments);
+    New arguments(List<Expr> arguments);
 
     /** The class body for anonymous classes, or null. */
     ClassBody body();

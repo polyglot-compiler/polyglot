@@ -28,6 +28,7 @@ package polyglot.ast;
 
 import polyglot.types.SemanticException;
 import polyglot.util.CodeWriter;
+import polyglot.util.Copy;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
@@ -62,7 +63,12 @@ public class AmbTypeNode_c extends TypeNode_c implements AmbTypeNode {
 
     @Override
     public AmbTypeNode id(Id name) {
-        AmbTypeNode_c n = (AmbTypeNode_c) copy();
+        return id(this, name);
+    }
+
+    protected <N extends AmbTypeNode_c> N id(N n, Id name) {
+        if (n.name == name) return n;
+        if (n == this) n = Copy.Util.copy(n);
         n.name = name;
         return n;
     }
@@ -84,20 +90,21 @@ public class AmbTypeNode_c extends TypeNode_c implements AmbTypeNode {
 
     @Override
     public AmbTypeNode qual(QualifierNode qual) {
-        AmbTypeNode_c n = (AmbTypeNode_c) copy();
+        return qual(this, qual);
+    }
+
+    protected <N extends AmbTypeNode_c> N qual(N n, QualifierNode qual) {
+        if (n.qual == qual) return n;
+        if (n == this) n = Copy.Util.copy(n);
         n.qual = qual;
         return n;
     }
 
     protected AmbTypeNode_c reconstruct(QualifierNode qual, Id name) {
-        if (qual != this.qual || name != this.name) {
-            AmbTypeNode_c n = (AmbTypeNode_c) copy();
-            n.qual = qual;
-            n.name = name;
-            return n;
-        }
-
-        return this;
+        AmbTypeNode_c n = this;
+        n = qual(n, qual);
+        n = id(n, name);
+        return n;
     }
 
     @Override

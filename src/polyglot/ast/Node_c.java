@@ -40,6 +40,7 @@ import polyglot.types.SemanticException;
 import polyglot.types.Type;
 import polyglot.types.TypeSystem;
 import polyglot.util.CodeWriter;
+import polyglot.util.Copy;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
@@ -183,7 +184,12 @@ public abstract class Node_c implements Node {
 
     @Override
     public Node position(Position position) {
-        Node_c n = (Node_c) copy();
+        return position(this, position);
+    }
+
+    protected <N extends Node_c> N position(N n, Position position) {
+        if (n.position == position) return n;
+        if (n == this) n = Copy.Util.copy(n);
         n.position = position;
         return n;
     }
@@ -205,7 +211,12 @@ public abstract class Node_c implements Node {
 
     @Override
     public Node error(boolean flag) {
-        Node_c n = (Node_c) copy();
+        return error(this, flag);
+    }
+
+    protected <N extends Node_c> N error(N n, boolean flag) {
+        if (n.error == flag) return n;
+        if (n == this) n = Copy.Util.copy(n);
         n.error = flag;
         return n;
     }
@@ -592,5 +603,4 @@ public abstract class Node_c implements Node {
     public Node copy(ExtensionInfo extInfo) throws SemanticException {
         return extInfo.nodeFactory().lang().copy(this, extInfo.nodeFactory());
     }
-
 }

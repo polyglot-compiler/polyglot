@@ -28,6 +28,7 @@ package polyglot.ast;
 
 import polyglot.types.SemanticException;
 import polyglot.util.CodeWriter;
+import polyglot.util.Copy;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
@@ -58,7 +59,12 @@ public class FloatLit_c extends Lit_c implements FloatLit {
 
     @Override
     public FloatLit kind(FloatLit.Kind kind) {
-        FloatLit_c n = (FloatLit_c) copy();
+        return kind(this, kind);
+    }
+
+    protected <N extends FloatLit_c> N kind(N n, FloatLit.Kind kind) {
+        if (n.kind == kind) return n;
+        if (n == this) n = Copy.Util.copy(n);
         n.kind = kind;
         return n;
     }
@@ -70,7 +76,12 @@ public class FloatLit_c extends Lit_c implements FloatLit {
 
     @Override
     public FloatLit value(double value) {
-        FloatLit_c n = (FloatLit_c) copy();
+        return value(this, value);
+    }
+
+    protected <N extends FloatLit_c> N value(N n, double value) {
+        if (n.value == value) return n;
+        if (n == this) n = Copy.Util.copy(n);
         n.value = value;
         return n;
     }
