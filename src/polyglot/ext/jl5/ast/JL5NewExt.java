@@ -70,9 +70,9 @@ public class JL5NewExt extends JL5ProcedureCallExt implements NewOps {
     public Node disambiguateOverride(Node parent, AmbiguityRemover ar)
             throws SemanticException {
         New n = (New) superLang().disambiguateOverride(this.node(), parent, ar);
-        JL5NewExt ext = (JL5NewExt) JL5Ext.ext(n);
         // now do the type args
-        return ext.typeArgs(n.visitList(ext.typeArgs(), ar));
+        n = typeArgs(n, visitList(typeArgs, ar));
+        return n;
     }
 
     @Override

@@ -27,7 +27,6 @@
 package polyglot.ast;
 
 import java.io.Serializable;
-import java.util.List;
 
 import polyglot.util.CodeWriter;
 import polyglot.util.Copy;
@@ -123,27 +122,6 @@ public interface Node extends NodeOps, Copy<Node>, Serializable {
      */
     @Deprecated
     Node visitEdge(Node parent, NodeVisitor v);
-
-    /**
-     * Visit a single child of the node.
-     *
-     * @param v The visitor which will traverse/rewrite the AST.
-     * @param child The child to visit.
-     * @return The result of {@code child.visit(v)}, or {@code null}
-     * if {@code child} was {@code null}.
-     */
-    <N extends Node> N visitChild(N child, NodeVisitor v);
-
-    /**
-     * Visit all the elements of a list.
-     * @param l The list to visit.
-     * @param v The visitor to use.
-     * @return A new list with each element from the old list
-     *         replaced by the result of visiting that element.
-     *         If {@code l} is {@code null},
-     *         {@code null} is returned.
-     */
-    <N extends Node> List<N> visitList(List<N> l, NodeVisitor v);
 
     /**
      * Dump the AST node for debugging purposes.

@@ -53,11 +53,6 @@ public class JL5FormalExt extends JL5AnnotatedElementExt {
         return isVarArg;
     }
 
-    public static boolean isVarArg(Node n) {
-        JL5FormalExt ext = (JL5FormalExt) JL5Ext.ext(n);
-        return ext.isVarArg;
-    }
-
     public boolean isCatchFormal() {
         return isCatchFormal;
     }
@@ -95,7 +90,7 @@ public class JL5FormalExt extends JL5AnnotatedElementExt {
     public Node disambiguate(AmbiguityRemover ar) throws SemanticException {
         Formal f = (Formal) this.node();
 
-        if (isVarArg(f)) {
+        if (isVarArg) {
             ((JL5ArrayType) f.type().type()).setVarArg();
         }
         return superLang().disambiguate(this.node(), ar);
@@ -103,15 +98,11 @@ public class JL5FormalExt extends JL5AnnotatedElementExt {
 
     @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
+        super.prettyPrint(w, tr);
+
         Formal f = (Formal) this.node();
-
-        for (AnnotationElem ae : annotationElems(f)) {
-            tr.lang().prettyPrint(ae, w, tr);
-            w.newline();
-        }
-
         w.write(JL5Flags.clearVarArgs(f.flags()).translate());
-        if (isVarArg(f)) {
+        if (isVarArg) {
             w.write(((ArrayType) f.type().type()).base().toString());
             //print(type, w, tr);
             w.write(" ...");

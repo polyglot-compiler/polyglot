@@ -448,7 +448,7 @@ public class InnerClassRemover extends ContextVisitor {
         List<Formal> newFormals = new ArrayList<Formal>();
         newFormals.addAll(formals);
         newFormals.addAll(cd.formals());
-        cd = cd.formals(newFormals);
+        cd = (ConstructorDecl) cd.formals(newFormals);
 
         // If the constructor call is a "this(...)" call, then
         // add the new arguments to the this call.

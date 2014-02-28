@@ -49,6 +49,7 @@ import polyglot.types.ProcedureInstance;
 import polyglot.types.SemanticException;
 import polyglot.types.Type;
 import polyglot.util.CodeWriter;
+import polyglot.util.Copy;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
@@ -78,28 +79,20 @@ public class AnnotationElemDecl_c extends Term_c implements AnnotationElemDecl {
     }
 
     @Override
-    public AnnotationElemDecl type(TypeNode type) {
-        if (!type.equals(this.type)) {
-            AnnotationElemDecl_c n = (AnnotationElemDecl_c) copy();
-            n.type = type;
-            return n;
-        }
-        return this;
-    }
-
-    @Override
     public TypeNode type() {
         return type;
     }
 
     @Override
-    public AnnotationElemDecl flags(Flags flags) {
-        if (!flags.equals(this.flags)) {
-            AnnotationElemDecl_c n = (AnnotationElemDecl_c) copy();
-            n.flags = flags;
-            return n;
-        }
-        return this;
+    public AnnotationElemDecl type(TypeNode type) {
+        return type(this, type);
+    }
+
+    protected <N extends AnnotationElemDecl_c> N type(N n, TypeNode type) {
+        if (n.type.equals(type)) return n;
+        if (n == this) n = Copy.Util.copy(n);
+        n.type = type;
+        return n;
     }
 
     @Override
@@ -108,13 +101,15 @@ public class AnnotationElemDecl_c extends Term_c implements AnnotationElemDecl {
     }
 
     @Override
-    public AnnotationElemDecl defaultVal(Term def) {
-        if (!def.equals(this.defaultVal)) {
-            AnnotationElemDecl_c n = (AnnotationElemDecl_c) copy();
-            n.defaultVal = def;
-            return n;
-        }
-        return this;
+    public AnnotationElemDecl flags(Flags flags) {
+        return flags(this, flags);
+    }
+
+    protected <N extends AnnotationElemDecl_c> N flags(N n, Flags flags) {
+        if (n.flags.equals(flags)) return n;
+        if (n == this) n = Copy.Util.copy(n);
+        n.flags = flags;
+        return n;
     }
 
     @Override
@@ -123,13 +118,32 @@ public class AnnotationElemDecl_c extends Term_c implements AnnotationElemDecl {
     }
 
     @Override
-    public AnnotationElemDecl name(String name) {
-        if (!name.equals(this.name())) {
-            AnnotationElemDecl_c n = (AnnotationElemDecl_c) copy();
-            n.name = this.name.id(name);
-            return n;
-        }
-        return this;
+    public AnnotationElemDecl defaultVal(Term def) {
+        return defaultVal(this, def);
+    }
+
+    protected <N extends AnnotationElemDecl_c> N defaultVal(N n, Term defaultVal) {
+        if (n.defaultVal == defaultVal) return n;
+        if (n == this) n = Copy.Util.copy(n);
+        n.defaultVal = defaultVal;
+        return n;
+    }
+
+    @Override
+    public Id id() {
+        return this.name;
+    }
+
+    @Override
+    public AnnotationElemDecl id(Id name) {
+        return id(this, name);
+    }
+
+    protected <N extends AnnotationElemDecl_c> N id(N n, Id name) {
+        if (n.name.equals(name)) return n;
+        if (n == this) n = Copy.Util.copy(n);
+        n.name = name;
+        return n;
     }
 
     @Override
@@ -138,11 +152,8 @@ public class AnnotationElemDecl_c extends Term_c implements AnnotationElemDecl {
     }
 
     @Override
-    public AnnotationElemDecl annotationElemInstance(
-            AnnotationTypeElemInstance ai) {
-        AnnotationElemDecl_c n = (AnnotationElemDecl_c) copy();
-        n.ai = ai;
-        return n;
+    public AnnotationElemDecl name(String name) {
+        return id(this.name.id(name));
     }
 
     @Override
@@ -150,14 +161,25 @@ public class AnnotationElemDecl_c extends Term_c implements AnnotationElemDecl {
         return ai;
     }
 
+    @Override
+    public AnnotationElemDecl annotationElemInstance(
+            AnnotationTypeElemInstance ai) {
+        return annotationElemInstance(this, ai);
+    }
+
+    protected <N extends AnnotationElemDecl_c> N annotationElemInstance(N n,
+            AnnotationTypeElemInstance ai) {
+        if (n.ai == ai) return n;
+        if (n == this) n = Copy.Util.copy(n);
+        n.ai = ai;
+        return n;
+    }
+
     protected AnnotationElemDecl_c reconstruct(TypeNode type, Term defaultVal) {
-        if (!type.equals(this.type) || this.defaultVal != defaultVal) {
-            AnnotationElemDecl_c n = (AnnotationElemDecl_c) copy();
-            n.type = type;
-            n.defaultVal = defaultVal;
-            return n;
-        }
-        return this;
+        AnnotationElemDecl_c n = this;
+        n = type(n, type);
+        n = defaultVal(n, defaultVal);
+        return n;
     }
 
     @Override
@@ -409,20 +431,5 @@ public class AnnotationElemDecl_c extends Term_c implements AnnotationElemDecl {
     @Override
     public CodeInstance codeInstance() {
         return this.annotationElemInstance();
-    }
-
-    @Override
-    public Id id() {
-        return this.name;
-    }
-
-    @Override
-    public MethodDecl id(Id name) {
-        if (this.name != name) {
-            AnnotationElemDecl_c n = (AnnotationElemDecl_c) copy();
-            n.name = name;
-            return n;
-        }
-        return this;
     }
 }

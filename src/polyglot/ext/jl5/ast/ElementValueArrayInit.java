@@ -52,6 +52,10 @@ public interface ElementValueArrayInit extends Term {
      */
     ElementValueArrayInit elements(List<Term> elements);
 
+    Type type();
+
+    ElementValueArrayInit type(Type type);
+
     /**
      * Type check the individual elements of the array initializer against the
      * left-hand-side type.  Each element is checked to see if it can be
@@ -60,8 +64,4 @@ public interface ElementValueArrayInit extends Term {
      * @exception SemanticException if there is a type error.
      */
     void typeCheckElements(Type lhsType) throws SemanticException;
-
-    Type type();
-
-    ElementValueArrayInit type(Type t);
 }

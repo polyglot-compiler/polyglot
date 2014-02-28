@@ -27,7 +27,8 @@ package polyglot.ext.jl5.translate;
 
 import polyglot.ast.ConstructorDecl;
 import polyglot.ast.Node;
-import polyglot.ext.jl5.ast.JL5AnnotatedElementExt;
+import polyglot.ext.jl5.ast.AnnotatedElement;
+import polyglot.ext.jl5.ast.JL5Ext;
 import polyglot.ext.jl5.ast.JL5NodeFactory;
 import polyglot.ext.jl5.ast.JL5ProcedureDeclExt;
 import polyglot.translate.ExtensionRewriter;
@@ -45,8 +46,8 @@ public class JL5ConstructorDeclToExt_c extends ConstructorDeclToExt_c {
         //Skip annotations and parameter nodes
         ConstructorDecl cd = (ConstructorDecl) node();
         rw =
-                (ExtensionRewriter) rw.bypass(JL5AnnotatedElementExt.annotationElems(cd));
-        return rw.bypass(JL5ProcedureDeclExt.typeParams(cd));
+                (ExtensionRewriter) rw.bypass(((AnnotatedElement) JL5Ext.ext(cd)).annotationElems());
+        return rw.bypass(((JL5ProcedureDeclExt) JL5Ext.ext(cd)).typeParams());
     }
 
     @Override
@@ -55,11 +56,11 @@ public class JL5ConstructorDeclToExt_c extends ConstructorDeclToExt_c {
         ConstructorDecl n = (ConstructorDecl) node();
         return to_nf.ConstructorDecl(n.position(),
                                      n.flags(),
-                                     JL5AnnotatedElementExt.annotationElems(n),
+                                     ((AnnotatedElement) JL5Ext.ext(n)).annotationElems(),
                                      n.id(),
                                      n.formals(),
                                      n.throwTypes(),
                                      n.body(),
-                                     JL5ProcedureDeclExt.typeParams(n));
+                                     ((JL5ProcedureDeclExt) JL5Ext.ext(n)).typeParams());
     }
 }

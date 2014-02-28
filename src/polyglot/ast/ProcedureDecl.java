@@ -43,17 +43,40 @@ public interface ProcedureDecl extends CodeDecl {
     ProcedureDecl flags(Flags flags);
 
     /** The procedure's name. */
+    Id id();
+
+    /** Set the procedure's name. */
+    ProcedureDecl id(Id id);
+
+    /** The procedure's name. */
     String name();
 
-    /** The procedure's formal parameters.
+    /** Set the procedure's name. */
+    ProcedureDecl name(String name);
+
+    /**
+     * The procedure's formal parameters.
      * @return A list of {@link polyglot.ast.Formal Formal}.
      */
     List<Formal> formals();
 
-    /** The procedure's exception throw types.
+    /**
+     * Set the procedure's formal parameters.
+     * @param formals A list of {@link polyglot.ast.Formal Formal}.
+     */
+    ProcedureDecl formals(List<Formal> formals);
+
+    /**
+     * The procedure's exception throw types.
      * @return A list of {@link polyglot.ast.TypeNode TypeNode}.
      */
     List<TypeNode> throwTypes();
+
+    /**
+     * Set the procedure's exception throw types.
+     * @param throwTypes A list of {@link polyglot.ast.TypeNode TypeNode}.
+     */
+    ProcedureDecl throwTypes(List<TypeNode> throwTypes);
 
     /**
      * The procedure's type object.  This field may not be valid until

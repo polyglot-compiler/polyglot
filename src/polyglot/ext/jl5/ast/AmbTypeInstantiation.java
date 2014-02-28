@@ -44,6 +44,8 @@ import polyglot.types.ReferenceType;
 import polyglot.types.SemanticException;
 import polyglot.types.Type;
 import polyglot.util.CodeWriter;
+import polyglot.util.CollectionUtil;
+import polyglot.util.Copy;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
@@ -68,6 +70,36 @@ public class AmbTypeInstantiation extends TypeNode_c implements Ambiguous {
     @Override
     public String name() {
         return base.name();
+    }
+
+    protected <N extends AmbTypeInstantiation> N base(N n, TypeNode base) {
+        if (n.base == base) return n;
+        if (n == this) n = Copy.Util.copy(n);
+        n.base = base;
+        return n;
+    }
+
+    protected <N extends AmbTypeInstantiation> N typeArguments(N n,
+            List<TypeNode> typeArguments) {
+        if (CollectionUtil.equals(n.typeArguments, typeArguments)) return n;
+        if (n == this) n = Copy.Util.copy(n);
+        n.typeArguments = typeArguments;
+        return n;
+    }
+
+    protected AmbTypeInstantiation reconstruct(TypeNode base,
+            List<TypeNode> typeArguments) {
+        AmbTypeInstantiation n = this;
+        n = base(n, base);
+        n = typeArguments(n, typeArguments);
+        return n;
+    }
+
+    @Override
+    public Node visitChildren(NodeVisitor v) {
+        TypeNode base = visitChild(this.base, v);
+        List<TypeNode> arguments = visitList(this.typeArguments, v);
+        return reconstruct(base, arguments);
     }
 
     @Override
@@ -219,30 +251,5 @@ public class AmbTypeInstantiation extends TypeNode_c implements Ambiguous {
             }
         }
         w.write(">");
-    }
-
-    @Override
-    public Node visitChildren(NodeVisitor v) {
-        TypeNode base = visitChild(this.base, v);
-        List<TypeNode> arguments = visitList(this.typeArguments, v);
-        return this.base(base).typeArguments(arguments);
-    }
-
-    private AmbTypeInstantiation typeArguments(List<TypeNode> arguments) {
-        if (this.typeArguments == arguments) {
-            return this;
-        }
-        AmbTypeInstantiation n = (AmbTypeInstantiation) this.copy();
-        n.typeArguments = arguments;
-        return n;
-    }
-
-    private AmbTypeInstantiation base(TypeNode b) {
-        if (this.base == b) {
-            return this;
-        }
-        AmbTypeInstantiation n = (AmbTypeInstantiation) this.copy();
-        n.base = b;
-        return n;
     }
 }

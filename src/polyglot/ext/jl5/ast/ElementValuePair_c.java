@@ -34,6 +34,7 @@ import polyglot.ast.Term_c;
 import polyglot.ext.jl5.types.JL5TypeSystem;
 import polyglot.types.SemanticException;
 import polyglot.util.CodeWriter;
+import polyglot.util.Copy;
 import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
 import polyglot.visit.CFGBuilder;
@@ -64,13 +65,15 @@ public class ElementValuePair_c extends Term_c implements ElementValuePair {
         return name;
     }
 
-    public ElementValuePair name(String name) {
-        if (!name.equals(this.name.id())) {
-            ElementValuePair_c n = (ElementValuePair_c) copy();
-            n.name = this.name.id(name);
-            return n;
-        }
-        return this;
+    public ElementValuePair id(Id name) {
+        return id(this, name);
+    }
+
+    protected <N extends ElementValuePair_c> N id(N n, Id name) {
+        if (n.name.equals(name)) return n;
+        if (n == this) n = Copy.Util.copy(n);
+        n.name = name;
+        return n;
     }
 
     @Override
@@ -79,12 +82,14 @@ public class ElementValuePair_c extends Term_c implements ElementValuePair {
     }
 
     public ElementValuePair value(Term value) {
-        if (!value.equals(this.value)) {
-            ElementValuePair_c n = (ElementValuePair_c) copy();
-            n.value = value;
-            return n;
-        }
-        return this;
+        return value(this, value);
+    }
+
+    protected <N extends ElementValuePair_c> N value(N n, Term value) {
+        if (n.value.equals(value)) return n;
+        if (n == this) n = Copy.Util.copy(n);
+        n.value = value;
+        return n;
     }
 
     @Override

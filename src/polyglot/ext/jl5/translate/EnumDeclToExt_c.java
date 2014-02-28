@@ -27,7 +27,8 @@ package polyglot.ext.jl5.translate;
 
 import polyglot.ast.ClassDecl;
 import polyglot.ast.Node;
-import polyglot.ext.jl5.ast.JL5AnnotatedElementExt;
+import polyglot.ext.jl5.ast.AnnotatedElement;
+import polyglot.ext.jl5.ast.JL5Ext;
 import polyglot.ext.jl5.ast.JL5NodeFactory;
 import polyglot.translate.ExtensionRewriter;
 import polyglot.translate.ext.ClassDeclToExt_c;
@@ -42,7 +43,7 @@ public class EnumDeclToExt_c extends ClassDeclToExt_c {
         ClassDecl cd = (ClassDecl) node();
         return ((JL5NodeFactory) rw.to_nf()).EnumDecl(cd.position(),
                                                       cd.flags(),
-                                                      JL5AnnotatedElementExt.annotationElems(cd),
+                                                      ((AnnotatedElement) JL5Ext.ext(cd)).annotationElems(),
                                                       cd.id(),
                                                       cd.superClass(),
                                                       cd.interfaces(),

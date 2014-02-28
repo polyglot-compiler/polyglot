@@ -47,6 +47,7 @@ import polyglot.types.SemanticException;
 import polyglot.types.Type;
 import polyglot.util.CodeWriter;
 import polyglot.util.CollectionUtil;
+import polyglot.util.Copy;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.ListUtil;
 import polyglot.util.Position;
@@ -82,24 +83,35 @@ public class AnnotationElem_c extends Term_c implements AnnotationElem {
 
     @Override
     public AnnotationElem typeName(TypeNode typeName) {
-        if (!typeName.equals(this.typeName)) {
-            AnnotationElem_c n = (AnnotationElem_c) copy();
-            n.typeName = typeName;
-            return n;
-        }
-        return this;
+        return typeName(this, typeName);
+    }
+
+    protected <N extends AnnotationElem_c> N typeName(N n, TypeNode typeName) {
+        if (n.typeName.equals(typeName)) return n;
+        if (n == this) n = Copy.Util.copy(n);
+        n.typeName = typeName;
+        return n;
+    }
+
+    @Override
+    public List<ElementValuePair> elements() {
+        return this.elements;
+    }
+
+    protected <N extends AnnotationElem_c> N elements(N n,
+            List<ElementValuePair> elements) {
+        if (CollectionUtil.equals(n.elements, elements)) return n;
+        if (n == this) n = Copy.Util.copy(n);
+        n.elements = elements;
+        return n;
     }
 
     protected AnnotationElem_c reconstruct(TypeNode typeName,
             List<ElementValuePair> elements) {
-        if (!typeName.equals(this.typeName)
-                || !CollectionUtil.equals(elements, this.elements)) {
-            AnnotationElem_c n = (AnnotationElem_c) copy();
-            n.typeName = typeName;
-            n.elements = ListUtil.copy(elements, true);
-            return n;
-        }
-        return this;
+        AnnotationElem_c n = this;
+        n = typeName(n, typeName);
+        n = elements(n, elements);
+        return n;
     }
 
     @Override
@@ -164,11 +176,6 @@ public class AnnotationElem_c extends Term_c implements AnnotationElem {
     @Override
     public Term firstChild() {
         return typeName;
-    }
-
-    @Override
-    public List<ElementValuePair> elements() {
-        return this.elements;
     }
 
     @Override

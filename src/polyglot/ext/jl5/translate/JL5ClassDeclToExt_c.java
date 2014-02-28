@@ -27,8 +27,9 @@ package polyglot.ext.jl5.translate;
 
 import polyglot.ast.ClassDecl;
 import polyglot.ast.Node;
-import polyglot.ext.jl5.ast.JL5AnnotatedElementExt;
+import polyglot.ext.jl5.ast.AnnotatedElement;
 import polyglot.ext.jl5.ast.JL5ClassDeclExt;
+import polyglot.ext.jl5.ast.JL5Ext;
 import polyglot.ext.jl5.ast.JL5NodeFactory;
 import polyglot.translate.ExtensionRewriter;
 import polyglot.translate.ext.ClassDeclToExt_c;
@@ -44,11 +45,11 @@ public class JL5ClassDeclToExt_c extends ClassDeclToExt_c {
         JL5NodeFactory to_nf = (JL5NodeFactory) rw.to_nf();
         return to_nf.ClassDecl(cd.position(),
                                cd.flags(),
-                               JL5AnnotatedElementExt.annotationElems(cd),
+                               ((AnnotatedElement) JL5Ext.ext(cd)).annotationElems(),
                                cd.id(),
                                cd.superClass(),
                                cd.interfaces(),
                                cd.body(),
-                               JL5ClassDeclExt.paramTypes(cd));
+                               ((JL5ClassDeclExt) JL5Ext.ext(cd)).paramTypes());
     }
 }

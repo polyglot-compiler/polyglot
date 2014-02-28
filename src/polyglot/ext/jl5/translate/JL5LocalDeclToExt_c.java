@@ -2,7 +2,8 @@ package polyglot.ext.jl5.translate;
 
 import polyglot.ast.LocalDecl;
 import polyglot.ast.Node;
-import polyglot.ext.jl5.ast.JL5AnnotatedElementExt;
+import polyglot.ext.jl5.ast.AnnotatedElement;
+import polyglot.ext.jl5.ast.JL5Ext;
 import polyglot.ext.jl5.ast.JL5NodeFactory;
 import polyglot.translate.ExtensionRewriter;
 import polyglot.translate.ext.LocalDeclToExt_c;
@@ -31,7 +32,7 @@ public class JL5LocalDeclToExt_c extends LocalDeclToExt_c {
         LocalDecl to =
                 to_nf.LocalDecl(n.position(),
                                 n.flags(),
-                                JL5AnnotatedElementExt.annotationElems(n),
+                                ((AnnotatedElement) JL5Ext.ext(n)).annotationElems(),
                                 n.type(),
                                 n.id(),
                                 n.init());

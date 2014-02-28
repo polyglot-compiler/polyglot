@@ -34,6 +34,7 @@ import polyglot.types.ReferenceType;
 import polyglot.types.SemanticException;
 import polyglot.types.Type;
 import polyglot.util.CodeWriter;
+import polyglot.util.Copy;
 import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
 import polyglot.visit.AmbiguityRemover;
@@ -55,6 +56,25 @@ public class AmbWildCard extends TypeNode_c implements Ambiguous {
         super(pos);
         this.constraint = constraint;
         this.isExtendsConstraint = isExtendsConstraint;
+    }
+
+    protected <N extends AmbWildCard> N constraint(N n, TypeNode constraint) {
+        if (n.constraint == constraint) return n;
+        if (n == this) n = Copy.Util.copy(n);
+        n.constraint = constraint;
+        return n;
+    }
+
+    protected AmbWildCard reconstruct(TypeNode constraint) {
+        AmbWildCard n = this;
+        n = constraint(n, constraint);
+        return n;
+    }
+
+    @Override
+    public Node visitChildren(NodeVisitor v) {
+        TypeNode c = visitChild(this.constraint, v);
+        return reconstruct(c);
     }
 
     @Override
@@ -90,20 +110,5 @@ public class AmbWildCard extends TypeNode_c implements Ambiguous {
             w.write(" ");
             tr.lang().prettyPrint(constraint, w, tr);
         }
-    }
-
-    protected AmbWildCard reconstruct(TypeNode constraint) {
-        if (this.constraint != constraint) {
-            AmbWildCard n = (AmbWildCard) this.copy();
-            n.constraint = constraint;
-            return n;
-        }
-        return this;
-    }
-
-    @Override
-    public Node visitChildren(NodeVisitor v) {
-        TypeNode c = visitChild(this.constraint, v);
-        return reconstruct(c);
     }
 }

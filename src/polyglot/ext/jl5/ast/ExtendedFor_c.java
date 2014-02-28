@@ -47,6 +47,7 @@ import polyglot.types.Context;
 import polyglot.types.SemanticException;
 import polyglot.types.Type;
 import polyglot.util.CodeWriter;
+import polyglot.util.Copy;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
@@ -72,25 +73,18 @@ public class ExtendedFor_c extends Loop_c implements ExtendedFor {
     }
 
     @Override
-    public Stmt body() {
-        return this.body;
-    }
-
-    @Override
-    public ExtendedFor body(Stmt body) {
-        ExtendedFor_c n = (ExtendedFor_c) copy();
-        n.body = body;
-        return n;
-    }
-
-    @Override
     public LocalDecl decl() {
         return this.decl;
     }
 
     @Override
     public ExtendedFor decl(LocalDecl decl) {
-        ExtendedFor_c n = (ExtendedFor_c) copy();
+        return decl(this, decl);
+    }
+
+    protected <N extends ExtendedFor_c> N decl(N n, LocalDecl decl) {
+        if (n.decl.equals(decl)) return n;
+        if (n == this) n = Copy.Util.copy(n);
         n.decl = decl;
         return n;
     }
@@ -102,22 +96,40 @@ public class ExtendedFor_c extends Loop_c implements ExtendedFor {
 
     @Override
     public ExtendedFor expr(Expr expr) {
-        ExtendedFor_c n = (ExtendedFor_c) copy();
+        return expr(this, expr);
+    }
+
+    protected <N extends ExtendedFor_c> N expr(N n, Expr expr) {
+        if (n.expr == expr) return n;
+        if (n == this) n = Copy.Util.copy(n);
         n.expr = expr;
+        return n;
+    }
+
+    @Override
+    public Stmt body() {
+        return this.body;
+    }
+
+    @Override
+    public ExtendedFor body(Stmt body) {
+        return body(this, body);
+    }
+
+    protected <N extends ExtendedFor_c> N body(N n, Stmt body) {
+        if (n.body == body) return n;
+        if (n == this) n = Copy.Util.copy(n);
+        n.body = body;
         return n;
     }
 
     /** Reconstruct the statement. */
     protected ExtendedFor_c reconstruct(LocalDecl decl, Expr expr, Stmt body) {
-        if (!decl.equals(this.decl) || expr != this.expr || body != this.body) {
-            ExtendedFor_c n = (ExtendedFor_c) copy();
-            n.decl = decl;
-            n.expr = expr;
-            n.body = body;
-            return n;
-        }
-
-        return this;
+        ExtendedFor_c n = this;
+        n = decl(n, decl);
+        n = expr(n, expr);
+        n = body(n, body);
+        return n;
     }
 
     @Override

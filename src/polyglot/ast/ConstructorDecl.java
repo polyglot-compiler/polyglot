@@ -26,64 +26,19 @@
 
 package polyglot.ast;
 
-import java.util.List;
-
 import polyglot.types.ConstructorInstance;
-import polyglot.types.Flags;
 
 /**
  * A {@code ConstructorDecl} is an immutable representation of a
  * constructor declaration as part of a class body. 
  */
 public interface ConstructorDecl extends ProcedureDecl {
-    /** The constructor's flags. */
-    @Override
-    Flags flags();
-
-    /** Set the constructor's flags. */
-    @Override
-    ConstructorDecl flags(Flags flags);
-
     /**
      * The constructor's name.  This should be the short name of the
      * containing class.
      */
+    @Override
     Id id();
-
-    /** Set the constructor's name. */
-    ConstructorDecl id(Id name);
-
-    /**
-     * The constructor's name.  This should be the short name of the
-     * containing class.
-     */
-    @Override
-    String name();
-
-    /** Set the constructor's name. */
-    ConstructorDecl name(String name);
-
-    /** The constructor's formal parameters.
-     * @return A list of {@link polyglot.ast.Formal Formal}.
-     */
-    @Override
-    List<Formal> formals();
-
-    /** Set the constructor's formal parameters.
-     * @param formals A list of {@link polyglot.ast.Formal Formal}.
-     */
-    ConstructorDecl formals(List<Formal> formals);
-
-    /** The constructor's exception throw types.
-     * @return A list of {@link polyglot.ast.TypeNode TypeNode}.
-     */
-    @Override
-    List<TypeNode> throwTypes();
-
-    /** Set the constructor's exception throw types.
-     * @param throwTypes A list of {@link polyglot.ast.TypeNode TypeNode}.
-     */
-    ConstructorDecl throwTypes(List<TypeNode> throwTypes);
 
     /**
      * The constructor's type object.  This field may not be valid until

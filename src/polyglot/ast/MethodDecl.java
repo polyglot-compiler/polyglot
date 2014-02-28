@@ -26,63 +26,17 @@
 
 package polyglot.ast;
 
-import java.util.List;
-
-import polyglot.types.Flags;
 import polyglot.types.MethodInstance;
 
 /**
  * A method declaration.
  */
 public interface MethodDecl extends ProcedureDecl {
-    /** The method's flags. */
-    @Override
-    Flags flags();
-
-    /** Set the method's flags. */
-    @Override
-    MethodDecl flags(Flags flags);
-
     /** The method's return type.  */
     TypeNode returnType();
 
     /** Set the method's return type.  */
     MethodDecl returnType(TypeNode returnType);
-
-    /** The method's name. */
-    Id id();
-
-    /** Set the method's name. */
-    MethodDecl id(Id name);
-
-    /** The method's name. */
-    @Override
-    String name();
-
-    /** Set the method's name. */
-    MethodDecl name(String name);
-
-    /** The method's formal parameters.
-     * @return A list of {@link polyglot.ast.Formal Formal}.
-     */
-    @Override
-    List<Formal> formals();
-
-    /** Set the method's formal parameters.
-     * @param formals A list of {@link polyglot.ast.Formal Formal}.
-     */
-    MethodDecl formals(List<Formal> formals);
-
-    /** The method's exception throw types.
-     * @return A list of {@link polyglot.ast.TypeNode TypeNode}.
-     */
-    @Override
-    List<TypeNode> throwTypes();
-
-    /** Set the method's exception throw types.
-     * @param throwTypes A list of {@link polyglot.ast.TypeNode TypeNode}.
-     */
-    MethodDecl throwTypes(List<TypeNode> throwTypes);
 
     /**
      * The method type object.  This field may not be valid until

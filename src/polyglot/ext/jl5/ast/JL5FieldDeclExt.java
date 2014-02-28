@@ -26,7 +26,6 @@
 package polyglot.ext.jl5.ast;
 
 import polyglot.ast.FieldDecl;
-import polyglot.ast.Node;
 import polyglot.ext.jl5.types.Annotations;
 import polyglot.ext.jl5.types.JL5FieldInstance;
 import polyglot.types.Declaration;
@@ -52,13 +51,8 @@ public class JL5FieldDeclExt extends JL5AnnotatedElementExt {
 
     @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
-        Node n = this.node();
-        for (AnnotationElem ae : annotationElems(n)) {
-            tr.lang().prettyPrint(ae, w, tr);
-            w.newline();
-        }
-
-        superLang().prettyPrint(this.node(), w, tr);
+        super.prettyPrint(w, tr);
+        superLang().prettyPrint(node(), w, tr);
     }
 
 }

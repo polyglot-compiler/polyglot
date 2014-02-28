@@ -285,7 +285,7 @@ public class RemoveEnums extends ContextVisitor {
                                             enumOrdinal)
                                     .localInstance(enumOrdLI));
         newFormals.addAll(n.formals());
-        n = n.formals(newFormals);
+        n = (ConstructorDecl) n.formals(newFormals);
 
         // use those arguments in the constructor call
         List<Expr> constructorCallArgs = new ArrayList<Expr>();
@@ -617,7 +617,7 @@ public class RemoveEnums extends ContextVisitor {
         newFormals.remove(0);
         newFormals.remove(0);
 
-        cd = cd.formals(newFormals);
+        cd = (ConstructorDecl) cd.formals(newFormals);
 
         // remove the call to super
 

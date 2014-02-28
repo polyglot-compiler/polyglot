@@ -44,6 +44,8 @@ import polyglot.types.SemanticException;
 import polyglot.types.Type;
 import polyglot.util.CodeWriter;
 import polyglot.util.CollectionUtil;
+import polyglot.util.Copy;
+import polyglot.util.ListUtil;
 import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
 import polyglot.visit.AmbiguityRemover;
@@ -56,7 +58,6 @@ public class ParamTypeNode_c extends TypeNode_c implements ParamTypeNode {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
     protected Id id;
-
     protected List<TypeNode> bounds;
 
     public ParamTypeNode_c(Position pos, List<TypeNode> bounds, Id id) {
@@ -66,21 +67,19 @@ public class ParamTypeNode_c extends TypeNode_c implements ParamTypeNode {
     }
 
     @Override
-    public ParamTypeNode id(Id id) {
-        ParamTypeNode_c n = (ParamTypeNode_c) copy();
-        n.id = id;
-        return n;
-    }
-
-    @Override
     public Id id() {
         return this.id;
     }
 
     @Override
-    public ParamTypeNode bounds(List<TypeNode> l) {
-        ParamTypeNode_c n = (ParamTypeNode_c) copy();
-        n.bounds = l;
+    public ParamTypeNode id(Id id) {
+        return id(this, id);
+    }
+
+    protected <N extends ParamTypeNode_c> N id(N n, Id id) {
+        if (n.id == id) return n;
+        if (n == this) n = Copy.Util.copy(n);
+        n.id = id;
         return n;
     }
 
@@ -89,13 +88,22 @@ public class ParamTypeNode_c extends TypeNode_c implements ParamTypeNode {
         return bounds;
     }
 
+    @Override
+    public ParamTypeNode bounds(List<TypeNode> bounds) {
+        return bounds(this, bounds);
+    }
+
+    protected <N extends ParamTypeNode_c> N bounds(N n, List<TypeNode> bounds) {
+        if (CollectionUtil.equals(n.bounds, bounds)) return n;
+        if (n == this) n = Copy.Util.copy(n);
+        n.bounds = ListUtil.copy(bounds, true);
+        return n;
+    }
+
     public ParamTypeNode reconstruct(List<TypeNode> bounds) {
-        if (!CollectionUtil.equals(bounds, this.bounds)) {
-            ParamTypeNode_c n = (ParamTypeNode_c) copy();
-            n.bounds = bounds;
-            return n;
-        }
-        return this;
+        ParamTypeNode_c n = this;
+        n = bounds(n, bounds);
+        return n;
     }
 
     @Override

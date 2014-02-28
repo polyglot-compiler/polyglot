@@ -212,7 +212,7 @@ public class TypeErasureProcDecls extends ErrorHandlingVisitor {
         if (!changed) {
             return n;
         }
-        return n.formals(newFormals).returnType(newRetType);
+        return n.returnType(newRetType).formals(newFormals);
     }
 
     protected Type erasedReturnType(MethodInstance mjErased,

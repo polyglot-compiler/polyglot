@@ -39,6 +39,7 @@ import polyglot.types.Type;
 import polyglot.types.TypeSystem;
 import polyglot.util.CodeWriter;
 import polyglot.util.CollectionUtil;
+import polyglot.util.Copy;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.ListUtil;
 import polyglot.util.Position;
@@ -76,20 +77,39 @@ public class ElementValueArrayInit_c extends Term_c implements
 
     @Override
     public ElementValueArrayInit elements(List<Term> elements) {
-        ElementValueArrayInit_c n = (ElementValueArrayInit_c) copy();
+        return elements(this, elements);
+    }
+
+    protected <N extends ElementValueArrayInit_c> N elements(N n,
+            List<Term> elements) {
+        if (CollectionUtil.equals(n.elements, elements)) return n;
+        if (n == this) n = Copy.Util.copy(n);
         n.elements = ListUtil.copy(elements, true);
+        return n;
+    }
+
+    @Override
+    public Type type() {
+        return this.type;
+    }
+
+    @Override
+    public ElementValueArrayInit type(Type type) {
+        return type(this, type);
+    }
+
+    protected <N extends ElementValueArrayInit_c> N type(N n, Type type) {
+        if (n.type == type) return n;
+        if (n == this) n = Copy.Util.copy(n);
+        n.type = type;
         return n;
     }
 
     /** Reconstruct the initializer. */
     protected ElementValueArrayInit_c reconstruct(List<Term> elements) {
-        if (!CollectionUtil.equals(elements, this.elements)) {
-            ElementValueArrayInit_c n = (ElementValueArrayInit_c) copy();
-            n.elements = ListUtil.copy(elements, true);
-            return n;
-        }
-
-        return this;
+        ElementValueArrayInit_c n = this;
+        n = elements(n, elements);
+        return n;
     }
 
     @Override
@@ -229,20 +249,5 @@ public class ElementValueArrayInit_c extends Term_c implements
     public Node copy(NodeFactory nf) {
         return ((JL5NodeFactory) nf).ElementValueArrayInit(this.position,
                                                            this.elements);
-    }
-
-    @Override
-    public Type type() {
-        return this.type;
-    }
-
-    @Override
-    public ElementValueArrayInit type(Type t) {
-        if (t == this.type) {
-            return this;
-        }
-        ElementValueArrayInit_c n = (ElementValueArrayInit_c) this.copy();
-        n.type = t;
-        return n;
     }
 }

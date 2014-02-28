@@ -28,9 +28,10 @@ package polyglot.ext.jl5.translate;
 import java.util.List;
 
 import polyglot.ast.Node;
+import polyglot.ext.jl5.ast.AnnotatedElement;
 import polyglot.ext.jl5.ast.AnnotationElem;
 import polyglot.ext.jl5.ast.EnumConstantDecl;
-import polyglot.ext.jl5.ast.JL5AnnotatedElementExt;
+import polyglot.ext.jl5.ast.JL5Ext;
 import polyglot.ext.jl5.ast.JL5NodeFactory;
 import polyglot.translate.ExtensionRewriter;
 import polyglot.translate.ext.ToExt_c;
@@ -44,7 +45,7 @@ public class EnumConstantDeclToExt_c extends ToExt_c {
     public Node toExt(ExtensionRewriter rw) throws SemanticException {
         EnumConstantDecl cd = (EnumConstantDecl) node();
         List<AnnotationElem> annotationElems =
-                JL5AnnotatedElementExt.annotationElems(cd);
+                ((AnnotatedElement) JL5Ext.ext(cd)).annotationElems();
         rw = (ExtensionRewriter) rw.bypass(annotationElems);
         return ((JL5NodeFactory) rw.to_nf()).EnumConstantDecl(cd.position(),
                                                               cd.flags(),

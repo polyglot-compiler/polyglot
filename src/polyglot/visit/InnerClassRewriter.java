@@ -157,13 +157,13 @@ public class InnerClassRewriter extends InnerClassAbstractRemover {
 
         addEnvToCI(cd.constructorInstance(), env);
 
-        cd = cd.name(ct.name());
+        cd = (ConstructorDecl) cd.name(ct.name());
 
         // Add the new formals.
         List<Formal> newFormals = new ArrayList<Formal>();
         newFormals.addAll(cd.formals());
         newFormals.addAll(envAsFormals(env));
-        cd = cd.formals(newFormals);
+        cd = (ConstructorDecl) cd.formals(newFormals);
 
         if (cd.body() == null) {
             // Must be a native constructor; just let the programmer

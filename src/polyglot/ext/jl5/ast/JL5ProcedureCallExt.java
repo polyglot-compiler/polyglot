@@ -37,6 +37,8 @@ import polyglot.ast.TypeNode;
 import polyglot.types.ReferenceType;
 import polyglot.util.CodeWriter;
 import polyglot.util.CollectionUtil;
+import polyglot.util.Copy;
+import polyglot.util.ListUtil;
 import polyglot.util.SerialVersionUID;
 import polyglot.visit.NodeVisitor;
 import polyglot.visit.PrettyPrinter;
@@ -59,38 +61,30 @@ public abstract class JL5ProcedureCallExt extends JL5Ext implements
 
     @Override
     public ProcedureCall typeArgs(List<TypeNode> typeArgs) {
-        if (this.typeArgs == typeArgs) {
-            return this.node();
-        }
-        ProcedureCall n = (ProcedureCall) this.node().copy();
+        return typeArgs(node(), typeArgs);
+    }
+
+    protected <N extends Node> N typeArgs(N n, List<TypeNode> typeArgs) {
         JL5ProcedureCallExt ext = (JL5ProcedureCallExt) JL5Ext.ext(n);
-        ext.typeArgs = typeArgs;
+        if (CollectionUtil.equals(ext.typeArgs, typeArgs)) return n;
+        if (n == node) {
+            n = Copy.Util.copy(n);
+            ext = (JL5ProcedureCallExt) JL5Ext.ext(n);
+        }
+        ext.typeArgs = ListUtil.copy(typeArgs, true);
+        return n;
+    }
+
+    private Node reconstruct(Node n, List<TypeNode> typeArgs) {
+        n = typeArgs(n, typeArgs);
         return n;
     }
 
     @Override
     public Node visitChildren(NodeVisitor v) {
-        JL5ProcedureCallExt ext = (JL5ProcedureCallExt) JL5Ext.ext(this.node());
-
-        List<TypeNode> typeArgs = this.node().visitList(ext.typeArgs(), v);
-
-        Node newN = superLang().visitChildren(this.node(), v);
-        JL5ProcedureCallExt newext = (JL5ProcedureCallExt) JL5Ext.ext(newN);
-
-        if (!CollectionUtil.equals(typeArgs, newext.typeArgs())) {
-            // the type args changed! Let's update the node.
-            if (newN == this.node()) {
-                // we need to create a copy.
-                newN = newN.copy();
-                newext = (JL5ProcedureCallExt) JL5Ext.ext(newN);
-            }
-            else {
-                // the call to super.visitChildren(v) already
-                // created a copy of the node (and thus of its extension).
-            }
-            newext.typeArgs = typeArgs;
-        }
-        return newN;
+        List<TypeNode> typeArgs = visitList(this.typeArgs, v);
+        Node n = superLang().visitChildren(node(), v);
+        return reconstruct(n, typeArgs);
     }
 
     protected List<ReferenceType> actualTypeArgs() {

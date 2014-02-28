@@ -81,6 +81,16 @@ public abstract class Ext_c implements Ext {
     }
 
     @Override
+    public <N extends Node> N visitChild(N child, NodeVisitor v) {
+        return node().visitChild(child, v);
+    }
+
+    @Override
+    public <N extends Node> List<N> visitList(List<N> l, NodeVisitor v) {
+        return node().visitList(l, v);
+    }
+
+    @Override
     public Node node() {
         return node;
     }

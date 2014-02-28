@@ -2,7 +2,8 @@ package polyglot.ext.jl5.translate;
 
 import polyglot.ast.Formal;
 import polyglot.ast.Node;
-import polyglot.ext.jl5.ast.JL5AnnotatedElementExt;
+import polyglot.ext.jl5.ast.AnnotatedElement;
+import polyglot.ext.jl5.ast.JL5Ext;
 import polyglot.ext.jl5.ast.JL5FormalExt;
 import polyglot.ext.jl5.ast.JL5NodeFactory;
 import polyglot.translate.ExtensionRewriter;
@@ -23,7 +24,7 @@ public class JL5FormalToExt_c extends FormalToExt_c {
     public NodeVisitor toExtEnter(ExtensionRewriter rw)
             throws SemanticException {
         // Skip annotations
-        return rw.bypass(JL5AnnotatedElementExt.annotationElems(node()));
+        return rw.bypass(((AnnotatedElement) JL5Ext.ext(node())).annotationElems());
     }
 
     @Override
@@ -34,10 +35,10 @@ public class JL5FormalToExt_c extends FormalToExt_c {
         Formal to =
                 to_nf.Formal(f.position(),
                              f.flags(),
-                             JL5AnnotatedElementExt.annotationElems(f),
+                             ((AnnotatedElement) JL5Ext.ext(f)).annotationElems(),
                              f.type(),
                              f.id(),
-                             JL5FormalExt.isVarArg(f));
+                             ((JL5FormalExt) JL5Ext.ext(f)).isVarArg());
         Type type = rw.to_ts().unknownType(f.position());
         LocalInstance li =
                 rw.to_ts().localInstance(f.position(),

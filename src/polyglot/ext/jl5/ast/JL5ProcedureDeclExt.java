@@ -27,7 +27,6 @@ package polyglot.ext.jl5.ast;
 
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 
 import polyglot.ast.Formal;
@@ -52,8 +51,8 @@ import polyglot.types.Type;
 import polyglot.types.UnknownType;
 import polyglot.util.CodeWriter;
 import polyglot.util.CollectionUtil;
+import polyglot.util.Copy;
 import polyglot.util.InternalCompilerError;
-import polyglot.util.ListUtil;
 import polyglot.util.SerialVersionUID;
 import polyglot.visit.AmbiguityRemover;
 import polyglot.visit.NodeVisitor;
@@ -71,14 +70,17 @@ public abstract class JL5ProcedureDeclExt extends JL5AnnotatedElementExt
         return this.typeParams;
     }
 
-    public static List<ParamTypeNode> typeParams(Node n) {
-        JL5ProcedureDeclExt ext = (JL5ProcedureDeclExt) JL5Ext.ext(n);
-        return ext.typeParams;
+    public Node typeParams(List<ParamTypeNode> typeParams) {
+        return typeParams(node(), typeParams);
     }
 
-    public ProcedureDecl typeParams(List<ParamTypeNode> typeParams) {
-        ProcedureDecl n = (ProcedureDecl) node().copy();
+    protected <N extends Node> N typeParams(N n, List<ParamTypeNode> typeParams) {
         JL5ProcedureDeclExt ext = (JL5ProcedureDeclExt) JL5Ext.ext(n);
+        if (CollectionUtil.equals(ext.typeParams, typeParams)) return n;
+        if (n == node) {
+            n = Copy.Util.copy(n);
+            ext = (JL5ProcedureDeclExt) JL5Ext.ext(n);
+        }
         ext.typeParams = typeParams;
         return n;
     }
@@ -90,20 +92,15 @@ public abstract class JL5ProcedureDeclExt extends JL5AnnotatedElementExt
         pi.setAnnotations(annotations);
     }
 
-    private Node reconstruct(Node n, List<ParamTypeNode> typeParams) {
-        if (!CollectionUtil.equals(typeParams, typeParams(n))) {
-            if (n == this.node()) n = n.copy();
-            JL5ProcedureDeclExt ext = (JL5ProcedureDeclExt) JL5Ext.ext(n);
-            ext.typeParams = ListUtil.copy(typeParams, true);
-        }
+    protected Node reconstruct(Node n, List<ParamTypeNode> typeParams) {
+        n = typeParams(n, typeParams);
         return n;
     }
 
     @Override
     public Node visitChildren(NodeVisitor v) {
-        Node n = this.node();
-        List<ParamTypeNode> typeParams = n.visitList(typeParams(n), v);
-        n = super.visitChildren(v);
+        List<ParamTypeNode> typeParams = visitList(this.typeParams, v);
+        Node n = super.visitChildren(v);
         return reconstruct(n, typeParams);
     }
 
@@ -111,7 +108,7 @@ public abstract class JL5ProcedureDeclExt extends JL5AnnotatedElementExt
     public Context enterScope(Context c) {
         ProcedureDecl pd = (ProcedureDecl) this.node();
         c = superLang().enterScope(pd, c);
-        for (ParamTypeNode pn : typeParams(pd)) {
+        for (ParamTypeNode pn : typeParams) {
             ((JL5Context) c).addTypeVariable((TypeVariable) pn.type());
         }
         return c;
@@ -146,8 +143,8 @@ public abstract class JL5ProcedureDeclExt extends JL5AnnotatedElementExt
         }
 
         List<TypeVariable> typeParams =
-                new ArrayList<TypeVariable>(typeParams(pd).size());
-        for (int i = 0; i < typeParams(pd).size(); i++) {
+                new ArrayList<TypeVariable>(this.typeParams.size());
+        for (int i = 0; i < this.typeParams.size(); i++) {
             typeParams.add(ts.unknownTypeVariable(pd.position()));
         }
 
@@ -173,9 +170,10 @@ public abstract class JL5ProcedureDeclExt extends JL5AnnotatedElementExt
         ProcedureDecl n =
                 (ProcedureDecl) superLang().disambiguate(this.node(), ar);
 
-        List<TypeVariable> typeParams = new LinkedList<TypeVariable>();
+        List<TypeVariable> typeParams =
+                new ArrayList<TypeVariable>(this.typeParams.size());
 
-        for (TypeNode tn : typeParams(n)) {
+        for (TypeNode tn : this.typeParams) {
             if (!tn.isDisambiguated()) {
                 return n;
             }
@@ -196,8 +194,8 @@ public abstract class JL5ProcedureDeclExt extends JL5AnnotatedElementExt
 
         JL5ProcedureInstance pi = (JL5ProcedureInstance) pd.procedureInstance();
         // check no duplicate annotations used
-        ts.checkDuplicateAnnotations(annotationElems(pd));
-        for (ParamTypeNode typeParam : typeParams(pd))
+        ts.checkDuplicateAnnotations(annotations);
+        for (ParamTypeNode typeParam : typeParams)
             ts.checkCycles(typeParam.type().toReference());
 
         // mark the formals as being procedure formals (since they are)
@@ -243,16 +241,16 @@ public abstract class JL5ProcedureDeclExt extends JL5AnnotatedElementExt
     }
 
     @Override
+    public void prettyPrint(CodeWriter w, PrettyPrinter pp) {
+        superLang().prettyPrint(node(), w, pp);
+    }
+
+    @Override
     public void prettyPrintHeader(Flags flags, CodeWriter w, PrettyPrinter tr) {
-        ProcedureDecl n = (ProcedureDecl) this.node();
-
         w.begin(0);
 
         w.begin(0);
-        for (AnnotationElem ae : annotationElems(n)) {
-            tr.lang().prettyPrint(ae, w, tr);
-            w.newline();
-        }
+        super.prettyPrint(w, tr);
         w.end();
 
         w.write(JL5Flags.clearVarArgs(flags).translate());
@@ -263,9 +261,9 @@ public abstract class JL5ProcedureDeclExt extends JL5AnnotatedElementExt
             JL5Translator jl5tr = (JL5Translator) tr;
             printTypeVars = !jl5tr.removeJava5isms();
         }
-        if (printTypeVars && !typeParams(n).isEmpty()) {
+        if (printTypeVars && !typeParams.isEmpty()) {
             w.write("<");
-            for (Iterator<ParamTypeNode> iter = typeParams(n).iterator(); iter.hasNext();) {
+            for (Iterator<ParamTypeNode> iter = typeParams.iterator(); iter.hasNext();) {
                 ParamTypeNode ptn = iter.next();
                 tr.lang().prettyPrint(ptn, w, tr);
                 if (iter.hasNext()) {
@@ -276,6 +274,7 @@ public abstract class JL5ProcedureDeclExt extends JL5AnnotatedElementExt
             w.write("> ");
         }
 
+        ProcedureDecl n = (ProcedureDecl) this.node();
         prettyPrintName(w, tr);
 
         w.write("(");

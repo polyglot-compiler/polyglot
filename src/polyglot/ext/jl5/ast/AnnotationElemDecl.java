@@ -25,6 +25,7 @@
  ******************************************************************************/
 package polyglot.ext.jl5.ast;
 
+import polyglot.ast.Id;
 import polyglot.ast.MethodDecl;
 import polyglot.ast.Term;
 import polyglot.ast.TypeNode;
@@ -33,27 +34,33 @@ import polyglot.types.Flags;
 
 public interface AnnotationElemDecl extends MethodDecl {
 
-    AnnotationElemDecl type(TypeNode type);
-
     TypeNode type();
 
-    @Override
-    AnnotationElemDecl flags(Flags flags);
+    AnnotationElemDecl type(TypeNode type);
 
     @Override
     Flags flags();
 
-    AnnotationElemDecl defaultVal(Term def);
+    @Override
+    AnnotationElemDecl flags(Flags flags);
 
     Term defaultVal();
 
+    AnnotationElemDecl defaultVal(Term def);
+
     @Override
-    AnnotationElemDecl name(String name);
+    Id id();
+
+    @Override
+    AnnotationElemDecl id(Id id);
 
     @Override
     String name();
 
-    AnnotationElemDecl annotationElemInstance(AnnotationTypeElemInstance ai);
+    @Override
+    AnnotationElemDecl name(String name);
 
     AnnotationTypeElemInstance annotationElemInstance();
+
+    AnnotationElemDecl annotationElemInstance(AnnotationTypeElemInstance ai);
 }

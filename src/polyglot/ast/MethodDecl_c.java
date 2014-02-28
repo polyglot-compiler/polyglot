@@ -29,12 +29,10 @@ package polyglot.ast;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 
 import polyglot.main.Report;
 import polyglot.translate.ExtensionRewriter;
-import polyglot.types.CodeInstance;
 import polyglot.types.Context;
 import polyglot.types.Flags;
 import polyglot.types.MemberInstance;
@@ -47,12 +45,10 @@ import polyglot.types.TypeSystem;
 import polyglot.util.CodeWriter;
 import polyglot.util.CollectionUtil;
 import polyglot.util.Copy;
-import polyglot.util.ListUtil;
 import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
 import polyglot.visit.AmbiguityRemover;
 import polyglot.visit.CFGBuilder;
-import polyglot.visit.ExceptionChecker;
 import polyglot.visit.NodeVisitor;
 import polyglot.visit.PrettyPrinter;
 import polyglot.visit.TypeBuilder;
@@ -61,29 +57,17 @@ import polyglot.visit.TypeChecker;
 /**
  * A method declaration.
  */
-public class MethodDecl_c extends Term_c implements MethodDecl,
-        ProcedureDeclOps {
+public class MethodDecl_c extends ProcedureDecl_c implements MethodDecl {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
-    protected Flags flags;
     protected TypeNode returnType;
-    protected Id name;
-    protected List<Formal> formals;
-    protected List<TypeNode> throwTypes;
-    protected Block body;
     protected MethodInstance mi;
 
     public MethodDecl_c(Position pos, Flags flags, TypeNode returnType,
             Id name, List<Formal> formals, List<TypeNode> throwTypes, Block body) {
-        super(pos);
-        assert (flags != null && returnType != null && name != null
-                && formals != null && throwTypes != null); // body may be null
-        this.flags = flags;
+        super(pos, flags, name, formals, throwTypes, body);
+        assert (returnType != null);
         this.returnType = returnType;
-        this.name = name;
-        this.formals = ListUtil.copy(formals, true);
-        this.throwTypes = ListUtil.copy(throwTypes, true);
-        this.body = body;
     }
 
     @Override
@@ -94,23 +78,6 @@ public class MethodDecl_c extends Term_c implements MethodDecl,
     @Override
     public MemberInstance memberInstance() {
         return mi;
-    }
-
-    @Override
-    public Flags flags() {
-        return this.flags;
-    }
-
-    @Override
-    public MethodDecl flags(Flags flags) {
-        return flags(this, flags);
-    }
-
-    protected <N extends MethodDecl_c> N flags(N n, Flags flags) {
-        if (n.flags.equals(flags)) return n;
-        if (n == this) n = Copy.Util.copy(n);
-        n.flags = flags;
-        return n;
     }
 
     @Override
@@ -128,95 +95,6 @@ public class MethodDecl_c extends Term_c implements MethodDecl,
         if (n == this) n = Copy.Util.copy(n);
         n.returnType = returnType;
         return n;
-    }
-
-    @Override
-    public Id id() {
-        return this.name;
-    }
-
-    @Override
-    public MethodDecl id(Id name) {
-        return id(this, name);
-    }
-
-    protected <N extends MethodDecl_c> N id(N n, Id name) {
-        if (n.name == name) return n;
-        if (n == this) n = Copy.Util.copy(n);
-        n.name = name;
-        return n;
-    }
-
-    @Override
-    public String name() {
-        return this.name.id();
-    }
-
-    @Override
-    public MethodDecl name(String name) {
-        return id(this.name.id(name));
-    }
-
-    @Override
-    public List<Formal> formals() {
-        return this.formals;
-    }
-
-    @Override
-    public MethodDecl formals(List<Formal> formals) {
-        return formals(this, formals);
-    }
-
-    protected <N extends MethodDecl_c> N formals(N n, List<Formal> formals) {
-        if (CollectionUtil.equals(n.formals, formals)) return n;
-        if (n == this) n = Copy.Util.copy(n);
-        n.formals = ListUtil.copy(formals, true);
-        return n;
-    }
-
-    @Override
-    public List<TypeNode> throwTypes() {
-        return this.throwTypes;
-    }
-
-    @Override
-    public MethodDecl throwTypes(List<TypeNode> throwTypes) {
-        return throwTypes(this, throwTypes);
-    }
-
-    protected <N extends MethodDecl_c> N throwTypes(N n,
-            List<TypeNode> throwTypes) {
-        if (CollectionUtil.equals(n.throwTypes, throwTypes)) return n;
-        if (n == this) n = Copy.Util.copy(n);
-        n.throwTypes = ListUtil.copy(throwTypes, true);
-        return n;
-    }
-
-    @Override
-    public Term codeBody() {
-        return body();
-    }
-
-    @Override
-    public Block body() {
-        return this.body;
-    }
-
-    @Override
-    public MethodDecl body(Block body) {
-        return body(this, body);
-    }
-
-    protected <N extends MethodDecl_c> N body(N n, Block body) {
-        if (n.body == body) return n;
-        if (n == this) n = Copy.Util.copy(n);
-        n.body = body;
-        return n;
-    }
-
-    @Override
-    public CodeInstance codeInstance() {
-        return procedureInstance();
     }
 
     @Override
@@ -264,11 +142,6 @@ public class MethodDecl_c extends Term_c implements MethodDecl,
     }
 
     @Override
-    public NodeVisitor buildTypesEnter(TypeBuilder tb) throws SemanticException {
-        return tb.pushCode();
-    }
-
-    @Override
     public Node buildTypes(TypeBuilder tb) throws SemanticException {
         TypeSystem ts = tb.typeSystem();
 
@@ -308,39 +181,11 @@ public class MethodDecl_c extends Term_c implements MethodDecl,
 
     @Override
     public Node disambiguate(AmbiguityRemover ar) throws SemanticException {
-        if (this.mi.isCanonical()) {
-            // already done
-            return this;
-        }
-
         if (!returnType.isDisambiguated()) {
             return this;
         }
-
         mi.setReturnType(returnType.type());
-
-        List<Type> formalTypes = new LinkedList<Type>();
-        List<Type> throwTypes = new LinkedList<Type>();
-
-        for (Formal f : formals) {
-            if (!f.isDisambiguated()) {
-                return this;
-            }
-            formalTypes.add(f.declType());
-        }
-
-        mi.setFormalTypes(formalTypes);
-
-        for (TypeNode tn : throwTypes()) {
-            if (!tn.isDisambiguated()) {
-                return this;
-            }
-            throwTypes.add(tn.type());
-        }
-
-        mi.setThrowTypes(throwTypes);
-
-        return this;
+        return super.disambiguate(ar);
     }
 
     @Override
@@ -431,12 +276,6 @@ public class MethodDecl_c extends Term_c implements MethodDecl,
     }
 
     @Override
-    public NodeVisitor exceptionCheckEnter(ExceptionChecker ec)
-            throws SemanticException {
-        return ec.push(methodInstance().throwTypes());
-    }
-
-    @Override
     public Node extRewrite(ExtensionRewriter rw) throws SemanticException {
         MethodDecl_c n = (MethodDecl_c) super.extRewrite(rw);
         n = methodInstance(n, null);
@@ -491,27 +330,8 @@ public class MethodDecl_c extends Term_c implements MethodDecl,
     }
 
     @Override
-    public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
-        ((JLang) tr.lang()).prettyPrintHeader(this, flags(), w, tr);
-
-        if (body != null) {
-            printSubStmt(body, w, tr);
-        }
-        else {
-            w.write(";");
-        }
-    }
-
-    @Override
     public void dump(CodeWriter w) {
         super.dump(w);
-
-        if (mi != null) {
-            w.allowBreak(4, " ");
-            w.begin(0);
-            w.write("(instance " + mi + ")");
-            w.end();
-        }
 
         w.allowBreak(4, " ");
         w.begin(0);

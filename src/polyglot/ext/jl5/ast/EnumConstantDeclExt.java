@@ -83,10 +83,7 @@ public class EnumConstantDeclExt extends JL5AnnotatedElementExt {
         }
 
         // Now visit the annotations
-        nn =
-                (EnumConstantDecl) annotationElems(nn,
-                                                   nn.visitList(annotationElems(nn),
-                                                                childbd));
+        nn = annotationElems(nn, nn.visitList(annotations, childbd));
 
         nn = (EnumConstantDecl) bd.leave(parent, old, nn, childbd);
 
@@ -95,12 +92,8 @@ public class EnumConstantDeclExt extends JL5AnnotatedElementExt {
 
     @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
-        Node n = this.node();
-        for (AnnotationElem ae : annotationElems(n)) {
-            tr.lang().prettyPrint(ae, w, tr);
-            w.newline();
-        }
-        superLang().prettyPrint(n, w, tr);
+        super.prettyPrint(w, tr);
+        superLang().prettyPrint(node(), w, tr);
     }
 
     @Override

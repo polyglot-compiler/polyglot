@@ -31,11 +31,11 @@ import polyglot.ast.Id;
 import polyglot.ast.TypeNode;
 
 public interface ParamTypeNode extends TypeNode {
-    ParamTypeNode id(Id id);
-
     Id id();
 
-    ParamTypeNode bounds(List<TypeNode> l);
+    ParamTypeNode id(Id id);
 
     List<TypeNode> bounds();
+
+    ParamTypeNode bounds(List<TypeNode> bounds);
 }

@@ -51,7 +51,7 @@ import polyglot.types.Type;
 import polyglot.types.UnknownType;
 import polyglot.util.CodeWriter;
 import polyglot.util.CollectionUtil;
-import polyglot.util.ListUtil;
+import polyglot.util.Copy;
 import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
 import polyglot.visit.AscriptionVisitor;
@@ -89,14 +89,14 @@ public class EnumConstantDecl_c extends Term_c implements EnumConstantDecl {
 
     @Override
     public EnumConstantDecl ordinal(long ordinal) {
-        EnumConstantDecl_c n = (EnumConstantDecl_c) copy();
-        n.ordinal = ordinal;
-        return n;
+        return ordinal(this, ordinal);
     }
 
-    @Override
-    public MemberInstance memberInstance() {
-        return enumInstance;
+    protected <N extends EnumConstantDecl_c> N ordinal(N n, long ordinal) {
+        if (n.ordinal == ordinal) return n;
+        if (n == this) n = Copy.Util.copy(n);
+        n.ordinal = ordinal;
+        return n;
     }
 
     @Override
@@ -106,7 +106,12 @@ public class EnumConstantDecl_c extends Term_c implements EnumConstantDecl {
 
     @Override
     public EnumConstantDecl args(List<Expr> args) {
-        EnumConstantDecl_c n = (EnumConstantDecl_c) copy();
+        return args(this, args);
+    }
+
+    protected <N extends EnumConstantDecl_c> N args(N n, List<Expr> args) {
+        if (CollectionUtil.equals(n.args, args)) return n;
+        if (n == this) n = Copy.Util.copy(n);
         n.args = args;
         return n;
     }
@@ -118,7 +123,12 @@ public class EnumConstantDecl_c extends Term_c implements EnumConstantDecl {
 
     @Override
     public EnumConstantDecl name(Id name) {
-        EnumConstantDecl_c n = (EnumConstantDecl_c) copy();
+        return name(this, name);
+    }
+
+    protected <N extends EnumConstantDecl_c> N name(N n, Id name) {
+        if (n.name == name) return n;
+        if (n == this) n = Copy.Util.copy(n);
         n.name = name;
         return n;
     }
@@ -130,7 +140,12 @@ public class EnumConstantDecl_c extends Term_c implements EnumConstantDecl {
 
     @Override
     public EnumConstantDecl body(ClassBody body) {
-        EnumConstantDecl_c n = (EnumConstantDecl_c) copy();
+        return body(this, body);
+    }
+
+    protected <N extends EnumConstantDecl_c> N body(N n, ClassBody body) {
+        if (n.body == body) return n;
+        if (n == this) n = Copy.Util.copy(n);
         n.body = body;
         return n;
     }
@@ -141,22 +156,20 @@ public class EnumConstantDecl_c extends Term_c implements EnumConstantDecl {
     }
 
     @Override
-    public Flags flags() {
-        return flags;
-    }
-
-    @Override
     public EnumConstantDecl type(ParsedClassType pct) {
-        EnumConstantDecl_c n = (EnumConstantDecl_c) copy();
-        n.type = pct;
+        return type(this, pct);
+    }
+
+    protected <N extends EnumConstantDecl_c> N type(N n, ParsedClassType type) {
+        if (n.type == type) return n;
+        if (n == this) n = Copy.Util.copy(n);
+        n.type = type;
         return n;
     }
 
     @Override
-    public EnumConstantDecl enumInstance(EnumInstance ei) {
-        EnumConstantDecl_c n = (EnumConstantDecl_c) copy();
-        n.enumInstance = ei;
-        return n;
+    public MemberInstance memberInstance() {
+        return enumInstance();
     }
 
     @Override
@@ -165,9 +178,14 @@ public class EnumConstantDecl_c extends Term_c implements EnumConstantDecl {
     }
 
     @Override
-    public EnumConstantDecl constructorInstance(ConstructorInstance ci) {
-        EnumConstantDecl_c n = (EnumConstantDecl_c) copy();
-        n.constructorInstance = ci;
+    public EnumConstantDecl enumInstance(EnumInstance ei) {
+        return enumInstance(this, ei);
+    }
+
+    protected <N extends EnumConstantDecl_c> N enumInstance(N n, EnumInstance ei) {
+        if (n.enumInstance == ei) return n;
+        if (n == this) n = Copy.Util.copy(n);
+        n.enumInstance = ei;
         return n;
     }
 
@@ -176,14 +194,29 @@ public class EnumConstantDecl_c extends Term_c implements EnumConstantDecl {
         return constructorInstance;
     }
 
+    @Override
+    public EnumConstantDecl constructorInstance(ConstructorInstance ci) {
+        return constructorInstance(this, ci);
+    }
+
+    protected <N extends EnumConstantDecl_c> N constructorInstance(N n,
+            ConstructorInstance ci) {
+        if (n.constructorInstance == ci) return n;
+        if (n == this) n = Copy.Util.copy(n);
+        n.constructorInstance = ci;
+        return n;
+    }
+
+    @Override
+    public Flags flags() {
+        return flags;
+    }
+
     protected EnumConstantDecl_c reconstruct(List<Expr> args, ClassBody body) {
-        if (!CollectionUtil.equals(args, this.args) || body != this.body) {
-            EnumConstantDecl_c n = (EnumConstantDecl_c) copy();
-            n.args = ListUtil.<Expr> copy(args, true);
-            n.body = body;
-            return n;
-        }
-        return this;
+        EnumConstantDecl_c n = this;
+        n = args(n, args);
+        n = body(n, body);
+        return n;
     }
 
     @Override
@@ -224,11 +257,12 @@ public class EnumConstantDecl_c extends Term_c implements EnumConstantDecl {
                                        l,
                                        Collections.<Type> emptyList());
 
-        EnumConstantDecl n = constructorInstance(ci);
+        EnumConstantDecl_c n = this;
+        n = constructorInstance(n, ci);
         JL5ParsedClassType enumType = null;
         if (n.body() != null) {
             ParsedClassType type = tb.currentClass();
-            n = n.type(type);
+            n = type(n, type);
             type.setMembersAdded(true);
             enumType = (JL5ParsedClassType) tb.pop().currentClass();
 
@@ -241,7 +275,7 @@ public class EnumConstantDecl_c extends Term_c implements EnumConstantDecl {
         else {
             // this is not an anonymous class extending the enum
             enumType = (JL5ParsedClassType) tb.currentClass();
-            n = n.type(enumType);
+            n = type(n, enumType);
         }
 
         // now add the appropriate enum declaration to the containing class
@@ -255,7 +289,7 @@ public class EnumConstantDecl_c extends Term_c implements EnumConstantDecl {
                                 name.id(),
                                 ordinal);
         enumType.addEnumConstant(ei);
-        n = n.enumInstance(ei);
+        n = enumInstance(n, ei);
 
         return n;
     }
@@ -273,8 +307,7 @@ public class EnumConstantDecl_c extends Term_c implements EnumConstantDecl {
 
         ConstructorInstance ci =
                 ts.findConstructor(ct, argTypes, c.currentClass());
-        EnumConstantDecl_c n =
-                (EnumConstantDecl_c) this.constructorInstance(ci);
+        EnumConstantDecl_c n = constructorInstance(this, ci);
 
         if (n.flags() != Flags.NONE) {
             throw new SemanticException("Cannot have modifier(s): " + flags
@@ -308,8 +341,11 @@ public class EnumConstantDecl_c extends Term_c implements EnumConstantDecl {
 
     @Override
     public Node extRewrite(ExtensionRewriter rw) throws SemanticException {
-        EnumConstantDecl n = (EnumConstantDecl) super.extRewrite(rw);
-        return n.enumInstance(null).constructorInstance(null).type(null);
+        EnumConstantDecl_c n = (EnumConstantDecl_c) super.extRewrite(rw);
+        n = enumInstance(n, null);
+        n = constructorInstance(n, null);
+        n = type(n, null);
+        return n;
     }
 
     @Override
