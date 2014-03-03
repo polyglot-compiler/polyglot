@@ -120,8 +120,7 @@ public class Local_c extends Expr_c implements Local {
     }
 
     /** Reconstruct the expression. */
-    protected Local_c reconstruct(Id name) {
-        Local_c n = this;
+    protected <N extends Local_c> N reconstruct(N n, Id name) {
         n = id(n, name);
         return n;
     }
@@ -129,7 +128,7 @@ public class Local_c extends Expr_c implements Local {
     @Override
     public Node visitChildren(NodeVisitor v) {
         Id name = visitChild(this.name, v);
-        return reconstruct(name);
+        return reconstruct(this, name);
     }
 
     @Override

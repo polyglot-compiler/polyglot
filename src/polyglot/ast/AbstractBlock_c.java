@@ -91,8 +91,8 @@ public abstract class AbstractBlock_c extends Stmt_c implements Block {
     }
 
     /** Reconstruct the block. */
-    protected AbstractBlock_c reconstruct(List<Stmt> statements) {
-        AbstractBlock_c n = this;
+    protected <N extends AbstractBlock_c> N reconstruct(N n,
+            List<Stmt> statements) {
         n = statements(n, statements);
         return n;
     }
@@ -100,7 +100,7 @@ public abstract class AbstractBlock_c extends Stmt_c implements Block {
     @Override
     public Node visitChildren(NodeVisitor v) {
         List<Stmt> statements = visitList(this.statements, v);
-        return reconstruct(statements);
+        return reconstruct(this, statements);
     }
 
     @Override

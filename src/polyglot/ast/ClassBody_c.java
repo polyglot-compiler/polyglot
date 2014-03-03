@@ -90,8 +90,8 @@ public class ClassBody_c extends Term_c implements ClassBody {
         return members(l);
     }
 
-    protected ClassBody_c reconstruct(List<ClassMember> members) {
-        ClassBody_c n = this;
+    protected <N extends ClassBody_c> N reconstruct(N n,
+            List<ClassMember> members) {
         n = members(n, members);
         return n;
     }
@@ -99,7 +99,7 @@ public class ClassBody_c extends Term_c implements ClassBody {
     @Override
     public Node visitChildren(NodeVisitor v) {
         List<ClassMember> members = visitList(this.members, v);
-        return reconstruct(members);
+        return reconstruct(this, members);
     }
 
     @Override

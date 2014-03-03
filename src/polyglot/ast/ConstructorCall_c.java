@@ -161,8 +161,8 @@ public class ConstructorCall_c extends Stmt_c implements ConstructorCall,
     }
 
     /** Reconstruct the constructor call. */
-    protected ConstructorCall_c reconstruct(Expr qualifier, List<Expr> arguments) {
-        ConstructorCall_c n = this;
+    protected <N extends ConstructorCall_c> N reconstruct(N n, Expr qualifier,
+            List<Expr> arguments) {
         n = qualifier(n, qualifier);
         n = arguments(n, arguments);
         return n;
@@ -172,7 +172,7 @@ public class ConstructorCall_c extends Stmt_c implements ConstructorCall,
     public Node visitChildren(NodeVisitor v) {
         Expr qualifier = visitChild(this.qualifier, v);
         List<Expr> arguments = visitList(this.arguments, v);
-        return reconstruct(qualifier, arguments);
+        return reconstruct(this, qualifier, arguments);
     }
 
     @Override

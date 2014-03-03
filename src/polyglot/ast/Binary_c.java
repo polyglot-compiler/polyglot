@@ -137,8 +137,7 @@ public class Binary_c extends Expr_c implements Binary {
     }
 
     /** Reconstruct the expression. */
-    protected Binary_c reconstruct(Expr left, Expr right) {
-        Binary_c n = this;
+    protected <N extends Binary_c> N reconstruct(N n, Expr left, Expr right) {
         n = left(n, left);
         n = right(n, right);
         return n;
@@ -148,7 +147,7 @@ public class Binary_c extends Expr_c implements Binary {
     public Node visitChildren(NodeVisitor v) {
         Expr left = visitChild(this.left, v);
         Expr right = visitChild(this.right, v);
-        return reconstruct(left, right);
+        return reconstruct(this, left, right);
     }
 
     @Override

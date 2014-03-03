@@ -99,8 +99,7 @@ public class Unary_c extends Expr_c implements Unary {
     }
 
     /** Reconstruct the expression. */
-    protected Unary_c reconstruct(Expr expr) {
-        Unary_c n = this;
+    protected <N extends Unary_c> N reconstruct(N n, Expr expr) {
         n = expr(n, expr);
         return n;
     }
@@ -108,7 +107,7 @@ public class Unary_c extends Expr_c implements Unary {
     @Override
     public Node visitChildren(NodeVisitor v) {
         Expr expr = visitChild(this.expr, v);
-        return reconstruct(expr);
+        return reconstruct(this, expr);
     }
 
     @Override

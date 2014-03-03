@@ -99,8 +99,7 @@ public class Branch_c extends Stmt_c implements Branch {
     }
 
     /** Reconstruct the expression. */
-    protected Branch_c reconstruct(Id label) {
-        Branch_c n = this;
+    protected <N extends Branch_c> N reconstruct(N n, Id label) {
         n = labelNode(n, label);
         return n;
     }
@@ -108,7 +107,7 @@ public class Branch_c extends Stmt_c implements Branch {
     @Override
     public Node visitChildren(NodeVisitor v) {
         Id label = visitChild(this.label, v);
-        return reconstruct(label);
+        return reconstruct(this, label);
     }
 
     @Override

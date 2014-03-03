@@ -35,6 +35,6 @@ public interface Do extends Loop {
     @Override
     Do body(Stmt body);
 
-    /** Set the condition of the do statement. */
+    @Override
     Do cond(Expr cond);
 }

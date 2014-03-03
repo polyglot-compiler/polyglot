@@ -44,7 +44,7 @@ public interface For extends Loop {
      */
     For inits(List<ForInit> inits);
 
-    /** Set the loop condition */
+    @Override
     For cond(Expr cond);
 
     /** List of iterator expressions.
@@ -57,7 +57,6 @@ public interface For extends Loop {
      */
     For iters(List<ForUpdate> iters);
 
-    /** Set the loop body */
     @Override
     For body(Stmt body);
 }

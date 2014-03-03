@@ -155,8 +155,7 @@ public class Formal_c extends Term_c implements Formal {
     }
 
     /** Reconstruct the formal. */
-    protected Formal_c reconstruct(TypeNode type, Id name) {
-        Formal_c n = this;
+    protected <N extends Formal_c> N reconstruct(N n, TypeNode type, Id name) {
         n = type(n, type);
         n = id(n, name);
         return n;
@@ -166,7 +165,7 @@ public class Formal_c extends Term_c implements Formal {
     public Node visitChildren(NodeVisitor v) {
         TypeNode type = visitChild(this.type, v);
         Id name = visitChild(this.name, v);
-        return reconstruct(type, name);
+        return reconstruct(this, type, name);
     }
 
     @Override

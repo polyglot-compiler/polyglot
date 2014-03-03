@@ -185,6 +185,16 @@ public abstract class ProcedureDecl_c extends Term_c implements ProcedureDecl,
         return tb.pushCode();
     }
 
+    /** Reconstruct the procedure. */
+    protected <N extends ProcedureDecl_c> N reconstruct(N n, Id name,
+            List<Formal> formals, List<TypeNode> throwTypes, Block body) {
+        n = id(n, name);
+        n = formals(n, formals);
+        n = throwTypes(n, throwTypes);
+        n = body(n, body);
+        return n;
+    }
+
     @Override
     public Node disambiguate(AmbiguityRemover ar) throws SemanticException {
         ProcedureInstance pi = procedureInstance();

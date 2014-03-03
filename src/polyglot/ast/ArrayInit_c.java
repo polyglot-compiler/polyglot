@@ -80,8 +80,7 @@ public class ArrayInit_c extends Expr_c implements ArrayInit {
     }
 
     /** Reconstruct the initializer. */
-    protected ArrayInit_c reconstruct(List<Expr> elements) {
-        ArrayInit_c n = this;
+    protected <N extends ArrayInit_c> N reconstruct(N n, List<Expr> elements) {
         n = elements(n, elements);
         return n;
     }
@@ -89,7 +88,7 @@ public class ArrayInit_c extends Expr_c implements ArrayInit {
     @Override
     public Node visitChildren(NodeVisitor v) {
         List<Expr> elements = visitList(this.elements, v);
-        return reconstruct(elements);
+        return reconstruct(this, elements);
     }
 
     @Override

@@ -99,24 +99,13 @@ public class ConstructorDecl_c extends ProcedureDecl_c implements
         return n;
     }
 
-    /** Reconstruct the constructor. */
-    protected ProcedureDecl_c reconstruct(Id name, List<Formal> formals,
-            List<TypeNode> throwTypes, Block body) {
-        ProcedureDecl_c n = this;
-        n = id(n, name);
-        n = formals(n, formals);
-        n = throwTypes(n, throwTypes);
-        n = body(n, body);
-        return n;
-    }
-
     @Override
     public Node visitChildren(NodeVisitor v) {
         Id name = visitChild(this.name, v);
         List<Formal> formals = visitList(this.formals, v);
         List<TypeNode> throwTypes = visitList(this.throwTypes, v);
         Block body = visitChild(this.body, v);
-        return reconstruct(name, formals, throwTypes, body);
+        return reconstruct(this, name, formals, throwTypes, body);
     }
 
     @Override

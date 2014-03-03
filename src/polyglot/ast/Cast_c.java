@@ -100,8 +100,7 @@ public class Cast_c extends Expr_c implements Cast {
     }
 
     /** Reconstruct the expression. */
-    protected Cast_c reconstruct(TypeNode castType, Expr expr) {
-        Cast_c n = this;
+    protected <N extends Cast_c> N reconstruct(N n, TypeNode castType, Expr expr) {
         n = castType(n, castType);
         n = expr(n, expr);
         return n;
@@ -111,7 +110,7 @@ public class Cast_c extends Expr_c implements Cast {
     public Node visitChildren(NodeVisitor v) {
         TypeNode castType = visitChild(this.castType, v);
         Expr expr = visitChild(this.expr, v);
-        return reconstruct(castType, expr);
+        return reconstruct(this, castType, expr);
     }
 
     @Override

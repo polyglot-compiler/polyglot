@@ -114,8 +114,8 @@ public class If_c extends Stmt_c implements If {
     }
 
     /** Reconstruct the statement. */
-    protected If_c reconstruct(Expr cond, Stmt consequent, Stmt alternative) {
-        If_c n = this;
+    protected <N extends If_c> N reconstruct(N n, Expr cond, Stmt consequent,
+            Stmt alternative) {
         n = cond(n, cond);
         n = consequent(n, consequent);
         n = alternative(n, alternative);
@@ -125,9 +125,9 @@ public class If_c extends Stmt_c implements If {
     @Override
     public Node visitChildren(NodeVisitor v) {
         Expr cond = visitChild(this.cond, v);
-        Node consequent = visitChild(this.consequent, v);
-        Node alternative = visitChild(this.alternative, v);
-        return reconstruct(cond, (Stmt) consequent, (Stmt) alternative);
+        Stmt consequent = visitChild(this.consequent, v);
+        Stmt alternative = visitChild(this.alternative, v);
+        return reconstruct(this, cond, consequent, alternative);
     }
 
     @Override

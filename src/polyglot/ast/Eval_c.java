@@ -72,10 +72,15 @@ public class Eval_c extends Stmt_c implements Eval {
     }
 
     /** Reconstruct the statement. */
-    protected Eval_c reconstruct(Expr expr) {
-        Eval_c n = this;
+    protected <N extends Eval_c> N reconstruct(N n, Expr expr) {
         n = expr(n, expr);
         return n;
+    }
+
+    @Override
+    public Node visitChildren(NodeVisitor v) {
+        Expr expr = visitChild(this.expr, v);
+        return reconstruct(this, expr);
     }
 
     @Override
@@ -87,12 +92,6 @@ public class Eval_c extends Stmt_c implements Eval {
         }
 
         return child.type();
-    }
-
-    @Override
-    public Node visitChildren(NodeVisitor v) {
-        Expr expr = visitChild(this.expr, v);
-        return reconstruct(expr);
     }
 
     @Override

@@ -145,8 +145,7 @@ public class Initializer_c extends Term_c implements Initializer {
     }
 
     /** Reconstruct the initializer. */
-    protected Initializer_c reconstruct(Block body) {
-        Initializer_c n = this;
+    protected <N extends Initializer_c> N reconstruct(N n, Block body) {
         n = body(n, body);
         return n;
     }
@@ -154,7 +153,7 @@ public class Initializer_c extends Term_c implements Initializer {
     @Override
     public Node visitChildren(NodeVisitor v) {
         Block body = visitChild(this.body, v);
-        return reconstruct(body);
+        return reconstruct(this, body);
     }
 
     @Override

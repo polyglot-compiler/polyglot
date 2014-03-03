@@ -118,8 +118,7 @@ public abstract class Assign_c extends Expr_c implements Assign {
     }
 
     /** Reconstruct the expression. */
-    protected Assign_c reconstruct(Expr left, Expr right) {
-        Assign_c n = this;
+    protected <N extends Assign_c> N reconstruct(N n, Expr left, Expr right) {
         n = left(n, left);
         n = right(n, right);
         return n;
@@ -129,7 +128,7 @@ public abstract class Assign_c extends Expr_c implements Assign {
     public Node visitChildren(NodeVisitor v) {
         Expr left = visitChild(this.left, v);
         Expr right = visitChild(this.right, v);
-        return reconstruct(left, right);
+        return reconstruct(this, left, right);
     }
 
     @Override

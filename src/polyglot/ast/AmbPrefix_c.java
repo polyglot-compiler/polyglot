@@ -100,8 +100,7 @@ public class AmbPrefix_c extends Node_c implements AmbPrefix {
     }
 
     /** Reconstruct the prefix. */
-    protected AmbPrefix_c reconstruct(Prefix prefix, Id name) {
-        AmbPrefix_c n = this;
+    protected <N extends AmbPrefix_c> N reconstruct(N n, Prefix prefix, Id name) {
         n = prefix(n, prefix);
         n = id(n, name);
         return n;
@@ -111,7 +110,7 @@ public class AmbPrefix_c extends Node_c implements AmbPrefix {
     public Node visitChildren(NodeVisitor v) {
         Prefix prefix = visitChild(this.prefix, v);
         Id name = visitChild(this.name, v);
-        return reconstruct(prefix, name);
+        return reconstruct(this, prefix, name);
     }
 
     @Override

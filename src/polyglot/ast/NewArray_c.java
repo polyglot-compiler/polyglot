@@ -151,9 +151,8 @@ public class NewArray_c extends Expr_c implements NewArray {
     }
 
     /** Reconstruct the expression. */
-    protected NewArray_c reconstruct(TypeNode baseType, List<Expr> dims,
-            ArrayInit init) {
-        NewArray_c n = this;
+    protected <N extends NewArray_c> N reconstruct(N n, TypeNode baseType,
+            List<Expr> dims, ArrayInit init) {
         n = baseType(n, baseType);
         n = dims(n, dims);
         n = init(n, init);
@@ -165,7 +164,7 @@ public class NewArray_c extends Expr_c implements NewArray {
         TypeNode baseType = visitChild(this.baseType, v);
         List<Expr> dims = visitList(this.dims, v);
         ArrayInit init = visitChild(this.init, v);
-        return reconstruct(baseType, dims, init);
+        return reconstruct(this, baseType, dims, init);
     }
 
     @Override

@@ -98,8 +98,8 @@ public class Instanceof_c extends Expr_c implements Instanceof {
     }
 
     /** Reconstruct the expression. */
-    protected Instanceof_c reconstruct(Expr expr, TypeNode compareType) {
-        Instanceof_c n = this;
+    protected <N extends Instanceof_c> N reconstruct(N n, Expr expr,
+            TypeNode compareType) {
         n = expr(n, expr);
         n = compareType(n, compareType);
         return n;
@@ -109,7 +109,7 @@ public class Instanceof_c extends Expr_c implements Instanceof {
     public Node visitChildren(NodeVisitor v) {
         Expr expr = visitChild(this.expr, v);
         TypeNode compareType = visitChild(this.compareType, v);
-        return reconstruct(expr, compareType);
+        return reconstruct(this, expr, compareType);
     }
 
     @Override

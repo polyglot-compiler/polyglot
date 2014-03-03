@@ -164,9 +164,8 @@ public class SourceFile_c extends Node_c implements SourceFile {
     }
 
     /** Reconstruct the source file. */
-    protected SourceFile_c reconstruct(PackageNode package_,
+    protected <N extends SourceFile_c> N reconstruct(N n, PackageNode package_,
             List<Import> imports, List<TopLevelDecl> decls) {
-        SourceFile_c n = this;
         n = package_(n, package_);
         n = imports(n, imports);
         n = decls(n, decls);
@@ -178,7 +177,7 @@ public class SourceFile_c extends Node_c implements SourceFile {
         PackageNode package_ = visitChild(this.package_, v);
         List<Import> imports = visitList(this.imports, v);
         List<TopLevelDecl> decls = visitList(this.decls, v);
-        return reconstruct(package_, imports, decls);
+        return reconstruct(this, package_, imports, decls);
     }
 
     /**

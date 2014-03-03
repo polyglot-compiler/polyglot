@@ -98,8 +98,7 @@ public class Case_c extends Stmt_c implements Case {
     }
 
     /** Reconstruct the statement. */
-    protected Case_c reconstruct(Expr expr) {
-        Case_c n = this;
+    protected <N extends Case_c> N reconstruct(N n, Expr expr) {
         n = expr(n, expr);
         return n;
     }
@@ -107,7 +106,7 @@ public class Case_c extends Stmt_c implements Case {
     @Override
     public Node visitChildren(NodeVisitor v) {
         Expr expr = visitChild(this.expr, v);
-        return reconstruct(expr);
+        return reconstruct(this, expr);
     }
 
     @Override

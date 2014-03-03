@@ -78,8 +78,8 @@ public class SourceCollection_c extends Node_c implements SourceCollection {
     }
 
     /** Reconstruct the collection. */
-    protected SourceCollection_c reconstruct(List<SourceFile> sources) {
-        SourceCollection_c n = this;
+    protected <N extends SourceCollection_c> N reconstruct(N n,
+            List<SourceFile> sources) {
         n = sources(n, sources);
         return n;
     }
@@ -87,7 +87,7 @@ public class SourceCollection_c extends Node_c implements SourceCollection {
     @Override
     public Node visitChildren(NodeVisitor v) {
         List<SourceFile> sources = visitList(this.sources, v);
-        return reconstruct(sources);
+        return reconstruct(this, sources);
     }
 
     @Override

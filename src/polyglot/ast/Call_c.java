@@ -187,8 +187,8 @@ public class Call_c extends Expr_c implements Call, CallOps {
     }
 
     /** Reconstruct the call. */
-    protected Call_c reconstruct(Receiver target, Id name, List<Expr> arguments) {
-        Call_c n = this;
+    protected <N extends Call_c> N reconstruct(N n, Receiver target, Id name,
+            List<Expr> arguments) {
         n = target(n, target);
         n = id(n, name);
         n = arguments(n, arguments);
@@ -200,7 +200,7 @@ public class Call_c extends Expr_c implements Call, CallOps {
         Receiver target = visitChild(this.target, v);
         Id name = visitChild(this.name, v);
         List<Expr> arguments = visitList(this.arguments, v);
-        return reconstruct(target, name, arguments);
+        return reconstruct(this, target, name, arguments);
     }
 
     @Override

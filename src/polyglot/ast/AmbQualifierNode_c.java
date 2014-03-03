@@ -120,8 +120,8 @@ public class AmbQualifierNode_c extends Node_c implements AmbQualifierNode {
         return n;
     }
 
-    protected AmbQualifierNode_c reconstruct(QualifierNode qual, Id name) {
-        AmbQualifierNode_c n = this;
+    protected <N extends AmbQualifierNode_c> N reconstruct(N n,
+            QualifierNode qual, Id name) {
         n = n.qual(n, qual);
         n = n.id(n, name);
         return n;
@@ -131,7 +131,7 @@ public class AmbQualifierNode_c extends Node_c implements AmbQualifierNode {
     public Node visitChildren(NodeVisitor v) {
         Id name = visitChild(this.name, v);
         QualifierNode qual = visitChild(this.qual, v);
-        return reconstruct(qual, name);
+        return reconstruct(this, qual, name);
     }
 
     @Override

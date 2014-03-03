@@ -98,8 +98,7 @@ public class Labeled_c extends Stmt_c implements Labeled {
     }
 
     /** Reconstruct the statement. */
-    protected Labeled_c reconstruct(Id label, Stmt statement) {
-        Labeled_c n = this;
+    protected <N extends Labeled_c> N reconstruct(N n, Id label, Stmt statement) {
         n = labelNode(n, label);
         n = statement(n, statement);
         return n;
@@ -109,7 +108,7 @@ public class Labeled_c extends Stmt_c implements Labeled {
     public Node visitChildren(NodeVisitor v) {
         Id label = visitChild(this.label, v);
         Stmt statement = visitChild(this.statement, v);
-        return reconstruct(label, statement);
+        return reconstruct(this, label, statement);
     }
 
     @Override

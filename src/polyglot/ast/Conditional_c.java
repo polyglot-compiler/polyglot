@@ -119,9 +119,8 @@ public class Conditional_c extends Expr_c implements Conditional {
     }
 
     /** Reconstruct the expression. */
-    protected Conditional_c reconstruct(Expr cond, Expr consequent,
-            Expr alternative) {
-        Conditional_c n = this;
+    protected <N extends Conditional_c> N reconstruct(N n, Expr cond,
+            Expr consequent, Expr alternative) {
         n = cond(n, cond);
         n = consequent(n, consequent);
         n = alternative(n, alternative);
@@ -133,7 +132,7 @@ public class Conditional_c extends Expr_c implements Conditional {
         Expr cond = visitChild(this.cond, v);
         Expr consequent = visitChild(this.consequent, v);
         Expr alternative = visitChild(this.alternative, v);
-        return reconstruct(cond, consequent, alternative);
+        return reconstruct(this, cond, consequent, alternative);
     }
 
     @Override

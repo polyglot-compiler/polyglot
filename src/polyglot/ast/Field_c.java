@@ -172,8 +172,7 @@ public class Field_c extends Expr_c implements Field {
     }
 
     /** Reconstruct the field. */
-    protected Field_c reconstruct(Receiver target, Id name) {
-        Field_c n = this;
+    protected <N extends Field_c> N reconstruct(N n, Receiver target, Id name) {
         n = target(n, target);
         n = id(n, name);
         return n;
@@ -183,7 +182,7 @@ public class Field_c extends Expr_c implements Field {
     public Node visitChildren(NodeVisitor v) {
         Receiver target = visitChild(this.target, v);
         Id name = visitChild(this.name, v);
-        return reconstruct(target, name);
+        return reconstruct(this, target, name);
     }
 
     @Override

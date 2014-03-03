@@ -212,9 +212,8 @@ public class ClassDecl_c extends Term_c implements ClassDecl, ClassDeclOps {
         return n;
     }
 
-    protected ClassDecl_c reconstruct(Id name, TypeNode superClass,
-            List<TypeNode> interfaces, ClassBody body) {
-        ClassDecl_c n = this;
+    protected <N extends ClassDecl_c> N reconstruct(N n, Id name,
+            TypeNode superClass, List<TypeNode> interfaces, ClassBody body) {
         n = id(n, name);
         n = superClass(n, superClass);
         n = interfaces(n, interfaces);
@@ -223,23 +222,12 @@ public class ClassDecl_c extends Term_c implements ClassDecl, ClassDeclOps {
     }
 
     @Override
-    public Term firstChild() {
-        return body();
-    }
-
-    @Override
-    public <T> List<T> acceptCFG(CFGBuilder<?> v, List<T> succs) {
-        v.visitCFG(this.body(), this, EXIT);
-        return succs;
-    }
-
-    @Override
     public Node visitChildren(NodeVisitor v) {
         Id name = visitChild(this.name, v);
         TypeNode superClass = visitChild(this.superClass, v);
         List<TypeNode> interfaces = visitList(this.interfaces, v);
         ClassBody body = visitChild(this.body, v);
-        return reconstruct(name, superClass, interfaces, body);
+        return reconstruct(this, name, superClass, interfaces, body);
     }
 
     @Override
@@ -640,6 +628,17 @@ public class ClassDecl_c extends Term_c implements ClassDecl, ClassDeclOps {
         if (n == this) n = Copy.Util.copy(n);
         n.defaultCI = null;
         return n;
+    }
+
+    @Override
+    public Term firstChild() {
+        return body();
+    }
+
+    @Override
+    public <T> List<T> acceptCFG(CFGBuilder<?> v, List<T> succs) {
+        v.visitCFG(this.body(), this, EXIT);
+        return succs;
     }
 
     @Override

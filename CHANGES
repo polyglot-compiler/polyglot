@@ -9,8 +9,8 @@ XXX, 2014 : Polyglot ???
 ===============================
 
 Delegate objects and delegate factories are now deprecated.  AST nodes in
-an extension need not be attached with delegate objects.  Rather, an instance of
-type polyglot.ast.Lang, alongside extension objects, defines appropriate
+an extension need not be attached with delegate objects.  Rather, a _language
+dispatcher_, an instance of type polyglot.ast.Lang, defines appropriate
 dispatching mechanisms for all AST nodes.  Any class implementing Lang should be
 singleton; multiple instances of the same Lang implementation are unnecessary.
 
@@ -33,6 +33,12 @@ our customized CUP parser.
 
 Deprecated features should still work with this version, with the exception of
 any overriding of del() and copy() methods described above.
+
+Changed the signature of reconstruct(...) to also take the node under
+reconstruction.  Existing calls to reconstruct(...) should now be
+reconstruct(this, ...).  This additional parameter allows the method to be used
+by subclasses without creating temporary node objects when updating their
+fields.
 
 
 December 3, 2013 : Polyglot 2.5.4rc1

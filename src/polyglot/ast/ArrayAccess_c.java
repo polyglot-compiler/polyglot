@@ -105,8 +105,8 @@ public class ArrayAccess_c extends Expr_c implements ArrayAccess {
     }
 
     /** Reconstruct the expression. */
-    protected ArrayAccess_c reconstruct(Expr array, Expr index) {
-        ArrayAccess_c n = this;
+    protected <N extends ArrayAccess_c> N reconstruct(N n, Expr array,
+            Expr index) {
         n = array(n, array);
         n = index(n, index);
         return n;
@@ -116,7 +116,7 @@ public class ArrayAccess_c extends Expr_c implements ArrayAccess {
     public Node visitChildren(NodeVisitor v) {
         Expr array = visitChild(this.array, v);
         Expr index = visitChild(this.index, v);
-        return reconstruct(array, index);
+        return reconstruct(this, array, index);
     }
 
     @Override

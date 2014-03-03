@@ -228,8 +228,8 @@ public class FieldDecl_c extends Term_c implements FieldDecl {
     }
 
     /** Reconstruct the declaration. */
-    protected FieldDecl_c reconstruct(TypeNode type, Id name, Expr init) {
-        FieldDecl_c n = this;
+    protected <N extends FieldDecl_c> N reconstruct(N n, TypeNode type,
+            Id name, Expr init) {
         n = type(n, type);
         n = id(n, name);
         n = init(n, init);
@@ -241,7 +241,7 @@ public class FieldDecl_c extends Term_c implements FieldDecl {
         TypeNode type = visitChild(this.type, v);
         Id name = visitChild(this.name, v);
         Expr init = visitChild(this.init, v);
-        return reconstruct(type, name, init);
+        return reconstruct(this, type, name, init);
     }
 
     @Override

@@ -98,8 +98,7 @@ public class Catch_c extends Stmt_c implements Catch {
     }
 
     /** Reconstruct the catch block. */
-    protected Catch_c reconstruct(Formal formal, Block body) {
-        Catch_c n = this;
+    protected <N extends Catch_c> N reconstruct(N n, Formal formal, Block body) {
         n = formal(n, formal);
         n = body(n, body);
         return n;
@@ -109,7 +108,7 @@ public class Catch_c extends Stmt_c implements Catch {
     public Node visitChildren(NodeVisitor v) {
         Formal formal = visitChild(this.formal, v);
         Block body = visitChild(this.body, v);
-        return reconstruct(formal, body);
+        return reconstruct(this, formal, body);
     }
 
     @Override

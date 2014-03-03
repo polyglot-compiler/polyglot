@@ -32,7 +32,6 @@ import polyglot.types.SemanticException;
 import polyglot.types.Type;
 import polyglot.types.TypeSystem;
 import polyglot.util.CodeWriter;
-import polyglot.util.Copy;
 import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
 import polyglot.visit.AscriptionVisitor;
@@ -50,19 +49,9 @@ import polyglot.visit.TypeChecker;
 public class While_c extends Loop_c implements While {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
-    protected Expr cond;
-    protected Stmt body;
-
     public While_c(Position pos, Expr cond, Stmt body) {
-        super(pos);
-        assert (cond != null && body != null);
-        this.cond = cond;
-        this.body = body;
-    }
-
-    @Override
-    public Expr cond() {
-        return this.cond;
+        super(pos, cond, body);
+        assert (cond != null);
     }
 
     @Override
@@ -70,43 +59,16 @@ public class While_c extends Loop_c implements While {
         return cond(this, cond);
     }
 
-    protected <N extends While_c> N cond(N n, Expr cond) {
-        if (n.cond == cond) return n;
-        if (n == this) n = Copy.Util.copy(n);
-        n.cond = cond;
-        return n;
-    }
-
-    @Override
-    public Stmt body() {
-        return this.body;
-    }
-
     @Override
     public While body(Stmt body) {
         return body(this, body);
-    }
-
-    protected <N extends While_c> N body(N n, Stmt body) {
-        if (n.body == body) return n;
-        if (n == this) n = Copy.Util.copy(n);
-        n.body = body;
-        return n;
-    }
-
-    /** Reconstruct the statement. */
-    protected While_c reconstruct(Expr cond, Stmt body) {
-        While_c n = this;
-        n = cond(n, cond);
-        n = body(n, body);
-        return n;
     }
 
     @Override
     public Node visitChildren(NodeVisitor v) {
         Expr cond = visitChild(this.cond, v);
         Stmt body = visitChild(this.body, v);
-        return reconstruct(cond, body);
+        return reconstruct(this, cond, body);
     }
 
     @Override

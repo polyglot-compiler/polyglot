@@ -186,8 +186,8 @@ public class LocalDecl_c extends Stmt_c implements LocalDecl {
     }
 
     /** Reconstruct the declaration. */
-    protected LocalDecl_c reconstruct(TypeNode type, Id name, Expr init) {
-        LocalDecl_c n = this;
+    protected <N extends LocalDecl_c> N reconstruct(N n, TypeNode type,
+            Id name, Expr init) {
         n = type(n, type);
         n = id(n, name);
         n = init(n, init);
@@ -199,7 +199,7 @@ public class LocalDecl_c extends Stmt_c implements LocalDecl {
         TypeNode type = visitChild(this.type, v);
         Id name = visitChild(this.name, v);
         Expr init = visitChild(this.init, v);
-        return reconstruct(type, name, init);
+        return reconstruct(this, type, name, init);
     }
 
     /**

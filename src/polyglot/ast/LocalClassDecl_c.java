@@ -71,10 +71,15 @@ public class LocalClassDecl_c extends Stmt_c implements LocalClassDecl {
     }
 
     /** Reconstruct the statement. */
-    protected LocalClassDecl_c reconstruct(ClassDecl decl) {
-        LocalClassDecl_c n = this;
+    protected <N extends LocalClassDecl_c> N reconstruct(N n, ClassDecl decl) {
         n = decl(n, decl);
         return n;
+    }
+
+    @Override
+    public Node visitChildren(NodeVisitor v) {
+        ClassDecl decl = visitChild(this.decl, v);
+        return reconstruct(this, decl);
     }
 
     @Override
@@ -86,12 +91,6 @@ public class LocalClassDecl_c extends Stmt_c implements LocalClassDecl {
     public <T> List<T> acceptCFG(CFGBuilder<?> v, List<T> succs) {
         v.visitCFG(decl(), this, EXIT);
         return succs;
-    }
-
-    @Override
-    public Node visitChildren(NodeVisitor v) {
-        ClassDecl decl = visitChild(this.decl, v);
-        return reconstruct(decl);
     }
 
     @Override

@@ -33,6 +33,7 @@ import polyglot.ast.IntLit;
 import polyglot.ast.Lit;
 import polyglot.ast.Local;
 import polyglot.ast.LocalDecl;
+import polyglot.ast.Loop;
 import polyglot.ast.Loop_c;
 import polyglot.ast.NewArray;
 import polyglot.ast.Node;
@@ -63,13 +64,19 @@ public class ExtendedFor_c extends Loop_c implements ExtendedFor {
     /** Loop body */
     protected LocalDecl decl;
     protected Expr expr;
-    protected Stmt body;
 
     public ExtendedFor_c(Position pos, LocalDecl decl, Expr expr, Stmt stmt) {
-        super(pos);
+        super(pos, null, stmt);
+        assert (decl != null && expr != null);
         this.decl = decl;
         this.expr = expr;
-        this.body = stmt;
+    }
+
+    @Override
+    public Loop cond(Expr cond) {
+        if (cond != null)
+            throw new InternalCompilerError("Non-null condition for ExtendedFor.");
+        return this;
     }
 
     @Override
@@ -107,28 +114,16 @@ public class ExtendedFor_c extends Loop_c implements ExtendedFor {
     }
 
     @Override
-    public Stmt body() {
-        return this.body;
-    }
-
-    @Override
     public ExtendedFor body(Stmt body) {
         return body(this, body);
     }
 
-    protected <N extends ExtendedFor_c> N body(N n, Stmt body) {
-        if (n.body == body) return n;
-        if (n == this) n = Copy.Util.copy(n);
-        n.body = body;
-        return n;
-    }
-
     /** Reconstruct the statement. */
-    protected ExtendedFor_c reconstruct(LocalDecl decl, Expr expr, Stmt body) {
-        ExtendedFor_c n = this;
+    protected <N extends ExtendedFor_c> N reconstruct(N n, LocalDecl decl,
+            Expr expr, Stmt body) {
+        n = super.reconstruct(n, null, body);
         n = decl(n, decl);
         n = expr(n, expr);
-        n = body(n, body);
         return n;
     }
 
@@ -137,7 +132,7 @@ public class ExtendedFor_c extends Loop_c implements ExtendedFor {
         LocalDecl decl = visitChild(this.decl, v);
         Expr expr = visitChild(this.expr, v);
         Stmt body = visitChild(this.body, v);
-        return reconstruct(decl, expr, body);
+        return reconstruct(this, decl, expr, body);
     }
 
     @Override
@@ -251,11 +246,6 @@ public class ExtendedFor_c extends Loop_c implements ExtendedFor {
         v.visitCFG(decl, body, ENTRY);
         v.push(this).visitCFG(body, continueTarget(), ENTRY);
         return succs;
-    }
-
-    @Override
-    public Expr cond() {
-        return null;
     }
 
     @Override

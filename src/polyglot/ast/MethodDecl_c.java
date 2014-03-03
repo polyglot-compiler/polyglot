@@ -120,14 +120,10 @@ public class MethodDecl_c extends ProcedureDecl_c implements MethodDecl {
     }
 
     /** Reconstruct the method. */
-    protected MethodDecl_c reconstruct(TypeNode returnType, Id name,
-            List<Formal> formals, List<TypeNode> throwTypes, Block body) {
-        MethodDecl_c n = this;
+    protected <N extends MethodDecl_c> N reconstruct(N n, TypeNode returnType,
+            Id name, List<Formal> formals, List<TypeNode> throwTypes, Block body) {
+        n = super.reconstruct(n, name, formals, throwTypes, body);
         n = returnType(n, returnType);
-        n = id(n, name);
-        n = formals(n, formals);
-        n = throwTypes(n, throwTypes);
-        n = body(n, body);
         return n;
     }
 
@@ -138,7 +134,7 @@ public class MethodDecl_c extends ProcedureDecl_c implements MethodDecl {
         TypeNode returnType = visitChild(this.returnType, v);
         List<TypeNode> throwTypes = visitList(this.throwTypes, v);
         Block body = visitChild(this.body, v);
-        return reconstruct(returnType, name, formals, throwTypes, body);
+        return reconstruct(this, returnType, name, formals, throwTypes, body);
     }
 
     @Override

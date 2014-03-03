@@ -32,9 +32,6 @@ import polyglot.ast.Stmt;
 
 public interface ExtendedFor extends Loop {
 
-    @Override
-    ExtendedFor body(Stmt body);
-
     ExtendedFor decl(LocalDecl decl);
 
     LocalDecl decl();
@@ -43,4 +40,6 @@ public interface ExtendedFor extends Loop {
 
     ExtendedFor expr(Expr expr);
 
+    @Override
+    ExtendedFor body(Stmt body);
 }

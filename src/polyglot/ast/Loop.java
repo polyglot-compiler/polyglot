@@ -32,8 +32,17 @@ package polyglot.ast;
  * to be tested indicating whether to reexecute the statement.
  */
 public interface Loop extends CompoundStmt {
-    /** Loop condition */
+    /** Loop condition. */
     Expr cond();
+
+    /** Set the loop condition. */
+    Loop cond(Expr cond);
+
+    /** Loop body. */
+    Stmt body();
+
+    /** Set the loop body. */
+    Loop body(Stmt body);
 
     /** Returns true of cond() evaluates to a constant. */
     boolean condIsConstant();
@@ -43,12 +52,6 @@ public interface Loop extends CompoundStmt {
 
     /** Returns true if cond() is a constant that evaluates to false. */
     boolean condIsConstantFalse();
-
-    /** Loop body. */
-    Stmt body();
-
-    /** Set the loop body. */
-    Loop body(Stmt body);
 
     /** Target of a continue statement in the loop body. */
     Term continueTarget();

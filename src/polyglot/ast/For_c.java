@@ -56,18 +56,14 @@ public class For_c extends Loop_c implements For {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
     protected List<ForInit> inits;
-    protected Expr cond;
     protected List<ForUpdate> iters;
-    protected Stmt body;
 
     public For_c(Position pos, List<ForInit> inits, Expr cond,
             List<ForUpdate> iters, Stmt body) {
-        super(pos);
-        assert (inits != null && iters != null && body != null); // cond may be null, inits and iters may be empty
+        super(pos, cond, body);
+        assert (inits != null && iters != null); // cond may be null, inits and iters may be empty
         this.inits = ListUtil.copy(inits, true);
-        this.cond = cond;
         this.iters = ListUtil.copy(iters, true);
-        this.body = body;
     }
 
     @Override
@@ -88,20 +84,8 @@ public class For_c extends Loop_c implements For {
     }
 
     @Override
-    public Expr cond() {
-        return this.cond;
-    }
-
-    @Override
     public For cond(Expr cond) {
         return cond(this, cond);
-    }
-
-    protected <N extends For_c> N cond(N n, Expr cond) {
-        if (n.cond == cond) return n;
-        if (n == this) n = Copy.Util.copy(n);
-        n.cond = cond;
-        return n;
     }
 
     @Override
@@ -122,30 +106,16 @@ public class For_c extends Loop_c implements For {
     }
 
     @Override
-    public Stmt body() {
-        return this.body;
-    }
-
-    @Override
     public For body(Stmt body) {
         return body(this, body);
     }
 
-    protected <N extends For_c> N body(N n, Stmt body) {
-        if (n.body == body) return n;
-        if (n == this) n = Copy.Util.copy(n);
-        n.body = body;
-        return n;
-    }
-
     /** Reconstruct the statement. */
-    protected For_c reconstruct(List<ForInit> inits, Expr cond,
-            List<ForUpdate> iters, Stmt body) {
-        For_c n = this;
+    protected <N extends For_c> N reconstruct(N n, List<ForInit> inits,
+            Expr cond, List<ForUpdate> iters, Stmt body) {
+        n = super.reconstruct(n, cond, body);
         n = inits(n, inits);
-        n = cond(n, cond);
         n = iters(n, iters);
-        n = body(n, body);
         return n;
     }
 
@@ -155,7 +125,7 @@ public class For_c extends Loop_c implements For {
         Expr cond = visitChild(this.cond, v);
         List<ForUpdate> iters = visitList(this.iters, v);
         Stmt body = visitChild(this.body, v);
-        return reconstruct(inits, cond, iters, body);
+        return reconstruct(this, inits, cond, iters, body);
     }
 
     @Override

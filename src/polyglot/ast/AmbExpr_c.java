@@ -89,8 +89,7 @@ public class AmbExpr_c extends Expr_c implements AmbExpr {
     }
 
     /** Reconstruct the expression. */
-    protected AmbExpr_c reconstruct(Id name) {
-        AmbExpr_c n = this;
+    protected <N extends AmbExpr_c> N reconstruct(N n, Id name) {
         n = id(n, name);
         return n;
     }
@@ -98,7 +97,7 @@ public class AmbExpr_c extends Expr_c implements AmbExpr {
     @Override
     public Node visitChildren(NodeVisitor v) {
         Id name = visitChild(this.name, v);
-        return reconstruct(name);
+        return reconstruct(this, name);
     }
 
     @Override

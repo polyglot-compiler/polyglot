@@ -83,8 +83,7 @@ public class Return_c extends Stmt_c implements Return {
     }
 
     /** Reconstruct the statement. */
-    protected Return_c reconstruct(Expr expr) {
-        Return_c n = this;
+    protected <N extends Return_c> N reconstruct(N n, Expr expr) {
         n = expr(n, expr);
         return n;
     }
@@ -92,7 +91,7 @@ public class Return_c extends Stmt_c implements Return {
     @Override
     public Node visitChildren(NodeVisitor v) {
         Expr expr = visitChild(this.expr, v);
-        return reconstruct(expr);
+        return reconstruct(this, expr);
     }
 
     @Override

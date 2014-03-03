@@ -97,11 +97,18 @@ public class Assert_c extends Stmt_c implements Assert {
     }
 
     /** Reconstruct the statement. */
-    protected Assert_c reconstruct(Expr cond, Expr errorMessage) {
-        Assert_c n = this;
+    protected <N extends Assert_c> N reconstruct(N n, Expr cond,
+            Expr errorMessage) {
         n = cond(n, cond);
         n = errorMessage(n, errorMessage);
         return n;
+    }
+
+    @Override
+    public Node visitChildren(NodeVisitor v) {
+        Expr cond = visitChild(this.cond, v);
+        Expr errorMessage = visitChild(this.errorMessage, v);
+        return reconstruct(this, cond, errorMessage);
     }
 
     @Override
@@ -147,13 +154,6 @@ public class Assert_c extends Stmt_c implements Assert {
         */
 
         return child.type();
-    }
-
-    @Override
-    public Node visitChildren(NodeVisitor v) {
-        Expr cond = visitChild(this.cond, v);
-        Expr errorMessage = visitChild(this.errorMessage, v);
-        return reconstruct(cond, errorMessage);
     }
 
     @Override

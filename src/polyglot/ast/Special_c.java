@@ -100,8 +100,7 @@ public class Special_c extends Expr_c implements Special {
     }
 
     /** Reconstruct the expression. */
-    protected Special_c reconstruct(TypeNode qualifier) {
-        Special_c n = this;
+    protected <N extends Special_c> N reconstruct(N n, TypeNode qualifier) {
         n = qualifier(n, qualifier);
         return n;
     }
@@ -109,7 +108,7 @@ public class Special_c extends Expr_c implements Special {
     @Override
     public Node visitChildren(NodeVisitor v) {
         TypeNode qualifier = visitChild(this.qualifier, v);
-        return reconstruct(qualifier);
+        return reconstruct(this, qualifier);
     }
 
     @Override

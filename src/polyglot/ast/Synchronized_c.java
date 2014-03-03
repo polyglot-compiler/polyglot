@@ -94,8 +94,8 @@ public class Synchronized_c extends Stmt_c implements Synchronized {
     }
 
     /** Reconstruct the statement. */
-    protected Synchronized_c reconstruct(Expr expr, Block body) {
-        Synchronized_c n = this;
+    protected <N extends Synchronized_c> N reconstruct(N n, Expr expr,
+            Block body) {
         n = expr(n, expr);
         n = body(n, body);
         return n;
@@ -105,7 +105,7 @@ public class Synchronized_c extends Stmt_c implements Synchronized {
     public Node visitChildren(NodeVisitor v) {
         Expr expr = visitChild(this.expr, v);
         Block body = visitChild(this.body, v);
-        return reconstruct(expr, body);
+        return reconstruct(this, expr, body);
     }
 
     @Override

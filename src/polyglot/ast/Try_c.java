@@ -118,9 +118,8 @@ public class Try_c extends Stmt_c implements Try, TryOps {
     }
 
     /** Reconstruct the statement. */
-    protected Try_c reconstruct(Block tryBlock, List<Catch> catchBlocks,
-            Block finallyBlock) {
-        Try_c n = this;
+    protected <N extends Try_c> N reconstruct(N n, Block tryBlock,
+            List<Catch> catchBlocks, Block finallyBlock) {
         n = tryBlock(n, tryBlock);
         n = catchBlocks(n, catchBlocks);
         n = finallyBlock(n, finallyBlock);
@@ -132,7 +131,7 @@ public class Try_c extends Stmt_c implements Try, TryOps {
         Block tryBlock = visitChild(this.tryBlock, v);
         List<Catch> catchBlocks = visitList(this.catchBlocks, v);
         Block finallyBlock = visitChild(this.finallyBlock, v);
-        return reconstruct(tryBlock, catchBlocks, finallyBlock);
+        return reconstruct(this, tryBlock, catchBlocks, finallyBlock);
     }
 
     /**

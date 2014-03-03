@@ -32,7 +32,7 @@ package polyglot.ast;
  * to be tested indicating whether to reexecute the statement.
  */
 public interface While extends Loop {
-    /** Set the loop condition. */
+    @Override
     While cond(Expr cond);
 
     @Override

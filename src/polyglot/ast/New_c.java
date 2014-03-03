@@ -219,9 +219,8 @@ public class New_c extends Expr_c implements New, NewOps {
     }
 
     /** Reconstruct the expression. */
-    protected New_c reconstruct(Expr qualifier, TypeNode tn,
+    protected <N extends New_c> N reconstruct(N n, Expr qualifier, TypeNode tn,
             List<Expr> arguments, ClassBody body) {
-        New_c n = this;
         n = objectType(n, tn);
         n = qualifier(n, qualifier);
         n = arguments(n, arguments);
@@ -235,7 +234,7 @@ public class New_c extends Expr_c implements New, NewOps {
         TypeNode tn = visitChild(this.objectType, v);
         List<Expr> arguments = visitList(this.arguments, v);
         ClassBody body = visitChild(this.body, v);
-        return reconstruct(qualifier, tn, arguments, body);
+        return reconstruct(this, qualifier, tn, arguments, body);
     }
 
     @Override

@@ -100,23 +100,23 @@ public class AmbTypeNode_c extends TypeNode_c implements AmbTypeNode {
         return n;
     }
 
-    protected AmbTypeNode_c reconstruct(QualifierNode qual, Id name) {
-        AmbTypeNode_c n = this;
+    protected <N extends AmbTypeNode_c> N reconstruct(N n, QualifierNode qual,
+            Id name) {
         n = qual(n, qual);
         n = id(n, name);
         return n;
     }
 
     @Override
-    public Node buildTypes(TypeBuilder tb) throws SemanticException {
-        return type(tb.typeSystem().unknownType(position()));
-    }
-
-    @Override
     public Node visitChildren(NodeVisitor v) {
         QualifierNode qual = visitChild(this.qual, v);
         Id name = visitChild(this.name, v);
-        return reconstruct(qual, name);
+        return reconstruct(this, qual, name);
+    }
+
+    @Override
+    public Node buildTypes(TypeBuilder tb) throws SemanticException {
+        return type(tb.typeSystem().unknownType(position()));
     }
 
     @Override

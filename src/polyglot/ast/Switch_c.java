@@ -105,23 +105,23 @@ public class Switch_c extends Stmt_c implements Switch {
     }
 
     /** Reconstruct the statement. */
-    protected Switch_c reconstruct(Expr expr, List<SwitchElement> elements) {
-        Switch_c n = this;
+    protected <N extends Switch_c> N reconstruct(N n, Expr expr,
+            List<SwitchElement> elements) {
         n = expr(n, expr);
         n = elements(n, elements);
         return n;
     }
 
     @Override
-    public Context enterScope(Context c) {
-        return c.pushBlock();
-    }
-
-    @Override
     public Node visitChildren(NodeVisitor v) {
         Expr expr = visitChild(this.expr, v);
         List<SwitchElement> elements = visitList(this.elements, v);
-        return reconstruct(expr, elements);
+        return reconstruct(this, expr, elements);
+    }
+
+    @Override
+    public Context enterScope(Context c) {
+        return c.pushBlock();
     }
 
     @Override

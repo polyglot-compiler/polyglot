@@ -26,6 +26,7 @@
 
 package polyglot.ast;
 
+import polyglot.util.Copy;
 import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
 
@@ -37,8 +38,31 @@ import polyglot.util.SerialVersionUID;
 public abstract class Loop_c extends Stmt_c implements Loop {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
-    public Loop_c(Position pos) {
+    protected Expr cond;
+    protected Stmt body;
+
+    public Loop_c(Position pos, Expr cond, Stmt body) {
         super(pos);
+        assert (body != null);
+        this.body = body;
+        this.cond = cond;
+    }
+
+    @Override
+    public Expr cond() {
+        return this.cond;
+    }
+
+    @Override
+    public Loop cond(Expr cond) {
+        return cond(this, cond);
+    }
+
+    protected <N extends Loop_c> N cond(N n, Expr cond) {
+        if (n.cond == cond) return n;
+        if (n == this) n = Copy.Util.copy(n);
+        n.cond = cond;
+        return n;
     }
 
     @Override
@@ -54,5 +78,29 @@ public abstract class Loop_c extends Stmt_c implements Loop {
     @Override
     public boolean condIsConstantFalse() {
         return Boolean.FALSE.equals(cond().constantValue());
+    }
+
+    @Override
+    public Stmt body() {
+        return this.body;
+    }
+
+    @Override
+    public Loop body(Stmt body) {
+        return body(this, body);
+    }
+
+    protected <N extends Loop_c> N body(N n, Stmt body) {
+        if (n.body == body) return n;
+        if (n == this) n = Copy.Util.copy(n);
+        n.body = body;
+        return n;
+    }
+
+    /** Reconstruct the statement. */
+    protected <N extends Loop_c> N reconstruct(N n, Expr cond, Stmt body) {
+        n = cond(n, cond);
+        n = body(n, body);
+        return n;
     }
 }

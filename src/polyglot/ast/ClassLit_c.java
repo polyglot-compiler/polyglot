@@ -90,8 +90,7 @@ public class ClassLit_c extends Lit_c implements ClassLit {
         return succs;
     }
 
-    protected ClassLit_c reconstruct(TypeNode typeNode) {
-        ClassLit_c n = this;
+    protected <N extends ClassLit_c> N reconstruct(N n, TypeNode typeNode) {
         n = typeNode(n, typeNode);
         return n;
     }
@@ -99,7 +98,7 @@ public class ClassLit_c extends Lit_c implements ClassLit {
     @Override
     public Node visitChildren(NodeVisitor v) {
         TypeNode tn = visitChild(this.typeNode, v);
-        return reconstruct(tn);
+        return reconstruct(this, tn);
     }
 
     @Override

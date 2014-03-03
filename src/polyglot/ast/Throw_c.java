@@ -77,8 +77,7 @@ public class Throw_c extends Stmt_c implements Throw {
     }
 
     /** Reconstruct the statement. */
-    protected Throw_c reconstruct(Expr expr) {
-        Throw_c n = this;
+    protected <N extends Throw_c> N reconstruct(N n, Expr expr) {
         n = expr(n, expr);
         return n;
     }
@@ -86,7 +85,7 @@ public class Throw_c extends Stmt_c implements Throw {
     @Override
     public Node visitChildren(NodeVisitor v) {
         Expr expr = visitChild(this.expr, v);
-        return reconstruct(expr);
+        return reconstruct(this, expr);
     }
 
     @Override

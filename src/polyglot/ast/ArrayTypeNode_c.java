@@ -57,6 +57,11 @@ public class ArrayTypeNode_c extends TypeNode_c implements ArrayTypeNode {
     }
 
     @Override
+    public boolean isDisambiguated() {
+        return false;
+    }
+
+    @Override
     public TypeNode base() {
         return base;
     }
@@ -73,21 +78,15 @@ public class ArrayTypeNode_c extends TypeNode_c implements ArrayTypeNode {
         return n;
     }
 
-    protected ArrayTypeNode_c reconstruct(TypeNode base) {
-        ArrayTypeNode_c n = this;
+    protected <N extends ArrayTypeNode_c> N reconstruct(N n, TypeNode base) {
         n = base(n, base);
         return n;
     }
 
     @Override
-    public boolean isDisambiguated() {
-        return false;
-    }
-
-    @Override
     public Node visitChildren(NodeVisitor v) {
         TypeNode base = visitChild(this.base, v);
-        return reconstruct(base);
+        return reconstruct(this, base);
     }
 
     @Override

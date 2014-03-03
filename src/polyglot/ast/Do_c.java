@@ -32,7 +32,6 @@ import polyglot.types.SemanticException;
 import polyglot.types.Type;
 import polyglot.types.TypeSystem;
 import polyglot.util.CodeWriter;
-import polyglot.util.Copy;
 import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
 import polyglot.visit.AscriptionVisitor;
@@ -50,36 +49,9 @@ import polyglot.visit.TypeChecker;
 public class Do_c extends Loop_c implements Do {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
-    protected Stmt body;
-    protected Expr cond;
-
     public Do_c(Position pos, Stmt body, Expr cond) {
-        super(pos);
-        assert (body != null && cond != null);
-        this.body = body;
-        this.cond = cond;
-    }
-
-    @Override
-    public Stmt body() {
-        return this.body;
-    }
-
-    @Override
-    public Do body(Stmt body) {
-        return body(this, body);
-    }
-
-    protected <N extends Do_c> N body(N n, Stmt body) {
-        if (n.body == body) return n;
-        if (n == this) n = Copy.Util.copy(n);
-        n.body = body;
-        return n;
-    }
-
-    @Override
-    public Expr cond() {
-        return this.cond;
+        super(pos, cond, body);
+        assert (cond != null);
     }
 
     @Override
@@ -87,26 +59,16 @@ public class Do_c extends Loop_c implements Do {
         return cond(this, cond);
     }
 
-    protected <N extends Do_c> N cond(N n, Expr cond) {
-        if (n.cond == cond) return n;
-        if (n == this) n = Copy.Util.copy(n);
-        n.cond = cond;
-        return n;
-    }
-
-    /** Reconstruct the statement. */
-    protected Do_c reconstruct(Stmt body, Expr cond) {
-        Do_c n = this;
-        n = body(n, body);
-        n = cond(n, cond);
-        return n;
+    @Override
+    public Do body(Stmt body) {
+        return body(this, body);
     }
 
     @Override
     public Node visitChildren(NodeVisitor v) {
         Stmt body = visitChild(this.body, v);
         Expr cond = visitChild(this.cond, v);
-        return reconstruct(body, cond);
+        return reconstruct(this, cond, body);
     }
 
     @Override
