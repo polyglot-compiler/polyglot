@@ -37,6 +37,7 @@ import polyglot.ast.Expr;
 import polyglot.ast.IntLit;
 import polyglot.ast.Node;
 import polyglot.ast.Node_c;
+import polyglot.ast.TypeNode;
 import polyglot.ext.jl5.JL5Options;
 import polyglot.ext.jl5.types.JL5Context;
 import polyglot.ext.jl5.types.JL5Flags;
@@ -56,6 +57,10 @@ import polyglot.visit.TypeChecker;
 
 public class JL5ConstructorCallExt extends JL5ProcedureCallExt {
     private static final long serialVersionUID = SerialVersionUID.generate();
+
+    public JL5ConstructorCallExt(List<TypeNode> typeArgs) {
+        super(typeArgs);
+    }
 
     @Override
     public ConstructorCall node() {

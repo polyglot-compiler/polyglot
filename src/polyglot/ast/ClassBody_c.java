@@ -58,8 +58,13 @@ public class ClassBody_c extends Term_c implements ClassBody {
 
     protected List<ClassMember> members;
 
+    @Deprecated
     public ClassBody_c(Position pos, List<ClassMember> members) {
-        super(pos);
+        this(pos, members, null);
+    }
+
+    public ClassBody_c(Position pos, List<ClassMember> members, Ext ext) {
+        super(pos, ext);
         assert (members != null);
         this.members = ListUtil.copy(members, true);
     }

@@ -40,8 +40,13 @@ import polyglot.visit.PrettyPrinter;
 public class Block_c extends AbstractBlock_c {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
+    @Deprecated
     public Block_c(Position pos, List<Stmt> statements) {
-        super(pos, statements);
+        this(pos, statements, null);
+    }
+
+    public Block_c(Position pos, List<Stmt> statements, Ext ext) {
+        super(pos, statements, ext);
     }
 
     @Override

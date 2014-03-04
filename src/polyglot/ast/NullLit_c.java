@@ -38,8 +38,13 @@ import polyglot.visit.TypeChecker;
 public class NullLit_c extends Lit_c implements NullLit {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
+    @Deprecated
     public NullLit_c(Position pos) {
-        super(pos);
+        this(pos, null);
+    }
+
+    public NullLit_c(Position pos, Ext ext) {
+        super(pos, ext);
     }
 
     @Override

@@ -45,6 +45,11 @@ import polyglot.visit.TypeChecker;
 public class JL5ConstructorDeclExt extends JL5ProcedureDeclExt {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
+    public JL5ConstructorDeclExt(List<ParamTypeNode> typeParams,
+            List<AnnotationElem> annotations) {
+        super(typeParams, annotations);
+    }
+
     @Override
     protected Declaration declaration() {
         ConstructorDecl cd = (ConstructorDecl) this.node();

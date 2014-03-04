@@ -51,8 +51,13 @@ public class AmbQualifierNode_c extends Node_c implements AmbQualifierNode {
     protected QualifierNode qual;
     protected Id name;
 
+    @Deprecated
     public AmbQualifierNode_c(Position pos, QualifierNode qual, Id name) {
-        super(pos);
+        this(pos, qual, name, null);
+    }
+
+    public AmbQualifierNode_c(Position pos, QualifierNode qual, Id name, Ext ext) {
+        super(pos, ext);
         assert (name != null); // qual may be null
 
         this.qual = qual;

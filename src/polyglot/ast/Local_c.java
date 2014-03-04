@@ -54,8 +54,13 @@ public class Local_c extends Expr_c implements Local {
     protected Id name;
     protected LocalInstance li;
 
+    @Deprecated
     public Local_c(Position pos, Id name) {
-        super(pos);
+        this(pos, name, null);
+    }
+
+    public Local_c(Position pos, Id name, Ext ext) {
+        super(pos, ext);
         assert (name != null);
         this.name = name;
     }

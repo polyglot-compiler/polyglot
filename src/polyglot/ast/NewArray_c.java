@@ -62,9 +62,15 @@ public class NewArray_c extends Expr_c implements NewArray {
     protected int addDims;
     protected ArrayInit init;
 
+    @Deprecated
     public NewArray_c(Position pos, TypeNode baseType, List<Expr> dims,
             int addDims, ArrayInit init) {
-        super(pos);
+        this(pos, baseType, dims, addDims, init, null);
+    }
+
+    public NewArray_c(Position pos, TypeNode baseType, List<Expr> dims,
+            int addDims, ArrayInit init, Ext ext) {
+        super(pos, ext);
         assert (baseType != null && dims != null); // init may be null
         assert (addDims >= 0);
         assert (!dims.isEmpty() || init != null); // dims may be empty only if there is an initializer

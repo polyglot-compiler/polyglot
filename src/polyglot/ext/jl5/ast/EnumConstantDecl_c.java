@@ -33,6 +33,7 @@ import java.util.List;
 
 import polyglot.ast.ClassBody;
 import polyglot.ast.Expr;
+import polyglot.ast.Ext;
 import polyglot.ast.Id;
 import polyglot.ast.Node;
 import polyglot.ast.Term;
@@ -74,8 +75,8 @@ public class EnumConstantDecl_c extends Term_c implements EnumConstantDecl {
     protected long ordinal;
 
     public EnumConstantDecl_c(Position pos, Flags flags, Id name,
-            List<Expr> args, ClassBody body) {
-        super(pos);
+            List<Expr> args, ClassBody body, Ext ext) {
+        super(pos, ext);
         this.name = name;
         this.args = args;
         this.body = body;

@@ -71,9 +71,19 @@ public abstract class Node_c implements Node {
     protected Ext ext;
     protected boolean error;
 
+    @Deprecated
     public Node_c(Position pos) {
+        this(pos, null);
+    }
+
+    public Node_c(Position pos, Ext ext) {
         assert (pos != null);
         this.position = pos;
+        this.ext = ext;
+        if (ext != null) {
+            ext.init(this);
+            ext.initPred(this);
+        }
         this.error = false;
     }
 

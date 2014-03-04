@@ -41,8 +41,13 @@ import polyglot.visit.TypeChecker;
 public class CharLit_c extends NumLit_c implements CharLit {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
+    @Deprecated
     public CharLit_c(Position pos, char value) {
-        super(pos, value);
+        this(pos, value, null);
+    }
+
+    public CharLit_c(Position pos, char value, Ext ext) {
+        super(pos, value, ext);
     }
 
     @Override

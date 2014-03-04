@@ -44,9 +44,13 @@ public class AmbReceiver_c extends AmbPrefix_c implements AmbReceiver {
 
     protected Type type;
 
+    @Deprecated
     public AmbReceiver_c(Position pos, Prefix prefix, Id name) {
-        super(pos, prefix, name);
-        assert (name != null); // prefix may be null
+        this(pos, prefix, name, null);
+    }
+
+    public AmbReceiver_c(Position pos, Prefix prefix, Id name, Ext ext) {
+        super(pos, prefix, name, ext);
     }
 
     @Override

@@ -25,6 +25,8 @@
  ******************************************************************************/
 package polyglot.ext.jl5.ast;
 
+import java.util.List;
+
 import polyglot.ast.Node;
 import polyglot.ext.jl5.types.Annotations;
 import polyglot.types.Declaration;
@@ -40,12 +42,16 @@ import polyglot.visit.SignatureDisambiguator;
 import polyglot.visit.SupertypeDisambiguator;
 
 /**
- * This class mainly exists so that EnumConstantDecls can be indentified as
+ * This class mainly exists so that EnumConstantDecls can be identified as
  * being Annotated Elements by examining their JL5Ext.
  *
  */
 public class EnumConstantDeclExt extends JL5AnnotatedElementExt {
     private static final long serialVersionUID = SerialVersionUID.generate();
+
+    public EnumConstantDeclExt(List<AnnotationElem> annotations) {
+        super(annotations);
+    }
 
     @Override
     public Node disambiguateOverride(Node parent, AmbiguityRemover ar)

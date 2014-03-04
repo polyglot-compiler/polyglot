@@ -48,6 +48,10 @@ public abstract class JL5AnnotatedElementExt extends JL5Ext implements
 
     protected List<AnnotationElem> annotations;
 
+    public JL5AnnotatedElementExt(List<AnnotationElem> annotations) {
+        this.annotations = ListUtil.copy(annotations, true);
+    }
+
     @Override
     public List<AnnotationElem> annotationElems() {
         return this.annotations;

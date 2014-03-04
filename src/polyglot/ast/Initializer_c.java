@@ -65,8 +65,13 @@ public class Initializer_c extends Term_c implements Initializer {
     protected Block body;
     protected InitializerInstance ii;
 
+    @Deprecated
     public Initializer_c(Position pos, Flags flags, Block body) {
-        super(pos);
+        this(pos, flags, body, null);
+    }
+
+    public Initializer_c(Position pos, Flags flags, Block body, Ext ext) {
+        super(pos, ext);
         assert (flags != null && body != null);
         this.flags = flags;
         this.body = body;

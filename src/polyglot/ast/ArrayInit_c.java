@@ -56,8 +56,13 @@ public class ArrayInit_c extends Expr_c implements ArrayInit {
 
     protected List<Expr> elements;
 
+    @Deprecated
     public ArrayInit_c(Position pos, List<Expr> elements) {
-        super(pos);
+        this(pos, elements, null);
+    }
+
+    public ArrayInit_c(Position pos, List<Expr> elements, Ext ext) {
+        super(pos, ext);
         assert (elements != null);
         this.elements = ListUtil.copy(elements, true);
     }

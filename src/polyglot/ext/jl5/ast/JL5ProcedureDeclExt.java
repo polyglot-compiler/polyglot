@@ -53,6 +53,7 @@ import polyglot.util.CodeWriter;
 import polyglot.util.CollectionUtil;
 import polyglot.util.Copy;
 import polyglot.util.InternalCompilerError;
+import polyglot.util.ListUtil;
 import polyglot.util.SerialVersionUID;
 import polyglot.visit.AmbiguityRemover;
 import polyglot.visit.NodeVisitor;
@@ -65,6 +66,12 @@ public abstract class JL5ProcedureDeclExt extends JL5AnnotatedElementExt
     private static final long serialVersionUID = SerialVersionUID.generate();
 
     protected List<ParamTypeNode> typeParams;
+
+    public JL5ProcedureDeclExt(List<ParamTypeNode> typeParams,
+            List<AnnotationElem> annotations) {
+        super(annotations);
+        this.typeParams = ListUtil.copy(typeParams, true);
+    }
 
     public List<ParamTypeNode> typeParams() {
         return this.typeParams;
@@ -81,7 +88,7 @@ public abstract class JL5ProcedureDeclExt extends JL5AnnotatedElementExt
             n = Copy.Util.copy(n);
             ext = (JL5ProcedureDeclExt) JL5Ext.ext(n);
         }
-        ext.typeParams = typeParams;
+        ext.typeParams = ListUtil.copy(typeParams, true);
         return n;
     }
 

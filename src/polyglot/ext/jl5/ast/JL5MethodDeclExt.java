@@ -51,6 +51,11 @@ public class JL5MethodDeclExt extends JL5ProcedureDeclExt {
 
     protected boolean compilerGenerated;
 
+    public JL5MethodDeclExt(List<ParamTypeNode> typeParams,
+            List<AnnotationElem> annotations) {
+        super(typeParams, annotations);
+    }
+
     public boolean isGeneric() {
         if (!typeParams.isEmpty()) return true;
         return false;

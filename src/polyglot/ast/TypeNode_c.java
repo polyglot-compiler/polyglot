@@ -50,8 +50,13 @@ public abstract class TypeNode_c extends Term_c implements TypeNode {
 
     protected Type type;
 
+    @Deprecated
     public TypeNode_c(Position pos) {
-        super(pos);
+        this(pos, null);
+    }
+
+    public TypeNode_c(Position pos, Ext ext) {
+        super(pos, ext);
     }
 
     @Override

@@ -47,9 +47,15 @@ import polyglot.visit.CFGBuilder;
 public class ArrayAccessAssign_c extends Assign_c implements ArrayAccessAssign {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
+    @Deprecated
     public ArrayAccessAssign_c(Position pos, ArrayAccess left, Operator op,
             Expr right) {
-        super(pos, left, op, right);
+        this(pos, left, op, right, null);
+    }
+
+    public ArrayAccessAssign_c(Position pos, ArrayAccess left, Operator op,
+            Expr right, Ext ext) {
+        super(pos, left, op, right, ext);
     }
 
     @Override

@@ -55,8 +55,13 @@ public class Assert_c extends Stmt_c implements Assert {
     protected Expr cond;
     protected Expr errorMessage;
 
+    @Deprecated
     public Assert_c(Position pos, Expr cond, Expr errorMessage) {
-        super(pos);
+        this(pos, cond, errorMessage, null);
+    }
+
+    public Assert_c(Position pos, Expr cond, Expr errorMessage, Ext ext) {
+        super(pos, ext);
         assert (cond != null); // errorMessage may be null
         this.cond = cond;
         this.errorMessage = errorMessage;

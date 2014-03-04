@@ -52,8 +52,13 @@ public class Unary_c extends Expr_c implements Unary {
     protected Unary.Operator op;
     protected Expr expr;
 
+    @Deprecated
     public Unary_c(Position pos, Unary.Operator op, Expr expr) {
-        super(pos);
+        this(pos, op, expr, null);
+    }
+
+    public Unary_c(Position pos, Unary.Operator op, Expr expr, Ext ext) {
+        super(pos, ext);
         assert (op != null && expr != null);
         this.op = op;
         this.expr = expr;

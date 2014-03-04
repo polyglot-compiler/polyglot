@@ -48,8 +48,13 @@ public class SourceCollection_c extends Node_c implements SourceCollection {
 
     protected List<SourceFile> sources;
 
+    @Deprecated
     public SourceCollection_c(Position pos, List<SourceFile> sources) {
-        super(pos);
+        this(pos, sources, null);
+    }
+
+    public SourceCollection_c(Position pos, List<SourceFile> sources, Ext ext) {
+        super(pos, ext);
         assert (sources != null);
         this.sources = ListUtil.copy(sources, true);
     }

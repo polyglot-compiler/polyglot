@@ -41,8 +41,13 @@ public class Id_c extends Node_c implements Id {
 
     protected String id;
 
+    @Deprecated
     public Id_c(Position pos, String id) {
-        super(pos);
+        this(pos, id, null);
+    }
+
+    public Id_c(Position pos, String id, Ext ext) {
+        super(pos, ext);
         assert (id != null);
         assert (StringUtil.isNameShort(id));
         this.id = id;

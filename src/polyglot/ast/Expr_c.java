@@ -45,8 +45,13 @@ public abstract class Expr_c extends Term_c implements Expr {
 
     protected Type type;
 
+    @Deprecated
     public Expr_c(Position pos) {
-        super(pos);
+        this(pos, null);
+    }
+
+    public Expr_c(Position pos, Ext ext) {
+        super(pos, ext);
     }
 
     /**

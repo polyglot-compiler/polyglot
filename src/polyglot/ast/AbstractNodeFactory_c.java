@@ -46,7 +46,8 @@ public abstract class AbstractNodeFactory_c implements NodeFactory {
     }
 
     @Override
-    public Prefix PrefixFromQualifiedName(Position pos, String qualifiedName) {
+    public final Prefix PrefixFromQualifiedName(Position pos,
+            String qualifiedName) {
         if (StringUtil.isNameShort(qualifiedName)) {
             return AmbPrefix(pos, null, qualifiedName);
         }
@@ -60,7 +61,8 @@ public abstract class AbstractNodeFactory_c implements NodeFactory {
     }
 
     @Override
-    public TypeNode TypeNodeFromQualifiedName(Position pos, String qualifiedName) {
+    public final TypeNode TypeNodeFromQualifiedName(Position pos,
+            String qualifiedName) {
         if (StringUtil.isNameShort(qualifiedName)) {
             return AmbTypeNode(pos, null, qualifiedName);
         }
@@ -76,7 +78,8 @@ public abstract class AbstractNodeFactory_c implements NodeFactory {
     }
 
     @Override
-    public Receiver ReceiverFromQualifiedName(Position pos, String qualifiedName) {
+    public final Receiver ReceiverFromQualifiedName(Position pos,
+            String qualifiedName) {
         if (StringUtil.isNameShort(qualifiedName)) {
             return AmbReceiver(pos, null, qualifiedName);
         }
@@ -91,7 +94,7 @@ public abstract class AbstractNodeFactory_c implements NodeFactory {
     }
 
     @Override
-    public Expr ExprFromQualifiedName(Position pos, String qualifiedName) {
+    public final Expr ExprFromQualifiedName(Position pos, String qualifiedName) {
         if (StringUtil.isNameShort(qualifiedName)) {
             return AmbExpr(pos, qualifiedName);
         }
@@ -105,7 +108,7 @@ public abstract class AbstractNodeFactory_c implements NodeFactory {
     }
 
     @Override
-    public QualifierNode QualifierNodeFromQualifiedName(Position pos,
+    public final QualifierNode QualifierNodeFromQualifiedName(Position pos,
             String qualifiedName) {
         if (StringUtil.isNameShort(qualifiedName)) {
             return AmbQualifierNode(pos, null, qualifiedName);

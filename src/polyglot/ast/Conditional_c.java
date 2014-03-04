@@ -53,9 +53,15 @@ public class Conditional_c extends Expr_c implements Conditional {
     protected Expr consequent;
     protected Expr alternative;
 
+    @Deprecated
     public Conditional_c(Position pos, Expr cond, Expr consequent,
             Expr alternative) {
-        super(pos);
+        this(pos, cond, consequent, alternative, null);
+    }
+
+    public Conditional_c(Position pos, Expr cond, Expr consequent,
+            Expr alternative, Ext ext) {
+        super(pos, ext);
         assert (cond != null && consequent != null && alternative != null);
         this.cond = cond;
         this.consequent = consequent;

@@ -63,8 +63,14 @@ public class Switch_c extends Stmt_c implements Switch {
     protected Expr expr;
     protected List<SwitchElement> elements;
 
+    @Deprecated
     public Switch_c(Position pos, Expr expr, List<SwitchElement> elements) {
-        super(pos);
+        this(pos, expr, elements, null);
+    }
+
+    public Switch_c(Position pos, Expr expr, List<SwitchElement> elements,
+            Ext ext) {
+        super(pos, ext);
         assert (expr != null && elements != null);
         this.expr = expr;
         this.elements = ListUtil.copy(elements, true);

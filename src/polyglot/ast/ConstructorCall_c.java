@@ -67,9 +67,15 @@ public class ConstructorCall_c extends Stmt_c implements ConstructorCall,
     protected List<Expr> arguments;
     protected ConstructorInstance ci;
 
+    @Deprecated
     public ConstructorCall_c(Position pos, Kind kind, Expr qualifier,
             List<? extends Expr> arguments) {
-        super(pos);
+        this(pos, kind, qualifier, arguments, null);
+    }
+
+    public ConstructorCall_c(Position pos, Kind kind, Expr qualifier,
+            List<? extends Expr> arguments, Ext ext) {
+        super(pos, ext);
         assert (kind != null && arguments != null); // qualifier may be null
         this.kind = kind;
         this.qualifier = qualifier;

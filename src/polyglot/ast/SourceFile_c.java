@@ -63,9 +63,15 @@ public class SourceFile_c extends Node_c implements SourceFile {
     protected ImportTable importTable;
     protected Source source;
 
+    @Deprecated
     public SourceFile_c(Position pos, PackageNode package_,
             List<Import> imports, List<TopLevelDecl> decls) {
-        super(pos);
+        this(pos, package_, imports, decls, null);
+    }
+
+    public SourceFile_c(Position pos, PackageNode package_,
+            List<Import> imports, List<TopLevelDecl> decls, Ext ext) {
+        super(pos, ext);
         assert (imports != null && decls != null && !decls.isEmpty()); // package_ may be null, imports empty
         this.package_ = package_;
         this.imports = ListUtil.copy(imports, true);

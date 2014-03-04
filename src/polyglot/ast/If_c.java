@@ -54,8 +54,14 @@ public class If_c extends Stmt_c implements If {
     protected Stmt consequent;
     protected Stmt alternative;
 
+    @Deprecated
     public If_c(Position pos, Expr cond, Stmt consequent, Stmt alternative) {
-        super(pos);
+        this(pos, cond, consequent, alternative, null);
+    }
+
+    public If_c(Position pos, Expr cond, Stmt consequent, Stmt alternative,
+            Ext ext) {
+        super(pos, ext);
         assert (cond != null && consequent != null); // alternative may be null;
         this.cond = cond;
         this.consequent = consequent;

@@ -50,8 +50,13 @@ public class Import_c extends Node_c implements Import {
     protected Kind kind;
     protected String name;
 
+    @Deprecated
     public Import_c(Position pos, Kind kind, String name) {
-        super(pos);
+        this(pos, kind, name, null);
+    }
+
+    public Import_c(Position pos, Kind kind, String name, Ext ext) {
+        super(pos, ext);
         assert (kind != null && name != null);
         this.name = name;
         this.kind = kind;

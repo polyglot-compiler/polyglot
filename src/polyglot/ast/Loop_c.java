@@ -41,8 +41,13 @@ public abstract class Loop_c extends Stmt_c implements Loop {
     protected Expr cond;
     protected Stmt body;
 
+    @Deprecated
     public Loop_c(Position pos, Expr cond, Stmt body) {
-        super(pos);
+        this(pos, cond, body, null);
+    }
+
+    public Loop_c(Position pos, Expr cond, Stmt body, Ext ext) {
+        super(pos, ext);
         assert (body != null);
         this.body = body;
         this.cond = cond;

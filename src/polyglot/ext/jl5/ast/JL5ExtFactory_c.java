@@ -60,7 +60,7 @@ public final class JL5ExtFactory_c extends JL5AbstractExtFactory_c {
 
     @Override
     protected Ext extCallImpl() {
-        return new JL5CallExt();
+        return null;
     }
 
     @Override
@@ -85,7 +85,7 @@ public final class JL5ExtFactory_c extends JL5AbstractExtFactory_c {
 
     @Override
     protected Ext extClassDeclImpl() {
-        return new JL5ClassDeclExt();
+        return null;
     }
 
     @Override
@@ -100,22 +100,22 @@ public final class JL5ExtFactory_c extends JL5AbstractExtFactory_c {
 
     @Override
     protected Ext extConstructorDeclImpl() {
-        return new JL5ConstructorDeclExt();
+        return null;
     }
 
     @Override
     protected Ext extEnumConstantDeclImpl() {
-        return new EnumConstantDeclExt();
+        return null;
     }
 
     @Override
     protected Ext extEnumDeclImpl() {
-        return new JL5EnumDeclExt();
+        return null;
     }
 
     @Override
     protected Ext extConstructorCallImpl() {
-        return new JL5ConstructorCallExt();
+        return null;
     }
 
     @Override
@@ -125,12 +125,12 @@ public final class JL5ExtFactory_c extends JL5AbstractExtFactory_c {
 
     @Override
     protected Ext extFieldDeclImpl() {
-        return new JL5FieldDeclExt();
+        return null;
     }
 
     @Override
     protected Ext extFormalImpl() {
-        return new JL5FormalExt();
+        return null;
     }
 
     @Override
@@ -140,17 +140,17 @@ public final class JL5ExtFactory_c extends JL5AbstractExtFactory_c {
 
     @Override
     protected Ext extLocalDeclImpl() {
-        return new JL5LocalDeclExt();
+        return null;
     }
 
     @Override
     protected Ext extMethodDeclImpl() {
-        return new JL5MethodDeclExt();
+        return null;
     }
 
     @Override
     protected Ext extNewImpl() {
-        return new JL5NewExt();
+        return null;
     }
 
     @Override

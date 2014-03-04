@@ -50,8 +50,13 @@ public class ArrayTypeNode_c extends TypeNode_c implements ArrayTypeNode {
 
     protected TypeNode base;
 
+    @Deprecated
     public ArrayTypeNode_c(Position pos, TypeNode base) {
-        super(pos);
+        this(pos, base, null);
+    }
+
+    public ArrayTypeNode_c(Position pos, TypeNode base, Ext ext) {
+        super(pos, ext);
         assert (base != null);
         this.base = base;
     }

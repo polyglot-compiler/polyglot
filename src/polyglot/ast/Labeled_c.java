@@ -46,8 +46,13 @@ public class Labeled_c extends Stmt_c implements Labeled {
     protected Id label;
     protected Stmt statement;
 
+    @Deprecated
     public Labeled_c(Position pos, Id label, Stmt statement) {
-        super(pos);
+        this(pos, label, statement, null);
+    }
+
+    public Labeled_c(Position pos, Id label, Stmt statement, Ext ext) {
+        super(pos, ext);
         assert (label != null && statement != null);
         this.label = label;
         this.statement = statement;

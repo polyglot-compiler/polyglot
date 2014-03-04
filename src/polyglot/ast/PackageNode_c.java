@@ -47,8 +47,13 @@ public class PackageNode_c extends Node_c implements PackageNode {
 
     protected Package package_;
 
+    @Deprecated
     public PackageNode_c(Position pos, Package package_) {
-        super(pos);
+        this(pos, package_, null);
+    }
+
+    public PackageNode_c(Position pos, Package package_, Ext ext) {
+        super(pos, ext);
         assert (package_ != null);
         this.package_ = package_;
     }

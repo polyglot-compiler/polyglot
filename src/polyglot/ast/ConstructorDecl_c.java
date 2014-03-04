@@ -61,9 +61,15 @@ public class ConstructorDecl_c extends ProcedureDecl_c implements
 
     protected ConstructorInstance ci;
 
+    @Deprecated
     public ConstructorDecl_c(Position pos, Flags flags, Id name,
             List<Formal> formals, List<TypeNode> throwTypes, Block body) {
-        super(pos, flags, name, formals, throwTypes, body);
+        this(pos, flags, name, formals, throwTypes, body, null);
+    }
+
+    public ConstructorDecl_c(Position pos, Flags flags, Id name,
+            List<Formal> formals, List<TypeNode> throwTypes, Block body, Ext ext) {
+        super(pos, flags, name, formals, throwTypes, body, ext);
     }
 
     @Override

@@ -53,8 +53,14 @@ public class Special_c extends Expr_c implements Special {
     protected Special.Kind kind;
     protected TypeNode qualifier;
 
+    @Deprecated
     public Special_c(Position pos, Special.Kind kind, TypeNode qualifier) {
-        super(pos);
+        this(pos, kind, qualifier, null);
+    }
+
+    public Special_c(Position pos, Special.Kind kind, TypeNode qualifier,
+            Ext ext) {
+        super(pos, ext);
         assert (kind != null); // qualifier may be null
         this.kind = kind;
         this.qualifier = qualifier;

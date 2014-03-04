@@ -46,8 +46,13 @@ public class IntLit_c extends NumLit_c implements IntLit {
     /** The kind of literal: INT or LONG. */
     protected Kind kind;
 
+    @Deprecated
     public IntLit_c(Position pos, Kind kind, long value) {
-        super(pos, value);
+        this(pos, kind, value, null);
+    }
+
+    public IntLit_c(Position pos, Kind kind, long value, Ext ext) {
+        super(pos, value, ext);
         assert (kind != null);
         this.kind = kind;
     }

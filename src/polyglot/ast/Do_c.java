@@ -49,8 +49,13 @@ import polyglot.visit.TypeChecker;
 public class Do_c extends Loop_c implements Do {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
+    @Deprecated
     public Do_c(Position pos, Stmt body, Expr cond) {
-        super(pos, cond, body);
+        this(pos, body, cond, null);
+    }
+
+    public Do_c(Position pos, Stmt body, Expr cond, Ext ext) {
+        super(pos, cond, body, ext);
         assert (cond != null);
     }
 

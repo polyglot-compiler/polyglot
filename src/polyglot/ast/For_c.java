@@ -58,9 +58,15 @@ public class For_c extends Loop_c implements For {
     protected List<ForInit> inits;
     protected List<ForUpdate> iters;
 
+    @Deprecated
     public For_c(Position pos, List<ForInit> inits, Expr cond,
             List<ForUpdate> iters, Stmt body) {
-        super(pos, cond, body);
+        this(pos, inits, cond, iters, body, null);
+    }
+
+    public For_c(Position pos, List<ForInit> inits, Expr cond,
+            List<ForUpdate> iters, Stmt body, Ext ext) {
+        super(pos, cond, body, ext);
         assert (inits != null && iters != null); // cond may be null, inits and iters may be empty
         this.inits = ListUtil.copy(inits, true);
         this.iters = ListUtil.copy(iters, true);

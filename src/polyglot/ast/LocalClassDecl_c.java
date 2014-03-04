@@ -47,8 +47,13 @@ public class LocalClassDecl_c extends Stmt_c implements LocalClassDecl {
 
     protected ClassDecl decl;
 
+    @Deprecated
     public LocalClassDecl_c(Position pos, ClassDecl decl) {
-        super(pos);
+        this(pos, decl, null);
+    }
+
+    public LocalClassDecl_c(Position pos, ClassDecl decl, Ext ext) {
+        super(pos, ext);
         assert (decl != null);
         this.decl = decl;
     }

@@ -45,8 +45,13 @@ import polyglot.visit.ExceptionChecker;
 public abstract class Term_c extends Node_c implements Term {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
+    @Deprecated
     public Term_c(Position pos) {
-        super(pos);
+        this(pos, null);
+    }
+
+    public Term_c(Position pos, Ext ext) {
+        super(pos, ext);
     }
 
     protected boolean reachable;

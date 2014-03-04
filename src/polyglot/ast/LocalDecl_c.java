@@ -65,9 +65,15 @@ public class LocalDecl_c extends Stmt_c implements LocalDecl {
     protected Expr init;
     protected LocalInstance li;
 
+    @Deprecated
     public LocalDecl_c(Position pos, Flags flags, TypeNode type, Id name,
             Expr init) {
-        super(pos);
+        this(pos, flags, type, name, init, null);
+    }
+
+    public LocalDecl_c(Position pos, Flags flags, TypeNode type, Id name,
+            Expr init, Ext ext) {
+        super(pos, ext);
         assert (flags != null && type != null && name != null); // init may be null
         this.flags = flags;
         this.type = type;

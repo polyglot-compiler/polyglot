@@ -25,6 +25,8 @@
  ******************************************************************************/
 package polyglot.ext.jl5.ast;
 
+import java.util.List;
+
 import polyglot.ast.LocalDecl;
 import polyglot.ast.Node;
 import polyglot.ext.jl5.types.Annotations;
@@ -41,6 +43,10 @@ import polyglot.visit.TypeChecker;
 
 public class JL5LocalDeclExt extends JL5AnnotatedElementExt {
     private static final long serialVersionUID = SerialVersionUID.generate();
+
+    public JL5LocalDeclExt(List<AnnotationElem> annotations) {
+        super(annotations);
+    }
 
     @Override
     public void setAnnotations(Annotations annotations) {

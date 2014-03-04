@@ -49,8 +49,13 @@ public class StringLit_c extends Lit_c implements StringLit {
 
     protected String value;
 
+    @Deprecated
     public StringLit_c(Position pos, String value) {
-        super(pos);
+        this(pos, value, null);
+    }
+
+    public StringLit_c(Position pos, String value, Ext ext) {
+        super(pos, ext);
         assert (value != null);
         this.value = value;
     }

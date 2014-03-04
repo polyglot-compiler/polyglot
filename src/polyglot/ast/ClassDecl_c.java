@@ -77,9 +77,15 @@ public class ClassDecl_c extends Term_c implements ClassDecl, ClassDeclOps {
 
     protected ParsedClassType type;
 
+    @Deprecated
     public ClassDecl_c(Position pos, Flags flags, Id name, TypeNode superClass,
             List<TypeNode> interfaces, ClassBody body) {
-        super(pos);
+        this(pos, flags, name, superClass, interfaces, body, null);
+    }
+
+    public ClassDecl_c(Position pos, Flags flags, Id name, TypeNode superClass,
+            List<TypeNode> interfaces, ClassBody body, Ext ext) {
+        super(pos, ext);
         assert (flags != null && name != null && interfaces != null && body != null); // superClass may be null, interfaces may be empty
         this.flags = flags;
         this.name = name;

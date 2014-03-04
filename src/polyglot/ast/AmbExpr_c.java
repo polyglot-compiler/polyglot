@@ -50,8 +50,13 @@ public class AmbExpr_c extends Expr_c implements AmbExpr {
 
     protected Id name;
 
+    @Deprecated
     public AmbExpr_c(Position pos, Id name) {
-        super(pos);
+        this(pos, name, null);
+    }
+
+    public AmbExpr_c(Position pos, Id name, Ext ext) {
+        super(pos, ext);
         assert (name != null);
         this.name = name;
     }

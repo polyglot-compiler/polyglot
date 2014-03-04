@@ -25,6 +25,8 @@
  ******************************************************************************/
 package polyglot.ext.jl5.ast;
 
+import java.util.List;
+
 import polyglot.ast.FieldDecl;
 import polyglot.ext.jl5.types.Annotations;
 import polyglot.ext.jl5.types.JL5FieldInstance;
@@ -35,6 +37,10 @@ import polyglot.visit.PrettyPrinter;
 
 public class JL5FieldDeclExt extends JL5AnnotatedElementExt {
     private static final long serialVersionUID = SerialVersionUID.generate();
+
+    public JL5FieldDeclExt(List<AnnotationElem> annotations) {
+        super(annotations);
+    }
 
     @Override
     public void setAnnotations(Annotations annotations) {

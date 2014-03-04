@@ -38,8 +38,13 @@ import polyglot.visit.CFGBuilder;
 public abstract class Lit_c extends Expr_c implements Lit {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
+    @Deprecated
     public Lit_c(Position pos) {
-        super(pos);
+        this(pos, null);
+    }
+
+    public Lit_c(Position pos, Ext ext) {
+        super(pos, ext);
     }
 
     @Override

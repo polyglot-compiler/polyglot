@@ -50,8 +50,13 @@ public abstract class AbstractBlock_c extends Stmt_c implements Block {
 
     protected List<Stmt> statements;
 
+    @Deprecated
     public AbstractBlock_c(Position pos, List<Stmt> statements) {
-        super(pos);
+        this(pos, statements, null);
+    }
+
+    public AbstractBlock_c(Position pos, List<Stmt> statements, Ext ext) {
+        super(pos, ext);
         assert (statements != null);
         this.statements = ListUtil.copy(statements, true);
     }

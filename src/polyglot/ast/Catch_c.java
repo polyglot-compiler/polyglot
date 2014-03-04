@@ -51,8 +51,13 @@ public class Catch_c extends Stmt_c implements Catch {
     protected Formal formal;
     protected Block body;
 
+    @Deprecated
     public Catch_c(Position pos, Formal formal, Block body) {
-        super(pos);
+        this(pos, formal, body, null);
+    }
+
+    public Catch_c(Position pos, Formal formal, Block body, Ext ext) {
+        super(pos, ext);
         assert (formal != null && body != null);
         this.formal = formal;
         this.body = body;

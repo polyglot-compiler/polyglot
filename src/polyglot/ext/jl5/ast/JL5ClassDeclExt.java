@@ -69,6 +69,12 @@ public class JL5ClassDeclExt extends JL5AnnotatedElementExt implements
 
     protected List<ParamTypeNode> paramTypes = new ArrayList<ParamTypeNode>();
 
+    public JL5ClassDeclExt(List<ParamTypeNode> paramTypes,
+            List<AnnotationElem> annotations) {
+        super(annotations);
+        this.paramTypes = ListUtil.copy(paramTypes, true);
+    }
+
     @Override
     public ClassDecl node() {
         return (ClassDecl) super.node();

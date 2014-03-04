@@ -60,9 +60,15 @@ public abstract class ProcedureDecl_c extends Term_c implements ProcedureDecl,
     protected List<TypeNode> throwTypes;
     protected Block body;
 
+    @Deprecated
     public ProcedureDecl_c(Position pos, Flags flags, Id name,
             List<Formal> formals, List<TypeNode> throwTypes, Block body) {
-        super(pos);
+        this(pos, flags, name, formals, throwTypes, body, null);
+    }
+
+    public ProcedureDecl_c(Position pos, Flags flags, Id name,
+            List<Formal> formals, List<TypeNode> throwTypes, Block body, Ext ext) {
+        super(pos, ext);
         assert (flags != null && name != null && formals != null && throwTypes != null); // body may be null
         this.flags = flags;
         this.name = name;

@@ -52,8 +52,13 @@ public class Case_c extends Stmt_c implements Case {
     protected Expr expr;
     protected long value;
 
+    @Deprecated
     public Case_c(Position pos, Expr expr) {
-        super(pos);
+        this(pos, expr, null);
+    }
+
+    public Case_c(Position pos, Expr expr, Ext ext) {
+        super(pos, ext);
         assert (true); // expr may be null for default case
         this.expr = expr;
     }

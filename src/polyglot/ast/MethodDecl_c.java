@@ -63,9 +63,16 @@ public class MethodDecl_c extends ProcedureDecl_c implements MethodDecl {
     protected TypeNode returnType;
     protected MethodInstance mi;
 
+    @Deprecated
     public MethodDecl_c(Position pos, Flags flags, TypeNode returnType,
             Id name, List<Formal> formals, List<TypeNode> throwTypes, Block body) {
-        super(pos, flags, name, formals, throwTypes, body);
+        this(pos, flags, returnType, name, formals, throwTypes, body, null);
+    }
+
+    public MethodDecl_c(Position pos, Flags flags, TypeNode returnType,
+            Id name, List<Formal> formals, List<TypeNode> throwTypes,
+            Block body, Ext ext) {
+        super(pos, flags, name, formals, throwTypes, body, ext);
         assert (returnType != null);
         this.returnType = returnType;
     }

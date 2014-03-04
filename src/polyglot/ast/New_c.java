@@ -82,9 +82,15 @@ public class New_c extends Expr_c implements New, NewOps {
     protected ParsedClassType anonType;
     protected boolean qualifierImplicit;
 
+    @Deprecated
     public New_c(Position pos, Expr qualifier, TypeNode tn,
             List<Expr> arguments, ClassBody body) {
-        super(pos);
+        this(pos, qualifier, tn, arguments, body, null);
+    }
+
+    public New_c(Position pos, Expr qualifier, TypeNode tn,
+            List<Expr> arguments, ClassBody body, Ext ext) {
+        super(pos, ext);
         assert (tn != null && arguments != null); // qualifier and body may be null
         this.qualifier = qualifier;
         this.qualifierImplicit = (qualifier == null);

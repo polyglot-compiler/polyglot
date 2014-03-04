@@ -102,15 +102,10 @@ public abstract class Ext_c implements Ext {
 
     @Override
     public void init(Node node) {
-        if (this.node != null) {
+        if (this.node != null)
             throw new InternalCompilerError("Already initialized.");
-        }
-
         this.node = node;
-
-        if (this.ext != null) {
-            this.ext.init(node);
-        }
+        if (this.ext != null) this.ext.init(node);
     }
 
     @Override

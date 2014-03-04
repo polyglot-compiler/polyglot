@@ -72,9 +72,15 @@ public class FieldDecl_c extends Term_c implements FieldDecl {
     protected FieldInstance fi;
     protected InitializerInstance ii;
 
+    @Deprecated
     public FieldDecl_c(Position pos, Flags flags, TypeNode type, Id name,
             Expr init) {
-        super(pos);
+        this(pos, flags, type, name, init, null);
+    }
+
+    public FieldDecl_c(Position pos, Flags flags, TypeNode type, Id name,
+            Expr init, Ext ext) {
+        super(pos, ext);
         assert (flags != null && type != null && name != null); // init may be null
         this.flags = flags;
         this.type = type;

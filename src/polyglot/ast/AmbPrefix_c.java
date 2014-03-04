@@ -48,8 +48,13 @@ public class AmbPrefix_c extends Node_c implements AmbPrefix {
     protected Prefix prefix;
     protected Id name;
 
+    @Deprecated
     public AmbPrefix_c(Position pos, Prefix prefix, Id name) {
-        super(pos);
+        this(pos, prefix, name, null);
+    }
+
+    public AmbPrefix_c(Position pos, Prefix prefix, Id name, Ext ext) {
+        super(pos, ext);
         assert (name != null); // prefix may be null
         this.prefix = prefix;
         this.name = name;

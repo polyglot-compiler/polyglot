@@ -1,6 +1,7 @@
 package polyglot.ext.jl5.ast;
 
 import java.util.Collections;
+import java.util.List;
 
 import polyglot.ast.ClassDecl;
 import polyglot.ast.ClassMember;
@@ -32,6 +33,10 @@ import polyglot.visit.TypeChecker;
 
 public class JL5EnumDeclExt extends JL5ClassDeclExt {
     private static final long serialVersionUID = SerialVersionUID.generate();
+
+    public JL5EnumDeclExt(List<AnnotationElem> annotations) {
+        super(Collections.<ParamTypeNode> emptyList(), annotations);
+    }
 
     public ClassDecl addValueOfMethodType(TypeSystem ts) {
         ClassDecl n = this.node();

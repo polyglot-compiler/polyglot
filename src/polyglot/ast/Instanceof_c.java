@@ -51,8 +51,13 @@ public class Instanceof_c extends Expr_c implements Instanceof {
     protected Expr expr;
     protected TypeNode compareType;
 
+    @Deprecated
     public Instanceof_c(Position pos, Expr expr, TypeNode compareType) {
-        super(pos);
+        this(pos, expr, compareType, null);
+    }
+
+    public Instanceof_c(Position pos, Expr expr, TypeNode compareType, Ext ext) {
+        super(pos, ext);
         assert (expr != null && compareType != null);
         this.expr = expr;
         this.compareType = compareType;

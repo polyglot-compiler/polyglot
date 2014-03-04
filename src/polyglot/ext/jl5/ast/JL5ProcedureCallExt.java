@@ -49,6 +49,10 @@ public abstract class JL5ProcedureCallExt extends JL5Ext implements
 
     protected List<TypeNode> typeArgs;
 
+    public JL5ProcedureCallExt(List<TypeNode> typeArgs) {
+        this.typeArgs = ListUtil.copy(typeArgs, true);
+    }
+
     @Override
     public ProcedureCall node() {
         return (ProcedureCall) super.node();

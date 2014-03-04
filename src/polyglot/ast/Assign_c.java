@@ -53,8 +53,13 @@ public abstract class Assign_c extends Expr_c implements Assign {
     protected Operator op;
     protected Expr right;
 
+    @Deprecated
     public Assign_c(Position pos, Expr left, Operator op, Expr right) {
-        super(pos);
+        this(pos, left, op, right, null);
+    }
+
+    public Assign_c(Position pos, Expr left, Operator op, Expr right, Ext ext) {
+        super(pos, ext);
         assert (left != null && op != null && right != null);
         this.left = left;
         this.op = op;
