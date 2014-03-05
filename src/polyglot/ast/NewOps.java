@@ -13,7 +13,7 @@ public interface NewOps extends ProcedureCallOps {
     TypeNode findQualifiedTypeNode(AmbiguityRemover ar, ClassType outer,
             TypeNode objectType) throws SemanticException;
 
-    New findQualifier(AmbiguityRemover ar, ClassType ct)
+    Expr findQualifier(AmbiguityRemover ar, ClassType ct)
             throws SemanticException;
 
     void typeCheckFlags(TypeChecker tc) throws SemanticException;

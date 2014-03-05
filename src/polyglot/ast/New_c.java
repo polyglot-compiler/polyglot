@@ -315,70 +315,64 @@ public class New_c extends Expr_c implements New, NewOps {
     public Node disambiguateOverride(Node parent, AmbiguityRemover ar)
             throws SemanticException {
         New_c nn = this;
-        New old = nn;
 
         BodyDisambiguator bd = new BodyDisambiguator(ar);
         NodeVisitor childv = bd.enter(parent, this);
 
-        if (childv instanceof PruningVisitor) {
-            return nn;
-        }
+        if (childv instanceof PruningVisitor) return nn;
 
         BodyDisambiguator childbd = (BodyDisambiguator) childv;
 
         // Disambiguate the qualifier and object type, if possible.
-        if (nn.qualifier() == null) {
-            nn = objectType(nn, nn.visitChild(nn.objectType(), childbd));
+        if (qualifier == null) {
+            TypeNode objectType = visitChild(this.objectType, childbd);
+            nn = objectType(nn, objectType);
             if (childbd.hasErrors()) throw new SemanticException();
 
-            if (!nn.objectType().isDisambiguated()) {
-                return nn;
-            }
+            if (!objectType.isDisambiguated()) return nn;
 
-            if (nn.objectType().type().isClass()) {
-                ClassType ct = nn.objectType().type().toClass();
+            if (objectType.type().isClass()) {
+                ClassType ct = objectType.type().toClass();
 
                 if (ct.isMember() && !ct.flags().isStatic()
                         && !ct.flags().isInterface()) {
-                    nn = (New_c) ar.lang().findQualifier(nn, ar, ct);
-
-                    nn = qualifier(nn, nn.visitChild(nn.qualifier(), childbd));
+                    Expr qualifier =
+                            visitChild(ar.lang().findQualifier(this, ar, ct),
+                                       childbd);
+                    nn = qualifier(nn, qualifier);
                     nn = qualifierImplicit(nn, true);
                     if (childbd.hasErrors()) throw new SemanticException();
                 }
             }
         }
         else {
-            nn = qualifier(nn, nn.visitChild(nn.qualifier(), childbd));
+            Expr qualifier = visitChild(this.qualifier, childbd);
+            nn = qualifier(nn, qualifier);
             if (childbd.hasErrors()) throw new SemanticException();
 
-            TypeNode objectType = nn.objectType();
+            TypeNode objectType = this.objectType;
             if (objectType instanceof Ambiguous) {
-                if (nn.qualifier().isDisambiguated()
-                        && nn.qualifier().type() != null
-                        && nn.qualifier().type().isCanonical()) {
-
-                    if (!nn.qualifier().type().isClass()) {
-                        throw new SemanticException("Cannot instantiate member class of non-class type.",
-                                                    nn.position());
-                    }
-
-                    ClassType outer = nn.qualifier().type().toClass();
-
-                    // We have to disambiguate the type node as if it were a member of the
-                    // static type, outer, of the qualifier.  For Java this is simple: type
-                    // nested type is just a name and we
-                    // use that name to lookup a member of the outer class.  For some
-                    // extensions (e.g., PolyJ), the type node may be more complex than
-                    // just a name.  We'll just punt here and let the extensions handle
-                    // this complexity.
-                    TypeNode tn =
-                            ar.lang().findQualifiedTypeNode(this,
-                                                            ar,
-                                                            outer,
-                                                            objectType);
-                    nn = objectType(nn, tn);
+                if (!qualifier.isTypeChecked()) return nn;
+                if (!qualifier.type().isClass()) {
+                    throw new SemanticException("Cannot instantiate member class of non-class type.",
+                                                nn.position());
                 }
+
+                ClassType outer = qualifier.type().toClass();
+
+                // We have to disambiguate the type node as if it were a member of the
+                // static type, outer, of the qualifier.  For Java this is simple: type
+                // nested type is just a name and we
+                // use that name to lookup a member of the outer class.  For some
+                // extensions (e.g., PolyJ), the type node may be more complex than
+                // just a name.  We'll just punt here and let the extensions handle
+                // this complexity.
+                TypeNode tn =
+                        ar.lang().findQualifiedTypeNode(this,
+                                                        ar,
+                                                        outer,
+                                                        objectType);
+                nn = objectType(nn, tn);
             }
             else if (!objectType.isDisambiguated()) {
                 // not yet disambiguated.
@@ -390,16 +384,14 @@ public class New_c extends Expr_c implements New, NewOps {
         }
 
         // Now disambiguate the actuals.
-        nn = arguments(nn, nn.visitList(nn.arguments(), childbd));
+        nn = arguments(nn, visitList(arguments, childbd));
         if (childbd.hasErrors()) throw new SemanticException();
 
-        if (nn.body() != null) {
-            if (!nn.objectType().isDisambiguated()) {
-                return nn;
-            }
+        if (body != null) {
+            TypeNode objectType = nn.objectType;
+            if (!objectType.isDisambiguated()) return nn;
 
-            ClassType ct = nn.objectType().type().toClass();
-
+            ClassType ct = objectType.type().toClass();
             ParsedClassType anonType = nn.anonType();
 
             if (anonType != null && !anonType.supertypesResolved()) {
@@ -429,7 +421,7 @@ public class New_c extends Expr_c implements New, NewOps {
             if (childbd.hasErrors()) throw new SemanticException();
         }
 
-        nn = (New_c) bd.leave(parent, old, nn, childbd);
+        nn = (New_c) bd.leave(parent, this, nn, childbd);
 
         return nn;
     }
@@ -452,7 +444,7 @@ public class New_c extends Expr_c implements New, NewOps {
     }
 
     @Override
-    public New findQualifier(AmbiguityRemover ar, ClassType ct)
+    public Expr findQualifier(AmbiguityRemover ar, ClassType ct)
             throws SemanticException {
         // If we're instantiating a non-static member class, add a "this"
         // qualifier.
@@ -481,12 +473,15 @@ public class New_c extends Expr_c implements New, NewOps {
                             nf.CanonicalTypeNode(position(), outer));
         }
         q = q.type(outer);
+        return q;
+        /*
         New_c n = qualifier(this, q);
         if (this.qualifier == null) {
             // we set a qualifier when there wasn't one already
             n = qualifierImplicit(n, true);
         }
         return n;
+        */
     }
 
     @Override

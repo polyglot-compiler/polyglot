@@ -29,7 +29,6 @@ import polyglot.ast.AmbReceiver;
 import polyglot.ast.Expr;
 import polyglot.ast.Field;
 import polyglot.ast.Node;
-import polyglot.ast.Node_c;
 import polyglot.ast.TypeNode;
 import polyglot.ext.jl5.types.EnumInstance;
 import polyglot.ext.jl5.visit.JL5Translator;
@@ -76,7 +75,7 @@ public class JL5FieldExt extends JL5Ext {
                     jltr.printReceiver(n.target(), w);
                 }
                 else {
-                    ((Node_c) n).print(n.target(), w, tr);
+                    print(n.target(), w, tr);
                 }
             }
 

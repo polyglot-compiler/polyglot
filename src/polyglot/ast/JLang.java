@@ -207,7 +207,7 @@ public interface JLang extends Lang {
     TypeNode findQualifiedTypeNode(New n, AmbiguityRemover ar, ClassType outer,
             TypeNode objectType) throws SemanticException;
 
-    New findQualifier(New n, AmbiguityRemover ar, ClassType ct)
+    Expr findQualifier(New n, AmbiguityRemover ar, ClassType ct)
             throws SemanticException;
 
     void typeCheckFlags(New n, TypeChecker tc) throws SemanticException;

@@ -293,7 +293,7 @@ public class JLang_c implements JLang {
     }
 
     @Override
-    public final New findQualifier(New n, AmbiguityRemover ar, ClassType ct)
+    public final Expr findQualifier(New n, AmbiguityRemover ar, ClassType ct)
             throws SemanticException {
         return NewOps(n).findQualifier(ar, ct);
     }

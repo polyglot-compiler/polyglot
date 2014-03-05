@@ -29,7 +29,6 @@ import java.util.List;
 
 import polyglot.ast.Formal;
 import polyglot.ast.Node;
-import polyglot.ast.Node_c;
 import polyglot.ext.jl5.types.Annotations;
 import polyglot.ext.jl5.types.JL5ArrayType;
 import polyglot.ext.jl5.types.JL5Flags;
@@ -115,7 +114,7 @@ public class JL5FormalExt extends JL5AnnotatedElementExt {
             w.write(" ...");
         }
         else {
-            ((Node_c) f).print(f.type(), w, tr);
+            print(f.type(), w, tr);
         }
         w.write(" ");
         w.write(f.name());

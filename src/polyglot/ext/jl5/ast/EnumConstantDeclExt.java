@@ -66,7 +66,6 @@ public class EnumConstantDeclExt extends JL5AnnotatedElementExt {
         }
 
         BodyDisambiguator childbd = (BodyDisambiguator) childv;
-        EnumConstantDecl old = nn;
 
         // Now disambiguate the actuals.
         nn = nn.args(nn.visitList(nn.args(), childbd));
@@ -91,7 +90,7 @@ public class EnumConstantDeclExt extends JL5AnnotatedElementExt {
         // Now visit the annotations
         nn = annotationElems(nn, nn.visitList(annotations, childbd));
 
-        nn = (EnumConstantDecl) bd.leave(parent, old, nn, childbd);
+        nn = (EnumConstantDecl) bd.leave(parent, node(), nn, childbd);
 
         return nn;
     }

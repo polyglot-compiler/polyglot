@@ -36,7 +36,6 @@ import polyglot.ast.Expr;
 import polyglot.ast.FieldDecl;
 import polyglot.ast.LocalDecl;
 import polyglot.ast.Node;
-import polyglot.ast.Node_c;
 import polyglot.ast.Return;
 import polyglot.ast.Special;
 import polyglot.ast.TypeNode;
@@ -261,7 +260,7 @@ public class JL5CallExt extends JL5ProcedureCallExt implements CallOps {
                     jltr.printReceiver(n.target(), w);
                 }
                 else {
-                    ((Node_c) n).print(n.target(), w, tr);
+                    print(n.target(), w, tr);
                 }
             }
             w.write(".");

@@ -153,7 +153,13 @@ public abstract class Ext_c implements Ext {
 
     @Override
     public String toString() {
-        return StringUtil.getShortNameComponent(getClass().getName());
+        StringBuffer sb =
+                new StringBuffer(StringUtil.getShortNameComponent(getClass().getName()));
+        if (ext != null) {
+            sb.append(":");
+            sb.append(ext.toString());
+        }
+        return sb.toString();
     }
 
     @Override
@@ -308,6 +314,16 @@ public abstract class Ext_c implements Ext {
     @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter pp) {
         superLang().prettyPrint(node(), w, pp);
+    }
+
+    public void print(Node child, CodeWriter w, PrettyPrinter pp) {
+        pp.print(node(), child, w);
+    }
+
+    public void printBlock(Node n, CodeWriter w, PrettyPrinter pp) {
+        w.begin(0);
+        print(n, w, pp);
+        w.end();
     }
 
     @Override

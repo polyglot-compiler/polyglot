@@ -33,7 +33,6 @@ import polyglot.ast.ClassDecl;
 import polyglot.ast.ClassDeclOps;
 import polyglot.ast.Node;
 import polyglot.ast.NodeFactory;
-import polyglot.ast.Node_c;
 import polyglot.ast.TypeNode;
 import polyglot.ext.jl5.types.AnnotationTypeElemInstance;
 import polyglot.ext.jl5.types.Annotations;
@@ -299,7 +298,7 @@ public class JL5ClassDeclExt extends JL5AnnotatedElementExt implements
         if (n.superClass() != null
                 && ((!JL5Flags.isEnum(n.flags()) && !JL5Flags.isAnnotation(n.flags())))) {
             w.write(" extends ");
-            ((Node_c) n).print(n.superClass(), w, tr);
+            print(n.superClass(), w, tr);
         }
 
         if (!n.interfaces().isEmpty() && !JL5Flags.isAnnotation(n.flags())) {
@@ -312,7 +311,7 @@ public class JL5ClassDeclExt extends JL5AnnotatedElementExt implements
 
             for (Iterator<TypeNode> i = n.interfaces().iterator(); i.hasNext();) {
                 TypeNode tn = i.next();
-                ((Node_c) n).print(tn, w, tr);
+                print(tn, w, tr);
 
                 if (i.hasNext()) {
                     w.write(", ");

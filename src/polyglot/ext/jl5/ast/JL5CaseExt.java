@@ -31,7 +31,6 @@ import polyglot.ast.Expr;
 import polyglot.ast.Field;
 import polyglot.ast.Lit;
 import polyglot.ast.Node;
-import polyglot.ast.Node_c;
 import polyglot.ast.Receiver;
 import polyglot.ext.jl5.types.EnumInstance;
 import polyglot.ext.jl5.types.JL5TypeSystem;
@@ -222,7 +221,7 @@ public class JL5CaseExt extends JL5Ext implements JL5CaseOps {
                 w.write(f.name());
             }
             else {
-                ((Node_c) c).print(expr, w, tr);
+                print(expr, w, tr);
             }
             w.write(":");
         }

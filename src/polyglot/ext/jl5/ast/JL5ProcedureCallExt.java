@@ -30,7 +30,6 @@ import java.util.Iterator;
 import java.util.List;
 
 import polyglot.ast.Node;
-import polyglot.ast.Node_c;
 import polyglot.ast.ProcedureCall;
 import polyglot.ast.ProcedureCallOps;
 import polyglot.ast.TypeNode;
@@ -112,7 +111,7 @@ public abstract class JL5ProcedureCallExt extends JL5Ext implements
             Iterator<TypeNode> it = ext.typeArgs().iterator();
             while (it.hasNext()) {
                 TypeNode tn = it.next();
-                ((Node_c) n).print(tn, w, tr);
+                print(tn, w, tr);
                 if (it.hasNext()) {
                     w.write(",");
                     w.allowBreak(0, " ");

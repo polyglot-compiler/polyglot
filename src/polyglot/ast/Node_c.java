@@ -596,7 +596,13 @@ public abstract class Node_c implements Node {
         // return new StringPrettyPrinter(5).toString(this);
 
         // Not slow anymore.
-        return getClass().getName();
+        StringBuffer sb =
+                new StringBuffer(StringUtil.getShortNameComponent(getClass().getName()));
+        if (ext != null) {
+            sb.append(":");
+            sb.append(ext.toString());
+        }
+        return sb.toString();
     }
 
     @Override

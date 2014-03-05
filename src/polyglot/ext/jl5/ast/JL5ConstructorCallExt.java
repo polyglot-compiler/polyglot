@@ -36,7 +36,6 @@ import polyglot.ast.ConstructorCall_c;
 import polyglot.ast.Expr;
 import polyglot.ast.IntLit;
 import polyglot.ast.Node;
-import polyglot.ast.Node_c;
 import polyglot.ast.TypeNode;
 import polyglot.ext.jl5.JL5Options;
 import polyglot.ext.jl5.types.JL5Context;
@@ -261,7 +260,7 @@ public class JL5ConstructorCallExt extends JL5ProcedureCallExt {
         }
 
         if (cc.qualifier() != null) {
-            ((Node_c) cc).print(cc.qualifier(), w, tr);
+            print(cc.qualifier(), w, tr);
             w.write(".");
         }
 

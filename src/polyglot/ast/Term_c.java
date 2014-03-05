@@ -45,6 +45,9 @@ import polyglot.visit.ExceptionChecker;
 public abstract class Term_c extends Node_c implements Term {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
+    protected boolean reachable;
+    protected SubtypeSet exceptions;
+
     @Deprecated
     public Term_c(Position pos) {
         this(pos, null);
@@ -54,35 +57,22 @@ public abstract class Term_c extends Node_c implements Term {
         super(pos, ext);
     }
 
-    protected boolean reachable;
-
-    @Override
-    public abstract <T> List<T> acceptCFG(CFGBuilder<?> v, List<T> succs);
-
     @Override
     public boolean reachable() {
         return reachable;
     }
 
     @Override
-    public Term reachable(boolean reachability) {
-        return reachable(this, reachability);
+    public Term reachable(boolean reachable) {
+        return reachable(this, reachable);
     }
 
-    protected <N extends Term_c> N reachable(N n, boolean reachability) {
-        if (n.reachable == reachability) return n;
+    protected <N extends Term_c> N reachable(N n, boolean reachable) {
+        if (n.reachable == reachable) return n;
         if (n == this) n = Copy.Util.copy(n);
-        n.reachable = reachability;
+        n.reachable = reachable;
         return n;
     }
-
-    /** Utility function to get the first entry of a list, or else alt. */
-    public static <T extends Term, U extends T, V extends T> T listChild(
-            List<U> l, V alt) {
-        return CollectionUtil.<T, U, V> firstOrElse(l, alt);
-    }
-
-    protected SubtypeSet exceptions;
 
     @Override
     public SubtypeSet exceptions() {
@@ -101,6 +91,12 @@ public abstract class Term_c extends Node_c implements Term {
         return n;
     }
 
+    /** Utility function to get the first entry of a list, or else alt. */
+    public static <T extends Term, U extends T, V extends T> T listChild(
+            List<U> l, V alt) {
+        return CollectionUtil.<T, U, V> firstOrElse(l, alt);
+    }
+
     @Override
     public Node exceptionCheck(ExceptionChecker ec) throws SemanticException {
         Term_c t = (Term_c) super.exceptionCheck(ec);
@@ -115,4 +111,10 @@ public abstract class Term_c extends Node_c implements Term {
         t = reachable(t, false);
         return t;
     }
+
+    @Override
+    public abstract Term firstChild();
+
+    @Override
+    public abstract <T> List<T> acceptCFG(CFGBuilder<?> v, List<T> succs);
 }

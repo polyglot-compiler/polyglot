@@ -34,7 +34,6 @@ import polyglot.ast.Expr;
 import polyglot.ast.New;
 import polyglot.ast.NewOps;
 import polyglot.ast.Node;
-import polyglot.ast.Node_c;
 import polyglot.ast.Special;
 import polyglot.ast.TypeNode;
 import polyglot.ext.jl5.types.JL5ClassType;
@@ -128,13 +127,13 @@ public class JL5NewExt extends JL5ProcedureCallExt implements NewOps {
     }
 
     @Override
-    public New findQualifier(AmbiguityRemover ar, ClassType ct)
+    public Expr findQualifier(AmbiguityRemover ar, ClassType ct)
             throws SemanticException {
         // Call super.findQualifier in order to perform its checks, but throw away the
         // qualifier that it finds. That is, just return this node. Do not attempt to infer 
         // a qualifier if one is missing.
         superLang().findQualifier(this.node(), ar, ct);
-        return this.node();
+        return this.node().qualifier();
     }
 
     @Override
@@ -237,7 +236,7 @@ public class JL5NewExt extends JL5ProcedureCallExt implements NewOps {
             }
         }
         else {
-            ((Node_c) n).print(n.objectType(), w, tr);
+            print(n.objectType(), w, tr);
         }
 
         printArgs(w, tr);
@@ -266,7 +265,8 @@ public class JL5NewExt extends JL5ProcedureCallExt implements NewOps {
         return t;
     }
 
-    ClassType findEnclosingClassFrom(ClassType t, Context c, ClassType ct) {
+    private ClassType findEnclosingClassFrom(ClassType t, Context c,
+            ClassType ct) {
         JL5TypeSystem ts = (JL5TypeSystem) ct.typeSystem();
         String name = ct.name();
         while (t != null) {

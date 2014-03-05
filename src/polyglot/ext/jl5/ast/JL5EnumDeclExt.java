@@ -11,7 +11,6 @@ import polyglot.ast.JLang;
 import polyglot.ast.MethodDecl;
 import polyglot.ast.Node;
 import polyglot.ast.NodeFactory;
-import polyglot.ast.Node_c;
 import polyglot.ast.TypeNode;
 import polyglot.ext.jl5.types.JL5Flags;
 import polyglot.ext.jl5.types.JL5MethodInstance;
@@ -216,7 +215,7 @@ public class JL5EnumDeclExt extends JL5ClassDeclExt {
         }
 
         if (!hasEnumConstant) w.write(";");
-        ((Node_c) n).print(n.body(), w, tr);
+        print(n.body(), w, tr);
         ((JLang) tr.lang()).prettyPrintFooter(n, w, tr);
     }
 

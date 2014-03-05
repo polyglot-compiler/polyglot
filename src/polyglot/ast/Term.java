@@ -28,6 +28,11 @@ package polyglot.ast;
 
 import java.util.List;
 
+import polyglot.translate.ExtensionRewriter;
+import polyglot.types.SemanticException;
+import polyglot.util.InternalCompilerError;
+import polyglot.util.Position;
+import polyglot.util.SerialVersionUID;
 import polyglot.util.SubtypeSet;
 import polyglot.visit.CFGBuilder;
 
@@ -73,7 +78,7 @@ public interface Term extends Node {
     /**
      * Set the reachability of this term.
      */
-    Term reachable(boolean reachability);
+    Term reachable(boolean reachable);
 
     /**
      * List of Types with all exceptions possibly thrown by this term.
@@ -84,4 +89,30 @@ public interface Term extends Node {
     SubtypeSet exceptions();
 
     Term exceptions(SubtypeSet exceptions);
+
+    class Instance extends Term_c {
+        private static final long serialVersionUID =
+                SerialVersionUID.generate();
+
+        public Instance(Position pos, Ext ext) {
+            super(pos, ext);
+            assert (ext != null);
+        }
+
+        @Override
+        public Node extRewrite(ExtensionRewriter rw) throws SemanticException {
+            throw new InternalCompilerError("This term cannot be represented in the "
+                    + "target language and should have been rewritten: " + this);
+        }
+
+        @Override
+        public Term firstChild() {
+            throw new InternalCompilerError("Unexpected invocation from extension object.");
+        }
+
+        @Override
+        public <T> List<T> acceptCFG(CFGBuilder<?> v, List<T> succs) {
+            throw new InternalCompilerError("Unexpected invocation from extension object.");
+        }
+    }
 }
