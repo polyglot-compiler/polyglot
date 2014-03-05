@@ -30,7 +30,6 @@ import java.util.List;
 
 import polyglot.ast.Block;
 import polyglot.ast.Call;
-import polyglot.ast.CanonicalTypeNode;
 import polyglot.ast.ClassBody;
 import polyglot.ast.ClassDecl;
 import polyglot.ast.ConstructorCall;
@@ -51,7 +50,6 @@ import polyglot.ast.Stmt;
 import polyglot.ast.Term;
 import polyglot.ast.TypeNode;
 import polyglot.types.Flags;
-import polyglot.types.Type;
 import polyglot.util.CollectionUtil;
 import polyglot.util.Position;
 
@@ -119,13 +117,6 @@ public class JL5NodeFactory_c extends JL5AbstractNodeFactory_c {
                 new AnnotationElemDecl_c(pos, flags, type, name, defaultValue);
         n = (AnnotationElemDecl) n.ext(extFactory().extAnnotationElemDecl());
         return n;
-    }
-
-    @Override
-    public CanonicalTypeNode CanonicalTypeNode(Position pos, Type type) {
-        return super.CanonicalTypeNode(pos,
-                                       JL5CanonicalTypeNodeExt.makeRawIfNeeded(type,
-                                                                               pos));
     }
 
     @Override

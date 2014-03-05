@@ -30,7 +30,7 @@ class Test {
         t.mCPublic(); // OK
         ct.mCPublic();
         t.mCPrivate(); // compile-time error
-        ct.mCPrivate();
+        ct.mCPrivate(); // compile-time error
         t.mCProtected();
         ct.mCProtected();
     }

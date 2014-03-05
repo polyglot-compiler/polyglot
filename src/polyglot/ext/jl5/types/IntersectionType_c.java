@@ -83,6 +83,15 @@ public class IntersectionType_c extends ClassType_c implements IntersectionType 
     }
 
     @Override
+    public boolean isEnclosedImpl(ClassType maybe_outer) {
+        for (ReferenceType bound : bounds) {
+            if (!bound.isClass() || !bound.toClass().isEnclosed(maybe_outer))
+                return false;
+        }
+        return true;
+    }
+
+    @Override
     public String translate(Resolver c) {
         StringBuffer sb = new StringBuffer();//("intersection[ ");
         for (Iterator<ReferenceType> iter = bounds.iterator(); iter.hasNext();) {

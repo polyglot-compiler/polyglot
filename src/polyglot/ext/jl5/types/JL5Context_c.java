@@ -77,7 +77,7 @@ public class JL5Context_c extends Context_c implements JL5Context {
         }
 
         try {
-            // might be a static iport
+            // might be a static import
             if (importTable() != null) {
                 JL5ImportTable jit = (JL5ImportTable) importTable();
                 for (String next : jit.singleStaticImports()) {

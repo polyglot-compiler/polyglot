@@ -32,10 +32,8 @@ import polyglot.ast.CanonicalTypeNode;
 import polyglot.ast.Node;
 import polyglot.ext.jl5.types.IntersectionType;
 import polyglot.ext.jl5.types.JL5Context;
-import polyglot.ext.jl5.types.JL5ParsedClassType;
 import polyglot.ext.jl5.types.JL5SubstClassType;
 import polyglot.ext.jl5.types.JL5TypeSystem;
-import polyglot.ext.jl5.types.RawClass;
 import polyglot.ext.jl5.types.TypeVariable;
 import polyglot.ext.jl5.types.WildCardType;
 import polyglot.frontend.MissingDependencyException;
@@ -46,44 +44,11 @@ import polyglot.types.ClassType;
 import polyglot.types.ReferenceType;
 import polyglot.types.SemanticException;
 import polyglot.types.Type;
-import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
 import polyglot.visit.TypeChecker;
 
 public class JL5CanonicalTypeNodeExt extends JL5Ext {
     private static final long serialVersionUID = SerialVersionUID.generate();
-
-    /**
-     * This method takes a type, and, if that type 
-     * is a class with type parameters, then
-     * make it a raw class. Also, if the type is a 
-     * class with no type variables, but is an inner
-     * class of a raw class, then the class should 
-     * be a raw class (i.e., the erasure of the type).
-     */
-    public static Type makeRawIfNeeded(Type type, Position pos) {
-        if (type.isClass()) {
-            JL5TypeSystem ts = (JL5TypeSystem) type.typeSystem();
-            if (type instanceof JL5ParsedClassType
-                    && !((JL5ParsedClassType) type).typeVariables().isEmpty()) {
-                // needs to be a raw type
-                return ts.rawClass((JL5ParsedClassType) type, pos);
-            }
-            if (type.toClass().isInnerClass()) {
-                ClassType t = type.toClass();
-                ClassType outer = type.toClass().outer();
-                while (t.isInnerClass() && outer != null) {
-                    if (outer instanceof RawClass) {
-                        // an inner class of a raw class should be a raw class.
-                        return ts.erasureType(type);
-                    }
-                    t = outer;
-                    outer = outer.outer();
-                }
-            }
-        }
-        return type;
-    }
 
     @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {

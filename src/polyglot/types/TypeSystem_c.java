@@ -463,22 +463,13 @@ public class TypeSystem_c implements TypeSystem {
             ClassType contextClass) {
         Flags flags = mi.flags();
 
-        ReferenceType target;
-        // does container inherit mi?
-        if (container.descendsFrom(mi.container()) && mi.flags().isPublic()) {
-            target = container;
-        }
-        else {
-            target = mi.container();
-        }
-
-        if (!target.isClass()) {
+        if (!container.isClass()) {
             // public members of non-classes are accessible;
             // non-public members of non-classes are inaccessible
             return flags.isPublic();
         }
 
-        ClassType targetClass = target.toClass();
+        ClassType targetClass = container.toClass();
 
         if (!classAccessible(targetClass, contextClass)) {
             return false;
@@ -732,10 +723,17 @@ public class TypeSystem_c implements TypeSystem {
                     + fi.container() + " and " + fi2.container() + ".");
         }
 
-        if (currClass != null) {
+        if (container == null) {
             if (!isAccessible(fi, currClass) && !isInherited(fi, currClass)) {
                 // currClass neither inherits fi, nor can access it.
                 throw new SemanticException("Cannot access " + fi + ".");
+            }
+        }
+        else if (currClass != null) {
+            if (!isAccessible(fi, container, currClass)) {
+                // Cannot access private field declared in superclasses.
+                throw new SemanticException("Field " + fi + " is not visible "
+                        + "in class " + container + ".");
             }
         }
 
@@ -931,7 +929,7 @@ public class TypeSystem_c implements TypeSystem {
             }
 
             for (MethodInstance mi : type.toReference().methodsNamed(name)) {
-                if (isAccessible(mi, container, currClass)) {
+                if (isAccessible(mi, currClass)) {
                     return true;
                 }
             }

@@ -44,7 +44,7 @@ import polyglot.visit.PrettyPrinter;
 public class AmbWildCard extends TypeNode_c implements Ambiguous {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
-    private TypeNode constraint;
+    protected TypeNode constraint;
     private boolean isExtendsConstraint;
 
     public AmbWildCard(Position pos) {

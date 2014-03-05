@@ -2025,24 +2025,20 @@ public class JL5TypeSystem_c extends
             ClassType contextClass) {
         assert_(mi);
 
-        ReferenceType target;
-        // does container inherit mi?
-        if (container.descendsFrom(mi.container()) && mi.flags().isPublic()) {
-            target = container;
-        }
-        else {
-            target = mi.container();
-        }
-
         Flags flags = mi.flags();
 
-        if (!target.isClass()) {
+        if (container instanceof TypeVariable) {
+            TypeVariable tv = (TypeVariable) container;
+            return !flags.isPrivate()
+                    && isAccessible(mi, tv.upperBound(), contextClass);
+        }
+        if (!container.isClass()) {
             // public members of non-classes are accessible;
             // non-public members of non-classes are inaccessible
             return flags.isPublic();
         }
 
-        JL5ClassType targetClass = (JL5ClassType) target.toClass();
+        JL5ClassType targetClass = (JL5ClassType) container.toClass();
 
         if (isAccessible_(flags, targetClass, contextClass)) {
             return true;
