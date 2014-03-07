@@ -98,12 +98,8 @@ parser Grm extends polyglot.parse.Grm  {:
     nf = (JL5NodeFactory) n;
   }
 
-    public ParamTypeNode toParamType(Position pos, Id id, List<TypeNode> bounds){
-        if (bounds == null){
-            bounds = new LinkedList<TypeNode>();
-        }
-        ParamTypeNode tn = nf.ParamTypeNode(pos, bounds, id);
-        return tn;
+    public TypeNode toParamType(Position pos, Id id, List<TypeNode> bounds){
+        return nf.ParamTypeNode(pos, id, CollectionUtil.nonNullList(bounds));
     }
 
     public List<LocalDecl> variableDeclarators(TypeNode a, List<VarDeclarator> b, Flags flags, List<AnnotationElem> annotations)
@@ -163,11 +159,11 @@ non terminal List<TypeNode> type_argument_list_3;
 non terminal TypeNode reference_type_3;
 
 // JSR-14 2.2) Parameterized Type Declarations 2.3) Handling Consecutive...
-non terminal List<ParamTypeNode> type_parameters, type_parameters_opt;
-non terminal ParamTypeNode type_parameter;
-non terminal List<ParamTypeNode> type_parameter_list;
-non terminal ParamTypeNode type_parameter_1;
-non terminal List<ParamTypeNode> type_parameter_list_1;
+non terminal List<TypeNode> type_parameters, type_parameters_opt;
+non terminal TypeNode type_parameter;
+non terminal List<TypeNode> type_parameter_list;
+non terminal TypeNode type_parameter_1;
+non terminal List<TypeNode> type_parameter_list_1;
 non terminal List<TypeNode> type_bound, type_bound_opt;
 non terminal List<TypeNode> type_bound_1;
 non terminal List<TypeNode> additional_bound_list, additional_bound_list_opt;
@@ -548,7 +544,7 @@ override method_header ::=
         // but it might still turn out to be a field declaration).
         modifiers_or_annotations_opt:a type:b IDENTIFIER:d LPAREN
                 formal_parameter_list_opt:e RPAREN:f dims_opt:g throws_opt:h
-        {: RESULT = parser.nf.MethodDecl(parser.pos(b, f, d), a.flags(), a.annotations(), parser.array(b, g.intValue()), parser.nf.Id(parser.pos(d), d.getIdentifier()), e, h, null, new LinkedList<ParamTypeNode>()); :}
+        {: RESULT = parser.nf.MethodDecl(parser.pos(b, f, d), a.flags(), a.annotations(), parser.array(b, g.intValue()), parser.nf.Id(parser.pos(d), d.getIdentifier()), e, h, null, new LinkedList<TypeNode>()); :}
         |       
     modifiers_or_annotations_opt:a LT:b type_parameter_list_1:c type:d IDENTIFIER:i LPAREN
                 formal_parameter_list_opt:e RPAREN:f dims_opt:g throws_opt:h
@@ -556,7 +552,7 @@ override method_header ::=
         |       
     modifiers_or_annotations_opt:a VOID:b IDENTIFIER:c LPAREN
                 formal_parameter_list_opt:e RPAREN:f dims_opt:g throws_opt:h
-        {: RESULT = parser.nf.MethodDecl(parser.pos(b, f, c), a.flags(), a.annotations(), parser.nf.CanonicalTypeNode(parser.pos(b), parser.ts.Void()), parser.nf.Id(parser.pos(c), c.getIdentifier()), e, h, null, new LinkedList<ParamTypeNode>()); :}
+        {: RESULT = parser.nf.MethodDecl(parser.pos(b, f, c), a.flags(), a.annotations(), parser.nf.CanonicalTypeNode(parser.pos(b), parser.ts.Void()), parser.nf.Id(parser.pos(c), c.getIdentifier()), e, h, null, new LinkedList<TypeNode>()); :}
         |       
     modifiers_or_annotations_opt:a LT:b type_parameter_list_1:c VOID:d IDENTIFIER:i LPAREN
                 formal_parameter_list_opt:e RPAREN:f dims_opt:g throws_opt:h
@@ -605,7 +601,7 @@ override local_variable_declaration ::=
 // 19.8.5) Constructor Declarations
 override constructor_declaration ::=
         modifiers_or_annotations_opt:a  simple_name:d LPAREN formal_parameter_list_opt:e RPAREN  throws_opt:f constructor_body:g
-        {: RESULT = parser.nf.ConstructorDecl(d.pos, a.flags(), a.annotations(), d.name, e, f, g, new LinkedList<ParamTypeNode>()); :}
+        {: RESULT = parser.nf.ConstructorDecl(d.pos, a.flags(), a.annotations(), d.name, e, f, g, new LinkedList<TypeNode>()); :}
         |       
     modifiers_or_annotations_opt:a LT:b type_parameter_list_1:c simple_name:d LPAREN formal_parameter_list_opt:e RPAREN throws_opt:f constructor_body:g
         {: RESULT = parser.nf.ConstructorDecl(d.pos, a.flags(), a.annotations(), d.name, e, f, g, c); :} 
@@ -890,7 +886,7 @@ type_parameters_opt ::=
     type_parameters:a 
     {: RESULT = a; :}
     | 
-    {: RESULT = new LinkedList<ParamTypeNode>(); :}
+    {: RESULT = new LinkedList<TypeNode>(); :}
 ;
 type_parameters ::=
 		LT type_parameter_list_1:a
@@ -902,13 +898,13 @@ type_parameter_list ::=
            RESULT = a; :}
 	|	
     type_parameter:a
-        {: List<ParamTypeNode> l = new LinkedList<ParamTypeNode>();
+        {: List<TypeNode> l = new LinkedList<TypeNode>();
            l.add(a);
            RESULT = l; :}
 	;
 type_parameter_list_1 ::=
     type_parameter_1:a
-        {: List<ParamTypeNode> l = new LinkedList<ParamTypeNode>();
+        {: List<TypeNode> l = new LinkedList<TypeNode>();
            l.add(a);
            RESULT = l; :}
 	|	

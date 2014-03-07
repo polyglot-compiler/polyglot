@@ -184,8 +184,7 @@ public class JL5NodeFactory_c extends JL5AbstractNodeFactory_c {
     @Override
     public ClassDecl ClassDecl(Position pos, Flags flags,
             List<AnnotationElem> annotations, Id name, TypeNode superType,
-            List<TypeNode> interfaces, ClassBody body,
-            List<ParamTypeNode> paramTypes) {
+            List<TypeNode> interfaces, ClassBody body, List<TypeNode> paramTypes) {
         return ClassDecl(pos,
                          flags,
                          annotations,
@@ -201,7 +200,7 @@ public class JL5NodeFactory_c extends JL5AbstractNodeFactory_c {
     protected final ClassDecl ClassDecl(Position pos, Flags flags,
             List<AnnotationElem> annotations, Id name, TypeNode superType,
             List<TypeNode> interfaces, ClassBody body,
-            List<ParamTypeNode> paramTypes, Ext ext, ExtFactory extFactory) {
+            List<TypeNode> paramTypes, Ext ext, ExtFactory extFactory) {
         for (;; extFactory = extFactory.nextExtFactory()) {
             Ext e = extFactory.extClassDecl();
             if (e == null) break;
@@ -257,8 +256,7 @@ public class JL5NodeFactory_c extends JL5AbstractNodeFactory_c {
     @Override
     public ConstructorDecl ConstructorDecl(Position pos, Flags flags,
             List<AnnotationElem> annotations, Id name, List<Formal> formals,
-            List<TypeNode> throwTypes, Block body,
-            List<ParamTypeNode> typeParams) {
+            List<TypeNode> throwTypes, Block body, List<TypeNode> typeParams) {
         return ConstructorDecl(pos,
                                flags,
                                annotations,
@@ -273,8 +271,8 @@ public class JL5NodeFactory_c extends JL5AbstractNodeFactory_c {
 
     protected final ConstructorDecl ConstructorDecl(Position pos, Flags flags,
             List<AnnotationElem> annotations, Id name, List<Formal> formals,
-            List<TypeNode> throwTypes, Block body,
-            List<ParamTypeNode> typeParams, Ext ext, ExtFactory extFactory) {
+            List<TypeNode> throwTypes, Block body, List<TypeNode> typeParams,
+            Ext ext, ExtFactory extFactory) {
         for (;; extFactory = extFactory.nextExtFactory()) {
             Ext e = extFactory.extConstructorDecl();
             if (e == null) break;
@@ -465,7 +463,7 @@ public class JL5NodeFactory_c extends JL5AbstractNodeFactory_c {
     public MethodDecl MethodDecl(Position pos, Flags flags,
             List<AnnotationElem> annotations, TypeNode returnType, Id name,
             List<Formal> formals, List<TypeNode> throwTypes, Block body,
-            List<ParamTypeNode> typeParams) {
+            List<TypeNode> typeParams) {
         return MethodDecl(pos,
                           flags,
                           annotations,
@@ -482,7 +480,7 @@ public class JL5NodeFactory_c extends JL5AbstractNodeFactory_c {
     protected final MethodDecl MethodDecl(Position pos, Flags flags,
             List<AnnotationElem> annotations, TypeNode returnType, Id name,
             List<Formal> formals, List<TypeNode> throwTypes, Block body,
-            List<ParamTypeNode> typeParams, Ext ext, ExtFactory extFactory) {
+            List<TypeNode> typeParams, Ext ext, ExtFactory extFactory) {
         for (;; extFactory = extFactory.nextExtFactory()) {
             Ext e = extFactory.extMethodDecl();
             if (e == null) break;
@@ -548,11 +546,19 @@ public class JL5NodeFactory_c extends JL5AbstractNodeFactory_c {
     }
 
     @Override
-    public ParamTypeNode ParamTypeNode(Position pos, List<TypeNode> bounds,
-            Id id) {
-        ParamTypeNode n = new ParamTypeNode_c(pos, bounds, id);
-        n = (ParamTypeNode) n.ext(extFactory().extParamTypeNode());
-        return n;
+    public TypeNode ParamTypeNode(Position pos, Id id, List<TypeNode> bounds) {
+        return ParamTypeNode(pos, id, bounds, null, extFactory());
+    }
+
+    protected final TypeNode ParamTypeNode(Position pos, Id id,
+            List<TypeNode> bounds, Ext ext, ExtFactory extFactory) {
+        for (;; extFactory = extFactory.nextExtFactory()) {
+            Ext e = ((JL5ExtFactory) extFactory).extParamTypeNode();
+            if (e == null) break;
+            ext = composeExts(ext, e);
+        }
+        ext = composeExts(ext, new ParamTypeNode_c(id, bounds));
+        return super.TypeNode(pos, ext, extFactory.nextExtFactory());
     }
 
     @Override

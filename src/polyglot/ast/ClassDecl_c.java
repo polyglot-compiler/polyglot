@@ -632,6 +632,7 @@ public class ClassDecl_c extends Term_c implements ClassDecl, ClassDeclOps {
     public Node extRewrite(ExtensionRewriter rw) throws SemanticException {
         ClassDecl_c n = (ClassDecl_c) super.extRewrite(rw);
         if (n == this) n = Copy.Util.copy(n);
+        n = type(n, null);
         n.defaultCI = null;
         return n;
     }

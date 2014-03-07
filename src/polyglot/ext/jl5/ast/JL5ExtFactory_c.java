@@ -159,6 +159,11 @@ public final class JL5ExtFactory_c extends JL5AbstractExtFactory_c {
     }
 
     @Override
+    protected Ext extParamTypeNodeImpl() {
+        return null;
+    }
+
+    @Override
     protected Ext extSpecialImpl() {
         return new JL5SpecialExt();
     }

@@ -44,12 +44,8 @@ parser Grm extends polyglot.qq.Grm {:
    /**
     * Copied from JL5 PPG.
     */
-   public ParamTypeNode toParamType(Position pos, Id id, List<TypeNode> bounds){
-        if (bounds == null){
-            bounds = new LinkedList<TypeNode>();
-        }
-        ParamTypeNode tn = nf.ParamTypeNode(pos, bounds, id);
-        return tn;
+    public TypeNode toParamType(Position pos, Id id, List<TypeNode> bounds){
+        return nf.ParamTypeNode(pos, id, CollectionUtil.nonNullList(bounds));
     }
     
    /**

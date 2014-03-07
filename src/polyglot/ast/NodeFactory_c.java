@@ -1127,6 +1127,13 @@ public class NodeFactory_c extends AbstractNodeFactory_c {
                          ext);
     }
 
+    protected final TypeNode TypeNode(Position pos, Ext ext,
+            ExtFactory extFactory) {
+        for (; extFactory != null; extFactory = extFactory.nextExtFactory())
+            ext = composeExts(ext, extFactory.extTypeNode());
+        return new TypeNode.Instance(pos, ext);
+    }
+
     @Override
     public ArrayTypeNode ArrayTypeNode(Position pos, TypeNode base) {
         ArrayTypeNode n = ArrayTypeNode(pos, base, null, extFactory());

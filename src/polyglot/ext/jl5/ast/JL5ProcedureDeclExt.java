@@ -65,23 +65,23 @@ public abstract class JL5ProcedureDeclExt extends JL5AnnotatedElementExt
         implements ProcedureDeclOps {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
-    protected List<ParamTypeNode> typeParams;
+    protected List<TypeNode> typeParams;
 
-    public JL5ProcedureDeclExt(List<ParamTypeNode> typeParams,
+    public JL5ProcedureDeclExt(List<TypeNode> typeParams,
             List<AnnotationElem> annotations) {
         super(annotations);
         this.typeParams = ListUtil.copy(typeParams, true);
     }
 
-    public List<ParamTypeNode> typeParams() {
+    public List<TypeNode> typeParams() {
         return this.typeParams;
     }
 
-    public Node typeParams(List<ParamTypeNode> typeParams) {
+    public Node typeParams(List<TypeNode> typeParams) {
         return typeParams(node(), typeParams);
     }
 
-    protected <N extends Node> N typeParams(N n, List<ParamTypeNode> typeParams) {
+    protected <N extends Node> N typeParams(N n, List<TypeNode> typeParams) {
         JL5ProcedureDeclExt ext = (JL5ProcedureDeclExt) JL5Ext.ext(n);
         if (CollectionUtil.equals(ext.typeParams, typeParams)) return n;
         if (n == node) {
@@ -99,14 +99,14 @@ public abstract class JL5ProcedureDeclExt extends JL5AnnotatedElementExt
         pi.setAnnotations(annotations);
     }
 
-    protected Node reconstruct(Node n, List<ParamTypeNode> typeParams) {
+    protected Node reconstruct(Node n, List<TypeNode> typeParams) {
         n = typeParams(n, typeParams);
         return n;
     }
 
     @Override
     public Node visitChildren(NodeVisitor v) {
-        List<ParamTypeNode> typeParams = visitList(this.typeParams, v);
+        List<TypeNode> typeParams = visitList(this.typeParams, v);
         Node n = super.visitChildren(v);
         return reconstruct(n, typeParams);
     }
@@ -115,7 +115,7 @@ public abstract class JL5ProcedureDeclExt extends JL5AnnotatedElementExt
     public Context enterScope(Context c) {
         ProcedureDecl pd = (ProcedureDecl) this.node();
         c = superLang().enterScope(pd, c);
-        for (ParamTypeNode pn : typeParams) {
+        for (TypeNode pn : typeParams) {
             ((JL5Context) c).addTypeVariable((TypeVariable) pn.type());
         }
         return c;
@@ -202,7 +202,7 @@ public abstract class JL5ProcedureDeclExt extends JL5AnnotatedElementExt
         JL5ProcedureInstance pi = (JL5ProcedureInstance) pd.procedureInstance();
         // check no duplicate annotations used
         ts.checkDuplicateAnnotations(annotations);
-        for (ParamTypeNode typeParam : typeParams)
+        for (TypeNode typeParam : typeParams)
             ts.checkCycles(typeParam.type().toReference());
 
         // mark the formals as being procedure formals (since they are)
@@ -270,8 +270,8 @@ public abstract class JL5ProcedureDeclExt extends JL5AnnotatedElementExt
         }
         if (printTypeVars && !typeParams.isEmpty()) {
             w.write("<");
-            for (Iterator<ParamTypeNode> iter = typeParams.iterator(); iter.hasNext();) {
-                ParamTypeNode ptn = iter.next();
+            for (Iterator<TypeNode> iter = typeParams.iterator(); iter.hasNext();) {
+                TypeNode ptn = iter.next();
                 tr.lang().prettyPrint(ptn, w, tr);
                 if (iter.hasNext()) {
                     w.write(",");

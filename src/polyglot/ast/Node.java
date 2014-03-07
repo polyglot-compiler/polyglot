@@ -55,6 +55,7 @@ public interface Node extends NodeOps, Copy<Node>, Serializable {
     /**
      * Set the extension of the node.
      */
+    @Deprecated
     Node ext(Ext ext);
 
     /**
@@ -65,6 +66,7 @@ public interface Node extends NodeOps, Copy<Node>, Serializable {
     /**
      * Set the node's nth extension, n &gt;= 1.
      */
+    @Deprecated
     Node ext(int n, Ext ext);
 
     /**

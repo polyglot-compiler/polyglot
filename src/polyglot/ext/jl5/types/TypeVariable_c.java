@@ -177,6 +177,11 @@ public class TypeVariable_c extends ReferenceType_c implements TypeVariable {
     }
 
     @Override
+    public String fullName() {
+        return name();
+    }
+
+    @Override
     public boolean isCanonical() {
         return true;
     }
@@ -319,8 +324,8 @@ public class TypeVariable_c extends ReferenceType_c implements TypeVariable {
     @Override
     public int hashCode() {
         return (this.name == null ? 0 : this.name.hashCode())
-                ^ (this.syntheticUniqueId == null ? 0
-                        : this.syntheticUniqueId.hashCode());
+                ^ (this.syntheticUniqueId == null
+                        ? 0 : this.syntheticUniqueId.hashCode());
     }
 
     @SuppressWarnings("unused")

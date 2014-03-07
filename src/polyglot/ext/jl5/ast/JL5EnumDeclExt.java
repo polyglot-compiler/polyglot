@@ -34,7 +34,7 @@ public class JL5EnumDeclExt extends JL5ClassDeclExt {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
     public JL5EnumDeclExt(List<AnnotationElem> annotations) {
-        super(Collections.<ParamTypeNode> emptyList(), annotations);
+        super(Collections.<TypeNode> emptyList(), annotations);
     }
 
     public ClassDecl addValueOfMethodType(TypeSystem ts) {

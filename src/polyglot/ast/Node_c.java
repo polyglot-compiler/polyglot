@@ -123,6 +123,7 @@ public abstract class Node_c implements Node {
         return ext(n - 1).ext();
     }
 
+    @Deprecated
     @Override
     public Node ext(int n, Ext ext) {
         if (n < 1) throw new InternalCompilerError("n must be >= 1");
@@ -139,6 +140,7 @@ public abstract class Node_c implements Node {
         return ext;
     }
 
+    @Deprecated
     @Override
     public Node ext(Ext ext) {
         if (this.ext == ext) {

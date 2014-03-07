@@ -26,7 +26,14 @@
 
 package polyglot.ast;
 
+import polyglot.translate.ExtensionRewriter;
+import polyglot.types.SemanticException;
 import polyglot.types.Type;
+import polyglot.util.CodeWriter;
+import polyglot.util.InternalCompilerError;
+import polyglot.util.Position;
+import polyglot.util.SerialVersionUID;
+import polyglot.visit.PrettyPrinter;
 
 /**
  * A {@code TypeNode} is the syntactic representation of a 
@@ -38,4 +45,27 @@ public interface TypeNode extends Receiver, QualifierNode, Term {
 
     /** Short name of the type, or null if not a {@code Named} type. */
     String name();
+
+    class Instance extends TypeNode_c {
+        private static final long serialVersionUID =
+                SerialVersionUID.generate();
+
+        public Instance(Position pos, Ext ext) {
+            super(pos, ext);
+            assert (ext != null);
+        }
+
+        @Override
+        public Node extRewrite(ExtensionRewriter rw) throws SemanticException {
+            throw new InternalCompilerError("This type node cannot be represented in the "
+                    + "target language and should have been rewritten: " + this);
+        }
+
+        @Override
+        public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
+            throw new InternalCompilerError("Unexpected invocation from extension object:"
+                    + this);
+        }
+
+    }
 }

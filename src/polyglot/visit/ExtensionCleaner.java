@@ -54,6 +54,7 @@ import polyglot.util.InternalCompilerError;
  * sets delegate object refs to point back to the node,
  * and strips type information out.
  **/
+@Deprecated
 public class ExtensionCleaner extends NodeVisitor {
     protected NodeFactory nf;
     protected TypeSystem ts;

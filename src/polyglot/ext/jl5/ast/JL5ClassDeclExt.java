@@ -66,9 +66,9 @@ public class JL5ClassDeclExt extends JL5AnnotatedElementExt implements
         ClassDeclOps {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
-    protected List<ParamTypeNode> paramTypes = new ArrayList<ParamTypeNode>();
+    protected List<TypeNode> paramTypes = new ArrayList<TypeNode>();
 
-    public JL5ClassDeclExt(List<ParamTypeNode> paramTypes,
+    public JL5ClassDeclExt(List<TypeNode> paramTypes,
             List<AnnotationElem> annotations) {
         super(annotations);
         this.paramTypes = ListUtil.copy(paramTypes, true);
@@ -79,15 +79,15 @@ public class JL5ClassDeclExt extends JL5AnnotatedElementExt implements
         return (ClassDecl) super.node();
     }
 
-    public List<ParamTypeNode> paramTypes() {
+    public List<TypeNode> paramTypes() {
         return this.paramTypes;
     }
 
-    public Node paramTypes(List<ParamTypeNode> types) {
+    public Node paramTypes(List<TypeNode> types) {
         return paramTypes(node(), types);
     }
 
-    protected <N extends Node> N paramTypes(N n, List<ParamTypeNode> types) {
+    protected <N extends Node> N paramTypes(N n, List<TypeNode> types) {
         JL5ClassDeclExt ext = (JL5ClassDeclExt) JL5Ext.ext(n);
         if (CollectionUtil.equals(ext.paramTypes, types)) return n;
         if (n == node) {
@@ -141,14 +141,14 @@ public class JL5ClassDeclExt extends JL5AnnotatedElementExt implements
         return n.type();
     }
 
-    private Node reconstruct(Node n, List<ParamTypeNode> paramTypes) {
+    private Node reconstruct(Node n, List<TypeNode> paramTypes) {
         n = paramTypes(n, paramTypes);
         return n;
     }
 
     @Override
     public Node visitChildren(NodeVisitor v) {
-        List<ParamTypeNode> typeParams = visitList(paramTypes, v);
+        List<TypeNode> typeParams = visitList(paramTypes, v);
         Node n = super.visitChildren(v);
         return reconstruct(n, typeParams);
     }
@@ -168,7 +168,7 @@ public class JL5ClassDeclExt extends JL5AnnotatedElementExt implements
         if (paramTypes != null && !paramTypes.isEmpty()) {
             List<TypeVariable> typeVars =
                     new ArrayList<TypeVariable>(paramTypes.size());
-            for (ParamTypeNode ptn : paramTypes) {
+            for (TypeNode ptn : paramTypes) {
                 TypeVariable tv = (TypeVariable) ptn.type();
                 typeVars.add(tv);
                 tv.setDeclaringClass(ct);
@@ -200,7 +200,7 @@ public class JL5ClassDeclExt extends JL5AnnotatedElementExt implements
             c = ((JL5Context) c).pushExtendsClause(n.type());
             c.addNamed(n.type());
         }
-        for (ParamTypeNode tn : paramTypes) {
+        for (TypeNode tn : paramTypes) {
             ((JL5Context) c).addTypeVariable((TypeVariable) tn.type());
         }
         return c.lang().enterScope(child, c);
@@ -252,7 +252,7 @@ public class JL5ClassDeclExt extends JL5AnnotatedElementExt implements
             }
         }
 
-        for (ParamTypeNode paramType : ext.paramTypes)
+        for (TypeNode paramType : ext.paramTypes)
             ts.checkCycles(paramType.type().toReference());
 
         return super.typeCheck(tc);
@@ -343,8 +343,8 @@ public class JL5ClassDeclExt extends JL5AnnotatedElementExt implements
         }
         if (printTypeVars && !paramTypes.isEmpty()) {
             w.write("<");
-            for (Iterator<ParamTypeNode> iter = paramTypes.iterator(); iter.hasNext();) {
-                ParamTypeNode ptn = iter.next();
+            for (Iterator<TypeNode> iter = paramTypes.iterator(); iter.hasNext();) {
+                TypeNode ptn = iter.next();
                 tr.lang().prettyPrint(ptn, w, tr);
                 if (iter.hasNext()) {
                     w.write(", ");
