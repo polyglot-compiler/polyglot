@@ -206,6 +206,7 @@ polyglot.ext.jl5.JL5ExtensionInfo "-d out -classpath java-out -assert -noserial 
         GenericMethod13.jl5;
         GenericMethod14.jl5;
         GenericMethod15.jl5;
+        GenericMethod16.jl5;
         InfiniteLoop.jl5;
         Throw02.jl5;
         JLS8.1.2.jl5;
@@ -600,6 +601,7 @@ polyglot.ext.jl5.JL5ExtensionInfo "-d out -classpath java-out -removeJava5isms -
         GenericMethod13.jl5;
         GenericMethod14.jl5;
         GenericMethod15.jl5;
+        GenericMethod16.jl5;
         InfiniteLoop.jl5;
         Throw02.jl5;
         JLS8.1.2.jl5;

@@ -76,8 +76,8 @@ public class SuperConversionConstraint extends Constraint {
                 }
             }
         }
-        else if ((formal instanceof JL5SubstClassType)
-                && (actual instanceof JL5SubstClassType)) {
+        else if (formal instanceof JL5SubstClassType
+                && actual instanceof JL5SubstClassType) {
             JL5SubstClassType formal_pt = (JL5SubstClassType) formal;
             JL5SubstClassType actual_pt = (JL5SubstClassType) actual;
             if (!actual_pt.base().equals(formal_pt.base())) {
@@ -109,8 +109,8 @@ public class SuperConversionConstraint extends Constraint {
                                                                     formal_targ,
                                                                     solver));
                             }
-                            else if (actual_targ_wc.isExtendsConstraint()) {
-                                r.add(new SubConversionConstraint(actual_targ_wc.upperBound(),
+                            else if (actual_targ_wc.isSuperConstraint()) {
+                                r.add(new SubConversionConstraint(actual_targ_wc.lowerBound(),
                                                                   formal_targ,
                                                                   solver));
                             }

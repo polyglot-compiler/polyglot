@@ -1,0 +1,11 @@
+class Test extends Term {
+    public Term firstChild() {
+        return listChild(this);
+    }
+}
+
+class Term {
+    public static <T extends Term, V extends T> T listChild(V alt) {
+        return alt;
+    }
+}
