@@ -428,6 +428,7 @@ polyglot.ext.jl5.JL5ExtensionInfo "-d out -classpath java-out -assert -noserial 
         PermissiveCasts03.jl5 (Semantic, "Cannot cast");
         FinalInit01.jl5;
         Nested01.jl5;
+        Nested02.jl5;
         Switch01.jl5;
         Switch02.jl5 ();
         Switch03.jl5 ();
@@ -822,6 +823,7 @@ polyglot.ext.jl5.JL5ExtensionInfo "-d out -classpath java-out -removeJava5isms -
         PermissiveCasts03.jl5 (Semantic, "Cannot cast");
         FinalInit01.jl5;
         Nested01.jl5;
+        Nested02.jl5;
         Switch01.jl5;
         Switch02.jl5 ();
         Switch03.jl5 ();

@@ -1,0 +1,9 @@
+class C extends DataFlow<C.FlowItem> {
+	static class FlowItem extends DataFlow.Item {
+	}
+}
+
+class DataFlow<FlowItem extends DataFlow.Item> {
+	public static class Item {
+	}
+}

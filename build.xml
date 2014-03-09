@@ -301,6 +301,7 @@
 		</delete>
 		<delete>
 			<fileset dir="${cup.src}">
+				<include name="java_cup/Lexer.java" />
 				<include name="java_cup/parser.java" />
 				<include name="java_cup/sym.java" />
 			</fileset>
