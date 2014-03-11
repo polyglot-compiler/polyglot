@@ -160,10 +160,9 @@ public class JL5Subst_c extends Subst_c<TypeVariable, ReferenceType> implements
     public <T extends MethodInstance> T substMethod(T mi) {
         JL5MethodInstance mj = (JL5MethodInstance) super.substMethod(mi);
         if (mj.typeParams() != null && !mj.typeParams().isEmpty()) {
-            // remove any type params we have replced.
+            // remove any type params we have replaced.
             List<TypeVariable> l = new ArrayList<TypeVariable>(mj.typeParams());
             l.removeAll(this.subst.keySet());
-            mj = (JL5MethodInstance) mj.copy();
             mj.setTypeParams(l);
         }
         // subst the type params
@@ -182,7 +181,6 @@ public class JL5Subst_c extends Subst_c<TypeVariable, ReferenceType> implements
             // remove any type params we have replaced.
             List<TypeVariable> l = new ArrayList<TypeVariable>(cj.typeParams());
             l.removeAll(this.subst.keySet());
-            cj = (JL5ConstructorInstance) cj.copy();
             cj.setTypeParams(l);
         }
 

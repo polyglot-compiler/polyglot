@@ -54,6 +54,13 @@ public class SubstClassType_c<Formal extends Param, Actual extends TypeObject>
         extends ClassType_c implements SubstType<Formal, Actual> {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
+    // substitution caches
+    protected transient List<? extends ReferenceType> interfaces;
+    protected transient List<? extends FieldInstance> fields;
+    protected transient List<? extends ConstructorInstance> constructors;
+    protected transient List<? extends ClassType> memberClasses;
+    protected transient List<? extends MethodInstance> methods;
+
     /** The class type we are substituting into. */
     protected ClassType base;
 
@@ -98,27 +105,35 @@ public class SubstClassType_c<Formal extends Param, Actual extends TypeObject>
 
     @Override
     public List<? extends ReferenceType> interfaces() {
-        return subst.substTypeList(base.interfaces());
+        if (interfaces == null)
+            interfaces = subst.substTypeList(base.interfaces());
+        return interfaces;
     }
 
     @Override
     public List<? extends FieldInstance> fields() {
-        return subst.substFieldList(base.fields());
+        if (fields == null) fields = subst.substFieldList(base.fields());
+        return fields;
     }
 
     @Override
     public List<? extends MethodInstance> methods() {
-        return subst.substMethodList(base.methods());
+        if (methods == null) methods = subst.substMethodList(base.methods());
+        return methods;
     }
 
     @Override
     public List<? extends ConstructorInstance> constructors() {
-        return subst.substConstructorList(base.constructors());
+        if (constructors == null)
+            constructors = subst.substConstructorList(base.constructors());
+        return constructors;
     }
 
     @Override
     public List<? extends ClassType> memberClasses() {
-        return subst.substTypeList(base.memberClasses());
+        if (memberClasses == null)
+            memberClasses = subst.substTypeList(base.memberClasses());
+        return memberClasses;
     }
 
     @Override

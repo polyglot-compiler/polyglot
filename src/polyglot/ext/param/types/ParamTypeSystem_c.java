@@ -44,6 +44,9 @@ import polyglot.util.Position;
  */
 public abstract class ParamTypeSystem_c<Formal extends Param, Actual extends TypeObject>
         extends TypeSystem_c implements ParamTypeSystem<Formal, Actual> {
+    protected Map<Map<Formal, ? extends Actual>, Subst<Formal, Actual>> substCache =
+            new HashMap<Map<Formal, ? extends Actual>, Subst<Formal, Actual>>();
+
     @Override
     public MuPClass<Formal, Actual> mutablePClass(Position pos) {
         return new MuPClass_c<Formal, Actual>(this, pos);
@@ -117,7 +120,18 @@ public abstract class ParamTypeSystem_c<Formal extends Param, Actual extends Typ
     }
 
     @Override
-    public Subst<Formal, Actual> subst(Map<Formal, ? extends Actual> substMap) {
+    public final Subst<Formal, Actual> subst(
+            Map<Formal, ? extends Actual> substMap) {
+        Subst<Formal, Actual> subst = substCache.get(substMap);
+        if (subst == null) {
+            subst = substImpl(substMap);
+            substCache.put(substMap, subst);
+        }
+        return subst;
+    }
+
+    protected Subst<Formal, Actual> substImpl(
+            Map<Formal, ? extends Actual> substMap) {
         return new Subst_c<Formal, Actual>(this, substMap);
     }
 }

@@ -64,6 +64,8 @@ public class Subst_c<Formal extends Param, Actual extends TypeObject>
     /** Cache of types. From CacheTypeWrapper(t) to subst(t)*/
     protected transient Map<CacheTypeWrapper, Type> cache;
 
+    protected transient Map<ClassType, ClassType> substClassTypeCache;
+
     protected transient ParamTypeSystem<Formal, Actual> ts;
 
     public Subst_c(ParamTypeSystem<Formal, Actual> ts,
@@ -71,6 +73,7 @@ public class Subst_c<Formal extends Param, Actual extends TypeObject>
         this.ts = ts;
         this.subst = new HashMap<Formal, Actual>(subst);
         this.cache = new HashMap<CacheTypeWrapper, Type>();
+        this.substClassTypeCache = new HashMap<ClassType, ClassType>();
     }
 
     @Override
@@ -149,7 +152,16 @@ public class Subst_c<Formal extends Param, Actual extends TypeObject>
     /** Perform substitutions on a class type. Substitutions are performed
      * lazily. */
     public ClassType substClassType(ClassType t) {
-        return new SubstClassType_c<Formal, Actual>(ts, t.position(), t, this);
+        ClassType substct = substClassTypeCache.get(t);
+        if (substct == null) {
+            substct =
+                    new SubstClassType_c<Formal, Actual>(ts,
+                                                         t.position(),
+                                                         t,
+                                                         this);
+            substClassTypeCache.put(t, substct);
+        }
+        return substct;
     }
 
     @Override

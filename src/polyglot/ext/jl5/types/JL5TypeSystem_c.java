@@ -1100,7 +1100,7 @@ public class JL5TypeSystem_c extends
     }
 
     @Override
-    public Subst<TypeVariable, ReferenceType> subst(
+    protected Subst<TypeVariable, ReferenceType> substImpl(
             Map<TypeVariable, ? extends ReferenceType> substMap) {
         return new JL5Subst_c(this, substMap);
     }
