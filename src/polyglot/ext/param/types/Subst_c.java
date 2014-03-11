@@ -151,17 +151,17 @@ public class Subst_c<Formal extends Param, Actual extends TypeObject>
 
     /** Perform substitutions on a class type. Substitutions are performed
      * lazily. */
-    public ClassType substClassType(ClassType t) {
+    public final ClassType substClassType(ClassType t) {
         ClassType substct = substClassTypeCache.get(t);
         if (substct == null) {
-            substct =
-                    new SubstClassType_c<Formal, Actual>(ts,
-                                                         t.position(),
-                                                         t,
-                                                         this);
+            substct = substClassTypeImpl(t);
             substClassTypeCache.put(t, substct);
         }
         return substct;
+    }
+
+    protected ClassType substClassTypeImpl(ClassType t) {
+        return new SubstClassType_c<Formal, Actual>(ts, t.position(), t, this);
     }
 
     @Override

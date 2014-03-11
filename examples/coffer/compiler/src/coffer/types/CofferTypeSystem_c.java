@@ -153,7 +153,7 @@ public class CofferTypeSystem_c extends ParamTypeSystem_c<Key, Key> implements
     }
 
     @Override
-    public Subst<Key, Key> subst(Map<Key, ? extends Key> substMap) {
+    protected Subst<Key, Key> substImpl(Map<Key, ? extends Key> substMap) {
         return new CofferSubst_c(this, substMap);
     }
 

@@ -139,7 +139,7 @@
         <available classname="java_cup.Main"
 	           classpathref="standard.classpath"
 	           property="cp_existence.java_cup"/>
-        <available classname="JFlex.Main"
+        <available classname="jflex.Main"
 	           classpathref="standard.classpath"
 	           property="cp_existence.jflex"/>
 
@@ -148,7 +148,7 @@
         <fail unless="cp_existence.java_cup"
 	      message="The java_cup classes must be on the classpath. Try adding java_cup.jar to the classpath."/>
         <fail unless="cp_existence.jflex"
-	      message="The JFlex classes must be on the classpath. Try adding JFlex.jar to the classpath."/>
+	      message="The jflex classes must be on the classpath. Try adding jflex.jar to the classpath."/>
     </target>
 
     <target name="executables">
@@ -371,8 +371,9 @@ sh ${compiler.sh} %CMD_LINE_ARGS%
        @param jflex.file    The name of the JFlex file.
    -->
     <target name="jflex-lexer" depends="jflex-lexer-deps" unless="jflex.lexer.up-to-date">
-        <java classname="JFlex.Main" fork="true" dir="${lexer.dir}" failonerror="true">
+        <java classname="jflex.Main" fork="true" dir="${lexer.dir}" failonerror="true">
             <classpath refid="standard.classpath" />
+			<arg value="--noinputstreamctor" />
             <arg value="${jflex.file}" />
         </java>
     </target>

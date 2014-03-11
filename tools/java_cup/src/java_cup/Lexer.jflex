@@ -100,8 +100,8 @@ ident = ([:jletter:] | "_" ) ([:jletterdigit:] | [:jletter:] | "_" )*
 
 <CODESEG> {
   ":}"         { yybegin(YYINITIAL); return symbolFactory.newSymbol("CODE_STRING", sym.CODE_STRING, new Location(csline, cscolumn), new Location(yyline+1, yycolumn+1+yylength()), sb.toString()); }
-  .|\n            { sb.append(yytext()); }
+  [^]            { sb.append(yytext()); }
 }
 
 // error fallback
-.|\n          { emit_warning("Unrecognized character '" +yytext()+"' -- ignored"); }
+[^]          { emit_warning("Unrecognized character '" +yytext()+"' -- ignored"); }

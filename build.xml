@@ -56,7 +56,7 @@
 	<path id="standard.classpath">
 		<pathelement location="${classes}" />
 		<pathelement location="${lib}/java_cup.jar" />
-		<pathelement location="${lib}/JFlex.jar" />
+		<pathelement location="${lib}/jflex.jar" />
 		<pathelement location="${lib}/ppg.jar" />
 		<pathelement location="${env.JAVA_HOME}/lib/tools.jar" />
 	</path>
@@ -115,9 +115,9 @@
 
 	<target name="check-jars">
 		<available file="${cup.dir}/lib/java_cup.jar" property="cup.jar.exists" />
-		<available file="${lib}/JFlex.jar" property="jflex.jar.exists" />
+		<available file="${lib}/jflex.jar" property="jflex.jar.exists" />
 		<fail unless="cup.jar.exists" message="${cup.dir}/lib/java_cup.jar not found." />
-		<fail unless="jflex.jar.exists" message="${lib}/JFlex.jar not found." />
+		<fail unless="jflex.jar.exists" message="${lib}/jflex.jar not found." />
 	</target>
 
 	<!-- create appropriate executables in the bin directory -->
@@ -171,10 +171,10 @@
 		<copy file="${lib}/java_cup.jar" todir="${coffer.dir}/lib" />
 		<copy file="${lib}/java_cup.jar" todir="${carray.dir}/lib" />
 		<copy file="${lib}/java_cup.jar" todir="${carray_jl5.dir}/lib" />
-		<copy file="${lib}/JFlex.jar" todir="${pao.dir}/lib" />
-		<copy file="${lib}/JFlex.jar" todir="${coffer.dir}/lib" />
-		<copy file="${lib}/JFlex.jar" todir="${carray.dir}/lib" />
-		<copy file="${lib}/JFlex.jar" todir="${carray_jl5.dir}/lib" />
+		<copy file="${lib}/jflex.jar" todir="${pao.dir}/lib" />
+		<copy file="${lib}/jflex.jar" todir="${coffer.dir}/lib" />
+		<copy file="${lib}/jflex.jar" todir="${carray.dir}/lib" />
+		<copy file="${lib}/jflex.jar" todir="${carray_jl5.dir}/lib" />
 		<copy file="${lib}/ppg.jar" todir="${pao.dir}/lib" />
 		<copy file="${lib}/ppg.jar" todir="${coffer.dir}/lib" />
 		<copy file="${lib}/ppg.jar" todir="${carray.dir}/lib" />
@@ -225,6 +225,23 @@
 		<ant inheritAll="false" antfile="${coffer.dir}/build.xml" dir="${coffer.dir}" target="clobber" />
 		<ant inheritAll="false" antfile="${carray.dir}/build.xml" dir="${carray.dir}" target="clobber" />
 		<ant inheritAll="false" antfile="${carray_jl5.dir}/build.xml" dir="${carray_jl5.dir}" target="clobber" />
+		<delete file="${pao.dir}/lib/polyglot.jar" />
+		<delete file="${coffer.dir}/lib/polyglot.jar" />
+		<delete file="${covarRet.dir}/lib/polyglot.jar" />
+		<delete file="${carray.dir}/lib/polyglot.jar" />
+		<delete file="${carray_jl5.dir}/lib/polyglot.jar" />
+		<delete file="${pao.dir}/lib/java_cup.jar" />
+		<delete file="${coffer.dir}/libjava_cup.jar" />
+		<delete file="${carray.dir}/libjava_cup.jar" />
+		<delete file="${carray_jl5.dir}/lib" />
+		<delete file="${pao.dir}/lib/jflex.jar" />
+		<delete file="${coffer.dir}/lib/jflex.jar" />
+		<delete file="${carray.dir}/lib/jflex.jar" />
+		<delete file="${carray_jl5.dir}/lib/jflex.jar" />
+		<delete file="${pao.dir}/lib/ppg.jar" />
+		<delete file="${coffer.dir}/lib/ppg.jar" />
+		<delete file="${carray.dir}/lib/ppg.jar" />
+		<delete file="${carray_jl5.dir}/lib/ppg.jar" />
 	</target>
 
 	<!-- jar the examples -->
@@ -465,8 +482,9 @@
        @param jflex.file    The name of the JFlex file.
       -->
 	<target name="jflex-lexer" depends="jflex-lexer-deps" unless="jflex-lexer.up-to-date">
-		<java classname="JFlex.Main" fork="true" dir="${lexer.dir}" failonerror="true">
+		<java classname="jflex.Main" fork="true" dir="${lexer.dir}" failonerror="true">
 			<classpath refid="standard.classpath" />
+			<arg value="--noinputstreamctor" />
 			<arg value="${jflex.file}" />
 		</java>
 	</target>
@@ -806,7 +824,7 @@
 		<copy file="${lib}/pth.jar" todir="${tmp}/lib" />
 		<copy file="${lib}/ppg.jar" todir="${tmp}/lib" />
 		<copy file="${lib}/java_cup.jar" todir="${tmp}/lib" />
-		<copy file="${lib}/JFlex.jar" todir="${tmp}/lib" />
+		<copy file="${lib}/jflex.jar" todir="${tmp}/lib" />
 		<copy file="build.xml" todir="${tmp}" />
 		<copy file="build.properties" todir="${tmp}" />
 		<copy file="README" todir="${tmp}" />

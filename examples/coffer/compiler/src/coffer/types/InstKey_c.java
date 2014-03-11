@@ -20,6 +20,11 @@ public class InstKey_c extends Key_c implements InstKey {
     }
 
     @Override
+    public String fullName() {
+        return name();
+    }
+
+    @Override
     public boolean equalsImpl(TypeObject o) {
         if (o instanceof InstKey) {
             return name.equals(((InstKey) o).name());

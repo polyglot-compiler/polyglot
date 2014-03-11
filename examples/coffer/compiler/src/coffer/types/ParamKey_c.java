@@ -20,6 +20,11 @@ public class ParamKey_c extends Key_c implements ParamKey {
     }
 
     @Override
+    public String fullName() {
+        return name();
+    }
+
+    @Override
     public boolean equalsImpl(TypeObject o) {
         if (o instanceof ParamKey) {
             return name.equals(((ParamKey) o).name());

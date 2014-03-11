@@ -14,11 +14,11 @@ parser code {:
     public Grm(File file) {
         this();
         try {
-            lexer = new Lexer_c(new FileInputStream(file));
+            lexer = new Lexer_c(new FileReader(file));
         }
         catch (Exception e) {
             System.out.println("open script file (" + file.getName() +") error: " + e);
-            lexer = new Lexer_c(System.in);
+            lexer = new Lexer_c(new InputStreamReader(System.in));
         }
     }
 

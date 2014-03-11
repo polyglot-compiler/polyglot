@@ -26,7 +26,7 @@ import java_cup.runtime.Symbol;
 return (sym("EOF", sym.EOF));
 %eofval}
 
-LINE_TERMINATOR = [\r]|[\n]|[\r\n]
+LINE_TERMINATOR = \R
 WHITE_SPACE     = {LINE_TERMINATOR} | [ \t\f]
 
 /* comments */
@@ -36,14 +36,14 @@ C_COMMENT            = "/*" ~"*/"
 END_OF_LINE_COMMENT  = "//" ~{LINE_TERMINATOR}
 LINE_COMMENT         = "#" ~{LINE_TERMINATOR}
 
-IDENT                = [a-zA-Z0-9_\:\.\$\/\\\-]*
+IDENT                = [a-zA-Z0-9_\:\.\$\/\\\-]+
 
 %state STRING_LIT
 
 %%
 <YYINITIAL> {
    /* identifiers */
-   {IDENT}                     { return sym("ID", sym.IDENT, yytext()); }
+   {IDENT}                        { return sym("ID", sym.IDENT, yytext()); }
 
    /* literals */
    \"                             { string.setLength(0); yybegin(STRING_LIT); }
@@ -82,7 +82,7 @@ IDENT                = [a-zA-Z0-9_\:\.\$\/\\\-]*
 \^Cd   { return sym("EOF", sym.EOF); }
 
 /* error fallback */
-.|\n                             { throw new Error("Illegal character <"+
+[^]                               { throw new Error("Illegal character <"+
                                                      yytext()+">"); }
 
 

@@ -19,6 +19,11 @@ public class UnknownKey_c extends Key_c implements UnknownKey {
     }
 
     @Override
+    public String fullName() {
+        return name();
+    }
+
+    @Override
     public boolean isCanonical() {
         return false;
     }

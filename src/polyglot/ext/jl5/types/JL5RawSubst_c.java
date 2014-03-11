@@ -54,39 +54,12 @@ public class JL5RawSubst_c extends JL5Subst_c {
     }
 
     @Override
-    public ClassType substClassType(ClassType t) {
+    protected ClassType substClassTypeImpl(ClassType t) {
         JL5TypeSystem ts = (JL5TypeSystem) this.ts;
         if (base.equals(t)) {
             return ts.rawClass(base);
         }
-
-        return super.substClassType(t);
-//        // Don't bother trying to substitute into a non-JL5 class.
-//        if (! (t instanceof JL5ClassType)) {
-//            return t;
-//        }
-//
-//        if (t instanceof RawClass) {
-//            // don't substitute raw classes
-//            return t;
-//        }
-//        if (t instanceof JL5SubstClassType) {
-//            // this case should be impossible
-//            throw new InternalCompilerError("Should have no JL5SubstClassTypes");
-//        }
-//        
-//        if (t instanceof JL5ParsedClassType) {
-//            JL5ParsedClassType pct = (JL5ParsedClassType)t;            
-//            if (pct.typeVariables().isEmpty()) {
-//                // no parameters to be instantiated!
-//                return pct;
-//            }
-//            return new JL5SubstClassType_c((JL5TypeSystem) ts, t.position(),
-//                                           (JL5ParsedClassType) t, this);
-//        }
-//
-//        throw new InternalCompilerError("Don't know how to handle class type " + t.getClass());
-
+        return super.substClassTypeImpl(t);
     }
 
     @Override

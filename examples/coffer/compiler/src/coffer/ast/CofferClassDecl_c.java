@@ -67,7 +67,7 @@ public class CofferClassDecl_c extends ClassDecl_c implements CofferClassDecl {
             n.key = key;
         }
 
-        return (CofferClassDecl_c) n.reconstruct(name,
+        return (CofferClassDecl_c) reconstruct(n, name,
                                                  superClass,
                                                  interfaces,
                                                  body);

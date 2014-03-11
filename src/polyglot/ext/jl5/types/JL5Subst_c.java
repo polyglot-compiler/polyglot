@@ -115,7 +115,7 @@ public class JL5Subst_c extends Subst_c<TypeVariable, ReferenceType> implements
     }
 
     @Override
-    public ClassType substClassType(ClassType t) {
+    protected ClassType substClassTypeImpl(ClassType t) {
         // Don't bother trying to substitute into a non-JL5 class.
         if (!(t instanceof JL5ClassType)) {
             return t;

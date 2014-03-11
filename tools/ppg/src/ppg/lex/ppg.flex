@@ -1,6 +1,6 @@
 package ppg.lex;
 
-import java.io.InputStream;
+import java.io.Reader;
 import ppg.parse.*;
 
 @SuppressWarnings({"unused", "fallthrough"})
@@ -14,7 +14,7 @@ import ppg.parse.*;
         return new Position(filename, yyline+1, yycolumn);
     }
 */
-    public Lexer(InputStream in, String filename) {
+    public Lexer(Reader in, String filename) {
         this(in);
         this.filename = filename;
     }

@@ -145,27 +145,22 @@ public class CofferMethodDecl_c extends MethodDecl_c implements
     protected CofferMethodDecl_c reconstruct(TypeNode returnType, Id name,
             List<Formal> formals, KeySetNode entryKeys, KeySetNode returnKeys,
             List<ThrowConstraintNode> throwConstraints, Block body) {
+        CofferMethodDecl_c n = this;
         if (entryKeys != this.entryKeys
                 || returnKeys != this.returnKeys
                 || !CollectionUtil.equals(throwConstraints,
                                           this.throwConstraints)) {
-            CofferMethodDecl_c n = (CofferMethodDecl_c) copy();
+            n = (CofferMethodDecl_c) copy();
             n.entryKeys = entryKeys;
             n.returnKeys = returnKeys;
             n.throwConstraints =
                     new ArrayList<ThrowConstraintNode>(throwConstraints);
-            return (CofferMethodDecl_c) n.reconstruct(returnType,
-                                                      name,
-                                                      formals,
-                                                      Collections.<TypeNode> emptyList(),
-                                                      body);
         }
-
-        return (CofferMethodDecl_c) super.reconstruct(returnType,
-                                                      name,
-                                                      formals,
-                                                      Collections.<TypeNode> emptyList(),
-                                                      body);
+        return (CofferMethodDecl_c) n.reconstruct(n, returnType,
+                                                  name,
+                                                  formals,
+                                                  Collections.<TypeNode> emptyList(),
+                                                  body);
     }
 
     @Override

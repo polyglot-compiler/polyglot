@@ -25,8 +25,11 @@
  ******************************************************************************/
 package ppg.lex;
 
-import java.io.*;
-import ppg.parse.*;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+
+import ppg.parse.Constant;
 
 public class LexTest {
     private static final String HEADER = "ppg [lexertest]: ";
@@ -35,11 +38,11 @@ public class LexTest {
     }
 
     public static void main(String args[]) {
-        FileInputStream fileInput;
+        FileReader fileReader;
         String filename = null;
         try {
             filename = args[0];
-            fileInput = new FileInputStream(filename);
+            fileReader = new FileReader(filename);
         }
         catch (FileNotFoundException e) {
             System.err.println("Error: " + filename + " is not found.");
@@ -53,7 +56,7 @@ public class LexTest {
         File f = new File(filename);
         String simpleName = f.getName();
 
-        Lexer lex = new Lexer(fileInput, simpleName);
+        Lexer lex = new Lexer(fileReader, simpleName);
         Token t = null;
         try {
             while (true) {
@@ -64,7 +67,7 @@ public class LexTest {
                 }
                 System.out.println();
             }
-            fileInput.close();
+            fileReader.close();
         }
         catch (Error e) {
             System.err.println(e.getMessage());

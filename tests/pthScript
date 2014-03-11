@@ -142,6 +142,7 @@ polyglot.frontend.JLExtensionInfo "-d out -cp ." {
         LocalClass3.jl ; LocalClass4.jl ;
         LocalInners2.jl ;
         LocalInit.jl ;
+        LongString01.jl;
        MemberClassFlags.jl ;
         Narrowing.jl ;
         # Output.jl ;

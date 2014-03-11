@@ -54,12 +54,17 @@ public class SubstClassType_c<Formal extends Param, Actual extends TypeObject>
         extends ClassType_c implements SubstType<Formal, Actual> {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
-    // substitution caches
     protected transient List<? extends ReferenceType> interfaces;
     protected transient List<? extends FieldInstance> fields;
+    protected transient List<? extends MethodInstance> methods;
     protected transient List<? extends ConstructorInstance> constructors;
     protected transient List<? extends ClassType> memberClasses;
-    protected transient List<? extends MethodInstance> methods;
+    // substitution caches
+    protected transient List<? extends ReferenceType> substInterfaces;
+    protected transient List<? extends FieldInstance> substFields;
+    protected transient List<? extends MethodInstance> substMethods;
+    protected transient List<? extends ConstructorInstance> substConstructors;
+    protected transient List<? extends ClassType> substMemberClasses;
 
     /** The class type we are substituting into. */
     protected ClassType base;
@@ -105,35 +110,52 @@ public class SubstClassType_c<Formal extends Param, Actual extends TypeObject>
 
     @Override
     public List<? extends ReferenceType> interfaces() {
-        if (interfaces == null)
-            interfaces = subst.substTypeList(base.interfaces());
-        return interfaces;
+        List<? extends ReferenceType> interfaces = base.interfaces();
+        if (!interfaces.equals(this.interfaces)) {
+            this.interfaces = interfaces;
+            substInterfaces = subst.substTypeList(interfaces);
+        }
+        return substInterfaces;
     }
 
     @Override
     public List<? extends FieldInstance> fields() {
-        if (fields == null) fields = subst.substFieldList(base.fields());
-        return fields;
+        List<? extends FieldInstance> fields = base.fields();
+        if (!fields.equals(this.fields)) {
+            this.fields = fields;
+            substFields = subst.substFieldList(fields);
+        }
+        return substFields;
     }
 
     @Override
     public List<? extends MethodInstance> methods() {
-        if (methods == null) methods = subst.substMethodList(base.methods());
-        return methods;
+        List<? extends MethodInstance> methods = base.methods();
+        if (!methods.equals(this.methods)) {
+            this.methods = methods;
+            substMethods = subst.substMethodList(methods);
+        }
+        return substMethods;
     }
 
     @Override
     public List<? extends ConstructorInstance> constructors() {
-        if (constructors == null)
-            constructors = subst.substConstructorList(base.constructors());
-        return constructors;
+        List<? extends ConstructorInstance> constructors = base.constructors();
+        if (!constructors.equals(this.constructors)) {
+            this.constructors = constructors;
+            substConstructors = subst.substConstructorList(constructors);
+        }
+        return substConstructors;
     }
 
     @Override
     public List<? extends ClassType> memberClasses() {
-        if (memberClasses == null)
-            memberClasses = subst.substTypeList(base.memberClasses());
-        return memberClasses;
+        List<? extends ClassType> memberClasses = base.memberClasses();
+        if (!memberClasses.equals(this.memberClasses)) {
+            this.memberClasses = memberClasses;
+            substMemberClasses = subst.substTypeList(memberClasses);
+        }
+        return substMemberClasses;
     }
 
     @Override
