@@ -54,22 +54,22 @@ catch_type ::=
 ;
 
 extend class_instance_creation_expression ::=
-	NEW:a class_or_interface:b LT:c GT:d LPAREN:e argument_list_opt:f RPAREN:g class_body_opt:h {:
+	NEW:a class_or_interface:b LT GT:d LPAREN argument_list_opt:f RPAREN class_body_opt:h {:
 		TypeNode tn = parser.nf.AmbDiamondTypeNode(parser.pos(b, d), b);
 		RESULT = parser.nf.New(parser.pos(a), tn, f, h);
 	:}
-	| NEW:a type_arguments:b class_or_interface:c LT:d GT:e LPAREN:f argument_list_opt:g RPAREN:h class_body_opt:i
+	| NEW:a type_arguments:b class_or_interface:c LT GT:e LPAREN argument_list_opt:g RPAREN class_body_opt:i
 			/* Instantiating type arguments */ {:
 		TypeNode tn = parser.nf.AmbDiamondTypeNode(parser.pos(c, e), c);
 		RESULT = parser.nf.New(parser.pos(a), b, tn, g, i);
 	:}
-	| primary:a DOT:b NEW:c type_arguments_opt:d IDENTIFIER:e LT:f GT:g LPAREN:h argument_list_opt:i RPAREN:j class_body_opt:k
+	| primary:a DOT NEW type_arguments_opt:d IDENTIFIER:e LT GT:g LPAREN argument_list_opt:i RPAREN class_body_opt:k
 			/* Instantiating type arguments */ {:
 		TypeNode aa = (new JL5Name(parser.nf, parser.ts, parser.pos(e), parser.nf.Id(parser.pos(e), e.getIdentifier()))).toType();
 		TypeNode tn = parser.nf.AmbDiamondTypeNode(parser.pos(e, g), aa);
 		RESULT = parser.nf.New(parser.pos(a), a, d, tn, i, k);
 	:}
-	| name:a DOT:b NEW:c type_arguments_opt:d IDENTIFIER:e LT:f GT:g LPAREN:h argument_list_opt:i RPAREN:j class_body_opt:k
+	| name:a DOT NEW type_arguments_opt:d IDENTIFIER:e LT GT:g LPAREN argument_list_opt:i RPAREN class_body_opt:k
 			/* Instantiating type arguments */ {:
 		TypeNode aa = (new JL5Name(parser.nf, parser.ts, parser.pos(e), parser.nf.Id(parser.pos(e), e.getIdentifier()))).toType();
 		TypeNode tn = parser.nf.AmbDiamondTypeNode(parser.pos(e, g), aa);

@@ -381,8 +381,7 @@
 	<target name="cup-parser" depends="cup,cup-parser-deps,serialuid" unless="cup-parser.up-to-date">
 		<java classname="java_cup.Main" fork="true" dir="${parser.dir}" failonerror="true">
 			<classpath refid="standard.classpath" />
-			<arg value="-max_actions" />
-			<arg value="100" />
+			<arg value="-nopositions" />
 			<arg value="-parser" />
 			<arg value="${parser.class}" />
 			<arg value="-symbols" />
@@ -397,6 +396,7 @@
 	<target name="cup-parser-using-jar" depends="cup-parser-deps,serialuid" unless="cup-parser.up-to-date">
 		<java classname="java_cup.Main" fork="true" dir="${parser.dir}" failonerror="true">
 			<classpath refid="cup.jar.classpath" />
+			<arg value="-nopositions" />
 			<arg value="-parser" />
 			<arg value="${parser.class}" />
 			<arg value="-symbols" />

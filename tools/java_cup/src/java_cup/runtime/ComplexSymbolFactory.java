@@ -10,13 +10,17 @@ package java_cup.runtime;
 
 /* *************************************************
   class DefaultSymbolFactory
-
   interface for creating new symbols  
  ***************************************************/
 public class ComplexSymbolFactory implements SymbolFactory {
     public static class Location {
         private String unit = "unknown";
-        private int line, column;
+        private int line, column, offset = 0;
+
+        public Location(String unit, int line, int column, int offset) {
+            this(unit, line, column);
+            this.offset = offset;
+        }
 
         public Location(String unit, int line, int column) {
             this.unit = unit;
@@ -24,14 +28,14 @@ public class ComplexSymbolFactory implements SymbolFactory {
             this.column = column;
         }
 
+        public Location(int line, int column, int offset) {
+            this(line, column);
+            this.offset = offset;
+        }
+
         public Location(int line, int column) {
             this.line = line;
             this.column = column;
-        }
-
-        @Override
-        public String toString() {
-            return unit + ":" + line + "/" + column;
         }
 
         public int getColumn() {
@@ -45,6 +49,16 @@ public class ComplexSymbolFactory implements SymbolFactory {
         public String getUnit() {
             return unit;
         }
+
+        @Override
+        public String toString() {
+            return getUnit() + ":" + getLine() + "/" + getColumn() + "("
+                    + offset + ")";
+        }
+
+        public int getOffset() {
+            return offset;
+        }
     }
 
     /**
@@ -52,7 +66,7 @@ public class ComplexSymbolFactory implements SymbolFactory {
      */
     public static class ComplexSymbol extends Symbol {
         protected String name;
-        protected Location xleft, xright;
+        public Location xleft, xright;
 
         public ComplexSymbol(String name, int id) {
             super(id);
@@ -83,7 +97,7 @@ public class ComplexSymbolFactory implements SymbolFactory {
         }
 
         public ComplexSymbol(String name, int id, Location left, Location right) {
-            super(id);
+            super(id, left.offset, right.offset);
             this.name = name;
             this.xleft = left;
             this.xright = right;
@@ -91,7 +105,7 @@ public class ComplexSymbolFactory implements SymbolFactory {
 
         public ComplexSymbol(String name, int id, Symbol left, Symbol right,
                 Object value) {
-            super(id, value);
+            super(id, left.left, right.right, value);
             this.name = name;
             if (left != null) this.xleft = ((ComplexSymbol) left).xleft;
             if (right != null) this.xright = ((ComplexSymbol) right).xright;
@@ -99,7 +113,7 @@ public class ComplexSymbolFactory implements SymbolFactory {
 
         public ComplexSymbol(String name, int id, Location left,
                 Location right, Object value) {
-            super(id, value);
+            super(id, left.offset, right.offset, value);
             this.name = name;
             this.xleft = left;
             this.xright = right;

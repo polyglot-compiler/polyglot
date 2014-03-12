@@ -336,6 +336,7 @@ sh ${compiler.sh} %CMD_LINE_ARGS%
     <target name="cup-parser-using-jar" depends="cup-parser-deps" unless="cup.parser.up-to-date">
         <java classname="java_cup.Main" fork="true" dir="${parser.dir}" failonerror="true">
             <classpath refid="standard.classpath" />
+			<arg value="-nopositions" />
             <arg value="-parser"/>
             <arg value="${parser.class}"/>
             <arg value="-symbols"/>

@@ -523,27 +523,27 @@ modifiers ::=
     ;
 modifier ::=
                     // Flags
-        PUBLIC:a
+        PUBLIC
             {: RESULT = Flags.PUBLIC; :}
-    |   PROTECTED:a
+    |   PROTECTED
             {: RESULT = Flags.PROTECTED; :}
-    |   PRIVATE:a
+    |   PRIVATE
             {: RESULT = Flags.PRIVATE; :}
-    |   STATIC:a
+    |   STATIC
             {: RESULT = Flags.STATIC; :}
-    |   ABSTRACT:a
+    |   ABSTRACT
             {: RESULT = Flags.ABSTRACT; :}
-    |   FINAL:a
+    |   FINAL
             {: RESULT = Flags.FINAL; :}
-    |   NATIVE:a
+    |   NATIVE
             {: RESULT = Flags.NATIVE; :}
-    |   SYNCHRONIZED:a
+    |   SYNCHRONIZED
             {: RESULT = Flags.SYNCHRONIZED; :}
-    |   TRANSIENT:a
+    |   TRANSIENT
             {: RESULT = Flags.TRANSIENT; :}
-    |   VOLATILE:a
+    |   VOLATILE
             {: RESULT = Flags.VOLATILE; :}
-    |   STRICTFP:a
+    |   STRICTFP
             {: RESULT = Flags.STRICTFP; :}
     ;
 // 19.8) Classes
@@ -625,10 +625,10 @@ class_body_declaration ::=
     |   SEMICOLON
             {: List<ClassMember> l = new LinkedList<ClassMember>();
                RESULT = l; :}
-    |   error SEMICOLON:a
+    |   error SEMICOLON
             {: List<ClassMember> l = new LinkedList<ClassMember>();
                RESULT = l; :}
-    |   error LBRACE:a
+    |   error LBRACE
             {: List<ClassMember> l = new LinkedList<ClassMember>();
                RESULT = l; :}
     ;

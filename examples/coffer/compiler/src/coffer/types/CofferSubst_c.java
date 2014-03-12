@@ -40,7 +40,7 @@ public class CofferSubst_c extends Subst_c<Key, Key> implements CofferSubst {
     // Override substitution methods to handle Coffer constructs
 
     @Override
-    public ClassType substClassType(ClassType t) {
+    protected ClassType substClassTypeImpl(ClassType t) {
         // Don't bother trying to substitute into a non-Coffer class.
         if (!(t instanceof CofferClassType)) {
             return t;

@@ -133,7 +133,8 @@ public class production {
         6/14/96 frankf */
         if (action_str == null) action_str = "";
         if (tail_action != null && tail_action.code_string() != null)
-            action_str = action_str + "\t\t" + tail_action.code_string();
+            action_str =
+                    action_str + "                " + tail_action.code_string();
 
         /* stash the action */
         _action = new action_part(action_str);
@@ -388,31 +389,56 @@ public class production {
         String ret;
 
         /* Put in the left/right value labels */
-        if (emit.lr_values())
-            ret =
-                    "\t\tint "
+        if (emit.lr_values()) {
+            if (!emit.locations())
+                ret =
+                        "                "
+                                + "int "
+                                + labelname
+                                + "left = "
+                                + emit.pre("stack")
+                                +
+                                // TUM 20050917
+                                ((offset == 0) ? ".peek()" : (".elementAt("
+                                        + emit.pre("top") + "-" + offset + ")"))
+                                + ".left;\n"
+                                + "                "
+                                + "int "
+                                + labelname
+                                + "right = "
+                                + emit.pre("stack")
+                                +
+                                // TUM 20050917
+                                ((offset == 0) ? ".peek()" : (".elementAt("
+                                        + emit.pre("top") + "-" + offset + ")"))
+                                + ".right;\n";
+            else ret =
+                    "                "
+                            + "Location "
                             + labelname
-                            + "left = "
+                            + "xleft = ((java_cup.runtime.ComplexSymbolFactory.ComplexSymbol)"
                             + emit.pre("stack")
                             +
                             // TUM 20050917
                             ((offset == 0) ? ".peek()" : (".elementAt("
                                     + emit.pre("top") + "-" + offset + ")"))
-                            + ".left;\n"
-                            + "\t\tint "
+                            + ").xleft;\n"
+                            + "                "
+                            + "Location "
                             + labelname
-                            + "right = "
+                            + "xright = ((java_cup.runtime.ComplexSymbolFactory.ComplexSymbol)"
                             + emit.pre("stack")
                             +
                             // TUM 20050917
                             ((offset == 0) ? ".peek()" : (".elementAt("
                                     + emit.pre("top") + "-" + offset + ")"))
-                            + ".right;\n";
+                            + ").xright;\n";
+        }
         else ret = "";
 
         /* otherwise, just declare label. */
         return ret
-                + "\t\t"
+                + "                "
                 + stack_type
                 + " "
                 + labelname
@@ -575,8 +601,8 @@ public class production {
                                       0,
                                       declare_str
                                               + ((action_part) rhs(act_loc)).code_string(),
-                                      (lastLocation == -1) ? -1
-                                              : (act_loc - lastLocation));
+                                      (lastLocation == -1)
+                                              ? -1 : (act_loc - lastLocation));
 
                 /* replace the action with the generated non terminal */
                 _rhs[act_loc] = new symbol_part(new_nt);
