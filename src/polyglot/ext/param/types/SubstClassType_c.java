@@ -26,6 +26,7 @@
 
 package polyglot.ext.param.types;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map.Entry;
@@ -42,6 +43,7 @@ import polyglot.types.ReferenceType;
 import polyglot.types.Resolver;
 import polyglot.types.Type;
 import polyglot.types.TypeObject;
+import polyglot.util.Copy;
 import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
 
@@ -112,7 +114,7 @@ public class SubstClassType_c<Formal extends Param, Actual extends TypeObject>
     public List<? extends ReferenceType> interfaces() {
         List<? extends ReferenceType> interfaces = base.interfaces();
         if (!interfaces.equals(this.interfaces)) {
-            this.interfaces = interfaces;
+            this.interfaces = deepCopy(interfaces);
             substInterfaces = subst.substTypeList(interfaces);
         }
         return substInterfaces;
@@ -122,8 +124,8 @@ public class SubstClassType_c<Formal extends Param, Actual extends TypeObject>
     public List<? extends FieldInstance> fields() {
         List<? extends FieldInstance> fields = base.fields();
         if (!fields.equals(this.fields)) {
-            this.fields = fields;
-            substFields = subst.substFieldList(fields);
+            this.fields = deepCopy(fields);
+            this.substFields = subst.substFieldList(fields);
         }
         return substFields;
     }
@@ -132,7 +134,7 @@ public class SubstClassType_c<Formal extends Param, Actual extends TypeObject>
     public List<? extends MethodInstance> methods() {
         List<? extends MethodInstance> methods = base.methods();
         if (!methods.equals(this.methods)) {
-            this.methods = methods;
+            this.methods = deepCopy(methods);
             substMethods = subst.substMethodList(methods);
         }
         return substMethods;
@@ -142,7 +144,7 @@ public class SubstClassType_c<Formal extends Param, Actual extends TypeObject>
     public List<? extends ConstructorInstance> constructors() {
         List<? extends ConstructorInstance> constructors = base.constructors();
         if (!constructors.equals(this.constructors)) {
-            this.constructors = constructors;
+            this.constructors = deepCopy(constructors);
             substConstructors = subst.substConstructorList(constructors);
         }
         return substConstructors;
@@ -152,7 +154,7 @@ public class SubstClassType_c<Formal extends Param, Actual extends TypeObject>
     public List<? extends ClassType> memberClasses() {
         List<? extends ClassType> memberClasses = base.memberClasses();
         if (!memberClasses.equals(this.memberClasses)) {
-            this.memberClasses = memberClasses;
+            this.memberClasses = deepCopy(memberClasses);
             substMemberClasses = subst.substTypeList(memberClasses);
         }
         return substMemberClasses;
@@ -161,6 +163,13 @@ public class SubstClassType_c<Formal extends Param, Actual extends TypeObject>
     @Override
     public ClassType outer() {
         return (ClassType) subst.substType(base.outer());
+    }
+
+    protected <T extends TypeObject> List<T> deepCopy(List<T> src) {
+        List<T> dst = new ArrayList<T>(src.size());
+        for (T t : src)
+            dst.add(Copy.Util.copy(t));
+        return dst;
     }
 
     ////////////////////////////////////////////////////////////////

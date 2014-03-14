@@ -329,12 +329,8 @@ public class JL5SubstClassType_c extends
                     JL5TypeSystem ts = (JL5TypeSystem) typeSystem();
                     Context ctx = (Context) c;
                     ClassType currentClass = ctx.currentClass();
-                    ClassType outer = ct.outer();
-                    if (!ts.isSubtype(currentClass,
-                                      ts.subst(outer, subst().substitutions()))
-                            && !ts.isEnclosed(currentClass, outer)) {
-                        toTry = false;
-                    }
+                    ClassType outer = subst().substType(ct.outer()).toClass();
+                    if (!ts.isSubtype(currentClass, outer)) toTry = false;
                 }
 
                 if (toTry) {

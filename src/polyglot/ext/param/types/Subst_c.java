@@ -61,7 +61,7 @@ public class Subst_c<Formal extends Param, Actual extends TypeObject>
     /** Map from formal parameters (of type Param) to actuals. */
     protected Map<Formal, Actual> subst;
 
-    /** Cache of types. From CacheTypeWrapper(t) to subst(t)*/
+    /** Cache of types, from CacheTypeWrapper(t) to subst(t).*/
     protected transient Map<CacheTypeWrapper, Type> cache;
 
     protected transient Map<ClassType, ClassType> substClassTypeCache;
@@ -184,24 +184,28 @@ public class Subst_c<Formal extends Param, Actual extends TypeObject>
         return cached;
     }
 
+    protected CacheTypeWrapper typeWrapper(Type t) {
+        return new CacheTypeWrapper(t);
+    }
+
     protected void cachePut(Type t, Type cached) {
-        cache.put(new CacheTypeWrapper(t), cached);
+        cache.put(typeWrapper(t), cached);
     }
 
     protected Type cacheGet(Type t) {
-        return cache.get(new CacheTypeWrapper(t));
+        return cache.get(typeWrapper(t));
     }
 
-    class CacheTypeWrapper {
-        final Type t;
+    protected class CacheTypeWrapper {
+        private final Type t;
 
-        CacheTypeWrapper(Type t) {
+        public CacheTypeWrapper(Type t) {
             this.t = t;
         }
 
         @Override
         public boolean equals(Object o) {
-            if (o instanceof Subst_c.CacheTypeWrapper) {
+            if (o instanceof Subst_c<?, ?>.CacheTypeWrapper) {
                 @SuppressWarnings("unchecked")
                 CacheTypeWrapper wrapper = (CacheTypeWrapper) o;
                 return Subst_c.this.cacheTypeEquality(t, wrapper.t);
