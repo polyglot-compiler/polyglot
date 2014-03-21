@@ -28,6 +28,7 @@ package polyglot.ext.jl5.ast;
 import java.util.List;
 
 import polyglot.ast.Node;
+import polyglot.ast.Term;
 import polyglot.ext.jl5.types.Annotations;
 import polyglot.ext.jl5.visit.AnnotationChecker;
 import polyglot.types.SemanticException;
@@ -40,9 +41,9 @@ import polyglot.types.SemanticException;
  *
  */
 public interface AnnotatedElement {
-    List<AnnotationElem> annotationElems();
+    List<Term> annotationElems();
 
-    Node annotationElems(List<AnnotationElem> annotations);
+    Node annotationElems(List<Term> annotations);
 
     Node annotationCheck(AnnotationChecker ac) throws SemanticException;
 

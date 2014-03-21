@@ -887,6 +887,13 @@ public class NodeFactory_c extends AbstractNodeFactory_c {
         return new LocalDecl_c(pos, flags, type, name, init, ext);
     }
 
+    protected final Loop Loop(Position pos, Expr cond, Stmt body, Ext ext,
+            ExtFactory extFactory) {
+        for (; extFactory != null; extFactory = extFactory.nextExtFactory())
+            ext = composeExts(ext, extFactory.extLoop());
+        return new Loop.Instance(pos, cond, body, ext);
+    }
+
     @Override
     public MethodDecl MethodDecl(Position pos, Flags flags,
             TypeNode returnType, Id name, List<Formal> formals,
@@ -1085,6 +1092,12 @@ public class NodeFactory_c extends AbstractNodeFactory_c {
         for (; extFactory != null; extFactory = extFactory.nextExtFactory())
             ext = composeExts(ext, extFactory.extSynchronized());
         return new Synchronized_c(pos, expr, body, ext);
+    }
+
+    protected final Term Term(Position pos, Ext ext, ExtFactory extFactory) {
+        for (; extFactory != null; extFactory = extFactory.nextExtFactory())
+            ext = composeExts(ext, extFactory.extTerm());
+        return new Term.Instance(pos, ext);
     }
 
     @Override

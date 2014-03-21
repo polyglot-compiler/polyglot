@@ -46,6 +46,7 @@ public interface Expr extends Receiver, Term {
     /** Return true iff the compiler has determined whether this expression has a
      * constant value.  The value returned by {@code isConstant()} is valid only if
      * {@code constantValueSet()} is true. */
+    @Deprecated
     boolean constantValueSet();
 
     /**
@@ -53,11 +54,13 @@ public interface Expr extends Receiver, Term {
      * Requires that disambiguation has been done, and that
      * {@code constantValueSet()} is true.
      */
+    @Deprecated
     boolean isConstant();
 
     /** Return the constant value of the expression, if any.
      *  Requires that {@code isConstant()} is true.
      */
+    @Deprecated
     Object constantValue();
 
     /**

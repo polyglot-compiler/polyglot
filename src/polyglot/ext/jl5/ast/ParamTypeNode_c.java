@@ -53,7 +53,7 @@ import polyglot.visit.PrettyPrinter;
 import polyglot.visit.TypeBuilder;
 import polyglot.visit.TypeChecker;
 
-public class ParamTypeNode_c extends JL5Ext implements ParamTypeNode {
+public class ParamTypeNode_c extends JL5TermExt implements ParamTypeNode {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
     protected Id id;

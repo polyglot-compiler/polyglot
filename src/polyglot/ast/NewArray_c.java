@@ -187,7 +187,7 @@ public class NewArray_c extends Expr_c implements NewArray {
         ArrayType type = arrayOf(ts, baseType.type(), dims.size() + addDims);
 
         if (init != null) {
-            init.typeCheckElements(type);
+            init.typeCheckElements(tc, type);
         }
 
         return type(type);

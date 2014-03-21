@@ -42,13 +42,14 @@ import polyglot.visit.ExceptionChecker;
  * A {@code Term} represents any Java expression or statement on which
  * dataflow can be performed.
  */
-public abstract class Term_c extends Node_c implements Term {
+public abstract class Term_c extends Node_c implements Term, TermOps {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
     protected boolean reachable;
     protected SubtypeSet exceptions;
 
-    @Deprecated
+    // TODO
+    // @Deprecated
     public Term_c(Position pos) {
         this(pos, null);
     }

@@ -63,15 +63,15 @@ public abstract class Lit_c extends Expr_c implements Lit {
     }
 
     @Override
-    public boolean constantValueSet() {
+    public boolean constantValueSet(Lang lang) {
         return true;
     }
 
     @Override
-    public boolean isConstant() {
+    public boolean isConstant(Lang lang) {
         return true;
     }
 
     @Override
-    public abstract Object constantValue();
+    public abstract Object constantValue(Lang lang);
 }

@@ -43,11 +43,13 @@ import polyglot.ast.IntLit;
 import polyglot.ast.Labeled;
 import polyglot.ast.Local;
 import polyglot.ast.LocalDecl;
+import polyglot.ast.Loop;
 import polyglot.ast.Node;
 import polyglot.ast.NodeFactory;
 import polyglot.ast.Stmt;
 import polyglot.ast.While;
 import polyglot.ext.jl5.ast.ExtendedFor;
+import polyglot.ext.jl5.ast.JL5Ext;
 import polyglot.frontend.Job;
 import polyglot.types.Flags;
 import polyglot.types.LocalInstance;
@@ -82,9 +84,9 @@ public class RemoveExtendedFors extends ContextVisitor {
     @Override
     protected Node leaveCall(Node parent, Node old, Node n, NodeVisitor v)
             throws SemanticException {
-        if (n instanceof ExtendedFor && !(parent instanceof Labeled)) {
+        if (isExtendedFor(n) && !(parent instanceof Labeled)) {
             n =
-                    translateExtendedFor((ExtendedFor) n,
+                    translateExtendedFor((Loop) n,
                                          Collections.<String> emptyList());
         }
         if (n instanceof CodeDecl) {
@@ -98,24 +100,31 @@ public class RemoveExtendedFors extends ContextVisitor {
                 labels.add(lbled.label());
                 s = lbled.statement();
             }
-            if (s instanceof ExtendedFor) {
+            if (isExtendedFor(s)) {
                 // we have a situation L1, ..., Ln: for (C x : e) { ...}
-                n = translateExtendedFor((ExtendedFor) s, labels);
+                n = translateExtendedFor((Loop) s, labels);
             }
         }
         return n;
     }
 
-    private Node translateExtendedFor(ExtendedFor n, List<String> labels)
-            throws SemanticException {
+    protected boolean isExtendedFor(Node n) {
+        return n instanceof Loop && JL5Ext.ext(n) instanceof ExtendedFor;
+    }
 
-        if (n.expr().type().isArray()) {
+    private Node translateExtendedFor(Loop n, List<String> labels)
+            throws SemanticException {
+        ExtendedFor ext = (ExtendedFor) JL5Ext.ext(n);
+        LocalDecl decl = ext.decl();
+        Expr expr = ext.expr();
+
+        if (expr.type().isArray()) {
             return translateExtForArray(n, labels);
         }
 
         Position pos = Position.compilerGenerated();
         Type iterType = ts.typeForName("java.util.Iterator");
-        Type iteratedType = n.decl().type().type();
+        Type iteratedType = decl.type().type();
         // translate "L1,...,Ln: for (C x: e) b" to 
         // "{ Iterator iter = e.iterator(); L1,...,Ln: while (iter.hasNext();)  { C x = (C)iter.next(); b }"
 
@@ -126,12 +135,10 @@ public class RemoveExtendedFors extends ContextVisitor {
                 ts.localInstance(pos, Flags.NONE, iterType, iterName);
         {
             Id id = nodeFactory().Id(pos, "iterator");
-            Call iterator = nodeFactory().Call(pos, n.expr(), id);
+            Call iterator = nodeFactory().Call(pos, expr, id);
             iterator = (Call) iterator.type(iterType);
             iterator =
-                    iterator.methodInstance(ts.findMethod(n.expr()
-                                                           .type()
-                                                           .toClass(),
+                    iterator.methodInstance(ts.findMethod(expr.type().toClass(),
                                                           "iterator",
                                                           Collections.<Type> emptyList(),
                                                           this.context()
@@ -173,7 +180,7 @@ public class RemoveExtendedFors extends ContextVisitor {
                                        call);
             cast = (Cast) cast.type(iteratedType);
 
-            loopBody.add(n.decl().init(cast));
+            loopBody.add(decl.init(cast));
             loopBody.add(n.body());
         }
 
@@ -214,10 +221,14 @@ public class RemoveExtendedFors extends ContextVisitor {
         return "extfor$" + desc + "$" + count;
     }
 
-    protected Node translateExtForArray(ExtendedFor n, List<String> labels)
+    protected Node translateExtForArray(Loop n, List<String> labels)
             throws SemanticException {
+        ExtendedFor ext = (ExtendedFor) JL5Ext.ext(n);
+        LocalDecl decl = ext.decl();
+        Expr expr = ext.expr();
+
         Position pos = Position.compilerGenerated();
-        Type iteratedType = n.decl().type().type();
+        Type iteratedType = decl.type().type();
         // translate "L1,...,Ln: for (C x: e) b" to 
         // "{ C[] arr = e; int iter = 0;  L1,...,Ln: while (iter < arr.length)  { C x = arr[iter]; iter = iter + 1; b; }"
         List<Stmt> stmts = new ArrayList<Stmt>();
@@ -225,7 +236,7 @@ public class RemoveExtendedFors extends ContextVisitor {
         // add the declaration of arr: "C[] arr = e"
         String arrID = freshName("arr");
         LocalInstance arrLI =
-                ts.localInstance(pos, Flags.NONE, n.expr().type(), arrID);
+                ts.localInstance(pos, Flags.NONE, expr.type(), arrID);
         {
             LocalDecl ld =
                     nodeFactory().LocalDecl(pos,
@@ -234,7 +245,7 @@ public class RemoveExtendedFors extends ContextVisitor {
                                                                             arrLI.type()),
                                             nodeFactory().Id(pos, arrID));
             ld = ld.localInstance(arrLI);
-            ld = ld.init(n.expr());
+            ld = ld.init(expr);
             stmts.add(ld);
         }
 
@@ -307,7 +318,7 @@ public class RemoveExtendedFors extends ContextVisitor {
         {
             // Create a new loop body from the old body followed by the increment
             Block loopBody =
-                    nodeFactory().Block(pos, n.decl().init(init), inc, n.body());
+                    nodeFactory().Block(pos, decl.init(init), inc, n.body());
             While loop = nodeFactory().While(pos, cond, loopBody);
             stmts.add(labelStmt(loop, labels));
         }

@@ -140,7 +140,8 @@ public abstract class Node_c implements Node {
         return ext;
     }
 
-    @Deprecated
+    // TODO
+    // @Deprecated
     @Override
     public Node ext(Ext ext) {
         if (this.ext == ext) {

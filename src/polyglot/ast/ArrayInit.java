@@ -30,6 +30,7 @@ import java.util.List;
 
 import polyglot.types.SemanticException;
 import polyglot.types.Type;
+import polyglot.visit.TypeChecker;
 
 /**
  * An {@code ArrayInit} is an immutable representation of
@@ -54,8 +55,10 @@ public interface ArrayInit extends Expr {
      * Type check the individual elements of the array initializer against the
      * left-hand-side type.  Each element is checked to see if it can be
      * assigned to a variable of type lhsType.
+     * @param tc The type checking visitor.
      * @param lhsType Type to compare against.
      * @exception SemanticException if there is a type error.
      */
-    void typeCheckElements(Type lhsType) throws SemanticException;
+    void typeCheckElements(TypeChecker tc, Type lhsType)
+            throws SemanticException;
 }

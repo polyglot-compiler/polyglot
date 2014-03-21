@@ -37,7 +37,7 @@ import polyglot.util.CollectionUtil;
 import polyglot.util.SerialVersionUID;
 import polyglot.visit.TypeChecker;
 
-public class JL5ConditionalExt extends JL5Ext {
+public class JL5ConditionalExt extends JL5ExprExt {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
     @Override
@@ -107,25 +107,37 @@ public class JL5ConditionalExt extends JL5Ext {
             // If one of the operands is of type T where T is byte, short, or char, 
             // and the other operand is a constant expression of type int whose value is 
             // represent- able in type T, then the type of the conditional expression is T.
-            if (t1.isIntOrLess() && t2.isInt()
-                    && ts.numericConversionValid(t1, e2.constantValue())) {
+            if (t1.isIntOrLess()
+                    && t2.isInt()
+                    && ts.numericConversionValid(t1,
+                                                 tc.lang()
+                                                   .constantValue(e2, tc.lang()))) {
                 return c.type(t1);
             }
 
-            if (t2.isIntOrLess() && t1.isInt()
-                    && ts.numericConversionValid(t2, e1.constantValue())) {
+            if (t2.isIntOrLess()
+                    && t1.isInt()
+                    && ts.numericConversionValid(t2,
+                                                 tc.lang()
+                                                   .constantValue(e1, tc.lang()))) {
                 return c.type(t2);
             }
 
             // If one of the operands is of type Byte and the other operand is a constant 
             // expression of type int whose value is representable in type byte, then the type 
             // of the conditional expression is byte.
-            if (t1.equals(ts.typeForName("java.lang.Byte")) && t2.isInt()
-                    && ts.numericConversionValid(ts.Byte(), e2.constantValue())) {
+            if (t1.equals(ts.typeForName("java.lang.Byte"))
+                    && t2.isInt()
+                    && ts.numericConversionValid(ts.Byte(),
+                                                 tc.lang()
+                                                   .constantValue(e2, tc.lang()))) {
                 return c.type(ts.Byte());
             }
-            if (t2.equals(ts.typeForName("java.lang.Byte")) && t1.isInt()
-                    && ts.numericConversionValid(ts.Byte(), e1.constantValue())) {
+            if (t2.equals(ts.typeForName("java.lang.Byte"))
+                    && t1.isInt()
+                    && ts.numericConversionValid(ts.Byte(),
+                                                 tc.lang()
+                                                   .constantValue(e1, tc.lang()))) {
                 return c.type(ts.Byte());
             }
 
@@ -134,24 +146,34 @@ public class JL5ConditionalExt extends JL5Ext {
             // conditional expression is short.
             if (t1.equals(ts.typeForName("java.lang.Short"))
                     && t2.isInt()
-                    && ts.numericConversionValid(ts.Short(), e2.constantValue())) {
+                    && ts.numericConversionValid(ts.Short(),
+                                                 tc.lang()
+                                                   .constantValue(e2, tc.lang()))) {
                 return c.type(ts.Short());
             }
             if (t2.equals(ts.typeForName("java.lang.Short"))
                     && t1.isInt()
-                    && ts.numericConversionValid(ts.Short(), e1.constantValue())) {
+                    && ts.numericConversionValid(ts.Short(),
+                                                 tc.lang()
+                                                   .constantValue(e1, tc.lang()))) {
                 return c.type(ts.Short());
             }
 
             // If one of the operands is of type Character and the other operand is a 
             // constant expression of type int whose value is representable in type char, 
             // then the type of the conditional expression is char.
-            if (t1.equals(ts.typeForName("java.lang.Character")) && t2.isInt()
-                    && ts.numericConversionValid(ts.Char(), e2.constantValue())) {
+            if (t1.equals(ts.typeForName("java.lang.Character"))
+                    && t2.isInt()
+                    && ts.numericConversionValid(ts.Char(),
+                                                 tc.lang()
+                                                   .constantValue(e2, tc.lang()))) {
                 return c.type(ts.Char());
             }
-            if (t2.equals(ts.typeForName("java.lang.Character")) && t1.isInt()
-                    && ts.numericConversionValid(ts.Char(), e1.constantValue())) {
+            if (t2.equals(ts.typeForName("java.lang.Character"))
+                    && t1.isInt()
+                    && ts.numericConversionValid(ts.Char(),
+                                                 tc.lang()
+                                                   .constantValue(e1, tc.lang()))) {
                 return c.type(ts.Char());
             }
 

@@ -267,25 +267,25 @@ public class Unary_c extends Expr_c implements Unary {
     }
 
     @Override
-    public boolean constantValueSet() {
-        return expr.constantValueSet();
+    public boolean constantValueSet(Lang lang) {
+        return lang.constantValueSet(expr, lang);
     }
 
     @Override
-    public boolean isConstant() {
+    public boolean isConstant(Lang lang) {
         if (op == POST_INC || op == POST_DEC || op == PRE_INC || op == PRE_DEC) {
             return false;
         }
-        return expr.isConstant();
+        return lang.isConstant(expr, lang);
     }
 
     @Override
-    public Object constantValue() {
-        if (!isConstant()) {
+    public Object constantValue(Lang lang) {
+        if (!lang.isConstant(this, lang)) {
             return null;
         }
 
-        Object v = expr.constantValue();
+        Object v = lang.constantValue(expr, lang);
 
         if (v instanceof Boolean) {
             boolean vv = ((Boolean) v).booleanValue();

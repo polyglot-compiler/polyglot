@@ -35,7 +35,7 @@ import polyglot.util.SerialVersionUID;
  * statement.  It contains a statement to be executed and an expression
  * to be tested indicating whether to reexecute the statement.
  */
-public abstract class Loop_c extends Stmt_c implements Loop {
+public abstract class Loop_c extends Stmt_c implements Loop, LoopOps {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
     protected Expr cond;
@@ -71,18 +71,18 @@ public abstract class Loop_c extends Stmt_c implements Loop {
     }
 
     @Override
-    public boolean condIsConstant() {
-        return cond().isConstant();
+    public boolean condIsConstant(JLang lang) {
+        return lang.isConstant(cond(), lang);
     }
 
     @Override
-    public boolean condIsConstantTrue() {
-        return Boolean.TRUE.equals(cond().constantValue());
+    public boolean condIsConstantTrue(JLang lang) {
+        return Boolean.TRUE.equals(lang.constantValue(cond(), lang));
     }
 
     @Override
-    public boolean condIsConstantFalse() {
-        return Boolean.FALSE.equals(cond().constantValue());
+    public boolean condIsConstantFalse(JLang lang) {
+        return Boolean.FALSE.equals(lang.constantValue(cond(), lang));
     }
 
     @Override

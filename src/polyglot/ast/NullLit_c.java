@@ -68,7 +68,7 @@ public class NullLit_c extends Lit_c implements NullLit {
     }
 
     @Override
-    public Object constantValue() {
+    public Object constantValue(Lang lang) {
         return null;
     }
 

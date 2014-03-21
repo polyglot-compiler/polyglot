@@ -23,13 +23,31 @@
  *
  * See README for contributors.
  ******************************************************************************/
-package polyglot.ext.jl5.ast;
 
-import polyglot.ast.Node;
-import polyglot.ext.jl5.types.EnumInstance;
+package polyglot.ast;
 
-public interface EnumConstant {
-    EnumInstance enumInstance();
+import java.util.List;
 
-    Node enumInstance(EnumInstance enumInstance);
+import polyglot.visit.CFGBuilder;
+
+/**
+ * This interface allows extensions both to override and reuse functionality in
+ * Term_c.
+ */
+public interface TermOps {
+    /**
+     * Return the first direct subterm performed when evaluating this term. If
+     * this term has no subterms, this should return null.
+     * 
+     * This method is similar to the deprecated entry(), but it should *not*
+     * recursively drill down to the innermost subterm. The direct child visited
+     * first in this term's dataflow should be returned.
+     */
+    Term firstChild();
+
+    /**
+     * Visit this term in evaluation order, calling v.edge() for each successor
+     * in succs, if data flows on that edge.
+     */
+    <T> List<T> acceptCFG(CFGBuilder<?> v, List<T> succs);
 }

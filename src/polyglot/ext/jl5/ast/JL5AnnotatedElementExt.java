@@ -28,6 +28,7 @@ package polyglot.ext.jl5.ast;
 import java.util.List;
 
 import polyglot.ast.Node;
+import polyglot.ast.Term;
 import polyglot.ext.jl5.types.Annotations;
 import polyglot.ext.jl5.types.JL5TypeSystem;
 import polyglot.ext.jl5.visit.AnnotationChecker;
@@ -42,28 +43,27 @@ import polyglot.visit.NodeVisitor;
 import polyglot.visit.PrettyPrinter;
 import polyglot.visit.TypeChecker;
 
-public abstract class JL5AnnotatedElementExt extends JL5Ext implements
+public abstract class JL5AnnotatedElementExt extends JL5TermExt implements
         AnnotatedElement {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
-    protected List<AnnotationElem> annotations;
+    protected List<Term> annotations;
 
-    public JL5AnnotatedElementExt(List<AnnotationElem> annotations) {
+    public JL5AnnotatedElementExt(List<Term> annotations) {
         this.annotations = ListUtil.copy(annotations, true);
     }
 
     @Override
-    public List<AnnotationElem> annotationElems() {
+    public List<Term> annotationElems() {
         return this.annotations;
     }
 
     @Override
-    public Node annotationElems(List<AnnotationElem> annotations) {
+    public Node annotationElems(List<Term> annotations) {
         return annotationElems(node(), annotations);
     }
 
-    protected <N extends Node> N annotationElems(N n,
-            List<AnnotationElem> annotations) {
+    protected <N extends Node> N annotationElems(N n, List<Term> annotations) {
         JL5AnnotatedElementExt ext = (JL5AnnotatedElementExt) JL5Ext.ext(n);
         if (CollectionUtil.equals(ext.annotations, annotations)) return n;
         if (n == node) {
@@ -74,7 +74,7 @@ public abstract class JL5AnnotatedElementExt extends JL5Ext implements
         return n;
     }
 
-    private Node reconstruct(Node n, List<AnnotationElem> annotations) {
+    private Node reconstruct(Node n, List<Term> annotations) {
         n = annotationElems(n, annotations);
         return n;
     }
@@ -82,7 +82,7 @@ public abstract class JL5AnnotatedElementExt extends JL5Ext implements
     @Override
     public Node visitChildren(NodeVisitor v) {
         Node n = superLang().visitChildren(this.node(), v);
-        List<AnnotationElem> annots = visitList(annotations, v);
+        List<Term> annots = visitList(annotations, v);
         return reconstruct(n, annots);
     }
 
@@ -95,7 +95,7 @@ public abstract class JL5AnnotatedElementExt extends JL5Ext implements
 
     @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
-        for (AnnotationElem ae : annotations) {
+        for (Term ae : annotations) {
             tr.lang().prettyPrint(ae, w, tr);
             w.newline();
         }
@@ -105,7 +105,7 @@ public abstract class JL5AnnotatedElementExt extends JL5Ext implements
     public Node annotationCheck(AnnotationChecker annoCheck)
             throws SemanticException {
         Node n = this.node();
-        for (AnnotationElem elem : annotations) {
+        for (Term elem : annotations) {
             annoCheck.checkAnnotationApplicability(elem, this.declaration());
         }
         return n;

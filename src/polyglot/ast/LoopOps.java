@@ -23,13 +23,23 @@
  *
  * See README for contributors.
  ******************************************************************************/
-package polyglot.ext.jl5.ast;
 
-import polyglot.ast.Node;
-import polyglot.ext.jl5.types.EnumInstance;
+package polyglot.ast;
 
-public interface EnumConstant {
-    EnumInstance enumInstance();
+/**
+ * This interface allows extensions both to override and reuse functionality in
+ * Loop_c.
+ */
+public interface LoopOps {
+    /** Returns true of cond() evaluates to a constant. */
+    boolean condIsConstant(JLang lang);
 
-    Node enumInstance(EnumInstance enumInstance);
+    /** Returns true if cond() is a constant that evaluates to true. */
+    boolean condIsConstantTrue(JLang lang);
+
+    /** Returns true if cond() is a constant that evaluates to false. */
+    boolean condIsConstantFalse(JLang lang);
+
+    /** Target of a continue statement in the loop body. */
+    Term continueTarget();
 }

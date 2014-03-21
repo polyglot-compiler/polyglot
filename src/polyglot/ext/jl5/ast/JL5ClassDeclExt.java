@@ -33,6 +33,7 @@ import polyglot.ast.ClassDecl;
 import polyglot.ast.ClassDeclOps;
 import polyglot.ast.Node;
 import polyglot.ast.NodeFactory;
+import polyglot.ast.Term;
 import polyglot.ast.TypeNode;
 import polyglot.ext.jl5.types.AnnotationTypeElemInstance;
 import polyglot.ext.jl5.types.Annotations;
@@ -68,8 +69,7 @@ public class JL5ClassDeclExt extends JL5AnnotatedElementExt implements
 
     protected List<TypeNode> paramTypes = new ArrayList<TypeNode>();
 
-    public JL5ClassDeclExt(List<TypeNode> paramTypes,
-            List<AnnotationElem> annotations) {
+    public JL5ClassDeclExt(List<TypeNode> paramTypes, List<Term> annotations) {
         super(annotations);
         this.paramTypes = ListUtil.copy(paramTypes, true);
     }

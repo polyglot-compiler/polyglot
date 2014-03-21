@@ -44,6 +44,7 @@ import polyglot.types.TypeSystem;
 import polyglot.util.CodeWriter;
 import polyglot.visit.AmbiguityRemover;
 import polyglot.visit.AscriptionVisitor;
+import polyglot.visit.CFGBuilder;
 import polyglot.visit.ConstantChecker;
 import polyglot.visit.ExceptionChecker;
 import polyglot.visit.NodeVisitor;
@@ -76,6 +77,14 @@ public class JLang_c implements JLang {
         return (ClassDeclOps) n;
     }
 
+    protected ExprOps ExprOps(Expr n) {
+        return (ExprOps) n;
+    }
+
+    protected LoopOps LoopOps(Loop n) {
+        return (LoopOps) n;
+    }
+
     protected NewOps NewOps(New n) {
         return (NewOps) n;
     }
@@ -86,6 +95,10 @@ public class JLang_c implements JLang {
 
     protected ProcedureDeclOps ProcedureDeclOps(ProcedureDecl n) {
         return (ProcedureDeclOps) n;
+    }
+
+    protected TermOps TermOps(Term n) {
+        return (TermOps) n;
     }
 
     protected TryOps TryOps(Try n) {
@@ -191,13 +204,13 @@ public class JLang_c implements JLang {
     }
 
     @Override
-    public NodeVisitor extRewriteEnter(Node n, ExtensionRewriter rw)
+    public final NodeVisitor extRewriteEnter(Node n, ExtensionRewriter rw)
             throws SemanticException {
         return NodeOps(n).extRewriteEnter(rw);
     }
 
     @Override
-    public Node extRewrite(Node n, ExtensionRewriter rw)
+    public final Node extRewrite(Node n, ExtensionRewriter rw)
             throws SemanticException {
         return NodeOps(n).extRewrite(rw);
     }
@@ -284,6 +297,45 @@ public class JLang_c implements JLang {
                                                      defaultConstructorInstance);
     }
 
+    // ExprOps
+
+    @Override
+    public final boolean constantValueSet(Expr n, Lang lang) {
+        return ExprOps(n).constantValueSet(lang);
+    }
+
+    @Override
+    public final boolean isConstant(Expr n, Lang lang) {
+        return ExprOps(n).isConstant(lang);
+    }
+
+    @Override
+    public final Object constantValue(Expr n, Lang lang) {
+        return ExprOps(n).constantValue(lang);
+    }
+
+    // LoopOps
+
+    @Override
+    public final boolean condIsConstant(Loop n, JLang lang) {
+        return LoopOps(n).condIsConstant(lang);
+    }
+
+    @Override
+    public final boolean condIsConstantTrue(Loop n, JLang lang) {
+        return LoopOps(n).condIsConstantTrue(lang);
+    }
+
+    @Override
+    public final boolean condIsConstantFalse(Loop n, JLang lang) {
+        return LoopOps(n).condIsConstantFalse(lang);
+    }
+
+    @Override
+    public final Term continueTarget(Loop n) {
+        return LoopOps(n).continueTarget();
+    }
+
     // NewOps
 
     @Override
@@ -338,6 +390,18 @@ public class JLang_c implements JLang {
     public final void prettyPrintHeader(ProcedureDecl n, Flags flags,
             CodeWriter w, PrettyPrinter tr) {
         ProcedureDeclOps(n).prettyPrintHeader(flags, w, tr);
+    }
+
+    // TermOps
+
+    @Override
+    public final Term firstChild(Term n) {
+        return TermOps(n).firstChild();
+    }
+
+    @Override
+    public final <T> List<T> acceptCFG(Term n, CFGBuilder<?> v, List<T> succs) {
+        return TermOps(n).acceptCFG(v, succs);
     }
 
     // TryOps

@@ -51,7 +51,7 @@ parser Grm extends polyglot.qq.Grm {:
    /**
     * Copied from JL5 PPG.
     */
-    public List<LocalDecl> variableDeclarators(TypeNode a, List<VarDeclarator> b, Flags flags, List<AnnotationElem> annotations)
+    public List<LocalDecl> variableDeclarators(TypeNode a, List<VarDeclarator> b, Flags flags, List<Term> annotations)
     throws Exception
     {
       List<LocalDecl> l = new LinkedList<LocalDecl>();

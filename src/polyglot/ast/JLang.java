@@ -40,6 +40,7 @@ import polyglot.types.TypeSystem;
 import polyglot.util.CodeWriter;
 import polyglot.visit.AmbiguityRemover;
 import polyglot.visit.AscriptionVisitor;
+import polyglot.visit.CFGBuilder;
 import polyglot.visit.ConstantChecker;
 import polyglot.visit.ExceptionChecker;
 import polyglot.visit.NodeVisitor;
@@ -166,21 +167,6 @@ public interface JLang extends Lang {
      */
     List<Type> throwTypes(Node n, TypeSystem ts);
 
-    // ClassDeclOps
-
-    void prettyPrintHeader(ClassDecl n, CodeWriter w, PrettyPrinter tr);
-
-    void prettyPrintFooter(ClassDecl n, CodeWriter w, PrettyPrinter tr);
-
-    Node addDefaultConstructor(ClassDecl n, TypeSystem ts, NodeFactory nf,
-            ConstructorInstance defaultConstructorInstance)
-            throws SemanticException;
-
-    // ProcedureDeclOps
-
-    void prettyPrintHeader(ProcedureDecl n, Flags flags, CodeWriter w,
-            PrettyPrinter tr);
-
     // CallOps
 
     /**
@@ -201,6 +187,30 @@ public interface JLang extends Lang {
     */
     Node typeCheckNullTarget(Call n, TypeChecker tc, List<Type> argTypes)
             throws SemanticException;
+
+    // ClassDeclOps
+
+    void prettyPrintHeader(ClassDecl n, CodeWriter w, PrettyPrinter tr);
+
+    void prettyPrintFooter(ClassDecl n, CodeWriter w, PrettyPrinter tr);
+
+    Node addDefaultConstructor(ClassDecl n, TypeSystem ts, NodeFactory nf,
+            ConstructorInstance defaultConstructorInstance)
+            throws SemanticException;
+
+    // LoopOps
+
+    /** Returns true of cond() evaluates to a constant. */
+    boolean condIsConstant(Loop n, JLang lang);
+
+    /** Returns true if cond() is a constant that evaluates to true. */
+    boolean condIsConstantTrue(Loop n, JLang lang);
+
+    /** Returns true if cond() is a constant that evaluates to false. */
+    boolean condIsConstantFalse(Loop n, JLang lang);
+
+    /** Target of a continue statement in the loop body. */
+    Term continueTarget(Loop n);
 
     // NewOps
 
@@ -223,6 +233,29 @@ public interface JLang extends Lang {
     // ProcedureCallOps
 
     void printArgs(ProcedureCall n, CodeWriter w, PrettyPrinter tr);
+
+    // ProcedureDeclOps
+
+    void prettyPrintHeader(ProcedureDecl n, Flags flags, CodeWriter w,
+            PrettyPrinter tr);
+
+    // TermOps
+
+    /**
+     * Return the first direct subterm performed when evaluating this term. If
+     * this term has no subterms, this should return null.
+     * 
+     * This method is similar to the deprecated entry(), but it should *not*
+     * recursively drill down to the innermost subterm. The direct child visited
+     * first in this term's dataflow should be returned.
+     */
+    Term firstChild(Term n);
+
+    /**
+     * Visit this term in evaluation order, calling v.edge() for each successor
+     * in succs, if data flows on that edge.
+     */
+    <T> List<T> acceptCFG(Term n, CFGBuilder<?> v, List<T> succs);
 
     // TryOps
 

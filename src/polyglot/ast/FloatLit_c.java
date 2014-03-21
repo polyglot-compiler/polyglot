@@ -125,7 +125,7 @@ public class FloatLit_c extends Lit_c implements FloatLit {
     }
 
     @Override
-    public Object constantValue() {
+    public Object constantValue(Lang lang) {
         if (kind == FLOAT) {
             return new Float(value);
         }

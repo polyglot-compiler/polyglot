@@ -56,13 +56,14 @@ public interface TypeNode extends Receiver, QualifierNode, Term {
         }
 
         @Override
-        public Node extRewrite(ExtensionRewriter rw) throws SemanticException {
+        public final Node extRewrite(ExtensionRewriter rw)
+                throws SemanticException {
             throw new InternalCompilerError("This type node cannot be represented in the "
                     + "target language and should have been rewritten: " + this);
         }
 
         @Override
-        public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
+        public final void prettyPrint(CodeWriter w, PrettyPrinter tr) {
             throw new InternalCompilerError("Unexpected invocation from extension object:"
                     + this);
         }

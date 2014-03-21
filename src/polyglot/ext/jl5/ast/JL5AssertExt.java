@@ -33,7 +33,7 @@ import polyglot.types.Type;
 import polyglot.util.SerialVersionUID;
 import polyglot.visit.TypeChecker;
 
-public class JL5AssertExt extends JL5Ext {
+public class JL5AssertExt extends JL5TermExt {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
     @Override

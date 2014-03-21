@@ -189,13 +189,13 @@ public class Cast_c extends Expr_c implements Cast {
     }
 
     @Override
-    public boolean isConstant() {
-        return expr.isConstant() && castType.type().isPrimitive();
+    public boolean isConstant(Lang lang) {
+        return lang.isConstant(expr, lang) && castType.type().isPrimitive();
     }
 
     @Override
-    public Object constantValue() {
-        Object v = expr.constantValue();
+    public Object constantValue(Lang lang) {
+        Object v = lang.constantValue(expr, lang);
 
         if (v == null) {
             return null;

@@ -130,13 +130,13 @@ public abstract class JL5AbstractNodeFactory_c extends NodeFactory_c implements
     }
 
     @Override
-    public final ElementValueArrayInit ElementValueArrayInit(Position pos) {
+    public final Term ElementValueArrayInit(Position pos) {
         return ElementValueArrayInit(pos, Collections.<Term> emptyList());
     }
 
     @Override
     public final EnumConstantDecl EnumConstantDecl(Position pos, Flags flags,
-            List<AnnotationElem> annotations, Id name, List<Expr> args) {
+            List<Term> annotations, Id name, List<Expr> args) {
         return EnumConstantDecl(pos, flags, annotations, name, args, null);
     }
 
@@ -148,7 +148,7 @@ public abstract class JL5AbstractNodeFactory_c extends NodeFactory_c implements
 
     @Override
     public final FieldDecl FieldDecl(Position pos, Flags flags,
-            List<AnnotationElem> annotations, TypeNode type, Id name) {
+            List<Term> annotations, TypeNode type, Id name) {
         return FieldDecl(pos, flags, annotations, type, name, null);
     }
 
@@ -159,7 +159,7 @@ public abstract class JL5AbstractNodeFactory_c extends NodeFactory_c implements
 
     @Override
     public final Formal Formal(Position pos, Flags flags,
-            List<AnnotationElem> annotations, TypeNode type, Id name) {
+            List<Term> annotations, TypeNode type, Id name) {
         return Formal(pos, flags, annotations, type, name, false);
     }
 
@@ -171,12 +171,12 @@ public abstract class JL5AbstractNodeFactory_c extends NodeFactory_c implements
 
     @Override
     public final LocalDecl LocalDecl(Position pos, Flags flags,
-            List<AnnotationElem> annotations, TypeNode type, Id name) {
+            List<Term> annotations, TypeNode type, Id name) {
         return LocalDecl(pos, flags, annotations, type, name, null);
     }
 
     @Override
-    public final AnnotationElem MarkerAnnotationElem(Position pos, TypeNode name) {
+    public final Term MarkerAnnotationElem(Position pos, TypeNode name) {
         return NormalAnnotationElem(pos, name, null);
     }
 

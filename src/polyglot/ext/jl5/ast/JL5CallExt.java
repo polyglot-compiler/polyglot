@@ -34,6 +34,7 @@ import polyglot.ast.Call;
 import polyglot.ast.CallOps;
 import polyglot.ast.Expr;
 import polyglot.ast.FieldDecl;
+import polyglot.ast.Lang;
 import polyglot.ast.LocalDecl;
 import polyglot.ast.Node;
 import polyglot.ast.Return;
@@ -292,4 +293,18 @@ public class JL5CallExt extends JL5ProcedureCallExt implements CallOps {
         return superLang().typeCheckNullTarget(node(), tc, argTypes);
     }
 
+    @Override
+    public boolean constantValueSet(Lang lang) {
+        return superLang().constantValueSet(node(), lang);
+    }
+
+    @Override
+    public boolean isConstant(Lang lang) {
+        return superLang().isConstant(node(), lang);
+    }
+
+    @Override
+    public Object constantValue(Lang lang) {
+        return superLang().constantValue(node(), lang);
+    }
 }

@@ -95,7 +95,7 @@ public class BooleanLit_c extends Lit_c implements BooleanLit {
     }
 
     @Override
-    public Object constantValue() {
+    public Object constantValue(Lang lang) {
         return Boolean.valueOf(value);
     }
 

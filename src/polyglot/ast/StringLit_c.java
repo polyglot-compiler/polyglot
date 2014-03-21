@@ -165,7 +165,7 @@ public class StringLit_c extends Lit_c implements StringLit {
     }
 
     @Override
-    public Object constantValue() {
+    public Object constantValue(Lang lang) {
         return value;
     }
 

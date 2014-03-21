@@ -150,6 +150,7 @@ public class Switch_c extends Stmt_c implements Switch {
         for (SwitchElement s : elements) {
             if (s instanceof Case) {
                 Case c = (Case) s;
+                Expr expr = c.expr();
                 Object key;
                 String str;
 
@@ -157,13 +158,13 @@ public class Switch_c extends Stmt_c implements Switch {
                     key = "default";
                     str = "default";
                 }
-                else if (!c.expr().constantValueSet()) {
+                else if (!cc.lang().constantValueSet(expr, cc.lang())) {
                     // Constant not known yet; we'll try again later.
                     return this;
                 }
-                else if (c.expr().isConstant()) {
+                else if (cc.lang().isConstant(expr, cc.lang())) {
                     key = new Long(c.value());
-                    str = c.expr().toString() + " (" + c.value() + ")";
+                    str = expr.toString() + " (" + c.value() + ")";
                 }
                 else {
                     continue;

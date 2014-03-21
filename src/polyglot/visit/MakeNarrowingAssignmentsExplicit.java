@@ -24,7 +24,7 @@ public class MakeNarrowingAssignmentsExplicit extends NodeVisitor {
 
     private Expr rewriteRHS(Type toType, Expr r) {
         Type rt = r.type();
-        if (r.isConstant() && rt.isIntOrLess()
+        if (lang().isConstant(r, lang()) && rt.isIntOrLess()
                 && (toType.isByte() || toType.isShort() || toType.isChar())) {
             // Assume that this was the result of a narrowing primitive conversion
             // and make it explicit by adding a cast.

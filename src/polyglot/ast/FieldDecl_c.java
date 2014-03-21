@@ -355,11 +355,11 @@ public class FieldDecl_c extends Term_c implements FieldDecl {
             fi.setNotConstant();
             return this;
         }
-        if (!init.isConstant()) {
+        if (!cc.lang().isConstant(init, cc.lang())) {
             fi.setNotConstant();
         }
         else {
-            fi.setConstantValue(init.constantValue());
+            fi.setConstantValue(cc.lang().constantValue(init, cc.lang()));
         }
 
         return this;
@@ -428,13 +428,15 @@ public class FieldDecl_c extends Term_c implements FieldDecl {
 
         if (init != null) {
             if (init instanceof ArrayInit) {
-                ((ArrayInit) init).typeCheckElements(type.type());
+                ((ArrayInit) init).typeCheckElements(tc, type.type());
             }
             else {
                 if (!ts.isImplicitCastValid(init.type(), type.type())
                         && !ts.typeEquals(init.type(), type.type())
                         && !ts.numericConversionValid(type.type(),
-                                                      init.constantValue())) {
+                                                      tc.lang()
+                                                        .constantValue(init,
+                                                                       tc.lang()))) {
 
                     throw new SemanticException("The type of the variable "
                                                         + "initializer \""
@@ -452,7 +454,8 @@ public class FieldDecl_c extends Term_c implements FieldDecl {
         if (flags().isStatic()
                 && fieldInstance().container().toClass().isInnerClass()) {
             // it's a static field in an inner class.
-            if (!flags().isFinal() || init == null || !init.isConstant()) {
+            if (!flags().isFinal() || init == null
+                    || !tc.lang().isConstant(init, tc.lang())) {
                 throw new SemanticException("Inner classes cannot declare "
                         + "static fields, unless they are compile-time "
                         + "constant fields.", this.position());

@@ -136,13 +136,13 @@ public class Case_c extends Stmt_c implements Case {
             return this;
         }
 
-        if (!expr.constantValueSet()) {
+        if (!cc.lang().constantValueSet(expr, cc.lang())) {
             // Not ready yet; pass will get rerun.
             return this;
         }
 
-        if (expr.isConstant()) {
-            Object o = expr.constantValue();
+        if (cc.lang().isConstant(expr, cc.lang())) {
+            Object o = cc.lang().constantValue(expr, cc.lang());
 
             if (o instanceof Number && !(o instanceof Long)
                     && !(o instanceof Float) && !(o instanceof Double)) {

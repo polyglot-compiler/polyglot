@@ -52,22 +52,6 @@ public interface Term extends Node {
     public static final int EXIT = 0;
 
     /**
-     * Return the first direct subterm performed when evaluating this term. If
-     * this term has no subterms, this should return null.
-     * 
-     * This method is similar to the deprecated entry(), but it should *not*
-     * recursively drill down to the innermost subterm. The direct child visited
-     * first in this term's dataflow should be returned.
-     */
-    Term firstChild();
-
-    /**
-     * Visit this term in evaluation order, calling v.edge() for each successor
-     * in succs, if data flows on that edge.
-     */
-    <T> List<T> acceptCFG(CFGBuilder<?> v, List<T> succs);
-
-    /**
      * Returns true if the term is reachable.  This attribute is not
      * guaranteed correct until after the reachability pass.
      *
@@ -100,18 +84,19 @@ public interface Term extends Node {
         }
 
         @Override
-        public Node extRewrite(ExtensionRewriter rw) throws SemanticException {
+        public final Node extRewrite(ExtensionRewriter rw)
+                throws SemanticException {
             throw new InternalCompilerError("This term cannot be represented in the "
                     + "target language and should have been rewritten: " + this);
         }
 
         @Override
-        public Term firstChild() {
+        public final Term firstChild() {
             throw new InternalCompilerError("Unexpected invocation from extension object.");
         }
 
         @Override
-        public <T> List<T> acceptCFG(CFGBuilder<?> v, List<T> succs) {
+        public final <T> List<T> acceptCFG(CFGBuilder<?> v, List<T> succs) {
             throw new InternalCompilerError("Unexpected invocation from extension object.");
         }
     }

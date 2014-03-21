@@ -35,7 +35,7 @@ import polyglot.util.CodeWriter;
 import polyglot.util.SerialVersionUID;
 import polyglot.visit.PrettyPrinter;
 
-public class JL5ClassBodyExt extends JL5Ext {
+public class JL5ClassBodyExt extends JL5TermExt {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
     @Override

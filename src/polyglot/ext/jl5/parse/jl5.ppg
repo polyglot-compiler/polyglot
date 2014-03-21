@@ -102,7 +102,7 @@ parser Grm extends polyglot.parse.Grm  {:
         return nf.ParamTypeNode(pos, id, CollectionUtil.nonNullList(bounds));
     }
 
-    public List<LocalDecl> variableDeclarators(TypeNode a, List<VarDeclarator> b, Flags flags, List<AnnotationElem> annotations)
+    public List<LocalDecl> variableDeclarators(TypeNode a, List<VarDeclarator> b, Flags flags, List<Term> annotations)
     throws Exception
     {
       List<LocalDecl> l = new LinkedList<LocalDecl>();
@@ -142,7 +142,7 @@ non terminal comma_opt;
 
 // 19.8.5) Constructor Declarations
 
-non terminal ExtendedFor foreach_statement, foreach_statement_no_short_if;
+non terminal Loop foreach_statement, foreach_statement_no_short_if;
 
 non terminal NewArray initialized_array_creation_expression;
 
@@ -195,19 +195,19 @@ non terminal Expr assignment_expression_nn;
 non terminal Expr expression_nn;
 
 // non terminals added for annotations
-non terminal AnnotationElem annotation; // AnnotationElem
+non terminal Term annotation; // Term:AnnotationElem
 non terminal ClassBody annotation_body; // ClassBody
 non terminal List<ClassMember> annotation_type_element_declarations_opt; // List
 non terminal List<ClassMember> annotation_type_element_declarations; // List
 non terminal List<ClassMember> annotation_type_element_declaration; // List
 non terminal Term element_value; // Term
 non terminal Term default_value_opt; // Term
-non terminal ElementValuePair element_value_pair; // ElementValuePair
-non terminal List<ElementValuePair> element_value_pairs, element_value_pairs_opt; // List
-non terminal AnnotationElem marker_annotation, single_element_annotation, normal_annotation; // AnnotationElem
+non terminal Term element_value_pair; // Term
+non terminal List<Term> element_value_pairs, element_value_pairs_opt; // List
+non terminal Term marker_annotation, single_element_annotation, normal_annotation; // Term:AnnotationElem
 non terminal FlagAnnotations modifiers_or_annotations; // FlagAnnotations
 non terminal FlagAnnotations modifiers_or_annotations_opt; // FlagAnnotations
-non terminal ElementValueArrayInit element_value_array_initializer; // ArrayInit
+non terminal Term element_value_array_initializer; // Term:ElementValueArrayInit
 non terminal List<Term> element_values; // List
 
 start with goal;
@@ -1245,7 +1245,7 @@ normal_annotation ::=
 ;
 
 element_value_pairs_opt ::=
-        {: RESULT = new LinkedList<ElementValuePair>(); :}
+        {: RESULT = new LinkedList<Term>(); :}
     |
     element_value_pairs:a
         {: RESULT = a; :}
@@ -1253,7 +1253,7 @@ element_value_pairs_opt ::=
 
 element_value_pairs ::=
     element_value_pair:a
-        {: List<ElementValuePair> l = new LinkedList<ElementValuePair>();
+        {: List<Term> l = new LinkedList<Term>();
            l.add(a);
            RESULT = l;
         :}

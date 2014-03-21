@@ -122,7 +122,7 @@ public class Do_c extends Loop_c implements Do {
     public <T> List<T> acceptCFG(CFGBuilder<?> v, List<T> succs) {
         v.push(this).visitCFG(body, cond, ENTRY);
 
-        if (condIsConstantTrue()) {
+        if (v.lang().condIsConstantTrue(this, v.lang())) {
             v.visitCFG(cond, body, ENTRY);
         }
         else {

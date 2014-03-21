@@ -39,10 +39,12 @@ import polyglot.ast.Disamb;
 import polyglot.ast.Expr;
 import polyglot.ast.Ext;
 import polyglot.ast.ExtFactory;
+import polyglot.ast.Field;
 import polyglot.ast.FieldDecl;
 import polyglot.ast.Formal;
 import polyglot.ast.Id;
 import polyglot.ast.LocalDecl;
+import polyglot.ast.Loop;
 import polyglot.ast.MethodDecl;
 import polyglot.ast.New;
 import polyglot.ast.Receiver;
@@ -121,7 +123,7 @@ public class JL5NodeFactory_c extends JL5AbstractNodeFactory_c {
 
     @Override
     public ClassDecl EnumDecl(Position pos, Flags flags,
-            List<AnnotationElem> annotations, Id name, TypeNode superType,
+            List<Term> annotations, Id name, TypeNode superType,
             List<TypeNode> interfaces, ClassBody body) {
         return EnumDecl(pos,
                         flags,
@@ -135,7 +137,7 @@ public class JL5NodeFactory_c extends JL5AbstractNodeFactory_c {
     }
 
     protected final ClassDecl EnumDecl(Position pos, Flags flags,
-            List<AnnotationElem> annotations, Id name, TypeNode superType,
+            List<Term> annotations, Id name, TypeNode superType,
             List<TypeNode> interfaces, ClassBody body, Ext ext,
             ExtFactory extFactory) {
         for (;; extFactory = extFactory.nextExtFactory()) {
@@ -183,7 +185,7 @@ public class JL5NodeFactory_c extends JL5AbstractNodeFactory_c {
 
     @Override
     public ClassDecl ClassDecl(Position pos, Flags flags,
-            List<AnnotationElem> annotations, Id name, TypeNode superType,
+            List<Term> annotations, Id name, TypeNode superType,
             List<TypeNode> interfaces, ClassBody body, List<TypeNode> paramTypes) {
         return ClassDecl(pos,
                          flags,
@@ -198,7 +200,7 @@ public class JL5NodeFactory_c extends JL5AbstractNodeFactory_c {
     }
 
     protected final ClassDecl ClassDecl(Position pos, Flags flags,
-            List<AnnotationElem> annotations, Id name, TypeNode superType,
+            List<Term> annotations, Id name, TypeNode superType,
             List<TypeNode> interfaces, ClassBody body,
             List<TypeNode> paramTypes, Ext ext, ExtFactory extFactory) {
         for (;; extFactory = extFactory.nextExtFactory()) {
@@ -255,7 +257,7 @@ public class JL5NodeFactory_c extends JL5AbstractNodeFactory_c {
 
     @Override
     public ConstructorDecl ConstructorDecl(Position pos, Flags flags,
-            List<AnnotationElem> annotations, Id name, List<Formal> formals,
+            List<Term> annotations, Id name, List<Formal> formals,
             List<TypeNode> throwTypes, Block body, List<TypeNode> typeParams) {
         return ConstructorDecl(pos,
                                flags,
@@ -270,7 +272,7 @@ public class JL5NodeFactory_c extends JL5AbstractNodeFactory_c {
     }
 
     protected final ConstructorDecl ConstructorDecl(Position pos, Flags flags,
-            List<AnnotationElem> annotations, Id name, List<Formal> formals,
+            List<Term> annotations, Id name, List<Formal> formals,
             List<TypeNode> throwTypes, Block body, List<TypeNode> typeParams,
             Ext ext, ExtFactory extFactory) {
         for (;; extFactory = extFactory.nextExtFactory()) {
@@ -299,32 +301,56 @@ public class JL5NodeFactory_c extends JL5AbstractNodeFactory_c {
     }
 
     @Override
-    public ElementValueArrayInit ElementValueArrayInit(Position pos,
-            List<Term> elements) {
-        ElementValueArrayInit n = new ElementValueArrayInit_c(pos, elements);
-        n =
-                (ElementValueArrayInit) n.ext(extFactory().extElementValueArrayInit());
-        return n;
+    public Term ElementValueArrayInit(Position pos, List<Term> elements) {
+        return ElementValueArrayInit(pos, elements, null, extFactory());
+    }
+
+    protected final Term ElementValueArrayInit(Position pos,
+            List<Term> elements, Ext ext, ExtFactory extFactory) {
+        for (;; extFactory = extFactory.nextExtFactory()) {
+            Ext e = ((JL5ExtFactory) extFactory).extElementValueArrayInit();
+            if (e == null) break;
+            ext = composeExts(ext, e);
+        }
+        ext = composeExts(ext, new ElementValueArrayInit_c(elements));
+        return super.Term(pos, ext, extFactory.nextExtFactory());
     }
 
     @Override
-    public ElementValuePair ElementValuePair(Position pos, Id name, Term value) {
-        ElementValuePair n = new ElementValuePair_c(pos, name, value);
-        n = (ElementValuePair) n.ext(extFactory().extElementValuePair());
-        return n;
+    public Term ElementValuePair(Position pos, Id name, Term value) {
+        return ElementValuePair(pos, name, value, null, extFactory());
+    }
+
+    protected final Term ElementValuePair(Position pos, Id name, Term value,
+            Ext ext, ExtFactory extFactory) {
+        for (;; extFactory = extFactory.nextExtFactory()) {
+            Ext e = ((JL5ExtFactory) extFactory).extElementValuePair();
+            if (e == null) break;
+            ext = composeExts(ext, e);
+        }
+        ext = composeExts(ext, new ElementValuePair_c(name, value));
+        return super.Term(pos, ext, extFactory.nextExtFactory());
     }
 
     @Override
-    public EnumConstant EnumConstant(Position pos, Receiver target, Id name) {
-        EnumConstant n = new EnumConstant_c(pos, target, name);
-        n = (EnumConstant) n.ext(extFactory().extEnumConstant());
-        return n;
+    public Field EnumConstant(Position pos, Receiver target, Id name) {
+        return EnumConstant(pos, target, name, null, extFactory());
+    }
+
+    protected final Field EnumConstant(Position pos, Receiver target, Id name,
+            Ext ext, ExtFactory extFactory) {
+        for (;; extFactory = extFactory.nextExtFactory()) {
+            Ext e = ((JL5ExtFactory) extFactory).extEnumConstant();
+            if (e == null) break;
+            ext = composeExts(ext, e);
+        }
+        ext = composeExts(ext, new EnumConstant_c());
+        return super.Field(pos, target, name, ext, extFactory.nextExtFactory());
     }
 
     @Override
     public EnumConstantDecl EnumConstantDecl(Position pos, Flags flags,
-            List<AnnotationElem> annotations, Id name, List<Expr> args,
-            ClassBody body) {
+            List<Term> annotations, Id name, List<Expr> args, ClassBody body) {
         return EnumConstantDecl(pos,
                                 flags,
                                 annotations,
@@ -336,8 +362,8 @@ public class JL5NodeFactory_c extends JL5AbstractNodeFactory_c {
     }
 
     protected final EnumConstantDecl EnumConstantDecl(Position pos,
-            Flags flags, List<AnnotationElem> annotations, Id name,
-            List<Expr> args, ClassBody body, Ext ext, ExtFactory extFactory) {
+            Flags flags, List<Term> annotations, Id name, List<Expr> args,
+            ClassBody body, Ext ext, ExtFactory extFactory) {
         for (;; extFactory = extFactory.nextExtFactory()) {
             Ext e = ((JL5ExtFactory) extFactory).extEnumConstantDecl();
             if (e == null) break;
@@ -352,16 +378,24 @@ public class JL5NodeFactory_c extends JL5AbstractNodeFactory_c {
     }
 
     @Override
-    public ExtendedFor ExtendedFor(Position pos, LocalDecl decl, Expr expr,
-            Stmt stmt) {
-        ExtendedFor n = new ExtendedFor_c(pos, decl, expr, stmt);
-        n = (ExtendedFor) n.ext(extFactory().extExtendedFor());
-        return n;
+    public Loop ExtendedFor(Position pos, LocalDecl decl, Expr expr, Stmt body) {
+        return ExtendedFor(pos, decl, expr, body, null, extFactory());
+    }
+
+    protected final Loop ExtendedFor(Position pos, LocalDecl decl, Expr expr,
+            Stmt body, Ext ext, ExtFactory extFactory) {
+        for (;; extFactory = extFactory.nextExtFactory()) {
+            Ext e = ((JL5ExtFactory) extFactory).extExtendedFor();
+            if (e == null) break;
+            ext = composeExts(ext, e);
+        }
+        ext = composeExts(ext, new ExtendedFor_c(decl, expr));
+        return super.Loop(pos, null, body, ext, extFactory.nextExtFactory());
     }
 
     @Override
     public FieldDecl FieldDecl(Position pos, Flags flags,
-            List<AnnotationElem> annotations, TypeNode type, Id name, Expr init) {
+            List<Term> annotations, TypeNode type, Id name, Expr init) {
         return FieldDecl(pos,
                          flags,
                          annotations,
@@ -373,8 +407,8 @@ public class JL5NodeFactory_c extends JL5AbstractNodeFactory_c {
     }
 
     protected final FieldDecl FieldDecl(Position pos, Flags flags,
-            List<AnnotationElem> annotations, TypeNode type, Id name,
-            Expr init, Ext ext, ExtFactory extFactory) {
+            List<Term> annotations, TypeNode type, Id name, Expr init, Ext ext,
+            ExtFactory extFactory) {
         for (;; extFactory = extFactory.nextExtFactory()) {
             Ext e = extFactory.extFieldDecl();
             if (e == null) break;
@@ -393,9 +427,8 @@ public class JL5NodeFactory_c extends JL5AbstractNodeFactory_c {
     }
 
     @Override
-    public Formal Formal(Position pos, Flags flags,
-            List<AnnotationElem> annotations, TypeNode type, Id name,
-            boolean var_args) {
+    public Formal Formal(Position pos, Flags flags, List<Term> annotations,
+            TypeNode type, Id name, boolean var_args) {
         return Formal(pos,
                       flags,
                       annotations,
@@ -406,9 +439,9 @@ public class JL5NodeFactory_c extends JL5AbstractNodeFactory_c {
                       extFactory());
     }
 
-    protected Formal Formal(Position pos, Flags flags,
-            List<AnnotationElem> annotations, TypeNode type, Id name,
-            boolean isVarArg, Ext ext, ExtFactory extFactory) {
+    protected Formal Formal(Position pos, Flags flags, List<Term> annotations,
+            TypeNode type, Id name, boolean isVarArg, Ext ext,
+            ExtFactory extFactory) {
         for (;; extFactory = extFactory.nextExtFactory()) {
             Ext e = extFactory.extFormal();
             if (e == null) break;
@@ -428,7 +461,7 @@ public class JL5NodeFactory_c extends JL5AbstractNodeFactory_c {
 
     @Override
     public LocalDecl LocalDecl(Position pos, Flags flags,
-            List<AnnotationElem> annotations, TypeNode type, Id name, Expr init) {
+            List<Term> annotations, TypeNode type, Id name, Expr init) {
         return LocalDecl(pos,
                          flags,
                          annotations,
@@ -440,8 +473,8 @@ public class JL5NodeFactory_c extends JL5AbstractNodeFactory_c {
     }
 
     protected final LocalDecl LocalDecl(Position pos, Flags flags,
-            List<AnnotationElem> annotations, TypeNode type, Id name,
-            Expr init, Ext ext, ExtFactory extFactory) {
+            List<Term> annotations, TypeNode type, Id name, Expr init, Ext ext,
+            ExtFactory extFactory) {
         for (;; extFactory = extFactory.nextExtFactory()) {
             Ext e = extFactory.extLocalDecl();
             if (e == null) break;
@@ -461,7 +494,7 @@ public class JL5NodeFactory_c extends JL5AbstractNodeFactory_c {
 
     @Override
     public MethodDecl MethodDecl(Position pos, Flags flags,
-            List<AnnotationElem> annotations, TypeNode returnType, Id name,
+            List<Term> annotations, TypeNode returnType, Id name,
             List<Formal> formals, List<TypeNode> throwTypes, Block body,
             List<TypeNode> typeParams) {
         return MethodDecl(pos,
@@ -478,7 +511,7 @@ public class JL5NodeFactory_c extends JL5AbstractNodeFactory_c {
     }
 
     protected final MethodDecl MethodDecl(Position pos, Flags flags,
-            List<AnnotationElem> annotations, TypeNode returnType, Id name,
+            List<Term> annotations, TypeNode returnType, Id name,
             List<Formal> formals, List<TypeNode> throwTypes, Block body,
             List<TypeNode> typeParams, Ext ext, ExtFactory extFactory) {
         for (;; extFactory = extFactory.nextExtFactory()) {
@@ -535,14 +568,23 @@ public class JL5NodeFactory_c extends JL5AbstractNodeFactory_c {
     }
 
     @Override
-    public AnnotationElem NormalAnnotationElem(Position pos, TypeNode name,
-            List<ElementValuePair> elements) {
-        AnnotationElem n =
-                new AnnotationElem_c(pos,
-                                     name,
-                                     CollectionUtil.nonNullList(elements));
-        n = (AnnotationElem) n.ext(extFactory().extNormalAnnotationElem());
-        return n;
+    public Term NormalAnnotationElem(Position pos, TypeNode name,
+            List<Term> elements) {
+        return NormalAnnotationElem(pos, name, elements, null, extFactory());
+    }
+
+    protected final Term NormalAnnotationElem(Position pos, TypeNode name,
+            List<Term> elements, Ext ext, ExtFactory extFactory) {
+        for (;; extFactory = extFactory.nextExtFactory()) {
+            Ext e = ((JL5ExtFactory) extFactory).extNormalAnnotationElem();
+            if (e == null) break;
+            ext = composeExts(ext, e);
+        }
+        ext =
+                composeExts(ext,
+                            new AnnotationElem_c(name,
+                                                 CollectionUtil.nonNullList(elements)));
+        return super.Term(pos, ext, extFactory.nextExtFactory());
     }
 
     @Override
@@ -562,9 +604,9 @@ public class JL5NodeFactory_c extends JL5AbstractNodeFactory_c {
     }
 
     @Override
-    public AnnotationElem SingleElementAnnotationElem(Position pos,
-            TypeNode name, Term value) {
-        List<ElementValuePair> l = new LinkedList<ElementValuePair>();
+    public Term SingleElementAnnotationElem(Position pos, TypeNode name,
+            Term value) {
+        List<Term> l = new LinkedList<Term>();
         l.add(ElementValuePair(pos, this.Id(pos, "value"), value));
         return NormalAnnotationElem(pos, name, l);
     }

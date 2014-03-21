@@ -34,7 +34,7 @@ import polyglot.types.SemanticException;
 import polyglot.util.SerialVersionUID;
 import polyglot.visit.TypeChecker;
 
-public class JL5ClassLitExt extends JL5Ext {
+public class JL5ClassLitExt extends JL5ExprExt {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
     @Override

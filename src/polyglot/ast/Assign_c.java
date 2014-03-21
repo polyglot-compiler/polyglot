@@ -149,8 +149,12 @@ public abstract class Assign_c extends Expr_c implements Assign {
         }
 
         if (op == ASSIGN) {
-            if (!ts.isImplicitCastValid(s, t) && !ts.typeEquals(s, t)
-                    && !ts.numericConversionValid(t, right.constantValue())) {
+            if (!ts.isImplicitCastValid(s, t)
+                    && !ts.typeEquals(s, t)
+                    && !ts.numericConversionValid(t,
+                                                  tc.lang()
+                                                    .constantValue(right,
+                                                                   tc.lang()))) {
 
                 throw new SemanticException("Cannot assign " + s + " to " + t
                         + ".", position());

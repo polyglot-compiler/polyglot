@@ -42,7 +42,6 @@ import polyglot.util.CollectionUtil;
 import polyglot.util.Copy;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.ListUtil;
-import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
 import polyglot.visit.AscriptionVisitor;
 import polyglot.visit.CFGBuilder;
@@ -56,7 +55,7 @@ import polyglot.visit.TypeChecker;
  * the elements of these array may be expressions of any type (e.g.,
  * {@code Call}).
  */
-public class ElementValueArrayInit_c extends Term_c implements
+public class ElementValueArrayInit_c extends JL5TermExt implements
         ElementValueArrayInit {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
@@ -64,8 +63,7 @@ public class ElementValueArrayInit_c extends Term_c implements
 
     protected Type type;
 
-    public ElementValueArrayInit_c(Position pos, List<Term> elements) {
-        super(pos);
+    public ElementValueArrayInit_c(List<Term> elements) {
         assert (elements != null);
         this.elements = ListUtil.copy(elements, true);
     }
@@ -76,15 +74,18 @@ public class ElementValueArrayInit_c extends Term_c implements
     }
 
     @Override
-    public ElementValueArrayInit elements(List<Term> elements) {
-        return elements(this, elements);
+    public Node elements(List<Term> elements) {
+        return elements(node, elements);
     }
 
-    protected <N extends ElementValueArrayInit_c> N elements(N n,
-            List<Term> elements) {
-        if (CollectionUtil.equals(n.elements, elements)) return n;
-        if (n == this) n = Copy.Util.copy(n);
-        n.elements = ListUtil.copy(elements, true);
+    protected <N extends Node> N elements(N n, List<Term> elements) {
+        ElementValueArrayInit_c ext = (ElementValueArrayInit_c) JL5Ext.ext(n);
+        if (CollectionUtil.equals(ext.elements, elements)) return n;
+        if (n == node) {
+            n = Copy.Util.copy(n);
+            ext = (ElementValueArrayInit_c) JL5Ext.ext(n);
+        }
+        ext.elements = ListUtil.copy(elements, true);
         return n;
     }
 
@@ -94,20 +95,23 @@ public class ElementValueArrayInit_c extends Term_c implements
     }
 
     @Override
-    public ElementValueArrayInit type(Type type) {
-        return type(this, type);
+    public Node type(Type type) {
+        return type(node, type);
     }
 
-    protected <N extends ElementValueArrayInit_c> N type(N n, Type type) {
-        if (n.type == type) return n;
-        if (n == this) n = Copy.Util.copy(n);
-        n.type = type;
+    protected <N extends Node> N type(N n, Type type) {
+        ElementValueArrayInit_c ext = (ElementValueArrayInit_c) JL5Ext.ext(n);
+        if (ext.type == type) return n;
+        if (n == node) {
+            n = Copy.Util.copy(n);
+            ext = (ElementValueArrayInit_c) JL5Ext.ext(n);
+        }
+        ext.type = type;
         return n;
     }
 
     /** Reconstruct the initializer. */
-    protected ElementValueArrayInit_c reconstruct(List<Term> elements) {
-        ElementValueArrayInit_c n = this;
+    protected <N extends Node> N reconstruct(N n, List<Term> elements) {
         n = elements(n, elements);
         return n;
     }
@@ -115,7 +119,7 @@ public class ElementValueArrayInit_c extends Term_c implements
     @Override
     public Node visitChildren(NodeVisitor v) {
         List<Term> elements = visitList(this.elements, v);
-        return reconstruct(elements);
+        return reconstruct(node, elements);
     }
 
     @Override
@@ -145,8 +149,8 @@ public class ElementValueArrayInit_c extends Term_c implements
         if (e instanceof Expr) {
             return ((Expr) e).type();
         }
-        if (e instanceof ElementValueArrayInit) {
-            return ((ElementValueArrayInit) e).type();
+        if (JL5Ext.ext(e) instanceof ElementValueArrayInit) {
+            return ((ElementValueArrayInit) JL5Ext.ext(e)).type();
         }
         return null;
     }
@@ -167,7 +171,7 @@ public class ElementValueArrayInit_c extends Term_c implements
         }
         if (!t.isArray()) {
             throw new InternalCompilerError("Type of array initializer must "
-                    + "be an array.", position());
+                    + "be an array.", node().position());
         }
 
         t = t.toArray().base();
@@ -184,12 +188,13 @@ public class ElementValueArrayInit_c extends Term_c implements
     }
 
     @Override
-    public void typeCheckElements(Type lhsType) throws SemanticException {
+    public void typeCheckElements(TypeChecker tc, Type lhsType)
+            throws SemanticException {
         TypeSystem ts = lhsType.typeSystem();
 
         if (!lhsType.isArray()) {
             throw new SemanticException("Cannot initialize " + lhsType
-                    + " with " + type() + ".", position());
+                    + " with " + type() + ".", node().position());
         }
 
         // Check if we can assign each individual element.
@@ -198,14 +203,17 @@ public class ElementValueArrayInit_c extends Term_c implements
         for (Term e : elements) {
             Type s = typeOf(e);
 
-            if (e instanceof ElementValueArrayInit) {
-                ((ElementValueArrayInit) e).typeCheckElements(t);
+            if (JL5Ext.ext(e) instanceof ElementValueArrayInit) {
+                ((ElementValueArrayInit) JL5Ext.ext(e)).typeCheckElements(tc, t);
                 continue;
             }
 
             if (!ts.isImplicitCastValid(s, t)
                     && !ts.typeEquals(s, t)
-                    && !ts.numericConversionValid(t, ((Expr) e).constantValue())) {
+                    && !ts.numericConversionValid(t,
+                                                  tc.lang()
+                                                    .constantValue((Expr) e,
+                                                                   tc.lang()))) {
                 throw new SemanticException("Cannot assign " + s + " to " + t
                         + ".", e.position());
             }
@@ -236,18 +244,18 @@ public class ElementValueArrayInit_c extends Term_c implements
 
     @Override
     public Term firstChild() {
-        return listChild(elements, (Expr) null);
+        return Term_c.listChild(elements, (Expr) null);
     }
 
     @Override
     public <T> List<T> acceptCFG(CFGBuilder<?> v, List<T> succs) {
-        v.visitCFGList(elements, this, EXIT);
+        v.visitCFGList(elements, node(), Term.EXIT);
         return succs;
     }
 
     @Override
     public Node copy(NodeFactory nf) {
-        return ((JL5NodeFactory) nf).ElementValueArrayInit(this.position,
+        return ((JL5NodeFactory) nf).ElementValueArrayInit(node().position(),
                                                            this.elements);
     }
 }

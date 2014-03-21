@@ -33,6 +33,7 @@ import polyglot.ast.Formal;
 import polyglot.ast.Node;
 import polyglot.ast.ProcedureDecl;
 import polyglot.ast.ProcedureDeclOps;
+import polyglot.ast.Term;
 import polyglot.ast.TypeNode;
 import polyglot.ext.jl5.types.Annotations;
 import polyglot.ext.jl5.types.JL5ArrayType;
@@ -67,8 +68,7 @@ public abstract class JL5ProcedureDeclExt extends JL5AnnotatedElementExt
 
     protected List<TypeNode> typeParams;
 
-    public JL5ProcedureDeclExt(List<TypeNode> typeParams,
-            List<AnnotationElem> annotations) {
+    public JL5ProcedureDeclExt(List<TypeNode> typeParams, List<Term> annotations) {
         super(annotations);
         this.typeParams = ListUtil.copy(typeParams, true);
     }

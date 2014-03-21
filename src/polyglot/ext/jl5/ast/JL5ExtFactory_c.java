@@ -99,7 +99,27 @@ public final class JL5ExtFactory_c extends JL5AbstractExtFactory_c {
     }
 
     @Override
+    protected Ext extConstructorCallImpl() {
+        return null;
+    }
+
+    @Override
     protected Ext extConstructorDeclImpl() {
+        return null;
+    }
+
+    @Override
+    protected Ext extElementValueArrayInitImpl() {
+        return null;
+    }
+
+    @Override
+    protected Ext extElementValuePairImpl() {
+        return null;
+    }
+
+    @Override
+    protected Ext extEnumConstantImpl() {
         return null;
     }
 
@@ -114,7 +134,12 @@ public final class JL5ExtFactory_c extends JL5AbstractExtFactory_c {
     }
 
     @Override
-    protected Ext extConstructorCallImpl() {
+    protected Ext extExprImpl() {
+        return new JL5ExprExt();
+    }
+
+    @Override
+    protected Ext extExtendedForImpl() {
         return null;
     }
 
@@ -144,6 +169,11 @@ public final class JL5ExtFactory_c extends JL5AbstractExtFactory_c {
     }
 
     @Override
+    protected Ext extLoopImpl() {
+        return new JL5LoopExt();
+    }
+
+    @Override
     protected Ext extMethodDeclImpl() {
         return null;
     }
@@ -159,6 +189,11 @@ public final class JL5ExtFactory_c extends JL5AbstractExtFactory_c {
     }
 
     @Override
+    protected Ext extNormalAnnotationElemImpl() {
+        return null;
+    }
+
+    @Override
     protected Ext extParamTypeNodeImpl() {
         return null;
     }
@@ -171,6 +206,11 @@ public final class JL5ExtFactory_c extends JL5AbstractExtFactory_c {
     @Override
     protected Ext extSwitchImpl() {
         return new JL5SwitchExt();
+    }
+
+    @Override
+    protected Ext extTermImpl() {
+        return new JL5TermExt();
     }
 
     @Override

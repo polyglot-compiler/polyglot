@@ -41,6 +41,7 @@ import java.util.Set;
 
 import polyglot.ast.ClassLit;
 import polyglot.ast.Expr;
+import polyglot.ast.JLang;
 import polyglot.ast.NullLit;
 import polyglot.ast.Term;
 import polyglot.ext.jl5.JL5Options;
@@ -48,6 +49,7 @@ import polyglot.ext.jl5.ast.AnnotationElem;
 import polyglot.ext.jl5.ast.ElementValueArrayInit;
 import polyglot.ext.jl5.ast.EnumConstant;
 import polyglot.ext.jl5.ast.J5Lang_c;
+import polyglot.ext.jl5.ast.JL5Ext;
 import polyglot.ext.jl5.types.inference.InferenceSolver;
 import polyglot.ext.jl5.types.inference.InferenceSolver_c;
 import polyglot.ext.jl5.types.inference.LubType;
@@ -2527,16 +2529,16 @@ public class JL5TypeSystem_c extends
     @Override
     public void checkAnnotationValueConstant(Term value)
             throws SemanticException {
-        if (value instanceof ElementValueArrayInit) {
+        if (JL5Ext.ext(value) instanceof ElementValueArrayInit) {
             // check elements
-            for (Term next : ((ElementValueArrayInit) value).elements()) {
+            for (Term next : ((ElementValueArrayInit) JL5Ext.ext(value)).elements()) {
                 if (!isAnnotationValueConstant(next)) {
                     throw new SemanticException("Annotation attribute value must be constant",
                                                 next.position());
                 }
             }
         }
-        else if (value instanceof AnnotationElem) {
+        else if (JL5Ext.ext(value) instanceof AnnotationElem) {
             return;
         }
         else if (!isAnnotationValueConstant(value)) {
@@ -2554,16 +2556,17 @@ public class JL5TypeSystem_c extends
             return true;
         }
         if (value instanceof Expr) {
+            JLang lang = J5Lang_c.instance;
             Expr ev = (Expr) value;
-            if (ev.constantValueSet() && ev.isConstant()) {
+            if (lang.constantValueSet(ev, lang) && lang.isConstant(ev, lang)) {
                 // value is a constant
                 return true;
             }
-            if (ev instanceof EnumConstant) {
+            if (JL5Ext.ext(ev) instanceof EnumConstant) {
                 // Enum constants are constants for our purposes.
                 return true;
             }
-            if (!ev.constantValueSet()) {
+            if (!lang.constantValueSet(ev, lang)) {
                 // the constant value hasn't been set yet...
                 return true; // TODO: should this throw a missing dependency exception?
             }
@@ -2573,18 +2576,19 @@ public class JL5TypeSystem_c extends
     }
 
     @Override
-    public void checkDuplicateAnnotations(List<AnnotationElem> annotations)
+    public void checkDuplicateAnnotations(List<Term> annotations)
             throws SemanticException {
         // check no duplicate annotations used
-        ArrayList<AnnotationElem> l =
-                new ArrayList<AnnotationElem>(annotations);
+        ArrayList<Term> l = new ArrayList<Term>(annotations);
         for (int i = 0; i < l.size(); i++) {
-            AnnotationElem ai = l.get(i);
+            Term ti = l.get(i);
+            AnnotationElem ai = (AnnotationElem) JL5Ext.ext(ti);
             for (int j = i + 1; j < l.size(); j++) {
-                AnnotationElem aj = l.get(j);
+                Term tj = l.get(j);
+                AnnotationElem aj = (AnnotationElem) JL5Ext.ext(tj);
                 if (ai.typeName().type() == aj.typeName().type()) {
                     throw new SemanticException("Duplicate annotation use: "
-                            + aj.typeName(), aj.position());
+                            + aj.typeName(), tj.position());
                 }
             }
         }

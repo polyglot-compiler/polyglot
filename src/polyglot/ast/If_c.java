@@ -200,11 +200,11 @@ public class If_c extends Stmt_c implements If {
 
     @Override
     public <T> List<T> acceptCFG(CFGBuilder<?> v, List<T> succs) {
-        if (cond.isConstant() && v.skipDeadIfBranches()) {
+        if (v.lang().isConstant(cond, v.lang()) && v.skipDeadIfBranches()) {
             // the condition is a constant expression.
             // That means that one branch is dead code
             boolean condConstantValue =
-                    ((Boolean) cond.constantValue()).booleanValue();
+                    ((Boolean) v.lang().constantValue(cond, v.lang())).booleanValue();
             if (condConstantValue) {
                 // the condition is constantly true.
                 // the alternative won't be executed.

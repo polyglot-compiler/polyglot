@@ -150,7 +150,8 @@ public class ArrayInit_c extends Expr_c implements ArrayInit {
     }
 
     @Override
-    public void typeCheckElements(Type lhsType) throws SemanticException {
+    public void typeCheckElements(TypeChecker tc, Type lhsType)
+            throws SemanticException {
         TypeSystem ts = lhsType.typeSystem();
 
         if (!lhsType.isArray()) {
@@ -165,12 +166,15 @@ public class ArrayInit_c extends Expr_c implements ArrayInit {
             Type s = e.type();
 
             if (e instanceof ArrayInit) {
-                ((ArrayInit) e).typeCheckElements(t);
+                ((ArrayInit) e).typeCheckElements(tc, t);
                 continue;
             }
 
-            if (!ts.isImplicitCastValid(s, t) && !ts.typeEquals(s, t)
-                    && !ts.numericConversionValid(t, e.constantValue())) {
+            if (!ts.isImplicitCastValid(s, t)
+                    && !ts.typeEquals(s, t)
+                    && !ts.numericConversionValid(t,
+                                                  tc.lang()
+                                                    .constantValue(e, tc.lang()))) {
                 throw new SemanticException("Cannot assign " + s + " to " + t
                         + ".", e.position());
             }

@@ -156,23 +156,24 @@ public class Binary_c extends Expr_c implements Binary {
     }
 
     @Override
-    public boolean constantValueSet() {
-        return left.constantValueSet() && right.constantValueSet();
+    public boolean constantValueSet(Lang lang) {
+        return lang.constantValueSet(left, lang)
+                && lang.constantValueSet(right, lang);
     }
 
     @Override
-    public boolean isConstant() {
-        return left.isConstant() && right.isConstant();
+    public boolean isConstant(Lang lang) {
+        return lang.isConstant(left, lang) && lang.isConstant(right, lang);
     }
 
     @Override
-    public Object constantValue() {
-        if (!isConstant()) {
+    public Object constantValue(Lang lang) {
+        if (!lang.isConstant(this, lang)) {
             return null;
         }
 
-        Object lv = left.constantValue();
-        Object rv = right.constantValue();
+        Object lv = lang.constantValue(left, lang);
+        Object rv = lang.constantValue(right, lang);
 
         if (op == ADD && (lv instanceof String || rv instanceof String)) {
             // toString() does what we want for String, Number, and Boolean
@@ -595,9 +596,9 @@ public class Binary_c extends Expr_c implements Binary {
     public <T> List<T> acceptCFG(CFGBuilder<?> v, List<T> succs) {
         if (op == COND_AND || op == COND_OR) {
             // short-circuit
-            if (left.isConstant()) {
+            if (v.lang().isConstant(left, v.lang())) {
                 boolean leftConstantValue =
-                        ((Boolean) left.constantValue()).booleanValue();
+                        ((Boolean) v.lang().constantValue(left, v.lang())).booleanValue();
                 if ((leftConstantValue && op == COND_OR)
                         || (!leftConstantValue && op == COND_AND)) {
                     v.visitCFG(left, this, EXIT);

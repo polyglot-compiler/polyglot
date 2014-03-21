@@ -158,7 +158,7 @@ public class IntLit_c extends NumLit_c implements IntLit {
     }
 
     @Override
-    public Object constantValue() {
+    public Object constantValue(Lang lang) {
         if (kind() == LONG) {
             return new Long(value);
         }

@@ -42,7 +42,7 @@ import polyglot.util.SerialVersionUID;
 import polyglot.visit.NodeVisitor;
 import polyglot.visit.PrettyPrinter;
 
-public abstract class JL5ProcedureCallExt extends JL5Ext implements
+public abstract class JL5ProcedureCallExt extends JL5TermExt implements
         JL5ProcedureCall, ProcedureCallOps {
     private static final long serialVersionUID = SerialVersionUID.generate();
 

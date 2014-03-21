@@ -279,9 +279,10 @@ public class CFGBuilder<FlowItem extends DataFlow.Item> implements
                             if (s instanceof Loop) {
                                 Loop loop = (Loop) s;
                                 edge(last_peer,
-                                     this.graph().peer(loop.continueTarget(),
-                                                       this.path_to_finally,
-                                                       Term.ENTRY),
+                                     this.graph()
+                                         .peer(lang().continueTarget(loop),
+                                               this.path_to_finally,
+                                               Term.ENTRY),
                                      FlowGraph.EDGE_KEY_OTHER);
                             }
                             else {
@@ -300,7 +301,7 @@ public class CFGBuilder<FlowItem extends DataFlow.Item> implements
                     Loop l = (Loop) c;
                     if (b.kind() == Branch.CONTINUE) {
                         edge(last_peer,
-                             this.graph().peer(l.continueTarget(),
+                             this.graph().peer(lang().continueTarget(l),
                                                this.path_to_finally,
                                                Term.ENTRY),
                              FlowGraph.EDGE_KEY_OTHER);
@@ -551,7 +552,7 @@ public class CFGBuilder<FlowItem extends DataFlow.Item> implements
      * @param succs a list of {@code EdgeKeyTermPair}s
      */
     protected void visitCFG(Term a, List<EdgeKeyTermPair> succs) {
-        Term child = a.firstChild();
+        Term child = lang().firstChild(a);
 
         if (child == null) {
             edge(this, a, Term.ENTRY, a, Term.EXIT, FlowGraph.EDGE_KEY_OTHER);
@@ -568,7 +569,7 @@ public class CFGBuilder<FlowItem extends DataFlow.Item> implements
         if (Report.should_report(Report.cfg, 2))
             Report.report(2, "// node " + a + " -> " + succs);
 
-        succs = a.acceptCFG(this, succs);
+        succs = lang().acceptCFG(a, this, succs);
 
         for (EdgeKeyTermPair s : succs) {
             edge(a, s.term, s.entry, s.edgeKey);

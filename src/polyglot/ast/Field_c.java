@@ -251,7 +251,7 @@ public class Field_c extends Expr_c implements Field {
     public Node checkConstants(ConstantChecker cc) throws SemanticException {
         // Just check if the field is constant to force a dependency to be
         // created.
-        isConstant();
+        cc.lang().isConstant(this, cc.lang());
         return this;
     }
 
@@ -356,7 +356,7 @@ public class Field_c extends Expr_c implements Field {
     }
 
     @Override
-    public boolean constantValueSet() {
+    public boolean constantValueSet(Lang lang) {
         if (fi != null
                 && (target instanceof TypeNode || (target instanceof Special && targetImplicit))) {
             return fi.constantValueSet();
@@ -365,7 +365,7 @@ public class Field_c extends Expr_c implements Field {
     }
 
     @Override
-    public boolean isConstant() {
+    public boolean isConstant(Lang lang) {
         if (fi != null
                 && (target instanceof TypeNode || (target instanceof Special && targetImplicit))) {
             return fi.isConstant();
@@ -375,8 +375,8 @@ public class Field_c extends Expr_c implements Field {
     }
 
     @Override
-    public Object constantValue() {
-        if (isConstant()) {
+    public Object constantValue(Lang lang) {
+        if (lang.isConstant(this, lang)) {
             return fi.constantValue();
         }
 

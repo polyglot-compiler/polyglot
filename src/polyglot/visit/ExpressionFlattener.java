@@ -260,7 +260,7 @@ public class ExpressionFlattener extends NodeVisitor {
         // don't flatten constant expressions
         if (n instanceof Expr) {
             Expr e = (Expr) n;
-            if (e.isConstant()) {
+            if (lang().isConstant(e, lang())) {
                 addDontFlatten(e);
             }
         }

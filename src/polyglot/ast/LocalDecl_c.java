@@ -291,13 +291,15 @@ public class LocalDecl_c extends Stmt_c implements LocalDecl {
 
         if (init != null) {
             if (init instanceof ArrayInit) {
-                ((ArrayInit) init).typeCheckElements(type.type());
+                ((ArrayInit) init).typeCheckElements(tc, type.type());
             }
             else {
                 if (!ts.isImplicitCastValid(init.type(), type.type())
                         && !ts.typeEquals(init.type(), type.type())
                         && !ts.numericConversionValid(type.type(),
-                                                      init.constantValue())) {
+                                                      tc.lang()
+                                                        .constantValue(init,
+                                                                       tc.lang()))) {
                     throw new SemanticException("The type of the variable "
                                                         + "initializer \""
                                                         + init.type()
@@ -353,11 +355,12 @@ public class LocalDecl_c extends Stmt_c implements LocalDecl {
 //            return this;
 //        }
 
-        if (init == null || !init.isConstant() || !li.flags().isFinal()) {
+        if (init == null || !cc.lang().isConstant(init, cc.lang())
+                || !li.flags().isFinal()) {
             li.setNotConstant();
         }
         else {
-            li.setConstantValue(init.constantValue());
+            li.setConstantValue(cc.lang().constantValue(init, cc.lang()));
         }
 
         return this;

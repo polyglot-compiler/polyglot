@@ -30,9 +30,13 @@ import polyglot.ast.CallOps;
 import polyglot.ast.Case;
 import polyglot.ast.ClassDecl;
 import polyglot.ast.ClassDeclOps;
+import polyglot.ast.Expr;
+import polyglot.ast.ExprOps;
 import polyglot.ast.Ext;
 import polyglot.ast.JLang_c;
 import polyglot.ast.Lang;
+import polyglot.ast.Loop;
+import polyglot.ast.LoopOps;
 import polyglot.ast.New;
 import polyglot.ast.NewOps;
 import polyglot.ast.Node;
@@ -40,6 +44,8 @@ import polyglot.ast.NodeOps;
 import polyglot.ast.ProcedureDecl;
 import polyglot.ast.ProcedureDeclOps;
 import polyglot.ast.Switch;
+import polyglot.ast.Term;
+import polyglot.ast.TermOps;
 import polyglot.types.SemanticException;
 import polyglot.types.Type;
 import polyglot.util.InternalCompilerError;
@@ -82,6 +88,16 @@ public class J5Lang_c extends JLang_c implements J5Lang {
     }
 
     @Override
+    protected ExprOps ExprOps(Expr n) {
+        return (ExprOps) jl5ext(n);
+    }
+
+    @Override
+    protected LoopOps LoopOps(Loop n) {
+        return (LoopOps) jl5ext(n);
+    }
+
+    @Override
     protected NewOps NewOps(New n) {
         return (NewOps) jl5ext(n);
     }
@@ -89,6 +105,11 @@ public class J5Lang_c extends JLang_c implements J5Lang {
     @Override
     protected ProcedureDeclOps ProcedureDeclOps(ProcedureDecl n) {
         return (ProcedureDeclOps) jl5ext(n);
+    }
+
+    @Override
+    protected TermOps TermOps(Term n) {
+        return (TermOps) jl5ext(n);
     }
 
     protected JL5CaseOps JL5CaseOps(Case n) {

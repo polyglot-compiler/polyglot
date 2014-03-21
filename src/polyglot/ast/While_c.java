@@ -119,10 +119,11 @@ public class While_c extends Loop_c implements While {
 
     @Override
     public <T> List<T> acceptCFG(CFGBuilder<?> v, List<T> succs) {
-        if (condIsConstantTrue()) {
+        if (v.lang().condIsConstantTrue(this, v.lang())) {
             v.visitCFG(cond, body, ENTRY);
         }
-        else if (condIsConstantFalse() && v.skipDeadLoopBodies()) {
+        else if (v.lang().condIsConstantFalse(this, v.lang())
+                && v.skipDeadLoopBodies()) {
             v.visitCFG(cond, FlowGraph.EDGE_KEY_FALSE, this, EXIT);
             return succs;
         }

@@ -9,7 +9,7 @@ import polyglot.util.SerialVersionUID;
 import polyglot.visit.TypeBuilder;
 import polyglot.visit.TypeChecker;
 
-public class JL5CatchExt extends JL5Ext {
+public class JL5CatchExt extends JL5TermExt {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
     @Override

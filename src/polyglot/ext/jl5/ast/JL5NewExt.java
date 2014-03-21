@@ -31,6 +31,7 @@ import java.util.List;
 import java.util.Map;
 
 import polyglot.ast.Expr;
+import polyglot.ast.Lang;
 import polyglot.ast.New;
 import polyglot.ast.NewOps;
 import polyglot.ast.Node;
@@ -339,5 +340,20 @@ public class JL5NewExt extends JL5ProcedureCallExt implements NewOps {
     @Override
     public void printBody(CodeWriter w, PrettyPrinter tr) {
         superLang().printBody(this.node(), w, tr);
+    }
+
+    @Override
+    public boolean constantValueSet(Lang lang) {
+        return superLang().constantValueSet(node(), lang);
+    }
+
+    @Override
+    public boolean isConstant(Lang lang) {
+        return superLang().isConstant(node(), lang);
+    }
+
+    @Override
+    public Object constantValue(Lang lang) {
+        return superLang().constantValue(node(), lang);
     }
 }

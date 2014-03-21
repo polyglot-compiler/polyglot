@@ -31,6 +31,7 @@ import polyglot.types.SemanticException;
 import polyglot.types.Type;
 import polyglot.util.CodeWriter;
 import polyglot.util.Copy;
+import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
 import polyglot.visit.PrettyPrinter;
@@ -40,7 +41,7 @@ import polyglot.visit.TypeBuilder;
  * An {@code Expr} represents any Java expression.  All expressions
  * must be subtypes of Expr.
  */
-public abstract class Expr_c extends Term_c implements Expr {
+public abstract class Expr_c extends Term_c implements Expr, ExprOps {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
     protected Type type;
@@ -93,55 +94,87 @@ public abstract class Expr_c extends Term_c implements Expr {
         return Precedence.UNKNOWN;
     }
 
+    @Deprecated
+    protected Lang lastLang() {
+        Lang lang = lang();
+        for (Ext ext = ext(); ext != null; ext = ext.ext()) {
+            try {
+                lang = ext.lang();
+            }
+            catch (InternalCompilerError e) {
+                return JLangToJLDel.instance;
+            }
+        }
+        return lang;
+    }
+
+    @Deprecated
     @Override
     public boolean constantValueSet() {
+        return lastLang().constantValueSet(this, lastLang());
+    }
+
+    @Deprecated
+    @Override
+    public boolean isConstant() {
+        return lastLang().isConstant(this, lastLang());
+    }
+
+    @Deprecated
+    @Override
+    public Object constantValue() {
+        return lastLang().constantValue(this, lastLang());
+    }
+
+    @Override
+    public boolean constantValueSet(Lang lang) {
         return true;
     }
 
     @Override
-    public boolean isConstant() {
+    public boolean isConstant(Lang lang) {
         return false;
     }
 
     @Override
-    public Object constantValue() {
+    public Object constantValue(Lang lang) {
         return null;
     }
 
-    public String stringValue() {
-        return (String) constantValue();
+    public String stringValue(Lang lang) {
+        return (String) lang.constantValue(this, lang);
     }
 
-    public boolean booleanValue() {
-        return ((Boolean) constantValue()).booleanValue();
+    public boolean booleanValue(Lang lang) {
+        return ((Boolean) lang.constantValue(this, lang)).booleanValue();
     }
 
-    public byte byteValue() {
-        return ((Byte) constantValue()).byteValue();
+    public byte byteValue(Lang lang) {
+        return ((Byte) lang.constantValue(this, lang)).byteValue();
     }
 
-    public short shortValue() {
-        return ((Short) constantValue()).shortValue();
+    public short shortValue(Lang lang) {
+        return ((Short) lang.constantValue(this, lang)).shortValue();
     }
 
-    public char charValue() {
-        return ((Character) constantValue()).charValue();
+    public char charValue(Lang lang) {
+        return ((Character) lang.constantValue(this, lang)).charValue();
     }
 
-    public int intValue() {
-        return ((Integer) constantValue()).intValue();
+    public int intValue(Lang lang) {
+        return ((Integer) lang.constantValue(this, lang)).intValue();
     }
 
-    public long longValue() {
-        return ((Long) constantValue()).longValue();
+    public long longValue(Lang lang) {
+        return ((Long) lang.constantValue(this, lang)).longValue();
     }
 
-    public float floatValue() {
-        return ((Float) constantValue()).floatValue();
+    public float floatValue(Lang lang) {
+        return ((Float) lang.constantValue(this, lang)).floatValue();
     }
 
-    public double doubleValue() {
-        return ((Double) constantValue()).doubleValue();
+    public double doubleValue(Lang lang) {
+        return ((Double) lang.constantValue(this, lang)).doubleValue();
     }
 
     @Override

@@ -33,6 +33,7 @@ import java.util.List;
 
 import polyglot.ast.Node;
 import polyglot.ast.NodeFactory;
+import polyglot.ast.Term;
 import polyglot.ext.jl5.ast.AnnotatedElement;
 import polyglot.ext.jl5.ast.AnnotationElem;
 import polyglot.ext.jl5.ast.JL5Ext;
@@ -98,8 +99,9 @@ public class AnnotationChecker extends ContextVisitor {
      * @param decl
      * @throws SemanticException
      */
-    public void checkAnnotationApplicability(AnnotationElem annotation,
-            Declaration decl) throws SemanticException {
+    public void checkAnnotationApplicability(Term n, Declaration decl)
+            throws SemanticException {
+        AnnotationElem annotation = (AnnotationElem) JL5Ext.ext(n);
         JL5ClassType annotationType =
                 (JL5ClassType) annotation.typeName().type().toClass();
 
@@ -116,7 +118,7 @@ public class AnnotationChecker extends ContextVisitor {
                 if (at.equals(typeSystem().TargetAnnotation())) {
                     // annotationType has a target annotation!
                     checkTargetMetaAnnotation((AnnotationElementValueArray) ra.singleElement(at),
-                                              annotation,
+                                              n,
                                               decl);
                 }
             }
@@ -141,8 +143,9 @@ public class AnnotationChecker extends ContextVisitor {
     }
 
     protected void checkTargetMetaAnnotation(
-            AnnotationElementValueArray targetKinds, AnnotationElem annotation,
-            Declaration decl) throws SemanticException {
+            AnnotationElementValueArray targetKinds, Term n, Declaration decl)
+            throws SemanticException {
+        AnnotationElem annotation = (AnnotationElem) JL5Ext.ext(n);
         Collection<EnumInstance> eis =
                 annotationElementTypesForDeclaration(decl);
         // the array targs must contain at least one of the eis.
@@ -162,7 +165,7 @@ public class AnnotationChecker extends ContextVisitor {
             throw new SemanticException("Annotation "
                                                 + annotation
                                                 + " not applicable to this kind of declaration.",
-                                        annotation.position());
+                                        n.position());
         }
 
     }

@@ -71,8 +71,9 @@ public class JL7CaseExt extends JL7Ext implements JL5CaseOps {
         Case c = (Case) this.node();
         Expr expr = c.expr();
 
-        if (expr.constantValueSet() && expr.isConstant()
-                && expr.constantValue() instanceof String) {
+        if (cc.lang().constantValueSet(expr, cc.lang())
+                && cc.lang().isConstant(expr, cc.lang())
+                && cc.lang().constantValue(expr, cc.lang()) instanceof String) {
             return c; // OK, it's a string.
         }
 

@@ -45,7 +45,7 @@ import polyglot.util.SerialVersionUID;
 import polyglot.visit.AscriptionVisitor;
 import polyglot.visit.TypeChecker;
 
-public class JL5UnaryExt extends JL5Ext {
+public class JL5UnaryExt extends JL5ExprExt {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
     /** Type check the expression. */

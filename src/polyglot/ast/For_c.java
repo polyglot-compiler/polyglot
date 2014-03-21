@@ -262,10 +262,11 @@ public class For_c extends Loop_c implements For {
         v.visitCFGList(inits, cond != null ? (Term) cond : body, ENTRY);
 
         if (cond != null) {
-            if (condIsConstantTrue()) {
+            if (v.lang().condIsConstantTrue(this, v.lang())) {
                 v.visitCFG(cond, body, ENTRY);
             }
-            else if (condIsConstantFalse() && v.skipDeadLoopBodies()) {
+            else if (v.lang().condIsConstantFalse(this, v.lang())
+                    && v.skipDeadLoopBodies()) {
                 v.visitCFG(cond, FlowGraph.EDGE_KEY_FALSE, this, EXIT);
                 return succs;
             }
@@ -280,7 +281,7 @@ public class For_c extends Loop_c implements For {
             }
         }
 
-        v.push(this).visitCFG(body, continueTarget(), ENTRY);
+        v.push(this).visitCFG(body, lang().continueTarget(this), ENTRY);
         v.visitCFGList(iters, cond != null ? (Term) cond : body, ENTRY);
 
         return succs;

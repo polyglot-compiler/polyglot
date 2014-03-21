@@ -10,6 +10,12 @@ public class CaptureConvertedWildCardType_c extends TypeVariable_c implements
         CaptureConvertedWildCardType {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
+    /**
+     * Do not recurse when translating capture-converted wildcard appearing
+     * recursively in its bound.
+     */
+    private boolean inBound = false;
+
     public CaptureConvertedWildCardType_c(TypeSystem ts, Position pos) {
         super(ts, pos, UniqueID.newID("capture"), null); // we'll replace this unknown type soon.
     }
@@ -41,13 +47,17 @@ public class CaptureConvertedWildCardType_c extends TypeVariable_c implements
             sb.append("-of ");
         }
         sb.append('?');
-        if (!ts.Object().equals(this.upperBound)) {
-            sb.append(" extends ");
-            sb.append(this.upperBound);
-        }
-        else if (lowerBound != null) {
-            sb.append(" super ");
-            sb.append(this.lowerBound);
+        if (!inBound) {
+            inBound = true;
+            if (!ts.Object().equals(this.upperBound)) {
+                sb.append(" extends ");
+                sb.append(this.upperBound);
+            }
+            else if (lowerBound != null) {
+                sb.append(" super ");
+                sb.append(this.lowerBound);
+            }
+            inBound = false;
         }
         return sb.toString();
     }

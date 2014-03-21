@@ -226,8 +226,8 @@ public class DefiniteAssignmentChecker extends
         public String toString() {
             return "["
                     + (this.definitelyAssigned ? "definitely assigned " : "")
-                    + (this.definitelyUnassigned ? "definitely unassigned "
-                            : "") + "]";
+                    + (this.definitelyUnassigned
+                            ? "definitely unassigned " : "") + "]";
         }
 
         public static AssignmentStatus join(AssignmentStatus as1,
@@ -737,8 +737,8 @@ public class DefiniteAssignmentChecker extends
         }
         if (n instanceof Expr) {
             Expr e = (Expr) n;
-            if (e.isConstant() && e.type().isBoolean()) {
-                if (Boolean.TRUE.equals(e.constantValue())) {
+            if (lang().isConstant(e, lang()) && e.type().isBoolean()) {
+                if (Boolean.TRUE.equals(lang().constantValue(e, lang()))) {
                     // the false branch is dead
                     ret =
                             remap(ret,

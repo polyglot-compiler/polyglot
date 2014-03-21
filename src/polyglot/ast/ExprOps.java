@@ -23,13 +23,29 @@
  *
  * See README for contributors.
  ******************************************************************************/
-package polyglot.ext.jl5.ast;
 
-import polyglot.ast.Node;
-import polyglot.ext.jl5.types.EnumInstance;
+package polyglot.ast;
 
-public interface EnumConstant {
-    EnumInstance enumInstance();
+/**
+ * This interface allows extensions both to override and reuse functionality in
+ * Term_c.
+ */
+public interface ExprOps {
 
-    Node enumInstance(EnumInstance enumInstance);
+    /** Return true iff the compiler has determined whether this expression has a
+     * constant value.  The value returned by {@code isConstant()} is valid only if
+     * {@code constantValueSet()} is true. */
+    boolean constantValueSet(Lang lang);
+
+    /**
+     * Return whether the expression evaluates to a constant.
+     * Requires that disambiguation has been done, and that
+     * {@code constantValueSet()} is true.
+     */
+    boolean isConstant(Lang lang);
+
+    /** Return the constant value of the expression, if any.
+     *  Requires that {@code isConstant()} is true.
+     */
+    Object constantValue(Lang lang);
 }

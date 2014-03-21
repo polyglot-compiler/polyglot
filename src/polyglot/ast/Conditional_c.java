@@ -177,13 +177,19 @@ public class Conditional_c extends Expr_c implements Conditional {
             // whose value is representable in type T, then the type of the
             // conditional expression is T.
 
-            if (t1.isIntOrLess() && t2.isInt()
-                    && ts.numericConversionValid(t1, e2.constantValue())) {
+            if (t1.isIntOrLess()
+                    && t2.isInt()
+                    && ts.numericConversionValid(t1,
+                                                 tc.lang()
+                                                   .constantValue(e2, tc.lang()))) {
                 return type(t1);
             }
 
-            if (t2.isIntOrLess() && t1.isInt()
-                    && ts.numericConversionValid(t2, e1.constantValue())) {
+            if (t2.isIntOrLess()
+                    && t1.isInt()
+                    && ts.numericConversionValid(t2,
+                                                 tc.lang()
+                                                   .constantValue(e1, tc.lang()))) {
                 return type(t2);
             }
 
@@ -261,11 +267,11 @@ public class Conditional_c extends Expr_c implements Conditional {
 
     @Override
     public <T> List<T> acceptCFG(CFGBuilder<?> v, List<T> succs) {
-        if (this.cond.isConstant()) {
+        if (v.lang().isConstant(cond, v.lang())) {
             // the condition is a constant expression.
             // That means that one branch is dead code
             boolean condConstantValue =
-                    ((Boolean) cond.constantValue()).booleanValue();
+                    ((Boolean) v.lang().constantValue(cond, v.lang())).booleanValue();
             if (condConstantValue) {
                 // Condition is constantly true, only the consequent will be executed
                 v.visitCFG(cond, FlowGraph.EDGE_KEY_TRUE, consequent, ENTRY);
@@ -294,16 +300,16 @@ public class Conditional_c extends Expr_c implements Conditional {
     }
 
     @Override
-    public boolean isConstant() {
-        return cond.isConstant() && consequent.isConstant()
-                && alternative.isConstant();
+    public boolean isConstant(Lang lang) {
+        return lang.isConstant(cond, lang) && lang.isConstant(consequent, lang)
+                && lang.isConstant(alternative, lang);
     }
 
     @Override
-    public Object constantValue() {
-        Object cond_ = cond.constantValue();
-        Object then_ = consequent.constantValue();
-        Object else_ = alternative.constantValue();
+    public Object constantValue(Lang lang) {
+        Object cond_ = lang.constantValue(cond, lang);
+        Object then_ = lang.constantValue(consequent, lang);
+        Object else_ = lang.constantValue(alternative, lang);
 
         if (cond_ instanceof Boolean && then_ != null && else_ != null) {
             boolean c = ((Boolean) cond_).booleanValue();

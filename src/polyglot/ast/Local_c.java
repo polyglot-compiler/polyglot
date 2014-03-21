@@ -214,18 +214,18 @@ public class Local_c extends Expr_c implements Local {
     }
 
     @Override
-    public boolean constantValueSet() {
+    public boolean constantValueSet(Lang lang) {
         return li != null && li.constantValueSet();
     }
 
     @Override
-    public boolean isConstant() {
+    public boolean isConstant(Lang lang) {
         return li != null && li.isConstant();
     }
 
     @Override
-    public Object constantValue() {
-        if (!isConstant()) return null;
+    public Object constantValue(Lang lang) {
+        if (!lang.isConstant(this, lang)) return null;
         return li.constantValue();
     }
 

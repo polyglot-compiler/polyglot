@@ -269,13 +269,15 @@ public class AnnotationElemDecl_c extends Term_c implements AnnotationElemDecl {
             if (defaultVal instanceof Expr) {
                 defaultValType = ((Expr) defaultVal).type();
             }
-            else if (defaultVal instanceof ElementValueArrayInit) {
-                ElementValueArrayInit evai = (ElementValueArrayInit) defaultVal;
+            else if (JL5Ext.ext(defaultVal) instanceof ElementValueArrayInit) {
+                ElementValueArrayInit evai =
+                        (ElementValueArrayInit) JL5Ext.ext(defaultVal);
                 defaultValType = evai.type();
             }
-            else if (defaultVal instanceof AnnotationElem) {
+            else if (JL5Ext.ext(defaultVal) instanceof AnnotationElem) {
                 defaultValType =
-                        ((AnnotationElem) defaultVal).typeName().type();
+                        ((AnnotationElem) JL5Ext.ext(defaultVal)).typeName()
+                                                                 .type();
             }
             else {
                 throw new InternalCompilerError("Don't know how to deal with default value ("
@@ -284,17 +286,22 @@ public class AnnotationElemDecl_c extends Term_c implements AnnotationElemDecl {
                                                         + defaultVal.getClass(),
                                                 defaultVal.position());
             }
-            if (defaultVal instanceof ElementValueArrayInit) {
-                ((ElementValueArrayInit) defaultVal).typeCheckElements(type.type());
+            if (JL5Ext.ext(defaultVal) instanceof ElementValueArrayInit) {
+                ((ElementValueArrayInit) JL5Ext.ext(defaultVal)).typeCheckElements(tc,
+                                                                                   type.type());
             }
             else {
                 if (!ts.isImplicitCastValid(defaultValType, type.type())
                         && !ts.equals(defaultValType, type.type())
                         && !(defaultVal instanceof Expr && ts.numericConversionValid(type.type(),
-                                                                                     ((Expr) defaultVal).constantValue()))
+                                                                                     tc.lang()
+                                                                                       .constantValue((Expr) defaultVal,
+                                                                                                      tc.lang())))
                         && !ts.isBaseCastValid(defaultValType, type.type())
                         && !(defaultVal instanceof Expr && ts.numericConversionBaseValid(type.type(),
-                                                                                         ((Expr) defaultVal).constantValue()))) {
+                                                                                         tc.lang()
+                                                                                           .constantValue((Expr) defaultVal,
+                                                                                                          tc.lang())))) {
                     throw new SemanticException("The type of the default value: "
                                                         + defaultVal
                                                         + " does not match the annotation element type: "

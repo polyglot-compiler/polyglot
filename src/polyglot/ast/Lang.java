@@ -233,4 +233,24 @@ public interface Lang {
      * @throws SemanticException If the type information cannot be copied.
      */
     Node copy(Node n, ExtensionInfo extInfo) throws SemanticException;
+
+    // ExprOps
+
+    /** Return true iff the compiler has determined whether this expression has a
+     * constant value.  The value returned by {@code isConstant()} is valid only if
+     * {@code constantValueSet()} is true. */
+    boolean constantValueSet(Expr n, Lang lang);
+
+    /**
+     * Return whether the expression evaluates to a constant.
+     * Requires that disambiguation has been done, and that
+     * {@code constantValueSet()} is true.
+     */
+    boolean isConstant(Expr n, Lang lang);
+
+    /** Return the constant value of the expression, if any.
+     *  Requires that {@code isConstant()} is true.
+     */
+    Object constantValue(Expr n, Lang lang);
+
 }

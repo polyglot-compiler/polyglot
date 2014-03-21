@@ -38,22 +38,22 @@ import polyglot.util.SerialVersionUID;
 import polyglot.visit.PrettyPrinter;
 import polyglot.visit.TypeChecker;
 
-public class JL5FieldExt extends JL5Ext {
+public class JL5FieldExt extends JL5ExprExt {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
     @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
         Field n = (Field) superLang().typeCheck(this.node(), tc);
         if (n.fieldInstance() instanceof EnumInstance
-                && !(n instanceof EnumConstant)) {
+                && !(JL5Ext.ext(n) instanceof EnumConstant)) {
             // it's an enum, so replace this with the appropriate AST node for enum constants.
             JL5NodeFactory nf = (JL5NodeFactory) tc.nodeFactory();
-            EnumConstant ec =
+            Field ec =
                     nf.EnumConstant(n.position(),
                                     n.target(),
                                     nf.Id(n.id().position(), n.name()));
-            ec = (EnumConstant) ec.type(n.type());
-            ec = ec.enumInstance((EnumInstance) n.fieldInstance());
+            ec = (Field) ec.type(n.type());
+            ec = ec.fieldInstance(n.fieldInstance());
             n = ec;
         }
         return n;

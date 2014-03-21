@@ -129,12 +129,12 @@ public class ClassLit_c extends Lit_c implements ClassLit {
      * is not a compile time constant.
      */
     @Override
-    public boolean isConstant() {
+    public boolean isConstant(Lang lang) {
         return false;
     }
 
     @Override
-    public Object constantValue() {
+    public Object constantValue(Lang lang) {
         return null;
     }
 

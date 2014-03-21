@@ -39,7 +39,7 @@ import polyglot.types.Type;
 import polyglot.util.SerialVersionUID;
 import polyglot.visit.TypeChecker;
 
-public class JL5SwitchExt extends JL5Ext implements JL5SwitchOps {
+public class JL5SwitchExt extends JL5TermExt implements JL5SwitchOps {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
     @Override

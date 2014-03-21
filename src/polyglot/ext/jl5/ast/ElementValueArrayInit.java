@@ -28,9 +28,11 @@ package polyglot.ext.jl5.ast;
 
 import java.util.List;
 
+import polyglot.ast.Node;
 import polyglot.ast.Term;
 import polyglot.types.SemanticException;
 import polyglot.types.Type;
+import polyglot.visit.TypeChecker;
 
 /**
  * An {@code ArrayInit} is an immutable representation of
@@ -38,7 +40,7 @@ import polyglot.types.Type;
  * the elements of these array may be expressions of any type (e.g.,
  * {@code Call}).
  */
-public interface ElementValueArrayInit extends Term {
+public interface ElementValueArrayInit {
     /**
      * Get the initializer elements.
      * @return A list of {@link polyglot.ast.Term Term}. Are actually either expressions of
@@ -50,18 +52,20 @@ public interface ElementValueArrayInit extends Term {
      * Set the initializer elements.
      * @param elements A list of {@link polyglot.ast.Term Term}.
      */
-    ElementValueArrayInit elements(List<Term> elements);
+    Node elements(List<Term> elements);
 
     Type type();
 
-    ElementValueArrayInit type(Type type);
+    Node type(Type type);
 
     /**
      * Type check the individual elements of the array initializer against the
      * left-hand-side type.  Each element is checked to see if it can be
      * assigned to a variable of type lhsType.
+     * @param tc The type checking visitor.
      * @param lhsType Type to compare against.
      * @exception SemanticException if there is a type error.
      */
-    void typeCheckElements(Type lhsType) throws SemanticException;
+    void typeCheckElements(TypeChecker tc, Type lhsType)
+            throws SemanticException;
 }

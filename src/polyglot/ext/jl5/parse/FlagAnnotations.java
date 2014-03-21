@@ -28,17 +28,17 @@ package polyglot.ext.jl5.parse;
 import java.util.LinkedList;
 import java.util.List;
 
-import polyglot.ext.jl5.ast.AnnotationElem;
+import polyglot.ast.Term;
 import polyglot.types.Flags;
 
 public class FlagAnnotations {
 
     protected Flags classicFlags;
-    protected List<AnnotationElem> annotations;
+    protected List<Term> annotations;
 
     public FlagAnnotations() {
         classicFlags = Flags.NONE;
-        annotations = new LinkedList<AnnotationElem>();
+        annotations = new LinkedList<Term>();
     }
 
     public Flags flags() {
@@ -55,16 +55,16 @@ public class FlagAnnotations {
         return this.flags(f);
     }
 
-    public FlagAnnotations annotations(List<AnnotationElem> annotations) {
+    public FlagAnnotations annotations(List<Term> annotations) {
         this.annotations = annotations;
         return this;
     }
 
-    public List<AnnotationElem> annotations() {
+    public List<Term> annotations() {
         return annotations;
     }
 
-    public FlagAnnotations addAnnotation(AnnotationElem o) {
+    public FlagAnnotations addAnnotation(Term o) {
         annotations.add(o);
         return this;
     }

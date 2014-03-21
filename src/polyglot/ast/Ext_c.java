@@ -73,7 +73,8 @@ public abstract class Ext_c implements Ext {
 
     @Override
     public Lang lang() {
-        throw new InternalCompilerError("Unexpected invocation from extension object.");
+        throw new InternalCompilerError("Unexpected invocation from extension object: "
+                + this);
     }
 
     protected final JLang superLang() {
@@ -324,6 +325,17 @@ public abstract class Ext_c implements Ext {
         w.begin(0);
         print(n, w, pp);
         w.end();
+    }
+
+    public void printSubStmt(Stmt stmt, CodeWriter w, PrettyPrinter pp) {
+        if (stmt instanceof Block) {
+            w.write(" ");
+            print(stmt, w, pp);
+        }
+        else {
+            w.allowBreak(4, " ");
+            printBlock(stmt, w, pp);
+        }
     }
 
     @Override
