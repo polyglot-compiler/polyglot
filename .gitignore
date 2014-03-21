@@ -8,3 +8,4 @@ dist
 .classpath
 .project
 SyncToy*
+/bin_
