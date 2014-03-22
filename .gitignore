@@ -7,3 +7,4 @@ cup-classes
 dist
 .classpath
 .project
+/bin_
