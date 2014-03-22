@@ -32,13 +32,16 @@ import polyglot.util.CodeWriter;
 import polyglot.util.Copy;
 
 /**
- * <code>Ext</code> is the super type of all node extension objects.
+ * {@code Ext} is the super type of all node extension objects.
  * It contains a pointer back to the node it is extending and a possibly-null
  * pointer to another extension node.
  */
-public interface Ext extends Copy, Serializable {
-    /** The node that we are extending. */
+public interface Ext extends NodeOps, Copy<Ext>, Serializable {
+    /** The node we ultimately extend. */
     Node node();
+
+    /** The parent of this extension. */
+    NodeOps pred();
 
     /**
      * Initialize the extension object's pointer back to the node.
@@ -46,6 +49,13 @@ public interface Ext extends Copy, Serializable {
      * the extension.
      */
     void init(Node node);
+
+    /**
+     * Initialize the extension object's pointer back to the parent.
+     * This also initializes the back pointers for all extensions of
+     * the extension.
+     */
+    void initPred(NodeOps pred);
 
     /** An extension of this extension, or null. */
     Ext ext();

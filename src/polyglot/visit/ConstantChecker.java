@@ -27,6 +27,8 @@
 package polyglot.visit;
 
 import polyglot.ast.Expr;
+import polyglot.ast.JLang;
+import polyglot.ast.Lang;
 import polyglot.ast.Node;
 import polyglot.ast.NodeFactory;
 import polyglot.frontend.Job;
@@ -41,6 +43,11 @@ import polyglot.types.TypeSystem;
 public class ConstantChecker extends ContextVisitor {
     public ConstantChecker(Job job, TypeSystem ts, NodeFactory nf) {
         super(job, ts, nf);
+    }
+
+    @Override
+    public JLang lang() {
+        return (JLang) super.lang();
     }
 
     /*
@@ -60,6 +67,10 @@ public class ConstantChecker extends ContextVisitor {
     protected static class TypeCheckChecker extends NodeVisitor {
         public boolean checked = true;
 
+        public TypeCheckChecker(Lang lang) {
+            super(lang);
+        }
+
         @Override
         public Node override(Node n) {
             if (!n.isTypeChecked()) {
@@ -75,7 +86,7 @@ public class ConstantChecker extends ContextVisitor {
         if (Report.should_report(Report.visit, 2))
             Report.report(2, ">> " + this + "::leave " + n);
 
-        TypeCheckChecker tcc = new TypeCheckChecker();
+        TypeCheckChecker tcc = new TypeCheckChecker(lang());
 
         if (n instanceof Expr) {
             Expr e = (Expr) n;
@@ -85,13 +96,13 @@ public class ConstantChecker extends ContextVisitor {
         }
 
         if (tcc.checked) {
-            n.del().visitChildren(tcc);
+            lang().visitChildren(n, tcc);
         }
 
         Node m = n;
 
         if (tcc.checked) {
-            m = m.del().checkConstants((ConstantChecker) v);
+            m = lang().checkConstants(m, (ConstantChecker) v);
         }
         else {
             Scheduler scheduler = job().extensionInfo().scheduler();

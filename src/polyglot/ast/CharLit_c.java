@@ -28,6 +28,7 @@ package polyglot.ast;
 
 import polyglot.types.SemanticException;
 import polyglot.util.CodeWriter;
+import polyglot.util.Copy;
 import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
 import polyglot.util.StringUtil;
@@ -35,31 +36,37 @@ import polyglot.visit.PrettyPrinter;
 import polyglot.visit.TypeChecker;
 
 /** 
- * An <code>CharLit</code> represents a literal in java of
- * <code>char</code> type.
+ * A {@code CharLit} represents a literal in java of {@code char} type.
  */
 public class CharLit_c extends NumLit_c implements CharLit {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
+    @Deprecated
     public CharLit_c(Position pos, char value) {
-        super(pos, value);
+        this(pos, value, null);
     }
 
-    /** Get the value of the expression. */
+    public CharLit_c(Position pos, char value, Ext ext) {
+        super(pos, value, ext);
+    }
+
     @Override
     public char value() {
         return (char) longValue();
     }
 
-    /** Set the value of the expression. */
     @Override
     public CharLit value(char value) {
-        CharLit_c n = (CharLit_c) copy();
+        return value(this, value);
+    }
+
+    protected <N extends CharLit_c> N value(N n, char value) {
+        if (n.value == value) return n;
+        if (n == this) n = Copy.Util.copy(n);
         n.value = value;
         return n;
     }
 
-    /** Type check the expression. */
     @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
         return type(tc.typeSystem().Char());
@@ -70,7 +77,6 @@ public class CharLit_c extends NumLit_c implements CharLit {
         return "'" + StringUtil.escape((char) value) + "'";
     }
 
-    /** Write the expression to an output file. */
     @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
         w.write("'");
@@ -79,7 +85,7 @@ public class CharLit_c extends NumLit_c implements CharLit {
     }
 
     @Override
-    public Object constantValue() {
+    public Object constantValue(Lang lang) {
         return new Character((char) value);
     }
 

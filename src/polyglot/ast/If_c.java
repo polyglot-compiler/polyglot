@@ -32,6 +32,7 @@ import polyglot.types.SemanticException;
 import polyglot.types.Type;
 import polyglot.types.TypeSystem;
 import polyglot.util.CodeWriter;
+import polyglot.util.Copy;
 import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
 import polyglot.visit.AscriptionVisitor;
@@ -42,7 +43,7 @@ import polyglot.visit.PrettyPrinter;
 import polyglot.visit.TypeChecker;
 
 /**
- * An immutable representation of a Java language <code>if</code> statement.
+ * An immutable representation of a Java language {@code if} statement.
  * Contains an expression whose value is tested, a ``then'' statement 
  * (consequent), and optionally an ``else'' statement (alternate).
  */
@@ -53,80 +54,88 @@ public class If_c extends Stmt_c implements If {
     protected Stmt consequent;
     protected Stmt alternative;
 
+    @Deprecated
     public If_c(Position pos, Expr cond, Stmt consequent, Stmt alternative) {
-        super(pos);
+        this(pos, cond, consequent, alternative, null);
+    }
+
+    public If_c(Position pos, Expr cond, Stmt consequent, Stmt alternative,
+            Ext ext) {
+        super(pos, ext);
         assert (cond != null && consequent != null); // alternative may be null;
         this.cond = cond;
         this.consequent = consequent;
         this.alternative = alternative;
     }
 
-    /** Get the conditional of the statement. */
     @Override
     public Expr cond() {
         return this.cond;
     }
 
-    /** Set the conditional of the statement. */
     @Override
     public If cond(Expr cond) {
-        If_c n = (If_c) copy();
+        return cond(this, cond);
+    }
+
+    protected <N extends If_c> N cond(N n, Expr cond) {
+        if (n.cond == cond) return n;
+        if (n == this) n = Copy.Util.copy(n);
         n.cond = cond;
         return n;
     }
 
-    /** Get the consequent of the statement. */
     @Override
     public Stmt consequent() {
         return this.consequent;
     }
 
-    /** Set the consequent of the statement. */
     @Override
     public If consequent(Stmt consequent) {
-        If_c n = (If_c) copy();
+        return consequent(this, consequent);
+    }
+
+    protected <N extends If_c> N consequent(N n, Stmt consequent) {
+        if (n.consequent == consequent) return n;
+        if (n == this) n = Copy.Util.copy(n);
         n.consequent = consequent;
         return n;
     }
 
-    /** Get the alternative of the statement. */
     @Override
     public Stmt alternative() {
         return this.alternative;
     }
 
-    /** Set the alternative of the statement. */
     @Override
     public If alternative(Stmt alternative) {
-        If_c n = (If_c) copy();
+        return alternative(this, alternative);
+    }
+
+    protected <N extends If_c> N alternative(N n, Stmt alternative) {
+        if (n.alternative == alternative) return n;
+        if (n == this) n = Copy.Util.copy(n);
         n.alternative = alternative;
         return n;
     }
 
     /** Reconstruct the statement. */
-    protected If_c reconstruct(Expr cond, Stmt consequent, Stmt alternative) {
-        if (cond != this.cond || consequent != this.consequent
-                || alternative != this.alternative) {
-            If_c n = (If_c) copy();
-            n.cond = cond;
-            n.consequent = consequent;
-            n.alternative = alternative;
-            return n;
-        }
-
-        return this;
+    protected <N extends If_c> N reconstruct(N n, Expr cond, Stmt consequent,
+            Stmt alternative) {
+        n = cond(n, cond);
+        n = consequent(n, consequent);
+        n = alternative(n, alternative);
+        return n;
     }
 
-    /** Visit the children of the statement. */
     @Override
     public Node visitChildren(NodeVisitor v) {
-        Expr cond = (Expr) visitChild(this.cond, v);
-        Node consequent = visitChild(this.consequent, v);
-        Node alternative = visitChild(this.alternative, v);
-        return reconstruct(cond, (Stmt) consequent, (Stmt) alternative);
+        Expr cond = visitChild(this.cond, v);
+        Stmt consequent = visitChild(this.consequent, v);
+        Stmt alternative = visitChild(this.alternative, v);
+        return reconstruct(this, cond, consequent, alternative);
     }
 
-    /** Type check the statement. */
     @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
         TypeSystem ts = tc.typeSystem();
@@ -156,7 +165,6 @@ public class If_c extends Stmt_c implements If {
                 + (alternative != null ? " else " + alternative : "");
     }
 
-    /** Write the statement to an output file. */
     @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
         w.write("if (");
@@ -192,11 +200,11 @@ public class If_c extends Stmt_c implements If {
 
     @Override
     public <T> List<T> acceptCFG(CFGBuilder<?> v, List<T> succs) {
-        if (cond.isConstant() && v.skipDeadIfBranches()) {
+        if (v.lang().isConstant(cond, v.lang()) && v.skipDeadIfBranches()) {
             // the condition is a constant expression.
             // That means that one branch is dead code
             boolean condConstantValue =
-                    ((Boolean) cond.constantValue()).booleanValue();
+                    ((Boolean) v.lang().constantValue(cond, v.lang())).booleanValue();
             if (condConstantValue) {
                 // the condition is constantly true.
                 // the alternative won't be executed.

@@ -12,6 +12,7 @@ import polyglot.types.LazyClassInitializer;
 import polyglot.types.ParsedClassType_c;
 import polyglot.types.Type;
 import polyglot.types.TypeSystem;
+import polyglot.util.SerialVersionUID;
 
 /**
  * A PAO class type. This class overrides the method 
@@ -19,6 +20,8 @@ import polyglot.types.TypeSystem;
  * <code>Object</code> to primitives.
  */
 public class PaoParsedClassType_c extends ParsedClassType_c {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     protected PaoParsedClassType_c() {
         super();
     }

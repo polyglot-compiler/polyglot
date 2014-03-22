@@ -31,6 +31,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import polyglot.ast.JLang;
 import polyglot.ast.Node;
 import polyglot.util.InternalCompilerError;
 
@@ -42,6 +43,10 @@ public class FindSharedASTVisitor extends NodeVisitor {
     private Map<Node, NodeStack> seenNodes =
             new HashMap<Node, FindSharedASTVisitor.NodeStack>();
     private NodeStack currentStack;
+
+    public FindSharedASTVisitor(JLang lang) {
+        super(lang);
+    }
 
     @Override
     public NodeVisitor enter(Node n) {
@@ -64,7 +69,7 @@ public class FindSharedASTVisitor extends NodeVisitor {
     protected void alreadySeenNode(Node n, NodeStack stack1, NodeStack stack2) {
         Node m = findCommonParent(stack1, stack2);
         if (m != null) {
-            m.prettyPrint(System.err);
+            lang().prettyPrint(m, lang(), System.err);
         }
 
         throw new InternalCompilerError("Already seen node " + n + " ("

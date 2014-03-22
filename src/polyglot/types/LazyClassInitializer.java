@@ -41,65 +41,65 @@ public interface LazyClassInitializer extends LazyInitializer {
     public void setClass(ParsedClassType ct);
 
     /**
-     * Initialize <code>ct</code>'s superclass.
-     * This method ensures the superclass of the class is initailized to a
-     * canonical type, or throws a <code>MissingDependencyException</code>.
+     * Initialize {@code ct}'s superclass.
+     * This method ensures the superclass of the class is initialized to a
+     * canonical type, or throws a {@code MissingDependencyException}.
      */
     public void initSuperclass();
 
     /**
-     * Initialize <code>ct</code>'s constructors.
+     * Initialize {@code ct}'s constructors.
      * This method ensures the list of constructors is populated with
-     * canonical ConstructorInstances, or throws a <code>MissingDependencyException</code>.
+     * canonical ConstructorInstances, or throws a {@code MissingDependencyException}.
      */
     public void canonicalConstructors();
 
     /**
-     * Initialize <code>ct</code>'s methods.
+     * Initialize {@code ct}'s methods.
      * This method ensures the list of methods is populated with
-     * canonical MethodInstances, or throws a <code>MissingDependencyException</code>.
+     * canonical MethodInstances, or throws a {@code MissingDependencyException}.
      */
     public void canonicalMethods();
 
     /**
-     * Initialize <code>ct</code>'s fields.
+     * Initialize {@code ct}'s fields.
      * This method ensures the list of fields is populated with
-     * canonical FieldInstances, or throws a <code>MissingDependencyException</code>.
+     * canonical FieldInstances, or throws a {@code MissingDependencyException}.
      */
     public void canonicalFields();
 
     /**
-     * Initialize <code>ct</code>'s constructors.
+     * Initialize {@code ct}'s constructors.
      * This method ensures the list of fields is populated with (possibly
-     * non-canonical) ConstructorInstances, or throws a <code>MissingDependencyException</code>.
+     * non-canonical) ConstructorInstances, or throws a {@code MissingDependencyException}.
      */
     public void initConstructors();
 
     /**
-     * Initialize <code>ct</code>'s methods.
+     * Initialize {@code ct}'s methods.
      * This method ensures the list of fields is populated with (possibly
-     * non-canonical) MethodInstances, or throws a <code>MissingDependencyException</code>.
+     * non-canonical) MethodInstances, or throws a {@code MissingDependencyException}.
      */
     public void initMethods();
 
     /**
-     * Initialize <code>ct</code>'s fields.
+     * Initialize {@code ct}'s fields.
      * This method ensures the list of fields is populated with (possibly
-     * non-canonical) FieldInstances, or throws a <code>MissingDependencyException</code>.
+     * non-canonical) FieldInstances, or throws a {@code MissingDependencyException}.
      */
     public void initFields();
 
     /**
-     * Initialize <code>ct</code>'s member classes.
-     * This method ensures the member classes of the class are initailized to
-     * canonical types, or throws a <code>MissingDependencyException</code>.
+     * Initialize {@code ct}'s member classes.
+     * This method ensures the member classes of the class are initialized to
+     * canonical types, or throws a {@code MissingDependencyException}.
      */
     public void initMemberClasses();
 
     /**
-     * Initialize <code>ct</code>'s interfaces.
-     * This method ensures the interfaces of the class are initailized to
-     * canonical types, or throws a <code>MissingDependencyException</code>.
+     * Initialize {@code ct}'s interfaces.
+     * This method ensures the interfaces of the class are initialized to
+     * canonical types, or throws a {@code MissingDependencyException}.
      */
     public void initInterfaces();
 }

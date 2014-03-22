@@ -33,6 +33,7 @@ import polyglot.ast.ClassDecl;
 import polyglot.ast.ClassMember;
 import polyglot.ast.CodeDecl;
 import polyglot.ast.FieldDecl;
+import polyglot.ast.JLang;
 import polyglot.ast.New;
 import polyglot.ast.Node;
 import polyglot.ast.NodeFactory;
@@ -67,6 +68,11 @@ public class AmbiguityRemover extends DisambiguationDriver {
     }
 
     @Override
+    public JLang lang() {
+        return (JLang) super.lang();
+    }
+
+    @Override
     public Node override(Node parent, Node n) {
         if (!visitSigs && n instanceof ClassMember && !(n instanceof ClassDecl)) {
             return n;
@@ -85,7 +91,7 @@ public class AmbiguityRemover extends DisambiguationDriver {
                 Report.report(2, ">> " + this + "::override " + n + " ("
                         + n.getClass().getName() + ")");
 
-            Node m = n.del().disambiguateOverride(parent, this);
+            Node m = lang().disambiguateOverride(n, parent, this);
 
             if (Report.should_report(Report.visit, 2))
                 Report.report(2, "<< "
@@ -137,7 +143,8 @@ public class AmbiguityRemover extends DisambiguationDriver {
             Report.report(2, ">> " + this + "::enter " + n + " ("
                     + n.getClass().getName() + ")");
 
-        AmbiguityRemover v = (AmbiguityRemover) n.del().disambiguateEnter(this);
+        AmbiguityRemover v =
+                (AmbiguityRemover) lang().disambiguateEnter(n, this);
 
         if (Report.should_report(Report.visit, 2))
             Report.report(2, "<< " + this + "::enter " + n + " ("
@@ -148,6 +155,10 @@ public class AmbiguityRemover extends DisambiguationDriver {
 
     protected static class AmbChecker2 extends NodeVisitor {
         public boolean amb;
+
+        public AmbChecker2(JLang lang) {
+            super(lang);
+        }
 
         @Override
         public Node override(Node n) {
@@ -173,7 +184,7 @@ public class AmbiguityRemover extends DisambiguationDriver {
 //            return n;
 //        }
 
-        Node m = n.del().disambiguate((AmbiguityRemover) v);
+        Node m = lang().disambiguate(n, (AmbiguityRemover) v);
 
         if (Report.should_report(Report.visit, 2))
             Report.report(2, "<< " + this + "::leave " + n + " -> " + m
@@ -204,11 +215,15 @@ public class AmbiguityRemover extends DisambiguationDriver {
     }
 
     public boolean isASTDisambiguated(Node n) {
-        return astAmbiguityCount(n) == 0;
+        return astAmbiguityCount(lang(), n) == 0;
     }
 
     protected static class AmbChecker extends NodeVisitor {
         public int notOkCount;
+
+        public AmbChecker(JLang lang) {
+            super(lang);
+        }
 
         @Override
         public Node override(Node parent, Node n) {
@@ -233,8 +248,8 @@ public class AmbiguityRemover extends DisambiguationDriver {
         }
     }
 
-    public static int astAmbiguityCount(Node n) {
-        AmbChecker ac = new AmbChecker();
+    public static int astAmbiguityCount(JLang lang, Node n) {
+        AmbChecker ac = new AmbChecker(lang);
         n.visit(ac);
         return ac.notOkCount;
     }

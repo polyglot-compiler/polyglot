@@ -32,6 +32,7 @@ import polyglot.types.SemanticException;
 import polyglot.types.Type;
 import polyglot.types.TypeSystem;
 import polyglot.util.CodeWriter;
+import polyglot.util.Copy;
 import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
 import polyglot.visit.AscriptionVisitor;
@@ -42,7 +43,7 @@ import polyglot.visit.PrettyPrinter;
 import polyglot.visit.TypeChecker;
 
 /**
- * A <code>Unary</code> represents a Java unary expression, an
+ * A {@code Unary} represents a Java unary expression, an
  * immutable pair of an expression and an operator.
  */
 public class Unary_c extends Expr_c implements Unary {
@@ -51,66 +52,69 @@ public class Unary_c extends Expr_c implements Unary {
     protected Unary.Operator op;
     protected Expr expr;
 
+    @Deprecated
     public Unary_c(Position pos, Unary.Operator op, Expr expr) {
-        super(pos);
+        this(pos, op, expr, null);
+    }
+
+    public Unary_c(Position pos, Unary.Operator op, Expr expr, Ext ext) {
+        super(pos, ext);
         assert (op != null && expr != null);
         this.op = op;
         this.expr = expr;
     }
 
-    /** Get the precedence of the expression. */
     @Override
     public Precedence precedence() {
         return Precedence.UNARY;
     }
 
-    /** Get the sub-expression of the expression. */
     @Override
     public Expr expr() {
         return this.expr;
     }
 
-    /** Set the sub-expression of the expression. */
     @Override
     public Unary expr(Expr expr) {
-        Unary_c n = (Unary_c) copy();
+        return expr(this, expr);
+    }
+
+    protected <N extends Unary_c> N expr(N n, Expr expr) {
+        if (n.expr == expr) return n;
+        if (n == this) n = Copy.Util.copy(n);
         n.expr = expr;
         return n;
     }
 
-    /** Get the operator. */
     @Override
     public Unary.Operator operator() {
         return this.op;
     }
 
-    /** Set the operator. */
     @Override
     public Unary operator(Unary.Operator op) {
-        Unary_c n = (Unary_c) copy();
+        return operator(this, op);
+    }
+
+    protected <N extends Unary_c> N operator(N n, Unary.Operator op) {
+        if (n.op == op) return n;
+        if (n == this) n = Copy.Util.copy(n);
         n.op = op;
         return n;
     }
 
     /** Reconstruct the expression. */
-    protected Unary_c reconstruct(Expr expr) {
-        if (expr != this.expr) {
-            Unary_c n = (Unary_c) copy();
-            n.expr = expr;
-            return n;
-        }
-
-        return this;
+    protected <N extends Unary_c> N reconstruct(N n, Expr expr) {
+        n = expr(n, expr);
+        return n;
     }
 
-    /** Visit the children of the expression. */
     @Override
     public Node visitChildren(NodeVisitor v) {
-        Expr expr = (Expr) visitChild(this.expr, v);
-        return reconstruct(expr);
+        Expr expr = visitChild(this.expr, v);
+        return reconstruct(this, expr);
     }
 
-    /** Type check the expression. */
     @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
         TypeSystem ts = tc.typeSystem();
@@ -210,7 +214,6 @@ public class Unary_c extends Expr_c implements Unary {
         return child.type();
     }
 
-    /** Check exceptions thrown by the statement. */
     @Override
     public String toString() {
         if (op == NEG && expr instanceof IntLit && ((IntLit) expr).boundary()) {
@@ -264,25 +267,25 @@ public class Unary_c extends Expr_c implements Unary {
     }
 
     @Override
-    public boolean constantValueSet() {
-        return expr.constantValueSet();
+    public boolean constantValueSet(Lang lang) {
+        return lang.constantValueSet(expr, lang);
     }
 
     @Override
-    public boolean isConstant() {
+    public boolean isConstant(Lang lang) {
         if (op == POST_INC || op == POST_DEC || op == PRE_INC || op == PRE_DEC) {
             return false;
         }
-        return expr.isConstant();
+        return lang.isConstant(expr, lang);
     }
 
     @Override
-    public Object constantValue() {
-        if (!isConstant()) {
+    public Object constantValue(Lang lang) {
+        if (!lang.isConstant(this, lang)) {
             return null;
         }
 
-        Object v = expr.constantValue();
+        Object v = lang.constantValue(expr, lang);
 
         if (v instanceof Boolean) {
             boolean vv = ((Boolean) v).booleanValue();

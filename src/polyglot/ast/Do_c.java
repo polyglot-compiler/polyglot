@@ -42,72 +42,40 @@ import polyglot.visit.PrettyPrinter;
 import polyglot.visit.TypeChecker;
 
 /**
- * A immutable representation of a Java language <code>do</code> statement. 
+ * A immutable representation of a Java language {@code do} statement. 
  * It contains a statement to be executed and an expression to be tested 
  * indicating whether to reexecute the statement.
  */
 public class Do_c extends Loop_c implements Do {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
-    protected Stmt body;
-    protected Expr cond;
-
+    @Deprecated
     public Do_c(Position pos, Stmt body, Expr cond) {
-        super(pos);
-        assert (body != null && cond != null);
-        this.body = body;
-        this.cond = cond;
+        this(pos, body, cond, null);
     }
 
-    /** Get the body of the statement. */
-    @Override
-    public Stmt body() {
-        return this.body;
+    public Do_c(Position pos, Stmt body, Expr cond, Ext ext) {
+        super(pos, cond, body, ext);
+        assert (cond != null);
     }
 
-    /** Set the body of the statement. */
-    @Override
-    public Do body(Stmt body) {
-        Do_c n = (Do_c) copy();
-        n.body = body;
-        return n;
-    }
-
-    /** Get the conditional of the statement. */
-    @Override
-    public Expr cond() {
-        return this.cond;
-    }
-
-    /** Set the conditional of the statement. */
     @Override
     public Do cond(Expr cond) {
-        Do_c n = (Do_c) copy();
-        n.cond = cond;
-        return n;
+        return cond(this, cond);
     }
 
-    /** Reconstruct the statement. */
-    protected Do_c reconstruct(Stmt body, Expr cond) {
-        if (body != this.body || cond != this.cond) {
-            Do_c n = (Do_c) copy();
-            n.body = body;
-            n.cond = cond;
-            return n;
-        }
-
-        return this;
+    @Override
+    public Do body(Stmt body) {
+        return body(this, body);
     }
 
-    /** Visit the children of the statement. */
     @Override
     public Node visitChildren(NodeVisitor v) {
-        Stmt body = (Stmt) visitChild(this.body, v);
-        Expr cond = (Expr) visitChild(this.cond, v);
-        return reconstruct(body, cond);
+        Stmt body = visitChild(this.body, v);
+        Expr cond = visitChild(this.cond, v);
+        return reconstruct(this, cond, body);
     }
 
-    /** Type check the statement. */
     @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
         TypeSystem ts = tc.typeSystem();
@@ -136,7 +104,6 @@ public class Do_c extends Loop_c implements Do {
         return "do { ... } while (" + cond + ")";
     }
 
-    /** Write the statement to an output file. */
     @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
         w.write("do ");
@@ -155,7 +122,7 @@ public class Do_c extends Loop_c implements Do {
     public <T> List<T> acceptCFG(CFGBuilder<?> v, List<T> succs) {
         v.push(this).visitCFG(body, cond, ENTRY);
 
-        if (condIsConstantTrue()) {
+        if (v.lang().condIsConstantTrue(this, v.lang())) {
             v.visitCFG(cond, body, ENTRY);
         }
         else {

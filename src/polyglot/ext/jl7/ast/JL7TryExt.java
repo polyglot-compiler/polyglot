@@ -5,12 +5,12 @@ import java.util.List;
 
 import polyglot.ast.Block;
 import polyglot.ast.Catch;
+import polyglot.ast.JLang;
 import polyglot.ast.Local;
 import polyglot.ast.LocalAssign;
 import polyglot.ast.Node;
 import polyglot.ast.Throw;
 import polyglot.ast.Try;
-import polyglot.ast.TryOps;
 import polyglot.types.LocalInstance;
 import polyglot.types.SemanticException;
 import polyglot.types.Type;
@@ -20,25 +20,53 @@ import polyglot.util.SubtypeSet;
 import polyglot.visit.ExceptionChecker;
 import polyglot.visit.NodeVisitor;
 
-public class JL7TryExt extends JL7Ext {
+public class JL7TryExt extends JL7Ext implements JL7TryOps {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
+    @Override
+    public Try node() {
+        return (Try) super.node();
+    }
+
+    @Override
     public Block exceptionCheckTryBlock(ExceptionChecker ec)
             throws SemanticException {
-        Block b = ((TryOps) this.superDel()).exceptionCheckTryBlock(ec);
+        Block b = superLang().exceptionCheckTryBlock(this.node(), ec);
 
-        ((JL7TryOps) this.node().del()).checkPreciseRethrows(ec.typeSystem(), b);
+        ((J7Lang) ec.lang()).checkPreciseRethrows(this.node(),
+                                                  (J7Lang) ec.lang(),
+                                                  ec.typeSystem(),
+                                                  b);
 
         return b;
     }
 
-    public void checkPreciseRethrows(TypeSystem ts, Block tryBlock) {
-        Try n = (Try) this.node();
+    @Override
+    public ExceptionChecker constructTryBlockExceptionChecker(
+            ExceptionChecker ec) {
+        return superLang().constructTryBlockExceptionChecker(this.node(), ec);
+    }
+
+    @Override
+    public List<Catch> exceptionCheckCatchBlocks(ExceptionChecker ec)
+            throws SemanticException {
+        return superLang().exceptionCheckCatchBlocks(this.node(), ec);
+    }
+
+    @Override
+    public Block exceptionCheckFinallyBlock(ExceptionChecker ec)
+            throws SemanticException {
+        return superLang().exceptionCheckFinallyBlock(this.node(), ec);
+    }
+
+    @Override
+    public void checkPreciseRethrows(J7Lang lang, TypeSystem ts, Block tryBlock) {
+        Try n = this.node();
 
         // For each catch block, identify which exceptions can get to it.
         // First, get the set of all exceptions that the try block can throw
         SubtypeSet thrown =
-                new SubtypeSet(ts.Throwable(), tryBlock.throwTypes(ts));
+                new SubtypeSet(ts.Throwable(), lang.throwTypes(tryBlock, ts));
 
         // Second, go through the catch blocks, and see what exceptions can actually reach them.
         for (Catch cb : n.catchBlocks()) {
@@ -47,15 +75,15 @@ public class JL7TryExt extends JL7Ext {
             // The exceptions that can reach cb are the exceptions in thrown
             // that may be assignable to catchType.
 
-            ((JL7TryOps) this.node().del()).preciseRethrowsForCatchBlock(cb,
-                                                                         thrown);
+            lang.preciseRethrowsForCatchBlock(this.node(), lang, cb, thrown);
 
             thrown.remove(catchType);
         }
-
     }
 
-    public void preciseRethrowsForCatchBlock(Catch cb, SubtypeSet reaching) {
+    @Override
+    public void preciseRethrowsForCatchBlock(J7Lang lang, Catch cb,
+            SubtypeSet reaching) {
         List<Type> s = new ArrayList<Type>();
         for (Type t : reaching) {
             if (cb.catchType().isSubtype(t)) {
@@ -69,12 +97,12 @@ public class JL7TryExt extends JL7Ext {
         }
         // now, if cb.formal() is final, or effectively final, then
         // set the throwsSet of any rethrow.
-        if (isFinalFormal(cb)) {
-            setThrowsTypes(cb.formal().localInstance(), s, cb.body());
+        if (isFinalFormal(lang, cb)) {
+            setThrowsTypes(lang, cb.formal().localInstance(), s, cb.body());
         }
     }
 
-    protected boolean isFinalFormal(Catch cb) {
+    protected boolean isFinalFormal(JLang lang, Catch cb) {
         if (cb.formal().localInstance().flags().isFinal()
                 || cb instanceof MultiCatch) {
             // explcitly final
@@ -82,7 +110,7 @@ public class JL7TryExt extends JL7Ext {
         }
         // Check to see if the local is effectively final.
         EffectivelyFinalVisitor v =
-                new EffectivelyFinalVisitor(cb.formal().localInstance());
+                new EffectivelyFinalVisitor(lang, cb.formal().localInstance());
         cb.body().visit(v);
 
         return v.isEffectivelyFinal();
@@ -92,7 +120,8 @@ public class JL7TryExt extends JL7Ext {
         boolean isEffectivelyFinal;
         LocalInstance li;
 
-        public EffectivelyFinalVisitor(LocalInstance li) {
+        public EffectivelyFinalVisitor(JLang lang, LocalInstance li) {
+            super(lang);
             this.li = li;
             this.isEffectivelyFinal = true;
         }
@@ -105,27 +134,26 @@ public class JL7TryExt extends JL7Ext {
         public Node leave(Node old, Node n, NodeVisitor v) {
             if (n instanceof LocalAssign) {
                 LocalAssign la = (LocalAssign) n;
-                if (((Local) la.left()).localInstance().equals(li)) {
+                if (la.left().localInstance().equals(li)) {
                     this.isEffectivelyFinal = false;
                 }
             }
             return n;
         }
-
     }
 
-    protected void setThrowsTypes(LocalInstance localInstance, List<Type> s,
-            Block b) {
-        SetThrowSetVisitor v = new SetThrowSetVisitor(localInstance, s);
+    protected void setThrowsTypes(JLang lang, LocalInstance localInstance,
+            List<Type> s, Block b) {
+        SetThrowSetVisitor v = new SetThrowSetVisitor(lang, localInstance, s);
         b.visit(v);
-
     }
 
     public class SetThrowSetVisitor extends NodeVisitor {
         LocalInstance li;
         List<Type> s;
 
-        public SetThrowSetVisitor(LocalInstance li, List<Type> s) {
+        public SetThrowSetVisitor(JLang lang, LocalInstance li, List<Type> s) {
+            super(lang);
             this.li = li;
             this.s = s;
         }
@@ -146,5 +174,4 @@ public class JL7TryExt extends JL7Ext {
             return n;
         }
     }
-
 }

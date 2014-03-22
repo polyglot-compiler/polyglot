@@ -32,6 +32,7 @@ import polyglot.types.SemanticException;
 import polyglot.types.Type;
 import polyglot.types.TypeSystem;
 import polyglot.util.CodeWriter;
+import polyglot.util.Copy;
 import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
 import polyglot.visit.AscriptionVisitor;
@@ -42,8 +43,8 @@ import polyglot.visit.PrettyPrinter;
 import polyglot.visit.TypeChecker;
 
 /**
- * A <code>Case</code> is a representation of a Java <code>case</code>
- * statement.  It can only be contained in a <code>Switch</code>.
+ * A {@code Case} is a representation of a Java {@code case}
+ * statement.  It can only be contained in a {@code Switch}.
  */
 public class Case_c extends Stmt_c implements Case {
     private static final long serialVersionUID = SerialVersionUID.generate();
@@ -51,71 +52,68 @@ public class Case_c extends Stmt_c implements Case {
     protected Expr expr;
     protected long value;
 
+    @Deprecated
     public Case_c(Position pos, Expr expr) {
-        super(pos);
+        this(pos, expr, null);
+    }
+
+    public Case_c(Position pos, Expr expr, Ext ext) {
+        super(pos, ext);
         assert (true); // expr may be null for default case
         this.expr = expr;
     }
 
-    /** Returns true iff this is the default case. */
     @Override
     public boolean isDefault() {
         return this.expr == null;
     }
 
-    /**
-     * Get the case label.  This must should a constant expression.
-     * The case label is null for the <code>default</code> case.
-     */
     @Override
     public Expr expr() {
         return this.expr;
     }
 
-    /** Set the case label.  This must should a constant expression, or null. */
     @Override
     public Case expr(Expr expr) {
-        Case_c n = (Case_c) copy();
+        return expr(this, expr);
+    }
+
+    protected <N extends Case_c> N expr(N n, Expr expr) {
+        if (n.expr == expr) return n;
+        if (n == this) n = Copy.Util.copy(n);
         n.expr = expr;
         return n;
     }
 
-    /**
-     * Returns the value of the case label.  This value is only valid
-     * after type-checking.
-     */
     @Override
     public long value() {
         return this.value;
     }
 
-    /** Set the value of the case label. */
     @Override
     public Case value(long value) {
-        Case_c n = (Case_c) copy();
+        return value(this, value);
+    }
+
+    protected <N extends Case_c> N value(N n, long value) {
+        if (n.value == value) return n;
+        if (n == this) n = Copy.Util.copy(n);
         n.value = value;
         return n;
     }
 
     /** Reconstruct the statement. */
-    protected Case_c reconstruct(Expr expr) {
-        if (expr != this.expr) {
-            Case_c n = (Case_c) copy();
-            n.expr = expr;
-            return n;
-        }
-
-        return this;
+    protected <N extends Case_c> N reconstruct(N n, Expr expr) {
+        n = expr(n, expr);
+        return n;
     }
 
-    /** Visit the children of the statement. */
     @Override
     public Node visitChildren(NodeVisitor v) {
-        Expr expr = (Expr) visitChild(this.expr, v);
-        return reconstruct(expr);
+        Expr expr = visitChild(this.expr, v);
+        return reconstruct(this, expr);
     }
 
-    /** Type check the statement. */
     @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
         if (expr == null) {
@@ -138,13 +136,13 @@ public class Case_c extends Stmt_c implements Case {
             return this;
         }
 
-        if (!expr.constantValueSet()) {
+        if (!cc.lang().constantValueSet(expr, cc.lang())) {
             // Not ready yet; pass will get rerun.
             return this;
         }
 
-        if (expr.isConstant()) {
-            Object o = expr.constantValue();
+        if (cc.lang().isConstant(expr, cc.lang())) {
+            Object o = cc.lang().constantValue(expr, cc.lang());
 
             if (o instanceof Number && !(o instanceof Long)
                     && !(o instanceof Float) && !(o instanceof Double)) {
@@ -181,7 +179,6 @@ public class Case_c extends Stmt_c implements Case {
         }
     }
 
-    /** Write the statement to an output file. */
     @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
         if (expr == null) {

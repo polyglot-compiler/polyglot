@@ -42,6 +42,7 @@ import polyglot.ast.ConstructorDecl;
 import polyglot.ast.Expr;
 import polyglot.ast.Field;
 import polyglot.ast.Formal;
+import polyglot.ast.Lang;
 import polyglot.ast.Local;
 import polyglot.ast.LocalClassDecl;
 import polyglot.ast.New;
@@ -106,13 +107,13 @@ public class LocalClassRemover extends ContextVisitor {
             for (int i = 0; i < ss.size(); i++) {
                 Stmt s = ss.get(i);
                 if (s instanceof LocalClassDecl) {
-                    s = (Stmt) n.visitChild(s, this);
+                    s = n.visitChild(s, this);
 
                     LocalClassDecl lcd = (LocalClassDecl) s;
                     ClassDecl cd = lcd.decl();
                     Flags flags =
-                            context.inStaticContext() ? Flags.PUBLIC.Static()
-                                    : Flags.PUBLIC;
+                            context.inStaticContext()
+                                    ? Flags.PUBLIC.Static() : Flags.PUBLIC;
                     cd = cd.flags(flags);
                     cd.type().flags(flags);
                     cd.type().kind(ClassType.MEMBER);
@@ -150,7 +151,7 @@ public class LocalClassRemover extends ContextVisitor {
                     i--;
                 }
                 else {
-                    s = (Stmt) n.visitChild(s, this);
+                    s = n.visitChild(s, this);
                     ss.set(i, s);
                 }
             }
@@ -236,8 +237,8 @@ public class LocalClassRemover extends ContextVisitor {
             type.package_(context.package_());
 
             Flags flags =
-                    context.inStaticContext() ? Flags.PUBLIC.Static()
-                            : Flags.PUBLIC;
+                    context.inStaticContext()
+                            ? Flags.PUBLIC.Static() : Flags.PUBLIC;
             type.flags(flags);
 
             cd = cd.type(type);
@@ -343,7 +344,7 @@ public class LocalClassRemover extends ContextVisitor {
 
     Node rewriteConstructorCalls(Node s, final ClassType ct,
             final List<FieldInstance> fields) {
-        Node r = s.visit(new ConstructorCallRewriter(fields, ct));
+        Node r = s.visit(new ConstructorCallRewriter(lang(), fields, ct));
         return r;
     }
 
@@ -542,8 +543,9 @@ public class LocalClassRemover extends ContextVisitor {
         private final ClassType theLocalClass;
         ParsedClassType curr;
 
-        protected ConstructorCallRewriter(List<FieldInstance> fields,
-                ClassType ct) {
+        protected ConstructorCallRewriter(Lang lang,
+                List<FieldInstance> fields, ClassType ct) {
+            super(lang);
             this.newFields = fields;
             this.theLocalClass = ct;
         }
@@ -567,11 +569,11 @@ public class LocalClassRemover extends ContextVisitor {
                         (ConstructorInstance) ci.declaration();
                 if (nci.container().toClass().declaration() == theLocalClass.declaration()) {
                     neu =
-                            (New) neu.arguments(addArgs(neu,
-                                                        nci,
-                                                        newFields,
-                                                        curr,
-                                                        theLocalClass));
+                            neu.arguments(addArgs(neu,
+                                                  nci,
+                                                  newFields,
+                                                  curr,
+                                                  theLocalClass));
                     if (!theLocalClass.flags().isStatic()) {
                         Expr q;
                         if (theLocalClass.outer() == context.currentClass())

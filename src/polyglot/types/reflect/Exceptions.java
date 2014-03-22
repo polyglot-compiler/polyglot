@@ -44,13 +44,13 @@ public class Exceptions extends Attribute {
     private ClassFile clazz;
 
     /**
-     * Constructor for create an <code>Exceptions</code> from scratch.
+     * Constructor for create an {@code Exceptions} from scratch.
      *
      * @param nameIndex
      *        The index of the UTF8 string "Exceptions" in the class's
      *        constant pool
      * @param exceptions
-     *        A non-<code>null</code> array of indices into the constant
+     *        A non-{@code null} array of indices into the constant
      *        pool for the types of the exceptions
      */
     public Exceptions(ClassFile clazz, int nameIndex, int[] exceptions) {

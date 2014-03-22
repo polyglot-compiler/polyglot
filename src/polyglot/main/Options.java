@@ -99,6 +99,7 @@ public class Options {
     public boolean output_stdout; // whether to output to stdout
 
     public String post_compiler;
+    public String post_compiler_opts;
 
     public int output_width;
     public boolean fully_qualified_names;
@@ -340,9 +341,19 @@ public class Options {
                               "set the maximum width of the .java output files",
                               80));
 
-        flags.add(new OptFlag<String>("-post",
+        flags.add(new OptFlag<String>("-postcompiler",
                                       "<compiler>",
                                       "run javac-like compiler after translation") {
+            @Override
+            public Arg<String> handle(String[] args, int index)
+                    throws UsageError {
+                return createArg(index + 1, args[index]);
+            }
+        });
+
+        flags.add(new OptFlag<String>("-postopts",
+                                      "<options>",
+                                      "options to pass to the compiler after translation") {
             @Override
             public Arg<String> handle(String[] args, int index)
                     throws UsageError {
@@ -525,7 +536,7 @@ public class Options {
 
     /**
      * Iterates over arguments parsed from the command line and applies them to
-     * this object. Any source arguments are added to <code>source</code>.
+     * this object. Any source arguments are added to {@code source}.
      * 
      * @param source
      *          The set of source filenames provided on the command line.
@@ -562,7 +573,7 @@ public class Options {
 
     /**
      * Iterates over arguments parsed from the command line and applies them to
-     * this object. Any source arguments are added to <code>source</code>.
+     * this object. Any source arguments are added to {@code source}.
      * 
      * @param source
      *          The set of source filenames provided on the command line.
@@ -604,7 +615,7 @@ public class Options {
     }
 
     /**
-     * Process the option specified by <code>arg</code>
+     * Process the option specified by {@code arg}
      */
     protected void handleArg(Arg<?> arg) throws UsageError {
         assert (arg.flag != null);
@@ -665,8 +676,12 @@ public class Options {
             setOutputWidth((Integer) arg.value());
 
         }
-        else if (arg.flag().ids().contains("-post")) {
+        else if (arg.flag().ids().contains("-postcompiler")) {
             setPostCompiler((String) arg.value());
+
+        }
+        else if (arg.flag().ids().contains("-postopts")) {
+            setPostCompilerOpts((String) arg.value());
 
         }
         else if (arg.flag().ids().contains("-stdout")) {
@@ -802,6 +817,10 @@ public class Options {
 
     protected void setPostCompiler(String value) {
         post_compiler = value;
+    }
+
+    protected void setPostCompilerOpts(String value) {
+        post_compiler_opts = value;
     }
 
     protected void setOutputStdOut(boolean value) {
@@ -944,17 +963,17 @@ public class Options {
 
     /**
      * The maximum width of a line when printing usage information. Used by
-     * <code>usageForFlag</code> and <code>usageSubsection</code>.
+     * {@code usageForFlag} and {@code usageSubsection}.
      */
     protected int USAGE_SCREEN_WIDTH = 76;
     /**
      * The number of spaces from the left that the descriptions for flags will
-     * be displayed. Used by <code>usageForFlag</code>.
+     * be displayed. Used by {@code usageForFlag}.
      */
     protected int USAGE_FLAG_WIDTH = 27;
     /**
      * The number of spaces to indent a subsection of usage information. Used by
-     * <code>usageSubsection</code>.
+     * {@code usageSubsection}.
      */
     protected int USAGE_SUBSECTION_INDENT = 8;
 
@@ -1021,7 +1040,7 @@ public class Options {
     /**
      * Output a section of text for usage information. This text will be
      * displayed indented a certain amount from the left, controlled by the
-     * field <code>USAGE_SUBSECTION_INDENT</code>
+     * field {@code USAGE_SUBSECTION_INDENT}
      * 
      * @param out
      *            the output PrintStream

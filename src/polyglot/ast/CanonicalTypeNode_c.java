@@ -27,6 +27,7 @@
 package polyglot.ast;
 
 import polyglot.frontend.ExtensionInfo;
+import polyglot.translate.ExtensionRewriter;
 import polyglot.types.ClassType;
 import polyglot.types.SemanticException;
 import polyglot.types.Type;
@@ -39,14 +40,19 @@ import polyglot.visit.Translator;
 import polyglot.visit.TypeChecker;
 
 /**
- * A <code>CanonicalTypeNode</code> is a type node for a canonical type.
+ * A {@code CanonicalTypeNode} is a type node for a canonical type.
  */
 public class CanonicalTypeNode_c extends TypeNode_c implements
         CanonicalTypeNode {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
+    @Deprecated
     public CanonicalTypeNode_c(Position pos, Type type) {
-        super(pos);
+        this(pos, type, null);
+    }
+
+    public CanonicalTypeNode_c(Position pos, Type type, Ext ext) {
+        super(pos, ext);
         assert (type != null);
         this.type = type;
     }
@@ -71,6 +77,11 @@ public class CanonicalTypeNode_c extends TypeNode_c implements
     }
 
     @Override
+    public Node extRewrite(ExtensionRewriter rw) throws SemanticException {
+        return rw.typeToJava(type(), position());
+    }
+
+    @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
         if (type == null) {
             w.write("<unknown-type>");
@@ -83,7 +94,7 @@ public class CanonicalTypeNode_c extends TypeNode_c implements
     /**
      * Translate the type.
      * If the "use-fully-qualified-class-names" options is used, then the
-     * fully qualified names is written out (<code>java.lang.Object</code>).
+     * fully qualified names is written out ({@code java.lang.Object}).
      * Otherwise, the string that originally represented the type in the
      * source file is used.
      */
@@ -116,7 +127,10 @@ public class CanonicalTypeNode_c extends TypeNode_c implements
 
     @Override
     public Node copy(ExtensionInfo extInfo) throws SemanticException {
-        TypeNode tn = (TypeNode) this.del().copy(extInfo.nodeFactory());
+        TypeNode tn =
+                (TypeNode) extInfo.nodeFactory()
+                                  .lang()
+                                  .copy(this, extInfo.nodeFactory());
         Type t = tn.type();
         if (t != null) {
             // try to copy over type information

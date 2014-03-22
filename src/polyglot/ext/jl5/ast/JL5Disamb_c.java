@@ -30,12 +30,15 @@ import java.util.LinkedList;
 import polyglot.ast.Disamb_c;
 import polyglot.ast.Expr;
 import polyglot.ast.Node;
+import polyglot.ast.PackageNode;
 import polyglot.ast.Receiver;
 import polyglot.ast.TypeNode;
 import polyglot.ext.jl5.types.JL5Context;
 import polyglot.ext.jl5.types.JL5NoMemberException;
+import polyglot.ext.jl5.types.JL5ParsedClassType;
 import polyglot.ext.jl5.types.JL5SubstClassType;
 import polyglot.ext.jl5.types.JL5TypeSystem;
+import polyglot.ext.jl5.types.RawClass;
 import polyglot.ext.jl5.types.TypeVariable;
 import polyglot.types.ClassType;
 import polyglot.types.FieldInstance;
@@ -43,6 +46,7 @@ import polyglot.types.LocalInstance;
 import polyglot.types.Named;
 import polyglot.types.NoClassException;
 import polyglot.types.NoMemberException;
+import polyglot.types.Qualifier;
 import polyglot.types.ReferenceType;
 import polyglot.types.Resolver;
 import polyglot.types.SemanticException;
@@ -51,6 +55,38 @@ import polyglot.types.VarInstance;
 import polyglot.util.InternalCompilerError;
 
 public class JL5Disamb_c extends Disamb_c {
+    @Override
+    protected Node disambiguatePackagePrefix(PackageNode pn)
+            throws SemanticException {
+        Resolver pc = ts.packageContextResolver(pn.package_());
+
+        Named n;
+
+        try {
+            n = pc.find(name.id());
+        }
+        catch (SemanticException e) {
+            return null;
+        }
+
+        Qualifier q = null;
+
+        if (n instanceof Qualifier) {
+            q = (Qualifier) n;
+        }
+        else {
+            return null;
+        }
+
+        if (q.isPackage() && packageOK()) {
+            return nf.PackageNode(pos, q.toPackage());
+        }
+        else if (q.isType() && typeOK()) {
+            return nf.CanonicalTypeNode(pos, makeRawIfNeeded(q.toType()));
+        }
+
+        return null;
+    }
 
     @Override
     protected Node disambiguateTypeNodePrefix(TypeNode tn)
@@ -114,7 +150,7 @@ public class JL5Disamb_c extends Disamb_c {
                     }
                 }
 
-                return nf.CanonicalTypeNode(pos, type);
+                return nf.CanonicalTypeNode(pos, makeRawIfNeeded(type));
             }
         }
         return null;
@@ -173,7 +209,7 @@ public class JL5Disamb_c extends Disamb_c {
                                                                                       type.toClass());
                     }
 
-                    return nf.CanonicalTypeNode(pos, type);
+                    return nf.CanonicalTypeNode(pos, makeRawIfNeeded(type));
                 }
             }
             catch (NoClassException e) {
@@ -203,4 +239,35 @@ public class JL5Disamb_c extends Disamb_c {
         return null;
     }
 
+    /**
+     * This method takes a type, and, if that type 
+     * is a class with type parameters, then
+     * make it a raw class. Also, if the type is a 
+     * class with no type variables, but is an inner
+     * class of a raw class, then the class should 
+     * be a raw class (i.e., the erasure of the type).
+     */
+    protected Type makeRawIfNeeded(Type type) {
+        if (type.isClass()) {
+            JL5TypeSystem ts = (JL5TypeSystem) type.typeSystem();
+            if (type instanceof JL5ParsedClassType
+                    && !((JL5ParsedClassType) type).typeVariables().isEmpty()) {
+                // needs to be a raw type
+                return ts.rawClass((JL5ParsedClassType) type, pos);
+            }
+            if (type.toClass().isInnerClass()) {
+                ClassType t = type.toClass();
+                ClassType outer = type.toClass().outer();
+                while (t.isInnerClass() && outer != null) {
+                    if (outer instanceof RawClass) {
+                        // an inner class of a raw class should be a raw class.
+                        return ts.erasureType(type);
+                    }
+                    t = outer;
+                    outer = outer.outer();
+                }
+            }
+        }
+        return type;
+    }
 }

@@ -27,7 +27,6 @@
 package polyglot.ast;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -38,6 +37,7 @@ import polyglot.types.Type;
 import polyglot.types.TypeSystem;
 import polyglot.util.CodeWriter;
 import polyglot.util.CollectionUtil;
+import polyglot.util.Copy;
 import polyglot.util.ListUtil;
 import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
@@ -50,8 +50,8 @@ import polyglot.visit.PrettyPrinter;
 import polyglot.visit.TypeChecker;
 
 /**
- * A <code>Switch</code> is an immutable representation of a Java
- * <code>switch</code> statement.  Such a statement has an expression which
+ * A {@code Switch} is an immutable representation of a Java
+ * {@code switch} statement.  Such a statement has an expression which
  * is evaluated to determine where to branch to, an a list of labels
  * and block statements which are conditionally evaluated.  One of the
  * labels, rather than having a constant expression, may be labelled
@@ -63,52 +63,66 @@ public class Switch_c extends Stmt_c implements Switch {
     protected Expr expr;
     protected List<SwitchElement> elements;
 
+    @Deprecated
     public Switch_c(Position pos, Expr expr, List<SwitchElement> elements) {
-        super(pos);
+        this(pos, expr, elements, null);
+    }
+
+    public Switch_c(Position pos, Expr expr, List<SwitchElement> elements,
+            Ext ext) {
+        super(pos, ext);
         assert (expr != null && elements != null);
         this.expr = expr;
         this.elements = ListUtil.copy(elements, true);
     }
 
-    /** Get the expression to switch on. */
     @Override
     public Expr expr() {
         return this.expr;
     }
 
-    /** Set the expression to switch on. */
     @Override
     public Switch expr(Expr expr) {
-        Switch_c n = (Switch_c) copy();
+        return expr(this, expr);
+    }
+
+    protected <N extends Switch_c> N expr(N n, Expr expr) {
+        if (n.expr == expr) return n;
+        if (n == this) n = Copy.Util.copy(n);
         n.expr = expr;
         return n;
     }
 
-    /** Get the switch elements of the statement. */
     @Override
     public List<SwitchElement> elements() {
-        return Collections.unmodifiableList(this.elements);
+        return this.elements;
     }
 
-    /** Set the switch elements of the statement. */
     @Override
     public Switch elements(List<SwitchElement> elements) {
-        Switch_c n = (Switch_c) copy();
+        return elements(this, elements);
+    }
+
+    protected <N extends Switch_c> N elements(N n, List<SwitchElement> elements) {
+        if (CollectionUtil.equals(n.elements, elements)) return n;
+        if (n == this) n = Copy.Util.copy(n);
         n.elements = ListUtil.copy(elements, true);
         return n;
     }
 
     /** Reconstruct the statement. */
-    protected Switch_c reconstruct(Expr expr, List<SwitchElement> elements) {
-        if (expr != this.expr
-                || !CollectionUtil.equals(elements, this.elements)) {
-            Switch_c n = (Switch_c) copy();
-            n.expr = expr;
-            n.elements = ListUtil.copy(elements, true);
-            return n;
-        }
+    protected <N extends Switch_c> N reconstruct(N n, Expr expr,
+            List<SwitchElement> elements) {
+        n = expr(n, expr);
+        n = elements(n, elements);
+        return n;
+    }
 
-        return this;
+    @Override
+    public Node visitChildren(NodeVisitor v) {
+        Expr expr = visitChild(this.expr, v);
+        List<SwitchElement> elements = visitList(this.elements, v);
+        return reconstruct(this, expr, elements);
     }
 
     @Override
@@ -116,15 +130,6 @@ public class Switch_c extends Stmt_c implements Switch {
         return c.pushBlock();
     }
 
-    /** Visit the children of the statement. */
-    @Override
-    public Node visitChildren(NodeVisitor v) {
-        Expr expr = (Expr) visitChild(this.expr, v);
-        List<SwitchElement> elements = visitList(this.elements, v);
-        return reconstruct(expr, elements);
-    }
-
-    /** Type check the statement. */
     @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
         TypeSystem ts = tc.typeSystem();
@@ -145,6 +150,7 @@ public class Switch_c extends Stmt_c implements Switch {
         for (SwitchElement s : elements) {
             if (s instanceof Case) {
                 Case c = (Case) s;
+                Expr expr = c.expr();
                 Object key;
                 String str;
 
@@ -152,13 +158,13 @@ public class Switch_c extends Stmt_c implements Switch {
                     key = "default";
                     str = "default";
                 }
-                else if (!c.expr().constantValueSet()) {
+                else if (!cc.lang().constantValueSet(expr, cc.lang())) {
                     // Constant not known yet; we'll try again later.
                     return this;
                 }
-                else if (c.expr().isConstant()) {
+                else if (cc.lang().isConstant(expr, cc.lang())) {
                     key = new Long(c.value());
-                    str = c.expr().toString() + " (" + c.value() + ")";
+                    str = expr.toString() + " (" + c.value() + ")";
                 }
                 else {
                     continue;
@@ -192,7 +198,6 @@ public class Switch_c extends Stmt_c implements Switch {
         return "switch (" + expr + ") { ... }";
     }
 
-    /** Write the statement to an output file. */
     @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
         w.write("switch (");

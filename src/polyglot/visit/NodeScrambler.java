@@ -37,6 +37,7 @@ import polyglot.ast.ClassMember;
 import polyglot.ast.Expr;
 import polyglot.ast.Formal;
 import polyglot.ast.Import;
+import polyglot.ast.JLang;
 import polyglot.ast.LocalDecl;
 import polyglot.ast.Node;
 import polyglot.ast.SourceFile;
@@ -46,9 +47,9 @@ import polyglot.frontend.Compiler;
 import polyglot.util.CodeWriter;
 
 /**
- * The <code>NodeScrambler</code> is test case generator of sorts. Since it
- * is ofter useful to introduce ``random'' errors into source code, this
- * class provides a way of doing so in a semi-structed manner. The process
+ * The {@code NodeScrambler} is test case generator of sorts. Since it
+ * is often useful to introduce ``random'' errors into source code, this
+ * class provides a way of doing so in a semi-structured manner. The process
  * takes place in two phases. First, a "FirstPass" is made to collect 
  * a list of nodes and their parents. Then a second pass is made to randomly 
  * replace a branch of the tree with another suitable branch. 
@@ -64,16 +65,17 @@ public class NodeScrambler extends NodeVisitor {
     protected boolean scrambled = false;
     protected CodeWriter cw;
 
-    public NodeScrambler() {
-        this(new Random().nextLong());
+    public NodeScrambler(JLang lang) {
+        this(lang, new Random().nextLong());
     }
 
     /**
-     * Create a new <code>NodeScrambler</code> with the given random number
+     * Create a new {@code NodeScrambler} with the given random number
      * generator seed.
      */
-    public NodeScrambler(long seed) {
-        this.fp = new FirstPass();
+    public NodeScrambler(JLang lang, long seed) {
+        super(lang);
+        this.fp = new FirstPass(lang);
 
         this.pairs = new HashMap<Node, LinkedList<Node>>();
         this.nodes = new LinkedList<Node>();
@@ -85,15 +87,18 @@ public class NodeScrambler extends NodeVisitor {
     }
 
     /**
-     * Scans throught the AST, create a list of all nodes present, along with
+     * Scans through the AST, create a list of all nodes present, along with
      * the set of parents for each node in the tree. <b>This visitor should be
-     * run before the main <code>NodeScrambler</code> visits the tree.</b>
+     * run before the main {@code NodeScrambler} visits the tree.</b>
      */
     public class FirstPass extends NodeVisitor {
+        public FirstPass(JLang lang) {
+            super(lang);
+        }
+
         @Override
         public NodeVisitor enter(Node n) {
-            @SuppressWarnings("unchecked")
-            LinkedList<Node> clone = (LinkedList<Node>) currentParents.clone();
+            LinkedList<Node> clone = new LinkedList<Node>(currentParents);
             pairs.put(n, clone);
             nodes.add(n);
 
@@ -125,9 +130,9 @@ public class NodeScrambler extends NodeVisitor {
 
                 try {
                     System.err.println("Replacing:");
-                    n.del().dump(System.err);
+                    lang().dump(n, lang(), System.err);
                     System.err.println("With:");
-                    m.del().dump(System.err);
+                    lang().dump(n, lang(), System.err);
                 }
                 catch (Exception e) {
                     e.printStackTrace();

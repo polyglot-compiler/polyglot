@@ -29,26 +29,32 @@ package polyglot.types;
 import java.util.List;
 
 /**
- * A <code>ProcedureInstance</code> contains the type information for a Java
+ * A {@code ProcedureInstance} contains the type information for a Java
  * procedure (either a method or a constructor).
  */
 public interface ProcedureInstance extends CodeInstance {
     /**
      * List of formal parameter types.
-     * @return A list of <code>Type</code>.
+     * @return A list of {@code Type}.
      * @see polyglot.types.Type
      */
     List<? extends Type> formalTypes();
 
+    /**
+     * @param formalTypes The formalTypes to set.
+     */
     void setFormalTypes(List<? extends Type> l);
 
     /**
      * List of declared exception types thrown.
-     * @return A list of <code>Type</code>.
+     * @return A list of {@code Type}.
      * @see polyglot.types.Type
      */
     List<? extends Type> throwTypes();
 
+    /**
+     * @param throwTypes The throwTypes to set.
+     */
     void setThrowTypes(List<? extends Type> l);
 
     /**
@@ -64,46 +70,46 @@ public interface ProcedureInstance extends CodeInstance {
     String designator();
 
     /**
-     * Return true if <code>this</code> is more specific than <code>pi</code>
+     * Return true if {@code this} is more specific than {@code pi}
      * in terms of method overloading.
      */
     boolean moreSpecific(ProcedureInstance pi);
 
     /**
-     * Returns true if the procedure has the given arguments.
+     * Returns true if the procedure has the given formal parameter types.
      */
     boolean hasFormals(List<? extends Type> arguments);
 
     /**
      * Returns true if the procedure throws a subset of the exceptions
-     * thrown by <code>pi</code>.
+     * thrown by {@code pi}.
      */
     boolean throwsSubset(ProcedureInstance pi);
 
     /**
-     * Returns true if the procedure can be called with the given arguments.
+     * Returns true if the procedure can be called with the given argument types.
      */
     boolean callValid(List<? extends Type> actualTypes);
 
     /**
-     * Return true if <code>this</code> is more specific than <code>pi</code>
+     * Return true if {@code this} is more specific than {@code pi}
      * in terms of method overloading.
      */
     boolean moreSpecificImpl(ProcedureInstance pi);
 
     /**
-     * Returns true if the procedure has the given arguments.
+     * Returns true if the procedure has the given formal parameter types.
      */
     boolean hasFormalsImpl(List<? extends Type> arguments);
 
     /**
      * Returns true if the procedure throws a subset of the exceptions
-     * thrown by <code>pi</code>.
+     * thrown by {@code pi}.
      */
     boolean throwsSubsetImpl(ProcedureInstance pi);
 
     /**
-     * Returns true if the procedure can be called with the given arguments.
+     * Returns true if the procedure can be called with the given argument types.
      */
     boolean callValidImpl(List<? extends Type> actualTypes);
 }

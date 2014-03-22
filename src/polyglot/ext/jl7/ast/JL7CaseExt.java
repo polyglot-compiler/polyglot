@@ -28,6 +28,7 @@ package polyglot.ext.jl7.ast;
 import polyglot.ast.Case;
 import polyglot.ast.Expr;
 import polyglot.ast.Node;
+import polyglot.ext.jl5.ast.J5Lang_c;
 import polyglot.ext.jl5.ast.JL5CaseOps;
 import polyglot.ext.jl5.types.JL5TypeSystem;
 import polyglot.types.SemanticException;
@@ -37,9 +38,10 @@ import polyglot.util.SerialVersionUID;
 import polyglot.visit.ConstantChecker;
 import polyglot.visit.TypeChecker;
 
-public class JL7CaseExt extends JL7Ext {
+public class JL7CaseExt extends JL7Ext implements JL5CaseOps {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
+    @Override
     public Node resolveCaseLabel(TypeChecker tc, Type switchType)
             throws SemanticException {
         JL5TypeSystem ts = (JL5TypeSystem) tc.typeSystem();
@@ -49,9 +51,10 @@ public class JL7CaseExt extends JL7Ext {
         if (switchType.isClass() && ts.String().equals(switchType)) {
             return c;
         }
-        return ((JL5CaseOps) this.superDel()).resolveCaseLabel(tc, switchType);
+        return J5Lang_c.lang(pred()).resolveCaseLabel(c, tc, switchType);
     }
 
+    @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
         Case c = (Case) this.node();
         TypeSystem ts = tc.typeSystem();
@@ -60,19 +63,21 @@ public class JL7CaseExt extends JL7Ext {
             return c;
         }
 
-        return this.superDel().typeCheck(tc);
+        return superLang().typeCheck(this.node(), tc);
     }
 
+    @Override
     public Node checkConstants(ConstantChecker cc) throws SemanticException {
         Case c = (Case) this.node();
         Expr expr = c.expr();
 
-        if (expr.constantValueSet() && expr.isConstant()
-                && expr.constantValue() instanceof String) {
+        if (cc.lang().constantValueSet(expr, cc.lang())
+                && cc.lang().isConstant(expr, cc.lang())
+                && cc.lang().constantValue(expr, cc.lang()) instanceof String) {
             return c; // OK, it's a string.
         }
 
-        return superDel().checkConstants(cc);
+        return superLang().checkConstants(this.node(), cc);
 
     }
 }

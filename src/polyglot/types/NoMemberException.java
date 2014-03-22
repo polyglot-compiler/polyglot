@@ -31,7 +31,7 @@ import polyglot.util.SerialVersionUID;
 
 /**
  * Signals an error in the class resolver system. This exception is thrown
- * when a <code>ClassResolver</code> is unable to resolve a given class name.
+ * when a {@code ClassResolver} is unable to resolve a given class name.
  */
 public class NoMemberException extends SemanticException {
     private static final long serialVersionUID = SerialVersionUID.generate();

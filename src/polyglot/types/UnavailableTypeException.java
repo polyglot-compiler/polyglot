@@ -32,7 +32,7 @@ import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
 
 /**
- * An <code>UnavailableTypeException</code> is an exception thrown when a type
+ * An {@code UnavailableTypeException} is an exception thrown when a type
  * object is not in a required state to continue a pass.
  * 
  * @author nystrom

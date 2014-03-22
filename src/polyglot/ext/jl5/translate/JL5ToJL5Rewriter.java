@@ -37,7 +37,7 @@ public class JL5ToJL5Rewriter extends ExtensionRewriter {
             List<TypeNode> bounds = new ArrayList<TypeNode>(ct.bounds().size());
             for (ReferenceType rt : ct.bounds())
                 bounds.add(typeToJava(rt, pos));
-            return to_nf.ParamTypeNode(pos, bounds, to_nf.Id(pos, ct.name()));
+            return to_nf.ParamTypeNode(pos, to_nf.Id(pos, ct.name()), bounds);
 
         }
         else if (t instanceof LubType) {

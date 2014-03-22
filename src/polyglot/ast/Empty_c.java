@@ -35,16 +35,20 @@ import polyglot.visit.CFGBuilder;
 import polyglot.visit.PrettyPrinter;
 
 /**
- * <code>Empty</code> is the class for a empty statement <code>(;)</code>.
+ * {@code Empty} is the class for a empty statement {@code (;)}.
  */
 public class Empty_c extends Stmt_c implements Empty {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
+    @Deprecated
     public Empty_c(Position pos) {
-        super(pos);
+        this(pos, null);
     }
 
-    /** Write the statement to an output file. */
+    public Empty_c(Position pos, Ext ext) {
+        super(pos, ext);
+    }
+
     @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
         w.write(";");

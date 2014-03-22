@@ -66,13 +66,7 @@
         <!-- the java classpath -->
         <pathelement path="${java.class.path}" />
 
-        <!-- polyglot classes, assuming a cvs checkout -->
-        <pathelement path="${polyglot.dir}/classes" />
-        <fileset dir="${polyglot.dir}/lib">
-          <include name="*.jar"/>
-        </fileset>
-
-        <!-- jar files in the lib directory -->
+        <!-- jar files in the lib directory, excluding generated jars -->
         <fileset dir="${lib.dir}">
             <include name="*.jar" />
             <exclude name="${package}.jar" />
@@ -145,7 +139,7 @@
         <available classname="java_cup.Main"
 	           classpathref="standard.classpath"
 	           property="cp_existence.java_cup"/>
-        <available classname="JFlex.Main"
+        <available classname="jflex.Main"
 	           classpathref="standard.classpath"
 	           property="cp_existence.jflex"/>
 
@@ -154,7 +148,7 @@
         <fail unless="cp_existence.java_cup"
 	      message="The java_cup classes must be on the classpath. Try adding java_cup.jar to the classpath."/>
         <fail unless="cp_existence.jflex"
-	      message="The JFlex classes must be on the classpath. Try adding JFlex.jar to the classpath."/>
+	      message="The jflex classes must be on the classpath. Try adding jflex.jar to the classpath."/>
     </target>
 
     <target name="executables">
@@ -295,13 +289,15 @@ sh ${compiler.sh} %CMD_LINE_ARGS%
        @param parser.class  The name to be passed to CUP with -parser.
        @param symbol.class  The name to be passed to CUP with -symbols.
    -->
-    <target name="ppg-parser" depends="ppg-parser-deps" unless="ppg.parser.up-to-date">
-        <java classname="ppg.PPG" fork="true" dir="${parser.dir}" output="${parser.dir}/${cup.file}" failonerror="true">
-            <classpath refid="standard.classpath" />
-            <arg value="${ppg.file}" />
-        </java>
-        <antcall target="cup-parser" />
-    </target>
+	<target name="ppg-parser" depends="ppg-parser-deps" unless="ppg-parser.up-to-date">
+		<java classname="ppg.PPG" fork="true" failonerror="true">
+			<classpath refid="standard.classpath" />
+			<arg value="${parser.dir}/${ppg.file}" />
+			<arg value="-o" />
+			<arg value="${parser.dir}/${cup.file}" />
+		</java>
+		<antcall target="cup-parser" />
+	</target>
 
     <!-- Set the property ppg.parser.up-to-date if the parser is in fact
        up to date.  Called by the ppg-parser target.
@@ -340,20 +336,13 @@ sh ${compiler.sh} %CMD_LINE_ARGS%
     <target name="cup-parser-using-jar" depends="cup-parser-deps" unless="cup.parser.up-to-date">
         <java classname="java_cup.Main" fork="true" dir="${parser.dir}" failonerror="true">
             <classpath refid="standard.classpath" />
+			<arg value="-nopositions" />
             <arg value="-parser"/>
             <arg value="${parser.class}"/>
             <arg value="-symbols"/>
             <arg value="${symbol.class}"/>
             <arg value="${cup.file}"/>
         </java>
-	<!-- Hack to suppress warnings in parser. -->
-	<replaceregexp
-	  file="${parser.dir}/${parser.class}.java"
-	  match="^(public )?class"
-	  replace="@SuppressWarnings(&quot;all&quot;) \1class"
-	  flags="g"
-	  byline="yes"
-	/>
     </target>
 
     <!-- Set the property cup.parser.up-to-date if the parser is in fact
@@ -383,8 +372,9 @@ sh ${compiler.sh} %CMD_LINE_ARGS%
        @param jflex.file    The name of the JFlex file.
    -->
     <target name="jflex-lexer" depends="jflex-lexer-deps" unless="jflex.lexer.up-to-date">
-        <java classname="JFlex.Main" fork="true" dir="${lexer.dir}" failonerror="true">
+        <java classname="jflex.Main" fork="true" dir="${lexer.dir}" failonerror="true">
             <classpath refid="standard.classpath" />
+			<arg value="--noinputstreamctor" />
             <arg value="${jflex.file}" />
         </java>
     </target>

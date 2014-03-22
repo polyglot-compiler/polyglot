@@ -28,6 +28,7 @@ import polyglot.util.CodeWriter;
 import polyglot.util.CollectionUtil;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
+import polyglot.util.SerialVersionUID;
 import polyglot.util.Transformation;
 import polyglot.visit.AmbiguityRemover;
 import polyglot.visit.NodeVisitor;
@@ -46,6 +47,8 @@ import coffer.types.ThrowConstraint;
  */
 public class CofferConstructorDecl_c extends ConstructorDecl_c implements
         CofferConstructorDecl {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     protected KeySetNode entryKeys;
     protected KeySetNode returnKeys;
     protected List<ThrowConstraintNode> throwConstraints;
@@ -141,36 +144,32 @@ public class CofferConstructorDecl_c extends ConstructorDecl_c implements
     protected CofferConstructorDecl_c reconstruct(Id name,
             List<Formal> formals, KeySetNode entryKeys, KeySetNode returnKeys,
             List<ThrowConstraintNode> throwConstraints, Block body) {
+        CofferConstructorDecl_c n = this;
         if (entryKeys != this.entryKeys
                 || returnKeys != this.returnKeys
                 || !CollectionUtil.equals(throwConstraints,
                                           this.throwConstraints)) {
-            CofferConstructorDecl_c n = (CofferConstructorDecl_c) copy();
+            n = (CofferConstructorDecl_c) copy();
             n.entryKeys = entryKeys;
             n.returnKeys = returnKeys;
             n.throwConstraints =
                     new ArrayList<ThrowConstraintNode>(throwConstraints);
-            return (CofferConstructorDecl_c) n.reconstruct(name,
-                                                           formals,
-                                                           Collections.<TypeNode> emptyList(),
-                                                           body);
         }
-
-        return (CofferConstructorDecl_c) super.reconstruct(name,
-                                                           formals,
-                                                           Collections.<TypeNode> emptyList(),
-                                                           body);
+        return (CofferConstructorDecl_c) reconstruct(n, name,
+                                                     formals,
+                                                     Collections.<TypeNode> emptyList(),
+                                                     body);
     }
 
     @Override
     public Node visitChildren(NodeVisitor v) {
-        Id name = (Id) visitChild(this.name, v);
+        Id name = visitChild(this.name, v);
         List<Formal> formals = visitList(this.formals, v);
-        KeySetNode entryKeys = (KeySetNode) visitChild(this.entryKeys, v);
-        KeySetNode returnKeys = (KeySetNode) visitChild(this.returnKeys, v);
+        KeySetNode entryKeys = visitChild(this.entryKeys, v);
+        KeySetNode returnKeys = visitChild(this.returnKeys, v);
         List<ThrowConstraintNode> throwConstraints =
                 visitList(this.throwConstraints, v);
-        Block body = (Block) visitChild(this.body, v);
+        Block body = visitChild(this.body, v);
         return reconstruct(name,
                            formals,
                            entryKeys,

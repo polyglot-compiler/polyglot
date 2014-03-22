@@ -27,7 +27,7 @@
 package polyglot.types;
 
 /**
- * A <code>NullType</code> represents the type of the Java <code>null</code>
+ * A {@code NullType} represents the type of the Java {@code null}
  * literal.
  */
 public interface NullType extends Type {

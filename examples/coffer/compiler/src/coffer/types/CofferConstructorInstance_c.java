@@ -20,12 +20,15 @@ import polyglot.types.Type;
 import polyglot.util.CachingTransformingList;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
+import polyglot.util.SerialVersionUID;
 import polyglot.util.Transformation;
 
 /** An implementation of the <code>CofferConstructorInstance</code> interface. 
  */
 public class CofferConstructorInstance_c extends ConstructorInstance_c
         implements CofferConstructorInstance {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     protected KeySet entryKeys;
     protected KeySet returnKeys;
     protected List<ThrowConstraint> throwConstraints;

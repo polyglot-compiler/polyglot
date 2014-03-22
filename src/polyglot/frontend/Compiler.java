@@ -79,7 +79,7 @@ public class Compiler {
     /**
      * Initialize the compiler.
      *
-     * @param extensionInfo the <code>ExtensionInfo</code> this compiler is for.
+     * @param extensionInfo the {@code ExtensionInfo} this compiler is for.
      */
     public Compiler(ExtensionInfo extensionInfo) {
         this(extensionInfo,
@@ -91,7 +91,7 @@ public class Compiler {
     /**
      * Initialize the compiler.
      *
-     * @param extensionInfo the <code>ExtensionInfo</code> this compiler is for.
+     * @param extensionInfo the {@code ExtensionInfo} this compiler is for.
      */
     public Compiler(ExtensionInfo extensionInfo, ErrorQueue eq) {
         this.extensionInfo = extensionInfo;
@@ -110,8 +110,8 @@ public class Compiler {
     }
 
     /**
-     * Compile all the files listed in the set of strings <code>source</code>.
-     * Return true on success. The method <code>outputFiles</code> can be
+     * Compile all the files listed in the set of strings {@code source}.
+     * Return true on success. The method {@code outputFiles} can be
      * used to obtain the output of the compilation.  This is the main entry
      * point for the compiler, called from main().
      */
@@ -173,8 +173,8 @@ public class Compiler {
     }
 
     /**
-     * Compile all the files listed in the set of Sources <code>source</code>.
-     * Return true on success. The method <code>outputFiles</code> can be
+     * Compile all the files listed in the set of Sources {@code source}.
+     * Return true on success. The method {@code outputFiles} can be
      * used to obtain the output of the compilation.  This is the main entry
      * point for the compiler, called from main().
      */

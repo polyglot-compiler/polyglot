@@ -120,8 +120,8 @@ public class InferenceSolver_c implements InferenceSolver {
         Comparator<Constraint> comp = new Comparator<Constraint>() {
             @Override
             public int compare(Constraint o1, Constraint o2) {
-                return typeVariablesToSolve().indexOf(o1)
-                        - typeVariablesToSolve().indexOf(o2);
+                return typeVariablesToSolve().indexOf(o1.formal)
+                        - typeVariablesToSolve().indexOf(o2.formal);
             }
         };
         Collections.sort(equals, comp);
@@ -144,12 +144,12 @@ public class InferenceSolver_c implements InferenceSolver {
                 solution[i] = eq.actual;
             }
         }
+        List<? extends Constraint> subSupConstraints =
+                useSubtypeConstraints ? subs : supers;
         for (int i = 0; i < solution.length; i++) {
             if (solution[i] == null) {
                 TypeVariable toSolve = typeVariablesToSolve().get(i);
                 Set<ReferenceType> bounds = new LinkedHashSet<ReferenceType>();
-                List<? extends Constraint> subSupConstraints =
-                        useSubtypeConstraints ? subs : supers;
                 for (Constraint c : subSupConstraints) {
                     if (c.formal.equals(toSolve) && c.actual.isReference()) {
                         bounds.add((ReferenceType) c.actual);
@@ -251,7 +251,7 @@ public class InferenceSolver_c implements InferenceSolver {
                 cons.add(new SuperConversionConstraint(expectedReturnType,
                                                        returnType,
                                                        this));
-                Type[] betterSolution = this.solve(cons, true, true);
+                Type[] betterSolution = this.solve(cons, true, false);
                 if (betterSolution != null) {
 //                    System.err.println("Found a better solution: " + Arrays.asList(betterSolution));
                     solution = betterSolution;
@@ -276,7 +276,7 @@ public class InferenceSolver_c implements InferenceSolver {
         List<Constraint> constraints = new ArrayList<Constraint>();
         constraints.addAll(this.getInitialConstraints());
 
-        // get the subsitution corresponding to the solution so far
+        // get the substitution corresponding to the solution so far
         Map<TypeVariable, ReferenceType> m =
                 new LinkedHashMap<TypeVariable, ReferenceType>();
         for (int i = 0; i < solution.length; i++) {
@@ -308,7 +308,11 @@ public class InferenceSolver_c implements InferenceSolver {
             constraints.add(new SuperConversionConstraint(bi, ti, this));
         }
 
-        return solve(constraints, false, true);
+        Type[] remainingSolution = solve(constraints, false, true);
+        for (int i = 0; i < solution.length; i++) {
+            if (solution[i] == null) solution[i] = remainingSolution[i];
+        }
+        return solution;
     }
 
     private static Type returnType(JL5ProcedureInstance pi) {
@@ -318,7 +322,7 @@ public class InferenceSolver_c implements InferenceSolver {
         return null;
     }
 
-    private boolean hasUnresolvedTypeArguments(Type[] solution) {
+    private static boolean hasUnresolvedTypeArguments(Type[] solution) {
         for (Type element : solution) {
             if (element == null) {
                 return true;

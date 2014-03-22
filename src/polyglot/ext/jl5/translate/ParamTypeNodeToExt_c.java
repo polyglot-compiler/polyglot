@@ -26,22 +26,24 @@
 package polyglot.ext.jl5.translate;
 
 import polyglot.ast.Node;
+import polyglot.ast.TypeNode;
+import polyglot.ext.jl5.ast.JL5Ext;
 import polyglot.ext.jl5.ast.JL5NodeFactory;
 import polyglot.ext.jl5.ast.ParamTypeNode;
 import polyglot.translate.ExtensionRewriter;
-import polyglot.translate.ext.ToExt;
 import polyglot.translate.ext.ToExt_c;
 import polyglot.types.SemanticException;
 import polyglot.util.SerialVersionUID;
 
-public class ParamTypeNodeToExt_c extends ToExt_c implements ToExt {
+public class ParamTypeNodeToExt_c extends ToExt_c {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
     @Override
     public Node toExt(ExtensionRewriter rw) throws SemanticException {
-        ParamTypeNode ptn = (ParamTypeNode) node();
+        TypeNode ptn = (TypeNode) node();
+        ParamTypeNode ext = (ParamTypeNode) JL5Ext.ext(ptn);
         return ((JL5NodeFactory) rw.to_nf()).ParamTypeNode(ptn.position(),
-                                                           ptn.bounds(),
-                                                           ptn.id());
+                                                           ext.id(),
+                                                           ext.bounds());
     }
 }

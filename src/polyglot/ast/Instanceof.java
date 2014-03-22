@@ -27,8 +27,8 @@
 package polyglot.ast;
 
 /**
- * An <code>Instanceof</code> is an immutable representation of
- * the use of the <code>instanceof</code> operator.
+ * An {@code Instanceof} is an immutable representation of
+ * the use of the {@code instanceof} operator.
  */
 public interface Instanceof extends Expr {
     /** Get the expression to check. */

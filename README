@@ -205,13 +205,14 @@ including:
 
         Owen Arden              Michael Brukman
         Stephen Chong           Michael Clarkson
-        Matt Harren             Rob Jellinek
-        Aleksey Kliger          Samarth Lad
-        Jed Liu                 Scott Moore
-        Andrew Myers            Nate Nystrom  
-        Naveen Sastry           Dan Spoonhower 
-        Xin Qi                  Steve Zdancewic 
-        Lantian Zheng           Xin Zheng
+        Matt Harren             Chin Isradisaikul
+        Rob Jellinek            Aleksey Kliger
+        Samarth Lad             Jed Liu
+        Scott Moore             Andrew Myers
+        Nate Nystrom            Xin Qi
+        Naveen Sastry           Dan Spoonhower
+        Steve Zdancewic         Lantian Zheng
+        Xin Zheng
 
 The Polyglot class file parsing code (src/polyglot/types/reflect)
 is derived from code written for the BLOAT bytecode optimizer written
@@ -225,7 +226,7 @@ code by Robert Harder <rob@iharder.net>.  See http://iharder.net/base64.
 The JL5 extension was based on the "Polyglot for Java 5" project by Milan
 Stanojevic and Todd Millstein
 (http://www.cs.ucla.edu/~todd/research/polyglot5.html), with additional input
-from Vincent Cavé.
+from Vincent Cavï¿½.
 
 The following people have provided patches:
 

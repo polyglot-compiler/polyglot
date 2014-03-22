@@ -33,6 +33,7 @@ import polyglot.types.SemanticException;
 import polyglot.types.Type;
 import polyglot.types.TypeSystem;
 import polyglot.util.CodeWriter;
+import polyglot.util.Copy;
 import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
 import polyglot.visit.CFGBuilder;
@@ -41,7 +42,7 @@ import polyglot.visit.PrettyPrinter;
 import polyglot.visit.TypeChecker;
 
 /**
- * A <code>Catch</code> represents one half of a <code>try-catch</code>
+ * A {@code Catch} represents one half of a {@code try-catch}
  * statement.  Specifically, the second half.
  */
 public class Catch_c extends Stmt_c implements Catch {
@@ -50,65 +51,70 @@ public class Catch_c extends Stmt_c implements Catch {
     protected Formal formal;
     protected Block body;
 
+    // TODO
+    // @Deprecated
     public Catch_c(Position pos, Formal formal, Block body) {
-        super(pos);
+        this(pos, formal, body, null);
+    }
+
+    public Catch_c(Position pos, Formal formal, Block body, Ext ext) {
+        super(pos, ext);
         assert (formal != null && body != null);
         this.formal = formal;
         this.body = body;
     }
 
-    /** Get the catchType of the catch block. */
     @Override
     public Type catchType() {
         return formal.declType();
     }
 
-    /** Get the formal of the catch block. */
     @Override
     public Formal formal() {
         return this.formal;
     }
 
-    /** Set the formal of the catch block. */
     @Override
     public Catch formal(Formal formal) {
-        Catch_c n = (Catch_c) copy();
+        return formal(this, formal);
+    }
+
+    protected <N extends Catch_c> N formal(N n, Formal formal) {
+        if (n.formal == formal) return n;
+        if (n == this) n = Copy.Util.copy(n);
         n.formal = formal;
         return n;
     }
 
-    /** Get the body of the catch block. */
     @Override
     public Block body() {
         return this.body;
     }
 
-    /** Set the body of the catch block. */
     @Override
     public Catch body(Block body) {
-        Catch_c n = (Catch_c) copy();
+        return body(this, body);
+    }
+
+    protected <N extends Catch_c> N body(N n, Block body) {
+        if (n.body == body) return n;
+        if (n == this) n = Copy.Util.copy(n);
         n.body = body;
         return n;
     }
 
     /** Reconstruct the catch block. */
-    protected Catch_c reconstruct(Formal formal, Block body) {
-        if (formal != this.formal || body != this.body) {
-            Catch_c n = (Catch_c) copy();
-            n.formal = formal;
-            n.body = body;
-            return n;
-        }
-
-        return this;
+    protected <N extends Catch_c> N reconstruct(N n, Formal formal, Block body) {
+        n = formal(n, formal);
+        n = body(n, body);
+        return n;
     }
 
-    /** Visit the children of the catch block. */
     @Override
     public Node visitChildren(NodeVisitor v) {
-        Formal formal = (Formal) visitChild(this.formal, v);
-        Block body = (Block) visitChild(this.body, v);
-        return reconstruct(formal, body);
+        Formal formal = visitChild(this.formal, v);
+        Block body = visitChild(this.body, v);
+        return reconstruct(this, formal, body);
     }
 
     @Override
@@ -116,7 +122,6 @@ public class Catch_c extends Stmt_c implements Catch {
         return c.pushBlock();
     }
 
-    /** Type check the catch block. */
     @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
         TypeSystem ts = tc.typeSystem();
@@ -135,7 +140,6 @@ public class Catch_c extends Stmt_c implements Catch {
         return "catch (" + formal + ") " + body;
     }
 
-    /** Write the catch block to an output file. */
     @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
         w.write("catch (");

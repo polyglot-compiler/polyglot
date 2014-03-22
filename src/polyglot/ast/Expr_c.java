@@ -26,30 +26,38 @@
 
 package polyglot.ast;
 
+import polyglot.translate.ExtensionRewriter;
 import polyglot.types.SemanticException;
 import polyglot.types.Type;
 import polyglot.util.CodeWriter;
+import polyglot.util.Copy;
+import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
 import polyglot.visit.PrettyPrinter;
 import polyglot.visit.TypeBuilder;
 
 /**
- * An <code>Expr</code> represents any Java expression.  All expressions
+ * An {@code Expr} represents any Java expression.  All expressions
  * must be subtypes of Expr.
  */
-public abstract class Expr_c extends Term_c implements Expr {
+public abstract class Expr_c extends Term_c implements Expr, ExprOps {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
     protected Type type;
 
+    @Deprecated
     public Expr_c(Position pos) {
-        super(pos);
+        this(pos, null);
+    }
+
+    public Expr_c(Position pos, Ext ext) {
+        super(pos, ext);
     }
 
     /**
      * Get the type of the expression.  This may return an
-     * <code>UnknownType</code> before type-checking, but should return the
+     * {@code UnknownType} before type-checking, but should return the
      * correct type after type-checking.
      */
     @Override
@@ -57,11 +65,14 @@ public abstract class Expr_c extends Term_c implements Expr {
         return this.type;
     }
 
-    /** Set the type of the expression. */
     @Override
     public Expr type(Type type) {
-        if (type == this.type) return this;
-        Expr_c n = (Expr_c) copy();
+        return type(this, type);
+    }
+
+    protected <N extends Expr_c> N type(N n, Type type) {
+        if (n.type == type) return n;
+        if (n == this) n = Copy.Util.copy(n);
         n.type = type;
         return n;
     }
@@ -78,61 +89,92 @@ public abstract class Expr_c extends Term_c implements Expr {
         }
     }
 
-    /** Get the precedence of the expression. */
     @Override
     public Precedence precedence() {
         return Precedence.UNKNOWN;
     }
 
+    @Deprecated
+    protected Lang lastLang() {
+        Lang lang = lang();
+        for (Ext ext = ext(); ext != null; ext = ext.ext()) {
+            try {
+                lang = ext.lang();
+            }
+            catch (InternalCompilerError e) {
+                return JLangToJLDel.instance;
+            }
+        }
+        return lang;
+    }
+
+    @Deprecated
     @Override
     public boolean constantValueSet() {
+        return lastLang().constantValueSet(this, lastLang());
+    }
+
+    @Deprecated
+    @Override
+    public boolean isConstant() {
+        return lastLang().isConstant(this, lastLang());
+    }
+
+    @Deprecated
+    @Override
+    public Object constantValue() {
+        return lastLang().constantValue(this, lastLang());
+    }
+
+    @Override
+    public boolean constantValueSet(Lang lang) {
         return true;
     }
 
     @Override
-    public boolean isConstant() {
+    public boolean isConstant(Lang lang) {
         return false;
     }
 
     @Override
-    public Object constantValue() {
+    public Object constantValue(Lang lang) {
         return null;
     }
 
-    public String stringValue() {
-        return (String) constantValue();
+    public String stringValue(Lang lang) {
+        return (String) lang.constantValue(this, lang);
     }
 
-    public boolean booleanValue() {
-        return ((Boolean) constantValue()).booleanValue();
+    public boolean booleanValue(Lang lang) {
+        return ((Boolean) lang.constantValue(this, lang)).booleanValue();
     }
 
-    public byte byteValue() {
-        return ((Byte) constantValue()).byteValue();
+    public byte byteValue(Lang lang) {
+        return ((Byte) lang.constantValue(this, lang)).byteValue();
     }
 
-    public short shortValue() {
-        return ((Short) constantValue()).shortValue();
+    public short shortValue(Lang lang) {
+        return ((Short) lang.constantValue(this, lang)).shortValue();
     }
 
-    public char charValue() {
-        return ((Character) constantValue()).charValue();
+    public char charValue(Lang lang) {
+        return ((Character) lang.constantValue(this, lang)).charValue();
     }
 
-    public int intValue() {
-        return ((Integer) constantValue()).intValue();
+    public int intValue(Lang lang) {
+        return ((Integer) lang.constantValue(this, lang)).intValue();
     }
 
-    public long longValue() {
-        return ((Long) constantValue()).longValue();
+    public long longValue(Lang lang) {
+        return ((Long) lang.constantValue(this, lang)).longValue();
     }
 
-    public float floatValue() {
-        return ((Float) constantValue()).floatValue();
+    public float floatValue(Lang lang) {
+        return ((Float) lang.constantValue(this, lang)).floatValue();
     }
 
-    public double doubleValue() {
-        return ((Double) constantValue()).doubleValue();
+    public double doubleValue(Lang lang) {
+        return ((Double) lang.constantValue(this, lang)).doubleValue();
     }
 
     @Override
@@ -145,37 +187,17 @@ public abstract class Expr_c extends Term_c implements Expr {
         return type(tb.typeSystem().unknownType(position()));
     }
 
-    /**
-     * Correctly parenthesize the subexpression <code>expr<code> given
-     * the its precendence and the precedence of the current expression.
-     *
-     * If the sub-expression has the same precedence as this expression
-     * we do not parenthesize.
-     *
-     * @param expr The subexpression.
-     * @param w The output writer.
-     * @param pp The pretty printer.
-     */
+    @Override
+    public Node extRewrite(ExtensionRewriter rw) throws SemanticException {
+        Expr n = (Expr) super.extRewrite(rw);
+        return n.type(null);
+    }
+
     @Override
     public void printSubExpr(Expr expr, CodeWriter w, PrettyPrinter pp) {
         printSubExpr(expr, true, w, pp);
     }
 
-    /**
-     * Correctly parenthesize the subexpression <code>expr<code> given
-     * the its precendence and the precedence of the current expression.
-     *
-     * If the sub-expression has the same precedence as this expression
-     * we parenthesize if the sub-expression does not associate; e.g.,
-     * we parenthesis the right sub-expression of a left-associative
-     * operator.
-     *
-     * @param expr The subexpression.
-     * @param associative Whether expr is the left (right) child of a left-
-     * (right-) associative operator.
-     * @param w The output writer.
-     * @param pp The pretty printer.
-     */
     @Override
     public void printSubExpr(Expr expr, boolean associative, CodeWriter w,
             PrettyPrinter pp) {

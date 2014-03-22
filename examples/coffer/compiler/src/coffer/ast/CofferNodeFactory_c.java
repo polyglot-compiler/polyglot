@@ -10,28 +10,20 @@ package coffer.ast;
 import java.util.LinkedList;
 import java.util.List;
 
-import polyglot.ast.ArrayAccess;
-import polyglot.ast.ArrayAccessAssign;
-import polyglot.ast.Assign;
 import polyglot.ast.Block;
 import polyglot.ast.ClassBody;
 import polyglot.ast.ClassDecl;
 import polyglot.ast.ConstructorDecl;
 import polyglot.ast.Expr;
 import polyglot.ast.ExtFactory;
-import polyglot.ast.Field;
-import polyglot.ast.FieldAssign;
 import polyglot.ast.Formal;
 import polyglot.ast.Id;
-import polyglot.ast.Local;
-import polyglot.ast.LocalAssign;
 import polyglot.ast.MethodDecl;
 import polyglot.ast.New;
 import polyglot.ast.NodeFactory_c;
 import polyglot.ast.TypeNode;
 import polyglot.types.Flags;
 import polyglot.util.Position;
-import coffer.extension.AssignDel_c;
 import coffer.types.Key;
 import coffer.types.KeySet;
 
@@ -40,11 +32,11 @@ import coffer.types.KeySet;
 public class CofferNodeFactory_c extends NodeFactory_c implements
         CofferNodeFactory {
     public CofferNodeFactory_c() {
-        super(new CofferExtFactory_c());
+        super(CofferLang.instance, new CofferExtFactory_c());
     }
 
     protected CofferNodeFactory_c(ExtFactory extFact) {
-        super(extFact);
+        super(CofferLang.instance, extFact);
     }
 
     @Override
@@ -211,32 +203,4 @@ public class CofferNodeFactory_c extends NodeFactory_c implements
         n = (CofferConstructorDecl) n.ext(extFactory().extConstructorDecl());
         return n;
     }
-
-    @Override
-    public FieldAssign FieldAssign(Position pos, Field left,
-            Assign.Operator op, Expr right) {
-        return (FieldAssign) super.FieldAssign(pos, left, op, right)
-                                  .del(new AssignDel_c());
-    }
-
-    @Override
-    public ArrayAccessAssign ArrayAccessAssign(Position pos, ArrayAccess left,
-            Assign.Operator op, Expr right) {
-        return (ArrayAccessAssign) super.ArrayAccessAssign(pos, left, op, right)
-                                        .del(new AssignDel_c());
-    }
-
-    @Override
-    public LocalAssign LocalAssign(Position pos, Local left,
-            Assign.Operator op, Expr right) {
-        return (LocalAssign) super.LocalAssign(pos, left, op, right)
-                                  .del(new AssignDel_c());
-    }
-
-    @Override
-    public Assign Assign(Position pos, Expr left, Assign.Operator op, Expr right) {
-        return (Assign) super.Assign(pos, left, op, right)
-                             .del(new AssignDel_c());
-    }
-
 }

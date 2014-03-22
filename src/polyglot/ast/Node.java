@@ -27,7 +27,6 @@
 package polyglot.ast;
 
 import java.io.Serializable;
-import java.util.List;
 
 import polyglot.util.CodeWriter;
 import polyglot.util.Copy;
@@ -35,25 +34,29 @@ import polyglot.util.Position;
 import polyglot.visit.NodeVisitor;
 
 /**
- * A <code>Node</code> represents an AST node.  All AST nodes must implement
+ * A {@code Node} represents an AST node.  All AST nodes must implement
  * this interface.  Nodes should be immutable: methods which set fields
  * of the node should copy the node, set the field in the copy, and then
  * return the copy.
  */
-public interface Node extends JLDel, Copy, Serializable {
+public interface Node extends NodeOps, Copy<Node>, Serializable {
     /**
      * Set the delegate of the node.
      */
+    @Deprecated
     Node del(JLDel del);
 
     /**
      * Get the node's delegate.
      */
-    JLDel del();
+    @Deprecated
+    NodeOps del();
 
     /**
      * Set the extension of the node.
      */
+    // TODO
+    // @Deprecated
     Node ext(Ext ext);
 
     /**
@@ -64,6 +67,7 @@ public interface Node extends JLDel, Copy, Serializable {
     /**
      * Set the node's nth extension, n &gt;= 1.
      */
+    @Deprecated
     Node ext(int n, Ext ext);
 
     /**
@@ -99,49 +103,28 @@ public interface Node extends JLDel, Copy, Serializable {
 
     /**
      * Visit the node.  This method is equivalent to
-     * <code>visitEdge(null, v)</code>.
+     * {@code visitEdge(null, v)}.
      *
      * @param v The visitor which will traverse/rewrite the AST.
-     * @return A new AST if a change was made, or <code>this</code>.
+     * @return A new AST if a change was made, or {@code this}.
      */
     Node visit(NodeVisitor v);
 
     /**
      * Visit the node, passing in the node's parent.  This method is called by
-     * a <code>NodeVisitor</code> to traverse the AST starting at this node.
-     * This method should call the <code>override</code>, <code>enter</code>,
-     * and <code>leave<code> methods of the visitor.  The method may return a
+     * a {@code NodeVisitor} to traverse the AST starting at this node.
+     * This method should call the {@code override}, {@code enter},
+     * and {@code leave} methods of the visitor.  The method may return a
      * new version of the node.
      *
-     * @param parent The parent of <code>this</code> in the AST.
+     * @param parent The parent of {@code this} in the AST.
      * @param v The visitor which will traverse/rewrite the AST.
-     * @return A new AST if a change was made, or <code>this</code>.
+     * @return A new AST if a change was made, or {@code this}.
      * 
      * @deprecated Call {@link Node#visitChild(Node, NodeVisitor)} instead.
      */
     @Deprecated
     Node visitEdge(Node parent, NodeVisitor v);
-
-    /**
-     * Visit a single child of the node.
-     *
-     * @param v The visitor which will traverse/rewrite the AST.
-     * @param child The child to visit.
-     * @return The result of <code>child.visit(v)</code>, or <code>null</code>
-     * if <code>child</code> was <code>null</code>.
-     */
-    Node visitChild(Node child, NodeVisitor v);
-
-    /**
-     * Visit all the elements of a list.
-     * @param l The list to visit.
-     * @param v The visitor to use.
-     * @return A new list with each element from the old list
-     *         replaced by the result of visiting that element.
-     *         If <code>l</code> is <code>null</code>,
-     *         <code>null</code> is returned.
-     */
-    public <T extends Node> List<T> visitList(List<T> l, NodeVisitor v);
 
     /**
      * Dump the AST node for debugging purposes.

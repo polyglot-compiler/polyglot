@@ -29,7 +29,7 @@ package polyglot.ast;
 import java.util.List;
 
 /**
- * An immutable representation of a Java language <code>for</code>
+ * An immutable representation of a Java language {@code for}
  * statement.  Contains a statement to be executed and an expression
  * to be tested indicating whether to reexecute the statement.
  */
@@ -44,7 +44,7 @@ public interface For extends Loop {
      */
     For inits(List<ForInit> inits);
 
-    /** Set the loop condition */
+    @Override
     For cond(Expr cond);
 
     /** List of iterator expressions.
@@ -57,7 +57,6 @@ public interface For extends Loop {
      */
     For iters(List<ForUpdate> iters);
 
-    /** Set the loop body */
     @Override
     For body(Stmt body);
 }

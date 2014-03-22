@@ -1,0 +1,7 @@
+class C {
+	private void foo() {
+	}
+	protected <T extends C> void bar(T t) {
+		t.foo();
+	}
+}

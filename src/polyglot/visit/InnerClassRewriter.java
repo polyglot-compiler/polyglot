@@ -43,6 +43,7 @@ import polyglot.ast.FieldAssign;
 import polyglot.ast.FieldDecl;
 import polyglot.ast.Formal;
 import polyglot.ast.Id;
+import polyglot.ast.Lang;
 import polyglot.ast.Local;
 import polyglot.ast.Node;
 import polyglot.ast.NodeFactory;
@@ -106,8 +107,9 @@ public class InnerClassRewriter extends InnerClassAbstractRemover {
         Map<ClassType, FieldInstance> fieldMap;
         Context outerContext;
 
-        ClassBodyTranslator(ParsedClassType ct,
+        ClassBodyTranslator(Lang lang, ParsedClassType ct,
                 Map<ClassType, FieldInstance> fieldMap, Context context) {
+            super(lang);
             this.ct = ct;
             this.fieldMap = fieldMap;
             this.outerContext = context;
@@ -155,13 +157,13 @@ public class InnerClassRewriter extends InnerClassAbstractRemover {
 
         addEnvToCI(cd.constructorInstance(), env);
 
-        cd = cd.name(ct.name());
+        cd = (ConstructorDecl) cd.name(ct.name());
 
         // Add the new formals.
         List<Formal> newFormals = new ArrayList<Formal>();
         newFormals.addAll(cd.formals());
         newFormals.addAll(envAsFormals(env));
-        cd = cd.formals(newFormals);
+        cd = (ConstructorDecl) cd.formals(newFormals);
 
         if (cd.body() == null) {
             // Must be a native constructor; just let the programmer
@@ -254,7 +256,7 @@ public class InnerClassRewriter extends InnerClassAbstractRemover {
                 // Translate the class body if any supertype (including ct itself)
                 // is an inner class.
                 Context innerContext =
-                        cd.del().enterChildScope(cd.body(), context);
+                        lang().enterChildScope(cd, cd.body(), context);
                 cd = cd.body(translateClassBody(ct, cd.body(), innerContext));
             }
 
@@ -301,7 +303,8 @@ public class InnerClassRewriter extends InnerClassAbstractRemover {
         body = body.members(members);
 
         // Rewrite the class body.
-        ClassBodyTranslator v = new ClassBodyTranslator(ct, fieldMap, context);
+        ClassBodyTranslator v =
+                new ClassBodyTranslator(lang(), ct, fieldMap, context);
         v = (ClassBodyTranslator) v.begin();
         body = (ClassBody) body.visit(v);
 

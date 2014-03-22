@@ -35,7 +35,7 @@ import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
 
 /**
- * An <code>ArrayType</code> represents an array of base java types.
+ * An {@code ArrayType} represents an array of base java types.
  */
 public class ArrayType_c extends ReferenceType_c implements ArrayType {
     private static final long serialVersionUID = SerialVersionUID.generate();
@@ -101,13 +101,11 @@ public class ArrayType_c extends ReferenceType_c implements ArrayType {
                                  Collections.<Type> emptyList());
     }
 
-    /** Get the base type of the array. */
     @Override
     public Type base() {
         return base;
     }
 
-    /** Set the base type of the array. */
     @Override
     public ArrayType base(Type base) {
         if (base == this.base) return this;
@@ -116,7 +114,6 @@ public class ArrayType_c extends ReferenceType_c implements ArrayType {
         return n;
     }
 
-    /** Get the ulitimate base type of the array. */
     @Override
     public Type ultimateBase() {
         if (base().isArray()) {
@@ -142,13 +139,11 @@ public class ArrayType_c extends ReferenceType_c implements ArrayType {
         w.write("[]");
     }
 
-    /** Translate the type. */
     @Override
     public String translate(Resolver c) {
         return base().translate(c) + "[]";
     }
 
-    /** Returns true iff the type is canonical. */
     @Override
     public boolean isCanonical() {
         return base().isCanonical();
@@ -164,46 +159,39 @@ public class ArrayType_c extends ReferenceType_c implements ArrayType {
         return this;
     }
 
-    /** Get the methods implemented by the array type. */
     @Override
     public List<? extends MethodInstance> methods() {
         init();
         return Collections.unmodifiableList(methods);
     }
 
-    /** Get the fields of the array type. */
     @Override
     public List<? extends FieldInstance> fields() {
         init();
         return Collections.unmodifiableList(fields);
     }
 
-    /** Get the clone() method. */
     @Override
     public MethodInstance cloneMethod() {
         return methods().get(0);
     }
 
-    /** Get a field of the type by name. */
     @Override
     public FieldInstance fieldNamed(String name) {
         FieldInstance fi = lengthField();
         return name.equals(fi.name()) ? fi : null;
     }
 
-    /** Get the length field. */
     @Override
     public FieldInstance lengthField() {
         return fields().get(0);
     }
 
-    /** Get the super type of the array type. */
     @Override
     public Type superType() {
         return ts.Object();
     }
 
-    /** Get the interfaces implemented by the array type. */
     @Override
     public List<? extends ReferenceType> interfaces() {
         init();
@@ -250,12 +238,6 @@ public class ArrayType_c extends ReferenceType_c implements ArrayType {
         return ts.isSubtype(this, toType);
     }
 
-    /**
-     * Requires: all type arguments are canonical.  ToType is not a NullType.
-     *
-     * Returns true iff a cast from this to toType is valid; in other
-     * words, some non-null members of this are also members of toType.
-     **/
     @Override
     public boolean isCastValidImpl(Type toType) {
         if (!toType.isReference()) return false;

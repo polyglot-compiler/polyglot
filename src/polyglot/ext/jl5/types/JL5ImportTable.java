@@ -147,7 +147,7 @@ public class JL5ImportTable extends ImportTable {
         return containingTypes;
     }
 
-    private boolean hasStatic(List<? extends MemberInstance> members) {
+    private static boolean hasStatic(List<? extends MemberInstance> members) {
         for (MemberInstance mi : members) {
             if (isStatic(mi)) {
                 return true;
@@ -156,7 +156,7 @@ public class JL5ImportTable extends ImportTable {
         return false;
     }
 
-    private boolean isStatic(MemberInstance mi) {
+    private static boolean isStatic(MemberInstance mi) {
         return mi != null && mi.flags().isStatic();
     }
 

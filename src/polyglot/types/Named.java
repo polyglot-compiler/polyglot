@@ -27,7 +27,7 @@
 package polyglot.types;
 
 /**
- * A <code>Named</code> is a TypeObject that is named.
+ * A {@code Named} is a TypeObject that is named.
  */
 public interface Named extends TypeObject {
     /**

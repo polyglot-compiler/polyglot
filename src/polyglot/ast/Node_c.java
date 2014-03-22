@@ -34,11 +34,13 @@ import java.util.List;
 
 import polyglot.frontend.Compiler;
 import polyglot.frontend.ExtensionInfo;
+import polyglot.translate.ExtensionRewriter;
 import polyglot.types.Context;
 import polyglot.types.SemanticException;
 import polyglot.types.Type;
 import polyglot.types.TypeSystem;
 import polyglot.util.CodeWriter;
+import polyglot.util.Copy;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
@@ -55,7 +57,7 @@ import polyglot.visit.TypeBuilder;
 import polyglot.visit.TypeChecker;
 
 /**
- * A <code>Node</code> represents an AST node.  All AST nodes must implement
+ * A {@code Node} represents an AST node.  All AST nodes must implement
  * this interface.  Nodes should be immutable: methods which set fields
  * of the node should copy the node, set the field in the copy, and then
  * return the copy.
@@ -64,33 +66,34 @@ public abstract class Node_c implements Node {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
     protected Position position;
+    @Deprecated
     protected JLDel del;
     protected Ext ext;
     protected boolean error;
 
+    @Deprecated
     public Node_c(Position pos) {
+        this(pos, null);
+    }
+
+    public Node_c(Position pos, Ext ext) {
         assert (pos != null);
         this.position = pos;
+        this.ext = ext;
+        if (ext != null) {
+            ext.init(this);
+            ext.initPred(this);
+        }
         this.error = false;
     }
 
+    @Deprecated
     @Override
-    public void init(Node node) {
-        if (node != this) {
-            throw new InternalCompilerError("Cannot use a Node as a delegate or extension.");
-        }
-    }
-
-    @Override
-    public Node node() {
-        return this;
-    }
-
-    @Override
-    public JLDel del() {
+    public NodeOps del() {
         return del != null ? del : this;
     }
 
+    @Deprecated
     @Override
     public Node del(JLDel del) {
         if (this.del == del) {
@@ -102,7 +105,7 @@ public abstract class Node_c implements Node {
 
         Node_c n = (Node_c) copy();
 
-        n.del = del != this ? del : null;
+        n.del = del;
 
         if (n.del != null) {
             n.del.init(n);
@@ -120,6 +123,7 @@ public abstract class Node_c implements Node {
         return ext(n - 1).ext();
     }
 
+    @Deprecated
     @Override
     public Node ext(int n, Ext ext) {
         if (n < 1) throw new InternalCompilerError("n must be >= 1");
@@ -136,6 +140,8 @@ public abstract class Node_c implements Node {
         return ext;
     }
 
+    // TODO
+    // @Deprecated
     @Override
     public Node ext(Ext ext) {
         if (this.ext == ext) {
@@ -151,6 +157,7 @@ public abstract class Node_c implements Node {
 
         if (n.ext != null) {
             n.ext.init(n);
+            n.ext.initPred(n);
         }
 
         this.ext = old;
@@ -158,19 +165,22 @@ public abstract class Node_c implements Node {
         return n;
     }
 
+    @SuppressWarnings("deprecation")
     @Override
-    public Object copy() {
+    public Node copy() {
         try {
             Node_c n = (Node_c) super.clone();
 
+            // XXX Deprecated
             if (this.del != null) {
-                n.del = (JLDel) this.del.copy();
+                n.del = this.del.copy();
                 n.del.init(n);
             }
 
             if (this.ext != null) {
-                n.ext = (Ext) this.ext.copy();
+                n.ext = this.ext.copy();
                 n.ext.init(n);
+                n.ext.initPred(n);
             }
 
             return n;
@@ -187,7 +197,12 @@ public abstract class Node_c implements Node {
 
     @Override
     public Node position(Position position) {
-        Node_c n = (Node_c) copy();
+        return position(this, position);
+    }
+
+    protected <N extends Node_c> N position(N n, Position position) {
+        if (n.position == position) return n;
+        if (n == this) n = Copy.Util.copy(n);
         n.position = position;
         return n;
     }
@@ -209,13 +224,18 @@ public abstract class Node_c implements Node {
 
     @Override
     public Node error(boolean flag) {
-        Node_c n = (Node_c) copy();
+        return error(this, flag);
+    }
+
+    protected <N extends Node_c> N error(N n, boolean flag) {
+        if (n.error == flag) return n;
+        if (n == this) n = Copy.Util.copy(n);
         n.error = flag;
         return n;
     }
 
     @Override
-    public Node visitChild(Node n, NodeVisitor v) {
+    public <N extends Node> N visitChild(N n, NodeVisitor v) {
         if (n == null) {
             return null;
         }
@@ -243,7 +263,7 @@ public abstract class Node_c implements Node {
                 throw new InternalCompilerError("NodeVisitor.enter() returned null.");
             }
 
-            n = this.del().visitChildren(v_);
+            n = v.lang().visitChildren(this, v_);
 
             if (n == null) {
                 throw new InternalCompilerError("Node_c.visitChildren() returned null.");
@@ -265,8 +285,8 @@ public abstract class Node_c implements Node {
      * @param v The visitor to use.
      * @return A new list with each element from the old list
      *         replaced by the result of visiting that element.
-     *         If <code>l</code> is <code>null</code>,
-     *         <code>null</code> is returned.
+     *         If {@code l} is {@code null},
+     *         {@code null} is returned.
      */
     @Override
     public <T extends Node> List<T> visitList(List<T> l, NodeVisitor v) {
@@ -278,18 +298,22 @@ public abstract class Node_c implements Node {
         List<T> vl = new ArrayList<T>(l.size());
 
         for (T n : l) {
-            Node m = visitChild(n, v);
+            T m = visitChild(n, v);
             if (n != m) {
                 result = vl;
             }
             if (m != null) {
-                @SuppressWarnings("unchecked")
-                T t = (T) m;
+                T t = m;
                 vl.add(t);
             }
         }
 
         return result;
+    }
+
+    @Override
+    public final JLang lang() {
+        return JLang_c.instance;
     }
 
     @Override
@@ -300,27 +324,17 @@ public abstract class Node_c implements Node {
     /**
      * Push a new scope upon entering this node, and add any declarations to the
      * context that should be in scope when visiting children of this node.
-     * @param c the current <code>Context</code>
-     * @return the <code>Context</code> to be used for visiting this node. 
+     * @param c the current {@code Context}
+     * @return the {@code Context} to be used for visiting this node. 
      */
     @Override
     public Context enterScope(Context c) {
         return c;
     }
 
-    /**
-     * Push a new scope for visiting the child node <code>child</code>. 
-     * The default behavior is to delegate the call to the child node, and let
-     * it add appropriate declarations that should be in scope. However,
-     * this method gives parent nodes have the ability to modify this behavior.
-     * @param child the child node about to be entered.
-     * @param c the current <code>Context</code>
-     * @return the <code>Context</code> to be used for visiting node 
-     *           <code>child</code>
-     */
     @Override
     public Context enterChildScope(Node child, Context c) {
-        return child.del().enterScope(c);
+        return c.lang().enterScope(child, c);
     }
 
     /**
@@ -396,7 +410,7 @@ public abstract class Node_c implements Node {
 
     @Override
     public Node exceptionCheck(ExceptionChecker ec) throws SemanticException {
-        List<? extends Type> l = this.del().throwTypes(ec.typeSystem());
+        List<? extends Type> l = ec.lang().throwTypes(this, ec.typeSystem());
         for (Type exc : l) {
             ec.throwsException(exc, position());
         }
@@ -408,7 +422,18 @@ public abstract class Node_c implements Node {
         return Collections.emptyList();
     }
 
-    /** Dump the AST for debugging. */
+    @Override
+    public NodeVisitor extRewriteEnter(ExtensionRewriter rw)
+            throws SemanticException {
+        return rw;
+    }
+
+    @Override
+    public Node extRewrite(ExtensionRewriter rw) throws SemanticException {
+        return this;
+    }
+
+    @Deprecated
     @Override
     public void dump(OutputStream os) {
         CodeWriter cw = Compiler.createCodeWriter(os);
@@ -419,7 +444,17 @@ public abstract class Node_c implements Node {
         dumper.finish();
     }
 
-    /** Dump the AST for debugging. */
+    @Override
+    public void dump(Lang lang, OutputStream os) {
+        CodeWriter cw = Compiler.createCodeWriter(os);
+        NodeVisitor dumper = new DumpAst(lang, cw);
+        dumper = dumper.begin();
+        this.visit(dumper);
+        cw.newline();
+        dumper.finish();
+    }
+
+    @Deprecated
     @Override
     public void dump(Writer w) {
         CodeWriter cw = Compiler.createCodeWriter(w);
@@ -430,7 +465,17 @@ public abstract class Node_c implements Node {
         dumper.finish();
     }
 
-    /** Pretty-print the AST for debugging. */
+    @Override
+    public void dump(Lang lang, Writer w) {
+        CodeWriter cw = Compiler.createCodeWriter(w);
+        NodeVisitor dumper = new DumpAst(lang, cw);
+        dumper = dumper.begin();
+        this.visit(dumper);
+        cw.newline();
+        dumper.finish();
+    }
+
+    @Deprecated
     @Override
     public void prettyPrint(OutputStream os) {
         try {
@@ -442,7 +487,18 @@ public abstract class Node_c implements Node {
         }
     }
 
-    /** Pretty-print the AST for debugging. */
+    @Override
+    public void prettyPrint(Lang lang, OutputStream os) {
+        try {
+            CodeWriter cw = Compiler.createCodeWriter(os);
+            lang.prettyPrint(this, cw, new PrettyPrinter(lang));
+            cw.flush();
+        }
+        catch (java.io.IOException e) {
+        }
+    }
+
+    @Deprecated
     @Override
     public void prettyPrint(Writer w) {
         try {
@@ -454,7 +510,18 @@ public abstract class Node_c implements Node {
         }
     }
 
-    /** Pretty-print the AST using the given <code>CodeWriter</code>. */
+    @Override
+    public void prettyPrint(Lang lang, Writer w) {
+        try {
+            CodeWriter cw = Compiler.createCodeWriter(w);
+            lang.prettyPrint(this, cw, new PrettyPrinter(lang));
+            cw.flush();
+        }
+        catch (java.io.IOException e) {
+        }
+    }
+
+    /** Pretty-print the AST using the given {@code CodeWriter}. */
     @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter pp) {
     }
@@ -480,17 +547,17 @@ public abstract class Node_c implements Node {
         pp.print(this, child, w);
     }
 
-    /** Translate the AST using the given <code>CodeWriter</code>. */
     @Override
     public void translate(CodeWriter w, Translator tr) {
         // By default, just rely on the pretty printer.
-        this.del().prettyPrint(w, tr);
+        tr.lang().prettyPrint(this, w, tr);
     }
 
     @Override
     public void dump(CodeWriter w) {
         w.write(StringUtil.getShortNameComponent(getClass().getName()));
 
+        // XXX Deprecated
         w.allowBreak(4, " ");
         w.begin(0);
         w.write("(del ");
@@ -532,7 +599,13 @@ public abstract class Node_c implements Node {
         // return new StringPrettyPrinter(5).toString(this);
 
         // Not slow anymore.
-        return getClass().getName();
+        StringBuffer sb =
+                new StringBuffer(StringUtil.getShortNameComponent(getClass().getName()));
+        if (ext != null) {
+            sb.append(":");
+            sb.append(ext.toString());
+        }
+        return sb.toString();
     }
 
     @Override
@@ -547,7 +620,6 @@ public abstract class Node_c implements Node {
 
     @Override
     public Node copy(ExtensionInfo extInfo) throws SemanticException {
-        return this.del().copy(extInfo.nodeFactory());
+        return extInfo.nodeFactory().lang().copy(this, extInfo.nodeFactory());
     }
-
 }

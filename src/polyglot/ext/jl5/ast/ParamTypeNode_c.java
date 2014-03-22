@@ -32,10 +32,10 @@ import java.util.List;
 import polyglot.ast.Id;
 import polyglot.ast.Node;
 import polyglot.ast.TypeNode;
-import polyglot.ast.TypeNode_c;
 import polyglot.ext.jl5.types.JL5Context;
 import polyglot.ext.jl5.types.JL5TypeSystem;
 import polyglot.ext.jl5.types.TypeVariable;
+import polyglot.translate.ExtensionRewriter;
 import polyglot.types.ArrayType;
 import polyglot.types.Context;
 import polyglot.types.ReferenceType;
@@ -43,6 +43,8 @@ import polyglot.types.SemanticException;
 import polyglot.types.Type;
 import polyglot.util.CodeWriter;
 import polyglot.util.CollectionUtil;
+import polyglot.util.Copy;
+import polyglot.util.ListUtil;
 import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
 import polyglot.visit.AmbiguityRemover;
@@ -51,24 +53,20 @@ import polyglot.visit.PrettyPrinter;
 import polyglot.visit.TypeBuilder;
 import polyglot.visit.TypeChecker;
 
-public class ParamTypeNode_c extends TypeNode_c implements ParamTypeNode {
+public class ParamTypeNode_c extends JL5TermExt implements ParamTypeNode {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
     protected Id id;
-
     protected List<TypeNode> bounds;
 
-    public ParamTypeNode_c(Position pos, List<TypeNode> bounds, Id id) {
-        super(pos);
+    public ParamTypeNode_c(Id id, List<TypeNode> bounds) {
         this.id = id;
-        this.bounds = bounds;
+        this.bounds = ListUtil.copy(bounds, true);
     }
 
     @Override
-    public ParamTypeNode id(Id id) {
-        ParamTypeNode_c n = (ParamTypeNode_c) copy();
-        n.id = id;
-        return n;
+    public TypeNode node() {
+        return (TypeNode) super.node();
     }
 
     @Override
@@ -77,9 +75,18 @@ public class ParamTypeNode_c extends TypeNode_c implements ParamTypeNode {
     }
 
     @Override
-    public ParamTypeNode bounds(List<TypeNode> l) {
-        ParamTypeNode_c n = (ParamTypeNode_c) copy();
-        n.bounds = l;
+    public Node id(Id id) {
+        return id(node, id);
+    }
+
+    protected <N extends Node> N id(N n, Id id) {
+        ParamTypeNode_c ext = (ParamTypeNode_c) JL5Ext.ext(n);
+        if (ext.id == id) return n;
+        if (n == node) {
+            n = Copy.Util.copy(n);
+            ext = (ParamTypeNode_c) JL5Ext.ext(n);
+        }
+        ext.id = id;
         return n;
     }
 
@@ -88,24 +95,36 @@ public class ParamTypeNode_c extends TypeNode_c implements ParamTypeNode {
         return bounds;
     }
 
-    public ParamTypeNode reconstruct(List<TypeNode> bounds) {
-        if (!CollectionUtil.equals(bounds, this.bounds)) {
-            ParamTypeNode_c n = (ParamTypeNode_c) copy();
-            n.bounds = bounds;
-            return n;
+    @Override
+    public Node bounds(List<TypeNode> bounds) {
+        return bounds(node, bounds);
+    }
+
+    protected <N extends Node> N bounds(N n, List<TypeNode> bounds) {
+        ParamTypeNode_c ext = (ParamTypeNode_c) JL5Ext.ext(n);
+        if (CollectionUtil.equals(ext.bounds, bounds)) return n;
+        if (n == node) {
+            n = Copy.Util.copy(n);
+            ext = (ParamTypeNode_c) JL5Ext.ext(n);
         }
-        return this;
+        ext.bounds = ListUtil.copy(bounds, true);
+        return n;
+    }
+
+    protected <N extends Node> N reconstruct(N n, List<TypeNode> bounds) {
+        n = bounds(n, bounds);
+        return n;
     }
 
     @Override
     public Node visitChildren(NodeVisitor v) {
         List<TypeNode> bounds = visitList(this.bounds, v);
-        return reconstruct(bounds);
+        return reconstruct(node, bounds);
     }
 
     @Override
     public Context enterScope(Context c) {
-        c = ((JL5Context) c).pushTypeVariable((TypeVariable) type());
+        c = ((JL5Context) c).pushTypeVariable((TypeVariable) node().type());
         return super.enterScope(c);
     }
 
@@ -123,17 +142,19 @@ public class ParamTypeNode_c extends TypeNode_c implements ParamTypeNode {
         // makes a new TypeVariable with a list of bounds which
         // are unknown types
         JL5TypeSystem ts = (JL5TypeSystem) tb.typeSystem();
+        TypeNode n = this.node();
+        Position position = n.position();
 
         ArrayList<ReferenceType> typeList =
                 new ArrayList<ReferenceType>(bounds.size());
         for (int i = 0; i < bounds.size(); i++) {
-            typeList.add(ts.unknownReferenceType(position()));
+            typeList.add(ts.unknownReferenceType(position));
         }
 
-        ReferenceType intersection = ts.intersectionType(position(), typeList);
-        TypeVariable iType = ts.typeVariable(position(), id.id(), intersection);
+        ReferenceType intersection = ts.intersectionType(position, typeList);
+        TypeVariable iType = ts.typeVariable(position, id.id(), intersection);
 
-        return type(iType);
+        return n.type(iType);
 
     }
 
@@ -142,6 +163,7 @@ public class ParamTypeNode_c extends TypeNode_c implements ParamTypeNode {
         // all of the children (bounds list) will have already been 
         // disambiguated and should there for be actual types
         JL5TypeSystem ts = (JL5TypeSystem) ar.typeSystem();
+        TypeNode n = this.node();
 
         boolean ambiguous = false;
         ArrayList<Type> typeList = new ArrayList<Type>();
@@ -156,14 +178,14 @@ public class ParamTypeNode_c extends TypeNode_c implements ParamTypeNode {
             typeList.add(tn.type());
         }
         if (!ambiguous) {
-            TypeVariable tv = (TypeVariable) this.type();
+            TypeVariable tv = (TypeVariable) n.type();
             //		System.err.println("paramtypenode_c : dismab and setting bounds of " + tv + " to " + typeList);
             List<ReferenceType> refTypeList = new ArrayList<ReferenceType>();
             for (Type t : typeList)
                 refTypeList.add((ReferenceType) t);
-            tv.setUpperBound(ts.intersectionType(this.position(), refTypeList));
+            tv.setUpperBound(ts.intersectionType(n.position(), refTypeList));
         }
-        return this;
+        return n;
     }
 
     @Override
@@ -209,6 +231,12 @@ public class ParamTypeNode_c extends TypeNode_c implements ParamTypeNode {
     }
 
     @Override
+    public Node extRewrite(ExtensionRewriter rw) throws SemanticException {
+        TypeNode n = this.node();
+        return rw.typeToJava(n.type(), n.position());
+    }
+
+    @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
         w.write(id.id());
         if (bounds() != null && !bounds().isEmpty()) {
@@ -221,10 +249,5 @@ public class ParamTypeNode_c extends TypeNode_c implements ParamTypeNode {
                 }
             }
         }
-    }
-
-    @Override
-    public String name() {
-        return id().toString();
     }
 }

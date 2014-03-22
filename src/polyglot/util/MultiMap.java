@@ -34,7 +34,7 @@ import java.util.Map;
 import java.util.Set;
 
 /** 
- * A <code>MultiMap</code> is a map that allows the same key to be used to map 
+ * A {@code MultiMap} is a map that allows the same key to be used to map 
  * to multiple values. 
  * It is therefore an arbitrary binary relation on keys and values.
  */
@@ -87,7 +87,7 @@ public class MultiMap<K, V> extends AbstractMap<K, Set<V>> {
     }
 
     /** 
-     * Makes <code>key</code> map to <code>value</code>, where <code>value</code>
+     * Makes {@code key} map to {@code value}, where {@code value}
      * has to be a collection of objects.
      */
     @Override
@@ -100,15 +100,15 @@ public class MultiMap<K, V> extends AbstractMap<K, Set<V>> {
     }
 
     /**
-     * Adds a single value into the set associated with <code>key</code>.
+     * Adds a single value into the set associated with {@code key}.
      */
     public boolean add(K key, V value) {
         return getValueSet(key).add(value);
     }
 
     /**
-     * Adds all the values in <code>values</code> into the set associated with 
-     * <code>key</code>.
+     * Adds all the values in {@code values} into the set associated with 
+     * {@code key}.
      */
     public boolean addAll(K key, Collection<V> values) {
         return getValueSet(key).addAll(values);
@@ -155,5 +155,3 @@ public class MultiMap<K, V> extends AbstractMap<K, Set<V>> {
         return sb.toString();
     }
 }
-
-

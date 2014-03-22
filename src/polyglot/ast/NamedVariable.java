@@ -39,6 +39,9 @@ public interface NamedVariable extends Variable {
     public Flags flags();
 
     /** Return the name of the variable. */
+    Id id();
+
+    /** Return the name of the variable. */
     public String name();
 
     /** Return the type object for the variable. */

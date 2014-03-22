@@ -26,6 +26,7 @@ import polyglot.types.ReferenceType;
 import polyglot.types.Type;
 import polyglot.util.CollectionUtil;
 import polyglot.util.Position;
+import coffer.ast.CofferLang;
 
 public class CofferTypeSystem_c extends ParamTypeSystem_c<Key, Key> implements
         CofferTypeSystem {
@@ -152,7 +153,7 @@ public class CofferTypeSystem_c extends ParamTypeSystem_c<Key, Key> implements
     }
 
     @Override
-    public Subst<Key, Key> subst(Map<Key, ? extends Key> substMap) {
+    protected Subst<Key, Key> substImpl(Map<Key, ? extends Key> substMap) {
         return new CofferSubst_c(this, substMap);
     }
 
@@ -163,7 +164,7 @@ public class CofferTypeSystem_c extends ParamTypeSystem_c<Key, Key> implements
 
     @Override
     public Context createContext() {
-        return new CofferContext_c(this);
+        return new CofferContext_c(CofferLang.instance, this);
     }
 
     @Override

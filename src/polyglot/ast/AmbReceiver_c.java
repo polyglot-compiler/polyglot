@@ -28,6 +28,7 @@ package polyglot.ast;
 
 import polyglot.types.SemanticException;
 import polyglot.types.Type;
+import polyglot.util.Copy;
 import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
 import polyglot.visit.AmbiguityRemover;
@@ -35,7 +36,7 @@ import polyglot.visit.TypeBuilder;
 import polyglot.visit.TypeChecker;
 
 /**
- * An <code>AmbReceiver</code> is an ambiguous AST node composed of
+ * An {@code AmbReceiver} is an ambiguous AST node composed of
  * dot-separated list of identifiers that must resolve to a receiver.
  */
 public class AmbReceiver_c extends AmbPrefix_c implements AmbReceiver {
@@ -43,9 +44,13 @@ public class AmbReceiver_c extends AmbPrefix_c implements AmbReceiver {
 
     protected Type type;
 
+    @Deprecated
     public AmbReceiver_c(Position pos, Prefix prefix, Id name) {
-        super(pos, prefix, name);
-        assert (name != null); // prefix may be null
+        this(pos, prefix, name, null);
+    }
+
+    public AmbReceiver_c(Position pos, Prefix prefix, Id name, Ext ext) {
+        super(pos, prefix, name, ext);
     }
 
     @Override
@@ -54,7 +59,12 @@ public class AmbReceiver_c extends AmbPrefix_c implements AmbReceiver {
     }
 
     public AmbReceiver type(Type type) {
-        AmbReceiver_c n = (AmbReceiver_c) copy();
+        return type(this, type);
+    }
+
+    protected <N extends AmbReceiver_c> N type(N n, Type type) {
+        if (n.type == type) return n;
+        if (n == this) n = Copy.Util.copy(n);
         n.type = type;
         return n;
     }

@@ -44,6 +44,7 @@ import polyglot.ast.Eval;
 import polyglot.ast.Expr;
 import polyglot.ast.For;
 import polyglot.ast.If;
+import polyglot.ast.JLang;
 import polyglot.ast.Local;
 import polyglot.ast.LocalAssign;
 import polyglot.ast.LocalDecl;
@@ -356,14 +357,16 @@ public class DeadCodeEliminator extends
 
     protected NodeVisitor createDefUseFinder(Set<LocalInstance> def,
             Set<LocalInstance> use) {
-        return new DefUseFinder(def, use);
+        return new DefUseFinder(lang(), def, use);
     }
 
     protected static class DefUseFinder extends HaltingVisitor {
         protected Set<LocalInstance> def;
         protected Set<LocalInstance> use;
 
-        public DefUseFinder(Set<LocalInstance> def, Set<LocalInstance> use) {
+        public DefUseFinder(JLang lang, Set<LocalInstance> def,
+                Set<LocalInstance> use) {
+            super(lang);
             this.def = def;
             this.use = use;
         }
@@ -404,7 +407,7 @@ public class DeadCodeEliminator extends
         final List<Stmt> result = new LinkedList<Stmt>();
         final Position pos = Position.compilerGenerated();
 
-        NodeVisitor v = new HaltingVisitor() {
+        NodeVisitor v = new HaltingVisitor(lang()) {
             @Override
             public NodeVisitor enter(Node n) {
                 if (n instanceof Assign || n instanceof ProcedureCall) {

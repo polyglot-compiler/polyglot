@@ -52,7 +52,7 @@ import polyglot.util.InternalCompilerError;
 
 /**
  * A Translator generates output code from the processed AST. Output is sent to
- * one or more java file in the directory <code>Options.output_directory</code>.
+ * one or more java file in the directory {@code Options.output_directory}.
  * Each SourceFile in the AST is output to exactly one java file. The name of
  * that file is determined as follows:
  * <ul>
@@ -70,9 +70,9 @@ import polyglot.util.InternalCompilerError;
  * new Translator(job, ts, nf, tf).translate(ast);
  * </pre>
  * 
- * The <code>ast</code> must be either a SourceFile or a SourceCollection.
+ * The {@code ast} must be either a SourceFile or a SourceCollection.
  */
-public class Translator extends PrettyPrinter implements Copy {
+public class Translator extends PrettyPrinter implements Copy<Translator> {
     protected Job job;
     protected NodeFactory nf;
     protected TargetFactory tf;
@@ -86,10 +86,10 @@ public class Translator extends PrettyPrinter implements Copy {
 
     /**
      * Create a Translator. The output of the visitor is a collection of files
-     * whose names are added to the collection <code>outputFiles</code>.
+     * whose names are added to the collection {@code outputFiles}.
      */
     public Translator(Job job, TypeSystem ts, NodeFactory nf, TargetFactory tf) {
-        super();
+        super(nf.lang());
         this.job = job;
         this.nf = nf;
         this.tf = tf;
@@ -131,8 +131,8 @@ public class Translator extends PrettyPrinter implements Copy {
     }
 
     /**
-     * Create a new <code>Translator</code> identical to <code>this</code> but
-     * with new context <code>c</code>
+     * Create a new {@code Translator} identical to {@code this} but
+     * with new context {@code c}
      */
     public Translator context(Context c) {
         if (c == this.context) {
@@ -146,7 +146,7 @@ public class Translator extends PrettyPrinter implements Copy {
     /**
      * Print an ast node using the given code writer. This method should not be
      * called directly to translate a source file AST; use
-     * <code>translate(Node)</code> instead. This method should only be called
+     * {@code translate(Node)} instead. This method should only be called
      * by nodes to print their children.
      */
     @Override
@@ -156,11 +156,11 @@ public class Translator extends PrettyPrinter implements Copy {
         if (context != null) {
             if (child.isDisambiguated() && child.isTypeChecked()) {
                 if (parent == null) {
-                    Context c = child.del().enterScope(context);
+                    Context c = lang().enterScope(child, context);
                     tr = this.context(c);
                 }
                 else if (parent.isDisambiguated() && parent.isTypeChecked()) {
-                    Context c = parent.del().enterChildScope(child, context);
+                    Context c = lang().enterChildScope(parent, child, context);
                     tr = this.context(c);
                 }
                 else {
@@ -172,11 +172,11 @@ public class Translator extends PrettyPrinter implements Copy {
             }
         }
 
-        child.del().translate(w, tr);
+        lang().translate(child, w, tr);
 
         if (context != null) {
             if (child.isDisambiguated() && child.isTypeChecked()) {
-                child.del().addDecls(context);
+                lang().addDecls(child, context);
             }
         }
     }
@@ -281,8 +281,8 @@ public class Translator extends PrettyPrinter implements Copy {
     }
 
     /**
-     * Translate a top-level declaration <code>decl</code> of source file
-     * <code>source</code>.
+     * Translate a top-level declaration {@code decl} of source file
+     * {@code source}.
      * 
      * @param w
      * @param source
@@ -292,20 +292,20 @@ public class Translator extends PrettyPrinter implements Copy {
             TopLevelDecl decl) {
         Translator tr;
         if (source.isDisambiguated() && source.isTypeChecked()) {
-            Context c = source.del().enterScope(context);
+            Context c = lang().enterScope(source, context);
             tr = this.context(c);
         }
         else {
             tr = this.context(null);
         }
-        decl.del().translate(w, tr);
+        lang().translate(decl, w, tr);
     }
 
     /** Write the package and import declarations for a source file. */
     protected void writeHeader(SourceFile sfn, CodeWriter w) {
         if (sfn.package_() != null) {
             w.write("package ");
-            sfn.package_().del().translate(w, this);
+            lang().translate(sfn.package_(), w, this);
             w.write(";");
             w.newline(0);
             w.newline(0);
@@ -314,7 +314,7 @@ public class Translator extends PrettyPrinter implements Copy {
         boolean newline = false;
 
         for (Import imp : sfn.imports()) {
-            imp.del().translate(w, this);
+            lang().translate(imp, w, this);
             newline = true;
         }
 

@@ -28,6 +28,7 @@ package polyglot.frontend;
 
 import java.io.Reader;
 
+import polyglot.ast.JLang_c;
 import polyglot.ast.NodeFactory;
 import polyglot.ast.NodeFactory_c;
 import polyglot.frontend.goals.Goal;
@@ -43,7 +44,7 @@ import polyglot.util.ErrorQueue;
 import polyglot.util.InternalCompilerError;
 
 /**
- * This class implements most of the <code>ExtensionInfo</code> for the Java
+ * This class implements most of the {@code ExtensionInfo} for the Java
  * language. It does not include a parser, however. EPL-licensed extensions
  * should extend this class rather than JLExtensionInfo since they should not
  * use the CUP-based grammar.
@@ -117,7 +118,7 @@ public abstract class ParserlessJLExtensionInfo extends AbstractExtensionInfo {
     /** Create the node factory for this extension. */
     @Override
     protected NodeFactory createNodeFactory() {
-        return new NodeFactory_c();
+        return new NodeFactory_c(JLang_c.instance);
     }
 
     @Override
@@ -126,16 +127,16 @@ public abstract class ParserlessJLExtensionInfo extends AbstractExtensionInfo {
     }
 
     /**
-     * Return a parser for <code>source</code> using the given
-     * <code>reader</code>.
+     * Return a parser for {@code source} using the given
+     * {@code reader}.
      */
     @Override
     public abstract Parser parser(Reader reader, FileSource source,
             ErrorQueue eq);
 
     /**
-     * Return the <code>Goal</code> to compile the source file associated with
-     * <code>job</code> to completion.
+     * Return the {@code Goal} to compile the source file associated with
+     * {@code job} to completion.
      */
     @Override
     public Goal getCompileGoal(Job job) {

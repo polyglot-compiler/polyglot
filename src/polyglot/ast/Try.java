@@ -29,8 +29,8 @@ package polyglot.ast;
 import java.util.List;
 
 /**
- * An immutable representation of a <code>try</code> block, one or more
- * <code>catch</code> blocks, and an optional <code>finally</code> block.
+ * An immutable representation of a {@code try} block, one or more
+ * {@code catch} blocks, and an optional {@code finally} block.
  *
  */
 public interface Try extends CompoundStmt {
@@ -40,12 +40,14 @@ public interface Try extends CompoundStmt {
     /** Set the block to "try". */
     Try tryBlock(Block tryBlock);
 
-    /** List of catch blocks.
+    /**
+     * List of catch blocks.
      * @return A list of {@link polyglot.ast.Catch Catch}.
      */
     List<Catch> catchBlocks();
 
-    /** Set the list of catch blocks.
+    /**
+     * Set the list of catch blocks.
      * @param catchBlocks A list of {@link polyglot.ast.Catch Catch}.
      */
     Try catchBlocks(List<Catch> catchBlocks);

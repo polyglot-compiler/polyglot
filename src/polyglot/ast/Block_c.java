@@ -34,17 +34,21 @@ import polyglot.util.SerialVersionUID;
 import polyglot.visit.PrettyPrinter;
 
 /**
- * A <code>Block</code> represents a Java block statement -- an immutable
+ * A {@code Block} represents a Java block statement -- an immutable
  * sequence of statements.
  */
-public class Block_c extends AbstractBlock_c implements Block {
+public class Block_c extends AbstractBlock_c {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
+    @Deprecated
     public Block_c(Position pos, List<Stmt> statements) {
-        super(pos, statements);
+        this(pos, statements, null);
     }
 
-    /** Write the block to an output file. */
+    public Block_c(Position pos, List<Stmt> statements, Ext ext) {
+        super(pos, statements, ext);
+    }
+
     @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
         w.write("{");

@@ -14,6 +14,7 @@ import polyglot.types.SemanticException;
 import polyglot.util.CodeWriter;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
+import polyglot.util.SerialVersionUID;
 import polyglot.visit.AmbiguityRemover;
 import polyglot.visit.PrettyPrinter;
 import polyglot.visit.Translator;
@@ -25,6 +26,8 @@ import coffer.types.Key;
  * An AST node for a <code>Key</code>.  The key may be ambiguous. 
  */
 public class KeyNode_c extends Node_c implements KeyNode {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     protected Key key;
 
     public KeyNode_c(Position pos, Key key) {

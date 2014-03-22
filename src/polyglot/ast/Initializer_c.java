@@ -28,6 +28,7 @@ package polyglot.ast;
 
 import java.util.List;
 
+import polyglot.translate.ExtensionRewriter;
 import polyglot.types.ClassType;
 import polyglot.types.CodeInstance;
 import polyglot.types.ConstructorInstance;
@@ -39,6 +40,7 @@ import polyglot.types.SemanticException;
 import polyglot.types.Type;
 import polyglot.types.TypeSystem;
 import polyglot.util.CodeWriter;
+import polyglot.util.Copy;
 import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
 import polyglot.util.SubtypeSet;
@@ -50,7 +52,7 @@ import polyglot.visit.TypeBuilder;
 import polyglot.visit.TypeChecker;
 
 /**
- * An <code>Initializer</code> is an immutable representation of an
+ * An {@code Initializer} is an immutable representation of an
  * initializer block in a Java class (which appears outside of any
  * method).  Such a block is executed before the code for any of the
  * constructors.  Such a block can optionally be static, in which case
@@ -63,8 +65,13 @@ public class Initializer_c extends Term_c implements Initializer {
     protected Block body;
     protected InitializerInstance ii;
 
+    @Deprecated
     public Initializer_c(Position pos, Flags flags, Block body) {
-        super(pos);
+        this(pos, flags, body, null);
+    }
+
+    public Initializer_c(Position pos, Flags flags, Block body, Ext ext) {
+        super(pos, ext);
         assert (flags != null && body != null);
         this.flags = flags;
         this.body = body;
@@ -76,29 +83,20 @@ public class Initializer_c extends Term_c implements Initializer {
     }
 
     @Override
-    public MemberInstance memberInstance() {
-        return ii;
-    }
-
-    /** Get the flags of the initializer. */
-    @Override
     public Flags flags() {
         return this.flags;
     }
 
-    /** Set the flags of the initializer. */
     @Override
     public Initializer flags(Flags flags) {
-        if (flags.equals(this.flags)) return this;
-        Initializer_c n = (Initializer_c) copy();
-        n.flags = flags;
-        return n;
+        return flags(this, flags);
     }
 
-    /** Get the initializer instance of the initializer. */
-    @Override
-    public InitializerInstance initializerInstance() {
-        return ii;
+    protected <N extends Initializer_c> N flags(N n, Flags flags) {
+        if (n.flags.equals(flags)) return n;
+        if (n == this) n = Copy.Util.copy(n);
+        n.flags = flags;
+        return n;
     }
 
     @Override
@@ -106,50 +104,61 @@ public class Initializer_c extends Term_c implements Initializer {
         return initializerInstance();
     }
 
-    /** Set the initializer instance of the initializer. */
+    @Override
+    public MemberInstance memberInstance() {
+        return initializerInstance();
+    }
+
+    @Override
+    public InitializerInstance initializerInstance() {
+        return ii;
+    }
+
     @Override
     public Initializer initializerInstance(InitializerInstance ii) {
-        if (ii == this.ii) return this;
-        Initializer_c n = (Initializer_c) copy();
+        return initializerInstance(this, ii);
+    }
+
+    protected <N extends Initializer_c> N initializerInstance(N n,
+            InitializerInstance ii) {
+        if (n.ii == ii) return n;
+        if (n == this) n = Copy.Util.copy(n);
         n.ii = ii;
         return n;
     }
 
     @Override
     public Term codeBody() {
-        return this.body;
+        return body();
     }
 
-    /** Get the body of the initializer. */
     @Override
     public Block body() {
         return this.body;
     }
 
-    /** Set the body of the initializer. */
     @Override
     public CodeBlock body(Block body) {
-        Initializer_c n = (Initializer_c) copy();
+        return body(this, body);
+    }
+
+    protected <N extends Initializer_c> N body(N n, Block body) {
+        if (n.body == body) return n;
+        if (n == this) n = Copy.Util.copy(n);
         n.body = body;
         return n;
     }
 
     /** Reconstruct the initializer. */
-    protected Initializer_c reconstruct(Block body) {
-        if (body != this.body) {
-            Initializer_c n = (Initializer_c) copy();
-            n.body = body;
-            return n;
-        }
-
-        return this;
+    protected <N extends Initializer_c> N reconstruct(N n, Block body) {
+        n = body(n, body);
+        return n;
     }
 
-    /** Visit the children of the initializer. */
     @Override
     public Node visitChildren(NodeVisitor v) {
-        Block body = (Block) visitChild(this.body, v);
-        return reconstruct(body);
+        Block body = visitChild(this.body, v);
+        return reconstruct(this, body);
     }
 
     @Override
@@ -162,22 +171,6 @@ public class Initializer_c extends Term_c implements Initializer {
         return tb.pushCode();
     }
 
-    /**
-     * Return the first (sub)term performed when evaluating this
-     * term.
-     */
-    @Override
-    public Term firstChild() {
-        return body();
-    }
-
-    @Override
-    public <T> List<T> acceptCFG(CFGBuilder<?> v, List<T> succs) {
-        v.visitCFG(body(), this, EXIT);
-        return succs;
-    }
-
-    /** Build type objects for the method. */
     @Override
     public Node buildTypes(TypeBuilder tb) throws SemanticException {
         TypeSystem ts = tb.typeSystem();
@@ -186,7 +179,6 @@ public class Initializer_c extends Term_c implements Initializer {
         return initializerInstance(ii);
     }
 
-    /** Type check the initializer. */
     @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
         TypeSystem ts = tc.typeSystem();
@@ -264,7 +256,29 @@ public class Initializer_c extends Term_c implements Initializer {
         return ec.push();
     }
 
-    /** Write the initializer to an output file. */
+    @Override
+    public Node extRewrite(ExtensionRewriter rw) throws SemanticException {
+        Initializer_c n = (Initializer_c) super.extRewrite(rw);
+        n = initializerInstance(n, null);
+        return n;
+    }
+
+    @Override
+    public Term firstChild() {
+        return body();
+    }
+
+    @Override
+    public <T> List<T> acceptCFG(CFGBuilder<?> v, List<T> succs) {
+        v.visitCFG(body(), this, EXIT);
+        return succs;
+    }
+
+    @Override
+    public String toString() {
+        return flags.translate() + "{ ... }";
+    }
+
     @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
         w.begin(0);
@@ -283,11 +297,6 @@ public class Initializer_c extends Term_c implements Initializer {
             w.write("(instance " + ii + ")");
             w.end();
         }
-    }
-
-    @Override
-    public String toString() {
-        return flags.translate() + "{ ... }";
     }
 
     @Override

@@ -1,7 +1,7 @@
 package java_cup;
 
-import java.util.Hashtable;
 import java.util.Enumeration;
+import java.util.Hashtable;
 
 /** This class represents a set of LALR items.  For purposes of building
  *  these sets, items are considered unique only if they have unique cores
@@ -32,9 +32,10 @@ public class lalr_item_set {
     /** Constructor for cloning from another set. 
      * @param other indicates set we should copy from.
      */
+    @SuppressWarnings("unchecked")
     public lalr_item_set(lalr_item_set other) throws internal_error {
         not_null(other);
-        _all = (Hashtable) other._all.clone();
+        _all = (Hashtable<lalr_item, lalr_item>) other._all.clone();
     }
 
     /*-----------------------------------------------------------*/
@@ -44,10 +45,11 @@ public class lalr_item_set {
     /** A hash table to implement the set.  We store the items using themselves
      *  as keys. 
      */
-    protected Hashtable _all = new Hashtable(11);
+    protected Hashtable<lalr_item, lalr_item> _all =
+            new Hashtable<lalr_item, lalr_item>(11);
 
     /** Access to all elements of the set. */
-    public Enumeration all() {
+    public Enumeration<lalr_item> all() {
         return _all.elements();
     }
 
@@ -81,7 +83,7 @@ public class lalr_item_set {
      *  @param itm the item we are looking for.
      */
     public lalr_item find(lalr_item itm) {
-        return (lalr_item) _all.get(itm);
+        return _all.get(itm);
     }
 
     /*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . .*/
@@ -93,8 +95,8 @@ public class lalr_item_set {
         not_null(other);
 
         /* walk down our set and make sure every element is in the other */
-        for (Enumeration e = all(); e.hasMoreElements();)
-            if (!other.contains((lalr_item) e.nextElement())) return false;
+        for (Enumeration<lalr_item> e = all(); e.hasMoreElements();)
+            if (!other.contains(e.nextElement())) return false;
 
         /* they were all there */
         return true;
@@ -123,7 +125,7 @@ public class lalr_item_set {
         not_null(itm);
 
         /* see if an item with a matching core is already there */
-        other = (lalr_item) _all.get(itm);
+        other = _all.get(itm);
 
         /* if so, merge this lookahead into the original and leave it */
         if (other != null) {
@@ -165,8 +167,8 @@ public class lalr_item_set {
         not_null(other);
 
         /* walk down the other set and do the adds individually */
-        for (Enumeration e = other.all(); e.hasMoreElements();)
-            add((lalr_item) e.nextElement());
+        for (Enumeration<lalr_item> e = other.all(); e.hasMoreElements();)
+            add(e.nextElement());
     }
 
     /*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . .*/
@@ -178,20 +180,20 @@ public class lalr_item_set {
         not_null(other);
 
         /* walk down the other set and do the removes individually */
-        for (Enumeration e = other.all(); e.hasMoreElements();)
-            remove((lalr_item) e.nextElement());
+        for (Enumeration<lalr_item> e = other.all(); e.hasMoreElements();)
+            remove(e.nextElement());
     }
 
     /*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . .*/
 
     /** Remove and return one item from the set (done in hash order). */
     public lalr_item get_one() throws internal_error {
-        Enumeration the_set;
+        Enumeration<lalr_item> the_set;
         lalr_item result;
 
         the_set = all();
         if (the_set.hasMoreElements()) {
-            result = (lalr_item) the_set.nextElement();
+            result = the_set.nextElement();
             remove(result);
             return result;
         }
@@ -233,7 +235,6 @@ public class lalr_item_set {
         lalr_item itm, new_itm, add_itm;
         non_terminal nt;
         terminal_set new_lookaheads;
-        Enumeration p;
         production prod;
         boolean need_prop;
 
@@ -258,8 +259,8 @@ public class lalr_item_set {
                 need_prop = itm.lookahead_visible();
 
                 /* create items for each production of that non term */
-                for (p = nt.productions(); p.hasMoreElements();) {
-                    prod = (production) p.nextElement();
+                for (Enumeration<production> p = nt.productions(); p.hasMoreElements();) {
+                    prod = p.nextElement();
 
                     /* create new item with dot at start and that lookahead */
                     new_itm =
@@ -302,6 +303,7 @@ public class lalr_item_set {
     /*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . .*/
 
     /** Generic equality comparison. */
+    @Override
     public boolean equals(Object other) {
         if (!(other instanceof lalr_item_set))
             return false;
@@ -311,9 +313,11 @@ public class lalr_item_set {
     /*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . .*/
 
     /** Return hash code. */
+    @Override
     public int hashCode() {
         int result = 0;
-        Enumeration e;
+        Enumeration<lalr_item> e;
+        @SuppressWarnings("unused")
         int cnt;
 
         /* only compute a new one if we don't have it cached */
@@ -323,7 +327,7 @@ public class lalr_item_set {
             //   that means equal sets will have inequal hashcodes, which
             //   we're not allowed (by contract) to do.  So hash them all.
             for (e = all(), cnt = 0; e.hasMoreElements() /*&& cnt<5*/; cnt++)
-                result ^= ((lalr_item) e.nextElement()).hashCode();
+                result ^= e.nextElement().hashCode();
 
             hashcode_cache = new Integer(result);
         }
@@ -334,12 +338,13 @@ public class lalr_item_set {
     /*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . .*/
 
     /** Convert to string. */
+    @Override
     public String toString() {
         StringBuffer result = new StringBuffer();
 
         result.append("{\n");
-        for (Enumeration e = all(); e.hasMoreElements();) {
-            result.append("  " + (lalr_item) e.nextElement() + "\n");
+        for (Enumeration<lalr_item> e = all(); e.hasMoreElements();) {
+            result.append("  " + e.nextElement() + "\n");
         }
         result.append("}");
 

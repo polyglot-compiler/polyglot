@@ -11,8 +11,11 @@ import polyglot.types.TypeObject;
 import polyglot.types.TypeObject_c;
 import polyglot.types.TypeSystem;
 import polyglot.util.Position;
+import polyglot.util.SerialVersionUID;
 
 public abstract class Key_c extends TypeObject_c implements Key {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     protected String name;
 
     public Key_c(TypeSystem ts, Position pos, String name) {

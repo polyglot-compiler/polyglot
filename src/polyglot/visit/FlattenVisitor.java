@@ -57,7 +57,7 @@ import polyglot.types.TypeSystem;
 import polyglot.util.Position;
 
 /**
- * The <code>FlattenVisitor</code> flattens the AST,
+ * The {@code FlattenVisitor} flattens the AST,
  */
 public class FlattenVisitor extends NodeVisitor {
     protected TypeSystem ts;
@@ -65,6 +65,7 @@ public class FlattenVisitor extends NodeVisitor {
     protected LinkedList<List<Stmt>> stack;
 
     public FlattenVisitor(TypeSystem ts, NodeFactory nf) {
+        super(nf.lang());
         this.ts = ts;
         this.nf = nf;
         stack = new LinkedList<List<Stmt>>();

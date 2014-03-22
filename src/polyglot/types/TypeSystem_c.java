@@ -39,6 +39,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import polyglot.ast.JLang_c;
 import polyglot.frontend.ExtensionInfo;
 import polyglot.frontend.Source;
 import polyglot.main.Report;
@@ -49,11 +50,12 @@ import polyglot.util.Position;
 import polyglot.util.StringUtil;
 
 /**
- * TypeSystem_c
+ * The {@code TypeSystem} defines the types of the language and
+ * how they are related.
  *
  * Overview:
- *    A TypeSystem_c is a universe of types, including all Java types.
- **/
+ *    A {@code TypeSystem_c} is a universe of types, including all Java types.
+ */
 public class TypeSystem_c implements TypeSystem {
     protected SystemResolver systemResolver;
     protected TopLevelResolver loadedResolver;
@@ -63,10 +65,6 @@ public class TypeSystem_c implements TypeSystem {
     public TypeSystem_c() {
     }
 
-    /**
-     * Initializes the type system and its internal constants (which depend on
-     * the resolver).
-     */
     @Override
     public void initialize(TopLevelResolver loadedResolver,
             ExtensionInfo extInfo) throws SemanticException {
@@ -136,7 +134,6 @@ public class TypeSystem_c implements TypeSystem {
         */
     }
 
-    /** Return the language extension this type system is for. */
     @Override
     public ExtensionInfo extensionInfo() {
         return extInfo;
@@ -162,11 +159,6 @@ public class TypeSystem_c implements TypeSystem {
         this.systemResolver = r;
     }
 
-    /**
-     * Return the system resolver.  This used to return a different resolver.
-     * enclosed in the system resolver.
-     * @deprecated
-     */
     @Deprecated
     @Override
     public CachingResolver parsedResolver() {
@@ -196,9 +188,6 @@ public class TypeSystem_c implements TypeSystem {
         return new ImportTable(this, pkg);
     }
 
-    /**
-     * Returns true if the package named <code>name</code> exists.
-     */
     @Override
     public boolean packageExists(String name) {
         return systemResolver.packageExists(name);
@@ -254,7 +243,7 @@ public class TypeSystem_c implements TypeSystem {
 
     @Override
     public Context createContext() {
-        return new Context_c(this);
+        return new Context_c(JLang_c.instance, this);
     }
 
     /** @deprecated */
@@ -390,10 +379,6 @@ public class TypeSystem_c implements TypeSystem {
                                     excTypes);
     }
 
-    /**
-     * Returns true iff child and ancestor are distinct
-     * reference types, and child descends from ancestor.
-     **/
     @Override
     public boolean descendsFrom(Type child, Type ancestor) {
         assert_(child);
@@ -401,12 +386,6 @@ public class TypeSystem_c implements TypeSystem {
         return child.descendsFromImpl(ancestor);
     }
 
-    /**
-     * Requires: all type arguments are canonical.  ToType is not a NullType.
-     *
-     * Returns true iff a cast from fromType to toType is valid; in other
-     * words, some non-null members of fromType are also members of toType.
-     **/
     @Override
     public boolean isCastValid(Type fromType, Type toType) {
         assert_(fromType);
@@ -414,17 +393,6 @@ public class TypeSystem_c implements TypeSystem {
         return fromType.isCastValidImpl(toType);
     }
 
-    /**
-     * Requires: all type arguments are canonical.
-     *
-     * Returns true iff an implicit cast from fromType to toType is valid;
-     * in other words, every member of fromType is member of toType.
-     *
-     * Returns true iff child and ancestor are non-primitive
-     * types, and a variable of type child may be legally assigned
-     * to a variable of type ancestor.
-     *
-     */
     @Override
     public boolean isImplicitCastValid(Type fromType, Type toType) {
         assert_(fromType);
@@ -432,9 +400,6 @@ public class TypeSystem_c implements TypeSystem {
         return fromType.isImplicitCastValidImpl(toType);
     }
 
-    /**
-     * Returns true iff type1 and type2 represent the same type object.
-     */
     @Override
     public boolean equals(TypeObject type1, TypeObject type2) {
         assert_(type1);
@@ -444,9 +409,6 @@ public class TypeSystem_c implements TypeSystem {
         return type1.equalsImpl(type2);
     }
 
-    /**
-     * Returns true iff type1 and type2 are equivalent.
-     */
     @Override
     public boolean typeEquals(Type type1, Type type2) {
         assert_(type1);
@@ -454,9 +416,6 @@ public class TypeSystem_c implements TypeSystem {
         return type1.typeEqualsImpl(type2);
     }
 
-    /**
-     * Returns true iff type1 and type2 are equivalent.
-     */
     @Override
     public boolean packageEquals(Package type1, Package type2) {
         assert_(type1);
@@ -464,52 +423,33 @@ public class TypeSystem_c implements TypeSystem {
         return type1.packageEqualsImpl(type2);
     }
 
-    /**
-     * Returns true if <code>value</code> can be implicitly cast to Primitive
-     * type <code>t</code>.
-     */
     @Override
     public boolean numericConversionValid(Type t, Object value) {
         assert_(t);
         return t.numericConversionValidImpl(value);
     }
 
-    /**
-     * Returns true if <code>value</code> can be implicitly cast to Primitive
-     * type <code>t</code>.  This method should be removed.  It is kept for
-     * backward compatibility.
-     */
+    @Deprecated
     @Override
     public boolean numericConversionValid(Type t, long value) {
-        assert_(t);
-        return t.numericConversionValidImpl(value);
+        return numericConversionValid(t, new Long(value));
     }
 
     ////
     // Functions for one-type checking and resolution.
     ////
 
-    /**
-     * Returns true iff <type> is a canonical (fully qualified) type.
-     */
     @Override
     public boolean isCanonical(Type type) {
         assert_(type);
         return type.isCanonical();
     }
 
-    /**
-     * Checks whether the member mi can be accessed from Context "context".
-     */
     @Override
     public boolean isAccessible(MemberInstance mi, Context context) {
         return isAccessible(mi, context.currentClass());
     }
 
-    /**
-     * Checks whether the member mi can be accessed from code that is
-     * declared in the class contextClass.
-     */
     @Override
     public boolean isAccessible(MemberInstance mi, ClassType contextClass) {
         assert_(mi);
@@ -518,31 +458,18 @@ public class TypeSystem_c implements TypeSystem {
         return isAccessible(mi, target, contextClass);
     }
 
-    /**
-     * Checks whether the member mi of container container can be accessed from code that is
-     * declared in the class contextClass.
-     */
     @Override
     public boolean isAccessible(MemberInstance mi, ReferenceType container,
             ClassType contextClass) {
         Flags flags = mi.flags();
 
-        ReferenceType target;
-        // does container inherit mi?
-        if (container.descendsFrom(mi.container()) && mi.flags().isPublic()) {
-            target = container;
-        }
-        else {
-            target = mi.container();
-        }
-
-        if (!target.isClass()) {
+        if (!container.isClass()) {
             // public members of non-classes are accessible;
             // non-public members of non-classes are inaccessible
             return flags.isPublic();
         }
 
-        ClassType targetClass = target.toClass();
+        ClassType targetClass = container.toClass();
 
         if (!classAccessible(targetClass, contextClass)) {
             return false;
@@ -587,7 +514,6 @@ public class TypeSystem_c implements TypeSystem {
                                      contextClass.package_());
     }
 
-    /** True if the class targetClass accessible from the context. */
     @Override
     public boolean classAccessible(ClassType targetClass, Context context) {
         if (context.currentClass() == null) {
@@ -599,7 +525,6 @@ public class TypeSystem_c implements TypeSystem {
         }
     }
 
-    /** True if the class targetClass accessible from the body of class contextClass. */
     @Override
     public boolean classAccessible(ClassType targetClass, ClassType contextClass) {
         assert_(targetClass);
@@ -624,7 +549,6 @@ public class TypeSystem_c implements TypeSystem {
         return classAccessibleFromPackage(targetClass, contextClass.package_());
     }
 
-    /** True if the class targetClass accessible from the package pkg. */
     @Override
     public boolean classAccessibleFromPackage(ClassType targetClass, Package pkg) {
         assert_(targetClass);
@@ -652,9 +576,9 @@ public class TypeSystem_c implements TypeSystem {
 
     /**
      * Return true if a member (in an accessible container) or a
-     * top-level class with access flags <code>flags</code>
-     * in package <code>pkg1</code> is accessible from package
-     * <code>pkg2</code>.
+     * top-level class with access flags {@code flags}
+     * in package {@code pkg1} is accessible from package
+     * {@code pkg2}.
      */
     protected boolean accessibleFromPackage(Flags flags, Package pkg1,
             Package pkg2) {
@@ -728,13 +652,6 @@ public class TypeSystem_c implements TypeSystem {
     // Various one-type predicates.
     ////
 
-    /**
-     * Returns true iff the type t can be coerced to a String in the given
-     * Context. If a type can be coerced to a String then it can be
-     * concatenated with Strings, e.g. if o is of type T, then the code snippet
-     *         "" + o
-     * would be allowed.
-     */
     @Override
     public boolean canCoerceToString(Type t, Context c) {
         // every Object can be coerced to a string, as can any primitive,
@@ -742,29 +659,18 @@ public class TypeSystem_c implements TypeSystem {
         return !t.isVoid();
     }
 
-    /**
-     * Returns true iff an object of type <type> may be thrown.
-     **/
     @Override
     public boolean isThrowable(Type type) {
         assert_(type);
         return type.isThrowable();
     }
 
-    /**
-     * Returns a true iff the type or a supertype is in the list
-     * returned by uncheckedExceptions().
-     */
     @Override
     public boolean isUncheckedException(Type type) {
         assert_(type);
         return type.isUncheckedException();
     }
 
-    /**
-     * Returns a list of the Throwable types that need not be declared
-     * in method and constructor signatures.
-     */
     @Override
     public Collection<Type> uncheckedExceptions() {
         List<Type> l = new ArrayList<Type>(2);
@@ -796,12 +702,6 @@ public class TypeSystem_c implements TypeSystem {
         return findField(container, name, ct);
     }
 
-    /**
-     * Returns the FieldInstance for the field <code>name</code> defined
-     * in type <code>container</code> or a supertype, and visible from
-     * <code>currClass</code>.  If no such field is found, a SemanticException
-     * is thrown.  <code>currClass</code> may be null.
-     **/
     @Override
     public FieldInstance findField(ReferenceType container, String name,
             ClassType currClass) throws SemanticException {
@@ -823,10 +723,17 @@ public class TypeSystem_c implements TypeSystem {
                     + fi.container() + " and " + fi2.container() + ".");
         }
 
-        if (currClass != null) {
+        if (container == null) {
             if (!isAccessible(fi, currClass) && !isInherited(fi, currClass)) {
                 // currClass neither inherits fi, nor can access it.
                 throw new SemanticException("Cannot access " + fi + ".");
+            }
+        }
+        else if (currClass != null) {
+            if (!isAccessible(fi, container, currClass)) {
+                // Cannot access private field declared in superclasses.
+                throw new SemanticException("Field " + fi + " is not visible "
+                        + "in class " + container + ".");
             }
         }
 
@@ -855,11 +762,6 @@ public class TypeSystem_c implements TypeSystem {
         return false;
     }
 
-    /**
-     * Returns the FieldInstance for the field <code>name</code> defined
-     * in type <code>container</code> or a supertype.  If no such field is
-     * found, a SemanticException is thrown.
-     */
     @Override
     public FieldInstance findField(ReferenceType container, String name)
             throws SemanticException {
@@ -868,8 +770,8 @@ public class TypeSystem_c implements TypeSystem {
     }
 
     /**
-     * Returns a set of fields named <code>name</code> defined
-     * in type <code>container</code> or a supertype.  The list
+     * Returns a set of fields named {@code name} defined
+     * in type {@code container} or a supertype.  The list
      * returned may be empty.
      */
     protected Set<FieldInstance> findFields(ReferenceType container, String name) {
@@ -965,11 +867,6 @@ public class TypeSystem_c implements TypeSystem {
         return findMethod(container, name, argTypes, c.currentClass());
     }
 
-    /**
-     * Returns the list of methods with the given name defined or inherited
-     * into container, checking if the methods are accessible from the
-     * body of currClass
-     */
     @Override
     public boolean hasMethodNamed(ReferenceType container, String name) {
         assert_(container);
@@ -1032,7 +929,7 @@ public class TypeSystem_c implements TypeSystem {
             }
 
             for (MethodInstance mi : type.toReference().methodsNamed(name)) {
-                if (isAccessible(mi, container, currClass)) {
+                if (isAccessible(mi, currClass)) {
                     return true;
                 }
             }
@@ -1045,13 +942,6 @@ public class TypeSystem_c implements TypeSystem {
         return false;
     }
 
-    /**
-     * Requires: all type arguments are canonical.
-     *
-     * Returns the MethodInstance named 'name' defined on 'type' visible in
-     * context.  If no such field may be found, returns a fieldmatch
-     * with an error explaining why.  Access flags are considered.
-     **/
     @Override
     public MethodInstance findMethod(ReferenceType container, String name,
             List<? extends Type> argTypes, ClassType currClass)
@@ -1466,7 +1356,7 @@ public class TypeSystem_c implements TypeSystem {
     }
 
     /**
-     * Returns whether method 1 is <i>more specific</i> than method 2,
+     * Returns true iff {@code m1} is <i>more specific</i> than {@code m2},
      * where <i>more specific</i> is defined as JLS 15.11.2.2
      */
     @Override
@@ -1474,29 +1364,18 @@ public class TypeSystem_c implements TypeSystem {
         return p1.moreSpecificImpl(p2);
     }
 
-    /**
-     * Returns the supertype of type, or null if type has no supertype.
-     **/
     @Override
     public Type superType(ReferenceType type) {
         assert_(type);
         return type.superType();
     }
 
-    /**
-     * Returns an immutable list of all the interface types which type
-     * implements.
-     **/
     @Override
     public List<? extends Type> interfaces(ReferenceType type) {
         assert_(type);
         return type.interfaces();
     }
 
-    /**
-     * Requires: all type arguments are canonical.
-     * Returns the least common ancestor of Type1 and Type2
-     **/
     @Override
     public Type leastCommonAncestor(Type type1, Type type2)
             throws SemanticException {
@@ -1569,9 +1448,6 @@ public class TypeSystem_c implements TypeSystem {
     // Functions for method testing.
     ////
 
-    /**
-     * Returns true iff <p1> throws fewer exceptions than <p2>.
-     */
     @Override
     public boolean throwsSubset(ProcedureInstance p1, ProcedureInstance p2) {
         assert_(p1);
@@ -1579,7 +1455,6 @@ public class TypeSystem_c implements TypeSystem {
         return p1.throwsSubsetImpl(p2);
     }
 
-    /** Return true if t overrides mi */
     @Override
     public boolean hasFormals(ProcedureInstance pi,
             List<? extends Type> formalTypes) {
@@ -1588,7 +1463,6 @@ public class TypeSystem_c implements TypeSystem {
         return pi.hasFormalsImpl(formalTypes);
     }
 
-    /** Return true if t overrides mi */
     @Override
     public boolean hasMethod(ReferenceType t, MethodInstance mi) {
         assert_(t);
@@ -1625,9 +1499,6 @@ public class TypeSystem_c implements TypeSystem {
         mi.canOverrideImpl(mj, false);
     }
 
-    /**
-     * Returns true iff <m1> is the same method as <m2>
-     */
     @Override
     public boolean isSameMethod(MethodInstance m1, MethodInstance m2) {
         assert_(m1);
@@ -1935,10 +1806,6 @@ public class TypeSystem_c implements TypeSystem {
         return createPackage(createPackage(p), s);
     }
 
-    /**
-     * Returns a type identical to <type>, but with <dims> more array
-     * dimensions.
-     */
     @Override
     public ArrayType arrayOf(Type type) {
         assert_(type);
@@ -2016,29 +1883,11 @@ public class TypeSystem_c implements TypeSystem {
         return (Type) resolver.find(clazz.getName());
     }
 
-    /**
-     * Return the set of objects that should be serialized into the
-     * type information for the given TypeObject.
-     * Usually only the object itself should get encoded, and references
-     * to other classes should just have their name written out.
-     * If it makes sense for additional types to be fully encoded,
-     * (i.e., they're necessary to correctly reconstruct the given clazz,
-     * and the usual class resolvers can't otherwise find them) they
-     * should be returned in the set in addition to clazz.
-     */
     @Override
     public Set<TypeObject> getTypeEncoderRootSet(TypeObject t) {
         return Collections.singleton(t);
     }
 
-    /**
-     * Get the transformed class name of a class.
-     * This utility method returns the "mangled" name of the given class,
-     * whereby all periods ('.') following the toplevel class name
-     * are replaced with dollar signs ('$'). If any of the containing
-     * classes is not a member class or a top level class, then null is
-     * returned.
-     */
     @Override
     public String getTransformedClassName(ClassType ct) {
         StringBuffer sb = new StringBuffer(ct.fullName().length());
@@ -2101,9 +1950,6 @@ public class TypeSystem_c implements TypeSystem {
         return new SchedulerClassInitializer(this);
     }
 
-    /**
-     * The lazy class initializer for deserialized classes.
-     */
     @Override
     public LazyClassInitializer deserializedClassInitializer() {
         return new DeserializedClassInitializer(this);
@@ -2183,7 +2029,6 @@ public class TypeSystem_c implements TypeSystem {
         return t.toPrimitive();
     }
 
-    /** All possible <i>access</i> flags. */
     @Override
     public Flags legalAccessFlags() {
         return Public().Protected().Private();
@@ -2191,7 +2036,6 @@ public class TypeSystem_c implements TypeSystem {
 
     protected final Flags ACCESS_FLAGS = legalAccessFlags();
 
-    /** All flags allowed for a local variable. */
     @Override
     public Flags legalLocalFlags() {
         return Final();
@@ -2199,7 +2043,6 @@ public class TypeSystem_c implements TypeSystem {
 
     protected final Flags LOCAL_FLAGS = legalLocalFlags();
 
-    /** All flags allowed for a field. */
     @Override
     public Flags legalFieldFlags() {
         return legalAccessFlags().Static().Final().Transient().Volatile();
@@ -2207,7 +2050,6 @@ public class TypeSystem_c implements TypeSystem {
 
     protected final Flags FIELD_FLAGS = legalFieldFlags();
 
-    /** All flags allowed for a constructor. */
     @Override
     public Flags legalConstructorFlags() {
         return legalAccessFlags().Synchronized().Native();
@@ -2215,7 +2057,6 @@ public class TypeSystem_c implements TypeSystem {
 
     protected final Flags CONSTRUCTOR_FLAGS = legalConstructorFlags();
 
-    /** All flags allowed for an initializer block. */
     @Override
     public Flags legalInitializerFlags() {
         return Static();
@@ -2223,7 +2064,6 @@ public class TypeSystem_c implements TypeSystem {
 
     protected final Flags INITIALIZER_FLAGS = legalInitializerFlags();
 
-    /** All flags allowed for a method. */
     @Override
     public Flags legalMethodFlags() {
         return legalAccessFlags().Abstract()
@@ -2243,7 +2083,6 @@ public class TypeSystem_c implements TypeSystem {
 
     protected final Flags ABSTRACT_METHOD_FLAGS = legalAbstractMethodFlags();
 
-    /** All flags allowed for a top-level class. */
     @Override
     public Flags legalTopLevelClassFlags() {
         return legalAccessFlags().clear(Private())
@@ -2255,7 +2094,6 @@ public class TypeSystem_c implements TypeSystem {
 
     protected final Flags TOP_LEVEL_CLASS_FLAGS = legalTopLevelClassFlags();
 
-    /** All flags allowed for an interface. */
     @Override
     public Flags legalInterfaceFlags() {
         return legalAccessFlags().Abstract().Interface().Static();
@@ -2263,7 +2101,6 @@ public class TypeSystem_c implements TypeSystem {
 
     protected final Flags INTERFACE_FLAGS = legalInterfaceFlags();
 
-    /** All flags allowed for a member class. */
     @Override
     public Flags legalMemberClassFlags() {
         return legalAccessFlags().Static()
@@ -2275,7 +2112,6 @@ public class TypeSystem_c implements TypeSystem {
 
     protected final Flags MEMBER_CLASS_FLAGS = legalMemberClassFlags();
 
-    /** All flags allowed for a local class. */
     @Override
     public Flags legalLocalClassFlags() {
         return Abstract().Final().StrictFP().Interface();
@@ -2389,17 +2225,16 @@ public class TypeSystem_c implements TypeSystem {
 
     /**
      * Utility method to gather all the superclasses and interfaces of
-     * <code>ct</code> that may contain abstract methods that must be
-     * implemented by <code>ct</code>. The list returned also contains
-     * <code>rt</code>.
+     * {@code ct} that may contain abstract methods that must be
+     * implemented by {@code ct}. The list returned also contains
+     * {@code rt}.
      */
     protected List<ReferenceType> abstractSuperInterfaces(ReferenceType rt) {
         List<ReferenceType> superInterfaces = new LinkedList<ReferenceType>();
         superInterfaces.add(rt);
 
-        @SuppressWarnings("unchecked")
-        List<ClassType> interfaces = (List<ClassType>) rt.interfaces();
-        for (ClassType interf : interfaces) {
+        List<? extends ReferenceType> interfaces = rt.interfaces();
+        for (ReferenceType interf : interfaces) {
             superInterfaces.addAll(abstractSuperInterfaces(interf));
         }
 
@@ -2419,13 +2254,6 @@ public class TypeSystem_c implements TypeSystem {
         return superInterfaces;
     }
 
-    /**
-     * Assert that <code>ct</code> implements all abstract methods required;
-     * that is, if it is a concrete class, then it must implement all
-     * interfaces and abstract methods that it or it's superclasses declare, and if 
-     * it is an abstract class then any methods that it overrides are overridden 
-     * correctly.
-     */
     @Override
     public void checkClassConformance(ClassType ct) throws SemanticException {
         if (ct.flags().isAbstract()) {
@@ -2520,10 +2348,6 @@ public class TypeSystem_c implements TypeSystem {
         return null;
     }
 
-    /**
-     * Returns t, modified as necessary to make it a legal
-     * static target.
-     */
     @Override
     public Type staticTarget(Type t) {
         // Nothing needs done in standard Java.

@@ -30,6 +30,7 @@ import java.util.List;
 
 import polyglot.types.Context;
 import polyglot.util.CodeWriter;
+import polyglot.util.Copy;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
@@ -46,60 +47,55 @@ public class LocalClassDecl_c extends Stmt_c implements LocalClassDecl {
 
     protected ClassDecl decl;
 
+    @Deprecated
     public LocalClassDecl_c(Position pos, ClassDecl decl) {
-        super(pos);
+        this(pos, decl, null);
+    }
+
+    public LocalClassDecl_c(Position pos, ClassDecl decl, Ext ext) {
+        super(pos, ext);
         assert (decl != null);
         this.decl = decl;
     }
 
-    /** Get the class declaration. */
     @Override
     public ClassDecl decl() {
         return this.decl;
     }
 
-    /** Set the class declaration. */
     @Override
     public LocalClassDecl decl(ClassDecl decl) {
-        LocalClassDecl_c n = (LocalClassDecl_c) copy();
+        return decl(this, decl);
+    }
+
+    protected <N extends LocalClassDecl_c> N decl(N n, ClassDecl decl) {
+        if (n.decl == decl) return n;
+        if (n == this) n = Copy.Util.copy(n);
         n.decl = decl;
         return n;
     }
 
     /** Reconstruct the statement. */
-    protected LocalClassDecl_c reconstruct(ClassDecl decl) {
-        if (decl != this.decl) {
-            LocalClassDecl_c n = (LocalClassDecl_c) copy();
-            n.decl = decl;
-            return n;
-        }
-
-        return this;
+    protected <N extends LocalClassDecl_c> N reconstruct(N n, ClassDecl decl) {
+        n = decl(n, decl);
+        return n;
     }
 
-    /**
-     * Return the first (sub)term performed when evaluating this
-     * term.
-     */
+    @Override
+    public Node visitChildren(NodeVisitor v) {
+        ClassDecl decl = visitChild(this.decl, v);
+        return reconstruct(this, decl);
+    }
+
     @Override
     public Term firstChild() {
         return decl();
     }
 
-    /**
-     * Visit this term in evaluation order.
-     */
     @Override
     public <T> List<T> acceptCFG(CFGBuilder<?> v, List<T> succs) {
         v.visitCFG(decl(), this, EXIT);
         return succs;
-    }
-
-    /** Visit the children of the statement. */
-    @Override
-    public Node visitChildren(NodeVisitor v) {
-        ClassDecl decl = (ClassDecl) visitChild(this.decl, v);
-        return reconstruct(decl);
     }
 
     @Override
@@ -119,7 +115,6 @@ public class LocalClassDecl_c extends Stmt_c implements LocalClassDecl {
         return decl.toString();
     }
 
-    /** Write the statement to an output file. */
     @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
         printBlock(decl, w, tr);

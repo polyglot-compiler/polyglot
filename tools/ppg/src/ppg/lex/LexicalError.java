@@ -25,9 +25,13 @@
  ******************************************************************************/
 package ppg.lex;
 
-import java.io.*;
+import java.io.IOException;
+import java.io.OutputStream;
+
+import polyglot.util.SerialVersionUID;
 
 public class LexicalError extends Exception implements LexerResult {
+    private static final long serialVersionUID = SerialVersionUID.generate();
     private String filename;
     private int lineNumber;
     private String message;

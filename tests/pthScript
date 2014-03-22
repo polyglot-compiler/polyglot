@@ -25,7 +25,7 @@
 #      CmdLineArgs  :   additional command line args for the Polyglot 
 #                       compiler; is always enclosed in quotes.
 
-polyglot.frontend.JLExtensionInfo "-cp ." {
+polyglot.frontend.JLExtensionInfo "-d out -cp ." {
         AnonymousClass.jl ;
         AnonymousClass02.jl ;
         ArrayInit.jl ;
@@ -67,10 +67,11 @@ polyglot.frontend.JLExtensionInfo "-cp ." {
         Except7.jl (Semantic, "must either be caught or declared");
         Field.jl ;
         FieldAccess.jl ;
-        FieldAccess2.jl (Semantic, "Cannot access field");
+        FieldAccess2.jl (Semantic, "Field .* not visible");
         FieldAccess3.jl ;
         FieldAccess4.jl (Semantic, "Field.*ambiguous");
         FieldAccess5.jl (Semantic, "Field.*ambiguous");
+        FieldAccess6.jl (Semantic, "Field .* not visible");
         FieldClassConflict.jl ;
         FinalInit1.jl ; FinalInit2.jl ; FinalInit3.jl ; FinalInit4.jl ;
         FinalInit5.jl ; FinalInit6.jl ; FinalInit7.jl ; FinalInit8.jl ;
@@ -124,7 +125,7 @@ polyglot.frontend.JLExtensionInfo "-cp ." {
         Inner5.jl ; Inner6.jl ; Inner7.jl ; Inner8.jl ; Inner9.jl ;
         Inner10.jl ; Inner11.jl ; Inner12.jl ; Inner13.jl ;
         InnerBen.jl ;
-        InnerFormalSuper.jl;
+        InnerFormalSuper.jl (Syntax);
         InnerSuperConstructor1.jl;
         InnerSuperConstructor2.jl (Semantic, ".*must have an enclosing instance that is a subtype.*");
         InnerSuperConstructor3.jl;
@@ -141,6 +142,7 @@ polyglot.frontend.JLExtensionInfo "-cp ." {
         LocalClass3.jl ; LocalClass4.jl ;
         LocalInners2.jl ;
         LocalInit.jl ;
+        LongString01.jl;
        MemberClassFlags.jl ;
         Narrowing.jl ;
         # Output.jl ;
@@ -281,6 +283,7 @@ polyglot.frontend.JLExtensionInfo "-cp ." {
 	Protection4.jl;
 	Protection5.jl;
 	Protection6a.jl Protection6b.jl;
+	Protection7.jl (Semantic, "Method .* inaccessible");
 
         // on the following file, javac produces an error, but we intentionally do not.
         //  BadFinalInit13.jl (Post); 
@@ -299,7 +302,7 @@ polyglot.frontend.JLExtensionInfo "-cp ." {
 		       (Semantic, "Illegal forward ref"); 
 }
 
-polyglot.frontend.JLExtensionInfo {
+polyglot.frontend.JLExtensionInfo "-d out" {
 	package3/name/ClassPackConflict.jl;
 }
 

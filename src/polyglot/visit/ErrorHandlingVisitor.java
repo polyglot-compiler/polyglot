@@ -50,12 +50,13 @@ public class ErrorHandlingVisitor extends HaltingVisitor {
     protected NodeFactory nf;
 
     public ErrorHandlingVisitor(Job job, TypeSystem ts, NodeFactory nf) {
+        super(nf.lang());
         this.job = job;
         this.ts = ts;
         this.nf = nf;
     }
 
-    /** Returns the <code>Job</code> that this Visitor is part of.
+    /** Returns the {@code Job} that this Visitor is part of.
      *
      * @see polyglot.frontend.Job
      */
@@ -73,7 +74,7 @@ public class ErrorHandlingVisitor extends HaltingVisitor {
         return super.begin();
     }
 
-    /** Returns the <code>ErrorQueue</code> for the current Job.
+    /** Returns the {@code ErrorQueue} for the current Job.
      *
      * @see polyglot.util.ErrorQueue
      */
@@ -88,7 +89,7 @@ public class ErrorHandlingVisitor extends HaltingVisitor {
         return errorQueue().hasErrors();
     }
 
-    /** Returns the <code>NodeFactory</code> that this Visitor is using.
+    /** Returns the {@code NodeFactory} that this Visitor is using.
      *
      * @see polyglot.ast.NodeFactory
      */
@@ -96,7 +97,7 @@ public class ErrorHandlingVisitor extends HaltingVisitor {
         return nf;
     }
 
-    /** Returns the <code>TypeSystem</code> that this Visitor is using.
+    /** Returns the {@code TypeSystem} that this Visitor is using.
      *
      * @see polyglot.types.TypeSystem
      */
@@ -104,24 +105,24 @@ public class ErrorHandlingVisitor extends HaltingVisitor {
         return ts;
     }
 
-    /** Replaces the functionality of the <code>enter()</code> method; all 
+    /** Replaces the functionality of the {@code enter()} method; all 
       * sub-classes should over-ride this method instead of 
-      * <code>enter()</code> if there is any chance of exceptions being
+      * {@code enter()} if there is any chance of exceptions being
       * generated.
       *
-      * This method is the replacement for the <code>enter()</code> method, 
+      * This method is the replacement for the {@code enter()} method, 
       * so that all of its subclasses gain the error handling capabilities 
       * of this visitor without having to rewrite it for the 
-      * <code>enter()</code> for each sub-class.
+      * {@code enter()} for each sub-class.
       *
-      * This method allows for a <code>SemanticException</code> to be 
-      * thrown in the body, while <code>enter()</code> does not.
+      * This method allows for a {@code SemanticException} to be 
+      * thrown in the body, while {@code enter()} does not.
       * 
       * @see polyglot.visit.NodeVisitor#enter(Node, Node)
       * @throws SemanticException
       * @param n The root of the subtree to be traversed.
-      * @return The <code>ErrorHandlingVisitor</code> which should be 
-      * used to visit the children of <code>n</code>.
+      * @return The {@code ErrorHandlingVisitor} which should be 
+      * used to visit the children of {@code n}.
      */
     protected NodeVisitor enterCall(Node parent, Node n)
             throws SemanticException {
@@ -137,33 +138,33 @@ public class ErrorHandlingVisitor extends HaltingVisitor {
         return this;
     }
 
-    /** This method determines what should be returned by <code>enter()</code>
-      * should its call to <code>enterCall()</code> throw a
-      * <code>SemanticException</code>.
+    /** This method determines what should be returned by {@code enter()}
+      * should its call to {@code enterCall()} throw a
+      * {@code SemanticException}.
       *
       * @param n The root of the subtree that was traversed.
-      * @return The <code>ErrorHandlingVisitor</code> which should be
-      * used to visit the childre of <code>n</code>.
+      * @return The {@code ErrorHandlingVisitor} which should be
+      * used to visit the children of {@code n}.
       */
     protected NodeVisitor enterError(Node n) {
         return this;
     }
 
-    /** Contains all of the functionality that can be done in the <code> leave
-      * </code> method, but allows <code>SemanticExceptions</code> to be
+    /** Contains all of the functionality that can be done in the {@code leave}
+      *  method, but allows {@code SemanticExceptions} to be
       * thrown.
       *
-      * This method is in addition to the <code>leave</code> method, 
+      * This method is in addition to the {@code leave} method, 
       * and allows the compiler writer to write code that can throw errors
-      * and let the polyglot infrastructure handle the exceptions.
+      * and let the Polyglot infrastructure handle the exceptions.
       *
       * @see polyglot.visit.NodeVisitor#leave(Node, Node, NodeVisitor)
       * @throws SemanticException
       * @param old The original state of root of the current subtree.
       * @param n The current state of the root of the current subtree.
-      * @param v The <code>NodeVisitor</code> object used to visit the children.
+      * @param v The {@code NodeVisitor} object used to visit the children.
       * @return The final result of the traversal of the tree rooted at
-      * <code>n</code>.
+      * {@code n}.
       */
     protected Node leaveCall(Node parent, Node old, Node n, NodeVisitor v)
             throws SemanticException {
@@ -192,22 +193,22 @@ public class ErrorHandlingVisitor extends HaltingVisitor {
     }
 
     /**
-     * Begin normal traversal of a subtree rooted at <code>n</code>. This gives
+     * Begin normal traversal of a subtree rooted at {@code n}. This gives
      * the visitor the option of changing internal state or returning a new
-     * visitor which will be used to visit the children of <code>n</code>.
+     * visitor which will be used to visit the children of {@code n}.
      *
      * This method delegates all responsibility of functionality to the
-     * <code>enterCall</code> method, and handles and reports any exceptions
-     * generated by <code>enterCall</code>.
+     * {@code enterCall} method, and handles and reports any exceptions
+     * generated by {@code enterCall}.
      *
      * In overriding this method, unless the class explicitly does not
      * want to maintain any of the error handling aspects of this class, a call
-     * <code>super.enter</code> should be embedded within the method at the 
+     * {@code super.enter} should be embedded within the method at the 
      * end.
      *
      * @param n The root of the subtree to be traversed.
-     * @return The <code>NodeVisitor</code> which should be used to visit the
-     * children of <code>n</code>.
+     * @return The {@code NodeVisitor} which should be used to visit the
+     * children of {@code n}.
      */
     @Override
     public NodeVisitor enter(Node parent, Node n) {
@@ -248,32 +249,32 @@ public class ErrorHandlingVisitor extends HaltingVisitor {
     }
 
     /**
-     * This method is called after all of the children of <code>n</code>
+     * This method is called after all of the children of {@code n}
      * have been visited. In this case, these children were visited by the
-     * visitor <code>v</code>. This is the last chance for the visitor to
-     * modify the tree rooted at <code>n</code>. This method will be called
-     * exactly the same number of times as <code>entry</code> is called.
-     * That is, for each node that is not overriden, <code>enter</code> and
-     * <code>leave</code> are each called exactly once.
+     * visitor {@code v}. This is the last chance for the visitor to
+     * modify the tree rooted at {@code n}. This method will be called
+     * exactly the same number of times as {@code entry} is called.
+     * That is, for each node that is not overridden, {@code enter} and
+     * {@code leave} are each called exactly once.
      * <p>
-     * Note that if <code>old == n</code> then the vistior should make a copy
-     * of <code>n</code> before modifying it. It should then return the
+     * Note that if {@code old == n} then the visitor should make a copy
+     * of {@code n} before modifying it. It should then return the
      * modified copy.
      *
      * This method delegates all responsibility of functionality to the
-     * <code>leaveCall</code> method, and handles and reports any exceptions
-     * generated by <code> leaveCall</code>.
+     * {@code leaveCall} method, and handles and reports any exceptions
+     * generated by {@code leaveCall}.
      *
      * In overriding this method, unless the class explicitly does not
      * want to maintain any of the error handling aspects of this class, a call
-     * <code>super.leave</code> should be embedded within the method at the 
+     * {@code super.leave} should be embedded within the method at the 
      * end.
      *
      * @param old The original state of root of the current subtree.
      * @param n The current state of the root of the current subtree.
-     * @param v The <code>NodeVisitor</code> object used to visit the children.
+     * @param v The {@code NodeVisitor} object used to visit the children.
      * @return The final result of the traversal of the tree rooted at
-     * <code>n</code>.
+     * {@code n}.
      */
 
     @Override

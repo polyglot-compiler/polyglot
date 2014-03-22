@@ -56,10 +56,10 @@ import polyglot.util.SerialVersionUID;
 import polyglot.visit.AscriptionVisitor;
 import polyglot.visit.TypeChecker;
 
-public class JL5BinaryExt extends JL5Ext {
+public class JL5BinaryExt extends JL5ExprExt {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
-    /** Type check the expression. */
+    @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
         Binary b = (Binary) this.node();
 
@@ -73,7 +73,7 @@ public class JL5BinaryExt extends JL5Ext {
         JL5TypeSystem ts = (JL5TypeSystem) tc.typeSystem();
 
         if (!ts.isPrimitiveWrapper(l) && !ts.isPrimitiveWrapper(r)) {
-            return this.superDel().typeCheck(tc);
+            return superLang().typeCheck(this.node(), tc);
         }
         // at least one of l or r is a primitive wrapper
         // If both of them are non null, then just use their primitive types
@@ -220,6 +220,7 @@ public class JL5BinaryExt extends JL5Ext {
         return b.type(ts.promote(l, r));
     }
 
+    @Override
     public Type childExpectedType(Expr child, AscriptionVisitor av) {
         Binary b = (Binary) this.node();
         Operator op = b.operator();
@@ -246,7 +247,7 @@ public class JL5BinaryExt extends JL5Ext {
 
         if (!ts.isPrimitiveWrapper(childType)
                 && !ts.isPrimitiveWrapper(otherType)) {
-            return this.superDel().childExpectedType(child, av);
+            return superLang().childExpectedType(this.node(), child, av);
         }
 
         Type childUnboxedType = ts.unboxingConversion(childType);

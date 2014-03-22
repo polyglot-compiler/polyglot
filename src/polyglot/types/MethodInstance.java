@@ -29,7 +29,7 @@ package polyglot.types;
 import java.util.List;
 
 /**
- * A <code>MethodInstance</code> represents the type information for a Java
+ * A {@code MethodInstance} represents the type information for a Java
  * method.
  */
 public interface MethodInstance extends FunctionInstance, MemberInstance,
@@ -41,7 +41,7 @@ public interface MethodInstance extends FunctionInstance, MemberInstance,
 
     /**
      * Destructively set the method's name.
-     * @param name
+     * @param name the name to set
      */
     void setName(String name);
 
@@ -62,21 +62,21 @@ public interface MethodInstance extends FunctionInstance, MemberInstance,
 
     /**
      * Get the list of methods this method (potentially) overrides, in order
-     * from this class (i.e., including <code>this</code>) to super classes.
-     * @return A list of <code>MethodInstance</code>, starting with
-     * <code>this</code>. Note that this list does not include methods declared
-     * in interfaces. Use <code>implemented</code> for that.
+     * from this class (i.e., including {@code this}) to super classes.
+     * @return A list of {@code MethodInstance}, starting with
+     * {@code this}. Note that this list does not include methods declared
+     * in interfaces. Use {@code implemented} for that.
      * @see polyglot.types.MethodInstance
      */
     List<MethodInstance> overrides();
 
     /**
-     * Return true if this method can override <code>mi</code>, false otherwise.
+     * Return true if this method can override {@code mi}, false otherwise.
      */
     boolean canOverride(MethodInstance mi);
 
     /**
-     * Return true if this method can override <code>mi</code>, throws
+     * Return true if this method can override {@code mi}, throws
      * a SemanticException otherwise.
      */
     void checkOverride(MethodInstance mi) throws SemanticException;
@@ -90,37 +90,41 @@ public interface MethodInstance extends FunctionInstance, MemberInstance,
     List<? extends MethodInstance> implemented();
 
     /**
-     * Return true if this method has the same signature as <code>mi</code>.
+     * Return true if this method has the same signature as {@code mi}.
      */
     boolean isSameMethod(MethodInstance mi);
 
     /**
-     * Return true if this method can be called with name <code>name</code>
-     * and actual parameters of types <code>actualTypes</code>.
+     * Return true if this method can be called with name {@code name}
+     * and actual parameters of types {@code actualTypes}.
      * @param name The method to call.
-     * @param actualTypes A list of argument types of type <code>Type</code>.
+     * @param actualTypes A list of argument types of type {@code Type}.
      * @see polyglot.types.Type
      */
     boolean methodCallValid(String name, List<? extends Type> actualTypes);
 
     /**
      * Get the list of methods this method (potentially) overrides, in order
-     * from this class (i.e., including <code>this</code>) to super classes.
-     * This method should not be called except by <code>TypeSystem</code>
+     * from this class (i.e., including {@code this}) to super classes.
+     * This method should not be called except by {@code TypeSystem}
      * and by subclasses.
-     * @return A list of <code>MethodInstance</code>, starting with
-     * <code>this</code>.
+     * @return A list of {@code MethodInstance}, starting with
+     * {@code this}.
      * @see polyglot.types.MethodInstance
      */
     List<MethodInstance> overridesImpl();
 
     /**
-     * Return true if this method can override <code>mi</code>.
-     * This method should not be called except by <code>TypeSystem</code>
+     * Return true if this method can override {@code mi}.
+     * This method should not be called except by {@code TypeSystem}
      * and by subclasses.
-     * If quiet is true and this method cannot override <code>mi</code>, then
+     * If quiet is true and this method cannot override {@code mi}, then
      * false is returned; otherwise, if quiet is false and this method cannot 
-     * override <code>mi</code>, then a SemanticException is thrown.
+     * override {@code mi}, then a SemanticException is thrown.
+     * @param quiet If true, then no Semantic Exceptions will be thrown, and the
+     *              return value will be true or false. Otherwise, if the method
+     *              cannot override, then a SemanticException will be thrown, else
+     *              the method will return true.
      */
     boolean canOverrideImpl(MethodInstance mi, boolean quiet)
             throws SemanticException;
@@ -134,16 +138,16 @@ public interface MethodInstance extends FunctionInstance, MemberInstance,
     List<MethodInstance> implementedImpl(ReferenceType rt);
 
     /**
-     * Return true if this method has the same signature as <code>mi</code>.
-     * This method should not be called except by <code>TypeSystem</code>
+     * Return true if this method has the same signature as {@code mi}.
+     * This method should not be called except by {@code TypeSystem}
      * and by subclasses.
      */
     boolean isSameMethodImpl(MethodInstance mi);
 
     /**
-     * Return true if this method can be called with name <code>name</code>
-     * and actual parameters of types <code>actualTypes</code>.
-     * This method should not be called except by <code>TypeSystem</code>
+     * Return true if this method can be called with name {@code name}
+     * and actual parameters of types {@code actualTypes}.
+     * This method should not be called except by {@code TypeSystem}
      * and by subclasses.
      */
     boolean methodCallValidImpl(String name, List<? extends Type> actualTypes);

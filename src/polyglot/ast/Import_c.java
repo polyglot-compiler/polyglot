@@ -31,6 +31,7 @@ import polyglot.types.Named;
 import polyglot.types.SemanticException;
 import polyglot.types.Type;
 import polyglot.util.CodeWriter;
+import polyglot.util.Copy;
 import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
 import polyglot.util.StringUtil;
@@ -38,8 +39,8 @@ import polyglot.visit.PrettyPrinter;
 import polyglot.visit.TypeChecker;
 
 /**
- * An <code>Import</code> is an immutable representation of a Java
- * <code>import</code> statement.  It consists of the string representing the
+ * An {@code Import} is an immutable representation of a Java
+ * {@code import} statement.  It consists of the string representing the
  * item being imported and the kind which is either indicating that a class
  * is being imported, or that an entire package is being imported.
  */
@@ -49,56 +50,51 @@ public class Import_c extends Node_c implements Import {
     protected Kind kind;
     protected String name;
 
+    @Deprecated
     public Import_c(Position pos, Kind kind, String name) {
-        super(pos);
+        this(pos, kind, name, null);
+    }
+
+    public Import_c(Position pos, Kind kind, String name, Ext ext) {
+        super(pos, ext);
         assert (kind != null && name != null);
         this.name = name;
         this.kind = kind;
     }
 
-    /** Get the name of the import. */
     @Override
     public String name() {
         return this.name;
     }
 
-    /** Set the name of the import. */
     @Override
     public Import name(String name) {
-        Import_c n = (Import_c) copy();
+        return name(this, name);
+    }
+
+    protected <N extends Import_c> N name(N n, String name) {
+        if (n.name == name) return n;
+        if (n == this) n = Copy.Util.copy(n);
         n.name = name;
         return n;
     }
 
-    /** Get the kind of the import. */
     @Override
     public Kind kind() {
         return this.kind;
     }
 
-    /** Set the kind of the import. */
     @Override
     public Import kind(Kind kind) {
-        Import_c n = (Import_c) copy();
+        return kind(this, kind);
+    }
+
+    protected <N extends Import_c> N kind(N n, Kind kind) {
+        if (n.kind == kind) return n;
+        if (n == this) n = Copy.Util.copy(n);
         n.kind = kind;
         return n;
     }
-
-    /**
-     * Build type objects for the import.
-    public Node buildTypes(TypeBuilder tb) throws SemanticException {
-    ImportTable it = tb.importTable();
-
-    if (kind == CLASS) {
-        it.addClassImport(name);
-    }
-    else if (kind == PACKAGE) {
-        it.addPackageImport(name);
-    }
-
-    return this;
-    }
-     */
 
     /** Check that imported classes and packages exist. */
     @Override
@@ -140,7 +136,6 @@ public class Import_c extends Node_c implements Import {
         return "import " + name + (kind == TYPE_IMPORT_ON_DEMAND ? ".*" : "");
     }
 
-    /** Write the import to an output file. */
     @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
         if (!Options.global.fully_qualified_names) {

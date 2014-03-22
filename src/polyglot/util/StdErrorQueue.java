@@ -34,7 +34,7 @@ import java.io.Reader;
 import java.util.StringTokenizer;
 
 /**
- * A <code>StdErrorQueue</code> handles outputting error messages.
+ * A {@code StdErrorQueue} handles outputting error messages.
  */
 public class StdErrorQueue extends AbstractErrorQueue {
     private PrintStream err;

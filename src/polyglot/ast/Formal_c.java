@@ -28,6 +28,7 @@ package polyglot.ast;
 
 import java.util.List;
 
+import polyglot.translate.ExtensionRewriter;
 import polyglot.types.Context;
 import polyglot.types.Flags;
 import polyglot.types.LocalInstance;
@@ -35,6 +36,7 @@ import polyglot.types.SemanticException;
 import polyglot.types.Type;
 import polyglot.types.TypeSystem;
 import polyglot.util.CodeWriter;
+import polyglot.util.Copy;
 import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
 import polyglot.visit.AmbiguityRemover;
@@ -45,7 +47,7 @@ import polyglot.visit.TypeBuilder;
 import polyglot.visit.TypeChecker;
 
 /**
- * A <code>Formal</code> represents a formal parameter for a procedure
+ * A {@code Formal} represents a formal parameter for a procedure
  * or catch block.  It consists of a type and a variable identifier.
  */
 public class Formal_c extends Term_c implements Formal {
@@ -56,10 +58,13 @@ public class Formal_c extends Term_c implements Formal {
     protected TypeNode type;
     protected Id name;
 
-//    protected boolean reachable;
-
+    @Deprecated
     public Formal_c(Position pos, Flags flags, TypeNode type, Id name) {
-        super(pos);
+        this(pos, flags, type, name, null);
+    }
+
+    public Formal_c(Position pos, Flags flags, TypeNode type, Id name, Ext ext) {
+        super(pos, ext);
         assert (flags != null && type != null && name != null);
         this.flags = flags;
         this.type = type;
@@ -71,100 +76,101 @@ public class Formal_c extends Term_c implements Formal {
         return li != null && li.isCanonical() && super.isDisambiguated();
     }
 
-    /** Get the type of the formal. */
     @Override
     public Type declType() {
         return type.type();
     }
 
-    /** Get the flags of the formal. */
     @Override
     public Flags flags() {
         return flags;
     }
 
-    /** Set the flags of the formal. */
     @Override
     public Formal flags(Flags flags) {
-        if (flags.equals(this.flags)) return this;
-        Formal_c n = (Formal_c) copy();
+        return flags(this, flags);
+    }
+
+    protected <N extends Formal_c> N flags(N n, Flags flags) {
+        if (n.flags.equals(flags)) return n;
+        if (n == this) n = Copy.Util.copy(n);
         n.flags = flags;
         return n;
     }
 
-    /** Get the type node of the formal. */
     @Override
     public TypeNode type() {
         return type;
     }
 
-    /** Set the type node of the formal. */
     @Override
     public Formal type(TypeNode type) {
-        Formal_c n = (Formal_c) copy();
+        return type(this, type);
+    }
+
+    protected <N extends Formal_c> N type(N n, TypeNode type) {
+        if (n.type == type) return n;
+        if (n == this) n = Copy.Util.copy(n);
         n.type = type;
         return n;
     }
 
-    /** Get the name of the formal. */
     @Override
     public Id id() {
         return name;
     }
 
-    /** Set the name of the formal. */
     @Override
     public Formal id(Id name) {
-        Formal_c n = (Formal_c) copy();
+        return id(this, name);
+    }
+
+    protected <N extends Formal_c> N id(N n, Id name) {
+        if (n.name == name) return n;
+        if (n == this) n = Copy.Util.copy(n);
         n.name = name;
         return n;
     }
 
-    /** Get the name of the formal. */
     @Override
     public String name() {
         return name.id();
     }
 
-    /** Set the name of the formal. */
     @Override
     public Formal name(String name) {
         return id(this.name.id(name));
     }
 
-    /** Get the local instance of the formal. */
     @Override
     public LocalInstance localInstance() {
         return li;
     }
 
-    /** Set the local instance of the formal. */
     @Override
     public Formal localInstance(LocalInstance li) {
-        if (li == this.li) return this;
-        Formal_c n = (Formal_c) copy();
+        return localInstance(this, li);
+    }
+
+    protected <N extends Formal_c> N localInstance(N n, LocalInstance li) {
+        if (n.li == li) return n;
+        if (n == this) n = Copy.Util.copy(n);
         n.li = li;
         return n;
     }
 
     /** Reconstruct the formal. */
-    protected Formal_c reconstruct(TypeNode type, Id name) {
-        if (this.type != type || this.name != name) {
-            Formal_c n = (Formal_c) copy();
-            n.type = type;
-            n.name = name;
-            return n;
-        }
-
-        return this;
+    protected <N extends Formal_c> N reconstruct(N n, TypeNode type, Id name) {
+        n = type(n, type);
+        n = id(n, name);
+        return n;
     }
 
-    /** Visit the children of the formal. */
     @Override
     public Node visitChildren(NodeVisitor v) {
-        TypeNode type = (TypeNode) visitChild(this.type, v);
-        Id name = (Id) visitChild(this.name, v);
-        return reconstruct(type, name);
+        TypeNode type = visitChild(this.type, v);
+        Id name = visitChild(this.name, v);
+        return reconstruct(this, type, name);
     }
 
     @Override
@@ -172,7 +178,6 @@ public class Formal_c extends Term_c implements Formal {
         c.addVariable(li);
     }
 
-    /** Write the formal to an output file. */
     @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
         w.write(flags.translate());
@@ -181,7 +186,6 @@ public class Formal_c extends Term_c implements Formal {
         tr.print(this, name, w);
     }
 
-    /** Build type objects for the formal. */
     @Override
     public Node buildTypes(TypeBuilder tb) throws SemanticException {
         Formal_c n = (Formal_c) super.buildTypes(tb);
@@ -194,7 +198,8 @@ public class Formal_c extends Term_c implements Formal {
                                  ts.unknownType(position()),
                                  name());
 
-        return n.localInstance(li);
+        n = localInstance(n, li);
+        return n;
     }
 
     @Override
@@ -210,7 +215,6 @@ public class Formal_c extends Term_c implements Formal {
         return this;
     }
 
-    /** Type check the formal. */
     @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
         // Check if the variable is multiply defined.
@@ -234,6 +238,13 @@ public class Formal_c extends Term_c implements Formal {
         }
 
         return this;
+    }
+
+    @Override
+    public Node extRewrite(ExtensionRewriter rw) throws SemanticException {
+        Formal_c n = (Formal_c) super.extRewrite(rw);
+        n = localInstance(n, null);
+        return n;
     }
 
     @Override

@@ -45,6 +45,28 @@ public class JL5ToExtFactory_c extends ToExtFactory_c implements JL5ExtFactory {
     }
 
     @Override
+    public Ext extAmbTypeInstantiation() {
+        Ext e = extAmbTypeInstantiationImpl();
+
+        if (nextExtFactory() != null) {
+            Ext e2 = nextExtFactory().extAmbTypeInstantiation();
+            e = composeExts(e, e2);
+        }
+        return postExtAmbTypeInstantiation(e);
+    }
+
+    @Override
+    public Ext extAmbWildCard() {
+        Ext e = extAmbWildCardImpl();
+
+        if (nextExtFactory() != null) {
+            Ext e2 = nextExtFactory().extAmbWildCard();
+            e = composeExts(e, e2);
+        }
+        return postExtAmbWildCard(e);
+    }
+
+    @Override
     public Ext extEnumDecl() {
         Ext e = extEnumDeclImpl();
 
@@ -165,6 +187,14 @@ public class JL5ToExtFactory_c extends ToExtFactory_c implements JL5ExtFactory {
         return postExtElementValueArrayInit(e);
     }
 
+    protected Ext extAmbTypeInstantiationImpl() {
+        return new CannotToExt_c();
+    }
+
+    protected Ext extAmbWildCardImpl() {
+        return new CannotToExt_c();
+    }
+
     protected Ext extEnumDeclImpl() {
         return new EnumDeclToExt_c();
     }
@@ -185,15 +215,13 @@ public class JL5ToExtFactory_c extends ToExtFactory_c implements JL5ExtFactory {
         return new ParamTypeNodeToExt_c();
     }
 
-//    @Override
-//    protected Ext extAssignImpl() {
-//        return new JL5T
-//    }
+    public Ext postExtAmbTypeInstantiation(Ext ext) {
+        return this.postExtTypeNode(ext);
+    }
 
-//    @Override
-//    protected Ext extNodeImpl() {
-//        return new JL5Del();
-//    }
+    public Ext postExtAmbWildCard(Ext ext) {
+        return this.postExtTypeNode(ext);
+    }
 
     public Ext postExtEnumDecl(Ext ext) {
         return this.postExtClassDecl(ext);

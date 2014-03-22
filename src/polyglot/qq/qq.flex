@@ -11,7 +11,6 @@
 
 package polyglot.qq;
 
-import java_cup.runtime.Symbol;
 import polyglot.lex.Lexer;
 import polyglot.lex.*;
 import polyglot.ast.*;
@@ -21,7 +20,7 @@ import java.util.*;
 import java.io.StringReader;
 import java.math.BigInteger;
 
-@SuppressWarnings("all")
+@SuppressWarnings({"unused", "fallthrough", "all"})
 %%
 
 %public
@@ -42,8 +41,8 @@ import java.math.BigInteger;
     StringBuffer sb = new StringBuffer();
     String file;
     String path;
-    HashMap keywords;
-    LinkedList subst;
+    HashMap<String, Integer> keywords;
+    LinkedList<Object> subst;
 
     public Lexer_c(String s, Position pos, Object... subst) {
         this(new EscapedUnicodeReader(new StringReader(s)));
@@ -56,9 +55,9 @@ import java.math.BigInteger;
             this.path = null;
         }
 
-        this.subst = new LinkedList();
+        this.subst = new LinkedList<Object>();
         Collections.addAll(this.subst, subst);
-        this.keywords = new HashMap();
+        this.keywords = new HashMap<String, Integer>();
         init_keywords();
     }
 
@@ -108,11 +107,10 @@ import java.math.BigInteger;
         String expected = substKind(kind, true);
 
         if (o instanceof List) {
-            List l = (List) o;
+            @SuppressWarnings("unchecked")
+            List<? extends Term> l = (List<? extends Term>) o;
 
-            for (Iterator i = l.iterator(); i.hasNext(); ) {
-                Object p = i.next();
-
+            for (Term p : l) {
                 switch (kind) {
                     case 'E':
                         if (p instanceof Expr) continue;
@@ -264,10 +262,12 @@ import java.math.BigInteger;
         keywords.put("while",         new Integer(sym.WHILE));
     }
 
+    @Override
     public String file() {
         return file;
     }
 
+    @Override
     public String path() {
         return path;
     }
@@ -481,7 +481,7 @@ OctalEscape = \\ [0-7]
 
     /* 3.9 Keywords */
     /* 3.8 Identifiers */
-    {Identifier}   { Integer i = (Integer) keywords.get(yytext());
+    {Identifier}   { Integer i = keywords.get(yytext());
                     if (i == null) return id();
                     else return key(i.intValue()); }
 
@@ -567,7 +567,7 @@ OctalEscape = \\ [0-7]
 
 <TRADITIONAL_COMMENT> {
     "*/"                         { yybegin(YYINITIAL); }
-    .|\n                         { /* ignore */ }
+    [^]                          { /* ignore */ }
 }
 
 <END_OF_LINE_COMMENT> {
@@ -651,5 +651,5 @@ OctalEscape = \\ [0-7]
 }
 
 /* Fallthrough case: anything not matched above is an error */
-.|\n                             { error("Illegal character \"" +
+[^]                              { error("Illegal character \"" +
                                               yytext() + "\"", pos()); }

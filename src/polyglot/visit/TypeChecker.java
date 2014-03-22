@@ -26,6 +26,7 @@
 
 package polyglot.visit;
 
+import polyglot.ast.JLang;
 import polyglot.ast.Node;
 import polyglot.ast.NodeFactory;
 import polyglot.frontend.Job;
@@ -46,6 +47,11 @@ public class TypeChecker extends DisambiguationDriver {
         super(job, ts, nf);
     }
 
+    @Override
+    public JLang lang() {
+        return (JLang) super.lang();
+    }
+
     public void setCheckConstants(boolean check) {
         this.checkConstants = check;
     }
@@ -56,7 +62,7 @@ public class TypeChecker extends DisambiguationDriver {
             if (Report.should_report(Report.visit, 2))
                 Report.report(2, ">> " + this + "::override " + n);
 
-            Node m = n.del().typeCheckOverride(parent, this);
+            Node m = lang().typeCheckOverride(n, parent, this);
 
             if (Report.should_report(Report.visit, 2))
                 Report.report(2, "<< " + this + "::override " + n + " -> " + m);
@@ -100,7 +106,7 @@ public class TypeChecker extends DisambiguationDriver {
         if (Report.should_report(Report.visit, 2))
             Report.report(2, ">> " + this + "::enter " + n);
 
-        TypeChecker v = (TypeChecker) n.del().typeCheckEnter(this);
+        TypeChecker v = (TypeChecker) lang().typeCheckEnter(n, this);
 
         if (Report.should_report(Report.visit, 2))
             Report.report(2, "<< " + this + "::enter " + n + " -> " + v);
@@ -110,6 +116,10 @@ public class TypeChecker extends DisambiguationDriver {
 
     protected static class AmbChecker extends NodeVisitor {
         public boolean amb;
+
+        public AmbChecker(JLang lang) {
+            super(lang);
+        }
 
         @Override
         public Node override(Node n) {
@@ -129,20 +139,20 @@ public class TypeChecker extends DisambiguationDriver {
         if (Report.should_report(Report.visit, 2))
             Report.report(2, ">> " + this + "::leave " + n);
 
-        AmbChecker ac = new AmbChecker();
-        n.del().visitChildren(ac);
+        AmbChecker ac = new AmbChecker(lang());
+        lang().visitChildren(n, ac);
 
         Node m = n;
 
         if (!ac.amb && m.isDisambiguated()) {
 //          System.out.println("running typeCheck for " + m);
             TypeChecker childTc = (TypeChecker) v;
-            m = m.del().typeCheck(childTc);
+            m = lang().typeCheck(m, childTc);
 
             if (checkConstants) {
                 ConstantChecker cc = new ConstantChecker(job, ts, nf);
                 cc = (ConstantChecker) cc.context(childTc.context());
-                m = m.del().checkConstants(cc);
+                m = lang().checkConstants(m, cc);
             }
 
 //            if (! m.isTypeChecked()) {

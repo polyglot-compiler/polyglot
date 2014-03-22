@@ -28,6 +28,8 @@ package polyglot.ext.jl5.ast;
 import java.util.List;
 import java.util.Map;
 
+import polyglot.ast.Lang;
+import polyglot.ast.Node;
 import polyglot.ast.Term;
 import polyglot.ast.TypeNode;
 import polyglot.ext.jl5.types.AnnotationElementValue;
@@ -38,19 +40,19 @@ import polyglot.types.SemanticException;
  * Represents an annotation on a declaration. 
  *
  */
-public interface AnnotationElem extends Term {
+public interface AnnotationElem {
 
     TypeNode typeName();
 
-    AnnotationElem typeName(TypeNode typeName);
+    Node typeName(TypeNode typeName);
 
-    List<ElementValuePair> elements();
+    List<Term> elements();
 
     /**
      * Convert this AST representation into a suitable type annotation.
      * @throws SemanticException 
      */
-    Map<String, AnnotationElementValue> toAnnotationElementValues(
+    Map<String, AnnotationElementValue> toAnnotationElementValues(Lang lang,
             JL5TypeSystem ts) throws SemanticException;
 
     /**

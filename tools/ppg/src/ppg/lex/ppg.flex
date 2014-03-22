@@ -1,26 +1,20 @@
 package ppg.lex;
 
-import java.io.InputStream;
+import java.io.Reader;
 import ppg.parse.*;
 
-@SuppressWarnings("all")
+@SuppressWarnings({"unused", "fallthrough"})
 %%
-
-%init{
-    lineSeparator = System.getProperty("line.separator", "\n");
-%init}
 
 %{
 
-    private int lastId = -1;
     private String filename = "";
-    private String lineSeparator;
 /*
     private Position pos() {
         return new Position(filename, yyline+1, yycolumn);
     }
 */
-    public Lexer(InputStream in, String filename) {
+    public Lexer(Reader in, String filename) {
         this(in);
         this.filename = filename;
     }
@@ -30,7 +24,6 @@ import ppg.parse.*;
     }
 
     private Token t(int id, Object value) {
-        lastId = id;
         return new Token(id, filename, yyline + 1, yychar, yychar + yylength(), value);
     }
 
@@ -107,6 +100,9 @@ string_lit_slash={string_lit}\\
 <YYINITIAL> "}"             { return t(Constant.RBRACE); }
 <YYINITIAL> "["             { return t(Constant.LBRACK); }
 <YYINITIAL> "]"             { return t(Constant.RBRACK); }
+<YYINITIAL> "<"             { return t(Constant.LT); }
+<YYINITIAL> ">"             { return t(Constant.GT); }
+<YYINITIAL> "?"             { return t(Constant.QUESTION); }
 <YYINITIAL> "|"             { return t(Constant.BAR); }
 <YYINITIAL> ":"             { return t(Constant.COLON); }
 <YYINITIAL> "*"             { return t(Constant.STAR); }

@@ -41,6 +41,7 @@ public class ConstantFolder extends NodeVisitor {
     protected NodeFactory nf;
 
     public ConstantFolder(TypeSystem ts, NodeFactory nf) {
+        super(nf.lang());
         this.ts = ts;
         this.nf = nf;
     }
@@ -61,7 +62,7 @@ public class ConstantFolder extends NodeVisitor {
 
         Expr e = (Expr) n;
 
-        if (!e.isConstant()) {
+        if (!lang().isConstant(e, lang())) {
             return e;
         }
 
@@ -71,14 +72,14 @@ public class ConstantFolder extends NodeVisitor {
             Binary b = (Binary) e;
 
             if (b.operator() == Binary.ADD
-                    && b.left().constantValue() instanceof String
-                    && b.right().constantValue() instanceof String) {
+                    && lang().constantValue(b.left(), lang()) instanceof String
+                    && lang().constantValue(b.right(), lang()) instanceof String) {
 
                 return b;
             }
         }
 
-        Object v = e.constantValue();
+        Object v = lang().constantValue(e, lang());
         Position pos = e.position();
 
         if (v == null) {

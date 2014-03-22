@@ -44,7 +44,7 @@ public interface ParamTypeSystem<Formal extends Param, Actual extends TypeObject
     /**
      * Create a new mutable PClass.
      *
-     * @param pos The position of the pclass
+     * @param pos The position of the PClass
      */
     MuPClass<Formal, Actual> mutablePClass(Position pos);
 
@@ -63,20 +63,16 @@ public interface ParamTypeSystem<Formal extends Param, Actual extends TypeObject
     /**
      * Apply a parameter substitution to a type.
      *
-     * @param base The type on which we perform substitutions.
+     * @param t The type on which we perform substitutions.
      * @param substMap Map from formal parameters to actuals; the formals are
-     * not necessarily formals of <code>base</code>.
+     * not necessarily formals of {@code t}.
      */
-    Type subst(Type base, Map<Formal, ? extends Actual> substMap);
+    Type subst(Type t, Map<Formal, ? extends Actual> substMap);
 
     /**
-     * Create a substitutor.
+     * Create a substituter.
      *
-     * @param substMap Map from formal parameters to actuals; the formals are
-     * not necessarily formals of <code>base</code>.
-     * @param cache Cache of substitutions performed, implemented as a map from
-     * base type to substituted type.  This is passed in to ensure pointers to
-     * outer classes are substituted correctly.
+     * @param substMap Map from formal parameters to actuals.
      */
     Subst<Formal, Actual> subst(Map<Formal, ? extends Actual> substMap);
 }

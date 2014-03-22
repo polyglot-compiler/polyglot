@@ -27,9 +27,10 @@
 package polyglot.ast;
 
 /**
- * A <code>DelFactory</code> constructs delegates. It is only used by
- * a <code>NodeFactory</code>, during the creation of AST nodes.
+ * A {@code DelFactory} constructs delegates. It is only used by
+ * a {@code NodeFactory}, during the creation of AST nodes.
  */
+@Deprecated
 public interface DelFactory {
 
     //////////////////////////////////////////////////////////////////

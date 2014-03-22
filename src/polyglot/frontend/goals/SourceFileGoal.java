@@ -29,7 +29,7 @@ package polyglot.frontend.goals;
 import polyglot.frontend.Job;
 
 /**
- * Comment for <code>SourceFileGoal</code>
+ * Comment for {@code SourceFileGoal}
  *
  * @author nystrom
  */

@@ -46,13 +46,14 @@ import java.util.zip.ZipFile;
 
 import javax.tools.FileObject;
 import javax.tools.ForwardingJavaFileManager;
+import javax.tools.JavaCompiler;
 import javax.tools.JavaFileObject;
 import javax.tools.JavaFileObject.Kind;
 import javax.tools.StandardJavaFileManager;
-import javax.tools.ToolProvider;
 
 import polyglot.frontend.ExtensionInfo;
 import polyglot.frontend.FileSource;
+import polyglot.main.Main;
 import polyglot.main.Report;
 import polyglot.types.reflect.ClassFile;
 import polyglot.util.CollectionUtil;
@@ -67,32 +68,35 @@ import polyglot.util.StringUtil;
 public class ExtFileManager extends
         ForwardingJavaFileManager<StandardJavaFileManager> implements
         FileManager {
+    protected static final JavaCompiler javaCompiler = Main.javaCompiler();
 
     protected final ExtensionInfo extInfo;
     /** Map of sources already loaded */
     protected final Map<String, FileSource> loadedSources;
     /** A cache for package look ups */
-    protected final Map<String, Boolean> packageCache;
+    protected static final Map<String, Boolean> packageCache =
+            new HashMap<String, Boolean>();
     /** A cache for the class files that don't exist */
-    protected final Set<String> nocache;
+    protected static final Set<String> nocache = new HashSet<String>();
 
-    protected final Map<File, Object> zipCache;
+    protected static final Map<File, Object> zipCache =
+            new HashMap<File, Object>();
 
-    protected final static Object not_found = new Object();
+    protected static final Object not_found = new Object();
 
     protected static final int BUF_SIZE = 1024 * 8;
 
-    protected final static Collection<String> report_topics =
+    protected static final Collection<String> report_topics =
             CollectionUtil.list(Report.types, Report.resolver, Report.loader);
 
     protected static final Set<Kind> ALL_KINDS = new HashSet<Kind>();
-
     static {
         ALL_KINDS.add(Kind.CLASS);
         ALL_KINDS.add(Kind.SOURCE);
         ALL_KINDS.add(Kind.HTML);
         ALL_KINDS.add(Kind.OTHER);
     }
+
     /**
      * Map for storing in-memory FileObjects and associated fully qualified
      * names
@@ -113,20 +117,25 @@ public class ExtFileManager extends
      */
     protected final boolean inMemory;
 
-    protected List<Location> default_locations;
+    protected static List<Location> default_locations;
 
     public ExtFileManager(ExtensionInfo extInfo) {
-        super(ToolProvider.getSystemJavaCompiler().getStandardFileManager(null,
-                                                                          null,
-                                                                          null));
+        super(javaCompiler.getStandardFileManager(null, null, null));
         this.extInfo = extInfo;
         loadedSources = new HashMap<String, FileSource>();
-        packageCache = new HashMap<String, Boolean>();
-        nocache = new HashSet<String>();
-        zipCache = new HashMap<File, Object>();
         objectMap = new HashMap<Location, Map<String, JavaFileObject>>();
         inMemory = extInfo.getOptions().noOutputToFS;
-        default_locations = extInfo.defaultLocations();
+        List<Location> defaultLocations = extInfo.defaultLocations();
+        if (!defaultLocations.equals(default_locations)) {
+            default_locations = defaultLocations;
+            clearCache();
+        }
+    }
+
+    protected void clearCache() {
+        packageCache.clear();
+        nocache.clear();
+        zipCache.clear();
     }
 
     @Override
@@ -291,7 +300,7 @@ public class ExtFileManager extends
         return exists;
     }
 
-    ZipFile loadZip(File dir) throws IOException {
+    protected static ZipFile loadZip(File dir) throws IOException {
         Object o = zipCache.get(dir);
         if (o != not_found) {
             ZipFile zip = (ZipFile) o;
@@ -599,10 +608,9 @@ public class ExtFileManager extends
     public boolean caseInsensitive() {
         if (!caseInsensitivityComputed) {
             setCaseInsensitive(System.getProperty("user.dir"));
+            if (caseInsensitive == 0)
+                throw new InternalCompilerError("unknown case sensitivity");
             caseInsensitivityComputed = true;
-        }
-        if (caseInsensitive == 0) {
-            throw new InternalCompilerError("unknown case sensitivity");
         }
         return caseInsensitive == 1;
     }

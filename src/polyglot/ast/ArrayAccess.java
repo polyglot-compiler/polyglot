@@ -27,7 +27,7 @@
 package polyglot.ast;
 
 /**
- * An <code>ArrayAccess</code> is an immutable representation of an
+ * An {@code ArrayAccess} is an immutable representation of an
  * access of an array member.
  */
 public interface ArrayAccess extends Variable {

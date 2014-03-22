@@ -27,7 +27,7 @@
 package polyglot.types;
 
 /**
- * A <code>CodeInstance</code> contains the type information for a Java
+ * A {@code CodeInstance} contains the type information for a Java
  * code-chunk (method, constructor, initializer, closure).
  */
 public interface CodeInstance extends TypeObject {

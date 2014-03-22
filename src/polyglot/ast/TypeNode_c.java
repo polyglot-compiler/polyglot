@@ -34,6 +34,7 @@ import polyglot.types.SemanticException;
 import polyglot.types.Type;
 import polyglot.types.TypeSystem;
 import polyglot.util.CodeWriter;
+import polyglot.util.Copy;
 import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
 import polyglot.visit.CFGBuilder;
@@ -41,16 +42,22 @@ import polyglot.visit.PrettyPrinter;
 import polyglot.visit.TypeBuilder;
 
 /**
- * A <code>TypeNode</code> is the syntactic representation of a 
- * <code>Type</code> within the abstract syntax tree.
+ * A {@code TypeNode} is the syntactic representation of a 
+ * {@code Type} within the abstract syntax tree.
  */
 public abstract class TypeNode_c extends Term_c implements TypeNode {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
     protected Type type;
 
+    // TODO
+    // @Deprecated
     public TypeNode_c(Position pos) {
-        super(pos);
+        this(pos, null);
+    }
+
+    public TypeNode_c(Position pos, Ext ext) {
+        super(pos, ext);
     }
 
     @Override
@@ -64,16 +71,19 @@ public abstract class TypeNode_c extends Term_c implements TypeNode {
         return type();
     }
 
-    /** Get the type this node encapsulates. */
     @Override
     public Type type() {
         return this.type;
     }
 
-    /** Set the type this node encapsulates. */
     @Override
     public TypeNode type(Type type) {
-        TypeNode_c n = (TypeNode_c) copy();
+        return type(this, type);
+    }
+
+    protected <N extends TypeNode_c> N type(N n, Type type) {
+        if (n.type == type) return n;
+        if (n == this) n = Copy.Util.copy(n);
         n.type = type;
         return n;
     }

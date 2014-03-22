@@ -5,6 +5,10 @@ import polyglot.ext.jl5.ast.JL5ExtFactory;
 
 public interface JL7ExtFactory extends JL5ExtFactory {
 
+    Ext extAmbDiamondTypeNode();
+
+    Ext extAmbUnionType();
+
     Ext extMultiCatch();
 
 }

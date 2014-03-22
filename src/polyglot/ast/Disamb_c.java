@@ -58,22 +58,13 @@ public class Disamb_c implements Disamb {
     protected Context c;
     protected Ambiguous amb;
 
-    /**
-     * Disambiguate the prefix and name into a unambiguous node.
-     * @return An unambiguous AST node, or null if disambiguation
-     *         fails.
-     */
+    @Deprecated
     @Override
     public Node disambiguate(Ambiguous amb, ContextVisitor v, Position pos,
             Prefix prefix, String name) throws SemanticException {
         return disambiguate(amb, v, pos, prefix, v.nodeFactory().Id(pos, name));
     }
 
-    /**
-     * Disambiguate the prefix and name into a unambiguous node.
-     * @return An unambiguous AST node, or null if disambiguation
-     *         fails.
-     */
     @Override
     public Node disambiguate(Ambiguous amb, ContextVisitor v, Position pos,
             Prefix prefix, Id name) throws SemanticException {

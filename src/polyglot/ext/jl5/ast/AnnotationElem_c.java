@@ -34,9 +34,9 @@ import java.util.Map;
 
 import polyglot.ast.ClassLit;
 import polyglot.ast.Expr;
+import polyglot.ast.Lang;
 import polyglot.ast.Node;
 import polyglot.ast.Term;
-import polyglot.ast.Term_c;
 import polyglot.ast.TypeNode;
 import polyglot.ext.jl5.types.AnnotationElementValue;
 import polyglot.ext.jl5.types.AnnotationElementValueArray;
@@ -47,32 +47,24 @@ import polyglot.types.SemanticException;
 import polyglot.types.Type;
 import polyglot.util.CodeWriter;
 import polyglot.util.CollectionUtil;
+import polyglot.util.Copy;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.ListUtil;
-import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
 import polyglot.visit.CFGBuilder;
 import polyglot.visit.NodeVisitor;
 import polyglot.visit.PrettyPrinter;
 import polyglot.visit.TypeChecker;
 
-public class AnnotationElem_c extends Term_c implements AnnotationElem {
+public class AnnotationElem_c extends JL5TermExt implements AnnotationElem {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
     protected TypeNode typeName;
-    protected List<ElementValuePair> elements;
+    protected List<Term> elements;
 
-    public AnnotationElem_c(Position pos, TypeNode typeName,
-            List<ElementValuePair> elements) {
-        super(pos);
+    public AnnotationElem_c(TypeNode typeName, List<Term> elements) {
         this.typeName = typeName;
         this.elements = ListUtil.copy(elements, true);
-    }
-
-    public AnnotationElem_c(Position pos, TypeNode typeName) {
-        super(pos);
-        this.typeName = typeName;
-        this.elements = Collections.emptyList();
     }
 
     @Override
@@ -81,46 +73,62 @@ public class AnnotationElem_c extends Term_c implements AnnotationElem {
     }
 
     @Override
-    public AnnotationElem typeName(TypeNode typeName) {
-        if (!typeName.equals(this.typeName)) {
-            AnnotationElem_c n = (AnnotationElem_c) copy();
-            n.typeName = typeName;
-            return n;
-        }
-        return this;
+    public Node typeName(TypeNode typeName) {
+        return typeName(node, typeName);
     }
 
-    protected AnnotationElem_c reconstruct(TypeNode typeName,
-            List<ElementValuePair> elements) {
-        if (!typeName.equals(this.typeName)
-                || !CollectionUtil.equals(elements, this.elements)) {
-            AnnotationElem_c n = (AnnotationElem_c) copy();
-            n.typeName = typeName;
-            n.elements = ListUtil.copy(elements, true);
-
-            return n;
+    protected <N extends Node> N typeName(N n, TypeNode typeName) {
+        AnnotationElem_c ext = (AnnotationElem_c) JL5Ext.ext(n);
+        if (ext.typeName == typeName) return n;
+        if (n == node) {
+            n = Copy.Util.copy(n);
+            ext = (AnnotationElem_c) JL5Ext.ext(n);
         }
-        return this;
+        ext.typeName = typeName;
+        return n;
+    }
+
+    @Override
+    public List<Term> elements() {
+        return this.elements;
+    }
+
+    protected <N extends Node> N elements(N n, List<Term> elements) {
+        AnnotationElem_c ext = (AnnotationElem_c) JL5Ext.ext(n);
+        if (CollectionUtil.equals(ext.elements, elements)) return n;
+        if (n == node) {
+            n = Copy.Util.copy(n);
+            ext = (AnnotationElem_c) JL5Ext.ext(n);
+        }
+        ext.elements = ListUtil.copy(elements, true);
+        return n;
+    }
+
+    protected <N extends Node> N reconstruct(N n, TypeNode typeName,
+            List<Term> elements) {
+        n = typeName(n, typeName);
+        n = elements(n, elements);
+        return n;
     }
 
     @Override
     public Node visitChildren(NodeVisitor v) {
-        TypeNode tn = (TypeNode) visitChild(this.typeName, v);
-        List<ElementValuePair> elements = visitList(this.elements, v);
-
-        return reconstruct(tn, elements);
+        TypeNode tn = visitChild(this.typeName, v);
+        List<Term> elements = visitList(this.elements, v);
+        return reconstruct(node, tn, elements);
     }
 
     @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
+        Node n = node();
         // only make annotation elements out of annotation types
         if (!typeName.type().isClass()
                 || !JL5Flags.isAnnotation(typeName.type().toClass().flags())) {
             throw new SemanticException("Annotation: " + typeName
-                    + " must be an annotation type, ", position());
+                    + " must be an annotation type, ", n.position());
 
         }
-        return this;
+        return n;
     }
 
     @Override
@@ -135,11 +143,13 @@ public class AnnotationElem_c extends Term_c implements AnnotationElem {
 
         // Single-element annotation named "value": special case
         if (this.isSingleElementAnnotation()) {
-            print(elements().get(0).value(), w, pp);
+            ElementValuePair p =
+                    (ElementValuePair) JL5Ext.ext(elements().get(0));
+            print(p.value(), w, pp);
         }
         else {
 
-            for (Iterator<ElementValuePair> it = elements().iterator(); it.hasNext();) {
+            for (Iterator<Term> it = elements().iterator(); it.hasNext();) {
                 print(it.next(), w, pp);
                 if (it.hasNext()) {
                     w.write(", ");
@@ -150,7 +160,7 @@ public class AnnotationElem_c extends Term_c implements AnnotationElem {
     }
 
     public Term entry() {
-        return this;
+        return node();
     }
 
     @Override
@@ -169,11 +179,6 @@ public class AnnotationElem_c extends Term_c implements AnnotationElem {
     }
 
     @Override
-    public List<ElementValuePair> elements() {
-        return this.elements;
-    }
-
-    @Override
     public boolean isMarkerAnnotation() {
         return elements().isEmpty();
     }
@@ -181,15 +186,17 @@ public class AnnotationElem_c extends Term_c implements AnnotationElem {
     @Override
     public boolean isSingleElementAnnotation() {
         return elements().size() == 1
-                && elements().get(0).name().equals("value");
+                && ((ElementValuePair) JL5Ext.ext(elements().get(0))).name()
+                                                                     .equals("value");
     }
 
     @Override
     public Map<String, AnnotationElementValue> toAnnotationElementValues(
-            JL5TypeSystem ts) throws SemanticException {
+            Lang lang, JL5TypeSystem ts) throws SemanticException {
         Map<String, AnnotationElementValue> m =
                 new LinkedHashMap<String, AnnotationElementValue>();
-        for (ElementValuePair p : this.elements()) {
+        for (Term t : this.elements()) {
+            ElementValuePair p = (ElementValuePair) JL5Ext.ext(t);
             List<? extends MethodInstance> methods =
                     this.typeName().type().toClass().methodsNamed(p.name());
             if (methods.size() != 1) {
@@ -200,7 +207,7 @@ public class AnnotationElem_c extends Term_c implements AnnotationElem {
             Type intendedType = mi.returnType();
 
             AnnotationElementValue v =
-                    toAnnotationElementValue(p.value(), intendedType, ts);
+                    toAnnotationElementValue(lang, p.value(), intendedType, ts);
 
             if (intendedType.isArray()
                     && !(v instanceof AnnotationElementValueArray)) {
@@ -215,8 +222,9 @@ public class AnnotationElem_c extends Term_c implements AnnotationElem {
         return m;
     }
 
-    private AnnotationElementValue toAnnotationElementValue(Term value,
-            Type intendedType, JL5TypeSystem ts) throws SemanticException {
+    private AnnotationElementValue toAnnotationElementValue(Lang lang,
+            Term value, Type intendedType, JL5TypeSystem ts)
+            throws SemanticException {
         Type intendedBaseType;
         if (intendedType.isArray()) {
             intendedBaseType = intendedType.toArray().base();
@@ -225,22 +233,23 @@ public class AnnotationElem_c extends Term_c implements AnnotationElem {
             intendedBaseType = intendedType;
         }
 
-        if (value instanceof ElementValueArrayInit) {
+        if (JL5Ext.ext(value) instanceof ElementValueArrayInit) {
             if (!intendedType.isArray()) {
                 throw new SemanticException("Array given when expected type is "
                                                     + intendedType.toString(),
                                             value.position());
             }
-            ElementValueArrayInit init = (ElementValueArrayInit) value;
+            ElementValueArrayInit init =
+                    (ElementValueArrayInit) JL5Ext.ext(value);
             List<AnnotationElementValue> vals =
                     new ArrayList<AnnotationElementValue>();
             for (Term v : init.elements()) {
-                vals.add(toAnnotationElementValue(v, intendedBaseType, ts));
+                vals.add(toAnnotationElementValue(lang, v, intendedBaseType, ts));
             }
             return ts.AnnotationElementValueArray(value.position(), vals);
         }
-        if (value instanceof AnnotationElem) {
-            AnnotationElem ae = (AnnotationElem) value;
+        if (JL5Ext.ext(value) instanceof AnnotationElem) {
+            AnnotationElem ae = (AnnotationElem) JL5Ext.ext(value);
             Type aeType = ae.typeName().type();
             // Check against intended type.
             if (aeType.isCanonical()
@@ -250,7 +259,8 @@ public class AnnotationElem_c extends Term_c implements AnnotationElem {
             }
             return ts.AnnotationElementValueAnnotation(value.position(),
                                                        aeType,
-                                                       ae.toAnnotationElementValues(ts));
+                                                       ae.toAnnotationElementValues(lang,
+                                                                                    ts));
         }
         // Otherwise, it should be a constant value.
         if (!(value instanceof Expr)) {
@@ -259,7 +269,7 @@ public class AnnotationElem_c extends Term_c implements AnnotationElem {
         }
         Expr ev = (Expr) value;
         ts.checkAnnotationValueConstant(ev);
-        Object constVal = ev.constantValue();
+        Object constVal = lang.constantValue(ev, lang);
         if (value instanceof ClassLit) {
             constVal = ((ClassLit) value).typeNode().type();
         }

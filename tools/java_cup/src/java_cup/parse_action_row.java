@@ -36,6 +36,12 @@ public class parse_action_row {
         return _size;
     }
 
+    //Hm Added clear  to clear all static fields
+    public static void clear() {
+        _size = 0;
+        reduction_count = null;
+    }
+
     /*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . .*/
 
     /** Table of reduction counts (reused by compute_default()). */

@@ -26,8 +26,8 @@
 package ppg.parse;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
 
 import ppg.lex.Lexer;
@@ -41,12 +41,12 @@ public class ParseTest {
     }
 
     public static void main(String args[]) {
-        FileInputStream fileInput;
+        FileReader fileReader;
 
         String filename = null;
         try {
             filename = args[0];
-            fileInput = new FileInputStream(filename);
+            fileReader = new FileReader(filename);
         }
         catch (FileNotFoundException e) {
             System.err.println("Error: " + filename + " is not found.");
@@ -60,7 +60,7 @@ public class ParseTest {
         File f = new File(filename);
         String simpleName = f.getName();
 
-        Lexer lex = new Lexer(fileInput, simpleName);
+        Lexer lex = new Lexer(fileReader, simpleName);
 
         Parser parser = new Parser(filename, lex);
         try {
@@ -76,7 +76,7 @@ public class ParseTest {
         try {
             spec.unparse(cw);
             cw.flush();
-            fileInput.close();
+            fileReader.close();
         }
         catch (IOException e) {
             System.err.println(HEADER + "exception: " + e.getMessage());

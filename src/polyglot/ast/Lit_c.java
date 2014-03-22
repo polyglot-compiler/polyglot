@@ -33,16 +33,20 @@ import polyglot.util.SerialVersionUID;
 import polyglot.visit.CFGBuilder;
 
 /**
- * <code>Lit</code> represents any Java literal.
+ * {@code Lit} represents any Java literal.
  */
 public abstract class Lit_c extends Expr_c implements Lit {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
+    @Deprecated
     public Lit_c(Position pos) {
-        super(pos);
+        this(pos, null);
     }
 
-    /** Get the precedence of the expression. */
+    public Lit_c(Position pos, Ext ext) {
+        super(pos, ext);
+    }
+
     @Override
     public Precedence precedence() {
         return Precedence.LITERAL;
@@ -59,15 +63,15 @@ public abstract class Lit_c extends Expr_c implements Lit {
     }
 
     @Override
-    public boolean constantValueSet() {
+    public boolean constantValueSet(Lang lang) {
         return true;
     }
 
     @Override
-    public boolean isConstant() {
+    public boolean isConstant(Lang lang) {
         return true;
     }
 
     @Override
-    public abstract Object constantValue();
+    public abstract Object constantValue(Lang lang);
 }

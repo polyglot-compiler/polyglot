@@ -28,39 +28,47 @@ package polyglot.ast;
 
 import polyglot.types.SemanticException;
 import polyglot.util.CodeWriter;
+import polyglot.util.Copy;
 import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
 import polyglot.visit.PrettyPrinter;
 import polyglot.visit.TypeChecker;
 
 /**
- * A <code>BooleanLit</code> represents a boolean literal expression.
+ * A {@code BooleanLit} represents a boolean literal expression.
  */
 public class BooleanLit_c extends Lit_c implements BooleanLit {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
     protected boolean value;
 
+    @Deprecated
     public BooleanLit_c(Position pos, boolean value) {
-        super(pos);
+        this(pos, value, null);
+    }
+
+    public BooleanLit_c(Position pos, boolean value, Ext ext) {
+        super(pos, ext);
         this.value = value;
     }
 
-    /** Get the value of the expression. */
     @Override
     public boolean value() {
         return this.value;
     }
 
-    /** Set the value of the expression. */
     @Override
     public BooleanLit value(boolean value) {
-        BooleanLit_c n = (BooleanLit_c) copy();
+        return value(this, value);
+    }
+
+    protected <N extends BooleanLit_c> N value(N n, boolean value) {
+        if (n.value == value) return n;
+        if (n == this) n = Copy.Util.copy(n);
         n.value = value;
         return n;
     }
 
-    /** Type check the expression. */
     @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
         return type(tc.typeSystem().Boolean());
@@ -71,13 +79,11 @@ public class BooleanLit_c extends Lit_c implements BooleanLit {
         return String.valueOf(value);
     }
 
-    /** Write the expression to an output file. */
     @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
         w.write(String.valueOf(value));
     }
 
-    /** Dumps the AST. */
     @Override
     public void dump(CodeWriter w) {
         super.dump(w);
@@ -89,7 +95,7 @@ public class BooleanLit_c extends Lit_c implements BooleanLit {
     }
 
     @Override
-    public Object constantValue() {
+    public Object constantValue(Lang lang) {
         return Boolean.valueOf(value);
     }
 

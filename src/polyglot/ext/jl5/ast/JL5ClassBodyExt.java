@@ -31,21 +31,21 @@ import java.util.List;
 
 import polyglot.ast.ClassBody;
 import polyglot.ast.ClassMember;
-import polyglot.ast.Node_c;
 import polyglot.util.CodeWriter;
 import polyglot.util.SerialVersionUID;
 import polyglot.visit.PrettyPrinter;
 
-public class JL5ClassBodyExt extends JL5Ext {
+public class JL5ClassBodyExt extends JL5TermExt {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
+    @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
         ClassBody cb = (ClassBody) this.node();
 
         // check if we have any EnumConstantDecl
         List<EnumConstantDecl> ecds = enumConstantDecls();
         if (ecds.isEmpty()) {
-            this.superDel().prettyPrint(w, tr);
+            superLang().prettyPrint(this.node(), w, tr);
             return;
         }
 
@@ -57,7 +57,7 @@ public class JL5ClassBodyExt extends JL5Ext {
             for (Iterator<EnumConstantDecl> i = ecds.iterator(); i.hasNext();) {
                 EnumConstantDecl ecd = i.next();
                 prev = ecd;
-                ((Node_c) cb).print(ecd, w, tr);
+                print(ecd, w, tr);
                 w.write(i.hasNext() ? "," : ";");
                 w.allowBreak(1);
             }
@@ -77,7 +77,7 @@ public class JL5ClassBodyExt extends JL5Ext {
                     w.newline(0);
                 }
                 prev = member;
-                ((Node_c) cb).printBlock(member, w, tr);
+                printBlock(member, w, tr);
                 if (i.hasNext()) {
                     w.newline(0);
                 }

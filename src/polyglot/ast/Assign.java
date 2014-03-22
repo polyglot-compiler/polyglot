@@ -30,7 +30,7 @@ import polyglot.util.Enum;
 import polyglot.util.SerialVersionUID;
 
 /**
- * An <code>Assign</code> represents a Java assignment expression.
+ * An {@code Assign} represents a Java assignment expression.
  */
 public interface Assign extends Expr {
     /** Assignment operator. */
@@ -101,5 +101,6 @@ public interface Assign extends Expr {
      */
     Assign right(Expr right);
 
+    /** Get the throwsArithmeticException of the expression. */
     boolean throwsArithmeticException();
 }

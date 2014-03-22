@@ -30,6 +30,7 @@ import java.util.Collections;
 import java.util.List;
 
 import polyglot.util.CodeWriter;
+import polyglot.util.Copy;
 import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
 import polyglot.visit.CFGBuilder;
@@ -37,7 +38,7 @@ import polyglot.visit.NodeVisitor;
 import polyglot.visit.PrettyPrinter;
 
 /**
- * A <code>Branch</code> is an immutable representation of a branch
+ * A {@code Branch} is an immutable representation of a branch
  * statment in Java (a break or continue).
  */
 public class Branch_c extends Stmt_c implements Branch {
@@ -46,69 +47,72 @@ public class Branch_c extends Stmt_c implements Branch {
     protected Branch.Kind kind;
     protected Id label;
 
+    @Deprecated
     public Branch_c(Position pos, Branch.Kind kind, Id label) {
-        super(pos);
+        this(pos, kind, label, null);
+    }
+
+    public Branch_c(Position pos, Branch.Kind kind, Id label, Ext ext) {
+        super(pos, ext);
         assert (kind != null); // label may be null
         this.kind = kind;
         this.label = label;
     }
 
-    /** Get the kind of the branch. */
     @Override
     public Branch.Kind kind() {
         return this.kind;
     }
 
-    /** Set the kind of the branch. */
     @Override
     public Branch kind(Branch.Kind kind) {
-        Branch_c n = (Branch_c) copy();
+        return kind(this, kind);
+    }
+
+    protected <N extends Branch_c> N kind(N n, Branch.Kind kind) {
+        if (n.kind == kind) return n;
+        if (n == this) n = Copy.Util.copy(n);
         n.kind = kind;
         return n;
     }
 
-    /** Get the target label of the branch. */
     @Override
     public Id labelNode() {
         return this.label;
     }
 
-    /** Set the target label of the branch. */
     @Override
     public Branch labelNode(Id label) {
-        Branch_c n = (Branch_c) copy();
+        return labelNode(this, label);
+    }
+
+    protected <N extends Branch_c> N labelNode(N n, Id label) {
+        if (n.label == label) return n;
+        if (n == this) n = Copy.Util.copy(n);
         n.label = label;
         return n;
     }
 
-    /** Get the target label of the branch. */
     @Override
     public String label() {
         return this.label != null ? this.label.id() : null;
     }
 
-    /** Set the target label of the branch. */
     @Override
     public Branch label(String label) {
         return labelNode(this.label.id(label));
     }
 
     /** Reconstruct the expression. */
-    protected Branch_c reconstruct(Id label) {
-        if (label != this.label) {
-            Branch_c n = (Branch_c) copy();
-            n.label = label;
-            return n;
-        }
-
-        return this;
+    protected <N extends Branch_c> N reconstruct(N n, Id label) {
+        n = labelNode(n, label);
+        return n;
     }
 
-    /** Visit the children of the constructor. */
     @Override
     public Node visitChildren(NodeVisitor v) {
-        Id label = (Id) visitChild(this.label, v);
-        return reconstruct(label);
+        Id label = visitChild(this.label, v);
+        return reconstruct(this, label);
     }
 
     @Override
@@ -116,7 +120,6 @@ public class Branch_c extends Stmt_c implements Branch {
         return kind.toString() + (label != null ? " " + label.toString() : "");
     }
 
-    /** Write the expression to an output file. */
     @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
         w.write(kind.toString());
@@ -126,10 +129,6 @@ public class Branch_c extends Stmt_c implements Branch {
         w.write(";");
     }
 
-    /**
-     * Return the first (sub)term performed when evaluating this
-     * term.
-     */
     @Override
     public Term firstChild() {
         return null;

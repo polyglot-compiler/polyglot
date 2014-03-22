@@ -30,7 +30,7 @@ import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
 
 /**
- * A <code>InitializerInstance</code> contains the type information for a
+ * A {@code InitializerInstance} contains the type information for a
  * static or anonymous initializer.
  */
 public class InitializerInstance_c extends TypeObject_c implements
@@ -93,9 +93,6 @@ public class InitializerInstance_c extends TypeObject_c implements
         this.container = container;
     }
 
-    /**
-     * @param flags The flags to set.
-     */
     @Override
     public void setFlags(Flags flags) {
         this.flags = flags;

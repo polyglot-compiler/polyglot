@@ -27,7 +27,7 @@
 package polyglot.types;
 
 /**
- * A <code>LocalInstance</code> contains type information for a local variable.
+ * A {@code LocalInstance} contains type information for a local variable.
  */
 public interface LocalInstance extends VarInstance {
     LocalInstance flags(Flags flags);

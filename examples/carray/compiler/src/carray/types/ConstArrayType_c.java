@@ -6,12 +6,15 @@ import polyglot.types.Type;
 import polyglot.types.TypeObject;
 import polyglot.types.TypeSystem;
 import polyglot.util.Position;
+import polyglot.util.SerialVersionUID;
 
 /**
  * A <code>ConstArrayType</code> represents an array of base java types,
  * whose elements cannot change after initialization.
  */
 public class ConstArrayType_c extends ArrayType_c implements ConstArrayType {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     protected boolean isConst;
 
     /** Used for deserializing types. */

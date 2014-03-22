@@ -34,22 +34,21 @@ import polyglot.types.ReferenceType;
 import polyglot.types.SemanticException;
 import polyglot.types.Type;
 import polyglot.util.CodeWriter;
+import polyglot.util.Copy;
 import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
 import polyglot.visit.AmbiguityRemover;
 import polyglot.visit.NodeVisitor;
 import polyglot.visit.PrettyPrinter;
 
-public class AmbWildCard extends TypeNode_c implements TypeNode, Ambiguous {
+public class AmbWildCard extends TypeNode_c implements Ambiguous {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
-    private TypeNode constraint;
+    protected TypeNode constraint;
     private boolean isExtendsConstraint;
 
     public AmbWildCard(Position pos) {
-        super(pos);
-        constraint = null;
-        isExtendsConstraint = true;
+        this(pos, null, true);
     }
 
     public AmbWildCard(Position pos, TypeNode constraint,
@@ -57,6 +56,25 @@ public class AmbWildCard extends TypeNode_c implements TypeNode, Ambiguous {
         super(pos);
         this.constraint = constraint;
         this.isExtendsConstraint = isExtendsConstraint;
+    }
+
+    protected <N extends AmbWildCard> N constraint(N n, TypeNode constraint) {
+        if (n.constraint == constraint) return n;
+        if (n == this) n = Copy.Util.copy(n);
+        n.constraint = constraint;
+        return n;
+    }
+
+    protected AmbWildCard reconstruct(TypeNode constraint) {
+        AmbWildCard n = this;
+        n = constraint(n, constraint);
+        return n;
+    }
+
+    @Override
+    public Node visitChildren(NodeVisitor v) {
+        TypeNode c = visitChild(this.constraint, v);
+        return reconstruct(c);
     }
 
     @Override
@@ -90,25 +108,7 @@ public class AmbWildCard extends TypeNode_c implements TypeNode, Ambiguous {
             w.write(" ");
             w.write(this.isExtendsConstraint ? "extends" : "super");
             w.write(" ");
-            constraint.del().prettyPrint(w, tr);
+            tr.lang().prettyPrint(constraint, w, tr);
         }
-    }
-
-    @Override
-    public Node visitChildren(NodeVisitor v) {
-        if (this.constraint != null) {
-            TypeNode c = (TypeNode) visitChild(this.constraint, v);
-            return this.constraint(c);
-        }
-        return this;
-    }
-
-    private AmbWildCard constraint(TypeNode constraint) {
-        if (this.constraint == constraint) {
-            return this;
-        }
-        AmbWildCard n = (AmbWildCard) this.copy();
-        n.constraint = constraint;
-        return n;
     }
 }

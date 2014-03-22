@@ -31,6 +31,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
+import polyglot.ast.JLang;
 import polyglot.ast.Node;
 import polyglot.ast.NodeFactory;
 import polyglot.frontend.Job;
@@ -91,6 +92,11 @@ public class ExceptionChecker extends ErrorHandlingVisitor {
         this.catchAllThrowable = false;
     }
 
+    @Override
+    public JLang lang() {
+        return (JLang) super.lang();
+    }
+
     public ExceptionChecker push(UncaughtReporter reporter) {
         ExceptionChecker ec = this.push();
         ec.reporter = reporter;
@@ -134,7 +140,7 @@ public class ExceptionChecker extends ErrorHandlingVisitor {
 
     @Override
     protected NodeVisitor enterCall(Node n) throws SemanticException {
-        return n.del().exceptionCheckEnter(this);
+        return lang().exceptionCheckEnter(n, this);
     }
 
     @Override
@@ -147,9 +153,9 @@ public class ExceptionChecker extends ErrorHandlingVisitor {
      *
      * @param old The original state of root of the current subtree.
      * @param n The current state of the root of the current subtree.
-     * @param v The <code>NodeVisitor</code> object used to visit the children.
+     * @param v The {@code NodeVisitor} object used to visit the children.
      * @return The final result of the traversal of the tree rooted at 
-     *  <code>n</code>.
+     *  {@code n}.
      */
     @Override
     protected Node leaveCall(Node old, Node n, NodeVisitor v)
@@ -173,7 +179,7 @@ public class ExceptionChecker extends ErrorHandlingVisitor {
         }
 
         // gather exceptions from this node.
-        return n.del().exceptionCheck(inner);
+        return lang().exceptionCheck(n, inner);
     }
 
     /**

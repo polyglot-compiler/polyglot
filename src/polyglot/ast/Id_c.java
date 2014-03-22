@@ -27,22 +27,27 @@
 package polyglot.ast;
 
 import polyglot.util.CodeWriter;
+import polyglot.util.Copy;
 import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
 import polyglot.util.StringUtil;
 import polyglot.visit.PrettyPrinter;
 
-/**
- * An <code>AmbExpr</code> is an ambiguous AST node composed of a single
- * identifier that must resolve to an expression.
- */
+/** An {@code Id} represents a simple identifier in the AST. Because it is a
+ * full-fledged node, extensions have the opportunity to attach additional
+ * information. */
 public class Id_c extends Node_c implements Id {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
     protected String id;
 
+    @Deprecated
     public Id_c(Position pos, String id) {
-        super(pos);
+        this(pos, id, null);
+    }
+
+    public Id_c(Position pos, String id, Ext ext) {
+        super(pos, ext);
         assert (id != null);
         assert (StringUtil.isNameShort(id));
         this.id = id;
@@ -52,21 +57,23 @@ public class Id_c extends Node_c implements Id {
     public final void equals(String s) {
     }
 
-    /** Get the name of the expression. */
     @Override
     public String id() {
         return this.id;
     }
 
-    /** Set the name of the expression. */
     @Override
     public Id id(String id) {
-        Id_c n = (Id_c) copy();
+        return id(this, id);
+    }
+
+    protected <N extends Id_c> N id(N n, String id) {
+        if (n.id == id) return n;
+        if (n == this) n = Copy.Util.copy(n);
         n.id = id;
         return n;
     }
 
-    /** Write the name to an output file. */
     @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
         w.write(id);

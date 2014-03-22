@@ -8,12 +8,12 @@ import polyglot.visit.AmbiguityRemover;
 import polyglot.visit.PrettyPrinter;
 import polyglot.visit.TypeChecker;
 
-public interface NewOps {
+public interface NewOps extends ProcedureCallOps, ExprOps {
 
     TypeNode findQualifiedTypeNode(AmbiguityRemover ar, ClassType outer,
             TypeNode objectType) throws SemanticException;
 
-    New findQualifier(AmbiguityRemover ar, ClassType ct)
+    Expr findQualifier(AmbiguityRemover ar, ClassType ct)
             throws SemanticException;
 
     void typeCheckFlags(TypeChecker tc) throws SemanticException;
@@ -21,8 +21,6 @@ public interface NewOps {
     void typeCheckNested(TypeChecker tc) throws SemanticException;
 
     void printQualifier(CodeWriter w, PrettyPrinter tr);
-
-    void printArgs(CodeWriter w, PrettyPrinter tr);
 
     void printBody(CodeWriter w, PrettyPrinter tr);
 

@@ -45,6 +45,7 @@ import java.util.Set;
 import java.util.StringTokenizer;
 
 import javax.tools.FileObject;
+import javax.tools.JavaCompiler;
 import javax.tools.JavaCompiler.CompilationTask;
 import javax.tools.JavaFileObject;
 import javax.tools.ToolProvider;
@@ -69,6 +70,15 @@ public class Main {
     private Set<String> source;
 
     public final static String verbose = "verbose";
+    private static final JavaCompiler javaCompiler = javaCompiler();
+
+    public static JavaCompiler javaCompiler() {
+        JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
+        if (compiler == null)
+            throw new InternalCompilerError("Java compiler not found.  "
+                    + "Does java that runs Polyglot have javac along with it?");
+        return compiler;
+    }
 
     /* modifies args */
     protected ExtensionInfo getExtensionInfo(List<String> args)
@@ -192,7 +202,16 @@ public class Main {
      * Returns a list of arguments to pass to the system java compiler.
      */
     protected List<String> getSystemJavacArgs(Options options) {
-        List<String> postCompilerArgs = new ArrayList<String>(1);
+        List<String> postCompilerArgs;
+        if (options.post_compiler_opts != null) {
+            QuotedStringTokenizer st =
+                    new QuotedStringTokenizer(options.post_compiler_opts);
+            int pc_size = st.countTokens();
+            postCompilerArgs = new ArrayList<String>(pc_size + 1);
+            while (st.hasMoreTokens())
+                postCompilerArgs.add(st.nextToken());
+        }
+        else postCompilerArgs = new ArrayList<String>(1);
         if (options.generate_debugging_info) postCompilerArgs.add("-g");
         return postCompilerArgs;
     }
@@ -210,34 +229,41 @@ public class Main {
                     FileManager fileManager =
                             compiler.sourceExtension().extFileManager();
                     CompilationTask task =
-                            ToolProvider.getSystemJavaCompiler()
-                                        .getTask(javac_err,
+                            javaCompiler.getTask(javac_err,
                                                  fileManager,
                                                  null,
                                                  postCompilerArgs,
                                                  null,
                                                  compiler.outputFiles());
 
-                    if (!task.call())
-                        eq.enqueue(ErrorInfo.POST_COMPILER_ERROR,
-                                   err.toString());
+                    task.call();
+                    String error = err.toString();
+                    if (!error.isEmpty())
+                        eq.enqueue(ErrorInfo.POST_COMPILER_ERROR, error);
                 }
                 else {
-                    Runtime runtime = Runtime.getRuntime();
-                    QuotedStringTokenizer st =
-                            new QuotedStringTokenizer(options.post_compiler);
-                    int pc_size = st.countTokens();
-                    int options_size = 2;
-                    if (options.classOutputLocation() != null) {
+                    int options_size = 3;
+                    if (options.classOutputLocation() != null)
                         options_size += 2;
-                    }
                     if (options.generate_debugging_info) options_size++;
-                    String[] javacCmd =
-                            new String[pc_size + options_size
-                                    + compiler.outputFiles().size()];
+
+                    String[] javacCmd;
                     int j = 0;
-                    for (int i = 0; i < pc_size; i++) {
-                        javacCmd[j++] = st.nextToken();
+                    if (options.post_compiler_opts != null) {
+                        QuotedStringTokenizer st =
+                                new QuotedStringTokenizer(options.post_compiler_opts);
+                        javacCmd =
+                                new String[st.countTokens() + options_size
+                                        + compiler.outputFiles().size()];
+                        javacCmd[j++] = options.post_compiler;
+                        while (st.hasMoreTokens())
+                            javacCmd[j++] = st.nextToken();
+                    }
+                    else {
+                        javacCmd =
+                                new String[options_size
+                                        + compiler.outputFiles().size()];
+                        javacCmd[j++] = options.post_compiler;
                     }
                     javacCmd[j++] = "-classpath";
                     javacCmd[j++] = options.constructPostCompilerClasspath();
@@ -246,9 +272,7 @@ public class Main {
                         javacCmd[j++] =
                                 options.classOutputDirectory().getPath();
                     }
-                    if (options.generate_debugging_info) {
-                        javacCmd[j++] = "-g";
-                    }
+                    if (options.generate_debugging_info) javacCmd[j++] = "-g";
 
                     for (JavaFileObject jfo : compiler.outputFiles()) {
                         URI jfoURI = jfo.toUri();
@@ -267,6 +291,7 @@ public class Main {
                         Report.report(1, "Executing post-compiler " + cmdStr);
                     }
 
+                    Runtime runtime = Runtime.getRuntime();
                     Process proc = runtime.exec(javacCmd);
 
                     InputStreamReader err =
@@ -276,14 +301,12 @@ public class Main {
                         char[] c = new char[72];
                         int len;
                         StringBuffer sb = new StringBuffer();
-                        while ((len = err.read(c)) > 0) {
+                        while ((len = err.read(c)) > 0)
                             sb.append(String.valueOf(c, 0, len));
-                        }
 
-                        if (sb.length() != 0) {
+                        if (sb.length() != 0)
                             eq.enqueue(ErrorInfo.POST_COMPILER_ERROR,
                                        sb.toString());
-                        }
                     }
                     finally {
                         err.close();
@@ -311,7 +334,7 @@ public class Main {
         return true;
     }
 
-    private List<String> explodeOptions(String[] args)
+    private static List<String> explodeOptions(String[] args)
             throws TerminationException {
         LinkedList<String> ll = new LinkedList<String>();
 
@@ -404,7 +427,7 @@ public class Main {
 
     /**
      * This exception signals termination of the compiler. It should be used
-     * instead of <code>System.exit</code> to allow Polyglot to be called within
+     * instead of {@code System.exit} to allow Polyglot to be called within
      * a JVM that wasn't started specifically for Polyglot, e.g. the Apache ANT
      * framework.
      */

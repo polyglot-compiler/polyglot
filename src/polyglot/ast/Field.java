@@ -29,9 +29,9 @@ package polyglot.ast;
 import polyglot.types.FieldInstance;
 
 /**
- * A <code>Field</code> is an immutable representation of a Java field
+ * A {@code Field} is an immutable representation of a Java field
  * access.  It consists of field name and may also have either a 
- * <code>Type</code> or an <code>Expr</code> containing the field being 
+ * {@code Type} or an {@code Expr} containing the field being 
  * accessed.
  */
 public interface Field extends NamedVariable {
@@ -63,17 +63,10 @@ public interface Field extends NamedVariable {
     /** 
      * Set whether the target of the field is implicit.
      */
-    Field targetImplicit(boolean implicit);
-
-    /** Get the field's name. */
-    Id id();
+    Field targetImplicit(boolean targetImplicit);
 
     /** Set the field's name. */
     Field id(Id name);
-
-    /** Get the field's name. */
-    @Override
-    String name();
 
     /** Set the field's name. */
     Field name(String name);

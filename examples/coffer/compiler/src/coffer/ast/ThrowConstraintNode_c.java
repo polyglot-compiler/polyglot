@@ -13,6 +13,7 @@ import polyglot.ast.TypeNode;
 import polyglot.types.SemanticException;
 import polyglot.util.CodeWriter;
 import polyglot.util.Position;
+import polyglot.util.SerialVersionUID;
 import polyglot.visit.AmbiguityRemover;
 import polyglot.visit.NodeVisitor;
 import polyglot.visit.PrettyPrinter;
@@ -26,6 +27,8 @@ import coffer.types.ThrowConstraint;
  */
 public class ThrowConstraintNode_c extends Node_c implements
         ThrowConstraintNode {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     TypeNode tn;
     KeySetNode keys;
     ThrowConstraint constraint;
@@ -108,8 +111,8 @@ public class ThrowConstraintNode_c extends Node_c implements
 
     @Override
     public Node visitChildren(NodeVisitor v) {
-        TypeNode tn = (TypeNode) visitChild(this.tn, v);
-        KeySetNode keys = (KeySetNode) visitChild(this.keys, v);
+        TypeNode tn = visitChild(this.tn, v);
+        KeySetNode keys = visitChild(this.keys, v);
         return reconstruct(tn, keys);
     }
 

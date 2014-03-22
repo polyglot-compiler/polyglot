@@ -71,6 +71,7 @@ public class ClassSerializer extends NodeVisitor {
 
     public ClassSerializer(TypeSystem ts, NodeFactory nf, long time,
             ErrorQueue eq, Version ver) {
+        super(nf.lang());
         this.ts = ts;
         this.nf = nf;
         this.te = new TypeEncoder(ts);

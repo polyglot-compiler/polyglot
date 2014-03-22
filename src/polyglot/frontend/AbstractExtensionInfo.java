@@ -55,7 +55,7 @@ import polyglot.util.ErrorQueue;
 import polyglot.util.InternalCompilerError;
 
 /**
- * This is an abstract <code>ExtensionInfo</code>.
+ * This is an abstract {@code ExtensionInfo}.
  */
 public abstract class AbstractExtensionInfo implements ExtensionInfo {
 

@@ -112,20 +112,41 @@ import java.util.Stack;
  */
 
 public abstract class lr_parser {
-
     /*-----------------------------------------------------------*/
     /*--- Constructor(s) ----------------------------------------*/
     /*-----------------------------------------------------------*/
 
-    /** Simple constructor. */
+    /** 
+     * Simple constructor. 
+     */
     public lr_parser() {
-        /* nothing to do here */
+        symbolFactory = new ComplexSymbolFactory();
     }
 
-    /** Constructor that sets the default scanner. [CSA/davidm] */
+    /** 
+     * Constructor that sets the default scanner. [CSA/davidm] 
+     */
+    @Deprecated
     public lr_parser(Scanner s) {
-        this(); /* in case default constructor someday does something */
+        this(s, new DefaultSymbolFactory()); // TUM 20060327 old cup v10 Symbols as default
+    }
+
+    /** 
+     * Constructor that sets the default scanner and a SymbolFactory
+     */
+    public lr_parser(Scanner s, SymbolFactory symfac) {
+        this(); // in case default constructor someday does something
+        symbolFactory = symfac;
         setScanner(s);
+    }
+
+    public SymbolFactory symbolFactory;// = new DefaultSymbolFactory();
+
+    /**
+     * Whenever creation of a new Symbol is necessary, one should use this factory.
+     */
+    public SymbolFactory getSymbolFactory() {
+        return symbolFactory;
     }
 
     /*-----------------------------------------------------------*/
@@ -247,7 +268,7 @@ public abstract class lr_parser {
     /*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . .*/
 
     /** The parse stack itself. */
-    protected Stack stack = new Stack();
+    protected Stack<Symbol> stack = new Stack<Symbol>();
 
     /*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . .*/
 
@@ -299,7 +320,7 @@ public abstract class lr_parser {
      * @param top       the index of the top element of the parse stack.
      */
     public abstract Symbol do_action(int act_num, lr_parser parser,
-            Stack stack, int top) throws java.lang.Exception;
+            Stack<Symbol> stack, int top) throws java.lang.Exception;
 
     /*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . .*/
 
@@ -333,7 +354,8 @@ public abstract class lr_parser {
      */
     public Symbol scan() throws java.lang.Exception {
         Symbol sym = getScanner().next_token();
-        return (sym != null) ? sym : new Symbol(EOF_sym());
+        return (sym != null) ? sym
+                : getSymbolFactory().newSymbol("END_OF_FILE", EOF_sym());
     }
 
     /*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . .*/
@@ -371,6 +393,7 @@ public abstract class lr_parser {
      */
     public void report_error(String message, Object info) {
         System.err.print(message);
+        System.err.flush();
         if (info instanceof Symbol)
             if (((Symbol) info).left != -1)
                 System.err.println(" at character " + ((Symbol) info).left
@@ -518,7 +541,7 @@ public abstract class lr_parser {
 
         /* push dummy Symbol with start state to get us underway */
         stack.removeAllElements();
-        stack.push(new Symbol(0, start_state()));
+        stack.push(getSymbolFactory().startSymbol("START", 0, start_state()));
         tos = 0;
 
         /* continue until we are told to stop */
@@ -530,9 +553,7 @@ public abstract class lr_parser {
             /* current state is always on the top of the stack */
 
             /* look up action out of the current state with the current input */
-            act =
-                    get_action(((Symbol) stack.peek()).parse_state,
-                               cur_token.sym);
+            act = get_action(stack.peek().parse_state, cur_token.sym);
 
             /* decode the action -- > 0 encodes shift */
             if (act > 0) {
@@ -561,9 +582,7 @@ public abstract class lr_parser {
                 }
 
                 /* look up the state to go to from the one popped back to */
-                act =
-                        get_reduce(((Symbol) stack.peek()).parse_state,
-                                   lhs_sym_num);
+                act = get_reduce(stack.peek().parse_state, lhs_sym_num);
 
                 /* shift to that state */
                 lhs_sym.parse_state = act;
@@ -585,7 +604,7 @@ public abstract class lr_parser {
                     done_parsing();
                 }
                 else {
-                    lhs_sym = (Symbol) stack.peek();
+                    lhs_sym = stack.peek();
                 }
             }
         }
@@ -616,8 +635,8 @@ public abstract class lr_parser {
 
         /* dump the stack */
         for (int i = 0; i < stack.size(); i++) {
-            debug_message("Symbol: " + ((Symbol) stack.elementAt(i)).sym
-                    + " State: " + ((Symbol) stack.elementAt(i)).parse_state);
+            debug_message("Symbol: " + stack.elementAt(i).sym + " State: "
+                    + stack.elementAt(i).parse_state);
         }
         debug_message("==========================================");
     }
@@ -653,7 +672,7 @@ public abstract class lr_parser {
     public void debug_stack() {
         StringBuffer sb = new StringBuffer("## STACK:");
         for (int i = 0; i < stack.size(); i++) {
-            Symbol s = (Symbol) stack.elementAt(i);
+            Symbol s = stack.elementAt(i);
             sb.append(" <state " + s.parse_state + ", sym " + s.sym + ">");
             if ((i % 3) == 2 || (i == (stack.size() - 1))) {
                 debug_message(sb.toString());
@@ -699,7 +718,7 @@ public abstract class lr_parser {
 
         /* push dummy Symbol with start state to get us underway */
         stack.removeAllElements();
-        stack.push(new Symbol(0, start_state()));
+        stack.push(getSymbolFactory().startSymbol("START", 0, start_state()));
         tos = 0;
 
         /* continue until we are told to stop */
@@ -712,9 +731,7 @@ public abstract class lr_parser {
             //debug_stack();
 
             /* look up action out of the current state with the current input */
-            act =
-                    get_action(((Symbol) stack.peek()).parse_state,
-                               cur_token.sym);
+            act = get_action(stack.peek().parse_state, cur_token.sym);
 
             /* decode the action -- > 0 encodes shift */
             if (act > 0) {
@@ -747,12 +764,10 @@ public abstract class lr_parser {
                 }
 
                 /* look up the state to go to from the one popped back to */
-                act =
-                        get_reduce(((Symbol) stack.peek()).parse_state,
-                                   lhs_sym_num);
+                act = get_reduce(stack.peek().parse_state, lhs_sym_num);
                 debug_message("# Reduce rule: top state "
-                        + ((Symbol) stack.peek()).parse_state + ", lhs sym "
-                        + lhs_sym_num + " -> state " + act);
+                        + stack.peek().parse_state + ", lhs sym " + lhs_sym_num
+                        + " -> state " + act);
 
                 /* shift to that state */
                 lhs_sym.parse_state = act;
@@ -776,7 +791,7 @@ public abstract class lr_parser {
                     done_parsing();
                 }
                 else {
-                    lhs_sym = (Symbol) stack.peek();
+                    lhs_sym = stack.peek();
                 }
             }
         }
@@ -865,7 +880,7 @@ public abstract class lr_parser {
      */
     protected boolean shift_under_error() {
         /* is there a shift under error Symbol */
-        return get_action(((Symbol) stack.peek()).parse_state, error_sym()) > 0;
+        return get_action(stack.peek().parse_state, error_sym()) > 0;
     }
 
     /*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . .*/
@@ -884,16 +899,16 @@ public abstract class lr_parser {
         if (debug) debug_message("# Finding recovery state on stack");
 
         /* Remember the right-position of the top symbol on the stack */
-        int right_pos = ((Symbol) stack.peek()).right;
-        int left_pos = ((Symbol) stack.peek()).left;
+        Symbol right = (stack.peek());// TUM 20060327 removed .right    
+        Symbol left = right;// TUM 20060327 removed .left       
 
         /* pop down until we can shift under error Symbol */
         while (!shift_under_error()) {
             /* pop the stack */
             if (debug)
                 debug_message("# Pop stack by one, state was # "
-                        + ((Symbol) stack.peek()).parse_state);
-            left_pos = ((Symbol) stack.pop()).left;
+                        + stack.peek().parse_state);
+            left = (stack.pop()); // TUM 20060327 removed .left 
             tos--;
 
             /* if we have hit bottom, we fail */
@@ -904,15 +919,16 @@ public abstract class lr_parser {
         }
 
         /* state on top of the stack can shift under error, find the shift */
-        act = get_action(((Symbol) stack.peek()).parse_state, error_sym());
+        act = get_action(stack.peek().parse_state, error_sym());
         if (debug) {
-            debug_message("# Recover state found (#"
-                    + ((Symbol) stack.peek()).parse_state + ")");
+            debug_message("# Recover state found (#" + stack.peek().parse_state
+                    + ")");
             debug_message("# Shifting on error to state #" + (act - 1));
         }
 
         /* build and shift a special error Symbol */
-        error_token = new Symbol(error_sym(), left_pos, right_pos);
+        error_token =
+                getSymbolFactory().newSymbol("ERROR", error_sym(), left, right);
         error_token.parse_state = act - 1;
         error_token.used_by_parser = true;
         stack.push(error_token);
@@ -1083,8 +1099,7 @@ public abstract class lr_parser {
         if (debug) {
             debug_message("# Reparsing saved input with actions");
             debug_message("# Current Symbol is #" + cur_err_token().sym);
-            debug_message("# Current state is #"
-                    + ((Symbol) stack.peek()).parse_state);
+            debug_message("# Current state is #" + stack.peek().parse_state);
         }
 
         /* continue until we accept or have read all lookahead input */
@@ -1092,9 +1107,7 @@ public abstract class lr_parser {
             /* current state is always on the top of the stack */
 
             /* look up action out of the current state with the current input */
-            act =
-                    get_action(((Symbol) stack.peek()).parse_state,
-                               cur_err_token().sym);
+            act = get_action(stack.peek().parse_state, cur_err_token().sym);
 
             /* decode the action -- > 0 encodes shift */
             if (act > 0) {
@@ -1140,9 +1153,7 @@ public abstract class lr_parser {
                 }
 
                 /* look up the state to go to from the one popped back to */
-                act =
-                        get_reduce(((Symbol) stack.peek()).parse_state,
-                                   lhs_sym_num);
+                act = get_reduce(stack.peek().parse_state, lhs_sym_num);
 
                 /* shift to that state */
                 lhs_sym.parse_state = act;
@@ -1172,11 +1183,11 @@ public abstract class lr_parser {
         for (int i = 1; i < sa.length; i++)
             sb.append(sa[i]);
         int n = 0; // location in initialization string
-        int size1 = (((int) sb.charAt(n)) << 16) | ((int) sb.charAt(n + 1));
+        int size1 = ((sb.charAt(n)) << 16) | (sb.charAt(n + 1));
         n += 2;
         short[][] result = new short[size1][];
         for (int i = 0; i < size1; i++) {
-            int size2 = (((int) sb.charAt(n)) << 16) | ((int) sb.charAt(n + 1));
+            int size2 = ((sb.charAt(n)) << 16) | (sb.charAt(n + 1));
             n += 2;
             result[i] = new short[size2];
             for (int j = 0; j < size2; j++)

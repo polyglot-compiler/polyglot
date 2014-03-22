@@ -30,6 +30,8 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 
+import polyglot.ast.JLangToJLDel;
+import polyglot.ast.Lang;
 import polyglot.ast.Node;
 import polyglot.frontend.Compiler;
 import polyglot.util.CodeWriter;
@@ -39,20 +41,32 @@ public class DumpAst extends NodeVisitor {
     protected PrintWriter fw;
     protected CodeWriter w;
 
-    /** @deprecated Use the other constructor. */
     @Deprecated
     public DumpAst(String name, int width) throws IOException {
+        this(JLangToJLDel.instance, name, width);
+    }
+
+    /** @deprecated Use the other constructor. */
+    @Deprecated
+    public DumpAst(Lang lang, String name, int width) throws IOException {
+        super(lang);
         this.fw = new PrintWriter(new FileWriter(name));
         this.w = Compiler.createCodeWriter(fw, width);
     }
 
+    @Deprecated
     public DumpAst(CodeWriter w) {
+        this(JLangToJLDel.instance, w);
+    }
+
+    public DumpAst(Lang lang, CodeWriter w) {
+        super(lang);
         this.w = w;
     }
 
     /** 
-     * Visit each node before traversal of children. Call <code>dump</code> for
-     * that node. Then we begin a new <code>CodeWriter</code> block and traverse
+     * Visit each node before traversal of children. Call {@code dump} for
+     * that node. Then we begin a new {@code CodeWriter} block and traverse
      * the children.
      */
     @Override
@@ -66,8 +80,8 @@ public class DumpAst extends NodeVisitor {
 
     /**
      * This method is called only after normal traversal of the children. Thus
-     * we must end the <code>CodeWriter</code> block that was begun in 
-     * <code>enter</code>.
+     * we must end the {@code CodeWriter} block that was begun in 
+     * {@code enter}.
      */
     @Override
     public Node leave(Node old, Node n, NodeVisitor v) {

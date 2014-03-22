@@ -27,8 +27,8 @@
 package polyglot.ast;
 
 /**
- * A <code>Conditional</code> is a representation of a Java ternary
- * expression.  That is, <code>(cond ? consequent : alternative)</code>.
+ * A {@code Conditional} is a representation of a Java ternary
+ * expression.  That is, {@code (cond ? consequent : alternative)}.
  */
 public interface Conditional extends Expr {
     /** Get the condition to test. */

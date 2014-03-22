@@ -1,0 +1,6 @@
+class C {
+	private Object o;
+	protected static <T extends C> void o(T t, Object o) {
+		t.o = o;
+	}
+}

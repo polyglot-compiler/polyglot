@@ -26,6 +26,7 @@
 
 package polyglot.ext.param.types;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map.Entry;
@@ -42,17 +43,30 @@ import polyglot.types.ReferenceType;
 import polyglot.types.Resolver;
 import polyglot.types.Type;
 import polyglot.types.TypeObject;
+import polyglot.util.Copy;
 import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
 
 /**
  * Implementation of a ClassType that performs substitutions using a
- * map.  Subclasses must define how the substititions are performed and
+ * map.  Subclasses must define how the substitutions are performed and
  * how to cache substituted types.
  */
 public class SubstClassType_c<Formal extends Param, Actual extends TypeObject>
         extends ClassType_c implements SubstType<Formal, Actual> {
     private static final long serialVersionUID = SerialVersionUID.generate();
+
+    protected transient List<? extends ReferenceType> interfaces;
+    protected transient List<? extends FieldInstance> fields;
+    protected transient List<? extends MethodInstance> methods;
+    protected transient List<? extends ConstructorInstance> constructors;
+    protected transient List<? extends ClassType> memberClasses;
+    // substitution caches
+    protected transient List<? extends ReferenceType> substInterfaces;
+    protected transient List<? extends FieldInstance> substFields;
+    protected transient List<? extends MethodInstance> substMethods;
+    protected transient List<? extends ConstructorInstance> substConstructors;
+    protected transient List<? extends ClassType> substMemberClasses;
 
     /** The class type we are substituting into. */
     protected ClassType base;
@@ -73,22 +87,16 @@ public class SubstClassType_c<Formal extends Param, Actual extends TypeObject>
         }
     }
 
-    /**
-     * Entries of the underlying substitution object.
-     * @return an <code>Iterator</code> of <code>Map.Entry</code>.
-     */
     @Override
     public Iterator<Entry<Formal, Actual>> entries() {
         return subst.entries();
     }
 
-    /** Get the class on that we are performing substitutions. */
     @Override
     public Type base() {
         return base;
     }
 
-    /** The substitution object. */
     @Override
     public Subst<Formal, Actual> subst() {
         return subst;
@@ -97,76 +105,96 @@ public class SubstClassType_c<Formal extends Param, Actual extends TypeObject>
     ////////////////////////////////////////////////////////////////
     // Perform substitutions on these operations of the base class
 
-    /** Get the class's super type. */
     @Override
     public Type superType() {
         return subst.substType(base.superType());
     }
 
-    /** Get the class's interfaces. */
     @Override
     public List<? extends ReferenceType> interfaces() {
-        return subst.substTypeList(base.interfaces());
+        List<? extends ReferenceType> interfaces = base.interfaces();
+        if (!interfaces.equals(this.interfaces)) {
+            this.interfaces = deepCopy(interfaces);
+            substInterfaces = subst.substTypeList(interfaces);
+        }
+        return substInterfaces;
     }
 
-    /** Get the class's fields. */
     @Override
     public List<? extends FieldInstance> fields() {
-        return subst.substFieldList(base.fields());
+        List<? extends FieldInstance> fields = base.fields();
+        if (!fields.equals(this.fields)) {
+            this.fields = deepCopy(fields);
+            this.substFields = subst.substFieldList(fields);
+        }
+        return substFields;
     }
 
-    /** Get the class's methods. */
     @Override
     public List<? extends MethodInstance> methods() {
-        return subst.substMethodList(base.methods());
+        List<? extends MethodInstance> methods = base.methods();
+        if (!methods.equals(this.methods)) {
+            this.methods = deepCopy(methods);
+            substMethods = subst.substMethodList(methods);
+        }
+        return substMethods;
     }
 
-    /** Get the class's constructors. */
     @Override
     public List<? extends ConstructorInstance> constructors() {
-        return subst.substConstructorList(base.constructors());
+        List<? extends ConstructorInstance> constructors = base.constructors();
+        if (!constructors.equals(this.constructors)) {
+            this.constructors = deepCopy(constructors);
+            substConstructors = subst.substConstructorList(constructors);
+        }
+        return substConstructors;
     }
 
-    /** Get the class's member classes. */
     @Override
     public List<? extends ClassType> memberClasses() {
-        return subst.substTypeList(base.memberClasses());
+        List<? extends ClassType> memberClasses = base.memberClasses();
+        if (!memberClasses.equals(this.memberClasses)) {
+            this.memberClasses = deepCopy(memberClasses);
+            substMemberClasses = subst.substTypeList(memberClasses);
+        }
+        return substMemberClasses;
     }
 
-    /** Get the class's outer class, if a nested class. */
     @Override
     public ClassType outer() {
         return (ClassType) subst.substType(base.outer());
     }
 
+    protected <T extends TypeObject> List<T> deepCopy(List<T> src) {
+        List<T> dst = new ArrayList<T>(src.size());
+        for (T t : src)
+            dst.add(Copy.Util.copy(t));
+        return dst;
+    }
+
     ////////////////////////////////////////////////////////////////
     // Delegate the rest of the class operations to the base class
 
-    /** Get the class's kind: top-level, member, local, or anonymous. */
     @Override
     public ClassType.Kind kind() {
         return base.kind();
     }
 
-    /** Get whether the class was declared in a static context */
     @Override
     public boolean inStaticContext() {
         return base.inStaticContext();
     }
 
-    /** Get the class's full name, if possible. */
     @Override
     public String fullName() {
         return base.fullName();
     }
 
-    /** Get the class's short name, if possible. */
     @Override
     public String name() {
         return base.name();
     }
 
-    /** Get the class's package, if possible. */
     @Override
     public Package package_() {
         return base.package_();
@@ -185,7 +213,6 @@ public class SubstClassType_c<Formal extends Param, Actual extends TypeObject>
     ////////////////////////////////////////////////////////////////
     // Equality tests
 
-    /** Type equality test. */
     @Override
     public boolean typeEqualsImpl(Type t) {
         if (t instanceof SubstType) {
@@ -196,7 +223,6 @@ public class SubstClassType_c<Formal extends Param, Actual extends TypeObject>
         return false;
     }
 
-    /** Type equality test. */
     @Override
     public boolean equalsImpl(TypeObject t) {
         if (t instanceof SubstType) {
@@ -207,7 +233,6 @@ public class SubstClassType_c<Formal extends Param, Actual extends TypeObject>
         return false;
     }
 
-    /** Hash code. */
     @Override
     public int hashCode() {
         return base.hashCode() ^ subst.hashCode();
@@ -223,17 +248,11 @@ public class SubstClassType_c<Formal extends Param, Actual extends TypeObject>
         return null;
     }
 
-    /**
-     * 
-     */
     @Override
     public void setFlags(Flags flags) {
         throw new UnsupportedOperationException();
     }
 
-    /**
-     * 
-     */
     @Override
     public void setContainer(ReferenceType container) {
         throw new UnsupportedOperationException();

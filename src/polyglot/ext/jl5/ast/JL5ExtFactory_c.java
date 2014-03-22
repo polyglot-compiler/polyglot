@@ -25,12 +25,10 @@
  ******************************************************************************/
 package polyglot.ext.jl5.ast;
 
-import polyglot.ast.AbstractExtFactory_c;
 import polyglot.ast.Ext;
 import polyglot.ast.ExtFactory;
 
-public class JL5ExtFactory_c extends AbstractExtFactory_c implements
-        JL5ExtFactory {
+public final class JL5ExtFactory_c extends JL5AbstractExtFactory_c {
 
     public JL5ExtFactory_c() {
         super();
@@ -41,13 +39,8 @@ public class JL5ExtFactory_c extends AbstractExtFactory_c implements
     }
 
     @Override
-    protected Ext extCaseImpl() {
-        return new JL5CaseExt();
-    }
-
-    @Override
-    protected Ext extCatchImpl() {
-        return new JL5CatchExt();
+    protected Ext extNodeImpl() {
+        return new JL5Ext();
     }
 
     @Override
@@ -66,13 +59,33 @@ public class JL5ExtFactory_c extends AbstractExtFactory_c implements
     }
 
     @Override
+    protected Ext extCallImpl() {
+        return null;
+    }
+
+    @Override
     protected Ext extCanonicalTypeNodeImpl() {
         return new JL5CanonicalTypeNodeExt();
     }
 
     @Override
+    protected Ext extCaseImpl() {
+        return new JL5CaseExt();
+    }
+
+    @Override
+    protected Ext extCatchImpl() {
+        return new JL5CatchExt();
+    }
+
+    @Override
     protected Ext extClassBodyImpl() {
         return new JL5ClassBodyExt();
+    }
+
+    @Override
+    protected Ext extClassDeclImpl() {
+        return null;
     }
 
     @Override
@@ -87,7 +100,47 @@ public class JL5ExtFactory_c extends AbstractExtFactory_c implements
 
     @Override
     protected Ext extConstructorCallImpl() {
-        return new JL5ConstructorCallExt();
+        return null;
+    }
+
+    @Override
+    protected Ext extConstructorDeclImpl() {
+        return null;
+    }
+
+    @Override
+    protected Ext extElementValueArrayInitImpl() {
+        return null;
+    }
+
+    @Override
+    protected Ext extElementValuePairImpl() {
+        return null;
+    }
+
+    @Override
+    protected Ext extEnumConstantImpl() {
+        return null;
+    }
+
+    @Override
+    protected Ext extEnumConstantDeclImpl() {
+        return null;
+    }
+
+    @Override
+    protected Ext extEnumDeclImpl() {
+        return null;
+    }
+
+    @Override
+    protected Ext extExprImpl() {
+        return new JL5ExprExt();
+    }
+
+    @Override
+    protected Ext extExtendedForImpl() {
+        return null;
     }
 
     @Override
@@ -96,13 +149,53 @@ public class JL5ExtFactory_c extends AbstractExtFactory_c implements
     }
 
     @Override
-    protected Ext extFormalImpl() {
-        return new JL5FormalExt();
+    protected Ext extFieldDeclImpl() {
+        return null;
     }
 
     @Override
-    protected Ext extCallImpl() {
-        return new JL5CallExt();
+    protected Ext extFormalImpl() {
+        return null;
+    }
+
+    @Override
+    protected Ext extImportImpl() {
+        return new JL5ImportExt();
+    }
+
+    @Override
+    protected Ext extLocalDeclImpl() {
+        return null;
+    }
+
+    @Override
+    protected Ext extLoopImpl() {
+        return new JL5LoopExt();
+    }
+
+    @Override
+    protected Ext extMethodDeclImpl() {
+        return null;
+    }
+
+    @Override
+    protected Ext extNewImpl() {
+        return null;
+    }
+
+    @Override
+    protected Ext extNewArrayImpl() {
+        return new JL5NewArrayExt();
+    }
+
+    @Override
+    protected Ext extNormalAnnotationElemImpl() {
+        return null;
+    }
+
+    @Override
+    protected Ext extParamTypeNodeImpl() {
+        return null;
     }
 
     @Override
@@ -116,332 +209,12 @@ public class JL5ExtFactory_c extends AbstractExtFactory_c implements
     }
 
     @Override
+    protected Ext extTermImpl() {
+        return new JL5TermExt();
+    }
+
+    @Override
     protected Ext extUnaryImpl() {
         return new JL5UnaryExt();
     }
-
-    @Override
-    protected Ext extFieldDeclImpl() {
-        return new JL5FieldDeclExt();
-    }
-
-    @Override
-    protected Ext extLocalDeclImpl() {
-        return new JL5LocalDeclExt();
-    }
-
-    @Override
-    protected Ext extClassDeclImpl() {
-        return new JL5ClassDeclExt();
-    }
-
-    @Override
-    protected Ext extConstructorDeclImpl() {
-        return new JL5ConstructorDeclExt();
-    }
-
-    @Override
-    protected Ext extImportImpl() {
-        return new JL5ImportExt();
-    }
-
-    @Override
-    protected Ext extMethodDeclImpl() {
-        return new JL5MethodDeclExt();
-    }
-
-    @Override
-    protected Ext extNewImpl() {
-        return new JL5NewExt();
-    }
-
-    @Override
-    protected Ext extNewArrayImpl() {
-        return new JL5NewArrayExt();
-    }
-
-    @Override
-    public Ext extEnumDecl() {
-        Ext e = extEnumDeclImpl();
-
-        if (nextExtFactory() != null) {
-            Ext e2;
-            if (nextExtFactory() instanceof JL5ExtFactory) {
-                e2 = ((JL5ExtFactory) nextExtFactory()).extEnumDecl();
-            }
-            else {
-                e2 = nextExtFactory().extClassDecl();
-            }
-            e = composeExts(e, e2);
-        }
-        return postExtEnumDecl(e);
-    }
-
-    @Override
-    public Ext extExtendedFor() {
-        Ext e = extExtendedForImpl();
-
-        if (nextExtFactory() != null) {
-            Ext e2;
-            if (nextExtFactory() instanceof JL5ExtFactory) {
-                e2 = ((JL5ExtFactory) nextExtFactory()).extExtendedFor();
-            }
-            else {
-                e2 = nextExtFactory().extLoop();
-            }
-            e = composeExts(e, e2);
-        }
-        return postExtExtendedFor(e);
-    }
-
-    @Override
-    public Ext extEnumConstantDecl() {
-        Ext e = extEnumConstantDeclImpl();
-
-        if (nextExtFactory() != null) {
-            Ext e2;
-            if (nextExtFactory() instanceof JL5ExtFactory) {
-                e2 = ((JL5ExtFactory) nextExtFactory()).extEnumConstantDecl();
-            }
-            else {
-                e2 = nextExtFactory().extClassMember();
-            }
-            e = composeExts(e, e2);
-        }
-        return postExtEnumConstantDecl(e);
-    }
-
-    @Override
-    public Ext extEnumConstant() {
-        Ext e = extEnumConstantImpl();
-
-        if (nextExtFactory() != null) {
-            Ext e2;
-            if (nextExtFactory() instanceof JL5ExtFactory) {
-                e2 = ((JL5ExtFactory) nextExtFactory()).extEnumConstant();
-            }
-            else {
-                e2 = nextExtFactory().extField();
-            }
-            e = composeExts(e, e2);
-        }
-        return postExtEnumConstant(e);
-    }
-
-    @Override
-    public Ext extParamTypeNode() {
-        Ext e = extParamTypeNodeImpl();
-
-        if (nextExtFactory() != null) {
-            Ext e2;
-            if (nextExtFactory() instanceof JL5ExtFactory) {
-                e2 = ((JL5ExtFactory) nextExtFactory()).extParamTypeNode();
-            }
-            else {
-                e2 = nextExtFactory().extTypeNode();
-            }
-            e = composeExts(e, e2);
-        }
-        return postExtParamTypeNode(e);
-    }
-
-    @Override
-    public Ext extAnnotationElemDecl() {
-        Ext e = extAnnotationElemDeclImpl();
-
-        if (nextExtFactory() != null) {
-            Ext e2;
-            if (nextExtFactory() instanceof JL5ExtFactory) {
-                e2 = ((JL5ExtFactory) nextExtFactory()).extAnnotationElemDecl();
-            }
-            else {
-                e2 = nextExtFactory().extMethodDecl();
-            }
-            e = composeExts(e, e2);
-        }
-        return postExtAnnotationElemDecl(e);
-    }
-
-    @Override
-    public Ext extNormalAnnotationElem() {
-        Ext e = extNormalAnnotationElemImpl();
-
-        if (nextExtFactory() != null) {
-            Ext e2;
-            if (nextExtFactory() instanceof JL5ExtFactory) {
-                e2 =
-                        ((JL5ExtFactory) nextExtFactory()).extNormalAnnotationElem();
-            }
-            else {
-                e2 = nextExtFactory().extTerm();
-            }
-            e = composeExts(e, e2);
-        }
-        return postExtNormalAnnotationElem(e);
-    }
-
-    @Override
-    public Ext extMarkerAnnotationElem() {
-        Ext e = extMarkerAnnotationElemImpl();
-
-        if (nextExtFactory() != null) {
-            Ext e2;
-            if (nextExtFactory() instanceof JL5ExtFactory) {
-                e2 =
-                        ((JL5ExtFactory) nextExtFactory()).extMarkerAnnotationElem();
-            }
-            else {
-                e2 = nextExtFactory().extTerm();
-            }
-            e = composeExts(e, e2);
-        }
-        return postExtMarkerAnnotationElem(e);
-    }
-
-    @Override
-    public Ext extSingleElementAnnotationElem() {
-        Ext e = extSingleElementAnnotationElemImpl();
-
-        if (nextExtFactory() != null) {
-            Ext e2;
-            if (nextExtFactory() instanceof JL5ExtFactory) {
-                e2 =
-                        ((JL5ExtFactory) nextExtFactory()).extSingleElementAnnotationElem();
-            }
-            else {
-                e2 = nextExtFactory().extTerm();
-            }
-            e = composeExts(e, e2);
-        }
-        return postExtSingleElementAnnotationElem(e);
-    }
-
-    @Override
-    public Ext extElementValuePair() {
-        Ext e = extElementValuePairImpl();
-
-        if (nextExtFactory() != null) {
-            Ext e2;
-            if (nextExtFactory() instanceof JL5ExtFactory) {
-                e2 = ((JL5ExtFactory) nextExtFactory()).extElementValuePair();
-            }
-            else {
-                e2 = nextExtFactory().extTerm();
-            }
-            e = composeExts(e, e2);
-        }
-        return postExtElementValuePair(e);
-    }
-
-    @Override
-    public Ext extElementValueArrayInit() {
-        Ext e = extElementValueArrayInitImpl();
-
-        if (nextExtFactory() != null) {
-            Ext e2;
-            if (nextExtFactory() instanceof JL5ExtFactory) {
-                e2 =
-                        ((JL5ExtFactory) nextExtFactory()).extElementValueArrayInit();
-            }
-            else {
-                e2 = nextExtFactory().extTerm();
-            }
-            e = composeExts(e, e2);
-        }
-        return postExtElementValueArrayInit(e);
-    }
-
-    protected Ext extEnumDeclImpl() {
-        return new JL5EnumDeclExt();
-    }
-
-    protected Ext extExtendedForImpl() {
-        return this.extLoopImpl();
-    }
-
-    protected Ext extEnumConstantDeclImpl() {
-        return new EnumConstantDeclExt();
-    }
-
-    protected Ext extEnumConstantImpl() {
-        return this.extFieldImpl();
-    }
-
-    protected Ext extParamTypeNodeImpl() {
-        return this.extTypeNodeImpl();
-    }
-
-    @Override
-    protected Ext extNodeImpl() {
-        return new JL5Ext();
-    }
-
-    public Ext postExtEnumDecl(Ext ext) {
-        return this.postExtClassDecl(ext);
-    }
-
-    public Ext postExtExtendedFor(Ext ext) {
-        return this.postExtLoop(ext);
-    }
-
-    public Ext postExtEnumConstantDecl(Ext ext) {
-        return this.postExtClassMember(ext);
-    }
-
-    public Ext postExtEnumConstant(Ext ext) {
-        return this.postExtField(ext);
-    }
-
-    public Ext postExtParamTypeNode(Ext ext) {
-        return this.postExtTypeNode(ext);
-    }
-
-    protected Ext extAnnotationElemDeclImpl() {
-        return this.extClassMemberImpl();
-    }
-
-    protected Ext extNormalAnnotationElemImpl() {
-        return this.extTermImpl();
-    }
-
-    protected Ext extMarkerAnnotationElemImpl() {
-        return this.extNormalAnnotationElemImpl();
-    }
-
-    protected Ext extSingleElementAnnotationElemImpl() {
-        return this.extNormalAnnotationElemImpl();
-    }
-
-    protected Ext extElementValuePairImpl() {
-        return this.extTermImpl();
-    }
-
-    protected Ext extElementValueArrayInitImpl() {
-        return this.extTermImpl();
-    }
-
-    protected Ext postExtAnnotationElemDecl(Ext ext) {
-        return ext;
-    }
-
-    protected Ext postExtNormalAnnotationElem(Ext ext) {
-        return ext;
-    }
-
-    protected Ext postExtMarkerAnnotationElem(Ext ext) {
-        return ext;
-    }
-
-    protected Ext postExtSingleElementAnnotationElem(Ext ext) {
-        return ext;
-    }
-
-    protected Ext postExtElementValuePair(Ext ext) {
-        return ext;
-    }
-
-    protected Ext postExtElementValueArrayInit(Ext ext) {
-        return ext;
-    }
-
 }

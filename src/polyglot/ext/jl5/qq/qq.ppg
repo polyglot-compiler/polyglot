@@ -9,17 +9,13 @@ include "polyglot/ext/jl5/parse/jl5.ppg"
 
 package polyglot.ext.jl5.qq;
 
-import polyglot.parse.Name;
+import java_cup.runtime.Symbol;
+
 import polyglot.qq.*;
-import polyglot.parse.VarDeclarator;
 import polyglot.lex.Lexer;
-import polyglot.ext.jl5.types.*;
-import polyglot.ext.jl5.ast.*;
 import polyglot.ext.jl5.parse.*;
 
-import polyglot.parse.*;
-
-parser Grm extends polyglot.qq.Grm implements QQParser {:
+parser Grm extends polyglot.qq.Grm {:
     public final JL5TypeSystem ts;
     public final JL5NodeFactory nf;
    /**
@@ -36,7 +32,8 @@ parser Grm extends polyglot.qq.Grm implements QQParser {:
   /**
    * Override the default CUP routine.
    */
-  public void syntax_error (java_cup.runtime.Symbol current) {
+  @Override
+  public void syntax_error(java_cup.runtime.Symbol current) {
     Position p = ((Token) current.value).getPosition();
     System.out.println("p = " + p);
     if (current.sym == sym.EOF)
@@ -47,18 +44,14 @@ parser Grm extends polyglot.qq.Grm implements QQParser {:
    /**
     * Copied from JL5 PPG.
     */
-   public ParamTypeNode toParamType(Position pos, Id id, List<TypeNode> bounds){
-        if (bounds == null){
-            bounds = new LinkedList<TypeNode>();
-        }
-        ParamTypeNode tn = nf.ParamTypeNode(pos, bounds, id);
-        return tn;
+    public TypeNode toParamType(Position pos, Id id, List<TypeNode> bounds){
+        return nf.ParamTypeNode(pos, id, CollectionUtil.nonNullList(bounds));
     }
     
    /**
     * Copied from JL5 PPG.
     */
-    public List<LocalDecl> variableDeclarators(TypeNode a, List<VarDeclarator> b, Flags flags, List<AnnotationElem> annotations)
+    public List<LocalDecl> variableDeclarators(TypeNode a, List<VarDeclarator> b, Flags flags, List<Term> annotations)
     throws Exception
     {
       List<LocalDecl> l = new LinkedList<LocalDecl>();
@@ -105,7 +98,7 @@ qq_expr ::=
 qq_stmt ::=
     	block_statement:a
      	    {: if (a.size() == 1) {
-                RESULT = (Stmt) a.get(0);
+                RESULT = a.get(0);
                }
                else {
                 RESULT = parser.nf.Block(parser.pos(a), a);
@@ -175,7 +168,7 @@ extend statement ::=
 
 extend statement ::=
 	explicit_constructor_invocation:a
-		{: RESULT = (Stmt) a; :}
+		{: RESULT = a; :}
 	;
 
 // now ambiguous	
@@ -207,43 +200,43 @@ extend type_declaration ::=
 
 extend class_member_declaration ::=
 	COMMA_MEMB:a
-	    {: List l = new ArrayList(1);
+	    {: List<ClassMember> l = new ArrayList<ClassMember>(1);
 	       l.add((ClassMember) a.node());
 	       RESULT = l; :}
     ;
 
 switch_block_statement_groups ::=
         COMMA_LIST:a
-            {: RESULT = a.list(); :}
+            {: RESULT = a.<SwitchElement> list(); :}
     ;
 
 block_statements ::=
         COMMA_LIST:a
-            {: RESULT = a.list(); :}
+            {: RESULT = a.<Stmt> list(); :}
     ;
 
 extend interface_member_declarations ::=
         COMMA_LIST:a
-	    {: RESULT = a.list(); :}
+	    {: RESULT = a.<ClassMember> list(); :}
     ;
 
 extend class_body_declarations ::=
         COMMA_LIST:a
-	    {: RESULT = a.list(); :}
+	    {: RESULT = a.<ClassMember> list(); :}
     ;
 
 extend field_access ::=
         COMMA_TYPE:a DOT IDENTIFIER:b
-            {: RESULT = parser.nf.Field(parser.pos(a, b, b), (TypeNode)a.node(), b.getIdentifier()); :}
+            {: RESULT = parser.nf.Field(parser.pos(a, b, b), (TypeNode)a.node(), parser.nf.Id(parser.pos(b), b.getIdentifier())); :}
     ;
 extend method_invocation ::=
         COMMA_TYPE:a DOT IDENTIFIER:b LPAREN argument_list_opt:c RPAREN:d
-        {: RESULT = parser.nf.Call(parser.pos(a,d), (TypeNode)a.node(), b.getIdentifier(), c); :}
+        {: RESULT = parser.nf.Call(parser.pos(a,d), (TypeNode)a.node(), parser.nf.Id(parser.pos(b), b.getIdentifier()), c); :}
     ;
     
 extend formal_parameter_list ::=
 	COMMA_LIST:a
-	    {: RESULT = a.list(); :}
+	    {: RESULT = a.<Formal> list(); :}
     ;
 
 extend formal_parameter ::=
@@ -253,15 +246,15 @@ extend formal_parameter ::=
 
 extend throws ::=
 	COMMA_LIST:a
-	    {: RESULT = a.list(); :}
+	    {: RESULT = a.<TypeNode> list(); :}
     ;
 
 extend class_type_list ::=
 	COMMA_LIST:a
-	    {: RESULT = a.list(); :}
+	    {: RESULT = a.<TypeNode> list(); :}
     ;
 
 extend argument_list ::=
 	COMMA_LIST:a
-	    {: RESULT = a.list(); :}
+	    {: RESULT = a.<Expr> list(); :}
     ;

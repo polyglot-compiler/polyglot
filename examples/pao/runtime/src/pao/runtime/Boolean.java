@@ -21,19 +21,22 @@ public class Boolean extends Primitive {
         return value;
     }
 
+    @Override
     public int hashCode() {
         return (value ? 1 : 0);
     }
 
+    @Override
     public boolean equals(Object o) {
         if (o instanceof Boolean) {
-            return ((Boolean)o).value == value;
+            return ((Boolean) o).value == value;
         }
         else {
             return false;
         }
     }
 
+    @Override
     public String toString() {
         return "" + value;
     }

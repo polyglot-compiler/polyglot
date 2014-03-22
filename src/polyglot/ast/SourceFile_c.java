@@ -26,12 +26,12 @@
 
 package polyglot.ast;
 
-import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
 import polyglot.frontend.Source;
+import polyglot.translate.ExtensionRewriter;
 import polyglot.types.Context;
 import polyglot.types.ImportTable;
 import polyglot.types.Package;
@@ -39,6 +39,7 @@ import polyglot.types.SemanticException;
 import polyglot.types.TypeSystem;
 import polyglot.util.CodeWriter;
 import polyglot.util.CollectionUtil;
+import polyglot.util.Copy;
 import polyglot.util.ListUtil;
 import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
@@ -49,9 +50,9 @@ import polyglot.visit.TypeBuilder;
 import polyglot.visit.TypeChecker;
 
 /**
- * A <code>SourceFile</code> is an immutable representations of a Java
- * langauge source file.  It consists of a package name, a list of 
- * <code>Import</code>s, and a list of <code>GlobalDecl</code>s.
+ * A {@code SourceFile} is an immutable representations of a Java
+ * language source file.  It consists of a package name, a list of 
+ * {@code Import}s, and a list of {@code GlobalDecl}s.
  */
 public class SourceFile_c extends Node_c implements SourceFile {
     private static final long serialVersionUID = SerialVersionUID.generate();
@@ -62,9 +63,15 @@ public class SourceFile_c extends Node_c implements SourceFile {
     protected ImportTable importTable;
     protected Source source;
 
+    @Deprecated
     public SourceFile_c(Position pos, PackageNode package_,
             List<Import> imports, List<TopLevelDecl> decls) {
-        super(pos);
+        this(pos, package_, imports, decls, null);
+    }
+
+    public SourceFile_c(Position pos, PackageNode package_,
+            List<Import> imports, List<TopLevelDecl> decls, Ext ext) {
+        super(pos, ext);
         assert (imports != null && decls != null && !decls.isEmpty()); // package_ may be null, imports empty
         this.package_ = package_;
         this.imports = ListUtil.copy(imports, true);
@@ -76,99 +83,107 @@ public class SourceFile_c extends Node_c implements SourceFile {
         return super.isDisambiguated() && this.importTable != null;
     }
 
-    /** Get the source of the source file. */
     @Override
     public Source source() {
         return this.source;
     }
 
-    /** Set the source of the source file. */
     @Override
     public SourceFile source(Source source) {
-        SourceFile_c n = (SourceFile_c) copy();
+        return source(this, source);
+    }
+
+    protected <N extends SourceFile_c> N source(N n, Source source) {
+        if (n.source == source) return n;
+        if (n == this) n = Copy.Util.copy(n);
         n.source = source;
         return n;
     }
 
-    /** Get the package of the source file. */
     @Override
     public PackageNode package_() {
         return this.package_;
     }
 
-    /** Set the package of the source file. */
     @Override
     public SourceFile package_(PackageNode package_) {
-        SourceFile_c n = (SourceFile_c) copy();
+        return package_(this, package_);
+    }
+
+    protected <N extends SourceFile_c> N package_(N n, PackageNode package_) {
+        if (n.package_ == package_) return n;
+        if (n == this) n = Copy.Util.copy(n);
         n.package_ = package_;
         return n;
     }
 
-    /** Get the imports of the source file. */
     @Override
     public List<Import> imports() {
-        return Collections.unmodifiableList(this.imports);
+        return this.imports;
     }
 
-    /** Set the imports of the source file. */
     @Override
     public SourceFile imports(List<Import> imports) {
-        SourceFile_c n = (SourceFile_c) copy();
+        return imports(this, imports);
+    }
+
+    protected <N extends SourceFile_c> N imports(N n, List<Import> imports) {
+        if (CollectionUtil.equals(n.imports, imports)) return n;
+        if (n == this) n = Copy.Util.copy(n);
         n.imports = ListUtil.copy(imports, true);
         return n;
     }
 
-    /** Get the declarations of the source file. */
     @Override
     public List<TopLevelDecl> decls() {
-        return Collections.unmodifiableList(this.decls);
+        return this.decls;
     }
 
-    /** Set the declarations of the source file. */
     @Override
     public SourceFile decls(List<TopLevelDecl> decls) {
-        SourceFile_c n = (SourceFile_c) copy();
+        return decls(this, decls);
+    }
+
+    protected <N extends SourceFile_c> N decls(N n, List<TopLevelDecl> decls) {
+        if (CollectionUtil.equals(n.decls, decls)) return n;
+        if (n == this) n = Copy.Util.copy(n);
         n.decls = ListUtil.copy(decls, true);
         return n;
     }
 
-    /** Get the declarations of the source file. */
     @Override
     public ImportTable importTable() {
         return this.importTable;
     }
 
-    /** Set the declarations of the source file. */
     @Override
     public SourceFile importTable(ImportTable importTable) {
-        SourceFile_c n = (SourceFile_c) copy();
+        return importTable(this, importTable);
+    }
+
+    protected <N extends SourceFile_c> N importTable(N n,
+            ImportTable importTable) {
+        if (n.importTable == importTable) return n;
+        if (n == this) n = Copy.Util.copy(n);
         n.importTable = importTable;
         return n;
     }
 
     /** Reconstruct the source file. */
-    protected SourceFile_c reconstruct(PackageNode package_,
+    protected <N extends SourceFile_c> N reconstruct(N n, PackageNode package_,
             List<Import> imports, List<TopLevelDecl> decls) {
-        if (package_ != this.package_
-                || !CollectionUtil.equals(imports, this.imports)
-                || !CollectionUtil.equals(decls, this.decls)) {
-            SourceFile_c n = (SourceFile_c) copy();
-            n.package_ = package_;
-            n.imports = ListUtil.copy(imports, true);
-            n.decls = ListUtil.copy(decls, true);
-            return n;
-        }
-
-        return this;
+        n = package_(n, package_);
+        n = imports(n, imports);
+        n = decls(n, decls);
+        return n;
     }
 
-    /** Visit the children of the source file. */
     @Override
     public Node visitChildren(NodeVisitor v) {
-        PackageNode package_ = (PackageNode) visitChild(this.package_, v);
+        PackageNode package_ = visitChild(this.package_, v);
         List<Import> imports = visitList(this.imports, v);
         List<TopLevelDecl> decls = visitList(this.decls, v);
-        return reconstruct(package_, imports, decls);
+        return reconstruct(this, package_, imports, decls);
     }
 
     /**
@@ -194,7 +209,6 @@ public class SourceFile_c extends Node_c implements SourceFile {
         return c.pushSource(importTable);
     }
 
-    /** Type check the source file. */
     @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
         Set<String> names = new LinkedHashSet<String>();
@@ -224,11 +238,17 @@ public class SourceFile_c extends Node_c implements SourceFile {
     }
 
     @Override
+    public Node extRewrite(ExtensionRewriter rw) throws SemanticException {
+        SourceFile_c n = (SourceFile_c) super.extRewrite(rw);
+        n = importTable(n, null);
+        return n;
+    }
+
+    @Override
     public String toString() {
         return "<<<< " + source + " >>>>";
     }
 
-    /** Write the source file to an output file. */
     @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
         w.write("<<<< " + source + " >>>>");
@@ -255,10 +275,6 @@ public class SourceFile_c extends Node_c implements SourceFile {
         }
     }
 
-    /**
-     * @param parent
-     * @param ar
-     */
     @Override
     public Node disambiguateOverride(Node parent, AmbiguityRemover ar)
             throws SemanticException {

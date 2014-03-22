@@ -4,7 +4,6 @@
 
 package pao.parse;
 
-import java_cup.runtime.Symbol;
 import polyglot.lex.Lexer;
 import polyglot.lex.*;
 import polyglot.util.Position;
@@ -14,7 +13,7 @@ import polyglot.frontend.FileSource;
 import java.util.HashMap;
 import java.math.BigInteger;
 
-@SuppressWarnings("all")
+@SuppressWarnings({"unused", "fallthrough", "all"})
 %%
 
 %public
@@ -36,7 +35,7 @@ import java.math.BigInteger;
     String file;
     String path;
     ErrorQueue eq;
-    HashMap keywords;
+    HashMap<String, Integer> keywords;
 
     public Lexer_c(java.io.InputStream in, FileSource file, ErrorQueue eq) {
         this(new java.io.BufferedReader(new java.io.InputStreamReader(in)),
@@ -48,7 +47,7 @@ import java.math.BigInteger;
         this.file = file.name();
         this.path = file.path();
         this.eq = eq;
-        this.keywords = new HashMap();
+        this.keywords = new HashMap<String, Integer>();
         init_keywords();
     }
 
@@ -106,10 +105,12 @@ import java.math.BigInteger;
         /* Pao-specific keywords */
     }
 
+    @Override
     public String file() {
         return file;
     }
 
+    @Override
     public String path() {
         return path;
     }
@@ -317,7 +318,7 @@ OctalEscape = \\ [0-7]
 
     /* 3.9 Keywords */
     /* 3.8 Identifiers */
-    {Identifier}   { Integer i = (Integer) keywords.get(yytext());
+    {Identifier}   { Integer i = keywords.get(yytext());
                     if (i == null) return id();
                     else return key(i.intValue()); }
 
@@ -392,7 +393,7 @@ OctalEscape = \\ [0-7]
 
 <TRADITIONAL_COMMENT> {
     "*/"                         { yybegin(YYINITIAL); }
-    .|\n                         { /* ignore */ }
+    [^]                          { /* ignore */ }
 }
 
 <END_OF_LINE_COMMENT> {
@@ -481,6 +482,6 @@ OctalEscape = \\ [0-7]
 }
 
 /* Fallthrough case: anything not matched above is an error */
-.|\n                             { eq.enqueue(ErrorInfo.LEXICAL_ERROR,
+[^]                              { eq.enqueue(ErrorInfo.LEXICAL_ERROR,
                                               "Illegal character \"" +
                                               yytext() + "\"", pos()); }

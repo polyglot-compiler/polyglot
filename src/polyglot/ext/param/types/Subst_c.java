@@ -51,7 +51,7 @@ import polyglot.util.TypeInputStream;
 
 /**
  * Utility class that performs substitutions on type objects using a
- * map.  Subclasses must define how the substititions are performed and
+ * map.  Subclasses must define how the substitutions are performed and
  * how to cache substituted types.
  */
 public class Subst_c<Formal extends Param, Actual extends TypeObject>
@@ -61,8 +61,10 @@ public class Subst_c<Formal extends Param, Actual extends TypeObject>
     /** Map from formal parameters (of type Param) to actuals. */
     protected Map<Formal, Actual> subst;
 
-    /** Cache of types. From CacheTypeWrapper(t) to subst(t)*/
+    /** Cache of types, from CacheTypeWrapper(t) to subst(t).*/
     protected transient Map<CacheTypeWrapper, Type> cache;
+
+    protected transient Map<ClassType, ClassType> substClassTypeCache;
 
     protected transient ParamTypeSystem<Formal, Actual> ts;
 
@@ -71,6 +73,7 @@ public class Subst_c<Formal extends Param, Actual extends TypeObject>
         this.ts = ts;
         this.subst = new HashMap<Formal, Actual>(subst);
         this.cache = new HashMap<CacheTypeWrapper, Type>();
+        this.substClassTypeCache = new HashMap<ClassType, ClassType>();
     }
 
     @Override
@@ -78,10 +81,6 @@ public class Subst_c<Formal extends Param, Actual extends TypeObject>
         return ts;
     }
 
-    /**
-     * Entries of the underlying substitution map.
-     * @return an <code>Iterator</code> of <code>Map.Entry</code>.
-     */
     @Override
     public Iterator<Entry<Formal, Actual>> entries() {
         return substitutions().entrySet().iterator();
@@ -97,9 +96,6 @@ public class Subst_c<Formal extends Param, Actual extends TypeObject>
         };
     }
 
-    /**
-     * The underlying substitution map.
-     */
     @Override
     public Map<Formal, Actual> substitutions() {
         return Collections.unmodifiableMap(subst);
@@ -155,11 +151,19 @@ public class Subst_c<Formal extends Param, Actual extends TypeObject>
 
     /** Perform substitutions on a class type. Substitutions are performed
      * lazily. */
-    public ClassType substClassType(ClassType t) {
+    public final ClassType substClassType(ClassType t) {
+        ClassType substct = substClassTypeCache.get(t);
+        if (substct == null) {
+            substct = substClassTypeImpl(t);
+            substClassTypeCache.put(t, substct);
+        }
+        return substct;
+    }
+
+    protected ClassType substClassTypeImpl(ClassType t) {
         return new SubstClassType_c<Formal, Actual>(ts, t.position(), t, this);
     }
 
-    /** Perform substitutions on a type. */
     @Override
     public Type substType(Type t) {
         if (t == null || t == this) // XXX comparison t == this can't succeed! (Findbugs)
@@ -180,24 +184,28 @@ public class Subst_c<Formal extends Param, Actual extends TypeObject>
         return cached;
     }
 
+    protected CacheTypeWrapper typeWrapper(Type t) {
+        return new CacheTypeWrapper(t);
+    }
+
     protected void cachePut(Type t, Type cached) {
-        cache.put(new CacheTypeWrapper(t), cached);
+        cache.put(typeWrapper(t), cached);
     }
 
     protected Type cacheGet(Type t) {
-        return cache.get(new CacheTypeWrapper(t));
+        return cache.get(typeWrapper(t));
     }
 
-    class CacheTypeWrapper {
-        final Type t;
+    protected class CacheTypeWrapper {
+        private final Type t;
 
-        CacheTypeWrapper(Type t) {
+        public CacheTypeWrapper(Type t) {
             this.t = t;
         }
 
         @Override
         public boolean equals(Object o) {
-            if (o instanceof Subst_c.CacheTypeWrapper) {
+            if (o instanceof Subst_c<?, ?>.CacheTypeWrapper) {
                 @SuppressWarnings("unchecked")
                 CacheTypeWrapper wrapper = (CacheTypeWrapper) o;
                 return Subst_c.this.cacheTypeEquality(t, wrapper.t);
@@ -227,7 +235,6 @@ public class Subst_c<Formal extends Param, Actual extends TypeObject>
         return ts.equals(t1, t2);
     }
 
-    /** Perform substitution on a PClass. */
     @Override
     public PClass<Formal, Actual> substPClass(PClass<Formal, Actual> pclazz) {
         MuPClass<Formal, Actual> newPclazz =
@@ -237,7 +244,6 @@ public class Subst_c<Formal extends Param, Actual extends TypeObject>
         return newPclazz;
     }
 
-    /** Perform substititions on a field. */
     @Override
     public <T extends FieldInstance> T substField(T fi) {
         ReferenceType ct = (ReferenceType) substType(fi.container());
@@ -249,7 +255,6 @@ public class Subst_c<Formal extends Param, Actual extends TypeObject>
         return newFI;
     }
 
-    /** Perform substititions on a method. */
     @Override
     public <T extends MethodInstance> T substMethod(T mi) {
         ReferenceType ct = (ReferenceType) substType(mi.container());
@@ -272,7 +277,6 @@ public class Subst_c<Formal extends Param, Actual extends TypeObject>
         return tmpMi;
     }
 
-    /** Perform substititions on a constructor. */
     @Override
     public <T extends ConstructorInstance> T substConstructor(T ci) {
         ClassType ct = (ClassType) substType(ci.container());
@@ -292,19 +296,16 @@ public class Subst_c<Formal extends Param, Actual extends TypeObject>
         return tmpCi;
     }
 
-    /** Perform substititions on a list of <code>Type</code>. */
     @Override
     public <T extends Type> List<T> substTypeList(List<? extends Type> list) {
         return new CachingTransformingList<Type, T>(list, new TypeXform<T>());
     }
 
-    /** Perform substititions on a list of <code>MethodInstance</code>. */
     @Override
     public <T extends MethodInstance> List<T> substMethodList(List<T> list) {
         return new CachingTransformingList<T, T>(list, new MethodXform<T>());
     }
 
-    /** Perform substititions on a list of <code>ConstructorInstance</code>. */
     @Override
     public <T extends ConstructorInstance> List<T> substConstructorList(
             List<T> list) {
@@ -312,7 +313,6 @@ public class Subst_c<Formal extends Param, Actual extends TypeObject>
                                                  new ConstructorXform<T>());
     }
 
-    /** Perform substititions on a list of <code>FieldInstance</code>. */
     @Override
     public <T extends FieldInstance> List<T> substFieldList(List<T> list) {
         return new CachingTransformingList<T, T>(list, new FieldXform<T>());

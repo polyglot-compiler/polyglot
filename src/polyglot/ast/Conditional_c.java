@@ -32,6 +32,7 @@ import polyglot.types.SemanticException;
 import polyglot.types.Type;
 import polyglot.types.TypeSystem;
 import polyglot.util.CodeWriter;
+import polyglot.util.Copy;
 import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
 import polyglot.visit.AscriptionVisitor;
@@ -42,8 +43,8 @@ import polyglot.visit.PrettyPrinter;
 import polyglot.visit.TypeChecker;
 
 /**
- * A <code>Conditional</code> is a representation of a Java ternary
- * expression.  That is, <code>(cond ? consequent : alternative)</code>.
+ * A {@code Conditional} is a representation of a Java ternary
+ * expression.  That is, {@code (cond ? consequent : alternative)}.
  */
 public class Conditional_c extends Expr_c implements Conditional {
     private static final long serialVersionUID = SerialVersionUID.generate();
@@ -52,88 +53,94 @@ public class Conditional_c extends Expr_c implements Conditional {
     protected Expr consequent;
     protected Expr alternative;
 
+    @Deprecated
     public Conditional_c(Position pos, Expr cond, Expr consequent,
             Expr alternative) {
-        super(pos);
+        this(pos, cond, consequent, alternative, null);
+    }
+
+    public Conditional_c(Position pos, Expr cond, Expr consequent,
+            Expr alternative, Ext ext) {
+        super(pos, ext);
         assert (cond != null && consequent != null && alternative != null);
         this.cond = cond;
         this.consequent = consequent;
         this.alternative = alternative;
     }
 
-    /** Get the precedence of the expression. */
     @Override
     public Precedence precedence() {
         return Precedence.CONDITIONAL;
     }
 
-    /** Get the conditional of the expression. */
     @Override
     public Expr cond() {
         return this.cond;
     }
 
-    /** Set the conditional of the expression. */
     @Override
     public Conditional cond(Expr cond) {
-        Conditional_c n = (Conditional_c) copy();
+        return cond(this, cond);
+    }
+
+    protected <N extends Conditional_c> N cond(N n, Expr cond) {
+        if (n.cond == cond) return n;
+        if (n == this) n = Copy.Util.copy(n);
         n.cond = cond;
         return n;
     }
 
-    /** Get the consequent of the expression. */
     @Override
     public Expr consequent() {
         return this.consequent;
     }
 
-    /** Set the consequent of the expression. */
     @Override
     public Conditional consequent(Expr consequent) {
-        Conditional_c n = (Conditional_c) copy();
+        return consequent(this, consequent);
+    }
+
+    protected <N extends Conditional_c> N consequent(N n, Expr consequent) {
+        if (n.consequent == consequent) return n;
+        if (n == this) n = Copy.Util.copy(n);
         n.consequent = consequent;
         return n;
     }
 
-    /** Get the alternative of the expression. */
     @Override
     public Expr alternative() {
         return this.alternative;
     }
 
-    /** Set the alternative of the expression. */
     @Override
     public Conditional alternative(Expr alternative) {
-        Conditional_c n = (Conditional_c) copy();
+        return alternative(this, alternative);
+    }
+
+    protected <N extends Conditional_c> N alternative(N n, Expr alternative) {
+        if (n.alternative == alternative) return n;
+        if (n == this) n = Copy.Util.copy(n);
         n.alternative = alternative;
         return n;
     }
 
     /** Reconstruct the expression. */
-    protected Conditional_c reconstruct(Expr cond, Expr consequent,
-            Expr alternative) {
-        if (cond != this.cond || consequent != this.consequent
-                || alternative != this.alternative) {
-            Conditional_c n = (Conditional_c) copy();
-            n.cond = cond;
-            n.consequent = consequent;
-            n.alternative = alternative;
-            return n;
-        }
-
-        return this;
+    protected <N extends Conditional_c> N reconstruct(N n, Expr cond,
+            Expr consequent, Expr alternative) {
+        n = cond(n, cond);
+        n = consequent(n, consequent);
+        n = alternative(n, alternative);
+        return n;
     }
 
-    /** Visit the children of the expression. */
     @Override
     public Node visitChildren(NodeVisitor v) {
-        Expr cond = (Expr) visitChild(this.cond, v);
-        Expr consequent = (Expr) visitChild(this.consequent, v);
-        Expr alternative = (Expr) visitChild(this.alternative, v);
-        return reconstruct(cond, consequent, alternative);
+        Expr cond = visitChild(this.cond, v);
+        Expr consequent = visitChild(this.consequent, v);
+        Expr alternative = visitChild(this.alternative, v);
+        return reconstruct(this, cond, consequent, alternative);
     }
 
-    /** Type check the expression. */
     @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
         TypeSystem ts = tc.typeSystem();
@@ -170,13 +177,19 @@ public class Conditional_c extends Expr_c implements Conditional {
             // whose value is representable in type T, then the type of the
             // conditional expression is T.
 
-            if (t1.isIntOrLess() && t2.isInt()
-                    && ts.numericConversionValid(t1, e2.constantValue())) {
+            if (t1.isIntOrLess()
+                    && t2.isInt()
+                    && ts.numericConversionValid(t1,
+                                                 tc.lang()
+                                                   .constantValue(e2, tc.lang()))) {
                 return type(t1);
             }
 
-            if (t2.isIntOrLess() && t1.isInt()
-                    && ts.numericConversionValid(t2, e1.constantValue())) {
+            if (t2.isIntOrLess()
+                    && t1.isInt()
+                    && ts.numericConversionValid(t2,
+                                                 tc.lang()
+                                                   .constantValue(e1, tc.lang()))) {
                 return type(t2);
             }
 
@@ -236,7 +249,6 @@ public class Conditional_c extends Expr_c implements Conditional {
         return cond + " ? " + consequent + " : " + alternative;
     }
 
-    /** Write the expression to an output file. */
     @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
         printSubExpr(cond, false, w, tr);
@@ -255,11 +267,11 @@ public class Conditional_c extends Expr_c implements Conditional {
 
     @Override
     public <T> List<T> acceptCFG(CFGBuilder<?> v, List<T> succs) {
-        if (this.cond.isConstant()) {
+        if (v.lang().isConstant(cond, v.lang())) {
             // the condition is a constant expression.
             // That means that one branch is dead code
             boolean condConstantValue =
-                    ((Boolean) cond.constantValue()).booleanValue();
+                    ((Boolean) v.lang().constantValue(cond, v.lang())).booleanValue();
             if (condConstantValue) {
                 // Condition is constantly true, only the consequent will be executed
                 v.visitCFG(cond, FlowGraph.EDGE_KEY_TRUE, consequent, ENTRY);
@@ -288,16 +300,16 @@ public class Conditional_c extends Expr_c implements Conditional {
     }
 
     @Override
-    public boolean isConstant() {
-        return cond.isConstant() && consequent.isConstant()
-                && alternative.isConstant();
+    public boolean isConstant(Lang lang) {
+        return lang.isConstant(cond, lang) && lang.isConstant(consequent, lang)
+                && lang.isConstant(alternative, lang);
     }
 
     @Override
-    public Object constantValue() {
-        Object cond_ = cond.constantValue();
-        Object then_ = consequent.constantValue();
-        Object else_ = alternative.constantValue();
+    public Object constantValue(Lang lang) {
+        Object cond_ = lang.constantValue(cond, lang);
+        Object then_ = lang.constantValue(consequent, lang);
+        Object else_ = lang.constantValue(alternative, lang);
 
         if (cond_ instanceof Boolean && then_ != null && else_ != null) {
             boolean c = ((Boolean) cond_).booleanValue();

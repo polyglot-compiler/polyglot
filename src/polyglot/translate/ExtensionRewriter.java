@@ -33,7 +33,6 @@ import polyglot.ast.TypeNode;
 import polyglot.frontend.ExtensionInfo;
 import polyglot.frontend.Job;
 import polyglot.qq.QQ;
-import polyglot.translate.ext.ToExt;
 import polyglot.types.SemanticException;
 import polyglot.types.Type;
 import polyglot.types.TypeSystem;
@@ -80,8 +79,7 @@ public class ExtensionRewriter extends ContextVisitor {
     @Override
     public NodeVisitor enterCall(Node n) throws SemanticException {
         try {
-            ToExt ext = from_ext.getToExt(to_ext, n);
-            return ext.toExtEnter(this);
+            return lang().extRewriteEnter(n, this);
         }
         catch (SemanticException e) {
             Position position = e.position();
@@ -102,8 +100,7 @@ public class ExtensionRewriter extends ContextVisitor {
     public Node leaveCall(Node old, Node n, NodeVisitor v)
             throws SemanticException {
         try {
-            ToExt ext = from_ext.getToExt(to_ext, n);
-            return ext.toExt(this);
+            return lang().extRewrite(n, this);
         }
         catch (SemanticException e) {
             Position position = e.position();

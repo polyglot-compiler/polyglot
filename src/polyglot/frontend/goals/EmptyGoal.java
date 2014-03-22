@@ -36,10 +36,6 @@ import polyglot.frontend.Pass;
  */
 public class EmptyGoal extends AbstractGoal {
 
-    public EmptyGoal(Job job) {
-        super(job);
-    }
-
     public EmptyGoal(Job job, String name) {
         super(job, name);
     }

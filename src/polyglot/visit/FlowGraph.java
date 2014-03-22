@@ -45,17 +45,17 @@ import polyglot.util.IdentityKey;
 public class FlowGraph<FlowItem extends DataFlow.Item> {
 
     /**
-     * Maps from AST nodes to path maps and hence to <code>Peer</code>s that
+     * Maps from AST nodes to path maps and hence to {@code Peer}s that
      * represent occurrences of the AST node in the flow graph. In particular,
-     * <code>peerMap</code> maps <code>IdentityKey(Node)</code>s to path
-     * maps. A path map is a map from paths (<code>ListKey(List of Terms)</code>)
-     * to <code>Peer</code>s. In particular, if <code>n</code> is an AST
-     * node in a finally block, then there will be a <code>Peer</code> of
-     * <code>n</code> for each possible path to the finally block, and the
-     * path map records which <code>Peer</code> corresponds to which path. If
-     * <code>n</code> does not occur in a finally block, then the path map
+     * {@code peerMap} maps {@code IdentityKey(Node)}s to path
+     * maps. A path map is a map from paths ({@code ListKey(List<Term>)})
+     * to {@code Peer}s. In particular, if {@code n} is an AST
+     * node in a finally block, then there will be a {@code Peer} of
+     * {@code n} for each possible path to the finally block, and the
+     * path map records which {@code Peer} corresponds to which path. If
+     * {@code n} does not occur in a finally block, then the path map
      * should have only a single entry, from an empty list to the unique
-     * <code>Peer</code> for <code>n</code>.
+     * {@code Peer} for {@code n}.
      * 
      * <p>
      * <b>WARNING</b>: the AST must be a tree, not a DAG. Otherwise the same
@@ -125,7 +125,7 @@ public class FlowGraph<FlowItem extends DataFlow.Item> {
     }
 
     /**
-     * Return a collection of all <code>Peer</code>s in this flow graph.
+     * Return a collection of all {@code Peer}s in this flow graph.
      */
     public Collection<Peer<FlowItem>> peers() {
         Collection<Peer<FlowItem>> c = new ArrayList<Peer<FlowItem>>();
@@ -138,11 +138,11 @@ public class FlowGraph<FlowItem extends DataFlow.Item> {
     }
 
     /**
-     * Retrieve the entry or exit <code>Peer</code> for the
-     * <code>Term n</code>, where <code>n</code> does not appear in a
+     * Retrieve the entry or exit {@code Peer} for the
+     * {@code Term n}, where {@code n} does not appear in a
      * finally block. If no such Peer exists, then one will be created.
      * 
-     * <code>entry</code> can be Term.ENTRY or Term.EXIT.
+     * {@code entry} can be Term.ENTRY or Term.EXIT.
      */
     public Peer<FlowItem> peer(Term n, int entry) {
         return peer(n, Collections.<Term> emptyList(), entry);
@@ -154,10 +154,10 @@ public class FlowGraph<FlowItem extends DataFlow.Item> {
     }
 
     /**
-     * Return a collection of all of the entry or exit <code>Peer</code>s for
-     * the given <code>Term n</code>.
+     * Return a collection of all of the entry or exit {@code Peer}s for
+     * the given {@code Term n}.
      * 
-     * <code>entry</code> can be Term.ENTRY or Term.EXIT.
+     * {@code entry} can be Term.ENTRY or Term.EXIT.
      */
     public Collection<Peer<FlowItem>> peers(Term n, int entry) {
         IdentityKey k = new IdentityKey(n);
@@ -180,12 +180,12 @@ public class FlowGraph<FlowItem extends DataFlow.Item> {
     }
 
     /**
-     * Retrieve the <code>Peer</code> for the <code>Term n</code> that is
+     * Retrieve the {@code Peer} for the {@code Term n} that is
      * associated with the given path to the finally block. (A term that occurs
      * in a finally block has one Peer for each possible path to that finally
      * block.) If no such Peer exists, then one will be created.
      * 
-     * <code>entry</code> can be Term.ENTRY or Term.EXIT.
+     * {@code entry} can be Term.ENTRY or Term.EXIT.
      */
     public Peer<FlowItem> peer(Term n, List<Term> path_to_finally, int entry) {
         PeerKey lk = new PeerKey(path_to_finally, entry);
@@ -193,7 +193,7 @@ public class FlowGraph<FlowItem extends DataFlow.Item> {
     }
 
     /**
-     * Retrieve the <code>Peer</code> for the <code>Term n</code> that is
+     * Retrieve the {@code Peer} for the {@code Term n} that is
      * associated with the given PeerKey.
      */
     public Peer<FlowItem> peer(Term n, PeerKey peerKey) {
@@ -345,10 +345,10 @@ public class FlowGraph<FlowItem extends DataFlow.Item> {
     }
 
     /**
-     * A <code>Peer</code> is an occurrence of an AST node in a flow graph. 
+     * A {@code Peer} is an occurrence of an AST node in a flow graph. 
      * For most AST nodes, there will be only one Peer for each AST node. 
      * However, if the AST node occurs in a finally block, then there will be
-     * multiple <code>Peer</code>s for that AST node, one for each possible
+     * multiple {@code Peer}s for that AST node, one for each possible
      * path to the finally block. This is because flow graphs for finally blocks 
      * are copied, one copy for each possible path to the finally block.
      */
@@ -455,7 +455,7 @@ public class FlowGraph<FlowItem extends DataFlow.Item> {
     }
 
     /**
-     * Class to be used for inserting Lists in hashtables using collection
+     * Class to be used for inserting Lists in hash tables using collection
      * equality (as defined in
      * {@link polyglot.util.CollectionUtil CollectionUtil}).
      */

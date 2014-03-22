@@ -26,15 +26,13 @@
 
 package polyglot.ast;
 
-import java.util.List;
-
 import polyglot.types.ConstructorInstance;
 import polyglot.util.Enum;
 import polyglot.util.SerialVersionUID;
 
 /**
- * A <code>ConstructorCall</code> represents a direct call to a constructor.
- * For instance, <code>super(...)</code> or <code>this(...)</code>.
+ * A {@code ConstructorCall} represents a direct call to a constructor.
+ * For instance, {@code super(...)} or {@code this(...)}.
  */
 public interface ConstructorCall extends Stmt, ProcedureCall {
     /** Constructor call kind: either "super" or "this". */
@@ -63,25 +61,11 @@ public interface ConstructorCall extends Stmt, ProcedureCall {
     ConstructorCall kind(Kind kind);
 
     /**
-     * Actual arguments.
-     * @return A list of {@link polyglot.ast.Expr Expr}.
-     */
-    @Override
-    List<Expr> arguments();
-
-    /**
-     * Set the actual arguments.
-     * @param arguments A list of {@link polyglot.ast.Expr Expr}.
-     */
-    @Override
-    ProcedureCall arguments(List<Expr> arguments);
-
-    /**
-     * The constructor that is called.  This field may not be valid until
-     * after type checking.
+     * The type object of the constructor to call.  This field may not
+     * be valid until after type checking.
      */
     ConstructorInstance constructorInstance();
 
-    /** Set the constructor to call. */
+    /** Set the type object of the constructor to call. */
     ConstructorCall constructorInstance(ConstructorInstance ci);
 }

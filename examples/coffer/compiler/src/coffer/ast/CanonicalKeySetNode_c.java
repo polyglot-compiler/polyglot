@@ -11,6 +11,7 @@ import polyglot.ast.Node_c;
 import polyglot.util.CodeWriter;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
+import polyglot.util.SerialVersionUID;
 import polyglot.visit.PrettyPrinter;
 import polyglot.visit.Translator;
 import coffer.types.KeySet;
@@ -21,6 +22,8 @@ import coffer.types.KeySet;
  */
 public class CanonicalKeySetNode_c extends Node_c implements
         CanonicalKeySetNode {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     protected KeySet keys;
 
     public CanonicalKeySetNode_c(Position pos, KeySet keys) {

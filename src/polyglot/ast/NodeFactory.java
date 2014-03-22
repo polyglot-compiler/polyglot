@@ -34,11 +34,16 @@ import polyglot.types.Type;
 import polyglot.util.Position;
 
 /**
- * A <code>NodeFactory</code> constructs AST nodes.  All node construction
- * should go through this factory or be done with the <code>copy()</code>
- * method of <code>Node</code>.
+ * A {@code NodeFactory} constructs AST nodes.  All node construction
+ * should go through this factory or be done with the {@code copy()}
+ * method of {@code Node}.
  */
 public interface NodeFactory {
+
+    /**
+     * Returns the language associated with this NodeFactory.
+     */
+    JLang lang();
 
     /**
      * Returns a disambiguator for nodes from this factory.

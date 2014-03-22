@@ -34,6 +34,7 @@ import polyglot.types.Type;
 import polyglot.types.TypeSystem;
 import polyglot.util.CodeWriter;
 import polyglot.util.CollectionUtil;
+import polyglot.util.Copy;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.ListUtil;
 import polyglot.util.Position;
@@ -45,55 +46,56 @@ import polyglot.visit.PrettyPrinter;
 import polyglot.visit.TypeChecker;
 
 /**
- * An <code>ArrayInit</code> is an immutable representation of
+ * An {@code ArrayInit} is an immutable representation of
  * an array initializer, such as { 3, 1, { 4, 1, 5 } }.  Note that
  * the elements of these array may be expressions of any type (e.g.,
- * <code>Call</code>).
+ * {@code Call}).
  */
 public class ArrayInit_c extends Expr_c implements ArrayInit {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
     protected List<Expr> elements;
 
+    @Deprecated
     public ArrayInit_c(Position pos, List<Expr> elements) {
-        super(pos);
+        this(pos, elements, null);
+    }
+
+    public ArrayInit_c(Position pos, List<Expr> elements, Ext ext) {
+        super(pos, ext);
         assert (elements != null);
         this.elements = ListUtil.copy(elements, true);
     }
 
-    /** Get the elements of the initializer. */
     @Override
     public List<Expr> elements() {
         return this.elements;
     }
 
-    /** Set the elements of the initializer. */
     @Override
     public ArrayInit elements(List<Expr> elements) {
-        ArrayInit_c n = (ArrayInit_c) copy();
+        return elements(this, elements);
+    }
+
+    protected <N extends ArrayInit_c> N elements(N n, List<Expr> elements) {
+        if (CollectionUtil.equals(n.elements, elements)) return n;
+        if (n == this) n = Copy.Util.copy(n);
         n.elements = ListUtil.copy(elements, true);
         return n;
     }
 
     /** Reconstruct the initializer. */
-    protected ArrayInit_c reconstruct(List<Expr> elements) {
-        if (!CollectionUtil.equals(elements, this.elements)) {
-            ArrayInit_c n = (ArrayInit_c) copy();
-            n.elements = ListUtil.copy(elements, true);
-            return n;
-        }
-
-        return this;
+    protected <N extends ArrayInit_c> N reconstruct(N n, List<Expr> elements) {
+        n = elements(n, elements);
+        return n;
     }
 
-    /** Visit the children of the initializer. */
     @Override
     public Node visitChildren(NodeVisitor v) {
         List<Expr> elements = visitList(this.elements, v);
-        return reconstruct(elements);
+        return reconstruct(this, elements);
     }
 
-    /** Type check the initializer. */
     @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
         TypeSystem ts = tc.typeSystem();
@@ -148,7 +150,8 @@ public class ArrayInit_c extends Expr_c implements ArrayInit {
     }
 
     @Override
-    public void typeCheckElements(Type lhsType) throws SemanticException {
+    public void typeCheckElements(TypeChecker tc, Type lhsType)
+            throws SemanticException {
         TypeSystem ts = lhsType.typeSystem();
 
         if (!lhsType.isArray()) {
@@ -163,12 +166,15 @@ public class ArrayInit_c extends Expr_c implements ArrayInit {
             Type s = e.type();
 
             if (e instanceof ArrayInit) {
-                ((ArrayInit) e).typeCheckElements(t);
+                ((ArrayInit) e).typeCheckElements(tc, t);
                 continue;
             }
 
-            if (!ts.isImplicitCastValid(s, t) && !ts.typeEquals(s, t)
-                    && !ts.numericConversionValid(t, e.constantValue())) {
+            if (!ts.isImplicitCastValid(s, t)
+                    && !ts.typeEquals(s, t)
+                    && !ts.numericConversionValid(t,
+                                                  tc.lang()
+                                                    .constantValue(e, tc.lang()))) {
                 throw new SemanticException("Cannot assign " + s + " to " + t
                         + ".", e.position());
             }
@@ -180,7 +186,6 @@ public class ArrayInit_c extends Expr_c implements ArrayInit {
         return "{ ... }";
     }
 
-    /** Write the initializer to an output file. */
     @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
         w.write("{ ");

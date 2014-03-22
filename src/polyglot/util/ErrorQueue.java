@@ -27,7 +27,7 @@
 package polyglot.util;
 
 /**
- * A <code>ErrorQueue</code> handles outputing error messages.
+ * A {@code ErrorQueue} handles outputting error messages.
  */
 public interface ErrorQueue {
     public void enqueue(int type, String message);

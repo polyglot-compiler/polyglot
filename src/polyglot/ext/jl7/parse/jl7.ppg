@@ -3,50 +3,76 @@ include "polyglot/ext/jl5/parse/jl5.ppg"
 
 package polyglot.ext.jl7.parse;
 
-import polyglot.parse.*;
 import polyglot.ext.jl5.parse.*;
 import polyglot.ext.jl7.ast.*;
 import polyglot.ext.jl7.types.*;
 
 
 parser Grm extends polyglot.ext.jl5.parse.Grm  {:
-  public final JL7TypeSystem ts;
-  public final JL7NodeFactory nf;
-    
-  public Grm(Lexer l, TypeSystem t, NodeFactory n, ErrorQueue q) {
-    super(l, t, n, q);
-    ts = (JL7TypeSystem) t;
-    nf = (JL7NodeFactory) n;
-  }
+	public final JL7TypeSystem ts;
+	public final JL7NodeFactory nf;
+
+	public static final List<TypeNode> diamond = new LinkedList<TypeNode>();
+
+	public Grm(Lexer l, TypeSystem t, NodeFactory n, ErrorQueue q) {
+		super(l, t, n, q);
+		ts = (JL7TypeSystem) t;
+		nf = (JL7NodeFactory) n;
+	}
 
 :};
 
 
-non terminal LinkedList catch_type; // List<TypeNode>
+non terminal List<TypeNode> catch_type;
 
 start with goal;
 
 
 override catch_clause ::=
-                    // Catch
-         CATCH:n LPAREN modifiers_or_annotations_opt:a catch_type:b IDENTIFIER:c RPAREN block:d
-            {: Formal f = parser.nf.Formal(parser.pos(b, c, c), a.flags(), a.annotations(),
-                        parser.nf.AmbUnionType(parser.pos(b), b), parser.nf.Id(parser.pos(c), c.getIdentifier()));
-               if (b.size() > 1) { 
-                  RESULT = parser.nf.MultiCatch(parser.pos(n, d), f, b, d); 
-               }
-               else {              
-                  RESULT = parser.nf.Catch(parser.pos(n, d), f, d); 
-               }
-            :}
-    ;
+	// Catch
+	CATCH:n LPAREN modifiers_or_annotations_opt:a catch_type:b IDENTIFIER:c RPAREN block:d {:
+		Formal f = parser.nf.Formal(parser.pos(b, c, c), a.flags(), a.annotations(),
+																parser.nf.AmbUnionType(parser.pos(b), b),
+																parser.nf.Id(parser.pos(c), c.getIdentifier()));
+		if (b.size() > 1)
+			RESULT = parser.nf.MultiCatch(parser.pos(n, d), f, b, d); 
+		else
+			RESULT = parser.nf.Catch(parser.pos(n, d), f, d); 
+	:}
+;
 
 catch_type ::=
-     name:a
-        {: LinkedList l = new LinkedList<Type>();
-           l.add(a.toType());
-           RESULT = l; :}
-   | name:a OR catch_type: as
-        {: as.addFirst(a.toType()); RESULT = as; :}
-   ;
-   
+	name:a {:
+		List<TypeNode> l = new LinkedList<TypeNode>();
+		l.add(a.toType());
+		RESULT = l;
+	:}
+	| catch_type:as OR name:a {:
+		as.add(a.toType());
+		RESULT = as;
+	:}
+;
+
+extend class_instance_creation_expression ::=
+	NEW:a class_or_interface:b LT GT:d LPAREN argument_list_opt:f RPAREN class_body_opt:h {:
+		TypeNode tn = parser.nf.AmbDiamondTypeNode(parser.pos(b, d), b);
+		RESULT = parser.nf.New(parser.pos(a), tn, f, h);
+	:}
+	| NEW:a type_arguments:b class_or_interface:c LT GT:e LPAREN argument_list_opt:g RPAREN class_body_opt:i
+			/* Instantiating type arguments */ {:
+		TypeNode tn = parser.nf.AmbDiamondTypeNode(parser.pos(c, e), c);
+		RESULT = parser.nf.New(parser.pos(a), b, tn, g, i);
+	:}
+	| primary:a DOT NEW type_arguments_opt:d IDENTIFIER:e LT GT:g LPAREN argument_list_opt:i RPAREN class_body_opt:k
+			/* Instantiating type arguments */ {:
+		TypeNode aa = (new JL5Name(parser.nf, parser.ts, parser.pos(e), parser.nf.Id(parser.pos(e), e.getIdentifier()))).toType();
+		TypeNode tn = parser.nf.AmbDiamondTypeNode(parser.pos(e, g), aa);
+		RESULT = parser.nf.New(parser.pos(a), a, d, tn, i, k);
+	:}
+	| name:a DOT NEW type_arguments_opt:d IDENTIFIER:e LT GT:g LPAREN argument_list_opt:i RPAREN class_body_opt:k
+			/* Instantiating type arguments */ {:
+		TypeNode aa = (new JL5Name(parser.nf, parser.ts, parser.pos(e), parser.nf.Id(parser.pos(e), e.getIdentifier()))).toType();
+		TypeNode tn = parser.nf.AmbDiamondTypeNode(parser.pos(e, g), aa);
+		RESULT = parser.nf.New(parser.pos(a), a.toExpr(), d, tn, i, k);
+	:}
+;

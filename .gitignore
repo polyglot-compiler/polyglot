@@ -7,4 +7,5 @@ cup-classes
 dist
 .classpath
 .project
+SyncToy*
 /bin_

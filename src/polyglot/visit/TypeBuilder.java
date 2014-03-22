@@ -59,6 +59,7 @@ public class TypeBuilder extends NodeVisitor {
     protected ParsedClassType type; // last class pushed.
 
     public TypeBuilder(Job job, TypeSystem ts, NodeFactory nf) {
+        super(nf.lang());
         this.job = job;
         this.ts = ts;
         this.nf = nf;
@@ -99,7 +100,7 @@ public class TypeBuilder extends NodeVisitor {
     @Override
     public NodeVisitor enter(Node n) {
         try {
-            return n.del().buildTypesEnter(this);
+            return lang().buildTypesEnter(n, this);
         }
         catch (SemanticException e) {
             Position position = e.position();
@@ -121,7 +122,7 @@ public class TypeBuilder extends NodeVisitor {
     @Override
     public Node leave(Node old, Node n, NodeVisitor v) {
         try {
-            return n.del().buildTypes((TypeBuilder) v);
+            return lang().buildTypes(n, (TypeBuilder) v);
         }
         catch (SemanticException e) {
             Position position = e.position();

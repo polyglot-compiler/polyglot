@@ -27,7 +27,7 @@
 package polyglot.types;
 
 /**
- * An <code>EmptyResolver</code> is a resolver that always fails.
+ * An {@code EmptyResolver} is a resolver that always fails.
  */
 public class EmptyResolver implements Resolver {
     protected String kind;

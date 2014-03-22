@@ -29,43 +29,56 @@ package polyglot.ast;
 import java.util.ArrayList;
 import java.util.List;
 
+import polyglot.translate.ExtensionRewriter;
+import polyglot.types.SemanticException;
 import polyglot.types.Type;
 import polyglot.types.TypeSystem;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
 import polyglot.visit.CFGBuilder;
+import polyglot.visit.NodeVisitor;
 
 /**
- * A <code>FieldAssign_c</code> represents a Java assignment expression to
- * a field.  For instance, <code>this.x = e</code>.
+ * A {@code FieldAssign} represents a Java assignment expression to
+ * a field.  For instance, {@code this.x = e}.
  * 
- * The class of the <code>Expr</code> returned by
- * <code>FieldAssign_c.left()</code>is guaranteed to be a <code>Field</code>.
+ * The class of the {@code Expr} returned by
+ * {@code FieldAssign_c.left()}is guaranteed to be a {@code Field}.
  */
 public class FieldAssign_c extends Assign_c implements FieldAssign {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
+    @Deprecated
     public FieldAssign_c(Position pos, Field left, Operator op, Expr right) {
-        super(pos, left, op, right);
+        this(pos, left, op, right, null);
+    }
+
+    public FieldAssign_c(Position pos, Field left, Operator op, Expr right,
+            Ext ext) {
+        super(pos, left, op, right, ext);
+    }
+
+    @Override
+    public Field left() {
+        return (Field) super.left();
     }
 
     @Override
     public Assign left(Expr left) {
-        FieldAssign_c n = (FieldAssign_c) super.left(left);
-        n.assertLeftType();
-        return n;
+        assertLeftType(left);
+        return super.left(left);
     }
 
-    private void assertLeftType() {
-        if (!(left() instanceof Field)) {
+    private static void assertLeftType(Expr left) {
+        if (!(left instanceof Field)) {
             throw new InternalCompilerError("left expression of an FieldAssign must be a field");
         }
     }
 
     @Override
     public Term firstChild() {
-        Field f = (Field) left();
+        Field f = left();
         if (f.target() instanceof Expr) {
             return ((Expr) f.target());
         }
@@ -81,7 +94,7 @@ public class FieldAssign_c extends Assign_c implements FieldAssign {
 
     @Override
     protected void acceptCFGAssign(CFGBuilder<?> v) {
-        Field f = (Field) left();
+        Field f = left();
         if (f.target() instanceof Expr) {
             Expr o = (Expr) f.target();
 
@@ -125,7 +138,7 @@ public class FieldAssign_c extends Assign_c implements FieldAssign {
     public List<Type> throwTypes(TypeSystem ts) {
         List<Type> l = new ArrayList<Type>(super.throwTypes(ts));
 
-        Field f = (Field) left();
+        Field f = left();
         if (f.target() instanceof Expr) {
             l.add(ts.NullPointerException());
         }
@@ -133,4 +146,24 @@ public class FieldAssign_c extends Assign_c implements FieldAssign {
         return l;
     }
 
+    @Override
+    public NodeVisitor extRewriteEnter(ExtensionRewriter rw)
+            throws SemanticException {
+        return rw.bypass(left());
+    }
+
+    @Override
+    public Node extRewrite(ExtensionRewriter rw) throws SemanticException {
+        FieldAssign_c n = (FieldAssign_c) super.extRewrite(rw);
+        Expr left = n.visitChild(n.left(), rw);
+        if (!left.isDisambiguated()) {
+            // Need to have an ambiguous assignment
+            return rw.nodeFactory().AmbAssign(n.position(),
+                                              left,
+                                              n.operator(),
+                                              n.right());
+        }
+        n = left(n, left);
+        return n;
+    }
 }

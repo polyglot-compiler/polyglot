@@ -85,7 +85,7 @@ public class LoadedClassResolver implements TopLevelResolver {
     }
 
     /**
-     * Load a class file for class <code>name</code>.
+     * Load a class file for class {@code name}.
      */
     protected ClassFile loadFile(String name) {
         return loader.loadFile(name);

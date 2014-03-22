@@ -247,10 +247,11 @@ public class JL5Scheduler extends JLScheduler {
         boolean typecheckResult =
                 !(opts instanceof JL5Options && ((JL5Options) opts).skip524checks);
         Goal g =
-                typecheckResult ? internGoal(new VisitorGoal(job,
-                                                             new JL5ToJLRewriter(job,
-                                                                                 extInfo,
-                                                                                 extInfo.outputExtensionInfo())))
+                typecheckResult
+                        ? internGoal(new VisitorGoal(job,
+                                                     new JL5ToJLRewriter(job,
+                                                                         extInfo,
+                                                                         extInfo.outputExtensionInfo())))
                         : new EmptyGoal(job, "RemoveJava5isms");
         try {
             g.addPrerequisiteGoal(PreRemoveJava5isms(job), this);
@@ -291,7 +292,8 @@ public class JL5Scheduler extends JLScheduler {
     public Goal TypeClosure(Job job) {
         Goal g =
                 internGoal(new VisitorGoal(job,
-                                           new polyglot.visit.TypeClosure()));
+                                           new polyglot.visit.TypeClosure(extInfo.nodeFactory()
+                                                                                 .lang())));
         try {
             g.addPrerequisiteGoal(TypeChecked(job), this);
         }
@@ -321,9 +323,9 @@ public class JL5Scheduler extends JLScheduler {
         Options opts = extInfo.getOptions();
         if (opts instanceof JL5Options && ((JL5Options) opts).removeJava5isms) {
             Goal g =
-                    (((JL5Options) opts).skip524checks) ? JL5CodeGenerated.create(this,
-                                                                                  job)
-                            : new EmptyGoal(job);
+                    (((JL5Options) opts).skip524checks)
+                            ? JL5CodeGenerated.create(this, job)
+                            : new EmptyGoal(job, "CodeGenerated");
             try {
                 g.addPrerequisiteGoal(RemoveJava5isms(job), this);
             }

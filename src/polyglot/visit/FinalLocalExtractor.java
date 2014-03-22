@@ -31,6 +31,7 @@ import java.util.Set;
 
 import polyglot.ast.Assign;
 import polyglot.ast.Formal;
+import polyglot.ast.Lang;
 import polyglot.ast.Local;
 import polyglot.ast.LocalDecl;
 import polyglot.ast.Node;
@@ -58,7 +59,7 @@ public class FinalLocalExtractor extends NodeVisitor {
      * @param nf
      */
     public FinalLocalExtractor(Job job, TypeSystem ts, NodeFactory nf) {
-        super();
+        super(nf.lang());
     }
 
     @Override
@@ -132,6 +133,10 @@ public class FinalLocalExtractor extends NodeVisitor {
     }
 
     protected static class LocalDeclFixer extends NodeVisitor {
+        public LocalDeclFixer(Lang lang) {
+            super(lang);
+        }
+
         @Override
         public Node leave(Node old, Node n, NodeVisitor v) {
             if (n instanceof Formal) {
@@ -151,7 +156,7 @@ public class FinalLocalExtractor extends NodeVisitor {
         // Revisit everything to ensure the local decls' flags agree with
         // their local instance's.
         if (n instanceof SourceFile) {
-            return n.visit(new LocalDeclFixer());
+            return n.visit(new LocalDeclFixer(lang()));
         }
         return n;
     }

@@ -33,8 +33,8 @@ import polyglot.frontend.Source;
 import polyglot.util.Position;
 
 /**
- * A <code>ParsedClassType</code> represents a class loaded from a source file.
- * <code>ParsedClassType</code>s are mutable.
+ * A {@code ParsedClassType} represents a class loaded from a source file.
+ * {@code ParsedClassType}s are mutable.
  */
 public interface ParsedClassType extends ClassType, ParsedTypeObject {
     void setJob(Job job);
@@ -45,9 +45,9 @@ public interface ParsedClassType extends ClassType, ParsedTypeObject {
     void position(Position pos);
 
     /**
-     * The <code>Source</code> that this class type
-     * was loaded from. Should be <code>null</code> if it was not loaded from
-     * a <code>Source</code> during this compilation. 
+     * The {@code Source} that this class type
+     * was loaded from. Should be {@code null} if it was not loaded from
+     * a {@code Source} during this compilation. 
      */
     Source fromSource();
 
@@ -122,7 +122,7 @@ public interface ParsedClassType extends ClassType, ParsedTypeObject {
     void outer(ClassType t);
 
     /**
-     * Set the name of the class.  Throws <code>InternalCompilerError</code>
+     * Set the name of the class.  Throws {@code InternalCompilerError}
      * if called on an anonymous class.
      */
     void name(String name);

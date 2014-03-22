@@ -63,7 +63,7 @@ public class parse_action_table {
 
         /* tabulate reductions -- look at every table entry */
         for (int row = 0; row < num_states(); row++) {
-            for (int col = 0; col < under_state[row].size(); col++) {
+            for (int col = 0; col < parse_action_row.size(); col++) {
                 /* look at the action entry to see if its a reduce */
                 act = under_state[row].under_term[col];
                 if (act != null && act.kind() == parse_action.REDUCE) {
@@ -74,8 +74,8 @@ public class parse_action_table {
         }
 
         /* now go across every production and make sure we hit it */
-        for (Enumeration p = production.all(); p.hasMoreElements();) {
-            prod = (production) p.nextElement();
+        for (Enumeration<production> p = production.all(); p.hasMoreElements();) {
+            prod = p.nextElement();
 
             /* if we didn't hit it give a warning */
             if (prod.num_reductions() == 0) {
@@ -84,9 +84,9 @@ public class parse_action_table {
 
                 /* give a warning if they haven't been turned off */
                 if (!emit.nowarn) {
-                    System.err.println("*** Production \""
+
+                    ErrorManager.getManager().emit_warning("*** Production \""
                             + prod.to_simple_string() + "\" never reduced");
-                    lexer.warning_count++;
                 }
             }
         }
@@ -95,6 +95,7 @@ public class parse_action_table {
     /*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . .*
 
     /** Convert to a string. */
+    @Override
     public String toString() {
         String result;
         int cnt;
@@ -103,7 +104,7 @@ public class parse_action_table {
         for (int row = 0; row < num_states(); row++) {
             result += "From state #" + row + "\n";
             cnt = 0;
-            for (int col = 0; col < under_state[row].size(); col++) {
+            for (int col = 0; col < parse_action_row.size(); col++) {
                 /* if the action is not an error print it */
                 if (under_state[row].under_term[col].kind() != parse_action.ERROR) {
                     result +=

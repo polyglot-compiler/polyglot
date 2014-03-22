@@ -11,15 +11,15 @@ import polyglot.util.Position;
 public class JL7NodeFactory_c extends JL5NodeFactory_c implements
         JL7NodeFactory {
     public JL7NodeFactory_c() {
-        super(new JL7ExtFactory_c(), new JL7DelFactory_c());
+        this(J7Lang_c.instance);
     }
 
-    public JL7NodeFactory_c(JL7ExtFactory extFactory) {
-        super(extFactory, new JL7DelFactory_c());
+    public JL7NodeFactory_c(J7Lang lang) {
+        super(lang);
     }
 
-    public JL7NodeFactory_c(JL7ExtFactory extFactory, JL7DelFactory delFactory) {
-        super(extFactory, delFactory);
+    public JL7NodeFactory_c(J7Lang lang, JL7ExtFactory extFactory) {
+        super(lang, extFactory);
     }
 
     @Override
@@ -28,13 +28,22 @@ public class JL7NodeFactory_c extends JL5NodeFactory_c implements
     }
 
     @Override
-    public JL7DelFactory delFactory() {
-        return (JL7DelFactory) super.delFactory();
+    public J7Lang lang() {
+        return (J7Lang) super.lang();
+    }
+
+    @Override
+    public AmbDiamondTypeNode AmbDiamondTypeNode(Position pos, TypeNode base) {
+        AmbDiamondTypeNode n = new AmbDiamondTypeNode(pos, base);
+        n = (AmbDiamondTypeNode) n.ext(extFactory().extAmbDiamondTypeNode());
+        return n;
     }
 
     @Override
     public TypeNode AmbUnionType(Position pos, List<TypeNode> alternatives) {
-        return new AmbUnionType(pos, alternatives);
+        AmbUnionType n = new AmbUnionType(pos, alternatives);
+        n = (AmbUnionType) n.ext(extFactory().extAmbUnionType());
+        return n;
     }
 
     @Override
@@ -42,7 +51,6 @@ public class JL7NodeFactory_c extends JL5NodeFactory_c implements
             List<TypeNode> alternatives, Block body) {
         MultiCatch n = new MultiCatch_c(pos, formal, alternatives, body);
         n = (MultiCatch) n.ext(extFactory().extMultiCatch());
-        n = (MultiCatch) n.del(delFactory().delMultiCatch());
         return n;
     }
 

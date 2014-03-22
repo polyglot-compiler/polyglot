@@ -27,17 +27,19 @@
 package polyglot.ast;
 
 import polyglot.frontend.ExtensionInfo;
+import polyglot.translate.ExtensionRewriter;
 import polyglot.types.Package;
 import polyglot.types.Qualifier;
 import polyglot.types.SemanticException;
 import polyglot.util.CodeWriter;
+import polyglot.util.Copy;
 import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
 import polyglot.visit.PrettyPrinter;
 import polyglot.visit.Translator;
 
 /**
- * A <code>PackageNode</code> is the syntactic representation of a 
+ * A {@code PackageNode} is the syntactic representation of a 
  * Java package within the abstract syntax tree.
  */
 public class PackageNode_c extends Node_c implements PackageNode {
@@ -45,8 +47,13 @@ public class PackageNode_c extends Node_c implements PackageNode {
 
     protected Package package_;
 
+    @Deprecated
     public PackageNode_c(Position pos, Package package_) {
-        super(pos);
+        this(pos, package_, null);
+    }
+
+    public PackageNode_c(Position pos, Package package_, Ext ext) {
+        super(pos, ext);
         assert (package_ != null);
         this.package_ = package_;
     }
@@ -60,24 +67,26 @@ public class PackageNode_c extends Node_c implements PackageNode {
     /** Get the package as a qualifier. */
     @Override
     public Qualifier qualifier() {
-        return this.package_;
+        return package_();
     }
 
-    /** Get the package. */
     @Override
     public Package package_() {
         return this.package_;
     }
 
-    /** Set the package. */
     @Override
     public PackageNode package_(Package package_) {
-        PackageNode_c n = (PackageNode_c) copy();
+        return package_(this, package_);
+    }
+
+    protected <N extends PackageNode_c> N package_(N n, Package package_) {
+        if (n.package_ == package_) return n;
+        if (n == this) n = Copy.Util.copy(n);
         n.package_ = package_;
         return n;
     }
 
-    /** Write the package name to an output file. */
     @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
         if (package_ == null) {
@@ -94,6 +103,15 @@ public class PackageNode_c extends Node_c implements PackageNode {
     }
 
     @Override
+    public Node extRewrite(ExtensionRewriter rw) throws SemanticException {
+        PackageNode_c n = (PackageNode_c) super.extRewrite(rw);
+        Package p = package_();
+        p = rw.to_ts().packageForName(p.fullName());
+        n = package_(n, p);
+        return n;
+    }
+
+    @Override
     public String toString() {
         return package_.toString();
     }
@@ -105,11 +123,15 @@ public class PackageNode_c extends Node_c implements PackageNode {
 
     @Override
     public Node copy(ExtensionInfo extInfo) throws SemanticException {
-        PackageNode pn = (PackageNode) this.del().copy(extInfo.nodeFactory());
+        PackageNode_c pn =
+                (PackageNode_c) extInfo.nodeFactory()
+                                       .lang()
+                                       .copy(this, extInfo.nodeFactory());
         if (pn.package_() != null) {
             pn =
-                    pn.package_(extInfo.typeSystem()
-                                       .packageForName(pn.package_().fullName()));
+                    package_(pn,
+                             extInfo.typeSystem().packageForName(pn.package_()
+                                                                   .fullName()));
         }
         return pn;
     }

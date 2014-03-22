@@ -32,6 +32,7 @@ import java.util.List;
 
 import polyglot.types.SemanticException;
 import polyglot.util.CodeWriter;
+import polyglot.util.Copy;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
@@ -40,35 +41,42 @@ import polyglot.visit.PrettyPrinter;
 import polyglot.visit.TypeChecker;
 
 /** 
- * A <code>StringLit</code> represents an immutable instance of a 
- * <code>String</code> which corresponds to a literal string in Java code.
+ * A {@code StringLit} represents an immutable instance of a 
+ * {@code String} which corresponds to a literal string in Java code.
  */
 public class StringLit_c extends Lit_c implements StringLit {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
     protected String value;
 
+    @Deprecated
     public StringLit_c(Position pos, String value) {
-        super(pos);
+        this(pos, value, null);
+    }
+
+    public StringLit_c(Position pos, String value, Ext ext) {
+        super(pos, ext);
         assert (value != null);
         this.value = value;
     }
 
-    /** Get the value of the expression. */
     @Override
     public String value() {
         return this.value;
     }
 
-    /** Set the value of the expression. */
     @Override
     public StringLit value(String value) {
-        StringLit_c n = (StringLit_c) copy();
+        return value(this, value);
+    }
+
+    protected <N extends StringLit_c> N value(N n, String value) {
+        if (n.value == value) return n;
+        if (n == this) n = Copy.Util.copy(n);
         n.value = value;
         return n;
     }
 
-    /** Type check the expression. */
     @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
         return type(tc.typeSystem().String());
@@ -86,7 +94,6 @@ public class StringLit_c extends Lit_c implements StringLit {
 
     protected int MAX_LENGTH = 60;
 
-    /** Write the expression to an output file. */
     @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
         List<String> l = breakupString();
@@ -158,7 +165,7 @@ public class StringLit_c extends Lit_c implements StringLit {
     }
 
     @Override
-    public Object constantValue() {
+    public Object constantValue(Lang lang) {
         return value;
     }
 

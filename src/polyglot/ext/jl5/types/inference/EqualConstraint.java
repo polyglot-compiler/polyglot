@@ -29,7 +29,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import polyglot.ext.jl5.types.JL5ParsedClassType;
-import polyglot.ext.jl5.types.JL5SubstClassType_c;
+import polyglot.ext.jl5.types.JL5SubstClassType;
 import polyglot.ext.jl5.types.TypeVariable;
 import polyglot.ext.jl5.types.WildCardType;
 import polyglot.types.NullType;
@@ -69,15 +69,14 @@ public class EqualConstraint extends Constraint {
                 }
             }
         }
-        else if (formal instanceof JL5SubstClassType_c
-                && actual instanceof JL5SubstClassType_c) {
+        else if (formal instanceof JL5SubstClassType
+                && actual instanceof JL5SubstClassType) {
             // both formal and actual are parameterized class types
-            JL5SubstClassType_c formal_pt = (JL5SubstClassType_c) formal;
-            JL5SubstClassType_c actual_pt = (JL5SubstClassType_c) actual;
+            JL5SubstClassType formal_pt = (JL5SubstClassType) formal;
+            JL5SubstClassType actual_pt = (JL5SubstClassType) actual;
             if (formal_pt.base().equals(actual_pt.base())) {
                 JL5ParsedClassType g = formal_pt.base();
                 for (TypeVariable tv : g.typeVariables()) {
-
                     ReferenceType formal_targ =
                             (ReferenceType) formal_pt.subst().substType(tv);
                     ReferenceType actual_targ =
@@ -94,16 +93,16 @@ public class EqualConstraint extends Constraint {
                                 (WildCardType) formal_targ;
                         WildCardType actual_targ_wc =
                                 (WildCardType) actual_targ;
-                        if (formal_targ_wc.isSuperConstraint()
-                                && actual_targ_wc.isSuperConstraint()) {
-                            r.add(new EqualConstraint(formal_targ_wc.lowerBound(),
-                                                      actual_targ_wc.lowerBound(),
-                                                      solver));
-                        }
                         if (formal_targ_wc.isExtendsConstraint()
                                 && actual_targ_wc.isExtendsConstraint()) {
                             r.add(new EqualConstraint(formal_targ_wc.upperBound(),
                                                       actual_targ_wc.upperBound(),
+                                                      solver));
+                        }
+                        else if (formal_targ_wc.isSuperConstraint()
+                                && actual_targ_wc.isSuperConstraint()) {
+                            r.add(new EqualConstraint(formal_targ_wc.lowerBound(),
+                                                      actual_targ_wc.lowerBound(),
                                                       solver));
                         }
                     }

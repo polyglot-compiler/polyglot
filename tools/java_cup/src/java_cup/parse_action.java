@@ -64,6 +64,7 @@ public class parse_action {
     /*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . .*/
 
     /** Generic equality test. */
+    @Override
     public boolean equals(Object other) {
         if (other instanceof parse_action)
             return equals((parse_action) other);
@@ -73,6 +74,7 @@ public class parse_action {
     /*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . .*/
 
     /** Compute a hash code. */
+    @Override
     public int hashCode() {
         /* all objects of this class hash together */
         return 0xCafe123;
@@ -81,6 +83,7 @@ public class parse_action {
     /*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . .*/
 
     /** Convert to string. */
+    @Override
     public String toString() {
         return "ERROR";
     }

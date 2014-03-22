@@ -30,6 +30,7 @@ import polyglot.types.SemanticException;
 import polyglot.types.Type;
 import polyglot.types.TypeSystem;
 import polyglot.util.CodeWriter;
+import polyglot.util.Copy;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
@@ -41,18 +42,28 @@ import polyglot.visit.TypeBuilder;
 import polyglot.visit.TypeChecker;
 
 /**
- * A <code>TypeNode</code> represents the syntactic representation of a
- * <code>Type</code> within the abstract syntax tree.
+ * An {@code ArrayTypeNode} is a type node for a non-canonical
+ * array type.
  */
 public class ArrayTypeNode_c extends TypeNode_c implements ArrayTypeNode {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
     protected TypeNode base;
 
+    @Deprecated
     public ArrayTypeNode_c(Position pos, TypeNode base) {
-        super(pos);
+        this(pos, base, null);
+    }
+
+    public ArrayTypeNode_c(Position pos, TypeNode base, Ext ext) {
+        super(pos, ext);
         assert (base != null);
         this.base = base;
+    }
+
+    @Override
+    public boolean isDisambiguated() {
+        return false;
     }
 
     @Override
@@ -62,30 +73,25 @@ public class ArrayTypeNode_c extends TypeNode_c implements ArrayTypeNode {
 
     @Override
     public ArrayTypeNode base(TypeNode base) {
-        ArrayTypeNode_c n = (ArrayTypeNode_c) copy();
+        return base(this, base);
+    }
+
+    protected <N extends ArrayTypeNode_c> N base(N n, TypeNode base) {
+        if (n.base == base) return n;
+        if (n == this) n = Copy.Util.copy(n);
         n.base = base;
         return n;
     }
 
-    protected ArrayTypeNode_c reconstruct(TypeNode base) {
-        if (base != this.base) {
-            ArrayTypeNode_c n = (ArrayTypeNode_c) copy();
-            n.base = base;
-            return n;
-        }
-
-        return this;
-    }
-
-    @Override
-    public boolean isDisambiguated() {
-        return false;
+    protected <N extends ArrayTypeNode_c> N reconstruct(N n, TypeNode base) {
+        n = base(n, base);
+        return n;
     }
 
     @Override
     public Node visitChildren(NodeVisitor v) {
-        TypeNode base = (TypeNode) visitChild(this.base, v);
-        return reconstruct(base);
+        TypeNode base = visitChild(this.base, v);
+        return reconstruct(this, base);
     }
 
     @Override

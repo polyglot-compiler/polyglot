@@ -30,6 +30,7 @@ import java.util.List;
 
 import polyglot.types.SemanticException;
 import polyglot.util.CodeWriter;
+import polyglot.util.Copy;
 import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
 import polyglot.visit.CFGBuilder;
@@ -38,7 +39,7 @@ import polyglot.visit.PrettyPrinter;
 import polyglot.visit.TypeChecker;
 
 /**
- * A <code>ClassLit</code> represents a class literal expression. 
+ * A {@code ClassLit} represents a class literal expression. 
  * A class literal expressions is an expression consisting of the 
  * name of a class, interface, array, or primitive type followed by a period (.) 
  * and the token class. 
@@ -48,8 +49,13 @@ public class ClassLit_c extends Lit_c implements ClassLit {
 
     protected TypeNode typeNode;
 
+    @Deprecated
     public ClassLit_c(Position pos, TypeNode typeNode) {
-        super(pos);
+        this(pos, typeNode, null);
+    }
+
+    public ClassLit_c(Position pos, TypeNode typeNode, Ext ext) {
+        super(pos, ext);
         assert (typeNode != null);
         this.typeNode = typeNode;
     }
@@ -60,10 +66,12 @@ public class ClassLit_c extends Lit_c implements ClassLit {
     }
 
     public ClassLit typeNode(TypeNode typeNode) {
-        if (this.typeNode == typeNode) {
-            return this;
-        }
-        ClassLit_c n = (ClassLit_c) copy();
+        return typeNode(this, typeNode);
+    }
+
+    protected <N extends ClassLit_c> N typeNode(N n, TypeNode typeNode) {
+        if (n.typeNode == typeNode) return n;
+        if (n == this) n = Copy.Util.copy(n);
         n.typeNode = typeNode;
         return n;
     }
@@ -87,13 +95,17 @@ public class ClassLit_c extends Lit_c implements ClassLit {
         return succs;
     }
 
-    @Override
-    public Node visitChildren(NodeVisitor v) {
-        TypeNode tn = (TypeNode) visitChild(this.typeNode, v);
-        return this.typeNode(tn);
+    protected <N extends ClassLit_c> N reconstruct(N n, TypeNode typeNode) {
+        n = typeNode(n, typeNode);
+        return n;
     }
 
-    /** Type check the expression. */
+    @Override
+    public Node visitChildren(NodeVisitor v) {
+        TypeNode tn = visitChild(this.typeNode, v);
+        return reconstruct(this, tn);
+    }
+
     @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
         return type(tc.typeSystem().Class());
@@ -104,7 +116,6 @@ public class ClassLit_c extends Lit_c implements ClassLit {
         return typeNode.toString() + ".class";
     }
 
-    /** Write the expression to an output file. */
     @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
         w.begin(0);
@@ -118,12 +129,12 @@ public class ClassLit_c extends Lit_c implements ClassLit {
      * is not a compile time constant.
      */
     @Override
-    public boolean isConstant() {
+    public boolean isConstant(Lang lang) {
         return false;
     }
 
     @Override
-    public Object constantValue() {
+    public Object constantValue(Lang lang) {
         return null;
     }
 

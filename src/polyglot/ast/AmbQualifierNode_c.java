@@ -29,6 +29,7 @@ package polyglot.ast;
 import polyglot.types.Qualifier;
 import polyglot.types.SemanticException;
 import polyglot.util.CodeWriter;
+import polyglot.util.Copy;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
@@ -40,7 +41,7 @@ import polyglot.visit.TypeBuilder;
 import polyglot.visit.TypeChecker;
 
 /**
- * An <code>AmbQualifierNode</code> is an ambiguous AST node composed of
+ * An {@code AmbQualifierNode} is an ambiguous AST node composed of
  * dot-separated list of identifiers that must resolve to a type qualifier.
  */
 public class AmbQualifierNode_c extends Node_c implements AmbQualifierNode {
@@ -50,8 +51,13 @@ public class AmbQualifierNode_c extends Node_c implements AmbQualifierNode {
     protected QualifierNode qual;
     protected Id name;
 
+    @Deprecated
     public AmbQualifierNode_c(Position pos, QualifierNode qual, Id name) {
-        super(pos);
+        this(pos, qual, name, null);
+    }
+
+    public AmbQualifierNode_c(Position pos, QualifierNode qual, Id name, Ext ext) {
+        super(pos, ext);
         assert (name != null); // qual may be null
 
         this.qual = qual;
@@ -63,13 +69,31 @@ public class AmbQualifierNode_c extends Node_c implements AmbQualifierNode {
         return this.qualifier;
     }
 
+    public AmbQualifierNode qualifier(Qualifier qualifier) {
+        return qualifier(this, qualifier);
+    }
+
+    protected <N extends AmbQualifierNode_c> N qualifier(N n,
+            Qualifier qualifier) {
+        if (n.qualifier == qualifier) return n;
+        if (n == this) n = Copy.Util.copy(n);
+        n.qualifier = qualifier;
+        return n;
+    }
+
     @Override
     public Id id() {
         return this.name;
     }
 
+    /** Set the name of the qualifier. */
     public AmbQualifierNode id(Id name) {
-        AmbQualifierNode_c n = (AmbQualifierNode_c) copy();
+        return id(this, name);
+    }
+
+    protected <N extends AmbQualifierNode_c> N id(N n, Id name) {
+        if (n.name == name) return n;
+        if (n == this) n = Copy.Util.copy(n);
         n.name = name;
         return n;
     }
@@ -79,6 +103,7 @@ public class AmbQualifierNode_c extends Node_c implements AmbQualifierNode {
         return this.name.id();
     }
 
+    /** Set the name of the qualifier. */
     public AmbQualifierNode name(String name) {
         return id(this.name.id(name));
     }
@@ -88,34 +113,30 @@ public class AmbQualifierNode_c extends Node_c implements AmbQualifierNode {
         return this.qual;
     }
 
+    /** Set the qualifier of the qualifier. */
     public AmbQualifierNode qual(QualifierNode qual) {
-        AmbQualifierNode_c n = (AmbQualifierNode_c) copy();
+        return qual(this, qual);
+    }
+
+    protected <N extends AmbQualifierNode_c> N qual(N n, QualifierNode qual) {
+        if (n.qual == qual) return n;
+        if (n == this) n = Copy.Util.copy(n);
         n.qual = qual;
         return n;
     }
 
-    public AmbQualifierNode qualifier(Qualifier qualifier) {
-        AmbQualifierNode_c n = (AmbQualifierNode_c) copy();
-        n.qualifier = qualifier;
+    protected <N extends AmbQualifierNode_c> N reconstruct(N n,
+            QualifierNode qual, Id name) {
+        n = n.qual(n, qual);
+        n = n.id(n, name);
         return n;
-    }
-
-    protected AmbQualifierNode_c reconstruct(QualifierNode qual, Id name) {
-        if (qual != this.qual || name != this.name) {
-            AmbQualifierNode_c n = (AmbQualifierNode_c) copy();
-            n.qual = qual;
-            n.name = name;
-            return n;
-        }
-
-        return this;
     }
 
     @Override
     public Node visitChildren(NodeVisitor v) {
-        Id name = (Id) visitChild(this.name, v);
-        QualifierNode qual = (QualifierNode) visitChild(this.qual, v);
-        return reconstruct(qual, name);
+        Id name = visitChild(this.name, v);
+        QualifierNode qual = visitChild(this.qual, v);
+        return reconstruct(this, qual, name);
     }
 
     @Override

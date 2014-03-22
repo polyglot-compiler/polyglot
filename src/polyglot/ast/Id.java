@@ -26,11 +26,13 @@
 
 package polyglot.ast;
 
-/** An Id represents a simple identifier in the AST. Because it is a
+/** An {@code Id} represents a simple identifier in the AST. Because it is a
   * full-fledged node, extensions have the opportunity to attach additional
   * information. */
 public interface Id extends Node {
+    /** Get the name of the identifier. */
     String id();
 
+    /** Set the name of the identifier. */
     Id id(String id);
 }

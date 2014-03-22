@@ -25,46 +25,41 @@
  ******************************************************************************/
 package polyglot.ext.jl5.ast;
 
-import polyglot.ast.Field_c;
-import polyglot.ast.Id;
-import polyglot.ast.Receiver;
+import polyglot.ast.Field;
+import polyglot.ast.Lang;
+import polyglot.ast.Node;
 import polyglot.ext.jl5.types.EnumInstance;
-import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
 
-public class EnumConstant_c extends Field_c implements EnumConstant {
+public class EnumConstant_c extends JL5ExprExt implements EnumConstant {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
-    //protected EnumInstance enumInstance;
-
-    public EnumConstant_c(Position pos, Receiver target, Id name) {
-        super(pos, target, name);
-    }
-
     @Override
-    public boolean constantValueSet() {
+    public boolean constantValueSet(Lang lang) {
         return true;
     }
 
     @Override
-    public boolean isConstant() {
+    public boolean isConstant(Lang lang) {
         // An enum constant is not a compile-time constant. See JLS 3rd edition 15.28.
         return false;
     }
 
     @Override
-    public Object constantValue() {
+    public Object constantValue(Lang lang) {
         return enumInstance();
     }
 
     @Override
     public EnumInstance enumInstance() {
-        return (EnumInstance) fieldInstance();
+        Field n = (Field) this.node();
+        return (EnumInstance) n.fieldInstance();
     }
 
     @Override
-    public EnumConstant enumInstance(EnumInstance enumInstance) {
-        return (EnumConstant) fieldInstance(enumInstance);
+    public Node enumInstance(EnumInstance enumInstance) {
+        Field n = (Field) this.node();
+        return n.fieldInstance(enumInstance);
     }
 
 }

@@ -46,6 +46,7 @@ public interface Expr extends Receiver, Term {
     /** Return true iff the compiler has determined whether this expression has a
      * constant value.  The value returned by {@code isConstant()} is valid only if
      * {@code constantValueSet()} is true. */
+    @Deprecated
     boolean constantValueSet();
 
     /**
@@ -53,20 +54,28 @@ public interface Expr extends Receiver, Term {
      * Requires that disambiguation has been done, and that
      * {@code constantValueSet()} is true.
      */
+    @Deprecated
     boolean isConstant();
 
     /** Return the constant value of the expression, if any.
      *  Requires that {@code isConstant()} is true.
      */
+    @Deprecated
     Object constantValue();
 
     /**
      * Correctly parenthesize the subexpression {@code expr}
      * based on its precedence and the precedence of this expression.
      *
-     * If the subexpression has the same precedence as this expression we
-     * parenthesize if the subexpression does not associate. For example, we
-     * parenthesize the right subexpression of a left-associative operator.
+     * If the sub-expression has the same precedence as this expression,
+     * we parenthesize if the sub-expression does not associate.  For example,
+     * we parenthesize the right subexpression of a left-associative operator.
+     *
+     * @param expr The subexpression.
+     * @param associative Whether expr is the left (right) child of a left-
+     * (right-) associative operator.
+     * @param w The output writer.
+     * @param pp The pretty printer.
      */
     void printSubExpr(Expr expr, boolean associative, CodeWriter w,
             PrettyPrinter pp);
@@ -75,7 +84,14 @@ public interface Expr extends Receiver, Term {
      * Correctly parenthesize the subexpression {@code expr}
      * based on its precedence and the precedence of this expression.
      *
+     * If the sub-expression has the same precedence as this expression
+     * we do not parenthesize.
+     *
      * This is equivalent to {@code printSubexpr(expr, true, w, pp)}
+     *
+     * @param expr The subexpression.
+     * @param w The output writer.
+     * @param pp The pretty printer.
      */
     void printSubExpr(Expr expr, CodeWriter w, PrettyPrinter pp);
 }

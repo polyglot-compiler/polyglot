@@ -31,6 +31,7 @@ import java.util.List;
 import polyglot.types.Type;
 import polyglot.types.TypeSystem;
 import polyglot.util.CodeWriter;
+import polyglot.util.Copy;
 import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
 import polyglot.visit.AscriptionVisitor;
@@ -39,43 +40,52 @@ import polyglot.visit.NodeVisitor;
 import polyglot.visit.PrettyPrinter;
 
 /**
- * An <code>Eval</code> is a wrapper for an expression in the context of
- * a statement.
+ * An {@code Eval} wraps an expression in the context of a statement.
+ * It evaluates the expression and then discards the result.
  */
 public class Eval_c extends Stmt_c implements Eval {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
     protected Expr expr;
 
+    @Deprecated
     public Eval_c(Position pos, Expr expr) {
-        super(pos);
+        this(pos, expr, null);
+    }
+
+    public Eval_c(Position pos, Expr expr, Ext ext) {
+        super(pos, ext);
         assert (expr != null);
         this.expr = expr;
     }
 
-    /** Get the expression of the statement. */
     @Override
     public Expr expr() {
         return this.expr;
     }
 
-    /** Set the expression of the statement. */
     @Override
     public Eval expr(Expr expr) {
-        Eval_c n = (Eval_c) copy();
+        return expr(this, expr);
+    }
+
+    protected <N extends Eval_c> N expr(N n, Expr expr) {
+        if (n.expr == expr) return n;
+        if (n == this) n = Copy.Util.copy(n);
         n.expr = expr;
         return n;
     }
 
     /** Reconstruct the statement. */
-    protected Eval_c reconstruct(Expr expr) {
-        if (expr != this.expr) {
-            Eval_c n = (Eval_c) copy();
-            n.expr = expr;
-            return n;
-        }
+    protected <N extends Eval_c> N reconstruct(N n, Expr expr) {
+        n = expr(n, expr);
+        return n;
+    }
 
-        return this;
+    @Override
+    public Node visitChildren(NodeVisitor v) {
+        Expr expr = visitChild(this.expr, v);
+        return reconstruct(this, expr);
     }
 
     @Override
@@ -89,19 +99,11 @@ public class Eval_c extends Stmt_c implements Eval {
         return child.type();
     }
 
-    /** Visit the children of the statement. */
-    @Override
-    public Node visitChildren(NodeVisitor v) {
-        Expr expr = (Expr) visitChild(this.expr, v);
-        return reconstruct(expr);
-    }
-
     @Override
     public String toString() {
         return "eval(" + expr.toString() + ");";
     }
 
-    /** Write the statement to an output file. */
     @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
         boolean semi = tr.appendSemicolon(true);

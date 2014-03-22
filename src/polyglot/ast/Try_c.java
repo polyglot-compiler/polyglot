@@ -27,7 +27,6 @@
 package polyglot.ast;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.ListIterator;
 
@@ -36,6 +35,7 @@ import polyglot.types.Type;
 import polyglot.types.TypeSystem;
 import polyglot.util.CodeWriter;
 import polyglot.util.CollectionUtil;
+import polyglot.util.Copy;
 import polyglot.util.ListUtil;
 import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
@@ -46,8 +46,8 @@ import polyglot.visit.NodeVisitor;
 import polyglot.visit.PrettyPrinter;
 
 /**
- * An immutable representation of a <code>try</code> block, one or more
- * <code>catch</code> blocks, and an optional <code>finally</code> block.
+ * An immutable representation of a {@code try} block, one or more
+ * {@code catch} blocks, and an optional {@code finally} block.
  */
 public class Try_c extends Stmt_c implements Try, TryOps {
     private static final long serialVersionUID = SerialVersionUID.generate();
@@ -56,9 +56,15 @@ public class Try_c extends Stmt_c implements Try, TryOps {
     protected List<Catch> catchBlocks;
     protected Block finallyBlock;
 
+    @Deprecated
     public Try_c(Position pos, Block tryBlock, List<Catch> catchBlocks,
             Block finallyBlock) {
-        super(pos);
+        this(pos, tryBlock, catchBlocks, finallyBlock, null);
+    }
+
+    public Try_c(Position pos, Block tryBlock, List<Catch> catchBlocks,
+            Block finallyBlock, Ext ext) {
+        super(pos, ext);
         assert (tryBlock != null && catchBlocks != null); // finallyBlock may be null, catchBlocks empty
         assert (!catchBlocks.isEmpty() || finallyBlock != null); // must be either try-catch or try(-catch)-finally
         this.tryBlock = tryBlock;
@@ -66,75 +72,76 @@ public class Try_c extends Stmt_c implements Try, TryOps {
         this.finallyBlock = finallyBlock;
     }
 
-    /** Get the try block of the statement. */
     @Override
     public Block tryBlock() {
         return this.tryBlock;
     }
 
-    /** Set the try block of the statement. */
     @Override
     public Try tryBlock(Block tryBlock) {
-        Try_c n = (Try_c) copy();
+        return tryBlock(this, tryBlock);
+    }
+
+    protected <N extends Try_c> N tryBlock(N n, Block tryBlock) {
+        if (n.tryBlock == tryBlock) return n;
+        if (n == this) n = Copy.Util.copy(n);
         n.tryBlock = tryBlock;
         return n;
     }
 
-    /** Get the catch blocks of the statement. */
     @Override
     public List<Catch> catchBlocks() {
-        return Collections.unmodifiableList(this.catchBlocks);
+        return this.catchBlocks;
     }
 
-    /** Set the catch blocks of the statement. */
     @Override
     public Try catchBlocks(List<Catch> catchBlocks) {
-        Try_c n = (Try_c) copy();
+        return catchBlocks(this, catchBlocks);
+    }
+
+    protected <N extends Try_c> N catchBlocks(N n, List<Catch> catchBlocks) {
+        if (CollectionUtil.equals(n.catchBlocks, catchBlocks)) return n;
+        if (n == this) n = Copy.Util.copy(n);
         n.catchBlocks = ListUtil.copy(catchBlocks, true);
         return n;
     }
 
-    /** Get the finally block of the statement. */
     @Override
     public Block finallyBlock() {
         return this.finallyBlock;
     }
 
-    /** Set the finally block of the statement. */
     @Override
     public Try finallyBlock(Block finallyBlock) {
-        Try_c n = (Try_c) copy();
+        return finallyBlock(this, finallyBlock);
+    }
+
+    protected <N extends Try_c> N finallyBlock(N n, Block finallyBlock) {
+        if (n.finallyBlock == finallyBlock) return n;
+        if (n == this) n = Copy.Util.copy(n);
         n.finallyBlock = finallyBlock;
         return n;
     }
 
     /** Reconstruct the statement. */
-    protected Try_c reconstruct(Block tryBlock, List<Catch> catchBlocks,
-            Block finallyBlock) {
-        if (tryBlock != this.tryBlock
-                || !CollectionUtil.equals(catchBlocks, this.catchBlocks)
-                || finallyBlock != this.finallyBlock) {
-            Try_c n = (Try_c) copy();
-            n.tryBlock = tryBlock;
-            n.catchBlocks = ListUtil.copy(catchBlocks, true);
-            n.finallyBlock = finallyBlock;
-            return n;
-        }
-
-        return this;
+    protected <N extends Try_c> N reconstruct(N n, Block tryBlock,
+            List<Catch> catchBlocks, Block finallyBlock) {
+        n = tryBlock(n, tryBlock);
+        n = catchBlocks(n, catchBlocks);
+        n = finallyBlock(n, finallyBlock);
+        return n;
     }
 
-    /** Visit the children of the statement. */
     @Override
     public Node visitChildren(NodeVisitor v) {
-        Block tryBlock = (Block) visitChild(this.tryBlock, v);
+        Block tryBlock = visitChild(this.tryBlock, v);
         List<Catch> catchBlocks = visitList(this.catchBlocks, v);
-        Block finallyBlock = (Block) visitChild(this.finallyBlock, v);
-        return reconstruct(tryBlock, catchBlocks, finallyBlock);
+        Block finallyBlock = visitChild(this.finallyBlock, v);
+        return reconstruct(this, tryBlock, catchBlocks, finallyBlock);
     }
 
     /**
-     * Bypass all children when peforming an exception check.
+     * Bypass all children when performing an exception check.
      * exceptionCheck(), called from ExceptionChecker.leave(),
      * will handle visiting children.
      */
@@ -147,7 +154,7 @@ public class Try_c extends Stmt_c implements Try, TryOps {
 
     /**
      * Performs exceptionChecking. This is a special method that is called
-     * via the exceptionChecker's override method (i.e, doesn't follow the
+     * via the exceptionChecker's override method (i.e., doesn't follow the
      * standard model for visitation.  
      *
      * @param ec The ExceptionChecker that was run against the 
@@ -168,32 +175,34 @@ public class Try_c extends Stmt_c implements Try, TryOps {
         }
 
         ExceptionChecker ecTryBlock =
-                constructTryBlockExceptionChecker(ecTryBlockEntry);
+                ec.lang().constructTryBlockExceptionChecker(this,
+                                                            ecTryBlockEntry);
 
         Try_c n = this;
         // Visit the try block.
-        Block tryBlock = ((TryOps) n.del()).exceptionCheckTryBlock(ecTryBlock);
-        n = (Try_c) n.tryBlock(tryBlock);
+        Block tryBlock = ec.lang().exceptionCheckTryBlock(n, ecTryBlock);
+        n = tryBlock(n, tryBlock);
 
         List<Catch> catchBlocks =
-                ((TryOps) n.del()).exceptionCheckCatchBlocks(ecTryBlockEntry);
-        n = (Try_c) n.catchBlocks(catchBlocks);
+                ec.lang().exceptionCheckCatchBlocks(n, ecTryBlockEntry);
+        n = catchBlocks(n, catchBlocks);
 
-        Block finallyBlock = ((TryOps) n.del()).exceptionCheckFinallyBlock(ec);
-        n = (Try_c) n.finallyBlock(finallyBlock);
+        Block finallyBlock = ec.lang().exceptionCheckFinallyBlock(n, ec);
+        n = finallyBlock(n, finallyBlock);
 
-        for (Type exc : n.del().throwTypes(ec.typeSystem())) {
+        for (Type exc : ec.lang().throwTypes(n, ec.typeSystem())) {
             ec.throwsException(exc, position());
         }
-        n = (Try_c) n.exceptions(ec.throwsSet());
+        n = exceptions(n, ec.throwsSet());
 
         return n;
     }
 
     @Override
     public Block exceptionCheckTryBlock(ExceptionChecker ec) {
-        return (Block) this.visitChild(this.tryBlock,
-                                       ((TryOps) this.del()).constructTryBlockExceptionChecker(ec));
+        return this.visitChild(this.tryBlock,
+                               ec.lang()
+                                 .constructTryBlockExceptionChecker(this, ec));
     }
 
     @Override
@@ -239,7 +248,7 @@ public class Try_c extends Stmt_c implements Try, TryOps {
         List<Catch> catchBlocks = new ArrayList<Catch>(this.catchBlocks.size());
 
         for (Catch cb : this.catchBlocks) {
-            cb = (Catch) this.visitChild(cb, ec.push());
+            cb = this.visitChild(cb, ec.push());
             catchBlocks.add(cb);
         }
 
@@ -251,7 +260,7 @@ public class Try_c extends Stmt_c implements Try, TryOps {
         if (this.finallyBlock == null) {
             return null;
         }
-        Block fb = (Block) this.visitChild(this.finallyBlock, ec.push());
+        Block fb = this.visitChild(this.finallyBlock, ec.push());
 
         if (!this.finallyBlock.reachable()) {
             // warn the user

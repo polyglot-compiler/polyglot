@@ -253,9 +253,9 @@ public class JL5MethodInstance_c extends MethodInstance_c implements
                                                 + " in "
                                                 + mj.container()
                                                 + "; overridden method is "
-                                                + (mj.flags().isStatic() ? ""
-                                                        : "not") + "static",
-                                        mi.position());
+                                                + (mj.flags().isStatic()
+                                                        ? "" : "not")
+                                                + "static", mi.position());
         }
 
         return true;
@@ -367,18 +367,18 @@ public class JL5MethodInstance_c extends MethodInstance_c implements
         StringBuffer sb = new StringBuffer();
         sb.append(designator());
         sb.append(" ");
+        sb.append(flags.translate());
         if (!this.typeParams.isEmpty()) {
             sb.append("<");
             Iterator<TypeVariable> iter = this.typeParams().iterator();
             while (iter.hasNext()) {
                 sb.append(iter.next());
                 if (iter.hasNext()) {
-                    sb.append(",");
+                    sb.append(", ");
                 }
             }
-            sb.append(">");
+            sb.append("> ");
         }
-        sb.append(flags.translate());
         sb.append(returnType);
         sb.append(" ");
         sb.append(container());

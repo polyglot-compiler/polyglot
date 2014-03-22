@@ -29,7 +29,7 @@ package polyglot.types;
 import polyglot.util.CodeWriter;
 
 /**
- * An <code>Package</code> represents a Java package.
+ * An {@code Package} represents a Java package.
  */
 public interface Package extends Qualifier, Named, Declaration {
     /**
@@ -43,10 +43,10 @@ public interface Package extends Qualifier, Named, Declaration {
      */
     String translate(Resolver c);
 
-    /** Return true if this package is equivalent to <code>p</code>. */
+    /** Return true if this package is equivalent to {@code p}. */
     boolean packageEquals(Package p);
 
-    /** Return true if this package is equivalent to <code>p</code>. */
+    /** Return true if this package is equivalent to {@code p}. */
     boolean packageEqualsImpl(Package p);
 
     /** A resolver to access member packages and classes of the package. */

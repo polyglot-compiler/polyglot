@@ -27,13 +27,13 @@
 package polyglot.ast;
 
 /**
- * A <code>Case</code> is a representation of a Java <code>case</code>
- * statement.  It can only be contained in a <code>Switch</code>.
+ * A {@code Case} is a representation of a Java {@code case}
+ * statement.  It can only be contained in a {@code Switch}.
  */
 public interface Case extends SwitchElement {
     /**
      * Get the case label.  This must should a constant expression.
-     * The case label is null for the <code>default</code> case.
+     * The case label is null for the {@code default} case.
      */
     Expr expr();
 

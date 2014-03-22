@@ -46,7 +46,8 @@ public abstract class AbstractNodeFactory_c implements NodeFactory {
     }
 
     @Override
-    public Prefix PrefixFromQualifiedName(Position pos, String qualifiedName) {
+    public final Prefix PrefixFromQualifiedName(Position pos,
+            String qualifiedName) {
         if (StringUtil.isNameShort(qualifiedName)) {
             return AmbPrefix(pos, null, qualifiedName);
         }
@@ -60,7 +61,8 @@ public abstract class AbstractNodeFactory_c implements NodeFactory {
     }
 
     @Override
-    public TypeNode TypeNodeFromQualifiedName(Position pos, String qualifiedName) {
+    public final TypeNode TypeNodeFromQualifiedName(Position pos,
+            String qualifiedName) {
         if (StringUtil.isNameShort(qualifiedName)) {
             return AmbTypeNode(pos, null, qualifiedName);
         }
@@ -76,7 +78,8 @@ public abstract class AbstractNodeFactory_c implements NodeFactory {
     }
 
     @Override
-    public Receiver ReceiverFromQualifiedName(Position pos, String qualifiedName) {
+    public final Receiver ReceiverFromQualifiedName(Position pos,
+            String qualifiedName) {
         if (StringUtil.isNameShort(qualifiedName)) {
             return AmbReceiver(pos, null, qualifiedName);
         }
@@ -91,7 +94,7 @@ public abstract class AbstractNodeFactory_c implements NodeFactory {
     }
 
     @Override
-    public Expr ExprFromQualifiedName(Position pos, String qualifiedName) {
+    public final Expr ExprFromQualifiedName(Position pos, String qualifiedName) {
         if (StringUtil.isNameShort(qualifiedName)) {
             return AmbExpr(pos, qualifiedName);
         }
@@ -105,7 +108,7 @@ public abstract class AbstractNodeFactory_c implements NodeFactory {
     }
 
     @Override
-    public QualifierNode QualifierNodeFromQualifiedName(Position pos,
+    public final QualifierNode QualifierNodeFromQualifiedName(Position pos,
             String qualifiedName) {
         if (StringUtil.isNameShort(qualifiedName)) {
             return AmbQualifierNode(pos, null, qualifiedName);
@@ -121,28 +124,33 @@ public abstract class AbstractNodeFactory_c implements NodeFactory {
                                 name);
     }
 
+    @Deprecated
     @Override
     public final AmbPrefix AmbPrefix(Position pos, Prefix prefix, String name) {
         return AmbPrefix(pos, prefix, Id(pos, name));
     }
 
+    @Deprecated
     @Override
     public final AmbReceiver AmbReceiver(Position pos, Prefix prefix,
             String name) {
         return AmbReceiver(pos, prefix, Id(pos, name));
     }
 
+    @Deprecated
     @Override
     public final AmbQualifierNode AmbQualifierNode(Position pos,
             QualifierNode qualifier, String name) {
         return AmbQualifierNode(pos, qualifier, Id(pos, name));
     }
 
+    @Deprecated
     @Override
     public final AmbExpr AmbExpr(Position pos, String name) {
         return AmbExpr(pos, Id(pos, name));
     }
 
+    @Deprecated
     @Override
     public final AmbTypeNode AmbTypeNode(Position pos, QualifierNode qualifier,
             String name) {
@@ -154,6 +162,7 @@ public abstract class AbstractNodeFactory_c implements NodeFactory {
         return AmbPrefix(pos, null, name);
     }
 
+    @Deprecated
     @Override
     public final AmbPrefix AmbPrefix(Position pos, String name) {
         return AmbPrefix(pos, null, name);
@@ -164,6 +173,7 @@ public abstract class AbstractNodeFactory_c implements NodeFactory {
         return AmbReceiver(pos, null, name);
     }
 
+    @Deprecated
     @Override
     public final AmbReceiver AmbReceiver(Position pos, String name) {
         return AmbReceiver(pos, null, name);
@@ -174,6 +184,7 @@ public abstract class AbstractNodeFactory_c implements NodeFactory {
         return AmbQualifierNode(pos, null, name);
     }
 
+    @Deprecated
     @Override
     public final AmbQualifierNode AmbQualifierNode(Position pos, String name) {
         return AmbQualifierNode(pos, null, name);
@@ -184,6 +195,7 @@ public abstract class AbstractNodeFactory_c implements NodeFactory {
         return AmbTypeNode(pos, null, name);
     }
 
+    @Deprecated
     @Override
     public final AmbTypeNode AmbTypeNode(Position pos, String name) {
         return AmbTypeNode(pos, null, name);
@@ -206,6 +218,7 @@ public abstract class AbstractNodeFactory_c implements NodeFactory {
         return Block(pos, l);
     }
 
+    @Deprecated
     @Override
     public final Branch Branch(Position pos, Branch.Kind kind, String label) {
         return Branch(pos, kind, Id(pos, label));
@@ -221,6 +234,7 @@ public abstract class AbstractNodeFactory_c implements NodeFactory {
         return Branch(pos, Branch.BREAK, label);
     }
 
+    @Deprecated
     @Override
     public final Branch Break(Position pos, String label) {
         return Branch(pos, Branch.BREAK, label);
@@ -236,6 +250,7 @@ public abstract class AbstractNodeFactory_c implements NodeFactory {
         return Branch(pos, Branch.CONTINUE, label);
     }
 
+    @Deprecated
     @Override
     public final Branch Continue(Position pos, String label) {
         return Branch(pos, Branch.CONTINUE, label);
@@ -246,6 +261,7 @@ public abstract class AbstractNodeFactory_c implements NodeFactory {
         return Branch(pos, kind, (Id) null);
     }
 
+    @Deprecated
     @Override
     public final Call Call(Position pos, Receiver target, String name,
             List<Expr> args) {
@@ -259,6 +275,7 @@ public abstract class AbstractNodeFactory_c implements NodeFactory {
         return Call(pos, null, name, l);
     }
 
+    @Deprecated
     @Override
     public final Call Call(Position pos, String name, Expr... args) {
         List<Expr> l = new ArrayList<Expr>(1);
@@ -271,6 +288,7 @@ public abstract class AbstractNodeFactory_c implements NodeFactory {
         return Call(pos, null, name, args);
     }
 
+    @Deprecated
     @Override
     public final Call Call(Position pos, String name, List<Expr> args) {
         return Call(pos, null, name, args);
@@ -283,6 +301,7 @@ public abstract class AbstractNodeFactory_c implements NodeFactory {
         return Call(pos, target, name, l);
     }
 
+    @Deprecated
     @Override
     public final Call Call(Position pos, Receiver target, String name,
             Expr... args) {
@@ -296,6 +315,7 @@ public abstract class AbstractNodeFactory_c implements NodeFactory {
         return Case(pos, null);
     }
 
+    @Deprecated
     @Override
     public final ClassDecl ClassDecl(Position pos, Flags flags, String name,
             TypeNode superClass, List<TypeNode> interfaces, ClassBody body) {
@@ -307,6 +327,7 @@ public abstract class AbstractNodeFactory_c implements NodeFactory {
                          body);
     }
 
+    @Deprecated
     @Override
     public final ConstructorDecl ConstructorDecl(Position pos, Flags flags,
             String name, List<Formal> formals, List<TypeNode> throwTypes,
@@ -347,28 +368,33 @@ public abstract class AbstractNodeFactory_c implements NodeFactory {
         return ConstructorCall(pos, kind, null, args);
     }
 
+    @Deprecated
     @Override
     public final Field Field(Position pos, Receiver target, String name) {
         return Field(pos, target, Id(pos, name));
     }
 
+    @Deprecated
     @Override
     public final Formal Formal(Position pos, Flags flags, TypeNode type,
             String name) {
         return Formal(pos, flags, type, Id(pos, name));
     }
 
+    @Deprecated
     @Override
     public final Local Local(Position pos, String name) {
         return Local(pos, Id(pos, name));
     }
 
+    @Deprecated
     @Override
     public final LocalDecl LocalDecl(Position pos, Flags flags, TypeNode type,
             String name, Expr init) {
         return LocalDecl(pos, flags, type, Id(pos, name), init);
     }
 
+    @Deprecated
     @Override
     public final MethodDecl MethodDecl(Position pos, Flags flags,
             TypeNode returnType, String name, List<Formal> formals,
@@ -382,6 +408,7 @@ public abstract class AbstractNodeFactory_c implements NodeFactory {
                           body);
     }
 
+    @Deprecated
     @Override
     public final Labeled Labeled(Position pos, String label, Stmt body) {
         return Labeled(pos, Id(pos, label), body);
@@ -393,12 +420,14 @@ public abstract class AbstractNodeFactory_c implements NodeFactory {
         return FieldDecl(pos, flags, type, name, null);
     }
 
+    @Deprecated
     @Override
     public final FieldDecl FieldDecl(Position pos, Flags flags, TypeNode type,
             String name, Expr init) {
         return FieldDecl(pos, flags, type, Id(pos, name), init);
     }
 
+    @Deprecated
     @Override
     public final FieldDecl FieldDecl(Position pos, Flags flags, TypeNode type,
             String name) {
@@ -410,6 +439,7 @@ public abstract class AbstractNodeFactory_c implements NodeFactory {
         return Field(pos, null, name);
     }
 
+    @Deprecated
     @Override
     public final Field Field(Position pos, String name) {
         return Field(pos, null, name);
@@ -426,6 +456,7 @@ public abstract class AbstractNodeFactory_c implements NodeFactory {
         return LocalDecl(pos, flags, type, name, null);
     }
 
+    @Deprecated
     @Override
     public final LocalDecl LocalDecl(Position pos, Flags flags, TypeNode type,
             String name) {

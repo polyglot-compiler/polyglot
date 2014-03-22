@@ -27,9 +27,9 @@
 package polyglot.ast;
 
 /**
- * A <code>Cast</code> is an immutable representation of a casting
- * operation.  It consists of an <code>Expr</code> being cast and a
- * <code>TypeNode</code> being cast to.
+ * A {@code Cast} is an immutable representation of a casting
+ * operation.  It consists of an {@code Expr} being cast and a
+ * {@code TypeNode} being cast to.
  */
 public interface Cast extends Expr {
     /**

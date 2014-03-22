@@ -17,6 +17,7 @@ import polyglot.types.SemanticException;
 import polyglot.types.Type;
 import polyglot.util.CodeWriter;
 import polyglot.util.Position;
+import polyglot.util.SerialVersionUID;
 import polyglot.visit.CFGBuilder;
 import polyglot.visit.NodeVisitor;
 import polyglot.visit.PrettyPrinter;
@@ -29,6 +30,8 @@ import coffer.types.CofferClassType;
  * The expression cannot be evaluated after this statement executes.
  */
 public class Free_c extends Stmt_c implements Free {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     protected Expr expr;
 
     public Free_c(Position pos, Expr expr) {
@@ -59,7 +62,7 @@ public class Free_c extends Stmt_c implements Free {
 
     @Override
     public Node visitChildren(NodeVisitor v) {
-        Expr expr = (Expr) visitChild(this.expr, v);
+        Expr expr = visitChild(this.expr, v);
         return reconstruct(expr);
     }
 

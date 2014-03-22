@@ -28,6 +28,8 @@ package polyglot.visit;
 
 import java.io.IOException;
 
+import polyglot.ast.JLangToJLDel;
+import polyglot.ast.Lang;
 import polyglot.ast.Node;
 import polyglot.util.CodeWriter;
 
@@ -39,10 +41,21 @@ import polyglot.util.CodeWriter;
  *     new PrettyPrinter().printAst(node, new CodeWriter(out));
  */
 public class PrettyPrinter {
+    private final Lang lang;
     protected boolean appendSemicolon = true;
     protected boolean printType = true;
 
+    @Deprecated
     public PrettyPrinter() {
+        this(JLangToJLDel.instance);
+    }
+
+    public PrettyPrinter(Lang lang) {
+        this.lang = lang;
+    }
+
+    public Lang lang() {
+        return this.lang;
     }
 
     /** Flag indicating whether to print a ';' after certain statements.
@@ -74,14 +87,14 @@ public class PrettyPrinter {
     }
 
     /** Print an AST node using the given code writer.  The
-     * <code>CodeWriter.flush()</code> method must be called after this method
-     * to ensure code is output.  Use <code>printAst</code> rather than this
+     * {@code CodeWriter.flush()} method must be called after this method
+     * to ensure code is output.  Use {@code printAst} rather than this
      * method to print the entire AST; this method should only be called by
      * nodes to print their children.
      */
     public void print(Node parent, Node child, CodeWriter w) {
         if (child != null) {
-            child.del().prettyPrint(w, this);
+            lang().prettyPrint(child, w, this);
         }
     }
 

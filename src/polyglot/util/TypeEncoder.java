@@ -43,17 +43,17 @@ import polyglot.types.TypeObject;
 import polyglot.types.TypeSystem;
 
 /**
- * The <code>TypeEncoder</code> gives the ability to encode a polyglot 
- * <code>Type</code> as a Java string.
+ * The {@code TypeEncoder} gives the ability to encode a polyglot 
+ * {@code Type} as a Java string.
  * <p>
- * It uses a form of serialization to encode the <code>Type</code> into
+ * It uses a form of serialization to encode the {@code Type} into
  * a byte stream and then converts the byte stream to a standard Java string.
  * <p>
  * The difference between the encoder and a normal serialization process is
  * that in order to encode this type, we need to sever any links to other types
- * in the current environment. So any <code>ClassType</code> other than the 
+ * in the current environment. So any {@code ClassType} other than the 
  * the type being encoded is replaced in the stream with a 
- * <code>PlaceHolder</code> that contains the name of the class. To aid
+ * {@code PlaceHolder} that contains the name of the class. To aid
  * in the decoding process, placeholders for member classes user their 
  * "mangled" name; non-member classes use their fully qualified name.
  */
@@ -111,8 +111,8 @@ public class TypeEncoder {
         }
         else {
             StringBuffer sb = new StringBuffer(b.length);
-            for (int i = 0; i < b.length; i++)
-                sb.append((char) b[i]);
+            for (byte element : b)
+                sb.append((char) element);
             s = sb.toString();
         }
 

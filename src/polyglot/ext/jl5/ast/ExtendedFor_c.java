@@ -33,7 +33,7 @@ import polyglot.ast.IntLit;
 import polyglot.ast.Lit;
 import polyglot.ast.Local;
 import polyglot.ast.LocalDecl;
-import polyglot.ast.Loop_c;
+import polyglot.ast.Loop;
 import polyglot.ast.NewArray;
 import polyglot.ast.Node;
 import polyglot.ast.NodeFactory;
@@ -47,6 +47,7 @@ import polyglot.types.Context;
 import polyglot.types.SemanticException;
 import polyglot.types.Type;
 import polyglot.util.CodeWriter;
+import polyglot.util.Copy;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
@@ -56,32 +57,17 @@ import polyglot.visit.NodeVisitor;
 import polyglot.visit.PrettyPrinter;
 import polyglot.visit.TypeChecker;
 
-public class ExtendedFor_c extends Loop_c implements ExtendedFor {
+public class ExtendedFor_c extends JL5LoopExt implements ExtendedFor {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
     /** Loop body */
     protected LocalDecl decl;
     protected Expr expr;
-    protected Stmt body;
 
-    public ExtendedFor_c(Position pos, LocalDecl decl, Expr expr, Stmt stmt) {
-        super(pos);
+    public ExtendedFor_c(LocalDecl decl, Expr expr) {
+        assert (decl != null && expr != null);
         this.decl = decl;
         this.expr = expr;
-        this.body = stmt;
-    }
-
-    @Override
-    public Stmt body() {
-        return this.body;
-    }
-
-    /** Set the body of the statement. */
-    @Override
-    public ExtendedFor body(Stmt body) {
-        ExtendedFor_c n = (ExtendedFor_c) copy();
-        n.body = body;
-        return n;
     }
 
     @Override
@@ -89,11 +75,19 @@ public class ExtendedFor_c extends Loop_c implements ExtendedFor {
         return this.decl;
     }
 
-    /** Set the body of the statement. */
     @Override
-    public ExtendedFor decl(LocalDecl decl) {
-        ExtendedFor_c n = (ExtendedFor_c) copy();
-        n.decl = decl;
+    public Node decl(LocalDecl decl) {
+        return decl(node, decl);
+    }
+
+    protected <N extends Node> N decl(N n, LocalDecl decl) {
+        ExtendedFor_c ext = (ExtendedFor_c) JL5Ext.ext(n);
+        if (ext.decl.equals(decl)) return n;
+        if (n == node) {
+            n = Copy.Util.copy(n);
+            ext = (ExtendedFor_c) JL5Ext.ext(n);
+        }
+        ext.decl = decl;
         return n;
     }
 
@@ -103,32 +97,35 @@ public class ExtendedFor_c extends Loop_c implements ExtendedFor {
     }
 
     @Override
-    public ExtendedFor expr(Expr expr) {
-        ExtendedFor_c n = (ExtendedFor_c) copy();
-        n.expr = expr;
+    public Node expr(Expr expr) {
+        return expr(node, expr);
+    }
+
+    protected <N extends Node> N expr(N n, Expr expr) {
+        ExtendedFor_c ext = (ExtendedFor_c) JL5Ext.ext(n);
+        if (ext.expr == expr) return n;
+        if (n == node) {
+            n = Copy.Util.copy(n);
+            ext = (ExtendedFor_c) JL5Ext.ext(n);
+        }
+        ext.expr = expr;
         return n;
     }
 
     /** Reconstruct the statement. */
-    protected ExtendedFor_c reconstruct(LocalDecl decl, Expr expr, Stmt body) {
-        if (!decl.equals(this.decl) || expr != this.expr || body != this.body) {
-            ExtendedFor_c n = (ExtendedFor_c) copy();
-            n.decl = decl;
-            n.expr = expr;
-            n.body = body;
-            return n;
-        }
-
-        return this;
+    protected <N extends Loop> N reconstruct(N n, LocalDecl decl, Expr expr) {
+        n = decl(n, decl);
+        n = expr(n, expr);
+        return n;
     }
 
-    /** Visit the children of the statement. */
     @Override
     public Node visitChildren(NodeVisitor v) {
-        LocalDecl decl = (LocalDecl) visitChild(this.decl, v);
-        Expr expr = (Expr) visitChild(this.expr, v);
-        Stmt body = (Stmt) visitChild(this.body, v);
-        return reconstruct(decl, expr, body);
+        Loop n = node();
+        LocalDecl decl = visitChild(this.decl, v);
+        Expr expr = visitChild(this.expr, v);
+        Stmt body = visitChild(n.body(), v);
+        return reconstruct(n, decl, expr).body(body);
     }
 
     @Override
@@ -136,11 +133,12 @@ public class ExtendedFor_c extends Loop_c implements ExtendedFor {
         return c.pushBlock();
     }
 
-    /** Type check the statement. */
     @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
         JL5TypeSystem ts = (JL5TypeSystem) tc.typeSystem();
         NodeFactory nf = tc.nodeFactory();
+        Node n = this.node();
+        Position position = n.position();
         // Check that the expr is an array or of type Iterable
         Type t = expr.type();
 //        System.err.println(" t is a " + t.getClass());
@@ -170,13 +168,13 @@ public class ExtendedFor_c extends Loop_c implements ExtendedFor {
             if (iterableType == null) {
                 throw new InternalCompilerError("Cannot find generic supertype of Iterable for "
                                                         + t.toReference(),
-                                                this.position());
+                                                position);
             }
             elementType = iterableType.actuals().get(0);
         }
         if (!elementType.isImplicitCastValid(declType)) {
             throw new SemanticException("Incompatible types: required "
-                    + declType + " but found " + elementType, this.position());
+                    + declType + " but found " + elementType, position);
         }
 
         if (expr instanceof Local
@@ -233,29 +231,25 @@ public class ExtendedFor_c extends Loop_c implements ExtendedFor {
 
     @Override
     public <T> List<T> acceptCFG(CFGBuilder<?> v, List<T> succs) {
+        Loop n = this.node();
         v.visitCFG(expr,
                    FlowGraph.EDGE_KEY_TRUE,
                    decl,
-                   ENTRY,
+                   Term.ENTRY,
                    FlowGraph.EDGE_KEY_FALSE,
-                   this,
-                   EXIT);
-        v.visitCFG(decl, body, ENTRY);
-        v.push(this).visitCFG(body, continueTarget(), ENTRY);
+                   n,
+                   Term.EXIT);
+        v.visitCFG(decl, n.body(), Term.ENTRY);
+        v.push(n).visitCFG(n.body(), continueTarget(), Term.ENTRY);
         return succs;
     }
 
     @Override
-    public Expr cond() {
-        return null;
-    }
-
-    @Override
     public Term continueTarget() {
-        return body;
+        Loop n = this.node();
+        return n.body();
     }
 
-    /** Write the statement to an output file. */
     @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
         w.write("for (");
@@ -273,7 +267,8 @@ public class ExtendedFor_c extends Loop_c implements ExtendedFor {
         w.end();
         w.write(")");
 
-        printSubStmt(body, w, tr);
+        Loop n = this.node();
+        printSubStmt(n.body(), w, tr);
     }
 
 }

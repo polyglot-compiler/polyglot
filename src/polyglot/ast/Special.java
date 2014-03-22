@@ -30,10 +30,10 @@ import polyglot.util.Enum;
 import polyglot.util.SerialVersionUID;
 
 /**
- * A <code>Special</code> is an immutable representation of a
- * reference to <code>this</code> or <code>super</code in Java.  This
+ * A {@code Special} is an immutable representation of a
+ * reference to {@code this} or {@code super} in Java.  This
  * reference can be optionally qualified with a type such as 
- * <code>Foo.this</code>.
+ * {@code Foo.this}.
  */
 public interface Special extends Expr {
     /** Special expression kind: either "super" or "this". */

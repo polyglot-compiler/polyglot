@@ -33,6 +33,7 @@ import polyglot.types.Context;
 import polyglot.types.SemanticException;
 import polyglot.types.TypeSystem;
 import polyglot.util.CodeWriter;
+import polyglot.util.Copy;
 import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
 import polyglot.visit.CFGBuilder;
@@ -41,10 +42,10 @@ import polyglot.visit.PrettyPrinter;
 import polyglot.visit.TypeChecker;
 
 /**
- * A <code>Special</code> is an immutable representation of a
- * reference to <code>this</code> or <code>super</code in Java.  This
+ * A {@code Special} is an immutable representation of a
+ * reference to {@code this} or {@code super} in Java.  This
  * reference can be optionally qualified with a type such as 
- * <code>Foo.this</code>.
+ * {@code Foo.this}.
  */
 public class Special_c extends Expr_c implements Special {
     private static final long serialVersionUID = SerialVersionUID.generate();
@@ -52,66 +53,70 @@ public class Special_c extends Expr_c implements Special {
     protected Special.Kind kind;
     protected TypeNode qualifier;
 
+    @Deprecated
     public Special_c(Position pos, Special.Kind kind, TypeNode qualifier) {
-        super(pos);
+        this(pos, kind, qualifier, null);
+    }
+
+    public Special_c(Position pos, Special.Kind kind, TypeNode qualifier,
+            Ext ext) {
+        super(pos, ext);
         assert (kind != null); // qualifier may be null
         this.kind = kind;
         this.qualifier = qualifier;
     }
 
-    /** Get the precedence of the expression. */
     @Override
     public Precedence precedence() {
         return Precedence.LITERAL;
     }
 
-    /** Get the kind of the special expression, either this or super. */
     @Override
     public Special.Kind kind() {
         return this.kind;
     }
 
-    /** Set the kind of the special expression, either this or super. */
     @Override
     public Special kind(Special.Kind kind) {
-        Special_c n = (Special_c) copy();
+        return kind(this, kind);
+    }
+
+    protected <N extends Special_c> N kind(N n, Special.Kind kind) {
+        if (n.kind == kind) return n;
+        if (n == this) n = Copy.Util.copy(n);
         n.kind = kind;
         return n;
     }
 
-    /** Get the qualifier of the special expression. */
     @Override
     public TypeNode qualifier() {
         return this.qualifier;
     }
 
-    /** Set the qualifier of the special expression. */
     @Override
     public Special qualifier(TypeNode qualifier) {
-        Special_c n = (Special_c) copy();
+        return qualifier(this, qualifier);
+    }
+
+    protected <N extends Special_c> N qualifier(N n, TypeNode qualifier) {
+        if (n.qualifier == qualifier) return n;
+        if (n == this) n = Copy.Util.copy(n);
         n.qualifier = qualifier;
         return n;
     }
 
     /** Reconstruct the expression. */
-    protected Special_c reconstruct(TypeNode qualifier) {
-        if (qualifier != this.qualifier) {
-            Special_c n = (Special_c) copy();
-            n.qualifier = qualifier;
-            return n;
-        }
-
-        return this;
+    protected <N extends Special_c> N reconstruct(N n, TypeNode qualifier) {
+        n = qualifier(n, qualifier);
+        return n;
     }
 
-    /** Visit the children of the expression. */
     @Override
     public Node visitChildren(NodeVisitor v) {
-        TypeNode qualifier = (TypeNode) visitChild(this.qualifier, v);
-        return reconstruct(qualifier);
+        TypeNode qualifier = visitChild(this.qualifier, v);
+        return reconstruct(this, qualifier);
     }
 
-    /** Type check the expression. */
     @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
         TypeSystem ts = tc.typeSystem();
@@ -199,7 +204,6 @@ public class Special_c extends Expr_c implements Special {
         return String.valueOf(kind);
     }
 
-    /** Write the expression to an output file. */
     @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
         if (qualifier != null) {
@@ -210,7 +214,7 @@ public class Special_c extends Expr_c implements Special {
                 w.write(qualifier.name());
             }
             else {
-                qualifier.del().prettyPrint(w, tr);
+                tr.lang().prettyPrint(qualifier, w, tr);
             }
             w.write(".");
         }

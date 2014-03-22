@@ -27,8 +27,7 @@
 package polyglot.ast;
 
 /** 
- * An <code>CharLit</code> represents a literal in java of
- * <code>char</code> type.
+ * A {@code CharLit} represents a literal in java of {@code char} type.
  */
 public interface CharLit extends NumLit {
     /**

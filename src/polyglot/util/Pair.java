@@ -53,8 +53,7 @@ public class Pair<T, U> {
     @Override
     public boolean equals(Object o) {
         if (o instanceof Pair) {
-            @SuppressWarnings("rawtypes")
-            Pair p = (Pair) o;
+            Pair<?, ?> p = (Pair<?, ?>) o;
             return (part1 == null ? p.part1 == null : part1.equals(p.part1))
                     && (part2 == null ? p.part2 == null : part2.equals(p.part2));
         }

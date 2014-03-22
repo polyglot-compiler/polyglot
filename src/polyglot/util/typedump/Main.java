@@ -98,7 +98,7 @@ public class Main {
             StdErrorQueue eq =
                     new StdErrorQueue(System.err, 100, extInfo.compilerName());
 
-            Compiler compiler = new Compiler(extInfo, eq);
+            new Compiler(extInfo, eq);
 
             TypeSystem ts = extInfo.typeSystem();
             TypeDumper t = TypeDumper.load(className, ts, extInfo.version());
@@ -114,10 +114,6 @@ public class Main {
             catch (java.io.IOException exn) {
                 System.err.println(exn.getMessage());
             }
-        }
-        catch (java.io.IOException exn) {
-            System.err.println("IO errors.");
-            System.err.println(exn.getMessage());
         }
         catch (ClassNotFoundException exn) {
             System.err.println("Could not load .class: " + className);

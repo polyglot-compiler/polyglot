@@ -27,6 +27,7 @@ package polyglot.translate.ext;
 
 import polyglot.ast.Ext;
 import polyglot.ast.Ext_c;
+import polyglot.ast.JLang;
 import polyglot.ast.Node;
 import polyglot.translate.ExtensionRewriter;
 import polyglot.types.SemanticException;
@@ -46,6 +47,11 @@ public class ToExt_c extends Ext_c implements ToExt {
     }
 
     @Override
+    public final JLang lang() {
+        return superLang();
+    }
+
+    @Override
     public NodeVisitor toExtEnter(ExtensionRewriter rw)
             throws SemanticException {
         return rw;
@@ -53,7 +59,7 @@ public class ToExt_c extends Ext_c implements ToExt {
 
     @Override
     public Node toExt(ExtensionRewriter rw) throws SemanticException {
-        throw new InternalCompilerError("Cannot transalate " + node() + ":"
+        throw new InternalCompilerError("Cannot translate " + node() + ":"
                 + node().ext().getClass());
     }
 }

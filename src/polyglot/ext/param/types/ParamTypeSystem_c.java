@@ -44,25 +44,14 @@ import polyglot.util.Position;
  */
 public abstract class ParamTypeSystem_c<Formal extends Param, Actual extends TypeObject>
         extends TypeSystem_c implements ParamTypeSystem<Formal, Actual> {
-    /**
-     * Create a new mutable PClass.
-     *
-     * @param pos The position of the PClass.
-     */
+    protected Map<Map<Formal, ? extends Actual>, Subst<Formal, Actual>> substCache =
+            new HashMap<Map<Formal, ? extends Actual>, Subst<Formal, Actual>>();
+
     @Override
     public MuPClass<Formal, Actual> mutablePClass(Position pos) {
         return new MuPClass_c<Formal, Actual>(this, pos);
     }
 
-    /**
-     * Instantiate a parametric type on a list of actual parameters.
-     *
-     * @param pos The position of the instantiated type
-     * @param base The parameterized type
-     * @param actuals The list of actuals
-     *
-     * @throws SemanticException when the actuals do not agree with the formals
-     */
     @Override
     public ClassType instantiate(Position pos, PClass<Formal, Actual> base,
             List<? extends Actual> actuals) throws SemanticException {
@@ -125,29 +114,24 @@ public abstract class ParamTypeSystem_c<Formal extends Param, Actual extends Typ
         return inst.toClass();
     }
 
-    /**
-     * Apply a parameter substitution to a type.
-     *
-     * @param t The type on which we perform substitutions.
-     * @param substMap Map from formal parameters to actuals; the formals are
-     * not necessarily formals of <code>t</code>.
-     */
     @Override
     public Type subst(Type t, Map<Formal, ? extends Actual> substMap) {
         return subst(substMap).substType(t);
     }
 
-    /**
-     * Create a substitutor.
-     *
-     * @param substMap Map from formal parameters to actuals; the formals are
-     * not necessarily formals of <code>t</code>.
-     * @param cache Cache of substitutions performed, implemented as a map from
-     * type to substituted type.  This is passed in to ensure pointers to
-     * outer classes are substituted correctly.
-     */
     @Override
-    public Subst<Formal, Actual> subst(Map<Formal, ? extends Actual> substMap) {
+    public final Subst<Formal, Actual> subst(
+            Map<Formal, ? extends Actual> substMap) {
+        Subst<Formal, Actual> subst = substCache.get(substMap);
+        if (subst == null) {
+            subst = substImpl(substMap);
+            substCache.put(substMap, subst);
+        }
+        return subst;
+    }
+
+    protected Subst<Formal, Actual> substImpl(
+            Map<Formal, ? extends Actual> substMap) {
         return new Subst_c<Formal, Actual>(this, substMap);
     }
 }

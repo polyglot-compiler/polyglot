@@ -1,6 +1,5 @@
 package java_cup;
 
-import java.util.Enumeration;
 
 /** This class represents the complete "reduce-goto" table of the parser.
  *  It has one row for each state in the parse machines, and a column for
@@ -53,6 +52,7 @@ public class parse_reduce_table {
     /*-----------------------------------------------------------*/
 
     /** Convert to a string. */
+    @Override
     public String toString() {
         String result;
         lalr_state goto_st;
@@ -62,7 +62,7 @@ public class parse_reduce_table {
         for (int row = 0; row < num_states(); row++) {
             result += "From state #" + row + "\n";
             cnt = 0;
-            for (int col = 0; col < under_state[row].size(); col++) {
+            for (int col = 0; col < parse_reduce_row.size(); col++) {
                 /* pull out the table entry */
                 goto_st = under_state[row].under_non_term[col];
 

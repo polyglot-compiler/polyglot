@@ -34,6 +34,7 @@ import polyglot.types.Type;
 import polyglot.types.TypeSystem;
 import polyglot.util.CodeWriter;
 import polyglot.util.CollectionUtil;
+import polyglot.util.Copy;
 import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
 import polyglot.visit.AscriptionVisitor;
@@ -43,7 +44,7 @@ import polyglot.visit.PrettyPrinter;
 import polyglot.visit.TypeChecker;
 
 /**
- * An <code>ArrayAccess</code> is an immutable representation of an
+ * An {@code ArrayAccess} is an immutable representation of an
  * access of an array member.
  */
 public class ArrayAccess_c extends Expr_c implements ArrayAccess {
@@ -52,74 +53,77 @@ public class ArrayAccess_c extends Expr_c implements ArrayAccess {
     protected Expr array;
     protected Expr index;
 
+    @Deprecated
     public ArrayAccess_c(Position pos, Expr array, Expr index) {
-        super(pos);
+        this(pos, array, index, null);
+    }
+
+    public ArrayAccess_c(Position pos, Expr array, Expr index, Ext ext) {
+        super(pos, ext);
         assert (array != null && index != null);
         this.array = array;
         this.index = index;
     }
 
-    /** Get the precedence of the expression. */
     @Override
     public Precedence precedence() {
         return Precedence.LITERAL;
     }
 
-    /** Get the array of the expression. */
     @Override
     public Expr array() {
         return this.array;
     }
 
-    /** Set the array of the expression. */
     @Override
     public ArrayAccess array(Expr array) {
-        ArrayAccess_c n = (ArrayAccess_c) copy();
+        return array(this, array);
+    }
+
+    protected <N extends ArrayAccess_c> N array(N n, Expr array) {
+        if (n.array == array) return n;
+        if (n == this) n = Copy.Util.copy(n);
         n.array = array;
         return n;
     }
 
-    /** Get the index of the expression. */
     @Override
     public Expr index() {
         return this.index;
     }
 
-    /** Set the index of the expression. */
     @Override
     public ArrayAccess index(Expr index) {
-        ArrayAccess_c n = (ArrayAccess_c) copy();
+        return index(this, index);
+    }
+
+    protected <N extends ArrayAccess_c> N index(N n, Expr index) {
+        if (n.index == index) return n;
+        if (n == this) n = Copy.Util.copy(n);
         n.index = index;
         return n;
     }
 
-    /** Return the access flags of the variable. */
     @Override
     public Flags flags() {
         return Flags.NONE;
     }
 
     /** Reconstruct the expression. */
-    protected ArrayAccess_c reconstruct(Expr array, Expr index) {
-        if (array != this.array || index != this.index) {
-            ArrayAccess_c n = (ArrayAccess_c) copy();
-            n.array = array;
-            n.index = index;
-            return n;
-        }
-
-        return this;
+    protected <N extends ArrayAccess_c> N reconstruct(N n, Expr array,
+            Expr index) {
+        n = array(n, array);
+        n = index(n, index);
+        return n;
     }
 
-    /** Visit the children of the expression. */
     @Override
     public Node visitChildren(NodeVisitor v) {
-        Expr array = (Expr) visitChild(this.array, v);
-        Expr index = (Expr) visitChild(this.index, v);
-        return reconstruct(array, index);
+        Expr array = visitChild(this.array, v);
+        Expr index = visitChild(this.index, v);
+        return reconstruct(this, array, index);
     }
 
-    /** Type check the expression. */
     @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
         TypeSystem ts = tc.typeSystem();
@@ -157,7 +161,6 @@ public class ArrayAccess_c extends Expr_c implements ArrayAccess {
         return array + "[" + index + "]";
     }
 
-    /** Write the expression to an output file. */
     @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
         printSubExpr(array, w, tr);

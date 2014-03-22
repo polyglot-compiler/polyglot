@@ -33,6 +33,7 @@ import polyglot.types.SemanticException;
 import polyglot.types.Type;
 import polyglot.types.TypeSystem;
 import polyglot.util.CodeWriter;
+import polyglot.util.Copy;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
@@ -43,7 +44,7 @@ import polyglot.visit.PrettyPrinter;
 import polyglot.visit.TypeChecker;
 
 /**
- * An <code>Assign</code> represents a Java assignment expression.
+ * An {@code Assign} represents a Java assignment expression.
  */
 public abstract class Assign_c extends Expr_c implements Assign {
     private static final long serialVersionUID = SerialVersionUID.generate();
@@ -52,83 +53,89 @@ public abstract class Assign_c extends Expr_c implements Assign {
     protected Operator op;
     protected Expr right;
 
+    @Deprecated
     public Assign_c(Position pos, Expr left, Operator op, Expr right) {
-        super(pos);
+        this(pos, left, op, right, null);
+    }
+
+    public Assign_c(Position pos, Expr left, Operator op, Expr right, Ext ext) {
+        super(pos, ext);
         assert (left != null && op != null && right != null);
         this.left = left;
         this.op = op;
         this.right = right;
     }
 
-    /** Get the precedence of the expression. */
     @Override
     public Precedence precedence() {
         return Precedence.ASSIGN;
     }
 
-    /** Get the left operand of the expression. */
     @Override
     public Expr left() {
         return this.left;
     }
 
-    /** Set the left operand of the expression. */
     @Override
     public Assign left(Expr left) {
-        Assign_c n = (Assign_c) copy();
+        return left(this, left);
+    }
+
+    protected <N extends Assign_c> N left(N n, Expr left) {
+        if (n.left == left) return n;
+        if (n == this) n = Copy.Util.copy(n);
         n.left = left;
         return n;
     }
 
-    /** Get the operator of the expression. */
     @Override
     public Operator operator() {
         return this.op;
     }
 
-    /** Set the operator of the expression. */
     @Override
     public Assign operator(Operator op) {
-        Assign_c n = (Assign_c) copy();
+        return operator(this, op);
+    }
+
+    protected <N extends Assign_c> N operator(N n, Operator op) {
+        if (n.op == op) return n;
+        if (n == this) n = Copy.Util.copy(n);
         n.op = op;
         return n;
     }
 
-    /** Get the right operand of the expression. */
     @Override
     public Expr right() {
         return this.right;
     }
 
-    /** Set the right operand of the expression. */
     @Override
     public Assign right(Expr right) {
-        Assign_c n = (Assign_c) copy();
+        return right(this, right);
+    }
+
+    protected <N extends Assign_c> N right(N n, Expr right) {
+        if (n.right == right) return n;
+        if (n == this) n = Copy.Util.copy(n);
         n.right = right;
         return n;
     }
 
     /** Reconstruct the expression. */
-    protected Assign_c reconstruct(Expr left, Expr right) {
-        if (left != this.left || right != this.right) {
-            Assign_c n = (Assign_c) copy();
-            n.left = left;
-            n.right = right;
-            return n;
-        }
-
-        return this;
+    protected <N extends Assign_c> N reconstruct(N n, Expr left, Expr right) {
+        n = left(n, left);
+        n = right(n, right);
+        return n;
     }
 
-    /** Visit the children of the expression. */
     @Override
     public Node visitChildren(NodeVisitor v) {
-        Expr left = (Expr) visitChild(this.left, v);
-        Expr right = (Expr) visitChild(this.right, v);
-        return reconstruct(left, right);
+        Expr left = visitChild(this.left, v);
+        Expr right = visitChild(this.right, v);
+        return reconstruct(this, left, right);
     }
 
-    /** Type check the expression. */
     @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
         Type t = left.type();
@@ -142,8 +149,12 @@ public abstract class Assign_c extends Expr_c implements Assign {
         }
 
         if (op == ASSIGN) {
-            if (!ts.isImplicitCastValid(s, t) && !ts.typeEquals(s, t)
-                    && !ts.numericConversionValid(t, right.constantValue())) {
+            if (!ts.isImplicitCastValid(s, t)
+                    && !ts.typeEquals(s, t)
+                    && !ts.numericConversionValid(t,
+                                                  tc.lang()
+                                                    .constantValue(right,
+                                                                   tc.lang()))) {
 
                 throw new SemanticException("Cannot assign " + s + " to " + t
                         + ".", position());
@@ -256,7 +267,6 @@ public abstract class Assign_c extends Expr_c implements Assign {
                 + op + ".");
     }
 
-    /** Get the throwsArithmeticException of the expression. */
     @Override
     public boolean throwsArithmeticException() {
         // conservatively assume that any division or mod may throw
@@ -270,7 +280,6 @@ public abstract class Assign_c extends Expr_c implements Assign {
         return left + " " + op + " " + right;
     }
 
-    /** Write the expression to an output file. */
     @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
         printSubExpr(left, true, w, tr);
@@ -282,7 +291,6 @@ public abstract class Assign_c extends Expr_c implements Assign {
         w.end();
     }
 
-    /** Dumps the AST. */
     @Override
     public void dump(CodeWriter w) {
         super.dump(w);

@@ -26,14 +26,15 @@
 
 package polyglot.ast;
 
-import polyglot.types.ImportTable;
-import polyglot.frontend.Source;
 import java.util.List;
 
+import polyglot.frontend.Source;
+import polyglot.types.ImportTable;
+
 /**
- * A <code>SourceFile</code> is an immutable representations of a Java
+ * A {@code SourceFile} is an immutable representations of a Java
  * language source file.  It consists of a package name, a list of 
- * <code>Import</code>s, and a list of <code>GlobalDecl</code>s.
+ * {@code Import}s, and a list of {@code GlobalDecl}s.
  */
 public interface SourceFile extends Node {
     /** Get the source's declared package. */

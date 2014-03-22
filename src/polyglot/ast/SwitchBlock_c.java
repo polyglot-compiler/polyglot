@@ -33,17 +33,22 @@ import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
 
 /**
- * A <code>SwitchBlock</code> is a list of statements within a switch.
+ * A {@code SwitchBlock} is a list of statements within a switch.
  */
 public class SwitchBlock_c extends AbstractBlock_c implements SwitchBlock {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
+    @Deprecated
     public SwitchBlock_c(Position pos, List<Stmt> statements) {
-        super(pos, statements);
+        this(pos, statements, null);
+    }
+
+    public SwitchBlock_c(Position pos, List<Stmt> statements, Ext ext) {
+        super(pos, statements, ext);
     }
 
     /**
-     * A <code>SwitchBlock</code> differs from a normal block in that 
+     * A {@code SwitchBlock} differs from a normal block in that 
      * declarations made in the context of the switch block are in the scope 
      * following the switch block. For example
      * <pre>

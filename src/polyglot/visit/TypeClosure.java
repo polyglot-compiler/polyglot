@@ -27,10 +27,15 @@ package polyglot.visit;
 
 import polyglot.ast.Call;
 import polyglot.ast.Field;
+import polyglot.ast.JLang;
 import polyglot.ast.New;
 import polyglot.ast.Node;
 
 public class TypeClosure extends NodeVisitor {
+    public TypeClosure(JLang lang) {
+        super(lang);
+    }
+
     @Override
     public Node leave(Node parent, Node old, Node n, NodeVisitor v) {
         if (n instanceof Call) {

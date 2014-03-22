@@ -30,6 +30,7 @@ import java.util.List;
 
 import polyglot.util.CodeWriter;
 import polyglot.util.CollectionUtil;
+import polyglot.util.Copy;
 import polyglot.util.ListUtil;
 import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
@@ -37,15 +38,23 @@ import polyglot.visit.NodeVisitor;
 import polyglot.visit.PrettyPrinter;
 
 /**
- * A <code>SourceCollection</code> represents a collection of source files.
+ * A {@code SourceCollection} represents a collection of source files.
+ * This node should be used only during AST rewriting, just before code
+ * generation in order to generate multiple target files from a single
+ * AST.
  */
 public class SourceCollection_c extends Node_c implements SourceCollection {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
     protected List<SourceFile> sources;
 
+    @Deprecated
     public SourceCollection_c(Position pos, List<SourceFile> sources) {
-        super(pos);
+        this(pos, sources, null);
+    }
+
+    public SourceCollection_c(Position pos, List<SourceFile> sources, Ext ext) {
+        super(pos, ext);
         assert (sources != null);
         this.sources = ListUtil.copy(sources, true);
     }
@@ -55,39 +64,37 @@ public class SourceCollection_c extends Node_c implements SourceCollection {
         return sources.toString();
     }
 
-    /** Get the source files. */
     @Override
     public List<SourceFile> sources() {
         return this.sources;
     }
 
-    /** Set the statements of the block. */
     @Override
     public SourceCollection sources(List<SourceFile> sources) {
-        SourceCollection_c n = (SourceCollection_c) copy();
+        return sources(this, sources);
+    }
+
+    protected <N extends SourceCollection_c> N sources(N n,
+            List<SourceFile> sources) {
+        if (CollectionUtil.equals(n.sources, sources)) return n;
+        if (n == this) n = Copy.Util.copy(n);
         n.sources = ListUtil.copy(sources, true);
         return n;
     }
 
     /** Reconstruct the collection. */
-    protected SourceCollection_c reconstruct(List<SourceFile> sources) {
-        if (!CollectionUtil.equals(sources, this.sources)) {
-            SourceCollection_c n = (SourceCollection_c) copy();
-            n.sources = ListUtil.copy(sources, true);
-            return n;
-        }
-
-        return this;
+    protected <N extends SourceCollection_c> N reconstruct(N n,
+            List<SourceFile> sources) {
+        n = sources(n, sources);
+        return n;
     }
 
-    /** Visit the children of the block. */
     @Override
     public Node visitChildren(NodeVisitor v) {
         List<SourceFile> sources = visitList(this.sources, v);
-        return reconstruct(sources);
+        return reconstruct(this, sources);
     }
 
-    /** Write the source files to an output file. */
     @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
         for (SourceFile s : sources) {

@@ -38,7 +38,7 @@ import java.util.TreeSet;
 import polyglot.util.SerialVersionUID;
 
 /**
- * <code>Flags</code> is an immutable set of class, method, or field modifiers.
+ * {@code Flags} is an immutable set of class, method, or field modifiers.
  * We represent package scope as the absence of private, public and protected
  * scope modifiers.
  */
@@ -153,7 +153,7 @@ public class Flags implements Serializable {
     }
 
     /**
-     * Create new flags with the flags in <code>other</code> also set.
+     * Create new flags with the flags in {@code other} also set.
      */
     public Flags set(Flags other) {
         Flags f = new Flags();
@@ -163,7 +163,7 @@ public class Flags implements Serializable {
     }
 
     /**
-     * Create new flags with the flags in <code>other</code> cleared.
+     * Create new flags with the flags in {@code other} cleared.
      */
     public Flags clear(Flags other) {
         Flags f = new Flags();
@@ -173,7 +173,7 @@ public class Flags implements Serializable {
     }
 
     /**
-     * Create new flags with only flags in <code>other</code> set.
+     * Create new flags with only flags in {@code other} set.
      */
     public Flags retain(Flags other) {
         Flags f = new Flags();
@@ -183,7 +183,7 @@ public class Flags implements Serializable {
     }
 
     /**
-     * Check if <i>any</i> flags in <code>other</code> are set.
+     * Check if <i>any</i> flags in {@code other} are set.
      */
     public boolean intersects(Flags other) {
         for (String name : this.flags) {
@@ -195,14 +195,14 @@ public class Flags implements Serializable {
     }
 
     /**
-     * Check if <i>all</i> flags in <code>other</code> are set.
+     * Check if <i>all</i> flags in {@code other} are set.
      */
     public boolean contains(Flags other) {
         return this.flags.containsAll(other.flags);
     }
 
     /**
-     * Return a copy of this <code>this</code> with the <code>public</code>
+     * Return a copy of this {@code this} with the {@code public}
      * flag set.
      */
     public Flags Public() {
@@ -210,7 +210,7 @@ public class Flags implements Serializable {
     }
 
     /**
-     * Return a copy of this <code>this</code> with the <code>public</code>
+     * Return a copy of this {@code this} with the {@code public}
      * flag clear.
      */
     public Flags clearPublic() {
@@ -218,14 +218,14 @@ public class Flags implements Serializable {
     }
 
     /**
-     * Return true if <code>this</code> has the <code>public</code> flag set.
+     * Return true if {@code this} has the {@code public} flag set.
      */
     public boolean isPublic() {
         return contains(PUBLIC);
     }
 
     /**
-     * Return a copy of this <code>this</code> with the <code>private</code>
+     * Return a copy of this {@code this} with the {@code private}
      * flag set.
      */
     public Flags Private() {
@@ -233,7 +233,7 @@ public class Flags implements Serializable {
     }
 
     /**
-     * Return a copy of this <code>this</code> with the <code>private</code>
+     * Return a copy of this {@code this} with the {@code private}
      * flag clear.
      */
     public Flags clearPrivate() {
@@ -241,14 +241,14 @@ public class Flags implements Serializable {
     }
 
     /**
-     * Return true if <code>this</code> has the <code>private</code> flag set.
+     * Return true if {@code this} has the {@code private} flag set.
      */
     public boolean isPrivate() {
         return contains(PRIVATE);
     }
 
     /**
-     * Return a copy of this <code>this</code> with the <code>protected</code>
+     * Return a copy of this {@code this} with the {@code protected}
      * flag set.
      */
     public Flags Protected() {
@@ -256,7 +256,7 @@ public class Flags implements Serializable {
     }
 
     /**
-     * Return a copy of this <code>this</code> with the <code>protected</code>
+     * Return a copy of this {@code this} with the {@code protected}
      * flag clear.
      */
     public Flags clearProtected() {
@@ -264,30 +264,30 @@ public class Flags implements Serializable {
     }
 
     /**
-     * Return true if <code>this</code> has the <code>protected</code> flag set.
+     * Return true if {@code this} has the {@code protected} flag set.
      */
     public boolean isProtected() {
         return contains(PROTECTED);
     }
 
     /**
-     * Return a copy of this <code>this</code> with no access flags
-     * (<code>public</code>, <code>private</code>, <code>protected</code>) set.
+     * Return a copy of this {@code this} with no access flags
+     * ({@code public}, {@code private}, {@code protected}) set.
      */
     public Flags Package() {
         return clear(ACCESS_FLAGS);
     }
 
     /**
-     * Return true if <code>this</code> has the no access flags
-     * (<code>public</code>, <code>private</code>, <code>protected</code>) set.
+     * Return true if {@code this} has the no access flags
+     * ({@code public}, {@code private}, {@code protected}) set.
      */
     public boolean isPackage() {
         return !intersects(ACCESS_FLAGS);
     }
 
     /**
-     * Return a copy of this <code>this</code> with the <code>static</code>
+     * Return a copy of this {@code this} with the {@code static}
      * flag set.
      */
     public Flags Static() {
@@ -295,7 +295,7 @@ public class Flags implements Serializable {
     }
 
     /**
-     * Return a copy of this <code>this</code> with the <code>static</code>
+     * Return a copy of this {@code this} with the {@code static}
      * flag clear.
      */
     public Flags clearStatic() {
@@ -303,14 +303,14 @@ public class Flags implements Serializable {
     }
 
     /**
-     * Return true if <code>this</code> has the <code>static</code> flag set.
+     * Return true if {@code this} has the {@code static} flag set.
      */
     public boolean isStatic() {
         return contains(STATIC);
     }
 
     /**
-     * Return a copy of this <code>this</code> with the <code>final</code>
+     * Return a copy of this {@code this} with the {@code final}
      * flag set.
      */
     public Flags Final() {
@@ -318,7 +318,7 @@ public class Flags implements Serializable {
     }
 
     /**
-     * Return a copy of this <code>this</code> with the <code>final</code>
+     * Return a copy of this {@code this} with the {@code final}
      * flag clear.
      */
     public Flags clearFinal() {
@@ -326,30 +326,30 @@ public class Flags implements Serializable {
     }
 
     /**
-     * Return true if <code>this</code> has the <code>final</code> flag set.
+     * Return true if {@code this} has the {@code final} flag set.
      */
     public boolean isFinal() {
         return contains(FINAL);
     }
 
     /**
-     * Return a copy of this <code>this</code> with the
-     * <code>synchronized</code> flag set.
+     * Return a copy of this {@code this} with the
+     * {@code synchronized} flag set.
      */
     public Flags Synchronized() {
         return set(SYNCHRONIZED);
     }
 
     /**
-     * Return a copy of this <code>this</code> with the
-     * <code>synchronized</code> flag clear.
+     * Return a copy of this {@code this} with the
+     * {@code synchronized} flag clear.
      */
     public Flags clearSynchronized() {
         return clear(SYNCHRONIZED);
     }
 
     /**
-     * Return true if <code>this</code> has the <code>synchronized</code> flag
+     * Return true if {@code this} has the {@code synchronized} flag
      * set.
      */
     public boolean isSynchronized() {
@@ -357,7 +357,7 @@ public class Flags implements Serializable {
     }
 
     /**
-     * Return a copy of this <code>this</code> with the <code>transient</code>
+     * Return a copy of this {@code this} with the {@code transient}
      * flag set.
      */
     public Flags Transient() {
@@ -365,7 +365,7 @@ public class Flags implements Serializable {
     }
 
     /**
-     * Return a copy of this <code>this</code> with the <code>transient</code>
+     * Return a copy of this {@code this} with the {@code transient}
      * flag clear.
      */
     public Flags clearTransient() {
@@ -373,14 +373,14 @@ public class Flags implements Serializable {
     }
 
     /**
-     * Return true if <code>this</code> has the <code>transient</code> flag set.
+     * Return true if {@code this} has the {@code transient} flag set.
      */
     public boolean isTransient() {
         return contains(TRANSIENT);
     }
 
     /**
-     * Return a copy of this <code>this</code> with the <code>native</code>
+     * Return a copy of this {@code this} with the {@code native}
      * flag set.
      */
     public Flags Native() {
@@ -388,7 +388,7 @@ public class Flags implements Serializable {
     }
 
     /**
-     * Return a copy of this <code>this</code> with the <code>native</code>
+     * Return a copy of this {@code this} with the {@code native}
      * flag clear.
      */
     public Flags clearNative() {
@@ -396,14 +396,14 @@ public class Flags implements Serializable {
     }
 
     /**
-     * Return true if <code>this</code> has the <code>native</code> flag set.
+     * Return true if {@code this} has the {@code native} flag set.
      */
     public boolean isNative() {
         return contains(NATIVE);
     }
 
     /**
-     * Return a copy of this <code>this</code> with the <code>interface</code>
+     * Return a copy of this {@code this} with the {@code interface}
      * flag set.
      */
     public Flags Interface() {
@@ -411,7 +411,7 @@ public class Flags implements Serializable {
     }
 
     /**
-     * Return a copy of this <code>this</code> with the <code>interface</code>
+     * Return a copy of this {@code this} with the {@code interface}
      * flag clear.
      */
     public Flags clearInterface() {
@@ -419,14 +419,14 @@ public class Flags implements Serializable {
     }
 
     /**
-     * Return true if <code>this</code> has the <code>interface</code> flag set.
+     * Return true if {@code this} has the {@code interface} flag set.
      */
     public boolean isInterface() {
         return contains(INTERFACE);
     }
 
     /**
-     * Return a copy of this <code>this</code> with the <code>abstract</code>
+     * Return a copy of this {@code this} with the {@code abstract}
      * flag set.
      */
     public Flags Abstract() {
@@ -434,7 +434,7 @@ public class Flags implements Serializable {
     }
 
     /**
-     * Return a copy of this <code>this</code> with the <code>abstract</code>
+     * Return a copy of this {@code this} with the {@code abstract}
      * flag clear.
      */
     public Flags clearAbstract() {
@@ -442,14 +442,14 @@ public class Flags implements Serializable {
     }
 
     /**
-     * Return true if <code>this</code> has the <code>abstract</code> flag set.
+     * Return true if {@code this} has the {@code abstract} flag set.
      */
     public boolean isAbstract() {
         return contains(ABSTRACT);
     }
 
     /**
-     * Return a copy of this <code>this</code> with the <code>volatile</code>
+     * Return a copy of this {@code this} with the {@code volatile}
      * flag set.
      */
     public Flags Volatile() {
@@ -457,7 +457,7 @@ public class Flags implements Serializable {
     }
 
     /**
-     * Return a copy of this <code>this</code> with the <code>volatile</code>
+     * Return a copy of this {@code this} with the {@code volatile}
      * flag clear.
      */
     public Flags clearVolatile() {
@@ -465,14 +465,14 @@ public class Flags implements Serializable {
     }
 
     /**
-     * Return true if <code>this</code> has the <code>volatile</code> flag set.
+     * Return true if {@code this} has the {@code volatile} flag set.
      */
     public boolean isVolatile() {
         return contains(VOLATILE);
     }
 
     /**
-     * Return a copy of this <code>this</code> with the <code>strictfp</code>
+     * Return a copy of this {@code this} with the {@code strictfp}
      * flag set.
      */
     public Flags StrictFP() {
@@ -480,7 +480,7 @@ public class Flags implements Serializable {
     }
 
     /**
-     * Return a copy of this <code>this</code> with the <code>strictfp</code>
+     * Return a copy of this {@code this} with the {@code strictfp}
      * flag clear.
      */
     public Flags clearStrictFP() {
@@ -488,15 +488,15 @@ public class Flags implements Serializable {
     }
 
     /**
-     * Return true if <code>this</code> has the <code>strictfp</code> flag set.
+     * Return true if {@code this} has the {@code strictfp} flag set.
      */
     public boolean isStrictFP() {
         return contains(STRICTFP);
     }
 
     /**
-     * Return true if <code>this</code> has more restrictive access flags than
-     * <code>f</code>.
+     * Return true if {@code this} has more restrictive access flags than
+     * {@code f}.
      */
     public boolean moreRestrictiveThan(Flags f) {
         if (isPrivate() && (f.isProtected() || f.isPackage() || f.isPublic())) {

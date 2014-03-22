@@ -39,7 +39,7 @@ import polyglot.frontend.Scheduler;
 import polyglot.util.StringUtil;
 
 /**
- * An <code>AbstractGoal</code> is the base class of most <code>Goal</code>
+ * An {@code AbstractGoal} is the base class of most {@code Goal}
  * implementations.
  *
  * @author nystrom

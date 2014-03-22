@@ -239,7 +239,7 @@ public class TVCaster extends AscriptionVisitor {
         return false;
     }
 
-    private JL5ParsedClassType getBase(ReferenceType container) {
+    private static JL5ParsedClassType getBase(ReferenceType container) {
         if (container instanceof JL5SubstClassType) {
             return ((JL5SubstClassType) container).base();
         }

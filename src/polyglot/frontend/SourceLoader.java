@@ -37,23 +37,23 @@ public interface SourceLoader {
     /**
      * @param name
      *            A package name
-     * @return true if a package <code>name</code> exists, otherwise false
+     * @return true if a package {@code name} exists, otherwise false
      */
     boolean packageExists(String name);
 
     /**
      * @param location
-     *            A location to search a package <code>name</code> in
+     *            A location to search a package {@code name} in
      * @param name
      *            A package name
-     * @return true if a package <code>name</code> exists, otherwise false
+     * @return true if a package {@code name} exists, otherwise false
      */
     boolean packageExists(Location location, String name);
 
     /**
      * @param fileName
      *            A source file name
-     * @return A FileSource if a source file <code>fileName</code> exists in
+     * @return A FileSource if a source file {@code fileName} exists in
      *         source path
      * @throws IOException
      */
@@ -64,7 +64,7 @@ public interface SourceLoader {
      *            A source file name
      * @param userSpecified
      *            If the user has specified this source file explicitly
-     * @return A FileSource if a source file <code>fileName</code> exists in
+     * @return A FileSource if a source file {@code fileName} exists in
      *         source path
      * @throws IOException
      */
@@ -76,7 +76,7 @@ public interface SourceLoader {
      *            A location to search a source file in
      * @param fileName
      *            A source file name
-     * @return A FileSource if a source file <code>fileName</code> exists
+     * @return A FileSource if a source file {@code fileName} exists
      * @throws IOException
      */
     FileSource fileSource(Location location, String fileName)
@@ -89,7 +89,7 @@ public interface SourceLoader {
      *            A source file name
      * @param userSpecified
      *            If the user has specified this source file explicitly
-     * @return A FileSource if a source file <code>fileName</code> exists
+     * @return A FileSource if a source file {@code fileName} exists
      * @throws IOException
      */
     FileSource fileSource(Location location, String fileName,
@@ -103,7 +103,7 @@ public interface SourceLoader {
      * @param className
      *            A class name
      * @return A FileSource containing definition of the class
-     *         <code>className</code> if it exists in source path, otherwise
+     *         {@code className} if it exists in source path, otherwise
      *         null
      */
     FileSource classSource(String className);
@@ -111,11 +111,11 @@ public interface SourceLoader {
     /**
      * @param location
      *            A location to search a file in, that contains definition of
-     *            the class <code>className</code>
+     *            the class {@code className}
      * @param className
      *            A class name
      * @return A FileSource containing definition of the class
-     *         <code>className</code> if it exists in <code>location</code>,
+     *         {@code className} if it exists in {@code location},
      *         otherwise null
      */
     FileSource classSource(Location location, String className);

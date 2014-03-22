@@ -25,8 +25,11 @@
  ******************************************************************************/
 package polyglot.ext.jl5.ast;
 
+import java.util.List;
+
 import polyglot.ast.LocalDecl;
 import polyglot.ast.Node;
+import polyglot.ast.Term;
 import polyglot.ext.jl5.types.Annotations;
 import polyglot.ext.jl5.types.JL5LocalInstance;
 import polyglot.ext.jl5.types.TypeVariable;
@@ -41,6 +44,10 @@ import polyglot.visit.TypeChecker;
 
 public class JL5LocalDeclExt extends JL5AnnotatedElementExt {
     private static final long serialVersionUID = SerialVersionUID.generate();
+
+    public JL5LocalDeclExt(List<Term> annotations) {
+        super(annotations);
+    }
 
     @Override
     public void setAnnotations(Annotations annotations) {
@@ -73,15 +80,10 @@ public class JL5LocalDeclExt extends JL5AnnotatedElementExt {
         return super.typeCheck(tc);
     }
 
+    @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
-        JL5AnnotatedElementExt ext =
-                (JL5AnnotatedElementExt) JL5Ext.ext(this.node());
-        for (AnnotationElem ae : ext.annotationElems()) {
-            ae.del().prettyPrint(w, tr);
-            w.newline();
-        }
-
-        this.superDel().prettyPrint(w, tr);
+        super.prettyPrint(w, tr);
+        superLang().prettyPrint(node(), w, tr);
     }
 
 }

@@ -54,8 +54,8 @@ public final class ConcatenatedIterator<T> implements Iterator<T> {
      * order, of every element of the collection iters, in order.
      **/
     @SuppressWarnings("unchecked")
-    public ConcatenatedIterator(Collection<T> iters) {
-        this.backing_iterators = (Iterator<T>[]) iters.toArray();
+    public ConcatenatedIterator(Collection<Iterator<T>> iters) {
+        this.backing_iterators = iters.toArray(new Iterator[iters.size()]);
         findNextItem();
     }
 

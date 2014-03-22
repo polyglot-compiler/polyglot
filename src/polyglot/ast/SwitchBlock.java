@@ -27,7 +27,7 @@
 package polyglot.ast;
 
 /**
- * A <code>SwitchBlock</code> is a list of statements within a switch.
+ * A {@code SwitchBlock} is a list of statements within a switch.
  */
 public interface SwitchBlock extends SwitchElement, Block {
 }

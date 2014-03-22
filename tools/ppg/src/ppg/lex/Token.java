@@ -25,12 +25,16 @@
  ******************************************************************************/
 package ppg.lex;
 
-import java.io.*;
+import java.io.IOException;
+
+import java_cup.runtime.ComplexSymbolFactory;
+import java_cup.runtime.ComplexSymbolFactory.Location;
 import java_cup.runtime.Symbol;
-import ppg.parse.*;
+import ppg.parse.Constant;
 
 public class Token /* extends Symbol */implements LexerResult {
 
+    private static ComplexSymbolFactory csf = new ComplexSymbolFactory();
     private Symbol symbol;
     private String filename;
     private int lineno;
@@ -47,7 +51,12 @@ public class Token /* extends Symbol */implements LexerResult {
             Object value/*, Position pos*/) {
         // super(id, left, right, value);
 
-        symbol = new Symbol(id, left, right, this);
+        symbol =
+                csf.newSymbol(value.toString(),
+                              id,
+                              new Location(filename, lineno, left),
+                              new Location(filename, lineno, right),
+                              this);
         lastID = id;
         this.filename = filename;
         this.lineno = lineno;
@@ -113,6 +122,10 @@ public class Token /* extends Symbol */implements LexerResult {
             return "LBRACK";
         case Constant.RBRACK:
             return "RBRACK";
+        case Constant.LT:
+            return "LT";
+        case Constant.GT:
+            return "GT";
 
         case Constant.ID:
             return "ID";

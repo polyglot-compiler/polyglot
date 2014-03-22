@@ -32,28 +32,38 @@ import polyglot.util.SerialVersionUID;
 import polyglot.visit.CFGBuilder;
 
 /**
- * A <code>LocalAssign_c</code> represents a Java assignment expression
- * to a local variable.  For instance, <code>x = e</code>.
+ * A {@code LocalAssign} represents a Java assignment expression
+ * to a local variable.  For instance, {@code x = e}.
  * 
- * The class of the <code>Expr</code> returned by
- * <code>LocalAssign_c.left()</code>is guaranteed to be an <code>Local</code>.
+ * The class of the {@code Expr} returned by
+ * {@code LocalAssign_c.left()}is guaranteed to be an {@code Local}.
  */
 public class LocalAssign_c extends Assign_c implements LocalAssign {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
+    @Deprecated
     public LocalAssign_c(Position pos, Local left, Operator op, Expr right) {
-        super(pos, left, op, right);
+        this(pos, left, op, right, null);
+    }
+
+    public LocalAssign_c(Position pos, Local left, Operator op, Expr right,
+            Ext ext) {
+        super(pos, left, op, right, ext);
+    }
+
+    @Override
+    public Local left() {
+        return (Local) super.left();
     }
 
     @Override
     public Assign left(Expr left) {
-        LocalAssign_c n = (LocalAssign_c) super.left(left);
-        n.assertLeftType();
-        return n;
+        assertLeftType(left);
+        return super.left(left);
     }
 
-    private void assertLeftType() {
-        if (!(left() instanceof Local)) {
+    private static void assertLeftType(Expr left) {
+        if (!(left instanceof Local)) {
             throw new InternalCompilerError("left expression of an LocalAssign must be a local");
         }
     }

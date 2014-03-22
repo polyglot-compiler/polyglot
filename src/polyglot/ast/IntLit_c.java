@@ -29,6 +29,7 @@ package polyglot.ast;
 import polyglot.types.SemanticException;
 import polyglot.types.TypeSystem;
 import polyglot.util.CodeWriter;
+import polyglot.util.Copy;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
@@ -36,7 +37,7 @@ import polyglot.visit.PrettyPrinter;
 import polyglot.visit.TypeChecker;
 
 /**
- * An <code>IntLit</code> represents a literal in Java of an integer
+ * An {@code IntLit} represents a literal in Java of an integer
  * type.
  */
 public class IntLit_c extends NumLit_c implements IntLit {
@@ -45,51 +46,57 @@ public class IntLit_c extends NumLit_c implements IntLit {
     /** The kind of literal: INT or LONG. */
     protected Kind kind;
 
+    @Deprecated
     public IntLit_c(Position pos, Kind kind, long value) {
-        super(pos, value);
+        this(pos, kind, value, null);
+    }
+
+    public IntLit_c(Position pos, Kind kind, long value, Ext ext) {
+        super(pos, value, ext);
         assert (kind != null);
         this.kind = kind;
     }
 
-    /**
-     * @return True if this is a boundary case: the literal can only appear
-     * as the operand of a unary minus.
-     */
     @Override
     public boolean boundary() {
         return (kind == INT && (int) value == Integer.MIN_VALUE)
                 || (kind == LONG && value == Long.MIN_VALUE);
     }
 
-    /** Get the value of the expression. */
     @Override
     public long value() {
         return longValue();
     }
 
-    /** Set the value of the expression. */
     @Override
     public IntLit value(long value) {
-        IntLit_c n = (IntLit_c) copy();
+        return value(this, value);
+    }
+
+    protected <N extends IntLit_c> N value(N n, long value) {
+        if (n.value == value) return n;
+        if (n == this) n = Copy.Util.copy(n);
         n.value = value;
         return n;
     }
 
-    /** Get the kind of the expression. */
     @Override
     public IntLit.Kind kind() {
         return kind;
     }
 
-    /** Set the kind of the expression. */
     @Override
     public IntLit kind(IntLit.Kind kind) {
-        IntLit_c n = (IntLit_c) copy();
+        return kind(this, kind);
+    }
+
+    protected <N extends IntLit_c> N kind(N n, IntLit.Kind kind) {
+        if (n.kind == kind) return n;
+        if (n == this) n = Copy.Util.copy(n);
         n.kind = kind;
         return n;
     }
 
-    /** Type check the expression. */
     @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
         TypeSystem ts = tc.typeSystem();
@@ -151,7 +158,7 @@ public class IntLit_c extends NumLit_c implements IntLit {
     }
 
     @Override
-    public Object constantValue() {
+    public Object constantValue(Lang lang) {
         if (kind() == LONG) {
             return new Long(value);
         }

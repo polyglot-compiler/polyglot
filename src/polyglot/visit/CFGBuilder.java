@@ -35,6 +35,7 @@ import polyglot.ast.Branch;
 import polyglot.ast.Catch;
 import polyglot.ast.CodeNode;
 import polyglot.ast.CompoundStmt;
+import polyglot.ast.JLang;
 import polyglot.ast.Labeled;
 import polyglot.ast.Loop;
 import polyglot.ast.Return;
@@ -57,8 +58,12 @@ import polyglot.visit.FlowGraph.Peer;
 /**
  * Class used to construct a CFG.
  */
-public class CFGBuilder<FlowItem extends DataFlow.Item> implements Copy {
-    /** The flowgraph under construction. */
+public class CFGBuilder<FlowItem extends DataFlow.Item> implements
+        Copy<CFGBuilder<FlowItem>> {
+    /** The language this CFGBuilder operates on. */
+    private final JLang lang;
+
+    /** The flow graph under construction. */
     protected FlowGraph<FlowItem> graph;
 
     /** The type system. */
@@ -89,14 +94,14 @@ public class CFGBuilder<FlowItem extends DataFlow.Item> implements Copy {
      * To explain by example, consider the following code (which is assumed to not
      * be nested inside a finally block, and assume that S1 does not contain any 
      * try-finally block).
-     *   <code>try { S1 } finally { S2 }</code>
+     *   {@code try { S1 } finally { S2 }}
      * Assume that term t1 in S1 may complete abruptly. The code for S2 will be 
      * analyzed (at least) twice: once for normal termination of S1 (and so 
      * path_to_finally will be empty) and once for the abrupt completion of t1
      * (and so path_to_finally will be [t1]).
      *   
      * Consider the following code:
-     *   <code>try { try { S1 } finally { S2 } } finally { S3 }</code>
+     *   {@code try { try { S1 } finally { S2 } } finally { S3 }}
      * Assume that terms t1 in S1 and t2 in S2 may complete abruptly.
      * Nodes in S2 will be analyzed (at least) twice, with path_to_finally empty
      * (for normal termination of S1) and with path_to_empty equals [t1] (for
@@ -107,7 +112,7 @@ public class CFGBuilder<FlowItem extends DataFlow.Item> implements Copy {
      * abrupt completion of t2). 
      * 
      * Consider the following code:
-     *   <code>try { S1 } finally { try { S2 } finally { S3 } }</code>
+     *   {@code try { S1 } finally { try { S2 } finally { S3 } }}
      * Assume that terms t1 in S1 and t2 in S2 may complete abruptly.
      * Nodes in S2 will be analyzed (at least) twice, with path_to_finally empty
      * (for normal termination of S1) and with path_to_empty equals [t1] (for
@@ -160,8 +165,9 @@ public class CFGBuilder<FlowItem extends DataFlow.Item> implements Copy {
      */
     protected boolean exceptionEdgesToFinally;
 
-    public CFGBuilder(TypeSystem ts, FlowGraph<FlowItem> graph,
+    public CFGBuilder(JLang lang, TypeSystem ts, FlowGraph<FlowItem> graph,
             DataFlow<FlowItem> df) {
+        this.lang = lang;
         this.ts = ts;
         this.graph = graph;
         this.df = df;
@@ -171,6 +177,10 @@ public class CFGBuilder<FlowItem extends DataFlow.Item> implements Copy {
         this.skipInnermostCatches = false;
         this.errorEdgesToExitNode = false;
         this.exceptionEdgesToFinally = false;
+    }
+
+    public JLang lang() {
+        return this.lang;
     }
 
     public FlowGraph<FlowItem> graph() {
@@ -213,7 +223,7 @@ public class CFGBuilder<FlowItem extends DataFlow.Item> implements Copy {
 
     /**
      * Construct a new CFGBuilder with the a new innermost loop or
-     * try-block <code>n</code>.
+     * try-block {@code n}.
      */
     public CFGBuilder<FlowItem> push(Stmt n) {
         return push(n, false);
@@ -221,7 +231,7 @@ public class CFGBuilder<FlowItem extends DataFlow.Item> implements Copy {
 
     /**
      * Construct a new CFGBuilder with the a new innermost loop or
-     * try-block <code>n</code>, optionally skipping innermost catch blocks.
+     * try-block {@code n}, optionally skipping innermost catch blocks.
      */
     public CFGBuilder<FlowItem> push(Stmt n, boolean skipInnermostCatches) {
         CFGBuilder<FlowItem> v = copy();
@@ -269,9 +279,10 @@ public class CFGBuilder<FlowItem extends DataFlow.Item> implements Copy {
                             if (s instanceof Loop) {
                                 Loop loop = (Loop) s;
                                 edge(last_peer,
-                                     this.graph().peer(loop.continueTarget(),
-                                                       this.path_to_finally,
-                                                       Term.ENTRY),
+                                     this.graph()
+                                         .peer(lang().continueTarget(loop),
+                                               this.path_to_finally,
+                                               Term.ENTRY),
                                      FlowGraph.EDGE_KEY_OTHER);
                             }
                             else {
@@ -290,7 +301,7 @@ public class CFGBuilder<FlowItem extends DataFlow.Item> implements Copy {
                     Loop l = (Loop) c;
                     if (b.kind() == Branch.CONTINUE) {
                         edge(last_peer,
-                             this.graph().peer(l.continueTarget(),
+                             this.graph().peer(lang().continueTarget(l),
                                                this.path_to_finally,
                                                Term.ENTRY),
                              FlowGraph.EDGE_KEY_OTHER);
@@ -404,9 +415,9 @@ public class CFGBuilder<FlowItem extends DataFlow.Item> implements Copy {
     /**
      * Utility function to visit all edges in a list.
      * 
-     * If <code>entry</code> is Term.ENTRY, the final successor is
-     * <code>after</code>'s entry node; if it's Term.EXIT, it's 
-     * <code>after</code>'s exit.
+     * If {@code entry} is Term.ENTRY, the final successor is
+     * {@code after}'s entry node; if it's Term.EXIT, it's 
+     * {@code after}'s exit.
      */
     public void visitCFGList(List<? extends Term> elements, Term after,
             int entry) {
@@ -426,25 +437,25 @@ public class CFGBuilder<FlowItem extends DataFlow.Item> implements Copy {
     }
 
     /**
-     * Create an edge for a node <code>a</code> with a single successor
-     * <code>succ</code>.
+     * Create an edge for a node {@code a} with a single successor
+     * {@code succ}.
      * 
-     * The EdgeKey used for the edge from <code>a</code> to <code>succ</code>
+     * The EdgeKey used for the edge from {@code a} to {@code succ}
      * will be FlowGraph.EDGE_KEY_OTHER.
      * 
-     * If <code>entry</code> is Term.ENTRY, the successor is <code>succ</code>'s
-     * entry node; if it's Term.EXIT, it's <code>succ</code>'s exit.
+     * If {@code entry} is Term.ENTRY, the successor is {@code succ}'s
+     * entry node; if it's Term.EXIT, it's {@code succ}'s exit.
      */
     public void visitCFG(Term a, Term succ, int entry) {
         visitCFG(a, FlowGraph.EDGE_KEY_OTHER, succ, entry);
     }
 
     /**
-     * Create an edge for a node <code>a</code> with a single successor
-     * <code>succ</code>, and EdgeKey <code>edgeKey</code>.
+     * Create an edge for a node {@code a} with a single successor
+     * {@code succ}, and EdgeKey {@code edgeKey}.
      * 
-     * If <code>entry</code> is Term.ENTRY, the successor is <code>succ</code>'s
-     * entry node; if it's Term.EXIT, it's <code>succ</code>'s exit.
+     * If {@code entry} is Term.ENTRY, the successor is {@code succ}'s
+     * entry node; if it's Term.EXIT, it's {@code succ}'s exit.
      */
     public void visitCFG(Term a, FlowGraph.EdgeKey edgeKey, Term succ, int entry) {
         visitCFG(a,
@@ -452,11 +463,11 @@ public class CFGBuilder<FlowItem extends DataFlow.Item> implements Copy {
     }
 
     /**
-     * Create edges from node <code>a</code> to successors <code>succ1</code> 
-     * and <code>succ2</code> with EdgeKeys <code>edgeKey1</code> and
-     * <code>edgeKey2</code> respecitvely.
+     * Create edges from node {@code a} to successors {@code succ1} 
+     * and {@code succ2} with EdgeKeys {@code edgeKey1} and
+     * {@code edgeKey2} respectively.
      * 
-     * <code>entry1</code> and <code>entry2</code> determine whether the
+     * {@code entry1} and {@code entry2} determine whether the
      * successors are entry or exit nodes. They can be Term.ENTRY or Term.EXIT.
      */
     public void visitCFG(Term a, FlowGraph.EdgeKey edgeKey1, Term succ1,
@@ -470,10 +481,10 @@ public class CFGBuilder<FlowItem extends DataFlow.Item> implements Copy {
     }
 
     /**
-     * Create edges from node <code>a</code> to all successors <code>succ</code> 
-     * with the EdgeKey <code>edgeKey</code> for all edges created.
+     * Create edges from node {@code a} to all successors {@code succ} 
+     * with the EdgeKey {@code edgeKey} for all edges created.
      * 
-     * If <code>entry</code> is Term.ENTRY, all terms in <code>succ</code> are
+     * If {@code entry} is Term.ENTRY, all terms in {@code succ} are
      * treated as entry nodes; if it's Term.EXIT, they are treated as exit
      * nodes.
      */
@@ -489,12 +500,12 @@ public class CFGBuilder<FlowItem extends DataFlow.Item> implements Copy {
     }
 
     /**
-     * Create edges from node <code>a</code> to all successors
-     * <code>succ</code> with the EdgeKey <code>edgeKey</code> for all edges
+     * Create edges from node {@code a} to all successors
+     * {@code succ} with the EdgeKey {@code edgeKey} for all edges
      * created.
      * 
-     * The <code>entry</code> list must have the same size as
-     * <code>succ</code>, and each corresponding element determines whether a
+     * The {@code entry} list must have the same size as
+     * {@code succ}, and each corresponding element determines whether a
      * successor is an entry or exit node (using Term.ENTRY or Term.EXIT).
      */
     public void visitCFG(Term a, FlowGraph.EdgeKey edgeKey, List<Term> succ,
@@ -534,14 +545,14 @@ public class CFGBuilder<FlowItem extends DataFlow.Item> implements Copy {
     }
 
     /**
-     * Create edges for a node <code>a</code> with successors
-     * <code>succs</code>.
+     * Create edges for a node {@code a} with successors
+     * {@code succs}.
      * 
      * @param a the source node for the edges.
-     * @param succs a list of <code>EdgeKeyTermPair</code>s
+     * @param succs a list of {@code EdgeKeyTermPair}s
      */
     protected void visitCFG(Term a, List<EdgeKeyTermPair> succs) {
-        Term child = a.firstChild();
+        Term child = lang().firstChild(a);
 
         if (child == null) {
             edge(this, a, Term.ENTRY, a, Term.EXIT, FlowGraph.EDGE_KEY_OTHER);
@@ -558,7 +569,7 @@ public class CFGBuilder<FlowItem extends DataFlow.Item> implements Copy {
         if (Report.should_report(Report.cfg, 2))
             Report.report(2, "// node " + a + " -> " + succs);
 
-        succs = a.acceptCFG(this, succs);
+        succs = lang().acceptCFG(a, this, succs);
 
         for (EdgeKeyTermPair s : succs) {
             edge(a, s.term, s.entry, s.edgeKey);
@@ -568,7 +579,7 @@ public class CFGBuilder<FlowItem extends DataFlow.Item> implements Copy {
     }
 
     public void visitThrow(Term a) {
-        for (Type type : a.del().throwTypes(ts)) {
+        for (Type type : lang().throwTypes(a, ts)) {
             visitThrow(a, Term.EXIT, type);
         }
 
@@ -585,7 +596,7 @@ public class CFGBuilder<FlowItem extends DataFlow.Item> implements Copy {
     }
 
     /**
-     * Create edges for an exception thrown from term <code>t</code>.
+     * Create edges for an exception thrown from term {@code t}.
      */
     public void visitThrow(Term t, int entry, Type type) {
         Peer<FlowItem> last_peer =
@@ -655,10 +666,10 @@ public class CFGBuilder<FlowItem extends DataFlow.Item> implements Copy {
     /**
      * Create edges for the finally block of a try-finally construct. 
      * 
-     * @param v v.innermostTarget is the Try term that the finallyBlock is assoicated with.
+     * @param v v.innermostTarget is the Try term that the finallyBlock is associated with.
      * @param last is the last peer visited before the finally block is entered.
      * @param abruptCompletion is true if and only if the finally block is being entered
-     *        due to the (attempted) abrupt completion of the term <code>last.node</code>.
+     *        due to the (attempted) abrupt completion of the term {@code last.node}.
      * @param edgeKeyToFinally the EdgeKey to use for the edge going to the entry of the finally block. If null, then FlowGraph.EDGE_KEY_OTHER will be used.
      * @param finallyBlock the finally block associated with a try finally block.
      */
@@ -688,10 +699,10 @@ public class CFGBuilder<FlowItem extends DataFlow.Item> implements Copy {
     /**
      * Create edges for the finally block of a try-finally construct. 
      * 
-     * @param v v.innermostTarget is the Try term that the finallyBlock is assoicated with.
+     * @param v v.innermostTarget is the Try term that the finallyBlock is associated with.
      * @param last is the last peer visited before the finally block is entered.
      * @param abruptCompletion is true if and only if the finally block is being entered
-     *        due to the (attempted) abrupt completion of the term <code>last.node</code>.
+     *        due to the (attempted) abrupt completion of the term {@code last.node}.
      * @param finallyBlock the finally block associated with a try finally block.
      */
     protected static <FlowItem extends DataFlow.Item> Peer<FlowItem> tryFinally(
@@ -707,12 +718,12 @@ public class CFGBuilder<FlowItem extends DataFlow.Item> implements Copy {
     /** 
      * Enter a finally block. This method returns a new CFGBuilder
      * with the path_to_finally set appropriately.
-     * If we are entering the finally block because peer <code>from</code> is
+     * If we are entering the finally block because peer {@code from} is
      * (attempting to) complete abruptly, then the path_to_finally will have
-     * Term <code>from</code> appended to the path_to_finally list 
-     * of <code>from</code>. Otherwise, <code>from</code> is not attempting
+     * Term {@code from} appended to the path_to_finally list 
+     * of {@code from}. Otherwise, {@code from} is not attempting
      * to complete abruptly, and the path_to_finally will be the same as
-     * <code>from.path_to_finally</code>.
+     * {@code from.path_to_finally}.
      *  
      */
     protected CFGBuilder<FlowItem> enterFinally(Peer<FlowItem> from,
@@ -737,24 +748,24 @@ public class CFGBuilder<FlowItem extends DataFlow.Item> implements Copy {
     }
 
     /**
-     * Add an edge to the CFG from the exit of <code>p</code> to either the
-     * entry or exit of <code>q</code>.
+     * Add an edge to the CFG from the exit of {@code p} to either the
+     * entry or exit of {@code q}.
      */
     public void edge(Term p, Term q, int qEntry) {
         edge(this, p, q, qEntry, FlowGraph.EDGE_KEY_OTHER);
     }
 
     /**
-     * Add an edge to the CFG from the exit of <code>p</code> to either the
-     * entry or exit of <code>q</code>.
+     * Add an edge to the CFG from the exit of {@code p} to either the
+     * entry or exit of {@code q}.
      */
     public void edge(Term p, Term q, int qEntry, FlowGraph.EdgeKey edgeKey) {
         edge(this, p, q, qEntry, edgeKey);
     }
 
     /**
-     * Add an edge to the CFG from the exit of <code>p</code> to either the
-     * entry or exit of <code>q</code>.
+     * Add an edge to the CFG from the exit of {@code p} to either the
+     * entry or exit of {@code q}.
      */
     public void edge(CFGBuilder<FlowItem> p_visitor, Term p, Term q,
             int qEntry, FlowGraph.EdgeKey edgeKey) {
@@ -762,7 +773,7 @@ public class CFGBuilder<FlowItem extends DataFlow.Item> implements Copy {
     }
 
     /**
-     * Add an edge to the CFG from the exit of <code>p</code> to peer pq.
+     * Add an edge to the CFG from the exit of {@code p} to peer pq.
      */
     public void edge(CFGBuilder<FlowItem> p_visitor, Term p, Peer<FlowItem> pq,
             FlowGraph.EdgeKey edgeKey) {

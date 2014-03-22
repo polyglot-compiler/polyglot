@@ -33,7 +33,7 @@ import polyglot.frontend.passes.TypeExistsPass;
 import polyglot.types.TypeSystem;
 
 /**
- * Comment for <code>TypeExists</code>
+ * Comment for {@code TypeExists}
  *
  * @author nystrom
  */

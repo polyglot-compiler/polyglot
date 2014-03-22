@@ -37,7 +37,7 @@ public class OutputPass extends AbstractPass {
 
     /**
      * Create a Translator.  The output of the visitor is a collection of files
-     * whose names are added to the collection <code>outputFiles</code>.
+     * whose names are added to the collection {@code outputFiles}.
      */
     public OutputPass(Goal goal, Translator translator) {
         super(goal);

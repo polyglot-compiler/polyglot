@@ -47,8 +47,6 @@ public interface TypeVariable extends ReferenceType, Param {
 
     JL5ProcedureInstance declaringProcedure();
 
-    String name();
-
 //	void setBounds(List<ReferenceType> newBounds);
 //	List<ReferenceType> bounds();
     ReferenceType erasureType();

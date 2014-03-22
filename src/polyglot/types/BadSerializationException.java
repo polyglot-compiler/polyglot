@@ -31,7 +31,7 @@ import polyglot.util.SerialVersionUID;
 
 /**
  * Signals an error in the class resolver system. This exception is thrown
- * when a <code>ClassResolver</code> finds a class file that contains encoded 
+ * when a {@code ClassResolver} finds a class file that contains encoded 
  * Polyglot type information, but is unable to read in the serialized class 
  * information. The most likely cause of this exception is that the compiler 
  * (or compiler extension) has been modified since the class file was created, 

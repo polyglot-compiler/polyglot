@@ -29,6 +29,7 @@ package polyglot.ast;
 import java.util.Collections;
 import java.util.List;
 
+import polyglot.translate.ExtensionRewriter;
 import polyglot.types.Context;
 import polyglot.types.FieldInstance;
 import polyglot.types.Flags;
@@ -37,6 +38,7 @@ import polyglot.types.Type;
 import polyglot.types.TypeSystem;
 import polyglot.types.VarInstance;
 import polyglot.util.CodeWriter;
+import polyglot.util.Copy;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
@@ -49,9 +51,9 @@ import polyglot.visit.TypeBuilder;
 import polyglot.visit.TypeChecker;
 
 /**
- * A <code>Field</code> is an immutable representation of a Java field
+ * A {@code Field} is an immutable representation of a Java field
  * access.  It consists of field name and may also have either a 
- * <code>Type</code> or an <code>Expr</code> containing the field being 
+ * {@code Type} or an {@code Expr} containing the field being 
  * accessed.
  */
 public class Field_c extends Expr_c implements Field {
@@ -62,8 +64,13 @@ public class Field_c extends Expr_c implements Field {
     protected FieldInstance fi;
     protected boolean targetImplicit;
 
+    @Deprecated
     public Field_c(Position pos, Receiver target, Id name) {
-        super(pos);
+        this(pos, target, name, null);
+    }
+
+    public Field_c(Position pos, Receiver target, Id name, Ext ext) {
+        super(pos, ext);
         assert (target != null && name != null);
         this.target = target;
         this.name = name;
@@ -76,75 +83,78 @@ public class Field_c extends Expr_c implements Field {
         }
     }
 
-    /** Get the precedence of the field. */
     @Override
     public Precedence precedence() {
         return Precedence.LITERAL;
     }
 
-    /** Get the target of the field. */
     @Override
     public Receiver target() {
         return this.target;
     }
 
-    /** Set the target of the field. */
     @Override
     public Field target(Receiver target) {
-        Field_c n = (Field_c) copy();
+        return target(this, target);
+    }
+
+    protected <N extends Field_c> N target(N n, Receiver target) {
+        if (n.target == target) return n;
+        if (n == this) n = Copy.Util.copy(n);
         n.target = target;
         return n;
     }
 
-    /** Get the name of the field. */
     @Override
     public Id id() {
         return this.name;
     }
 
-    /** Set the name of the field. */
     @Override
     public Field id(Id name) {
-        Field_c n = (Field_c) copy();
+        return id(this, name);
+    }
+
+    protected <N extends Field_c> N id(N n, Id name) {
+        if (n.name == name) return n;
+        if (n == this) n = Copy.Util.copy(n);
         n.name = name;
         return n;
     }
 
-    /** Get the name of the field. */
     @Override
     public String name() {
         return this.name.id();
     }
 
-    /** Set the name of the field. */
     @Override
     public Field name(String name) {
         return id(this.name.id(name));
     }
 
-    /** Return the access flags of the variable. */
     @Override
     public Flags flags() {
         return fi.flags();
     }
 
-    /** Get the field instance of the field. */
     @Override
     public VarInstance varInstance() {
-        return fi;
+        return fieldInstance();
     }
 
-    /** Get the field instance of the field. */
     @Override
     public FieldInstance fieldInstance() {
         return fi;
     }
 
-    /** Set the field instance of the field. */
     @Override
     public Field fieldInstance(FieldInstance fi) {
-        if (fi == this.fi) return this;
-        Field_c n = (Field_c) copy();
+        return fieldInstance(this, fi);
+    }
+
+    protected <N extends Field_c> N fieldInstance(N n, FieldInstance fi) {
+        if (n.fi == fi) return n;
+        if (n == this) n = Copy.Util.copy(n);
         n.fi = fi;
         return n;
     }
@@ -155,30 +165,29 @@ public class Field_c extends Expr_c implements Field {
     }
 
     @Override
-    public Field targetImplicit(boolean implicit) {
-        Field_c n = (Field_c) copy();
-        n.targetImplicit = implicit;
+    public Field targetImplicit(boolean targetImplicit) {
+        return targetImplicit(this, targetImplicit);
+    }
+
+    protected <N extends Field_c> N targetImplicit(N n, boolean targetImplicit) {
+        if (n.targetImplicit == targetImplicit) return n;
+        if (n == this) n = Copy.Util.copy(n);
+        n.targetImplicit = targetImplicit;
         return n;
     }
 
     /** Reconstruct the field. */
-    protected Field_c reconstruct(Receiver target, Id name) {
-        if (target != this.target || name != this.name) {
-            Field_c n = (Field_c) copy();
-            n.target = target;
-            n.name = name;
-            return n;
-        }
-
-        return this;
+    protected <N extends Field_c> N reconstruct(N n, Receiver target, Id name) {
+        n = target(n, target);
+        n = id(n, name);
+        return n;
     }
 
-    /** Visit the children of the field. */
     @Override
     public Node visitChildren(NodeVisitor v) {
-        Receiver target = (Receiver) visitChild(this.target, v);
-        Id name = (Id) visitChild(this.name, v);
-        return reconstruct(target, name);
+        Receiver target = visitChild(this.target, v);
+        Id name = visitChild(this.name, v);
+        return reconstruct(this, target, name);
     }
 
     @Override
@@ -193,10 +202,10 @@ public class Field_c extends Expr_c implements Field {
                                  Flags.NONE,
                                  ts.unknownType(position()),
                                  name.id());
-        return n.fieldInstance(fi);
+        n = fieldInstance(n, fi);
+        return n;
     }
 
-    /** Type check the field. */
     @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
         Context c = tc.context();
@@ -213,7 +222,9 @@ public class Field_c extends Expr_c implements Field {
                         + target.getClass().getName() + ".");
             }
 
-            Field_c f = (Field_c) fieldInstance(fi).type(fi.type());
+            Field_c f = this;
+            f = fieldInstance(f, fi);
+            f = type(f, fi.type());
             f.checkConsistency(c);
 
             if (!fi.flags().isStatic() && target instanceof TypeNode) {
@@ -229,8 +240,8 @@ public class Field_c extends Expr_c implements Field {
         throw new SemanticException("Cannot access field \""
                                             + name.id()
                                             + "\" "
-                                            + (target instanceof Expr ? "on an expression "
-                                                    : "")
+                                            + (target instanceof Expr
+                                                    ? "on an expression " : "")
                                             + "of non-reference type \""
                                             + target.type() + "\".",
                                     target.position());
@@ -240,7 +251,7 @@ public class Field_c extends Expr_c implements Field {
     public Node checkConstants(ConstantChecker cc) throws SemanticException {
         // Just check if the field is constant to force a dependency to be
         // created.
-        isConstant();
+        cc.lang().isConstant(this, cc.lang());
         return this;
     }
 
@@ -253,7 +264,6 @@ public class Field_c extends Expr_c implements Field {
         return child.type();
     }
 
-    /** Write the field to an output file. */
     @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
         w.begin(0);
@@ -324,7 +334,29 @@ public class Field_c extends Expr_c implements Field {
     }
 
     @Override
-    public boolean constantValueSet() {
+    public NodeVisitor extRewriteEnter(ExtensionRewriter rw)
+            throws SemanticException {
+        if (isTargetImplicit()) {
+            // don't translate the target
+            return rw.bypass(target());
+        }
+        return super.extRewriteEnter(rw);
+    }
+
+    @Override
+    public Node extRewrite(ExtensionRewriter rw) throws SemanticException {
+        Field_c n = (Field_c) super.extRewrite(rw);
+        if (n.isTargetImplicit()) {
+            // don't translate the target.
+            // Need to have an ambiguous expression that will be disambiguated later
+            return rw.nodeFactory().AmbExpr(n.position(), n.id());
+        }
+        n = fieldInstance(n, null);
+        return n;
+    }
+
+    @Override
+    public boolean constantValueSet(Lang lang) {
         if (fi != null
                 && (target instanceof TypeNode || (target instanceof Special && targetImplicit))) {
             return fi.constantValueSet();
@@ -333,7 +365,7 @@ public class Field_c extends Expr_c implements Field {
     }
 
     @Override
-    public boolean isConstant() {
+    public boolean isConstant(Lang lang) {
         if (fi != null
                 && (target instanceof TypeNode || (target instanceof Special && targetImplicit))) {
             return fi.isConstant();
@@ -343,8 +375,8 @@ public class Field_c extends Expr_c implements Field {
     }
 
     @Override
-    public Object constantValue() {
-        if (isConstant()) {
+    public Object constantValue(Lang lang) {
+        if (lang.isConstant(this, lang)) {
             return fi.constantValue();
         }
 

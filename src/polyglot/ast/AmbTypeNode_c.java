@@ -28,6 +28,7 @@ package polyglot.ast;
 
 import polyglot.types.SemanticException;
 import polyglot.util.CodeWriter;
+import polyglot.util.Copy;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
@@ -39,7 +40,7 @@ import polyglot.visit.TypeBuilder;
 import polyglot.visit.TypeChecker;
 
 /**
- * An <code>AmbTypeNode</code> is an ambiguous AST node composed of
+ * An {@code AmbTypeNode} is an ambiguous AST node composed of
  * dot-separated list of identifiers that must resolve to a type.
  */
 public class AmbTypeNode_c extends TypeNode_c implements AmbTypeNode {
@@ -48,8 +49,13 @@ public class AmbTypeNode_c extends TypeNode_c implements AmbTypeNode {
     protected QualifierNode qual;
     protected Id name;
 
+    @Deprecated
     public AmbTypeNode_c(Position pos, QualifierNode qual, Id name) {
-        super(pos);
+        this(pos, qual, name, null);
+    }
+
+    public AmbTypeNode_c(Position pos, QualifierNode qual, Id name, Ext ext) {
+        super(pos, ext);
         assert (name != null); // qual may be null
         this.qual = qual;
         this.name = name;
@@ -62,7 +68,12 @@ public class AmbTypeNode_c extends TypeNode_c implements AmbTypeNode {
 
     @Override
     public AmbTypeNode id(Id name) {
-        AmbTypeNode_c n = (AmbTypeNode_c) copy();
+        return id(this, name);
+    }
+
+    protected <N extends AmbTypeNode_c> N id(N n, Id name) {
+        if (n.name == name) return n;
+        if (n == this) n = Copy.Util.copy(n);
         n.name = name;
         return n;
     }
@@ -84,32 +95,33 @@ public class AmbTypeNode_c extends TypeNode_c implements AmbTypeNode {
 
     @Override
     public AmbTypeNode qual(QualifierNode qual) {
-        AmbTypeNode_c n = (AmbTypeNode_c) copy();
+        return qual(this, qual);
+    }
+
+    protected <N extends AmbTypeNode_c> N qual(N n, QualifierNode qual) {
+        if (n.qual == qual) return n;
+        if (n == this) n = Copy.Util.copy(n);
         n.qual = qual;
         return n;
     }
 
-    protected AmbTypeNode_c reconstruct(QualifierNode qual, Id name) {
-        if (qual != this.qual || name != this.name) {
-            AmbTypeNode_c n = (AmbTypeNode_c) copy();
-            n.qual = qual;
-            n.name = name;
-            return n;
-        }
+    protected <N extends AmbTypeNode_c> N reconstruct(N n, QualifierNode qual,
+            Id name) {
+        n = qual(n, qual);
+        n = id(n, name);
+        return n;
+    }
 
-        return this;
+    @Override
+    public Node visitChildren(NodeVisitor v) {
+        QualifierNode qual = visitChild(this.qual, v);
+        Id name = visitChild(this.name, v);
+        return reconstruct(this, qual, name);
     }
 
     @Override
     public Node buildTypes(TypeBuilder tb) throws SemanticException {
         return type(tb.typeSystem().unknownType(position()));
-    }
-
-    @Override
-    public Node visitChildren(NodeVisitor v) {
-        QualifierNode qual = (QualifierNode) visitChild(this.qual, v);
-        Id name = (Id) visitChild(this.name, v);
-        return reconstruct(qual, name);
     }
 
     @Override

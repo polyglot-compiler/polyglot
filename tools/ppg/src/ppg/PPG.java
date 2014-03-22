@@ -26,9 +26,9 @@
 package ppg;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintStream;
 
@@ -50,7 +50,7 @@ public class PPG {
     }
 
     public static void main(String args[]) {
-        FileInputStream fileInput;
+        FileReader fileReader;
         String filename = null;
 
         try {
@@ -90,7 +90,7 @@ public class PPG {
         }
 
         try {
-            fileInput = new FileInputStream(filename);
+            fileReader = new FileReader(filename);
         }
         catch (FileNotFoundException e) {
             System.err.println("Error: " + filename + " is not found.");
@@ -101,7 +101,7 @@ public class PPG {
             return;
         }
 
-        Lexer lex = new Lexer(fileInput, filename);
+        Lexer lex = new Lexer(fileReader, filename);
 
         Parser parser = new Parser(filename, lex);
         try {

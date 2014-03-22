@@ -6,7 +6,7 @@ import polyglot.types.SemanticException;
 import polyglot.visit.ExceptionChecker;
 
 /**
- * This interface allows extension delegates both to override and reuse functionality in Try_c.
+ * This interface allows extensions both to override and reuse functionality in Try_c.
  *
  */
 public interface TryOps {

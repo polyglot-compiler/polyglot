@@ -30,7 +30,7 @@ import polyglot.util.Enum;
 import polyglot.util.SerialVersionUID;
 
 /** 
- * An <code>IntLit</code> represents a literal in Java of an integer
+ * An {@code IntLit} represents a literal in Java of an integer
  * type.
  */
 public interface IntLit extends NumLit {
@@ -59,7 +59,12 @@ public interface IntLit extends NumLit {
     /** Set the kind of the literal: INT or LONG. */
     IntLit kind(Kind kind);
 
-    /** Is this a boundary case, i.e., max int or max long + 1? */
+    /**
+     * Is this a boundary case, i.e., max int or max long + 1?
+     * 
+     * @return True if this is a boundary case: the literal can only appear
+     * as the operand of a unary minus.
+     */
     boolean boundary();
 
     /** Print the string as a positive number. */

@@ -33,6 +33,7 @@ import polyglot.types.SemanticException;
 import polyglot.types.Type;
 import polyglot.types.TypeSystem;
 import polyglot.util.CodeWriter;
+import polyglot.util.Copy;
 import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
 import polyglot.visit.AscriptionVisitor;
@@ -42,9 +43,9 @@ import polyglot.visit.PrettyPrinter;
 import polyglot.visit.TypeChecker;
 
 /**
- * A <code>Cast</code> is an immutable representation of a casting
- * operation.  It consists of an <code>Expr</code> being cast and a
- * <code>TypeNode</code> being cast to.
+ * A {@code Cast} is an immutable representation of a casting
+ * operation.  It consists of an {@code Expr} being cast and a
+ * {@code TypeNode} being cast to.
  */
 public class Cast_c extends Expr_c implements Cast {
     private static final long serialVersionUID = SerialVersionUID.generate();
@@ -52,68 +53,71 @@ public class Cast_c extends Expr_c implements Cast {
     protected TypeNode castType;
     protected Expr expr;
 
+    @Deprecated
     public Cast_c(Position pos, TypeNode castType, Expr expr) {
-        super(pos);
+        this(pos, castType, expr, null);
+    }
+
+    public Cast_c(Position pos, TypeNode castType, Expr expr, Ext ext) {
+        super(pos, ext);
         assert (castType != null && expr != null);
         this.castType = castType;
         this.expr = expr;
     }
 
-    /** Get the precedence of the expression. */
     @Override
     public Precedence precedence() {
         return Precedence.CAST;
     }
 
-    /** Get the cast type of the expression. */
     @Override
     public TypeNode castType() {
         return this.castType;
     }
 
-    /** Set the cast type of the expression. */
     @Override
     public Cast castType(TypeNode castType) {
-        Cast_c n = (Cast_c) copy();
+        return castType(this, castType);
+    }
+
+    protected <N extends Cast_c> N castType(N n, TypeNode castType) {
+        if (n.castType == castType) return n;
+        if (n == this) n = Copy.Util.copy(n);
         n.castType = castType;
         return n;
     }
 
-    /** Get the expression being cast. */
     @Override
     public Expr expr() {
         return this.expr;
     }
 
-    /** Set the expression being cast. */
     @Override
     public Cast expr(Expr expr) {
-        Cast_c n = (Cast_c) copy();
+        return expr(this, expr);
+    }
+
+    protected <N extends Cast_c> N expr(N n, Expr expr) {
+        if (n.expr == expr) return n;
+        if (n == this) n = Copy.Util.copy(n);
         n.expr = expr;
         return n;
     }
 
     /** Reconstruct the expression. */
-    protected Cast_c reconstruct(TypeNode castType, Expr expr) {
-        if (castType != this.castType || expr != this.expr) {
-            Cast_c n = (Cast_c) copy();
-            n.castType = castType;
-            n.expr = expr;
-            return n;
-        }
-
-        return this;
+    protected <N extends Cast_c> N reconstruct(N n, TypeNode castType, Expr expr) {
+        n = castType(n, castType);
+        n = expr(n, expr);
+        return n;
     }
 
-    /** Visit the children of the expression. */
     @Override
     public Node visitChildren(NodeVisitor v) {
-        TypeNode castType = (TypeNode) visitChild(this.castType, v);
-        Expr expr = (Expr) visitChild(this.expr, v);
-        return reconstruct(castType, expr);
+        TypeNode castType = visitChild(this.castType, v);
+        Expr expr = visitChild(this.expr, v);
+        return reconstruct(this, castType, expr);
     }
 
-    /** Type check the expression. */
     @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
         TypeSystem ts = tc.typeSystem();
@@ -152,7 +156,6 @@ public class Cast_c extends Expr_c implements Cast {
         return "(" + castType + ") " + expr;
     }
 
-    /** Write the expression to an output file. */
     @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
         w.begin(0);
@@ -186,13 +189,13 @@ public class Cast_c extends Expr_c implements Cast {
     }
 
     @Override
-    public boolean isConstant() {
-        return expr.isConstant() && castType.type().isPrimitive();
+    public boolean isConstant(Lang lang) {
+        return lang.isConstant(expr, lang) && castType.type().isPrimitive();
     }
 
     @Override
-    public Object constantValue() {
-        Object v = expr.constantValue();
+    public Object constantValue(Lang lang) {
+        Object v = lang.constantValue(expr, lang);
 
         if (v == null) {
             return null;

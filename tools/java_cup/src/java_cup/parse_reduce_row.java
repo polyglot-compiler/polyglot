@@ -31,6 +31,11 @@ public class parse_reduce_row {
         return _size;
     }
 
+    //Hm Added clear  to clear all static fields
+    public static void clear() {
+        _size = 0;
+    }
+
     /*-----------------------------------------------------------*/
     /*--- (Access to) Instance Variables ------------------------*/
     /*-----------------------------------------------------------*/

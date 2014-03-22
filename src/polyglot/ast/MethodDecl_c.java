@@ -28,13 +28,11 @@ package polyglot.ast;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 
 import polyglot.main.Report;
-import polyglot.types.CodeInstance;
+import polyglot.translate.ExtensionRewriter;
 import polyglot.types.Context;
 import polyglot.types.Flags;
 import polyglot.types.MemberInstance;
@@ -46,12 +44,11 @@ import polyglot.types.Type;
 import polyglot.types.TypeSystem;
 import polyglot.util.CodeWriter;
 import polyglot.util.CollectionUtil;
-import polyglot.util.ListUtil;
+import polyglot.util.Copy;
 import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
 import polyglot.visit.AmbiguityRemover;
 import polyglot.visit.CFGBuilder;
-import polyglot.visit.ExceptionChecker;
 import polyglot.visit.NodeVisitor;
 import polyglot.visit.PrettyPrinter;
 import polyglot.visit.TypeBuilder;
@@ -60,29 +57,24 @@ import polyglot.visit.TypeChecker;
 /**
  * A method declaration.
  */
-public class MethodDecl_c extends Term_c implements MethodDecl,
-        ProcedureDeclOps {
+public class MethodDecl_c extends ProcedureDecl_c implements MethodDecl {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
-    protected Flags flags;
     protected TypeNode returnType;
-    protected Id name;
-    protected List<Formal> formals;
-    protected List<TypeNode> throwTypes;
-    protected Block body;
     protected MethodInstance mi;
 
+    @Deprecated
     public MethodDecl_c(Position pos, Flags flags, TypeNode returnType,
             Id name, List<Formal> formals, List<TypeNode> throwTypes, Block body) {
-        super(pos);
-        assert (flags != null && returnType != null && name != null
-                && formals != null && throwTypes != null); // body may be null
-        this.flags = flags;
+        this(pos, flags, returnType, name, formals, throwTypes, body, null);
+    }
+
+    public MethodDecl_c(Position pos, Flags flags, TypeNode returnType,
+            Id name, List<Formal> formals, List<TypeNode> throwTypes,
+            Block body, Ext ext) {
+        super(pos, flags, name, formals, throwTypes, body, ext);
+        assert (returnType != null);
         this.returnType = returnType;
-        this.name = name;
-        this.formals = ListUtil.copy(formals, true);
-        this.throwTypes = ListUtil.copy(throwTypes, true);
-        this.body = body;
     }
 
     @Override
@@ -95,170 +87,61 @@ public class MethodDecl_c extends Term_c implements MethodDecl,
         return mi;
     }
 
-    /** Get the flags of the method. */
-    @Override
-    public Flags flags() {
-        return this.flags;
-    }
-
-    /** Set the flags of the method. */
-    @Override
-    public MethodDecl flags(Flags flags) {
-        if (flags.equals(this.flags)) return this;
-        MethodDecl_c n = (MethodDecl_c) copy();
-        n.flags = flags;
-        return n;
-    }
-
-    /** Get the return type of the method. */
     @Override
     public TypeNode returnType() {
         return this.returnType;
     }
 
-    /** Set the return type of the method. */
     @Override
     public MethodDecl returnType(TypeNode returnType) {
-        MethodDecl_c n = (MethodDecl_c) copy();
+        return returnType(this, returnType);
+    }
+
+    protected <N extends MethodDecl_c> N returnType(N n, TypeNode returnType) {
+        if (n.returnType == returnType) return n;
+        if (n == this) n = Copy.Util.copy(n);
         n.returnType = returnType;
         return n;
     }
 
-    /** Get the name of the method. */
     @Override
-    public Id id() {
-        return this.name;
+    public ProcedureInstance procedureInstance() {
+        return methodInstance();
     }
 
-    /** Set the name of the method. */
-    @Override
-    public MethodDecl id(Id name) {
-        MethodDecl_c n = (MethodDecl_c) copy();
-        n.name = name;
-        return n;
-    }
-
-    /** Get the name of the method. */
-    @Override
-    public String name() {
-        return this.name.id();
-    }
-
-    /** Set the name of the method. */
-    @Override
-    public MethodDecl name(String name) {
-        return id(this.name.id(name));
-    }
-
-    /** Get the formals of the method. */
-    @Override
-    public List<Formal> formals() {
-        return Collections.unmodifiableList(this.formals);
-    }
-
-    /** Set the formals of the method. */
-    @Override
-    public MethodDecl formals(List<Formal> formals) {
-        MethodDecl_c n = (MethodDecl_c) copy();
-        n.formals = ListUtil.copy(formals, true);
-        return n;
-    }
-
-    /** Get the exception types of the method. */
-    @Override
-    public List<TypeNode> throwTypes() {
-        if (this.throwTypes == null) {
-            return Collections.emptyList();
-        }
-        return Collections.unmodifiableList(this.throwTypes);
-    }
-
-    /** Set the exception types of the method. */
-    @Override
-    public MethodDecl throwTypes(List<TypeNode> throwTypes) {
-        MethodDecl_c n = (MethodDecl_c) copy();
-        n.throwTypes = ListUtil.copy(throwTypes, true);
-        return n;
-    }
-
-    @Override
-    public Term codeBody() {
-        return this.body;
-    }
-
-    /** Get the body of the method. */
-    @Override
-    public Block body() {
-        return this.body;
-    }
-
-    /** Set the body of the method. */
-    @Override
-    public CodeBlock body(Block body) {
-        MethodDecl_c n = (MethodDecl_c) copy();
-        n.body = body;
-        return n;
-    }
-
-    /** Get the method instance of the method. */
     @Override
     public MethodInstance methodInstance() {
         return mi;
     }
 
-    /** Set the method instance of the method. */
     @Override
     public MethodDecl methodInstance(MethodInstance mi) {
-        if (mi == this.mi) return this;
-        MethodDecl_c n = (MethodDecl_c) copy();
+        return methodInstance(this, mi);
+    }
+
+    protected <N extends MethodDecl_c> N methodInstance(N n, MethodInstance mi) {
+        if (n.mi == mi) return n;
+        if (n == this) n = Copy.Util.copy(n);
         n.mi = mi;
         return n;
     }
 
-    @Override
-    public CodeInstance codeInstance() {
-        return procedureInstance();
-    }
-
-    /** Get the procedure instance of the method. */
-    @Override
-    public ProcedureInstance procedureInstance() {
-        return mi;
-    }
-
     /** Reconstruct the method. */
-    protected MethodDecl_c reconstruct(TypeNode returnType, Id name,
-            List<Formal> formals, List<TypeNode> throwTypes, Block body) {
-        if (returnType != this.returnType || name != this.name
-                || !CollectionUtil.equals(formals, this.formals)
-                || !CollectionUtil.equals(throwTypes, this.throwTypes)
-                || body != this.body) {
-            MethodDecl_c n = (MethodDecl_c) copy();
-            n.returnType = returnType;
-            n.name = name;
-            n.formals = ListUtil.copy(formals, true);
-            n.throwTypes = ListUtil.copy(throwTypes, true);
-            n.body = body;
-            return n;
-        }
-
-        return this;
+    protected <N extends MethodDecl_c> N reconstruct(N n, TypeNode returnType,
+            Id name, List<Formal> formals, List<TypeNode> throwTypes, Block body) {
+        n = super.reconstruct(n, name, formals, throwTypes, body);
+        n = returnType(n, returnType);
+        return n;
     }
 
-    /** Visit the children of the method. */
     @Override
     public Node visitChildren(NodeVisitor v) {
-        Id name = (Id) visitChild(this.name, v);
+        Id name = visitChild(this.name, v);
         List<Formal> formals = visitList(this.formals, v);
-        TypeNode returnType = (TypeNode) visitChild(this.returnType, v);
+        TypeNode returnType = visitChild(this.returnType, v);
         List<TypeNode> throwTypes = visitList(this.throwTypes, v);
-        Block body = (Block) visitChild(this.body, v);
-        return reconstruct(returnType, name, formals, throwTypes, body);
-    }
-
-    @Override
-    public NodeVisitor buildTypesEnter(TypeBuilder tb) throws SemanticException {
-        return tb.pushCode();
+        Block body = visitChild(this.body, v);
+        return reconstruct(this, returnType, name, formals, throwTypes, body);
     }
 
     @Override
@@ -301,39 +184,11 @@ public class MethodDecl_c extends Term_c implements MethodDecl,
 
     @Override
     public Node disambiguate(AmbiguityRemover ar) throws SemanticException {
-        if (this.mi.isCanonical()) {
-            // already done
-            return this;
-        }
-
         if (!returnType.isDisambiguated()) {
             return this;
         }
-
         mi.setReturnType(returnType.type());
-
-        List<Type> formalTypes = new LinkedList<Type>();
-        List<Type> throwTypes = new LinkedList<Type>();
-
-        for (Formal f : formals) {
-            if (!f.isDisambiguated()) {
-                return this;
-            }
-            formalTypes.add(f.declType());
-        }
-
-        mi.setFormalTypes(formalTypes);
-
-        for (TypeNode tn : throwTypes()) {
-            if (!tn.isDisambiguated()) {
-                return this;
-            }
-            throwTypes.add(tn.type());
-        }
-
-        mi.setThrowTypes(throwTypes);
-
-        return this;
+        return super.disambiguate(ar);
     }
 
     @Override
@@ -344,7 +199,6 @@ public class MethodDecl_c extends Term_c implements MethodDecl,
         return c;
     }
 
-    /** Type check the method. */
     @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
         TypeSystem ts = tc.typeSystem();
@@ -425,9 +279,10 @@ public class MethodDecl_c extends Term_c implements MethodDecl,
     }
 
     @Override
-    public NodeVisitor exceptionCheckEnter(ExceptionChecker ec)
-            throws SemanticException {
-        return ec.push(methodInstance().throwTypes());
+    public Node extRewrite(ExtensionRewriter rw) throws SemanticException {
+        MethodDecl_c n = (MethodDecl_c) super.extRewrite(rw);
+        n = methodInstance(n, null);
+        return n;
     }
 
     @Override
@@ -435,7 +290,6 @@ public class MethodDecl_c extends Term_c implements MethodDecl,
         return flags.translate() + returnType + " " + name + "(...)";
     }
 
-    /** Write the method to an output file. */
     @Override
     public void prettyPrintHeader(Flags flags, CodeWriter w, PrettyPrinter tr) {
         w.begin(0);
@@ -479,27 +333,8 @@ public class MethodDecl_c extends Term_c implements MethodDecl,
     }
 
     @Override
-    public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
-        ((ProcedureDeclOps) del()).prettyPrintHeader(flags(), w, tr);
-
-        if (body != null) {
-            printSubStmt(body, w, tr);
-        }
-        else {
-            w.write(";");
-        }
-    }
-
-    @Override
     public void dump(CodeWriter w) {
         super.dump(w);
-
-        if (mi != null) {
-            w.allowBreak(4, " ");
-            w.begin(0);
-            w.write("(instance " + mi + ")");
-            w.end();
-        }
 
         w.allowBreak(4, " ");
         w.begin(0);

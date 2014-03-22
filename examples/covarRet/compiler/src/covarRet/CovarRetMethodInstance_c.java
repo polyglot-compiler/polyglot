@@ -10,12 +10,15 @@ import polyglot.types.SemanticException;
 import polyglot.types.Type;
 import polyglot.types.TypeSystem;
 import polyglot.util.Position;
+import polyglot.util.SerialVersionUID;
 
 /**
  * A <code>MethodInstance</code> represents the type information for a Java
  * method.
  */
 public class CovarRetMethodInstance_c extends MethodInstance_c {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     /** Used for deserializing types. */
     protected CovarRetMethodInstance_c() {
     }

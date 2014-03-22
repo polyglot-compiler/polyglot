@@ -271,7 +271,7 @@ public class CopyPropagator extends DataFlow<CopyPropagator.DataFlowItem> {
             return map.get(var).root.li;
         }
 
-        private void die() {
+        private static void die() {
             throw new InternalCompilerError("Copy propagation dataflow item "
                     + "consistency error.");
         }
@@ -368,7 +368,7 @@ public class CopyPropagator extends DataFlow<CopyPropagator.DataFlowItem> {
         return result;
     }
 
-    private void killDecl(DataFlowItem dfi, Stmt stmt) {
+    private static void killDecl(DataFlowItem dfi, Stmt stmt) {
         if (stmt instanceof LocalDecl) {
             dfi.kill(((LocalDecl) stmt).localInstance());
         }

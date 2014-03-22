@@ -35,9 +35,9 @@ import polyglot.util.SerialVersionUID;
 
 /**
  * A place holder type when serializing the Polylgot type information. 
- * When serializing the type information for some class <code>C</code>, 
+ * When serializing the type information for some class {@code C}, 
  * Placeholders are used to prevent serializing the class type information
- * for classes that <code>C</code> depends on.  
+ * for classes that {@code C} depends on.  
  */
 public class PlaceHolder_c implements NamedPlaceHolder {
     private static final long serialVersionUID = SerialVersionUID.generate();
@@ -76,13 +76,6 @@ public class PlaceHolder_c implements NamedPlaceHolder {
                 || (o instanceof PlaceHolder_c && name.equals(((PlaceHolder_c) o).name));
     }
 
-    /**
-     * Resolve the place holder into a TypeObject.  This method
-     * should <strong>never</strong> throw a SchedulerException.
-     * Instead, it should return null if the object cannot be resolved 
-     * until after another pass runs.  The method is responsible for setting
-     * up the appropriate dependencies to reattempt the current goal.
-     */
     @Override
     public TypeObject resolve(TypeSystem ts)
             throws CannotResolvePlaceHolderException {

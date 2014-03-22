@@ -54,12 +54,14 @@ import polyglot.util.InternalCompilerError;
  * sets delegate object refs to point back to the node,
  * and strips type information out.
  **/
+@Deprecated
 public class ExtensionCleaner extends NodeVisitor {
     protected NodeFactory nf;
     protected TypeSystem ts;
     protected ExtensionInfo javaExt;
 
     public ExtensionCleaner(ExtensionInfo javaExt) {
+        super(javaExt.nodeFactory().lang());
         this.javaExt = javaExt;
         this.nf = javaExt.nodeFactory();
         this.ts = javaExt.typeSystem();
@@ -68,7 +70,6 @@ public class ExtensionCleaner extends NodeVisitor {
     @Override
     public Node leave(Node old, Node n, NodeVisitor v) {
         n = n.ext(null);
-        n = n.del(null);
         n = strip(n);
         return n;
     }

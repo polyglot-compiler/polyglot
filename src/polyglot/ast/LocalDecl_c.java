@@ -31,6 +31,7 @@ import java.util.List;
 import polyglot.frontend.MissingDependencyException;
 import polyglot.frontend.Scheduler;
 import polyglot.frontend.goals.Goal;
+import polyglot.translate.ExtensionRewriter;
 import polyglot.types.Context;
 import polyglot.types.Flags;
 import polyglot.types.LocalInstance;
@@ -39,6 +40,7 @@ import polyglot.types.Type;
 import polyglot.types.TypeSystem;
 import polyglot.types.VarInstance;
 import polyglot.util.CodeWriter;
+import polyglot.util.Copy;
 import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
 import polyglot.visit.AmbiguityRemover;
@@ -51,8 +53,8 @@ import polyglot.visit.TypeBuilder;
 import polyglot.visit.TypeChecker;
 
 /**
- * A <code>LocalDecl</code> is an immutable representation of the declaration
- * of a local variable.
+ * A {@code LocalDecl} is an immutable representation of a local variable
+ * declaration statement: a type, a name and an optional initializer.
  */
 public class LocalDecl_c extends Stmt_c implements LocalDecl {
     private static final long serialVersionUID = SerialVersionUID.generate();
@@ -63,9 +65,15 @@ public class LocalDecl_c extends Stmt_c implements LocalDecl {
     protected Expr init;
     protected LocalInstance li;
 
+    @Deprecated
     public LocalDecl_c(Position pos, Flags flags, TypeNode type, Id name,
             Expr init) {
-        super(pos);
+        this(pos, flags, type, name, init, null);
+    }
+
+    public LocalDecl_c(Position pos, Flags flags, TypeNode type, Id name,
+            Expr init, Ext ext) {
+        super(pos, ext);
         assert (flags != null && type != null && name != null); // init may be null
         this.flags = flags;
         this.type = type;
@@ -78,128 +86,131 @@ public class LocalDecl_c extends Stmt_c implements LocalDecl {
         return li != null && li.isCanonical() && super.isDisambiguated();
     }
 
-    /** Get the type of the declaration. */
     @Override
     public Type declType() {
         return type.type();
     }
 
-    /** Get the flags of the declaration. */
     @Override
     public Flags flags() {
         return flags;
     }
 
-    /** Set the flags of the declaration. */
     @Override
     public LocalDecl flags(Flags flags) {
-        if (flags.equals(this.flags)) return this;
-        LocalDecl_c n = (LocalDecl_c) copy();
+        return flags(this, flags);
+    }
+
+    protected <N extends LocalDecl_c> N flags(N n, Flags flags) {
+        if (n.flags.equals(flags)) return n;
+        if (n == this) n = Copy.Util.copy(n);
         n.flags = flags;
         return n;
     }
 
-    /** Get the type node of the declaration. */
     @Override
     public TypeNode type() {
         return type;
     }
 
-    /** Set the type of the declaration. */
     @Override
     public LocalDecl type(TypeNode type) {
-        if (type == this.type) return this;
-        LocalDecl_c n = (LocalDecl_c) copy();
+        return type(this, type);
+    }
+
+    protected <N extends LocalDecl_c> N type(N n, TypeNode type) {
+        if (n.type == type) return n;
+        if (n == this) n = Copy.Util.copy(n);
         n.type = type;
         return n;
     }
 
-    /** Get the name of the declaration. */
     @Override
     public Id id() {
         return name;
     }
 
-    /** Set the name of the declaration. */
     @Override
     public LocalDecl id(Id name) {
-        LocalDecl_c n = (LocalDecl_c) copy();
+        return id(this, name);
+    }
+
+    protected <N extends LocalDecl_c> N id(N n, Id name) {
+        if (n.name == name) return n;
+        if (n == this) n = Copy.Util.copy(n);
         n.name = name;
         return n;
     }
 
-    /** Get the name of the declaration. */
     @Override
     public String name() {
         return name.id();
     }
 
-    /** Set the name of the declaration. */
     @Override
     public LocalDecl name(String name) {
         return id(this.name.id(name));
     }
 
-    /** Get the initializer of the declaration. */
     @Override
     public Expr init() {
         return init;
     }
 
-    /** Set the initializer of the declaration. */
     @Override
     public LocalDecl init(Expr init) {
-        if (init == this.init) return this;
-        LocalDecl_c n = (LocalDecl_c) copy();
+        return init(this, init);
+    }
+
+    protected <N extends LocalDecl_c> N init(N n, Expr init) {
+        if (n.init == init) return n;
+        if (n == this) n = Copy.Util.copy(n);
         n.init = init;
         return n;
     }
 
-    /** Set the local instance of the declaration. */
     @Override
-    public LocalDecl localInstance(LocalInstance li) {
-        if (li == this.li) return this;
-        LocalDecl_c n = (LocalDecl_c) copy();
-        n.li = li;
-        return n;
+    public VarInstance varInstance() {
+        return localInstance();
     }
 
-    /** Get the local instance of the declaration. */
     @Override
     public LocalInstance localInstance() {
         return li;
     }
 
     @Override
-    public VarInstance varInstance() {
-        return li;
+    public LocalDecl localInstance(LocalInstance li) {
+        return localInstance(this, li);
+    }
+
+    protected <N extends LocalDecl_c> N localInstance(N n, LocalInstance li) {
+        if (n.li == li) return n;
+        if (n == this) n = Copy.Util.copy(n);
+        n.li = li;
+        return n;
     }
 
     /** Reconstruct the declaration. */
-    protected LocalDecl_c reconstruct(TypeNode type, Id name, Expr init) {
-        if (this.type != type || this.name != name || this.init != init) {
-            LocalDecl_c n = (LocalDecl_c) copy();
-            n.type = type;
-            n.name = name;
-            n.init = init;
-            return n;
-        }
-
-        return this;
+    protected <N extends LocalDecl_c> N reconstruct(N n, TypeNode type,
+            Id name, Expr init) {
+        n = type(n, type);
+        n = id(n, name);
+        n = init(n, init);
+        return n;
     }
 
-    /** Visit the children of the declaration. */
     @Override
     public Node visitChildren(NodeVisitor v) {
-        TypeNode type = (TypeNode) visitChild(this.type, v);
-        Id name = (Id) visitChild(this.name, v);
-        Expr init = (Expr) visitChild(this.init, v);
-        return reconstruct(type, name, init);
+        TypeNode type = visitChild(this.type, v);
+        Id name = visitChild(this.name, v);
+        Expr init = visitChild(this.init, v);
+        return reconstruct(this, type, name, init);
     }
 
     /**
      * Add the declaration of the variable as we enter the scope of the
-     * intializer
+     * initializer
      */
     @Override
     public Context enterChildScope(Node child, Context c) {
@@ -227,7 +238,8 @@ public class LocalDecl_c extends Stmt_c implements LocalDecl {
                                  flags(),
                                  ts.unknownType(position()),
                                  name());
-        return n.localInstance(li);
+        n = localInstance(n, li);
+        return n;
     }
 
     @Override
@@ -242,7 +254,7 @@ public class LocalDecl_c extends Stmt_c implements LocalDecl {
     }
 
     /**
-     * Override superclass behaviour to check if the variable is multiply
+     * Override superclass behavior to check if the variable is multiply
      * defined.
      */
     @Override
@@ -264,7 +276,6 @@ public class LocalDecl_c extends Stmt_c implements LocalDecl {
         return super.typeCheckEnter(tc);
     }
 
-    /** Type check the declaration. */
     @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
         TypeSystem ts = tc.typeSystem();
@@ -280,13 +291,15 @@ public class LocalDecl_c extends Stmt_c implements LocalDecl {
 
         if (init != null) {
             if (init instanceof ArrayInit) {
-                ((ArrayInit) init).typeCheckElements(type.type());
+                ((ArrayInit) init).typeCheckElements(tc, type.type());
             }
             else {
                 if (!ts.isImplicitCastValid(init.type(), type.type())
                         && !ts.typeEquals(init.type(), type.type())
                         && !ts.numericConversionValid(type.type(),
-                                                      init.constantValue())) {
+                                                      tc.lang()
+                                                        .constantValue(init,
+                                                                       tc.lang()))) {
                     throw new SemanticException("The type of the variable "
                                                         + "initializer \""
                                                         + init.type()
@@ -305,7 +318,8 @@ public class LocalDecl_c extends Stmt_c implements LocalDecl {
         protected ConstantChecker cc;
         protected LocalInstance li;
 
-        AddDependenciesVisitor(ConstantChecker cc, LocalInstance li) {
+        AddDependenciesVisitor(JLang lang, ConstantChecker cc, LocalInstance li) {
+            super(lang);
             this.cc = cc;
             this.li = li;
         }
@@ -341,11 +355,12 @@ public class LocalDecl_c extends Stmt_c implements LocalDecl {
 //            return this;
 //        }
 
-        if (init == null || !init.isConstant() || !li.flags().isFinal()) {
+        if (init == null || !cc.lang().isConstant(init, cc.lang())
+                || !li.flags().isFinal()) {
             li.setNotConstant();
         }
         else {
-            li.setConstantValue(init.constantValue());
+            li.setConstantValue(cc.lang().constantValue(init, cc.lang()));
         }
 
         return this;
@@ -365,6 +380,13 @@ public class LocalDecl_c extends Stmt_c implements LocalDecl {
         }
 
         return child.type();
+    }
+
+    @Override
+    public Node extRewrite(ExtensionRewriter rw) throws SemanticException {
+        LocalDecl_c n = (LocalDecl_c) super.extRewrite(rw);
+        n = localInstance(n, null);
+        return n;
     }
 
     @Override

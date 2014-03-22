@@ -27,7 +27,7 @@
 package polyglot.ast;
 
 /**
- * The Java literal <code>null</code>.
+ * The Java literal {@code null}.
  */
 public interface NullLit extends Lit {
 }

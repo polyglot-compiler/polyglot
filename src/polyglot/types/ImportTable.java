@@ -40,7 +40,7 @@ import polyglot.util.Position;
 import polyglot.util.StringUtil;
 
 /**
- * An <code>ImportTable</code> is a type of <code>ClassResolver</code> that
+ * An {@code ImportTable} is a type of {@code ClassResolver} that
  * corresponds to a particular source file.
  * <p>
  * It has a set of package and class imports, which caches the results of
@@ -90,7 +90,7 @@ public class ImportTable implements Resolver {
         }
 
         @Override
-        public Object copy() {
+        public TypeObject copy() {
             return null;
         }
 
@@ -364,8 +364,8 @@ public class ImportTable implements Resolver {
     }
 
     /**
-     * Return whether <code>n</code> in package <code>pkgName</code> is visible from within
-     * package <code>pkg</code>.  The empty string may
+     * Return whether {@code n} in package {@code pkgName} is visible from within
+     * package {@code pkg}.  The empty string may
      * be passed in to represent the default package.
      */
     protected boolean isVisibleFrom(Named n, String pkgName) {

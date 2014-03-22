@@ -73,6 +73,7 @@ import polyglot.types.ReferenceType;
 import polyglot.types.SemanticException;
 import polyglot.types.Type;
 import polyglot.types.TypeSystem;
+import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
 
 /**
@@ -314,6 +315,7 @@ public class InnerTranslator extends NodeVisitor {
     }
 
     public InnerTranslator(TypeSystem ts, NodeFactory nf) {
+        super(nf.lang());
         this.ts = ts;
         this.nf = nf;
         classContext = new Stack<ClassInfo>();
@@ -795,7 +797,7 @@ public class InnerTranslator extends NodeVisitor {
             }
             return ct;
         }
-        throw new RuntimeException("Unable to find field " + name + ".");
+        throw new InternalCompilerError("Unable to find field " + name + ".");
     }
 
     /**
@@ -813,7 +815,7 @@ public class InnerTranslator extends NodeVisitor {
             }
             return ct;
         }
-        throw new RuntimeException("Unable to find " + mi + ".");
+        throw new InternalCompilerError("Unable to find " + mi + ".");
     }
 
     protected ConstructorCall updateConstructorCall(ConstructorCall cc,
@@ -1002,7 +1004,7 @@ public class InnerTranslator extends NodeVisitor {
                 ftypes.add(f.type().type());
             }
 
-            New nExpr = (New) newExpr.arguments(args);
+            New nExpr = newExpr.arguments(args);
             ci.setFormalTypes(ftypes);
             if (newExpr.anonType() != null) {
                 ci.setContainer(newExpr.anonType());
@@ -1037,7 +1039,7 @@ public class InnerTranslator extends NodeVisitor {
                 ftypes.add(classContext.peek().classType());
             }
             ci.setFormalTypes(ftypes);
-            New nExpr = (New) newExpr.arguments(args);
+            New nExpr = newExpr.arguments(args);
             nExpr = nExpr.qualifier(null);
             nExpr = nExpr.constructorInstance(ci);
             return nExpr;

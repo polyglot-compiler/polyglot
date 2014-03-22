@@ -15,9 +15,12 @@ import polyglot.frontend.Source;
 import polyglot.types.LazyClassInitializer;
 import polyglot.types.ParsedClassType_c;
 import polyglot.types.TypeSystem;
+import polyglot.util.SerialVersionUID;
 
 public class CofferParsedClassType_c extends ParsedClassType_c implements
         CofferParsedClassType {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     PClass<Key, Key> instantiatedFrom;
     Key key;
 

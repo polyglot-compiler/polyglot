@@ -41,12 +41,15 @@ import java.util.Set;
 
 import polyglot.ast.ClassLit;
 import polyglot.ast.Expr;
+import polyglot.ast.JLang;
 import polyglot.ast.NullLit;
 import polyglot.ast.Term;
 import polyglot.ext.jl5.JL5Options;
 import polyglot.ext.jl5.ast.AnnotationElem;
 import polyglot.ext.jl5.ast.ElementValueArrayInit;
 import polyglot.ext.jl5.ast.EnumConstant;
+import polyglot.ext.jl5.ast.J5Lang_c;
+import polyglot.ext.jl5.ast.JL5Ext;
 import polyglot.ext.jl5.types.inference.InferenceSolver;
 import polyglot.ext.jl5.types.inference.InferenceSolver_c;
 import polyglot.ext.jl5.types.inference.LubType;
@@ -421,7 +424,7 @@ public class JL5TypeSystem_c extends
 
     @Override
     public Context createContext() {
-        return new JL5Context_c(this);
+        return new JL5Context_c(J5Lang_c.instance, this);
     }
 
     @Override
@@ -973,7 +976,7 @@ public class JL5TypeSystem_c extends
      * @param argTypes
      * @return
      */
-    private JL5Subst inferTypeArgs(JL5ProcedureInstance mi,
+    protected JL5Subst inferTypeArgs(JL5ProcedureInstance mi,
             List<? extends Type> argTypes, Type expectedReturnType) {
         InferenceSolver s = new InferenceSolver_c(mi, argTypes, this);
         Map<TypeVariable, ReferenceType> m = s.solve(expectedReturnType);
@@ -1032,7 +1035,7 @@ public class JL5TypeSystem_c extends
         return ret;
     }
 
-    private boolean boxingRequired(JL5ProcedureInstance pi,
+    protected boolean boxingRequired(JL5ProcedureInstance pi,
             List<? extends Type> paramTypes) {
         int numFormals = pi.formalTypes().size();
         for (int i = 0; i < numFormals - 1; i++) {
@@ -1056,7 +1059,7 @@ public class JL5TypeSystem_c extends
         return false;
     }
 
-    private boolean varArgsRequired(JL5ProcedureInstance pi) {
+    protected boolean varArgsRequired(JL5ProcedureInstance pi) {
         return pi.isVariableArity();
     }
 
@@ -1099,7 +1102,7 @@ public class JL5TypeSystem_c extends
     }
 
     @Override
-    public Subst<TypeVariable, ReferenceType> subst(
+    protected Subst<TypeVariable, ReferenceType> substImpl(
             Map<TypeVariable, ? extends ReferenceType> substMap) {
         return new JL5Subst_c(this, substMap);
     }
@@ -1549,20 +1552,6 @@ public class JL5TypeSystem_c extends
     }
 
     @Override
-    public boolean numericConversionValid(Type type, long value) {
-        // Optional support for allowing a boxing conversion when using a literal
-        // in an initializer for compatibility with with "javac -source 1.5"
-        JL5Options opts = (JL5Options) extInfo.getOptions();
-        if (opts.morePermissiveCasts && isPrimitiveWrapper(type)) {
-            return super.numericConversionValid(primitiveTypeOfWrapper(type),
-                                                value);
-        }
-        else {
-            return super.numericConversionValid(type, value);
-        }
-    }
-
-    @Override
     public boolean numericConversionValid(Type type, Object value) {
         // Optional support for allowing a boxing conversion when using a literal
         // in an initializer for compatibility with with "javac -source 1.5"
@@ -1756,7 +1745,8 @@ public class JL5TypeSystem_c extends
         return false;
     }
 
-    private boolean areProvablyDistinct(JL5SubstClassType s, JL5SubstClassType t) {
+    private static boolean areProvablyDistinct(JL5SubstClassType s,
+            JL5SubstClassType t) {
         // See JLS 3rd ed 4.5
         // Distinct if either (1) They are invocations of distinct generic type declarations.
         // or (2) Any of their type arguments are provably distinct
@@ -1778,7 +1768,8 @@ public class JL5TypeSystem_c extends
         return false;
     }
 
-    private boolean areTypArgsProvablyDistinct(ReferenceType s, ReferenceType t) {
+    private static boolean areTypArgsProvablyDistinct(ReferenceType s,
+            ReferenceType t) {
         // JLS 3rd ed 4.5. "Two type arguments are provably distinct if 
         // neither of the arguments is a type variable or wildcard, and 
         // the two arguments are not the same type."
@@ -2036,24 +2027,20 @@ public class JL5TypeSystem_c extends
             ClassType contextClass) {
         assert_(mi);
 
-        ReferenceType target;
-        // does container inherit mi?
-        if (container.descendsFrom(mi.container()) && mi.flags().isPublic()) {
-            target = container;
-        }
-        else {
-            target = mi.container();
-        }
-
         Flags flags = mi.flags();
 
-        if (!target.isClass()) {
+        if (container instanceof TypeVariable) {
+            TypeVariable tv = (TypeVariable) container;
+            return !flags.isPrivate()
+                    && isAccessible(mi, tv.upperBound(), contextClass);
+        }
+        if (!container.isClass()) {
             // public members of non-classes are accessible;
             // non-public members of non-classes are inaccessible
             return flags.isPublic();
         }
 
-        JL5ClassType targetClass = (JL5ClassType) target.toClass();
+        JL5ClassType targetClass = (JL5ClassType) container.toClass();
 
         if (isAccessible_(flags, targetClass, contextClass)) {
             return true;
@@ -2542,16 +2529,16 @@ public class JL5TypeSystem_c extends
     @Override
     public void checkAnnotationValueConstant(Term value)
             throws SemanticException {
-        if (value instanceof ElementValueArrayInit) {
+        if (JL5Ext.ext(value) instanceof ElementValueArrayInit) {
             // check elements
-            for (Term next : ((ElementValueArrayInit) value).elements()) {
+            for (Term next : ((ElementValueArrayInit) JL5Ext.ext(value)).elements()) {
                 if (!isAnnotationValueConstant(next)) {
                     throw new SemanticException("Annotation attribute value must be constant",
                                                 next.position());
                 }
             }
         }
-        else if (value instanceof AnnotationElem) {
+        else if (JL5Ext.ext(value) instanceof AnnotationElem) {
             return;
         }
         else if (!isAnnotationValueConstant(value)) {
@@ -2569,16 +2556,17 @@ public class JL5TypeSystem_c extends
             return true;
         }
         if (value instanceof Expr) {
+            JLang lang = J5Lang_c.instance;
             Expr ev = (Expr) value;
-            if (ev.constantValueSet() && ev.isConstant()) {
+            if (lang.constantValueSet(ev, lang) && lang.isConstant(ev, lang)) {
                 // value is a constant
                 return true;
             }
-            if (ev instanceof EnumConstant) {
+            if (JL5Ext.ext(ev) instanceof EnumConstant) {
                 // Enum constants are constants for our purposes.
                 return true;
             }
-            if (!ev.constantValueSet()) {
+            if (!lang.constantValueSet(ev, lang)) {
                 // the constant value hasn't been set yet...
                 return true; // TODO: should this throw a missing dependency exception?
             }
@@ -2588,18 +2576,19 @@ public class JL5TypeSystem_c extends
     }
 
     @Override
-    public void checkDuplicateAnnotations(List<AnnotationElem> annotations)
+    public void checkDuplicateAnnotations(List<Term> annotations)
             throws SemanticException {
         // check no duplicate annotations used
-        ArrayList<AnnotationElem> l =
-                new ArrayList<AnnotationElem>(annotations);
+        ArrayList<Term> l = new ArrayList<Term>(annotations);
         for (int i = 0; i < l.size(); i++) {
-            AnnotationElem ai = l.get(i);
+            Term ti = l.get(i);
+            AnnotationElem ai = (AnnotationElem) JL5Ext.ext(ti);
             for (int j = i + 1; j < l.size(); j++) {
-                AnnotationElem aj = l.get(j);
+                Term tj = l.get(j);
+                AnnotationElem aj = (AnnotationElem) JL5Ext.ext(tj);
                 if (ai.typeName().type() == aj.typeName().type()) {
                     throw new SemanticException("Duplicate annotation use: "
-                            + aj.typeName(), aj.position());
+                            + aj.typeName(), tj.position());
                 }
             }
         }

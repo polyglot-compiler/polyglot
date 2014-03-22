@@ -36,9 +36,9 @@ import polyglot.util.Copy;
 import polyglot.util.InternalCompilerError;
 
 /**
- * A <code>CachingResolver</code> memoizes another Resolver
+ * A {@code CachingResolver} memoizes another Resolver
  */
-public class CachingResolver implements Resolver, Copy {
+public class CachingResolver implements Resolver, Copy<CachingResolver> {
     protected Resolver inner;
     private Map<String, CachedResult> cache;
     private boolean cacheNotFound;

@@ -58,7 +58,7 @@ public class SimplifyExpressionsForBoxing extends HaltingVisitor {
     TypeSystem ts;
 
     public SimplifyExpressionsForBoxing(NodeFactory nf, TypeSystem ts) {
-        super();
+        super(nf.lang());
         this.nf = nf;
         this.ts = ts;
     }
@@ -164,7 +164,7 @@ public class SimplifyExpressionsForBoxing extends HaltingVisitor {
         Expr right = ass.right();
         Binary b =
                 nf.Binary(ass.position(),
-                          (Expr) ass.left().visit(new DeepCopy()),
+                          (Expr) ass.left().visit(new DeepCopy(lang())),
                           op,
                           right);
         if (leftTypePrim.isNumeric() && rightTypePrim.isNumeric()) {

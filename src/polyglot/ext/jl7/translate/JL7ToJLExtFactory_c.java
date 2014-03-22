@@ -16,6 +16,16 @@ public class JL7ToJLExtFactory_c extends JL5ToJLExtFactory_c implements
     }
 
     @Override
+    public Ext extAmbDiamondTypeNode() {
+        return extTypeNode();
+    }
+
+    @Override
+    public Ext extAmbUnionType() {
+        return extTypeNode();
+    }
+
+    @Override
     public Ext extMultiCatch() {
         return extCatch();
     }

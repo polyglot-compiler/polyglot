@@ -29,7 +29,7 @@ package polyglot.ast;
 import polyglot.types.Type;
 
 /**
- * A <code>Catch</code> represents one half of a <code>try-catch</code>
+ * A {@code Catch} represents one half of a {@code try-catch}
  * statement.  Specifically, the second half.
  */
 public interface Catch extends CompoundStmt {
@@ -40,12 +40,12 @@ public interface Catch extends CompoundStmt {
     Type catchType();
 
     /**
-     * The catch block's formal paramter.
+     * The catch block's formal parameter.
      */
     Formal formal();
 
     /**
-     * Set the catch block's formal paramter.
+     * Set the catch block's formal parameter.
      */
     Catch formal(Formal formal);
 

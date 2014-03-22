@@ -74,7 +74,7 @@ public class FwdReferenceChecker extends ContextVisitor {
         }
         else if (n instanceof FieldAssign) {
             FwdReferenceChecker frc = (FwdReferenceChecker) this.copy();
-            frc.fieldAssignLHS = (Field) ((FieldAssign) n).left();
+            frc.fieldAssignLHS = ((FieldAssign) n).left();
             return frc;
         }
         else if (n instanceof Field) {

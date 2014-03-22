@@ -188,15 +188,22 @@ public class terminal_set {
     /*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . .*/
 
     /** Generic equality comparison. */
+    @Override
     public boolean equals(Object other) {
         if (!(other instanceof terminal_set))
             return false;
         else return equals((terminal_set) other);
     }
 
+    @Override
+    public int hashCode() {
+        return _elements.hashCode();
+    }
+
     /*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . .*/
 
     /** Convert to string. */
+    @Override
     public String toString() {
         String result;
         boolean comma_flag;

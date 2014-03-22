@@ -1,0 +1,9 @@
+class G<T> {
+}
+
+class C {
+	G<String> foo() {
+		G<String> g = new G<>();
+		return g;
+	}
+}

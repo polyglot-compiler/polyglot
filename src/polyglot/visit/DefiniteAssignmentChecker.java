@@ -78,12 +78,12 @@ import polyglot.visit.FlowGraph.Peer;
  * and check(FlowGraph, Term, Item, Item).
  * 
  * If language extensions have new constructs that use local variables, they can
- * override the method <code>checkOther</code> to check that the uses of these
+ * override the method {@code checkOther} to check that the uses of these
  * local variables are correctly initialized. (The implementation of the method will
  * probably call checkLocalInstanceInit to see if the local used is initialized).
  * 
  * If language extensions have new constructs that assign to local variables,
- * they can override the method <code>flowOther</code> to capture the way 
+ * they can override the method {@code flowOther} to capture the way 
  * the new construct's initialization behavior.
  * 
  */
@@ -103,7 +103,7 @@ public class DefiniteAssignmentChecker extends
      */
     protected static class ClassBodyInfo {
         /** 
-         * The info for the outer ClassBody. The <code>ClassBodyInfo</code>s
+         * The info for the outer ClassBody. The {@code ClassBodyInfo}s
          * form a stack. 
          */
         public ClassBodyInfo outer = null;
@@ -154,14 +154,14 @@ public class DefiniteAssignmentChecker extends
         /**
          * Set of LocalInstances from the outer class body that were used
          * during the declaration of this class. We need to track this
-         * in order to correctly populate <code>localsUsedInClassBodies</code>
+         * in order to correctly populate {@code localsUsedInClassBodies}
          */
         public Set<LocalInstance> outerLocalsUsed =
                 new HashSet<LocalInstance>();
 
         /**
-         * Map from <code>ClassBody</code>s to <code>Set</code>s of 
-         * <code>LocalInstance</code>s. If localsUsedInClassBodies(C) = S, then
+         * Map from {@code ClassBody}s to {@code Set}s of 
+         * {@code LocalInstance}s. If localsUsedInClassBodies(C) = S, then
          * the class body C is an inner class declared in the current code 
          * declaration, and S is the set of LocalInstances that are defined
          * in the current code declaration, but are used in the declaration
@@ -226,8 +226,8 @@ public class DefiniteAssignmentChecker extends
         public String toString() {
             return "["
                     + (this.definitelyAssigned ? "definitely assigned " : "")
-                    + (this.definitelyUnassigned ? "definitely unassigned "
-                            : "") + "]";
+                    + (this.definitelyUnassigned
+                            ? "definitely unassigned " : "") + "]";
         }
 
         public static AssignmentStatus join(AssignmentStatus as1,
@@ -297,9 +297,9 @@ public class DefiniteAssignmentChecker extends
             new FlowItem(Collections.<VarInstance, AssignmentStatus> emptyMap());
 
     /**
-     * Initialise the FlowGraph to be used in the dataflow analysis.
+     * Initialize the FlowGraph to be used in the dataflow analysis.
      * @return null if no dataflow analysis should be performed for this
-     *         code declaration; otherwise, an apropriately initialized
+     *         code declaration; otherwise, an appropriately initialized
      *         FlowGraph.
      */
     @Override
@@ -519,10 +519,10 @@ public class DefiniteAssignmentChecker extends
     }
 
     /**
-     * Construct a flow graph for the <code>Expr</code> provided, and call 
-     * <code>dataflow(FlowGraph)</code>. Is also responsible for calling 
-     * <code>post(FlowGraph, Term)</code> after
-     * <code>dataflow(FlowGraph)</code> has been called.
+     * Construct a flow graph for the {@code Expr} provided, and call 
+     * {@code dataflow(FlowGraph)}. Is also responsible for calling 
+     * {@code post(FlowGraph, Term)} after
+     * {@code dataflow(FlowGraph)} has been called.
      * There is no need to push a CFG onto the stack, as dataflow is not
      * performed on entry in this analysis. 
      */
@@ -555,7 +555,7 @@ public class DefiniteAssignmentChecker extends
     @Override
     protected CFGBuilder<FlowItem> createCFGBuilder(TypeSystem ts,
             FlowGraph<FlowItem> g) {
-        CFGBuilder<FlowItem> v = new CFGBuilder<FlowItem>(ts, g, this);
+        CFGBuilder<FlowItem> v = new CFGBuilder<FlowItem>(lang(), ts, g, this);
         // skip dead loops bodies and dead if branches. See JLS 2nd edition, Section 16.
 //        v = v.skipDeadIfBranches(true);
 //        v = v.skipDeadLoopBodies(true);
@@ -563,13 +563,13 @@ public class DefiniteAssignmentChecker extends
     }
 
     /**
-     * The confluence operator for <code>Initializer</code>s and 
-     * <code>Constructor</code>s needs to be a 
+     * The confluence operator for {@code Initializer}s and 
+     * {@code Constructor}s needs to be a 
      * little special, as we are only concerned with non-exceptional flows in 
      * these cases.
      * This method ensures that a slightly different confluence is performed
-     * for these <code>Term</code>s, otherwise 
-     * <code>confluence(List, Term)</code> is called instead. 
+     * for these {@code Term}s, otherwise 
+     * {@code confluence(List, Term)} is called instead. 
      */
     @Override
     protected FlowItem confluence(List<FlowItem> items, List<EdgeKey> itemKeys,
@@ -737,8 +737,8 @@ public class DefiniteAssignmentChecker extends
         }
         if (n instanceof Expr) {
             Expr e = (Expr) n;
-            if (e.isConstant() && e.type().isBoolean()) {
-                if (Boolean.TRUE.equals(e.constantValue())) {
+            if (lang().isConstant(e, lang()) && e.type().isBoolean()) {
+                if (Boolean.TRUE.equals(lang().constantValue(e, lang()))) {
                     // the false branch is dead
                     ret =
                             remap(ret,
@@ -757,8 +757,8 @@ public class DefiniteAssignmentChecker extends
         return ret;
     }
 
-    private Map<EdgeKey, FlowItem> remap(Map<EdgeKey, FlowItem> m, EdgeKey ek,
-            AssignmentStatus assStatus) {
+    private static Map<EdgeKey, FlowItem> remap(Map<EdgeKey, FlowItem> m,
+            EdgeKey ek, AssignmentStatus assStatus) {
         FlowItem fi = m.get(ek);
         if (fi == null) {
             return m;
@@ -835,7 +835,7 @@ public class DefiniteAssignmentChecker extends
      */
     protected Map<EdgeKey, FlowItem> flowLocalAssign(FlowItem inItem,
             FlowGraph<FlowItem> graph, LocalAssign a, Set<EdgeKey> succEdgeKeys) {
-        Local l = (Local) a.left();
+        Local l = a.left();
         Map<VarInstance, AssignmentStatus> m =
                 new HashMap<VarInstance, AssignmentStatus>(inItem.assignmentStatus);
         AssignmentStatus initCount = m.get(l.localInstance().orig());
@@ -851,7 +851,7 @@ public class DefiniteAssignmentChecker extends
      */
     protected Map<EdgeKey, FlowItem> flowFieldAssign(FlowItem inItem,
             FlowGraph<FlowItem> graph, FieldAssign a, Set<EdgeKey> succEdgeKeys) {
-        Field f = (Field) a.left();
+        Field f = a.left();
         FieldInstance fi = f.fieldInstance();
 
         if (fi.flags().isFinal() && isFieldsTargetAppropriate(f)) {
@@ -964,7 +964,7 @@ public class DefiniteAssignmentChecker extends
             }
             else if (n instanceof LocalAssign) {
                 checkLocalAssign(graph,
-                                 ((Local) ((LocalAssign) n).left()).localInstance(),
+                                 ((LocalAssign) n).left().localInstance(),
                                  n.position(),
                                  dfIn);
             }
@@ -1007,7 +1007,7 @@ public class DefiniteAssignmentChecker extends
 
     /**
      * Perform necessary actions upon seeing the Initializer 
-     * <code>initializer</code>.
+     * {@code initializer}.
      */
     protected void finishInitializer(FlowGraph<FlowItem> graph,
             Initializer initializer, FlowItem dfIn, FlowItem dfOut) {
@@ -1031,7 +1031,7 @@ public class DefiniteAssignmentChecker extends
 
     /**
      * Perform necessary actions upon seeing the ConstructorDecl 
-     * <code>cd</code>.
+     * {@code cd}.
      */
     protected void finishConstructorDecl(FlowGraph<FlowItem> graph,
             ConstructorDecl cd, FlowItem dfIn, FlowItem dfOut) {
@@ -1079,7 +1079,7 @@ public class DefiniteAssignmentChecker extends
     }
 
     /**
-     * Check that the local variable <code>l</code> is used correctly.
+     * Check that the local variable {@code l} is used correctly.
      */
     protected void checkLocal(FlowGraph<FlowItem> graph, Local l, FlowItem dfIn)
             throws SemanticException {
@@ -1144,7 +1144,7 @@ public class DefiniteAssignmentChecker extends
     protected void checkFieldAssign(FlowGraph<FlowItem> graph, FieldAssign a,
             FlowItem dfIn) throws SemanticException {
 
-        Field f = (Field) a.left();
+        Field f = a.left();
         FieldInstance fi = f.fieldInstance();
         if (fi.flags().isFinal()) {
             if ((currCBI.currCodeDecl instanceof ConstructorDecl || currCBI.currCodeDecl instanceof Initializer)
@@ -1182,9 +1182,9 @@ public class DefiniteAssignmentChecker extends
     }
 
     /**
-     * Check that the set of <code>LocalInstance</code>s 
-     * <code>localsUsed</code>, which is the set of locals used in the inner 
-     * class declared by <code>cb</code>
+     * Check that the set of {@code LocalInstance}s 
+     * {@code localsUsed}, which is the set of locals used in the inner 
+     * class declared by {@code cb}
      * are initialized before the class declaration.
      * @throws SemanticException
      */
@@ -1200,9 +1200,9 @@ public class DefiniteAssignmentChecker extends
     }
 
     /**
-     * Check that the set of <code>LocalInstance</code>s 
-     * <code>localsUsed</code>, which is the set of locals used in the inner 
-     * class declared by <code>cb</code>
+     * Check that the set of {@code LocalInstance}s 
+     * {@code localsUsed}, which is the set of locals used in the inner 
+     * class declared by {@code cb}
      * are initialized before the class declaration.
      */
     protected void checkLocalsUsedByInnerClass(FlowGraph<FlowItem> graph,

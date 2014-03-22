@@ -32,6 +32,7 @@ import polyglot.types.SemanticException;
 import polyglot.types.Type;
 import polyglot.types.TypeSystem;
 import polyglot.util.CodeWriter;
+import polyglot.util.Copy;
 import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
 import polyglot.visit.AscriptionVisitor;
@@ -41,8 +42,8 @@ import polyglot.visit.PrettyPrinter;
 import polyglot.visit.TypeChecker;
 
 /**
- * An <code>Instanceof</code> is an immutable representation of
- * the use of the <code>instanceof</code> operator.
+ * An {@code Instanceof} is an immutable representation of
+ * the use of the {@code instanceof} operator.
  */
 public class Instanceof_c extends Expr_c implements Instanceof {
     private static final long serialVersionUID = SerialVersionUID.generate();
@@ -50,68 +51,72 @@ public class Instanceof_c extends Expr_c implements Instanceof {
     protected Expr expr;
     protected TypeNode compareType;
 
+    @Deprecated
     public Instanceof_c(Position pos, Expr expr, TypeNode compareType) {
-        super(pos);
+        this(pos, expr, compareType, null);
+    }
+
+    public Instanceof_c(Position pos, Expr expr, TypeNode compareType, Ext ext) {
+        super(pos, ext);
         assert (expr != null && compareType != null);
         this.expr = expr;
         this.compareType = compareType;
     }
 
-    /** Get the precedence of the expression. */
     @Override
     public Precedence precedence() {
         return Precedence.INSTANCEOF;
     }
 
-    /** Get the expression to be tested. */
     @Override
     public Expr expr() {
         return this.expr;
     }
 
-    /** Set the expression to be tested. */
     @Override
     public Instanceof expr(Expr expr) {
-        Instanceof_c n = (Instanceof_c) copy();
+        return expr(this, expr);
+    }
+
+    protected <N extends Instanceof_c> N expr(N n, Expr expr) {
+        if (n.expr == expr) return n;
+        if (n == this) n = Copy.Util.copy(n);
         n.expr = expr;
         return n;
     }
 
-    /** Get the type to be compared against. */
     @Override
     public TypeNode compareType() {
         return this.compareType;
     }
 
-    /** Set the type to be compared against. */
     @Override
     public Instanceof compareType(TypeNode compareType) {
-        Instanceof_c n = (Instanceof_c) copy();
+        return compareType(this, compareType);
+    }
+
+    protected <N extends Instanceof_c> N compareType(N n, TypeNode compareType) {
+        if (n.compareType == compareType) return n;
+        if (n == this) n = Copy.Util.copy(n);
         n.compareType = compareType;
         return n;
     }
 
     /** Reconstruct the expression. */
-    protected Instanceof_c reconstruct(Expr expr, TypeNode compareType) {
-        if (expr != this.expr || compareType != this.compareType) {
-            Instanceof_c n = (Instanceof_c) copy();
-            n.expr = expr;
-            n.compareType = compareType;
-            return n;
-        }
-
-        return this;
+    protected <N extends Instanceof_c> N reconstruct(N n, Expr expr,
+            TypeNode compareType) {
+        n = expr(n, expr);
+        n = compareType(n, compareType);
+        return n;
     }
 
-    /** Visit the children of the expression. */
     @Override
     public Node visitChildren(NodeVisitor v) {
-        Expr expr = (Expr) visitChild(this.expr, v);
-        TypeNode compareType = (TypeNode) visitChild(this.compareType, v);
-        return reconstruct(expr, compareType);
+        Expr expr = visitChild(this.expr, v);
+        TypeNode compareType = visitChild(this.compareType, v);
+        return reconstruct(this, expr, compareType);
     }
 
-    /** Type check the expression. */
     @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
         TypeSystem ts = tc.typeSystem();
@@ -146,7 +151,6 @@ public class Instanceof_c extends Expr_c implements Instanceof {
         return expr + " instanceof " + compareType;
     }
 
-    /** Write the expression to an output file. */
     @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
         printSubExpr(expr, w, tr);

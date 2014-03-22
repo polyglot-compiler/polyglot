@@ -58,7 +58,7 @@ public class ReachChecker extends DataFlow<ReachChecker.DataFlowItem> {
     protected CFGBuilder<ReachChecker.DataFlowItem> createCFGBuilder(
             TypeSystem ts, FlowGraph<ReachChecker.DataFlowItem> g) {
         CFGBuilder<ReachChecker.DataFlowItem> v =
-                new CFGBuilder<ReachChecker.DataFlowItem>(ts, g, this);
+                new CFGBuilder<ReachChecker.DataFlowItem>(lang(), ts, g, this);
         // skip dead loop bodies (i.e., S is unreachable in "while (false) S".
         // See JLS 2nd edition, Section 14.20.
         v = v.skipDeadLoopBodies(true);

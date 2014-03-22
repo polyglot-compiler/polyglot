@@ -1,8 +1,7 @@
 package java_cup;
 
-import java_cup.assoc;
-import java.util.Hashtable;
 import java.util.Enumeration;
+import java.util.Hashtable;
 
 /** This class represents a terminal symbol in the grammar.  Each terminal 
  *  has a textual name, an index, and a string which indicates the type of 
@@ -80,10 +79,20 @@ public class terminal extends symbol {
     /** Table of all terminals.  Elements are stored using name strings as 
      *  the key 
      */
-    protected static Hashtable _all = new Hashtable();
+    protected static Hashtable<String, terminal> _all =
+            new Hashtable<String, terminal>();
+
+    //Hm Added clear  to clear all static fields
+    public static void clear() {
+        _all.clear();
+        _all_by_index.clear();
+        next_index = 0;
+        EOF = new terminal("EOF");
+        error = new terminal("error");
+    }
 
     /** Access to all terminals. */
-    public static Enumeration all() {
+    public static Enumeration<terminal> all() {
         return _all.elements();
     }
 
@@ -91,19 +100,20 @@ public class terminal extends symbol {
     public static terminal find(String with_name) {
         if (with_name == null)
             return null;
-        else return (terminal) _all.get(with_name);
+        else return _all.get(with_name);
     }
 
     /*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . .*/
 
     /** Table of all terminals indexed by their index number. */
-    protected static Hashtable _all_by_index = new Hashtable();
+    protected static Hashtable<Integer, terminal> _all_by_index =
+            new Hashtable<Integer, terminal>();
 
     /** Lookup a terminal by index. */
     public static terminal find(int indx) {
         Integer the_indx = new Integer(indx);
 
-        return (terminal) _all_by_index.get(the_indx);
+        return _all_by_index.get(the_indx);
     }
 
     /*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . .*/
@@ -121,18 +131,19 @@ public class terminal extends symbol {
     /*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . .*/
 
     /** Special terminal for end of input. */
-    public static final terminal EOF = new terminal("EOF");
+    public static terminal EOF = new terminal("EOF");
 
     /*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . .*/
 
     /** special terminal used for error recovery */
-    public static final terminal error = new terminal("error");
+    public static terminal error = new terminal("error");
 
     /*-----------------------------------------------------------*/
     /*--- General Methods ---------------------------------------*/
     /*-----------------------------------------------------------*/
 
     /** Report this symbol as not being a non-terminal. */
+    @Override
     public boolean is_non_term() {
         return false;
     }
@@ -140,6 +151,7 @@ public class terminal extends symbol {
     /*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . .*/
 
     /** Convert to a string. */
+    @Override
     public String toString() {
         return super.toString() + "[" + index() + "]";
     }

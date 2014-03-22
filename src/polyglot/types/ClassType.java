@@ -32,9 +32,9 @@ import polyglot.util.Enum;
 import polyglot.util.SerialVersionUID;
 
 /**
- * A <code>ClassType</code> represents a class, either loaded from a
+ * A {@code ClassType} represents a class, either loaded from a
  * classpath, parsed from a source file, or obtained from other source.
- * A <code>ClassType</code> is not necessarily named.
+ * A {@code ClassType} is not necessarily named.
  */
 public interface ClassType extends Importable, ReferenceType, MemberInstance,
         Declaration {
@@ -57,7 +57,7 @@ public interface ClassType extends Importable, ReferenceType, MemberInstance,
      */
     Resolver resolver();
 
-    /** Get the class's kind. */
+    /** Get the class's kind: top-level, member, local, or anonymous. */
     Kind kind();
 
     /**
@@ -114,14 +114,14 @@ public interface ClassType extends Importable, ReferenceType, MemberInstance,
 
     /**
      * The class's constructors.
-     * A list of <code>ConstructorInstance</code>.
+     * A list of {@code ConstructorInstance}.
      * @see polyglot.types.ConstructorInstance
      */
     List<? extends ConstructorInstance> constructors();
 
     /**
      * The class's member classes.
-     * A list of <code>ClassType</code>.
+     * A list of {@code ClassType}.
      * @see polyglot.types.ClassType
      */
     List<? extends ClassType> memberClasses();
@@ -133,27 +133,27 @@ public interface ClassType extends Importable, ReferenceType, MemberInstance,
     @Override
     FieldInstance fieldNamed(String name);
 
-    /** Return true if the class is strictly contained in <code>outer</code>. */
+    /** Return true if the class is strictly contained in {@code outer}. */
     boolean isEnclosed(ClassType outer);
 
     /**
-     * Implementation of <code>isEnclosed</code>.
-     * This method should only be called by the <code>TypeSystem</code>
+     * Implementation of {@code isEnclosed}.
+     * This method should only be called by the {@code TypeSystem}
      * or by a subclass.
      */
     boolean isEnclosedImpl(ClassType outer);
 
     /** Return true if an object of the class has
-     * an enclosing instance of <code>encl</code>. */
+     * an enclosing instance of {@code encl}. */
     boolean hasEnclosingInstance(ClassType encl);
 
     /**
-     * Implementation of <code>hasEnclosingInstance</code>.
-     * This method should only be called by the <code>TypeSystem</code>
+     * Implementation of {@code hasEnclosingInstance}.
+     * This method should only be called by the {@code TypeSystem}
      * or by a subclass.
      */
     boolean hasEnclosingInstanceImpl(ClassType encl);
 
-    /** The class's outer class if this is a nested class, or null. */
+    /** The class's outer class, or null if a top-level class. */
     ClassType outer();
 }

@@ -39,6 +39,7 @@ import polyglot.ast.Expr;
 import polyglot.ast.For;
 import polyglot.ast.ForUpdate;
 import polyglot.ast.If;
+import polyglot.ast.JLang;
 import polyglot.ast.Local;
 import polyglot.ast.LocalDecl;
 import polyglot.ast.Loop;
@@ -63,9 +64,15 @@ public class LoopNormalizer extends NodeVisitor {
     protected final NodeFactory nf;
 
     public LoopNormalizer(Job job, TypeSystem ts, NodeFactory nf) {
+        super(nf.lang());
         this.job = job;
         this.ts = ts;
         this.nf = nf;
+    }
+
+    @Override
+    public JLang lang() {
+        return (JLang) super.lang();
     }
 
     @Override
@@ -212,7 +219,7 @@ public class LoopNormalizer extends NodeVisitor {
         Expr cond = s.cond();
 
         // avoid unnecessary translations
-        if (s.condIsConstantTrue()) {
+        if (lang().condIsConstantTrue(s, lang())) {
             if (cond instanceof BooleanLit) {
                 return s;
             }

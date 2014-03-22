@@ -31,7 +31,7 @@
 #javac "-d java-out -cp ." {
 #}
  
-polyglot.ext.jl7.JL7ExtensionInfo "-d out -classpath java-out -assert -noserial -post \"javac -source 1.7 -Xlint\\:-options\" -morepermissiveinference" {
+polyglot.ext.jl7.JL7ExtensionInfo "-d out -classpath java-out -assert -noserial -postopts \"-source 1.7 -Xlint\\:-options\" -morepermissiveinference" {
         IntLit01.jl7;
         IntLit02.jl7 (Syntax), (Syntax),(Syntax),(Syntax);
         IntLit02a.jl7 (Syntax);

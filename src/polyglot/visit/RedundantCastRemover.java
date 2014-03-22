@@ -32,18 +32,19 @@ import java.util.List;
 
 import polyglot.ast.Cast;
 import polyglot.ast.Expr;
+import polyglot.ast.JLang;
 import polyglot.ast.Node;
 import polyglot.ast.ProcedureCall;
 import polyglot.types.Type;
 
 /**
- * <code>RedundantCastRemover</code> removes redundant casts.  It's typically
+ * {@code RedundantCastRemover} removes redundant casts.  It's typically
  * used to clean up inefficient translations from the source language to Java.
  * The AST must be type-checked before using this visitor.
  */
 public class RedundantCastRemover extends NodeVisitor {
-    public RedundantCastRemover() {
-        super();
+    public RedundantCastRemover(JLang lang) {
+        super(lang);
     }
 
     @Override

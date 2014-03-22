@@ -27,25 +27,23 @@ package polyglot.ext.jl5.translate;
 
 import polyglot.ast.ClassDecl;
 import polyglot.ast.Node;
-import polyglot.ext.jl5.ast.JL5EnumDeclExt;
+import polyglot.ext.jl5.ast.AnnotatedElement;
 import polyglot.ext.jl5.ast.JL5Ext;
 import polyglot.ext.jl5.ast.JL5NodeFactory;
 import polyglot.translate.ExtensionRewriter;
 import polyglot.translate.ext.ClassDeclToExt_c;
-import polyglot.translate.ext.ToExt;
 import polyglot.types.SemanticException;
 import polyglot.util.SerialVersionUID;
 
-public class EnumDeclToExt_c extends ClassDeclToExt_c implements ToExt {
+public class EnumDeclToExt_c extends ClassDeclToExt_c {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
     @Override
     public Node toExt(ExtensionRewriter rw) throws SemanticException {
         ClassDecl cd = (ClassDecl) node();
-        JL5EnumDeclExt ext = (JL5EnumDeclExt) JL5Ext.ext(cd);
         return ((JL5NodeFactory) rw.to_nf()).EnumDecl(cd.position(),
                                                       cd.flags(),
-                                                      ext.annotationElems(),
+                                                      ((AnnotatedElement) JL5Ext.ext(cd)).annotationElems(),
                                                       cd.id(),
                                                       cd.superClass(),
                                                       cd.interfaces(),

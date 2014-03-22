@@ -21,6 +21,7 @@ import polyglot.types.Flags;
 import polyglot.types.SemanticException;
 import polyglot.util.CodeWriter;
 import polyglot.util.Position;
+import polyglot.util.SerialVersionUID;
 import polyglot.visit.NodeVisitor;
 import polyglot.visit.PrettyPrinter;
 import polyglot.visit.Translator;
@@ -37,6 +38,7 @@ import coffer.types.Key;
  */
 public class CofferClassDecl_c extends ClassDecl_c implements CofferClassDecl {
     protected KeyNode key;
+    private static final long serialVersionUID = SerialVersionUID.generate();
 
     public CofferClassDecl_c(Position pos, Flags flags, Id name, KeyNode key,
             TypeNode superClass, List<TypeNode> interfaces, ClassBody body) {
@@ -65,7 +67,7 @@ public class CofferClassDecl_c extends ClassDecl_c implements CofferClassDecl {
             n.key = key;
         }
 
-        return (CofferClassDecl_c) n.reconstruct(name,
+        return (CofferClassDecl_c) reconstruct(n, name,
                                                  superClass,
                                                  interfaces,
                                                  body);
@@ -73,11 +75,11 @@ public class CofferClassDecl_c extends ClassDecl_c implements CofferClassDecl {
 
     @Override
     public Node visitChildren(NodeVisitor v) {
-        Id name = (Id) visitChild(this.name, v);
-        KeyNode key = (KeyNode) visitChild(this.key, v);
-        TypeNode superClass = (TypeNode) visitChild(this.superClass, v);
+        Id name = visitChild(this.name, v);
+        KeyNode key = visitChild(this.key, v);
+        TypeNode superClass = visitChild(this.superClass, v);
         List<TypeNode> interfaces = visitList(this.interfaces, v);
-        ClassBody body = (ClassBody) visitChild(this.body, v);
+        ClassBody body = visitChild(this.body, v);
         return reconstruct(name, key, superClass, interfaces, body);
     }
 

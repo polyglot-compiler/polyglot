@@ -87,7 +87,7 @@ public class JL5ConstructorInstance_c extends ConstructorInstance_c implements
                 formal = formalTypes.next();
             }
             if (!formalTypes.hasNext() && this.isVariableArity()) {
-                // varible arity method, and this is the last arg.
+                // variable arity method, and this is the last arg.
                 ArrayType arr =
                         (ArrayType) myFormalTypes.get(myFormalTypes.size() - 1);
                 formal = arr.base();

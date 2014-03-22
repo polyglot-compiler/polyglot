@@ -29,6 +29,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import polyglot.ast.Lang;
 import polyglot.types.ClassType;
 import polyglot.types.Context;
 import polyglot.types.Context_c;
@@ -56,8 +57,8 @@ public class JL5Context_c extends Context_c implements JL5Context {
     public static final Kind SWITCH = new Kind("switch");
     public static final Kind EXTENDS = new Kind("extends");
 
-    public JL5Context_c(TypeSystem ts) {
-        super(ts);
+    public JL5Context_c(Lang lang, TypeSystem ts) {
+        super(lang, ts);
     }
 
     @Override
@@ -76,7 +77,7 @@ public class JL5Context_c extends Context_c implements JL5Context {
         }
 
         try {
-            // might be a static iport
+            // might be a static import
             if (importTable() != null) {
                 JL5ImportTable jit = (JL5ImportTable) importTable();
                 for (String next : jit.singleStaticImports()) {

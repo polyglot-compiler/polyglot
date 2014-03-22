@@ -71,29 +71,29 @@ public class Precedence extends Enum {
     public static final Precedence UNARY = new Precedence("unary", 10);
     /** The precedence of a cast expression. */
     public static final Precedence CAST = new Precedence("cast", 10);
-    /** The precedence of a <code>*</code>, <code>/</code>, or <code>%</code> expression. */
+    /** The precedence of a {@code *}, {@code /}, or {@code %} expression. */
     public static final Precedence MUL = new Precedence("*", 20);
-    /** The precedence of a <code>+</code> when applied to Strings.  This is of higher precedence than <code>+</code> applied to numbers. */
+    /** The precedence of a {@code +} when applied to Strings.  This is of higher precedence than {@code +} applied to numbers. */
     public static final Precedence STRING_ADD = new Precedence("string+", 30);
-    /** The precedence of a <code>+</code> when applied to numbers, and the precedence of <code>-</code>. */
+    /** The precedence of a {@code +} when applied to numbers, and the precedence of {@code -}. */
     public static final Precedence ADD = new Precedence("+", 40);
-    /** The precedence of the shift expressions <code>&lt;&lt;</code>, <code>&gt;&gt;</code>, and <code>&gt;&gt;&gt;</code>. */
+    /** The precedence of the shift expressions {@code <<}, {@code >>}, and {@code >>>}. */
     public static final Precedence SHIFT = new Precedence("<<", 50);
-    /** The precedence of the relational expressions <code>&lt;</code>, <code>&gt;</code>, <code>&lt;=</code>, and <code>&gt;=</code>. */
+    /** The precedence of the relational expressions {@code <}, {@code >}, {@code <=}, and {@code >=}. */
     public static final Precedence RELATIONAL = new Precedence("<", 60);
-    /** The precedence of <code>instanceof</code> expressions. */
+    /** The precedence of {@code instanceof} expressions. */
     public static final Precedence INSTANCEOF = new Precedence("isa", 70);
-    /** The precedence of equality operators.  That is, precedence of <code>==</code> and <code>!=</code> expressions. */
+    /** The precedence of equality operators.  That is, precedence of {@code ==} and {@code !=} expressions. */
     public static final Precedence EQUAL = new Precedence("==", 80);
-    /** The precedence of bitwise AND (<code>&amp;<code>) expressions. */
+    /** The precedence of bitwise AND ({@code &}) expressions. */
     public static final Precedence BIT_AND = new Precedence("&", 90);
-    /** The precedence of bitwise XOR (<code>^<code>) expressions. */
+    /** The precedence of bitwise XOR ({@code ^}) expressions. */
     public static final Precedence BIT_XOR = new Precedence("^", 100);
-    /** The precedence of bitwise OR (<code>|<code>) expressions. */
+    /** The precedence of bitwise OR ({@code |}) expressions. */
     public static final Precedence BIT_OR = new Precedence("|", 110);
-    /** The precedence of conditional AND (<code>&&<code>) expressions. */
+    /** The precedence of conditional AND ({@code &&}) expressions. */
     public static final Precedence COND_AND = new Precedence("&&", 120);
-    /** The precedence of conditional OR (<code>||<code>) expressions. */
+    /** The precedence of conditional OR ({@code ||}) expressions. */
     public static final Precedence COND_OR = new Precedence("||", 130);
     /** The precedence of ternary conditional expressions. */
     public static final Precedence CONDITIONAL = new Precedence("?:", 140);

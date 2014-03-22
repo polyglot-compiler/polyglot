@@ -51,8 +51,8 @@ import polyglot.util.InternalCompilerError;
 import polyglot.util.StringUtil;
 
 /**
- * The <code>Scheduler</code> manages <code>Goal</code>s and runs
- * <code>Pass</code>es.
+ * The {@code Scheduler} manages {@code Goal}s and runs
+ * {@code Pass}es.
  * 
  * The basic idea is to have the scheduler try to satisfy goals.
  * To reach a goal, a pass is run.  The pass could modify an AST or it
@@ -84,11 +84,11 @@ public abstract class Scheduler {
     protected LinkedList<Goal> worklist;
 
     /**
-     * A map from <code>Source</code>s to <code>Job</code>s or to
-     * the <code>COMPLETED_JOB</code> object if the Job previously
+     * A map from {@code Source}s to {@code Job}s or to
+     * the {@code COMPLETED_JOB} object if the Job previously
      * existed
      * but has now finished. The map contains entries for all
-     * <code>Source</code>s that have had <code>Job</code>s added for them.
+     * {@code Source}s that have had {@code Job}s added for them.
      */
     protected Map<Source, Job> jobs;
 
@@ -139,8 +139,8 @@ public abstract class Scheduler {
     }
 
     /**
-     * Add a new corequisite <code>subgoal</code> of the <code>goal</code>.
-     * <code>subgoal</code> is a goal on which <code>goal</code> mutually
+     * Add a new corequisite {@code subgoal} of the {@code goal}.
+     * {@code subgoal} is a goal on which {@code goal} mutually
      * depends. The caller must be careful to ensure that all corequisite goals
      * can be eventually reached.
      */
@@ -176,13 +176,13 @@ public abstract class Scheduler {
     }
 
     /**
-     * Add a new <code>subgoal</code> of <code>goal</code>.
-     * <code>subgoal</code> must be completed before <code>goal</code> is
+     * Add a new {@code subgoal} of {@code goal}.
+     * {@code subgoal} must be completed before {@code goal} is
      * attempted.
      * 
      * @throws CyclicDependencyException
-     *             if a prerequisite of <code>subgoal</code> is
-     *             <code>goal</code>
+     *             if a prerequisite of {@code subgoal} is
+     *             {@code goal}
      */
     public void addPrerequisiteDependency(Goal goal, Goal subgoal)
             throws CyclicDependencyException {
@@ -206,10 +206,10 @@ public abstract class Scheduler {
     }
 
     /**
-     * Intern the <code>goal</code> so that there is only one copy of the goal.
+     * Intern the {@code goal} so that there is only one copy of the goal.
      * All goals passed into and returned by scheduler should be interned.
      * @param goal
-     * @return the interned copy of <code>goal</code>
+     * @return the interned copy of {@code goal}
      */
     public synchronized Goal internGoal(Goal goal) {
         Goal g = goals.get(goal);
@@ -224,7 +224,7 @@ public abstract class Scheduler {
         return g;
     }
 
-    /** Add <code>goal</code> to the worklist. */
+    /** Add {@code goal} to the worklist. */
     public void addGoal(Goal goal) {
         if (!inWorklist.contains(goal)) {
             inWorklist.add(goal);
@@ -316,7 +316,7 @@ public abstract class Scheduler {
 
     /**
      * Attempt to complete all goals in the worklist (and any subgoals they
-     * have). This method returns <code>true</code> if all passes were
+     * have). This method returns {@code true} if all passes were
      * successfully run and all goals in the worklist were reached. The worklist
      * should be empty at return.
      */
@@ -386,7 +386,7 @@ public abstract class Scheduler {
     }
 
     /**
-     * Run a pass until the <code>goal</code> is attempted. Callers should
+     * Run a pass until the {@code goal} is attempted. Callers should
      * check goal.completed() and should be able to handle the goal not being
      * reached.
      * 
@@ -529,7 +529,7 @@ public abstract class Scheduler {
     }
 
     /**         
-     * Run the pass <code>pass</code>.  All subgoals of the pass's goal
+     * Run the pass {@code pass}.  All subgoals of the pass's goal
      * required to start the pass should be satisfied.  Running the pass
      * may not satisfy the goal, forcing it to be retried later with new
      * subgoals.
@@ -720,7 +720,11 @@ public abstract class Scheduler {
                 System.err.println("Pretty-printing AST for " + job + " after "
                         + pass.name());
 
-                job.ast().prettyPrint(System.err);
+                extInfo.nodeFactory()
+                       .lang()
+                       .prettyPrint(job.ast(),
+                                    extInfo.nodeFactory().lang(),
+                                    System.err);
             }
 
             // dump this pass if we need to.
@@ -731,7 +735,11 @@ public abstract class Scheduler {
                 System.err.println("Dumping AST for " + job + " after "
                         + pass.name());
 
-                job.ast().dump(System.err);
+                extInfo.nodeFactory()
+                       .lang()
+                       .dump(job.ast(),
+                             extInfo.nodeFactory().lang(),
+                             System.err);
             }
 
             // This seems to work around a VM bug on linux with JDK
@@ -839,10 +847,10 @@ public abstract class Scheduler {
     }
 
     /**
-     * Add a new <code>Job</code> for the <code>Source source</code>.
+     * Add a new {@code Job} for the {@code Source source}.
      * A new job will be created if
-     * needed. If the <code>Source source</code> has already been processed,
-     * and its job discarded to release resources, then <code>null</code>
+     * needed. If the {@code Source source} has already been processed,
+     * and its job discarded to release resources, then {@code null}
      * will be returned.
      */
     public Job addJob(Source source) {
@@ -850,11 +858,11 @@ public abstract class Scheduler {
     }
 
     /**
-     * Add a new <code>Job</code> for the <code>Source source</code>,
-     * with AST <code>ast</code>.
+     * Add a new {@code Job} for the {@code Source source},
+     * with AST {@code ast}.
      * A new job will be created if
-     * needed. If the <code>Source source</code> has already been processed,
-     * and its job discarded to release resources, then <code>null</code>
+     * needed. If the {@code Source source} has already been processed,
+     * and its job discarded to release resources, then {@code null}
      * will be returned.
      */
     public Job addJob(Source source, Node ast) {
@@ -883,8 +891,8 @@ public abstract class Scheduler {
     }
 
     /**
-     * Create a new <code>Job</code> for the given source and AST.
-     * In general, this method should only be called by <code>addJob</code>.
+     * Create a new {@code Job} for the given source and AST.
+     * In general, this method should only be called by {@code addJob}.
      */
     protected Job createSourceJob(Source source, Node ast) {
         return new Job(extInfo, extInfo.jobExt(), source, ast);

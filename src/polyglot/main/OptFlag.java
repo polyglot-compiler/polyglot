@@ -142,8 +142,10 @@ public abstract class OptFlag<T> implements Comparable<OptFlag<T>> {
     @Override
     public int compareTo(OptFlag<T> flag) {
         for (String id1 : ids) {
-            for (String id2 : flag.ids())
-                return id1.compareTo(id2);
+            for (String id2 : flag.ids()) {
+                int cmp = id1.compareToIgnoreCase(id2);
+                return cmp == 0 ? id1.compareTo(id2) : cmp;
+            }
         }
         throw new InternalCompilerError("Empty ids!");
     }
@@ -542,7 +544,7 @@ public abstract class OptFlag<T> implements Comparable<OptFlag<T>> {
         out.println();
     }
 
-    private void printSpaces(PrintStream out, int n) {
+    private static void printSpaces(PrintStream out, int n) {
         while (n-- > 0)
             out.print(' ');
     }
@@ -559,7 +561,7 @@ public abstract class OptFlag<T> implements Comparable<OptFlag<T>> {
          * @param entry
          *      an entry of the path string
          * @return 
-         *      the value corresponding to the path entry or <code>null</code> to skip this entry.
+         *      the value corresponding to the path entry or {@code null} to skip this entry.
          */
         public abstract T handlePathEntry(String entry);
 

@@ -39,6 +39,7 @@ import polyglot.types.SemanticException;
 import polyglot.types.Type;
 import polyglot.types.TypeSystem;
 import polyglot.util.CodeWriter;
+import polyglot.util.Copy;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
@@ -49,8 +50,8 @@ import polyglot.visit.PrettyPrinter;
 import polyglot.visit.TypeChecker;
 
 /**
- * A <code>Return</code> represents a <code>return</code> statement in Java.
- * It may or may not return a value.  If not <code>expr()</code> should return
+ * A {@code Return} represents a {@code return} statement in Java.
+ * It may or may not return a value.  If not {@code expr()} should return
  * null.
  */
 public class Return_c extends Stmt_c implements Return {
@@ -58,45 +59,46 @@ public class Return_c extends Stmt_c implements Return {
 
     protected Expr expr;
 
+    @Deprecated
     public Return_c(Position pos, Expr expr) {
-        super(pos);
+        this(pos, expr, null);
+    }
+
+    public Return_c(Position pos, Expr expr, Ext ext) {
+        super(pos, ext);
         assert (true); // expr may be null
         this.expr = expr;
     }
 
-    /** Get the expression to return, or null. */
     @Override
     public Expr expr() {
         return this.expr;
     }
 
-    /** Set the expression to return, or null. */
     @Override
     public Return expr(Expr expr) {
-        Return_c n = (Return_c) copy();
+        return expr(this, expr);
+    }
+
+    protected <N extends Return_c> N expr(N n, Expr expr) {
+        if (n.expr == expr) return n;
+        if (n == this) n = Copy.Util.copy(n);
         n.expr = expr;
         return n;
     }
 
     /** Reconstruct the statement. */
-    protected Return_c reconstruct(Expr expr) {
-        if (expr != this.expr) {
-            Return_c n = (Return_c) copy();
-            n.expr = expr;
-            return n;
-        }
-
-        return this;
+    protected <N extends Return_c> N reconstruct(N n, Expr expr) {
+        n = expr(n, expr);
+        return n;
     }
 
-    /** Visit the children of the statement. */
     @Override
     public Node visitChildren(NodeVisitor v) {
-        Expr expr = (Expr) visitChild(this.expr, v);
-        return reconstruct(expr);
+        Expr expr = visitChild(this.expr, v);
+        return reconstruct(this, expr);
     }
 
-    /** Type check the statement. */
     @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
         TypeSystem ts = tc.typeSystem();
@@ -139,7 +141,9 @@ public class Return_c extends Stmt_c implements Return {
                 return this;
             }
 
-            if (ts.numericConversionValid(fi.returnType(), expr.constantValue())) {
+            if (ts.numericConversionValid(fi.returnType(),
+                                          tc.lang().constantValue(expr,
+                                                                  tc.lang()))) {
                 return this;
             }
 
@@ -171,7 +175,6 @@ public class Return_c extends Stmt_c implements Return {
         return "return" + (expr != null ? " " + expr : "") + ";";
     }
 
-    /** Write the statement to an output file. */
     @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
         w.write("return");

@@ -37,7 +37,7 @@ import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
 
 /**
- * A <code>ClassType</code> represents a class -- either loaded from a
+ * A {@code ClassType} represents a class -- either loaded from a
  * classpath, parsed from a source file, or obtained from other source.
  */
 public abstract class ClassType_c extends ReferenceType_c implements ClassType {
@@ -88,11 +88,9 @@ public abstract class ClassType_c extends ReferenceType_c implements ClassType {
 
     public abstract Job job();
 
-    /** Get the class's kind. */
     @Override
     public abstract Kind kind();
 
-    /** Get the class's outer class, or null if a top-level class. */
     @Override
     public abstract ClassType outer();
 
@@ -201,31 +199,24 @@ public abstract class ClassType_c extends ReferenceType_c implements ClassType {
     @Override
     public abstract Flags flags();
 
-    /** Get the class's constructors. */
     @Override
     public abstract List<? extends ConstructorInstance> constructors();
 
-    /** Get the class's member classes. */
     @Override
     public abstract List<? extends ClassType> memberClasses();
 
-    /** Get the class's methods. */
     @Override
     public abstract List<? extends MethodInstance> methods();
 
-    /** Get the class's fields. */
     @Override
     public abstract List<? extends FieldInstance> fields();
 
-    /** Get the class's interfaces. */
     @Override
     public abstract List<? extends ReferenceType> interfaces();
 
-    /** Get the class's super type. */
     @Override
     public abstract Type superType();
 
-    /** Get a list of all the class's MemberInstances. */
     @Override
     public List<? extends MemberInstance> members() {
         List<MemberInstance> l = new ArrayList<MemberInstance>();
@@ -236,7 +227,6 @@ public abstract class ClassType_c extends ReferenceType_c implements ClassType {
         return l;
     }
 
-    /** Get a field of the class by name. */
     @Override
     public FieldInstance fieldNamed(String name) {
         for (FieldInstance fi : fields()) {
@@ -248,7 +238,6 @@ public abstract class ClassType_c extends ReferenceType_c implements ClassType {
         return null;
     }
 
-    /** Get a member class of the class by name. */
     @Override
     public ClassType memberClassNamed(String name) {
         for (ClassType t : memberClasses()) {
@@ -331,12 +320,6 @@ public abstract class ClassType_c extends ReferenceType_c implements ClassType {
         return ts.isSubtype(this, toType);
     }
 
-    /**
-     * Requires: all type arguments are canonical.  ToType is not a NullType.
-     *
-     * Returns true iff a cast from this to toType is valid; in other
-     * words, some non-null members of this are also members of toType.
-     **/
     @Override
     public boolean isCastValidImpl(Type toType) {
         if (!toType.isCanonical()) return false;
@@ -518,7 +501,7 @@ public abstract class ClassType_c extends ReferenceType_c implements ClassType {
 
     /** 
      * Return true if an object of the class has
-     * an enclosing instance of <code>encl</code>. 
+     * an enclosing instance of {@code encl}. 
      */
     @Override
     public boolean hasEnclosingInstanceImpl(ClassType encl) {

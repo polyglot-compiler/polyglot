@@ -25,9 +25,11 @@
  ******************************************************************************/
 package polyglot.ext.jl5.ast;
 
+import java.util.List;
+
 import polyglot.ast.Formal;
 import polyglot.ast.Node;
-import polyglot.ast.Node_c;
+import polyglot.ast.Term;
 import polyglot.ext.jl5.types.Annotations;
 import polyglot.ext.jl5.types.JL5ArrayType;
 import polyglot.ext.jl5.types.JL5Flags;
@@ -42,13 +44,17 @@ import polyglot.visit.AmbiguityRemover;
 import polyglot.visit.PrettyPrinter;
 import polyglot.visit.TypeChecker;
 
-public class JL5FormalExt extends JL5AnnotatedElementExt implements
-        AnnotatedElement {
+public class JL5FormalExt extends JL5AnnotatedElementExt {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
     protected boolean isVarArg = false;
 
     protected boolean isCatchFormal = false;
+
+    public JL5FormalExt(boolean isVarArg, List<Term> annotations) {
+        super(annotations);
+        this.isVarArg = isVarArg;
+    }
 
     public boolean isVarArg() {
         return isVarArg;
@@ -87,33 +93,29 @@ public class JL5FormalExt extends JL5AnnotatedElementExt implements
 
     }
 
+    @Override
     public Node disambiguate(AmbiguityRemover ar) throws SemanticException {
         Formal f = (Formal) this.node();
-        JL5FormalExt ext = (JL5FormalExt) JL5Ext.ext(f);
 
-        if (ext.isVarArg()) {
+        if (isVarArg) {
             ((JL5ArrayType) f.type().type()).setVarArg();
         }
-        return this.superDel().disambiguate(ar);
+        return superLang().disambiguate(this.node(), ar);
     }
 
+    @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
+        super.prettyPrint(w, tr);
+
         Formal f = (Formal) this.node();
-        JL5FormalExt ext = (JL5FormalExt) JL5Ext.ext(f);
-
-        for (AnnotationElem ae : ext.annotationElems()) {
-            ae.del().prettyPrint(w, tr);
-            w.newline();
-        }
-
         w.write(JL5Flags.clearVarArgs(f.flags()).translate());
-        if (ext.isVarArg()) {
+        if (isVarArg) {
             w.write(((ArrayType) f.type().type()).base().toString());
             //print(type, w, tr);
             w.write(" ...");
         }
         else {
-            ((Node_c) f).print(f.type(), w, tr);
+            print(f.type(), w, tr);
         }
         w.write(" ");
         w.write(f.name());

@@ -295,6 +295,16 @@ public class JL5ParsedClassType_c extends ParsedClassType_c implements
 
     @Override
     public String translate(Resolver c) {
+        if (isMember() && flags.isStatic()) {
+            ReferenceType container = container();
+            if (container instanceof JL5ParsedClassType) {
+                // For a static nested class whose enclosing class has a type
+                // parameter, the enclosing class is needed as the qualifier.
+                JL5ParsedClassType pct = (JL5ParsedClassType) container;
+                if (!pct.typeVariables().isEmpty())
+                    return container.translate(c) + "." + name();
+            }
+        }
         // Translate without printing out any parameters.
         return super.translate(c);
     }

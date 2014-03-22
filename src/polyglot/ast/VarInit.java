@@ -29,7 +29,7 @@ package polyglot.ast;
 import polyglot.types.VarInstance;
 
 /**
- * <code>VarInit</code> should be implemented by any node that could declare and
+ * {@code VarInit} should be implemented by any node that could declare and
  * initialize a variable or field.
  */
 public interface VarInit {

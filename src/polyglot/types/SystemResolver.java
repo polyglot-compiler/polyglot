@@ -40,7 +40,7 @@ import polyglot.util.Transformation;
 import polyglot.util.TransformingList;
 
 /**
- * The <code>SystemResolver</code> is the main resolver for
+ * The {@code SystemResolver} is the main resolver for
  * fully-qualified names.
  */
 public class SystemResolver extends CachingResolver implements TopLevelResolver {
@@ -244,8 +244,10 @@ public class SystemResolver extends CachingResolver implements TopLevelResolver 
     @Override
     public void install(String name, Named q) {
         if (Report.should_report(TOPICS, 2) && check(name) == null)
-            Report.report(2, (previous == null ? "root" : "non-root")
-                    + " SR installing " + name + "->" + q + " : " + q.getClass());
+            Report.report(2,
+                          (previous == null ? "root" : "non-root")
+                                  + " SR installing " + name + "->" + q + " : "
+                                  + q.getClass());
 
         super.install(name, q);
 

@@ -29,7 +29,7 @@ package polyglot.ast;
 import java.util.List;
 
 /**
- * A <code>Block</code> represents a Java block statement -- an immutable
+ * A {@code Block} represents a Java block statement -- an immutable
  * sequence of statements.
  */
 public interface Block extends CompoundStmt {

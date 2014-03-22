@@ -42,7 +42,7 @@ import polyglot.util.InternalCompilerError;
  * the base class of the disambiguation and type checking visitors.
  *
  * TODO: update this documentation.
- * For a node <code>n</code> methods are called in this order:
+ * For a node {@code n} methods are called in this order:
  * <pre>
  * v.enter(n)
  *   v.enterScope(n);
@@ -104,7 +104,7 @@ public class ContextVisitor extends ErrorHandlingVisitor {
      *
      *  @param c The new context that is to be used.
      *  @return Returns a copy of this visitor with the new context 
-     *  <code>c</code>.
+     *  {@code c}.
      */
     public ContextVisitor context(Context c) {
         ContextVisitor v = (ContextVisitor) this.copy();
@@ -114,18 +114,18 @@ public class ContextVisitor extends ErrorHandlingVisitor {
 
     /**
      * Returns a new context based on the current context, the Node current 
-     * being visited (<code>parent</code>), and the Node that is being 
-     * entered (<code>n</code>).  This new context is to be used
-     * for visiting <code>n</code>. 
+     * being visited ({@code parent}), and the Node that is being 
+     * entered ({@code n}).  This new context is to be used
+     * for visiting {@code n}. 
      *
-     * @return The new context after entering Node <code>n</code>.
+     * @return The new context after entering Node {@code n}.
      */
     protected Context enterScope(Node parent, Node n) {
         if (parent != null) {
-            return parent.del().enterChildScope(n, context);
+            return lang().enterChildScope(parent, n, context);
         }
         // no parent node yet.
-        return n.del().enterScope(context);
+        return lang().enterScope(n, context);
     }
 
     /**
@@ -142,7 +142,7 @@ public class ContextVisitor extends ErrorHandlingVisitor {
      * visiting the node.
      */
     protected void addDecls(Node n) {
-        n.del().addDecls(context);
+        lang().addDecls(n, context);
     }
 
     @Override
@@ -156,7 +156,7 @@ public class ContextVisitor extends ErrorHandlingVisitor {
             Report.report(5, "enter(" + n + ")");
 
         if (prune) {
-            return new PruningVisitor();
+            return new PruningVisitor(lang());
         }
 
         try {
@@ -189,7 +189,7 @@ public class ContextVisitor extends ErrorHandlingVisitor {
             if (this.rethrowMissingDependencies) {
                 throw e;
             }
-            return new PruningVisitor();
+            return new PruningVisitor(lang());
         }
     }
 

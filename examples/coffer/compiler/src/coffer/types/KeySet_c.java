@@ -14,8 +14,11 @@ import polyglot.types.TypeObject;
 import polyglot.types.TypeObject_c;
 import polyglot.types.TypeSystem;
 import polyglot.util.Position;
+import polyglot.util.SerialVersionUID;
 
 public class KeySet_c extends TypeObject_c implements KeySet {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     HashSet<Key> set;
 
     public KeySet_c(TypeSystem ts, Position pos) {

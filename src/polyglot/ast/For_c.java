@@ -26,7 +26,6 @@
 
 package polyglot.ast;
 
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
@@ -36,6 +35,7 @@ import polyglot.types.Type;
 import polyglot.types.TypeSystem;
 import polyglot.util.CodeWriter;
 import polyglot.util.CollectionUtil;
+import polyglot.util.Copy;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.ListUtil;
 import polyglot.util.Position;
@@ -48,7 +48,7 @@ import polyglot.visit.PrettyPrinter;
 import polyglot.visit.TypeChecker;
 
 /**
- * An immutable representation of a Java language <code>for</code>
+ * An immutable representation of a Java language {@code for}
  * statement.  Contains a statement to be executed and an expression
  * to be tested indicating whether to reexecute the statement.
  */
@@ -56,101 +56,82 @@ public class For_c extends Loop_c implements For {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
     protected List<ForInit> inits;
-    protected Expr cond;
     protected List<ForUpdate> iters;
-    protected Stmt body;
 
+    @Deprecated
     public For_c(Position pos, List<ForInit> inits, Expr cond,
             List<ForUpdate> iters, Stmt body) {
-        super(pos);
-        assert (inits != null && iters != null && body != null); // cond may be null, inits and iters may be empty
-        this.inits = ListUtil.copy(inits, true);
-        this.cond = cond;
-        this.iters = ListUtil.copy(iters, true);
-        this.body = body;
+        this(pos, inits, cond, iters, body, null);
     }
 
-    /** List of initialization statements */
+    public For_c(Position pos, List<ForInit> inits, Expr cond,
+            List<ForUpdate> iters, Stmt body, Ext ext) {
+        super(pos, cond, body, ext);
+        assert (inits != null && iters != null); // cond may be null, inits and iters may be empty
+        this.inits = ListUtil.copy(inits, true);
+        this.iters = ListUtil.copy(iters, true);
+    }
+
     @Override
     public List<ForInit> inits() {
-        return Collections.unmodifiableList(this.inits);
+        return this.inits;
     }
 
-    /** Set the inits of the statement. */
     @Override
     public For inits(List<ForInit> inits) {
-        For_c n = (For_c) copy();
+        return inits(this, inits);
+    }
+
+    protected <N extends For_c> N inits(N n, List<ForInit> inits) {
+        if (CollectionUtil.equals(n.inits, inits)) return n;
+        if (n == this) n = Copy.Util.copy(n);
         n.inits = ListUtil.copy(inits, true);
         return n;
     }
 
-    /** Loop condition */
-    @Override
-    public Expr cond() {
-        return this.cond;
-    }
-
-    /** Set the conditional of the statement. */
     @Override
     public For cond(Expr cond) {
-        For_c n = (For_c) copy();
-        n.cond = cond;
-        return n;
+        return cond(this, cond);
     }
 
-    /** List of iterator expressions. */
     @Override
     public List<ForUpdate> iters() {
-        return Collections.unmodifiableList(this.iters);
+        return this.iters;
     }
 
-    /** Set the iterator expressions of the statement. */
     @Override
     public For iters(List<ForUpdate> iters) {
-        For_c n = (For_c) copy();
+        return iters(this, iters);
+    }
+
+    protected <N extends For_c> N iters(N n, List<ForUpdate> iters) {
+        if (CollectionUtil.equals(n.iters, iters)) return n;
+        if (n == this) n = Copy.Util.copy(n);
         n.iters = ListUtil.copy(iters, true);
         return n;
     }
 
-    /** Loop body */
-    @Override
-    public Stmt body() {
-        return this.body;
-    }
-
-    /** Set the body of the statement. */
     @Override
     public For body(Stmt body) {
-        For_c n = (For_c) copy();
-        n.body = body;
-        return n;
+        return body(this, body);
     }
 
     /** Reconstruct the statement. */
-    protected For_c reconstruct(List<ForInit> inits, Expr cond,
-            List<ForUpdate> iters, Stmt body) {
-        if (!CollectionUtil.equals(inits, this.inits) || cond != this.cond
-                || !CollectionUtil.equals(iters, this.iters)
-                || body != this.body) {
-            For_c n = (For_c) copy();
-            n.inits = ListUtil.copy(inits, true);
-            n.cond = cond;
-            n.iters = ListUtil.copy(iters, true);
-            n.body = body;
-            return n;
-        }
-
-        return this;
+    protected <N extends For_c> N reconstruct(N n, List<ForInit> inits,
+            Expr cond, List<ForUpdate> iters, Stmt body) {
+        n = super.reconstruct(n, cond, body);
+        n = inits(n, inits);
+        n = iters(n, iters);
+        return n;
     }
 
-    /** Visit the children of the statement. */
     @Override
     public Node visitChildren(NodeVisitor v) {
         List<ForInit> inits = visitList(this.inits, v);
-        Expr cond = (Expr) visitChild(this.cond, v);
+        Expr cond = visitChild(this.cond, v);
         List<ForUpdate> iters = visitList(this.iters, v);
-        Stmt body = (Stmt) visitChild(this.body, v);
-        return reconstruct(inits, cond, iters, body);
+        Stmt body = visitChild(this.body, v);
+        return reconstruct(this, inits, cond, iters, body);
     }
 
     @Override
@@ -158,7 +139,6 @@ public class For_c extends Loop_c implements For {
         return c.pushBlock();
     }
 
-    /** Type check the statement. */
     @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
         TypeSystem ts = tc.typeSystem();
@@ -205,7 +185,6 @@ public class For_c extends Loop_c implements For {
         return child.type();
     }
 
-    /** Write the statement to an output file. */
     @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
         w.write("for (");
@@ -283,10 +262,11 @@ public class For_c extends Loop_c implements For {
         v.visitCFGList(inits, cond != null ? (Term) cond : body, ENTRY);
 
         if (cond != null) {
-            if (condIsConstantTrue()) {
+            if (v.lang().condIsConstantTrue(this, v.lang())) {
                 v.visitCFG(cond, body, ENTRY);
             }
-            else if (condIsConstantFalse() && v.skipDeadLoopBodies()) {
+            else if (v.lang().condIsConstantFalse(this, v.lang())
+                    && v.skipDeadLoopBodies()) {
                 v.visitCFG(cond, FlowGraph.EDGE_KEY_FALSE, this, EXIT);
                 return succs;
             }
@@ -301,7 +281,7 @@ public class For_c extends Loop_c implements For {
             }
         }
 
-        v.push(this).visitCFG(body, continueTarget(), ENTRY);
+        v.push(this).visitCFG(body, lang().continueTarget(this), ENTRY);
         v.visitCFGList(iters, cond != null ? (Term) cond : body, ENTRY);
 
         return succs;

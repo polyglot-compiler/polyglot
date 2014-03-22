@@ -26,33 +26,86 @@
 
 package polyglot.ast;
 
+import polyglot.util.Copy;
 import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
 
 /**
- * An immutable representation of a Java language <code>while</code>
+ * An immutable representation of a loop
  * statement.  It contains a statement to be executed and an expression
  * to be tested indicating whether to reexecute the statement.
  */
-public abstract class Loop_c extends Stmt_c implements Loop {
+public abstract class Loop_c extends Stmt_c implements Loop, LoopOps {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
-    public Loop_c(Position pos) {
-        super(pos);
+    protected Expr cond;
+    protected Stmt body;
+
+    @Deprecated
+    public Loop_c(Position pos, Expr cond, Stmt body) {
+        this(pos, cond, body, null);
+    }
+
+    public Loop_c(Position pos, Expr cond, Stmt body, Ext ext) {
+        super(pos, ext);
+        assert (body != null);
+        this.body = body;
+        this.cond = cond;
     }
 
     @Override
-    public boolean condIsConstant() {
-        return cond().isConstant();
+    public Expr cond() {
+        return this.cond;
     }
 
     @Override
-    public boolean condIsConstantTrue() {
-        return Boolean.TRUE.equals(cond().constantValue());
+    public Loop cond(Expr cond) {
+        return cond(this, cond);
+    }
+
+    protected <N extends Loop_c> N cond(N n, Expr cond) {
+        if (n.cond == cond) return n;
+        if (n == this) n = Copy.Util.copy(n);
+        n.cond = cond;
+        return n;
     }
 
     @Override
-    public boolean condIsConstantFalse() {
-        return Boolean.FALSE.equals(cond().constantValue());
+    public boolean condIsConstant(JLang lang) {
+        return lang.isConstant(cond(), lang);
+    }
+
+    @Override
+    public boolean condIsConstantTrue(JLang lang) {
+        return Boolean.TRUE.equals(lang.constantValue(cond(), lang));
+    }
+
+    @Override
+    public boolean condIsConstantFalse(JLang lang) {
+        return Boolean.FALSE.equals(lang.constantValue(cond(), lang));
+    }
+
+    @Override
+    public Stmt body() {
+        return this.body;
+    }
+
+    @Override
+    public Loop body(Stmt body) {
+        return body(this, body);
+    }
+
+    protected <N extends Loop_c> N body(N n, Stmt body) {
+        if (n.body == body) return n;
+        if (n == this) n = Copy.Util.copy(n);
+        n.body = body;
+        return n;
+    }
+
+    /** Reconstruct the statement. */
+    protected <N extends Loop_c> N reconstruct(N n, Expr cond, Stmt body) {
+        n = cond(n, cond);
+        n = body(n, body);
+        return n;
     }
 }

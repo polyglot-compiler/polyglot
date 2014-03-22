@@ -33,9 +33,10 @@ import polyglot.types.Type;
 import polyglot.util.SerialVersionUID;
 import polyglot.visit.TypeChecker;
 
-public class JL5AssertExt extends JL5Ext {
+public class JL5AssertExt extends JL5TermExt {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
+    @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
         Assert orig = (Assert) this.node();
 
@@ -47,13 +48,13 @@ public class JL5AssertExt extends JL5Ext {
             // superclass type check functionality.
             Assert n =
                     orig.cond(orig.cond().type(ts.primitiveTypeOfWrapper(c)));
-            n = (Assert) n.typeCheck(tc);
+            n = (Assert) superLang().typeCheck(n, tc);
 
             // restore the type
             n = n.cond(n.cond().type(c));
             return n;
         }
-        return this.node().typeCheck(tc);
+        return superLang().typeCheck(this.node(), tc);
     }
 
 }

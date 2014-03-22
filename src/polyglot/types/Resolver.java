@@ -27,7 +27,7 @@
 package polyglot.types;
 
 /**
- * A <code>Resolver</code> is responsible for looking up types and
+ * A {@code Resolver} is responsible for looking up types and
  * packages by name.
  */
 public interface Resolver {

@@ -1,10 +1,14 @@
 package ppg.test.multi;
 
 import java.io.*;
+
+import java_cup.runtime.ComplexSymbolFactory;
 import java_cup.runtime.Symbol;
+import java_cup.runtime.ComplexSymbolFactory.Location;
 
 public class Token /*extends Symbol */implements LexerResult {
 
+    private static ComplexSymbolFactory csf = new ComplexSymbolFactory();
     private Symbol symbol;
     private String filename;
     private int lineno;
@@ -21,7 +25,12 @@ public class Token /*extends Symbol */implements LexerResult {
 		  Object value/*, Position pos*/) {
 		// super(id, left, right, value);
 		
-		symbol = new Symbol (id, left, right, this);
+        symbol =
+                csf.newSymbol(value.toString(),
+                              id,
+                              new Location(filename, lineno, left),
+                              new Location(filename, lineno, right),
+                              this);
 		lastID=id;
 		this.filename = filename;
 		this.lineno = lineno;

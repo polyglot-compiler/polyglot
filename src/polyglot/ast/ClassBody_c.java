@@ -38,6 +38,7 @@ import polyglot.types.SemanticException;
 import polyglot.types.TypeSystem;
 import polyglot.util.CodeWriter;
 import polyglot.util.CollectionUtil;
+import polyglot.util.Copy;
 import polyglot.util.ListUtil;
 import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
@@ -49,7 +50,7 @@ import polyglot.visit.PrettyPrinter;
 import polyglot.visit.TypeChecker;
 
 /**
- * A <code>ClassBody</code> represents the body of a class or interface
+ * A {@code ClassBody} represents the body of a class or interface
  * declaration or the body of an anonymous class.
  */
 public class ClassBody_c extends Term_c implements ClassBody {
@@ -57,8 +58,13 @@ public class ClassBody_c extends Term_c implements ClassBody {
 
     protected List<ClassMember> members;
 
+    @Deprecated
     public ClassBody_c(Position pos, List<ClassMember> members) {
-        super(pos);
+        this(pos, members, null);
+    }
+
+    public ClassBody_c(Position pos, List<ClassMember> members, Ext ext) {
+        super(pos, ext);
         assert (members != null);
         this.members = ListUtil.copy(members, true);
     }
@@ -70,36 +76,35 @@ public class ClassBody_c extends Term_c implements ClassBody {
 
     @Override
     public ClassBody members(List<ClassMember> members) {
-        ClassBody_c n = (ClassBody_c) copy();
+        return members(this, members);
+    }
+
+    protected <N extends ClassBody_c> N members(N n, List<ClassMember> members) {
+        if (CollectionUtil.equals(n.members, members)) return n;
+        if (n == this) n = Copy.Util.copy(n);
         n.members = ListUtil.copy(members, true);
         return n;
     }
 
     @Override
     public ClassBody addMember(ClassMember member) {
-        ClassBody_c n = (ClassBody_c) copy();
         List<ClassMember> l =
                 new ArrayList<ClassMember>(this.members.size() + 1);
         l.addAll(this.members);
         l.add(member);
-        n.members = ListUtil.copy(l, true);
-        return n;
+        return members(l);
     }
 
-    protected ClassBody_c reconstruct(List<ClassMember> members) {
-        if (!CollectionUtil.equals(members, this.members)) {
-            ClassBody_c n = (ClassBody_c) copy();
-            n.members = ListUtil.copy(members, true);
-            return n;
-        }
-
-        return this;
+    protected <N extends ClassBody_c> N reconstruct(N n,
+            List<ClassMember> members) {
+        n = members(n, members);
+        return n;
     }
 
     @Override
     public Node visitChildren(NodeVisitor v) {
         List<ClassMember> members = visitList(this.members, v);
-        return reconstruct(members);
+        return reconstruct(this, members);
     }
 
     @Override
@@ -241,19 +246,12 @@ public class ClassBody_c extends Term_c implements ClassBody {
         }
     }
 
-    /**
-     * Return the first (sub)term performed when evaluating this
-     * term.
-     */
     @Override
     public Term firstChild() {
         // Do _not_ visit class members.
         return null;
     }
 
-    /**
-     * Visit this term in evaluation order.
-     */
     @Override
     public <T> List<T> acceptCFG(CFGBuilder<?> v, List<T> succs) {
         return succs;

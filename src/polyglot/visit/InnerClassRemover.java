@@ -114,7 +114,7 @@ public class InnerClassRemover extends ContextVisitor {
 
             if (Report.should_report("innerremover", 1)) {
                 System.out.println(">>> output ----------------------");
-                n.prettyPrint(System.out);
+                lang().prettyPrint(n, lang(), System.out);
                 System.out.println("<<< output ----------------------");
             }
 
@@ -122,7 +122,7 @@ public class InnerClassRemover extends ContextVisitor {
 
             if (Report.should_report("innerremover", 1)) {
                 System.out.println(">>> locals removed ----------------------");
-                n.prettyPrint(System.out);
+                lang().prettyPrint(n, lang(), System.out);
                 System.out.println("<<< locals removed ----------------------");
             }
 
@@ -130,7 +130,7 @@ public class InnerClassRemover extends ContextVisitor {
 
             if (Report.should_report("innerremover", 1)) {
                 System.out.println(">>> inners removed ----------------------");
-                n.prettyPrint(System.out);
+                lang().prettyPrint(n, lang(), System.out);
                 System.out.println("<<< inners removed ----------------------");
             }
 
@@ -185,7 +185,7 @@ public class InnerClassRemover extends ContextVisitor {
                 List<Expr> args = new ArrayList<Expr>();
                 args.add(q);
                 args.addAll(neu.arguments());
-                neu = (New) neu.arguments(args);
+                neu = neu.arguments(args);
             }
 
             return neu;
@@ -299,7 +299,7 @@ public class InnerClassRemover extends ContextVisitor {
     }
 
     public ClassDecl fixQualifiers(ClassDecl cd) {
-        return (ClassDecl) cd.visitChildren(new NodeVisitor() {
+        return (ClassDecl) lang().visitChildren(cd, new NodeVisitor(lang()) {
             LocalInstance li;
 
             @Override
@@ -355,7 +355,7 @@ public class InnerClassRemover extends ContextVisitor {
     }
 
     public Expr fixQualifier(Expr e, final LocalInstance li) {
-        return (Expr) e.visit(new NodeVisitor() {
+        return (Expr) e.visit(new NodeVisitor(lang()) {
             @Override
             public Node leave(Node old, Node n, NodeVisitor v) {
                 if (n instanceof Field) {
@@ -448,7 +448,7 @@ public class InnerClassRemover extends ContextVisitor {
         List<Formal> newFormals = new ArrayList<Formal>();
         newFormals.addAll(formals);
         newFormals.addAll(cd.formals());
-        cd = cd.formals(newFormals);
+        cd = (ConstructorDecl) cd.formals(newFormals);
 
         // If the constructor call is a "this(...)" call, then
         // add the new arguments to the this call.

@@ -37,30 +37,40 @@ import polyglot.util.SerialVersionUID;
 import polyglot.visit.CFGBuilder;
 
 /**
- * A <code>ArrayAccessAssign_c</code> represents a Java assignment expression
- * to an array element.  For instance, <code>A[3] = e</code>.
+ * A {@code ArrayAccessAssign_c} represents a Java assignment expression
+ * to an array element.  For instance, {@code A[3] = e}.
  * 
- * The class of the <code>Expr</code> returned by
- * <code>ArrayAccessAssign_c.left()</code>is guaranteed to be an
- * <code>ArrayAccess</code>.
+ * The class of the {@code Expr} returned by
+ * {@code ArrayAccessAssign_c.left()}is guaranteed to be an
+ * {@code ArrayAccess}.
  */
 public class ArrayAccessAssign_c extends Assign_c implements ArrayAccessAssign {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
+    @Deprecated
     public ArrayAccessAssign_c(Position pos, ArrayAccess left, Operator op,
             Expr right) {
-        super(pos, left, op, right);
+        this(pos, left, op, right, null);
+    }
+
+    public ArrayAccessAssign_c(Position pos, ArrayAccess left, Operator op,
+            Expr right, Ext ext) {
+        super(pos, left, op, right, ext);
+    }
+
+    @Override
+    public ArrayAccess left() {
+        return (ArrayAccess) super.left();
     }
 
     @Override
     public Assign left(Expr left) {
-        ArrayAccessAssign_c n = (ArrayAccessAssign_c) super.left(left);
-        n.assertLeftType();
-        return n;
+        assertLeftType(left);
+        return super.left(left);
     }
 
-    private void assertLeftType() {
-        if (!(left() instanceof ArrayAccess)) {
+    private void assertLeftType(Expr left) {
+        if (!(left instanceof ArrayAccess)) {
             throw new InternalCompilerError("left expression of an ArrayAccessAssign must be an array access");
         }
     }
@@ -68,7 +78,7 @@ public class ArrayAccessAssign_c extends Assign_c implements ArrayAccessAssign {
     @Override
     public Term firstChild() {
         if (operator() == ASSIGN) {
-            return ((ArrayAccess) left()).array();
+            return left().array();
         }
         else {
             return left();
@@ -77,7 +87,7 @@ public class ArrayAccessAssign_c extends Assign_c implements ArrayAccessAssign {
 
     @Override
     protected void acceptCFGAssign(CFGBuilder<?> v) {
-        ArrayAccess a = (ArrayAccess) left();
+        ArrayAccess a = left();
 
         //    a[i] = e: visit a -> i -> e -> (a[i] = e)
         v.visitCFG(a.array(), a.index(), ENTRY);
@@ -116,7 +126,6 @@ public class ArrayAccessAssign_c extends Assign_c implements ArrayAccessAssign {
         return l;
     }
 
-    /** Get the throwsArrayStoreException of the expression. */
     @Override
     public boolean throwsArrayStoreException() {
         return op == ASSIGN && left.type().isReference();

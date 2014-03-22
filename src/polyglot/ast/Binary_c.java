@@ -33,6 +33,7 @@ import polyglot.types.SemanticException;
 import polyglot.types.Type;
 import polyglot.types.TypeSystem;
 import polyglot.util.CodeWriter;
+import polyglot.util.Copy;
 import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
 import polyglot.visit.AscriptionVisitor;
@@ -43,7 +44,7 @@ import polyglot.visit.PrettyPrinter;
 import polyglot.visit.TypeChecker;
 
 /**
- * A <code>Binary</code> represents a Java binary expression, an
+ * A {@code Binary} represents a Java binary expression, an
  * immutable pair of expressions combined with an operator.
  */
 public class Binary_c extends Expr_c implements Binary {
@@ -54,8 +55,13 @@ public class Binary_c extends Expr_c implements Binary {
     protected Expr right;
     protected Precedence precedence;
 
+    @Deprecated
     public Binary_c(Position pos, Expr left, Operator op, Expr right) {
-        super(pos);
+        this(pos, left, op, right, null);
+    }
+
+    public Binary_c(Position pos, Expr left, Operator op, Expr right, Ext ext) {
+        super(pos, ext);
         assert (left != null && op != null && right != null);
         this.left = left;
         this.op = op;
@@ -67,49 +73,57 @@ public class Binary_c extends Expr_c implements Binary {
         }
     }
 
-    /** Get the left operand of the expression. */
     @Override
     public Expr left() {
         return this.left;
     }
 
-    /** Set the left operand of the expression. */
     @Override
     public Binary left(Expr left) {
-        Binary_c n = (Binary_c) copy();
+        return left(this, left);
+    }
+
+    protected <N extends Binary_c> N left(N n, Expr left) {
+        if (n.left == left) return n;
+        if (n == this) n = Copy.Util.copy(n);
         n.left = left;
         return n;
     }
 
-    /** Get the operator of the expression. */
     @Override
     public Operator operator() {
         return this.op;
     }
 
-    /** Set the operator of the expression. */
     @Override
     public Binary operator(Operator op) {
-        Binary_c n = (Binary_c) copy();
+        return operator(this, op);
+    }
+
+    protected <N extends Binary_c> N operator(N n, Operator op) {
+        if (n.op == op) return n;
+        if (n == this) n = Copy.Util.copy(n);
         n.op = op;
         return n;
     }
 
-    /** Get the right operand of the expression. */
     @Override
     public Expr right() {
         return this.right;
     }
 
-    /** Set the right operand of the expression. */
     @Override
     public Binary right(Expr right) {
-        Binary_c n = (Binary_c) copy();
+        return right(this, right);
+    }
+
+    protected <N extends Binary_c> N right(N n, Expr right) {
+        if (n.right == right) return n;
+        if (n == this) n = Copy.Util.copy(n);
         n.right = right;
         return n;
     }
 
-    /** Get the precedence of the expression. */
     @Override
     public Precedence precedence() {
         return this.precedence;
@@ -117,49 +131,49 @@ public class Binary_c extends Expr_c implements Binary {
 
     @Override
     public Binary precedence(Precedence precedence) {
-        Binary_c n = (Binary_c) copy();
+        return precedence(this, precedence);
+    }
+
+    protected <N extends Binary_c> N precedence(N n, Precedence precedence) {
+        if (n.precedence == precedence) return n;
+        if (n == this) n = Copy.Util.copy(n);
         n.precedence = precedence;
         return n;
     }
 
     /** Reconstruct the expression. */
-    protected Binary_c reconstruct(Expr left, Expr right) {
-        if (left != this.left || right != this.right) {
-            Binary_c n = (Binary_c) copy();
-            n.left = left;
-            n.right = right;
-            return n;
-        }
-
-        return this;
+    protected <N extends Binary_c> N reconstruct(N n, Expr left, Expr right) {
+        n = left(n, left);
+        n = right(n, right);
+        return n;
     }
 
-    /** Visit the children of the expression. */
     @Override
     public Node visitChildren(NodeVisitor v) {
-        Expr left = (Expr) visitChild(this.left, v);
-        Expr right = (Expr) visitChild(this.right, v);
-        return reconstruct(left, right);
+        Expr left = visitChild(this.left, v);
+        Expr right = visitChild(this.right, v);
+        return reconstruct(this, left, right);
     }
 
     @Override
-    public boolean constantValueSet() {
-        return left.constantValueSet() && right.constantValueSet();
+    public boolean constantValueSet(Lang lang) {
+        return lang.constantValueSet(left, lang)
+                && lang.constantValueSet(right, lang);
     }
 
     @Override
-    public boolean isConstant() {
-        return left.isConstant() && right.isConstant();
+    public boolean isConstant(Lang lang) {
+        return lang.isConstant(left, lang) && lang.isConstant(right, lang);
     }
 
     @Override
-    public Object constantValue() {
-        if (!isConstant()) {
+    public Object constantValue(Lang lang) {
+        if (!lang.isConstant(this, lang)) {
             return null;
         }
 
-        Object lv = left.constantValue();
-        Object rv = right.constantValue();
+        Object lv = lang.constantValue(left, lang);
+        Object rv = lang.constantValue(right, lang);
 
         if (op == ADD && (lv instanceof String || rv instanceof String)) {
             // toString() does what we want for String, Number, and Boolean
@@ -294,7 +308,6 @@ public class Binary_c extends Expr_c implements Binary {
         return null;
     }
 
-    /** Type check the expression. */
     @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
         Type l = left.type();
@@ -358,7 +371,10 @@ public class Binary_c extends Expr_c implements Binary {
                             + "of type " + l + " to a String.", left.position());
                 }
 
-                return precedence(Precedence.STRING_ADD).type(ts.String());
+                Binary_c n = this;
+                n = precedence(n, Precedence.STRING_ADD);
+                n = type(n, ts.String());
+                return n;
             }
         }
 
@@ -532,7 +548,6 @@ public class Binary_c extends Expr_c implements Binary {
         return child.type();
     }
 
-    /** Get the throwsArithmeticException of the expression. */
     @Override
     public boolean throwsArithmeticException() {
         // conservatively assume that any division or mod may throw
@@ -546,7 +561,6 @@ public class Binary_c extends Expr_c implements Binary {
         return left + " " + op + " " + right;
     }
 
-    /** Write the expression to an output file. */
     @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
         printSubExpr(left, true, w, tr);
@@ -582,9 +596,9 @@ public class Binary_c extends Expr_c implements Binary {
     public <T> List<T> acceptCFG(CFGBuilder<?> v, List<T> succs) {
         if (op == COND_AND || op == COND_OR) {
             // short-circuit
-            if (left.isConstant()) {
+            if (v.lang().isConstant(left, v.lang())) {
                 boolean leftConstantValue =
-                        ((Boolean) left.constantValue()).booleanValue();
+                        ((Boolean) v.lang().constantValue(left, v.lang())).booleanValue();
                 if ((leftConstantValue && op == COND_OR)
                         || (!leftConstantValue && op == COND_AND)) {
                     v.visitCFG(left, this, EXIT);

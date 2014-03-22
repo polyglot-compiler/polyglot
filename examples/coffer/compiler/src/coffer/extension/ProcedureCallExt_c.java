@@ -10,11 +10,14 @@ package coffer.extension;
 import polyglot.ast.ProcedureCall;
 import polyglot.types.SemanticException;
 import polyglot.types.Type;
+import polyglot.util.SerialVersionUID;
 import coffer.types.CofferProcedureInstance;
 import coffer.types.KeySet;
 import coffer.types.ThrowConstraint;
 
 public class ProcedureCallExt_c extends CofferExt_c {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     @Override
     public KeySet keyFlow(KeySet held_keys, Type throwType) {
         ProcedureCall n = (ProcedureCall) node();

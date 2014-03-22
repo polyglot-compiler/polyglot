@@ -22,12 +22,15 @@ import polyglot.types.Type;
 import polyglot.util.CachingTransformingList;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
+import polyglot.util.SerialVersionUID;
 import polyglot.util.Transformation;
 
 /** An implementation of the <code>CofferMethodInstance</code> interface. 
  */
 public class CofferMethodInstance_c extends MethodInstance_c implements
         CofferMethodInstance {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     protected KeySet entryKeys;
     protected KeySet returnKeys;
     protected List<ThrowConstraint> throwConstraints;

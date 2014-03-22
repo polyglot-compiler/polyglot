@@ -33,6 +33,7 @@ import java.util.List;
 import polyglot.types.Context;
 import polyglot.util.CodeWriter;
 import polyglot.util.CollectionUtil;
+import polyglot.util.Copy;
 import polyglot.util.ListUtil;
 import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
@@ -41,7 +42,7 @@ import polyglot.visit.NodeVisitor;
 import polyglot.visit.PrettyPrinter;
 
 /**
- * A <code>Block</code> represents a Java block statement -- an immutable
+ * A {@code Block} represents a Java block statement -- an immutable
  * sequence of statements.
  */
 public abstract class AbstractBlock_c extends Stmt_c implements Block {
@@ -49,27 +50,35 @@ public abstract class AbstractBlock_c extends Stmt_c implements Block {
 
     protected List<Stmt> statements;
 
+    @Deprecated
     public AbstractBlock_c(Position pos, List<Stmt> statements) {
-        super(pos);
+        this(pos, statements, null);
+    }
+
+    public AbstractBlock_c(Position pos, List<Stmt> statements, Ext ext) {
+        super(pos, ext);
         assert (statements != null);
         this.statements = ListUtil.copy(statements, true);
     }
 
-    /** Get the statements of the block. */
     @Override
     public List<Stmt> statements() {
         return this.statements;
     }
 
-    /** Set the statements of the block. */
     @Override
     public Block statements(List<Stmt> statements) {
-        AbstractBlock_c n = (AbstractBlock_c) copy();
+        return statements(this, statements);
+    }
+
+    protected <N extends AbstractBlock_c> N statements(N n,
+            List<Stmt> statements) {
+        if (CollectionUtil.equals(n.statements, statements)) return n;
+        if (n == this) n = Copy.Util.copy(n);
         n.statements = ListUtil.copy(statements, true);
         return n;
     }
 
-    /** Append a statement to the block. */
     @Override
     public Block append(Stmt stmt) {
         List<Stmt> l = new ArrayList<Stmt>(statements.size() + 1);
@@ -78,7 +87,6 @@ public abstract class AbstractBlock_c extends Stmt_c implements Block {
         return statements(l);
     }
 
-    /** Prepend a statement to the block. */
     @Override
     public Block prepend(Stmt stmt) {
         List<Stmt> l = new ArrayList<Stmt>(statements.size() + 1);
@@ -88,21 +96,16 @@ public abstract class AbstractBlock_c extends Stmt_c implements Block {
     }
 
     /** Reconstruct the block. */
-    protected AbstractBlock_c reconstruct(List<Stmt> statements) {
-        if (!CollectionUtil.equals(statements, this.statements)) {
-            AbstractBlock_c n = (AbstractBlock_c) copy();
-            n.statements = ListUtil.copy(statements, true);
-            return n;
-        }
-
-        return this;
+    protected <N extends AbstractBlock_c> N reconstruct(N n,
+            List<Stmt> statements) {
+        n = statements(n, statements);
+        return n;
     }
 
-    /** Visit the children of the block. */
     @Override
     public Node visitChildren(NodeVisitor v) {
         List<Stmt> statements = visitList(this.statements, v);
-        return reconstruct(statements);
+        return reconstruct(this, statements);
     }
 
     @Override
@@ -110,7 +113,6 @@ public abstract class AbstractBlock_c extends Stmt_c implements Block {
         return c.pushBlock();
     }
 
-    /** Write the block to an output file. */
     @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
         w.begin(0);

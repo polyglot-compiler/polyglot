@@ -27,19 +27,16 @@
 package polyglot.ast;
 
 /**
- * An <code>AmbPrefix</code> is an ambiguous AST node composed of dot-separated
+ * An {@code AmbPrefix} is an ambiguous AST node composed of dot-separated
  * list of identifiers that must resolve to a prefix.
  */
 public interface AmbPrefix extends Prefix, Ambiguous {
-    /**
-     * Prefix of the prefix.
-     */
+    /** Get the prefix of the prefix. */
     Prefix prefix();
 
-    /**
-     * Ambiguous name.
-     */
+    /** Get the name of the prefix. */
     String name();
 
+    /** Get the name of the prefix. */
     Id nameNode();
 }

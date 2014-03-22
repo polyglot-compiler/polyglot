@@ -547,7 +547,7 @@ public class JL5Signature extends Attribute {
         return new Result<ClassType>(ct, pos);
     }
 
-    private JL5ParsedClassType parsedClassTypeForClass(ClassType ct) {
+    private static JL5ParsedClassType parsedClassTypeForClass(ClassType ct) {
         if (ct instanceof JL5ParsedClassType) {
             return (JL5ParsedClassType) ct;
         }

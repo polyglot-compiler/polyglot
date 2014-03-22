@@ -33,7 +33,7 @@ import polyglot.frontend.Pass;
 import polyglot.frontend.Scheduler;
 
 /**
- * The <code>Parsed</code> is reached when a type is parsed. 
+ * The {@code Parsed} is reached when a type is parsed. 
  */
 public class Parsed extends SourceFileGoal {
     public static Goal create(Scheduler scheduler, Job job) {

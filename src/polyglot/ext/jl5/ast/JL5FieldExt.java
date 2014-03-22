@@ -29,7 +29,6 @@ import polyglot.ast.AmbReceiver;
 import polyglot.ast.Expr;
 import polyglot.ast.Field;
 import polyglot.ast.Node;
-import polyglot.ast.Node_c;
 import polyglot.ast.TypeNode;
 import polyglot.ext.jl5.types.EnumInstance;
 import polyglot.ext.jl5.visit.JL5Translator;
@@ -39,26 +38,28 @@ import polyglot.util.SerialVersionUID;
 import polyglot.visit.PrettyPrinter;
 import polyglot.visit.TypeChecker;
 
-public class JL5FieldExt extends JL5Ext {
+public class JL5FieldExt extends JL5ExprExt {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
+    @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
-        Field n = (Field) this.superDel().typeCheck(tc);
+        Field n = (Field) superLang().typeCheck(this.node(), tc);
         if (n.fieldInstance() instanceof EnumInstance
-                && !(this instanceof EnumConstant)) {
+                && !(JL5Ext.ext(n) instanceof EnumConstant)) {
             // it's an enum, so replace this with the appropriate AST node for enum constants.
             JL5NodeFactory nf = (JL5NodeFactory) tc.nodeFactory();
-            EnumConstant ec =
+            Field ec =
                     nf.EnumConstant(n.position(),
                                     n.target(),
                                     nf.Id(n.id().position(), n.name()));
-            ec = (EnumConstant) ec.type(n.type());
-            ec = ec.enumInstance((EnumInstance) n.fieldInstance());
+            ec = (Field) ec.type(n.type());
+            ec = ec.fieldInstance(n.fieldInstance());
             n = ec;
         }
         return n;
     }
 
+    @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
         Field n = (Field) this.node();
         w.begin(0);
@@ -74,7 +75,7 @@ public class JL5FieldExt extends JL5Ext {
                     jltr.printReceiver(n.target(), w);
                 }
                 else {
-                    ((Node_c) n).print(n.target(), w, tr);
+                    print(n.target(), w, tr);
                 }
             }
 

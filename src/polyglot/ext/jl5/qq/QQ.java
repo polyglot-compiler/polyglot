@@ -1,6 +1,5 @@
 package polyglot.ext.jl5.qq;
 
-import polyglot.ast.Node;
 import polyglot.ast.NodeFactory;
 import polyglot.frontend.ExtensionInfo;
 import polyglot.lex.Lexer;

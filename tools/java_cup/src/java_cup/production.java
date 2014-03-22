@@ -1,7 +1,7 @@
 package java_cup;
 
-import java.util.Hashtable;
 import java.util.Enumeration;
+import java.util.Hashtable;
 
 /** This class represents a production in the grammar.  It contains
  *  a LHS non terminal, and an array of RHS symbols.  As various 
@@ -133,7 +133,8 @@ public class production {
         6/14/96 frankf */
         if (action_str == null) action_str = "";
         if (tail_action != null && tail_action.code_string() != null)
-            action_str = action_str + "\t\t" + tail_action.code_string();
+            action_str =
+                    action_str + "                " + tail_action.code_string();
 
         /* stash the action */
         _action = new action_part(action_str);
@@ -194,16 +195,23 @@ public class production {
     /** Table of all productions.  Elements are stored using their index as 
      *  the key.
      */
-    protected static Hashtable _all = new Hashtable();
+    protected static Hashtable<Integer, production> _all =
+            new Hashtable<Integer, production>();
 
     /** Access to all productions. */
-    public static Enumeration all() {
+    public static Enumeration<production> all() {
         return _all.elements();
     }
 
     /** Lookup a production by index. */
     public static production find(int indx) {
-        return (production) _all.get(new Integer(indx));
+        return _all.get(new Integer(indx));
+    }
+
+    //Hm Added clear  to clear all static fields
+    public static void clear() {
+        _all.clear();
+        next_index = 0;
     }
 
     /*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . .*/
@@ -381,23 +389,66 @@ public class production {
         String ret;
 
         /* Put in the left/right value labels */
-        if (emit.lr_values())
-            ret =
-                    "\t\tint " + labelname
-                            + "left = ((java_cup.runtime.Symbol)"
-                            + emit.pre("stack") + ".elementAt("
-                            + emit.pre("top") + "-" + offset + ")).left;\n"
-                            + "\t\tint " + labelname
-                            + "right = ((java_cup.runtime.Symbol)"
-                            + emit.pre("stack") + ".elementAt("
-                            + emit.pre("top") + "-" + offset + ")).right;\n";
+        if (emit.lr_values()) {
+            if (!emit.locations())
+                ret =
+                        "                "
+                                + "int "
+                                + labelname
+                                + "left = "
+                                + emit.pre("stack")
+                                +
+                                // TUM 20050917
+                                ((offset == 0) ? ".peek()" : (".elementAt("
+                                        + emit.pre("top") + "-" + offset + ")"))
+                                + ".left;\n"
+                                + "                "
+                                + "int "
+                                + labelname
+                                + "right = "
+                                + emit.pre("stack")
+                                +
+                                // TUM 20050917
+                                ((offset == 0) ? ".peek()" : (".elementAt("
+                                        + emit.pre("top") + "-" + offset + ")"))
+                                + ".right;\n";
+            else ret =
+                    "                "
+                            + "Location "
+                            + labelname
+                            + "xleft = ((java_cup.runtime.ComplexSymbolFactory.ComplexSymbol)"
+                            + emit.pre("stack")
+                            +
+                            // TUM 20050917
+                            ((offset == 0) ? ".peek()" : (".elementAt("
+                                    + emit.pre("top") + "-" + offset + ")"))
+                            + ").xleft;\n"
+                            + "                "
+                            + "Location "
+                            + labelname
+                            + "xright = ((java_cup.runtime.ComplexSymbolFactory.ComplexSymbol)"
+                            + emit.pre("stack")
+                            +
+                            // TUM 20050917
+                            ((offset == 0) ? ".peek()" : (".elementAt("
+                                    + emit.pre("top") + "-" + offset + ")"))
+                            + ").xright;\n";
+        }
         else ret = "";
 
         /* otherwise, just declare label. */
-        return ret + "\t\t" + stack_type + " " + labelname + " = ("
-                + stack_type + ")((" + "java_cup.runtime.Symbol) "
-                + emit.pre("stack") + ".elementAt(" + emit.pre("top") + "-"
-                + offset + ")).value;\n";
+        return ret
+                + "                "
+                + stack_type
+                + " "
+                + labelname
+                + " = "
+                + emit.pre("stack")
+                +
+                // TUM 20050917
+                ((offset == 0) ? ".peek()" : (".elementAt(" + emit.pre("top")
+                        + "-" + offset + ")")) + ".<" + stack_type
+                + "> value();\n";
 
     }
 
@@ -414,7 +465,6 @@ public class production {
         String declaration = "";
 
         symbol_part part;
-        action_part act_part;
         int pos;
 
         /* walk down the parts and extract the labels */
@@ -531,29 +581,32 @@ public class production {
 
     ) throws internal_error {
         non_terminal new_nt;
-        production new_prod;
         String declare_str;
-
+        int lastLocation = -1;
         /* walk over the production and process each action */
         for (int act_loc = 0; act_loc < rhs_length(); act_loc++)
             if (rhs(act_loc).is_action()) {
 
                 declare_str = declare_labels(_rhs, act_loc, "");
                 /* create a new non terminal for the action production */
-                new_nt = non_terminal.create_new();
+                new_nt =
+                        non_terminal.create_new(null, lhs().the_symbol()
+                                                           .stack_type()); // TUM 20060608 embedded actions patch
                 new_nt.is_embedded_action = true; /* 24-Mar-1998, CSA */
 
                 /* create a new production with just the action */
-                new_prod =
-                        new action_production(this,
-                                              new_nt,
-                                              null,
-                                              0,
-                                              declare_str
-                                                      + ((action_part) rhs(act_loc)).code_string());
+                new action_production(this,
+                                      new_nt,
+                                      null,
+                                      0,
+                                      declare_str
+                                              + ((action_part) rhs(act_loc)).code_string(),
+                                      (lastLocation == -1)
+                                              ? -1 : (act_loc - lastLocation));
 
                 /* replace the action with the generated non terminal */
                 _rhs[act_loc] = new symbol_part(new_nt);
+                lastLocation = act_loc;
             }
     }
 
@@ -656,6 +709,7 @@ public class production {
     /*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . .*/
 
     /** Generic equality comparison. */
+    @Override
     public boolean equals(Object other) {
         if (!(other instanceof production))
             return false;
@@ -665,6 +719,7 @@ public class production {
     /*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . .*/
 
     /** Produce a hash code. */
+    @Override
     public int hashCode() {
         /* just use a simple function of the index */
         return _index * 13;
@@ -673,6 +728,7 @@ public class production {
     /*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . .*/
 
     /** Convert to a string. */
+    @Override
     public String toString() {
         String result;
 

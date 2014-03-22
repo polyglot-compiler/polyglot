@@ -61,6 +61,7 @@ public abstract class production_part {
     /*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . .*/
 
     /** Generic equality comparison. */
+    @Override
     public boolean equals(Object other) {
         if (!(other instanceof production_part))
             return false;
@@ -70,6 +71,7 @@ public abstract class production_part {
     /*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . .*/
 
     /** Produce a hash code. */
+    @Override
     public int hashCode() {
         return label() == null ? 0 : label().hashCode();
     }
@@ -77,6 +79,7 @@ public abstract class production_part {
     /*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . .*/
 
     /** Convert to a string. */
+    @Override
     public String toString() {
         if (label() != null)
             return label() + ":";

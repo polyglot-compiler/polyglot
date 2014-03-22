@@ -26,13 +26,13 @@
 
 package polyglot.ast;
 
-import polyglot.types.Type;
-import polyglot.types.Flags;
 import polyglot.types.FieldInstance;
+import polyglot.types.Flags;
 import polyglot.types.InitializerInstance;
+import polyglot.types.Type;
 
 /**
- * A <code>FieldDecl</code> is an immutable representation of the declaration
+ * A {@code FieldDecl} is an immutable representation of the declaration
  * of a field of a class.
  */
 public interface FieldDecl extends ClassMember, VarInit, CodeNode {
@@ -81,13 +81,10 @@ public interface FieldDecl extends ClassMember, VarInit, CodeNode {
     /**
      * Get the type object for the initializer expression, or null.
      * We evaluate the initializer expression as if it were in an
-     * initializer block (e.g., <code>{ }</code> or </code>static { }<code>).
+     * initializer block (e.g., {@code { }} or {@code static { }}).
      */
     InitializerInstance initializerInstance();
 
     /** Set the type object for the initializer expression. */
     FieldDecl initializerInstance(InitializerInstance fi);
-
-    @Override
-    boolean constantValueSet();
 }

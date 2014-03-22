@@ -28,83 +28,93 @@ package polyglot.ext.jl5.ast;
 import java.util.List;
 
 import polyglot.ast.Node;
+import polyglot.ast.Term;
 import polyglot.ext.jl5.types.Annotations;
 import polyglot.ext.jl5.types.JL5TypeSystem;
 import polyglot.ext.jl5.visit.AnnotationChecker;
 import polyglot.types.Declaration;
 import polyglot.types.SemanticException;
+import polyglot.util.CodeWriter;
 import polyglot.util.CollectionUtil;
+import polyglot.util.Copy;
+import polyglot.util.ListUtil;
 import polyglot.util.SerialVersionUID;
 import polyglot.visit.NodeVisitor;
+import polyglot.visit.PrettyPrinter;
 import polyglot.visit.TypeChecker;
 
-public abstract class JL5AnnotatedElementExt extends JL5Ext implements
+public abstract class JL5AnnotatedElementExt extends JL5TermExt implements
         AnnotatedElement {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
-    protected List<AnnotationElem> annotations;
+    protected List<Term> annotations;
+
+    public JL5AnnotatedElementExt(List<Term> annotations) {
+        this.annotations = ListUtil.copy(annotations, true);
+    }
 
     @Override
-    public Node annotationElems(List<AnnotationElem> annotations) {
-        Node n = (Node) this.node().copy();
+    public List<Term> annotationElems() {
+        return this.annotations;
+    }
+
+    @Override
+    public Node annotationElems(List<Term> annotations) {
+        return annotationElems(node(), annotations);
+    }
+
+    protected <N extends Node> N annotationElems(N n, List<Term> annotations) {
         JL5AnnotatedElementExt ext = (JL5AnnotatedElementExt) JL5Ext.ext(n);
-        ext.annotations = annotations;
+        if (CollectionUtil.equals(ext.annotations, annotations)) return n;
+        if (n == node) {
+            n = Copy.Util.copy(n);
+            ext = (JL5AnnotatedElementExt) JL5Ext.ext(n);
+        }
+        ext.annotations = ListUtil.copy(annotations, true);
         return n;
+    }
+
+    private Node reconstruct(Node n, List<Term> annotations) {
+        n = annotationElems(n, annotations);
+        return n;
+    }
+
+    @Override
+    public Node visitChildren(NodeVisitor v) {
+        Node n = superLang().visitChildren(this.node(), v);
+        List<Term> annots = visitList(annotations, v);
+        return reconstruct(n, annots);
+    }
+
+    @Override
+    public Node typeCheck(TypeChecker tc) throws SemanticException {
+        JL5TypeSystem ts = (JL5TypeSystem) tc.typeSystem();
+        ts.checkDuplicateAnnotations(annotations);
+        return superLang().typeCheck(this.node(), tc);
+    }
+
+    @Override
+    public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
+        for (Term ae : annotations) {
+            tr.lang().prettyPrint(ae, w, tr);
+            w.newline();
+        }
     }
 
     @Override
     public Node annotationCheck(AnnotationChecker annoCheck)
             throws SemanticException {
         Node n = this.node();
-        for (AnnotationElem elem : annotations) {
+        for (Term elem : annotations) {
             annoCheck.checkAnnotationApplicability(elem, this.declaration());
         }
         return n;
-    }
-
-    public Node visitChildren(NodeVisitor v) {
-        Node newN = this.node().visitChildren(v);
-        JL5AnnotatedElementExt newext =
-                (JL5AnnotatedElementExt) JL5Ext.ext(newN);
-
-        List<AnnotationElem> annots =
-                newN.visitList(newext.annotationElems(), v);
-
-        if (!CollectionUtil.equals(annots, newext.annotationElems())) {
-            // the annotations changed! Let's update the node.
-            if (newN == this.node()) {
-                // we need to create a copy.
-                newN = (Node) newN.copy();
-                newext = (JL5AnnotatedElementExt) JL5Ext.ext(newN);
-            }
-            else {
-                // the call to super.visitChildren(v) already
-                // created a copy of the node (and thus of its extension).
-            }
-            newext.annotations = annots;
-        }
-        return newN;
-    }
-
-    public Node typeCheck(TypeChecker tc) throws SemanticException {
-        JL5AnnotatedElementExt ext =
-                (JL5AnnotatedElementExt) JL5Ext.ext(this.node());
-
-        JL5TypeSystem ts = (JL5TypeSystem) tc.typeSystem();
-        ts.checkDuplicateAnnotations(ext.annotationElems());
-        return this.node().typeCheck(tc);
-
     }
 
     /**
      * Return the Declaration associated with this AST node.
      */
     protected abstract Declaration declaration();
-
-    @Override
-    public List<AnnotationElem> annotationElems() {
-        return this.annotations;
-    }
 
     @Override
     public abstract void setAnnotations(Annotations annotations);

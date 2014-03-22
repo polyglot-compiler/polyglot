@@ -34,6 +34,7 @@ import polyglot.frontend.MissingDependencyException;
 import polyglot.frontend.Scheduler;
 import polyglot.frontend.goals.Goal;
 import polyglot.main.Report;
+import polyglot.translate.ExtensionRewriter;
 import polyglot.types.ClassType;
 import polyglot.types.ConstructorInstance;
 import polyglot.types.Context;
@@ -47,6 +48,7 @@ import polyglot.types.Type;
 import polyglot.types.TypeSystem;
 import polyglot.util.CodeWriter;
 import polyglot.util.CollectionUtil;
+import polyglot.util.Copy;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.ListUtil;
 import polyglot.util.Position;
@@ -59,7 +61,7 @@ import polyglot.visit.TypeBuilder;
 import polyglot.visit.TypeChecker;
 
 /**
- * A <code>ClassDecl</code> is the definition of a class, abstract class,
+ * A {@code ClassDecl} is the definition of a class, abstract class,
  * or interface. It may be a public or other top-level class, or an inner
  * named class, or an anonymous class.
  */
@@ -75,9 +77,15 @@ public class ClassDecl_c extends Term_c implements ClassDecl, ClassDeclOps {
 
     protected ParsedClassType type;
 
+    @Deprecated
     public ClassDecl_c(Position pos, Flags flags, Id name, TypeNode superClass,
             List<TypeNode> interfaces, ClassBody body) {
-        super(pos);
+        this(pos, flags, name, superClass, interfaces, body, null);
+    }
+
+    public ClassDecl_c(Position pos, Flags flags, Id name, TypeNode superClass,
+            List<TypeNode> interfaces, ClassBody body, Ext ext) {
+        super(pos, ext);
         assert (flags != null && name != null && interfaces != null && body != null); // superClass may be null, interfaces may be empty
         this.flags = flags;
         this.name = name;
@@ -104,8 +112,12 @@ public class ClassDecl_c extends Term_c implements ClassDecl, ClassDeclOps {
 
     @Override
     public ClassDecl type(ParsedClassType type) {
-        if (type == this.type) return this;
-        ClassDecl_c n = (ClassDecl_c) copy();
+        return type(this, type);
+    }
+
+    protected <N extends ClassDecl_c> N type(N n, ParsedClassType type) {
+        if (n.type == type) return n;
+        if (n == this) n = Copy.Util.copy(n);
         n.type = type;
         return n;
     }
@@ -117,8 +129,12 @@ public class ClassDecl_c extends Term_c implements ClassDecl, ClassDeclOps {
 
     @Override
     public ClassDecl flags(Flags flags) {
-        if (flags.equals(this.flags)) return this;
-        ClassDecl_c n = (ClassDecl_c) copy();
+        return flags(this, flags);
+    }
+
+    protected <N extends ClassDecl_c> N flags(N n, Flags flags) {
+        if (n.flags.equals(flags)) return n;
+        if (n == this) n = Copy.Util.copy(n);
         n.flags = flags;
         return n;
     }
@@ -130,7 +146,12 @@ public class ClassDecl_c extends Term_c implements ClassDecl, ClassDeclOps {
 
     @Override
     public ClassDecl id(Id name) {
-        ClassDecl_c n = (ClassDecl_c) copy();
+        return id(this, name);
+    }
+
+    protected <N extends ClassDecl_c> N id(N n, Id name) {
+        if (n.name == name) return n;
+        if (n == this) n = Copy.Util.copy(n);
         n.name = name;
         return n;
     }
@@ -152,7 +173,12 @@ public class ClassDecl_c extends Term_c implements ClassDecl, ClassDeclOps {
 
     @Override
     public ClassDecl superClass(TypeNode superClass) {
-        ClassDecl_c n = (ClassDecl_c) copy();
+        return superClass(this, superClass);
+    }
+
+    protected <N extends ClassDecl_c> N superClass(N n, TypeNode superClass) {
+        if (n.superClass == superClass) return n;
+        if (n == this) n = Copy.Util.copy(n);
         n.superClass = superClass;
         return n;
     }
@@ -164,7 +190,13 @@ public class ClassDecl_c extends Term_c implements ClassDecl, ClassDeclOps {
 
     @Override
     public ClassDecl interfaces(List<TypeNode> interfaces) {
-        ClassDecl_c n = (ClassDecl_c) copy();
+        return interfaces(this, interfaces);
+    }
+
+    protected <N extends ClassDecl_c> N interfaces(N n,
+            List<TypeNode> interfaces) {
+        if (CollectionUtil.equals(n.interfaces, interfaces)) return n;
+        if (n == this) n = Copy.Util.copy(n);
         n.interfaces = ListUtil.copy(interfaces, true);
         return n;
     }
@@ -176,52 +208,32 @@ public class ClassDecl_c extends Term_c implements ClassDecl, ClassDeclOps {
 
     @Override
     public ClassDecl body(ClassBody body) {
-        ClassDecl_c n = (ClassDecl_c) copy();
+        return body(this, body);
+    }
+
+    protected <N extends ClassDecl_c> N body(N n, ClassBody body) {
+        if (n.body == body) return n;
+        if (n == this) n = Copy.Util.copy(n);
         n.body = body;
         return n;
     }
 
-    protected ClassDecl_c reconstruct(Id name, TypeNode superClass,
-            List<TypeNode> interfaces, ClassBody body) {
-        if (name != this.name || superClass != this.superClass
-                || !CollectionUtil.equals(interfaces, this.interfaces)
-                || body != this.body) {
-            ClassDecl_c n = (ClassDecl_c) copy();
-            n.name = name;
-            n.superClass = superClass;
-            n.interfaces = ListUtil.copy(interfaces, true);
-            n.body = body;
-            return n;
-        }
-
-        return this;
-    }
-
-    /**
-     * Return the first (sub)term performed when evaluating this
-     * term.
-     */
-    @Override
-    public Term firstChild() {
-        return body();
-    }
-
-    /**
-     * Visit this term in evaluation order.
-     */
-    @Override
-    public <T> List<T> acceptCFG(CFGBuilder<?> v, List<T> succs) {
-        v.visitCFG(this.body(), this, EXIT);
-        return succs;
+    protected <N extends ClassDecl_c> N reconstruct(N n, Id name,
+            TypeNode superClass, List<TypeNode> interfaces, ClassBody body) {
+        n = id(n, name);
+        n = superClass(n, superClass);
+        n = interfaces(n, interfaces);
+        n = body(n, body);
+        return n;
     }
 
     @Override
     public Node visitChildren(NodeVisitor v) {
-        Id name = (Id) visitChild(this.name, v);
-        TypeNode superClass = (TypeNode) visitChild(this.superClass, v);
+        Id name = visitChild(this.name, v);
+        TypeNode superClass = visitChild(this.superClass, v);
         List<TypeNode> interfaces = visitList(this.interfaces, v);
-        ClassBody body = (ClassBody) visitChild(this.body, v);
-        return reconstruct(name, superClass, interfaces, body);
+        ClassBody body = visitChild(this.body, v);
+        return reconstruct(this, name, superClass, interfaces, body);
     }
 
     @Override
@@ -272,11 +284,13 @@ public class ClassDecl_c extends Term_c implements ClassDecl, ClassDeclOps {
         ClassDecl_c n = this;
 
         if (n.defaultCI != ci) {
-            n = (ClassDecl_c) copy();
+            n = Copy.Util.copy(n);
             n.defaultCI = ci;
         }
 
-        return n.type(type).flags(type.flags());
+        n = type(n, type);
+        n = flags(n, type.flags());
+        return n;
     }
 
     @Override
@@ -356,9 +370,8 @@ public class ClassDecl_c extends Term_c implements ClassDecl, ClassDeclOps {
         if (type.superType() != null) {
             if (!type.superType().isReference()) {
                 throw new SemanticException("Cannot extend type "
-                                                    + type.superType() + ".",
-                                            superClass != null ? superClass.position()
-                                                    : position());
+                        + type.superType() + ".", superClass != null
+                        ? superClass.position() : position());
             }
             ReferenceType t = (ReferenceType) type.superType();
             ts.checkCycles(t);
@@ -427,9 +440,7 @@ public class ClassDecl_c extends Term_c implements ClassDecl, ClassDeclOps {
     protected Node addDefaultConstructorIfNeeded(TypeSystem ts, NodeFactory nf)
             throws SemanticException {
         if (defaultConstructorNeeded()) {
-            return ((ClassDeclOps) del()).addDefaultConstructor(ts,
-                                                                nf,
-                                                                defaultCI);
+            return nf.lang().addDefaultConstructor(this, ts, nf, defaultCI);
         }
         return this;
     }
@@ -618,6 +629,26 @@ public class ClassDecl_c extends Term_c implements ClassDecl, ClassDeclOps {
     }
 
     @Override
+    public Node extRewrite(ExtensionRewriter rw) throws SemanticException {
+        ClassDecl_c n = (ClassDecl_c) super.extRewrite(rw);
+        if (n == this) n = Copy.Util.copy(n);
+        n = type(n, null);
+        n.defaultCI = null;
+        return n;
+    }
+
+    @Override
+    public Term firstChild() {
+        return body();
+    }
+
+    @Override
+    public <T> List<T> acceptCFG(CFGBuilder<?> v, List<T> succs) {
+        v.visitCFG(this.body(), this, EXIT);
+        return succs;
+    }
+
+    @Override
     public String toString() {
         return flags.clearInterface().translate()
                 + (flags.isInterface() ? "interface " : "class ") + name + " "
@@ -683,9 +714,9 @@ public class ClassDecl_c extends Term_c implements ClassDecl, ClassDeclOps {
 
     @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
-        ((ClassDeclOps) this.del()).prettyPrintHeader(w, tr);
+        ((JLang) tr.lang()).prettyPrintHeader(this, w, tr);
         print(body(), w, tr);
-        ((ClassDeclOps) this.del()).prettyPrintFooter(w, tr);
+        ((JLang) tr.lang()).prettyPrintFooter(this, w, tr);
     }
 
     @Override
@@ -705,10 +736,6 @@ public class ClassDecl_c extends Term_c implements ClassDecl, ClassDeclOps {
         }
     }
 
-    /**
-     * @param parent
-     * @param ar
-     */
     @Override
     public Node disambiguateOverride(Node parent, AmbiguityRemover ar)
             throws SemanticException {

@@ -32,13 +32,14 @@ import polyglot.ast.SourceFile;
 import polyglot.frontend.ExtensionInfo;
 
 /**
- * This visitor adds jobs for <code>SourceFile</code>s in the AST to the
+ * This visitor adds jobs for {@code SourceFile}s in the AST to the
  * schedule of another extension.
  */
 public class HandoffVisitor extends NodeVisitor {
     protected ExtensionInfo ext;
 
     public HandoffVisitor(ExtensionInfo ext) {
+        super(ext.nodeFactory().lang());
         this.ext = ext;
     }
 

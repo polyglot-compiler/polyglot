@@ -30,7 +30,6 @@ import java.util.List;
 import java.util.Map;
 
 import polyglot.ast.Term;
-import polyglot.ext.jl5.ast.AnnotationElem;
 import polyglot.ext.jl5.types.inference.LubType;
 import polyglot.ext.param.types.ParamTypeSystem;
 import polyglot.frontend.Source;
@@ -49,10 +48,9 @@ import polyglot.types.ReferenceType;
 import polyglot.types.SemanticException;
 import polyglot.types.Type;
 import polyglot.types.TypeObject;
-import polyglot.types.TypeSystem;
 import polyglot.util.Position;
 
-public interface JL5TypeSystem extends TypeSystem,
+public interface JL5TypeSystem extends
         ParamTypeSystem<TypeVariable, ReferenceType> {
     @Override
     ParsedClassType createClassType(LazyClassInitializer init, Source fromSource);
@@ -101,8 +99,9 @@ public interface JL5TypeSystem extends TypeSystem,
     boolean hasSameSignature(JL5MethodInstance mi, JL5MethodInstance mj);
 
     /**
-     * Is method mi a sub-signature of method mj?  The signature ofmethod mi is a subsignature of the signature of a method mj if either
-     * mj hasthe same signature as mi, or
+     * Is method mi a sub-signature of method mj?  The signature of method mi
+     * is a subsignature of the signature of a method mj if either
+     * mj has the same signature as mi, or
      * the signature of mi is the same as the erasure of the signature of mj.
      * See JLS 3rd ed. 8.4.2 
      */
@@ -111,7 +110,8 @@ public interface JL5TypeSystem extends TypeSystem,
     /**
      * Are methods mi and mj override equivalent?
      * See JLS 3rd ed. 8.4.2 
-     * They are override equivalent if either mi is a subsignature of mj, or mj is a subsignature of mi.  
+     * They are override equivalent if either mi is a subsignature of mj,
+     * or mj is a subsignature of mi.  
      */
     boolean areOverrideEquivalent(JL5MethodInstance mi, JL5MethodInstance mj);
 
@@ -185,8 +185,8 @@ public interface JL5TypeSystem extends TypeSystem,
             List<? extends ReferenceType> actuals);
 
     /**
-     * Check whether <code>mi</code> can be called with name <code>name</code>
-     * and arguments of type <code>actualTypes</code>, with type parameters
+     * Check whether {@code mi} can be called with name {@code name}
+     * and arguments of type {@code actualTypes}, with type parameters
      * instantiated with actualTypeArgs. If actualTypeArgs is null or empty,
      * then type inference should be performed. (See JLS 3rd ed. 15.12.2.7)
      * Will return null if mi cannot be successfully called. Will return an appropriately 
@@ -198,8 +198,8 @@ public interface JL5TypeSystem extends TypeSystem,
             Type expectedReturnType);
 
     /**
-     * Check whether <code>ci</code> can be called with
-     * arguments of type <code>actualTypes</code>, with type parameters
+     * Check whether {@code ci} can be called with
+     * arguments of type {@code actualTypes}, with type parameters
      * instantiated with actualTypeArgs. If actualTypeArgs is null or empty,
      * then type inference should be performed. (See JLS 3rd ed. 15.12.2.7)
      * Will return null if ci cannot be successfully called. Will return an appropriately 
@@ -220,9 +220,6 @@ public interface JL5TypeSystem extends TypeSystem,
 
     EnumInstance enumInstance(Position pos, ClassType container, Flags f,
             String name, long ordinal);
-
-    @Override
-    Context createContext();
 
     EnumInstance findEnumConstant(ReferenceType container, long ordinal)
             throws SemanticException;
@@ -332,7 +329,7 @@ public interface JL5TypeSystem extends TypeSystem,
     Type unboxingConversion(Type t);
 
     /**
-     * Compute the least upper bound of a set of types <code>bounds</code>. This is the
+     * Compute the least upper bound of a set of types {@code bounds}. This is the
      * lub(U1 ... Uk) function, as defined in the JLS 3rd edition, Section 15.12.2.7. 
      */
     LubType lub(Position pos, List<ReferenceType> bounds);
@@ -347,11 +344,11 @@ public interface JL5TypeSystem extends TypeSystem,
     AnnotationTypeElemInstance findAnnotation(ReferenceType t, String name,
             ClassType currentClass) throws SemanticException;
 
-    void checkDuplicateAnnotations(List<AnnotationElem> annotations)
+    void checkDuplicateAnnotations(List<Term> annotations)
             throws SemanticException;
 
     /**
-     * Return the class representing Class<type>
+     * Return the class representing Class {@code type}.
      * @param type
      * @return
      */

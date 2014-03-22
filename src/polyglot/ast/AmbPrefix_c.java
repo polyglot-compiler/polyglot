@@ -28,6 +28,7 @@ package polyglot.ast;
 
 import polyglot.types.SemanticException;
 import polyglot.util.CodeWriter;
+import polyglot.util.Copy;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
@@ -38,7 +39,7 @@ import polyglot.visit.PrettyPrinter;
 import polyglot.visit.TypeChecker;
 
 /**
- * An <code>AmbPrefix</code> is an ambiguous AST node composed of dot-separated
+ * An {@code AmbPrefix} is an ambiguous AST node composed of dot-separated
  * list of identifiers that must resolve to a prefix.
  */
 public class AmbPrefix_c extends Node_c implements AmbPrefix {
@@ -47,14 +48,18 @@ public class AmbPrefix_c extends Node_c implements AmbPrefix {
     protected Prefix prefix;
     protected Id name;
 
+    @Deprecated
     public AmbPrefix_c(Position pos, Prefix prefix, Id name) {
-        super(pos);
+        this(pos, prefix, name, null);
+    }
+
+    public AmbPrefix_c(Position pos, Prefix prefix, Id name, Ext ext) {
+        super(pos, ext);
         assert (name != null); // prefix may be null
         this.prefix = prefix;
         this.name = name;
     }
 
-    /** Get the name of the prefix. */
     @Override
     public Id nameNode() {
         return this.name;
@@ -62,12 +67,16 @@ public class AmbPrefix_c extends Node_c implements AmbPrefix {
 
     /** Set the name of the prefix. */
     public AmbPrefix id(Id name) {
-        AmbPrefix_c n = (AmbPrefix_c) copy();
+        return id(this, name);
+    }
+
+    protected <N extends AmbPrefix_c> N id(N n, Id name) {
+        if (n.name == name) return n;
+        if (n == this) n = Copy.Util.copy(n);
         n.name = name;
         return n;
     }
 
-    /** Get the name of the prefix. */
     @Override
     public String name() {
         return this.name.id();
@@ -78,7 +87,6 @@ public class AmbPrefix_c extends Node_c implements AmbPrefix {
         return id(this.name.id(name));
     }
 
-    /** Get the prefix of the prefix. */
     @Override
     public Prefix prefix() {
         return this.prefix;
@@ -86,32 +94,30 @@ public class AmbPrefix_c extends Node_c implements AmbPrefix {
 
     /** Set the prefix of the prefix. */
     public AmbPrefix prefix(Prefix prefix) {
-        AmbPrefix_c n = (AmbPrefix_c) copy();
+        return prefix(this, prefix);
+    }
+
+    protected <N extends AmbPrefix_c> N prefix(N n, Prefix prefix) {
+        if (n.prefix == prefix) return n;
+        if (n == this) n = Copy.Util.copy(n);
         n.prefix = prefix;
         return n;
     }
 
     /** Reconstruct the prefix. */
-    protected AmbPrefix_c reconstruct(Prefix prefix, Id name) {
-        if (prefix != this.prefix || name != this.name) {
-            AmbPrefix_c n = (AmbPrefix_c) copy();
-            n.prefix = prefix;
-            n.name = name;
-            return n;
-        }
-
-        return this;
+    protected <N extends AmbPrefix_c> N reconstruct(N n, Prefix prefix, Id name) {
+        n = prefix(n, prefix);
+        n = id(n, name);
+        return n;
     }
 
-    /** Visit the children of the prefix. */
     @Override
     public Node visitChildren(NodeVisitor v) {
-        Prefix prefix = (Prefix) visitChild(this.prefix, v);
-        Id name = (Id) visitChild(this.name, v);
-        return reconstruct(prefix, name);
+        Prefix prefix = visitChild(this.prefix, v);
+        Id name = visitChild(this.name, v);
+        return reconstruct(this, prefix, name);
     }
 
-    /** Disambiguate the prefix. */
     @Override
     public Node disambiguate(AmbiguityRemover ar) throws SemanticException {
         if (prefix != null && !prefix.isDisambiguated()) {
@@ -129,7 +135,6 @@ public class AmbPrefix_c extends Node_c implements AmbPrefix {
         return this;
     }
 
-    /** Check exceptions thrown by the prefix. */
     @Override
     public Node exceptionCheck(ExceptionChecker ec) throws SemanticException {
         throw new InternalCompilerError(position(),
@@ -137,7 +142,6 @@ public class AmbPrefix_c extends Node_c implements AmbPrefix {
                                                 + this + ".");
     }
 
-    /** Write the prefix to an output file. */
     @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
         if (prefix != null) {

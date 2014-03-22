@@ -39,6 +39,9 @@
 	<property name="examples.dir" location="${basedir}/examples" />
 	<property name="pao.dir" location="${examples.dir}/pao" />
 	<property name="coffer.dir" location="${examples.dir}/coffer" />
+	<property name="carray.dir" location="${examples.dir}/carray" />
+	<property name="covarRet.dir" location="${examples.dir}/covarRet" />
+	<property name="carray_jl5.dir" location="${examples.dir}/carray_jl5" />
 
 	<!--
 	<property name="cvs.root" value=":pserver:anonymous@gforge.cis.cornell.edu:/cvsroot/polyglot" />
@@ -53,7 +56,7 @@
 	<path id="standard.classpath">
 		<pathelement location="${classes}" />
 		<pathelement location="${lib}/java_cup.jar" />
-		<pathelement location="${lib}/JFlex.jar" />
+		<pathelement location="${lib}/jflex.jar" />
 		<pathelement location="${lib}/ppg.jar" />
 		<pathelement location="${env.JAVA_HOME}/lib/tools.jar" />
 	</path>
@@ -64,6 +67,7 @@
 
 	<!-- classpath to use when bootstrapping java_cup.jar -->
 	<path id="cup.jar.classpath">
+		<pathelement location="${classes}" />
 		<pathelement location="${cup.dir}/lib/java_cup.jar" />
 	</path>
 
@@ -111,9 +115,9 @@
 
 	<target name="check-jars">
 		<available file="${cup.dir}/lib/java_cup.jar" property="cup.jar.exists" />
-		<available file="${lib}/JFlex.jar" property="jflex.jar.exists" />
+		<available file="${lib}/jflex.jar" property="jflex.jar.exists" />
 		<fail unless="cup.jar.exists" message="${cup.dir}/lib/java_cup.jar not found." />
-		<fail unless="jflex.jar.exists" message="${lib}/JFlex.jar not found." />
+		<fail unless="jflex.jar.exists" message="${lib}/jflex.jar not found." />
 	</target>
 
 	<!-- create appropriate executables in the bin directory -->
@@ -160,12 +164,31 @@
 	<target name="install-jars-in-examples" depends="jar">
 		<copy file="${lib}/polyglot.jar" todir="${pao.dir}/lib" />
 		<copy file="${lib}/polyglot.jar" todir="${coffer.dir}/lib" />
+		<copy file="${lib}/polyglot.jar" todir="${covarRet.dir}/lib" />
+		<copy file="${lib}/polyglot.jar" todir="${carray.dir}/lib" />
+		<copy file="${lib}/polyglot.jar" todir="${carray_jl5.dir}/lib" />
 		<copy file="${lib}/java_cup.jar" todir="${pao.dir}/lib" />
 		<copy file="${lib}/java_cup.jar" todir="${coffer.dir}/lib" />
+		<copy file="${lib}/java_cup.jar" todir="${carray.dir}/lib" />
+		<copy file="${lib}/java_cup.jar" todir="${carray_jl5.dir}/lib" />
+		<copy file="${lib}/jflex.jar" todir="${pao.dir}/lib" />
+		<copy file="${lib}/jflex.jar" todir="${coffer.dir}/lib" />
+		<copy file="${lib}/jflex.jar" todir="${carray.dir}/lib" />
+		<copy file="${lib}/jflex.jar" todir="${carray_jl5.dir}/lib" />
+		<copy file="${lib}/ppg.jar" todir="${pao.dir}/lib" />
+		<copy file="${lib}/ppg.jar" todir="${coffer.dir}/lib" />
+		<copy file="${lib}/ppg.jar" todir="${carray.dir}/lib" />
+		<copy file="${lib}/ppg.jar" todir="${carray_jl5.dir}/lib" />
+	</target>
+
+	<target name="serialuid" description="Build polyglot.util.SerialVersionUID">
+        <javac source="1.5" target="1.5" srcdir="${src}" destdir="${classes}" debug="on" includes="polyglot/util/SerialVersionUID.java" includeAntRuntime="false">
+            <classpath refid="standard.classpath" />
+        </javac>
 	</target>
 
 	<!-- build the examples -->
-	<target name="examples" depends="pao,coffer" description="Build the examples" />
+	<target name="examples" depends="pao,coffer,carray,carray_jl5" description="Build the examples" />
 
 	<target name="pao" depends="install-jars-in-examples" description="Build the pao example">
 		<ant inheritAll="false" antfile="${pao.dir}/build.xml" dir="${pao.dir}" target="compile-all" />
@@ -177,22 +200,56 @@
 		<ant inheritAll="false" antfile="${coffer.dir}/build.xml" dir="${coffer.dir}" target="jar" />
 	</target>
 
+	<target name="carray" depends="install-jars-in-examples" description="Build the carray example">
+		<ant inheritAll="false" antfile="${carray.dir}/build.xml" dir="${carray.dir}" target="compile-all" />
+		<ant inheritAll="false" antfile="${carray.dir}/build.xml" dir="${carray.dir}" target="jar" />
+	</target>
+
+	<target name="carray_jl5" depends="carray,install-jars-in-examples" description="Build the carray_jl5 example">
+		<copy file="${carray.dir}/lib/carray.jar" todir="${carray_jl5.dir}/lib" />
+		<ant inheritAll="false" antfile="${carray_jl5.dir}/build.xml" dir="${carray_jl5.dir}" target="compile-all" />
+		<ant inheritAll="false" antfile="${carray_jl5.dir}/build.xml" dir="${carray_jl5.dir}" target="jar" />
+	</target>
+
 	<!-- clean the examples -->
 	<target name="clean-examples" description="Clean the examples">
 		<ant inheritAll="false" antfile="${pao.dir}/build.xml" dir="${pao.dir}" target="clean" />
 		<ant inheritAll="false" antfile="${coffer.dir}/build.xml" dir="${coffer.dir}" target="clean" />
+		<ant inheritAll="false" antfile="${carray.dir}/build.xml" dir="${carray.dir}" target="clean" />
+		<ant inheritAll="false" antfile="${carray_jl5.dir}/build.xml" dir="${carray_jl5.dir}" target="clean" />
 	</target>
 
 	<!-- clobber the examples -->
 	<target name="clobber-examples" description="Clobber the examples">
 		<ant inheritAll="false" antfile="${pao.dir}/build.xml" dir="${pao.dir}" target="clobber" />
 		<ant inheritAll="false" antfile="${coffer.dir}/build.xml" dir="${coffer.dir}" target="clobber" />
+		<ant inheritAll="false" antfile="${carray.dir}/build.xml" dir="${carray.dir}" target="clobber" />
+		<ant inheritAll="false" antfile="${carray_jl5.dir}/build.xml" dir="${carray_jl5.dir}" target="clobber" />
+		<delete file="${pao.dir}/lib/polyglot.jar" />
+		<delete file="${coffer.dir}/lib/polyglot.jar" />
+		<delete file="${covarRet.dir}/lib/polyglot.jar" />
+		<delete file="${carray.dir}/lib/polyglot.jar" />
+		<delete file="${carray_jl5.dir}/lib/polyglot.jar" />
+		<delete file="${pao.dir}/lib/java_cup.jar" />
+		<delete file="${coffer.dir}/libjava_cup.jar" />
+		<delete file="${carray.dir}/libjava_cup.jar" />
+		<delete file="${carray_jl5.dir}/lib" />
+		<delete file="${pao.dir}/lib/jflex.jar" />
+		<delete file="${coffer.dir}/lib/jflex.jar" />
+		<delete file="${carray.dir}/lib/jflex.jar" />
+		<delete file="${carray_jl5.dir}/lib/jflex.jar" />
+		<delete file="${pao.dir}/lib/ppg.jar" />
+		<delete file="${coffer.dir}/lib/ppg.jar" />
+		<delete file="${carray.dir}/lib/ppg.jar" />
+		<delete file="${carray_jl5.dir}/lib/ppg.jar" />
 	</target>
 
 	<!-- jar the examples -->
 	<target name="jar-examples" description="Build pao.jar and coffer.jar">
 		<ant inheritAll="false" antfile="${pao.dir}/build.xml" dir="${pao.dir}" target="jar" />
 		<ant inheritAll="false" antfile="${coffer.dir}/build.xml" dir="${coffer.dir}" target="jar" />
+		<ant inheritAll="false" antfile="${carray.dir}/build.xml" dir="${carray.dir}" target="jar" />
+		<ant inheritAll="false" antfile="${carray_jl5.dir}/build.xml" dir="${carray_jl5.dir}" target="jar" />
 	</target>
 
 	<target name="clean-all" depends="clean,clean-examples" description="Clean the base compiler and the examples" />
@@ -259,6 +316,13 @@
 				<include name="ppg/lex/Lexer.java" />
 			</fileset>
 		</delete>
+		<delete>
+			<fileset dir="${cup.src}">
+				<include name="java_cup/Lexer.java" />
+				<include name="java_cup/parser.java" />
+				<include name="java_cup/sym.java" />
+			</fileset>
+		</delete>
 	</target>
 
 	<!-- compile the base compiler except for the quasiquoter and generated parser -->
@@ -268,12 +332,12 @@
             <classpath refid="standard.classpath" />
         </javac>
 		<!-- Compile the JL5 code -->
-        <javac source="1.5" target="1.5" srcdir="${src}" destdir="${classes}" debug="on" includes="polyglot/ext/jl5/**" includeAntRuntime="true" excludes="polyglot/ext/jl5/parse/Lexer_c.java,polyglot/ext/jl5/parse/sym.java,polyglot/ext/jl5/parse/Grm.java"
+        <javac source="1.5" target="1.5" srcdir="${src}" destdir="${classes}" debug="on" includes="polyglot/ext/jl5/**" excludes="polyglot/ext/jl5/parse/Lexer_c.java,polyglot/ext/jl5/parse/sym.java,polyglot/ext/jl5/parse/Grm.java"
                includeantruntime="false">
             <classpath refid="standard.classpath" />
         </javac>
 		<!-- Compile the JL7 code -->
-        <javac source="1.5" target="1.5" srcdir="${src}" destdir="${classes}" debug="on" includes="polyglot/ext/jl7/**" includeAntRuntime="true" excludes="polyglot/ext/jl7/parse/Lexer_c.java,polyglot/ext/jl7/parse/sym.java,polyglot/ext/jl7/parse/Grm.java"
+        <javac source="1.5" target="1.5" srcdir="${src}" destdir="${classes}" debug="on" includes="polyglot/ext/jl7/**" excludes="polyglot/ext/jl7/parse/Lexer_c.java,polyglot/ext/jl7/parse/sym.java,polyglot/ext/jl7/parse/Grm.java"
                includeantruntime="false">
             <classpath refid="standard.classpath" />
         </javac>
@@ -287,6 +351,11 @@
 	</target>
 
 	<target name="cup" depends="init" description="Builds the extended CUP parser generator">
+		<antcall target="jflex-lexer">
+			<param name="lexer.dir" value="${cup.src}/java_cup" />
+			<param name="lexer.class" value="Lexer" />
+			<param name="jflex.file" value="Lexer.jflex" />
+		</antcall>
 		<antcall target="cup-parser-using-jar">
 			<param name="parser.dir" value="${cup.src}/java_cup" />
 			<param name="cup.file" value="parser.cup" />
@@ -309,11 +378,25 @@
        @param symbol.class  The name to be passed to CUP with -symbols.
        @param cup.file      The name of the CUP file.
    -->
-	<target name="cup-parser" depends="cup,cup-parser-deps" unless="cup-parser.up-to-date">
+	<target name="cup-parser" depends="cup,cup-parser-deps,serialuid" unless="cup-parser.up-to-date">
 		<java classname="java_cup.Main" fork="true" dir="${parser.dir}" failonerror="true">
 			<classpath refid="standard.classpath" />
-			<arg value="-max_actions" />
-			<arg value="100" />
+			<arg value="-nopositions" />
+			<arg value="-parser" />
+			<arg value="${parser.class}" />
+			<arg value="-symbols" />
+			<arg value="${symbol.class}" />
+			<arg value="${cup.file}" />
+		</java>
+	</target>
+
+	<!-- The following target builds a cup parser using the version of
+       cup already sitting in the java_cup.jar file. This is needed to
+       bootstrap the build of cup. -->
+	<target name="cup-parser-using-jar" depends="cup-parser-deps,serialuid" unless="cup-parser.up-to-date">
+		<java classname="java_cup.Main" fork="true" dir="${parser.dir}" failonerror="true">
+			<classpath refid="cup.jar.classpath" />
+			<arg value="-nopositions" />
 			<arg value="-parser" />
 			<arg value="${parser.class}" />
 			<arg value="-symbols" />
@@ -324,24 +407,10 @@
 		<replaceregexp
 		  file="${parser.dir}/${parser.class}.java"
 		  match="^(public )?class"
-		  replace="@SuppressWarnings(&quot;all&quot;) \1class"
+		  replace="@SuppressWarnings(&quot;all&quot;)${line.separator}\1class"
 		  flags="g"
-		  byline="yes"
+		  byline="true"
 		/>
-	</target>
-
-	<!-- The following target builds a cup parser using the version of
-       cup already sitting in the java_cup.jar file. This is needed to
-       bootstrap the build of cup. -->
-	<target name="cup-parser-using-jar" depends="cup-parser-deps" unless="cup-parser.up-to-date">
-		<java classname="java_cup.Main" fork="true" dir="${parser.dir}" failonerror="true">
-			<classpath refid="cup.jar.classpath" />
-			<arg value="-parser" />
-			<arg value="${parser.class}" />
-			<arg value="-symbols" />
-			<arg value="${symbol.class}" />
-			<arg value="${cup.file}" />
-		</java>
 	</target>
 
 	<!-- Set the property cup-parser.up-to-date if the parser is in fact
@@ -371,7 +440,7 @@
            @param parser.class  The name to be passed to CUP with -parser.
            @param symbol.class  The name to be passed to CUP with -symbols.
        -->
-	<target name="ppg-parser" depends="ppg-parser.deps" unless="ppg-parser.up-to-date">
+	<target name="ppg-parser" depends="ppg-parser.deps,serialuid" unless="ppg-parser.up-to-date">
 		<java classname="ppg.PPG" fork="true" failonerror="true">
 			<classpath refid="standard.classpath" />
 			<arg value="${parser.dir}/${ppg.file}" />
@@ -413,8 +482,9 @@
        @param jflex.file    The name of the JFlex file.
       -->
 	<target name="jflex-lexer" depends="jflex-lexer-deps" unless="jflex-lexer.up-to-date">
-		<java classname="JFlex.Main" fork="true" dir="${lexer.dir}" failonerror="true">
+		<java classname="jflex.Main" fork="true" dir="${lexer.dir}" failonerror="true">
 			<classpath refid="standard.classpath" />
+			<arg value="--noinputstreamctor" />
 			<arg value="${jflex.file}" />
 		</java>
 	</target>
@@ -725,7 +795,7 @@
 		<mkdir dir="${tmp}/testsjl7/java-out" />
 
 		<copy todir="${tmp}/examples" includeEmptyDirs="true">
-                    <fileset dir="${examples.dir}" includes="pao/**,coffer/**" />
+                    <fileset dir="${examples.dir}" includes="pao/**,coffer/**,covarRet/**,carray/**,carray_jl5/**" />
 		</copy>
 
                 <copy file="META-INF/MANIFEST.MF" todir="${tmp}/META-INF" />
@@ -754,7 +824,7 @@
 		<copy file="${lib}/pth.jar" todir="${tmp}/lib" />
 		<copy file="${lib}/ppg.jar" todir="${tmp}/lib" />
 		<copy file="${lib}/java_cup.jar" todir="${tmp}/lib" />
-		<copy file="${lib}/JFlex.jar" todir="${tmp}/lib" />
+		<copy file="${lib}/jflex.jar" todir="${tmp}/lib" />
 		<copy file="build.xml" todir="${tmp}" />
 		<copy file="build.properties" todir="${tmp}" />
 		<copy file="README" todir="${tmp}" />

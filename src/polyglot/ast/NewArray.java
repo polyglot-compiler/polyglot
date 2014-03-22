@@ -29,12 +29,12 @@ package polyglot.ast;
 import java.util.List;
 
 /**
- * A <code>NewArray</code> represents a new array expression such as <code>new
- * File[8][] { null }</code>.  It consists of an element type (e.g.,
- * <code>File</code>), a list of dimension expressions (e.g., 8), 0 or more
- * additional dimensions (e.g., 1 for []), and an array initializer.  The
- * dimensions of the array initializer must equal the number of additional "[]"
- * dimensions.
+ * A {@code NewArray} represents a new array expression such as
+ * {@code new File[8][] { null }}.  It consists of an element type (e.g.,
+ * {@code File}), a list of dimension expressions (e.g., 8), 0 or more
+ * additional dimensions (e.g., 1 for {@code []}), and an array initializer.
+ * The dimensions of the array initializer must equal the number of additional
+ * {@code []} dimensions.
  */
 public interface NewArray extends Expr {
     /** The array's base type. */

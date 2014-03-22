@@ -14,7 +14,8 @@ parser code {:
         lexer = lex;
     } 
 
-    public void syntax_error (Symbol cur_token) { 
+	@Override
+    public void syntax_error(Symbol cur_token) { 
         Token tok = (Token) cur_token.value; 
         report_error (tok.getFilename()+": syntax error at line " + 
 						tok.getLineno() + ": \"" + tok.getValue() + "\" (" + 

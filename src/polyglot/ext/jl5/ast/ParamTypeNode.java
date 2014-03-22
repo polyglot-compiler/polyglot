@@ -28,14 +28,15 @@ package polyglot.ext.jl5.ast;
 import java.util.List;
 
 import polyglot.ast.Id;
+import polyglot.ast.Node;
 import polyglot.ast.TypeNode;
 
-public interface ParamTypeNode extends TypeNode {
-    ParamTypeNode id(Id id);
-
+public interface ParamTypeNode {
     Id id();
 
-    ParamTypeNode bounds(List<TypeNode> l);
+    Node id(Id id);
 
     List<TypeNode> bounds();
+
+    Node bounds(List<TypeNode> bounds);
 }

@@ -1,0 +1,8 @@
+covarRet.ExtensionInfo "-d out -assert" {
+	A.jl;
+	B.jl;
+	C.jl;
+	Sub.jl;
+	Sup.jl;
+	Test.jl;
+}

@@ -30,8 +30,8 @@ import polyglot.util.Enum;
 import polyglot.util.SerialVersionUID;
 
 /**
- * An <code>Import</code> is an immutable representation of a Java
- * <code>import</code> statement.  It consists of the string representing the
+ * An {@code Import} is an immutable representation of a Java
+ * {@code import} statement.  It consists of the string representing the
  * item being imported and the kind which is either indicating that a class
  * is being imported, or that an entire package is being imported.
  */

@@ -80,7 +80,7 @@ public class ParsedClassType_c extends ClassType_c implements ParsedClassType {
     /** Was the class declared in a static context? */
     protected boolean inStaticContext = false;
 
-    /** Wether we need to serialize this class. */
+    /** Whether we need to serialize this class. */
     protected boolean needSerialization = true;
 
     protected ParsedClassType_c() {

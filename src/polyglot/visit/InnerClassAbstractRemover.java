@@ -145,7 +145,7 @@ public abstract class InnerClassAbstractRemover extends ContextVisitor {
      * @param outer
      *          the class enclosing the inner class.
      * @param qualifier
-     *          the <code>new</code> expression's qualifier.
+     *          the {@code new} expression's qualifier.
      * @see polyglot.visit.InnerClassAbstractRemover#env(ClassType, boolean)
      */
     List<Expr> envAsActuals(List<ClassType> env, ClassType outer, Expr qualifier) {

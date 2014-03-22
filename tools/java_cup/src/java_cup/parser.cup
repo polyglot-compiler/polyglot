@@ -91,7 +91,7 @@
 package java_cup;
 import java_cup.runtime.*;
 import java.util.Hashtable;
-
+import java.util.Stack;
 /*----------------------------------------------------------------*/ 
 
 action code {:
@@ -131,17 +131,20 @@ action code {:
 
   /** string to build up multiple part names */
   protected String multipart_name = new String();
-
+  protected Stack multipart_names = new Stack();
   /** append a new name segment to the accumulated multipart name */
-  protected void append_multipart(String name)
-    {
-      String dot = "";
 
-      /* if we aren't just starting out, put on a dot */
-      if (multipart_name.length() != 0)  dot = ".";
-
-      multipart_name = multipart_name.concat(dot + name);
-    }
+//  TUM CHANGES
+//   protected void append_multipart(String name)
+//     {
+//       String dot = "";
+// 
+//       /* if we aren't just starting out, put on a dot */
+//       if (multipart_name.length() != 0)  dot = ".";
+// 
+//       multipart_name = multipart_name.concat(dot + name);
+//     }
+// TUM CHANGES
 
   /** table of declared symbols -- contains production parts indexed by name */
   protected Hashtable symbols = new Hashtable();
@@ -188,36 +191,46 @@ action code {:
 
 parser code {:
 
-  /* override error routines */
-
+ /* override error routines */
+  protected Lexer lexer;
   public void report_fatal_error(
     String   message,
     Object   info)
     {
       done_parsing();
-      lexer.emit_error(message);
-      System.err.println("Can't recover from previous error(s), giving up.");
+      if (info instanceof Symbol) ErrorManager.getManager().emit_fatal(message+ "\nCan't recover from previous error(s), giving up.",(Symbol)info);
+      else ErrorManager.getManager().emit_fatal(message + "\nCan't recover from previous error(s), giving up.",cur_token);
       System.exit(1);
     }
 
     public void report_error(String message, Object info)
     {
-      lexer.emit_error(message);
+      if (info instanceof Symbol)
+         ErrorManager.getManager().emit_error(message,(Symbol)info);
+      else
+         ErrorManager.getManager().emit_error(message,cur_token);
     }
 :};
 
-/*----------------------------------------------------------------*/ 
+/*---------------------------------------------------------------- */
 
-init with {: lexer.init(); :};
-scan with {: return lexer.next_token(); :};
+init with {: 
+    ComplexSymbolFactory f = new ComplexSymbolFactory();
+    symbolFactory = f;
+    lexer = new Lexer(f); 
+:}
+/*lexer.init(); :};*/
+scan with {: 
+    return lexer.next_token(); 
+:};
 
 /*----------------------------------------------------------------*/ 
 
 terminal
   PACKAGE, IMPORT, CODE, ACTION, PARSER, TERMINAL, NON, INIT, SCAN, WITH, 
   START, SEMI, COMMA, STAR, DOT, COLON, COLON_COLON_EQUALS, BAR, PRECEDENCE,
-  LEFT, RIGHT, NONASSOC, PERCENT_PREC, LBRACK, RBRACK, NONTERMINAL,
-  EXTENDS, IMPLEMENTS /* ACM extension */
+  LEFT, RIGHT, NONASSOC, PERCENT_PREC, LBRACK, RBRACK, NONTERMINAL, GT, LT,
+  QUESTION, EXTENDS, IMPLEMENTS /* ACM extension */
   ;
 
 terminal String  ID, CODE_STRING;
@@ -233,7 +246,7 @@ non terminal
   declares_non_term;
 
 non terminal String  nt_id, symbol_id, label_id, opt_label, terminal_id,
-                     term_id, robust_id;
+                     term_id, robust_id, typearglist, typearguement, wildcard;
 
 non terminal String qualified_identifier, extendsimpls; /* ACM extension */
 
@@ -327,7 +340,7 @@ action_code_part ::=
 	ACTION CODE CODE_STRING:user_code opt_semi
 	{:
 	  if (emit.action_code!=null)
-	    lexer.emit_error("Redundant action code (skipping)");
+	    ErrorManager.getManager().emit_warning("Redundant action code (skipping)");
 	  else /* save the user included code string */
 	    emit.action_code = user_code;
 	:}
@@ -339,7 +352,7 @@ parser_code_part ::=
 	PARSER CODE CODE_STRING:user_code opt_semi
 	{:
 	  if (emit.parser_code!=null)
-	    lexer.emit_error("Redundant parser code (skipping)");
+	    ErrorManager.getManager().emit_warning("Redundant parser code (skipping)");
 	  else /* save the user included code string */
 	    emit.parser_code = user_code;
 	:}
@@ -347,7 +360,7 @@ parser_code_part ::=
     |   PARSER ID:classname extendsimpls:e CODE_STRING:user_code opt_semi
 	{:
 	  if (emit.parser_code!=null) {
-	    lexer.emit_error("Redundant parser code (skipping)");
+	    ErrorManager.getManager().emit_warning("Redundant parser code (skipping)");
 	  } else {
 	    emit.parser_code = user_code;
 	    emit.parser_class_name = classname;
@@ -383,7 +396,7 @@ init_code ::=
 	INIT WITH CODE_STRING:user_code opt_semi
 	{: 
 	  if (emit.init_code!=null)
-	    lexer.emit_error("Redundant init code (skipping)");
+	    ErrorManager.getManager().emit_warning("Redundant init code (skipping)");
 	  else /* save the user code */
 	    emit.init_code = user_code;
 	:}
@@ -395,7 +408,7 @@ scan_code ::=
 	SCAN WITH CODE_STRING:user_code opt_semi
 	{: 
 	  if (emit.scan_code!=null)
-	    lexer.emit_error("Redundant scan code (skipping)");
+	    ErrorManager.getManager().emit_warning("Redundant scan code (skipping)");
 	  else /* save the user code */
 	    emit.scan_code = user_code;
 	:}
@@ -529,7 +542,7 @@ term_id ::= symbol_id:sym
 	  if (symbols.get(sym) == null)
 	    {
 	      /* issue a message */
-	      lexer.emit_error("Terminal \"" + sym + 
+	      ErrorManager.getManager().emit_error("Terminal \"" + sym + 
 			   "\" has not been declared");
 	    }
           RESULT = sym;
@@ -544,7 +557,7 @@ start_spec ::=
 	  non_terminal nt = (non_terminal)non_terms.get(start_name);
 	  if (nt == null)
 	    {
-	      lexer.emit_error( "Start non terminal \"" + start_name + 
+	    ErrorManager.getManager().emit_error( "Start non terminal \"" + start_name + 
 	  		         "\" has not been declared");
 	    }
           else
@@ -582,8 +595,8 @@ production ::=
           /* if it wasn't declared, emit a message */
 	  if (lhs_nt == null)
 	    {
-	      if (lexer.error_count == 0)
-	        lexer.emit_error("LHS non terminal \"" + lhs_id + 
+	      if (ErrorManager.getManager().getErrorCount() == 0)
+	      ErrorManager.getManager().emit_warning("LHS non terminal \"" + lhs_id + 
 			       "\" has not been declared");
 	    }
 
@@ -591,12 +604,12 @@ production ::=
 	  new_rhs();
 	:}
 	COLON_COLON_EQUALS
-	{: :}
+/*	{: :}*/
 	rhs_list
 	SEMI
 	|
 	error
-	{: lexer.emit_error("Syntax Error"); :}
+	{: ErrorManager.getManager().emit_error("Syntax Error"); :}
 	SEMI
 	;
 
@@ -707,8 +720,8 @@ prod_part ::=
 	  /* if that fails, symbol is undeclared */
 	  if (symb == null)
 	    {
-	      if (lexer.error_count == 0)
-	        lexer.emit_error("java_cup.runtime.Symbol \"" + symid + 
+	      if (ErrorManager.getManager().getErrorCount() == 0)
+	        ErrorManager.getManager().emit_error("java_cup.runtime.Symbol \"" + symid + 
 			       "\" has not been declared");
 	    }
 	  else
@@ -739,17 +752,49 @@ opt_label ::=
 
 multipart_id ::=
 	multipart_id DOT robust_id:another_id
-	{: append_multipart(another_id); :}
-	|
+	{: multipart_name = multipart_name.concat("."+another_id); :}
+	|multipart_id 
+        {: multipart_names.push(multipart_name); multipart_name="";:}
+        LT typearglist:types GT
+         {: multipart_name =
+         ((String)multipart_names.pop()).concat("<"+types+">"); :}
+        |
 	robust_id:an_id
-	{: append_multipart(an_id); :}
+	{: multipart_name = multipart_name.concat(an_id); :}
 	;
+/*. . . . . . . . . . . .TUM CHANGES. . . . . . . . . . . . . . . */
+
+
+typearglist ::= 
+            typearguement:arg
+            {: RESULT = arg; :}
+            | typearglist:list COMMA typearguement:arg
+            {: RESULT = list + "," + arg; :}
+            ;
+
+typearguement ::=
+              type_id
+              {: RESULT = multipart_name; multipart_name = new String(); :}
+              | wildcard:w
+              {: RESULT = w; :}
+              ;
+
+wildcard ::=
+         QUESTION
+         {: RESULT = " ? "; :}
+         | QUESTION EXTENDS type_id
+         {: RESULT = " ? extends "+multipart_name; multipart_name = new
+         String(); :}
+         ;
+
+/*. . . . . . . . . . .END TUM CHANGES. . . . . . . . . . . . . . */ 
+
 
 /*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . */ 
 
 import_id ::= 
 	multipart_id DOT STAR
-	{: append_multipart("*"); :}
+	{: multipart_name = multipart_name.concat(".*"); :}
 	|
 	multipart_id
 	;
@@ -759,7 +804,7 @@ import_id ::=
 type_id ::= multipart_id
 	| type_id LBRACK RBRACK
 	{: multipart_name = multipart_name.concat("[]"); :}
-	;
+       	;
 
 /*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . */ 
 
@@ -770,14 +815,14 @@ new_term_id ::=
 	  if (symbols.get(term_id) != null)
 	    {
 	      /* issue a message */
-	      lexer.emit_error("java_cup.runtime.Symbol \"" + term_id + 
+	      ErrorManager.getManager().emit_error("java_cup.runtime.Symbol \"" + term_id + 
 			   "\" has already been declared");
 	    }
 	  else
 	    {
 	      /* if no type declared, declare one */
 	      if (multipart_name.equals("")) {
-		append_multipart("Object");
+		multipart_name = "Object";
 	      }
 	      /* build a production_part and put it in the table */ 
 	      symbols.put(term_id, 
@@ -795,13 +840,13 @@ new_non_term_id ::=
 	  if (symbols.get(non_term_id) != null)
 	    {
 	      /* issue a message */
-	      lexer.emit_error( "java_cup.runtime.Symbol \"" + non_term_id + 
+	      ErrorManager.getManager().emit_error( "java_cup.runtime.Symbol \"" + non_term_id + 
 			                      "\" has already been declared");
 	    }
 	  else
 	    {
 	      if (multipart_name.equals("")) {
-		append_multipart("Object");
+                   multipart_name ="Object";
 	      }
 	      /* build the non terminal object */
               non_terminal this_nt = 
@@ -823,7 +868,7 @@ nt_id ::=
 	{: RESULT = the_id; :}
 	| error
 	{:
-		lexer.emit_error("Illegal use of reserved word");
+		ErrorManager.getManager().emit_error("Illegal use of reserved word");
 		RESULT="ILLEGAL";
 	:}
 	;
@@ -835,7 +880,7 @@ symbol_id ::=
 	{: RESULT = the_id; :}
 	| error
 	{:
-		lexer.emit_error("Illegal use of reserved word");
+		ErrorManager.getManager().emit_error("Illegal use of reserved word");
 		RESULT="ILLEGAL";
 	:}
 	;
@@ -869,7 +914,7 @@ robust_id ::= /* all ids that aren't reserved words in Java */
 	| NONASSOC	{: RESULT = "nonassoc"; :}
 	| error
 	{:
-		lexer.emit_error("Illegal use of reserved word");
+		ErrorManager.getManager().emit_error("Illegal use of reserved word");
 		RESULT="ILLEGAL";
 	:}
 	;

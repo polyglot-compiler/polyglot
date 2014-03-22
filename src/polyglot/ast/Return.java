@@ -27,12 +27,12 @@
 package polyglot.ast;
 
 /**
- * A <code>Return</code> represents a <code>return</code> statement in Java.
- * It may or may not return a value.  If not <code>expr()</code> should return
+ * A {@code Return} represents a {@code return} statement in Java.
+ * It may or may not return a value.  If not {@code expr()} should return
  * null.
  */
 public interface Return extends Stmt {
-    /** The expression to return. */
+    /** The expression to return, or null. */
     Expr expr();
 
     /** Set the expression to return. */

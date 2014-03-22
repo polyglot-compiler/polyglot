@@ -27,18 +27,17 @@ package polyglot.ext.jl5.translate;
 
 import polyglot.ast.ConstructorDecl;
 import polyglot.ast.Node;
-import polyglot.ext.jl5.ast.JL5ConstructorDeclExt;
+import polyglot.ext.jl5.ast.AnnotatedElement;
 import polyglot.ext.jl5.ast.JL5Ext;
 import polyglot.ext.jl5.ast.JL5NodeFactory;
+import polyglot.ext.jl5.ast.JL5ProcedureDeclExt;
 import polyglot.translate.ExtensionRewriter;
 import polyglot.translate.ext.ConstructorDeclToExt_c;
-import polyglot.translate.ext.ToExt;
 import polyglot.types.SemanticException;
 import polyglot.util.SerialVersionUID;
 import polyglot.visit.NodeVisitor;
 
-public class JL5ConstructorDeclToExt_c extends ConstructorDeclToExt_c implements
-        ToExt {
+public class JL5ConstructorDeclToExt_c extends ConstructorDeclToExt_c {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
     @Override
@@ -46,23 +45,22 @@ public class JL5ConstructorDeclToExt_c extends ConstructorDeclToExt_c implements
             throws SemanticException {
         //Skip annotations and parameter nodes
         ConstructorDecl cd = (ConstructorDecl) node();
-        JL5ConstructorDeclExt ext = (JL5ConstructorDeclExt) JL5Ext.ext(cd);
-        rw = (ExtensionRewriter) rw.bypass(ext.annotationElems());
-        return rw.bypass(ext.typeParams());
+        rw =
+                (ExtensionRewriter) rw.bypass(((AnnotatedElement) JL5Ext.ext(cd)).annotationElems());
+        return rw.bypass(((JL5ProcedureDeclExt) JL5Ext.ext(cd)).typeParams());
     }
 
     @Override
     public Node toExt(ExtensionRewriter rw) throws SemanticException {
         JL5NodeFactory to_nf = (JL5NodeFactory) rw.to_nf();
         ConstructorDecl n = (ConstructorDecl) node();
-        JL5ConstructorDeclExt ext = (JL5ConstructorDeclExt) JL5Ext.ext(n);
         return to_nf.ConstructorDecl(n.position(),
                                      n.flags(),
-                                     ext.annotationElems(),
+                                     ((AnnotatedElement) JL5Ext.ext(n)).annotationElems(),
                                      n.id(),
                                      n.formals(),
                                      n.throwTypes(),
                                      n.body(),
-                                     ext.typeParams());
+                                     ((JL5ProcedureDeclExt) JL5Ext.ext(n)).typeParams());
     }
 }

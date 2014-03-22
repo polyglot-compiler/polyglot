@@ -28,8 +28,10 @@ package polyglot.ast;
 
 import java.util.List;
 
+import polyglot.translate.ExtensionRewriter;
 import polyglot.types.SemanticException;
 import polyglot.util.CollectionUtil;
+import polyglot.util.Copy;
 import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
 import polyglot.util.SubtypeSet;
@@ -37,56 +39,41 @@ import polyglot.visit.CFGBuilder;
 import polyglot.visit.ExceptionChecker;
 
 /**
- * A <code>Term</code> represents any Java expression or statement on which
+ * A {@code Term} represents any Java expression or statement on which
  * dataflow can be performed.
  */
-public abstract class Term_c extends Node_c implements Term {
+public abstract class Term_c extends Node_c implements Term, TermOps {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
+    protected boolean reachable;
+    protected SubtypeSet exceptions;
+
+    // TODO
+    // @Deprecated
     public Term_c(Position pos) {
-        super(pos);
+        this(pos, null);
     }
 
-    protected boolean reachable;
+    public Term_c(Position pos, Ext ext) {
+        super(pos, ext);
+    }
 
-    /**
-     * Visit this term in evaluation order.
-     */
-    @Override
-    public abstract <T> List<T> acceptCFG(CFGBuilder<?> v, List<T> succs);
-
-    /**
-     * Return true if this term is eachable.  This attribute is not
-     * guaranteed correct until after the reachability pass
-     *
-     * @see polyglot.visit.ReachChecker
-     */
     @Override
     public boolean reachable() {
         return reachable;
     }
 
-    /**
-     * Set the reachability of this term.
-     */
     @Override
-    public Term reachable(boolean reachability) {
-        if (this.reachable == reachability) {
-            return this;
-        }
-
-        Term_c t = (Term_c) copy();
-        t.reachable = reachability;
-        return t;
+    public Term reachable(boolean reachable) {
+        return reachable(this, reachable);
     }
 
-    /** Utility function to get the first entry of a list, or else alt. */
-    public static <T extends Term, U extends T, V extends T> T listChild(
-            List<U> l, V alt) {
-        return CollectionUtil.<T, U, V> firstOrElse(l, alt);
+    protected <N extends Term_c> N reachable(N n, boolean reachable) {
+        if (n.reachable == reachable) return n;
+        if (n == this) n = Copy.Util.copy(n);
+        n.reachable = reachable;
+        return n;
     }
-
-    protected SubtypeSet exceptions;
 
     @Override
     public SubtypeSet exceptions() {
@@ -95,15 +82,40 @@ public abstract class Term_c extends Node_c implements Term {
 
     @Override
     public Term exceptions(SubtypeSet exceptions) {
-        Term_c n = (Term_c) copy();
+        return exceptions(this, exceptions);
+    }
+
+    protected <N extends Term_c> N exceptions(N n, SubtypeSet exceptions) {
+        if (n.exceptions == exceptions) return n;
+        if (n == this) n = Copy.Util.copy(n);
         n.exceptions = new SubtypeSet(exceptions);
         return n;
     }
 
+    /** Utility function to get the first entry of a list, or else alt. */
+    public static <T extends Term, U extends T, V extends T> T listChild(
+            List<U> l, V alt) {
+        return CollectionUtil.<T, U, V> firstOrElse(l, alt);
+    }
+
     @Override
     public Node exceptionCheck(ExceptionChecker ec) throws SemanticException {
-        Term t = (Term) super.exceptionCheck(ec);
+        Term_c t = (Term_c) super.exceptionCheck(ec);
+        t = exceptions(t, ec.throwsSet());
         //System.out.println("exceptions for " + t + " = " + ec.throwsSet());
-        return t.exceptions(ec.throwsSet());
+        return t;
     }
+
+    @Override
+    public Node extRewrite(ExtensionRewriter rw) throws SemanticException {
+        Term_c t = (Term_c) super.extRewrite(rw);
+        t = reachable(t, false);
+        return t;
+    }
+
+    @Override
+    public abstract Term firstChild();
+
+    @Override
+    public abstract <T> List<T> acceptCFG(CFGBuilder<?> v, List<T> succs);
 }

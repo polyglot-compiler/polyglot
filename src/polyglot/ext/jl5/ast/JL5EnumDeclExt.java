@@ -1,16 +1,17 @@
 package polyglot.ext.jl5.ast;
 
 import java.util.Collections;
+import java.util.List;
 
 import polyglot.ast.ClassDecl;
-import polyglot.ast.ClassDecl_c;
 import polyglot.ast.ClassMember;
 import polyglot.ast.ConstructorDecl;
 import polyglot.ast.Formal;
+import polyglot.ast.JLang;
 import polyglot.ast.MethodDecl;
 import polyglot.ast.Node;
 import polyglot.ast.NodeFactory;
-import polyglot.ast.Node_c;
+import polyglot.ast.Term;
 import polyglot.ast.TypeNode;
 import polyglot.ext.jl5.types.JL5Flags;
 import polyglot.ext.jl5.types.JL5MethodInstance;
@@ -24,15 +25,21 @@ import polyglot.types.Type;
 import polyglot.types.TypeSystem;
 import polyglot.util.CodeWriter;
 import polyglot.util.InternalCompilerError;
+import polyglot.util.SerialVersionUID;
 import polyglot.visit.NodeVisitor;
 import polyglot.visit.PrettyPrinter;
 import polyglot.visit.TypeBuilder;
 import polyglot.visit.TypeChecker;
 
 public class JL5EnumDeclExt extends JL5ClassDeclExt {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
+    public JL5EnumDeclExt(List<Term> annotations) {
+        super(Collections.<TypeNode> emptyList(), annotations);
+    }
 
     public ClassDecl addValueOfMethodType(TypeSystem ts) {
-        ClassDecl n = (ClassDecl) this.node();
+        ClassDecl n = this.node();
         Flags flags = Flags.PUBLIC.set(Flags.STATIC.set(Flags.FINAL));
 
         // add valueOf method
@@ -50,7 +57,7 @@ public class JL5EnumDeclExt extends JL5ClassDeclExt {
     }
 
     public ClassDecl addValuesMethodType(TypeSystem ts) {
-        ClassDecl n = (ClassDecl) this.node();
+        ClassDecl n = this.node();
         Flags flags = Flags.PUBLIC.set(Flags.STATIC.set(Flags.FINAL));
 
         // add values method
@@ -68,7 +75,7 @@ public class JL5EnumDeclExt extends JL5ClassDeclExt {
     }
 
     public Node addEnumMethodTypesIfNeeded(TypeSystem ts) {
-        ClassDecl n = (ClassDecl) this.node();
+        ClassDecl n = this.node();
         JL5EnumDeclExt ext = (JL5EnumDeclExt) JL5Ext.ext(n);
 
         JL5ParsedClassType ct = (JL5ParsedClassType) n.type();
@@ -102,8 +109,9 @@ public class JL5EnumDeclExt extends JL5ClassDeclExt {
         }
     }
 
+    @Override
     public NodeVisitor typeCheckEnter(TypeChecker tc) throws SemanticException {
-        ClassDecl n = (ClassDecl) this.node();
+        ClassDecl n = this.node();
         // figure out if this should be an abstract type.
         // need to do this before any anonymous subclasses are typechecked.
         for (MethodInstance mi : n.type().methods()) {
@@ -112,12 +120,12 @@ public class JL5EnumDeclExt extends JL5ClassDeclExt {
             // mi is abstract! First, mark the class as abstract.
             n.type().setFlags(n.type().flags().Abstract());
         }
-        return this.superDel().typeCheckEnter(tc);
+        return superLang().typeCheckEnter(this.node(), tc);
     }
 
     @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
-        ClassDecl n = (ClassDecl) this.node();
+        ClassDecl n = this.node();
         if (n.flags().isAbstract()) {
             throw new SemanticException("Enum types cannot have abstract modifier",
                                         n.position());
@@ -172,9 +180,10 @@ public class JL5EnumDeclExt extends JL5ClassDeclExt {
         return n;
     }
 
+    @Override
     public Node addDefaultConstructor(TypeSystem ts, NodeFactory nf,
             ConstructorInstance defaultCI) throws SemanticException {
-        ClassDecl n = (ClassDecl) this.node();
+        ClassDecl n = this.node();
         ConstructorInstance ci = defaultCI;
         if (ci == null) {
             throw new InternalCompilerError("addDefaultConstructor called without defaultCI set");
@@ -184,7 +193,7 @@ public class JL5EnumDeclExt extends JL5ClassDeclExt {
         ConstructorDecl cd =
                 nf.ConstructorDecl(n.body().position().startOf(),
                                    Flags.PRIVATE,
-                                   n.name(),
+                                   n.id(),
                                    Collections.<Formal> emptyList(),
                                    Collections.<TypeNode> emptyList(),
                                    nf.Block(n.position().startOf()));
@@ -193,9 +202,10 @@ public class JL5EnumDeclExt extends JL5ClassDeclExt {
 
     }
 
+    @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
-        ClassDecl n = (ClassDecl) this.node();
-        prettyPrintHeader(w, tr);
+        ClassDecl n = this.node();
+        ((JLang) tr.lang()).prettyPrintHeader(n, w, tr);
 
         boolean hasEnumConstant = false;
         for (ClassMember m : n.body().members()) {
@@ -206,8 +216,8 @@ public class JL5EnumDeclExt extends JL5ClassDeclExt {
         }
 
         if (!hasEnumConstant) w.write(";");
-        ((Node_c) n).print(n.body(), w, tr);
-        ((ClassDecl_c) n).prettyPrintFooter(w, tr);
+        print(n.body(), w, tr);
+        ((JLang) tr.lang()).prettyPrintFooter(n, w, tr);
     }
 
 }
