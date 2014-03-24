@@ -1,6 +1,9 @@
 package carray.ast;
 
 import polyglot.ast.ArrayTypeNode;
+import polyglot.ast.ArrayTypeNode_c;
+import polyglot.ast.Ext;
+import polyglot.ast.ExtFactory;
 import polyglot.ast.NodeFactory_c;
 import polyglot.ast.TypeNode;
 import polyglot.util.Position;
@@ -22,9 +25,18 @@ public class CarrayNodeFactory_c extends NodeFactory_c implements
 
     @Override
     public ArrayTypeNode ConstArrayTypeNode(Position pos, TypeNode base) {
-        ArrayTypeNode n = ArrayTypeNode(pos, base);
-        n = (ArrayTypeNode) n.ext(extFactory().extConstArrayTypeNode());
-        return n;
+        return ConstArrayTypeNode(pos, base, null, extFactory());
     }
 
+    protected final ArrayTypeNode ConstArrayTypeNode(Position pos,
+            TypeNode base, Ext ext, ExtFactory extFactory) {
+        for (;; extFactory = extFactory.nextExtFactory()) {
+            Ext e =
+                    CarrayAbstractExtFactory_c.extConstArrayTypeNode(extFactory);
+            if (e == null) break;
+            ext = composeExts(ext, e);
+        }
+        ext = composeExts(ext, new CarrayConstArrayTypeNodeExt());
+        return new ArrayTypeNode_c(pos, base, ext);
+    }
 }

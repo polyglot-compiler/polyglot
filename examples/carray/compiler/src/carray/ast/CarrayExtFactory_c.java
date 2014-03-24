@@ -27,6 +27,6 @@ public final class CarrayExtFactory_c extends CarrayAbstractExtFactory_c {
 
     @Override
     protected Ext extConstArrayTypeNodeImpl() {
-        return new CarrayConstArrayTypeNodeExt();
+        return null;
     }
 }

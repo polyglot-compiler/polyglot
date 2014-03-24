@@ -28,12 +28,11 @@ package polyglot.ext.jl5.translate;
 import polyglot.ast.Node;
 import polyglot.ast.TypeNode;
 import polyglot.translate.ExtensionRewriter;
-import polyglot.translate.ext.ToExt;
 import polyglot.translate.ext.ToExt_c;
 import polyglot.types.SemanticException;
 import polyglot.util.SerialVersionUID;
 
-public class JL5TypeNodeToJL_c extends ToExt_c implements ToExt {
+public class JL5TypeNodeToJL_c extends ToExt_c {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
     @Override

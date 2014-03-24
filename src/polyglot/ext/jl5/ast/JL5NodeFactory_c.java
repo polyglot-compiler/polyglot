@@ -86,29 +86,56 @@ public class JL5NodeFactory_c extends JL5AbstractNodeFactory_c {
             TypeNode base, List<TypeNode> typeArguments) {
         AmbTypeInstantiation n =
                 new AmbTypeInstantiation(pos, base, typeArguments);
-        n =
-                (AmbTypeInstantiation) n.ext(extFactory().extAmbTypeInstantiation());
+        Ext ext = null;
+        ExtFactory extFactory = extFactory();
+        for (; extFactory != null; extFactory = extFactory.nextExtFactory()) {
+            Ext e = JL5AbstractExtFactory_c.extAmbTypeInstantiation(extFactory);
+            if (e == null) break;
+            ext = composeExts(ext, e);
+        }
+        n = (AmbTypeInstantiation) n.ext(ext);
         return n;
     }
 
     @Override
     public AmbWildCard AmbWildCard(Position pos) {
         AmbWildCard n = new AmbWildCard(pos);
-        n = (AmbWildCard) n.ext(extFactory().extAmbWildCard());
+        Ext ext = null;
+        ExtFactory extFactory = extFactory();
+        for (; extFactory != null; extFactory = extFactory.nextExtFactory()) {
+            Ext e = JL5AbstractExtFactory_c.extAmbWildCard(extFactory);
+            if (e == null) break;
+            ext = composeExts(ext, e);
+        }
+        n = (AmbWildCard) n.ext(ext);
         return n;
     }
 
     @Override
     public AmbWildCard AmbWildCardExtends(Position pos, TypeNode extendsNode) {
         AmbWildCard n = new AmbWildCard(pos, extendsNode, true);
-        n = (AmbWildCard) n.ext(extFactory().extAmbWildCard());
+        Ext ext = null;
+        ExtFactory extFactory = extFactory();
+        for (; extFactory != null; extFactory = extFactory.nextExtFactory()) {
+            Ext e = JL5AbstractExtFactory_c.extAmbWildCard(extFactory);
+            if (e == null) break;
+            ext = composeExts(ext, e);
+        }
+        n = (AmbWildCard) n.ext(ext);
         return n;
     }
 
     @Override
     public AmbWildCard AmbWildCardSuper(Position pos, TypeNode superNode) {
         AmbWildCard n = new AmbWildCard(pos, superNode, false);
-        n = (AmbWildCard) n.ext(extFactory().extAmbWildCard());
+        Ext ext = null;
+        ExtFactory extFactory = extFactory();
+        for (; extFactory != null; extFactory = extFactory.nextExtFactory()) {
+            Ext e = JL5AbstractExtFactory_c.extAmbWildCard(extFactory);
+            if (e == null) break;
+            ext = composeExts(ext, e);
+        }
+        n = (AmbWildCard) n.ext(ext);
         return n;
     }
 
@@ -117,7 +144,14 @@ public class JL5NodeFactory_c extends JL5AbstractNodeFactory_c {
             TypeNode type, Id name, Term defaultValue) {
         AnnotationElemDecl n =
                 new AnnotationElemDecl_c(pos, flags, type, name, defaultValue);
-        n = (AnnotationElemDecl) n.ext(extFactory().extAnnotationElemDecl());
+        Ext ext = null;
+        ExtFactory extFactory = extFactory();
+        for (; extFactory != null; extFactory = extFactory.nextExtFactory()) {
+            Ext e = JL5AbstractExtFactory_c.extAnnotationElemDecl(extFactory);
+            if (e == null) break;
+            ext = composeExts(ext, e);
+        }
+        n = (AnnotationElemDecl) n.ext(ext);
         return n;
     }
 
@@ -141,7 +175,7 @@ public class JL5NodeFactory_c extends JL5AbstractNodeFactory_c {
             List<TypeNode> interfaces, ClassBody body, Ext ext,
             ExtFactory extFactory) {
         for (;; extFactory = extFactory.nextExtFactory()) {
-            Ext e = ((JL5ExtFactory) extFactory).extEnumDecl();
+            Ext e = JL5AbstractExtFactory_c.extEnumDecl(extFactory);
             if (e == null) break;
             ext = composeExts(ext, e);
         }
@@ -308,7 +342,8 @@ public class JL5NodeFactory_c extends JL5AbstractNodeFactory_c {
     protected final Term ElementValueArrayInit(Position pos,
             List<Term> elements, Ext ext, ExtFactory extFactory) {
         for (;; extFactory = extFactory.nextExtFactory()) {
-            Ext e = ((JL5ExtFactory) extFactory).extElementValueArrayInit();
+            Ext e =
+                    JL5AbstractExtFactory_c.extElementValueArrayInit(extFactory);
             if (e == null) break;
             ext = composeExts(ext, e);
         }
@@ -324,7 +359,7 @@ public class JL5NodeFactory_c extends JL5AbstractNodeFactory_c {
     protected final Term ElementValuePair(Position pos, Id name, Term value,
             Ext ext, ExtFactory extFactory) {
         for (;; extFactory = extFactory.nextExtFactory()) {
-            Ext e = ((JL5ExtFactory) extFactory).extElementValuePair();
+            Ext e = JL5AbstractExtFactory_c.extElementValuePair(extFactory);
             if (e == null) break;
             ext = composeExts(ext, e);
         }
@@ -340,7 +375,7 @@ public class JL5NodeFactory_c extends JL5AbstractNodeFactory_c {
     protected final Field EnumConstant(Position pos, Receiver target, Id name,
             Ext ext, ExtFactory extFactory) {
         for (;; extFactory = extFactory.nextExtFactory()) {
-            Ext e = ((JL5ExtFactory) extFactory).extEnumConstant();
+            Ext e = JL5AbstractExtFactory_c.extEnumConstant(extFactory);
             if (e == null) break;
             ext = composeExts(ext, e);
         }
@@ -365,7 +400,7 @@ public class JL5NodeFactory_c extends JL5AbstractNodeFactory_c {
             Flags flags, List<Term> annotations, Id name, List<Expr> args,
             ClassBody body, Ext ext, ExtFactory extFactory) {
         for (;; extFactory = extFactory.nextExtFactory()) {
-            Ext e = ((JL5ExtFactory) extFactory).extEnumConstantDecl();
+            Ext e = JL5AbstractExtFactory_c.extEnumConstantDecl(extFactory);
             if (e == null) break;
             ext = composeExts(ext, e);
         }
@@ -385,7 +420,7 @@ public class JL5NodeFactory_c extends JL5AbstractNodeFactory_c {
     protected final Loop ExtendedFor(Position pos, LocalDecl decl, Expr expr,
             Stmt body, Ext ext, ExtFactory extFactory) {
         for (;; extFactory = extFactory.nextExtFactory()) {
-            Ext e = ((JL5ExtFactory) extFactory).extExtendedFor();
+            Ext e = JL5AbstractExtFactory_c.extExtendedFor(extFactory);
             if (e == null) break;
             ext = composeExts(ext, e);
         }
@@ -576,7 +611,7 @@ public class JL5NodeFactory_c extends JL5AbstractNodeFactory_c {
     protected final Term NormalAnnotationElem(Position pos, TypeNode name,
             List<Term> elements, Ext ext, ExtFactory extFactory) {
         for (;; extFactory = extFactory.nextExtFactory()) {
-            Ext e = ((JL5ExtFactory) extFactory).extNormalAnnotationElem();
+            Ext e = JL5AbstractExtFactory_c.extNormalAnnotationElem(extFactory);
             if (e == null) break;
             ext = composeExts(ext, e);
         }
@@ -595,7 +630,7 @@ public class JL5NodeFactory_c extends JL5AbstractNodeFactory_c {
     protected final TypeNode ParamTypeNode(Position pos, Id id,
             List<TypeNode> bounds, Ext ext, ExtFactory extFactory) {
         for (;; extFactory = extFactory.nextExtFactory()) {
-            Ext e = ((JL5ExtFactory) extFactory).extParamTypeNode();
+            Ext e = JL5AbstractExtFactory_c.extParamTypeNode(extFactory);
             if (e == null) break;
             ext = composeExts(ext, e);
         }

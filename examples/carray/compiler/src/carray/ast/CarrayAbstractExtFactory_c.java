@@ -18,19 +18,13 @@ public abstract class CarrayAbstractExtFactory_c extends AbstractExtFactory_c
     @Override
     public final Ext extConstArrayTypeNode() {
         Ext e = extConstArrayTypeNodeImpl();
-
-        if (nextExtFactory() != null) {
-            Ext e2;
-            if (nextExtFactory() instanceof CarrayExtFactory) {
-                e2 =
-                        ((CarrayExtFactory) nextExtFactory()).extConstArrayTypeNode();
-            }
-            else {
-                e2 = nextExtFactory().extArrayTypeNode();
-            }
-            e = composeExts(e, e2);
-        }
         return postExtConstArrayTypeNode(e);
+    }
+
+    protected static final Ext extConstArrayTypeNode(ExtFactory extFactory) {
+        if (extFactory instanceof CarrayExtFactory)
+            return ((CarrayExtFactory) extFactory).extConstArrayTypeNode();
+        return extArrayTypeNode(extFactory);
     }
 
     protected Ext extConstArrayTypeNodeImpl() {

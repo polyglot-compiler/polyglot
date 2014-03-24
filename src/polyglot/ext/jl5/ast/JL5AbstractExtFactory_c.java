@@ -118,6 +118,85 @@ public abstract class JL5AbstractExtFactory_c extends AbstractExtFactory_c
         return postExtElementValueArrayInit(e);
     }
 
+    protected static final Ext extAmbTypeInstantiation(ExtFactory extFactory) {
+        if (extFactory instanceof JL5ExtFactory)
+            return ((JL5ExtFactory) extFactory).extAmbTypeInstantiation();
+        return extTypeNode(extFactory);
+    }
+
+    protected static final Ext extAmbWildCard(ExtFactory extFactory) {
+        if (extFactory instanceof JL5ExtFactory)
+            return ((JL5ExtFactory) extFactory).extAmbWildCard();
+        return extTypeNode(extFactory);
+    }
+
+    protected static final Ext extEnumDecl(ExtFactory extFactory) {
+        if (extFactory instanceof JL5ExtFactory)
+            return ((JL5ExtFactory) extFactory).extEnumDecl();
+        return extClassDecl(extFactory);
+    }
+
+    protected static final Ext extExtendedFor(ExtFactory extFactory) {
+        if (extFactory instanceof JL5ExtFactory)
+            return ((JL5ExtFactory) extFactory).extExtendedFor();
+        return extLoop(extFactory);
+    }
+
+    protected static final Ext extEnumConstantDecl(ExtFactory extFactory) {
+        if (extFactory instanceof JL5ExtFactory)
+            return ((JL5ExtFactory) extFactory).extEnumConstantDecl();
+        return extClassMember(extFactory);
+    }
+
+    protected static final Ext extEnumConstant(ExtFactory extFactory) {
+        if (extFactory instanceof JL5ExtFactory)
+            return ((JL5ExtFactory) extFactory).extEnumConstant();
+        return extField(extFactory);
+    }
+
+    protected static final Ext extParamTypeNode(ExtFactory extFactory) {
+        if (extFactory instanceof JL5ExtFactory)
+            return ((JL5ExtFactory) extFactory).extParamTypeNode();
+        return extTypeNode(extFactory);
+    }
+
+    protected static final Ext extAnnotationElemDecl(ExtFactory extFactory) {
+        if (extFactory instanceof JL5ExtFactory)
+            return ((JL5ExtFactory) extFactory).extAnnotationElemDecl();
+        return extMethodDecl(extFactory);
+    }
+
+    protected static final Ext extNormalAnnotationElem(ExtFactory extFactory) {
+        if (extFactory instanceof JL5ExtFactory)
+            return ((JL5ExtFactory) extFactory).extNormalAnnotationElem();
+        return extTerm(extFactory);
+    }
+
+    protected static final Ext extMarkerAnnotationElem(ExtFactory extFactory) {
+        if (extFactory instanceof JL5ExtFactory)
+            return ((JL5ExtFactory) extFactory).extMarkerAnnotationElem();
+        return extTerm(extFactory);
+    }
+
+    protected static final Ext extSingleElementAnnotationElem(
+            ExtFactory extFactory) {
+        if (extFactory instanceof JL5ExtFactory)
+            return ((JL5ExtFactory) extFactory).extSingleElementAnnotationElem();
+        return extTerm(extFactory);
+    }
+
+    protected static final Ext extElementValuePair(ExtFactory extFactory) {
+        if (extFactory instanceof JL5ExtFactory)
+            return ((JL5ExtFactory) extFactory).extElementValuePair();
+        return extTerm(extFactory);
+    }
+
+    protected static final Ext extElementValueArrayInit(ExtFactory extFactory) {
+        if (extFactory instanceof JL5ExtFactory)
+            return ((JL5ExtFactory) extFactory).extElementValueArrayInit();
+        return extTerm(extFactory);
+    }
+
     protected Ext extAmbTypeInstantiationImpl() {
         return this.extTypeNodeImpl();
     }

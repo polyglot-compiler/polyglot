@@ -55,8 +55,7 @@ public interface Node extends NodeOps, Copy<Node>, Serializable {
     /**
      * Set the extension of the node.
      */
-    // TODO
-    // @Deprecated
+    @Deprecated
     Node ext(Ext ext);
 
     /**

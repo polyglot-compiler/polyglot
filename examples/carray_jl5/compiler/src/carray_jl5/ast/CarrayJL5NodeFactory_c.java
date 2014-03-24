@@ -1,10 +1,13 @@
 package carray_jl5.ast;
 
 import polyglot.ast.ArrayTypeNode;
+import polyglot.ast.Ext;
+import polyglot.ast.ExtFactory;
 import polyglot.ast.TypeNode;
 import polyglot.ext.jl5.ast.JL5ExtFactory_c;
 import polyglot.ext.jl5.ast.JL5NodeFactory_c;
 import polyglot.util.Position;
+import carray.ast.CarrayConstArrayTypeNodeExt;
 import carray.ast.CarrayExtFactory_c;
 
 /**
@@ -25,9 +28,18 @@ public class CarrayJL5NodeFactory_c extends JL5NodeFactory_c implements
 
     @Override
     public ArrayTypeNode ConstArrayTypeNode(Position pos, TypeNode base) {
-        ArrayTypeNode n = ArrayTypeNode(pos, base);
-        n = (ArrayTypeNode) n.ext(extFactory().extConstArrayTypeNode());
-        return n;
+        return ConstArrayTypeNode(pos, base, null, extFactory());
     }
 
+    protected final ArrayTypeNode ConstArrayTypeNode(Position pos,
+            TypeNode base, Ext ext, ExtFactory extFactory) {
+        for (;; extFactory = extFactory.nextExtFactory()) {
+            Ext e =
+                    CarrayJL5AbstractExtFactory_c.extConstArrayTypeNode(extFactory);
+            if (e == null) break;
+            ext = composeExts(ext, e);
+        }
+        ext = composeExts(ext, new CarrayConstArrayTypeNodeExt());
+        return super.ArrayTypeNode(pos, base, ext, extFactory.nextExtFactory());
+    }
 }

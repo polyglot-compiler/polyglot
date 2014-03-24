@@ -351,7 +351,7 @@ public class EnumConstantDecl_c extends Term_c implements EnumConstantDecl {
 
     @Override
     public String toString() {
-        return name + "(" + args + ")" + body != null ? "..." : "";
+        return name + "(" + args + ")" + (body != null ? "..." : "");
     }
 
     @Override

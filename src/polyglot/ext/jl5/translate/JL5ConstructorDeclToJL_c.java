@@ -30,13 +30,11 @@ import polyglot.ext.jl5.ast.JL5ConstructorDeclExt;
 import polyglot.ext.jl5.ast.JL5Ext;
 import polyglot.translate.ExtensionRewriter;
 import polyglot.translate.ext.ConstructorDeclToExt_c;
-import polyglot.translate.ext.ToExt;
 import polyglot.types.SemanticException;
 import polyglot.util.SerialVersionUID;
 import polyglot.visit.NodeVisitor;
 
-public class JL5ConstructorDeclToJL_c extends ConstructorDeclToExt_c implements
-        ToExt {
+public class JL5ConstructorDeclToJL_c extends ConstructorDeclToExt_c {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
     @Override
