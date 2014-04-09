@@ -313,6 +313,12 @@ public interface JL5TypeSystem extends
     RawClass rawClass(JL5ParsedClassType base);
 
     /**
+     * @param type
+     * @return true of the type can be a raw class.
+     */
+    boolean canBeRaw(Type type);
+
+    /**
      * Perform boxing conversion on t. If t is a primitive, then
      * the return type will be the ReferenceType appropriate for boxing t 
      * (e.g., java.lang.Integer for int, etc.). If t is not a numeric primitive
@@ -392,5 +398,4 @@ public interface JL5TypeSystem extends
 
     AnnotationElementValue AnnotationElementValueConstant(Position pos,
             Type type, Object constVal);
-
 }

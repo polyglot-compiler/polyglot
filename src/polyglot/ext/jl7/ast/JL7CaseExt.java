@@ -70,6 +70,7 @@ public class JL7CaseExt extends JL7Ext implements JL5CaseOps {
     public Node checkConstants(ConstantChecker cc) throws SemanticException {
         Case c = (Case) this.node();
         Expr expr = c.expr();
+        if (expr == null) return c; // default case
 
         if (cc.lang().constantValueSet(expr, cc.lang())
                 && cc.lang().isConstant(expr, cc.lang())

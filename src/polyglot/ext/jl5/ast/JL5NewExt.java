@@ -246,10 +246,9 @@ public class JL5NewExt extends JL5ProcedureCallExt implements NewOps {
         ClassType t = findEnclosingClassFrom(c.currentClass(), c, ct);
         if (t == null) {
             // couldn't find anything suitable using the JL5ParsedClassType. Try using the raw class.
-            t =
-                    findEnclosingClassFrom(ts.rawClass((JL5ParsedClassType) c.currentClass()),
-                                           c,
-                                           ct);
+            JL5ParsedClassType curClass = (JL5ParsedClassType) c.currentClass();
+            if (ts.canBeRaw(curClass))
+                t = findEnclosingClassFrom(ts.rawClass(curClass), c, ct);
         }
         return t;
     }

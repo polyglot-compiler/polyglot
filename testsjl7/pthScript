@@ -40,6 +40,7 @@ polyglot.ext.jl7.JL7ExtensionInfo "-d out -classpath java-out -assert -noserial 
 	Diamond06.jl7;
 	Diamond07.jl7;
 	FloatLit01.jl7;
+	Inherit01.jl7 (Semantic, "Name clash");
 	IntLit01.jl7;
 	IntLit02.jl7 (Syntax), (Syntax),(Syntax),(Syntax);
 	IntLit02a.jl7 (Syntax);
@@ -59,4 +60,5 @@ polyglot.ext.jl7.JL7ExtensionInfo "-d out -classpath java-out -assert -noserial 
 	Rethrow02.jl7;
 	Rethrow03.jl7 (Semantic);
 	Switch01.jl7;
+	Switch02.jl7;
 }

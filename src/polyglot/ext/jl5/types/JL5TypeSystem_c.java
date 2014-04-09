@@ -2421,10 +2421,21 @@ public class JL5TypeSystem_c extends
 
     @Override
     public RawClass rawClass(JL5ParsedClassType base, Position pos) {
-//        if (base.typeVariables().isEmpty()) {
-//            throw new InternalCompilerError("Can only create a raw class with a parameterized class");
-//        }
+        if (!canBeRaw(base)) {
+            throw new InternalCompilerError("Can only create a raw class with a parameterized class");
+        }
         return new RawClass_c(base, pos);
+    }
+
+    @Override
+    public boolean canBeRaw(Type type) {
+        if (type instanceof JL5ParsedClassType) {
+            JL5ParsedClassType pct = (JL5ParsedClassType) type;
+            if (!pct.typeVariables().isEmpty()) return true;
+            ClassType outer = pct.outer();
+            if (outer != null) return canBeRaw(outer);
+        }
+        return false;
     }
 
     @Override
