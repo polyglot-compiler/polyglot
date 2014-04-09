@@ -1,0 +1,15 @@
+class G {
+	class H {
+		
+	}
+}
+
+class C {
+	G.H foo() {
+		G g = new G();
+		// JLS SE 7 | 15.9.1:
+		// When "<>" is used to elide type arguments after the class name, it is a
+		// compile-time error if the class is not generic. 
+		return g.new H<>();
+	}
+}

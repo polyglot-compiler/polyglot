@@ -22,6 +22,8 @@ public interface NewOps extends ProcedureCallOps, ExprOps {
 
     void printQualifier(CodeWriter w, PrettyPrinter tr);
 
+    void printShortObjectType(CodeWriter w, PrettyPrinter tr);
+
     void printBody(CodeWriter w, PrettyPrinter tr);
 
     ClassType findEnclosingClass(Context c, ClassType ct);

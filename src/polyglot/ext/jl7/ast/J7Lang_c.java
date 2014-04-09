@@ -30,6 +30,8 @@ import polyglot.ast.Case;
 import polyglot.ast.Catch;
 import polyglot.ast.Ext;
 import polyglot.ast.Lang;
+import polyglot.ast.New;
+import polyglot.ast.NewOps;
 import polyglot.ast.Node;
 import polyglot.ast.NodeOps;
 import polyglot.ast.Switch;
@@ -65,6 +67,11 @@ public class J7Lang_c extends J5Lang_c implements J7Lang {
     @Override
     protected NodeOps NodeOps(Node n) {
         return jl7ext(n);
+    }
+
+    @Override
+    protected NewOps NewOps(New n) {
+        return (NewOps) jl7ext(n);
     }
 
     @Override

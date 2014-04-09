@@ -31,6 +31,7 @@ import java.util.List;
 import java.util.Map;
 
 import polyglot.ast.Expr;
+import polyglot.ast.JLang;
 import polyglot.ast.Lang;
 import polyglot.ast.New;
 import polyglot.ast.NewOps;
@@ -43,7 +44,6 @@ import polyglot.ext.jl5.types.JL5SubstClassType;
 import polyglot.ext.jl5.types.JL5TypeSystem;
 import polyglot.ext.jl5.types.RawClass;
 import polyglot.ext.jl5.types.TypeVariable;
-import polyglot.ext.jl5.visit.JL5Translator;
 import polyglot.types.ClassType;
 import polyglot.types.ConstructorInstance;
 import polyglot.types.Context;
@@ -222,19 +222,7 @@ public class JL5NewExt extends JL5ProcedureCallExt implements NewOps {
         // in "T".  Instead, we print just "C".
         New n = this.node();
         if (n.qualifier() != null && n.objectType().type() != null) {
-            w.write(n.objectType().name());
-            ClassType ct = n.objectType().type().toClass();
-            if (ct instanceof JL5SubstClassType) {
-                boolean printParams = true;
-                if (tr instanceof JL5Translator) {
-                    JL5Translator jtr = (JL5Translator) tr;
-                    printParams = !jtr.removeJava5isms();
-                }
-                if (printParams) {
-                    JL5SubstClassType jsct = (JL5SubstClassType) ct;
-                    jsct.printParams(w);
-                }
-            }
+            ((JLang) tr.lang()).printShortObjectType(this.node(), w, tr);
         }
         else {
             print(n.objectType(), w, tr);
@@ -335,6 +323,17 @@ public class JL5NewExt extends JL5ProcedureCallExt implements NewOps {
     @Override
     public void printQualifier(CodeWriter w, PrettyPrinter tr) {
         superLang().printQualifier(this.node(), w, tr);
+    }
+
+    @Override
+    public void printShortObjectType(CodeWriter w, PrettyPrinter tr) {
+        New n = this.node();
+        superLang().printShortObjectType(n, w, tr);
+        ClassType ct = n.objectType().type().toClass();
+        if (ct instanceof JL5SubstClassType) {
+            JL5SubstClassType jsct = (JL5SubstClassType) ct;
+            jsct.printParams(w);
+        }
     }
 
     @Override

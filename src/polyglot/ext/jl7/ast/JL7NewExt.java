@@ -26,36 +26,41 @@
 package polyglot.ext.jl7.ast;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
-import polyglot.ast.Ambiguous;
 import polyglot.ast.Assign;
 import polyglot.ast.Expr;
 import polyglot.ast.FieldDecl;
+import polyglot.ast.Lang;
 import polyglot.ast.LocalDecl;
 import polyglot.ast.New;
+import polyglot.ast.NewOps;
 import polyglot.ast.Node;
 import polyglot.ast.Return;
-import polyglot.ast.Special;
 import polyglot.ast.TypeNode;
 import polyglot.ext.jl5.ast.JL5Ext;
 import polyglot.ext.jl5.ast.JL5NewExt;
-import polyglot.ext.jl5.types.JL5ParsedClassType;
 import polyglot.ext.jl5.types.JL5SubstClassType;
-import polyglot.ext.jl5.types.JL5TypeSystem;
+import polyglot.ext.jl5.types.RawClass;
+import polyglot.ext.jl7.types.DiamondType;
 import polyglot.ext.jl7.types.JL7TypeSystem;
 import polyglot.types.ClassType;
 import polyglot.types.CodeInstance;
 import polyglot.types.ConstructorInstance;
 import polyglot.types.Context;
 import polyglot.types.FunctionInstance;
+import polyglot.types.ParsedClassType;
 import polyglot.types.ReferenceType;
 import polyglot.types.SemanticException;
 import polyglot.types.Type;
+import polyglot.util.CodeWriter;
 import polyglot.util.SerialVersionUID;
+import polyglot.visit.AmbiguityRemover;
+import polyglot.visit.PrettyPrinter;
 import polyglot.visit.TypeChecker;
 
-public class JL7NewExt extends JL7Ext {
+public class JL7NewExt extends JL7ProcedureCallExt implements NewOps {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
     @Override
@@ -64,12 +69,12 @@ public class JL7NewExt extends JL7Ext {
     }
 
     @Override
-    public Node typeCheckOverride(Node parent, TypeChecker tc) {
-        JL7NewExt ext = (JL7NewExt) JL7Ext.ext(this.node());
+    public Node typeCheckOverride(Node parent, TypeChecker tc)
+            throws SemanticException {
         if (parent instanceof Return) {
             CodeInstance ci = tc.context().currentCode();
             if (ci instanceof FunctionInstance) {
-                ext.setExpectedObjectType(((FunctionInstance) ci).returnType());
+                setExpectedObjectType(((FunctionInstance) ci).returnType());
             }
         }
         if (parent instanceof Assign) {
@@ -80,7 +85,7 @@ public class JL7NewExt extends JL7Ext {
                     // not ready yet
                     return this.node();
                 }
-                ext.setExpectedObjectType(type);
+                setExpectedObjectType(type);
             }
         }
         if (parent instanceof LocalDecl) {
@@ -90,7 +95,7 @@ public class JL7NewExt extends JL7Ext {
                 // not ready yet
                 return this.node();
             }
-            ext.setExpectedObjectType(type);
+            setExpectedObjectType(type);
         }
         if (parent instanceof FieldDecl) {
             FieldDecl fd = (FieldDecl) parent;
@@ -99,10 +104,10 @@ public class JL7NewExt extends JL7Ext {
                 // not ready yet
                 return this.node();
             }
-            ext.setExpectedObjectType(type);
+            setExpectedObjectType(type);
         }
 
-        return null;
+        return superLang().typeCheckOverride(node(), parent, tc);
     }
 
     private transient Type expectedObjectType = null;
@@ -123,10 +128,18 @@ public class JL7NewExt extends JL7Ext {
     public Node typeCheck(TypeChecker tc) throws SemanticException {
         New n = this.node();
         TypeNode objectType = n.objectType();
-        if (!(objectType instanceof Ambiguous))
+        if (!(objectType.type() instanceof DiamondType))
             return superLang().typeCheck(this.node(), tc);
 
+        // Type check instance creation expressions using diamond.
         JL5NewExt ext5 = (JL5NewExt) JL5Ext.ext(n);
+        List<TypeNode> typeArgs = ext5.typeArgs();
+        if (!typeArgs.isEmpty())
+            throw new SemanticException("Explicit type arguments cannot be used"
+                    + " with '<>' in an allocation expression");
+        if (n.body() != null)
+            throw new SemanticException("'<>' cannot be used with anonymous classes");
+
         JL7TypeSystem ts = (JL7TypeSystem) tc.typeSystem();
 
         if (!n.objectType().type().isClass()) {
@@ -140,70 +153,107 @@ public class JL7NewExt extends JL7Ext {
             argTypes.add(e.type());
         }
 
-        List<ReferenceType> actualTypeArgs =
-                new ArrayList<ReferenceType>(ext5.typeArgs().size());
-        for (TypeNode tn : ext5.typeArgs()) {
-            actualTypeArgs.add((ReferenceType) tn.type());
-        }
-
         superLang().typeCheckFlags(this.node(), tc);
         superLang().typeCheckNested(this.node(), tc);
 
-        if (n.body() != null) {
-            ts.checkClassConformance(n.anonType());
-        }
+        // Perform overload resolution and type argument inference as specified
+        // in JLS SE 7 | 15.9.3.
+        DiamondType ct = (DiamondType) objectType.type().toClass();
+        Context c = tc.context();
 
-        ClassType ct = n.objectType().type().toClass();
-
-        if (ct.isInnerClass()) {
-            ClassType outer = ct.outer();
-            JL5TypeSystem ts5 = (JL5TypeSystem) tc.typeSystem();
-            if (outer instanceof JL5SubstClassType) {
-                JL5SubstClassType sct = (JL5SubstClassType) outer;
-                ct = (ClassType) sct.subst().substType(ct);
-            }
-            else if (n.qualifier() == null
-                    || (n.qualifier() instanceof Special && ((Special) n.qualifier()).kind() == Special.THIS)) {
-                ct = ts5.instantiateInnerClassFromContext(tc.context(), ct);
-            }
-            else if (n.qualifier().type() instanceof JL5SubstClassType) {
-                JL5SubstClassType sct =
-                        (JL5SubstClassType) n.qualifier().type();
-                ct = (ClassType) sct.subst().substType(ct);
-            }
-        }
-
-        ConstructorInstance ci;
-        if (!ct.flags().isInterface()) {
-            Context c = tc.context();
-            if (n.anonType() != null) {
-                c = c.pushClass(n.anonType(), n.anonType());
-            }
-            if (ct instanceof JL5ParsedClassType
-                    && !((JL5ParsedClassType) ct).typeVariables().isEmpty())
-                ci =
-                        ts.findConstructor(ct,
-                                           argTypes,
-                                           actualTypeArgs,
-                                           c.currentClass(),
-                                           this.expectedObjectType());
-            else ci =
-                    ts.findConstructor(ct,
-                                       argTypes,
-                                       actualTypeArgs,
-                                       c.currentClass());
-        }
-        else {
-            ci = ts.defaultConstructor(n.position(), ct);
-        }
+        ConstructorInstance ci =
+                ts.findConstructor(ct,
+                                   argTypes,
+                                   Collections.<ReferenceType> emptyList(),
+                                   c.currentClass(),
+                                   expectedObjectType());
+        ct.inferred((JL5SubstClassType) ci.container());
 
         n = n.constructorInstance(ci);
-
-        if (n.anonType() != null) {
-            // The type of the new expression is the anonymous type, not the base type.
-            ct = n.anonType();
-        }
-
         return n.type(ct);
+    }
+
+    @Override
+    public TypeNode findQualifiedTypeNode(AmbiguityRemover ar, ClassType outer,
+            TypeNode objectType) throws SemanticException {
+        if (objectType instanceof AmbDiamondTypeNode) {
+            JL7TypeSystem ts = (JL7TypeSystem) ar.typeSystem();
+            Context c = ar.context();
+
+            // Check for visibility of inner class, but ignore result
+            ts.findMemberClass(outer, objectType.name(), c.currentClass());
+
+            if (outer instanceof ParsedClassType) {
+                ParsedClassType opct = (ParsedClassType) outer;
+                c = c.pushClass(opct, opct);
+            }
+            else if (outer instanceof JL5SubstClassType) {
+                JL5SubstClassType osct = (JL5SubstClassType) outer;
+                c = c.pushClass(osct.base(), osct.base());
+            }
+            else if (outer instanceof RawClass) {
+                RawClass orct = (RawClass) outer;
+                c = c.pushClass(orct.base(), orct.base());
+            }
+            return (TypeNode) objectType.visit(ar.context(c));
+        }
+        return superLang().findQualifiedTypeNode(this.node(),
+                                                 ar,
+                                                 outer,
+                                                 objectType);
+    }
+
+    @Override
+    public Expr findQualifier(AmbiguityRemover ar, ClassType ct)
+            throws SemanticException {
+        return superLang().findQualifier(this.node(), ar, ct);
+    }
+
+    @Override
+    public ClassType findEnclosingClass(Context c, ClassType ct) {
+        return superLang().findEnclosingClass(this.node(), c, ct);
+    }
+
+    @Override
+    public void typeCheckFlags(TypeChecker tc) throws SemanticException {
+        superLang().typeCheckFlags(this.node(), tc);
+    }
+
+    @Override
+    public void typeCheckNested(TypeChecker tc) throws SemanticException {
+        superLang().typeCheckNested(this.node(), tc);
+    }
+
+    @Override
+    public void printQualifier(CodeWriter w, PrettyPrinter tr) {
+        superLang().printQualifier(this.node(), w, tr);
+    }
+
+    @Override
+    public void printShortObjectType(CodeWriter w, PrettyPrinter tr) {
+        New n = this.node();
+        superLang().printShortObjectType(n, w, tr);
+        ClassType ct = n.objectType().type().toClass();
+        if (ct instanceof DiamondType) w.write("<>");
+    }
+
+    @Override
+    public void printBody(CodeWriter w, PrettyPrinter tr) {
+        superLang().printBody(this.node(), w, tr);
+    }
+
+    @Override
+    public boolean constantValueSet(Lang lang) {
+        return superLang().constantValueSet(node(), lang);
+    }
+
+    @Override
+    public boolean isConstant(Lang lang) {
+        return superLang().isConstant(node(), lang);
+    }
+
+    @Override
+    public Object constantValue(Lang lang) {
+        return superLang().constantValue(node(), lang);
     }
 }

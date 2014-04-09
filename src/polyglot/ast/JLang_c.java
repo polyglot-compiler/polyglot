@@ -368,6 +368,11 @@ public class JLang_c implements JLang {
     }
 
     @Override
+    public final void printShortObjectType(New n, CodeWriter w, PrettyPrinter tr) {
+        NewOps(n).printShortObjectType(w, tr);
+    }
+
+    @Override
     public final void printBody(New n, CodeWriter w, PrettyPrinter tr) {
         NewOps(n).printBody(w, tr);
     }

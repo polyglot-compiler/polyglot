@@ -1,0 +1,15 @@
+class G<T> {
+	<X> G(X x) {
+	}
+}
+
+class C {
+	G<String> foo() {
+		// JLS SE 7 | 15.9:
+		// It is a compile-time error if a class instance creation expression
+		// provides a constructor type argument list but uses "<>" in place of a
+		// class type argument list.
+		G<String> g = new <Object> G<>(null);
+		return g;
+	}
+}

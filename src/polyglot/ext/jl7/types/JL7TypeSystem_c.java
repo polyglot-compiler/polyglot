@@ -14,6 +14,8 @@ import polyglot.ext.jl5.types.JL5ProcedureInstance;
 import polyglot.ext.jl5.types.JL5Subst;
 import polyglot.ext.jl5.types.JL5TypeSystem_c;
 import polyglot.ext.jl5.types.TypeVariable;
+import polyglot.ext.jl5.types.inference.InferenceSolver;
+import polyglot.ext.jl7.types.inference.JL7InferenceSolver_c;
 import polyglot.main.Report;
 import polyglot.types.ClassType;
 import polyglot.types.ConstructorInstance;
@@ -216,7 +218,7 @@ public class JL7TypeSystem_c extends JL5TypeSystem_c implements JL7TypeSystem {
     }
 
     @Override
-    public JL5ProcedureInstance callValid(JL5ProcedureInstance mi,
+    public JL5ProcedureInstance callValid(JL5ProcedureInstance pi,
             List<? extends Type> argTypes,
             List<? extends ReferenceType> actualTypeArgs,
             Type expectedReturnType) {
@@ -225,9 +227,9 @@ public class JL7TypeSystem_c extends JL5TypeSystem_c implements JL7TypeSystem {
         }
 
         // First check that the number of arguments is reasonable
-        if (argTypes.size() != mi.formalTypes().size()) {
+        if (argTypes.size() != pi.formalTypes().size()) {
             // the actual args don't match the number of the formal args.
-            if (!(mi.isVariableArity() && argTypes.size() >= mi.formalTypes()
+            if (!(pi.isVariableArity() && argTypes.size() >= pi.formalTypes()
                                                                .size() - 1)) {
                 // the last (variable) argument can consume 0 or more of the actual arguments.
                 return null;
@@ -236,22 +238,28 @@ public class JL7TypeSystem_c extends JL5TypeSystem_c implements JL7TypeSystem {
         }
 
         JL5Subst subst = null;
-        if (!mi.typeParams().isEmpty() && actualTypeArgs.isEmpty()) {
+        ReferenceType ct = pi.container();
+        if (ct instanceof JL5ParsedClassType
+                && !((JL5ParsedClassType) ct).typeVariables().isEmpty()
+                || !pi.typeParams().isEmpty() && actualTypeArgs.isEmpty()) {
             // need to perform type inference
-            subst = inferTypeArgs(mi, argTypes, expectedReturnType);
+            subst = inferTypeArgs(pi, argTypes, expectedReturnType);
         }
-        else if (!mi.typeParams().isEmpty() && !actualTypeArgs.isEmpty()) {
+        else if (!pi.typeParams().isEmpty() && !actualTypeArgs.isEmpty()) {
             Map<TypeVariable, ReferenceType> m =
                     new HashMap<TypeVariable, ReferenceType>();
             Iterator<? extends ReferenceType> iter = actualTypeArgs.iterator();
-            for (TypeVariable tv : mi.typeParams()) {
+            for (TypeVariable tv : pi.typeParams()) {
                 m.put(tv, iter.next());
             }
             subst = (JL5Subst) this.subst(m);
         }
 
-        JL5ProcedureInstance mj = mi;
-        if (!mi.typeParams().isEmpty() && subst != null) {
+        JL5ProcedureInstance mj = pi;
+        if ((ct instanceof JL5ParsedClassType
+                && !((JL5ParsedClassType) ct).typeVariables().isEmpty() || !pi.typeParams()
+                                                                              .isEmpty())
+                && subst != null) {
             // check that the substitution satisfies the bounds
 
             for (TypeVariable tv : subst.substitutions().keySet()) {
@@ -261,7 +269,7 @@ public class JL7TypeSystem_c extends JL5TypeSystem_c implements JL7TypeSystem {
                 }
             }
 
-            mj = subst.substProcedure(mi);
+            mj = subst.substProcedure(pi);
         }
 
         if (super.callValid(mj, argTypes)) {
@@ -269,5 +277,11 @@ public class JL7TypeSystem_c extends JL5TypeSystem_c implements JL7TypeSystem {
         }
 
         return null;
+    }
+
+    @Override
+    protected InferenceSolver inferenceSolver(JL5ProcedureInstance pi,
+            List<? extends Type> argTypes) {
+        return new JL7InferenceSolver_c(pi, argTypes, this);
     }
 }

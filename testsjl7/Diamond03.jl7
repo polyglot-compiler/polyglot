@@ -1,0 +1,18 @@
+interface G<T> {
+	void bar();
+}
+
+class C {
+	G<String> foo() {
+		// JLS SE 7 | 15.9:
+		// It is a compile-time error if a class instance creation expression
+		// declares an anonymous class using the "<>" form for the class's type
+		// arguments.
+		G<String> g = new G<>(){
+			@Override
+			public void bar() {
+			}
+		};
+		return g;
+	}
+}

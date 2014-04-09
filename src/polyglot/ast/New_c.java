@@ -728,6 +728,11 @@ public class New_c extends Expr_c implements New, NewOps {
     }
 
     @Override
+    public void printShortObjectType(CodeWriter w, PrettyPrinter tr) {
+        w.write(objectType.name());
+    }
+
+    @Override
     public void printArgs(CodeWriter w, PrettyPrinter tr) {
         w.write("(");
         w.allowBreak(2, 2, "", 0);
@@ -768,7 +773,7 @@ public class New_c extends Expr_c implements New, NewOps {
         // But, if we print "T.C", the post compiler will try to lookup "T"
         // in "T".  Instead, we print just "C".
         if (qualifier != null) {
-            w.write(objectType.name());
+            ((JLang) tr.lang()).printShortObjectType(this, w, tr);
         }
         else {
             print(objectType, w, tr);

@@ -1,0 +1,11 @@
+class G<G> {
+	class H<H> {
+	}
+}
+
+class C {
+	G<String>.H<Integer> foo() {
+		G<String> g = new G<>();
+		return g.new H<>();
+	}
+}

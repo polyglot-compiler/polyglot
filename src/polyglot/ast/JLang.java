@@ -226,6 +226,8 @@ public interface JLang extends Lang {
 
     void printQualifier(New n, CodeWriter w, PrettyPrinter tr);
 
+    void printShortObjectType(New n, CodeWriter w, PrettyPrinter tr);
+
     void printBody(New n, CodeWriter w, PrettyPrinter tr);
 
     ClassType findEnclosingClass(New n, Context c, ClassType ct);

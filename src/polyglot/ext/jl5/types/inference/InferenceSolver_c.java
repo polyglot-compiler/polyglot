@@ -50,7 +50,7 @@ public class InferenceSolver_c implements InferenceSolver {
 
     private JL5TypeSystem ts;
 
-    private JL5ProcedureInstance pi = null;
+    private JL5ProcedureInstance pi;
 
     private List<? extends Type> actualArgumentTypes;
 
@@ -61,10 +61,14 @@ public class InferenceSolver_c implements InferenceSolver {
     public InferenceSolver_c(JL5ProcedureInstance pi,
             List<? extends Type> actuals, JL5TypeSystem ts) {
         this.pi = pi;
-        this.typeVariablesToSolve = pi.typeParams();
+        this.typeVariablesToSolve = typeVariablesToSolve(pi);
         this.actualArgumentTypes = actuals;
         this.formalTypes = pi.formalTypes();
         this.ts = ts;
+    }
+
+    protected List<TypeVariable> typeVariablesToSolve(JL5ProcedureInstance pi) {
+        return pi.typeParams();
     }
 
     @Override
@@ -315,7 +319,7 @@ public class InferenceSolver_c implements InferenceSolver {
         return solution;
     }
 
-    private static Type returnType(JL5ProcedureInstance pi) {
+    protected Type returnType(JL5ProcedureInstance pi) {
         if (pi instanceof MethodInstance) {
             return ((MethodInstance) pi).returnType();
         }

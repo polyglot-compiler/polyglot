@@ -35,7 +35,6 @@ import polyglot.ext.jl7.types.JL7TypeSystem;
 import polyglot.types.SemanticException;
 import polyglot.types.Type;
 import polyglot.util.CodeWriter;
-import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
 import polyglot.visit.AmbiguityRemover;
@@ -50,6 +49,11 @@ public class AmbDiamondTypeNode extends TypeNode_c implements Ambiguous {
     public AmbDiamondTypeNode(Position pos, TypeNode base) {
         super(pos);
         this.base = base;
+    }
+
+    @Override
+    public String name() {
+        return base.name();
     }
 
     protected AmbDiamondTypeNode reconstruct(TypeNode base) {
@@ -77,8 +81,9 @@ public class AmbDiamondTypeNode extends TypeNode_c implements Ambiguous {
             Type t = ts.diamondType(position(), ct);
             return ar.nodeFactory().CanonicalTypeNode(this.position, t);
         }
-        throw new InternalCompilerError(base
-                + " is expected to be a raw class.");
+        throw new SemanticException("The type "
+                + base
+                + " is not generic; it cannot be parameterized with arguments <>");
     }
 
     @Override

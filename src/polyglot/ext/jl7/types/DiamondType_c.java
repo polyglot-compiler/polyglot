@@ -1,11 +1,13 @@
 package polyglot.ext.jl7.types;
 
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
 import polyglot.ext.jl5.types.AnnotationTypeElemInstance;
 import polyglot.ext.jl5.types.Annotations;
 import polyglot.ext.jl5.types.EnumInstance;
+import polyglot.ext.jl5.types.JL5ClassType;
 import polyglot.ext.jl5.types.JL5ClassType_c;
 import polyglot.ext.jl5.types.JL5ParsedClassType;
 import polyglot.ext.jl5.types.JL5SubstClassType;
@@ -33,6 +35,16 @@ public class DiamondType_c extends JL5ClassType_c implements DiamondType {
         super((JL7TypeSystem) base.typeSystem(), pos);
         this.base = base;
         this.setDeclaration(base);
+    }
+
+    protected JL5ClassType mostSpecific() {
+        if (inferred != null) return inferred;
+        return base;
+    }
+
+    @Override
+    public JL7TypeSystem typeSystem() {
+        return (JL7TypeSystem) super.typeSystem();
     }
 
     @Override
@@ -72,17 +84,17 @@ public class DiamondType_c extends JL5ClassType_c implements DiamondType {
 
     @Override
     public Annotations annotations() {
-        return ((JL7TypeSystem) this.typeSystem()).NoAnnotations();
+        return this.typeSystem().NoAnnotations();
     }
 
     @Override
     public Set<? extends Type> superclasses() {
-        return this.inferred().superclasses();
+        return mostSpecific().superclasses();
     }
 
     @Override
     public boolean inStaticContext() {
-        return this.inferred().inStaticContext();
+        return mostSpecific().inStaticContext();
     }
 
     @Override
@@ -107,79 +119,71 @@ public class DiamondType_c extends JL5ClassType_c implements DiamondType {
 
     @Override
     public Kind kind() {
-        return this.inferred().kind();
+        return mostSpecific().kind();
     }
 
     @Override
     public ClassType outer() {
-        return this.inferred().outer();
+        return mostSpecific().outer();
     }
 
     @Override
     public String name() {
-        return this.inferred().name();
+        return mostSpecific().name();
     }
 
     @Override
     public Package package_() {
-        return this.inferred().package_();
+        return mostSpecific().package_();
     }
 
     @Override
     public Flags flags() {
-        return this.inferred().flags();
+        return mostSpecific().flags();
     }
-
-    private transient List<? extends ConstructorInstance> constructors = null;
 
     @Override
     public List<? extends ConstructorInstance> constructors() {
-        if (constructors == null) {
-            this.constructors = this.inferred().constructors();
-        }
-        return this.constructors;
+        return mostSpecific().constructors();
     }
-
-    private transient List<? extends ClassType> memberClasses = null;
 
     @Override
     public List<? extends ClassType> memberClasses() {
-        if (memberClasses == null) {
-            this.memberClasses = this.inferred().memberClasses();
-        }
-        return this.memberClasses;
+        return mostSpecific().memberClasses();
     }
-
-    private transient List<? extends MethodInstance> methods = null;
 
     @Override
     public List<? extends MethodInstance> methods() {
-        if (methods == null) {
-            this.methods = this.inferred().methods();
-        }
-        return this.methods;
+        return mostSpecific().methods();
     }
-
-    private transient List<? extends FieldInstance> fields = null;
 
     @Override
     public List<? extends FieldInstance> fields() {
-        if (fields == null) {
-            this.fields = this.inferred().fields();
-            for (FieldInstance fi : this.fields) {
-                fi.setContainer(this);
-            }
-        }
-        return this.fields;
+        return this.inferred().fields();
     }
 
     @Override
     public List<? extends ReferenceType> interfaces() {
-        return this.inferred().interfaces();
+        return mostSpecific().interfaces();
     }
 
     @Override
     public Type superType() {
-        return this.inferred().superType();
+        return mostSpecific().superType();
+    }
+
+    @Override
+    public LinkedList<Type> isImplicitCastValidChainImpl(Type toType) {
+        return typeSystem().isImplicitCastValidChain(inferred, toType);
+    }
+
+    @Override
+    public String translate(Resolver c) {
+        return super.translate(c) + "<>";
+    }
+
+    @Override
+    public String toString() {
+        return super.toString() + "<>";
     }
 }

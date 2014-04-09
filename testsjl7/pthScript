@@ -32,19 +32,25 @@
 #}
  
 polyglot.ext.jl7.JL7ExtensionInfo "-d out -classpath java-out -assert -noserial -postopts \"-source 1.7 -Xlint\\:-options\" -morepermissiveinference" {
-        IntLit01.jl7;
-        IntLit02.jl7 (Syntax), (Syntax),(Syntax),(Syntax);
-        IntLit02a.jl7 (Syntax);
-        IntLit02b.jl7 ("Could not find") , ("Could not find"); // 2 errors
-        IntLit02c.jl7 (Syntax);
-        IntLit03.jl7;
-        IntLit04.jl7 ("out of range"),("unexpected .* literal"), 
-                     ("out of range"),("unexpected .* literal"), 
-                     ("out of range"),("out of range"),("out of range"),
-                     ("out of range"),("unexpected .* literal"), 
-                     ("out of range"),("unexpected .* literal"); // 11 errors
-        FloatLit01.jl7;
-	Switch01.jl7;
+	Diamond01.jl7;
+	Diamond02.jl7 (Semantic, "type arguments cannot be used");
+	Diamond03.jl7 (Semantic, "anonymous class");
+	Diamond04.jl7 (Semantic, "not generic");
+	Diamond05.jl7 (Semantic, "not generic");
+	Diamond06.jl7;
+	Diamond07.jl7;
+	FloatLit01.jl7;
+	IntLit01.jl7;
+	IntLit02.jl7 (Syntax), (Syntax),(Syntax),(Syntax);
+	IntLit02a.jl7 (Syntax);
+	IntLit02b.jl7 ("Could not find") , ("Could not find"); // 2 errors
+	IntLit02c.jl7 (Syntax);
+	IntLit03.jl7;
+	IntLit04.jl7 ("out of range"),("unexpected .* literal"), 
+	             ("out of range"),("unexpected .* literal"), 
+	             ("out of range"),("out of range"),("out of range"),
+	             ("out of range"),("unexpected .* literal"), 
+	             ("out of range"),("unexpected .* literal"); // 11 errors
 	MultiCatch01.jl7;
 	MultiCatch02.jl7 (Semantic);
 	MultiCatch03.jl7 (Semantic);
@@ -52,4 +58,5 @@ polyglot.ext.jl7.JL7ExtensionInfo "-d out -classpath java-out -assert -noserial 
 	Rethrow01.jl7;
 	Rethrow02.jl7;
 	Rethrow03.jl7 (Semantic);
+	Switch01.jl7;
 }

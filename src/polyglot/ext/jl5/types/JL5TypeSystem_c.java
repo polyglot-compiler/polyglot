@@ -972,18 +972,22 @@ public class JL5TypeSystem_c extends
 
     /**
      * Infer type arguments for mi, when it is called with arguments of type argTypes
-     * @param mi
+     * @param pi
      * @param argTypes
      * @return
      */
-    protected JL5Subst inferTypeArgs(JL5ProcedureInstance mi,
+    protected JL5Subst inferTypeArgs(JL5ProcedureInstance pi,
             List<? extends Type> argTypes, Type expectedReturnType) {
-        InferenceSolver s = new InferenceSolver_c(mi, argTypes, this);
+        InferenceSolver s = inferenceSolver(pi, argTypes);
         Map<TypeVariable, ReferenceType> m = s.solve(expectedReturnType);
         if (m == null) return null;
         JL5Subst subst = (JL5Subst) this.subst(m);
         return subst;
+    }
 
+    protected InferenceSolver inferenceSolver(JL5ProcedureInstance pi,
+            List<? extends Type> argTypes) {
+        return new InferenceSolver_c(pi, argTypes, this);
     }
 
     @Override
