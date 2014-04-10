@@ -95,6 +95,7 @@ public class JL5EnumDeclExt extends JL5ClassDeclExt {
 
         if (n.type().isMember()) {
             // it's a nested class
+            // JLS 3rd ed. | 8.9: Nested enum types are implicitly static.
             n = n.flags(n.flags().Static());
             n.type().flags(n.type().flags().Static());
         }

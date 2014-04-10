@@ -99,13 +99,15 @@ public interface JL5TypeSystem extends
     boolean hasSameSignature(JL5MethodInstance mi, JL5MethodInstance mj);
 
     /**
-     * Is method mi a sub-signature of method mj?  The signature of method mi
-     * is a subsignature of the signature of a method mj if either
-     * mj has the same signature as mi, or
-     * the signature of mi is the same as the erasure of the signature of mj.
-     * See JLS 3rd ed. 8.4.2 
+     * Return true of the signature of m1 is a subsignature of the signature of
+     * m2, according to JLS 3rd ed. | 8.4.2.  That is, m2 has the same signature
+     * as m1, or the signature of m1 is the same as the erasure of the signature
+     * of m2.
+     * @param m1
+     * @param m2
+     * @return
      */
-    boolean isSubSignature(JL5MethodInstance mi, JL5MethodInstance mj);
+    boolean isSubSignature(JL5MethodInstance m1, JL5MethodInstance m2);
 
     /**
      * Are methods mi and mj override equivalent?
@@ -351,6 +353,16 @@ public interface JL5TypeSystem extends
             ClassType currentClass) throws SemanticException;
 
     void checkDuplicateAnnotations(List<Term> annotations)
+            throws SemanticException;
+
+    /**
+     * Check whether mi's name clashes with some other method accessible in
+     * type, according to JLS 3rd ed. | 8.4.8.3.
+     * @param mi
+     * @param ct
+     * @throws SemanticException
+     */
+    void checkMethodNameClash(JL5MethodInstance mi, ClassType ct)
             throws SemanticException;
 
     /**

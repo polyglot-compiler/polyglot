@@ -1,0 +1,8 @@
+class C<T> { T id (T x) { return null; } }
+interface I<T> { T id(T x); }
+class D extends C<String> implements I<Integer> {
+	@Override
+	public String id(String x) { return null; }
+	@Override
+	public Integer id(Integer x) { return null; }
+}

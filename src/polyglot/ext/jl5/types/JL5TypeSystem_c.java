@@ -1164,12 +1164,12 @@ public class JL5TypeSystem_c extends
     }
 
     @Override
-    public boolean isSubSignature(JL5MethodInstance mi, JL5MethodInstance mj) {
-        if (hasSameSignature(mi, mj)) {
+    public boolean isSubSignature(JL5MethodInstance m1, JL5MethodInstance m2) {
+        if (hasSameSignature(m1, m2)) {
             return true;
         }
-        // check if the signature of mi is the same as the erasure of mj.
-        return hasSameSignature(mi, mj, true);
+        // check if the signature of m1 is the same as the erasure of m2.
+        return hasSameSignature(m1, m2, true);
     }
 
     @Override
@@ -2668,6 +2668,55 @@ public class JL5TypeSystem_c extends
         }
 
         return new HashSet<AnnotationTypeElemInstance>();
+    }
+
+    @Override
+    public void checkMethodNameClash(JL5MethodInstance mi, ClassType ct)
+            throws SemanticException {
+        checkMethodNameClash(mi, ct, ct);
+    }
+
+    public void checkMethodNameClash(JL5MethodInstance mi, ClassType type,
+            ReferenceType declaringClass) throws SemanticException {
+        for (MethodInstance mj_ : declaringClass.methods()) {
+            JL5MethodInstance mj = (JL5MethodInstance) mj_;
+            if (!mi.name().equals(mj.name())) continue;
+            if (!isAccessible(mj, type)) continue;
+            if (isSubSignature(mi, mj)) continue;
+
+            for (MethodInstance imi : implemented(mi))
+                for (MethodInstance imj : implemented(mj))
+                    if (hasSameErasure((JL5MethodInstance) imi,
+                                       (JL5MethodInstance) imj)) {
+                        throw new SemanticException("Name clash: The method "
+                                + imi.signature() + " of type "
+                                + imi.container() + " has the same erasure as "
+                                + imj.signature() + " of type "
+                                + imj.container() + " but does not override it");
+                    }
+        }
+
+        Type superType = declaringClass.superType();
+        if (superType != null)
+            checkMethodNameClash(mi, type, superType.toReference());
+        for (ReferenceType superInterface : declaringClass.interfaces())
+            checkMethodNameClash(mi, type, superInterface);
+    }
+
+    protected boolean hasSameErasure(JL5MethodInstance mi, JL5MethodInstance mj) {
+        if (!mi.name().equals(mj.name())) return false;
+        if (mi.formalTypes().size() != mj.formalTypes().size()) return false;
+        // now check that the types match
+        mi = (JL5MethodInstance) mi.declaration();
+        mj = (JL5MethodInstance) mj.declaration();
+        Iterator<? extends Type> typesi = mi.formalTypes().iterator();
+        Iterator<? extends Type> typesj = mj.formalTypes().iterator();
+        while (typesi.hasNext()) {
+            Type ti = erasureType(typesi.next());
+            Type tj = erasureType(typesj.next());
+            if (!ti.equals(tj)) return false;
+        }
+        return true;
     }
 
     @Override

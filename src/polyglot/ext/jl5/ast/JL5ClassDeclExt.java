@@ -50,8 +50,10 @@ import polyglot.types.ConstructorInstance;
 import polyglot.types.Context;
 import polyglot.types.Declaration;
 import polyglot.types.Flags;
+import polyglot.types.ParsedClassType;
 import polyglot.types.ReferenceType;
 import polyglot.types.SemanticException;
+import polyglot.types.Type;
 import polyglot.types.TypeSystem;
 import polyglot.util.CodeWriter;
 import polyglot.util.CollectionUtil;
@@ -209,17 +211,18 @@ public class JL5ClassDeclExt extends JL5AnnotatedElementExt implements
     @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
         ClassDecl n = this.node();
+        ParsedClassType type = n.type();
         JL5ClassDeclExt ext = (JL5ClassDeclExt) JL5Ext.ext(n);
 
         JL5TypeSystem ts = (JL5TypeSystem) tc.typeSystem();
 
-        if (n.type().superType() != null
-                && JL5Flags.isEnum(n.type().superType().toClass().flags())) {
+        Type superType = type.superType();
+        if (superType != null && JL5Flags.isEnum(superType.toClass().flags())) {
             throw new SemanticException("Cannot extend enum type", n.position());
         }
 
-        if (ts.equals(ts.Object(), n.type()) && !ext.paramTypes.isEmpty()) {
-            throw new SemanticException("Type: " + n.type()
+        if (ts.equals(ts.Object(), type) && !ext.paramTypes.isEmpty()) {
+            throw new SemanticException("Type: " + type
                     + " cannot declare type variables.", n.position());
         }
 
@@ -232,8 +235,7 @@ public class JL5ClassDeclExt extends JL5AnnotatedElementExt implements
 
         // check not extending java.lang.Throwable (or any of its subclasses)
         // with a generic class
-        if (n.type().superType() != null
-                && ts.isSubtype(n.type().superType(), ts.Throwable())
+        if (superType != null && ts.isSubtype(superType, ts.Throwable())
                 && !ext.paramTypes.isEmpty()) {
             // JLS 3rd ed. 8.1.2
             throw new SemanticException("Cannot subclass java.lang.Throwable or any of its subtypes with a generic class",

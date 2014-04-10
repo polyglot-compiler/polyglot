@@ -28,11 +28,9 @@ package polyglot.ext.jl5.ast;
 import java.util.List;
 
 import polyglot.ast.MethodDecl;
-import polyglot.ast.MethodDecl_c;
 import polyglot.ast.Node;
 import polyglot.ast.Term;
 import polyglot.ast.TypeNode;
-import polyglot.ext.jl5.types.JL5Flags;
 import polyglot.ext.jl5.types.JL5MethodInstance;
 import polyglot.ext.jl5.types.JL5TypeSystem;
 import polyglot.ext.jl5.types.TypeVariable;
@@ -104,60 +102,10 @@ public class JL5MethodDeclExt extends JL5ProcedureDeclExt {
     @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
         MethodDecl md = (MethodDecl) super.typeCheck(tc);
-        JL5TypeSystem ts = (JL5TypeSystem) tc.typeSystem();
-
         JL5MethodInstance mi = (JL5MethodInstance) md.methodInstance();
-        Flags flags = mi.flags();
-
-        // repeat super class type checking so it can be specialized
-        // to handle inner enum classes which indeed do have
-        // static methods
-        if (tc.context().currentClass().flags().isInterface()) {
-            if (flags.isProtected() || flags.isPrivate()) {
-                throw new SemanticException("Interface methods must be public.",
-                                            md.position());
-            }
-        }
-
-        try {
-            ts.checkMethodFlags(flags);
-        }
-        catch (SemanticException e) {
-            throw new SemanticException(e.getMessage(), md.position());
-        }
-
-        if (md.body() == null && !(flags.isAbstract() || flags.isNative())) {
-            throw new SemanticException("Missing method body.", md.position());
-        }
-
-        if (md.body() != null && flags.isAbstract()) {
-            throw new SemanticException("An abstract method cannot have a body.",
-                                        md.position());
-        }
-
-        if (md.body() != null && flags.isNative()) {
-            throw new SemanticException("A native method cannot have a body.",
-                                        md.position());
-        }
-
-        ((MethodDecl_c) md).throwsCheck(tc);
-
-        // check that inner classes do not declare static methods
-        // unless class is enum
-        if (flags.isStatic()
-                && !JL5Flags.isEnum(md.methodInstance()
-                                      .container()
-                                      .toClass()
-                                      .flags())
-                && md.methodInstance().container().toClass().isInnerClass()) {
-            // it's a static method in an inner class.
-            throw new SemanticException("Inner classes cannot declare "
-                    + "static methods.", md.position());
-        }
-
-        ((MethodDecl_c) md).overrideMethodCheck(tc);
-
-        return md;
+        JL5TypeSystem ts = (JL5TypeSystem) tc.typeSystem();
+        ts.checkMethodNameClash(mi, mi.container().toClass());
+        return superLang().typeCheck(md, tc);
     }
 
     @Override

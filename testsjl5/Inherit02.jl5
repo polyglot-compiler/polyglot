@@ -1,0 +1,4 @@
+class C<T> { T id (T x) { return null; } }
+class D extends C<String> {
+	Object id(Object x) { return null; }
+}

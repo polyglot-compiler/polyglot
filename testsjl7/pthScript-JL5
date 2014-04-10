@@ -148,7 +148,7 @@ polyglot.ext.jl7.JL7ExtensionInfo ["../testsjl5/"] "-sx jl5 -d out -classpath ja
         Conditional04.jl5;
         Constant01.jl5;
         Array.jl5;
-        Array2.jl5 (Semantic, "should be declared abstract");
+        Array2.jl5 (Semantic, "Name clash"), (Semantic, "should be declared abstract");
         Array03.jl5;
         Array04.jl5;
         Array05.jl5;
@@ -186,6 +186,9 @@ polyglot.ext.jl7.JL7ExtensionInfo ["../testsjl5/"] "-sx jl5 -d out -classpath ja
         GenericMethod14.jl5;
         GenericMethod15.jl5;
         GenericMethod16.jl5;
+        Inherit01.jl5 (Semantic, "Name clash");
+        Inherit02.jl5 (Semantic, "Name clash");
+        Inherit03.jl5 (Semantic, "Name clash"), (Semantic, "Name clash");
         InfiniteLoop.jl5;
         Throw02.jl5;
         JLS8.1.2.jl5;
@@ -211,7 +214,7 @@ polyglot.ext.jl7.JL7ExtensionInfo ["../testsjl5/"] "-sx jl5 -d out -classpath ja
         error1.jl5 (Semantic, "should be declared abstract");
         error3.jl5 (Semantic);
         error3b.jl5;
-        error3c.jl5 (Semantic, "should be declared abstract");
+        error3c.jl5 (Semantic, "Name clash"), (Semantic, "should be declared abstract");
         error3d.jl5;
         error3e.jl5 (Semantic, "type .* does not match");
         error3f.jl5 (Post, "Xlint");
@@ -219,7 +222,7 @@ polyglot.ext.jl7.JL7ExtensionInfo ["../testsjl5/"] "-sx jl5 -d out -classpath ja
         error3h.jl5 (Post, "Xlint");
         error4.jl5 (Semantic, "type .* does not match");
         error5.jl5 (Semantic, "type .* does not match");
-        error6.jl5 (Semantic, "should be declared abstract");
+        error6.jl5 (Semantic, "Name clash"), (Semantic, "should be declared abstract");
         error7.jl5 (Semantic, "not a subtype");
         exn1.jl5;
         exn2.jl5;
