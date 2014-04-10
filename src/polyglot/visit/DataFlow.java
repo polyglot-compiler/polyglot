@@ -180,6 +180,18 @@ public abstract class DataFlow<FlowItem extends DataFlow.Item> extends
 
     /**
      * Create an initial Item for the term node. This is generally how the Item
+     * that will be given to the entry peer of a graph is created, although this
+     * method may also be called for other (non-start) nodes.
+     * 
+     * @return a (possibly null) Item.
+     */
+    protected FlowItem createInitialItem(FlowGraph<FlowItem> graph,
+            Peer<FlowItem> peer) {
+        return createInitialItem(graph, peer.node, peer.isEntry());
+    }
+
+    /**
+     * Create an initial Item for the term node. This is generally how the Item
      * that will be given to the start node of a graph is created, although this
      * method may also be called for other (non-start) nodes.
      * 
@@ -344,17 +356,17 @@ public abstract class DataFlow<FlowItem extends DataFlow.Item> extends
                                                                  peer,
                                                                  graph);
         FlowItem falseItem =
-                falseItems.isEmpty() ? null
-                        : this.safeConfluence(falseItems,
-                                              falseItemKeys,
-                                              peer,
-                                              graph);
+                falseItems.isEmpty()
+                        ? null : this.safeConfluence(falseItems,
+                                                     falseItemKeys,
+                                                     peer,
+                                                     graph);
         FlowItem otherItem =
-                otherItems.isEmpty() ? null
-                        : this.safeConfluence(otherItems,
-                                              otherItemKeys,
-                                              peer,
-                                              graph);
+                otherItems.isEmpty()
+                        ? null : this.safeConfluence(otherItems,
+                                                     otherItemKeys,
+                                                     peer,
+                                                     graph);
 
         return this.flow(trueItem, falseItem, otherItem, graph, peer);
     }
@@ -493,7 +505,7 @@ public abstract class DataFlow<FlowItem extends DataFlow.Item> extends
             List<EdgeKey> itemKeys, Peer<FlowItem> peer,
             FlowGraph<FlowItem> graph) {
         if (items.isEmpty()) {
-            return this.createInitialItem(graph, peer.node(), peer.isEntry());
+            return this.createInitialItem(graph, peer);
         }
         if (items.size() == 1) {
             return items.get(0);
@@ -1527,7 +1539,8 @@ public abstract class DataFlow<FlowItem extends DataFlow.Item> extends
                                   + StringUtil.escape(StringUtil.getShortNameComponent(p.node.getClass()
                                                                                              .getName()))
                                   + ")"
-                                  + (p.path_to_finally.isEmpty() ? ""
+                                  + (p.path_to_finally.isEmpty()
+                                          ? ""
                                           : StringUtil.escape(p.path_to_finally.toString()))
                                   + "\" ];");
 
@@ -1541,7 +1554,8 @@ public abstract class DataFlow<FlowItem extends DataFlow.Item> extends
                                       + StringUtil.escape(StringUtil.getShortNameComponent(q.getTarget().node.getClass()
                                                                                                              .getName()))
                                       + ")"
-                                      + (q.getTarget().path_to_finally.isEmpty() ? ""
+                                      + (q.getTarget().path_to_finally.isEmpty()
+                                              ? ""
                                               : StringUtil.escape(q.getTarget().path_to_finally.toString()))
                                       + "\" ];");
                 String label = q.getKey().toString();
