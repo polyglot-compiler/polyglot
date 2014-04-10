@@ -25,16 +25,13 @@
  ******************************************************************************/
 package polyglot.ext.jl7.ast;
 
-import polyglot.ast.Block;
-import polyglot.ast.Catch;
-import polyglot.ast.TryOps;
-import polyglot.types.TypeSystem;
-import polyglot.util.SubtypeSet;
+import java.util.List;
 
-public interface JL7TryOps extends TryOps {
+import polyglot.ast.LocalDecl;
+import polyglot.ast.Try;
 
-    void checkPreciseRethrows(J7Lang lang, TypeSystem typeSystem, Block b);
+public interface TryWithResources extends Try {
+    List<LocalDecl> resources();
 
-    void preciseRethrowsForCatchBlock(J7Lang lang, Catch cb, SubtypeSet thrown);
-
+    TryWithResources resources(List<LocalDecl> resources);
 }

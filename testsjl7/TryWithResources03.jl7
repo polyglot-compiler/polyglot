@@ -1,0 +1,7 @@
+class C {
+	static String readFirstLineFromFile(String path) {
+		try (String s = "15") {
+			return path;
+		}
+	}
+}

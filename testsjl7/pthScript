@@ -60,4 +60,9 @@ polyglot.ext.jl7.JL7ExtensionInfo "-d out -classpath java-out -assert -noserial 
 	Rethrow03.jl7 (Semantic);
 	Switch01.jl7;
 	Switch02.jl7;
+	TryWithResources01.jl7;
+	TryWithResources02.jl7 (Semantic, "multiply defined");
+	TryWithResources03.jl7 (Semantic, "AutoCloseable");
+	TryWithResources04.jl7;
+	TryWithResources05.jl7;
 }

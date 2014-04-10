@@ -25,16 +25,34 @@
  ******************************************************************************/
 package polyglot.ext.jl7.ast;
 
-import polyglot.ast.Block;
-import polyglot.ast.Catch;
-import polyglot.ast.TryOps;
-import polyglot.types.TypeSystem;
-import polyglot.util.SubtypeSet;
+import polyglot.ast.LocalDecl;
+import polyglot.ast.Node;
+import polyglot.ext.jl7.types.JL7TypeSystem;
+import polyglot.types.SemanticException;
+import polyglot.types.Type;
+import polyglot.util.SerialVersionUID;
+import polyglot.visit.TypeChecker;
 
-public interface JL7TryOps extends TryOps {
+public class JL7ResourceExt extends JL7Ext {
+    private static final long serialVersionUID = SerialVersionUID.generate();
 
-    void checkPreciseRethrows(J7Lang lang, TypeSystem typeSystem, Block b);
+    @Override
+    public LocalDecl node() {
+        return (LocalDecl) super.node();
+    }
 
-    void preciseRethrowsForCatchBlock(J7Lang lang, Catch cb, SubtypeSet thrown);
-
+    @Override
+    public Node typeCheck(TypeChecker tc) throws SemanticException {
+        LocalDecl n = this.node();
+        Type declType = n.declType();
+        JL7TypeSystem ts = (JL7TypeSystem) tc.typeSystem();
+        if (!ts.isSubtype(declType, ts.AutoCloseable())) {
+            // JLS SE 7 | 14.20.3
+            // The type of a variable declared in a ResourceSpecification must be a
+            // subtype of AutoCloseable, or a compile-time error occurs. 
+            throw new SemanticException("The resource type " + declType
+                    + " does not implement java.lang.AutoCloseable");
+        }
+        return superLang().typeCheck(this.node(), tc);
+    }
 }

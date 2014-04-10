@@ -30,4 +30,13 @@ public class JL7ToJLExtFactory_c extends JL5ToJLExtFactory_c implements
         return extCatch();
     }
 
+    @Override
+    public Ext extResource() {
+        return extLocalDecl();
+    }
+
+    @Override
+    public Ext extTryWithResources() {
+        return extTry();
+    }
 }

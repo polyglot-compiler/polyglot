@@ -65,11 +65,16 @@ public class Try_c extends Stmt_c implements Try, TryOps {
     public Try_c(Position pos, Block tryBlock, List<Catch> catchBlocks,
             Block finallyBlock, Ext ext) {
         super(pos, ext);
-        assert (tryBlock != null && catchBlocks != null); // finallyBlock may be null, catchBlocks empty
-        assert (!catchBlocks.isEmpty() || finallyBlock != null); // must be either try-catch or try(-catch)-finally
+        assert_(pos, tryBlock, catchBlocks, finallyBlock);
         this.tryBlock = tryBlock;
         this.catchBlocks = ListUtil.copy(catchBlocks, true);
         this.finallyBlock = finallyBlock;
+    }
+
+    protected void assert_(Position pos, Block tryBlock,
+            List<Catch> catchBlocks, Block finallyBlock) {
+        assert (tryBlock != null && catchBlocks != null); // finallyBlock may be null, catchBlocks empty
+        assert (!catchBlocks.isEmpty() || finallyBlock != null); // must be either try-catch or try(-catch)-finally
     }
 
     @Override

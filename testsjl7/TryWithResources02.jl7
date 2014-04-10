@@ -1,0 +1,17 @@
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+
+class C {
+	static String readFirstLineFromFile(String path) throws IOException {
+		try (BufferedReader br =
+				new BufferedReader(new FileReader(path));
+				// JLS SE 7 | 14.20.3: It is a compile-time error for a
+				// ResourceSpecification to declare two variables with the same
+				// name. 
+				BufferedReader br =
+						new BufferedReader(new FileReader(path))) {
+			return br.readLine();
+		}
+	}
+}

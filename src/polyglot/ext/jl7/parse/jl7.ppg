@@ -22,11 +22,53 @@ parser Grm extends polyglot.ext.jl5.parse.Grm  {:
 
 :};
 
-
+non terminal semicolon_opt;
+non terminal TryWithResources try_with_resources_statement;
+non terminal List<LocalDecl> resources;
+non terminal LocalDecl resource;
 non terminal List<TypeNode> catch_type;
+non terminal Block finally_opt;
 
 start with goal;
 
+extend try_statement ::=
+	try_with_resources_statement:a {:
+		RESULT = a;
+	:}
+;
+
+semicolon_opt ::= | SEMICOLON;
+
+try_with_resources_statement ::=
+	TRY:a LPAREN resources:b semicolon_opt RPAREN:r block:c catches_opt:d finally_opt:e {:
+		RESULT = parser.nf.TryWithResources(parser.pos(a, e != null ? e : !d.isEmpty() ? d : r),
+																				b, c, d, e);
+	:}
+;
+
+resources ::=
+	resource:a {:
+		List<LocalDecl> l = new LinkedList<LocalDecl>();
+		l.add(a);
+		RESULT = l;
+	:}
+	| resources:a SEMICOLON resource:c {:
+		a.add(c);
+		RESULT = a;
+	:}
+;
+
+resource ::=
+	modifiers_or_annotations_opt:a type:b variable_declarator_id:c EQ expression:d {:
+		RESULT = parser.nf.Resource(parser.pos(c), a.flags(), a.annotations(),
+																parser.array(b, c.dims), c.name, d);
+	:}
+;
+
+finally_opt ::=
+	{: RESULT = null; :}
+	| finally:a {: RESULT = a; :}
+;
 
 override catch_clause ::=
 	// Catch
