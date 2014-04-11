@@ -114,7 +114,7 @@ public class ArrayAccessAssign_c extends Assign_c implements ArrayAccessAssign {
 
     @Override
     public List<Type> throwTypes(TypeSystem ts) {
-        List<Type> l = new ArrayList<Type>(super.throwTypes(ts));
+        List<Type> l = new ArrayList<>(super.throwTypes(ts));
 
         if (throwsArrayStoreException()) {
             l.add(ts.ArrayStoreException());

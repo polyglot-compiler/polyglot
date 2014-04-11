@@ -89,16 +89,16 @@ public class DeadCodeEliminator extends
          * Constructor for creating an empty set.
          */
         protected DataFlowItem() {
-            this.liveVars = new HashSet<LocalInstance>();
-            this.liveDecls = new HashSet<LocalInstance>();
+            this.liveVars = new HashSet<>();
+            this.liveDecls = new HashSet<>();
         }
 
         /**
          * Deep copy constructor.
          */
         protected DataFlowItem(DataFlowItem dfi) {
-            liveVars = new HashSet<LocalInstance>(dfi.liveVars);
-            liveDecls = new HashSet<LocalInstance>(dfi.liveDecls);
+            liveVars = new HashSet<>(dfi.liveVars);
+            liveDecls = new HashSet<>(dfi.liveDecls);
         }
 
         public void add(LocalInstance li) {
@@ -271,7 +271,7 @@ public class DeadCodeEliminator extends
         Collection<Peer<DataFlowItem>> peers = g.peers(n, Term.EXIT);
         if (peers == null || peers.isEmpty()) return null;
 
-        List<DataFlowItem> items = new ArrayList<DataFlowItem>();
+        List<DataFlowItem> items = new ArrayList<>();
         for (Peer<DataFlowItem> p : peers) {
             if (p.inItem() != null) items.add(p.inItem());
         }
@@ -328,7 +328,7 @@ public class DeadCodeEliminator extends
         if (n instanceof Block) {
             // Get rid of empty statements.
             Block b = (Block) n;
-            List<Stmt> stmts = new ArrayList<Stmt>(b.statements());
+            List<Stmt> stmts = new ArrayList<>(b.statements());
             for (Iterator<Stmt> it = stmts.iterator(); it.hasNext();) {
                 if (it.next() instanceof Empty) it.remove();
             }
@@ -345,14 +345,14 @@ public class DeadCodeEliminator extends
      * Element 1 is the set of local instances USEd by the node.
      */
     protected Pair<Set<LocalInstance>, Set<LocalInstance>> getDefUse(Node n) {
-        final Set<LocalInstance> def = new HashSet<LocalInstance>();
-        final Set<LocalInstance> use = new HashSet<LocalInstance>();
+        final Set<LocalInstance> def = new HashSet<>();
+        final Set<LocalInstance> use = new HashSet<>();
 
         if (n != null) {
             n.visit(createDefUseFinder(def, use));
         }
 
-        return new Pair<Set<LocalInstance>, Set<LocalInstance>>(def, use);
+        return new Pair<>(def, use);
     }
 
     protected NodeVisitor createDefUseFinder(Set<LocalInstance> def,
@@ -404,7 +404,7 @@ public class DeadCodeEliminator extends
         Stmt empty = nf.Empty(Position.compilerGenerated());
         if (expr == null) return empty;
 
-        final List<Stmt> result = new LinkedList<Stmt>();
+        final List<Stmt> result = new LinkedList<>();
         final Position pos = Position.compilerGenerated();
 
         NodeVisitor v = new HaltingVisitor(lang()) {

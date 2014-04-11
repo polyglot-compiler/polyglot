@@ -144,7 +144,7 @@ public class Switch_c extends Stmt_c implements Switch {
 
     @Override
     public Node checkConstants(ConstantChecker cc) throws SemanticException {
-        Collection<Object> labels = new LinkedHashSet<Object>();
+        Collection<Object> labels = new LinkedHashSet<>();
 
         // Check for duplicate labels.
         for (SwitchElement s : elements) {
@@ -238,8 +238,8 @@ public class Switch_c extends Stmt_c implements Switch {
 
     @Override
     public <T> List<T> acceptCFG(CFGBuilder<?> v, List<T> succs) {
-        List<Term> cases = new LinkedList<Term>();
-        List<Integer> entry = new LinkedList<Integer>();
+        List<Term> cases = new LinkedList<>();
+        List<Integer> entry = new LinkedList<>();
         boolean hasDefault = false;
 
         for (SwitchElement s : elements) {

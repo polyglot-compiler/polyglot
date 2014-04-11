@@ -54,7 +54,7 @@ public class NestedMap<K, V> extends AbstractMap<K, V> {
     public NestedMap(Map<K, V> containing) {
         this.superMap =
                 containing == null ? NilMap.<K, V> emptyMap() : containing;
-        this.myMap = new HashMap<K, V>();
+        this.myMap = new HashMap<>();
         setView = new EntrySet();
         nShadowed = 0;
     }
@@ -137,9 +137,9 @@ public class NestedMap<K, V> extends AbstractMap<K, V> {
         @SuppressWarnings("unchecked")
         @Override
         public Iterator<K> iterator() {
-            return new ConcatenatedIterator<K>(myMap.keySet().iterator(),
-                                               new FilteringIterator<K>(superMap.keySet(),
-                                                                        keyNotInMyMap));
+            return new ConcatenatedIterator<>(myMap.keySet().iterator(),
+                                              new FilteringIterator<>(superMap.keySet(),
+                                                                      keyNotInMyMap));
         }
 
         @Override
@@ -163,10 +163,9 @@ public class NestedMap<K, V> extends AbstractMap<K, V> {
         @SuppressWarnings("unchecked")
         @Override
         public Iterator<Entry<K, V>> iterator() {
-            return new ConcatenatedIterator<Entry<K, V>>(myMap.entrySet()
-                                                              .iterator(),
-                                                         new FilteringIterator<Entry<K, V>>(superMap.entrySet(),
-                                                                                            entryKeyNotInMyMap));
+            return new ConcatenatedIterator<>(myMap.entrySet().iterator(),
+                                              new FilteringIterator<>(superMap.entrySet(),
+                                                                      entryKeyNotInMyMap));
         }
 
         @Override

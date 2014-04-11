@@ -35,8 +35,7 @@ public class symbol_set {
 
     /** A hash table to hold the set. Symbols are keyed using their name string. 
      */
-    protected Hashtable<String, symbol> _all =
-            new Hashtable<String, symbol>(11);
+    protected Hashtable<String, symbol> _all = new Hashtable<>(11);
 
     /** Access to all elements of the set. */
     public Enumeration<symbol> all() {

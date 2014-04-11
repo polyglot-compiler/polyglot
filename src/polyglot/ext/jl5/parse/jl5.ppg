@@ -105,7 +105,7 @@ parser Grm extends polyglot.parse.Grm  {:
     public List<LocalDecl> variableDeclarators(TypeNode a, List<VarDeclarator> b, Flags flags, List<Term> annotations)
     throws Exception
     {
-      List<LocalDecl> l = new LinkedList<LocalDecl>();
+      List<LocalDecl> l = new LinkedList<>();
       for (VarDeclarator d : b) {
           l.add(nf.LocalDecl(pos(d), flags, annotations, array(a, d.dims),
                                   d.name, d.init));
@@ -345,7 +345,7 @@ reference_type_3 ::=
 	;
 type_argument_list ::=
 	type_argument:a
-        {: List<TypeNode> l = new LinkedList<TypeNode>();
+        {: List<TypeNode> l = new LinkedList<>();
            l.add(a);
            RESULT = l; 
          :}
@@ -357,7 +357,7 @@ type_argument_list ::=
 	;
 type_argument_list_1 ::=
 		type_argument_1:a
-		{: List<TypeNode> l = new LinkedList<TypeNode>();
+		{: List<TypeNode> l = new LinkedList<>();
            l.add(a);
            RESULT = l; 
          :}
@@ -368,7 +368,7 @@ type_argument_list_1 ::=
 	;
 type_argument_list_2 ::=
 		type_argument_2:a
-	{: List<TypeNode> l = new LinkedList<TypeNode>();
+	{: List<TypeNode> l = new LinkedList<>();
            l.add(a);
            RESULT = l; 
          :}
@@ -380,7 +380,7 @@ type_argument_list_2 ::=
 	;
 type_argument_list_3 ::=
 		type_argument_3:a
-        {: List<TypeNode> l = new LinkedList<TypeNode>();
+        {: List<TypeNode> l = new LinkedList<>();
            l.add(a);
            RESULT = l; 
          :}
@@ -461,11 +461,11 @@ drop { class_member_declaration ::= modifiers_opt CLASS IDENTIFIER super_opt int
 
 extend class_member_declaration ::=
     enum_declaration:a
-    {: List<ClassMember> l = new LinkedList<ClassMember>();
+    {: List<ClassMember> l = new LinkedList<>();
        l.add(a);
        RESULT = l; :}
  |  class_declaration:a 
-    {: List<ClassMember> l = new LinkedList<ClassMember>();
+    {: List<ClassMember> l = new LinkedList<>();
        l.add(a);
        RESULT = l; :}
 	;
@@ -492,14 +492,14 @@ comma_opt ::=
     ;
 
 enum_constants_opt ::=
-        {: RESULT = new LinkedList<ClassMember>(); :}
+        {: RESULT = new LinkedList<>(); :}
 	|	enum_constants:a comma_opt
         {: RESULT = a; :}
 	;
 
 enum_constants ::=
 		enum_constant:a
-        {: List<ClassMember> l = new LinkedList<ClassMember>();
+        {: List<ClassMember> l = new LinkedList<>();
            parser.next_ordinal = 0;
            l.add(a.ordinal(parser.next_ordinal++));
            RESULT = l; :}
@@ -515,19 +515,19 @@ enum_constant ::=
         {: RESULT = parser.nf.EnumConstantDecl(parser.pos(a), d.flags(), d.annotations(), parser.nf.Id(parser.pos(a), a.getIdentifier()), b, c); :}
 	;
 enum_arguments_opt ::=
-        {: RESULT = new LinkedList<Expr>(); :}
+        {: RESULT = new LinkedList<>(); :}
 	|	LPAREN argument_list_opt:a RPAREN
         {: RESULT = a; :}
 	;
 enum_body_declarations_opt ::=
-        {: RESULT = new LinkedList<ClassMember>(); :}
+        {: RESULT = new LinkedList<>(); :}
 	|	SEMICOLON class_body_declarations_opt:a
         {: RESULT = a; :}
 	;
 
 override field_declaration ::=
     modifiers_or_annotations_opt:a type:b variable_declarators:c SEMICOLON:e
-    {: List<ClassMember> l = new LinkedList<ClassMember>();
+    {: List<ClassMember> l = new LinkedList<>();
        for (VarDeclarator d : c) {
          l.add(parser.nf.FieldDecl(parser.pos(b, e),
                a.flags(), a.annotations(), parser.array(b, d.dims),
@@ -635,18 +635,18 @@ override interface_declaration ::=
 		modifiers_or_annotations_opt:a INTERFACE:b IDENTIFIER:c type_parameters_opt:d extends_interfaces_opt:e interface_body:f
         {: RESULT = parser.nf.ClassDecl(parser.pos(b, f), a.setFlag(Flags.INTERFACE).flags(), a.annotations(), parser.nf.Id(parser.pos(c), c.getIdentifier()), null, e, f, d); :}
     | AT:a INTERFACE:b IDENTIFIER:c annotation_body:d
-        {: List<TypeNode> superints = new LinkedList<TypeNode>();
+        {: List<TypeNode> superints = new LinkedList<>();
            superints.add(parser.nf.CanonicalTypeNode(parser.pos(b, d), parser.ts.Annotation()));
            RESULT = parser.nf.ClassDecl(parser.pos(a, d), Flags.INTERFACE.set(JL5Flags.ANNOTATION), null, parser.nf.Id(parser.pos(c), c.getIdentifier()), null, superints, d, null); :}
     | modifiers_or_annotations:a AT:b INTERFACE IDENTIFIER:d annotation_body:e
-        {: List<TypeNode> superints = new LinkedList<TypeNode>();
+        {: List<TypeNode> superints = new LinkedList<>();
            superints.add(parser.nf.CanonicalTypeNode(parser.pos(b, e), parser.ts.Annotation()));
            RESULT = parser.nf.ClassDecl(parser.pos(b, d), a.setFlag(Flags.INTERFACE.set(JL5Flags.ANNOTATION)).flags(), a.annotations(), parser.nf.Id(parser.pos(d), d.getIdentifier()), null, superints, e, null); :}
 	;
 	
 extend interface_member_declaration ::=
 	enum_declaration:a
-        {: List<ClassMember> l = new LinkedList<ClassMember>();
+        {: List<ClassMember> l = new LinkedList<>();
            l.add(a);
            RESULT = l; :}
 	;
@@ -655,11 +655,11 @@ extend interface_member_declaration ::=
 // 19.11) Blocks and Statements
 extend block_statement ::=
 	enum_declaration:a
-        {: List<Stmt> l = new LinkedList<Stmt>();
+        {: List<Stmt> l = new LinkedList<>();
            l.add(parser.nf.LocalClassDecl(parser.pos(a), a));
            RESULT = l; :}
 	|	interface_declaration:a
-        {: List<Stmt> l = new LinkedList<Stmt>();
+        {: List<Stmt> l = new LinkedList<>();
            l.add(parser.nf.LocalClassDecl(parser.pos(a), a));
            RESULT = l; :}
 	;
@@ -886,7 +886,7 @@ type_parameters_opt ::=
     type_parameters:a 
     {: RESULT = a; :}
     | 
-    {: RESULT = new LinkedList<TypeNode>(); :}
+    {: RESULT = new LinkedList<>(); :}
 ;
 type_parameters ::=
 		LT type_parameter_list_1:a
@@ -898,13 +898,13 @@ type_parameter_list ::=
            RESULT = a; :}
 	|	
     type_parameter:a
-        {: List<TypeNode> l = new LinkedList<TypeNode>();
+        {: List<TypeNode> l = new LinkedList<>();
            l.add(a);
            RESULT = l; :}
 	;
 type_parameter_list_1 ::=
     type_parameter_1:a
-        {: List<TypeNode> l = new LinkedList<TypeNode>();
+        {: List<TypeNode> l = new LinkedList<>();
            l.add(a);
            RESULT = l; :}
 	|	
@@ -931,7 +931,7 @@ type_bound_opt ::=
 type_bound ::=
 		EXTENDS reference_type:a additional_bound_list_opt:b
         {: if (b == null) {
-                List<TypeNode> l = new LinkedList<TypeNode>();
+                List<TypeNode> l = new LinkedList<>();
                 l.add(a);
                 RESULT = l;
            } 
@@ -942,7 +942,7 @@ type_bound ::=
 	;
 type_bound_1 ::=
 		EXTENDS reference_type_1:a
-        {: List<TypeNode> l = new LinkedList<TypeNode>();
+        {: List<TypeNode> l = new LinkedList<>();
            l.add(a);
            RESULT = l; :}
 	|	EXTENDS reference_type:a additional_bound_list_1:b
@@ -960,7 +960,7 @@ additional_bound_list ::=
         {: b.add(0, a);
            RESULT = b; :}
 	|	additional_bound:a
-        {: List<TypeNode> l = new LinkedList<TypeNode>();
+        {: List<TypeNode> l = new LinkedList<>();
            l.add(a);
            RESULT = l; :}
 	;
@@ -969,7 +969,7 @@ additional_bound_list_1 ::=
         {: b.add(0, a);
            RESULT = b; :}
 	|	additional_bound_1:a
-        {: List<TypeNode> l = new LinkedList<TypeNode>();
+        {: List<TypeNode> l = new LinkedList<>();
            l.add(a);
            RESULT = l; :}
 	;
@@ -1245,7 +1245,7 @@ normal_annotation ::=
 ;
 
 element_value_pairs_opt ::=
-        {: RESULT = new LinkedList<Term>(); :}
+        {: RESULT = new LinkedList<>(); :}
     |
     element_value_pairs:a
         {: RESULT = a; :}
@@ -1253,7 +1253,7 @@ element_value_pairs_opt ::=
 
 element_value_pairs ::=
     element_value_pair:a
-        {: List<Term> l = new LinkedList<Term>();
+        {: List<Term> l = new LinkedList<>();
            l.add(a);
            RESULT = l;
         :}
@@ -1273,7 +1273,7 @@ annotation_body ::=
 ;
 
 annotation_type_element_declarations_opt ::=
-        {: RESULT = new LinkedList<ClassMember>(); :}
+        {: RESULT = new LinkedList<>(); :}
     |
     annotation_type_element_declarations:a
         {: RESULT = a; :}
@@ -1289,21 +1289,21 @@ annotation_type_element_declarations ::=
 ;
 annotation_type_element_declaration ::=
     modifiers_or_annotations_opt:a type:b IDENTIFIER:c LPAREN RPAREN default_value_opt:d SEMICOLON
-        {: List<ClassMember> l = new LinkedList<ClassMember>();
+        {: List<ClassMember> l = new LinkedList<>();
            l.add(parser.nf.AnnotationElemDecl(parser.pos(b,d), a.flags(), parser.array(b, (new Integer(0)).intValue()), parser.nf.Id(parser.pos(c), c.getIdentifier()), d));
            RESULT = l; :}
     | constant_declaration:a
         {: RESULT = a; :}
     | class_declaration:a
-        {: List<ClassMember> l = new LinkedList<ClassMember>();
+        {: List<ClassMember> l = new LinkedList<>();
            l.add(a);
            RESULT = l; :}
     | interface_declaration:a
-        {: List<ClassMember> l = new LinkedList<ClassMember>();
+        {: List<ClassMember> l = new LinkedList<>();
            l.add(a);
            RESULT = l; :}
     | enum_declaration:a
-        {: List<ClassMember> l = new LinkedList<ClassMember>();
+        {: List<ClassMember> l = new LinkedList<>();
            l.add(a);
            RESULT = l; :}
     | SEMICOLON
@@ -1320,7 +1320,7 @@ default_value_opt ::=
 
 element_values ::=
     element_value:a
-        {: List<Term> l = new LinkedList<Term>();
+        {: List<Term> l = new LinkedList<>();
            l.add(a);
            RESULT = l;
         :}

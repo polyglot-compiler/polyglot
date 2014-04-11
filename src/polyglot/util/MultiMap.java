@@ -41,12 +41,12 @@ import java.util.Set;
 public class MultiMap<K, V> extends AbstractMap<K, Set<V>> {
     /* The representation is a mapping from each key to the set of values that 
      * that key maps to. */
-    private Map<K, Set<V>> map = new HashMap<K, Set<V>>(); // Map <Object, Set <Object> >
+    private Map<K, Set<V>> map = new HashMap<>();
 
     private Set<V> getValueSet(K key) {
         Set<V> values = map.get(key);
         if (values == null) {
-            values = new HashSet<V>();
+            values = new HashSet<>();
             map.put(key, values);
         }
         return values;
@@ -93,7 +93,7 @@ public class MultiMap<K, V> extends AbstractMap<K, Set<V>> {
     @Override
     public Set<V> put(K key, Set<V> value) {
         Set<V> original = map.get(key);
-        Set<V> values = new HashSet<V>();
+        Set<V> values = new HashSet<>();
         values.addAll(value);
         map.put(key, values);
         return original;

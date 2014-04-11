@@ -40,8 +40,7 @@ import polyglot.util.InternalCompilerError;
  * */
 public class FindSharedASTVisitor extends NodeVisitor {
 
-    private Map<Node, NodeStack> seenNodes =
-            new HashMap<Node, FindSharedASTVisitor.NodeStack>();
+    private Map<Node, NodeStack> seenNodes = new HashMap<>();
     private NodeStack currentStack;
 
     public FindSharedASTVisitor(JLang lang) {
@@ -78,12 +77,12 @@ public class FindSharedASTVisitor extends NodeVisitor {
     }
 
     protected Node findCommonParent(NodeStack stack1, NodeStack stack2) {
-        List<Node> list1 = new ArrayList<Node>();
+        List<Node> list1 = new ArrayList<>();
         while (stack1 != null) {
             list1.add(stack1.n);
             stack1 = stack1.rest;
         }
-        List<Node> list2 = new ArrayList<Node>();
+        List<Node> list2 = new ArrayList<>();
         while (stack2 != null) {
             list2.add(stack2.n);
             stack2 = stack2.rest;

@@ -60,7 +60,7 @@ public class MemberClassResolver implements TopLevelResolver {
         this.ts = ts;
         this.inner = inner;
         this.allowRawClasses = allowRawClasses;
-        this.nocache = new HashSet<String>();
+        this.nocache = new HashSet<>();
     }
 
     @Override

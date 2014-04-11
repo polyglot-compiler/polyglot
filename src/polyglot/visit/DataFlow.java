@@ -149,7 +149,7 @@ public abstract class DataFlow<FlowItem extends DataFlow.Item> extends
         this.detectBackEdges = detectBackEdges;
         this.dataflowOnEntry = dataflowOnEntry;
         if (dataflowOnEntry)
-            this.flowgraphStack = new LinkedList<FlowGraphSource<FlowItem>>();
+            this.flowgraphStack = new LinkedList<>();
         else this.flowgraphStack = null;
     }
 
@@ -240,8 +240,7 @@ public abstract class DataFlow<FlowItem extends DataFlow.Item> extends
             // Since there is an edge from inItemPeer to the current peer p, the edge
             // is a back edge if the post-order number of inItemPeer is less than
             // the post-order number of the peer p.
-            List<Boolean> isBackEdges =
-                    new ArrayList<Boolean>(inItemPeers.size());
+            List<Boolean> isBackEdges = new ArrayList<>(inItemPeers.size());
 
             int currentPeerOrder = postordering.get(p).intValue();
 
@@ -323,12 +322,12 @@ public abstract class DataFlow<FlowItem extends DataFlow.Item> extends
     protected final Map<EdgeKey, FlowItem> flowToBooleanFlow(
             List<FlowItem> inItems, List<EdgeKey> inItemKeys,
             FlowGraph<FlowItem> graph, Peer<FlowItem> peer) {
-        List<FlowItem> trueItems = new ArrayList<FlowItem>();
-        List<EdgeKey> trueItemKeys = new ArrayList<EdgeKey>();
-        List<FlowItem> falseItems = new ArrayList<FlowItem>();
-        List<EdgeKey> falseItemKeys = new ArrayList<EdgeKey>();
-        List<FlowItem> otherItems = new ArrayList<FlowItem>();
-        List<EdgeKey> otherItemKeys = new ArrayList<EdgeKey>();
+        List<FlowItem> trueItems = new ArrayList<>();
+        List<EdgeKey> trueItemKeys = new ArrayList<>();
+        List<FlowItem> falseItems = new ArrayList<>();
+        List<EdgeKey> falseItemKeys = new ArrayList<>();
+        List<FlowItem> otherItems = new ArrayList<>();
+        List<EdgeKey> otherItemKeys = new ArrayList<>();
 
         Iterator<FlowItem> i = inItems.iterator();
         Iterator<EdgeKey> j = inItemKeys.iterator();
@@ -523,8 +522,8 @@ public abstract class DataFlow<FlowItem extends DataFlow.Item> extends
             FlowItem item2, FlowGraph.EdgeKey key2, FlowItem item3,
             FlowGraph.EdgeKey key3, Peer<FlowItem> peer,
             FlowGraph<FlowItem> graph) {
-        List<FlowItem> items = new ArrayList<FlowItem>(3);
-        List<EdgeKey> itemKeys = new ArrayList<EdgeKey>(3);
+        List<FlowItem> items = new ArrayList<>(3);
+        List<EdgeKey> itemKeys = new ArrayList<>(3);
 
         if (item1 != null) {
             items.add(item1);
@@ -604,14 +603,14 @@ public abstract class DataFlow<FlowItem extends DataFlow.Item> extends
 
                 // push the CFG onto the stack if we are dataflowing on entry
                 if (dataflowOnEntry)
-                    flowgraphStack.addFirst(new FlowGraphSource<FlowItem>(g, cd));
+                    flowgraphStack.addFirst(new FlowGraphSource<>(g, cd));
             }
         }
     }
 
     protected Frame<FlowItem> createFrame(Peer<FlowItem> p, boolean forward,
             FlowGraph<FlowItem> grahp) {
-        return new Frame<FlowItem>(p, forward);
+        return new Frame<>(p, forward);
     }
 
     /** A "stack frame" for recursive DFS */
@@ -648,8 +647,8 @@ public abstract class DataFlow<FlowItem extends DataFlow.Item> extends
 
 // First, topologically sort the nodes (put in postorder)
         int n = 0;
-        LinkedList<Frame<FlowItem>> stack = new LinkedList<Frame<FlowItem>>();
-        HashSet<Peer<FlowItem>> reachable = new HashSet<Peer<FlowItem>>();
+        LinkedList<Frame<FlowItem>> stack = new LinkedList<>();
+        HashSet<Peer<FlowItem>> reachable = new HashSet<>();
         for (Peer<FlowItem> peer : start) {
             if (!reachable.contains(peer)) {
                 reachable.add(peer);
@@ -678,12 +677,12 @@ public abstract class DataFlow<FlowItem extends DataFlow.Item> extends
         @SuppressWarnings("unchecked")
         Peer<FlowItem>[] by_scc = new Peer[n];
         int[] scc_head = new int[n];
-        HashSet<Peer<FlowItem>> visited = new HashSet<Peer<FlowItem>>();
+        HashSet<Peer<FlowItem>> visited = new HashSet<>();
         int head = 0;
         for (int i = n - 1; i >= 0; i--) {
             if (!visited.contains(sorted[i])) {
                 // First, find all the nodes in the SCC
-                HashSet<Peer<FlowItem>> SCC = new HashSet<Peer<FlowItem>>();
+                HashSet<Peer<FlowItem>> SCC = new HashSet<>();
                 visited.add(sorted[i]);
                 stack.add(createFrame(sorted[i], false, graph));
                 while (stack.size() != 0) {
@@ -705,8 +704,7 @@ public abstract class DataFlow<FlowItem extends DataFlow.Item> extends
                 // Now, topologically sort the SCC (as much as possible)
                 // and place into by_scc[head..head+scc_size-1]
                 stack.add(createFrame(sorted[i], true, graph));
-                HashSet<Peer<FlowItem>> revisited =
-                        new HashSet<Peer<FlowItem>>();
+                HashSet<Peer<FlowItem>> revisited = new HashSet<>();
                 revisited.add(sorted[i]);
                 int scc_size = SCC.size();
                 int nsorted = 0;
@@ -752,7 +750,7 @@ public abstract class DataFlow<FlowItem extends DataFlow.Item> extends
                 }
             }
         }
-        return new Pair<Peer<FlowItem>[], int[]>(by_scc, scc_head);
+        return new Pair<>(by_scc, scc_head);
     }
 
     /**
@@ -810,9 +808,9 @@ public abstract class DataFlow<FlowItem extends DataFlow.Item> extends
 
         if (this.detectBackEdges) {
             // construct a postordering of the peers by visiting each peer in a depth first manner
-            this.postordering = new HashMap<Peer<FlowItem>, Integer>();
+            this.postordering = new HashMap<>();
             int count = 0;
-            Set<Peer<FlowItem>> visited = new HashSet<Peer<FlowItem>>();
+            Set<Peer<FlowItem>> visited = new HashSet<>();
             for (Peer<FlowItem> p : graph.startPeers()) {
                 count = postorder(p, count, visited);
             }
@@ -833,10 +831,9 @@ public abstract class DataFlow<FlowItem extends DataFlow.Item> extends
 
             // get the in items by examining the out items of all
             // the predecessors of p
-            List<FlowItem> inItems = new ArrayList<FlowItem>(p.preds.size());
-            List<EdgeKey> inItemKeys = new ArrayList<EdgeKey>(p.preds.size());
-            List<Peer<FlowItem>> inItemPeers =
-                    new ArrayList<Peer<FlowItem>>(p.preds.size());
+            List<FlowItem> inItems = new ArrayList<>(p.preds.size());
+            List<EdgeKey> inItemKeys = new ArrayList<>(p.preds.size());
+            List<Peer<FlowItem>> inItemPeers = new ArrayList<>(p.preds.size());
             for (Edge<FlowItem> e : p.preds) {
                 Peer<FlowItem> o = e.getTarget();
                 if (o.outItems != null) {
@@ -898,7 +895,7 @@ public abstract class DataFlow<FlowItem extends DataFlow.Item> extends
      *         {@code FlowGraph.}
      */
     protected FlowGraph<FlowItem> initGraph(CodeNode code, Term root) {
-        return new FlowGraph<FlowItem>(root, forward);
+        return new FlowGraph<>(root, forward);
     }
 
     /**
@@ -922,7 +919,7 @@ public abstract class DataFlow<FlowItem extends DataFlow.Item> extends
      */
     protected CFGBuilder<FlowItem> createCFGBuilder(TypeSystem ts,
             FlowGraph<FlowItem> g) {
-        return new CFGBuilder<FlowItem>(lang(), ts, g, this);
+        return new CFGBuilder<>(lang(), ts, g, this);
     }
 
     /**
@@ -994,10 +991,9 @@ public abstract class DataFlow<FlowItem extends DataFlow.Item> extends
         }
 
         // Check the nodes in approximately flow order.
-        Set<Peer<FlowItem>> uncheckedPeers =
-                new HashSet<Peer<FlowItem>>(graph.peers());
+        Set<Peer<FlowItem>> uncheckedPeers = new HashSet<>(graph.peers());
         LinkedList<Peer<FlowItem>> peersToCheck =
-                new LinkedList<Peer<FlowItem>>(graph.startPeers());
+                new LinkedList<>(graph.startPeers());
         while (!peersToCheck.isEmpty()) {
             Peer<FlowItem> p = peersToCheck.removeFirst();
             uncheckedPeers.remove(p);
@@ -1062,7 +1058,7 @@ public abstract class DataFlow<FlowItem extends DataFlow.Item> extends
      */
     public static final <FlowItem> Map<EdgeKey, FlowItem> itemToMap(FlowItem i,
             Set<EdgeKey> edgeKeys) {
-        Map<EdgeKey, FlowItem> m = new HashMap<EdgeKey, FlowItem>();
+        Map<EdgeKey, FlowItem> m = new HashMap<>();
         for (EdgeKey k : edgeKeys) {
             m.put(k, i);
         }
@@ -1097,7 +1093,7 @@ public abstract class DataFlow<FlowItem extends DataFlow.Item> extends
     protected static final <FlowItem> Map<EdgeKey, FlowItem> itemsToMap(
             FlowItem trueItem, FlowItem falseItem, FlowItem remainingItem,
             Set<EdgeKey> edgeKeys) {
-        Map<EdgeKey, FlowItem> m = new HashMap<EdgeKey, FlowItem>();
+        Map<EdgeKey, FlowItem> m = new HashMap<>();
 
         for (EdgeKey k : edgeKeys) {
             if (FlowGraph.EDGE_KEY_TRUE.equals(k)) {
@@ -1129,7 +1125,7 @@ public abstract class DataFlow<FlowItem extends DataFlow.Item> extends
      */
     protected final List<FlowItem> filterItemsNonError(List<FlowItem> items,
             List<EdgeKey> itemKeys) {
-        List<FlowItem> filtered = new ArrayList<FlowItem>(items.size());
+        List<FlowItem> filtered = new ArrayList<>(items.size());
         Iterator<FlowItem> i = items.iterator();
         Iterator<EdgeKey> j = itemKeys.iterator();
         while (i.hasNext() && j.hasNext()) {
@@ -1165,7 +1161,7 @@ public abstract class DataFlow<FlowItem extends DataFlow.Item> extends
      */
     protected final List<FlowItem> filterItemsNonException(
             List<FlowItem> items, List<EdgeKey> itemKeys) {
-        List<FlowItem> filtered = new ArrayList<FlowItem>(items.size());
+        List<FlowItem> filtered = new ArrayList<>(items.size());
         Iterator<FlowItem> i = items.iterator();
         Iterator<EdgeKey> j = itemKeys.iterator();
         while (i.hasNext() && j.hasNext()) {
@@ -1203,7 +1199,7 @@ public abstract class DataFlow<FlowItem extends DataFlow.Item> extends
      */
     protected final List<FlowItem> filterItemsExceptionSubclass(
             List<FlowItem> items, List<EdgeKey> itemKeys, Type excType) {
-        List<FlowItem> filtered = new ArrayList<FlowItem>(items.size());
+        List<FlowItem> filtered = new ArrayList<>(items.size());
         Iterator<FlowItem> i = items.iterator();
         Iterator<EdgeKey> j = itemKeys.iterator();
         while (i.hasNext() && j.hasNext()) {
@@ -1240,7 +1236,7 @@ public abstract class DataFlow<FlowItem extends DataFlow.Item> extends
      */
     protected final List<FlowItem> filterItems(List<FlowItem> items,
             List<EdgeKey> itemKeys, FlowGraph.EdgeKey filterEdgeKey) {
-        List<FlowItem> filtered = new ArrayList<FlowItem>(items.size());
+        List<FlowItem> filtered = new ArrayList<>(items.size());
         Iterator<FlowItem> i = items.iterator();
         Iterator<EdgeKey> j = itemKeys.iterator();
         while (i.hasNext() && j.hasNext()) {
@@ -1321,7 +1317,7 @@ public abstract class DataFlow<FlowItem extends DataFlow.Item> extends
         BoolItem<FlowItem> results =
                 navigator.navigate(booleanCond, startingItem);
 
-        Map<EdgeKey, FlowItem> m = new HashMap<EdgeKey, FlowItem>();
+        Map<EdgeKey, FlowItem> m = new HashMap<>();
         m.put(FlowGraph.EDGE_KEY_TRUE, results.trueItem());
         m.put(FlowGraph.EDGE_KEY_FALSE, results.falseItem());
 
@@ -1455,9 +1451,8 @@ public abstract class DataFlow<FlowItem extends DataFlow.Item> extends
          */
         public BoolItem<FlowItem> andResults(BoolItem<FlowItem> left,
                 BoolItem<FlowItem> right, FlowItem startingItem) {
-            return new BoolItem<FlowItem>(combine(left.trueItem(),
-                                                  right.trueItem()),
-                                          startingItem);
+            return new BoolItem<>(combine(left.trueItem(), right.trueItem()),
+                                  startingItem);
         }
 
         /**
@@ -1466,9 +1461,8 @@ public abstract class DataFlow<FlowItem extends DataFlow.Item> extends
          */
         public BoolItem<FlowItem> orResults(BoolItem<FlowItem> left,
                 BoolItem<FlowItem> right, FlowItem startingItem) {
-            return new BoolItem<FlowItem>(startingItem,
-                                          combine(left.falseItem(),
-                                                  right.falseItem()));
+            return new BoolItem<>(startingItem, combine(left.falseItem(),
+                                                        right.falseItem()));
         }
 
         /**
@@ -1476,8 +1470,7 @@ public abstract class DataFlow<FlowItem extends DataFlow.Item> extends
          * a NEGATION boolean operator (a !).
          */
         public BoolItem<FlowItem> notResult(BoolItem<FlowItem> results) {
-            return new BoolItem<FlowItem>(results.falseItem(),
-                                          results.trueItem());
+            return new BoolItem<>(results.falseItem(), results.trueItem());
         }
 
         /**

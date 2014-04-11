@@ -56,9 +56,9 @@ public class SystemResolver extends CachingResolver implements TopLevelResolver 
     public SystemResolver(TopLevelResolver inner, ExtensionInfo extInfo) {
         super(inner);
         this.extInfo = extInfo;
-        this.packageCache = new HashMap<String, Boolean>();
+        this.packageCache = new HashMap<>();
         this.previous = null;
-        this.justAdded = new LinkedList<Pair<String, Named>>();
+        this.justAdded = new LinkedList<>();
     }
 
     public SystemResolver previous() {
@@ -68,9 +68,9 @@ public class SystemResolver extends CachingResolver implements TopLevelResolver 
     @Override
     public SystemResolver copy() {
         SystemResolver r = (SystemResolver) super.copy();
-        r.packageCache = new HashMap<String, Boolean>(this.packageCache);
+        r.packageCache = new HashMap<>(this.packageCache);
         r.previous = this;
-        r.justAdded = new LinkedList<Pair<String, Named>>();
+        r.justAdded = new LinkedList<>();
         return r;
     }
 
@@ -168,18 +168,18 @@ public class SystemResolver extends CachingResolver implements TopLevelResolver 
     }
 
     public Collection<Named> justAdded() {
-        return new TransformingList<Pair<String, Named>, Named>(justAdded,
-                                                                new Transformation<Pair<String, Named>, Named>() {
-                                                                    @Override
-                                                                    public Named transform(
-                                                                            Pair<String, Named> o) {
-                                                                        return o.part2();
-                                                                    }
-                                                                });
+        return new TransformingList<>(justAdded,
+                                      new Transformation<Pair<String, Named>, Named>() {
+                                          @Override
+                                          public Named transform(
+                                                  Pair<String, Named> o) {
+                                              return o.part2();
+                                          }
+                                      });
     }
 
     public void clearAdded() {
-        justAdded = new LinkedList<Pair<String, Named>>();
+        justAdded = new LinkedList<>();
     }
 
     /**
@@ -262,7 +262,7 @@ public class SystemResolver extends CachingResolver implements TopLevelResolver 
             }
         }
         else {
-            justAdded.add(new Pair<String, Named>(name, q));
+            justAdded.add(new Pair<>(name, q));
         }
     }
 

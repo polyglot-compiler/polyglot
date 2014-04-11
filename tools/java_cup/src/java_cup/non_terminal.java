@@ -58,8 +58,7 @@ public class non_terminal extends symbol {
     /** Table of all non-terminals -- elements are stored using name strings 
      *  as the key 
      */
-    protected static Hashtable<String, non_terminal> _all =
-            new Hashtable<String, non_terminal>();
+    protected static Hashtable<String, non_terminal> _all = new Hashtable<>();
 
     //Hm Added clear  to clear all static fields
     public static void clear() {
@@ -85,7 +84,7 @@ public class non_terminal extends symbol {
 
     /** Table of all non terminals indexed by their index number. */
     protected static Hashtable<Integer, non_terminal> _all_by_index =
-            new Hashtable<Integer, non_terminal>();
+            new Hashtable<>();
 
     /** Lookup a non terminal by index. */
     public static non_terminal find(int indx) {
@@ -225,7 +224,7 @@ public class non_terminal extends symbol {
 
     /** Table of all productions with this non terminal on the LHS. */
     protected Hashtable<production, production> _productions =
-            new Hashtable<production, production>(11);
+            new Hashtable<>(11);
 
     /** Access to productions with this non terminal on the LHS. */
     public Enumeration<production> productions() {

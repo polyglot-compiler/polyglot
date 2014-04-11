@@ -59,7 +59,7 @@ public class RemoveStaticImports extends ContextVisitor {
         if (n instanceof SourceFile) {
             // remove the static imports
             SourceFile sf = (SourceFile) n;
-            List<Import> imports = new ArrayList<Import>(sf.imports());
+            List<Import> imports = new ArrayList<>(sf.imports());
             boolean changed = false;
             for (Iterator<Import> iter = imports.iterator(); iter.hasNext();) {
                 Import imp = iter.next();

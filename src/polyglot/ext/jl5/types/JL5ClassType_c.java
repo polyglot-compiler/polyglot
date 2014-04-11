@@ -83,7 +83,7 @@ public abstract class JL5ClassType_c extends ClassType_c implements
         JL5TypeSystem ts = (JL5TypeSystem) this.ts;
         LinkedList<Type> chain = null;
         if (ts.isSubtype(this, toType)) {
-            chain = new LinkedList<Type>();
+            chain = new LinkedList<>();
             chain.add(this);
             chain.add(toType);
         }

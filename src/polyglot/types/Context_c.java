@@ -608,7 +608,7 @@ public class Context_c implements Context {
     }
 
     public void addNamedToThisScope(Named type) {
-        if (types == null) types = new HashMap<String, Named>();
+        if (types == null) types = new HashMap<>();
         types.put(type.name(), type);
     }
 
@@ -636,7 +636,7 @@ public class Context_c implements Context {
     }
 
     public void addVariableToThisScope(VarInstance var) {
-        if (vars == null) vars = new HashMap<String, VarInstance>();
+        if (vars == null) vars = new HashMap<>();
         vars.put(var.name(), var);
     }
 

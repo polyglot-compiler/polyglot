@@ -32,7 +32,7 @@ public class virtual_parse_stack {
 
         /* set up our internals */
         real_stack = shadowing_stack;
-        vstack = new Stack<Integer>();
+        vstack = new Stack<>();
         real_next = 0;
 
         /* get one element onto the virtual portion of the stack */

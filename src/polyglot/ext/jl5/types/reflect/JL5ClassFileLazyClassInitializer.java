@@ -116,7 +116,7 @@ public class JL5ClassFileLazyClassInitializer extends
             List<TypeVariable> typeVars =
                     signature.parseClassTypeVariables(ts, position());
             ct.setTypeVariables(typeVars);
-            pc.formals(new ArrayList<TypeVariable>(ct.typeVariables()));
+            pc.formals(new ArrayList<>(ct.typeVariables()));
 
             signature.parseClassSignature(ts, position());
 
@@ -171,7 +171,7 @@ public class JL5ClassFileLazyClassInitializer extends
         String type = (String) constants[method.getType()].value();
         JL5Signature signature = method.getSignature();
 
-        List<ReferenceType> excTypes = new ArrayList<ReferenceType>();
+        List<ReferenceType> excTypes = new ArrayList<>();
 
         // JL5 method signature does not contain the throw types
         // so parse that first, so we can use it in both cases.
@@ -240,7 +240,7 @@ public class JL5ClassFileLazyClassInitializer extends
         }
 
         Map<Type, Map<String, AnnotationElementValue>> annotationElems =
-                new LinkedHashMap<Type, Map<String, AnnotationElementValue>>();
+                new LinkedHashMap<>();
 
         if (method.getRuntimeVisibleAnnotations() != null) {
             annotationElems.putAll(method.getRuntimeVisibleAnnotations()
@@ -384,7 +384,7 @@ public class JL5ClassFileLazyClassInitializer extends
         }
 
         Map<Type, Map<String, AnnotationElementValue>> annotationElems =
-                new LinkedHashMap<Type, Map<String, AnnotationElementValue>>();
+                new LinkedHashMap<>();
         if (field.getRuntimeVisibleAnnotations() != null) {
             annotationElems.putAll(field.getRuntimeVisibleAnnotations()
                                         .toAnnotationElems(this, ts));
@@ -406,7 +406,7 @@ public class JL5ClassFileLazyClassInitializer extends
         }
         // initialize fields first
         initFields();
-        List<EnumInstance> enumInstances = new ArrayList<EnumInstance>();
+        List<EnumInstance> enumInstances = new ArrayList<>();
         for (FieldInstance fi : this.ct.fields()) {
             if (JL5Flags.isEnum(fi.flags())) {
                 EnumInstance ei = (EnumInstance) fi;
@@ -437,7 +437,7 @@ public class JL5ClassFileLazyClassInitializer extends
         }
         JL5TypeSystem ts = (JL5TypeSystem) this.ts;
         Map<Type, Map<String, AnnotationElementValue>> annotationElems =
-                new LinkedHashMap<Type, Map<String, AnnotationElementValue>>();
+                new LinkedHashMap<>();
         JL5ClassFile cls = (JL5ClassFile) clazz;
         if (cls.getRuntimeVisibleAnnotations() != null) {
             annotationElems.putAll(cls.getRuntimeVisibleAnnotations()

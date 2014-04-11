@@ -88,7 +88,7 @@ public class FlowGraph<FlowItem extends DataFlow.Item> {
     public FlowGraph(Term root, boolean forward, boolean alwaysHaveSuccEdgeKey) {
         this.root = root;
         this.forward = forward;
-        this.peerMap = new HashMap<IdentityKey, Map<PeerKey, Peer<FlowItem>>>();
+        this.peerMap = new HashMap<>();
         this.alwaysHaveSuccEdgeKey = alwaysHaveSuccEdgeKey;
     }
 
@@ -128,7 +128,7 @@ public class FlowGraph<FlowItem extends DataFlow.Item> {
      * Return a collection of all {@code Peer}s in this flow graph.
      */
     public Collection<Peer<FlowItem>> peers() {
-        Collection<Peer<FlowItem>> c = new ArrayList<Peer<FlowItem>>();
+        Collection<Peer<FlowItem>> c = new ArrayList<>();
         for (Map<PeerKey, Peer<FlowItem>> m : peerMap.values()) {
             for (Peer<FlowItem> p : m.values()) {
                 c.add(p);
@@ -149,8 +149,8 @@ public class FlowGraph<FlowItem extends DataFlow.Item> {
     }
 
     public Peer<FlowItem> peer(Term n, boolean isEntry) {
-        return peer(n, Collections.<Term> emptyList(), isEntry ? Term.ENTRY
-                : Term.EXIT);
+        return peer(n, Collections.<Term> emptyList(), isEntry
+                ? Term.ENTRY : Term.EXIT);
     }
 
     /**
@@ -168,7 +168,7 @@ public class FlowGraph<FlowItem extends DataFlow.Item> {
         }
 
         Collection<Peer<FlowItem>> peers = pathMap.values();
-        List<Peer<FlowItem>> l = new ArrayList<Peer<FlowItem>>(peers.size());
+        List<Peer<FlowItem>> l = new ArrayList<>(peers.size());
 
         for (Peer<FlowItem> p : peers) {
             if (p.entry == entry) {
@@ -201,7 +201,7 @@ public class FlowGraph<FlowItem extends DataFlow.Item> {
         Map<PeerKey, Peer<FlowItem>> pathMap = peerMap.get(k);
 
         if (pathMap == null) {
-            pathMap = new HashMap<PeerKey, Peer<FlowItem>>();
+            pathMap = new HashMap<>();
             peerMap.put(k, pathMap);
         }
 
@@ -209,10 +209,10 @@ public class FlowGraph<FlowItem extends DataFlow.Item> {
 
         if (p == null) {
             p =
-                    new Peer<FlowItem>(n,
-                                       peerKey.list,
-                                       peerKey.entry,
-                                       this.alwaysHaveSuccEdgeKey);
+                    new Peer<>(n,
+                               peerKey.list,
+                               peerKey.entry,
+                               this.alwaysHaveSuccEdgeKey);
             pathMap.put(peerKey, p);
         }
 
@@ -284,8 +284,8 @@ public class FlowGraph<FlowItem extends DataFlow.Item> {
 
         @Override
         public String toString() {
-            return (type().isClass() ? type().toClass().name()
-                    : type().toString());
+            return (type().isClass()
+                    ? type().toClass().name() : type().toString());
         }
     }
 
@@ -381,8 +381,8 @@ public class FlowGraph<FlowItem extends DataFlow.Item> {
             this.path_to_finally = path_to_finally;
             this.inItem = null;
             this.outItems = null;
-            this.succs = new ArrayList<Edge<FlowItem>>();
-            this.preds = new ArrayList<Edge<FlowItem>>();
+            this.succs = new ArrayList<>();
+            this.preds = new ArrayList<>();
             this.entry = entry;
             this.succEdgeKeys = null;
             this.alwaysHaveSuccEdgeKey = alwaysHaveSuccEdgeKey;
@@ -439,7 +439,7 @@ public class FlowGraph<FlowItem extends DataFlow.Item> {
             if (this.succEdgeKeys == null) {
                 // the successor edge keys have not yet been calculated. do it
                 // now.
-                this.succEdgeKeys = new HashSet<EdgeKey>();
+                this.succEdgeKeys = new HashSet<>();
                 for (Edge<FlowItem> e : this.succs) {
                     this.succEdgeKeys.add(e.getKey());
                 }
@@ -491,9 +491,8 @@ public class FlowGraph<FlowItem extends DataFlow.Item> {
     public String toString() {
 
         StringBuffer sb = new StringBuffer();
-        Set<Peer<FlowItem>> todo = new HashSet<Peer<FlowItem>>(this.peers());
-        LinkedList<Peer<FlowItem>> queue =
-                new LinkedList<Peer<FlowItem>>(startPeers());
+        Set<Peer<FlowItem>> todo = new HashSet<>(this.peers());
+        LinkedList<Peer<FlowItem>> queue = new LinkedList<>(startPeers());
 
         while (!queue.isEmpty()) {
             Peer<FlowItem> p = queue.removeFirst();

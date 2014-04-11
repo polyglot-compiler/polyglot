@@ -74,7 +74,7 @@ public class RemoveVarargVisitor extends ErrorHandlingVisitor {
     }
 
     private Node rewriteProcedureDecl(ProcedureDecl n) {
-        List<Formal> formals = new ArrayList<Formal>(n.formals());
+        List<Formal> formals = new ArrayList<>(n.formals());
         if (formals.size() > 0) {
             int varArgIndex = formals.size() - 1;
             Formal varArgFormal = formals.get(varArgIndex);
@@ -135,7 +135,7 @@ public class RemoveVarargVisitor extends ErrorHandlingVisitor {
             }
 
             List<Expr> standardArgs =
-                    new ArrayList<Expr>(args.subList(0, numStandardFormals));
+                    new ArrayList<>(args.subList(0, numStandardFormals));
 
             ArrayInit initValues =
                     nf.ArrayInit(pos, args.subList(numStandardFormals, numArgs));

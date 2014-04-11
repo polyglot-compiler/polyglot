@@ -77,9 +77,9 @@ public class NodeScrambler extends NodeVisitor {
         super(lang);
         this.fp = new FirstPass(lang);
 
-        this.pairs = new HashMap<Node, LinkedList<Node>>();
-        this.nodes = new LinkedList<Node>();
-        this.currentParents = new LinkedList<Node>();
+        this.pairs = new HashMap<>();
+        this.nodes = new LinkedList<>();
+        this.currentParents = new LinkedList<>();
         this.cw = Compiler.createCodeWriter(System.err, 72);
         this.seed = seed;
 
@@ -98,7 +98,7 @@ public class NodeScrambler extends NodeVisitor {
 
         @Override
         public NodeVisitor enter(Node n) {
-            LinkedList<Node> clone = new LinkedList<Node>(currentParents);
+            LinkedList<Node> clone = new LinkedList<>(currentParents);
             pairs.put(n, clone);
             nodes.add(n);
 

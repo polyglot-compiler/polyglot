@@ -163,7 +163,7 @@ public class JL5RawSubst_c extends JL5Subst_c {
     }
 
     public List<Type> eraseTypeList(List<? extends Type> list) {
-        return new CachingTransformingList<Type, Type>(list, TypeErase);
+        return new CachingTransformingList<>(list, TypeErase);
     }
 
     /** Function object for transforming types. */

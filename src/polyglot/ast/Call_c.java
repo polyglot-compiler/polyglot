@@ -215,7 +215,7 @@ public class Call_c extends Expr_c implements Call, CallOps {
 
         TypeSystem ts = tb.typeSystem();
 
-        List<Type> l = new ArrayList<Type>(arguments.size());
+        List<Type> l = new ArrayList<>(arguments.size());
         for (int i = 0; i < arguments.size(); i++) {
             l.add(ts.unknownType(position()));
         }
@@ -287,7 +287,7 @@ public class Call_c extends Expr_c implements Call, CallOps {
         TypeSystem ts = tc.typeSystem();
         Context c = tc.context();
 
-        List<Type> argTypes = new ArrayList<Type>(this.arguments.size());
+        List<Type> argTypes = new ArrayList<>(this.arguments.size());
 
         for (Expr e : arguments) {
             if (!e.type().isCanonical()) {
@@ -523,7 +523,7 @@ public class Call_c extends Expr_c implements Call, CallOps {
 
     @Override
     public List<Type> throwTypes(TypeSystem ts) {
-        List<Type> l = new LinkedList<Type>();
+        List<Type> l = new LinkedList<>();
 
         l.addAll(mi.throwTypes());
         l.addAll(ts.uncheckedExceptions());

@@ -76,7 +76,7 @@ public class TypeErasureProcDecls extends ErrorHandlingVisitor {
 
     public TypeErasureProcDecls(Job job, TypeSystem ts, NodeFactory nf) {
         super(job, ts, nf);
-        this.newMethodDecls = new ArrayList<MethodDecl>();
+        this.newMethodDecls = new ArrayList<>();
     }
 
     @Override
@@ -158,7 +158,7 @@ public class TypeErasureProcDecls extends ErrorHandlingVisitor {
         // we need to rewrite the method decl to have the same arguments as mjErased, the erased version of mj.
         List<? extends Type> mjErasedFormals = erase(mjErased.formalTypes());
         boolean changed = false;
-        List<Formal> newFormals = new ArrayList<Formal>(n.formals().size());
+        List<Formal> newFormals = new ArrayList<>(n.formals().size());
         Iterator<Formal> formals = n.formals().iterator();
         for (Type tj : mjErasedFormals) {
             Formal f = formals.next();
@@ -182,7 +182,7 @@ public class TypeErasureProcDecls extends ErrorHandlingVisitor {
                      .flags()
                      .isInterface()) {
             Set<List<? extends Type>> alreadyAddedMethods =
-                    new LinkedHashSet<List<? extends Type>>();
+                    new LinkedHashSet<>();
             alreadyAddedMethods.add(mjErasedFormals);
 
             // now we need to go through all the other methods we override, 
@@ -247,8 +247,7 @@ public class TypeErasureProcDecls extends ErrorHandlingVisitor {
                                                                  origReturnType));
 
         List<? extends Type> mkErasedFormals = erase(mkErased.formalTypes());
-        List<Formal> formals =
-                new ArrayList<Formal>(mkErased.formalTypes().size());
+        List<Formal> formals = new ArrayList<>(mkErased.formalTypes().size());
         int i = 0;
         for (Type ft : mkErasedFormals) {
             Formal f =
@@ -268,12 +267,12 @@ public class TypeErasureProcDecls extends ErrorHandlingVisitor {
         }
 
         List<TypeNode> throwTypes =
-                new ArrayList<TypeNode>(mkErased.throwTypes().size());
+                new ArrayList<>(mkErased.throwTypes().size());
         for (Type tt : mkErased.throwTypes()) {
             throwTypes.add(nodeFactory().CanonicalTypeNode(pos, tt));
         }
 
-        List<Expr> actualArgs = new ArrayList<Expr>(mkErasedFormals.size());
+        List<Expr> actualArgs = new ArrayList<>(mkErasedFormals.size());
         i = 0;
         for (Type dt : dispatchArgTypes) {
             LocalInstance li = formals.get(i).localInstance();
@@ -343,7 +342,7 @@ public class TypeErasureProcDecls extends ErrorHandlingVisitor {
 
     private List<? extends Type> erase(List<? extends Type> types) {
         JL5TypeSystem ts = (JL5TypeSystem) this.ts;
-        List<Type> nt = new ArrayList<Type>(types.size());
+        List<Type> nt = new ArrayList<>(types.size());
         for (Type t : types) {
             nt.add(ts.erasureType(t));
         }
@@ -359,8 +358,7 @@ public class TypeErasureProcDecls extends ErrorHandlingVisitor {
         // we'll get the erasure substitutions for mj, and for mj.container(),
         // and combine them, then erase mj.
         JL5TypeSystem ts = (JL5TypeSystem) this.ts;
-        Map<TypeVariable, ReferenceType> subst =
-                new HashMap<TypeVariable, ReferenceType>();
+        Map<TypeVariable, ReferenceType> subst = new HashMap<>();
 
         JL5ParsedClassType containerBase =
                 (JL5ParsedClassType) ((JL5ClassType) mj.container()).declaration();

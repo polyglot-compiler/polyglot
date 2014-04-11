@@ -58,7 +58,7 @@ public class TypeInputStream extends ObjectInputStream {
         this.cache = cache;
         this.failed = false;
         this.enableReplace = true;
-        this.placeHoldersUsed = new HashSet<Object>();
+        this.placeHoldersUsed = new HashSet<>();
     }
 
     public Set<Object> placeHoldersUsed() {

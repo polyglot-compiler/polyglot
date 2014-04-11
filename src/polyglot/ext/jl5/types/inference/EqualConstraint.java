@@ -45,7 +45,7 @@ public class EqualConstraint extends Constraint {
 
     @Override
     public List<Constraint> simplify() {
-        List<Constraint> r = new ArrayList<Constraint>();
+        List<Constraint> r = new ArrayList<>();
         if (actual instanceof NullType) {
             // no constraint implied!
         }

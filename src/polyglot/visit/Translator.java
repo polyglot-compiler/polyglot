@@ -325,7 +325,7 @@ public class Translator extends PrettyPrinter implements Copy<Translator> {
 
     /** Get the list of public top-level classes declared in the source file. */
     protected List<TopLevelDecl> exports(SourceFile sfn) {
-        List<TopLevelDecl> exports = new LinkedList<TopLevelDecl>();
+        List<TopLevelDecl> exports = new LinkedList<>();
 
         for (TopLevelDecl decl : sfn.decls()) {
             if (decl.flags().isPublic()) {

@@ -139,7 +139,7 @@ public class ClassContextResolver extends AbstractAccessControlResolver {
 
         // Collect all members of the super types.
         // Use a Set to eliminate duplicates.
-        Set<Named> acceptable = new HashSet<Named>();
+        Set<Named> acceptable = new HashSet<>();
 
         if (type.superType() != null) {
             Type sup = type.superType();
@@ -170,8 +170,7 @@ public class ClassContextResolver extends AbstractAccessControlResolver {
             throw new NoClassException(name, type);
         }
         else if (acceptable.size() > 1) {
-            Set<ReferenceType> containers =
-                    new HashSet<ReferenceType>(acceptable.size());
+            Set<ReferenceType> containers = new HashSet<>(acceptable.size());
             for (Named n : acceptable) {
                 if (n instanceof MemberInstance) {
                     MemberInstance mi = (MemberInstance) n;

@@ -1,0 +1,15 @@
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
+class G<T, U> {
+}
+
+class H<T, U> {
+	H(Collection<? extends T> underlying, G<T, U> trans) {
+		this(new ArrayList<>(underlying), trans);
+	}
+
+	H(List<T> underlying, G<T, U> trans) {
+	}
+}

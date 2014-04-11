@@ -103,8 +103,7 @@ public class JL5NewExt extends JL5ProcedureCallExt implements NewOps {
                 if (!objectType.isDisambiguated()) return objectType;
 
                 Map<TypeVariable, ReferenceType> substMap =
-                        new LinkedHashMap<TypeVariable, ReferenceType>(osct.subst()
-                                                                           .substitutions());
+                        new LinkedHashMap<>(osct.subst().substitutions());
                 Type type = objectType.type();
                 if (type instanceof JL5SubstClassType) {
                     JL5SubstClassType tsct = (JL5SubstClassType) type;
@@ -147,7 +146,7 @@ public class JL5NewExt extends JL5ProcedureCallExt implements NewOps {
                                         n.position());
         }
 
-        List<Type> argTypes = new ArrayList<Type>(n.arguments().size());
+        List<Type> argTypes = new ArrayList<>(n.arguments().size());
 
         for (Expr e : n.arguments()) {
             argTypes.add(e.type());

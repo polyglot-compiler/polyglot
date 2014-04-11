@@ -172,7 +172,7 @@ ppg_precedence_list ::=
 
 ppg_start_spec ::=
 	START WITH nt_id:start SEMI {: 
-		Vector<String> v = new Vector<String>();
+		Vector<String> v = new Vector<>();
 		v.addElement(start);
 		RESULT = v;
 	:}	
@@ -189,7 +189,7 @@ ppg_start_spec_list ::=
 
 ppg_start_spec_elt ::=
 	START WITH id:start id:method SEMI {:
-		Vector<String> m = new Vector<String>();
+		Vector<String> m = new Vector<>();
 		m.addElement(start);
 		m.addElement(method);
 		RESULT = m;
@@ -203,7 +203,7 @@ command_list_opt ::=
 		b.addElement(a);
 		RESULT = b;
 	:}
-|	{: RESULT = new Vector<Command>(); :}
+|	{: RESULT = new Vector<>(); :}
 ;
 
 command ::=
@@ -233,7 +233,7 @@ nt_id_list ::=
 		RESULT = list;
 	:}
 |	nt_id:id {:
-		Vector<String> list = new Vector<String>();
+		Vector<String> list = new Vector<>();
 		list.addElement(id);
 		RESULT = list;
 	:}
@@ -252,7 +252,7 @@ transfer_list ::=
 		RESULT = tl;
 	:}
 |	TO nt_id:nt LBRACE rhs_list:rhs RBRACE {:
-		Vector<Production> v = new Vector<Production>();
+		Vector<Production> v = new Vector<>();
 		Production p = new Production(new Nonterminal(nt), rhs);
 		v.addElement(p);
 		RESULT = v;
@@ -269,7 +269,7 @@ production_list ::=
 		RESULT = p_list;
 	:}
 |	production:p {:
-		Vector<Production> p_list = new Vector<Production>();
+		Vector<Production> p_list = new Vector<>();
 		p_list.addElement(p);
 		RESULT = p_list;
 	:}
@@ -295,7 +295,7 @@ rhs_list ::=
 		RESULT = r_list;
 	:}
 |	rhs:r {:
-		Vector<Vector<GrammarPart>> r_list = new Vector<Vector<GrammarPart>>();
+		Vector<Vector<GrammarPart>> r_list = new Vector<>();
 		r_list.addElement(r);
 		RESULT = r_list;
 	:}
@@ -315,7 +315,7 @@ prod_part_list ::=
 		/* Vector a, (non)terminal/code b */
 		a.addElement(b); RESULT = a;
 	:}
-|	/* empty */ {: RESULT = new Vector<GrammarPart>(); :};
+|	/* empty */ {: RESULT = new Vector<>(); :};
 
 prod_part ::=
 	symbol_id:symid opt_label:labid
@@ -367,7 +367,7 @@ import_list ::=
 		i_list.addElement(i);
 		RESULT = i_list;
 	:}
-|	/* empty */ {: RESULT = new Vector<String>(); :}
+|	/* empty */ {: RESULT = new Vector<>(); :}
 ;
 
 import_spec ::=
@@ -381,7 +381,7 @@ code_parts ::=
 		c_parts.addElement(c);
 		RESULT = c_parts;
 	:}
-|	/* empty */ {: RESULT = new Vector<Code>(); :}
+|	/* empty */ {: RESULT = new Vector<>(); :}
 ;
 
 code_part ::=
@@ -432,7 +432,7 @@ symbol_list ::=
 		RESULT = s_list;
 	:}
 |	symbol:s {: 
-		Vector<SymbolList> s_list = new Vector<SymbolList>();
+		Vector<SymbolList> s_list = new Vector<>();
 		s_list.addElement(s);
 		RESULT = s_list;
 	:}
@@ -465,7 +465,7 @@ term_name_list ::=
 		RESULT = tn_list;
 	:}
 |	new_term_id:n_id {:
-		Vector<String> tn_list = new Vector<String>();
+		Vector<String> tn_list = new Vector<>();
 		tn_list.addElement(n_id);
 		RESULT = tn_list;
 	:}
@@ -477,7 +477,7 @@ non_term_name_list ::=
 		RESULT = ntn_list;
 	:}
 |	new_non_term_id:n_id {: 
-		Vector<String> nnt_list = new Vector<String>();
+		Vector<String> nnt_list = new Vector<>();
 		nnt_list.addElement(n_id);
 		RESULT = nnt_list; 
 	:}
@@ -485,7 +485,7 @@ non_term_name_list ::=
 
 precedence_list ::=
 	precedence_l:p_l {: RESULT = p_l; :}
-|	/* empty */ {: RESULT = new Vector<Precedence>(); :}
+|	/* empty */ {: RESULT = new Vector<>(); :}
 ;
 
 precedence_l ::= 
@@ -494,7 +494,7 @@ precedence_l ::=
 		RESULT = p_l;
 	:}
 |	preced:p {: 
-		Vector<Precedence> p_l = new Vector<Precedence>();
+		Vector<Precedence> p_l = new Vector<>();
 		p_l.addElement(p);
 		RESULT = p_l;
 	:}
@@ -518,7 +518,7 @@ terminal_list ::=
 		RESULT = t_list;
 	:}
 |	terminal_id:t {:
-		Vector<GrammarSymbol> t_list = new Vector<GrammarSymbol>();
+		Vector<GrammarSymbol> t_list = new Vector<>();
 		t_list.addElement(new Terminal(t));
 		RESULT = t_list;
 	:}

@@ -66,8 +66,7 @@ public class RedundantCastRemover extends NodeVisitor {
         if (n instanceof ProcedureCall) {
             ProcedureCall newCall = (ProcedureCall) n;
             ProcedureCall oldCall = (ProcedureCall) old;
-            List<Expr> newArgs =
-                    new ArrayList<Expr>(newCall.arguments().size());
+            List<Expr> newArgs = new ArrayList<>(newCall.arguments().size());
             boolean changed = false;
             Iterator<Expr> i = newCall.arguments().iterator();
             Iterator<Expr> j = oldCall.arguments().iterator();

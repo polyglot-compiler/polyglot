@@ -168,7 +168,7 @@ extend type_declaration ::=
 
 extend class_member_declaration ::=
 	COMMA_MEMB:a
-	    {: List<ClassMember> l = new ArrayList<ClassMember>(1);
+	    {: List<ClassMember> l = new ArrayList<>(1);
 	       l.add((ClassMember) a.node());
 	       RESULT = l; :}
     ;

@@ -108,7 +108,7 @@ public abstract class AbstractGoal implements Goal {
         // This takes a hell of a long time.  Disable the check for now.
         // checkCycles(g, scheduler);
         if (prerequisites == Collections.EMPTY_SET) {
-            prerequisites = new LinkedHashSet<Goal>();
+            prerequisites = new LinkedHashSet<>();
         }
         prerequisites.add(g);
     }
@@ -128,7 +128,7 @@ public abstract class AbstractGoal implements Goal {
     @Override
     public void addCorequisiteGoal(Goal g, Scheduler scheduler) {
         if (corequisites == Collections.EMPTY_SET) {
-            corequisites = new LinkedHashSet<Goal>();
+            corequisites = new LinkedHashSet<>();
         }
         corequisites.add(g);
     }

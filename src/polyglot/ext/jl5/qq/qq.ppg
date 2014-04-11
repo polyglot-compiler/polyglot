@@ -54,7 +54,7 @@ parser Grm extends polyglot.qq.Grm {:
     public List<LocalDecl> variableDeclarators(TypeNode a, List<VarDeclarator> b, Flags flags, List<Term> annotations)
     throws Exception
     {
-      List<LocalDecl> l = new LinkedList<LocalDecl>();
+      List<LocalDecl> l = new LinkedList<>();
       for (Iterator<VarDeclarator> i = b.iterator(); i.hasNext(); ) {
           VarDeclarator d = i.next();
           l.add(nf.LocalDecl(pos(d), flags, annotations, array(a, d.dims),
@@ -200,7 +200,7 @@ extend type_declaration ::=
 
 extend class_member_declaration ::=
 	COMMA_MEMB:a
-	    {: List<ClassMember> l = new ArrayList<ClassMember>(1);
+	    {: List<ClassMember> l = new ArrayList<>(1);
 	       l.add((ClassMember) a.node());
 	       RESULT = l; :}
     ;

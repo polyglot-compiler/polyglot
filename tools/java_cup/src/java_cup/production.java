@@ -195,8 +195,7 @@ public class production {
     /** Table of all productions.  Elements are stored using their index as 
      *  the key.
      */
-    protected static Hashtable<Integer, production> _all =
-            new Hashtable<Integer, production>();
+    protected static Hashtable<Integer, production> _all = new Hashtable<>();
 
     /** Access to all productions. */
     public static Enumeration<production> all() {

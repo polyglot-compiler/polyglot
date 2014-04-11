@@ -100,7 +100,7 @@ public class Annotations extends Attribute {
         Position pos = init.position();
 
         Map<Type, Map<String, AnnotationElementValue>> m =
-                new LinkedHashMap<Type, Map<String, AnnotationElementValue>>();
+                new LinkedHashMap<>();
         for (Annotation a : this.annotations) {
             String typeString =
                     (String) (cls.getConstants()[a.typeIndex]).value();
@@ -123,7 +123,7 @@ public class Annotations extends Attribute {
             this.typeIndex = in.readUnsignedShort();
             int numElementValuePairs = in.readUnsignedShort();
 
-            this.elementValuePairs = new LinkedHashMap<String, ElementValue>();
+            this.elementValuePairs = new LinkedHashMap<>();
 
             for (int i = 0; i < numElementValuePairs; i++) {
                 int elementNameIndex = in.readUnsignedShort();
@@ -138,8 +138,7 @@ public class Annotations extends Attribute {
                 JL5ClassFileLazyClassInitializer init, JL5TypeSystem ts,
                 Position pos) {
 
-            Map<String, AnnotationElementValue> m =
-                    new LinkedHashMap<String, AnnotationElementValue>();
+            Map<String, AnnotationElementValue> m = new LinkedHashMap<>();
 
             for (String key : elementValuePairs.keySet()) {
                 m.put(key,
@@ -304,8 +303,7 @@ public class Annotations extends Attribute {
         public AnnotationElementValue toAnnotationElementValue(
                 JL5ClassFileLazyClassInitializer init, JL5TypeSystem ts,
                 Position pos) {
-            List<AnnotationElementValue> l =
-                    new ArrayList<AnnotationElementValue>();
+            List<AnnotationElementValue> l = new ArrayList<>();
             for (ElementValue v : vals) {
                 l.add(v.toAnnotationElementValue(init, ts, pos));
             }

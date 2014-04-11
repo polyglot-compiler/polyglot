@@ -25,11 +25,19 @@
  ******************************************************************************/
 package polyglot.ext.jl7.ast;
 
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
+
 import polyglot.ast.LocalDecl;
 import polyglot.ast.Node;
 import polyglot.ext.jl7.types.JL7TypeSystem;
+import polyglot.types.ClassType;
+import polyglot.types.MethodInstance;
 import polyglot.types.SemanticException;
 import polyglot.types.Type;
+import polyglot.types.TypeSystem;
+import polyglot.util.InternalCompilerError;
 import polyglot.util.SerialVersionUID;
 import polyglot.visit.TypeChecker;
 
@@ -54,5 +62,31 @@ public class JL7ResourceExt extends JL7Ext {
                     + " does not implement java.lang.AutoCloseable");
         }
         return superLang().typeCheck(this.node(), tc);
+    }
+
+    @Override
+    public List<Type> throwTypes(TypeSystem ts) {
+        List<Type> l = new LinkedList<>();
+
+        LocalDecl n = this.node();
+        ClassType declType = n.declType().toClass();
+        JL7TypeSystem jl7ts = (JL7TypeSystem) ts;
+        try {
+            MethodInstance mi =
+                    ts.findMethod(declType,
+                                  "close",
+                                  Collections.<Type> emptyList(),
+                                  jl7ts.AutoCloseable());
+            // The resource may throw exceptions declared by close().
+            l.addAll(mi.throwTypes());
+        }
+        catch (SemanticException e) {
+            throw new InternalCompilerError("Unexpected SemanticException: "
+                    + e);
+        }
+
+        l.addAll(superLang().throwTypes(n, ts));
+
+        return l;
     }
 }

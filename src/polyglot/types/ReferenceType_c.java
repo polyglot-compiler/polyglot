@@ -65,7 +65,7 @@ public abstract class ReferenceType_c extends Type_c implements ReferenceType {
 
     @Override
     public List<? extends MemberInstance> members() {
-        List<MemberInstance> l = new ArrayList<MemberInstance>();
+        List<MemberInstance> l = new ArrayList<>();
         l.addAll(methods());
         l.addAll(fields());
         return l;
@@ -138,7 +138,7 @@ public abstract class ReferenceType_c extends Type_c implements ReferenceType {
 
     @Override
     public List<? extends MethodInstance> methodsNamed(String name) {
-        List<MethodInstance> l = new LinkedList<MethodInstance>();
+        List<MethodInstance> l = new LinkedList<>();
 
         for (MethodInstance mi : methods()) {
             if (mi.name().equals(name)) {
@@ -152,7 +152,7 @@ public abstract class ReferenceType_c extends Type_c implements ReferenceType {
     @Override
     public List<? extends MethodInstance> methods(String name,
             List<? extends Type> argTypes) {
-        List<MethodInstance> l = new LinkedList<MethodInstance>();
+        List<MethodInstance> l = new LinkedList<>();
 
         for (MethodInstance mi : methodsNamed(name)) {
             if (mi.hasFormals(argTypes)) {

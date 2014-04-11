@@ -73,7 +73,7 @@ public abstract class HaltingVisitor extends NodeVisitor {
             v.bypass = Collections.singleton(n);
         }
         else {
-            v.bypass = new ArrayList<Node>(this.bypass.size() + 1);
+            v.bypass = new ArrayList<>(this.bypass.size() + 1);
             v.bypass.addAll(bypass);
             v.bypass.add(n);
         }
@@ -90,10 +90,10 @@ public abstract class HaltingVisitor extends NodeVisitor {
         // FIXME: Using a collection is expensive, but is hopefully not
         // often used.
         if (this.bypass == null) {
-            v.bypass = new ArrayList<Node>(c);
+            v.bypass = new ArrayList<>(c);
         }
         else {
-            v.bypass = new ArrayList<Node>(this.bypass.size() + c.size());
+            v.bypass = new ArrayList<>(this.bypass.size() + c.size());
             v.bypass.addAll(bypass);
             v.bypass.addAll(c);
         }

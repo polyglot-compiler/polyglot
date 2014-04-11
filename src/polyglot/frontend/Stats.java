@@ -48,13 +48,13 @@ public class Stats {
     protected ExtensionInfo ext;
 
     /** Map from Objects to pair of inclusive and exclusive times. */
-    protected Map<Object, Times> passTimes = new HashMap<Object, Times>();
+    protected Map<Object, Times> passTimes = new HashMap<>();
 
     /**
      * List of Objects used as keys to passTimes.  We have an explicit
      * list in order to report the keys in order.
      */
-    protected List<Object> keys = new ArrayList<Object>(20);
+    protected List<Object> keys = new ArrayList<>(20);
 
     public Stats(ExtensionInfo ext) {
         this.ext = ext;

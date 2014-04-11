@@ -88,8 +88,7 @@ public class ClassBody_c extends Term_c implements ClassBody {
 
     @Override
     public ClassBody addMember(ClassMember member) {
-        List<ClassMember> l =
-                new ArrayList<ClassMember>(this.members.size() + 1);
+        List<ClassMember> l = new ArrayList<>(this.members.size() + 1);
         l.addAll(this.members);
         l.add(member);
         return members(l);
@@ -120,8 +119,7 @@ public class ClassBody_c extends Term_c implements ClassBody {
     protected void duplicateFieldCheck(TypeChecker tc) throws SemanticException {
         ClassType type = tc.context().currentClass();
 
-        ArrayList<FieldInstance> l =
-                new ArrayList<FieldInstance>(type.fields());
+        List<FieldInstance> l = new ArrayList<>(type.fields());
 
         for (int i = 0; i < l.size(); i++) {
             FieldInstance fi = l.get(i);
@@ -141,8 +139,7 @@ public class ClassBody_c extends Term_c implements ClassBody {
             throws SemanticException {
         ClassType type = tc.context().currentClass();
 
-        ArrayList<ConstructorInstance> l =
-                new ArrayList<ConstructorInstance>(type.constructors());
+        List<ConstructorInstance> l = new ArrayList<>(type.constructors());
 
         for (int i = 0; i < l.size(); i++) {
             ConstructorInstance ci = l.get(i);
@@ -163,8 +160,7 @@ public class ClassBody_c extends Term_c implements ClassBody {
         ClassType type = tc.context().currentClass();
         TypeSystem ts = tc.typeSystem();
 
-        ArrayList<MethodInstance> l =
-                new ArrayList<MethodInstance>(type.methods());
+        List<MethodInstance> l = new ArrayList<>(type.methods());
 
         for (int i = 0; i < l.size(); i++) {
             MethodInstance mi = l.get(i);
@@ -184,7 +180,7 @@ public class ClassBody_c extends Term_c implements ClassBody {
             throws SemanticException {
         ClassType type = tc.context().currentClass();
 
-        ArrayList<ClassType> l = new ArrayList<ClassType>(type.memberClasses());
+        List<ClassType> l = new ArrayList<>(type.memberClasses());
 
         for (int i = 0; i < l.size(); i++) {
             ClassType mi = l.get(i);

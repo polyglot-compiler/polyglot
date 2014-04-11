@@ -328,7 +328,7 @@ public abstract class Assign_c extends Expr_c implements Assign {
 
     @Override
     public List<Type> throwTypes(TypeSystem ts) {
-        List<Type> l = new LinkedList<Type>();
+        List<Type> l = new LinkedList<>();
 
         if (throwsArithmeticException()) {
             l.add(ts.ArithmeticException());

@@ -67,7 +67,7 @@ public class SerialVersionUID implements Serializable {
             md.update((byte) (externalizable ? 1 : 0));
 
             // Go through fields in alphabetical order.
-            Set<Field> fields = new TreeSet<Field>(new Comparator<Field>() {
+            Set<Field> fields = new TreeSet<>(new Comparator<Field>() {
                 @Override
                 public int compare(Field f1, Field f2) {
                     return f1.getName().compareTo(f2.getName());

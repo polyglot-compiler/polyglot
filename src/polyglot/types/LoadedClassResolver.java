@@ -71,7 +71,7 @@ public class LoadedClassResolver implements TopLevelResolver {
         this.te = new TypeEncoder(extInfo.typeSystem());
         this.loader = extInfo.classFileLoader();
         this.version = extInfo.version();
-        this.nocache = new HashSet<String>();
+        this.nocache = new HashSet<>();
         this.allowRawClasses = allowRawClasses;
     }
 

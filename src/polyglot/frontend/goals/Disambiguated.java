@@ -48,7 +48,7 @@ public class Disambiguated extends VisitorGoal {
 
     @Override
     public Collection<Goal> prerequisiteGoals(Scheduler scheduler) {
-        List<Goal> l = new ArrayList<Goal>();
+        List<Goal> l = new ArrayList<>();
         l.add(scheduler.ImportTableInitialized(job));
         l.addAll(super.prerequisiteGoals(scheduler));
         return l;

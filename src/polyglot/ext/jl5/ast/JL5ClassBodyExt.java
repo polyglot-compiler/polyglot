@@ -90,7 +90,7 @@ public class JL5ClassBodyExt extends JL5TermExt {
 
     public List<EnumConstantDecl> enumConstantDecls() {
         ClassBody cb = (ClassBody) this.node();
-        List<EnumConstantDecl> ecds = new ArrayList<EnumConstantDecl>();
+        List<EnumConstantDecl> ecds = new ArrayList<>();
         for (ClassMember m : cb.members()) {
             if (m instanceof EnumConstantDecl) {
                 ecds.add((EnumConstantDecl) m);

@@ -136,7 +136,7 @@ public class FieldAssign_c extends Assign_c implements FieldAssign {
 
     @Override
     public List<Type> throwTypes(TypeSystem ts) {
-        List<Type> l = new ArrayList<Type>(super.throwTypes(ts));
+        List<Type> l = new ArrayList<>(super.throwTypes(ts));
 
         Field f = left();
         if (f.target() instanceof Expr) {

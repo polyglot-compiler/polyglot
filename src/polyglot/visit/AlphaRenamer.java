@@ -92,12 +92,12 @@ public class AlphaRenamer extends NodeVisitor {
         super(nf.lang());
         this.nf = nf;
 
-        this.setStack = new Stack<Set<String>>();
+        this.setStack = new Stack<>();
         this.setStack.push(new HashSet<String>());
 
-        this.renamingMap = new HashMap<String, String>();
-        this.localInstanceMemo = new HashMap<String, LocalInstance>();
-        this.freshVars = new HashSet<String>();
+        this.renamingMap = new HashMap<>();
+        this.localInstanceMemo = new HashMap<>();
+        this.freshVars = new HashSet<>();
 
         this.renameCatchFormals = renameCatchFormals;
         this.createNewLocalInstances = createNewLocalInstances;

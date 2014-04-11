@@ -65,7 +65,7 @@ public class Annotations_c extends TypeObject_c implements Annotations {
 
     @Override
     public Set<Type> retainedAnnotationTypes() {
-        Set<Type> retAnnType = new LinkedHashSet<Type>(annotations.keySet());
+        Set<Type> retAnnType = new LinkedHashSet<>(annotations.keySet());
         JL5TypeSystem ts = (JL5TypeSystem) this.typeSystem();
         for (Iterator<Type> iter = retAnnType.iterator(); iter.hasNext();) {
             Type t = iter.next();

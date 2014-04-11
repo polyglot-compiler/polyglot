@@ -74,13 +74,11 @@ public class ExtFileManager extends
     /** Map of sources already loaded */
     protected final Map<String, FileSource> loadedSources;
     /** A cache for package look ups */
-    protected static final Map<String, Boolean> packageCache =
-            new HashMap<String, Boolean>();
+    protected static final Map<String, Boolean> packageCache = new HashMap<>();
     /** A cache for the class files that don't exist */
-    protected static final Set<String> nocache = new HashSet<String>();
+    protected static final Set<String> nocache = new HashSet<>();
 
-    protected static final Map<File, Object> zipCache =
-            new HashMap<File, Object>();
+    protected static final Map<File, Object> zipCache = new HashMap<>();
 
     protected static final Object not_found = new Object();
 
@@ -89,7 +87,7 @@ public class ExtFileManager extends
     protected static final Collection<String> report_topics =
             CollectionUtil.list(Report.types, Report.resolver, Report.loader);
 
-    protected static final Set<Kind> ALL_KINDS = new HashSet<Kind>();
+    protected static final Set<Kind> ALL_KINDS = new HashSet<>();
     static {
         ALL_KINDS.add(Kind.CLASS);
         ALL_KINDS.add(Kind.SOURCE);
@@ -122,8 +120,8 @@ public class ExtFileManager extends
     public ExtFileManager(ExtensionInfo extInfo) {
         super(javaCompiler.getStandardFileManager(null, null, null));
         this.extInfo = extInfo;
-        loadedSources = new HashMap<String, FileSource>();
-        objectMap = new HashMap<Location, Map<String, JavaFileObject>>();
+        loadedSources = new HashMap<>();
+        objectMap = new HashMap<>();
         inMemory = extInfo.getOptions().noOutputToFS;
         List<Location> defaultLocations = extInfo.defaultLocations();
         if (!defaultLocations.equals(default_locations)) {
@@ -183,7 +181,7 @@ public class ExtFileManager extends
                     new ExtFileObject(src, kindFromExtension(relativeName));
             Map<String, JavaFileObject> locMap = objectMap.get(location);
             if (locMap == null) {
-                locMap = new HashMap<String, JavaFileObject>();
+                locMap = new HashMap<>();
                 objectMap.put(location, locMap);
             }
             locMap.put(key, jfo);
@@ -693,7 +691,7 @@ public class ExtFileManager extends
     protected static Collection<String> verbose;
 
     static {
-        verbose = new HashSet<String>();
+        verbose = new HashSet<>();
         verbose.add("filemanager");
     }
 }

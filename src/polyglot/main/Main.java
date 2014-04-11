@@ -137,7 +137,7 @@ public class Main {
 
     public void start(String[] argv, ExtensionInfo ext, ErrorQueue eq)
             throws TerminationException {
-        source = new LinkedHashSet<String>();
+        source = new LinkedHashSet<>();
         List<String> args = explodeOptions(argv);
         if (ext == null) {
             ext = getExtensionInfo(args);
@@ -207,11 +207,11 @@ public class Main {
             QuotedStringTokenizer st =
                     new QuotedStringTokenizer(options.post_compiler_opts);
             int pc_size = st.countTokens();
-            postCompilerArgs = new ArrayList<String>(pc_size + 1);
+            postCompilerArgs = new ArrayList<>(pc_size + 1);
             while (st.hasMoreTokens())
                 postCompilerArgs.add(st.nextToken());
         }
-        else postCompilerArgs = new ArrayList<String>(1);
+        else postCompilerArgs = new ArrayList<>(1);
         if (options.generate_debugging_info) postCompilerArgs.add("-g");
         return postCompilerArgs;
     }
@@ -294,10 +294,8 @@ public class Main {
                     Runtime runtime = Runtime.getRuntime();
                     Process proc = runtime.exec(javacCmd);
 
-                    InputStreamReader err =
-                            new InputStreamReader(proc.getErrorStream());
-
-                    try {
+                    try (InputStreamReader err =
+                            new InputStreamReader(proc.getErrorStream())) {
                         char[] c = new char[72];
                         int len;
                         StringBuffer sb = new StringBuffer();
@@ -307,9 +305,6 @@ public class Main {
                         if (sb.length() != 0)
                             eq.enqueue(ErrorInfo.POST_COMPILER_ERROR,
                                        sb.toString());
-                    }
-                    finally {
-                        err.close();
                     }
 
                     proc.waitFor();
@@ -336,15 +331,14 @@ public class Main {
 
     private static List<String> explodeOptions(String[] args)
             throws TerminationException {
-        LinkedList<String> ll = new LinkedList<String>();
+        LinkedList<String> ll = new LinkedList<>();
 
         for (String arg : args) {
             // special case for the @ command-line parameter
             if (arg.startsWith("@")) {
                 String fn = arg.substring(1);
-                try {
-                    BufferedReader lr = new BufferedReader(new FileReader(fn));
-                    LinkedList<String> newArgs = new LinkedList<String>();
+                try (BufferedReader lr = new BufferedReader(new FileReader(fn))) {
+                    LinkedList<String> newArgs = new LinkedList<>();
 
                     while (true) {
                         String l = lr.readLine();
@@ -355,7 +349,6 @@ public class Main {
                             newArgs.add(st.nextToken());
                     }
 
-                    lr.close();
                     ll.addAll(newArgs);
                 }
                 catch (java.io.IOException e) {
@@ -416,7 +409,7 @@ public class Main {
         return null;
     }
 
-    static private Collection<String> timeTopics = new ArrayList<String>(1);
+    static private Collection<String> timeTopics = new ArrayList<>(1);
     static {
         timeTopics.add("time");
     }

@@ -81,7 +81,7 @@ public abstract class AbstractBlock_c extends Stmt_c implements Block {
 
     @Override
     public Block append(Stmt stmt) {
-        List<Stmt> l = new ArrayList<Stmt>(statements.size() + 1);
+        List<Stmt> l = new ArrayList<>(statements.size() + 1);
         l.addAll(statements);
         l.add(stmt);
         return statements(l);
@@ -89,7 +89,7 @@ public abstract class AbstractBlock_c extends Stmt_c implements Block {
 
     @Override
     public Block prepend(Stmt stmt) {
-        List<Stmt> l = new ArrayList<Stmt>(statements.size() + 1);
+        List<Stmt> l = new ArrayList<>(statements.size() + 1);
         l.add(stmt);
         l.addAll(statements);
         return statements(l);

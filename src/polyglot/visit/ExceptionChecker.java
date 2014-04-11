@@ -113,7 +113,7 @@ public class ExceptionChecker extends ErrorHandlingVisitor {
 
     public ExceptionChecker push(Collection<? extends Type> catchableTypes) {
         ExceptionChecker ec = this.push();
-        ec.catchable = new HashSet<Type>(catchableTypes);
+        ec.catchable = new HashSet<>(catchableTypes);
         ec.throwsSet = new SubtypeSet(ts.Throwable());
         return ec;
     }

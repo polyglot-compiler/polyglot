@@ -56,7 +56,7 @@ public class CUPSpec extends Spec {
         prec = precedence;
         start = startSym;
         productions = prods;
-        ntProds = new Hashtable<String, Integer>();
+        ntProds = new Hashtable<>();
         hashNonterminals();
     }
 
@@ -103,7 +103,7 @@ public class CUPSpec extends Spec {
             for (int j = 0; j < sourceRHSList.size(); j++) {
                 Vector<GrammarPart> source = sourceRHSList.elementAt(j);
                 if (Production.isSameProduction(toMatch, source)) {
-                    Vector<GrammarPart> clone = new Vector<GrammarPart>();
+                    Vector<GrammarPart> clone = new Vector<>();
                     for (int k = 0; k < source.size(); k++) {
                         clone.addElement((GrammarPart) source.elementAt(k)
                                                              .clone());
@@ -134,12 +134,12 @@ public class CUPSpec extends Spec {
         String newPkgName =
                 (packageName == null) ? null : packageName.toString();
         /*******************/
-        Vector<String> newImports = new Vector<String>();
+        Vector<String> newImports = new Vector<>();
         for (int i = 0; i < imports.size(); i++) {
             newImports.addElement(imports.elementAt(i).toString());
         }
         /*******************/
-        Vector<Code> newCode = new Vector<Code>();
+        Vector<Code> newCode = new Vector<>();
         if (actionCode != null) newCode.addElement(actionCode);
         if (initCode != null) newCode.addElement(initCode);
         if (parserCode != null) newCode.addElement(parserCode);
@@ -148,19 +148,19 @@ public class CUPSpec extends Spec {
         	newCode.addElement( ((Code) code.elementAt(i)).clone());
         }*/
         /*******************/
-        Vector<SymbolList> newSymbols = new Vector<SymbolList>();
+        Vector<SymbolList> newSymbols = new Vector<>();
         for (int i = 0; i < symbols.size(); i++) {
             newSymbols.addElement((SymbolList) symbols.elementAt(i).clone());
         }
         /*******************/
-        Vector<Precedence> newPrec = new Vector<Precedence>();
+        Vector<Precedence> newPrec = new Vector<>();
         for (int i = 0; i < prec.size(); i++) {
             newPrec.addElement((Precedence) prec.elementAt(i).clone());
         }
         /*******************/
         String newStart = (start == null) ? null : start.toString();
         /*******************/
-        Vector<Production> newProductions = new Vector<Production>();
+        Vector<Production> newProductions = new Vector<>();
         for (int i = 0; i < productions.size(); i++) {
             newProductions.addElement((Production) productions.elementAt(i)
                                                               .clone());

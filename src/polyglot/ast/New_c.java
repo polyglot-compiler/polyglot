@@ -274,7 +274,7 @@ public class New_c extends Expr_c implements New, NewOps {
         New_c n = this;
         TypeSystem ts = tb.typeSystem();
 
-        List<Type> l = new ArrayList<Type>(n.arguments.size());
+        List<Type> l = new ArrayList<>(n.arguments.size());
         for (int i = 0; i < n.arguments.size(); i++) {
             l.add(ts.unknownType(position()));
         }
@@ -488,7 +488,7 @@ public class New_c extends Expr_c implements New, NewOps {
     public Node typeCheck(TypeChecker tc) throws SemanticException {
         TypeSystem ts = tc.typeSystem();
 
-        List<Type> argTypes = new ArrayList<Type>(arguments.size());
+        List<Type> argTypes = new ArrayList<>(arguments.size());
 
         for (Expr e : arguments) {
             argTypes.add(e.type());
@@ -814,7 +814,7 @@ public class New_c extends Expr_c implements New, NewOps {
 
     @Override
     public List<Type> throwTypes(TypeSystem ts) {
-        List<Type> l = new LinkedList<Type>();
+        List<Type> l = new LinkedList<>();
         l.addAll(ci.throwTypes());
         l.addAll(ts.uncheckedExceptions());
         return l;

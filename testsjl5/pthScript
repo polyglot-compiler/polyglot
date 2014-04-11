@@ -412,7 +412,7 @@ polyglot.ext.jl5.JL5ExtensionInfo "-d out -classpath java-out -assert -noserial 
 	Conditional10.jl5 (Semantic, "does not match");
 	Conditional11.jl5;
         Conditional12.jl5;
-	CaptureConversion01.jl5 (Post, "Xlint");
+	CaptureConversion01.jl5;
         NumericConversion01.jl5 (Semantic, "does not match");
         PermissiveCasts01.jl5 (Semantic, "does not match"),(Semantic, "does not match"),
                               (Semantic, "Cannot cast"),(Semantic, "Cannot cast"),

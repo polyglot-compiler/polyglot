@@ -45,8 +45,7 @@ public class lalr_item_set {
     /** A hash table to implement the set.  We store the items using themselves
      *  as keys. 
      */
-    protected Hashtable<lalr_item, lalr_item> _all =
-            new Hashtable<lalr_item, lalr_item>(11);
+    protected Hashtable<lalr_item, lalr_item> _all = new Hashtable<>(11);
 
     /** Access to all elements of the set. */
     public Enumeration<lalr_item> all() {

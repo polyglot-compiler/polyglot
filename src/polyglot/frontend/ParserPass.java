@@ -54,8 +54,7 @@ public class ParserPass extends AbstractPass {
 
         FileSource source = (FileSource) goal.job().source();
 
-        try {
-            Reader reader = source.openReader(false);
+        try (Reader reader = source.openReader(false)) {
 
             Parser p = goal.job().extensionInfo().parser(reader, source, eq);
 
@@ -63,8 +62,6 @@ public class ParserPass extends AbstractPass {
                 Report.report(2, "Using parser " + p);
 
             Node ast = p.parse();
-
-            reader.close();
 
             if (ast != null) {
                 goal.job().ast(ast);

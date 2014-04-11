@@ -246,7 +246,7 @@ public class EnumConstantDecl_c extends Term_c implements EnumConstantDecl {
     public Node buildTypes(TypeBuilder tb) throws SemanticException {
         JL5TypeSystem ts = (JL5TypeSystem) tb.typeSystem();
 
-        List<UnknownType> l = new ArrayList<UnknownType>(args().size());
+        List<UnknownType> l = new ArrayList<>(args().size());
         for (int i = 0; i < args().size(); i++) {
             l.add(ts.unknownType(position()));
         }
@@ -301,7 +301,7 @@ public class EnumConstantDecl_c extends Term_c implements EnumConstantDecl {
         Context c = tc.context();
         JL5ParsedClassType ct = (JL5ParsedClassType) c.currentClass();
 
-        List<Type> argTypes = new LinkedList<Type>();
+        List<Type> argTypes = new LinkedList<>();
         for (Expr e : this.args) {
             argTypes.add(e.type());
         }

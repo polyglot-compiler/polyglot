@@ -250,7 +250,7 @@ public class Try_c extends Stmt_c implements Try, TryOps {
         }
 
         // now visit the catch blocks, using the original exception checker
-        List<Catch> catchBlocks = new ArrayList<Catch>(this.catchBlocks.size());
+        List<Catch> catchBlocks = new ArrayList<>(this.catchBlocks.size());
 
         for (Catch cb : this.catchBlocks) {
             cb = this.visitChild(cb, ec.push());

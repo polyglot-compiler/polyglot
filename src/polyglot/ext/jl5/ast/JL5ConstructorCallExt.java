@@ -89,7 +89,7 @@ public class JL5ConstructorCallExt extends JL5ProcedureCallExt {
             if (cc.arguments().isEmpty()) {
                 // this is an enum decl, so we need to replace a call to the default
                 // constructor with a call to java.lang.Enum.Enum(String, int)
-                List<Expr> args = new ArrayList<Expr>(2);// XXX the right thing to do is change the type of java.lang.Enum instead of adding these dummy params
+                List<Expr> args = new ArrayList<>(2);// XXX the right thing to do is change the type of java.lang.Enum instead of adding these dummy params
                 args.add(ar.nodeFactory().NullLit(Position.compilerGenerated()));
                 args.add(ar.nodeFactory().IntLit(Position.compilerGenerated(),
                                                  IntLit.INT,
@@ -215,7 +215,7 @@ public class JL5ConstructorCallExt extends JL5ProcedureCallExt {
             // we differ here from the implementation in ConstructorCall_c in that we do not modify the qualifier
         }
 
-        List<Type> argTypes = new LinkedList<Type>();
+        List<Type> argTypes = new LinkedList<>();
 
         for (Expr e : n.arguments()) {
             if (!e.isDisambiguated()) {

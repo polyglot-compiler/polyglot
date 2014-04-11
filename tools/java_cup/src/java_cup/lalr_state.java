@@ -85,7 +85,7 @@ public class lalr_state {
 
     /** Collection of all states. */
     protected static Hashtable<lalr_item_set, lalr_state> _all =
-            new Hashtable<lalr_item_set, lalr_state>();
+            new Hashtable<>();
 
     /** Collection of all states. */
     public static Enumeration<lalr_state> all() {
@@ -113,7 +113,7 @@ public class lalr_state {
      *  stores state objects using (a copy of) their kernel item sets as keys. 
      */
     protected static Hashtable<lalr_item_set, lalr_state> _all_kernels =
-            new Hashtable<lalr_item_set, lalr_state>();
+            new Hashtable<>();
 
     /*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . .*/
 
@@ -289,7 +289,7 @@ public class lalr_state {
         lalr_item_set new_items;
         lalr_item_set linked_items;
         lalr_item_set kernel;
-        Stack<lalr_state> work_stack = new Stack<lalr_state>();
+        Stack<lalr_state> work_stack = new Stack<>();
         lalr_state st, new_st;
         symbol_set outgoing;
         lalr_item itm, new_itm, existing, fix_itm;
@@ -938,11 +938,11 @@ public class lalr_state {
      * path.
      */
     protected Path shortest_path(lalr_item itm) throws internal_error {
-        HashSet<StateItem> visited = new HashSet<StateItem>(); /* of StateItem */
-        LinkedList<Path> active = new LinkedList<Path>(); /* of paths */
+        HashSet<StateItem> visited = new HashSet<>();
+        LinkedList<Path> active = new LinkedList<>();
         StateItem start = new StateItem(start_state, start_itm);
 
-        Path p = new Path(new LinkedList<Object>(), start);
+        Path p = new Path(new LinkedList<>(), start);
         active.add(p);
         while (!active.isEmpty()) {
             Path p1 = active.removeFirst();
@@ -960,7 +960,7 @@ public class lalr_state {
                     tr.next()) {
                 if (tr.on_symbol().equals(i.symbol_after_dot())) {
                     lalr_item i2 = i.shift();
-                    LinkedList<Object> newt = new LinkedList<Object>(p1.steps);
+                    LinkedList<Object> newt = new LinkedList<>(p1.steps);
                     newt.add(tr);
                     Path p2 = new Path(newt, new StateItem(tr.to_state(), i2));
                     active.add(p2);
@@ -976,7 +976,7 @@ public class lalr_state {
                     lalr_item i2 =
                             new lalr_item(prod,
                                           new terminal_set(new_lookaheads));
-                    LinkedList<Object> newt = new LinkedList<Object>(p1.steps);
+                    LinkedList<Object> newt = new LinkedList<>(p1.steps);
                     newt.add(prod);
                     Path p2 = new Path(newt, new StateItem(s, i2));
                     active.add(p2);

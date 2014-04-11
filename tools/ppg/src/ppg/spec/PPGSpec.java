@@ -145,7 +145,7 @@ public class PPGSpec extends Spec {
         parseCode += "Symbol " + currSymbolName + ";\n\n";
 
         // Generate token names
-        Vector<String> tokens = new Vector<String>();
+        Vector<String> tokens = new Vector<>();
         for (int i = 0; i < startSyms.size(); i += 2) {
             tokens.addElement("JLGEN_TOKEN_" + String.valueOf(i / 2));
         }
@@ -188,28 +188,28 @@ public class PPGSpec extends Spec {
         // set start symbol
         cupSpec.setStart(newStartSym);
         Nonterminal startNT = new Nonterminal(newStartSym, null);
-        Vector<String> newSymbols = new Vector<String>();
+        Vector<String> newSymbols = new Vector<>();
         newSymbols.addElement(newStartSym);
 
         // add start symbol to the grammar
         SymbolList sl =
                 new SymbolList(SymbolList.NONTERMINAL, null, newSymbols);
-        Vector<SymbolList> addedSymbols = new Vector<SymbolList>();
+        Vector<SymbolList> addedSymbols = new Vector<>();
         addedSymbols.addElement(sl);
         cupSpec.addSymbols(addedSymbols);
 
         // add token declaration to the grammar
         SymbolList tokenList =
                 new SymbolList(SymbolList.TERMINAL, "Symbol", tokens);
-        Vector<SymbolList> addedTokens = new Vector<SymbolList>();
+        Vector<SymbolList> addedTokens = new Vector<>();
         addedTokens.addElement(tokenList);
         cupSpec.addSymbols(addedTokens);
 
-        Vector<Vector<GrammarPart>> rhs = new Vector<Vector<GrammarPart>>();
+        Vector<Vector<GrammarPart>> rhs = new Vector<>();
 
         //String grammarPatch = newStartSym + " ::=\n";
         for (int i = 0; i < startSyms.size(); i += 2) {
-            Vector<GrammarPart> rhsPart = new Vector<GrammarPart>();
+            Vector<GrammarPart> rhsPart = new Vector<>();
             startSym = startSyms.elementAt(i);
             token = tokens.elementAt(i / 2); //startSyms.elementAt(i+2); 
             //if (i > 0) grammarPatch += "|";
@@ -253,11 +253,13 @@ public class PPGSpec extends Spec {
                 simpleName = file.getName();
             }
 
-            Lexer lex = new Lexer(new InputStreamReader(is), simpleName);
-            Parser parser = new Parser(simpleName, lex);
+            try (InputStreamReader reader = new InputStreamReader(is)) {
+                Lexer lex = new Lexer(reader, simpleName);
+                Parser parser = new Parser(simpleName, lex);
 
-            PPG.DEBUG("parsing " + simpleName);
-            parser.parse();
+                PPG.DEBUG("parsing " + simpleName);
+                parser.parse();
+            }
             parent = (Spec) Parser.getProgramNode();
             is.close();
 

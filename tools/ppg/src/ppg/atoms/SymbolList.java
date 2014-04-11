@@ -25,7 +25,7 @@
  ******************************************************************************/
 package ppg.atoms;
 
-import java.util.*;
+import java.util.Vector;
 
 public class SymbolList {
     public static final int TERMINAL = 0;
@@ -55,7 +55,7 @@ public class SymbolList {
     @Override
     public Object clone() {
         String newType = (type == null) ? null : type.toString();
-        Vector<String> newSyms = new Vector<String>();
+        Vector<String> newSyms = new Vector<>();
         for (int i = 0; i < symbols.size(); i++) {
             newSyms.addElement(symbols.elementAt(i).toString());
         }

@@ -71,7 +71,7 @@ public class RemoveExtendedFors extends ContextVisitor {
     /** track how many iterator variables we have created in this CodeDecl
      * 
      */
-    private LinkedList<Integer> varCount = new LinkedList<Integer>();
+    private LinkedList<Integer> varCount = new LinkedList<>();
 
     @Override
     protected NodeVisitor enterCall(Node n) throws SemanticException {
@@ -94,7 +94,7 @@ public class RemoveExtendedFors extends ContextVisitor {
         }
         if (n instanceof Labeled && !(parent instanceof Labeled)) {
             Node s = n;
-            List<String> labels = new ArrayList<String>();
+            List<String> labels = new ArrayList<>();
             while (s instanceof Labeled) {
                 Labeled lbled = (Labeled) s;
                 labels.add(lbled.label());
@@ -155,7 +155,7 @@ public class RemoveExtendedFors extends ContextVisitor {
         }
 
         // create the loop body
-        List<Stmt> loopBody = new ArrayList<Stmt>();
+        List<Stmt> loopBody = new ArrayList<>();
         {
             Id id = nodeFactory().Id(pos, "next");
             Call call =
@@ -231,7 +231,7 @@ public class RemoveExtendedFors extends ContextVisitor {
         Type iteratedType = decl.type().type();
         // translate "L1,...,Ln: for (C x: e) b" to 
         // "{ C[] arr = e; int iter = 0;  L1,...,Ln: while (iter < arr.length)  { C x = arr[iter]; iter = iter + 1; b; }"
-        List<Stmt> stmts = new ArrayList<Stmt>();
+        List<Stmt> stmts = new ArrayList<>();
 
         // add the declaration of arr: "C[] arr = e"
         String arrID = freshName("arr");

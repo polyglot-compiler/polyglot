@@ -179,8 +179,7 @@ public class JL5Context_c extends Context_c implements JL5Context {
 
     @Override
     public void addTypeVariable(TypeVariable type) {
-        if (typeVars == null)
-            typeVars = new LinkedHashMap<String, TypeVariable>();
+        if (typeVars == null) typeVars = new LinkedHashMap<>();
         typeVars.put(type.name(), type);
     }
 

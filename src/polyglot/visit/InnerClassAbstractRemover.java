@@ -86,7 +86,7 @@ public abstract class InnerClassAbstractRemover extends ContextVisitor {
             superEnv = env((ClassType) ct.superType(), true);
         }
 
-        List<ClassType> env = new ArrayList<ClassType>();
+        List<ClassType> env = new ArrayList<>();
 
         for (ClassType outer = ct.outer();; outer = outer.outer()) {
             env.add(outer);
@@ -105,7 +105,7 @@ public abstract class InnerClassAbstractRemover extends ContextVisitor {
             return env;
         }
 
-        List<ClassType> l = new ArrayList<ClassType>();
+        List<ClassType> l = new ArrayList<>();
         l.addAll(env);
         l.addAll(superEnv);
         return l;
@@ -116,7 +116,7 @@ public abstract class InnerClassAbstractRemover extends ContextVisitor {
     }
 
     List<Formal> envAsFormals(List<ClassType> env) {
-        List<Formal> formals = new ArrayList<Formal>();
+        List<Formal> formals = new ArrayList<>();
         int arg = 1;
         for (ClassType ct : env) {
             LocalInstance li =
@@ -149,7 +149,7 @@ public abstract class InnerClassAbstractRemover extends ContextVisitor {
      * @see polyglot.visit.InnerClassAbstractRemover#env(ClassType, boolean)
      */
     List<Expr> envAsActuals(List<ClassType> env, ClassType outer, Expr qualifier) {
-        List<Expr> actuals = new ArrayList<Expr>();
+        List<Expr> actuals = new ArrayList<>();
         for (ClassType ct : env) {
             if (outer != null && qualifier != null && ct.equals(outer)) {
                 actuals.add(qualifier);

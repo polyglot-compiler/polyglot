@@ -61,8 +61,8 @@ public class JL5ParsedClassType_c extends ParsedClassType_c implements
     public JL5ParsedClassType_c(TypeSystem ts, LazyClassInitializer init,
             Source fromSource) {
         super(ts, init, fromSource);
-        this.annotationElems = new LinkedList<AnnotationTypeElemInstance>();
-        this.enumConstants = new LinkedList<EnumInstance>();
+        this.annotationElems = new LinkedList<>();
+        this.enumConstants = new LinkedList<>();
     }
 
     @Override
@@ -118,7 +118,7 @@ public class JL5ParsedClassType_c extends ParsedClassType_c implements
     // find methods with compatible name and formals as the given one
     @Override
     public List<? extends JL5MethodInstance> methods(JL5MethodInstance mi) {
-        List<JL5MethodInstance> l = new LinkedList<JL5MethodInstance>();
+        List<JL5MethodInstance> l = new LinkedList<>();
 
         for (JL5MethodInstance pi : methodsNamed(mi.name())) {
             if (pi.hasFormals(mi.formalTypes())) {
@@ -167,7 +167,7 @@ public class JL5ParsedClassType_c extends ParsedClassType_c implements
         JL5TypeSystem ts = (JL5TypeSystem) this.ts;
         LinkedList<Type> chain = null;
         if (ts.isSubtype(this, toType)) {
-            chain = new LinkedList<Type>();
+            chain = new LinkedList<>();
             chain.add(this);
             chain.add(toType);
         }

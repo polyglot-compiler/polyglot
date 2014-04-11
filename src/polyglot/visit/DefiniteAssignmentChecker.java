@@ -120,20 +120,19 @@ public class DefiniteAssignmentChecker extends
          * in createInitialItem(). 
          * */
         public Map<FieldInstance, AssignmentStatus> currClassFinalFieldAssStatuses =
-                new HashMap<FieldInstance, AssignmentStatus>();
+                new HashMap<>();
         /**
          * List of all the constructors. These will be checked once all the
          * initializer blocks have been processed.
          */
-        public List<ConstructorDecl> allConstructors =
-                new ArrayList<ConstructorDecl>();
+        public List<ConstructorDecl> allConstructors = new ArrayList<>();
 
         /**
          * Set of all constructors that cannot terminate normally. This is a subset
          * of the complete list of constructors, i.e. of this.allConstructors.
          */
         public Set<ConstructorDecl> constructorsCannotTerminateNormally =
-                new HashSet<ConstructorDecl>();
+                new HashSet<>();
 
         /**
          * Map from ConstructorInstances to ConstructorInstances detailing
@@ -141,7 +140,7 @@ public class DefiniteAssignmentChecker extends
          * This is used in checking the initialization of final fields.
          */
         public Map<ConstructorInstance, ConstructorInstance> constructorCalls =
-                new HashMap<ConstructorInstance, ConstructorInstance>();
+                new HashMap<>();
 
         /**
          * Map from ConstructorInstances to Sets of FieldInstances, detailing
@@ -149,15 +148,14 @@ public class DefiniteAssignmentChecker extends
          * This is used in checking the initialization of final fields.
          */
         public Map<ConstructorInstance, Set<FieldInstance>> fieldsConstructorInitializes =
-                new HashMap<ConstructorInstance, Set<FieldInstance>>();
+                new HashMap<>();
 
         /**
          * Set of LocalInstances from the outer class body that were used
          * during the declaration of this class. We need to track this
          * in order to correctly populate {@code localsUsedInClassBodies}
          */
-        public Set<LocalInstance> outerLocalsUsed =
-                new HashSet<LocalInstance>();
+        public Set<LocalInstance> outerLocalsUsed = new HashSet<>();
 
         /**
          * Map from {@code ClassBody}s to {@code Set}s of 
@@ -170,7 +168,7 @@ public class DefiniteAssignmentChecker extends
          * declaration of C. 
          */
         public Map<ClassBody, Set<LocalInstance>> localsUsedInClassBodies =
-                new HashMap<ClassBody, Set<LocalInstance>>();
+                new HashMap<>();
 
         /**
          * Set of LocalInstances that we have seen declarations for in this 
@@ -179,8 +177,7 @@ public class DefiniteAssignmentChecker extends
          * their own initialization) or are locals declared in an enclosing 
          * class.
          */
-        public Set<LocalInstance> localDeclarations =
-                new HashSet<LocalInstance>();
+        public Set<LocalInstance> localDeclarations = new HashSet<>();
     }
 
     /**
@@ -305,7 +302,7 @@ public class DefiniteAssignmentChecker extends
     @Override
     protected FlowGraph<FlowItem> initGraph(CodeNode code, Term root) {
         currCBI.currCodeDecl = code;
-        return new FlowGraph<FlowItem>(root, forward);
+        return new FlowGraph<>(root, forward);
     }
 
     /**
@@ -528,7 +525,7 @@ public class DefiniteAssignmentChecker extends
      */
     protected void dataflow(Expr root) throws SemanticException {
         // Build the control flow graph.
-        FlowGraph<FlowItem> g = new FlowGraph<FlowItem>(root, forward);
+        FlowGraph<FlowItem> g = new FlowGraph<>(root, forward);
         CFGBuilder<FlowItem> v = createCFGBuilder(ts, g);
         v.visitGraph();
         dataflow(g);
@@ -555,7 +552,7 @@ public class DefiniteAssignmentChecker extends
     @Override
     protected CFGBuilder<FlowItem> createCFGBuilder(TypeSystem ts,
             FlowGraph<FlowItem> g) {
-        CFGBuilder<FlowItem> v = new CFGBuilder<FlowItem>(lang(), ts, g, this);
+        CFGBuilder<FlowItem> v = new CFGBuilder<>(lang(), ts, g, this);
         // skip dead loops bodies and dead if branches. See JLS 2nd edition, Section 16.
 //        v = v.skipDeadIfBranches(true);
 //        v = v.skipDeadLoopBodies(true);
@@ -608,8 +605,7 @@ public class DefiniteAssignmentChecker extends
         for (FlowItem itm : inItems) {
             if (itm == BOTTOM) continue;
             if (m == null) {
-                m =
-                        new HashMap<VarInstance, AssignmentStatus>(itm.assignmentStatus);
+                m = new HashMap<>(itm.assignmentStatus);
             }
             else {
                 Map<VarInstance, AssignmentStatus> n = itm.assignmentStatus;
@@ -667,7 +663,7 @@ public class DefiniteAssignmentChecker extends
                 LocalDecl ld = (LocalDecl) n;
                 if (inItem.assignmentStatus.containsKey(ld.localInstance())) {
                     Map<VarInstance, AssignmentStatus> newAssStatus =
-                            new HashMap<VarInstance, DefiniteAssignmentChecker.AssignmentStatus>(inItem.assignmentStatus);
+                            new HashMap<>(inItem.assignmentStatus);
 
                     newAssStatus.remove(ld.localInstance());
                     inItem = new FlowItem(newAssStatus);
@@ -764,14 +760,13 @@ public class DefiniteAssignmentChecker extends
             return m;
         }
 
-        Map<VarInstance, AssignmentStatus> assignmentStatus =
-                new HashMap<VarInstance, AssignmentStatus>();
+        Map<VarInstance, AssignmentStatus> assignmentStatus = new HashMap<>();
         for (VarInstance vi : fi.assignmentStatus.keySet()) {
             assignmentStatus.put(vi, assStatus);
         }
 
         FlowItem newFI = new FlowItem(assignmentStatus, fi.normalTermination);
-        Map<EdgeKey, FlowItem> newM = new HashMap<EdgeKey, FlowItem>(m);
+        Map<EdgeKey, FlowItem> newM = new HashMap<>(m);
         newM.put(ek, newFI);
         return newM;
     }
@@ -783,7 +778,7 @@ public class DefiniteAssignmentChecker extends
     protected Map<EdgeKey, FlowItem> flowFormal(FlowItem inItem,
             FlowGraph<FlowItem> graph, Formal f, Set<EdgeKey> succEdgeKeys) {
         Map<VarInstance, AssignmentStatus> m =
-                new HashMap<VarInstance, AssignmentStatus>(inItem.assignmentStatus);
+                new HashMap<>(inItem.assignmentStatus);
         // a formal argument is always defined.            
         m.put(f.localInstance().orig(), AssignmentStatus.ASS);
 
@@ -800,7 +795,7 @@ public class DefiniteAssignmentChecker extends
     protected Map<EdgeKey, FlowItem> flowLocalDecl(FlowItem inItem,
             FlowGraph<FlowItem> graph, LocalDecl ld, Set<EdgeKey> succEdgeKeys) {
         Map<VarInstance, AssignmentStatus> m =
-                new HashMap<VarInstance, AssignmentStatus>(inItem.assignmentStatus);
+                new HashMap<>(inItem.assignmentStatus);
         AssignmentStatus assStatus = m.get(ld.localInstance().orig());
         if (ld.init() != null) {
             // declaration of local var with initialization.
@@ -837,7 +832,7 @@ public class DefiniteAssignmentChecker extends
             FlowGraph<FlowItem> graph, LocalAssign a, Set<EdgeKey> succEdgeKeys) {
         Local l = a.left();
         Map<VarInstance, AssignmentStatus> m =
-                new HashMap<VarInstance, AssignmentStatus>(inItem.assignmentStatus);
+                new HashMap<>(inItem.assignmentStatus);
         AssignmentStatus initCount = m.get(l.localInstance().orig());
 
         initCount = AssignmentStatus.ASS;
@@ -858,7 +853,7 @@ public class DefiniteAssignmentChecker extends
             // this field is final and the target for this field is 
             // appropriate for what we are interested in.
             Map<VarInstance, AssignmentStatus> m =
-                    new HashMap<VarInstance, AssignmentStatus>(inItem.assignmentStatus);
+                    new HashMap<>(inItem.assignmentStatus);
             // m.get(fi.orig()) may be null if the field is defined in an
             // outer class. If so, ignore this assignment.
             if (m.get(fi.orig()) != null) {
@@ -1050,7 +1045,7 @@ public class DefiniteAssignmentChecker extends
         // of the initializations performed by initializers), then
         // the constructor does indeed initialize the field.
 
-        Set<FieldInstance> s = new HashSet<FieldInstance>();
+        Set<FieldInstance> s = new HashSet<>();
 
         // go through every final non-static field in dfOut.initStatus
         for (Entry<VarInstance, AssignmentStatus> e : dfOut.assignmentStatus.entrySet()) {

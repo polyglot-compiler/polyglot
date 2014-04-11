@@ -66,8 +66,7 @@ public class AmbUnionType extends TypeNode_c implements Ambiguous {
 
     @Override
     public Node visitChildren(NodeVisitor v) {
-        List<TypeNode> alternatives =
-                new ArrayList<TypeNode>(this.alternatives.size());
+        List<TypeNode> alternatives = new ArrayList<>(this.alternatives.size());
         for (TypeNode tn : this.alternatives) {
             alternatives.add(visitChild(tn, v));
         }
@@ -76,8 +75,7 @@ public class AmbUnionType extends TypeNode_c implements Ambiguous {
 
     @Override
     public Node disambiguate(AmbiguityRemover sc) throws SemanticException {
-        List<ReferenceType> types =
-                new ArrayList<ReferenceType>(this.alternatives.size());
+        List<ReferenceType> types = new ArrayList<>(this.alternatives.size());
         for (TypeNode tn : this.alternatives) {
             if (!tn.isDisambiguated()) {
                 return this;

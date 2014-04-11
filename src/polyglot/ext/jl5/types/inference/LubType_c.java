@@ -90,7 +90,7 @@ public class LubType_c extends ClassType_c implements LubType {
     }
 
     private ReferenceType lub(Type... a) {
-        List<ReferenceType> l = new ArrayList<ReferenceType>();
+        List<ReferenceType> l = new ArrayList<>();
         JL5TypeSystem ts = (JL5TypeSystem) this.ts;
         for (Type t : a) {
             l.add((ReferenceType) t);
@@ -102,7 +102,7 @@ public class LubType_c extends ClassType_c implements LubType {
         JL5TypeSystem ts = (JL5TypeSystem) this.ts;
 
         // st is the set of all supertypes of the lubElems.        
-        Set<Type> st = new LinkedHashSet<Type>();
+        Set<Type> st = new LinkedHashSet<>();
 
         // est is the intersection of all erased supertypes of lubElems.
         // That is, during the loop below, it is the intersection of
@@ -114,7 +114,7 @@ public class LubType_c extends ClassType_c implements LubType {
         for (Type u : lubElems) {
             st.addAll(ts.allAncestorsOf((ReferenceType) u));
 
-            List<ReferenceType> u_supers = new ArrayList<ReferenceType>();
+            List<ReferenceType> u_supers = new ArrayList<>();
             for (ReferenceType u_super : ts.allAncestorsOf((ReferenceType) u)) {
                 if (u_super instanceof RawClass) {
                     u_supers.add(((RawClass) u_super).erased());
@@ -122,7 +122,7 @@ public class LubType_c extends ClassType_c implements LubType {
                 else u_supers.add(u_super);
             }
 
-            Set<Type> est_of_u = new LinkedHashSet<Type>();
+            Set<Type> est_of_u = new LinkedHashSet<>();
             for (Type super_of_u : u_supers) {
                 if (super_of_u instanceof JL5SubstClassType) {
                     JL5SubstClassType g = (JL5SubstClassType) super_of_u;
@@ -131,14 +131,14 @@ public class LubType_c extends ClassType_c implements LubType {
                 else est_of_u.add(super_of_u);
             }
             if (est == null) {
-                est = new LinkedHashSet<Type>();
+                est = new LinkedHashSet<>();
                 est.addAll(est_of_u);
             }
             else {
                 est.retainAll(est_of_u);
             }
         }
-        Set<Type> mec = new LinkedHashSet<Type>(est);
+        Set<Type> mec = new LinkedHashSet<>(est);
         for (Type e1 : est) {
             for (Type e2 : est) {
                 if (!ts.equals(e1, e2) && ts.isSubtype(e2, e1)) {
@@ -147,9 +147,9 @@ public class LubType_c extends ClassType_c implements LubType {
                 }
             }
         }
-        List<ReferenceType> cand = new ArrayList<ReferenceType>();
+        List<ReferenceType> cand = new ArrayList<>();
         for (Type m : mec) {
-            List<Type> inv = new ArrayList<Type>();
+            List<Type> inv = new ArrayList<>();
             for (Type t : st) {
                 if (ts.equals(m, t)
                         || ((t instanceof JL5SubstClassType) && ((JL5SubstClassType) t).base()
@@ -185,7 +185,7 @@ public class LubType_c extends ClassType_c implements LubType {
             if (next instanceof RawClass || next instanceof JL5ParsedClassType) {
                 return next;
             }
-            List<ReferenceType> lcta_args = new ArrayList<ReferenceType>();
+            List<ReferenceType> lcta_args = new ArrayList<>();
             JL5SubstClassType nextp = (JL5SubstClassType) next;
             for (int argi = 0; argi < res.actuals().size(); argi++) {
                 ReferenceType a1 = res.actuals().get(argi);
@@ -322,7 +322,7 @@ public class LubType_c extends ClassType_c implements LubType {
             if (!ts.isImplicitCastValid(elem, toType)) return null;
         }
 
-        LinkedList<Type> chain = new LinkedList<Type>();
+        LinkedList<Type> chain = new LinkedList<>();
         chain.add(this);
         chain.add(toType);
         return chain;

@@ -219,7 +219,7 @@ public abstract class ClassType_c extends ReferenceType_c implements ClassType {
 
     @Override
     public List<? extends MemberInstance> members() {
-        List<MemberInstance> l = new ArrayList<MemberInstance>();
+        List<MemberInstance> l = new ArrayList<>();
         l.addAll(methods());
         l.addAll(fields());
         l.addAll(constructors());

@@ -26,7 +26,9 @@
 package polyglot.ext.jl7.types.inference;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import polyglot.ext.jl5.types.JL5ConstructorInstance;
 import polyglot.ext.jl5.types.JL5ParsedClassType;
@@ -34,6 +36,7 @@ import polyglot.ext.jl5.types.JL5ProcedureInstance;
 import polyglot.ext.jl5.types.JL5TypeSystem;
 import polyglot.ext.jl5.types.TypeVariable;
 import polyglot.ext.jl5.types.inference.InferenceSolver_c;
+import polyglot.ext.jl7.types.JL7TypeSystem;
 import polyglot.types.ConstructorInstance;
 import polyglot.types.ReferenceType;
 import polyglot.types.Type;
@@ -53,7 +56,7 @@ public class JL7InferenceSolver_c extends InferenceSolver_c {
             if (ct instanceof JL5ParsedClassType) {
                 JL5ParsedClassType pct = (JL5ParsedClassType) ct;
                 List<TypeVariable> result =
-                        new ArrayList<TypeVariable>(pct.typeVariables().size()
+                        new ArrayList<>(pct.typeVariables().size()
                                 + pi.typeParams().size());
                 result.addAll(pct.typeVariables());
                 result.addAll(pi.typeParams());
@@ -66,7 +69,22 @@ public class JL7InferenceSolver_c extends InferenceSolver_c {
     @Override
     protected Type returnType(JL5ProcedureInstance pi) {
         if (pi instanceof ConstructorInstance) {
-            return ((ConstructorInstance) pi).container();
+            ConstructorInstance ci = (ConstructorInstance) pi;
+            ReferenceType container = ci.container();
+            if (container.isClass()) {
+                // Transform C<Fi> (JL5ParsedClassType) to
+                // C<Fi> (JL5SubstClassType) by applying substitution to itself.
+                // See JLS SE 7 | 15.9.3:
+                // The return type of mj is θj applied to C<F1,...,Fp>.
+                JL5ParsedClassType ct =
+                        (JL5ParsedClassType) container.toClass();
+                JL7TypeSystem ts = (JL7TypeSystem) ci.typeSystem();
+                Map<TypeVariable, ReferenceType> substm = new LinkedHashMap<>();
+                for (TypeVariable tv : ct.typeVariables())
+                    substm.put(tv, tv);
+                return ts.subst(container, substm);
+            }
+            return container;
         }
         return super.returnType(pi);
     }

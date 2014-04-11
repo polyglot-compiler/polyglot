@@ -85,7 +85,7 @@ public class FieldConstantsChecked extends AbstractGoal {
 
     @Override
     public Collection<Goal> prerequisiteGoals(Scheduler scheduler) {
-        List<Goal> l = new ArrayList<Goal>();
+        List<Goal> l = new ArrayList<>();
         if (ct != null) {
             l.add(scheduler.SignaturesResolved(ct));
         }
@@ -95,7 +95,7 @@ public class FieldConstantsChecked extends AbstractGoal {
 
     @Override
     public Collection<Goal> corequisiteGoals(Scheduler scheduler) {
-        List<Goal> l = new ArrayList<Goal>();
+        List<Goal> l = new ArrayList<>();
         if (ct != null && ct.job() != null) {
             l.add(scheduler.TypeChecked(ct.job()));
         }

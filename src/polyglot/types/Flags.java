@@ -49,18 +49,18 @@ public class Flags implements Serializable {
 
     protected static class FlagComparator implements Comparator<String> {
         protected static List<String> order =
-                new ArrayList<String>(Arrays.asList("public",
-                                                    "private",
-                                                    "protected",
-                                                    "static",
-                                                    "final",
-                                                    "synchronized",
-                                                    "transient",
-                                                    "native",
-                                                    "interface",
-                                                    "abstract",
-                                                    "volatile",
-                                                    "strictfp"));
+                new ArrayList<>(Arrays.asList("public",
+                                              "private",
+                                              "protected",
+                                              "static",
+                                              "final",
+                                              "synchronized",
+                                              "transient",
+                                              "native",
+                                              "interface",
+                                              "abstract",
+                                              "volatile",
+                                              "strictfp"));
 
         @Override
         public int compare(String o1, String o2) {
@@ -140,7 +140,7 @@ public class Flags implements Serializable {
      * Effects: returns a new accessflags object with no accessflags set.
      */
     protected Flags() {
-        this.flags = new TreeSet<String>();
+        this.flags = new TreeSet<>();
     }
 
     protected Flags(String name) {

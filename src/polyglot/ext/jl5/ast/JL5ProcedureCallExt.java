@@ -94,7 +94,7 @@ public abstract class JL5ProcedureCallExt extends JL5TermExt implements
         ProcedureCall n = this.node();
         JL5ProcedureCallExt ext = (JL5ProcedureCallExt) JL5Ext.ext(n);
         List<ReferenceType> actualTypeArgs =
-                new ArrayList<ReferenceType>(ext.typeArgs().size());
+                new ArrayList<>(ext.typeArgs().size());
         for (TypeNode tn : ext.typeArgs()) {
             actualTypeArgs.add((ReferenceType) tn.type());
         }

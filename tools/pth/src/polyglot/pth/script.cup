@@ -108,12 +108,12 @@ command_line_args_opt ::=
     
 filetest_list ::=
         filetest:a
-            {: List<SourceFileTest> list = new LinkedList<SourceFileTest>();
+            {: List<SourceFileTest> list = new LinkedList<>();
                list.add(a);
                RESULT = list;
             :}
     |   filetest:a SEMICOLON
-            {: List<SourceFileTest> list = new LinkedList<SourceFileTest>();
+            {: List<SourceFileTest> list = new LinkedList<>();
                list.add(a);
                RESULT = list;
             :}
@@ -132,7 +132,7 @@ filetest ::=
 
 filename_list ::=
         IDENT:a
-            {: List<String> list = new LinkedList<String>();
+            {: List<String> list = new LinkedList<>();
                list.add(a);
                RESULT = list;
             :}
@@ -158,7 +158,7 @@ sentence ::=
     ;
 
 failure_set_opt ::=
-            {: List<ExpectedFailure> l = new ArrayList<ExpectedFailure>();
+            {: List<ExpectedFailure> l = new ArrayList<>();
                RESULT = l;
             :}
     | failure_set:a
@@ -167,7 +167,7 @@ failure_set_opt ::=
     
 failure_set ::=
         failure:a
-            {: List<ExpectedFailure> l = new ArrayList<ExpectedFailure>();
+            {: List<ExpectedFailure> l = new ArrayList<>();
                l.add(a);
                RESULT = l;
             :}

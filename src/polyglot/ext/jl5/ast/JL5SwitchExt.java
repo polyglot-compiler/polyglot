@@ -58,8 +58,7 @@ public class JL5SwitchExt extends JL5TermExt implements JL5SwitchOps {
                                         s.position());
         }
 
-        ArrayList<SwitchElement> newels =
-                new ArrayList<SwitchElement>(s.elements().size());
+        ArrayList<SwitchElement> newels = new ArrayList<>(s.elements().size());
         Type switchType = expr.type();
         for (SwitchElement el : s.elements()) {
             if (el instanceof Case) {

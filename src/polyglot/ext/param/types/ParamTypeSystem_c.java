@@ -45,11 +45,11 @@ import polyglot.util.Position;
 public abstract class ParamTypeSystem_c<Formal extends Param, Actual extends TypeObject>
         extends TypeSystem_c implements ParamTypeSystem<Formal, Actual> {
     protected Map<Map<Formal, ? extends Actual>, Subst<Formal, Actual>> substCache =
-            new HashMap<Map<Formal, ? extends Actual>, Subst<Formal, Actual>>();
+            new HashMap<>();
 
     @Override
     public MuPClass<Formal, Actual> mutablePClass(Position pos) {
-        return new MuPClass_c<Formal, Actual>(this, pos);
+        return new MuPClass_c<>(this, pos);
     }
 
     @Override
@@ -88,7 +88,7 @@ public abstract class ParamTypeSystem_c<Formal extends Param, Actual extends Typ
      */
     protected ClassType uncheckedInstantiate(Position pos,
             PClass<Formal, Actual> base, List<? extends Actual> actuals) {
-        Map<Formal, Actual> substMap = new HashMap<Formal, Actual>();
+        Map<Formal, Actual> substMap = new HashMap<>();
         Iterator<Formal> i = base.formals().iterator();
         Iterator<? extends Actual> j = actuals.iterator();
 
@@ -132,6 +132,6 @@ public abstract class ParamTypeSystem_c<Formal extends Param, Actual extends Typ
 
     protected Subst<Formal, Actual> substImpl(
             Map<Formal, ? extends Actual> substMap) {
-        return new Subst_c<Formal, Actual>(this, substMap);
+        return new Subst_c<>(this, substMap);
     }
 }

@@ -66,12 +66,11 @@ public class ClassFile_c implements ClassFile {
     protected FileObject classFileSource;
     protected ExtensionInfo extensionInfo;
 
-    protected Map<String, JLCInfo> jlcInfoCache =
-            new HashMap<String, JLCInfo>();
+    protected Map<String, JLCInfo> jlcInfoCache = new HashMap<>();
 
     protected static Collection<String> verbose;
     static {
-        verbose = new HashSet<String>();
+        verbose = new HashSet<>();
         verbose.add("loader");
     }
 
@@ -87,11 +86,10 @@ public class ClassFile_c implements ClassFile {
         this.classFileSource = classFileSource;
         this.extensionInfo = ext;
 
-        ByteArrayInputStream bin = new ByteArrayInputStream(code);
-        DataInputStream in = new DataInputStream(bin);
-        read(in);
-        in.close();
-        bin.close();
+        try (ByteArrayInputStream bin = new ByteArrayInputStream(code);
+             DataInputStream in = new DataInputStream(bin)) {
+            read(in);
+        }
     }
 
     @Deprecated

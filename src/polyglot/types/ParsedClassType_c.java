@@ -94,11 +94,11 @@ public class ParsedClassType_c extends ClassType_c implements ParsedClassType {
 
         setInitializer(init);
 
-        this.interfaces = new LinkedList<ReferenceType>();
-        this.methods = new LinkedList<MethodInstance>();
-        this.fields = new LinkedList<FieldInstance>();
-        this.constructors = new LinkedList<ConstructorInstance>();
-        this.memberClasses = new LinkedList<ClassType>();
+        this.interfaces = new LinkedList<>();
+        this.methods = new LinkedList<>();
+        this.fields = new LinkedList<>();
+        this.constructors = new LinkedList<>();
+        this.memberClasses = new LinkedList<>();
     }
 
     @Override
@@ -263,27 +263,27 @@ public class ParsedClassType_c extends ClassType_c implements ParsedClassType {
 
     @Override
     public void setInterfaces(List<? extends ReferenceType> l) {
-        this.interfaces = new ArrayList<ReferenceType>(l);
+        this.interfaces = new ArrayList<>(l);
     }
 
     @Override
     public void setMethods(List<? extends MethodInstance> l) {
-        this.methods = new ArrayList<MethodInstance>(l);
+        this.methods = new ArrayList<>(l);
     }
 
     @Override
     public void setFields(List<? extends FieldInstance> l) {
-        this.fields = new ArrayList<FieldInstance>(l);
+        this.fields = new ArrayList<>(l);
     }
 
     @Override
     public void setConstructors(List<? extends ConstructorInstance> l) {
-        this.constructors = new ArrayList<ConstructorInstance>(l);
+        this.constructors = new ArrayList<>(l);
     }
 
     @Override
     public void setMemberClasses(List<? extends ClassType> l) {
-        this.memberClasses = new ArrayList<ClassType>(l);
+        this.memberClasses = new ArrayList<>(l);
     }
 
     @Override
@@ -326,7 +326,7 @@ public class ParsedClassType_c extends ClassType_c implements ParsedClassType {
         // returned is canonical.
         init.initMethods();
 
-        List<MethodInstance> l = new LinkedList<MethodInstance>();
+        List<MethodInstance> l = new LinkedList<>();
 
         for (MethodInstance mi : methods) {
             if (mi.name().equals(name)) {
@@ -435,8 +435,8 @@ public class ParsedClassType_c extends ClassType_c implements ParsedClassType {
 
         // Create a new list of members.  Don't use members() since
         // it ensures that signatures be resolved and this method
-        // is just suppossed to check if they are resolved.
-        List<MemberInstance> l = new ArrayList<MemberInstance>();
+        // is just supposed to check if they are resolved.
+        List<MemberInstance> l = new ArrayList<>();
         l.addAll(methods);
         l.addAll(fields);
         l.addAll(constructors);
@@ -466,8 +466,8 @@ public class ParsedClassType_c extends ClassType_c implements ParsedClassType {
 
             // Create a new list of members.  Don't use members() since
             // it ensures that signatures be resolved and this method
-            // is just suppossed to check if they are resolved.
-            List<MemberInstance> l = new ArrayList<MemberInstance>();
+            // is just supposed to check if they are resolved.
+            List<MemberInstance> l = new ArrayList<>();
             l.addAll(methods);
             l.addAll(fields);
             l.addAll(constructors);
@@ -559,7 +559,7 @@ public class ParsedClassType_c extends ClassType_c implements ParsedClassType {
             membersAdded = true;
             supertypesResolved = true;
             signaturesResolved = true;
-            memberClasses = new ArrayList<ClassType>();
+            memberClasses = new ArrayList<>();
         }
 
         in.defaultReadObject();

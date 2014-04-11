@@ -83,8 +83,7 @@ public class InnerClassRemover extends ContextVisitor {
         super(job, ts, nf);
     }
 
-    Map<ParsedClassType, FieldInstance> outerFieldInstance =
-            new HashMap<ParsedClassType, FieldInstance>();
+    Map<ParsedClassType, FieldInstance> outerFieldInstance = new HashMap<>();
 
     /** Get a reference to the enclosing instance of the current class that is of type containerClass */
     Expr getContainer(Position pos, Expr this_, ClassType currentClass,
@@ -175,14 +174,14 @@ public class InnerClassRemover extends ContextVisitor {
                 ConstructorInstance ci = neu.constructorInstance();
                 // Fix the ci if a copy; otherwise, let the ci be modified at the declaration node.
                 if (ci != ci.declaration()) {
-                    List<Type> args = new ArrayList<Type>();
+                    List<Type> args = new ArrayList<>();
                     args.add(ci.container());
                     args.addAll(ci.formalTypes());
                     ci = ci.formalTypes(args);
                     neu = neu.constructorInstance(ci);
                 }
 
-                List<Expr> args = new ArrayList<Expr>();
+                List<Expr> args = new ArrayList<>();
                 args.add(q);
                 args.addAll(neu.arguments());
                 neu = neu.arguments(args);
@@ -238,14 +237,14 @@ public class InnerClassRemover extends ContextVisitor {
 
             // Fix the ci if a copy; otherwise, let the ci be modified at the declaration node.
             if (ci != cidecl && fixCI) {
-                List<Type> args = new ArrayList<Type>();
+                List<Type> args = new ArrayList<>();
                 args.add(ci.container());
                 args.addAll(ci.formalTypes());
                 ci = ci.formalTypes(args);
                 cc = cc.constructorInstance(ci);
             }
 
-            List<Expr> args = new ArrayList<Expr>();
+            List<Expr> args = new ArrayList<>();
             args.add(q);
             args.addAll(cc.arguments());
             cc = (ConstructorCall) cc.arguments(args);
@@ -386,7 +385,7 @@ public class InnerClassRemover extends ContextVisitor {
         ClassBody b = cd.body();
 
         // Add the new fields to the class.
-        List<ClassMember> newMembers = new ArrayList<ClassMember>();
+        List<ClassMember> newMembers = new ArrayList<>();
         for (FieldInstance fi : newFields) {
             Position pos = fi.position();
             FieldDecl fd =
@@ -420,9 +419,9 @@ public class InnerClassRemover extends ContextVisitor {
             ConstructorDecl cd, List<FieldInstance> newFields, TypeSystem ts,
             NodeFactory nf) {
         // Create a list of formals to add to the constructor.
-        List<Formal> formals = new ArrayList<Formal>();
-        List<LocalInstance> localInstances = new ArrayList<LocalInstance>();
-        List<Local> localVars = new ArrayList<Local>();
+        List<Formal> formals = new ArrayList<>();
+        List<LocalInstance> localInstances = new ArrayList<>();
+        List<Local> localVars = new ArrayList<>();
 
         for (FieldInstance fi : newFields) {
             Position pos = fi.position();
@@ -445,7 +444,7 @@ public class InnerClassRemover extends ContextVisitor {
 
         }
 
-        List<Formal> newFormals = new ArrayList<Formal>();
+        List<Formal> newFormals = new ArrayList<>();
         newFormals.addAll(formals);
         newFormals.addAll(cd.formals());
         cd = (ConstructorDecl) cd.formals(newFormals);
@@ -455,7 +454,7 @@ public class InnerClassRemover extends ContextVisitor {
         Block block = cd.body();
         ConstructorCall constructorCall = null;
         boolean performFieldAssignments = true;
-        List<Stmt> remainingStatements = new ArrayList<Stmt>(); // any statements in the constructor decl other than the constructor call
+        List<Stmt> remainingStatements = new ArrayList<>(); // any statements in the constructor decl other than the constructor call
 
         if (block.statements().size() > 0) {
             Stmt s0 = block.statements().get(0);
@@ -473,7 +472,7 @@ public class InnerClassRemover extends ContextVisitor {
                     // Modify the CI if it is a copy of the declaration CI.
                     // If not a copy, it will get modified at the declaration.
                     if (ci != ci.declaration()) {
-                        List<Type> newFormalTypes = new ArrayList<Type>();
+                        List<Type> newFormalTypes = new ArrayList<>();
                         for (int j = 0; j < newFields.size(); j++) {
                             FieldInstance fi = newFields.get(j);
                             newFormalTypes.add(fi.type());
@@ -492,7 +491,7 @@ public class InnerClassRemover extends ContextVisitor {
 
         }
 
-        List<Stmt> statements = new ArrayList<Stmt>();
+        List<Stmt> statements = new ArrayList<>();
         if (constructorCall != null) {
             // the original constructor decl had a constructor call. Let's add it.
             statements.add(constructorCall);
@@ -528,7 +527,7 @@ public class InnerClassRemover extends ContextVisitor {
         block = block.statements(statements);
         cd = (ConstructorDecl) cd.body(block);
 
-        List<Type> newFormalTypes = new ArrayList<Type>();
+        List<Type> newFormalTypes = new ArrayList<>();
         for (Formal f : newFormals) {
             newFormalTypes.add(f.declType());
         }
@@ -544,7 +543,7 @@ public class InnerClassRemover extends ContextVisitor {
     // Add local variables to the argument list until it matches the declaration.
     List<Expr> addArgs(ProcedureCall n, ConstructorInstance nci, Expr q) {
         if (nci == null || q == null) return n.arguments();
-        List<Expr> args = new ArrayList<Expr>();
+        List<Expr> args = new ArrayList<>();
         args.add(q);
         args.addAll(n.arguments());
         assert args.size() == nci.formalTypes().size();

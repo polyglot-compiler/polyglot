@@ -34,7 +34,7 @@ public class JL5ToJL5Rewriter extends ExtensionRewriter {
         // JL5ToJL5Rewriter.typeToJava
         if (t instanceof IntersectionType) {
             IntersectionType ct = (IntersectionType) t.toClass();
-            List<TypeNode> bounds = new ArrayList<TypeNode>(ct.bounds().size());
+            List<TypeNode> bounds = new ArrayList<>(ct.bounds().size());
             for (ReferenceType rt : ct.bounds())
                 bounds.add(typeToJava(rt, pos));
             return to_nf.ParamTypeNode(pos, to_nf.Id(pos, ct.name()), bounds);
@@ -66,16 +66,14 @@ public class JL5ToJL5Rewriter extends ExtensionRewriter {
         if (t.isClass()) {
             if (t instanceof JL5ParsedClassType) {
                 JL5ParsedClassType ct = (JL5ParsedClassType) t.toClass();
-                List<TypeNode> tvs =
-                        new ArrayList<TypeNode>(ct.typeVariables().size());
+                List<TypeNode> tvs = new ArrayList<>(ct.typeVariables().size());
                 for (ReferenceType rt : ct.typeVariables())
                     tvs.add(typeToJava(rt, pos));
                 return to_nf.TypeNodeFromQualifiedName(pos, ct.fullName(), tvs);
             }
             else if (t instanceof JL5SubstClassType) {
                 JL5SubstClassType ct = (JL5SubstClassType) t.toClass();
-                List<TypeNode> actuals =
-                        new ArrayList<TypeNode>(ct.actuals().size());
+                List<TypeNode> actuals = new ArrayList<>(ct.actuals().size());
                 for (ReferenceType rt : ct.actuals())
                     actuals.add(typeToJava(rt, pos));
 

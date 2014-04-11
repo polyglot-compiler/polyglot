@@ -78,7 +78,7 @@ public class CachingResolver implements Resolver, Copy<CachingResolver> {
     public CachingResolver(Resolver inner, boolean cacheNotFound) {
         this.inner = inner;
         this.cacheNotFound = cacheNotFound;
-        this.cache = new HashMap<String, CachedResult>();
+        this.cache = new HashMap<>();
     }
 
     public CachingResolver(Resolver inner) {
@@ -94,7 +94,7 @@ public class CachingResolver implements Resolver, Copy<CachingResolver> {
     public CachingResolver copy() {
         try {
             CachingResolver r = (CachingResolver) super.clone();
-            r.cache = new HashMap<String, CachedResult>(this.cache);
+            r.cache = new HashMap<>(this.cache);
             return r;
         }
         catch (CloneNotSupportedException e) {

@@ -69,7 +69,7 @@ public class JL5ClassDeclExt extends JL5AnnotatedElementExt implements
         ClassDeclOps {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
-    protected List<TypeNode> paramTypes = new ArrayList<TypeNode>();
+    protected List<TypeNode> paramTypes = new ArrayList<>();
 
     public JL5ClassDeclExt(List<TypeNode> paramTypes, List<Term> annotations) {
         super(annotations);
@@ -168,15 +168,14 @@ public class JL5ClassDeclExt extends JL5AnnotatedElementExt implements
         pc.clazz(ct);
 
         if (paramTypes != null && !paramTypes.isEmpty()) {
-            List<TypeVariable> typeVars =
-                    new ArrayList<TypeVariable>(paramTypes.size());
+            List<TypeVariable> typeVars = new ArrayList<>(paramTypes.size());
             for (TypeNode ptn : paramTypes) {
                 TypeVariable tv = (TypeVariable) ptn.type();
                 typeVars.add(tv);
                 tv.setDeclaringClass(ct);
             }
             ct.setTypeVariables(typeVars);
-            pc.formals(new ArrayList<TypeVariable>(typeVars));
+            pc.formals(new ArrayList<>(typeVars));
         }
 
         return n;

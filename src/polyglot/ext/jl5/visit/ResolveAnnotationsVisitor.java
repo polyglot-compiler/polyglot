@@ -65,7 +65,7 @@ public class ResolveAnnotationsVisitor extends ContextVisitor {
         if (ext instanceof AnnotatedElement) {
             AnnotatedElement aext = (AnnotatedElement) ext;
             List<Term> newElems =
-                    new ArrayList<Term>(aext.annotationElems().size());
+                    new ArrayList<>(aext.annotationElems().size());
             for (Term elem : aext.annotationElems()) {
                 // type check elem
                 TypeChecker tc =
@@ -101,7 +101,7 @@ public class ResolveAnnotationsVisitor extends ContextVisitor {
     public Annotations createAnnotations(List<Term> annotationElems,
             Position pos) throws SemanticException {
         Map<Type, Map<String, AnnotationElementValue>> m =
-                new LinkedHashMap<Type, Map<String, AnnotationElementValue>>();
+                new LinkedHashMap<>();
 
         JL5TypeSystem ts = (JL5TypeSystem) this.typeSystem();
         for (Term t : annotationElems) {

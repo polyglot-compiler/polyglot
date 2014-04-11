@@ -60,7 +60,7 @@ public class InnerClassConstructorFixer extends InnerClassAbstractRemover {
             // If instantiating an inner class, pass in the environment at
             // the class declaration.  env(ct) will be empty of the class
             // was not inner.
-            List<Expr> newArgs = new ArrayList<Expr>(newExp.arguments());
+            List<Expr> newArgs = new ArrayList<>(newExp.arguments());
             newArgs.addAll(envAsActuals(env(ct, true),
                                         ct.outer(),
                                         newExp.qualifier()));
@@ -83,7 +83,7 @@ public class InnerClassConstructorFixer extends InnerClassAbstractRemover {
             ClassType ct = context.currentClass();
 
             if (cc.kind() == ConstructorCall.THIS) {
-                List<Expr> newArgs = new ArrayList<Expr>();
+                List<Expr> newArgs = new ArrayList<>();
                 newArgs.addAll(cc.arguments());
                 newArgs.addAll(envAsActuals(env(ct, true),
                                             ct.outer(),
@@ -95,7 +95,7 @@ public class InnerClassConstructorFixer extends InnerClassAbstractRemover {
             }
             else {
                 // adjust the super call arguments
-                List<Expr> newArgs = new ArrayList<Expr>();
+                List<Expr> newArgs = new ArrayList<>();
                 newArgs.addAll(cc.arguments());
                 ClassType sup = (ClassType) ct.superType();
                 if (sup.isInnerClass()) {

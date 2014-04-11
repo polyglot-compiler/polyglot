@@ -38,7 +38,7 @@ public class FlagAnnotations {
 
     public FlagAnnotations() {
         classicFlags = Flags.NONE;
-        annotations = new LinkedList<Term>();
+        annotations = new LinkedList<>();
     }
 
     public Flags flags() {

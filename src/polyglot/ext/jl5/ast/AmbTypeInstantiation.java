@@ -108,8 +108,7 @@ public class AmbTypeInstantiation extends TypeNode_c implements Ambiguous {
 
         checkRareType(sc);
 
-        Map<TypeVariable, ReferenceType> typeMap =
-                new LinkedHashMap<TypeVariable, ReferenceType>();
+        Map<TypeVariable, ReferenceType> typeMap = new LinkedHashMap<>();
         JL5ParsedClassType pct = handleBase(typeMap);
 
         Type baseType = this.base.type();

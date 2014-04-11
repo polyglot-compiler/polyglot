@@ -126,11 +126,11 @@ public class ImportTable implements Resolver {
         this.sourcePos = src != null ? new Position(null, src) : null;
         this.pkg = pkg;
 
-        this.map = new HashMap<String, Named>();
-        this.typeOnDemandImports = new ArrayList<String>();
-        this.lazyImports = new ArrayList<String>();
-        this.lazyImportPositions = new ArrayList<Position>();
-        this.singleTypeImports = new ArrayList<String>();
+        this.map = new HashMap<>();
+        this.typeOnDemandImports = new ArrayList<>();
+        this.lazyImports = new ArrayList<>();
+        this.lazyImportPositions = new ArrayList<>();
+        this.singleTypeImports = new ArrayList<>();
     }
 
     /**
@@ -264,7 +264,7 @@ public class ImportTable implements Resolver {
                 }
             }
             List<String> imports =
-                    new ArrayList<String>(typeOnDemandImports.size() + 5);
+                    new ArrayList<>(typeOnDemandImports.size() + 5);
 
             imports.addAll(ts.defaultPackageImports());
             imports.addAll(typeOnDemandImports);
@@ -416,8 +416,8 @@ public class ImportTable implements Resolver {
             }
         }
 
-        lazyImports = new ArrayList<String>();
-        lazyImportPositions = new ArrayList<Position>();
+        lazyImports = new ArrayList<>();
+        lazyImportPositions = new ArrayList<>();
     }
 
     /**

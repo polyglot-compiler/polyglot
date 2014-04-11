@@ -109,7 +109,7 @@ public class JL7TryExt extends JL7Ext implements JL7TryOps {
     @Override
     public void preciseRethrowsForCatchBlock(J7Lang lang, Catch cb,
             SubtypeSet reaching) {
-        List<Type> s = new ArrayList<Type>();
+        List<Type> s = new ArrayList<>();
         for (Type t : reaching) {
             if (cb.catchType().isSubtype(t)) {
                 // nope, it's not worth it.

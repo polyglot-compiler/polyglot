@@ -68,7 +68,7 @@ public class FlattenVisitor extends NodeVisitor {
         super(nf.lang());
         this.ts = ts;
         this.nf = nf;
-        stack = new LinkedList<List<Stmt>>();
+        stack = new LinkedList<>();
     }
 
     @Override
@@ -144,8 +144,8 @@ public class FlattenVisitor extends NodeVisitor {
         return "flat$$$" + count++;
     }
 
-    protected Set<Term> noFlatten = new HashSet<Term>();
-    protected Set<Term> neverFlatten = new HashSet<Term>();
+    protected Set<Term> noFlatten = new HashSet<>();
+    protected Set<Term> neverFlatten = new HashSet<>();
 
     /** 
      * When entering a BlockStatement, place a new StatementList

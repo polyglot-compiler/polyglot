@@ -87,7 +87,7 @@ public class CollectionUtil {
 
     /** Return a list containing {@code o1} and {@code o2}. */
     public static <T> List<T> list(T o1, T o2) {
-        List<T> l = new ArrayList<T>(2);
+        List<T> l = new ArrayList<>(2);
         l.add(o1);
         l.add(o2);
         return l;
@@ -95,7 +95,7 @@ public class CollectionUtil {
 
     /** Return a list containing {@code o1}, ..., {@code o3}. */
     public static <T> List<T> list(T o1, T o2, T o3) {
-        List<T> l = new ArrayList<T>(3);
+        List<T> l = new ArrayList<>(3);
         l.add(o1);
         l.add(o2);
         l.add(o3);
@@ -104,7 +104,7 @@ public class CollectionUtil {
 
     /** Return a list containing {@code o1}, ..., {@code o4}. */
     public static <T> List<T> list(T o1, T o2, T o3, T o4) {
-        List<T> l = new ArrayList<T>(3);
+        List<T> l = new ArrayList<>(3);
         l.add(o1);
         l.add(o2);
         l.add(o3);
@@ -120,10 +120,10 @@ public class CollectionUtil {
     }
 
     public static <T> Iterator<Pair<T, T>> pairs(Collection<T> l) {
-        List<Pair<T, T>> x = new LinkedList<Pair<T, T>>();
+        List<Pair<T, T>> x = new LinkedList<>();
         T prev = null;
         for (T curr : l) {
-            if (prev != null) x.add(new Pair<T, T>(prev, curr));
+            if (prev != null) x.add(new Pair<>(prev, curr));
             prev = curr;
         }
         return x.iterator();
@@ -136,8 +136,8 @@ public class CollectionUtil {
      * in the same order as the original elements.
      */
     public static <T, U> List<U> map(List<T> l, Transformation<T, U> t) {
-        List<U> m = new ArrayList<U>(l.size());
-        for (Iterator<U> i = new TransformingIterator<T, U>(l.iterator(), t); i.hasNext();) {
+        List<U> m = new ArrayList<>(l.size());
+        for (Iterator<U> i = new TransformingIterator<>(l.iterator(), t); i.hasNext();) {
             m.add(i.next());
         }
         return m;

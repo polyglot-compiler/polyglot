@@ -57,7 +57,7 @@ public class TypeDumper {
                         Long.class, Float.class, Double.class, Class.class,
                         String.class, Character.class };
         dontExpand =
-                new java.util.HashSet<Class<?>>(java.util.Arrays.asList(primitiveLike));
+                new java.util.HashSet<>(java.util.Arrays.asList(primitiveLike));
 
         dontExpand.add(Position.class);
         dontExpand.add(Compiler.class);
@@ -163,8 +163,9 @@ public class TypeDumper {
                 && !(o instanceof ExtensionInfo)
                 && !(o instanceof ClassFile)
                 && !dontDump(rtType)
-                && !(dontDump(rtType.getName(), (declaredField == null ? null
-                        : declaredField.getName()))) && !rtType.isArray()
+                && !(dontDump(rtType.getName(), (declaredField == null
+                        ? null : declaredField.getName())))
+                && !rtType.isArray()
                 && !(cache.containsKey(o) && cache.get(o) == o)) {
             w.allowBreak(2);
             cache.put(o);
@@ -200,7 +201,7 @@ public class TypeDumper {
         w.begin(4);
         w.write("    ");
         try {
-            List<Field> allFields = new ArrayList<Field>();
+            List<Field> allFields = new ArrayList<>();
             Class<?> objClass = obj.getClass();
             while (objClass != null) {
                 allFields.addAll(Arrays.asList(objClass.getDeclaredFields()));
@@ -251,14 +252,13 @@ public class TypeDumper {
     }
 
     public static class TypeCache {
-        private final Map<TypeSystem, Map<Object, Object>> c =
-                new HashMap<TypeSystem, Map<Object, Object>>();
+        private final Map<TypeSystem, Map<Object, Object>> c = new HashMap<>();
 
         public void put(Object o) {
             TypeSystem ts = typeSystemFor(o);
             Map<Object, Object> m = c.get(ts);
             if (m == null) {
-                m = new HashMap<Object, Object>();
+                m = new HashMap<>();
                 c.put(ts, m);
             }
             m.put(o, o);

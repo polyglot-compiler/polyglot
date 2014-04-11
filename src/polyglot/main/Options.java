@@ -75,9 +75,9 @@ public class Options {
     public int error_count;
     private File source_output_directory;
     private File class_output_directory;
-    public final List<File> sourcepath_directories = new ArrayList<File>();
-    private final List<File> classpath_directories = new ArrayList<File>();
-    private final List<File> bootclasspath_directories = new ArrayList<File>();
+    public final List<File> sourcepath_directories = new ArrayList<>();
+    private final List<File> classpath_directories = new ArrayList<>();
+    private final List<File> bootclasspath_directories = new ArrayList<>();
 
     public JavaFileManager.Location source_path = StandardLocation.SOURCE_PATH;
     public JavaFileManager.Location source_output =
@@ -108,13 +108,13 @@ public class Options {
     public boolean serialize_type_info;
 
     /** Dump the AST after the following passes? */
-    public final Set<String> dump_ast = new HashSet<String>();
+    public final Set<String> dump_ast = new HashSet<>();
 
     /** Pretty-print the AST after the following passes? */
-    public final Set<String> print_ast = new HashSet<String>();
+    public final Set<String> print_ast = new HashSet<>();
 
     /** Disable the following passes? */
-    public final Set<String> disable_passes = new HashSet<String>();
+    public final Set<String> disable_passes = new HashSet<>();
 
     /** keep output files */
     public boolean keep_output_files;
@@ -150,11 +150,11 @@ public class Options {
 
     public Options(ExtensionInfo extension, boolean checkFlags) {
         this.extension = extension;
-        this.flags = new LinkedHashSet<OptFlag<?>>();
-        this.arguments = new ArrayList<Arg<?>>();
+        this.flags = new LinkedHashSet<>();
+        this.arguments = new ArrayList<>();
         populateFlags(flags);
         if (checkFlags) {
-            Set<String> ids = new LinkedHashSet<String>();
+            Set<String> ids = new LinkedHashSet<>();
             for (OptFlag<?> flag : flags) {
                 for (String id : flag.ids()) {
                     if (!ids.add(id)) {
@@ -177,7 +177,7 @@ public class Options {
     }
 
     public List<OptFlag.Arg<?>> filterArgs(Set<OptFlag<?>> flags) {
-        List<Arg<?>> matches = new ArrayList<OptFlag.Arg<?>>();
+        List<Arg<?>> matches = new ArrayList<>();
         for (Arg<?> arg : arguments) {
             if (arg.flag != null && flags.contains(arg.flag()))
                 matches.add(arg);
@@ -443,8 +443,7 @@ public class Options {
                     catch (NumberFormatException e) {
                     }
                 }
-                return createArg(index + 1, new Pair<String, Integer>(topic,
-                                                                      level));
+                return createArg(index + 1, new Pair<>(topic, level));
             }
         });
 
@@ -542,7 +541,7 @@ public class Options {
      *          The set of source filenames provided on the command line.
      */
     final protected void applyArgs(Set<String> source) throws UsageError {
-        Set<OptFlag<?>> seen = new LinkedHashSet<OptFlag<?>>();
+        Set<OptFlag<?>> seen = new LinkedHashSet<>();
         for (Arg<?> arg : arguments) {
             if (arg.flag == null) {
                 handleSourceArg(arg, source);
@@ -579,7 +578,7 @@ public class Options {
      *          The set of source filenames provided on the command line.
      */
     public void printCommandLine(PrintStream out) {
-        Set<OptFlag<?>> seen = new LinkedHashSet<OptFlag<?>>();
+        Set<OptFlag<?>> seen = new LinkedHashSet<>();
         for (Arg<?> arg : arguments) {
             if (arg.flag != null) {
                 seen.add(arg.flag);
@@ -912,7 +911,7 @@ public class Options {
     }
 
     protected int parseSourceArg(String[] args, int index) {
-        Arg<String> src = new Arg<String>(index + 1, args[index]);
+        Arg<String> src = new Arg<>(index + 1, args[index]);
         arguments.add(src);
         return src.next();
     }
@@ -940,7 +939,7 @@ public class Options {
         usageHeader(out);
 
         boolean firstSecretItem = true;
-        List<OptFlag<?>> sorted = new ArrayList<OptFlag<?>>(flags);
+        List<OptFlag<?>> sorted = new ArrayList<>(flags);
         Collections.sort(sorted, null);
         for (OptFlag<?> flag : sorted) {
             boolean isSecret = flag.kind.compareTo(Kind.SECRET) >= 0;
@@ -1154,7 +1153,7 @@ public class Options {
     }
 
     public List<File> defaultPlatformClasspath() {
-        List<File> path = new ArrayList<File>();
+        List<File> path = new ArrayList<>();
         StringTokenizer st =
                 new StringTokenizer(jvmbootclasspath(), pathSeparator);
         while (st.hasMoreTokens()) {

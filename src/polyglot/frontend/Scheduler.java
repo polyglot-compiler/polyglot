@@ -109,11 +109,11 @@ public abstract class Scheduler {
     public Scheduler(ExtensionInfo extInfo) {
         this.extInfo = extInfo;
 
-        this.jobs = new LinkedHashMap<Source, Job>();
-        this.goals = new LinkedHashMap<Goal, Goal>();
-        this.runCount = new LinkedHashMap<Goal, Integer>();
-        this.inWorklist = new LinkedHashSet<Goal>();
-        this.worklist = new LinkedList<Goal>();
+        this.jobs = new LinkedHashMap<>();
+        this.goals = new LinkedHashMap<>();
+        this.runCount = new LinkedHashMap<>();
+        this.inWorklist = new LinkedHashSet<>();
+        this.worklist = new LinkedList<>();
         this.currentPass = null;
     }
 
@@ -423,7 +423,7 @@ public abstract class Scheduler {
 
         boolean progress = true;
 
-        Set<Goal> newAbove = new LinkedHashSet<Goal>();
+        Set<Goal> newAbove = new LinkedHashSet<>();
         newAbove.addAll(above);
         newAbove.add(goal);
 
@@ -435,7 +435,7 @@ public abstract class Scheduler {
                 Report.report(4, "outer loop for " + goal);
 
             // Run the prereqs of the goal.
-            for (Goal subgoal : new ArrayList<Goal>(goal.prerequisiteGoals(this))) {
+            for (Goal subgoal : new ArrayList<>(goal.prerequisiteGoals(this))) {
                 if (reached(subgoal)) {
                     continue;
                 }
@@ -486,7 +486,7 @@ public abstract class Scheduler {
             }
 
             // If the goal was not reached, run the coreqs of the goal. 
-            for (Goal subgoal : new ArrayList<Goal>(goal.corequisiteGoals(this))) {
+            for (Goal subgoal : new ArrayList<>(goal.corequisiteGoals(this))) {
                 if (reached(subgoal)) {
                     continue;
                 }
@@ -835,7 +835,7 @@ public abstract class Scheduler {
 
     /** Return all compilation units currently being compiled. */
     public Collection<Job> jobs() {
-        ArrayList<Job> l = new ArrayList<Job>(jobs.size());
+        ArrayList<Job> l = new ArrayList<>(jobs.size());
 
         for (Job job : jobs.values()) {
             if (job != Job.COMPLETED) {
@@ -923,7 +923,7 @@ public abstract class Scheduler {
         Report.report(2,
                       "  fontsize=20; center=true; ratio=auto; size = \"8.5,11\";");
 
-        for (Goal g : new ArrayList<Goal>(goals.keySet())) {
+        for (Goal g : new ArrayList<>(goals.keySet())) {
             g = internGoal(g);
 
             int h = System.identityHashCode(g);
@@ -961,9 +961,9 @@ public abstract class Scheduler {
         Report.report(2,
                       "  fontsize=20; center=true; ratio=auto; size = \"8.5,11\";");
 
-        Set<Goal> print = new LinkedHashSet<Goal>();
+        Set<Goal> print = new LinkedHashSet<>();
 
-        for (Goal g : new ArrayList<Goal>(goals.keySet())) {
+        for (Goal g : new ArrayList<>(goals.keySet())) {
             g = internGoal(g);
 
             if (g.state() == Goal.REACHED || g.state() == Goal.UNREACHED
@@ -1032,7 +1032,7 @@ public abstract class Scheduler {
         Report.report(2, h + " [ label = \"" + StringUtil.escape(g.toString())
                 + "\" ];");
 
-        Set<Integer> seen = new HashSet<Integer>();
+        Set<Integer> seen = new HashSet<>();
         seen.add(h);
 
         // dump out the successors.

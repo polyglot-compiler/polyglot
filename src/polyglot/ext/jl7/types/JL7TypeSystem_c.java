@@ -149,34 +149,23 @@ public class JL7TypeSystem_c extends JL5TypeSystem_c implements JL7TypeSystem {
         assert_(container);
         assert_(argTypes);
 
-        // apply capture conversion to container and argTypes
+        // apply capture conversion to container
         container =
                 (ClassType) applyCaptureConversion(container,
                                                    container.position());
-        List<Type> captureConvertedArgTypes =
-                new ArrayList<Type>(argTypes.size());
-        for (Type argType : argTypes) {
-            if (argType instanceof ReferenceType)
-                argType = applyCaptureConversion(argType, argType.position());
-            captureConvertedArgTypes.add(argType);
-        }
-        argTypes = captureConvertedArgTypes;
 
         SemanticException error = null;
 
         // List of constructors accessible from curClass that have valid new
         // call without boxing/unboxing conversion or variable arity and
         // are not overridden by an unaccessible constructor
-        List<ConstructorInstance> phase1constructors =
-                new ArrayList<ConstructorInstance>();
+        List<ConstructorInstance> phase1constructors = new ArrayList<>();
         // List of constructors accessible from curClass that have a valid new
         // call relying on boxing/unboxing conversion
-        List<ConstructorInstance> phase2constructors =
-                new ArrayList<ConstructorInstance>();
+        List<ConstructorInstance> phase2constructors = new ArrayList<>();
         // List of constructors accessible from curClass that have a valid new
         // call relying on boxing/unboxing conversion and variable arity
-        List<ConstructorInstance> phase3constructors =
-                new ArrayList<ConstructorInstance>();
+        List<ConstructorInstance> phase3constructors = new ArrayList<>();
 
         if (Report.should_report(Report.types, 2))
             Report.report(2, "Searching type " + container
@@ -279,8 +268,7 @@ public class JL7TypeSystem_c extends JL5TypeSystem_c implements JL7TypeSystem {
             subst = inferTypeArgs(pi, argTypes, expectedReturnType);
         }
         else if (!pi.typeParams().isEmpty() && !actualTypeArgs.isEmpty()) {
-            Map<TypeVariable, ReferenceType> m =
-                    new HashMap<TypeVariable, ReferenceType>();
+            Map<TypeVariable, ReferenceType> m = new HashMap<>();
             Iterator<? extends ReferenceType> iter = actualTypeArgs.iterator();
             for (TypeVariable tv : pi.typeParams()) {
                 m.put(tv, iter.next());

@@ -78,8 +78,8 @@ public class TestSuite extends AbstractTest {
         }
 
         Map<String, TestResult> oldTestResults =
-                new HashMap<String, TestResult>(this.getTestSuiteResult().testResults);
-        Map<String, TestResult> newResults = new HashMap<String, TestResult>();
+                new HashMap<>(this.getTestSuiteResult().testResults);
+        Map<String, TestResult> newResults = new HashMap<>();
 
         for (Test t : tests) {
             TestResult tr = oldTestResults.get(t.getUniqueId());
@@ -153,7 +153,7 @@ public class TestSuite extends AbstractTest {
             testResults = getTestSuiteResult().testResults;
         }
         else {
-            testResults = new LinkedHashMap<String, TestResult>();
+            testResults = new LinkedHashMap<>();
         }
         Date lastRun = new Date();
         if (this.success()) {

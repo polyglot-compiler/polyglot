@@ -39,6 +39,9 @@ polyglot.ext.jl7.JL7ExtensionInfo "-d out -classpath java-out -assert -noserial 
 	Diamond05.jl7 (Semantic, "not generic");
 	Diamond06.jl7;
 	Diamond07.jl7;
+	Diamond08.jl7;
+	Diamond09.jl7;
+	Diamond10.jl7;
 	FloatLit01.jl7;
 	IntLit01.jl7;
 	IntLit02.jl7 (Syntax), (Syntax),(Syntax),(Syntax);
@@ -65,4 +68,7 @@ polyglot.ext.jl7.JL7ExtensionInfo "-d out -classpath java-out -assert -noserial 
 	TryWithResources03.jl7 (Semantic, "AutoCloseable");
 	TryWithResources04.jl7;
 	TryWithResources05.jl7;
+	TryWithResources06.jl7 (Semantic, "exception .* caught or declared");
+	TryWithResources07.jl7 (Semantic, "exception .* caught or declared");
+	TryWithResources08.jl7;
 }

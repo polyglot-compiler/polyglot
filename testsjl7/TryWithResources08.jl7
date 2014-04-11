@@ -1,0 +1,14 @@
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.Reader;
+
+class C {
+	public boolean run() {
+		try (Reader reader = new FileReader("dummy")) {
+			return true;
+		}
+		catch (IOException e) {
+			return false;
+		}
+	}
+}

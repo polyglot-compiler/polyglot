@@ -50,7 +50,7 @@ public class SubConversionConstraint extends Constraint {
 
     @Override
     public List<Constraint> simplify() {
-        List<Constraint> r = new ArrayList<Constraint>();
+        List<Constraint> r = new ArrayList<>();
         if (actual instanceof JL5PrimitiveType) {
             JL5PrimitiveType prim_actual = (JL5PrimitiveType) actual;
             r.add(new SubConversionConstraint(solver().typeSystem()

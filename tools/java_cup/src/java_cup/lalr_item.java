@@ -43,7 +43,7 @@ public class lalr_item extends lr_item_core {
             throws internal_error {
         super(prod, pos);
         _lookahead = look;
-        _propagate_items = new Stack<lalr_item>();
+        _propagate_items = new Stack<>();
         needs_propagation = true;
     }
 

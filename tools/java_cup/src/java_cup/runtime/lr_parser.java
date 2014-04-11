@@ -268,7 +268,7 @@ public abstract class lr_parser {
     /*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . .*/
 
     /** The parse stack itself. */
-    protected Stack<Symbol> stack = new Stack<Symbol>();
+    protected Stack<Symbol> stack = new Stack<>();
 
     /*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . .*/
 
@@ -354,8 +354,8 @@ public abstract class lr_parser {
      */
     public Symbol scan() throws java.lang.Exception {
         Symbol sym = getScanner().next_token();
-        return (sym != null) ? sym
-                : getSymbolFactory().newSymbol("END_OF_FILE", EOF_sym());
+        return (sym != null)
+                ? sym : getSymbolFactory().newSymbol("END_OF_FILE", EOF_sym());
     }
 
     /*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . .*/

@@ -146,7 +146,7 @@ public class InnerClassRewriter extends InnerClassAbstractRemover {
     }
 
     void addEnvToCI(ConstructorInstance ci, List<ClassType> env) {
-        List<Type> formals = new ArrayList<Type>(ci.formalTypes());
+        List<Type> formals = new ArrayList<>(ci.formalTypes());
         formals.addAll(envAsFormalTypes(env));
         ci.setFormalTypes(formals);
     }
@@ -160,7 +160,7 @@ public class InnerClassRewriter extends InnerClassAbstractRemover {
         cd = (ConstructorDecl) cd.name(ct.name());
 
         // Add the new formals.
-        List<Formal> newFormals = new ArrayList<Formal>();
+        List<Formal> newFormals = new ArrayList<>();
         newFormals.addAll(cd.formals());
         newFormals.addAll(envAsFormals(env));
         cd = (ConstructorDecl) cd.formals(newFormals);
@@ -172,7 +172,7 @@ public class InnerClassRewriter extends InnerClassAbstractRemover {
         }
 
         List<Stmt> oldStmts = cd.body().statements();
-        List<Stmt> newStmts = new ArrayList<Stmt>();
+        List<Stmt> newStmts = new ArrayList<>();
 
         // Check if this constructor invokes another with a this call.
         // If so, don't initialize the fields, but do pass the environment
@@ -269,12 +269,11 @@ public class InnerClassRewriter extends InnerClassAbstractRemover {
 
     protected ClassBody translateClassBody(ParsedClassType ct, ClassBody body,
             Context context) {
-        List<ClassMember> members = new ArrayList<ClassMember>();
+        List<ClassMember> members = new ArrayList<>();
 
         List<ClassType> env = env(ct, false);
 
-        Map<ClassType, FieldInstance> fieldMap =
-                new HashMap<ClassType, FieldInstance>();
+        Map<ClassType, FieldInstance> fieldMap = new HashMap<>();
 
         for (ClassType outer : env) {
             FieldInstance fi = localToField(ct, outer);
@@ -286,8 +285,8 @@ public class InnerClassRewriter extends InnerClassAbstractRemover {
         // Now add existing members, making sure constructors appear
         // first.  The constructors may have field
         // initializers which must be run before other initializers.
-        List<ConstructorDecl> ctors = new ArrayList<ConstructorDecl>();
-        List<ClassMember> others = new ArrayList<ClassMember>();
+        List<ConstructorDecl> ctors = new ArrayList<>();
+        List<ClassMember> others = new ArrayList<>();
         for (ClassMember cm : body.members()) {
             if (cm instanceof ConstructorDecl) {
                 ctors.add((ConstructorDecl) cm);

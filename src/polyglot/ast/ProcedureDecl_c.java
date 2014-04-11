@@ -209,8 +209,8 @@ public abstract class ProcedureDecl_c extends Term_c implements ProcedureDecl,
             return this;
         }
 
-        List<Type> formalTypes = new LinkedList<Type>();
-        List<Type> throwTypes = new LinkedList<Type>();
+        List<Type> formalTypes = new LinkedList<>();
+        List<Type> throwTypes = new LinkedList<>();
 
         for (Formal f : formals) {
             if (!f.isDisambiguated()) {

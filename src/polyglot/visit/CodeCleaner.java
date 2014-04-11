@@ -112,7 +112,7 @@ public class CodeCleaner extends NodeVisitor {
      * Turns a Block into a list of Stmts.
      **/
     protected List<Stmt> flattenBlock(Block b) {
-        List<Stmt> stmtList = new LinkedList<Stmt>();
+        List<Stmt> stmtList = new LinkedList<>();
         for (Stmt stmt : b.statements()) {
             if (stmt instanceof Block) {
                 // Alpha-rename local decls in the block that we're flattening.
@@ -131,7 +131,7 @@ public class CodeCleaner extends NodeVisitor {
      * Performs some trivial dead code elimination on a list of statements.
      **/
     protected List<Stmt> clean(List<Stmt> l) {
-        List<Stmt> stmtList = new LinkedList<Stmt>();
+        List<Stmt> stmtList = new LinkedList<>();
         for (Stmt stmt : l) {
             stmtList.add(stmt);
 
@@ -148,7 +148,7 @@ public class CodeCleaner extends NodeVisitor {
      * Traverses a Block and determines the set of label references.
      **/
     protected Set<String> labelRefs(Block b) {
-        final Set<String> result = new HashSet<String>();
+        final Set<String> result = new HashSet<>();
         b.visit(new NodeVisitor(lang()) {
             @Override
             public Node leave(Node old, Node n, NodeVisitor v) {

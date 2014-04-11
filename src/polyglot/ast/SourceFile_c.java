@@ -211,7 +211,7 @@ public class SourceFile_c extends Node_c implements SourceFile {
 
     @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
-        Set<String> names = new LinkedHashSet<String>();
+        Set<String> names = new LinkedHashSet<>();
         boolean hasPublic = false;
 
         for (TopLevelDecl d : decls) {

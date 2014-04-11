@@ -34,7 +34,6 @@ import java.util.Collections;
 import java.util.List;
 
 import javax.tools.FileObject;
-import javax.tools.JavaFileManager;
 import javax.tools.JavaFileManager.Location;
 import javax.tools.StandardLocation;
 
@@ -275,7 +274,7 @@ public abstract class AbstractExtensionInfo implements ExtensionInfo {
                 Collections.singletonList(opt.sourceOutputDirectory());
         extFM.setLocation(StandardLocation.SOURCE_PATH, sourcepath);
 
-        List<File> classpath = new ArrayList<File>();
+        List<File> classpath = new ArrayList<>();
         classpath.addAll(opt.bootclasspathDirectories());
         classpath.addAll(opt.classpathDirectories());
         extFM.setLocation(StandardLocation.CLASS_PATH, classpath);
@@ -306,7 +305,7 @@ public abstract class AbstractExtensionInfo implements ExtensionInfo {
 
     @Override
     public void cleanup() {
-        // Flush the outputfiles collection
+        // Flush the outputFiles collection
         compiler().outputFiles().clear();
         ts = null;
     }
@@ -314,7 +313,7 @@ public abstract class AbstractExtensionInfo implements ExtensionInfo {
     @Override
     public List<Location> defaultLocations() {
         if (default_locations == null) {
-            default_locations = new ArrayList<JavaFileManager.Location>();
+            default_locations = new ArrayList<>();
             default_locations.add(getOptions().bootclasspath);
             default_locations.add(getOptions().classpath);
         }

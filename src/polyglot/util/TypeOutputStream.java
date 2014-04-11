@@ -50,7 +50,7 @@ public class TypeOutputStream extends ObjectOutputStream {
 
         this.ts = ts;
         this.roots = ts.getTypeEncoderRootSet(root);
-        this.placeHolders = new HashMap<IdentityKey, Object>();
+        this.placeHolders = new HashMap<>();
 
         if (Report.should_report(Report.serialize, 2)) {
             Report.report(2, "Began TypeOutputStream with roots: " + roots);
@@ -65,7 +65,8 @@ public class TypeOutputStream extends ObjectOutputStream {
         if (p == null) {
             p =
                     ts.placeHolder(o,
-                                   useRoots ? roots
+                                   useRoots
+                                           ? roots
                                            : Collections.<TypeObject> emptySet());
             placeHolders.put(k, p);
         }

@@ -73,7 +73,7 @@ public class ClassFileLazyClassInitializer implements LazyClassInitializer {
 
     protected static Collection<String> verbose;
     static {
-        verbose = new HashSet<String>();
+        verbose = new HashSet<>();
         verbose.add("loader");
     }
 
@@ -208,7 +208,7 @@ public class ClassFileLazyClassInitializer implements LazyClassInitializer {
      * @return The corresponding list of types.
      */
     protected List<Type> typeListForString(String str) {
-        List<Type> types = new ArrayList<Type>();
+        List<Type> types = new ArrayList<>();
 
         for (int i = 0; i < str.length(); i++) {
             int dims = 0;
@@ -540,7 +540,7 @@ public class ClassFileLazyClassInitializer implements LazyClassInitializer {
         List<Type> argTypes = typeListForString(type.substring(1, index));
         Type returnType = typeForString(type.substring(index + 1));
 
-        List<Type> excTypes = new ArrayList<Type>();
+        List<Type> excTypes = new ArrayList<>();
 
         Exceptions exceptions = method.getExceptions();
         if (exceptions != null) {

@@ -53,7 +53,7 @@ public class FwdReferenceChecker extends ContextVisitor {
     private boolean inInitialization = false;
     private boolean inStaticInit = false;
     private Field fieldAssignLHS = null;
-    private Set<FieldInstance> declaredFields = new HashSet<FieldInstance>();
+    private Set<FieldInstance> declaredFields = new HashSet<>();
 
     @Override
     protected NodeVisitor enterCall(Node n) throws SemanticException {

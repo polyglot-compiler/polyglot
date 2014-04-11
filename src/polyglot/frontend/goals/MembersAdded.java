@@ -77,7 +77,7 @@ public class MembersAdded extends ClassTypeGoal {
 
     @Override
     public Collection<Goal> prerequisiteGoals(Scheduler scheduler) {
-        List<Goal> l = new ArrayList<Goal>();
+        List<Goal> l = new ArrayList<>();
         if (ct.job() != null) {
             l.add(scheduler.Parsed(ct.job()));
         }
@@ -87,7 +87,7 @@ public class MembersAdded extends ClassTypeGoal {
 
     @Override
     public Collection<Goal> corequisiteGoals(Scheduler scheduler) {
-        List<Goal> l = new ArrayList<Goal>();
+        List<Goal> l = new ArrayList<>();
         if (ct.job() != null) {
             l.add(scheduler.TypesInitialized(ct.job()));
         }

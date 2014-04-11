@@ -103,11 +103,11 @@ public class InnerTranslator extends NodeVisitor {
 
         public ClassInfo(ParsedClassType ct) {
             this.ct = ct;
-            localNameCount = new HashMap<String, Integer>();
-            newMemberClasses = new LinkedList<ClassDecl>();
-            newMemberMethods = new LinkedList<MethodDecl>();
-            newConsFormals = new LinkedList<Formal>();
-            innerClassInfo = new LinkedList<ClassInfo>();
+            localNameCount = new HashMap<>();
+            newMemberClasses = new LinkedList<>();
+            newMemberMethods = new LinkedList<>();
+            newConsFormals = new LinkedList<>();
+            innerClassInfo = new LinkedList<>();
             hasOuterField = false;
             insideCode = null;
         }
@@ -216,9 +216,9 @@ public class InnerTranslator extends NodeVisitor {
 
         public CodeInfo(CodeInstance ci) {
             this.ci = ci;
-            finalArgs = new LinkedList<LocalInstance>();
-            localClassInfo = new LinkedList<ClassInfo>();
-            blockFinals = new Stack<LinkedList<LocalInstance>>();
+            finalArgs = new LinkedList<>();
+            localClassInfo = new LinkedList<>();
+            blockFinals = new Stack<>();
         }
 
         @Override
@@ -244,7 +244,7 @@ public class InnerTranslator extends NodeVisitor {
         }
 
         public List<LocalInstance> finalList() {
-            List<LocalInstance> result = new LinkedList<LocalInstance>();
+            List<LocalInstance> result = new LinkedList<>();
             result.addAll(finalArgs);
             for (List<LocalInstance> l : blockFinals) {
                 result.addAll(l);
@@ -318,11 +318,11 @@ public class InnerTranslator extends NodeVisitor {
         super(nf.lang());
         this.ts = ts;
         this.nf = nf;
-        classContext = new Stack<ClassInfo>();
-        codeContext = new Stack<CodeInfo>();
-        innerClassInfoMap = new HashMap<String, ClassInfo>();
-        insideCode = new Stack<Boolean>();
-        staticFieldDecl = new Stack<Boolean>();
+        classContext = new Stack<>();
+        codeContext = new Stack<>();
+        innerClassInfoMap = new HashMap<>();
+        insideCode = new Stack<>();
+        staticFieldDecl = new Stack<>();
     }
 
     @Override
@@ -727,10 +727,9 @@ public class InnerTranslator extends NodeVisitor {
      */
     protected ClassDecl addAnonymousConstructor(ClassDecl cd,
             ParsedClassType ct, ClassInfo cinfo, New newExpr) {
-        List<Formal> formals =
-                new ArrayList<Formal>(newExpr.arguments().size() + 1);
-        List<Expr> args = new ArrayList<Expr>(newExpr.arguments().size() + 1);
-        List<Type> ftypes = new ArrayList<Type>(newExpr.arguments().size() + 1);
+        List<Formal> formals = new ArrayList<>(newExpr.arguments().size() + 1);
+        List<Expr> args = new ArrayList<>(newExpr.arguments().size() + 1);
+        List<Type> ftypes = new ArrayList<>(newExpr.arguments().size() + 1);
 
         int i = 0;
         for (Expr arg : newExpr.arguments()) {
@@ -774,8 +773,7 @@ public class InnerTranslator extends NodeVisitor {
                                        Collections.<Type> emptyList());
         cons = cons.constructorInstance(consInst);
         List<ClassMember> members = cd.body().members();
-        List<ClassMember> newMembers =
-                new ArrayList<ClassMember>(members.size() + 1);
+        List<ClassMember> newMembers = new ArrayList<>(members.size() + 1);
         newMembers.add(cons);
         newMembers.addAll(members);
         cd = cd.body(nf.ClassBody(cd.body().position(), newMembers));
@@ -828,7 +826,7 @@ public class InnerTranslator extends NodeVisitor {
             ci = updateConstructorInst(ct, ci, cinfo);
             List<Formal> formals = cinfo.newConsFormals();
             List<Expr> args =
-                    new ArrayList<Expr>(cc.arguments().size() + formals.size());
+                    new ArrayList<>(cc.arguments().size() + formals.size());
             args.addAll(cc.arguments());
             for (Formal f : formals) {
                 Id id = nf.Id(Position.compilerGenerated(), f.name());
@@ -848,7 +846,7 @@ public class InnerTranslator extends NodeVisitor {
                     // For member inner classes, only need to add one formal that refers to the outer instance.
                     ci = updateConstructorInst(ct, ci, cinfo);
                     List<Expr> args =
-                            new ArrayList<Expr>(cc.arguments().size() + 1);
+                            new ArrayList<>(cc.arguments().size() + 1);
                     Formal f = selfInfo.newConsFormals().get(0);
                     Id id =
                             nf.Id(Position.compilerGenerated(),
@@ -866,7 +864,7 @@ public class InnerTranslator extends NodeVisitor {
                     ci = updateConstructorInst(ct, ci, cinfo);
                     List<Formal> formals = cinfo.newConsFormals();
                     List<Expr> args =
-                            new ArrayList<Expr>(cc.arguments().size()
+                            new ArrayList<>(cc.arguments().size()
                                     + formals.size());
                     args.addAll(cc.arguments());
                     for (Formal f : formals) {
@@ -904,7 +902,7 @@ public class InnerTranslator extends NodeVisitor {
                     ci = updateConstructorInst(ct, ci, cinfo);
                     List<Formal> formals = cinfo.newConsFormals();
                     List<Expr> args =
-                            new ArrayList<Expr>(cc.arguments().size()
+                            new ArrayList<>(cc.arguments().size()
                                     + formals.size());
                     args.addAll(cc.arguments());
                     for (Formal f : formals) {
@@ -928,7 +926,7 @@ public class InnerTranslator extends NodeVisitor {
      */
     protected ClassDecl addNewMembers(ClassDecl cd, ClassInfo cinfo) {
         List<ClassMember> members =
-                new ArrayList<ClassMember>(cd.body().members().size()
+                new ArrayList<>(cd.body().members().size()
                         + cinfo.newMemberClasses().size()
                         + cinfo.newMemberMethods().size());
         members.addAll(cd.body().members());
@@ -978,11 +976,9 @@ public class InnerTranslator extends NodeVisitor {
             ConstructorInstance ci = newExpr.constructorInstance();
             List<Formal> formals = cinfo.newConsFormals();
             List<Expr> args =
-                    new ArrayList<Expr>(newExpr.arguments().size()
-                            + formals.size());
+                    new ArrayList<>(newExpr.arguments().size() + formals.size());
             List<Type> ftypes =
-                    new ArrayList<Type>(newExpr.arguments().size()
-                            + formals.size());
+                    new ArrayList<>(newExpr.arguments().size() + formals.size());
             args.addAll(newExpr.arguments());
             ftypes.addAll(ci.formalTypes());
             Iterator<Formal> it = formals.iterator();
@@ -1024,10 +1020,8 @@ public class InnerTranslator extends NodeVisitor {
             // Maybe we have encountered the new expression of an inner class before it is translated.
             // But we have to make sure that ct is a type in the source language.
             ConstructorInstance ci = newExpr.constructorInstance();
-            List<Expr> args =
-                    new ArrayList<Expr>(newExpr.arguments().size() + 1);
-            List<Type> ftypes =
-                    new ArrayList<Type>(newExpr.arguments().size() + 1);
+            List<Expr> args = new ArrayList<>(newExpr.arguments().size() + 1);
+            List<Type> ftypes = new ArrayList<>(newExpr.arguments().size() + 1);
             args.addAll(newExpr.arguments());
             ftypes.addAll(ci.formalTypes());
             if (newExpr.qualifier() != null) {
@@ -1084,7 +1078,7 @@ public class InnerTranslator extends NodeVisitor {
         Flags f = ct.flags().Static();
         ct.flags(f);
 
-        List<ClassMember> members = new LinkedList<ClassMember>();
+        List<ClassMember> members = new LinkedList<>();
 
         List<FieldDecl> fields = produceFieldDecls(ct, cinfo);
         members.addAll(fields);
@@ -1141,7 +1135,7 @@ public class InnerTranslator extends NodeVisitor {
 
     protected List<FieldDecl> produceFieldDecls(ClassType ct, ClassInfo cinfo) {
         List<Formal> newFormals = cinfo.newConsFormals();
-        List<FieldDecl> fields = new ArrayList<FieldDecl>(newFormals.size());
+        List<FieldDecl> fields = new ArrayList<>(newFormals.size());
         for (Formal formal : newFormals) {
             Id id =
                     nf.Id(Position.compilerGenerated(),
@@ -1206,7 +1200,7 @@ public class InnerTranslator extends NodeVisitor {
             ConstructorInstance ci, ClassInfo cinfo) {
         List<Formal> newFormals = cinfo.newConsFormals();
         List<Type> ftypes =
-                new ArrayList<Type>(ci.formalTypes().size() + newFormals.size());
+                new ArrayList<>(ci.formalTypes().size() + newFormals.size());
         ftypes.addAll(ci.formalTypes());
         for (Formal f : newFormals) {
             ftypes.add(f.type().type());
@@ -1237,13 +1231,12 @@ public class InnerTranslator extends NodeVisitor {
             ConstructorDecl cons, ClassInfo cinfo) {
         List<Formal> newFormals = cinfo.newConsFormals();
         List<Formal> formals =
-                new ArrayList<Formal>(cons.formals().size() + newFormals.size());
+                new ArrayList<>(cons.formals().size() + newFormals.size());
         formals.addAll(cons.formals());
         formals.addAll(newFormals);
 
         List<Stmt> oldStmts = cons.body().statements();
-        List<Stmt> stmts =
-                new ArrayList<Stmt>(oldStmts.size() + newFormals.size());
+        List<Stmt> stmts = new ArrayList<>(oldStmts.size() + newFormals.size());
         Iterator<Stmt> it = oldStmts.iterator();
 
         // Check whether the first statement is a constructor call.
@@ -1292,7 +1285,7 @@ public class InnerTranslator extends NodeVisitor {
     // Generate a list that contains all the field assignments for initializing newly added fields.
     protected List<Stmt> produceFieldInits(ClassInfo cinfo) {
         List<Formal> newFormals = cinfo.newConsFormals();
-        List<Stmt> fInits = new ArrayList<Stmt>(newFormals.size());
+        List<Stmt> fInits = new ArrayList<>(newFormals.size());
         for (Formal formal : newFormals) {
             Id formalId = nf.Id(Position.compilerGenerated(), formal.name());
             Local local = nf.Local(Position.compilerGenerated(), formalId);

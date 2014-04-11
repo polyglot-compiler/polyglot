@@ -135,7 +135,7 @@ public class JL5CallExt extends JL5ProcedureCallExt implements CallOps {
         Call n = this.node();
         JL5CallExt ext = (JL5CallExt) JL5Ext.ext(n);
 
-        List<Type> argTypes = new ArrayList<Type>(n.arguments().size());
+        List<Type> argTypes = new ArrayList<>(n.arguments().size());
 
         for (Expr e : n.arguments()) {
             if (!e.type().isCanonical()) {

@@ -76,14 +76,14 @@ public class CopyPropagator extends DataFlow<CopyPropagator.DataFlowItem> {
          * Constructor for creating an empty set.
          */
         protected DataFlowItem() {
-            this.map = new HashMap<LocalInstance, CopyInfo>();
+            this.map = new HashMap<>();
         }
 
         /**
          * Deep copy constructor.
          */
         protected DataFlowItem(DataFlowItem dfi) {
-            map = new HashMap<LocalInstance, CopyInfo>(dfi.map.size());
+            map = new HashMap<>(dfi.map.size());
             for (Map.Entry<LocalInstance, CopyInfo> e : dfi.map.entrySet()) {
                 LocalInstance li = e.getKey();
                 CopyInfo ci = e.getValue();
@@ -105,12 +105,12 @@ public class CopyPropagator extends DataFlow<CopyPropagator.DataFlowItem> {
 
                 this.li = li;
                 this.from = null;
-                this.to = new HashSet<CopyInfo>();
+                this.to = new HashSet<>();
                 this.root = this;
             }
 
             protected void setRoot(CopyInfo root) {
-                List<CopyInfo> worklist = new ArrayList<CopyInfo>();
+                List<CopyInfo> worklist = new ArrayList<>();
                 worklist.add(this);
                 while (worklist.size() > 0) {
                     CopyInfo ci = worklist.remove(worklist.size() - 1);
@@ -127,7 +127,8 @@ public class CopyPropagator extends DataFlow<CopyPropagator.DataFlowItem> {
                 // Assume both are in consistent data structures, so only check
                 // up pointers.  Also check root pointers because we can.
                 return li == ci.li
-                        && (from == null ? ci.from == null
+                        && (from == null
+                                ? ci.from == null
                                 : (ci.from != null && from.li == ci.from.li))
                         && root.li == ci.root.li;
             }
@@ -491,7 +492,7 @@ public class CopyPropagator extends DataFlow<CopyPropagator.DataFlowItem> {
             Collection<Peer<DataFlowItem>> peers = g.peers(l, Term.EXIT);
             if (peers == null || peers.isEmpty()) return n;
 
-            List<DataFlowItem> items = new ArrayList<DataFlowItem>();
+            List<DataFlowItem> items = new ArrayList<>();
             for (Peer<DataFlowItem> p : peers) {
                 if (p.inItem() != null) items.add(p.inItem());
             }

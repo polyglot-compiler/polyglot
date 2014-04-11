@@ -57,7 +57,7 @@ public class SubtypeSet implements java.util.Set<Type> {
     }
 
     public SubtypeSet(Type top) {
-        v = new ArrayList<Type>();
+        v = new ArrayList<>();
         this.ts = top.typeSystem();
         this.topType = top;
     }
@@ -66,7 +66,7 @@ public class SubtypeSet implements java.util.Set<Type> {
      * Creates a copy of the given SubtypeSet
      */
     public SubtypeSet(SubtypeSet s) {
-        v = new ArrayList<Type>(s.v);
+        v = new ArrayList<>(s.v);
         ts = s.ts;
         topType = s.topType;
     }

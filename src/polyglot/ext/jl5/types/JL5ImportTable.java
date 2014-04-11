@@ -49,8 +49,8 @@ public class JL5ImportTable extends ImportTable {
 
     public JL5ImportTable(TypeSystem ts, polyglot.types.Package pkg, String src) {
         super(ts, pkg, src);
-        this.singleStaticImports = new ArrayList<String>();
-        this.staticOnDemandImports = new ArrayList<String>();
+        this.singleStaticImports = new ArrayList<>();
+        this.staticOnDemandImports = new ArrayList<>();
     }
 
     public JL5ImportTable(TypeSystem ts, polyglot.types.Package pkg) {
@@ -116,7 +116,7 @@ public class JL5ImportTable extends ImportTable {
 
     public List<ReferenceType> findTypesContainingMethodOrField(String name)
             throws SemanticException {
-        List<ReferenceType> containingTypes = new ArrayList<ReferenceType>();
+        List<ReferenceType> containingTypes = new ArrayList<>();
         for (String next : singleStaticImports) {
             String id = StringUtil.getShortNameComponent(next);
             if (name.equals(id)) {

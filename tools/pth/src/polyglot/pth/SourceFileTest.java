@@ -56,7 +56,7 @@ public class SourceFileTest extends AbstractTest {
 
     protected List<ExpectedFailure> expectedFailures;
 
-    protected Set<String> undefinedEnvVars = new HashSet<String>();
+    protected Set<String> undefinedEnvVars = new HashSet<>();
 
     public SourceFileTest(List<String> filenames) {
         super(testName(filenames));
@@ -167,7 +167,7 @@ public class SourceFileTest extends AbstractTest {
     }
 
     protected boolean checkErrorQueue(SilentErrorQueue eq) {
-        List<ErrorInfo> errors = new ArrayList<ErrorInfo>(eq.getErrors());
+        List<ErrorInfo> errors = new ArrayList<>(eq.getErrors());
 
         boolean swallowRemainingFailures = false;
         for (ExpectedFailure f : expectedFailures) {
@@ -211,7 +211,7 @@ public class SourceFileTest extends AbstractTest {
     }
 
     protected List<String> getSourceFileNames() {
-        List<String> sf = new ArrayList<String>(sourceFilenames.size());
+        List<String> sf = new ArrayList<>(sourceFilenames.size());
         for (String f : sourceFilenames)
             sf.add(prependTestPath(f));
         return sf;
@@ -251,7 +251,7 @@ public class SourceFileTest extends AbstractTest {
     }
 
     protected List<String> buildCmdLine(List<String> files) {
-        List<String> args = new LinkedList<String>();
+        List<String> args = new LinkedList<>();
 
         String s;
         String[] sa;
@@ -279,7 +279,7 @@ public class SourceFileTest extends AbstractTest {
         char pathSep = File.pathSeparatorChar;
 
         if (mainExtraArgs == null && (s = Main.options.extraArgs) != null) {
-            mainExtraArgs = new LinkedList<String>();
+            mainExtraArgs = new LinkedList<>();
             sa = breakString(Main.options.extraArgs);
             for (String element : sa) {
                 String sas = element;
@@ -386,7 +386,7 @@ public class SourceFileTest extends AbstractTest {
     }
 
     protected static String[] breakString(String s) {
-        List<String> l = new LinkedList<String>();
+        List<String> l = new LinkedList<>();
         int i = 0;
         String token = "";
         // if endChar != 0, then we are parsing a long token that may

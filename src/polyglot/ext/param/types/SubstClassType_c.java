@@ -166,7 +166,7 @@ public class SubstClassType_c<Formal extends Param, Actual extends TypeObject>
     }
 
     protected <T extends TypeObject> List<T> deepCopy(List<T> src) {
-        List<T> dst = new ArrayList<T>(src.size());
+        List<T> dst = new ArrayList<>(src.size());
         for (T t : src)
             dst.add(Copy.Util.copy(t));
         return dst;

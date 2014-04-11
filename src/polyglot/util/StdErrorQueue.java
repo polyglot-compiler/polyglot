@@ -47,8 +47,9 @@ public class StdErrorQueue extends AbstractErrorQueue {
     @Override
     public void displayError(ErrorInfo e) {
         String message =
-                e.getErrorKind() != ErrorInfo.DEBUG ? e.getMessage()
-                        : e.getErrorString() + " -- " + e.getMessage();
+                e.getErrorKind() != ErrorInfo.DEBUG
+                        ? e.getMessage() : e.getErrorString() + " -- "
+                                + e.getMessage();
 
         Position position = e.getPosition();
 
@@ -184,52 +185,47 @@ public class StdErrorQueue extends AbstractErrorQueue {
     }
 
     private void showError(Position pos) {
-        try {
-            Reader r = reader(pos);
+        try (Reader r = reader(pos)) {
+            if (r == null) return;
 
-            if (r == null) {
-                return;
-            }
+            try (LineNumberReader reader = new LineNumberReader(r)) {
 
-            LineNumberReader reader = new LineNumberReader(r);
+                String s = null;
+                while (reader.getLineNumber() < pos.line()) {
+                    s = reader.readLine();
+                }
 
-            String s = null;
-            while (reader.getLineNumber() < pos.line()) {
-                s = reader.readLine();
-            }
+                if (s != null) {
+                    err.println(s);
+                    showErrorIndicator(pos, reader.getLineNumber(), s);
 
-            if (s != null) {
-                err.println(s);
-                showErrorIndicator(pos, reader.getLineNumber(), s);
+                    if (pos.endLine() != pos.line()
+                            && pos.endLine() != Position.UNKNOWN
+                            && pos.endLine() != Position.END_UNUSED) {
 
-                if (pos.endLine() != pos.line()
-                        && pos.endLine() != Position.UNKNOWN
-                        && pos.endLine() != Position.END_UNUSED) {
-
-                    // if there is more than two lines,
-                    // print some ellipsis.
-                    if (pos.endLine() - pos.line() > 1) {
-                        // add some whitespace first
-                        for (int j = 0; j < s.length()
-                                && Character.isWhitespace(s.charAt(j)); j++) {
-                            err.print(s.charAt(j));
+                        // if there is more than two lines,
+                        // print some ellipsis.
+                        if (pos.endLine() - pos.line() > 1) {
+                            // add some whitespace first
+                            for (int j = 0; j < s.length()
+                                    && Character.isWhitespace(s.charAt(j)); j++) {
+                                err.print(s.charAt(j));
+                            }
+                            err.println("...");
                         }
-                        err.println("...");
-                    }
 
-                    while (reader.getLineNumber() < pos.endLine()) {
-                        s = reader.readLine();
-                    }
+                        while (reader.getLineNumber() < pos.endLine()) {
+                            s = reader.readLine();
+                        }
 
-                    // s is now the last line of the error.
-                    if (s != null) {
-                        err.println(s);
-                        showErrorIndicator(pos, reader.getLineNumber(), s);
+                        // s is now the last line of the error.
+                        if (s != null) {
+                            err.println(s);
+                            showErrorIndicator(pos, reader.getLineNumber(), s);
+                        }
                     }
                 }
             }
-
-            reader.close();
 
             err.println();
         }

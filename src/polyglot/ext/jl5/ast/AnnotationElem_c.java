@@ -193,8 +193,7 @@ public class AnnotationElem_c extends JL5TermExt implements AnnotationElem {
     @Override
     public Map<String, AnnotationElementValue> toAnnotationElementValues(
             Lang lang, JL5TypeSystem ts) throws SemanticException {
-        Map<String, AnnotationElementValue> m =
-                new LinkedHashMap<String, AnnotationElementValue>();
+        Map<String, AnnotationElementValue> m = new LinkedHashMap<>();
         for (Term t : this.elements()) {
             ElementValuePair p = (ElementValuePair) JL5Ext.ext(t);
             List<? extends MethodInstance> methods =
@@ -241,8 +240,7 @@ public class AnnotationElem_c extends JL5TermExt implements AnnotationElem {
             }
             ElementValueArrayInit init =
                     (ElementValueArrayInit) JL5Ext.ext(value);
-            List<AnnotationElementValue> vals =
-                    new ArrayList<AnnotationElementValue>();
+            List<AnnotationElementValue> vals = new ArrayList<>();
             for (Term v : init.elements()) {
                 vals.add(toAnnotationElementValue(lang, v, intendedBaseType, ts));
             }

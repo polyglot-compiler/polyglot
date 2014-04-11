@@ -117,7 +117,7 @@ public class JL5Disamb_c extends Disamb_c {
                 // we found a type that was named appropriately. Access it 
                 // through t in order to ensure that substitution is 
                 // applied correctly.
-                LinkedList<ClassType> typeQueue = new LinkedList<ClassType>();
+                LinkedList<ClassType> typeQueue = new LinkedList<>();
                 typeQueue.addLast(t.toClass());
                 ClassType type = null;
                 while (!typeQueue.isEmpty()) {

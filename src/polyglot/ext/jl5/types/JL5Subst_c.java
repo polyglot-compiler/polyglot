@@ -70,8 +70,7 @@ public class JL5Subst_c extends Subst_c<TypeVariable, ReferenceType> implements
     // when substituting type variables that aren't in the subst map, 
     // keep track of which ones we have seen already, so that we don't go into 
     // an infinite loop as we subst on their upper bounds.
-    private LinkedList<TypeVariable> visitedTypeVars =
-            new LinkedList<TypeVariable>();
+    private LinkedList<TypeVariable> visitedTypeVars = new LinkedList<>();
 
     public ReferenceType substTypeVariable(TypeVariable t) {
         if (subst.containsKey(t)) {
@@ -161,7 +160,7 @@ public class JL5Subst_c extends Subst_c<TypeVariable, ReferenceType> implements
         JL5MethodInstance mj = (JL5MethodInstance) super.substMethod(mi);
         if (mj.typeParams() != null && !mj.typeParams().isEmpty()) {
             // remove any type params we have replaced.
-            List<TypeVariable> l = new ArrayList<TypeVariable>(mj.typeParams());
+            List<TypeVariable> l = new ArrayList<>(mj.typeParams());
             l.removeAll(this.subst.keySet());
             mj.setTypeParams(l);
         }
@@ -179,7 +178,7 @@ public class JL5Subst_c extends Subst_c<TypeVariable, ReferenceType> implements
                 (JL5ConstructorInstance) super.substConstructor(ci);
         if (cj.typeParams() != null && !cj.typeParams().isEmpty()) {
             // remove any type params we have replaced.
-            List<TypeVariable> l = new ArrayList<TypeVariable>(cj.typeParams());
+            List<TypeVariable> l = new ArrayList<>(cj.typeParams());
             l.removeAll(this.subst.keySet());
             cj.setTypeParams(l);
         }

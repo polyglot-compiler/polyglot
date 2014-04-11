@@ -45,7 +45,7 @@ public class ObjectDumper {
     }
 
     public void dump(Object o) {
-        Set<Object> cache = new java.util.HashSet<Object>();
+        Set<Object> cache = new java.util.HashSet<>();
         w.write("(");
         dumpObject(o, cache);
         w.write(")");
@@ -79,8 +79,7 @@ public class ObjectDumper {
         try {
             Field[] fields = obj.getClass().getDeclaredFields();
             java.lang.reflect.AccessibleObject.setAccessible(fields, true);
-            for (int i = 0; i < fields.length; i++) {
-                Field field = fields[i];
+            for (Field field : fields) {
                 if ((field.getModifiers() & modifiersMask) != 0) continue;
                 w.write("(");
                 w.write(field.getName());

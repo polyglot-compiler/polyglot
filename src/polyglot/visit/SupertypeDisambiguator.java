@@ -68,7 +68,7 @@ public class SupertypeDisambiguator extends Disambiguator {
             cd = cd.superClass(cd.visitChild(cd.superClass(), v));
             if (v.hasErrors()) return cd;
 
-            List<TypeNode> newInterfaces = new ArrayList<TypeNode>();
+            List<TypeNode> newInterfaces = new ArrayList<>();
             for (TypeNode tn : cd.interfaces()) {
                 newInterfaces.add(cd.visitChild(tn, v));
                 if (v.hasErrors()) return cd;

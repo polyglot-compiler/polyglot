@@ -1,0 +1,10 @@
+class G {
+	class H<T> {
+		public H(T result) {
+		}
+	}
+
+	H<G> foo() {
+		return new H<>(new G());
+	}
+}

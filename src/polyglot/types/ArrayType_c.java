@@ -60,21 +60,21 @@ public class ArrayType_c extends ReferenceType_c implements ArrayType {
 
     protected void init() {
         if (methods == null) {
-            methods = new ArrayList<MethodInstance>(1);
+            methods = new ArrayList<>(1);
 
             // Add method public Object clone()
             methods.add(createCloneMethodInstance());
         }
 
         if (fields == null) {
-            fields = new ArrayList<FieldInstance>(1);
+            fields = new ArrayList<>(1);
 
             // Add field public final int length
             fields.add(createLengthFieldInstance());
         }
 
         if (interfaces == null) {
-            interfaces = new ArrayList<ClassType>(2);
+            interfaces = new ArrayList<>(2);
             interfaces.add(ts.Cloneable());
             interfaces.add(ts.Serializable());
         }

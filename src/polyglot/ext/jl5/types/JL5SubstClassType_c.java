@@ -194,7 +194,7 @@ public class JL5SubstClassType_c extends
     public LinkedList<Type> isImplicitCastValidChainImpl(Type toType) {
         LinkedList<Type> chain = null;
         if (ts.isSubtype(this, toType)) {
-            chain = new LinkedList<Type>();
+            chain = new LinkedList<>();
             chain.add(this);
             chain.add(toType);
         }
@@ -271,7 +271,9 @@ public class JL5SubstClassType_c extends
         JL5ParsedClassType b = (JL5ParsedClassType) this.base;
 
         for (TypeVariable t : b.typeVariables()) {
-            if (subst.substType(t) instanceof WildCardType) {
+            Type substType = subst.substType(t);
+            if (substType instanceof WildCardType
+                    && !(substType instanceof CaptureConvertedWildCardType)) {
                 return true;
             }
         }

@@ -25,7 +25,6 @@
  ******************************************************************************/
 package polyglot.ext.jl5.types;
 
-
 public interface CaptureConvertedWildCardType extends TypeVariable {
 
     boolean isExtendsConstraint();

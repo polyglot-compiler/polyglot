@@ -38,7 +38,7 @@ public class Enum implements Internable, Serializable {
     private String name;
 
     /** The intern cache. */
-    private static Map<EnumKey, Enum> cache = new HashMap<EnumKey, Enum>();
+    private static Map<EnumKey, Enum> cache = new HashMap<>();
 
     protected Enum(String name) {
         this.name = name;

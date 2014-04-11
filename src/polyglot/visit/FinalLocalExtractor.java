@@ -64,7 +64,7 @@ public class FinalLocalExtractor extends NodeVisitor {
 
     @Override
     public NodeVisitor begin() {
-        isFinal = new HashSet<LocalInstance>();
+        isFinal = new HashSet<>();
         return super.begin();
     }
 

@@ -1,0 +1,11 @@
+import java.util.ArrayList;
+import java.util.List;
+
+class C {
+	void foo() {
+		List<C> l = new ArrayList<>(bar());
+	}
+	List<? extends C> bar() {
+		return null;
+	}
+}

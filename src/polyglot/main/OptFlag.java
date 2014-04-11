@@ -91,7 +91,7 @@ public abstract class OptFlag<T> implements Comparable<OptFlag<T>> {
     }
 
     public static List<Arg<?>> sourceArgs(List<Arg<?>> arguments) {
-        List<Arg<?>> matches = new ArrayList<Arg<?>>();
+        List<Arg<?>> matches = new ArrayList<>();
         for (Arg<?> arg : arguments) {
             if (arg.flag == null) matches.add(arg);
         }
@@ -106,7 +106,7 @@ public abstract class OptFlag<T> implements Comparable<OptFlag<T>> {
     }
 
     public static List<Arg<?>> lookupAll(String id, List<Arg<?>> args) {
-        List<Arg<?>> matches = new ArrayList<Arg<?>>();
+        List<Arg<?>> matches = new ArrayList<>();
         for (Arg<?> arg : args) {
             if (arg.flag != null && arg.flag.ids.contains(id))
                 matches.add(arg);
@@ -352,7 +352,7 @@ public abstract class OptFlag<T> implements Comparable<OptFlag<T>> {
             String defaultValue) {
         this.kind = kind;
 
-        this.ids = new LinkedHashSet<String>(ids.length);
+        this.ids = new LinkedHashSet<>(ids.length);
         for (String flag : ids)
             this.ids.add(flag);
 
@@ -402,11 +402,11 @@ public abstract class OptFlag<T> implements Comparable<OptFlag<T>> {
     }
 
     public Arg<T> createArg(int next, T value) {
-        return new Arg<T>(this, next, value);
+        return new Arg<>(this, next, value);
     }
 
     public Arg<T> createDefault(T value) {
-        return new Arg<T>(this, -1, value);
+        return new Arg<>(this, -1, value);
     }
 
     /**
@@ -571,7 +571,7 @@ public abstract class OptFlag<T> implements Comparable<OptFlag<T>> {
          */
         @Override
         public Arg<List<T>> handle(String[] args, int index) {
-            List<T> path = new ArrayList<T>();
+            List<T> path = new ArrayList<>();
             StringTokenizer st =
                     new StringTokenizer(args[index], pathSeparator);
             while (st.hasMoreTokens()) {

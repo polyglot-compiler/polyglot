@@ -140,7 +140,7 @@ public class JL5CanonicalTypeNodeExt extends JL5TermExt {
     }
 
     private Set<TypeVariable> findInstanceTypeVariables(Type t) {
-        Set<TypeVariable> s = new LinkedHashSet<TypeVariable>();
+        Set<TypeVariable> s = new LinkedHashSet<>();
         findInstanceTypeVariables(t, s);
         return s;
     }

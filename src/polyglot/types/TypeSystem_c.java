@@ -673,7 +673,7 @@ public class TypeSystem_c implements TypeSystem {
 
     @Override
     public Collection<Type> uncheckedExceptions() {
-        List<Type> l = new ArrayList<Type>(2);
+        List<Type> l = new ArrayList<>(2);
         l.add(Error());
         l.add(RuntimeException());
         return l;
@@ -788,7 +788,7 @@ public class TypeSystem_c implements TypeSystem {
             return Collections.singleton(fi);
         }
 
-        Set<FieldInstance> fields = new HashSet<FieldInstance>();
+        Set<FieldInstance> fields = new HashSet<>();
 
         if (container.superType() != null
                 && container.superType().isReference()) {
@@ -910,9 +910,9 @@ public class TypeSystem_c implements TypeSystem {
                     + "\" within a null container type.");
         }
 
-        Set<Type> visitedTypes = new HashSet<Type>();
+        Set<Type> visitedTypes = new HashSet<>();
 
-        LinkedList<Type> typeQueue = new LinkedList<Type>();
+        LinkedList<Type> typeQueue = new LinkedList<>();
         typeQueue.addLast(container);
 
         while (!typeQueue.isEmpty()) {
@@ -1052,12 +1052,11 @@ public class TypeSystem_c implements TypeSystem {
 
         // now, use JLS 15.11.2.2
         // First sort from most- to least-specific.
-        MostSpecificComparator<Instance> msc =
-                new MostSpecificComparator<Instance>();
-        acceptable = new ArrayList<Instance>(acceptable); // make into array list to sort
+        MostSpecificComparator<Instance> msc = new MostSpecificComparator<>();
+        acceptable = new ArrayList<>(acceptable); // make into array list to sort
         Collections.sort(acceptable, msc);
 
-        List<Instance> maximal = new ArrayList<Instance>(acceptable.size());
+        List<Instance> maximal = new ArrayList<>(acceptable.size());
 
         Iterator<Instance> i = acceptable.iterator();
 
@@ -1074,8 +1073,7 @@ public class TypeSystem_c implements TypeSystem {
         }
         if (maximal.size() > 1) {
             // If exactly one method is not abstract, it is the most specific.
-            List<Instance> notAbstract =
-                    new ArrayList<Instance>(maximal.size());
+            List<Instance> notAbstract = new ArrayList<>(maximal.size());
             for (Instance p : maximal) {
                 if (!p.flags().isAbstract()) {
                     notAbstract.add(p);
@@ -1158,21 +1156,21 @@ public class TypeSystem_c implements TypeSystem {
         // by an unacceptable method (which can occur with protected methods
         // only). They include methods that are inherited from super classes 
         // and interfaces but not overridden.
-        List<MethodInstance> acceptable = new ArrayList<MethodInstance>();
+        List<MethodInstance> acceptable = new ArrayList<>();
 
         // A list of unacceptable methods, where the method call is valid, but
         // the method is not accessible. This list is needed to make sure that
         // the acceptable methods are not overridden by an unacceptable method.
-        List<MethodInstance> unacceptable = new ArrayList<MethodInstance>();
+        List<MethodInstance> unacceptable = new ArrayList<>();
 
         // A set of all the methods that methods in acceptable override.
         // Used to make sure we don't mistakenly add in overridden methods
         // (since overridden methods aren't inherited from superclasses).
-        Set<MethodInstance> overridden = new HashSet<MethodInstance>();
+        Set<MethodInstance> overridden = new HashSet<>();
 
-        Set<Type> visitedTypes = new HashSet<Type>();
+        Set<Type> visitedTypes = new HashSet<>();
 
-        LinkedList<Type> typeQueue = new LinkedList<Type>();
+        LinkedList<Type> typeQueue = new LinkedList<>();
         typeQueue.addLast(container);
 
         while (!typeQueue.isEmpty()) {
@@ -1296,8 +1294,7 @@ public class TypeSystem_c implements TypeSystem {
 
         SemanticException error = null;
 
-        List<ConstructorInstance> acceptable =
-                new ArrayList<ConstructorInstance>();
+        List<ConstructorInstance> acceptable = new ArrayList<>();
 
         if (Report.should_report(Report.types, 2))
             Report.report(2, "Searching type " + container
@@ -1818,7 +1815,7 @@ public class TypeSystem_c implements TypeSystem {
         return arrayType(pos, type);
     }
 
-    Map<Type, ArrayType> arrayTypeCache = new HashMap<Type, ArrayType>();
+    Map<Type, ArrayType> arrayTypeCache = new HashMap<>();
 
     /**
      * Factory method for ArrayTypes.
@@ -1978,7 +1975,7 @@ public class TypeSystem_c implements TypeSystem {
 
     @Override
     public List<String> defaultPackageImports() {
-        List<String> l = new ArrayList<String>(1);
+        List<String> l = new ArrayList<>(1);
         l.add("java.lang");
         return l;
     }
@@ -2230,7 +2227,7 @@ public class TypeSystem_c implements TypeSystem {
      * {@code rt}.
      */
     protected List<ReferenceType> abstractSuperInterfaces(ReferenceType rt) {
-        List<ReferenceType> superInterfaces = new LinkedList<ReferenceType>();
+        List<ReferenceType> superInterfaces = new LinkedList<>();
         superInterfaces.add(rt);
 
         List<? extends ReferenceType> interfaces = rt.interfaces();
@@ -2355,7 +2352,7 @@ public class TypeSystem_c implements TypeSystem {
     }
 
     protected void initFlags() {
-        flagsForName = new HashMap<String, Flags>();
+        flagsForName = new HashMap<>();
         flagsForName.put("public", Flags.PUBLIC);
         flagsForName.put("private", Flags.PRIVATE);
         flagsForName.put("protected", Flags.PROTECTED);

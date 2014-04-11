@@ -73,7 +73,7 @@ public class JL5MethodInstance_c extends MethodInstance_c implements
 
     @Override
     public List<MethodInstance> overridesImpl() {
-        List<MethodInstance> l = new LinkedList<MethodInstance>();
+        List<MethodInstance> l = new LinkedList<>();
         ReferenceType rt = container();
         JL5TypeSystem ts = (JL5TypeSystem) this.typeSystem();
         while (rt != null) {
@@ -103,7 +103,7 @@ public class JL5MethodInstance_c extends MethodInstance_c implements
         }
         JL5TypeSystem ts = (JL5TypeSystem) this.typeSystem();
 
-        List<MethodInstance> l = new LinkedList<MethodInstance>();
+        List<MethodInstance> l = new LinkedList<>();
         // add any method with the same name and formalTypes from 
         // rt
         for (MethodInstance mj : rt.methodsNamed(name)) {
@@ -169,8 +169,7 @@ public class JL5MethodInstance_c extends MethodInstance_c implements
 
         // replace the type variables of mj with the type variables of mi
         if (!mi.typeParams().isEmpty()) {
-            Map<TypeVariable, ReferenceType> substm =
-                    new LinkedHashMap<TypeVariable, ReferenceType>();
+            Map<TypeVariable, ReferenceType> substm = new LinkedHashMap<>();
             for (int i = 0; i < mi.typeParams().size(); i++) {
                 substm.put(mj.typeParams().get(i), mi.typeParams().get(i));
             }

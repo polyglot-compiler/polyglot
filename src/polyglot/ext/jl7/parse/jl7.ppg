@@ -12,7 +12,7 @@ parser Grm extends polyglot.ext.jl5.parse.Grm  {:
 	public final JL7TypeSystem ts;
 	public final JL7NodeFactory nf;
 
-	public static final List<TypeNode> diamond = new LinkedList<TypeNode>();
+	public static final List<TypeNode> diamond = new LinkedList<>();
 
 	public Grm(Lexer l, TypeSystem t, NodeFactory n, ErrorQueue q) {
 		super(l, t, n, q);
@@ -48,7 +48,7 @@ try_with_resources_statement ::=
 
 resources ::=
 	resource:a {:
-		List<LocalDecl> l = new LinkedList<LocalDecl>();
+		List<LocalDecl> l = new LinkedList<>();
 		l.add(a);
 		RESULT = l;
 	:}
@@ -85,7 +85,7 @@ override catch_clause ::=
 
 catch_type ::=
 	name:a {:
-		List<TypeNode> l = new LinkedList<TypeNode>();
+		List<TypeNode> l = new LinkedList<>();
 		l.add(a.toType());
 		RESULT = l;
 	:}

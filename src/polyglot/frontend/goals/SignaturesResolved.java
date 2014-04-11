@@ -78,7 +78,7 @@ public class SignaturesResolved extends ClassTypeGoal {
 
     @Override
     public Collection<Goal> prerequisiteGoals(Scheduler scheduler) {
-        List<Goal> l = new ArrayList<Goal>();
+        List<Goal> l = new ArrayList<>();
         if (ct.job() != null) {
             l.add(scheduler.TypesInitialized(ct.job()));
         }
@@ -94,7 +94,7 @@ public class SignaturesResolved extends ClassTypeGoal {
 
     @Override
     public Collection<Goal> corequisiteGoals(Scheduler scheduler) {
-        List<Goal> l = new ArrayList<Goal>();
+        List<Goal> l = new ArrayList<>();
         if (ct.job() != null) {
             if (isGlobal(ct)) {
                 l.add(scheduler.SignaturesDisambiguated(ct.job()));

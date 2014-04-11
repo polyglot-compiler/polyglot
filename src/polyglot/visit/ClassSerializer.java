@@ -114,7 +114,7 @@ public class ClassSerializer extends NodeVisitor {
 
     public List<ClassMember> createSerializationMembers(ClassType ct) {
         try {
-            List<ClassMember> newMembers = new ArrayList<ClassMember>(3);
+            List<ClassMember> newMembers = new ArrayList<>(3);
 
             // HACK: force class members to get created from lazy class
             // initializer.

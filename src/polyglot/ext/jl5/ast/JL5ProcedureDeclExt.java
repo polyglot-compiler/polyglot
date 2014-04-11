@@ -134,8 +134,7 @@ public abstract class JL5ProcedureDeclExt extends JL5AnnotatedElementExt
         }
 
         boolean isVarArgs = false;
-        List<UnknownType> formalTypes =
-                new ArrayList<UnknownType>(pd.formals().size());
+        List<UnknownType> formalTypes = new ArrayList<>(pd.formals().size());
         for (int i = 0; i < pd.formals().size(); i++) {
             formalTypes.add(ts.unknownType(pd.position()));
             Formal f = pd.formals().get(i);
@@ -143,14 +142,12 @@ public abstract class JL5ProcedureDeclExt extends JL5AnnotatedElementExt
             if (fext.isVarArg()) isVarArgs = true;
         }
 
-        List<UnknownType> throwTypes =
-                new ArrayList<UnknownType>(pd.throwTypes().size());
+        List<UnknownType> throwTypes = new ArrayList<>(pd.throwTypes().size());
         for (int i = 0; i < pd.throwTypes().size(); i++) {
             throwTypes.add(ts.unknownType(pd.position()));
         }
 
-        List<TypeVariable> typeParams =
-                new ArrayList<TypeVariable>(this.typeParams.size());
+        List<TypeVariable> typeParams = new ArrayList<>(this.typeParams.size());
         for (int i = 0; i < this.typeParams.size(); i++) {
             typeParams.add(ts.unknownTypeVariable(pd.position()));
         }
@@ -177,8 +174,7 @@ public abstract class JL5ProcedureDeclExt extends JL5AnnotatedElementExt
         ProcedureDecl n =
                 (ProcedureDecl) superLang().disambiguate(this.node(), ar);
 
-        List<TypeVariable> typeParams =
-                new ArrayList<TypeVariable>(this.typeParams.size());
+        List<TypeVariable> typeParams = new ArrayList<>(this.typeParams.size());
 
         for (TypeNode tn : this.typeParams) {
             if (!tn.isDisambiguated()) {

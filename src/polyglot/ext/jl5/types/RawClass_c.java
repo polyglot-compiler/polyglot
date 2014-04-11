@@ -175,7 +175,7 @@ public class RawClass_c extends JL5ClassType_c implements RawClass {
             return origInts;
         }
 
-        List<ReferenceType> ints = new ArrayList<ReferenceType>();
+        List<ReferenceType> ints = new ArrayList<>();
         JL5TypeSystem ts = (JL5TypeSystem) typeSystem();
         for (ReferenceType rt : origInts) {
             ints.add((ReferenceType) ts.erasureType(rt));
@@ -199,7 +199,7 @@ public class RawClass_c extends JL5ClassType_c implements RawClass {
             return origInts;
         }
 
-        Set<Type> ints = new LinkedHashSet<Type>();
+        Set<Type> ints = new LinkedHashSet<>();
         JL5TypeSystem ts = (JL5TypeSystem) typeSystem();
         for (Type rt : origInts) {
             ints.add(ts.erasureType(rt));

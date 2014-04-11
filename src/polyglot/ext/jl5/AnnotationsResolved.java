@@ -68,7 +68,7 @@ public class AnnotationsResolved extends VisitorGoal {
 
     @Override
     public Collection<Goal> prerequisiteGoals(Scheduler scheduler) {
-        List<Goal> l = new ArrayList<Goal>();
+        List<Goal> l = new ArrayList<>();
         l.add(scheduler.Disambiguated(job));
         l.addAll(super.prerequisiteGoals(scheduler));
         return l;
@@ -81,7 +81,7 @@ public class AnnotationsResolved extends VisitorGoal {
 
         @Override
         public Collection<Goal> prerequisiteGoals(Scheduler scheduler) {
-            List<Goal> l = new ArrayList<Goal>();
+            List<Goal> l = new ArrayList<>();
             l.add(scheduler.SignaturesResolved(ct));
             l.addAll(super.prerequisiteGoals(scheduler));
             return l;

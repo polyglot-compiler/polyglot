@@ -169,7 +169,7 @@ public class emit {
     /*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . .*/
 
     /** List of imports (Strings containing class names) to go with actions. */
-    public static Stack<String> import_list = new Stack<String>();
+    public static Stack<String> import_list = new Stack<>();
 
     /*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . .*/
 
@@ -244,7 +244,7 @@ public class emit {
         _locations = false;
         _lr_values = true;
         action_code = null;
-        import_list = new Stack<String>();
+        import_list = new Stack<>();
         init_code = null;
         not_reduced = 0;
         num_conflicts = 0;

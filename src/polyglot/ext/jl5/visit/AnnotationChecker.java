@@ -133,8 +133,7 @@ public class AnnotationChecker extends ContextVisitor {
         }
         MethodInstance mi = (MethodInstance) decl;
         JL5TypeSystem ts = this.typeSystem();
-        List<MethodInstance> overrides =
-                new LinkedList<MethodInstance>(ts.implemented(mi));
+        List<MethodInstance> overrides = new LinkedList<>(ts.implemented(mi));
         overrides.remove(mi);
         if (overrides.isEmpty()) {
             throw new SemanticException("Method " + mi.signature()

@@ -154,12 +154,12 @@ public class MethodDecl_c extends ProcedureDecl_c implements MethodDecl {
             return this;
         }
 
-        List<Type> formalTypes = new ArrayList<Type>(formals.size());
+        List<Type> formalTypes = new ArrayList<>(formals.size());
         for (int i = 0; i < formals.size(); i++) {
             formalTypes.add(ts.unknownType(position()));
         }
 
-        List<Type> throwTypes = new ArrayList<Type>(throwTypes().size());
+        List<Type> throwTypes = new ArrayList<>(throwTypes().size());
         for (int i = 0; i < throwTypes().size(); i++) {
             throwTypes.add(ts.unknownType(position()));
         }

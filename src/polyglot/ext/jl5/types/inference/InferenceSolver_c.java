@@ -87,9 +87,9 @@ public class InferenceSolver_c implements InferenceSolver {
 
     private Type[] solve(List<Constraint> constraints,
             boolean useSubtypeConstraints, boolean useSupertypeConstraints) {
-        List<EqualConstraint> equals = new ArrayList<EqualConstraint>();
-        List<SubTypeConstraint> subs = new ArrayList<SubTypeConstraint>();
-        List<SuperTypeConstraint> supers = new ArrayList<SuperTypeConstraint>();
+        List<EqualConstraint> equals = new ArrayList<>();
+        List<SubTypeConstraint> subs = new ArrayList<>();
+        List<SuperTypeConstraint> supers = new ArrayList<>();
 //        System.err.println("**** inference solver:");
 //        System.err.println("      constraints : " + constraints);
 //        System.err.println("      use subs? : " + useSubtypeConstraints
@@ -153,13 +153,13 @@ public class InferenceSolver_c implements InferenceSolver {
         for (int i = 0; i < solution.length; i++) {
             if (solution[i] == null) {
                 TypeVariable toSolve = typeVariablesToSolve().get(i);
-                Set<ReferenceType> bounds = new LinkedHashSet<ReferenceType>();
+                Set<ReferenceType> bounds = new LinkedHashSet<>();
                 for (Constraint c : subSupConstraints) {
                     if (c.formal.equals(toSolve) && c.actual.isReference()) {
                         bounds.add((ReferenceType) c.actual);
                     }
                 }
-                List<ReferenceType> u = new ArrayList<ReferenceType>(bounds);
+                List<ReferenceType> u = new ArrayList<>(bounds);
                 if (u.size() == 1) {
                     solution[i] = u.get(0);
                 }
@@ -185,7 +185,7 @@ public class InferenceSolver_c implements InferenceSolver {
     }
 
     private List<Constraint> getInitialConstraints() {
-        List<Constraint> constraints = new ArrayList<Constraint>();
+        List<Constraint> constraints = new ArrayList<>();
         int numFormals = formalTypes.size();
         for (int i = 0; i < numFormals - 1; i++) {
             constraints.add(new SubConversionConstraint(actualArgumentTypes.get(i),
@@ -250,7 +250,7 @@ public class InferenceSolver_c implements InferenceSolver {
                 // We do this for compatibility with javac, which appears to deviate
                 // from the Java Language Spec on type inference.
 
-                List<Constraint> cons = new ArrayList<Constraint>();
+                List<Constraint> cons = new ArrayList<>();
                 cons.addAll(getInitialConstraints());
                 cons.add(new SuperConversionConstraint(expectedReturnType,
                                                        returnType,
@@ -263,8 +263,7 @@ public class InferenceSolver_c implements InferenceSolver {
             }
         }
 
-        Map<TypeVariable, ReferenceType> m =
-                new LinkedHashMap<TypeVariable, ReferenceType>();
+        Map<TypeVariable, ReferenceType> m = new LinkedHashMap<>();
         for (int i = 0; i < solution.length; i++) {
             if (solution[i] == null) {
                 // no solution for this variable.
@@ -277,12 +276,11 @@ public class InferenceSolver_c implements InferenceSolver {
 
     private Type[] handleUnresolvedTypeArgs(Type[] solution,
             Type expectedReturnType) {
-        List<Constraint> constraints = new ArrayList<Constraint>();
+        List<Constraint> constraints = new ArrayList<>();
         constraints.addAll(this.getInitialConstraints());
 
         // get the substitution corresponding to the solution so far
-        Map<TypeVariable, ReferenceType> m =
-                new LinkedHashMap<TypeVariable, ReferenceType>();
+        Map<TypeVariable, ReferenceType> m = new LinkedHashMap<>();
         for (int i = 0; i < solution.length; i++) {
             ReferenceType t = (ReferenceType) solution[i];
             if (t == null) {

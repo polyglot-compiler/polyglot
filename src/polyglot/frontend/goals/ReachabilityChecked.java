@@ -48,7 +48,7 @@ public class ReachabilityChecked extends VisitorGoal {
 
     @Override
     public Collection<Goal> prerequisiteGoals(Scheduler scheduler) {
-        List<Goal> l = new ArrayList<Goal>();
+        List<Goal> l = new ArrayList<>();
         l.add(scheduler.TypeChecked(job));
 //        l.add(scheduler.ConstantsChecked(job));
         l.addAll(super.prerequisiteGoals(scheduler));

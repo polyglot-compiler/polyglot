@@ -26,11 +26,11 @@
 
 package polyglot.util;
 
-import java.io.PrintWriter;
-import java.io.Writer;
+import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
-import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.Writer;
 import java.util.Stack;
 
 /**
@@ -69,7 +69,7 @@ public class SimpleCodeWriter extends CodeWriter {
         adjustRmargin();
         breakAll = false;
         pos = 0;
-        lmargins = new Stack<State>();
+        lmargins = new Stack<>();
     }
 
     public SimpleCodeWriter(Writer o, int width_) {

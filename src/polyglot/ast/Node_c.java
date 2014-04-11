@@ -294,7 +294,7 @@ public abstract class Node_c implements Node {
         }
 
         List<T> result = l;
-        List<T> vl = new ArrayList<T>(l.size());
+        List<T> vl = new ArrayList<>(l.size());
 
         for (T n : l) {
             T m = visitChild(n, v);

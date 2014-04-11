@@ -110,12 +110,12 @@ public class ExpressionFlattener extends NodeVisitor {
     protected final NodeFactory nf;
 
     /** Stack of nested blocks we are currently in. */
-    protected final Stack<List<Stmt>> blockStack = new Stack<List<Stmt>>();
+    protected final Stack<List<Stmt>> blockStack = new Stack<>();
 
     /** Set of expressions not to flatten. Only applies to the expressions
       * themselves, and not their subexpressions (unless they are also in
       * the set explicitly). */
-    protected final Set<Expr> dontFlatten = new HashSet<Expr>();
+    protected final Set<Expr> dontFlatten = new HashSet<>();
 
     /** Used to copy a whole AST subtree. */
     protected final DeepCopy deepCopier;

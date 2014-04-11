@@ -40,15 +40,14 @@ public class CachingTransformingList<T, U> extends TransformingList<T, U> {
 
     public CachingTransformingList(Collection<? extends T> underlying,
             Transformation<T, U> trans) {
-        this(new ArrayList<T>(underlying), trans);
+        this(new ArrayList<>(underlying), trans);
     }
 
     public CachingTransformingList(List<T> underlying,
             Transformation<T, U> trans) {
         super(underlying, trans);
         cache =
-                new ArrayList<U>(Collections.<U> nCopies(underlying.size(),
-                                                         null));
+                new ArrayList<>(Collections.<U> nCopies(underlying.size(), null));
     }
 
     @Override

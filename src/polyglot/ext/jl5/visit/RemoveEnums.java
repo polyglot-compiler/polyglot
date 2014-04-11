@@ -113,8 +113,7 @@ public class RemoveEnums extends ContextVisitor {
      * ClassMembers to add at the closest surrounding class body.
      * An element is pushed when entering a ClassBody, and popped when exiting a ClassBody.
      */
-    private Stack<List<ClassMember>> classMembersToAdd =
-            new Stack<List<ClassMember>>();
+    private Stack<List<ClassMember>> classMembersToAdd = new Stack<>();
 
     public RemoveEnums(Job job, TypeSystem ts, NodeFactory nf) {
         super(job, ts, nf);
@@ -245,7 +244,7 @@ public class RemoveEnums extends ContextVisitor {
         Id enumName = nodeFactory().Id(pos, "enum$name");
         Id enumOrdinal = nodeFactory().Id(pos, "enum$ordinal");
 
-        List<Stmt> oldStmts = new LinkedList<Stmt>(n.body().statements());
+        List<Stmt> oldStmts = new LinkedList<>(n.body().statements());
         ConstructorCall existingCC = null;
         if (!oldStmts.isEmpty() && oldStmts.get(0) instanceof ConstructorCall) {
             existingCC = (ConstructorCall) oldStmts.remove(0);
@@ -258,7 +257,7 @@ public class RemoveEnums extends ContextVisitor {
         }
 
         // add two new arguments to the constructor
-        List<Formal> newFormals = new ArrayList<Formal>();
+        List<Formal> newFormals = new ArrayList<>();
         JL5LocalInstance enumNameLI =
                 (JL5LocalInstance) ts.localInstance(pos,
                                                     Flags.NONE,
@@ -288,7 +287,7 @@ public class RemoveEnums extends ContextVisitor {
         n = (ConstructorDecl) n.formals(newFormals);
 
         // use those arguments in the constructor call
-        List<Expr> constructorCallArgs = new ArrayList<Expr>();
+        List<Expr> constructorCallArgs = new ArrayList<>();
         constructorCallArgs.add(nodeFactory().Local(pos, enumName)
                                              .localInstance(enumNameLI));
         constructorCallArgs.add(nodeFactory().Local(pos, enumOrdinal)
@@ -297,7 +296,7 @@ public class RemoveEnums extends ContextVisitor {
             constructorCallArgs.addAll(existingCC.arguments());
         }
 
-        List<Stmt> newStmts = new ArrayList<Stmt>();
+        List<Stmt> newStmts = new ArrayList<>();
         newStmts.add((ConstructorCall) existingCC.arguments(constructorCallArgs));
         newStmts.addAll(oldStmts);
         n = (ConstructorDecl) n.body(nodeFactory().Block(pos, newStmts));
@@ -321,7 +320,7 @@ public class RemoveEnums extends ContextVisitor {
     private ClassBody addValuesField(ClassBody body) {
         // private static final T[] values = {decl1, decl2, ...};
         Position pos = Position.compilerGenerated();
-        List<Expr> decls = new ArrayList<Expr>();
+        List<Expr> decls = new ArrayList<>();
         for (MemberInstance mi : enumDeclType.toClass().members()) {
             if (mi instanceof EnumInstance) {
                 EnumInstance ei = (EnumInstance) mi;
@@ -447,7 +446,7 @@ public class RemoveEnums extends ContextVisitor {
         //		System.err.println("Translate enum constant decl " + ecd);
         //		System.err.println("  " + ecd.constructorInstance());
         //		System.err.println("  " + ecd.ordinal());
-        List<Expr> args = new ArrayList<Expr>();
+        List<Expr> args = new ArrayList<>();
         // add the name and ordinal
         args.add(nf.StringLit(Position.compilerGenerated(), ecd.name().id()));
         args.add(nf.IntLit(Position.compilerGenerated(),
@@ -494,8 +493,8 @@ public class RemoveEnums extends ContextVisitor {
         w.write("{");
 
         // figure out which members to add and which to ignore
-        List<FieldDecl> enumConstDecls = new ArrayList<FieldDecl>();
-        List<ClassMember> otherMembers = new ArrayList<ClassMember>();
+        List<FieldDecl> enumConstDecls = new ArrayList<>();
+        List<ClassMember> otherMembers = new ArrayList<>();
         for (ClassMember cm : decl.body().members()) {
             boolean isEnumConstDecl = false;
             boolean addMember = true;
@@ -580,7 +579,7 @@ public class RemoveEnums extends ContextVisitor {
             New ne = (New) init;
             // we have added two args to the new statement
             // remove them to print the args nicely
-            List<Expr> newArgs = new LinkedList<Expr>(ne.arguments());
+            List<Expr> newArgs = new LinkedList<>(ne.arguments());
             newArgs.remove(0);
             newArgs.remove(0);
             if (!newArgs.isEmpty()) {
@@ -613,7 +612,7 @@ public class RemoveEnums extends ContextVisitor {
     private static void prettyPrintConstructorDeclAsEnumConstructorDecl(
             ConstructorDecl cd, CodeWriter w, PrettyPrinter tr) {
         // remove the two dummy arguments
-        List<Formal> newFormals = new LinkedList<Formal>(cd.formals());
+        List<Formal> newFormals = new LinkedList<>(cd.formals());
         newFormals.remove(0);
         newFormals.remove(0);
 
@@ -621,7 +620,7 @@ public class RemoveEnums extends ContextVisitor {
 
         // remove the call to super
 
-        List<Stmt> newStmts = new LinkedList<Stmt>(cd.body().statements());
+        List<Stmt> newStmts = new LinkedList<>(cd.body().statements());
         if (!newStmts.isEmpty() && newStmts.get(0) instanceof ConstructorCall) {
             newStmts.remove(0);
         }
@@ -659,7 +658,7 @@ public class RemoveEnums extends ContextVisitor {
 
         // the body of the method is something like "private static int enum$SwitchMap(Object e) { if (e == Coin.GREEN) return Coin.GREEN.ordinal(); ... return -1; } 
         Id arg = nodeFactory().Id(pos, "e");
-        List<Stmt> stmts = new ArrayList<Stmt>();
+        List<Stmt> stmts = new ArrayList<>();
 
         LocalInstance argLI =
                 ts.localInstance(pos, Flags.NONE, enumType, arg.id());
@@ -680,7 +679,7 @@ public class RemoveEnums extends ContextVisitor {
                                        nodeFactory().IntLit(pos, IntLit.INT, -1)
                                                     .type(ts.Int())));
 
-        List<Formal> formals = new ArrayList<Formal>();
+        List<Formal> formals = new ArrayList<>();
         formals.add(nodeFactory().Formal(pos,
                                          Flags.NONE,
                                          nodeFactory().CanonicalTypeNode(pos,
@@ -745,7 +744,7 @@ public class RemoveEnums extends ContextVisitor {
 
     private static List<FieldInstance> enumConstantFieldInstances(
             ClassType enumType) {
-        List<FieldInstance> l = new ArrayList<FieldInstance>();
+        List<FieldInstance> l = new ArrayList<>();
         for (FieldInstance f : enumType.fields()) {
             if (f.flags().isStatic() && f.type() == enumType) {
                 // it's an enum

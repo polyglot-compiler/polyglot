@@ -142,7 +142,7 @@ public class TypeBuilder extends NodeVisitor {
     }
 
     public TypeBuilder pushContext(Context c) throws SemanticException {
-        LinkedList<Context> stack = new LinkedList<Context>();
+        LinkedList<Context> stack = new LinkedList<>();
         while (c != null) {
             stack.addFirst(c);
             c = c.pop();

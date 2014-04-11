@@ -412,7 +412,7 @@ public class JL5TypeSystem_c extends
             return Collections.singleton(ei);
         }
 
-        return new HashSet<EnumInstance>();
+        return new HashSet<>();
     }
 
     @Override
@@ -605,7 +605,7 @@ public class JL5TypeSystem_c extends
         return new JL5ArrayType_c(this, pos, type, false);
     }
 
-    Map<Type, ArrayType> varargsArrayTypeCache = new HashMap<Type, ArrayType>();
+    Map<Type, ArrayType> varargsArrayTypeCache = new HashMap<>();
 
     protected ArrayType arrayType(Position pos, Type type, boolean isVarargs) {
         if (isVarargs) {
@@ -663,47 +663,39 @@ public class JL5TypeSystem_c extends
         assert_(container);
         assert_(argTypes);
 
-        // apply capture conversion to container and argTypes
+        // apply capture conversion to container
         container =
                 (ReferenceType) applyCaptureConversion(container,
                                                        container.position());
-        List<Type> captureConvertedArgTypes =
-                new ArrayList<Type>(argTypes.size());
-        for (Type argType : argTypes) {
-            if (argType instanceof ReferenceType)
-                argType = applyCaptureConversion(argType, argType.position());
-            captureConvertedArgTypes.add(argType);
-        }
-        argTypes = captureConvertedArgTypes;
 
         SemanticException error = null;
 
         // List of methods accessible from curClass that have valid method
         // calls without boxing/unboxing conversion or variable arity and
         // are not overridden by an unaccessible method
-        List<MethodInstance> phase1methods = new ArrayList<MethodInstance>();
+        List<MethodInstance> phase1methods = new ArrayList<>();
         // List of methods accessible from curClass that have a valid method
         // call relying on boxing/unboxing conversion
-        List<MethodInstance> phase2methods = new ArrayList<MethodInstance>();
+        List<MethodInstance> phase2methods = new ArrayList<>();
         // List of methods accessible from curClass that have a valid method
         // call relying on boxing/unboxing conversion and variable arity
-        List<MethodInstance> phase3methods = new ArrayList<MethodInstance>();
+        List<MethodInstance> phase3methods = new ArrayList<>();
 
         // A list of unacceptable methods, where the method call is valid, but
         // the method is not accessible. This list is needed to make sure that
         // the acceptable methods are not overridden by an unacceptable method.
-        List<MethodInstance> inaccessible = new ArrayList<MethodInstance>();
+        List<MethodInstance> inaccessible = new ArrayList<>();
 
         // A set of all the methods that methods in phase[123]methods override.
         // Used to make sure we don't mistakenly add in overridden methods
         // (since overridden methods aren't inherited from superclasses).
-        Set<MethodInstance> phase1overridden = new HashSet<MethodInstance>();
-        Set<MethodInstance> phase2overridden = new HashSet<MethodInstance>();
-        Set<MethodInstance> phase3overridden = new HashSet<MethodInstance>();
+        Set<MethodInstance> phase1overridden = new HashSet<>();
+        Set<MethodInstance> phase2overridden = new HashSet<>();
+        Set<MethodInstance> phase3overridden = new HashSet<>();
 
-        Set<Type> visitedTypes = new HashSet<Type>();
+        Set<Type> visitedTypes = new HashSet<>();
 
-        LinkedList<Type> typeQueue = new LinkedList<Type>();
+        LinkedList<Type> typeQueue = new LinkedList<>();
         typeQueue.addLast(container);
 
 //        System.err.println("JL5TS: findAcceptableMethods for " + name + " in " + container);
@@ -896,8 +888,7 @@ public class JL5TypeSystem_c extends
             subst = inferTypeArgs(mi, argTypes, expectedReturnType);
         }
         else if (!mi.typeParams().isEmpty() && !actualTypeArgs.isEmpty()) {
-            Map<TypeVariable, ReferenceType> m =
-                    new HashMap<TypeVariable, ReferenceType>();
+            Map<TypeVariable, ReferenceType> m = new HashMap<>();
             Iterator<? extends ReferenceType> iter = actualTypeArgs.iterator();
             for (TypeVariable tv : mi.typeParams()) {
                 m.put(tv, iter.next());
@@ -940,8 +931,7 @@ public class JL5TypeSystem_c extends
             subst = inferTypeArgs(mi, argTypes, null);
         }
         else if (!mi.typeParams().isEmpty() && !actualTypeArgs.isEmpty()) {
-            Map<TypeVariable, ReferenceType> m =
-                    new HashMap<TypeVariable, ReferenceType>();
+            Map<TypeVariable, ReferenceType> m = new HashMap<>();
             Iterator<? extends ReferenceType> iter = actualTypeArgs.iterator();
             for (TypeVariable tv : mi.typeParams()) {
                 m.put(tv, iter.next());
@@ -1027,8 +1017,7 @@ public class JL5TypeSystem_c extends
     @Override
     public JL5ProcedureInstance instantiate(Position pos,
             JL5ProcedureInstance mi, List<? extends ReferenceType> actuals) {
-        Map<TypeVariable, ReferenceType> m =
-                new LinkedHashMap<TypeVariable, ReferenceType>();
+        Map<TypeVariable, ReferenceType> m = new LinkedHashMap<>();
         Iterator<? extends ReferenceType> iter = actuals.iterator();
         for (TypeVariable tv : mi.typeParams()) {
             m.put(tv, iter.next());
@@ -1069,7 +1058,7 @@ public class JL5TypeSystem_c extends
 
     @Override
     public List<ReferenceType> allAncestorsOf(ReferenceType rt) {
-        Set<ReferenceType> ancestors = new LinkedHashSet<ReferenceType>();
+        Set<ReferenceType> ancestors = new LinkedHashSet<>();
         ancestors.add(rt);
         Set<? extends Type> superClasses;
         if (rt.isClass()) {
@@ -1088,7 +1077,7 @@ public class JL5TypeSystem_c extends
             ancestors.add(inter);
             ancestors.addAll(allAncestorsOf(inter));
         }
-        return new ArrayList<ReferenceType>(ancestors);
+        return new ArrayList<>(ancestors);
     }
 
     public static String listToString(List<?> l) {
@@ -1138,8 +1127,7 @@ public class JL5TypeSystem_c extends
 
         // replace the type variables of mj with the type variables of mi
         if (!eraseMj && !mi.typeParams().isEmpty()) {
-            Map<TypeVariable, ReferenceType> substm =
-                    new LinkedHashMap<TypeVariable, ReferenceType>();
+            Map<TypeVariable, ReferenceType> substm = new LinkedHashMap<>();
             for (int i = 0; i < mi.typeParams().size(); i++) {
                 substm.put(mj.typeParams().get(i), mi.typeParams().get(i));
             }
@@ -1350,8 +1338,7 @@ public class JL5TypeSystem_c extends
     @Override
     public JL5Subst erasureSubst(JL5ProcedureInstance pi) {
         List<TypeVariable> typeParams = pi.typeParams();
-        Map<TypeVariable, ReferenceType> m =
-                new LinkedHashMap<TypeVariable, ReferenceType>();
+        Map<TypeVariable, ReferenceType> m = new LinkedHashMap<>();
         for (TypeVariable tv : typeParams) {
             m.put(tv, tv.erasureType());
         }
@@ -1363,8 +1350,7 @@ public class JL5TypeSystem_c extends
 
     @Override
     public JL5Subst erasureSubst(JL5ParsedClassType base) {
-        Map<TypeVariable, ReferenceType> m =
-                new LinkedHashMap<TypeVariable, ReferenceType>();
+        Map<TypeVariable, ReferenceType> m = new LinkedHashMap<>();
         JL5ParsedClassType t = base;
         while (t != null) {
             for (TypeVariable tv : t.typeVariables()) {
@@ -1547,7 +1533,7 @@ public class JL5TypeSystem_c extends
                     ((JL5ClassType) fromType).isImplicitCastValidChainImpl(toType);
         }
         else if (fromType.isImplicitCastValidImpl(toType)) {
-            chain = new LinkedList<Type>();
+            chain = new LinkedList<>();
             chain.add(fromType);
             chain.add(toType);
         }
@@ -1718,7 +1704,7 @@ public class JL5TypeSystem_c extends
             }
             if (upperBound instanceof TypeVariable) {
                 // should we do a recursive call? Check whether there are cycles in the type variables...
-                Set<TypeVariable> visited = new HashSet<TypeVariable>();
+                Set<TypeVariable> visited = new HashSet<>();
                 visited.add(tv);
                 while (upperBound instanceof TypeVariable) {
                     if (!visited.add((TypeVariable) upperBound)) {
@@ -1784,7 +1770,7 @@ public class JL5TypeSystem_c extends
 
     @Override
     protected List<ReferenceType> abstractSuperInterfaces(ReferenceType rt) {
-        List<ReferenceType> superInterfaces = new LinkedList<ReferenceType>();
+        List<ReferenceType> superInterfaces = new LinkedList<>();
         superInterfaces.add(rt);
 
         @SuppressWarnings("unchecked")
@@ -1949,16 +1935,13 @@ public class JL5TypeSystem_c extends
         // List of methods accessible from curClass that have valid method
         // calls without boxing/unboxing conversion or variable arity and
         // are not overridden by an unaccessible method
-        List<ConstructorInstance> phase1methods =
-                new ArrayList<ConstructorInstance>();
+        List<ConstructorInstance> phase1methods = new ArrayList<>();
         // List of methods accessible from curClass that have a valid method
         // call relying on boxing/unboxing conversion
-        List<ConstructorInstance> phase2methods =
-                new ArrayList<ConstructorInstance>();
+        List<ConstructorInstance> phase2methods = new ArrayList<>();
         // List of methods accessible from curClass that have a valid method
         // call relying on boxing/unboxing conversion and variable arity
-        List<ConstructorInstance> phase3methods =
-                new ArrayList<ConstructorInstance>();
+        List<ConstructorInstance> phase3methods = new ArrayList<>();
 
         if (Report.should_report(Report.types, 2))
             Report.report(2, "Searching type " + container
@@ -2167,8 +2150,7 @@ public class JL5TypeSystem_c extends
         JL5SubstClassType_c ct = (JL5SubstClassType_c) t;
         JL5ParsedClassType g = ct.base();
 
-        Map<TypeVariable, ReferenceType> substmap =
-                new LinkedHashMap<TypeVariable, ReferenceType>();
+        Map<TypeVariable, ReferenceType> substmap = new LinkedHashMap<>();
         // If g is an inner class, need to examine the outer class.
         // first, set up a subst from the formals to the captured variables.
         for (JL5ParsedClassType cur = g; cur != null; cur =
@@ -2346,9 +2328,9 @@ public class JL5TypeSystem_c extends
     //@Override
     public List<Type> concreteBounds(List<? extends Type> bounds) {
 
-        Set<Type> included = new LinkedHashSet<Type>();
-        Set<Type> visited = new LinkedHashSet<Type>();
-        List<Type> queue = new ArrayList<Type>(bounds);
+        Set<Type> included = new LinkedHashSet<>();
+        Set<Type> visited = new LinkedHashSet<>();
+        List<Type> queue = new ArrayList<>(bounds);
         while (!queue.isEmpty()) {
             Type t = queue.remove(0);
             if (visited.contains(t)) continue;
@@ -2365,7 +2347,7 @@ public class JL5TypeSystem_c extends
                 included.add(t);
             }
         }
-        return new ArrayList<Type>(included);
+        return new ArrayList<>(included);
     }
 
     @Override
@@ -2375,7 +2357,7 @@ public class JL5TypeSystem_c extends
 
     protected ReferenceType glb(ReferenceType t1, ReferenceType t2,
             boolean performIntersectionCheck) {
-        List<ReferenceType> l = new ArrayList<ReferenceType>();
+        List<ReferenceType> l = new ArrayList<>();
         l.add(t1);
         l.add(t2);
         return glb(Position.compilerGenerated(), l, performIntersectionCheck);
@@ -2470,7 +2452,7 @@ public class JL5TypeSystem_c extends
     @Override
     public List<TypeVariable> classAndEnclosingTypeVariables(
             JL5ParsedClassType ct) {
-        List<TypeVariable> l = new ArrayList<TypeVariable>();
+        List<TypeVariable> l = new ArrayList<>();
         classAndEnclosingTypeVariables(ct, l);
         return l;
     }
@@ -2594,7 +2576,7 @@ public class JL5TypeSystem_c extends
     public void checkDuplicateAnnotations(List<Term> annotations)
             throws SemanticException {
         // check no duplicate annotations used
-        ArrayList<Term> l = new ArrayList<Term>(annotations);
+        ArrayList<Term> l = new ArrayList<>(annotations);
         for (int i = 0; i < l.size(); i++) {
             Term ti = l.get(i);
             AnnotationElem ai = (AnnotationElem) JL5Ext.ext(ti);
@@ -2667,7 +2649,7 @@ public class JL5TypeSystem_c extends
             return Collections.singleton(ai);
         }
 
-        return new HashSet<AnnotationTypeElemInstance>();
+        return new HashSet<>();
     }
 
     @Override

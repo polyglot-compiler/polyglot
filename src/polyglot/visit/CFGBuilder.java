@@ -490,7 +490,7 @@ public class CFGBuilder<FlowItem extends DataFlow.Item> implements
      */
     public void visitCFG(Term a, FlowGraph.EdgeKey edgeKey, List<Term> succ,
             int entry) {
-        List<EdgeKeyTermPair> l = new ArrayList<EdgeKeyTermPair>(succ.size());
+        List<EdgeKeyTermPair> l = new ArrayList<>(succ.size());
 
         for (Term t : succ) {
             l.add(new EdgeKeyTermPair(edgeKey, t, entry));
@@ -514,7 +514,7 @@ public class CFGBuilder<FlowItem extends DataFlow.Item> implements
             throw new IllegalArgumentException();
         }
 
-        List<EdgeKeyTermPair> l = new ArrayList<EdgeKeyTermPair>(succ.size());
+        List<EdgeKeyTermPair> l = new ArrayList<>(succ.size());
 
         for (int i = 0; i < succ.size(); i++) {
             Term t = succ.get(i);
@@ -731,7 +731,7 @@ public class CFGBuilder<FlowItem extends DataFlow.Item> implements
         if (abruptCompletion) {
             CFGBuilder<FlowItem> v = this.copy();
             v.path_to_finally =
-                    new ArrayList<Term>(from.path_to_finally.size() + 1);
+                    new ArrayList<>(from.path_to_finally.size() + 1);
             v.path_to_finally.addAll(from.path_to_finally);
             v.path_to_finally.add(from.node);
             return v;
@@ -742,7 +742,7 @@ public class CFGBuilder<FlowItem extends DataFlow.Item> implements
                 return this;
             }
             CFGBuilder<FlowItem> v = this.copy();
-            v.path_to_finally = new ArrayList<Term>(from.path_to_finally);
+            v.path_to_finally = new ArrayList<>(from.path_to_finally);
             return v;
         }
     }
@@ -831,16 +831,16 @@ public class CFGBuilder<FlowItem extends DataFlow.Item> implements
                 Report.report(2, pp.hashCode() + " -> " + pq.hashCode()
                         + " [label=\"" + edgeKey + "\"];");
             }
-            pp.succs.add(new Edge<FlowItem>(edgeKey, pq));
-            pq.preds.add(new Edge<FlowItem>(edgeKey, pp));
+            pp.succs.add(new Edge<>(edgeKey, pq));
+            pq.preds.add(new Edge<>(edgeKey, pp));
         }
         else {
             if (Report.should_report(Report.cfg, 2)) {
                 Report.report(2, pq.hashCode() + " -> " + pp.hashCode()
                         + " [label=\"" + edgeKey + "\"];");
             }
-            pq.succs.add(new Edge<FlowItem>(edgeKey, pp));
-            pp.preds.add(new Edge<FlowItem>(edgeKey, pq));
+            pq.succs.add(new Edge<>(edgeKey, pp));
+            pp.preds.add(new Edge<>(edgeKey, pq));
         }
     }
 

@@ -37,7 +37,7 @@ public class SilentErrorQueue extends AbstractErrorQueue {
 
     public SilentErrorQueue(int limit, String name) {
         super(limit, name);
-        this.errors = new ArrayList<ErrorInfo>(limit);
+        this.errors = new ArrayList<>(limit);
     }
 
     @Override

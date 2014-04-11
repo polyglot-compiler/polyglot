@@ -37,7 +37,7 @@ public class Options {
     private final static int USAGE_FLAG_WIDTH = 21;
     private final static int USAGE_SCREEN_WIDTH = 75;
 
-    protected List<String> inputFilenames = new LinkedList<String>();
+    protected List<String> inputFilenames = new LinkedList<>();
 
     // verbosity level, from 0 to 9.
     protected int verbosity = 5;

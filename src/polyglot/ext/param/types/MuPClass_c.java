@@ -54,7 +54,7 @@ public class MuPClass_c<Formal extends Param, Actual extends TypeObject>
 
     public MuPClass_c(TypeSystem ts, Position pos) {
         super(ts, pos);
-        formals = new LinkedList<Formal>();
+        formals = new LinkedList<>();
     }
 
     /////////////////////////////////////////////////////////////////////////

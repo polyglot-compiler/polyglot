@@ -46,7 +46,7 @@ public class ConstructorCallChecker extends ContextVisitor {
     }
 
     protected Map<ConstructorInstance, ConstructorInstance> constructorInvocations =
-            new HashMap<ConstructorInstance, ConstructorInstance>();
+            new HashMap<>();
 
     @Override
     protected NodeVisitor enterCall(Node n) throws SemanticException {

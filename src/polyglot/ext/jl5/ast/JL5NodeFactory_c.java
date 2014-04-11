@@ -641,7 +641,7 @@ public class JL5NodeFactory_c extends JL5AbstractNodeFactory_c {
     @Override
     public Term SingleElementAnnotationElem(Position pos, TypeNode name,
             Term value) {
-        List<Term> l = new LinkedList<Term>();
+        List<Term> l = new LinkedList<>();
         l.add(ElementValuePair(pos, this.Id(pos, "value"), value));
         return NormalAnnotationElem(pos, name, l);
     }

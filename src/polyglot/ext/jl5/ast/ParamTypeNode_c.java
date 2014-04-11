@@ -145,8 +145,7 @@ public class ParamTypeNode_c extends JL5TermExt implements ParamTypeNode {
         TypeNode n = this.node();
         Position position = n.position();
 
-        ArrayList<ReferenceType> typeList =
-                new ArrayList<ReferenceType>(bounds.size());
+        List<ReferenceType> typeList = new ArrayList<>(bounds.size());
         for (int i = 0; i < bounds.size(); i++) {
             typeList.add(ts.unknownReferenceType(position));
         }
@@ -166,7 +165,7 @@ public class ParamTypeNode_c extends JL5TermExt implements ParamTypeNode {
         TypeNode n = this.node();
 
         boolean ambiguous = false;
-        ArrayList<Type> typeList = new ArrayList<Type>();
+        List<Type> typeList = new ArrayList<>();
         for (TypeNode tn : bounds) {
             if (!tn.isDisambiguated()) {
                 // not disambiguated yet
@@ -180,7 +179,7 @@ public class ParamTypeNode_c extends JL5TermExt implements ParamTypeNode {
         if (!ambiguous) {
             TypeVariable tv = (TypeVariable) n.type();
             //		System.err.println("paramtypenode_c : dismab and setting bounds of " + tv + " to " + typeList);
-            List<ReferenceType> refTypeList = new ArrayList<ReferenceType>();
+            List<ReferenceType> refTypeList = new ArrayList<>();
             for (Type t : typeList)
                 refTypeList.add((ReferenceType) t);
             tv.setUpperBound(ts.intersectionType(n.position(), refTypeList));

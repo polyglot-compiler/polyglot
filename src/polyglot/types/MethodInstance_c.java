@@ -237,7 +237,7 @@ public class MethodInstance_c extends ProcedureInstance_c implements
 
     @Override
     public List<MethodInstance> overridesImpl() {
-        List<MethodInstance> l = new LinkedList<MethodInstance>();
+        List<MethodInstance> l = new LinkedList<>();
         ReferenceType rt = container();
 
         while (rt != null) {
@@ -410,7 +410,7 @@ public class MethodInstance_c extends ProcedureInstance_c implements
             return Collections.<MethodInstance> emptyList();
         }
 
-        List<MethodInstance> l = new LinkedList<MethodInstance>();
+        List<MethodInstance> l = new LinkedList<>();
         l.addAll(rt.methods(name, formalTypes));
 
         Type superType = rt.superType();

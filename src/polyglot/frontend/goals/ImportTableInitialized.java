@@ -48,7 +48,7 @@ public class ImportTableInitialized extends VisitorGoal {
 
     @Override
     public Collection<Goal> prerequisiteGoals(Scheduler scheduler) {
-        List<Goal> l = new ArrayList<Goal>();
+        List<Goal> l = new ArrayList<>();
         l.add(scheduler.TypesInitialized(job));
         l.add(scheduler.TypesInitializedForCommandLine());
         l.addAll(super.prerequisiteGoals(scheduler));

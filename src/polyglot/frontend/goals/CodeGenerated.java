@@ -68,7 +68,7 @@ public class CodeGenerated extends SourceFileGoal implements EndGoal {
 
     @Override
     public Collection<Goal> prerequisiteGoals(Scheduler scheduler) {
-        List<Goal> l = new ArrayList<Goal>();
+        List<Goal> l = new ArrayList<>();
         l.add(scheduler.Serialized(job));
         l.addAll(super.prerequisiteGoals(scheduler));
         return l;

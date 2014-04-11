@@ -213,7 +213,7 @@ public abstract class AbstractNodeFactory_c implements NodeFactory {
 
     @Override
     public final Block Block(Position pos, Stmt... stmts) {
-        List<Stmt> l = new ArrayList<Stmt>(1);
+        List<Stmt> l = new ArrayList<>(1);
         Collections.addAll(l, stmts);
         return Block(pos, l);
     }
@@ -270,7 +270,7 @@ public abstract class AbstractNodeFactory_c implements NodeFactory {
 
     @Override
     public final Call Call(Position pos, Id name, Expr... args) {
-        List<Expr> l = new ArrayList<Expr>(1);
+        List<Expr> l = new ArrayList<>(1);
         Collections.addAll(l, args);
         return Call(pos, null, name, l);
     }
@@ -278,7 +278,7 @@ public abstract class AbstractNodeFactory_c implements NodeFactory {
     @Deprecated
     @Override
     public final Call Call(Position pos, String name, Expr... args) {
-        List<Expr> l = new ArrayList<Expr>(1);
+        List<Expr> l = new ArrayList<>(1);
         Collections.addAll(l, args);
         return Call(pos, null, name, l);
     }
@@ -296,7 +296,7 @@ public abstract class AbstractNodeFactory_c implements NodeFactory {
 
     @Override
     public final Call Call(Position pos, Receiver target, Id name, Expr... args) {
-        List<Expr> l = new ArrayList<Expr>(1);
+        List<Expr> l = new ArrayList<>(1);
         Collections.addAll(l, args);
         return Call(pos, target, name, l);
     }
@@ -305,7 +305,7 @@ public abstract class AbstractNodeFactory_c implements NodeFactory {
     @Override
     public final Call Call(Position pos, Receiver target, String name,
             Expr... args) {
-        List<Expr> l = new ArrayList<Expr>(1);
+        List<Expr> l = new ArrayList<>(1);
         Collections.addAll(l, args);
         return Call(pos, target, name, l);
     }

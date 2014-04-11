@@ -76,7 +76,7 @@ public class IntersectionType_c extends ClassType_c implements IntersectionType 
     @Override
     public List<ReferenceType> bounds() {
         if (bounds == null || bounds.size() == 0) {
-            bounds = new ArrayList<ReferenceType>();
+            bounds = new ArrayList<>();
             bounds.add(ts.Object());
         }
         return bounds;
@@ -187,7 +187,7 @@ public class IntersectionType_c extends ClassType_c implements IntersectionType 
 
     @Override
     public List<? extends ReferenceType> interfaces() {
-        List<ClassType> interfaces = new ArrayList<ClassType>();
+        List<ClassType> interfaces = new ArrayList<>();
         for (Type t : bounds) {
             if (t.isClass() && t.toClass().flags().isInterface()) {
                 interfaces.add((ClassType) t);
@@ -240,7 +240,7 @@ public class IntersectionType_c extends ClassType_c implements IntersectionType 
 
         for (Type b : bounds()) {
             if (typeSystem().isImplicitCastValid(b, toType)) {
-                LinkedList<Type> chain = new LinkedList<Type>();
+                LinkedList<Type> chain = new LinkedList<>();
                 chain.add(this);
                 chain.add(toType);
                 return chain;
@@ -381,7 +381,7 @@ public class IntersectionType_c extends ClassType_c implements IntersectionType 
 
     @Override
     public Set<Type> superclasses() {
-        Set<Type> classes = new LinkedHashSet<Type>();
+        Set<Type> classes = new LinkedHashSet<>();
         for (Type t : bounds) {
             if (t.isClass() && !t.toClass().flags().isInterface()) {
                 classes.add(t);

@@ -26,16 +26,16 @@
 
 package polyglot.util;
 
-import java.util.Map;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Map;
 import java.util.Set;
 
 /**
  * This class represents a constant map which never contains any elements.
  **/
 public final class NilMap<K, V> implements Map<K, V> {
-    public static final NilMap<?, ?> EMPTY_MAP = new NilMap<Object, Object>();
+    public static final NilMap<?, ?> EMPTY_MAP = new NilMap<>();
 
     @SuppressWarnings("unchecked")
     public static final <K, V> NilMap<K, V> emptyMap() {

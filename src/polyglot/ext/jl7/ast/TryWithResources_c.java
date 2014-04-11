@@ -35,6 +35,7 @@ import polyglot.ast.LocalDecl;
 import polyglot.ast.Node;
 import polyglot.ast.Term;
 import polyglot.ast.Try_c;
+import polyglot.types.SemanticException;
 import polyglot.util.CodeWriter;
 import polyglot.util.CollectionUtil;
 import polyglot.util.Copy;
@@ -42,6 +43,7 @@ import polyglot.util.ListUtil;
 import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
 import polyglot.visit.CFGBuilder;
+import polyglot.visit.ExceptionChecker;
 import polyglot.visit.NodeVisitor;
 import polyglot.visit.PrettyPrinter;
 
@@ -100,6 +102,30 @@ public class TryWithResources_c extends Try_c implements TryWithResources {
         List<Catch> catchBlocks = visitList(this.catchBlocks, v);
         Block finallyBlock = visitChild(this.finallyBlock, v);
         return reconstruct(this, resources, tryBlock, catchBlocks, finallyBlock);
+    }
+
+    @Override
+    public Node exceptionCheck(ExceptionChecker ec) throws SemanticException {
+        TryWithResources_c n = (TryWithResources_c) super.exceptionCheck(ec);
+
+        ExceptionChecker ecTryBlockEntry = ec;
+        if (this.finallyBlock != null && !this.finallyBlock.reachable()) {
+            // the finally block cannot terminate normally.
+            // This implies that exceptions thrown in the try and catch
+            // blocks will not propagate upwards.
+            // Prevent exceptions from propagation upwards past the finally
+            // block. (The original exception checker will be used
+            // for checking the finally block).
+            ecTryBlockEntry = ecTryBlockEntry.pushCatchAllThrowable();
+        }
+
+        ExceptionChecker ecTryBlock =
+                ec.lang().constructTryBlockExceptionChecker(n, ecTryBlockEntry);
+
+        // Visit the resources.
+        List<LocalDecl> resources = n.visitList(n.resources, ecTryBlock);
+        n = resources(n, resources);
+        return n;
     }
 
     @Override
@@ -171,7 +197,7 @@ public class TryWithResources_c extends Try_c implements TryWithResources {
 
     @Override
     public <T> List<T> acceptCFG(CFGBuilder<?> v, List<T> succs) {
-        v.visitCFGList(resources, tryBlock, ENTRY);
+        v.push(this).visitCFGList(resources, tryBlock, ENTRY);
         return super.acceptCFG(v, succs);
     }
 }

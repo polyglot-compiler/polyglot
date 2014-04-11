@@ -42,7 +42,7 @@ public class TableResolver implements TopLevelResolver {
      * Create a resolver.
      */
     public TableResolver() {
-        this.table = new HashMap<String, Named>();
+        this.table = new HashMap<>();
     }
 
     /**

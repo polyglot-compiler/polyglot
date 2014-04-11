@@ -142,12 +142,12 @@ public class JL7NewExt extends JL7ProcedureCallExt implements NewOps {
 
         JL7TypeSystem ts = (JL7TypeSystem) tc.typeSystem();
 
-        if (!n.objectType().type().isClass()) {
+        if (!objectType.type().isClass()) {
             throw new SemanticException("Must have a class for a new expression.",
                                         n.position());
         }
 
-        List<Type> argTypes = new ArrayList<Type>(n.arguments().size());
+        List<Type> argTypes = new ArrayList<>(n.arguments().size());
 
         for (Expr e : n.arguments()) {
             argTypes.add(e.type());
@@ -211,6 +211,10 @@ public class JL7NewExt extends JL7ProcedureCallExt implements NewOps {
 
     @Override
     public ClassType findEnclosingClass(Context c, ClassType ct) {
+        if (ct instanceof DiamondType) {
+            DiamondType dt = (DiamondType) ct;
+            ct = dt.base();
+        }
         return superLang().findEnclosingClass(this.node(), c, ct);
     }
 

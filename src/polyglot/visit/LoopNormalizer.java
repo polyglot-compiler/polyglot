@@ -173,7 +173,7 @@ public class LoopNormalizer extends NodeVisitor {
     protected If createIterIf(LocalDecl var, List<ForUpdate> iters) {
         Position pos = var.position();
         Local use = createLocal(var.localInstance(), pos);
-        List<Stmt> stmts = new ArrayList<Stmt>(iters.size());
+        List<Stmt> stmts = new ArrayList<>(iters.size());
 
         for (Stmt s : iters) {
             stmts.add(postCreate(s));
@@ -232,7 +232,7 @@ public class LoopNormalizer extends NodeVisitor {
         While w = createLoop(s);
         LocalDecl var = createLoopVar(s, cond);
         If branch = createLoopIf(var, s.body());
-        List<Stmt> stmts = new ArrayList<Stmt>(2);
+        List<Stmt> stmts = new ArrayList<>(2);
         stmts.add(var);
         stmts.add(branch);
         w = w.body(((Block) w.body()).statements(stmts));
@@ -264,11 +264,11 @@ public class LoopNormalizer extends NodeVisitor {
         LocalDecl var = createLoopVar(s);
         If init = createInitIf(var, cond);
         If branch = createLoopIf(var, s.body());
-        List<Stmt> stmts = new ArrayList<Stmt>(2);
+        List<Stmt> stmts = new ArrayList<>(2);
         stmts.add(init);
         stmts.add(branch);
         w = w.body(((Block) w.body()).statements(stmts));
-        stmts = new ArrayList<Stmt>(2);
+        stmts = new ArrayList<>(2);
         stmts.add(var);
         stmts.add(w);
 
@@ -305,12 +305,12 @@ public class LoopNormalizer extends NodeVisitor {
         If iter = createIterIf(var, s.iters());
         Eval update = createAssign(var, cond);
         If branch = createLoopIf(var, s.body());
-        List<Stmt> stmts = new ArrayList<Stmt>(3);
+        List<Stmt> stmts = new ArrayList<>(3);
         stmts.add(iter);
         stmts.add(update);
         stmts.add(branch);
         w = w.body(((Block) w.body()).statements(stmts));
-        stmts = new ArrayList<Stmt>(s.inits().size() + 2);
+        stmts = new ArrayList<>(s.inits().size() + 2);
         addInits(stmts, s);
         stmts.add(var);
         stmts.add(w);

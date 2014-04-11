@@ -79,8 +79,7 @@ public class terminal extends symbol {
     /** Table of all terminals.  Elements are stored using name strings as 
      *  the key 
      */
-    protected static Hashtable<String, terminal> _all =
-            new Hashtable<String, terminal>();
+    protected static Hashtable<String, terminal> _all = new Hashtable<>();
 
     //Hm Added clear  to clear all static fields
     public static void clear() {
@@ -107,7 +106,7 @@ public class terminal extends symbol {
 
     /** Table of all terminals indexed by their index number. */
     protected static Hashtable<Integer, terminal> _all_by_index =
-            new Hashtable<Integer, terminal>();
+            new Hashtable<>();
 
     /** Lookup a terminal by index. */
     public static terminal find(int indx) {

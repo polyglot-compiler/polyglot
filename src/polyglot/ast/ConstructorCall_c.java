@@ -195,7 +195,7 @@ public class ConstructorCall_c extends Stmt_c implements ConstructorCall,
 
         ConstructorCall_c n = (ConstructorCall_c) super.buildTypes(tb);
 
-        List<Type> l = new ArrayList<Type>(arguments.size());
+        List<Type> l = new ArrayList<>(arguments.size());
         for (int i = 0; i < arguments.size(); i++) {
             l.add(ts.unknownType(position()));
         }
@@ -324,7 +324,7 @@ public class ConstructorCall_c extends Stmt_c implements ConstructorCall,
             n = qualifier(n, q);
         }
 
-        List<Type> argTypes = new LinkedList<Type>();
+        List<Type> argTypes = new LinkedList<>();
 
         for (Expr e : n.arguments) {
             if (!e.isDisambiguated()) {
@@ -444,7 +444,7 @@ public class ConstructorCall_c extends Stmt_c implements ConstructorCall,
 
     @Override
     public List<Type> throwTypes(TypeSystem ts) {
-        List<Type> l = new LinkedList<Type>();
+        List<Type> l = new LinkedList<>();
         l.addAll(ci.throwTypes());
         l.addAll(ts.uncheckedExceptions());
         return l;

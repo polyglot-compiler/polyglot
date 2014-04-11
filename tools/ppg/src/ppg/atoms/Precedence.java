@@ -25,7 +25,7 @@
  ******************************************************************************/
 package ppg.atoms;
 
-import java.util.*;
+import java.util.Vector;
 
 public class Precedence {
     public static final int LEFT = 0;
@@ -42,7 +42,7 @@ public class Precedence {
 
     @Override
     public Object clone() {
-        Vector<GrammarSymbol> newSyms = new Vector<GrammarSymbol>();
+        Vector<GrammarSymbol> newSyms = new Vector<>();
         for (int i = 0; i < symbols.size(); i++) {
             newSyms.addElement((GrammarSymbol) symbols.elementAt(i).clone());
         }

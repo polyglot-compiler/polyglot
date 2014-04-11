@@ -71,9 +71,9 @@ public class Subst_c<Formal extends Param, Actual extends TypeObject>
     public Subst_c(ParamTypeSystem<Formal, Actual> ts,
             Map<Formal, ? extends Actual> subst) {
         this.ts = ts;
-        this.subst = new HashMap<Formal, Actual>(subst);
-        this.cache = new HashMap<CacheTypeWrapper, Type>();
-        this.substClassTypeCache = new HashMap<ClassType, ClassType>();
+        this.subst = new HashMap<>(subst);
+        this.cache = new HashMap<>();
+        this.substClassTypeCache = new HashMap<>();
     }
 
     @Override
@@ -115,7 +115,7 @@ public class Subst_c<Formal extends Param, Actual extends TypeObject>
             Type tbase = substType.base();
             Map<Formal, Actual> tsubst = substType.subst().substitutions();
 
-            Map<Formal, Actual> newSubst = new HashMap<Formal, Actual>();
+            Map<Formal, Actual> newSubst = new HashMap<>();
 
             // go through the map, and perform substitution on the actuals
             for (Entry<Formal, Actual> e : tsubst.entrySet()) {
@@ -161,7 +161,7 @@ public class Subst_c<Formal extends Param, Actual extends TypeObject>
     }
 
     protected ClassType substClassTypeImpl(ClassType t) {
-        return new SubstClassType_c<Formal, Actual>(ts, t.position(), t, this);
+        return new SubstClassType_c<>(ts, t.position(), t, this);
     }
 
     @Override
@@ -298,24 +298,23 @@ public class Subst_c<Formal extends Param, Actual extends TypeObject>
 
     @Override
     public <T extends Type> List<T> substTypeList(List<? extends Type> list) {
-        return new CachingTransformingList<Type, T>(list, new TypeXform<T>());
+        return new CachingTransformingList<>(list, new TypeXform<T>());
     }
 
     @Override
     public <T extends MethodInstance> List<T> substMethodList(List<T> list) {
-        return new CachingTransformingList<T, T>(list, new MethodXform<T>());
+        return new CachingTransformingList<>(list, new MethodXform<T>());
     }
 
     @Override
     public <T extends ConstructorInstance> List<T> substConstructorList(
             List<T> list) {
-        return new CachingTransformingList<T, T>(list,
-                                                 new ConstructorXform<T>());
+        return new CachingTransformingList<>(list, new ConstructorXform<T>());
     }
 
     @Override
     public <T extends FieldInstance> List<T> substFieldList(List<T> list) {
-        return new CachingTransformingList<T, T>(list, new FieldXform<T>());
+        return new CachingTransformingList<>(list, new FieldXform<T>());
     }
 
     ////////////////////////////////////////////////////////////////
@@ -414,7 +413,7 @@ public class Subst_c<Formal extends Param, Actual extends TypeObject>
             this.ts = ts;
         }
 
-        this.cache = new HashMap<CacheTypeWrapper, Type>();
+        this.cache = new HashMap<>();
 
         in.defaultReadObject();
     }
