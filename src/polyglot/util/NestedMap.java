@@ -134,7 +134,6 @@ public class NestedMap<K, V> extends AbstractMap<K, V> {
     }
 
     public final class KeySet extends AbstractSet<K> {
-        @SuppressWarnings("unchecked")
         @Override
         public Iterator<K> iterator() {
             return new ConcatenatedIterator<>(myMap.keySet().iterator(),
@@ -160,7 +159,6 @@ public class NestedMap<K, V> extends AbstractMap<K, V> {
     }
 
     private final class EntrySet extends AbstractSet<Entry<K, V>> {
-        @SuppressWarnings("unchecked")
         @Override
         public Iterator<Entry<K, V>> iterator() {
             return new ConcatenatedIterator<>(myMap.entrySet().iterator(),
@@ -176,7 +174,7 @@ public class NestedMap<K, V> extends AbstractMap<K, V> {
         // No add; it's not meaningful.
         @Override
         public boolean contains(Object o) {
-            if (!(o instanceof Map.Entry)) return false;
+            if (!(o instanceof Map.Entry<?, ?>)) return false;
             @SuppressWarnings("unchecked")
             Map.Entry<K, V> ent = (Entry<K, V>) o;
             K entKey = ent.getKey();

@@ -44,6 +44,7 @@ public final class ConcatenatedIterator<T> implements Iterator<T> {
      * Constructs a new ConcatenatedIterator which yields every element, in
      *  order, of every element of the array iters, in order.
      **/
+    @SafeVarargs
     public ConcatenatedIterator(Iterator<T>... iters) {
         this.backing_iterators = iters.clone();
         findNextItem();

@@ -156,7 +156,7 @@ public class SerialVersionUID implements Serializable {
                 clazz.getDeclaredMethod("readResolve");
                 try {
                     Field readResolveVersion =
-                            clazz.getDeclaredField("writeReplaceVersionUID");
+                            clazz.getDeclaredField("readResolveVersionUID");
                     readResolveVersion.setAccessible(true);
                     long ver = readResolveVersion.getLong(clazz);
                     md.update(getBytes(ver));

@@ -33,7 +33,6 @@ import java.io.InvalidClassException;
 import java.io.ObjectOutputStream;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
 import polyglot.frontend.SchedulerException;
@@ -78,24 +77,18 @@ public class TypeEncoder {
      */
     public String encode(TypeObject t) throws IOException {
         ByteArrayOutputStream baos;
-        ObjectOutputStream oos;
 
         if (Report.should_report(Report.serialize, 1)) {
             Report.report(1, "Encoding type " + t);
         }
 
         baos = new ByteArrayOutputStream();
-
-        if (zip) {
-            oos = new TypeOutputStream(new GZIPOutputStream(baos), ts, t);
+        try (GZIPOutputStream gzos = zip ? new GZIPOutputStream(baos) : null;
+             ObjectOutputStream oos =
+                     new TypeOutputStream(zip ? gzos : baos, ts, t)) {
+            oos.writeObject(t);
+            oos.flush();
         }
-        else {
-            oos = new TypeOutputStream(baos, ts, t);
-        }
-
-        oos.writeObject(t);
-        oos.flush();
-        oos.close();
 
         byte[] b = baos.toByteArray();
 
@@ -107,7 +100,7 @@ public class TypeEncoder {
         String s;
 
         if (base64) {
-            s = new String(Base64.encode(b));
+            s = Base64.encodeBytes(b);
         }
         else {
             StringBuffer sb = new StringBuffer(b.length);
@@ -149,25 +142,11 @@ public class TypeEncoder {
      * @return The decoded TypeObject, or null if deserialization fails.
      * @throws InvalidClassException If the string is malformed.
      */
-    @SuppressWarnings("unused")
     public TypeObject decode(String s, String name)
             throws InvalidClassException {
-        TypeInputStream ois = null;
-        byte[] b;
-
-        if (base64) {
-            b = Base64.decode(s.toCharArray());
-        }
-        else {
-            char[] source;
-            source = s.toCharArray();
-            b = new byte[source.length];
-            for (int i = 0; i < source.length; i++)
-                b[i] = (byte) source[i];
-        }
 
         Map<Object, Object> oldCache = placeHolderCache;
-        placeHolderCache = new HashMap<Object, Object>();
+        placeHolderCache = new HashMap<>();
         if (oldCache != null) {
             placeHolderCache.putAll(oldCache);
         }
@@ -177,32 +156,39 @@ public class TypeEncoder {
         depth++;
 
         try {
-            if (zip && !base64) {
-                // The base64 decoder automatically unzips byte streams, so
-                // we only need an explicit GZIPInputStream if we are not
-                // using base64 encoding.
-                ois =
-                        new TypeInputStream(new GZIPInputStream(new ByteArrayInputStream(b)),
-                                            ts,
-                                            placeHolderCache);
+            byte[] b;
+
+            if (base64) {
+                b = Base64.decode(s);
             }
             else {
-                ois =
-                        new TypeInputStream(new ByteArrayInputStream(b),
-                                            ts,
-                                            placeHolderCache);
+                char[] source;
+                source = s.toCharArray();
+                b = new byte[source.length];
+                for (int i = 0; i < source.length; i++)
+                    b[i] = (byte) source[i];
             }
 
-            TypeObject o = (TypeObject) ois.readObject();
+//            // dead code
+//            if (zip && !base64) {
+//                // The base64 decoder automatically unzips byte streams, so
+//                // we only need an explicit GZIPInputStream if we are not
+//                // using base64 encoding.
+//                ois =
+//                        new TypeInputStream(new GZIPInputStream(new ByteArrayInputStream(b)),
+//                                            ts,
+//                                            placeHolderCache);
+//            }
+            try (TypeInputStream ois =
+                    new TypeInputStream(new ByteArrayInputStream(b),
+                                        ts,
+                                        placeHolderCache)) {
+                TypeObject o = (TypeObject) ois.readObject();
 
-            if (ois.deserializationFailed()) {
-                return null;
+                if (ois.deserializationFailed()) return null;
+
+                return o;
             }
-
-            return o;
-        }
-        catch (InvalidClassException e) {
-            throw e;
         }
         catch (IOException e) {
             throw new InternalCompilerError("IOException thrown while "
@@ -221,15 +207,6 @@ public class TypeEncoder {
         finally {
             placeHolderCache = oldCache;
             depth--;
-            if (ois != null) {
-                try {
-                    ois.close();
-                }
-                catch (IOException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                }
-            }
         }
     }
 }
