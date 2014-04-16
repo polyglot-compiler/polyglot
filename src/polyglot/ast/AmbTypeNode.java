@@ -30,10 +30,11 @@ package polyglot.ast;
  * An {@code AmbTypeNode} is an ambiguous AST node composed of
  * dot-separated list of identifiers that must resolve to a type.
  */
-public interface AmbTypeNode extends AmbQualifierNode, TypeNode, Ambiguous {
+public interface AmbTypeNode extends AmbQualifierNode, TypeNode {
     /**
      * Qualifier of the type.
      */
+    @Override
     QualifierNode qual();
 
     /**
@@ -44,6 +45,7 @@ public interface AmbTypeNode extends AmbQualifierNode, TypeNode, Ambiguous {
     /**
      * Ambiguous name.
      */
+    @Override
     Id id();
 
     /**
