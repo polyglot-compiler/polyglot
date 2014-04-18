@@ -179,10 +179,7 @@ public class TypeEncoder {
 //                                            ts,
 //                                            placeHolderCache);
 //            }
-            try (TypeInputStream ois =
-                    new TypeInputStream(new ByteArrayInputStream(b),
-                                        ts,
-                                        placeHolderCache)) {
+            try (TypeInputStream ois = ois(new ByteArrayInputStream(b))) {
                 TypeObject o = (TypeObject) ois.readObject();
 
                 if (ois.deserializationFailed()) return null;
@@ -208,5 +205,9 @@ public class TypeEncoder {
             placeHolderCache = oldCache;
             depth--;
         }
+    }
+
+    public TypeInputStream ois(ByteArrayInputStream bais) throws IOException {
+        return new TypeInputStream(bais, ts, placeHolderCache);
     }
 }
