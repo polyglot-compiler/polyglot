@@ -38,7 +38,6 @@ import polyglot.types.Type;
 import polyglot.types.TypeSystem;
 import polyglot.types.VarInstance;
 import polyglot.util.CodeWriter;
-import polyglot.util.Copy;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
@@ -100,7 +99,7 @@ public class Field_c extends Expr_c implements Field {
 
     protected <N extends Field_c> N target(N n, Receiver target) {
         if (n.target == target) return n;
-        if (n == this) n = Copy.Util.copy(n);
+        n = copyIfNeeded(n);
         n.target = target;
         return n;
     }
@@ -117,7 +116,7 @@ public class Field_c extends Expr_c implements Field {
 
     protected <N extends Field_c> N id(N n, Id name) {
         if (n.name == name) return n;
-        if (n == this) n = Copy.Util.copy(n);
+        n = copyIfNeeded(n);
         n.name = name;
         return n;
     }
@@ -154,7 +153,7 @@ public class Field_c extends Expr_c implements Field {
 
     protected <N extends Field_c> N fieldInstance(N n, FieldInstance fi) {
         if (n.fi == fi) return n;
-        if (n == this) n = Copy.Util.copy(n);
+        n = copyIfNeeded(n);
         n.fi = fi;
         return n;
     }
@@ -171,7 +170,7 @@ public class Field_c extends Expr_c implements Field {
 
     protected <N extends Field_c> N targetImplicit(N n, boolean targetImplicit) {
         if (n.targetImplicit == targetImplicit) return n;
-        if (n == this) n = Copy.Util.copy(n);
+        n = copyIfNeeded(n);
         n.targetImplicit = targetImplicit;
         return n;
     }

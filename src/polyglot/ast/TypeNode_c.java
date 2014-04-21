@@ -34,7 +34,6 @@ import polyglot.types.SemanticException;
 import polyglot.types.Type;
 import polyglot.types.TypeSystem;
 import polyglot.util.CodeWriter;
-import polyglot.util.Copy;
 import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
 import polyglot.visit.CFGBuilder;
@@ -83,7 +82,7 @@ public abstract class TypeNode_c extends Term_c implements TypeNode {
 
     protected <N extends TypeNode_c> N type(N n, Type type) {
         if (n.type == type) return n;
-        if (n == this) n = Copy.Util.copy(n);
+        n = copyIfNeeded(n);
         n.type = type;
         return n;
     }

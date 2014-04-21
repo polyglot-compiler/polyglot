@@ -32,7 +32,6 @@ import polyglot.types.SemanticException;
 import polyglot.types.Type;
 import polyglot.types.TypeSystem;
 import polyglot.util.CodeWriter;
-import polyglot.util.Copy;
 import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
 import polyglot.visit.AscriptionVisitor;
@@ -80,7 +79,7 @@ public class Instanceof_c extends Expr_c implements Instanceof {
 
     protected <N extends Instanceof_c> N expr(N n, Expr expr) {
         if (n.expr == expr) return n;
-        if (n == this) n = Copy.Util.copy(n);
+        n = copyIfNeeded(n);
         n.expr = expr;
         return n;
     }
@@ -97,7 +96,7 @@ public class Instanceof_c extends Expr_c implements Instanceof {
 
     protected <N extends Instanceof_c> N compareType(N n, TypeNode compareType) {
         if (n.compareType == compareType) return n;
-        if (n == this) n = Copy.Util.copy(n);
+        n = copyIfNeeded(n);
         n.compareType = compareType;
         return n;
     }

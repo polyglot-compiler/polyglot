@@ -117,7 +117,7 @@ public class ClassDecl_c extends Term_c implements ClassDecl, ClassDeclOps {
 
     protected <N extends ClassDecl_c> N type(N n, ParsedClassType type) {
         if (n.type == type) return n;
-        if (n == this) n = Copy.Util.copy(n);
+        n = copyIfNeeded(n);
         n.type = type;
         return n;
     }
@@ -134,7 +134,7 @@ public class ClassDecl_c extends Term_c implements ClassDecl, ClassDeclOps {
 
     protected <N extends ClassDecl_c> N flags(N n, Flags flags) {
         if (n.flags.equals(flags)) return n;
-        if (n == this) n = Copy.Util.copy(n);
+        n = copyIfNeeded(n);
         n.flags = flags;
         return n;
     }
@@ -151,7 +151,7 @@ public class ClassDecl_c extends Term_c implements ClassDecl, ClassDeclOps {
 
     protected <N extends ClassDecl_c> N id(N n, Id name) {
         if (n.name == name) return n;
-        if (n == this) n = Copy.Util.copy(n);
+        n = copyIfNeeded(n);
         n.name = name;
         return n;
     }
@@ -178,7 +178,7 @@ public class ClassDecl_c extends Term_c implements ClassDecl, ClassDeclOps {
 
     protected <N extends ClassDecl_c> N superClass(N n, TypeNode superClass) {
         if (n.superClass == superClass) return n;
-        if (n == this) n = Copy.Util.copy(n);
+        n = copyIfNeeded(n);
         n.superClass = superClass;
         return n;
     }
@@ -196,7 +196,7 @@ public class ClassDecl_c extends Term_c implements ClassDecl, ClassDeclOps {
     protected <N extends ClassDecl_c> N interfaces(N n,
             List<TypeNode> interfaces) {
         if (CollectionUtil.equals(n.interfaces, interfaces)) return n;
-        if (n == this) n = Copy.Util.copy(n);
+        n = copyIfNeeded(n);
         n.interfaces = ListUtil.copy(interfaces, true);
         return n;
     }
@@ -213,7 +213,7 @@ public class ClassDecl_c extends Term_c implements ClassDecl, ClassDeclOps {
 
     protected <N extends ClassDecl_c> N body(N n, ClassBody body) {
         if (n.body == body) return n;
-        if (n == this) n = Copy.Util.copy(n);
+        n = copyIfNeeded(n);
         n.body = body;
         return n;
     }
@@ -631,7 +631,7 @@ public class ClassDecl_c extends Term_c implements ClassDecl, ClassDeclOps {
     @Override
     public Node extRewrite(ExtensionRewriter rw) throws SemanticException {
         ClassDecl_c n = (ClassDecl_c) super.extRewrite(rw);
-        if (n == this) n = Copy.Util.copy(n);
+        n = copyIfNeeded(n);
         n = type(n, null);
         n.defaultCI = null;
         return n;

@@ -44,7 +44,6 @@ import polyglot.types.Type;
 import polyglot.types.TypeSystem;
 import polyglot.util.CodeWriter;
 import polyglot.util.CollectionUtil;
-import polyglot.util.Copy;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.ListUtil;
 import polyglot.util.Position;
@@ -104,7 +103,7 @@ public class Call_c extends Expr_c implements Call, CallOps {
 
     protected <N extends Call_c> N target(N n, Receiver target) {
         if (n.target == target) return n;
-        if (n == this) n = Copy.Util.copy(n);
+        n = copyIfNeeded(n);
         n.target = target;
         return n;
     }
@@ -121,7 +120,7 @@ public class Call_c extends Expr_c implements Call, CallOps {
 
     protected <N extends Call_c> N id(N n, Id name) {
         if (n.name == name) return n;
-        if (n == this) n = Copy.Util.copy(n);
+        n = copyIfNeeded(n);
         n.name = name;
         return n;
     }
@@ -153,7 +152,7 @@ public class Call_c extends Expr_c implements Call, CallOps {
 
     protected <N extends Call_c> N methodInstance(N n, MethodInstance mi) {
         if (n.mi == mi) return n;
-        if (n == this) n = Copy.Util.copy(n);
+        n = copyIfNeeded(n);
         n.mi = mi;
         return n;
     }
@@ -170,7 +169,7 @@ public class Call_c extends Expr_c implements Call, CallOps {
 
     protected <N extends Call_c> N targetImplicit(N n, boolean targetImplicit) {
         if (n.targetImplicit == targetImplicit) return n;
-        if (n == this) n = Copy.Util.copy(n);
+        n = copyIfNeeded(n);
         n.targetImplicit = targetImplicit;
         return n;
     }
@@ -187,7 +186,7 @@ public class Call_c extends Expr_c implements Call, CallOps {
 
     protected <N extends Call_c> N arguments(N n, List<Expr> arguments) {
         if (CollectionUtil.equals(n.arguments, arguments)) return n;
-        if (n == this) n = Copy.Util.copy(n);
+        n = copyIfNeeded(n);
         n.arguments = ListUtil.copy(arguments, true);
         return n;
     }

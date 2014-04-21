@@ -43,7 +43,6 @@ import polyglot.types.Type;
 import polyglot.types.TypeSystem;
 import polyglot.util.CodeWriter;
 import polyglot.util.CollectionUtil;
-import polyglot.util.Copy;
 import polyglot.util.ListUtil;
 import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
@@ -94,7 +93,7 @@ public class ConstructorCall_c extends Stmt_c implements ConstructorCall,
 
     protected <N extends ConstructorCall_c> N qualifier(N n, Expr qualifier) {
         if (n.qualifier == qualifier) return n;
-        if (n == this) n = Copy.Util.copy(n);
+        n = copyIfNeeded(n);
         n.qualifier = qualifier;
         return n;
     }
@@ -111,7 +110,7 @@ public class ConstructorCall_c extends Stmt_c implements ConstructorCall,
 
     protected <N extends ConstructorCall_c> N kind(N n, Kind kind) {
         if (n.kind == kind) return n;
-        if (n == this) n = Copy.Util.copy(n);
+        n = copyIfNeeded(n);
         n.kind = kind;
         return n;
     }
@@ -129,7 +128,7 @@ public class ConstructorCall_c extends Stmt_c implements ConstructorCall,
     protected <N extends ConstructorCall_c> N arguments(N n,
             List<Expr> arguments) {
         if (CollectionUtil.equals(n.arguments, arguments)) return n;
-        if (n == this) n = Copy.Util.copy(n);
+        n = copyIfNeeded(n);
         n.arguments = ListUtil.copy(arguments, true);
         return n;
     }
@@ -152,7 +151,7 @@ public class ConstructorCall_c extends Stmt_c implements ConstructorCall,
     protected <N extends ConstructorCall_c> N constructorInstance(N n,
             ConstructorInstance ci) {
         if (n.ci == ci) return n;
-        if (n == this) n = Copy.Util.copy(n);
+        n = copyIfNeeded(n);
         n.ci = ci;
         return n;
     }

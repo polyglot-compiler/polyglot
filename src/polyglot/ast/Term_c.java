@@ -31,7 +31,6 @@ import java.util.List;
 import polyglot.translate.ExtensionRewriter;
 import polyglot.types.SemanticException;
 import polyglot.util.CollectionUtil;
-import polyglot.util.Copy;
 import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
 import polyglot.util.SubtypeSet;
@@ -70,7 +69,7 @@ public abstract class Term_c extends Node_c implements Term, TermOps {
 
     protected <N extends Term_c> N reachable(N n, boolean reachable) {
         if (n.reachable == reachable) return n;
-        if (n == this) n = Copy.Util.copy(n);
+        n = copyIfNeeded(n);
         n.reachable = reachable;
         return n;
     }
@@ -87,7 +86,7 @@ public abstract class Term_c extends Node_c implements Term, TermOps {
 
     protected <N extends Term_c> N exceptions(N n, SubtypeSet exceptions) {
         if (n.exceptions == exceptions) return n;
-        if (n == this) n = Copy.Util.copy(n);
+        n = copyIfNeeded(n);
         n.exceptions = new SubtypeSet(exceptions);
         return n;
     }

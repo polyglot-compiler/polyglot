@@ -38,7 +38,6 @@ import polyglot.types.SemanticException;
 import polyglot.types.TypeSystem;
 import polyglot.util.CodeWriter;
 import polyglot.util.CollectionUtil;
-import polyglot.util.Copy;
 import polyglot.util.ListUtil;
 import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
@@ -81,7 +80,7 @@ public class ClassBody_c extends Term_c implements ClassBody {
 
     protected <N extends ClassBody_c> N members(N n, List<ClassMember> members) {
         if (CollectionUtil.equals(n.members, members)) return n;
-        if (n == this) n = Copy.Util.copy(n);
+        n = copyIfNeeded(n);
         n.members = ListUtil.copy(members, true);
         return n;
     }

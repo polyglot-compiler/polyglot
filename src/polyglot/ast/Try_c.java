@@ -35,7 +35,6 @@ import polyglot.types.Type;
 import polyglot.types.TypeSystem;
 import polyglot.util.CodeWriter;
 import polyglot.util.CollectionUtil;
-import polyglot.util.Copy;
 import polyglot.util.ListUtil;
 import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
@@ -89,7 +88,7 @@ public class Try_c extends Stmt_c implements Try, TryOps {
 
     protected <N extends Try_c> N tryBlock(N n, Block tryBlock) {
         if (n.tryBlock == tryBlock) return n;
-        if (n == this) n = Copy.Util.copy(n);
+        n = copyIfNeeded(n);
         n.tryBlock = tryBlock;
         return n;
     }
@@ -106,7 +105,7 @@ public class Try_c extends Stmt_c implements Try, TryOps {
 
     protected <N extends Try_c> N catchBlocks(N n, List<Catch> catchBlocks) {
         if (CollectionUtil.equals(n.catchBlocks, catchBlocks)) return n;
-        if (n == this) n = Copy.Util.copy(n);
+        n = copyIfNeeded(n);
         n.catchBlocks = ListUtil.copy(catchBlocks, true);
         return n;
     }
@@ -123,7 +122,7 @@ public class Try_c extends Stmt_c implements Try, TryOps {
 
     protected <N extends Try_c> N finallyBlock(N n, Block finallyBlock) {
         if (n.finallyBlock == finallyBlock) return n;
-        if (n == this) n = Copy.Util.copy(n);
+        n = copyIfNeeded(n);
         n.finallyBlock = finallyBlock;
         return n;
     }

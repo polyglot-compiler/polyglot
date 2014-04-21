@@ -26,7 +26,6 @@
 
 package polyglot.ast;
 
-import polyglot.util.Copy;
 import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
 
@@ -65,7 +64,7 @@ public abstract class Loop_c extends Stmt_c implements Loop, LoopOps {
 
     protected <N extends Loop_c> N cond(N n, Expr cond) {
         if (n.cond == cond) return n;
-        if (n == this) n = Copy.Util.copy(n);
+        n = copyIfNeeded(n);
         n.cond = cond;
         return n;
     }
@@ -97,7 +96,7 @@ public abstract class Loop_c extends Stmt_c implements Loop, LoopOps {
 
     protected <N extends Loop_c> N body(N n, Stmt body) {
         if (n.body == body) return n;
-        if (n == this) n = Copy.Util.copy(n);
+        n = copyIfNeeded(n);
         n.body = body;
         return n;
     }

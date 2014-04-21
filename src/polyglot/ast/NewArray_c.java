@@ -35,7 +35,6 @@ import polyglot.types.Type;
 import polyglot.types.TypeSystem;
 import polyglot.util.CodeWriter;
 import polyglot.util.CollectionUtil;
-import polyglot.util.Copy;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.ListUtil;
 import polyglot.util.Position;
@@ -95,7 +94,7 @@ public class NewArray_c extends Expr_c implements NewArray {
 
     protected <N extends NewArray_c> N baseType(N n, TypeNode baseType) {
         if (n.baseType == baseType) return n;
-        if (n == this) n = Copy.Util.copy(n);
+        n = copyIfNeeded(n);
         n.baseType = baseType;
         return n;
     }
@@ -112,7 +111,7 @@ public class NewArray_c extends Expr_c implements NewArray {
 
     protected <N extends NewArray_c> N dims(N n, List<Expr> dims) {
         if (CollectionUtil.equals(n.dims, dims)) return n;
-        if (n == this) n = Copy.Util.copy(n);
+        n = copyIfNeeded(n);
         n.dims = ListUtil.copy(dims, true);
         return n;
     }
@@ -134,7 +133,7 @@ public class NewArray_c extends Expr_c implements NewArray {
 
     protected <N extends NewArray_c> N additionalDims(N n, int addDims) {
         if (n.addDims == addDims) return n;
-        if (n == this) n = Copy.Util.copy(n);
+        n = copyIfNeeded(n);
         n.addDims = addDims;
         return n;
     }
@@ -151,7 +150,7 @@ public class NewArray_c extends Expr_c implements NewArray {
 
     protected <N extends NewArray_c> N init(N n, ArrayInit init) {
         if (n.init == init) return n;
-        if (n == this) n = Copy.Util.copy(n);
+        n = copyIfNeeded(n);
         n.init = init;
         return n;
     }

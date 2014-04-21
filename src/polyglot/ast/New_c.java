@@ -45,7 +45,6 @@ import polyglot.types.Type;
 import polyglot.types.TypeSystem;
 import polyglot.util.CodeWriter;
 import polyglot.util.CollectionUtil;
-import polyglot.util.Copy;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.ListUtil;
 import polyglot.util.Position;
@@ -111,7 +110,7 @@ public class New_c extends Expr_c implements New, NewOps {
 
     protected <N extends New_c> N qualifier(N n, Expr qualifier) {
         if (n.qualifier == qualifier) return n;
-        if (n == this) n = Copy.Util.copy(n);
+        n = copyIfNeeded(n);
         n.qualifier = qualifier;
         return n;
     }
@@ -128,7 +127,7 @@ public class New_c extends Expr_c implements New, NewOps {
 
     protected <N extends New_c> N qualifierImplicit(N n, boolean implicit) {
         if (n.qualifierImplicit == implicit) return n;
-        if (n == this) n = Copy.Util.copy(n);
+        n = copyIfNeeded(n);
         n.qualifierImplicit = implicit;
         return n;
     }
@@ -145,7 +144,7 @@ public class New_c extends Expr_c implements New, NewOps {
 
     protected <N extends New_c> N objectType(N n, TypeNode objectType) {
         if (n.objectType == objectType) return n;
-        if (n == this) n = Copy.Util.copy(n);
+        n = copyIfNeeded(n);
         n.objectType = objectType;
         return n;
     }
@@ -162,7 +161,7 @@ public class New_c extends Expr_c implements New, NewOps {
 
     protected <N extends New_c> N anonType(N n, ParsedClassType anonType) {
         if (n.anonType == anonType) return n;
-        if (n == this) n = Copy.Util.copy(n);
+        n = copyIfNeeded(n);
         n.anonType = anonType;
         return n;
     }
@@ -185,7 +184,7 @@ public class New_c extends Expr_c implements New, NewOps {
     protected <N extends New_c> N constructorInstance(N n,
             ConstructorInstance ci) {
         if (n.ci == ci) return n;
-        if (n == this) n = Copy.Util.copy(n);
+        n = copyIfNeeded(n);
         n.ci = ci;
         return n;
     }
@@ -202,7 +201,7 @@ public class New_c extends Expr_c implements New, NewOps {
 
     protected <N extends New_c> N arguments(N n, List<Expr> arguments) {
         if (CollectionUtil.equals(n.arguments, arguments)) return n;
-        if (n == this) n = Copy.Util.copy(n);
+        n = copyIfNeeded(n);
         n.arguments = ListUtil.copy(arguments, true);
         return n;
     }
@@ -219,7 +218,7 @@ public class New_c extends Expr_c implements New, NewOps {
 
     protected <N extends New_c> N body(N n, ClassBody body) {
         if (n.body == body) return n;
-        if (n == this) n = Copy.Util.copy(n);
+        n = copyIfNeeded(n);
         n.body = body;
         return n;
     }

@@ -34,7 +34,6 @@ import polyglot.types.Type;
 import polyglot.types.TypeSystem;
 import polyglot.util.CodeWriter;
 import polyglot.util.CollectionUtil;
-import polyglot.util.Copy;
 import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
 import polyglot.visit.AscriptionVisitor;
@@ -82,7 +81,7 @@ public class ArrayAccess_c extends Expr_c implements ArrayAccess {
 
     protected <N extends ArrayAccess_c> N array(N n, Expr array) {
         if (n.array == array) return n;
-        if (n == this) n = Copy.Util.copy(n);
+        n = copyIfNeeded(n);
         n.array = array;
         return n;
     }
@@ -99,7 +98,7 @@ public class ArrayAccess_c extends Expr_c implements ArrayAccess {
 
     protected <N extends ArrayAccess_c> N index(N n, Expr index) {
         if (n.index == index) return n;
-        if (n == this) n = Copy.Util.copy(n);
+        n = copyIfNeeded(n);
         n.index = index;
         return n;
     }

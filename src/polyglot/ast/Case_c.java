@@ -32,7 +32,6 @@ import polyglot.types.SemanticException;
 import polyglot.types.Type;
 import polyglot.types.TypeSystem;
 import polyglot.util.CodeWriter;
-import polyglot.util.Copy;
 import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
 import polyglot.visit.AscriptionVisitor;
@@ -80,7 +79,7 @@ public class Case_c extends Stmt_c implements Case {
 
     protected <N extends Case_c> N expr(N n, Expr expr) {
         if (n.expr == expr) return n;
-        if (n == this) n = Copy.Util.copy(n);
+        n = copyIfNeeded(n);
         n.expr = expr;
         return n;
     }
@@ -97,7 +96,7 @@ public class Case_c extends Stmt_c implements Case {
 
     protected <N extends Case_c> N value(N n, long value) {
         if (n.value == value) return n;
-        if (n == this) n = Copy.Util.copy(n);
+        n = copyIfNeeded(n);
         n.value = value;
         return n;
     }

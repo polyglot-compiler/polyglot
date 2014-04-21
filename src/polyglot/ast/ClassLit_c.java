@@ -30,7 +30,6 @@ import java.util.List;
 
 import polyglot.types.SemanticException;
 import polyglot.util.CodeWriter;
-import polyglot.util.Copy;
 import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
 import polyglot.visit.CFGBuilder;
@@ -71,7 +70,7 @@ public class ClassLit_c extends Lit_c implements ClassLit {
 
     protected <N extends ClassLit_c> N typeNode(N n, TypeNode typeNode) {
         if (n.typeNode == typeNode) return n;
-        if (n == this) n = Copy.Util.copy(n);
+        n = copyIfNeeded(n);
         n.typeNode = typeNode;
         return n;
     }

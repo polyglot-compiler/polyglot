@@ -29,7 +29,6 @@ package polyglot.ast;
 import java.util.List;
 
 import polyglot.util.CodeWriter;
-import polyglot.util.Copy;
 import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
 import polyglot.visit.CFGBuilder;
@@ -70,7 +69,7 @@ public class Labeled_c extends Stmt_c implements Labeled {
 
     protected <N extends Labeled_c> N labelNode(N n, Id label) {
         if (n.label == label) return n;
-        if (n == this) n = Copy.Util.copy(n);
+        n = copyIfNeeded(n);
         n.label = label;
         return n;
     }
@@ -97,7 +96,7 @@ public class Labeled_c extends Stmt_c implements Labeled {
 
     protected <N extends Labeled_c> N statement(N n, Stmt statement) {
         if (n.statement == statement) return n;
-        if (n == this) n = Copy.Util.copy(n);
+        n = copyIfNeeded(n);
         n.statement = statement;
         return n;
     }

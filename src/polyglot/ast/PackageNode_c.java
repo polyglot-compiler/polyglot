@@ -32,7 +32,6 @@ import polyglot.types.Package;
 import polyglot.types.Qualifier;
 import polyglot.types.SemanticException;
 import polyglot.util.CodeWriter;
-import polyglot.util.Copy;
 import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
 import polyglot.visit.PrettyPrinter;
@@ -82,7 +81,7 @@ public class PackageNode_c extends Node_c implements PackageNode {
 
     protected <N extends PackageNode_c> N package_(N n, Package package_) {
         if (n.package_ == package_) return n;
-        if (n == this) n = Copy.Util.copy(n);
+        n = copyIfNeeded(n);
         n.package_ = package_;
         return n;
     }

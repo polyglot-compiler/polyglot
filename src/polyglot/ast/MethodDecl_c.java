@@ -44,7 +44,6 @@ import polyglot.types.Type;
 import polyglot.types.TypeSystem;
 import polyglot.util.CodeWriter;
 import polyglot.util.CollectionUtil;
-import polyglot.util.Copy;
 import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
 import polyglot.visit.AmbiguityRemover;
@@ -99,7 +98,7 @@ public class MethodDecl_c extends ProcedureDecl_c implements MethodDecl {
 
     protected <N extends MethodDecl_c> N returnType(N n, TypeNode returnType) {
         if (n.returnType == returnType) return n;
-        if (n == this) n = Copy.Util.copy(n);
+        n = copyIfNeeded(n);
         n.returnType = returnType;
         return n;
     }
@@ -121,7 +120,7 @@ public class MethodDecl_c extends ProcedureDecl_c implements MethodDecl {
 
     protected <N extends MethodDecl_c> N methodInstance(N n, MethodInstance mi) {
         if (n.mi == mi) return n;
-        if (n == this) n = Copy.Util.copy(n);
+        n = copyIfNeeded(n);
         n.mi = mi;
         return n;
     }

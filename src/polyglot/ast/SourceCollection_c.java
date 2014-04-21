@@ -30,7 +30,6 @@ import java.util.List;
 
 import polyglot.util.CodeWriter;
 import polyglot.util.CollectionUtil;
-import polyglot.util.Copy;
 import polyglot.util.ListUtil;
 import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
@@ -77,7 +76,7 @@ public class SourceCollection_c extends Node_c implements SourceCollection {
     protected <N extends SourceCollection_c> N sources(N n,
             List<SourceFile> sources) {
         if (CollectionUtil.equals(n.sources, sources)) return n;
-        if (n == this) n = Copy.Util.copy(n);
+        n = copyIfNeeded(n);
         n.sources = ListUtil.copy(sources, true);
         return n;
     }

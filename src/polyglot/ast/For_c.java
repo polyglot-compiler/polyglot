@@ -35,7 +35,6 @@ import polyglot.types.Type;
 import polyglot.types.TypeSystem;
 import polyglot.util.CodeWriter;
 import polyglot.util.CollectionUtil;
-import polyglot.util.Copy;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.ListUtil;
 import polyglot.util.Position;
@@ -84,7 +83,7 @@ public class For_c extends Loop_c implements For {
 
     protected <N extends For_c> N inits(N n, List<ForInit> inits) {
         if (CollectionUtil.equals(n.inits, inits)) return n;
-        if (n == this) n = Copy.Util.copy(n);
+        n = copyIfNeeded(n);
         n.inits = ListUtil.copy(inits, true);
         return n;
     }
@@ -106,7 +105,7 @@ public class For_c extends Loop_c implements For {
 
     protected <N extends For_c> N iters(N n, List<ForUpdate> iters) {
         if (CollectionUtil.equals(n.iters, iters)) return n;
-        if (n == this) n = Copy.Util.copy(n);
+        n = copyIfNeeded(n);
         n.iters = ListUtil.copy(iters, true);
         return n;
     }

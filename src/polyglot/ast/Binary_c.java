@@ -33,7 +33,6 @@ import polyglot.types.SemanticException;
 import polyglot.types.Type;
 import polyglot.types.TypeSystem;
 import polyglot.util.CodeWriter;
-import polyglot.util.Copy;
 import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
 import polyglot.visit.AscriptionVisitor;
@@ -85,7 +84,7 @@ public class Binary_c extends Expr_c implements Binary {
 
     protected <N extends Binary_c> N left(N n, Expr left) {
         if (n.left == left) return n;
-        if (n == this) n = Copy.Util.copy(n);
+        n = copyIfNeeded(n);
         n.left = left;
         return n;
     }
@@ -102,7 +101,7 @@ public class Binary_c extends Expr_c implements Binary {
 
     protected <N extends Binary_c> N operator(N n, Operator op) {
         if (n.op == op) return n;
-        if (n == this) n = Copy.Util.copy(n);
+        n = copyIfNeeded(n);
         n.op = op;
         return n;
     }
@@ -119,7 +118,7 @@ public class Binary_c extends Expr_c implements Binary {
 
     protected <N extends Binary_c> N right(N n, Expr right) {
         if (n.right == right) return n;
-        if (n == this) n = Copy.Util.copy(n);
+        n = copyIfNeeded(n);
         n.right = right;
         return n;
     }
@@ -136,7 +135,7 @@ public class Binary_c extends Expr_c implements Binary {
 
     protected <N extends Binary_c> N precedence(N n, Precedence precedence) {
         if (n.precedence == precedence) return n;
-        if (n == this) n = Copy.Util.copy(n);
+        n = copyIfNeeded(n);
         n.precedence = precedence;
         return n;
     }

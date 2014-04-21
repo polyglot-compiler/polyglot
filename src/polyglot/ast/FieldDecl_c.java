@@ -44,7 +44,6 @@ import polyglot.types.Type;
 import polyglot.types.TypeSystem;
 import polyglot.types.VarInstance;
 import polyglot.util.CodeWriter;
-import polyglot.util.Copy;
 import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
 import polyglot.visit.AmbiguityRemover;
@@ -123,7 +122,7 @@ public class FieldDecl_c extends Term_c implements FieldDecl {
     protected <N extends FieldDecl_c> N initializerInstance(N n,
             InitializerInstance ii) {
         if (n.ii == ii) return n;
-        if (n == this) n = Copy.Util.copy(n);
+        n = copyIfNeeded(n);
         n.ii = ii;
         return n;
     }
@@ -145,7 +144,7 @@ public class FieldDecl_c extends Term_c implements FieldDecl {
 
     protected <N extends FieldDecl_c> N flags(N n, Flags flags) {
         if (n.flags.equals(flags)) return n;
-        if (n == this) n = Copy.Util.copy(n);
+        n = copyIfNeeded(n);
         n.flags = flags;
         return n;
     }
@@ -162,7 +161,7 @@ public class FieldDecl_c extends Term_c implements FieldDecl {
 
     protected <N extends FieldDecl_c> N type(N n, TypeNode type) {
         if (n.type == type) return n;
-        if (n == this) n = Copy.Util.copy(n);
+        n = copyIfNeeded(n);
         n.type = type;
         return n;
     }
@@ -179,7 +178,7 @@ public class FieldDecl_c extends Term_c implements FieldDecl {
 
     protected <N extends FieldDecl_c> N id(N n, Id name) {
         if (n.name == name) return n;
-        if (n == this) n = Copy.Util.copy(n);
+        n = copyIfNeeded(n);
         n.name = name;
         return n;
     }
@@ -211,7 +210,7 @@ public class FieldDecl_c extends Term_c implements FieldDecl {
 
     protected <N extends FieldDecl_c> N init(N n, Expr init) {
         if (n.init == init) return n;
-        if (n == this) n = Copy.Util.copy(n);
+        n = copyIfNeeded(n);
         n.init = init;
         return n;
     }
@@ -228,7 +227,7 @@ public class FieldDecl_c extends Term_c implements FieldDecl {
 
     protected <N extends FieldDecl_c> N fieldInstance(N n, FieldInstance fi) {
         if (n.fi == fi) return n;
-        if (n == this) n = Copy.Util.copy(n);
+        n = copyIfNeeded(n);
         n.fi = fi;
         return n;
     }

@@ -33,7 +33,6 @@ import polyglot.types.SemanticException;
 import polyglot.types.Type;
 import polyglot.types.TypeSystem;
 import polyglot.util.CodeWriter;
-import polyglot.util.Copy;
 import polyglot.util.ErrorInfo;
 import polyglot.util.ErrorQueue;
 import polyglot.util.Position;
@@ -79,7 +78,7 @@ public class Assert_c extends Stmt_c implements Assert {
 
     protected <N extends Assert_c> N cond(N n, Expr cond) {
         if (n.cond == cond) return n;
-        if (n == this) n = Copy.Util.copy(n);
+        n = copyIfNeeded(n);
         n.cond = cond;
         return n;
     }
@@ -96,7 +95,7 @@ public class Assert_c extends Stmt_c implements Assert {
 
     protected <N extends Assert_c> N errorMessage(N n, Expr errorMessage) {
         if (n.errorMessage == errorMessage) return n;
-        if (n == this) n = Copy.Util.copy(n);
+        n = copyIfNeeded(n);
         n.errorMessage = errorMessage;
         return n;
     }

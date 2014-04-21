@@ -39,7 +39,6 @@ import polyglot.types.SemanticException;
 import polyglot.types.TypeSystem;
 import polyglot.util.CodeWriter;
 import polyglot.util.CollectionUtil;
-import polyglot.util.Copy;
 import polyglot.util.ListUtil;
 import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
@@ -95,7 +94,7 @@ public class SourceFile_c extends Node_c implements SourceFile {
 
     protected <N extends SourceFile_c> N source(N n, Source source) {
         if (n.source == source) return n;
-        if (n == this) n = Copy.Util.copy(n);
+        n = copyIfNeeded(n);
         n.source = source;
         return n;
     }
@@ -112,7 +111,7 @@ public class SourceFile_c extends Node_c implements SourceFile {
 
     protected <N extends SourceFile_c> N package_(N n, PackageNode package_) {
         if (n.package_ == package_) return n;
-        if (n == this) n = Copy.Util.copy(n);
+        n = copyIfNeeded(n);
         n.package_ = package_;
         return n;
     }
@@ -129,7 +128,7 @@ public class SourceFile_c extends Node_c implements SourceFile {
 
     protected <N extends SourceFile_c> N imports(N n, List<Import> imports) {
         if (CollectionUtil.equals(n.imports, imports)) return n;
-        if (n == this) n = Copy.Util.copy(n);
+        n = copyIfNeeded(n);
         n.imports = ListUtil.copy(imports, true);
         return n;
     }
@@ -146,7 +145,7 @@ public class SourceFile_c extends Node_c implements SourceFile {
 
     protected <N extends SourceFile_c> N decls(N n, List<TopLevelDecl> decls) {
         if (CollectionUtil.equals(n.decls, decls)) return n;
-        if (n == this) n = Copy.Util.copy(n);
+        n = copyIfNeeded(n);
         n.decls = ListUtil.copy(decls, true);
         return n;
     }
@@ -164,7 +163,7 @@ public class SourceFile_c extends Node_c implements SourceFile {
     protected <N extends SourceFile_c> N importTable(N n,
             ImportTable importTable) {
         if (n.importTable == importTable) return n;
-        if (n == this) n = Copy.Util.copy(n);
+        n = copyIfNeeded(n);
         n.importTable = importTable;
         return n;
     }

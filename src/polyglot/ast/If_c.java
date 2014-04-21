@@ -32,7 +32,6 @@ import polyglot.types.SemanticException;
 import polyglot.types.Type;
 import polyglot.types.TypeSystem;
 import polyglot.util.CodeWriter;
-import polyglot.util.Copy;
 import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
 import polyglot.visit.AscriptionVisitor;
@@ -80,7 +79,7 @@ public class If_c extends Stmt_c implements If {
 
     protected <N extends If_c> N cond(N n, Expr cond) {
         if (n.cond == cond) return n;
-        if (n == this) n = Copy.Util.copy(n);
+        n = copyIfNeeded(n);
         n.cond = cond;
         return n;
     }
@@ -97,7 +96,7 @@ public class If_c extends Stmt_c implements If {
 
     protected <N extends If_c> N consequent(N n, Stmt consequent) {
         if (n.consequent == consequent) return n;
-        if (n == this) n = Copy.Util.copy(n);
+        n = copyIfNeeded(n);
         n.consequent = consequent;
         return n;
     }
@@ -114,7 +113,7 @@ public class If_c extends Stmt_c implements If {
 
     protected <N extends If_c> N alternative(N n, Stmt alternative) {
         if (n.alternative == alternative) return n;
-        if (n == this) n = Copy.Util.copy(n);
+        n = copyIfNeeded(n);
         n.alternative = alternative;
         return n;
     }

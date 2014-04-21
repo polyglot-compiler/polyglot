@@ -28,7 +28,6 @@ package polyglot.ast;
 
 import polyglot.types.SemanticException;
 import polyglot.util.CodeWriter;
-import polyglot.util.Copy;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
@@ -73,7 +72,7 @@ public class AmbTypeNode_c extends TypeNode_c implements AmbTypeNode {
 
     protected <N extends AmbTypeNode_c> N id(N n, Id name) {
         if (n.name == name) return n;
-        if (n == this) n = Copy.Util.copy(n);
+        n = copyIfNeeded(n);
         n.name = name;
         return n;
     }
@@ -100,7 +99,6 @@ public class AmbTypeNode_c extends TypeNode_c implements AmbTypeNode {
 
     protected <N extends AmbTypeNode_c> N qual(N n, QualifierNode qual) {
         if (n.qual == qual) return n;
-        if (n == this) n = Copy.Util.copy(n);
         n.qual = qual;
         return n;
     }

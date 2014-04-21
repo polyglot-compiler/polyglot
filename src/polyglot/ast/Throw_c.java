@@ -34,7 +34,6 @@ import polyglot.types.Type;
 import polyglot.types.TypeSystem;
 import polyglot.util.CodeWriter;
 import polyglot.util.CollectionUtil;
-import polyglot.util.Copy;
 import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
 import polyglot.visit.AscriptionVisitor;
@@ -76,7 +75,7 @@ public class Throw_c extends Stmt_c implements Throw {
 
     protected <N extends Throw_c> N expr(N n, Expr expr) {
         if (n.expr == expr) return n;
-        if (n == this) n = Copy.Util.copy(n);
+        n = copyIfNeeded(n);
         n.expr = expr;
         return n;
     }

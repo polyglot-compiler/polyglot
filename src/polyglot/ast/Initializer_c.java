@@ -40,7 +40,6 @@ import polyglot.types.SemanticException;
 import polyglot.types.Type;
 import polyglot.types.TypeSystem;
 import polyglot.util.CodeWriter;
-import polyglot.util.Copy;
 import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
 import polyglot.util.SubtypeSet;
@@ -94,7 +93,7 @@ public class Initializer_c extends Term_c implements Initializer {
 
     protected <N extends Initializer_c> N flags(N n, Flags flags) {
         if (n.flags.equals(flags)) return n;
-        if (n == this) n = Copy.Util.copy(n);
+        n = copyIfNeeded(n);
         n.flags = flags;
         return n;
     }
@@ -122,7 +121,7 @@ public class Initializer_c extends Term_c implements Initializer {
     protected <N extends Initializer_c> N initializerInstance(N n,
             InitializerInstance ii) {
         if (n.ii == ii) return n;
-        if (n == this) n = Copy.Util.copy(n);
+        n = copyIfNeeded(n);
         n.ii = ii;
         return n;
     }
@@ -144,7 +143,7 @@ public class Initializer_c extends Term_c implements Initializer {
 
     protected <N extends Initializer_c> N body(N n, Block body) {
         if (n.body == body) return n;
-        if (n == this) n = Copy.Util.copy(n);
+        n = copyIfNeeded(n);
         n.body = body;
         return n;
     }

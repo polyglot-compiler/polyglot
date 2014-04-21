@@ -30,7 +30,6 @@ import java.util.List;
 
 import polyglot.types.SemanticException;
 import polyglot.util.CodeWriter;
-import polyglot.util.Copy;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
@@ -78,7 +77,7 @@ public class AmbExpr_c extends Expr_c implements AmbExpr {
 
     protected <N extends AmbExpr_c> N id(N n, Id name) {
         if (n.name == name) return n;
-        if (n == this) n = Copy.Util.copy(n);
+        n = copyIfNeeded(n);
         n.name = name;
         return n;
     }

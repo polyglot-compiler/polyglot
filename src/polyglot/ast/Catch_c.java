@@ -33,7 +33,6 @@ import polyglot.types.SemanticException;
 import polyglot.types.Type;
 import polyglot.types.TypeSystem;
 import polyglot.util.CodeWriter;
-import polyglot.util.Copy;
 import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
 import polyglot.visit.CFGBuilder;
@@ -81,7 +80,7 @@ public class Catch_c extends Stmt_c implements Catch {
 
     protected <N extends Catch_c> N formal(N n, Formal formal) {
         if (n.formal == formal) return n;
-        if (n == this) n = Copy.Util.copy(n);
+        n = copyIfNeeded(n);
         n.formal = formal;
         return n;
     }
@@ -98,7 +97,7 @@ public class Catch_c extends Stmt_c implements Catch {
 
     protected <N extends Catch_c> N body(N n, Block body) {
         if (n.body == body) return n;
-        if (n == this) n = Copy.Util.copy(n);
+        n = copyIfNeeded(n);
         n.body = body;
         return n;
     }

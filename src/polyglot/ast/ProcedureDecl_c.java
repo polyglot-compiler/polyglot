@@ -36,7 +36,6 @@ import polyglot.types.SemanticException;
 import polyglot.types.Type;
 import polyglot.util.CodeWriter;
 import polyglot.util.CollectionUtil;
-import polyglot.util.Copy;
 import polyglot.util.ListUtil;
 import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
@@ -89,7 +88,7 @@ public abstract class ProcedureDecl_c extends Term_c implements ProcedureDecl,
 
     protected <N extends ProcedureDecl_c> N flags(N n, Flags flags) {
         if (n.flags.equals(flags)) return n;
-        if (n == this) n = Copy.Util.copy(n);
+        n = copyIfNeeded(n);
         n.flags = flags;
         return n;
     }
@@ -106,7 +105,7 @@ public abstract class ProcedureDecl_c extends Term_c implements ProcedureDecl,
 
     protected <N extends ProcedureDecl_c> N id(N n, Id name) {
         if (n.name == name) return n;
-        if (n == this) n = Copy.Util.copy(n);
+        n = copyIfNeeded(n);
         n.name = name;
         return n;
     }
@@ -133,7 +132,7 @@ public abstract class ProcedureDecl_c extends Term_c implements ProcedureDecl,
 
     protected <N extends ProcedureDecl_c> N formals(N n, List<Formal> formals) {
         if (CollectionUtil.equals(n.formals, formals)) return n;
-        if (n == this) n = Copy.Util.copy(n);
+        n = copyIfNeeded(n);
         n.formals = ListUtil.copy(formals, true);
         return n;
     }
@@ -151,7 +150,7 @@ public abstract class ProcedureDecl_c extends Term_c implements ProcedureDecl,
     protected <N extends ProcedureDecl_c> N throwTypes(N n,
             List<TypeNode> throwTypes) {
         if (CollectionUtil.equals(n.throwTypes, throwTypes)) return n;
-        if (n == this) n = Copy.Util.copy(n);
+        n = copyIfNeeded(n);
         n.throwTypes = ListUtil.copy(throwTypes, true);
         return n;
     }
@@ -173,7 +172,7 @@ public abstract class ProcedureDecl_c extends Term_c implements ProcedureDecl,
 
     protected <N extends ProcedureDecl_c> N body(N n, Block body) {
         if (n.body == body) return n;
-        if (n == this) n = Copy.Util.copy(n);
+        n = copyIfNeeded(n);
         n.body = body;
         return n;
     }

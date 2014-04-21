@@ -32,7 +32,6 @@ import polyglot.types.SemanticException;
 import polyglot.types.Type;
 import polyglot.types.TypeSystem;
 import polyglot.util.CodeWriter;
-import polyglot.util.Copy;
 import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
 import polyglot.visit.AscriptionVisitor;
@@ -76,7 +75,7 @@ public class Synchronized_c extends Stmt_c implements Synchronized {
 
     protected <N extends Synchronized_c> N expr(N n, Expr expr) {
         if (n.expr == expr) return n;
-        if (n == this) n = Copy.Util.copy(n);
+        n = copyIfNeeded(n);
         n.expr = expr;
         return n;
     }
@@ -93,7 +92,7 @@ public class Synchronized_c extends Stmt_c implements Synchronized {
 
     protected <N extends Synchronized_c> N body(N n, Block body) {
         if (n.body == body) return n;
-        if (n == this) n = Copy.Util.copy(n);
+        n = copyIfNeeded(n);
         n.body = body;
         return n;
     }

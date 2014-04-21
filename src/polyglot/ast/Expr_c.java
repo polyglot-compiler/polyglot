@@ -30,7 +30,6 @@ import polyglot.translate.ExtensionRewriter;
 import polyglot.types.SemanticException;
 import polyglot.types.Type;
 import polyglot.util.CodeWriter;
-import polyglot.util.Copy;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
@@ -72,7 +71,7 @@ public abstract class Expr_c extends Term_c implements Expr, ExprOps {
 
     protected <N extends Expr_c> N type(N n, Type type) {
         if (n.type == type) return n;
-        if (n == this) n = Copy.Util.copy(n);
+        n = copyIfNeeded(n);
         n.type = type;
         return n;
     }

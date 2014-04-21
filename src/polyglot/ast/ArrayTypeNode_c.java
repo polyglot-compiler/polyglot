@@ -30,7 +30,6 @@ import polyglot.types.SemanticException;
 import polyglot.types.Type;
 import polyglot.types.TypeSystem;
 import polyglot.util.CodeWriter;
-import polyglot.util.Copy;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
@@ -78,7 +77,7 @@ public class ArrayTypeNode_c extends TypeNode_c implements ArrayTypeNode {
 
     protected <N extends ArrayTypeNode_c> N base(N n, TypeNode base) {
         if (n.base == base) return n;
-        if (n == this) n = Copy.Util.copy(n);
+        n = copyIfNeeded(n);
         n.base = base;
         return n;
     }

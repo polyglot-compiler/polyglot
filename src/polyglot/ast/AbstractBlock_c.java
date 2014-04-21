@@ -33,7 +33,6 @@ import java.util.List;
 import polyglot.types.Context;
 import polyglot.util.CodeWriter;
 import polyglot.util.CollectionUtil;
-import polyglot.util.Copy;
 import polyglot.util.ListUtil;
 import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
@@ -74,7 +73,7 @@ public abstract class AbstractBlock_c extends Stmt_c implements Block {
     protected <N extends AbstractBlock_c> N statements(N n,
             List<Stmt> statements) {
         if (CollectionUtil.equals(n.statements, statements)) return n;
-        if (n == this) n = Copy.Util.copy(n);
+        n = copyIfNeeded(n);
         n.statements = ListUtil.copy(statements, true);
         return n;
     }

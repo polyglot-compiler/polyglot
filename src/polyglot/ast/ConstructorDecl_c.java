@@ -42,7 +42,6 @@ import polyglot.types.SemanticException;
 import polyglot.types.Type;
 import polyglot.types.TypeSystem;
 import polyglot.util.CodeWriter;
-import polyglot.util.Copy;
 import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
 import polyglot.visit.CFGBuilder;
@@ -100,7 +99,7 @@ public class ConstructorDecl_c extends ProcedureDecl_c implements
     protected <N extends ConstructorDecl_c> N constructorInstance(N n,
             ConstructorInstance ci) {
         if (n.ci == ci) return n;
-        if (n == this) n = Copy.Util.copy(n);
+        n = copyIfNeeded(n);
         n.ci = ci;
         return n;
     }

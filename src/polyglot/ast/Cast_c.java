@@ -33,7 +33,6 @@ import polyglot.types.SemanticException;
 import polyglot.types.Type;
 import polyglot.types.TypeSystem;
 import polyglot.util.CodeWriter;
-import polyglot.util.Copy;
 import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
 import polyglot.visit.AscriptionVisitor;
@@ -82,7 +81,7 @@ public class Cast_c extends Expr_c implements Cast {
 
     protected <N extends Cast_c> N castType(N n, TypeNode castType) {
         if (n.castType == castType) return n;
-        if (n == this) n = Copy.Util.copy(n);
+        n = copyIfNeeded(n);
         n.castType = castType;
         return n;
     }
@@ -99,7 +98,7 @@ public class Cast_c extends Expr_c implements Cast {
 
     protected <N extends Cast_c> N expr(N n, Expr expr) {
         if (n.expr == expr) return n;
-        if (n == this) n = Copy.Util.copy(n);
+        n = copyIfNeeded(n);
         n.expr = expr;
         return n;
     }

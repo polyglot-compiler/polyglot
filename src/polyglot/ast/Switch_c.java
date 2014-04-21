@@ -37,7 +37,6 @@ import polyglot.types.Type;
 import polyglot.types.TypeSystem;
 import polyglot.util.CodeWriter;
 import polyglot.util.CollectionUtil;
-import polyglot.util.Copy;
 import polyglot.util.ListUtil;
 import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
@@ -88,7 +87,7 @@ public class Switch_c extends Stmt_c implements Switch {
 
     protected <N extends Switch_c> N expr(N n, Expr expr) {
         if (n.expr == expr) return n;
-        if (n == this) n = Copy.Util.copy(n);
+        n = copyIfNeeded(n);
         n.expr = expr;
         return n;
     }
@@ -105,7 +104,7 @@ public class Switch_c extends Stmt_c implements Switch {
 
     protected <N extends Switch_c> N elements(N n, List<SwitchElement> elements) {
         if (CollectionUtil.equals(n.elements, elements)) return n;
-        if (n == this) n = Copy.Util.copy(n);
+        n = copyIfNeeded(n);
         n.elements = ListUtil.copy(elements, true);
         return n;
     }

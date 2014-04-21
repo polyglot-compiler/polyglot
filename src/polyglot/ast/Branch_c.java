@@ -30,7 +30,6 @@ import java.util.Collections;
 import java.util.List;
 
 import polyglot.util.CodeWriter;
-import polyglot.util.Copy;
 import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
 import polyglot.visit.CFGBuilder;
@@ -71,7 +70,7 @@ public class Branch_c extends Stmt_c implements Branch {
 
     protected <N extends Branch_c> N kind(N n, Branch.Kind kind) {
         if (n.kind == kind) return n;
-        if (n == this) n = Copy.Util.copy(n);
+        n = copyIfNeeded(n);
         n.kind = kind;
         return n;
     }
@@ -88,7 +87,7 @@ public class Branch_c extends Stmt_c implements Branch {
 
     protected <N extends Branch_c> N labelNode(N n, Id label) {
         if (n.label == label) return n;
-        if (n == this) n = Copy.Util.copy(n);
+        n = copyIfNeeded(n);
         n.label = label;
         return n;
     }

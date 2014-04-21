@@ -32,7 +32,6 @@ import polyglot.types.SemanticException;
 import polyglot.types.Type;
 import polyglot.types.TypeSystem;
 import polyglot.util.CodeWriter;
-import polyglot.util.Copy;
 import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
 import polyglot.visit.AscriptionVisitor;
@@ -81,7 +80,7 @@ public class Unary_c extends Expr_c implements Unary {
 
     protected <N extends Unary_c> N expr(N n, Expr expr) {
         if (n.expr == expr) return n;
-        if (n == this) n = Copy.Util.copy(n);
+        n = copyIfNeeded(n);
         n.expr = expr;
         return n;
     }
@@ -98,7 +97,7 @@ public class Unary_c extends Expr_c implements Unary {
 
     protected <N extends Unary_c> N operator(N n, Unary.Operator op) {
         if (n.op == op) return n;
-        if (n == this) n = Copy.Util.copy(n);
+        n = copyIfNeeded(n);
         n.op = op;
         return n;
     }

@@ -36,7 +36,6 @@ import polyglot.types.SemanticException;
 import polyglot.types.TypeSystem;
 import polyglot.types.VarInstance;
 import polyglot.util.CodeWriter;
-import polyglot.util.Copy;
 import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
 import polyglot.visit.CFGBuilder;
@@ -82,7 +81,7 @@ public class Local_c extends Expr_c implements Local {
 
     protected <N extends Local_c> N id(N n, Id name) {
         if (n.name == name) return n;
-        if (n == this) n = Copy.Util.copy(n);
+        n = copyIfNeeded(n);
         n.name = name;
         return n;
     }
@@ -119,7 +118,7 @@ public class Local_c extends Expr_c implements Local {
 
     protected <N extends Local_c> N localInstance(N n, LocalInstance li) {
         if (n.li == li) return n;
-        if (n == this) n = Copy.Util.copy(n);
+        n = copyIfNeeded(n);
         n.li = li;
         return n;
     }

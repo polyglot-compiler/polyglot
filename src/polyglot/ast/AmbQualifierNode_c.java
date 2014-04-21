@@ -29,7 +29,6 @@ package polyglot.ast;
 import polyglot.types.Qualifier;
 import polyglot.types.SemanticException;
 import polyglot.util.CodeWriter;
-import polyglot.util.Copy;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
@@ -76,7 +75,7 @@ public class AmbQualifierNode_c extends Node_c implements AmbQualifierNode {
     protected <N extends AmbQualifierNode_c> N qualifier(N n,
             Qualifier qualifier) {
         if (n.qualifier == qualifier) return n;
-        if (n == this) n = Copy.Util.copy(n);
+        n = copyIfNeeded(n);
         n.qualifier = qualifier;
         return n;
     }
@@ -93,7 +92,7 @@ public class AmbQualifierNode_c extends Node_c implements AmbQualifierNode {
 
     protected <N extends AmbQualifierNode_c> N id(N n, Id name) {
         if (n.name == name) return n;
-        if (n == this) n = Copy.Util.copy(n);
+        n = copyIfNeeded(n);
         n.name = name;
         return n;
     }
@@ -120,7 +119,7 @@ public class AmbQualifierNode_c extends Node_c implements AmbQualifierNode {
 
     protected <N extends AmbQualifierNode_c> N qual(N n, QualifierNode qual) {
         if (n.qual == qual) return n;
-        if (n == this) n = Copy.Util.copy(n);
+        n = copyIfNeeded(n);
         n.qual = qual;
         return n;
     }

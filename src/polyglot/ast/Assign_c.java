@@ -33,7 +33,6 @@ import polyglot.types.SemanticException;
 import polyglot.types.Type;
 import polyglot.types.TypeSystem;
 import polyglot.util.CodeWriter;
-import polyglot.util.Copy;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
@@ -83,7 +82,7 @@ public abstract class Assign_c extends Expr_c implements Assign {
 
     protected <N extends Assign_c> N left(N n, Expr left) {
         if (n.left == left) return n;
-        if (n == this) n = Copy.Util.copy(n);
+        n = copyIfNeeded(n);
         n.left = left;
         return n;
     }
@@ -100,7 +99,7 @@ public abstract class Assign_c extends Expr_c implements Assign {
 
     protected <N extends Assign_c> N operator(N n, Operator op) {
         if (n.op == op) return n;
-        if (n == this) n = Copy.Util.copy(n);
+        n = copyIfNeeded(n);
         n.op = op;
         return n;
     }
@@ -117,7 +116,7 @@ public abstract class Assign_c extends Expr_c implements Assign {
 
     protected <N extends Assign_c> N right(N n, Expr right) {
         if (n.right == right) return n;
-        if (n == this) n = Copy.Util.copy(n);
+        n = copyIfNeeded(n);
         n.right = right;
         return n;
     }
