@@ -135,8 +135,8 @@ public class JL7NodeFactory_c extends JL5NodeFactory_c implements
     protected final TryWithResources TryWithResources(Position pos,
             List<LocalDecl> resources, Block tryBlock, List<Catch> catchBlocks,
             Block finallyBlock, Ext ext, ExtFactory extFactory) {
-        for (; extFactory != null; extFactory = extFactory.nextExtFactory()) {
-            Ext e = JL7AbstractExtFactory_c.extTryWithResources(extFactory);
+        for (ExtFactory ef : extFactory) {
+            Ext e = JL7AbstractExtFactory_c.extTryWithResources(ef);
             if (e == null) break;
             ext = composeExts(ext, e);
         }

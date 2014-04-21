@@ -26,6 +26,8 @@
 
 package polyglot.ast;
 
+import java.util.Iterator;
+
 /**
  * This abstract implementation of {@code ExtFactory} provides
  * a way of chaining together ExtFactories, and default implementations
@@ -1836,6 +1838,33 @@ public abstract class AbstractExtFactory_c implements ExtFactory {
 
     protected Ext postExtWhile(Ext ext) {
         return postExtLoop(ext);
+    }
+
+    /**
+     * Iterates over the chain of extension factories, starting with this one.
+     */
+    @Override
+    public Iterator<ExtFactory> iterator() {
+        return new Iterator<ExtFactory>() {
+            ExtFactory next = AbstractExtFactory_c.this;
+
+            @Override
+            public boolean hasNext() {
+                return next != null;
+            }
+
+            @Override
+            public ExtFactory next() {
+                ExtFactory result = next;
+                next = next.nextExtFactory();
+                return result;
+            }
+
+            @Override
+            public void remove() {
+                throw new UnsupportedOperationException();
+            }
+        };
     }
 
 }

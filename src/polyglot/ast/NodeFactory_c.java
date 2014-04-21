@@ -148,13 +148,11 @@ public class NodeFactory_c extends AbstractNodeFactory_c {
      * Utility method to find an instance of an Extension Factory
      */
     protected final ExtFactory findExtFactInstance(Class<? extends ExtFactory> c) {
-        ExtFactory e = extFactory();
-        while (e != null) {
+        for (ExtFactory e : extFactory()) {
             if (c.isInstance(e)) {
                 // the factory e is an instance of the class c
                 return e;
             }
-            e = e.nextExtFactory();
         }
         return null;
     }
@@ -168,8 +166,8 @@ public class NodeFactory_c extends AbstractNodeFactory_c {
 
     protected final Id Id(Position pos, String name, Ext ext,
             ExtFactory extFactory) {
-        for (; extFactory != null; extFactory = extFactory.nextExtFactory())
-            ext = composeExts(ext, extFactory.extId());
+        for (ExtFactory ef : extFactory)
+            ext = composeExts(ext, ef.extId());
         return new Id_c(pos, name, ext);
     }
 
@@ -182,8 +180,8 @@ public class NodeFactory_c extends AbstractNodeFactory_c {
 
     protected final AmbPrefix AmbPrefix(Position pos, Prefix prefix, Id name,
             Ext ext, ExtFactory extFactory) {
-        for (; extFactory != null; extFactory = extFactory.nextExtFactory())
-            ext = composeExts(ext, extFactory.extAmbPrefix());
+        for (ExtFactory ef : extFactory)
+            ext = composeExts(ext, ef.extAmbPrefix());
         return new AmbPrefix_c(pos, prefix, name, ext);
     }
 
@@ -196,8 +194,8 @@ public class NodeFactory_c extends AbstractNodeFactory_c {
 
     protected final AmbReceiver AmbReceiver(Position pos, Prefix prefix,
             Id name, Ext ext, ExtFactory extFactory) {
-        for (; extFactory != null; extFactory = extFactory.nextExtFactory())
-            ext = composeExts(ext, extFactory.extAmbReceiver());
+        for (ExtFactory ef : extFactory)
+            ext = composeExts(ext, ef.extAmbReceiver());
         return new AmbReceiver_c(pos, prefix, name, ext);
     }
 
@@ -212,8 +210,8 @@ public class NodeFactory_c extends AbstractNodeFactory_c {
 
     protected final AmbQualifierNode AmbQualifierNode(Position pos,
             QualifierNode qualifier, Id name, Ext ext, ExtFactory extFactory) {
-        for (; extFactory != null; extFactory = extFactory.nextExtFactory())
-            ext = composeExts(ext, extFactory.extAmbQualifierNode());
+        for (ExtFactory ef : extFactory)
+            ext = composeExts(ext, ef.extAmbQualifierNode());
         return new AmbQualifierNode_c(pos, qualifier, name, ext);
     }
 
@@ -226,8 +224,8 @@ public class NodeFactory_c extends AbstractNodeFactory_c {
 
     protected final AmbExpr AmbExpr(Position pos, Id name, Ext ext,
             ExtFactory extFactory) {
-        for (; extFactory != null; extFactory = extFactory.nextExtFactory())
-            ext = composeExts(ext, extFactory.extAmbExpr());
+        for (ExtFactory ef : extFactory)
+            ext = composeExts(ext, ef.extAmbExpr());
         return new AmbExpr_c(pos, name, ext);
     }
 
@@ -241,8 +239,8 @@ public class NodeFactory_c extends AbstractNodeFactory_c {
 
     protected final AmbTypeNode AmbTypeNode(Position pos,
             QualifierNode qualifier, Id name, Ext ext, ExtFactory extFactory) {
-        for (; extFactory != null; extFactory = extFactory.nextExtFactory())
-            ext = composeExts(ext, extFactory.extAmbTypeNode());
+        for (ExtFactory ef : extFactory)
+            ext = composeExts(ext, ef.extAmbTypeNode());
         return new AmbTypeNode_c(pos, qualifier, name, ext);
     }
 
@@ -255,8 +253,8 @@ public class NodeFactory_c extends AbstractNodeFactory_c {
 
     protected final ArrayAccess ArrayAccess(Position pos, Expr base,
             Expr index, Ext ext, ExtFactory extFactory) {
-        for (; extFactory != null; extFactory = extFactory.nextExtFactory())
-            ext = composeExts(ext, extFactory.extArrayAccess());
+        for (ExtFactory ef : extFactory)
+            ext = composeExts(ext, ef.extArrayAccess());
         return new ArrayAccess_c(pos, base, index, ext);
     }
 
@@ -269,8 +267,8 @@ public class NodeFactory_c extends AbstractNodeFactory_c {
 
     protected final ArrayInit ArrayInit(Position pos, List<Expr> elements,
             Ext ext, ExtFactory extFactory) {
-        for (; extFactory != null; extFactory = extFactory.nextExtFactory())
-            ext = composeExts(ext, extFactory.extArrayInit());
+        for (ExtFactory ef : extFactory)
+            ext = composeExts(ext, ef.extArrayInit());
         return new ArrayInit_c(pos, CollectionUtil.nonNullList(elements), ext);
     }
 
@@ -283,8 +281,8 @@ public class NodeFactory_c extends AbstractNodeFactory_c {
 
     protected final Assert Assert(Position pos, Expr cond, Expr errorMessage,
             Ext ext, ExtFactory extFactory) {
-        for (; extFactory != null; extFactory = extFactory.nextExtFactory())
-            ext = composeExts(ext, extFactory.extAssert());
+        for (ExtFactory ef : extFactory)
+            ext = composeExts(ext, ef.extAssert());
         return new Assert_c(pos, cond, errorMessage, ext);
     }
 
@@ -312,8 +310,8 @@ public class NodeFactory_c extends AbstractNodeFactory_c {
 
     protected final LocalAssign LocalAssign(Position pos, Local left,
             Assign.Operator op, Expr right, Ext ext, ExtFactory extFactory) {
-        for (; extFactory != null; extFactory = extFactory.nextExtFactory())
-            ext = composeExts(ext, extFactory.extLocalAssign());
+        for (ExtFactory ef : extFactory)
+            ext = composeExts(ext, ef.extLocalAssign());
         return new LocalAssign_c(pos, left, op, right, ext);
     }
 
@@ -327,8 +325,8 @@ public class NodeFactory_c extends AbstractNodeFactory_c {
 
     protected final FieldAssign FieldAssign(Position pos, Field left,
             Assign.Operator op, Expr right, Ext ext, ExtFactory extFactory) {
-        for (; extFactory != null; extFactory = extFactory.nextExtFactory())
-            ext = composeExts(ext, extFactory.extFieldAssign());
+        for (ExtFactory ef : extFactory)
+            ext = composeExts(ext, ef.extFieldAssign());
         return new FieldAssign_c(pos, left, op, right, ext);
     }
 
@@ -344,8 +342,8 @@ public class NodeFactory_c extends AbstractNodeFactory_c {
     protected final ArrayAccessAssign ArrayAccessAssign(Position pos,
             ArrayAccess left, Assign.Operator op, Expr right, Ext ext,
             ExtFactory extFactory) {
-        for (; extFactory != null; extFactory = extFactory.nextExtFactory())
-            ext = composeExts(ext, extFactory.extArrayAccessAssign());
+        for (ExtFactory ef : extFactory)
+            ext = composeExts(ext, ef.extArrayAccessAssign());
         return new ArrayAccessAssign_c(pos, left, op, right, ext);
     }
 
@@ -359,8 +357,8 @@ public class NodeFactory_c extends AbstractNodeFactory_c {
 
     protected final AmbAssign AmbAssign(Position pos, Expr left,
             Assign.Operator op, Expr right, Ext ext, ExtFactory extFactory) {
-        for (; extFactory != null; extFactory = extFactory.nextExtFactory())
-            ext = composeExts(ext, extFactory.extAmbAssign());
+        for (ExtFactory ef : extFactory)
+            ext = composeExts(ext, ef.extAmbAssign());
         return new AmbAssign_c(pos, left, op, right, ext);
     }
 
@@ -373,8 +371,8 @@ public class NodeFactory_c extends AbstractNodeFactory_c {
 
     protected final Binary Binary(Position pos, Expr left, Binary.Operator op,
             Expr right, Ext ext, ExtFactory extFactory) {
-        for (; extFactory != null; extFactory = extFactory.nextExtFactory())
-            ext = composeExts(ext, extFactory.extBinary());
+        for (ExtFactory ef : extFactory)
+            ext = composeExts(ext, ef.extBinary());
         return new Binary_c(pos, left, op, right, ext);
     }
 
@@ -387,8 +385,8 @@ public class NodeFactory_c extends AbstractNodeFactory_c {
 
     protected final Block Block(Position pos, List<Stmt> statements, Ext ext,
             ExtFactory extFactory) {
-        for (; extFactory != null; extFactory = extFactory.nextExtFactory())
-            ext = composeExts(ext, extFactory.extBlock());
+        for (ExtFactory ef : extFactory)
+            ext = composeExts(ext, ef.extBlock());
         return new Block_c(pos, CollectionUtil.nonNullList(statements), ext);
     }
 
@@ -401,8 +399,8 @@ public class NodeFactory_c extends AbstractNodeFactory_c {
 
     protected final SwitchBlock SwitchBlock(Position pos,
             List<Stmt> statements, Ext ext, ExtFactory extFactory) {
-        for (; extFactory != null; extFactory = extFactory.nextExtFactory())
-            ext = composeExts(ext, extFactory.extSwitchBlock());
+        for (ExtFactory ef : extFactory)
+            ext = composeExts(ext, ef.extSwitchBlock());
         return new SwitchBlock_c(pos,
                                  CollectionUtil.nonNullList(statements),
                                  ext);
@@ -417,8 +415,8 @@ public class NodeFactory_c extends AbstractNodeFactory_c {
 
     protected final BooleanLit BooleanLit(Position pos, boolean value, Ext ext,
             ExtFactory extFactory) {
-        for (; extFactory != null; extFactory = extFactory.nextExtFactory())
-            ext = composeExts(ext, extFactory.extBooleanLit());
+        for (ExtFactory ef : extFactory)
+            ext = composeExts(ext, ef.extBooleanLit());
         return new BooleanLit_c(pos, value, ext);
     }
 
@@ -431,8 +429,8 @@ public class NodeFactory_c extends AbstractNodeFactory_c {
 
     protected final Branch Branch(Position pos, Branch.Kind kind, Id label,
             Ext ext, ExtFactory extFactory) {
-        for (; extFactory != null; extFactory = extFactory.nextExtFactory())
-            ext = composeExts(ext, extFactory.extBranch());
+        for (ExtFactory ef : extFactory)
+            ext = composeExts(ext, ef.extBranch());
         return new Branch_c(pos, kind, label, ext);
     }
 
@@ -445,8 +443,8 @@ public class NodeFactory_c extends AbstractNodeFactory_c {
 
     protected final Call Call(Position pos, Receiver target, Id name,
             List<Expr> args, Ext ext, ExtFactory extFactory) {
-        for (; extFactory != null; extFactory = extFactory.nextExtFactory())
-            ext = composeExts(ext, extFactory.extCall());
+        for (ExtFactory ef : extFactory)
+            ext = composeExts(ext, ef.extCall());
         return new Call_c(pos,
                           target,
                           name,
@@ -463,8 +461,8 @@ public class NodeFactory_c extends AbstractNodeFactory_c {
 
     protected final Case Case(Position pos, Expr expr, Ext ext,
             ExtFactory extFactory) {
-        for (; extFactory != null; extFactory = extFactory.nextExtFactory())
-            ext = composeExts(ext, extFactory.extCase());
+        for (ExtFactory ef : extFactory)
+            ext = composeExts(ext, ef.extCase());
         return new Case_c(pos, expr, ext);
     }
 
@@ -477,8 +475,8 @@ public class NodeFactory_c extends AbstractNodeFactory_c {
 
     protected final Cast Cast(Position pos, TypeNode type, Expr expr, Ext ext,
             ExtFactory extFactory) {
-        for (; extFactory != null; extFactory = extFactory.nextExtFactory())
-            ext = composeExts(ext, extFactory.extCast());
+        for (ExtFactory ef : extFactory)
+            ext = composeExts(ext, ef.extCast());
         return new Cast_c(pos, type, expr, ext);
     }
 
@@ -491,8 +489,8 @@ public class NodeFactory_c extends AbstractNodeFactory_c {
 
     protected final Catch Catch(Position pos, Formal formal, Block body,
             Ext ext, ExtFactory extFactory) {
-        for (; extFactory != null; extFactory = extFactory.nextExtFactory())
-            ext = composeExts(ext, extFactory.extCatch());
+        for (ExtFactory ef : extFactory)
+            ext = composeExts(ext, ef.extCatch());
         return new Catch_c(pos, formal, body, ext);
     }
 
@@ -505,8 +503,8 @@ public class NodeFactory_c extends AbstractNodeFactory_c {
 
     protected final CharLit CharLit(Position pos, char value, Ext ext,
             ExtFactory extFactory) {
-        for (; extFactory != null; extFactory = extFactory.nextExtFactory())
-            ext = composeExts(ext, extFactory.extCharLit());
+        for (ExtFactory ef : extFactory)
+            ext = composeExts(ext, ef.extCharLit());
         return new CharLit_c(pos, value, ext);
     }
 
@@ -519,8 +517,8 @@ public class NodeFactory_c extends AbstractNodeFactory_c {
 
     protected final ClassBody ClassBody(Position pos,
             List<ClassMember> members, Ext ext, ExtFactory extFactory) {
-        for (; extFactory != null; extFactory = extFactory.nextExtFactory())
-            ext = composeExts(ext, extFactory.extClassBody());
+        for (ExtFactory ef : extFactory)
+            ext = composeExts(ext, ef.extClassBody());
         return new ClassBody_c(pos, CollectionUtil.nonNullList(members), ext);
     }
 
@@ -543,8 +541,8 @@ public class NodeFactory_c extends AbstractNodeFactory_c {
     protected final ClassDecl ClassDecl(Position pos, Flags flags, Id name,
             TypeNode superClass, List<TypeNode> interfaces, ClassBody body,
             Ext ext, ExtFactory extFactory) {
-        for (; extFactory != null; extFactory = extFactory.nextExtFactory())
-            ext = composeExts(ext, extFactory.extClassDecl());
+        for (ExtFactory ef : extFactory)
+            ext = composeExts(ext, ef.extClassDecl());
         return new ClassDecl_c(pos,
                                flags,
                                name,
@@ -563,8 +561,8 @@ public class NodeFactory_c extends AbstractNodeFactory_c {
 
     protected final ClassLit ClassLit(Position pos, TypeNode typeNode, Ext ext,
             ExtFactory extFactory) {
-        for (; extFactory != null; extFactory = extFactory.nextExtFactory())
-            ext = composeExts(ext, extFactory.extClassLit());
+        for (ExtFactory ef : extFactory)
+            ext = composeExts(ext, ef.extClassLit());
         return new ClassLit_c(pos, typeNode, ext);
     }
 
@@ -584,8 +582,8 @@ public class NodeFactory_c extends AbstractNodeFactory_c {
 
     protected final Conditional Conditional(Position pos, Expr cond,
             Expr consequent, Expr alternative, Ext ext, ExtFactory extFactory) {
-        for (; extFactory != null; extFactory = extFactory.nextExtFactory())
-            ext = composeExts(ext, extFactory.extConditional());
+        for (ExtFactory ef : extFactory)
+            ext = composeExts(ext, ef.extConditional());
         return new Conditional_c(pos, cond, consequent, alternative, ext);
     }
 
@@ -601,8 +599,8 @@ public class NodeFactory_c extends AbstractNodeFactory_c {
     protected final ConstructorCall ConstructorCall(Position pos,
             ConstructorCall.Kind kind, Expr outer, List<Expr> args, Ext ext,
             ExtFactory extFactory) {
-        for (; extFactory != null; extFactory = extFactory.nextExtFactory())
-            ext = composeExts(ext, extFactory.extConstructorCall());
+        for (ExtFactory ef : extFactory)
+            ext = composeExts(ext, ef.extConstructorCall());
         return new ConstructorCall_c(pos,
                                      kind,
                                      outer,
@@ -629,8 +627,8 @@ public class NodeFactory_c extends AbstractNodeFactory_c {
     protected final ConstructorDecl ConstructorDecl(Position pos, Flags flags,
             Id name, List<Formal> formals, List<TypeNode> throwTypes,
             Block body, Ext ext, ExtFactory extFactory) {
-        for (; extFactory != null; extFactory = extFactory.nextExtFactory())
-            ext = composeExts(ext, extFactory.extConstructorDecl());
+        for (ExtFactory ef : extFactory)
+            ext = composeExts(ext, ef.extConstructorDecl());
         return new ConstructorDecl_c(pos,
                                      flags,
                                      name,
@@ -651,8 +649,8 @@ public class NodeFactory_c extends AbstractNodeFactory_c {
 
     protected final FieldDecl FieldDecl(Position pos, Flags flags,
             TypeNode type, Id name, Expr init, Ext ext, ExtFactory extFactory) {
-        for (; extFactory != null; extFactory = extFactory.nextExtFactory())
-            ext = composeExts(ext, extFactory.extFieldDecl());
+        for (ExtFactory ef : extFactory)
+            ext = composeExts(ext, ef.extFieldDecl());
         return new FieldDecl_c(pos, flags, type, name, init, ext);
     }
 
@@ -665,8 +663,8 @@ public class NodeFactory_c extends AbstractNodeFactory_c {
 
     protected final Do Do(Position pos, Stmt body, Expr cond, Ext ext,
             ExtFactory extFactory) {
-        for (; extFactory != null; extFactory = extFactory.nextExtFactory())
-            ext = composeExts(ext, extFactory.extDo());
+        for (ExtFactory ef : extFactory)
+            ext = composeExts(ext, ef.extDo());
         return new Do_c(pos, body, cond, ext);
     }
 
@@ -678,8 +676,8 @@ public class NodeFactory_c extends AbstractNodeFactory_c {
     }
 
     protected final Empty Empty(Position pos, Ext ext, ExtFactory extFactory) {
-        for (; extFactory != null; extFactory = extFactory.nextExtFactory())
-            ext = composeExts(ext, extFactory.extEmpty());
+        for (ExtFactory ef : extFactory)
+            ext = composeExts(ext, ef.extEmpty());
         return new Empty_c(pos, ext);
     }
 
@@ -692,8 +690,8 @@ public class NodeFactory_c extends AbstractNodeFactory_c {
 
     protected final Eval Eval(Position pos, Expr expr, Ext ext,
             ExtFactory extFactory) {
-        for (; extFactory != null; extFactory = extFactory.nextExtFactory())
-            ext = composeExts(ext, extFactory.extEval());
+        for (ExtFactory ef : extFactory)
+            ext = composeExts(ext, ef.extEval());
         return new Eval_c(pos, expr, ext);
     }
 
@@ -706,8 +704,8 @@ public class NodeFactory_c extends AbstractNodeFactory_c {
 
     protected final Field Field(Position pos, Receiver target, Id name,
             Ext ext, ExtFactory extFactory) {
-        for (; extFactory != null; extFactory = extFactory.nextExtFactory())
-            ext = composeExts(ext, extFactory.extField());
+        for (ExtFactory ef : extFactory)
+            ext = composeExts(ext, ef.extField());
         return new Field_c(pos, target, name, ext);
     }
 
@@ -720,8 +718,8 @@ public class NodeFactory_c extends AbstractNodeFactory_c {
 
     protected final FloatLit FloatLit(Position pos, FloatLit.Kind kind,
             double value, Ext ext, ExtFactory extFactory) {
-        for (; extFactory != null; extFactory = extFactory.nextExtFactory())
-            ext = composeExts(ext, extFactory.extFloatLit());
+        for (ExtFactory ef : extFactory)
+            ext = composeExts(ext, ef.extFloatLit());
         return new FloatLit_c(pos, kind, value, ext);
     }
 
@@ -735,8 +733,8 @@ public class NodeFactory_c extends AbstractNodeFactory_c {
 
     protected final For For(Position pos, List<ForInit> inits, Expr cond,
             List<ForUpdate> iters, Stmt body, Ext ext, ExtFactory extFactory) {
-        for (; extFactory != null; extFactory = extFactory.nextExtFactory())
-            ext = composeExts(ext, extFactory.extFor());
+        for (ExtFactory ef : extFactory)
+            ext = composeExts(ext, ef.extFor());
         return new For_c(pos,
                          CollectionUtil.nonNullList(inits),
                          cond,
@@ -754,8 +752,8 @@ public class NodeFactory_c extends AbstractNodeFactory_c {
 
     protected final Formal Formal(Position pos, Flags flags, TypeNode type,
             Id name, Ext ext, ExtFactory extFactory) {
-        for (; extFactory != null; extFactory = extFactory.nextExtFactory())
-            ext = composeExts(ext, extFactory.extFormal());
+        for (ExtFactory ef : extFactory)
+            ext = composeExts(ext, ef.extFormal());
         return new Formal_c(pos, flags, type, name, ext);
     }
 
@@ -768,8 +766,8 @@ public class NodeFactory_c extends AbstractNodeFactory_c {
 
     protected final If If(Position pos, Expr cond, Stmt consequent,
             Stmt alternative, Ext ext, ExtFactory extFactory) {
-        for (; extFactory != null; extFactory = extFactory.nextExtFactory())
-            ext = composeExts(ext, extFactory.extIf());
+        for (ExtFactory ef : extFactory)
+            ext = composeExts(ext, ef.extIf());
         return new If_c(pos, cond, consequent, alternative, ext);
     }
 
@@ -782,8 +780,8 @@ public class NodeFactory_c extends AbstractNodeFactory_c {
 
     protected final Import Import(Position pos, Import.Kind kind, String name,
             Ext ext, ExtFactory extFactory) {
-        for (; extFactory != null; extFactory = extFactory.nextExtFactory())
-            ext = composeExts(ext, extFactory.extImport());
+        for (ExtFactory ef : extFactory)
+            ext = composeExts(ext, ef.extImport());
         return new Import_c(pos, kind, name, ext);
     }
 
@@ -796,8 +794,8 @@ public class NodeFactory_c extends AbstractNodeFactory_c {
 
     protected final Initializer Initializer(Position pos, Flags flags,
             Block body, Ext ext, ExtFactory extFactory) {
-        for (; extFactory != null; extFactory = extFactory.nextExtFactory())
-            ext = composeExts(ext, extFactory.extInitializer());
+        for (ExtFactory ef : extFactory)
+            ext = composeExts(ext, ef.extInitializer());
         return new Initializer_c(pos, flags, body, ext);
     }
 
@@ -810,8 +808,8 @@ public class NodeFactory_c extends AbstractNodeFactory_c {
 
     protected final Instanceof Instanceof(Position pos, Expr expr,
             TypeNode type, Ext ext, ExtFactory extFactory) {
-        for (; extFactory != null; extFactory = extFactory.nextExtFactory())
-            ext = composeExts(ext, extFactory.extInstanceof());
+        for (ExtFactory ef : extFactory)
+            ext = composeExts(ext, ef.extInstanceof());
         return new Instanceof_c(pos, expr, type, ext);
     }
 
@@ -824,8 +822,8 @@ public class NodeFactory_c extends AbstractNodeFactory_c {
 
     protected final IntLit IntLit(Position pos, IntLit.Kind kind, long value,
             Ext ext, ExtFactory extFactory) {
-        for (; extFactory != null; extFactory = extFactory.nextExtFactory())
-            ext = composeExts(ext, extFactory.extIntLit());
+        for (ExtFactory ef : extFactory)
+            ext = composeExts(ext, ef.extIntLit());
         return new IntLit_c(pos, kind, value, ext);
     }
 
@@ -838,8 +836,8 @@ public class NodeFactory_c extends AbstractNodeFactory_c {
 
     protected final Labeled Labeled(Position pos, Id label, Stmt body, Ext ext,
             ExtFactory extFactory) {
-        for (; extFactory != null; extFactory = extFactory.nextExtFactory())
-            ext = composeExts(ext, extFactory.extLabeled());
+        for (ExtFactory ef : extFactory)
+            ext = composeExts(ext, ef.extLabeled());
         return new Labeled_c(pos, label, body, ext);
     }
 
@@ -852,8 +850,8 @@ public class NodeFactory_c extends AbstractNodeFactory_c {
 
     protected final Local Local(Position pos, Id name, Ext ext,
             ExtFactory extFactory) {
-        for (; extFactory != null; extFactory = extFactory.nextExtFactory())
-            ext = composeExts(ext, extFactory.extLocal());
+        for (ExtFactory ef : extFactory)
+            ext = composeExts(ext, ef.extLocal());
         return new Local_c(pos, name, ext);
     }
 
@@ -866,8 +864,8 @@ public class NodeFactory_c extends AbstractNodeFactory_c {
 
     protected final LocalClassDecl LocalClassDecl(Position pos, ClassDecl decl,
             Ext ext, ExtFactory extFactory) {
-        for (; extFactory != null; extFactory = extFactory.nextExtFactory())
-            ext = composeExts(ext, extFactory.extLocalClassDecl());
+        for (ExtFactory ef : extFactory)
+            ext = composeExts(ext, ef.extLocalClassDecl());
         return new LocalClassDecl_c(pos, decl, ext);
     }
 
@@ -882,15 +880,15 @@ public class NodeFactory_c extends AbstractNodeFactory_c {
 
     protected final LocalDecl LocalDecl(Position pos, Flags flags,
             TypeNode type, Id name, Expr init, Ext ext, ExtFactory extFactory) {
-        for (; extFactory != null; extFactory = extFactory.nextExtFactory())
-            ext = composeExts(ext, extFactory.extLocalDecl());
+        for (ExtFactory ef : extFactory)
+            ext = composeExts(ext, ef.extLocalDecl());
         return new LocalDecl_c(pos, flags, type, name, init, ext);
     }
 
     protected final Loop Loop(Position pos, Expr cond, Stmt body, Ext ext,
             ExtFactory extFactory) {
-        for (; extFactory != null; extFactory = extFactory.nextExtFactory())
-            ext = composeExts(ext, extFactory.extLoop());
+        for (ExtFactory ef : extFactory)
+            ext = composeExts(ext, ef.extLoop());
         return new Loop.Instance(pos, cond, body, ext);
     }
 
@@ -916,8 +914,8 @@ public class NodeFactory_c extends AbstractNodeFactory_c {
             TypeNode returnType, Id name, List<Formal> formals,
             List<TypeNode> throwTypes, Block body, Ext ext,
             ExtFactory extFactory) {
-        for (; extFactory != null; extFactory = extFactory.nextExtFactory())
-            ext = composeExts(ext, extFactory.extMethodDecl());
+        for (ExtFactory ef : extFactory)
+            ext = composeExts(ext, ef.extMethodDecl());
         return new MethodDecl_c(pos,
                                 flags,
                                 returnType,
@@ -938,8 +936,8 @@ public class NodeFactory_c extends AbstractNodeFactory_c {
 
     protected final New New(Position pos, Expr outer, TypeNode objectType,
             List<Expr> args, ClassBody body, Ext ext, ExtFactory extFactory) {
-        for (; extFactory != null; extFactory = extFactory.nextExtFactory())
-            ext = composeExts(ext, extFactory.extNew());
+        for (ExtFactory ef : extFactory)
+            ext = composeExts(ext, ef.extNew());
         return new New_c(pos,
                          outer,
                          objectType,
@@ -960,8 +958,8 @@ public class NodeFactory_c extends AbstractNodeFactory_c {
     protected final NewArray NewArray(Position pos, TypeNode base,
             List<Expr> dims, int addDims, ArrayInit init, Ext ext,
             ExtFactory extFactory) {
-        for (; extFactory != null; extFactory = extFactory.nextExtFactory())
-            ext = composeExts(ext, extFactory.extNewArray());
+        for (ExtFactory ef : extFactory)
+            ext = composeExts(ext, ef.extNewArray());
         return new NewArray_c(pos,
                               base,
                               CollectionUtil.nonNullList(dims),
@@ -978,8 +976,8 @@ public class NodeFactory_c extends AbstractNodeFactory_c {
     }
 
     protected final NullLit NullLit(Position pos, Ext ext, ExtFactory extFactory) {
-        for (; extFactory != null; extFactory = extFactory.nextExtFactory())
-            ext = composeExts(ext, extFactory.extNullLit());
+        for (ExtFactory ef : extFactory)
+            ext = composeExts(ext, ef.extNullLit());
         return new NullLit_c(pos, ext);
     }
 
@@ -992,8 +990,8 @@ public class NodeFactory_c extends AbstractNodeFactory_c {
 
     protected final Return Return(Position pos, Expr expr, Ext ext,
             ExtFactory extFactory) {
-        for (; extFactory != null; extFactory = extFactory.nextExtFactory())
-            ext = composeExts(ext, extFactory.extReturn());
+        for (ExtFactory ef : extFactory)
+            ext = composeExts(ext, ef.extReturn());
         return new Return_c(pos, expr, ext);
     }
 
@@ -1007,8 +1005,8 @@ public class NodeFactory_c extends AbstractNodeFactory_c {
 
     protected final SourceCollection SourceCollection(Position pos,
             List<SourceFile> sources, Ext ext, ExtFactory extFactory) {
-        for (; extFactory != null; extFactory = extFactory.nextExtFactory())
-            ext = composeExts(ext, extFactory.extSourceCollection());
+        for (ExtFactory ef : extFactory)
+            ext = composeExts(ext, ef.extSourceCollection());
         return new SourceCollection_c(pos,
                                       CollectionUtil.nonNullList(sources),
                                       ext);
@@ -1026,8 +1024,8 @@ public class NodeFactory_c extends AbstractNodeFactory_c {
     protected final SourceFile SourceFile(Position pos,
             PackageNode packageName, List<Import> imports,
             List<TopLevelDecl> decls, Ext ext, ExtFactory extFactory) {
-        for (; extFactory != null; extFactory = extFactory.nextExtFactory())
-            ext = composeExts(ext, extFactory.extSourceFile());
+        for (ExtFactory ef : extFactory)
+            ext = composeExts(ext, ef.extSourceFile());
         return new SourceFile_c(pos,
                                 packageName,
                                 CollectionUtil.nonNullList(imports),
@@ -1044,8 +1042,8 @@ public class NodeFactory_c extends AbstractNodeFactory_c {
 
     protected final Special Special(Position pos, Special.Kind kind,
             TypeNode outer, Ext ext, ExtFactory extFactory) {
-        for (; extFactory != null; extFactory = extFactory.nextExtFactory())
-            ext = composeExts(ext, extFactory.extSpecial());
+        for (ExtFactory ef : extFactory)
+            ext = composeExts(ext, ef.extSpecial());
         return new Special_c(pos, kind, outer, ext);
     }
 
@@ -1058,8 +1056,8 @@ public class NodeFactory_c extends AbstractNodeFactory_c {
 
     protected final StringLit StringLit(Position pos, String value, Ext ext,
             ExtFactory extFactory) {
-        for (; extFactory != null; extFactory = extFactory.nextExtFactory())
-            ext = composeExts(ext, extFactory.extStringLit());
+        for (ExtFactory ef : extFactory)
+            ext = composeExts(ext, ef.extStringLit());
         return new StringLit_c(pos, value, ext);
     }
 
@@ -1072,8 +1070,8 @@ public class NodeFactory_c extends AbstractNodeFactory_c {
 
     protected final Switch Switch(Position pos, Expr expr,
             List<SwitchElement> elements, Ext ext, ExtFactory extFactory) {
-        for (; extFactory != null; extFactory = extFactory.nextExtFactory())
-            ext = composeExts(ext, extFactory.extSwitch());
+        for (ExtFactory ef : extFactory)
+            ext = composeExts(ext, ef.extSwitch());
         return new Switch_c(pos,
                             expr,
                             CollectionUtil.nonNullList(elements),
@@ -1089,14 +1087,14 @@ public class NodeFactory_c extends AbstractNodeFactory_c {
 
     protected final Synchronized Synchronized(Position pos, Expr expr,
             Block body, Ext ext, ExtFactory extFactory) {
-        for (; extFactory != null; extFactory = extFactory.nextExtFactory())
-            ext = composeExts(ext, extFactory.extSynchronized());
+        for (ExtFactory ef : extFactory)
+            ext = composeExts(ext, ef.extSynchronized());
         return new Synchronized_c(pos, expr, body, ext);
     }
 
     protected final Term Term(Position pos, Ext ext, ExtFactory extFactory) {
-        for (; extFactory != null; extFactory = extFactory.nextExtFactory())
-            ext = composeExts(ext, extFactory.extTerm());
+        for (ExtFactory ef : extFactory)
+            ext = composeExts(ext, ef.extTerm());
         return new Term.Instance(pos, ext);
     }
 
@@ -1109,8 +1107,8 @@ public class NodeFactory_c extends AbstractNodeFactory_c {
 
     protected final Throw Throw(Position pos, Expr expr, Ext ext,
             ExtFactory extFactory) {
-        for (; extFactory != null; extFactory = extFactory.nextExtFactory())
-            ext = composeExts(ext, extFactory.extThrow());
+        for (ExtFactory ef : extFactory)
+            ext = composeExts(ext, ef.extThrow());
         return new Throw_c(pos, expr, ext);
     }
 
@@ -1131,8 +1129,8 @@ public class NodeFactory_c extends AbstractNodeFactory_c {
     protected final Try Try(Position pos, Block tryBlock,
             List<Catch> catchBlocks, Block finallyBlock, Ext ext,
             ExtFactory extFactory) {
-        for (; extFactory != null; extFactory = extFactory.nextExtFactory())
-            ext = composeExts(ext, extFactory.extTry());
+        for (ExtFactory ef : extFactory)
+            ext = composeExts(ext, ef.extTry());
         return new Try_c(pos,
                          tryBlock,
                          CollectionUtil.nonNullList(catchBlocks),
@@ -1142,8 +1140,8 @@ public class NodeFactory_c extends AbstractNodeFactory_c {
 
     protected final TypeNode TypeNode(Position pos, Ext ext,
             ExtFactory extFactory) {
-        for (; extFactory != null; extFactory = extFactory.nextExtFactory())
-            ext = composeExts(ext, extFactory.extTypeNode());
+        for (ExtFactory ef : extFactory)
+            ext = composeExts(ext, ef.extTypeNode());
         return new TypeNode.Instance(pos, ext);
     }
 
@@ -1156,8 +1154,8 @@ public class NodeFactory_c extends AbstractNodeFactory_c {
 
     protected final ArrayTypeNode ArrayTypeNode(Position pos, TypeNode base,
             Ext ext, ExtFactory extFactory) {
-        for (; extFactory != null; extFactory = extFactory.nextExtFactory())
-            ext = composeExts(ext, extFactory.extArrayTypeNode());
+        for (ExtFactory ef : extFactory)
+            ext = composeExts(ext, ef.extArrayTypeNode());
         return new ArrayTypeNode_c(pos, base, ext);
     }
 
@@ -1175,8 +1173,8 @@ public class NodeFactory_c extends AbstractNodeFactory_c {
                     + "type node for a non-canonical type.");
         }
 
-        for (; extFactory != null; extFactory = extFactory.nextExtFactory())
-            ext = composeExts(ext, extFactory.extCanonicalTypeNode());
+        for (ExtFactory ef : extFactory)
+            ext = composeExts(ext, ef.extCanonicalTypeNode());
         return new CanonicalTypeNode_c(pos, type, ext);
     }
 
@@ -1189,8 +1187,8 @@ public class NodeFactory_c extends AbstractNodeFactory_c {
 
     protected final PackageNode PackageNode(Position pos, Package p, Ext ext,
             ExtFactory extFactory) {
-        for (; extFactory != null; extFactory = extFactory.nextExtFactory())
-            ext = composeExts(ext, extFactory.extPackageNode());
+        for (ExtFactory ef : extFactory)
+            ext = composeExts(ext, ef.extPackageNode());
         return new PackageNode_c(pos, p, ext);
     }
 
@@ -1203,8 +1201,8 @@ public class NodeFactory_c extends AbstractNodeFactory_c {
 
     protected final Unary Unary(Position pos, Unary.Operator op, Expr expr,
             Ext ext, ExtFactory extFactory) {
-        for (; extFactory != null; extFactory = extFactory.nextExtFactory())
-            ext = composeExts(ext, extFactory.extUnary());
+        for (ExtFactory ef : extFactory)
+            ext = composeExts(ext, ef.extUnary());
         return new Unary_c(pos, op, expr, ext);
     }
 
@@ -1217,8 +1215,8 @@ public class NodeFactory_c extends AbstractNodeFactory_c {
 
     protected final While While(Position pos, Expr cond, Stmt body, Ext ext,
             ExtFactory extFactory) {
-        for (; extFactory != null; extFactory = extFactory.nextExtFactory())
-            ext = composeExts(ext, extFactory.extWhile());
+        for (ExtFactory ef : extFactory)
+            ext = composeExts(ext, ef.extWhile());
         return new While_c(pos, cond, body, ext);
     }
 }

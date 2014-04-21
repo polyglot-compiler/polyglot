@@ -32,7 +32,7 @@ package polyglot.ast;
  * may be chained together (see AbstractExtFactory_c) to allow extensions to be
  * composed.
  */
-public interface ExtFactory {
+public interface ExtFactory extends Iterable<ExtFactory> {
 
     /**
      * The next extFactory in the chain. 

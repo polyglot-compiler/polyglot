@@ -87,8 +87,7 @@ public class JL5NodeFactory_c extends JL5AbstractNodeFactory_c {
         AmbTypeInstantiation n =
                 new AmbTypeInstantiation(pos, base, typeArguments);
         Ext ext = null;
-        ExtFactory extFactory = extFactory();
-        for (; extFactory != null; extFactory = extFactory.nextExtFactory()) {
+        for (ExtFactory extFactory : extFactory()) {
             Ext e = JL5AbstractExtFactory_c.extAmbTypeInstantiation(extFactory);
             if (e == null) break;
             ext = composeExts(ext, e);
@@ -101,8 +100,7 @@ public class JL5NodeFactory_c extends JL5AbstractNodeFactory_c {
     public AmbWildCard AmbWildCard(Position pos) {
         AmbWildCard n = new AmbWildCard(pos);
         Ext ext = null;
-        ExtFactory extFactory = extFactory();
-        for (; extFactory != null; extFactory = extFactory.nextExtFactory()) {
+        for (ExtFactory extFactory : extFactory()) {
             Ext e = JL5AbstractExtFactory_c.extAmbWildCard(extFactory);
             if (e == null) break;
             ext = composeExts(ext, e);
@@ -115,8 +113,7 @@ public class JL5NodeFactory_c extends JL5AbstractNodeFactory_c {
     public AmbWildCard AmbWildCardExtends(Position pos, TypeNode extendsNode) {
         AmbWildCard n = new AmbWildCard(pos, extendsNode, true);
         Ext ext = null;
-        ExtFactory extFactory = extFactory();
-        for (; extFactory != null; extFactory = extFactory.nextExtFactory()) {
+        for (ExtFactory extFactory : extFactory()) {
             Ext e = JL5AbstractExtFactory_c.extAmbWildCard(extFactory);
             if (e == null) break;
             ext = composeExts(ext, e);
@@ -129,8 +126,7 @@ public class JL5NodeFactory_c extends JL5AbstractNodeFactory_c {
     public AmbWildCard AmbWildCardSuper(Position pos, TypeNode superNode) {
         AmbWildCard n = new AmbWildCard(pos, superNode, false);
         Ext ext = null;
-        ExtFactory extFactory = extFactory();
-        for (; extFactory != null; extFactory = extFactory.nextExtFactory()) {
+        for (ExtFactory extFactory : extFactory()) {
             Ext e = JL5AbstractExtFactory_c.extAmbWildCard(extFactory);
             if (e == null) break;
             ext = composeExts(ext, e);
@@ -145,8 +141,7 @@ public class JL5NodeFactory_c extends JL5AbstractNodeFactory_c {
         AnnotationElemDecl n =
                 new AnnotationElemDecl_c(pos, flags, type, name, defaultValue);
         Ext ext = null;
-        ExtFactory extFactory = extFactory();
-        for (; extFactory != null; extFactory = extFactory.nextExtFactory()) {
+        for (ExtFactory extFactory : extFactory()) {
             Ext e = JL5AbstractExtFactory_c.extAnnotationElemDecl(extFactory);
             if (e == null) break;
             ext = composeExts(ext, e);
