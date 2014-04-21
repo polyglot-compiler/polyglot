@@ -40,7 +40,6 @@ import polyglot.types.SemanticException;
 import polyglot.types.Type;
 import polyglot.types.TypeSystem;
 import polyglot.util.CodeWriter;
-import polyglot.util.CollectionUtil;
 import polyglot.util.Copy;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
@@ -190,15 +189,7 @@ public abstract class Node_c implements Node {
         }
     }
 
-    protected <N extends Node, M> N copyIfNeeded(N n, M origChild, M newChild) {
-        if (origChild == newChild) return n;
-        if (n == this) n = Copy.Util.copy(n);
-        return n;
-    }
-
-    protected <N extends Node, M> N copyIfNeeded(N n, List<M> origChild,
-            List<M> newChild) {
-        if (CollectionUtil.equals(origChild, newChild)) return n;
+    protected <N extends Node> N copyIfNeeded(N n) {
         if (n == this) n = Copy.Util.copy(n);
         return n;
     }
@@ -214,7 +205,8 @@ public abstract class Node_c implements Node {
     }
 
     protected <N extends Node_c> N position(N n, Position position) {
-        n = copyIfNeeded(n, n.position, position);
+        if (n.position == position) return n;
+        n = copyIfNeeded(n);
         n.position = position;
         return n;
     }
@@ -240,7 +232,8 @@ public abstract class Node_c implements Node {
     }
 
     protected <N extends Node_c> N error(N n, boolean flag) {
-        n = copyIfNeeded(n, n.error, flag);
+        if (n.error == flag) return n;
+        n = copyIfNeeded(n);
         n.error = flag;
         return n;
     }
