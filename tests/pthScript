@@ -30,8 +30,24 @@ polyglot.frontend.JLExtensionInfo "-d out -cp ." {
         AnonymousClass02.jl ;
         ArrayInit.jl ;
 #        Array01.jl ;
+        Assign01.jl
+          (Semantic, "Cannot assign"),
+          (Semantic, "type .* does not match"),
+          (Semantic, "type .* does not match"),
+          (Semantic, "type .* does not match"),
+          (Semantic, "type .* does not match");
+        Binary01.jl
+          (Semantic, "numeric or String operands"),
+          (Semantic, "numeric or String operands"),
+          (Semantic, "numeric or String operands");
         BoolTest.jl ;
         BoolTest2.jl (Semantic, "may not have been initialized");
+        ClassDecl01.jl
+          (Semantic, "abstract and final"),
+          (Semantic, "abstract and final"),
+          (Semantic, "abstract and final");
+        ClassDecl02.jl (Semantic, "Duplicate interface");
+        ClassDecl03.jl (Semantic, "flags protected");
         ClassLit.jl ;
         Conditional1.jl ;
 	ConformanceCheck1.jl (Semantic, "cannot override.*attempting to assign weaker access");
@@ -53,6 +69,7 @@ polyglot.frontend.JLExtensionInfo "-d out -cp ." {
         Constants11.jl ;
         Constants13.jl ;
         Constants14A.jl ;
+        ConstructorDecl01.jl (Semantic, "synchronized");
         Ctor.jl ;
         DefaultCtor.jl ;
         Dep1.jl ;
@@ -73,6 +90,8 @@ polyglot.frontend.JLExtensionInfo "-d out -cp ." {
         FieldAccess5.jl (Semantic, "Field.*ambiguous");
         FieldAccess6.jl (Semantic, "Field .* not visible");
         FieldClassConflict.jl ;
+        FieldDecl01.jl (Semantic, "final and volatile");
+        FieldDecl02.jl (Semantic, "interface constant .* transient");
         FinalInit1.jl ; FinalInit2.jl ; FinalInit3.jl ; FinalInit4.jl ;
         FinalInit5.jl ; FinalInit6.jl ; FinalInit7.jl ; FinalInit8.jl ;
 	FinalInit9.jl ;
@@ -84,6 +103,7 @@ polyglot.frontend.JLExtensionInfo "-d out -cp ." {
         Inherit.jl (Semantic);
         InheritClass.jl ;
         Init1.jl ; Init2.jl ; Init3.jl ; Init4.jl ; Init5.jl ;
+        Label01.jl (Semantic, "Label .* already in use");
         LiteralsCf.jl   (Lexical, "Illegal float literal"),
                         (Lexical, "Illegal float literal"),
                         (Lexical, "Illegal float literal"),
@@ -140,10 +160,20 @@ polyglot.frontend.JLExtensionInfo "-d out -cp ." {
         LocalClass.jl ; 
 #        LocalClass2.jl ; 
         LocalClass3.jl ; LocalClass4.jl ;
+	LocalClass5.jl ;
+	LocalClass6.jl (Semantic, "Circular inheritance");
+        LocalClass07.jl (Semantic, "Unreachable statement");
+        LocalClass08.jl
+          (Semantic, "Inner classes cannot declare static fields"),
+          (Semantic, "Inner classes cannot declare static methods"),
+          (Semantic, "Inner classes cannot declare static initializers"),
+          (Semantic, "Inner classes cannot declare static member classes"),
+          (Semantic, "Inner classes cannot declare member interfaces");
         LocalInners2.jl ;
         LocalInit.jl ;
         LongString01.jl;
        MemberClassFlags.jl ;
+        MethodDecl01.jl (Semantic, "native and strictfp");
         Narrowing.jl ;
         # Output.jl ;
         Prim.jl ;
@@ -164,6 +194,8 @@ polyglot.frontend.JLExtensionInfo "-d out -cp ." {
         Switch1.jl ; Switch2.jl ; Switch3.jl ; Switch4.jl ; Switch5.jl ;
         Switch6.jl ; 
 #        Switch7.jl ;
+        Switch08.jl (Semantic, "not assignable");
+        Synchronized01.jl (Semantic, "Cannot synchronize");
         TernaryPrimitiveOps.jl ;
         TypeShadowing.jl ;
         xIterator.jl ;
@@ -273,8 +305,6 @@ polyglot.frontend.JLExtensionInfo "-d out -cp ." {
 	BadExpCC.jl (Syntax), (); // misplaced constructor call
 	BadOverride2.jl;
 	DoubleFlags.jl (Syntax), ();
-	LocalClass5.jl ;
-	LocalClass6.jl (Semantic, "Circular inheritance");
 	Protection.jl (Semantic, "Cannot declare abstract method with flags static"),
 		      (Semantic, "Cannot declare abstract method with flags final"),
 		      (Semantic, "Cannot declare abstract method with flags native");

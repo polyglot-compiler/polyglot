@@ -282,8 +282,10 @@ public class ConstructorCall_c extends Stmt_c implements ConstructorCall,
             // instance of its container class), then either a qualifier 
             // must be provided, or ct must have an enclosing instance of the
             // super class's container class, or a subclass thereof.
+            // See JLS 2nd Ed. | 8.8.5.1.
             if (q == null && superType.isClass()
-                    && superType.toClass().isInnerClass()) {
+                    && superType.toClass().isInnerClass()
+                    && !superType.toClass().inStaticContext()) {
                 ClassType superContainer = superType.toClass().outer();
                 // ct needs an enclosing instance of superContainer, 
                 // or a subclass of superContainer.

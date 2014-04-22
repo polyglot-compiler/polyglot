@@ -28,12 +28,15 @@ package polyglot.ast;
 
 import java.util.List;
 
+import polyglot.types.Context;
+import polyglot.types.SemanticException;
 import polyglot.util.CodeWriter;
 import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
 import polyglot.visit.CFGBuilder;
 import polyglot.visit.NodeVisitor;
 import polyglot.visit.PrettyPrinter;
+import polyglot.visit.TypeChecker;
 
 /**
  * Am immutable representation of a Java statement with a label.  A labeled
@@ -118,6 +121,28 @@ public class Labeled_c extends Stmt_c implements Labeled {
     @Override
     public String toString() {
         return label + ": " + statement;
+    }
+
+    @Override
+    public Context enterChildScope(Node child, Context c) {
+        c = c.pushLabel(label.id());
+        return super.enterChildScope(child, c);
+    }
+
+    @Override
+    public Node typeCheck(TypeChecker tc) throws SemanticException {
+        // Check if the label is multiply defined.
+        // See JLS 2nd Ed. | 14.14.
+        Context c = tc.context();
+
+        String outerLabel = c.findLabelSilent(label.id());
+
+        if (outerLabel != null && outerLabel.equals(label.id())) {
+            throw new SemanticException("Label \"" + label
+                    + "\" already in use.");
+        }
+
+        return super.typeCheck(tc);
     }
 
     @Override

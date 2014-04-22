@@ -27,8 +27,10 @@
 package polyglot.ast;
 
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import polyglot.frontend.MissingDependencyException;
 import polyglot.frontend.Scheduler;
@@ -588,6 +590,7 @@ public class ClassDecl_c extends Term_c implements ClassDecl, ClassDeclOps {
             }
         }
 
+        Set<Type> superInterfaces = new HashSet<>();
         for (TypeNode tn : interfaces) {
             Type t = tn.type();
 
@@ -603,6 +606,15 @@ public class ClassDecl_c extends Term_c implements ClassDecl, ClassDeclOps {
                 throw new SemanticException("Class " + this.type
                         + " cannot have a superinterface.", tn.position());
             }
+
+            if (superInterfaces.contains(t)) {
+                // A compile-time error occurs if the same interface is
+                // mentioned two or more times in a single implements clause.
+                // See JLS 2nd Ed. | 8.1.4
+                throw new SemanticException("Duplicate interface " + t,
+                                            tn.position());
+            }
+            superInterfaces.add(t);
         }
 
         TypeSystem ts = tc.typeSystem();
@@ -624,6 +636,8 @@ public class ClassDecl_c extends Term_c implements ClassDecl, ClassDeclOps {
 
         // check the class implements all abstract methods that it needs to.
         ts.checkClassConformance(type);
+
+        ts.checkInterfaceFieldFlags(type);
 
         return this;
     }

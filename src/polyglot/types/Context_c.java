@@ -66,6 +66,7 @@ public class Context_c implements Context {
     public static final Kind BLOCK = new Kind("block");
     public static final Kind CLASS = new Kind("class");
     public static final Kind CODE = new Kind("code");
+    public static final Kind LABEL = new Kind("label");
     public static final Kind OUTER = new Kind("outer");
     public static final Kind SOURCE = new Kind("source");
 
@@ -126,6 +127,7 @@ public class Context_c implements Context {
         v.outer = this;
         v.types = null;
         v.vars = null;
+        v.label = null;
         return v;
     }
 
@@ -137,6 +139,7 @@ public class Context_c implements Context {
     protected ClassType type;
     protected ParsedClassType scope;
     protected CodeInstance code;
+    protected String label;
     protected Map<String, Named> types;
     protected Map<String, VarInstance> vars;
     protected boolean inCode;
@@ -385,6 +388,26 @@ public class Context_c implements Context {
         return null;
     }
 
+    @Override
+    public String findLabelSilent(String label) {
+        if (Report.should_report(TOPICS, 3))
+            Report.report(3, "find-label " + label + " in " + this);
+
+        if (isCode()) return null;
+
+        if (this.label != null && this.label.equals(label)) {
+            if (Report.should_report(TOPICS, 3))
+                Report.report(3, "find-label " + label + " -> " + this.label);
+            return this.label;
+        }
+
+        if (outer != null) {
+            return outer.findLabelSilent(label);
+        }
+
+        return null;
+    }
+
     protected String mapsToString() {
         return "types=" + types + " vars=" + vars;
     }
@@ -479,6 +502,18 @@ public class Context_c implements Context {
         if (Report.should_report(TOPICS, 4)) Report.report(4, "push block");
         Context_c v = push();
         v.kind = BLOCK;
+        return v;
+    }
+
+    /**
+     * enters a label.
+     */
+    @Override
+    public Context pushLabel(String label) {
+        if (Report.should_report(TOPICS, 4)) Report.report(4, "push label");
+        Context_c v = push();
+        v.kind = LABEL;
+        v.label = label;
         return v;
     }
 

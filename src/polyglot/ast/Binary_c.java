@@ -358,7 +358,9 @@ public class Binary_c extends Expr_c implements Binary {
         }
 
         if (op == ADD) {
-            if (ts.isSubtype(l, ts.String()) || ts.isSubtype(r, ts.String())) {
+            // If the type of either operand of a + operator is String, then the
+            // operation is string concatenation.  See JLS 2nd Ed. | 15.18.
+            if (ts.typeEquals(l, ts.String()) || ts.typeEquals(r, ts.String())) {
                 if (!ts.canCoerceToString(r, tc.context())) {
                     throw new SemanticException("Cannot coerce an expression "
                                                         + "of type " + r

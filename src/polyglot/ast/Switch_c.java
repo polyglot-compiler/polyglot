@@ -132,10 +132,33 @@ public class Switch_c extends Stmt_c implements Switch {
     @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
         TypeSystem ts = tc.typeSystem();
+        Type type = expr.type();
 
-        if (!ts.isImplicitCastValid(expr.type(), ts.Int())) {
+        if (!ts.isImplicitCastValid(type, ts.Int())) {
             throw new SemanticException("Switch index must be an integer.",
                                         position());
+        }
+
+        // Check whether case constant expressions are assignable to the type of
+        // expr.  See JLS 2nd Ed. | 14.10.
+        for (SwitchElement se : elements) {
+            if (se instanceof Case) {
+                Case c = (Case) se;
+                Expr cExpr = c.expr();
+                if (cExpr != null
+                        && !ts.isImplicitCastValid(cExpr.type(), type)
+                        && !ts.typeEquals(cExpr.type(), type)
+                        && !ts.numericConversionValid(type,
+                                                      tc.lang()
+                                                        .constantValue(cExpr,
+                                                                       tc.lang()))) {
+                    throw new SemanticException("Case constant \""
+                                                        + cExpr
+                                                        + "\" is not assignable to "
+                                                        + type + ".",
+                                                c.position());
+                }
+            }
         }
 
         return this;

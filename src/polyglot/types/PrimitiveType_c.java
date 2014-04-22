@@ -251,6 +251,7 @@ public class PrimitiveType_c extends Type_c implements PrimitiveType {
         }
 
         if (isLong()) return true;
+        if (value instanceof Long) return false;
         if (isInt()) return Integer.MIN_VALUE <= v && v <= Integer.MAX_VALUE;
         if (isChar())
             return Character.MIN_VALUE <= v && v <= Character.MAX_VALUE;

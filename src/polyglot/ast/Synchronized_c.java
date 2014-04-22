@@ -114,9 +114,9 @@ public class Synchronized_c extends Stmt_c implements Synchronized {
 
     @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
-        TypeSystem ts = tc.typeSystem();
-
-        if (!ts.isSubtype(expr.type(), ts.Object())) {
+        // Synchronized expression must be a reference type.
+        // See JLS 2nd Ed. | 14.18.
+        if (!expr.type().isReference()) {
             throw new SemanticException("Cannot synchronize on an expression of type \""
                                                 + expr.type() + "\".",
                                         expr.position());

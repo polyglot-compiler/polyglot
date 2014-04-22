@@ -90,6 +90,9 @@ public interface Context extends Resolver, Copy<Context> {
      */
     ClassType findMethodScope(String name) throws SemanticException;
 
+    /** Looks up a label in the current scope. */
+    String findLabelSilent(String label);
+
     /** Get import table currently in scope. */
     ImportTable importTable();
 
@@ -111,6 +114,9 @@ public interface Context extends Resolver, Copy<Context> {
 
     /** Enter the scope of a block. */
     Context pushBlock();
+
+    /** Enter the scope of a label. */
+    Context pushLabel(String label);
 
     /** Enter a static scope. In general, this is only used for
      * explicit constructor calls; static methods, initializers of static

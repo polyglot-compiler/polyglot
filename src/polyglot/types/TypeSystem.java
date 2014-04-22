@@ -854,37 +854,40 @@ public interface TypeSystem {
     PrimitiveType primitiveForName(String name) throws SemanticException;
 
     /** All possible <i>access</i> flags. */
-    public abstract Flags legalAccessFlags();
+    Flags legalAccessFlags();
 
     /** All flags allowed for a local variable. */
-    public abstract Flags legalLocalFlags();
+    Flags legalLocalFlags();
 
     /** All flags allowed for a field. */
-    public abstract Flags legalFieldFlags();
+    Flags legalFieldFlags();
 
     /** All flags allowed for a constructor. */
-    public abstract Flags legalConstructorFlags();
+    Flags legalConstructorFlags();
 
     /** All flags allowed for an initializer block. */
-    public abstract Flags legalInitializerFlags();
+    Flags legalInitializerFlags();
 
     /** All flags allowed for a method. */
-    public abstract Flags legalMethodFlags();
+    Flags legalMethodFlags();
 
     /** All flags allowed for an abstract method. */
-    public abstract Flags legalAbstractMethodFlags();
+    Flags legalAbstractMethodFlags();
 
     /** All flags allowed for an interface. */
-    public abstract Flags legalInterfaceFlags();
+    Flags legalInterfaceFlags();
 
     /** All flags allowed for a top-level class. */
-    public abstract Flags legalTopLevelClassFlags();
+    Flags legalTopLevelClassFlags();
 
     /** All flags allowed for a member class. */
-    public abstract Flags legalMemberClassFlags();
+    Flags legalMemberClassFlags();
 
     /** All flags allowed for a local class. */
-    public abstract Flags legalLocalClassFlags();
+    Flags legalLocalClassFlags();
+
+    /** All flags allowed for a field declared in an interface. */
+    Flags legalInterfaceFieldFlags();
 
     /**
      * Assert if the flags {@code f} are legal method flags.
@@ -942,7 +945,13 @@ public interface TypeSystem {
      * that is, if it is a concrete class, then it must implement all
      * interfaces and abstract methods that it or its superclasses declare.
      */
-    public void checkClassConformance(ClassType ct) throws SemanticException;
+    void checkClassConformance(ClassType ct) throws SemanticException;
+
+    /**
+     * Assert that if {@code ct} is an interface, its fields' flags is a subset
+     * of public, static, final.
+     */
+    void checkInterfaceFieldFlags(ClassType ct) throws SemanticException;
 
     /**
      * Find a potentially suitable implementation of the method {@code mi}

@@ -2049,7 +2049,9 @@ public class TypeSystem_c implements TypeSystem {
 
     @Override
     public Flags legalConstructorFlags() {
-        return legalAccessFlags().Synchronized().Native();
+        // A constructor cannot be abstract, static, final, native, strictfp, 
+        // or synchronized.  See JLS 2nd Ed. | 8.8.3.
+        return legalAccessFlags();
     }
 
     protected final Flags CONSTRUCTOR_FLAGS = legalConstructorFlags();
@@ -2093,7 +2095,7 @@ public class TypeSystem_c implements TypeSystem {
 
     @Override
     public Flags legalInterfaceFlags() {
-        return legalAccessFlags().Abstract().Interface().Static();
+        return legalAccessFlags().Abstract().Interface().Static().StrictFP();
     }
 
     protected final Flags INTERFACE_FLAGS = legalInterfaceFlags();
@@ -2117,6 +2119,13 @@ public class TypeSystem_c implements TypeSystem {
     protected final Flags LOCAL_CLASS_FLAGS = legalLocalClassFlags();
 
     @Override
+    public Flags legalInterfaceFieldFlags() {
+        return Public().Static().Final();
+    }
+
+    protected final Flags INTERFACE_FIELD_FLAGS = legalInterfaceFieldFlags();
+
+    @Override
     public void checkMethodFlags(Flags f) throws SemanticException {
         if (!f.clear(METHOD_FLAGS).equals(Flags.NONE)) {
             throw new SemanticException("Cannot declare method with flags "
@@ -2127,6 +2136,12 @@ public class TypeSystem_c implements TypeSystem {
                 && !f.clear(ABSTRACT_METHOD_FLAGS).equals(Flags.NONE)) {
             throw new SemanticException("Cannot declare abstract method with flags "
                     + f.clear(ABSTRACT_METHOD_FLAGS) + ".");
+        }
+
+        // A compile-time error occurs if a method declaration that contains the
+        // keyword native also contains strictfp.  See JLS 2nd Ed. | 8.4.3.
+        if (f.isNative() && f.isStrictFP()) {
+            throw new SemanticException("Method cannot be both native and strictfp.");
         }
 
         checkAccessFlags(f);
@@ -2145,6 +2160,13 @@ public class TypeSystem_c implements TypeSystem {
         if (!f.clear(FIELD_FLAGS).equals(Flags.NONE)) {
             throw new SemanticException("Cannot declare field with flags "
                     + f.clear(FIELD_FLAGS) + ".");
+        }
+
+        // A compile-time error occurs if a final variable is also declared
+        // volatile.
+        // See JLS 2nd Ed. | 8.3.1.4.
+        if (f.isFinal() && f.isVolatile()) {
+            throw new SemanticException("Field cannot be both final and volatile.");
         }
 
         checkAccessFlags(f);
@@ -2175,11 +2197,17 @@ public class TypeSystem_c implements TypeSystem {
                     + f.clear(TOP_LEVEL_CLASS_FLAGS) + ".");
         }
 
-        if (f.isInterface() && !f.clear(INTERFACE_FLAGS).equals(Flags.NONE)) {
+        // The access modifiers protected, private, and static pertain only to
+        // member interfaces.  See JLS 2nd Ed. | 9.1.1.
+        Flags topLevelInterfaceFlags =
+                legalInterfaceFlags().clear(Protected().Private().Static());
+        if (f.isInterface()
+                && !f.clear(topLevelInterfaceFlags).equals(Flags.NONE)) {
             throw new SemanticException("Cannot declare interface with flags "
-                    + f.clear(INTERFACE_FLAGS) + ".");
+                    + f.clear(topLevelInterfaceFlags) + ".");
         }
 
+        checkClassFlagsConflict(f);
         checkAccessFlags(f);
     }
 
@@ -2190,6 +2218,7 @@ public class TypeSystem_c implements TypeSystem {
                     + f.clear(MEMBER_CLASS_FLAGS) + ".");
         }
 
+        checkClassFlagsConflict(f);
         checkAccessFlags(f);
     }
 
@@ -2204,7 +2233,16 @@ public class TypeSystem_c implements TypeSystem {
                     + f.clear(LOCAL_CLASS_FLAGS) + ".");
         }
 
+        checkClassFlagsConflict(f);
         checkAccessFlags(f);
+    }
+
+    protected void checkClassFlagsConflict(Flags f) throws SemanticException {
+        // A compile-time error occurs if a class is declared both final and abstract.
+        // See JLS 2nd Ed. | 8.1.1.2.
+        if (f.isAbstract() && f.isFinal()) {
+            throw new SemanticException("Class cannot be both abstract and final");
+        }
     }
 
     @Override
@@ -2306,6 +2344,24 @@ public class TypeSystem_c implements TypeSystem {
                     // declared in ct. So other checks will take
                     // care of access issues
                 }
+            }
+        }
+    }
+
+    @Override
+    public void checkInterfaceFieldFlags(ClassType ct) throws SemanticException {
+        // For interface declaration, check the flags of field declarations
+        // which may only be any of: public, static, final.
+        // See JLS 2nd Ed. | 9.3.
+        if (!ct.flags().isInterface()) return;
+
+        for (FieldInstance fi : ct.fields()) {
+            Flags f = fi.flags();
+            if (!f.clear(INTERFACE_FIELD_FLAGS).equals(Flags.NONE)) {
+                throw new SemanticException("Cannot declare an interface constant with flag(s) "
+                                                    + f.clear(INTERFACE_FIELD_FLAGS)
+                                                    + ".",
+                                            fi.position());
             }
         }
     }
