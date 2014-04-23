@@ -190,8 +190,8 @@ public class StdErrorQueue extends AbstractErrorQueue {
 
             try (LineNumberReader reader = new LineNumberReader(r)) {
 
-                String s = null;
-                while (reader.getLineNumber() < pos.line()) {
+                String s = reader.readLine();
+                while (s != null && reader.getLineNumber() < pos.line()) {
                     s = reader.readLine();
                 }
 

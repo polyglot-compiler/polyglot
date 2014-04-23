@@ -103,30 +103,6 @@ polyglot.frontend.JLExtensionInfo "-d out -cp ." {
         Inherit.jl (Semantic);
         InheritClass.jl ;
         Init1.jl ; Init2.jl ; Init3.jl ; Init4.jl ; Init5.jl ;
-        Label01.jl (Semantic, "Label .* already in use");
-        LiteralsCf.jl   (Lexical, "Illegal float literal"),
-                        (Lexical, "Illegal float literal"),
-                        (Lexical, "Illegal float literal"),
-                        (Lexical, "Illegal double literal"),
-                        (Lexical, "Illegal double literal"),
-                        (Syntax),
-                        (Syntax),
-                        (Lexical, "Integer literal.*out of range"),
-                        (Lexical, "Integer literal.*out of range"),
-                        (Lexical, "Integer literal.*out of range"),
-                        (Lexical, "Integer literal.*out of range"),
-                        (Lexical, "Integer literal.*out of range"),
-                        (Lexical, "Integer literal.*out of range"),
-                        (Lexical, "Integer literal.*out of range"),
-                        (Syntax),
-                        (Lexical, "Long literal.*out of range"),
-                        (Lexical, "Long literal.*out of range"),
-                        (Lexical, "Long literal.*out of range"),
-                        (Lexical, "Long literal.*out of range"),
-                        (Lexical, "Long literal.*out of range"),
-                        (Lexical, "Long literal.*out of range"),
-                        (Lexical, "Long literal.*out of range"),
-                        (Syntax);
         Init6.jl ;
         Init7.jl ; Init8.jl ; Init9.jl ;
 	Init10.jl; 
@@ -155,7 +131,33 @@ polyglot.frontend.JLExtensionInfo "-d out -cp ." {
         InnerSuperConstructor7.jl (Semantic, ".*an enclosing instance .* must be specified");
         InnerSuperConstructor8.jl;
         InterfaceOverride.jl ;
+        Label01.jl (Semantic, "Label .* already in use");
         LabeledBreak.jl ;
+        Lexical01.jl;
+        Lexical02.jl (Lexical, "Unclosed comment");
+        LiteralsCf.jl   (Lexical, "Illegal float literal"),
+                        (Lexical, "Illegal float literal"),
+                        (Lexical, "Illegal float literal"),
+                        (Lexical, "Illegal double literal"),
+                        (Lexical, "Illegal double literal"),
+                        (Syntax),
+                        (Syntax),
+                        (Lexical, "Integer literal.*out of range"),
+                        (Lexical, "Integer literal.*out of range"),
+                        (Lexical, "Integer literal.*out of range"),
+                        (Lexical, "Integer literal.*out of range"),
+                        (Lexical, "Integer literal.*out of range"),
+                        (Lexical, "Integer literal.*out of range"),
+                        (Lexical, "Integer literal.*out of range"),
+                        (Syntax),
+                        (Lexical, "Long literal.*out of range"),
+                        (Lexical, "Long literal.*out of range"),
+                        (Lexical, "Long literal.*out of range"),
+                        (Lexical, "Long literal.*out of range"),
+                        (Lexical, "Long literal.*out of range"),
+                        (Lexical, "Long literal.*out of range"),
+                        (Lexical, "Long literal.*out of range"),
+                        (Syntax);
         Local.jl ;
         LocalClass.jl ; 
 #        LocalClass2.jl ; 

@@ -43,6 +43,7 @@ import java.math.BigInteger;
     String path;
     ErrorQueue eq;
     HashMap<String, Integer> keywords;
+    Position commentBegin;
 
     public Lexer_c(java.io.Reader reader, FileSource file, ErrorQueue eq) {
         this(reader);
@@ -315,7 +316,8 @@ OctalEscape = \\ [0-7]
 
 <YYINITIAL> {
     /* 3.7 Comments */
-    "/*"    { yybegin(TRADITIONAL_COMMENT); }
+    "/*"    { yybegin(TRADITIONAL_COMMENT);
+              commentBegin = pos(); }
     "//"    { yybegin(END_OF_LINE_COMMENT); }
 
     /* 3.10.4 Character Literals */
@@ -410,6 +412,10 @@ OctalEscape = \\ [0-7]
 
 <TRADITIONAL_COMMENT> {
     "*/"                         { yybegin(YYINITIAL); }
+    <<EOF>>                      { yybegin(YYINITIAL);
+                                   eq.enqueue(ErrorInfo.LEXICAL_ERROR,
+                                                  "Unclosed comment",
+                                                  commentBegin); }
     [^]                          { /* ignore */ }
 }
 
