@@ -51,8 +51,14 @@ import java.util.Iterator;
  * @see polyglot.ast.AbstractDelFactory_c has a very similar structure. 
  */
 public abstract class AbstractExtFactory_c implements ExtFactory {
+    // use an empty implementation of AbstractExtFactory_c,
+    // so we don't need to do null checks
+    public static final ExtFactory emptyExtFactory =
+            new AbstractExtFactory_c() {
+            };
+
     protected AbstractExtFactory_c() {
-        this(null);
+        this(emptyExtFactory);
     }
 
     protected AbstractExtFactory_c(ExtFactory nextExtFactory) {
@@ -1850,7 +1856,7 @@ public abstract class AbstractExtFactory_c implements ExtFactory {
 
             @Override
             public boolean hasNext() {
-                return next != null;
+                return next != emptyExtFactory;
             }
 
             @Override

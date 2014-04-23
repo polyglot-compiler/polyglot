@@ -46,12 +46,6 @@ public class NodeFactory_c extends AbstractNodeFactory_c {
     private final JLang lang;
     private final ExtFactory extFactory;
 
-    // use an empty implementation of AbstractExtFactory_c,
-    // so we don't need to do null checks
-    protected static final ExtFactory emptyExtFactory =
-            new AbstractExtFactory_c() {
-            };
-
     protected static final DelFactory emptyDelFactory =
             new AbstractDelFactory_c() {
             };
@@ -67,7 +61,7 @@ public class NodeFactory_c extends AbstractNodeFactory_c {
 
     @Deprecated
     public NodeFactory_c() {
-        this(emptyExtFactory, emptyDelFactory);
+        this(AbstractExtFactory_c.emptyExtFactory, emptyDelFactory);
     }
 
     @Deprecated
@@ -81,7 +75,7 @@ public class NodeFactory_c extends AbstractNodeFactory_c {
     }
 
     public NodeFactory_c(JLang lang) {
-        this(lang, emptyExtFactory);
+        this(lang, AbstractExtFactory_c.emptyExtFactory);
     }
 
     public NodeFactory_c(JLang lang, ExtFactory extFactory) {
