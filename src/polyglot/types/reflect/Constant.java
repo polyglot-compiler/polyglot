@@ -102,12 +102,27 @@ public class Constant {
     public static final byte NAME_AND_TYPE = 12;
 
     /**
-     * Constant tag for holding the a UTF8 format string.
+     * Constant tag for holding a UTF8 format string.
      * The string is used to hold the name and type descriptor for
      * NameandType constants, the class name for Class constants,
      * the string value for String constants.
      */
     public static final byte UTF8 = 1;
+
+    /**
+     * Constant tag for holding a method handle.
+     */
+    public static final byte METHOD_HANDLE = 15;
+
+    /**
+     * Constant tag for holding a method type.
+     */
+    public static final byte METHOD_TYPE = 16;
+
+    /**
+     * Constant tag for holding a bootstrap method.
+     */
+    public static final byte INVOKE_DYNAMIC = 18;
 
     /**
      * @param tag
@@ -156,11 +171,14 @@ public class Constant {
         case LONG:
         case DOUBLE:
         case UTF8:
+        case METHOD_TYPE:
             return tag ^ value.hashCode();
         case FIELD_REF:
         case METHOD_REF:
         case INTERFACE_METHOD_REF:
         case NAME_AND_TYPE:
+        case METHOD_HANDLE:
+        case INVOKE_DYNAMIC:
             return tag ^ ((int[]) value)[0] ^ ((int[]) value)[1];
         }
 
@@ -195,11 +213,14 @@ public class Constant {
         case LONG:
         case DOUBLE:
         case UTF8:
+        case METHOD_TYPE:
             return value.equals(c.value);
         case FIELD_REF:
         case METHOD_REF:
         case INTERFACE_METHOD_REF:
         case NAME_AND_TYPE:
+        case METHOD_HANDLE:
+        case INVOKE_DYNAMIC:
             return ((int[]) value)[0] == ((int[]) c.value)[0]
                     && ((int[]) value)[1] == ((int[]) c.value)[1];
         }

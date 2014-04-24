@@ -277,15 +277,23 @@ public class ClassFile_c implements ClassFile {
         switch (tag) {
         case Constant.CLASS:
         case Constant.STRING:
+        case Constant.METHOD_TYPE:
             value = new Integer(in.readUnsignedShort());
             break;
         case Constant.FIELD_REF:
         case Constant.METHOD_REF:
         case Constant.INTERFACE_METHOD_REF:
         case Constant.NAME_AND_TYPE:
+        case Constant.INVOKE_DYNAMIC:
             value = new int[2];
 
             ((int[]) value)[0] = in.readUnsignedShort();
+            ((int[]) value)[1] = in.readUnsignedShort();
+            break;
+        case Constant.METHOD_HANDLE:
+            value = new int[2];
+
+            ((int[]) value)[0] = in.readUnsignedByte();
             ((int[]) value)[1] = in.readUnsignedShort();
             break;
         case Constant.INTEGER:
