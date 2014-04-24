@@ -2021,83 +2021,26 @@ public class JL5TypeSystem_c extends
             return !flags.isPrivate()
                     && isAccessible(mi, tv.upperBound(), contextClass);
         }
-        if (!container.isClass()) {
-            // public members of non-classes are accessible;
-            // non-public members of non-classes are inaccessible
-            return flags.isPublic();
-        }
 
-        JL5ClassType targetClass = (JL5ClassType) container.toClass();
+        if (super.isAccessible(mi, container, contextClass)) return true;
 
-        if (isAccessible_(flags, targetClass, contextClass)) {
-            return true;
-        }
-        // make sure we strip away any parameters.
-        ClassType targetClassDecl = (ClassType) targetClass.declaration();
-        if (targetClassDecl != targetClass
-                && isAccessible_(flags, targetClassDecl, contextClass)) {
-            return true;
-        }
-
-        ClassType contextClassDecl = (ClassType) contextClass.declaration();
-        if (contextClassDecl != contextClass
-                && isAccessible_(flags, targetClass, contextClassDecl)) {
-            return true;
-        }
-
-        if (targetClassDecl != targetClass && contextClassDecl != contextClass
-                && isAccessible_(flags, targetClassDecl, contextClassDecl)) {
-            return true;
+        if (flags.isProtected()) {
+            // XXX Is there a more graceful way to deal with raw types?
+            // Let C be the class in which a protected member is declared.
+            // Access is permitted only within the body of a subclass S of C.
+            Type targetClass = erasureType(mi.container().toClass());
+            ClassType ct = contextClass;
+            while (!isSubtype(ct, targetClass) && !ct.isTopLevel())
+                ct = ct.outer();
+            if (isSubtype(ct, targetClass)) {
+                // In addition, for expressions of the form E.Id or E.Id(...),
+                // access is permitted iff the type of E is S or a subclass of S.
+                // (Deferred to typeCheck in Call_c.)
+                return true;
+            }
         }
 
         return false;
-    }
-
-    protected boolean isAccessible_(Flags flags, ClassType targetClass,
-            ClassType contextClass) {
-        if (!classAccessible(targetClass, contextClass)) {
-            return false;
-        }
-
-        if (equals(targetClass, contextClass)) return true;
-
-        // If the current class and the target class are both in the
-        // same class body, then protection doesn't matter, i.e.
-        // protected and private members may be accessed. Do this by
-        // working up through contextClass's containers.
-        if (isEnclosed(contextClass, targetClass)
-                || isEnclosed(targetClass, contextClass)) return true;
-
-        ClassType ct = contextClass;
-        while (!ct.isTopLevel()) {
-            ct = ct.outer();
-            if (isEnclosed(targetClass, ct)) return true;
-        }
-
-        // protected
-        if (flags.isProtected()) {
-            // If the current class is in a
-            // class body that extends/implements the target class, then
-            // protected members can be accessed. Do this by
-            // working up through contextClass's containers.
-            // Use the erasure types so that parameters don't matter.
-            if (descendsFrom(erasureType(contextClass),
-                             erasureType(targetClass))) {
-                return true;
-            }
-
-            ct = contextClass;
-            while (!ct.isTopLevel()) {
-                ct = ct.outer();
-                if (descendsFrom(erasureType(ct), erasureType(targetClass))) {
-                    return true;
-                }
-            }
-        }
-
-        return accessibleFromPackage(flags,
-                                     targetClass.package_(),
-                                     contextClass.package_());
     }
 
     @Override

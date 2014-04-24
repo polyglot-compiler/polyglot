@@ -326,28 +326,24 @@ public class New_c extends Expr_c implements New, NewOps {
         if (qualifier == null) {
             TypeNode objectType = visitChild(this.objectType, childbd);
             nn = objectType(nn, objectType);
-            if (childbd.hasErrors()) throw new SemanticException();
 
             if (!objectType.isDisambiguated()) return nn;
 
             if (objectType.type().isClass()) {
                 ClassType ct = objectType.type().toClass();
 
-                if (ct.isMember() && !ct.flags().isStatic()
-                        && !ct.flags().isInterface()) {
+                if (ct.isInnerClass()) {
                     Expr qualifier =
                             visitChild(ar.lang().findQualifier(this, ar, ct),
                                        childbd);
                     nn = qualifier(nn, qualifier);
                     nn = qualifierImplicit(nn, true);
-                    if (childbd.hasErrors()) throw new SemanticException();
                 }
             }
         }
         else {
             Expr qualifier = visitChild(this.qualifier, childbd);
             nn = qualifier(nn, qualifier);
-            if (childbd.hasErrors()) throw new SemanticException();
 
             TypeNode objectType = this.objectType;
             if (objectType instanceof Ambiguous) {
@@ -384,7 +380,6 @@ public class New_c extends Expr_c implements New, NewOps {
 
         // Now disambiguate the actuals.
         nn = arguments(nn, visitList(arguments, childbd));
-        if (childbd.hasErrors()) throw new SemanticException();
 
         if (body != null) {
             TypeNode objectType = nn.objectType;
@@ -408,16 +403,13 @@ public class New_c extends Expr_c implements New, NewOps {
             SupertypeDisambiguator supDisamb =
                     new SupertypeDisambiguator(childbd);
             nn = body(nn, nn.visitChild(nn.body(), supDisamb));
-            if (supDisamb.hasErrors()) throw new SemanticException();
 
             SignatureDisambiguator sigDisamb =
                     new SignatureDisambiguator(childbd);
             nn = body(nn, nn.visitChild(nn.body(), sigDisamb));
-            if (sigDisamb.hasErrors()) throw new SemanticException();
 
             // Now visit the body.
             nn = body(nn, nn.visitChild(nn.body(), childbd));
-            if (childbd.hasErrors()) throw new SemanticException();
         }
 
         nn = (New_c) bd.leave(parent, this, nn, childbd);
@@ -445,10 +437,22 @@ public class New_c extends Expr_c implements New, NewOps {
     @Override
     public Expr findQualifier(AmbiguityRemover ar, ClassType ct)
             throws SemanticException {
-        // If we're instantiating a non-static member class, add a "this"
-        // qualifier.
         NodeFactory nf = ar.nodeFactory();
         Context c = ar.context();
+
+        // See JLS 2nd Ed. | 15.9.2.
+        if (ct.isLocal() && ct.inStaticContext()) return null;
+        if (c.inStaticContext()) {
+            if (body != null)
+                return null;
+            else throw new SemanticException("Inner class "
+                                                     + ct
+                                                     + " cannot be instantiated in a static context.",
+                                             position());
+        }
+
+        // If we're instantiating a non-static member class, add a "this"
+        // qualifier.
 
         // Search for the outer class of the member.  The outer class is
         // not just ct.outer(); it may be a subclass of ct.outer().
@@ -473,14 +477,6 @@ public class New_c extends Expr_c implements New, NewOps {
         }
         q = q.type(outer);
         return q;
-        /*
-        New_c n = qualifier(this, q);
-        if (this.qualifier == null) {
-            // we set a qualifier when there wasn't one already
-            n = qualifierImplicit(n, true);
-        }
-        return n;
-        */
     }
 
     @Override
@@ -523,6 +519,21 @@ public class New_c extends Expr_c implements New, NewOps {
         if (anonType != null) {
             // The type of the new expression is the anonymous type, not the base type.
             ct = anonType;
+        }
+        else {
+            if (ci.flags().isProtected()) {
+                // A protected constructor C(...) can be accessed by new C(...)
+                // only from within the package it which it is defined.
+                // See JLS 2nd Ed. | 6.6.2.2.
+                ClassType contextClass = tc.context().currentClass();
+                if (!ts.equals(contextClass.package_(), ct.package_())) {
+                    throw new SemanticException("Constructor "
+                                                        + ci.signature()
+                                                        + " is inaccessible from class "
+                                                        + contextClass,
+                                                position());
+                }
+            }
         }
 
         return type(n, ct);
@@ -595,7 +606,7 @@ public class New_c extends Expr_c implements New, NewOps {
                 t = ts.staticTarget(t).toClass();
                 ClassType mt = ts.findMemberClass(t, name, c.currentClass());
 
-                if (ts.equals(mt, ct)) {
+                if (ts.isSubtype(mt, ct)) {
                     return t;
                 }
             }
@@ -771,7 +782,7 @@ public class New_c extends Expr_c implements New, NewOps {
         // static type "T", the TypeNode for "C" is actually the type "T.C".
         // But, if we print "T.C", the post compiler will try to lookup "T"
         // in "T".  Instead, we print just "C".
-        if (qualifier != null) {
+        if (qualifier != null && !qualifierImplicit) {
             ((JLang) tr.lang()).printShortObjectType(this, w, tr);
         }
         else {
@@ -825,7 +836,6 @@ public class New_c extends Expr_c implements New, NewOps {
         New_c nn = this;
         New old = nn;
 
-        BodyDisambiguator bd = new BodyDisambiguator(tc);
         NodeVisitor childv = tc.enter(parent, this);
 
         if (childv instanceof PruningVisitor) {
@@ -836,15 +846,14 @@ public class New_c extends Expr_c implements New, NewOps {
 
         if (nn.qualifier() != null) {
             nn = qualifier(nn, nn.visitChild(nn.qualifier(), childtc));
-            if (childtc.hasErrors()) throw new SemanticException();
 
             if (!nn.qualifier().type().isCanonical()) {
                 return nn;
             }
 
             // Force the object type and class body, if any, to be disambiguated.
+            BodyDisambiguator bd = new BodyDisambiguator(tc);
             nn = bd.visitEdge(parent, nn);
-            if (bd.hasErrors()) throw new SemanticException();
 
             if (!nn.objectType().isDisambiguated()) {
                 return nn;
@@ -853,18 +862,10 @@ public class New_c extends Expr_c implements New, NewOps {
 
         // Now type check the rest of the children.
         nn = objectType(nn, nn.visitChild(nn.objectType(), childtc));
-        if (childtc.hasErrors()) throw new SemanticException();
-
-        if (!nn.objectType().type().isCanonical()) {
-            return nn;
-        }
+        if (!nn.objectType().type().isCanonical()) return nn;
 
         nn = arguments(nn, nn.visitList(nn.arguments(), childtc));
-        if (childtc.hasErrors()) throw new SemanticException();
-
         nn = body(nn, nn.visitChild(nn.body(), childtc));
-        if (childtc.hasErrors()) throw new SemanticException();
-
         nn = (New_c) tc.leave(parent, old, nn, childtc);
 
         ConstantChecker cc =

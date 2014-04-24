@@ -66,22 +66,18 @@ public class SupertypeDisambiguator extends Disambiguator {
 
             // Now visit the supertypes only.
             cd = cd.superClass(cd.visitChild(cd.superClass(), v));
-            if (v.hasErrors()) return cd;
 
             List<TypeNode> newInterfaces = new ArrayList<>();
             for (TypeNode tn : cd.interfaces()) {
                 newInterfaces.add(cd.visitChild(tn, v));
-                if (v.hasErrors()) return cd;
             }
             cd = cd.interfaces(newInterfaces);
 
             // Force the supertypes of cd.type() to be updated.
             cd = (ClassDecl) leave(parent, old, cd, v);
-            if (this.hasErrors()) return cd;
 
             // Now visit the class body.
             cd = cd.body(cd.visitChild(cd.body(), v));
-            if (v.hasErrors()) return cd;
 
             // Finally, rebulid the node again.
             return leave(parent, old, cd, v);

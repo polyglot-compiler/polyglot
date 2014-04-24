@@ -70,22 +70,18 @@ public class EnumConstantDeclExt extends JL5AnnotatedElementExt {
 
         // Now disambiguate the actuals.
         nn = nn.args(nn.visitList(nn.args(), childbd));
-        if (childbd.hasErrors()) throw new SemanticException();
 
         if (nn.body() != null) {
             SupertypeDisambiguator supDisamb =
                     new SupertypeDisambiguator(childbd);
             nn = nn.body(nn.visitChild(nn.body(), supDisamb));
-            if (supDisamb.hasErrors()) throw new SemanticException();
 
             SignatureDisambiguator sigDisamb =
                     new SignatureDisambiguator(childbd);
             nn = nn.body(nn.visitChild(nn.body(), sigDisamb));
-            if (sigDisamb.hasErrors()) throw new SemanticException();
 
             // Now visit the body.
             nn = nn.body(nn.visitChild(nn.body(), childbd));
-            if (childbd.hasErrors()) throw new SemanticException();
         }
 
         // Now visit the annotations

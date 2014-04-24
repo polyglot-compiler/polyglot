@@ -287,13 +287,12 @@ public class ExtFileManager extends
 
     @Override
     public boolean packageExists(String name) {
-        Boolean exists = packageCache.get(name);
-        if (exists != null) return exists;
-        exists = false;
-        for (int i = default_locations.size() - 1; i >= 0; i--) {
+        if (packageCache.containsKey(name)) return packageCache.get(name);
+        boolean exists = false;
+        for (int i = default_locations.size() - 1; !exists && i >= 0; i--)
             exists = packageExists(default_locations.get(i), name);
-            if (exists) break;
-        }
+        if (!exists)
+            exists = packageExists(extInfo.getOptions().source_path, name);
         packageCache.put(name, exists);
         return exists;
     }

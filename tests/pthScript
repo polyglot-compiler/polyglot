@@ -62,6 +62,11 @@ polyglot.frontend.JLExtensionInfo "-d out -cp ." {
         packA/ProtectedAccess1.jl packB/ProtectedAccess2.jl (Semantic, "Method.*inaccessible");
         package1/ProtectedTest.jl package2/ProtectedTestBase.jl (Semantic, "Method.*inaccessible");
         package1/InnerClassAccess.jl package1/InnerClassProblem.jl ;
+        package1/Point.jl package2/Point3d.jl
+          (Semantic, "Cannot access field");
+        package2/Point3d.jl package1/Point.jl
+          (Semantic, "Field .* inaccessible"),
+          (Semantic, "Field .* inaccessible");
         ConstantInit.jl ;
         Constants.jl ;  Constants2.jl ; Constants3.jl ; Constants4.jl ;
         Constants5.jl ; Constants6.jl ; Constants7.jl ; Constants8.jl;
@@ -84,7 +89,7 @@ polyglot.frontend.JLExtensionInfo "-d out -cp ." {
         Except7.jl (Semantic, "must either be caught or declared");
         Field.jl ;
         FieldAccess.jl ;
-        FieldAccess2.jl (Semantic, "Field .* not visible");
+        FieldAccess2.jl (Semantic, "Cannot access field");
         FieldAccess3.jl ;
         FieldAccess4.jl (Semantic, "Field.*ambiguous");
         FieldAccess5.jl (Semantic, "Field.*ambiguous");
@@ -120,6 +125,11 @@ polyglot.frontend.JLExtensionInfo "-d out -cp ." {
         Inner0.jl ; Inner1.jl ; Inner2.jl ; Inner3.jl ; Inner4.jl ;
         Inner5.jl ; Inner6.jl ; Inner7.jl ; Inner8.jl ; Inner9.jl ;
         Inner10.jl ; Inner11.jl ; Inner12.jl ; Inner13.jl ;
+        Inner14.jl;
+        Inner15.jl;
+        Inner16.jl
+          (Semantic, "Constructor .* inaccessible"),
+          (Semantic, "Constructor .* inaccessible");
         InnerBen.jl ;
         InnerFormalSuper.jl (Syntax);
         InnerSuperConstructor1.jl;
@@ -182,6 +192,17 @@ polyglot.frontend.JLExtensionInfo "-d out -cp ." {
         Prec.jl ; 
 	Prec2.jl ;
 	Prec3.jl ;
+	Protection.jl (Semantic, "Cannot declare abstract method with flags static"),
+		      (Semantic, "Cannot declare abstract method with flags final"),
+		      (Semantic, "Cannot declare abstract method with flags native");
+	Protection2.jl (Semantic, "cannot override.*overridden method is final");
+	Protection3.jl package1/ProtClassPubMeth.jl package1/PubClassInheritMeth.jl ;
+	Protection4.jl;
+	Protection5.jl;
+	Protection6a.jl Protection6b.jl;
+	Protection7.jl (Semantic, "Method .* inaccessible");
+	Protection08A.jl package1/Protection08B.jl;
+	Protection09.jl;
         Return1.jl ; Return2.jl ; Return3.jl ;
         Return4.jl ;
         Return5.jl ;
@@ -233,8 +254,10 @@ polyglot.frontend.JLExtensionInfo "-d out -cp ." {
 
         BadInit.jl (Semantic, "Method .* not found"),
                    (Semantic, "Method .* not found");
-        BadInner.jl (Semantic, "Could not find non-static member class");
-        BadInner2.jl (Semantic, "Cannot provide a containing instance for non-inner class");
+        BadInner.jl (Semantic, "Inner class .* cannot be instantiated in a static context.");
+        BadInner2.jl
+          (Semantic, "Cannot provide a containing instance for non-inner class"),
+          (Semantic, "Cannot provide a containing instance for non-inner class");
         BadInner3.jl (Semantic, "The nested class .* does not have an enclosing instance of type .*");
         BadInner4.jl (Semantic, "The type of the qualifier .* does not match the immediately enclosing class  of the super class .*");
 	BadInner5.jl (Semantic, "Could not find type");
@@ -307,15 +330,6 @@ polyglot.frontend.JLExtensionInfo "-d out -cp ." {
 	BadExpCC.jl (Syntax), (); // misplaced constructor call
 	BadOverride2.jl;
 	DoubleFlags.jl (Syntax), ();
-	Protection.jl (Semantic, "Cannot declare abstract method with flags static"),
-		      (Semantic, "Cannot declare abstract method with flags final"),
-		      (Semantic, "Cannot declare abstract method with flags native");
-	Protection2.jl (Semantic, "cannot override.*overridden method is final");
-	Protection3.jl package1/ProtClassPubMeth.jl package1/PubClassInheritMeth.jl ;
-	Protection4.jl;
-	Protection5.jl;
-	Protection6a.jl Protection6b.jl;
-	Protection7.jl (Semantic, "Method .* inaccessible");
 
         // on the following file, javac produces an error, but we intentionally do not.
         //  BadFinalInit13.jl (Post); 

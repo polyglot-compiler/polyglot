@@ -463,52 +463,80 @@ public class TypeSystem_c implements TypeSystem {
             ClassType contextClass) {
         Flags flags = mi.flags();
 
-        if (!container.isClass()) {
+        // See JLS 2nd Ed. | 6.6.1.
+
+        // A member (class, interface, field, or method) of a reference (class,
+        // interface, or array) type or a constructor of a class type is
+        // accessible only if the type is accessible and the member or
+        // constructor is declared to permit access:
+        ReferenceType target = mi.container();
+        if (!target.isClass() || contextClass == null) {
             // public members of non-classes are accessible;
             // non-public members of non-classes are inaccessible
             return flags.isPublic();
         }
-
-        ClassType targetClass = container.toClass();
-
-        if (!classAccessible(targetClass, contextClass)) {
+        ClassType targetClass = (ClassType) target.toClass().declaration();
+        if (container.isClass()
+                && !classAccessible(container.toClass(), contextClass))
             return false;
+
+        // If the member or constructor is declared public, then access is
+        // permitted.
+        if (flags.isPublic()) return true;
+
+        // Otherwise, if the member or constructor is declared private, then
+        // access is permitted iff it occurs within the body of the top level
+        // class that encloses the declaration of the member.
+        if (flags.isPrivate()) {
+            ClassType ct = contextClass;
+            while (!ct.isTopLevel())
+                ct = ct.outer();
+            return typeEquals(targetClass, ct) || isEnclosed(targetClass, ct);
         }
 
-        if (equals(targetClass, contextClass)) return true;
-
-        // If the current class and the target class are both in the
-        // same class body, then protection doesn't matter, i.e.
-        // protected and private members may be accessed. Do this by
-        // working up through contextClass's containers.
-        if (isEnclosed(contextClass, targetClass)
-                || isEnclosed(targetClass, contextClass)) return true;
-
-        ClassType ct = contextClass;
-        while (!ct.isTopLevel()) {
-            ct = ct.outer();
-            if (isEnclosed(targetClass, ct)) return true;
-        }
-
-        // protected
+        // Otherwise, if the member or constructor is declared protected, then
+        // access is permitted only when one of the following is true:
+        // - Access to the member or constructor occurs from within the package
+        //   containing the class in which the protected member or constructor
+        //   is declared.  (Deferred to default case.)
+        // - Access is correct as described in | 6.6.2.
         if (flags.isProtected()) {
-            // If the current class is in a
-            // class body that extends/implements the target class, then
-            // protected members can be accessed. Do this by
-            // working up through contextClass's containers.
-            if (descendsFrom(contextClass, targetClass)) {
+            if (mi instanceof ConstructorInstance) {
+                // See JLS 2nd Ed. | 6.6.2.2
+
+                // Let C be the class in which a protected constructor is declared
+                // and let S be the innermost class in whose declaration the use of
+                // the protected constructor occurs.  Then:
+                // - If the access is one of super(...), E.super(...),
+                //   new C(...){...}, or E.new C(...){...}, then access is permitted.
+                // - Otherwise, if the access is new C(...) or E.new C(...), then
+                //   the access is not permitted.  (Deferred to typeCheck in New_c.)
                 return true;
             }
+            else {
+                // See JLS 2nd Ed. | 6.6.2.1
 
-            ct = contextClass;
-            while (!ct.isTopLevel()) {
-                ct = ct.outer();
-                if (descendsFrom(ct, targetClass)) {
+                // Let C be the class in which a protected member is declared.
+                // Access is permitted only within the body of a subclass S of C.
+                ClassType ct = contextClass;
+                while (!isSubtype(ct, targetClass) && !ct.isTopLevel())
+                    ct = ct.outer();
+                if (isSubtype(ct, targetClass)) {
+                    // Class and static members are accessible.
+                    if (mi instanceof ClassType || flags.isStatic())
+                        return true;
+                    // In addition, for expressions of the form E.Id or E.Id(...),
+                    // access is permitted iff the type of E is S or a subclass of S.
+                    // TODO
+//                    if (isSubtype(container, ct)) return true;
                     return true;
                 }
             }
         }
 
+        // Otherwise, we say there is default access, which is permitted only
+        // when the access occurs from within the package in which the type is
+        // declared.
         return accessibleFromPackage(flags,
                                      targetClass.package_(),
                                      contextClass.package_());
@@ -723,17 +751,9 @@ public class TypeSystem_c implements TypeSystem {
                     + fi.container() + " and " + fi2.container() + ".");
         }
 
-        if (container == null) {
-            if (!isAccessible(fi, currClass) && !isInherited(fi, currClass)) {
-                // currClass neither inherits fi, nor can access it.
-                throw new SemanticException("Cannot access " + fi + ".");
-            }
-        }
-        else if (currClass != null) {
+        if (currClass != null) {
             if (!isAccessible(fi, container, currClass)) {
-                // Cannot access private field declared in superclasses.
-                throw new SemanticException("Field " + fi + " is not visible "
-                        + "in class " + container + ".");
+                throw new SemanticException("Cannot access " + fi + ".");
             }
         }
 
@@ -929,7 +949,7 @@ public class TypeSystem_c implements TypeSystem {
             }
 
             for (MethodInstance mi : type.toReference().methodsNamed(name)) {
-                if (isAccessible(mi, currClass)) {
+                if (isAccessible(mi, container, currClass)) {
                     return true;
                 }
             }

@@ -40,7 +40,6 @@ import polyglot.types.TypeSystem;
 public class BodyDisambiguator extends Disambiguator {
     public BodyDisambiguator(DisambiguationDriver dd) {
         super(dd);
-        ;
     }
 
     public BodyDisambiguator(Job job, TypeSystem ts, NodeFactory nf, Context c) {
