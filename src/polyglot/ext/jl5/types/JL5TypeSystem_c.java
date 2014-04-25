@@ -242,42 +242,14 @@ public class JL5TypeSystem_c extends
         }
     }
 
-    protected final Flags TOP_LEVEL_CLASS_FLAGS =
-            JL5Flags.setAnnotation(JL5Flags.setEnum(super.TOP_LEVEL_CLASS_FLAGS));
-
-    protected final Flags MEMBER_CLASS_FLAGS =
-            JL5Flags.setAnnotation(JL5Flags.setEnum(super.MEMBER_CLASS_FLAGS));
-
     @Override
-    public void checkTopLevelClassFlags(Flags f) throws SemanticException {
-        if (!f.clear(TOP_LEVEL_CLASS_FLAGS).equals(Flags.NONE)) {
-            throw new SemanticException("Cannot declare a top-level class with flag(s) "
-                    + f.clear(TOP_LEVEL_CLASS_FLAGS) + ".");
-        }
-
-        if (f.isFinal() && f.isInterface()) {
-            throw new SemanticException("Cannot declare a final interface.");
-        }
-
-        checkAccessFlags(f);
+    public Flags legalTopLevelClassFlags() {
+        return JL5Flags.setAnnotation(JL5Flags.setEnum(super.legalTopLevelClassFlags()));
     }
 
     @Override
-    public void checkMemberClassFlags(Flags f) throws SemanticException {
-        if (!f.clear(MEMBER_CLASS_FLAGS).equals(Flags.NONE)) {
-            throw new SemanticException("Cannot declare a member class with flag(s) "
-                    + f.clear(MEMBER_CLASS_FLAGS) + ".");
-        }
-
-        if (f.isStrictFP() && f.isInterface()) {
-            throw new SemanticException("Cannot declare a strictfp interface.");
-        }
-
-        if (f.isFinal() && f.isInterface()) {
-            throw new SemanticException("Cannot declare a final interface.");
-        }
-
-        checkAccessFlags(f);
+    public Flags legalMemberClassFlags() {
+        return JL5Flags.setAnnotation(JL5Flags.setEnum(super.legalMemberClassFlags()));
     }
 
     @Override

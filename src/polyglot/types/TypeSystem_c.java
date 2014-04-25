@@ -2220,7 +2220,7 @@ public class TypeSystem_c implements TypeSystem {
         // The access modifiers protected, private, and static pertain only to
         // member interfaces.  See JLS 2nd Ed. | 9.1.1.
         Flags topLevelInterfaceFlags =
-                legalInterfaceFlags().clear(Protected().Private().Static());
+                INTERFACE_FLAGS.clear(Protected().Private().Static());
         if (f.isInterface()
                 && !f.clear(topLevelInterfaceFlags).equals(Flags.NONE)) {
             throw new SemanticException("Cannot declare interface with flags "

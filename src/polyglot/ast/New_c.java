@@ -332,7 +332,7 @@ public class New_c extends Expr_c implements New, NewOps {
             if (objectType.type().isClass()) {
                 ClassType ct = objectType.type().toClass();
 
-                if (ct.isInnerClass()) {
+                if (ct.isInnerClass() && !ct.isLocal()) {
                     Expr qualifier =
                             visitChild(ar.lang().findQualifier(this, ar, ct),
                                        childbd);
@@ -441,7 +441,6 @@ public class New_c extends Expr_c implements New, NewOps {
         Context c = ar.context();
 
         // See JLS 2nd Ed. | 15.9.2.
-        if (ct.isLocal() && ct.inStaticContext()) return null;
         if (c.inStaticContext()) {
             if (body != null)
                 return null;
@@ -804,10 +803,10 @@ public class New_c extends Expr_c implements New, NewOps {
             v.visitCFG(qualifier, objectType, ENTRY);
         }
 
-        if (body() != null) {
-            v.visitCFG(objectType, listChild(arguments, body()), ENTRY);
-            v.visitCFGList(arguments, body(), ENTRY);
-            v.visitCFG(body(), this, EXIT);
+        if (body != null) {
+            v.visitCFG(objectType, listChild(arguments, body), ENTRY);
+            v.visitCFGList(arguments, body, ENTRY);
+            v.visitCFG(body, this, EXIT);
         }
         else {
             if (!arguments.isEmpty()) {

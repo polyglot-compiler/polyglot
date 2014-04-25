@@ -36,6 +36,7 @@ import polyglot.ext.jl5.types.JL5Flags;
 import polyglot.ext.jl5.types.JL5TypeSystem;
 import polyglot.types.SemanticException;
 import polyglot.types.Type;
+import polyglot.types.TypeSystem;
 import polyglot.util.SerialVersionUID;
 import polyglot.visit.TypeChecker;
 
@@ -49,8 +50,10 @@ public class JL5SwitchExt extends JL5TermExt implements JL5SwitchOps {
 
     @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
+        TypeSystem ts = tc.typeSystem();
         Switch s = this.node();
         Expr expr = s.expr();
+        Type type = expr.type();
 
         if (!((J5Lang) tc.lang()).isAcceptableSwitchType(s, expr.type())) {
             throw new SemanticException("Switch index must be of type char, byte,"
@@ -62,8 +65,23 @@ public class JL5SwitchExt extends JL5TermExt implements JL5SwitchOps {
         Type switchType = expr.type();
         for (SwitchElement el : s.elements()) {
             if (el instanceof Case) {
+                Case c = (Case) el;
+                Expr cExpr = c.expr();
+                if (cExpr != null
+                        && !ts.isImplicitCastValid(cExpr.type(), type)
+                        && !ts.typeEquals(cExpr.type(), type)
+                        && !ts.numericConversionValid(type,
+                                                      tc.lang()
+                                                        .constantValue(cExpr,
+                                                                       tc.lang()))) {
+                    throw new SemanticException("Case constant \""
+                                                        + cExpr
+                                                        + "\" is not assignable to "
+                                                        + type + ".",
+                                                c.position());
+                }
                 el =
-                        (SwitchElement) ((J5Lang) tc.lang()).resolveCaseLabel((Case) el,
+                        (SwitchElement) ((J5Lang) tc.lang()).resolveCaseLabel(c,
                                                                               tc,
                                                                               switchType);
             }

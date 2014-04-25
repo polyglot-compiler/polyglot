@@ -39,6 +39,7 @@ import java.util.Set;
 import polyglot.ast.Binary;
 import polyglot.ast.CodeDecl;
 import polyglot.ast.CodeNode;
+import polyglot.ast.Conditional;
 import polyglot.ast.Expr;
 import polyglot.ast.JLang;
 import polyglot.ast.Node;
@@ -393,8 +394,8 @@ public abstract class DataFlow<FlowItem extends DataFlow.Item> extends
         Expr n = (Expr) peer.node();
         Set<EdgeKey> edgeKeys = peer.succEdgeKeys();
         if (!n.type().isBoolean()
-                || !(n instanceof Binary || n instanceof Unary)) {
-            throw new InternalCompilerError("This method only takes binary "
+                || !(n instanceof Binary || n instanceof Conditional || n instanceof Unary)) {
+            throw new InternalCompilerError("This method only takes binary, conditional, "
                     + "or unary operators of boolean type");
         }
 
@@ -409,7 +410,7 @@ public abstract class DataFlow<FlowItem extends DataFlow.Item> extends
                 return itemsToMap(falseItem, trueItem, otherItem, edgeKeys);
             }
         }
-        else {
+        else if (n instanceof Binary) {
             Binary b = (Binary) n;
             if (b.operator() == Binary.COND_AND) {
                 // the only true item coming into this node should be
@@ -447,6 +448,9 @@ public abstract class DataFlow<FlowItem extends DataFlow.Item> extends
                                             graph);
                 return itemsToMap(bitORTrue, falseItem, otherItem, edgeKeys);
             }
+        }
+        else if (n instanceof Conditional) {
+            return itemsToMap(trueItem, falseItem, otherItem, edgeKeys);
         }
         return null;
     }

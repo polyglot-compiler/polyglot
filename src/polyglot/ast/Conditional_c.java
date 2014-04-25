@@ -266,6 +266,7 @@ public class Conditional_c extends Expr_c implements Conditional {
 
     @Override
     public <T> List<T> acceptCFG(CFGBuilder<?> v, List<T> succs) {
+        boolean isBoolean = type.isBoolean();
         if (v.lang().isConstant(cond, v.lang())) {
             // the condition is a constant expression.
             // That means that one branch is dead code
@@ -274,12 +275,28 @@ public class Conditional_c extends Expr_c implements Conditional {
             if (condConstantValue) {
                 // Condition is constantly true, only the consequent will be executed
                 v.visitCFG(cond, FlowGraph.EDGE_KEY_TRUE, consequent, ENTRY);
-                v.visitCFG(consequent, this, EXIT);
+                if (isBoolean)
+                    v.visitCFG(consequent,
+                               FlowGraph.EDGE_KEY_TRUE,
+                               this,
+                               EXIT,
+                               FlowGraph.EDGE_KEY_FALSE,
+                               this,
+                               EXIT);
+                else v.visitCFG(consequent, this, EXIT);
             }
             else {
                 // Condition is constantly false, only the alternative will be executed
                 v.visitCFG(cond, FlowGraph.EDGE_KEY_FALSE, alternative, ENTRY);
-                v.visitCFG(alternative, this, EXIT);
+                if (isBoolean)
+                    v.visitCFG(alternative,
+                               FlowGraph.EDGE_KEY_TRUE,
+                               this,
+                               EXIT,
+                               FlowGraph.EDGE_KEY_FALSE,
+                               this,
+                               EXIT);
+                else v.visitCFG(alternative, this, EXIT);
             }
         }
         else {
@@ -291,8 +308,26 @@ public class Conditional_c extends Expr_c implements Conditional {
                        FlowGraph.EDGE_KEY_FALSE,
                        alternative,
                        ENTRY);
-            v.visitCFG(consequent, this, EXIT);
-            v.visitCFG(alternative, this, EXIT);
+            if (isBoolean) {
+                v.visitCFG(consequent,
+                           FlowGraph.EDGE_KEY_TRUE,
+                           this,
+                           EXIT,
+                           FlowGraph.EDGE_KEY_FALSE,
+                           this,
+                           EXIT);
+                v.visitCFG(alternative,
+                           FlowGraph.EDGE_KEY_TRUE,
+                           this,
+                           EXIT,
+                           FlowGraph.EDGE_KEY_FALSE,
+                           this,
+                           EXIT);
+            }
+            else {
+                v.visitCFG(consequent, this, EXIT);
+                v.visitCFG(alternative, this, EXIT);
+            }
         }
 
         return succs;

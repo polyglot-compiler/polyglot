@@ -40,6 +40,7 @@ import polyglot.ast.ClassBody;
 import polyglot.ast.ClassDecl;
 import polyglot.ast.ClassMember;
 import polyglot.ast.CodeNode;
+import polyglot.ast.Conditional;
 import polyglot.ast.ConstructorCall;
 import polyglot.ast.ConstructorDecl;
 import polyglot.ast.Expr;
@@ -375,7 +376,7 @@ public class DefiniteAssignmentChecker extends
                 checkStaticFinalFieldsInit((ClassBody) n);
 
                 // check that at the end of each constructor all non-static
-                // final fields are initialzed.
+                // final fields are initialized.
                 checkNonStaticFinalFieldsInit((ClassBody) n);
 
                 // copy the locals used to the outer scope
@@ -461,7 +462,7 @@ public class DefiniteAssignmentChecker extends
     protected void checkNonStaticFinalFieldsInit(ClassBody cb)
             throws SemanticException {
         // for each non-static final field instance, check that all 
-        // constructors intitalize it exactly once, taking into account constructor calls.
+        // constructors initialize it exactly once, taking into account constructor calls.
         for (FieldInstance fi : currCBI.currClassFinalFieldAssStatuses.keySet()) {
             if (fi.flags().isFinal() && !fi.flags().isStatic()) {
                 // the field is final and not static
@@ -714,8 +715,9 @@ public class DefiniteAssignmentChecker extends
                                         (ConstructorCall) n,
                                         peer.succEdgeKeys());
         }
-        else if (n instanceof Expr && ((Expr) n).type().isBoolean()
-                && (n instanceof Binary || n instanceof Unary)) {
+        else if (n instanceof Expr
+                && ((Expr) n).type().isBoolean()
+                && (n instanceof Binary || n instanceof Conditional || n instanceof Unary)) {
             if (trueItem == null) trueItem = inDFItem;
             if (falseItem == null) falseItem = inDFItem;
             ret =
@@ -985,11 +987,11 @@ public class DefiniteAssignmentChecker extends
         }
 
         if (n == graph.root() && !entry) {
-            if (currCBI.currCodeDecl instanceof Initializer) {
-                finishInitializer(graph,
-                                  (Initializer) currCBI.currCodeDecl,
-                                  dfIn,
-                                  dfOut);
+            if (currCBI.currCodeDecl instanceof FieldDecl) {
+                finishFieldDecl(graph,
+                                (FieldDecl) currCBI.currCodeDecl,
+                                dfIn,
+                                dfOut);
             }
             if (currCBI.currCodeDecl instanceof ConstructorDecl) {
                 finishConstructorDecl(graph,
@@ -997,19 +999,25 @@ public class DefiniteAssignmentChecker extends
                                       dfIn,
                                       dfOut);
             }
+            if (currCBI.currCodeDecl instanceof Initializer) {
+                finishInitializer(graph,
+                                  (Initializer) currCBI.currCodeDecl,
+                                  dfIn,
+                                  dfOut);
+            }
         }
     }
 
     /**
-     * Perform necessary actions upon seeing the Initializer 
-     * {@code initializer}.
+     * Perform necessary actions upon seeing the FieldDecl 
+     * {@code fd}.
      */
-    protected void finishInitializer(FlowGraph<FlowItem> graph,
-            Initializer initializer, FlowItem dfIn, FlowItem dfOut) {
-        // We are finishing the checking of an intializer.
+    protected void finishFieldDecl(FlowGraph<FlowItem> graph, FieldDecl fd,
+            FlowItem dfIn, FlowItem dfOut) {
+        // We are finishing the checking of a field declaration.
         // We need to copy back the init counts of any fields back into
         // currClassFinalFieldInitCounts, so that the counts are 
-        // correct for the next initializer or constructor.
+        // correct for the next field declaration, initializer, or constructor.
         for (Entry<VarInstance, AssignmentStatus> e : dfOut.assignmentStatus.entrySet()) {
             if (e.getKey() instanceof FieldInstance) {
                 FieldInstance fi = (FieldInstance) e.getKey();
@@ -1070,6 +1078,30 @@ public class DefiniteAssignmentChecker extends
         if (!dfIn.normalTermination) {
             // this ci cannot terminate normally. Record this fact.
             currCBI.constructorsCannotTerminateNormally.add(cd);
+        }
+    }
+
+    /**
+     * Perform necessary actions upon seeing the Initializer 
+     * {@code initializer}.
+     */
+    protected void finishInitializer(FlowGraph<FlowItem> graph,
+            Initializer initializer, FlowItem dfIn, FlowItem dfOut) {
+        // We are finishing the checking of an initializer.
+        // We need to copy back the init counts of any fields back into
+        // currClassFinalFieldInitCounts, so that the counts are 
+        // correct for the next field declaration, initializer, or constructor.
+        for (Entry<VarInstance, AssignmentStatus> e : dfOut.assignmentStatus.entrySet()) {
+            if (e.getKey() instanceof FieldInstance) {
+                FieldInstance fi = (FieldInstance) e.getKey();
+                if (fi.flags().isFinal()) {
+                    // we don't need to join the init counts, as all
+                    // dataflows will go through all of the 
+                    // initializers
+                    currCBI.currClassFinalFieldAssStatuses.put(fi.orig(),
+                                                               e.getValue());
+                }
+            }
         }
     }
 
@@ -1142,7 +1174,8 @@ public class DefiniteAssignmentChecker extends
         Field f = a.left();
         FieldInstance fi = f.fieldInstance();
         if (fi.flags().isFinal()) {
-            if ((currCBI.currCodeDecl instanceof ConstructorDecl || currCBI.currCodeDecl instanceof Initializer)
+            if ((currCBI.currCodeDecl instanceof FieldDecl
+                    || currCBI.currCodeDecl instanceof ConstructorDecl || currCBI.currCodeDecl instanceof Initializer)
                     && isFieldsTargetAppropriate(f)) {
                 // we are in a constructor or initializer block and 
                 // if the field is static then the target is the class
@@ -1166,7 +1199,7 @@ public class DefiniteAssignmentChecker extends
                 }
             }
             else {
-                // not in a constructor or intializer, or the target is
+                // not in a constructor or initializer, or the target is
                 // not appropriate. So we cannot assign 
                 // to a final field at all.
                 throw new SemanticException("Cannot assign a value "

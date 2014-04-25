@@ -596,72 +596,55 @@ public class Binary_c extends Expr_c implements Binary {
     @Override
     public <T> List<T> acceptCFG(CFGBuilder<?> v, List<T> succs) {
         if (op == COND_AND || op == COND_OR) {
-            // short-circuit
-            if (v.lang().isConstant(left, v.lang())) {
-                boolean leftConstantValue =
-                        ((Boolean) v.lang().constantValue(left, v.lang())).booleanValue();
-                if ((leftConstantValue && op == COND_OR)
-                        || (!leftConstantValue && op == COND_AND)) {
-                    v.visitCFG(left, this, EXIT);
-                }
-                else {
-                    v.visitCFG(left, right, ENTRY);
-                    v.visitCFG(right, this, EXIT);
-                }
-            }
-            else {
-                if (op == COND_AND) {
-                    // AND operator
-                    // short circuit means that left is false
-                    v.visitCFG(left,
-                               FlowGraph.EDGE_KEY_TRUE,
-                               right,
-                               ENTRY,
-                               FlowGraph.EDGE_KEY_FALSE,
-                               this,
-                               EXIT);
-                }
-                else {
-                    // OR operator
-                    // short circuit means that left is true
-                    v.visitCFG(left,
-                               FlowGraph.EDGE_KEY_FALSE,
-                               right,
-                               ENTRY,
-                               FlowGraph.EDGE_KEY_TRUE,
-                               this,
-                               EXIT);
-                }
-                v.visitCFG(right,
-                           FlowGraph.EDGE_KEY_TRUE,
-                           this,
-                           EXIT,
-                           FlowGraph.EDGE_KEY_FALSE,
-                           this,
-                           EXIT);
-            }
-        }
-        else {
-            if (left.type().isBoolean() && right.type().isBoolean()) {
+            if (op == COND_AND) {
+                // AND operator
+                // short circuit means that left is false
                 v.visitCFG(left,
                            FlowGraph.EDGE_KEY_TRUE,
                            right,
                            ENTRY,
                            FlowGraph.EDGE_KEY_FALSE,
-                           right,
-                           ENTRY);
-                v.visitCFG(right,
-                           FlowGraph.EDGE_KEY_TRUE,
-                           this,
-                           EXIT,
-                           FlowGraph.EDGE_KEY_FALSE,
                            this,
                            EXIT);
             }
             else {
-                v.visitCFG(left, right, ENTRY);
-                v.visitCFG(right, this, EXIT);
+                // OR operator
+                // short circuit means that left is true
+                v.visitCFG(left,
+                           FlowGraph.EDGE_KEY_FALSE,
+                           right,
+                           ENTRY,
+                           FlowGraph.EDGE_KEY_TRUE,
+                           this,
+                           EXIT);
             }
+            v.visitCFG(right,
+                       FlowGraph.EDGE_KEY_TRUE,
+                       this,
+                       EXIT,
+                       FlowGraph.EDGE_KEY_FALSE,
+                       this,
+                       EXIT);
+        }
+        else if (left.type().isBoolean() && right.type().isBoolean()) {
+            v.visitCFG(left,
+                       FlowGraph.EDGE_KEY_TRUE,
+                       right,
+                       ENTRY,
+                       FlowGraph.EDGE_KEY_FALSE,
+                       right,
+                       ENTRY);
+            v.visitCFG(right,
+                       FlowGraph.EDGE_KEY_TRUE,
+                       this,
+                       EXIT,
+                       FlowGraph.EDGE_KEY_FALSE,
+                       this,
+                       EXIT);
+        }
+        else {
+            v.visitCFG(left, right, ENTRY);
+            v.visitCFG(right, this, EXIT);
         }
 
         return succs;

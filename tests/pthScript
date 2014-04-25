@@ -48,6 +48,7 @@ polyglot.frontend.JLExtensionInfo "-d out -cp ." {
           (Semantic, "abstract and final");
         ClassDecl02.jl (Semantic, "Duplicate interface");
         ClassDecl03.jl (Semantic, "flags protected");
+        ClassDecl04.jl;
         ClassLit.jl ;
         Conditional1.jl ;
 	ConformanceCheck1.jl (Semantic, "cannot override.*attempting to assign weaker access");
@@ -113,6 +114,9 @@ polyglot.frontend.JLExtensionInfo "-d out -cp ." {
 	Init10.jl; 
 	Init11.jl; 
 	Init12.jl; 
+	Init13.jl;
+	Init14.jl;
+	Init15.jl;
         InitializerType1.jl ;
         Initializer1.jl (Semantic, "Initializers must be able to complete normally");
         Initializer2.jl (Semantic, "Initializers must be able to complete normally");
@@ -181,6 +185,7 @@ polyglot.frontend.JLExtensionInfo "-d out -cp ." {
           (Semantic, "Inner classes cannot declare static initializers"),
           (Semantic, "Inner classes cannot declare static member classes"),
           (Semantic, "Inner classes cannot declare member interfaces");
+        LocalClass09.jl;
         LocalInners2.jl ;
         LocalInit.jl ;
         LongString01.jl;
