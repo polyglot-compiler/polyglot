@@ -48,6 +48,7 @@ polyglot.ext.jl5.JL5ExtensionInfo ["../tests/"] "-sx jl -d out -classpath java-o
         Constants11.jl ;
         Constants13.jl ;
         Constants14A.jl ;
+        ConstructorCall01.jl;
         ConstructorDecl01.jl (Semantic, "synchronized");
         Ctor.jl ;
         DefaultCtor.jl ;
@@ -68,6 +69,7 @@ polyglot.ext.jl5.JL5ExtensionInfo ["../tests/"] "-sx jl -d out -classpath java-o
         FieldAccess4.jl (Semantic, "Field.*ambiguous");
         FieldAccess5.jl (Semantic, "Field.*ambiguous");
         FieldAccess6.jl (Semantic, "Field .* not visible");
+        FieldAccess07.jl (Semantic, "Non-static field .* static context");
         FieldClassConflict.jl ;
         FieldDecl01.jl (Semantic, "final and volatile");
         FieldDecl02.jl (Semantic, "interface constant .* transient");
@@ -77,6 +79,8 @@ polyglot.ext.jl5.JL5ExtensionInfo ["../tests/"] "-sx jl -d out -classpath java-o
         ForInit.jl ;
         ForwardRef.jl ; ForwardRef2.jl ; ForwardRef3.jl ;
         Import.jl ;
+        Import02.jl (Semantic, "import .* conflicts with a type");
+        Import03.jl (Semantic, "already defined in a single-type import");
         Increment.jl ;
         Infinite.jl ;
         Inherit.jl (Semantic);
@@ -159,6 +163,7 @@ polyglot.ext.jl5.JL5ExtensionInfo ["../tests/"] "-sx jl -d out -classpath java-o
           (Semantic, "Inner classes cannot declare static member classes"),
           (Semantic, "Inner classes cannot declare member interfaces");
         LocalClass09.jl;
+        LocalClass10.jl;
         LocalInners2.jl ;
         LocalInit.jl ;
         LongString01.jl;
@@ -211,12 +216,6 @@ polyglot.ext.jl5.JL5ExtensionInfo ["../tests/"] "-sx jl -d out -classpath java-o
         BadExtends.jl (Semantic, "Cannot extend final class");
 #	BadInterfaceMethod.jl (Semantic, "weaker access privileges");
         BadFinalInit1.jl (Semantic, "Local variable .* may not have been initialized");
-        BadFinalInit10.jl (Semantic, "Final field .* might already have been initialized");
-        BadFinalInit11.jl (Semantic, "Final field .* might already have been initialized");
-        BadFinalInit12.jl (Semantic, "Cannot assign a value to final field");
-        BadFinalInit14.jl (Semantic, "Cannot assign a value to final field");
-        BadFinalInit15.jl (Semantic, "Final variable .* might already have been initialized"); 
-        BadFinalInit16.jl (Semantic, "Local variable .* may not have been initialized"); 
         BadFinalInit2.jl (Semantic, "Final variable .* might already have been initialized");
         BadFinalInit3.jl (Semantic, "Final variable .* might already have been initialized");
         BadFinalInit4.jl (Post, "may not be assigned"); # we allow, javac rejects.
@@ -225,6 +224,13 @@ polyglot.ext.jl5.JL5ExtensionInfo ["../tests/"] "-sx jl -d out -classpath java-o
         BadFinalInit7.jl (Semantic, "Cannot assign a value to final field .*");
         BadFinalInit8.jl (Semantic, "Final field .* might already have been initialized");
         BadFinalInit9.jl (Semantic, "Final variable .* might already have been initialized");
+        BadFinalInit10.jl (Semantic, "Final field .* might already have been initialized");
+        BadFinalInit11.jl (Semantic, "Final field .* might already have been initialized");
+        BadFinalInit12.jl (Semantic, "Cannot assign a value to final field");
+        BadFinalInit14.jl (Semantic, "Cannot assign a value to final field");
+        BadFinalInit15.jl (Semantic, "Final variable .* might already have been initialized"); 
+        BadFinalInit16.jl (Semantic, "Local variable .* may not have been initialized"); 
+        BadFinalInit17.jl (Semantic, "Final field .* might not have been initialized");
         BadIncrement1.jl (Semantic, "Operand of .* operator must be a variable");
         BadIncrement2.jl (Semantic, "Operand of .* operator must be a variable");
         BadIncrement3.jl (Semantic, "Operand of .* operator must be a variable");

@@ -100,12 +100,6 @@ public abstract class ParserlessJLExtensionInfo extends AbstractExtensionInfo {
     }
 
     @Override
-    public String[] defaultFileExtensions() {
-        String ext = defaultFileExtension();
-        return new String[] { ext, "java" };
-    }
-
-    @Override
     public String compilerName() {
         return "jlc";
     }

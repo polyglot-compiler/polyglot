@@ -661,7 +661,7 @@ public class Context_c implements Context {
         }
         if (vi == null && isClass()) {
             try {
-                return ts.findField(this.type, name, this.type);
+                return ts.findField(this.type, name);
             }
             catch (SemanticException e) {
                 return null;

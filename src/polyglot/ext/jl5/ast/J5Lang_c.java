@@ -123,7 +123,7 @@ public class J5Lang_c extends JLang_c implements J5Lang {
     // JL5CaseOps
 
     @Override
-    public final Node resolveCaseLabel(Case n, TypeChecker tc, Type switchType)
+    public final Case resolveCaseLabel(Case n, TypeChecker tc, Type switchType)
             throws SemanticException {
         return JL5CaseOps(n).resolveCaseLabel(tc, switchType);
     }

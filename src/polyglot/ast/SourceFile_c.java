@@ -26,14 +26,17 @@
 
 package polyglot.ast;
 
-import java.util.LinkedHashSet;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import polyglot.frontend.Source;
 import polyglot.translate.ExtensionRewriter;
 import polyglot.types.Context;
 import polyglot.types.ImportTable;
+import polyglot.types.Named;
 import polyglot.types.Package;
 import polyglot.types.SemanticException;
 import polyglot.types.TypeSystem;
@@ -210,7 +213,7 @@ public class SourceFile_c extends Node_c implements SourceFile {
 
     @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
-        Set<String> names = new LinkedHashSet<>();
+        Set<String> names = new HashSet<>();
         boolean hasPublic = false;
 
         for (TopLevelDecl d : decls) {
@@ -231,6 +234,46 @@ public class SourceFile_c extends Node_c implements SourceFile {
 
                 hasPublic = true;
             }
+        }
+
+        TypeSystem ts = tc.typeSystem();
+        Map<String, Named> importedTypes = new HashMap<>();
+
+        for (Import i : imports) {
+            if (i.kind() != Import.SINGLE_TYPE) continue;
+
+            String s = i.name();
+            Named named = ts.forName(s);
+            String name = named.name();
+
+            // See JLS 2nd Ed. | 7.5.1.
+
+            // If two single-type-import declarations in the same compilation
+            // unit attempts to import types with the same simple name, then a
+            // compile-time error occurs, unless the two types are the same
+            // type.
+            if (importedTypes.containsKey(name)) {
+                Named importedType = importedTypes.get(name);
+                if (!ts.equals(named, importedType)) {
+                    throw new SemanticException(name
+                                                        + " is already defined in a single-type import as type "
+                                                        + importedType + ".",
+                                                i.position());
+                }
+            }
+            else importedTypes.put(name, named);
+
+            // If another top level type with the same simple name is otherwise
+            // declared in the current compilation unit except by a
+            // type-import-on-demand declaration, then a compile-time-error
+            // occurs.
+            if (names.contains(name)) {
+                throw new SemanticException("The import "
+                                                    + s
+                                                    + " conflicts with a type defined in the same file.",
+                                            i.position());
+            }
+
         }
 
         return this;

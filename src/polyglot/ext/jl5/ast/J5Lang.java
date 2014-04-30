@@ -27,7 +27,6 @@ package polyglot.ext.jl5.ast;
 
 import polyglot.ast.Case;
 import polyglot.ast.JLang;
-import polyglot.ast.Node;
 import polyglot.ast.Switch;
 import polyglot.types.SemanticException;
 import polyglot.types.Type;
@@ -36,7 +35,7 @@ import polyglot.visit.TypeChecker;
 public interface J5Lang extends JLang {
     // JL5CaseOps
 
-    Node resolveCaseLabel(Case n, TypeChecker tc, Type switchType)
+    Case resolveCaseLabel(Case n, TypeChecker tc, Type switchType)
             throws SemanticException;
 
     // JL5SwitchOps

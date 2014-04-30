@@ -66,6 +66,7 @@ public class JL5SwitchExt extends JL5TermExt implements JL5SwitchOps {
         for (SwitchElement el : s.elements()) {
             if (el instanceof Case) {
                 Case c = (Case) el;
+                c = ((J5Lang) tc.lang()).resolveCaseLabel(c, tc, switchType);
                 Expr cExpr = c.expr();
                 if (cExpr != null
                         && !ts.isImplicitCastValid(cExpr.type(), type)
@@ -80,10 +81,7 @@ public class JL5SwitchExt extends JL5TermExt implements JL5SwitchOps {
                                                         + type + ".",
                                                 c.position());
                 }
-                el =
-                        (SwitchElement) ((J5Lang) tc.lang()).resolveCaseLabel(c,
-                                                                              tc,
-                                                                              switchType);
+                el = c;
             }
 
             newels.add(el);

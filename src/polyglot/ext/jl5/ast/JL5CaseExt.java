@@ -54,7 +54,7 @@ public class JL5CaseExt extends JL5TermExt implements JL5CaseOps {
     }
 
     @Override
-    public Node resolveCaseLabel(TypeChecker tc, Type switchType)
+    public Case resolveCaseLabel(TypeChecker tc, Type switchType)
             throws SemanticException {
         JL5TypeSystem ts = (JL5TypeSystem) tc.typeSystem();
         JL5NodeFactory nf = (JL5NodeFactory) tc.nodeFactory();
@@ -185,7 +185,7 @@ public class JL5CaseExt extends JL5TermExt implements JL5CaseOps {
         if (expr == null || expr instanceof Lit) {
             return null;
         }
-        // We will do type checking vis the resolveCaseLabel method
+        // We will do type checking via the resolveCaseLabel method
         return c;
     }
 

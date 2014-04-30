@@ -248,6 +248,11 @@ public class JL5TypeSystem_c extends
     }
 
     @Override
+    public Flags legalInterfaceFlags() {
+        return JL5Flags.setAnnotation(super.legalInterfaceFlags());
+    }
+
+    @Override
     public Flags legalMemberClassFlags() {
         return JL5Flags.setAnnotation(JL5Flags.setEnum(super.legalMemberClassFlags()));
     }

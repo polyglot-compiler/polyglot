@@ -956,7 +956,10 @@ public class DefiniteAssignmentChecker extends
             // due to the flow equations, all DataFlowItems in the outItems map
             // are the same, so just take the first one.
             dfOut = outItems.values().iterator().next();
-            if (n instanceof Local) {
+            if (n instanceof Field) {
+                checkField(graph, (Field) n, dfIn);
+            }
+            else if (n instanceof Local) {
                 checkLocal(graph, (Local) n, dfIn);
             }
             else if (n instanceof LocalAssign) {
@@ -1100,6 +1103,33 @@ public class DefiniteAssignmentChecker extends
                     // initializers
                     currCBI.currClassFinalFieldAssStatuses.put(fi.orig(),
                                                                e.getValue());
+                }
+            }
+        }
+    }
+
+    /**
+     * Check that the field {@code f} is used correctly.
+     * See JLS 2nd Ed. | 16: Every blank final field must have a definitely
+     * assigned value when any access of its value occurs.
+     */
+    protected void checkField(FlowGraph<FlowItem> graph, Field f, FlowItem dfIn)
+            throws SemanticException {
+        FieldInstance fi = f.fieldInstance();
+        // Use of blank final field only needs to be checked when the use
+        // occurs inside the same class as the field's container.
+        if (fi.flags().isFinal()
+                && ts.typeEquals(currCBI.currClass, fi.container())) {
+            if ((currCBI.currCodeDecl instanceof FieldDecl
+                    || currCBI.currCodeDecl instanceof ConstructorDecl || currCBI.currCodeDecl instanceof Initializer)
+                    && isFieldsTargetAppropriate(f)) {
+                AssignmentStatus initCount =
+                        dfIn.assignmentStatus.get(fi.orig());
+                if (initCount == null || !initCount.definitelyAssigned) {
+                    throw new SemanticException("Final field \""
+                                                        + f.name()
+                                                        + "\" might not have been initialized",
+                                                f.position());
                 }
             }
         }

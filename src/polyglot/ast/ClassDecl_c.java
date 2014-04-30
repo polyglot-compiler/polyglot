@@ -43,6 +43,7 @@ import polyglot.types.Context;
 import polyglot.types.Flags;
 import polyglot.types.MemberInstance;
 import polyglot.types.Named;
+import polyglot.types.NoClassException;
 import polyglot.types.ParsedClassType;
 import polyglot.types.ReferenceType;
 import polyglot.types.SemanticException;
@@ -531,24 +532,29 @@ public class ClassDecl_c extends Term_c implements ClassDecl, ClassDeclOps {
 
             if (this.type().isLocal()) {
                 // a local class name cannot be redeclared within the same
-                // method, constructor or initializer, and within its scope                
+                // method, constructor or initializer, and within its scope
                 Context ctxt = tc.context();
 
                 if (ctxt.isLocal(this.name.id())) {
                     // something with the same name was declared locally.
-                    // (but not in an enclosing class)                                    
-                    Named nm = ctxt.find(this.name.id());
-                    if (nm instanceof Type) {
-                        Type another = (Type) nm;
-                        if (another.isClass() && another.toClass().isLocal()) {
-                            throw new SemanticException("Cannot declare local "
-                                                                + "class \""
-                                                                + this.type
-                                                                + "\" within the same "
-                                                                + "method, constructor or initializer as another "
-                                                                + "local class of the same name.",
-                                                        position());
+                    // (but not in an enclosing class)
+                    try {
+                        Named nm = ctxt.find(this.name.id());
+                        if (nm instanceof Type) {
+                            Type another = (Type) nm;
+                            if (another.isClass()
+                                    && another.toClass().isLocal()) {
+                                throw new SemanticException("Cannot declare local "
+                                                                    + "class \""
+                                                                    + this.type
+                                                                    + "\" within the same "
+                                                                    + "method, constructor or initializer as another "
+                                                                    + "local class of the same name.",
+                                                            position());
+                            }
                         }
+                    }
+                    catch (NoClassException e) {
                     }
                 }
             }

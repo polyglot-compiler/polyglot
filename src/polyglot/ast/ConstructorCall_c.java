@@ -383,7 +383,7 @@ public class ConstructorCall_c extends Stmt_c implements ConstructorCall,
     @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
         if (qualifier != null) {
-            print(qualifier, w, tr);
+            printSubExpr(qualifier, w, tr);
             w.write(".");
         }
 
@@ -459,4 +459,14 @@ public class ConstructorCall_c extends Stmt_c implements ConstructorCall,
                                   this.arguments);
     }
 
+    protected void printSubExpr(Expr expr, CodeWriter w, PrettyPrinter pp) {
+        if (Precedence.LITERAL.isTighter(expr.precedence())) {
+            w.write("(");
+            printBlock(expr, w, pp);
+            w.write(")");
+        }
+        else {
+            print(expr, w, pp);
+        }
+    }
 }

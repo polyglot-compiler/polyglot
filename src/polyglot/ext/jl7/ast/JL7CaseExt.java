@@ -42,7 +42,7 @@ public class JL7CaseExt extends JL7Ext implements JL5CaseOps {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
     @Override
-    public Node resolveCaseLabel(TypeChecker tc, Type switchType)
+    public Case resolveCaseLabel(TypeChecker tc, Type switchType)
             throws SemanticException {
         JL5TypeSystem ts = (JL5TypeSystem) tc.typeSystem();
 
