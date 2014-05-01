@@ -406,8 +406,9 @@ public class ClassDecl_c extends Term_c implements ClassDecl, ClassDeclOps {
             this.type.superType(t);
         }
         else if (this.type.equals(ts.Object())
-                || this.type.fullName().equals(ts.Object().fullName())) {
-            // the type is the same as ts.Object(), so it has no superclass.
+                || this.type.fullName().equals(ts.Object().fullName())
+                || this.flags.isInterface()) {
+            // the type is an interface or ts.Object(), so it has no superclass.
             if (Report.should_report(Report.types, 3))
                 Report.report(3, "setting superclass of " + this.type + " to "
                         + null);

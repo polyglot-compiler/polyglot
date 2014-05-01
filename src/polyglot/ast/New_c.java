@@ -810,7 +810,7 @@ public class New_c extends Expr_c implements New, NewOps {
         }
         else {
             if (!arguments.isEmpty()) {
-                v.visitCFG(objectType, listChild(arguments, (Expr) null), ENTRY);
+                v.visitCFG(objectType, listChild(arguments, null), ENTRY);
                 v.visitCFGList(arguments, this, EXIT);
             }
             else {

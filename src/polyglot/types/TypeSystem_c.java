@@ -752,6 +752,10 @@ public class TypeSystem_c implements TypeSystem {
         }
 
         if (currClass != null) {
+            if (!typeEquals(fi.container(), container)
+                    && !isInherited(fi, container.toClass()))
+                throw new NoMemberException(NoMemberException.FIELD, "The "
+                        + fi + " is not visible in class " + container + ".");
             if (!isAccessible(fi, container, currClass)) {
                 throw new SemanticException("Cannot access " + fi + ".");
             }
@@ -772,7 +776,10 @@ public class TypeSystem_c implements TypeSystem {
                 containerPackage = mi.container().toClass().package_();
             }
 
-            if (ct.package_().equals(containerPackage)) {
+            Package package_ = ct.package_();
+            if (package_ == null
+                    ? package_ == containerPackage
+                    : package_.equals(containerPackage)) {
                 // ct and the container are in the same package.
                 return true;
             }
@@ -785,8 +792,7 @@ public class TypeSystem_c implements TypeSystem {
     @Override
     public FieldInstance findField(ReferenceType container, String name)
             throws SemanticException {
-
-        return findField(container, name, (ClassType) null);
+        return findField(container, name, container.toClass());
     }
 
     /**
@@ -949,7 +955,9 @@ public class TypeSystem_c implements TypeSystem {
             }
 
             for (MethodInstance mi : type.toReference().methodsNamed(name)) {
-                if (isAccessible(mi, container, currClass)) {
+                if ((typeEquals(mi.container(), container) || isInherited(mi,
+                                                                          container.toClass()))
+                        && isAccessible(mi, container, currClass)) {
                     return true;
                 }
             }
@@ -1070,7 +1078,7 @@ public class TypeSystem_c implements TypeSystem {
     protected <Instance extends ProcedureInstance> Collection<Instance> findMostSpecificProcedures(
             List<Instance> acceptable) throws SemanticException {
 
-        // now, use JLS 15.11.2.2
+        // now, use JLS 15.12.2.2
         // First sort from most- to least-specific.
         MostSpecificComparator<Instance> msc = new MostSpecificComparator<>();
         acceptable = new ArrayList<>(acceptable); // make into array list to sort
@@ -1220,13 +1228,15 @@ public class TypeSystem_c implements TypeSystem {
                 }
 
                 if (methodCallValid(mi, name, argTypes)) {
-                    if (isAccessible(mi, container, currClass)) {
+                    if ((typeEquals(mi.container(), container) || isInherited(mi,
+                                                                              container.toClass()))
+                            && isAccessible(mi, container, currClass)) {
                         if (Report.should_report(Report.types, 3)) {
                             Report.report(3, "->acceptable: " + mi + " in "
                                     + mi.container());
                         }
 
-                        // Check that we it isn't overridden by something 
+                        // Check that mi isn't overridden by something 
                         // already accepted
                         if (!overridden.contains(mi)) {
                             // mi isn't overridden by something already in acceptable

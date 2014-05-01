@@ -40,7 +40,7 @@ import polyglot.types.FieldInstance;
 import polyglot.types.SemanticException;
 import polyglot.types.TypeSystem;
 
-/** Visitor which ensures that field intializers and initializers do not
+/** Visitor which ensures that field initializers and initializers do not
  * make illegal forward references to fields.
  *  This is an implementation of the rules of the Java Language Spec, 2nd
  * Edition, Section 8.3.2.3 
@@ -79,7 +79,7 @@ public class FwdReferenceChecker extends ContextVisitor {
         }
         else if (n instanceof Field) {
             if (fieldAssignLHS == n) {
-                // the field is on  the left hand side of an assignment.
+                // the field is on the left hand side of an assignment.
                 // we can ignore it
                 fieldAssignLHS = null;
             }
