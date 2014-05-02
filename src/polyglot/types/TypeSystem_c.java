@@ -2363,7 +2363,7 @@ public class TypeSystem_c implements TypeSystem {
                                 + mi.signature() + ", which is declared in "
                                 + rt.toClass().fullName(), ct.position());
                     }
-                    else if (ct != mi.container()) {
+                    else if (isInherited(mi, ct)) {
                         String signature = mi.signature();
                         if (signatureMap.containsKey(signature)) {
                             // no implementation, so ct inherits mi.
