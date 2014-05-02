@@ -26,8 +26,10 @@
 
 package polyglot.types;
 
-import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import polyglot.frontend.Job;
 import polyglot.main.Options;
@@ -218,7 +220,7 @@ public abstract class ClassType_c extends ReferenceType_c implements ClassType {
 
     @Override
     public List<? extends MemberInstance> members() {
-        List<MemberInstance> l = new ArrayList<>();
+        List<MemberInstance> l = new LinkedList<>();
         l.addAll(methods());
         l.addAll(fields());
         l.addAll(constructors());
@@ -344,7 +346,7 @@ public abstract class ClassType_c extends ReferenceType_c implements ClassType {
         if (!fromInterface) {
             // From is not an interface.
             if (!toInterface) {
-                // Nether from nor to is an interface.
+                // Neither from nor to is an interface.
                 return ts.isSubtype(this, toType) || ts.isSubtype(toType, this);
             }
 
@@ -369,6 +371,26 @@ public abstract class ClassType_c extends ReferenceType_c implements ClassType {
             }
 
             // To and From are both interfaces.
+            // If To and From contain methods with the same signature but
+            // different return types, then a compile-time error occurs.
+            Map<String, MethodInstance> signatureMap = new HashMap<>();
+            List<ReferenceType> typeList = new LinkedList<>();
+            typeList.add(this);
+            typeList.add(toType.toClass());
+            while (!typeList.isEmpty()) {
+                ReferenceType type = typeList.remove(0);
+                for (MethodInstance mi : type.methods()) {
+                    String signature = mi.signature();
+                    if (signatureMap.containsKey(signature)) {
+                        MethodInstance mj = signatureMap.get(signature);
+                        if (!ts.typeEquals(mi.returnType(), mj.returnType())) {
+                            return false;
+                        }
+                    }
+                    else signatureMap.put(signature, mi);
+                }
+                typeList.addAll(type.interfaces());
+            }
             return true;
         }
     }

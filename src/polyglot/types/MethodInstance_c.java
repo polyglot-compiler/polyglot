@@ -251,8 +251,7 @@ public class MethodInstance_c extends ProcedureInstance_c implements
             }
 
             rt = sup;
-        }
-        ;
+        };
 
         return l;
     }
@@ -285,12 +284,12 @@ public class MethodInstance_c extends ProcedureInstance_c implements
             if (quiet) return false;
             throw new SemanticException(mi.signature() + " in "
                     + mi.container() + " cannot override " + mj.signature()
-                    + " in " + mj.container() + "; incompatible "
-                    + "parameter types", mi.position());
+                    + " in " + mj.container()
+                    + "; incompatible parameter types", mi.position());
         }
 
-        // HACK: Java5 allows return types to be covariant.  We'll allow covariant
-        // return if mj is defined in a class file.
+        // XXX HACK: Java5 allows return types to be covariant.  We'll allow
+        // covariant return if mj is defined in a class file.
         boolean allowCovariantReturn = false;
 
         if (mj.container() instanceof ParsedClassType) {
@@ -316,7 +315,7 @@ public class MethodInstance_c extends ProcedureInstance_c implements
             throw new SemanticException(mi.signature() + " in "
                     + mi.container() + " cannot override " + mj.signature()
                     + " in " + mj.container()
-                    + "; attempting to use incompatible " + "return type\n"
+                    + "; attempting to use incompatible return type\n"
                     + "found: " + mi.returnType() + "\n" + "required: "
                     + mj.returnType(), mi.position());
         }
@@ -327,19 +326,12 @@ public class MethodInstance_c extends ProcedureInstance_c implements
                               mi.throwTypes() + " not subset of "
                                       + mj.throwTypes());
             if (quiet) return false;
-            throw new SemanticException(mi.signature()
-                                                + " in "
-                                                + mi.container()
-                                                + " cannot override "
-                                                + mj.signature()
-                                                + " in "
-                                                + mj.container()
-                                                + "; the throw set "
-                                                + mi.throwTypes()
-                                                + " is not a subset of the "
-                                                + "overridden method's throw set "
-                                                + mj.throwTypes() + ".",
-                                        mi.position());
+            throw new SemanticException(mi.signature() + " in "
+                    + mi.container() + " cannot override " + mj.signature()
+                    + " in " + mj.container() + "; the throw set "
+                    + mi.throwTypes()
+                    + " is not a subset of the overridden method's throw set "
+                    + mj.throwTypes() + ".", mi.position());
         }
 
         if (mi.flags().moreRestrictiveThan(mj.flags())) {
@@ -355,8 +347,7 @@ public class MethodInstance_c extends ProcedureInstance_c implements
                                                 + mj.signature()
                                                 + " in "
                                                 + mj.container()
-                                                + "; attempting to assign weaker "
-                                                + "access privileges",
+                                                + "; attempting to assign weaker access privileges",
                                         mi.position());
         }
 
@@ -376,7 +367,7 @@ public class MethodInstance_c extends ProcedureInstance_c implements
                                                 + mj.container()
                                                 + "; overridden method is "
                                                 + (mj.flags().isStatic()
-                                                        ? "" : "not")
+                                                        ? "" : "not ")
                                                 + "static", mi.position());
         }
 
@@ -415,7 +406,8 @@ public class MethodInstance_c extends ProcedureInstance_c implements
 
         Type superType = rt.superType();
         if (superType != null) {
-            l.addAll(implementedImpl(superType.toReference()));
+            for (MethodInstance mi : implementedImpl(superType.toReference()))
+                if (ts.isInherited(mi, rt.toClass())) l.add(mi);
         }
 
         List<? extends ReferenceType> ints = rt.interfaces();

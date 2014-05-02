@@ -45,6 +45,7 @@ import polyglot.frontend.Source;
 import polyglot.main.Report;
 import polyglot.types.reflect.ClassFile;
 import polyglot.types.reflect.ClassFileLazyClassInitializer;
+import polyglot.util.Copy;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
 import polyglot.util.StringUtil;
@@ -1113,8 +1114,10 @@ public class TypeSystem_c implements TypeSystem {
             }
             else if (notAbstract.size() == 0) {
                 // all are abstract; if all signatures match, any will do.
+                List<Type> throwTypes = new LinkedList<>();
                 Iterator<Instance> j = maximal.iterator();
                 first = j.next();
+                throwTypes.addAll(first.throwTypes());
                 while (j.hasNext()) {
                     Instance p = j.next();
 
@@ -1134,9 +1137,18 @@ public class TypeSystem_c implements TypeSystem {
                         // not all signatures match; must be ambiguous
                         return maximal;
                     }
+
+                    throwTypes.retainAll(p.throwTypes());
                 }
 
                 // all signatures match, just take the first
+                // However, the most specific method is considered to throw a
+                // checked exception iff that exception is declared in the
+                // throws clauses of each of the maximally specific methods.
+                if (!first.throwTypes().equals(throwTypes)) {
+                    first = Copy.Util.copy(first);
+                    first.setThrowTypes(throwTypes);
+                }
                 maximal = Collections.singletonList(first);
             }
         }
@@ -2321,15 +2333,14 @@ public class TypeSystem_c implements TypeSystem {
 
     @Override
     public void checkClassConformance(ClassType ct) throws SemanticException {
-        if (ct.flags().isAbstract()) {
-            // don't need to check interfaces or abstract classes           
-            return;
-        }
-
         // build up a list of superclasses and interfaces that ct 
         // extends/implements that may contain abstract methods that 
-        // ct must define.
+        // ct inherits or must define.
         List<ReferenceType> superInterfaces = abstractSuperInterfaces(ct);
+
+        // map used to determine incompatible return types of inherited methods
+        // of same signature
+        Map<String, MethodInstance> signatureMap = new HashMap<>();
 
         // check each abstract method of the classes and interfaces in
         // superInterfaces
@@ -2350,8 +2361,23 @@ public class TypeSystem_c implements TypeSystem {
                                 + mi.signature() + ", which is declared in "
                                 + rt.toClass().fullName(), ct.position());
                     }
-                    else {
-                        // no implementation, but that's ok, the class is abstract.
+                    else if (ct != mi.container()) {
+                        String signature = mi.signature();
+                        if (signatureMap.containsKey(signature)) {
+                            // no implementation, so ct inherits mi.
+                            // Check that the return type of inherited methods
+                            // are consistent.  See JLS 2nd Ed. | 8.4.6.4.
+                            mj = signatureMap.get(signature);
+                            if (!typeEquals(mi.returnType(), mj.returnType())) {
+                                throw new SemanticException("Types "
+                                        + mj.container() + " and "
+                                        + mi.container()
+                                        + " are incompatible; both define "
+                                        + signature
+                                        + ", but with unrelated return types.");
+                            }
+                        }
+                        else signatureMap.put(signature, mi);
                     }
                 }
                 else if (!equals(ct, mj.container())
@@ -2403,25 +2429,25 @@ public class TypeSystem_c implements TypeSystem {
             List<? extends MethodInstance> possible =
                     curr.methods(mi.name(), mi.formalTypes());
             for (MethodInstance mj : possible) {
-                if (!mj.flags().isAbstract()
-                        && ((isAccessible(mi, ct) && isAccessible(mj, ct)) || isAccessible(mi,
-                                                                                           mj.container()
-                                                                                             .toClass()))) {
-                    // The method mj may be a suitable implementation of mi.
-                    // mj is not abstract, and either mj's container 
-                    // can access mi (thus mj can really override mi), or
-                    // mi and mj are both accessible from ct (e.g.,
-                    // mi is declared in an interface that ct implements,
-                    // and mj is defined in a superclass of ct).
-                    return mj;
+                if (isAccessible(mi, ct) && isAccessible(mj, ct)
+                        || isAccessible(mi, mj.container().toClass())) {
+                    if (!mj.flags().isAbstract()) {
+                        // The method mj may be a suitable implementation of mi.
+                        // mj is not abstract, and either mj's container 
+                        // can access mi (thus mj can really override mi), or
+                        // mi and mj are both accessible from ct (e.g.,
+                        // mi is declared in an interface that ct implements,
+                        // and mj is defined in a superclass of ct).
+                        return mj;
+                    }
+                    else if (curr == ct || curr == mi.container()) {
+                        // we've reached the definition of the abstract 
+                        // method. We don't want to look higher in the 
+                        // hierarchy; this is not an optimization, but is 
+                        // required for correctness. 
+                        return null;
+                    }
                 }
-            }
-            if (curr == mi.container()) {
-                // we've reached the definition of the abstract 
-                // method. We don't want to look higher in the 
-                // hierarchy; this is not an optimization, but is 
-                // required for correctness. 
-                break;
             }
 
             curr =

@@ -127,7 +127,7 @@ public class Instanceof_c extends Expr_c implements Instanceof {
 
         if (!ts.isCastValid(expr.type(), compareType.type())) {
             throw new SemanticException("Expression operand type "
-                    + expr.type() + " incompatible with type operand "
+                    + expr.type() + " is incompatible with type operand "
                     + compareType.type() + ".", expr.position());
         }
 

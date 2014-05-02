@@ -26,6 +26,7 @@
 
 package polyglot.ast;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -42,6 +43,7 @@ import polyglot.types.ConstructorInstance;
 import polyglot.types.Context;
 import polyglot.types.Flags;
 import polyglot.types.MemberInstance;
+import polyglot.types.MethodInstance;
 import polyglot.types.Named;
 import polyglot.types.NoClassException;
 import polyglot.types.ParsedClassType;
@@ -77,6 +79,7 @@ public class ClassDecl_c extends Term_c implements ClassDecl, ClassDeclOps {
     protected List<TypeNode> interfaces;
     protected ClassBody body;
     protected ConstructorInstance defaultCI;
+    protected boolean implicitMembersAdded;
 
     protected ParsedClassType type;
 
@@ -286,6 +289,7 @@ public class ClassDecl_c extends Term_c implements ClassDecl, ClassDeclOps {
 
         ClassDecl_c n = this;
 
+        // TODO remove if this is not needed
         if (n.defaultCI != ci) {
             n = Copy.Util.copy(n);
             n.defaultCI = ci;
@@ -317,9 +321,10 @@ public class ClassDecl_c extends Term_c implements ClassDecl, ClassDeclOps {
         if (type == null) {
             throw new InternalCompilerError("Missing type.", position());
         }
+        TypeSystem ts = ar.typeSystem();
 
         ClassDecl_c n = disambiguateSupertypes(ar);
-        checkSupertypeCycles(ar.typeSystem());
+        checkSupertypeCycles(ts);
 
         ParsedClassType type = n.type();
 
@@ -333,8 +338,64 @@ public class ClassDecl_c extends Term_c implements ClassDecl, ClassDeclOps {
         Context ctxt = ar.context();
         type.inStaticContext(ctxt.inStaticContext());
 
+        if (!implicitMembersAdded && flags.isInterface()
+                && interfaces.isEmpty()) {
+            // See JLS 2nd Ed. | 9.2.
+            // If an interface has no direct superinterfaces, then the interface
+            // implicitly declares a public abstract member method corresponding
+            // to each public instance method declared in Object, unless a
+            // method with the same signature, same return type, and a
+            // compatible throws clause is explicitly declared by the interface.
+            List<? extends MethodInstance> objectMethods =
+                    ts.Object().methods();
+            List<MethodInstance> implicitlyDeclaredMethods =
+                    new ArrayList<>(objectMethods.size());
+            for (MethodInstance mi : objectMethods) {
+                Flags flags = mi.flags();
+                if (!flags.isPublic()) continue;
+                boolean methodNeeded = false;
+                List<? extends MethodInstance> mjs =
+                        type.methods(mi.name(), mi.formalTypes());
+                if (mjs.isEmpty())
+                    methodNeeded = true;
+                else {
+                    for (MethodInstance mj : mjs) {
+                        // It follows that it is a compile-time error if the
+                        // interface declares a method with the same signature
+                        // and different return types or incompatible throws
+                        // clause.
+                        if (!ts.typeEquals(mi.returnType(), mj.returnType())) {
+                            throw new SemanticException("Method "
+                                    + mj.signature() + " in " + type
+                                    + " cannot override " + mi.signature()
+                                    + " in " + mi.container()
+                                    + "; return type " + mj.returnType()
+                                    + " is not compatible with "
+                                    + mi.returnType(), mj.position());
+                        }
+                        if (!mj.throwsSubset(mi)) {
+                            throw new SemanticException("Method "
+                                    + mj.signature() + " in " + type
+                                    + " cannot override " + mi.signature()
+                                    + " in " + mi.container()
+                                    + "; throws clause " + mj.throwTypes()
+                                    + " is not compatible with "
+                                    + mi.throwTypes(), mj.position());
+                        }
+                    }
+                }
+                if (methodNeeded)
+                    implicitlyDeclaredMethods.add(mi.container(type)
+                                                    .flags(flags.Abstract()
+                                                                .clearFinal()));
+            }
+            for (MethodInstance mi : implicitlyDeclaredMethods)
+                type.addMethod(mi);
+            implicitMembersAdded = true;
+        }
+
         // FIXME: shouldn't reach MembersAdded(type) until here!
-        return addDefaultConstructorIfNeeded(ar.typeSystem(), ar.nodeFactory());
+        return addDefaultConstructorIfNeeded(ts, ar.nodeFactory());
     }
 
     protected ClassDecl_c disambiguateSupertypes(AmbiguityRemover ar)

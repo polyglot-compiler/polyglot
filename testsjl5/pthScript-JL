@@ -19,6 +19,9 @@ polyglot.ext.jl5.JL5ExtensionInfo ["../tests/"] "-sx jl -d out -classpath java-o
         Call02.jl (Semantic, "does not have an enclosing instance");
         Call03.jl (Semantic, "Method .* inaccessible");
         Call04.jl;
+        Call05.jl;
+        Call06.jl;
+        Cast01.jl (Semantic, "Cannot cast");
         ClassDecl01.jl
           (Semantic, "abstract and final"),
           (Semantic, "abstract and final"),
@@ -61,6 +64,7 @@ polyglot.ext.jl5.JL5ExtensionInfo ["../tests/"] "-sx jl -d out -classpath java-o
         Empty.jl ;
         Equality.jl ;
         Equality2.jl ;
+        Equality03.jl (Semantic, "must have operands of similar type");
         ExcTest.jl ;
         Except.jl ; Except2.jl ; Except3.jl ; Except4.jl ;
         Except5.jl ;
@@ -90,6 +94,8 @@ polyglot.ext.jl5.JL5ExtensionInfo ["../tests/"] "-sx jl -d out -classpath java-o
         Increment.jl ;
         Infinite.jl ;
         Inherit.jl (Semantic);
+        Inherit02.jl (Semantic, "unrelated return types");
+        Inherit03.jl (Semantic, "weaker access privileges");
         InheritClass.jl ;
         Init1.jl ; Init2.jl ; Init3.jl ; Init4.jl ; Init5.jl ;
         Init6.jl ;
@@ -127,6 +133,7 @@ polyglot.ext.jl5.JL5ExtensionInfo ["../tests/"] "-sx jl -d out -classpath java-o
         InnerSuperConstructor6.jl;
         InnerSuperConstructor7.jl (Semantic, ".*an enclosing instance .* must be specified");
         InnerSuperConstructor8.jl;
+        Instanceof01.jl (Semantic, "incompatible with type operand");
         InterfaceOverride.jl ;
         Label01.jl (Semantic, "Label .* already in use");
         LabeledBreak.jl ;
@@ -177,6 +184,9 @@ polyglot.ext.jl5.JL5ExtensionInfo ["../tests/"] "-sx jl -d out -classpath java-o
         MethodDecl01.jl (Semantic, "native and strictfp");
         MethodDecl02.jl;
         MethodDecl03.jl;
+        MethodDecl04.jl;
+        MethodDecl05.jl (Semantic, "return type .* not compatible");
+        MethodDecl06.jl (Semantic, "throws clause .* not compatible");
         Narrowing.jl ;
         # Output.jl ;
         Prim.jl ;
