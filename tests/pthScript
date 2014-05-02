@@ -48,6 +48,7 @@ polyglot.frontend.JLExtensionInfo "-d out -cp ." {
         Call04.jl;
         Call05.jl;
         Call06.jl;
+        Call07.jl;
         Cast01.jl (Semantic, "Cannot cast");
         ClassDecl01.jl
           (Semantic, "abstract and final"),
@@ -116,8 +117,9 @@ polyglot.frontend.JLExtensionInfo "-d out -cp ." {
         ForInit.jl ;
         ForwardRef.jl ; ForwardRef2.jl ; ForwardRef3.jl ;
         Import.jl ;
-        Import02.jl (Semantic, "import .* conflicts with a type");
+        Import02.jl (Semantic, "import .* conflicts with type .* defined in the same file");
         Import03.jl (Semantic, "already defined in a single-type import");
+        Import04.jl;
         Increment.jl ;
         Infinite.jl ;
         Inherit.jl (Semantic);
@@ -150,6 +152,7 @@ polyglot.frontend.JLExtensionInfo "-d out -cp ." {
         Inner16.jl
           (Semantic, "Constructor .* inaccessible"),
           (Semantic, "Constructor .* inaccessible");
+        Inner17.jl (Semantic, "Member class .* not visible");
         InnerBen.jl ;
         InnerFormalSuper.jl (Syntax);
         InnerSuperConstructor1.jl;
@@ -207,13 +210,15 @@ polyglot.frontend.JLExtensionInfo "-d out -cp ." {
         LocalInners2.jl ;
         LocalInit.jl ;
         LongString01.jl;
+        MemberClass01.jl (Semantic, "Member class .* not visible");
        MemberClassFlags.jl ;
         MethodDecl01.jl (Semantic, "native and strictfp");
         MethodDecl02.jl;
         MethodDecl03.jl;
         MethodDecl04.jl;
-        MethodDecl05.jl (Semantic, "return type .* not compatible");
-        MethodDecl06.jl (Semantic, "throws clause .* not compatible");
+        MethodDecl05.jl (Semantic, "incompatible return type");
+        MethodDecl06.jl (Semantic, "throw set .* not a subset of the overridden method");
+        MethodDecl07.jl (Semantic, "overridden method is final");
         Narrowing.jl ;
         # Output.jl ;
         Prim.jl ;

@@ -73,6 +73,8 @@ public class ClassContextResolver extends AbstractAccessControlResolver {
                     + name);
         }
 
+        if (accessor == null) accessor = type;
+
         // Check if the name is for a member class.
         ClassType mt = null;
 
@@ -115,6 +117,71 @@ public class ClassContextResolver extends AbstractAccessControlResolver {
             }
         }
 
+        if (m == null) {
+            // Collect all members of the super types.
+            // Use a Set to eliminate duplicates.
+            Set<Named> acceptable = new HashSet<>();
+            SemanticException error = null;
+
+            if (type.superType() != null) {
+                Type sup = type.superType();
+                if (sup instanceof ClassType) {
+                    Resolver r =
+                            ts.classContextResolver((ClassType) sup, accessor);
+                    try {
+                        Named n = r.find(name);
+                        acceptable.add(n);
+                    }
+                    catch (SemanticException e) {
+                        if (error == null) error = e;
+                    }
+                }
+            }
+
+            for (Type sup : type.interfaces()) {
+                if (sup instanceof ClassType) {
+                    Resolver r =
+                            ts.classContextResolver((ClassType) sup, accessor);
+                    try {
+                        Named n = r.find(name);
+                        acceptable.add(n);
+                    }
+                    catch (SemanticException e) {
+                        if (error == null) error = e;
+                    }
+                }
+            }
+
+            if (acceptable.size() == 0) {
+                throw error == null ? new NoClassException(name, type) : error;
+            }
+            else if (acceptable.size() > 1) {
+                Set<ReferenceType> containers =
+                        new HashSet<>(acceptable.size());
+                for (Named n : acceptable) {
+                    if (n instanceof MemberInstance) {
+                        MemberInstance mi = (MemberInstance) n;
+                        containers.add(mi.container());
+                    }
+                }
+
+                if (containers.size() == 2) {
+                    Iterator<ReferenceType> i = containers.iterator();
+                    Type t1 = i.next();
+                    Type t2 = i.next();
+                    throw new SemanticException("Member \"" + name + "\" of "
+                            + type + " is ambiguous; it is defined in both "
+                            + t1 + " and " + t2 + ".");
+                }
+                else {
+                    throw new SemanticException("Member \"" + name + "\" of "
+                            + type + " is ambiguous; it is defined in "
+                            + containers + ".");
+                }
+            }
+            m = acceptable.iterator().next();
+        }
+
         if (m instanceof ClassType) {
             mt = (ClassType) m;
 
@@ -122,11 +189,6 @@ public class ClassContextResolver extends AbstractAccessControlResolver {
                 throw new SemanticException("Class " + mt
                         + " is not a member class, " + " but was found in "
                         + type + ".");
-            }
-
-            if (mt.outer().declaration() != type.declaration()) {
-                throw new SemanticException("Class " + mt
-                        + " is not a member class " + " of " + type + ".");
             }
 
             if (!canAccess(mt, accessor)) {
@@ -137,74 +199,18 @@ public class ClassContextResolver extends AbstractAccessControlResolver {
             return mt;
         }
 
-        // Collect all members of the super types.
-        // Use a Set to eliminate duplicates.
-        Set<Named> acceptable = new HashSet<>();
-
-        if (type.superType() != null) {
-            Type sup = type.superType();
-            if (sup instanceof ClassType) {
-                Resolver r = ts.classContextResolver((ClassType) sup, accessor);
-                try {
-                    Named n = r.find(name);
-                    acceptable.add(n);
-                }
-                catch (SemanticException e) {
-                }
-            }
-        }
-
-        for (Type sup : type.interfaces()) {
-            if (sup instanceof ClassType) {
-                Resolver r = ts.classContextResolver((ClassType) sup, accessor);
-                try {
-                    Named n = r.find(name);
-                    acceptable.add(n);
-                }
-                catch (SemanticException e) {
-                }
-            }
-        }
-
-        if (acceptable.size() == 0) {
-            throw new NoClassException(name, type);
-        }
-        else if (acceptable.size() > 1) {
-            Set<ReferenceType> containers = new HashSet<>(acceptable.size());
-            for (Named n : acceptable) {
-                if (n instanceof MemberInstance) {
-                    MemberInstance mi = (MemberInstance) n;
-                    containers.add(mi.container());
-                }
-            }
-
-            if (containers.size() == 2) {
-                Iterator<ReferenceType> i = containers.iterator();
-                Type t1 = i.next();
-                Type t2 = i.next();
-                throw new SemanticException("Member \"" + name + "\" of "
-                        + type + " is ambiguous; it is defined in both " + t1
-                        + " and " + t2 + ".");
-            }
-            else {
-                throw new SemanticException("Member \"" + name + "\" of "
-                        + type + " is ambiguous; it is defined in "
-                        + containers + ".");
-            }
-        }
-
-        Named t = acceptable.iterator().next();
-
         if (Report.should_report(TOPICS, 2))
-            Report.report(2, "Found member class " + t);
+            Report.report(2, "Found member class " + m);
 
-        return t;
+        return m;
     }
 
     protected boolean canAccess(Named n, ClassType accessor) {
         if (n instanceof MemberInstance) {
             return accessor == null
-                    || ts.isAccessible((MemberInstance) n, accessor);
+                    || ts.isAccessible((MemberInstance) n,
+                                       ((MemberInstance) n).container(),
+                                       accessor);
         }
         return true;
     }

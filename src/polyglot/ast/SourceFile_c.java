@@ -27,10 +27,8 @@
 package polyglot.ast;
 
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import polyglot.frontend.Source;
 import polyglot.translate.ExtensionRewriter;
@@ -213,18 +211,18 @@ public class SourceFile_c extends Node_c implements SourceFile {
 
     @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
-        Set<String> names = new HashSet<>();
+        Map<String, Named> declaredTypes = new HashMap<>();
         boolean hasPublic = false;
 
         for (TopLevelDecl d : decls) {
             String s = d.name();
 
-            if (names.contains(s)) {
+            if (declaredTypes.containsKey(s)) {
                 throw new SemanticException("Duplicate declaration: \"" + s
                         + "\".", d.position());
             }
 
-            names.add(s);
+            declaredTypes.put(s, ((ClassDecl) d).type());
 
             if (d.flags().isPublic()) {
                 if (hasPublic) {
@@ -267,11 +265,13 @@ public class SourceFile_c extends Node_c implements SourceFile {
             // declared in the current compilation unit except by a
             // type-import-on-demand declaration, then a compile-time-error
             // occurs.
-            if (names.contains(name)) {
-                throw new SemanticException("The import "
-                                                    + s
-                                                    + " conflicts with a type defined in the same file.",
-                                            i.position());
+            if (declaredTypes.containsKey(name)) {
+                Named declaredType = declaredTypes.get(name);
+                if (!ts.equals(named, declaredType)) {
+                    throw new SemanticException("The import " + s
+                            + " conflicts with type " + declaredType
+                            + " defined in the same file.", i.position());
+                }
             }
 
         }

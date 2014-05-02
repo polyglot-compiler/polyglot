@@ -754,7 +754,7 @@ public class TypeSystem_c implements TypeSystem {
 
         if (currClass != null) {
             if (!typeEquals(fi.container(), container)
-                    && !isInherited(fi, container.toClass()))
+                    && !isInherited(fi, container.toReference()))
                 throw new NoMemberException(NoMemberException.FIELD, "The "
                         + fi + " is not visible in class " + container + ".");
             if (!isAccessible(fi, container, currClass)) {
@@ -766,23 +766,25 @@ public class TypeSystem_c implements TypeSystem {
     }
 
     @Override
-    public boolean isInherited(MemberInstance mi, ClassType ct) {
+    public boolean isInherited(MemberInstance mi, ReferenceType type) {
         if (mi.flags().isPrivate()) {
             // private members are never inherited.
             return false;
         }
-        if (ct.descendsFrom(mi.container())) {
+        if (type.descendsFrom(mi.container())) {
             Package containerPackage = null;
             if (mi.container().isClass()) {
                 containerPackage = mi.container().toClass().package_();
             }
 
-            Package package_ = ct.package_();
-            if (package_ == null
-                    ? package_ == containerPackage
-                    : package_.equals(containerPackage)) {
-                // ct and the container are in the same package.
-                return true;
+            if (type.isClass()) {
+                Package package_ = type.toClass().package_();
+                if (package_ == null
+                        ? package_ == containerPackage
+                        : package_.equals(containerPackage)) {
+                    // ct and the container are in the same package.
+                    return true;
+                }
             }
             // ct and the container are in different packages.
             return mi.flags().isProtected() || mi.flags().isPublic();
@@ -957,7 +959,7 @@ public class TypeSystem_c implements TypeSystem {
 
             for (MethodInstance mi : type.toReference().methodsNamed(name)) {
                 if ((typeEquals(mi.container(), container) || isInherited(mi,
-                                                                          container.toClass()))
+                                                                          container.toReference()))
                         && isAccessible(mi, container, currClass)) {
                     return true;
                 }
@@ -1241,7 +1243,7 @@ public class TypeSystem_c implements TypeSystem {
 
                 if (methodCallValid(mi, name, argTypes)) {
                     if ((typeEquals(mi.container(), container) || isInherited(mi,
-                                                                              container.toClass()))
+                                                                              container.toReference()))
                             && isAccessible(mi, container, currClass)) {
                         if (Report.should_report(Report.types, 3)) {
                             Report.report(3, "->acceptable: " + mi + " in "
@@ -2368,7 +2370,7 @@ public class TypeSystem_c implements TypeSystem {
                             // Check that the return type of inherited methods
                             // are consistent.  See JLS 2nd Ed. | 8.4.6.4.
                             mj = signatureMap.get(signature);
-                            if (!typeEquals(mi.returnType(), mj.returnType())) {
+                            if (!returnTypesConsistent(mi, mj)) {
                                 throw new SemanticException("Types "
                                         + mj.container() + " and "
                                         + mi.container()
@@ -2402,6 +2404,10 @@ public class TypeSystem_c implements TypeSystem {
                 }
             }
         }
+    }
+
+    protected boolean returnTypesConsistent(MethodInstance mi, MethodInstance mj) {
+        return typeEquals(mi.returnType(), mj.returnType());
     }
 
     @Override

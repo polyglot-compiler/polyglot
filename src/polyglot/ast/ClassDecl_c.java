@@ -364,24 +364,7 @@ public class ClassDecl_c extends Term_c implements ClassDecl, ClassDeclOps {
                         // interface declares a method with the same signature
                         // and different return types or incompatible throws
                         // clause.
-                        if (!ts.typeEquals(mi.returnType(), mj.returnType())) {
-                            throw new SemanticException("Method "
-                                    + mj.signature() + " in " + type
-                                    + " cannot override " + mi.signature()
-                                    + " in " + mi.container()
-                                    + "; return type " + mj.returnType()
-                                    + " is not compatible with "
-                                    + mi.returnType(), mj.position());
-                        }
-                        if (!mj.throwsSubset(mi)) {
-                            throw new SemanticException("Method "
-                                    + mj.signature() + " in " + type
-                                    + " cannot override " + mi.signature()
-                                    + " in " + mi.container()
-                                    + "; throws clause " + mj.throwTypes()
-                                    + " is not compatible with "
-                                    + mi.throwTypes(), mj.position());
-                        }
+                        ts.checkOverride(mj, mi);
                     }
                 }
                 if (methodNeeded)

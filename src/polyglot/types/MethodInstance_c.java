@@ -407,7 +407,7 @@ public class MethodInstance_c extends ProcedureInstance_c implements
         Type superType = rt.superType();
         if (superType != null) {
             for (MethodInstance mi : implementedImpl(superType.toReference()))
-                if (ts.isInherited(mi, rt.toClass())) l.add(mi);
+                if (ts.isInherited(mi, rt.toReference())) l.add(mi);
         }
 
         List<? extends ReferenceType> ints = rt.interfaces();

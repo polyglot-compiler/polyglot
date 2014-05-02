@@ -2622,6 +2622,16 @@ public class JL5TypeSystem_c extends
     }
 
     @Override
+    protected boolean returnTypesConsistent(MethodInstance mi, MethodInstance mj) {
+        // See JLS 3rd Ed. | 8.4.8.4.
+        // One method must be return-type-substitutable for the other.
+        Type miRet = mi.returnType();
+        Type mjRet = mj.returnType();
+        return areReturnTypeSubstitutable(miRet, mjRet)
+                || areReturnTypeSubstitutable(mjRet, miRet);
+    }
+
+    @Override
     public Type Class(Position pos, ReferenceType type) {
         try {
             return this.instantiate(pos,
