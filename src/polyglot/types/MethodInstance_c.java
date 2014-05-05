@@ -411,7 +411,9 @@ public class MethodInstance_c extends ProcedureInstance_c implements
         // instances from rt's supertypes.  See JLS 2nd Ed. | 8.4.6.
         List<MethodInstance> l = new LinkedList<>();
         for (MethodInstance mi : implementedImplAux(rt)) {
-            if (ts.isAccessible(mi, mi.container(), rt, false)) l.add(mi);
+            if (!mi.flags().isPrivate()
+                    && ts.isAccessible(mi, mi.container(), rt, false))
+                l.add(mi);
         }
         return l;
     }

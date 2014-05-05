@@ -302,6 +302,19 @@ public class SystemResolver extends CachingResolver implements TopLevelResolver 
                 addNamed(containerName, p.prefix());
             }
         }
+
+        // A package may not contain two members of the same name, or a
+        // compile-time error results.  See JLS 2nd Ed. | 7.1.
+        if (q instanceof ClassType) {
+            ClassType ct = (ClassType) q;
+            Package p = ct.package_();
+            if (p != null && packageExists(name)) {
+                throw new SemanticException("Class \""
+                                                    + q
+                                                    + "\" clashes with package of the same name.",
+                                            q.position());
+            }
+        }
     }
 
     private static final Collection<String> TOPICS =

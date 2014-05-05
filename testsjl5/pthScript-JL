@@ -37,6 +37,7 @@ polyglot.ext.jl5.JL5ExtensionInfo ["../tests/"] "-sx jl -d out -classpath java-o
         ClassDecl04.jl;
         ClassDecl05.jl;
         ClassDecl06.jl (Semantic, "Cannot declare a top-level class with flag");
+        ClassDecl07.jl (Semantic, "clashes with package of the same name");
         ClassLit.jl ;
         Conditional1.jl ;
 	ConformanceCheck1.jl (Semantic, "cannot override.*attempting to assign weaker access");
@@ -104,6 +105,7 @@ polyglot.ext.jl5.JL5ExtensionInfo ["../tests/"] "-sx jl -d out -classpath java-o
         Import02.jl (Semantic, "import .* conflicts with type .* defined in the same file");
         Import03.jl (Semantic, "already defined in a single-type import");
         Import04.jl;
+        Import05a.jl Import05b.jl;
         Increment.jl ;
         Infinite.jl ;
         Inherit.jl (Semantic);
@@ -203,8 +205,9 @@ polyglot.ext.jl5.JL5ExtensionInfo ["../tests/"] "-sx jl -d out -classpath java-o
         MethodDecl04.jl;
         MethodDecl05.jl (Semantic, "incompatible return type");
         MethodDecl06.jl (Semantic, "throw set .* not a subset of the overridden method");
-        MethodDecl07.jl (Semantic, "hidden method is final");
-        MethodDecl08a.jl MethodDecl08b.jl (Semantic, "overridden method is not static");
+        MethodDecl07.jl (Semantic, "overridden method is final");
+        MethodDecl08a.jl MethodDecl08b.jl (Semantic, "hidden method is not static");
+        MethodDecl09.jl;
         Narrowing.jl ;
         New01a.jl New01b.jl;
         New02a.jl New02b.jl (Semantic, "Cannot instantiate an interface");

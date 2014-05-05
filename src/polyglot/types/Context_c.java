@@ -439,7 +439,7 @@ public class Context_c implements Context {
             // Find a type within the current compilation unit first.
             // If not found, try import tables.
             Named n = ts.systemResolver().check(name);
-            if (n != null) return n;
+            if (n instanceof Type) return n;
             return it.find(name);
         }
 

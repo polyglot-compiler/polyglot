@@ -267,14 +267,8 @@ public class MethodDecl_c extends ProcedureDecl_c implements MethodDecl {
     public void overrideMethodCheck(TypeChecker tc) throws SemanticException {
         TypeSystem ts = tc.typeSystem();
 
-        for (MethodInstance mj : mi.implemented()) {
-
-            if (!ts.isAccessible(mj, tc.context())) {
-                continue;
-            }
-
+        for (MethodInstance mj : mi.implemented())
             ts.checkOverride(mi, mj);
-        }
     }
 
     @Override
