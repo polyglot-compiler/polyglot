@@ -278,6 +278,9 @@ polyglot.frontend.JLExtensionInfo "-d out -cp ." {
         TypeAccess02a.jl TypeAccess02b.jl (Semantic, "Could not find type");
         TypeShadowing.jl ;
         xIterator.jl ;
+	CombRule1.jl; 
+	CombRule2.jl (Semantic); 
+	CombRule3.jl (Semantic); 
         FormalsDup.jl (Semantic, "multiply defined"), (Semantic, "multiply defined");
         AbstractSuperMethod.jl (Semantic, "Cannot call an abstract method of the super class");
         BadAbstract.jl (Semantic, "should be declared abstract");
