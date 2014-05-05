@@ -110,14 +110,13 @@ public class JL5ClassDeclExt extends JL5AnnotatedElementExt implements
         // check annotation circularity
         if (JL5Flags.isAnnotation(n.flags())) {
             JL5ParsedClassType ct = (JL5ParsedClassType) n.type();
+            ClassType annot = annoCheck.typeSystem().Annotation();
             for (AnnotationTypeElemInstance ai : ct.annotationElems()) {
-                if (ai.type() instanceof ClassType
-                        && ((ClassType) ((ClassType) ai.type()).superType()).fullName()
-                                                                            .equals("java.lang.annotation.Annotation")) {
-                    JL5ParsedClassType other = (JL5ParsedClassType) ai.type();
-                    for (Object element2 : other.annotationElems()) {
-                        AnnotationTypeElemInstance aj =
-                                (AnnotationTypeElemInstance) element2;
+                Type aiType = ai.type();
+                if (aiType.isClass()
+                        && aiType.toClass().interfaces().contains(annot)) {
+                    JL5ParsedClassType other = (JL5ParsedClassType) aiType;
+                    for (AnnotationTypeElemInstance aj : other.annotationElems()) {
                         if (aj.type().equals(ct)) {
                             throw new SemanticException("cyclic annotation element type",
                                                         aj.position());

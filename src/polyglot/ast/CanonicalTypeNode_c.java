@@ -62,6 +62,8 @@ public class CanonicalTypeNode_c extends TypeNode_c implements
     public Node typeCheck(TypeChecker tc) throws SemanticException {
         TypeSystem ts = tc.typeSystem();
 
+        Type type = this.type;
+        if (type.isArray()) type = type.toArray().ultimateBase();
         if (type.isClass()) {
             ClassType ct = type.toClass();
             if (ct.isTopLevel() || ct.isMember()) {

@@ -111,7 +111,8 @@ public class AutoBoxer extends AscriptionVisitor {
                 call.methodInstance(ts.findMethod(toType,
                                                   methodName,
                                                   CollectionUtil.list((Type) toTypePrim),
-                                                  this.context().currentClass()));
+                                                  this.context().currentClass(),
+                                                  true));
         return call;
     }
 
@@ -128,7 +129,8 @@ public class AutoBoxer extends AscriptionVisitor {
                 call.methodInstance(ts.findMethod(wrapperType,
                                                   methodName,
                                                   CollectionUtil.list((Type) fromType),
-                                                  this.context().currentClass()));
+                                                  this.context().currentClass(),
+                                                  true));
         return call;
     }
 
@@ -151,7 +153,8 @@ public class AutoBoxer extends AscriptionVisitor {
                 call.methodInstance(ts.findMethod(wrapperType,
                                                   methodName,
                                                   Collections.<Type> emptyList(),
-                                                  this.context().currentClass()));
+                                                  this.context().currentClass(),
+                                                  true));
         return call;
     }
 

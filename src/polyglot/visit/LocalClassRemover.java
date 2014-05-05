@@ -361,7 +361,10 @@ public class LocalClassRemover extends ContextVisitor {
         }
 
         ConstructorInstance superCi =
-                typeSystem().findConstructor(superType, argTypes, cd.type());
+                typeSystem().findConstructor(superType,
+                                             argTypes,
+                                             cd.type(),
+                                             false);
         Position argpos = Position.compilerGenerated();
         for (int i = 0; i < superCi.formalTypes().size(); i++) {
             Type at = superCi.formalTypes().get(i);

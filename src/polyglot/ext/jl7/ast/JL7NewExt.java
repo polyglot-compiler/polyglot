@@ -166,7 +166,8 @@ public class JL7NewExt extends JL7ProcedureCallExt implements NewOps {
                                    argTypes,
                                    Collections.<ReferenceType> emptyList(),
                                    c.currentClass(),
-                                   expectedObjectType());
+                                   expectedObjectType(),
+                                   n.body() == null);
         ct.inferred((JL5SubstClassType) ci.container());
 
         n = n.constructorInstance(ci);

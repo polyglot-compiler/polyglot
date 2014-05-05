@@ -35,6 +35,7 @@ import polyglot.main.Report;
 import polyglot.types.ClassType;
 import polyglot.types.ConstructorInstance;
 import polyglot.types.FieldInstance;
+import polyglot.types.Flags;
 import polyglot.types.LazyClassInitializer;
 import polyglot.types.MethodInstance;
 import polyglot.types.ParsedClassType;
@@ -335,12 +336,19 @@ public class ClassFileLazyClassInitializer implements LazyClassInitializer {
         else {
             String superName = clazz.classNameCP(clazz.getSuperClass());
 
-            if (superName != null) {
-                ct.superType(quietTypeForName(superName));
+            ClassType superType =
+                    superName == null
+                            ? ts.Object() : quietTypeForName(superName);
+            // For an interface, the value of the super_class item must always
+            // be a valid index into the constant_pool table. The constant_pool
+            // entry at that index must be a CONSTANT_Class_info structure
+            // representing the class Object.
+            // See JVMS 2nd Ed. | 4.1.
+            if (ct.flags().isInterface()) {
+                if (!ts.typeEquals(superType, ts.Object()))
+                    throw new ClassFormatError("The superclass of an interface is not Object.");
             }
-            else {
-                ct.superType(ts.Object());
-            }
+            else ct.superType(superType);
         }
 
         superclassInitialized = true;
@@ -471,6 +479,7 @@ public class ClassFileLazyClassInitializer implements LazyClassInitializer {
         }
 
         Method[] methods = clazz.getMethods();
+        List<MethodInstance> declaredMethods = new ArrayList<>(methods.length);
         for (int i = 0; i < methods.length; i++) {
             if (!methods[i].name().equals("<init>")
                     && !methods[i].name().equals("<clinit>")
@@ -479,8 +488,39 @@ public class ClassFileLazyClassInitializer implements LazyClassInitializer {
                 MethodInstance mi = this.methodInstance(methods[i], ct);
                 if (Report.should_report(verbose, 3))
                     Report.report(3, "adding " + mi + " to " + ct);
+                declaredMethods.add(mi);
                 ct.addMethod(mi);
             }
+        }
+
+        if (ct.flags().isInterface() && ct.interfaces().isEmpty()) {
+            // See JLS 2nd Ed. | 9.2.
+            // If an interface has no direct superinterfaces, then the interface
+            // implicitly declares a public abstract member method corresponding
+            // to each public instance method declared in Object, unless a
+            // method with the same signature, same return type, and a
+            // compatible throws clause is explicitly declared by the interface.
+            List<? extends MethodInstance> objectMethods =
+                    ts.Object().methods();
+            List<MethodInstance> implicitlyDeclaredMethods =
+                    new ArrayList<>(objectMethods.size());
+            for (MethodInstance mi : objectMethods) {
+                Flags flags = mi.flags();
+                if (!flags.isPublic()) continue;
+                boolean methodNeeded = true;
+                for (MethodInstance mj : declaredMethods) {
+                    if (!mi.name().equals(mj.name())) continue;
+                    if (!mi.formalTypes().equals(mj.formalTypes())) continue;
+                    methodNeeded = false;
+                    break;
+                }
+                if (methodNeeded)
+                    implicitlyDeclaredMethods.add(mi.container(ct)
+                                                    .flags(flags.Abstract()
+                                                                .clearFinal()));
+            }
+            for (MethodInstance mi : implicitlyDeclaredMethods)
+                ct.addMethod(mi);
         }
 
         methodsInitialized = true;

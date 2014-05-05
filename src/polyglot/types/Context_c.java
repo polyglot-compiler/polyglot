@@ -235,7 +235,8 @@ public class Context_c implements Context {
             return ts.findMethod(this.currentClass(),
                                  name,
                                  argTypes,
-                                 this.currentClass());
+                                 this.currentClass(),
+                                 false);
         }
 
         if (outer != null) {
@@ -433,7 +434,14 @@ public class Context_c implements Context {
             Report.report(3, "find-type " + name + " in " + this);
 
         if (isOuter()) return ts.systemResolver().find(name);
-        if (isSource()) return it.find(name);
+        if (isSource()) {
+            // See JLS 2nd Ed. | 6.5.5.1.
+            // Find a type within the current compilation unit first.
+            // If not found, try import tables.
+            Named n = ts.systemResolver().check(name);
+            if (n != null) return n;
+            return it.find(name);
+        }
 
         Named type = findInThisScope(name);
 
@@ -488,10 +496,6 @@ public class Context_c implements Context {
         v.type = type;
         v.inCode = false;
         v.staticContext = false;
-
-        if (!type.isAnonymous()) {
-            v.addNamed(type);
-        }
 
         return v;
     }
@@ -625,21 +629,17 @@ public class Context_c implements Context {
     }
 
     public Named findInThisScope(String name) {
+        // See JLS 2nd Ed. | 6.5.5.1.
+        // The priority is as follows: local class > member > top-level.
         Named t = null;
-        if (types != null) {
-            t = types.get(name);
-        }
+        if (types != null) t = types.get(name);
         if (t == null && isClass()) {
-            if (!this.type.isAnonymous() && this.type.name().equals(name)) {
-                return this.type;
+            try {
+                return ts.findMemberClass(type, name, type);
             }
-            else {
-                try {
-                    return ts.findMemberClass(this.type, name, this.type);
-                }
-                catch (SemanticException e) {
-                }
+            catch (SemanticException e) {
             }
+            if (!type.isAnonymous() && type.name().equals(name)) return type;
         }
         return t;
     }
@@ -663,7 +663,7 @@ public class Context_c implements Context {
         }
         if (vi == null && isClass()) {
             try {
-                return ts.findField(this.type, name);
+                return ts.findField(this.type, name, this.type, true);
             }
             catch (SemanticException e) {
                 return null;

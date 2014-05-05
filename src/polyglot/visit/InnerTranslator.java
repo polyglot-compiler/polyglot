@@ -788,7 +788,7 @@ public class InnerTranslator extends NodeVisitor {
             ClassInfo cinfo = classContext.get(i);
             ParsedClassType ct = cinfo.classType();
             try {
-                ts.findField(ct, name, current);
+                ts.findField(ct, name, current, true);
             }
             catch (SemanticException se) {
                 continue;
@@ -806,7 +806,7 @@ public class InnerTranslator extends NodeVisitor {
             ClassInfo cinfo = classContext.get(i);
             ParsedClassType ct = cinfo.classType();
             try {
-                ts.findMethod(ct, mi.name(), mi.formalTypes(), current);
+                ts.findMethod(ct, mi.name(), mi.formalTypes(), current, true);
             }
             catch (SemanticException se) {
                 continue;

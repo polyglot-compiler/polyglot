@@ -1,8 +1,9 @@
 polyglot.ext.jl5.JL5ExtensionInfo ["../tests/"] "-sx jl -d out -classpath java-out -assert -noserial -postopts \"-source 1.5 -Xlint\\:-options\" -morepermissiveinference" {
         AnonymousClass.jl ;
         AnonymousClass02.jl ;
+        AnonymousClass03.jl;
         ArrayInit.jl ;
-#        Array01.jl ;
+        Array01.jl ;
         Assign01.jl
           (Semantic, "Cannot assign"),
           (Semantic, "type .* does not match"),
@@ -22,14 +23,20 @@ polyglot.ext.jl5.JL5ExtensionInfo ["../tests/"] "-sx jl -d out -classpath java-o
         Call05.jl;
         Call06.jl;
         Call07.jl;
-        Cast01.jl (Semantic, "Cannot cast");
+        Call08a.jl Call08b.jl;
+        Call09a.jl Call09b.jl (Semantic, "ambiguous, multiple methods match");
+        Call10.jl (Semantic, "No valid method call found for clone()");
+        Call11.jl;
+        Cast01.jl;
         ClassDecl01.jl
           (Semantic, "abstract and final"),
           (Semantic, "abstract and final"),
           (Semantic, "abstract and final");
         ClassDecl02.jl (Semantic, "Duplicate interface");
-        ClassDecl03.jl (Semantic, "flags protected");
+        ClassDecl03.jl (Semantic, "Cannot declare a top-level interface with flag");
         ClassDecl04.jl;
+        ClassDecl05.jl;
+        ClassDecl06.jl (Semantic, "Cannot declare a top-level class with flag");
         ClassLit.jl ;
         Conditional1.jl ;
 	ConformanceCheck1.jl (Semantic, "cannot override.*attempting to assign weaker access");
@@ -47,8 +54,8 @@ polyglot.ext.jl5.JL5ExtensionInfo ["../tests/"] "-sx jl -d out -classpath java-o
         package1/Point.jl package2/Point3d.jl
           (Semantic, "Cannot access field");
         package2/Point3d.jl package1/Point.jl
-          (Semantic, "Field .* inaccessible"),
-          (Semantic, "Field .* inaccessible");
+          (Semantic, "Cannot access field"),
+          (Semantic, "Cannot access field");
         ConstantInit.jl ;
         Constants.jl ;  Constants2.jl ; Constants3.jl ; Constants4.jl ;
         Constants5.jl ; Constants6.jl ; Constants7.jl ; Constants8.jl;
@@ -81,6 +88,10 @@ polyglot.ext.jl5.JL5ExtensionInfo ["../tests/"] "-sx jl -d out -classpath java-o
         FieldAccess07.jl (Semantic, "does not have an enclosing instance");
         FieldAccess08.jl (Semantic, "field .* not visible");
         FieldAccess09.jl (Semantic, "field .* not visible");
+        FieldAccess10a.jl FieldAccess10b.jl (Semantic, "Cannot access field");
+        FieldAccess11.jl (Semantic, "type .* inaccessible from class");
+        FieldAccess12a.jl FieldAccess12b.jl;
+        FieldAccess13a.jl FieldAccess13b.jl;
         FieldClassConflict.jl ;
         FieldDecl01.jl (Semantic, "final and volatile");
         FieldDecl02.jl (Semantic, "interface constant .* transient");
@@ -192,9 +203,14 @@ polyglot.ext.jl5.JL5ExtensionInfo ["../tests/"] "-sx jl -d out -classpath java-o
         MethodDecl04.jl;
         MethodDecl05.jl (Semantic, "incompatible return type");
         MethodDecl06.jl (Semantic, "throw set .* not a subset of the overridden method");
-        MethodDecl07.jl (Semantic, "overridden method is final");
+        MethodDecl07.jl (Semantic, "hidden method is final");
+        MethodDecl08a.jl MethodDecl08b.jl (Semantic, "overridden method is not static");
         Narrowing.jl ;
+        New01a.jl New01b.jl;
+        New02a.jl New02b.jl (Semantic, "Cannot instantiate an interface");
         # Output.jl ;
+        Package01a.jl Package01b.jl Package01c.jl (Semantic, "imported type .* not canonical");
+        Package02.jl (Semantic, "imported type .* not visible");
         Prim.jl ;
         Prec.jl ; 
 	Prec2.jl ;
@@ -210,6 +226,7 @@ polyglot.ext.jl5.JL5ExtensionInfo ["../tests/"] "-sx jl -d out -classpath java-o
 	Protection7.jl (Semantic, "Method .* inaccessible");
 	Protection08A.jl package1/Protection08B.jl;
 	Protection09.jl;
+        Resolver01a.jl Resolver01b.jl
         Return1.jl ; Return2.jl ; Return3.jl ;
         Return4.jl ;
         Return5.jl ;
@@ -227,6 +244,8 @@ polyglot.ext.jl5.JL5ExtensionInfo ["../tests/"] "-sx jl -d out -classpath java-o
         Switch08.jl (Semantic, "not assignable");
         Synchronized01.jl (Semantic, "Cannot synchronize");
         TernaryPrimitiveOps.jl ;
+        TypeAccess01a.jl TypeAccess01b.jl (Semantic, "Cannot access class");
+        TypeAccess02a.jl TypeAccess02b.jl (Semantic, "Could not find type");
         TypeShadowing.jl ;
         xIterator.jl ;
         FormalsDup.jl (Semantic, "multiply defined"), (Semantic, "multiply defined");

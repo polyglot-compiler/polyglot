@@ -150,7 +150,8 @@ public class Disamb_c implements Disamb {
                 FieldInstance fi =
                         ts.findField(t.toReference(),
                                      name.id(),
-                                     c.currentClass());
+                                     c.currentClass(),
+                                     true);
                 return nf.Field(pos, tn, name)
                          .fieldInstance(fi)
                          .type(ts.unknownType(pos));
@@ -268,25 +269,26 @@ public class Disamb_c implements Disamb {
     protected Receiver makeMissingFieldTarget(FieldInstance fi)
             throws SemanticException {
         Receiver r;
+        // Get the enclosing class which
+        // brought the field into scope.  This is different
+        // from fi.container().  fi.container() returns a super
+        // type of the class we want.
+        ClassType scope = c.findFieldScope(name.id());
 
         if (fi.flags().isStatic()) {
-            r = nf.CanonicalTypeNode(pos, fi.container());
+            // Even if the field is static, the receiver type is not necessarily
+            // fi.container() because fi.container() could be inaccessible
+            // from the context class.  The appropriate receiver type is the
+            // scope class, which inherits the field.
+            r = nf.CanonicalTypeNode(pos, scope);
         }
         else {
             // The field is non-static, so we must prepend with
             // "this", but we need to determine if the "this"
-            // should be qualified.  Get the enclosing class which
-            // brought the field into scope.  This is different
-            // from fi.container().  fi.container() returns a super
-            // type of the class we want.
-            ClassType scope = c.findFieldScope(name.id());
-
-            if (!ts.equals(scope, c.currentClass())) {
+            // should be qualified.
+            if (!ts.equals(scope, c.currentClass()))
                 r = nf.This(pos.startOf(), nf.CanonicalTypeNode(pos, scope));
-            }
-            else {
-                r = nf.This(pos.startOf());
-            }
+            else r = nf.This(pos.startOf());
         }
 
         return r;

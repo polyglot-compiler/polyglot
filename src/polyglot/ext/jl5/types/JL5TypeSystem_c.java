@@ -248,11 +248,6 @@ public class JL5TypeSystem_c extends
     }
 
     @Override
-    public Flags legalInterfaceFlags() {
-        return JL5Flags.setAnnotation(super.legalInterfaceFlags());
-    }
-
-    @Override
     public Flags legalMemberClassFlags() {
         return JL5Flags.setAnnotation(JL5Flags.setEnum(super.legalMemberClassFlags()));
     }
@@ -411,7 +406,7 @@ public class JL5TypeSystem_c extends
         FieldInstance fi = null;
 
         try {
-            fi = findField(container, name, currClass);
+            fi = findField(container, name, currClass, true);
         }
         catch (NoMemberException e) {
             fi = findEnumConstant(container, name, currClass);
@@ -610,33 +605,36 @@ public class JL5TypeSystem_c extends
     @Override
     protected List<? extends MethodInstance> findAcceptableMethods(
             ReferenceType container, String name,
-            List<? extends Type> argTypes, ClassType currClass)
-            throws SemanticException {
+            List<? extends Type> argTypes, ClassType currClass,
+            boolean fromClient) throws SemanticException {
         return findAcceptableMethods(container,
                                      name,
                                      argTypes,
                                      Collections.<ReferenceType> emptyList(),
-                                     currClass);
-    }
-
-    protected List<? extends MethodInstance> findAcceptableMethods(
-            ReferenceType container, String name,
-            List<? extends Type> argTypes,
-            List<? extends ReferenceType> actualTypeArgs, ClassType currClass)
-            throws SemanticException {
-        return findAcceptableMethods(container,
-                                     name,
-                                     argTypes,
-                                     actualTypeArgs,
                                      currClass,
-                                     null);
+                                     fromClient);
     }
 
     protected List<? extends MethodInstance> findAcceptableMethods(
             ReferenceType container, String name,
             List<? extends Type> argTypes,
             List<? extends ReferenceType> actualTypeArgs, ClassType currClass,
-            Type expectedReturnType) throws SemanticException {
+            boolean fromClient) throws SemanticException {
+        return findAcceptableMethods(container,
+                                     name,
+                                     argTypes,
+                                     actualTypeArgs,
+                                     currClass,
+                                     null,
+                                     fromClient);
+    }
+
+    protected List<? extends MethodInstance> findAcceptableMethods(
+            ReferenceType container, String name,
+            List<? extends Type> argTypes,
+            List<? extends ReferenceType> actualTypeArgs, ClassType currClass,
+            Type expectedReturnType, boolean fromClient)
+            throws SemanticException {
         assert_(container);
         assert_(argTypes);
 
@@ -714,7 +712,12 @@ public class JL5TypeSystem_c extends
                 JL5MethodInstance origMi = mi;
                 if (substMi != null) {
                     mi = substMi;
-                    if (isAccessible(mi, container, currClass)) {
+                    if ((typeEquals(mi.container(), container) || isInherited(mi,
+                                                                              container.toReference()))
+                            && isAccessible(mi,
+                                            container,
+                                            currClass,
+                                            fromClient)) {
                         if (Report.should_report(Report.types, 3)) {
                             Report.report(3, "->acceptable: " + mi + " in "
                                     + mi.container());
@@ -1778,16 +1781,23 @@ public class JL5TypeSystem_c extends
 
     @Override
     public MethodInstance findMethod(ReferenceType container, String name,
-            List<? extends Type> argTypes, ClassType currClass)
-            throws SemanticException {
-        return this.findMethod(container, name, argTypes, null, currClass, null);
+            List<? extends Type> argTypes, ClassType currClass,
+            boolean fromClient) throws SemanticException {
+        return findMethod(container,
+                          name,
+                          argTypes,
+                          null,
+                          currClass,
+                          null,
+                          fromClient);
     }
 
     @Override
     public MethodInstance findMethod(ReferenceType container,
             java.lang.String name, List<? extends Type> argTypes,
             List<? extends ReferenceType> typeArgs, ClassType currClass,
-            Type expectedReturnType) throws SemanticException {
+            Type expectedReturnType, boolean fromClient)
+            throws SemanticException {
 
         assert_(container);
         assert_(argTypes);
@@ -1798,7 +1808,8 @@ public class JL5TypeSystem_c extends
                                       argTypes,
                                       typeArgs,
                                       currClass,
-                                      expectedReturnType);
+                                      expectedReturnType,
+                                      fromClient);
 
         if (acceptable.size() == 0) {
             throw new NoMemberException(NoMemberException.METHOD,
@@ -1840,19 +1851,20 @@ public class JL5TypeSystem_c extends
 
     @Override
     public ConstructorInstance findConstructor(ClassType container,
-            List<? extends Type> argTypes, ClassType currClass)
-            throws SemanticException {
-        return this.findConstructor(container,
-                                    argTypes,
-                                    Collections.<ReferenceType> emptyList(),
-                                    currClass);
+            List<? extends Type> argTypes, ClassType currClass,
+            boolean fromClient) throws SemanticException {
+        return findConstructor(container,
+                               argTypes,
+                               Collections.<ReferenceType> emptyList(),
+                               currClass,
+                               fromClient);
     }
 
     @Override
     public ConstructorInstance findConstructor(ClassType container,
             List<? extends Type> argTypes,
-            List<? extends ReferenceType> typeArgs, ClassType currClass)
-            throws SemanticException {
+            List<? extends ReferenceType> typeArgs, ClassType currClass,
+            boolean fromClient) throws SemanticException {
 
         assert_(container);
         assert_(argTypes);
@@ -1861,7 +1873,8 @@ public class JL5TypeSystem_c extends
                 findAcceptableConstructors(container,
                                            argTypes,
                                            typeArgs,
-                                           currClass);
+                                           currClass,
+                                           fromClient);
 
         if (acceptable.size() == 0) {
             throw new NoMemberException(NoMemberException.CONSTRUCTOR,
@@ -1888,11 +1901,12 @@ public class JL5TypeSystem_c extends
     @Override
     protected List<? extends ConstructorInstance> findAcceptableConstructors(
             ClassType container, List<? extends Type> argTypes,
-            ClassType currClass) throws SemanticException {
+            ClassType currClass, boolean fromClient) throws SemanticException {
         return this.findAcceptableConstructors(container,
                                                argTypes,
                                                Collections.<ReferenceType> emptyList(),
-                                               currClass);
+                                               currClass,
+                                               fromClient);
     }
 
     /**
@@ -1902,8 +1916,8 @@ public class JL5TypeSystem_c extends
      */
     protected List<ConstructorInstance> findAcceptableConstructors(
             ClassType container, List<? extends Type> argTypes,
-            List<? extends ReferenceType> actualTypeArgs, ClassType currClass)
-            throws SemanticException {
+            List<? extends ReferenceType> actualTypeArgs, ClassType currClass,
+            boolean fromClient) throws SemanticException {
         assert_(container);
         assert_(argTypes);
 
@@ -1988,7 +2002,7 @@ public class JL5TypeSystem_c extends
 
     @Override
     public boolean isAccessible(MemberInstance mi, ReferenceType container,
-            ClassType contextClass) {
+            ReferenceType contextType, boolean fromClient) {
         assert_(mi);
 
         Flags flags = mi.flags();
@@ -1996,20 +2010,28 @@ public class JL5TypeSystem_c extends
         if (container instanceof TypeVariable) {
             TypeVariable tv = (TypeVariable) container;
             return !flags.isPrivate()
-                    && isAccessible(mi, tv.upperBound(), contextClass);
+                    && isAccessible(mi,
+                                    tv.upperBound(),
+                                    contextType,
+                                    fromClient);
         }
 
-        if (super.isAccessible(mi, container, contextClass)) return true;
+        if (super.isAccessible(mi, container, contextType, fromClient))
+            return true;
 
         if (flags.isProtected()) {
             // XXX Is there a more graceful way to deal with raw types?
             // Let C be the class in which a protected member is declared.
             // Access is permitted only within the body of a subclass S of C.
             Type targetClass = erasureType(mi.container().toClass());
-            ClassType ct = contextClass;
-            while (!isSubtype(ct, targetClass) && !ct.isTopLevel())
-                ct = ct.outer();
-            if (isSubtype(ct, targetClass)) {
+            ReferenceType rt = contextType;
+            if (contextType.isClass()) {
+                ClassType ct = contextType.toClass();
+                while (!isSubtype(ct, targetClass) && !ct.isTopLevel())
+                    ct = ct.outer();
+                rt = ct;
+            }
+            if (isSubtype(rt, targetClass)) {
                 // In addition, for expressions of the form E.Id or E.Id(...),
                 // access is permitted iff the type of E is S or a subclass of S.
                 // (Deferred to typeCheck in Call_c.)

@@ -308,7 +308,8 @@ public class Call_c extends Expr_c implements Call, CallOps {
                 ts.findMethod(targetType,
                               this.name.id(),
                               argTypes,
-                              c.currentClass());
+                              c.currentClass(),
+                              !(target instanceof Special));
 
         /* This call is in a static context if and only if
          * the target (possibly implicit) is a type node.

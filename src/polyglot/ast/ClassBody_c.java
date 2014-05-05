@@ -46,6 +46,7 @@ import polyglot.visit.CFGBuilder;
 import polyglot.visit.ExceptionChecker;
 import polyglot.visit.NodeVisitor;
 import polyglot.visit.PrettyPrinter;
+import polyglot.visit.TypeBuilder;
 import polyglot.visit.TypeChecker;
 
 /**
@@ -103,6 +104,11 @@ public class ClassBody_c extends Term_c implements ClassBody {
     public Node visitChildren(NodeVisitor v) {
         List<ClassMember> members = visitList(this.members, v);
         return reconstruct(this, members);
+    }
+
+    @Override
+    public NodeVisitor buildTypesEnter(TypeBuilder tb) throws SemanticException {
+        return tb.enterAnonClass();
     }
 
     @Override

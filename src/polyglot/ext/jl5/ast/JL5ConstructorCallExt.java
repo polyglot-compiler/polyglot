@@ -232,7 +232,8 @@ public class JL5ConstructorCallExt extends JL5ProcedureCallExt {
                 ts.findConstructor(ct,
                                    argTypes,
                                    actualTypeArgs,
-                                   c.currentClass());
+                                   c.currentClass(),
+                                   false);
         return n.constructorInstance(ci);
     }
 

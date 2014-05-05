@@ -274,12 +274,13 @@ public interface JL5TypeSystem extends
     MethodInstance findMethod(ReferenceType container, String name,
             List<? extends Type> argTypes,
             List<? extends ReferenceType> typeArgs, ClassType currClass,
-            Type expectedReturnType) throws SemanticException;
+            Type expectedReturnType, boolean fromClient)
+            throws SemanticException;
 
     ConstructorInstance findConstructor(ClassType container,
             List<? extends Type> argTypes,
-            List<? extends ReferenceType> typeArgs, ClassType currClass)
-            throws SemanticException;
+            List<? extends ReferenceType> typeArgs, ClassType currClass,
+            boolean fromClient) throws SemanticException;
 
     /**
      * Base is a generic supertype (e.g., a class C with uninstantiated parameters).

@@ -117,13 +117,22 @@ public class Import_c extends Node_c implements Import {
         // The type must exist.
         Named nt = tc.typeSystem().forName(name);
 
+        // The type must be canonical.
+        String fullName = nt.fullName();
+        if (!fullName.equals(name)) {
+            throw new SemanticException("The imported type " + name
+                    + " is not canonical; use " + fullName + " instead.");
+        }
+
         // And the type must be accessible.
         if (nt instanceof Type) {
             Type t = (Type) nt;
-            if (t.isClass()) {
-                tc.typeSystem().classAccessibleFromPackage(t.toClass(),
-                                                           tc.context()
-                                                             .package_());
+            if (t.isClass()
+                    && !tc.typeSystem()
+                          .classAccessibleFromPackage(t.toClass(),
+                                                      tc.context().package_())) {
+                throw new SemanticException("The imported type " + t
+                        + " is not visible.");
             }
         }
 

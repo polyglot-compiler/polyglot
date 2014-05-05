@@ -188,8 +188,7 @@ public class SystemResolver extends CachingResolver implements TopLevelResolver 
     public void putAll(SystemResolver r) throws SemanticException {
         for (Pair<String, Named> e : r.justAdded) {
             String name = e.part1();
-            Named n = e.part2();
-            ;
+            Named n = e.part2();;
 
             install(name, n);
 
@@ -302,11 +301,6 @@ public class SystemResolver extends CachingResolver implements TopLevelResolver 
                     && containerName.equals(p.prefix().fullName())) {
                 addNamed(containerName, p.prefix());
             }
-        }
-
-        if (q instanceof Type && packageExists(name)) {
-            throw new SemanticException("Type \"" + name
-                    + "\" clashes with package of the same name.", q.position());
         }
     }
 

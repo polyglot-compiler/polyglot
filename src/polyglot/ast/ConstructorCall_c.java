@@ -339,7 +339,7 @@ public class ConstructorCall_c extends Stmt_c implements ConstructorCall,
         }
 
         ConstructorInstance ci =
-                ts.findConstructor(ct, argTypes, c.currentClass());
+                ts.findConstructor(ct, argTypes, c.currentClass(), false);
         n = constructorInstance(n, ci);
         return n;
     }

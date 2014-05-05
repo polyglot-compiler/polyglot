@@ -92,7 +92,7 @@ public class JL5ImportExt extends JL5Ext {
         }
 
         try {
-            FieldInstance fi = ts.findField(t, id);
+            FieldInstance fi = ts.findField(t, id, t.toClass(), true);
             if (fi != null
                     && fi.flags().isStatic()
                     && ts.accessibleFromPackage(fi.flags(),

@@ -353,19 +353,16 @@ public class ClassDecl_c extends Term_c implements ClassDecl, ClassDeclOps {
             for (MethodInstance mi : objectMethods) {
                 Flags flags = mi.flags();
                 if (!flags.isPublic()) continue;
-                boolean methodNeeded = false;
+                boolean methodNeeded = true;
                 List<? extends MethodInstance> mjs =
                         type.methods(mi.name(), mi.formalTypes());
-                if (mjs.isEmpty())
-                    methodNeeded = true;
-                else {
-                    for (MethodInstance mj : mjs) {
-                        // It follows that it is a compile-time error if the
-                        // interface declares a method with the same signature
-                        // and different return types or incompatible throws
-                        // clause.
-                        ts.checkOverride(mj, mi);
-                    }
+                for (MethodInstance mj : mjs) {
+                    // It follows that it is a compile-time error if the
+                    // interface declares a method with the same signature
+                    // and different return types or incompatible throws
+                    // clause.
+                    ts.checkOverride(mj, mi);
+                    methodNeeded = false;
                 }
                 if (methodNeeded)
                     implicitlyDeclaredMethods.add(mi.container(type)
@@ -526,7 +523,8 @@ public class ClassDecl_c extends Term_c implements ClassDecl, ClassDeclOps {
             ConstructorInstance sci =
                     ts.findConstructor((ClassType) this.type.superType(),
                                        Collections.<Type> emptyList(),
-                                       this.type);
+                                       this.type,
+                                       false);
 
             ConstructorCall cc =
                     nf.SuperCall(position().startOf(),

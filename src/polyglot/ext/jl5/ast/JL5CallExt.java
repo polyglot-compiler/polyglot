@@ -171,7 +171,8 @@ public class JL5CallExt extends JL5ProcedureCallExt implements CallOps {
                                                   argTypes,
                                                   actualTypeArgs,
                                                   c.currentClass(),
-                                                  ext.expectedReturnType());
+                                                  ext.expectedReturnType(),
+                                                  !(n.target() instanceof Special));
 
 //        System.err.println("\nJL5Call_c.typeCheck targettype is " + targetType);
 //        System.err.println("  JL5Call_c.typeCheck target is " + this.target);
@@ -208,7 +209,7 @@ public class JL5CallExt extends JL5ProcedureCallExt implements CallOps {
         ext = (JL5CallExt) JL5Ext.ext(n);
 
         // Need to deal with Object.getClass() specially. See JLS 3rd ed., section 4.3.2
-        if (mi.name().equals("getClass") && mi.container().equals(ts.Object())) {
+        if (mi.name().equals("getClass") && mi.formalTypes().isEmpty()) {
             // the return type of the call is "Class<? extends |T|>" where T is the static type of
             // the receiver.
             Type t = n.target().type();

@@ -69,16 +69,22 @@ public class JL7TypeSystem_c extends JL5TypeSystem_c implements JL7TypeSystem {
     @Override
     public ConstructorInstance findConstructor(ClassType container,
             List<? extends Type> argTypes,
-            List<? extends ReferenceType> typeArgs, ClassType currClass)
-            throws SemanticException {
-        return findConstructor(container, argTypes, typeArgs, currClass, null);
+            List<? extends ReferenceType> typeArgs, ClassType currClass,
+            boolean fromClient) throws SemanticException {
+        return findConstructor(container,
+                               argTypes,
+                               typeArgs,
+                               currClass,
+                               null,
+                               fromClient);
     }
 
     @Override
     public ConstructorInstance findConstructor(ClassType container,
             List<? extends Type> argTypes,
             List<? extends ReferenceType> typeArgs, ClassType currClass,
-            Type expectedObjectType) throws SemanticException {
+            Type expectedObjectType, boolean fromClient)
+            throws SemanticException {
         assert_(container);
         assert_(argTypes);
 
@@ -87,7 +93,8 @@ public class JL7TypeSystem_c extends JL5TypeSystem_c implements JL7TypeSystem {
                                            argTypes,
                                            typeArgs,
                                            currClass,
-                                           expectedObjectType);
+                                           expectedObjectType,
+                                           fromClient);
 
         if (acceptable.size() == 0) {
             throw new NoMemberException(NoMemberException.CONSTRUCTOR,
@@ -128,13 +135,14 @@ public class JL7TypeSystem_c extends JL5TypeSystem_c implements JL7TypeSystem {
     @Override
     protected List<ConstructorInstance> findAcceptableConstructors(
             ClassType container, List<? extends Type> argTypes,
-            List<? extends ReferenceType> actualTypeArgs, ClassType currClass)
-            throws SemanticException {
-        return this.findAcceptableConstructors(container,
-                                               argTypes,
-                                               actualTypeArgs,
-                                               currClass,
-                                               null);
+            List<? extends ReferenceType> actualTypeArgs, ClassType currClass,
+            boolean fromClient) throws SemanticException {
+        return findAcceptableConstructors(container,
+                                          argTypes,
+                                          actualTypeArgs,
+                                          currClass,
+                                          null,
+                                          fromClient);
     }
 
     /**
@@ -145,7 +153,8 @@ public class JL7TypeSystem_c extends JL5TypeSystem_c implements JL7TypeSystem {
     protected List<ConstructorInstance> findAcceptableConstructors(
             ClassType container, List<? extends Type> argTypes,
             List<? extends ReferenceType> actualTypeArgs, ClassType currClass,
-            Type expectedObjectType) throws SemanticException {
+            Type expectedObjectType, boolean fromClient)
+            throws SemanticException {
         assert_(container);
         assert_(argTypes);
 
@@ -185,7 +194,7 @@ public class JL7TypeSystem_c extends JL5TypeSystem_c implements JL7TypeSystem {
                                                        expectedObjectType);
             if (substCi != null) {
                 ci = substCi;
-                if (isAccessible(ci, currClass)) {
+                if (isAccessible(ci, currClass, fromClient)) {
                     if (Report.should_report(Report.types, 3))
                         Report.report(3, "->acceptable: " + ci);
                     if (varArgsRequired(ci))

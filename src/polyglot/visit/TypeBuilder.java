@@ -53,6 +53,7 @@ public class TypeBuilder extends NodeVisitor {
     protected TypeSystem ts;
     protected NodeFactory nf;
     protected TypeBuilder outer;
+    protected TypeBuilder anon;
     protected boolean inCode; // true if the last scope pushed as not a class.
     protected boolean global; // true if all scopes pushed have been classes.
     protected Package package_;
@@ -314,7 +315,14 @@ public class TypeBuilder extends NodeVisitor {
 
 //        ct.superType(ts.unknownType(pos));
 
-        return pushClass(ct);
+        TypeBuilder tb = push();
+        tb.anon = tb.pushClass(ct);
+        return tb;
+    }
+
+    public TypeBuilder enterAnonClass() {
+        if (inCode) return anon;
+        return this;
     }
 
     public TypeBuilder pushClass(Position pos, Flags flags, String name)
@@ -326,6 +334,10 @@ public class TypeBuilder extends NodeVisitor {
 
     public ParsedClassType currentClass() {
         return this.type;
+    }
+
+    public ParsedClassType anonClass() {
+        return anon.type;
     }
 
     public Package currentPackage() {

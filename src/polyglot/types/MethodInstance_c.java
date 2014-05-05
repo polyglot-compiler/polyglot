@@ -279,12 +279,13 @@ public class MethodInstance_c extends ProcedureInstance_c implements
     public boolean canOverrideImpl(MethodInstance mj, boolean quiet)
             throws SemanticException {
         MethodInstance mi = this;
+        String overridOrHid = mi.flags().isStatic() ? "hid" : "overrid";
 
         if (!(mi.name().equals(mj.name()) && mi.hasFormals(mj.formalTypes()))) {
             if (quiet) return false;
             throw new SemanticException(mi.signature() + " in "
-                    + mi.container() + " cannot override " + mj.signature()
-                    + " in " + mj.container()
+                    + mi.container() + " cannot " + overridOrHid + "e "
+                    + mj.signature() + " in " + mj.container()
                     + "; incompatible parameter types", mi.position());
         }
 
@@ -313,8 +314,8 @@ public class MethodInstance_c extends ProcedureInstance_c implements
                                       + mj.returnType());
             if (quiet) return false;
             throw new SemanticException(mi.signature() + " in "
-                    + mi.container() + " cannot override " + mj.signature()
-                    + " in " + mj.container()
+                    + mi.container() + " cannot " + overridOrHid + "e "
+                    + mj.signature() + " in " + mj.container()
                     + "; attempting to use incompatible return type\n"
                     + "found: " + mi.returnType() + "\n" + "required: "
                     + mj.returnType(), mi.position());
@@ -327,11 +328,17 @@ public class MethodInstance_c extends ProcedureInstance_c implements
                                       + mj.throwTypes());
             if (quiet) return false;
             throw new SemanticException(mi.signature() + " in "
-                    + mi.container() + " cannot override " + mj.signature()
-                    + " in " + mj.container() + "; the throw set "
-                    + mi.throwTypes()
-                    + " is not a subset of the overridden method's throw set "
-                    + mj.throwTypes() + ".", mi.position());
+                                                + mi.container() + " cannot "
+                                                + overridOrHid + "e "
+                                                + mj.signature() + " in "
+                                                + mj.container()
+                                                + "; the throw set "
+                                                + mi.throwTypes()
+                                                + " is not a subset of the "
+                                                + overridOrHid
+                                                + "den method's throw set "
+                                                + mj.throwTypes() + ".",
+                                        mi.position());
         }
 
         if (mi.flags().moreRestrictiveThan(mj.flags())) {
@@ -343,7 +350,9 @@ public class MethodInstance_c extends ProcedureInstance_c implements
             throw new SemanticException(mi.signature()
                                                 + " in "
                                                 + mi.container()
-                                                + " cannot override "
+                                                + " cannot "
+                                                + overridOrHid
+                                                + "e "
                                                 + mj.signature()
                                                 + " in "
                                                 + mj.container()
@@ -361,11 +370,15 @@ public class MethodInstance_c extends ProcedureInstance_c implements
             throw new SemanticException(mi.signature()
                                                 + " in "
                                                 + mi.container()
-                                                + " cannot override "
+                                                + " cannot "
+                                                + overridOrHid
+                                                + "e "
                                                 + mj.signature()
                                                 + " in "
                                                 + mj.container()
-                                                + "; overridden method is "
+                                                + "; "
+                                                + overridOrHid
+                                                + "den method is "
                                                 + (mj.flags().isStatic()
                                                         ? "" : "not ")
                                                 + "static", mi.position());
@@ -376,15 +389,10 @@ public class MethodInstance_c extends ProcedureInstance_c implements
             if (Report.should_report(Report.types, 3))
                 Report.report(3, mj.flags() + " final");
             if (quiet) return false;
-            throw new SemanticException(mi.signature()
-                                                + " in "
-                                                + mi.container()
-                                                + " cannot override "
-                                                + mj.signature()
-                                                + " in "
-                                                + mj.container()
-                                                + "; overridden method is final",
-                                        mi.position());
+            throw new SemanticException(mi.signature() + " in "
+                    + mi.container() + " cannot " + overridOrHid + "e "
+                    + mj.signature() + " in " + mj.container() + "; "
+                    + overridOrHid + "den method is final", mi.position());
         }
 
         return true;
@@ -397,6 +405,18 @@ public class MethodInstance_c extends ProcedureInstance_c implements
 
     @Override
     public List<MethodInstance> implementedImpl(ReferenceType rt) {
+        // A method m1 may implement another method m2 which is accessible by rt
+        // but is not accessible by rt's direct superclass.  This is why we
+        // cannot check for accessibility until we have the entire set of method
+        // instances from rt's supertypes.  See JLS 2nd Ed. | 8.4.6.
+        List<MethodInstance> l = new LinkedList<>();
+        for (MethodInstance mi : implementedImplAux(rt)) {
+            if (ts.isAccessible(mi, mi.container(), rt, false)) l.add(mi);
+        }
+        return l;
+    }
+
+    protected List<MethodInstance> implementedImplAux(ReferenceType rt) {
         if (rt == null) {
             return Collections.<MethodInstance> emptyList();
         }
@@ -406,13 +426,12 @@ public class MethodInstance_c extends ProcedureInstance_c implements
 
         Type superType = rt.superType();
         if (superType != null) {
-            for (MethodInstance mi : implementedImpl(superType.toReference()))
-                if (ts.isInherited(mi, rt.toReference())) l.add(mi);
+            l.addAll(implementedImplAux(superType.toReference()));
         }
 
         List<? extends ReferenceType> ints = rt.interfaces();
         for (ReferenceType rt2 : ints) {
-            l.addAll(implementedImpl(rt2));
+            l.addAll(implementedImplAux(rt2));
         }
 
         return l;

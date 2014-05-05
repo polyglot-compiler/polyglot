@@ -191,7 +191,8 @@ public class JL5NewExt extends JL5ProcedureCallExt implements NewOps {
                     ts.findConstructor(ct,
                                        argTypes,
                                        actualTypeArgs,
-                                       c.currentClass());
+                                       c.currentClass(),
+                                       n.body() == null);
         }
         else {
             ci = ts.defaultConstructor(n.position(), ct);

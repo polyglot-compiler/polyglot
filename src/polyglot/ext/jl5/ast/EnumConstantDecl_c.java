@@ -238,7 +238,7 @@ public class EnumConstantDecl_c extends Term_c implements EnumConstantDecl {
     @Override
     public NodeVisitor buildTypesEnter(TypeBuilder tb) throws SemanticException {
         if (body() != null)
-            return tb.pushCode().pushAnonClass(position());
+            return tb.pushCode().pushAnonClass(position()).enterAnonClass();
         else return tb.pushCode();
     }
 
@@ -307,7 +307,7 @@ public class EnumConstantDecl_c extends Term_c implements EnumConstantDecl {
         }
 
         ConstructorInstance ci =
-                ts.findConstructor(ct, argTypes, c.currentClass());
+                ts.findConstructor(ct, argTypes, c.currentClass(), false);
         EnumConstantDecl_c n = constructorInstance(this, ci);
 
         if (n.flags() != Flags.NONE) {

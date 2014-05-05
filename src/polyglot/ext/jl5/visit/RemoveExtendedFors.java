@@ -142,7 +142,8 @@ public class RemoveExtendedFors extends ContextVisitor {
                                                           "iterator",
                                                           Collections.<Type> emptyList(),
                                                           this.context()
-                                                              .currentClass()));
+                                                              .currentClass(),
+                                                          true));
 
             iterDecl =
                     nodeFactory().LocalDecl(pos,
@@ -171,7 +172,8 @@ public class RemoveExtendedFors extends ContextVisitor {
                                                       "next",
                                                       Collections.<Type> emptyList(),
                                                       this.context()
-                                                          .currentClass()));
+                                                          .currentClass(),
+                                                      true));
 
             Cast cast =
                     nodeFactory().Cast(pos,
@@ -201,7 +203,8 @@ public class RemoveExtendedFors extends ContextVisitor {
                                                       "hasNext",
                                                       Collections.<Type> emptyList(),
                                                       this.context()
-                                                          .currentClass()));
+                                                          .currentClass(),
+                                                      true));
 
             loop =
                     nodeFactory().While(pos,
@@ -276,7 +279,9 @@ public class RemoveExtendedFors extends ContextVisitor {
                                          .type(ts.Int());
             field =
                     field.fieldInstance(ts.findField(arrLI.type().toReference(),
-                                                     "length"));
+                                                     "length",
+                                                     context().currentClass(),
+                                                     true));
 
             cond =
                     nodeFactory().Binary(pos,

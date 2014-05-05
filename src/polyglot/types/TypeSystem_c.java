@@ -453,15 +453,27 @@ public class TypeSystem_c implements TypeSystem {
 
     @Override
     public boolean isAccessible(MemberInstance mi, ClassType contextClass) {
+        return isAccessible(mi, contextClass, false);
+    }
+
+    @Override
+    public boolean isAccessible(MemberInstance mi, ClassType contextClass,
+            boolean fromClient) {
         assert_(mi);
 
         ReferenceType target = mi.container();
-        return isAccessible(mi, target, contextClass);
+        return isAccessible(mi, target, contextClass, fromClient);
     }
 
     @Override
     public boolean isAccessible(MemberInstance mi, ReferenceType container,
             ClassType contextClass) {
+        return isAccessible(mi, container, contextClass, true);
+    }
+
+    @Override
+    public boolean isAccessible(MemberInstance mi, ReferenceType container,
+            ReferenceType contextType, boolean fromClient) {
         Flags flags = mi.flags();
 
         // See JLS 2nd Ed. | 6.6.1.
@@ -471,14 +483,14 @@ public class TypeSystem_c implements TypeSystem {
         // accessible only if the type is accessible and the member or
         // constructor is declared to permit access:
         ReferenceType target = mi.container();
-        if (!target.isClass() || contextClass == null) {
+        if (!target.isClass()) {
             // public members of non-classes are accessible;
             // non-public members of non-classes are inaccessible
             return flags.isPublic();
         }
         ClassType targetClass = (ClassType) target.toClass().declaration();
-        if (container.isClass()
-                && !classAccessible(container.toClass(), contextClass))
+        if (container.isClass() && contextType.isClass()
+                && !classAccessible(container.toClass(), contextType.toClass()))
             return false;
 
         // If the member or constructor is declared public, then access is
@@ -489,11 +501,22 @@ public class TypeSystem_c implements TypeSystem {
         // access is permitted iff it occurs within the body of the top level
         // class that encloses the declaration of the member.
         if (flags.isPrivate()) {
-            ClassType ct = contextClass;
-            while (!ct.isTopLevel())
-                ct = ct.outer();
-            return typeEquals(targetClass, ct) || isEnclosed(targetClass, ct);
+            if (contextType.isClass()) {
+                ClassType ct = contextType.toClass();
+                while (!ct.isTopLevel())
+                    ct = ct.outer();
+                return typeEquals(targetClass, ct)
+                        || isEnclosed(targetClass, ct);
+            }
+            else return typeEquals(targetClass, contextType);
         }
+
+        boolean isAccessibleFromPackage =
+                contextType.isClass()
+                        && accessibleFromPackage(flags,
+                                                 targetClass.package_(),
+                                                 contextType.toClass()
+                                                            .package_());
 
         // Otherwise, if the member or constructor is declared protected, then
         // access is permitted only when one of the following is true:
@@ -502,6 +525,7 @@ public class TypeSystem_c implements TypeSystem {
         //   is declared.  (Deferred to default case.)
         // - Access is correct as described in | 6.6.2.
         if (flags.isProtected()) {
+            if (isAccessibleFromPackage) return true;
             if (mi instanceof ConstructorInstance) {
                 // See JLS 2nd Ed. | 6.6.2.2
 
@@ -511,26 +535,28 @@ public class TypeSystem_c implements TypeSystem {
                 // - If the access is one of super(...), E.super(...),
                 //   new C(...){...}, or E.new C(...){...}, then access is permitted.
                 // - Otherwise, if the access is new C(...) or E.new C(...), then
-                //   the access is not permitted.  (Deferred to typeCheck in New_c.)
-                return true;
+                //   the access is not permitted.
+                return !fromClient;
             }
             else {
                 // See JLS 2nd Ed. | 6.6.2.1
 
                 // Let C be the class in which a protected member is declared.
                 // Access is permitted only within the body of a subclass S of C.
-                ClassType ct = contextClass;
-                while (!isSubtype(ct, targetClass) && !ct.isTopLevel())
-                    ct = ct.outer();
-                if (isSubtype(ct, targetClass)) {
+                ReferenceType rt = contextType;
+                if (contextType.isClass()) {
+                    ClassType ct = contextType.toClass();
+                    while (!isSubtype(ct, targetClass) && !ct.isTopLevel())
+                        ct = ct.outer();
+                    rt = ct;
+                }
+                if (isSubtype(rt, targetClass)) {
                     // Class and static members are accessible.
                     if (mi instanceof ClassType || flags.isStatic())
                         return true;
                     // In addition, for expressions of the form E.Id or E.Id(...),
                     // access is permitted iff the type of E is S or a subclass of S.
-                    // TODO
-//                    if (isSubtype(container, ct)) return true;
-                    return true;
+                    return !fromClient || isSubtype(container, rt);
                 }
             }
         }
@@ -538,9 +564,7 @@ public class TypeSystem_c implements TypeSystem {
         // Otherwise, we say there is default access, which is permitted only
         // when the access occurs from within the package in which the type is
         // declared.
-        return accessibleFromPackage(flags,
-                                     targetClass.package_(),
-                                     contextClass.package_());
+        return isAccessibleFromPackage;
     }
 
     @Override
@@ -731,38 +755,80 @@ public class TypeSystem_c implements TypeSystem {
         return findField(container, name, ct);
     }
 
+    @Deprecated
     @Override
     public FieldInstance findField(ReferenceType container, String name,
             ClassType currClass) throws SemanticException {
+        return this.findField(container, name, currClass, true);
+    }
+
+    @Override
+    public FieldInstance findField(ReferenceType container, String name,
+            ClassType currClass, boolean fromClient) throws SemanticException {
         Collection<FieldInstance> fields = findFields(container, name);
 
-        if (fields.size() == 0) {
-            throw new NoMemberException(NoMemberException.FIELD, "Field \""
-                    + name + "\" not found in type \"" + container + "\".");
-        }
-
-        Iterator<FieldInstance> i = fields.iterator();
-        FieldInstance fi = i.next();
-
-        if (i.hasNext()) {
-            FieldInstance fi2 = i.next();
-
-            throw new SemanticException("Field \"" + name
-                    + "\" is ambiguous; it is defined in both "
-                    + fi.container() + " and " + fi2.container() + ".");
-        }
-
-        if (currClass != null) {
-            if (!typeEquals(fi.container(), container)
-                    && !isInherited(fi, container.toReference()))
-                throw new NoMemberException(NoMemberException.FIELD, "The "
-                        + fi + " is not visible in class " + container + ".");
-            if (!isAccessible(fi, container, currClass)) {
-                throw new SemanticException("Cannot access " + fi + ".");
+        FieldInstance result = null;
+        SemanticException error = null;
+        for (FieldInstance fi : fields) {
+            ReferenceType fc = fi.container();
+            if (currClass != null) {
+                Type fiType = fi.type();
+                if (fiType.isArray()) fiType = fiType.toArray().ultimateBase();
+                if (fiType.isClass()
+                        && !classAccessible(fiType.toClass(), currClass)) {
+                    if (error == null)
+                        error =
+                                new SemanticException("The field \""
+                                        + fi.name() + "\" has type "
+                                        + fi.type()
+                                        + ", which is inaccessible from class "
+                                        + currClass);
+                }
+                else if (!typeEquals(fc, container)
+                        && !isInherited(fi, container.toReference())) {
+                    if (error == null)
+                        error =
+                                new NoMemberException(NoMemberException.FIELD,
+                                                      "The "
+                                                              + fi
+                                                              + " is not visible in class "
+                                                              + container + ".");
+                }
+                else if (!isAccessible(fi, container, currClass, fromClient)) {
+                    if (error == null)
+                        error =
+                                new SemanticException("Cannot access " + fi
+                                        + ".");
+                }
+                else if (result != null) {
+                    throw new SemanticException("Field \"" + name
+                            + "\" is ambiguous; it is defined in both "
+                            + result.container() + " and " + fc + ".");
+                }
+                else result = fi;
+            }
+            else {
+                if (!fi.flags().isPublic()) {
+                    if (error == null)
+                        error =
+                                new SemanticException("Cannot access " + fi
+                                        + ".");
+                }
+                else if (result != null) {
+                    throw new SemanticException("Field \"" + name
+                            + "\" is ambiguous; it is defined in both "
+                            + result.container() + " and " + fc + ".");
+                }
+                else result = fi;
             }
         }
-
-        return fi;
+        if (result == null) {
+            throw error == null
+                    ? new NoMemberException(NoMemberException.FIELD, "Field \""
+                            + name + "\" not found in type \"" + container
+                            + "\".") : error;
+        }
+        return result;
     }
 
     @Override
@@ -771,27 +837,41 @@ public class TypeSystem_c implements TypeSystem {
             // private members are never inherited.
             return false;
         }
-        if (type.descendsFrom(mi.container())) {
-            Package containerPackage = null;
-            if (mi.container().isClass()) {
-                containerPackage = mi.container().toClass().package_();
+        ReferenceType container = mi.container();
+        if (type.descendsFrom(container)) {
+            boolean isInheritedInSuperType = false;
+            Type superType = type.superType();
+            if (superType != null) {
+                if (typeEquals(container, superType)
+                        || isInherited(mi, superType.toReference()))
+                    isInheritedInSuperType = true;
             }
-
-            if (type.isClass()) {
-                Package package_ = type.toClass().package_();
-                if (package_ == null
-                        ? package_ == containerPackage
-                        : package_.equals(containerPackage)) {
-                    // ct and the container are in the same package.
-                    return true;
+            if (!isInheritedInSuperType) {
+                for (ReferenceType rt : type.interfaces()) {
+                    if (typeEquals(container, rt) || isInherited(mi, rt)) {
+                        isInheritedInSuperType = true;
+                        break;
+                    }
                 }
             }
-            // ct and the container are in different packages.
-            return mi.flags().isProtected() || mi.flags().isPublic();
+            if (isInheritedInSuperType) {
+                if (mi.flags().isProtected() || mi.flags().isPublic())
+                    return true;
+                Package typePackage = null;
+                if (type.isClass()) typePackage = type.toClass().package_();
+                Package containerPackage = null;
+                if (container.isClass())
+                    containerPackage = container.toClass().package_();
+                // whether type and the container are in the same package.
+                return typePackage == null
+                        ? typePackage == containerPackage
+                        : packageEquals(typePackage, containerPackage);
+            }
         }
         return false;
     }
 
+    @Deprecated
     @Override
     public FieldInstance findField(ReferenceType container, String name)
             throws SemanticException {
@@ -973,16 +1053,28 @@ public class TypeSystem_c implements TypeSystem {
         return false;
     }
 
+    @Deprecated
     @Override
     public MethodInstance findMethod(ReferenceType container, String name,
             List<? extends Type> argTypes, ClassType currClass)
             throws SemanticException {
+        return findMethod(container, name, argTypes, currClass, true);
+    }
+
+    @Override
+    public MethodInstance findMethod(ReferenceType container, String name,
+            List<? extends Type> argTypes, ClassType currClass,
+            boolean fromClient) throws SemanticException {
 
         assert_(container);
         assert_(argTypes);
 
         List<? extends MethodInstance> acceptable =
-                findAcceptableMethods(container, name, argTypes, currClass);
+                findAcceptableMethods(container,
+                                      name,
+                                      argTypes,
+                                      currClass,
+                                      fromClient);
 
         if (acceptable.size() == 0) {
             throw new NoMemberException(NoMemberException.METHOD,
@@ -1031,16 +1123,26 @@ public class TypeSystem_c implements TypeSystem {
         return findConstructor(container, argTypes, c.currentClass());
     }
 
+    @Deprecated
     @Override
     public ConstructorInstance findConstructor(ClassType container,
             List<? extends Type> argTypes, ClassType currClass)
             throws SemanticException {
+        return findConstructor(container, argTypes, currClass, true);
+    }
 
+    @Override
+    public ConstructorInstance findConstructor(ClassType container,
+            List<? extends Type> argTypes, ClassType currClass,
+            boolean fromClient) throws SemanticException {
         assert_(container);
         assert_(argTypes);
 
         List<? extends ConstructorInstance> acceptable =
-                findAcceptableConstructors(container, argTypes, currClass);
+                findAcceptableConstructors(container,
+                                           argTypes,
+                                           currClass,
+                                           fromClient);
 
         if (acceptable.size() == 0) {
             throw new NoMemberException(NoMemberException.CONSTRUCTOR,
@@ -1103,6 +1205,30 @@ public class TypeSystem_c implements TypeSystem {
             }
         }
         if (maximal.size() > 1) {
+            // First, check that all the maximally specific methods have the
+            // same signature.
+            // Use the declarations to compare formals.
+            Iterator<Instance> j = maximal.iterator();
+            first = j.next();
+            ProcedureInstance firstDecl = first;
+            if (first instanceof Declaration) {
+                firstDecl =
+                        (ProcedureInstance) ((Declaration) first).declaration();
+            }
+            while (j.hasNext()) {
+                Instance p = j.next();
+
+                ProcedureInstance pDecl = p;
+                if (p instanceof Declaration) {
+                    pDecl = (ProcedureInstance) ((Declaration) p).declaration();
+                }
+
+                if (!firstDecl.hasFormals(pDecl.formalTypes())) {
+                    // not all signatures match; must be ambiguous
+                    return maximal;
+                }
+            }
+
             // If exactly one method is not abstract, it is the most specific.
             List<Instance> notAbstract = new ArrayList<>(maximal.size());
             for (Instance p : maximal) {
@@ -1117,28 +1243,11 @@ public class TypeSystem_c implements TypeSystem {
             else if (notAbstract.size() == 0) {
                 // all are abstract; if all signatures match, any will do.
                 List<Type> throwTypes = new LinkedList<>();
-                Iterator<Instance> j = maximal.iterator();
+                j = maximal.iterator();
                 first = j.next();
                 throwTypes.addAll(first.throwTypes());
                 while (j.hasNext()) {
                     Instance p = j.next();
-
-                    // Use the declarations to compare formals.
-                    ProcedureInstance firstDecl = first;
-                    ProcedureInstance pDecl = p;
-                    if (first instanceof Declaration) {
-                        firstDecl =
-                                (ProcedureInstance) ((Declaration) first).declaration();
-                    }
-                    if (p instanceof Declaration) {
-                        pDecl =
-                                (ProcedureInstance) ((Declaration) p).declaration();
-                    }
-
-                    if (!firstDecl.hasFormals(pDecl.formalTypes())) {
-                        // not all signatures match; must be ambiguous
-                        return maximal;
-                    }
 
                     throwTypes.retainAll(p.throwTypes());
                 }
@@ -1181,12 +1290,12 @@ public class TypeSystem_c implements TypeSystem {
 
     /**
      * Populates the list acceptable with those MethodInstances which are
-     * Applicable and Accessible as defined by JLS 15.11.2.1
+     * Applicable and Accessible as defined by JLS 15.12.2.1
      */
     protected List<? extends MethodInstance> findAcceptableMethods(
             ReferenceType container, String name,
-            List<? extends Type> argTypes, ClassType currClass)
-            throws SemanticException {
+            List<? extends Type> argTypes, ClassType currClass,
+            boolean fromClient) throws SemanticException {
 
         assert_(container);
         assert_(argTypes);
@@ -1244,7 +1353,10 @@ public class TypeSystem_c implements TypeSystem {
                 if (methodCallValid(mi, name, argTypes)) {
                     if ((typeEquals(mi.container(), container) || isInherited(mi,
                                                                               container.toReference()))
-                            && isAccessible(mi, container, currClass)) {
+                            && isAccessible(mi,
+                                            container,
+                                            currClass,
+                                            fromClient)) {
                         if (Report.should_report(Report.types, 3)) {
                             Report.report(3, "->acceptable: " + mi + " in "
                                     + mi.container());
@@ -1256,8 +1368,10 @@ public class TypeSystem_c implements TypeSystem {
                             // mi isn't overridden by something already in acceptable
                             // so add mi to acceptable, and add all the methods it
                             // overrides to the set overridden.
-                            overridden.addAll(mi.implemented());
-                            acceptable.removeAll(mi.implemented()); // remove everything that mi overrides
+                            List<? extends MethodInstance> implemented =
+                                    mi.implemented();
+                            overridden.addAll(implemented);
+                            acceptable.removeAll(implemented); // remove everything that mi overrides
                             acceptable.add(mi);
                         }
                     }
@@ -1332,7 +1446,7 @@ public class TypeSystem_c implements TypeSystem {
      */
     protected List<? extends ConstructorInstance> findAcceptableConstructors(
             ClassType container, List<? extends Type> argTypes,
-            ClassType currClass) throws SemanticException {
+            ClassType currClass, boolean fromClient) throws SemanticException {
         assert_(container);
         assert_(argTypes);
 
@@ -1350,7 +1464,7 @@ public class TypeSystem_c implements TypeSystem {
                 Report.report(3, "Trying " + ci);
 
             if (callValid(ci, argTypes)) {
-                if (isAccessible(ci, currClass)) {
+                if (isAccessible(ci, currClass, fromClient)) {
                     if (Report.should_report(Report.types, 3))
                         Report.report(3, "->acceptable: " + ci);
                     acceptable.add(ci);
@@ -2128,21 +2242,10 @@ public class TypeSystem_c implements TypeSystem {
 
     @Override
     public Flags legalTopLevelClassFlags() {
-        return legalAccessFlags().clear(Private())
-                                 .Abstract()
-                                 .Final()
-                                 .StrictFP()
-                                 .Interface();
+        return Public().Abstract().Final().StrictFP().Interface();
     }
 
     protected final Flags TOP_LEVEL_CLASS_FLAGS = legalTopLevelClassFlags();
-
-    @Override
-    public Flags legalInterfaceFlags() {
-        return legalAccessFlags().Abstract().Interface().Static().StrictFP();
-    }
-
-    protected final Flags INTERFACE_FLAGS = legalInterfaceFlags();
 
     @Override
     public Flags legalMemberClassFlags() {
@@ -2236,19 +2339,11 @@ public class TypeSystem_c implements TypeSystem {
 
     @Override
     public void checkTopLevelClassFlags(Flags f) throws SemanticException {
-        if (!f.clear(TOP_LEVEL_CLASS_FLAGS).equals(Flags.NONE)) {
-            throw new SemanticException("Cannot declare a top-level class with flag(s) "
-                    + f.clear(TOP_LEVEL_CLASS_FLAGS) + ".");
-        }
-
-        // The access modifiers protected, private, and static pertain only to
-        // member interfaces.  See JLS 2nd Ed. | 9.1.1.
-        Flags topLevelInterfaceFlags =
-                INTERFACE_FLAGS.clear(Protected().Private().Static());
-        if (f.isInterface()
-                && !f.clear(topLevelInterfaceFlags).equals(Flags.NONE)) {
-            throw new SemanticException("Cannot declare interface with flags "
-                    + f.clear(topLevelInterfaceFlags) + ".");
+        Flags remainingFlags = f.clear(TOP_LEVEL_CLASS_FLAGS);
+        if (!remainingFlags.equals(Flags.NONE)) {
+            throw new SemanticException("Cannot declare a top-level "
+                    + (f.isInterface() ? "interface" : "class")
+                    + " with flag(s) " + remainingFlags + ".");
         }
 
         checkClassFlagsConflict(f);

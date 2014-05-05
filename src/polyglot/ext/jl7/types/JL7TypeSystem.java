@@ -46,7 +46,8 @@ public interface JL7TypeSystem extends JL5TypeSystem {
     ConstructorInstance findConstructor(ClassType container,
             List<? extends Type> argTypes,
             List<? extends ReferenceType> typeArgs, ClassType currClass,
-            Type expectedObjectType) throws SemanticException;
+            Type expectedObjectType, boolean fromClient)
+            throws SemanticException;
 
     JL5ProcedureInstance callValid(JL5ProcedureInstance mi,
             List<? extends Type> argTypes,

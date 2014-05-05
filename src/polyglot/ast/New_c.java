@@ -298,7 +298,7 @@ public class New_c extends Expr_c implements New, NewOps {
             n = (New_c) n.body((ClassBody)n.body().visit(bodyTB));
             ParsedClassType type = (ParsedClassType) bodyTB.currentClass();
              */
-            ParsedClassType type = tb.currentClass();
+            ParsedClassType type = tb.anonClass();
             n = anonType(n, type);
 
             type.setMembersAdded(true);
@@ -507,7 +507,11 @@ public class New_c extends Expr_c implements New, NewOps {
             if (anonType != null) {
                 c = c.pushClass(anonType, anonType);
             }
-            ci = ts.findConstructor(ct, argTypes, c.currentClass());
+            ci =
+                    ts.findConstructor(ct,
+                                       argTypes,
+                                       c.currentClass(),
+                                       body == null);
         }
         else {
             ci = ts.defaultConstructor(this.position(), ct);

@@ -291,12 +291,28 @@ public interface TypeSystem {
     boolean isAccessible(MemberInstance mi, ClassType contextClass);
 
     /**
+     * Checks whether a class member can be accessed from code that is
+     * declared in the class {@code contextClass}.
+     */
+    boolean isAccessible(MemberInstance mi, ClassType contextClass,
+            boolean fromClient);
+
+    /**
      * Checks whether a class member mi, which is declared in container or
      * an ancestor of container, can be accessed from code that is declared
      * in class {@code contextClass}, accessing it via the type container.
      */
     boolean isAccessible(MemberInstance mi, ReferenceType container,
             ClassType contextClass);
+
+    /**
+     * Checks whether a member mi, which is declared in container or
+     * an ancestor of container, can be accessed from code that is declared
+     * in type {@code context}.  fromClient indicates whether this member is
+     * being access from a client (true) or by inheritance (false).
+     */
+    boolean isAccessible(MemberInstance mi, ReferenceType container,
+            ReferenceType contextType, boolean fromClient);
 
     /**
      * Checks whether {@code targetClass} can be accessed from {@code context}.
@@ -387,6 +403,14 @@ public interface TypeSystem {
             throws SemanticException;
 
     /**
+     * Deprecated version of the findField method.
+     * @deprecated
+     */
+    @Deprecated
+    FieldInstance findField(ReferenceType container, String name,
+            ClassType currClass) throws SemanticException;
+
+    /**
      * Returns the FieldInstance for the field {@code name} defined
      * in type {@code container} or a supertype, and visible from
      * {@code currClass}.  {@code currClass} may be null.
@@ -394,7 +418,7 @@ public interface TypeSystem {
      * inaccessible.
      */
     FieldInstance findField(ReferenceType container, String name,
-            ClassType currClass) throws SemanticException;
+            ClassType currClass, boolean fromClient) throws SemanticException;
 
     /**
      * Returns the FieldInstance for the field {@code name} defined
@@ -402,7 +426,25 @@ public interface TypeSystem {
      * @exception SemanticException if the field cannot be found or is
      * inaccessible.
      */
+    @Deprecated
     FieldInstance findField(ReferenceType container, String name)
+            throws SemanticException;
+
+    /**
+     * Deprecated version of the findMethod method.
+     * @deprecated
+     */
+    @Deprecated
+    MethodInstance findMethod(ReferenceType container, String name,
+            List<? extends Type> argTypes, Context c) throws SemanticException;
+
+    /**
+     * Deprecated version of the findMethod method.
+     * @deprecated
+     */
+    @Deprecated
+    MethodInstance findMethod(ReferenceType container, String name,
+            List<? extends Type> argTypes, ClassType currClass)
             throws SemanticException;
 
     /**
@@ -418,28 +460,8 @@ public interface TypeSystem {
      * inaccessible.
      */
     MethodInstance findMethod(ReferenceType container, String name,
-            List<? extends Type> argTypes, ClassType currClass)
-            throws SemanticException;
-
-    /**
-     * Deprecated version of the findMethod method.
-     * @deprecated
-     */
-    @Deprecated
-    MethodInstance findMethod(ReferenceType container, String name,
-            List<? extends Type> argTypes, Context c) throws SemanticException;
-
-    /**
-     * Find a constructor.  We need to pass the class from which the constructor
-     * is being found because the constructor
-     * we find depends on whether the constructor is accessible from that
-     * class.
-     * @exception SemanticException if the constructor cannot be found or is
-     * inaccessible.
-     */
-    ConstructorInstance findConstructor(ClassType container,
-            List<? extends Type> argTypes, ClassType currClass)
-            throws SemanticException;
+            List<? extends Type> argTypes, ClassType currClass,
+            boolean fromClient) throws SemanticException;
 
     /**
      * Deprecated version of the findConstructor method.
@@ -448,6 +470,28 @@ public interface TypeSystem {
     @Deprecated
     ConstructorInstance findConstructor(ClassType container,
             List<? extends Type> argTypes, Context c) throws SemanticException;
+
+    /**
+     * Deprecated version of the findConstructor method.
+     * @deprecated
+     */
+    @Deprecated
+    ConstructorInstance findConstructor(ClassType container,
+            List<? extends Type> argTypes, ClassType currClass)
+            throws SemanticException;
+
+    /**
+     * Find a constructor.  We need to pass the class from which the constructor
+     * is being found because the constructor we find depends on whether the
+     * constructor is accessible from that class.
+     * @param fromClient indicates whether the constructor is being accessed
+     *   from a client or by inheritance
+     * @exception SemanticException if the constructor cannot be found or is
+     * inaccessible.
+     */
+    ConstructorInstance findConstructor(ClassType container,
+            List<? extends Type> argTypes, ClassType currClass,
+            boolean fromClient) throws SemanticException;
 
     /**
      * Find a member class.
@@ -873,9 +917,6 @@ public interface TypeSystem {
 
     /** All flags allowed for an abstract method. */
     Flags legalAbstractMethodFlags();
-
-    /** All flags allowed for an interface. */
-    Flags legalInterfaceFlags();
 
     /** All flags allowed for a top-level class. */
     Flags legalTopLevelClassFlags();

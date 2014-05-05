@@ -119,7 +119,7 @@ polyglot.ext.jl5.JL5ExtensionInfo "-d out -classpath java-out -assert -noserial 
         Access02.jl5;
         Access03A.jl5  Access03B.jl5;
         Access04A.jl5  Access04B.jl5;
-        Access05.jl5 (Semantic, "Field .* not visible");
+        Access05.jl5 (Semantic, "field .* not visible");
         Access06.jl5 (Semantic, "Method .* inaccessible");
         Anonymous01.jl5 (Post, "Xlint");
         Anonymous02.jl5;
@@ -297,7 +297,6 @@ polyglot.ext.jl5.JL5ExtensionInfo "-d out -classpath java-out -assert -noserial 
         test7.jl5;
         test8.jl5;
         test9.jl5;
-        wildcard2.jl5 (Semantic), (Semantic), (Semantic);
         wildcard2.jl5 (Semantic), (Semantic), (Semantic);
         wildcard2a.jl5;
         wildcard3.jl5;
@@ -519,7 +518,7 @@ polyglot.ext.jl5.JL5ExtensionInfo "-d out -classpath java-out -removeJava5isms -
         Access02.jl5;
         Access03A.jl5  Access03B.jl5;
         Access04A.jl5  Access04B.jl5;
-        Access05.jl5 (Semantic, "Field .* not visible");
+        Access05.jl5 (Semantic, "field .* not visible");
         Access06.jl5 (Semantic, "Method .* inaccessible");
         Anonymous01.jl5;
         Anonymous02.jl5;

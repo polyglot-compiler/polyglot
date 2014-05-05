@@ -76,7 +76,8 @@ public class JL7ResourceExt extends JL7Ext {
                     ts.findMethod(declType,
                                   "close",
                                   Collections.<Type> emptyList(),
-                                  jl7ts.AutoCloseable());
+                                  jl7ts.AutoCloseable(),
+                                  true);
             // The resource may throw exceptions declared by close().
             l.addAll(mi.throwTypes());
         }

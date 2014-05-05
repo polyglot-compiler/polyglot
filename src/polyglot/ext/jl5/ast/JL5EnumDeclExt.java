@@ -151,7 +151,7 @@ public class JL5EnumDeclExt extends JL5ClassDeclExt {
             }
         }
 
-        // set the supertype appropraitely
+        // set the supertype appropriately
         JL5TypeSystem ts = (JL5TypeSystem) tc.typeSystem();
         if (ts.rawClass((JL5ParsedClassType) ts.Enum()).equals(n.type()
                                                                 .superType())) {

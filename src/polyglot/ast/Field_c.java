@@ -214,7 +214,8 @@ public class Field_c extends Expr_c implements Field {
             FieldInstance fi =
                     ts.findField(target.type().toReference(),
                                  name.id(),
-                                 c.currentClass());
+                                 c.currentClass(),
+                                 !(target instanceof Special));
 
             if (fi == null) {
                 throw new InternalCompilerError("Cannot access field on node of type "
