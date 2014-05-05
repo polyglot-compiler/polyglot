@@ -279,8 +279,8 @@ polyglot.frontend.JLExtensionInfo "-d out -cp ." {
         TypeShadowing.jl ;
         xIterator.jl ;
 	CombRule1.jl; 
-	CombRule2.jl (Semantic); 
-	CombRule3.jl (Semantic); 
+	CombRule2.jl (Semantic, "Method.*cannot be called with arguments");
+	CombRule3.jl (Semantic, "Method.*cannot be called with arguments");
         FormalsDup.jl (Semantic, "multiply defined"), (Semantic, "multiply defined");
         AbstractSuperMethod.jl (Semantic, "Cannot call an abstract method of the super class");
         BadAbstract.jl (Semantic, "should be declared abstract");
