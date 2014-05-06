@@ -55,7 +55,7 @@ public class ArrayInit_c extends Expr_c implements ArrayInit {
 
     protected List<Expr> elements;
 
-    @Deprecated
+//    @Deprecated
     public ArrayInit_c(Position pos, List<Expr> elements) {
         this(pos, elements, null);
     }

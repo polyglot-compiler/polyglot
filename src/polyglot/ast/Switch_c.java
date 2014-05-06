@@ -62,7 +62,7 @@ public class Switch_c extends Stmt_c implements Switch {
     protected Expr expr;
     protected List<SwitchElement> elements;
 
-    @Deprecated
+//    @Deprecated
     public Switch_c(Position pos, Expr expr, List<SwitchElement> elements) {
         this(pos, expr, elements, null);
     }

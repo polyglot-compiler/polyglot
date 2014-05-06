@@ -61,7 +61,7 @@ public class NewArray_c extends Expr_c implements NewArray {
     protected int addDims;
     protected ArrayInit init;
 
-    @Deprecated
+//    @Deprecated
     public NewArray_c(Position pos, TypeNode baseType, List<Expr> dims,
             int addDims, ArrayInit init) {
         this(pos, baseType, dims, addDims, init, null);

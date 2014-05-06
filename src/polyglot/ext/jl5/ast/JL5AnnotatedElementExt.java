@@ -47,23 +47,24 @@ public abstract class JL5AnnotatedElementExt extends JL5TermExt implements
         AnnotatedElement {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
-    protected List<Term> annotations;
+    protected List<AnnotationElem> annotations;
 
-    public JL5AnnotatedElementExt(List<Term> annotations) {
+    public JL5AnnotatedElementExt(List<AnnotationElem> annotations) {
         this.annotations = ListUtil.copy(annotations, true);
     }
 
     @Override
-    public List<Term> annotationElems() {
+    public List<AnnotationElem> annotationElems() {
         return this.annotations;
     }
 
     @Override
-    public Node annotationElems(List<Term> annotations) {
+    public Node annotationElems(List<AnnotationElem> annotations) {
         return annotationElems(node(), annotations);
     }
 
-    protected <N extends Node> N annotationElems(N n, List<Term> annotations) {
+    protected <N extends Node> N annotationElems(N n,
+            List<AnnotationElem> annotations) {
         JL5AnnotatedElementExt ext = (JL5AnnotatedElementExt) JL5Ext.ext(n);
         if (CollectionUtil.equals(ext.annotations, annotations)) return n;
         if (n == node) {
@@ -74,7 +75,7 @@ public abstract class JL5AnnotatedElementExt extends JL5TermExt implements
         return n;
     }
 
-    private Node reconstruct(Node n, List<Term> annotations) {
+    private Node reconstruct(Node n, List<AnnotationElem> annotations) {
         n = annotationElems(n, annotations);
         return n;
     }
@@ -82,7 +83,7 @@ public abstract class JL5AnnotatedElementExt extends JL5TermExt implements
     @Override
     public Node visitChildren(NodeVisitor v) {
         Node n = superLang().visitChildren(this.node(), v);
-        List<Term> annots = visitList(annotations, v);
+        List<AnnotationElem> annots = visitList(annotations, v);
         return reconstruct(n, annots);
     }
 
@@ -105,7 +106,7 @@ public abstract class JL5AnnotatedElementExt extends JL5TermExt implements
     public Node annotationCheck(AnnotationChecker annoCheck)
             throws SemanticException {
         Node n = this.node();
-        for (Term elem : annotations) {
+        for (AnnotationElem elem : annotations) {
             annoCheck.checkAnnotationApplicability(elem, this.declaration());
         }
         return n;

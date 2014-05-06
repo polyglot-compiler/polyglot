@@ -58,7 +58,7 @@ public class Return_c extends Stmt_c implements Return {
 
     protected Expr expr;
 
-    @Deprecated
+//    @Deprecated
     public Return_c(Position pos, Expr expr) {
         this(pos, expr, null);
     }

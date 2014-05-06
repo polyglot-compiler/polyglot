@@ -47,7 +47,7 @@ public class Eval_c extends Stmt_c implements Eval {
 
     protected Expr expr;
 
-    @Deprecated
+//    @Deprecated
     public Eval_c(Position pos, Expr expr) {
         this(pos, expr, null);
     }

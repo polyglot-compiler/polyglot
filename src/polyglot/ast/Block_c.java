@@ -40,7 +40,7 @@ import polyglot.visit.PrettyPrinter;
 public class Block_c extends AbstractBlock_c {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
-    @Deprecated
+//    @Deprecated
     public Block_c(Position pos, List<Stmt> statements) {
         this(pos, statements, null);
     }

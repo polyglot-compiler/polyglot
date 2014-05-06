@@ -57,7 +57,7 @@ public class For_c extends Loop_c implements For {
     protected List<ForInit> inits;
     protected List<ForUpdate> iters;
 
-    @Deprecated
+//    @Deprecated
     public For_c(Position pos, List<ForInit> inits, Expr cond,
             List<ForUpdate> iters, Stmt body) {
         this(pos, inits, cond, iters, body, null);

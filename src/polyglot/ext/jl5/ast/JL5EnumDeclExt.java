@@ -11,7 +11,6 @@ import polyglot.ast.JLang;
 import polyglot.ast.MethodDecl;
 import polyglot.ast.Node;
 import polyglot.ast.NodeFactory;
-import polyglot.ast.Term;
 import polyglot.ast.TypeNode;
 import polyglot.ext.jl5.types.JL5Flags;
 import polyglot.ext.jl5.types.JL5MethodInstance;
@@ -34,8 +33,12 @@ import polyglot.visit.TypeChecker;
 public class JL5EnumDeclExt extends JL5ClassDeclExt {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
-    public JL5EnumDeclExt(List<Term> annotations) {
-        super(Collections.<TypeNode> emptyList(), annotations);
+    public JL5EnumDeclExt() {
+        this(null);
+    }
+
+    public JL5EnumDeclExt(List<AnnotationElem> annotations) {
+        super(Collections.<ParamTypeNode> emptyList(), annotations);
     }
 
     public ClassDecl addValueOfMethodType(TypeSystem ts) {

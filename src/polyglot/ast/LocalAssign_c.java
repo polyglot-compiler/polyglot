@@ -41,7 +41,7 @@ import polyglot.visit.CFGBuilder;
 public class LocalAssign_c extends Assign_c implements LocalAssign {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
-    @Deprecated
+//    @Deprecated
     public LocalAssign_c(Position pos, Local left, Operator op, Expr right) {
         this(pos, left, op, right, null);
     }

@@ -38,7 +38,7 @@ import polyglot.util.SerialVersionUID;
 public class SwitchBlock_c extends AbstractBlock_c implements SwitchBlock {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
-    @Deprecated
+//    @Deprecated
     public SwitchBlock_c(Position pos, List<Stmt> statements) {
         this(pos, statements, null);
     }

@@ -49,7 +49,7 @@ import polyglot.visit.NodeVisitor;
 public class FieldAssign_c extends Assign_c implements FieldAssign {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
-    @Deprecated
+//    @Deprecated
     public FieldAssign_c(Position pos, Field left, Operator op, Expr right) {
         this(pos, left, op, right, null);
     }

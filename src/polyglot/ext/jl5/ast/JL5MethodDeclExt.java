@@ -29,8 +29,6 @@ import java.util.List;
 
 import polyglot.ast.MethodDecl;
 import polyglot.ast.Node;
-import polyglot.ast.Term;
-import polyglot.ast.TypeNode;
 import polyglot.ext.jl5.types.JL5MethodInstance;
 import polyglot.ext.jl5.types.JL5TypeSystem;
 import polyglot.ext.jl5.types.TypeVariable;
@@ -51,7 +49,12 @@ public class JL5MethodDeclExt extends JL5ProcedureDeclExt {
 
     protected boolean compilerGenerated;
 
-    public JL5MethodDeclExt(List<TypeNode> typeParams, List<Term> annotations) {
+    public JL5MethodDeclExt() {
+        this(null, null);
+    }
+
+    public JL5MethodDeclExt(List<ParamTypeNode> typeParams,
+            List<AnnotationElem> annotations) {
         super(typeParams, annotations);
     }
 

@@ -30,7 +30,6 @@ import java.util.List;
 
 import polyglot.ast.Block;
 import polyglot.ast.Catch;
-import polyglot.ast.Ext;
 import polyglot.ast.LocalDecl;
 import polyglot.ast.Node;
 import polyglot.ast.Term;
@@ -56,8 +55,8 @@ public class TryWithResources_c extends Try_c implements TryWithResources {
     protected List<LocalDecl> resources;
 
     public TryWithResources_c(Position pos, List<LocalDecl> resources,
-            Block tryBlock, List<Catch> catchBlocks, Block finallyBlock, Ext ext) {
-        super(pos, tryBlock, catchBlocks, finallyBlock, ext);
+            Block tryBlock, List<Catch> catchBlocks, Block finallyBlock) {
+        super(pos, tryBlock, catchBlocks, finallyBlock);
         assert_(pos, tryBlock, catchBlocks, finallyBlock);
         this.resources = ListUtil.copy(resources, true);
     }

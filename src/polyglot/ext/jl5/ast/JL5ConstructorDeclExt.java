@@ -29,8 +29,6 @@ import java.util.List;
 
 import polyglot.ast.ConstructorDecl;
 import polyglot.ast.Node;
-import polyglot.ast.Term;
-import polyglot.ast.TypeNode;
 import polyglot.ext.jl5.types.JL5TypeSystem;
 import polyglot.ext.jl5.types.TypeVariable;
 import polyglot.types.ConstructorInstance;
@@ -47,8 +45,12 @@ import polyglot.visit.TypeChecker;
 public class JL5ConstructorDeclExt extends JL5ProcedureDeclExt {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
-    public JL5ConstructorDeclExt(List<TypeNode> typeParams,
-            List<Term> annotations) {
+    public JL5ConstructorDeclExt() {
+        this(null, null);
+    }
+
+    public JL5ConstructorDeclExt(List<ParamTypeNode> typeParams,
+            List<AnnotationElem> annotations) {
         super(typeParams, annotations);
     }
 

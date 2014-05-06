@@ -81,7 +81,7 @@ public class New_c extends Expr_c implements New, NewOps {
     protected ParsedClassType anonType;
     protected boolean qualifierImplicit;
 
-    @Deprecated
+//    @Deprecated
     public New_c(Position pos, Expr qualifier, TypeNode tn,
             List<Expr> arguments, ClassBody body) {
         this(pos, qualifier, tn, arguments, body, null);

@@ -30,13 +30,13 @@ import java.util.List;
 import polyglot.ast.Block;
 import polyglot.ast.Catch;
 import polyglot.ast.Expr;
-import polyglot.ast.Ext;
-import polyglot.ast.ExtFactory;
 import polyglot.ast.Formal;
 import polyglot.ast.Id;
 import polyglot.ast.LocalDecl;
-import polyglot.ast.Term;
 import polyglot.ast.TypeNode;
+import polyglot.ext.jl5.ast.AnnotationElem;
+import polyglot.ext.jl5.ast.JL5AnnotatedElementExt;
+import polyglot.ext.jl5.ast.JL5Ext;
 import polyglot.ext.jl5.ast.JL5NodeFactory_c;
 import polyglot.types.Flags;
 import polyglot.util.Position;
@@ -68,14 +68,14 @@ public class JL7NodeFactory_c extends JL5NodeFactory_c implements
     @Override
     public AmbDiamondTypeNode AmbDiamondTypeNode(Position pos, TypeNode base) {
         AmbDiamondTypeNode n = new AmbDiamondTypeNode(pos, base);
-        n = (AmbDiamondTypeNode) n.ext(extFactory().extAmbDiamondTypeNode());
+        n = ext(n, extFactory().extAmbDiamondTypeNode());
         return n;
     }
 
     @Override
     public TypeNode AmbUnionType(Position pos, List<TypeNode> alternatives) {
         AmbUnionType n = new AmbUnionType(pos, alternatives);
-        n = (AmbUnionType) n.ext(extFactory().extAmbUnionType());
+        n = ext(n, extFactory().extAmbUnionType());
         return n;
     }
 
@@ -83,68 +83,33 @@ public class JL7NodeFactory_c extends JL5NodeFactory_c implements
     public MultiCatch MultiCatch(Position pos, Formal formal,
             List<TypeNode> alternatives, Block body) {
         MultiCatch n = new MultiCatch_c(pos, formal, alternatives, body);
-        n = (MultiCatch) n.ext(extFactory().extMultiCatch());
+        n = ext(n, extFactory().extMultiCatch());
         return n;
     }
 
     @Override
     public LocalDecl Resource(Position pos, Flags flags,
-            List<Term> annotations, TypeNode type, Id name, Expr init) {
-        return Resource(pos,
-                        flags,
-                        annotations,
-                        type,
-                        name,
-                        init,
-                        null,
-                        extFactory());
-    }
-
-    protected final LocalDecl Resource(Position pos, Flags flags,
-            List<Term> annotations, TypeNode type, Id name, Expr init, Ext ext,
-            ExtFactory extFactory) {
-        for (;; extFactory = extFactory.nextExtFactory()) {
-            Ext e = JL7AbstractExtFactory_c.extResource(extFactory);
-            if (e == null) break;
-            ext = composeExts(ext, e);
-        }
-        ext = composeExts(ext, new JL7ResourceExt());
-        return super.LocalDecl(pos,
-                               flags,
-                               annotations,
-                               type,
-                               name,
-                               init,
-                               ext,
-                               extFactory.nextExtFactory());
+            List<AnnotationElem> annotations, TypeNode type, Id name, Expr init) {
+        LocalDecl n =
+                super.LocalDecl(pos, flags, annotations, type, name, init);
+        n = ext(n, extFactory().extResource());
+        // FIXME ugh!
+        JL5AnnotatedElementExt jl5ext = (JL5AnnotatedElementExt) JL5Ext.ext(n);
+        n = (LocalDecl) jl5ext.annotationElems(annotations);
+        return n;
     }
 
     @Override
     public TryWithResources TryWithResources(Position pos,
             List<LocalDecl> resources, Block tryBlock, List<Catch> catchBlocks,
             Block finallyBlock) {
-        return TryWithResources(pos,
-                                resources,
-                                tryBlock,
-                                catchBlocks,
-                                finallyBlock,
-                                null,
-                                extFactory());
-    }
-
-    protected final TryWithResources TryWithResources(Position pos,
-            List<LocalDecl> resources, Block tryBlock, List<Catch> catchBlocks,
-            Block finallyBlock, Ext ext, ExtFactory extFactory) {
-        for (ExtFactory ef : extFactory) {
-            Ext e = JL7AbstractExtFactory_c.extTryWithResources(ef);
-            if (e == null) break;
-            ext = composeExts(ext, e);
-        }
-        return new TryWithResources_c(pos,
-                                      resources,
-                                      tryBlock,
-                                      catchBlocks,
-                                      finallyBlock,
-                                      ext);
+        TryWithResources n =
+                new TryWithResources_c(pos,
+                                       resources,
+                                       tryBlock,
+                                       catchBlocks,
+                                       finallyBlock);
+        n = ext(n, extFactory().extTryWithResources());
+        return n;
     }
 }

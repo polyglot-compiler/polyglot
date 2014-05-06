@@ -43,7 +43,7 @@ public class AmbReceiver_c extends AmbPrefix_c implements AmbReceiver {
 
     protected Type type;
 
-    @Deprecated
+//    @Deprecated
     public AmbReceiver_c(Position pos, Prefix prefix, Id name) {
         this(pos, prefix, name, null);
     }

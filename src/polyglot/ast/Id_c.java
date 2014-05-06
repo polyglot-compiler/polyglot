@@ -40,7 +40,7 @@ public class Id_c extends Node_c implements Id {
 
     protected String id;
 
-    @Deprecated
+//    @Deprecated
     public Id_c(Position pos, String id) {
         this(pos, id, null);
     }

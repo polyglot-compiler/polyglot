@@ -41,7 +41,7 @@ public class BooleanLit_c extends Lit_c implements BooleanLit {
 
     protected boolean value;
 
-    @Deprecated
+//    @Deprecated
     public BooleanLit_c(Position pos, boolean value) {
         this(pos, value, null);
     }

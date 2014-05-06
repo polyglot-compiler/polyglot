@@ -25,13 +25,20 @@
  ******************************************************************************/
 package polyglot.ext.jl5.ast;
 
-import polyglot.ast.Field;
+import polyglot.ast.Field_c;
+import polyglot.ast.Id;
 import polyglot.ast.Lang;
 import polyglot.ast.Node;
+import polyglot.ast.Receiver;
 import polyglot.ext.jl5.types.EnumInstance;
+import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
 
-public class EnumConstant_c extends JL5ExprExt implements EnumConstant {
+public class EnumConstant_c extends Field_c implements EnumConstant {
+    public EnumConstant_c(Position pos, Receiver target, Id name) {
+        super(pos, target, name);
+    }
+
     private static final long serialVersionUID = SerialVersionUID.generate();
 
     @Override
@@ -52,14 +59,12 @@ public class EnumConstant_c extends JL5ExprExt implements EnumConstant {
 
     @Override
     public EnumInstance enumInstance() {
-        Field n = (Field) this.node();
-        return (EnumInstance) n.fieldInstance();
+        return (EnumInstance) fieldInstance();
     }
 
     @Override
     public Node enumInstance(EnumInstance enumInstance) {
-        Field n = (Field) this.node();
-        return n.fieldInstance(enumInstance);
+        return fieldInstance(enumInstance);
     }
 
 }

@@ -52,7 +52,7 @@ public class Cast_c extends Expr_c implements Cast {
     protected TypeNode castType;
     protected Expr expr;
 
-    @Deprecated
+//    @Deprecated
     public Cast_c(Position pos, TypeNode castType, Expr expr) {
         this(pos, castType, expr, null);
     }

@@ -94,25 +94,35 @@ public abstract class JL7AbstractExtFactory_c extends JL5AbstractExtFactory_c
     @Override
     public final Ext extResource() {
         Ext e = extResourceImpl();
+
+        if (nextExtFactory() != null) {
+            Ext e2;
+            if (nextExtFactory() instanceof JL7ExtFactory) {
+                e2 = ((JL7ExtFactory) nextExtFactory()).extMultiCatch();
+            }
+            else {
+                e2 = nextExtFactory().extLocalDecl();
+            }
+            e = composeExts(e, e2);
+        }
         return postResource(e);
     }
 
     @Override
     public final Ext extTryWithResources() {
         Ext e = extTryWithResourcesImpl();
+
+        if (nextExtFactory() != null) {
+            Ext e2;
+            if (nextExtFactory() instanceof JL7ExtFactory) {
+                e2 = ((JL7ExtFactory) nextExtFactory()).extMultiCatch();
+            }
+            else {
+                e2 = nextExtFactory().extTry();
+            }
+            e = composeExts(e, e2);
+        }
         return postTryWithResources(e);
-    }
-
-    public static final Ext extResource(ExtFactory extFactory) {
-        if (extFactory instanceof JL7ExtFactory)
-            return ((JL7ExtFactory) extFactory).extResource();
-        return extLocalDecl(extFactory);
-    }
-
-    public static final Ext extTryWithResources(ExtFactory extFactory) {
-        if (extFactory instanceof JL7ExtFactory)
-            return ((JL7ExtFactory) extFactory).extTryWithResources();
-        return extTry(extFactory);
     }
 
     protected Ext extAmbDiamondTypeNodeImpl() {

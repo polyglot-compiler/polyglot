@@ -46,7 +46,7 @@ public class CanonicalTypeNode_c extends TypeNode_c implements
         CanonicalTypeNode {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
-    @Deprecated
+//    @Deprecated
     public CanonicalTypeNode_c(Position pos, Type type) {
         this(pos, type, null);
     }

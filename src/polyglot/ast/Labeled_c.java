@@ -48,7 +48,7 @@ public class Labeled_c extends Stmt_c implements Labeled {
     protected Id label;
     protected Stmt statement;
 
-    @Deprecated
+//    @Deprecated
     public Labeled_c(Position pos, Id label, Stmt statement) {
         this(pos, label, statement, null);
     }

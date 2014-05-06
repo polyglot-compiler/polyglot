@@ -63,7 +63,7 @@ public class SourceFile_c extends Node_c implements SourceFile {
     protected ImportTable importTable;
     protected Source source;
 
-    @Deprecated
+//    @Deprecated
     public SourceFile_c(Position pos, PackageNode package_,
             List<Import> imports, List<TopLevelDecl> decls) {
         this(pos, package_, imports, decls, null);

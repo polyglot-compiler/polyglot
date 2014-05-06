@@ -40,7 +40,7 @@ import polyglot.visit.TypeChecker;
 public class AmbAssign_c extends Assign_c implements AmbAssign {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
-    @Deprecated
+//    @Deprecated
     public AmbAssign_c(Position pos, Expr left, Operator op, Expr right) {
         this(pos, left, op, right, null);
     }

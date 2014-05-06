@@ -46,7 +46,7 @@ public class PackageNode_c extends Node_c implements PackageNode {
 
     protected Package package_;
 
-    @Deprecated
+//    @Deprecated
     public PackageNode_c(Position pos, Package package_) {
         this(pos, package_, null);
     }

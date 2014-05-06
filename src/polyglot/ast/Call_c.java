@@ -71,7 +71,7 @@ public class Call_c extends Expr_c implements Call, CallOps {
     protected MethodInstance mi;
     protected boolean targetImplicit;
 
-    @Deprecated
+//    @Deprecated
     public Call_c(Position pos, Receiver target, Id name, List<Expr> arguments) {
         this(pos, target, name, arguments, null);
     }

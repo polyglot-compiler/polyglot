@@ -49,7 +49,7 @@ public class Import_c extends Node_c implements Import {
     protected Kind kind;
     protected String name;
 
-    @Deprecated
+//    @Deprecated
     public Import_c(Position pos, Kind kind, String name) {
         this(pos, kind, name, null);
     }

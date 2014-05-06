@@ -51,7 +51,7 @@ public class Case_c extends Stmt_c implements Case {
     protected Expr expr;
     protected long value;
 
-    @Deprecated
+//    @Deprecated
     public Case_c(Position pos, Expr expr) {
         this(pos, expr, null);
     }

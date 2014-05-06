@@ -49,7 +49,6 @@ import polyglot.ast.NodeFactory;
 import polyglot.ast.Stmt;
 import polyglot.ast.While;
 import polyglot.ext.jl5.ast.ExtendedFor;
-import polyglot.ext.jl5.ast.JL5Ext;
 import polyglot.frontend.Job;
 import polyglot.types.Flags;
 import polyglot.types.LocalInstance;
@@ -86,7 +85,7 @@ public class RemoveExtendedFors extends ContextVisitor {
             throws SemanticException {
         if (isExtendedFor(n) && !(parent instanceof Labeled)) {
             n =
-                    translateExtendedFor((Loop) n,
+                    translateExtendedFor((ExtendedFor) n,
                                          Collections.<String> emptyList());
         }
         if (n instanceof CodeDecl) {
@@ -102,19 +101,19 @@ public class RemoveExtendedFors extends ContextVisitor {
             }
             if (isExtendedFor(s)) {
                 // we have a situation L1, ..., Ln: for (C x : e) { ...}
-                n = translateExtendedFor((Loop) s, labels);
+                n = translateExtendedFor((ExtendedFor) s, labels);
             }
         }
         return n;
     }
 
     protected boolean isExtendedFor(Node n) {
-        return n instanceof Loop && JL5Ext.ext(n) instanceof ExtendedFor;
+        return n instanceof Loop && n instanceof ExtendedFor;
     }
 
-    private Node translateExtendedFor(Loop n, List<String> labels)
+    private Node translateExtendedFor(ExtendedFor n, List<String> labels)
             throws SemanticException {
-        ExtendedFor ext = (ExtendedFor) JL5Ext.ext(n);
+        ExtendedFor ext = n;
         LocalDecl decl = ext.decl();
         Expr expr = ext.expr();
 
@@ -224,9 +223,9 @@ public class RemoveExtendedFors extends ContextVisitor {
         return "extfor$" + desc + "$" + count;
     }
 
-    protected Node translateExtForArray(Loop n, List<String> labels)
+    protected Node translateExtForArray(ExtendedFor n, List<String> labels)
             throws SemanticException {
-        ExtendedFor ext = (ExtendedFor) JL5Ext.ext(n);
+        ExtendedFor ext = n;
         LocalDecl decl = ext.decl();
         Expr expr = ext.expr();
 

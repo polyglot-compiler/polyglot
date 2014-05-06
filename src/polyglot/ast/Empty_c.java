@@ -40,7 +40,7 @@ import polyglot.visit.PrettyPrinter;
 public class Empty_c extends Stmt_c implements Empty {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
-    @Deprecated
+//    @Deprecated
     public Empty_c(Position pos) {
         this(pos, null);
     }

@@ -109,6 +109,12 @@ public class NodeFactory_c extends AbstractNodeFactory_c {
         return this.extFactory;
     }
 
+    @SuppressWarnings("unchecked")
+    protected <T extends Node> T ext(T n, Ext ext) {
+        if (ext != null) return (T) n.ext(ext);
+        return n;
+    }
+
     /**
      * Compose two extensions together. Order is important: e1 gets added
      * at the end of e2's chain of extensions.
@@ -153,131 +159,77 @@ public class NodeFactory_c extends AbstractNodeFactory_c {
 
     @Override
     public Id Id(Position pos, String name) {
-        Id n = Id(pos, name, null, extFactory());
+        Id n = new Id_c(pos, name);
+        n = ext(n, extFactory().extId());
         n = del(n, delFactory().delId());
         return n;
     }
 
-    protected final Id Id(Position pos, String name, Ext ext,
-            ExtFactory extFactory) {
-        for (ExtFactory ef : extFactory)
-            ext = composeExts(ext, ef.extId());
-        return new Id_c(pos, name, ext);
-    }
-
     @Override
     public AmbPrefix AmbPrefix(Position pos, Prefix prefix, Id name) {
-        AmbPrefix n = AmbPrefix(pos, prefix, name, null, extFactory());
+        AmbPrefix n = new AmbPrefix_c(pos, prefix, name);
+        n = ext(n, extFactory().extAmbPrefix());
         n = del(n, delFactory().delAmbPrefix());
         return n;
     }
 
-    protected final AmbPrefix AmbPrefix(Position pos, Prefix prefix, Id name,
-            Ext ext, ExtFactory extFactory) {
-        for (ExtFactory ef : extFactory)
-            ext = composeExts(ext, ef.extAmbPrefix());
-        return new AmbPrefix_c(pos, prefix, name, ext);
-    }
-
     @Override
     public AmbReceiver AmbReceiver(Position pos, Prefix prefix, Id name) {
-        AmbReceiver n = AmbReceiver(pos, prefix, name, null, extFactory());
+        AmbReceiver n = new AmbReceiver_c(pos, prefix, name);
+        n = ext(n, extFactory().extAmbReceiver());
         n = del(n, delFactory().delAmbReceiver());
         return n;
-    }
-
-    protected final AmbReceiver AmbReceiver(Position pos, Prefix prefix,
-            Id name, Ext ext, ExtFactory extFactory) {
-        for (ExtFactory ef : extFactory)
-            ext = composeExts(ext, ef.extAmbReceiver());
-        return new AmbReceiver_c(pos, prefix, name, ext);
     }
 
     @Override
     public AmbQualifierNode AmbQualifierNode(Position pos,
             QualifierNode qualifier, Id name) {
-        AmbQualifierNode n =
-                AmbQualifierNode(pos, qualifier, name, null, extFactory());
+        AmbQualifierNode n = new AmbQualifierNode_c(pos, qualifier, name);
+        n = ext(n, extFactory().extAmbQualifierNode());
         n = del(n, delFactory().delAmbQualifierNode());
         return n;
     }
 
-    protected final AmbQualifierNode AmbQualifierNode(Position pos,
-            QualifierNode qualifier, Id name, Ext ext, ExtFactory extFactory) {
-        for (ExtFactory ef : extFactory)
-            ext = composeExts(ext, ef.extAmbQualifierNode());
-        return new AmbQualifierNode_c(pos, qualifier, name, ext);
-    }
-
     @Override
     public AmbExpr AmbExpr(Position pos, Id name) {
-        AmbExpr n = AmbExpr(pos, name, null, extFactory());
+        AmbExpr n = new AmbExpr_c(pos, name);
+        n = ext(n, extFactory().extAmbExpr());
         n = del(n, delFactory().delAmbExpr());
         return n;
-    }
-
-    protected final AmbExpr AmbExpr(Position pos, Id name, Ext ext,
-            ExtFactory extFactory) {
-        for (ExtFactory ef : extFactory)
-            ext = composeExts(ext, ef.extAmbExpr());
-        return new AmbExpr_c(pos, name, ext);
     }
 
     @Override
     public AmbTypeNode AmbTypeNode(Position pos, QualifierNode qualifier,
             Id name) {
-        AmbTypeNode n = AmbTypeNode(pos, qualifier, name, null, extFactory());
+        AmbTypeNode n = new AmbTypeNode_c(pos, qualifier, name);
+        n = ext(n, extFactory().extAmbTypeNode());
         n = del(n, delFactory().delAmbTypeNode());
         return n;
     }
 
-    protected final AmbTypeNode AmbTypeNode(Position pos,
-            QualifierNode qualifier, Id name, Ext ext, ExtFactory extFactory) {
-        for (ExtFactory ef : extFactory)
-            ext = composeExts(ext, ef.extAmbTypeNode());
-        return new AmbTypeNode_c(pos, qualifier, name, ext);
-    }
-
     @Override
     public ArrayAccess ArrayAccess(Position pos, Expr base, Expr index) {
-        ArrayAccess n = ArrayAccess(pos, base, index, null, extFactory());
+        ArrayAccess n = new ArrayAccess_c(pos, base, index);
+        n = ext(n, extFactory().extArrayAccess());
         n = del(n, delFactory().delArrayAccess());
         return n;
     }
 
-    protected final ArrayAccess ArrayAccess(Position pos, Expr base,
-            Expr index, Ext ext, ExtFactory extFactory) {
-        for (ExtFactory ef : extFactory)
-            ext = composeExts(ext, ef.extArrayAccess());
-        return new ArrayAccess_c(pos, base, index, ext);
-    }
-
     @Override
     public ArrayInit ArrayInit(Position pos, List<Expr> elements) {
-        ArrayInit n = ArrayInit(pos, elements, null, extFactory());
+        ArrayInit n =
+                new ArrayInit_c(pos, CollectionUtil.nonNullList(elements));
+        n = ext(n, extFactory().extArrayInit());
         n = del(n, delFactory().delArrayInit());
         return n;
     }
 
-    protected final ArrayInit ArrayInit(Position pos, List<Expr> elements,
-            Ext ext, ExtFactory extFactory) {
-        for (ExtFactory ef : extFactory)
-            ext = composeExts(ext, ef.extArrayInit());
-        return new ArrayInit_c(pos, CollectionUtil.nonNullList(elements), ext);
-    }
-
     @Override
     public Assert Assert(Position pos, Expr cond, Expr errorMessage) {
-        Assert n = Assert(pos, cond, errorMessage, null, extFactory());
+        Assert n = new Assert_c(pos, cond, errorMessage);
+        n = ext(n, extFactory().extAssert());
         n = del(n, delFactory().delAssert());
         return n;
-    }
-
-    protected final Assert Assert(Position pos, Expr cond, Expr errorMessage,
-            Ext ext, ExtFactory extFactory) {
-        for (ExtFactory ef : extFactory)
-            ext = composeExts(ext, ef.extAssert());
-        return new Assert_c(pos, cond, errorMessage, ext);
     }
 
     @Override
@@ -297,593 +249,331 @@ public class NodeFactory_c extends AbstractNodeFactory_c {
     @Override
     public LocalAssign LocalAssign(Position pos, Local left,
             Assign.Operator op, Expr right) {
-        LocalAssign n = LocalAssign(pos, left, op, right, null, extFactory());
+        LocalAssign n = new LocalAssign_c(pos, left, op, right);
+        n = ext(n, extFactory().extLocalAssign());
         n = del(n, delFactory().delLocalAssign());
         return n;
-    }
-
-    protected final LocalAssign LocalAssign(Position pos, Local left,
-            Assign.Operator op, Expr right, Ext ext, ExtFactory extFactory) {
-        for (ExtFactory ef : extFactory)
-            ext = composeExts(ext, ef.extLocalAssign());
-        return new LocalAssign_c(pos, left, op, right, ext);
     }
 
     @Override
     public FieldAssign FieldAssign(Position pos, Field left,
             Assign.Operator op, Expr right) {
-        FieldAssign n = FieldAssign(pos, left, op, right, null, extFactory());
+        FieldAssign n = new FieldAssign_c(pos, left, op, right);
+        n = ext(n, extFactory().extFieldAssign());
         n = del(n, delFactory().delFieldAssign());
         return n;
-    }
-
-    protected final FieldAssign FieldAssign(Position pos, Field left,
-            Assign.Operator op, Expr right, Ext ext, ExtFactory extFactory) {
-        for (ExtFactory ef : extFactory)
-            ext = composeExts(ext, ef.extFieldAssign());
-        return new FieldAssign_c(pos, left, op, right, ext);
     }
 
     @Override
     public ArrayAccessAssign ArrayAccessAssign(Position pos, ArrayAccess left,
             Assign.Operator op, Expr right) {
-        ArrayAccessAssign n =
-                ArrayAccessAssign(pos, left, op, right, null, extFactory());
+        ArrayAccessAssign n = new ArrayAccessAssign_c(pos, left, op, right);
+        n = ext(n, extFactory().extArrayAccessAssign());
         n = del(n, delFactory().delArrayAccessAssign());
         return n;
-    }
-
-    protected final ArrayAccessAssign ArrayAccessAssign(Position pos,
-            ArrayAccess left, Assign.Operator op, Expr right, Ext ext,
-            ExtFactory extFactory) {
-        for (ExtFactory ef : extFactory)
-            ext = composeExts(ext, ef.extArrayAccessAssign());
-        return new ArrayAccessAssign_c(pos, left, op, right, ext);
     }
 
     @Override
     public AmbAssign AmbAssign(Position pos, Expr left, Assign.Operator op,
             Expr right) {
-        AmbAssign n = AmbAssign(pos, left, op, right, null, extFactory());
+        AmbAssign n = new AmbAssign_c(pos, left, op, right);
+        n = ext(n, extFactory().extAmbAssign());
         n = del(n, delFactory().delAmbAssign());
         return n;
     }
 
-    protected final AmbAssign AmbAssign(Position pos, Expr left,
-            Assign.Operator op, Expr right, Ext ext, ExtFactory extFactory) {
-        for (ExtFactory ef : extFactory)
-            ext = composeExts(ext, ef.extAmbAssign());
-        return new AmbAssign_c(pos, left, op, right, ext);
-    }
-
     @Override
     public Binary Binary(Position pos, Expr left, Binary.Operator op, Expr right) {
-        Binary n = Binary(pos, left, op, right, null, extFactory());
+        Binary n = new Binary_c(pos, left, op, right);
+        n = ext(n, extFactory().extBinary());
         n = del(n, delFactory().delBinary());
         return n;
     }
 
-    protected final Binary Binary(Position pos, Expr left, Binary.Operator op,
-            Expr right, Ext ext, ExtFactory extFactory) {
-        for (ExtFactory ef : extFactory)
-            ext = composeExts(ext, ef.extBinary());
-        return new Binary_c(pos, left, op, right, ext);
-    }
-
     @Override
     public Block Block(Position pos, List<Stmt> statements) {
-        Block n = Block(pos, statements, null, extFactory());
+        Block n = new Block_c(pos, CollectionUtil.nonNullList(statements));
+        n = ext(n, extFactory().extBlock());
         n = del(n, delFactory().delBlock());
         return n;
     }
 
-    protected final Block Block(Position pos, List<Stmt> statements, Ext ext,
-            ExtFactory extFactory) {
-        for (ExtFactory ef : extFactory)
-            ext = composeExts(ext, ef.extBlock());
-        return new Block_c(pos, CollectionUtil.nonNullList(statements), ext);
-    }
-
     @Override
     public SwitchBlock SwitchBlock(Position pos, List<Stmt> statements) {
-        SwitchBlock n = SwitchBlock(pos, statements, null, extFactory());
+        SwitchBlock n =
+                new SwitchBlock_c(pos, CollectionUtil.nonNullList(statements));
+        n = ext(n, extFactory().extSwitchBlock());
         n = del(n, delFactory().delSwitchBlock());
         return n;
     }
 
-    protected final SwitchBlock SwitchBlock(Position pos,
-            List<Stmt> statements, Ext ext, ExtFactory extFactory) {
-        for (ExtFactory ef : extFactory)
-            ext = composeExts(ext, ef.extSwitchBlock());
-        return new SwitchBlock_c(pos,
-                                 CollectionUtil.nonNullList(statements),
-                                 ext);
-    }
-
     @Override
     public BooleanLit BooleanLit(Position pos, boolean value) {
-        BooleanLit n = BooleanLit(pos, value, null, extFactory());
+        BooleanLit n = new BooleanLit_c(pos, value);
+        n = ext(n, extFactory().extBooleanLit());
         n = del(n, delFactory().delBooleanLit());
         return n;
     }
 
-    protected final BooleanLit BooleanLit(Position pos, boolean value, Ext ext,
-            ExtFactory extFactory) {
-        for (ExtFactory ef : extFactory)
-            ext = composeExts(ext, ef.extBooleanLit());
-        return new BooleanLit_c(pos, value, ext);
-    }
-
     @Override
     public Branch Branch(Position pos, Branch.Kind kind, Id label) {
-        Branch n = Branch(pos, kind, label, null, extFactory());
+        Branch n = new Branch_c(pos, kind, label);
+        n = ext(n, extFactory().extBranch());
         n = del(n, delFactory().delBranch());
         return n;
     }
 
-    protected final Branch Branch(Position pos, Branch.Kind kind, Id label,
-            Ext ext, ExtFactory extFactory) {
-        for (ExtFactory ef : extFactory)
-            ext = composeExts(ext, ef.extBranch());
-        return new Branch_c(pos, kind, label, ext);
-    }
-
     @Override
     public Call Call(Position pos, Receiver target, Id name, List<Expr> args) {
-        Call n = Call(pos, target, name, args, null, extFactory());
+        Call n =
+                new Call_c(pos, target, name, CollectionUtil.nonNullList(args));
+        n = ext(n, extFactory().extCall());
         n = del(n, delFactory().delCall());
         return n;
     }
 
-    protected final Call Call(Position pos, Receiver target, Id name,
-            List<Expr> args, Ext ext, ExtFactory extFactory) {
-        for (ExtFactory ef : extFactory)
-            ext = composeExts(ext, ef.extCall());
-        return new Call_c(pos,
-                          target,
-                          name,
-                          CollectionUtil.nonNullList(args),
-                          ext);
-    }
-
     @Override
     public Case Case(Position pos, Expr expr) {
-        Case n = Case(pos, expr, null, extFactory());
+        Case n = new Case_c(pos, expr);
+        n = ext(n, extFactory().extCase());
         n = del(n, delFactory().delCase());
         return n;
     }
 
-    protected final Case Case(Position pos, Expr expr, Ext ext,
-            ExtFactory extFactory) {
-        for (ExtFactory ef : extFactory)
-            ext = composeExts(ext, ef.extCase());
-        return new Case_c(pos, expr, ext);
-    }
-
     @Override
     public Cast Cast(Position pos, TypeNode type, Expr expr) {
-        Cast n = Cast(pos, type, expr, null, extFactory());
+        Cast n = new Cast_c(pos, type, expr);
+        n = ext(n, extFactory().extCast());
         n = del(n, delFactory().delCast());
         return n;
     }
 
-    protected final Cast Cast(Position pos, TypeNode type, Expr expr, Ext ext,
-            ExtFactory extFactory) {
-        for (ExtFactory ef : extFactory)
-            ext = composeExts(ext, ef.extCast());
-        return new Cast_c(pos, type, expr, ext);
-    }
-
     @Override
     public Catch Catch(Position pos, Formal formal, Block body) {
-        Catch n = Catch(pos, formal, body, null, extFactory());
+        Catch n = new Catch_c(pos, formal, body);
+        n = ext(n, extFactory().extCatch());
         n = del(n, delFactory().delCatch());
         return n;
     }
 
-    protected final Catch Catch(Position pos, Formal formal, Block body,
-            Ext ext, ExtFactory extFactory) {
-        for (ExtFactory ef : extFactory)
-            ext = composeExts(ext, ef.extCatch());
-        return new Catch_c(pos, formal, body, ext);
-    }
-
     @Override
     public CharLit CharLit(Position pos, char value) {
-        CharLit n = CharLit(pos, value, null, extFactory());
+        CharLit n = new CharLit_c(pos, value);
+        n = ext(n, extFactory().extCharLit());
         n = del(n, delFactory().delCharLit());
         return n;
     }
 
-    protected final CharLit CharLit(Position pos, char value, Ext ext,
-            ExtFactory extFactory) {
-        for (ExtFactory ef : extFactory)
-            ext = composeExts(ext, ef.extCharLit());
-        return new CharLit_c(pos, value, ext);
-    }
-
     @Override
     public ClassBody ClassBody(Position pos, List<ClassMember> members) {
-        ClassBody n = ClassBody(pos, members, null, extFactory());
+        ClassBody n = new ClassBody_c(pos, CollectionUtil.nonNullList(members));
+        n = ext(n, extFactory().extClassBody());
         n = del(n, delFactory().delClassBody());
         return n;
-    }
-
-    protected final ClassBody ClassBody(Position pos,
-            List<ClassMember> members, Ext ext, ExtFactory extFactory) {
-        for (ExtFactory ef : extFactory)
-            ext = composeExts(ext, ef.extClassBody());
-        return new ClassBody_c(pos, CollectionUtil.nonNullList(members), ext);
     }
 
     @Override
     public ClassDecl ClassDecl(Position pos, Flags flags, Id name,
             TypeNode superClass, List<TypeNode> interfaces, ClassBody body) {
         ClassDecl n =
-                ClassDecl(pos,
-                          flags,
-                          name,
-                          superClass,
-                          interfaces,
-                          body,
-                          null,
-                          extFactory());
+                new ClassDecl_c(pos,
+                                flags,
+                                name,
+                                superClass,
+                                CollectionUtil.nonNullList(interfaces),
+                                body);
+        n = ext(n, extFactory().extClassDecl());
         n = del(n, delFactory().delClassDecl());
         return n;
     }
 
-    protected final ClassDecl ClassDecl(Position pos, Flags flags, Id name,
-            TypeNode superClass, List<TypeNode> interfaces, ClassBody body,
-            Ext ext, ExtFactory extFactory) {
-        for (ExtFactory ef : extFactory)
-            ext = composeExts(ext, ef.extClassDecl());
-        return new ClassDecl_c(pos,
-                               flags,
-                               name,
-                               superClass,
-                               CollectionUtil.nonNullList(interfaces),
-                               body,
-                               ext);
-    }
-
     @Override
     public ClassLit ClassLit(Position pos, TypeNode typeNode) {
-        ClassLit n = ClassLit(pos, typeNode, null, extFactory());
+        ClassLit n = new ClassLit_c(pos, typeNode);
+        n = ext(n, extFactory().extClassLit());
         n = del(n, delFactory().delClassLit());
         return n;
-    }
-
-    protected final ClassLit ClassLit(Position pos, TypeNode typeNode, Ext ext,
-            ExtFactory extFactory) {
-        for (ExtFactory ef : extFactory)
-            ext = composeExts(ext, ef.extClassLit());
-        return new ClassLit_c(pos, typeNode, ext);
     }
 
     @Override
     public Conditional Conditional(Position pos, Expr cond, Expr consequent,
             Expr alternative) {
-        Conditional n =
-                Conditional(pos,
-                            cond,
-                            consequent,
-                            alternative,
-                            null,
-                            extFactory());
+        Conditional n = new Conditional_c(pos, cond, consequent, alternative);
+        n = ext(n, extFactory().extConditional());
         n = del(n, delFactory().delConditional());
         return n;
-    }
-
-    protected final Conditional Conditional(Position pos, Expr cond,
-            Expr consequent, Expr alternative, Ext ext, ExtFactory extFactory) {
-        for (ExtFactory ef : extFactory)
-            ext = composeExts(ext, ef.extConditional());
-        return new Conditional_c(pos, cond, consequent, alternative, ext);
     }
 
     @Override
     public ConstructorCall ConstructorCall(Position pos,
             ConstructorCall.Kind kind, Expr outer, List<Expr> args) {
         ConstructorCall n =
-                ConstructorCall(pos, kind, outer, args, null, extFactory());
+                new ConstructorCall_c(pos,
+                                      kind,
+                                      outer,
+                                      CollectionUtil.nonNullList(args));
+        n = ext(n, extFactory().extConstructorCall());
         n = del(n, delFactory().delConstructorCall());
         return n;
-    }
-
-    protected final ConstructorCall ConstructorCall(Position pos,
-            ConstructorCall.Kind kind, Expr outer, List<Expr> args, Ext ext,
-            ExtFactory extFactory) {
-        for (ExtFactory ef : extFactory)
-            ext = composeExts(ext, ef.extConstructorCall());
-        return new ConstructorCall_c(pos,
-                                     kind,
-                                     outer,
-                                     CollectionUtil.nonNullList(args),
-                                     ext);
     }
 
     @Override
     public ConstructorDecl ConstructorDecl(Position pos, Flags flags, Id name,
             List<Formal> formals, List<TypeNode> throwTypes, Block body) {
         ConstructorDecl n =
-                ConstructorDecl(pos,
-                                flags,
-                                name,
-                                formals,
-                                throwTypes,
-                                body,
-                                null,
-                                extFactory());
+                new ConstructorDecl_c(pos,
+                                      flags,
+                                      name,
+                                      CollectionUtil.nonNullList(formals),
+                                      CollectionUtil.nonNullList(throwTypes),
+                                      body);
+        n = ext(n, extFactory().extConstructorDecl());
         n = del(n, delFactory().delConstructorDecl());
         return n;
-    }
-
-    protected final ConstructorDecl ConstructorDecl(Position pos, Flags flags,
-            Id name, List<Formal> formals, List<TypeNode> throwTypes,
-            Block body, Ext ext, ExtFactory extFactory) {
-        for (ExtFactory ef : extFactory)
-            ext = composeExts(ext, ef.extConstructorDecl());
-        return new ConstructorDecl_c(pos,
-                                     flags,
-                                     name,
-                                     CollectionUtil.nonNullList(formals),
-                                     CollectionUtil.nonNullList(throwTypes),
-                                     body,
-                                     ext);
     }
 
     @Override
     public FieldDecl FieldDecl(Position pos, Flags flags, TypeNode type,
             Id name, Expr init) {
-        FieldDecl n =
-                FieldDecl(pos, flags, type, name, init, null, extFactory());
+        FieldDecl n = new FieldDecl_c(pos, flags, type, name, init);
+        n = ext(n, extFactory().extFieldDecl());
         n = del(n, delFactory().delFieldDecl());
         return n;
     }
 
-    protected final FieldDecl FieldDecl(Position pos, Flags flags,
-            TypeNode type, Id name, Expr init, Ext ext, ExtFactory extFactory) {
-        for (ExtFactory ef : extFactory)
-            ext = composeExts(ext, ef.extFieldDecl());
-        return new FieldDecl_c(pos, flags, type, name, init, ext);
-    }
-
     @Override
     public Do Do(Position pos, Stmt body, Expr cond) {
-        Do n = Do(pos, body, cond, null, extFactory());
+        Do n = new Do_c(pos, body, cond);
+        n = ext(n, extFactory().extDo());
         n = del(n, delFactory().delDo());
         return n;
     }
 
-    protected final Do Do(Position pos, Stmt body, Expr cond, Ext ext,
-            ExtFactory extFactory) {
-        for (ExtFactory ef : extFactory)
-            ext = composeExts(ext, ef.extDo());
-        return new Do_c(pos, body, cond, ext);
-    }
-
     @Override
     public Empty Empty(Position pos) {
-        Empty n = Empty(pos, null, extFactory());
+        Empty n = new Empty_c(pos);
+        n = ext(n, extFactory().extEmpty());
         n = del(n, delFactory().delEmpty());
         return n;
     }
 
-    protected final Empty Empty(Position pos, Ext ext, ExtFactory extFactory) {
-        for (ExtFactory ef : extFactory)
-            ext = composeExts(ext, ef.extEmpty());
-        return new Empty_c(pos, ext);
-    }
-
     @Override
     public Eval Eval(Position pos, Expr expr) {
-        Eval n = Eval(pos, expr, null, extFactory());
+        Eval n = new Eval_c(pos, expr);
+        n = ext(n, extFactory().extEval());
         n = del(n, delFactory().delEval());
         return n;
     }
 
-    protected final Eval Eval(Position pos, Expr expr, Ext ext,
-            ExtFactory extFactory) {
-        for (ExtFactory ef : extFactory)
-            ext = composeExts(ext, ef.extEval());
-        return new Eval_c(pos, expr, ext);
-    }
-
     @Override
     public Field Field(Position pos, Receiver target, Id name) {
-        Field n = Field(pos, target, name, null, extFactory());
+        Field n = new Field_c(pos, target, name);
+        n = ext(n, extFactory().extField());
         n = del(n, delFactory().delField());
         return n;
     }
 
-    protected final Field Field(Position pos, Receiver target, Id name,
-            Ext ext, ExtFactory extFactory) {
-        for (ExtFactory ef : extFactory)
-            ext = composeExts(ext, ef.extField());
-        return new Field_c(pos, target, name, ext);
-    }
-
     @Override
     public FloatLit FloatLit(Position pos, FloatLit.Kind kind, double value) {
-        FloatLit n = FloatLit(pos, kind, value, null, extFactory());
+        FloatLit n = new FloatLit_c(pos, kind, value);
+        n = ext(n, extFactory().extFloatLit());
         n = del(n, delFactory().delFloatLit());
         return n;
-    }
-
-    protected final FloatLit FloatLit(Position pos, FloatLit.Kind kind,
-            double value, Ext ext, ExtFactory extFactory) {
-        for (ExtFactory ef : extFactory)
-            ext = composeExts(ext, ef.extFloatLit());
-        return new FloatLit_c(pos, kind, value, ext);
     }
 
     @Override
     public For For(Position pos, List<ForInit> inits, Expr cond,
             List<ForUpdate> iters, Stmt body) {
-        For n = For(pos, inits, cond, iters, body, null, extFactory());
+        For n =
+                new For_c(pos,
+                          CollectionUtil.nonNullList(inits),
+                          cond,
+                          CollectionUtil.nonNullList(iters),
+                          body);
+        n = ext(n, extFactory().extFor());
         n = del(n, delFactory().delFor());
         return n;
     }
 
-    protected final For For(Position pos, List<ForInit> inits, Expr cond,
-            List<ForUpdate> iters, Stmt body, Ext ext, ExtFactory extFactory) {
-        for (ExtFactory ef : extFactory)
-            ext = composeExts(ext, ef.extFor());
-        return new For_c(pos,
-                         CollectionUtil.nonNullList(inits),
-                         cond,
-                         CollectionUtil.nonNullList(iters),
-                         body,
-                         ext);
-    }
-
     @Override
     public Formal Formal(Position pos, Flags flags, TypeNode type, Id name) {
-        Formal n = Formal(pos, flags, type, name, null, extFactory());
+        Formal n = new Formal_c(pos, flags, type, name);
+        n = ext(n, extFactory().extFormal());
         n = del(n, delFactory().delFormal());
         return n;
     }
 
-    protected final Formal Formal(Position pos, Flags flags, TypeNode type,
-            Id name, Ext ext, ExtFactory extFactory) {
-        for (ExtFactory ef : extFactory)
-            ext = composeExts(ext, ef.extFormal());
-        return new Formal_c(pos, flags, type, name, ext);
-    }
-
     @Override
     public If If(Position pos, Expr cond, Stmt consequent, Stmt alternative) {
-        If n = If(pos, cond, consequent, alternative, null, extFactory());
+        If n = new If_c(pos, cond, consequent, alternative);
+        n = ext(n, extFactory().extIf());
         n = del(n, delFactory().delIf());
         return n;
     }
 
-    protected final If If(Position pos, Expr cond, Stmt consequent,
-            Stmt alternative, Ext ext, ExtFactory extFactory) {
-        for (ExtFactory ef : extFactory)
-            ext = composeExts(ext, ef.extIf());
-        return new If_c(pos, cond, consequent, alternative, ext);
-    }
-
     @Override
     public Import Import(Position pos, Import.Kind kind, String name) {
-        Import n = Import(pos, kind, name, null, extFactory());
+        Import n = new Import_c(pos, kind, name);
+        n = ext(n, extFactory().extImport());
         n = del(n, delFactory().delImport());
         return n;
     }
 
-    protected final Import Import(Position pos, Import.Kind kind, String name,
-            Ext ext, ExtFactory extFactory) {
-        for (ExtFactory ef : extFactory)
-            ext = composeExts(ext, ef.extImport());
-        return new Import_c(pos, kind, name, ext);
-    }
-
     @Override
     public Initializer Initializer(Position pos, Flags flags, Block body) {
-        Initializer n = Initializer(pos, flags, body, null, extFactory());
+        Initializer n = new Initializer_c(pos, flags, body);
+        n = ext(n, extFactory().extInitializer());
         n = del(n, delFactory().delInitializer());
         return n;
     }
 
-    protected final Initializer Initializer(Position pos, Flags flags,
-            Block body, Ext ext, ExtFactory extFactory) {
-        for (ExtFactory ef : extFactory)
-            ext = composeExts(ext, ef.extInitializer());
-        return new Initializer_c(pos, flags, body, ext);
-    }
-
     @Override
     public Instanceof Instanceof(Position pos, Expr expr, TypeNode type) {
-        Instanceof n = Instanceof(pos, expr, type, null, extFactory());
+        Instanceof n = new Instanceof_c(pos, expr, type);
+        n = ext(n, extFactory().extInstanceof());
         n = del(n, delFactory().delInstanceof());
         return n;
     }
 
-    protected final Instanceof Instanceof(Position pos, Expr expr,
-            TypeNode type, Ext ext, ExtFactory extFactory) {
-        for (ExtFactory ef : extFactory)
-            ext = composeExts(ext, ef.extInstanceof());
-        return new Instanceof_c(pos, expr, type, ext);
-    }
-
     @Override
     public IntLit IntLit(Position pos, IntLit.Kind kind, long value) {
-        IntLit n = IntLit(pos, kind, value, null, extFactory());
+        IntLit n = new IntLit_c(pos, kind, value);
+        n = ext(n, extFactory().extIntLit());
         n = del(n, delFactory().delIntLit());
         return n;
     }
 
-    protected final IntLit IntLit(Position pos, IntLit.Kind kind, long value,
-            Ext ext, ExtFactory extFactory) {
-        for (ExtFactory ef : extFactory)
-            ext = composeExts(ext, ef.extIntLit());
-        return new IntLit_c(pos, kind, value, ext);
-    }
-
     @Override
     public Labeled Labeled(Position pos, Id label, Stmt body) {
-        Labeled n = Labeled(pos, label, body, null, extFactory());
+        Labeled n = new Labeled_c(pos, label, body);
+        n = ext(n, extFactory().extLabeled());
         n = del(n, delFactory().delLabeled());
         return n;
     }
 
-    protected final Labeled Labeled(Position pos, Id label, Stmt body, Ext ext,
-            ExtFactory extFactory) {
-        for (ExtFactory ef : extFactory)
-            ext = composeExts(ext, ef.extLabeled());
-        return new Labeled_c(pos, label, body, ext);
-    }
-
     @Override
     public Local Local(Position pos, Id name) {
-        Local n = Local(pos, name, null, extFactory());
+        Local n = new Local_c(pos, name);
+        n = ext(n, extFactory().extLocal());
         n = del(n, delFactory().delLocal());
         return n;
     }
 
-    protected final Local Local(Position pos, Id name, Ext ext,
-            ExtFactory extFactory) {
-        for (ExtFactory ef : extFactory)
-            ext = composeExts(ext, ef.extLocal());
-        return new Local_c(pos, name, ext);
-    }
-
     @Override
     public LocalClassDecl LocalClassDecl(Position pos, ClassDecl decl) {
-        LocalClassDecl n = LocalClassDecl(pos, decl, null, extFactory());
+        LocalClassDecl n = new LocalClassDecl_c(pos, decl);
+        n = ext(n, extFactory().extLocalClassDecl());
         n = del(n, delFactory().delLocalClassDecl());
         return n;
-    }
-
-    protected final LocalClassDecl LocalClassDecl(Position pos, ClassDecl decl,
-            Ext ext, ExtFactory extFactory) {
-        for (ExtFactory ef : extFactory)
-            ext = composeExts(ext, ef.extLocalClassDecl());
-        return new LocalClassDecl_c(pos, decl, ext);
     }
 
     @Override
     public LocalDecl LocalDecl(Position pos, Flags flags, TypeNode type,
             Id name, Expr init) {
-        LocalDecl n =
-                LocalDecl(pos, flags, type, name, init, null, extFactory());
+        LocalDecl n = new LocalDecl_c(pos, flags, type, name, init);
+        n = ext(n, extFactory().extLocalDecl());
         n = del(n, delFactory().delLocalDecl());
         return n;
-    }
-
-    protected final LocalDecl LocalDecl(Position pos, Flags flags,
-            TypeNode type, Id name, Expr init, Ext ext, ExtFactory extFactory) {
-        for (ExtFactory ef : extFactory)
-            ext = composeExts(ext, ef.extLocalDecl());
-        return new LocalDecl_c(pos, flags, type, name, init, ext);
-    }
-
-    protected final Loop Loop(Position pos, Expr cond, Stmt body, Ext ext,
-            ExtFactory extFactory) {
-        for (ExtFactory ef : extFactory)
-            ext = composeExts(ext, ef.extLoop());
-        return new Loop.Instance(pos, cond, body, ext);
     }
 
     @Override
@@ -891,326 +581,181 @@ public class NodeFactory_c extends AbstractNodeFactory_c {
             TypeNode returnType, Id name, List<Formal> formals,
             List<TypeNode> throwTypes, Block body) {
         MethodDecl n =
-                MethodDecl(pos,
-                           flags,
-                           returnType,
-                           name,
-                           formals,
-                           throwTypes,
-                           body,
-                           null,
-                           extFactory());
+                new MethodDecl_c(pos,
+                                 flags,
+                                 returnType,
+                                 name,
+                                 CollectionUtil.nonNullList(formals),
+                                 CollectionUtil.nonNullList(throwTypes),
+                                 body);
+        n = ext(n, extFactory().extMethodDecl());
         n = del(n, delFactory().delMethodDecl());
         return n;
-    }
-
-    protected final MethodDecl MethodDecl(Position pos, Flags flags,
-            TypeNode returnType, Id name, List<Formal> formals,
-            List<TypeNode> throwTypes, Block body, Ext ext,
-            ExtFactory extFactory) {
-        for (ExtFactory ef : extFactory)
-            ext = composeExts(ext, ef.extMethodDecl());
-        return new MethodDecl_c(pos,
-                                flags,
-                                returnType,
-                                name,
-                                CollectionUtil.nonNullList(formals),
-                                CollectionUtil.nonNullList(throwTypes),
-                                body,
-                                ext);
     }
 
     @Override
     public New New(Position pos, Expr outer, TypeNode objectType,
             List<Expr> args, ClassBody body) {
-        New n = New(pos, outer, objectType, args, body, null, extFactory());
+        New n =
+                new New_c(pos,
+                          outer,
+                          objectType,
+                          CollectionUtil.nonNullList(args),
+                          body);
+        n = ext(n, extFactory().extNew());
         n = del(n, delFactory().delNew());
         return n;
-    }
-
-    protected final New New(Position pos, Expr outer, TypeNode objectType,
-            List<Expr> args, ClassBody body, Ext ext, ExtFactory extFactory) {
-        for (ExtFactory ef : extFactory)
-            ext = composeExts(ext, ef.extNew());
-        return new New_c(pos,
-                         outer,
-                         objectType,
-                         CollectionUtil.nonNullList(args),
-                         body,
-                         ext);
     }
 
     @Override
     public NewArray NewArray(Position pos, TypeNode base, List<Expr> dims,
             int addDims, ArrayInit init) {
         NewArray n =
-                NewArray(pos, base, dims, addDims, init, null, extFactory());
+                new NewArray_c(pos,
+                               base,
+                               CollectionUtil.nonNullList(dims),
+                               addDims,
+                               init);
+        n = ext(n, extFactory().extNewArray());
         n = del(n, delFactory().delNewArray());
         return n;
     }
 
-    protected final NewArray NewArray(Position pos, TypeNode base,
-            List<Expr> dims, int addDims, ArrayInit init, Ext ext,
-            ExtFactory extFactory) {
-        for (ExtFactory ef : extFactory)
-            ext = composeExts(ext, ef.extNewArray());
-        return new NewArray_c(pos,
-                              base,
-                              CollectionUtil.nonNullList(dims),
-                              addDims,
-                              init,
-                              ext);
-    }
-
     @Override
     public NullLit NullLit(Position pos) {
-        NullLit n = NullLit(pos, null, extFactory());
+        NullLit n = new NullLit_c(pos);
+        n = ext(n, extFactory().extNullLit());
         n = del(n, delFactory().delNullLit());
         return n;
     }
 
-    protected final NullLit NullLit(Position pos, Ext ext, ExtFactory extFactory) {
-        for (ExtFactory ef : extFactory)
-            ext = composeExts(ext, ef.extNullLit());
-        return new NullLit_c(pos, ext);
-    }
-
     @Override
     public Return Return(Position pos, Expr expr) {
-        Return n = Return(pos, expr, null, extFactory());
+        Return n = new Return_c(pos, expr);
+        n = ext(n, extFactory().extReturn());
         n = del(n, delFactory().delReturn());
         return n;
-    }
-
-    protected final Return Return(Position pos, Expr expr, Ext ext,
-            ExtFactory extFactory) {
-        for (ExtFactory ef : extFactory)
-            ext = composeExts(ext, ef.extReturn());
-        return new Return_c(pos, expr, ext);
     }
 
     @Override
     public SourceCollection SourceCollection(Position pos,
             List<SourceFile> sources) {
-        SourceCollection n = SourceCollection(pos, sources, null, extFactory());
+        SourceCollection n =
+                new SourceCollection_c(pos, CollectionUtil.nonNullList(sources));
+        n = ext(n, extFactory().extSourceCollection());
         n = del(n, delFactory().delSourceCollection());
         return n;
-    }
-
-    protected final SourceCollection SourceCollection(Position pos,
-            List<SourceFile> sources, Ext ext, ExtFactory extFactory) {
-        for (ExtFactory ef : extFactory)
-            ext = composeExts(ext, ef.extSourceCollection());
-        return new SourceCollection_c(pos,
-                                      CollectionUtil.nonNullList(sources),
-                                      ext);
     }
 
     @Override
     public SourceFile SourceFile(Position pos, PackageNode packageName,
             List<Import> imports, List<TopLevelDecl> decls) {
         SourceFile n =
-                SourceFile(pos, packageName, imports, decls, null, extFactory());
+                new SourceFile_c(pos,
+                                 packageName,
+                                 CollectionUtil.nonNullList(imports),
+                                 CollectionUtil.nonNullList(decls));
+        n = ext(n, extFactory().extSourceFile());
         n = del(n, delFactory().delSourceFile());
         return n;
     }
 
-    protected final SourceFile SourceFile(Position pos,
-            PackageNode packageName, List<Import> imports,
-            List<TopLevelDecl> decls, Ext ext, ExtFactory extFactory) {
-        for (ExtFactory ef : extFactory)
-            ext = composeExts(ext, ef.extSourceFile());
-        return new SourceFile_c(pos,
-                                packageName,
-                                CollectionUtil.nonNullList(imports),
-                                CollectionUtil.nonNullList(decls),
-                                ext);
-    }
-
     @Override
     public Special Special(Position pos, Special.Kind kind, TypeNode outer) {
-        Special n = Special(pos, kind, outer, null, extFactory());
+        Special n = new Special_c(pos, kind, outer);
+        n = ext(n, extFactory().extSpecial());
         n = del(n, delFactory().delSpecial());
         return n;
     }
 
-    protected final Special Special(Position pos, Special.Kind kind,
-            TypeNode outer, Ext ext, ExtFactory extFactory) {
-        for (ExtFactory ef : extFactory)
-            ext = composeExts(ext, ef.extSpecial());
-        return new Special_c(pos, kind, outer, ext);
-    }
-
     @Override
     public StringLit StringLit(Position pos, String value) {
-        StringLit n = StringLit(pos, value, null, extFactory());
+        StringLit n = new StringLit_c(pos, value);
+        n = ext(n, extFactory().extStringLit());
         n = del(n, delFactory().delStringLit());
         return n;
     }
 
-    protected final StringLit StringLit(Position pos, String value, Ext ext,
-            ExtFactory extFactory) {
-        for (ExtFactory ef : extFactory)
-            ext = composeExts(ext, ef.extStringLit());
-        return new StringLit_c(pos, value, ext);
-    }
-
     @Override
     public Switch Switch(Position pos, Expr expr, List<SwitchElement> elements) {
-        Switch n = Switch(pos, expr, elements, null, extFactory());
+        Switch n =
+                new Switch_c(pos, expr, CollectionUtil.nonNullList(elements));
+        n = ext(n, extFactory().extSwitch());
         n = del(n, delFactory().delSwitch());
         return n;
     }
 
-    protected final Switch Switch(Position pos, Expr expr,
-            List<SwitchElement> elements, Ext ext, ExtFactory extFactory) {
-        for (ExtFactory ef : extFactory)
-            ext = composeExts(ext, ef.extSwitch());
-        return new Switch_c(pos,
-                            expr,
-                            CollectionUtil.nonNullList(elements),
-                            ext);
-    }
-
     @Override
     public Synchronized Synchronized(Position pos, Expr expr, Block body) {
-        Synchronized n = Synchronized(pos, expr, body, null, extFactory());
+        Synchronized n = new Synchronized_c(pos, expr, body);
+        n = ext(n, extFactory().extSynchronized());
         n = del(n, delFactory().delSynchronized());
         return n;
     }
 
-    protected final Synchronized Synchronized(Position pos, Expr expr,
-            Block body, Ext ext, ExtFactory extFactory) {
-        for (ExtFactory ef : extFactory)
-            ext = composeExts(ext, ef.extSynchronized());
-        return new Synchronized_c(pos, expr, body, ext);
-    }
-
-    protected final Term Term(Position pos, Ext ext, ExtFactory extFactory) {
-        for (ExtFactory ef : extFactory)
-            ext = composeExts(ext, ef.extTerm());
-        return new Term.Instance(pos, ext);
-    }
-
     @Override
     public Throw Throw(Position pos, Expr expr) {
-        Throw n = Throw(pos, expr, null, extFactory());
+        Throw n = new Throw_c(pos, expr);
+        n = ext(n, extFactory().extThrow());
         n = del(n, delFactory().delThrow());
         return n;
-    }
-
-    protected final Throw Throw(Position pos, Expr expr, Ext ext,
-            ExtFactory extFactory) {
-        for (ExtFactory ef : extFactory)
-            ext = composeExts(ext, ef.extThrow());
-        return new Throw_c(pos, expr, ext);
     }
 
     @Override
     public Try Try(Position pos, Block tryBlock, List<Catch> catchBlocks,
             Block finallyBlock) {
         Try n =
-                Try(pos,
-                    tryBlock,
-                    catchBlocks,
-                    finallyBlock,
-                    null,
-                    extFactory());
+                new Try_c(pos,
+                          tryBlock,
+                          CollectionUtil.nonNullList(catchBlocks),
+                          finallyBlock);
+        n = ext(n, extFactory().extTry());
         n = del(n, delFactory().delTry());
         return n;
     }
 
-    protected final Try Try(Position pos, Block tryBlock,
-            List<Catch> catchBlocks, Block finallyBlock, Ext ext,
-            ExtFactory extFactory) {
-        for (ExtFactory ef : extFactory)
-            ext = composeExts(ext, ef.extTry());
-        return new Try_c(pos,
-                         tryBlock,
-                         CollectionUtil.nonNullList(catchBlocks),
-                         finallyBlock,
-                         ext);
-    }
-
-    protected final TypeNode TypeNode(Position pos, Ext ext,
-            ExtFactory extFactory) {
-        for (ExtFactory ef : extFactory)
-            ext = composeExts(ext, ef.extTypeNode());
-        return new TypeNode.Instance(pos, ext);
-    }
-
     @Override
     public ArrayTypeNode ArrayTypeNode(Position pos, TypeNode base) {
-        ArrayTypeNode n = ArrayTypeNode(pos, base, null, extFactory());
+        ArrayTypeNode n = new ArrayTypeNode_c(pos, base);
+        n = ext(n, extFactory().extArrayTypeNode());
         n = del(n, delFactory().delArrayTypeNode());
         return n;
     }
 
-    protected final ArrayTypeNode ArrayTypeNode(Position pos, TypeNode base,
-            Ext ext, ExtFactory extFactory) {
-        for (ExtFactory ef : extFactory)
-            ext = composeExts(ext, ef.extArrayTypeNode());
-        return new ArrayTypeNode_c(pos, base, ext);
-    }
-
     @Override
     public CanonicalTypeNode CanonicalTypeNode(Position pos, Type type) {
-        CanonicalTypeNode n = CanonicalTypeNode(pos, type, null, extFactory());
-        n = del(n, delFactory().delCanonicalTypeNode());
-        return n;
-    }
-
-    protected final CanonicalTypeNode CanonicalTypeNode(Position pos,
-            Type type, Ext ext, ExtFactory extFactory) {
         if (!type.isCanonical()) {
             throw new InternalCompilerError("Cannot construct a canonical "
                     + "type node for a non-canonical type.");
         }
 
-        for (ExtFactory ef : extFactory)
-            ext = composeExts(ext, ef.extCanonicalTypeNode());
-        return new CanonicalTypeNode_c(pos, type, ext);
+        CanonicalTypeNode n = new CanonicalTypeNode_c(pos, type);
+        n = ext(n, extFactory().extCanonicalTypeNode());
+        n = del(n, delFactory().delCanonicalTypeNode());
+        return n;
     }
 
     @Override
     public PackageNode PackageNode(Position pos, Package p) {
-        PackageNode n = PackageNode(pos, p, null, extFactory());
+        PackageNode n = new PackageNode_c(pos, p);
+        n = ext(n, extFactory().extPackageNode());
         n = del(n, delFactory().delPackageNode());
         return n;
     }
 
-    protected final PackageNode PackageNode(Position pos, Package p, Ext ext,
-            ExtFactory extFactory) {
-        for (ExtFactory ef : extFactory)
-            ext = composeExts(ext, ef.extPackageNode());
-        return new PackageNode_c(pos, p, ext);
-    }
-
     @Override
     public Unary Unary(Position pos, Unary.Operator op, Expr expr) {
-        Unary n = Unary(pos, op, expr, null, extFactory());
+        Unary n = new Unary_c(pos, op, expr);
+        n = ext(n, extFactory().extUnary());
         n = del(n, delFactory().delUnary());
         return n;
     }
 
-    protected final Unary Unary(Position pos, Unary.Operator op, Expr expr,
-            Ext ext, ExtFactory extFactory) {
-        for (ExtFactory ef : extFactory)
-            ext = composeExts(ext, ef.extUnary());
-        return new Unary_c(pos, op, expr, ext);
-    }
-
     @Override
     public While While(Position pos, Expr cond, Stmt body) {
-        While n = While(pos, cond, body, null, extFactory());
+        While n = new While_c(pos, cond, body);
+        n = ext(n, extFactory().extWhile());
         n = del(n, delFactory().delWhile());
         return n;
-    }
-
-    protected final While While(Position pos, Expr cond, Stmt body, Ext ext,
-            ExtFactory extFactory) {
-        for (ExtFactory ef : extFactory)
-            ext = composeExts(ext, ef.extWhile());
-        return new While_c(pos, cond, body, ext);
     }
 }

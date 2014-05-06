@@ -50,7 +50,7 @@ public class Instanceof_c extends Expr_c implements Instanceof {
     protected Expr expr;
     protected TypeNode compareType;
 
-    @Deprecated
+//    @Deprecated
     public Instanceof_c(Position pos, Expr expr, TypeNode compareType) {
         this(pos, expr, compareType, null);
     }

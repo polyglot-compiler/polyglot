@@ -52,7 +52,7 @@ public class ArrayAccess_c extends Expr_c implements ArrayAccess {
     protected Expr array;
     protected Expr index;
 
-    @Deprecated
+//    @Deprecated
     public ArrayAccess_c(Position pos, Expr array, Expr index) {
         this(pos, array, index, null);
     }

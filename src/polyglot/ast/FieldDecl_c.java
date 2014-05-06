@@ -71,7 +71,7 @@ public class FieldDecl_c extends Term_c implements FieldDecl {
     protected FieldInstance fi;
     protected InitializerInstance ii;
 
-    @Deprecated
+//    @Deprecated
     public FieldDecl_c(Position pos, Flags flags, TypeNode type, Id name,
             Expr init) {
         this(pos, flags, type, name, init, null);

@@ -33,8 +33,8 @@ import polyglot.ast.Expr;
 import polyglot.ast.Formal;
 import polyglot.ast.Id;
 import polyglot.ast.LocalDecl;
-import polyglot.ast.Term;
 import polyglot.ast.TypeNode;
+import polyglot.ext.jl5.ast.AnnotationElem;
 import polyglot.ext.jl5.ast.JL5NodeFactory;
 import polyglot.types.Flags;
 import polyglot.util.Position;
@@ -48,8 +48,8 @@ public interface JL7NodeFactory extends JL5NodeFactory {
     MultiCatch MultiCatch(Position pos, Formal formal,
             List<TypeNode> alternatives, Block body);
 
-    LocalDecl Resource(Position pos, Flags flags, List<Term> annotations,
-            TypeNode type, Id name, Expr init);
+    LocalDecl Resource(Position pos, Flags flags,
+            List<AnnotationElem> annotations, TypeNode type, Id name, Expr init);
 
     TryWithResources TryWithResources(Position pos, List<LocalDecl> resources,
             Block tryBlock, List<Catch> catchBlocks, Block finallyBlock);

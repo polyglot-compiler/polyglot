@@ -40,7 +40,7 @@ import polyglot.visit.TypeChecker;
  * the elements of these array may be expressions of any type (e.g.,
  * {@code Call}).
  */
-public interface ElementValueArrayInit {
+public interface ElementValueArrayInit extends Term {
     /**
      * Get the initializer elements.
      * @return A list of {@link polyglot.ast.Term Term}. Are actually either expressions of

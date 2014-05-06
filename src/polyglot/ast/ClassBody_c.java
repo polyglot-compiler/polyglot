@@ -58,7 +58,7 @@ public class ClassBody_c extends Term_c implements ClassBody {
 
     protected List<ClassMember> members;
 
-    @Deprecated
+//    @Deprecated
     public ClassBody_c(Position pos, List<ClassMember> members) {
         this(pos, members, null);
     }

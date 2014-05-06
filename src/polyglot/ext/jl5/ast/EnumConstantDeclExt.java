@@ -28,7 +28,6 @@ package polyglot.ext.jl5.ast;
 import java.util.List;
 
 import polyglot.ast.Node;
-import polyglot.ast.Term;
 import polyglot.ext.jl5.types.Annotations;
 import polyglot.types.Declaration;
 import polyglot.types.SemanticException;
@@ -50,7 +49,11 @@ import polyglot.visit.SupertypeDisambiguator;
 public class EnumConstantDeclExt extends JL5AnnotatedElementExt {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
-    public EnumConstantDeclExt(List<Term> annotations) {
+    public EnumConstantDeclExt() {
+        this(null);
+    }
+
+    public EnumConstantDeclExt(List<AnnotationElem> annotations) {
         super(annotations);
     }
 

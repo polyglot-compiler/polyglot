@@ -269,15 +269,13 @@ public class AnnotationElemDecl_c extends Term_c implements AnnotationElemDecl {
             if (defaultVal instanceof Expr) {
                 defaultValType = ((Expr) defaultVal).type();
             }
-            else if (JL5Ext.ext(defaultVal) instanceof ElementValueArrayInit) {
-                ElementValueArrayInit evai =
-                        (ElementValueArrayInit) JL5Ext.ext(defaultVal);
+            else if (defaultVal instanceof ElementValueArrayInit) {
+                ElementValueArrayInit evai = (ElementValueArrayInit) defaultVal;
                 defaultValType = evai.type();
             }
-            else if (JL5Ext.ext(defaultVal) instanceof AnnotationElem) {
+            else if (defaultVal instanceof AnnotationElem) {
                 defaultValType =
-                        ((AnnotationElem) JL5Ext.ext(defaultVal)).typeName()
-                                                                 .type();
+                        ((AnnotationElem) defaultVal).typeName().type();
             }
             else {
                 throw new InternalCompilerError("Don't know how to deal with default value ("
@@ -286,9 +284,9 @@ public class AnnotationElemDecl_c extends Term_c implements AnnotationElemDecl {
                                                         + defaultVal.getClass(),
                                                 defaultVal.position());
             }
-            if (JL5Ext.ext(defaultVal) instanceof ElementValueArrayInit) {
-                ((ElementValueArrayInit) JL5Ext.ext(defaultVal)).typeCheckElements(tc,
-                                                                                   type.type());
+            if (defaultVal instanceof ElementValueArrayInit) {
+                ((ElementValueArrayInit) defaultVal).typeCheckElements(tc,
+                                                                       type.type());
             }
             else {
                 if (!ts.isImplicitCastValid(defaultValType, type.type())

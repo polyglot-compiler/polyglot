@@ -32,6 +32,7 @@ import java.util.List;
 import polyglot.ast.Id;
 import polyglot.ast.Node;
 import polyglot.ast.TypeNode;
+import polyglot.ast.TypeNode_c;
 import polyglot.ext.jl5.types.JL5Context;
 import polyglot.ext.jl5.types.JL5TypeSystem;
 import polyglot.ext.jl5.types.TypeVariable;
@@ -53,20 +54,16 @@ import polyglot.visit.PrettyPrinter;
 import polyglot.visit.TypeBuilder;
 import polyglot.visit.TypeChecker;
 
-public class ParamTypeNode_c extends JL5TermExt implements ParamTypeNode {
+public class ParamTypeNode_c extends TypeNode_c implements ParamTypeNode {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
     protected Id id;
     protected List<TypeNode> bounds;
 
-    public ParamTypeNode_c(Id id, List<TypeNode> bounds) {
+    public ParamTypeNode_c(Position pos, Id id, List<TypeNode> bounds) {
+        super(pos);
         this.id = id;
         this.bounds = ListUtil.copy(bounds, true);
-    }
-
-    @Override
-    public TypeNode node() {
-        return (TypeNode) super.node();
     }
 
     @Override
@@ -75,16 +72,16 @@ public class ParamTypeNode_c extends JL5TermExt implements ParamTypeNode {
     }
 
     @Override
-    public Node id(Id id) {
-        return id(node, id);
+    public ParamTypeNode id(Id id) {
+        return id(this, id);
     }
 
-    protected <N extends Node> N id(N n, Id id) {
-        ParamTypeNode_c ext = (ParamTypeNode_c) JL5Ext.ext(n);
+    protected <N extends ParamTypeNode_c> N id(N n, Id id) {
+        ParamTypeNode_c ext = n;
         if (ext.id == id) return n;
-        if (n == node) {
+        if (n == this) {
             n = Copy.Util.copy(n);
-            ext = (ParamTypeNode_c) JL5Ext.ext(n);
+            ext = n;
         }
         ext.id = id;
         return n;
@@ -96,22 +93,23 @@ public class ParamTypeNode_c extends JL5TermExt implements ParamTypeNode {
     }
 
     @Override
-    public Node bounds(List<TypeNode> bounds) {
-        return bounds(node, bounds);
+    public ParamTypeNode bounds(List<TypeNode> bounds) {
+        return bounds(this, bounds);
     }
 
-    protected <N extends Node> N bounds(N n, List<TypeNode> bounds) {
-        ParamTypeNode_c ext = (ParamTypeNode_c) JL5Ext.ext(n);
+    protected <N extends ParamTypeNode_c> N bounds(N n, List<TypeNode> bounds) {
+        ParamTypeNode_c ext = n;
         if (CollectionUtil.equals(ext.bounds, bounds)) return n;
-        if (n == node) {
+        if (n == this) {
             n = Copy.Util.copy(n);
-            ext = (ParamTypeNode_c) JL5Ext.ext(n);
+            ext = n;
         }
         ext.bounds = ListUtil.copy(bounds, true);
         return n;
     }
 
-    protected <N extends Node> N reconstruct(N n, List<TypeNode> bounds) {
+    protected <N extends ParamTypeNode_c> N reconstruct(N n,
+            List<TypeNode> bounds) {
         n = bounds(n, bounds);
         return n;
     }
@@ -119,12 +117,12 @@ public class ParamTypeNode_c extends JL5TermExt implements ParamTypeNode {
     @Override
     public Node visitChildren(NodeVisitor v) {
         List<TypeNode> bounds = visitList(this.bounds, v);
-        return reconstruct(node, bounds);
+        return reconstruct(this, bounds);
     }
 
     @Override
     public Context enterScope(Context c) {
-        c = ((JL5Context) c).pushTypeVariable((TypeVariable) node().type());
+        c = ((JL5Context) c).pushTypeVariable((TypeVariable) type());
         return super.enterScope(c);
     }
 
@@ -142,7 +140,7 @@ public class ParamTypeNode_c extends JL5TermExt implements ParamTypeNode {
         // makes a new TypeVariable with a list of bounds which
         // are unknown types
         JL5TypeSystem ts = (JL5TypeSystem) tb.typeSystem();
-        TypeNode n = this.node();
+        TypeNode n = this;
         Position position = n.position();
 
         List<ReferenceType> typeList = new ArrayList<>(bounds.size());
@@ -162,7 +160,7 @@ public class ParamTypeNode_c extends JL5TermExt implements ParamTypeNode {
         // all of the children (bounds list) will have already been 
         // disambiguated and should there for be actual types
         JL5TypeSystem ts = (JL5TypeSystem) ar.typeSystem();
-        TypeNode n = this.node();
+        TypeNode n = this;
 
         boolean ambiguous = false;
         List<Type> typeList = new ArrayList<>();
@@ -231,7 +229,7 @@ public class ParamTypeNode_c extends JL5TermExt implements ParamTypeNode {
 
     @Override
     public Node extRewrite(ExtensionRewriter rw) throws SemanticException {
-        TypeNode n = this.node();
+        TypeNode n = this;
         return rw.typeToJava(n.type(), n.position());
     }
 

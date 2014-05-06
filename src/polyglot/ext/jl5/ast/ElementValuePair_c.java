@@ -30,10 +30,12 @@ import java.util.List;
 import polyglot.ast.Id;
 import polyglot.ast.Node;
 import polyglot.ast.Term;
+import polyglot.ast.Term_c;
 import polyglot.ext.jl5.types.JL5TypeSystem;
 import polyglot.types.SemanticException;
 import polyglot.util.CodeWriter;
 import polyglot.util.Copy;
+import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
 import polyglot.visit.CFGBuilder;
 import polyglot.visit.NodeVisitor;
@@ -41,13 +43,14 @@ import polyglot.visit.PrettyPrinter;
 import polyglot.visit.Translator;
 import polyglot.visit.TypeChecker;
 
-public class ElementValuePair_c extends JL5TermExt implements ElementValuePair {
+public class ElementValuePair_c extends Term_c implements ElementValuePair {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
     protected Id name;
     protected Term value;
 
-    public ElementValuePair_c(Id name, Term value) {
+    public ElementValuePair_c(Position pos, Id name, Term value) {
+        super(pos);
         this.name = name;
         this.value = value;
     }
@@ -62,16 +65,16 @@ public class ElementValuePair_c extends JL5TermExt implements ElementValuePair {
         return name;
     }
 
-    public Node id(Id name) {
-        return id(node, name);
+    public ElementValuePair id(Id name) {
+        return id(this, name);
     }
 
-    protected <N extends Node> N id(N n, Id name) {
-        ElementValuePair_c ext = (ElementValuePair_c) JL5Ext.ext(n);
+    protected <N extends ElementValuePair_c> N id(N n, Id name) {
+        ElementValuePair_c ext = n;
         if (ext.name == name) return n;
-        if (n == node) {
+        if (n == this) {
             n = Copy.Util.copy(n);
-            ext = (ElementValuePair_c) JL5Ext.ext(n);
+            ext = n;
         }
         ext.name = name;
         return n;
@@ -82,16 +85,16 @@ public class ElementValuePair_c extends JL5TermExt implements ElementValuePair {
         return value;
     }
 
-    public Node value(Term value) {
-        return value(node, value);
+    public ElementValuePair value(Term value) {
+        return value(this, value);
     }
 
-    protected <N extends Node> N value(N n, Term value) {
-        ElementValuePair_c ext = (ElementValuePair_c) JL5Ext.ext(n);
+    protected <N extends ElementValuePair_c> N value(N n, Term value) {
+        ElementValuePair_c ext = n;
         if (ext.value == value) return n;
-        if (n == node) {
+        if (n == this) {
             n = Copy.Util.copy(n);
-            ext = (ElementValuePair_c) JL5Ext.ext(n);
+            ext = n;
         }
         ext.value = value;
         return n;
@@ -107,7 +110,7 @@ public class ElementValuePair_c extends JL5TermExt implements ElementValuePair {
     public Node typeCheck(TypeChecker tc) throws SemanticException {
         JL5TypeSystem ts = (JL5TypeSystem) tc.typeSystem();
         ts.checkAnnotationValueConstant(value);
-        return node();
+        return this;
     }
 
     @Override
@@ -124,7 +127,7 @@ public class ElementValuePair_c extends JL5TermExt implements ElementValuePair {
 
     @Override
     public <T> List<T> acceptCFG(CFGBuilder<?> v, List<T> succs) {
-        v.visitCFG(value, node(), Term.EXIT);
+        v.visitCFG(value, this, Term.EXIT);
         return succs;
     }
 

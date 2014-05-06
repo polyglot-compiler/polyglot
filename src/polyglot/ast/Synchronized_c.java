@@ -51,7 +51,7 @@ public class Synchronized_c extends Stmt_c implements Synchronized {
     protected Expr expr;
     protected Block body;
 
-    @Deprecated
+//    @Deprecated
     public Synchronized_c(Position pos, Expr expr, Block body) {
         this(pos, expr, body, null);
     }

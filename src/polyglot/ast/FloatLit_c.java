@@ -44,7 +44,7 @@ public class FloatLit_c extends Lit_c implements FloatLit {
     protected FloatLit.Kind kind;
     protected double value;
 
-    @Deprecated
+//    @Deprecated
     public FloatLit_c(Position pos, FloatLit.Kind kind, double value) {
         this(pos, kind, value, null);
     }

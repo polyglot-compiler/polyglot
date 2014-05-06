@@ -54,7 +54,7 @@ public class Binary_c extends Expr_c implements Binary {
     protected Expr right;
     protected Precedence precedence;
 
-    @Deprecated
+//    @Deprecated
     public Binary_c(Position pos, Expr left, Operator op, Expr right) {
         this(pos, left, op, right, null);
     }

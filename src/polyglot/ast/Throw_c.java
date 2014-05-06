@@ -52,7 +52,7 @@ public class Throw_c extends Stmt_c implements Throw {
 
     protected Expr expr;
 
-    @Deprecated
+//    @Deprecated
     public Throw_c(Position pos, Expr expr) {
         this(pos, expr, null);
     }

@@ -48,7 +48,7 @@ public class ClassLit_c extends Lit_c implements ClassLit {
 
     protected TypeNode typeNode;
 
-    @Deprecated
+//    @Deprecated
     public ClassLit_c(Position pos, TypeNode typeNode) {
         this(pos, typeNode, null);
     }

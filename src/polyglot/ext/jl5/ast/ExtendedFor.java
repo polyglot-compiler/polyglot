@@ -27,15 +27,15 @@ package polyglot.ext.jl5.ast;
 
 import polyglot.ast.Expr;
 import polyglot.ast.LocalDecl;
-import polyglot.ast.Node;
+import polyglot.ast.Loop;
 
-public interface ExtendedFor {
-
-    Node decl(LocalDecl decl);
+public interface ExtendedFor extends Loop {
 
     LocalDecl decl();
 
+    ExtendedFor decl(LocalDecl decl);
+
     Expr expr();
 
-    Node expr(Expr expr);
+    ExtendedFor expr(Expr expr);
 }

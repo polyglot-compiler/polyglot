@@ -47,7 +47,7 @@ public class SourceCollection_c extends Node_c implements SourceCollection {
 
     protected List<SourceFile> sources;
 
-    @Deprecated
+//    @Deprecated
     public SourceCollection_c(Position pos, List<SourceFile> sources) {
         this(pos, sources, null);
     }

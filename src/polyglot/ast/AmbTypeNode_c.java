@@ -48,7 +48,7 @@ public class AmbTypeNode_c extends TypeNode_c implements AmbTypeNode {
     protected QualifierNode qual;
     protected Id name;
 
-    @Deprecated
+//    @Deprecated
     public AmbTypeNode_c(Position pos, QualifierNode qual, Id name) {
         this(pos, qual, name, null);
     }

@@ -49,7 +49,6 @@ import polyglot.ext.jl5.ast.AnnotationElem;
 import polyglot.ext.jl5.ast.ElementValueArrayInit;
 import polyglot.ext.jl5.ast.EnumConstant;
 import polyglot.ext.jl5.ast.J5Lang_c;
-import polyglot.ext.jl5.ast.JL5Ext;
 import polyglot.ext.jl5.types.inference.InferenceSolver;
 import polyglot.ext.jl5.types.inference.InferenceSolver_c;
 import polyglot.ext.jl5.types.inference.LubType;
@@ -2468,16 +2467,16 @@ public class JL5TypeSystem_c extends
     @Override
     public void checkAnnotationValueConstant(Term value)
             throws SemanticException {
-        if (JL5Ext.ext(value) instanceof ElementValueArrayInit) {
+        if (value instanceof ElementValueArrayInit) {
             // check elements
-            for (Term next : ((ElementValueArrayInit) JL5Ext.ext(value)).elements()) {
+            for (Term next : ((ElementValueArrayInit) value).elements()) {
                 if (!isAnnotationValueConstant(next)) {
                     throw new SemanticException("Annotation attribute value must be constant",
                                                 next.position());
                 }
             }
         }
-        else if (JL5Ext.ext(value) instanceof AnnotationElem) {
+        else if (value instanceof AnnotationElem) {
             return;
         }
         else if (!isAnnotationValueConstant(value)) {
@@ -2501,7 +2500,7 @@ public class JL5TypeSystem_c extends
                 // value is a constant
                 return true;
             }
-            if (JL5Ext.ext(ev) instanceof EnumConstant) {
+            if (ev instanceof EnumConstant) {
                 // Enum constants are constants for our purposes.
                 return true;
             }
@@ -2515,19 +2514,17 @@ public class JL5TypeSystem_c extends
     }
 
     @Override
-    public void checkDuplicateAnnotations(List<Term> annotations)
+    public void checkDuplicateAnnotations(List<AnnotationElem> annotations)
             throws SemanticException {
         // check no duplicate annotations used
-        ArrayList<Term> l = new ArrayList<>(annotations);
+        ArrayList<AnnotationElem> l = new ArrayList<>(annotations);
         for (int i = 0; i < l.size(); i++) {
-            Term ti = l.get(i);
-            AnnotationElem ai = (AnnotationElem) JL5Ext.ext(ti);
+            AnnotationElem ai = l.get(i);
             for (int j = i + 1; j < l.size(); j++) {
-                Term tj = l.get(j);
-                AnnotationElem aj = (AnnotationElem) JL5Ext.ext(tj);
+                AnnotationElem aj = l.get(j);
                 if (ai.typeName().type() == aj.typeName().type()) {
                     throw new SemanticException("Duplicate annotation use: "
-                            + aj.typeName(), tj.position());
+                            + aj.typeName(), aj.position());
                 }
             }
         }

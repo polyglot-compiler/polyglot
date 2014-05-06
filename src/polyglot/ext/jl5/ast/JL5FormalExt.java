@@ -29,7 +29,6 @@ import java.util.List;
 
 import polyglot.ast.Formal;
 import polyglot.ast.Node;
-import polyglot.ast.Term;
 import polyglot.ext.jl5.types.Annotations;
 import polyglot.ext.jl5.types.JL5ArrayType;
 import polyglot.ext.jl5.types.JL5Flags;
@@ -51,7 +50,11 @@ public class JL5FormalExt extends JL5AnnotatedElementExt {
 
     protected boolean isCatchFormal = false;
 
-    public JL5FormalExt(boolean isVarArg, List<Term> annotations) {
+    public JL5FormalExt() {
+        this(false, null);
+    }
+
+    public JL5FormalExt(boolean isVarArg, List<AnnotationElem> annotations) {
         super(annotations);
         this.isVarArg = isVarArg;
     }

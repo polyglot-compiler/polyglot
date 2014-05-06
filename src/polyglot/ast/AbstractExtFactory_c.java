@@ -103,791 +103,870 @@ public abstract class AbstractExtFactory_c implements ExtFactory {
     @Override
     public final Ext extId() {
         Ext e = extIdImpl();
+
+        if (nextExtFactory != null) {
+            Ext e2 = nextExtFactory.extId();
+            e = composeExts(e, e2);
+        }
         return postExtId(e);
     }
 
     @Override
     public final Ext extAmbAssign() {
         Ext e = extAmbAssignImpl();
+
+        if (nextExtFactory != null) {
+            Ext e2 = nextExtFactory.extAmbAssign();
+            e = composeExts(e, e2);
+        }
         return postExtAmbAssign(e);
     }
 
     @Override
     public final Ext extAmbExpr() {
         Ext e = extAmbExprImpl();
+
+        if (nextExtFactory != null) {
+            Ext e2 = nextExtFactory.extAmbExpr();
+            e = composeExts(e, e2);
+        }
         return postExtAmbExpr(e);
     }
 
     @Override
     public final Ext extAmbPrefix() {
         Ext e = extAmbPrefixImpl();
+
+        if (nextExtFactory != null) {
+            Ext e2 = nextExtFactory.extAmbPrefix();
+            e = composeExts(e, e2);
+        }
         return postExtAmbPrefix(e);
     }
 
     @Override
     public final Ext extAmbQualifierNode() {
         Ext e = extAmbQualifierNodeImpl();
+
+        if (nextExtFactory != null) {
+            Ext e2 = nextExtFactory.extAmbQualifierNode();
+            e = composeExts(e, e2);
+        }
         return postExtAmbQualifierNode(e);
     }
 
     @Override
     public final Ext extAmbReceiver() {
         Ext e = extAmbReceiverImpl();
+
+        if (nextExtFactory != null) {
+            Ext e2 = nextExtFactory.extAmbReceiver();
+            e = composeExts(e, e2);
+        }
         return postExtAmbReceiver(e);
     }
 
     @Override
     public final Ext extAmbTypeNode() {
         Ext e = extAmbTypeNodeImpl();
+
+        if (nextExtFactory != null) {
+            Ext e2 = nextExtFactory.extAmbTypeNode();
+            e = composeExts(e, e2);
+        }
         return postExtAmbTypeNode(e);
     }
 
     @Override
     public final Ext extArrayAccess() {
         Ext e = extArrayAccessImpl();
+
+        if (nextExtFactory != null) {
+            Ext e2 = nextExtFactory.extArrayAccess();
+            e = composeExts(e, e2);
+        }
         return postExtArrayAccess(e);
     }
 
     @Override
     public final Ext extArrayInit() {
         Ext e = extArrayInitImpl();
+
+        if (nextExtFactory != null) {
+            Ext e2 = nextExtFactory.extArrayInit();
+            e = composeExts(e, e2);
+        }
         return postExtArrayInit(e);
     }
 
     @Override
     public final Ext extArrayTypeNode() {
         Ext e = extArrayTypeNodeImpl();
+
+        if (nextExtFactory != null) {
+            Ext e2 = nextExtFactory.extArrayTypeNode();
+            e = composeExts(e, e2);
+        }
         return postExtArrayTypeNode(e);
     }
 
     @Override
     public final Ext extAssert() {
         Ext e = extAssertImpl();
+
+        if (nextExtFactory != null) {
+            Ext e2 = nextExtFactory.extAssert();
+            e = composeExts(e, e2);
+        }
         return postExtAssert(e);
     }
 
     @Override
     public final Ext extAssign() {
         Ext e = extAssignImpl();
+
+        if (nextExtFactory != null) {
+            Ext e2 = nextExtFactory.extAssign();
+            e = composeExts(e, e2);
+        }
         return postExtAssign(e);
     }
 
     @Override
     public final Ext extLocalAssign() {
         Ext e = extLocalAssignImpl();
+
+        if (nextExtFactory != null) {
+            Ext e2 = nextExtFactory.extLocalAssign();
+            e = composeExts(e, e2);
+        }
         return postExtLocalAssign(e);
     }
 
     @Override
     public final Ext extFieldAssign() {
         Ext e = extFieldAssignImpl();
+
+        if (nextExtFactory != null) {
+            Ext e2 = nextExtFactory.extFieldAssign();
+            e = composeExts(e, e2);
+        }
         return postExtFieldAssign(e);
     }
 
     @Override
     public final Ext extArrayAccessAssign() {
         Ext e = extArrayAccessAssignImpl();
+
+        if (nextExtFactory != null) {
+            Ext e2 = nextExtFactory.extArrayAccessAssign();
+            e = composeExts(e, e2);
+        }
         return postExtArrayAccessAssign(e);
     }
 
     @Override
     public final Ext extBinary() {
         Ext e = extBinaryImpl();
+
+        if (nextExtFactory != null) {
+            Ext e2 = nextExtFactory.extBinary();
+            e = composeExts(e, e2);
+        }
         return postExtBinary(e);
     }
 
     @Override
     public final Ext extBlock() {
         Ext e = extBlockImpl();
+
+        if (nextExtFactory != null) {
+            Ext e2 = nextExtFactory.extBlock();
+            e = composeExts(e, e2);
+        }
         return postExtBlock(e);
     }
 
     @Override
     public final Ext extBooleanLit() {
         Ext e = extBooleanLitImpl();
+
+        if (nextExtFactory != null) {
+            Ext e2 = nextExtFactory.extBooleanLit();
+            e = composeExts(e, e2);
+        }
         return postExtBooleanLit(e);
     }
 
     @Override
     public final Ext extBranch() {
         Ext e = extBranchImpl();
+
+        if (nextExtFactory != null) {
+            Ext e2 = nextExtFactory.extBranch();
+            e = composeExts(e, e2);
+        }
         return postExtBranch(e);
     }
 
     @Override
     public final Ext extCall() {
         Ext e = extCallImpl();
+
+        if (nextExtFactory != null) {
+            Ext e2 = nextExtFactory.extCall();
+            e = composeExts(e, e2);
+        }
         return postExtCall(e);
     }
 
     @Override
     public final Ext extCanonicalTypeNode() {
         Ext e = extCanonicalTypeNodeImpl();
+
+        if (nextExtFactory != null) {
+            Ext e2 = nextExtFactory.extCanonicalTypeNode();
+            e = composeExts(e, e2);
+        }
         return postExtCanonicalTypeNode(e);
     }
 
     @Override
     public final Ext extCase() {
         Ext e = extCaseImpl();
+
+        if (nextExtFactory != null) {
+            Ext e2 = nextExtFactory.extCase();
+            e = composeExts(e, e2);
+        }
         return postExtCase(e);
     }
 
     @Override
     public final Ext extCast() {
         Ext e = extCastImpl();
+
+        if (nextExtFactory != null) {
+            Ext e2 = nextExtFactory.extCast();
+            e = composeExts(e, e2);
+        }
         return postExtCast(e);
     }
 
     @Override
     public final Ext extCatch() {
         Ext e = extCatchImpl();
+
+        if (nextExtFactory != null) {
+            Ext e2 = nextExtFactory.extCatch();
+            e = composeExts(e, e2);
+        }
         return postExtCatch(e);
     }
 
     @Override
     public final Ext extCharLit() {
         Ext e = extCharLitImpl();
+
+        if (nextExtFactory != null) {
+            Ext e2 = nextExtFactory.extCharLit();
+            e = composeExts(e, e2);
+        }
         return postExtCharLit(e);
     }
 
     @Override
     public final Ext extClassBody() {
         Ext e = extClassBodyImpl();
+
+        if (nextExtFactory != null) {
+            Ext e2 = nextExtFactory.extClassBody();
+            e = composeExts(e, e2);
+        }
         return postExtClassBody(e);
     }
 
     @Override
     public final Ext extClassDecl() {
         Ext e = extClassDeclImpl();
+
+        if (nextExtFactory != null) {
+            Ext e2 = nextExtFactory.extClassDecl();
+            e = composeExts(e, e2);
+        }
         return postExtClassDecl(e);
     }
 
     @Override
     public final Ext extClassLit() {
         Ext e = extClassLitImpl();
+
+        if (nextExtFactory != null) {
+            Ext e2 = nextExtFactory.extClassLit();
+            e = composeExts(e, e2);
+        }
         return postExtClassLit(e);
     }
 
     @Override
     public final Ext extClassMember() {
         Ext e = extClassMemberImpl();
+
+        if (nextExtFactory != null) {
+            Ext e2 = nextExtFactory.extClassMember();
+            e = composeExts(e, e2);
+        }
         return postExtClassMember(e);
     }
 
     @Override
     public final Ext extCodeDecl() {
         Ext e = extCodeDeclImpl();
+
+        if (nextExtFactory != null) {
+            Ext e2 = nextExtFactory.extCodeDecl();
+            e = composeExts(e, e2);
+        }
         return postExtCodeDecl(e);
     }
 
     @Override
     public final Ext extCompoundStmt() {
         Ext e = extCompoundStmtImpl();
+
+        if (nextExtFactory != null) {
+            Ext e2 = nextExtFactory.extCompoundStmt();
+            e = composeExts(e, e2);
+        }
         return postExtCompoundStmt(e);
     }
 
     @Override
     public final Ext extConditional() {
         Ext e = extConditionalImpl();
+
+        if (nextExtFactory != null) {
+            Ext e2 = nextExtFactory.extConditional();
+            e = composeExts(e, e2);
+        }
         return postExtConditional(e);
     }
 
     @Override
     public final Ext extConstructorCall() {
         Ext e = extConstructorCallImpl();
+
+        if (nextExtFactory != null) {
+            Ext e2 = nextExtFactory.extConstructorCall();
+            e = composeExts(e, e2);
+        }
         return postExtConstructorCall(e);
     }
 
     @Override
     public final Ext extConstructorDecl() {
         Ext e = extConstructorDeclImpl();
+
+        if (nextExtFactory != null) {
+            Ext e2 = nextExtFactory.extConstructorDecl();
+            e = composeExts(e, e2);
+        }
         return postExtConstructorDecl(e);
     }
 
     @Override
     public final Ext extDo() {
         Ext e = extDoImpl();
+
+        if (nextExtFactory != null) {
+            Ext e2 = nextExtFactory.extDo();
+            e = composeExts(e, e2);
+        }
         return postExtDo(e);
     }
 
     @Override
     public final Ext extEmpty() {
         Ext e = extEmptyImpl();
+
+        if (nextExtFactory != null) {
+            Ext e2 = nextExtFactory.extEmpty();
+            e = composeExts(e, e2);
+        }
         return postExtEmpty(e);
     }
 
     @Override
     public final Ext extEval() {
         Ext e = extEvalImpl();
+
+        if (nextExtFactory != null) {
+            Ext e2 = nextExtFactory.extEval();
+            e = composeExts(e, e2);
+        }
         return postExtEval(e);
     }
 
     @Override
     public final Ext extExpr() {
         Ext e = extExprImpl();
+
+        if (nextExtFactory != null) {
+            Ext e2 = nextExtFactory.extExpr();
+            e = composeExts(e, e2);
+        }
         return postExtExpr(e);
     }
 
     @Override
     public final Ext extField() {
         Ext e = extFieldImpl();
+
+        if (nextExtFactory != null) {
+            Ext e2 = nextExtFactory.extField();
+            e = composeExts(e, e2);
+        }
         return postExtField(e);
     }
 
     @Override
     public final Ext extFieldDecl() {
         Ext e = extFieldDeclImpl();
+
+        if (nextExtFactory != null) {
+            Ext e2 = nextExtFactory.extFieldDecl();
+            e = composeExts(e, e2);
+        }
         return postExtFieldDecl(e);
     }
 
     @Override
     public final Ext extFloatLit() {
         Ext e = extFloatLitImpl();
+
+        if (nextExtFactory != null) {
+            Ext e2 = nextExtFactory.extFloatLit();
+            e = composeExts(e, e2);
+        }
         return postExtFloatLit(e);
     }
 
     @Override
     public final Ext extFor() {
         Ext e = extForImpl();
+
+        if (nextExtFactory != null) {
+            Ext e2 = nextExtFactory.extFor();
+            e = composeExts(e, e2);
+        }
         return postExtFor(e);
     }
 
     @Override
     public final Ext extFormal() {
         Ext e = extFormalImpl();
+
+        if (nextExtFactory != null) {
+            Ext e2 = nextExtFactory.extFormal();
+            e = composeExts(e, e2);
+        }
         return postExtFormal(e);
     }
 
     @Override
     public final Ext extIf() {
         Ext e = extIfImpl();
+
+        if (nextExtFactory != null) {
+            Ext e2 = nextExtFactory.extIf();
+            e = composeExts(e, e2);
+        }
         return postExtIf(e);
     }
 
     @Override
     public final Ext extImport() {
         Ext e = extImportImpl();
+
+        if (nextExtFactory != null) {
+            Ext e2 = nextExtFactory.extImport();
+            e = composeExts(e, e2);
+        }
         return postExtImport(e);
     }
 
     @Override
     public final Ext extInitializer() {
         Ext e = extInitializerImpl();
+
+        if (nextExtFactory != null) {
+            Ext e2 = nextExtFactory.extInitializer();
+            e = composeExts(e, e2);
+        }
         return postExtInitializer(e);
     }
 
     @Override
     public final Ext extInstanceof() {
         Ext e = extInstanceofImpl();
+
+        if (nextExtFactory != null) {
+            Ext e2 = nextExtFactory.extInstanceof();
+            e = composeExts(e, e2);
+        }
         return postExtInstanceof(e);
     }
 
     @Override
     public final Ext extIntLit() {
         Ext e = extIntLitImpl();
+
+        if (nextExtFactory != null) {
+            Ext e2 = nextExtFactory.extIntLit();
+            e = composeExts(e, e2);
+        }
         return postExtIntLit(e);
     }
 
     @Override
     public final Ext extLabeled() {
         Ext e = extLabeledImpl();
+
+        if (nextExtFactory != null) {
+            Ext e2 = nextExtFactory.extLabeled();
+            e = composeExts(e, e2);
+        }
         return postExtLabeled(e);
     }
 
     @Override
     public final Ext extLit() {
         Ext e = extLitImpl();
+
+        if (nextExtFactory != null) {
+            Ext e2 = nextExtFactory.extLit();
+            e = composeExts(e, e2);
+        }
         return postExtLit(e);
     }
 
     @Override
     public final Ext extLocal() {
         Ext e = extLocalImpl();
+
+        if (nextExtFactory != null) {
+            Ext e2 = nextExtFactory.extLocal();
+            e = composeExts(e, e2);
+        }
         return postExtLocal(e);
     }
 
     @Override
     public final Ext extLocalClassDecl() {
         Ext e = extLocalClassDeclImpl();
+
+        if (nextExtFactory != null) {
+            Ext e2 = nextExtFactory.extLocalClassDecl();
+            e = composeExts(e, e2);
+        }
         return postExtLocalClassDecl(e);
     }
 
     @Override
     public final Ext extLocalDecl() {
         Ext e = extLocalDeclImpl();
+
+        if (nextExtFactory != null) {
+            Ext e2 = nextExtFactory.extLocalDecl();
+            e = composeExts(e, e2);
+        }
         return postExtLocalDecl(e);
     }
 
     @Override
     public final Ext extLoop() {
         Ext e = extLoopImpl();
+
+        if (nextExtFactory != null) {
+            Ext e2 = nextExtFactory.extLoop();
+            e = composeExts(e, e2);
+        }
         return postExtLoop(e);
     }
 
     @Override
     public final Ext extMethodDecl() {
         Ext e = extMethodDeclImpl();
+
+        if (nextExtFactory != null) {
+            Ext e2 = nextExtFactory.extMethodDecl();
+            e = composeExts(e, e2);
+        }
         return postExtMethodDecl(e);
     }
 
     @Override
     public final Ext extNewArray() {
         Ext e = extNewArrayImpl();
+
+        if (nextExtFactory != null) {
+            Ext e2 = nextExtFactory.extNewArray();
+            e = composeExts(e, e2);
+        }
         return postExtNewArray(e);
     }
 
     @Override
     public final Ext extNode() {
         Ext e = extNodeImpl();
+
+        if (nextExtFactory != null) {
+            Ext e2 = nextExtFactory.extNode();
+            e = composeExts(e, e2);
+        }
         return postExtNode(e);
     }
 
     @Override
     public final Ext extNodeList() {
         Ext e = extNodeListImpl();
+
+        if (nextExtFactory != null) {
+            Ext e2 = nextExtFactory.extNode();
+            e = composeExts(e, e2);
+        }
         return postExtNodeList(e);
     }
 
     @Override
     public final Ext extNew() {
         Ext e = extNewImpl();
+
+        if (nextExtFactory != null) {
+            Ext e2 = nextExtFactory.extNew();
+            e = composeExts(e, e2);
+        }
         return postExtNew(e);
     }
 
     @Override
     public final Ext extNullLit() {
         Ext e = extNullLitImpl();
+
+        if (nextExtFactory != null) {
+            Ext e2 = nextExtFactory.extNullLit();
+            e = composeExts(e, e2);
+        }
         return postExtNullLit(e);
     }
 
     @Override
     public final Ext extNumLit() {
         Ext e = extNumLitImpl();
+
+        if (nextExtFactory != null) {
+            Ext e2 = nextExtFactory.extNumLit();
+            e = composeExts(e, e2);
+        }
         return postExtNumLit(e);
     }
 
     @Override
     public final Ext extPackageNode() {
         Ext e = extPackageNodeImpl();
+
+        if (nextExtFactory != null) {
+            Ext e2 = nextExtFactory.extPackageNode();
+            e = composeExts(e, e2);
+        }
         return postExtPackageNode(e);
     }
 
     @Override
     public final Ext extProcedureDecl() {
         Ext e = extProcedureDeclImpl();
+
+        if (nextExtFactory != null) {
+            Ext e2 = nextExtFactory.extProcedureDecl();
+            e = composeExts(e, e2);
+        }
         return postExtProcedureDecl(e);
     }
 
     @Override
     public final Ext extReturn() {
         Ext e = extReturnImpl();
+
+        if (nextExtFactory != null) {
+            Ext e2 = nextExtFactory.extReturn();
+            e = composeExts(e, e2);
+        }
         return postExtReturn(e);
     }
 
     @Override
     public final Ext extSourceCollection() {
         Ext e = extSourceCollectionImpl();
+
+        if (nextExtFactory != null) {
+            Ext e2 = nextExtFactory.extSourceCollection();
+            e = composeExts(e, e2);
+        }
         return postExtSourceCollection(e);
     }
 
     @Override
     public final Ext extSourceFile() {
         Ext e = extSourceFileImpl();
+
+        if (nextExtFactory != null) {
+            Ext e2 = nextExtFactory.extSourceFile();
+            e = composeExts(e, e2);
+        }
         return postExtSourceFile(e);
     }
 
     @Override
     public final Ext extSpecial() {
         Ext e = extSpecialImpl();
+
+        if (nextExtFactory != null) {
+            Ext e2 = nextExtFactory.extSpecial();
+            e = composeExts(e, e2);
+        }
         return postExtSpecial(e);
     }
 
     @Override
     public final Ext extStmt() {
         Ext e = extStmtImpl();
+
+        if (nextExtFactory != null) {
+            Ext e2 = nextExtFactory.extStmt();
+            e = composeExts(e, e2);
+        }
         return postExtStmt(e);
     }
 
     @Override
     public final Ext extStringLit() {
         Ext e = extStringLitImpl();
+
+        if (nextExtFactory != null) {
+            Ext e2 = nextExtFactory.extStringLit();
+            e = composeExts(e, e2);
+        }
         return postExtStringLit(e);
     }
 
     @Override
     public final Ext extSwitchBlock() {
         Ext e = extSwitchBlockImpl();
+
+        if (nextExtFactory != null) {
+            Ext e2 = nextExtFactory.extSwitchBlock();
+            e = composeExts(e, e2);
+        }
         return postExtSwitchBlock(e);
     }
 
     @Override
     public final Ext extSwitchElement() {
         Ext e = extSwitchElementImpl();
+
+        if (nextExtFactory != null) {
+            Ext e2 = nextExtFactory.extSwitchElement();
+            e = composeExts(e, e2);
+        }
         return postExtSwitchElement(e);
     }
 
     @Override
     public final Ext extSwitch() {
         Ext e = extSwitchImpl();
+
+        if (nextExtFactory != null) {
+            Ext e2 = nextExtFactory.extSwitch();
+            e = composeExts(e, e2);
+        }
         return postExtSwitch(e);
     }
 
     @Override
     public final Ext extSynchronized() {
         Ext e = extSynchronizedImpl();
+
+        if (nextExtFactory != null) {
+            Ext e2 = nextExtFactory.extSynchronized();
+            e = composeExts(e, e2);
+        }
         return postExtSynchronized(e);
     }
 
     @Override
     public final Ext extTerm() {
         Ext e = extTermImpl();
+
+        if (nextExtFactory != null) {
+            Ext e2 = nextExtFactory.extTerm();
+            e = composeExts(e, e2);
+        }
         return postExtTerm(e);
     }
 
     @Override
     public final Ext extThrow() {
         Ext e = extThrowImpl();
+
+        if (nextExtFactory != null) {
+            Ext e2 = nextExtFactory.extThrow();
+            e = composeExts(e, e2);
+        }
         return postExtThrow(e);
     }
 
     @Override
     public final Ext extTry() {
         Ext e = extTryImpl();
+
+        if (nextExtFactory != null) {
+            Ext e2 = nextExtFactory.extTry();
+            e = composeExts(e, e2);
+        }
         return postExtTry(e);
     }
 
     @Override
     public final Ext extTypeNode() {
         Ext e = extTypeNodeImpl();
+
+        if (nextExtFactory != null) {
+            Ext e2 = nextExtFactory.extTypeNode();
+            e = composeExts(e, e2);
+        }
         return postExtTypeNode(e);
     }
 
     @Override
     public final Ext extUnary() {
         Ext e = extUnaryImpl();
+
+        if (nextExtFactory != null) {
+            Ext e2 = nextExtFactory.extUnary();
+            e = composeExts(e, e2);
+        }
         return postExtUnary(e);
     }
 
     @Override
     public final Ext extWhile() {
         Ext e = extWhileImpl();
+
+        if (nextExtFactory != null) {
+            Ext e2 = nextExtFactory.extWhile();
+            e = composeExts(e, e2);
+        }
         return postExtWhile(e);
-    }
-
-    protected static final Ext extId(ExtFactory extFactory) {
-        return extFactory.extId();
-    }
-
-    protected static final Ext extAmbAssign(ExtFactory extFactory) {
-        return extFactory.extAmbAssign();
-    }
-
-    protected static final Ext extAmbExpr(ExtFactory extFactory) {
-        return extFactory.extAmbExpr();
-    }
-
-    protected static final Ext extAmbPrefix(ExtFactory extFactory) {
-        return extFactory.extAmbPrefix();
-    }
-
-    protected static final Ext extAmbQualifierNode(ExtFactory extFactory) {
-        return extFactory.extAmbQualifierNode();
-    }
-
-    protected static final Ext extAmbReceiver(ExtFactory extFactory) {
-        return extFactory.extAmbReceiver();
-    }
-
-    protected static final Ext extAmbTypeNode(ExtFactory extFactory) {
-        return extFactory.extAmbTypeNode();
-    }
-
-    protected static final Ext extArrayAccess(ExtFactory extFactory) {
-        return extFactory.extArrayAccess();
-    }
-
-    protected static final Ext extArrayInit(ExtFactory extFactory) {
-        return extFactory.extArrayInit();
-    }
-
-    protected static final Ext extArrayTypeNode(ExtFactory extFactory) {
-        return extFactory.extArrayTypeNode();
-    }
-
-    protected static final Ext extAssert(ExtFactory extFactory) {
-        return extFactory.extAssert();
-    }
-
-    protected static final Ext extAssign(ExtFactory extFactory) {
-        return extFactory.extAssign();
-    }
-
-    protected static final Ext extLocalAssign(ExtFactory extFactory) {
-        return extFactory.extLocalAssign();
-    }
-
-    protected static final Ext extFieldAssign(ExtFactory extFactory) {
-        return extFactory.extFieldAssign();
-    }
-
-    protected static final Ext extArrayAccessAssign(ExtFactory extFactory) {
-        return extFactory.extArrayAccessAssign();
-    }
-
-    protected static final Ext extBinary(ExtFactory extFactory) {
-        return extFactory.extBinary();
-    }
-
-    protected static final Ext extBlock(ExtFactory extFactory) {
-        return extFactory.extBlock();
-    }
-
-    protected static final Ext extBooleanLit(ExtFactory extFactory) {
-        return extFactory.extBooleanLit();
-    }
-
-    protected static final Ext extBranch(ExtFactory extFactory) {
-        return extFactory.extBranch();
-    }
-
-    protected static final Ext extCall(ExtFactory extFactory) {
-        return extFactory.extCall();
-    }
-
-    protected static final Ext extCanonicalTypeNode(ExtFactory extFactory) {
-        return extFactory.extCanonicalTypeNode();
-    }
-
-    protected static final Ext extCase(ExtFactory extFactory) {
-        return extFactory.extCase();
-    }
-
-    protected static final Ext extCast(ExtFactory extFactory) {
-        return extFactory.extCast();
-    }
-
-    protected static final Ext extCatch(ExtFactory extFactory) {
-        return extFactory.extCatch();
-    }
-
-    protected static final Ext extCharLit(ExtFactory extFactory) {
-        return extFactory.extCharLit();
-    }
-
-    protected static final Ext extClassBody(ExtFactory extFactory) {
-        return extFactory.extClassBody();
-    }
-
-    protected static final Ext extClassDecl(ExtFactory extFactory) {
-        return extFactory.extClassDecl();
-    }
-
-    protected static final Ext extClassLit(ExtFactory extFactory) {
-        return extFactory.extClassLit();
-    }
-
-    protected static final Ext extClassMember(ExtFactory extFactory) {
-        return extFactory.extClassMember();
-    }
-
-    protected static final Ext extCodeDecl(ExtFactory extFactory) {
-        return extFactory.extCodeDecl();
-    }
-
-    protected static final Ext extCompoundStmt(ExtFactory extFactory) {
-        return extFactory.extCompoundStmt();
-    }
-
-    protected static final Ext extConditional(ExtFactory extFactory) {
-        return extFactory.extConditional();
-    }
-
-    protected static final Ext extConstructorCall(ExtFactory extFactory) {
-        return extFactory.extConstructorCall();
-    }
-
-    protected static final Ext extConstructorDecl(ExtFactory extFactory) {
-        return extFactory.extConstructorDecl();
-    }
-
-    protected static final Ext extDo(ExtFactory extFactory) {
-        return extFactory.extDo();
-    }
-
-    protected static final Ext extEmpty(ExtFactory extFactory) {
-        return extFactory.extEmpty();
-    }
-
-    protected static final Ext extEval(ExtFactory extFactory) {
-        return extFactory.extEval();
-    }
-
-    protected static final Ext extExpr(ExtFactory extFactory) {
-        return extFactory.extExpr();
-    }
-
-    protected static final Ext extField(ExtFactory extFactory) {
-        return extFactory.extField();
-    }
-
-    protected static final Ext extFieldDecl(ExtFactory extFactory) {
-        return extFactory.extFieldDecl();
-    }
-
-    protected static final Ext extFloatLit(ExtFactory extFactory) {
-        return extFactory.extFloatLit();
-    }
-
-    protected static final Ext extFor(ExtFactory extFactory) {
-        return extFactory.extFor();
-    }
-
-    protected static final Ext extFormal(ExtFactory extFactory) {
-        return extFactory.extFormal();
-    }
-
-    protected static final Ext extIf(ExtFactory extFactory) {
-        return extFactory.extIf();
-    }
-
-    protected static final Ext extImport(ExtFactory extFactory) {
-        return extFactory.extImport();
-    }
-
-    protected static final Ext extInitializer(ExtFactory extFactory) {
-        return extFactory.extInitializer();
-    }
-
-    protected static final Ext extInstanceof(ExtFactory extFactory) {
-        return extFactory.extInstanceof();
-    }
-
-    protected static final Ext extIntLit(ExtFactory extFactory) {
-        return extFactory.extIntLit();
-    }
-
-    protected static final Ext extLabeled(ExtFactory extFactory) {
-        return extFactory.extLabeled();
-    }
-
-    protected static final Ext extLit(ExtFactory extFactory) {
-        return extFactory.extLit();
-    }
-
-    protected static final Ext extLocal(ExtFactory extFactory) {
-        return extFactory.extLocal();
-    }
-
-    protected static final Ext extLocalClassDecl(ExtFactory extFactory) {
-        return extFactory.extLocalClassDecl();
-    }
-
-    protected static final Ext extLocalDecl(ExtFactory extFactory) {
-        return extFactory.extLocalDecl();
-    }
-
-    protected static final Ext extLoop(ExtFactory extFactory) {
-        return extFactory.extLoop();
-    }
-
-    protected static final Ext extMethodDecl(ExtFactory extFactory) {
-        return extFactory.extMethodDecl();
-    }
-
-    protected static final Ext extNewArray(ExtFactory extFactory) {
-        return extFactory.extNewArray();
-    }
-
-    protected static final Ext extNode(ExtFactory extFactory) {
-        return extFactory.extNode();
-    }
-
-    protected static final Ext extNodeList(ExtFactory extFactory) {
-        return extFactory.extNodeList();
-    }
-
-    protected static final Ext extNew(ExtFactory extFactory) {
-        return extFactory.extNew();
-    }
-
-    protected static final Ext extNullLit(ExtFactory extFactory) {
-        return extFactory.extNullLit();
-    }
-
-    protected static final Ext extNumLit(ExtFactory extFactory) {
-        return extFactory.extNumLit();
-    }
-
-    protected static final Ext extPackageNode(ExtFactory extFactory) {
-        return extFactory.extPackageNode();
-    }
-
-    protected static final Ext extProcedureDecl(ExtFactory extFactory) {
-        return extFactory.extProcedureDecl();
-    }
-
-    protected static final Ext extReturn(ExtFactory extFactory) {
-        return extFactory.extReturn();
-    }
-
-    protected static final Ext extSourceCollection(ExtFactory extFactory) {
-        return extFactory.extSourceCollection();
-    }
-
-    protected static final Ext extSourceFile(ExtFactory extFactory) {
-        return extFactory.extSourceFile();
-    }
-
-    protected static final Ext extSpecial(ExtFactory extFactory) {
-        return extFactory.extSpecial();
-    }
-
-    protected static final Ext extStmt(ExtFactory extFactory) {
-        return extFactory.extStmt();
-    }
-
-    protected static final Ext extStringLit(ExtFactory extFactory) {
-        return extFactory.extStringLit();
-    }
-
-    protected static final Ext extSwitchBlock(ExtFactory extFactory) {
-        return extFactory.extSwitchBlock();
-    }
-
-    protected static final Ext extSwitchElement(ExtFactory extFactory) {
-        return extFactory.extSwitchElement();
-    }
-
-    protected static final Ext extSwitch(ExtFactory extFactory) {
-        return extFactory.extSwitch();
-    }
-
-    protected static final Ext extSynchronized(ExtFactory extFactory) {
-        return extFactory.extSynchronized();
-    }
-
-    protected static final Ext extTerm(ExtFactory extFactory) {
-        return extFactory.extTerm();
-    }
-
-    protected static final Ext extThrow(ExtFactory extFactory) {
-        return extFactory.extThrow();
-    }
-
-    protected static final Ext extTry(ExtFactory extFactory) {
-        return extFactory.extTry();
-    }
-
-    protected static final Ext extTypeNode(ExtFactory extFactory) {
-        return extFactory.extTypeNode();
-    }
-
-    protected static final Ext extUnary(ExtFactory extFactory) {
-        return extFactory.extUnary();
-    }
-
-    protected static final Ext extWhile(ExtFactory extFactory) {
-        return extFactory.extWhile();
     }
 
     // ********************************************

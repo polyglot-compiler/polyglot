@@ -49,7 +49,7 @@ public class ArrayTypeNode_c extends TypeNode_c implements ArrayTypeNode {
 
     protected TypeNode base;
 
-    @Deprecated
+//    @Deprecated
     public ArrayTypeNode_c(Position pos, TypeNode base) {
         this(pos, base, null);
     }

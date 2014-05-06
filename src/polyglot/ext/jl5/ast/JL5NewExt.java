@@ -61,6 +61,10 @@ import polyglot.visit.TypeChecker;
 public class JL5NewExt extends JL5ProcedureCallExt implements NewOps {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
+    public JL5NewExt() {
+        this(null);
+    }
+
     public JL5NewExt(List<TypeNode> typeArgs) {
         super(typeArgs);
     }

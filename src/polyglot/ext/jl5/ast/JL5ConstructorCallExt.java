@@ -57,8 +57,14 @@ import polyglot.visit.TypeChecker;
 public class JL5ConstructorCallExt extends JL5ProcedureCallExt {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
-    public JL5ConstructorCallExt(List<TypeNode> typeArgs) {
+    public JL5ConstructorCallExt() {
+        this(null, false);
+    }
+
+    public JL5ConstructorCallExt(List<TypeNode> typeArgs,
+            boolean isEnumConstructorCall) {
         super(typeArgs);
+        this.isEnumConstructorCall = isEnumConstructorCall;
     }
 
     @Override

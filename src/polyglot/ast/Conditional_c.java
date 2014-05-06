@@ -52,7 +52,7 @@ public class Conditional_c extends Expr_c implements Conditional {
     protected Expr consequent;
     protected Expr alternative;
 
-    @Deprecated
+//    @Deprecated
     public Conditional_c(Position pos, Expr cond, Expr consequent,
             Expr alternative) {
         this(pos, cond, consequent, alternative, null);

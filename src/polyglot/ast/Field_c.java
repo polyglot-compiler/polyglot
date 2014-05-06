@@ -63,7 +63,7 @@ public class Field_c extends Expr_c implements Field {
     protected FieldInstance fi;
     protected boolean targetImplicit;
 
-    @Deprecated
+//    @Deprecated
     public Field_c(Position pos, Receiver target, Id name) {
         this(pos, target, name, null);
     }

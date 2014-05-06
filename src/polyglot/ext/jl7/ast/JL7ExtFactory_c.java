@@ -58,7 +58,8 @@ public final class JL7ExtFactory_c extends JL7AbstractExtFactory_c {
 
     @Override
     protected Ext extResourceImpl() {
-        return null;
+        JL7ResourceExt ext = new JL7ResourceExt();
+        return ext;
     }
 
     @Override

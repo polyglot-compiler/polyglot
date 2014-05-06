@@ -69,12 +69,12 @@ public class JL5CaseExt extends JL5TermExt implements JL5CaseOps {
             // must be an enum...
             if (expr.type().isCanonical()) {
                 // we have already resolved the expression
-                EnumConstant ec = (EnumConstant) JL5Ext.ext(expr);
+                EnumConstant ec = (EnumConstant) expr;
                 return c.value(ec.enumInstance().ordinal());
             }
-            else if (JL5Ext.ext(expr) instanceof EnumConstant) {
+            else if (expr instanceof EnumConstant) {
                 Field ec = (Field) expr;
-                EnumConstant ext = (EnumConstant) JL5Ext.ext(ec);
+                EnumConstant ext = (EnumConstant) ec;
                 EnumInstance ei =
                         ts.findEnumConstant(switchType.toReference(), ec.name());
                 ec = (Field) ext.enumInstance(ei);
@@ -90,7 +90,7 @@ public class JL5CaseExt extends JL5TermExt implements JL5CaseOps {
                         nf.CanonicalTypeNode(Position.compilerGenerated(),
                                              switchType);
                 Field e = nf.EnumConstant(expr.position(), r, amb.id());
-                e = (Field) ((EnumConstant) JL5Ext.ext(e)).enumInstance(ei);
+                e = (Field) ((EnumConstant) e).enumInstance(ei);
                 e = (Field) e.type(ei.type());
                 return c.expr(e).value(ei.ordinal());
             }
@@ -197,7 +197,7 @@ public class JL5CaseExt extends JL5TermExt implements JL5CaseOps {
 
         if (!cc.lang().constantValueSet(expr, cc.lang())) return c; // Not ready yet; pass will be rerun.
 
-        if (JL5Ext.ext(expr) instanceof EnumConstant) return c;
+        if (expr instanceof EnumConstant) return c;
 
         return superLang().checkConstants(this.node(), cc);
     }

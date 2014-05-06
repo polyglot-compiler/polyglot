@@ -50,7 +50,7 @@ public class AmbQualifierNode_c extends Node_c implements AmbQualifierNode {
     protected QualifierNode qual;
     protected Id name;
 
-    @Deprecated
+//    @Deprecated
     public AmbQualifierNode_c(Position pos, QualifierNode qual, Id name) {
         this(pos, qual, name, null);
     }

@@ -33,7 +33,6 @@ import java.util.List;
 
 import polyglot.ast.Node;
 import polyglot.ast.NodeFactory;
-import polyglot.ast.Term;
 import polyglot.ext.jl5.ast.AnnotatedElement;
 import polyglot.ext.jl5.ast.AnnotationElem;
 import polyglot.ext.jl5.ast.JL5Ext;
@@ -99,9 +98,9 @@ public class AnnotationChecker extends ContextVisitor {
      * @param decl
      * @throws SemanticException
      */
-    public void checkAnnotationApplicability(Term n, Declaration decl)
+    public void checkAnnotationApplicability(AnnotationElem n, Declaration decl)
             throws SemanticException {
-        AnnotationElem annotation = (AnnotationElem) JL5Ext.ext(n);
+        AnnotationElem annotation = n;
         JL5ClassType annotationType =
                 (JL5ClassType) annotation.typeName().type().toClass();
 
@@ -142,9 +141,9 @@ public class AnnotationChecker extends ContextVisitor {
     }
 
     protected void checkTargetMetaAnnotation(
-            AnnotationElementValueArray targetKinds, Term n, Declaration decl)
-            throws SemanticException {
-        AnnotationElem annotation = (AnnotationElem) JL5Ext.ext(n);
+            AnnotationElementValueArray targetKinds, AnnotationElem n,
+            Declaration decl) throws SemanticException {
+        AnnotationElem annotation = n;
         Collection<EnumInstance> eis =
                 annotationElementTypesForDeclaration(decl);
         // the array targs must contain at least one of the eis.

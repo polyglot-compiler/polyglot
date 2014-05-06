@@ -25,10 +25,11 @@
  ******************************************************************************/
 package polyglot.ext.jl5.ast;
 
+import polyglot.ast.Field;
 import polyglot.ast.Node;
 import polyglot.ext.jl5.types.EnumInstance;
 
-public interface EnumConstant {
+public interface EnumConstant extends Field {
     EnumInstance enumInstance();
 
     Node enumInstance(EnumInstance enumInstance);

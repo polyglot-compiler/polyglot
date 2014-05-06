@@ -31,7 +31,6 @@ import java.util.List;
 import java.util.Map;
 
 import polyglot.ast.Node;
-import polyglot.ast.Term;
 import polyglot.ext.jl5.ast.AnnotatedElement;
 import polyglot.ext.jl5.ast.AnnotationElem;
 import polyglot.ext.jl5.ast.JL5Ext;
@@ -64,9 +63,9 @@ public class ResolveAnnotationsVisitor extends ContextVisitor {
         JL5Ext ext = JL5Ext.ext(n);
         if (ext instanceof AnnotatedElement) {
             AnnotatedElement aext = (AnnotatedElement) ext;
-            List<Term> newElems =
+            List<AnnotationElem> newElems =
                     new ArrayList<>(aext.annotationElems().size());
-            for (Term elem : aext.annotationElems()) {
+            for (AnnotationElem elem : aext.annotationElems()) {
                 // type check elem
                 TypeChecker tc =
                         new TypeChecker(this.job(),
@@ -74,8 +73,8 @@ public class ResolveAnnotationsVisitor extends ContextVisitor {
                                         this.nodeFactory());
 
                 tc = (TypeChecker) tc.context(this.context());
-                elem = (Term) elem.visit(tc);
-                AnnotationElem ae = (AnnotationElem) JL5Ext.ext(elem);
+                elem = (AnnotationElem) elem.visit(tc);
+                AnnotationElem ae = elem;
                 if (!ae.typeName().type().isCanonical()) {
                     throw new InternalCompilerError("Couldn't type check "
                                                             + elem
@@ -98,14 +97,13 @@ public class ResolveAnnotationsVisitor extends ContextVisitor {
      * type information)
      * @throws SemanticException 
      */
-    public Annotations createAnnotations(List<Term> annotationElems,
+    public Annotations createAnnotations(List<AnnotationElem> annotationElems,
             Position pos) throws SemanticException {
         Map<Type, Map<String, AnnotationElementValue>> m =
                 new LinkedHashMap<>();
 
         JL5TypeSystem ts = (JL5TypeSystem) this.typeSystem();
-        for (Term t : annotationElems) {
-            AnnotationElem ae = (AnnotationElem) JL5Ext.ext(t);
+        for (AnnotationElem ae : annotationElems) {
             Type annotationType = ae.typeName().type();
             m.put(annotationType, ae.toAnnotationElementValues(lang(), ts));
         }

@@ -61,6 +61,10 @@ import polyglot.visit.TypeChecker;
 public class JL5CallExt extends JL5ProcedureCallExt implements CallOps {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
+    public JL5CallExt() {
+        this(null);
+    }
+
     public JL5CallExt(List<TypeNode> typeArgs) {
         super(typeArgs);
     }

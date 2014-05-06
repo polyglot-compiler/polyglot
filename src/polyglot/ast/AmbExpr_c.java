@@ -49,7 +49,7 @@ public class AmbExpr_c extends Expr_c implements AmbExpr {
 
     protected Id name;
 
-    @Deprecated
+//    @Deprecated
     public AmbExpr_c(Position pos, Id name) {
         this(pos, name, null);
     }

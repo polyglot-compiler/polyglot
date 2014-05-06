@@ -35,12 +35,10 @@ import polyglot.ast.ConstructorCall;
 import polyglot.ast.ConstructorCall.Kind;
 import polyglot.ast.ConstructorDecl;
 import polyglot.ast.Expr;
-import polyglot.ast.Field;
 import polyglot.ast.FieldDecl;
 import polyglot.ast.Formal;
 import polyglot.ast.Id;
 import polyglot.ast.LocalDecl;
-import polyglot.ast.Loop;
 import polyglot.ast.MethodDecl;
 import polyglot.ast.New;
 import polyglot.ast.NodeFactory;
@@ -55,51 +53,55 @@ import polyglot.util.Position;
  * NodeFactory for jl5 extension.
  */
 public interface JL5NodeFactory extends NodeFactory {
-    ClassDecl EnumDecl(Position pos, Flags flags, List<Term> annotations,
-            Id name, TypeNode superType, List<TypeNode> interfaces,
+    ClassDecl EnumDecl(Position pos, Flags flags,
+            List<AnnotationElem> annotations, Id name, TypeNode superType,
+            List<TypeNode> interfaces, ClassBody body);
+
+    EnumConstantDecl EnumConstantDecl(Position pos, Flags flags,
+            List<AnnotationElem> annotations, Id name, List<Expr> args,
             ClassBody body);
 
     EnumConstantDecl EnumConstantDecl(Position pos, Flags flags,
-            List<Term> annotations, Id name, List<Expr> args, ClassBody body);
+            List<AnnotationElem> annotations, Id name, List<Expr> args);
 
-    EnumConstantDecl EnumConstantDecl(Position pos, Flags flags,
-            List<Term> annotations, Id name, List<Expr> args);
-
-    ClassDecl ClassDecl(Position pos, Flags flags, List<Term> annotations,
-            Id name, TypeNode superType, List<TypeNode> interfaces,
-            ClassBody body, List<TypeNode> paramTypes);
+    ClassDecl ClassDecl(Position pos, Flags flags,
+            List<AnnotationElem> annotations, Id name, TypeNode superType,
+            List<TypeNode> interfaces, ClassBody body,
+            List<ParamTypeNode> paramTypes);
 
     ConstructorDecl ConstructorDecl(Position pos, Flags flags,
-            List<Term> annotations, Id name, List<Formal> formals,
-            List<TypeNode> throwTypes, Block body, List<TypeNode> typeParams);
+            List<AnnotationElem> annotations, Id name, List<Formal> formals,
+            List<TypeNode> throwTypes, Block body,
+            List<ParamTypeNode> typeParams);
 
-    MethodDecl MethodDecl(Position pos, Flags flags, List<Term> annotations,
-            TypeNode returnType, Id name, List<Formal> formals,
-            List<TypeNode> throwTypes, Block body, List<TypeNode> typeParams);
+    MethodDecl MethodDecl(Position pos, Flags flags,
+            List<AnnotationElem> annotations, TypeNode returnType, Id name,
+            List<Formal> formals, List<TypeNode> throwTypes, Block body,
+            List<ParamTypeNode> typeParams);
 
-    Formal Formal(Position pos, Flags flags, List<Term> annotations,
+    Formal Formal(Position pos, Flags flags, List<AnnotationElem> annotations,
             TypeNode type, Id name, boolean var_args);
 
-    Formal Formal(Position pos, Flags flags, List<Term> annotations,
+    Formal Formal(Position pos, Flags flags, List<AnnotationElem> annotations,
             TypeNode type, Id name);
 
-    LocalDecl LocalDecl(Position pos, Flags flags, List<Term> annotations,
-            TypeNode type, Id name);
+    LocalDecl LocalDecl(Position pos, Flags flags,
+            List<AnnotationElem> annotations, TypeNode type, Id name);
 
-    LocalDecl LocalDecl(Position pos, Flags flags, List<Term> annotations,
-            TypeNode type, Id name, Expr init);
+    LocalDecl LocalDecl(Position pos, Flags flags,
+            List<AnnotationElem> annotations, TypeNode type, Id name, Expr init);
 
-    FieldDecl FieldDecl(Position pos, Flags flags, List<Term> annotations,
-            TypeNode type, Id name);
+    FieldDecl FieldDecl(Position pos, Flags flags,
+            List<AnnotationElem> annotations, TypeNode type, Id name);
 
-    FieldDecl FieldDecl(Position pos, Flags flags, List<Term> annotations,
-            TypeNode type, Id name, Expr init);
+    FieldDecl FieldDecl(Position pos, Flags flags,
+            List<AnnotationElem> annotations, TypeNode type, Id name, Expr init);
 
-    Field EnumConstant(Position pos, Receiver r, Id name);
+    EnumConstant EnumConstant(Position pos, Receiver r, Id name);
 
-    Loop ExtendedFor(Position pos, LocalDecl decl, Expr expr, Stmt body);
+    ExtendedFor ExtendedFor(Position pos, LocalDecl decl, Expr expr, Stmt body);
 
-    TypeNode ParamTypeNode(Position pos, Id id, List<TypeNode> bounds);
+    ParamTypeNode ParamTypeNode(Position pos, Id id, List<TypeNode> bounds);
 
     AmbTypeInstantiation AmbTypeInstantiation(Position pos, TypeNode base,
             List<TypeNode> typeArguments);
@@ -147,17 +149,20 @@ public interface JL5NodeFactory extends NodeFactory {
     AnnotationElemDecl AnnotationElemDecl(Position pos, Flags flags,
             TypeNode type, Id name, Term def);
 
-    Term NormalAnnotationElem(Position pos, TypeNode name, List<Term> elements);
+    AnnotationElem NormalAnnotationElem(Position pos, TypeNode name,
+            List<ElementValuePair> elements);
 
-    Term MarkerAnnotationElem(Position pos, TypeNode name);
+    AnnotationElem MarkerAnnotationElem(Position pos, TypeNode name);
 
-    Term SingleElementAnnotationElem(Position pos, TypeNode name, Term value);
+    AnnotationElem SingleElementAnnotationElem(Position pos, TypeNode name,
+            Term value);
 
-    Term ElementValuePair(Position pos, Id name, Term value);
+    ElementValuePair ElementValuePair(Position pos, Id name, Term value);
 
-    Term ElementValueArrayInit(Position pos);
+    ElementValueArrayInit ElementValueArrayInit(Position pos);
 
-    Term ElementValueArrayInit(Position pos, List<Term> elements);
+    ElementValueArrayInit ElementValueArrayInit(Position pos,
+            List<Term> elements);
 
     TypeNode TypeNodeFromQualifiedName(Position pos, String qualifiedName,
             List<TypeNode> typeArgs);

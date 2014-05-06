@@ -62,7 +62,7 @@ public class MethodDecl_c extends ProcedureDecl_c implements MethodDecl {
     protected TypeNode returnType;
     protected MethodInstance mi;
 
-    @Deprecated
+//    @Deprecated
     public MethodDecl_c(Position pos, Flags flags, TypeNode returnType,
             Id name, List<Formal> formals, List<TypeNode> throwTypes, Block body) {
         this(pos, flags, returnType, name, formals, throwTypes, body, null);

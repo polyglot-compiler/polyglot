@@ -57,7 +57,7 @@ public class Formal_c extends Term_c implements Formal {
     protected TypeNode type;
     protected Id name;
 
-    @Deprecated
+//    @Deprecated
     public Formal_c(Position pos, Flags flags, TypeNode type, Id name) {
         this(pos, flags, type, name, null);
     }

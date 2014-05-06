@@ -30,6 +30,7 @@ import java.util.List;
 import java.util.Map;
 
 import polyglot.ast.Term;
+import polyglot.ext.jl5.ast.AnnotationElem;
 import polyglot.ext.jl5.types.inference.LubType;
 import polyglot.ext.param.types.ParamTypeSystem;
 import polyglot.frontend.Source;
@@ -353,7 +354,7 @@ public interface JL5TypeSystem extends
     AnnotationTypeElemInstance findAnnotation(ReferenceType t, String name,
             ClassType currentClass) throws SemanticException;
 
-    void checkDuplicateAnnotations(List<Term> annotations)
+    void checkDuplicateAnnotations(List<AnnotationElem> annotations)
             throws SemanticException;
 
     /**

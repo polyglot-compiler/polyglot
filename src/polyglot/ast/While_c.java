@@ -49,7 +49,7 @@ import polyglot.visit.TypeChecker;
 public class While_c extends Loop_c implements While {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
-    @Deprecated
+//    @Deprecated
     public While_c(Position pos, Expr cond, Stmt body) {
         this(pos, cond, body, null);
     }

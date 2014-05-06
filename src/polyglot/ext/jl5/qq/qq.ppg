@@ -44,14 +44,14 @@ parser Grm extends polyglot.qq.Grm {:
    /**
     * Copied from JL5 PPG.
     */
-    public TypeNode toParamType(Position pos, Id id, List<TypeNode> bounds){
+    public ParamTypeNode toParamType(Position pos, Id id, List<TypeNode> bounds){
         return nf.ParamTypeNode(pos, id, CollectionUtil.nonNullList(bounds));
     }
     
    /**
     * Copied from JL5 PPG.
     */
-    public List<LocalDecl> variableDeclarators(TypeNode a, List<VarDeclarator> b, Flags flags, List<Term> annotations)
+    public List<LocalDecl> variableDeclarators(TypeNode a, List<VarDeclarator> b, Flags flags, List<AnnotationElem> annotations)
     throws Exception
     {
       List<LocalDecl> l = new LinkedList<>();

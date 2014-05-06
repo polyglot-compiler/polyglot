@@ -33,7 +33,7 @@ import polyglot.ast.IntLit;
 import polyglot.ast.Lit;
 import polyglot.ast.Local;
 import polyglot.ast.LocalDecl;
-import polyglot.ast.Loop;
+import polyglot.ast.Loop_c;
 import polyglot.ast.NewArray;
 import polyglot.ast.Node;
 import polyglot.ast.NodeFactory;
@@ -57,14 +57,15 @@ import polyglot.visit.NodeVisitor;
 import polyglot.visit.PrettyPrinter;
 import polyglot.visit.TypeChecker;
 
-public class ExtendedFor_c extends JL5LoopExt implements ExtendedFor {
+public class ExtendedFor_c extends Loop_c implements ExtendedFor {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
     /** Loop body */
     protected LocalDecl decl;
     protected Expr expr;
 
-    public ExtendedFor_c(LocalDecl decl, Expr expr) {
+    public ExtendedFor_c(Position pos, LocalDecl decl, Expr expr, Stmt body) {
+        super(pos, null, body);
         assert (decl != null && expr != null);
         this.decl = decl;
         this.expr = expr;
@@ -76,16 +77,16 @@ public class ExtendedFor_c extends JL5LoopExt implements ExtendedFor {
     }
 
     @Override
-    public Node decl(LocalDecl decl) {
-        return decl(node, decl);
+    public ExtendedFor decl(LocalDecl decl) {
+        return decl(this, decl);
     }
 
-    protected <N extends Node> N decl(N n, LocalDecl decl) {
-        ExtendedFor_c ext = (ExtendedFor_c) JL5Ext.ext(n);
+    protected <N extends ExtendedFor_c> N decl(N n, LocalDecl decl) {
+        ExtendedFor_c ext = n;
         if (ext.decl.equals(decl)) return n;
-        if (n == node) {
+        if (n == this) {
             n = Copy.Util.copy(n);
-            ext = (ExtendedFor_c) JL5Ext.ext(n);
+            ext = n;
         }
         ext.decl = decl;
         return n;
@@ -97,23 +98,24 @@ public class ExtendedFor_c extends JL5LoopExt implements ExtendedFor {
     }
 
     @Override
-    public Node expr(Expr expr) {
-        return expr(node, expr);
+    public ExtendedFor expr(Expr expr) {
+        return expr(this, expr);
     }
 
-    protected <N extends Node> N expr(N n, Expr expr) {
-        ExtendedFor_c ext = (ExtendedFor_c) JL5Ext.ext(n);
+    protected <N extends ExtendedFor_c> N expr(N n, Expr expr) {
+        ExtendedFor_c ext = n;
         if (ext.expr == expr) return n;
-        if (n == node) {
+        if (n == this) {
             n = Copy.Util.copy(n);
-            ext = (ExtendedFor_c) JL5Ext.ext(n);
+            ext = n;
         }
         ext.expr = expr;
         return n;
     }
 
     /** Reconstruct the statement. */
-    protected <N extends Loop> N reconstruct(N n, LocalDecl decl, Expr expr) {
+    protected <N extends ExtendedFor_c> N reconstruct(N n, LocalDecl decl,
+            Expr expr) {
         n = decl(n, decl);
         n = expr(n, expr);
         return n;
@@ -121,7 +123,7 @@ public class ExtendedFor_c extends JL5LoopExt implements ExtendedFor {
 
     @Override
     public Node visitChildren(NodeVisitor v) {
-        Loop n = node();
+        ExtendedFor_c n = this;
         LocalDecl decl = visitChild(this.decl, v);
         Expr expr = visitChild(this.expr, v);
         Stmt body = visitChild(n.body(), v);
@@ -137,7 +139,7 @@ public class ExtendedFor_c extends JL5LoopExt implements ExtendedFor {
     public Node typeCheck(TypeChecker tc) throws SemanticException {
         JL5TypeSystem ts = (JL5TypeSystem) tc.typeSystem();
         NodeFactory nf = tc.nodeFactory();
-        Node n = this.node();
+        Node n = this;
         Position position = n.position();
         // Check that the expr is an array or of type Iterable
         Type t = expr.type();
@@ -231,7 +233,7 @@ public class ExtendedFor_c extends JL5LoopExt implements ExtendedFor {
 
     @Override
     public <T> List<T> acceptCFG(CFGBuilder<?> v, List<T> succs) {
-        Loop n = this.node();
+        ExtendedFor n = this;
         v.visitCFG(expr,
                    FlowGraph.EDGE_KEY_TRUE,
                    decl,
@@ -246,7 +248,7 @@ public class ExtendedFor_c extends JL5LoopExt implements ExtendedFor {
 
     @Override
     public Term continueTarget() {
-        Loop n = this.node();
+        ExtendedFor n = this;
         return n.body();
     }
 
@@ -267,7 +269,7 @@ public class ExtendedFor_c extends JL5LoopExt implements ExtendedFor {
         w.end();
         w.write(")");
 
-        Loop n = this.node();
+        ExtendedFor n = this;
         printSubStmt(n.body(), w, tr);
     }
 

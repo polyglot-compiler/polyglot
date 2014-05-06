@@ -46,7 +46,7 @@ public class Branch_c extends Stmt_c implements Branch {
     protected Branch.Kind kind;
     protected Id label;
 
-    @Deprecated
+//    @Deprecated
     public Branch_c(Position pos, Branch.Kind kind, Id label) {
         this(pos, kind, label, null);
     }

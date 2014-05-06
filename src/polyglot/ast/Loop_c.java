@@ -40,7 +40,7 @@ public abstract class Loop_c extends Stmt_c implements Loop, LoopOps {
     protected Expr cond;
     protected Stmt body;
 
-    @Deprecated
+//    @Deprecated
     public Loop_c(Position pos, Expr cond, Stmt body) {
         this(pos, cond, body, null);
     }
