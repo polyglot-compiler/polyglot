@@ -35,6 +35,7 @@ import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
 import polyglot.util.StringUtil;
 import polyglot.visit.PrettyPrinter;
+import polyglot.visit.TypeBuilder;
 import polyglot.visit.TypeChecker;
 
 /**
@@ -92,6 +93,18 @@ public class Import_c extends Node_c implements Import {
         if (n.kind == kind) return n;
         n = copyIfNeeded(n);
         n.kind = kind;
+        return n;
+    }
+
+    @Override
+    public Node buildTypes(TypeBuilder tb) {
+        Import n = this;
+        if (n.kind() == Import.SINGLE_TYPE) {
+            tb.importTable().addClassImport(n.name(), n.position());
+        }
+        else if (n.kind() == Import.TYPE_IMPORT_ON_DEMAND) {
+            tb.importTable().addTypeOnDemandImport(n.name(), n.position());
+        }
         return n;
     }
 

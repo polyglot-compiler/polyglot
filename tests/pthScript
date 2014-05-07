@@ -256,7 +256,8 @@ polyglot.frontend.JLExtensionInfo "-d out -cp ." {
 	Protection7.jl (Semantic, "Method .* inaccessible");
 	Protection08A.jl package1/Protection08B.jl;
 	Protection09.jl;
-        Resolver01a.jl Resolver01b.jl
+        Resolver01a.jl Resolver01b.jl;
+        Resolver02a.jl Resolver02b.jl Resolver02c.jl;
         Return1.jl ; Return2.jl ; Return3.jl ;
         Return4.jl ;
         Return5.jl ;

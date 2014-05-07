@@ -41,6 +41,7 @@ import polyglot.visit.InitImportsVisitor;
 import polyglot.visit.NodeVisitor;
 
 /** Visitor which traverses the AST constructing type objects. */
+@Deprecated
 public class JL5InitImportsVisitor extends InitImportsVisitor {
     public JL5InitImportsVisitor(Job job, TypeSystem ts, NodeFactory nf) {
         super(job, ts, nf);

@@ -32,8 +32,7 @@ import java.util.List;
 
 import polyglot.ast.Import;
 import polyglot.ast.Node;
-import polyglot.ast.SourceFile;
-import polyglot.ast.TopLevelDecl;
+import polyglot.ext.jl5.types.JL5ImportTable;
 import polyglot.ext.jl5.types.JL5TypeSystem;
 import polyglot.types.ClassType;
 import polyglot.types.FieldInstance;
@@ -45,10 +44,25 @@ import polyglot.util.CodeWriter;
 import polyglot.util.SerialVersionUID;
 import polyglot.util.StringUtil;
 import polyglot.visit.PrettyPrinter;
+import polyglot.visit.TypeBuilder;
 import polyglot.visit.TypeChecker;
 
 public class JL5ImportExt extends JL5Ext {
     private static final long serialVersionUID = SerialVersionUID.generate();
+
+    @Override
+    public Node buildTypes(TypeBuilder tb) throws SemanticException {
+        Import im = (Import) node();
+        JL5ImportTable it = (JL5ImportTable) tb.importTable();
+
+        if (im.kind() == JL5Import.SINGLE_STATIC_MEMBER) {
+            it.addSingleStaticImport(im.name(), im.position());
+        }
+        else if (im.kind() == JL5Import.STATIC_ON_DEMAND) {
+            it.addStaticOnDemandImport(im.name(), im.position());
+        }
+        return superLang().buildTypes(im, tb);
+    }
 
     @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
@@ -65,18 +79,6 @@ public class JL5ImportExt extends JL5Ext {
                                   tc.context().package_())) {
                 throw new SemanticException("Cannot find static member " + id
                         + " in class: " + nt, n.position());
-            }
-            // check whether there is a top level type called id.
-            if (tc.job().ast() instanceof SourceFile) {
-                SourceFile sf = (SourceFile) tc.job().ast();
-                List<TopLevelDecl> decls = sf.decls();
-                for (TopLevelDecl tld : decls) {
-                    if (id.equals(tld.name())) {
-                        throw new SemanticException("Static import conflicts with top level declaration "
-                                                            + id,
-                                                    n.position());
-                    }
-                }
             }
             return n;
         }
@@ -108,7 +110,10 @@ public class JL5ImportExt extends JL5Ext {
             List<? extends MethodInstance> meths = t.methodsNamed(id);
             boolean anyAccessible = false;
             for (MethodInstance mi : meths) {
-                if (ts.accessibleFromPackage(mi.flags(), t.package_(), package_)) {
+                if (mi.flags().isStatic()
+                        && ts.accessibleFromPackage(mi.flags(),
+                                                    t.package_(),
+                                                    package_)) {
                     anyAccessible = true;
                     break;
                 }

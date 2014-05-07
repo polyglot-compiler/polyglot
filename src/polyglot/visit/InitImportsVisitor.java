@@ -36,7 +36,11 @@ import polyglot.types.ImportTable;
 import polyglot.types.SemanticException;
 import polyglot.types.TypeSystem;
 
-/** Visitor which traverses the AST constructing type objects. */
+/**
+ * Visitor which traverses the AST constructing type objects.
+ * @deprecated Use TypeBuilder instead.
+ */
+@Deprecated
 public class InitImportsVisitor extends ErrorHandlingVisitor {
     protected ImportTable importTable;
 

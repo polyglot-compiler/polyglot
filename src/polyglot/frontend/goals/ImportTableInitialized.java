@@ -34,16 +34,15 @@ import polyglot.ast.NodeFactory;
 import polyglot.frontend.Job;
 import polyglot.frontend.Scheduler;
 import polyglot.types.TypeSystem;
-import polyglot.visit.InitImportsVisitor;
 
-public class ImportTableInitialized extends VisitorGoal {
+public class ImportTableInitialized extends EmptyGoal {
     public static Goal create(Scheduler scheduler, Job job, TypeSystem ts,
             NodeFactory nf) {
         return scheduler.internGoal(new ImportTableInitialized(job, ts, nf));
     }
 
     protected ImportTableInitialized(Job job, TypeSystem ts, NodeFactory nf) {
-        super(job, new InitImportsVisitor(job, ts, nf));
+        super(job, "InitImportsVisitor");
     }
 
     @Override

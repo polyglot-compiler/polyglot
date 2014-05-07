@@ -31,7 +31,6 @@ import polyglot.ext.jl5.types.JL5TypeSystem;
 import polyglot.ext.jl5.visit.AnnotationChecker;
 import polyglot.ext.jl5.visit.AutoBoxer;
 import polyglot.ext.jl5.visit.JL5DefiniteAssignmentChecker;
-import polyglot.ext.jl5.visit.JL5InitImportsVisitor;
 import polyglot.ext.jl5.visit.JL5Translator;
 import polyglot.ext.jl5.visit.RemoveAnnotations;
 import polyglot.ext.jl5.visit.RemoveEnums;
@@ -296,21 +295,6 @@ public class JL5Scheduler extends JLScheduler {
                                                                                  .lang())));
         try {
             g.addPrerequisiteGoal(TypeChecked(job), this);
-        }
-        catch (CyclicDependencyException e) {
-            throw new InternalCompilerError(e);
-        }
-        return this.internGoal(g);
-    }
-
-    @Override
-    public Goal ImportTableInitialized(Job job) {
-        TypeSystem ts = extInfo.typeSystem();
-        NodeFactory nf = extInfo.nodeFactory();
-        Goal g = new VisitorGoal(job, new JL5InitImportsVisitor(job, ts, nf));
-        try {
-            g.addPrerequisiteGoal(TypesInitialized(job), this);
-            g.addPrerequisiteGoal(TypesInitializedForCommandLine(), this);
         }
         catch (CyclicDependencyException e) {
             throw new InternalCompilerError(e);

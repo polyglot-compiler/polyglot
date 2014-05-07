@@ -434,14 +434,7 @@ public class Context_c implements Context {
             Report.report(3, "find-type " + name + " in " + this);
 
         if (isOuter()) return ts.systemResolver().find(name);
-        if (isSource()) {
-            // See JLS 2nd Ed. | 6.5.5.1.
-            // Find a type within the current compilation unit first.
-            // If not found, try import tables.
-            Named n = ts.systemResolver().check(name);
-            if (n instanceof Type) return n;
-            return it.find(name);
-        }
+        if (isSource()) return it.find(name);
 
         Named type = findInThisScope(name);
 

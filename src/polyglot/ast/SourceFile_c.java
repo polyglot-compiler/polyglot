@@ -205,6 +205,11 @@ public class SourceFile_c extends Node_c implements SourceFile {
     }
 
     @Override
+    public Node buildTypes(TypeBuilder tb) throws SemanticException {
+        return importTable(tb.importTable());
+    }
+
+    @Override
     public Context enterScope(Context c) {
         return c.pushSource(importTable);
     }
