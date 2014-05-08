@@ -837,29 +837,25 @@ public class TypeSystem_c implements TypeSystem {
             // private members are never inherited.
             return false;
         }
+        if (mi instanceof MethodInstance) {
+            MethodInstance mi_ = (MethodInstance) mi;
+            if (!type.methods(mi_.name(), mi_.formalTypes()).isEmpty())
+                return false;
+        }
         ReferenceType container = mi.container();
         if (type.descendsFrom(container)) {
             boolean isInheritedInSuperType = false;
             Type superType = type.superType();
             if (superType != null) {
-                if (typeEquals(container, superType))
-                    isInheritedInSuperType = true;
-                else if (isInherited(mi, superType.toReference())) {
-                    if (mi instanceof MethodInstance
-                            && findOverridingMethod(superType.toReference(),
-                                                    (MethodInstance) mi) != null)
-                        return false;
+                if (typeEquals(container, superType)
+                        || isInherited(mi, superType.toReference())) {
                     isInheritedInSuperType = true;
                 }
             }
             if (!isInheritedInSuperType) {
                 for (ReferenceType rt : type.interfaces()) {
-                    if (typeEquals(container, rt))
-                        isInheritedInSuperType = true;
-                    else if (isInherited(mi, rt.toReference())) {
-                        if (mi instanceof MethodInstance
-                                && findOverridingMethod(rt, (MethodInstance) mi) != null)
-                            return false;
+                    if (typeEquals(container, rt)
+                            || isInherited(mi, rt.toReference())) {
                         isInheritedInSuperType = true;
                         break;
                     }
@@ -880,15 +876,6 @@ public class TypeSystem_c implements TypeSystem {
             }
         }
         return false;
-    }
-
-    protected MethodInstance findOverridingMethod(ReferenceType rt,
-            MethodInstance mi) {
-        List<? extends MethodInstance> possible =
-                rt.methods(mi.name(), mi.formalTypes());
-        for (MethodInstance mj : possible)
-            return mj;
-        return null;
     }
 
     @Deprecated
