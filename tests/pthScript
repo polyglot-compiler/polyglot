@@ -25,7 +25,12 @@
 #      CmdLineArgs  :   additional command line args for the Polyglot 
 #                       compiler; is always enclosed in quotes.
 
-polyglot.frontend.JLExtensionInfo "-d out -cp ." {
+# Compile some java classes first
+javac "-d java-out -cp ." {
+	java-src/ClassFile01.java;
+}
+
+polyglot.frontend.JLExtensionInfo "-d out -cp java-out" {
         AnonymousClass.jl ;
         AnonymousClass02.jl ;
         AnonymousClass03.jl;
@@ -65,6 +70,7 @@ polyglot.frontend.JLExtensionInfo "-d out -cp ." {
         ClassDecl05.jl;
         ClassDecl06.jl (Semantic, "Cannot declare a top-level class with flag");
         ClassDecl07.jl (Semantic, "clashes with package of the same name");
+        ClassFile01.jl;
         ClassLit.jl ;
         Conditional1.jl ;
 	ConformanceCheck1.jl (Semantic, "cannot override.*attempting to assign weaker access");

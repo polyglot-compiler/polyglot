@@ -52,10 +52,12 @@ terminal SEMICOLON, COMMA;
 terminal PLUS;
 
 non terminal List<SourceFileTest> goal;
+non terminal List<SourceFileTest> compilertest_list_opt;
 non terminal List<SourceFileTest> compilertest_list;
 non terminal List<SourceFileTest> compilertest;
 non terminal String testpath_opt;
 non terminal String command_line_args_opt;
+non terminal List<SourceFileTest> filetest_list_opt;
 non terminal List<SourceFileTest> filetest_list;
 non terminal SourceFileTest filetest;
 non terminal List<String> filename_list;
@@ -68,8 +70,13 @@ non terminal ExpectedFailure failure;
 start with goal;
 
 goal ::=
-        compilertest_list:a
+        compilertest_list_opt:a
             {: RESULT = a; :}
+    ;
+
+compilertest_list_opt ::=
+        {: RESULT = Collections.emptyList(); :}
+    |   compilertest_list:a {: RESULT = a; :}
     ;
 
 compilertest_list ::=
@@ -82,7 +89,7 @@ compilertest_list ::=
     ;
 
 compilertest ::=
-        IDENT:a testpath_opt:b command_line_args_opt:c LBRACE filetest_list:d RBRACE
+        IDENT:a testpath_opt:b command_line_args_opt:c LBRACE filetest_list_opt:d RBRACE
             {: String extClassName = a;
                
 		        for (SourceFileTest sft : d) {
@@ -105,7 +112,12 @@ command_line_args_opt ::=
             {: RESULT = a; :}
     | {: RESULT = null; :}
     ;
-    
+
+filetest_list_opt ::=
+        {: RESULT = Collections.emptyList(); :}
+    |   filetest_list:a {: RESULT = a; :}
+    ;
+
 filetest_list ::=
         filetest:a
             {: List<SourceFileTest> list = new LinkedList<>();
