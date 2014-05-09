@@ -49,6 +49,7 @@ import polyglot.util.Copy;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
 import polyglot.util.StringUtil;
+import polyglot.util.SubtypeSet;
 
 /**
  * The {@code TypeSystem} defines the types of the language and
@@ -1249,20 +1250,20 @@ public class TypeSystem_c implements TypeSystem {
             }
             else if (notAbstract.size() == 0) {
                 // all are abstract; if all signatures match, any will do.
-                List<Type> throwTypes = new LinkedList<>();
                 j = maximal.iterator();
                 first = j.next();
-                throwTypes.addAll(first.throwTypes());
+                SubtypeSet throwsSubsetType =
+                        new SubtypeSet(this, first.throwTypes());
                 while (j.hasNext()) {
                     Instance p = j.next();
-
-                    throwTypes.retainAll(p.throwTypes());
+                    throwsSubsetType.retainAll(p.throwTypes());
                 }
 
                 // all signatures match, just take the first
                 // However, the most specific method is considered to throw a
                 // checked exception iff that exception is declared in the
                 // throws clauses of each of the maximally specific methods.
+                List<Type> throwTypes = new LinkedList<>(throwsSubsetType);
                 if (!first.throwTypes().equals(throwTypes)) {
                     first = Copy.Util.copy(first);
                     first.setThrowTypes(throwTypes);

@@ -74,6 +74,9 @@ polyglot.frontend.JLExtensionInfo "-d out -cp java-out" {
         ClassFile01.jl;
         ClassFile02.jl (Semantic, "incompatible return type");
         ClassLit.jl ;
+	CombRule1.jl; 
+	CombRule2.jl (Semantic, "Method.*cannot be called with arguments");
+	CombRule3.jl (Semantic, "Method.*cannot be called with arguments");
         Conditional1.jl ;
 	ConformanceCheck1.jl (Semantic, "cannot override.*attempting to assign weaker access");
 	ConformanceCheck2.jl (Semantic, "cannot override.*throw set.*is not a subset");
@@ -147,6 +150,7 @@ polyglot.frontend.JLExtensionInfo "-d out -cp java-out" {
         Inherit02.jl (Semantic, "unrelated return types");
         Inherit03.jl (Semantic, "weaker access privileges");
         Inherit04a.jl Inherit04b.jl;
+        Inherit05.jl;
         InheritClass.jl ;
         Init1.jl ; Init2.jl ; Init3.jl ; Init4.jl ; Init5.jl ;
         Init6.jl ;
@@ -266,6 +270,7 @@ polyglot.frontend.JLExtensionInfo "-d out -cp java-out" {
 	Protection09.jl;
         Resolver01a.jl Resolver01b.jl;
         Resolver02a.jl Resolver02b.jl Resolver02c.jl;
+        Resolver03a.jl Resolver03b.jl Resolver03c.jl;
         Return1.jl ; Return2.jl ; Return3.jl ;
         Return4.jl ;
         Return5.jl ;
@@ -287,9 +292,6 @@ polyglot.frontend.JLExtensionInfo "-d out -cp java-out" {
         TypeAccess02a.jl TypeAccess02b.jl (Semantic, "Could not find type");
         TypeShadowing.jl ;
         xIterator.jl ;
-	CombRule1.jl; 
-	CombRule2.jl (Semantic, "Method.*cannot be called with arguments");
-	CombRule3.jl (Semantic, "Method.*cannot be called with arguments");
         FormalsDup.jl (Semantic, "multiply defined"), (Semantic, "multiply defined");
         AbstractSuperMethod.jl (Semantic, "Cannot call an abstract method of the super class");
         BadAbstract.jl (Semantic, "should be declared abstract");

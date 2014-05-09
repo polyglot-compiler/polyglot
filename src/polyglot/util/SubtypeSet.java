@@ -30,6 +30,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+import java.util.ListIterator;
 
 import polyglot.types.Type;
 import polyglot.types.TypeSystem;
@@ -241,7 +242,29 @@ public class SubtypeSet implements java.util.Set<Type> {
 
     @Override
     public boolean retainAll(Collection<?> c) {
-        throw new UnsupportedOperationException("Not supported");
+        boolean changed = false;
+        for (ListIterator<Type> itr = v.listIterator(); itr.hasNext();) {
+            Type t = itr.next();
+            Type glb = null;
+            for (Object o : c) {
+                if (o instanceof Type) {
+                    Type type = (Type) o;
+                    if (glb == null) {
+                        if (ts.isSubtype(type, t))
+                            glb = type;
+                        else if (ts.isSubtype(t, type)) glb = t;
+                    }
+                    else if (ts.isSubtype(type, glb)) glb = type;
+                }
+            }
+            if (glb != t) {
+                changed = true;
+                if (glb == null)
+                    itr.remove();
+                else itr.set(glb);;
+            }
+        }
+        return changed;
     }
 
     @Override

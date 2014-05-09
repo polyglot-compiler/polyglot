@@ -333,11 +333,6 @@ public class Call_c extends Expr_c implements Call, CallOps {
         Call_c call = this;
         call = methodInstance(call, mi);
         call = type(call, mi.returnType());
-
-        // If we found a method, the call must type check, so no need to check
-        // the arguments here.
-        call.checkConsistency(c);
-
         return call;
     }
 
@@ -553,28 +548,6 @@ public class Call_c extends Expr_c implements Call, CallOps {
             c = target(c, null);
         }
         return c;
-    }
-
-    /** Check that the implicit target setting is correct. */
-    protected void checkConsistency(Context c) throws SemanticException {
-        if (targetImplicit) {
-            // the target is implicit. Check that the
-            // method found in the target type is the
-            // same as the method found in the context.
-
-            // as exception will be thrown if no appropriate method
-            // exists. 
-            @SuppressWarnings("unused")
-            MethodInstance ctxtMI = c.findMethod(name.id(), mi.formalTypes());
-
-            // cannot perform this check due to the context's findMethod returning a 
-            // different method instance than the typeSystem in some situations
-//          if (!c.typeSystem().equals(ctxtMI, mi)) {
-//              throw new InternalCompilerError("Method call " + this + " has an " +
-//                   "implicit target, but the name " + name + " resolves to " +
-//                   ctxtMI + " in " + ctxtMI.container() + " instead of " + mi+ " in " + mi.container(), position());
-//          }
-        }
     }
 
     @Override

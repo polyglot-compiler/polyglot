@@ -245,24 +245,24 @@ public class ImportTable implements Resolver {
             }
             return res;
         }
-        try {
-            if (pkg != null) {
-                // check if the current package defines it.
-                // If so, this takes priority over the package imports (or 
-                // "type-import-on-demand" declarations as they are called in
-                // the JLS), so even if another package defines the same name,
-                // there is no conflict. See Section 6.5.2 of JLS, 2nd Ed.
-                Named n = findInPkgOrType(name, pkg.fullName());
-                if (n != null) {
-                    if (Report.should_report(TOPICS, 3))
-                        Report.report(3, this + ".find(" + name
-                                + "): found in current package");
 
-                    // Memoize the result.
-                    map.put(name, n);
-                    return n;
-                }
-            }
+        // check if the current package defines it.
+        // If so, this takes priority over the package imports (or 
+        // "type-import-on-demand" declarations as they are called in
+        // the JLS), so even if another package defines the same name,
+        // there is no conflict.  See JLS 2nd Ed. | 6.5.2.
+        res = findInPkgOrType(name, pkg == null ? "" : pkg.fullName());
+        if (res != null) {
+            if (Report.should_report(TOPICS, 3))
+                Report.report(3, this + ".find(" + name
+                        + "): found in current package");
+
+            // Memoize the result.
+            map.put(name, res);
+            return res;
+        }
+
+        try {
             List<String> imports =
                     new ArrayList<>(typeOnDemandImports.size() + 5);
 
@@ -335,7 +335,8 @@ public class ImportTable implements Resolver {
             actualPkg = pkgOrTypeName;
         }
 
-        String fullName = pkgOrTypeName + "." + name;
+        String fullName =
+                pkgOrTypeName.length() == 0 ? name : pkgOrTypeName + "." + name;
         try {
             Named n = ts.systemResolver().find(fullName);
             // Check if the type is visible in this pake or type.

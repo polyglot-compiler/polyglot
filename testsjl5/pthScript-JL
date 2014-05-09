@@ -120,6 +120,7 @@ polyglot.ext.jl5.JL5ExtensionInfo ["../tests/"] "-sx jl -d out -classpath java-o
         Inherit02.jl (Semantic, "unrelated return types");
         Inherit03.jl (Semantic, "weaker access privileges");
         Inherit04a.jl Inherit04b.jl;
+        Inherit05.jl;
         InheritClass.jl ;
         Init1.jl ; Init2.jl ; Init3.jl ; Init4.jl ; Init5.jl ;
         Init6.jl ;
@@ -239,6 +240,7 @@ polyglot.ext.jl5.JL5ExtensionInfo ["../tests/"] "-sx jl -d out -classpath java-o
 	Protection09.jl;
         Resolver01a.jl Resolver01b.jl;
         Resolver02a.jl Resolver02b.jl Resolver02c.jl;
+        Resolver03a.jl Resolver03b.jl Resolver03c.jl;
         Return1.jl ; Return2.jl ; Return3.jl ;
         Return4.jl ;
         Return5.jl ;
