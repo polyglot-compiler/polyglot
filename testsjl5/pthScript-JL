@@ -8,6 +8,7 @@ polyglot.ext.jl5.JL5ExtensionInfo ["../tests/"] "-sx jl -d out -classpath java-o
         AnonymousClass.jl ;
         AnonymousClass02.jl ;
         AnonymousClass03.jl;
+        AnonymousClass04.jl;
         ArrayInit.jl ;
         Array01.jl ;
         Assign01.jl

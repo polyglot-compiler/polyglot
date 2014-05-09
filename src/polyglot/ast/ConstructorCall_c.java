@@ -295,10 +295,15 @@ public class ConstructorCall_c extends Stmt_c implements ConstructorCall,
                     if (e.isSubtype(superContainer)
                             && ct.hasEnclosingInstance(e)) {
                         NodeFactory nf = tc.nodeFactory();
+                        // If an enclosing instance is of an anonymous class,
+                        // there is no qualifier.
                         q =
-                                nf.This(position(),
-                                        nf.CanonicalTypeNode(position(), e))
-                                  .type(e);
+                                e.isAnonymous()
+                                        ? null
+                                        : nf.This(position(),
+                                                  nf.CanonicalTypeNode(position(),
+                                                                       e))
+                                            .type(e);
                         break;
                     }
                     e = e.outer();

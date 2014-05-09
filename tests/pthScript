@@ -35,6 +35,7 @@ polyglot.frontend.JLExtensionInfo "-d out -cp java-out" {
         AnonymousClass.jl ;
         AnonymousClass02.jl ;
         AnonymousClass03.jl;
+        AnonymousClass04.jl;
         ArrayInit.jl ;
         Array01.jl ;
         Assign01.jl
