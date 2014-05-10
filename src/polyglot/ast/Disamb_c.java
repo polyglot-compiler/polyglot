@@ -30,7 +30,6 @@ import polyglot.types.ClassType;
 import polyglot.types.Context;
 import polyglot.types.FieldInstance;
 import polyglot.types.LocalInstance;
-import polyglot.types.MemberInstance;
 import polyglot.types.Named;
 import polyglot.types.NoClassException;
 import polyglot.types.NoMemberException;
@@ -178,12 +177,6 @@ public class Disamb_c implements Disamb {
             }
             if (n instanceof Type) {
                 Type type = (Type) n;
-                if (!ts.typeEquals(((MemberInstance) type).container(),
-                                   t.toClass())
-                        && !ts.isInherited((MemberInstance) type, t.toClass())) {
-                    throw new SemanticException("Member class " + type
-                            + " is not visible in class " + t);
-                }
                 return nf.CanonicalTypeNode(pos, type);
             }
         }

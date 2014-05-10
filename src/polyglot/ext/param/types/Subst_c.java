@@ -40,6 +40,7 @@ import polyglot.types.ArrayType;
 import polyglot.types.ClassType;
 import polyglot.types.ConstructorInstance;
 import polyglot.types.FieldInstance;
+import polyglot.types.MemberInstance;
 import polyglot.types.MethodInstance;
 import polyglot.types.ReferenceType;
 import polyglot.types.Type;
@@ -246,7 +247,7 @@ public class Subst_c<Formal extends Param, Actual extends TypeObject>
 
     @Override
     public <T extends FieldInstance> T substField(T fi) {
-        ReferenceType ct = (ReferenceType) substType(fi.container());
+        ReferenceType ct = substContainer(fi);
         Type t = substType(fi.type());
         @SuppressWarnings("unchecked")
         T newFI = (T) fi.copy();
@@ -257,7 +258,7 @@ public class Subst_c<Formal extends Param, Actual extends TypeObject>
 
     @Override
     public <T extends MethodInstance> T substMethod(T mi) {
-        ReferenceType ct = (ReferenceType) substType(mi.container());
+        ReferenceType ct = substContainer(mi);
 
         Type rt = substType(mi.returnType());
 
@@ -294,6 +295,10 @@ public class Subst_c<Formal extends Param, Actual extends TypeObject>
         tmpCi.setContainer(ct);
 
         return tmpCi;
+    }
+
+    protected ReferenceType substContainer(MemberInstance mi) {
+        return substType(mi.container()).toReference();
     }
 
     @Override

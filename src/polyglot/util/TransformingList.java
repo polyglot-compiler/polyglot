@@ -39,7 +39,8 @@ public class TransformingList<T, U> extends java.util.AbstractList<U> {
     protected final Transformation<T, U> trans;
     protected final List<T> underlying;
 
-    public TransformingList(Collection<T> underlying, Transformation<T, U> trans) {
+    public TransformingList(Collection<? extends T> underlying,
+            Transformation<T, U> trans) {
         this(new ArrayList<>(underlying), trans);
     }
 

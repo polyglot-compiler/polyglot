@@ -34,6 +34,7 @@ import polyglot.ext.param.types.ParamTypeSystem;
 import polyglot.ext.param.types.Subst_c;
 import polyglot.types.ClassType;
 import polyglot.types.ConstructorInstance;
+import polyglot.types.MemberInstance;
 import polyglot.types.MethodInstance;
 import polyglot.types.ReferenceType;
 import polyglot.types.Type;
@@ -152,7 +153,6 @@ public class JL5Subst_c extends Subst_c<TypeVariable, ReferenceType> implements
 
         throw new InternalCompilerError("Don't know how to handle class type "
                 + t.getClass());
-
     }
 
     @Override
@@ -189,6 +189,12 @@ public class JL5Subst_c extends Subst_c<TypeVariable, ReferenceType> implements
         @SuppressWarnings("unchecked")
         T result = (T) cj;
         return result;
+    }
+
+    @Override
+    protected ReferenceType substContainer(MemberInstance mi) {
+        if (mi.flags().isStatic()) return mi.container();
+        return super.substContainer(mi);
     }
 
     @Override

@@ -785,8 +785,7 @@ public class TypeSystem_c implements TypeSystem {
                                         + ", which is inaccessible from class "
                                         + currClass);
                 }
-                else if (!typeEquals(fc, container)
-                        && !isInherited(fi, container.toReference())) {
+                else if (!isMember(fi, container.toReference())) {
                     if (error == null)
                         error =
                                 new NoMemberException(NoMemberException.FIELD,
@@ -833,6 +832,11 @@ public class TypeSystem_c implements TypeSystem {
     }
 
     @Override
+    public boolean isMember(MemberInstance mi, ReferenceType type) {
+        return typeEquals(mi.container(), type) || isInherited(mi, type);
+    }
+
+    @Override
     public boolean isInherited(MemberInstance mi, ReferenceType type) {
         if (mi.flags().isPrivate()) {
             // private members are never inherited.
@@ -844,37 +848,32 @@ public class TypeSystem_c implements TypeSystem {
                 return false;
         }
         ReferenceType container = mi.container();
-        if (type.descendsFrom(container)) {
-            boolean isInheritedInSuperType = false;
-            Type superType = type.superType();
-            if (superType != null) {
-                if (typeEquals(container, superType)
-                        || isInherited(mi, superType.toReference())) {
+        boolean isInheritedInSuperType = false;
+        Type superType = type.superType();
+        if (superType != null) {
+            if (isMember(mi, superType.toReference())) {
+                isInheritedInSuperType = true;
+            }
+        }
+        if (!isInheritedInSuperType) {
+            for (ReferenceType rt : type.interfaces()) {
+                if (isMember(mi, rt.toReference())) {
                     isInheritedInSuperType = true;
+                    break;
                 }
             }
-            if (!isInheritedInSuperType) {
-                for (ReferenceType rt : type.interfaces()) {
-                    if (typeEquals(container, rt)
-                            || isInherited(mi, rt.toReference())) {
-                        isInheritedInSuperType = true;
-                        break;
-                    }
-                }
-            }
-            if (isInheritedInSuperType) {
-                if (mi.flags().isProtected() || mi.flags().isPublic())
-                    return true;
-                Package typePackage = null;
-                if (type.isClass()) typePackage = type.toClass().package_();
-                Package containerPackage = null;
-                if (container.isClass())
-                    containerPackage = container.toClass().package_();
-                // whether type and the container are in the same package.
-                return typePackage == null
-                        ? typePackage == containerPackage
-                        : packageEquals(typePackage, containerPackage);
-            }
+        }
+        if (isInheritedInSuperType) {
+            if (mi.flags().isProtected() || mi.flags().isPublic()) return true;
+            Package typePackage = null;
+            if (type.isClass()) typePackage = type.toClass().package_();
+            Package containerPackage = null;
+            if (container.isClass())
+                containerPackage = container.toClass().package_();
+            // whether type and the container are in the same package.
+            return typePackage == null
+                    ? typePackage == containerPackage
+                    : packageEquals(typePackage, containerPackage);
         }
         return false;
     }
@@ -1046,8 +1045,7 @@ public class TypeSystem_c implements TypeSystem {
             }
 
             for (MethodInstance mi : type.toReference().methodsNamed(name)) {
-                if ((typeEquals(mi.container(), container) || isInherited(mi,
-                                                                          container.toReference()))
+                if (isMember(mi, container.toReference())
                         && isAccessible(mi, container, currClass)) {
                     return true;
                 }
@@ -1359,8 +1357,7 @@ public class TypeSystem_c implements TypeSystem {
                 }
 
                 if (methodCallValid(mi, name, argTypes)) {
-                    if ((typeEquals(mi.container(), container) || isInherited(mi,
-                                                                              container.toReference()))
+                    if (isMember(mi, container.toReference())
                             && isAccessible(mi,
                                             container,
                                             currClass,

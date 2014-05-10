@@ -255,13 +255,14 @@ public class JL5Disamb_c extends Disamb_c {
                 // needs to be a raw type
                 return ts.rawClass((JL5ParsedClassType) type, pos);
             }
-            if (type.toClass().isInnerClass()) {
-                ClassType t = type.toClass();
-                ClassType outer = type.toClass().outer();
+            ClassType ct = type.toClass();
+            if (ct.isInnerClass()) {
+                ClassType t = ct;
+                ClassType outer = ct.outer();
                 while (t.isInnerClass() && outer != null) {
                     if (outer instanceof RawClass) {
                         // an inner class of a raw class should be a raw class.
-                        return ts.erasureType(type);
+                        return ts.erasureType(ct);
                     }
                     t = outer;
                     outer = outer.outer();

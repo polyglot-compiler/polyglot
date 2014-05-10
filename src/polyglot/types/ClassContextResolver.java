@@ -29,6 +29,7 @@ package polyglot.types;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.Set;
 
 import polyglot.main.Report;
@@ -73,129 +74,114 @@ public class ClassContextResolver extends AbstractAccessControlResolver {
                     + name);
         }
 
-        if (accessor == null) accessor = type;
+        LinkedList<ClassType> typeQueue = new LinkedList<>();
+        typeQueue.addLast(type);
+        Set<Named> acceptable = new HashSet<>();
+        SemanticException error = null;
+        while (!typeQueue.isEmpty()) {
+            ClassType type = typeQueue.removeFirst();
+            // Check if the member was explicitly declared.
+            Named m = type.memberClassNamed(name);
 
-        // Check if the name is for a member class.
-        ClassType mt = null;
+            // XXX why is this needed?
+//            String fullName = type.fullName() + "." + name;
+//            String rawName = ts.getTransformedClassName(type) + "$" + name;
+//
+//            // Check the system resolver.
+//            if (m == null) {
+//                m = ts.systemResolver().check(fullName);
+//            }
+//
+//            // Try the raw class file name.
+//            if (m == null) {
+//                m = ts.systemResolver().check(rawName);
+//            }
+//
+//            if (m == null) {
+//                // Go to disk, but only if there is no job for the type.
+//                // If there is a job, all members should be in the resolver
+//                // already.
+//                boolean useLoadedResolver = true;
+//
+//                if (type instanceof ParsedTypeObject) {
+//                    ParsedTypeObject pto = (ParsedTypeObject) type;
+//                    if (pto.job() != null) {
+//                        useLoadedResolver = false;
+//                    }
+//                }
+//
+//                if (useLoadedResolver) {
+//                    try {
+//                        m = ts.systemResolver().find(rawName);
+//                    }
+//                    catch (SemanticException e) {
+//                        // Not found; will fall through to error handling code
+//                    }
+//                }
+//            }
 
-        Named m;
-
-        String fullName = type.fullName() + "." + name;
-        String rawName = ts.getTransformedClassName(type) + "$" + name;
-
-        // First check the system resolver.
-        m = ts.systemResolver().check(fullName);
-
-        // Try the raw class file name.
-        if (m == null) {
-            m = ts.systemResolver().check(rawName);
-        }
-
-        // Check if the member was explicitly declared.
-        if (m == null) {
-            m = type.memberClassNamed(name);
-        }
-
-        // Go to disk, but only if there is no job for the type.
-        // If there is a job, all members should be in the resolver
-        // already.
-        boolean useLoadedResolver = true;
-
-        if (type instanceof ParsedTypeObject) {
-            ParsedTypeObject pto = (ParsedTypeObject) type;
-            if (pto.job() != null) {
-                useLoadedResolver = false;
+            if (m instanceof MemberInstance) {
+                if (!ts.isMember((MemberInstance) m, this.type)) {
+                    if (error == null)
+                        error =
+                                new SemanticException("Member class " + m
+                                        + " is not visible in class "
+                                        + this.type);
+                }
+                else if (!canAccess(m, accessor)) {
+                    acceptable.add(m);
+                    if (error == null)
+                        error =
+                                new SemanticException("Cannot access member type \""
+                                        + m + "\" from class " + accessor + ".");
+                }
+                else acceptable.add(m);
+                continue;
             }
-        }
-
-        if (m == null && useLoadedResolver) {
-            try {
-                m = ts.systemResolver().find(rawName);
-            }
-            catch (SemanticException e) {
-                // Not found; will fall through to error handling code
-            }
-        }
-
-        if (m == null) {
-            // Collect all members of the super types.
-            // Use a Set to eliminate duplicates.
-            Set<Named> acceptable = new HashSet<>();
-            SemanticException error = null;
 
             if (type.superType() != null) {
                 Type sup = type.superType();
                 if (sup instanceof ClassType) {
-                    Resolver r = ts.classContextResolver((ClassType) sup, type);
-                    try {
-                        Named n = r.find(name);
-                        acceptable.add(n);
-                    }
-                    catch (SemanticException e) {
-                        if (error == null) error = e;
-                    }
+                    ClassType ct = (ClassType) sup;
+                    typeQueue.addLast(ct);
                 }
             }
 
             for (Type sup : type.interfaces()) {
                 if (sup instanceof ClassType) {
-                    Resolver r = ts.classContextResolver((ClassType) sup, type);
-                    try {
-                        Named n = r.find(name);
-                        acceptable.add(n);
-                    }
-                    catch (SemanticException e) {
-                        if (error == null) error = e;
-                    }
+                    ClassType ct = (ClassType) sup;
+                    typeQueue.addLast(ct);
                 }
             }
-
-            if (acceptable.size() == 0) {
-                throw error == null ? new NoClassException(name, type) : error;
-            }
-            else if (acceptable.size() > 1) {
-                Set<ReferenceType> containers =
-                        new HashSet<>(acceptable.size());
-                for (Named n : acceptable) {
-                    if (n instanceof MemberInstance) {
-                        MemberInstance mi = (MemberInstance) n;
-                        containers.add(mi.container());
-                    }
-                }
-
-                if (containers.size() == 2) {
-                    Iterator<ReferenceType> i = containers.iterator();
-                    Type t1 = i.next();
-                    Type t2 = i.next();
-                    throw new SemanticException("Member \"" + name + "\" of "
-                            + type + " is ambiguous; it is defined in both "
-                            + t1 + " and " + t2 + ".");
-                }
-                else {
-                    throw new SemanticException("Member \"" + name + "\" of "
-                            + type + " is ambiguous; it is defined in "
-                            + containers + ".");
-                }
-            }
-            m = acceptable.iterator().next();
         }
 
-        if (m instanceof ClassType) {
-            mt = (ClassType) m;
-
-            if (!mt.isMember()) {
-                throw new SemanticException("Class " + mt
-                        + " is not a member class, " + " but was found in "
-                        + type + ".");
-            }
-
-            if (!canAccess(mt, accessor)) {
-                throw new SemanticException("Cannot access member type \"" + mt
-                        + "\".");
-            }
-
-            return mt;
+        if (acceptable.size() == 0) {
+            throw error == null ? new NoClassException(name, type) : error;
         }
+        else if (acceptable.size() > 1) {
+            Set<ReferenceType> containers = new HashSet<>(acceptable.size());
+            for (Named n : acceptable) {
+                if (n instanceof MemberInstance) {
+                    MemberInstance mi = (MemberInstance) n;
+                    containers.add(mi.container());
+                }
+            }
+
+            if (containers.size() == 2) {
+                Iterator<ReferenceType> i = containers.iterator();
+                Type t1 = i.next();
+                Type t2 = i.next();
+                throw new SemanticException("Member \"" + name + "\" of "
+                        + type + " is ambiguous; it is defined in both " + t1
+                        + " and " + t2 + ".");
+            }
+            else {
+                throw new SemanticException("Member \"" + name + "\" of "
+                        + type + " is ambiguous; it is defined in "
+                        + containers + ".");
+            }
+        }
+        Named m = acceptable.iterator().next();
 
         if (Report.should_report(TOPICS, 2))
             Report.report(2, "Found member class " + m);

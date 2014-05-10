@@ -711,8 +711,7 @@ public class JL5TypeSystem_c extends
                 JL5MethodInstance origMi = mi;
                 if (substMi != null) {
                     mi = substMi;
-                    if ((typeEquals(mi.container(), container) || isInherited(mi,
-                                                                              container.toReference()))
+                    if (isMember(mi, container.toReference())
                             && isAccessible(mi,
                                             container,
                                             currClass,
@@ -1221,7 +1220,6 @@ public class JL5TypeSystem_c extends
     }
 
     protected Type erasureType(Type t, Set<TypeVariable> visitedTypeVariables) {
-
         if (t.isArray()) {
             ArrayType at = t.toArray();
             return at.base(this.erasureType(at.base(), visitedTypeVariables));
@@ -1997,6 +1995,21 @@ public class JL5TypeSystem_c extends
         }
 
         throw error;
+    }
+
+    @Override
+    public boolean isMember(MemberInstance mi, ReferenceType type) {
+        if (super.isMember(mi, type)) return true;
+        if (mi.flags().isStatic()) {
+            if (type instanceof JL5SubstClassType) {
+                type = ((JL5SubstClassType) type).base();
+            }
+            else if (type instanceof RawClass) {
+                type = ((RawClass) type).base();
+            }
+            return typeEquals(mi.container(), type);
+        }
+        return false;
     }
 
     @Override
