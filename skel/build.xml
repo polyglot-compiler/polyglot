@@ -136,7 +136,7 @@
         <available classname="java_cup.Main"
 	           classpathref="standard.classpath"
 	           property="cp_existence.java_cup"/>
-        <available classname="JFlex.Main"
+        <available classname="jflex.Main"
 	           classpathref="standard.classpath"
 	           property="cp_existence.jflex"/>
 
@@ -145,7 +145,7 @@
         <fail unless="cp_existence.java_cup"
 	      message="The java_cup classes must be on the classpath. Try adding java_cup.jar to the classpath."/>
         <fail unless="cp_existence.jflex"
-	      message="The JFlex classes must be on the classpath. Try adding JFlex.jar to the classpath."/>
+	      message="The jflex classes must be on the classpath. Try adding jflex.jar to the classpath."/>
     </target>
 
     <!-- ****************************************
@@ -164,7 +164,7 @@
 
     <target name="runtime" depends="init,configure" description="compile the runtime" if="has-runtime">
         <mkdir dir="${runtime.classes}" />
-        <javac source="1.4" target="1.4" srcdir="${runtime.src}" destdir="${runtime.classes}" debug="on" includes="**">
+        <javac source="1.7" target="1.7" srcdir="${runtime.src}" destdir="${runtime.classes}" debug="on" includes="**" includeantruntime="false">
             <classpath>
                 <path refid="standard.classpath" />
             </classpath>
@@ -248,7 +248,7 @@
        @param ${ext.pkg}     the package directory of the extension
     -->
     <target name="compile-ext">
-        <javac source="1.4" target="1.4" srcdir="${compiler.src}" destdir="${compiler.classes}" debug="on" includes="${ext.pkg}/**">
+        <javac source="1.7" target="1.7" srcdir="${compiler.src}" destdir="${compiler.classes}" debug="on" includes="${ext.pkg}/**" includeantruntime="false">
             <classpath refid="standard.classpath" />
         </javac>
     </target>
@@ -306,6 +306,7 @@
     <target name="cup-parser-using-jar" depends="cup-parser-deps" unless="cup.parser.up-to-date">
         <java classname="java_cup.Main" fork="true" dir="${parser.dir}" failonerror="true">
             <classpath refid="standard.classpath" />
+            <arg value="-nopositions" />
             <arg value="-parser"/>
             <arg value="${parser.class}"/>
             <arg value="-symbols"/>
@@ -341,8 +342,9 @@
        @param jflex.file    The name of the JFlex file.
    -->
     <target name="jflex-lexer" depends="jflex-lexer-deps" unless="jflex.lexer.up-to-date">
-        <java classname="JFlex.Main" fork="true" dir="${lexer.dir}" failonerror="true">
+        <java classname="jflex.Main" fork="true" dir="${lexer.dir}" failonerror="true">
             <classpath refid="standard.classpath" />
+            <arg value="--noinputstreamctor" />
             <arg value="${jflex.file}" />
         </java>
     </target>

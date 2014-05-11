@@ -6,6 +6,7 @@ package skelpkg.parse;
 import skelpkg.types.SkelTypeSystem;
 import skelpkg.ast.SkelNodeFactory;
 import polyglot.parse.Name;
+import polyglot.parse.VarDeclarator;
 
 parser Grm extends polyglot.parse.Grm {:
     public final SkelTypeSystem ts;

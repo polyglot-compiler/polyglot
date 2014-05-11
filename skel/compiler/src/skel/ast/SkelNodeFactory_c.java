@@ -13,6 +13,6 @@ import java.util.*;
  */
 public class SkelNodeFactory_c extends NodeFactory_c implements SkelNodeFactory {
     // TODO:  Implement factory methods for new AST nodes.
-    // TODO:  Override factory methods for overriden AST nodes.
+    // TODO:  Override factory methods for overridden AST nodes.
     // TODO:  Override factory methods for AST nodes with new extension nodes.
 }

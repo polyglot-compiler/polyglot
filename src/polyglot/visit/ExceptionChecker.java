@@ -265,7 +265,7 @@ public class ExceptionChecker extends ErrorHandlingVisitor {
 
         @Override
         void uncaughtType(Type t, Position pos) throws SemanticException {
-            throw new SemanticException("A " + codeType + " can not "
+            throw new SemanticException("A " + codeType + " cannot "
                     + "throw a \"" + t + "\".", pos);
         }
     }

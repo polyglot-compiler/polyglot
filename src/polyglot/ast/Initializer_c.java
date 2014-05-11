@@ -214,8 +214,9 @@ public class Initializer_c extends Term_c implements Initializer {
             // An instance initializer of a named class may not throw
             // a checked exception unless that exception or one of its 
             // superclasses is explicitly declared in the throws clause
-            // of each contructor or its class, and the class has at least
+            // of each constructor or its class, and the class has at least
             // one explicitly declared constructor.
+            // See JLS 2nd Ed. | 8.6.
             SubtypeSet allowed = null;
             Type throwable = ec.typeSystem().Throwable();
             ClassType container = initializerInstance().container().toClass();

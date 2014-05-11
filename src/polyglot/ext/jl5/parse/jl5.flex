@@ -50,7 +50,7 @@ import java.math.BigInteger;
         this.file = file.name();
         this.path = file.path();
         this.eq = eq;
-        this.keywords = new HashMap<String, Integer>();
+        this.keywords = new HashMap<>();
         init_keywords();
     }
 
