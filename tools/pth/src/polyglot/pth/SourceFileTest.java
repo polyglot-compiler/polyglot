@@ -153,7 +153,6 @@ public class SourceFileTest extends AbstractTest {
                         invokeJavac(cmdLine);
                     }
                     else {
-                        System.out.println(cmdLine);
                         invokePolyglot(cmdLine);
                     }
                 }
