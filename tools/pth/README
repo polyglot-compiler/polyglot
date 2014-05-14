@@ -24,27 +24,28 @@ comments ("/*...*/" and "// ...") and lines beginning with a pound
 sign ('#') are treated as comments.
 
 
-  ScriptFile   ::= CompilerTest+
-  CompilerTest ::= ExtClassName ["CmdLineArgs"] { FileTest [; FileTest]* }
-  FileTest     ::= Filenames [Description] [FailureSet]
-  Filenames    ::= Filename [Filename]*
-  Description  ::= LitString
-  FailureSet   ::= Failure [, Failure]*
-  Failure      ::= ( ErrorKind )
-                |  ( ErrorKind, "RegExp" )
-                |  ( "RegExp" )
-                |  ( )
-  ErrorKind    :   one of, or a unique prefix of one of the following 
-                   strings: "Warning", "Internal Error", "I/O Error", 
-                   "Lexical Error", "Syntax Error", "Semantic Error"
-                   or "Post-compiler Error".
-  Filename     :   the name of a file. Is interpreted from the 
-                   directory where pth is run.
-  LitString    :   a literal string, enclosed in quotes.
-  RegExp       :   a regular expression, as in java.util.regex; 
-                   is always enclosed in quotes.
-  CmdLineArgs  :   additional command line args for the Polyglot 
-                   compiler; is always enclosed in quotes.
+  ScriptFile       ::= CompilerTest+
+  CompilerTest     ::= ExtClassName ["CmdLineArgs"] { FileTest [; FileTest]* }
+  FileTest         ::= CompilationUnits [Description] [FailureSet]
+  CompilationUnits ::= Filenames [, Filenames]*
+  Filenames        ::= Filename [Filename]*
+  Description      ::= LitString
+  FailureSet       ::= Failure [, Failure]*
+  Failure          ::= ( ErrorKind )
+                    |  ( ErrorKind, "RegExp" )
+                    |  ( "RegExp" )
+                    |  ( )
+  ErrorKind        :   one of, or a unique prefix of one of the following 
+                       strings: "Warning", "Internal Error", "I/O Error", 
+                       "Lexical Error", "Syntax Error", "Semantic Error"
+                       or "Post-compiler Error".
+  Filename         :   the name of a file. Is interpreted from the 
+                       directory where pth is run.
+  LitString        :   a literal string, enclosed in quotes.
+  RegExp           :   a regular expression, as in java.util.regex; 
+                       is always enclosed in quotes.
+  CmdLineArgs      :   additional command line args for the Polyglot 
+                       compiler; is always enclosed in quotes.
 
 
 
@@ -71,6 +72,9 @@ common usage of the test script files.
 
 		 // this test requires compiling two files at the same time.
 		 MutualA.jl MutualB.jl ; 
+
+		 // this tests separate compilation of two files.
+		 SeparateA.jl, SeparateB.jl ;
 
 		 // this test fails with a syntax failure, and the
 		 // special expected failure "()" ignores all other failures.

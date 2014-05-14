@@ -46,7 +46,10 @@ public class SourceFileTest extends AbstractTest {
     private static final String JAVAC = "javac";
     private static final JavaCompiler javaCompiler =
             polyglot.main.Main.javaCompiler();
-    protected final List<String> sourceFilenames;
+    /**
+     * Each compilation unit is a list of source file names.
+     */
+    protected final List<List<String>> compilationUnits;
     protected String extensionClassname = null;
     protected String[] extraArgs;
     protected List<String> mainExtraArgs;
@@ -58,15 +61,20 @@ public class SourceFileTest extends AbstractTest {
 
     protected Set<String> undefinedEnvVars = new HashSet<>();
 
-    public SourceFileTest(List<String> filenames) {
-        super(testName(filenames));
-        this.sourceFilenames = filenames;
+    public SourceFileTest(List<List<String>> compilationUnits) {
+        super(testName(compilationUnits));
+        this.compilationUnits = compilationUnits;
         this.eq = new SilentErrorQueue(100, this.getName());
     }
 
-    private static String testName(List<String> filenames) {
-        if (filenames.size() == 1) return new File(filenames.get(0)).getName();
-        return filenames.toString();
+    private static String testName(List<List<String>> compilationUnits) {
+        if (compilationUnits.size() == 1) {
+            List<String> filenames = compilationUnits.get(0);
+            if (filenames.size() == 1)
+                return new File(filenames.get(0)).getName();
+            return filenames.toString();
+        }
+        return compilationUnits.toString();
     }
 
     @Override
@@ -92,65 +100,88 @@ public class SourceFileTest extends AbstractTest {
 
     @Override
     protected boolean runTest() {
-        for (String filename : sourceFilenames) {
-            File sourceFile = new File(prependTestPath(filename));
-            if (!sourceFile.exists()) {
-                setFailureMessage("File not found.");
-                return false;
-            }
-        }
+        List<List<String>> sourceFileNames = getSourceFileNames();
 
-        List<String> cmdLine = buildCmdLine(getSourceFileNames());
-
-        File destDir;
-        String s = getDestDir();
-        if (s != null)
-            destDir = new File(s);
-        else {
-            destDir = new File("pthOutput");
-
-            for (int i = 1; destDir.exists(); i++)
-                destDir = new File("pthOutput." + i);
-
-            destDir.mkdir();
-
-            cmdLine.add("-d");
-            cmdLine.add(prependTestPath(destDir.getName()));
-        }
-
-        // invoke the compiler on the file.
-        try {
-            if (JAVAC.equals(this.getExtensionClassname())) {
-                // invoke javac on the program
-                invokeJavac(cmdLine);
-            }
-            else {
-                invokePolyglot(cmdLine);
-            }
-        }
-        catch (polyglot.main.Main.TerminationException e) {
-            if (e.getMessage() != null) {
-                setFailureMessage(e.getMessage());
-                return false;
-            }
-            else {
-                if (!eq.hasErrors()) {
-                    setFailureMessage("Failed to compile for unknown reasons: "
-                            + e.toString());
+        // First, check that all source files exist.
+        for (List<String> compilationUnit : sourceFileNames) {
+            for (String filename : compilationUnit) {
+                File sourceFile = new File(filename);
+                if (!sourceFile.exists()) {
+                    setFailureMessage("File not found.");
                     return false;
                 }
             }
         }
-        catch (RuntimeException e) {
-            if (e.getMessage() != null) {
-                setFailureMessage(e.getMessage());
-                e.printStackTrace();
-                return false;
-            }
+
+        // Figure out the output directory.
+        File destDir;
+        boolean addDestDirToCmdLine = false;
+        {
+            String s = getDestDir();
+            if (s != null)
+                destDir = new File(s);
             else {
-                setFailureMessage("Uncaught " + e.getClass().getName());
-                e.printStackTrace();
-                return false;
+                destDir = new File("pthOutput");
+
+                for (int i = 1; destDir.exists(); i++)
+                    destDir = new File("pthOutput." + i);
+
+                destDir.mkdir();
+                addDestDirToCmdLine = true;
+            }
+        }
+
+        try {
+            // Next, loop through each compilation unit and compile it.
+            for (List<String> list : sourceFileNames) {
+                List<String> cmdLine = buildCmdLine(list);
+
+                if (addDestDirToCmdLine) {
+                    cmdLine.add("-d");
+                    cmdLine.add(prependTestPath(destDir.getName()));
+                }
+
+                // To get separate compilation, add the output directory to the
+                // class path.
+                cmdLine.add("-cp");
+                cmdLine.add(prependTestPath(destDir.getName()));
+
+                // Invoke the compiler on the compilation unit.
+                try {
+                    if (JAVAC.equals(this.getExtensionClassname())) {
+                        // invoke javac on the program
+                        invokeJavac(cmdLine);
+                    }
+                    else {
+                        System.out.println(cmdLine);
+                        invokePolyglot(cmdLine);
+                    }
+                }
+                catch (polyglot.main.Main.TerminationException e) {
+                    if (e.getMessage() != null) {
+                        setFailureMessage(e.getMessage());
+                        return false;
+                    }
+                    else {
+                        if (!eq.hasErrors()) {
+                            setFailureMessage("Failed to compile for unknown reasons: "
+                                    + e.toString());
+                            return false;
+                        }
+                    }
+                }
+                catch (RuntimeException e) {
+                    if (e.getMessage() != null) {
+                        setFailureMessage(e.getMessage());
+                        e.printStackTrace();
+                        return false;
+                    }
+                    else {
+                        setFailureMessage("Uncaught " + e.getClass().getName());
+                        e.printStackTrace();
+                        return false;
+                    }
+                }
             }
         }
         finally {
@@ -158,6 +189,8 @@ public class SourceFileTest extends AbstractTest {
                 deleteDir(destDir);
             }
         }
+
+        // invoke the compiler on the file.
         return checkErrorQueue(eq);
     }
 
@@ -210,11 +243,17 @@ public class SourceFileTest extends AbstractTest {
         return errors.isEmpty() || swallowRemainingFailures;
     }
 
-    protected List<String> getSourceFileNames() {
-        List<String> sf = new ArrayList<>(sourceFilenames.size());
-        for (String f : sourceFilenames)
-            sf.add(prependTestPath(f));
-        return sf;
+    protected List<List<String>> getSourceFileNames() {
+        List<List<String>> result = new ArrayList<>(compilationUnits.size());
+        for (List<String> compilationUnit : compilationUnits) {
+            List<String> sourceFileNames =
+                    new ArrayList<>(compilationUnit.size());
+            for (String sourceFile : compilationUnit) {
+                sourceFileNames.add(prependTestPath(sourceFile));
+            }
+            result.add(sourceFileNames);
+        }
+        return result;
     }
 
     protected void invokePolyglot(List<String> cmdLine)
