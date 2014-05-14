@@ -39,7 +39,7 @@ import java.io.IOException;
  * Line breaks can have different levels, which is useful for implementing
  * things like "miser mode" layout.
  */
-public abstract class CodeWriter {
+public abstract class CodeWriter implements AutoCloseable {
     /**
      * Print the string {@code s} verbatim on the output stream.
      * @param s the string to print.
@@ -165,6 +165,7 @@ public abstract class CodeWriter {
      * Flush all formatted text, reset formatter state, and
      * close the underlying writer.
      */
+    @Override
     public abstract void close() throws IOException;
 
     /** Like {@code flush}, but passing {@code format=false}

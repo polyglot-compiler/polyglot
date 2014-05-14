@@ -27,14 +27,13 @@
 package polyglot.types;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Comparator;
-import java.util.List;
-import java.util.ListIterator;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
+import polyglot.util.InternalCompilerError;
 import polyglot.util.SerialVersionUID;
 
 /**
@@ -48,46 +47,31 @@ public class Flags implements Serializable {
     protected Set<String> flags;
 
     protected static class FlagComparator implements Comparator<String> {
-        protected static List<String> order =
-                new ArrayList<>(Arrays.asList("public",
-                                              "private",
-                                              "protected",
-                                              "static",
-                                              "final",
-                                              "synchronized",
-                                              "transient",
-                                              "native",
-                                              "interface",
-                                              "abstract",
-                                              "volatile",
-                                              "strictfp"));
+        protected static final FlagComparator instance = new FlagComparator();
+        protected static Map<String, Integer> ordering = new HashMap<>();
+        protected static Map<Integer, String> revOrdering = new HashMap<>();
 
         @Override
         public int compare(String o1, String o2) {
-            if (o1.equals(o2)) return 0;
-
-            for (int i = 0; i < order.size(); i++) {
-                if (o1.equals(order.get(i))) return -1;
-                if (o2.equals(order.get(i))) return 1;
-            }
-
+            if (ordering.containsKey(o1) && ordering.containsKey(o2))
+                return ordering.get(o1) - ordering.get(o2);
             return o1.compareTo(o2);
         }
     }
 
     public static final Flags NONE = new Flags();
     public static final Flags PUBLIC = createFlag("public", null);
-    public static final Flags PRIVATE = createFlag("private", null);
     public static final Flags PROTECTED = createFlag("protected", null);
+    public static final Flags PRIVATE = createFlag("private", null);
+    public static final Flags ABSTRACT = createFlag("abstract", null);
     public static final Flags STATIC = createFlag("static", null);
     public static final Flags FINAL = createFlag("final", null);
     public static final Flags SYNCHRONIZED = createFlag("synchronized", null);
-    public static final Flags TRANSIENT = createFlag("transient", null);
     public static final Flags NATIVE = createFlag("native", null);
-    public static final Flags INTERFACE = createFlag("interface", null);
-    public static final Flags ABSTRACT = createFlag("abstract", null);
-    public static final Flags VOLATILE = createFlag("volatile", null);
     public static final Flags STRICTFP = createFlag("strictfp", null);
+    public static final Flags TRANSIENT = createFlag("transient", null);
+    public static final Flags VOLATILE = createFlag("volatile", null);
+    public static final Flags INTERFACE = createFlag("interface", null);
 
     /** All access flags. */
     protected static final Flags ACCESS_FLAGS = PUBLIC.set(PRIVATE)
@@ -109,38 +93,37 @@ public class Flags implements Serializable {
     }
 
     public static void addToOrder(String name, Flags after) {
-        List<String> order = FlagComparator.order;
-        boolean added = false;
+        Map<String, Integer> ordering = FlagComparator.ordering;
+        Map<Integer, String> revOrdering = FlagComparator.revOrdering;
+        if (ordering.containsKey(name))
+            throw new InternalCompilerError("Flag " + name + "already added.");
 
-        if (after == null) {
-            order.add(name);
-        }
-        else if (after.flags.isEmpty()) {
-            order.add(0, name);
-        }
+        int index;
+        if (after == null)
+            index = ordering.size() + 1;
         else {
-            for (ListIterator<String> i = order.listIterator(); i.hasNext();) {
-                String s = i.next();
-                after = after.clear(new Flags(s));
-                if (after.flags.isEmpty()) {
-                    i.add(name);
-                    added = true;
-                    break;
-                }
+            index = 0;
+            for (String s : after.flags) {
+                int si = ordering.get(s);
+                if (si > index) index = si;
             }
-
-            if (!added) {
-                // shouldn't happen
-                order.add(name);
+            // shift indices of existing flags
+            for (int i = ordering.size(); i > index; i--) {
+                String s = revOrdering.get(i);
+                ordering.put(s, i + 1);
+                revOrdering.put(i + 1, s);
             }
+            index++;
         }
+        ordering.put(name, index);
+        revOrdering.put(index, name);
     }
 
     /**
-     * Effects: returns a new accessflags object with no accessflags set.
+     * Effects: returns a new access flags object with no access flags set.
      */
     protected Flags() {
-        this.flags = new TreeSet<>();
+        this.flags = new TreeSet<>(FlagComparator.instance);
     }
 
     protected Flags(String name) {

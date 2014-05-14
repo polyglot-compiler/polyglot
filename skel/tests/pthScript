@@ -27,5 +27,5 @@
 #                       compiler; is always enclosed in quotes.
 
 skelpkg.ExtensionInfo "-d out" {
-    Hello.sx ;
+    Hello.sx;
 }

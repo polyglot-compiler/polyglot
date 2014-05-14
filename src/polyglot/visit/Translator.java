@@ -251,7 +251,6 @@ public class Translator extends PrettyPrinter implements Copy<Translator> {
                 if (decl.flags().isPublic() && decl != first) {
                     // We hit a new exported declaration, open a new file.
                     // But, first close the old file.
-                    w.flush();
                     w.close();
 
                     of = tf.outputFileObject(pkg, decl.name(), sfn.source());
@@ -268,7 +267,7 @@ public class Translator extends PrettyPrinter implements Copy<Translator> {
                 }
             }
 
-            w.flush();
+            w.close();
             return true;
         }
         catch (IOException e) {

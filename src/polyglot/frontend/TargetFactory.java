@@ -98,33 +98,32 @@ public class TargetFactory {
         }
 
         try {
+            JavaFileObject outputFile;
             if (outputExtension.equals("java")) {
-                if (packageName != null && !packageName.equals("")) {
-                    return fileManager.getJavaFileForOutput(outputLocation,
-                                                            packageName + "."
-                                                                    + className,
-                                                            Kind.SOURCE,
-                                                            null);
-                }
-                return fileManager.getJavaFileForOutput(outputLocation,
-                                                        className,
-                                                        Kind.SOURCE,
-                                                        null);
+                outputFile =
+                        fileManager.getJavaFileForOutput(outputLocation,
+                                                         !"".equals(packageName)
+                                                                 ? packageName
+                                                                         + "."
+                                                                         + className
+                                                                 : className,
+                                                         Kind.SOURCE,
+                                                         null);
             }
             else {
-                FileObject outputFile =
-                        fileManager.getFileForOutput(outputLocation,
-                                                     packageName,
-                                                     className + "."
-                                                             + outputExtension,
-                                                     null);
-
-                if (source != null
-                        && fileManager.isSameFile(source, outputFile)) {
-                    throw new InternalCompilerError("The output file is the same as the source file");
-                }
-                return (JavaFileObject) outputFile;
+                outputFile =
+                        (JavaFileObject) fileManager.getFileForOutput(outputLocation,
+                                                                      packageName,
+                                                                      className
+                                                                              + "."
+                                                                              + outputExtension,
+                                                                      null);
             }
+
+            if (source != null && fileManager.isSameFile(source, outputFile)) {
+                throw new InternalCompilerError("The output file is the same as the source file");
+            }
+            return outputFile;
         }
         catch (IOException e) {
             throw new InternalCompilerError("Error creating output file for "
