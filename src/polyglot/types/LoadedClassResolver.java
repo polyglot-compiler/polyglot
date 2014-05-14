@@ -33,7 +33,6 @@ import java.util.Set;
 import java.util.StringTokenizer;
 
 import polyglot.frontend.ExtensionInfo;
-import polyglot.frontend.SchedulerException;
 import polyglot.main.Report;
 import polyglot.main.Version;
 import polyglot.types.reflect.ClassFile;
@@ -198,7 +197,9 @@ public class LoadedClassResolver implements TopLevelResolver {
                     // be resolved. Abort this pass. Dependencies have already
                     // been set up so that this goal will be reattempted after
                     // the types are resolved.
-                    throw new SchedulerException("Could not decode " + name);
+                    throw new UnavailableTypeException(null,
+                                                       "Could not decode "
+                                                               + name);
                 }
             }
             catch (InternalCompilerError e) {
@@ -330,6 +331,9 @@ public class LoadedClassResolver implements TopLevelResolver {
                 throw new SemanticException("Class " + name + " not found in "
                         + clazz.name() + ".");
             }
+        }
+        catch (UnavailableTypeException e) {
+            throw e;
         }
         catch (RuntimeException e) {
             e.printStackTrace();
