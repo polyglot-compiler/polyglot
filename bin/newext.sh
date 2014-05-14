@@ -65,4 +65,10 @@ find skel \( -path '*/CVS/*' -o -name CVS \) -prune -o -print | while read i; do
         sed $sed_opt "$i" > "$base/$j"
     fi
 done
+
+mkdir -p "$base/$ext_small/lib"
+cp -f "lib/polyglot.jar" "lib/jflex.jar" "lib/ppg.jar" "lib/java_cup.jar" "$base/$ext_small/lib"
 )
+
+cd "$base/$ext_small/lib"
+chmod 0644 *.jar
