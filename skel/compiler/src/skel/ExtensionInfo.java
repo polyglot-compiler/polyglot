@@ -6,13 +6,11 @@ import skelpkg.parse.Grm;
 import skelpkg.ast.*;
 import skelpkg.types.*;
 import polyglot.ast.*;
-import polyglot.types.*;
-import polyglot.util.*;
-import polyglot.visit.*;
 import polyglot.frontend.*;
 import polyglot.main.*;
+import polyglot.types.*;
+import polyglot.util.*;
 
-import java.util.*;
 import java.io.*;
 
 /**
@@ -44,7 +42,7 @@ public class ExtensionInfo extends polyglot.frontend.JLExtensionInfo {
 
     @Override
     protected NodeFactory createNodeFactory() {
-        return new SkelNodeFactory_c();
+        return new SkelNodeFactory_c(SkelLang_c.instance, new SkelExtFactory_c());
     }
 
     @Override

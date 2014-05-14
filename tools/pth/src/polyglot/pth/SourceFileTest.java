@@ -113,6 +113,8 @@ public class SourceFileTest extends AbstractTest {
             }
         }
 
+        List<String> cmdLineHdr = buildCmdLine();
+
         // Figure out the output directory.
         File destDir;
         boolean addDestDirToCmdLine = false;
@@ -134,7 +136,8 @@ public class SourceFileTest extends AbstractTest {
         try {
             // Next, loop through each compilation unit and compile it.
             for (List<String> list : sourceFileNames) {
-                List<String> cmdLine = buildCmdLine(list);
+                List<String> cmdLine = new LinkedList<>(cmdLineHdr);
+                cmdLine.addAll(list);
 
                 if (addDestDirToCmdLine) {
                     cmdLine.add("-d");
@@ -288,7 +291,7 @@ public class SourceFileTest extends AbstractTest {
         }
     }
 
-    protected List<String> buildCmdLine(List<String> files) {
+    protected List<String> buildCmdLine() {
         List<String> args = new LinkedList<>();
 
         String s;
@@ -356,8 +359,6 @@ public class SourceFileTest extends AbstractTest {
                 args.add(sas);
             }
         }
-
-        args.addAll(files);
 
         return args;
     }
