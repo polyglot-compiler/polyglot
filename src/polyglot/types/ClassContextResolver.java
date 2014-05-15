@@ -88,14 +88,10 @@ public class ClassContextResolver extends AbstractAccessControlResolver {
 //            String rawName = ts.getTransformedClassName(type) + "$" + name;
 //
 //            // Check the system resolver.
-//            if (m == null) {
-//                m = ts.systemResolver().check(fullName);
-//            }
+//            if (m == null) m = ts.systemResolver().check(fullName);
 //
 //            // Try the raw class file name.
-//            if (m == null) {
-//                m = ts.systemResolver().check(rawName);
-//            }
+//            if (m == null) m = ts.systemResolver().check(rawName);
 //
 //            if (m == null) {
 //                // Go to disk, but only if there is no job for the type.
@@ -105,9 +101,7 @@ public class ClassContextResolver extends AbstractAccessControlResolver {
 //
 //                if (type instanceof ParsedTypeObject) {
 //                    ParsedTypeObject pto = (ParsedTypeObject) type;
-//                    if (pto.job() != null) {
-//                        useLoadedResolver = false;
-//                    }
+//                    if (pto.job() != null) useLoadedResolver = false;
 //                }
 //
 //                if (useLoadedResolver) {

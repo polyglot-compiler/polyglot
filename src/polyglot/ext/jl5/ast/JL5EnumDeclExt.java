@@ -1,3 +1,28 @@
+/*******************************************************************************
+ * This file is part of the Polyglot extensible compiler framework.
+ *
+ * Copyright (c) 2000-2012 Polyglot project group, Cornell University
+ * Copyright (c) 2006-2012 IBM Corporation
+ * All rights reserved.
+ *
+ * This program and the accompanying materials are made available under
+ * the terms of the Eclipse Public License v1.0 which accompanies this
+ * distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * This program and the accompanying materials are made available under
+ * the terms of the Lesser GNU Public License v2.0 which accompanies this
+ * distribution.
+ * 
+ * The development of the Polyglot project has been supported by a
+ * number of funding sources, including DARPA Contract F30602-99-1-0533,
+ * monitored by USAF Rome Laboratory, ONR Grants N00014-01-1-0968 and
+ * N00014-09-1-0652, NSF Grants CNS-0208642, CNS-0430161, CCF-0133302,
+ * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan 
+ * Research Fellowship, and an Intel Research Ph.D. Fellowship.
+ *
+ * See README for contributors.
+ ******************************************************************************/
 package polyglot.ext.jl5.ast;
 
 import java.util.Collections;
@@ -42,7 +67,7 @@ public class JL5EnumDeclExt extends JL5ClassDeclExt {
     }
 
     public ClassDecl addValueOfMethodType(TypeSystem ts) {
-        ClassDecl n = this.node();
+        ClassDecl n = node();
         Flags flags = Flags.PUBLIC.set(Flags.STATIC.set(Flags.FINAL));
 
         // add valueOf method
@@ -60,7 +85,7 @@ public class JL5EnumDeclExt extends JL5ClassDeclExt {
     }
 
     public ClassDecl addValuesMethodType(TypeSystem ts) {
-        ClassDecl n = this.node();
+        ClassDecl n = node();
         Flags flags = Flags.PUBLIC.set(Flags.STATIC.set(Flags.FINAL));
 
         // add values method
@@ -78,7 +103,7 @@ public class JL5EnumDeclExt extends JL5ClassDeclExt {
     }
 
     public Node addEnumMethodTypesIfNeeded(TypeSystem ts) {
-        ClassDecl n = this.node();
+        ClassDecl n = node();
         JL5EnumDeclExt ext = (JL5EnumDeclExt) JL5Ext.ext(n);
 
         JL5ParsedClassType ct = (JL5ParsedClassType) n.type();
@@ -115,7 +140,7 @@ public class JL5EnumDeclExt extends JL5ClassDeclExt {
 
     @Override
     public NodeVisitor typeCheckEnter(TypeChecker tc) throws SemanticException {
-        ClassDecl n = this.node();
+        ClassDecl n = node();
         // figure out if this should be an abstract type.
         // need to do this before any anonymous subclasses are typechecked.
         for (MethodInstance mi : n.type().methods()) {
@@ -124,12 +149,12 @@ public class JL5EnumDeclExt extends JL5ClassDeclExt {
             // mi is abstract! First, mark the class as abstract.
             n.type().setFlags(n.type().flags().Abstract());
         }
-        return superLang().typeCheckEnter(this.node(), tc);
+        return superLang().typeCheckEnter(node(), tc);
     }
 
     @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
-        ClassDecl n = this.node();
+        ClassDecl n = node();
         if (n.flags().isAbstract()) {
             throw new SemanticException("Enum types cannot have abstract modifier",
                                         n.position());
@@ -187,7 +212,7 @@ public class JL5EnumDeclExt extends JL5ClassDeclExt {
     @Override
     public Node addDefaultConstructor(TypeSystem ts, NodeFactory nf,
             ConstructorInstance defaultCI) throws SemanticException {
-        ClassDecl n = this.node();
+        ClassDecl n = node();
         ConstructorInstance ci = defaultCI;
         if (ci == null) {
             throw new InternalCompilerError("addDefaultConstructor called without defaultCI set");
@@ -208,7 +233,7 @@ public class JL5EnumDeclExt extends JL5ClassDeclExt {
 
     @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
-        ClassDecl n = this.node();
+        ClassDecl n = node();
         ((JLang) tr.lang()).prettyPrintHeader(n, w, tr);
 
         boolean hasEnumConstant = false;

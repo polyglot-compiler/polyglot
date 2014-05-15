@@ -1,3 +1,28 @@
+/*******************************************************************************
+ * This file is part of the Polyglot extensible compiler framework.
+ *
+ * Copyright (c) 2000-2012 Polyglot project group, Cornell University
+ * Copyright (c) 2006-2012 IBM Corporation
+ * All rights reserved.
+ *
+ * This program and the accompanying materials are made available under
+ * the terms of the Eclipse Public License v1.0 which accompanies this
+ * distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * This program and the accompanying materials are made available under
+ * the terms of the Lesser GNU Public License v2.0 which accompanies this
+ * distribution.
+ * 
+ * The development of the Polyglot project has been supported by a
+ * number of funding sources, including DARPA Contract F30602-99-1-0533,
+ * monitored by USAF Rome Laboratory, ONR Grants N00014-01-1-0968 and
+ * N00014-09-1-0652, NSF Grants CNS-0208642, CNS-0430161, CCF-0133302,
+ * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan 
+ * Research Fellowship, and an Intel Research Ph.D. Fellowship.
+ *
+ * See README for contributors.
+ ******************************************************************************/
 package polyglot.util;
 
 import java.io.Externalizable;
@@ -187,26 +212,26 @@ public class SerialVersionUID implements Serializable {
      * Returns the long that starts at the given position in the given byte array.
      */
     public static final long longAt(byte[] data, int pos) {
-        return ((long) (data[pos + 0] & 0xff) << 56)
-                | ((long) (data[pos + 1] & 0xff) << 48)
-                | ((long) (data[pos + 2] & 0xff) << 40)
-                | ((long) (data[pos + 3] & 0xff) << 32)
-                | ((long) (data[pos + 4] & 0xff) << 24)
-                | ((long) (data[pos + 5] & 0xff) << 16)
-                | ((long) (data[pos + 6] & 0xff) << 8)
-                | ((long) (data[pos + 7] & 0xff) << 0);
+        return (long) (data[pos + 0] & 0xff) << 56
+                | (long) (data[pos + 1] & 0xff) << 48
+                | (long) (data[pos + 2] & 0xff) << 40
+                | (long) (data[pos + 3] & 0xff) << 32
+                | (long) (data[pos + 4] & 0xff) << 24
+                | (long) (data[pos + 5] & 0xff) << 16
+                | (long) (data[pos + 6] & 0xff) << 8
+                | (long) (data[pos + 7] & 0xff) << 0;
     }
 
     public static final byte[] getBytes(long value) {
         byte[] data = new byte[8];
-        data[0] = (byte) (0xff & (value >> 56));
-        data[1] = (byte) (0xff & (value >> 48));
-        data[2] = (byte) (0xff & (value >> 40));
-        data[3] = (byte) (0xff & (value >> 32));
-        data[4] = (byte) (0xff & (value >> 24));
-        data[5] = (byte) (0xff & (value >> 16));
-        data[6] = (byte) (0xff & (value >> 8));
-        data[7] = (byte) (0xff & (value >> 0));
+        data[0] = (byte) (0xff & value >> 56);
+        data[1] = (byte) (0xff & value >> 48);
+        data[2] = (byte) (0xff & value >> 40);
+        data[3] = (byte) (0xff & value >> 32);
+        data[4] = (byte) (0xff & value >> 24);
+        data[5] = (byte) (0xff & value >> 16);
+        data[6] = (byte) (0xff & value >> 8);
+        data[7] = (byte) (0xff & value >> 0);
         return data;
     }
 }

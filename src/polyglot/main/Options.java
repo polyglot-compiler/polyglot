@@ -55,7 +55,7 @@ import polyglot.util.InternalCompilerError;
 import polyglot.util.Pair;
 
 /**
- * This object encapsulates various polyglot options.
+ * This object encapsulates various Polyglot options.
  */
 public class Options {
     /**
@@ -150,8 +150,8 @@ public class Options {
 
     public Options(ExtensionInfo extension, boolean checkFlags) {
         this.extension = extension;
-        this.flags = new LinkedHashSet<>();
-        this.arguments = new ArrayList<>();
+        flags = new LinkedHashSet<>();
+        arguments = new ArrayList<>();
         populateFlags(flags);
         if (checkFlags) {
             Set<String> ids = new LinkedHashSet<>();
@@ -225,6 +225,7 @@ public class Options {
                 return createDefault(new File(System.getProperty("user.dir")));
             }
         });
+
         flags.add(new OptFlag<File>("-D",
                                     "<directory>",
                                     "output directory for .java files",
@@ -253,6 +254,7 @@ public class Options {
                 throw new UnsupportedOperationException("The -D flag requires other arguments to set its default value.");
             }
         });
+
         flags.add(new PathFlag<File>(new String[] { "-classpath", "-cp" },
                                      "<path>",
                                      "where to find user class files",
@@ -271,6 +273,7 @@ public class Options {
                 else return null;
             }
         });
+
         flags.add(new PathFlag<File>("-bootclasspath",
                                      "<path>",
                                      "where to find runtime class files",
@@ -288,6 +291,7 @@ public class Options {
                 else return null;
             }
         });
+
         flags.add(new PathFlag<File>("-addbootcp",
                                      "<path>",
                                      "prepend <path> to the bootclasspath") {
@@ -318,6 +322,7 @@ public class Options {
                 else return null;
             }
         });
+
         flags.add(new Switch("-commandlineonly",
                              "only compile files named on the command-line (may also require -c)"));
 
@@ -336,6 +341,7 @@ public class Options {
                               "<num>",
                               "set the maximum number of errors",
                               100));
+
         flags.add(new IntFlag("-w",
                               "<num>",
                               "set the maximum width of the .java output files",
@@ -370,6 +376,7 @@ public class Options {
                 return createArg(index + 1, args[index]);
             }
         });
+
         flags.add(new OptFlag<String>("-ox", "<ext>", "set output extension") {
             @Override
             public Arg<String> handle(String[] args, int index)
@@ -382,7 +389,9 @@ public class Options {
                 return createDefault("java");
             }
         });
+
         flags.add(new Switch("-noserial", "disable class serialization"));
+
         flags.add(new OptFlag<String>("-dump",
                                       "<pass>",
                                       "dump the ast after pass <pass>") {
@@ -392,6 +401,7 @@ public class Options {
                 return createArg(index + 1, args[index]);
             }
         });
+
         flags.add(new OptFlag<String>("-print",
                                       "<pass>",
                                       "pretty-print the ast after pass <pass>") {
@@ -401,6 +411,7 @@ public class Options {
                 return createArg(index + 1, args[index]);
             }
         });
+
         flags.add(new OptFlag<String>("-disable",
                                       "<pass>",
                                       "disable pass <pass>") {
@@ -424,6 +435,7 @@ public class Options {
                 allowedTopics.append(", ");
             }
         }
+
         flags.add(new OptFlag<Pair<String, Integer>>("-report",
                                                      "<topic>=<level>",
                                                      "print verbose debugging information about"
@@ -449,15 +461,18 @@ public class Options {
 
         flags.add(new Switch("-debugpositions",
                              "generate position information for compiler-generated code"));
+
         flags.add(new Switch("-simpleoutput", "use SimpleCodeWriter"));
+
         flags.add(new Switch("-mergestrings",
                              "parse concatenated string literals as one single string literal"));
+
         flags.add(new Switch(Kind.SECRET,
                              "-print-arguments",
                              "Check that no options try to handle the same command line flag."));
+
         flags.add(new Switch("-no-output-to-fs",
-                             "keep .java files in memory if possible"));
-        ;
+                             "keep .java files in memory if possible"));;
     }
 
     /**
@@ -477,13 +492,10 @@ public class Options {
             throws UsageError {
         for (int i = 0; i < args.length;) {
             try {
-
                 int ni = parseCommand(args, i, source);
-                if (ni == i) {
+                if (ni == i)
                     throw new UsageError("Illegal option: " + args[i]);
-                }
                 i = ni;
-
             }
             catch (ArrayIndexOutOfBoundsException e) {
                 throw new UsageError("Missing argument");
@@ -514,9 +526,7 @@ public class Options {
     protected void postApplyArgs() {
         // If we are using an external post compiler, 
         // we have to output files to disk
-        if (post_compiler != null || keep_output_files) {
-            noOutputToFS = false;
-        }
+        if (post_compiler != null || keep_output_files) noOutputToFS = false;
     }
 
     /**
@@ -617,133 +627,105 @@ public class Options {
      * Process the option specified by {@code arg}
      */
     protected void handleArg(Arg<?> arg) throws UsageError {
-        assert (arg.flag != null);
+        assert arg.flag != null;
+        Set<String> ids = arg.flag().ids();
 
-        if (arg.flag().ids().contains("-d")) {
+        if (ids.contains("-d")) {
             setClassOutput((File) arg.value());
-
         }
-        else if (arg.flag().ids().contains("-D")) {
+        else if (ids.contains("-D")) {
             setSourceOutput((File) arg.value());
-
         }
-        else if (arg.flag().ids().contains("-classpath")) {
+        else if (ids.contains("-classpath")) {
             setClasspath(this.<List<File>, File> sccast(arg.value(), File.class));
-
         }
-        else if (arg.flag().ids().contains("-bootclasspath")) {
+        else if (ids.contains("-bootclasspath")) {
             setBootclasspath(this.<List<File>, File> sccast(arg.value(),
                                                             File.class));
         }
-        else if (arg.flag().ids().contains("-addbootcp")) {
+        else if (ids.contains("-addbootcp")) {
             addBootCP(this.<List<File>, File> sccast(arg.value(), File.class));
         }
-        else if (arg.flag().ids().contains("-sourcepath")) {
+        else if (ids.contains("-sourcepath")) {
             setSourcepath(this.<List<File>, File> sccast(arg.value(),
                                                          File.class));
-
         }
-        else if (arg.flag().ids().contains("-commandlineonly")) {
+        else if (ids.contains("-commandlineonly")) {
             setCommandLineOnly((Boolean) arg.value());
-
         }
-        else if (arg.flag().ids().contains("-preferclassfiles")) {
+        else if (ids.contains("-preferclassfiles")) {
             setIgnoreModTimes((Boolean) arg.value());
-
         }
-        else if (arg.flag().ids().contains("-assert")) {
+        else if (ids.contains("-assert")) {
             setAssertions((Boolean) arg.value());
-
         }
-        else if (arg.flag().ids().contains("-fqcn")) {
+        else if (ids.contains("-fqcn")) {
             setFullyQualifiedNames((Boolean) arg.value());
-
         }
-        else if (arg.flag().ids().contains("-g")) {
+        else if (ids.contains("-g")) {
             setGenerateDebugInfo((Boolean) arg.value());
-
         }
-        else if (arg.flag().ids().contains("-c")) {
+        else if (ids.contains("-c")) {
             setOutputOnly((Boolean) arg.value());
-
         }
-        else if (arg.flag().ids().contains("-errors")) {
+        else if (ids.contains("-errors")) {
             setErrorCount((Integer) arg.value());
-
         }
-        else if (arg.flag().ids().contains("-w")) {
+        else if (ids.contains("-w")) {
             setOutputWidth((Integer) arg.value());
-
         }
-        else if (arg.flag().ids().contains("-postcompiler")) {
+        else if (ids.contains("-postcompiler")) {
             setPostCompiler((String) arg.value());
-
         }
-        else if (arg.flag().ids().contains("-postopts")) {
+        else if (ids.contains("-postopts")) {
             setPostCompilerOpts((String) arg.value());
-
         }
-        else if (arg.flag().ids().contains("-stdout")) {
+        else if (ids.contains("-stdout")) {
             setOutputStdOut((Boolean) arg.value());
-
         }
-        else if (arg.flag().ids().contains("-sx")) {
+        else if (ids.contains("-sx")) {
             addSourceExtension((String) arg.value());
-
         }
-        else if (arg.flag().ids().contains("-ox")) {
+        else if (ids.contains("-ox")) {
             setOutputExtension((String) arg.value());
-
         }
-        else if (arg.flag().ids().contains("-noserial")) {
+        else if (ids.contains("-noserial")) {
             setNoSerializedTypes((Boolean) arg.value());
-
         }
-        else if (arg.flag().ids().contains("-dump")) {
+        else if (ids.contains("-dump")) {
             addDumpAST((String) arg.value());
-
         }
-        else if (arg.flag().ids().contains("-print")) {
+        else if (ids.contains("-print")) {
             addPrintAST((String) arg.value());
-
         }
-        else if (arg.flag().ids().contains("-disable")) {
+        else if (ids.contains("-disable")) {
             addDisablePass((String) arg.value());
-
         }
-        else if (arg.flag().ids().contains("-nooutput")) {
+        else if (ids.contains("-nooutput")) {
             setNoOutput((Boolean) arg.value());
-
         }
-        else if (arg.flag().ids().contains("-verbose")) {
+        else if (ids.contains("-verbose")) {
             setVerbose((Boolean) arg.value());
-
         }
-        else if (arg.flag().ids().contains("-report")) {
+        else if (ids.contains("-report")) {
             @SuppressWarnings("unchecked")
             Pair<String, Integer> pair = (Pair<String, Integer>) arg.value();
             addReportTopic(pair.part1(), pair.part2());
-
         }
-        else if (arg.flag().ids().contains("-debugpositions")) {
+        else if (ids.contains("-debugpositions")) {
             setDebugPositions((Boolean) arg.value());
-
         }
-        else if (arg.flag().ids().contains("-simpleoutput")) {
+        else if (ids.contains("-simpleoutput")) {
             setSimpleOutput((Boolean) arg.value());
-
         }
-        else if (arg.flag().ids().contains("-mergestrings")) {
+        else if (ids.contains("-mergestrings")) {
             setMergeStrings((Boolean) arg.value());
-
         }
-        else if (arg.flag().ids().contains("-print-arguments")) {
+        else if (ids.contains("-print-arguments")) {
             print_args = (Boolean) arg.value();
-
         }
-        else if (arg.flag().ids().contains("-no-output-to-fs")) {
+        else if (ids.contains("-no-output-to-fs")) {
             noOutputToFS = (Boolean) arg.value();
-
         }
         else throw new UnhandledArgument(arg);
     }
@@ -860,9 +842,11 @@ public class Options {
 
     protected void setNoOutput(boolean value) {
         keep_output_files = !value;
-        output_width = 1000; // we do not keep the output files, so
-                             // set the output_width to a large number
-                             // to reduce the time spent pretty-printing
+        if (value) {
+            // If we do not keep the output files, set the output_width to a
+            // large number to reduce the time spent pretty-printing
+            output_width = 1000;
+        }
     }
 
     protected void addReportTopic(String topic, Integer level) {

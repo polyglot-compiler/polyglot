@@ -55,13 +55,13 @@ public class StringLit_c extends Lit_c implements StringLit {
 
     public StringLit_c(Position pos, String value, Ext ext) {
         super(pos, ext);
-        assert (value != null);
+        assert value != null;
         this.value = value;
     }
 
     @Override
     public String value() {
-        return this.value;
+        return value;
     }
 
     @Override
@@ -113,7 +113,7 @@ public class StringLit_c extends Lit_c implements StringLit {
 
             if (i.hasNext()) {
                 w.write(" +");
-                w.allowBreak(0, " ");
+                w.allowBreak(0);
             }
         }
 
@@ -170,7 +170,7 @@ public class StringLit_c extends Lit_c implements StringLit {
 
     @Override
     public Node copy(NodeFactory nf) {
-        return nf.StringLit(this.position, this.value);
+        return nf.StringLit(position, value);
     }
 
 }
