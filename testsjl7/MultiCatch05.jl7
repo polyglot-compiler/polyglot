@@ -1,0 +1,12 @@
+@SuppressWarnings("serial")
+class SemanticException extends Exception {}
+abstract class C {
+	abstract void foo() throws SemanticException;
+	void bar() {
+		try {
+			foo();
+		} catch (RuntimeException | SemanticException e) {
+			e.printStackTrace();
+		}
+	}
+}

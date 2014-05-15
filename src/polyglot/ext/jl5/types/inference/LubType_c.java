@@ -35,6 +35,7 @@ import java.util.Set;
 import polyglot.ext.jl5.types.AnnotationTypeElemInstance;
 import polyglot.ext.jl5.types.Annotations;
 import polyglot.ext.jl5.types.EnumInstance;
+import polyglot.ext.jl5.types.JL5ClassType;
 import polyglot.ext.jl5.types.JL5ParsedClassType;
 import polyglot.ext.jl5.types.JL5SubstClassType;
 import polyglot.ext.jl5.types.JL5TypeSystem;
@@ -74,10 +75,10 @@ public class LubType_c extends ClassType_c implements LubType {
         return lubElems;
     }
 
-    protected Type lubCalculated = null;
+    protected ReferenceType lubCalculated = null;
 
     @Override
-    public Type calculateLub() {
+    public ReferenceType calculateLub() {
         if (lubCalculated == null) {
             lubCalculated = lub_force();
         }
@@ -89,41 +90,41 @@ public class LubType_c extends ClassType_c implements LubType {
         return LUB;
     }
 
-    private ReferenceType lub(Type... a) {
+    private ReferenceType lub(ReferenceType... a) {
         List<ReferenceType> l = new ArrayList<>();
         JL5TypeSystem ts = (JL5TypeSystem) this.ts;
-        for (Type t : a) {
-            l.add((ReferenceType) t);
+        for (ReferenceType t : a) {
+            l.add(t);
         }
         return ts.lub(this.position, l);
     }
 
-    private Type lub_force() {
+    private ReferenceType lub_force() {
         JL5TypeSystem ts = (JL5TypeSystem) this.ts;
 
         // st is the set of all supertypes of the lubElems.        
-        Set<Type> st = new LinkedHashSet<>();
+        Set<ReferenceType> st = new LinkedHashSet<>();
 
         // est is the intersection of all erased supertypes of lubElems.
         // That is, during the loop below, it is the intersection of
         // the sets of erased supertypes of elements considered so far.
         // By the end of the loop it will be mec, the minimal erased 
         // candidate set (JLS 3rd ed, 15.12.2, p 464.)
-        Set<Type> est = null;
+        Set<ReferenceType> est = null;
 
-        for (Type u : lubElems) {
-            st.addAll(ts.allAncestorsOf((ReferenceType) u));
+        for (ReferenceType u : lubElems) {
+            st.addAll(ts.allAncestorsOf(u));
 
             List<ReferenceType> u_supers = new ArrayList<>();
-            for (ReferenceType u_super : ts.allAncestorsOf((ReferenceType) u)) {
+            for (ReferenceType u_super : ts.allAncestorsOf(u)) {
                 if (u_super instanceof RawClass) {
                     u_supers.add(((RawClass) u_super).erased());
                 }
                 else u_supers.add(u_super);
             }
 
-            Set<Type> est_of_u = new LinkedHashSet<>();
-            for (Type super_of_u : u_supers) {
+            Set<ReferenceType> est_of_u = new LinkedHashSet<>();
+            for (ReferenceType super_of_u : u_supers) {
                 if (super_of_u instanceof JL5SubstClassType) {
                     JL5SubstClassType g = (JL5SubstClassType) super_of_u;
                     est_of_u.add(g.base());
@@ -138,9 +139,9 @@ public class LubType_c extends ClassType_c implements LubType {
                 est.retainAll(est_of_u);
             }
         }
-        Set<Type> mec = new LinkedHashSet<>(est);
-        for (Type e1 : est) {
-            for (Type e2 : est) {
+        Set<ReferenceType> mec = new LinkedHashSet<>(est);
+        for (ReferenceType e1 : est) {
+            for (ReferenceType e2 : est) {
                 if (!ts.equals(e1, e2) && ts.isSubtype(e2, e1)) {
                     mec.remove(e1);
                     break;
@@ -148,19 +149,17 @@ public class LubType_c extends ClassType_c implements LubType {
             }
         }
         List<ReferenceType> cand = new ArrayList<>();
-        for (Type m : mec) {
-            List<Type> inv = new ArrayList<>();
-            for (Type t : st) {
-                if (ts.equals(m, t)
-                        || ((t instanceof JL5SubstClassType) && ((JL5SubstClassType) t).base()
-                                                                                       .equals(m))
-                        || ((t instanceof RawClass) && ((RawClass) t).erased()
-                                                                     .base()
-                                                                     .equals(m))) {
+        for (ReferenceType m : mec) {
+            List<ReferenceType> inv = new ArrayList<>();
+            for (ReferenceType t : st) {
+                if (ts.equals(m, t) || t instanceof JL5SubstClassType
+                        && ((JL5SubstClassType) t).base().equals(m)
+                        || t instanceof RawClass
+                        && ((RawClass) t).erased().base().equals(m)) {
                     inv.add(t);
                 }
             }
-            cand.add((ReferenceType) lci(inv));
+            cand.add(lci(inv));
         }
         try {
             if (ts.checkIntersectionBounds(cand, true)) {
@@ -172,16 +171,16 @@ public class LubType_c extends ClassType_c implements LubType {
         return ts.Object();
     }
 
-    private Type lci(List<Type> inv) {
+    private ReferenceType lci(List<ReferenceType> inv) {
         JL5TypeSystem ts = (JL5TypeSystem) this.ts;
-        Type first = inv.get(0);
+        ReferenceType first = inv.get(0);
         if (inv.size() == 1 || first instanceof RawClass
                 || first instanceof JL5ParsedClassType) {
             return first;
         }
         JL5SubstClassType res = (JL5SubstClassType) first;
         for (int i = 1; i < inv.size(); i++) {
-            Type next = inv.get(i);
+            ReferenceType next = inv.get(i);
             if (next instanceof RawClass || next instanceof JL5ParsedClassType) {
                 return next;
             }
@@ -283,10 +282,9 @@ public class LubType_c extends ClassType_c implements LubType {
         }
     }
 
-    private ReferenceType glb(Type t1, Type t2) {
+    private ReferenceType glb(ReferenceType t1, ReferenceType t2) {
         JL5TypeSystem ts = (JL5TypeSystem) this.ts;
-        List<ReferenceType> l =
-                CollectionUtil.list((ReferenceType) t1, (ReferenceType) t2);
+        List<ReferenceType> l = CollectionUtil.list(t1, t2);
         try {
             if (!ts.checkIntersectionBounds(l, true)) {
                 return ts.Object();
@@ -408,27 +406,32 @@ public class LubType_c extends ClassType_c implements LubType {
 
     @Override
     public List<? extends MethodInstance> methods() {
-        return Collections.<MethodInstance> emptyList();
+        return calculateLub().methods();
     }
 
     @Override
     public List<? extends FieldInstance> fields() {
-        return Collections.<FieldInstance> emptyList();
+        return calculateLub().fields();
     }
 
     @Override
     public List<? extends ReferenceType> interfaces() {
-        return Collections.<ReferenceType> emptyList();
+        return calculateLub().interfaces();
     }
 
     @Override
     public Set<? extends Type> superclasses() {
-        return Collections.<Type> singleton(ts.Object());
+        Type lub = calculateLub();
+        if (lub instanceof JL5ClassType) {
+            JL5ClassType ct = (JL5ClassType) lub;
+            return ct.superclasses();
+        }
+        return Collections.<Type> singleton(superType());
     }
 
     @Override
     public Type superType() {
-        return ts.Object();
+        return calculateLub().superType();
     }
 
     @Override
