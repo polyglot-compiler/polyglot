@@ -97,14 +97,8 @@ public class PlaceHolder_c implements NamedPlaceHolder {
             scheduler.addDependencyAndEnqueue(scheduler.currentGoal(), g, false);
             throw new CannotResolvePlaceHolderException(e);
         }
-        catch (SchedulerException e) {
-            // Some other scheduler error occurred.
-            scheduler.currentGoal().setUnreachableThisRun();
-            scheduler.addDependencyAndEnqueue(scheduler.currentGoal(), g, false);
-            throw new CannotResolvePlaceHolderException(e);
-        }
-        catch (SemanticException e) {
-            // The type could not be found.
+        catch (SchedulerException | SemanticException e) {
+            // Some other scheduler error occurred, or the type could not be found.
             scheduler.currentGoal().setUnreachableThisRun();
             scheduler.addDependencyAndEnqueue(scheduler.currentGoal(), g, false);
             throw new CannotResolvePlaceHolderException(e);

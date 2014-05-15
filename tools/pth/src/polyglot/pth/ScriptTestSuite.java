@@ -116,11 +116,7 @@ public class ScriptTestSuite extends TestSuite {
         catch (FileNotFoundException e) {
             // ignore, and fail silently
         }
-        catch (ClassNotFoundException e) {
-            System.err.println("Unable to load results for test suite "
-                    + this.getName() + ": " + e.getMessage());
-        }
-        catch (IOException e) {
+        catch (ClassNotFoundException | IOException e) {
             System.err.println("Unable to load results for test suite "
                     + this.getName() + ": " + e.getMessage());
         }

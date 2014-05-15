@@ -175,16 +175,10 @@ public class SerialVersionUID implements Serializable {
             byte[] md5 = md.digest();
             return longAt(md5, 0) ^ longAt(md5, 8);
         }
-        catch (NoSuchAlgorithmException e) {
-            throw new Error(e);
-        }
-        catch (UnsupportedEncodingException e) {
-            throw new Error(e);
-        }
-        catch (SecurityException e) {
-            throw new Error(e);
-        }
-        catch (IllegalArgumentException e) {
+        catch (NoSuchAlgorithmException
+               | UnsupportedEncodingException
+               | SecurityException
+               | IllegalArgumentException e) {
             throw new Error(e);
         }
     }

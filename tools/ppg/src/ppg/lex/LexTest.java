@@ -69,11 +69,7 @@ public class LexTest {
             }
             fileReader.close();
         }
-        catch (Error e) {
-            System.err.println(e.getMessage());
-            System.exit(1);
-        }
-        catch (Exception e) {
+        catch (Error | Exception e) {
             System.err.println(e.getMessage());
             System.exit(1);
         }

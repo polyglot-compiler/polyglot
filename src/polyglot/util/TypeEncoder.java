@@ -187,6 +187,9 @@ public class TypeEncoder {
                 return o;
             }
         }
+        catch (InvalidClassException e) {
+            throw e;
+        }
         catch (IOException e) {
             throw new InternalCompilerError("IOException thrown while "
                     + "decoding serialized type info: " + e.getMessage(), e);

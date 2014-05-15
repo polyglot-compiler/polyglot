@@ -234,6 +234,7 @@ public class SourceClassResolver extends LoadedClassResolver {
         }
 
         Named result = null;
+        SemanticException se = null;
 
         if (encodedClazz != null) {
             if (Report.should_report(report_topics, 4))
@@ -242,7 +243,7 @@ public class SourceClassResolver extends LoadedClassResolver {
                 result = getEncodedType(encodedClazz, name);
             }
             catch (BadSerializationException e) {
-                throw e;
+                se = e;
             }
             catch (SemanticException e) {
                 if (Report.should_report(report_topics, 4))
@@ -280,7 +281,7 @@ public class SourceClassResolver extends LoadedClassResolver {
                     + ext.compilerName() + ". Try using " + ext.compilerName()
                     + " to recompile the source code.");
         }
-        throw new NoClassException(name);
+        throw se == null ? new NoClassException(name) : se;
     }
 
     /**

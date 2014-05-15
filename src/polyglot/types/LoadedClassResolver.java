@@ -182,44 +182,22 @@ public class LoadedClassResolver implements TopLevelResolver {
         recursive = true;
 
         try {
-            try {
+            if (Report.should_report(Report.serialize, 1))
+                Report.report(1, "Decoding " + name + " in " + clazz);
+
+            dt = te.decode(clazz.encodedClassType(version.name()), name);
+
+            if (dt == null) {
                 if (Report.should_report(Report.serialize, 1))
-                    Report.report(1, "Decoding " + name + " in " + clazz);
+                    Report.report(1, "* Decoding " + name + " failed");
 
-                dt = te.decode(clazz.encodedClassType(version.name()), name);
-
-                if (dt == null) {
-                    if (Report.should_report(Report.serialize, 1))
-                        Report.report(1, "* Decoding " + name + " failed");
-
-                    // Deserialization failed because one or more types could
-                    // not
-                    // be resolved. Abort this pass. Dependencies have already
-                    // been set up so that this goal will be reattempted after
-                    // the types are resolved.
-                    throw new UnavailableTypeException(null,
-                                                       "Could not decode "
-                                                               + name);
-                }
-            }
-            catch (InternalCompilerError e) {
-                if (Report.should_report(Report.serialize, 2)) {
-                    Report.report(2,
-                                  "Failing to deserialize: Internal compiler error: "
-                                          + e.getMessage());
-                }
-
-                throw e;
-            }
-            catch (InvalidClassException e) {
-                if (Report.should_report(Report.serialize, 2))
-                    Report.report(2,
-                                  "Failing to deserialize: Bad serialization: "
-                                          + clazz.name() + "@"
-                                          + clazz.getClassFileURI());
-
-                throw new BadSerializationException(clazz.name() + "@"
-                        + clazz.getClassFileURI());
+                // Deserialization failed because one or more types could
+                // not
+                // be resolved. Abort this pass. Dependencies have already
+                // been set up so that this goal will be reattempted after
+                // the types are resolved.
+                throw new UnavailableTypeException(null, "Could not decode "
+                        + name);
             }
 
             if (dt instanceof ClassType) {
@@ -332,14 +310,27 @@ public class LoadedClassResolver implements TopLevelResolver {
                         + clazz.name() + ".");
             }
         }
+        catch (InvalidClassException e) {
+            if (Report.should_report(Report.serialize, 2))
+                Report.report(2, "Failing to deserialize: Bad serialization: "
+                        + clazz.name() + "@" + clazz.getClassFileURI());
+
+            throw new BadSerializationException(clazz.name() + "@"
+                    + clazz.getClassFileURI());
+        }
         catch (UnavailableTypeException e) {
             throw e;
         }
-        catch (RuntimeException e) {
-            e.printStackTrace();
+        catch (InternalCompilerError e) {
+            if (Report.should_report(Report.serialize, 2)) {
+                Report.report(2,
+                              "Failing to deserialize: Internal compiler error: "
+                                      + e.getMessage());
+            }
+
             throw e;
         }
-        catch (SemanticException e) {
+        catch (RuntimeException | SemanticException e) {
             e.printStackTrace();
             throw e;
         }

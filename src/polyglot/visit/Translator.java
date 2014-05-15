@@ -29,21 +29,23 @@ package polyglot.visit;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import javax.tools.JavaFileObject;
 
 import polyglot.ast.Import;
 import polyglot.ast.Node;
 import polyglot.ast.NodeFactory;
+import polyglot.ast.PackageNode;
 import polyglot.ast.SourceCollection;
 import polyglot.ast.SourceFile;
 import polyglot.ast.TopLevelDecl;
 import polyglot.frontend.Job;
 import polyglot.frontend.TargetFactory;
 import polyglot.types.Context;
-import polyglot.types.Package;
 import polyglot.types.TypeSystem;
 import polyglot.util.CodeWriter;
 import polyglot.util.Copy;
@@ -144,7 +146,7 @@ public class Translator extends PrettyPrinter implements Copy<Translator> {
     }
 
     /**
-     * Print an ast node using the given code writer. This method should not be
+     * Print an AST node using the given code writer. This method should not be
      * called directly to translate a source file AST; use
      * {@code translate(Node)} instead. This method should only be called
      * by nodes to print their children.
@@ -205,78 +207,51 @@ public class Translator extends PrettyPrinter implements Copy<Translator> {
     }
 
     /** Translate a single SourceFile node */
-    protected boolean translateSource(SourceFile sfn) {
+    protected boolean translateSource(SourceFile sf) {
         TargetFactory tf = this.tf;
         int outputWidth = job.compiler().outputWidth();
         Collection<JavaFileObject> outputFiles = job.compiler().outputFiles();
+
+        PackageNode pkgNode = sf.package_();
+        String pkg = pkgNode != null ? pkgNode.package_().fullName() : "";
 
         // Find the public declarations in the file. We'll use these to
         // derive the names of the target files. There will be one
         // target file per public declaration. If there are no public
         // declarations, we'll use the source file name to derive the
         // target file name.
-        List<TopLevelDecl> exports = exports(sfn);
+        for (Map.Entry<String, List<TopLevelDecl>> fileEntry : filenames(sf).entrySet()) {
+            String filename = fileEntry.getKey();
+            List<TopLevelDecl> decls = fileEntry.getValue();
 
-        try {
             JavaFileObject of;
-            CodeWriter w;
-
-            String pkg = "";
-
-            if (sfn.package_() != null) {
-                Package p = sfn.package_().package_();
-                pkg = p.fullName();
-            }
-
-            TopLevelDecl first = null;
-
-            if (exports.size() == 0) {
+            if (filename == null) {
                 // Use the source name to derive a default output file name.
-                of = tf.outputFileObject(pkg, sfn.source());
+                of = tf.outputFileObject(pkg, sf.source());
             }
-            else {
-                first = exports.get(0);
-                of = tf.outputFileObject(pkg, first.name(), sfn.source());
-            }
+            else of = tf.outputFileObject(pkg, filename, sf.source());
 
             String opfPath = of.getName();
             if (!opfPath.endsWith("$")) outputFiles.add(of);
-            w = tf.outputCodeWriter(of, outputWidth);
+            try (CodeWriter w = tf.outputCodeWriter(of, outputWidth)) {
+                writeHeader(sf, w);
 
-            writeHeader(sfn, w);
+                for (Iterator<TopLevelDecl> i = decls.iterator(); i.hasNext();) {
+                    TopLevelDecl decl = i.next();
+                    translateTopLevelDecl(w, sf, decl);
 
-            for (Iterator<TopLevelDecl> i = sfn.decls().iterator(); i.hasNext();) {
-                TopLevelDecl decl = i.next();
-
-                if (decl.flags().isPublic() && decl != first) {
-                    // We hit a new exported declaration, open a new file.
-                    // But, first close the old file.
-                    w.close();
-
-                    of = tf.outputFileObject(pkg, decl.name(), sfn.source());
-                    outputFiles.add(of);
-                    w = tf.outputCodeWriter(of, outputWidth);
-
-                    writeHeader(sfn, w);
-                }
-
-                translateTopLevelDecl(w, sfn, decl);
-
-                if (i.hasNext()) {
-                    w.newline(0);
+                    if (i.hasNext()) w.newline(0);
                 }
             }
-
-            w.close();
-            return true;
+            catch (IOException e) {
+                job.compiler()
+                   .errorQueue()
+                   .enqueue(ErrorInfo.IO_ERROR,
+                            "I/O error while translating: " + e.getMessage());
+                return false;
+            }
         }
-        catch (IOException e) {
-            job.compiler()
-               .errorQueue()
-               .enqueue(ErrorInfo.IO_ERROR,
-                        "I/O error while translating: " + e.getMessage());
-            return false;
-        }
+        return true;
     }
 
     /**
@@ -322,17 +297,25 @@ public class Translator extends PrettyPrinter implements Copy<Translator> {
         }
     }
 
-    /** Get the list of public top-level classes declared in the source file. */
-    protected List<TopLevelDecl> exports(SourceFile sfn) {
-        List<TopLevelDecl> exports = new LinkedList<>();
+    /**
+     * Determine the list of file names that top-level declarations in the
+     * given source file will reside.
+     * @param sf
+     * @return
+     */
+    protected Map<String, List<TopLevelDecl>> filenames(SourceFile sf) {
+        Map<String, List<TopLevelDecl>> filenameMap = new LinkedHashMap<>();
+        List<TopLevelDecl> files = new LinkedList<>();
 
-        for (TopLevelDecl decl : sfn.decls()) {
+        for (TopLevelDecl decl : sf.decls()) {
+            files.add(decl);
             if (decl.flags().isPublic()) {
-                exports.add(decl);
+                if (!filenameMap.isEmpty()) files = new LinkedList<>();
+                filenameMap.put(decl.name(), files);
             }
         }
-
-        return exports;
+        if (filenameMap.isEmpty()) filenameMap.put(null, files);
+        return filenameMap;
     }
 
     @Override

@@ -168,7 +168,7 @@ polyglot.frontend.JLExtensionInfo "-d out -cp java-out" {
         Initializer3.jl ;
         Initializer4.jl ;
         Initializer5.jl ;
-        Initializer6.jl (Semantic, "can not throw a");
+        Initializer6.jl (Semantic, "cannot throw a");
         Initializer7.jl ;
         Initializer8.jl ;
         Inner0.jl ; Inner1.jl ; Inner2.jl ; Inner3.jl ; Inner4.jl ;

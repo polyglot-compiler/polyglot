@@ -419,6 +419,7 @@ public class Subst_c<Formal extends Param, Actual extends TypeObject>
         }
 
         this.cache = new HashMap<>();
+        this.substClassTypeCache = new HashMap<>();
 
         in.defaultReadObject();
     }
