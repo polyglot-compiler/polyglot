@@ -46,7 +46,10 @@ public class Flags implements Serializable {
 
     protected Set<String> flags;
 
-    protected static class FlagComparator implements Comparator<String> {
+    protected static class FlagComparator implements Comparator<String>,
+            Serializable {
+        private static final long serialVersionUID =
+                SerialVersionUID.generate();
         protected static final FlagComparator instance = new FlagComparator();
         protected static Map<String, Integer> ordering = new HashMap<>();
         protected static Map<Integer, String> revOrdering = new HashMap<>();
@@ -56,6 +59,15 @@ public class Flags implements Serializable {
             if (ordering.containsKey(o1) && ordering.containsKey(o2))
                 return ordering.get(o1) - ordering.get(o2);
             return o1.compareTo(o2);
+        }
+
+        @SuppressWarnings("unused")
+        private static final long readResolveVersionUID = 1L;
+
+        private Object readResolve() {
+            // If you update this method in an incompatible way, increment
+            // readResolveVersionUID.
+            return instance;
         }
     }
 
@@ -96,7 +108,7 @@ public class Flags implements Serializable {
         Map<String, Integer> ordering = FlagComparator.ordering;
         Map<Integer, String> revOrdering = FlagComparator.revOrdering;
         if (ordering.containsKey(name))
-            throw new InternalCompilerError("Flag " + name + "already added.");
+            throw new InternalCompilerError("Flag " + name + " already added.");
 
         int index;
         if (after == null)
