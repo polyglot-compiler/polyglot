@@ -120,7 +120,8 @@ public class TargetFactory {
                                                                       null);
             }
 
-            if (source != null && fileManager.isSameFile(source, outputFile)) {
+            if (source != null && !source.compilerGenerated()
+                    && fileManager.isSameFile(source, outputFile)) {
                 throw new InternalCompilerError("The output file is the same as the source file");
             }
             return outputFile;

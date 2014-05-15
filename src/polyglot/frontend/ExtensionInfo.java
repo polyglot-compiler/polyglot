@@ -36,6 +36,7 @@ import javax.tools.JavaFileManager.Location;
 import polyglot.ast.Node;
 import polyglot.ast.NodeFactory;
 import polyglot.filemanager.FileManager;
+import polyglot.frontend.Source.Kind;
 import polyglot.frontend.goals.Goal;
 import polyglot.main.Options;
 import polyglot.translate.ext.ToExt;
@@ -140,9 +141,16 @@ public interface ExtensionInfo {
     /** Create class file for a file object. */
     ClassFile createClassFile(FileObject f, byte[] code) throws IOException;
 
-    /** Create file source for a file object. */
+    /**
+     * Create file source for a file object.
+     * @deprecated Use {@link #createFileSource(FileObject, Kind)} instead.
+     */
+    @Deprecated
     FileSource createFileSource(FileObject fo, boolean userSpecified)
             throws IOException;
+
+    /** Create file source for a file object. */
+    FileSource createFileSource(FileObject fo, Kind kind) throws IOException;
 
     /** Produce a class factory for this language extension. */
     ClassFileLoader classFileLoader();

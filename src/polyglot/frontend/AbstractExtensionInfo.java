@@ -41,6 +41,7 @@ import polyglot.ast.Node;
 import polyglot.ast.NodeFactory;
 import polyglot.filemanager.ExtFileManager;
 import polyglot.filemanager.FileManager;
+import polyglot.frontend.Source.Kind;
 import polyglot.frontend.goals.Goal;
 import polyglot.main.Options;
 import polyglot.main.Version;
@@ -221,10 +222,17 @@ public abstract class AbstractExtensionInfo implements ExtensionInfo {
         return new ClassFile_c(f, code, this);
     }
 
+    @Deprecated
     @Override
     public FileSource createFileSource(FileObject f, boolean user)
             throws IOException {
-        return new Source_c(f, user);
+        return createFileSource(f, user ? Kind.USER_SPECIFIED : Kind.DEPENDENCY);
+    }
+
+    @Override
+    public FileSource createFileSource(FileObject fo, Kind kind)
+            throws IOException {
+        return new Source_c(fo, kind);
     }
 
     @Override

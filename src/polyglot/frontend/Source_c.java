@@ -37,21 +37,51 @@ import polyglot.util.InternalCompilerError;
 
 public class Source_c extends ForwardingFileObject<FileObject> implements
         FileSource {
-    protected boolean user_specified;
 
+    protected Kind kind;
+
+    /**
+     * @Deprecated Use {@link #Source_c(FileObject, Kind)} instead.
+     */
+    @Deprecated
     protected Source_c(FileObject f, boolean userSpecified) {
-        super(f);
-        this.user_specified = userSpecified;
+        this(f, userSpecified ? Kind.USER_SPECIFIED : Kind.DEPENDENCY);
     }
 
+    protected Source_c(FileObject f, Kind kind) {
+        super(f);
+        this.kind = kind;
+    }
+
+    @Deprecated
     @Override
     public void setUserSpecified(boolean userSpecified) {
-        this.user_specified = userSpecified;
+        if (userSpecified) {
+            setKind(Kind.USER_SPECIFIED);
+        }
+        else if (userSpecified()) {
+            setKind(Kind.DEPENDENCY);
+        }
     }
 
     @Override
     public boolean userSpecified() {
-        return user_specified;
+        return kind == Kind.USER_SPECIFIED;
+    }
+
+    @Override
+    public boolean compilerGenerated() {
+        return kind == Kind.COMPILER_GENERATED;
+    }
+
+    @Override
+    public void setKind(Kind kind) {
+        this.kind = kind;
+    }
+
+    @Override
+    public Kind kind() {
+        return kind;
     }
 
     @Override

@@ -37,6 +37,7 @@ import java.util.List;
 
 import javax.tools.JavaFileObject;
 
+import polyglot.frontend.Source.Kind;
 import polyglot.main.Options;
 import polyglot.types.reflect.ClassFileLoader;
 import polyglot.util.CodeWriter;
@@ -126,7 +127,8 @@ public class Compiler {
                     // mark this source as being explicitly specified
                     // by the user.
                     FileSource source =
-                            source_loader.fileSource(sourceName, true);
+                            source_loader.fileSource(sourceName,
+                                                     Kind.USER_SPECIFIED);
 
                     sources.add(source);
                 }

@@ -53,6 +53,7 @@ import javax.tools.StandardJavaFileManager;
 
 import polyglot.frontend.ExtensionInfo;
 import polyglot.frontend.FileSource;
+import polyglot.frontend.Source;
 import polyglot.main.Main;
 import polyglot.main.Report;
 import polyglot.types.reflect.ClassFile;
@@ -436,31 +437,47 @@ public class ExtFileManager extends
 
     @Override
     public FileSource fileSource(String fileName) throws IOException {
-        return fileSource(extInfo.getOptions().source_path, fileName, false);
+        return fileSource(extInfo.getOptions().source_path,
+                          fileName,
+                          Source.Kind.DEPENDENCY);
     }
 
+    @Deprecated
     @Override
     public FileSource fileSource(String fileName, boolean userSpecified)
             throws IOException {
-        return fileSource(extInfo.getOptions().source_path,
-                          fileName,
-                          userSpecified);
+        return fileSource(fileName, userSpecified
+                ? Source.Kind.USER_SPECIFIED : Source.Kind.DEPENDENCY);
+    }
+
+    @Override
+    public FileSource fileSource(String fileName,
+            polyglot.frontend.Source.Kind kind) throws IOException {
+        return fileSource(extInfo.getOptions().source_path, fileName, kind);
     }
 
     @Override
     public FileSource fileSource(Location location, String fileName)
             throws IOException {
-        return fileSource(location, fileName, false);
+        return fileSource(location, fileName, Source.Kind.DEPENDENCY);
+    }
+
+    @Deprecated
+    @Override
+    public FileSource fileSource(Location location, String fileName,
+            boolean userSpecified) throws IOException {
+        return fileSource(location, fileName, userSpecified
+                ? Source.Kind.USER_SPECIFIED : Source.Kind.DEPENDENCY);
     }
 
     @Override
     public FileSource fileSource(Location location, String fileName,
-            boolean userSpecified) throws IOException {
+            polyglot.frontend.Source.Kind kind) throws IOException {
         File f = new File(fileName);
         FileSource sourceFile;
         FileObject fo = null;
         String key;
-        if (userSpecified) {
+        if (kind == Source.Kind.USER_SPECIFIED) {
             key = fileName;
             f = f.getAbsoluteFile();
             sourceFile = loadedSources.get(key);
@@ -483,7 +500,7 @@ public class ExtFileManager extends
                 throw new FileNotFoundException("File: " + fileName
                         + " not found.");
         }
-        sourceFile = extInfo.createFileSource(fo, userSpecified);
+        sourceFile = extInfo.createFileSource(fo, kind);
         String[] exts = extInfo.fileExtensions();
         boolean ok = false;
 
@@ -525,12 +542,11 @@ public class ExtFileManager extends
             Report.report(2, "Loading class from " + sourceFile);
 
         if (sourceFile != null) {
-            if (!sourceFile.userSpecified() && userSpecified) {
-                sourceFile.setUserSpecified(true);
-            }
+            sourceFile.setKind(kind);
             loadedSources.put(key, sourceFile);
             return sourceFile;
         }
+
         return sourceFile;
     }
 
@@ -580,7 +596,7 @@ public class ExtFileManager extends
             if (fo == null) continue;
 
             try {
-                source = extInfo.createFileSource(fo, false);
+                source = extInfo.createFileSource(fo, Source.Kind.DEPENDENCY);
                 if (Report.should_report(Report.loader, 2))
                     Report.report(2, "Loading " + className + " from " + source);
 

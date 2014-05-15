@@ -51,6 +51,8 @@ public interface SourceLoader {
     boolean packageExists(Location location, String name);
 
     /**
+     * Obtains a FileSource for a dependency.
+     * 
      * @param fileName
      *            A source file name
      * @return A FileSource if a source file {@code fileName} exists in
@@ -67,11 +69,26 @@ public interface SourceLoader {
      * @return A FileSource if a source file {@code fileName} exists in
      *         source path
      * @throws IOException
+     * @deprecated Use {@link #fileSource(String, Source.Kind)} instead.
      */
+    @Deprecated
     FileSource fileSource(String fileName, boolean userSpecified)
             throws IOException;
 
     /**
+     * @param fileName
+     *            A source file name
+     * @param kind
+     *            How the source was found
+     * @return A FileSource if a source file {@code fileName} exists in
+     *         source path
+     * @throws IOException
+     */
+    FileSource fileSource(String fileName, Source.Kind kind) throws IOException;
+
+    /**
+     * Obtains a FileSource for a dependency.
+     * 
      * @param location
      *            A location to search a source file in
      * @param fileName
@@ -91,9 +108,24 @@ public interface SourceLoader {
      *            If the user has specified this source file explicitly
      * @return A FileSource if a source file {@code fileName} exists
      * @throws IOException
+     * @deprecated Use {@link #fileSource(Location, String, Source.Kind)} instead. 
      */
+    @Deprecated
     FileSource fileSource(Location location, String fileName,
             boolean userSpecified) throws IOException;
+
+    /**
+     * @param location
+     *            A location to search a source file in
+     * @param kind
+     *            How the source was found
+     * @param userSpecified
+     *            If the user has specified this source file explicitly
+     * @return A FileSource if a source file {@code fileName} exists
+     * @throws IOException
+     */
+    FileSource fileSource(Location location, String fileName, Source.Kind kind)
+            throws IOException;
 
     /**
      * Load the source file for the given (possibly nested) class name using the
