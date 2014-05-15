@@ -544,7 +544,6 @@ public class ExtFileManager extends
         if (sourceFile != null) {
             sourceFile.setKind(kind);
             loadedSources.put(key, sourceFile);
-            return sourceFile;
         }
 
         return sourceFile;
