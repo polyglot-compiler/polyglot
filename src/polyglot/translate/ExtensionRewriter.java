@@ -25,6 +25,7 @@
  ******************************************************************************/
 package polyglot.translate;
 
+import polyglot.ast.Lang;
 import polyglot.ast.Node;
 import polyglot.ast.NodeFactory;
 import polyglot.ast.SourceCollection;
@@ -66,14 +67,23 @@ public class ExtensionRewriter extends ContextVisitor {
     /** A quasi-quoter for generating AST node in the target language */
     protected QQ qq;
 
+    /** The language dispatcher for the source language */
+    private final Lang lang;
+
     public ExtensionRewriter(Job job, ExtensionInfo from_ext,
             ExtensionInfo to_ext) {
         super(job, from_ext.typeSystem(), to_ext.nodeFactory());
         this.job = job;
         this.from_ext = from_ext;
         this.to_ext = to_ext;
-        this.qq = new QQ(to_ext);
-        this.rethrowMissingDependencies = true;
+        qq = new QQ(to_ext);
+        rethrowMissingDependencies = true;
+        lang = from_ext.nodeFactory().lang();
+    }
+
+    @Override
+    public Lang lang() {
+        return lang;
     }
 
     @Override
@@ -167,8 +177,8 @@ public class ExtensionRewriter extends ContextVisitor {
     }
 
     public TypeNode typeToJava(Type t, Position pos) throws SemanticException {
-        NodeFactory nf = this.to_nf();
-        TypeSystem ts = this.to_ts();
+        NodeFactory nf = to_nf();
+        TypeSystem ts = to_ts();
 
         if (t.isNull()) return canonical(nf, ts.Null(), pos);
         if (t.isVoid()) return canonical(nf, ts.Void(), pos);

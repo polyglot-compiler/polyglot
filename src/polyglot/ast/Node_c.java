@@ -77,14 +77,14 @@ public abstract class Node_c implements Node {
     }
 
     public Node_c(Position pos, Ext ext) {
-        assert (pos != null);
-        this.position = pos;
+        assert pos != null;
+        position = pos;
         this.ext = ext;
         if (ext != null) {
             ext.init(this);
             ext.initPred(this);
         }
-        this.error = false;
+        error = false;
     }
 
     @Deprecated
@@ -171,13 +171,13 @@ public abstract class Node_c implements Node {
             Node_c n = (Node_c) super.clone();
 
             // XXX Deprecated
-            if (this.del != null) {
-                n.del = this.del.copy();
+            if (del != null) {
+                n.del = del.copy();
                 n.del.init(n);
             }
 
-            if (this.ext != null) {
-                n.ext = this.ext.copy();
+            if (ext != null) {
+                n.ext = ext.copy();
                 n.ext.init(n);
                 n.ext.initPred(n);
             }
@@ -196,7 +196,7 @@ public abstract class Node_c implements Node {
 
     @Override
     public Position position() {
-        return this.position;
+        return position;
     }
 
     @Override
@@ -434,7 +434,7 @@ public abstract class Node_c implements Node {
 
     @Override
     public Node extRewrite(ExtensionRewriter rw) throws SemanticException {
-        return this;
+        return copy(rw.to_nf());
     }
 
     @Deprecated
@@ -443,7 +443,7 @@ public abstract class Node_c implements Node {
         CodeWriter cw = Compiler.createCodeWriter(os);
         NodeVisitor dumper = new DumpAst(cw);
         dumper = dumper.begin();
-        this.visit(dumper);
+        visit(dumper);
         cw.newline();
         dumper.finish();
     }
@@ -453,7 +453,7 @@ public abstract class Node_c implements Node {
         CodeWriter cw = Compiler.createCodeWriter(os);
         NodeVisitor dumper = new DumpAst(lang, cw);
         dumper = dumper.begin();
-        this.visit(dumper);
+        visit(dumper);
         cw.newline();
         dumper.finish();
     }
@@ -464,7 +464,7 @@ public abstract class Node_c implements Node {
         CodeWriter cw = Compiler.createCodeWriter(w);
         NodeVisitor dumper = new DumpAst(cw);
         dumper = dumper.begin();
-        this.visit(dumper);
+        visit(dumper);
         cw.newline();
         dumper.finish();
     }
@@ -474,7 +474,7 @@ public abstract class Node_c implements Node {
         CodeWriter cw = Compiler.createCodeWriter(w);
         NodeVisitor dumper = new DumpAst(lang, cw);
         dumper = dumper.begin();
-        this.visit(dumper);
+        visit(dumper);
         cw.newline();
         dumper.finish();
     }

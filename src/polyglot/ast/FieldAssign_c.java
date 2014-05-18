@@ -80,7 +80,7 @@ public class FieldAssign_c extends Assign_c implements FieldAssign {
     public Term firstChild() {
         Field f = left();
         if (f.target() instanceof Expr) {
-            return ((Expr) f.target());
+            return (Expr) f.target();
         }
         else {
             if (operator() != Assign.ASSIGN) {
@@ -154,15 +154,12 @@ public class FieldAssign_c extends Assign_c implements FieldAssign {
 
     @Override
     public Node extRewrite(ExtensionRewriter rw) throws SemanticException {
-        FieldAssign_c n = (FieldAssign_c) super.extRewrite(rw);
-        Expr left = n.visitChild(n.left(), rw);
+        Expr left = visitChild(left(), rw);
         if (!left.isDisambiguated()) {
             // Need to have an ambiguous assignment
-            return rw.nodeFactory().AmbAssign(n.position(),
-                                              left,
-                                              n.operator(),
-                                              n.right());
+            return rw.nodeFactory().AmbAssign(position, left, op, right);
         }
+        FieldAssign_c n = (FieldAssign_c) super.extRewrite(rw);
         n = left(n, left);
         return n;
     }
