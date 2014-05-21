@@ -62,7 +62,7 @@ public class AmbTypeInstantiation extends TypeNode_c implements Ambiguous {
     public AmbTypeInstantiation(Position pos, TypeNode base,
             List<TypeNode> typeArguments) {
         super(pos);
-        assert (typeArguments != null);
+        assert typeArguments != null;
         this.base = base;
         this.typeArguments = typeArguments;
     }
@@ -70,6 +70,10 @@ public class AmbTypeInstantiation extends TypeNode_c implements Ambiguous {
     @Override
     public String name() {
         return base.name();
+    }
+
+    public TypeNode base() {
+        return base;
     }
 
     protected <N extends AmbTypeInstantiation> N base(N n, TypeNode base) {
@@ -98,7 +102,7 @@ public class AmbTypeInstantiation extends TypeNode_c implements Ambiguous {
     @Override
     public Node visitChildren(NodeVisitor v) {
         TypeNode base = visitChild(this.base, v);
-        List<TypeNode> arguments = visitList(this.typeArguments, v);
+        List<TypeNode> arguments = visitList(typeArguments, v);
         return reconstruct(base, arguments);
     }
 
@@ -111,7 +115,7 @@ public class AmbTypeInstantiation extends TypeNode_c implements Ambiguous {
         Map<TypeVariable, ReferenceType> typeMap = new LinkedHashMap<>();
         JL5ParsedClassType pct = handleBase(typeMap);
 
-        Type baseType = this.base.type();
+        Type baseType = base.type();
 //        System.err.println("Base type is " + base);
 //        System.err.println("typeArguments is " + typeArguments);
 //        if (baseType instanceof JL5SubstClassType) {
@@ -122,11 +126,11 @@ public class AmbTypeInstantiation extends TypeNode_c implements Ambiguous {
 //            System.err.println("   type args are is " + this.typeArguments);
 //        }
 
-        if ((pct.pclass() == null || pct.pclass().formals().isEmpty())) {
+        if (pct.pclass() == null || pct.pclass().formals().isEmpty()) {
             // The base class has no formals.
             // Then this node should not be created in the first place.
             throw new SemanticException("Cannot instantiate " + baseType
-                    + " because it has no formals", this.position);
+                    + " because it has no formals", position);
         }
 
         checkParamSize(pct);
@@ -149,11 +153,11 @@ public class AmbTypeInstantiation extends TypeNode_c implements Ambiguous {
 //        System.err.println("Instantiating " + pct + " with " + typeMap);
         JL5TypeSystem ts = (JL5TypeSystem) sc.typeSystem();
         Type instantiated = ts.subst(pct, typeMap);
-        return sc.nodeFactory().CanonicalTypeNode(this.position, instantiated);
+        return sc.nodeFactory().CanonicalTypeNode(position, instantiated);
     }
 
     protected boolean shouldDisambiguate() {
-        if (!this.base.isDisambiguated()) {
+        if (!base.isDisambiguated()) {
             return false;
         }
         for (TypeNode tn : typeArguments) {
@@ -166,7 +170,7 @@ public class AmbTypeInstantiation extends TypeNode_c implements Ambiguous {
 
     protected void checkRareType(AmbiguityRemover ar) throws SemanticException {
         JL5TypeSystem ts = (JL5TypeSystem) ar.typeSystem();
-        Type baseType = this.base.type();
+        Type baseType = base.type();
         if (baseType instanceof ClassType) {
             ClassType ct = (ClassType) baseType;
             if (ct.isInnerClass()) {
@@ -195,7 +199,7 @@ public class AmbTypeInstantiation extends TypeNode_c implements Ambiguous {
 
     protected JL5ParsedClassType handleBase(
             Map<TypeVariable, ReferenceType> typeMap) {
-        Type baseType = this.base.type();
+        Type baseType = base.type();
         if (baseType instanceof JL5ParsedClassType)
             return (JL5ParsedClassType) baseType;
         if (baseType instanceof RawClass) return ((RawClass) baseType).base();
@@ -211,10 +215,10 @@ public class AmbTypeInstantiation extends TypeNode_c implements Ambiguous {
     protected void checkParamSize(JL5ParsedClassType pct)
             throws SemanticException {
         int pctFormalSize = pct.pclass().formals().size();
-        if (pctFormalSize != this.typeArguments.size()) {
+        if (pctFormalSize != typeArguments.size()) {
             throw new SemanticException("Wrong number of type parameters for class "
                                                 + pct,
-                                        this.position);
+                                        position);
         }
     }
 
