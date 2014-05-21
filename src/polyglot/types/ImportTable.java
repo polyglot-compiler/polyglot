@@ -122,15 +122,15 @@ public class ImportTable implements Resolver {
      */
     public ImportTable(TypeSystem ts, Package pkg, String src) {
         this.ts = ts;
-        this.sourceName = src;
-        this.sourcePos = src != null ? new Position(null, src) : null;
+        sourceName = src;
+        sourcePos = src != null ? new Position(null, src) : null;
         this.pkg = pkg;
 
-        this.map = new HashMap<>();
-        this.typeOnDemandImports = new ArrayList<>();
-        this.lazyImports = new ArrayList<>();
-        this.lazyImportPositions = new ArrayList<>();
-        this.singleTypeImports = new ArrayList<>();
+        map = new HashMap<>();
+        typeOnDemandImports = new ArrayList<>();
+        lazyImports = new ArrayList<>();
+        lazyImportPositions = new ArrayList<>();
+        singleTypeImports = new ArrayList<>();
     }
 
     /**
@@ -173,7 +173,7 @@ public class ImportTable implements Resolver {
     public void addTypeOnDemandImport(String pkgOrTypeName) {
         // don't add the import if it is the same as the current package,
         // the same as a default import, or has already been imported
-        if ((pkg != null && pkg.fullName().equals(pkgOrTypeName))
+        if (pkg != null && pkg.fullName().equals(pkgOrTypeName)
                 || ts.defaultPackageImports().contains(pkgOrTypeName)
                 || typeOnDemandImports.contains(pkgOrTypeName)) {
             return;
@@ -325,21 +325,25 @@ public class ImportTable implements Resolver {
         // in case pkgName is actually a class, we need to try loading it, to make sure
         // all the nested classes are loaded
         String actualPkg;
-        if (!this.ts.packageExists(pkgOrTypeName)) {
+        String separator;
+        if (!ts.packageExists(pkgOrTypeName)) {
             // try loading the class
             ts.systemResolver().find(pkgOrTypeName);
             actualPkg = StringUtil.getPackageComponent(pkgOrTypeName);
+            separator = "$";
         }
         else {
             // it really is a package
             actualPkg = pkgOrTypeName;
+            separator = ".";
         }
 
         String fullName =
-                pkgOrTypeName.length() == 0 ? name : pkgOrTypeName + "." + name;
+                pkgOrTypeName.length() == 0 ? name : pkgOrTypeName + separator
+                        + name;
         try {
             Named n = ts.systemResolver().find(fullName);
-            // Check if the type is visible in this pake or type.
+            // Check if the type is visible in this package or type.
             if (isVisibleFrom(n, actualPkg)) {
                 return n;
             }
@@ -372,8 +376,8 @@ public class ImportTable implements Resolver {
     protected boolean isVisibleFrom(Named n, String pkgName) {
         boolean isVisible = false;
         boolean inSamePackage =
-                this.pkg != null && this.pkg.fullName().equals(pkgName)
-                        || this.pkg == null && pkgName.equals("");
+                pkg != null && pkg.fullName().equals(pkgName) || pkg == null
+                        && pkgName.equals("");
         if (n instanceof Type) {
             Type t = (Type) n;
             //FIXME: Assume non-class types are always visible.

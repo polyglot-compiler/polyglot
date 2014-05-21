@@ -64,7 +64,7 @@ public class SourceFileTest extends AbstractTest {
     public SourceFileTest(List<List<String>> compilationUnits) {
         super(testName(compilationUnits));
         this.compilationUnits = compilationUnits;
-        this.eq = new SilentErrorQueue(100, this.getName());
+        eq = new SilentErrorQueue(100, getName());
     }
 
     private static String testName(List<List<String>> compilationUnits) {
@@ -80,13 +80,13 @@ public class SourceFileTest extends AbstractTest {
     @Override
     public String getUniqueId() {
         StringBuffer sb = new StringBuffer();
-        sb.append(this.getName());
-        if (this.extensionClassname != null) {
+        sb.append(getName());
+        if (extensionClassname != null) {
             sb.append("::");
             sb.append(extensionClassname);
         }
-        if (this.extraArgs != null) {
-            for (String extraArg : this.extraArgs) {
+        if (extraArgs != null) {
+            for (String extraArg : extraArgs) {
                 sb.append("::");
                 sb.append(extraArg);
             }
@@ -135,6 +135,7 @@ public class SourceFileTest extends AbstractTest {
 
         try {
             // Next, loop through each compilation unit and compile it.
+            boolean addClassPath = false;
             for (List<String> list : sourceFileNames) {
                 List<String> cmdLine = new LinkedList<>(cmdLineHdr);
                 cmdLine.addAll(list);
@@ -145,13 +146,16 @@ public class SourceFileTest extends AbstractTest {
                 }
 
                 // To get separate compilation, add the output directory to the
-                // class path.
-                cmdLine.add("-cp");
-                cmdLine.add(prependTestPath(destDir.getName()));
+                // class path only if we are compiling subsequent sets of files.
+                if (addClassPath) {
+                    cmdLine.add("-cp");
+                    cmdLine.add(prependTestPath(destDir.getName()));
+                }
+                else addClassPath = true;
 
                 // Invoke the compiler on the compilation unit.
                 try {
-                    if (JAVAC.equals(this.getExtensionClassname())) {
+                    if (JAVAC.equals(getExtensionClassname())) {
                         // invoke javac on the program
                         invokeJavac(cmdLine);
                     }
@@ -373,7 +377,7 @@ public class SourceFileTest extends AbstractTest {
         // system specific one
         StringBuffer sb = new StringBuffer();
         for (int j = 0; j < sas.length(); j++) {
-            if (sas.charAt(j) == '\\' && (j + 1) < sas.length()
+            if (sas.charAt(j) == '\\' && j + 1 < sas.length()
                     && sas.charAt(j + 1) == ':') {
                 // escaped ':'
                 j++;
@@ -417,11 +421,11 @@ public class SourceFileTest extends AbstractTest {
     }
 
     protected void setExtensionClassname(String extClassname) {
-        this.extensionClassname = extClassname;
+        extensionClassname = extClassname;
     }
 
     protected String[] getExtraCmdLineArgs() {
-        return this.extraArgs;
+        return extraArgs;
     }
 
     protected static String[] breakString(String s) {
@@ -466,7 +470,7 @@ public class SourceFileTest extends AbstractTest {
 
     protected void setExtraCmdLineArgs(String args) {
         if (args != null) {
-            this.extraArgs = breakString(args);
+            extraArgs = breakString(args);
         }
     }
 
@@ -475,7 +479,7 @@ public class SourceFileTest extends AbstractTest {
     }
 
     protected void setDestDir(String dir) {
-        this.destDir = dir;
+        destDir = dir;
     }
 
     protected String getDestDir() {
@@ -487,11 +491,11 @@ public class SourceFileTest extends AbstractTest {
     }
 
     protected void setTestDir(String dir) {
-        this.testDir =
+        testDir =
                 Main.options.testpath == null
-                        ? (dir == null ? null : dir) : (dir == null
+                        ? dir == null ? null : dir : dir == null
                                 ? Main.options.testpath : Main.options.testpath
-                                        + dir);
+                                        + dir;
     }
 
     protected String getTestDir() {
