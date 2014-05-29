@@ -45,8 +45,8 @@
 
 	<!--
 	<property name="cvs.root" value=":pserver:anonymous@gforge.cis.cornell.edu:/cvsroot/polyglot" />
-	-->
 	<property name="cvs.root" value=":ext:gforge.cis.cornell.edu:/cvsroot/polyglot" />
+	-->
 
 	<!-- temporary directory -->
 	<property name="tmp" location="${basedir}/tmp" />
@@ -695,7 +695,7 @@
 	</target>
 
 	<target name="source-tarball-stable" depends="configure-buildstring" description="generate a source tarball from CVS">
-		<antcall target="cvs-checkout" />
+		<antcall target="git-checkout" />
 		<antcall target="sub-ant-cvs">
 			<param name="sub-ant.target" value="gen-version" />
 		</antcall>
@@ -710,7 +710,7 @@
 	</target>
 
 	<target name="binary-jar-epl-stable" depends="configure-buildstring" description="generate an EPL jar file from CVS">
-		<antcall target="cvs-checkout" />
+		<antcall target="git-checkout" />
 		<antcall target="sub-ant-cvs">
 			<param name="sub-ant.target" value="gen-version" />
 		</antcall>
@@ -722,7 +722,7 @@
 	</target>
 
 	<target name="source-jar-epl-stable" depends="configure-buildstring" description="generate an EPL source jar file from CVS" >
-		<antcall target="cvs-checkout" />
+		<antcall target="git-checkout" />
 		<antcall target="sub-ant-cvs">
 			<param name="sub-ant.target" value="gen-version" />
 		</antcall>
@@ -939,6 +939,7 @@
 		</antcall>
 	</target>
 
+<!--
 	<target name="cvs-checkout" depends="mkdir-tmp">
 		<cvs command="checkout polyglot" quiet="true" cvsRsh="ssh" cvsRoot="${cvs.root}" dest="${tmp}" failonerror="true" />
 	</target>
@@ -947,6 +948,7 @@
 		<cvs command="checkout rtag -F -rRELEASE_${jl.version.major}_${jl.version.minor}_${jl.version.patch} polyglot" cvsRoot="${cvs.root}" failonerror="true" />
 	</target>
 
+-->
 
 	<target name="dist-checklist">
 		<echo>Checklist:</echo>
