@@ -37,7 +37,4 @@ package polyglot.ast;
 public interface ArrayAccessAssign extends Assign {
     @Override
     ArrayAccess left();
-
-    /** Get the throwsArrayStoreException of the expression. */
-    boolean throwsArrayStoreException();
 }

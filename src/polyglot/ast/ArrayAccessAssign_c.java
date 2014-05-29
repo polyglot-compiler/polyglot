@@ -116,7 +116,7 @@ public class ArrayAccessAssign_c extends Assign_c implements ArrayAccessAssign {
     public List<Type> throwTypes(TypeSystem ts) {
         List<Type> l = new ArrayList<>(super.throwTypes(ts));
 
-        if (throwsArrayStoreException()) {
+        if (op == ASSIGN && left.type().isReference()) {
             l.add(ts.ArrayStoreException());
         }
 
@@ -126,8 +126,4 @@ public class ArrayAccessAssign_c extends Assign_c implements ArrayAccessAssign {
         return l;
     }
 
-    @Override
-    public boolean throwsArrayStoreException() {
-        return op == ASSIGN && left.type().isReference();
-    }
 }
