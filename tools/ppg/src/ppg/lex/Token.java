@@ -179,11 +179,9 @@ public class Token /* extends Symbol */implements LexerResult {
             return "ERROR";
 
         default: {
-            System.err.println("Invalid token conversion: " + type);
-            System.exit(2);
+            return "<undefined>";
         }
         }
-        return null;
     }
 
     @Override
@@ -197,7 +195,7 @@ public class Token /* extends Symbol */implements LexerResult {
 
         if (value != null) {
             try {
-                o.write((filename + ":" + lineno + ": " + this.getID() + ": \""
+                o.write((filename + ":" + lineno + ": " + getID() + ": \""
                         + value + "\"").getBytes());
                 //o.write (value.toString ().getBytes ());
             }

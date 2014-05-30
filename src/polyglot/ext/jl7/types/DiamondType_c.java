@@ -59,7 +59,7 @@ public class DiamondType_c extends JL5ClassType_c implements DiamondType {
     public DiamondType_c(Position pos, JL5ParsedClassType base) {
         super((JL7TypeSystem) base.typeSystem(), pos);
         this.base = base;
-        this.setDeclaration(base);
+        setDeclaration(base);
     }
 
     protected JL5ClassType mostSpecific() {
@@ -79,12 +79,12 @@ public class DiamondType_c extends JL5ClassType_c implements DiamondType {
 
     @Override
     public JL5ParsedClassType base() {
-        return this.base;
+        return base;
     }
 
     @Override
     public JL5SubstClassType inferred() {
-        return this.inferred;
+        return inferred;
     }
 
     @Override
@@ -104,12 +104,12 @@ public class DiamondType_c extends JL5ClassType_c implements DiamondType {
 
     @Override
     public String translateAsReceiver(Resolver resolver) {
-        return this.translate(resolver);
+        return translate(resolver);
     }
 
     @Override
     public Annotations annotations() {
-        return this.typeSystem().NoAnnotations();
+        return typeSystem().NoAnnotations();
     }
 
     @Override
@@ -204,11 +204,11 @@ public class DiamondType_c extends JL5ClassType_c implements DiamondType {
 
     @Override
     public String translate(Resolver c) {
-        return super.translate(c) + "<>";
+        return base.translate(c) + "<>";
     }
 
     @Override
     public String toString() {
-        return super.toString() + "<>";
+        return base.toString() + "<>";
     }
 }
