@@ -196,7 +196,7 @@ public class ExtensionRewriter extends ContextVisitor {
         }
 
         if (t.isClass()) {
-            return nf.TypeNodeFromQualifiedName(pos, t.toClass().fullName());
+            return nf.TypeNodeFromQualifiedName(pos, t.translate(context));
         }
 
         throw new InternalCompilerError("Cannot translate type " + t + ".");

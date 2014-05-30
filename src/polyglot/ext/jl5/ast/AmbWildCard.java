@@ -73,24 +73,24 @@ public class AmbWildCard extends TypeNode_c implements Ambiguous {
 
     @Override
     public Node visitChildren(NodeVisitor v) {
-        TypeNode c = visitChild(this.constraint, v);
+        TypeNode c = visitChild(constraint, v);
         return reconstruct(c);
     }
 
     @Override
     public Node disambiguate(AmbiguityRemover sc) throws SemanticException {
-        if (this.constraint != null && !this.constraint.isDisambiguated()) {
+        if (constraint != null && !constraint.isDisambiguated()) {
             return this;
         }
         JL5TypeSystem ts = (JL5TypeSystem) sc.typeSystem();
         Type t;
-        if (this.constraint == null) {
+        if (constraint == null) {
             t = ts.wildCardType(this.position());
         }
         else {
             ReferenceType upperBound = null;
             ReferenceType lowerBound = null;
-            if (this.isExtendsConstraint) {
+            if (isExtendsConstraint) {
                 upperBound = (ReferenceType) constraint.type();
             }
             else {
@@ -98,7 +98,20 @@ public class AmbWildCard extends TypeNode_c implements Ambiguous {
             }
             t = ts.wildCardType(this.position(), upperBound, lowerBound);
         }
-        return sc.nodeFactory().CanonicalTypeNode(this.position, t);
+        return sc.nodeFactory().CanonicalTypeNode(position, t);
+    }
+
+    @Override
+    public String toString() {
+        StringBuffer sb = new StringBuffer();
+        sb.append("?");
+        if (constraint != null) {
+            sb.append(" ");
+            sb.append(isExtendsConstraint ? "extends" : "super");
+            sb.append(" ");
+            sb.append(constraint);
+        }
+        return sb.toString();
     }
 
     @Override
@@ -106,7 +119,7 @@ public class AmbWildCard extends TypeNode_c implements Ambiguous {
         w.write("?");
         if (constraint != null) {
             w.write(" ");
-            w.write(this.isExtendsConstraint ? "extends" : "super");
+            w.write(isExtendsConstraint ? "extends" : "super");
             w.write(" ");
             tr.lang().prettyPrint(constraint, w, tr);
         }
