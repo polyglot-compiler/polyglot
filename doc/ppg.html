@@ -1,5 +1,7 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
+<link rel="stylesheet" href="overview.css" type="text/css">
 <title>PPG documentation</title>
 </head>
 
@@ -24,11 +26,12 @@ separately</a>.
 Questions about PPG should be directed to Andrew Myers
 (<a href="mailto:myers@cs.cornell.edu">myers@cs.cornell.edu</a>).
 
-<a name="usage"><h2>PPG syntax</h2></a>
+<a name="usage"></a>
+<h2>PPG syntax</h2>
 The PPG grammar syntax extends that of CUP with several new declarations:
 <ol>
-  <li>The first line of a PPG specification is <ul><tt><b>include</b>
-    &quot;</tt><i>filename</i><tt>&quot;</tt></ul> where <i>filename</i>
+  <li>The first line of a PPG specification is <p><tt><b>include</b>
+    &quot;</tt><i>filename</i><tt>&quot;</tt></p> where <i>filename</i>
     is a relative path to the inherited specification.  A PPG spec can
     include a CUP spec or another PPG spec. It is an error for the
     chain of included files to contain a cycle.
@@ -115,11 +118,12 @@ The PPG grammar syntax extends that of CUP with several new declarations:
        switch. See <a href="#running">running PPG</a> section.
 </ol>
 
-<a name="running"><h2>Running PPG</h2></a>
+<a name="running"></a>
+<h2>Running PPG</h2>
 
 The syntax for invocation of PPG is<br>
-<ul><tt>ppg</tt> [<tt>-symbols</tt> &lt;<i>class name</i>&gt;]
-	&lt;<i>grammar file</i>&gt;</ul>
+<p><tt>ppg</tt> [<tt>-symbols</tt> &lt;<i>class name</i>&gt;]
+	&lt;<i>grammar file</i>&gt;</p>
 where
 <ul>
 	<li><tt>-symbols</tt> &lt;<i>class name</i>&gt;<br>
@@ -134,25 +138,26 @@ where
 		of the PPG source file.
 </ul>
 
-<a name="semantics"><h2>Semantics of PPG</h2></a>
+<a name="semantics"></a>
+<h2>Semantics of PPG</h2>
 
 The order of specification of commands is not important. The resulting
 productions for any nonterminal N is as follows:
-<ul>N' = N - drop(N) - transferL(N) + override(N) + transferR(N) +
-extend(N) + newProductions(N)</ul><br>
+<p>N' = N - drop(N) - transferL(N) + override(N) + transferR(N) +
+extend(N) + newProductions(N)</p>
 
 The resulting available set of terminals is simply:
-<ul>T' = T - drop(T) + newTerminals</ul>
+<p>T' = T - drop(T) + newTerminals</p>
 where T is the set of terminals from base grammar, drop(T) is the
 set of dropped terminals using the <b>drop</b> command, <b>newTerminals</b>
 are terminals defined using CUP syntax. The resulting set of nonterminals
 is similar.<br>
 
 For precedence rules:
-<ul>P' = {}</ul>
+<p>P' = {}</p>
 if "<tt><b>precedence;</b></tt>" is specified by the PPG grammar, thus 
 not inheriting any precedence rules from the base grammar, or
-<ul>P' = P<sub>new</sub></ul>
+<p>P' = P<sub>new</sub></p>
 where any newly defined precedence rules override any inherited precedence
 rules from the base grammar.
 

@@ -1,3 +1,4 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <head>
 <title>How to Use Polyglot</title>
 <link rel="stylesheet" href="overview.css" type="text/css">
@@ -48,7 +49,7 @@ any ambiguities, type check the AST, possibly rewrite the AST to another
 AST, then output the AST as Java source code.
 </p>
 
-<img style="float: right" src="images/passes.png">
+<img style="float: right" src="images/passes.png" alt="Compiler passes">
 
 <p>
 When the compiler is invoked (through <code>polyglot.main.Main.main()</code>), it
@@ -464,7 +465,6 @@ Polyglot distribution at <tt class="fname">polyglot/ext/pao</tt>.
     We modify <tt class="fname">parse/pao.ppg</tt> to redefine the <code>instanceof</code> production to
     allow any type to be used in an <code>instanceof</code> expression.  This required
     only appending the following code to <tt class="fname">pao.ppg</tt>: 
-  </li>
 
 <pre class="code">
       extend relational_expression ::=
@@ -478,6 +478,7 @@ Polyglot distribution at <tt class="fname">polyglot/ext/pao</tt>.
 </pre>
 
     The remainder of the file is boilerplate code.
+  </li>
 
 <li>
     We next extend the Java type system to handle Pao's semantics.
@@ -669,13 +670,13 @@ the single method <code>extNodeImpl()</code> needs to be overridden.
 The <code>postExt&lt;<i>node</i>&gt;(Ext)</code> methods provide hooks for subclasses to
 manipulate Ext objects after they have been created. The default
 implementation of these methods in <code>AbstractExtFactory_c</code> is simply to
-call the postExt<super>(Ext) method, where <super> is the superclass
+call the postExt&lt;super&gt;(Ext) method, where &lt;super&gt; is the superclass
 of <code>&lt;<i>node</i>&gt;</code>.
 </p>
 
 <p>
 The structure of the delegate factory AbstractDelFactory_c class is
-analogous to that of <code>AbstractExtFactory_c.
+analogous to that of <code>AbstractExtFactory_c</code>.
 </p>
 </div>
 </body>
