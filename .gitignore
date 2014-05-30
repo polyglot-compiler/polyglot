@@ -9,4 +9,4 @@ dist
 .project
 SyncToy*
 /bin_
-polyglot-?.?.?src*
+polyglot-?.?.?-src*
