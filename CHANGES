@@ -5,8 +5,8 @@ This file documents changes between releases of Polyglot. More information
 about some releases may be found in the appropriate directory
 doc/release-notes-<version>.
 
-XXX, 2014 : Polyglot ???
-===============================
+June 2, 2014 : Polyglot 2.6.0
+=============================
 
 Delegate objects and delegate factories are now deprecated.  AST nodes in
 an extension need not be attached with delegate objects.  Rather, a _language
