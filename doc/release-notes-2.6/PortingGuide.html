@@ -1,0 +1,50 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<link rel="stylesheet" href="../overview.css" type="text/css">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>Porting Guide 2.6</title>
+</head>
+<body>
+ <div class="content">
+	<h2>Polyglot 2.6 Porting Guide</h2>
+	<p>Some Polyglot extensions may need minor changes to work with the
+		new version of Polyglot. This document is intended to help developers
+		fix their extensions accordingly.</p>
+   <h3>JL5 extension</h3>
+   <div>Polyglot 2.6 supoprts Java 5 and Java 7 language features, via the JL5
+   and JL7 extensions (packages <code>polyglot.ext.jl5</code>,
+	<code>polyglot.ext.jl7</code>). There are two options to implement a
+   Polyglot extension that supports these language features
+   (whether porting an existing extension, or writing a new one).
+   <ol>
+     <li><b>Translate to Java 1.4.</b> <p>The JL5 extension can be used
+     to translate from Java 1.5 language features to equivalent Java
+     1.4 code. Extension writers can leverage this to provide support for
+     Java 1.5 langauge features without needing to directly reason
+     about such features in their extensions.</p>
+     <p> The easiest way to write an extension that first translates Java 1.5 code
+     to Java 1.4 code is to use the ExtensionRewriter pattern.  This pattern
+     rewrites Java 1.5 AST nodes to the extension's AST nodes.  An example of
+     this pattern is used by the JL5 extension to output Java 1.4 files.  The
+     JL5 AST is translated to JL ASTs, typechecked as Java 1.4, and then output
+     to disk.  See the <code>RemoveJava5isms</code> goal in
+     <code>polyglot.ext.jl5.JL5Scheduler</code> for more info, as well as
+     <code>polyglot.translate.JLOutputExtensionInfo</code>, for more
+     information.
+     </p></li>
+     <li><b>Directly support Java 5/Java 7.</b>
+     <p>The JL5 and JL7 extensions can be directly extended, allowing
+     extensions to directly support language features such as
+     generics, enhanced for loops, enums, and annotations.</p>
+     </li>
+   </ol>
+   </div>
+   <p>For porting extensions not already working with release 2.5, please
+      consult the release 2.5 porting guide for more information.
+   </p>
+  </div>
+</body>
+</html>
+<!-- vim: ts=4
+-->

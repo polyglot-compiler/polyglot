@@ -57,15 +57,15 @@ public class CaptureConvertedWildCardType_c extends TypeVariable_c implements
 
     @Override
     public String translate(Resolver c) {
-        return toString(false);
+        return translate(c, false);
     }
 
     @Override
     public String toString() {
-        return toString(true);
+        return translate(null, true);
     }
 
-    private String toString(boolean printCaptureName) {
+    private String translate(Resolver c, boolean printCaptureName) {
         StringBuffer sb = new StringBuffer();
         if (printCaptureName) {
             sb.append(name);
@@ -76,11 +76,15 @@ public class CaptureConvertedWildCardType_c extends TypeVariable_c implements
             inBound = true;
             if (!ts.Object().equals(upperBound)) {
                 sb.append(" extends ");
-                sb.append(upperBound);
+                if (c == null)
+                    sb.append(upperBound);
+                else sb.append(upperBound.translate(c));
             }
             else if (lowerBound != null) {
                 sb.append(" super ");
-                sb.append(lowerBound);
+                if (c == null)
+                    sb.append(lowerBound);
+                else sb.append(lowerBound.translate(c));
             }
             inBound = false;
         }

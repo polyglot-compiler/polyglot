@@ -1,14 +1,14 @@
-             Polyglot Extensible Compiler Framework (Version 2.5.3)
+             Polyglot Extensible Compiler Framework (Version 2.6.0)
              ------------------------------------------------------
 
 Overview
 --------
 
-This is release 2.5 of the Polyglot extensible compiler framework.
+This is release 2.6 of the Polyglot extensible compiler framework.
 It contains many improvements over previous releases of Polyglot,
-including support for Java 5 and significantly improved performance.
+including support for Java 7 and significantly improved performance.
 More details on these changes can be found in the file
-doc/release-2.5-notes/PolyglotChanges.html.
+doc/release-2.6-notes/PolyglotChanges.html.
 
 Contents
 --------
@@ -116,8 +116,8 @@ To compile using the base compiler, just leave out the -ext option:
 This should produce a file called File.java that is almost identical to
 File.jl.
 
-Java 5 language extension
--------------------------
+Java 5 and Java 7 language extensions
+-------------------------------------
 
 Polyglot supports Java 5 language extensions with a Polyglot compiler
 extension, which can be found in the directory
@@ -144,6 +144,8 @@ allows the user to specify a different class to use as the superclass
 of enumeration classes. See $POLYGLOT/testsjl5/java-src/MyEnum.java
 for an example of a suitable class to use as the superclass of
 enumeration classes.
+
+Similarly, the scripts "jl7c" can be used to compile Java 7 programs.
 
 Building Polyglot
 -----------------
@@ -187,14 +189,9 @@ instructions earlier in this file for how to use the compiler.
 Credits and Acknowledgments
 ---------------------------
 
-Version 2.5 of Polyglot was prepared largely through the work of the following
-people:
-
-    Steve Chong (Harvard)
-    Owen Arden (Cornell)
-    Scott Moore (Harvard)
-    Samarth Lad (Cornell)
-    Jed Liu (Cornell)
+Version 2.6 of Polyglot was prepared largely through the work of
+Chinawat Isradisaikul (Cornell), though many others have contributed
+to it.
 
 The Polyglot project is jointly supervised by Prof. Andrew Myers (Cornell
 University), by Prof. Stephen Chong (Harvard University), and by Prof.
@@ -226,7 +223,7 @@ code by Robert Harder <rob@iharder.net>.  See http://iharder.net/base64.
 The JL5 extension was based on the "Polyglot for Java 5" project by Milan
 Stanojevic and Todd Millstein
 (http://www.cs.ucla.edu/~todd/research/polyglot5.html), with additional input
-from Vincent Cav�.
+from Vincent Cavé.
 
 The following people have provided patches:
 

@@ -47,6 +47,7 @@
 	<property name="cvs.root" value=":pserver:anonymous@gforge.cis.cornell.edu:/cvsroot/polyglot" />
 	<property name="cvs.root" value=":ext:gforge.cis.cornell.edu:/cvsroot/polyglot" />
 	-->
+	<property name="gitrepo" value="https://github.com/polyglot-compiler/polyglot.git" />
 
 	<!-- temporary directory -->
 	<property name="tmp" location="${basedir}/tmp" />
@@ -703,9 +704,9 @@
 			<param name="sub-ant.target" value="javadoc" />
 		</antcall>
 		<antcall target="sub-ant-cvs">
-			<param name="sub-ant.target" value="src.tar" />
+			<param name="sub-ant.target" value="src.zip" />
 		</antcall>
-                <move tofile="${basedir}/polyglot-${jl.version}-src.tar.gz" file="${tmp}/polyglot/polyglot-${jl.version}-src.tar.gz" />
+                <move tofile="${basedir}/polyglot-${jl.version}-src.zip" file="${tmp}/polyglot/polyglot-${jl.version}-src.zip" />
 		<antcall target="rmdir-tmp" />
 	</target>
 
@@ -744,13 +745,13 @@
 	</target>
 
 	<!-- make the LGPL source distribution and install into dist -->
-	<target name="src.tar" depends="configure-buildstring,src-dist-tmp">
+	<target name="src.zip" depends="configure-buildstring,src-dist-tmp">
 		<antcall target="rmdir">
 			<param name="dir" value="${basedir}/polyglot-${jl.version}-src" />
 		</antcall>
 		<!-- <ant inheritall="false" antfile="${tmp}/build.xml" target="javadoc"/> -->
 		<move tofile="${basedir}/polyglot-${jl.version}-src" file="${tmp}" />
-                <tar destfile="${basedir}/polyglot-${jl.version}-src.tar.gz" basedir="${basedir}" includes="polyglot-${jl.version}-src/**" compression="gzip" />
+                <zip destfile="${basedir}/polyglot-${jl.version}-src.zip" basedir="${basedir}" includes="polyglot-${jl.version}-src/**" />
 	</target>
 
 	<target name="src-epl.tar" depends="configure-buildstring,src-dist-epl-tmp">
@@ -939,6 +940,13 @@
 		</antcall>
 	</target>
 
+	<target name="git-checkout" depends="mkdir-tmp">
+	    <echo message="checking out repository" />
+	    <exec executable="git" dir="${tmp}">
+		<arg value="clone" />
+		<arg value="${gitrepo}" />
+	    </exec>
+	</target>
 <!--
 	<target name="cvs-checkout" depends="mkdir-tmp">
 		<cvs command="checkout polyglot" quiet="true" cvsRsh="ssh" cvsRoot="${cvs.root}" dest="${tmp}" failonerror="true" />

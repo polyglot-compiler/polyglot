@@ -59,7 +59,7 @@ public interface JL5ClassType extends ClassType {
     LinkedList<Type> isImplicitCastValidChainImpl(Type toType);
 
     /**
-     * Translate the type as it should be if it where the receiver
+     * Translate the type as it should be if it were the receiver
      * of a field or method call.
      * @param context
      */

@@ -1,0 +1,44 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<link rel="stylesheet" href="../overview.css" type="text/css">
+<title>Changes to Polyglot for Version 2.6</title>
+<style type="text/css">
+  p { width: 100ex }
+</style>
+
+</head>
+<body>
+    <div class="content">
+
+	<h1>Major changes to Polyglot for Version 2.6</h1>
+        <p>
+          See the file CHANGES for more information about the changes
+	  made to Polyglot for Version 2.6.
+        </p>
+      <p>Support for Java 7 language features added, through the JL7 extension (<code>polyglot.ext.jl7</code>),
+         which in turn builds on the JL5 extension.
+      </p>
+
+      <p>The source code of Polyglot has itself been updated to take advantage of the
+	 features introduced in Java 7. This may break older extensions that
+	 assume non-generic interfaces.
+      </p>
+
+      <p>
+	New language dispatcher design pattern. The Delegate pattern used in
+	previous versions of Polyglot is still supported, but is now deprecated
+	in favor of a new pattern of <em>language dispatchers</em>. Previously
+	each node had its own delegate object to perform dispatching to
+	pass-specific operations; in the new design, all nodes in a given
+	language share the same language dispatcher object. This object is
+	responsible for dispatching operations to the appropriate extension
+	object for the AST node. The new design pattern adds expressive power,
+	eliminates the need for DelegateFactories, and improves performance by
+	reducing the number of object creations needed.
+      </p>
+
+    </div>
+</body>
+</html>

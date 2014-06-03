@@ -69,32 +69,32 @@ public class WildCardType_c extends ReferenceType_c implements WildCardType {
 
     @Override
     public ReferenceType upperBound() {
-        return this.upperBound;
+        return upperBound;
     }
 
     @Override
     public WildCardType upperBound(ReferenceType newUpperBound) {
-        if (this.upperBound == newUpperBound) {
+        if (upperBound == newUpperBound) {
             return this;
         }
-        WildCardType_c n = (WildCardType_c) this.copy();
+        WildCardType_c n = (WildCardType_c) copy();
         n.upperBound = newUpperBound;
         return n;
     }
 
     @Override
     public WildCardType lowerBound(ReferenceType newLowerBound) {
-        if (this.lowerBound == newLowerBound) {
+        if (lowerBound == newLowerBound) {
             return this;
         }
-        WildCardType_c n = (WildCardType_c) this.copy();
+        WildCardType_c n = (WildCardType_c) copy();
         n.lowerBound = newLowerBound;
         return n;
     }
 
     @Override
     public ReferenceType lowerBound() {
-        return this.lowerBound;
+        return lowerBound;
     }
 
     @Override
@@ -127,20 +127,30 @@ public class WildCardType_c extends ReferenceType_c implements WildCardType {
 
     @Override
     public String translate(Resolver c) {
-        return this.toString();
+        StringBuffer sb = new StringBuffer();
+        sb.append('?');
+        if (!ts.Object().equals(upperBound)) {
+            sb.append(" extends ");
+            sb.append(upperBound.translate(c));
+        }
+        else if (lowerBound != null) {
+            sb.append(" super ");
+            sb.append(lowerBound.translate(c));
+        }
+        return sb.toString();
     }
 
     @Override
     public String toString() {
         StringBuffer sb = new StringBuffer();
         sb.append('?');
-        if (!ts.Object().equals(this.upperBound)) {
+        if (!ts.Object().equals(upperBound)) {
             sb.append(" extends ");
-            sb.append(this.upperBound);
+            sb.append(upperBound);
         }
         else if (lowerBound != null) {
             sb.append(" super ");
-            sb.append(this.lowerBound);
+            sb.append(lowerBound);
         }
         return sb.toString();
     }
@@ -149,12 +159,12 @@ public class WildCardType_c extends ReferenceType_c implements WildCardType {
     public boolean equalsImpl(TypeObject t) {
         if (t instanceof WildCardType_c) {
             WildCardType_c that = (WildCardType_c) t;
-            if (!(this.upperBound == that.upperBound || (this.upperBound != null && typeSystem().equals(this.upperBound,
-                                                                                                        that.upperBound)))) {
+            if (!(upperBound == that.upperBound || upperBound != null
+                    && typeSystem().equals(upperBound, that.upperBound))) {
                 return false;
             }
-            if (!(this.lowerBound == that.lowerBound || (this.lowerBound != null && typeSystem().equals(this.lowerBound,
-                                                                                                        that.lowerBound)))) {
+            if (!(lowerBound == that.lowerBound || lowerBound != null
+                    && typeSystem().equals(lowerBound, that.lowerBound))) {
                 return false;
             }
             return true;
@@ -166,12 +176,12 @@ public class WildCardType_c extends ReferenceType_c implements WildCardType {
     public boolean typeEqualsImpl(Type t) {
         if (t instanceof WildCardType_c) {
             WildCardType_c that = (WildCardType_c) t;
-            if (!(this.upperBound == that.upperBound || (this.upperBound != null && typeSystem().typeEquals(this.upperBound,
-                                                                                                            that.upperBound)))) {
+            if (!(upperBound == that.upperBound || upperBound != null
+                    && typeSystem().typeEquals(upperBound, that.upperBound))) {
                 return false;
             }
-            if (!(this.lowerBound == that.lowerBound || (this.lowerBound != null && typeSystem().typeEquals(this.lowerBound,
-                                                                                                            that.lowerBound)))) {
+            if (!(lowerBound == that.lowerBound || lowerBound != null
+                    && typeSystem().typeEquals(lowerBound, that.lowerBound))) {
                 return false;
             }
             return true;
@@ -181,9 +191,8 @@ public class WildCardType_c extends ReferenceType_c implements WildCardType {
 
     @Override
     public int hashCode() {
-        return 723492
-                ^ (this.lowerBound == null ? 0 : this.lowerBound.hashCode())
-                ^ (this.upperBound == null ? 0 : this.upperBound.hashCode());
+        return 723492 ^ (lowerBound == null ? 0 : lowerBound.hashCode())
+                ^ (upperBound == null ? 0 : upperBound.hashCode());
     }
 
     @Override
