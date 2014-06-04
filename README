@@ -145,14 +145,16 @@ of enumeration classes. See $POLYGLOT/testsjl5/java-src/MyEnum.java
 for an example of a suitable class to use as the superclass of
 enumeration classes.
 
-Similarly, the scripts "jl7c" can be used to compile Java 7 programs.
+Similarly, the script "jl7c" can be used to compile Java 7 programs.
 
 Building Polyglot
 -----------------
 
-Follow these steps to build the base compiler and the installed extensions:
+The source release includes a fully compiled version of Polyglot.
+However, you may want to build the base compiler and the installed extensions
+yourself. Follow these steps:
 
-1. First ensure javac is in your path and that you are using JDK 1.5
+1. First, ensure javac is in your path and that you are using JDK 1.5
 or later.  Also ensure JFlex.jar is in your classpath or is in the lib
 directory.
 
@@ -189,13 +191,13 @@ instructions earlier in this file for how to use the compiler.
 Credits and Acknowledgments
 ---------------------------
 
-Version 2.6 of Polyglot was prepared largely through the work of
-Chinawat Isradisaikul (Cornell), though many others have contributed
-to it.
-
 The Polyglot project is jointly supervised by Prof. Andrew Myers (Cornell
 University), by Prof. Stephen Chong (Harvard University), and by Prof.
 Nathaniel Nystrom (U. Lugano).
+
+Version 2.6 of Polyglot was prepared largely through the work of
+Chinawat Isradisaikul (Cornell), though many others have contributed
+to it.
 
 Many people have contributed substantially to the development of Polyglot,
 including:
