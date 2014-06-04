@@ -1,13 +1,13 @@
 package java_cup;
 
-import java.util.Enumeration;
-import java.util.Hashtable;
+import java.util.HashMap;
+import java.util.Iterator;
 
 /** This class represents a set of LALR items.  For purposes of building
  *  these sets, items are considered unique only if they have unique cores
  *  (i.e., ignoring differences in their lookahead sets).<p>
  *
- *  This class provides fairly conventional set oriented operations (union,
+ *  This class provides fairly conventional set-oriented operations (union,
  *  sub/super-set tests, etc.), as well as an LALR "closure" operation (see 
  *  compute_closure()).
  *
@@ -17,7 +17,7 @@ import java.util.Hashtable;
  * @author  Scott Hudson
  */
 
-public class lalr_item_set {
+public class lalr_item_set implements Iterable<lalr_item> {
 
     /*-----------------------------------------------------------*/
     /*--- Constructor(s) ----------------------------------------*/
@@ -35,7 +35,7 @@ public class lalr_item_set {
     @SuppressWarnings("unchecked")
     public lalr_item_set(lalr_item_set other) throws internal_error {
         not_null(other);
-        _all = (Hashtable<lalr_item, lalr_item>) other._all.clone();
+        _all = (HashMap<lalr_item, lalr_item>) other._all.clone();
     }
 
     /*-----------------------------------------------------------*/
@@ -45,11 +45,12 @@ public class lalr_item_set {
     /** A hash table to implement the set.  We store the items using themselves
      *  as keys. 
      */
-    protected Hashtable<lalr_item, lalr_item> _all = new Hashtable<>(11);
+    protected HashMap<lalr_item, lalr_item> _all = new HashMap<>(11);
 
     /** Access to all elements of the set. */
-    public Enumeration<lalr_item> all() {
-        return _all.elements();
+    @Override
+    public Iterator<lalr_item> iterator() {
+        return _all.values().iterator();
     }
 
     /*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . .*/
@@ -94,8 +95,8 @@ public class lalr_item_set {
         not_null(other);
 
         /* walk down our set and make sure every element is in the other */
-        for (Enumeration<lalr_item> e = all(); e.hasMoreElements();)
-            if (!other.contains(e.nextElement())) return false;
+        for (lalr_item e : this)
+            if (!other.contains(e)) return false;
 
         /* they were all there */
         return true;
@@ -166,8 +167,8 @@ public class lalr_item_set {
         not_null(other);
 
         /* walk down the other set and do the adds individually */
-        for (Enumeration<lalr_item> e = other.all(); e.hasMoreElements();)
-            add(e.nextElement());
+        for (lalr_item e : other)
+            add(e);
     }
 
     /*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . .*/
@@ -179,24 +180,22 @@ public class lalr_item_set {
         not_null(other);
 
         /* walk down the other set and do the removes individually */
-        for (Enumeration<lalr_item> e = other.all(); e.hasMoreElements();)
-            remove(e.nextElement());
+        for (lalr_item e : other)
+            remove(e);
     }
 
     /*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . .*/
 
-    /** Remove and return one item from the set (done in hash order). */
+    /** Remove and return one item from the set (done in hash order).
+     *  Return null if there are no items in the set. */
     public lalr_item get_one() throws internal_error {
-        Enumeration<lalr_item> the_set;
+        Iterator<lalr_item> the_set;
         lalr_item result;
+        if (_all.values().size() == 0) return null;
 
-        the_set = all();
-        if (the_set.hasMoreElements()) {
-            result = the_set.nextElement();
-            remove(result);
-            return result;
-        }
-        else return null;
+        result = iterator().next();
+        remove(result);
+        return result;
     }
 
     /*-----------------------------------------------------------*/
@@ -234,7 +233,7 @@ public class lalr_item_set {
         lalr_item itm, new_itm, add_itm;
         non_terminal nt;
         terminal_set new_lookaheads;
-        production prod;
+
         boolean need_prop;
 
         /* invalidate cached hashcode */
@@ -258,8 +257,7 @@ public class lalr_item_set {
                 need_prop = itm.lookahead_visible();
 
                 /* create items for each production of that non term */
-                for (Enumeration<production> p = nt.productions(); p.hasMoreElements();) {
-                    prod = p.nextElement();
+                for (production prod : nt.productions()) {
 
                     /* create new item with dot at start and that lookahead */
                     new_itm =
@@ -315,9 +313,6 @@ public class lalr_item_set {
     @Override
     public int hashCode() {
         int result = 0;
-        Enumeration<lalr_item> e;
-        @SuppressWarnings("unused")
-        int cnt;
 
         /* only compute a new one if we don't have it cached */
         if (hashcode_cache == null) {
@@ -325,8 +320,8 @@ public class lalr_item_set {
             //   CSA fix! we'd *like* to hash just a few elements, but
             //   that means equal sets will have inequal hashcodes, which
             //   we're not allowed (by contract) to do.  So hash them all.
-            for (e = all(), cnt = 0; e.hasMoreElements() /*&& cnt<5*/; cnt++)
-                result ^= e.nextElement().hashCode();
+            for (lalr_item e : this)
+                result ^= e.hashCode();
 
             hashcode_cache = new Integer(result);
         }
@@ -339,12 +334,11 @@ public class lalr_item_set {
     /** Convert to string. */
     @Override
     public String toString() {
-        StringBuffer result = new StringBuffer();
+        StringBuilder result = new StringBuilder();
 
         result.append("{\n");
-        for (Enumeration<lalr_item> e = all(); e.hasMoreElements();) {
-            result.append("  " + e.nextElement() + "\n");
-        }
+        for (lalr_item e : this)
+            result.append("  " + e + "\n");
         result.append("}");
 
         return result.toString();

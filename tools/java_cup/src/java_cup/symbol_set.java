@@ -1,7 +1,7 @@
 package java_cup;
 
-import java.util.Enumeration;
-import java.util.Hashtable;
+import java.util.HashMap;
+import java.util.Iterator;
 
 /** This class represents a set of symbols and provides a series of 
  *  set operations to manipulate them.
@@ -10,7 +10,7 @@ import java.util.Hashtable;
  * @version last updated: 11/25/95
  * @author  Scott Hudson
  */
-public class symbol_set {
+public class symbol_set implements Iterable<symbol> {
 
     /*-----------------------------------------------------------*/
     /*--- Constructor(s) ----------------------------------------*/
@@ -26,7 +26,7 @@ public class symbol_set {
     @SuppressWarnings("unchecked")
     public symbol_set(symbol_set other) throws internal_error {
         not_null(other);
-        _all = (Hashtable<String, symbol>) other._all.clone();
+        _all = (HashMap<String, symbol>) other._all.clone();
     }
 
     /*-----------------------------------------------------------*/
@@ -35,11 +35,12 @@ public class symbol_set {
 
     /** A hash table to hold the set. Symbols are keyed using their name string. 
      */
-    protected Hashtable<String, symbol> _all = new Hashtable<>(11);
+    protected HashMap<String, symbol> _all = new HashMap<>(11);
 
     /** Access to all elements of the set. */
-    public Enumeration<symbol> all() {
-        return _all.elements();
+    @Override
+    public Iterator<symbol> iterator() {
+        return _all.values().iterator();
     }
 
     /** size of the set */
@@ -78,8 +79,8 @@ public class symbol_set {
         not_null(other);
 
         /* walk down our set and make sure every element is in the other */
-        for (Enumeration<symbol> e = all(); e.hasMoreElements();)
-            if (!other.contains(e.nextElement())) return false;
+        for (symbol s : this)
+            if (!other.contains(s)) return false;
 
         /* they were all there */
         return true;
@@ -135,8 +136,8 @@ public class symbol_set {
         not_null(other);
 
         /* walk down the other set and do the adds individually */
-        for (Enumeration<symbol> e = other.all(); e.hasMoreElements();)
-            result = add(e.nextElement()) || result;
+        for (symbol s : other)
+            result = add(s) || result;
 
         return result;
     }
@@ -150,8 +151,8 @@ public class symbol_set {
         not_null(other);
 
         /* walk down the other set and do the removes individually */
-        for (Enumeration<symbol> e = other.all(); e.hasMoreElements();)
-            remove(e.nextElement());
+        for (symbol s : other)
+            remove(s);
     }
 
     /*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . .*/
@@ -188,11 +189,9 @@ public class symbol_set {
     public int hashCode() {
         int result = 0;
         int cnt;
-        Enumeration<symbol> e;
 
-        /* hash together codes from at most first 5 elements */
-        for (e = all(), cnt = 0; e.hasMoreElements() && cnt < 5; cnt++)
-            result ^= e.nextElement().hashCode();
+        for (symbol s : this)
+            result ^= s.hashCode();
 
         return result;
     }
@@ -207,12 +206,12 @@ public class symbol_set {
 
         result = "{";
         comma_flag = false;
-        for (Enumeration<symbol> e = all(); e.hasMoreElements();) {
+        for (symbol s : this) {
             if (comma_flag)
                 result += ", ";
             else comma_flag = true;
 
-            result += e.nextElement().name();
+            result += s.name();
         }
         result += "}";
 

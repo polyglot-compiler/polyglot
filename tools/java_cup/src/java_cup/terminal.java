@@ -1,7 +1,6 @@
 package java_cup;
 
-import java.util.Enumeration;
-import java.util.Hashtable;
+import java.util.HashMap;
 
 /** This class represents a terminal symbol in the grammar.  Each terminal 
  *  has a textual name, an index, and a string which indicates the type of 
@@ -34,7 +33,7 @@ public class terminal extends symbol {
         // initializers, so we do a crash instead
         // was:
         // throw new internal_error("Duplicate terminal (" + nm + ") created");
-            (new internal_error("Duplicate terminal (" + nm + ") created")).crash();
+            new internal_error("Duplicate terminal (" + nm + ") created").crash();
 
         /* assign a unique index */
         _index = next_index++;
@@ -79,7 +78,7 @@ public class terminal extends symbol {
     /** Table of all terminals.  Elements are stored using name strings as 
      *  the key 
      */
-    protected static Hashtable<String, terminal> _all = new Hashtable<>();
+    protected static HashMap<String, terminal> _all = new HashMap<>();
 
     //Hm Added clear  to clear all static fields
     public static void clear() {
@@ -91,8 +90,8 @@ public class terminal extends symbol {
     }
 
     /** Access to all terminals. */
-    public static Enumeration<terminal> all() {
-        return _all.elements();
+    public static Iterable<terminal> all() {
+        return _all.values();
     }
 
     /** Lookup a terminal by name string. */
@@ -105,8 +104,8 @@ public class terminal extends symbol {
     /*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . .*/
 
     /** Table of all terminals indexed by their index number. */
-    protected static Hashtable<Integer, terminal> _all_by_index =
-            new Hashtable<>();
+    protected static HashMap<Integer, terminal> _all_by_index =
+            new HashMap<>();
 
     /** Lookup a terminal by index. */
     public static terminal find(int indx) {
