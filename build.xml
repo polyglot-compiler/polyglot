@@ -1,5 +1,3 @@
-<project name="polyglot" default="compile" basedir=".">
-	<description>
     Polyglot build file
   </description>
 
@@ -784,7 +782,7 @@
 		</copy>
 
 		<copy todir="${tmp}/tests" includeEmptyDirs="false">
-                    <fileset dir="tests" includes="java-src/*.java,**/*.*,pthScript" excludes="**/pthOutput*,**/*.java,**/*.java,**/*.results" />
+                    <fileset dir="tests" includes="java-src/*.java,**/*.*,pthScript" excludes="**/pthOutput*/**,*.java,**/*.results,out/**,**/*.class" />
 		</copy>
 
 		<copy todir="${tmp}/testsjl5" includeEmptyDirs="false">
