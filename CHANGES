@@ -5,7 +5,7 @@ This file documents changes between releases of Polyglot. More information
 about some releases may be found in the appropriate directory
 doc/release-notes-<version>.
 
-June 2, 2014 : Polyglot 2.6.0
+June 4, 2014 : Polyglot 2.6.0
 =============================
 
 Delegate objects and delegate factories are now deprecated.  AST nodes in

@@ -2,7 +2,6 @@ package java_cup;
 
 import java.io.PrintWriter;
 import java.util.Date;
-import java.util.Enumeration;
 import java.util.Stack;
 
 /** 
@@ -302,9 +301,7 @@ public class emit {
      */
     public static void symbols(PrintWriter out, boolean emit_non_terms,
             boolean sym_interface) {
-        terminal term;
-        non_terminal nt;
-        String class_or_interface = (sym_interface) ? "interface" : "class";
+        String class_or_interface = sym_interface ? "interface" : "class";
 
         long start_time = System.currentTimeMillis();
 
@@ -327,9 +324,7 @@ public class emit {
         out.println("  /* terminals */");
 
         /* walk over the terminals *//* later might sort these */
-        for (Enumeration<terminal> e = terminal.all(); e.hasMoreElements();) {
-            term = e.nextElement();
-
+        for (terminal term : terminal.all()) {
             /* output a constant decl for the terminal */
             out.println("  public static final int " + term.name() + " = "
                     + term.index() + ";");
@@ -341,8 +336,7 @@ public class emit {
             out.println("  /* non terminals */");
 
             /* walk over the non terminals *//* later might sort these */
-            for (Enumeration<non_terminal> e = non_terminal.all(); e.hasMoreElements();) {
-                nt = e.nextElement();
+            for (non_terminal nt : non_terminal.all()) {
 
                 // ****
                 // TUM Comment: here we could add a typesafe enumeration
@@ -508,9 +502,9 @@ public class emit {
                         emit.pre("stack")
                                 +
                                 // TUM 20050917
-                                ((lastResult == 1) ? ".peek()" : (".elementAt("
+                                (lastResult == 1 ? ".peek()" : ".elementAt("
                                         + emit.pre("top") + "-"
-                                        + (lastResult - 1) + ")")) + ".<"
+                                        + (lastResult - 1) + ")") + ".<"
                                 + prod.lhs().the_symbol().stack_type()
                                 + "> value()";
             }
@@ -555,8 +549,8 @@ public class emit {
                     + emit.pre("stack")
                     +
                     // TUM 20050917
-                    ((index == 0) ? ".peek()" : (".elementAt("
-                            + emit.pre("top") + "-" + index + ")")) + ".<"
+                    (index == 0 ? ".peek()" : ".elementAt(" + emit.pre("top")
+                            + "-" + index + ")") + ".<"
                     + prod.lhs().the_symbol().stack_type() + "> value();");
             break;
         }
@@ -588,13 +582,10 @@ public class emit {
             else {
                 loffset = prod.rhs_length() - 1;
                 leftstring =
-                        emit.pre("stack")
-                                +
-                                // TUM 20050917
-                                ((loffset == 0)
-                                        ? (".peek()") : (".elementAt("
-                                                + emit.pre("top") + "-"
-                                                + loffset + ")"))
+                        emit.pre("stack") +
+                        // TUM 20050917
+                                (loffset == 0 ? ".peek()" : ".elementAt("
+                                        + emit.pre("top") + "-" + loffset + ")")
                 // TUM 20060327 removed .left
                 ;
             }
@@ -662,21 +653,19 @@ public class emit {
      */
     protected static void emit_production_table(PrintWriter out) {
         production all_prods[];
-        production prod;
 
         long start_time = System.currentTimeMillis();
 
         /* collect up the productions in order */
         all_prods = new production[production.number()];
-        for (Enumeration<production> p = production.all(); p.hasMoreElements();) {
-            prod = p.nextElement();
+        for (production prod : production.all()) {
             all_prods[prod.index()] = prod;
         }
 
         // make short[][]
         short[][] prod_table = new short[production.number()][2];
         for (int i = 0; i < production.number(); i++) {
-            prod = all_prods[i];
+            production prod = all_prods[i];
             // { lhs symbol , rhs size }
             prod_table[i][0] = (short) prod.lhs().the_symbol().index();
             prod_table[i][1] = (short) prod.rhs_length();
@@ -757,7 +746,7 @@ public class emit {
                         if (red != row.default_reduce) {
                             /* make entry */
                             temp_table[nentries++] = (short) j;
-                            temp_table[nentries++] = (short) (-(red + 1));
+                            temp_table[nentries++] = (short) -(red + 1);
                         }
                     }
                     else if (act.kind() == parse_action.NONASSOC) {
@@ -776,8 +765,7 @@ public class emit {
             /* finish off the row with a default entry */
             action_table[i][nentries++] = -1;
             if (row.default_reduce != -1)
-                action_table[i][nentries++] =
-                        (short) (-(row.default_reduce + 1));
+                action_table[i][nentries++] = (short) -(row.default_reduce + 1);
             else action_table[i][nentries++] = 0;
         }
 
