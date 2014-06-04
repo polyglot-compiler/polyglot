@@ -773,7 +773,7 @@
 		</copy>
 
 		<copy todir="${tmp}/tools" includeEmptyDirs="false">
-			<fileset dir="${basedir}/tools" includes="pth/**,ppg/**,java_cup/**,tests/java-src/*.java" excludes="**/classes,**/Makefile,**/tests/**/*.java,**/tests/**/*.class,**/tests/**/*.results" />
+			<fileset dir="${basedir}/tools" includes="pth/**,ppg/**,java_cup/**" excludes="**/classes,**/Makefile,**/tests/**/*.java,**/tests/**/*.class,**/tests/**/*.results" />
 		</copy>
 		<copy todir="${tmp}/eclipse" includeEmptyDirs="false">
 			<fileset dir="${basedir}/eclipse" includes="*.in" />
@@ -784,7 +784,7 @@
 		</copy>
 
 		<copy todir="${tmp}/tests" includeEmptyDirs="false">
-                    <fileset dir="tests" excludes="**/pthOutput*,**/*.java,**/*.java,**/*.results" />
+                    <fileset dir="tests" includes="tests/java-src/*.java" excludes="**/pthOutput*,**/*.java,**/*.java,**/*.results" />
 		</copy>
 
 		<copy todir="${tmp}/testsjl5" includeEmptyDirs="false">
