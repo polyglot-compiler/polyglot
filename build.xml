@@ -1,3 +1,5 @@
+<project name="polyglot" default="compile" basedir=".">
+	<description>
     Polyglot build file
   </description>
 
