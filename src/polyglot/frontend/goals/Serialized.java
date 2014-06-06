@@ -58,8 +58,8 @@ public class Serialized extends SourceFileGoal {
 
     @Override
     public Pass createPass(ExtensionInfo extInfo) {
-        Compiler compiler = extInfo.compiler();
-        if (compiler.serializeClassInfo()) {
+        if (extInfo.getOptions().serialize_type_info) {
+            Compiler compiler = extInfo.compiler();
             TypeSystem ts = extInfo.typeSystem();
             NodeFactory nf = extInfo.nodeFactory();
             return new VisitorPass(this,
