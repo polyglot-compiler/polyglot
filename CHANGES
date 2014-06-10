@@ -5,6 +5,11 @@ This file documents changes between releases of Polyglot. More information
 about some releases may be found in the appropriate directory
 doc/release-notes-<version>.
 
+June 10, 2014 : Polyglot 2.6.1
+==============================
+
+Minor changes were made to type serialization.
+
 June 4, 2014 : Polyglot 2.6.0
 =============================
 
@@ -22,13 +27,13 @@ The return type of polyglot.ast.Node_c:del() is changed from JLDel to NodeOps
 because Node no longer extends JLDel.  Both extend NodeOps, however, which is
 essentially what we need to dispatch to compiler operations.
 
-Interface polyglot.util.Copy is now generic to customize the return type of
+Interface polyglot.util.Copy is now generic, to customize the return type of
 copy().  Classes implementing Copy<T> should have T, instead of Object, as the
 return type of copy().
 
-Updated JFlex to version 1.5.1 and CUP to a variant of version 0.11b beta
+JFlex was updated to to version 1.5.1 and CUP to a variant of version 0.11b beta
 20140226.  The regular expression ".|\n" in *.flex files should be replaced with
-"[^]" because "." excludes unicode newline characters.
+"[^]" because "." excludes Unicode newline characters.
 
 Deprecated features should still work with this version, with the exception of
 any overriding of del() and copy() methods described above.
