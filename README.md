@@ -8,3 +8,6 @@ such as optimization and fault injection. Polyglot has been used for both major
 and minor language extensions; our experience suggests that the cost of
 implementing an extension scales well with the degree to which it modifies
 Java.
+
+See the web site at http://www.cs.cornell.edu/polyglot for more
+information and documentation about Polyglot.
