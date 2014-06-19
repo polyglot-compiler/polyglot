@@ -83,6 +83,10 @@ public class AmbTypeInstantiation extends TypeNode_c implements Ambiguous {
         return n;
     }
 
+    public List<TypeNode> typeArguments() {
+        return typeArguments;
+    }
+
     protected <N extends AmbTypeInstantiation> N typeArguments(N n,
             List<TypeNode> typeArguments) {
         if (CollectionUtil.equals(n.typeArguments, typeArguments)) return n;
