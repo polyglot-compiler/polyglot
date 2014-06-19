@@ -82,7 +82,9 @@ public class JL5NodeFactory_c extends JL5AbstractNodeFactory_c {
     public AmbTypeInstantiation AmbTypeInstantiation(Position pos,
             TypeNode base, List<TypeNode> typeArguments) {
         AmbTypeInstantiation n =
-                new AmbTypeInstantiation(pos, base, typeArguments);
+                new AmbTypeInstantiation(pos,
+                                         base,
+                                         CollectionUtil.nonNullList(typeArguments));
         n = ext(n, extFactory().extAmbTypeInstantiation());
         return n;
     }
@@ -360,12 +362,7 @@ public class JL5NodeFactory_c extends JL5AbstractNodeFactory_c {
     @Override
     public New New(Position pos, Expr outer, List<TypeNode> typeArgs,
             TypeNode objectType, List<Expr> args, ClassBody body) {
-        New n =
-                super.New(pos,
-                          outer,
-                          objectType,
-                          CollectionUtil.nonNullList(args),
-                          body);
+        New n = super.New(pos, outer, objectType, args, body);
         JL5NewExt ext = (JL5NewExt) JL5Ext.ext(n);
         ext.typeArgs = CollectionUtil.nonNullList(typeArgs);
         return n;
@@ -385,7 +382,8 @@ public class JL5NodeFactory_c extends JL5AbstractNodeFactory_c {
     @Override
     public ParamTypeNode ParamTypeNode(Position pos, Id id,
             List<TypeNode> bounds) {
-        ParamTypeNode n = new ParamTypeNode_c(pos, id, bounds);
+        ParamTypeNode n =
+                new ParamTypeNode_c(pos, id, CollectionUtil.nonNullList(bounds));
         n = ext(n, extFactory().extParamTypeNode());
         return n;
     }

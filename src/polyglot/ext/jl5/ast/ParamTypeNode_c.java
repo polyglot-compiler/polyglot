@@ -62,6 +62,7 @@ public class ParamTypeNode_c extends TypeNode_c implements ParamTypeNode {
 
     public ParamTypeNode_c(Position pos, Id id, List<TypeNode> bounds) {
         super(pos);
+        assert bounds != null;
         this.id = id;
         this.bounds = ListUtil.copy(bounds, true);
     }
