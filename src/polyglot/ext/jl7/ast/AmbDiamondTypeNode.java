@@ -56,6 +56,10 @@ public class AmbDiamondTypeNode extends TypeNode_c implements Ambiguous {
         return base.name();
     }
 
+    public TypeNode base() {
+        return base;
+    }
+
     protected AmbDiamondTypeNode reconstruct(TypeNode base) {
         if (this.base != base) {
             AmbDiamondTypeNode n = (AmbDiamondTypeNode) this.copy();
