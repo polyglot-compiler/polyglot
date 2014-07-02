@@ -170,6 +170,10 @@ public class Report {
         noReporting = false;
     }
 
+    public static void setTopic(String topic, int level) {
+        if (reportTopics.containsKey(topic)) reportTopics.put(topic, level);
+    }
+
     /** Get the error queue, possibly creating it if not set. */
     public static ErrorQueue getQueue() {
         if (eq == null) {
@@ -183,7 +187,7 @@ public class Report {
         Report.eq = eq;
     }
 
-    protected static int level(String name) {
+    public static int level(String name) {
         Object i = reportTopics.get(name);
         if (i == null)
             return 0;

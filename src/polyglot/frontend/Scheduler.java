@@ -109,20 +109,20 @@ public abstract class Scheduler {
     public Scheduler(ExtensionInfo extInfo) {
         this.extInfo = extInfo;
 
-        this.jobs = new LinkedHashMap<>();
-        this.goals = new LinkedHashMap<>();
-        this.runCount = new LinkedHashMap<>();
-        this.inWorklist = new LinkedHashSet<>();
-        this.worklist = new LinkedList<>();
-        this.currentPass = null;
+        jobs = new LinkedHashMap<>();
+        goals = new LinkedHashMap<>();
+        runCount = new LinkedHashMap<>();
+        inWorklist = new LinkedHashSet<>();
+        worklist = new LinkedList<>();
+        currentPass = null;
     }
 
     public Collection<Job> commandLineJobs() {
-        return this.commandLineJobs;
+        return commandLineJobs;
     }
 
     public void setCommandLineJobs(Collection<Job> c) {
-        this.commandLineJobs = Collections.unmodifiableCollection(c);
+        commandLineJobs = Collections.unmodifiableCollection(c);
     }
 
     public boolean prerequisiteDependsOn(Goal goal, Goal subgoal) {
@@ -554,10 +554,10 @@ public abstract class Scheduler {
                     + goal);
         }
 
-        Integer countObj = this.runCount.get(goal);
+        Integer countObj = runCount.get(goal);
         int count = countObj != null ? countObj.intValue() : 0;
         count++;
-        this.runCount.put(goal, count);
+        runCount.put(goal, count);
 
         if (count >= MAX_RUN_COUNT) {
             String[] suffix = new String[] { "th", "st", "nd", "rd" };
@@ -573,19 +573,10 @@ public abstract class Scheduler {
             ErrorQueue eq = extInfo.compiler().errorQueue();
 
             // Go for one last loop with reporting enabled.
-            if (goal.equals(infiniteLoopGoal)) {
-                // We've gone around the loop once, abort the compiler.
-
-                if (Report.should_report("dump-dep-graph", 1))
-                    dumpInFlightDependenceGraph();
-                if (Report.should_report("dump-dep-graph", 1))
-                    dumpDependenceGraph();
-
-                eq.enqueue(ErrorInfo.INTERNAL_ERROR, message + "  Aborting.");
-                throw new Main.TerminationException(1);
-            }
-            else if (infiniteLoopGoal == null) {
+            if (infiniteLoopGoal == null) {
                 infiniteLoopGoal = goal;
+                infiniteFrontEnd = Report.level(Report.frontend);
+                infiniteDeps = Report.level("deps");
 
                 // Enable reporting.
                 Report.addTopic(Report.frontend, 4);
@@ -595,6 +586,24 @@ public abstract class Scheduler {
                            message
                                    + "  The compiler will attempt the goal one more time with reporting enabled, then abort.");
             }
+            else {
+                // Disable reporting.
+                Report.setTopic(Report.frontend, infiniteFrontEnd);
+                Report.setTopic("deps", infiniteDeps);
+
+                if (goal.equals(infiniteLoopGoal)) {
+                    // We've gone around the loop once, abort the compiler.
+
+                    if (Report.should_report("dump-dep-graph", 1))
+                        dumpInFlightDependenceGraph();
+                    if (Report.should_report("dump-dep-graph", 1))
+                        dumpDependenceGraph();
+
+                    eq.enqueue(ErrorInfo.INTERNAL_ERROR, message
+                            + "  Aborting.");
+                    throw new Main.TerminationException(1);
+                }
+            }
         }
 
         pass.resetTimers();
@@ -602,8 +611,8 @@ public abstract class Scheduler {
         boolean result = false;
 
         if (job == null || job.status()) {
-            Pass oldPass = this.currentPass;
-            this.currentPass = pass;
+            Pass oldPass = currentPass;
+            currentPass = pass;
             Report.pushTopic(pass.name());
 
             // Stop the timer on the old pass. */
@@ -704,7 +713,7 @@ public abstract class Scheduler {
                 }
 
                 Report.popTopic();
-                this.currentPass = oldPass;
+                currentPass = oldPass;
 
                 // Restart the timer on the old pass. */
                 if (oldPass != null) {
@@ -877,7 +886,7 @@ public abstract class Scheduler {
         if (job != null) return job;
 
         // No appropriate job yet exists, we will create one.
-        job = this.createSourceJob(source, ast);
+        job = createSourceJob(source, ast);
 
         // record the job in the map and the worklist.
         jobs.put(source, job);
@@ -907,6 +916,8 @@ public abstract class Scheduler {
 
     protected static final int MAX_RUN_COUNT = 200;
     protected Goal infiniteLoopGoal = null;
+    protected int infiniteFrontEnd;
+    protected int infiniteDeps;
 
     public boolean inInfiniteLoop() {
         return infiniteLoopGoal != null;
