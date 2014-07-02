@@ -34,6 +34,7 @@ import polyglot.types.ClassType;
 import polyglot.types.ConstructorInstance_c;
 import polyglot.types.Flags;
 import polyglot.types.Type;
+import polyglot.util.ListUtil;
 import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
 
@@ -46,9 +47,9 @@ public class JL5ConstructorInstance_c extends ConstructorInstance_c implements
 
     public JL5ConstructorInstance_c(JL5TypeSystem_c ts, Position pos,
             ClassType container, Flags flags, List<? extends Type> argTypes,
-            List<? extends Type> excTypes, List<TypeVariable> typeParams) {
+            List<? extends Type> excTypes, List<? extends TypeVariable> typeParams) {
         super(ts, pos, container, flags, argTypes, excTypes);
-        this.typeParams = typeParams;
+        this.typeParams = ListUtil.copy(typeParams, true);
         // Set the declaring procedure of the type vars
         for (TypeVariable tv : typeParams) {
             tv.setDeclaringProcedure((JL5ProcedureInstance) this.declaration());
