@@ -43,6 +43,7 @@ import polyglot.types.ProcedureInstance;
 import polyglot.types.ReferenceType;
 import polyglot.types.SemanticException;
 import polyglot.types.Type;
+import polyglot.util.ListUtil;
 import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
 
@@ -56,9 +57,9 @@ public class JL5MethodInstance_c extends MethodInstance_c implements
     public JL5MethodInstance_c(JL5TypeSystem ts, Position pos,
             ReferenceType container, Flags flags, Type returnType, String name,
             List<? extends Type> argTypes, List<? extends Type> excTypes,
-            List<TypeVariable> typeParams) {
+            List<? extends TypeVariable> typeParams) {
         super(ts, pos, container, flags, returnType, name, argTypes, excTypes);
-        this.typeParams = typeParams;
+        this.typeParams = ListUtil.copy(typeParams, true);
         // Set the declaring procedure of the type vars
         for (TypeVariable tv : typeParams) {
             tv.setDeclaringProcedure((JL5ProcedureInstance) this.declaration());
