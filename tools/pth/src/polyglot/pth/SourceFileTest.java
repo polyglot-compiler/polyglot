@@ -120,8 +120,11 @@ public class SourceFileTest extends AbstractTest {
         boolean addDestDirToCmdLine = false;
         {
             String s = getDestDir();
-            if (s != null)
+            if (s != null) {
                 destDir = new File(s);
+                if (!destDir.exists())
+                    destDir.mkdir();
+            }
             else {
                 destDir = new File("pthOutput");
 
@@ -483,7 +486,7 @@ public class SourceFileTest extends AbstractTest {
     }
 
     protected String getDestDir() {
-        return prependTestPath(destDir);
+        return destDir;
     }
 
     protected String getSourceDir() {
