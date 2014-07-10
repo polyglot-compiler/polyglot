@@ -3,8 +3,6 @@ package java_cup;
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.Stack;
 
 /** This class represents a state in the LALR viable prefix recognition machine.
@@ -276,6 +274,14 @@ public class lalr_state {
 
     private static lalr_state start_state;
     private static lalr_item start_itm;
+
+    public static lalr_state startState() {
+        return start_state;
+    }
+
+    public static lalr_item startItem() {
+        return start_itm;
+    }
 
     public static lalr_state build_machine(production start_prod)
             throws internal_error {
@@ -732,7 +738,10 @@ public class lalr_state {
         ByteArrayOutputStream ds = new ByteArrayOutputStream();
         if (Main.report_counterexamples) {
             message.append("    Example:    ");
-            report_shortest_path(itm1, message, new PrintStream(ds));
+            counterexamples.report_shortest_path(this,
+                                                 itm1,
+                                                 message,
+                                                 new PrintStream(ds));
             message.append(" (*)\n    Derivation: ");
             errOutput(message, ds);
             message.append(" ] (*)\n\n");
@@ -745,7 +754,10 @@ public class lalr_state {
         ds.reset();
         if (Main.report_counterexamples) {
             message.append("    Example:    ");
-            report_shortest_path(itm2, message, new PrintStream(ds));
+            counterexamples.report_shortest_path(this,
+                                                 itm2,
+                                                 message,
+                                                 new PrintStream(ds));
             message.append(" (*)\n    Derivation: ");
             errOutput(message, ds);
             message.append(" ] (*)\n");
@@ -792,7 +804,10 @@ public class lalr_state {
         ByteArrayOutputStream ds = new ByteArrayOutputStream();
         if (Main.report_counterexamples) {
             message.append("    Example:    ");
-            report_shortest_path(red_itm, message, new PrintStream(ds));
+            counterexamples.report_shortest_path(this,
+                                                 red_itm,
+                                                 message,
+                                                 new PrintStream(ds));
             message.append(" (*) ");
             message.append(terminal.find(conflict_sym).name());
             message.append("\n    Derivation: ");
@@ -820,7 +835,10 @@ public class lalr_state {
                     if (Main.report_counterexamples) {
                         ds.reset();
                         message.append("    Example:    ");
-                        report_shortest_path(itm, message, new PrintStream(ds));
+                        counterexamples.report_shortest_path(this,
+                                                             itm,
+                                                             message,
+                                                             new PrintStream(ds));
                         message.append(" (*) ");
                         message.append(right_of_dot(itm));
                         message.append("\n    Derivation: ");
@@ -842,173 +860,19 @@ public class lalr_state {
         ErrorManager.getManager().emit_warning(message.toString());
     }
 
-    /* ACM extension */
-    /** A Path represents a path through the DFA, with edges between different
-     *  items in the same state represented explicitly.
-     */
-
-    private interface Step {
-        void appendToReport(StringBuilder example_s, PrintStream derivation_s,
-                boolean first);
-    }
-
-    private static class TransStep implements Step {
-        public TransStep(lalr_transition tr) {
-            trans = tr;
-        }
-
-        lalr_transition trans;
-
-        @Override
-        public void appendToReport(StringBuilder example_s,
-                PrintStream derivation_s, boolean first) {
-            String name = trans.on_symbol().name();
-            if (!first) {
-                derivation_s.print(" ");
-                example_s.append(" ");
-            }
-            example_s.append(name);
-            derivation_s.print(name);
-        }
-    }
-
-    private static class ProdStep implements Step {
-        private production prod;
-
-        public ProdStep(production pr) {
-            prod = pr;
-        }
-
-        @Override
-        public void appendToReport(StringBuilder example_s,
-                PrintStream derivation_s, boolean first) {
-            /* production: don't add anything to the example */
-            if (!first) derivation_s.print(" ");
-            derivation_s.print("[" + prod.lhs().the_symbol().name() + "::=");
-        }
-    }
-
-    private static class Path {
-        Path(LinkedList<Step> t, StateItem si) {
-            steps = t;
-            last = si;
-        }
-
-        /** steps is a linked list of lalr_transition _or_ production.
-         * The latter are found in the path when a "push" occurs to work
-         * on a new production. */
-        LinkedList<Step> steps;
-        /** last is the last state and item reached on the path. */
-        StateItem last;
-    }
-
-    private static class StateItem {
-        lalr_state state;
-        lalr_item item;
-
-        StateItem(lalr_state s, lalr_item i) {
-            state = s;
-            item = i;
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            StateItem si2 = (StateItem) o;
-            return state.equals(si2.state) && item.equals(si2.item);
-        }
-
-        @Override
-        public int hashCode() {
-            return state.hashCode() + item.hashCode();
-        }
-    }
-
-    /**
-     * Report on example_s a textual version of the shortest
-     * path from the start state and start item to the current state
-     * and item itm. Report on derivation_s a more detailed
-     * textual description including derivation information.
-     * This output is useful for diagnosing conflicts in the grammar.
-     */
-    protected void report_shortest_path(lalr_item itm, StringBuilder example_s,
-            PrintStream derivation_s) throws internal_error {
-        Path p = shortest_path(itm);
-        boolean first = true;
-        for (Step s : p.steps) {
-            s.appendToReport(example_s, derivation_s, first);
-            first = false;
-        }
-    }
-
-    /**
-     * Find the shortest way to get from the start state and start item
-     * to the current state and the item "itm". The steps that change
-     * the item being transitioned on (corresponding to items formed
-     * through closure computation) are represented explicitly in this
-     * path.
-     */
-    protected Path shortest_path(lalr_item itm) throws internal_error {
-        HashSet<StateItem> visited = new HashSet<>();
-        LinkedList<Path> active = new LinkedList<>(); // work queue
-        StateItem start = new StateItem(start_state, start_itm);
-
-        // This is a breadth-first search over the state graph, building
-        // up paths as we go.
-        Path p = new Path(new LinkedList<Step>(), start);
-        active.add(p);
-        while (!active.isEmpty()) {
-            Path p1 = active.removeFirst();
-            StateItem si = p1.last;
-            if (visited.contains(si)) continue; /* saw it already */
-            visited.add(si);
-            lalr_state s = si.state;
-            lalr_item i = si.item;
-            if (equals(s) && itm.equals(i)) {
-                p = p1;
-                return p;
-            }
-            /* try taking transitions */
-            for (lalr_transition tr = s.transitions(); tr != null; tr =
-                    tr.next()) {
-                if (tr.on_symbol().equals(i.symbol_after_dot())) {
-                    lalr_item i2 = i.shift();
-                    LinkedList<Step> newt = new LinkedList<Step>(p1.steps);
-                    newt.add(new TransStep(tr));
-                    Path p2 = new Path(newt, new StateItem(tr.to_state(), i2));
-                    active.add(p2);
-                }
-            }
-            /* try changing the production (one step of closure) */
-            non_terminal nt = i.dot_before_nt();
-            if (nt != null) {
-                for (production prod : nt.productions()) {
-                    terminal_set new_lookaheads =
-                            i.calc_lookahead(i.lookahead());
-                    lalr_item i2 =
-                            new lalr_item(prod,
-                                          new terminal_set(new_lookaheads));
-                    LinkedList<Step> newt = new LinkedList<>(p1.steps);
-                    newt.add(new ProdStep(prod));
-                    Path p2 = new Path(newt, new StateItem(s, i2));
-                    active.add(p2);
-                }
-            }
-        }
-        return null;
-    }
-
+    /* Begin ACM extension */
     String right_of_dot(lalr_item itm) throws internal_error {
-        String result = "";
+        StringBuilder sb = new StringBuilder();
         production prod = itm.the_production();
         int pos = itm.dot_pos();
         for (int i = pos; i < prod.rhs_length(); i++) {
-            if (i != pos) result += " ";
+            if (i != pos) sb.append(" ");
             production_part pp = prod.rhs(i);
             if (pp instanceof symbol_part) {
-                result = result + ((symbol_part) pp).the_symbol().name();
+                sb.append(((symbol_part) pp).the_symbol().name());
             }
         }
-        return result;
+        return sb.toString();
     }
 
     /* End ACM extension */

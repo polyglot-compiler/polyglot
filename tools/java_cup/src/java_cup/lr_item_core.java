@@ -104,7 +104,8 @@ public class lr_item_core {
 
     /** Is the dot at the end of the production? */
     public boolean dot_at_end() {
-        return _dot_pos >= _the_production.rhs_length();
+        assert _dot_pos <= _the_production.rhs_length();
+        return _dot_pos == _the_production.rhs_length();
     }
 
     /*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . .*/
@@ -215,27 +216,28 @@ public class lr_item_core {
 
         for (int i = 0; i < _the_production.rhs_length(); i++) {
             /* do we need the dot before this one? */
+            if (i > 0) result += " ";
             if (i == _dot_pos) result += "(*) ";
 
             /* print the name of the part */
             if (_the_production.rhs(i) == null) {
-                result += "$$NULL$$ ";
+                result += "$$NULL$$";
             }
             else {
                 part = _the_production.rhs(i);
                 if (part == null)
-                    result += "$$NULL$$ ";
+                    result += "$$NULL$$";
                 else if (part.is_action())
-                    result += "{ACTION} ";
+                    result += "{ACTION}";
                 else if (((symbol_part) part).the_symbol() != null
                         && ((symbol_part) part).the_symbol().name() != null)
-                    result += ((symbol_part) part).the_symbol().name() + " ";
-                else result += "$$NULL$$ ";
+                    result += ((symbol_part) part).the_symbol().name();
+                else result += "$$NULL$$";
             }
         }
 
         /* put the dot after if needed */
-        if (_dot_pos == _the_production.rhs_length()) result += "(*) ";
+        if (_dot_pos == _the_production.rhs_length()) result += " (*)";
 
         return result;
     }

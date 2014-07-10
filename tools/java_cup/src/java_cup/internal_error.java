@@ -3,7 +3,7 @@ package java_cup;
 import polyglot.util.SerialVersionUID;
 
 /** Exception subclass for reporting internal errors in JavaCup. */
-public class internal_error extends Exception {
+public class internal_error extends Error {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
     /** Constructor with a message */
