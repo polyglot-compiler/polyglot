@@ -734,7 +734,7 @@ public class production {
         try {
             result = "production [" + index() + "]: ";
             result += lhs() != null ? lhs().toString() : "$$NULL-LHS$$";
-            result += " :: = ";
+            result += " ::= ";
             for (int i = 0; i < rhs_length(); i++)
                 result += rhs(i) + " ";
             result += ";";
