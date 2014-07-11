@@ -46,6 +46,7 @@ import polyglot.visit.ConstantChecker;
 import polyglot.visit.FlowGraph;
 import polyglot.visit.NodeVisitor;
 import polyglot.visit.PrettyPrinter;
+import polyglot.visit.Traverser;
 import polyglot.visit.TypeChecker;
 
 /**
@@ -62,22 +63,16 @@ public class Switch_c extends Stmt_c implements Switch {
     protected Expr expr;
     protected List<SwitchElement> elements;
 
-//    @Deprecated
     public Switch_c(Position pos, Expr expr, List<SwitchElement> elements) {
-        this(pos, expr, elements, null);
-    }
-
-    public Switch_c(Position pos, Expr expr, List<SwitchElement> elements,
-            Ext ext) {
-        super(pos, ext);
-        assert (expr != null && elements != null);
+        super(pos);
+        assert expr != null && elements != null;
         this.expr = expr;
         this.elements = ListUtil.copy(elements, true);
     }
 
     @Override
     public Expr expr() {
-        return this.expr;
+        return expr;
     }
 
     @Override
@@ -94,7 +89,7 @@ public class Switch_c extends Stmt_c implements Switch {
 
     @Override
     public List<SwitchElement> elements() {
-        return this.elements;
+        return elements;
     }
 
     @Override
@@ -125,7 +120,7 @@ public class Switch_c extends Stmt_c implements Switch {
     }
 
     @Override
-    public Context enterScope(Context c) {
+    public Context enterScope(Context c, Traverser v) {
         return c.pushBlock();
     }
 
@@ -151,7 +146,7 @@ public class Switch_c extends Stmt_c implements Switch {
                         && !ts.numericConversionValid(type,
                                                       tc.lang()
                                                         .constantValue(cExpr,
-                                                                       tc.lang()))) {
+                                                                       tc))) {
                     throw new SemanticException("Case constant \""
                                                         + cExpr
                                                         + "\" is not assignable to "
@@ -180,11 +175,11 @@ public class Switch_c extends Stmt_c implements Switch {
                     key = "default";
                     str = "default";
                 }
-                else if (!cc.lang().constantValueSet(expr, cc.lang())) {
+                else if (!cc.lang().constantValueSet(expr, cc)) {
                     // Constant not known yet; we'll try again later.
                     return this;
                 }
-                else if (cc.lang().isConstant(expr, cc.lang())) {
+                else if (cc.lang().isConstant(expr, cc)) {
                     key = new Long(c.value());
                     str = expr.toString() + " (" + c.value() + ")";
                 }
@@ -254,7 +249,7 @@ public class Switch_c extends Stmt_c implements Switch {
     }
 
     @Override
-    public Term firstChild() {
+    public Term firstChild(Traverser v) {
         return expr;
     }
 
@@ -289,7 +284,7 @@ public class Switch_c extends Stmt_c implements Switch {
 
     @Override
     public Node copy(NodeFactory nf) {
-        return nf.Switch(this.position, this.expr, this.elements);
+        return nf.Switch(position, expr, elements);
     }
 
 }

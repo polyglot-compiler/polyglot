@@ -29,6 +29,7 @@ package polyglot.visit;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Map;
 
 import polyglot.ast.Lang;
 import polyglot.ast.Node;
@@ -42,8 +43,8 @@ public abstract class HaltingVisitor extends NodeVisitor {
     protected Node bypassParent;
     protected Collection<Node> bypass;
 
-    protected HaltingVisitor(Lang lang) {
-        super(lang);
+    protected HaltingVisitor(Lang lang, Map<Lang, Lang> superLangMap) {
+        super(lang, superLangMap);
     }
 
     /** Return a new visitor that will bypass all children of node n. */
@@ -69,11 +70,11 @@ public abstract class HaltingVisitor extends NodeVisitor {
 
         // FIXME: Using a collection is expensive, but is hopefully not
         // often used.
-        if (this.bypass == null) {
+        if (bypass == null) {
             v.bypass = Collections.singleton(n);
         }
         else {
-            v.bypass = new ArrayList<>(this.bypass.size() + 1);
+            v.bypass = new ArrayList<>(bypass.size() + 1);
             v.bypass.addAll(bypass);
             v.bypass.add(n);
         }
@@ -89,11 +90,11 @@ public abstract class HaltingVisitor extends NodeVisitor {
 
         // FIXME: Using a collection is expensive, but is hopefully not
         // often used.
-        if (this.bypass == null) {
+        if (bypass == null) {
             v.bypass = new ArrayList<>(c);
         }
         else {
-            v.bypass = new ArrayList<>(this.bypass.size() + c.size());
+            v.bypass = new ArrayList<>(bypass.size() + c.size());
             v.bypass.addAll(bypass);
             v.bypass.addAll(c);
         }

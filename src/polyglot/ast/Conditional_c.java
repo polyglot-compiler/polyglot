@@ -39,6 +39,7 @@ import polyglot.visit.CFGBuilder;
 import polyglot.visit.FlowGraph;
 import polyglot.visit.NodeVisitor;
 import polyglot.visit.PrettyPrinter;
+import polyglot.visit.Traverser;
 import polyglot.visit.TypeChecker;
 
 /**
@@ -52,16 +53,10 @@ public class Conditional_c extends Expr_c implements Conditional {
     protected Expr consequent;
     protected Expr alternative;
 
-//    @Deprecated
     public Conditional_c(Position pos, Expr cond, Expr consequent,
             Expr alternative) {
-        this(pos, cond, consequent, alternative, null);
-    }
-
-    public Conditional_c(Position pos, Expr cond, Expr consequent,
-            Expr alternative, Ext ext) {
-        super(pos, ext);
-        assert (cond != null && consequent != null && alternative != null);
+        super(pos);
+        assert cond != null && consequent != null && alternative != null;
         this.cond = cond;
         this.consequent = consequent;
         this.alternative = alternative;
@@ -74,7 +69,7 @@ public class Conditional_c extends Expr_c implements Conditional {
 
     @Override
     public Expr cond() {
-        return this.cond;
+        return cond;
     }
 
     @Override
@@ -91,7 +86,7 @@ public class Conditional_c extends Expr_c implements Conditional {
 
     @Override
     public Expr consequent() {
-        return this.consequent;
+        return consequent;
     }
 
     @Override
@@ -108,7 +103,7 @@ public class Conditional_c extends Expr_c implements Conditional {
 
     @Override
     public Expr alternative() {
-        return this.alternative;
+        return alternative;
     }
 
     @Override
@@ -180,7 +175,7 @@ public class Conditional_c extends Expr_c implements Conditional {
                     && t2.isInt()
                     && ts.numericConversionValid(t1,
                                                  tc.lang()
-                                                   .constantValue(e2, tc.lang()))) {
+                                                   .constantValue(e2, tc))) {
                 return type(t1);
             }
 
@@ -188,7 +183,7 @@ public class Conditional_c extends Expr_c implements Conditional {
                     && t1.isInt()
                     && ts.numericConversionValid(t2,
                                                  tc.lang()
-                                                   .constantValue(e1, tc.lang()))) {
+                                                   .constantValue(e1, tc))) {
                 return type(t2);
             }
 
@@ -260,18 +255,18 @@ public class Conditional_c extends Expr_c implements Conditional {
     }
 
     @Override
-    public Term firstChild() {
+    public Term firstChild(Traverser v) {
         return cond;
     }
 
     @Override
     public <T> List<T> acceptCFG(CFGBuilder<?> v, List<T> succs) {
         boolean isBoolean = type.isBoolean();
-        if (v.lang().isConstant(cond, v.lang())) {
+        if (v.lang().isConstant(cond, v)) {
             // the condition is a constant expression.
             // That means that one branch is dead code
             boolean condConstantValue =
-                    ((Boolean) v.lang().constantValue(cond, v.lang())).booleanValue();
+                    ((Boolean) v.lang().constantValue(cond, v)).booleanValue();
             if (condConstantValue) {
                 // Condition is constantly true, only the consequent will be executed
                 v.visitCFG(cond, FlowGraph.EDGE_KEY_TRUE, consequent, ENTRY);
@@ -334,16 +329,17 @@ public class Conditional_c extends Expr_c implements Conditional {
     }
 
     @Override
-    public boolean isConstant(Lang lang) {
-        return lang.isConstant(cond, lang) && lang.isConstant(consequent, lang)
-                && lang.isConstant(alternative, lang);
+    public boolean isConstant(Traverser v) {
+        return v.lang().isConstant(cond, v)
+                && v.lang().isConstant(consequent, v)
+                && v.lang().isConstant(alternative, v);
     }
 
     @Override
-    public Object constantValue(Lang lang) {
-        Object cond_ = lang.constantValue(cond, lang);
-        Object then_ = lang.constantValue(consequent, lang);
-        Object else_ = lang.constantValue(alternative, lang);
+    public Object constantValue(Traverser v) {
+        Object cond_ = v.lang().constantValue(cond, v);
+        Object then_ = v.lang().constantValue(consequent, v);
+        Object else_ = v.lang().constantValue(alternative, v);
 
         if (cond_ instanceof Boolean && then_ != null && else_ != null) {
             boolean c = ((Boolean) cond_).booleanValue();
@@ -360,10 +356,7 @@ public class Conditional_c extends Expr_c implements Conditional {
 
     @Override
     public Node copy(NodeFactory nf) {
-        return nf.Conditional(this.position,
-                              this.cond,
-                              this.consequent,
-                              this.alternative);
+        return nf.Conditional(position, cond, consequent, alternative);
     }
 
 }

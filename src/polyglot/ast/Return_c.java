@@ -46,6 +46,7 @@ import polyglot.visit.AscriptionVisitor;
 import polyglot.visit.CFGBuilder;
 import polyglot.visit.NodeVisitor;
 import polyglot.visit.PrettyPrinter;
+import polyglot.visit.Traverser;
 import polyglot.visit.TypeChecker;
 
 /**
@@ -58,20 +59,14 @@ public class Return_c extends Stmt_c implements Return {
 
     protected Expr expr;
 
-//    @Deprecated
     public Return_c(Position pos, Expr expr) {
-        this(pos, expr, null);
-    }
-
-    public Return_c(Position pos, Expr expr, Ext ext) {
-        super(pos, ext);
-        assert (true); // expr may be null
+        super(pos);
         this.expr = expr;
     }
 
     @Override
     public Expr expr() {
-        return this.expr;
+        return expr;
     }
 
     @Override
@@ -141,8 +136,7 @@ public class Return_c extends Stmt_c implements Return {
             }
 
             if (ts.numericConversionValid(fi.returnType(),
-                                          tc.lang().constantValue(expr,
-                                                                  tc.lang()))) {
+                                          tc.lang().constantValue(expr, tc))) {
                 return this;
             }
 
@@ -185,7 +179,7 @@ public class Return_c extends Stmt_c implements Return {
     }
 
     @Override
-    public Term firstChild() {
+    public Term firstChild(Traverser v) {
         if (expr != null) return expr;
         return null;
     }
@@ -202,7 +196,7 @@ public class Return_c extends Stmt_c implements Return {
 
     @Override
     public Node copy(NodeFactory nf) {
-        return nf.Return(this.position, this.expr);
+        return nf.Return(position, expr);
     }
 
 }

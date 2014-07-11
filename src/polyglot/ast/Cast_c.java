@@ -39,6 +39,7 @@ import polyglot.visit.AscriptionVisitor;
 import polyglot.visit.CFGBuilder;
 import polyglot.visit.NodeVisitor;
 import polyglot.visit.PrettyPrinter;
+import polyglot.visit.Traverser;
 import polyglot.visit.TypeChecker;
 
 /**
@@ -52,14 +53,9 @@ public class Cast_c extends Expr_c implements Cast {
     protected TypeNode castType;
     protected Expr expr;
 
-//    @Deprecated
     public Cast_c(Position pos, TypeNode castType, Expr expr) {
-        this(pos, castType, expr, null);
-    }
-
-    public Cast_c(Position pos, TypeNode castType, Expr expr, Ext ext) {
-        super(pos, ext);
-        assert (castType != null && expr != null);
+        super(pos);
+        assert castType != null && expr != null;
         this.castType = castType;
         this.expr = expr;
     }
@@ -71,7 +67,7 @@ public class Cast_c extends Expr_c implements Cast {
 
     @Override
     public TypeNode castType() {
-        return this.castType;
+        return castType;
     }
 
     @Override
@@ -88,7 +84,7 @@ public class Cast_c extends Expr_c implements Cast {
 
     @Override
     public Expr expr() {
-        return this.expr;
+        return expr;
     }
 
     @Override
@@ -167,7 +163,7 @@ public class Cast_c extends Expr_c implements Cast {
     }
 
     @Override
-    public Term firstChild() {
+    public Term firstChild(Traverser v) {
         return expr;
     }
 
@@ -179,7 +175,7 @@ public class Cast_c extends Expr_c implements Cast {
     }
 
     @Override
-    public List<Type> throwTypes(TypeSystem ts) {
+    public List<Type> throwTypes(TypeSystem ts, Traverser v) {
         if (expr.type().isReference()) {
             return Collections.singletonList((Type) ts.ClassCastException());
         }
@@ -188,29 +184,29 @@ public class Cast_c extends Expr_c implements Cast {
     }
 
     @Override
-    public boolean isConstant(Lang lang) {
-        return lang.isConstant(expr, lang) && castType.type().isPrimitive();
+    public boolean isConstant(Traverser v) {
+        return v.lang().isConstant(expr, v) && castType.type().isPrimitive();
     }
 
     @Override
-    public Object constantValue(Lang lang) {
-        Object v = lang.constantValue(expr, lang);
+    public Object constantValue(Traverser v) {
+        Object val = v.lang().constantValue(expr, v);
 
-        if (v == null) {
+        if (val == null) {
             return null;
         }
 
-        if (v instanceof Boolean) {
-            if (castType.type().isBoolean()) return v;
+        if (val instanceof Boolean) {
+            if (castType.type().isBoolean()) return val;
         }
 
-        if (v instanceof String) {
+        if (val instanceof String) {
             TypeSystem ts = castType.type().typeSystem();
-            if (castType.type().typeEquals(ts.String())) return v;
+            if (castType.type().typeEquals(ts.String())) return val;
         }
 
-        if (v instanceof Double) {
-            double vv = ((Double) v).doubleValue();
+        if (val instanceof Double) {
+            double vv = ((Double) val).doubleValue();
 
             if (castType.type().isDouble()) return new Double(vv);
             if (castType.type().isFloat()) return new Float((float) vv);
@@ -221,8 +217,8 @@ public class Cast_c extends Expr_c implements Cast {
             if (castType.type().isByte()) return new Byte((byte) vv);
         }
 
-        if (v instanceof Float) {
-            float vv = ((Float) v).floatValue();
+        if (val instanceof Float) {
+            float vv = ((Float) val).floatValue();
 
             if (castType.type().isDouble()) return new Double(vv);
             if (castType.type().isFloat()) return new Float(vv);
@@ -233,8 +229,8 @@ public class Cast_c extends Expr_c implements Cast {
             if (castType.type().isByte()) return new Byte((byte) vv);
         }
 
-        if (v instanceof Number) {
-            long vv = ((Number) v).longValue();
+        if (val instanceof Number) {
+            long vv = ((Number) val).longValue();
 
             if (castType.type().isDouble()) return new Double(vv);
             if (castType.type().isFloat()) return new Float(vv);
@@ -245,8 +241,8 @@ public class Cast_c extends Expr_c implements Cast {
             if (castType.type().isByte()) return new Byte((byte) vv);
         }
 
-        if (v instanceof Character) {
-            char vv = ((Character) v).charValue();
+        if (val instanceof Character) {
+            char vv = ((Character) val).charValue();
 
             if (castType.type().isDouble()) return new Double(vv);
             if (castType.type().isFloat()) return new Float(vv);
@@ -263,7 +259,7 @@ public class Cast_c extends Expr_c implements Cast {
 
     @Override
     public Node copy(NodeFactory nf) {
-        return nf.Cast(this.position, this.castType, this.expr);
+        return nf.Cast(position, castType, expr);
     }
 
 }

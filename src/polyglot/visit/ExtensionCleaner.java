@@ -61,10 +61,11 @@ public class ExtensionCleaner extends NodeVisitor {
     protected ExtensionInfo javaExt;
 
     public ExtensionCleaner(ExtensionInfo javaExt) {
-        super(javaExt.nodeFactory().lang());
+        super(javaExt.nodeFactory().lang(), javaExt.nodeFactory()
+                                                   .superLangMap());
         this.javaExt = javaExt;
-        this.nf = javaExt.nodeFactory();
-        this.ts = javaExt.typeSystem();
+        nf = javaExt.nodeFactory();
+        ts = javaExt.typeSystem();
     }
 
     @Override

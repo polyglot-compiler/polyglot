@@ -48,21 +48,16 @@ public class AmbTypeNode_c extends TypeNode_c implements AmbTypeNode {
     protected QualifierNode qual;
     protected Id name;
 
-//    @Deprecated
     public AmbTypeNode_c(Position pos, QualifierNode qual, Id name) {
-        this(pos, qual, name, null);
-    }
-
-    public AmbTypeNode_c(Position pos, QualifierNode qual, Id name, Ext ext) {
-        super(pos, ext);
-        assert (name != null); // qual may be null
+        super(pos);
+        assert name != null; // qual may be null
         this.qual = qual;
         this.name = name;
     }
 
     @Override
     public Id id() {
-        return this.name;
+        return name;
     }
 
     @Override
@@ -79,7 +74,7 @@ public class AmbTypeNode_c extends TypeNode_c implements AmbTypeNode {
 
     @Override
     public String name() {
-        return this.name.id();
+        return name.id();
     }
 
     @Override
@@ -89,7 +84,7 @@ public class AmbTypeNode_c extends TypeNode_c implements AmbTypeNode {
 
     @Override
     public QualifierNode qual() {
-        return this.qual;
+        return qual;
     }
 
     @Override
@@ -175,6 +170,6 @@ public class AmbTypeNode_c extends TypeNode_c implements AmbTypeNode {
 
     @Override
     public Node copy(NodeFactory nf) {
-        return nf.AmbTypeNode(this.position, this.qual, this.name);
+        return nf.AmbTypeNode(position, qual, name);
     }
 }

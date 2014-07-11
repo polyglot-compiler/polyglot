@@ -38,6 +38,7 @@ import polyglot.visit.AscriptionVisitor;
 import polyglot.visit.CFGBuilder;
 import polyglot.visit.NodeVisitor;
 import polyglot.visit.PrettyPrinter;
+import polyglot.visit.Traverser;
 import polyglot.visit.TypeChecker;
 
 /**
@@ -50,14 +51,9 @@ public class Instanceof_c extends Expr_c implements Instanceof {
     protected Expr expr;
     protected TypeNode compareType;
 
-//    @Deprecated
     public Instanceof_c(Position pos, Expr expr, TypeNode compareType) {
-        this(pos, expr, compareType, null);
-    }
-
-    public Instanceof_c(Position pos, Expr expr, TypeNode compareType, Ext ext) {
-        super(pos, ext);
-        assert (expr != null && compareType != null);
+        super(pos);
+        assert expr != null && compareType != null;
         this.expr = expr;
         this.compareType = compareType;
     }
@@ -69,7 +65,7 @@ public class Instanceof_c extends Expr_c implements Instanceof {
 
     @Override
     public Expr expr() {
-        return this.expr;
+        return expr;
     }
 
     @Override
@@ -86,7 +82,7 @@ public class Instanceof_c extends Expr_c implements Instanceof {
 
     @Override
     public TypeNode compareType() {
-        return this.compareType;
+        return compareType;
     }
 
     @Override
@@ -158,7 +154,7 @@ public class Instanceof_c extends Expr_c implements Instanceof {
     }
 
     @Override
-    public Term firstChild() {
+    public Term firstChild(Traverser v) {
         return expr;
     }
 
@@ -171,7 +167,7 @@ public class Instanceof_c extends Expr_c implements Instanceof {
 
     @Override
     public Node copy(NodeFactory nf) {
-        return nf.Instanceof(this.position, this.expr, this.compareType);
+        return nf.Instanceof(position, expr, compareType);
     }
 
 }

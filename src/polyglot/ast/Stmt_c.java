@@ -36,12 +36,7 @@ import polyglot.util.SerialVersionUID;
 public abstract class Stmt_c extends Term_c implements Stmt {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
-    @Deprecated
     public Stmt_c(Position pos) {
-        this(pos, null);
-    }
-
-    public Stmt_c(Position pos, Ext ext) {
-        super(pos, ext);
+        super(pos);
     }
 }

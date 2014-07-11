@@ -64,10 +64,10 @@ public class JL5ConditionalExt extends JL5ExprExt {
 
         // If one of the second and third operands is of type boolean and the type of 
         // the other is of type Boolean, then the type of the conditional expression is bool- ean.
-        if ((ts.typeEquals(t1, ts.Boolean()) && ts.typeEquals(t2,
-                                                              ts.typeForName("java.lang.Boolean")))
-                || (ts.typeEquals(t2, ts.Boolean()) && ts.typeEquals(t1,
-                                                                     ts.typeForName("java.lang.Boolean")))) {
+        if (ts.typeEquals(t1, ts.Boolean())
+                && ts.typeEquals(t2, ts.typeForName("java.lang.Boolean"))
+                || ts.typeEquals(t2, ts.Boolean())
+                && ts.typeEquals(t1, ts.typeForName("java.lang.Boolean"))) {
             return c.type(ts.Boolean());
         }
 
@@ -111,7 +111,7 @@ public class JL5ConditionalExt extends JL5ExprExt {
                     && t2.isInt()
                     && ts.numericConversionValid(t1,
                                                  tc.lang()
-                                                   .constantValue(e2, tc.lang()))) {
+                                                   .constantValue(e2, tc))) {
                 return c.type(t1);
             }
 
@@ -119,7 +119,7 @@ public class JL5ConditionalExt extends JL5ExprExt {
                     && t1.isInt()
                     && ts.numericConversionValid(t2,
                                                  tc.lang()
-                                                   .constantValue(e1, tc.lang()))) {
+                                                   .constantValue(e1, tc))) {
                 return c.type(t2);
             }
 
@@ -130,14 +130,14 @@ public class JL5ConditionalExt extends JL5ExprExt {
                     && t2.isInt()
                     && ts.numericConversionValid(ts.Byte(),
                                                  tc.lang()
-                                                   .constantValue(e2, tc.lang()))) {
+                                                   .constantValue(e2, tc))) {
                 return c.type(ts.Byte());
             }
             if (t2.equals(ts.typeForName("java.lang.Byte"))
                     && t1.isInt()
                     && ts.numericConversionValid(ts.Byte(),
                                                  tc.lang()
-                                                   .constantValue(e1, tc.lang()))) {
+                                                   .constantValue(e1, tc))) {
                 return c.type(ts.Byte());
             }
 
@@ -148,14 +148,14 @@ public class JL5ConditionalExt extends JL5ExprExt {
                     && t2.isInt()
                     && ts.numericConversionValid(ts.Short(),
                                                  tc.lang()
-                                                   .constantValue(e2, tc.lang()))) {
+                                                   .constantValue(e2, tc))) {
                 return c.type(ts.Short());
             }
             if (t2.equals(ts.typeForName("java.lang.Short"))
                     && t1.isInt()
                     && ts.numericConversionValid(ts.Short(),
                                                  tc.lang()
-                                                   .constantValue(e1, tc.lang()))) {
+                                                   .constantValue(e1, tc))) {
                 return c.type(ts.Short());
             }
 
@@ -166,14 +166,14 @@ public class JL5ConditionalExt extends JL5ExprExt {
                     && t2.isInt()
                     && ts.numericConversionValid(ts.Char(),
                                                  tc.lang()
-                                                   .constantValue(e2, tc.lang()))) {
+                                                   .constantValue(e2, tc))) {
                 return c.type(ts.Char());
             }
             if (t2.equals(ts.typeForName("java.lang.Character"))
                     && t1.isInt()
                     && ts.numericConversionValid(ts.Char(),
                                                  tc.lang()
-                                                   .constantValue(e1, tc.lang()))) {
+                                                   .constantValue(e1, tc))) {
                 return c.type(ts.Char());
             }
 

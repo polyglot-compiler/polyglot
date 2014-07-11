@@ -43,6 +43,7 @@ import polyglot.visit.CFGBuilder;
 import polyglot.visit.ExceptionChecker;
 import polyglot.visit.NodeVisitor;
 import polyglot.visit.PrettyPrinter;
+import polyglot.visit.Traverser;
 
 /**
  * An immutable representation of a {@code try} block, one or more
@@ -55,15 +56,9 @@ public class Try_c extends Stmt_c implements Try, TryOps {
     protected List<Catch> catchBlocks;
     protected Block finallyBlock;
 
-//    @Deprecated
     public Try_c(Position pos, Block tryBlock, List<Catch> catchBlocks,
             Block finallyBlock) {
-        this(pos, tryBlock, catchBlocks, finallyBlock, null);
-    }
-
-    public Try_c(Position pos, Block tryBlock, List<Catch> catchBlocks,
-            Block finallyBlock, Ext ext) {
-        super(pos, ext);
+        super(pos);
         assert_(pos, tryBlock, catchBlocks, finallyBlock);
         this.tryBlock = tryBlock;
         this.catchBlocks = ListUtil.copy(catchBlocks, true);
@@ -72,13 +67,13 @@ public class Try_c extends Stmt_c implements Try, TryOps {
 
     protected void assert_(Position pos, Block tryBlock,
             List<Catch> catchBlocks, Block finallyBlock) {
-        assert (tryBlock != null && catchBlocks != null); // finallyBlock may be null, catchBlocks empty
-        assert (!catchBlocks.isEmpty() || finallyBlock != null); // must be either try-catch or try(-catch)-finally
+        assert tryBlock != null && catchBlocks != null; // finallyBlock may be null, catchBlocks empty
+        assert !catchBlocks.isEmpty() || finallyBlock != null; // must be either try-catch or try(-catch)-finally
     }
 
     @Override
     public Block tryBlock() {
-        return this.tryBlock;
+        return tryBlock;
     }
 
     @Override
@@ -95,7 +90,7 @@ public class Try_c extends Stmt_c implements Try, TryOps {
 
     @Override
     public List<Catch> catchBlocks() {
-        return this.catchBlocks;
+        return catchBlocks;
     }
 
     @Override
@@ -112,7 +107,7 @@ public class Try_c extends Stmt_c implements Try, TryOps {
 
     @Override
     public Block finallyBlock() {
-        return this.finallyBlock;
+        return finallyBlock;
     }
 
     @Override
@@ -168,7 +163,7 @@ public class Try_c extends Stmt_c implements Try, TryOps {
     @Override
     public Node exceptionCheck(ExceptionChecker ec) throws SemanticException {
         ExceptionChecker ecTryBlockEntry = ec;
-        if (this.finallyBlock != null && !this.finallyBlock.reachable()) {
+        if (finallyBlock != null && !finallyBlock.reachable()) {
             // the finally block cannot terminate normally.
             // This implies that exceptions thrown in the try and catch
             // blocks will not propagate upwards.
@@ -194,7 +189,7 @@ public class Try_c extends Stmt_c implements Try, TryOps {
         Block finallyBlock = ec.lang().exceptionCheckFinallyBlock(n, ec);
         n = finallyBlock(n, finallyBlock);
 
-        for (Type exc : ec.lang().throwTypes(n, ec.typeSystem())) {
+        for (Type exc : ec.lang().throwTypes(n, ec.typeSystem(), ec)) {
             ec.throwsException(exc, position());
         }
         n = exceptions(n, ec.throwsSet());
@@ -204,7 +199,7 @@ public class Try_c extends Stmt_c implements Try, TryOps {
 
     @Override
     public Block exceptionCheckTryBlock(ExceptionChecker ec) {
-        return this.visitChild(this.tryBlock,
+        return this.visitChild(tryBlock,
                                ec.lang()
                                  .constructTryBlockExceptionChecker(this, ec));
     }
@@ -219,7 +214,7 @@ public class Try_c extends Stmt_c implements Try, TryOps {
         // an ExceptionChecker indicating that they catch exceptions of the appropriate
         // type.
         for (ListIterator<Catch> i =
-                this.catchBlocks.listIterator(this.catchBlocks.size()); i.hasPrevious();) {
+                catchBlocks.listIterator(catchBlocks.size()); i.hasPrevious();) {
             Catch cb = i.previous();
             Type catchType = cb.catchType();
 
@@ -234,7 +229,7 @@ public class Try_c extends Stmt_c implements Try, TryOps {
         // Walk through our catch blocks, making sure that they each can 
         // catch something.
         SubtypeSet caught = new SubtypeSet(ec.typeSystem().Throwable());
-        for (Catch cb : this.catchBlocks) {
+        for (Catch cb : catchBlocks) {
             Type catchType = cb.catchType();
 
             // Check if the exception has already been caught.
@@ -261,12 +256,12 @@ public class Try_c extends Stmt_c implements Try, TryOps {
 
     @Override
     public Block exceptionCheckFinallyBlock(ExceptionChecker ec) {
-        if (this.finallyBlock == null) {
+        if (finallyBlock == null) {
             return null;
         }
-        Block fb = this.visitChild(this.finallyBlock, ec.push());
+        Block fb = this.visitChild(finallyBlock, ec.push());
 
-        if (!this.finallyBlock.reachable()) {
+        if (!finallyBlock.reachable()) {
             // warn the user
 //              ###Don't warn, some versions of javac don't.              
 //              ec.errorQueue().enqueue(ErrorInfo.WARNING,
@@ -321,7 +316,7 @@ public class Try_c extends Stmt_c implements Try, TryOps {
     }
 
     @Override
-    public Term firstChild() {
+    public Term firstChild(Traverser v) {
         return tryBlock;
     }
 
@@ -362,10 +357,7 @@ public class Try_c extends Stmt_c implements Try, TryOps {
 
     @Override
     public Node copy(NodeFactory nf) {
-        return nf.Try(this.position,
-                      this.tryBlock,
-                      this.catchBlocks,
-                      this.finallyBlock);
+        return nf.Try(position, tryBlock, catchBlocks, finallyBlock);
     }
 
 }

@@ -26,6 +26,7 @@
 package polyglot.ext.jl7.ast;
 
 import polyglot.ast.Ambiguous;
+import polyglot.ast.JLang;
 import polyglot.ast.Node;
 import polyglot.ast.TypeNode;
 import polyglot.ast.TypeNode_c;
@@ -70,6 +71,11 @@ public class AmbDiamondTypeNode extends TypeNode_c implements Ambiguous {
     }
 
     @Override
+    public JLang lang() {
+        return J7Lang_c.instance;
+    }
+
+    @Override
     public Node visitChildren(NodeVisitor v) {
         TypeNode base = visitChild(this.base, v);
         return reconstruct(base);
@@ -83,7 +89,7 @@ public class AmbDiamondTypeNode extends TypeNode_c implements Ambiguous {
         if (base instanceof RawClass) {
             JL5ParsedClassType ct = ((RawClass) base).base();
             Type t = ts.diamondType(position(), ct);
-            return ar.nodeFactory().CanonicalTypeNode(this.position, t);
+            return ar.nodeFactory().CanonicalTypeNode(position, t);
         }
         throw new SemanticException("The type "
                 + base

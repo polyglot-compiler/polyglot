@@ -46,14 +46,9 @@ public class CanonicalTypeNode_c extends TypeNode_c implements
         CanonicalTypeNode {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
-//    @Deprecated
     public CanonicalTypeNode_c(Position pos, Type type) {
-        this(pos, type, null);
-    }
-
-    public CanonicalTypeNode_c(Position pos, Type type, Ext ext) {
-        super(pos, ext);
-        assert (type != null);
+        super(pos);
+        assert type != null;
         this.type = type;
     }
 
@@ -122,8 +117,7 @@ public class CanonicalTypeNode_c extends TypeNode_c implements
 
     @Override
     public Node copy(NodeFactory nf) {
-        CanonicalTypeNode result =
-                nf.CanonicalTypeNode(this.position, this.type);
+        CanonicalTypeNode result = nf.CanonicalTypeNode(position, type);
         return result;
     }
 

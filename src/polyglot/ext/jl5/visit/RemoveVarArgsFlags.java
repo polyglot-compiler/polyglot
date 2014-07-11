@@ -39,7 +39,7 @@ import polyglot.visit.NodeVisitor;
 public class RemoveVarArgsFlags extends NodeVisitor {
 
     public RemoveVarArgsFlags(Job job, TypeSystem ts, NodeFactory nf) {
-        super(nf.lang());
+        super(nf.lang(), nf.superLangMap());
     }
 
     @Override

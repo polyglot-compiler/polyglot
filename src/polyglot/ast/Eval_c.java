@@ -37,6 +37,7 @@ import polyglot.visit.AscriptionVisitor;
 import polyglot.visit.CFGBuilder;
 import polyglot.visit.NodeVisitor;
 import polyglot.visit.PrettyPrinter;
+import polyglot.visit.Traverser;
 
 /**
  * An {@code Eval} wraps an expression in the context of a statement.
@@ -47,20 +48,15 @@ public class Eval_c extends Stmt_c implements Eval {
 
     protected Expr expr;
 
-//    @Deprecated
     public Eval_c(Position pos, Expr expr) {
-        this(pos, expr, null);
-    }
-
-    public Eval_c(Position pos, Expr expr, Ext ext) {
-        super(pos, ext);
-        assert (expr != null);
+        super(pos);
+        assert expr != null;
         this.expr = expr;
     }
 
     @Override
     public Expr expr() {
-        return this.expr;
+        return expr;
     }
 
     @Override
@@ -117,7 +113,7 @@ public class Eval_c extends Stmt_c implements Eval {
     }
 
     @Override
-    public Term firstChild() {
+    public Term firstChild(Traverser v) {
         return expr;
     }
 
@@ -129,7 +125,7 @@ public class Eval_c extends Stmt_c implements Eval {
 
     @Override
     public Node copy(NodeFactory nf) {
-        return nf.Eval(this.position, this.expr);
+        return nf.Eval(position, expr);
     }
 
 }

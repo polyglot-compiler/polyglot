@@ -30,7 +30,9 @@ import java.io.OutputStream;
 import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import polyglot.frontend.Compiler;
 import polyglot.frontend.ExtensionInfo;
@@ -53,6 +55,7 @@ import polyglot.visit.ExceptionChecker;
 import polyglot.visit.NodeVisitor;
 import polyglot.visit.PrettyPrinter;
 import polyglot.visit.Translator;
+import polyglot.visit.Traverser;
 import polyglot.visit.TypeBuilder;
 import polyglot.visit.TypeChecker;
 
@@ -68,23 +71,16 @@ public abstract class Node_c implements Node {
     protected Position position;
     @Deprecated
     protected JLDel del;
+    @Deprecated
     protected Ext ext;
     protected boolean error;
 
-    @Deprecated
-    public Node_c(Position pos) {
-        this(pos, null);
-    }
+    protected Lang primaryLang;
+    protected Map<Lang, NodeOps> nodeMap;
 
-    public Node_c(Position pos, Ext ext) {
+    public Node_c(Position pos) {
         assert pos != null;
         position = pos;
-        this.ext = ext;
-        if (ext != null) {
-            ext.init(this);
-            ext.initPred(this);
-        }
-        error = false;
     }
 
     @Deprecated
@@ -116,6 +112,7 @@ public abstract class Node_c implements Node {
         return n;
     }
 
+    @Deprecated
     @Override
     public Ext ext(int n) {
         if (n < 1) throw new InternalCompilerError("n must be >= 1");
@@ -135,12 +132,13 @@ public abstract class Node_c implements Node {
         return this.ext(n - 1, prev.ext(ext));
     }
 
+    @Deprecated
     @Override
     public Ext ext() {
         return ext;
     }
 
-//    @Deprecated
+    @Deprecated
     @Override
     public Node ext(Ext ext) {
         if (this.ext == ext) {
@@ -156,7 +154,6 @@ public abstract class Node_c implements Node {
 
         if (n.ext != null) {
             n.ext.init(n);
-            n.ext.initPred(n);
         }
 
         this.ext = old;
@@ -164,29 +161,49 @@ public abstract class Node_c implements Node {
         return n;
     }
 
-    @SuppressWarnings("deprecation")
     @Override
     public Node copy() {
         try {
             Node_c n = (Node_c) super.clone();
+            n.nodeMap = null;
 
-            // XXX Deprecated
-            if (del != null) {
-                n.del = del.copy();
-                n.del.init(n);
+            if (nodeMap != null && lang() == primaryLang) {
+                Map<Lang, NodeOps> nodeMap = new HashMap<>(this.nodeMap.size());
+                for (Map.Entry<Lang, NodeOps> entry : this.nodeMap.entrySet()) {
+                    Lang k = entry.getKey();
+                    NodeOps v = entry.getValue();
+                    if (v == this)
+                        v = n;
+                    else if (v instanceof Ext)
+                        v = Copy.Util.copy((Ext) v);
+                    else v = Copy.Util.copy((Node) v);
+                    v.initNodeMap(nodeMap);
+                    nodeMap.put(k, v);
+                }
             }
 
-            if (ext != null) {
-                n.ext = ext.copy();
-                n.ext.init(n);
-                n.ext.initPred(n);
-            }
+            n = legacyCopy(n);
 
             return n;
         }
         catch (CloneNotSupportedException e) {
             throw new InternalCompilerError("Java clone() weirdness.");
         }
+    }
+
+    @SuppressWarnings("deprecation")
+    private final Node_c legacyCopy(Node_c n) {
+        if (del != null) {
+            n.del = del.copy();
+            n.del.init(n);
+        }
+
+        if (ext != null) {
+            n.ext = ext.copy();
+            n.ext.init(n);
+        }
+
+        return n;
     }
 
     protected <N extends Node> N copyIfNeeded(N n) {
@@ -239,15 +256,6 @@ public abstract class Node_c implements Node {
     }
 
     @Override
-    public <N extends Node> N visitChild(N n, NodeVisitor v) {
-        if (n == null) {
-            return null;
-        }
-
-        return v.visitEdge(this, n);
-    }
-
-    @Override
     public Node visit(NodeVisitor v) {
         return v.visitEdge(null, this);
     }
@@ -283,15 +291,46 @@ public abstract class Node_c implements Node {
         return n;
     }
 
-    /**
-     * Visit all the elements of a list.
-     * @param l The list to visit.
-     * @param v The visitor to use.
-     * @return A new list with each element from the old list
-     *         replaced by the result of visiting that element.
-     *         If {@code l} is {@code null},
-     *         {@code null} is returned.
-     */
+    @Override
+    public JLang lang() {
+        return JLang_c.instance;
+    }
+
+    @Override
+    public final void initPrimaryLang(Lang primaryLang) {
+        if (this.primaryLang != null)
+            throw new InternalCompilerError("Already initialized.");
+        this.primaryLang = primaryLang;
+    }
+
+    @Override
+    public final void initNodeMap(Map<Lang, NodeOps> nodeMap) {
+        if (this.nodeMap != null)
+            throw new InternalCompilerError("Already initialized.");
+        this.nodeMap = nodeMap;
+    }
+
+    @Override
+    public final NodeOps node(Lang lang) {
+        if (nodeMap == null)
+            throw new InternalCompilerError("Uninitialized node directory for "
+                    + this + " (" + getClass() + ")");
+        NodeOps node = nodeMap.get(lang);
+        if (node == null)
+            throw new InternalCompilerError("No node corresponding to " + lang
+                    + " (" + getClass() + ") for " + this);
+        return node;
+    }
+
+    @Override
+    public <N extends Node> N visitChild(N n, NodeVisitor v) {
+        if (n == null) {
+            return null;
+        }
+
+        return v.visitEdge(this, n);
+    }
+
     @Override
     public <T extends Node> List<T> visitList(List<T> l, NodeVisitor v) {
         if (l == null) {
@@ -316,37 +355,53 @@ public abstract class Node_c implements Node {
     }
 
     @Override
-    public final JLang lang() {
-        return JLang_c.instance;
-    }
-
-    @Override
     public Node visitChildren(NodeVisitor v) {
         return this;
     }
 
-    /**
-     * Push a new scope upon entering this node, and add any declarations to the
-     * context that should be in scope when visiting children of this node.
-     * @param c the current {@code Context}
-     * @return the {@code Context} to be used for visiting this node. 
-     */
+    @Deprecated
+    protected static final Traverser delTraverser = new Traverser() {
+        @Override
+        public Lang lang() {
+            return JLangToJLDel.instance;
+        }
+
+        @Override
+        public Lang superLang(Lang lang) {
+            throw new InternalCompilerError("Unsupported");
+        }
+    };
+
+    @Deprecated
     @Override
     public Context enterScope(Context c) {
+        return enterScope(c, delTraverser);
+    }
+
+    @Override
+    public Context enterScope(Context c, Traverser v) {
         return c;
     }
 
+    @Deprecated
     @Override
     public Context enterChildScope(Node child, Context c) {
-        return c.lang().enterScope(child, c);
+        return enterChildScope(child, c, delTraverser);
     }
 
-    /**
-     * Add any declarations to the context that should be in scope when
-     * visiting later sibling nodes.
-     */
+    @Override
+    public Context enterChildScope(Node child, Context c, Traverser v) {
+        return v.lang().enterScope(child, c, v);
+    }
+
+    @Deprecated
     @Override
     public void addDecls(Context c) {
+        addDecls(c, delTraverser);
+    }
+
+    @Override
+    public void addDecls(Context c, Traverser v) {
     }
 
     // These methods override the methods in Ext_c.
@@ -414,15 +469,22 @@ public abstract class Node_c implements Node {
 
     @Override
     public Node exceptionCheck(ExceptionChecker ec) throws SemanticException {
-        List<? extends Type> l = ec.lang().throwTypes(this, ec.typeSystem());
+        List<? extends Type> l =
+                ec.lang().throwTypes(this, ec.typeSystem(), ec);
         for (Type exc : l) {
             ec.throwsException(exc, position());
         }
         return this;
     }
 
+    @Deprecated
     @Override
     public List<Type> throwTypes(TypeSystem ts) {
+        return throwTypes(ts, delTraverser);
+    }
+
+    @Override
+    public List<Type> throwTypes(TypeSystem ts, Traverser v) {
         return Collections.emptyList();
     }
 
@@ -435,94 +497,6 @@ public abstract class Node_c implements Node {
     @Override
     public Node extRewrite(ExtensionRewriter rw) throws SemanticException {
         return copy(rw.to_nf());
-    }
-
-    @Deprecated
-    @Override
-    public void dump(OutputStream os) {
-        CodeWriter cw = Compiler.createCodeWriter(os);
-        NodeVisitor dumper = new DumpAst(cw);
-        dumper = dumper.begin();
-        visit(dumper);
-        cw.newline();
-        dumper.finish();
-    }
-
-    @Override
-    public void dump(Lang lang, OutputStream os) {
-        CodeWriter cw = Compiler.createCodeWriter(os);
-        NodeVisitor dumper = new DumpAst(lang, cw);
-        dumper = dumper.begin();
-        visit(dumper);
-        cw.newline();
-        dumper.finish();
-    }
-
-    @Deprecated
-    @Override
-    public void dump(Writer w) {
-        CodeWriter cw = Compiler.createCodeWriter(w);
-        NodeVisitor dumper = new DumpAst(cw);
-        dumper = dumper.begin();
-        visit(dumper);
-        cw.newline();
-        dumper.finish();
-    }
-
-    @Override
-    public void dump(Lang lang, Writer w) {
-        CodeWriter cw = Compiler.createCodeWriter(w);
-        NodeVisitor dumper = new DumpAst(lang, cw);
-        dumper = dumper.begin();
-        visit(dumper);
-        cw.newline();
-        dumper.finish();
-    }
-
-    @Deprecated
-    @Override
-    public void prettyPrint(OutputStream os) {
-        try {
-            CodeWriter cw = Compiler.createCodeWriter(os);
-            this.del().prettyPrint(cw, new PrettyPrinter());
-            cw.flush();
-        }
-        catch (java.io.IOException e) {
-        }
-    }
-
-    @Override
-    public void prettyPrint(Lang lang, OutputStream os) {
-        try {
-            CodeWriter cw = Compiler.createCodeWriter(os);
-            lang.prettyPrint(this, cw, new PrettyPrinter(lang));
-            cw.flush();
-        }
-        catch (java.io.IOException e) {
-        }
-    }
-
-    @Deprecated
-    @Override
-    public void prettyPrint(Writer w) {
-        try {
-            CodeWriter cw = Compiler.createCodeWriter(w);
-            this.del().prettyPrint(cw, new PrettyPrinter());
-            cw.flush();
-        }
-        catch (java.io.IOException e) {
-        }
-    }
-
-    @Override
-    public void prettyPrint(Lang lang, Writer w) {
-        try {
-            CodeWriter cw = Compiler.createCodeWriter(w);
-            lang.prettyPrint(this, cw, new PrettyPrinter(lang));
-            cw.flush();
-        }
-        catch (java.io.IOException e) {
-        }
     }
 
     /** Pretty-print the AST using the given {@code CodeWriter}. */
@@ -561,7 +535,29 @@ public abstract class Node_c implements Node {
     public void dump(CodeWriter w) {
         w.write(StringUtil.getShortNameComponent(getClass().getName()));
 
-        // XXX Deprecated
+        if (nodeMap != null)
+            for (Map.Entry<Lang, NodeOps> entry : nodeMap.entrySet()) {
+                Lang k = entry.getKey();
+                NodeOps v = entry.getValue();
+                w.allowBreak(4, " ");
+                w.begin(0);
+                w.write("(lang ");
+                w.write(k.toString());
+                if (v instanceof Ext) ((Ext) v).dump(w);
+                w.write(")");
+                w.end();
+            }
+        else legacyDump(w);
+
+        w.allowBreak(4, " ");
+        w.begin(0);
+        w.write("(position "
+                + (position != null ? position.toString() : "UNKNOWN") + ")");
+        w.end();
+    }
+
+    @SuppressWarnings("deprecation")
+    private final void legacyDump(CodeWriter w) {
         w.allowBreak(4, " ");
         w.begin(0);
         w.write("(del ");
@@ -589,12 +585,75 @@ public abstract class Node_c implements Node {
                 break;
             }
         }
+    }
 
-        w.allowBreak(4, " ");
-        w.begin(0);
-        w.write("(position "
-                + (position != null ? position.toString() : "UNKNOWN") + ")");
-        w.end();
+    @Deprecated
+    @Override
+    public final void dump(OutputStream os) {
+        dump(JLangToJLDel.instance, null, os);
+    }
+
+    @Override
+    public final void dump(Lang lang, Map<Lang, Lang> superLangMap,
+            OutputStream os) {
+        CodeWriter cw = Compiler.createCodeWriter(os);
+        NodeVisitor dumper = new DumpAst(lang, superLangMap, cw);
+        dumper = dumper.begin();
+        visit(dumper);
+        cw.newline();
+        dumper.finish();
+    }
+
+    @Deprecated
+    @Override
+    public final void dump(Writer w) {
+        dump(JLangToJLDel.instance, null, w);
+    }
+
+    @Override
+    public final void dump(Lang lang, Map<Lang, Lang> superLangMap, Writer w) {
+        CodeWriter cw = Compiler.createCodeWriter(w);
+        NodeVisitor dumper = new DumpAst(lang, superLangMap, cw);
+        dumper = dumper.begin();
+        visit(dumper);
+        cw.newline();
+        dumper.finish();
+    }
+
+    @Deprecated
+    @Override
+    public final void prettyPrint(OutputStream os) {
+        prettyPrint(JLangToJLDel.instance, null, os);
+    }
+
+    @Override
+    public final void prettyPrint(Lang lang, Map<Lang, Lang> superLangMap,
+            OutputStream os) {
+        try {
+            CodeWriter cw = Compiler.createCodeWriter(os);
+            lang.prettyPrint(this, cw, new PrettyPrinter(lang, superLangMap));
+            cw.flush();
+        }
+        catch (java.io.IOException e) {
+        }
+    }
+
+    @Deprecated
+    @Override
+    public final void prettyPrint(Writer w) {
+        prettyPrint(JLangToJLDel.instance, null, w);
+    }
+
+    @Override
+    public final void prettyPrint(Lang lang, Map<Lang, Lang> superLangMap,
+            Writer w) {
+        try {
+            CodeWriter cw = Compiler.createCodeWriter(w);
+            lang.prettyPrint(this, cw, new PrettyPrinter(lang, superLangMap));
+            cw.flush();
+        }
+        catch (java.io.IOException e) {
+        }
     }
 
     @Override

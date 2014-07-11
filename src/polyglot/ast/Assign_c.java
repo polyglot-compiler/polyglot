@@ -40,6 +40,7 @@ import polyglot.visit.AscriptionVisitor;
 import polyglot.visit.CFGBuilder;
 import polyglot.visit.NodeVisitor;
 import polyglot.visit.PrettyPrinter;
+import polyglot.visit.Traverser;
 import polyglot.visit.TypeChecker;
 
 /**
@@ -52,14 +53,9 @@ public abstract class Assign_c extends Expr_c implements Assign {
     protected Operator op;
     protected Expr right;
 
-    @Deprecated
     public Assign_c(Position pos, Expr left, Operator op, Expr right) {
-        this(pos, left, op, right, null);
-    }
-
-    public Assign_c(Position pos, Expr left, Operator op, Expr right, Ext ext) {
-        super(pos, ext);
-        assert (left != null && op != null && right != null);
+        super(pos);
+        assert left != null && op != null && right != null;
         this.left = left;
         this.op = op;
         this.right = right;
@@ -72,7 +68,7 @@ public abstract class Assign_c extends Expr_c implements Assign {
 
     @Override
     public Expr left() {
-        return this.left;
+        return left;
     }
 
     @Override
@@ -89,7 +85,7 @@ public abstract class Assign_c extends Expr_c implements Assign {
 
     @Override
     public Operator operator() {
-        return this.op;
+        return op;
     }
 
     @Override
@@ -106,7 +102,7 @@ public abstract class Assign_c extends Expr_c implements Assign {
 
     @Override
     public Expr right() {
-        return this.right;
+        return right;
     }
 
     @Override
@@ -152,8 +148,7 @@ public abstract class Assign_c extends Expr_c implements Assign {
                     && !ts.typeEquals(s, t)
                     && !ts.numericConversionValid(t,
                                                   tc.lang()
-                                                    .constantValue(right,
-                                                                   tc.lang()))) {
+                                                    .constantValue(right, tc))) {
 
                 throw new SemanticException("Cannot assign " + s + " to " + t
                         + ".", position());
@@ -300,7 +295,7 @@ public abstract class Assign_c extends Expr_c implements Assign {
     }
 
     @Override
-    abstract public Term firstChild();
+    public abstract Term firstChild(Traverser v);
 
     @Override
     public <T> List<T> acceptCFG(CFGBuilder<?> v, List<T> succs) {
@@ -326,7 +321,7 @@ public abstract class Assign_c extends Expr_c implements Assign {
     protected abstract void acceptCFGOpAssign(CFGBuilder<?> v);
 
     @Override
-    public List<Type> throwTypes(TypeSystem ts) {
+    public List<Type> throwTypes(TypeSystem ts, Traverser v) {
         List<Type> l = new LinkedList<>();
 
         if (throwsArithmeticException()) {
@@ -338,7 +333,7 @@ public abstract class Assign_c extends Expr_c implements Assign {
 
     @Override
     public Node copy(NodeFactory nf) {
-        return nf.Assign(this.position, this.left, this.op, this.right);
+        return nf.Assign(position, left, op, right);
     }
 
 }

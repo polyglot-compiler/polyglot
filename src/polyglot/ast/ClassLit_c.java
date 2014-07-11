@@ -35,6 +35,7 @@ import polyglot.util.SerialVersionUID;
 import polyglot.visit.CFGBuilder;
 import polyglot.visit.NodeVisitor;
 import polyglot.visit.PrettyPrinter;
+import polyglot.visit.Traverser;
 import polyglot.visit.TypeChecker;
 
 /**
@@ -48,20 +49,15 @@ public class ClassLit_c extends Lit_c implements ClassLit {
 
     protected TypeNode typeNode;
 
-//    @Deprecated
     public ClassLit_c(Position pos, TypeNode typeNode) {
-        this(pos, typeNode, null);
-    }
-
-    public ClassLit_c(Position pos, TypeNode typeNode, Ext ext) {
-        super(pos, ext);
-        assert (typeNode != null);
+        super(pos);
+        assert typeNode != null;
         this.typeNode = typeNode;
     }
 
     @Override
     public TypeNode typeNode() {
-        return this.typeNode;
+        return typeNode;
     }
 
     public ClassLit typeNode(TypeNode typeNode) {
@@ -84,7 +80,7 @@ public class ClassLit_c extends Lit_c implements ClassLit {
     }
 
     @Override
-    public Term firstChild() {
+    public Term firstChild(Traverser v) {
         return typeNode;
     }
 
@@ -101,7 +97,7 @@ public class ClassLit_c extends Lit_c implements ClassLit {
 
     @Override
     public Node visitChildren(NodeVisitor v) {
-        TypeNode tn = visitChild(this.typeNode, v);
+        TypeNode tn = visitChild(typeNode, v);
         return reconstruct(this, tn);
     }
 
@@ -125,21 +121,21 @@ public class ClassLit_c extends Lit_c implements ClassLit {
 
     /**
      * According to the JLS 2nd Ed, sec 15.28, a class literal 
-     * is not a compile time constant.
+     * is not a compile-time constant.
      */
     @Override
-    public boolean isConstant(Lang lang) {
+    public boolean isConstant(Traverser v) {
         return false;
     }
 
     @Override
-    public Object constantValue(Lang lang) {
+    public Object constantValue(Traverser v) {
         return null;
     }
 
     @Override
     public Node copy(NodeFactory nf) {
-        return nf.ClassLit(this.position, this.typeNode);
+        return nf.ClassLit(position, typeNode);
     }
 
 }

@@ -39,6 +39,7 @@ import polyglot.visit.CFGBuilder;
 import polyglot.visit.ConstantChecker;
 import polyglot.visit.NodeVisitor;
 import polyglot.visit.PrettyPrinter;
+import polyglot.visit.Traverser;
 import polyglot.visit.TypeChecker;
 
 /**
@@ -51,25 +52,19 @@ public class Case_c extends Stmt_c implements Case {
     protected Expr expr;
     protected long value;
 
-//    @Deprecated
     public Case_c(Position pos, Expr expr) {
-        this(pos, expr, null);
-    }
-
-    public Case_c(Position pos, Expr expr, Ext ext) {
-        super(pos, ext);
-        assert (true); // expr may be null for default case
+        super(pos);
         this.expr = expr;
     }
 
     @Override
     public boolean isDefault() {
-        return this.expr == null;
+        return expr == null;
     }
 
     @Override
     public Expr expr() {
-        return this.expr;
+        return expr;
     }
 
     @Override
@@ -86,7 +81,7 @@ public class Case_c extends Stmt_c implements Case {
 
     @Override
     public long value() {
-        return this.value;
+        return value;
     }
 
     @Override
@@ -135,13 +130,13 @@ public class Case_c extends Stmt_c implements Case {
             return this;
         }
 
-        if (!cc.lang().constantValueSet(expr, cc.lang())) {
+        if (!cc.lang().constantValueSet(expr, cc)) {
             // Not ready yet; pass will get rerun.
             return this;
         }
 
-        if (cc.lang().isConstant(expr, cc.lang())) {
-            Object o = cc.lang().constantValue(expr, cc.lang());
+        if (cc.lang().isConstant(expr, cc)) {
+            Object o = cc.lang().constantValue(expr, cc);
 
             if (o instanceof Number && !(o instanceof Long)
                     && !(o instanceof Float) && !(o instanceof Double)) {
@@ -191,7 +186,7 @@ public class Case_c extends Stmt_c implements Case {
     }
 
     @Override
-    public Term firstChild() {
+    public Term firstChild(Traverser v) {
         if (expr != null) return expr;
         return null;
     }
@@ -207,7 +202,7 @@ public class Case_c extends Stmt_c implements Case {
 
     @Override
     public Node copy(NodeFactory nf) {
-        return nf.Case(this.position, this.expr).value(value);
+        return nf.Case(position, expr).value(value);
     }
 
 }

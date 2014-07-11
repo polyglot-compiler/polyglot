@@ -342,7 +342,11 @@ public class LocalClassRemover extends ContextVisitor {
 
     Node rewriteConstructorCalls(Node s, final ClassType ct,
             final List<FieldInstance> fields) {
-        Node r = s.visit(new ConstructorCallRewriter(lang(), fields, ct));
+        Node r =
+                s.visit(new ConstructorCallRewriter(lang(),
+                                                    superLangMap(),
+                                                    fields,
+                                                    ct));
         return r;
     }
 
@@ -543,10 +547,11 @@ public class LocalClassRemover extends ContextVisitor {
         ParsedClassType curr;
 
         protected ConstructorCallRewriter(Lang lang,
-                List<FieldInstance> fields, ClassType ct) {
-            super(lang);
-            this.newFields = fields;
-            this.theLocalClass = ct;
+                Map<Lang, Lang> superLangMap, List<FieldInstance> fields,
+                ClassType ct) {
+            super(lang, superLangMap);
+            newFields = fields;
+            theLocalClass = ct;
         }
 
         @Override

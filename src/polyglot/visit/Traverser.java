@@ -23,19 +23,13 @@
  *
  * See README for contributors.
  ******************************************************************************/
-package polyglot.ext.jl7.ast;
 
-import polyglot.ast.Block;
-import polyglot.ast.Catch;
-import polyglot.ast.TryOps;
-import polyglot.util.SubtypeSet;
-import polyglot.visit.ExceptionChecker;
+package polyglot.visit;
 
-public interface JL7TryOps extends TryOps {
+import polyglot.ast.Lang;
 
-    void checkPreciseRethrows(Block b, ExceptionChecker ec);
+public interface Traverser {
+    Lang lang();
 
-    void preciseRethrowsForCatchBlock(Catch cb, SubtypeSet thrown,
-            ExceptionChecker ec);
-
+    Lang superLang(Lang lang);
 }

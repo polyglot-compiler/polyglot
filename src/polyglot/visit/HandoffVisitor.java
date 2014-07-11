@@ -39,7 +39,7 @@ public class HandoffVisitor extends NodeVisitor {
     protected ExtensionInfo ext;
 
     public HandoffVisitor(ExtensionInfo ext) {
-        super(ext.nodeFactory().lang());
+        super(ext.nodeFactory().lang(), ext.nodeFactory().superLangMap());
         this.ext = ext;
     }
 

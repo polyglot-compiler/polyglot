@@ -26,8 +26,6 @@
 
 package polyglot.ast;
 
-import java.io.OutputStream;
-import java.io.Writer;
 import java.util.List;
 
 import polyglot.frontend.ExtensionInfo;
@@ -50,6 +48,7 @@ import polyglot.visit.ExceptionChecker;
 import polyglot.visit.NodeVisitor;
 import polyglot.visit.PrettyPrinter;
 import polyglot.visit.Translator;
+import polyglot.visit.Traverser;
 import polyglot.visit.TypeBuilder;
 import polyglot.visit.TypeChecker;
 
@@ -65,44 +64,48 @@ public class JLang_c implements JLang {
     protected JLang_c() {
     }
 
+    protected static NodeOps jl(Node n) {
+        return n.node(instance);
+    }
+
     protected NodeOps NodeOps(Node n) {
-        return n;
+        return jl(n);
     }
 
     protected CallOps CallOps(Call n) {
-        return (CallOps) n;
+        return (CallOps) jl(n);
     }
 
     protected ClassDeclOps ClassDeclOps(ClassDecl n) {
-        return (ClassDeclOps) n;
+        return (ClassDeclOps) jl(n);
     }
 
     protected ExprOps ExprOps(Expr n) {
-        return (ExprOps) n;
+        return (ExprOps) jl(n);
     }
 
     protected LoopOps LoopOps(Loop n) {
-        return (LoopOps) n;
+        return (LoopOps) jl(n);
     }
 
     protected NewOps NewOps(New n) {
-        return (NewOps) n;
+        return (NewOps) jl(n);
     }
 
     protected ProcedureCallOps ProcedureCallOps(ProcedureCall n) {
-        return (ProcedureCallOps) n;
+        return (ProcedureCallOps) jl(n);
     }
 
     protected ProcedureDeclOps ProcedureDeclOps(ProcedureDecl n) {
-        return (ProcedureDeclOps) n;
+        return (ProcedureDeclOps) jl(n);
     }
 
     protected TermOps TermOps(Term n) {
-        return (TermOps) n;
+        return (TermOps) jl(n);
     }
 
     protected TryOps TryOps(Try n) {
-        return (TryOps) n;
+        return (TryOps) jl(n);
     }
 
     // NodeOps
@@ -113,18 +116,19 @@ public class JLang_c implements JLang {
     }
 
     @Override
-    public final Context enterScope(Node n, Context c) {
-        return NodeOps(n).enterScope(c);
+    public final Context enterScope(Node n, Context c, Traverser v) {
+        return NodeOps(n).enterScope(c, v);
     }
 
     @Override
-    public final Context enterChildScope(Node n, Node child, Context c) {
-        return NodeOps(n).enterChildScope(child, c);
+    public final Context enterChildScope(Node n, Node child, Context c,
+            Traverser v) {
+        return NodeOps(n).enterChildScope(child, c, v);
     }
 
     @Override
-    public final void addDecls(Node n, Context c) {
-        NodeOps(n).addDecls(c);
+    public final void addDecls(Node n, Context c, Traverser v) {
+        NodeOps(n).addDecls(c, v);
     }
 
     @Override
@@ -199,8 +203,8 @@ public class JLang_c implements JLang {
     }
 
     @Override
-    public final List<Type> throwTypes(Node n, TypeSystem ts) {
-        return NodeOps(n).throwTypes(ts);
+    public final List<Type> throwTypes(Node n, TypeSystem ts, Traverser v) {
+        return NodeOps(n).throwTypes(ts, v);
     }
 
     @Override
@@ -213,26 +217,6 @@ public class JLang_c implements JLang {
     public final Node extRewrite(Node n, ExtensionRewriter rw)
             throws SemanticException {
         return NodeOps(n).extRewrite(rw);
-    }
-
-    @Override
-    public final void dump(Node n, Lang lang, OutputStream os) {
-        NodeOps(n).dump(lang, os);
-    }
-
-    @Override
-    public final void dump(Node n, Lang lang, Writer w) {
-        NodeOps(n).dump(lang, w);
-    }
-
-    @Override
-    public final void prettyPrint(Node n, Lang lang, OutputStream os) {
-        NodeOps(n).prettyPrint(lang, os);
-    }
-
-    @Override
-    public final void prettyPrint(Node n, Lang lang, Writer w) {
-        NodeOps(n).prettyPrint(lang, w);
     }
 
     @Override
@@ -264,8 +248,9 @@ public class JLang_c implements JLang {
     }
 
     @Override
-    public final ReferenceType findTargetType(Call n) throws SemanticException {
-        return CallOps(n).findTargetType();
+    public final ReferenceType findTargetType(Call n, Traverser v)
+            throws SemanticException {
+        return CallOps(n).findTargetType(v);
     }
 
     @Override
@@ -289,51 +274,49 @@ public class JLang_c implements JLang {
     }
 
     @Override
-    public final Node addDefaultConstructor(ClassDecl n, TypeSystem ts,
-            NodeFactory nf, ConstructorInstance defaultConstructorInstance)
+    public final Node addDefaultConstructor(ClassDecl n,
+            ConstructorInstance defaultCI, AmbiguityRemover ar)
             throws SemanticException {
-        return ClassDeclOps(n).addDefaultConstructor(ts,
-                                                     nf,
-                                                     defaultConstructorInstance);
+        return ClassDeclOps(n).addDefaultConstructor(defaultCI, ar);
     }
 
     // ExprOps
 
     @Override
-    public final boolean constantValueSet(Expr n, Lang lang) {
-        return ExprOps(n).constantValueSet(lang);
+    public final boolean constantValueSet(Expr n, Traverser v) {
+        return ExprOps(n).constantValueSet(v);
     }
 
     @Override
-    public final boolean isConstant(Expr n, Lang lang) {
-        return ExprOps(n).isConstant(lang);
+    public final boolean isConstant(Expr n, Traverser v) {
+        return ExprOps(n).isConstant(v);
     }
 
     @Override
-    public final Object constantValue(Expr n, Lang lang) {
-        return ExprOps(n).constantValue(lang);
+    public final Object constantValue(Expr n, Traverser v) {
+        return ExprOps(n).constantValue(v);
     }
 
     // LoopOps
 
     @Override
-    public final boolean condIsConstant(Loop n, JLang lang) {
-        return LoopOps(n).condIsConstant(lang);
+    public final boolean condIsConstant(Loop n, Traverser v) {
+        return LoopOps(n).condIsConstant(v);
     }
 
     @Override
-    public final boolean condIsConstantTrue(Loop n, JLang lang) {
-        return LoopOps(n).condIsConstantTrue(lang);
+    public final boolean condIsConstantTrue(Loop n, Traverser v) {
+        return LoopOps(n).condIsConstantTrue(v);
     }
 
     @Override
-    public final boolean condIsConstantFalse(Loop n, JLang lang) {
-        return LoopOps(n).condIsConstantFalse(lang);
+    public final boolean condIsConstantFalse(Loop n, Traverser v) {
+        return LoopOps(n).condIsConstantFalse(v);
     }
 
     @Override
-    public final Term continueTarget(Loop n) {
-        return LoopOps(n).continueTarget();
+    public final Term continueTarget(Loop n, Traverser v) {
+        return LoopOps(n).continueTarget(v);
     }
 
     // NewOps
@@ -378,8 +361,9 @@ public class JLang_c implements JLang {
     }
 
     @Override
-    public final ClassType findEnclosingClass(New n, Context c, ClassType ct) {
-        return NewOps(n).findEnclosingClass(c, ct);
+    public final ClassType findEnclosingClass(New n, Context c, ClassType ct,
+            Traverser v) {
+        return NewOps(n).findEnclosingClass(c, ct, v);
     }
 
     // ProcedureCallOps
@@ -400,8 +384,8 @@ public class JLang_c implements JLang {
     // TermOps
 
     @Override
-    public final Term firstChild(Term n) {
-        return TermOps(n).firstChild();
+    public final Term firstChild(Term n, Traverser v) {
+        return TermOps(n).firstChild(v);
     }
 
     @Override

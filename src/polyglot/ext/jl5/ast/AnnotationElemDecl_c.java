@@ -33,6 +33,7 @@ import polyglot.ast.CodeBlock;
 import polyglot.ast.Expr;
 import polyglot.ast.Formal;
 import polyglot.ast.Id;
+import polyglot.ast.JLang;
 import polyglot.ast.MethodDecl;
 import polyglot.ast.Node;
 import polyglot.ast.Term;
@@ -57,6 +58,7 @@ import polyglot.visit.AmbiguityRemover;
 import polyglot.visit.CFGBuilder;
 import polyglot.visit.NodeVisitor;
 import polyglot.visit.PrettyPrinter;
+import polyglot.visit.Traverser;
 import polyglot.visit.TypeBuilder;
 import polyglot.visit.TypeChecker;
 
@@ -131,7 +133,7 @@ public class AnnotationElemDecl_c extends Term_c implements AnnotationElemDecl {
 
     @Override
     public Id id() {
-        return this.name;
+        return name;
     }
 
     @Override
@@ -148,7 +150,7 @@ public class AnnotationElemDecl_c extends Term_c implements AnnotationElemDecl {
 
     @Override
     public String name() {
-        return this.name.id();
+        return name.id();
     }
 
     @Override
@@ -183,9 +185,14 @@ public class AnnotationElemDecl_c extends Term_c implements AnnotationElemDecl {
     }
 
     @Override
+    public JLang lang() {
+        return J5Lang_c.instance;
+    }
+
+    @Override
     public Node visitChildren(NodeVisitor v) {
         TypeNode type = visitChild(this.type, v);
-        Term defVal = visitChild(this.defaultVal, v);
+        Term defVal = visitChild(defaultVal, v);
         return reconstruct(type, defVal);
     }
 
@@ -208,7 +215,7 @@ public class AnnotationElemDecl_c extends Term_c implements AnnotationElemDecl {
             return this;
         }
 
-        Flags f = this.flags;
+        Flags f = flags;
         f = f.Public().Abstract();
 
         AnnotationTypeElemInstance ai =
@@ -225,7 +232,7 @@ public class AnnotationElemDecl_c extends Term_c implements AnnotationElemDecl {
 
     @Override
     public Node disambiguate(AmbiguityRemover ar) throws SemanticException {
-        if (this.ai.isCanonical()) {
+        if (ai.isCanonical()) {
             // already done
             return this;
         }
@@ -294,12 +301,12 @@ public class AnnotationElemDecl_c extends Term_c implements AnnotationElemDecl {
                         && !(defaultVal instanceof Expr && ts.numericConversionValid(type.type(),
                                                                                      tc.lang()
                                                                                        .constantValue((Expr) defaultVal,
-                                                                                                      tc.lang())))
+                                                                                                      tc)))
                         && !ts.isBaseCastValid(defaultValType, type.type())
                         && !(defaultVal instanceof Expr && ts.numericConversionBaseValid(type.type(),
                                                                                          tc.lang()
                                                                                            .constantValue((Expr) defaultVal,
-                                                                                                          tc.lang())))) {
+                                                                                                          tc)))) {
                     throw new SemanticException("The type of the default value: "
                                                         + defaultVal
                                                         + " does not match the annotation element type: "
@@ -318,7 +325,8 @@ public class AnnotationElemDecl_c extends Term_c implements AnnotationElemDecl {
                                         position());
         }
 
-        if (defaultVal != null) ts.checkAnnotationValueConstant(defaultVal);
+        if (defaultVal != null)
+            JL5TermExt.checkAnnotationValueConstant(defaultVal, tc);
         return this;
     }
 
@@ -360,8 +368,8 @@ public class AnnotationElemDecl_c extends Term_c implements AnnotationElemDecl {
     }
 
     @Override
-    public Term firstChild() {
-        return this.type;
+    public Term firstChild(Traverser v) {
+        return type;
     }
 
     @Override

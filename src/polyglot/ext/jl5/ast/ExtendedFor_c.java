@@ -30,6 +30,7 @@ import java.util.List;
 import polyglot.ast.Expr;
 import polyglot.ast.FloatLit;
 import polyglot.ast.IntLit;
+import polyglot.ast.JLang;
 import polyglot.ast.Lit;
 import polyglot.ast.Local;
 import polyglot.ast.LocalDecl;
@@ -55,6 +56,7 @@ import polyglot.visit.CFGBuilder;
 import polyglot.visit.FlowGraph;
 import polyglot.visit.NodeVisitor;
 import polyglot.visit.PrettyPrinter;
+import polyglot.visit.Traverser;
 import polyglot.visit.TypeChecker;
 
 public class ExtendedFor_c extends Loop_c implements ExtendedFor {
@@ -66,14 +68,14 @@ public class ExtendedFor_c extends Loop_c implements ExtendedFor {
 
     public ExtendedFor_c(Position pos, LocalDecl decl, Expr expr, Stmt body) {
         super(pos, null, body);
-        assert (decl != null && expr != null);
+        assert decl != null && expr != null;
         this.decl = decl;
         this.expr = expr;
     }
 
     @Override
     public LocalDecl decl() {
-        return this.decl;
+        return decl;
     }
 
     @Override
@@ -94,7 +96,7 @@ public class ExtendedFor_c extends Loop_c implements ExtendedFor {
 
     @Override
     public Expr expr() {
-        return this.expr;
+        return expr;
     }
 
     @Override
@@ -122,6 +124,11 @@ public class ExtendedFor_c extends Loop_c implements ExtendedFor {
     }
 
     @Override
+    public JLang lang() {
+        return J5Lang_c.instance;
+    }
+
+    @Override
     public Node visitChildren(NodeVisitor v) {
         ExtendedFor_c n = this;
         LocalDecl decl = visitChild(this.decl, v);
@@ -131,7 +138,7 @@ public class ExtendedFor_c extends Loop_c implements ExtendedFor {
     }
 
     @Override
-    public Context enterScope(Context c) {
+    public Context enterScope(Context c, Traverser v) {
         return c.pushBlock();
     }
 
@@ -227,7 +234,7 @@ public class ExtendedFor_c extends Loop_c implements ExtendedFor {
     }
 
     @Override
-    public Term firstChild() {
+    public Term firstChild(Traverser v) {
         return expr;
     }
 
@@ -242,12 +249,14 @@ public class ExtendedFor_c extends Loop_c implements ExtendedFor {
                    n,
                    Term.EXIT);
         v.visitCFG(decl, n.body(), Term.ENTRY);
-        v.push(n).visitCFG(n.body(), continueTarget(), Term.ENTRY);
+        v.push(n).visitCFG(n.body(),
+                           v.lang().continueTarget(this, v),
+                           Term.ENTRY);
         return succs;
     }
 
     @Override
-    public Term continueTarget() {
+    public Term continueTarget(Traverser v) {
         ExtendedFor n = this;
         return n.body();
     }

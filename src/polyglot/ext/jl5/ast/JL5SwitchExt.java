@@ -55,7 +55,7 @@ public class JL5SwitchExt extends JL5TermExt implements JL5SwitchOps {
         Expr expr = s.expr();
         Type type = expr.type();
 
-        if (!((J5Lang) tc.lang()).isAcceptableSwitchType(s, expr.type())) {
+        if (!((J5Lang) tc.lang()).isAcceptableSwitchType(s, expr.type(), tc)) {
             throw new SemanticException("Switch index must be of type char, byte,"
                                                 + " short, int, Character, Byte, Short, Integer, or an enum type.",
                                         s.position());
@@ -74,7 +74,7 @@ public class JL5SwitchExt extends JL5TermExt implements JL5SwitchOps {
                         && !ts.numericConversionValid(type,
                                                       tc.lang()
                                                         .constantValue(cExpr,
-                                                                       tc.lang()))) {
+                                                                       tc))) {
                     throw new SemanticException("Case constant \""
                                                         + cExpr
                                                         + "\" is not assignable to "
@@ -90,7 +90,7 @@ public class JL5SwitchExt extends JL5TermExt implements JL5SwitchOps {
     }
 
     @Override
-    public boolean isAcceptableSwitchType(Type type) {
+    public boolean isAcceptableSwitchType(Type type, TypeChecker tc) {
         JL5TypeSystem ts = (JL5TypeSystem) type.typeSystem();
         if (ts.Char().equals(type) || ts.Byte().equals(type)
                 || ts.Short().equals(type) || ts.Int().equals(type)) {

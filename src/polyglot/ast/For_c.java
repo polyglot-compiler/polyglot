@@ -44,6 +44,7 @@ import polyglot.visit.CFGBuilder;
 import polyglot.visit.FlowGraph;
 import polyglot.visit.NodeVisitor;
 import polyglot.visit.PrettyPrinter;
+import polyglot.visit.Traverser;
 import polyglot.visit.TypeChecker;
 
 /**
@@ -57,23 +58,17 @@ public class For_c extends Loop_c implements For {
     protected List<ForInit> inits;
     protected List<ForUpdate> iters;
 
-//    @Deprecated
     public For_c(Position pos, List<ForInit> inits, Expr cond,
             List<ForUpdate> iters, Stmt body) {
-        this(pos, inits, cond, iters, body, null);
-    }
-
-    public For_c(Position pos, List<ForInit> inits, Expr cond,
-            List<ForUpdate> iters, Stmt body, Ext ext) {
-        super(pos, cond, body, ext);
-        assert (inits != null && iters != null); // cond may be null, inits and iters may be empty
+        super(pos, cond, body);
+        assert inits != null && iters != null; // cond may be null, inits and iters may be empty
         this.inits = ListUtil.copy(inits, true);
         this.iters = ListUtil.copy(iters, true);
     }
 
     @Override
     public List<ForInit> inits() {
-        return this.inits;
+        return inits;
     }
 
     @Override
@@ -95,7 +90,7 @@ public class For_c extends Loop_c implements For {
 
     @Override
     public List<ForUpdate> iters() {
-        return this.iters;
+        return iters;
     }
 
     @Override
@@ -134,7 +129,7 @@ public class For_c extends Loop_c implements For {
     }
 
     @Override
-    public Context enterScope(Context c) {
+    public Context enterScope(Context c, Traverser v) {
         return c.pushBlock();
     }
 
@@ -252,7 +247,7 @@ public class For_c extends Loop_c implements For {
     }
 
     @Override
-    public Term firstChild() {
+    public Term firstChild(Traverser v) {
         return listChild(inits, cond != null ? (Term) cond : body);
     }
 
@@ -261,10 +256,10 @@ public class For_c extends Loop_c implements For {
         v.visitCFGList(inits, cond != null ? (Term) cond : body, ENTRY);
 
         if (cond != null) {
-            if (v.lang().condIsConstantTrue(this, v.lang())) {
+            if (v.lang().condIsConstantTrue(this, v)) {
                 v.visitCFG(cond, body, ENTRY);
             }
-            else if (v.lang().condIsConstantFalse(this, v.lang())
+            else if (v.lang().condIsConstantFalse(this, v)
                     && v.skipDeadLoopBodies()) {
                 v.visitCFG(cond, FlowGraph.EDGE_KEY_FALSE, this, EXIT);
                 return succs;
@@ -280,24 +275,20 @@ public class For_c extends Loop_c implements For {
             }
         }
 
-        v.push(this).visitCFG(body, lang().continueTarget(this), ENTRY);
+        v.push(this).visitCFG(body, v.lang().continueTarget(this, v), ENTRY);
         v.visitCFGList(iters, cond != null ? (Term) cond : body, ENTRY);
 
         return succs;
     }
 
     @Override
-    public Term continueTarget() {
+    public Term continueTarget(Traverser v) {
         return listChild(iters, cond != null ? (Term) cond : body);
     }
 
     @Override
     public Node copy(NodeFactory nf) {
-        return nf.For(this.position,
-                      this.inits,
-                      this.cond,
-                      this.iters,
-                      this.body);
+        return nf.For(position, inits, cond, iters, body);
     }
 
 }

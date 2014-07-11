@@ -103,7 +103,7 @@ public class JL5FormalExt extends JL5AnnotatedElementExt {
         if (isVarArg) {
             ((JL5ArrayType) f.type().type()).setVarArg();
         }
-        return superLang().disambiguate(this.node(), ar);
+        return ar.superLang(lang()).disambiguate(this.node(), ar);
     }
 
     @Override

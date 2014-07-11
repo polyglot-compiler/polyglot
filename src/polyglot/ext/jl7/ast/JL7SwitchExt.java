@@ -26,13 +26,14 @@
 package polyglot.ext.jl7.ast;
 
 import polyglot.ast.Switch;
-import polyglot.ext.jl5.ast.J5Lang_c;
+import polyglot.ext.jl5.ast.J5Lang;
 import polyglot.ext.jl5.ast.JL5SwitchOps;
 import polyglot.ext.jl5.types.JL5TypeSystem;
 import polyglot.types.Type;
 import polyglot.util.SerialVersionUID;
+import polyglot.visit.TypeChecker;
 
-public class JL7SwitchExt extends JL7Ext implements JL5SwitchOps {
+public class JL7SwitchExt extends JL7TermExt implements JL5SwitchOps {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
     @Override
@@ -41,12 +42,14 @@ public class JL7SwitchExt extends JL7Ext implements JL5SwitchOps {
     }
 
     @Override
-    public boolean isAcceptableSwitchType(Type type) {
+    public boolean isAcceptableSwitchType(Type type, TypeChecker tc) {
         JL5TypeSystem ts = (JL5TypeSystem) type.typeSystem();
         if (ts.String().equals(type)) {
             return true;
         }
-        return J5Lang_c.lang(pred()).isAcceptableSwitchType(this.node(), type);
+        return ((J5Lang) tc.superLang(lang())).isAcceptableSwitchType(this.node(),
+                                                                      type,
+                                                                      tc);
     }
 
 }

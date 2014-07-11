@@ -28,6 +28,7 @@ package polyglot.visit;
 
 import polyglot.ast.Expr;
 import polyglot.ast.JLang;
+import polyglot.ast.Lang;
 import polyglot.ast.Node;
 import polyglot.ast.NodeFactory;
 import polyglot.frontend.Job;
@@ -67,6 +68,11 @@ public class AscriptionVisitor extends ContextVisitor {
     @Override
     public JLang lang() {
         return (JLang) super.lang();
+    }
+
+    @Override
+    public JLang superLang(Lang lang) {
+        return (JLang) super.superLang(lang);
     }
 
     // FIXME: what does this do?

@@ -40,15 +40,10 @@ public class Id_c extends Node_c implements Id {
 
     protected String id;
 
-//    @Deprecated
     public Id_c(Position pos, String id) {
-        this(pos, id, null);
-    }
-
-    public Id_c(Position pos, String id, Ext ext) {
-        super(pos, ext);
-        assert (id != null);
-        assert (StringUtil.isNameShort(id));
+        super(pos);
+        assert id != null;
+        assert StringUtil.isNameShort(id);
         this.id = id;
     }
 
@@ -58,7 +53,7 @@ public class Id_c extends Node_c implements Id {
 
     @Override
     public String id() {
-        return this.id;
+        return id;
     }
 
     @Override
@@ -90,7 +85,7 @@ public class Id_c extends Node_c implements Id {
 
     @Override
     public Node copy(NodeFactory nf) {
-        return nf.Id(this.position, this.id);
+        return nf.Id(position, id);
     }
 
 }

@@ -32,7 +32,7 @@ import java.util.List;
 import polyglot.ast.Assign;
 import polyglot.ast.Expr;
 import polyglot.ast.FieldDecl;
-import polyglot.ast.Lang;
+import polyglot.ast.JLang;
 import polyglot.ast.LocalDecl;
 import polyglot.ast.New;
 import polyglot.ast.NewOps;
@@ -58,6 +58,7 @@ import polyglot.util.CodeWriter;
 import polyglot.util.SerialVersionUID;
 import polyglot.visit.AmbiguityRemover;
 import polyglot.visit.PrettyPrinter;
+import polyglot.visit.Traverser;
 import polyglot.visit.TypeChecker;
 
 public class JL7NewExt extends JL7ProcedureCallExt implements NewOps {
@@ -107,13 +108,13 @@ public class JL7NewExt extends JL7ProcedureCallExt implements NewOps {
             setExpectedObjectType(type);
         }
 
-        return superLang().typeCheckOverride(node(), parent, tc);
+        return tc.superLang(lang()).typeCheckOverride(node(), parent, tc);
     }
 
     private transient Type expectedObjectType = null;
 
     protected Type expectedObjectType() {
-        return this.expectedObjectType;
+        return expectedObjectType;
     }
 
     protected void setExpectedObjectType(Type type) {
@@ -129,7 +130,7 @@ public class JL7NewExt extends JL7ProcedureCallExt implements NewOps {
         New n = this.node();
         TypeNode objectType = n.objectType();
         if (!(objectType.type() instanceof DiamondType))
-            return superLang().typeCheck(this.node(), tc);
+            return tc.superLang(lang()).typeCheck(this.node(), tc);
 
         // Type check instance creation expressions using diamond.
         JL5NewExt ext5 = (JL5NewExt) JL5Ext.ext(n);
@@ -153,8 +154,8 @@ public class JL7NewExt extends JL7ProcedureCallExt implements NewOps {
             argTypes.add(e.type());
         }
 
-        superLang().typeCheckFlags(this.node(), tc);
-        superLang().typeCheckNested(this.node(), tc);
+        tc.superLang(lang()).typeCheckFlags(this.node(), tc);
+        tc.superLang(lang()).typeCheckNested(this.node(), tc);
 
         // Perform overload resolution and type argument inference as specified
         // in JLS SE 7 | 15.9.3.
@@ -198,67 +199,70 @@ public class JL7NewExt extends JL7ProcedureCallExt implements NewOps {
             }
             return (TypeNode) objectType.visit(ar.context(c));
         }
-        return superLang().findQualifiedTypeNode(this.node(),
-                                                 ar,
-                                                 outer,
-                                                 objectType);
+        return ar.superLang(lang()).findQualifiedTypeNode(this.node(),
+                                                          ar,
+                                                          outer,
+                                                          objectType);
     }
 
     @Override
     public Expr findQualifier(AmbiguityRemover ar, ClassType ct)
             throws SemanticException {
-        return superLang().findQualifier(this.node(), ar, ct);
+        return ar.superLang(lang()).findQualifier(this.node(), ar, ct);
     }
 
     @Override
-    public ClassType findEnclosingClass(Context c, ClassType ct) {
+    public ClassType findEnclosingClass(Context c, ClassType ct, Traverser v) {
         if (ct instanceof DiamondType) {
             DiamondType dt = (DiamondType) ct;
             ct = dt.base();
         }
-        return superLang().findEnclosingClass(this.node(), c, ct);
+        return ((JLang) v.superLang(lang())).findEnclosingClass(this.node(),
+                                                                c,
+                                                                ct,
+                                                                v);
     }
 
     @Override
     public void typeCheckFlags(TypeChecker tc) throws SemanticException {
-        superLang().typeCheckFlags(this.node(), tc);
+        tc.superLang(lang()).typeCheckFlags(this.node(), tc);
     }
 
     @Override
     public void typeCheckNested(TypeChecker tc) throws SemanticException {
-        superLang().typeCheckNested(this.node(), tc);
+        tc.superLang(lang()).typeCheckNested(this.node(), tc);
     }
 
     @Override
     public void printQualifier(CodeWriter w, PrettyPrinter tr) {
-        superLang().printQualifier(this.node(), w, tr);
+        ((JLang) tr.superLang(lang())).printQualifier(this.node(), w, tr);
     }
 
     @Override
     public void printShortObjectType(CodeWriter w, PrettyPrinter tr) {
         New n = this.node();
-        superLang().printShortObjectType(n, w, tr);
+        ((JLang) tr.superLang(lang())).printShortObjectType(n, w, tr);
         ClassType ct = n.objectType().type().toClass();
         if (ct instanceof DiamondType) w.write("<>");
     }
 
     @Override
     public void printBody(CodeWriter w, PrettyPrinter tr) {
-        superLang().printBody(this.node(), w, tr);
+        ((JLang) tr.superLang(lang())).printBody(this.node(), w, tr);
     }
 
     @Override
-    public boolean constantValueSet(Lang lang) {
-        return superLang().constantValueSet(node(), lang);
+    public boolean constantValueSet(Traverser v) {
+        return v.superLang(lang()).constantValueSet(node(), v);
     }
 
     @Override
-    public boolean isConstant(Lang lang) {
-        return superLang().isConstant(node(), lang);
+    public boolean isConstant(Traverser v) {
+        return v.superLang(lang()).isConstant(node(), v);
     }
 
     @Override
-    public Object constantValue(Lang lang) {
-        return superLang().constantValue(node(), lang);
+    public Object constantValue(Traverser v) {
+        return v.superLang(lang()).constantValue(node(), v);
     }
 }

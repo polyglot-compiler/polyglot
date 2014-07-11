@@ -45,7 +45,7 @@ public class JL5ClassBodyExt extends JL5TermExt {
         // check if we have any EnumConstantDecl
         List<EnumConstantDecl> ecds = enumConstantDecls();
         if (ecds.isEmpty()) {
-            superLang().prettyPrint(this.node(), w, tr);
+            tr.superLang(lang()).prettyPrint(this.node(), w, tr);
             return;
         }
 
@@ -72,8 +72,8 @@ public class JL5ClassBodyExt extends JL5TermExt {
                     continue;
                 }
 
-                if ((member instanceof polyglot.ast.CodeDecl)
-                        || (prev instanceof polyglot.ast.CodeDecl)) {
+                if (member instanceof polyglot.ast.CodeDecl
+                        || prev instanceof polyglot.ast.CodeDecl) {
                     w.newline(0);
                 }
                 prev = member;

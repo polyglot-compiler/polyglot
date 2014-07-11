@@ -38,6 +38,7 @@ import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
 import polyglot.visit.CFGBuilder;
 import polyglot.visit.PrettyPrinter;
+import polyglot.visit.Traverser;
 import polyglot.visit.TypeBuilder;
 
 /**
@@ -49,14 +50,8 @@ public abstract class TypeNode_c extends Term_c implements TypeNode {
 
     protected Type type;
 
-    // TODO
-    // @Deprecated
     public TypeNode_c(Position pos) {
-        this(pos, null);
-    }
-
-    public TypeNode_c(Position pos, Ext ext) {
-        super(pos, ext);
+        super(pos);
     }
 
     @Override
@@ -72,7 +67,7 @@ public abstract class TypeNode_c extends Term_c implements TypeNode {
 
     @Override
     public Type type() {
-        return this.type;
+        return type;
     }
 
     @Override
@@ -99,7 +94,7 @@ public abstract class TypeNode_c extends Term_c implements TypeNode {
     }
 
     @Override
-    public Term firstChild() {
+    public Term firstChild(Traverser v) {
         return null;
     }
 

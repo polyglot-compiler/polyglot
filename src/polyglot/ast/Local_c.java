@@ -41,6 +41,7 @@ import polyglot.util.SerialVersionUID;
 import polyglot.visit.CFGBuilder;
 import polyglot.visit.NodeVisitor;
 import polyglot.visit.PrettyPrinter;
+import polyglot.visit.Traverser;
 import polyglot.visit.TypeBuilder;
 import polyglot.visit.TypeChecker;
 
@@ -53,14 +54,9 @@ public class Local_c extends Expr_c implements Local {
     protected Id name;
     protected LocalInstance li;
 
-//    @Deprecated
     public Local_c(Position pos, Id name) {
-        this(pos, name, null);
-    }
-
-    public Local_c(Position pos, Id name, Ext ext) {
-        super(pos, ext);
-        assert (name != null);
+        super(pos);
+        assert name != null;
         this.name = name;
     }
 
@@ -71,7 +67,7 @@ public class Local_c extends Expr_c implements Local {
 
     @Override
     public Id id() {
-        return this.name;
+        return name;
     }
 
     @Override
@@ -88,7 +84,7 @@ public class Local_c extends Expr_c implements Local {
 
     @Override
     public String name() {
-        return this.name.id();
+        return name.id();
     }
 
     @Override
@@ -181,7 +177,7 @@ public class Local_c extends Expr_c implements Local {
     }
 
     @Override
-    public Term firstChild() {
+    public Term firstChild(Traverser v) {
         return null;
     }
 
@@ -213,24 +209,24 @@ public class Local_c extends Expr_c implements Local {
     }
 
     @Override
-    public boolean constantValueSet(Lang lang) {
+    public boolean constantValueSet(Traverser v) {
         return li != null && li.constantValueSet();
     }
 
     @Override
-    public boolean isConstant(Lang lang) {
+    public boolean isConstant(Traverser v) {
         return li != null && li.isConstant();
     }
 
     @Override
-    public Object constantValue(Lang lang) {
-        if (!lang.isConstant(this, lang)) return null;
+    public Object constantValue(Traverser v) {
+        if (!v.lang().isConstant(this, v)) return null;
         return li.constantValue();
     }
 
     @Override
     public Node copy(NodeFactory nf) {
-        return nf.Local(this.position, this.name);
+        return nf.Local(position, name);
     }
 
 }

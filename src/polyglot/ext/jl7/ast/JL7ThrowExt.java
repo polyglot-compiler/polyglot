@@ -27,30 +27,32 @@ package polyglot.ext.jl7.ast;
 
 import java.util.List;
 
+import polyglot.ast.JLang;
 import polyglot.ast.Local;
 import polyglot.ast.Throw;
 import polyglot.types.Type;
 import polyglot.types.TypeSystem;
 import polyglot.util.SerialVersionUID;
+import polyglot.visit.Traverser;
 
-public class JL7ThrowExt extends JL7Ext {
+public class JL7ThrowExt extends JL7TermExt {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
     protected List<Type> throwSet = null;
 
     @Override
-    public List<Type> throwTypes(TypeSystem ts) {
+    public List<Type> throwTypes(TypeSystem ts, Traverser v) {
         Throw n = (Throw) this.node();
         if (n.expr() instanceof Local) {
-            if (this.throwSet != null) {
+            if (throwSet != null) {
                 // this is a rethrow of a final (or implicitly final)
                 // formal of a catch block. See JLS7 11.2.2.
                 // The throwSet field is set by the ExceptionChecker analysis
                 // via the code in JL7TryExt. 
-                return this.throwSet;
+                return throwSet;
             }
         }
-        return superLang().throwTypes(this.node(), ts);
+        return ((JLang) v.superLang(lang())).throwTypes(this.node(), ts, v);
     }
 
 }

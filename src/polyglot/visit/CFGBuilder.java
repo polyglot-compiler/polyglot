@@ -29,6 +29,7 @@ package polyglot.visit;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import polyglot.ast.Block;
 import polyglot.ast.Branch;
@@ -37,6 +38,7 @@ import polyglot.ast.CodeNode;
 import polyglot.ast.CompoundStmt;
 import polyglot.ast.JLang;
 import polyglot.ast.Labeled;
+import polyglot.ast.Lang;
 import polyglot.ast.Loop;
 import polyglot.ast.Return;
 import polyglot.ast.Stmt;
@@ -58,10 +60,12 @@ import polyglot.visit.FlowGraph.Peer;
 /**
  * Class used to construct a CFG.
  */
-public class CFGBuilder<FlowItem extends DataFlow.Item> implements
+public class CFGBuilder<FlowItem extends DataFlow.Item> implements Traverser,
         Copy<CFGBuilder<FlowItem>> {
     /** The language this CFGBuilder operates on. */
     private final JLang lang;
+    /** The language hierarchy directory. */
+    private final Map<Lang, Lang> superLangMap;
 
     /** The flow graph under construction. */
     protected FlowGraph<FlowItem> graph;
@@ -165,9 +169,10 @@ public class CFGBuilder<FlowItem extends DataFlow.Item> implements
      */
     protected boolean exceptionEdgesToFinally;
 
-    public CFGBuilder(JLang lang, TypeSystem ts, FlowGraph<FlowItem> graph,
-            DataFlow<FlowItem> df) {
+    public CFGBuilder(JLang lang, Map<Lang, Lang> superLangMap, TypeSystem ts,
+            FlowGraph<FlowItem> graph, DataFlow<FlowItem> df) {
         this.lang = lang;
+        this.superLangMap = superLangMap;
         this.ts = ts;
         this.graph = graph;
         this.df = df;
@@ -179,8 +184,19 @@ public class CFGBuilder<FlowItem extends DataFlow.Item> implements
         this.exceptionEdgesToFinally = false;
     }
 
+    @Override
     public JLang lang() {
         return this.lang;
+    }
+
+    @Override
+    public JLang superLang(Lang lang) {
+        if (superLangMap == null)
+            throw new InternalCompilerError("No language hierarchy directory available");
+        if (!superLangMap.containsKey(lang))
+            throw new InternalCompilerError("Superlanguage undefined for "
+                    + lang);
+        return (JLang) superLangMap.get(lang);
     }
 
     public FlowGraph<FlowItem> graph() {
@@ -280,7 +296,7 @@ public class CFGBuilder<FlowItem extends DataFlow.Item> implements
                                 Loop loop = (Loop) s;
                                 edge(last_peer,
                                      this.graph()
-                                         .peer(lang().continueTarget(loop),
+                                         .peer(lang().continueTarget(loop, this),
                                                this.path_to_finally,
                                                Term.ENTRY),
                                      FlowGraph.EDGE_KEY_OTHER);
@@ -301,7 +317,7 @@ public class CFGBuilder<FlowItem extends DataFlow.Item> implements
                     Loop l = (Loop) c;
                     if (b.kind() == Branch.CONTINUE) {
                         edge(last_peer,
-                             this.graph().peer(lang().continueTarget(l),
+                             this.graph().peer(lang().continueTarget(l, this),
                                                this.path_to_finally,
                                                Term.ENTRY),
                              FlowGraph.EDGE_KEY_OTHER);
@@ -552,7 +568,7 @@ public class CFGBuilder<FlowItem extends DataFlow.Item> implements
      * @param succs a list of {@code EdgeKeyTermPair}s
      */
     protected void visitCFG(Term a, List<EdgeKeyTermPair> succs) {
-        Term child = lang().firstChild(a);
+        Term child = lang().firstChild(a, this);
 
         if (child == null) {
             edge(this, a, Term.ENTRY, a, Term.EXIT, FlowGraph.EDGE_KEY_OTHER);
@@ -579,16 +595,15 @@ public class CFGBuilder<FlowItem extends DataFlow.Item> implements
     }
 
     public void visitThrow(Term a) {
-        for (Type type : lang().throwTypes(a, ts)) {
+        for (Type type : lang().throwTypes(a, ts, this)) {
             visitThrow(a, Term.EXIT, type);
         }
 
         if (trackImplicitErrors) {
             // Every statement can throw an error.
             // This is probably too inefficient.
-            if ((a instanceof Stmt && !(a instanceof CompoundStmt))
-                    || (a instanceof Block && ((Block) a).statements()
-                                                         .isEmpty())) {
+            if (a instanceof Stmt && !(a instanceof CompoundStmt)
+                    || a instanceof Block && ((Block) a).statements().isEmpty()) {
 
                 visitThrow(a, Term.EXIT, ts.Error());
             }

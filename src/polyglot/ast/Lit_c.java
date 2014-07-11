@@ -31,6 +31,7 @@ import java.util.List;
 import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
 import polyglot.visit.CFGBuilder;
+import polyglot.visit.Traverser;
 
 /**
  * {@code Lit} represents any Java literal.
@@ -38,13 +39,8 @@ import polyglot.visit.CFGBuilder;
 public abstract class Lit_c extends Expr_c implements Lit {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
-    @Deprecated
     public Lit_c(Position pos) {
-        this(pos, null);
-    }
-
-    public Lit_c(Position pos, Ext ext) {
-        super(pos, ext);
+        super(pos);
     }
 
     @Override
@@ -53,7 +49,7 @@ public abstract class Lit_c extends Expr_c implements Lit {
     }
 
     @Override
-    public Term firstChild() {
+    public Term firstChild(Traverser v) {
         return null;
     }
 
@@ -63,15 +59,15 @@ public abstract class Lit_c extends Expr_c implements Lit {
     }
 
     @Override
-    public boolean constantValueSet(Lang lang) {
+    public boolean constantValueSet(Traverser v) {
         return true;
     }
 
     @Override
-    public boolean isConstant(Lang lang) {
+    public boolean isConstant(Traverser v) {
         return true;
     }
 
     @Override
-    public abstract Object constantValue(Lang lang);
+    public abstract Object constantValue(Traverser v);
 }

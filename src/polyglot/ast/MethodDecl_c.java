@@ -50,6 +50,7 @@ import polyglot.visit.AmbiguityRemover;
 import polyglot.visit.CFGBuilder;
 import polyglot.visit.NodeVisitor;
 import polyglot.visit.PrettyPrinter;
+import polyglot.visit.Traverser;
 import polyglot.visit.TypeBuilder;
 import polyglot.visit.TypeChecker;
 
@@ -62,17 +63,10 @@ public class MethodDecl_c extends ProcedureDecl_c implements MethodDecl {
     protected TypeNode returnType;
     protected MethodInstance mi;
 
-//    @Deprecated
     public MethodDecl_c(Position pos, Flags flags, TypeNode returnType,
             Id name, List<Formal> formals, List<TypeNode> throwTypes, Block body) {
-        this(pos, flags, returnType, name, formals, throwTypes, body, null);
-    }
-
-    public MethodDecl_c(Position pos, Flags flags, TypeNode returnType,
-            Id name, List<Formal> formals, List<TypeNode> throwTypes,
-            Block body, Ext ext) {
-        super(pos, flags, name, formals, throwTypes, body, ext);
-        assert (returnType != null);
+        super(pos, flags, name, formals, throwTypes, body);
+        assert returnType != null;
         this.returnType = returnType;
     }
 
@@ -88,7 +82,7 @@ public class MethodDecl_c extends ProcedureDecl_c implements MethodDecl {
 
     @Override
     public TypeNode returnType() {
-        return this.returnType;
+        return returnType;
     }
 
     @Override
@@ -163,7 +157,7 @@ public class MethodDecl_c extends ProcedureDecl_c implements MethodDecl {
             throwTypes.add(ts.unknownType(position()));
         }
 
-        Flags f = this.flags;
+        Flags f = flags;
 
         if (ct.flags().isInterface()) {
             f = f.Public().Abstract();
@@ -191,7 +185,7 @@ public class MethodDecl_c extends ProcedureDecl_c implements MethodDecl {
     }
 
     @Override
-    public Context enterScope(Context c) {
+    public Context enterScope(Context c, Traverser v) {
         if (Report.should_report(TOPICS, 5))
             Report.report(5, "enter scope of method " + name);
         c = c.pushCode(mi);
@@ -336,7 +330,7 @@ public class MethodDecl_c extends ProcedureDecl_c implements MethodDecl {
     }
 
     @Override
-    public Term firstChild() {
+    public Term firstChild(Traverser v) {
         return listChild(formals(), returnType());
     }
 
@@ -360,13 +354,13 @@ public class MethodDecl_c extends ProcedureDecl_c implements MethodDecl {
 
     @Override
     public Node copy(NodeFactory nf) {
-        return nf.MethodDecl(this.position,
-                             this.flags,
-                             this.returnType,
-                             this.name,
-                             this.formals,
-                             this.throwTypes,
-                             this.body);
+        return nf.MethodDecl(position,
+                             flags,
+                             returnType,
+                             name,
+                             formals,
+                             throwTypes,
+                             body);
     }
 
 }

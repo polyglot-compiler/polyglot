@@ -47,14 +47,9 @@ public class SourceCollection_c extends Node_c implements SourceCollection {
 
     protected List<SourceFile> sources;
 
-//    @Deprecated
     public SourceCollection_c(Position pos, List<SourceFile> sources) {
-        this(pos, sources, null);
-    }
-
-    public SourceCollection_c(Position pos, List<SourceFile> sources, Ext ext) {
-        super(pos, ext);
-        assert (sources != null);
+        super(pos);
+        assert sources != null;
         this.sources = ListUtil.copy(sources, true);
     }
 
@@ -65,7 +60,7 @@ public class SourceCollection_c extends Node_c implements SourceCollection {
 
     @Override
     public List<SourceFile> sources() {
-        return this.sources;
+        return sources;
     }
 
     @Override
@@ -104,7 +99,7 @@ public class SourceCollection_c extends Node_c implements SourceCollection {
 
     @Override
     public Node copy(NodeFactory nf) {
-        return nf.SourceCollection(this.position, this.sources);
+        return nf.SourceCollection(position, sources);
     }
 
 }

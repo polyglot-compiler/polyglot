@@ -34,7 +34,7 @@ import polyglot.ast.Call;
 import polyglot.ast.CallOps;
 import polyglot.ast.Expr;
 import polyglot.ast.FieldDecl;
-import polyglot.ast.Lang;
+import polyglot.ast.JLang;
 import polyglot.ast.LocalDecl;
 import polyglot.ast.Node;
 import polyglot.ast.Return;
@@ -56,6 +56,7 @@ import polyglot.types.TypeSystem;
 import polyglot.util.CodeWriter;
 import polyglot.util.SerialVersionUID;
 import polyglot.visit.PrettyPrinter;
+import polyglot.visit.Traverser;
 import polyglot.visit.TypeChecker;
 
 public class JL5CallExt extends JL5ProcedureCallExt implements CallOps {
@@ -77,7 +78,7 @@ public class JL5CallExt extends JL5ProcedureCallExt implements CallOps {
     private transient Type expectedReturnType = null;
 
     protected Type expectedReturnType() {
-        return this.expectedReturnType;
+        return expectedReturnType;
     }
 
     protected void setExpectedReturnType(Type type) {
@@ -158,12 +159,12 @@ public class JL5CallExt extends JL5ProcedureCallExt implements CallOps {
 
         List<ReferenceType> actualTypeArgs = actualTypeArgs();
 
-        ReferenceType targetType = tc.lang().findTargetType(n);
+        ReferenceType targetType = tc.lang().findTargetType(n, tc);
 
         /* This call is in a static context if and only if
          * the target (possibly implicit) is a type node.
          */
-        boolean staticContext = (n.target() instanceof TypeNode);
+        boolean staticContext = n.target() instanceof TypeNode;
 
         if (staticContext && targetType instanceof RawClass) {
             targetType = ((RawClass) targetType).base();
@@ -288,28 +289,28 @@ public class JL5CallExt extends JL5ProcedureCallExt implements CallOps {
     }
 
     @Override
-    public ReferenceType findTargetType() throws SemanticException {
-        return superLang().findTargetType(node());
+    public ReferenceType findTargetType(Traverser v) throws SemanticException {
+        return ((JLang) v.superLang(lang())).findTargetType(node(), v);
     }
 
     @Override
     public Node typeCheckNullTarget(TypeChecker tc, List<Type> argTypes)
             throws SemanticException {
-        return superLang().typeCheckNullTarget(node(), tc, argTypes);
+        return tc.superLang(lang()).typeCheckNullTarget(node(), tc, argTypes);
     }
 
     @Override
-    public boolean constantValueSet(Lang lang) {
-        return superLang().constantValueSet(node(), lang);
+    public boolean constantValueSet(Traverser v) {
+        return v.superLang(lang()).constantValueSet(node(), v);
     }
 
     @Override
-    public boolean isConstant(Lang lang) {
-        return superLang().isConstant(node(), lang);
+    public boolean isConstant(Traverser v) {
+        return v.superLang(lang()).isConstant(node(), v);
     }
 
     @Override
-    public Object constantValue(Lang lang) {
-        return superLang().constantValue(node(), lang);
+    public Object constantValue(Traverser v) {
+        return v.superLang(lang()).constantValue(node(), v);
     }
 }

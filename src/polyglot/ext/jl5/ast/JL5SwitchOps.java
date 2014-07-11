@@ -26,9 +26,8 @@
 package polyglot.ext.jl5.ast;
 
 import polyglot.types.Type;
+import polyglot.visit.TypeChecker;
 
 public interface JL5SwitchOps {
-
-    boolean isAcceptableSwitchType(Type type);
-
+    boolean isAcceptableSwitchType(Type type, TypeChecker tc);
 }

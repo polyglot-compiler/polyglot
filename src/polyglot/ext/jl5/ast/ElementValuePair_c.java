@@ -28,10 +28,10 @@ package polyglot.ext.jl5.ast;
 import java.util.List;
 
 import polyglot.ast.Id;
+import polyglot.ast.JLang;
 import polyglot.ast.Node;
 import polyglot.ast.Term;
 import polyglot.ast.Term_c;
-import polyglot.ext.jl5.types.JL5TypeSystem;
 import polyglot.types.SemanticException;
 import polyglot.util.CodeWriter;
 import polyglot.util.Copy;
@@ -41,6 +41,7 @@ import polyglot.visit.CFGBuilder;
 import polyglot.visit.NodeVisitor;
 import polyglot.visit.PrettyPrinter;
 import polyglot.visit.Translator;
+import polyglot.visit.Traverser;
 import polyglot.visit.TypeChecker;
 
 public class ElementValuePair_c extends Term_c implements ElementValuePair {
@@ -101,6 +102,11 @@ public class ElementValuePair_c extends Term_c implements ElementValuePair {
     }
 
     @Override
+    public JLang lang() {
+        return J5Lang_c.instance;
+    }
+
+    @Override
     public Node visitChildren(NodeVisitor v) {
         Term value = visitChild(this.value, v);
         return value(value);
@@ -108,8 +114,7 @@ public class ElementValuePair_c extends Term_c implements ElementValuePair {
 
     @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
-        JL5TypeSystem ts = (JL5TypeSystem) tc.typeSystem();
-        ts.checkAnnotationValueConstant(value);
+        JL5TermExt.checkAnnotationValueConstant(value, tc);
         return this;
     }
 
@@ -132,8 +137,8 @@ public class ElementValuePair_c extends Term_c implements ElementValuePair {
     }
 
     @Override
-    public Term firstChild() {
-        return this.value;
+    public Term firstChild(Traverser v) {
+        return value;
     }
 
     @Override

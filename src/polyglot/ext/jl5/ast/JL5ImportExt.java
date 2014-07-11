@@ -61,7 +61,7 @@ public class JL5ImportExt extends JL5Ext {
         else if (im.kind() == JL5Import.STATIC_ON_DEMAND) {
             it.addStaticOnDemandImport(im.name(), im.position());
         }
-        return superLang().buildTypes(im, tb);
+        return tb.superLang(lang()).buildTypes(im, tb);
     }
 
     @Override
@@ -83,7 +83,7 @@ public class JL5ImportExt extends JL5Ext {
             return n;
         }
         else {
-            return superLang().typeCheck(this.node(), tc);
+            return tc.superLang(lang()).typeCheck(this.node(), tc);
         }
     }
 
@@ -151,7 +151,7 @@ public class JL5ImportExt extends JL5Ext {
             w.write(";");
             w.newline(0);
         }
-        else superLang().prettyPrint(this.node(), w, tr);
+        else tr.superLang(lang()).prettyPrint(this.node(), w, tr);
 
     }
 }

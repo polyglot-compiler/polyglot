@@ -29,10 +29,12 @@ package polyglot.visit;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import polyglot.ast.Cast;
 import polyglot.ast.Expr;
 import polyglot.ast.JLang;
+import polyglot.ast.Lang;
 import polyglot.ast.Node;
 import polyglot.ast.ProcedureCall;
 import polyglot.types.Type;
@@ -43,8 +45,8 @@ import polyglot.types.Type;
  * The AST must be type-checked before using this visitor.
  */
 public class RedundantCastRemover extends NodeVisitor {
-    public RedundantCastRemover(JLang lang) {
-        super(lang);
+    public RedundantCastRemover(JLang lang, Map<Lang, Lang> superLangMap) {
+        super(lang, superLangMap);
     }
 
     @Override

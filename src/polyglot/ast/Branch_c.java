@@ -35,6 +35,7 @@ import polyglot.util.SerialVersionUID;
 import polyglot.visit.CFGBuilder;
 import polyglot.visit.NodeVisitor;
 import polyglot.visit.PrettyPrinter;
+import polyglot.visit.Traverser;
 
 /**
  * A {@code Branch} is an immutable representation of a branch
@@ -46,21 +47,16 @@ public class Branch_c extends Stmt_c implements Branch {
     protected Branch.Kind kind;
     protected Id label;
 
-//    @Deprecated
     public Branch_c(Position pos, Branch.Kind kind, Id label) {
-        this(pos, kind, label, null);
-    }
-
-    public Branch_c(Position pos, Branch.Kind kind, Id label, Ext ext) {
-        super(pos, ext);
-        assert (kind != null); // label may be null
+        super(pos);
+        assert kind != null; // label may be null
         this.kind = kind;
         this.label = label;
     }
 
     @Override
     public Branch.Kind kind() {
-        return this.kind;
+        return kind;
     }
 
     @Override
@@ -77,7 +73,7 @@ public class Branch_c extends Stmt_c implements Branch {
 
     @Override
     public Id labelNode() {
-        return this.label;
+        return label;
     }
 
     @Override
@@ -94,7 +90,7 @@ public class Branch_c extends Stmt_c implements Branch {
 
     @Override
     public String label() {
-        return this.label != null ? this.label.id() : null;
+        return label != null ? label.id() : null;
     }
 
     @Override
@@ -129,7 +125,7 @@ public class Branch_c extends Stmt_c implements Branch {
     }
 
     @Override
-    public Term firstChild() {
+    public Term firstChild(Traverser v) {
         return null;
     }
 
@@ -141,7 +137,7 @@ public class Branch_c extends Stmt_c implements Branch {
 
     @Override
     public Node copy(NodeFactory nf) {
-        return nf.Branch(this.position, this.kind, this.label);
+        return nf.Branch(position, kind, label);
     }
 
 }

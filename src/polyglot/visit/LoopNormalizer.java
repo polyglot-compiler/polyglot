@@ -64,7 +64,7 @@ public class LoopNormalizer extends NodeVisitor {
     protected final NodeFactory nf;
 
     public LoopNormalizer(Job job, TypeSystem ts, NodeFactory nf) {
-        super(nf.lang());
+        super(nf.lang(), nf.superLangMap());
         this.job = job;
         this.ts = ts;
         this.nf = nf;
@@ -219,7 +219,7 @@ public class LoopNormalizer extends NodeVisitor {
         Expr cond = s.cond();
 
         // avoid unnecessary translations
-        if (lang().condIsConstantTrue(s, lang())) {
+        if (lang().condIsConstantTrue(s, this)) {
             if (cond instanceof BooleanLit) {
                 return s;
             }

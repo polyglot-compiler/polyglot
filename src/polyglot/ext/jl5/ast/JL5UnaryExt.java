@@ -58,13 +58,14 @@ public class JL5UnaryExt extends JL5ExprExt {
         Expr expr = u.expr();
 
         if (!ts.isPrimitiveWrapper(expr.type())) {
-            return superLang().typeCheck(this.node(), tc);
+            return tc.superLang(lang()).typeCheck(this.node(), tc);
         }
 
         if (op == POST_INC || op == POST_DEC || op == PRE_INC || op == PRE_DEC) {
 
             if (!expr.type().isNumeric()) {
-                if (!(ts.isPrimitiveWrapper(expr.type()) && (ts.primitiveTypeOfWrapper(expr.type()).isNumeric()))) {
+                if (!(ts.isPrimitiveWrapper(expr.type()) && ts.primitiveTypeOfWrapper(expr.type())
+                                                              .isNumeric())) {
                     throw new SemanticException("Operand of " + op
                             + " operator must be numeric.", expr.position());
                 }
@@ -101,7 +102,8 @@ public class JL5UnaryExt extends JL5ExprExt {
 
         if (op == NEG || op == POS) {
             if (!expr.type().isNumeric()) {
-                if (!(ts.isPrimitiveWrapper(expr.type()) && (ts.primitiveTypeOfWrapper(expr.type()).isNumeric()))) {
+                if (!(ts.isPrimitiveWrapper(expr.type()) && ts.primitiveTypeOfWrapper(expr.type())
+                                                              .isNumeric())) {
                     throw new SemanticException("Operand of " + op
                             + " operator must be numeric.", expr.position());
                 }
@@ -117,7 +119,8 @@ public class JL5UnaryExt extends JL5ExprExt {
 
         if (op == NOT) {
             if (!expr.type().isBoolean()) {
-                if (!(ts.isPrimitiveWrapper(expr.type()) && (ts.primitiveTypeOfWrapper(expr.type()).isBoolean()))) {
+                if (!(ts.isPrimitiveWrapper(expr.type()) && ts.primitiveTypeOfWrapper(expr.type())
+                                                              .isBoolean())) {
                     throw new SemanticException("Operand of " + op
                             + " operator must be boolean.", expr.position());
                 }

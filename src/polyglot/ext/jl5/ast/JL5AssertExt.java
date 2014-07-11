@@ -48,13 +48,13 @@ public class JL5AssertExt extends JL5TermExt {
             // superclass type check functionality.
             Assert n =
                     orig.cond(orig.cond().type(ts.primitiveTypeOfWrapper(c)));
-            n = (Assert) superLang().typeCheck(n, tc);
+            n = (Assert) tc.superLang(lang()).typeCheck(n, tc);
 
             // restore the type
             n = n.cond(n.cond().type(c));
             return n;
         }
-        return superLang().typeCheck(this.node(), tc);
+        return tc.superLang(lang()).typeCheck(this.node(), tc);
     }
 
 }

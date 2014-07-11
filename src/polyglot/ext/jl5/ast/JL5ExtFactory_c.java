@@ -39,6 +39,11 @@ public final class JL5ExtFactory_c extends JL5AbstractExtFactory_c {
     }
 
     @Override
+    public J5Lang lang() {
+        return J5Lang_c.instance;
+    }
+
+    @Override
     protected Ext extNodeImpl() {
         return new JL5Ext();
     }

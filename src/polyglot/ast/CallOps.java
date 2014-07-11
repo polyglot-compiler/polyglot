@@ -32,6 +32,7 @@ import polyglot.types.ReferenceType;
 import polyglot.types.SemanticException;
 import polyglot.types.Type;
 import polyglot.types.TypeSystem;
+import polyglot.visit.Traverser;
 import polyglot.visit.TypeChecker;
 
 /**
@@ -46,7 +47,7 @@ public interface CallOps extends ProcedureCallOps, ExprOps {
      */
     Type findContainer(TypeSystem ts, MethodInstance mi);
 
-    ReferenceType findTargetType() throws SemanticException;
+    ReferenceType findTargetType(Traverser v) throws SemanticException;
 
     /**
      * Typecheck the Call when the target is null. This method finds

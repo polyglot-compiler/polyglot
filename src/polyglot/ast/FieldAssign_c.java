@@ -38,6 +38,7 @@ import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
 import polyglot.visit.CFGBuilder;
 import polyglot.visit.NodeVisitor;
+import polyglot.visit.Traverser;
 
 /**
  * A {@code FieldAssign} represents a Java assignment expression to
@@ -49,14 +50,8 @@ import polyglot.visit.NodeVisitor;
 public class FieldAssign_c extends Assign_c implements FieldAssign {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
-//    @Deprecated
     public FieldAssign_c(Position pos, Field left, Operator op, Expr right) {
-        this(pos, left, op, right, null);
-    }
-
-    public FieldAssign_c(Position pos, Field left, Operator op, Expr right,
-            Ext ext) {
-        super(pos, left, op, right, ext);
+        super(pos, left, op, right);
     }
 
     @Override
@@ -77,7 +72,7 @@ public class FieldAssign_c extends Assign_c implements FieldAssign {
     }
 
     @Override
-    public Term firstChild() {
+    public Term firstChild(Traverser v) {
         Field f = left();
         if (f.target() instanceof Expr) {
             return (Expr) f.target();
@@ -135,8 +130,8 @@ public class FieldAssign_c extends Assign_c implements FieldAssign {
     }
 
     @Override
-    public List<Type> throwTypes(TypeSystem ts) {
-        List<Type> l = new ArrayList<>(super.throwTypes(ts));
+    public List<Type> throwTypes(TypeSystem ts, Traverser v) {
+        List<Type> l = new ArrayList<>(super.throwTypes(ts, v));
 
         Field f = left();
         if (f.target() instanceof Expr) {

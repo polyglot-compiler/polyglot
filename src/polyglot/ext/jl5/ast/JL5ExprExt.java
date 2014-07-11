@@ -2,8 +2,8 @@ package polyglot.ext.jl5.ast;
 
 import polyglot.ast.Expr;
 import polyglot.ast.ExprOps;
-import polyglot.ast.Lang;
 import polyglot.util.SerialVersionUID;
+import polyglot.visit.Traverser;
 
 public class JL5ExprExt extends JL5TermExt implements ExprOps {
     private static final long serialVersionUID = SerialVersionUID.generate();
@@ -14,17 +14,17 @@ public class JL5ExprExt extends JL5TermExt implements ExprOps {
     }
 
     @Override
-    public boolean constantValueSet(Lang lang) {
-        return superLang().constantValueSet(node(), lang);
+    public boolean constantValueSet(Traverser v) {
+        return v.superLang(lang()).constantValueSet(node(), v);
     }
 
     @Override
-    public boolean isConstant(Lang lang) {
-        return superLang().isConstant(node(), lang);
+    public boolean isConstant(Traverser v) {
+        return v.superLang(lang()).isConstant(node(), v);
     }
 
     @Override
-    public Object constantValue(Lang lang) {
-        return superLang().constantValue(node(), lang);
+    public Object constantValue(Traverser v) {
+        return v.superLang(lang()).constantValue(node(), v);
     }
 }

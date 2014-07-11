@@ -49,14 +49,9 @@ public class ArrayTypeNode_c extends TypeNode_c implements ArrayTypeNode {
 
     protected TypeNode base;
 
-//    @Deprecated
     public ArrayTypeNode_c(Position pos, TypeNode base) {
-        this(pos, base, null);
-    }
-
-    public ArrayTypeNode_c(Position pos, TypeNode base, Ext ext) {
-        super(pos, ext);
-        assert (base != null);
+        super(pos);
+        assert base != null;
         this.base = base;
     }
 
@@ -145,6 +140,6 @@ public class ArrayTypeNode_c extends TypeNode_c implements ArrayTypeNode {
 
     @Override
     public Node copy(NodeFactory nf) {
-        return nf.ArrayTypeNode(this.position, this.base);
+        return nf.ArrayTypeNode(position, base);
     }
 }

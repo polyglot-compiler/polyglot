@@ -34,6 +34,9 @@ package polyglot.ast;
  */
 public interface ExtFactory extends Iterable<ExtFactory> {
 
+    /** The language associated with this extension factory. */
+    Lang lang();
+
     /**
      * The next extFactory in the chain. 
      */

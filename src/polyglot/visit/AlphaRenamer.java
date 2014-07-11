@@ -89,15 +89,15 @@ public class AlphaRenamer extends NodeVisitor {
 
     public AlphaRenamer(NodeFactory nf, boolean renameCatchFormals,
             boolean createNewLocalInstances) {
-        super(nf.lang());
+        super(nf.lang(), nf.superLangMap());
         this.nf = nf;
 
-        this.setStack = new Stack<>();
-        this.setStack.push(new HashSet<String>());
+        setStack = new Stack<>();
+        setStack.push(new HashSet<String>());
 
-        this.renamingMap = new HashMap<>();
-        this.localInstanceMemo = new HashMap<>();
-        this.freshVars = new HashSet<>();
+        renamingMap = new HashMap<>();
+        localInstanceMemo = new HashMap<>();
+        freshVars = new HashSet<>();
 
         this.renameCatchFormals = renameCatchFormals;
         this.createNewLocalInstances = createNewLocalInstances;
@@ -110,7 +110,7 @@ public class AlphaRenamer extends NodeVisitor {
             setStack.push(new HashSet<String>());
         }
 
-        if (this.renameCatchFormals && n instanceof Catch) {
+        if (renameCatchFormals && n instanceof Catch) {
             Catch c = (Catch) n;
             addToRenamingMap(c.formal().name());
         }
@@ -190,7 +190,7 @@ public class AlphaRenamer extends NodeVisitor {
             return l.name(newName);
         }
 
-        if (n instanceof Catch && this.renameCatchFormals) {
+        if (n instanceof Catch && renameCatchFormals) {
             // Rename the catch formal.
             Catch c = (Catch) n;
             String name = c.formal().name();

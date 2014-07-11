@@ -91,12 +91,12 @@ public class Translator extends PrettyPrinter implements Copy<Translator> {
      * whose names are added to the collection {@code outputFiles}.
      */
     public Translator(Job job, TypeSystem ts, NodeFactory nf, TargetFactory tf) {
-        super(nf.lang());
+        super(nf.lang(), nf.superLangMap());
         this.job = job;
         this.nf = nf;
         this.tf = tf;
         this.ts = ts;
-        this.context = ts.createContext();
+        context = ts.createContext();
     }
 
     /**
@@ -129,7 +129,7 @@ public class Translator extends PrettyPrinter implements Copy<Translator> {
 
     /** Get the current typing context, or null. */
     public Context context() {
-        return this.context;
+        return context;
     }
 
     /**
@@ -137,7 +137,7 @@ public class Translator extends PrettyPrinter implements Copy<Translator> {
      * with new context {@code c}
      */
     public Translator context(Context c) {
-        if (c == this.context) {
+        if (c == context) {
             return this;
         }
         Translator tr = copy();
@@ -158,11 +158,12 @@ public class Translator extends PrettyPrinter implements Copy<Translator> {
         if (context != null) {
             if (child.isDisambiguated() && child.isTypeChecked()) {
                 if (parent == null) {
-                    Context c = lang().enterScope(child, context);
+                    Context c = lang().enterScope(child, context, this);
                     tr = this.context(c);
                 }
                 else if (parent.isDisambiguated() && parent.isTypeChecked()) {
-                    Context c = lang().enterChildScope(parent, child, context);
+                    Context c =
+                            lang().enterChildScope(parent, child, context, this);
                     tr = this.context(c);
                 }
                 else {
@@ -178,7 +179,7 @@ public class Translator extends PrettyPrinter implements Copy<Translator> {
 
         if (context != null) {
             if (child.isDisambiguated() && child.isTypeChecked()) {
-                lang().addDecls(child, context);
+                lang().addDecls(child, context, this);
             }
         }
     }
@@ -266,7 +267,7 @@ public class Translator extends PrettyPrinter implements Copy<Translator> {
             TopLevelDecl decl) {
         Translator tr;
         if (source.isDisambiguated() && source.isTypeChecked()) {
-            Context c = lang().enterScope(source, context);
+            Context c = lang().enterScope(source, context, this);
             tr = this.context(c);
         }
         else {

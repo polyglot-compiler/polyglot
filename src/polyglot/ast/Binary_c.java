@@ -40,6 +40,7 @@ import polyglot.visit.CFGBuilder;
 import polyglot.visit.FlowGraph;
 import polyglot.visit.NodeVisitor;
 import polyglot.visit.PrettyPrinter;
+import polyglot.visit.Traverser;
 import polyglot.visit.TypeChecker;
 
 /**
@@ -54,27 +55,22 @@ public class Binary_c extends Expr_c implements Binary {
     protected Expr right;
     protected Precedence precedence;
 
-//    @Deprecated
     public Binary_c(Position pos, Expr left, Operator op, Expr right) {
-        this(pos, left, op, right, null);
-    }
-
-    public Binary_c(Position pos, Expr left, Operator op, Expr right, Ext ext) {
-        super(pos, ext);
-        assert (left != null && op != null && right != null);
+        super(pos);
+        assert left != null && op != null && right != null;
         this.left = left;
         this.op = op;
         this.right = right;
-        this.precedence = op.precedence();
+        precedence = op.precedence();
         if (op == ADD
                 && (left instanceof StringLit || right instanceof StringLit)) {
-            this.precedence = Precedence.STRING_ADD;
+            precedence = Precedence.STRING_ADD;
         }
     }
 
     @Override
     public Expr left() {
-        return this.left;
+        return left;
     }
 
     @Override
@@ -91,7 +87,7 @@ public class Binary_c extends Expr_c implements Binary {
 
     @Override
     public Operator operator() {
-        return this.op;
+        return op;
     }
 
     @Override
@@ -108,7 +104,7 @@ public class Binary_c extends Expr_c implements Binary {
 
     @Override
     public Expr right() {
-        return this.right;
+        return right;
     }
 
     @Override
@@ -125,7 +121,7 @@ public class Binary_c extends Expr_c implements Binary {
 
     @Override
     public Precedence precedence() {
-        return this.precedence;
+        return precedence;
     }
 
     @Override
@@ -155,24 +151,24 @@ public class Binary_c extends Expr_c implements Binary {
     }
 
     @Override
-    public boolean constantValueSet(Lang lang) {
-        return lang.constantValueSet(left, lang)
-                && lang.constantValueSet(right, lang);
+    public boolean constantValueSet(Traverser v) {
+        return v.lang().constantValueSet(left, v)
+                && v.lang().constantValueSet(right, v);
     }
 
     @Override
-    public boolean isConstant(Lang lang) {
-        return lang.isConstant(left, lang) && lang.isConstant(right, lang);
+    public boolean isConstant(Traverser v) {
+        return v.lang().isConstant(left, v) && v.lang().isConstant(right, v);
     }
 
     @Override
-    public Object constantValue(Lang lang) {
-        if (!lang.isConstant(this, lang)) {
+    public Object constantValue(Traverser v) {
+        if (!v.lang().isConstant(this, v)) {
             return null;
         }
 
-        Object lv = lang.constantValue(left, lang);
-        Object rv = lang.constantValue(right, lang);
+        Object lv = v.lang().constantValue(left, v);
+        Object rv = v.lang().constantValue(right, v);
 
         if (op == ADD && (lv instanceof String || rv instanceof String)) {
             // toString() does what we want for String, Number, and Boolean
@@ -181,11 +177,11 @@ public class Binary_c extends Expr_c implements Binary {
             return lv.toString() + rv.toString();
         }
 
-        if (op == EQ && (lv instanceof String && rv instanceof String)) {
+        if (op == EQ && lv instanceof String && rv instanceof String) {
             return Boolean.valueOf(((String) lv).intern() == ((String) rv).intern());
         }
 
-        if (op == NE && (lv instanceof String && rv instanceof String)) {
+        if (op == NE && lv instanceof String && rv instanceof String) {
             return Boolean.valueOf(((String) lv).intern() != ((String) rv).intern());
         }
 
@@ -589,7 +585,7 @@ public class Binary_c extends Expr_c implements Binary {
     }
 
     @Override
-    public Term firstChild() {
+    public Term firstChild(Traverser v) {
         return left;
     }
 
@@ -651,7 +647,7 @@ public class Binary_c extends Expr_c implements Binary {
     }
 
     @Override
-    public List<Type> throwTypes(TypeSystem ts) {
+    public List<Type> throwTypes(TypeSystem ts, Traverser v) {
         if (throwsArithmeticException()) {
             return Collections.singletonList((Type) ts.ArithmeticException());
         }
@@ -661,7 +657,7 @@ public class Binary_c extends Expr_c implements Binary {
 
     @Override
     public Node copy(NodeFactory nf) {
-        return nf.Binary(this.position, this.left, this.op, this.right);
+        return nf.Binary(position, left, op, right);
     }
 
 }

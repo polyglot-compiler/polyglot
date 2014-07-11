@@ -27,6 +27,7 @@
 package polyglot.ast;
 
 import java.util.List;
+import java.util.Map;
 
 import polyglot.frontend.MissingDependencyException;
 import polyglot.frontend.Scheduler;
@@ -48,6 +49,7 @@ import polyglot.visit.CFGBuilder;
 import polyglot.visit.ConstantChecker;
 import polyglot.visit.NodeVisitor;
 import polyglot.visit.PrettyPrinter;
+import polyglot.visit.Traverser;
 import polyglot.visit.TypeBuilder;
 import polyglot.visit.TypeChecker;
 
@@ -64,16 +66,10 @@ public class LocalDecl_c extends Stmt_c implements LocalDecl {
     protected Expr init;
     protected LocalInstance li;
 
-//    @Deprecated
     public LocalDecl_c(Position pos, Flags flags, TypeNode type, Id name,
             Expr init) {
-        this(pos, flags, type, name, init, null);
-    }
-
-    public LocalDecl_c(Position pos, Flags flags, TypeNode type, Id name,
-            Expr init, Ext ext) {
-        super(pos, ext);
-        assert (flags != null && type != null && name != null); // init may be null
+        super(pos);
+        assert flags != null && type != null && name != null; // init may be null
         this.flags = flags;
         this.type = type;
         this.name = name;
@@ -212,15 +208,15 @@ public class LocalDecl_c extends Stmt_c implements LocalDecl {
      * initializer
      */
     @Override
-    public Context enterChildScope(Node child, Context c) {
+    public Context enterChildScope(Node child, Context c, Traverser v) {
         if (child == init) {
             c.addVariable(li);
         }
-        return super.enterChildScope(child, c);
+        return super.enterChildScope(child, c, v);
     }
 
     @Override
-    public void addDecls(Context c) {
+    public void addDecls(Context c, Traverser v) {
         // Add the declaration of the variable in case we haven't already done
         // so in enterScope, when visiting the initializer.
         c.addVariable(li);
@@ -297,8 +293,7 @@ public class LocalDecl_c extends Stmt_c implements LocalDecl {
                         && !ts.typeEquals(init.type(), type.type())
                         && !ts.numericConversionValid(type.type(),
                                                       tc.lang()
-                                                        .constantValue(init,
-                                                                       tc.lang()))) {
+                                                        .constantValue(init, tc))) {
                     throw new SemanticException("The type of the variable "
                                                         + "initializer \""
                                                         + init.type()
@@ -317,8 +312,9 @@ public class LocalDecl_c extends Stmt_c implements LocalDecl {
         protected ConstantChecker cc;
         protected LocalInstance li;
 
-        AddDependenciesVisitor(JLang lang, ConstantChecker cc, LocalInstance li) {
-            super(lang);
+        AddDependenciesVisitor(JLang lang, Map<Lang, Lang> superLangMap,
+                ConstantChecker cc, LocalInstance li) {
+            super(lang, superLangMap);
             this.cc = cc;
             this.li = li;
         }
@@ -354,12 +350,12 @@ public class LocalDecl_c extends Stmt_c implements LocalDecl {
 //            return this;
 //        }
 
-        if (init == null || !cc.lang().isConstant(init, cc.lang())
+        if (init == null || !cc.lang().isConstant(init, cc)
                 || !li.flags().isFinal()) {
             li.setNotConstant();
         }
         else {
-            li.setConstantValue(cc.lang().constantValue(init, cc.lang()));
+            li.setConstantValue(cc.lang().constantValue(init, cc));
         }
 
         return this;
@@ -433,7 +429,7 @@ public class LocalDecl_c extends Stmt_c implements LocalDecl {
     }
 
     @Override
-    public Term firstChild() {
+    public Term firstChild(Traverser v) {
         return type();
     }
 
@@ -452,11 +448,7 @@ public class LocalDecl_c extends Stmt_c implements LocalDecl {
 
     @Override
     public Node copy(NodeFactory nf) {
-        return nf.LocalDecl(this.position,
-                            this.flags,
-                            this.type,
-                            this.name,
-                            this.init);
+        return nf.LocalDecl(position, flags, type, name, init);
     }
 
 }

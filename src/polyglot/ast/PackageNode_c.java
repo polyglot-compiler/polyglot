@@ -46,14 +46,9 @@ public class PackageNode_c extends Node_c implements PackageNode {
 
     protected Package package_;
 
-//    @Deprecated
     public PackageNode_c(Position pos, Package package_) {
-        this(pos, package_, null);
-    }
-
-    public PackageNode_c(Position pos, Package package_, Ext ext) {
-        super(pos, ext);
-        assert (package_ != null);
+        super(pos);
+        assert package_ != null;
         this.package_ = package_;
     }
 
@@ -71,7 +66,7 @@ public class PackageNode_c extends Node_c implements PackageNode {
 
     @Override
     public Package package_() {
-        return this.package_;
+        return package_;
     }
 
     @Override
@@ -117,7 +112,7 @@ public class PackageNode_c extends Node_c implements PackageNode {
 
     @Override
     public Node copy(NodeFactory nf) {
-        return nf.PackageNode(this.position, this.package_);
+        return nf.PackageNode(position, package_);
     }
 
     @Override

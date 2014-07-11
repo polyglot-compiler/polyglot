@@ -27,6 +27,7 @@
 package polyglot.ast;
 
 import java.util.List;
+import java.util.Map;
 
 import polyglot.types.Flags;
 import polyglot.types.Package;
@@ -37,15 +38,15 @@ import polyglot.util.Position;
 
 /**
  * A {@code NodeFactory} constructs AST nodes.  All node construction
- * should go through this factory or by done with the {@code copy()}
+ * should go through this factory or be done with the {@code copy()}
  * method of {@code Node}.
  */
-// XXX Backward compatible with Polyglot 2.5.3
-@SuppressWarnings("deprecation")
+@Deprecated
 public class NodeFactory_c extends AbstractNodeFactory_c {
     private final JLang lang;
     private final ExtFactory extFactory;
 
+    @Deprecated
     protected static final DelFactory emptyDelFactory =
             new AbstractDelFactory_c() {
             };
@@ -86,7 +87,12 @@ public class NodeFactory_c extends AbstractNodeFactory_c {
 
     @Override
     public JLang lang() {
-        return this.lang;
+        return lang;
+    }
+
+    @Override
+    public Map<Lang, Lang> superLangMap() {
+        throw new InternalCompilerError("Unsupported method superLangMap()");
     }
 
     /**
@@ -106,7 +112,7 @@ public class NodeFactory_c extends AbstractNodeFactory_c {
     }
 
     protected ExtFactory extFactory() {
-        return this.extFactory;
+        return extFactory;
     }
 
     @SuppressWarnings("unchecked")

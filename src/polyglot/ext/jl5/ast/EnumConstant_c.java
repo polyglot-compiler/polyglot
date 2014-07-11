@@ -27,12 +27,13 @@ package polyglot.ext.jl5.ast;
 
 import polyglot.ast.Field_c;
 import polyglot.ast.Id;
-import polyglot.ast.Lang;
+import polyglot.ast.JLang;
 import polyglot.ast.Node;
 import polyglot.ast.Receiver;
 import polyglot.ext.jl5.types.EnumInstance;
 import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
+import polyglot.visit.Traverser;
 
 public class EnumConstant_c extends Field_c implements EnumConstant {
     public EnumConstant_c(Position pos, Receiver target, Id name) {
@@ -42,18 +43,18 @@ public class EnumConstant_c extends Field_c implements EnumConstant {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
     @Override
-    public boolean constantValueSet(Lang lang) {
+    public boolean constantValueSet(Traverser v) {
         return true;
     }
 
     @Override
-    public boolean isConstant(Lang lang) {
+    public boolean isConstant(Traverser v) {
         // An enum constant is not a compile-time constant. See JLS 3rd edition 15.28.
         return false;
     }
 
     @Override
-    public Object constantValue(Lang lang) {
+    public Object constantValue(Traverser v) {
         return enumInstance();
     }
 
@@ -67,4 +68,8 @@ public class EnumConstant_c extends Field_c implements EnumConstant {
         return fieldInstance(enumInstance);
     }
 
+    @Override
+    public JLang lang() {
+        return J5Lang_c.instance;
+    }
 }

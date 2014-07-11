@@ -50,6 +50,7 @@ import polyglot.types.TypeSystem;
 import polyglot.util.CodeWriter;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.SerialVersionUID;
+import polyglot.visit.AmbiguityRemover;
 import polyglot.visit.NodeVisitor;
 import polyglot.visit.PrettyPrinter;
 import polyglot.visit.TypeBuilder;
@@ -149,7 +150,7 @@ public class JL5EnumDeclExt extends JL5ClassDeclExt {
             // mi is abstract! First, mark the class as abstract.
             n.type().setFlags(n.type().flags().Abstract());
         }
-        return superLang().typeCheckEnter(node(), tc);
+        return tc.superLang(lang()).typeCheckEnter(node(), tc);
     }
 
     @Override
@@ -210,8 +211,9 @@ public class JL5EnumDeclExt extends JL5ClassDeclExt {
     }
 
     @Override
-    public Node addDefaultConstructor(TypeSystem ts, NodeFactory nf,
-            ConstructorInstance defaultCI) throws SemanticException {
+    public Node addDefaultConstructor(ConstructorInstance defaultCI,
+            AmbiguityRemover ar) throws SemanticException {
+        NodeFactory nf = ar.nodeFactory();
         ClassDecl n = node();
         ConstructorInstance ci = defaultCI;
         if (ci == null) {

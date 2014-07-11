@@ -31,6 +31,7 @@ import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
 import polyglot.visit.AmbiguityRemover;
 import polyglot.visit.CFGBuilder;
+import polyglot.visit.Traverser;
 import polyglot.visit.TypeChecker;
 
 /**
@@ -40,17 +41,12 @@ import polyglot.visit.TypeChecker;
 public class AmbAssign_c extends Assign_c implements AmbAssign {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
-//    @Deprecated
     public AmbAssign_c(Position pos, Expr left, Operator op, Expr right) {
-        this(pos, left, op, right, null);
-    }
-
-    public AmbAssign_c(Position pos, Expr left, Operator op, Expr right, Ext ext) {
-        super(pos, left, op, right, ext);
+        super(pos, left, op, right);
     }
 
     @Override
-    public Term firstChild() {
+    public Term firstChild(Traverser v) {
         if (operator() != Assign.ASSIGN) {
             return left();
         }
@@ -105,6 +101,6 @@ public class AmbAssign_c extends Assign_c implements AmbAssign {
 
     @Override
     public Node copy(NodeFactory nf) {
-        return nf.AmbAssign(this.position, this.left, this.op, this.right);
+        return nf.AmbAssign(position, left, op, right);
     }
 }

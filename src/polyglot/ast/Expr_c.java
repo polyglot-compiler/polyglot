@@ -34,6 +34,7 @@ import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
 import polyglot.visit.PrettyPrinter;
+import polyglot.visit.Traverser;
 import polyglot.visit.TypeBuilder;
 
 /**
@@ -45,13 +46,8 @@ public abstract class Expr_c extends Term_c implements Expr, ExprOps {
 
     protected Type type;
 
-    @Deprecated
     public Expr_c(Position pos) {
-        this(pos, null);
-    }
-
-    public Expr_c(Position pos, Ext ext) {
-        super(pos, ext);
+        super(pos);
     }
 
     /**
@@ -61,7 +57,7 @@ public abstract class Expr_c extends Term_c implements Expr, ExprOps {
      */
     @Override
     public Type type() {
-        return this.type;
+        return type;
     }
 
     @Override
@@ -110,70 +106,70 @@ public abstract class Expr_c extends Term_c implements Expr, ExprOps {
     @Deprecated
     @Override
     public boolean constantValueSet() {
-        return lastLang().constantValueSet(this, lastLang());
+        return constantValueSet(delTraverser);
     }
 
     @Deprecated
     @Override
     public boolean isConstant() {
-        return lastLang().isConstant(this, lastLang());
+        return isConstant(delTraverser);
     }
 
     @Deprecated
     @Override
     public Object constantValue() {
-        return lastLang().constantValue(this, lastLang());
+        return constantValue(delTraverser);
     }
 
     @Override
-    public boolean constantValueSet(Lang lang) {
+    public boolean constantValueSet(Traverser v) {
         return true;
     }
 
     @Override
-    public boolean isConstant(Lang lang) {
+    public boolean isConstant(Traverser v) {
         return false;
     }
 
     @Override
-    public Object constantValue(Lang lang) {
+    public Object constantValue(Traverser v) {
         return null;
     }
 
-    public String stringValue(Lang lang) {
-        return (String) lang.constantValue(this, lang);
+    public String stringValue(Traverser v) {
+        return (String) v.lang().constantValue(this, v);
     }
 
-    public boolean booleanValue(Lang lang) {
-        return ((Boolean) lang.constantValue(this, lang)).booleanValue();
+    public boolean booleanValue(Traverser v) {
+        return ((Boolean) v.lang().constantValue(this, v)).booleanValue();
     }
 
-    public byte byteValue(Lang lang) {
-        return ((Byte) lang.constantValue(this, lang)).byteValue();
+    public byte byteValue(Traverser v) {
+        return ((Byte) v.lang().constantValue(this, v)).byteValue();
     }
 
-    public short shortValue(Lang lang) {
-        return ((Short) lang.constantValue(this, lang)).shortValue();
+    public short shortValue(Traverser v) {
+        return ((Short) v.lang().constantValue(this, v)).shortValue();
     }
 
-    public char charValue(Lang lang) {
-        return ((Character) lang.constantValue(this, lang)).charValue();
+    public char charValue(Traverser v) {
+        return ((Character) v.lang().constantValue(this, v)).charValue();
     }
 
-    public int intValue(Lang lang) {
-        return ((Integer) lang.constantValue(this, lang)).intValue();
+    public int intValue(Traverser v) {
+        return ((Integer) v.lang().constantValue(this, v)).intValue();
     }
 
-    public long longValue(Lang lang) {
-        return ((Long) lang.constantValue(this, lang)).longValue();
+    public long longValue(Traverser v) {
+        return ((Long) v.lang().constantValue(this, v)).longValue();
     }
 
-    public float floatValue(Lang lang) {
-        return ((Float) lang.constantValue(this, lang)).floatValue();
+    public float floatValue(Traverser v) {
+        return ((Float) v.lang().constantValue(this, v)).floatValue();
     }
 
-    public double doubleValue(Lang lang) {
-        return ((Double) lang.constantValue(this, lang)).doubleValue();
+    public double doubleValue(Traverser v) {
+        return ((Double) v.lang().constantValue(this, v)).doubleValue();
     }
 
     @Override

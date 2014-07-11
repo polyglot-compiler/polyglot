@@ -30,6 +30,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import polyglot.ast.Expr;
+import polyglot.ast.JLang;
 import polyglot.ast.Node;
 import polyglot.ast.NodeFactory;
 import polyglot.ast.Term;
@@ -48,6 +49,7 @@ import polyglot.visit.AscriptionVisitor;
 import polyglot.visit.CFGBuilder;
 import polyglot.visit.NodeVisitor;
 import polyglot.visit.PrettyPrinter;
+import polyglot.visit.Traverser;
 import polyglot.visit.TypeChecker;
 
 /**
@@ -66,13 +68,13 @@ public class ElementValueArrayInit_c extends Term_c implements
 
     public ElementValueArrayInit_c(Position pos, List<Term> elements) {
         super(pos);
-        assert (elements != null);
+        assert elements != null;
         this.elements = ListUtil.copy(elements, true);
     }
 
     @Override
     public List<Term> elements() {
-        return this.elements;
+        return elements;
     }
 
     @Override
@@ -94,7 +96,7 @@ public class ElementValueArrayInit_c extends Term_c implements
 
     @Override
     public Type type() {
-        return this.type;
+        return type;
     }
 
     @Override
@@ -118,6 +120,11 @@ public class ElementValueArrayInit_c extends Term_c implements
             List<Term> elements) {
         n = elements(n, elements);
         return n;
+    }
+
+    @Override
+    public JLang lang() {
+        return J5Lang_c.instance;
     }
 
     @Override
@@ -216,8 +223,7 @@ public class ElementValueArrayInit_c extends Term_c implements
                     && !ts.typeEquals(s, t)
                     && !ts.numericConversionValid(t,
                                                   tc.lang()
-                                                    .constantValue((Expr) e,
-                                                                   tc.lang()))) {
+                                                    .constantValue((Expr) e, tc))) {
                 throw new SemanticException("Cannot assign " + s + " to " + t
                         + ".", e.position());
             }
@@ -247,7 +253,7 @@ public class ElementValueArrayInit_c extends Term_c implements
     }
 
     @Override
-    public Term firstChild() {
+    public Term firstChild(Traverser v) {
         return Term_c.listChild(elements, (Expr) null);
     }
 
@@ -259,7 +265,6 @@ public class ElementValueArrayInit_c extends Term_c implements
 
     @Override
     public Node copy(NodeFactory nf) {
-        return ((JL5NodeFactory) nf).ElementValueArrayInit(position(),
-                                                           this.elements);
+        return ((JL5NodeFactory) nf).ElementValueArrayInit(position(), elements);
     }
 }

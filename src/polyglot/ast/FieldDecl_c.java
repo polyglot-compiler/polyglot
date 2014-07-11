@@ -27,6 +27,7 @@
 package polyglot.ast;
 
 import java.util.List;
+import java.util.Map;
 
 import polyglot.frontend.MissingDependencyException;
 import polyglot.frontend.Scheduler;
@@ -54,6 +55,7 @@ import polyglot.visit.ExceptionChecker;
 import polyglot.visit.NodeVisitor;
 import polyglot.visit.PrettyPrinter;
 import polyglot.visit.PruningVisitor;
+import polyglot.visit.Traverser;
 import polyglot.visit.TypeBuilder;
 import polyglot.visit.TypeChecker;
 
@@ -71,16 +73,10 @@ public class FieldDecl_c extends Term_c implements FieldDecl {
     protected FieldInstance fi;
     protected InitializerInstance ii;
 
-//    @Deprecated
     public FieldDecl_c(Position pos, Flags flags, TypeNode type, Id name,
             Expr init) {
-        this(pos, flags, type, name, init, null);
-    }
-
-    public FieldDecl_c(Position pos, Flags flags, TypeNode type, Id name,
-            Expr init, Ext ext) {
-        super(pos, ext);
-        assert (flags != null && type != null && name != null); // init may be null
+        super(pos);
+        assert flags != null && type != null && name != null; // init may be null
         this.flags = flags;
         this.type = type;
         this.name = name;
@@ -90,7 +86,7 @@ public class FieldDecl_c extends Term_c implements FieldDecl {
     @Override
     public boolean isDisambiguated() {
         return fi != null && fi.isCanonical()
-                && (init == null || (ii != null && ii.isCanonical()))
+                && (init == null || ii != null && ii.isCanonical())
                 && super.isDisambiguated();
     }
 
@@ -295,20 +291,20 @@ public class FieldDecl_c extends Term_c implements FieldDecl {
 
     @Override
     public Node disambiguate(AmbiguityRemover ar) throws SemanticException {
-        if (this.fi.isCanonical()) {
+        if (fi.isCanonical()) {
             // Nothing to do.
             return this;
         }
 
         if (declType().isCanonical()) {
-            this.fi.setType(declType());
+            fi.setType(declType());
         }
 
         return this;
     }
 
     @Override
-    public Context enterScope(Context c) {
+    public Context enterScope(Context c, Traverser v) {
         if (ii != null) {
             return c.pushCode(ii);
         }
@@ -319,8 +315,9 @@ public class FieldDecl_c extends Term_c implements FieldDecl {
         protected Scheduler scheduler;
         protected FieldInstance fi;
 
-        AddDependenciesVisitor(JLang lang, Scheduler scheduler, FieldInstance fi) {
-            super(lang);
+        AddDependenciesVisitor(JLang lang, Map<Lang, Lang> superLangMap,
+                Scheduler scheduler, FieldInstance fi) {
+            super(lang, superLangMap);
             this.scheduler = scheduler;
             this.fi = fi;
         }
@@ -333,11 +330,11 @@ public class FieldDecl_c extends Term_c implements FieldDecl {
                     Goal newGoal =
                             scheduler.FieldConstantsChecked(f.fieldInstance()
                                                              .orig());
-                    Goal myGoal = scheduler.FieldConstantsChecked(this.fi);
+                    Goal myGoal = scheduler.FieldConstantsChecked(fi);
 
                     for (Goal g : newGoal.prerequisiteGoals(scheduler)) {
                         if (scheduler.prerequisiteDependsOn(g, myGoal)) {
-                            this.fi.setNotConstant();
+                            fi.setNotConstant();
                             return n;
                         }
                     }
@@ -354,11 +351,11 @@ public class FieldDecl_c extends Term_c implements FieldDecl {
             fi.setNotConstant();
             return this;
         }
-        if (!cc.lang().isConstant(init, cc.lang())) {
+        if (!cc.lang().isConstant(init, cc)) {
             fi.setNotConstant();
         }
         else {
-            fi.setConstantValue(cc.lang().constantValue(init, cc.lang()));
+            fi.setConstantValue(cc.lang().constantValue(init, cc));
         }
 
         return this;
@@ -434,8 +431,7 @@ public class FieldDecl_c extends Term_c implements FieldDecl {
                         && !ts.typeEquals(init.type(), type.type())
                         && !ts.numericConversionValid(type.type(),
                                                       tc.lang()
-                                                        .constantValue(init,
-                                                                       tc.lang()))) {
+                                                        .constantValue(init, tc))) {
 
                     throw new SemanticException("The type of the variable "
                                                         + "initializer \""
@@ -454,7 +450,7 @@ public class FieldDecl_c extends Term_c implements FieldDecl {
                 && fieldInstance().container().toClass().isInnerClass()) {
             // it's a static field in an inner class.
             if (!flags().isFinal() || init == null
-                    || !tc.lang().isConstant(init, tc.lang())) {
+                    || !tc.lang().isConstant(init, tc)) {
                 throw new SemanticException("Inner classes cannot declare "
                         + "static fields, unless they are compile-time "
                         + "constant fields.", this.position());
@@ -491,7 +487,7 @@ public class FieldDecl_c extends Term_c implements FieldDecl {
     }
 
     @Override
-    public Term firstChild() {
+    public Term firstChild(Traverser v) {
         return type;
     }
 
@@ -561,11 +557,7 @@ public class FieldDecl_c extends Term_c implements FieldDecl {
 
     @Override
     public Node copy(NodeFactory nf) {
-        return nf.FieldDecl(this.position,
-                            this.flags,
-                            this.type,
-                            this.name,
-                            this.init);
+        return nf.FieldDecl(position, flags, type, name, init);
     }
 
 }

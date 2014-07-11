@@ -50,6 +50,7 @@ import polyglot.visit.AscriptionVisitor;
 import polyglot.visit.CFGBuilder;
 import polyglot.visit.NodeVisitor;
 import polyglot.visit.PrettyPrinter;
+import polyglot.visit.Traverser;
 import polyglot.visit.TypeBuilder;
 import polyglot.visit.TypeChecker;
 
@@ -66,16 +67,10 @@ public class ConstructorCall_c extends Stmt_c implements ConstructorCall,
     protected List<Expr> arguments;
     protected ConstructorInstance ci;
 
-//    @Deprecated
     public ConstructorCall_c(Position pos, Kind kind, Expr qualifier,
             List<? extends Expr> arguments) {
-        this(pos, kind, qualifier, arguments, null);
-    }
-
-    public ConstructorCall_c(Position pos, Kind kind, Expr qualifier,
-            List<? extends Expr> arguments, Ext ext) {
-        super(pos, ext);
-        assert (kind != null && arguments != null); // qualifier may be null
+        super(pos);
+        assert kind != null && arguments != null; // qualifier may be null
         this.kind = kind;
         this.qualifier = qualifier;
         this.arguments = ListUtil.copy(arguments, true);
@@ -83,7 +78,7 @@ public class ConstructorCall_c extends Stmt_c implements ConstructorCall,
 
     @Override
     public Expr qualifier() {
-        return this.qualifier;
+        return qualifier;
     }
 
     @Override
@@ -100,7 +95,7 @@ public class ConstructorCall_c extends Stmt_c implements ConstructorCall,
 
     @Override
     public Kind kind() {
-        return this.kind;
+        return kind;
     }
 
     @Override
@@ -117,7 +112,7 @@ public class ConstructorCall_c extends Stmt_c implements ConstructorCall,
 
     @Override
     public List<Expr> arguments() {
-        return this.arguments;
+        return arguments;
     }
 
     @Override
@@ -161,7 +156,7 @@ public class ConstructorCall_c extends Stmt_c implements ConstructorCall,
      * this.
      */
     @Override
-    public Context enterScope(Context c) {
+    public Context enterScope(Context c, Traverser v) {
         return c.pushStatic();
     }
 
@@ -358,7 +353,7 @@ public class ConstructorCall_c extends Stmt_c implements ConstructorCall,
             return ts.Object();
         }
 
-        Iterator<Expr> i = this.arguments.iterator();
+        Iterator<Expr> i = arguments.iterator();
         Iterator<? extends Type> j = ci.formalTypes().iterator();
 
         while (i.hasNext() && j.hasNext()) {
@@ -419,7 +414,7 @@ public class ConstructorCall_c extends Stmt_c implements ConstructorCall,
     }
 
     @Override
-    public Term firstChild() {
+    public Term firstChild(Traverser v) {
         if (qualifier != null) {
             return qualifier;
         }
@@ -449,7 +444,7 @@ public class ConstructorCall_c extends Stmt_c implements ConstructorCall,
     }
 
     @Override
-    public List<Type> throwTypes(TypeSystem ts) {
+    public List<Type> throwTypes(TypeSystem ts, Traverser v) {
         List<Type> l = new LinkedList<>();
         l.addAll(ci.throwTypes());
         l.addAll(ts.uncheckedExceptions());
@@ -458,10 +453,7 @@ public class ConstructorCall_c extends Stmt_c implements ConstructorCall,
 
     @Override
     public Node copy(NodeFactory nf) {
-        return nf.ConstructorCall(this.position,
-                                  this.kind,
-                                  this.qualifier,
-                                  this.arguments);
+        return nf.ConstructorCall(position, kind, qualifier, arguments);
     }
 
     protected void printSubExpr(Expr expr, CodeWriter w, PrettyPrinter pp) {

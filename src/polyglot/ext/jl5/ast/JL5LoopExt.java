@@ -5,6 +5,7 @@ import polyglot.ast.Loop;
 import polyglot.ast.LoopOps;
 import polyglot.ast.Term;
 import polyglot.util.SerialVersionUID;
+import polyglot.visit.Traverser;
 
 public class JL5LoopExt extends JL5TermExt implements LoopOps {
     private static final long serialVersionUID = SerialVersionUID.generate();
@@ -15,22 +16,22 @@ public class JL5LoopExt extends JL5TermExt implements LoopOps {
     }
 
     @Override
-    public boolean condIsConstant(JLang lang) {
-        return superLang().condIsConstant(node(), lang);
+    public boolean condIsConstant(Traverser v) {
+        return ((JLang) v.superLang(lang())).condIsConstant(node(), v);
     }
 
     @Override
-    public boolean condIsConstantTrue(JLang lang) {
-        return superLang().condIsConstantTrue(node(), lang);
+    public boolean condIsConstantTrue(Traverser v) {
+        return ((JLang) v.superLang(lang())).condIsConstantTrue(node(), v);
     }
 
     @Override
-    public boolean condIsConstantFalse(JLang lang) {
-        return superLang().condIsConstantFalse(node(), lang);
+    public boolean condIsConstantFalse(Traverser v) {
+        return ((JLang) v.superLang(lang())).condIsConstantFalse(node(), v);
     }
 
     @Override
-    public Term continueTarget() {
-        return superLang().continueTarget(node());
+    public Term continueTarget(Traverser v) {
+        return ((JLang) v.superLang(lang())).continueTarget(node(), v);
     }
 }

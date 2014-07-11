@@ -26,6 +26,7 @@
 package polyglot.ext.jl5.ast;
 
 import polyglot.ast.Ambiguous;
+import polyglot.ast.JLang;
 import polyglot.ast.Node;
 import polyglot.ast.TypeNode;
 import polyglot.ast.TypeNode_c;
@@ -69,6 +70,11 @@ public class AmbWildCard extends TypeNode_c implements Ambiguous {
         AmbWildCard n = this;
         n = constraint(n, constraint);
         return n;
+    }
+
+    @Override
+    public JLang lang() {
+        return J5Lang_c.instance;
     }
 
     @Override

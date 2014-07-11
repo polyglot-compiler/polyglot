@@ -31,8 +31,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import polyglot.ast.JLangToJLDel;
-import polyglot.ast.Lang;
 import polyglot.main.Report;
 import polyglot.util.CollectionUtil;
 import polyglot.util.Enum;
@@ -51,7 +49,6 @@ import polyglot.util.SerialVersionUID;
  */
 public class Context_c implements Context {
     protected Context outer;
-    private final Lang lang;
     protected TypeSystem ts;
 
     public static class Kind extends Enum {
@@ -70,16 +67,10 @@ public class Context_c implements Context {
     public static final Kind OUTER = new Kind("outer");
     public static final Kind SOURCE = new Kind("source");
 
-    @Deprecated
     public Context_c(TypeSystem ts) {
-        this(JLangToJLDel.instance, ts);
-    }
-
-    public Context_c(Lang lang, TypeSystem ts) {
-        this.lang = lang;
         this.ts = ts;
-        this.outer = null;
-        this.kind = OUTER;
+        outer = null;
+        kind = OUTER;
     }
 
     public boolean isBlock() {
@@ -103,11 +94,6 @@ public class Context_c implements Context {
     }
 
     @Override
-    public Lang lang() {
-        return lang;
-    }
-
-    @Override
     public TypeSystem typeSystem() {
         return ts;
     }
@@ -123,7 +109,7 @@ public class Context_c implements Context {
     }
 
     protected Context_c push() {
-        Context_c v = (Context_c) this.copy();
+        Context_c v = (Context_c) copy();
         v.outer = this;
         v.types = null;
         v.vars = null;
@@ -222,20 +208,20 @@ public class Context_c implements Context {
         // Check for any method with the appropriate name.
         // If found, stop the search since it shadows any enclosing
         // classes method of the same name.
-        if (this.currentClass() != null
-                && ts.hasAccessibleMethodNamed(this.currentClass(),
+        if (currentClass() != null
+                && ts.hasAccessibleMethodNamed(currentClass(),
                                                name,
-                                               this.currentClass())) {
+                                               currentClass())) {
             if (Report.should_report(TOPICS, 3))
                 Report.report(3, "find-method " + name + argTypes + " -> "
-                        + this.currentClass());
+                        + currentClass());
 
             // Found a class which has a method of the right name.
             // Now need to check if the method is of the correct type.
-            return ts.findMethod(this.currentClass(),
+            return ts.findMethod(currentClass(),
                                  name,
                                  argTypes,
-                                 this.currentClass(),
+                                 currentClass(),
                                  false);
         }
 
@@ -310,15 +296,14 @@ public class Context_c implements Context {
         if (Report.should_report(TOPICS, 3))
             Report.report(3, "find-method-scope " + name + " in " + this);
 
-        if (this.currentClass() != null
-                && ts.hasAccessibleMethodNamed(this.currentClass(),
+        if (currentClass() != null
+                && ts.hasAccessibleMethodNamed(currentClass(),
                                                name,
-                                               this.currentClass())) {
+                                               currentClass())) {
             if (Report.should_report(TOPICS, 3))
-                Report.report(3,
-                              "find-method-scope " + name + " -> "
-                                      + this.currentClass());
-            return this.currentClass();
+                Report.report(3, "find-method-scope " + name + " -> "
+                        + currentClass());
+            return currentClass();
         }
 
         if (outer != null) {
@@ -643,8 +628,8 @@ public class Context_c implements Context {
     }
 
     public ClassType findMethodContainerInThisScope(String name) {
-        if (isClass() && ts.hasMethodNamed(this.currentClass(), name)) {
-            return this.type;
+        if (isClass() && ts.hasMethodNamed(currentClass(), name)) {
+            return type;
         }
         return null;
     }
@@ -656,7 +641,7 @@ public class Context_c implements Context {
         }
         if (vi == null && isClass()) {
             try {
-                return ts.findField(this.type, name, this.type, true);
+                return ts.findField(type, name, type, true);
             }
             catch (SemanticException e) {
                 return null;

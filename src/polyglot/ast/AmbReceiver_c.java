@@ -43,18 +43,13 @@ public class AmbReceiver_c extends AmbPrefix_c implements AmbReceiver {
 
     protected Type type;
 
-//    @Deprecated
     public AmbReceiver_c(Position pos, Prefix prefix, Id name) {
-        this(pos, prefix, name, null);
-    }
-
-    public AmbReceiver_c(Position pos, Prefix prefix, Id name, Ext ext) {
-        super(pos, prefix, name, ext);
+        super(pos, prefix, name);
     }
 
     @Override
     public Type type() {
-        return this.type;
+        return type;
     }
 
     public AmbReceiver type(Type type) {
@@ -96,7 +91,7 @@ public class AmbReceiver_c extends AmbPrefix_c implements AmbReceiver {
 
     @Override
     public Node copy(NodeFactory nf) {
-        return nf.AmbReceiver(this.position, this.prefix, this.name);
+        return nf.AmbReceiver(position, prefix, name);
     }
 
 }

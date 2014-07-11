@@ -25,18 +25,23 @@
  ******************************************************************************/
 package polyglot.ext.jl7.ast;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import polyglot.ast.Block;
 import polyglot.ast.Catch;
 import polyglot.ast.Expr;
+import polyglot.ast.ExtFactory;
 import polyglot.ast.Formal;
 import polyglot.ast.Id;
+import polyglot.ast.JLAbstractExtFactory_c;
+import polyglot.ast.JLang_c;
+import polyglot.ast.Lang;
 import polyglot.ast.LocalDecl;
+import polyglot.ast.NodeOps;
 import polyglot.ast.TypeNode;
 import polyglot.ext.jl5.ast.AnnotationElem;
-import polyglot.ext.jl5.ast.JL5AnnotatedElementExt;
-import polyglot.ext.jl5.ast.JL5Ext;
 import polyglot.ext.jl5.ast.JL5NodeFactory_c;
 import polyglot.types.Flags;
 import polyglot.util.Position;
@@ -67,49 +72,181 @@ public class JL7NodeFactory_c extends JL5NodeFactory_c implements
 
     @Override
     public AmbDiamondTypeNode AmbDiamondTypeNode(Position pos, TypeNode base) {
+        Map<Lang, NodeOps> nodeMap = new HashMap<>();
+        return AmbDiamondTypeNode(pos,
+                                  base,
+                                  J7Lang_c.instance,
+                                  nodeMap,
+                                  extFactory());
+    }
+
+    protected final AmbDiamondTypeNode AmbDiamondTypeNode(Position pos,
+            TypeNode base, Lang primaryLang, Map<Lang, NodeOps> nodeMap,
+            ExtFactory extFactory) {
+        for (; extFactory != JLAbstractExtFactory_c.emptyExtFactory; extFactory =
+                extFactory.nextExtFactory()) {
+            Lang lang = extFactory.lang();
+            if (lang == J7Lang_c.instance) break;
+            nodeMap.put(lang,
+                        ((JL7ExtFactory) extFactory).extAmbDiamondTypeNode());
+        }
         AmbDiamondTypeNode n = new AmbDiamondTypeNode(pos, base);
-        n = ext(n, extFactory().extAmbDiamondTypeNode());
+        nodeMap.put(J7Lang_c.instance, n);
+        for (NodeOps o : nodeMap.values()) {
+            o.initPrimaryLang(primaryLang);
+            o.initNodeMap(nodeMap);
+        }
         return n;
     }
 
     @Override
     public TypeNode AmbUnionType(Position pos, List<TypeNode> alternatives) {
+        Map<Lang, NodeOps> nodeMap = new HashMap<>();
+        return AmbUnionType(pos,
+                            alternatives,
+                            J7Lang_c.instance,
+                            nodeMap,
+                            extFactory());
+    }
+
+    protected final TypeNode AmbUnionType(Position pos,
+            List<TypeNode> alternatives, Lang primaryLang,
+            Map<Lang, NodeOps> nodeMap, ExtFactory extFactory) {
+        for (; extFactory != JLAbstractExtFactory_c.emptyExtFactory; extFactory =
+                extFactory.nextExtFactory()) {
+            Lang lang = extFactory.lang();
+            if (lang == J7Lang_c.instance) break;
+            nodeMap.put(lang, ((JL7ExtFactory) extFactory).extAmbUnionType());
+        }
         AmbUnionType n = new AmbUnionType(pos, alternatives);
-        n = ext(n, extFactory().extAmbUnionType());
+        nodeMap.put(J7Lang_c.instance, n);
+        for (NodeOps o : nodeMap.values()) {
+            o.initPrimaryLang(primaryLang);
+            o.initNodeMap(nodeMap);
+        }
         return n;
     }
 
     @Override
     public MultiCatch MultiCatch(Position pos, Formal formal,
             List<TypeNode> alternatives, Block body) {
+        Map<Lang, NodeOps> nodeMap = new HashMap<>();
+        return MultiCatch(pos,
+                          formal,
+                          alternatives,
+                          body,
+                          J7Lang_c.instance,
+                          nodeMap,
+                          extFactory());
+    }
+
+    protected final MultiCatch MultiCatch(Position pos, Formal formal,
+            List<TypeNode> alternatives, Block body, Lang primaryLang,
+            Map<Lang, NodeOps> nodeMap, ExtFactory extFactory) {
+        for (; extFactory != JLAbstractExtFactory_c.emptyExtFactory; extFactory =
+                extFactory.nextExtFactory()) {
+            Lang lang = extFactory.lang();
+            if (lang == J7Lang_c.instance) break;
+            nodeMap.put(lang, ((JL7ExtFactory) extFactory).extMultiCatch());
+        }
         MultiCatch n = new MultiCatch_c(pos, formal, alternatives, body);
-        n = ext(n, extFactory().extMultiCatch());
+        nodeMap.put(J7Lang_c.instance, n);
+//        for (NodeOps o : nodeMap.values()) {
+//            o.initPrimaryLang(primaryLang);
+//            o.initNodeMap(nodeMap);
+//        }
+        // TODO
+        super.Catch(pos,
+                    formal,
+                    body,
+                    primaryLang,
+                    nodeMap,
+                    extFactory.nextExtFactory());
         return n;
     }
 
     @Override
     public LocalDecl Resource(Position pos, Flags flags,
             List<AnnotationElem> annotations, TypeNode type, Id name, Expr init) {
-        LocalDecl n =
-                super.LocalDecl(pos, flags, annotations, type, name, init);
-        n = ext(n, extFactory().extResource());
-        // FIXME ugh!
-        JL5AnnotatedElementExt jl5ext = (JL5AnnotatedElementExt) JL5Ext.ext(n);
-        n = (LocalDecl) jl5ext.annotationElems(annotations);
-        return n;
+        Map<Lang, NodeOps> nodeMap = new HashMap<>();
+        return Resource(pos,
+                        flags,
+                        annotations,
+                        type,
+                        name,
+                        init,
+                        JLang_c.instance,
+                        nodeMap,
+                        extFactory());
+    }
+
+    protected final LocalDecl Resource(Position pos, Flags flags,
+            List<AnnotationElem> annotations, TypeNode type, Id name,
+            Expr init, Lang primaryLang, Map<Lang, NodeOps> nodeMap,
+            ExtFactory extFactory) {
+        for (; extFactory != JLAbstractExtFactory_c.emptyExtFactory; extFactory =
+                extFactory.nextExtFactory()) {
+            Lang lang = extFactory.lang();
+            if (lang == J7Lang_c.instance) break;
+            nodeMap.put(lang, ((JL7ExtFactory) extFactory).extResource());
+        }
+        nodeMap.put(J7Lang_c.instance, new JL7ResourceExt());
+        return super.LocalDecl(pos,
+                               flags,
+                               annotations,
+                               type,
+                               name,
+                               init,
+                               primaryLang,
+                               nodeMap,
+                               extFactory.nextExtFactory());
     }
 
     @Override
     public TryWithResources TryWithResources(Position pos,
             List<LocalDecl> resources, Block tryBlock, List<Catch> catchBlocks,
             Block finallyBlock) {
+        Map<Lang, NodeOps> nodeMap = new HashMap<>();
+        return TryWithResources(pos,
+                                resources,
+                                tryBlock,
+                                catchBlocks,
+                                finallyBlock,
+                                J7Lang_c.instance,
+                                nodeMap,
+                                extFactory());
+    }
+
+    protected final TryWithResources TryWithResources(Position pos,
+            List<LocalDecl> resources, Block tryBlock, List<Catch> catchBlocks,
+            Block finallyBlock, Lang primaryLang, Map<Lang, NodeOps> nodeMap,
+            ExtFactory extFactory) {
+        for (; extFactory != JLAbstractExtFactory_c.emptyExtFactory; extFactory =
+                extFactory.nextExtFactory()) {
+            Lang lang = extFactory.lang();
+            if (lang == J7Lang_c.instance) break;
+            nodeMap.put(lang,
+                        ((JL7ExtFactory) extFactory).extTryWithResources());
+        }
         TryWithResources n =
                 new TryWithResources_c(pos,
                                        resources,
                                        tryBlock,
                                        catchBlocks,
                                        finallyBlock);
-        n = ext(n, extFactory().extTryWithResources());
+        nodeMap.put(J7Lang_c.instance, n);
+//        for (NodeOps o : nodeMap.values()) {
+//            o.initPrimaryLang(primaryLang);
+//            o.initNodeMap(nodeMap);
+//        }
+        // TODO
+        super.Try(pos,
+                  tryBlock,
+                  catchBlocks,
+                  finallyBlock,
+                  primaryLang,
+                  nodeMap,
+                  extFactory.nextExtFactory());
         return n;
     }
 }

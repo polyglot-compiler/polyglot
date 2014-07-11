@@ -26,6 +26,9 @@
 
 package polyglot.visit;
 
+import java.util.Collections;
+import java.util.Map;
+
 import polyglot.ast.JLangToJLDel;
 import polyglot.ast.Lang;
 import polyglot.ast.Node;
@@ -49,21 +52,41 @@ import polyglot.util.StringUtil;
  * @see polyglot.ast.Node#visit
  * @see polyglot.ast.Node
  */
-public abstract class NodeVisitor implements Copy<NodeVisitor> {
+public abstract class NodeVisitor implements Traverser, Copy<NodeVisitor> {
     /** The language this NodeVisitor operates on. */
     private final Lang lang;
+    /** The language hierarchy directory. */
+    private final Map<Lang, Lang> superLangMap;
 
     @Deprecated
     protected NodeVisitor() {
-        this(JLangToJLDel.instance);
+        this(JLangToJLDel.instance, null);
     }
 
-    protected NodeVisitor(Lang lang) {
+    protected NodeVisitor(Lang lang, Map<Lang, Lang> superLangMap) {
         this.lang = lang;
+        this.superLangMap = Collections.unmodifiableMap(superLangMap);
     }
 
+    @Override
     public Lang lang() {
-        return this.lang;
+        return lang;
+    }
+
+    public Map<Lang, Lang> superLangMap() {
+        return superLangMap;
+    }
+
+    @Override
+    public Lang superLang(Lang lang) {
+        // TODO
+        Map<Lang, Lang> superLangMap = superLangMap();
+        if (superLangMap == null)
+            throw new InternalCompilerError("No language hierarchy directory available");
+        if (!superLangMap.containsKey(lang))
+            throw new InternalCompilerError("Superlanguage undefined for "
+                    + lang);
+        return superLangMap.get(lang);
     }
 
     /**

@@ -26,9 +26,6 @@
 
 package polyglot.ast;
 
-import java.io.OutputStream;
-import java.io.Writer;
-
 import polyglot.frontend.ExtensionInfo;
 import polyglot.translate.ExtensionRewriter;
 import polyglot.types.Context;
@@ -37,6 +34,7 @@ import polyglot.util.CodeWriter;
 import polyglot.visit.NodeVisitor;
 import polyglot.visit.PrettyPrinter;
 import polyglot.visit.Translator;
+import polyglot.visit.Traverser;
 import polyglot.visit.TypeBuilder;
 import polyglot.visit.TypeChecker;
 
@@ -59,9 +57,10 @@ public interface Lang {
      * imperatively.  Use {@code addDecls} when leaving the node
      * for that.
      * @param c the current {@code Context}
+     * @param v the {@code Visitor} to visit this node
      * @return the {@code Context} to be used for visiting this node. 
      */
-    Context enterScope(Node n, Context c);
+    Context enterScope(Node n, Context c, Traverser v);
 
     /**
      * Push a new scope for visiting the child node {@code child}. 
@@ -70,17 +69,19 @@ public interface Lang {
      * this method gives parent nodes have the ability to modify this behavior.
      * @param child The child node about to be entered.
      * @param c The current {@code Context}
+     * @param v the {@code Visitor} to visit this node
      * @return the {@code Context} to be used for visiting node 
      *           {@code child}
      */
-    Context enterChildScope(Node n, Node child, Context c);
+    Context enterChildScope(Node n, Node child, Context c, Traverser v);
 
     /**
      * Add any declarations to the context that should be in scope when
      * visiting later sibling nodes.
      * @param c The context to which to add declarations.
+     * @param v the {@code Visitor} that visited this node
      */
-    void addDecls(Node n, Context c);
+    void addDecls(Node n, Context c, Traverser v);
 
     /**
      * Collects classes, methods, and fields from the AST rooted at this node
@@ -192,18 +193,6 @@ public interface Lang {
      */
     Node extRewrite(Node n, ExtensionRewriter rw) throws SemanticException;
 
-    /** Dump the AST for debugging. */
-    void dump(Node n, Lang lang, OutputStream os);
-
-    /** Dump the AST for debugging. */
-    void dump(Node n, Lang lang, Writer w);
-
-    /** Pretty-print the AST for debugging. */
-    void prettyPrint(Node n, Lang lang, OutputStream os);
-
-    /** Pretty-print the AST for debugging. */
-    void prettyPrint(Node n, Lang lang, Writer w);
-
     /**
      * Pretty-print the AST using the given code writer.
      *
@@ -239,18 +228,18 @@ public interface Lang {
     /** Return true iff the compiler has determined whether this expression has a
      * constant value.  The value returned by {@code isConstant()} is valid only if
      * {@code constantValueSet()} is true. */
-    boolean constantValueSet(Expr n, Lang lang);
+    boolean constantValueSet(Expr n, Traverser v);
 
     /**
      * Return whether the expression evaluates to a constant.
      * Requires that disambiguation has been done, and that
      * {@code constantValueSet()} is true.
      */
-    boolean isConstant(Expr n, Lang lang);
+    boolean isConstant(Expr n, Traverser v);
 
     /** Return the constant value of the expression, if any.
      *  Requires that {@code isConstant()} is true.
      */
-    Object constantValue(Expr n, Lang lang);
+    Object constantValue(Expr n, Traverser v);
 
 }

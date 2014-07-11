@@ -29,7 +29,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import polyglot.ast.Term;
 import polyglot.ext.jl5.ast.AnnotationElem;
 import polyglot.ext.jl5.types.inference.LubType;
 import polyglot.ext.param.types.ParamTypeSystem;
@@ -348,8 +347,6 @@ public interface JL5TypeSystem extends
 
     AnnotationTypeElemInstance annotationElemInstance(Position pos,
             ClassType ct, Flags f, Type type, String name, boolean hasDefault);
-
-    void checkAnnotationValueConstant(Term value) throws SemanticException;
 
     AnnotationTypeElemInstance findAnnotation(ReferenceType t, String name,
             ClassType currentClass) throws SemanticException;

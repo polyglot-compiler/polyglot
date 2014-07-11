@@ -36,6 +36,7 @@ import polyglot.util.SerialVersionUID;
 import polyglot.util.SubtypeSet;
 import polyglot.visit.CFGBuilder;
 import polyglot.visit.ExceptionChecker;
+import polyglot.visit.Traverser;
 
 /**
  * A {@code Term} represents any Java expression or statement on which
@@ -47,14 +48,8 @@ public abstract class Term_c extends Node_c implements Term, TermOps {
     protected boolean reachable;
     protected SubtypeSet exceptions;
 
-    // TODO
-    // @Deprecated
     public Term_c(Position pos) {
-        this(pos, null);
-    }
-
-    public Term_c(Position pos, Ext ext) {
-        super(pos, ext);
+        super(pos);
     }
 
     @Override
@@ -112,8 +107,14 @@ public abstract class Term_c extends Node_c implements Term, TermOps {
         return t;
     }
 
+    @Deprecated
     @Override
-    public abstract Term firstChild();
+    public Term firstChild() {
+        return firstChild(delTraverser);
+    }
+
+    @Override
+    public abstract Term firstChild(Traverser v);
 
     @Override
     public abstract <T> List<T> acceptCFG(CFGBuilder<?> v, List<T> succs);

@@ -26,6 +26,8 @@
 
 package polyglot.visit;
 
+import java.util.Map;
+
 import polyglot.ast.Lang;
 import polyglot.ast.Node;
 
@@ -35,8 +37,8 @@ import polyglot.ast.Node;
  * NodeVisitor.enter method ensures no children will be visited.
  */
 public class PruningVisitor extends NodeVisitor {
-    public PruningVisitor(Lang lang) {
-        super(lang);
+    public PruningVisitor(Lang lang, Map<Lang, Lang> superLangMap) {
+        super(lang, superLangMap);
     }
 
     @Override

@@ -129,11 +129,11 @@ public class ExpressionFlattener extends NodeVisitor {
 
     public ExpressionFlattener(Job job, TypeSystem ts, NodeFactory nf,
             boolean flatten_all_decls) {
-        super(nf.lang());
+        super(nf.lang(), nf.superLangMap());
         this.job = job;
         this.ts = ts;
         this.nf = nf;
-        this.deepCopier = new DeepCopy(nf.lang());
+        deepCopier = new DeepCopy(nf.lang(), nf.superLangMap());
         this.flatten_all_decls = flatten_all_decls;
     }
 
@@ -260,7 +260,7 @@ public class ExpressionFlattener extends NodeVisitor {
         // don't flatten constant expressions
         if (n instanceof Expr) {
             Expr e = (Expr) n;
-            if (lang().isConstant(e, lang())) {
+            if (lang().isConstant(e, this)) {
                 addDontFlatten(e);
             }
         }

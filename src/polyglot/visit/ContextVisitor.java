@@ -70,15 +70,15 @@ public class ContextVisitor extends ErrorHandlingVisitor {
 
     public ContextVisitor(Job job, TypeSystem ts, NodeFactory nf) {
         super(job, ts, nf);
-        this.outer = null;
-        this.context = null;
+        outer = null;
+        context = null;
     }
 
     public ContextVisitor rethrowMissingDependencies(boolean rethrow) {
-        if (rethrow == this.rethrowMissingDependencies) {
+        if (rethrow == rethrowMissingDependencies) {
             return this;
         }
-        ContextVisitor cv = (ContextVisitor) this.copy();
+        ContextVisitor cv = (ContextVisitor) copy();
         cv.rethrowMissingDependencies = rethrow;
         return cv;
     }
@@ -107,7 +107,7 @@ public class ContextVisitor extends ErrorHandlingVisitor {
      *  {@code c}.
      */
     public ContextVisitor context(Context c) {
-        ContextVisitor v = (ContextVisitor) this.copy();
+        ContextVisitor v = (ContextVisitor) copy();
         v.context = c;
         return v;
     }
@@ -122,10 +122,10 @@ public class ContextVisitor extends ErrorHandlingVisitor {
      */
     protected Context enterScope(Node parent, Node n) {
         if (parent != null) {
-            return lang().enterChildScope(parent, n, context);
+            return lang().enterChildScope(parent, n, context, this);
         }
         // no parent node yet.
-        return lang().enterScope(n, context);
+        return lang().enterScope(n, context, this);
     }
 
     /**
@@ -142,7 +142,7 @@ public class ContextVisitor extends ErrorHandlingVisitor {
      * visiting the node.
      */
     protected void addDecls(Node n) {
-        lang().addDecls(n, context);
+        lang().addDecls(n, context, this);
     }
 
     @Override
@@ -156,16 +156,16 @@ public class ContextVisitor extends ErrorHandlingVisitor {
             Report.report(5, "enter(" + n + ")");
 
         if (prune) {
-            return new PruningVisitor(lang());
+            return new PruningVisitor(lang(), superLangMap());
         }
 
         try {
             ContextVisitor v = this;
 
-            Context c = this.enterScope(parent, n);
+            Context c = enterScope(parent, n);
 
-            if (c != this.context) {
-                v = (ContextVisitor) this.copy();
+            if (c != context) {
+                v = (ContextVisitor) copy();
                 v.context = c;
                 v.outer = this;
                 v.error = false;
@@ -185,11 +185,11 @@ public class ContextVisitor extends ErrorHandlingVisitor {
             // The context might also be incorrect for later siblings
             // of this node, so set a flag to prune until the scope
             // is popped.
-            this.prune = true;
-            if (this.rethrowMissingDependencies) {
+            prune = true;
+            if (rethrowMissingDependencies) {
                 throw e;
             }
-            return new PruningVisitor(lang());
+            return new PruningVisitor(lang(), superLangMap());
         }
     }
 
@@ -218,7 +218,7 @@ public class ContextVisitor extends ErrorHandlingVisitor {
             Goal g = scheduler.currentGoal();
             scheduler.addDependencyAndEnqueue(g, e.goal(), e.prerequisite());
             g.setUnreachableThisRun();
-            if (this.rethrowMissingDependencies) {
+            if (rethrowMissingDependencies) {
                 throw e;
             }
         }

@@ -26,10 +26,9 @@
 
 package polyglot.ast;
 
-import java.io.OutputStream;
 import java.io.Serializable;
-import java.io.Writer;
 import java.util.List;
+import java.util.Map;
 
 import polyglot.frontend.ExtensionInfo;
 import polyglot.translate.ExtensionRewriter;
@@ -48,6 +47,7 @@ import polyglot.visit.ExceptionChecker;
 import polyglot.visit.NodeVisitor;
 import polyglot.visit.PrettyPrinter;
 import polyglot.visit.Translator;
+import polyglot.visit.Traverser;
 import polyglot.visit.TypeBuilder;
 import polyglot.visit.TypeChecker;
 
@@ -80,13 +80,13 @@ public class JLDel_c implements JLDel, Serializable {
 
     @Override
     public void init(Node n) {
-        assert (this.node == null);
-        this.node = n;
+        assert node == null;
+        node = n;
     }
 
     @Override
     public Node node() {
-        return this.node;
+        return node;
     }
 
     @Override
@@ -104,6 +104,21 @@ public class JLDel_c implements JLDel, Serializable {
     @Override
     public final JLang lang() {
         throw new InternalCompilerError("Unsupported method lang() for delegates");
+    }
+
+    @Override
+    public final void initPrimaryLang(Lang primaryLang) {
+        throw new InternalCompilerError("Unsupported method initPrimaryLang() for delegates");
+    }
+
+    @Override
+    public final void initNodeMap(Map<Lang, NodeOps> nodeMap) {
+        throw new InternalCompilerError("Unsupported method initNodeMap() for delegates");
+    }
+
+    @Override
+    public final NodeOps node(Lang lang) {
+        throw new InternalCompilerError("Unsupported method node() for delegates");
     }
 
     @Override
@@ -127,13 +142,28 @@ public class JLDel_c implements JLDel, Serializable {
     }
 
     @Override
+    public Context enterScope(Context c, Traverser v) {
+        return enterScope(c);
+    }
+
+    @Override
     public Context enterChildScope(Node child, Context c) {
         return jl().enterChildScope(child, c);
     }
 
     @Override
+    public Context enterChildScope(Node child, Context c, Traverser v) {
+        return enterChildScope(child, c);
+    }
+
+    @Override
     public void addDecls(Context c) {
         jl().addDecls(c);
+    }
+
+    @Override
+    public void addDecls(Context c, Traverser v) {
+        addDecls(c);
     }
 
     @Override
@@ -206,6 +236,11 @@ public class JLDel_c implements JLDel, Serializable {
     }
 
     @Override
+    public List<Type> throwTypes(TypeSystem ts, Traverser v) {
+        return jl().throwTypes(ts, v);
+    }
+
+    @Override
     public NodeVisitor extRewriteEnter(ExtensionRewriter rw)
             throws SemanticException {
         ToExt ext = rw.from_ext().getToExt(rw.to_ext(), node());
@@ -216,50 +251,6 @@ public class JLDel_c implements JLDel, Serializable {
     public Node extRewrite(ExtensionRewriter rw) throws SemanticException {
         ToExt ext = rw.from_ext().getToExt(rw.to_ext(), node());
         return ext.toExt(rw);
-    }
-
-    @Deprecated
-    @Override
-    public void dump(OutputStream os) {
-        jl().dump(os);
-    }
-
-    @Override
-    public void dump(Lang lang, OutputStream os) {
-        jl().dump(lang, os);
-    }
-
-    @Deprecated
-    @Override
-    public void dump(Writer w) {
-        jl().dump(w);
-    }
-
-    @Override
-    public void dump(Lang lang, Writer w) {
-        jl().dump(lang, w);
-    }
-
-    @Deprecated
-    @Override
-    public void prettyPrint(OutputStream os) {
-        jl().prettyPrint(os);
-    }
-
-    @Override
-    public void prettyPrint(Lang lang, OutputStream os) {
-        jl().prettyPrint(lang, os);
-    }
-
-    @Deprecated
-    @Override
-    public void prettyPrint(Writer w) {
-        jl().prettyPrint(w);
-    }
-
-    @Override
-    public void prettyPrint(Lang lang, Writer w) {
-        jl().prettyPrint(lang, w);
     }
 
     @Override

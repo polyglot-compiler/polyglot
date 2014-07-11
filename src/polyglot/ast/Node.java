@@ -26,7 +26,10 @@
 
 package polyglot.ast;
 
+import java.io.OutputStream;
 import java.io.Serializable;
+import java.io.Writer;
+import java.util.Map;
 
 import polyglot.util.CodeWriter;
 import polyglot.util.Copy;
@@ -55,23 +58,25 @@ public interface Node extends NodeOps, Copy<Node>, Serializable {
     /**
      * Set the extension of the node.
      */
-//    @Deprecated
+    @Deprecated
     Node ext(Ext ext);
 
     /**
      * Get the node's extension.
      */
+    @Deprecated
     Ext ext();
 
     /**
      * Set the node's nth extension, n &gt;= 1.
      */
-//    @Deprecated
+    @Deprecated
     Node ext(int n, Ext ext);
 
     /**
      * Get the node's nth extension, n &gt;= 1.
      */
+    @Deprecated
     Ext ext(int n);
 
     /**
@@ -129,4 +134,32 @@ public interface Node extends NodeOps, Copy<Node>, Serializable {
      * Dump the AST node for debugging purposes.
      */
     void dump(CodeWriter w);
+
+    /** Dump the AST for debugging. */
+    @Deprecated
+    void dump(OutputStream os);
+
+    /** Dump the AST for debugging. */
+    void dump(Lang lang, Map<Lang, Lang> superLangMap, OutputStream os);
+
+    /** Dump the AST for debugging. */
+    @Deprecated
+    void dump(Writer w);
+
+    /** Dump the AST for debugging. */
+    void dump(Lang lang, Map<Lang, Lang> superLangMap, Writer w);
+
+    /** Pretty-print the AST for debugging. */
+    @Deprecated
+    void prettyPrint(OutputStream os);
+
+    /** Pretty-print the AST for debugging. */
+    void prettyPrint(Lang lang, Map<Lang, Lang> superLangMap, OutputStream os);
+
+    /** Pretty-print the AST for debugging. */
+    @Deprecated
+    void prettyPrint(Writer w);
+
+    /** Pretty-print the AST for debugging. */
+    void prettyPrint(Lang lang, Map<Lang, Lang> superLangMap, Writer w);
 }

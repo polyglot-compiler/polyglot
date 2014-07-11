@@ -38,6 +38,7 @@ import polyglot.util.SerialVersionUID;
 import polyglot.visit.CFGBuilder;
 import polyglot.visit.NodeVisitor;
 import polyglot.visit.PrettyPrinter;
+import polyglot.visit.Traverser;
 import polyglot.visit.TypeChecker;
 
 /**
@@ -50,14 +51,9 @@ public class Catch_c extends Stmt_c implements Catch {
     protected Formal formal;
     protected Block body;
 
-//    @Deprecated
     public Catch_c(Position pos, Formal formal, Block body) {
-        this(pos, formal, body, null);
-    }
-
-    public Catch_c(Position pos, Formal formal, Block body, Ext ext) {
-        super(pos, ext);
-        assert (formal != null && body != null);
+        super(pos);
+        assert formal != null && body != null;
         this.formal = formal;
         this.body = body;
     }
@@ -69,7 +65,7 @@ public class Catch_c extends Stmt_c implements Catch {
 
     @Override
     public Formal formal() {
-        return this.formal;
+        return formal;
     }
 
     @Override
@@ -86,7 +82,7 @@ public class Catch_c extends Stmt_c implements Catch {
 
     @Override
     public Block body() {
-        return this.body;
+        return body;
     }
 
     @Override
@@ -116,7 +112,7 @@ public class Catch_c extends Stmt_c implements Catch {
     }
 
     @Override
-    public Context enterScope(Context c) {
+    public Context enterScope(Context c, Traverser v) {
         return c.pushBlock();
     }
 
@@ -147,7 +143,7 @@ public class Catch_c extends Stmt_c implements Catch {
     }
 
     @Override
-    public Term firstChild() {
+    public Term firstChild(Traverser v) {
         return formal;
     }
 
@@ -160,7 +156,7 @@ public class Catch_c extends Stmt_c implements Catch {
 
     @Override
     public Node copy(NodeFactory nf) {
-        return nf.Catch(this.position, this.formal, this.body);
+        return nf.Catch(position, formal, body);
     }
 
 }

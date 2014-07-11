@@ -58,6 +58,7 @@ import polyglot.util.SerialVersionUID;
 import polyglot.visit.AmbiguityRemover;
 import polyglot.visit.NodeVisitor;
 import polyglot.visit.PrettyPrinter;
+import polyglot.visit.Traverser;
 import polyglot.visit.TypeBuilder;
 import polyglot.visit.TypeChecker;
 
@@ -74,7 +75,7 @@ public abstract class JL5ProcedureDeclExt extends JL5AnnotatedElementExt
     }
 
     public List<ParamTypeNode> typeParams() {
-        return this.typeParams;
+        return typeParams;
     }
 
     public Node typeParams(List<ParamTypeNode> typeParams) {
@@ -84,7 +85,7 @@ public abstract class JL5ProcedureDeclExt extends JL5AnnotatedElementExt
     protected <N extends Node> N typeParams(N n, List<ParamTypeNode> typeParams) {
         JL5ProcedureDeclExt ext = (JL5ProcedureDeclExt) JL5Ext.ext(n);
         if (CollectionUtil.equals(ext.typeParams, typeParams)) return n;
-        if (n == node) {
+        if (ext == this) {
             n = Copy.Util.copy(n);
             ext = (JL5ProcedureDeclExt) JL5Ext.ext(n);
         }
@@ -112,9 +113,9 @@ public abstract class JL5ProcedureDeclExt extends JL5AnnotatedElementExt
     }
 
     @Override
-    public Context enterScope(Context c) {
+    public Context enterScope(Context c, Traverser v) {
         ProcedureDecl pd = (ProcedureDecl) this.node();
-        c = superLang().enterScope(pd, c);
+        c = v.superLang(lang()).enterScope(pd, c, v);
         for (TypeNode pn : typeParams) {
             ((JL5Context) c).addTypeVariable((TypeVariable) pn.type());
         }
@@ -172,7 +173,8 @@ public abstract class JL5ProcedureDeclExt extends JL5AnnotatedElementExt
     @Override
     public Node disambiguate(AmbiguityRemover ar) throws SemanticException {
         ProcedureDecl n =
-                (ProcedureDecl) superLang().disambiguate(this.node(), ar);
+                (ProcedureDecl) ar.superLang(lang()).disambiguate(this.node(),
+                                                                  ar);
 
         List<TypeVariable> typeParams = new ArrayList<>(this.typeParams.size());
 
@@ -245,7 +247,7 @@ public abstract class JL5ProcedureDeclExt extends JL5AnnotatedElementExt
 
     @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter pp) {
-        superLang().prettyPrint(node(), w, pp);
+        pp.superLang(lang()).prettyPrint(node(), w, pp);
     }
 
     @Override

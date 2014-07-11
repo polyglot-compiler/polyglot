@@ -29,6 +29,7 @@ package polyglot.visit;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.Map;
 
 import polyglot.ast.JLangToJLDel;
 import polyglot.ast.Lang;
@@ -43,24 +44,25 @@ public class DumpAst extends NodeVisitor {
 
     @Deprecated
     public DumpAst(String name, int width) throws IOException {
-        this(JLangToJLDel.instance, name, width);
+        this(JLangToJLDel.instance, null, name, width);
     }
 
     /** @deprecated Use the other constructor. */
     @Deprecated
-    public DumpAst(Lang lang, String name, int width) throws IOException {
-        super(lang);
-        this.fw = new PrintWriter(new FileWriter(name));
-        this.w = Compiler.createCodeWriter(fw, width);
+    public DumpAst(Lang lang, Map<Lang, Lang> superLangMap, String name,
+            int width) throws IOException {
+        super(lang, superLangMap);
+        fw = new PrintWriter(new FileWriter(name));
+        w = Compiler.createCodeWriter(fw, width);
     }
 
     @Deprecated
     public DumpAst(CodeWriter w) {
-        this(JLangToJLDel.instance, w);
+        this(JLangToJLDel.instance, null, w);
     }
 
-    public DumpAst(Lang lang, CodeWriter w) {
-        super(lang);
+    public DumpAst(Lang lang, Map<Lang, Lang> superLangMap, CodeWriter w) {
+        super(lang, superLangMap);
         this.w = w;
     }
 

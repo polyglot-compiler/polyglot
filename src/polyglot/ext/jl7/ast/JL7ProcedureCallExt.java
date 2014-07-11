@@ -25,13 +25,14 @@
  ******************************************************************************/
 package polyglot.ext.jl7.ast;
 
+import polyglot.ast.JLang;
 import polyglot.ast.ProcedureCall;
 import polyglot.ast.ProcedureCallOps;
 import polyglot.util.CodeWriter;
 import polyglot.util.SerialVersionUID;
 import polyglot.visit.PrettyPrinter;
 
-public abstract class JL7ProcedureCallExt extends JL7Ext implements
+public abstract class JL7ProcedureCallExt extends JL7TermExt implements
         ProcedureCallOps {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
@@ -42,6 +43,6 @@ public abstract class JL7ProcedureCallExt extends JL7Ext implements
 
     @Override
     public void printArgs(CodeWriter w, PrettyPrinter tr) {
-        superLang().printArgs(this.node(), w, tr);
+        ((JLang) tr.superLang(lang())).printArgs(this.node(), w, tr);
     }
 }

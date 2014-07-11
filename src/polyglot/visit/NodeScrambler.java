@@ -28,6 +28,7 @@ package polyglot.visit;
 
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.Map;
 import java.util.Random;
 
 import polyglot.ast.Block;
@@ -38,6 +39,7 @@ import polyglot.ast.Expr;
 import polyglot.ast.Formal;
 import polyglot.ast.Import;
 import polyglot.ast.JLang;
+import polyglot.ast.Lang;
 import polyglot.ast.LocalDecl;
 import polyglot.ast.Node;
 import polyglot.ast.SourceFile;
@@ -65,25 +67,25 @@ public class NodeScrambler extends NodeVisitor {
     protected boolean scrambled = false;
     protected CodeWriter cw;
 
-    public NodeScrambler(JLang lang) {
-        this(lang, new Random().nextLong());
+    public NodeScrambler(JLang lang, Map<Lang, Lang> superLangMap) {
+        this(lang, null, new Random().nextLong());
     }
 
     /**
      * Create a new {@code NodeScrambler} with the given random number
      * generator seed.
      */
-    public NodeScrambler(JLang lang, long seed) {
-        super(lang);
-        this.fp = new FirstPass(lang);
+    public NodeScrambler(JLang lang, Map<Lang, Lang> superLangMap, long seed) {
+        super(lang, superLangMap);
+        fp = new FirstPass(lang, superLangMap);
 
-        this.pairs = new HashMap<>();
-        this.nodes = new LinkedList<>();
-        this.currentParents = new LinkedList<>();
-        this.cw = Compiler.createCodeWriter(System.err, 72);
+        pairs = new HashMap<>();
+        nodes = new LinkedList<>();
+        currentParents = new LinkedList<>();
+        cw = Compiler.createCodeWriter(System.err, 72);
         this.seed = seed;
 
-        this.ran = new Random(seed);
+        ran = new Random(seed);
     }
 
     /**
@@ -92,8 +94,8 @@ public class NodeScrambler extends NodeVisitor {
      * run before the main {@code NodeScrambler} visits the tree.</b>
      */
     public class FirstPass extends NodeVisitor {
-        public FirstPass(JLang lang) {
-            super(lang);
+        public FirstPass(JLang lang, Map<Lang, Lang> superLangMap) {
+            super(lang, superLangMap);
         }
 
         @Override
@@ -130,9 +132,9 @@ public class NodeScrambler extends NodeVisitor {
 
                 try {
                     System.err.println("Replacing:");
-                    lang().dump(n, lang(), System.err);
+                    n.dump(lang(), superLangMap(), System.err);
                     System.err.println("With:");
-                    lang().dump(n, lang(), System.err);
+                    n.dump(lang(), superLangMap(), System.err);
                 }
                 catch (Exception e) {
                     e.printStackTrace();

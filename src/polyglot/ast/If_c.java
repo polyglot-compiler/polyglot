@@ -39,6 +39,7 @@ import polyglot.visit.CFGBuilder;
 import polyglot.visit.FlowGraph;
 import polyglot.visit.NodeVisitor;
 import polyglot.visit.PrettyPrinter;
+import polyglot.visit.Traverser;
 import polyglot.visit.TypeChecker;
 
 /**
@@ -53,15 +54,9 @@ public class If_c extends Stmt_c implements If {
     protected Stmt consequent;
     protected Stmt alternative;
 
-//    @Deprecated
     public If_c(Position pos, Expr cond, Stmt consequent, Stmt alternative) {
-        this(pos, cond, consequent, alternative, null);
-    }
-
-    public If_c(Position pos, Expr cond, Stmt consequent, Stmt alternative,
-            Ext ext) {
-        super(pos, ext);
-        assert (cond != null && consequent != null); // alternative may be null;
+        super(pos);
+        assert cond != null && consequent != null; // alternative may be null;
         this.cond = cond;
         this.consequent = consequent;
         this.alternative = alternative;
@@ -69,7 +64,7 @@ public class If_c extends Stmt_c implements If {
 
     @Override
     public Expr cond() {
-        return this.cond;
+        return cond;
     }
 
     @Override
@@ -86,7 +81,7 @@ public class If_c extends Stmt_c implements If {
 
     @Override
     public Stmt consequent() {
-        return this.consequent;
+        return consequent;
     }
 
     @Override
@@ -103,7 +98,7 @@ public class If_c extends Stmt_c implements If {
 
     @Override
     public Stmt alternative() {
-        return this.alternative;
+        return alternative;
     }
 
     @Override
@@ -193,17 +188,17 @@ public class If_c extends Stmt_c implements If {
     }
 
     @Override
-    public Term firstChild() {
+    public Term firstChild(Traverser v) {
         return cond;
     }
 
     @Override
     public <T> List<T> acceptCFG(CFGBuilder<?> v, List<T> succs) {
-        if (v.lang().isConstant(cond, v.lang()) && v.skipDeadIfBranches()) {
+        if (v.lang().isConstant(cond, v) && v.skipDeadIfBranches()) {
             // the condition is a constant expression.
             // That means that one branch is dead code
             boolean condConstantValue =
-                    ((Boolean) v.lang().constantValue(cond, v.lang())).booleanValue();
+                    ((Boolean) v.lang().constantValue(cond, v)).booleanValue();
             if (condConstantValue) {
                 // the condition is constantly true.
                 // the alternative won't be executed.
@@ -257,10 +252,7 @@ public class If_c extends Stmt_c implements If {
 
     @Override
     public Node copy(NodeFactory nf) {
-        return nf.If(this.position,
-                     this.cond,
-                     this.consequent,
-                     this.alternative);
+        return nf.If(position, cond, consequent, alternative);
     }
 
 }

@@ -30,6 +30,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import polyglot.ast.Id;
+import polyglot.ast.JLang;
 import polyglot.ast.Node;
 import polyglot.ast.TypeNode;
 import polyglot.ast.TypeNode_c;
@@ -51,6 +52,7 @@ import polyglot.util.SerialVersionUID;
 import polyglot.visit.AmbiguityRemover;
 import polyglot.visit.NodeVisitor;
 import polyglot.visit.PrettyPrinter;
+import polyglot.visit.Traverser;
 import polyglot.visit.TypeBuilder;
 import polyglot.visit.TypeChecker;
 
@@ -69,7 +71,7 @@ public class ParamTypeNode_c extends TypeNode_c implements ParamTypeNode {
 
     @Override
     public Id id() {
-        return this.id;
+        return id;
     }
 
     @Override
@@ -116,22 +118,27 @@ public class ParamTypeNode_c extends TypeNode_c implements ParamTypeNode {
     }
 
     @Override
+    public JLang lang() {
+        return J5Lang_c.instance;
+    }
+
+    @Override
     public Node visitChildren(NodeVisitor v) {
         List<TypeNode> bounds = visitList(this.bounds, v);
         return reconstruct(this, bounds);
     }
 
     @Override
-    public Context enterScope(Context c) {
+    public Context enterScope(Context c, Traverser v) {
         c = ((JL5Context) c).pushTypeVariable((TypeVariable) type());
-        return super.enterScope(c);
+        return super.enterScope(c, v);
     }
 
     @Override
-    public void addDecls(Context c) {
+    public void addDecls(Context c, Traverser v) {
         // we do not need to add the type variable to the scope
         // since that will be taken care of by the parent node.
-        super.addDecls(c);
+        super.addDecls(c, v);
     }
 
     // nothing needed for buildTypesEnter - not a code block like methods

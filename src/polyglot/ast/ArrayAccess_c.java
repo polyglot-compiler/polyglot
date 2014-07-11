@@ -40,6 +40,7 @@ import polyglot.visit.AscriptionVisitor;
 import polyglot.visit.CFGBuilder;
 import polyglot.visit.NodeVisitor;
 import polyglot.visit.PrettyPrinter;
+import polyglot.visit.Traverser;
 import polyglot.visit.TypeChecker;
 
 /**
@@ -52,14 +53,9 @@ public class ArrayAccess_c extends Expr_c implements ArrayAccess {
     protected Expr array;
     protected Expr index;
 
-//    @Deprecated
     public ArrayAccess_c(Position pos, Expr array, Expr index) {
-        this(pos, array, index, null);
-    }
-
-    public ArrayAccess_c(Position pos, Expr array, Expr index, Ext ext) {
-        super(pos, ext);
-        assert (array != null && index != null);
+        super(pos);
+        assert array != null && index != null;
         this.array = array;
         this.index = index;
     }
@@ -71,7 +67,7 @@ public class ArrayAccess_c extends Expr_c implements ArrayAccess {
 
     @Override
     public Expr array() {
-        return this.array;
+        return array;
     }
 
     @Override
@@ -88,7 +84,7 @@ public class ArrayAccess_c extends Expr_c implements ArrayAccess {
 
     @Override
     public Expr index() {
-        return this.index;
+        return index;
     }
 
     @Override
@@ -149,7 +145,7 @@ public class ArrayAccess_c extends Expr_c implements ArrayAccess {
         }
 
         if (child == array) {
-            return ts.arrayOf(this.type);
+            return ts.arrayOf(type);
         }
 
         return child.type();
@@ -169,7 +165,7 @@ public class ArrayAccess_c extends Expr_c implements ArrayAccess {
     }
 
     @Override
-    public Term firstChild() {
+    public Term firstChild(Traverser v) {
         return array;
     }
 
@@ -181,13 +177,13 @@ public class ArrayAccess_c extends Expr_c implements ArrayAccess {
     }
 
     @Override
-    public List<Type> throwTypes(TypeSystem ts) {
+    public List<Type> throwTypes(TypeSystem ts, Traverser v) {
         return CollectionUtil.list((Type) ts.OutOfBoundsException(),
                                    ts.NullPointerException());
     }
 
     @Override
     public Node copy(NodeFactory nf) {
-        return nf.ArrayAccess(this.position, this.array, this.index);
+        return nf.ArrayAccess(position, array, index);
     }
 }

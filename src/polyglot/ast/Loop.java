@@ -34,6 +34,7 @@ import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
 import polyglot.visit.CFGBuilder;
+import polyglot.visit.Traverser;
 
 /**
  * An immutable representation of a loop
@@ -53,13 +54,15 @@ public interface Loop extends CompoundStmt {
     /** Set the loop body. */
     Loop body(Stmt body);
 
+    @Deprecated
+    Term continueTarget();
+
     class Instance extends Loop_c {
         private static final long serialVersionUID =
                 SerialVersionUID.generate();
 
-        public Instance(Position pos, Expr cond, Stmt body, Ext ext) {
-            super(pos, cond, body, ext);
-            assert (ext != null);
+        public Instance(Position pos, Expr cond, Stmt body) {
+            super(pos, cond, body);
         }
 
         @Override
@@ -70,7 +73,7 @@ public interface Loop extends CompoundStmt {
         }
 
         @Override
-        public final Term firstChild() {
+        public final Term firstChild(Traverser v) {
             throw new InternalCompilerError("Unexpected invocation from extension object: "
                     + this);
         }
@@ -82,7 +85,7 @@ public interface Loop extends CompoundStmt {
         }
 
         @Override
-        public final Term continueTarget() {
+        public final Term continueTarget(Traverser v) {
             throw new InternalCompilerError("Unexpected invocation from extension object: "
                     + this);
         }

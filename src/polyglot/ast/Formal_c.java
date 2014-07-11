@@ -42,6 +42,7 @@ import polyglot.visit.AmbiguityRemover;
 import polyglot.visit.CFGBuilder;
 import polyglot.visit.NodeVisitor;
 import polyglot.visit.PrettyPrinter;
+import polyglot.visit.Traverser;
 import polyglot.visit.TypeBuilder;
 import polyglot.visit.TypeChecker;
 
@@ -57,14 +58,9 @@ public class Formal_c extends Term_c implements Formal {
     protected TypeNode type;
     protected Id name;
 
-//    @Deprecated
     public Formal_c(Position pos, Flags flags, TypeNode type, Id name) {
-        this(pos, flags, type, name, null);
-    }
-
-    public Formal_c(Position pos, Flags flags, TypeNode type, Id name, Ext ext) {
-        super(pos, ext);
-        assert (flags != null && type != null && name != null);
+        super(pos);
+        assert flags != null && type != null && name != null;
         this.flags = flags;
         this.type = type;
         this.name = name;
@@ -173,7 +169,7 @@ public class Formal_c extends Term_c implements Formal {
     }
 
     @Override
-    public void addDecls(Context c) {
+    public void addDecls(Context c, Traverser v) {
         c.addVariable(li);
     }
 
@@ -247,7 +243,7 @@ public class Formal_c extends Term_c implements Formal {
     }
 
     @Override
-    public Term firstChild() {
+    public Term firstChild(Traverser v) {
         return type;
     }
 
@@ -281,7 +277,7 @@ public class Formal_c extends Term_c implements Formal {
 
     @Override
     public Node copy(NodeFactory nf) {
-        return nf.Formal(this.position, this.flags, this.type, this.name);
+        return nf.Formal(position, flags, type, name);
     }
 
 }

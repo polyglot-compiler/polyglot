@@ -33,6 +33,7 @@ import java.util.List;
 
 import polyglot.ast.Node;
 import polyglot.ast.NodeFactory;
+import polyglot.ast.NodeOps;
 import polyglot.ext.jl5.ast.AnnotatedElement;
 import polyglot.ext.jl5.ast.AnnotationElem;
 import polyglot.ext.jl5.ast.JL5Ext;
@@ -73,7 +74,7 @@ public class AnnotationChecker extends ContextVisitor {
     @Override
     protected Node leaveCall(Node old, Node n, NodeVisitor v)
             throws SemanticException {
-        JL5Ext ext = JL5Ext.ext(n);
+        NodeOps ext = JL5Ext.ext(n);
         if (ext instanceof AnnotatedElement) {
             AnnotatedElement ae = (AnnotatedElement) ext;
             return ae.annotationCheck((AnnotationChecker) v);
@@ -131,7 +132,7 @@ public class AnnotationChecker extends ContextVisitor {
                                         decl.position());
         }
         MethodInstance mi = (MethodInstance) decl;
-        JL5TypeSystem ts = this.typeSystem();
+        JL5TypeSystem ts = typeSystem();
         List<MethodInstance> overrides = new LinkedList<>(ts.implemented(mi));
         overrides.remove(mi);
         if (overrides.isEmpty()) {

@@ -32,9 +32,7 @@ import polyglot.ast.ClassDecl;
 import polyglot.ast.ClassDeclOps;
 import polyglot.ast.Expr;
 import polyglot.ast.ExprOps;
-import polyglot.ast.Ext;
 import polyglot.ast.JLang_c;
-import polyglot.ast.Lang;
 import polyglot.ast.Loop;
 import polyglot.ast.LoopOps;
 import polyglot.ast.New;
@@ -48,27 +46,26 @@ import polyglot.ast.Term;
 import polyglot.ast.TermOps;
 import polyglot.types.SemanticException;
 import polyglot.types.Type;
-import polyglot.util.InternalCompilerError;
 import polyglot.visit.TypeChecker;
 
 public class J5Lang_c extends JLang_c implements J5Lang {
     public static final J5Lang_c instance = new J5Lang_c();
 
-    public static J5Lang lang(NodeOps n) {
-        while (n != null) {
-            Lang lang = n.lang();
-            if (lang instanceof J5Lang) return (J5Lang) lang;
-            if (n instanceof Ext)
-                n = ((Ext) n).pred();
-            else return null;
-        }
-        throw new InternalCompilerError("Impossible to reach");
-    }
+//    public static J5Lang lang(NodeOps n) {
+//        while (n != null) {
+//            Lang lang = n.lang();
+//            if (lang instanceof J5Lang) return (J5Lang) lang;
+//            if (n instanceof Ext)
+//                n = ((Ext) n).pred();
+//            else return null;
+//        }
+//        throw new InternalCompilerError("Impossible to reach");
+//    }
 
     protected J5Lang_c() {
     }
 
-    protected static JL5Ext jl5ext(Node n) {
+    protected static NodeOps jl5ext(Node n) {
         return JL5Ext.ext(n);
     }
 
@@ -131,7 +128,8 @@ public class J5Lang_c extends JLang_c implements J5Lang {
     // JL5SwitchOps
 
     @Override
-    public final boolean isAcceptableSwitchType(Switch n, Type type) {
-        return JL5SwitchOps(n).isAcceptableSwitchType(type);
+    public final boolean isAcceptableSwitchType(Switch n, Type type,
+            TypeChecker tc) {
+        return JL5SwitchOps(n).isAcceptableSwitchType(type, tc);
     }
 }

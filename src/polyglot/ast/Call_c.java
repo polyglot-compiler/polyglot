@@ -53,6 +53,7 @@ import polyglot.visit.CFGBuilder;
 import polyglot.visit.ExceptionChecker;
 import polyglot.visit.NodeVisitor;
 import polyglot.visit.PrettyPrinter;
+import polyglot.visit.Traverser;
 import polyglot.visit.TypeBuilder;
 import polyglot.visit.TypeChecker;
 
@@ -71,19 +72,13 @@ public class Call_c extends Expr_c implements Call, CallOps {
     protected MethodInstance mi;
     protected boolean targetImplicit;
 
-//    @Deprecated
     public Call_c(Position pos, Receiver target, Id name, List<Expr> arguments) {
-        this(pos, target, name, arguments, null);
-    }
-
-    public Call_c(Position pos, Receiver target, Id name, List<Expr> arguments,
-            Ext ext) {
-        super(pos, ext);
-        assert (name != null && arguments != null); // target may be null
+        super(pos);
+        assert name != null && arguments != null; // target may be null
         this.target = target;
         this.name = name;
         this.arguments = ListUtil.copy(arguments, true);
-        this.targetImplicit = (target == null);
+        targetImplicit = target == null;
     }
 
     @Override
@@ -93,7 +88,7 @@ public class Call_c extends Expr_c implements Call, CallOps {
 
     @Override
     public Receiver target() {
-        return this.target;
+        return target;
     }
 
     @Override
@@ -110,7 +105,7 @@ public class Call_c extends Expr_c implements Call, CallOps {
 
     @Override
     public Id id() {
-        return this.name;
+        return name;
     }
 
     @Override
@@ -127,7 +122,7 @@ public class Call_c extends Expr_c implements Call, CallOps {
 
     @Override
     public String name() {
-        return this.name.id();
+        return name.id();
     }
 
     @Override
@@ -142,7 +137,7 @@ public class Call_c extends Expr_c implements Call, CallOps {
 
     @Override
     public MethodInstance methodInstance() {
-        return this.mi;
+        return mi;
     }
 
     @Override
@@ -159,7 +154,7 @@ public class Call_c extends Expr_c implements Call, CallOps {
 
     @Override
     public boolean isTargetImplicit() {
-        return this.targetImplicit;
+        return targetImplicit;
     }
 
     @Override
@@ -176,7 +171,7 @@ public class Call_c extends Expr_c implements Call, CallOps {
 
     @Override
     public List<Expr> arguments() {
-        return this.arguments;
+        return arguments;
     }
 
     @Override
@@ -241,7 +236,7 @@ public class Call_c extends Expr_c implements Call, CallOps {
         // let's find the target, using the context, and
         // set the target appropriately, and then type check
         // the result
-        MethodInstance mi = c.findMethod(this.name.id(), argTypes);
+        MethodInstance mi = c.findMethod(name.id(), argTypes);
 
         Receiver r;
         if (mi.flags().isStatic()) {
@@ -286,7 +281,7 @@ public class Call_c extends Expr_c implements Call, CallOps {
         TypeSystem ts = tc.typeSystem();
         Context c = tc.context();
 
-        List<Type> argTypes = new ArrayList<>(this.arguments.size());
+        List<Type> argTypes = new ArrayList<>(arguments.size());
 
         for (Expr e : arguments) {
             if (!e.type().isCanonical()) {
@@ -295,18 +290,18 @@ public class Call_c extends Expr_c implements Call, CallOps {
             argTypes.add(e.type());
         }
 
-        if (this.target == null) {
+        if (target == null) {
             return tc.lang().typeCheckNullTarget(this, tc, argTypes);
         }
 
-        if (!this.target.type().isCanonical()) {
+        if (!target.type().isCanonical()) {
             return this;
         }
 
-        ReferenceType targetType = tc.lang().findTargetType(this);
+        ReferenceType targetType = tc.lang().findTargetType(this, tc);
         MethodInstance mi =
                 ts.findMethod(targetType,
-                              this.name.id(),
+                              name.id(),
                               argTypes,
                               c.currentClass(),
                               !(target instanceof Special));
@@ -314,17 +309,17 @@ public class Call_c extends Expr_c implements Call, CallOps {
         /* This call is in a static context if and only if
          * the target (possibly implicit) is a type node.
          */
-        boolean staticContext = (this.target instanceof TypeNode);
+        boolean staticContext = target instanceof TypeNode;
 
         if (staticContext && !mi.flags().isStatic()) {
             throw new SemanticException("Cannot call non-static method "
-                    + this.name.id() + " of " + target.type() + " in static "
+                    + name.id() + " of " + target.type() + " in static "
                     + "context.", this.position());
         }
 
         // If the target is super, but the method is abstract, then complain.
-        if (this.target instanceof Special
-                && ((Special) this.target).kind() == Special.SUPER
+        if (target instanceof Special
+                && ((Special) target).kind() == Special.SUPER
                 && mi.flags().isAbstract()) {
             throw new SemanticException("Cannot call an abstract method "
                     + "of the super class", this.position());
@@ -337,7 +332,7 @@ public class Call_c extends Expr_c implements Call, CallOps {
     }
 
     @Override
-    public ReferenceType findTargetType() throws SemanticException {
+    public ReferenceType findTargetType(Traverser v) throws SemanticException {
         Type t = target.type();
         if (t.isReference()) {
             return t.toReference();
@@ -368,7 +363,7 @@ public class Call_c extends Expr_c implements Call, CallOps {
             return mi.container();
         }
 
-        Iterator<Expr> i = this.arguments.iterator();
+        Iterator<Expr> i = arguments.iterator();
         Iterator<? extends Type> j = mi.formalTypes().iterator();
 
         while (i.hasNext() && j.hasNext()) {
@@ -478,7 +473,7 @@ public class Call_c extends Expr_c implements Call, CallOps {
     }
 
     @Override
-    public Term firstChild() {
+    public Term firstChild(Traverser v) {
         if (target instanceof Term) {
             return (Term) target;
         }
@@ -517,7 +512,7 @@ public class Call_c extends Expr_c implements Call, CallOps {
     }
 
     @Override
-    public List<Type> throwTypes(TypeSystem ts) {
+    public List<Type> throwTypes(TypeSystem ts, Traverser v) {
         List<Type> l = new LinkedList<>();
 
         l.addAll(mi.throwTypes());
@@ -552,7 +547,7 @@ public class Call_c extends Expr_c implements Call, CallOps {
 
     @Override
     public Node copy(NodeFactory nf) {
-        return nf.Call(this.position, this.target, this.name, this.arguments);
+        return nf.Call(position, target, name, arguments);
     }
 
 }

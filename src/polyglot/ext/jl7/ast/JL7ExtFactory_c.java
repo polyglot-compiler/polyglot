@@ -39,6 +39,11 @@ public final class JL7ExtFactory_c extends JL7AbstractExtFactory_c {
     }
 
     @Override
+    public J7Lang lang() {
+        return J7Lang_c.instance;
+    }
+
+    @Override
     protected Ext extNodeImpl() {
         JL7Ext ext = new JL7Ext();
         return ext;
@@ -65,6 +70,12 @@ public final class JL7ExtFactory_c extends JL7AbstractExtFactory_c {
     @Override
     protected Ext extSwitchImpl() {
         JL7SwitchExt ext = new JL7SwitchExt();
+        return ext;
+    }
+
+    @Override
+    protected Ext extTermImpl() {
+        JL7TermExt ext = new JL7TermExt();
         return ext;
     }
 

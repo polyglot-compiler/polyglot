@@ -50,21 +50,16 @@ public class Import_c extends Node_c implements Import {
     protected Kind kind;
     protected String name;
 
-//    @Deprecated
     public Import_c(Position pos, Kind kind, String name) {
-        this(pos, kind, name, null);
-    }
-
-    public Import_c(Position pos, Kind kind, String name, Ext ext) {
-        super(pos, ext);
-        assert (kind != null && name != null);
+        super(pos);
+        assert kind != null && name != null;
         this.name = name;
         this.kind = kind;
     }
 
     @Override
     public String name() {
-        return this.name;
+        return name;
     }
 
     @Override
@@ -81,7 +76,7 @@ public class Import_c extends Node_c implements Import {
 
     @Override
     public Kind kind() {
-        return this.kind;
+        return kind;
     }
 
     @Override
@@ -174,7 +169,7 @@ public class Import_c extends Node_c implements Import {
 
     @Override
     public Node copy(NodeFactory nf) {
-        return nf.Import(this.position, this.kind, this.name);
+        return nf.Import(position, kind, name);
     }
 
 }

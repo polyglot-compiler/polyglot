@@ -119,7 +119,7 @@ public class JL5AssignExt extends JL5ExprExt {
                     && !ts.numericConversionValid(t,
                                                   tc.lang()
                                                     .constantValue(a.right(),
-                                                                   tc.lang()))) {
+                                                                   tc))) {
 
                 throw new SemanticException("Cannot assign " + s + " to " + t
                         + ".", a.position());

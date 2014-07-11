@@ -55,7 +55,7 @@ public abstract class JL5AnnotatedElementExt extends JL5TermExt implements
 
     @Override
     public List<AnnotationElem> annotationElems() {
-        return this.annotations;
+        return annotations;
     }
 
     @Override
@@ -67,7 +67,7 @@ public abstract class JL5AnnotatedElementExt extends JL5TermExt implements
             List<AnnotationElem> annotations) {
         JL5AnnotatedElementExt ext = (JL5AnnotatedElementExt) JL5Ext.ext(n);
         if (CollectionUtil.equals(ext.annotations, annotations)) return n;
-        if (n == node) {
+        if (ext == this) {
             n = Copy.Util.copy(n);
             ext = (JL5AnnotatedElementExt) JL5Ext.ext(n);
         }
@@ -82,7 +82,7 @@ public abstract class JL5AnnotatedElementExt extends JL5TermExt implements
 
     @Override
     public Node visitChildren(NodeVisitor v) {
-        Node n = superLang().visitChildren(this.node(), v);
+        Node n = v.superLang(lang()).visitChildren(this.node(), v);
         List<AnnotationElem> annots = visitList(annotations, v);
         return reconstruct(n, annots);
     }
@@ -91,7 +91,7 @@ public abstract class JL5AnnotatedElementExt extends JL5TermExt implements
     public Node typeCheck(TypeChecker tc) throws SemanticException {
         JL5TypeSystem ts = (JL5TypeSystem) tc.typeSystem();
         ts.checkDuplicateAnnotations(annotations);
-        return superLang().typeCheck(this.node(), tc);
+        return tc.superLang(lang()).typeCheck(this.node(), tc);
     }
 
     @Override
@@ -107,7 +107,7 @@ public abstract class JL5AnnotatedElementExt extends JL5TermExt implements
             throws SemanticException {
         Node n = this.node();
         for (AnnotationElem elem : annotations) {
-            annoCheck.checkAnnotationApplicability(elem, this.declaration());
+            annoCheck.checkAnnotationApplicability(elem, declaration());
         }
         return n;
     }

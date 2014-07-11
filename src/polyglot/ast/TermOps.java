@@ -29,6 +29,7 @@ package polyglot.ast;
 import java.util.List;
 
 import polyglot.visit.CFGBuilder;
+import polyglot.visit.Traverser;
 
 /**
  * This interface allows extensions both to override and reuse functionality in
@@ -43,7 +44,7 @@ public interface TermOps {
      * recursively drill down to the innermost subterm. The direct child visited
      * first in this term's dataflow should be returned.
      */
-    Term firstChild();
+    Term firstChild(Traverser v);
 
     /**
      * Visit this term in evaluation order, calling v.edge() for each successor

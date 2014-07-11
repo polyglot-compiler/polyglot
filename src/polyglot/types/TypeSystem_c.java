@@ -39,7 +39,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import polyglot.ast.JLang_c;
 import polyglot.frontend.ExtensionInfo;
 import polyglot.frontend.Source;
 import polyglot.main.Report;
@@ -85,7 +84,7 @@ public class TypeSystem_c implements TypeSystem {
         // fully qualified names to instances of Named. A pass over a
         // compilation unit looks up classes first in its
         // import table and then in the system resolver.
-        this.systemResolver = new SystemResolver(loadedResolver, extInfo);
+        systemResolver = new SystemResolver(loadedResolver, extInfo);
 
         initEnums();
         initFlags();
@@ -148,17 +147,17 @@ public class TypeSystem_c implements TypeSystem {
 
     @Override
     public SystemResolver saveSystemResolver() {
-        SystemResolver r = this.systemResolver;
-        this.systemResolver = r.copy();
+        SystemResolver r = systemResolver;
+        systemResolver = r.copy();
         return r;
     }
 
     @Override
     public void restoreSystemResolver(SystemResolver r) {
-        if (r != this.systemResolver.previous()) {
+        if (r != systemResolver.previous()) {
             throw new InternalCompilerError("Inconsistent systemResolver.previous");
         }
-        this.systemResolver = r;
+        systemResolver = r;
     }
 
     @Deprecated
@@ -245,7 +244,7 @@ public class TypeSystem_c implements TypeSystem {
 
     @Override
     public Context createContext() {
-        return new Context_c(JLang_c.instance, this);
+        return new Context_c(this);
     }
 
     /** @deprecated */

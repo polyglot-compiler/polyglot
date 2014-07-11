@@ -32,6 +32,7 @@ import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
 import polyglot.util.StringUtil;
 import polyglot.visit.PrettyPrinter;
+import polyglot.visit.Traverser;
 import polyglot.visit.TypeChecker;
 
 /** 
@@ -40,13 +41,8 @@ import polyglot.visit.TypeChecker;
 public class CharLit_c extends NumLit_c implements CharLit {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
-//    @Deprecated
     public CharLit_c(Position pos, char value) {
-        this(pos, value, null);
-    }
-
-    public CharLit_c(Position pos, char value, Ext ext) {
-        super(pos, value, ext);
+        super(pos, value);
     }
 
     @Override
@@ -84,13 +80,13 @@ public class CharLit_c extends NumLit_c implements CharLit {
     }
 
     @Override
-    public Object constantValue(Lang lang) {
+    public Object constantValue(Traverser v) {
         return new Character((char) value);
     }
 
     @Override
     public Node copy(NodeFactory nf) {
-        return nf.CharLit(this.position, (char) this.value);
+        return nf.CharLit(position, (char) value);
     }
 
 }

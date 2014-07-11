@@ -26,9 +26,8 @@
 
 package polyglot.ast;
 
-import java.io.OutputStream;
-import java.io.Writer;
 import java.util.List;
+import java.util.Map;
 
 import polyglot.frontend.ExtensionInfo;
 import polyglot.translate.ExtensionRewriter;
@@ -47,6 +46,7 @@ import polyglot.visit.ExceptionChecker;
 import polyglot.visit.NodeVisitor;
 import polyglot.visit.PrettyPrinter;
 import polyglot.visit.Translator;
+import polyglot.visit.Traverser;
 import polyglot.visit.TypeBuilder;
 import polyglot.visit.TypeChecker;
 
@@ -58,16 +58,20 @@ import polyglot.visit.TypeChecker;
 public abstract class Ext_c implements Ext {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
+    @Deprecated
     protected Node node;
-    protected NodeOps pred;
+    @Deprecated
     protected Ext ext;
+
+    protected Lang primaryLang;
+    protected Map<Lang, NodeOps> nodeMap;
 
     public Ext_c() {
         this(null);
     }
 
     public Ext_c(Ext ext) {
-        this.node = null;
+        node = null;
         this.ext = ext;
     }
 
@@ -75,10 +79,6 @@ public abstract class Ext_c implements Ext {
     public Lang lang() {
         throw new InternalCompilerError("Unexpected invocation from extension object: "
                 + this);
-    }
-
-    protected final JLang superLang() {
-        return (JLang) pred.lang();
     }
 
     @Override
@@ -93,35 +93,51 @@ public abstract class Ext_c implements Ext {
 
     @Override
     public Node node() {
+        // TODO
+        if (nodeMap != null) return (Node) nodeMap.get(primaryLang);
         return node;
     }
 
     @Override
-    public NodeOps pred() {
-        return pred;
+    public final void initPrimaryLang(Lang primaryLang) {
+        if (this.primaryLang != null)
+            throw new InternalCompilerError("Already initialized.");
+        this.primaryLang = primaryLang;
     }
 
+    @Override
+    public final void initNodeMap(Map<Lang, NodeOps> nodeMap) {
+        if (this.nodeMap != null)
+            throw new InternalCompilerError("Already initialized.");
+        this.nodeMap = nodeMap;
+    }
+
+    @Override
+    public final NodeOps node(Lang lang) {
+        if (nodeMap == null)
+            throw new InternalCompilerError("Uninitialized node directory");
+        NodeOps node = nodeMap.get(lang);
+        if (node == null)
+            throw new InternalCompilerError("No node corresponding to " + lang);
+        return node;
+    }
+
+    @Deprecated
     @Override
     public void init(Node node) {
         if (this.node != null)
             throw new InternalCompilerError("Already initialized.");
         this.node = node;
-        if (this.ext != null) this.ext.init(node);
+        if (ext != null) ext.init(node);
     }
 
-    @Override
-    public void initPred(NodeOps pred) {
-        if (this.pred != null)
-            throw new InternalCompilerError("Already initialized.");
-        this.pred = pred;
-        if (this.ext != null) this.ext.initPred(this);
-    }
-
+    @Deprecated
     @Override
     public Ext ext() {
         return ext;
     }
 
+    @Deprecated
     @Override
     public Ext ext(Ext ext) {
         Ext old = this.ext;
@@ -140,16 +156,21 @@ public abstract class Ext_c implements Ext {
     public Ext copy() {
         try {
             Ext_c copy = (Ext_c) super.clone();
-            if (ext != null) {
-                copy.ext = ext.copy();
-            }
-            copy.node = null; // uninitialize
-            copy.pred = null; // uninitialize
+            copy.nodeMap = null; // uninitialize
+            copy = legacyCopy(copy);
             return copy;
         }
         catch (CloneNotSupportedException e) {
             throw new InternalCompilerError("Unable to clone an extension object.");
         }
+    }
+
+    private Ext_c legacyCopy(Ext_c copy) {
+        if (ext != null) {
+            copy.ext = ext.copy();
+        }
+        copy.node = null; // uninitialize
+        return copy;
     }
 
     @Override
@@ -170,151 +191,131 @@ public abstract class Ext_c implements Ext {
 
     @Override
     public Node visitChildren(NodeVisitor v) {
-        return superLang().visitChildren(node(), v);
+        return v.superLang(lang()).visitChildren(node(), v);
     }
 
+    @Deprecated
     @Override
     public Context enterScope(Context c) {
-        return superLang().enterScope(node(), c);
+        throw new InternalCompilerError("Unexpected invocation from extension object.");
     }
 
+    @Override
+    public Context enterScope(Context c, Traverser v) {
+        return v.superLang(lang()).enterScope(node(), c, v);
+    }
+
+    @Deprecated
     @Override
     public Context enterChildScope(Node child, Context c) {
-        return superLang().enterChildScope(node(), child, c);
+        throw new InternalCompilerError("Unexpected invocation from extension object.");
     }
 
     @Override
+    public Context enterChildScope(Node child, Context c, Traverser v) {
+        return v.superLang(lang()).enterChildScope(node(), child, c, v);
+    }
+
+    @Deprecated
+    @Override
     public void addDecls(Context c) {
-        superLang().addDecls(node(), c);
+        throw new InternalCompilerError("Unexpected invocation from extension object.");
+    }
+
+    @Override
+    public void addDecls(Context c, Traverser v) {
+        v.superLang(lang()).addDecls(node(), c, v);
     }
 
     @Override
     public NodeVisitor buildTypesEnter(TypeBuilder tb) throws SemanticException {
-        return superLang().buildTypesEnter(node(), tb);
+        return tb.superLang(lang()).buildTypesEnter(node(), tb);
     }
 
     @Override
     public Node buildTypes(TypeBuilder tb) throws SemanticException {
-        return superLang().buildTypes(node(), tb);
+        return tb.superLang(lang()).buildTypes(node(), tb);
     }
 
     @Override
     public Node disambiguateOverride(Node parent, AmbiguityRemover ar)
             throws SemanticException {
-        return superLang().disambiguateOverride(node(), parent, ar);
+        return ar.superLang(lang()).disambiguateOverride(node(), parent, ar);
     }
 
     @Override
     public NodeVisitor disambiguateEnter(AmbiguityRemover ar)
             throws SemanticException {
-        return superLang().disambiguateEnter(node(), ar);
+        return ar.superLang(lang()).disambiguateEnter(node(), ar);
     }
 
     @Override
     public Node disambiguate(AmbiguityRemover ar) throws SemanticException {
-        return superLang().disambiguate(node(), ar);
+        return ar.superLang(lang()).disambiguate(node(), ar);
     }
 
     @Override
     public Node typeCheckOverride(Node parent, TypeChecker tc)
             throws SemanticException {
-        return superLang().typeCheckOverride(node(), parent, tc);
+        return tc.superLang(lang()).typeCheckOverride(node(), parent, tc);
     }
 
     @Override
     public NodeVisitor typeCheckEnter(TypeChecker tc) throws SemanticException {
-        return superLang().typeCheckEnter(node(), tc);
+        return tc.superLang(lang()).typeCheckEnter(node(), tc);
     }
 
     @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
-        return superLang().typeCheck(node(), tc);
+        return tc.superLang(lang()).typeCheck(node(), tc);
     }
 
     @Override
     public Type childExpectedType(Expr child, AscriptionVisitor av) {
-        return superLang().childExpectedType(node(), child, av);
+        return av.superLang(lang()).childExpectedType(node(), child, av);
     }
 
     @Override
     public Node checkConstants(ConstantChecker cc) throws SemanticException {
-        return superLang().checkConstants(node(), cc);
+        return cc.superLang(lang()).checkConstants(node(), cc);
     }
 
     @Override
     public NodeVisitor exceptionCheckEnter(ExceptionChecker ec)
             throws SemanticException {
-        return superLang().exceptionCheckEnter(node(), ec);
+        return ec.superLang(lang()).exceptionCheckEnter(node(), ec);
     }
 
     @Override
     public Node exceptionCheck(ExceptionChecker ec) throws SemanticException {
-        return superLang().exceptionCheck(node(), ec);
+        return ec.superLang(lang()).exceptionCheck(node(), ec);
+    }
+
+    @Deprecated
+    @Override
+    public List<Type> throwTypes(TypeSystem ts) {
+        throw new InternalCompilerError("Unexpected invocation from extension object.");
     }
 
     @Override
-    public List<Type> throwTypes(TypeSystem ts) {
-        return superLang().throwTypes(node(), ts);
+    public List<Type> throwTypes(TypeSystem ts, Traverser v) {
+        return ((JLang) v.superLang(lang())).throwTypes(node(), ts, v);
     }
 
     @Override
     public NodeVisitor extRewriteEnter(ExtensionRewriter rw)
             throws SemanticException {
-        return superLang().extRewriteEnter(node(), rw);
+        return rw.superLang(lang()).extRewriteEnter(node(), rw);
     }
 
     @Override
     public Node extRewrite(ExtensionRewriter rw) throws SemanticException {
-        return superLang().extRewrite(node(), rw);
-    }
-
-    @Deprecated
-    @Override
-    public void dump(OutputStream os) {
-        node().del().dump(os);
-    }
-
-    @Override
-    public void dump(Lang lang, OutputStream os) {
-        superLang().dump(node(), lang, os);
-    }
-
-    @Deprecated
-    @Override
-    public void dump(Writer w) {
-        node().del().dump(w);
-    }
-
-    @Override
-    public void dump(Lang lang, Writer w) {
-        superLang().dump(node(), lang, w);
-    }
-
-    @Deprecated
-    @Override
-    public void prettyPrint(OutputStream os) {
-        node().del().prettyPrint(os);
-    }
-
-    @Override
-    public void prettyPrint(Lang lang, OutputStream os) {
-        superLang().prettyPrint(node(), lang, os);
-    }
-
-    @Deprecated
-    @Override
-    public void prettyPrint(Writer w) {
-        node().del().prettyPrint(w);
-    }
-
-    @Override
-    public void prettyPrint(Lang lang, Writer w) {
-        superLang().prettyPrint(node(), lang, w);
+        return rw.superLang(lang()).extRewrite(node(), rw);
     }
 
     @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter pp) {
-        superLang().prettyPrint(node(), w, pp);
+        pp.superLang(lang()).prettyPrint(node(), w, pp);
     }
 
     public void print(Node child, CodeWriter w, PrettyPrinter pp) {
@@ -340,16 +341,18 @@ public abstract class Ext_c implements Ext {
 
     @Override
     public void translate(CodeWriter w, Translator tr) {
-        superLang().translate(node(), w, tr);
+        tr.superLang(lang()).translate(node(), w, tr);
     }
 
     @Override
     public Node copy(NodeFactory nf) {
-        return superLang().copy(node(), nf);
+        throw new InternalCompilerError("Unexpected invocation from extension object.");
+//        return superLang(lang()).copy(node(), nf);
     }
 
     @Override
     public Node copy(ExtensionInfo extInfo) throws SemanticException {
-        return superLang().copy(node(), extInfo);
+        throw new InternalCompilerError("Unexpected invocation from extension object.");
+//        return superLang(lang()).copy(node(), extInfo);
     }
 }

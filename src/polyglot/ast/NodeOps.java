@@ -26,9 +26,8 @@
 
 package polyglot.ast;
 
-import java.io.OutputStream;
-import java.io.Writer;
 import java.util.List;
+import java.util.Map;
 
 import polyglot.frontend.ExtensionInfo;
 import polyglot.translate.ExtensionRewriter;
@@ -44,6 +43,7 @@ import polyglot.visit.ExceptionChecker;
 import polyglot.visit.NodeVisitor;
 import polyglot.visit.PrettyPrinter;
 import polyglot.visit.Translator;
+import polyglot.visit.Traverser;
 import polyglot.visit.TypeBuilder;
 import polyglot.visit.TypeChecker;
 
@@ -56,6 +56,15 @@ import polyglot.visit.TypeChecker;
 public interface NodeOps {
     /** The language defined by this NodeOps implementation. */
     Lang lang();
+
+    /** Initialize the primary language for this AST. */
+    void initPrimaryLang(Lang primaryLang);
+
+    /** Initialize the AST object's pointer to the node directory. */
+    void initNodeMap(Map<Lang, NodeOps> nodeMap);
+
+    /** Return the node corresponding to the given language. */
+    NodeOps node(Lang lang);
 
     /**
      * Visit a single child of the node.
@@ -95,7 +104,20 @@ public interface NodeOps {
      * @param c the current {@code Context}
      * @return the {@code Context} to be used for visiting this node. 
      */
-    public Context enterScope(Context c);
+    @Deprecated
+    Context enterScope(Context c);
+
+    /**
+     * Push a new scope upon entering this node, and add any declarations to the
+     * context that should be in scope when visiting children of this node.
+     * This should <i>not</i> update the old context
+     * imperatively.  Use {@code addDecls} when leaving the node
+     * for that.
+     * @param c the current {@code Context}
+     * @param v the {@code Visitor} to visit this node
+     * @return the {@code Context} to be used for visiting this node. 
+     */
+    Context enterScope(Context c, Traverser v);
 
     /**
      * Push a new scope for visiting the child node {@code child}. 
@@ -107,14 +129,37 @@ public interface NodeOps {
      * @return the {@code Context} to be used for visiting node 
      *           {@code child}
      */
-    public Context enterChildScope(Node child, Context c);
+    @Deprecated
+    Context enterChildScope(Node child, Context c);
+
+    /**
+     * Push a new scope for visiting the child node {@code child}. 
+     * The default behavior is to delegate the call to the child node, and let
+     * it add appropriate declarations that should be in scope. However,
+     * this method gives parent nodes have the ability to modify this behavior.
+     * @param child the child node about to be entered.
+     * @param c the current {@code Context}
+     * @param v the {@code Visitor} to visit this node
+     * @return the {@code Context} to be used for visiting node 
+     *           {@code child}
+     */
+    Context enterChildScope(Node child, Context c, Traverser v);
 
     /**
      * Add any declarations to the context that should be in scope when
      * visiting later sibling nodes.
      * @param c The context to which to add declarations.
      */
+    @Deprecated
     void addDecls(Context c);
+
+    /**
+     * Add any declarations to the context that should be in scope when
+     * visiting later sibling nodes.
+     * @param c The context to which to add declarations.
+     * @param v the {@code Visitor} that visited this node
+     */
+    void addDecls(Context c, Traverser v);
 
     /**
      * Collects classes, methods, and fields from the AST rooted at this node
@@ -309,7 +354,14 @@ public interface NodeOps {
      * List of Types of exceptions that might get thrown.  The result is
      * not necessarily correct until after type checking. 
      */
+    @Deprecated
     List<Type> throwTypes(TypeSystem ts);
+
+    /** 
+     * List of Types of exceptions that might get thrown.  The result is
+     * not necessarily correct until after type checking. 
+     */
+    List<Type> throwTypes(TypeSystem ts, Traverser v);
 
     /**
      * Rewrite the AST for the compilation in this language.
@@ -337,34 +389,6 @@ public interface NodeOps {
      * @param rw The visitor.
      */
     Node extRewrite(ExtensionRewriter rw) throws SemanticException;
-
-    /** Dump the AST for debugging. */
-    @Deprecated
-    void dump(OutputStream os);
-
-    /** Dump the AST for debugging. */
-    void dump(Lang lang, OutputStream os);
-
-    /** Dump the AST for debugging. */
-    @Deprecated
-    void dump(Writer w);
-
-    /** Dump the AST for debugging. */
-    void dump(Lang lang, Writer w);
-
-    /** Pretty-print the AST for debugging. */
-    @Deprecated
-    void prettyPrint(OutputStream os);
-
-    /** Pretty-print the AST for debugging. */
-    void prettyPrint(Lang lang, OutputStream os);
-
-    /** Pretty-print the AST for debugging. */
-    @Deprecated
-    void prettyPrint(Writer w);
-
-    /** Pretty-print the AST for debugging. */
-    void prettyPrint(Lang lang, Writer w);
 
     /**
      * Pretty-print the AST using the given {@code CodeWriter}.

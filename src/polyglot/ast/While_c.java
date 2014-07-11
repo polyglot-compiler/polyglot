@@ -39,6 +39,7 @@ import polyglot.visit.CFGBuilder;
 import polyglot.visit.FlowGraph;
 import polyglot.visit.NodeVisitor;
 import polyglot.visit.PrettyPrinter;
+import polyglot.visit.Traverser;
 import polyglot.visit.TypeChecker;
 
 /**
@@ -49,14 +50,9 @@ import polyglot.visit.TypeChecker;
 public class While_c extends Loop_c implements While {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
-//    @Deprecated
     public While_c(Position pos, Expr cond, Stmt body) {
-        this(pos, cond, body, null);
-    }
-
-    public While_c(Position pos, Expr cond, Stmt body, Ext ext) {
-        super(pos, cond, body, ext);
-        assert (cond != null);
+        super(pos, cond, body);
+        assert cond != null;
     }
 
     @Override
@@ -113,16 +109,16 @@ public class While_c extends Loop_c implements While {
     }
 
     @Override
-    public Term firstChild() {
+    public Term firstChild(Traverser v) {
         return cond;
     }
 
     @Override
     public <T> List<T> acceptCFG(CFGBuilder<?> v, List<T> succs) {
-        if (v.lang().condIsConstantTrue(this, v.lang())) {
+        if (v.lang().condIsConstantTrue(this, v)) {
             v.visitCFG(cond, body, ENTRY);
         }
-        else if (v.lang().condIsConstantFalse(this, v.lang())
+        else if (v.lang().condIsConstantFalse(this, v)
                 && v.skipDeadLoopBodies()) {
             v.visitCFG(cond, FlowGraph.EDGE_KEY_FALSE, this, EXIT);
             return succs;
@@ -143,13 +139,13 @@ public class While_c extends Loop_c implements While {
     }
 
     @Override
-    public Term continueTarget() {
+    public Term continueTarget(Traverser v) {
         return cond;
     }
 
     @Override
     public Node copy(NodeFactory nf) {
-        return nf.While(this.position, this.cond, this.body);
+        return nf.While(position, cond, body);
     }
 
 }

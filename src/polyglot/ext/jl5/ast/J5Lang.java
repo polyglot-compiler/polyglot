@@ -40,5 +40,5 @@ public interface J5Lang extends JLang {
 
     // JL5SwitchOps
 
-    boolean isAcceptableSwitchType(Switch n, Type type);
+    boolean isAcceptableSwitchType(Switch n, Type type, TypeChecker tc);
 }

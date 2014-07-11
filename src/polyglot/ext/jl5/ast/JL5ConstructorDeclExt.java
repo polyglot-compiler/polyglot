@@ -80,7 +80,7 @@ public class JL5ConstructorDeclExt extends JL5ProcedureDeclExt {
     @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
         ConstructorDecl cd = (ConstructorDecl) super.typeCheck(tc);
-        return superLang().typeCheck(cd, tc);
+        return tc.superLang(lang()).typeCheck(cd, tc);
     }
 
     @Override

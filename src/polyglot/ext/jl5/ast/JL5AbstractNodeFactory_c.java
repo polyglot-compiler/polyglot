@@ -28,16 +28,22 @@ package polyglot.ext.jl5.ast;
 import java.util.Collections;
 import java.util.List;
 
+import polyglot.ast.Block;
+import polyglot.ast.Call;
 import polyglot.ast.ClassBody;
+import polyglot.ast.ClassDecl;
 import polyglot.ast.ConstructorCall;
 import polyglot.ast.ConstructorCall.Kind;
+import polyglot.ast.ConstructorDecl;
 import polyglot.ast.Expr;
 import polyglot.ast.FieldDecl;
 import polyglot.ast.Formal;
 import polyglot.ast.Id;
+import polyglot.ast.JLNodeFactory_c;
 import polyglot.ast.LocalDecl;
+import polyglot.ast.MethodDecl;
 import polyglot.ast.New;
-import polyglot.ast.NodeFactory_c;
+import polyglot.ast.Receiver;
 import polyglot.ast.Term;
 import polyglot.ast.TypeNode;
 import polyglot.types.Flags;
@@ -46,8 +52,8 @@ import polyglot.util.Position;
 /**
  * This is a node factory that creates no nodes.
  */
-public abstract class JL5AbstractNodeFactory_c extends NodeFactory_c implements
-        JL5NodeFactory {
+public abstract class JL5AbstractNodeFactory_c extends JLNodeFactory_c
+        implements JL5NodeFactory {
     public JL5AbstractNodeFactory_c() {
         this(J5Lang_c.instance);
     }
@@ -58,6 +64,36 @@ public abstract class JL5AbstractNodeFactory_c extends NodeFactory_c implements
 
     public JL5AbstractNodeFactory_c(J5Lang lang, JL5ExtFactory extFactory) {
         super(lang, extFactory);
+    }
+
+    @Override
+    public final AmbWildCard AmbWildCard(Position pos) {
+        return AmbWildCardExtends(pos, null);
+    }
+
+    @Override
+    public final Call Call(Position pos, Receiver target, Id name,
+            List<Expr> args) {
+        return Call(pos, target, null, name, args);
+    }
+
+    @Override
+    public final ClassDecl ClassDecl(Position pos, Flags flags, Id name,
+            TypeNode superClass, List<TypeNode> interfaces, ClassBody body) {
+        return ClassDecl(pos,
+                         flags,
+                         null,
+                         name,
+                         superClass,
+                         interfaces,
+                         body,
+                         null);
+    }
+
+    @Override
+    public final ConstructorCall ConstructorCall(Position pos, Kind kind,
+            Expr outer, List<Expr> args) {
+        return ConstructorCall(pos, kind, outer, args, false);
     }
 
     @Override
@@ -84,8 +120,22 @@ public abstract class JL5AbstractNodeFactory_c extends NodeFactory_c implements
     }
 
     @Override
-    public final polyglot.ext.jl5.ast.ElementValueArrayInit ElementValueArrayInit(
-            Position pos) {
+    public final ConstructorDecl ConstructorDecl(Position pos, Flags flags,
+            Id name, List<Formal> formals, List<TypeNode> throwTypes, Block body) {
+        ConstructorDecl n =
+                ConstructorDecl(pos,
+                                flags,
+                                null,
+                                name,
+                                formals,
+                                throwTypes,
+                                body,
+                                null);
+        return n;
+    }
+
+    @Override
+    public final ElementValueArrayInit ElementValueArrayInit(Position pos) {
         return ElementValueArrayInit(pos, Collections.<Term> emptyList());
     }
 
@@ -96,15 +146,32 @@ public abstract class JL5AbstractNodeFactory_c extends NodeFactory_c implements
     }
 
     @Override
+    public final FieldDecl FieldDecl(Position pos, Flags flags, TypeNode type,
+            Id name, Expr init) {
+        return FieldDecl(pos, flags, null, type, name, init);
+    }
+
+    @Override
     public final FieldDecl FieldDecl(Position pos, Flags flags,
             List<AnnotationElem> annotations, TypeNode type, Id name) {
         return FieldDecl(pos, flags, annotations, type, name, null);
     }
 
     @Override
+    public final Formal Formal(Position pos, Flags flags, TypeNode type, Id name) {
+        return Formal(pos, flags, null, type, name);
+    }
+
+    @Override
     public final Formal Formal(Position pos, Flags flags,
             List<AnnotationElem> annotations, TypeNode type, Id name) {
         return Formal(pos, flags, annotations, type, name, false);
+    }
+
+    @Override
+    public final LocalDecl LocalDecl(Position pos, Flags flags, TypeNode type,
+            Id name, Expr init) {
+        return LocalDecl(pos, flags, null, type, name, init);
     }
 
     @Override
@@ -116,6 +183,29 @@ public abstract class JL5AbstractNodeFactory_c extends NodeFactory_c implements
     @Override
     public final AnnotationElem MarkerAnnotationElem(Position pos, TypeNode name) {
         return NormalAnnotationElem(pos, name, null);
+    }
+
+    @Override
+    public final MethodDecl MethodDecl(Position pos, Flags flags,
+            TypeNode returnType, Id name, List<Formal> formals,
+            List<TypeNode> throwTypes, Block body) {
+        MethodDecl n =
+                MethodDecl(pos,
+                           flags,
+                           null,
+                           returnType,
+                           name,
+                           formals,
+                           throwTypes,
+                           body,
+                           null);
+        return n;
+    }
+
+    @Override
+    public final New New(Position pos, Expr outer, TypeNode objectType,
+            List<Expr> args, ClassBody body) {
+        return New(pos, outer, null, objectType, args, body);
     }
 
     @Override

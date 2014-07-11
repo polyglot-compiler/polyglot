@@ -36,6 +36,7 @@ import polyglot.util.SerialVersionUID;
 import polyglot.visit.CFGBuilder;
 import polyglot.visit.NodeVisitor;
 import polyglot.visit.PrettyPrinter;
+import polyglot.visit.Traverser;
 
 /**
  * A local class declaration statement.  The node is just a wrapper around
@@ -46,20 +47,15 @@ public class LocalClassDecl_c extends Stmt_c implements LocalClassDecl {
 
     protected ClassDecl decl;
 
-//    @Deprecated
     public LocalClassDecl_c(Position pos, ClassDecl decl) {
-        this(pos, decl, null);
-    }
-
-    public LocalClassDecl_c(Position pos, ClassDecl decl, Ext ext) {
-        super(pos, ext);
-        assert (decl != null);
+        super(pos);
+        assert decl != null;
         this.decl = decl;
     }
 
     @Override
     public ClassDecl decl() {
-        return this.decl;
+        return decl;
     }
 
     @Override
@@ -87,7 +83,7 @@ public class LocalClassDecl_c extends Stmt_c implements LocalClassDecl {
     }
 
     @Override
-    public Term firstChild() {
+    public Term firstChild(Traverser v) {
         return decl();
     }
 
@@ -98,7 +94,7 @@ public class LocalClassDecl_c extends Stmt_c implements LocalClassDecl {
     }
 
     @Override
-    public void addDecls(Context c) {
+    public void addDecls(Context c, Traverser v) {
         // We should now be back in the scope of the enclosing block.
         // Add the type, if any.
         if (decl.type() == null) return;
@@ -122,7 +118,7 @@ public class LocalClassDecl_c extends Stmt_c implements LocalClassDecl {
 
     @Override
     public Node copy(NodeFactory nf) {
-        return nf.LocalClassDecl(this.position, this.decl);
+        return nf.LocalClassDecl(position, decl);
     }
 
 }

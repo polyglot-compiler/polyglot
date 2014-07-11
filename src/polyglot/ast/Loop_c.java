@@ -28,6 +28,7 @@ package polyglot.ast;
 
 import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
+import polyglot.visit.Traverser;
 
 /**
  * An immutable representation of a loop
@@ -40,21 +41,16 @@ public abstract class Loop_c extends Stmt_c implements Loop, LoopOps {
     protected Expr cond;
     protected Stmt body;
 
-//    @Deprecated
     public Loop_c(Position pos, Expr cond, Stmt body) {
-        this(pos, cond, body, null);
-    }
-
-    public Loop_c(Position pos, Expr cond, Stmt body, Ext ext) {
-        super(pos, ext);
-        assert (body != null);
+        super(pos);
+        assert body != null;
         this.body = body;
         this.cond = cond;
     }
 
     @Override
     public Expr cond() {
-        return this.cond;
+        return cond;
     }
 
     @Override
@@ -70,23 +66,23 @@ public abstract class Loop_c extends Stmt_c implements Loop, LoopOps {
     }
 
     @Override
-    public boolean condIsConstant(JLang lang) {
-        return lang.isConstant(cond(), lang);
+    public boolean condIsConstant(Traverser v) {
+        return v.lang().isConstant(cond(), v);
     }
 
     @Override
-    public boolean condIsConstantTrue(JLang lang) {
-        return Boolean.TRUE.equals(lang.constantValue(cond(), lang));
+    public boolean condIsConstantTrue(Traverser v) {
+        return Boolean.TRUE.equals(v.lang().constantValue(cond(), v));
     }
 
     @Override
-    public boolean condIsConstantFalse(JLang lang) {
-        return Boolean.FALSE.equals(lang.constantValue(cond(), lang));
+    public boolean condIsConstantFalse(Traverser v) {
+        return Boolean.FALSE.equals(v.lang().constantValue(cond(), v));
     }
 
     @Override
     public Stmt body() {
-        return this.body;
+        return body;
     }
 
     @Override
@@ -106,5 +102,11 @@ public abstract class Loop_c extends Stmt_c implements Loop, LoopOps {
         n = cond(n, cond);
         n = body(n, body);
         return n;
+    }
+
+    @Deprecated
+    @Override
+    public Term continueTarget() {
+        return continueTarget(delTraverser);
     }
 }

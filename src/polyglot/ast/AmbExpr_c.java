@@ -38,6 +38,7 @@ import polyglot.visit.CFGBuilder;
 import polyglot.visit.ExceptionChecker;
 import polyglot.visit.NodeVisitor;
 import polyglot.visit.PrettyPrinter;
+import polyglot.visit.Traverser;
 import polyglot.visit.TypeChecker;
 
 /**
@@ -49,14 +50,9 @@ public class AmbExpr_c extends Expr_c implements AmbExpr {
 
     protected Id name;
 
-//    @Deprecated
     public AmbExpr_c(Position pos, Id name) {
-        this(pos, name, null);
-    }
-
-    public AmbExpr_c(Position pos, Id name, Ext ext) {
-        super(pos, ext);
-        assert (name != null);
+        super(pos);
+        assert name != null;
         this.name = name;
     }
 
@@ -67,7 +63,7 @@ public class AmbExpr_c extends Expr_c implements AmbExpr {
 
     @Override
     public Id id() {
-        return this.name;
+        return name;
     }
 
     @Override
@@ -84,7 +80,7 @@ public class AmbExpr_c extends Expr_c implements AmbExpr {
 
     @Override
     public String name() {
-        return this.name.id();
+        return name.id();
     }
 
     @Override
@@ -143,7 +139,7 @@ public class AmbExpr_c extends Expr_c implements AmbExpr {
     }
 
     @Override
-    public Term firstChild() {
+    public Term firstChild(Traverser v) {
         return null;
     }
 
@@ -154,7 +150,7 @@ public class AmbExpr_c extends Expr_c implements AmbExpr {
 
     @Override
     public Node copy(NodeFactory nf) {
-        return nf.AmbExpr(this.position, this.name);
+        return nf.AmbExpr(position, name);
     }
 
 }

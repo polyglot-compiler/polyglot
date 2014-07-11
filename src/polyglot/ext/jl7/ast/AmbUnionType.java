@@ -30,6 +30,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import polyglot.ast.Ambiguous;
+import polyglot.ast.JLang;
 import polyglot.ast.Node;
 import polyglot.ast.TypeNode;
 import polyglot.ast.TypeNode_c;
@@ -65,6 +66,11 @@ public class AmbUnionType extends TypeNode_c implements Ambiguous {
     }
 
     @Override
+    public JLang lang() {
+        return J7Lang_c.instance;
+    }
+
+    @Override
     public Node visitChildren(NodeVisitor v) {
         List<TypeNode> alternatives = new ArrayList<>(this.alternatives.size());
         for (TypeNode tn : this.alternatives) {
@@ -75,8 +81,8 @@ public class AmbUnionType extends TypeNode_c implements Ambiguous {
 
     @Override
     public Node disambiguate(AmbiguityRemover sc) throws SemanticException {
-        List<ReferenceType> types = new ArrayList<>(this.alternatives.size());
-        for (TypeNode tn : this.alternatives) {
+        List<ReferenceType> types = new ArrayList<>(alternatives.size());
+        for (TypeNode tn : alternatives) {
             if (!tn.isDisambiguated()) {
                 return this;
             }
@@ -91,12 +97,12 @@ public class AmbUnionType extends TypeNode_c implements Ambiguous {
         else {
             t = ts.lub(this.position(), types);
         }
-        return sc.nodeFactory().CanonicalTypeNode(this.position, t);
+        return sc.nodeFactory().CanonicalTypeNode(position, t);
     }
 
     @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
-        Iterator<TypeNode> i = this.alternatives.iterator();
+        Iterator<TypeNode> i = alternatives.iterator();
         while (i.hasNext()) {
             TypeNode a = i.next();
             tr.lang().prettyPrint(a, w, tr);

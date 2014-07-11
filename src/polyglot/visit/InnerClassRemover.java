@@ -113,7 +113,7 @@ public class InnerClassRemover extends ContextVisitor {
 
             if (Report.should_report("innerremover", 1)) {
                 System.out.println(">>> output ----------------------");
-                lang().prettyPrint(n, lang(), System.out);
+                n.prettyPrint(lang(), superLangMap(), System.out);
                 System.out.println("<<< output ----------------------");
             }
 
@@ -121,7 +121,7 @@ public class InnerClassRemover extends ContextVisitor {
 
             if (Report.should_report("innerremover", 1)) {
                 System.out.println(">>> locals removed ----------------------");
-                lang().prettyPrint(n, lang(), System.out);
+                n.prettyPrint(lang(), superLangMap(), System.out);
                 System.out.println("<<< locals removed ----------------------");
             }
 
@@ -129,7 +129,7 @@ public class InnerClassRemover extends ContextVisitor {
 
             if (Report.should_report("innerremover", 1)) {
                 System.out.println(">>> inners removed ----------------------");
-                lang().prettyPrint(n, lang(), System.out);
+                n.prettyPrint(lang(), superLangMap(), System.out);
                 System.out.println("<<< inners removed ----------------------");
             }
 
@@ -298,41 +298,50 @@ public class InnerClassRemover extends ContextVisitor {
     }
 
     public ClassDecl fixQualifiers(ClassDecl cd) {
-        return (ClassDecl) lang().visitChildren(cd, new NodeVisitor(lang()) {
-            LocalInstance li;
+        return (ClassDecl) lang().visitChildren(cd,
+                                                new NodeVisitor(lang(),
+                                                                superLangMap()) {
+                                                    LocalInstance li;
 
-            @Override
-            public Node override(Node parent, Node n) {
-                if (n instanceof ClassBody) {
-                    return null;
-                }
+                                                    @Override
+                                                    public Node override(
+                                                            Node parent, Node n) {
+                                                        if (n instanceof ClassBody) {
+                                                            return null;
+                                                        }
 
-                if (n instanceof ConstructorDecl) {
-                    return null;
-                }
+                                                        if (n instanceof ConstructorDecl) {
+                                                            return null;
+                                                        }
 
-                if (parent instanceof ConstructorDecl && n instanceof Formal) {
-                    Formal f = (Formal) n;
-                    LocalInstance li = f.localInstance();
-                    if (li.name().equals(OUTER_FIELD_NAME)) {
-                        this.li = li;
-                    }
-                    return n;
-                }
+                                                        if (parent instanceof ConstructorDecl
+                                                                && n instanceof Formal) {
+                                                            Formal f =
+                                                                    (Formal) n;
+                                                            LocalInstance li =
+                                                                    f.localInstance();
+                                                            if (li.name()
+                                                                  .equals(OUTER_FIELD_NAME)) {
+                                                                this.li = li;
+                                                            }
+                                                            return n;
+                                                        }
 
-                if (parent instanceof ConstructorDecl && n instanceof Block) {
-                    return null;
-                }
+                                                        if (parent instanceof ConstructorDecl
+                                                                && n instanceof Block) {
+                                                            return null;
+                                                        }
 
-                if (parent instanceof Block && n instanceof ConstructorCall) {
-                    return null;
-                }
+                                                        if (parent instanceof Block
+                                                                && n instanceof ConstructorCall) {
+                                                            return null;
+                                                        }
 
-                if (parent instanceof ConstructorCall) {
-                    return null;
-                }
+                                                        if (parent instanceof ConstructorCall) {
+                                                            return null;
+                                                        }
 
-                return n;
+                                                        return n;
 //
 //                if (n instanceof ClassMember) {
 //                    this.li = null;
@@ -340,21 +349,26 @@ public class InnerClassRemover extends ContextVisitor {
 //                }
 //
 //                return null;
-            }
+                                                    }
 
-            @Override
-            public Node leave(Node parent, Node old, Node n, NodeVisitor v) {
-                if (parent instanceof ConstructorCall && li != null
-                        && n instanceof Expr) {
-                    return fixQualifier((Expr) n, li);
-                }
-                return n;
-            }
-        });
+                                                    @Override
+                                                    public Node leave(
+                                                            Node parent,
+                                                            Node old, Node n,
+                                                            NodeVisitor v) {
+                                                        if (parent instanceof ConstructorCall
+                                                                && li != null
+                                                                && n instanceof Expr) {
+                                                            return fixQualifier((Expr) n,
+                                                                                li);
+                                                        }
+                                                        return n;
+                                                    }
+                                                });
     }
 
     public Expr fixQualifier(Expr e, final LocalInstance li) {
-        return (Expr) e.visit(new NodeVisitor(lang()) {
+        return (Expr) e.visit(new NodeVisitor(lang(), superLangMap()) {
             @Override
             public Node leave(Node old, Node n, NodeVisitor v) {
                 if (n instanceof Field) {

@@ -28,12 +28,14 @@ package polyglot.visit;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Map;
 
 import polyglot.ast.ClassDecl;
 import polyglot.ast.ClassMember;
 import polyglot.ast.CodeDecl;
 import polyglot.ast.FieldDecl;
 import polyglot.ast.JLang;
+import polyglot.ast.Lang;
 import polyglot.ast.New;
 import polyglot.ast.Node;
 import polyglot.ast.NodeFactory;
@@ -73,6 +75,11 @@ public class AmbiguityRemover extends DisambiguationDriver {
     }
 
     @Override
+    public JLang superLang(Lang lang) {
+        return (JLang) super.superLang(lang);
+    }
+
+    @Override
     public Node override(Node parent, Node n) {
         if (!visitSigs && n instanceof ClassMember && !(n instanceof ClassDecl)) {
             return n;
@@ -94,14 +101,16 @@ public class AmbiguityRemover extends DisambiguationDriver {
             Node m = lang().disambiguateOverride(n, parent, this);
 
             if (Report.should_report(Report.visit, 2))
-                Report.report(2, "<< "
-                        + this
-                        + "::override "
-                        + n
-                        + " -> "
-                        + m
-                        + (m != null ? (" (" + m.getClass().getName() + ")")
-                                : ""));
+                Report.report(2,
+                              "<< "
+                                      + this
+                                      + "::override "
+                                      + n
+                                      + " -> "
+                                      + m
+                                      + (m != null
+                                              ? " (" + m.getClass().getName()
+                                                      + ")" : ""));
 
             return m;
         }
@@ -111,7 +120,7 @@ public class AmbiguityRemover extends DisambiguationDriver {
             Goal g = scheduler.currentGoal();
             scheduler.addDependencyAndEnqueue(g, e.goal(), e.prerequisite());
             g.setUnreachableThisRun();
-            if (this.rethrowMissingDependencies) {
+            if (rethrowMissingDependencies) {
                 throw e;
             }
             return n;
@@ -124,9 +133,9 @@ public class AmbiguityRemover extends DisambiguationDriver {
                     position = n.position();
                 }
 
-                this.errorQueue().enqueue(ErrorInfo.SEMANTIC_ERROR,
-                                          e.getMessage(),
-                                          position);
+                errorQueue().enqueue(ErrorInfo.SEMANTIC_ERROR,
+                                     e.getMessage(),
+                                     position);
             }
             else {
                 // silent error; these should be thrown only
@@ -156,8 +165,8 @@ public class AmbiguityRemover extends DisambiguationDriver {
     protected static class AmbChecker2 extends NodeVisitor {
         public boolean amb;
 
-        public AmbChecker2(JLang lang) {
-            super(lang);
+        public AmbChecker2(JLang lang, Map<Lang, Lang> superLangMap) {
+            super(lang, superLangMap);
         }
 
         @Override
@@ -188,7 +197,7 @@ public class AmbiguityRemover extends DisambiguationDriver {
 
         if (Report.should_report(Report.visit, 2))
             Report.report(2, "<< " + this + "::leave " + n + " -> " + m
-                    + (m != null ? (" (" + m.getClass().getName() + ")") : ""));
+                    + (m != null ? " (" + m.getClass().getName() + ")" : ""));
 
         return m;
     }
@@ -215,14 +224,14 @@ public class AmbiguityRemover extends DisambiguationDriver {
     }
 
     public boolean isASTDisambiguated(Node n) {
-        return astAmbiguityCount(lang(), n) == 0;
+        return astAmbiguityCount(lang(), superLangMap(), n) == 0;
     }
 
     protected static class AmbChecker extends NodeVisitor {
         public int notOkCount;
 
-        public AmbChecker(JLang lang) {
-            super(lang);
+        public AmbChecker(JLang lang, Map<Lang, Lang> superLangMap) {
+            super(lang, superLangMap);
         }
 
         @Override
@@ -248,8 +257,9 @@ public class AmbiguityRemover extends DisambiguationDriver {
         }
     }
 
-    public static int astAmbiguityCount(JLang lang, Node n) {
-        AmbChecker ac = new AmbChecker(lang);
+    public static int astAmbiguityCount(JLang lang,
+            Map<Lang, Lang> superLangMap, Node n) {
+        AmbChecker ac = new AmbChecker(lang, superLangMap);
         n.visit(ac);
         return ac.notOkCount;
     }

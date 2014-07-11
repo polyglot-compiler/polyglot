@@ -39,6 +39,7 @@ import polyglot.visit.CFGBuilder;
 import polyglot.visit.FlowGraph;
 import polyglot.visit.NodeVisitor;
 import polyglot.visit.PrettyPrinter;
+import polyglot.visit.Traverser;
 import polyglot.visit.TypeChecker;
 
 /**
@@ -49,14 +50,9 @@ import polyglot.visit.TypeChecker;
 public class Do_c extends Loop_c implements Do {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
-//    @Deprecated
     public Do_c(Position pos, Stmt body, Expr cond) {
-        this(pos, body, cond, null);
-    }
-
-    public Do_c(Position pos, Stmt body, Expr cond, Ext ext) {
-        super(pos, cond, body, ext);
-        assert (cond != null);
+        super(pos, cond, body);
+        assert cond != null;
     }
 
     @Override
@@ -114,7 +110,7 @@ public class Do_c extends Loop_c implements Do {
     }
 
     @Override
-    public Term firstChild() {
+    public Term firstChild(Traverser v) {
         return body;
     }
 
@@ -122,7 +118,7 @@ public class Do_c extends Loop_c implements Do {
     public <T> List<T> acceptCFG(CFGBuilder<?> v, List<T> succs) {
         v.push(this).visitCFG(body, cond, ENTRY);
 
-        if (v.lang().condIsConstantTrue(this, v.lang())) {
+        if (v.lang().condIsConstantTrue(this, v)) {
             v.visitCFG(cond, body, ENTRY);
         }
         else {
@@ -139,13 +135,13 @@ public class Do_c extends Loop_c implements Do {
     }
 
     @Override
-    public Term continueTarget() {
+    public Term continueTarget(Traverser v) {
         return cond;
     }
 
     @Override
     public Node copy(NodeFactory nf) {
-        return nf.Do(this.position, this.body, this.cond);
+        return nf.Do(position, body, cond);
     }
 
 }

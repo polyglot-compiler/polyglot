@@ -40,6 +40,7 @@ import polyglot.visit.AscriptionVisitor;
 import polyglot.visit.CFGBuilder;
 import polyglot.visit.NodeVisitor;
 import polyglot.visit.PrettyPrinter;
+import polyglot.visit.Traverser;
 import polyglot.visit.TypeChecker;
 
 /**
@@ -52,20 +53,15 @@ public class Throw_c extends Stmt_c implements Throw {
 
     protected Expr expr;
 
-//    @Deprecated
     public Throw_c(Position pos, Expr expr) {
-        this(pos, expr, null);
-    }
-
-    public Throw_c(Position pos, Expr expr, Ext ext) {
-        super(pos, ext);
-        assert (expr != null);
+        super(pos);
+        assert expr != null;
         this.expr = expr;
     }
 
     @Override
     public Expr expr() {
-        return this.expr;
+        return expr;
     }
 
     @Override
@@ -126,7 +122,7 @@ public class Throw_c extends Stmt_c implements Throw {
     }
 
     @Override
-    public Term firstChild() {
+    public Term firstChild(Traverser v) {
         return expr;
     }
 
@@ -139,7 +135,7 @@ public class Throw_c extends Stmt_c implements Throw {
     }
 
     @Override
-    public List<Type> throwTypes(TypeSystem ts) {
+    public List<Type> throwTypes(TypeSystem ts, Traverser v) {
         // if the exception that a throw statement is given to throw is null,
         // then a NullPointerException will be thrown.
         return CollectionUtil.list(expr.type(), ts.NullPointerException());
@@ -147,7 +143,7 @@ public class Throw_c extends Stmt_c implements Throw {
 
     @Override
     public Node copy(NodeFactory nf) {
-        return nf.Throw(this.position, this.expr);
+        return nf.Throw(position, expr);
     }
 
 }

@@ -107,12 +107,13 @@ public class InnerClassRewriter extends InnerClassAbstractRemover {
         Map<ClassType, FieldInstance> fieldMap;
         Context outerContext;
 
-        ClassBodyTranslator(Lang lang, ParsedClassType ct,
-                Map<ClassType, FieldInstance> fieldMap, Context context) {
-            super(lang);
+        ClassBodyTranslator(Lang lang, Map<Lang, Lang> superLangMap,
+                ParsedClassType ct, Map<ClassType, FieldInstance> fieldMap,
+                Context context) {
+            super(lang, superLangMap);
             this.ct = ct;
             this.fieldMap = fieldMap;
-            this.outerContext = context;
+            outerContext = context;
         }
 
         @Override
@@ -256,7 +257,7 @@ public class InnerClassRewriter extends InnerClassAbstractRemover {
                 // Translate the class body if any supertype (including ct itself)
                 // is an inner class.
                 Context innerContext =
-                        lang().enterChildScope(cd, cd.body(), context);
+                        lang().enterChildScope(cd, cd.body(), context, this);
                 cd = cd.body(translateClassBody(ct, cd.body(), innerContext));
             }
 
@@ -303,7 +304,11 @@ public class InnerClassRewriter extends InnerClassAbstractRemover {
 
         // Rewrite the class body.
         ClassBodyTranslator v =
-                new ClassBodyTranslator(lang(), ct, fieldMap, context);
+                new ClassBodyTranslator(lang(),
+                                        superLangMap(),
+                                        ct,
+                                        fieldMap,
+                                        context);
         v = (ClassBodyTranslator) v.begin();
         body = (ClassBody) body.visit(v);
 

@@ -28,11 +28,11 @@ package polyglot.ext.jl5.ast;
 import java.util.List;
 import java.util.Map;
 
-import polyglot.ast.Lang;
 import polyglot.ast.Term;
 import polyglot.ast.TypeNode;
 import polyglot.ext.jl5.types.AnnotationElementValue;
 import polyglot.ext.jl5.types.JL5TypeSystem;
+import polyglot.ext.jl5.visit.ResolveAnnotationsVisitor;
 import polyglot.types.SemanticException;
 
 /**
@@ -51,8 +51,9 @@ public interface AnnotationElem extends Term {
      * Convert this AST representation into a suitable type annotation.
      * @throws SemanticException 
      */
-    Map<String, AnnotationElementValue> toAnnotationElementValues(Lang lang,
-            JL5TypeSystem ts) throws SemanticException;
+    Map<String, AnnotationElementValue> toAnnotationElementValues(
+            JL5TypeSystem ts, ResolveAnnotationsVisitor rav)
+            throws SemanticException;
 
     /**
      * An annotation is a marker annotation if it has no elements

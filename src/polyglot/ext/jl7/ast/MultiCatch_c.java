@@ -31,6 +31,7 @@ import java.util.List;
 import polyglot.ast.Block;
 import polyglot.ast.Catch_c;
 import polyglot.ast.Formal;
+import polyglot.ast.JLang;
 import polyglot.ast.Node;
 import polyglot.ast.TypeNode;
 import polyglot.types.SemanticException;
@@ -57,7 +58,7 @@ public class MultiCatch_c extends Catch_c implements MultiCatch {
 
     @Override
     public List<TypeNode> alternatives() {
-        return this.alternatives;
+        return alternatives;
     }
 
     @Override
@@ -68,9 +69,14 @@ public class MultiCatch_c extends Catch_c implements MultiCatch {
     }
 
     @Override
+    public JLang lang() {
+        return J7Lang_c.instance;
+    }
+
+    @Override
     public Node visitChildren(NodeVisitor v) {
         MultiCatch_c n = (MultiCatch_c) super.visitChildren(v);
-        List<TypeNode> as = visitList(this.alternatives, v);
+        List<TypeNode> as = visitList(alternatives, v);
         if (CollectionUtil.equals(as, n.alternatives())) {
             return n;
         }
@@ -80,7 +86,7 @@ public class MultiCatch_c extends Catch_c implements MultiCatch {
     @Override
     public String toString() {
         StringBuilder types = new StringBuilder();
-        Iterator<TypeNode> i = this.alternatives.iterator();
+        Iterator<TypeNode> i = alternatives.iterator();
         while (i.hasNext()) {
             types.append(i.next().toString());
             if (i.hasNext()) {
@@ -104,9 +110,9 @@ public class MultiCatch_c extends Catch_c implements MultiCatch {
     public Node typeCheck(TypeChecker tc) throws SemanticException {
         MultiCatch n = (MultiCatch) super.typeCheck(tc);
 
-        for (int i = 0; i < this.alternatives.size(); i++) {
+        for (int i = 0; i < alternatives.size(); i++) {
             Type ti = this.alternatives().get(i).type();
-            for (int j = i + 1; j < this.alternatives.size(); j++) {
+            for (int j = i + 1; j < alternatives.size(); j++) {
                 Type tj = this.alternatives().get(j).type();
                 if (ti.isSubtype(tj) || tj.isSubtype(ti)) {
                     throw new SemanticException("Alternatives in a multi-catch statement must not be subclasses of each other.",
@@ -127,7 +133,7 @@ public class MultiCatch_c extends Catch_c implements MultiCatch {
 
         w.begin(0);
         w.write(formal().flags().translate());
-        Iterator<TypeNode> i = this.alternatives.iterator();
+        Iterator<TypeNode> i = alternatives.iterator();
         while (i.hasNext()) {
             print(i.next(), w, tr);
             if (i.hasNext()) {

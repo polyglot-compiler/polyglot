@@ -47,6 +47,7 @@ import polyglot.util.SerialVersionUID;
 import polyglot.visit.CFGBuilder;
 import polyglot.visit.NodeVisitor;
 import polyglot.visit.PrettyPrinter;
+import polyglot.visit.Traverser;
 import polyglot.visit.TypeBuilder;
 import polyglot.visit.TypeChecker;
 
@@ -60,15 +61,9 @@ public class ConstructorDecl_c extends ProcedureDecl_c implements
 
     protected ConstructorInstance ci;
 
-//    @Deprecated
     public ConstructorDecl_c(Position pos, Flags flags, Id name,
             List<Formal> formals, List<TypeNode> throwTypes, Block body) {
-        this(pos, flags, name, formals, throwTypes, body, null);
-    }
-
-    public ConstructorDecl_c(Position pos, Flags flags, Id name,
-            List<Formal> formals, List<TypeNode> throwTypes, Block body, Ext ext) {
-        super(pos, flags, name, formals, throwTypes, body, ext);
+        super(pos, flags, name, formals, throwTypes, body);
     }
 
     @Override
@@ -145,7 +140,7 @@ public class ConstructorDecl_c extends ProcedureDecl_c implements
     }
 
     @Override
-    public Context enterScope(Context c) {
+    public Context enterScope(Context c, Traverser v) {
         return c.pushCode(ci);
     }
 
@@ -258,7 +253,7 @@ public class ConstructorDecl_c extends ProcedureDecl_c implements
     }
 
     @Override
-    public Term firstChild() {
+    public Term firstChild(Traverser v) {
         return listChild(formals(), body() != null ? body() : null);
     }
 
@@ -277,12 +272,12 @@ public class ConstructorDecl_c extends ProcedureDecl_c implements
 
     @Override
     public Node copy(NodeFactory nf) {
-        return nf.ConstructorDecl(this.position,
-                                  this.flags,
-                                  this.name,
-                                  this.formals,
-                                  this.throwTypes,
-                                  this.body);
+        return nf.ConstructorDecl(position,
+                                  flags,
+                                  name,
+                                  formals,
+                                  throwTypes,
+                                  body);
     }
 
 }

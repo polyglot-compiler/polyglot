@@ -26,6 +26,8 @@
 
 package polyglot.ast;
 
+import polyglot.visit.Traverser;
+
 /**
  * This interface allows extensions both to override and reuse functionality in
  * Term_c.
@@ -35,17 +37,17 @@ public interface ExprOps {
     /** Return true iff the compiler has determined whether this expression has a
      * constant value.  The value returned by {@code isConstant()} is valid only if
      * {@code constantValueSet()} is true. */
-    boolean constantValueSet(Lang lang);
+    boolean constantValueSet(Traverser v);
 
     /**
      * Return whether the expression evaluates to a constant.
      * Requires that disambiguation has been done, and that
      * {@code constantValueSet()} is true.
      */
-    boolean isConstant(Lang lang);
+    boolean isConstant(Traverser v);
 
     /** Return the constant value of the expression, if any.
      *  Requires that {@code isConstant()} is true.
      */
-    Object constantValue(Lang lang);
+    Object constantValue(Traverser v);
 }

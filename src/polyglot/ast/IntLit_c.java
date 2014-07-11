@@ -33,6 +33,7 @@ import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
 import polyglot.visit.PrettyPrinter;
+import polyglot.visit.Traverser;
 import polyglot.visit.TypeChecker;
 
 /**
@@ -45,21 +46,16 @@ public class IntLit_c extends NumLit_c implements IntLit {
     /** The kind of literal: INT or LONG. */
     protected Kind kind;
 
-//    @Deprecated
     public IntLit_c(Position pos, Kind kind, long value) {
-        this(pos, kind, value, null);
-    }
-
-    public IntLit_c(Position pos, Kind kind, long value, Ext ext) {
-        super(pos, value, ext);
-        assert (kind != null);
+        super(pos, value);
+        assert kind != null;
         this.kind = kind;
     }
 
     @Override
     public boolean boundary() {
-        return (kind == INT && (int) value == Integer.MIN_VALUE)
-                || (kind == LONG && value == Long.MIN_VALUE);
+        return kind == INT && (int) value == Integer.MIN_VALUE || kind == LONG
+                && value == Long.MIN_VALUE;
     }
 
     @Override
@@ -157,7 +153,7 @@ public class IntLit_c extends NumLit_c implements IntLit {
     }
 
     @Override
-    public Object constantValue(Lang lang) {
+    public Object constantValue(Traverser v) {
         if (kind() == LONG) {
             return new Long(value);
         }
@@ -178,7 +174,7 @@ public class IntLit_c extends NumLit_c implements IntLit {
 
     @Override
     public Node copy(NodeFactory nf) {
-        return nf.IntLit(this.position, this.kind, this.value);
+        return nf.IntLit(position, kind, value);
     }
 
 }

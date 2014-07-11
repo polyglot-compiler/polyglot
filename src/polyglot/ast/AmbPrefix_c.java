@@ -47,21 +47,16 @@ public class AmbPrefix_c extends Node_c implements AmbPrefix {
     protected Prefix prefix;
     protected Id name;
 
-//    @Deprecated
     public AmbPrefix_c(Position pos, Prefix prefix, Id name) {
-        this(pos, prefix, name, null);
-    }
-
-    public AmbPrefix_c(Position pos, Prefix prefix, Id name, Ext ext) {
-        super(pos, ext);
-        assert (name != null); // prefix may be null
+        super(pos);
+        assert name != null; // prefix may be null
         this.prefix = prefix;
         this.name = name;
     }
 
     @Override
     public Id nameNode() {
-        return this.name;
+        return name;
     }
 
     /** Set the name of the prefix. */
@@ -78,7 +73,7 @@ public class AmbPrefix_c extends Node_c implements AmbPrefix {
 
     @Override
     public String name() {
-        return this.name.id();
+        return name.id();
     }
 
     /** Set the name of the prefix. */
@@ -88,7 +83,7 @@ public class AmbPrefix_c extends Node_c implements AmbPrefix {
 
     @Override
     public Prefix prefix() {
-        return this.prefix;
+        return prefix;
     }
 
     /** Set the prefix of the prefix. */
@@ -160,6 +155,6 @@ public class AmbPrefix_c extends Node_c implements AmbPrefix {
 
     @Override
     public Node copy(NodeFactory nf) {
-        return nf.AmbPrefix(this.position, this.prefix, this.name);
+        return nf.AmbPrefix(position, prefix, name);
     }
 }

@@ -58,7 +58,7 @@ public class SimplifyExpressionsForBoxing extends HaltingVisitor {
     TypeSystem ts;
 
     public SimplifyExpressionsForBoxing(NodeFactory nf, TypeSystem ts) {
-        super(nf.lang());
+        super(nf.lang(), nf.superLangMap());
         this.nf = nf;
         this.ts = ts;
     }
@@ -91,7 +91,8 @@ public class SimplifyExpressionsForBoxing extends HaltingVisitor {
          */
         if (Unary.PRE_DEC.equals(u.operator())
                 || Unary.PRE_INC.equals(u.operator())
-                || (discardValue && (Unary.POST_DEC.equals(u.operator()) || Unary.POST_INC.equals(u.operator())))) {
+                || discardValue
+                && (Unary.POST_DEC.equals(u.operator()) || Unary.POST_INC.equals(u.operator()))) {
             if (!isTargetPure(u.expr())) {
                 throw new InternalCompilerError("Don't support effectful LHS "
                         + u + " " + u.expr().getClass());
@@ -118,8 +119,8 @@ public class SimplifyExpressionsForBoxing extends HaltingVisitor {
             }
             Expr left = u.expr();
             Assign.Operator newOp =
-                    Unary.POST_INC.equals(u.operator()) ? Assign.ADD_ASSIGN
-                            : Assign.SUB_ASSIGN;
+                    Unary.POST_INC.equals(u.operator())
+                            ? Assign.ADD_ASSIGN : Assign.SUB_ASSIGN;
             Assign ass =
                     nf.Assign(u.position(),
                               left,
@@ -131,8 +132,8 @@ public class SimplifyExpressionsForBoxing extends HaltingVisitor {
             Binary b =
                     nf.Binary(u.position(),
                               sa,
-                              Unary.POST_INC.equals(u.operator()) ? Binary.SUB
-                                      : Binary.ADD,
+                              Unary.POST_INC.equals(u.operator())
+                                      ? Binary.SUB : Binary.ADD,
                               nf.IntLit(u.position(), IntLit.INT, 1)
                                 .type(ts.Int()));
 
@@ -164,7 +165,8 @@ public class SimplifyExpressionsForBoxing extends HaltingVisitor {
         Expr right = ass.right();
         Binary b =
                 nf.Binary(ass.position(),
-                          (Expr) ass.left().visit(new DeepCopy(lang())),
+                          (Expr) ass.left().visit(new DeepCopy(lang(),
+                                                               superLangMap())),
                           op,
                           right);
         if (leftTypePrim.isNumeric() && rightTypePrim.isNumeric()) {

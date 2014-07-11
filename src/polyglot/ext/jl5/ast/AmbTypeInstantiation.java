@@ -31,6 +31,7 @@ import java.util.List;
 import java.util.Map;
 
 import polyglot.ast.Ambiguous;
+import polyglot.ast.JLang;
 import polyglot.ast.Node;
 import polyglot.ast.TypeNode;
 import polyglot.ast.TypeNode_c;
@@ -65,6 +66,11 @@ public class AmbTypeInstantiation extends TypeNode_c implements Ambiguous {
         assert typeArguments != null;
         this.base = base;
         this.typeArguments = typeArguments;
+    }
+
+    @Override
+    public JLang lang() {
+        return J5Lang_c.instance;
     }
 
     @Override

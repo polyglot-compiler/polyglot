@@ -47,6 +47,7 @@ import polyglot.visit.CFGBuilder;
 import polyglot.visit.ExceptionChecker;
 import polyglot.visit.NodeVisitor;
 import polyglot.visit.PrettyPrinter;
+import polyglot.visit.Traverser;
 import polyglot.visit.TypeBuilder;
 import polyglot.visit.TypeChecker;
 
@@ -64,14 +65,9 @@ public class Initializer_c extends Term_c implements Initializer {
     protected Block body;
     protected InitializerInstance ii;
 
-//    @Deprecated
     public Initializer_c(Position pos, Flags flags, Block body) {
-        this(pos, flags, body, null);
-    }
-
-    public Initializer_c(Position pos, Flags flags, Block body, Ext ext) {
-        super(pos, ext);
-        assert (flags != null && body != null);
+        super(pos);
+        assert flags != null && body != null;
         this.flags = flags;
         this.body = body;
     }
@@ -83,7 +79,7 @@ public class Initializer_c extends Term_c implements Initializer {
 
     @Override
     public Flags flags() {
-        return this.flags;
+        return flags;
     }
 
     @Override
@@ -133,7 +129,7 @@ public class Initializer_c extends Term_c implements Initializer {
 
     @Override
     public Block body() {
-        return this.body;
+        return body;
     }
 
     @Override
@@ -161,7 +157,7 @@ public class Initializer_c extends Term_c implements Initializer {
     }
 
     @Override
-    public Context enterScope(Context c) {
+    public Context enterScope(Context c, Traverser v) {
         return c.pushCode(ii);
     }
 
@@ -264,7 +260,7 @@ public class Initializer_c extends Term_c implements Initializer {
     }
 
     @Override
-    public Term firstChild() {
+    public Term firstChild(Traverser v) {
         return body();
     }
 
@@ -301,7 +297,7 @@ public class Initializer_c extends Term_c implements Initializer {
 
     @Override
     public Node copy(NodeFactory nf) {
-        return nf.Initializer(this.position, this.flags, this.body);
+        return nf.Initializer(position, flags, body);
     }
 
 }

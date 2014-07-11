@@ -39,16 +39,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import polyglot.ast.ClassLit;
-import polyglot.ast.Expr;
-import polyglot.ast.JLang;
-import polyglot.ast.NullLit;
-import polyglot.ast.Term;
 import polyglot.ext.jl5.JL5Options;
 import polyglot.ext.jl5.ast.AnnotationElem;
-import polyglot.ext.jl5.ast.ElementValueArrayInit;
-import polyglot.ext.jl5.ast.EnumConstant;
-import polyglot.ext.jl5.ast.J5Lang_c;
 import polyglot.ext.jl5.types.inference.InferenceSolver;
 import polyglot.ext.jl5.types.inference.InferenceSolver_c;
 import polyglot.ext.jl5.types.inference.LubType;
@@ -194,7 +186,7 @@ public class JL5TypeSystem_c extends
     @Override
     public ClassType wrapperClassOfPrimitive(PrimitiveType t) {
         try {
-            return (ClassType) this.typeForName(t.wrapperTypeString(this));
+            return (ClassType) typeForName(t.wrapperTypeString(this));
         }
         catch (SemanticException e) {
             throw new InternalCompilerError("Couldn't find primitive wrapper "
@@ -206,24 +198,15 @@ public class JL5TypeSystem_c extends
     @Override
     public PrimitiveType primitiveTypeOfWrapper(Type l) {
         try {
-            if (l.equals(this.typeForName("java.lang.Boolean")))
-                return this.Boolean();
-            if (l.equals(this.typeForName("java.lang.Character")))
-                return this.Char();
-            if (l.equals(this.typeForName("java.lang.Byte")))
-                return this.Byte();
-            if (l.equals(this.typeForName("java.lang.Short")))
-                return this.Short();
-            if (l.equals(this.typeForName("java.lang.Integer")))
-                return this.Int();
-            if (l.equals(this.typeForName("java.lang.Long")))
-                return this.Long();
-            if (l.equals(this.typeForName("java.lang.Float")))
-                return this.Float();
-            if (l.equals(this.typeForName("java.lang.Double")))
-                return this.Double();
-            if (l.equals(this.typeForName("java.lang.Void")))
-                return this.Void();
+            if (l.equals(typeForName("java.lang.Boolean"))) return Boolean();
+            if (l.equals(typeForName("java.lang.Character"))) return Char();
+            if (l.equals(typeForName("java.lang.Byte"))) return Byte();
+            if (l.equals(typeForName("java.lang.Short"))) return Short();
+            if (l.equals(typeForName("java.lang.Integer"))) return Int();
+            if (l.equals(typeForName("java.lang.Long"))) return Long();
+            if (l.equals(typeForName("java.lang.Float"))) return Float();
+            if (l.equals(typeForName("java.lang.Double"))) return Double();
+            if (l.equals(typeForName("java.lang.Void"))) return Void();
         }
         catch (SemanticException e) {
             throw new InternalCompilerError("Couldn't find wrapper class");
@@ -395,7 +378,7 @@ public class JL5TypeSystem_c extends
 
     @Override
     public Context createContext() {
-        return new JL5Context_c(J5Lang_c.instance, this);
+        return new JL5Context_c(this);
     }
 
     @Override
@@ -975,8 +958,8 @@ public class JL5TypeSystem_c extends
     @Override
     public ClassType instantiate(Position pos, JL5ParsedClassType clazz,
             List<? extends ReferenceType> actuals) throws SemanticException {
-        if (clazz.typeVariables().isEmpty()
-                || (actuals == null || actuals.isEmpty())) {
+        if (clazz.typeVariables().isEmpty() || actuals == null
+                || actuals.isEmpty()) {
             return clazz;
         }
         boolean allNull = true;
@@ -1165,7 +1148,7 @@ public class JL5TypeSystem_c extends
             return ri.equals(rj);
         }
         else if (ri.isReference()) {
-            return ri.isSubtype(rj) || this.isUncheckedConversion(ri, rj)
+            return ri.isSubtype(rj) || isUncheckedConversion(ri, rj)
                     || ri.isSubtype(this.erasureType(rj));
         }
         else if (ri.isVoid()) {
@@ -1184,17 +1167,17 @@ public class JL5TypeSystem_c extends
                     curr.methodsNamed(mi.name());
             for (MethodInstance mj : possible) {
                 if (!mj.flags().isAbstract()
-                        && ((isAccessible(mi, ct) && isAccessible(mj, ct)) || isAccessible(mi,
-                                                                                           mj.container()
-                                                                                             .toClass()))) {
+                        && (isAccessible(mi, ct) && isAccessible(mj, ct) || isAccessible(mi,
+                                                                                         mj.container()
+                                                                                           .toClass()))) {
                     // The method mj may be a suitable implementation of mi.
                     // mj is not abstract, and either mj's container 
                     // can access mi (thus mj can really override mi), or
                     // mi and mj are both accessible from ct (e.g.,
                     // mi is declared in an interface that ct implements,
                     // and mj is defined in a superclass of ct).
-                    if (this.areOverrideEquivalent((JL5MethodInstance) mi,
-                                                   (JL5MethodInstance) mj)) {
+                    if (areOverrideEquivalent((JL5MethodInstance) mi,
+                                              (JL5MethodInstance) mj)) {
                         return mj;
                     }
                 }
@@ -1229,7 +1212,7 @@ public class JL5TypeSystem_c extends
             if (!visitedTypeVariables.add(tv)) {
                 // tv was already in visitedTypeVariables
                 // whoops, we're in some kind of recursive type
-                return this.Object();
+                return Object();
             }
 
             ReferenceType upperBound = tv.upperBound();
@@ -1298,7 +1281,7 @@ public class JL5TypeSystem_c extends
         if (t instanceof WildCardType) {
             WildCardType tv = (WildCardType) t;
             if (tv.upperBound() == null) {
-                return this.Object();
+                return Object();
             }
             return this.erasureType(tv.upperBound(), visitedTypeVariables);
         }
@@ -1307,7 +1290,7 @@ public class JL5TypeSystem_c extends
             return this.erasureType(jst.base(), visitedTypeVariables);
         }
         if (t instanceof JL5ParsedClassType) {
-            return this.toRawType(t);
+            return toRawType(t);
         }
         return t;
     }
@@ -1377,7 +1360,7 @@ public class JL5TypeSystem_c extends
             return false;
         }
         else {
-            return this.typeEquals(fromType, toType);
+            return typeEquals(fromType, toType);
         }
 
     }
@@ -1540,11 +1523,10 @@ public class JL5TypeSystem_c extends
 
         // Optional support for widening conversion after unboxing for compatibility
         // with "javac -source 1.5"
-        JL5Options opts = (JL5Options) this.extensionInfo().getOptions();
+        JL5Options opts = (JL5Options) extensionInfo().getOptions();
         if (opts.morePermissiveCasts) {
             if (isPrimitiveWrapper(fromType) && toType.isPrimitive()) {
-                if (this.isImplicitCastValid(this.unboxingConversion(fromType),
-                                             toType)) {
+                if (isImplicitCastValid(unboxingConversion(fromType), toType)) {
                     return true;
                 }
             }
@@ -1572,8 +1554,7 @@ public class JL5TypeSystem_c extends
 
     protected boolean isCastValidFromClass(ClassType fromType, Type toType) {
         if (toType instanceof TypeVariable) {
-            return this.isCastValid(fromType,
-                                    ((TypeVariable) toType).upperBound());
+            return isCastValid(fromType, ((TypeVariable) toType).upperBound());
         }
         if (toType.isClass()) {
             if (!toType.toClass().flags().isInterface()) {
@@ -1642,10 +1623,8 @@ public class JL5TypeSystem_c extends
             // if there exists a supertype X of T, and a supertype Y of S, such that both X and Y are provably distinct parameterized types, 
             // and that the erasures of X and Y are the same, a compile-time error occurs.
             // Go through the supertypes of each.
-            List<ReferenceType> allY =
-                    this.allAncestorsOf(fromType.toReference());
-            List<ReferenceType> allX =
-                    this.allAncestorsOf(toType.toReference());
+            List<ReferenceType> allY = allAncestorsOf(fromType.toReference());
+            List<ReferenceType> allX = allAncestorsOf(toType.toReference());
             for (ReferenceType y : allY) {
                 for (ReferenceType x : allX) {
                     if (x instanceof JL5SubstClassType
@@ -2085,7 +2064,7 @@ public class JL5TypeSystem_c extends
     public WildCardType wildCardType(Position position,
             ReferenceType upperBound, ReferenceType lowerBound) {
         if (upperBound == null) {
-            upperBound = this.Object();
+            upperBound = Object();
         }
         return new WildCardType_c(this, position, upperBound, lowerBound);
     }
@@ -2114,7 +2093,7 @@ public class JL5TypeSystem_c extends
                 ReferenceType si = ti;
                 if (ti instanceof WildCardType) {
                     CaptureConvertedWildCardType tv =
-                            this.captureConvertedWildCardType(ti.position());
+                            captureConvertedWildCardType(ti.position());
                     tv.setSyntheticOrigin();
                     si = tv;
                 }
@@ -2246,7 +2225,7 @@ public class JL5TypeSystem_c extends
                 }
                 if (!t1.toClass().flags().isInterface()
                         && !t2.toClass().flags().isInterface()) {
-                    if ((!isSubtype(t1, t2)) && (!isSubtype(t2, t1))) {
+                    if (!isSubtype(t1, t2) && !isSubtype(t2, t1)) {
                         if (!quiet)
                             throw new SemanticException("Error in intersection type. Types "
                                     + t1
@@ -2258,8 +2237,8 @@ public class JL5TypeSystem_c extends
                 }
                 if (t1.toClass().flags().isInterface()
                         && t2.toClass().flags().isInterface()
-                        && (t1 instanceof JL5SubstClassType)
-                        && (t2 instanceof JL5SubstClassType)) {
+                        && t1 instanceof JL5SubstClassType
+                        && t2 instanceof JL5SubstClassType) {
                     JL5SubstClassType j5t1 = (JL5SubstClassType) t1;
                     JL5SubstClassType j5t2 = (JL5SubstClassType) t2;
                     if (j5t1.base().equals(j5t2.base()) && !j5t1.equals(j5t2)) {
@@ -2325,20 +2304,20 @@ public class JL5TypeSystem_c extends
     protected ReferenceType glb(Position pos, List<ReferenceType> bounds,
             boolean performIntersectionCheck) {
         if (bounds == null || bounds.isEmpty()) {
-            return this.Object();
+            return Object();
         }
         try {
             // XXX also need to check that does not have two classes that are not in a subclass relation?
             if (performIntersectionCheck
-                    && !this.checkIntersectionBounds(bounds, true)) {
-                return this.Object();
+                    && !checkIntersectionBounds(bounds, true)) {
+                return Object();
             }
             else {
-                return this.intersectionType(pos, bounds);
+                return intersectionType(pos, bounds);
             }
         }
         catch (SemanticException e) {
-            return this.Object();
+            return Object();
         }
     }
 
@@ -2394,7 +2373,7 @@ public class JL5TypeSystem_c extends
         }
         if (t instanceof ArrayType) {
             ArrayType at = t.toArray();
-            Type b = this.toRawType(at.base());
+            Type b = toRawType(at.base());
             return at.base(b);
         }
         return t;
@@ -2435,7 +2414,7 @@ public class JL5TypeSystem_c extends
     @Override
     public Type boxingConversion(Type t) {
         if (t.isPrimitive()) {
-            return this.wrapperClassOfPrimitive(t.toPrimitive());
+            return wrapperClassOfPrimitive(t.toPrimitive());
         }
         return t;
     }
@@ -2475,55 +2454,6 @@ public class JL5TypeSystem_c extends
             return isValidAnnotationValueType(t.toArray().base());
         }
         return false;
-    }
-
-    @Override
-    public void checkAnnotationValueConstant(Term value)
-            throws SemanticException {
-        if (value instanceof ElementValueArrayInit) {
-            // check elements
-            for (Term next : ((ElementValueArrayInit) value).elements()) {
-                if (!isAnnotationValueConstant(next)) {
-                    throw new SemanticException("Annotation attribute value must be constant",
-                                                next.position());
-                }
-            }
-        }
-        else if (value instanceof AnnotationElem) {
-            return;
-        }
-        else if (!isAnnotationValueConstant(value)) {
-            throw new SemanticException("Annotation attribute value must be constant: "
-                                                + value,
-                                        value.position());
-        }
-    }
-
-    protected boolean isAnnotationValueConstant(Term value) {
-        if (value == null || value instanceof NullLit
-                || value instanceof ClassLit) {
-            // for purposes of annotation elems class lits are constants
-            // we're ok, try the next one.
-            return true;
-        }
-        if (value instanceof Expr) {
-            JLang lang = J5Lang_c.instance;
-            Expr ev = (Expr) value;
-            if (lang.constantValueSet(ev, lang) && lang.isConstant(ev, lang)) {
-                // value is a constant
-                return true;
-            }
-            if (ev instanceof EnumConstant) {
-                // Enum constants are constants for our purposes.
-                return true;
-            }
-            if (!lang.constantValueSet(ev, lang)) {
-                // the constant value hasn't been set yet...
-                return true; // TODO: should this throw a missing dependency exception?
-            }
-        }
-        return false;
-
     }
 
     @Override
@@ -2769,7 +2699,7 @@ public class JL5TypeSystem_c extends
     @Override
     public boolean isRetainedAnnotation(Type annotationType) {
         if (annotationType.isClass()
-                && annotationType.toClass().isSubtype(this.Annotation())) {
+                && annotationType.toClass().isSubtype(Annotation())) {
             // well, it's an annotation type at least.
             // check if there is a retention policy on it.
             JL5ClassType ct = (JL5ClassType) annotationType.toClass();
@@ -2832,11 +2762,11 @@ public class JL5TypeSystem_c extends
             throws SemanticException {
         if (type1.isPrimitive() && (type2.isReference() || type2.isNull())) {
             // box type1, i.e. promote to an object
-            return leastCommonAncestor(this.boxingConversion(type1), type2);
+            return leastCommonAncestor(boxingConversion(type1), type2);
         }
         if (type2.isPrimitive() && (type1.isReference() || type1.isNull())) {
             // box type2, i.e. promote to an object
-            return leastCommonAncestor(type1, this.boxingConversion(type2));
+            return leastCommonAncestor(type1, boxingConversion(type2));
         }
         return super.leastCommonAncestor(type1, type2);
     }

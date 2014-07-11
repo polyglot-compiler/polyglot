@@ -26,6 +26,8 @@
 
 package polyglot.visit;
 
+import java.util.Map;
+
 import polyglot.ast.Expr;
 import polyglot.ast.JLang;
 import polyglot.ast.Lang;
@@ -50,6 +52,11 @@ public class ConstantChecker extends ContextVisitor {
         return (JLang) super.lang();
     }
 
+    @Override
+    public JLang superLang(Lang lang) {
+        return (JLang) super.superLang(lang);
+    }
+
     /*
     protected NodeVisitor enterCall(Node n) throws SemanticException {
         if (Report.should_report(Report.visit, 2))
@@ -67,8 +74,8 @@ public class ConstantChecker extends ContextVisitor {
     protected static class TypeCheckChecker extends NodeVisitor {
         public boolean checked = true;
 
-        public TypeCheckChecker(Lang lang) {
-            super(lang);
+        public TypeCheckChecker(Lang lang, Map<Lang, Lang> superLangMap) {
+            super(lang, superLangMap);
         }
 
         @Override
@@ -86,7 +93,7 @@ public class ConstantChecker extends ContextVisitor {
         if (Report.should_report(Report.visit, 2))
             Report.report(2, ">> " + this + "::leave " + n);
 
-        TypeCheckChecker tcc = new TypeCheckChecker(lang());
+        TypeCheckChecker tcc = new TypeCheckChecker(lang(), superLangMap());
 
         if (n instanceof Expr) {
             Expr e = (Expr) n;

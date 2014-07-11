@@ -45,6 +45,7 @@ import polyglot.ast.Expr;
 import polyglot.ast.For;
 import polyglot.ast.If;
 import polyglot.ast.JLang;
+import polyglot.ast.Lang;
 import polyglot.ast.Local;
 import polyglot.ast.LocalAssign;
 import polyglot.ast.LocalDecl;
@@ -89,8 +90,8 @@ public class DeadCodeEliminator extends
          * Constructor for creating an empty set.
          */
         protected DataFlowItem() {
-            this.liveVars = new HashSet<>();
-            this.liveDecls = new HashSet<>();
+            liveVars = new HashSet<>();
+            liveDecls = new HashSet<>();
         }
 
         /**
@@ -357,16 +358,16 @@ public class DeadCodeEliminator extends
 
     protected NodeVisitor createDefUseFinder(Set<LocalInstance> def,
             Set<LocalInstance> use) {
-        return new DefUseFinder(lang(), def, use);
+        return new DefUseFinder(lang(), superLangMap(), def, use);
     }
 
     protected static class DefUseFinder extends HaltingVisitor {
         protected Set<LocalInstance> def;
         protected Set<LocalInstance> use;
 
-        public DefUseFinder(JLang lang, Set<LocalInstance> def,
-                Set<LocalInstance> use) {
-            super(lang);
+        public DefUseFinder(JLang lang, Map<Lang, Lang> superLangMap,
+                Set<LocalInstance> def, Set<LocalInstance> use) {
+            super(lang, superLangMap);
             this.def = def;
             this.use = use;
         }
@@ -407,7 +408,7 @@ public class DeadCodeEliminator extends
         final List<Stmt> result = new LinkedList<>();
         final Position pos = Position.compilerGenerated();
 
-        NodeVisitor v = new HaltingVisitor(lang()) {
+        NodeVisitor v = new HaltingVisitor(lang(), superLangMap()) {
             @Override
             public NodeVisitor enter(Node n) {
                 if (n instanceof Assign || n instanceof ProcedureCall) {

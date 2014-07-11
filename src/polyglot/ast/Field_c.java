@@ -46,6 +46,7 @@ import polyglot.visit.CFGBuilder;
 import polyglot.visit.ConstantChecker;
 import polyglot.visit.NodeVisitor;
 import polyglot.visit.PrettyPrinter;
+import polyglot.visit.Traverser;
 import polyglot.visit.TypeBuilder;
 import polyglot.visit.TypeChecker;
 
@@ -63,13 +64,8 @@ public class Field_c extends Expr_c implements Field {
     protected FieldInstance fi;
     protected boolean targetImplicit;
 
-//    @Deprecated
     public Field_c(Position pos, Receiver target, Id name) {
-        this(pos, target, name, null);
-    }
-
-    public Field_c(Position pos, Receiver target, Id name, Ext ext) {
-        super(pos, ext);
+        super(pos);
         assert target != null && name != null;
         this.target = target;
         this.name = name;
@@ -251,7 +247,7 @@ public class Field_c extends Expr_c implements Field {
     public Node checkConstants(ConstantChecker cc) throws SemanticException {
         // Just check if the field is constant to force a dependency to be
         // created.
-        cc.lang().isConstant(this, cc.lang());
+        cc.lang().isConstant(this, cc);
         return this;
     }
 
@@ -302,7 +298,7 @@ public class Field_c extends Expr_c implements Field {
     }
 
     @Override
-    public Term firstChild() {
+    public Term firstChild(Traverser v) {
         if (target instanceof Term) {
             return (Term) target;
         }
@@ -325,7 +321,7 @@ public class Field_c extends Expr_c implements Field {
     }
 
     @Override
-    public List<Type> throwTypes(TypeSystem ts) {
+    public List<Type> throwTypes(TypeSystem ts, Traverser v) {
         if (target instanceof Expr && !(target instanceof Special)) {
             return Collections.singletonList((Type) ts.NullPointerException());
         }
@@ -356,7 +352,7 @@ public class Field_c extends Expr_c implements Field {
     }
 
     @Override
-    public boolean constantValueSet(Lang lang) {
+    public boolean constantValueSet(Traverser v) {
         if (fi != null
                 && (target instanceof TypeNode || target instanceof Special
                         && targetImplicit)) {
@@ -366,7 +362,7 @@ public class Field_c extends Expr_c implements Field {
     }
 
     @Override
-    public boolean isConstant(Lang lang) {
+    public boolean isConstant(Traverser v) {
         if (fi != null
                 && (target instanceof TypeNode || target instanceof Special
                         && targetImplicit)) {
@@ -377,8 +373,8 @@ public class Field_c extends Expr_c implements Field {
     }
 
     @Override
-    public Object constantValue(Lang lang) {
-        if (lang.isConstant(this, lang)) {
+    public Object constantValue(Traverser v) {
+        if (v.lang().isConstant(this, v)) {
             return fi.constantValue();
         }
 

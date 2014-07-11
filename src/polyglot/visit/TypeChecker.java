@@ -26,7 +26,10 @@
 
 package polyglot.visit;
 
+import java.util.Map;
+
 import polyglot.ast.JLang;
+import polyglot.ast.Lang;
 import polyglot.ast.Node;
 import polyglot.ast.NodeFactory;
 import polyglot.frontend.Job;
@@ -52,8 +55,13 @@ public class TypeChecker extends DisambiguationDriver {
         return (JLang) super.lang();
     }
 
+    @Override
+    public JLang superLang(Lang lang) {
+        return (JLang) super.superLang(lang);
+    }
+
     public void setCheckConstants(boolean check) {
-        this.checkConstants = check;
+        checkConstants = check;
     }
 
     @Override
@@ -75,7 +83,7 @@ public class TypeChecker extends DisambiguationDriver {
             Goal g = scheduler.currentGoal();
             scheduler.addDependencyAndEnqueue(g, e.goal(), e.prerequisite());
             g.setUnreachableThisRun();
-            if (this.rethrowMissingDependencies) {
+            if (rethrowMissingDependencies) {
                 throw e;
             }
             return n;
@@ -88,9 +96,9 @@ public class TypeChecker extends DisambiguationDriver {
                     position = n.position();
                 }
 
-                this.errorQueue().enqueue(ErrorInfo.SEMANTIC_ERROR,
-                                          e.getMessage(),
-                                          position);
+                errorQueue().enqueue(ErrorInfo.SEMANTIC_ERROR,
+                                     e.getMessage(),
+                                     position);
             }
             else {
                 // silent error; these should be thrown only
@@ -117,8 +125,8 @@ public class TypeChecker extends DisambiguationDriver {
     protected static class AmbChecker extends NodeVisitor {
         public boolean amb;
 
-        public AmbChecker(JLang lang) {
-            super(lang);
+        public AmbChecker(JLang lang, Map<Lang, Lang> superLangMap) {
+            super(lang, superLangMap);
         }
 
         @Override
@@ -139,7 +147,7 @@ public class TypeChecker extends DisambiguationDriver {
         if (Report.should_report(Report.visit, 2))
             Report.report(2, ">> " + this + "::leave " + n);
 
-        AmbChecker ac = new AmbChecker(lang());
+        AmbChecker ac = new AmbChecker(lang(), superLangMap());
         lang().visitChildren(n, ac);
 
         Node m = n;

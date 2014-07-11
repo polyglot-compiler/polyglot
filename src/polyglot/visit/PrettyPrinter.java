@@ -27,11 +27,13 @@
 package polyglot.visit;
 
 import java.io.IOException;
+import java.util.Map;
 
 import polyglot.ast.JLangToJLDel;
 import polyglot.ast.Lang;
 import polyglot.ast.Node;
 import polyglot.util.CodeWriter;
+import polyglot.util.InternalCompilerError;
 
 /**
  * A PrettyPrinter generates output code from the processed AST.
@@ -40,22 +42,35 @@ import polyglot.util.CodeWriter;
  * To use:
  *     new PrettyPrinter().printAst(node, new CodeWriter(out));
  */
-public class PrettyPrinter {
+public class PrettyPrinter implements Traverser {
     private final Lang lang;
+    private final Map<Lang, Lang> superLangMap;
     protected boolean appendSemicolon = true;
     protected boolean printType = true;
 
     @Deprecated
     public PrettyPrinter() {
-        this(JLangToJLDel.instance);
+        this(JLangToJLDel.instance, null);
     }
 
-    public PrettyPrinter(Lang lang) {
+    public PrettyPrinter(Lang lang, Map<Lang, Lang> superLangMap) {
         this.lang = lang;
+        this.superLangMap = superLangMap;
     }
 
+    @Override
     public Lang lang() {
-        return this.lang;
+        return lang;
+    }
+
+    @Override
+    public Lang superLang(Lang lang) {
+        if (superLangMap == null)
+            throw new InternalCompilerError("No language hierarchy directory available");
+        if (!superLangMap.containsKey(lang))
+            throw new InternalCompilerError("Superlanguage undefined for "
+                    + lang);
+        return superLangMap.get(lang);
     }
 
     /** Flag indicating whether to print a ';' after certain statements.
@@ -67,8 +82,8 @@ public class PrettyPrinter {
     /** Set a flag indicating whether to print a ';' after certain statements.
      * This is used when pretty-printing for loops. */
     public boolean appendSemicolon(boolean a) {
-        boolean old = this.appendSemicolon;
-        this.appendSemicolon = a;
+        boolean old = appendSemicolon;
+        appendSemicolon = a;
         return old;
     }
 
@@ -81,8 +96,8 @@ public class PrettyPrinter {
     /** Set a flag indicating whether to print type type in a local declaration.
      * This is used when pretty-printing for loops. */
     public boolean printType(boolean a) {
-        boolean old = this.printType;
-        this.printType = a;
+        boolean old = printType;
+        printType = a;
         return old;
     }
 

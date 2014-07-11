@@ -124,12 +124,12 @@ public class JL5CaseExt extends JL5TermExt implements JL5CaseOps {
             n = c.expr((Expr) c.expr().visit(tc));
         }
 
-        if (!tc.lang().constantValueSet(n.expr(), tc.lang())) {
+        if (!tc.lang().constantValueSet(n.expr(), tc)) {
             // Not ready yet; pass will get rerun.
             return n;
         }
-        if (tc.lang().isConstant(n.expr(), tc.lang())) {
-            Object o = tc.lang().constantValue(n.expr(), tc.lang());
+        if (tc.lang().isConstant(n.expr(), tc)) {
+            Object o = tc.lang().constantValue(n.expr(), tc);
             if (o instanceof Number && !(o instanceof Long)
                     && !(o instanceof Float) && !(o instanceof Double)) {
                 return n.value(((Number) o).longValue());
@@ -195,11 +195,11 @@ public class JL5CaseExt extends JL5TermExt implements JL5CaseOps {
         Expr expr = c.expr();
         if (expr == null) return c; // default case
 
-        if (!cc.lang().constantValueSet(expr, cc.lang())) return c; // Not ready yet; pass will be rerun.
+        if (!cc.lang().constantValueSet(expr, cc)) return c; // Not ready yet; pass will be rerun.
 
         if (expr instanceof EnumConstant) return c;
 
-        return superLang().checkConstants(this.node(), cc);
+        return cc.superLang(lang()).checkConstants(this.node(), cc);
     }
 
     @Override

@@ -50,9 +50,8 @@ public interface TypeNode extends Receiver, QualifierNode, Term {
         private static final long serialVersionUID =
                 SerialVersionUID.generate();
 
-        public Instance(Position pos, Ext ext) {
-            super(pos, ext);
-            assert (ext != null);
+        public Instance(Position pos) {
+            super(pos);
         }
 
         @Override

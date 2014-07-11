@@ -43,85 +43,30 @@ public abstract class JL7AbstractExtFactory_c extends JL5AbstractExtFactory_c
     @Override
     public final Ext extAmbDiamondTypeNode() {
         Ext e = extAmbDiamondTypeNodeImpl();
-
-        if (nextExtFactory() != null) {
-            Ext e2;
-            if (nextExtFactory() instanceof JL7ExtFactory) {
-                e2 = ((JL7ExtFactory) nextExtFactory()).extAmbDiamondTypeNode();
-            }
-            else {
-                e2 = nextExtFactory().extTypeNode();
-            }
-            e = composeExts(e, e2);
-        }
         return postExtAmbDiamondTypeNode(e);
     }
 
     @Override
     public final Ext extAmbUnionType() {
         Ext e = extAmbUnionTypeImpl();
-
-        if (nextExtFactory() != null) {
-            Ext e2;
-            if (nextExtFactory() instanceof JL7ExtFactory) {
-                e2 = ((JL7ExtFactory) nextExtFactory()).extAmbUnionType();
-            }
-            else {
-                e2 = nextExtFactory().extTypeNode();
-            }
-            e = composeExts(e, e2);
-        }
         return postExtAmbUnionType(e);
     }
 
     @Override
     public final Ext extMultiCatch() {
         Ext e = extMultiCatchImpl();
-
-        if (nextExtFactory() != null) {
-            Ext e2;
-            if (nextExtFactory() instanceof JL7ExtFactory) {
-                e2 = ((JL7ExtFactory) nextExtFactory()).extMultiCatch();
-            }
-            else {
-                e2 = nextExtFactory().extCatch();
-            }
-            e = composeExts(e, e2);
-        }
         return postExtMultiCatch(e);
     }
 
     @Override
     public final Ext extResource() {
         Ext e = extResourceImpl();
-
-        if (nextExtFactory() != null) {
-            Ext e2;
-            if (nextExtFactory() instanceof JL7ExtFactory) {
-                e2 = ((JL7ExtFactory) nextExtFactory()).extMultiCatch();
-            }
-            else {
-                e2 = nextExtFactory().extLocalDecl();
-            }
-            e = composeExts(e, e2);
-        }
         return postResource(e);
     }
 
     @Override
     public final Ext extTryWithResources() {
         Ext e = extTryWithResourcesImpl();
-
-        if (nextExtFactory() != null) {
-            Ext e2;
-            if (nextExtFactory() instanceof JL7ExtFactory) {
-                e2 = ((JL7ExtFactory) nextExtFactory()).extMultiCatch();
-            }
-            else {
-                e2 = nextExtFactory().extTry();
-            }
-            e = composeExts(e, e2);
-        }
         return postTryWithResources(e);
     }
 

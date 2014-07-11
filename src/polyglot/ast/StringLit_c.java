@@ -37,6 +37,7 @@ import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
 import polyglot.util.StringUtil;
 import polyglot.visit.PrettyPrinter;
+import polyglot.visit.Traverser;
 import polyglot.visit.TypeChecker;
 
 /** 
@@ -48,13 +49,8 @@ public class StringLit_c extends Lit_c implements StringLit {
 
     protected String value;
 
-//    @Deprecated
     public StringLit_c(Position pos, String value) {
-        this(pos, value, null);
-    }
-
-    public StringLit_c(Position pos, String value, Ext ext) {
-        super(pos, ext);
+        super(pos);
         assert value != null;
         this.value = value;
     }
@@ -164,7 +160,7 @@ public class StringLit_c extends Lit_c implements StringLit {
     }
 
     @Override
-    public Object constantValue(Lang lang) {
+    public Object constantValue(Traverser v) {
         return value;
     }
 

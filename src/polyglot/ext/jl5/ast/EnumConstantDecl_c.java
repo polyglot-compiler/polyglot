@@ -58,6 +58,7 @@ import polyglot.visit.AscriptionVisitor;
 import polyglot.visit.CFGBuilder;
 import polyglot.visit.NodeVisitor;
 import polyglot.visit.PrettyPrinter;
+import polyglot.visit.Traverser;
 import polyglot.visit.TypeBuilder;
 import polyglot.visit.TypeChecker;
 
@@ -227,11 +228,11 @@ public class EnumConstantDecl_c extends Term_c implements EnumConstantDecl {
     }
 
     @Override
-    public Context enterChildScope(Node child, Context c) {
+    public Context enterChildScope(Node child, Context c, Traverser v) {
         if (child == body && type != null && body != null) {
             c = c.pushClass(type, type);
         }
-        return super.enterChildScope(child, c);
+        return super.enterChildScope(child, c, v);
     }
 
     @Override
@@ -301,7 +302,7 @@ public class EnumConstantDecl_c extends Term_c implements EnumConstantDecl {
         JL5ParsedClassType ct = (JL5ParsedClassType) c.currentClass();
 
         List<Type> argTypes = new LinkedList<>();
-        for (Expr e : this.args) {
+        for (Expr e : args) {
             argTypes.add(e.type());
         }
 
@@ -314,7 +315,7 @@ public class EnumConstantDecl_c extends Term_c implements EnumConstantDecl {
                     + " on enum constant declaration", this.position());
         }
 
-        if (this.body != null) {
+        if (body != null) {
             ts.checkClassConformance(type);
         }
 
@@ -382,7 +383,7 @@ public class EnumConstantDecl_c extends Term_c implements EnumConstantDecl {
     }
 
     @Override
-    public Term firstChild() {
+    public Term firstChild(Traverser v) {
         return this;
     }
 

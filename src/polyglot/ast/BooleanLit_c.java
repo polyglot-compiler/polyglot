@@ -31,6 +31,7 @@ import polyglot.util.CodeWriter;
 import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
 import polyglot.visit.PrettyPrinter;
+import polyglot.visit.Traverser;
 import polyglot.visit.TypeChecker;
 
 /**
@@ -41,19 +42,14 @@ public class BooleanLit_c extends Lit_c implements BooleanLit {
 
     protected boolean value;
 
-//    @Deprecated
     public BooleanLit_c(Position pos, boolean value) {
-        this(pos, value, null);
-    }
-
-    public BooleanLit_c(Position pos, boolean value, Ext ext) {
-        super(pos, ext);
+        super(pos);
         this.value = value;
     }
 
     @Override
     public boolean value() {
-        return this.value;
+        return value;
     }
 
     @Override
@@ -94,13 +90,13 @@ public class BooleanLit_c extends Lit_c implements BooleanLit {
     }
 
     @Override
-    public Object constantValue(Lang lang) {
+    public Object constantValue(Traverser v) {
         return Boolean.valueOf(value);
     }
 
     @Override
     public Node copy(NodeFactory nf) {
-        return nf.BooleanLit(this.position, this.value);
+        return nf.BooleanLit(position, value);
     }
 
 }

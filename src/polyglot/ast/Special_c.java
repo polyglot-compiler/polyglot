@@ -38,6 +38,7 @@ import polyglot.util.SerialVersionUID;
 import polyglot.visit.CFGBuilder;
 import polyglot.visit.NodeVisitor;
 import polyglot.visit.PrettyPrinter;
+import polyglot.visit.Traverser;
 import polyglot.visit.TypeChecker;
 
 /**
@@ -52,15 +53,9 @@ public class Special_c extends Expr_c implements Special {
     protected Special.Kind kind;
     protected TypeNode qualifier;
 
-//    @Deprecated
     public Special_c(Position pos, Special.Kind kind, TypeNode qualifier) {
-        this(pos, kind, qualifier, null);
-    }
-
-    public Special_c(Position pos, Special.Kind kind, TypeNode qualifier,
-            Ext ext) {
-        super(pos, ext);
-        assert (kind != null); // qualifier may be null
+        super(pos);
+        assert kind != null; // qualifier may be null
         this.kind = kind;
         this.qualifier = qualifier;
     }
@@ -72,7 +67,7 @@ public class Special_c extends Expr_c implements Special {
 
     @Override
     public Special.Kind kind() {
-        return this.kind;
+        return kind;
     }
 
     @Override
@@ -89,7 +84,7 @@ public class Special_c extends Expr_c implements Special {
 
     @Override
     public TypeNode qualifier() {
-        return this.qualifier;
+        return qualifier;
     }
 
     @Override
@@ -150,8 +145,7 @@ public class Special_c extends Expr_c implements Special {
             }
         }
 
-        if (t == null
-                || (c.inStaticContext() && ts.equals(t, c.currentClass()))) {
+        if (t == null || c.inStaticContext() && ts.equals(t, c.currentClass())) {
             // trying to access "this" or "super" from a static context.
             throw new SemanticException("Cannot access a non-static "
                     + "field or method, or refer to \"this\" or \"super\" "
@@ -169,7 +163,7 @@ public class Special_c extends Expr_c implements Special {
     }
 
     @Override
-    public Term firstChild() {
+    public Term firstChild(Traverser v) {
         if (qualifier != null) {
             return qualifier;
         }
@@ -235,6 +229,6 @@ public class Special_c extends Expr_c implements Special {
 
     @Override
     public Node copy(NodeFactory nf) {
-        return nf.Special(this.position, this.kind, this.qualifier);
+        return nf.Special(position, kind, qualifier);
     }
 }

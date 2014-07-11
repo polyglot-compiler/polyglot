@@ -108,7 +108,7 @@ public class JL5MethodDeclExt extends JL5ProcedureDeclExt {
         JL5MethodInstance mi = (JL5MethodInstance) md.methodInstance();
         JL5TypeSystem ts = (JL5TypeSystem) tc.typeSystem();
         ts.checkMethodNameClash(mi, mi.container().toClass());
-        return superLang().typeCheck(md, tc);
+        return tc.superLang(lang()).typeCheck(md, tc);
     }
 
     @Override
@@ -118,7 +118,7 @@ public class JL5MethodDeclExt extends JL5ProcedureDeclExt {
 
         if (ext.isCompilerGenerated()) return;
 
-        superLang().translate(this.node(), w, tr);
+        tr.superLang(lang()).translate(this.node(), w, tr);
     }
 
     @Override

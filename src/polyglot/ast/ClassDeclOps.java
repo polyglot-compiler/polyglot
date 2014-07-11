@@ -27,8 +27,8 @@ package polyglot.ast;
 
 import polyglot.types.ConstructorInstance;
 import polyglot.types.SemanticException;
-import polyglot.types.TypeSystem;
 import polyglot.util.CodeWriter;
+import polyglot.visit.AmbiguityRemover;
 import polyglot.visit.PrettyPrinter;
 
 /**
@@ -41,7 +41,6 @@ public interface ClassDeclOps {
 
     void prettyPrintFooter(CodeWriter w, PrettyPrinter tr);
 
-    Node addDefaultConstructor(TypeSystem ts, NodeFactory nf,
-            ConstructorInstance defaultConstructorInstance)
-            throws SemanticException;
+    Node addDefaultConstructor(ConstructorInstance defaultCI,
+            AmbiguityRemover ar) throws SemanticException;
 }

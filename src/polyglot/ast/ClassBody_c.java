@@ -46,6 +46,7 @@ import polyglot.visit.CFGBuilder;
 import polyglot.visit.ExceptionChecker;
 import polyglot.visit.NodeVisitor;
 import polyglot.visit.PrettyPrinter;
+import polyglot.visit.Traverser;
 import polyglot.visit.TypeBuilder;
 import polyglot.visit.TypeChecker;
 
@@ -58,20 +59,15 @@ public class ClassBody_c extends Term_c implements ClassBody {
 
     protected List<ClassMember> members;
 
-//    @Deprecated
     public ClassBody_c(Position pos, List<ClassMember> members) {
-        this(pos, members, null);
-    }
-
-    public ClassBody_c(Position pos, List<ClassMember> members, Ext ext) {
-        super(pos, ext);
-        assert (members != null);
+        super(pos);
+        assert members != null;
         this.members = ListUtil.copy(members, true);
     }
 
     @Override
     public List<ClassMember> members() {
-        return this.members;
+        return members;
     }
 
     @Override
@@ -88,8 +84,8 @@ public class ClassBody_c extends Term_c implements ClassBody {
 
     @Override
     public ClassBody addMember(ClassMember member) {
-        List<ClassMember> l = new ArrayList<>(this.members.size() + 1);
-        l.addAll(this.members);
+        List<ClassMember> l = new ArrayList<>(members.size() + 1);
+        l.addAll(members);
         l.add(member);
         return members(l);
     }
@@ -231,8 +227,8 @@ public class ClassBody_c extends Term_c implements ClassBody {
 
             for (Iterator<ClassMember> i = members.iterator(); i.hasNext();) {
                 ClassMember member = i.next();
-                if ((member instanceof polyglot.ast.CodeDecl)
-                        || (prev instanceof polyglot.ast.CodeDecl)) {
+                if (member instanceof polyglot.ast.CodeDecl
+                        || prev instanceof polyglot.ast.CodeDecl) {
                     w.newline(0);
                 }
                 prev = member;
@@ -248,7 +244,7 @@ public class ClassBody_c extends Term_c implements ClassBody {
     }
 
     @Override
-    public Term firstChild() {
+    public Term firstChild(Traverser v) {
         // Do _not_ visit class members.
         return null;
     }
@@ -260,7 +256,7 @@ public class ClassBody_c extends Term_c implements ClassBody {
 
     @Override
     public Node copy(NodeFactory nf) {
-        return nf.ClassBody(this.position, this.members);
+        return nf.ClassBody(position, members);
     }
 
 }

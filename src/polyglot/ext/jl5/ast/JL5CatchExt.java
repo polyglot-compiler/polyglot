@@ -44,7 +44,7 @@ public class JL5CatchExt extends JL5TermExt {
         JL5FormalExt formalExt = (JL5FormalExt) JL5Ext.ext(c.formal());
         formalExt.setIsCatchFormal(true);
 
-        return superLang().buildTypes(node(), tb);
+        return tb.superLang(lang()).buildTypes(node(), tb);
     }
 
     @Override
@@ -54,7 +54,7 @@ public class JL5CatchExt extends JL5TermExt {
         JL5LocalInstance li = (JL5LocalInstance) f.localInstance();
         li.setProcedureFormal(true);
 
-        return superLang().typeCheck(node(), tc);
+        return tc.superLang(lang()).typeCheck(node(), tc);
     }
 
 }

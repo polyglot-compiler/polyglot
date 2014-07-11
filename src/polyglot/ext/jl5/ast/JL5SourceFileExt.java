@@ -45,7 +45,7 @@ public class JL5SourceFileExt extends JL5Ext {
 
     @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
-        SourceFile n = (SourceFile) superLang().typeCheck(node(), tc);
+        SourceFile n = (SourceFile) tc.superLang(lang()).typeCheck(node(), tc);
         Map<String, Named> declaredTypes = new HashMap<>();
 
         for (TopLevelDecl d : n.decls()) {

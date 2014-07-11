@@ -923,7 +923,7 @@ public abstract class DataFlow<FlowItem extends DataFlow.Item> extends
      */
     protected CFGBuilder<FlowItem> createCFGBuilder(TypeSystem ts,
             FlowGraph<FlowItem> g) {
-        return new CFGBuilder<>(lang(), ts, g, this);
+        return new CFGBuilder<>(lang(), superLangMap(), ts, g, this);
     }
 
     /**

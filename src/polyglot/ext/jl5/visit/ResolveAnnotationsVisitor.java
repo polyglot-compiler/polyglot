@@ -31,6 +31,7 @@ import java.util.List;
 import java.util.Map;
 
 import polyglot.ast.Node;
+import polyglot.ast.NodeOps;
 import polyglot.ext.jl5.ast.AnnotatedElement;
 import polyglot.ext.jl5.ast.AnnotationElem;
 import polyglot.ext.jl5.ast.JL5Ext;
@@ -46,11 +47,6 @@ import polyglot.visit.ContextVisitor;
 import polyglot.visit.NodeVisitor;
 import polyglot.visit.TypeChecker;
 
-/**
- * Simplify some expressions for the later analyses. Actually, this is a kitchen-sink
- * clean up pass...
- * @param <E>
- */
 public class ResolveAnnotationsVisitor extends ContextVisitor {
     public ResolveAnnotationsVisitor(Job job) {
         super(job, job.extensionInfo().typeSystem(), job.extensionInfo()
@@ -60,7 +56,7 @@ public class ResolveAnnotationsVisitor extends ContextVisitor {
     @Override
     protected Node leaveCall(Node old, Node n, NodeVisitor v)
             throws SemanticException {
-        JL5Ext ext = JL5Ext.ext(n);
+        NodeOps ext = JL5Ext.ext(n);
         if (ext instanceof AnnotatedElement) {
             AnnotatedElement aext = (AnnotatedElement) ext;
             List<AnnotationElem> newElems =
@@ -68,9 +64,7 @@ public class ResolveAnnotationsVisitor extends ContextVisitor {
             for (AnnotationElem elem : aext.annotationElems()) {
                 // type check elem
                 TypeChecker tc =
-                        new TypeChecker(this.job(),
-                                        this.typeSystem(),
-                                        this.nodeFactory());
+                        new TypeChecker(job(), typeSystem(), nodeFactory());
 
                 tc = (TypeChecker) tc.context(this.context());
                 elem = (AnnotationElem) elem.visit(tc);
@@ -102,12 +96,11 @@ public class ResolveAnnotationsVisitor extends ContextVisitor {
         Map<Type, Map<String, AnnotationElementValue>> m =
                 new LinkedHashMap<>();
 
-        JL5TypeSystem ts = (JL5TypeSystem) this.typeSystem();
+        JL5TypeSystem ts = (JL5TypeSystem) typeSystem();
         for (AnnotationElem ae : annotationElems) {
             Type annotationType = ae.typeName().type();
-            m.put(annotationType, ae.toAnnotationElementValues(lang(), ts));
+            m.put(annotationType, ae.toAnnotationElementValues(ts, this));
         }
         return ts.createAnnotations(m, pos);
     }
-
 }

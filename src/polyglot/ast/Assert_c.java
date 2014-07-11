@@ -42,6 +42,7 @@ import polyglot.visit.CFGBuilder;
 import polyglot.visit.NodeVisitor;
 import polyglot.visit.PrettyPrinter;
 import polyglot.visit.Translator;
+import polyglot.visit.Traverser;
 import polyglot.visit.TypeChecker;
 
 /**
@@ -54,21 +55,16 @@ public class Assert_c extends Stmt_c implements Assert {
     protected Expr cond;
     protected Expr errorMessage;
 
-//    @Deprecated
     public Assert_c(Position pos, Expr cond, Expr errorMessage) {
-        this(pos, cond, errorMessage, null);
-    }
-
-    public Assert_c(Position pos, Expr cond, Expr errorMessage, Ext ext) {
-        super(pos, ext);
-        assert (cond != null); // errorMessage may be null
+        super(pos);
+        assert cond != null; // errorMessage may be null
         this.cond = cond;
         this.errorMessage = errorMessage;
     }
 
     @Override
     public Expr cond() {
-        return this.cond;
+        return cond;
     }
 
     @Override
@@ -85,7 +81,7 @@ public class Assert_c extends Stmt_c implements Assert {
 
     @Override
     public Expr errorMessage() {
-        return this.errorMessage;
+        return errorMessage;
     }
 
     @Override
@@ -191,7 +187,7 @@ public class Assert_c extends Stmt_c implements Assert {
     }
 
     @Override
-    public Term firstChild() {
+    public Term firstChild(Traverser v) {
         return cond;
     }
 
@@ -210,7 +206,7 @@ public class Assert_c extends Stmt_c implements Assert {
 
     @Override
     public Node copy(NodeFactory nf) {
-        return nf.Assert(this.position, this.cond, this.errorMessage);
+        return nf.Assert(position, cond, errorMessage);
     }
 
 }

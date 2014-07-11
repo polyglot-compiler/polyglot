@@ -32,6 +32,7 @@ import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
 import polyglot.visit.PrettyPrinter;
+import polyglot.visit.Traverser;
 import polyglot.visit.TypeChecker;
 
 /** 
@@ -44,21 +45,16 @@ public class FloatLit_c extends Lit_c implements FloatLit {
     protected FloatLit.Kind kind;
     protected double value;
 
-//    @Deprecated
     public FloatLit_c(Position pos, FloatLit.Kind kind, double value) {
-        this(pos, kind, value, null);
-    }
-
-    public FloatLit_c(Position pos, FloatLit.Kind kind, double value, Ext ext) {
-        super(pos, ext);
-        assert (kind != null);
+        super(pos);
+        assert kind != null;
         this.kind = kind;
         this.value = value;
     }
 
     @Override
     public FloatLit.Kind kind() {
-        return this.kind;
+        return kind;
     }
 
     @Override
@@ -75,7 +71,7 @@ public class FloatLit_c extends Lit_c implements FloatLit {
 
     @Override
     public double value() {
-        return this.value;
+        return value;
     }
 
     @Override
@@ -124,7 +120,7 @@ public class FloatLit_c extends Lit_c implements FloatLit {
     }
 
     @Override
-    public Object constantValue(Lang lang) {
+    public Object constantValue(Traverser v) {
         if (kind == FLOAT) {
             return new Float(value);
         }
@@ -145,7 +141,7 @@ public class FloatLit_c extends Lit_c implements FloatLit {
 
     @Override
     public Node copy(NodeFactory nf) {
-        return nf.FloatLit(this.position, this.kind, this.value);
+        return nf.FloatLit(position, kind, value);
     }
 
 }

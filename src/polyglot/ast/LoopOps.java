@@ -26,20 +26,22 @@
 
 package polyglot.ast;
 
+import polyglot.visit.Traverser;
+
 /**
  * This interface allows extensions both to override and reuse functionality in
  * Loop_c.
  */
 public interface LoopOps {
     /** Returns true of cond() evaluates to a constant. */
-    boolean condIsConstant(JLang lang);
+    boolean condIsConstant(Traverser v);
 
     /** Returns true if cond() is a constant that evaluates to true. */
-    boolean condIsConstantTrue(JLang lang);
+    boolean condIsConstantTrue(Traverser v);
 
     /** Returns true if cond() is a constant that evaluates to false. */
-    boolean condIsConstantFalse(JLang lang);
+    boolean condIsConstantFalse(Traverser v);
 
     /** Target of a continue statement in the loop body. */
-    Term continueTarget();
+    Term continueTarget(Traverser v);
 }

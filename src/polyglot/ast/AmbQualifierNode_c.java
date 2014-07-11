@@ -50,14 +50,9 @@ public class AmbQualifierNode_c extends Node_c implements AmbQualifierNode {
     protected QualifierNode qual;
     protected Id name;
 
-//    @Deprecated
     public AmbQualifierNode_c(Position pos, QualifierNode qual, Id name) {
-        this(pos, qual, name, null);
-    }
-
-    public AmbQualifierNode_c(Position pos, QualifierNode qual, Id name, Ext ext) {
-        super(pos, ext);
-        assert (name != null); // qual may be null
+        super(pos);
+        assert name != null; // qual may be null
 
         this.qual = qual;
         this.name = name;
@@ -65,7 +60,7 @@ public class AmbQualifierNode_c extends Node_c implements AmbQualifierNode {
 
     @Override
     public Qualifier qualifier() {
-        return this.qualifier;
+        return qualifier;
     }
 
     public AmbQualifierNode qualifier(Qualifier qualifier) {
@@ -82,7 +77,7 @@ public class AmbQualifierNode_c extends Node_c implements AmbQualifierNode {
 
     @Override
     public Id id() {
-        return this.name;
+        return name;
     }
 
     /** Set the name of the qualifier. */
@@ -99,7 +94,7 @@ public class AmbQualifierNode_c extends Node_c implements AmbQualifierNode {
 
     @Override
     public String name() {
-        return this.name.id();
+        return name.id();
     }
 
     /** Set the name of the qualifier. */
@@ -109,7 +104,7 @@ public class AmbQualifierNode_c extends Node_c implements AmbQualifierNode {
 
     @Override
     public QualifierNode qual() {
-        return this.qual;
+        return qual;
     }
 
     /** Set the qualifier of the qualifier. */
@@ -196,6 +191,6 @@ public class AmbQualifierNode_c extends Node_c implements AmbQualifierNode {
 
     @Override
     public Node copy(NodeFactory nf) {
-        return nf.AmbQualifierNode(this.position, this.qual, this.name);
+        return nf.AmbQualifierNode(position, qual, name);
     }
 }

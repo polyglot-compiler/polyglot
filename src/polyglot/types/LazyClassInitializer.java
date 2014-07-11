@@ -70,14 +70,14 @@ public interface LazyClassInitializer extends LazyInitializer {
 
     /**
      * Initialize {@code ct}'s constructors.
-     * This method ensures the list of fields is populated with (possibly
+     * This method ensures the list of constructors is populated with (possibly
      * non-canonical) ConstructorInstances, or throws a {@code MissingDependencyException}.
      */
     public void initConstructors();
 
     /**
      * Initialize {@code ct}'s methods.
-     * This method ensures the list of fields is populated with (possibly
+     * This method ensures the list of methods is populated with (possibly
      * non-canonical) MethodInstances, or throws a {@code MissingDependencyException}.
      */
     public void initMethods();

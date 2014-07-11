@@ -25,6 +25,8 @@
  ******************************************************************************/
 package polyglot.visit;
 
+import java.util.Map;
+
 import polyglot.ast.Lang;
 import polyglot.ast.Node;
 
@@ -32,8 +34,8 @@ import polyglot.ast.Node;
  * Returns a deep copy of the AST.
  */
 public class DeepCopy extends HaltingVisitor {
-    public DeepCopy(Lang lang) {
-        super(lang);
+    public DeepCopy(Lang lang, Map<Lang, Lang> superLangMap) {
+        super(lang, superLangMap);
     }
 
     @Override

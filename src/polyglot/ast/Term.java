@@ -35,6 +35,7 @@ import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
 import polyglot.util.SubtypeSet;
 import polyglot.visit.CFGBuilder;
+import polyglot.visit.Traverser;
 
 /**
  * A {@code Term} represents any Java expression or statement on which
@@ -74,13 +75,15 @@ public interface Term extends Node {
 
     Term exceptions(SubtypeSet exceptions);
 
+    @Deprecated
+    Term firstChild();
+
     class Instance extends Term_c {
         private static final long serialVersionUID =
                 SerialVersionUID.generate();
 
-        public Instance(Position pos, Ext ext) {
-            super(pos, ext);
-            assert (ext != null);
+        public Instance(Position pos) {
+            super(pos);
         }
 
         @Override
@@ -91,7 +94,7 @@ public interface Term extends Node {
         }
 
         @Override
-        public final Term firstChild() {
+        public final Term firstChild(Traverser v) {
             throw new InternalCompilerError("Unexpected invocation from extension object.");
         }
 

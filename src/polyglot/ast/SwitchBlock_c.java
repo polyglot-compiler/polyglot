@@ -31,6 +31,7 @@ import java.util.List;
 import polyglot.types.Context;
 import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
+import polyglot.visit.Traverser;
 
 /**
  * A {@code SwitchBlock} is a list of statements within a switch.
@@ -38,13 +39,8 @@ import polyglot.util.SerialVersionUID;
 public class SwitchBlock_c extends AbstractBlock_c implements SwitchBlock {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
-//    @Deprecated
     public SwitchBlock_c(Position pos, List<Stmt> statements) {
-        this(pos, statements, null);
-    }
-
-    public SwitchBlock_c(Position pos, List<Stmt> statements, Ext ext) {
-        super(pos, statements, ext);
+        super(pos, statements);
     }
 
     /**
@@ -62,13 +58,13 @@ public class SwitchBlock_c extends AbstractBlock_c implements SwitchBlock {
      * </pre>
      */
     @Override
-    public Context enterScope(Context c) {
+    public Context enterScope(Context c, Traverser v) {
         return c;
     }
 
     @Override
     public Node copy(NodeFactory nf) {
-        return nf.SwitchBlock(this.position, statements);
+        return nf.SwitchBlock(position, statements);
     }
 
 }

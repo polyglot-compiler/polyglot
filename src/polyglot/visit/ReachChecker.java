@@ -58,7 +58,7 @@ public class ReachChecker extends DataFlow<ReachChecker.DataFlowItem> {
     protected CFGBuilder<ReachChecker.DataFlowItem> createCFGBuilder(
             TypeSystem ts, FlowGraph<ReachChecker.DataFlowItem> g) {
         CFGBuilder<ReachChecker.DataFlowItem> v =
-                new CFGBuilder<>(lang(), ts, g, this);
+                new CFGBuilder<>(lang(), superLangMap(), ts, g, this);
         // skip dead loop bodies (i.e., S is unreachable in "while (false) S".
         // See JLS 2nd edition, Section 14.20.
         v = v.skipDeadLoopBodies(true);
@@ -97,8 +97,8 @@ public class ReachChecker extends DataFlow<ReachChecker.DataFlowItem> {
         @Override
         public boolean equals(Object o) {
             if (o instanceof DataFlowItem) {
-                return this.reachable == ((DataFlowItem) o).reachable
-                        && this.normalReachable == ((DataFlowItem) o).normalReachable;
+                return reachable == ((DataFlowItem) o).reachable
+                        && normalReachable == ((DataFlowItem) o).normalReachable;
             }
             return false;
         }
@@ -162,7 +162,7 @@ public class ReachChecker extends DataFlow<ReachChecker.DataFlowItem> {
         // predecessor is normal reachable, and the edge key is not an 
         // exception edge key, then so is this one.
 
-        List<DataFlowItem> l = this.filterItemsNonException(inItems, itemKeys);
+        List<DataFlowItem> l = filterItemsNonException(inItems, itemKeys);
         for (DataFlowItem i : l) {
             if (i == DataFlowItem.REACHABLE) {
                 // this term is reachable via a non-exception edge
@@ -200,8 +200,8 @@ public class ReachChecker extends DataFlow<ReachChecker.DataFlowItem> {
                 // statement is truly unreachable, one of its sub-statements
                 // will be also and we will report an error there.
 
-                if ((n instanceof Block && ((Block) n).statements().isEmpty())
-                        || (n instanceof Stmt && !(n instanceof CompoundStmt))) {
+                if (n instanceof Block && ((Block) n).statements().isEmpty()
+                        || n instanceof Stmt && !(n instanceof CompoundStmt)) {
                     throw new SemanticException("Unreachable statement.",
                                                 n.position());
                 }

@@ -29,6 +29,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import polyglot.ast.JLang;
 import polyglot.ast.Node;
 import polyglot.ast.ProcedureCall;
 import polyglot.ast.ProcedureCallOps;
@@ -59,7 +60,7 @@ public abstract class JL5ProcedureCallExt extends JL5TermExt implements
 
     @Override
     public List<TypeNode> typeArgs() {
-        return this.typeArgs;
+        return typeArgs;
     }
 
     @Override
@@ -70,7 +71,7 @@ public abstract class JL5ProcedureCallExt extends JL5TermExt implements
     protected <N extends Node> N typeArgs(N n, List<TypeNode> typeArgs) {
         JL5ProcedureCallExt ext = (JL5ProcedureCallExt) JL5Ext.ext(n);
         if (CollectionUtil.equals(ext.typeArgs, typeArgs)) return n;
-        if (n == node) {
+        if (ext == this) {
             n = Copy.Util.copy(n);
             ext = (JL5ProcedureCallExt) JL5Ext.ext(n);
         }
@@ -86,7 +87,7 @@ public abstract class JL5ProcedureCallExt extends JL5TermExt implements
     @Override
     public Node visitChildren(NodeVisitor v) {
         List<TypeNode> typeArgs = visitList(this.typeArgs, v);
-        Node n = superLang().visitChildren(node(), v);
+        Node n = v.superLang(lang()).visitChildren(node(), v);
         return reconstruct(n, typeArgs);
     }
 
@@ -124,6 +125,6 @@ public abstract class JL5ProcedureCallExt extends JL5TermExt implements
 
     @Override
     public void printArgs(CodeWriter w, PrettyPrinter tr) {
-        superLang().printArgs(this.node(), w, tr);
+        ((JLang) tr.superLang(lang())).printArgs(this.node(), w, tr);
     }
 }

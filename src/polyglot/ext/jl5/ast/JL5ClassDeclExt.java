@@ -31,8 +31,8 @@ import java.util.List;
 
 import polyglot.ast.ClassDecl;
 import polyglot.ast.ClassDeclOps;
+import polyglot.ast.JLang;
 import polyglot.ast.Node;
-import polyglot.ast.NodeFactory;
 import polyglot.ast.TypeNode;
 import polyglot.ext.jl5.types.AnnotationTypeElemInstance;
 import polyglot.ext.jl5.types.Annotations;
@@ -59,8 +59,10 @@ import polyglot.util.CollectionUtil;
 import polyglot.util.Copy;
 import polyglot.util.ListUtil;
 import polyglot.util.SerialVersionUID;
+import polyglot.visit.AmbiguityRemover;
 import polyglot.visit.NodeVisitor;
 import polyglot.visit.PrettyPrinter;
+import polyglot.visit.Traverser;
 import polyglot.visit.TypeBuilder;
 import polyglot.visit.TypeChecker;
 
@@ -86,7 +88,7 @@ public class JL5ClassDeclExt extends JL5AnnotatedElementExt implements
     }
 
     public List<ParamTypeNode> paramTypes() {
-        return this.paramTypes;
+        return paramTypes;
     }
 
     public Node paramTypes(List<ParamTypeNode> types) {
@@ -96,7 +98,7 @@ public class JL5ClassDeclExt extends JL5AnnotatedElementExt implements
     protected <N extends Node> N paramTypes(N n, List<ParamTypeNode> types) {
         JL5ClassDeclExt ext = (JL5ClassDeclExt) JL5Ext.ext(n);
         if (CollectionUtil.equals(ext.paramTypes, types)) return n;
-        if (n == node) {
+        if (ext == this) {
             n = Copy.Util.copy(n);
             ext = (JL5ClassDeclExt) JL5Ext.ext(n);
         }
@@ -160,7 +162,8 @@ public class JL5ClassDeclExt extends JL5AnnotatedElementExt implements
 
     @Override
     public Node buildTypes(TypeBuilder tb) throws SemanticException {
-        ClassDecl n = (ClassDecl) superLang().buildTypes(this.node(), tb);
+        ClassDecl n =
+                (ClassDecl) tb.superLang(lang()).buildTypes(this.node(), tb);
 
         JL5TypeSystem ts = (JL5TypeSystem) tb.typeSystem();
         JL5ParsedClassType ct = (JL5ParsedClassType) n.type();
@@ -190,7 +193,7 @@ public class JL5ClassDeclExt extends JL5AnnotatedElementExt implements
      * @see polyglot.ast.NodeOps#enterScope(polyglot.types.Context)
      */
     @Override
-    public Context enterChildScope(Node child, Context c) {
+    public Context enterChildScope(Node child, Context c, Traverser v) {
         ClassDecl n = this.node();
 
         if (child == n.body()) {
@@ -207,7 +210,7 @@ public class JL5ClassDeclExt extends JL5AnnotatedElementExt implements
         for (TypeNode tn : paramTypes) {
             ((JL5Context) c).addTypeVariable((TypeVariable) tn.type());
         }
-        return c.lang().enterScope(child, c);
+        return v.lang().enterScope(child, c, v);
     }
 
     @Override
@@ -299,8 +302,8 @@ public class JL5ClassDeclExt extends JL5AnnotatedElementExt implements
 
     public void prettyPrintHeaderRest(CodeWriter w, PrettyPrinter tr) {
         ClassDecl n = this.node();
-        if (n.superClass() != null
-                && ((!JL5Flags.isEnum(n.flags()) && !JL5Flags.isAnnotation(n.flags())))) {
+        if (n.superClass() != null && !JL5Flags.isEnum(n.flags())
+                && !JL5Flags.isAnnotation(n.flags())) {
             w.write(" extends ");
             print(n.superClass(), w, tr);
         }
@@ -328,7 +331,7 @@ public class JL5ClassDeclExt extends JL5AnnotatedElementExt implements
 
     @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter pp) {
-        superLang().prettyPrint(node(), w, pp);
+        pp.superLang(lang()).prettyPrint(node(), w, pp);
     }
 
     @Override
@@ -361,16 +364,14 @@ public class JL5ClassDeclExt extends JL5AnnotatedElementExt implements
 
     @Override
     public void prettyPrintFooter(CodeWriter w, PrettyPrinter tr) {
-        superLang().prettyPrintFooter(this.node(), w, tr);
+        ((JLang) tr.superLang(lang())).prettyPrintFooter(this.node(), w, tr);
     }
 
     @Override
-    public Node addDefaultConstructor(TypeSystem ts, NodeFactory nf,
-            ConstructorInstance defaultConstructorInstance)
-            throws SemanticException {
-        return superLang().addDefaultConstructor(this.node(),
-                                                 ts,
-                                                 nf,
-                                                 defaultConstructorInstance);
+    public Node addDefaultConstructor(ConstructorInstance defaultCI,
+            AmbiguityRemover ar) throws SemanticException {
+        return ar.superLang(lang()).addDefaultConstructor(this.node(),
+                                                          defaultCI,
+                                                          ar);
     }
 }

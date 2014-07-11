@@ -29,15 +29,15 @@ import polyglot.ast.Block;
 import polyglot.ast.Catch;
 import polyglot.ast.Try;
 import polyglot.ext.jl5.ast.J5Lang;
-import polyglot.types.TypeSystem;
 import polyglot.util.SubtypeSet;
+import polyglot.visit.ExceptionChecker;
 
 public interface J7Lang extends J5Lang {
 
     // JL7TryOps
 
-    void checkPreciseRethrows(Try n, J7Lang lang, TypeSystem typeSystem, Block b);
+    void checkPreciseRethrows(Try n, Block b, ExceptionChecker ec);
 
-    void preciseRethrowsForCatchBlock(Try n, J7Lang lang, Catch cb,
-            SubtypeSet thrown);
+    void preciseRethrowsForCatchBlock(Try n, Catch cb, SubtypeSet thrown,
+            ExceptionChecker ec);
 }

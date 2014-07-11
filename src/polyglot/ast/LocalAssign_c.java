@@ -30,6 +30,7 @@ import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
 import polyglot.visit.CFGBuilder;
+import polyglot.visit.Traverser;
 
 /**
  * A {@code LocalAssign} represents a Java assignment expression
@@ -41,14 +42,8 @@ import polyglot.visit.CFGBuilder;
 public class LocalAssign_c extends Assign_c implements LocalAssign {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
-//    @Deprecated
     public LocalAssign_c(Position pos, Local left, Operator op, Expr right) {
-        this(pos, left, op, right, null);
-    }
-
-    public LocalAssign_c(Position pos, Local left, Operator op, Expr right,
-            Ext ext) {
-        super(pos, left, op, right, ext);
+        super(pos, left, op, right);
     }
 
     @Override
@@ -69,7 +64,7 @@ public class LocalAssign_c extends Assign_c implements LocalAssign {
     }
 
     @Override
-    public Term firstChild() {
+    public Term firstChild(Traverser v) {
         if (operator() != Assign.ASSIGN) {
             return left();
         }

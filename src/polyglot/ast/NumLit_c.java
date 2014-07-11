@@ -38,19 +38,14 @@ public abstract class NumLit_c extends Lit_c implements NumLit {
 
     protected long value;
 
-    @Deprecated
     public NumLit_c(Position pos, long value) {
-        this(pos, value, null);
-    }
-
-    public NumLit_c(Position pos, long value, Ext ext) {
-        super(pos, ext);
+        super(pos);
         this.value = value;
     }
 
     @Override
     public long longValue() {
-        return this.value;
+        return value;
     }
 
     @Override

@@ -26,28 +26,19 @@ ram and the accompanying materials are made available under
  ******************************************************************************/
 package polyglot.ext.jl5.ast;
 
-import polyglot.ast.Ext;
 import polyglot.ast.Ext_c;
 import polyglot.ast.Node;
+import polyglot.ast.NodeOps;
 import polyglot.ext.jl5.visit.JL5Translator;
 import polyglot.util.CodeWriter;
-import polyglot.util.InternalCompilerError;
 import polyglot.util.SerialVersionUID;
 import polyglot.visit.Translator;
 
 public class JL5Ext extends Ext_c {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
-    public static JL5Ext ext(Node n) {
-        Ext e = n.ext();
-        while (e != null && !(e instanceof JL5Ext)) {
-            e = e.ext();
-        }
-        if (e == null) {
-            throw new InternalCompilerError("No JL5 extension object for node "
-                    + n + " (" + n.getClass() + ")", n.position());
-        }
-        return (JL5Ext) e;
+    public static NodeOps ext(Node n) {
+        return n.node(J5Lang_c.instance);
     }
 
     @Override
@@ -59,6 +50,6 @@ public class JL5Ext extends Ext_c {
     public void translate(CodeWriter w, Translator tr) {
         if (tr instanceof JL5Translator)
             ((JL5Translator) tr).translateNode(node(), w);
-        else superLang().translate(node(), w, tr);
+        else tr.superLang(lang()).translate(node(), w, tr);
     }
 }

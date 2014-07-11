@@ -29,6 +29,7 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
+import polyglot.ast.JLang;
 import polyglot.ast.LocalDecl;
 import polyglot.ast.Node;
 import polyglot.ext.jl7.types.JL7TypeSystem;
@@ -39,9 +40,10 @@ import polyglot.types.Type;
 import polyglot.types.TypeSystem;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.SerialVersionUID;
+import polyglot.visit.Traverser;
 import polyglot.visit.TypeChecker;
 
-public class JL7ResourceExt extends JL7Ext {
+public class JL7ResourceExt extends JL7TermExt {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
     @Override
@@ -61,11 +63,11 @@ public class JL7ResourceExt extends JL7Ext {
             throw new SemanticException("The resource type " + declType
                     + " does not implement java.lang.AutoCloseable");
         }
-        return superLang().typeCheck(this.node(), tc);
+        return tc.superLang(lang()).typeCheck(this.node(), tc);
     }
 
     @Override
-    public List<Type> throwTypes(TypeSystem ts) {
+    public List<Type> throwTypes(TypeSystem ts, Traverser v) {
         List<Type> l = new LinkedList<>();
 
         LocalDecl n = this.node();
@@ -86,7 +88,7 @@ public class JL7ResourceExt extends JL7Ext {
                     + e);
         }
 
-        l.addAll(superLang().throwTypes(n, ts));
+        l.addAll(((JLang) v.superLang(lang())).throwTypes(n, ts, v));
 
         return l;
     }

@@ -39,6 +39,7 @@ import polyglot.util.SerialVersionUID;
 import polyglot.visit.CFGBuilder;
 import polyglot.visit.NodeVisitor;
 import polyglot.visit.PrettyPrinter;
+import polyglot.visit.Traverser;
 
 /**
  * A {@code Block} represents a Java block statement -- an immutable
@@ -49,20 +50,15 @@ public abstract class AbstractBlock_c extends Stmt_c implements Block {
 
     protected List<Stmt> statements;
 
-    @Deprecated
     public AbstractBlock_c(Position pos, List<Stmt> statements) {
-        this(pos, statements, null);
-    }
-
-    public AbstractBlock_c(Position pos, List<Stmt> statements, Ext ext) {
-        super(pos, ext);
-        assert (statements != null);
+        super(pos);
+        assert statements != null;
         this.statements = ListUtil.copy(statements, true);
     }
 
     @Override
     public List<Stmt> statements() {
-        return this.statements;
+        return statements;
     }
 
     @Override
@@ -108,7 +104,7 @@ public abstract class AbstractBlock_c extends Stmt_c implements Block {
     }
 
     @Override
-    public Context enterScope(Context c) {
+    public Context enterScope(Context c, Traverser v) {
         return c.pushBlock();
     }
 
@@ -129,7 +125,7 @@ public abstract class AbstractBlock_c extends Stmt_c implements Block {
     }
 
     @Override
-    public Term firstChild() {
+    public Term firstChild(Traverser v) {
         return listChild(statements, (Stmt) null);
     }
 

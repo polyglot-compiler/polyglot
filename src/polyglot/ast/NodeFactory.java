@@ -27,6 +27,7 @@
 package polyglot.ast;
 
 import java.util.List;
+import java.util.Map;
 
 import polyglot.types.Flags;
 import polyglot.types.Package;
@@ -44,6 +45,9 @@ public interface NodeFactory {
      * Returns the language associated with this NodeFactory.
      */
     JLang lang();
+
+    /** Returns the language hierarchy directory for this NodeFactory. */
+    Map<Lang, Lang> superLangMap();
 
     /**
      * Returns a disambiguator for nodes from this factory.

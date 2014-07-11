@@ -28,39 +28,39 @@ package polyglot.ext.jl7.ast;
 import polyglot.ast.Block;
 import polyglot.ast.Case;
 import polyglot.ast.Catch;
-import polyglot.ast.Ext;
-import polyglot.ast.Lang;
 import polyglot.ast.New;
 import polyglot.ast.NewOps;
 import polyglot.ast.Node;
 import polyglot.ast.NodeOps;
 import polyglot.ast.Switch;
+import polyglot.ast.Term;
+import polyglot.ast.TermOps;
 import polyglot.ast.Try;
+import polyglot.ast.TryOps;
 import polyglot.ext.jl5.ast.J5Lang_c;
 import polyglot.ext.jl5.ast.JL5CaseOps;
 import polyglot.ext.jl5.ast.JL5SwitchOps;
-import polyglot.types.TypeSystem;
-import polyglot.util.InternalCompilerError;
 import polyglot.util.SubtypeSet;
+import polyglot.visit.ExceptionChecker;
 
 public class J7Lang_c extends J5Lang_c implements J7Lang {
     public static final J7Lang_c instance = new J7Lang_c();
 
-    public static J7Lang lang(NodeOps n) {
-        while (n != null) {
-            Lang lang = n.lang();
-            if (lang instanceof J7Lang) return (J7Lang) lang;
-            if (n instanceof Ext)
-                n = ((Ext) n).pred();
-            else return null;
-        }
-        throw new InternalCompilerError("Impossible to reach");
-    }
+//    public static J7Lang lang(NodeOps n) {
+//        while (n != null) {
+//            Lang lang = n.lang();
+//            if (lang instanceof J7Lang) return (J7Lang) lang;
+//            if (n instanceof Ext)
+//                n = ((Ext) n).pred();
+//            else return null;
+//        }
+//        throw new InternalCompilerError("Impossible to reach");
+//    }
 
     protected J7Lang_c() {
     }
 
-    protected static JL7Ext jl7ext(Node n) {
+    protected static NodeOps jl7ext(Node n) {
         return JL7Ext.ext(n);
     }
 
@@ -75,6 +75,11 @@ public class J7Lang_c extends J5Lang_c implements J7Lang {
     }
 
     @Override
+    protected TermOps TermOps(Term n) {
+        return (TermOps) jl7ext(n);
+    }
+
+    @Override
     protected JL5CaseOps JL5CaseOps(Case n) {
         return (JL5CaseOps) jl7ext(n);
     }
@@ -85,21 +90,20 @@ public class J7Lang_c extends J5Lang_c implements J7Lang {
     }
 
     @Override
-    protected JL7TryOps TryOps(Try n) {
-        return (JL7TryOps) jl7ext(n);
+    protected TryOps TryOps(Try n) {
+        return (TryOps) jl7ext(n);
     }
 
     // JL7TryOps
 
     @Override
-    public final void checkPreciseRethrows(Try n, J7Lang lang,
-            TypeSystem typeSystem, Block b) {
-        TryOps(n).checkPreciseRethrows(lang, typeSystem, b);
+    public final void checkPreciseRethrows(Try n, Block b, ExceptionChecker ec) {
+        ((JL7TryOps) TryOps(n)).checkPreciseRethrows(b, ec);
     }
 
     @Override
-    public final void preciseRethrowsForCatchBlock(Try n, J7Lang lang,
-            Catch cb, SubtypeSet thrown) {
-        TryOps(n).preciseRethrowsForCatchBlock(lang, cb, thrown);
+    public final void preciseRethrowsForCatchBlock(Try n, Catch cb,
+            SubtypeSet thrown, ExceptionChecker ec) {
+        ((JL7TryOps) TryOps(n)).preciseRethrowsForCatchBlock(cb, thrown, ec);
     }
 }

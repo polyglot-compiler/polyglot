@@ -60,15 +60,15 @@ public class TypeBuilder extends NodeVisitor {
     protected ParsedClassType type; // last class pushed.
 
     public TypeBuilder(Job job, TypeSystem ts, NodeFactory nf) {
-        super(nf.lang());
+        super(nf.lang(), nf.superLangMap());
         this.job = job;
         this.ts = ts;
         this.nf = nf;
-        this.outer = null;
+        outer = null;
     }
 
     public TypeBuilder push() {
-        TypeBuilder tb = (TypeBuilder) this.copy();
+        TypeBuilder tb = (TypeBuilder) copy();
         tb.outer = this;
         return tb;
     }
@@ -253,8 +253,7 @@ public class TypeBuilder extends NodeVisitor {
             // classes or top level classes, then add this class to the
             // parsed resolver.
             ClassType container = ct.outer();
-            boolean allMembers =
-                    (container.isMember() || container.isTopLevel());
+            boolean allMembers = container.isMember() || container.isTopLevel();
             while (container.isMember()) {
                 container = container.outer();
                 allMembers =
@@ -303,7 +302,7 @@ public class TypeBuilder extends NodeVisitor {
 
         TypeSystem ts = typeSystem();
 
-        ParsedClassType ct = ts.createClassType(this.job().source());
+        ParsedClassType ct = ts.createClassType(job().source());
         ct.kind(ClassType.ANONYMOUS);
         ct.outer(currentClass());
         ct.position(pos);
@@ -333,7 +332,7 @@ public class TypeBuilder extends NodeVisitor {
     }
 
     public ParsedClassType currentClass() {
-        return this.type;
+        return type;
     }
 
     public ParsedClassType anonClass() {
@@ -349,7 +348,7 @@ public class TypeBuilder extends NodeVisitor {
     }
 
     public void setImportTable(ImportTable it) {
-        this.importTable = it;
+        importTable = it;
     }
 
     public String context() {

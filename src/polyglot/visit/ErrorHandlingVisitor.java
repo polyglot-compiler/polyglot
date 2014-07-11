@@ -50,7 +50,7 @@ public class ErrorHandlingVisitor extends HaltingVisitor {
     protected NodeFactory nf;
 
     public ErrorHandlingVisitor(Job job, TypeSystem ts, NodeFactory nf) {
-        super(nf.lang());
+        super(nf.lang(), nf.superLangMap());
         this.job = job;
         this.ts = ts;
         this.nf = nf;
@@ -70,7 +70,7 @@ public class ErrorHandlingVisitor extends HaltingVisitor {
      */
     @Override
     public NodeVisitor begin() {
-        this.error = false;
+        error = false;
         return super.begin();
     }
 
@@ -216,7 +216,7 @@ public class ErrorHandlingVisitor extends HaltingVisitor {
             Report.report(5, "enter(" + n + ")");
 
         if (catchErrors(n)) {
-            this.error = false;
+            error = false;
         }
 
         try {
@@ -241,7 +241,7 @@ public class ErrorHandlingVisitor extends HaltingVisitor {
             }
 
             if (!catchErrors(n)) {
-                this.error = true;
+                error = true;
             }
 
             return enterError(n);
@@ -287,12 +287,12 @@ public class ErrorHandlingVisitor extends HaltingVisitor {
                     Report.report(5, "leave(" + n + "): error below");
 
                 if (catchErrors(n)) {
-                    this.error = false;
+                    error = false;
                     ((ErrorHandlingVisitor) v).error = false;
                 }
                 else {
                     // propagate the error outward
-                    this.error = true;
+                    error = true;
                 }
 
                 // don't visit the node
@@ -322,11 +322,11 @@ public class ErrorHandlingVisitor extends HaltingVisitor {
             }
 
             if (catchErrors(n)) {
-                this.error = false;
+                error = false;
                 ((ErrorHandlingVisitor) v).error = false;
             }
             else {
-                this.error = true;
+                error = true;
                 ((ErrorHandlingVisitor) v).error = true;
             }
 

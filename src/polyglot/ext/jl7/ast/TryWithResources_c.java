@@ -30,6 +30,7 @@ import java.util.List;
 
 import polyglot.ast.Block;
 import polyglot.ast.Catch;
+import polyglot.ast.JLang;
 import polyglot.ast.LocalDecl;
 import polyglot.ast.Node;
 import polyglot.ast.Term;
@@ -45,6 +46,7 @@ import polyglot.visit.CFGBuilder;
 import polyglot.visit.ExceptionChecker;
 import polyglot.visit.NodeVisitor;
 import polyglot.visit.PrettyPrinter;
+import polyglot.visit.Traverser;
 
 /**
  * An immutable representation of a {@code try}-with-resources block.
@@ -64,12 +66,12 @@ public class TryWithResources_c extends Try_c implements TryWithResources {
     @Override
     protected void assert_(Position pos, Block tryBlock,
             List<Catch> catchBlocks, Block finallyBlock) {
-        assert (tryBlock != null); // catchBlock and finallyBlock may be null
+        assert tryBlock != null; // catchBlock and finallyBlock may be null
     }
 
     @Override
     public List<LocalDecl> resources() {
-        return this.resources;
+        return resources;
     }
 
     @Override
@@ -95,6 +97,11 @@ public class TryWithResources_c extends Try_c implements TryWithResources {
     }
 
     @Override
+    public JLang lang() {
+        return J7Lang_c.instance;
+    }
+
+    @Override
     public Node visitChildren(NodeVisitor v) {
         List<LocalDecl> resources = visitList(this.resources, v);
         Block tryBlock = visitChild(this.tryBlock, v);
@@ -108,7 +115,7 @@ public class TryWithResources_c extends Try_c implements TryWithResources {
         TryWithResources_c n = (TryWithResources_c) super.exceptionCheck(ec);
 
         ExceptionChecker ecTryBlockEntry = ec;
-        if (this.finallyBlock != null && !this.finallyBlock.reachable()) {
+        if (finallyBlock != null && !finallyBlock.reachable()) {
             // the finally block cannot terminate normally.
             // This implies that exceptions thrown in the try and catch
             // blocks will not propagate upwards.
@@ -190,7 +197,7 @@ public class TryWithResources_c extends Try_c implements TryWithResources {
     }
 
     @Override
-    public Term firstChild() {
+    public Term firstChild(Traverser v) {
         return listChild(resources, null);
     }
 

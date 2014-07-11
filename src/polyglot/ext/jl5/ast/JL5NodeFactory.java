@@ -54,7 +54,7 @@ import polyglot.util.Position;
  */
 public interface JL5NodeFactory extends NodeFactory {
     ClassDecl EnumDecl(Position pos, Flags flags,
-            List<AnnotationElem> annotations, Id name, TypeNode superType,
+            List<AnnotationElem> annotations, Id name, TypeNode superClass,
             List<TypeNode> interfaces, ClassBody body);
 
     EnumConstantDecl EnumConstantDecl(Position pos, Flags flags,
@@ -65,7 +65,7 @@ public interface JL5NodeFactory extends NodeFactory {
             List<AnnotationElem> annotations, Id name, List<Expr> args);
 
     ClassDecl ClassDecl(Position pos, Flags flags,
-            List<AnnotationElem> annotations, Id name, TypeNode superType,
+            List<AnnotationElem> annotations, Id name, TypeNode superClass,
             List<TypeNode> interfaces, ClassBody body,
             List<ParamTypeNode> paramTypes);
 
@@ -80,7 +80,7 @@ public interface JL5NodeFactory extends NodeFactory {
             List<ParamTypeNode> typeParams);
 
     Formal Formal(Position pos, Flags flags, List<AnnotationElem> annotations,
-            TypeNode type, Id name, boolean var_args);
+            TypeNode type, Id name, boolean isVarArg);
 
     Formal Formal(Position pos, Flags flags, List<AnnotationElem> annotations,
             TypeNode type, Id name);

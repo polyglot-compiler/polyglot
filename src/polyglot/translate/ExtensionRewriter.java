@@ -25,6 +25,8 @@
  ******************************************************************************/
 package polyglot.translate;
 
+import java.util.Map;
+
 import polyglot.ast.Lang;
 import polyglot.ast.Node;
 import polyglot.ast.NodeFactory;
@@ -84,6 +86,12 @@ public class ExtensionRewriter extends ContextVisitor {
     @Override
     public Lang lang() {
         return lang;
+    }
+
+    // TODO
+    @Override
+    public Map<Lang, Lang> superLangMap() {
+        return from_ext.nodeFactory().superLangMap();
     }
 
     @Override

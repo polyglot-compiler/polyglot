@@ -34,7 +34,7 @@ import java.util.Map;
 
 import polyglot.ast.ClassLit;
 import polyglot.ast.Expr;
-import polyglot.ast.Lang;
+import polyglot.ast.JLang;
 import polyglot.ast.Node;
 import polyglot.ast.Term;
 import polyglot.ast.Term_c;
@@ -43,6 +43,7 @@ import polyglot.ext.jl5.types.AnnotationElementValue;
 import polyglot.ext.jl5.types.AnnotationElementValueArray;
 import polyglot.ext.jl5.types.JL5Flags;
 import polyglot.ext.jl5.types.JL5TypeSystem;
+import polyglot.ext.jl5.visit.ResolveAnnotationsVisitor;
 import polyglot.types.MethodInstance;
 import polyglot.types.SemanticException;
 import polyglot.types.Type;
@@ -56,6 +57,7 @@ import polyglot.util.SerialVersionUID;
 import polyglot.visit.CFGBuilder;
 import polyglot.visit.NodeVisitor;
 import polyglot.visit.PrettyPrinter;
+import polyglot.visit.Traverser;
 import polyglot.visit.TypeChecker;
 
 public class AnnotationElem_c extends Term_c implements AnnotationElem {
@@ -94,7 +96,7 @@ public class AnnotationElem_c extends Term_c implements AnnotationElem {
 
     @Override
     public List<ElementValuePair> elements() {
-        return this.elements;
+        return elements;
     }
 
     protected <N extends AnnotationElem_c> N elements(N n,
@@ -117,8 +119,13 @@ public class AnnotationElem_c extends Term_c implements AnnotationElem {
     }
 
     @Override
+    public JLang lang() {
+        return J5Lang_c.instance;
+    }
+
+    @Override
     public Node visitChildren(NodeVisitor v) {
-        TypeNode tn = visitChild(this.typeName, v);
+        TypeNode tn = visitChild(typeName, v);
         List<ElementValuePair> elements = visitList(this.elements, v);
         return reconstruct(this, tn, elements);
     }
@@ -140,19 +147,18 @@ public class AnnotationElem_c extends Term_c implements AnnotationElem {
     public void prettyPrint(CodeWriter w, PrettyPrinter pp) {
         w.write("@");
         print(typeName, w, pp);
-        if (this.isMarkerAnnotation()) {
+        if (isMarkerAnnotation()) {
             // marker annotation, so no values to print out.
             return;
         }
         w.write("(");
 
         // Single-element annotation named "value": special case
-        if (this.isSingleElementAnnotation()) {
+        if (isSingleElementAnnotation()) {
             ElementValuePair p = elements().get(0);
             print(p.value(), w, pp);
         }
         else {
-
             for (Iterator<ElementValuePair> it = elements().iterator(); it.hasNext();) {
                 print(it.next(), w, pp);
                 if (it.hasNext()) {
@@ -178,7 +184,7 @@ public class AnnotationElem_c extends Term_c implements AnnotationElem {
     }
 
     @Override
-    public Term firstChild() {
+    public Term firstChild(Traverser v) {
         return typeName;
     }
 
@@ -195,7 +201,8 @@ public class AnnotationElem_c extends Term_c implements AnnotationElem {
 
     @Override
     public Map<String, AnnotationElementValue> toAnnotationElementValues(
-            Lang lang, JL5TypeSystem ts) throws SemanticException {
+            JL5TypeSystem ts, ResolveAnnotationsVisitor rav)
+            throws SemanticException {
         Map<String, AnnotationElementValue> m = new LinkedHashMap<>();
         for (ElementValuePair p : this.elements()) {
             List<? extends MethodInstance> methods =
@@ -208,7 +215,7 @@ public class AnnotationElem_c extends Term_c implements AnnotationElem {
             Type intendedType = mi.returnType();
 
             AnnotationElementValue v =
-                    toAnnotationElementValue(lang, p.value(), intendedType, ts);
+                    toAnnotationElementValue(p.value(), intendedType, ts, rav);
 
             if (intendedType.isArray()
                     && !(v instanceof AnnotationElementValueArray)) {
@@ -223,8 +230,8 @@ public class AnnotationElem_c extends Term_c implements AnnotationElem {
         return m;
     }
 
-    private AnnotationElementValue toAnnotationElementValue(Lang lang,
-            Term value, Type intendedType, JL5TypeSystem ts)
+    private AnnotationElementValue toAnnotationElementValue(Term value,
+            Type intendedType, JL5TypeSystem ts, ResolveAnnotationsVisitor rav)
             throws SemanticException {
         Type intendedBaseType;
         if (intendedType.isArray()) {
@@ -243,7 +250,7 @@ public class AnnotationElem_c extends Term_c implements AnnotationElem {
             ElementValueArrayInit init = (ElementValueArrayInit) value;
             List<AnnotationElementValue> vals = new ArrayList<>();
             for (Term v : init.elements()) {
-                vals.add(toAnnotationElementValue(lang, v, intendedBaseType, ts));
+                vals.add(toAnnotationElementValue(v, intendedBaseType, ts, rav));
             }
             return ts.AnnotationElementValueArray(value.position(), vals);
         }
@@ -258,8 +265,8 @@ public class AnnotationElem_c extends Term_c implements AnnotationElem {
             }
             return ts.AnnotationElementValueAnnotation(value.position(),
                                                        aeType,
-                                                       ae.toAnnotationElementValues(lang,
-                                                                                    ts));
+                                                       ae.toAnnotationElementValues(ts,
+                                                                                    rav));
         }
         // Otherwise, it should be a constant value.
         if (!(value instanceof Expr)) {
@@ -267,8 +274,8 @@ public class AnnotationElem_c extends Term_c implements AnnotationElem {
                     + value.getClass(), value.position());
         }
         Expr ev = (Expr) value;
-        ts.checkAnnotationValueConstant(ev);
-        Object constVal = lang.constantValue(ev, lang);
+        JL5TermExt.checkAnnotationValueConstant(ev, rav);
+        Object constVal = rav.lang().constantValue(ev, rav);
         if (value instanceof ClassLit) {
             constVal = ((ClassLit) value).typeNode().type();
         }

@@ -30,6 +30,7 @@ import polyglot.util.CodeWriter;
 import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
 import polyglot.visit.PrettyPrinter;
+import polyglot.visit.Traverser;
 import polyglot.visit.TypeChecker;
 
 /**
@@ -38,13 +39,8 @@ import polyglot.visit.TypeChecker;
 public class NullLit_c extends Lit_c implements NullLit {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
-//    @Deprecated
     public NullLit_c(Position pos) {
-        this(pos, null);
-    }
-
-    public NullLit_c(Position pos, Ext ext) {
-        super(pos, ext);
+        super(pos);
     }
 
     @Override
@@ -68,13 +64,13 @@ public class NullLit_c extends Lit_c implements NullLit {
     }
 
     @Override
-    public Object constantValue(Lang lang) {
+    public Object constantValue(Traverser v) {
         return null;
     }
 
     @Override
     public Node copy(NodeFactory nf) {
-        return nf.NullLit(this.position);
+        return nf.NullLit(position);
     }
 
 }

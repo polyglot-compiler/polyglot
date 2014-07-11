@@ -46,6 +46,7 @@ import polyglot.util.SerialVersionUID;
 import polyglot.visit.AmbiguityRemover;
 import polyglot.visit.NodeVisitor;
 import polyglot.visit.PrettyPrinter;
+import polyglot.visit.Traverser;
 import polyglot.visit.TypeBuilder;
 import polyglot.visit.TypeChecker;
 
@@ -63,16 +64,10 @@ public class SourceFile_c extends Node_c implements SourceFile {
     protected ImportTable importTable;
     protected Source source;
 
-//    @Deprecated
     public SourceFile_c(Position pos, PackageNode package_,
             List<Import> imports, List<TopLevelDecl> decls) {
-        this(pos, package_, imports, decls, null);
-    }
-
-    public SourceFile_c(Position pos, PackageNode package_,
-            List<Import> imports, List<TopLevelDecl> decls, Ext ext) {
-        super(pos, ext);
-        assert (imports != null && decls != null); // package_ may be null, imports and decls empty
+        super(pos);
+        assert imports != null && decls != null; // package_ may be null, imports and decls empty
         this.package_ = package_;
         this.imports = ListUtil.copy(imports, true);
         this.decls = ListUtil.copy(decls, true);
@@ -80,12 +75,12 @@ public class SourceFile_c extends Node_c implements SourceFile {
 
     @Override
     public boolean isDisambiguated() {
-        return super.isDisambiguated() && this.importTable != null;
+        return super.isDisambiguated() && importTable != null;
     }
 
     @Override
     public Source source() {
-        return this.source;
+        return source;
     }
 
     @Override
@@ -102,7 +97,7 @@ public class SourceFile_c extends Node_c implements SourceFile {
 
     @Override
     public PackageNode package_() {
-        return this.package_;
+        return package_;
     }
 
     @Override
@@ -119,7 +114,7 @@ public class SourceFile_c extends Node_c implements SourceFile {
 
     @Override
     public List<Import> imports() {
-        return this.imports;
+        return imports;
     }
 
     @Override
@@ -136,7 +131,7 @@ public class SourceFile_c extends Node_c implements SourceFile {
 
     @Override
     public List<TopLevelDecl> decls() {
-        return this.decls;
+        return decls;
     }
 
     @Override
@@ -153,7 +148,7 @@ public class SourceFile_c extends Node_c implements SourceFile {
 
     @Override
     public ImportTable importTable() {
-        return this.importTable;
+        return importTable;
     }
 
     @Override
@@ -210,7 +205,7 @@ public class SourceFile_c extends Node_c implements SourceFile {
     }
 
     @Override
-    public Context enterScope(Context c) {
+    public Context enterScope(Context c, Traverser v) {
         return c.pushSource(importTable);
     }
 
@@ -363,10 +358,7 @@ public class SourceFile_c extends Node_c implements SourceFile {
 
     @Override
     public Node copy(NodeFactory nf) {
-        return nf.SourceFile(this.position,
-                             this.package_,
-                             this.imports,
-                             this.decls).source(this.source);
+        return nf.SourceFile(position, package_, imports, decls).source(source);
     }
 
 }

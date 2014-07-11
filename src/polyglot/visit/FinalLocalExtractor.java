@@ -27,6 +27,7 @@
 package polyglot.visit;
 
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import polyglot.ast.Assign;
@@ -59,7 +60,7 @@ public class FinalLocalExtractor extends NodeVisitor {
      * @param nf
      */
     public FinalLocalExtractor(Job job, TypeSystem ts, NodeFactory nf) {
-        super(nf.lang());
+        super(nf.lang(), nf.superLangMap());
     }
 
     @Override
@@ -133,8 +134,8 @@ public class FinalLocalExtractor extends NodeVisitor {
     }
 
     protected static class LocalDeclFixer extends NodeVisitor {
-        public LocalDeclFixer(Lang lang) {
-            super(lang);
+        public LocalDeclFixer(Lang lang, Map<Lang, Lang> superLangMap) {
+            super(lang, superLangMap);
         }
 
         @Override
@@ -156,7 +157,7 @@ public class FinalLocalExtractor extends NodeVisitor {
         // Revisit everything to ensure the local decls' flags agree with
         // their local instance's.
         if (n instanceof SourceFile) {
-            return n.visit(new LocalDeclFixer(lang()));
+            return n.visit(new LocalDeclFixer(lang(), superLangMap()));
         }
         return n;
     }

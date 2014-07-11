@@ -66,12 +66,12 @@ public class JL5Scheduler extends JLScheduler {
 
     public Goal AnnotationsResolved(ParsedClassType ct) {
         Goal g = AnnotationsResolved.create(this, ct);
-        return this.internGoal(g);
+        return internGoal(g);
     }
 
     public Goal AnnotationsResolved(Job job) {
         Goal g = AnnotationsResolved.create(this, job);
-        return this.internGoal(g);
+        return internGoal(g);
     }
 
     public Goal CastsInserted(Job job) {
@@ -89,7 +89,7 @@ public class JL5Scheduler extends JLScheduler {
         catch (CyclicDependencyException e) {
             throw new InternalCompilerError(e);
         }
-        return this.internGoal(g);
+        return internGoal(g);
 
     }
 
@@ -107,7 +107,7 @@ public class JL5Scheduler extends JLScheduler {
         catch (CyclicDependencyException e) {
             throw new InternalCompilerError(e);
         }
-        return this.internGoal(g);
+        return internGoal(g);
 
     }
 
@@ -124,7 +124,7 @@ public class JL5Scheduler extends JLScheduler {
         catch (CyclicDependencyException e) {
             throw new InternalCompilerError(e);
         }
-        return this.internGoal(g);
+        return internGoal(g);
 
     }
 
@@ -138,7 +138,7 @@ public class JL5Scheduler extends JLScheduler {
         catch (CyclicDependencyException e) {
             throw new InternalCompilerError(e);
         }
-        return this.internGoal(g);
+        return internGoal(g);
     }
 
     public Goal SimplifyExpressionsForBoxing(Job job) {
@@ -151,7 +151,7 @@ public class JL5Scheduler extends JLScheduler {
         catch (CyclicDependencyException e) {
             throw new InternalCompilerError(e);
         }
-        return this.internGoal(g);
+        return internGoal(g);
     }
 
     public Goal RemoveEnums(Job job) {
@@ -167,7 +167,7 @@ public class JL5Scheduler extends JLScheduler {
         catch (CyclicDependencyException e) {
             throw new InternalCompilerError(e);
         }
-        return this.internGoal(g);
+        return internGoal(g);
     }
 
     public Goal RemoveVarArgsFlags(Job job) {
@@ -181,7 +181,7 @@ public class JL5Scheduler extends JLScheduler {
         catch (CyclicDependencyException e) {
             throw new InternalCompilerError(e);
         }
-        return this.internGoal(g);
+        return internGoal(g);
     }
 
     public Goal RemoveExtendedFors(Job job) {
@@ -194,7 +194,7 @@ public class JL5Scheduler extends JLScheduler {
         catch (CyclicDependencyException e) {
             throw new InternalCompilerError(e);
         }
-        return this.internGoal(g);
+        return internGoal(g);
 
     }
 
@@ -208,7 +208,7 @@ public class JL5Scheduler extends JLScheduler {
         catch (CyclicDependencyException e) {
             throw new InternalCompilerError(e);
         }
-        return this.internGoal(g);
+        return internGoal(g);
 
     }
 
@@ -223,7 +223,7 @@ public class JL5Scheduler extends JLScheduler {
         catch (CyclicDependencyException e) {
             throw new InternalCompilerError(e);
         }
-        return this.internGoal(g);
+        return internGoal(g);
 
     }
 
@@ -284,22 +284,23 @@ public class JL5Scheduler extends JLScheduler {
         catch (CyclicDependencyException e) {
             throw new InternalCompilerError(e);
         }
-        return this.internGoal(g);
+        return internGoal(g);
 
     }
 
     public Goal TypeClosure(Job job) {
+        NodeFactory nf = extInfo.nodeFactory();
         Goal g =
                 internGoal(new VisitorGoal(job,
-                                           new polyglot.visit.TypeClosure(extInfo.nodeFactory()
-                                                                                 .lang())));
+                                           new polyglot.visit.TypeClosure(nf.lang(),
+                                                                          nf.superLangMap())));
         try {
             g.addPrerequisiteGoal(TypeChecked(job), this);
         }
         catch (CyclicDependencyException e) {
             throw new InternalCompilerError(e);
         }
-        return this.internGoal(g);
+        return internGoal(g);
     }
 
     @Override
@@ -307,7 +308,7 @@ public class JL5Scheduler extends JLScheduler {
         Options opts = extInfo.getOptions();
         if (opts instanceof JL5Options && ((JL5Options) opts).removeJava5isms) {
             Goal g =
-                    (((JL5Options) opts).skip524checks)
+                    ((JL5Options) opts).skip524checks
                             ? JL5CodeGenerated.create(this, job)
                             : new EmptyGoal(job, "CodeGenerated");
             try {
@@ -330,7 +331,7 @@ public class JL5Scheduler extends JLScheduler {
         catch (CyclicDependencyException e) {
             throw new InternalCompilerError(e);
         }
-        return this.internGoal(g);
+        return internGoal(g);
     }
 
     @Override
@@ -400,7 +401,7 @@ public class JL5Scheduler extends JLScheduler {
         catch (CyclicDependencyException e) {
             throw new InternalCompilerError(e);
         }
-        return this.internGoal(g);
+        return internGoal(g);
     }
 
 }

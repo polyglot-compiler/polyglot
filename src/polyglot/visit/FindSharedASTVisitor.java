@@ -32,6 +32,7 @@ import java.util.List;
 import java.util.Map;
 
 import polyglot.ast.JLang;
+import polyglot.ast.Lang;
 import polyglot.ast.Node;
 import polyglot.util.InternalCompilerError;
 
@@ -43,15 +44,15 @@ public class FindSharedASTVisitor extends NodeVisitor {
     private Map<Node, NodeStack> seenNodes = new HashMap<>();
     private NodeStack currentStack;
 
-    public FindSharedASTVisitor(JLang lang) {
-        super(lang);
+    public FindSharedASTVisitor(JLang lang, Map<Lang, Lang> superLangMap) {
+        super(lang, superLangMap);
     }
 
     @Override
     public NodeVisitor enter(Node n) {
-        this.currentStack = new NodeStack(n, this.currentStack);
+        currentStack = new NodeStack(n, currentStack);
         if (seenNodes.containsKey(n)) {
-            alreadySeenNode(n, seenNodes.get(n), this.currentStack);
+            alreadySeenNode(n, seenNodes.get(n), currentStack);
         }
         else {
             seenNodes.put(n, currentStack);
@@ -68,7 +69,7 @@ public class FindSharedASTVisitor extends NodeVisitor {
     protected void alreadySeenNode(Node n, NodeStack stack1, NodeStack stack2) {
         Node m = findCommonParent(stack1, stack2);
         if (m != null) {
-            lang().prettyPrint(m, lang(), System.err);
+            m.prettyPrint(lang(), superLangMap(), System.err);
         }
 
         throw new InternalCompilerError("Already seen node " + n + " ("
@@ -108,8 +109,8 @@ public class FindSharedASTVisitor extends NodeVisitor {
 
     @Override
     public Node leave(Node old, Node n, NodeVisitor v) {
-        if (this.currentStack != null) {
-            this.currentStack = this.currentStack.rest;
+        if (currentStack != null) {
+            currentStack = currentStack.rest;
         }
         return n;
     }
@@ -125,7 +126,7 @@ public class FindSharedASTVisitor extends NodeVisitor {
 
         NodeStack(Node n) {
             this.n = n;
-            this.rest = null;
+            rest = null;
         }
 
         @Override

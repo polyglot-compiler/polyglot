@@ -29,7 +29,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import polyglot.ast.Lang;
 import polyglot.types.ClassType;
 import polyglot.types.Context;
 import polyglot.types.Context_c;
@@ -58,8 +57,8 @@ public class JL5Context_c extends Context_c implements JL5Context {
     public static final Kind SWITCH = new Kind("switch");
     public static final Kind EXTENDS = new Kind("extends");
 
-    public JL5Context_c(Lang lang, TypeSystem ts) {
-        super(lang, ts);
+    public JL5Context_c(TypeSystem ts) {
+        super(ts);
     }
 
     @Override
@@ -240,14 +239,14 @@ public class JL5Context_c extends Context_c implements JL5Context {
         catch (SemanticException e) {
             // couldn't find the method.
             // try static imports.
-            JL5ImportTable it = (JL5ImportTable) this.importTable();
-            if (it != null && this.currentClass() != null) {
+            JL5ImportTable it = (JL5ImportTable) importTable();
+            if (it != null && currentClass() != null) {
                 for (ReferenceType rt : it.findTypesContainingMethodOrField(name)) {
                     try {
                         return ts.findMethod(rt,
                                              name,
                                              argTypes,
-                                             this.currentClass(),
+                                             currentClass(),
                                              false);
                     }
                     catch (SemanticException f) {
@@ -264,12 +263,12 @@ public class JL5Context_c extends Context_c implements JL5Context {
 
     @Override
     public boolean inExtendsClause() {
-        return this.kind == EXTENDS;
+        return kind == EXTENDS;
     }
 
     @Override
     public ClassType extendsClauseDeclaringClass() {
-        return this.declaringClass;
+        return declaringClass;
     }
 
 }

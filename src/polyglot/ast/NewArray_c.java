@@ -43,6 +43,7 @@ import polyglot.visit.AscriptionVisitor;
 import polyglot.visit.CFGBuilder;
 import polyglot.visit.NodeVisitor;
 import polyglot.visit.PrettyPrinter;
+import polyglot.visit.Traverser;
 import polyglot.visit.TypeChecker;
 
 /**
@@ -61,20 +62,14 @@ public class NewArray_c extends Expr_c implements NewArray {
     protected int addDims;
     protected ArrayInit init;
 
-//    @Deprecated
     public NewArray_c(Position pos, TypeNode baseType, List<Expr> dims,
             int addDims, ArrayInit init) {
-        this(pos, baseType, dims, addDims, init, null);
-    }
-
-    public NewArray_c(Position pos, TypeNode baseType, List<Expr> dims,
-            int addDims, ArrayInit init, Ext ext) {
-        super(pos, ext);
-        assert (baseType != null && dims != null); // init may be null
-        assert (addDims >= 0);
-        assert (!dims.isEmpty() || init != null); // dims may be empty only if there is an initializer
-        assert (addDims > 0 || init == null); // init may be non-null only if addDims > 0
-        assert (dims.size() + addDims > 0); // must allocate something
+        super(pos);
+        assert baseType != null && dims != null; // init may be null
+        assert addDims >= 0;
+        assert !dims.isEmpty() || init != null; // dims may be empty only if there is an initializer
+        assert addDims > 0 || init == null; // init may be non-null only if addDims > 0
+        assert dims.size() + addDims > 0; // must allocate something
 
         this.baseType = baseType;
         this.dims = ListUtil.copy(dims, true);
@@ -84,7 +79,7 @@ public class NewArray_c extends Expr_c implements NewArray {
 
     @Override
     public TypeNode baseType() {
-        return this.baseType;
+        return baseType;
     }
 
     @Override
@@ -101,7 +96,7 @@ public class NewArray_c extends Expr_c implements NewArray {
 
     @Override
     public List<Expr> dims() {
-        return this.dims;
+        return dims;
     }
 
     @Override
@@ -123,7 +118,7 @@ public class NewArray_c extends Expr_c implements NewArray {
 
     @Override
     public int additionalDims() {
-        return this.addDims;
+        return addDims;
     }
 
     @Override
@@ -140,7 +135,7 @@ public class NewArray_c extends Expr_c implements NewArray {
 
     @Override
     public ArrayInit init() {
-        return this.init;
+        return init;
     }
 
     @Override
@@ -199,7 +194,7 @@ public class NewArray_c extends Expr_c implements NewArray {
     @Override
     public Type childExpectedType(Expr child, AscriptionVisitor av) {
         if (child == init) {
-            return this.type;
+            return type;
         }
 
         if (this.dims() != null && this.dims().contains(child)) {
@@ -236,7 +231,7 @@ public class NewArray_c extends Expr_c implements NewArray {
     }
 
     @Override
-    public Term firstChild() {
+    public Term firstChild(Traverser v) {
         return baseType;
     }
 
@@ -256,7 +251,7 @@ public class NewArray_c extends Expr_c implements NewArray {
     }
 
     @Override
-    public List<Type> throwTypes(TypeSystem ts) {
+    public List<Type> throwTypes(TypeSystem ts, Traverser v) {
         if (dims != null && !dims.isEmpty()) {
             // if dimension expressions are given, then
             // a NegativeArraySizeException may be thrown.
@@ -273,11 +268,7 @@ public class NewArray_c extends Expr_c implements NewArray {
 
     @Override
     public Node copy(NodeFactory nf) {
-        return nf.NewArray(this.position,
-                           this.baseType,
-                           this.dims,
-                           this.addDims,
-                           this.init);
+        return nf.NewArray(position, baseType, dims, addDims, init);
     }
 
 }

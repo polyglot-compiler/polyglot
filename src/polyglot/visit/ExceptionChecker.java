@@ -32,6 +32,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import polyglot.ast.JLang;
+import polyglot.ast.Lang;
 import polyglot.ast.Node;
 import polyglot.ast.NodeFactory;
 import polyglot.frontend.Job;
@@ -88,13 +89,18 @@ public class ExceptionChecker extends ErrorHandlingVisitor {
 
     public ExceptionChecker(Job job, TypeSystem ts, NodeFactory nf) {
         super(job, ts, nf);
-        this.outer = null;
-        this.catchAllThrowable = false;
+        outer = null;
+        catchAllThrowable = false;
     }
 
     @Override
     public JLang lang() {
         return (JLang) super.lang();
+    }
+
+    @Override
+    public JLang superLang(Lang lang) {
+        return (JLang) super.superLang(lang);
     }
 
     public ExceptionChecker push(UncaughtReporter reporter) {
@@ -127,7 +133,7 @@ public class ExceptionChecker extends ErrorHandlingVisitor {
 
     public ExceptionChecker push() {
         throwsSet(); // force an instantiation of the throwsSet.
-        ExceptionChecker ec = (ExceptionChecker) this.visitChildren();
+        ExceptionChecker ec = (ExceptionChecker) visitChildren();
         ec.outer = this;
         ec.catchable = null;
         ec.catchAllThrowable = false;
@@ -170,7 +176,7 @@ public class ExceptionChecker extends ErrorHandlingVisitor {
             boolean isAncestor = false;
             ExceptionChecker ec = inner;
             while (!isAncestor && ec != null) {
-                isAncestor = isAncestor || (ec == this);
+                isAncestor = isAncestor || ec == this;
                 ec = ec.outer;
             }
             if (!isAncestor) {
@@ -224,10 +230,10 @@ public class ExceptionChecker extends ErrorHandlingVisitor {
     }
 
     public SubtypeSet throwsSet() {
-        if (this.throwsSet == null) {
-            this.throwsSet = new SubtypeSet(ts.Throwable());
+        if (throwsSet == null) {
+            throwsSet = new SubtypeSet(ts.Throwable());
         }
-        return this.throwsSet;
+        return throwsSet;
     }
 
     protected void reportUncaughtException(Type t, Position pos)

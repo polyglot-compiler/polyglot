@@ -37,7 +37,7 @@ public class JL5NewArrayExt extends JL5ExprExt {
 
     @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
-        NewArray n = (NewArray) superLang().typeCheck(this.node(), tc);
+        NewArray n = (NewArray) tc.superLang(lang()).typeCheck(this.node(), tc);
         JL5TypeSystem ts = (JL5TypeSystem) tc.typeSystem();
         if (!ts.isReifiable(n.type())) {
             throw new SemanticException("The base type of an array must be reifiable.",

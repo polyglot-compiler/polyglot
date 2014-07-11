@@ -39,6 +39,7 @@ import polyglot.visit.CFGBuilder;
 import polyglot.visit.FlowGraph;
 import polyglot.visit.NodeVisitor;
 import polyglot.visit.PrettyPrinter;
+import polyglot.visit.Traverser;
 import polyglot.visit.TypeChecker;
 
 /**
@@ -51,14 +52,9 @@ public class Unary_c extends Expr_c implements Unary {
     protected Unary.Operator op;
     protected Expr expr;
 
-//    @Deprecated
     public Unary_c(Position pos, Unary.Operator op, Expr expr) {
-        this(pos, op, expr, null);
-    }
-
-    public Unary_c(Position pos, Unary.Operator op, Expr expr, Ext ext) {
-        super(pos, ext);
-        assert (op != null && expr != null);
+        super(pos);
+        assert op != null && expr != null;
         this.op = op;
         this.expr = expr;
     }
@@ -70,7 +66,7 @@ public class Unary_c extends Expr_c implements Unary {
 
     @Override
     public Expr expr() {
-        return this.expr;
+        return expr;
     }
 
     @Override
@@ -87,7 +83,7 @@ public class Unary_c extends Expr_c implements Unary {
 
     @Override
     public Unary.Operator operator() {
-        return this.op;
+        return op;
     }
 
     @Override
@@ -243,7 +239,7 @@ public class Unary_c extends Expr_c implements Unary {
     }
 
     @Override
-    public Term firstChild() {
+    public Term firstChild(Traverser v) {
         return expr;
     }
 
@@ -266,66 +262,66 @@ public class Unary_c extends Expr_c implements Unary {
     }
 
     @Override
-    public boolean constantValueSet(Lang lang) {
-        return lang.constantValueSet(expr, lang);
+    public boolean constantValueSet(Traverser v) {
+        return v.lang().constantValueSet(expr, v);
     }
 
     @Override
-    public boolean isConstant(Lang lang) {
+    public boolean isConstant(Traverser v) {
         if (op == POST_INC || op == POST_DEC || op == PRE_INC || op == PRE_DEC) {
             return false;
         }
-        return lang.isConstant(expr, lang);
+        return v.lang().isConstant(expr, v);
     }
 
     @Override
-    public Object constantValue(Lang lang) {
-        if (!lang.isConstant(this, lang)) {
+    public Object constantValue(Traverser v) {
+        if (!v.lang().isConstant(this, v)) {
             return null;
         }
 
-        Object v = lang.constantValue(expr, lang);
+        Object val = v.lang().constantValue(expr, v);
 
-        if (v instanceof Boolean) {
-            boolean vv = ((Boolean) v).booleanValue();
+        if (val instanceof Boolean) {
+            boolean vv = ((Boolean) val).booleanValue();
             if (op == NOT) return Boolean.valueOf(!vv);
         }
-        if (v instanceof Double) {
-            double vv = ((Double) v).doubleValue();
+        if (val instanceof Double) {
+            double vv = ((Double) val).doubleValue();
             if (op == POS) return new Double(+vv);
             if (op == NEG) return new Double(-vv);
         }
-        if (v instanceof Float) {
-            float vv = ((Float) v).floatValue();
+        if (val instanceof Float) {
+            float vv = ((Float) val).floatValue();
             if (op == POS) return new Float(+vv);
             if (op == NEG) return new Float(-vv);
         }
-        if (v instanceof Long) {
-            long vv = ((Long) v).longValue();
+        if (val instanceof Long) {
+            long vv = ((Long) val).longValue();
             if (op == BIT_NOT) return new Long(~vv);
             if (op == POS) return new Long(+vv);
             if (op == NEG) return new Long(-vv);
         }
-        if (v instanceof Integer) {
-            int vv = ((Integer) v).intValue();
+        if (val instanceof Integer) {
+            int vv = ((Integer) val).intValue();
             if (op == BIT_NOT) return new Integer(~vv);
             if (op == POS) return new Integer(+vv);
             if (op == NEG) return new Integer(-vv);
         }
-        if (v instanceof Character) {
-            char vv = ((Character) v).charValue();
+        if (val instanceof Character) {
+            char vv = ((Character) val).charValue();
             if (op == BIT_NOT) return new Integer(~vv);
             if (op == POS) return new Integer(+vv);
             if (op == NEG) return new Integer(-vv);
         }
-        if (v instanceof Short) {
-            short vv = ((Short) v).shortValue();
+        if (val instanceof Short) {
+            short vv = ((Short) val).shortValue();
             if (op == BIT_NOT) return new Integer(~vv);
             if (op == POS) return new Integer(+vv);
             if (op == NEG) return new Integer(-vv);
         }
-        if (v instanceof Byte) {
-            byte vv = ((Byte) v).byteValue();
+        if (val instanceof Byte) {
+            byte vv = ((Byte) val).byteValue();
             if (op == BIT_NOT) return new Integer(~vv);
             if (op == POS) return new Integer(+vv);
             if (op == NEG) return new Integer(-vv);
@@ -337,7 +333,7 @@ public class Unary_c extends Expr_c implements Unary {
 
     @Override
     public Node copy(NodeFactory nf) {
-        return nf.Unary(this.position, this.op, this.expr);
+        return nf.Unary(position, op, expr);
     }
 
 }

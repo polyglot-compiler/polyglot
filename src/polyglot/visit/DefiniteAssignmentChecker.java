@@ -214,18 +214,17 @@ public class DefiniteAssignmentChecker extends
         @Override
         public boolean equals(Object o) {
             if (o instanceof AssignmentStatus) {
-                return this.definitelyAssigned == ((AssignmentStatus) o).definitelyAssigned
-                        && this.definitelyUnassigned == ((AssignmentStatus) o).definitelyUnassigned;
+                return definitelyAssigned == ((AssignmentStatus) o).definitelyAssigned
+                        && definitelyUnassigned == ((AssignmentStatus) o).definitelyUnassigned;
             }
             return false;
         }
 
         @Override
         public String toString() {
-            return "["
-                    + (this.definitelyAssigned ? "definitely assigned " : "")
-                    + (this.definitelyUnassigned
-                            ? "definitely unassigned " : "") + "]";
+            return "[" + (definitelyAssigned ? "definitely assigned " : "")
+                    + (definitelyUnassigned ? "definitely unassigned " : "")
+                    + "]";
         }
 
         public static AssignmentStatus join(AssignmentStatus as1,
@@ -261,14 +260,14 @@ public class DefiniteAssignmentChecker extends
         public final boolean normalTermination;
 
         FlowItem(Map<VarInstance, AssignmentStatus> m) {
-            this.assignmentStatus = Collections.unmodifiableMap(m);
-            this.normalTermination = true;
+            assignmentStatus = Collections.unmodifiableMap(m);
+            normalTermination = true;
         }
 
         FlowItem(Map<VarInstance, AssignmentStatus> m,
                 boolean canTerminateNormally) {
-            this.assignmentStatus = Collections.unmodifiableMap(m);
-            this.normalTermination = canTerminateNormally;
+            assignmentStatus = Collections.unmodifiableMap(m);
+            normalTermination = canTerminateNormally;
         }
 
         @Override
@@ -279,14 +278,14 @@ public class DefiniteAssignmentChecker extends
         @Override
         public boolean equals(Object o) {
             if (o instanceof FlowItem) {
-                return this.assignmentStatus.equals(((FlowItem) o).assignmentStatus);
+                return assignmentStatus.equals(((FlowItem) o).assignmentStatus);
             }
             return false;
         }
 
         @Override
         public int hashCode() {
-            return (assignmentStatus.hashCode());
+            return assignmentStatus.hashCode();
         }
 
     }
@@ -553,7 +552,8 @@ public class DefiniteAssignmentChecker extends
     @Override
     protected CFGBuilder<FlowItem> createCFGBuilder(TypeSystem ts,
             FlowGraph<FlowItem> g) {
-        CFGBuilder<FlowItem> v = new CFGBuilder<>(lang(), ts, g, this);
+        CFGBuilder<FlowItem> v =
+                new CFGBuilder<>(lang(), superLangMap(), ts, g, this);
         // skip dead loops bodies and dead if branches. See JLS 2nd edition, Section 16.
 //        v = v.skipDeadIfBranches(true);
 //        v = v.skipDeadLoopBodies(true);
@@ -628,7 +628,7 @@ public class DefiniteAssignmentChecker extends
     protected Map<EdgeKey, FlowItem> flow(List<FlowItem> inItems,
             List<EdgeKey> inItemKeys, FlowGraph<FlowItem> graph,
             Peer<FlowItem> peer) {
-        return this.flowToBooleanFlow(inItems, inItemKeys, graph, peer);
+        return flowToBooleanFlow(inItems, inItemKeys, graph, peer);
     }
 
     /**
@@ -735,8 +735,8 @@ public class DefiniteAssignmentChecker extends
         }
         if (n instanceof Expr) {
             Expr e = (Expr) n;
-            if (lang().isConstant(e, lang()) && e.type().isBoolean()) {
-                if (Boolean.TRUE.equals(lang().constantValue(e, lang()))) {
+            if (lang().isConstant(e, this) && e.type().isBoolean()) {
+                if (Boolean.TRUE.equals(lang().constantValue(e, this))) {
                     // the false branch is dead
                     ret =
                             remap(ret,

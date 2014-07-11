@@ -38,6 +38,7 @@ import polyglot.visit.AscriptionVisitor;
 import polyglot.visit.CFGBuilder;
 import polyglot.visit.NodeVisitor;
 import polyglot.visit.PrettyPrinter;
+import polyglot.visit.Traverser;
 import polyglot.visit.TypeChecker;
 
 /**
@@ -51,21 +52,16 @@ public class Synchronized_c extends Stmt_c implements Synchronized {
     protected Expr expr;
     protected Block body;
 
-//    @Deprecated
     public Synchronized_c(Position pos, Expr expr, Block body) {
-        this(pos, expr, body, null);
-    }
-
-    public Synchronized_c(Position pos, Expr expr, Block body, Ext ext) {
-        super(pos, ext);
-        assert (expr != null && body != null);
+        super(pos);
+        assert expr != null && body != null;
         this.expr = expr;
         this.body = body;
     }
 
     @Override
     public Expr expr() {
-        return this.expr;
+        return expr;
     }
 
     @Override
@@ -82,7 +78,7 @@ public class Synchronized_c extends Stmt_c implements Synchronized {
 
     @Override
     public Block body() {
-        return this.body;
+        return body;
     }
 
     @Override
@@ -150,7 +146,7 @@ public class Synchronized_c extends Stmt_c implements Synchronized {
     }
 
     @Override
-    public Term firstChild() {
+    public Term firstChild(Traverser v) {
         return expr;
     }
 
@@ -163,7 +159,7 @@ public class Synchronized_c extends Stmt_c implements Synchronized {
 
     @Override
     public Node copy(NodeFactory nf) {
-        return nf.Synchronized(this.position, this.expr, this.body);
+        return nf.Synchronized(position, expr, body);
     }
 
 }

@@ -62,7 +62,7 @@ public class JL5FieldDeclExt extends JL5AnnotatedElementExt {
     @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
         super.prettyPrint(w, tr);
-        superLang().prettyPrint(node(), w, tr);
+        tr.superLang(lang()).prettyPrint(node(), w, tr);
     }
 
 }

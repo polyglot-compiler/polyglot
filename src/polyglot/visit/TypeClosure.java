@@ -25,15 +25,18 @@
  ******************************************************************************/
 package polyglot.visit;
 
+import java.util.Map;
+
 import polyglot.ast.Call;
 import polyglot.ast.Field;
 import polyglot.ast.JLang;
+import polyglot.ast.Lang;
 import polyglot.ast.New;
 import polyglot.ast.Node;
 
 public class TypeClosure extends NodeVisitor {
-    public TypeClosure(JLang lang) {
-        super(lang);
+    public TypeClosure(JLang lang, Map<Lang, Lang> superLangMap) {
+        super(lang, superLangMap);
     }
 
     @Override

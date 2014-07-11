@@ -36,6 +36,7 @@ import polyglot.util.SerialVersionUID;
 import polyglot.visit.CFGBuilder;
 import polyglot.visit.NodeVisitor;
 import polyglot.visit.PrettyPrinter;
+import polyglot.visit.Traverser;
 import polyglot.visit.TypeChecker;
 
 /**
@@ -48,21 +49,16 @@ public class Labeled_c extends Stmt_c implements Labeled {
     protected Id label;
     protected Stmt statement;
 
-//    @Deprecated
     public Labeled_c(Position pos, Id label, Stmt statement) {
-        this(pos, label, statement, null);
-    }
-
-    public Labeled_c(Position pos, Id label, Stmt statement, Ext ext) {
-        super(pos, ext);
-        assert (label != null && statement != null);
+        super(pos);
+        assert label != null && statement != null;
         this.label = label;
         this.statement = statement;
     }
 
     @Override
     public Id labelNode() {
-        return this.label;
+        return label;
     }
 
     @Override
@@ -79,7 +75,7 @@ public class Labeled_c extends Stmt_c implements Labeled {
 
     @Override
     public String label() {
-        return this.label.id();
+        return label.id();
     }
 
     @Override
@@ -89,7 +85,7 @@ public class Labeled_c extends Stmt_c implements Labeled {
 
     @Override
     public Stmt statement() {
-        return this.statement;
+        return statement;
     }
 
     @Override
@@ -124,9 +120,9 @@ public class Labeled_c extends Stmt_c implements Labeled {
     }
 
     @Override
-    public Context enterChildScope(Node child, Context c) {
+    public Context enterChildScope(Node child, Context c, Traverser v) {
         c = c.pushLabel(label.id());
-        return super.enterChildScope(child, c);
+        return super.enterChildScope(child, c, v);
     }
 
     @Override
@@ -152,7 +148,7 @@ public class Labeled_c extends Stmt_c implements Labeled {
     }
 
     @Override
-    public Term firstChild() {
+    public Term firstChild(Traverser v) {
         return statement;
     }
 
@@ -164,7 +160,7 @@ public class Labeled_c extends Stmt_c implements Labeled {
 
     @Override
     public Node copy(NodeFactory nf) {
-        return nf.Labeled(this.position, this.label, this.statement);
+        return nf.Labeled(position, label, statement);
     }
 
 }

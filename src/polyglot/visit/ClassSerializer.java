@@ -71,10 +71,10 @@ public class ClassSerializer extends NodeVisitor {
 
     public ClassSerializer(TypeSystem ts, NodeFactory nf, long time,
             ErrorQueue eq, Version ver) {
-        super(nf.lang());
+        super(nf.lang(), nf.superLangMap());
         this.ts = ts;
         this.nf = nf;
-        this.te = new TypeEncoder(ts);
+        te = new TypeEncoder(ts);
         this.eq = eq;
         this.time = time;
         this.ver = ver;
@@ -208,7 +208,7 @@ public class ClassSerializer extends NodeVisitor {
                 }
                 // add an additional suffix to distinguish fields.
                 String additionalFieldSuffix =
-                        numberETIFields == 0 ? "" : ("$" + numberETIFields);
+                        numberETIFields == 0 ? "" : "$" + numberETIFields;
                 String encoded = encodedTypeInfo.substring(etiStart, etiEnd);
                 fi =
                         ts.fieldInstance(pos,

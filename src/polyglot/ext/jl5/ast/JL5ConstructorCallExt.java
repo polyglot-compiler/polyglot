@@ -52,6 +52,7 @@ import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
 import polyglot.visit.AmbiguityRemover;
 import polyglot.visit.PrettyPrinter;
+import polyglot.visit.Traverser;
 import polyglot.visit.TypeChecker;
 
 public class JL5ConstructorCallExt extends JL5ProcedureCallExt {
@@ -78,11 +79,11 @@ public class JL5ConstructorCallExt extends JL5ProcedureCallExt {
     protected boolean isEnumConstructorCall;
 
     public boolean isEnumConstructorCall() {
-        return this.isEnumConstructorCall;
+        return isEnumConstructorCall;
     }
 
     @Override
-    public Context enterScope(Context c) {
+    public Context enterScope(Context c, Traverser v) {
         return ((JL5Context) c).pushCTORCall();
     }
 
@@ -103,10 +104,10 @@ public class JL5ConstructorCallExt extends JL5ProcedureCallExt {
                 cc = (ConstructorCall) cc.arguments(args);
                 ext = (JL5ConstructorCallExt) JL5Ext.ext(cc);
                 ext.isEnumConstructorCall = true;
-                return superLang().disambiguate(cc, ar);
+                return ar.superLang(lang()).disambiguate(cc, ar);
             }
         }
-        return superLang().disambiguate(this.node(), ar);
+        return ar.superLang(lang()).disambiguate(this.node(), ar);
     }
 
     @Override

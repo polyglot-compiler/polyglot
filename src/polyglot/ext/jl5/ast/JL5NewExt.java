@@ -32,7 +32,6 @@ import java.util.Map;
 
 import polyglot.ast.Expr;
 import polyglot.ast.JLang;
-import polyglot.ast.Lang;
 import polyglot.ast.New;
 import polyglot.ast.NewOps;
 import polyglot.ast.Node;
@@ -56,6 +55,7 @@ import polyglot.util.InternalCompilerError;
 import polyglot.util.SerialVersionUID;
 import polyglot.visit.AmbiguityRemover;
 import polyglot.visit.PrettyPrinter;
+import polyglot.visit.Traverser;
 import polyglot.visit.TypeChecker;
 
 public class JL5NewExt extends JL5ProcedureCallExt implements NewOps {
@@ -77,7 +77,10 @@ public class JL5NewExt extends JL5ProcedureCallExt implements NewOps {
     @Override
     public Node disambiguateOverride(Node parent, AmbiguityRemover ar)
             throws SemanticException {
-        New n = (New) superLang().disambiguateOverride(this.node(), parent, ar);
+        New n =
+                (New) ar.superLang(lang()).disambiguateOverride(this.node(),
+                                                                parent,
+                                                                ar);
         // now do the type args
         n = typeArgs(n, visitList(typeArgs, ar));
         return n;
@@ -124,10 +127,10 @@ public class JL5NewExt extends JL5ProcedureCallExt implements NewOps {
                         + " since it is not static");
             }
         }
-        return superLang().findQualifiedTypeNode(this.node(),
-                                                 ar,
-                                                 outer,
-                                                 objectType);
+        return ar.superLang(lang()).findQualifiedTypeNode(this.node(),
+                                                          ar,
+                                                          outer,
+                                                          objectType);
     }
 
     @Override
@@ -136,7 +139,7 @@ public class JL5NewExt extends JL5ProcedureCallExt implements NewOps {
         // Call super.findQualifier in order to perform its checks, but throw away the
         // qualifier that it finds. That is, just return this node. Do not attempt to infer 
         // a qualifier if one is missing.
-        superLang().findQualifier(this.node(), ar, ct);
+        ar.superLang(lang()).findQualifier(this.node(), ar, ct);
         return this.node().qualifier();
     }
 
@@ -158,8 +161,8 @@ public class JL5NewExt extends JL5ProcedureCallExt implements NewOps {
 
         List<ReferenceType> actualTypeArgs = actualTypeArgs();
 
-        superLang().typeCheckFlags(this.node(), tc);
-        superLang().typeCheckNested(this.node(), tc);
+        tc.superLang(lang()).typeCheckFlags(this.node(), tc);
+        tc.superLang(lang()).typeCheckNested(this.node(), tc);
 
         if (n.body() != null) {
             ts.checkClassConformance(n.anonType());
@@ -174,8 +177,8 @@ public class JL5NewExt extends JL5ProcedureCallExt implements NewOps {
                 JL5SubstClassType sct = (JL5SubstClassType) outer;
                 ct = (ClassType) sct.subst().substType(ct);
             }
-            else if (n.qualifier() == null
-                    || (n.qualifier() instanceof Special && ((Special) n.qualifier()).kind() == Special.THIS)) {
+            else if (n.qualifier() == null || n.qualifier() instanceof Special
+                    && ((Special) n.qualifier()).kind() == Special.THIS) {
                 ct = ts5.instantiateInnerClassFromContext(tc.context(), ct);
             }
             else if (n.qualifier().type() instanceof JL5SubstClassType) {
@@ -237,7 +240,7 @@ public class JL5NewExt extends JL5ProcedureCallExt implements NewOps {
     }
 
     @Override
-    public ClassType findEnclosingClass(Context c, ClassType ct) {
+    public ClassType findEnclosingClass(Context c, ClassType ct, Traverser v) {
         New n = this.node();
 
         if (ct == n.anonType()) {
@@ -315,23 +318,23 @@ public class JL5NewExt extends JL5ProcedureCallExt implements NewOps {
 
     @Override
     public void typeCheckFlags(TypeChecker tc) throws SemanticException {
-        superLang().typeCheckFlags(this.node(), tc);
+        tc.superLang(lang()).typeCheckFlags(this.node(), tc);
     }
 
     @Override
     public void typeCheckNested(TypeChecker tc) throws SemanticException {
-        superLang().typeCheckNested(this.node(), tc);
+        tc.superLang(lang()).typeCheckNested(this.node(), tc);
     }
 
     @Override
     public void printQualifier(CodeWriter w, PrettyPrinter tr) {
-        superLang().printQualifier(this.node(), w, tr);
+        ((JLang) tr.superLang(lang())).printQualifier(this.node(), w, tr);
     }
 
     @Override
     public void printShortObjectType(CodeWriter w, PrettyPrinter tr) {
         New n = this.node();
-        superLang().printShortObjectType(n, w, tr);
+        ((JLang) tr.superLang(lang())).printShortObjectType(n, w, tr);
         ClassType ct = n.objectType().type().toClass();
         if (ct instanceof JL5SubstClassType) {
             JL5SubstClassType jsct = (JL5SubstClassType) ct;
@@ -341,21 +344,21 @@ public class JL5NewExt extends JL5ProcedureCallExt implements NewOps {
 
     @Override
     public void printBody(CodeWriter w, PrettyPrinter tr) {
-        superLang().printBody(this.node(), w, tr);
+        ((JLang) tr.superLang(lang())).printBody(this.node(), w, tr);
     }
 
     @Override
-    public boolean constantValueSet(Lang lang) {
-        return superLang().constantValueSet(node(), lang);
+    public boolean constantValueSet(Traverser v) {
+        return v.superLang(lang()).constantValueSet(node(), v);
     }
 
     @Override
-    public boolean isConstant(Lang lang) {
-        return superLang().isConstant(node(), lang);
+    public boolean isConstant(Traverser v) {
+        return v.superLang(lang()).isConstant(node(), v);
     }
 
     @Override
-    public Object constantValue(Lang lang) {
-        return superLang().constantValue(node(), lang);
+    public Object constantValue(Traverser v) {
+        return v.superLang(lang()).constantValue(node(), v);
     }
 }

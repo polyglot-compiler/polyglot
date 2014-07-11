@@ -33,6 +33,7 @@ import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
 import polyglot.visit.CFGBuilder;
 import polyglot.visit.PrettyPrinter;
+import polyglot.visit.Traverser;
 
 /**
  * {@code Empty} is the class for a empty statement {@code (;)}.
@@ -40,13 +41,8 @@ import polyglot.visit.PrettyPrinter;
 public class Empty_c extends Stmt_c implements Empty {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
-//    @Deprecated
     public Empty_c(Position pos) {
-        this(pos, null);
-    }
-
-    public Empty_c(Position pos, Ext ext) {
-        super(pos, ext);
+        super(pos);
     }
 
     @Override
@@ -55,7 +51,7 @@ public class Empty_c extends Stmt_c implements Empty {
     }
 
     @Override
-    public Term firstChild() {
+    public Term firstChild(Traverser v) {
         return null;
     }
 
@@ -71,7 +67,7 @@ public class Empty_c extends Stmt_c implements Empty {
 
     @Override
     public Node copy(NodeFactory nf) {
-        return nf.Empty(this.position);
+        return nf.Empty(position);
     }
 
 }

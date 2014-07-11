@@ -45,6 +45,7 @@ import polyglot.visit.ConstantChecker;
 import polyglot.visit.ExceptionChecker;
 import polyglot.visit.NodeVisitor;
 import polyglot.visit.PrettyPrinter;
+import polyglot.visit.Traverser;
 import polyglot.visit.TypeChecker;
 
 /**
@@ -165,7 +166,7 @@ public interface JLang extends Lang {
      * List of Types of exceptions that might get thrown.  The result is
      * not necessarily correct until after type checking. 
      */
-    List<Type> throwTypes(Node n, TypeSystem ts);
+    List<Type> throwTypes(Node n, TypeSystem ts, Traverser v);
 
     // CallOps
 
@@ -176,7 +177,7 @@ public interface JLang extends Lang {
      */
     Type findContainer(Call n, TypeSystem ts, MethodInstance mi);
 
-    ReferenceType findTargetType(Call n) throws SemanticException;
+    ReferenceType findTargetType(Call n, Traverser v) throws SemanticException;
 
     /**
     * Typecheck the Call when the target is null. This method finds
@@ -194,23 +195,22 @@ public interface JLang extends Lang {
 
     void prettyPrintFooter(ClassDecl n, CodeWriter w, PrettyPrinter tr);
 
-    Node addDefaultConstructor(ClassDecl n, TypeSystem ts, NodeFactory nf,
-            ConstructorInstance defaultConstructorInstance)
-            throws SemanticException;
+    Node addDefaultConstructor(ClassDecl n, ConstructorInstance defaultCI,
+            AmbiguityRemover ar) throws SemanticException;
 
     // LoopOps
 
     /** Returns true of cond() evaluates to a constant. */
-    boolean condIsConstant(Loop n, JLang lang);
+    boolean condIsConstant(Loop n, Traverser v);
 
     /** Returns true if cond() is a constant that evaluates to true. */
-    boolean condIsConstantTrue(Loop n, JLang lang);
+    boolean condIsConstantTrue(Loop n, Traverser v);
 
     /** Returns true if cond() is a constant that evaluates to false. */
-    boolean condIsConstantFalse(Loop n, JLang lang);
+    boolean condIsConstantFalse(Loop n, Traverser v);
 
     /** Target of a continue statement in the loop body. */
-    Term continueTarget(Loop n);
+    Term continueTarget(Loop n, Traverser v);
 
     // NewOps
 
@@ -219,6 +219,8 @@ public interface JLang extends Lang {
 
     Expr findQualifier(New n, AmbiguityRemover ar, ClassType ct)
             throws SemanticException;
+
+    ClassType findEnclosingClass(New n, Context c, ClassType ct, Traverser v);
 
     void typeCheckFlags(New n, TypeChecker tc) throws SemanticException;
 
@@ -229,8 +231,6 @@ public interface JLang extends Lang {
     void printShortObjectType(New n, CodeWriter w, PrettyPrinter tr);
 
     void printBody(New n, CodeWriter w, PrettyPrinter tr);
-
-    ClassType findEnclosingClass(New n, Context c, ClassType ct);
 
     // ProcedureCallOps
 
@@ -251,7 +251,7 @@ public interface JLang extends Lang {
      * recursively drill down to the innermost subterm. The direct child visited
      * first in this term's dataflow should be returned.
      */
-    Term firstChild(Term n);
+    Term firstChild(Term n, Traverser v);
 
     /**
      * Visit this term in evaluation order, calling v.edge() for each successor

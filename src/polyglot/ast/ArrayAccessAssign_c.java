@@ -35,6 +35,7 @@ import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
 import polyglot.visit.CFGBuilder;
+import polyglot.visit.Traverser;
 
 /**
  * A {@code ArrayAccessAssign_c} represents a Java assignment expression
@@ -47,15 +48,9 @@ import polyglot.visit.CFGBuilder;
 public class ArrayAccessAssign_c extends Assign_c implements ArrayAccessAssign {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
-//    @Deprecated
     public ArrayAccessAssign_c(Position pos, ArrayAccess left, Operator op,
             Expr right) {
-        this(pos, left, op, right, null);
-    }
-
-    public ArrayAccessAssign_c(Position pos, ArrayAccess left, Operator op,
-            Expr right, Ext ext) {
-        super(pos, left, op, right, ext);
+        super(pos, left, op, right);
     }
 
     @Override
@@ -76,7 +71,7 @@ public class ArrayAccessAssign_c extends Assign_c implements ArrayAccessAssign {
     }
 
     @Override
-    public Term firstChild() {
+    public Term firstChild(Traverser v) {
         if (operator() == ASSIGN) {
             return left().array();
         }
@@ -113,8 +108,8 @@ public class ArrayAccessAssign_c extends Assign_c implements ArrayAccessAssign {
     }
 
     @Override
-    public List<Type> throwTypes(TypeSystem ts) {
-        List<Type> l = new ArrayList<>(super.throwTypes(ts));
+    public List<Type> throwTypes(TypeSystem ts, Traverser v) {
+        List<Type> l = new ArrayList<>(super.throwTypes(ts, v));
 
         if (op == ASSIGN && left.type().isReference()) {
             l.add(ts.ArrayStoreException());

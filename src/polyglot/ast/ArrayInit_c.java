@@ -42,6 +42,7 @@ import polyglot.visit.AscriptionVisitor;
 import polyglot.visit.CFGBuilder;
 import polyglot.visit.NodeVisitor;
 import polyglot.visit.PrettyPrinter;
+import polyglot.visit.Traverser;
 import polyglot.visit.TypeChecker;
 
 /**
@@ -55,20 +56,15 @@ public class ArrayInit_c extends Expr_c implements ArrayInit {
 
     protected List<Expr> elements;
 
-//    @Deprecated
     public ArrayInit_c(Position pos, List<Expr> elements) {
-        this(pos, elements, null);
-    }
-
-    public ArrayInit_c(Position pos, List<Expr> elements, Ext ext) {
-        super(pos, ext);
-        assert (elements != null);
+        super(pos);
+        assert elements != null;
         this.elements = ListUtil.copy(elements, true);
     }
 
     @Override
     public List<Expr> elements() {
-        return this.elements;
+        return elements;
     }
 
     @Override
@@ -173,7 +169,7 @@ public class ArrayInit_c extends Expr_c implements ArrayInit {
                     && !ts.typeEquals(s, t)
                     && !ts.numericConversionValid(t,
                                                   tc.lang()
-                                                    .constantValue(e, tc.lang()))) {
+                                                    .constantValue(e, tc))) {
                 throw new SemanticException("Cannot assign " + s + " to " + t
                         + ".", e.position());
             }
@@ -203,7 +199,7 @@ public class ArrayInit_c extends Expr_c implements ArrayInit {
     }
 
     @Override
-    public Term firstChild() {
+    public Term firstChild(Traverser v) {
         return listChild(elements, (Expr) null);
     }
 
@@ -215,6 +211,6 @@ public class ArrayInit_c extends Expr_c implements ArrayInit {
 
     @Override
     public Node copy(NodeFactory nf) {
-        return nf.ArrayInit(this.position, this.elements);
+        return nf.ArrayInit(position, elements);
     }
 }
