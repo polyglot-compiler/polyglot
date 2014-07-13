@@ -288,7 +288,6 @@ public class counterexamples {
 
             }
             if (nsteps == rhslen) {
-
                 Completed c = new Completed();
                 c.history = h[0];
                 return c;
@@ -389,13 +388,19 @@ public class counterexamples {
         StateItem start =
                 new StateItem(lalr_state.startState(), lalr_state.startItem());
 
-        // This is a breadth-first search over the state graph, building
+        // This is a breadth-first search over paths through the state graph, building
         // up paths as we go.
         Path p = new Path(new LinkedList<Step>(), start);
         active.add(p);
+        int pathlen = 0;
         while (!active.isEmpty()) {
             Path p1 = active.removeFirst();
             if (debug) println("Looking at " + p1);
+
+            if (p1.steps.size() != pathlen) {
+                pathlen = p1.steps.size();
+                System.out.println("Considering path of length " + pathlen);
+            }
             StateItem si = p1.last;
 
             lalr_state s = si.state;
@@ -409,15 +414,20 @@ public class counterexamples {
                         if (debug) println("Does contain " + conflict_sym);
 
                         terminal_set look = precise_lookaheads(p1);
+                        // It's important for useful examples to only generate an example if
+                        // the lookahead symbols that can happen _in context_ match the symbols
+                        // on which the conflict is being seen.
 
-                        StateItemCtxt sc = new StateItemCtxt(si, null);
+                        StateItemCtxt sc = new StateItemCtxt(si, look);
                         if (visited.contains(sc)) {
                             println("  Skipping this possible match, we saw it already");
-                            //continue;
+                            continue;
+                            // XXX Don't see how to break out early without possibly
+                            // missing an example. In principle we should hit an example
+                            // eventually, so termination is guaranteed.
                         }
                         visited.add(sc);
 
-                        //XXX what if rest of i_prev is nullable? Need to walk outward more?
                         if (look.contains(conflict_sym)) {
                             if (debug)
                                 println("Outer production does have "
@@ -437,12 +447,13 @@ public class counterexamples {
                 }
             }
             else {
-                StateItemCtxt sc = new StateItemCtxt(si, null);
+                terminal_set look = precise_lookaheads(p1);
+                StateItemCtxt sc = new StateItemCtxt(si, look);
                 if (visited.contains(sc)) {
                     println("  Skipping this one, we saw it already");
                     continue;
                 }
-                //visited.add(sc);
+                visited.add(sc);
             }
             if (debug) println("symbol after dot is " + i.symbol_after_dot());
             /* try taking transitions */
@@ -455,12 +466,7 @@ public class counterexamples {
                     newt.add(new TransStep(si, tr));
                     Path p2 = new Path(newt, new StateItem(tr.to_state(), i2));
                     active.add(p2);
-                    //System.out.println("Adding " + p2);
                 }
-//                else {
-//                    System.out.println("  ignoring transition on "
-//                            + tr.on_symbol());
-//                }
             }
             /* try changing the production (one step of closure) */
             non_terminal nt = i.dot_before_nt();
@@ -486,11 +492,23 @@ public class counterexamples {
     // context.
     static terminal_set precise_lookaheads(Path p) {
         production pr = p.last.item.the_production();
+
         int rhslen = pr.rhs_length();
+        rhslen = p.last.item.dot_pos();
+        System.out.println("item = " + p.last.item + " dotpos = "
+                + p.last.item.dot_pos());
+        if (p.last.item.dot_at_end()) assert rhslen == pr.rhs_length();
         int nsteps = p.steps.size();
+        if (nsteps == rhslen) { // start item
+            terminal_set eof = new terminal_set();
+            eof.add(terminal.EOF);
+            return eof;
+        }
         Produce pstep = (Produce) p.steps.get(nsteps - rhslen - 1);
         lalr_item i_prev = pstep.source.item;
         terminal_set look = i_prev.calc_lookahead(i_prev.lookahead());
+
+        //XXX what if rest of i_prev is nullable? Could walk outward more to replace i_prev.lookahead() with more precise info?
         return look;
     }
 }
