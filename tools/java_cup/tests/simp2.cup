@@ -1,0 +1,38 @@
+terminal Integer DIGIT;
+terminal Token DOT, MEM, ASSIGN;
+non terminal Command goal, statement;
+non terminal Expr expr;
+non terminal Expr number ;
+
+start with goal;
+
+goal ::= statement ;
+
+number ::= DIGIT | number DIGIT ;
+
+statement ::= expr DOT DOT statement statement
+	   | MEM expr ASSIGN expr
+	   ;
+
+expr ::= number
+      ;
+
+/** ideal counterexample would be:
+
+expr DOT DOT MEM expr ASSIGN number (*) DIGIT DOT DOT statement statement
+
+[goal ::=
+  [statement ::=
+    expr DOT DOT [stmt::= MEM expr ASSIGN [expr::= number (*) ]
+        [stmt::= [expr::= [number::= DIGIT] DOT DOT statement statement
+
+vs.
+
+expr DOT DOT MEM expr ASSIGN number (*) DIGIT DIGIT DOT DOT statement statement
+
+[goal ::=
+  [statement ::=
+    expr DOT DOT [stmt::= MEM expr ASSIGN [expr::= number (*) DIGIT ]
+        [stmt::= [expr::= [number::= DIGIT] DOT DOT statement statement
+
+**/
