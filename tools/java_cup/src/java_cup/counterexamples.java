@@ -397,7 +397,7 @@ public class counterexamples {
             Path p1 = active.removeFirst();
             if (debug) println("Looking at " + p1);
 
-            if (p1.steps.size() != pathlen) {
+            if (debug && p1.steps.size() != pathlen) {
                 pathlen = p1.steps.size();
                 System.out.println("Considering path of length " + pathlen);
             }
@@ -495,8 +495,6 @@ public class counterexamples {
 
         int rhslen = pr.rhs_length();
         rhslen = p.last.item.dot_pos();
-        System.out.println("item = " + p.last.item + " dotpos = "
-                + p.last.item.dot_pos());
         if (p.last.item.dot_at_end()) assert rhslen == pr.rhs_length();
         int nsteps = p.steps.size();
         if (nsteps == rhslen) { // start item
