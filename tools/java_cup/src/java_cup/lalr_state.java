@@ -3,6 +3,8 @@ package java_cup;
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.Stack;
 
 /** This class represents a state in the LALR viable prefix recognition machine.
@@ -736,13 +738,21 @@ public class lalr_state {
         message.append("\n");
         /* ACM extension */
         ByteArrayOutputStream ds = new ByteArrayOutputStream();
+        /** conflict_lookaheads is the list of symbols on which the two actions conflict. */
+        Set<terminal> conflict_lookaheads = new HashSet<>();
+        for (int t = 0; t < terminal.number(); t++) {
+            if (itm1.lookahead().contains(t) && itm2.lookahead().contains(t))
+                conflict_lookaheads.add(terminal.find(t));
+        }
+        terminal cs = conflict_lookaheads.iterator().next(); // pick one
         if (Main.report_counterexamples) {
             message.append("    Example:    ");
             counterexamples.report_shortest_path(this,
                                                  itm1,
+                                                 cs,
                                                  message,
                                                  new PrintStream(ds));
-            message.append(" (*)\n    Derivation: ");
+            message.append("\n    Derivation: ");
             errOutput(message, ds);
             message.append(" ] (*)\n\n");
         }
@@ -756,6 +766,7 @@ public class lalr_state {
             message.append("    Example:    ");
             counterexamples.report_shortest_path(this,
                                                  itm2,
+                                                 cs,
                                                  message,
                                                  new PrintStream(ds));
             message.append(" (*)\n    Derivation: ");
@@ -802,18 +813,16 @@ public class lalr_state {
         message.append("\n");
         /* ACM extension */
         ByteArrayOutputStream ds = new ByteArrayOutputStream();
+        terminal cs = terminal.find(conflict_sym);
         if (Main.report_counterexamples) {
             message.append("    Example:    ");
             counterexamples.report_shortest_path(this,
                                                  red_itm,
+                                                 cs,
                                                  message,
                                                  new PrintStream(ds));
-            message.append(" (*) ");
-            message.append(terminal.find(conflict_sym).name());
             message.append("\n    Derivation: ");
             errOutput(message, ds);
-            message.append(" ] (*) ");
-            message.append(terminal.find(conflict_sym).name());
             message.append("\n\n");
         }
         /* end ACM extension */
@@ -837,14 +846,11 @@ public class lalr_state {
                         message.append("    Example:    ");
                         counterexamples.report_shortest_path(this,
                                                              itm,
+                                                             cs,
                                                              message,
                                                              new PrintStream(ds));
-                        message.append(" (*) ");
-                        message.append(right_of_dot(itm));
                         message.append("\n    Derivation: ");
                         errOutput(message, ds);
-                        message.append(" (*) ");
-                        message.append(right_of_dot(itm));
                         message.append("\n\n");
                     }
                     /* end ACM extension */

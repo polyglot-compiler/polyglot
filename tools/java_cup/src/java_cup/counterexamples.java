@@ -9,6 +9,16 @@ import java.util.Set;
 
 public class counterexamples {
 
+    static final boolean debug = false;
+
+    static void println(String s) {
+        if (debug) System.out.println(s);
+    }
+
+    static void println(Object o) {
+        if (debug) System.out.println(o);
+    }
+
     private static class Path {
         Path(LinkedList<Step> t, StateItem si) {
             steps = t;
@@ -21,6 +31,20 @@ public class counterexamples {
         LinkedList<Step> steps;
         /** last is the last state and item reached on the path. */
         StateItem last;
+
+        @Override
+        public String toString() {
+            StringBuilder example_s = new StringBuilder();
+            ByteArrayOutputStream ds = new ByteArrayOutputStream();
+            PrintStream derivation_s = new PrintStream(ds);
+            boolean first = true;
+            for (Step s : steps) {
+                s.appendToReport(example_s, derivation_s, first);
+                first = false;
+            }
+            derivation_s.append("(Final state: " + last.item + ")");
+            return ds.toString();
+        }
     }
 
     private static class Produce extends Step {
@@ -41,7 +65,7 @@ public class counterexamples {
 
         @Override
         public String toString() {
-            return "Produce " + prod;
+            return "Produce " + prod + " from " + super.source.item.toString();
         }
     }
 
@@ -109,6 +133,9 @@ public class counterexamples {
         @Override
         public String toString() {
             StringBuilder ex = new StringBuilder();
+            ex.append("From ");
+            ex.append(source);
+            ex.append(" via ");
             ByteArrayOutputStream ds = new ByteArrayOutputStream();
             appendToReport(ex, new PrintStream(ds), true);
             return ex.toString();
@@ -154,10 +181,11 @@ public class counterexamples {
          * @throws internal_error 
          */
     static Path complete_path(Path p) {
-        System.out.println("Completing path " + p);
+        if (debug) println("Completing path " + p);
         LinkedList<Path[]> active = new LinkedList<Path[]>();
         HashSet<StateItem> visited = new HashSet<>();
-        active.add(new Path[] { p, p });
+        Path empty = new Path(new LinkedList<Step>(), p.last);
+        active.add(new Path[] { empty, p });
         while (!active.isEmpty()) {
             Path[] h = active.removeFirst();
 
@@ -175,24 +203,54 @@ public class counterexamples {
         Path history;
     }
 
+    static class StateItemCtxt {
+        StateItem si;
+        terminal_set lookaheads;
+
+        StateItemCtxt(StateItem si, terminal_set ls) {
+            this.si = si;
+            lookaheads = ls;
+        }
+
+        @Override
+        public boolean equals(Object o2) {
+            if (!(o2 instanceof StateItemCtxt)) return false;
+            StateItemCtxt si2 = (StateItemCtxt) o2;
+            if (!si.equals(si2.si)) return false;
+            if (lookaheads == null) {
+                assert si2.lookaheads == null;
+                return true;
+            }
+            return lookaheads.equals(si2.lookaheads);
+        }
+
+        @Override
+        public int hashCode() {
+            return si.hashCode();
+        }
+    }
+
     static Completed complete_from_state(Path[] h, Set<StateItem> visited,
             List<Path[]> active) {
         StateItem si = h[1].last;
         if (visited.contains(si)) {
-            System.out.println("Dropping " + si + " on second encounter.");
+            if (debug) println("Dropping " + si + " on second encounter.");
             return null;
         }
 
         lalr_state s = si.state;
         lalr_item i = si.item;
 
-        System.out.println("Looking at " + s);
-        System.out.println("item is " + i);
+        if (debug) {
+            println("Looking at " + s);
+            println("item is " + i);
+        }
 
         /* try taking transitions */
         for (lalr_transition tr = s.transitions(); tr != null; tr = tr.next()) {
             if (tr.on_symbol().equals(i.symbol_after_dot())) {
-                System.out.println("Found transition symbol " + tr.on_symbol());
+                if (debug)
+                    println("Found transition symbol " + tr.on_symbol());
                 lalr_item i2 = i.shift();
 
                 LinkedList<Step> ns0 = new LinkedList<>(h[0].steps), ns1 =
@@ -204,14 +262,15 @@ public class counterexamples {
                 active.add(new Path[] {
                         new Path(ns0, new StateItem(tr.to_state(), i2)),
                         new Path(ns1, new StateItem(tr.to_state(), i2)) });
-                System.out.println("Added " + i2 + ", path now has "
-                        + ns1.size() + " steps.");
-                System.out.println(ns1);
+                if (debug)
+                    println("Added " + i2 + ", path now has " + ns1.size()
+                            + " steps.");
+                println(ns1);
             }
         }
         // Try doing reduces
         if (i.dot_at_end()) {
-            System.out.println("Trying to reduce " + i);
+            if (debug) println("Trying to reduce " + i);
 
             LinkedList<Step> ns0 = new LinkedList<>(h[0].steps);
 
@@ -223,7 +282,7 @@ public class counterexamples {
             for (int j = 0; j < nsteps; j++) {
                 Step step = h[1].steps.get(j);
                 int k = j - (nsteps - rhslen - 1);
-                System.out.println("Step " + k + ". " + step);
+                if (debug) println("Step " + k + ". " + step);
                 assert k != 0 || step instanceof Produce;
                 assert k <= 0 || step instanceof TransStep;
 
@@ -236,8 +295,8 @@ public class counterexamples {
             }
             StateItem si1 = h[1].steps.get(nsteps - rhslen - 1).source;
 
-            System.out.println("In state  " + si1.state + " with item "
-                    + si1.item);
+            if (debug)
+                println("In state  " + si1.state + " with item " + si1.item);
 
             LinkedList<Step> ns1 = new LinkedList<>();
             for (int j = 0; j < nsteps - rhslen - 1; j++) {
@@ -246,19 +305,17 @@ public class counterexamples {
 
             symbol lhs = pr.lhs().the_symbol();
 
-            System.out.println("doing a goto on " + lhs + " to "
-                    + si1.item.shift());
+            if (debug)
+                println("doing a goto on " + lhs + " to " + si1.item.shift());
             boolean found_transition = false;
             for (lalr_transition tr = si1.state.transitions(); tr != null; tr =
                     tr.next()) {
                 if (tr.on_symbol().equals(lhs)) {
                     assert !found_transition;
-                    System.out.println("Found the right transition: " + tr);
+                    if (debug) println("Found the right transition: " + tr);
                     found_transition = true;
-                    System.out.println("Before: " + ns1);
                     ns1.add(new TransStep(si1, tr));
 
-                    System.out.println("After: " + ns1);
                     StateItem si1new =
                             new StateItem(tr.to_state(), si1.item.shift());
                     Path p1 = new Path(ns1, si1new);
@@ -291,19 +348,30 @@ public class counterexamples {
     /**
      * Report on example_s a textual version of the shortest
      * path from the start state and start item to the current state
-     * and item itm. Report on derivation_s a more detailed
+     * and item itm, with given lookahead symbol.
+     * Report on derivation_s a more detailed
      * textual description including derivation information.
      * This output is useful for diagnosing conflicts in the grammar.
      */
     protected static void report_shortest_path(lalr_state state, lalr_item itm,
-            StringBuilder example_s, PrintStream derivation_s)
-            throws internal_error {
-        Path p = shortest_path(state, itm);
-        Path p2 = complete_path(p);
+            terminal conflict_sym, StringBuilder example_s,
+            PrintStream derivation_s) throws internal_error {
+        Path p1 = shortest_path(state, itm, conflict_sym);
+        if (p1 == null) {
+            example_s.append("<Sorry, cannot find a way to get into state "
+                    + state + " with conflict lookahead " + conflict_sym + ">");
+            return;
+        }
+        Path p2 = complete_path(p1);
         boolean first = true;
-        for (Step s : p2.steps) {
+        for (Step s : p1.steps) {
             s.appendToReport(example_s, derivation_s, first);
             first = false;
+        }
+        example_s.append(" (*)");
+        derivation_s.append(" (*)");
+        for (Step s : p2.steps) {
+            s.appendToReport(example_s, derivation_s, false);
         }
     }
 
@@ -315,8 +383,8 @@ public class counterexamples {
      * path.
      */
     protected static Path shortest_path(lalr_state target_state,
-            lalr_item target_itm) throws internal_error {
-        HashSet<StateItem> visited = new HashSet<>();
+            lalr_item target_itm, terminal conflict_sym) throws internal_error {
+        HashSet<StateItemCtxt> visited = new HashSet<>();
         LinkedList<Path> active = new LinkedList<>(); // work queue
         StateItem start =
                 new StateItem(lalr_state.startState(), lalr_state.startItem());
@@ -327,25 +395,72 @@ public class counterexamples {
         active.add(p);
         while (!active.isEmpty()) {
             Path p1 = active.removeFirst();
+            if (debug) println("Looking at " + p1);
             StateItem si = p1.last;
-            if (visited.contains(si)) continue; /* saw it already */
-            visited.add(si);
+
             lalr_state s = si.state;
             lalr_item i = si.item;
             if (target_state.equals(s) && target_itm.equals(i)) {
-                p = p1;
-                return p; // done!
+                if (target_itm.dot_at_end()) {
+                    terminal_set ls = target_itm.lookahead();
+                    if (debug)
+                        println("found target state as reduction?" + ls);
+                    if (ls.contains(conflict_sym)) {
+                        if (debug) println("Does contain " + conflict_sym);
+
+                        terminal_set look = precise_lookaheads(p1);
+
+                        StateItemCtxt sc = new StateItemCtxt(si, null);
+                        if (visited.contains(sc)) {
+                            println("  Skipping this possible match, we saw it already");
+                            //continue;
+                        }
+                        visited.add(sc);
+
+                        //XXX what if rest of i_prev is nullable? Need to walk outward more?
+                        if (look.contains(conflict_sym)) {
+                            if (debug)
+                                println("Outer production does have "
+                                        + conflict_sym + " as a lookahead");
+                            return p1;
+                        }
+                        else {
+                            if (debug)
+                                println("Outer production has only " + look
+                                        + " as lookaheads");
+                        }
+
+                    }
+                }
+                else {
+                    return p1; // done!
+                }
             }
+            else {
+                StateItemCtxt sc = new StateItemCtxt(si, null);
+                if (visited.contains(sc)) {
+                    println("  Skipping this one, we saw it already");
+                    continue;
+                }
+                //visited.add(sc);
+            }
+            if (debug) println("symbol after dot is " + i.symbol_after_dot());
             /* try taking transitions */
             for (lalr_transition tr = s.transitions(); tr != null; tr =
                     tr.next()) {
+
                 if (tr.on_symbol().equals(i.symbol_after_dot())) {
                     lalr_item i2 = i.shift();
                     LinkedList<Step> newt = new LinkedList<Step>(p1.steps);
                     newt.add(new TransStep(si, tr));
                     Path p2 = new Path(newt, new StateItem(tr.to_state(), i2));
                     active.add(p2);
+                    //System.out.println("Adding " + p2);
                 }
+//                else {
+//                    System.out.println("  ignoring transition on "
+//                            + tr.on_symbol());
+//                }
             }
             /* try changing the production (one step of closure) */
             non_terminal nt = i.dot_before_nt();
@@ -360,10 +475,22 @@ public class counterexamples {
                     newt.add(new Produce(si, prod));
                     Path p2 = new Path(newt, new StateItem(s, i2));
                     active.add(p2);
+                    //  System.out.println("Adding " + p2);
                 }
             }
         }
         return null;
     }
 
+    // compute what terminals can follow the dot given the larger
+    // context.
+    static terminal_set precise_lookaheads(Path p) {
+        production pr = p.last.item.the_production();
+        int rhslen = pr.rhs_length();
+        int nsteps = p.steps.size();
+        Produce pstep = (Produce) p.steps.get(nsteps - rhslen - 1);
+        lalr_item i_prev = pstep.source.item;
+        terminal_set look = i_prev.calc_lookahead(i_prev.lookahead());
+        return look;
+    }
 }
