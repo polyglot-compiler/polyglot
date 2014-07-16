@@ -169,7 +169,7 @@ public class counterexamples {
         }
     }
 
-    /**   A machine history is a pair of paths stored in an array of length 2. The first
+       /**    A machine history is a pair of paths stored in an array of length 2. The first
          *    element is the full history to this point, the second element is the current path
          *    after applying all the actions in the history, including reduce actions.
          *    Our goal is to get to a history where the the current path is empty.
@@ -323,23 +323,6 @@ public class counterexamples {
                     active.add(new Path[] { p0, p1 });
                 }
             }
-//                   
-//                }
-//                ns0new.add(new TransStep(si0, ))
-
-            //                for (production prod : nt.productions()) {
-            //                    terminal_set new_lookaheads =
-            //                            i.calc_lookahead(i.lookahead());
-            //                    lalr_item i2 =
-            //                            new lalr_item(prod,
-            //                                          new terminal_set(new_lookaheads));
-            //                    LinkedList<Step> newt = new LinkedList<>(p1.steps);
-            //                    newt.add(new Produce(s, prod));
-            //                    Path p2 = new Path(newt, new StateItem(s, i2));
-            //                    active.add(p2);
-            //                }
-            //}
-
         }
         return null;
     }
@@ -422,9 +405,6 @@ public class counterexamples {
                         if (visited.contains(sc)) {
                             println("  Skipping this possible match, we saw it already");
                             continue;
-                            // XXX Don't see how to break out early without possibly
-                            // missing an example. In principle we should hit an example
-                            // eventually, so termination is guaranteed.
                         }
                         visited.add(sc);
 
@@ -488,8 +468,9 @@ public class counterexamples {
         return null;
     }
 
-    // compute what terminals can follow the dot given the larger
-    // context.
+    /** The set of terminals that can follow the dot, given the larger
+     *  prior context in p.
+     */
     static terminal_set precise_lookaheads(Path p) {
         production pr = p.last.item.the_production();
 
