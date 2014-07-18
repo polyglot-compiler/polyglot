@@ -12,3 +12,30 @@ statement ::= SKIP
         ;
 
 expr ::= NUM ;
+
+/** counterexample
+    IF expr THEN IF expr THEN statement (*) ELSE statement
+
+    parse 1 (reduce)
+
+    [statements::= [statement::= IF expr THEN [statement::= IF expr THEN statement (*) ] ELSE statement ] ]
+
+    parse 2 (shift)
+     
+    [statements::= [statement::= IF expr THEN [statement::= IF expr THEN statement (*) ELSE statement ] ] ]
+
+
+    find reduce item:
+    [statements::= [statement::= IF expr THEN [statement::= IF expr THEN statement (*) , ELSE
+
+    parse 1: complete
+
+        [statements::= [statement::= IF expr THEN [statement::= IF expr THEN statement (*) ] ELSE statement ] ]
+
+    parse 2:
+
+        prune:    [statements::= [statement::= IF expr THEN [statement::= IF expr THEN statement ELSE
+        search:   [statements::= [statement::= IF expr THEN [statement::= IF expr THEN statement (*) ELSE
+        shift:    [statements::= [statement::= IF expr THEN [statement::= IF expr THEN statement ELSE (*)
+        complete: [statements::= [statement::= IF expr THEN [statement::= IF expr THEN statement ELSE (*) statement ]]]
+*/

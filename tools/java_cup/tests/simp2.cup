@@ -65,7 +65,7 @@ expr ::= number
         expr DOT DOT [stmt::= MEM expr ASSIGN [expr::= [number::= number DIGIT (*)]
             [statement::= [expr::= [number::= DIGIT]] DOT DOT statement statement]
 
-    removing the productions, we have a single example that could be parsed either way:
+    removing the productions, we have a single example that could be parsed either way: (are we guaranteed it works for the reduce action too?)
 
         expr DOT DOT MEM expr ASSIGN number (*) DIGIT DIGIT DOT DOT statement statement
 
