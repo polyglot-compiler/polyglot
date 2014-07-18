@@ -1,0 +1,18 @@
+terminal Token NUM, PLUS, TIMES, LP, RP;
+
+non terminal expr, atom;
+
+precedence left PLUS;
+precedence left TIMES;
+
+start with expr;
+
+expr ::= expr PLUS expr
+      |  expr TIMES expr
+      |  NUM
+      |  atom
+      ;
+
+atom ::= NUM 
+      |  LP expr RP
+      ;
