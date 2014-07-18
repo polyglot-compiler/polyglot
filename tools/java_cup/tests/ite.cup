@@ -1,0 +1,14 @@
+terminal Token SKIP, IF, THEN, ELSE, SEMI, NUM;
+
+non terminal statements, statement, expr;
+
+start with statements;
+
+statements ::= statement | statements SEMI statement ;
+
+statement ::= SKIP
+        | IF expr THEN statement ELSE statement
+        | IF expr THEN statement
+        ;
+
+expr ::= NUM ;
