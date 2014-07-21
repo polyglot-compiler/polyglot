@@ -1,0 +1,18 @@
+import java.util.List;
+
+class Generics53 {
+
+	<T> T f(List<? super Outer<T>.Inner> x) {
+		List<? super Outer<Integer>.Inner> y = null;
+		setInt(f(y));
+		return null;
+	}
+
+	void setInt(Integer i) {
+	}
+}
+
+class Outer<T> {
+	class Inner {
+	}
+}
