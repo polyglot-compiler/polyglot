@@ -1,14 +1,15 @@
 terminal Token NUM, PLUS, TIMES, LP, RP;
 
-non terminal expr;
+non terminal expr, op;
 
 /*precedence left PLUS;
 precedence left TIMES; */
 
 start with expr;
 
-expr ::= expr PLUS expr
-      |  expr TIMES expr
+expr ::= expr op expr
       |  LP expr RP
       |  NUM
       ;
+
+op ::= PLUS | TIMES ;
