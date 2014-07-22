@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.Stack;
+import java.util.TreeSet;
 
 /** This class represents a state in the LALR viable prefix recognition machine.
  *  A state consists of an LALR item set and a set of transitions to other
@@ -192,7 +193,7 @@ public class lalr_state {
                 if (part.is_action())
                     System.out.print("{action} ");
                 else System.out.print(((symbol_part) part).the_symbol().name()
-                                      + " ");
+                        + " ");
             }
             if (itm.dot_at_end()) System.out.print("(*) ");
             System.out.println("]");
@@ -395,7 +396,7 @@ public class lalr_state {
                             /* fix up the item so it points to the existing set */
                             if (existing != null)
                                 fix_itm.propagate_items()
-                                .setElementAt(existing, l);
+                                       .setElementAt(existing, l);
                         }
                     }
                 }
@@ -486,7 +487,7 @@ public class lalr_state {
                                 && other_act.kind() != parse_action.NONASSOC) {
                             /* if we have lower index hence priority, replace it*/
                             if (itm.the_production().index() < ((reduce_action) other_act).reduce_with()
-                                    .index()) {
+                                                                                          .index()) {
                                 /* replace the action */
                                 our_act_row.under_term[t] = act;
                             }
@@ -567,7 +568,7 @@ public class lalr_state {
     protected boolean fix_with_precedence(production p, int term_index,
             parse_action_row table_row, parse_action act)
 
-                    throws internal_error {
+    throws internal_error {
 
         terminal term = terminal.find(term_index);
 
@@ -672,6 +673,7 @@ public class lalr_state {
             throws internal_error {
 
         boolean after_itm;
+        Set<Integer> shift_reduce_conflict_set = new TreeSet<>();
 
         /* consider each element */
         for (lalr_item itm : items()) {
@@ -682,32 +684,44 @@ public class lalr_state {
             if (itm.dot_at_end()) {
                 /* not yet after itm */
                 after_itm = false;
+                shift_reduce_conflict_set.clear();
+                terminal_set lookahead = itm.lookahead();
 
                 /* compare this item against all others looking for conflicts */
                 for (lalr_item compare : items()) {
 
                     /* if this is the item, next one is after it */
-                    if (itm == compare) after_itm = true;
+                    if (itm == compare) {
+                        after_itm = true;
+                        continue;
+                    }
 
-                    /* only look at it if its not the same item */
-                    if (itm != compare) {
-                        /* is it a reduce */
-                        if (compare.dot_at_end()) {
-                            /* only look at reduces after itm */
-                            if (after_itm)
-                                /* does the comparison item conflict? */
-                                if (compare.lookahead()
-                                        .intersects(itm.lookahead()))
-                                    /* report a reduce/reduce conflict */
-                                    report_reduce_reduce(itm, compare);
+                    /* only look at reduces after itm */
+                    /* is it a reduce */
+                    if (compare.dot_at_end()) {
+                        /* only look at reduces after itm */
+                        if (after_itm)
+                        /* does the comparison item conflict? */
+                        if (compare.lookahead().intersects(lookahead)) {
+                            /* report a reduce/reduce conflict */
+                            report_reduce_reduce(itm, compare);
+                        }
+                    }
+                    else {
+                        /* is it a shift on our conflicting terminal */
+                        symbol shift_sym = compare.symbol_after_dot();
+                        int t;
+                        if (!shift_sym.is_non_term()
+                                && conflict_set.contains(t = shift_sym.index())
+                                && lookahead.contains(t)) {
+                            /* note a shift/reduce conflict */
+                            shift_reduce_conflict_set.add(t);
                         }
                     }
                 }
                 /* report S/R conflicts under all the symbols we conflict under */
-                terminal_set lookahead = itm.lookahead();
-                for (int t = 0; t < terminal.number(); t++)
-                    if (conflict_set.contains(t) && lookahead.contains(t))
-                        report_shift_reduce(itm, t);
+                for (int t : shift_reduce_conflict_set)
+                    report_shift_reduce(itm, t);
             }
         }
     }
@@ -839,6 +853,23 @@ public class lalr_state {
                 if (!shift_sym.is_non_term()
                         && shift_sym.index() == conflict_sym) {
                     /* yes, report on it */
+                    /* APL extension */
+//                    if (Main.report_counterexamples) {
+//                        Chin_examples.DerivableSymbol example = null;
+//                        example =
+//                                Chin_examples.findCounterexample(red_itm,
+//                                                                 itm,
+//                                                                 cs);
+//                        message.append("    Example:    ");
+//                        message.append(example.prettyPrint());
+//                        message.append("\n    Derivation: ");
+//                        message.append(example);
+//                        message.append("\n\n"); // XXX
+//                        // XXX
+//                        Chin_examples.derive(itm, example);
+//                        // XXX
+//                    }
+                    /* end APL extension */
                     message.append("  and shift on ");
                     message.append(itm.to_simple_string());
                     message.append("\n");

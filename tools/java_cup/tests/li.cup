@@ -1,0 +1,9 @@
+terminal Token num, little, indians;
+non terminal Token goal, VERSE, LITTLE, INDIANS;
+
+start with goal;
+
+goal ::= VERSE | goal VERSE;
+VERSE ::= num | LITTLE | INDIANS;
+LITTLE ::= num num little;
+INDIANS ::= num num num little indians;
