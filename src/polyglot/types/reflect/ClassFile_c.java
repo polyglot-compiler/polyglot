@@ -13,12 +13,12 @@
  * This program and the accompanying materials are made available under
  * the terms of the Lesser GNU Public License v2.0 which accompanies this
  * distribution.
- * 
+ *
  * The development of the Polyglot project has been supported by a
  * number of funding sources, including DARPA Contract F30602-99-1-0533,
  * monitored by USAF Rome Laboratory, ONR Grants N00014-01-1-0968 and
  * N00014-09-1-0652, NSF Grants CNS-0208642, CNS-0430161, CCF-0133302,
- * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan 
+ * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan
  * Research Fellowship, and an Intel Research Ph.D. Fellowship.
  *
  * See README for contributors.
@@ -45,15 +45,38 @@ import polyglot.types.SemanticException;
  * ClassFile represents a Java classfile as it is found on disk. The classfile
  * is modeled according to the Java Virtual Machine Specification. Methods are
  * provided to access the classfile at a very low level.
- * 
+ *
  * @see polyglot.types.reflect Attribute
  * @see polyglot.types.reflect ConstantValue
  * @see polyglot.types.reflect Field
  * @see polyglot.types.reflect Method
- * 
+ *
  * @author Nate Nystrom
  */
 public class ClassFile_c implements ClassFile {
+
+    /**
+     * Read the class file header.
+     *
+     * @param in
+     *            The stream from which to read.
+     * @exception IOException
+     *                If an error occurs while reading.
+     */
+    public static final int readHeader(DataInputStream in) throws IOException {
+        int magic = in.readInt();
+
+        if (magic != 0xCAFEBABE) {
+            throw new ClassFormatError("Bad magic number.");
+        }
+
+        @SuppressWarnings("unused")
+        int minor = in.readUnsignedShort();
+
+        int major = in.readUnsignedShort();
+        return major;
+    }
+
     protected Constant[] constants; // The constant pool
     protected int modifiers; // This class's modifier bit field
     protected int thisClass;
@@ -76,7 +99,7 @@ public class ClassFile_c implements ClassFile {
 
     /**
      * Constructor. This constructor parses the class file from the byte array
-     * 
+     *
      * @param code
      *            A byte array containing the class data
      * @throws IOException
@@ -84,10 +107,10 @@ public class ClassFile_c implements ClassFile {
     public ClassFile_c(FileObject classFileSource, byte[] code,
             ExtensionInfo ext) throws IOException {
         this.classFileSource = classFileSource;
-        this.extensionInfo = ext;
+        extensionInfo = ext;
 
         try (ByteArrayInputStream bin = new ByteArrayInputStream(code);
-             DataInputStream in = new DataInputStream(bin)) {
+                DataInputStream in = new DataInputStream(bin)) {
             read(in);
         }
     }
@@ -136,7 +159,7 @@ public class ClassFile_c implements ClassFile {
                     boolean found;
                     do {
                         found = false;
-                        String suffix = ("$" + seeking);
+                        String suffix = "$" + seeking;
                         String seekingFieldName =
                                 "jlc$ClassType$" + typeSystemKey + suffix;
                         for (Field field2 : fields) {
@@ -171,7 +194,7 @@ public class ClassFile_c implements ClassFile {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see
      * polyglot.types.reflect.ClassFileI#sourceLastModified(java.lang.String)
      */
@@ -183,7 +206,7 @@ public class ClassFile_c implements ClassFile {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see polyglot.types.reflect.ClassFileI#compilerVersion(java.lang.String)
      */
     @Override
@@ -194,7 +217,7 @@ public class ClassFile_c implements ClassFile {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see polyglot.types.reflect.ClassFileI#encodedClassType(java.lang.String)
      */
     @Override
@@ -219,7 +242,7 @@ public class ClassFile_c implements ClassFile {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see polyglot.types.reflect.ClassFileI#classNameCP(int)
      */
     @Override
@@ -242,7 +265,7 @@ public class ClassFile_c implements ClassFile {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see polyglot.types.reflect.ClassFileI#name()
      */
     @Override
@@ -263,94 +286,59 @@ public class ClassFile_c implements ClassFile {
 
     /**
      * Read a constant from the constant pool.
-     * 
+     *
      * @param in
      *            The stream from which to read.
      * @return The constant.
      * @exception IOException
      *                If an error occurs while reading.
      */
-    Constant readConstant(DataInputStream in) throws IOException {
+    final Constant readConstant(DataInputStream in) throws IOException {
         int tag = in.readUnsignedByte();
-        Object value;
+        Object value = readConstantInfo(in, tag);
+        return createConstant(tag, value);
+    }
 
+    protected Object readConstantInfo(DataInputStream in, int tag)
+            throws IOException {
         switch (tag) {
         case Constant.CLASS:
         case Constant.STRING:
-        case Constant.METHOD_TYPE:
-            value = new Integer(in.readUnsignedShort());
-            break;
+            return new Integer(in.readUnsignedShort());
         case Constant.FIELD_REF:
         case Constant.METHOD_REF:
         case Constant.INTERFACE_METHOD_REF:
         case Constant.NAME_AND_TYPE:
-        case Constant.INVOKE_DYNAMIC:
-            value = new int[2];
-
-            ((int[]) value)[0] = in.readUnsignedShort();
-            ((int[]) value)[1] = in.readUnsignedShort();
-            break;
-        case Constant.METHOD_HANDLE:
-            value = new int[2];
-
-            ((int[]) value)[0] = in.readUnsignedByte();
-            ((int[]) value)[1] = in.readUnsignedShort();
-            break;
         case Constant.INTEGER:
-            value = new Integer(in.readInt());
-            break;
+            return new Integer(in.readInt());
         case Constant.FLOAT:
-            value = new Float(in.readFloat());
-            break;
+            return new Float(in.readFloat());
         case Constant.LONG:
             // Longs take up 2 constant pool entries.
-            value = new Long(in.readLong());
-            break;
+            return new Long(in.readLong());
         case Constant.DOUBLE:
             // Doubles take up 2 constant pool entries.
-            value = new Double(in.readDouble());
-            break;
+            return new Double(in.readDouble());
         case Constant.UTF8:
-            value = in.readUTF();
-            break;
+            return in.readUTF();
         default:
             throw new ClassFormatError("Invalid constant tag: " + tag);
         }
-
-        return new Constant(tag, value);
     }
 
-    /**
-     * Read the class file header.
-     * 
-     * @param in
-     *            The stream from which to read.
-     * @exception IOException
-     *                If an error occurs while reading.
-     */
-    void readHeader(DataInputStream in) throws IOException {
-        int magic = in.readInt();
-
-        if (magic != 0xCAFEBABE) {
-            throw new ClassFormatError("Bad magic number.");
-        }
-
-        @SuppressWarnings("unused")
-        int minor = in.readUnsignedShort();
-
-        @SuppressWarnings("unused")
-        int major = in.readUnsignedShort();
+    protected Constant createConstant(int tag, Object value) {
+        return new Constant(tag, value);
     }
 
     /**
      * Read the class's constant pool. Constants in the constant pool are
      * modeled by an array of <tt>reflect.Constant</tt>/
-     * 
+     *
      * @param in
      *            The stream from which to read.
      * @exception IOException
      *                If an error occurs while reading.
-     * 
+     *
      * @see Constant
      * @see #constants
      */
@@ -378,7 +366,7 @@ public class ClassFile_c implements ClassFile {
 
     /**
      * Read the class's access flags.
-     * 
+     *
      * @param in
      *            The stream from which to read.
      * @exception IOException
@@ -390,7 +378,7 @@ public class ClassFile_c implements ClassFile {
 
     /**
      * Read the class's name, superclass, and interfaces.
-     * 
+     *
      * @param in
      *            The stream from which to read.
      * @exception IOException
@@ -411,7 +399,7 @@ public class ClassFile_c implements ClassFile {
 
     /**
      * Read the class's fields.
-     * 
+     *
      * @param in
      *            The stream from which to read.
      * @exception IOException
@@ -429,7 +417,7 @@ public class ClassFile_c implements ClassFile {
 
     /**
      * Read the class's methods.
-     * 
+     *
      * @param in
      *            The stream from which to read.
      * @exception IOException
@@ -447,7 +435,7 @@ public class ClassFile_c implements ClassFile {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see
      * polyglot.types.reflect.ClassFileI#readAttributes(java.io.DataInputStream)
      */
@@ -476,7 +464,7 @@ public class ClassFile_c implements ClassFile {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see
      * polyglot.types.reflect.ClassFileI#createMethod(java.io.DataInputStream)
      */
@@ -489,7 +477,7 @@ public class ClassFile_c implements ClassFile {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see
      * polyglot.types.reflect.ClassFileI#createField(java.io.DataInputStream)
      */
@@ -502,7 +490,7 @@ public class ClassFile_c implements ClassFile {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see
      * polyglot.types.reflect.ClassFileI#createAttribute(java.io.DataInputStream
      * , java.lang.String, int, int)
@@ -519,7 +507,7 @@ public class ClassFile_c implements ClassFile {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see polyglot.types.reflect.ClassFileI#getAttrs()
      */
     @Override
@@ -529,7 +517,7 @@ public class ClassFile_c implements ClassFile {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see polyglot.types.reflect.ClassFileI#getConstants()
      */
     @Override
@@ -539,7 +527,7 @@ public class ClassFile_c implements ClassFile {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see polyglot.types.reflect.ClassFileI#getFields()
      */
     @Override
@@ -549,7 +537,7 @@ public class ClassFile_c implements ClassFile {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see polyglot.types.reflect.ClassFileI#getInnerClasses()
      */
     @Override
@@ -559,7 +547,7 @@ public class ClassFile_c implements ClassFile {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see polyglot.types.reflect.ClassFileI#getInterfaces()
      */
     @Override
@@ -569,7 +557,7 @@ public class ClassFile_c implements ClassFile {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see polyglot.types.reflect.ClassFileI#getMethods()
      */
     @Override
@@ -579,7 +567,7 @@ public class ClassFile_c implements ClassFile {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see polyglot.types.reflect.ClassFileI#getModifiers()
      */
     @Override
@@ -589,7 +577,7 @@ public class ClassFile_c implements ClassFile {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see polyglot.types.reflect.ClassFileI#getSuperClass()
      */
     @Override
@@ -599,7 +587,7 @@ public class ClassFile_c implements ClassFile {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see polyglot.types.reflect.ClassFileI#getThisClass()
      */
     @Override

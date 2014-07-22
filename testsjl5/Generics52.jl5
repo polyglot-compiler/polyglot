@@ -1,0 +1,18 @@
+class Generics52 {
+
+	<T> T f(Outer<T>.Inner x) {
+		Outer<Integer>.Inner y = null;
+		setInt(f(y));
+		return null;
+	}
+	
+	void setInt(Integer i) {
+	}
+}
+
+
+
+class Outer<T> {
+	class Inner {
+	}
+}

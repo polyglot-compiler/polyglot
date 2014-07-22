@@ -58,6 +58,8 @@ import polyglot.visit.PrettyPrinter;
 import polyglot.visit.Traverser;
 import polyglot.visit.TypeChecker;
 
+/** Extends {@code New} with the ability to supply type arguments to the constructor.
+ */
 public class JL5NewExt extends JL5ProcedureCallExt implements NewOps {
     private static final long serialVersionUID = SerialVersionUID.generate();
 

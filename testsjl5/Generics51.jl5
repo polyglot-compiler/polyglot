@@ -1,0 +1,15 @@
+import java.util.*;
+
+class Generics51 {
+	
+	<T> void f(List<Outer<T>.Inner> x) {
+		List<Outer<Integer>.Inner> y = null;
+		f(y);
+	}
+	
+}
+
+class Outer<T> {
+	class Inner {
+	}
+}

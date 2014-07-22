@@ -13,12 +13,12 @@
  * This program and the accompanying materials are made available under
  * the terms of the Lesser GNU Public License v2.0 which accompanies this
  * distribution.
- * 
+ *
  * The development of the Polyglot project has been supported by a
  * number of funding sources, including DARPA Contract F30602-99-1-0533,
  * monitored by USAF Rome Laboratory, ONR Grants N00014-01-1-0968 and
  * N00014-09-1-0652, NSF Grants CNS-0208642, CNS-0430161, CCF-0133302,
- * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan 
+ * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan
  * Research Fellowship, and an Intel Research Ph.D. Fellowship.
  *
  * See README for contributors.
@@ -26,6 +26,8 @@
 
 package polyglot.frontend;
 
+import java.io.ByteArrayInputStream;
+import java.io.DataInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.Reader;
@@ -39,6 +41,8 @@ import javax.tools.StandardLocation;
 
 import polyglot.ast.Node;
 import polyglot.ast.NodeFactory;
+import polyglot.ext.jl5.types.reflect.JL5ClassFile;
+import polyglot.ext.jl7.types.reflect.JL7ClassFile_c;
 import polyglot.filemanager.ExtFileManager;
 import polyglot.filemanager.FileManager;
 import polyglot.frontend.Source.Kind;
@@ -84,8 +88,8 @@ public abstract class AbstractExtensionInfo implements ExtensionInfo {
 
     @Override
     public Options getOptions() {
-        if (this.options == null) {
-            this.options = createOptions();
+        if (options == null) {
+            options = createOptions();
         }
         return options;
     }
@@ -97,8 +101,8 @@ public abstract class AbstractExtensionInfo implements ExtensionInfo {
     /** Return a Stats object to accumulate and report statistics. */
     @Override
     public Stats getStats() {
-        if (this.stats == null) {
-            this.stats = new Stats(this);
+        if (stats == null) {
+            stats = new Stats(this);
         }
         return stats;
     }
@@ -116,8 +120,8 @@ public abstract class AbstractExtensionInfo implements ExtensionInfo {
         compiler.addExtension(this);
 
         // Initialize the output extension if there is one
-        if (this.outputExtensionInfo() != null)
-            this.outputExtensionInfo().initCompiler(compiler);
+        if (outputExtensionInfo() != null)
+            outputExtensionInfo().initCompiler(compiler);
 
         // Create the type system and node factory.
         typeSystem();
@@ -217,9 +221,21 @@ public abstract class AbstractExtensionInfo implements ExtensionInfo {
     }
 
     @Override
-    public ClassFile createClassFile(FileObject f, byte[] code)
+    public final ClassFile createClassFile(FileObject f, byte[] code)
             throws IOException {
-        return new ClassFile_c(f, code, this);
+        try (ByteArrayInputStream bin = new ByteArrayInputStream(code);
+                DataInputStream in = new DataInputStream(bin)) {
+            int major = ClassFile_c.readHeader(in);
+            if (major >= 51) {
+                // Java 7 or greater
+                return new JL7ClassFile_c(f, code, this);
+            }
+            else if (major >= 49) {
+                // Java 5 or greater
+                return new JL5ClassFile(f, code, this);
+            }
+            else return new ClassFile_c(f, code, this);
+        }
     }
 
     @Deprecated
@@ -268,7 +284,7 @@ public abstract class AbstractExtensionInfo implements ExtensionInfo {
      * Configure the file manager for the post-compiler. This implementation
      * constructs a classpath from the source output directory, the current
      * directory, the classpath, and the bootclasspath.
-     * 
+     *
      * @return
      */
     @Override

@@ -23,19 +23,40 @@
  *
  * See README for contributors.
  ******************************************************************************/
-package polyglot.ast;
+package polyglot.ext.jl7.types.reflect;
 
-import polyglot.types.Flags;
-import polyglot.util.CodeWriter;
-import polyglot.visit.PrettyPrinter;
+import java.io.DataInputStream;
+import java.io.IOException;
 
-/**
- * This interface allows extension delegates both to override and reuse
- * functionality in {@code ConstructorDecl_c} and {@code MethodDecl_c}.
- *
- */
-public interface ProcedureDeclOps extends TermOps {
+import javax.tools.FileObject;
 
-    /** Pretty-print the procedure's header using the given code writer. */
-    void prettyPrintHeader(Flags flags, CodeWriter w, PrettyPrinter tr);
+import polyglot.ext.jl5.types.reflect.JL5ClassFile;
+import polyglot.frontend.ExtensionInfo;
+import polyglot.types.reflect.Constant;
+
+public class JL7ClassFile_c extends JL5ClassFile {
+    public JL7ClassFile_c(FileObject classFileSource, byte[] code,
+            ExtensionInfo ext) throws IOException {
+        super(classFileSource, code, ext);
+    }
+
+    @Override
+    protected Object readConstantInfo(DataInputStream in, int tag)
+            throws IOException {
+        switch (tag) {
+        case JL7Constant.METHOD_HANDLE:
+            return new int[] { in.readUnsignedByte(), in.readUnsignedShort() };
+        case JL7Constant.METHOD_TYPE:
+            return new Integer(in.readUnsignedShort());
+        case JL7Constant.INVOKE_DYNAMIC:
+            return new int[] { in.readUnsignedShort(), in.readUnsignedShort() };
+        default:
+            return super.readConstantInfo(in, tag);
+        }
+    }
+
+    @Override
+    protected Constant createConstant(int tag, Object value) {
+        return new JL7Constant(tag, value);
+    }
 }

@@ -13,12 +13,12 @@
  * This program and the accompanying materials are made available under
  * the terms of the Lesser GNU Public License v2.0 which accompanies this
  * distribution.
- * 
+ *
  * The development of the Polyglot project has been supported by a
  * number of funding sources, including DARPA Contract F30602-99-1-0533,
  * monitored by USAF Rome Laboratory, ONR Grants N00014-01-1-0968 and
  * N00014-09-1-0652, NSF Grants CNS-0208642, CNS-0430161, CCF-0133302,
- * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan 
+ * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan
  * Research Fellowship, and an Intel Research Ph.D. Fellowship.
  *
  * See README for contributors.
@@ -60,7 +60,7 @@ public abstract class NodeVisitor implements Traverser, Copy<NodeVisitor> {
 
     @Deprecated
     protected NodeVisitor() {
-        this(JLangToJLDel.instance, null);
+        this(JLangToJLDel.instance, Collections.<Lang, Lang> emptyMap());
     }
 
     protected NodeVisitor(Lang lang, Map<Lang, Lang> superLangMap) {
@@ -99,11 +99,11 @@ public abstract class NodeVisitor implements Traverser, Copy<NodeVisitor> {
      * visitor does not wish to override traversal of the subtree rooted at
      * {@code n}, then it should return {@code null}.
      * <p>
-     * The default implementation of this method is to call 
+     * The default implementation of this method is to call
      * {@link #override(Node) override(n)}, as most subclasses do not need to know
      * the parent of the node {@code n}.
      *
-     * @param parent The parent of {@code n}, 
+     * @param parent The parent of {@code n},
      *    {@code null} if {@code n} has no parent.
      * @param n The root of the subtree to be traversed.
      * @return A node if normal traversal is to stop, {@code null} if it
@@ -123,11 +123,11 @@ public abstract class NodeVisitor implements Traverser, Copy<NodeVisitor> {
      * visitor does not wish to override traversal of the subtree rooted at
      * {@code n}, then it should return {@code null}.
      * <p>
-     * This method is typically called by the method 
+     * This method is typically called by the method
      * {@link #override(Node, Node) override(parent, n)}. If a subclass overrides the
      * method {@link #override(Node, Node) override(parent, n)} then this method
      * may not be called.
-     * 
+     *
      * @param n The root of the subtree to be traversed.
      * @return A node if normal traversal is to stop, {@code null} if it
      * is to continue.
@@ -141,7 +141,7 @@ public abstract class NodeVisitor implements Traverser, Copy<NodeVisitor> {
      * the visitor the option of changing internal state or returning a new
      * visitor which will be used to visit the children of {@code n}.
      * <p>
-     * The default implementation of this method is to call 
+     * The default implementation of this method is to call
      * {@link #enter(Node) enter(n)}, as most subclasses do not need to know
      * the parent of the node {@code n}.
      *
@@ -159,7 +159,7 @@ public abstract class NodeVisitor implements Traverser, Copy<NodeVisitor> {
      * the visitor the option of changing internal state or returning a new
      * visitor which will be used to visit the children of {@code n}.
      * <p>
-     * This method is typically called by the method 
+     * This method is typically called by the method
      * {@link #enter(Node, Node) enter(parent, n)}. If a subclass overrides the
      * method {@link #enter(Node, Node) enter(parent, n)} then this method
      * may not be called.
@@ -185,12 +185,12 @@ public abstract class NodeVisitor implements Traverser, Copy<NodeVisitor> {
      * of {@code n} before modifying it. It should then return the
      * modified copy.
      * <p>
-     * The default implementation of this method is to call 
-     * {@link #leave(Node, Node, NodeVisitor) leave(old, n, v)}, 
-     * as most subclasses do not need to know the parent of the 
+     * The default implementation of this method is to call
+     * {@link #leave(Node, Node, NodeVisitor) leave(old, n, v)},
+     * as most subclasses do not need to know the parent of the
      * node {@code n}.
      *
-     * @param parent The parent of {@code old}, 
+     * @param parent The parent of {@code old},
      *    {@code null} if {@code old} has no parent.
      * @param old The original state of root of the current subtree.
      * @param n The current state of the root of the current subtree.
@@ -215,12 +215,12 @@ public abstract class NodeVisitor implements Traverser, Copy<NodeVisitor> {
      * of {@code n} before modifying it. It should then return the
      * modified copy.
      * <p>
-     * This method is typically called by the method 
-     * {@link #leave(Node, Node, Node, NodeVisitor) leave(parent, old, n v)}. 
-     * If a subclass overrides the method 
-     * {@link #leave(Node, Node, Node, NodeVisitor) leave(parent, old, n v)} 
+     * This method is typically called by the method
+     * {@link #leave(Node, Node, Node, NodeVisitor) leave(parent, old, n v)}.
+     * If a subclass overrides the method
+     * {@link #leave(Node, Node, Node, NodeVisitor) leave(parent, old, n v)}
      * then this method may not be called.
-     * 
+     *
      * @param old The original state of root of the current subtree.
      * @param n The current state of the root of the current subtree.
      * @param v The {@code NodeVisitor} object used to visit the children.
@@ -237,8 +237,8 @@ public abstract class NodeVisitor implements Traverser, Copy<NodeVisitor> {
      * that cannot be done when the visitor is created.
      * If {@code null} is returned, the ast is not traversed.
      *
-     * @return the {@code NodeVisitor} to traverse the ast with. If 
-     *     {@code null} is returned, the ast is not traversed. 
+     * @return the {@code NodeVisitor} to traverse the ast with. If
+     *     {@code null} is returned, the ast is not traversed.
      */
     public NodeVisitor begin() {
         return this;
@@ -265,14 +265,14 @@ public abstract class NodeVisitor implements Traverser, Copy<NodeVisitor> {
      * Visit the edge between the parent node {@code parent}, and child
      * node {@code child}. This method recursively visits  the subtree rooted
      * at {@code child}.
-     * 
+     *
      * @param parent the parent node of {@code child}, {@code null} if
-     *         {@code child} was visited by calling 
+     *         {@code child} was visited by calling
      *         {@link polyglot.ast.Node#visit(NodeVisitor) Node.visit(NodeVisitor)} instead
-     *         of {@link polyglot.ast.Node#visitChild(Node, NodeVisitor) 
+     *         of {@link polyglot.ast.Node#visitChild(Node, NodeVisitor)
      *         polyglot.ast.Node.visitChild(Node, NodeVisitor)}.
      * @param child the child node of {@code parent} to be visited.
-     * @return the (possibly new) version of {@code child} after the 
+     * @return the (possibly new) version of {@code child} after the
      *       subtree rooted at {@code child} has been recursively visited.
      */
     public <N extends Node> N visitEdge(Node parent, N child) {
@@ -298,10 +298,10 @@ public abstract class NodeVisitor implements Traverser, Copy<NodeVisitor> {
      * node {@code child}, without invoking {@code override} for
      * the child.  This method recursively visits the subtree rooted at
      * {@code child}.
-     * 
+     *
      * @param parent
      * @param child
-     * @return the (possibly new) version of {@code child} after the 
+     * @return the (possibly new) version of {@code child} after the
      *       subtree rooted at {@code child} has been recursively visited.
      */
     public <N extends Node> N visitEdgeNoOverride(Node parent, N child) {
