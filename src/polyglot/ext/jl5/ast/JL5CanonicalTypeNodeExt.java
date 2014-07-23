@@ -32,13 +32,12 @@ import polyglot.ast.CanonicalTypeNode;
 import polyglot.ast.Node;
 import polyglot.ext.jl5.types.IntersectionType;
 import polyglot.ext.jl5.types.JL5Context;
+import polyglot.ext.jl5.types.JL5ParsedClassType;
 import polyglot.ext.jl5.types.JL5SubstClassType;
 import polyglot.ext.jl5.types.JL5TypeSystem;
 import polyglot.ext.jl5.types.TypeVariable;
 import polyglot.ext.jl5.types.WildCardType;
-import polyglot.frontend.MissingDependencyException;
-import polyglot.frontend.Scheduler;
-import polyglot.frontend.goals.Goal;
+import polyglot.frontend.SchedulerException;
 import polyglot.types.ArrayType;
 import polyglot.types.ClassType;
 import polyglot.types.ReferenceType;
@@ -54,9 +53,13 @@ public class JL5CanonicalTypeNodeExt extends JL5TermExt {
     public Node typeCheck(TypeChecker tc) throws SemanticException {
         CanonicalTypeNode n = (CanonicalTypeNode) this.node();
         Type t = n.type();
+        JL5TypeSystem ts = (JL5TypeSystem) tc.typeSystem();
+
+        // check subtype constraints on type arguments are obeyed
+        checkSubtypeConstraints(ts, t);
+
         if (t instanceof JL5SubstClassType) {
             JL5SubstClassType st = (JL5SubstClassType) t;
-            JL5TypeSystem ts = (JL5TypeSystem) tc.typeSystem();
 
             // Check for rare types: e.g., Outer<String>.Inner, where Inner has uninstantiated type variables
             // See JLS 3rd ed. 4.8
@@ -75,33 +78,6 @@ public class JL5CanonicalTypeNodeExt extends JL5TermExt {
                     }
                 }
 
-            }
-            if (!st.base().typeVariables().isEmpty()) {
-                // check that arguments obey their bounds.
-                // first we must perform capture conversion. see beginning of JLS 4.5            
-                JL5SubstClassType capCT =
-                        (JL5SubstClassType) ts.applyCaptureConversion(st,
-                                                                      n.position());
-
-                for (int i = 0; i < capCT.actuals().size(); i++) {
-                    TypeVariable ai = capCT.base().typeVariables().get(i);
-                    Type xi = capCT.actuals().get(i);
-                    if (!ai.upperBound().isCanonical()) {
-                        // need to disambiguate
-                        Scheduler scheduler =
-                                tc.job().extensionInfo().scheduler();
-                        Goal g = scheduler.SupertypesResolved(st.base());
-                        throw new MissingDependencyException(g);
-                    }
-                    //require that arguments obey their bounds
-                    if (!ts.isSubtype(xi,
-                                      capCT.subst().substType(ai.upperBound()))) {
-                        throw new SemanticException("Type argument "
-                                + st.actuals().get(i)
-                                + " is not a subtype of its declared bound "
-                                + ai.upperBound(), n.position());
-                    }
-                }
             }
         }
 
@@ -174,6 +150,46 @@ public class JL5CanonicalTypeNodeExt extends JL5TermExt {
         }
         if (t.isClass() && t.toClass().isNested()) {
             findInstanceTypeVariables(t.toClass().outer(), tvs);
+        }
+    }
+
+    protected void checkSubtypeConstraints(JL5TypeSystem ts, Type t)
+            throws SemanticException {
+        if (t instanceof JL5SubstClassType) {
+            JL5SubstClassType substClass = (JL5SubstClassType) t;
+            JL5ParsedClassType pct = substClass.base();
+            JL5SubstClassType capSC =
+                    (JL5SubstClassType) ts.applyCaptureConversion(substClass,
+                                                                  substClass.position());
+            for (JL5ParsedClassType cur = pct; cur != null; cur =
+                    (JL5ParsedClassType) cur.outer()) {
+
+                for (TypeVariable tv : cur.typeVariables()) {
+                    if (!tv.upperBound().isCanonical()) {
+                        // need to disambiguate
+                        throw new SchedulerException();
+                    }
+
+                    Type actual = capSC.subst().substType(tv);
+                    Type upperBound =
+                            capSC.subst().substType(tv.upperBound());
+                    if (!ts.isSubtype(actual, upperBound)) {
+                        throw new SemanticException("Type argument " + actual
+                                + " is not a subtype of its declared bound "
+                                + upperBound, actual.position());
+                    }
+
+                    checkSubtypeConstraints(ts, substClass.subst()
+                                                          .substType(tv));
+                }
+            }
+        }
+        else if (t instanceof ArrayType) {
+            checkSubtypeConstraints(ts, ((ArrayType) t).base());
+        }
+        else if (t instanceof WildCardType) {
+            checkSubtypeConstraints(ts, ((WildCardType) t).upperBound());
+            checkSubtypeConstraints(ts, ((WildCardType) t).lowerBound());
         }
     }
 }
