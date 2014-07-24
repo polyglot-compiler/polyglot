@@ -51,8 +51,8 @@ public class JL5MethodInstance_c extends MethodInstance_c implements
         JL5MethodInstance {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
-    private List<TypeVariable> typeParams;
-    private Annotations annotations;
+    protected List<TypeVariable> typeParams;
+	protected Annotations annotations;
 
     public JL5MethodInstance_c(JL5TypeSystem ts, Position pos,
             ReferenceType container, Flags flags, Type returnType, String name,
