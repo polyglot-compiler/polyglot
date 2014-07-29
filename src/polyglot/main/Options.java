@@ -490,12 +490,12 @@ public class Options {
      */
     public final void parseCommandLine(String args[], Set<String> source)
             throws UsageError {
-        for (int i = 0; i < args.length;) {
+        for (int index = 0; index < args.length;) {
             try {
-                int ni = parseCommand(args, i, source);
-                if (ni == i)
-                    throw new UsageError("Illegal option: " + args[i]);
-                i = ni;
+                int nextIndex = parseCommand(args, index, source);
+                if (nextIndex == index)
+                    throw new UsageError("Illegal option: " + args[index]);
+                index = nextIndex;
             }
             catch (ArrayIndexOutOfBoundsException e) {
                 throw new UsageError("Missing argument");
