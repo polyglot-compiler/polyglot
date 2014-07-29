@@ -38,6 +38,7 @@ import java.util.List;
 import javax.tools.JavaFileObject;
 
 import polyglot.frontend.Source.Kind;
+import polyglot.frontend.goals.Goal;
 import polyglot.main.Options;
 import polyglot.types.reflect.ClassFileLoader;
 import polyglot.util.CodeWriter;
@@ -180,6 +181,34 @@ public class Compiler {
      * point for the compiler, called from main().
      */
     public boolean compile(Collection<FileSource> sources) {
+        return runToGoal(sources, new GoalFactory() {
+            @Override
+            public Goal getGoal(Job job) {
+                return sourceExtension().getCompileGoal(job);
+            }
+        });
+    }
+
+    /**
+     * Validates the files listed in the set of Sources {@code source} by
+     * running passes that are dependent on the validation goal. Returns true on
+     * success.
+     */
+    public boolean validate(Collection<Source> sources) {
+        return runToGoal(sources, new GoalFactory() {
+            @Override
+            public Goal getGoal(Job job) {
+                return sourceExtension().getValidationGoal(job);
+            }
+        });
+    }
+
+    private static interface GoalFactory {
+        Goal getGoal(Job job);
+    }
+
+    private boolean runToGoal(Collection<? extends Source> sources,
+            GoalFactory goalFactory) {
         boolean okay = false;
 
         try {
@@ -195,7 +224,7 @@ public class Compiler {
                     jobs.add(job);
 
                     // Now, add a goal for completing the job.
-                    scheduler.addGoal(sourceExtension().getCompileGoal(job));
+                    scheduler.addGoal(goalFactory.getGoal(job));
                 }
 
                 scheduler.setCommandLineJobs(jobs);

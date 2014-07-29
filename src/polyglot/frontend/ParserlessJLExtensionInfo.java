@@ -142,6 +142,11 @@ public abstract class ParserlessJLExtensionInfo extends AbstractExtensionInfo {
         return scheduler.CodeGenerated(job);
     }
 
+    @Override
+    public Goal getValidationGoal(Job job) {
+        return scheduler.Validated(job);
+    }
+
     static {
         // Force Topics to load.
         @SuppressWarnings("unused")

@@ -50,6 +50,7 @@ import polyglot.frontend.goals.TypeChecked;
 import polyglot.frontend.goals.TypeExists;
 import polyglot.frontend.goals.TypesInitialized;
 import polyglot.frontend.goals.TypesInitializedForCommandLine;
+import polyglot.frontend.goals.Validated;
 import polyglot.types.FieldInstance;
 import polyglot.types.ParsedClassType;
 import polyglot.types.TypeSystem;
@@ -207,6 +208,12 @@ public class JLScheduler extends Scheduler {
         TypeSystem ts = extInfo.typeSystem();
         NodeFactory nf = extInfo.nodeFactory();
         Goal g = ForwardReferencesChecked.create(this, job, ts, nf);
+        return g;
+    }
+
+    @Override
+    public Goal Validated(Job job) {
+        Goal g = Validated.create(this, job);
         return g;
     }
 

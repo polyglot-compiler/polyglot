@@ -68,6 +68,11 @@ public interface ExtensionInfo {
     Goal getCompileGoal(Job job);
 
     /**
+     * @return the goal for validating a particular compilation unit.
+     */
+    Goal getValidationGoal(Job job);
+
+    /**
      * Return an Options object, which will be given the command line to parse.
      */
     Options getOptions();

@@ -83,14 +83,7 @@ public class Serialized extends SourceFileGoal {
     @Override
     public Collection<Goal> prerequisiteGoals(Scheduler scheduler) {
         List<Goal> l = new ArrayList<>();
-        l.add(scheduler.TypeChecked(job));
-//        l.add(scheduler.ConstantsChecked(job));
-        l.add(scheduler.ReachabilityChecked(job));
-        l.add(scheduler.ExceptionsChecked(job));
-        l.add(scheduler.ExitPathsChecked(job));
-        l.add(scheduler.InitializationsChecked(job));
-        l.add(scheduler.ConstructorCallsChecked(job));
-        l.add(scheduler.ForwardReferencesChecked(job));
+        l.add(scheduler.Validated(job));
         l.addAll(super.prerequisiteGoals(scheduler));
         return l;
     }

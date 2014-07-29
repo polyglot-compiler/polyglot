@@ -838,6 +838,8 @@ public abstract class Scheduler {
 
     public abstract Goal ForwardReferencesChecked(Job job);
 
+    public abstract Goal Validated(Job job);
+
     public abstract Goal Serialized(Job job);
 
     public abstract Goal CodeGenerated(Job job);
