@@ -131,8 +131,7 @@ public abstract class ParserlessJLExtensionInfo extends AbstractExtensionInfo {
      * {@code reader}.
      */
     @Override
-    public abstract Parser parser(Reader reader, FileSource source,
-            ErrorQueue eq);
+    public abstract Parser parser(Reader reader, Source source, ErrorQueue eq);
 
     /**
      * Return the {@code Goal} to compile the source file associated with

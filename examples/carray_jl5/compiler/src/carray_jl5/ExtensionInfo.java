@@ -4,8 +4,8 @@ import java.io.Reader;
 
 import polyglot.ast.NodeFactory;
 import polyglot.frontend.CupParser;
-import polyglot.frontend.FileSource;
 import polyglot.frontend.Parser;
+import polyglot.frontend.Source;
 import polyglot.lex.Lexer;
 import polyglot.types.TypeSystem;
 import polyglot.util.ErrorQueue;
@@ -25,7 +25,7 @@ public class ExtensionInfo extends polyglot.ext.jl5.JL5ExtensionInfo {
     }
 
     @Override
-    public Parser parser(Reader reader, FileSource source, ErrorQueue eq) {
+    public Parser parser(Reader reader, Source source, ErrorQueue eq) {
         Lexer lexer = new Lexer_c(reader, source, eq);
         Grm grm = new Grm(lexer, ts, nf, eq);
         return new CupParser(grm, source, eq);

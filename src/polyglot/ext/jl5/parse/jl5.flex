@@ -14,7 +14,7 @@ import polyglot.lex.*;
 import polyglot.util.Position;
 import polyglot.util.ErrorQueue;
 import polyglot.util.ErrorInfo;
-import polyglot.frontend.FileSource;
+import polyglot.frontend.Source;
 import java.util.HashMap;
 import java.math.BigInteger;
 
@@ -45,7 +45,7 @@ import java.math.BigInteger;
     HashMap<String, Integer> keywords;
     Position commentBegin;
 
-    public Lexer_c(java.io.Reader reader, FileSource file, ErrorQueue eq) {
+    public Lexer_c(java.io.Reader reader, Source file, ErrorQueue eq) {
         this(reader);
         this.file = file.name();
         this.path = file.path();

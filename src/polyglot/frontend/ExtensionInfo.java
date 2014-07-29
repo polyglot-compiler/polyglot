@@ -124,7 +124,7 @@ public interface ExtensionInfo {
     TargetFactory targetFactory();
 
     /** Get a parser for this language extension. */
-    Parser parser(Reader reader, FileSource source, ErrorQueue eq);
+    Parser parser(Reader reader, Source source, ErrorQueue eq);
 
     /**
      * Get the ToExt extension object used for translating AST nodes to the

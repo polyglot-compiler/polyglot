@@ -208,8 +208,7 @@ public abstract class AbstractExtensionInfo implements ExtensionInfo {
     }
 
     @Override
-    public abstract Parser parser(Reader reader, FileSource source,
-            ErrorQueue eq);
+    public abstract Parser parser(Reader reader, Source source, ErrorQueue eq);
 
     @Override
     public String toString() {

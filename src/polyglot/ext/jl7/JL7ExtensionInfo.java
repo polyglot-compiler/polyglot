@@ -37,9 +37,9 @@ import polyglot.ext.jl7.parse.Grm;
 import polyglot.ext.jl7.parse.Lexer_c;
 import polyglot.ext.jl7.types.JL7TypeSystem_c;
 import polyglot.frontend.CupParser;
-import polyglot.frontend.FileSource;
 import polyglot.frontend.Parser;
 import polyglot.frontend.Scheduler;
+import polyglot.frontend.Source;
 import polyglot.main.Version;
 import polyglot.types.TypeSystem;
 import polyglot.util.ErrorQueue;
@@ -93,7 +93,7 @@ public class JL7ExtensionInfo extends JL5ExtensionInfo {
      * {@code reader}.
      */
     @Override
-    public Parser parser(Reader reader, FileSource source, ErrorQueue eq) {
+    public Parser parser(Reader reader, Source source, ErrorQueue eq) {
         reader = new polyglot.lex.EscapedUnicodeReader(reader);
 
         polyglot.lex.Lexer lexer = new Lexer_c(reader, source, eq);

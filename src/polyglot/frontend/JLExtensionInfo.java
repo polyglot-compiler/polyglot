@@ -65,7 +65,7 @@ public class JLExtensionInfo extends ParserlessJLExtensionInfo {
      * {@code reader}.
      */
     @Override
-    public Parser parser(Reader reader, FileSource source, ErrorQueue eq) {
+    public Parser parser(Reader reader, Source source, ErrorQueue eq) {
         reader = new EscapedUnicodeReader(reader);
 
         polyglot.lex.Lexer lexer = new Lexer_c(reader, source, eq);

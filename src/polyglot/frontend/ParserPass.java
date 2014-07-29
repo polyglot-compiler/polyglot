@@ -52,7 +52,7 @@ public class ParserPass extends AbstractPass {
     public boolean run() {
         ErrorQueue eq = compiler.errorQueue();
 
-        FileSource source = (FileSource) goal.job().source();
+        Source source = goal.job().source();
 
         try (Reader reader = source.openReader(false)) {
 

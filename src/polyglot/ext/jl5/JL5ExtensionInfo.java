@@ -39,10 +39,10 @@ import polyglot.ext.jl5.parse.Lexer_c;
 import polyglot.ext.jl5.types.JL5TypeSystem_c;
 import polyglot.ext.jl5.types.reflect.JL5ClassFile;
 import polyglot.frontend.CupParser;
-import polyglot.frontend.FileSource;
 import polyglot.frontend.JLExtensionInfo;
 import polyglot.frontend.Parser;
 import polyglot.frontend.Scheduler;
+import polyglot.frontend.Source;
 import polyglot.main.Options;
 import polyglot.main.Version;
 import polyglot.translate.JLOutputExtensionInfo;
@@ -104,7 +104,7 @@ public class JL5ExtensionInfo extends JLExtensionInfo {
      * {@code reader}.
      */
     @Override
-    public Parser parser(Reader reader, FileSource source, ErrorQueue eq) {
+    public Parser parser(Reader reader, Source source, ErrorQueue eq) {
         reader = new polyglot.lex.EscapedUnicodeReader(reader);
 
         polyglot.lex.Lexer lexer = new Lexer_c(reader, source, eq);
