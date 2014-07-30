@@ -27,6 +27,7 @@ package polyglot.ext.jl5;
 
 import java.io.IOException;
 import java.io.Reader;
+import java.util.Set;
 
 import javax.tools.FileObject;
 
@@ -111,6 +112,11 @@ public class JL5ExtensionInfo extends JLExtensionInfo {
         polyglot.parse.BaseParser parser = new Grm(lexer, ts, nf, eq);
 
         return new CupParser(parser, source, eq);
+    }
+
+    @Override
+    public Set<String> keywords() {
+	return new Lexer_c(null).keywords();
     }
 
     @Override

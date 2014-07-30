@@ -26,6 +26,7 @@
 package polyglot.ext.jl7;
 
 import java.io.Reader;
+import java.util.Set;
 
 import polyglot.ast.NodeFactory;
 import polyglot.ext.jl5.JL5ExtensionInfo;
@@ -100,6 +101,11 @@ public class JL7ExtensionInfo extends JL5ExtensionInfo {
         polyglot.parse.BaseParser parser = new Grm(lexer, ts, nf, eq);
 
         return new CupParser(parser, source, eq);
+    }
+
+    @Override
+    public Set<String> keywords() {
+	return new Lexer_c(null).keywords();
     }
 
     @Override

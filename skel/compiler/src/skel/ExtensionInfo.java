@@ -12,6 +12,7 @@ import polyglot.types.*;
 import polyglot.util.*;
 
 import java.io.*;
+import java.util.Set;
 
 /**
  * Extension information for skel extension.
@@ -38,6 +39,11 @@ public class ExtensionInfo extends polyglot.frontend.JLExtensionInfo {
         Lexer lexer = new Lexer_c(reader, source, eq);
         Grm grm = new Grm(lexer, ts, nf, eq);
         return new CupParser(grm, source, eq);
+    }
+
+    @Override
+    public Set<String> keywords() {
+	return new Lexer_c(null).keywords();
     }
 
     @Override

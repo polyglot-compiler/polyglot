@@ -32,8 +32,10 @@ import polyglot.util.Position;
 import polyglot.util.ErrorQueue;
 import polyglot.util.ErrorInfo;
 import polyglot.frontend.Source;
-import java.util.HashMap;
 import java.math.BigInteger;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Set;
 
 @SuppressWarnings({"unused", "fallthrough", "all"})
 %%
@@ -67,6 +69,15 @@ import java.math.BigInteger;
         this.eq = eq;
         this.keywords = new HashMap<>();
         init_keywords();
+    }
+
+    public Set<String> keywords() {
+        if (keywords == null) {
+	    keywords = new HashMap<>();
+	    init_keywords();
+	}
+
+	return Collections.unmodifiableSet(keywords.keySet());
     }
 
     protected void init_keywords() {

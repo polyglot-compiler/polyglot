@@ -29,6 +29,7 @@ package polyglot.frontend;
 import java.io.IOException;
 import java.io.Reader;
 import java.util.List;
+import java.util.Set;
 
 import javax.tools.FileObject;
 import javax.tools.JavaFileManager.Location;
@@ -127,6 +128,11 @@ public interface ExtensionInfo {
      * and a class or source file name.
      */
     TargetFactory targetFactory();
+
+    /**
+     * Gets a set of keywords for this language extension.
+     */
+    Set<String> keywords();
 
     /** Get a parser for this language extension. */
     Parser parser(Reader reader, Source source, ErrorQueue eq);

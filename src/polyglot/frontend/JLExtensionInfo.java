@@ -27,6 +27,7 @@
 package polyglot.frontend;
 
 import java.io.Reader;
+import java.util.Set;
 
 import polyglot.lex.EscapedUnicodeReader;
 import polyglot.parse.Grm;
@@ -72,6 +73,11 @@ public class JLExtensionInfo extends ParserlessJLExtensionInfo {
         polyglot.parse.BaseParser parser = new Grm(lexer, ts, nf, eq);
 
         return new CupParser(parser, source, eq);
+    }
+
+    @Override
+    public Set<String> keywords() {
+        return new Lexer_c(null).keywords();
     }
 
 }
