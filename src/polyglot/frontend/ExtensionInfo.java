@@ -13,12 +13,12 @@
  * This program and the accompanying materials are made available under
  * the terms of the Lesser GNU Public License v2.0 which accompanies this
  * distribution.
- * 
+ *
  * The development of the Polyglot project has been supported by a
  * number of funding sources, including DARPA Contract F30602-99-1-0533,
  * monitored by USAF Rome Laboratory, ONR Grants N00014-01-1-0968 and
  * N00014-09-1-0652, NSF Grants CNS-0208642, CNS-0430161, CCF-0133302,
- * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan 
+ * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan
  * Research Fellowship, and an Intel Research Ph.D. Fellowship.
  *
  * See README for contributors.
@@ -29,6 +29,7 @@ package polyglot.frontend;
 import java.io.IOException;
 import java.io.Reader;
 import java.util.List;
+import java.util.Set;
 
 import javax.tools.FileObject;
 import javax.tools.JavaFileManager.Location;
@@ -66,6 +67,11 @@ public interface ExtensionInfo {
      * have subgoals on which it depends.
      */
     Goal getCompileGoal(Job job);
+
+    /**
+     * @return the goal for validating a particular compilation unit.
+     */
+    Goal getValidationGoal(Job job);
 
     /**
      * Return an Options object, which will be given the command line to parse.
@@ -123,8 +129,13 @@ public interface ExtensionInfo {
      */
     TargetFactory targetFactory();
 
+    /**
+     * Gets a set of keywords for this language extension.
+     */
+    Set<String> keywords();
+
     /** Get a parser for this language extension. */
-    Parser parser(Reader reader, FileSource source, ErrorQueue eq);
+    Parser parser(Reader reader, Source source, ErrorQueue eq);
 
     /**
      * Get the ToExt extension object used for translating AST nodes to the
@@ -168,7 +179,7 @@ public interface ExtensionInfo {
 
     /**
      * The set of locations to search for packages and class files when
-     * otherwise unspecified.  This provides some backward compatibility 
+     * otherwise unspecified.  This provides some backward compatibility
      * for code written prior to the FileManager API
      */
     List<Location> defaultLocations();

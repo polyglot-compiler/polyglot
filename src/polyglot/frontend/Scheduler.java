@@ -13,12 +13,12 @@
  * This program and the accompanying materials are made available under
  * the terms of the Lesser GNU Public License v2.0 which accompanies this
  * distribution.
- * 
+ *
  * The development of the Polyglot project has been supported by a
  * number of funding sources, including DARPA Contract F30602-99-1-0533,
  * monitored by USAF Rome Laboratory, ONR Grants N00014-01-1-0968 and
  * N00014-09-1-0652, NSF Grants CNS-0208642, CNS-0430161, CCF-0133302,
- * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan 
+ * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan
  * Research Fellowship, and an Intel Research Ph.D. Fellowship.
  *
  * See README for contributors.
@@ -55,7 +55,7 @@ import polyglot.util.StringUtil;
 /**
  * The {@code Scheduler} manages {@code Goal}s and runs
  * {@code Pass}es.
- * 
+ *
  * The basic idea is to have the scheduler try to satisfy goals.
  * To reach a goal, a pass is run.  The pass could modify an AST or it
  * could, for example, initialize the members of a class loaded from a
@@ -181,7 +181,7 @@ public abstract class Scheduler {
      * Add a new {@code subgoal} of {@code goal}.
      * {@code subgoal} must be completed before {@code goal} is
      * attempted.
-     * 
+     *
      * @throws CyclicDependencyException
      *             if a prerequisite of {@code subgoal} is
      *             {@code goal}
@@ -240,7 +240,7 @@ public abstract class Scheduler {
     Pass schedulerPass(Goal g) {
         return new EmptyPass(g);
     }
-    */
+     */
 
     public boolean reached(Goal g) {
         return g.hasBeenReached();
@@ -339,10 +339,10 @@ public abstract class Scheduler {
         return okay;
     }
 
-    /**         
+    /**
      * Load a source file and create a job for it.  Optionally add a goal
      * to compile the job to Java.
-     * 
+     *
      * @param source The source file to load.
      * @param compile True if the compile goal should be added for the new job.
      * @return The new job or null if the job has already completed.
@@ -391,7 +391,7 @@ public abstract class Scheduler {
      * Run a pass until the {@code goal} is attempted. Callers should
      * check goal.completed() and should be able to handle the goal not being
      * reached.
-     * 
+     *
      * @return false if there was an error trying to reach the goal; true if
      *         there was no error, even if the goal was not reached.
      */
@@ -487,7 +487,7 @@ public abstract class Scheduler {
                 return true;
             }
 
-            // If the goal was not reached, run the coreqs of the goal. 
+            // If the goal was not reached, run the coreqs of the goal.
             for (Goal subgoal : new ArrayList<>(goal.corequisiteGoals(this))) {
                 if (reached(subgoal)) {
                     continue;
@@ -530,7 +530,7 @@ public abstract class Scheduler {
         return runPass(pass);
     }
 
-    /**         
+    /**
      * Run the pass {@code pass}.  All subgoals of the pass's goal
      * required to start the pass should be satisfied.  Running the pass
      * may not satisfy the goal, forcing it to be retried later with new
@@ -575,19 +575,10 @@ public abstract class Scheduler {
             ErrorQueue eq = extInfo.compiler().errorQueue();
 
             // Go for one last loop with reporting enabled.
-            if (goal.equals(infiniteLoopGoal)) {
-                // We've gone around the loop once, abort the compiler.
-
-                if (Report.should_report("dump-dep-graph", 1))
-                    dumpInFlightDependenceGraph();
-                if (Report.should_report("dump-dep-graph", 1))
-                    dumpDependenceGraph();
-
-                eq.enqueue(ErrorInfo.INTERNAL_ERROR, message + "  Aborting.");
-                throw new Main.TerminationException(1);
-            }
-            else if (infiniteLoopGoal == null) {
+            if (infiniteLoopGoal == null) {
                 infiniteLoopGoal = goal;
+                infiniteFrontEnd = Report.level(Report.frontend);
+                infiniteDeps = Report.level("deps");
 
                 // Enable reporting.
                 Report.addTopic(Report.frontend, 4);
@@ -596,6 +587,24 @@ public abstract class Scheduler {
                 eq.enqueue(ErrorInfo.DEBUG,
                            message
                                    + "  The compiler will attempt the goal one more time with reporting enabled, then abort.");
+            }
+            else {
+                // Disable reporting.
+                Report.setTopic(Report.frontend, infiniteFrontEnd);
+                Report.setTopic("deps", infiniteDeps);
+
+                if (goal.equals(infiniteLoopGoal)) {
+                    // We've gone around the loop once, abort the compiler.
+
+                    if (Report.should_report("dump-dep-graph", 1))
+                        dumpInFlightDependenceGraph();
+                    if (Report.should_report("dump-dep-graph", 1))
+                        dumpDependenceGraph();
+
+                    eq.enqueue(ErrorInfo.INTERNAL_ERROR, message
+                            + "  Aborting.");
+                    throw new Main.TerminationException(1);
+                }
             }
         }
 
@@ -827,6 +836,8 @@ public abstract class Scheduler {
 
     public abstract Goal ForwardReferencesChecked(Job job);
 
+    public abstract Goal Validated(Job job);
+
     public abstract Goal Serialized(Job job);
 
     public abstract Goal CodeGenerated(Job job);
@@ -905,6 +916,8 @@ public abstract class Scheduler {
 
     protected static final int MAX_RUN_COUNT = 200;
     protected Goal infiniteLoopGoal = null;
+    protected int infiniteFrontEnd;
+    protected int infiniteDeps;
 
     public boolean inInfiniteLoop() {
         return infiniteLoopGoal != null;

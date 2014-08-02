@@ -210,6 +210,15 @@ import java.math.BigInteger;
         return null;
     }
 
+    public Set<String> keywords() {
+        if (keywords == null) {
+	    keywords = new HashMap<>();
+	    init_keywords();
+	}
+
+	return Collections.unmodifiableSet(keywords.keySet());
+    }
+
     protected void init_keywords() {
         keywords.put("abstract",      new Integer(sym.ABSTRACT));
         keywords.put("assert",        new Integer(sym.ASSERT));

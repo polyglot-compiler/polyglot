@@ -11,6 +11,7 @@ import java.io.Reader;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 import pao.ast.PaoNodeFactory_c;
 import pao.parse.Grm;
@@ -19,12 +20,12 @@ import pao.types.PaoTypeSystem_c;
 import pao.visit.PaoBoxer;
 import polyglot.ast.NodeFactory;
 import polyglot.frontend.CupParser;
-import polyglot.frontend.FileSource;
 import polyglot.frontend.JLExtensionInfo;
 import polyglot.frontend.JLScheduler;
 import polyglot.frontend.Job;
 import polyglot.frontend.Parser;
 import polyglot.frontend.Scheduler;
+import polyglot.frontend.Source;
 import polyglot.frontend.goals.Goal;
 import polyglot.frontend.goals.Serialized;
 import polyglot.frontend.goals.VisitorGoal;
@@ -54,10 +55,15 @@ public class ExtensionInfo extends JLExtensionInfo {
     }
 
     @Override
-    public Parser parser(Reader reader, FileSource source, ErrorQueue eq) {
+    public Parser parser(Reader reader, Source source, ErrorQueue eq) {
         Lexer lexer = new Lexer_c(reader, source, eq);
         Grm grm = new Grm(lexer, ts, nf, eq);
         return new CupParser(grm, source, eq);
+    }
+
+    @Override
+    public Set<String> keywords() {
+	return new Lexer_c(null).keywords();
     }
 
     @Override

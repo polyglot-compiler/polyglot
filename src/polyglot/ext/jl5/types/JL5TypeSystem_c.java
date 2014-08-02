@@ -875,6 +875,14 @@ public class JL5TypeSystem_c extends
         }
         JL5MethodInstance mj = mi;
         if (!mi.typeParams().isEmpty() && subst != null) {
+            // check that the substitution satisfies the bounds
+            for (TypeVariable tv : subst.substitutions().keySet()) {
+                Type a = subst.substitutions().get(tv);
+                Type substUpperBound = subst.substType(tv.upperBound());
+                if (!isSubtype(a, substUpperBound)) {
+                    return null;
+                }
+            }
             //mj = (JL5MethodInstance) this.instantiate(mi.position(), mi, actualTypeArgs);
             mj = subst.substMethod(mi);
         }

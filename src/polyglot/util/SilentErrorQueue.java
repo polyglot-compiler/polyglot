@@ -13,12 +13,12 @@
  * This program and the accompanying materials are made available under
  * the terms of the Lesser GNU Public License v2.0 which accompanies this
  * distribution.
- * 
+ *
  * The development of the Polyglot project has been supported by a
  * number of funding sources, including DARPA Contract F30602-99-1-0533,
  * monitored by USAF Rome Laboratory, ONR Grants N00014-01-1-0968 and
  * N00014-09-1-0652, NSF Grants CNS-0208642, CNS-0430161, CCF-0133302,
- * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan 
+ * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan
  * Research Fellowship, and an Intel Research Ph.D. Fellowship.
  *
  * See README for contributors.
@@ -27,17 +27,19 @@
 package polyglot.util;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 /**
  * A {@code SilentErrorQueue} records but does not output error messages.
  */
-public class SilentErrorQueue extends AbstractErrorQueue {
+public class SilentErrorQueue extends AbstractErrorQueue implements
+Iterable<ErrorInfo> {
     private List<ErrorInfo> errors;
 
     public SilentErrorQueue(int limit, String name) {
         super(limit, name);
-        this.errors = new ArrayList<>(limit);
+        errors = new ArrayList<>(limit);
     }
 
     @Override
@@ -47,5 +49,10 @@ public class SilentErrorQueue extends AbstractErrorQueue {
 
     public List<ErrorInfo> getErrors() {
         return errors;
+    }
+
+    @Override
+    public Iterator<ErrorInfo> iterator() {
+        return errors.iterator();
     }
 }

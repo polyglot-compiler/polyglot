@@ -13,12 +13,12 @@
  * This program and the accompanying materials are made available under
  * the terms of the Lesser GNU Public License v2.0 which accompanies this
  * distribution.
- * 
+ *
  * The development of the Polyglot project has been supported by a
  * number of funding sources, including DARPA Contract F30602-99-1-0533,
  * monitored by USAF Rome Laboratory, ONR Grants N00014-01-1-0968 and
  * N00014-09-1-0652, NSF Grants CNS-0208642, CNS-0430161, CCF-0133302,
- * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan 
+ * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan
  * Research Fellowship, and an Intel Research Ph.D. Fellowship.
  *
  * See README for contributors.
@@ -45,7 +45,7 @@ import polyglot.visit.ClassSerializer;
 
 /**
  * The {@code Serialized} goal is reached after typing information is serialized
- * into the compiled code. 
+ * into the compiled code.
  */
 public class Serialized extends SourceFileGoal {
     public static Goal create(Scheduler scheduler, Job job) {
@@ -83,14 +83,7 @@ public class Serialized extends SourceFileGoal {
     @Override
     public Collection<Goal> prerequisiteGoals(Scheduler scheduler) {
         List<Goal> l = new ArrayList<>();
-        l.add(scheduler.TypeChecked(job));
-//        l.add(scheduler.ConstantsChecked(job));
-        l.add(scheduler.ReachabilityChecked(job));
-        l.add(scheduler.ExceptionsChecked(job));
-        l.add(scheduler.ExitPathsChecked(job));
-        l.add(scheduler.InitializationsChecked(job));
-        l.add(scheduler.ConstructorCallsChecked(job));
-        l.add(scheduler.ForwardReferencesChecked(job));
+        l.add(scheduler.Validated(job));
         l.addAll(super.prerequisiteGoals(scheduler));
         return l;
     }

@@ -76,36 +76,42 @@ public class EqualConstraint extends Constraint {
             JL5SubstClassType actual_pt = (JL5SubstClassType) actual;
             if (formal_pt.base().equals(actual_pt.base())) {
                 JL5ParsedClassType g = formal_pt.base();
-                for (TypeVariable tv : g.typeVariables()) {
-                    ReferenceType formal_targ =
-                            (ReferenceType) formal_pt.subst().substType(tv);
-                    ReferenceType actual_targ =
-                            (ReferenceType) actual_pt.subst().substType(tv);
-                    if (!(formal_targ instanceof WildCardType)
-                            && !(actual_targ instanceof WildCardType)) {
-                        r.add(new EqualConstraint(actual_targ,
-                                                  formal_targ,
-                                                  solver));
-                    }
-                    else if (formal_targ instanceof WildCardType
-                            && actual_targ instanceof WildCardType) {
-                        WildCardType formal_targ_wc =
-                                (WildCardType) formal_targ;
-                        WildCardType actual_targ_wc =
-                                (WildCardType) actual_targ;
-                        if (formal_targ_wc.isExtendsConstraint()
-                                && actual_targ_wc.isExtendsConstraint()) {
-                            r.add(new EqualConstraint(formal_targ_wc.upperBound(),
-                                                      actual_targ_wc.upperBound(),
+                for (JL5ParsedClassType cur = g; cur != null; cur =
+                        (JL5ParsedClassType) cur.outer()) {
+                    for (TypeVariable tv : cur.typeVariables()) {
+                        ReferenceType formal_targ =
+                                (ReferenceType) formal_pt.subst()
+                                                         .substType(tv);
+                        ReferenceType actual_targ =
+                                (ReferenceType) actual_pt.subst()
+                                                         .substType(tv);
+                        if (!(formal_targ instanceof WildCardType)
+                                && !(actual_targ instanceof WildCardType)) {
+                            r.add(new EqualConstraint(actual_targ,
+                                                      formal_targ,
                                                       solver));
                         }
-                        else if (formal_targ_wc.isSuperConstraint()
-                                && actual_targ_wc.isSuperConstraint()) {
-                            r.add(new EqualConstraint(formal_targ_wc.lowerBound(),
-                                                      actual_targ_wc.lowerBound(),
-                                                      solver));
+                        else if (formal_targ instanceof WildCardType
+                                && actual_targ instanceof WildCardType) {
+                            WildCardType formal_targ_wc =
+                                    (WildCardType) formal_targ;
+                            WildCardType actual_targ_wc =
+                                    (WildCardType) actual_targ;
+                            if (formal_targ_wc.isExtendsConstraint()
+                                    && actual_targ_wc.isExtendsConstraint()) {
+                                r.add(new EqualConstraint(formal_targ_wc.upperBound(),
+                                                          actual_targ_wc.upperBound(),
+                                                          solver));
+                            }
+                            else if (formal_targ_wc.isSuperConstraint()
+                                    && actual_targ_wc.isSuperConstraint()) {
+                                r.add(new EqualConstraint(formal_targ_wc.lowerBound(),
+                                                          actual_targ_wc.lowerBound(),
+                                                          solver));
+                            }
                         }
                     }
+
                 }
             }
         }

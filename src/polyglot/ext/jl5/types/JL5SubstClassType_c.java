@@ -248,7 +248,7 @@ public class JL5SubstClassType_c extends
                 // same base. check the params
                 // go through each type variable, and check containment
                 boolean allContained = true;
-                for (TypeVariable tv : base().typeVariables()) {
+                for (TypeVariable tv : ts.classAndEnclosingTypeVariables(base())) {
                     Type ti = this.subst.substType(tv);
                     Type si = anc.subst.substType(tv);
 //                    System.err.println("      E " + ti + " contained in "+si+" ? " + ts.isContained(ti, si));

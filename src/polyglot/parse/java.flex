@@ -31,9 +31,11 @@ import polyglot.lex.*;
 import polyglot.util.Position;
 import polyglot.util.ErrorQueue;
 import polyglot.util.ErrorInfo;
-import polyglot.frontend.FileSource;
-import java.util.HashMap;
+import polyglot.frontend.Source;
 import java.math.BigInteger;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Set;
 
 @SuppressWarnings({"unused", "fallthrough", "all"})
 %%
@@ -60,13 +62,22 @@ import java.math.BigInteger;
     HashMap<String, Integer> keywords;
     Position commentBegin;
 
-    public Lexer_c(java.io.Reader reader, FileSource file, ErrorQueue eq) {
+    public Lexer_c(java.io.Reader reader, Source file, ErrorQueue eq) {
         this(reader);
         this.file = file.name();
         this.path = file.path();
         this.eq = eq;
         this.keywords = new HashMap<>();
         init_keywords();
+    }
+
+    public Set<String> keywords() {
+        if (keywords == null) {
+	    keywords = new HashMap<>();
+	    init_keywords();
+	}
+
+	return Collections.unmodifiableSet(keywords.keySet());
     }
 
     protected void init_keywords() {
