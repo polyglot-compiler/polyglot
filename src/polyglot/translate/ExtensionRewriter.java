@@ -67,8 +67,8 @@ public class ExtensionRewriter extends ContextVisitor {
     /** A quasi-quoter for generating AST node in the target language */
     protected QQ qq;
 
-    /** The language dispatcher for the source language */
-    private final Lang lang;
+    /** The language dispatcher for the AST */
+    private Lang lang;
 
     public ExtensionRewriter(Job job, ExtensionInfo from_ext,
             ExtensionInfo to_ext) {
@@ -145,6 +145,7 @@ public class ExtensionRewriter extends ContextVisitor {
         else {
             to_ext.scheduler().addJob(job.source(), ast);
         }
+        lang = to_ext.nodeFactory().lang();
     }
 
     public ExtensionInfo from_ext() {

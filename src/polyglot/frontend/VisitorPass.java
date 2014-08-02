@@ -26,6 +26,7 @@
 
 package polyglot.frontend;
 
+import polyglot.ast.Lang;
 import polyglot.ast.Node;
 import polyglot.frontend.goals.Goal;
 import polyglot.main.Report;
@@ -44,6 +45,11 @@ public class VisitorPass extends AbstractPass {
     public VisitorPass(Goal goal, NodeVisitor v) {
         super(goal);
         this.v = v;
+    }
+
+    @Override
+    public Lang lang() {
+        return v.lang();
     }
 
     public void visitor(NodeVisitor v) {

@@ -37,11 +37,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import polyglot.ast.Lang;
 import polyglot.ast.Node;
 import polyglot.frontend.goals.AbstractGoal;
 import polyglot.frontend.goals.EndGoal;
 import polyglot.frontend.goals.Goal;
 import polyglot.main.Main;
+import polyglot.main.Options;
 import polyglot.main.Report;
 import polyglot.types.FieldInstance;
 import polyglot.types.ParsedClassType;
@@ -109,20 +111,20 @@ public abstract class Scheduler {
     public Scheduler(ExtensionInfo extInfo) {
         this.extInfo = extInfo;
 
-        this.jobs = new LinkedHashMap<>();
-        this.goals = new LinkedHashMap<>();
-        this.runCount = new LinkedHashMap<>();
-        this.inWorklist = new LinkedHashSet<>();
-        this.worklist = new LinkedList<>();
-        this.currentPass = null;
+        jobs = new LinkedHashMap<>();
+        goals = new LinkedHashMap<>();
+        runCount = new LinkedHashMap<>();
+        inWorklist = new LinkedHashSet<>();
+        worklist = new LinkedList<>();
+        currentPass = null;
     }
 
     public Collection<Job> commandLineJobs() {
-        return this.commandLineJobs;
+        return commandLineJobs;
     }
 
     public void setCommandLineJobs(Collection<Job> c) {
-        this.commandLineJobs = Collections.unmodifiableCollection(c);
+        commandLineJobs = Collections.unmodifiableCollection(c);
     }
 
     public boolean prerequisiteDependsOn(Goal goal, Goal subgoal) {
@@ -554,10 +556,10 @@ public abstract class Scheduler {
                     + goal);
         }
 
-        Integer countObj = this.runCount.get(goal);
+        Integer countObj = runCount.get(goal);
         int count = countObj != null ? countObj.intValue() : 0;
         count++;
-        this.runCount.put(goal, count);
+        runCount.put(goal, count);
 
         if (count >= MAX_RUN_COUNT) {
             String[] suffix = new String[] { "th", "st", "nd", "rd" };
@@ -602,8 +604,8 @@ public abstract class Scheduler {
         boolean result = false;
 
         if (job == null || job.status()) {
-            Pass oldPass = this.currentPass;
-            this.currentPass = pass;
+            Pass oldPass = currentPass;
+            currentPass = pass;
             Report.pushTopic(pass.name());
 
             // Stop the timer on the old pass. */
@@ -704,7 +706,7 @@ public abstract class Scheduler {
                 }
 
                 Report.popTopic();
-                this.currentPass = oldPass;
+                currentPass = oldPass;
 
                 // Restart the timer on the old pass. */
                 if (oldPass != null) {
@@ -712,34 +714,30 @@ public abstract class Scheduler {
                 }
             }
 
-            // pretty-print this pass if we need to.
-            if (job != null
-                    && extInfo.getOptions().print_ast.contains(pass.name())) {
-                System.err.println("--------------------------------"
-                        + "--------------------------------");
-                System.err.println("Pretty-printing AST for " + job + " after "
-                        + pass.name());
+            if (job != null) {
+                Options options = extInfo.getOptions();
+                String passName = pass.name();
+                Lang lang = pass.lang();
 
-                extInfo.nodeFactory()
-                       .lang()
-                       .prettyPrint(job.ast(),
-                                    extInfo.nodeFactory().lang(),
-                                    System.err);
-            }
+                // pretty-print this pass if we need to.
+                if (options.print_ast.contains(passName)) {
+                    System.err.println("--------------------------------"
+                            + "--------------------------------");
+                    System.err.println("Pretty-printing AST for " + job
+                            + " after " + passName);
 
-            // dump this pass if we need to.
-            if (job != null
-                    && extInfo.getOptions().dump_ast.contains(pass.name())) {
-                System.err.println("--------------------------------"
-                        + "--------------------------------");
-                System.err.println("Dumping AST for " + job + " after "
-                        + pass.name());
+                    lang.prettyPrint(job.ast(), lang, System.err);
+                }
 
-                extInfo.nodeFactory()
-                       .lang()
-                       .dump(job.ast(),
-                             extInfo.nodeFactory().lang(),
-                             System.err);
+                // dump this pass if we need to.
+                if (options.dump_ast.contains(passName)) {
+                    System.err.println("--------------------------------"
+                            + "--------------------------------");
+                    System.err.println("Dumping AST for " + job + " after "
+                            + passName);
+
+                    lang.dump(job.ast(), lang, System.err);
+                }
             }
 
             // This seems to work around a VM bug on linux with JDK
@@ -877,7 +875,7 @@ public abstract class Scheduler {
         if (job != null) return job;
 
         // No appropriate job yet exists, we will create one.
-        job = this.createSourceJob(source, ast);
+        job = createSourceJob(source, ast);
 
         // record the job in the map and the worklist.
         jobs.put(source, job);

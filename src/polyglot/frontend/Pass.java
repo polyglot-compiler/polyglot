@@ -26,6 +26,7 @@
 
 package polyglot.frontend;
 
+import polyglot.ast.Lang;
 import polyglot.frontend.goals.Goal;
 
 /** A {@code Pass} represents a compiler pass that runs on a
@@ -37,6 +38,9 @@ import polyglot.frontend.goals.Goal;
 public interface Pass {
     /** The goal the pass is trying to satisfy. */
     public Goal goal();
+
+    /** The language dispatcher for the AST of this pass. */
+    public Lang lang();
 
     /** Return a user-readable name for the pass. */
     public String name();

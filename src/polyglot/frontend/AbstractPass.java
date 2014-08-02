@@ -26,6 +26,7 @@
 
 package polyglot.frontend;
 
+import polyglot.ast.Lang;
 import polyglot.frontend.goals.Goal;
 import polyglot.util.StringUtil;
 
@@ -54,6 +55,11 @@ public abstract class AbstractPass implements Pass {
     @Override
     public Goal goal() {
         return goal;
+    }
+
+    @Override
+    public Lang lang() {
+        return goal().job().extensionInfo().nodeFactory().lang();
     }
 
     /** The human-readable name of the pass. */
