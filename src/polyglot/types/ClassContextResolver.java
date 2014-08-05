@@ -123,7 +123,6 @@ public class ClassContextResolver extends AbstractAccessControlResolver {
                                         + this.type);
                 }
                 else if (!canAccess(m, accessor)) {
-                    acceptable.add(m);
                     if (error == null)
                         error =
                                 new SemanticException("Cannot access member type \""
