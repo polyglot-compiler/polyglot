@@ -594,7 +594,7 @@ public class New_c extends Expr_c implements New, NewOps {
 
     @Override
     public ClassType findEnclosingClass(Context c, ClassType ct) {
-        if (ct == anonType) {
+        if (anonType != null) {
             // we need to find ct, is an anonymous class, and so 
             // the enclosing class is the current class.
             return c.currentClass();

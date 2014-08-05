@@ -242,7 +242,7 @@ public class JL5NewExt extends JL5ProcedureCallExt implements NewOps {
     public ClassType findEnclosingClass(Context c, ClassType ct) {
         New n = this.node();
 
-        if (ct == n.anonType()) {
+        if (n.anonType() != null) {
             // we need to find ct, is an anonymous class, and so 
             // the enclosing class is the current class.
             return c.currentClass();
