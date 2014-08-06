@@ -250,6 +250,15 @@ public class TypeVariable_c extends ReferenceType_c implements TypeVariable {
     }
 
     @Override
+    public boolean isImplicitCastValidImpl(Type toType) {
+        if (super.isImplicitCastValidImpl(toType)) {
+            return true;
+        }
+        
+        return ts.isImplicitCastValid(this.upperBound, toType);
+    }
+
+    @Override
     public boolean hasLowerBound() {
         return this.lowerBound != null;
     }
