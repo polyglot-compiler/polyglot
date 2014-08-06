@@ -1,0 +1,10 @@
+import java.util.*;
+
+class Generics01 {
+	<L extends List<E>, E> E f(L l) { return l.get(0); }
+
+	void m() {
+		ArrayList<Integer> l = null;
+		f(l);
+	}
+}
