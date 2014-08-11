@@ -56,7 +56,7 @@ Unop  ::= MINUS Unop
       | RFactor                  
       | LFactor                  
       | LFactor RFactor          
-      | VAR LPAREN Exprs RPAREN  
+      | VAR LPAREN Exprs RPAREN
       ;
  
 RFactor ::= SQRT Unop		
@@ -76,7 +76,7 @@ RFactor ::= SQRT Unop
       | FLOOR Unop              
       ;
 
-LFactor ::= LFactor Atom	       	 
+LFactor ::= LFactor Atom
       | Atom			
       ;
 
@@ -89,7 +89,7 @@ Atom  ::= LPAREN Expr RPAREN
       | THETA			
       | PI			
       | E			
-      | VAR                      
+      | VAR
       | REAL 			
       | Atom POW Atom            
       | Atom SUPTWO              
