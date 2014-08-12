@@ -1,0 +1,17 @@
+
+class L {
+	<X extends Foo> void f(X x) {
+	}
+}
+
+class LL extends L {
+	@Override
+	<X extends Bar> void f(X x) {
+	}
+}
+
+class Foo {
+}
+
+class Bar {
+}
