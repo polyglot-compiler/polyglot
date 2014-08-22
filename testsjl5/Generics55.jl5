@@ -1,0 +1,3 @@
+public class Generics55 {
+	<T, T> void f() {}
+}
