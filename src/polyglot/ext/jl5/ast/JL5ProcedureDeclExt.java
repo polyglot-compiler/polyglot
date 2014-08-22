@@ -13,12 +13,12 @@
  * This program and the accompanying materials are made available under
  * the terms of the Lesser GNU Public License v2.0 which accompanies this
  * distribution.
- * 
+ *
  * The development of the Polyglot project has been supported by a
  * number of funding sources, including DARPA Contract F30602-99-1-0533,
  * monitored by USAF Rome Laboratory, ONR Grants N00014-01-1-0968 and
  * N00014-09-1-0652, NSF Grants CNS-0208642, CNS-0430161, CCF-0133302,
- * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan 
+ * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan
  * Research Fellowship, and an Intel Research Ph.D. Fellowship.
  *
  * See README for contributors.
@@ -26,8 +26,10 @@
 package polyglot.ext.jl5.ast;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import polyglot.ast.Formal;
 import polyglot.ast.Node;
@@ -74,7 +76,7 @@ public abstract class JL5ProcedureDeclExt extends JL5AnnotatedElementExt
     }
 
     public List<ParamTypeNode> typeParams() {
-        return this.typeParams;
+        return typeParams;
     }
 
     public Node typeParams(List<ParamTypeNode> typeParams) {
@@ -94,7 +96,7 @@ public abstract class JL5ProcedureDeclExt extends JL5AnnotatedElementExt
 
     @Override
     public void setAnnotations(Annotations annotations) {
-        ProcedureDecl pd = (ProcedureDecl) this.node();
+        ProcedureDecl pd = (ProcedureDecl) node();
         JL5ProcedureInstance pi = (JL5ProcedureInstance) pd.procedureInstance();
         pi.setAnnotations(annotations);
     }
@@ -113,7 +115,7 @@ public abstract class JL5ProcedureDeclExt extends JL5AnnotatedElementExt
 
     @Override
     public Context enterScope(Context c) {
-        ProcedureDecl pd = (ProcedureDecl) this.node();
+        ProcedureDecl pd = (ProcedureDecl) node();
         c = superLang().enterScope(pd, c);
         for (TypeNode pn : typeParams) {
             ((JL5Context) c).addTypeVariable((TypeVariable) pn.type());
@@ -123,7 +125,7 @@ public abstract class JL5ProcedureDeclExt extends JL5AnnotatedElementExt
 
     @Override
     public Node buildTypes(TypeBuilder tb) throws SemanticException {
-        ProcedureDecl pd = (ProcedureDecl) this.node();
+        ProcedureDecl pd = (ProcedureDecl) node();
 
         JL5TypeSystem ts = (JL5TypeSystem) tb.typeSystem();
 
@@ -171,8 +173,7 @@ public abstract class JL5ProcedureDeclExt extends JL5AnnotatedElementExt
 
     @Override
     public Node disambiguate(AmbiguityRemover ar) throws SemanticException {
-        ProcedureDecl n =
-                (ProcedureDecl) superLang().disambiguate(this.node(), ar);
+        ProcedureDecl n = (ProcedureDecl) superLang().disambiguate(node(), ar);
 
         List<TypeVariable> typeParams = new ArrayList<>(this.typeParams.size());
 
@@ -192,7 +193,7 @@ public abstract class JL5ProcedureDeclExt extends JL5AnnotatedElementExt
 
     @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
-        ProcedureDecl pd = (ProcedureDecl) this.node();
+        ProcedureDecl pd = (ProcedureDecl) node();
         JL5TypeSystem ts = (JL5TypeSystem) tc.typeSystem();
 
         JL5ProcedureInstance pi = (JL5ProcedureInstance) pd.procedureInstance();
@@ -240,6 +241,16 @@ public abstract class JL5ProcedureDeclExt extends JL5AnnotatedElementExt
             }
         }
 
+        // check duplicate type parameter decls
+        Set<String> typeParamNames = new HashSet<>();
+        for (TypeNode tn : typeParams) {
+            String name = tn.name();
+            if (typeParamNames.contains(name))
+                throw new SemanticException("Duplicate type variable declaration.",
+                                            tn.position());
+            typeParamNames.add(name);
+        }
+
         return pd;
     }
 
@@ -277,7 +288,7 @@ public abstract class JL5ProcedureDeclExt extends JL5AnnotatedElementExt
             w.write("> ");
         }
 
-        ProcedureDecl n = (ProcedureDecl) this.node();
+        ProcedureDecl n = (ProcedureDecl) node();
         prettyPrintName(w, tr);
 
         w.write("(");

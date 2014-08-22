@@ -103,6 +103,7 @@ polyglot.ext.jl5.JL5ExtensionInfo "-d out -classpath java-out -assert -noserial 
         Boxing03.jl5;
         Boxing04.jl5;
         Boxing05.jl5;
+        Unboxing01.jl5
         StaticInit01.jl5;
         InnerClass01.jl5;
         InnerClass02.jl5 (Post, "Xlint");
@@ -218,6 +219,8 @@ polyglot.ext.jl5.JL5ExtensionInfo "-d out -classpath java-out -assert -noserial 
         GenericMethod14.jl5;
         GenericMethod15.jl5;
         GenericMethod16.jl5;
+        GenericMethod17.jl5;
+        GenericMethod18.jl5 (Semantic, "Duplicate type variable");
         Inherit01.jl5 (Semantic, "Name clash");
         Inherit02.jl5 (Semantic, "Name clash");
         Inherit03.jl5 (Semantic, "Name clash"), (Semantic, "Name clash");
@@ -389,6 +392,7 @@ polyglot.ext.jl5.JL5ExtensionInfo "-d out -classpath java-out -assert -noserial 
         Annotations20.jl5;
         Annotations21.jl5;
         Annotations22.jl5  (Semantic, "not applicable");
+        Override01.jl5 (Semantic);
         Call02.jl5;
         ClassLoad01.jl5;
         CovariantRet01.jl5;
@@ -505,6 +509,7 @@ polyglot.ext.jl5.JL5ExtensionInfo "-d out -classpath java-out -removeJava5isms -
         Boxing03.jl5;
         Boxing04.jl5;
         Boxing05.jl5;
+        Unboxing01.jl5
         StaticInit01.jl5;
         InnerClass01.jl5; 
         InnerClass02.jl5;
@@ -620,6 +625,8 @@ polyglot.ext.jl5.JL5ExtensionInfo "-d out -classpath java-out -removeJava5isms -
         GenericMethod14.jl5;
         GenericMethod15.jl5;
         GenericMethod16.jl5;
+        GenericMethod17.jl5;
+        GenericMethod18.jl5 (Semantic, "Duplicate type variable");
         Inherit01.jl5 (Semantic, "Name clash");
         Inherit02.jl5 (Semantic, "Name clash");
         Inherit03.jl5 (Semantic, "Name clash"), (Semantic, "Name clash");
@@ -791,6 +798,7 @@ polyglot.ext.jl5.JL5ExtensionInfo "-d out -classpath java-out -removeJava5isms -
         Annotations20.jl5;
         Annotations21.jl5;
         Annotations22.jl5  (Semantic, "not applicable");
+        Override01.jl5 (Semantic);
         Call02.jl5;
         ClassLoad01.jl5;
         CovariantRet01.jl5;

@@ -1,4 +1,3 @@
-
 class L {
 	<X extends Foo> void f(X x) {
 	}
