@@ -1,0 +1,16 @@
+
+interface Foo {
+}
+
+interface Bar extends Foo {
+}
+
+class A {
+	<T extends Foo> void m() {
+	}
+}
+
+class B extends A {
+	<T extends Bar> void m() {
+	}
+}
