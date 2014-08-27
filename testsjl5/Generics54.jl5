@@ -1,0 +1,4 @@
+
+public class Generics54 <T> extends T {
+
+}
