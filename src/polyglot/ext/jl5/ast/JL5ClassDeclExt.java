@@ -13,12 +13,12 @@
  * This program and the accompanying materials are made available under
  * the terms of the Lesser GNU Public License v2.0 which accompanies this
  * distribution.
- * 
+ *
  * The development of the Polyglot project has been supported by a
  * number of funding sources, including DARPA Contract F30602-99-1-0533,
  * monitored by USAF Rome Laboratory, ONR Grants N00014-01-1-0968 and
  * N00014-09-1-0652, NSF Grants CNS-0208642, CNS-0430161, CCF-0133302,
- * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan 
+ * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan
  * Research Fellowship, and an Intel Research Ph.D. Fellowship.
  *
  * See README for contributors.
@@ -65,7 +65,7 @@ import polyglot.visit.TypeBuilder;
 import polyglot.visit.TypeChecker;
 
 public class JL5ClassDeclExt extends JL5AnnotatedElementExt implements
-        ClassDeclOps {
+ClassDeclOps {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
     protected List<ParamTypeNode> paramTypes = new ArrayList<>();
@@ -86,7 +86,7 @@ public class JL5ClassDeclExt extends JL5AnnotatedElementExt implements
     }
 
     public List<ParamTypeNode> paramTypes() {
-        return this.paramTypes;
+        return paramTypes;
     }
 
     public Node paramTypes(List<ParamTypeNode> types) {
@@ -109,7 +109,7 @@ public class JL5ClassDeclExt extends JL5AnnotatedElementExt implements
             throws SemanticException {
         super.annotationCheck(annoCheck);
 
-        ClassDecl n = this.node();
+        ClassDecl n = node();
 
         // check annotation circularity
         if (JL5Flags.isAnnotation(n.flags())) {
@@ -134,7 +134,7 @@ public class JL5ClassDeclExt extends JL5AnnotatedElementExt implements
 
     @Override
     public void setAnnotations(Annotations annotations) {
-        ClassDecl n = this.node();
+        ClassDecl n = node();
         JL5ParsedClassType pct = (JL5ParsedClassType) n.type();
         pct.setAnnotations(annotations);
         pct.setAnnotationsResolved(true);
@@ -142,7 +142,7 @@ public class JL5ClassDeclExt extends JL5AnnotatedElementExt implements
 
     @Override
     protected Declaration declaration() {
-        ClassDecl n = this.node();
+        ClassDecl n = node();
         return n.type();
     }
 
@@ -160,7 +160,7 @@ public class JL5ClassDeclExt extends JL5AnnotatedElementExt implements
 
     @Override
     public Node buildTypes(TypeBuilder tb) throws SemanticException {
-        ClassDecl n = (ClassDecl) superLang().buildTypes(this.node(), tb);
+        ClassDecl n = (ClassDecl) superLang().buildTypes(node(), tb);
 
         JL5TypeSystem ts = (JL5TypeSystem) tb.typeSystem();
         JL5ParsedClassType ct = (JL5ParsedClassType) n.type();
@@ -186,12 +186,12 @@ public class JL5ClassDeclExt extends JL5AnnotatedElementExt implements
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see polyglot.ast.NodeOps#enterScope(polyglot.types.Context)
      */
     @Override
     public Context enterChildScope(Node child, Context c) {
-        ClassDecl n = this.node();
+        ClassDecl n = node();
 
         if (child == n.body()) {
             TypeSystem ts = c.typeSystem();
@@ -212,20 +212,21 @@ public class JL5ClassDeclExt extends JL5AnnotatedElementExt implements
 
     @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
-        ClassDecl n = this.node();
+        ClassDecl n = node();
         ParsedClassType type = n.type();
         JL5ClassDeclExt ext = (JL5ClassDeclExt) JL5Ext.ext(n);
 
         JL5TypeSystem ts = (JL5TypeSystem) tc.typeSystem();
 
         Type superType = type.superType();
-        if (superType != null && JL5Flags.isEnum(superType.toClass().flags())) {
+        if (superType != null && superType.isClass()
+                && JL5Flags.isEnum(superType.toClass().flags())) {
             throw new SemanticException("Cannot extend enum type", n.position());
         }
 
         if (ts.equals(ts.Object(), type) && !ext.paramTypes.isEmpty()) {
             throw new SemanticException("Type: " + type
-                    + " cannot declare type variables.", n.position());
+                                        + " cannot declare type variables.", n.position());
         }
 
         if (JL5Flags.isAnnotation(n.flags()) && n.flags().isPrivate()) {
@@ -263,7 +264,7 @@ public class JL5ClassDeclExt extends JL5AnnotatedElementExt implements
     }
 
     public void prettyPrintModifiers(CodeWriter w, PrettyPrinter tr) {
-        ClassDecl n = this.node();
+        ClassDecl n = node();
         Flags f = n.flags();
         if (f.isInterface()) {
             f = f.clearInterface().clearAbstract();
@@ -293,14 +294,14 @@ public class JL5ClassDeclExt extends JL5AnnotatedElementExt implements
     }
 
     public void prettyPrintName(CodeWriter w, PrettyPrinter tr) {
-        ClassDecl n = this.node();
+        ClassDecl n = node();
         w.write(n.id().id());
     }
 
     public void prettyPrintHeaderRest(CodeWriter w, PrettyPrinter tr) {
-        ClassDecl n = this.node();
-        if (n.superClass() != null
-                && ((!JL5Flags.isEnum(n.flags()) && !JL5Flags.isAnnotation(n.flags())))) {
+        ClassDecl n = node();
+        if (n.superClass() != null && !JL5Flags.isEnum(n.flags())
+                && !JL5Flags.isAnnotation(n.flags())) {
             w.write(" extends ");
             print(n.superClass(), w, tr);
         }
@@ -361,14 +362,14 @@ public class JL5ClassDeclExt extends JL5AnnotatedElementExt implements
 
     @Override
     public void prettyPrintFooter(CodeWriter w, PrettyPrinter tr) {
-        superLang().prettyPrintFooter(this.node(), w, tr);
+        superLang().prettyPrintFooter(node(), w, tr);
     }
 
     @Override
     public Node addDefaultConstructor(TypeSystem ts, NodeFactory nf,
             ConstructorInstance defaultConstructorInstance)
-            throws SemanticException {
-        return superLang().addDefaultConstructor(this.node(),
+                    throws SemanticException {
+        return superLang().addDefaultConstructor(node(),
                                                  ts,
                                                  nf,
                                                  defaultConstructorInstance);

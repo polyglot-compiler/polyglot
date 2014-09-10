@@ -98,6 +98,7 @@ polyglot.ext.jl5.JL5ExtensionInfo "-d out -classpath java-out -assert -noserial 
         Generics51.jl5;
         Generics52.jl5;
         Generics53.jl5;
+        Generics54.jl5 (Semantic, "Cannot extend non-class");
         Boxing01.jl5;
         Boxing02.jl5;
         Boxing03.jl5;
@@ -221,6 +222,8 @@ polyglot.ext.jl5.JL5ExtensionInfo "-d out -classpath java-out -assert -noserial 
         GenericMethod16.jl5;
         GenericMethod17.jl5;
         GenericMethod18.jl5 (Semantic, "Duplicate type variable");
+        GenericMethod19.jl5 (Semantic, "incompatible parameter types");
+        GenericMethod20.jl5 (Semantic, "Name clash.* same erasure");
         Inherit01.jl5 (Semantic, "Name clash");
         Inherit02.jl5 (Semantic, "Name clash");
         Inherit03.jl5 (Semantic, "Name clash"), (Semantic, "Name clash");
@@ -504,6 +507,7 @@ polyglot.ext.jl5.JL5ExtensionInfo "-d out -classpath java-out -removeJava5isms -
         Generics51.jl5;
         Generics52.jl5;
         Generics53.jl5;
+        Generics54.jl5 (Semantic, "Cannot extend non-class");
         Boxing01.jl5;
         Boxing02.jl5;
         Boxing03.jl5;
@@ -627,6 +631,8 @@ polyglot.ext.jl5.JL5ExtensionInfo "-d out -classpath java-out -removeJava5isms -
         GenericMethod16.jl5;
         GenericMethod17.jl5;
         GenericMethod18.jl5 (Semantic, "Duplicate type variable");
+        GenericMethod19.jl5 (Semantic, "incompatible parameter types");
+        GenericMethod20.jl5 (Semantic, "Name clash.* same erasure");
         Inherit01.jl5 (Semantic, "Name clash");
         Inherit02.jl5 (Semantic, "Name clash");
         Inherit03.jl5 (Semantic, "Name clash"), (Semantic, "Name clash");
