@@ -13,12 +13,12 @@
  * This program and the accompanying materials are made available under
  * the terms of the Lesser GNU Public License v2.0 which accompanies this
  * distribution.
- * 
+ *
  * The development of the Polyglot project has been supported by a
  * number of funding sources, including DARPA Contract F30602-99-1-0533,
  * monitored by USAF Rome Laboratory, ONR Grants N00014-01-1-0968 and
  * N00014-09-1-0652, NSF Grants CNS-0208642, CNS-0430161, CCF-0133302,
- * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan 
+ * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan
  * Research Fellowship, and an Intel Research Ph.D. Fellowship.
  *
  * See README for contributors.
@@ -93,7 +93,7 @@ public interface TypeSystem {
     /**
      * Create an import table for the source file.
      * @param sourceName Name of the source file to import into.  This is used
-     * mainly for error messages and for debugging. 
+     * mainly for error messages and for debugging.
      * @param pkg The package of the source file in which to import.
      */
     ImportTable importTable(String sourceName, Package pkg);
@@ -118,14 +118,14 @@ public interface TypeSystem {
     /**
      * Get the named type object with the following name.
      * @param name The name of the type object to look for.
-     * @exception SemanticException when object is not found.    
+     * @exception SemanticException when object is not found.
      */
     Named forName(String name) throws SemanticException;
 
     /**
      * Get the  type with the following name.
      * @param name The name to create the type for.
-     * @exception SemanticException when type is not found.    
+     * @exception SemanticException when type is not found.
      */
     Type typeForName(String name) throws SemanticException;
 
@@ -188,7 +188,7 @@ public interface TypeSystem {
     /**
      * Create a default constructor instance.
      * @param pos Position of the constructor.
-     * @param container Containing class of the constructor. 
+     * @param container Containing class of the constructor.
      */
     ConstructorInstance defaultConstructor(Position pos, ClassType container);
 
@@ -218,7 +218,7 @@ public interface TypeSystem {
 
     /**
      * Requires: all type arguments are canonical, and toType is not a NullType.
-     * 
+     *
      * Returns true iff a cast from fromType to toType is valid; in other
      * words, some non-null members of fromType are also members of toType.
      */
@@ -338,7 +338,7 @@ public interface TypeSystem {
 
     /**
      * Returns whether an object of the inner class {@code inner} has an
-     * enclosing instance of class {@code encl}. 
+     * enclosing instance of class {@code encl}.
      */
     boolean hasEnclosingInstance(ClassType inner, ClassType encl);
 
@@ -359,8 +359,8 @@ public interface TypeSystem {
     ////
 
     /**
-     * Returns true iff the type t can be coerced to a String in the given 
-     * Context. If a type can be coerced to a String then it can be 
+     * Returns true iff the type t can be coerced to a String in the given
+     * Context. If a type can be coerced to a String then it can be
      * concatenated with Strings, e.g. if o is of type T, then the code snippet
      *         {@code "" + o}
      * would be allowed.
@@ -386,13 +386,13 @@ public interface TypeSystem {
 
     /**
      * Unary promotion for numeric types.
-     * @exception SemanticException if the type cannot be promoted. 
+     * @exception SemanticException if the type cannot be promoted.
      */
     PrimitiveType promote(Type t) throws SemanticException;
 
     /**
      * Binary promotion for numeric types.
-     * @exception SemanticException if the types cannot be promoted. 
+     * @exception SemanticException if the types cannot be promoted.
      */
     PrimitiveType promote(Type t1, Type t2) throws SemanticException;
 
@@ -451,7 +451,7 @@ public interface TypeSystem {
     @Deprecated
     MethodInstance findMethod(ReferenceType container, String name,
             List<? extends Type> argTypes, ClassType currClass)
-            throws SemanticException;
+                    throws SemanticException;
 
     /**
      * Requires: all type arguments are canonical.
@@ -484,7 +484,7 @@ public interface TypeSystem {
     @Deprecated
     ConstructorInstance findConstructor(ClassType container,
             List<? extends Type> argTypes, ClassType currClass)
-            throws SemanticException;
+                    throws SemanticException;
 
     /**
      * Find a constructor.  We need to pass the class from which the constructor
@@ -567,6 +567,11 @@ public interface TypeSystem {
      * Returns true iff {@code m1} is the same method as {@code m2}.
      */
     boolean isSameMethod(MethodInstance m1, MethodInstance m2);
+
+    /**
+     * Returns true iff {@code c1} is the same constructor as {@code c2}.
+     */
+    boolean isSameConstructor(ConstructorInstance c1, ConstructorInstance c2);
 
     /**
      * Returns true iff {@code m1} is more specific than {@code m2}.
@@ -868,7 +873,7 @@ public interface TypeSystem {
             List<? extends Type> argTypes);
 
     /**
-     * Return true if {@code pi} can be called with 
+     * Return true if {@code pi} can be called with
      * actual parameters of types {@code actualTypes}.
      */
     boolean callValid(ProcedureInstance mi, List<? extends Type> argTypes);
@@ -886,7 +891,7 @@ public interface TypeSystem {
     boolean canOverride(MethodInstance mi, MethodInstance mj);
 
     /**
-     * Throw a SemanticException if {@code mi} cannot override 
+     * Throw a SemanticException if {@code mi} cannot override
      * {@code mj}.
      */
     void checkOverride(MethodInstance mi, MethodInstance mj)
@@ -1008,7 +1013,7 @@ public interface TypeSystem {
      * that is visible from {@code ct}, with the correct signature, in
      * the most precise class in the class hierarchy starting from
      * {@code ct}.
-     * 
+     *
      * @return a suitable implementation of the method mi in the class
      *         {@code ct} or a supertype thereof, null if none exists.
      */

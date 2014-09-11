@@ -48,7 +48,7 @@ import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
 
 public class JL5MethodInstance_c extends MethodInstance_c implements
-        JL5MethodInstance {
+JL5MethodInstance {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
     protected List<TypeVariable> typeParams;
@@ -135,6 +135,13 @@ public class JL5MethodInstance_c extends MethodInstance_c implements
     }
 
     @Override
+    public boolean isSameMethodImpl(MethodInstance mi) {
+        if (!(mi instanceof JL5MethodInstance)) return false;
+        JL5TypeSystem ts = (JL5TypeSystem) typeSystem();
+        return ts.areOverrideEquivalent(this, (JL5MethodInstance) mi);
+    }
+
+    @Override
     public boolean canOverrideImpl(MethodInstance mj_, boolean quiet)
             throws SemanticException {
         JL5MethodInstance mi = this;
@@ -158,13 +165,13 @@ public class JL5MethodInstance_c extends MethodInstance_c implements
                 Report.report(3, mj.flags() + " final");
             if (quiet) return false;
             throw new SemanticException(mi.signature()
-                                                + " in "
-                                                + mi.container()
-                                                + " cannot override "
-                                                + mj.signature()
-                                                + " in "
-                                                + mj.container()
-                                                + "; overridden method is final",
+                                        + " in "
+                                        + mi.container()
+                                        + " cannot override "
+                                        + mj.signature()
+                                        + " in "
+                                        + mj.container()
+                                        + "; overridden method is final",
                                         mi.position());
         }
 
@@ -186,16 +193,16 @@ public class JL5MethodInstance_c extends MethodInstance_c implements
                 Report.report(3, "return type " + miRet + " != " + mjRet);
             if (quiet) return false;
             throw new SemanticException(mi.signature()
-                                                + " in "
-                                                + mi.container()
-                                                + " cannot override "
-                                                + mj.signature()
-                                                + " in "
-                                                + mj.container()
-                                                + "; attempting to use incompatible "
-                                                + "return type\n" + "found: "
-                                                + miRet + "\n" + "required: "
-                                                + mjRet,
+                                        + " in "
+                                        + mi.container()
+                                        + " cannot override "
+                                        + mj.signature()
+                                        + " in "
+                                        + mj.container()
+                                        + "; attempting to use incompatible "
+                                        + "return type\n" + "found: "
+                                        + miRet + "\n" + "required: "
+                                        + mjRet,
                                         mi.position());
         }
 
@@ -206,17 +213,17 @@ public class JL5MethodInstance_c extends MethodInstance_c implements
                                       + mj.throwTypes());
             if (quiet) return false;
             throw new SemanticException(mi.signature()
-                                                + " in "
-                                                + mi.container()
-                                                + " cannot override "
-                                                + mj.signature()
-                                                + " in "
-                                                + mj.container()
-                                                + "; the throw set "
-                                                + mi.throwTypes()
-                                                + " is not a subset of the "
-                                                + "overridden method's throw set "
-                                                + mj.throwTypes() + ".",
+                                        + " in "
+                                        + mi.container()
+                                        + " cannot override "
+                                        + mj.signature()
+                                        + " in "
+                                        + mj.container()
+                                        + "; the throw set "
+                                        + mi.throwTypes()
+                                        + " is not a subset of the "
+                                        + "overridden method's throw set "
+                                        + mj.throwTypes() + ".",
                                         mi.position());
         }
 
@@ -227,14 +234,14 @@ public class JL5MethodInstance_c extends MethodInstance_c implements
                                       + mj.flags());
             if (quiet) return false;
             throw new SemanticException(mi.signature()
-                                                + " in "
-                                                + mi.container()
-                                                + " cannot override "
-                                                + mj.signature()
-                                                + " in "
-                                                + mj.container()
-                                                + "; attempting to assign weaker "
-                                                + "access privileges",
+                                        + " in "
+                                        + mi.container()
+                                        + " cannot override "
+                                        + mj.signature()
+                                        + " in "
+                                        + mj.container()
+                                        + "; attempting to assign weaker "
+                                        + "access privileges",
                                         mi.position());
         }
 
@@ -246,15 +253,15 @@ public class JL5MethodInstance_c extends MethodInstance_c implements
                         + (mj.flags().isStatic() ? "" : "not") + " static");
             if (quiet) return false;
             throw new SemanticException(mi.signature()
-                                                + " in "
-                                                + mi.container()
-                                                + " cannot override "
-                                                + mj.signature()
-                                                + " in "
-                                                + mj.container()
-                                                + "; overridden method is "
-                                                + (mj.flags().isStatic()
-                                                        ? "" : "not")
+                                        + " in "
+                                        + mi.container()
+                                        + " cannot override "
+                                        + mj.signature()
+                                        + " in "
+                                        + mj.container()
+                                        + "; overridden method is "
+                                        + (mj.flags().isStatic()
+                                                ? "" : "not")
                                                 + "static", mi.position());
         }
 

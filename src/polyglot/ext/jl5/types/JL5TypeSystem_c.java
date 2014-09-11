@@ -85,7 +85,7 @@ import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
 
 public class JL5TypeSystem_c extends
-        ParamTypeSystem_c<TypeVariable, ReferenceType> implements JL5TypeSystem {
+ParamTypeSystem_c<TypeVariable, ReferenceType> implements JL5TypeSystem {
 
     protected ClassType ENUM_;
 
@@ -310,8 +310,8 @@ public class JL5TypeSystem_c extends
         if (enumConstants.size() == 0) {
             throw new NoMemberException(JL5NoMemberException.ENUM_CONSTANT,
                                         "Enum Constant: \"" + name
-                                                + "\" not found in type \""
-                                                + container + "\".");
+                                        + "\" not found in type \""
+                                        + container + "\".");
         }
         Iterator<EnumInstance> i = enumConstants.iterator();
         EnumInstance ei = i.next();
@@ -320,8 +320,8 @@ public class JL5TypeSystem_c extends
             EnumInstance ei2 = i.next();
 
             throw new SemanticException("Enum Constant \"" + name
-                    + "\" is ambiguous; it is defined in both "
-                    + ei.container() + " and " + ei2.container() + ".");
+                                        + "\" is ambiguous; it is defined in both "
+                                        + ei.container() + " and " + ei2.container() + ".");
         }
 
         if (currClass != null && !isAccessible(ei, currClass)
@@ -358,7 +358,7 @@ public class JL5TypeSystem_c extends
     }
 
     public Set<EnumInstance> findEnumConstants(ReferenceType container,
-            String name) {
+                                               String name) {
         assert_(container);
         if (container == null) {
             throw new InternalCompilerError("Cannot access enum constant \""
@@ -594,9 +594,9 @@ public class JL5TypeSystem_c extends
      */
     @Override
     protected List<? extends MethodInstance> findAcceptableMethods(
-            ReferenceType container, String name,
-            List<? extends Type> argTypes, ClassType currClass,
-            boolean fromClient) throws SemanticException {
+                                                                   ReferenceType container, String name,
+                                                                   List<? extends Type> argTypes, ClassType currClass,
+                                                                   boolean fromClient) throws SemanticException {
         return findAcceptableMethods(container,
                                      name,
                                      argTypes,
@@ -606,10 +606,10 @@ public class JL5TypeSystem_c extends
     }
 
     protected List<? extends MethodInstance> findAcceptableMethods(
-            ReferenceType container, String name,
-            List<? extends Type> argTypes,
-            List<? extends ReferenceType> actualTypeArgs, ClassType currClass,
-            boolean fromClient) throws SemanticException {
+                                                                   ReferenceType container, String name,
+                                                                   List<? extends Type> argTypes,
+                                                                   List<? extends ReferenceType> actualTypeArgs, ClassType currClass,
+                                                                   boolean fromClient) throws SemanticException {
         return findAcceptableMethods(container,
                                      name,
                                      argTypes,
@@ -620,11 +620,11 @@ public class JL5TypeSystem_c extends
     }
 
     protected List<? extends MethodInstance> findAcceptableMethods(
-            ReferenceType container, String name,
-            List<? extends Type> argTypes,
-            List<? extends ReferenceType> actualTypeArgs, ClassType currClass,
-            Type expectedReturnType, boolean fromClient)
-            throws SemanticException {
+                                                                   ReferenceType container, String name,
+                                                                   List<? extends Type> argTypes,
+                                                                   List<? extends ReferenceType> actualTypeArgs, ClassType currClass,
+                                                                   Type expectedReturnType, boolean fromClient)
+                                                                           throws SemanticException {
         assert_(container);
         assert_(argTypes);
 
@@ -684,7 +684,7 @@ public class JL5TypeSystem_c extends
 
             @SuppressWarnings("unchecked")
             List<JL5MethodInstance> methods =
-                    (List<JL5MethodInstance>) type.toReference().methods();
+            (List<JL5MethodInstance>) type.toReference().methods();
             for (JL5MethodInstance mi : methods) {
                 if (Report.should_report(Report.types, 3))
                     Report.report(3, "Trying " + mi);
@@ -845,7 +845,7 @@ public class JL5TypeSystem_c extends
         if (argTypes.size() != mi.formalTypes().size()) {
             // the actual args don't match the number of the formal args.
             if (!(mi.isVariableArity() && argTypes.size() >= mi.formalTypes()
-                                                               .size() - 1)) {
+                    .size() - 1)) {
                 // the last (variable) argument can consume 0 or more of the actual arguments.
                 return null;
             }
@@ -908,6 +908,9 @@ public class JL5TypeSystem_c extends
             subst = inferTypeArgs(mi, argTypes, null);
         }
         else if (!mi.typeParams().isEmpty() && !actualTypeArgs.isEmpty()) {
+            // Number of actual type parameters must be equal to number of
+            // formal type parameters.
+            if (mi.typeParams().size() != actualTypeArgs.size()) return null;
             Map<TypeVariable, ReferenceType> m = new HashMap<>();
             Iterator<? extends ReferenceType> iter = actualTypeArgs.iterator();
             for (TypeVariable tv : mi.typeParams()) {
@@ -1073,17 +1076,18 @@ public class JL5TypeSystem_c extends
 
     @Override
     protected Subst<TypeVariable, ReferenceType> substImpl(
-            Map<TypeVariable, ? extends ReferenceType> substMap) {
+                                                           Map<TypeVariable, ? extends ReferenceType> substMap) {
         return new JL5Subst_c(this, substMap);
     }
 
     @Override
-    public boolean hasSameSignature(JL5MethodInstance mi, JL5MethodInstance mj) {
+    public boolean hasSameSignature(JL5ProcedureInstance mi,
+            JL5ProcedureInstance mj) {
         return hasSameSignature(mi, mj, false);
     }
 
-    protected boolean hasSameSignature(JL5MethodInstance mi,
-            JL5MethodInstance mj, boolean eraseMj) {
+    protected boolean hasSameSignature(JL5ProcedureInstance mi,
+            JL5ProcedureInstance mj, boolean eraseMj) {
         // JLS 3rd Ed. | 8.4.2
         // Two methods have the same signature if they have the same name
         // and argument types.
@@ -1092,8 +1096,11 @@ public class JL5TypeSystem_c extends
         // - They have same number of type parameters
         // - After renaming type parameters to match, the bounds of type
         //   variables and argument types are the same.
-        if (!mi.name().equals(mj.name())) {
-            return false;
+        if (mi instanceof JL5MethodInstance && mj instanceof JL5MethodInstance) {
+            if (!((JL5MethodInstance) mi).name()
+                                         .equals(((JL5MethodInstance) mj).name())) {
+                return false;
+            }
         }
         if (mi.formalTypes().size() != mj.formalTypes().size()) {
             return false;
@@ -1128,7 +1135,9 @@ public class JL5TypeSystem_c extends
                     return false;
             }
 
-            mj = subst.substMethod(mj);
+            if (mj instanceof JL5MethodInstance)
+                mj = subst.substMethod((JL5MethodInstance) mj);
+            else mj = subst.substConstructor((JL5ConstructorInstance) mj);
         }
 
         // Check that the argument types match
@@ -1147,7 +1156,8 @@ public class JL5TypeSystem_c extends
     }
 
     @Override
-    public boolean isSubSignature(JL5MethodInstance m1, JL5MethodInstance m2) {
+    public boolean isSubSignature(JL5ProcedureInstance m1,
+            JL5ProcedureInstance m2) {
         if (hasSameSignature(m1, m2)) {
             return true;
         }
@@ -1156,8 +1166,8 @@ public class JL5TypeSystem_c extends
     }
 
     @Override
-    public boolean areOverrideEquivalent(JL5MethodInstance mi,
-            JL5MethodInstance mj) {
+    public boolean areOverrideEquivalent(JL5ProcedureInstance mi,
+            JL5ProcedureInstance mj) {
         return isSubSignature(mi, mj) || isSubSignature(mj, mi);
     }
 
@@ -1203,7 +1213,7 @@ public class JL5TypeSystem_c extends
                 if (!mj.flags().isAbstract()
                         && (isAccessible(mi, ct) && isAccessible(mj, ct) || isAccessible(mi,
                                                                                          mj.container()
-                                                                                         .toClass()))) {
+                                                                                           .toClass()))) {
                     // The method mj may be a suitable implementation of mi.
                     // mj is not abstract, and either mj's container
                     // can access mi (thus mj can really override mi), or
@@ -1226,7 +1236,7 @@ public class JL5TypeSystem_c extends
 
             curr =
                     curr.superType() == null ? null : curr.superType()
-                                                          .toReference();
+                            .toReference();
         }
         return null;
     }
@@ -1276,10 +1286,10 @@ public class JL5TypeSystem_c extends
                 }
                 if (!rt.isClass()) {
                     throw new InternalCompilerError("Don't know how to deal with erasure of intersection type "
-                                                            + it
-                                                            + ", specifcally component "
-                                                            + origRt,
-                                                    t.position());
+                            + it
+                            + ", specifcally component "
+                            + origRt,
+                            t.position());
                 }
                 ClassType next = (ClassType) rt;
                 if (equals(Object(), next)) continue;
@@ -1483,7 +1493,7 @@ public class JL5TypeSystem_c extends
                     isImplicitCastValidChain(fromType,
                                              this.rawClass(toSubstCT.base(),
                                                            toSubstCT.base()
-                                                                    .position()));
+                                                           .position()));
             if (chain != null) {
                 // success!
                 chain.addLast(toType);
@@ -1665,7 +1675,7 @@ public class JL5TypeSystem_c extends
                             && y instanceof JL5SubstClassType
                             && areProvablyDistinct((JL5SubstClassType) x,
                                                    (JL5SubstClassType) y)
-                            && erasureType(x).equals(erasureType(y))) {
+                                                   && erasureType(x).equals(erasureType(y))) {
                         return false;
                     }
                 }
@@ -1807,7 +1817,7 @@ public class JL5TypeSystem_c extends
             java.lang.String name, List<? extends Type> argTypes,
             List<? extends ReferenceType> typeArgs, ClassType currClass,
             Type expectedReturnType, boolean fromClient)
-            throws SemanticException {
+                    throws SemanticException {
 
         assert_(container);
         assert_(argTypes);
@@ -1852,7 +1862,7 @@ public class JL5TypeSystem_c extends
             }
 
             throw new SemanticException("Reference to " + name
-                    + " is ambiguous, multiple methods match: " + sb.toString());
+                                        + " is ambiguous, multiple methods match: " + sb.toString());
         }
 
         MethodInstance mi = maximal.iterator().next();
@@ -1899,9 +1909,9 @@ public class JL5TypeSystem_c extends
         if (maximal.size() > 1) {
             throw new NoMemberException(NoMemberException.CONSTRUCTOR,
                                         "Reference to " + container
-                                                + " is ambiguous, multiple "
-                                                + "constructors match: "
-                                                + maximal);
+                                        + " is ambiguous, multiple "
+                                        + "constructors match: "
+                                        + maximal);
         }
 
         ConstructorInstance ci = maximal.iterator().next();
@@ -1910,8 +1920,8 @@ public class JL5TypeSystem_c extends
 
     @Override
     protected List<? extends ConstructorInstance> findAcceptableConstructors(
-            ClassType container, List<? extends Type> argTypes,
-            ClassType currClass, boolean fromClient) throws SemanticException {
+                                                                             ClassType container, List<? extends Type> argTypes,
+                                                                             ClassType currClass, boolean fromClient) throws SemanticException {
         return this.findAcceptableConstructors(container,
                                                argTypes,
                                                Collections.<ReferenceType> emptyList(),
@@ -1925,9 +1935,9 @@ public class JL5TypeSystem_c extends
      * @throws SemanticException
      */
     protected List<ConstructorInstance> findAcceptableConstructors(
-            ClassType container, List<? extends Type> argTypes,
-            List<? extends ReferenceType> actualTypeArgs, ClassType currClass,
-            boolean fromClient) throws SemanticException {
+                                                                   ClassType container, List<? extends Type> argTypes,
+                                                                   List<? extends ReferenceType> actualTypeArgs, ClassType currClass,
+                                                                   boolean fromClient) throws SemanticException {
         assert_(container);
         assert_(argTypes);
 
@@ -1946,11 +1956,11 @@ public class JL5TypeSystem_c extends
 
         if (Report.should_report(Report.types, 2))
             Report.report(2, "Searching type " + container
-                    + " for constructor " + container + "("
-                    + listToString(argTypes) + ")");
+                          + " for constructor " + container + "("
+                          + listToString(argTypes) + ")");
         @SuppressWarnings("unchecked")
         List<JL5ConstructorInstance> constructors =
-                (List<JL5ConstructorInstance>) container.constructors();
+        (List<JL5ConstructorInstance>) container.constructors();
         for (JL5ConstructorInstance ci : constructors) {
             if (Report.should_report(Report.types, 3))
                 Report.report(3, "Trying " + ci);
@@ -1986,10 +1996,16 @@ public class JL5TypeSystem_c extends
                             new NoMemberException(NoMemberException.CONSTRUCTOR,
                                                   "Constructor "
                                                           + ci.signature()
-                                                          + " cannot be invoked with arguments "
-                                                          + "("
-                                                          + listToString(argTypes)
-                                                          + ").");
+                                                          + " cannot be invoked with "
+                                                          + (!actualTypeArgs.isEmpty()
+                                                                  ? "type arguments <"
+                                                                  + listToString(actualTypeArgs)
+                                                                  + "> and "
+                                                                  : "")
+                                                                  + "arguments "
+                                                                  + "("
+                                                                  + listToString(argTypes)
+                                                                  + ").");
                 }
             }
         }
@@ -2159,15 +2175,15 @@ public class JL5TypeSystem_c extends
                                 && !wub.toClass().flags().isInterface()
                                 && substUpperBoundOfA.isClass()
                                 && !substUpperBoundOfA.toClass()
-                                                      .flags()
-                                                      .isInterface()) {
+                                .flags()
+                                .isInterface()) {
                             // check that wub is a subtype of substUpperBoundOfA, or vice versa
                             // JLS 3rd ed 5.1.10
                             if (!isSubtype(wub, substUpperBoundOfA)
                                     && !isSubtype(substUpperBoundOfA, wub)) {
                                 throw new SemanticException("Cannot capture convert "
-                                                                    + t,
-                                                            pos);
+                                        + t,
+                                        pos);
                             }
                         }
                     }
@@ -2418,7 +2434,7 @@ public class JL5TypeSystem_c extends
      */
     @Override
     public List<TypeVariable> classAndEnclosingTypeVariables(
-            JL5ParsedClassType ct) {
+                                                             JL5ParsedClassType ct) {
         List<TypeVariable> l = new ArrayList<>();
         classAndEnclosingTypeVariables(ct, l);
         return l;
@@ -2507,8 +2523,8 @@ public class JL5TypeSystem_c extends
         }
         else if (!isAnnotationValueConstant(value)) {
             throw new SemanticException("Annotation attribute value must be constant: "
-                                                + value,
-                                        value.position());
+                    + value,
+                    value.position());
         }
     }
 
@@ -2579,8 +2595,8 @@ public class JL5TypeSystem_c extends
         if (annotations.size() == 0) {
             throw new NoMemberException(JL5NoMemberException.ANNOTATION,
                                         "Annotation: \"" + name
-                                                + "\" not found in type \""
-                                                + container + "\".");
+                                        + "\" not found in type \""
+                                        + container + "\".");
         }
         Iterator<AnnotationTypeElemInstance> i = annotations.iterator();
         AnnotationTypeElemInstance ai = i.next();
@@ -2589,8 +2605,8 @@ public class JL5TypeSystem_c extends
             AnnotationTypeElemInstance ai2 = i.next();
 
             throw new SemanticException("Annotation \"" + name
-                    + "\" is ambiguous; it is defined in both "
-                    + ai.container() + " and " + ai2.container() + ".");
+                                        + "\" is ambiguous; it is defined in both "
+                                        + ai.container() + " and " + ai2.container() + ".");
         }
 
         if (currClass != null && !isAccessible(ai, currClass)
@@ -2601,7 +2617,7 @@ public class JL5TypeSystem_c extends
     }
 
     public Set<AnnotationTypeElemInstance> findAnnotations(
-            ReferenceType container, String name) {
+                                                           ReferenceType container, String name) {
         assert_(container);
         if (container == null) {
             throw new InternalCompilerError("Cannot access annotation \""
@@ -2685,8 +2701,8 @@ public class JL5TypeSystem_c extends
         }
         catch (SemanticException e) {
             throw new InternalCompilerError("Couldn't create class java.lang.Class<"
-                                                    + type + ">",
-                                            e);
+                    + type + ">",
+                    e);
         }
     }
 

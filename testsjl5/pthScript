@@ -135,6 +135,7 @@ polyglot.ext.jl5.JL5ExtensionInfo "-d out -classpath java-out -assert -noserial 
         Interface04.jl5;
         Interface05.jl5 (Post, "Xlint");
         Interface06.jl5 (Post, "Xlint");
+        Interface07.jl5 (Semantic, "Name clash.* same erasure");
         Intersect01.jl5;
         Intersect02.jl5;
         Intersect03.jl5 (Semantic, "additional bound");
@@ -198,6 +199,8 @@ polyglot.ext.jl5.JL5ExtensionInfo "-d out -classpath java-out -assert -noserial 
         FBoundSub3.jl5;
         FBoundSub4.jl5 (Semantic, "cannot be called with arguments");
         Generic.jl5;
+        GenericConstructor01.jl5 (Semantic, "cannot be invoked");
+        GenericConstructor02.jl5 (Semantic, "Duplicate constructor");
         GenericMethod1.jl5;
         GenericMethod1a.jl5 (Semantic);
         GenericMethod2.jl5 (Semantic);
@@ -224,6 +227,7 @@ polyglot.ext.jl5.JL5ExtensionInfo "-d out -classpath java-out -assert -noserial 
         GenericMethod18.jl5 (Semantic, "Duplicate type variable");
         GenericMethod19.jl5 (Semantic, "incompatible parameter types");
         GenericMethod20.jl5 (Semantic, "Name clash.* same erasure");
+        GenericMethod21.jl5 (Semantic, "Duplicate method");
         Inherit01.jl5 (Semantic, "Name clash");
         Inherit02.jl5 (Semantic, "Name clash");
         Inherit03.jl5 (Semantic, "Name clash"), (Semantic, "Name clash");
@@ -405,7 +409,6 @@ polyglot.ext.jl5.JL5ExtensionInfo "-d out -classpath java-out -assert -noserial 
 	CovariantRet05.jl5;
         EnumTest5.jl5;
         EnumTest8.jl5;
-        Interface07.jl5 (Post, "Xlint");
         Iterator01.jl5;
         Negate01.jl5;
         Throw01.jl5;
@@ -544,6 +547,7 @@ polyglot.ext.jl5.JL5ExtensionInfo "-d out -classpath java-out -removeJava5isms -
         Interface04.jl5;
         Interface05.jl5;
         Interface06.jl5;
+        Interface07.jl5 (Semantic, "Name clash.* same erasure");
         Intersect01.jl5;
         Intersect02.jl5;
         Intersect03.jl5 (Semantic, "additional bound");
@@ -607,6 +611,8 @@ polyglot.ext.jl5.JL5ExtensionInfo "-d out -classpath java-out -removeJava5isms -
         FBoundSub3.jl5;
         FBoundSub4.jl5 (Semantic, "cannot be called with arguments");
         Generic.jl5;
+        GenericConstructor01.jl5 (Semantic, "cannot be invoked");
+        GenericConstructor02.jl5 (Semantic, "Duplicate constructor");
         GenericMethod1.jl5;
         GenericMethod1a.jl5 (Semantic);
         GenericMethod2.jl5 (Semantic);
@@ -633,6 +639,7 @@ polyglot.ext.jl5.JL5ExtensionInfo "-d out -classpath java-out -removeJava5isms -
         GenericMethod18.jl5 (Semantic, "Duplicate type variable");
         GenericMethod19.jl5 (Semantic, "incompatible parameter types");
         GenericMethod20.jl5 (Semantic, "Name clash.* same erasure");
+        GenericMethod21.jl5 (Semantic, "Duplicate method");
         Inherit01.jl5 (Semantic, "Name clash");
         Inherit02.jl5 (Semantic, "Name clash");
         Inherit03.jl5 (Semantic, "Name clash"), (Semantic, "Name clash");
@@ -814,7 +821,6 @@ polyglot.ext.jl5.JL5ExtensionInfo "-d out -classpath java-out -removeJava5isms -
 	CovariantRet05.jl5 (Semantic, "incompatible return");
         EnumTest5.jl5;
         EnumTest8.jl5;
-        Interface07.jl5;
         Iterator01.jl5;
         Negate01.jl5;
         Throw01.jl5;

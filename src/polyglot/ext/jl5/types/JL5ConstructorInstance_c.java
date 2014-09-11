@@ -13,12 +13,12 @@
  * This program and the accompanying materials are made available under
  * the terms of the Lesser GNU Public License v2.0 which accompanies this
  * distribution.
- * 
+ *
  * The development of the Polyglot project has been supported by a
  * number of funding sources, including DARPA Contract F30602-99-1-0533,
  * monitored by USAF Rome Laboratory, ONR Grants N00014-01-1-0968 and
  * N00014-09-1-0652, NSF Grants CNS-0208642, CNS-0430161, CCF-0133302,
- * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan 
+ * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan
  * Research Fellowship, and an Intel Research Ph.D. Fellowship.
  *
  * See README for contributors.
@@ -31,6 +31,7 @@ import java.util.List;
 
 import polyglot.types.ArrayType;
 import polyglot.types.ClassType;
+import polyglot.types.ConstructorInstance;
 import polyglot.types.ConstructorInstance_c;
 import polyglot.types.Flags;
 import polyglot.types.Type;
@@ -39,7 +40,7 @@ import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
 
 public class JL5ConstructorInstance_c extends ConstructorInstance_c implements
-        JL5ConstructorInstance {
+JL5ConstructorInstance {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
     protected List<TypeVariable> typeParams;
@@ -47,12 +48,13 @@ public class JL5ConstructorInstance_c extends ConstructorInstance_c implements
 
     public JL5ConstructorInstance_c(JL5TypeSystem_c ts, Position pos,
             ClassType container, Flags flags, List<? extends Type> argTypes,
-            List<? extends Type> excTypes, List<? extends TypeVariable> typeParams) {
+            List<? extends Type> excTypes,
+            List<? extends TypeVariable> typeParams) {
         super(ts, pos, container, flags, argTypes, excTypes);
         this.typeParams = ListUtil.copy(typeParams, true);
         // Set the declaring procedure of the type vars
         for (TypeVariable tv : typeParams) {
-            tv.setDeclaringProcedure((JL5ProcedureInstance) this.declaration());
+            tv.setDeclaringProcedure((JL5ProcedureInstance) declaration());
         }
     }
 
@@ -63,16 +65,15 @@ public class JL5ConstructorInstance_c extends ConstructorInstance_c implements
 
     @Override
     public boolean callValidImpl(List<? extends Type> argTypes) {
-        List<Type> myFormalTypes = this.formalTypes;
+        List<Type> myFormalTypes = formalTypes;
 
         // System.err.println("JL5MethodInstance_c callValid Impl " + this +
         // " called with " +argTypes);
         // now compare myFormalTypes to argTypes
-        if (!this.isVariableArity() && argTypes.size() != myFormalTypes.size()) {
+        if (!isVariableArity() && argTypes.size() != myFormalTypes.size()) {
             return false;
         }
-        if (this.isVariableArity()
-                && argTypes.size() < myFormalTypes.size() - 1) {
+        if (isVariableArity() && argTypes.size() < myFormalTypes.size() - 1) {
             // the last (variable) argument can consume 0 or more of the actual
             // arguments.
             return false;
@@ -87,7 +88,7 @@ public class JL5ConstructorInstance_c extends ConstructorInstance_c implements
             if (formalTypes.hasNext()) {
                 formal = formalTypes.next();
             }
-            if (!formalTypes.hasNext() && this.isVariableArity()) {
+            if (!formalTypes.hasNext() && isVariableArity()) {
                 // variable arity method, and this is the last arg.
                 ArrayType arr =
                         (ArrayType) myFormalTypes.get(myFormalTypes.size() - 1);
@@ -99,8 +100,7 @@ public class JL5ConstructorInstance_c extends ConstructorInstance_c implements
             }
             // the actual can't be cast to the formal.
             // HOWEVER: there is still hope.
-            if (this.isVariableArity()
-                    && myFormalTypes.size() == argTypes.size()
+            if (isVariableArity() && myFormalTypes.size() == argTypes.size()
                     && !formalTypes.hasNext()) {
                 // This is a variable arity method (e.g., m(int x,
                 // String[])) and there
@@ -127,6 +127,13 @@ public class JL5ConstructorInstance_c extends ConstructorInstance_c implements
     }
 
     @Override
+    public boolean isSameConstructorImpl(ConstructorInstance ci) {
+        if (!(ci instanceof JL5ConstructorInstance)) return false;
+        JL5TypeSystem ts = (JL5TypeSystem) typeSystem();
+        return ts.areOverrideEquivalent(this, (JL5ConstructorInstance) ci);
+    }
+
+    @Override
     public boolean isCanonical() {
         return super.isCanonical() && listIsCanonical(typeParams);
     }
@@ -136,25 +143,59 @@ public class JL5ConstructorInstance_c extends ConstructorInstance_c implements
         this.typeParams = typeParams;
         // Set the declaring procedure of the type vars
         for (TypeVariable tv : typeParams) {
-            tv.setDeclaringProcedure((JL5ProcedureInstance) this.declaration());
+            tv.setDeclaringProcedure((JL5ProcedureInstance) declaration());
         }
 
     }
 
     @Override
     public List<TypeVariable> typeParams() {
-        return Collections.unmodifiableList(this.typeParams);
+        return Collections.unmodifiableList(typeParams);
     }
 
     @Override
     public JL5Subst erasureSubst() {
-        JL5TypeSystem ts = (JL5TypeSystem) this.typeSystem();
+        JL5TypeSystem ts = (JL5TypeSystem) typeSystem();
         return ts.erasureSubst(this);
     }
 
     @Override
+    public String toString() {
+        StringBuffer sb = new StringBuffer();
+        sb.append(designator());
+        sb.append(" ");
+        sb.append(flags.translate());
+        if (!typeParams.isEmpty()) {
+            sb.append("<");
+            Iterator<TypeVariable> iter = typeParams().iterator();
+            while (iter.hasNext()) {
+                sb.append(iter.next());
+                if (iter.hasNext()) {
+                    sb.append(", ");
+                }
+            }
+            sb.append("> ");
+        }
+        sb.append(signature());
+
+        if (!throwTypes.isEmpty()) {
+            sb.append(" throws ");
+            for (Iterator<Type> i = throwTypes.iterator(); i.hasNext();) {
+                Object o = i.next();
+                sb.append(o.toString());
+
+                if (i.hasNext()) {
+                    sb.append(", ");
+                }
+            }
+        }
+
+        return sb.toString();
+    }
+
+    @Override
     public Annotations annotations() {
-        return this.annotations;
+        return annotations;
     }
 
     @Override

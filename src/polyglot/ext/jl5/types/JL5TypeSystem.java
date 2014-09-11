@@ -13,12 +13,12 @@
  * This program and the accompanying materials are made available under
  * the terms of the Lesser GNU Public License v2.0 which accompanies this
  * distribution.
- * 
+ *
  * The development of the Polyglot project has been supported by a
  * number of funding sources, including DARPA Contract F30602-99-1-0533,
  * monitored by USAF Rome Laboratory, ONR Grants N00014-01-1-0968 and
  * N00014-09-1-0652, NSF Grants CNS-0208642, CNS-0430161, CCF-0133302,
- * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan 
+ * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan
  * Research Fellowship, and an Intel Research Ph.D. Fellowship.
  *
  * See README for contributors.
@@ -78,7 +78,7 @@ public interface JL5TypeSystem extends
     boolean accessibleFromPackage(Flags flags, Package pkg1, Package pkg2);
 
     /**
-     * 
+     *
      * @return the list of types that makes the implicit cast valid. Returns empty list if isImplicitCastValid(t1, t2) == false.
      *      If the return value is non empty, then t1 is the first element, and t2 is the last.
      */
@@ -86,18 +86,18 @@ public interface JL5TypeSystem extends
 
     /**
      * Do methods mi and mj have the same signature?
-     * See JLS 3rd ed. 8.4.2 
-     * They have the same signature if they have the same name and argument types. 
-     * Two method or constructor declarations M and N have the same argument types if all 
+     * See JLS 3rd ed. 8.4.2
+     * They have the same signature if they have the same name and argument types.
+     * Two method or constructor declarations M and N have the same argument types if all
      * of the following conditions hold:
      * 1. They have the same number of formal parameters (possibly zero)
      * 2. They have the same number of type parameters (possibly zero)
-     * 3. Let <A1,...,An> be the formal type parameters of M and let <B1,...,Bn> be the 
-     *     formal type parameters of N. After renaming each occurrence of a Bi in N's 
-     *     type to Ai the bounds of corresponding type variables and the 
-     *     argument types of M and N are the same. 
+     * 3. Let <A1,...,An> be the formal type parameters of M and let <B1,...,Bn> be the
+     *     formal type parameters of N. After renaming each occurrence of a Bi in N's
+     *     type to Ai the bounds of corresponding type variables and the
+     *     argument types of M and N are the same.
      */
-    boolean hasSameSignature(JL5MethodInstance mi, JL5MethodInstance mj);
+    boolean hasSameSignature(JL5ProcedureInstance mi, JL5ProcedureInstance mj);
 
     /**
      * Return true of the signature of m1 is a subsignature of the signature of
@@ -108,22 +108,23 @@ public interface JL5TypeSystem extends
      * @param m2
      * @return
      */
-    boolean isSubSignature(JL5MethodInstance m1, JL5MethodInstance m2);
+    boolean isSubSignature(JL5ProcedureInstance m1, JL5ProcedureInstance m2);
 
     /**
      * Are methods mi and mj override equivalent?
-     * See JLS 3rd ed. 8.4.2 
+     * See JLS 3rd ed. 8.4.2
      * They are override equivalent if either mi is a subsignature of mj,
-     * or mj is a subsignature of mi.  
+     * or mj is a subsignature of mi.
      */
-    boolean areOverrideEquivalent(JL5MethodInstance mi, JL5MethodInstance mj);
+    boolean areOverrideEquivalent(JL5ProcedureInstance mi,
+            JL5ProcedureInstance mj);
 
     /**
      * Are types ri and rj return type substitutable?
      * See JLS 3rd ed. 8.4.5
      * They are return type substitutable if:
      * - if ri is a primitive type, and rj is identical to ri.
-     * - if ri is a reference type, and ri is either a subtype of rj or 
+     * - if ri is a reference type, and ri is either a subtype of rj or
      *      ri can be converted to a subtype of rj by unchecked conversion (5.1.9), or
             ri is the erasure of rj.
      * - if ri is void and rj is void.
@@ -133,7 +134,7 @@ public interface JL5TypeSystem extends
     /**
      * Is there an unchecked conversion from "from" to "to"?
      * See JLS 3rd ed. 5.1.9
-     * 
+     *
      * True if: "from" is a generic type G with n formal type parameters,
      * and "to" is any parameterized type of the form G<T1 ... Tn>.
      */
@@ -159,7 +160,7 @@ public interface JL5TypeSystem extends
 
     /**
      * Returns the erased type of t.
-     * See JLS 3rd ed. 4.6 
+     * See JLS 3rd ed. 4.6
      */
     Type erasureType(Type t);
 
@@ -192,8 +193,8 @@ public interface JL5TypeSystem extends
      * and arguments of type {@code actualTypes}, with type parameters
      * instantiated with actualTypeArgs. If actualTypeArgs is null or empty,
      * then type inference should be performed. (See JLS 3rd ed. 15.12.2.7)
-     * Will return null if mi cannot be successfully called. Will return an appropriately 
-     * instantiated method instance if the call is valid (i.e., the substitution after type inference). 
+     * Will return null if mi cannot be successfully called. Will return an appropriately
+     * instantiated method instance if the call is valid (i.e., the substitution after type inference).
      */
     JL5MethodInstance methodCallValid(JL5MethodInstance mi, String name,
             List<? extends Type> argTypes,
@@ -205,8 +206,8 @@ public interface JL5TypeSystem extends
      * arguments of type {@code actualTypes}, with type parameters
      * instantiated with actualTypeArgs. If actualTypeArgs is null or empty,
      * then type inference should be performed. (See JLS 3rd ed. 15.12.2.7)
-     * Will return null if ci cannot be successfully called. Will return an appropriately 
-     * instantiated instance if the call is valid (i.e., the substitution after type inference). 
+     * Will return null if ci cannot be successfully called. Will return an appropriately
+     * instantiated instance if the call is valid (i.e., the substitution after type inference).
      */
     JL5ProcedureInstance callValid(JL5ProcedureInstance mi,
             List<? extends Type> argTypes,
@@ -250,7 +251,7 @@ public interface JL5TypeSystem extends
 
     /**
      * Apply capture conversion to t. See JLS 3rd ed 5.1.10
-     * @throws SemanticException 
+     * @throws SemanticException
      */
     Type applyCaptureConversion(Type t, Position pos) throws SemanticException;
 
@@ -285,7 +286,7 @@ public interface JL5TypeSystem extends
 
     /**
      * Base is a generic supertype (e.g., a class C with uninstantiated parameters).
-     * Try to find a supertype of sub that is an instantiation of base. 
+     * Try to find a supertype of sub that is an instantiation of base.
      */
     JL5SubstClassType findGenericSupertype(JL5ParsedClassType base,
             ReferenceType sub);
@@ -324,7 +325,7 @@ public interface JL5TypeSystem extends
 
     /**
      * Perform boxing conversion on t. If t is a primitive, then
-     * the return type will be the ReferenceType appropriate for boxing t 
+     * the return type will be the ReferenceType appropriate for boxing t
      * (e.g., java.lang.Integer for int, etc.). If t is not a numeric primitive
      * then the return type is t.
      */
@@ -332,7 +333,7 @@ public interface JL5TypeSystem extends
 
     /**
      * Perform unboxing conversion on t. If t is a wrapper type for a primitive type, then
-     * the return type will be the appropriate primitive type 
+     * the return type will be the appropriate primitive type
      * (e.g., int for java.lang.Integer, etc.). If t is not a wrapper type for a  primitive
      * type then the return type is t.
      */
@@ -340,7 +341,7 @@ public interface JL5TypeSystem extends
 
     /**
      * Compute the least upper bound of a set of types {@code bounds}. This is the
-     * lub(U1 ... Uk) function, as defined in the JLS 3rd edition, Section 15.12.2.7. 
+     * lub(U1 ... Uk) function, as defined in the JLS 3rd edition, Section 15.12.2.7.
      */
     LubType lub(Position pos, List<ReferenceType> bounds);
 
@@ -375,7 +376,7 @@ public interface JL5TypeSystem extends
     Type Class(Position pos, ReferenceType type);
 
     /**
-     * What are the type variables of class ct or any outer 
+     * What are the type variables of class ct or any outer
      * class for which an instance of ct has an enclosing instance?
      */
     List<TypeVariable> classAndEnclosingTypeVariables(JL5ParsedClassType ct);
