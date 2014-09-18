@@ -13,12 +13,12 @@
  * This program and the accompanying materials are made available under
  * the terms of the Lesser GNU Public License v2.0 which accompanies this
  * distribution.
- * 
+ *
  * The development of the Polyglot project has been supported by a
  * number of funding sources, including DARPA Contract F30602-99-1-0533,
  * monitored by USAF Rome Laboratory, ONR Grants N00014-01-1-0968 and
  * N00014-09-1-0652, NSF Grants CNS-0208642, CNS-0430161, CCF-0133302,
- * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan 
+ * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan
  * Research Fellowship, and an Intel Research Ph.D. Fellowship.
  *
  * See README for contributors.
@@ -49,16 +49,20 @@ public class JL5SwitchExt extends JL5TermExt implements JL5SwitchOps {
     }
 
     @Override
-    public Node typeCheck(TypeChecker tc) throws SemanticException {
+    public Node typeCheckOverride(Node parent, TypeChecker tc)
+            throws SemanticException {
         TypeSystem ts = tc.typeSystem();
-        Switch s = this.node();
-        Expr expr = s.expr();
+        Switch s = node();
+        Expr expr = s.visitChild(s.expr(), tc);
+        if (!expr.isTypeChecked()) {
+            return s;
+        }
         Type type = expr.type();
 
         if (!((J5Lang) tc.lang()).isAcceptableSwitchType(s, expr.type())) {
             throw new SemanticException("Switch index must be of type char, byte,"
-                                                + " short, int, Character, Byte, Short, Integer, or an enum type.",
-                                        s.position());
+                    + " short, int, Character, Byte, Short, Integer, or an enum type.",
+                    s.position());
         }
 
         ArrayList<SwitchElement> newels = new ArrayList<>(s.elements().size());
@@ -73,20 +77,21 @@ public class JL5SwitchExt extends JL5TermExt implements JL5SwitchOps {
                         && !ts.typeEquals(cExpr.type(), type)
                         && !ts.numericConversionValid(type,
                                                       tc.lang()
-                                                        .constantValue(cExpr,
-                                                                       tc.lang()))) {
+                                                      .constantValue(cExpr,
+                                                                     tc.lang()))) {
                     throw new SemanticException("Case constant \""
-                                                        + cExpr
-                                                        + "\" is not assignable to "
-                                                        + type + ".",
-                                                c.position());
+                            + cExpr
+                            + "\" is not assignable to "
+                            + type + ".",
+                            c.position());
                 }
                 el = c;
             }
+            else el = s.visitChild(el, tc);
 
             newels.add(el);
         }
-        return s.elements(newels);
+        return s.expr(expr).elements(newels);
     }
 
     @Override
