@@ -232,6 +232,8 @@ polyglot.ext.jl5.JL5ExtensionInfo "-d out -classpath java-out -assert -noserial 
         Inherit02.jl5 (Semantic, "Name clash");
         Inherit03.jl5 (Semantic, "Name clash"), (Semantic, "Name clash");
         InfiniteLoop.jl5;
+        Instanceof01.jl5 (Semantic, "not reifiable");
+        Instanceof02.jl5;
         Throw02.jl5;
         JLS8.1.2.jl5;
         Lists1.jl5;
@@ -644,6 +646,8 @@ polyglot.ext.jl5.JL5ExtensionInfo "-d out -classpath java-out -removeJava5isms -
         Inherit02.jl5 (Semantic, "Name clash");
         Inherit03.jl5 (Semantic, "Name clash"), (Semantic, "Name clash");
         InfiniteLoop.jl5;
+        Instanceof01.jl5 (Semantic, "not reifiable");
+        Instanceof02.jl5;
         Throw02.jl5;
         JLS8.1.2.jl5;
         Lists1.jl5;
