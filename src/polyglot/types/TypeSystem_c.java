@@ -1188,7 +1188,7 @@ public class TypeSystem_c implements TypeSystem {
      */
     protected <Instance extends ProcedureInstance> Collection<Instance> findMostSpecificProcedures(
             List<Instance> acceptable) throws SemanticException {
-
+        MostSpecificComparator<Instance> msc = mostSpecificComparator();
         // now, use JLS 15.12.2.2
         // First sort from most- to least-specific.
         acceptable = new ArrayList<>(acceptable); // make into array list to sort
@@ -1273,12 +1273,9 @@ public class TypeSystem_c implements TypeSystem {
     }
 
     @Override
-    public Comparator<ProcedureInstance> mostSpecificComparator() {
-        if (msc == null) msc = new MostSpecificComparator<>();
-        return msc;
+    public <T extends ProcedureInstance> MostSpecificComparator<T> mostSpecificComparator() {
+        return new MostSpecificComparator<>();
     }
-
-    protected Comparator<ProcedureInstance> msc;
 
     /**
      * Class to handle the comparisons; dispatches to moreSpecific method.

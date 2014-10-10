@@ -904,7 +904,7 @@ public interface TypeSystem {
      */
     List<MethodInstance> implemented(MethodInstance mi);
 
-    Comparator<? extends ProcedureInstance> mostSpecificComparator();
+    <T extends ProcedureInstance> Comparator<T> mostSpecificComparator();
 
     /**
      * Return the primitive with the given name.
