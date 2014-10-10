@@ -27,6 +27,7 @@
 package polyglot.types;
 
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 
@@ -451,7 +452,7 @@ public interface TypeSystem {
     @Deprecated
     MethodInstance findMethod(ReferenceType container, String name,
             List<? extends Type> argTypes, ClassType currClass)
-                    throws SemanticException;
+            throws SemanticException;
 
     /**
      * Requires: all type arguments are canonical.
@@ -484,7 +485,7 @@ public interface TypeSystem {
     @Deprecated
     ConstructorInstance findConstructor(ClassType container,
             List<? extends Type> argTypes, ClassType currClass)
-                    throws SemanticException;
+            throws SemanticException;
 
     /**
      * Find a constructor.  We need to pass the class from which the constructor
@@ -903,6 +904,8 @@ public interface TypeSystem {
      */
     List<MethodInstance> implemented(MethodInstance mi);
 
+    Comparator<? extends ProcedureInstance> mostSpecificComparator();
+
     /**
      * Return the primitive with the given name.
      */
@@ -1063,4 +1066,5 @@ public interface TypeSystem {
     public Flags Volatile();
 
     public Flags StrictFP();
+
 }
