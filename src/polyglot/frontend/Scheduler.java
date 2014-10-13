@@ -561,7 +561,7 @@ public abstract class Scheduler {
         count++;
         runCount.put(goal, count);
 
-        if (count >= MAX_RUN_COUNT) {
+        if (count >= maxRunCount()) {
             String[] suffix = new String[] { "th", "st", "nd", "rd" };
             int index = count % 10;
             if (index > 3) index = 0;
@@ -914,10 +914,13 @@ public abstract class Scheduler {
 
     protected static int dumpCounter = 0;
 
-    protected static final int MAX_RUN_COUNT = 200;
     protected Goal infiniteLoopGoal = null;
     protected int infiniteFrontEnd;
     protected int infiniteDeps;
+
+    protected int maxRunCount() {
+        return 200;
+    }
 
     public boolean inInfiniteLoop() {
         return infiniteLoopGoal != null;
