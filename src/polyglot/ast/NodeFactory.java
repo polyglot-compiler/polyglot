@@ -416,4 +416,6 @@ public interface NodeFactory {
     Unary Unary(Position pos, Expr expr, Unary.Operator op);
 
     While While(Position pos, Expr cond, Stmt body);
+    
+    Javadoc Javadoc(Position pos, String text);
 }

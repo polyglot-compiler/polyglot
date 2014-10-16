@@ -26,16 +26,29 @@
 
 package polyglot.ast;
 
-import polyglot.types.Flags;
+import polyglot.util.CodeWriter;
+import polyglot.util.Position;
+import polyglot.util.SerialVersionUID;
+import polyglot.visit.PrettyPrinter;
 
-/**
- * A top-level declaration.  This is any declaration that can appear in the
- * outermost scope of a source file.
- */
-public interface TopLevelDecl extends Node, Documentable {
-    /** The declaration's flags. */
-    Flags flags();
+public class Javadoc_c extends Node_c implements Javadoc {
+	private static final long serialVersionUID = SerialVersionUID.generate();
 
-    /** The declaration's name. */
-    String name();
+	private String text;
+
+	public Javadoc_c(Position pos, String text) {
+		super(pos, null);
+		this.text = text;
+	}
+
+	@Override
+	public void prettyPrint(CodeWriter w, PrettyPrinter pp) {
+		w.write(text.replaceAll("\n\t", "\n    "));
+		w.newline();
+	}
+
+	@Override
+	public String getText() {
+		return text;
+	}
 }

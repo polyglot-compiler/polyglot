@@ -82,6 +82,32 @@ parser Grm extends BaseParser {:
     }
     return l;
   }
+  
+  protected void attachJavadoc(Documentable documentable, Pair<Integer, Integer> currPos, Pair<Integer, Integer> endPos) {
+  	Integer index = positionToTokenIndexMap.get(currPos);
+            		
+	if(index < 0 || index >= tokenStream.size())
+		return;
+	
+	Token token = tokenStream.get(index);
+	if(token == null)
+		return;
+	
+	while(token.getPosition().line() >= endPos.part1()) {
+		if(token.getPosition().line() == endPos.part1() && token.getPosition().column() <= endPos.part2())
+			break;
+			
+		if(token instanceof JavadocToken) {
+			documentable.javadoc(nf.Javadoc(token.getPosition(), ((JavadocToken)token).getText()));
+			break;
+		}
+		
+		if(index == 0)
+			break;
+		else	
+			token = tokenStream.get(--index);	
+	}
+  }
 :};
 
 scan with {: return nextSymbol(); :};
@@ -134,6 +160,7 @@ terminal Token QUESTION; // conditional_expression
 terminal Token MULTEQ, DIVEQ, MODEQ, PLUSEQ, MINUSEQ; // assignment_operator
 terminal Token LSHIFTEQ, RSHIFTEQ, URSHIFTEQ; // assignment_operator
 terminal Token ANDEQ, XOREQ, OREQ; // assignment_operator
+terminal Token JAVADOC;
 
 terminal polyglot.lex.IntegerLiteral INTEGER_LITERAL;
 terminal polyglot.lex.IntegerLiteral INTEGER_LITERAL_BD;
@@ -422,9 +449,26 @@ compilation_unit ::=
         package_declaration_opt:a
         import_declarations_opt:b
         type_declarations_opt:c
-            {: RESULT = parser.nf.SourceFile(new Position(parser.lexer.path(), parser.lexer.file()),
-					     a, b, c);
-	    :}
+            {:  if(c != null && c.size() > 0) {
+            	Pair<Integer, Integer> endPos = new Pair<>(0, 0);
+            	
+            	if(b != null && b.size() > 0) {
+            		Position position = b.get(b.size()-1).position();
+            		endPos = new Pair<>(position.endLine(), position.endColumn());
+            	}
+            	else if(a != null) {
+            		endPos = new Pair<>(a.position().endLine(), a.position().endColumn());
+            	}
+            		
+            	for(TopLevelDecl topLevelDecl : c) {
+            		Pair<Integer, Integer> currPos = new Pair<>(topLevelDecl.position().line(), topLevelDecl.position().column());
+            		parser.attachJavadoc((Documentable) topLevelDecl, currPos, endPos);
+					endPos = new Pair<>(topLevelDecl.position().endLine(), topLevelDecl.position().endColumn());
+            	}
+            }
+            
+            RESULT = parser.nf.SourceFile(new Position(parser.lexer.path(), parser.lexer.file()),
+					     a, b, c); :}
     |   error
         type_declarations_opt:c
             {: RESULT = parser.nf.SourceFile(new Position(parser.lexer.path(), parser.lexer.file()),
@@ -590,7 +634,18 @@ interface_type_list ::=
 class_body ::=
                     // ClassBody
         LBRACE:n class_body_declarations_opt:a RBRACE:b
-            {: RESULT = parser.nf.ClassBody(parser.pos(n, b), a); :}
+            {: if(a != null && a.size() > 0) {
+	    	   		Pair<Integer, Integer> endPos = new Pair<>(n.getPosition().endLine(), n.getPosition().endColumn());
+	    	   		for(ClassMember classMember : a) {
+						if(classMember instanceof Documentable) {
+	    					Pair<Integer, Integer> currPos = new Pair<>(classMember.position().line(), classMember.position().column());
+	    					parser.attachJavadoc((Documentable) classMember, currPos, endPos);
+	    				}	
+	    				endPos = new Pair<>(classMember.position().endLine(), classMember.position().endColumn());
+	    			}
+	    		}
+            
+            	RESULT = parser.nf.ClassBody(parser.pos(n, b), a); :}
     ;
 class_body_declarations_opt ::=
                     // List of ClassMember
@@ -848,7 +903,17 @@ extends_interfaces ::=
 interface_body ::=
                     // ClassBody
         LBRACE:n interface_member_declarations_opt:a RBRACE:d
-            {: RESULT = parser.nf.ClassBody(parser.pos(n, d), a); :}
+            {: if(a != null && a.size() > 0) {
+	    	   		Pair<Integer, Integer> endPos = new Pair<>(n.getPosition().endLine(), n.getPosition().endColumn());
+	    	   		for(ClassMember classMember : a) {
+						if(classMember instanceof Documentable) {
+	    					Pair<Integer, Integer> currPos = new Pair<>(classMember.position().line(), classMember.position().column());
+	    					parser.attachJavadoc((Documentable) classMember, currPos, endPos);
+	    				}	
+	    				endPos = new Pair<>(classMember.position().endLine(), classMember.position().endColumn());
+	    			}
+	    		}
+            	RESULT = parser.nf.ClassBody(parser.pos(n, d), a); :}
     ;
 interface_member_declarations_opt ::=
                     // List of ClassMember

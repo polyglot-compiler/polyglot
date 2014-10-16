@@ -61,7 +61,7 @@ import java.util.Set;
     ErrorQueue eq;
     HashMap<String, Integer> keywords;
     Position commentBegin;
-
+    
     public Lexer_c(java.io.Reader reader, Source file, ErrorQueue eq) {
         this(reader);
         this.file = file.name();
@@ -80,7 +80,7 @@ import java.util.Set;
 	return Collections.unmodifiableSet(keywords.keySet());
     }
 
-    protected void init_keywords() {
+	protected void init_keywords() {
         keywords.put("abstract",      new Integer(sym.ABSTRACT));
         keywords.put("assert",        new Integer(sym.ASSERT));
         keywords.put("boolean",       new Integer(sym.BOOLEAN));
@@ -265,7 +265,11 @@ import java.util.Set;
         return new StringLiteral(pos(sb.length()), sb.toString(),
                                  sym.STRING_LITERAL);
     }
-
+	
+	private Token javadoc_token() {
+		return new JavadocToken(pos(sb.length()), sb.toString(), sym.JAVADOC);
+	}
+	
     private String chop(int i, int j) {
         return yytext().substring(i,yylength()-j);
     }
@@ -329,6 +333,8 @@ OctalEscape = \\ [0-7]
 <YYINITIAL> {
     /* 3.7 Comments */
     "/*"    { yybegin(TRADITIONAL_COMMENT);
+              sb.setLength(0);
+              sb.append(yytext());
               commentBegin = pos(); }
     "//"    { yybegin(END_OF_LINE_COMMENT); }
 
@@ -421,17 +427,20 @@ OctalEscape = \\ [0-7]
 }
 
 <TRADITIONAL_COMMENT> {
-    "*/"                         { yybegin(YYINITIAL); }
+    "*/"                         { yybegin(YYINITIAL);
+    							   sb.append(yytext()); 
+    							   return javadoc_token(); }
+
     <<EOF>>                      { yybegin(YYINITIAL);
                                    eq.enqueue(ErrorInfo.LEXICAL_ERROR,
                                                   "Unclosed comment",
                                                   commentBegin); }
-    [^]                          { /* ignore */ }
+    [^]                          { sb.append(yytext()); }
 }
 
 <END_OF_LINE_COMMENT> {
     {LineTerminator}             { yybegin(YYINITIAL); }
-    .                            { /* ignore */ }
+    .							 { /* ignore */ }
 }
 
 <CHARACTER> {

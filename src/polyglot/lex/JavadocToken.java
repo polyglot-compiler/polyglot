@@ -24,18 +24,24 @@
  * See README for contributors.
  ******************************************************************************/
 
-package polyglot.ast;
+package polyglot.lex;
 
-import polyglot.types.Flags;
+import polyglot.util.Position;
 
-/**
- * A top-level declaration.  This is any declaration that can appear in the
- * outermost scope of a source file.
- */
-public interface TopLevelDecl extends Node, Documentable {
-    /** The declaration's flags. */
-    Flags flags();
+public class JavadocToken extends Token {
+    protected String text;
 
-    /** The declaration's name. */
-    String name();
+    public JavadocToken(Position position, String s, int sym) {
+        super(position, sym);
+        text = s;
+    }
+
+    public String getText() {
+        return text;
+    }
+
+    @Override
+    public String toString() {
+        return "javadoc \"" + Token.escape(text) + "\"";
+    }
 }
