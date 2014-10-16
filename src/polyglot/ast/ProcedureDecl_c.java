@@ -58,8 +58,7 @@ public abstract class ProcedureDecl_c extends Term_c implements ProcedureDecl,
     protected List<Formal> formals;
     protected List<TypeNode> throwTypes;
     protected Block body;
-    protected Javadoc javadoc;
-    
+
     @Deprecated
     public ProcedureDecl_c(Position pos, Flags flags, Id name,
             List<Formal> formals, List<TypeNode> throwTypes, Block body) {
@@ -241,10 +240,7 @@ public abstract class ProcedureDecl_c extends Term_c implements ProcedureDecl,
 
     @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
-    	if(javadoc != null)	
-        	javadoc.prettyPrint(w, tr);
-    	
-    	((JLang) tr.lang()).prettyPrintHeader(this, flags(), w, tr);
+        ((JLang) tr.lang()).prettyPrintHeader(this, flags(), w, tr);
 
         if (body != null) {
             printSubStmt(body, w, tr);
@@ -266,9 +262,4 @@ public abstract class ProcedureDecl_c extends Term_c implements ProcedureDecl,
             w.end();
         }
     }
-
-	@Override
-	public void javadoc(Javadoc javadoc) {
-		this.javadoc = javadoc;
-	}
 }

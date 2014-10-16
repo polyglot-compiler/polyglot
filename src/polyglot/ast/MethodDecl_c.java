@@ -369,9 +369,4 @@ public class MethodDecl_c extends ProcedureDecl_c implements MethodDecl {
                              this.body);
     }
 
-	@Override
-	public void javadoc(Javadoc javadoc) {
-		this.javadoc = javadoc;
-	}
-
 }

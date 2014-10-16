@@ -33,7 +33,6 @@ import polyglot.ast.CodeBlock;
 import polyglot.ast.Expr;
 import polyglot.ast.Formal;
 import polyglot.ast.Id;
-import polyglot.ast.Javadoc;
 import polyglot.ast.MethodDecl;
 import polyglot.ast.Node;
 import polyglot.ast.Term;
@@ -438,9 +437,4 @@ public class AnnotationElemDecl_c extends Term_c implements AnnotationElemDecl {
     public CodeInstance codeInstance() {
         return this.annotationElemInstance();
     }
-
-	@Override
-	public void javadoc(Javadoc javadoc) {
-		// No need to attach javadoc to an annotation
-	}
 }

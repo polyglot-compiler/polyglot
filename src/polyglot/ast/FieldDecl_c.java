@@ -70,8 +70,7 @@ public class FieldDecl_c extends Term_c implements FieldDecl {
     protected Expr init;
     protected FieldInstance fi;
     protected InitializerInstance ii;
-    protected Javadoc javadoc;
-    
+
 //    @Deprecated
     public FieldDecl_c(Position pos, Flags flags, TypeNode type, Id name,
             Expr init) {
@@ -528,10 +527,7 @@ public class FieldDecl_c extends Term_c implements FieldDecl {
             f = f.clearStatic();
             f = f.clearFinal();
         }
-        
-        if(javadoc != null)	
-        	javadoc.prettyPrint(w, tr);
-        	
+
         w.write(f.translate());
         print(type, w, tr);
         w.allowBreak(2, 2, " ", 1);
@@ -572,8 +568,4 @@ public class FieldDecl_c extends Term_c implements FieldDecl {
                             this.init);
     }
 
-	@Override
-	public void javadoc(Javadoc javadoc) {
-		this.javadoc = javadoc;
-	}
 }

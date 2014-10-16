@@ -35,7 +35,7 @@ import polyglot.types.Type;
  * A {@code FieldDecl} is an immutable representation of the declaration
  * of a field of a class.
  */
-public interface FieldDecl extends ClassMember, VarInit, CodeNode, Documentable {
+public interface FieldDecl extends ClassMember, VarInit, CodeNode {
     /** Get the type object for the declaration's type. */
     Type declType();
 
