@@ -35,7 +35,7 @@ import polyglot.types.ProcedureInstance;
  * A procedure declaration.  A procedure is the supertype of methods and
  * constructors.
  */
-public interface ProcedureDecl extends CodeDecl {
+public interface ProcedureDecl extends CodeDecl, Documentable {
     /** The procedure's flags. */
     Flags flags();
 

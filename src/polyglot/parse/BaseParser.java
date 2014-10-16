@@ -26,7 +26,10 @@
 
 package polyglot.parse;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import java_cup.runtime.Symbol;
 import polyglot.ast.AmbExpr;
@@ -42,11 +45,13 @@ import polyglot.ast.Prefix;
 import polyglot.ast.QualifierNode;
 import polyglot.ast.Receiver;
 import polyglot.ast.TypeNode;
+import polyglot.lex.JavadocToken;
 import polyglot.lex.Lexer;
 import polyglot.lex.Token;
 import polyglot.types.Type;
 import polyglot.types.TypeSystem;
 import polyglot.util.ErrorQueue;
+import polyglot.util.Pair;
 import polyglot.util.Position;
 
 public abstract class BaseParser extends java_cup.runtime.lr_parser {
@@ -56,7 +61,17 @@ public abstract class BaseParser extends java_cup.runtime.lr_parser {
     public final NodeFactory nf;
     protected Position prev_pos;
     protected Position position;
-
+    
+    /**
+     * Keeps track of every token seen by the Parser
+     */
+    public final List<Token> tokenStream;
+    
+    /**
+     * Mapping from Pos(Line#, Col#) -> Index into tokenStream
+     */
+    public final Map<Pair<Integer, Integer>, Integer> positionToTokenIndexMap;
+    
     public BaseParser(Lexer l, TypeSystem t, NodeFactory n, ErrorQueue q) {
         lexer = l;
         eq = q;
@@ -64,8 +79,11 @@ public abstract class BaseParser extends java_cup.runtime.lr_parser {
         nf = n;
         prev_pos = Position.compilerGenerated();
         position = Position.compilerGenerated();
+        
+        tokenStream = new ArrayList<>();
+        positionToTokenIndexMap = new HashMap<>();
     }
-
+    
     /**
      * The standard scanning routine for use in the CUP "scan with"
      * declaration. Should read:
@@ -73,6 +91,16 @@ public abstract class BaseParser extends java_cup.runtime.lr_parser {
      */
     public Symbol nextSymbol() throws java.io.IOException {
         Token t = lexer.nextToken();
+        
+        while(t instanceof JavadocToken) {
+   	        tokenStream.add(t);
+   	        positionToTokenIndexMap.put(new Pair<>(t.getPosition().line(), t.getPosition().column()), tokenStream.size() - 1);
+        	t = lexer.nextToken();
+        }
+        
+        tokenStream.add(t);
+        positionToTokenIndexMap.put(new Pair<>(t.getPosition().line(), t.getPosition().column()), tokenStream.size() - 1);
+        
         // use two positions, since the parser does one token lookahead
         position = prev_pos;
         prev_pos = t.getPosition();

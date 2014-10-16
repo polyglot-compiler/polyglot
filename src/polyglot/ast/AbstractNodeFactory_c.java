@@ -551,4 +551,9 @@ public abstract class AbstractNodeFactory_c implements NodeFactory {
     public final Unary Unary(Position pos, Expr expr, Unary.Operator op) {
         return Unary(pos, op, expr);
     }
+    
+    @Override
+    public Javadoc Javadoc(Position pos, String text) {
+        return new Javadoc_c(pos, text);
+    }
 }

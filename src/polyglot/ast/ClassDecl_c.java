@@ -82,6 +82,8 @@ public class ClassDecl_c extends Term_c implements ClassDecl, ClassDeclOps {
     protected boolean implicitMembersAdded;
 
     protected ParsedClassType type;
+    
+    protected Javadoc javadoc;
 
 //    @Deprecated
     public ClassDecl_c(Position pos, Flags flags, Id name, TypeNode superClass,
@@ -144,7 +146,12 @@ public class ClassDecl_c extends Term_c implements ClassDecl, ClassDeclOps {
         n.flags = flags;
         return n;
     }
-
+    
+    @Override
+	public void javadoc(Javadoc javadoc) {
+		this.javadoc = javadoc;
+	}
+    
     @Override
     public Id id() {
         return this.name;
@@ -721,6 +728,10 @@ public class ClassDecl_c extends Term_c implements ClassDecl, ClassDeclOps {
     @Override
     public void prettyPrintHeader(CodeWriter w, PrettyPrinter tr) {
         w.begin(0);
+        
+        if(javadoc != null)	
+        	javadoc.prettyPrint(w, tr);
+        	
         if (flags.isInterface()) {
             w.write(flags.clearInterface().clearAbstract().translate());
         }
