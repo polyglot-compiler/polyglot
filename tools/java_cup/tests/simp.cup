@@ -1,0 +1,18 @@
+terminal Integer DIGIT;
+terminal Token DOT, MEM, ASSIGN;
+non terminal Command goal, statement;
+non terminal Expr expr;
+non terminal Expr number ;
+
+start with goal;
+
+goal ::= statement ;
+
+number ::= DIGIT | DIGIT number ;
+
+statement ::= expr DOT DOT statement statement
+	   | MEM expr ASSIGN expr
+	   ;
+
+expr ::= number
+      ;

@@ -1,0 +1,77 @@
+parser code {: :}
+
+scan with {:
+    return lexer.nextToken().symbol();
+:}
+
+terminal SWITCH, NEXT_CRITTER, PREV_CRITTER, DECLARE_ENEMY, DECLARE_FRIEND;
+terminal Token FORWARD, BACKWARD, LEFT, RIGHT;
+terminal Token LBRACK, RBRACK, LPAREN, RPAREN, EAT, GET, ATTACK;
+terminal Integer DIGIT;
+terminal Token IS_WALL, IS_FOOD, IS_ENEMY, IS_FRIEND;
+terminal Token DOT, WHILE, MEM, ASSIGN;
+terminal Token PLUS, MINUS, TIMES, DIVIDE, NOT, EQUALS, AND, OR, LT, GT, RND;
+non terminal Command goal, command, statement, statements, simple_statement;
+non terminal Expr expr, is_;
+non terminal Expr number ;
+non terminal Operator binop, unop;
+
+precedence left OR;
+precedence left AND;
+precedence left EQUALS;
+precedence left LT, GT;
+precedence left PLUS, MINUS;
+precedence left TIMES, DIVIDE;
+precedence nonassoc NOT, MINUS, RND;
+
+start with goal;
+
+goal ::= command | statement ;
+
+command ::= number SWITCH
+        | NEXT_CRITTER
+        | PREV_CRITTER
+	| number DECLARE_ENEMY
+	| number DECLARE_FRIEND
+	;
+
+number ::= DIGIT | number DIGIT ;
+
+statement ::= expr simple_statement
+	    | expr DOT statement  
+	    | expr DOT DOT statement statement
+	    | expr WHILE statement
+	    | simple_statement
+	    | MEM expr ASSIGN expr
+	    ;
+
+simple_statement ::= LBRACK statements RBRACK 
+	   | EAT 
+	   | ATTACK 
+	   | FORWARD 
+	   | LEFT 
+	   | RIGHT 
+	   ;
+
+statements ::= 
+            | statements statement
+	    ;
+
+expr ::= number
+	   | expr PLUS expr
+	   | expr MINUS expr
+	   | expr TIMES expr
+	   | expr DIVIDE expr
+	   | expr EQUALS expr
+	   | expr LT expr
+	   | expr GT expr
+	   | expr LT EQUALS expr
+	   | MINUS expr
+	   | NOT expr
+	   | RND expr
+	   | MEM expr
+	   | IS_FRIEND expr
+	   | IS_ENEMY expr
+	   | IS_WALL expr
+	   | LPAREN expr RPAREN
+	   ;

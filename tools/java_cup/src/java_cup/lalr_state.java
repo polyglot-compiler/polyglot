@@ -8,6 +8,8 @@ import java.util.Set;
 import java.util.Stack;
 import java.util.TreeSet;
 
+import parser.UnifiedExample;
+
 /** This class represents a state in the LALR viable prefix recognition machine.
  *  A state consists of an LALR item set and a set of transitions to other
  *  states under terminal and non-terminal symbols.  Each state represents
@@ -193,7 +195,7 @@ public class lalr_state {
                 if (part.is_action())
                     System.out.print("{action} ");
                 else System.out.print(((symbol_part) part).the_symbol().name()
-                        + " ");
+                                      + " ");
             }
             if (itm.dot_at_end()) System.out.print("(*) ");
             System.out.println("]");
@@ -396,7 +398,7 @@ public class lalr_state {
                             /* fix up the item so it points to the existing set */
                             if (existing != null)
                                 fix_itm.propagate_items()
-                                       .setElementAt(existing, l);
+                                .setElementAt(existing, l);
                         }
                     }
                 }
@@ -487,7 +489,7 @@ public class lalr_state {
                                 && other_act.kind() != parse_action.NONASSOC) {
                             /* if we have lower index hence priority, replace it*/
                             if (itm.the_production().index() < ((reduce_action) other_act).reduce_with()
-                                                                                          .index()) {
+                                    .index()) {
                                 /* replace the action */
                                 our_act_row.under_term[t] = act;
                             }
@@ -540,6 +542,10 @@ public class lalr_state {
             }
         }
 
+        // XXX
+//        for (lalr_state state : all_states())
+//            System.out.println(state);
+
         /* if we end up with conflict(s), report them */
         if (!conflict_set.empty()) report_conflicts(conflict_set);
     }
@@ -568,7 +574,7 @@ public class lalr_state {
     protected boolean fix_with_precedence(production p, int term_index,
             parse_action_row table_row, parse_action act)
 
-    throws internal_error {
+                    throws internal_error {
 
         terminal term = terminal.find(term_index);
 
@@ -701,11 +707,11 @@ public class lalr_state {
                     if (compare.dot_at_end()) {
                         /* only look at reduces after itm */
                         if (after_itm)
-                        /* does the comparison item conflict? */
-                        if (compare.lookahead().intersects(lookahead)) {
-                            /* report a reduce/reduce conflict */
-                            report_reduce_reduce(itm, compare);
-                        }
+                            /* does the comparison item conflict? */
+                            if (compare.lookahead().intersects(lookahead)) {
+                                /* report a reduce/reduce conflict */
+                                report_reduce_reduce(itm, compare);
+                            }
                     }
                     else {
                         /* is it a shift on our conflicting terminal */
@@ -828,8 +834,10 @@ public class lalr_state {
         message.append(red_itm.to_simple_string());
         message.append("\n");
         /* ACM extension */
+        long start;
         ByteArrayOutputStream ds = new ByteArrayOutputStream();
         terminal cs = terminal.find(conflict_sym);
+        start = System.nanoTime();
         if (Main.report_counterexamples) {
             message.append("    Example:    ");
             counterexamples.report_shortest_path(this,
@@ -841,7 +849,17 @@ public class lalr_state {
             errOutput(message, ds);
             message.append("\n\n");
         }
+        System.err.println("Andrew's search: " + (System.nanoTime() - start));
         /* end ACM extension */
+        /* APL extension */
+//        start = System.nanoTime();
+//        List<Chin_examples.PrefixPath> prefixes =
+//                Chin_examples.findSRPrefix(this, red_itm, cs);
+//        for (Chin_examples.PrefixPath candidate : prefixes) {
+//            System.err.println(candidate);
+//        }
+//        System.err.println("prefix finder: " + (System.nanoTime() - start));
+        /* end APL extension */
 
         /* find and report on all items that shift under our conflict symbol */
         for (lalr_item itm : items()) {
@@ -854,6 +872,15 @@ public class lalr_state {
                         && shift_sym.index() == conflict_sym) {
                     /* yes, report on it */
                     /* APL extension */
+                    start = System.nanoTime();
+                    UnifiedExample ue =
+                            new UnifiedExample(this, red_itm, itm, cs);
+                    ue.find();
+//                    Chin_examples3.findSRExample(this, red_itm, itm, cs);
+//                    Chin_examples4.findSRExample(this, red_itm, itm, cs);
+//                    Chin_examples4.findSRExample(this, red_itm, itm, cs);
+//                    Chin_examples.findSRExample(prefixes, red_itm, itm);
+                    System.err.println("stage4: " + (System.nanoTime() - start));
 //                    if (Main.report_counterexamples) {
 //                        Chin_examples.DerivableSymbol example = null;
 //                        example =
@@ -874,6 +901,7 @@ public class lalr_state {
                     message.append(itm.to_simple_string());
                     message.append("\n");
                     /* ACM extension */
+                    start = System.nanoTime();
                     if (Main.report_counterexamples) {
                         ds.reset();
                         message.append("    Example:    ");
@@ -886,6 +914,7 @@ public class lalr_state {
                         errOutput(message, ds);
                         message.append("\n\n");
                     }
+                    System.err.println(System.nanoTime() - start);
                     /* end ACM extension */
                 }
             }
@@ -898,23 +927,6 @@ public class lalr_state {
         emit.num_conflicts++;
         ErrorManager.getManager().emit_warning(message.toString());
     }
-
-    /* Begin ACM extension */
-    String right_of_dot(lalr_item itm) throws internal_error {
-        StringBuilder sb = new StringBuilder();
-        production prod = itm.the_production();
-        int pos = itm.dot_pos();
-        for (int i = pos; i < prod.rhs_length(); i++) {
-            if (i != pos) sb.append(" ");
-            production_part pp = prod.rhs(i);
-            if (pp instanceof symbol_part) {
-                sb.append(((symbol_part) pp).the_symbol().name());
-            }
-        }
-        return sb.toString();
-    }
-
-    /* End ACM extension */
 
     /*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . .*/
 

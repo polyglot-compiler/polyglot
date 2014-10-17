@@ -1,0 +1,13 @@
+terminal Token H, J, K, x;
+
+non terminal S, A, I;
+
+start with S;
+
+S ::= A J;
+A ::= H I;
+I ::= x | I J K;
+
+// Not ambiguous (LR(2))
+// Reduce example: H I J
+// Shift example: H I J K J

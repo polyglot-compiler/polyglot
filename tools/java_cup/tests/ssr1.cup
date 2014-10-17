@@ -1,0 +1,7 @@
+terminal Token DIGIT, DOT;
+non terminal Token goal, num;
+
+start with goal;
+
+goal ::= num | num num;
+num ::= DIGIT | DIGIT num | DIGIT DOT num;
