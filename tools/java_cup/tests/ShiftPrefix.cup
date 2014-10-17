@@ -1,0 +1,19 @@
+terminal Token a, b, x, y;
+
+non terminal A, R, S, T, B, X, XX, XY, Y;
+
+start with A;
+
+A ::= R T | S;
+R ::= B;
+B ::= b;
+T ::= a XX | a X XY;
+S ::= B a XX Y;
+X ::= x;
+XX ::= x x;
+XY ::= x y;
+Y ::= y;
+
+// Example: B a x x y
+// Reduction: R ::= B (*)
+// Shift: S ::= B (*) a XX Y

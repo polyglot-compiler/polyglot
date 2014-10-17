@@ -1,0 +1,13 @@
+terminal Token H, J;
+
+non terminal S, A, I;
+
+start with S;
+
+S ::= A | A J;
+A ::= H I J J;
+I ::= I J;
+
+// Example: H I J J J
+// Reduction: A ::= I J (*)
+// Shift: I ::= H I J (*) J

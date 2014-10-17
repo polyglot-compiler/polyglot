@@ -1,0 +1,10 @@
+terminal Token a, b, c, d;
+non terminal Token S, AB, CD, AD, BC;
+
+start with S;
+
+S ::= AD | AB CD;
+AB ::= a AB b | a b;
+CD ::= c CD d | c d;
+AD ::= a AD d | a BC d;
+BC ::= b BC c | b c;
