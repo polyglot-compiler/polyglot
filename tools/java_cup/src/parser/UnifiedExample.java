@@ -182,15 +182,16 @@ public class UnifiedExample {
                                 StateItem.lookup(conflict, itm2));
         long start;
         start = System.nanoTime();
-        List<SearchState> stage1results = initial.stage1(nextSym);
-        System.err.println("stage1: " + (System.nanoTime() - start));
-        System.err.println("size: " + stage1results.size());
+//        List<SearchState> stage1results = initial.stage1(nextSym, scpSet);
+//        System.err.println("stage1: " + (System.nanoTime() - start));
+//        System.err.println("size: " + stage1results.size());
         // TODO
         Map<Integer, FixedComplexitySearchState> fcssMap = new HashMap<>();
         PriorityQueue<FixedComplexitySearchState> pq = new PriorityQueue<>();
         Map<List<StateItem>, Set<List<StateItem>>> visited = new HashMap<>();
-        for (SearchState ss : stage1results)
-            add(pq, fcssMap, visited, ss);
+        add(pq, fcssMap, visited, initial);
+//        for (SearchState ss : stage1results)
+//            add(pq, fcssMap, visited, ss);
         start = System.nanoTime();
         boolean assurancePrinted = false;
         SearchState stage3result = null;
@@ -228,23 +229,23 @@ public class UnifiedExample {
                     if (stage3result == null) stage3result = ss;
                     stage = 4;
                 }
-//                if (!assurancePrinted
-//                        && System.nanoTime() - start > ASSURANCE_LIMIT
-//                        && stage3result != null) {
-//                    System.err.println("Productions leading up to the conflict stage found.  Finding a possible unified example...");
-//                    assurancePrinted = true;
-//                }
-//                if (System.nanoTime() - start > TIME_LIMIT
-//                        && stage3result != null) {
-//                    System.err.println("time limit exceeded: "
-//                            + (System.nanoTime() - start));
-//                    System.err.println(stage3result.derivs1);
-//                    System.err.println(stage3result.derivs2);
-//                    System.err.println(stage3result.states1);
-//                    System.err.println(stage3result.states2);
-//                    System.err.println(stage3result.complexity);
-//                    return;
-//                }
+                if (!assurancePrinted
+                        && System.nanoTime() - start > ASSURANCE_LIMIT
+                        && stage3result != null) {
+                    System.err.println("Productions leading up to the conflict stage found.  Finding a possible unified example...");
+                    assurancePrinted = true;
+                }
+                if (System.nanoTime() - start > TIME_LIMIT
+                        && stage3result != null) {
+                    System.err.println("time limit exceeded: "
+                            + (System.nanoTime() - start));
+                    System.err.println(stage3result.derivs1);
+                    System.err.println(stage3result.derivs2);
+                    System.err.println(stage3result.states1);
+                    System.err.println(stage3result.states2);
+                    System.err.println(stage3result.complexity);
+                    return;
+                }
                 StateItem si1 = ss.states1.get(ss.states1.size() - 1);
                 StateItem si2 = ss.states2.get(ss.states2.size() - 1);
                 boolean si1reduce = si1.item.dot_at_end();
@@ -348,9 +349,10 @@ public class UnifiedExample {
                         for (SearchState prepended : ss.prepend(sym,
                                                                 null,
                                                                 null,
-                                                                ss.shiftDepth < 0
-                                                                        ? scpSet
-                                                                        : null)) {
+                                                                scpSet
+                                                                /*ss.shiftDepth < 0
+                        ? scpSet
+                        : null*/)) {
                             add(pq, fcssMap, visited, prepended);
                         }
                     }
@@ -461,7 +463,8 @@ public class UnifiedExample {
                                    shiftDepth);
         }
 
-        protected List<SearchState> stage1(terminal nextSym) {
+        protected List<SearchState> stage1(terminal nextSym,
+                Set<lalr_state> scpSet) {
             lalr_item item = states1.get(0).item;
             production prod = item.the_production();
             List<SearchState> result = new LinkedList<>();
@@ -472,7 +475,17 @@ public class UnifiedExample {
                 symbol sym = rhs(prod, pos);
                 while (!queue.isEmpty()) {
                     SearchState ss = queue.remove();
-                    newQueue.addAll(ss.prepend(sym, nextSym, null));
+                    for (SearchState candidate : ss.prepend(sym,
+                                                            nextSym,
+                                                            null,
+                                                            scpSet)) {
+                        if (candidate.states1.size() < 2
+                                || candidate.states1.get(0).item.dot_pos() + 1 != candidate.states1.get(1).item.dot_pos()
+                                || candidate.states2.size() < 2
+                                || candidate.states2.get(0).item.dot_pos() + 1 != candidate.states2.get(1).item.dot_pos())
+                            queue.add(candidate);
+                        else newQueue.add(candidate);
+                    }
                 }
                 Queue<SearchState> tmp = queue;
                 queue = newQueue;
@@ -491,39 +504,47 @@ public class UnifiedExample {
                 symbol nextSym2, Set<lalr_state> guide) {
             List<SearchState> result = new LinkedList<>();
             SearchState ss = this;
-            StateItem si1 = ss.states1.get(0);
-            StateItem si2 = ss.states2.get(0);
+            StateItem si1src = ss.states1.get(0);
+            StateItem si2src = ss.states2.get(0);
             Set<symbol> si1lookahead =
                     nextSym1 == null
-                    ? StateItem.symbolSet(si1.item.lookahead())
+                    ? StateItem.symbolSet(si1src.item.lookahead())
                             : symbolSet(nextSym1);
                     Set<symbol> si2lookahead =
                             nextSym2 == null
-                            ? StateItem.symbolSet(si2.item.lookahead())
+                            ? StateItem.symbolSet(si2src.item.lookahead())
                                     : symbolSet(nextSym2);
-//                            if (nextSym1 == null && nextSym2 == null) {
-//                                si1lookahead.retainAll(si2lookahead);
-//                                si2lookahead.retainAll(si1lookahead);
-//                            }
                             List<List<StateItem>> prev1 =
-                                    si1.reverseTransition(sym, si1lookahead, guide);
+                                    si1src.reverseTransition(sym, si1lookahead, guide);
                             List<List<StateItem>> prev2 =
-                                    si2.reverseTransition(sym, si2lookahead, guide);
+                                    si2src.reverseTransition(sym, si2lookahead, guide);
                             for (List<StateItem> psis1 : prev1) {
-                                StateItem psi1 = psis1.get(0);
+                                StateItem psi1 = psis1.isEmpty() ? si1src : psis1.get(0);
                                 for (List<StateItem> psis2 : prev2) {
-                                    StateItem psi2 = psis2.get(0);
+                                    StateItem psi2 = psis2.isEmpty() ? si2src : psis2.get(0);
+                                    if (psi1 == si1src && psi2 == si2src) continue;
                                     if (psi1.state != psi2.state) continue;
                                     SearchState copy = ss.copy();
-                                    Derivation deriv = new Derivation(sym);
-                                    copy.derivs1.add(0, deriv);
-                                    copy.derivs2.add(0, deriv);
                                     copy.states1.addAll(0, psis1);
                                     copy.states2.addAll(0, psis2);
+                                    if (!psis1.isEmpty()
+                                            && copy.states1.get(0).item.dot_pos() + 1 == copy.states1.get(1).item.dot_pos()) {
+                                        if (!psis2.isEmpty()
+                                                && copy.states2.get(0).item.dot_pos() + 1 == copy.states2.get(1).item.dot_pos()) {
+                                            Derivation deriv = new Derivation(sym);
+                                            copy.derivs1.add(0, deriv);
+                                            copy.derivs2.add(0, deriv);
+                                        }
+                                        else continue;
+                                    }
+                                    else if (!psis2.isEmpty()
+                                            && copy.states2.get(0).item.dot_pos() + 1 == copy.states2.get(1).item.dot_pos()) {
+                                        continue;
+                                    }
                                     int prependSize = psis1.size() + psis2.size();
                                     int productionSteps =
-                                            productionSteps(psis1, si1)
-                                            + productionSteps(psis2, si2);
+                                            productionSteps(psis1, si1src)
+                                            + productionSteps(psis2, si2src);
                                     copy.complexity +=
                                             UNSHIFT_COST * (prependSize - productionSteps)
                                             + PRODUCTION_COST * productionSteps;
