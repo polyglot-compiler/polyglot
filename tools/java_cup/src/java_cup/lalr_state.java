@@ -195,7 +195,7 @@ public class lalr_state {
                 if (part.is_action())
                     System.out.print("{action} ");
                 else System.out.print(((symbol_part) part).the_symbol().name()
-                                      + " ");
+                        + " ");
             }
             if (itm.dot_at_end()) System.out.print("(*) ");
             System.out.println("]");
@@ -398,7 +398,7 @@ public class lalr_state {
                             /* fix up the item so it points to the existing set */
                             if (existing != null)
                                 fix_itm.propagate_items()
-                                .setElementAt(existing, l);
+                                       .setElementAt(existing, l);
                         }
                     }
                 }
@@ -489,7 +489,7 @@ public class lalr_state {
                                 && other_act.kind() != parse_action.NONASSOC) {
                             /* if we have lower index hence priority, replace it*/
                             if (itm.the_production().index() < ((reduce_action) other_act).reduce_with()
-                                    .index()) {
+                                                                                          .index()) {
                                 /* replace the action */
                                 our_act_row.under_term[t] = act;
                             }
@@ -574,7 +574,7 @@ public class lalr_state {
     protected boolean fix_with_precedence(production p, int term_index,
             parse_action_row table_row, parse_action act)
 
-                    throws internal_error {
+    throws internal_error {
 
         terminal term = terminal.find(term_index);
 
@@ -707,11 +707,11 @@ public class lalr_state {
                     if (compare.dot_at_end()) {
                         /* only look at reduces after itm */
                         if (after_itm)
-                            /* does the comparison item conflict? */
-                            if (compare.lookahead().intersects(lookahead)) {
-                                /* report a reduce/reduce conflict */
-                                report_reduce_reduce(itm, compare);
-                            }
+                        /* does the comparison item conflict? */
+                        if (compare.lookahead().intersects(lookahead)) {
+                            /* report a reduce/reduce conflict */
+                            report_reduce_reduce(itm, compare);
+                        }
                     }
                     else {
                         /* is it a shift on our conflicting terminal */
@@ -796,6 +796,12 @@ public class lalr_state {
             message.append(" ] (*)\n");
         }
         /* End ACM extension */
+        /* APL extension */
+        long start = System.nanoTime();
+        UnifiedExample ue = new UnifiedExample(this, itm1, itm2, cs);
+        ue.find();
+        System.err.println("stage4: " + (System.nanoTime() - start));
+        /* End APL extension */
         message.append("  under symbols: {");
         for (int t = 0; t < terminal.number(); t++) {
             if (itm1.lookahead().contains(t) && itm2.lookahead().contains(t)) {
