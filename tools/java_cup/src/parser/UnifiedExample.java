@@ -181,7 +181,7 @@ public class UnifiedExample {
                 new SearchState(StateItem.lookup(conflict, itm1),
                                 StateItem.lookup(conflict, itm2));
         long start;
-        start = System.nanoTime();
+//        start = System.nanoTime();
 //        List<SearchState> stage1results = initial.stage1(nextSym, scpSet);
 //        System.err.println("stage1: " + (System.nanoTime() - start));
 //        System.err.println("size: " + stage1results.size());
@@ -426,11 +426,11 @@ public class UnifiedExample {
      * @author Chinawat
      *
      */
-    protected static class SearchState implements Comparable<SearchState> {
+    protected class SearchState implements Comparable<SearchState> {
 
         protected List<Derivation> derivs1, derivs2;
         protected List<StateItem> states1, states2;
-        protected int complexity, shiftDepth;
+        protected int complexity, reduceDepth, shiftDepth;
 
         protected SearchState(StateItem si1, StateItem si2) {
             derivs1 = new LinkedList<>();
@@ -440,17 +440,19 @@ public class UnifiedExample {
             states1.add(si1);
             states2.add(si2);
             complexity = 0;
+            reduceDepth = 0;
             shiftDepth = 0;
         }
 
         private SearchState(List<Derivation> derivs1, List<Derivation> derivs2,
                 List<StateItem> states1, List<StateItem> states2,
-                int complexity, int shiftDepth) {
+                int complexity, int reduceDepth, int shiftDepth) {
             this.derivs1 = new LinkedList<>(derivs1);
             this.derivs2 = new LinkedList<>(derivs2);
             this.states1 = new LinkedList<>(states1);
             this.states2 = new LinkedList<>(states2);
             this.complexity = complexity;
+            this.reduceDepth = reduceDepth;
             this.shiftDepth = shiftDepth;
         }
 
@@ -460,6 +462,7 @@ public class UnifiedExample {
                                    states1,
                                    states2,
                                    complexity,
+                                   reduceDepth,
                                    shiftDepth);
         }
 
@@ -554,27 +557,6 @@ public class UnifiedExample {
             return result;
         }
 
-        protected static boolean samePrefix(lalr_item itm1, lalr_item itm2) {
-            if (itm1.dot_pos() != itm2.dot_pos()) return false;
-            production prod1 = itm1.the_production();
-            production prod2 = itm2.the_production();
-            for (int i = 0, len = itm1.dot_pos(); i < len; i++)
-                if (rhs(prod1, i) != rhs(prod2, i)) return false;
-            return true;
-        }
-
-        protected static int productionSteps(List<StateItem> sis, StateItem last) {
-            int count = 0;
-            lalr_state lastState = last.state;
-            for (ListIterator<StateItem> itr = sis.listIterator(sis.size()); itr.hasPrevious();) {
-                StateItem si = itr.previous();
-                lalr_state state = si.state;
-                if (state == lastState) count++;
-                lastState = state;
-            }
-            return count;
-        }
-
         protected List<SearchState> reduce1(symbol nextSym) {
             List<StateItem> states = states1;
             List<Derivation> derivs = derivs1;
@@ -595,6 +577,10 @@ public class UnifiedExample {
                     int dSize = derivs.size();
                     Derivation deriv =
                             new Derivation(lhs, derivs.subList(dSize - len, dSize));
+                    if (reduceDepth == 0) {
+                        deriv.deriv.add(itm1.dot_pos(), Derivation.dot);
+                        reduceDepth--;
+                    }
                     derivs = new LinkedList<>(derivs.subList(0, dSize - len));
                     derivs.add(deriv);
                     if (sSize == len + 1) {
@@ -652,7 +638,8 @@ public class UnifiedExample {
                     int dSize = derivs.size();
                     Derivation deriv =
                             new Derivation(lhs, derivs.subList(dSize - len, dSize));
-//            if (shiftDepth == 0) deriv.deriv.add(Derivation.dot);
+                    if (shiftDepth == 0)
+                        deriv.deriv.add(itm2.dot_pos(), Derivation.dot);
                     derivs = new LinkedList<>(derivs.subList(0, dSize - len));
                     derivs.add(deriv);
                     if (sSize == len + 1) {
@@ -714,6 +701,27 @@ public class UnifiedExample {
             if (o instanceof SearchState) return equals((SearchState) o);
             return false;
         }
+    }
+
+    protected static boolean samePrefix(lalr_item itm1, lalr_item itm2) {
+        if (itm1.dot_pos() != itm2.dot_pos()) return false;
+        production prod1 = itm1.the_production();
+        production prod2 = itm2.the_production();
+        for (int i = 0, len = itm1.dot_pos(); i < len; i++)
+            if (rhs(prod1, i) != rhs(prod2, i)) return false;
+        return true;
+    }
+
+    protected static int productionSteps(List<StateItem> sis, StateItem last) {
+        int count = 0;
+        lalr_state lastState = last.state;
+        for (ListIterator<StateItem> itr = sis.listIterator(sis.size()); itr.hasPrevious();) {
+            StateItem si = itr.previous();
+            lalr_state state = si.state;
+            if (state == lastState) count++;
+            lastState = state;
+        }
+        return count;
     }
 
     protected static boolean compatible(symbol sym1, symbol sym2) {
