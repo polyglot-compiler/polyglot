@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import java_cup.assoc;
 import java_cup.lalr_item;
 import java_cup.lalr_state;
 import java_cup.lalr_transition;
@@ -141,10 +142,11 @@ public class StateItem {
                 // Check that the next symbol in the parent lalr_item is
                 // compatible with the lookahead.
                 for (lalr_item prev : prevs) {
+                    production prevProd = prev.the_production();
+                    if (!StateItem.productionAllowed(prevProd, prod)) continue;
                     StateItem prevsi = lookup(si.state, prev);
                     // Avoid reusing the same item if desired.
                     if (uniqueItems && sis.contains(prevsi)) continue;
-                    production prevProd = prevsi.item.the_production();
                     int prevLen = prevProd.rhs_length();
                     int prevPos = prev.dot_pos() + 1;
                     terminal_set prevLookahead = prev.lookahead();
@@ -352,5 +354,20 @@ public class StateItem {
     protected static symbol rhs(production prod, int pos) {
         symbol_part sp = (symbol_part) prod.rhs(pos);
         return sp.the_symbol();
+    }
+
+    protected static boolean productionAllowed(production prod,
+            production nextProd) {
+        int prodPred = prod.precedence_num();
+        int nextProdPred = nextProd.precedence_num();
+        if (prodPred >= 0 && nextProdPred >= 0) {
+            // Do not expand if lower precedence
+            if (prodPred > nextProdPred) return false;
+            if (prodPred == nextProdPred) {
+                int prodAssoc = prod.precedence_side();
+                if (prodAssoc == assoc.left) return false;
+            }
+        }
+        return true;
     }
 }
