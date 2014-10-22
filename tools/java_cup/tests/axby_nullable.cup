@@ -1,0 +1,11 @@
+terminal Token a, b, x, y;
+non terminal Token S, AX, BY, XBY, X, Y;
+
+start with S;
+
+S ::= AX BY | a XBY;
+AX ::= a X;
+X ::= | x X;
+BY ::= b Y;
+Y ::= | y Y;
+XBY ::= b | x XBY y;

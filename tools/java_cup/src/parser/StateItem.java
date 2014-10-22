@@ -27,7 +27,7 @@ public class StateItem {
     }
 
     protected List<List<StateItem>> reverseTransition(symbol sym,
-            Set<symbol> lookahead, Set<lalr_state> guide) {
+                                                      Set<symbol> lookahead, Set<lalr_state> guide) {
         List<List<StateItem>> result = new LinkedList<>();
         List<StateItem> empty = new LinkedList<>();
         result.add(empty);
@@ -280,10 +280,8 @@ public class StateItem {
             Map<non_terminal, Set<lalr_item>> closureMap = new HashMap<>();
             for (lalr_item item : state.items()) {
                 if (item.dot_pos() == 0) {
-                    non_terminal lhs =
-                            (non_terminal) item.the_production()
-                                               .lhs()
-                                               .the_symbol();
+                    production prod = item.the_production();
+                    non_terminal lhs = (non_terminal) prod.lhs().the_symbol();
                     Set<lalr_item> itms = closureMap.get(lhs);
                     if (itms == null) {
                         itms = new HashSet<>();
