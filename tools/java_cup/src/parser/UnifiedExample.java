@@ -1,6 +1,7 @@
 package parser;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -37,6 +38,7 @@ public class UnifiedExample {
     protected boolean isShiftReduce;
     protected List<StateItem> shortestConflictPath;
     protected Set<lalr_state> scpSet;
+    protected Set<lalr_state> rppSet;
 
     public UnifiedExample(lalr_state conflict, lalr_item itm1, lalr_item itm2,
             terminal nextSym) {
@@ -65,8 +67,15 @@ public class UnifiedExample {
         else throw new Error("Expected at least one reduce item.");
         shortestConflictPath = findShortestPathFromStart();
         scpSet = new HashSet<>(shortestConflictPath.size());
-        for (StateItem si : shortestConflictPath)
+        production reduceProd = this.itm1.the_production();
+        rppSet = new HashSet<>(reduceProd.rhs_length());
+        boolean reduceProdReached = false;
+        for (StateItem si : shortestConflictPath) {
             scpSet.add(si.state);
+            reduceProdReached =
+                    reduceProdReached || si.item.the_production() == reduceProd;
+            if (reduceProdReached) rppSet.add(si.state);
+        }
     }
 
     protected List<StateItem> findShortestPathFromStart() {
@@ -101,7 +110,7 @@ public class UnifiedExample {
             }
             if (StateItem.trans.containsKey(last.si)) {
                 for (Map.Entry<symbol, StateItem> trans : StateItem.trans.get(last.si)
-                        .entrySet()) {
+                                                                         .entrySet()) {
                     StateItem nextSI = trans.getValue();
                     StateItemWithLookahead next =
                             new StateItemWithLookahead(nextSI, last.lookahead);
@@ -203,8 +212,8 @@ public class UnifiedExample {
                     }
                     stage = 3;
                     if (si1src.item.the_production().lhs().the_symbol() == si2src.item.the_production()
-                                                                                      .lhs()
-                                                                                      .the_symbol()
+                            .lhs()
+                            .the_symbol()
                             && hasCommonPrefix(si1src.item, si2src.item)) {
                         if (ss.derivs1.size() == 1
                                 && ss.derivs2.size() == 1
@@ -251,23 +260,72 @@ public class UnifiedExample {
                     //   if they are the same.
                     // - Take a production step, avoiding duplicates as necessary.
                     if (si1sym == si2sym) {
-                        SearchState copy = ss.copy();
-                        copy.derivs1.add(new Derivation(si1sym));
-                        copy.states1.add(StateItem.trans.get(si1).get(si1sym));
-                        copy.derivs2.add(new Derivation(si2sym));
-                        copy.states2.add(StateItem.trans.get(si2).get(si1sym));
-                        copy.complexity += 2 * SHIFT_COST;
-                        add(pq, fcssMap, visited, copy);
+                        StateItem si1last =
+                                StateItem.trans.get(si1).get(si1sym);
+                        StateItem si2last =
+                                StateItem.trans.get(si2).get(si2sym);
+                        List<Derivation> derivs1 = new LinkedList<>();
+                        List<Derivation> derivs2 = new LinkedList<>();
+                        List<StateItem> states1 = new LinkedList<>();
+                        List<StateItem> states2 = new LinkedList<>();
+                        derivs1.add(new Derivation(si1sym));
+                        states1.add(si1last);
+                        derivs2.add(new Derivation(si2sym));
+                        states2.add(si2last);
+                        // Check for subsequent nullable nonterminals
+                        production prod1 = si1.item.the_production();
+                        for (int pos = si1.item.dot_pos() + 1, len1 =
+                                prod1.rhs_length(); pos < len1; pos++) {
+                            symbol sp = rhs(prod1, pos);
+                            if (!sp.is_non_term()) break;
+                            non_terminal nt = (non_terminal) sp;
+                            if (!nt.nullable()) break;
+                            si1last = StateItem.trans.get(si1last).get(nt);
+                            derivs1.add(new Derivation(nt,
+                                                       Collections.<Derivation> emptyList()));
+                            states1.add(si1last);
+                        }
+                        production prod2 = si2.item.the_production();
+                        for (int pos = si1.item.dot_pos() + 1, len =
+                                prod2.rhs_length(); pos < len; pos++) {
+                            symbol sp = rhs(prod2, pos);
+                            if (!sp.is_non_term()) break;
+                            non_terminal nt = (non_terminal) sp;
+                            if (!nt.nullable()) break;
+                            si2last = StateItem.trans.get(si2last).get(nt);
+                            derivs2.add(new Derivation(nt,
+                                                       Collections.<Derivation> emptyList()));
+                            states2.add(si2last);
+                        }
+                        for (int i = 1, size1 = derivs1.size(); i <= size1; i++) {
+                            List<Derivation> subderivs1 =
+                                    new ArrayList<>(derivs1.subList(0, i));
+                            List<StateItem> substates1 =
+                                    new ArrayList<>(states1.subList(0, i));
+                            for (int j = 1, size2 = derivs2.size(); j <= size2; j++) {
+                                List<Derivation> subderivs2 =
+                                        new ArrayList<>(derivs2.subList(0, j));
+                                List<StateItem> substates2 =
+                                        new ArrayList<>(states2.subList(0, j));
+                                SearchState copy = ss.copy();
+                                copy.derivs1.addAll(subderivs1);
+                                copy.states1.addAll(substates1);
+                                copy.derivs2.addAll(subderivs2);
+                                copy.states2.addAll(substates2);
+                                copy.complexity += 2 * SHIFT_COST;
+                                add(pq, fcssMap, visited, copy);
+                            }
+                        }
                     }
                     if (si1sym instanceof non_terminal
                             && StateItem.prods.containsKey(si1))
                         for (lalr_item itm1 : StateItem.prods.get(si1)) {
-                            // Take production step only if lhs is nullable or
+                            // Take production step only if lhs is not nullable and
                             // if first rhs symbol is compatible with the other path
                             boolean applicable =
-                                    itm1.dot_at_end()
-                                    || compatible(itm1.symbol_after_dot(),
-                                                  si2sym);
+                                    !itm1.dot_at_end()
+                                            && compatible(itm1.symbol_after_dot(),
+                                                          si2sym);
                             if (!applicable) continue;
                             SearchState copy = ss.copy();
                             StateItem next = StateItem.lookup(si1.state, itm1);
@@ -281,12 +339,12 @@ public class UnifiedExample {
                     if (si2sym instanceof non_terminal
                             && StateItem.prods.containsKey(si2))
                         for (lalr_item itm2 : StateItem.prods.get(si2)) {
-                            // Take production step only if lhs is nullable or
+                            // Take production step only if lhs is not nullable and
                             // if first rhs symbol is compatible with the other path
                             boolean applicable =
-                                    itm2.dot_at_end()
-                                    || compatible(itm2.symbol_after_dot(),
-                                                  si1sym);
+                                    !itm2.dot_at_end()
+                                            && compatible(itm2.symbol_after_dot(),
+                                                          si1sym);
                             if (!applicable) continue;
                             SearchState copy = ss.copy();
                             StateItem next = StateItem.lookup(si2.state, itm2);
@@ -341,11 +399,12 @@ public class UnifiedExample {
                         for (SearchState prepended : ss.prepend(sym,
                                                                 null,
                                                                 null,
-//                                                                scpSet
                                                                 ss.reduceDepth >= 0
-                                                                || ss.shiftDepth < 0
-                                                                ? scpSet
-                                                                        : null)) {
+                                                                ? rppSet
+                                                                        : scpSet
+                                                                        /*: ss.shiftDepth < 0
+                        ? scpSet
+                        : null*/)) {
                             add(pq, fcssMap, visited, prepended);
                         }
                     }
@@ -380,7 +439,7 @@ public class UnifiedExample {
     }
 
     protected static class FixedComplexitySearchState implements
-    Comparable<FixedComplexitySearchState> {
+            Comparable<FixedComplexitySearchState> {
         protected int complexity;
         protected Set<SearchState> sss;
 
@@ -456,62 +515,62 @@ public class UnifiedExample {
         }
 
         protected List<SearchState> prepend(symbol sym, symbol nextSym1,
-                symbol nextSym2) {
+                                            symbol nextSym2) {
             return prepend(sym, nextSym1, nextSym2, null);
         }
 
         protected List<SearchState> prepend(symbol sym, symbol nextSym1,
-                                            symbol nextSym2, Set<lalr_state> guide) {
+                symbol nextSym2, Set<lalr_state> guide) {
             List<SearchState> result = new LinkedList<>();
             SearchState ss = this;
             StateItem si1src = ss.states1.get(0);
             StateItem si2src = ss.states2.get(0);
             Set<symbol> si1lookahead =
                     nextSym1 == null
-                            ? StateItem.symbolSet(si1src.item.lookahead())
+                    ? StateItem.symbolSet(si1src.item.lookahead())
                             : symbolSet(nextSym1);
-            Set<symbol> si2lookahead =
-                    nextSym2 == null
+                    Set<symbol> si2lookahead =
+                            nextSym2 == null
                             ? StateItem.symbolSet(si2src.item.lookahead())
-                            : symbolSet(nextSym2);
-            List<List<StateItem>> prev1 =
-                    si1src.reverseTransition(sym, si1lookahead, guide);
-            List<List<StateItem>> prev2 =
-                    si2src.reverseTransition(sym, si2lookahead, guide);
-            for (List<StateItem> psis1 : prev1) {
-                StateItem psi1 = psis1.isEmpty() ? si1src : psis1.get(0);
-                for (List<StateItem> psis2 : prev2) {
-                    StateItem psi2 = psis2.isEmpty() ? si2src : psis2.get(0);
-                    if (psi1 == si1src && psi2 == si2src) continue;
-                    if (psi1.state != psi2.state) continue;
-                    SearchState copy = ss.copy();
-                    copy.states1.addAll(0, psis1);
-                    copy.states2.addAll(0, psis2);
-                    if (!psis1.isEmpty()
-                            && copy.states1.get(0).item.dot_pos() + 1 == copy.states1.get(1).item.dot_pos()) {
-                        if (!psis2.isEmpty()
-                                && copy.states2.get(0).item.dot_pos() + 1 == copy.states2.get(1).item.dot_pos()) {
-                            Derivation deriv = new Derivation(sym);
-                            copy.derivs1.add(0, deriv);
-                            copy.derivs2.add(0, deriv);
-                        }
-                        else continue;
-                    }
-                    else if (!psis2.isEmpty()
-                            && copy.states2.get(0).item.dot_pos() + 1 == copy.states2.get(1).item.dot_pos()) {
-                        continue;
-                    }
-                    int prependSize = psis1.size() + psis2.size();
-                    int productionSteps =
-                            productionSteps(psis1, si1src)
-                                    + productionSteps(psis2, si2src);
-                    copy.complexity +=
-                            UNSHIFT_COST * (prependSize - productionSteps)
-                                    + PRODUCTION_COST * productionSteps;
-                    result.add(copy);
-                }
-            }
-                            return result;
+                                    : symbolSet(nextSym2);
+                            List<List<StateItem>> prev1 =
+                                    si1src.reverseTransition(sym, si1lookahead, guide);
+                            List<List<StateItem>> prev2 =
+                                    si2src.reverseTransition(sym, si2lookahead, guide);
+                            for (List<StateItem> psis1 : prev1) {
+                                StateItem psi1 = psis1.isEmpty() ? si1src : psis1.get(0);
+                                for (List<StateItem> psis2 : prev2) {
+                                    StateItem psi2 = psis2.isEmpty() ? si2src : psis2.get(0);
+                                    if (psi1 == si1src && psi2 == si2src) continue;
+                                    if (psi1.state != psi2.state) continue;
+                                    SearchState copy = ss.copy();
+                                    copy.states1.addAll(0, psis1);
+                                    copy.states2.addAll(0, psis2);
+                                    if (!psis1.isEmpty()
+                                            && copy.states1.get(0).item.dot_pos() + 1 == copy.states1.get(1).item.dot_pos()) {
+                                        if (!psis2.isEmpty()
+                                                && copy.states2.get(0).item.dot_pos() + 1 == copy.states2.get(1).item.dot_pos()) {
+                                            Derivation deriv = new Derivation(sym);
+                                            copy.derivs1.add(0, deriv);
+                                            copy.derivs2.add(0, deriv);
+                                        }
+                                        else continue;
+                                    }
+                                    else if (!psis2.isEmpty()
+                                            && copy.states2.get(0).item.dot_pos() + 1 == copy.states2.get(1).item.dot_pos()) {
+                                        continue;
+                                    }
+                                    int prependSize = psis1.size() + psis2.size();
+                                    int productionSteps =
+                                            productionSteps(psis1, si1src)
+                                            + productionSteps(psis2, si2src);
+                                    copy.complexity +=
+                                            UNSHIFT_COST * (prependSize - productionSteps)
+                                            + PRODUCTION_COST * productionSteps;
+                                    result.add(copy);
+                                }
+                            }
+            return result;
         }
 
         protected List<SearchState> reduce1(symbol nextSym) {
@@ -524,56 +583,56 @@ public class UnifiedExample {
             List<SearchState> result = new LinkedList<>();
             Set<symbol> symbolSet =
                     nextSym == null
-                            ? StateItem.symbolSet(item.lookahead())
+                    ? StateItem.symbolSet(item.lookahead())
                             : symbolSet(nextSym);
-            if (!StateItem.intersect(item.lookahead(), symbolSet))
-                return result;
-            production prod = item.the_production();
-            symbol lhs = prod.lhs().the_symbol();
-            int len = prod.rhs_length();
-            int dSize = derivs.size();
-            Derivation deriv =
-                    new Derivation(lhs, new LinkedList<>(derivs.subList(dSize
-                                                                                - len, dSize)));
-            if (reduceDepth == 0) {
-                deriv.deriv.add(itm1.dot_pos(), Derivation.dot);
-                reduceDepth--;
-            }
-            derivs = new LinkedList<>(derivs.subList(0, dSize - len));
-            derivs.add(deriv);
-            if (sSize == len + 1) {
-                // The head StateItem is a production item, so we need to prepend
-                // with possible source StateItems.
-                List<List<StateItem>> prev =
-                        states.get(0).reverseProduction(symbolSet);
-                for (List<StateItem> psis : prev) {
-                    SearchState copy = copy();
-                    copy.derivs1 = derivs;
-                    copy.states1 =
-                            new LinkedList<>(states1.subList(0, sSize - len - 1));
-                    copy.states1.addAll(0, psis);
-                    copy.states1.add(StateItem.trans.get(copy.states1.get(copy.states1.size() - 1))
-                                             .get(lhs));
-                    int statesSize = copy.states1.size();
-                    int productionSteps =
-                            productionSteps(copy.states1, states.get(0));
-                    copy.complexity +=
-                            UNSHIFT_COST * (statesSize - productionSteps)
+                    if (!StateItem.intersect(item.lookahead(), symbolSet))
+                        return result;
+                    production prod = item.the_production();
+                    symbol lhs = prod.lhs().the_symbol();
+                    int len = prod.rhs_length();
+                    int dSize = derivs.size();
+                    Derivation deriv =
+                            new Derivation(lhs, new LinkedList<>(derivs.subList(dSize
+                            - len, dSize)));
+                    if (reduceDepth == 0) {
+                        deriv.deriv.add(itm1.dot_pos(), Derivation.dot);
+                        reduceDepth--;
+                    }
+                    derivs = new LinkedList<>(derivs.subList(0, dSize - len));
+                    derivs.add(deriv);
+                    if (sSize == len + 1) {
+                        // The head StateItem is a production item, so we need to prepend
+                        // with possible source StateItems.
+                        List<List<StateItem>> prev =
+                                states.get(0).reverseProduction(symbolSet);
+                        for (List<StateItem> psis : prev) {
+                            SearchState copy = copy();
+                            copy.derivs1 = derivs;
+                            copy.states1 =
+                                    new LinkedList<>(states1.subList(0, sSize - len - 1));
+                            copy.states1.addAll(0, psis);
+                            copy.states1.add(StateItem.trans.get(copy.states1.get(copy.states1.size() - 1))
+                                                    .get(lhs));
+                            int statesSize = copy.states1.size();
+                            int productionSteps =
+                                    productionSteps(copy.states1, states.get(0));
+                            copy.complexity +=
+                                    UNSHIFT_COST * (statesSize - productionSteps)
                                     + PRODUCTION_COST * productionSteps;
-                    result.add(copy);
-                }
-            }
-            else {
-                SearchState copy = copy();
-                copy.derivs1 = derivs;
-                copy.states1 =
-                        new LinkedList<>(states1.subList(0, sSize - len - 1));
-                copy.states1.add(StateItem.trans.get(copy.states1.get(copy.states1.size() - 1))
-                                         .get(lhs));
-                copy.complexity += REDUCE_COST;
-                result.add(copy);
-            }
-            return result;
+                            result.add(copy);
+                        }
+                    }
+                    else {
+                        SearchState copy = copy();
+                        copy.derivs1 = derivs;
+                        copy.states1 =
+                                new LinkedList<>(states1.subList(0, sSize - len - 1));
+                        copy.states1.add(StateItem.trans.get(copy.states1.get(copy.states1.size() - 1))
+                                                .get(lhs));
+                        copy.complexity += REDUCE_COST;
+                        result.add(copy);
+                    }
+                    return result;
         }
 
         protected List<SearchState> reduce2(symbol nextSym) {
@@ -586,56 +645,56 @@ public class UnifiedExample {
             List<SearchState> result = new LinkedList<>();
             Set<symbol> symbolSet =
                     nextSym == null
-                            ? StateItem.symbolSet(item.lookahead())
+                    ? StateItem.symbolSet(item.lookahead())
                             : symbolSet(nextSym);
-            if (!StateItem.intersect(item.lookahead(), symbolSet))
-                return result;
-            production prod = item.the_production();
-            symbol lhs = prod.lhs().the_symbol();
-            int len = prod.rhs_length();
-            int dSize = derivs.size();
-            Derivation deriv =
-                    new Derivation(lhs, new LinkedList<>(derivs.subList(dSize
-                                                                                - len, dSize)));
-            if (shiftDepth == 0)
-                deriv.deriv.add(itm2.dot_pos(), Derivation.dot);
-            derivs = new LinkedList<>(derivs.subList(0, dSize - len));
-            derivs.add(deriv);
-            if (sSize == len + 1) {
-                // The head StateItem is a production item, so we need to prepend
-                // with possible source StateItems.
-                List<List<StateItem>> prev =
-                        states.get(0).reverseProduction(symbolSet);
-                for (List<StateItem> psis : prev) {
-                    SearchState copy = copy();
-                    copy.derivs2 = derivs;
-                    copy.states2 =
-                            new LinkedList<>(states.subList(0, sSize - len - 1));
-                    copy.states2.addAll(0, psis);
-                    copy.states2.add(StateItem.trans.get(copy.states2.get(copy.states2.size() - 1))
-                                             .get(lhs));
-                    int statesSize = copy.states2.size();
-                    int productionSteps =
-                            productionSteps(copy.states2, states.get(0));
-                    copy.complexity +=
-                            SHIFT_COST * (statesSize - productionSteps)
+                    if (!StateItem.intersect(item.lookahead(), symbolSet))
+                        return result;
+                    production prod = item.the_production();
+                    symbol lhs = prod.lhs().the_symbol();
+                    int len = prod.rhs_length();
+                    int dSize = derivs.size();
+                    Derivation deriv =
+                            new Derivation(lhs, new LinkedList<>(derivs.subList(dSize
+                            - len, dSize)));
+                    if (shiftDepth == 0)
+                        deriv.deriv.add(itm2.dot_pos(), Derivation.dot);
+                    derivs = new LinkedList<>(derivs.subList(0, dSize - len));
+                    derivs.add(deriv);
+                    if (sSize == len + 1) {
+                        // The head StateItem is a production item, so we need to prepend
+                        // with possible source StateItems.
+                        List<List<StateItem>> prev =
+                                states.get(0).reverseProduction(symbolSet);
+                        for (List<StateItem> psis : prev) {
+                            SearchState copy = copy();
+                            copy.derivs2 = derivs;
+                            copy.states2 =
+                                    new LinkedList<>(states.subList(0, sSize - len - 1));
+                            copy.states2.addAll(0, psis);
+                            copy.states2.add(StateItem.trans.get(copy.states2.get(copy.states2.size() - 1))
+                                                    .get(lhs));
+                            int statesSize = copy.states2.size();
+                            int productionSteps =
+                                    productionSteps(copy.states2, states.get(0));
+                            copy.complexity +=
+                                    SHIFT_COST * (statesSize - productionSteps)
                                     + PRODUCTION_COST * productionSteps;
-                    if (copy.shiftDepth >= 0) copy.shiftDepth--;
-                    result.add(copy);
-                }
-            }
-            else {
-                SearchState copy = copy();
-                copy.derivs2 = derivs;
-                copy.states2 =
-                        new LinkedList<>(states.subList(0, sSize - len - 1));
-                copy.states2.add(StateItem.trans.get(copy.states2.get(copy.states2.size() - 1))
-                                         .get(lhs));
-                copy.complexity += REDUCE_COST;
-                if (copy.shiftDepth >= 0) copy.shiftDepth--;
-                result.add(copy);
-            }
-            return result;
+                            if (copy.shiftDepth >= 0) copy.shiftDepth--;
+                            result.add(copy);
+                        }
+                    }
+                    else {
+                        SearchState copy = copy();
+                        copy.derivs2 = derivs;
+                        copy.states2 =
+                                new LinkedList<>(states.subList(0, sSize - len - 1));
+                        copy.states2.add(StateItem.trans.get(copy.states2.get(copy.states2.size() - 1))
+                                                .get(lhs));
+                        copy.complexity += REDUCE_COST;
+                        if (copy.shiftDepth >= 0) copy.shiftDepth--;
+                        result.add(copy);
+                    }
+                    return result;
         }
 
         @Override

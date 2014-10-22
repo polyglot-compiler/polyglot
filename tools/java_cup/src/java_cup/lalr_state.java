@@ -195,7 +195,7 @@ public class lalr_state {
                 if (part.is_action())
                     System.out.print("{action} ");
                 else System.out.print(((symbol_part) part).the_symbol().name()
-                        + " ");
+                                      + " ");
             }
             if (itm.dot_at_end()) System.out.print("(*) ");
             System.out.println("]");
@@ -398,7 +398,7 @@ public class lalr_state {
                             /* fix up the item so it points to the existing set */
                             if (existing != null)
                                 fix_itm.propagate_items()
-                                       .setElementAt(existing, l);
+                                .setElementAt(existing, l);
                         }
                     }
                 }
@@ -489,7 +489,7 @@ public class lalr_state {
                                 && other_act.kind() != parse_action.NONASSOC) {
                             /* if we have lower index hence priority, replace it*/
                             if (itm.the_production().index() < ((reduce_action) other_act).reduce_with()
-                                                                                          .index()) {
+                                    .index()) {
                                 /* replace the action */
                                 our_act_row.under_term[t] = act;
                             }
@@ -574,7 +574,7 @@ public class lalr_state {
     protected boolean fix_with_precedence(production p, int term_index,
             parse_action_row table_row, parse_action act)
 
-    throws internal_error {
+                    throws internal_error {
 
         terminal term = terminal.find(term_index);
 
@@ -707,11 +707,11 @@ public class lalr_state {
                     if (compare.dot_at_end()) {
                         /* only look at reduces after itm */
                         if (after_itm)
-                        /* does the comparison item conflict? */
-                        if (compare.lookahead().intersects(lookahead)) {
-                            /* report a reduce/reduce conflict */
-                            report_reduce_reduce(itm, compare);
-                        }
+                            /* does the comparison item conflict? */
+                            if (compare.lookahead().intersects(lookahead)) {
+                                /* report a reduce/reduce conflict */
+                                report_reduce_reduce(itm, compare);
+                            }
                     }
                     else {
                         /* is it a shift on our conflicting terminal */
@@ -759,6 +759,7 @@ public class lalr_state {
         message.append(itm1.to_simple_string());
         message.append("\n");
         /* ACM extension */
+        long start;
         ByteArrayOutputStream ds = new ByteArrayOutputStream();
         /** conflict_lookaheads is the list of symbols on which the two actions conflict. */
         Set<terminal> conflict_lookaheads = new HashSet<>();
@@ -767,6 +768,7 @@ public class lalr_state {
                 conflict_lookaheads.add(terminal.find(t));
         }
         terminal cs = conflict_lookaheads.iterator().next(); // pick one
+        start = System.nanoTime();
         if (Main.report_counterexamples) {
             message.append("    Example:    ");
             counterexamples.report_shortest_path(this,
@@ -778,6 +780,7 @@ public class lalr_state {
             errOutput(message, ds);
             message.append(" ] (*)\n\n");
         }
+        System.err.println("Andrew's search: " + (System.nanoTime() - start));
         /* End ACM extension */
         message.append("  and     ");
         message.append(itm2.to_simple_string());
@@ -797,7 +800,7 @@ public class lalr_state {
         }
         /* End ACM extension */
         /* APL extension */
-        long start = System.nanoTime();
+        start = System.nanoTime();
         UnifiedExample ue = new UnifiedExample(this, itm1, itm2, cs);
         ue.find();
         System.err.println("stage4: " + (System.nanoTime() - start));
