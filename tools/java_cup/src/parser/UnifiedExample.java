@@ -178,12 +178,12 @@ public class UnifiedExample {
         }
     }
 
-    public void find() {
+    public Counterexample find() {
         StateItem.init();
-        findExample();
+        return findExample();
     }
 
-    protected void findExample() {
+    protected Counterexample findExample() {
         SearchState initial =
                 new SearchState(StateItem.lookup(conflict, itm1),
                                 StateItem.lookup(conflict, itm2));
@@ -218,15 +218,10 @@ public class UnifiedExample {
                         if (ss.derivs1.size() == 1
                                 && ss.derivs2.size() == 1
                                 && ss.derivs1.get(0).sym == ss.derivs2.get(0).sym) {
-                            System.err.println(ss.derivs1.get(0).prettyPrint());
-                            System.err.println(ss.derivs1.get(0));
-                            System.err.println(ss.derivs2.get(0));
-//                            System.err.println(ss.derivs1);
-//                            System.err.println(ss.derivs2);
-//                            System.err.println(ss.states1);
-//                            System.err.println(ss.states2);
                             System.err.println(ss.complexity);
-                            return;
+                            return new Counterexample(ss.derivs1.get(0),
+                                                      ss.derivs2.get(0),
+                                                      true);
                         }
                         if (stage3result == null) stage3result = ss;
                         stage = 4;
@@ -235,20 +230,15 @@ public class UnifiedExample {
                 if (!assurancePrinted
                         && System.nanoTime() - start > ASSURANCE_LIMIT
                         && stage3result != null) {
-                    System.err.println("Productions leading up to the conflict stage found.  Finding a possible unified example...");
+                    System.err.println("Productions leading up to the conflict stage found.  Still finding a possible unified example...");
                     assurancePrinted = true;
                 }
                 if (System.nanoTime() - start > TIME_LIMIT
                         && stage3result != null) {
                     System.err.println("time limit exceeded: "
                             + (System.nanoTime() - start));
-                    completeDivergingExamples(stage3result);
-//                    System.err.println(stage3result.derivs1);
-//                    System.err.println(stage3result.derivs2);
-//                    System.err.println(stage3result.states1);
-//                    System.err.println(stage3result.states2);
                     System.err.println(stage3result.complexity);
-                    return;
+                    return completeDivergingExamples(stage3result);
                 }
                 StateItem si1 = ss.states1.get(ss.states1.size() - 1);
                 StateItem si2 = ss.states2.get(ss.states2.size() - 1);
@@ -423,6 +413,9 @@ public class UnifiedExample {
             }
             fcssMap.remove(fcss.complexity);
         }
+        // No unifying examples.  Construct examples from common shortest path
+        // to conflict state.
+        return exampleFromShortestPath();
     }
 
     protected void add(PriorityQueue<FixedComplexitySearchState> pq,
@@ -449,16 +442,124 @@ public class UnifiedExample {
         visited1.add(ss.states2);
     }
 
-    protected void completeDivergingExamples(SearchState ss) {
-        Derivation deriv1 = completeDiveringExample(ss.states1, ss.derivs1);
-        Derivation deriv2 = completeDiveringExample(ss.states2, ss.derivs2);
-        System.err.println(deriv1.prettyPrint());
-        System.err.println(deriv1);
-        System.err.println(deriv2.prettyPrint());
-        System.err.println(deriv2);
+    protected Counterexample exampleFromShortestPath() {
+        StateItem si = StateItem.lookup(conflict, itm2);
+        List<StateItem> result = new LinkedList<>();
+        result.add(si);
+        ListIterator<StateItem> itr =
+                shortestConflictPath.listIterator(shortestConflictPath.size());
+        // refsi is the last StateItem in this state of the shortest path.
+        StateItem refsi = itr.previous();
+        for (; refsi != null;) {
+            // Construct a list of items in the same state as refsi.
+            // prevrefsi is the last StateItem in the previous state.
+            List<StateItem> refsis = new LinkedList<>();
+            refsis.add(refsi);
+            StateItem prevrefsi = itr.hasPrevious() ? itr.previous() : null;
+            if (prevrefsi != null) {
+                for (int curPos = refsi.item.dot_pos(), prevPos =
+                        prevrefsi.item.dot_pos(); prevrefsi != null
+                        && prevPos + 1 != curPos;) {
+                    refsis.add(prevrefsi);
+                    curPos = prevPos;
+                    if (itr.hasPrevious()) {
+                        prevrefsi = itr.previous();
+                        prevPos = prevrefsi.item.dot_pos();
+                    }
+                    else prevrefsi = null;
+                }
+            }
+            if (si == refsi || si.item == lalr_state.startItem()) {
+                // Reached common item; prepend to the beginning.
+                refsis.remove(refsis.size() - 1);
+                result.addAll(0, refsis);
+                if (prevrefsi != null) result.add(0, prevrefsi);
+                while (itr.hasPrevious())
+                    result.add(0, itr.previous());
+                Derivation deriv1 =
+                        completeDivergingExample(shortestConflictPath);
+                Derivation deriv2 = completeDivergingExample(result);
+                return new Counterexample(deriv1, deriv2, false);
+            }
+
+            int pos = si.item.dot_pos();
+            if (pos == 0) {
+                // For a production item, find a sequence of items within the
+                // same state that leads to this production.
+                List<StateItem> init = new LinkedList<>();
+                init.add(si);
+                Queue<List<StateItem>> queue = new LinkedList<>();
+                queue.add(init);
+                while (!queue.isEmpty()) {
+                    List<StateItem> sis = queue.remove();
+                    StateItem sisrc = sis.get(0);
+                    if (sisrc.item == lalr_state.startItem()) {
+                        sis.remove(sis.size() - 1);
+                        result.addAll(0, sis);
+                        si = sisrc;
+                        break;
+                    }
+                    int srcpos = sisrc.item.dot_pos();
+                    if (srcpos > 0) {
+                        // Determine if reverse transition is possible.
+                        production prod = sisrc.item.the_production();
+                        symbol sym = rhs(prod, srcpos - 1);
+                        for (StateItem prevsi : StateItem.revTrans.get(sisrc)
+                                                                  .get(sym)) {
+                            // Only look for state compatible with the shortest path.
+                            if (prevsi.state != prevrefsi.state) continue;
+                            sis.remove(sis.size() - 1);
+                            result.addAll(0, sis);
+                            result.add(0, prevsi);
+                            si = prevsi;
+                            refsi = prevrefsi;
+                            break;
+                        }
+                    }
+                    else {
+                        production prod = sisrc.item.the_production();
+                        symbol lhs = prod.lhs().the_symbol();
+                        for (lalr_item prev : StateItem.revProds.get(sisrc.state)
+                                .get(lhs)) {
+                            StateItem prevsi =
+                                    StateItem.lookup(sisrc.state, prev);
+                            if (sis.contains(prevsi)) continue;
+                            List<StateItem> prevsis = new LinkedList<>(sis);
+                            prevsis.add(0, prevsi);
+                            queue.add(prevsis);
+                        }
+                    }
+                }
+            }
+            else {
+                // If not a production item, make a reverse transition.
+                production prod = si.item.the_production();
+                symbol sym = rhs(prod, pos - 1);
+                for (StateItem prevsi : StateItem.revTrans.get(si).get(sym)) {
+                    // Only look for state compatible with the shortest path.
+                    if (prevsi.state != prevrefsi.state) continue;
+                    result.add(0, prevsi);
+                    si = prevsi;
+                    refsi = prevrefsi;
+                    break;
+                }
+            }
+        }
+        throw new Error("Cannot find derivation to conflict state.");
     }
 
-    protected Derivation completeDiveringExample(List<StateItem> states,
+    protected Counterexample completeDivergingExamples(SearchState ss) {
+        Derivation deriv1 = completeDivergingExample(ss.states1, ss.derivs1);
+        Derivation deriv2 = completeDivergingExample(ss.states2, ss.derivs2);
+        return new Counterexample(deriv1, deriv2, false);
+    }
+
+    protected Derivation completeDivergingExample(List<StateItem> states) {
+        return completeDivergingExample(states,
+                                        Collections.<Derivation> emptyList());
+    }
+
+    protected Derivation completeDivergingExample(List<StateItem> states,
             List<Derivation> derivs) {
         List<Derivation> result = new LinkedList<>();
         ListIterator<Derivation> dItr = derivs.listIterator(derivs.size());
@@ -468,8 +569,11 @@ public class UnifiedExample {
             production prod = si.item.the_production();
             int len = prod.rhs_length();
             // symbols after dot
-            if (result.isEmpty() && !si.item.dot_at_end())
-                result.add(new Derivation(rhs(prod, pos)));
+            if (result.isEmpty()) {
+                if (derivs.isEmpty()) result.add(Derivation.dot);
+                if (!si.item.dot_at_end())
+                    result.add(new Derivation(rhs(prod, pos)));
+            }
             for (int i = pos + 1; i < len; i++) {
                 result.add(new Derivation(rhs(prod, i)));
             }
@@ -841,85 +945,5 @@ public class UnifiedExample {
     protected static symbol rhs(production prod, int pos) {
         symbol_part sp = (symbol_part) prod.rhs(pos);
         return sp.the_symbol();
-    }
-
-    /**
-     * A derivation consists of
-     * - a symbol
-     * - a list of derivations that derives the symbol
-     * @author Chinawat
-     *
-     */
-    protected static class Derivation {
-        public static final Derivation dot = new Derivation(new symbol("(*)") {
-            @Override
-            public boolean is_non_term() {
-                throw new UnsupportedOperationException();
-            }
-        });
-
-        protected final symbol sym;
-        protected final List<Derivation> deriv;
-
-        protected Derivation(symbol sym) {
-            this(sym, null);
-        }
-
-        protected Derivation(symbol sym, List<Derivation> deriv) {
-            this.sym = sym;
-            this.deriv = deriv;
-        }
-
-        protected int size() {
-            int size = 1;
-            if (deriv != null) {
-                for (Derivation d : deriv)
-                    size += d.size();
-            }
-            return size;
-        }
-
-        @Override
-        public String toString() {
-            StringBuffer sb = new StringBuffer(sym.name());
-            if (deriv != null) {
-                sb.append(" ::= [");
-                boolean tail = false;
-                for (Derivation d : deriv) {
-                    if (tail)
-                        sb.append(" ");
-                    else tail = true;
-                    sb.append(d);
-                }
-                sb.append("]");
-            }
-            return sb.toString();
-        }
-
-        public String prettyPrint() {
-            if (deriv == null) return sym.name();
-
-            StringBuffer sb = new StringBuffer();
-            for (Derivation d : deriv) {
-                if (sb.length() != 0) sb.append(" ");
-                sb.append(d.prettyPrint());
-            }
-            return sb.toString();
-        }
-
-        protected boolean equals(Derivation d) {
-            return sym == d.sym;
-        }
-
-        @Override
-        public int hashCode() {
-            return sym.hashCode();
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (o instanceof Derivation) return equals((Derivation) o);
-            return false;
-        }
     }
 }
