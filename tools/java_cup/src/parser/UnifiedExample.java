@@ -130,7 +130,7 @@ public class UnifiedExample {
                 else {
                     symbol sym = rhs(prod, pos);
                     if (sym instanceof terminal)
-                        lookahead = StateItem.symbolSet(sym);
+                        lookahead = symbolSet(sym);
                     else lookahead =
                             StateItem.symbolSet(((non_terminal) sym).first_set());
                 }
@@ -219,10 +219,12 @@ public class UnifiedExample {
                                 && ss.derivs2.size() == 1
                                 && ss.derivs1.get(0).sym == ss.derivs2.get(0).sym) {
                             System.err.println(ss.derivs1.get(0).prettyPrint());
-                            System.err.println(ss.derivs1);
-                            System.err.println(ss.derivs2);
-                            System.err.println(ss.states1);
-                            System.err.println(ss.states2);
+                            System.err.println(ss.derivs1.get(0));
+                            System.err.println(ss.derivs2.get(0));
+//                            System.err.println(ss.derivs1);
+//                            System.err.println(ss.derivs2);
+//                            System.err.println(ss.states1);
+//                            System.err.println(ss.states2);
                             System.err.println(ss.complexity);
                             return;
                         }
@@ -240,10 +242,11 @@ public class UnifiedExample {
                         && stage3result != null) {
                     System.err.println("time limit exceeded: "
                             + (System.nanoTime() - start));
-                    System.err.println(stage3result.derivs1);
-                    System.err.println(stage3result.derivs2);
-                    System.err.println(stage3result.states1);
-                    System.err.println(stage3result.states2);
+                    completeDivergingExamples(stage3result);
+//                    System.err.println(stage3result.derivs1);
+//                    System.err.println(stage3result.derivs2);
+//                    System.err.println(stage3result.states1);
+//                    System.err.println(stage3result.states2);
                     System.err.println(stage3result.complexity);
                     return;
                 }
@@ -444,6 +447,45 @@ public class UnifiedExample {
             visited.put(ss.states1, visited1);
         }
         visited1.add(ss.states2);
+    }
+
+    protected void completeDivergingExamples(SearchState ss) {
+        Derivation deriv1 = completeDiveringExample(ss.states1, ss.derivs1);
+        Derivation deriv2 = completeDiveringExample(ss.states2, ss.derivs2);
+        System.err.println(deriv1.prettyPrint());
+        System.err.println(deriv1);
+        System.err.println(deriv2.prettyPrint());
+        System.err.println(deriv2);
+    }
+
+    protected Derivation completeDiveringExample(List<StateItem> states,
+            List<Derivation> derivs) {
+        List<Derivation> result = new LinkedList<>();
+        ListIterator<Derivation> dItr = derivs.listIterator(derivs.size());
+        for (ListIterator<StateItem> sItr = states.listIterator(states.size()); sItr.hasPrevious();) {
+            StateItem si = sItr.previous();
+            int pos = si.item.dot_pos();
+            production prod = si.item.the_production();
+            int len = prod.rhs_length();
+            // symbols after dot
+            if (result.isEmpty() && !si.item.dot_at_end())
+                result.add(new Derivation(rhs(prod, pos)));
+            for (int i = pos + 1; i < len; i++) {
+                result.add(new Derivation(rhs(prod, i)));
+            }
+            // symbols before dot
+            for (int i = pos - 1; i >= 0; i--) {
+                if (sItr.hasPrevious()) sItr.previous();
+                result.add(0, dItr.hasPrevious()
+                           ? dItr.previous() : new Derivation(rhs(prod, i)));
+            }
+            // completing the derivation
+            symbol lhs = prod.lhs().the_symbol();
+            Derivation deriv = new Derivation(lhs, result);
+            result = new LinkedList<>();
+            result.add(deriv);
+        }
+        return result.get(0);
     }
 
     protected static class FixedComplexitySearchState implements

@@ -329,13 +329,6 @@ public class StateItem {
         System.err.println("init: " + (System.nanoTime() - start));
     }
 
-    // XXX duplicate method
-    protected static Set<symbol> symbolSet(symbol sym) {
-        Set<symbol> result = new HashSet<>();
-        result.add(sym);
-        return result;
-    }
-
     protected static Map<terminal_set, Set<symbol>> symbolSets =
             new HashMap<>();
 
@@ -361,10 +354,11 @@ public class StateItem {
         int prodPred = prod.precedence_num();
         int nextProdPred = nextProd.precedence_num();
         if (prodPred >= 0 && nextProdPred >= 0) {
-            // Do not expand if lower precedence
+            // Do not expand if lower precedence.
             if (prodPred > nextProdPred) return false;
             if (prodPred == nextProdPred) {
                 int prodAssoc = prod.precedence_side();
+                // Do not expand if same precedence, but left-associative.
                 if (prodAssoc == assoc.left) return false;
             }
         }
