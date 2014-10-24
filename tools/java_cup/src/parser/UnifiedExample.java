@@ -460,7 +460,7 @@ public class UnifiedExample {
                 for (int curPos = refsi.item.dot_pos(), prevPos =
                         prevrefsi.item.dot_pos(); prevrefsi != null
                         && prevPos + 1 != curPos;) {
-                    refsis.add(prevrefsi);
+                    refsis.add(0, prevrefsi);
                     curPos = prevPos;
                     if (itr.hasPrevious()) {
                         prevrefsi = itr.previous();
@@ -513,6 +513,7 @@ public class UnifiedExample {
                             result.add(0, prevsi);
                             si = prevsi;
                             refsi = prevrefsi;
+                            queue.clear();
                             break;
                         }
                     }
