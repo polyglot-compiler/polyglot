@@ -1,0 +1,8 @@
+terminal Token z, o, l, r;
+
+non terminal S, E;
+
+start with S;
+
+S ::= S l E r | E;
+E ::= l S r E | z | o |;
