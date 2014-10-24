@@ -1,0 +1,18 @@
+terminal Token n, a, b, c, d;
+
+non terminal S, N, A, B;
+
+start with S;
+
+S ::= N | N c;
+N ::= n N d | n N c | n A b | n B;
+A ::= a;
+B ::= a b c | a b d;
+
+/*
+This grammar is the set
+n{n}(nab(|c|d))+(c|d){n}(|c)
+where n>=0,
+which is equivalent to
+n{n}(nab(|c|d))*nab(c|d){n}(|c|d)(|c)
+*/

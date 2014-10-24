@@ -62,8 +62,11 @@ class Derivation {
 
         StringBuffer sb = new StringBuffer();
         for (Derivation d : deriv) {
-            if (sb.length() != 0) sb.append(" ");
-            sb.append(d.prettyPrint());
+            String pp = d.prettyPrint();
+            if (pp.length() != 0) {
+                if (sb.length() != 0) sb.append(" ");
+                sb.append(pp);
+            }
         }
         return sb.toString();
     }
