@@ -124,16 +124,26 @@ public class UnifiedExample {
                 production prod = last.si.item.the_production();
                 int len = prod.rhs_length();
                 int pos = last.si.item.dot_pos() + 1;
-                Set<symbol> lookahead;
-                if (pos == len)
-                    lookahead = last.lookahead;
-                else {
-                    symbol sym = rhs(prod, pos);
-                    if (sym instanceof terminal)
-                        lookahead = symbolSet(sym);
-                    else lookahead =
-                            StateItem.symbolSet(((non_terminal) sym).first_set());
-                }
+                Set<symbol> lookahead = new HashSet<>();
+                do {
+                    if (pos == len) {
+                        lookahead.addAll(last.lookahead);
+                        break;
+                    }
+                    else {
+                        symbol sym = rhs(prod, pos);
+                        if (sym instanceof terminal) {
+                            lookahead.add(sym);
+                            break;
+                        }
+                        else {
+                            non_terminal nt = (non_terminal) sym;
+                            lookahead.addAll(StateItem.symbolSet(nt.first_set()));
+                            if (!nt.nullable()) break;
+                        }
+                    }
+                    pos++;
+                } while (pos <= len);
                 for (lalr_item itm : StateItem.prods.get(last.si)) {
                     StateItem nextSI = StateItem.lookup(last.si.state, itm);
                     StateItemWithLookahead next =
