@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import java_cup.Main;
 import java_cup.assoc;
 import java_cup.lalr_item;
 import java_cup.lalr_state;
@@ -28,7 +29,7 @@ public class StateItem {
     }
 
     protected List<List<StateItem>> reverseTransition(symbol sym,
-                                                      Set<symbol> lookahead, Set<lalr_state> guide) {
+            Set<symbol> lookahead, Set<lalr_state> guide) {
         List<List<StateItem>> result = new LinkedList<>();
         List<StateItem> empty = new LinkedList<>();
         result.add(empty);
@@ -200,6 +201,31 @@ public class StateItem {
         return false;
     }
 
+    public static void clear() {
+        stateItms = null;
+        trans = null;
+        if (revTrans != null) revTrans.clear();
+        prods = null;
+        if (revProds != null) revProds.clear();
+        symbolSets.clear();
+    }
+
+    public static void report() {
+        int stateItmSize = 0;
+        for (Map<lalr_item, StateItem> stateItm : stateItms.values())
+            stateItmSize += stateItm.size();
+        System.out.println("items:\n" + stateItmSize);
+        int prodSize = 0;
+        for (Set<lalr_item> prod : prods.values())
+            prodSize += prod.size();
+        System.out.println("productions:\n" + prodSize);
+        int revProdSize = 0;
+        for (Map<non_terminal, Set<lalr_item>> revProd : revProds.values())
+            for (Set<lalr_item> rev : revProd.values())
+                revProdSize += rev.size();
+        System.out.println("reverse productions:\n" + revProdSize);
+    }
+
     protected static Map<lalr_state, Map<lalr_item, StateItem>> stateItms;
 
     protected static void initStateItms() {
@@ -326,6 +352,8 @@ public class StateItem {
         if (stateItms == null) initStateItms();
         if (trans == null) initTrans();
         if (prods == null) initProds();
+        if (Main.report_cex_stats)
+            System.out.println("init:\n" + (System.nanoTime() - start));
         System.err.println("init: " + (System.nanoTime() - start));
     }
 
