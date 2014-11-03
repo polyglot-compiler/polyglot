@@ -89,6 +89,7 @@ public class UnifiedExample {
         lalr_item startItem = lalr_state.startItem();
         StateItem source = StateItem.lookup(startState, startItem);
         StateItem target = StateItem.lookup(conflict, itm1);
+        Set<StateItem> eligible = eligibleStateItemsToConflict(target);
         Queue<List<StateItemWithLookahead>> queue = new LinkedList<>();
         Set<StateItemWithLookahead> visited = new HashSet<>();
         {
@@ -119,6 +120,7 @@ public class UnifiedExample {
                 for (Map.Entry<symbol, StateItem> trans : StateItem.trans.get(last.si)
                         .entrySet()) {
                     StateItem nextSI = trans.getValue();
+                    if (!eligible.contains(nextSI)) continue;
                     StateItemWithLookahead next =
                             new StateItemWithLookahead(nextSI, last.lookahead);
                     List<StateItemWithLookahead> nextPath =
@@ -153,6 +155,7 @@ public class UnifiedExample {
                 } while (pos <= len);
                 for (lalr_item itm : StateItem.prods.get(last.si)) {
                     StateItem nextSI = StateItem.lookup(last.si.state, itm);
+                    if (!eligible.contains(nextSI)) continue;
                     StateItemWithLookahead next =
                             new StateItemWithLookahead(nextSI, lookahead);
                     List<StateItemWithLookahead> nextPath =
@@ -163,6 +166,33 @@ public class UnifiedExample {
             }
         }
         throw new Error("Cannot find shortest path to conflict state.");
+    }
+
+    protected Set<StateItem> eligibleStateItemsToConflict(StateItem target) {
+        Set<StateItem> result = new HashSet<>();
+        Queue<StateItem> queue = new LinkedList<>();
+        queue.add(target);
+        while (!queue.isEmpty()) {
+            StateItem si = queue.remove();
+            if (result.contains(si)) continue;
+            result.add(si);
+            // Consider reverse transitions and reverse productions.
+            if (StateItem.revTrans.containsKey(si))
+                for (Set<StateItem> prev : StateItem.revTrans.get(si).values())
+                    queue.addAll(prev);
+            if (si.item.dot_pos() == 0) {
+                production prod = si.item.the_production();
+                symbol lhs = prod.lhs().the_symbol();
+                if (StateItem.revProds.containsKey(si.state)) {
+                    Map<non_terminal, Set<lalr_item>> revProd =
+                            StateItem.revProds.get(si.state);
+                    if (revProd.containsKey(lhs))
+                        for (lalr_item prev : revProd.get(lhs))
+                            queue.add(StateItem.lookup(si.state, prev));
+                }
+            }
+        }
+        return result;
     }
 
     protected class StateItemWithLookahead {
