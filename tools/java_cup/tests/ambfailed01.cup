@@ -1,0 +1,11 @@
+terminal t4, t5, t6, t7, t8;
+non terminal goal, S, X, T5, T67, T56;
+
+start with goal;
+
+goal ::= S | X;
+S ::= t4 X t8 | t4 X t7 t8;
+X ::= T5 T67 | T56;
+T5 ::= t5;
+T56 ::= t5 t6;
+T67 ::= t6 t7;
