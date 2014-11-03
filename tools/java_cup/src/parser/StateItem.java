@@ -28,11 +28,10 @@ public class StateItem {
         this.item = item;
     }
 
-    protected List<List<StateItem>> reverseTransition(symbol sym,
-            Set<symbol> lookahead, Set<lalr_state> guide) {
-        List<List<StateItem>> result = new LinkedList<>();
-        List<StateItem> empty = new LinkedList<>();
-        result.add(empty);
+    protected List<StateItem> reverseTransition(symbol sym,
+                                                Set<symbol> lookahead, Set<lalr_state> guide) {
+        List<StateItem> result = new LinkedList<>();
+        result.add(null);
         List<StateItem> init = new LinkedList<>();
         init.add(this);
         SearchState ss = new SearchState(init, lookahead);
@@ -48,53 +47,19 @@ public class StateItem {
                 if (ss.lookahead != null
                         && !intersect(prev.item.lookahead(), ss.lookahead))
                     continue;
-                List<StateItem> seq = new LinkedList<>(ss.sis);
-                seq.add(0, prev);
-                seq.remove(seq.size() - 1);
-                result.add(seq);
+                result.add(prev);
             }
             return result;
         }
         // Consider items in the same state that might use this
         // production.
-        for (SearchState candidate : new SearchState(init, lookahead).reverseProduction(false)) {
+        for (SearchState candidate : ss.reverseProduction(false)) {
             List<StateItem> seq = new LinkedList<>(candidate.sis);
             seq.remove(seq.size() - 1);
-            result.add(seq);
+            // XXX
+            result.add(seq.get(0));
         }
         return result;
-//        List<List<StateItem>> result = new LinkedList<>();
-//        Queue<SearchState> queue = new LinkedList<>();
-//        List<StateItem> init = new LinkedList<>();
-//        init.add(this);
-//        queue.add(new SearchState(init, lookahead));
-//        while (!queue.isEmpty()) {
-//            SearchState ss = queue.remove();
-//            StateItem si = ss.sis.get(0);
-//            Map<symbol, Set<StateItem>> revTran = revTrans.get(si);
-//            if (revTran != null) {
-//                Set<StateItem> prevs = revTran.get(sym);
-//                if (prevs == null) continue;
-//                // There are StateItems that can make a transition on sym
-//                // to the current StateItem.  Now, check if the lookahead
-//                // is compatible.
-//                for (StateItem prev : prevs) {
-//                    if (guide != null && !guide.contains(prev.state)) continue;
-//                    if (ss.lookahead != null
-//                            && !intersect(prev.item.lookahead(), ss.lookahead))
-//                        continue;
-//                    List<StateItem> seq = new LinkedList<>(ss.sis);
-//                    seq.add(0, prev);
-//                    seq.remove(seq.size() - 1);
-//                    result.add(seq);
-//                }
-//            }
-//            if (si.item.dot_pos() > 0) continue;
-//            // Consider items in the same state that might use this
-//            // production.
-//            queue.addAll(ss.reverseProduction(true));
-//        }
-//        return result;
     }
 
     protected List<List<StateItem>> reverseProduction(Set<symbol> lookahead) {
