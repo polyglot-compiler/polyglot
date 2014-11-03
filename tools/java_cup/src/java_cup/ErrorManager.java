@@ -20,7 +20,7 @@ public class ErrorManager {
         return warnings;
     }
 
-    static {
+    public static void clear() {
         errorManager = new ErrorManager();
     }
 
@@ -33,7 +33,7 @@ public class ErrorManager {
 
     //TODO: migrate to java.util.logging
     /**
-     * Error message format: 
+     * Error message format:
      * ERRORLEVEL at (LINE/COLUMN)@SYMBOL: MESSAGE
      * ERRORLEVEL : MESSAGE
      **/

@@ -12,6 +12,7 @@ import java.util.PriorityQueue;
 import java.util.Queue;
 import java.util.Set;
 
+import java_cup.Main;
 import java_cup.lalr_item;
 import java_cup.lalr_state;
 import java_cup.non_terminal;
@@ -27,6 +28,7 @@ public class UnifiedExample {
     protected static final int SHIFT_COST = 1;
     protected static final int UNSHIFT_COST = 1;
     protected static final int DUPLICATE_PRODUCTION_COST = 0;
+    protected static final int EXTENDED_COST = 10000;
 
     protected static final long ASSURANCE_LIMIT = 2 * 1000000000L;
     protected static final long TIME_LIMIT = 5 * 1000000000L;
@@ -101,6 +103,9 @@ public class UnifiedExample {
             if (target.equals(last.si) && last.lookahead.contains(nextSym)) {
                 // Done
 //                System.err.println(path);
+                if (Main.report_cex_stats)
+                    System.out.println("reachable:\n"
+                            + (System.nanoTime() - start));
                 System.err.println("reachable: " + (System.nanoTime() - start));
                 List<StateItem> shortestConflictPath =
                         new ArrayList<>(path.size());
@@ -214,12 +219,12 @@ public class UnifiedExample {
                 visited(visited, ss);
                 if (ss.reduceDepth < 0 && ss.shiftDepth < 0) {
                     // Stage 3
-                    if (!scpSet.contains(si1src.state)
-                            || !scpSet.contains(si2src.state)) {
-                        // The current head state is not on the shortest path.
-                        // Ignore this search state.
-                        continue;
-                    }
+//                    if (!scpSet.contains(si1src.state)
+//                            || !scpSet.contains(si2src.state)) {
+//                        // The current head state is not on the shortest path.
+//                        // Ignore this search state.
+//                        continue;
+//                    }
                     stage = 3;
                     if (si1src.item.the_production().lhs().the_symbol() == si2src.item.the_production()
                             .lhs()
@@ -248,6 +253,8 @@ public class UnifiedExample {
                     System.err.println("time limit exceeded: "
                             + (System.nanoTime() - start));
                     System.err.println(stage3result.complexity);
+                    if (Main.report_cex_stats)
+                        System.out.println("time limit exceeded");
                     return completeDivergingExamples(stage3result);
                 }
                 StateItem si1 = ss.states1.get(ss.states1.size() - 1);
@@ -411,11 +418,8 @@ public class UnifiedExample {
                                                                 null,
                                                                 null,
                                                                 ss.reduceDepth >= 0
-                                                                ? rppSet
-                                                                        : scpSet
-                                                                        /*: ss.shiftDepth < 0
-                        ? scpSet
-                        : null*/)) {
+                                                                        ? rppSet
+                                                                        : scpSet)) {
                             add(pq, fcssMap, visited, prepended);
                         }
                     }
@@ -698,13 +702,23 @@ public class UnifiedExample {
                             nextSym2 == null
                             ? StateItem.symbolSet(si2src.item.lookahead())
                                     : symbolSet(nextSym2);
-                            List<List<StateItem>> prev1 =
-                                    si1src.reverseTransition(sym, si1lookahead, guide);
-                            List<List<StateItem>> prev2 =
-                                    si2src.reverseTransition(sym, si2lookahead, guide);
-                            for (List<StateItem> psis1 : prev1) {
+                            Set<List<StateItem>> prev1 =
+                                    new HashSet<>(si1src.reverseTransition(sym,
+                                                           si1lookahead,
+                                                           guide));
+                            Set<List<StateItem>> prev2 =
+                                    new HashSet<>(si2src.reverseTransition(sym,
+                                                           si2lookahead,
+                                                           guide));
+                            List<List<StateItem>> prev1ext =
+                                    si1src.reverseTransition(sym, si1lookahead, null);
+                            List<List<StateItem>> prev2ext =
+                                    si2src.reverseTransition(sym, si2lookahead, null);
+                            for (List<StateItem> psis1 : prev1ext) {
+                                boolean guided1 = prev1.contains(psis1);
                                 StateItem psi1 = psis1.isEmpty() ? si1src : psis1.get(0);
-                                for (List<StateItem> psis2 : prev2) {
+                                for (List<StateItem> psis2 : prev2ext) {
+                                    boolean guided2 = prev2.contains(psis2);
                                     StateItem psi2 = psis2.isEmpty() ? si2src : psis2.get(0);
                                     if (psi1 == si1src && psi2 == si2src) continue;
                                     if (psi1.state != psi2.state) continue;
@@ -732,6 +746,7 @@ public class UnifiedExample {
                                     copy.complexity +=
                                             UNSHIFT_COST * (prependSize - productionSteps)
                                             + PRODUCTION_COST * productionSteps;
+                                    if (!guided1 || !guided2) copy.complexity += EXTENDED_COST;
                                     result.add(copy);
                                 }
                             }

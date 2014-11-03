@@ -8,10 +8,11 @@ import java.io.FileOutputStream;
 import java.io.PrintWriter;
 
 import java_cup.runtime.ComplexSymbolFactory;
+import parser.StateItem;
 
 /** This class serves as the main driver for the JavaCup system.
  *  It accepts user options and coordinates overall control flow.
- *  The main flow of control includes the following activities: 
+ *  The main flow of control includes the following activities:
  *  <ul>
  *    <li> Parse user supplied arguments and options.
  *    <li> Open output files.
@@ -24,41 +25,41 @@ import java_cup.runtime.ComplexSymbolFactory;
  *  </ul>
  *
  *  Options to the main program include: <dl>
- *   <dt> -package name  
+ *   <dt> -package name
  *   <dd> specify package generated classes go in [default none]
- *   <dt> -parser name   
+ *   <dt> -parser name
  *   <dd> specify parser class name [default "parser"]
- *   <dt> -symbols name  
+ *   <dt> -symbols name
  *   <dd> specify name for symbol constant class [default "sym"]
  *   <dt> -interface
  *   <dd> emit symbol constant <i>interface</i>, rather than class
- *   <dt> -nonterms      
+ *   <dt> -nonterms
  *   <dd> put non terminals in symbol constant class
- *   <dt> -expect #      
+ *   <dt> -expect #
  *   <dd> number of conflicts expected/allowed [default 0]
- *   <dt> -compact_red   
+ *   <dt> -compact_red
  *   <dd> compact tables by defaulting to most frequent reduce
  *   <dt> -max_actions #
  *   <dd> maximum number of actions per method in generated code
  *        (useful if javac complains about code size &gt;64K) [default 400]
- *   <dt> -nowarn        
+ *   <dt> -nowarn
  *   <dd> don't warn about useless productions, etc.
- *   <dt> -nosummary     
+ *   <dt> -nosummary
  *   <dd> don't print the usual summary of parse states, etc.
- *   <dt> -progress      
+ *   <dt> -progress
  *   <dd> print messages to indicate progress of the system
- *   <dt> -time          
+ *   <dt> -time
  *   <dd> print time usage summary
- *   <dt> -dump_grammar  
+ *   <dt> -dump_grammar
  *   <dd> produce a dump of the symbols and grammar
- *   <dt> -dump_states   
+ *   <dt> -dump_states
  *   <dd> produce a dump of parse state machine
- *   <dt> -dump_tables   
+ *   <dt> -dump_tables
  *   <dd> produce a dump of the parse tables
- *   <dt> -dump          
+ *   <dt> -dump
  *   <dd> produce a dump of all of the above
- *   <dt> -debug         
- *   <dd> turn on debugging messages within JavaCup 
+ *   <dt> -debug
+ *   <dd> turn on debugging messages within JavaCup
  *   <dt> -nopositions
  *   <dd> don't generate the positions code
  *   <dt> -locations
@@ -99,10 +100,10 @@ public class Main {
     protected static boolean opt_show_timing = false;
     /** User option -- do we run produce extra debugging messages */
     protected static boolean opt_do_debug = false;
-    /** User option -- do we compact tables by making most common reduce the 
+    /** User option -- do we compact tables by making most common reduce the
         default action */
     protected static boolean opt_compact_red = false;
-    /** User option -- should we include non terminal symbol numbers in the 
+    /** User option -- should we include non terminal symbol numbers in the
         symbol constant class. */
     protected static boolean include_non_terms = false;
     /** User option -- do not print a summary. */
@@ -114,6 +115,8 @@ public class Main {
     /** Whether to report counterexamples when conflicts are found.
      * (ACM extension) */
     public static boolean report_counterexamples = true;
+    /** Whether to report statistics about counterexample finding */
+    public static boolean report_cex_stats = false;
 
     /* frankf added this 6/18/96 */
     /** User option -- should generator generate code for left/right values? */
@@ -162,11 +165,11 @@ public class Main {
     /*--- Main Program ------------------------------------------*/
     /*-----------------------------------------------------------*/
 
-    /** The main driver for the system. 
+    /** The main driver for the system.
      * @param argv an array of strings containing command line arguments.
      */
     public static void main(String argv[]) throws internal_error,
-            java.io.IOException, java.lang.Exception {
+    java.io.IOException, java.lang.Exception {
         boolean did_output = false;
 
         start_time = System.currentTimeMillis();
@@ -174,12 +177,14 @@ public class Main {
         /** clean all static members, that contain remaining stuff from earlier calls */
         terminal.clear();
         production.clear();
-        production.clear();
         emit.clear();
         non_terminal.clear();
         parse_reduce_row.clear();
         parse_action_row.clear();
         lalr_state.clear();
+        ErrorManager.clear();
+        StateItem.clear();
+        System.gc();
 
         /* process user options and arguments */
         parse_args(argv);
@@ -246,14 +251,23 @@ public class Main {
         /* produce a summary if desired */
         if (!no_summary) emit_summary(did_output);
 
+//        for (lalr_state state : lalr_state.all_states()) {
+//            System.out.println(state);
+//        }
+
+        if (report_cex_stats) {
+            System.out.println("states:\n" + lalr_state.number());
+            StateItem.report();
+        }
+
         /* If there were errors during the run,
          * exit with non-zero status (makefile-friendliness). --CSA */
-        if (ErrorManager.getManager().getErrorCount() != 0) System.exit(100);
+//        if (ErrorManager.getManager().getErrorCount() != 0) System.exit(100);
     }
 
     /*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . .*/
 
-    /** Print a "usage message" that described possible command line options, 
+    /** Print a "usage message" that described possible command line options,
      *  then exit.
      * @param message a specific error message to preface the usage message by.
      */
@@ -296,7 +310,7 @@ public class Main {
     /*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . .*/
 
     /** Parse command line options and arguments to set various user-option
-     *  flags and variables. 
+     *  flags and variables.
      * @param argv the command line arguments to be parsed.
      */
     protected static void parse_args(String argv[]) {
@@ -520,10 +534,10 @@ public class Main {
             else parser_obj.parse();
         }
         catch (Exception e) {
-            /* something threw an exception.  catch it and emit a message so we 
+            /* something threw an exception.  catch it and emit a message so we
                have a line number to work with, then re-throw it */
             ErrorManager.getManager()
-                        .emit_error("Internal error: Unexpected exception");
+            .emit_error("Internal error: Unexpected exception");
             throw e;
         }
     }
@@ -636,8 +650,8 @@ public class Main {
         /* if we have more conflicts than we expected issue a message and die */
         if (emit.num_conflicts > expect_conflicts) {
             ErrorManager.getManager()
-                        .emit_error("*** More conflicts encountered than expected "
-                                + "-- parser generation aborted");
+            .emit_error("*** More conflicts encountered than expected "
+                    + "-- parser generation aborted");
             // indicate the problem.
             // we'll die on return, after clean up.
         }
@@ -660,7 +674,7 @@ public class Main {
 
     /*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . .*/
 
-    /** Helper routine to optionally return a plural or non-plural ending. 
+    /** Helper routine to optionally return a plural or non-plural ending.
      * @param val the numerical value determining plurality.
      */
     protected static String plural(int val) {
@@ -671,9 +685,9 @@ public class Main {
 
     /*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . .*/
 
-    /** Emit a long summary message to standard error (System.err) which 
+    /** Emit a long summary message to standard error (System.err) which
      *  summarizes what was found in the specification, how many states were
-     *  produced, how many conflicts were found, etc.  A detailed timing 
+     *  produced, how many conflicts were found, etc.  A detailed timing
      *  summary is also produced if it was requested by the user.
      * @param output_produced did the system get far enough to generate code.
      */
@@ -683,14 +697,14 @@ public class Main {
         if (no_summary) return;
 
         System.err.println("------- " + version.title_str
-                + " Parser Generation Summary -------");
+                           + " Parser Generation Summary -------");
 
         /* error and warning count */
         System.err.println("  " + ErrorManager.getManager().getErrorCount()
-                + " error" + plural(ErrorManager.getManager().getErrorCount())
-                + " and " + ErrorManager.getManager().getWarningCount()
-                + " warning"
-                + plural(ErrorManager.getManager().getWarningCount()));
+                           + " error" + plural(ErrorManager.getManager().getErrorCount())
+                           + " and " + ErrorManager.getManager().getWarningCount()
+                           + " warning"
+                           + plural(ErrorManager.getManager().getWarningCount()));
 
         /* basic stats */
         System.err.print("  " + terminal.number() + " terminal"
@@ -700,7 +714,7 @@ public class Main {
         System.err.println(production.number() + " production"
                 + plural(production.number()) + " declared, ");
         System.err.println("  producing " + lalr_state.number()
-                + " unique parse states.");
+                           + " unique parse states.");
 
         /* unused symbols */
         System.err.println("  " + emit.unused_term + " terminal"
@@ -720,8 +734,8 @@ public class Main {
         /* code location */
         if (output_produced)
             System.err.println("  Code written to \"" + emit.parser_class_name
-                    + ".java\", and \"" + emit.symbol_const_class_name
-                    + ".java\".");
+                               + ".java\", and \"" + emit.symbol_const_class_name
+                               + ".java\".");
         else System.err.println("  No code produced.");
 
         if (opt_show_timing) show_times();
@@ -795,7 +809,7 @@ public class Main {
 
     /** Helper routine to format a decimal based display of seconds and
      *  percentage of total time given counts of milliseconds.   Note: this
-     *  is broken for use with some instances of negative time (since we don't 
+     *  is broken for use with some instances of negative time (since we don't
      *  use any negative time here, we let if be for now).
      * @param time_val   the value being formatted (in ms).
      * @param total_time total time percentages are calculated against (in ms).
@@ -840,7 +854,7 @@ public class Main {
         System.err.println("===== Terminals =====");
         for (int tidx = 0, cnt = 0; tidx < terminal.number(); tidx++, cnt++) {
             System.err.print("[" + tidx + "]" + terminal.find(tidx).name()
-                    + " ");
+                             + " ");
             if ((cnt + 1) % 5 == 0) System.err.println();
         }
         System.err.println();
@@ -849,7 +863,7 @@ public class Main {
         System.err.println("===== Non terminals =====");
         for (int nidx = 0, cnt = 0; nidx < non_terminal.number(); nidx++, cnt++) {
             System.err.print("[" + nidx + "]" + non_terminal.find(nidx).name()
-                    + " ");
+                             + " ");
             if ((cnt + 1) % 5 == 0) System.err.println();
         }
         System.err.println();
@@ -859,12 +873,12 @@ public class Main {
         for (int pidx = 0; pidx < production.number(); pidx++) {
             production prod = production.find(pidx);
             System.err.print("[" + pidx + "] " + prod.lhs().the_symbol().name()
-                    + " ::= ");
+                             + " ::= ");
             for (int i = 0; i < prod.rhs_length(); i++)
                 if (prod.rhs(i).is_action())
                     System.err.print("{action} ");
                 else System.err.print(((symbol_part) prod.rhs(i)).the_symbol()
-                                                                 .name() + " ");
+                                      .name() + " ");
             System.err.println();
         }
         System.err.println();
@@ -872,8 +886,8 @@ public class Main {
 
     /*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . .*/
 
-    /** Produce a (semi-) human readable dump of the complete viable prefix 
-     *  recognition state machine. 
+    /** Produce a (semi-) human readable dump of the complete viable prefix
+     *  recognition state machine.
      */
     public static void dump_machine() {
         lalr_state ordered[] = new lalr_state[lalr_state.number()];
