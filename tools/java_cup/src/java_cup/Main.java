@@ -121,7 +121,9 @@ public class Main {
     /* frankf added this 6/18/96 */
     /** User option -- should generator generate code for left/right values? */
     protected static boolean lr_values = true;
-    protected static boolean locations = true;
+    protected static boolean locations = false;
+    protected static boolean xmlactions = false;
+    protected static boolean genericlabels = false;
     /** User option -- should symbols be put in a class or an interface? [CSA]*/
     protected static boolean sym_interface = false;
 
@@ -169,7 +171,7 @@ public class Main {
      * @param argv an array of strings containing command line arguments.
      */
     public static void main(String argv[]) throws internal_error,
-    java.io.IOException, java.lang.Exception {
+            java.io.IOException, java.lang.Exception {
         boolean did_output = false;
 
         start_time = System.currentTimeMillis();
@@ -193,7 +195,9 @@ public class Main {
         hackish, yes, but works */
         emit.set_lr_values(lr_values);
         emit.set_locations(locations);
-        /* open output files */
+        emit.set_xmlactions(xmlactions);
+        emit.set_genericlabels(genericlabels);
+        /* open output set_xmlactionsfiles */
         if (print_progress) System.err.println("Opening files...");
         /* use a buffered version of standard input */
         input_file = new BufferedInputStream(System.in);
@@ -275,35 +279,39 @@ public class Main {
         System.err.println();
         System.err.println(message);
         System.err.println();
-        System.err.println("Usage: "
-                + version.program_name
-                + " [options] [filename]\n"
-                + "  and expects a specification file on standard input if no filename is given.\n"
-                + "  Legal options include:\n"
-                + "    -package name  specify package generated classes go in [default none]\n"
-                + "    -destdir name  specify the destination directory, to store the generated files in\n"
-                + "    -parser name   specify parser class name [default \"parser\"]\n"
-                + "    -typearg args  specify type arguments for parser class\n"
-                + "    -symbols name  specify name for symbol constant class [default \"sym\"]\n"
-                + "    -interface     put symbols in an interface, rather than a class\n"
-                + "    -nonterms      put non terminals in symbol constant class\n"
-                + "    -expect #      number of conflicts expected/allowed [default 0]\n"
-                + "    -compact_red   compact tables by defaulting to most frequent reduce\n"
-                + "    -max_actions   maximum number of actions per method in generated code\n"
-                + "                   (useful if javac complains about code size >64K)\n"
-                + "                   [default 400]\n"
-                + "    -nowarn        don't warn about useless productions, etc.\n"
-                + "    -nosummary     don't print the usual summary of parse states, etc.\n"
-                + "    -nopositions   don't propagate the left and right token position values\n"
-                + "    -locations     generate handles xleft/xright for symbol positions in actions\n"
-                + "    -noscanner     don't refer to java_cup.runtime.Scanner\n"
-                + "    -progress      print messages to indicate progress of the system\n"
-                + "    -time          print time usage summary\n"
-                + "    -dump_grammar  produce a human readable dump of the symbols and grammar\n"
-                + "    -dump_states   produce a dump of parse state machine\n"
-                + "    -dump_tables   produce a dump of the parse tables\n"
-                + "    -dump          produce a dump of all of the above\n"
-                + "    -version       print the version information for CUP and exit\n");
+        System.err.println(version.title_str
+                + "\n"
+                + "Usage: "
+        + version.program_name
+        + " [options] [filename]\n"
+        + "  and expects a specification file on standard input if no filename is given.\n"
+        + "  Legal options include:\n"
+        + "    -package name  specify package generated classes go in [default none]\n"
+        + "    -destdir name  specify the destination directory, to store the generated files in\n"
+        + "    -parser name   specify parser class name [default \"parser\"]\n"
+        + "    -typearg args  specify type arguments for parser class\n"
+        + "    -symbols name  specify name for symbol constant class [default \"sym\"]\n"
+        + "    -interface     put symbols in an interface, rather than a class\n"
+        + "    -nonterms      put non terminals in symbol constant class\n"
+        + "    -expect #      number of conflicts expected/allowed [default 0]\n"
+        + "    -compact_red   compact tables by defaulting to most frequent reduce\n"
+        + "    -max_actions   maximum number of actions per method in generated code\n"
+        + "                   (useful if javac complains about code size >64K)\n"
+        + "                   [default 400]\n"
+        + "    -nowarn        don't warn about useless productions, etc.\n"
+        + "    -nosummary     don't print the usual summary of parse states, etc.\n"
+        + "    -nopositions   don't propagate the left and right token position values\n"
+        + "    -locations     generate handles xleft/xright for symbol positions in actions\n"
+        + "    -xmlactions    make the generated parser yield its parse tree as XML\n"
+        + "    -genericlabels automatically generate labels to all symbols in XML mode\n"
+        + "    -noscanner     don't refer to java_cup.runtime.Scanner\n"
+        + "    -progress      print messages to indicate progress of the system\n"
+        + "    -time          print time usage summary\n"
+        + "    -dump_grammar  produce a human readable dump of the symbols and grammar\n"
+        + "    -dump_states   produce a dump of parse state machine\n"
+        + "    -dump_tables   produce a dump of the parse tables\n"
+        + "    -dump          produce a dump of all of the above\n"
+        + "    -version       print the version information for CUP and exit\n");
         System.exit(1);
     }
 
@@ -414,6 +422,10 @@ public class Main {
                 lr_values = false;
             else if (argv[i].equals("-locations"))
                 locations = true;
+            else if (argv[i].equals("-xmlactions"))
+                xmlactions = true;
+            else if (argv[i].equals("-genericlabels"))
+                genericlabels = true;
             /* CSA 12/21/97 */
             else if (argv[i].equals("-interface"))
                 sym_interface = true;
@@ -539,7 +551,7 @@ public class Main {
             /* something threw an exception.  catch it and emit a message so we
                have a line number to work with, then re-throw it */
             ErrorManager.getManager()
-            .emit_error("Internal error: Unexpected exception");
+                        .emit_error("Internal error: Unexpected exception");
             throw e;
         }
     }
@@ -652,8 +664,8 @@ public class Main {
         /* if we have more conflicts than we expected issue a message and die */
         if (emit.num_conflicts > expect_conflicts) {
             ErrorManager.getManager()
-            .emit_error("*** More conflicts encountered than expected "
-                    + "-- parser generation aborted");
+                        .emit_error("*** More conflicts encountered than expected "
+                                + "-- parser generation aborted");
             // indicate the problem.
             // we'll die on return, after clean up.
         }
@@ -699,14 +711,14 @@ public class Main {
         if (no_summary) return;
 
         System.err.println("------- " + version.title_str
-                           + " Parser Generation Summary -------");
+                + " Parser Generation Summary -------");
 
         /* error and warning count */
         System.err.println("  " + ErrorManager.getManager().getErrorCount()
-                           + " error" + plural(ErrorManager.getManager().getErrorCount())
-                           + " and " + ErrorManager.getManager().getWarningCount()
-                           + " warning"
-                           + plural(ErrorManager.getManager().getWarningCount()));
+                + " error" + plural(ErrorManager.getManager().getErrorCount())
+                + " and " + ErrorManager.getManager().getWarningCount()
+                + " warning"
+                + plural(ErrorManager.getManager().getWarningCount()));
 
         /* basic stats */
         System.err.print("  " + terminal.number() + " terminal"
@@ -716,7 +728,7 @@ public class Main {
         System.err.println(production.number() + " production"
                 + plural(production.number()) + " declared, ");
         System.err.println("  producing " + lalr_state.number()
-                           + " unique parse states.");
+                + " unique parse states.");
 
         /* unused symbols */
         System.err.println("  " + emit.unused_term + " terminal"
@@ -736,14 +748,14 @@ public class Main {
         /* code location */
         if (output_produced)
             System.err.println("  Code written to \"" + emit.parser_class_name
-                               + ".java\", and \"" + emit.symbol_const_class_name
-                               + ".java\".");
+                    + ".java\", and \"" + emit.symbol_const_class_name
+                    + ".java\".");
         else System.err.println("  No code produced.");
 
         if (opt_show_timing) show_times();
 
         System.err.println("---------------------------------------------------- ("
-                + version.version_str + ")");
+                + version.title_str + ")");
     }
 
     /*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . .*/
@@ -856,7 +868,7 @@ public class Main {
         System.err.println("===== Terminals =====");
         for (int tidx = 0, cnt = 0; tidx < terminal.number(); tidx++, cnt++) {
             System.err.print("[" + tidx + "]" + terminal.find(tidx).name()
-                             + " ");
+                    + " ");
             if ((cnt + 1) % 5 == 0) System.err.println();
         }
         System.err.println();
@@ -865,7 +877,7 @@ public class Main {
         System.err.println("===== Non terminals =====");
         for (int nidx = 0, cnt = 0; nidx < non_terminal.number(); nidx++, cnt++) {
             System.err.print("[" + nidx + "]" + non_terminal.find(nidx).name()
-                             + " ");
+                    + " ");
             if ((cnt + 1) % 5 == 0) System.err.println();
         }
         System.err.println();
@@ -875,12 +887,12 @@ public class Main {
         for (int pidx = 0; pidx < production.number(); pidx++) {
             production prod = production.find(pidx);
             System.err.print("[" + pidx + "] " + prod.lhs().the_symbol().name()
-                             + " ::= ");
+                    + " ::= ");
             for (int i = 0; i < prod.rhs_length(); i++)
                 if (prod.rhs(i).is_action())
                     System.err.print("{action} ");
                 else System.err.print(((symbol_part) prod.rhs(i)).the_symbol()
-                                      .name() + " ");
+                                                                 .name() + " ");
             System.err.println();
         }
         System.err.println();
