@@ -290,7 +290,6 @@ public class lalr_state {
 
     public static lalr_state build_machine(production start_prod)
             throws internal_error {
-        /* lalr_state    start_state; // ACM -- made static */
         lalr_item_set start_items;
         lalr_item_set new_items;
         lalr_item_set linked_items;
@@ -795,7 +794,7 @@ public class lalr_state {
 //            message.append(" ] (*)\n");
 //        }
         /* End ACM extension */
-        /* APL extension */
+        /* CupEx extension */
         if (Main.report_counterexamples) {
             start = System.nanoTime();
             UnifiedExample ue = new UnifiedExample(this, itm1, itm2, cs);
@@ -816,7 +815,7 @@ public class lalr_state {
                 System.out.println("stage4:\n" + (System.nanoTime() - start));
             System.err.println("stage4: " + (System.nanoTime() - start));
         }
-        /* End APL extension */
+        /* End CupEx extension */
         message.append("  under symbols: {");
         for (int t = 0; t < terminal.number(); t++) {
             if (itm1.lookahead().contains(t) && itm2.lookahead().contains(t)) {
@@ -883,7 +882,7 @@ public class lalr_state {
                 if (!shift_sym.is_non_term()
                         && shift_sym.index() == conflict_sym) {
                     /* yes, report on it */
-                    /* APL extension */
+                    /* CupEx extension */
                     if (Main.report_counterexamples) {
                         start = System.nanoTime();
                         UnifiedExample ue =
@@ -907,7 +906,7 @@ public class lalr_state {
                         System.err.println("stage4: "
                                 + (System.nanoTime() - start));
                     }
-                    /* end APL extension */
+                    /* end CupEx extension */
                     message.append("  and shift on ");
                     message.append(itm.to_simple_string());
                     message.append("\n");

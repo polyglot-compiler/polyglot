@@ -113,7 +113,7 @@ public class Main {
     /** User option -- number of conflicts to expect */
     protected static int expect_conflicts = 0;
     /** Whether to report counterexamples when conflicts are found.
-     * (ACM extension) */
+     * (CupEx extension) */
     public static boolean report_counterexamples = true;
     /** Whether to report statistics about counterexample finding */
     public static boolean report_cex_stats = false;
@@ -434,7 +434,9 @@ public class Main {
                 /* record the typearg */
                 emit.class_type_argument = argv[i];
             }
-
+            /* CupEx extension */
+            else if (argv[i].equals("-noexamples"))
+                report_counterexamples = false;
             /* CSA 24-Jul-1999; suggestion by Jean Vaucher */
             else if (!argv[i].startsWith("-") && i == len - 1) {
                 /* use input from file. */
