@@ -20,6 +20,10 @@ public class Counterexample {
         return unified;
     }
 
+    public String ambNonterminal() {
+        return d1.sym.name();
+    }
+
     public String example1() {
         return d1.toString();
     }

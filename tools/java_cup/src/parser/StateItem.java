@@ -29,7 +29,7 @@ public class StateItem {
     }
 
     protected List<StateItem> reverseTransition(symbol sym,
-                                                Set<symbol> lookahead, Set<lalr_state> guide) {
+            Set<symbol> lookahead, Set<lalr_state> guide) {
         List<StateItem> result = new LinkedList<>();
         result.add(null);
         List<StateItem> init = new LinkedList<>();
@@ -180,6 +180,11 @@ public class StateItem {
         for (Map<lalr_item, StateItem> stateItm : stateItms.values())
             stateItmSize += stateItm.size();
         System.out.println("items:\n" + stateItmSize);
+        int revTranSize = 0;
+        for (Map<symbol, Set<StateItem>> revTran : revTrans.values())
+            for (Set<StateItem> rev : revTran.values())
+                revTranSize += rev.size();
+        System.out.println("reverse transitions:\n" + revTranSize);
         int prodSize = 0;
         for (Set<lalr_item> prod : prods.values())
             prodSize += prod.size();
