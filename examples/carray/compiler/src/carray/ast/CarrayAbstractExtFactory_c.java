@@ -5,7 +5,7 @@ import polyglot.ast.Ext;
 import polyglot.ast.ExtFactory;
 
 public abstract class CarrayAbstractExtFactory_c extends AbstractExtFactory_c
-        implements CarrayExtFactory {
+implements CarrayExtFactory {
 
     public CarrayAbstractExtFactory_c() {
         super();
@@ -24,11 +24,11 @@ public abstract class CarrayAbstractExtFactory_c extends AbstractExtFactory_c
     protected static final Ext extConstArrayTypeNode(ExtFactory extFactory) {
         if (extFactory instanceof CarrayExtFactory)
             return ((CarrayExtFactory) extFactory).extConstArrayTypeNode();
-        return extArrayTypeNode(extFactory);
+        return extFactory.extArrayTypeNode();
     }
 
     protected Ext extConstArrayTypeNodeImpl() {
-        return this.extArrayTypeNodeImpl();
+        return extArrayTypeNodeImpl();
     }
 
     protected Ext postExtConstArrayTypeNode(Ext ext) {

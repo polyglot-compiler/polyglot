@@ -25,7 +25,7 @@ public abstract class CarrayJL5AbstractExtFactory_c extends
     protected static final Ext extConstArrayTypeNode(ExtFactory extFactory) {
         if (extFactory instanceof CarrayExtFactory)
             return ((CarrayExtFactory) extFactory).extConstArrayTypeNode();
-        return extArrayTypeNode(extFactory);
+        return extFactory.extArrayTypeNode();
     }
 
     protected Ext extConstArrayTypeNodeImpl() {

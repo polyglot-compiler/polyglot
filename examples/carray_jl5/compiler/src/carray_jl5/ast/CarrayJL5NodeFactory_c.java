@@ -15,7 +15,7 @@ import carray.ast.CarrayExtFactory_c;
  *
  */
 public class CarrayJL5NodeFactory_c extends JL5NodeFactory_c implements
-        CarrayJL5NodeFactory {
+CarrayJL5NodeFactory {
     public CarrayJL5NodeFactory_c() {
         super(CarrayJL5Lang_c.instance,
               new CarrayJL5ExtFactory_c(new CarrayExtFactory_c(new JL5ExtFactory_c())));
@@ -40,6 +40,7 @@ public class CarrayJL5NodeFactory_c extends JL5NodeFactory_c implements
             ext = composeExts(ext, e);
         }
         ext = composeExts(ext, new CarrayConstArrayTypeNodeExt());
-        return super.ArrayTypeNode(pos, base, ext, extFactory.nextExtFactory());
+        // FIXME
+        return super.ArrayTypeNode(pos, base);
     }
 }

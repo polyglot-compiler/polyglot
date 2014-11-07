@@ -246,7 +246,7 @@
 	</target>
 
 	<!-- jar the examples -->
-	<target name="jar-examples" description="Build pao.jar and coffer.jar">
+	<target name="jar-examples" depends="examples" description="Build pao.jar and coffer.jar">
 		<ant inheritAll="false" antfile="${pao.dir}/build.xml" dir="${pao.dir}" target="jar" />
 		<ant inheritAll="false" antfile="${coffer.dir}/build.xml" dir="${coffer.dir}" target="jar" />
 		<ant inheritAll="false" antfile="${carray.dir}/build.xml" dir="${carray.dir}" target="jar" />
