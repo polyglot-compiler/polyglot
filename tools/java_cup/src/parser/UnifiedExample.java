@@ -24,7 +24,7 @@ import java_cup.terminal;
 public class UnifiedExample {
 
     public static boolean optimizeShortestPath = true;
-    public static final boolean extendedSearch = false;
+    public static boolean extendedSearch = false;
 
     protected static final int PRODUCTION_COST = 50;
     protected static final int REDUCE_COST = 1;
@@ -418,6 +418,7 @@ public class UnifiedExample {
                     boolean ready2 = si2reduce && size2 > len2;
                     // If there is a path ready for reduction
                     // without being prepended further, reduce.
+                    // TODO transition on nullable symbols
                     if (ready1) {
                         List<SearchState> reduced1 = ss.reduce1(si2sym);
                         if (ready2) {
