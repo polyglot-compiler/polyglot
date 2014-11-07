@@ -131,7 +131,7 @@ public class emit {
     /*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . .*/
 
     /** Extends and implements declarations for the parser class
-     * (ACM extension) */
+     * (extension to CUP) */
     public static String extendsimpls = "";
 
     /*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . .*/

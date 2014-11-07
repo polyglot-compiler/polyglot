@@ -781,6 +781,16 @@ public class lalr_state {
         message.append("  and     ");
         message.append(itm2.to_simple_string());
         message.append("\n");
+        message.append("  under symbols: {");
+        for (int t = 0; t < terminal.number(); t++) {
+            if (itm1.lookahead().contains(t) && itm2.lookahead().contains(t)) {
+                if (comma_flag)
+                    message.append(", ");
+                else comma_flag = true;
+                message.append(terminal.find(t).name());
+            }
+        }
+        message.append("}\n");
         /* ACM extension */
 //        ds.reset();
 //        if (Main.report_counterexamples) {
@@ -800,6 +810,28 @@ public class lalr_state {
             start = System.nanoTime();
             UnifiedExample ue = new UnifiedExample(this, itm1, itm2, cs);
             Counterexample cex = ue.find();
+            if (cex.unified()) {
+                message.append("  Ambiguity detected for nonterminal ");
+                message.append(cex.ambNonterminal());
+                message.append("\n  Example: ");
+                message.append(cex.prettyExample1());
+                message.append("\n  First derivation : ");
+                message.append(cex.example1());
+                message.append("\n  Second derivation: ");
+                message.append(cex.example2());
+                message.append("\n");
+            }
+            else {
+                message.append("  First example    : ");
+                message.append(cex.prettyExample1());
+                message.append("\n  First derivation : ");
+                message.append(cex.example1());
+                message.append("\n  Second example   : ");
+                message.append(cex.prettyExample2());
+                message.append("\n  Second derivation: ");
+                message.append(cex.example2());
+                message.append("\n");
+            }
             // TODO improve formatting
             if (cex.unified()) {
                 System.err.println(cex.prettyExample1());
@@ -817,16 +849,7 @@ public class lalr_state {
             System.err.println("stage4: " + (System.nanoTime() - start));
         }
         /* End CupEx extension */
-        message.append("  under symbols: {");
-        for (int t = 0; t < terminal.number(); t++) {
-            if (itm1.lookahead().contains(t) && itm2.lookahead().contains(t)) {
-                if (comma_flag)
-                    message.append(", ");
-                else comma_flag = true;
-                message.append(terminal.find(t).name());
-            }
-        }
-        message.append("}\n  Resolved in favor of ");
+        message.append("  Resolved in favor of ");
         if (itm1.the_production().index() < itm2.the_production().index())
             message.append("the first production.\n");
         else message.append("the second production.\n");
@@ -851,9 +874,9 @@ public class lalr_state {
         StringBuilder message =
                 new StringBuilder("*** Shift/Reduce conflict found in state #");
         message.append(index());
-        message.append("\n  between reduction on ");
-        message.append(red_itm.to_simple_string());
-        message.append("\n");
+//        message.append("\n  between reduction on ");
+//        message.append(red_itm.to_simple_string());
+//        message.append("\n");
         /* ACM extension */
         long start;
         ByteArrayOutputStream ds = new ByteArrayOutputStream();
@@ -883,23 +906,42 @@ public class lalr_state {
                 if (!shift_sym.is_non_term()
                         && shift_sym.index() == conflict_sym) {
                     /* yes, report on it */
+                    message.append("\n  between reduction on ");
+                    message.append(red_itm.to_simple_string());
+                    message.append("\n");
+                    message.append("  and shift on         ");
+                    message.append(itm.to_simple_string());
+                    message.append("\n");
+                    message.append("  under symbol ");
+                    message.append(terminal.find(conflict_sym).name());
+                    message.append("\n");
                     /* CupEx extension */
                     if (Main.report_counterexamples) {
                         start = System.nanoTime();
                         UnifiedExample ue =
                                 new UnifiedExample(this, red_itm, itm, cs);
                         Counterexample cex = ue.find();
-                        // TODO improve formatting
                         if (cex.unified()) {
-                            System.err.println(cex.prettyExample1());
-                            System.err.println(cex.example1());
-                            System.err.println(cex.example2());
+                            message.append("  Ambiguity detected for nonterminal ");
+                            message.append(cex.ambNonterminal());
+                            message.append("\n  Example: ");
+                            message.append(cex.prettyExample1());
+                            message.append("\n  Derivation using reduction: ");
+                            message.append(cex.example1());
+                            message.append("\n  Derivation using shift    : ");
+                            message.append(cex.example2());
+                            message.append("\n");
                         }
                         else {
-                            System.err.println(cex.prettyExample1());
-                            System.err.println(cex.example1());
-                            System.err.println(cex.prettyExample2());
-                            System.err.println(cex.example2());
+                            message.append("  Example using reduction   : ");
+                            message.append(cex.prettyExample1());
+                            message.append("\n  Derivation using reduction: ");
+                            message.append(cex.example1());
+                            message.append("\n  Example using shift       : ");
+                            message.append(cex.prettyExample2());
+                            message.append("\n  Derivation using shift    : ");
+                            message.append(cex.example2());
+                            message.append("\n");
                         }
                         if (Main.report_cex_stats)
                             System.out.println("stage4:\n"
@@ -908,9 +950,6 @@ public class lalr_state {
                                 + (System.nanoTime() - start));
                     }
                     /* end CupEx extension */
-                    message.append("  and shift on ");
-                    message.append(itm.to_simple_string());
-                    message.append("\n");
                     /* ACM extension */
 //                    start = System.nanoTime();
 //                    if (Main.report_counterexamples) {
@@ -930,8 +969,6 @@ public class lalr_state {
                 }
             }
         }
-        message.append("  under symbol ");
-        message.append(terminal.find(conflict_sym).name());
         message.append("\n  Resolved in favor of shifting.\n");
 
         /* count the conflict */
