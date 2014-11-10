@@ -195,7 +195,7 @@ public class lalr_state {
                 if (part.is_action())
                     System.out.print("{action} ");
                 else System.out.print(((symbol_part) part).the_symbol().name()
-                                      + " ");
+                        + " ");
             }
             if (itm.dot_at_end()) System.out.print("(*) ");
             System.out.println("]");
@@ -398,7 +398,7 @@ public class lalr_state {
                             /* fix up the item so it points to the existing set */
                             if (existing != null)
                                 fix_itm.propagate_items()
-                                .setElementAt(existing, l);
+                                       .setElementAt(existing, l);
                         }
                     }
                 }
@@ -489,7 +489,7 @@ public class lalr_state {
                                 && other_act.kind() != parse_action.NONASSOC) {
                             /* if we have lower index hence priority, replace it*/
                             if (itm.the_production().index() < ((reduce_action) other_act).reduce_with()
-                                    .index()) {
+                                                                                          .index()) {
                                 /* replace the action */
                                 our_act_row.under_term[t] = act;
                             }
@@ -570,7 +570,7 @@ public class lalr_state {
     protected boolean fix_with_precedence(production p, int term_index,
             parse_action_row table_row, parse_action act)
 
-                    throws internal_error {
+    throws internal_error {
 
         terminal term = terminal.find(term_index);
 
@@ -703,11 +703,11 @@ public class lalr_state {
                     if (compare.dot_at_end()) {
                         /* only look at reduces after itm */
                         if (after_itm)
-                            /* does the comparison item conflict? */
-                            if (compare.lookahead().intersects(lookahead)) {
-                                /* report a reduce/reduce conflict */
-                                report_reduce_reduce(itm, compare);
-                            }
+                        /* does the comparison item conflict? */
+                        if (compare.lookahead().intersects(lookahead)) {
+                            /* report a reduce/reduce conflict */
+                            report_reduce_reduce(itm, compare);
+                        }
                     }
                     else {
                         /* is it a shift on our conflicting terminal */
@@ -754,7 +754,7 @@ public class lalr_state {
         message.append("\n  between ");
         message.append(itm1.to_simple_string());
         message.append("\n");
-        /* ACM extension */
+        /* CupEx extension */
         long start;
         ByteArrayOutputStream ds = new ByteArrayOutputStream();
         /** conflict_lookaheads is the list of symbols on which the two actions conflict. */
@@ -764,20 +764,7 @@ public class lalr_state {
                 conflict_lookaheads.add(terminal.find(t));
         }
         terminal cs = conflict_lookaheads.iterator().next(); // pick one
-//        start = System.nanoTime();
-//        if (Main.report_counterexamples) {
-//            message.append("    Example:    ");
-//            counterexamples.report_shortest_path(this,
-//                                                 itm1,
-//                                                 cs,
-//                                                 message,
-//                                                 new PrintStream(ds));
-//            message.append("\n    Derivation: ");
-//            errOutput(message, ds);
-//            message.append(" ] (*)\n\n");
-//        }
-//        System.err.println("Andrew's search: " + (System.nanoTime() - start));
-        /* End ACM extension */
+        /* End CupEx extension */
         message.append("  and     ");
         message.append(itm2.to_simple_string());
         message.append("\n");
@@ -791,20 +778,6 @@ public class lalr_state {
             }
         }
         message.append("}\n");
-        /* ACM extension */
-//        ds.reset();
-//        if (Main.report_counterexamples) {
-//            message.append("    Example:    ");
-//            counterexamples.report_shortest_path(this,
-//                                                 itm2,
-//                                                 cs,
-//                                                 message,
-//                                                 new PrintStream(ds));
-//            message.append(" (*)\n    Derivation: ");
-//            errOutput(message, ds);
-//            message.append(" ] (*)\n");
-//        }
-        /* End ACM extension */
         /* CupEx extension */
         if (Main.report_counterexamples) {
             start = System.nanoTime();
@@ -831,18 +804,6 @@ public class lalr_state {
                 message.append("\n  Second derivation: ");
                 message.append(cex.example2());
                 message.append("\n");
-            }
-            // TODO improve formatting
-            if (cex.unified()) {
-                System.err.println(cex.prettyExample1());
-                System.err.println(cex.example1());
-                System.err.println(cex.example2());
-            }
-            else {
-                System.err.println(cex.prettyExample1());
-                System.err.println(cex.example1());
-                System.err.println(cex.prettyExample2());
-                System.err.println(cex.example2());
             }
             if (Main.report_cex_stats)
                 System.out.println("stage4:\n" + (System.nanoTime() - start));
@@ -877,24 +838,11 @@ public class lalr_state {
 //        message.append("\n  between reduction on ");
 //        message.append(red_itm.to_simple_string());
 //        message.append("\n");
-        /* ACM extension */
+        /* CupEx extension */
         long start;
         ByteArrayOutputStream ds = new ByteArrayOutputStream();
         terminal cs = terminal.find(conflict_sym);
-//        start = System.nanoTime();
-//        if (Main.report_counterexamples) {
-//            message.append("    Example:    ");
-//            counterexamples.report_shortest_path(this,
-//                                                 red_itm,
-//                                                 cs,
-//                                                 message,
-//                                                 new PrintStream(ds));
-//            message.append("\n    Derivation: ");
-//            errOutput(message, ds);
-//            message.append("\n\n");
-//        }
-//        System.err.println("Andrew's search: " + (System.nanoTime() - start));
-        /* end ACM extension */
+        /* end CupEx extension */
 
         /* find and report on all items that shift under our conflict symbol */
         for (lalr_item itm : items()) {
@@ -950,22 +898,6 @@ public class lalr_state {
                                 + (System.nanoTime() - start));
                     }
                     /* end CupEx extension */
-                    /* ACM extension */
-//                    start = System.nanoTime();
-//                    if (Main.report_counterexamples) {
-//                        ds.reset();
-//                        message.append("    Example:    ");
-//                        counterexamples.report_shortest_path(this,
-//                                                             itm,
-//                                                             cs,
-//                                                             message,
-//                                                             new PrintStream(ds));
-//                        message.append("\n    Derivation: ");
-//                        errOutput(message, ds);
-//                        message.append("\n\n");
-//                    }
-//                    System.err.println(System.nanoTime() - start);
-                    /* end ACM extension */
                 }
             }
         }
