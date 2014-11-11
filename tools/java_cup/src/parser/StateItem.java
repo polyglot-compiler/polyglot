@@ -322,9 +322,11 @@ public class StateItem {
         if (stateItms == null) initStateItms();
         if (trans == null) initTrans();
         if (prods == null) initProds();
-        if (Main.report_cex_stats)
-            System.out.println("init:\n" + (System.nanoTime() - start));
-        System.err.println("init: " + (System.nanoTime() - start));
+        if (Main.report_cex_stats) {
+            if (Main.report_cex_stats_to_out)
+                System.out.println("init:\n" + (System.nanoTime() - start));
+            else System.err.println("init: " + (System.nanoTime() - start));
+        }
     }
 
     protected static Map<terminal_set, Set<symbol>> symbolSets =

@@ -117,7 +117,9 @@ public class Main {
      * (CupEx extension) */
     public static boolean report_counterexamples = true;
     /** Whether to report statistics about counterexample finding */
-    public static boolean report_cex_stats = false;
+    public static boolean report_cex_stats = true;
+    /** Whether to report statistics about counterexample finding to standard output */
+    public static boolean report_cex_stats_to_out = false;
 
     /* frankf added this 6/18/96 */
     /** User option -- should generator generate code for left/right values? */
@@ -172,7 +174,7 @@ public class Main {
      * @param argv an array of strings containing command line arguments.
      */
     public static void main(String argv[]) throws internal_error,
-    java.io.IOException, java.lang.Exception {
+            java.io.IOException, java.lang.Exception {
         boolean did_output = false;
 
         start_time = System.currentTimeMillis();
@@ -260,7 +262,7 @@ public class Main {
 //            System.out.println(state);
 //        }
 
-        if (report_cex_stats) {
+        if (report_cex_stats && report_cex_stats_to_out) {
             System.out.println("states:\n" + lalr_state.number());
             StateItem.report();
         }
@@ -281,8 +283,8 @@ public class Main {
         System.err.println(message);
         System.err.println();
         System.err.println(version.title_str
-                           + "\n"
-                           + "Usage: "
+                + "\n"
+                + "Usage: "
                 + version.program_name
                 + " [options] [filename]\n"
                 + "  and expects a specification file on standard input if no filename is given.\n"
@@ -312,7 +314,9 @@ public class Main {
                 + "    -dump_states   produce a dump of parse state machine\n"
                 + "    -dump_tables   produce a dump of the parse tables\n"
                 + "    -dump          produce a dump of all of the above\n"
-                + "    -version       print the version information for CUP and exit\n");
+                + "    -version       print the version information for CUP and exit\n"
+                + "    -noexamples    do not search for counterexamples in case of conflict\n"
+                + "    -extendedserach do not use optimization when searching for counterexamples\n");
         System.exit(1);
     }
 
@@ -554,7 +558,7 @@ public class Main {
             /* something threw an exception.  catch it and emit a message so we
                have a line number to work with, then re-throw it */
             ErrorManager.getManager()
-            .emit_error("Internal error: Unexpected exception");
+                        .emit_error("Internal error: Unexpected exception");
             throw e;
         }
     }
@@ -667,8 +671,8 @@ public class Main {
         /* if we have more conflicts than we expected issue a message and die */
         if (emit.num_conflicts > expect_conflicts) {
             ErrorManager.getManager()
-            .emit_error("*** More conflicts encountered than expected "
-                    + "-- parser generation aborted");
+                        .emit_error("*** More conflicts encountered than expected "
+                                + "-- parser generation aborted");
             // indicate the problem.
             // we'll die on return, after clean up.
         }
@@ -714,14 +718,14 @@ public class Main {
         if (no_summary) return;
 
         System.err.println("------- " + version.title_str
-                           + " Parser Generation Summary -------");
+                + " Parser Generation Summary -------");
 
         /* error and warning count */
         System.err.println("  " + ErrorManager.getManager().getErrorCount()
-                           + " error" + plural(ErrorManager.getManager().getErrorCount())
-                           + " and " + ErrorManager.getManager().getWarningCount()
-                           + " warning"
-                           + plural(ErrorManager.getManager().getWarningCount()));
+                + " error" + plural(ErrorManager.getManager().getErrorCount())
+                + " and " + ErrorManager.getManager().getWarningCount()
+                + " warning"
+                + plural(ErrorManager.getManager().getWarningCount()));
 
         /* basic stats */
         System.err.print("  " + terminal.number() + " terminal"
@@ -731,7 +735,7 @@ public class Main {
         System.err.println(production.number() + " production"
                 + plural(production.number()) + " declared, ");
         System.err.println("  producing " + lalr_state.number()
-                           + " unique parse states.");
+                + " unique parse states.");
 
         /* unused symbols */
         System.err.println("  " + emit.unused_term + " terminal"
@@ -751,8 +755,8 @@ public class Main {
         /* code location */
         if (output_produced)
             System.err.println("  Code written to \"" + emit.parser_class_name
-                               + ".java\", and \"" + emit.symbol_const_class_name
-                               + ".java\".");
+                    + ".java\", and \"" + emit.symbol_const_class_name
+                    + ".java\".");
         else System.err.println("  No code produced.");
 
         if (opt_show_timing) show_times();
@@ -871,7 +875,7 @@ public class Main {
         System.err.println("===== Terminals =====");
         for (int tidx = 0, cnt = 0; tidx < terminal.number(); tidx++, cnt++) {
             System.err.print("[" + tidx + "]" + terminal.find(tidx).name()
-                             + " ");
+                    + " ");
             if ((cnt + 1) % 5 == 0) System.err.println();
         }
         System.err.println();
@@ -880,7 +884,7 @@ public class Main {
         System.err.println("===== Non terminals =====");
         for (int nidx = 0, cnt = 0; nidx < non_terminal.number(); nidx++, cnt++) {
             System.err.print("[" + nidx + "]" + non_terminal.find(nidx).name()
-                             + " ");
+                    + " ");
             if ((cnt + 1) % 5 == 0) System.err.println();
         }
         System.err.println();
@@ -890,12 +894,12 @@ public class Main {
         for (int pidx = 0; pidx < production.number(); pidx++) {
             production prod = production.find(pidx);
             System.err.print("[" + pidx + "] " + prod.lhs().the_symbol().name()
-                             + " ::= ");
+                    + " ::= ");
             for (int i = 0; i < prod.rhs_length(); i++)
                 if (prod.rhs(i).is_action())
                     System.err.print("{action} ");
                 else System.err.print(((symbol_part) prod.rhs(i)).the_symbol()
-                                      .name() + " ");
+                                                                 .name() + " ");
             System.err.println();
         }
         System.err.println();
