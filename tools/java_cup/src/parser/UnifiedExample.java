@@ -23,6 +23,7 @@ import java_cup.terminal;
 
 public class UnifiedExample {
 
+    public static boolean timeLimitEnforced = true;
     public static boolean optimizeShortestPath = true;
     public static boolean extendedSearch = false;
 
@@ -108,13 +109,15 @@ public class UnifiedExample {
             if (target.equals(last.si) && last.lookahead.contains(nextSym)) {
                 // Done
 //                System.err.println(path);
-                if (Main.report_cex_stats)
-                    System.out.println("reachable"
-                            + (optimized ? " optimized" : "") + ":\n"
+                if (Main.report_cex_stats) {
+                    if (Main.report_cex_stats_to_out)
+                        System.out.println("reachable"
+                                + (optimized ? " optimized" : "") + ":\n"
+                                + (System.nanoTime() - start));
+                    else System.err.println("reachable"
+                            + (optimized ? " optimized" : "") + ": "
                             + (System.nanoTime() - start));
-                System.err.println("reachable"
-                        + (optimized ? " optimized" : "") + ": "
-                        + (System.nanoTime() - start));
+                }
                 List<StateItem> shortestConflictPath =
                         new ArrayList<>(path.size());
                 for (StateItemWithLookahead sil : path)
@@ -273,22 +276,25 @@ public class UnifiedExample {
                         stage = 4;
                     }
                 }
-                if (!assurancePrinted
-                        && System.nanoTime() - start > ASSURANCE_LIMIT
-                        && stage3result != null) {
-                    System.err.println("Productions leading up to the conflict stage found.  Still finding a possible unified example...");
-                    assurancePrinted = true;
-                }
-                if (System.nanoTime() - start > TIME_LIMIT) {
-                    System.err.println("time limit exceeded: "
-                            + (System.nanoTime() - start));
-                    if (Main.report_cex_stats)
-                        System.out.println("time limit exceeded");
-                    if (stage3result != null) {
-                        System.err.println(stage3result.complexity);
-                        return completeDivergingExamples(stage3result);
+                if (timeLimitEnforced) {
+                    if (!assurancePrinted
+                            && System.nanoTime() - start > ASSURANCE_LIMIT
+                            && stage3result != null) {
+                        System.err.println("Productions leading up to the conflict stage found.  Still finding a possible unified example...");
+                        assurancePrinted = true;
                     }
-                    else return exampleFromShortestPath();
+                    if (System.nanoTime() - start > TIME_LIMIT) {
+                        System.err.println("time limit exceeded: "
+                                + (System.nanoTime() - start));
+                        if (Main.report_cex_stats
+                                && Main.report_cex_stats_to_out)
+                            System.out.println("time limit exceeded");
+                        if (stage3result != null) {
+                            System.err.println(stage3result.complexity);
+                            return completeDivergingExamples(stage3result);
+                        }
+                        else return exampleFromShortestPath();
+                    }
                 }
                 StateItem si1 = ss.states1.get(ss.states1.size() - 1);
                 StateItem si2 = ss.states2.get(ss.states2.size() - 1);
@@ -639,6 +645,7 @@ public class UnifiedExample {
             List<Derivation> derivs) {
         List<Derivation> result = new LinkedList<>();
         ListIterator<Derivation> dItr = derivs.listIterator(derivs.size());
+        boolean lookaheadRequired = false;
         for (ListIterator<StateItem> sItr = states.listIterator(states.size()); sItr.hasPrevious();) {
             StateItem si = sItr.previous();
             int pos = si.item.dot_pos();
@@ -646,12 +653,27 @@ public class UnifiedExample {
             int len = prod.rhs_length();
             // symbols after dot
             if (result.isEmpty()) {
-                if (derivs.isEmpty()) result.add(Derivation.dot);
-                if (!si.item.dot_at_end())
+                if (derivs.isEmpty()) {
+                    result.add(Derivation.dot);
+                    lookaheadRequired = true;
+                }
+                if (!si.item.dot_at_end()) {
                     result.add(new Derivation(rhs(prod, pos)));
+                    lookaheadRequired = false;
+                }
             }
             for (int i = pos + 1; i < len; i++) {
-                result.add(new Derivation(rhs(prod, i)));
+                symbol sym = rhs(prod, i);
+                if (lookaheadRequired) {
+                    if (sym != nextSym) {
+                        // Need to expand sym to match nextSym
+                        result.add(expandFirst(StateItem.trans.get(si)
+                                                              .get(rhs(prod,
+                                                                       pos))));
+                    }
+                    lookaheadRequired = false;
+                }
+                else result.add(new Derivation(sym));
             }
             // symbols before dot
             for (int i = pos - 1; i >= 0; i--) {
@@ -666,6 +688,48 @@ public class UnifiedExample {
             result.add(deriv);
         }
         return result.get(0);
+    }
+
+    protected Derivation expandFirst(StateItem start) {
+        Queue<List<StateItem>> queue = new LinkedList<>();
+        for (lalr_item itm : StateItem.prods.get(start)) {
+            List<StateItem> init = new LinkedList<>();
+            init.add(StateItem.lookup(start.state, itm));
+            queue.add(init);
+        }
+        while (!queue.isEmpty()) {
+            List<StateItem> states = queue.remove();
+            StateItem silast = states.get(states.size() - 1);
+            if (silast.item.symbol_after_dot() == nextSym) {
+                // done; construct derivation
+                List<Derivation> result = new LinkedList<>();
+                result.add(new Derivation(nextSym));
+                for (ListIterator<StateItem> sItr =
+                        states.listIterator(states.size()); sItr.hasPrevious();) {
+                    StateItem si = sItr.previous();
+                    int pos = si.item.dot_pos();
+                    production prod = si.item.the_production();
+                    int len = prod.rhs_length();
+                    for (int i = pos + 1; i < len; i++) {
+                        symbol sym = rhs(prod, i);
+                        result.add(new Derivation(sym));
+                    }
+                    symbol lhs = prod.lhs().the_symbol();
+                    Derivation deriv = new Derivation(lhs, result);
+                    result = new LinkedList<>();
+                    result.add(deriv);
+                }
+                return result.get(0);
+            }
+            for (lalr_item itm : StateItem.prods.get(silast)) {
+                StateItem nextsi = StateItem.lookup(silast.state, itm);
+                if (states.contains(nextsi)) continue;
+                List<StateItem> next = new LinkedList<>(states);
+                next.add(nextsi);
+                queue.add(next);
+            }
+        }
+        throw new Error("Should not reach here.");
     }
 
     protected static class FixedComplexitySearchState implements

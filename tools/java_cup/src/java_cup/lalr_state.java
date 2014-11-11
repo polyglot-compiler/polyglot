@@ -805,9 +805,13 @@ public class lalr_state {
                 message.append(cex.example2());
                 message.append("\n");
             }
-            if (Main.report_cex_stats)
-                System.out.println("stage4:\n" + (System.nanoTime() - start));
-            System.err.println("stage4: " + (System.nanoTime() - start));
+            if (Main.report_cex_stats) {
+                if (Main.report_cex_stats_to_out)
+                    System.out.println("stage4:\n"
+                            + (System.nanoTime() - start));
+                else System.err.println("stage4: "
+                        + (System.nanoTime() - start));
+            }
         }
         /* End CupEx extension */
         message.append("  Resolved in favor of ");
@@ -891,11 +895,13 @@ public class lalr_state {
                             message.append(cex.example2());
                             message.append("\n");
                         }
-                        if (Main.report_cex_stats)
-                            System.out.println("stage4:\n"
+                        if (Main.report_cex_stats) {
+                            if (Main.report_cex_stats_to_out)
+                                System.out.println("stage4:\n"
+                                        + (System.nanoTime() - start));
+                            else System.err.println("stage4: "
                                     + (System.nanoTime() - start));
-                        System.err.println("stage4: "
-                                + (System.nanoTime() - start));
+                        }
                     }
                     /* end CupEx extension */
                 }
