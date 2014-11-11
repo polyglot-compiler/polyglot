@@ -1,0 +1,79 @@
+terminal IDENTIFIER;
+terminal MUL_ASSIGN, DIV_ASSIGN, MOD_ASSIGN, ADD_ASSIGN;
+terminal SUB_ASSIGN, LEFT_ASSIGN, RIGHT_ASSIGN, AND_ASSIGN;
+terminal XOR_ASSIGN, OR_ASSIGN;
+
+terminal LPAREN, RPAREN, COMMA,
+EQ, LBRACE, RBRACE
+;
+
+non terminal unary_expr,
+cast_expr, assignment_expr,
+assignment_operator,
+init_declarator_list, init_declarator, declarator, declarator2,
+initializer, initializer_list,
+identifier;
+
+start with init_declarator_list;
+
+unary_expr
+	::= identifier
+	;
+
+cast_expr
+	::= unary_expr
+	;
+
+assignment_expr
+	::= cast_expr
+	| unary_expr assignment_operator assignment_expr
+	;
+
+assignment_operator
+	::= EQ
+	| MUL_ASSIGN
+	| DIV_ASSIGN
+	| MOD_ASSIGN
+	| ADD_ASSIGN
+	| SUB_ASSIGN
+	| LEFT_ASSIGN
+	| RIGHT_ASSIGN
+	| AND_ASSIGN
+	| XOR_ASSIGN
+	| OR_ASSIGN
+        | COMMA
+	;
+
+init_declarator_list
+	::= init_declarator
+	| init_declarator_list COMMA init_declarator
+	;
+
+init_declarator
+	::= declarator
+	| declarator EQ initializer
+	;
+
+declarator
+	::= declarator2
+	;
+
+declarator2
+	::= identifier
+	| declarator2 LPAREN RPAREN
+	;
+
+initializer
+	::= assignment_expr
+	| LBRACE initializer_list RBRACE
+	| LBRACE initializer_list COMMA RBRACE
+	;
+
+initializer_list
+	::= initializer
+	| initializer_list COMMA initializer
+	;
+
+identifier
+	::= IDENTIFIER
+	;

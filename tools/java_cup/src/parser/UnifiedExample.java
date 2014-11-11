@@ -849,10 +849,8 @@ public class UnifiedExample {
             Derivation deriv =
                     new Derivation(lhs, new LinkedList<>(derivs.subList(dSize
                             - len, dSize)));
-            if (reduceDepth == 0) {
+            if (reduceDepth == 0)
                 deriv.deriv.add(itm1.dot_pos(), Derivation.dot);
-                reduceDepth--;
-            }
             derivs = new LinkedList<>(derivs.subList(0, dSize - len));
             derivs.add(deriv);
             if (sSize == len + 1) {
@@ -874,6 +872,7 @@ public class UnifiedExample {
                     copy.complexity +=
                             UNSHIFT_COST * (statesSize - productionSteps)
                                     + PRODUCTION_COST * productionSteps;
+                    if (copy.reduceDepth == 0) copy.reduceDepth--;
                     result.add(copy);
                 }
             }
@@ -885,9 +884,33 @@ public class UnifiedExample {
                 copy.states1.add(StateItem.trans.get(copy.states1.get(copy.states1.size() - 1))
                                                 .get(lhs));
                 copy.complexity += REDUCE_COST;
+                if (copy.reduceDepth == 0) copy.reduceDepth--;
                 result.add(copy);
             }
-            return result;
+            // transition on nullable symbols
+            List<SearchState> finalizedResult = new LinkedList<>();
+            for (SearchState ss : result) {
+                StateItem next = ss.states1.get(ss.states1.size() - 1);
+                List<Derivation> derivs1 = new LinkedList<>();
+                List<StateItem> states1 = new LinkedList<>();
+                nullableClosure(next.item.the_production(),
+                                next.item.dot_pos(),
+                                next,
+                                states1,
+                                derivs1);
+                finalizedResult.add(ss);
+                for (int i = 1, size1 = derivs1.size(); i <= size1; i++) {
+                    List<Derivation> subderivs1 =
+                            new ArrayList<>(derivs1.subList(0, i));
+                    List<StateItem> substates1 =
+                            new ArrayList<>(states1.subList(0, i));
+                    SearchState copy = ss.copy();
+                    copy.derivs1.addAll(subderivs1);
+                    copy.states1.addAll(substates1);
+                    finalizedResult.add(copy);
+                }
+            }
+            return finalizedResult;
         }
 
         protected List<SearchState> reduce2(symbol nextSym) {
@@ -949,7 +972,30 @@ public class UnifiedExample {
                 if (copy.shiftDepth >= 0) copy.shiftDepth--;
                 result.add(copy);
             }
-            return result;
+            // transition on nullable symbols
+            List<SearchState> finalizedResult = new LinkedList<>();
+            for (SearchState ss : result) {
+                StateItem next = ss.states2.get(ss.states2.size() - 1);
+                List<Derivation> derivs2 = new LinkedList<>();
+                List<StateItem> states2 = new LinkedList<>();
+                nullableClosure(next.item.the_production(),
+                                next.item.dot_pos(),
+                                next,
+                                states2,
+                                derivs2);
+                finalizedResult.add(ss);
+                for (int i = 1, size2 = derivs2.size(); i <= size2; i++) {
+                    List<Derivation> subderivs2 =
+                            new ArrayList<>(derivs2.subList(0, i));
+                    List<StateItem> substates2 =
+                            new ArrayList<>(states2.subList(0, i));
+                    SearchState copy = ss.copy();
+                    copy.derivs2.addAll(subderivs2);
+                    copy.states2.addAll(substates2);
+                    finalizedResult.add(copy);
+                }
+            }
+            return finalizedResult;
         }
 
         @Override
