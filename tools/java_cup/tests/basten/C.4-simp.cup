@@ -1,0 +1,330 @@
+terminal IDENTIFIER, CONSTANT, STRING_LITERAL, SIZEOF;
+terminal PTR_OP, INC_OP, DEC_OP, LEFT_OP, RIGHT_OP, LE_OP, GE_OP, EQ_OP, NE_OP;
+terminal AND_OP, OR_OP, MUL_ASSIGN, DIV_ASSIGN, MOD_ASSIGN, ADD_ASSIGN;
+terminal SUB_ASSIGN, LEFT_ASSIGN, RIGHT_ASSIGN, AND_ASSIGN;
+terminal XOR_ASSIGN, OR_ASSIGN, TYPE_NAME;
+
+terminal CHAR, SHORT, INT, LONG, SIGNED, UNSIGNED, FLOAT, DOUBLE, CONST, VOLATILE, VOID;
+terminal STRUCT, UNION, ENUM, ELIPSIS;
+
+terminal LPAREN, RPAREN, LBRACK, RBRACK, DOT, COMMA, AND, OR, TIMES, PLUS, MINUS,
+NEG, NOT, LT, GT, XOR, QUESTION, ASSIGN, SEMICOLON, EQ, LBRACE, RBRACE,
+DIV, MOD;
+
+non terminal primary_expr, postfix_expr, argument_expr_list, unary_expr,
+unary_operator, cast_expr, multiplicative_expr, additive_expr, shift_expr,
+relational_expr, equality_expr, and_expr, exclusive_or_expr, inclusive_or_expr,
+logical_and_expr, logical_or_expr, conditional_expr, assignment_expr,
+assignment_operator, expr, constant_expr,
+init_declarator_list, init_declarator, type_specifier,
+struct_or_union_specifier, struct_or_union, struct_declaration_list,
+struct_declaration, struct_declarator_list, struct_declarator, enum_specifier,
+enumerator_list, enumerator, declarator, declarator2, pointer,
+type_specifier_list, parameter_identifier_list, identifier_list,
+parameter_type_list, parameter_list, parameter_declaration, type_name,
+abstract_declarator, abstract_declarator2, initializer, initializer_list,
+identifier;
+
+start with init_declarator_list;
+
+primary_expr
+	::= identifier
+	| CONSTANT
+	| STRING_LITERAL
+	| LPAREN expr RPAREN
+	;
+
+postfix_expr
+	::= primary_expr
+	| postfix_expr LBRACK expr RBRACK
+	| postfix_expr LPAREN RPAREN
+	| postfix_expr LPAREN argument_expr_list RPAREN
+	| postfix_expr DOT identifier
+	| postfix_expr PTR_OP identifier
+	| postfix_expr INC_OP
+	| postfix_expr DEC_OP
+	;
+
+argument_expr_list
+	::= assignment_expr
+	| argument_expr_list COMMA assignment_expr
+	;
+
+unary_expr
+	::= postfix_expr
+	| INC_OP unary_expr
+	| DEC_OP unary_expr
+	| unary_operator cast_expr
+	| SIZEOF unary_expr
+	| SIZEOF LPAREN type_name RPAREN
+	;
+
+unary_operator
+	::= AND
+	| TIMES
+	| PLUS
+	| MINUS
+	| NEG
+	| NOT
+	;
+
+cast_expr
+	::= unary_expr
+	| LPAREN type_name RPAREN cast_expr
+	;
+
+multiplicative_expr
+	::= cast_expr
+	| multiplicative_expr TIMES cast_expr
+	| multiplicative_expr DIV cast_expr
+	| multiplicative_expr MOD cast_expr
+	;
+
+additive_expr
+	::= multiplicative_expr
+	| additive_expr PLUS multiplicative_expr
+	| additive_expr MINUS multiplicative_expr
+	;
+
+shift_expr
+	::= additive_expr
+	| shift_expr LEFT_OP additive_expr
+	| shift_expr RIGHT_OP additive_expr
+	;
+
+relational_expr
+	::= shift_expr
+	| relational_expr LT shift_expr
+	| relational_expr GT shift_expr
+	| relational_expr LE_OP shift_expr
+	| relational_expr GE_OP shift_expr
+	;
+
+equality_expr
+	::= relational_expr
+	| equality_expr EQ_OP relational_expr
+	| equality_expr NE_OP relational_expr
+	;
+
+and_expr
+	::= equality_expr
+	| and_expr AND equality_expr
+	;
+
+exclusive_or_expr
+	::= and_expr
+	| exclusive_or_expr XOR and_expr
+	;
+
+inclusive_or_expr
+	::= exclusive_or_expr
+	| inclusive_or_expr OR exclusive_or_expr
+	;
+
+logical_and_expr
+	::= inclusive_or_expr
+	| logical_and_expr AND_OP inclusive_or_expr
+	;
+
+logical_or_expr
+	::= logical_and_expr
+	| logical_or_expr OR_OP logical_and_expr
+	;
+
+conditional_expr
+	::= logical_or_expr
+	| logical_or_expr QUESTION logical_or_expr ASSIGN conditional_expr
+	;
+
+assignment_expr
+	::= conditional_expr
+	| unary_expr assignment_operator assignment_expr
+	;
+
+assignment_operator
+	::= EQ
+	| MUL_ASSIGN
+	| DIV_ASSIGN
+	| MOD_ASSIGN
+	| ADD_ASSIGN
+	| SUB_ASSIGN
+	| LEFT_ASSIGN
+	| RIGHT_ASSIGN
+	| AND_ASSIGN
+	| XOR_ASSIGN
+	| OR_ASSIGN
+        | COMMA
+	;
+
+expr
+	::= assignment_expr
+	| expr COMMA assignment_expr
+	;
+
+constant_expr
+	::= conditional_expr
+	;
+
+init_declarator_list
+	::= init_declarator
+	| init_declarator_list COMMA init_declarator
+	;
+
+init_declarator
+	::= declarator
+	| declarator EQ initializer
+	;
+
+type_specifier
+	::= CHAR
+	| SHORT
+	| INT
+	| LONG
+	| SIGNED
+	| UNSIGNED
+	| FLOAT
+	| DOUBLE
+	| CONST
+	| VOLATILE
+	| VOID
+	| struct_or_union_specifier
+	| enum_specifier
+	| TYPE_NAME
+	;
+
+struct_or_union_specifier
+	::= struct_or_union identifier LBRACE struct_declaration_list RBRACE
+	| struct_or_union LBRACE struct_declaration_list RBRACE
+	| struct_or_union identifier
+	;
+
+struct_or_union
+	::= STRUCT
+	| UNION
+	;
+
+struct_declaration_list
+	::= struct_declaration
+	| struct_declaration_list struct_declaration
+	;
+
+struct_declaration
+	::= type_specifier_list struct_declarator_list SEMICOLON
+	;
+
+struct_declarator_list
+	::= struct_declarator
+	| struct_declarator_list COMMA struct_declarator
+	;
+
+struct_declarator
+	::= declarator
+	| ASSIGN constant_expr
+	| declarator ASSIGN constant_expr
+	;
+
+enum_specifier
+	::= ENUM LBRACE enumerator_list RBRACE
+	| ENUM identifier LBRACE enumerator_list RBRACE
+	| ENUM identifier
+	;
+
+enumerator_list
+	::= enumerator
+	| enumerator_list COMMA enumerator
+	;
+
+enumerator
+	::= identifier
+	| identifier EQ constant_expr
+	;
+
+declarator
+	::= declarator2
+	| pointer declarator2
+	;
+
+declarator2
+	::= identifier
+	| LPAREN declarator RPAREN
+	| declarator2 LBRACK RBRACK
+	| declarator2 LBRACK constant_expr RBRACK
+	| declarator2 LPAREN RPAREN
+	| declarator2 LPAREN parameter_type_list RPAREN
+	| declarator2 LPAREN parameter_identifier_list RPAREN
+	;
+
+pointer
+	::= TIMES
+	| TIMES type_specifier_list
+	| TIMES pointer
+	| TIMES type_specifier_list pointer
+	;
+
+type_specifier_list
+	::= type_specifier
+	| type_specifier_list type_specifier
+	;
+
+parameter_identifier_list
+	::= identifier_list
+	| identifier_list COMMA ELIPSIS
+	;
+
+identifier_list
+	::= identifier
+	| identifier_list COMMA identifier
+	;
+
+parameter_type_list
+	::= parameter_list
+	| parameter_list COMMA ELIPSIS
+	;
+
+parameter_list
+	::= parameter_declaration
+	| parameter_list COMMA parameter_declaration
+	;
+
+parameter_declaration
+	::= type_specifier_list declarator
+	| type_name
+	;
+
+type_name
+	::= type_specifier_list
+	| type_specifier_list abstract_declarator
+	;
+
+abstract_declarator
+	::= pointer
+	| abstract_declarator2
+	| pointer abstract_declarator2
+	;
+
+abstract_declarator2
+	::= LPAREN abstract_declarator RPAREN
+	| LBRACK RBRACK
+	| LBRACK constant_expr RBRACK
+	| abstract_declarator2 LBRACK RBRACK
+	| abstract_declarator2 LBRACK constant_expr RBRACK
+	| LPAREN RPAREN
+	| LPAREN parameter_type_list RPAREN
+	| abstract_declarator2 LPAREN RPAREN
+	| abstract_declarator2 LPAREN parameter_type_list RPAREN
+	;
+
+initializer
+	::= assignment_expr
+	| LBRACE initializer_list RBRACE
+	| LBRACE initializer_list COMMA RBRACE
+	;
+
+initializer_list
+	::= initializer
+	| initializer_list COMMA initializer
+	;
+
+identifier
+	::= IDENTIFIER
+	;
