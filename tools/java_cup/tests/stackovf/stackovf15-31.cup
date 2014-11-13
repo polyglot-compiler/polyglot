@@ -1,0 +1,29 @@
+//http://stackoverflow.com/questions/1760083/how-to-resolve-this-shift-reduce-conflict-in-yacc
+//(unamb)
+
+terminal NEWLINE, TERMINAL2, TERMINAL3;
+
+non terminal start_, rule1_list, rule1, rule2, rule3_list, rule3;
+
+start with start_;
+
+start_::=   rule1_list
+      ;
+
+rule1_list::=   rule1
+           |  rule1_list NEWLINE rule1
+            ;
+
+rule1::=   rule2
+     |   rule2 NEWLINE rule3_list
+      ;
+
+rule2::=   TERMINAL2
+      ;
+
+rule3_list::=   rule3
+          |   rule3_list NEWLINE rule3
+          ;
+
+rule3 ::=  TERMINAL3
+      ;

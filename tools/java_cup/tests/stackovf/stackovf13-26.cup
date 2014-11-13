@@ -1,0 +1,16 @@
+//http://stackoverflow.com/questions/958885/how-to-resolve-a-shift-reduce-conflict-in-unambiguous-grammar
+//(unamb)
+
+terminal LETTER;
+
+terminal SEMICOLON, ARR;
+
+non terminal input, input_elt, statement, rule, successor;
+
+start with input;
+
+input::=          /* empty */ | input input_elt;
+input_elt::=      rule | statement;
+statement::=      successor SEMICOLON;
+rule::=           LETTER ARR successor SEMICOLON;
+successor::=      /* empty */ | successor LETTER;

@@ -1,0 +1,53 @@
+//http://stackoverflow.com/questions/9651733/why-are-these-conflicts-appearing-in-the-following-yacc-grammar-for-xml
+//(amb)
+
+terminal ID, ASSIGNOP, NUM, WEB;
+
+terminal LT, QUESTION, GT, SLASH, QUOT;
+
+non terminal program, root, node_list, node_s, node, u_node, attribute_list,
+attributes, attribute;
+
+start with program;
+
+program 
+    ::= LT QUESTION ID attribute_list QUESTION GT
+      root
+    ;
+root
+    ::= LT ID attribute_list GT node_list LT SLASH ID GT
+    ;
+
+node_list
+    ::= node_s
+    | node_list node_s
+    ;
+node_s
+    ::= node
+    | u_node
+    | ID
+    |;
+
+node
+    ::= LT ID attribute_list SLASH GT
+    ;
+u_node
+    ::=LT ID attribute_list GT node_list LT SLASH ID GT
+    |LT ID attribute_list GT LT SLASH ID GT
+    ;
+
+attribute_list
+    ::= attributes
+    |
+    ;
+attributes
+    ::= attribute
+    | attributes attribute   
+    ;
+
+attribute
+    ::= ID ASSIGNOP QUOT ID QUOT
+    | ID ASSIGNOP QUOT NUM QUOT
+    | ID ASSIGNOP QUOT NUM ID QUOT
+    | ID ASSIGNOP QUOT WEB QUOT
+    ;

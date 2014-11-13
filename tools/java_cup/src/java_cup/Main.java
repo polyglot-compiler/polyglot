@@ -117,7 +117,7 @@ public class Main {
      * (CupEx extension) */
     public static boolean report_counterexamples = true;
     /** Whether to report statistics about counterexample finding */
-    public static boolean report_cex_stats = true;
+    public static boolean report_cex_stats = false;
     /** Whether to report statistics about counterexample finding to standard output */
     public static boolean report_cex_stats_to_out = false;
 
@@ -263,8 +263,12 @@ public class Main {
 //        }
 
         if (report_cex_stats && report_cex_stats_to_out) {
+            System.out.println("conflicts:\n" + emit.num_conflicts);
+            System.out.println("nonterminals:\n" + non_terminal.number());
+            System.out.println("productions:\n" + production.number());
             System.out.println("states:\n" + lalr_state.number());
             StateItem.report();
+            lalr_state.report();
         }
 
         /* If there were errors during the run,

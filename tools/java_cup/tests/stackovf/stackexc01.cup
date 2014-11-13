@@ -1,3 +1,6 @@
+//http://math.stackexchange.com/questions/297721/determining-ambiguity-in-context-free-grammars
+//(amb)
+
 terminal Token z, o, l, r;
 
 non terminal S, E;

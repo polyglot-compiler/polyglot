@@ -1,0 +1,47 @@
+//http://stackoverflow.com/questions/15947023/where-is-this-shift-reduce-conflict-coming-from-in-bison
+//(amb)
+
+terminal INT, TRUE, FALSE, WHILE, DO, IF, THEN, ELSE, LOCATION, ASSIGN, EOF_, DEREF;
+
+terminal PLUS, GE;
+
+non terminal Program, Statement, Expression, IntExpression, IntExpressionRest,
+BoolExpression;
+
+//precedence left PLUS;
+//precedence left GE;
+
+/* Define Start Production */
+start with Program ;
+
+Program
+    ::= Statement EOF_
+    ;
+
+Statement
+    ::= Expression
+    | WHILE BoolExpression DO Statement
+    | LOCATION ASSIGN IntExpression
+    ;
+
+Expression
+    ::= IntExpression
+    | BoolExpression
+    ;
+
+IntExpression
+    ::= INT IntExpressionRest
+    | IF BoolExpression THEN Statement ELSE Statement
+    | DEREF LOCATION
+    ;   
+
+IntExpressionRest
+    ::= /* epsilon */
+    | PLUS IntExpression
+    ;
+
+BoolExpression
+    ::= TRUE
+    | FALSE
+    | IntExpression GE IntExpression
+    ;
