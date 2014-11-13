@@ -176,19 +176,20 @@ public class StateItem {
     }
 
     public static void report() {
+        init();
         int stateItmSize = 0;
         for (Map<lalr_item, StateItem> stateItm : stateItms.values())
             stateItmSize += stateItm.size();
         System.out.println("items:\n" + stateItmSize);
+        int prodSize = 0;
+        for (Set<lalr_item> prod : prods.values())
+            prodSize += prod.size();
+        System.out.println("productions:\n" + prodSize);
         int revTranSize = 0;
         for (Map<symbol, Set<StateItem>> revTran : revTrans.values())
             for (Set<StateItem> rev : revTran.values())
                 revTranSize += rev.size();
         System.out.println("reverse transitions:\n" + revTranSize);
-        int prodSize = 0;
-        for (Set<lalr_item> prod : prods.values())
-            prodSize += prod.size();
-        System.out.println("productions:\n" + prodSize);
         int revProdSize = 0;
         for (Map<non_terminal, Set<lalr_item>> revProd : revProds.values())
             for (Set<lalr_item> rev : revProd.values())

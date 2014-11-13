@@ -1,0 +1,20 @@
+//http://stackoverflow.com/questions/7967202/bison-complained-conflicts-1-shift-reduce
+//(amb)
+
+terminal OR, AND, NUMBER;
+
+terminal LPAREN, RPAREN;
+
+non terminal search_condition, predicate;
+
+start with search_condition;
+
+search_condition::=
+        |       search_condition AND search_condition
+        |       LPAREN search_condition RPAREN
+        |       predicate
+        ;
+
+predicate::=
+                NUMBER
+        ;

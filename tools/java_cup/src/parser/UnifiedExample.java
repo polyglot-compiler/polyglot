@@ -267,7 +267,8 @@ public class UnifiedExample {
                         if (ss.derivs1.size() == 1
                                 && ss.derivs2.size() == 1
                                 && ss.derivs1.get(0).sym == ss.derivs2.get(0).sym) {
-                            System.err.println(ss.complexity);
+                            if (Main.report_cex_stats)
+                                System.err.println(ss.complexity);
                             return new Counterexample(ss.derivs1.get(0),
                                                       ss.derivs2.get(0),
                                                       true);
@@ -290,10 +291,11 @@ public class UnifiedExample {
                                 && Main.report_cex_stats_to_out)
                             System.out.println("time limit exceeded");
                         if (stage3result != null) {
-                            System.err.println(stage3result.complexity);
-                            return completeDivergingExamples(stage3result);
+                            if (Main.report_cex_stats)
+                                System.err.println(stage3result.complexity);
+                            return completeDivergingExamples(stage3result, true);
                         }
-                        else return exampleFromShortestPath();
+                        else return exampleFromShortestPath(true);
                     }
                 }
                 StateItem si1 = ss.states1.get(ss.states1.size() - 1);
@@ -440,7 +442,6 @@ public class UnifiedExample {
                     boolean ready2 = si2reduce && size2 > len2;
                     // If there is a path ready for reduction
                     // without being prepended further, reduce.
-                    // TODO transition on nullable symbols
                     if (ready1) {
                         List<SearchState> reduced1 = ss.reduce1(si2sym);
                         if (ready2) {
@@ -483,7 +484,7 @@ public class UnifiedExample {
         }
         // No unifying examples.  Construct examples from common shortest path
         // to conflict state.
-        return exampleFromShortestPath();
+        return exampleFromShortestPath(false);
     }
 
     protected void nullableClosure(production prod, int pos, StateItem silast,
@@ -523,7 +524,7 @@ public class UnifiedExample {
         visited1.add(ss.states2);
     }
 
-    protected Counterexample exampleFromShortestPath() {
+    public Counterexample exampleFromShortestPath(boolean timeout) {
         StateItem si = StateItem.lookup(conflict, itm2);
         List<StateItem> result = new LinkedList<>();
         result.add(si);
@@ -560,7 +561,7 @@ public class UnifiedExample {
                 Derivation deriv1 =
                         completeDivergingExample(shortestConflictPath);
                 Derivation deriv2 = completeDivergingExample(result);
-                return new Counterexample(deriv1, deriv2, false);
+                return new Counterexample(deriv1, deriv2, false, timeout);
             }
 
             int pos = si.item.dot_pos();
@@ -630,10 +631,11 @@ public class UnifiedExample {
         throw new Error("Cannot find derivation to conflict state.");
     }
 
-    protected Counterexample completeDivergingExamples(SearchState ss) {
+    protected Counterexample completeDivergingExamples(SearchState ss,
+            boolean timeout) {
         Derivation deriv1 = completeDivergingExample(ss.states1, ss.derivs1);
         Derivation deriv2 = completeDivergingExample(ss.states2, ss.derivs2);
-        return new Counterexample(deriv1, deriv2, false);
+        return new Counterexample(deriv1, deriv2, false, timeout);
     }
 
     protected Derivation completeDivergingExample(List<StateItem> states) {
@@ -700,7 +702,8 @@ public class UnifiedExample {
         while (!queue.isEmpty()) {
             List<StateItem> states = queue.remove();
             StateItem silast = states.get(states.size() - 1);
-            if (silast.item.symbol_after_dot() == nextSym) {
+            symbol sym = silast.item.symbol_after_dot();
+            if (sym == nextSym) {
                 // done; construct derivation
                 List<Derivation> result = new LinkedList<>();
                 result.add(new Derivation(nextSym));
@@ -711,8 +714,8 @@ public class UnifiedExample {
                     production prod = si.item.the_production();
                     int len = prod.rhs_length();
                     for (int i = pos + 1; i < len; i++) {
-                        symbol sym = rhs(prod, i);
-                        result.add(new Derivation(sym));
+                        symbol rhs = rhs(prod, i);
+                        result.add(new Derivation(rhs));
                     }
                     symbol lhs = prod.lhs().the_symbol();
                     Derivation deriv = new Derivation(lhs, result);
@@ -721,12 +724,14 @@ public class UnifiedExample {
                 }
                 return result.get(0);
             }
-            for (lalr_item itm : StateItem.prods.get(silast)) {
-                StateItem nextsi = StateItem.lookup(silast.state, itm);
-                if (states.contains(nextsi)) continue;
-                List<StateItem> next = new LinkedList<>(states);
-                next.add(nextsi);
-                queue.add(next);
+            if (sym instanceof non_terminal) {
+                for (lalr_item itm : StateItem.prods.get(silast)) {
+                    StateItem nextsi = StateItem.lookup(silast.state, itm);
+                    if (states.contains(nextsi)) continue;
+                    List<StateItem> next = new LinkedList<>(states);
+                    next.add(nextsi);
+                    queue.add(next);
+                }
             }
         }
         throw new Error("Should not reach here.");

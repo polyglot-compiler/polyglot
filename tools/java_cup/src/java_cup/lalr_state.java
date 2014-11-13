@@ -1,6 +1,5 @@
 package java_cup;
 
-import java.io.ByteArrayOutputStream;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
@@ -97,6 +96,7 @@ public class lalr_state {
         _all.clear();
         _all_kernels.clear();
         next_index = 0;
+        clearCexStats();
     }
 
     /*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . .*/
@@ -728,15 +728,6 @@ public class lalr_state {
         }
     }
 
-    private void errOutput(StringBuilder sb, ByteArrayOutputStream s) {
-        try {
-            sb.append(s.toString("UTF-8"));
-        }
-        catch (java.io.UnsupportedEncodingException e) {
-            sb.append("<UNENCODABLE>");
-        }
-    }
-
     /*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . .*/
 
     /** Produce a warning message for one reduce/reduce conflict.
@@ -756,7 +747,6 @@ public class lalr_state {
         message.append("\n");
         /* CupEx extension */
         long start;
-        ByteArrayOutputStream ds = new ByteArrayOutputStream();
         /** conflict_lookaheads is the list of symbols on which the two actions conflict. */
         Set<terminal> conflict_lookaheads = new HashSet<>();
         for (int t = 0; t < terminal.number(); t++) {
@@ -782,7 +772,9 @@ public class lalr_state {
         if (Main.report_counterexamples) {
             start = System.nanoTime();
             UnifiedExample ue = new UnifiedExample(this, itm1, itm2, cs);
-            Counterexample cex = ue.find();
+            boolean tle = cexTimeLimit();
+            Counterexample cex =
+                    tle ? ue.exampleFromShortestPath(true) : ue.find();
             if (cex.unified()) {
                 message.append("  Ambiguity detected for nonterminal ");
                 message.append(cex.ambNonterminal());
@@ -793,6 +785,7 @@ public class lalr_state {
                 message.append("\n  Second derivation: ");
                 message.append(cex.example2());
                 message.append("\n");
+                numUnif++;
             }
             else {
                 message.append("  First example    : ");
@@ -804,13 +797,28 @@ public class lalr_state {
                 message.append("\n  Second derivation: ");
                 message.append(cex.example2());
                 message.append("\n");
+                if (!tle) {
+                    if (cex.timeout())
+                        numTimeOut++;
+                    else numNonUnif++;
+                }
+                else numTle++;
             }
             if (Main.report_cex_stats) {
-                if (Main.report_cex_stats_to_out)
-                    System.out.println("stage4:\n"
-                            + (System.nanoTime() - start));
-                else System.err.println("stage4: "
-                        + (System.nanoTime() - start));
+                long duration = System.nanoTime() - start;
+                if (Main.report_cex_stats_to_out) {
+                    System.out.print("stage4");
+                    if (cex.unified())
+                        System.out.print(" unif");
+                    else if (tle)
+                        System.out.print(" tle");
+                    else if (cex.timeout())
+                        System.out.print(" t/o");
+                    else System.out.print(" nonunif");
+                    System.out.println(":\n" + duration);
+                }
+                else System.err.println("stage4: " + duration);
+                cumulativeCexTime += duration;
             }
         }
         /* End CupEx extension */
@@ -844,7 +852,6 @@ public class lalr_state {
 //        message.append("\n");
         /* CupEx extension */
         long start;
-        ByteArrayOutputStream ds = new ByteArrayOutputStream();
         terminal cs = terminal.find(conflict_sym);
         /* end CupEx extension */
 
@@ -872,7 +879,11 @@ public class lalr_state {
                         start = System.nanoTime();
                         UnifiedExample ue =
                                 new UnifiedExample(this, red_itm, itm, cs);
-                        Counterexample cex = ue.find();
+                        boolean tle = cexTimeLimit();
+                        Counterexample cex =
+                                tle
+                                        ? ue.exampleFromShortestPath(true)
+                                        : ue.find();
                         if (cex.unified()) {
                             message.append("  Ambiguity detected for nonterminal ");
                             message.append(cex.ambNonterminal());
@@ -883,6 +894,7 @@ public class lalr_state {
                             message.append("\n  Derivation using shift    : ");
                             message.append(cex.example2());
                             message.append("\n");
+                            numUnif++;
                         }
                         else {
                             message.append("  Example using reduction   : ");
@@ -894,24 +906,61 @@ public class lalr_state {
                             message.append("\n  Derivation using shift    : ");
                             message.append(cex.example2());
                             message.append("\n");
+                            if (!tle) {
+                                if (cex.timeout())
+                                    numTimeOut++;
+                                else numNonUnif++;
+                            }
+                            else numTle++;
                         }
                         if (Main.report_cex_stats) {
-                            if (Main.report_cex_stats_to_out)
-                                System.out.println("stage4:\n"
-                                        + (System.nanoTime() - start));
-                            else System.err.println("stage4: "
-                                    + (System.nanoTime() - start));
+                            long duration = System.nanoTime() - start;
+                            if (Main.report_cex_stats_to_out) {
+                                System.out.print("stage4");
+                                if (cex.unified())
+                                    System.out.print(" unif");
+                                else if (tle)
+                                    System.out.print(" tle");
+                                else if (cex.timeout())
+                                    System.out.print(" t/o");
+                                else System.out.print(" nonunif");
+                                System.out.println(":\n" + duration);
+                            }
+                            else System.err.println("stage4: " + duration);
+                            cumulativeCexTime += duration;
                         }
                     }
                     /* end CupEx extension */
+                    /* count the conflict */
+                    emit.num_conflicts++;
                 }
             }
         }
         message.append("\n  Resolved in favor of shifting.\n");
 
-        /* count the conflict */
-        emit.num_conflicts++;
         ErrorManager.getManager().emit_warning(message.toString());
+    }
+
+    protected static boolean cexTimeLimit() {
+        return cumulativeCexTime > 120000000000L;
+    }
+
+    protected static long cumulativeCexTime;
+    protected static int numUnif, numNonUnif, numTimeOut, numTle;
+
+    protected static void clearCexStats() {
+        cumulativeCexTime = 0;
+        numUnif = 0;
+        numNonUnif = 0;
+        numTimeOut = 0;
+        numTle = 0;
+    }
+
+    public static void report() {
+        System.out.println("numUnif:\n" + numUnif);
+        System.out.println("numNonUnif:\n" + numNonUnif);
+        System.out.println("numTimeOut:\n" + numTimeOut);
+        System.out.println("numTle:\n" + numTle);
     }
 
     /*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . .*/

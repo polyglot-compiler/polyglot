@@ -1,0 +1,26 @@
+//http://stackoverflow.com/questions/10031330/shift-reduce-conflicts-in-a-simple-grammar
+//(unamb)
+
+terminal A, B, C, D, SEP;
+
+non terminal items, items_nonempty, item;
+
+start with items;
+
+items          ::= /* empty */
+               | items_nonempty
+               ;
+
+items_nonempty ::= item
+               | items_nonempty SEP item
+               ;
+
+item           ::=       B
+               |       B       SEP D
+               |       B SEP C
+               |       B SEP C SEP D
+               | A SEP B
+               | A SEP B       SEP D
+               | A SEP B SEP C
+               | A SEP B SEP C SEP D
+               ;
