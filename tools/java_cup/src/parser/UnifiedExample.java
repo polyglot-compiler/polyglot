@@ -770,7 +770,6 @@ public class UnifiedExample {
      * - a shift depth, indicating the number of unreduced production steps
      *   that has been made from the original shift item.  This helps keep
      *   track of when the shift conflict item is reduced.
-     * @author Chinawat
      *
      */
     protected class SearchState implements Comparable<SearchState> {

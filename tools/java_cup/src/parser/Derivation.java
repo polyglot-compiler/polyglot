@@ -8,7 +8,6 @@ import java_cup.symbol;
  * A derivation consists of
  * - a symbol
  * - a list of derivations that derives the symbol
- * @author Chinawat
  *
  */
 class Derivation {

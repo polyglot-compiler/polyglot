@@ -3,7 +3,6 @@ package parser;
 /**
  * A representation of counterexamples for a parser conflict.
  * Each set of counterexamples might be unified, indicated by method unified().
- * @author Chinawat
  *
  */
 public class Counterexample {
