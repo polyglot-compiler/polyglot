@@ -83,7 +83,6 @@ public class StateItem {
      * A search state for previous item consists of a list of StateItems
      * indicating a sequence of transitions and production steps,
      * along with the required lookahead, which could be null.
-     * @author Chinawat
      *
      */
     protected static class SearchState {
