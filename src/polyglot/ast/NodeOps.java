@@ -13,12 +13,12 @@
  * This program and the accompanying materials are made available under
  * the terms of the Lesser GNU Public License v2.0 which accompanies this
  * distribution.
- * 
+ *
  * The development of the Polyglot project has been supported by a
  * number of funding sources, including DARPA Contract F30602-99-1-0533,
  * monitored by USAF Rome Laboratory, ONR Grants N00014-01-1-0968 and
  * N00014-09-1-0652, NSF Grants CNS-0208642, CNS-0430161, CCF-0133302,
- * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan 
+ * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan
  * Research Fellowship, and an Intel Research Ph.D. Fellowship.
  *
  * See README for contributors.
@@ -93,18 +93,18 @@ public interface NodeOps {
      * imperatively.  Use {@code addDecls} when leaving the node
      * for that.
      * @param c the current {@code Context}
-     * @return the {@code Context} to be used for visiting this node. 
+     * @return the {@code Context} to be used for visiting this node.
      */
     public Context enterScope(Context c);
 
     /**
-     * Push a new scope for visiting the child node {@code child}. 
+     * Push a new scope for visiting the child node {@code child}.
      * The default behavior is to delegate the call to the child node, and let
      * it add appropriate declarations that should be in scope. However,
      * this method gives parent nodes have the ability to modify this behavior.
      * @param child the child node about to be entered.
      * @param c the current {@code Context}
-     * @return the {@code Context} to be used for visiting node 
+     * @return the {@code Context} to be used for visiting node
      *           {@code child}
      */
     public Context enterChildScope(Node child, Context c);
@@ -305,9 +305,9 @@ public interface NodeOps {
      */
     Node exceptionCheck(ExceptionChecker ec) throws SemanticException;
 
-    /** 
+    /**
      * List of Types of exceptions that might get thrown.  The result is
-     * not necessarily correct until after type checking. 
+     * not necessarily correct until after type checking.
      */
     List<Type> throwTypes(TypeSystem ts);
 
@@ -337,6 +337,8 @@ public interface NodeOps {
      * @param rw The visitor.
      */
     Node extRewrite(ExtensionRewriter rw) throws SemanticException;
+
+    Node extRewriteOverride(ExtensionRewriter rw);
 
     /** Dump the AST for debugging. */
     @Deprecated
