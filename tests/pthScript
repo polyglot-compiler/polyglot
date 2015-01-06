@@ -88,6 +88,7 @@ polyglot.frontend.JLExtensionInfo "-d out -cp java-out" {
         ConformanceCheck7.jl (Semantic, "should be declared abstract");        
         packA/ConformanceCheck8.jl packB/ConformanceCheck8b.jl (Semantic, "should be declared abstract"); 
         ConformanceCheck9.jl ;         
+        ConformanceCheck10.jl packA/ConformanceCheck10a.jl packA/ConformanceCheck10b.jl; 
         packA/ProtectedAccess1.jl packB/ProtectedAccess2.jl (Semantic, "Method.*inaccessible");
         package1/ProtectedTest.jl package2/ProtectedTestBase.jl (Semantic, "Method.*inaccessible");
         package1/InnerClassAccess.jl package1/InnerClassProblem.jl ;
