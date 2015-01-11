@@ -2542,37 +2542,33 @@ public class TypeSystem_c implements TypeSystem {
 
     @Override
     public MethodInstance findImplementingMethod(ClassType ct, MethodInstance mi) {
-        ReferenceType curr = ct;
-        while (curr != null) {
-            List<? extends MethodInstance> possible =
-                    curr.methods(mi.name(), mi.formalTypes());
-            for (MethodInstance mj : possible) {
-                if (isAccessible(mi, ct) && isAccessible(mj, ct)
-                        || isAccessible(mi, mj.container().toClass())) {
-                    if (!mj.flags().isAbstract()) {
-                        // The method mj may be a suitable implementation of mi.
-                        // mj is not abstract, and either mj's container
-                        // can access mi (thus mj can really override mi), or
-                        // mi and mj are both accessible from ct (e.g.,
-                        // mi is declared in an interface that ct implements,
-                        // and mj is defined in a superclass of ct).
-                        return mj;
-                    }
-                    else if (curr == ct || curr == mi.container()) {
-                        // we've reached the definition of the abstract
-                        // method. We don't want to look higher in the
-                        // hierarchy; this is not an optimization, but is
-                        // required for correctness.
-                        return null;
-                    }
-                }
+        // Obtain a list of declared methods in ct.
+        List<? extends MethodInstance> declared =
+                ct.methods(mi.name(), mi.formalTypes());
+        for (MethodInstance mj : declared) {
+            if (mj.flags().isAbstract()) {
+                // We found a method that is declared abstract, so no
+                // implementation of mi can be found for ct.
+                return null;
             }
-
-            curr =
-                    curr.superType() == null ? null : curr.superType()
-                                                          .toReference();
+            if (mi.flags().isPublic() || mi.flags().isProtected()
+                    || isAccessible(mi, ct)) {
+                // If this method is implemented in ct and can override the
+                // desired method, we found an implementation.
+                return mj;
+            }
         }
-        return null;
+
+        // No method is declared and implemented in ct, so we must find an
+        // implementation of the method that is inherited from ct's superclass.
+        ClassType superClass =
+                ct.superType() == null ? null : ct.superType().toClass();
+        if (superClass == null) return null;
+
+        MethodInstance mj = findImplementingMethod(superClass, mi);
+        // Finally, check if mj is accessible from ct.
+        if (mj == null || !isAccessible(mj, ct)) return null;
+        return mj;
     }
 
     @Override
