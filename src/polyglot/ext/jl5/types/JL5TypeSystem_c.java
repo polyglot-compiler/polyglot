@@ -1168,12 +1168,7 @@ ParamTypeSystem_c<TypeVariable, ReferenceType> implements JL5TypeSystem {
     @Override
     public boolean areOverrideEquivalent(JL5ProcedureInstance mi, 
         JL5ProcedureInstance mj) {
-      //if (mj.flags().isPublic() || 
-       //   mj.flags().isProtected() ||
-        //  isAccessible(mj, mi.container(), mi.container(), false)) {
         return isSubSignature(mi, mj) || isSubSignature(mj, mi); 
-      //}                                                                                    
-      //return false;                                                                      
     }   
 
     @Override
@@ -1206,48 +1201,8 @@ ParamTypeSystem_c<TypeVariable, ReferenceType> implements JL5TypeSystem {
         else {
             throw new InternalCompilerError("Unexpected return type: " + ri);
         }
-    }
-
-    /*
-    @Override
-    public MethodInstance findImplementingMethod(ClassType ct, MethodInstance mi) {
-        ReferenceType curr = ct;
-        while (curr != null) {
-            List<? extends MethodInstance> possible =
-                    curr.methodsNamed(mi.name());
-            for (MethodInstance mj : possible) {
-                if (!mj.flags().isAbstract()
-                        && (isAccessible(mi, ct) && isAccessible(mj, ct) || isAccessible(mi,
-                                                                                         mj.container()
-                                                                                           .toClass()))) {
-                    // The method mj may be a suitable implementation of mi.
-                    // mj is not abstract, and either mj's container
-                    // can access mi (thus mj can really override mi), or
-                    // mi and mj are both accessible from ct (e.g.,
-                    // mi is declared in an interface that ct implements,
-                    // and mj is defined in a superclass of ct).
-                    if (areOverrideEquivalent((JL5MethodInstance) mi,
-                                              (JL5MethodInstance) mj)) {
-                        return mj;
-                    }
-                }
-            }
-            if (curr == mi.container()) {
-                // we've reached the definition of the abstract
-                // method. We don't want to look higher in the
-                // hierarchy; this is not an optimization, but is
-                // required for correctness.
-                break;
-            }
-
-            curr =
-                    curr.superType() == null ? null : curr.superType()
-                            .toReference();
-        }
-        return null;
-    }
-    */
-
+    } 
+    
     @Override
     public MethodInstance findImplementingMethod(ClassType ct, MethodInstance mi) {
         ReferenceType curr = ct;
