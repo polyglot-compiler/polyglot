@@ -65,7 +65,7 @@ import polyglot.visit.TypeBuilder;
 import polyglot.visit.TypeChecker;
 
 public class JL5ClassDeclExt extends JL5AnnotatedElementExt implements
-ClassDeclOps {
+        ClassDeclOps {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
     protected List<ParamTypeNode> paramTypes = new ArrayList<>();
@@ -161,10 +161,12 @@ ClassDeclOps {
     @Override
     public Node buildTypes(TypeBuilder tb) throws SemanticException {
         ClassDecl n = (ClassDecl) superLang().buildTypes(node(), tb);
+        JL5ParsedClassType ct = (JL5ParsedClassType) n.type();
+        if (ct == null) {
+            return n;
+        }
 
         JL5TypeSystem ts = (JL5TypeSystem) tb.typeSystem();
-        JL5ParsedClassType ct = (JL5ParsedClassType) n.type();
-
         MuPClass<TypeVariable, ReferenceType> pc =
                 ts.mutablePClass(ct.position());
         ct.setPClass(pc);
@@ -226,7 +228,7 @@ ClassDeclOps {
 
         if (ts.equals(ts.Object(), type) && !ext.paramTypes.isEmpty()) {
             throw new SemanticException("Type: " + type
-                                        + " cannot declare type variables.", n.position());
+                    + " cannot declare type variables.", n.position());
         }
 
         if (JL5Flags.isAnnotation(n.flags()) && n.flags().isPrivate()) {
@@ -368,7 +370,7 @@ ClassDeclOps {
     @Override
     public Node addDefaultConstructor(TypeSystem ts, NodeFactory nf,
             ConstructorInstance defaultConstructorInstance)
-                    throws SemanticException {
+            throws SemanticException {
         return superLang().addDefaultConstructor(node(),
                                                  ts,
                                                  nf,

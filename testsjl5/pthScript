@@ -413,6 +413,7 @@ polyglot.ext.jl5.JL5ExtensionInfo "-d out -classpath java-out -assert -noserial 
         WildCard03.jl5 (Post, "Xlint");
         WildCard04.jl5;
         WildCard05.jl5;
+        WildCard06.jl5; # TODO
         Wildcard1.jl5;
         wildcard2.jl5 (Semantic), (Semantic), (Semantic);
         wildcard2a.jl5;
@@ -426,6 +427,7 @@ polyglot.ext.jl5.JL5ExtensionInfo "-d out -classpath java-out -assert -noserial 
         wildcard7.jl5 (Semantic), (Semantic), (Semantic);
         wildcard7a.jl5;
         wildcard8.jl5 (Semantic);
+        wildcard9.jl5; # TODO
         wildcard10.jl5 (Semantic, "capture"), (Semantic, "capture"), (Semantic, "does not match"); 
         wildcard11.jl5 (Semantic, "capture"), (Semantic, "capture"), (Semantic, "does not match"), (Semantic, "does not match"), (Semantic, "does not match"); 
         wildcard12a.jl5(Semantic); 
@@ -828,6 +830,7 @@ polyglot.ext.jl5.JL5ExtensionInfo "-d out -classpath java-out -removeJava5isms -
         WildCard03.jl5;
         WildCard04.jl5;
         WildCard05.jl5;
+        WildCard06.jl5; # TODO
         Wildcard1.jl5;
         wildcard2.jl5 (Semantic), (Semantic), (Semantic);
         wildcard2a.jl5;
@@ -841,6 +844,7 @@ polyglot.ext.jl5.JL5ExtensionInfo "-d out -classpath java-out -removeJava5isms -
         wildcard7.jl5 (Semantic), (Semantic), (Semantic);
         wildcard7a.jl5;
         wildcard8.jl5 (Semantic);
+        wildcard9.jl5; # TODO
         wildcard10.jl5 (Semantic, "capture"), (Semantic, "capture"), (Semantic, "does not match"); 
         wildcard11.jl5 (Semantic, "capture"), (Semantic, "capture"), (Semantic, "does not match"), (Semantic, "does not match"), (Semantic, "does not match"); 
         wildcard12a.jl5(Semantic); 

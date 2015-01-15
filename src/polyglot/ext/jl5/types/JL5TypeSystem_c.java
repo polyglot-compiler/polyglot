@@ -85,7 +85,7 @@ import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
 
 public class JL5TypeSystem_c extends
-ParamTypeSystem_c<TypeVariable, ReferenceType> implements JL5TypeSystem {
+        ParamTypeSystem_c<TypeVariable, ReferenceType> implements JL5TypeSystem {
 
     protected ClassType ENUM_;
 
@@ -310,8 +310,8 @@ ParamTypeSystem_c<TypeVariable, ReferenceType> implements JL5TypeSystem {
         if (enumConstants.size() == 0) {
             throw new NoMemberException(JL5NoMemberException.ENUM_CONSTANT,
                                         "Enum Constant: \"" + name
-                                        + "\" not found in type \""
-                                        + container + "\".");
+                                                + "\" not found in type \""
+                                                + container + "\".");
         }
         Iterator<EnumInstance> i = enumConstants.iterator();
         EnumInstance ei = i.next();
@@ -320,8 +320,8 @@ ParamTypeSystem_c<TypeVariable, ReferenceType> implements JL5TypeSystem {
             EnumInstance ei2 = i.next();
 
             throw new SemanticException("Enum Constant \"" + name
-                                        + "\" is ambiguous; it is defined in both "
-                                        + ei.container() + " and " + ei2.container() + ".");
+                    + "\" is ambiguous; it is defined in both "
+                    + ei.container() + " and " + ei2.container() + ".");
         }
 
         if (currClass != null && !isAccessible(ei, currClass)
@@ -358,7 +358,7 @@ ParamTypeSystem_c<TypeVariable, ReferenceType> implements JL5TypeSystem {
     }
 
     public Set<EnumInstance> findEnumConstants(ReferenceType container,
-                                               String name) {
+            String name) {
         assert_(container);
         if (container == null) {
             throw new InternalCompilerError("Cannot access enum constant \""
@@ -594,9 +594,9 @@ ParamTypeSystem_c<TypeVariable, ReferenceType> implements JL5TypeSystem {
      */
     @Override
     protected List<? extends MethodInstance> findAcceptableMethods(
-                                                                   ReferenceType container, String name,
-                                                                   List<? extends Type> argTypes, ClassType currClass,
-                                                                   boolean fromClient) throws SemanticException {
+            ReferenceType container, String name,
+            List<? extends Type> argTypes, ClassType currClass,
+            boolean fromClient) throws SemanticException {
         return findAcceptableMethods(container,
                                      name,
                                      argTypes,
@@ -606,10 +606,10 @@ ParamTypeSystem_c<TypeVariable, ReferenceType> implements JL5TypeSystem {
     }
 
     protected List<? extends MethodInstance> findAcceptableMethods(
-                                                                   ReferenceType container, String name,
-                                                                   List<? extends Type> argTypes,
-                                                                   List<? extends ReferenceType> actualTypeArgs, ClassType currClass,
-                                                                   boolean fromClient) throws SemanticException {
+            ReferenceType container, String name,
+            List<? extends Type> argTypes,
+            List<? extends ReferenceType> actualTypeArgs, ClassType currClass,
+            boolean fromClient) throws SemanticException {
         return findAcceptableMethods(container,
                                      name,
                                      argTypes,
@@ -620,11 +620,11 @@ ParamTypeSystem_c<TypeVariable, ReferenceType> implements JL5TypeSystem {
     }
 
     protected List<? extends MethodInstance> findAcceptableMethods(
-                                                                   ReferenceType container, String name,
-                                                                   List<? extends Type> argTypes,
-                                                                   List<? extends ReferenceType> actualTypeArgs, ClassType currClass,
-                                                                   Type expectedReturnType, boolean fromClient)
-                                                                           throws SemanticException {
+            ReferenceType container, String name,
+            List<? extends Type> argTypes,
+            List<? extends ReferenceType> actualTypeArgs, ClassType currClass,
+            Type expectedReturnType, boolean fromClient)
+            throws SemanticException {
         assert_(container);
         assert_(argTypes);
 
@@ -684,7 +684,7 @@ ParamTypeSystem_c<TypeVariable, ReferenceType> implements JL5TypeSystem {
 
             @SuppressWarnings("unchecked")
             List<JL5MethodInstance> methods =
-            (List<JL5MethodInstance>) type.toReference().methods();
+                    (List<JL5MethodInstance>) type.toReference().methods();
             for (JL5MethodInstance mi : methods) {
                 if (Report.should_report(Report.types, 3))
                     Report.report(3, "Trying " + mi);
@@ -845,7 +845,7 @@ ParamTypeSystem_c<TypeVariable, ReferenceType> implements JL5TypeSystem {
         if (argTypes.size() != mi.formalTypes().size()) {
             // the actual args don't match the number of the formal args.
             if (!(mi.isVariableArity() && argTypes.size() >= mi.formalTypes()
-                    .size() - 1)) {
+                                                               .size() - 1)) {
                 // the last (variable) argument can consume 0 or more of the actual arguments.
                 return null;
             }
@@ -1076,7 +1076,7 @@ ParamTypeSystem_c<TypeVariable, ReferenceType> implements JL5TypeSystem {
 
     @Override
     protected Subst<TypeVariable, ReferenceType> substImpl(
-                                                           Map<TypeVariable, ? extends ReferenceType> substMap) {
+            Map<TypeVariable, ? extends ReferenceType> substMap) {
         return new JL5Subst_c(this, substMap);
     }
 
@@ -1236,7 +1236,7 @@ ParamTypeSystem_c<TypeVariable, ReferenceType> implements JL5TypeSystem {
 
             curr =
                     curr.superType() == null ? null : curr.superType()
-                            .toReference();
+                                                          .toReference();
         }
         return null;
     }
@@ -1286,10 +1286,10 @@ ParamTypeSystem_c<TypeVariable, ReferenceType> implements JL5TypeSystem {
                 }
                 if (!rt.isClass()) {
                     throw new InternalCompilerError("Don't know how to deal with erasure of intersection type "
-                            + it
-                            + ", specifcally component "
-                            + origRt,
-                            t.position());
+                                                            + it
+                                                            + ", specifcally component "
+                                                            + origRt,
+                                                    t.position());
                 }
                 ClassType next = (ClassType) rt;
                 if (equals(Object(), next)) continue;
@@ -1493,7 +1493,7 @@ ParamTypeSystem_c<TypeVariable, ReferenceType> implements JL5TypeSystem {
                     isImplicitCastValidChain(fromType,
                                              this.rawClass(toSubstCT.base(),
                                                            toSubstCT.base()
-                                                           .position()));
+                                                                    .position()));
             if (chain != null) {
                 // success!
                 chain.addLast(toType);
@@ -1675,7 +1675,7 @@ ParamTypeSystem_c<TypeVariable, ReferenceType> implements JL5TypeSystem {
                             && y instanceof JL5SubstClassType
                             && areProvablyDistinct((JL5SubstClassType) x,
                                                    (JL5SubstClassType) y)
-                                                   && erasureType(x).equals(erasureType(y))) {
+                            && erasureType(x).equals(erasureType(y))) {
                         return false;
                     }
                 }
@@ -1817,7 +1817,7 @@ ParamTypeSystem_c<TypeVariable, ReferenceType> implements JL5TypeSystem {
             java.lang.String name, List<? extends Type> argTypes,
             List<? extends ReferenceType> typeArgs, ClassType currClass,
             Type expectedReturnType, boolean fromClient)
-                    throws SemanticException {
+            throws SemanticException {
 
         assert_(container);
         assert_(argTypes);
@@ -1862,7 +1862,7 @@ ParamTypeSystem_c<TypeVariable, ReferenceType> implements JL5TypeSystem {
             }
 
             throw new SemanticException("Reference to " + name
-                                        + " is ambiguous, multiple methods match: " + sb.toString());
+                    + " is ambiguous, multiple methods match: " + sb.toString());
         }
 
         MethodInstance mi = maximal.iterator().next();
@@ -1909,9 +1909,9 @@ ParamTypeSystem_c<TypeVariable, ReferenceType> implements JL5TypeSystem {
         if (maximal.size() > 1) {
             throw new NoMemberException(NoMemberException.CONSTRUCTOR,
                                         "Reference to " + container
-                                        + " is ambiguous, multiple "
-                                        + "constructors match: "
-                                        + maximal);
+                                                + " is ambiguous, multiple "
+                                                + "constructors match: "
+                                                + maximal);
         }
 
         ConstructorInstance ci = maximal.iterator().next();
@@ -1920,8 +1920,8 @@ ParamTypeSystem_c<TypeVariable, ReferenceType> implements JL5TypeSystem {
 
     @Override
     protected List<? extends ConstructorInstance> findAcceptableConstructors(
-                                                                             ClassType container, List<? extends Type> argTypes,
-                                                                             ClassType currClass, boolean fromClient) throws SemanticException {
+            ClassType container, List<? extends Type> argTypes,
+            ClassType currClass, boolean fromClient) throws SemanticException {
         return this.findAcceptableConstructors(container,
                                                argTypes,
                                                Collections.<ReferenceType> emptyList(),
@@ -1935,9 +1935,9 @@ ParamTypeSystem_c<TypeVariable, ReferenceType> implements JL5TypeSystem {
      * @throws SemanticException
      */
     protected List<ConstructorInstance> findAcceptableConstructors(
-                                                                   ClassType container, List<? extends Type> argTypes,
-                                                                   List<? extends ReferenceType> actualTypeArgs, ClassType currClass,
-                                                                   boolean fromClient) throws SemanticException {
+            ClassType container, List<? extends Type> argTypes,
+            List<? extends ReferenceType> actualTypeArgs, ClassType currClass,
+            boolean fromClient) throws SemanticException {
         assert_(container);
         assert_(argTypes);
 
@@ -1956,11 +1956,11 @@ ParamTypeSystem_c<TypeVariable, ReferenceType> implements JL5TypeSystem {
 
         if (Report.should_report(Report.types, 2))
             Report.report(2, "Searching type " + container
-                          + " for constructor " + container + "("
-                          + listToString(argTypes) + ")");
+                    + " for constructor " + container + "("
+                    + listToString(argTypes) + ")");
         @SuppressWarnings("unchecked")
         List<JL5ConstructorInstance> constructors =
-        (List<JL5ConstructorInstance>) container.constructors();
+                (List<JL5ConstructorInstance>) container.constructors();
         for (JL5ConstructorInstance ci : constructors) {
             if (Report.should_report(Report.types, 3))
                 Report.report(3, "Trying " + ci);
@@ -1999,13 +1999,13 @@ ParamTypeSystem_c<TypeVariable, ReferenceType> implements JL5TypeSystem {
                                                           + " cannot be invoked with "
                                                           + (!actualTypeArgs.isEmpty()
                                                                   ? "type arguments <"
-                                                                  + listToString(actualTypeArgs)
-                                                                  + "> and "
+                                                                          + listToString(actualTypeArgs)
+                                                                          + "> and "
                                                                   : "")
-                                                                  + "arguments "
-                                                                  + "("
-                                                                  + listToString(argTypes)
-                                                                  + ").");
+                                                          + "arguments "
+                                                          + "("
+                                                          + listToString(argTypes)
+                                                          + ").");
                 }
             }
         }
@@ -2073,10 +2073,11 @@ ParamTypeSystem_c<TypeVariable, ReferenceType> implements JL5TypeSystem {
                 rt = ct;
             }
             if (isSubtype(rt, targetClass)) {
+                // Class and static members are accessible.
+                if (mi instanceof ClassType || flags.isStatic()) return true;
                 // In addition, for expressions of the form E.Id or E.Id(...),
                 // access is permitted iff the type of E is S or a subclass of S.
-                // (Deferred to typeCheck in Call_c.)
-                return true;
+                return !fromClient || isSubtype(container, rt);
             }
         }
 
@@ -2175,15 +2176,15 @@ ParamTypeSystem_c<TypeVariable, ReferenceType> implements JL5TypeSystem {
                                 && !wub.toClass().flags().isInterface()
                                 && substUpperBoundOfA.isClass()
                                 && !substUpperBoundOfA.toClass()
-                                .flags()
-                                .isInterface()) {
+                                                      .flags()
+                                                      .isInterface()) {
                             // check that wub is a subtype of substUpperBoundOfA, or vice versa
                             // JLS 3rd ed 5.1.10
                             if (!isSubtype(wub, substUpperBoundOfA)
                                     && !isSubtype(substUpperBoundOfA, wub)) {
                                 throw new SemanticException("Cannot capture convert "
-                                        + t,
-                                        pos);
+                                                                    + t,
+                                                            pos);
                             }
                         }
                     }
@@ -2434,7 +2435,7 @@ ParamTypeSystem_c<TypeVariable, ReferenceType> implements JL5TypeSystem {
      */
     @Override
     public List<TypeVariable> classAndEnclosingTypeVariables(
-                                                             JL5ParsedClassType ct) {
+            JL5ParsedClassType ct) {
         List<TypeVariable> l = new ArrayList<>();
         classAndEnclosingTypeVariables(ct, l);
         return l;
@@ -2523,8 +2524,8 @@ ParamTypeSystem_c<TypeVariable, ReferenceType> implements JL5TypeSystem {
         }
         else if (!isAnnotationValueConstant(value)) {
             throw new SemanticException("Annotation attribute value must be constant: "
-                    + value,
-                    value.position());
+                                                + value,
+                                        value.position());
         }
     }
 
@@ -2595,8 +2596,8 @@ ParamTypeSystem_c<TypeVariable, ReferenceType> implements JL5TypeSystem {
         if (annotations.size() == 0) {
             throw new NoMemberException(JL5NoMemberException.ANNOTATION,
                                         "Annotation: \"" + name
-                                        + "\" not found in type \""
-                                        + container + "\".");
+                                                + "\" not found in type \""
+                                                + container + "\".");
         }
         Iterator<AnnotationTypeElemInstance> i = annotations.iterator();
         AnnotationTypeElemInstance ai = i.next();
@@ -2605,8 +2606,8 @@ ParamTypeSystem_c<TypeVariable, ReferenceType> implements JL5TypeSystem {
             AnnotationTypeElemInstance ai2 = i.next();
 
             throw new SemanticException("Annotation \"" + name
-                                        + "\" is ambiguous; it is defined in both "
-                                        + ai.container() + " and " + ai2.container() + ".");
+                    + "\" is ambiguous; it is defined in both "
+                    + ai.container() + " and " + ai2.container() + ".");
         }
 
         if (currClass != null && !isAccessible(ai, currClass)
@@ -2617,7 +2618,7 @@ ParamTypeSystem_c<TypeVariable, ReferenceType> implements JL5TypeSystem {
     }
 
     public Set<AnnotationTypeElemInstance> findAnnotations(
-                                                           ReferenceType container, String name) {
+            ReferenceType container, String name) {
         assert_(container);
         if (container == null) {
             throw new InternalCompilerError("Cannot access annotation \""
@@ -2701,8 +2702,8 @@ ParamTypeSystem_c<TypeVariable, ReferenceType> implements JL5TypeSystem {
         }
         catch (SemanticException e) {
             throw new InternalCompilerError("Couldn't create class java.lang.Class<"
-                    + type + ">",
-                    e);
+                                                    + type + ">",
+                                            e);
         }
     }
 

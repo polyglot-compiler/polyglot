@@ -48,7 +48,7 @@ import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
 
 public class JL5MethodInstance_c extends MethodInstance_c implements
-JL5MethodInstance {
+        JL5MethodInstance {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
     protected List<TypeVariable> typeParams;
@@ -98,37 +98,32 @@ JL5MethodInstance {
     }
 
     @Override
-    public List<MethodInstance> implementedImpl(ReferenceType rt) {
+    protected List<MethodInstance> implementedImplAux(ReferenceType rt) {
         if (rt == null) {
             return Collections.<MethodInstance> emptyList();
         }
-        JL5TypeSystem ts = (JL5TypeSystem) typeSystem();
 
+        JL5TypeSystem ts = (JL5TypeSystem) typeSystem();
         List<MethodInstance> l = new LinkedList<>();
-        // add any method with the same name and formalTypes from
-        // rt
         for (MethodInstance mj : rt.methodsNamed(name)) {
             if (ts.areOverrideEquivalent(this, (JL5MethodInstance) mj)) {
                 l.add(mj);
             }
         }
 
-        List<? extends ReferenceType> ints = rt.interfaces();
-        for (ReferenceType rt2 : ints) {
-            l.addAll(implementedImpl(rt2));
-        }
-
-        Set<? extends Type> supers;
-        if (rt.isClass()) {
-            supers = ((JL5ClassType) rt).superclasses();
-        }
-        else {
-            supers = Collections.singleton(rt.superType());
-        }
+        Set<? extends Type> supers =
+                rt.isClass()
+                        ? ((JL5ClassType) rt).superclasses()
+                        : Collections.singleton(rt.superType());
         for (Type superType : supers) {
             if (superType != null && superType.isReference()) {
                 l.addAll(implementedImpl(superType.toReference()));
             }
+        }
+
+        List<? extends ReferenceType> ints = rt.interfaces();
+        for (ReferenceType rt2 : ints) {
+            l.addAll(implementedImplAux(rt2));
         }
 
         return l;
@@ -145,6 +140,7 @@ JL5MethodInstance {
     public boolean canOverrideImpl(MethodInstance mj_, boolean quiet)
             throws SemanticException {
         JL5MethodInstance mi = this;
+        String overridOrHid = mi.flags().isStatic() ? "hid" : "overrid";
         if (!(mj_ instanceof JL5MethodInstance)) {
             return false;
         }
@@ -154,8 +150,8 @@ JL5MethodInstance {
         if (!ts.isSubSignature(mi, mj)) {
             if (quiet) return false;
             throw new SemanticException(mi.signature() + " in "
-                    + mi.container() + " cannot override " + mj.signature()
-                    + " in " + mj.container()
+                    + mi.container() + " cannot " + overridOrHid + "e "
+                    + mj.signature() + " in " + mj.container()
                     + "; incompatible parameter types", mi.position());
         }
 
@@ -164,15 +160,10 @@ JL5MethodInstance {
             if (Report.should_report(Report.types, 3))
                 Report.report(3, mj.flags() + " final");
             if (quiet) return false;
-            throw new SemanticException(mi.signature()
-                                        + " in "
-                                        + mi.container()
-                                        + " cannot override "
-                                        + mj.signature()
-                                        + " in "
-                                        + mj.container()
-                                        + "; overridden method is final",
-                                        mi.position());
+            throw new SemanticException(mi.signature() + " in "
+                    + mi.container() + " cannot " + overridOrHid + "e "
+                    + mj.signature() + " in " + mj.container() + "; "
+                    + overridOrHid + "den method is final", mi.position());
         }
 
         // replace the type variables of mj with the type variables of mi
@@ -193,16 +184,18 @@ JL5MethodInstance {
                 Report.report(3, "return type " + miRet + " != " + mjRet);
             if (quiet) return false;
             throw new SemanticException(mi.signature()
-                                        + " in "
-                                        + mi.container()
-                                        + " cannot override "
-                                        + mj.signature()
-                                        + " in "
-                                        + mj.container()
-                                        + "; attempting to use incompatible "
-                                        + "return type\n" + "found: "
-                                        + miRet + "\n" + "required: "
-                                        + mjRet,
+                                                + " in "
+                                                + mi.container()
+                                                + " cannot "
+                                                + overridOrHid
+                                                + "e "
+                                                + mj.signature()
+                                                + " in "
+                                                + mj.container()
+                                                + "; attempting to use incompatible "
+                                                + "return type\n" + "found: "
+                                                + miRet + "\n" + "required: "
+                                                + mjRet,
                                         mi.position());
         }
 
@@ -212,18 +205,17 @@ JL5MethodInstance {
                               mi.throwTypes() + " not subset of "
                                       + mj.throwTypes());
             if (quiet) return false;
-            throw new SemanticException(mi.signature()
-                                        + " in "
-                                        + mi.container()
-                                        + " cannot override "
-                                        + mj.signature()
-                                        + " in "
-                                        + mj.container()
-                                        + "; the throw set "
-                                        + mi.throwTypes()
-                                        + " is not a subset of the "
-                                        + "overridden method's throw set "
-                                        + mj.throwTypes() + ".",
+            throw new SemanticException(mi.signature() + " in "
+                                                + mi.container() + " cannot "
+                                                + overridOrHid + "e "
+                                                + mj.signature() + " in "
+                                                + mj.container()
+                                                + "; the throw set "
+                                                + mi.throwTypes()
+                                                + " is not a subset of the "
+                                                + overridOrHid
+                                                + "den method's throw set "
+                                                + mj.throwTypes() + ".",
                                         mi.position());
         }
 
@@ -234,14 +226,16 @@ JL5MethodInstance {
                                       + mj.flags());
             if (quiet) return false;
             throw new SemanticException(mi.signature()
-                                        + " in "
-                                        + mi.container()
-                                        + " cannot override "
-                                        + mj.signature()
-                                        + " in "
-                                        + mj.container()
-                                        + "; attempting to assign weaker "
-                                        + "access privileges",
+                                                + " in "
+                                                + mi.container()
+                                                + " cannot "
+                                                + overridOrHid
+                                                + "e "
+                                                + mj.signature()
+                                                + " in "
+                                                + mj.container()
+                                                + "; attempting to assign weaker "
+                                                + "access privileges",
                                         mi.position());
         }
 
@@ -253,15 +247,19 @@ JL5MethodInstance {
                         + (mj.flags().isStatic() ? "" : "not") + " static");
             if (quiet) return false;
             throw new SemanticException(mi.signature()
-                                        + " in "
-                                        + mi.container()
-                                        + " cannot override "
-                                        + mj.signature()
-                                        + " in "
-                                        + mj.container()
-                                        + "; overridden method is "
-                                        + (mj.flags().isStatic()
-                                                ? "" : "not")
+                                                + " in "
+                                                + mi.container()
+                                                + " cannot "
+                                                + overridOrHid
+                                                + "e "
+                                                + mj.signature()
+                                                + " in "
+                                                + mj.container()
+                                                + "; "
+                                                + overridOrHid
+                                                + "den method is "
+                                                + (mj.flags().isStatic()
+                                                        ? "" : "not ")
                                                 + "static", mi.position());
         }
 
