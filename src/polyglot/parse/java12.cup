@@ -83,7 +83,7 @@ parser Grm extends BaseParser {:
     return l;
   }
   
-  protected void attachJavadoc(Documentable documentable, Pair<Integer, Integer> currPos, Pair<Integer, Integer> endPos) {
+  public void attachJavadoc(Documentable documentable, Pair<Integer, Integer> currPos, Pair<Integer, Integer> endPos) {
   	Integer index = positionToTokenIndexMap.get(currPos);
             		
 	if(index < 0 || index >= tokenStream.size())
