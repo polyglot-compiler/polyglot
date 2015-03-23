@@ -149,8 +149,15 @@ public class ClassDecl_c extends Term_c implements ClassDecl, ClassDeclOps {
     }
 
     @Override
-    public void javadoc(Javadoc javadoc) {
-        this.javadoc = javadoc;
+    public ClassDecl javadoc(Javadoc javadoc) {
+        return javadoc(this, javadoc);
+    }
+
+    protected <N extends ClassDecl_c> N javadoc(N n, Javadoc javadoc) {
+        if (n.javadoc == javadoc) return n;
+        n = copyIfNeeded(n);
+        n.javadoc = javadoc;
+        return n;
     }
 
     @Override

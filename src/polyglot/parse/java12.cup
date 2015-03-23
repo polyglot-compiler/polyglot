@@ -83,30 +83,38 @@ parser Grm extends BaseParser {:
     return l;
   }
   
-  public void attachJavadoc(Documentable documentable, Pair<Integer, Integer> currPos, Pair<Integer, Integer> endPos) {
+  public Documentable attachJavadoc(Documentable documentable, Pair<Integer, Integer> currPos, Pair<Integer, Integer> endPos) {
   	Integer index = positionToTokenIndexMap.get(currPos);
             		
 	if(index < 0 || index >= tokenStream.size())
-		return;
+		return documentable;
 	
 	Token token = tokenStream.get(index);
 	if(token == null)
-		return;
+		return documentable;
 	
-	while(token.getPosition().line() >= endPos.part1()) {
-		if(token.getPosition().line() == endPos.part1() && token.getPosition().column() <= endPos.part2())
+	int endLine = endPos.part1(), endCol = endPos.part2(); 
+	
+	while(true) {
+		Position currTokenPos = token.getPosition();
+		
+		if(currTokenPos.line() < endLine)
 			break;
 			
-		if(token instanceof JavadocToken) {
-			documentable.javadoc(nf.Javadoc(token.getPosition(), ((JavadocToken)token).getText()));
+		if(currTokenPos.line() == endLine && currTokenPos.column() <= endCol)
 			break;
-		}
+			
+		if(token instanceof JavadocToken)
+			return documentable.javadoc(nf.Javadoc(token.getPosition(), ((JavadocToken)token).getText()));
 		
 		if(index == 0)
 			break;
-		else	
-			token = tokenStream.get(--index);	
+			
+		index--;
+		token = tokenStream.get(index);	
 	}
+
+	return documentable;
   }
 :};
 
@@ -449,26 +457,33 @@ compilation_unit ::=
         package_declaration_opt:a
         import_declarations_opt:b
         type_declarations_opt:c
-            {:  if(c != null && c.size() > 0) {
-            	Pair<Integer, Integer> endPos = new Pair<>(0, 0);
+            {:  
+            	List<TopLevelDecl> c1 = new LinkedList<>();
             	
-            	if(b != null && b.size() > 0) {
-            		Position position = b.get(b.size()-1).position();
-            		endPos = new Pair<>(position.endLine(), position.endColumn());
+            	if(c != null && c.size() > 0) 
+            	{
+	            	Pair<Integer, Integer> endPos = new Pair<>(0, 0);
+	            	
+	            	if(b != null && b.size() > 0) {
+	            		Position position = b.get(b.size()-1).position();
+	            		endPos = new Pair<>(position.endLine(), position.endColumn());
+	            	}
+	            	else if(a != null) {
+	            		endPos = new Pair<>(a.position().endLine(), a.position().endColumn());
+	            	}
+	            		
+	            	for(TopLevelDecl topLevelDecl : c) {
+	            		Pair<Integer, Integer> currPos = new Pair<>(topLevelDecl.position().line(), topLevelDecl.position().column());
+	            		TopLevelDecl topLevelDeclWithJavadoc = (TopLevelDecl) parser.attachJavadoc(topLevelDecl, currPos, endPos);
+	            		c1.add(topLevelDeclWithJavadoc);
+	            		
+						endPos = new Pair<>(topLevelDecl.position().endLine(), topLevelDecl.position().endColumn());
+	            	}
             	}
-            	else if(a != null) {
-            		endPos = new Pair<>(a.position().endLine(), a.position().endColumn());
-            	}
-            		
-            	for(TopLevelDecl topLevelDecl : c) {
-            		Pair<Integer, Integer> currPos = new Pair<>(topLevelDecl.position().line(), topLevelDecl.position().column());
-            		parser.attachJavadoc((Documentable) topLevelDecl, currPos, endPos);
-					endPos = new Pair<>(topLevelDecl.position().endLine(), topLevelDecl.position().endColumn());
-            	}
-            }
             
-            RESULT = parser.nf.SourceFile(new Position(parser.lexer.path(), parser.lexer.file()),
-					     a, b, c); :}
+            	RESULT = parser.nf.SourceFile(new Position(parser.lexer.path(), parser.lexer.file()),
+					     a, b, c1); 
+			:}
     |   error
         type_declarations_opt:c
             {: RESULT = parser.nf.SourceFile(new Position(parser.lexer.path(), parser.lexer.file()),
@@ -634,18 +649,24 @@ interface_type_list ::=
 class_body ::=
                     // ClassBody
         LBRACE:n class_body_declarations_opt:a RBRACE:b
-            {: if(a != null && a.size() > 0) {
+            {: 
+            	List<ClassMember> a1 = new LinkedList<>();
+            	if(a != null && a.size() > 0) {
 	    	   		Pair<Integer, Integer> endPos = new Pair<>(n.getPosition().endLine(), n.getPosition().endColumn());
+	    	   		
 	    	   		for(ClassMember classMember : a) {
 						if(classMember instanceof Documentable) {
 	    					Pair<Integer, Integer> currPos = new Pair<>(classMember.position().line(), classMember.position().column());
-	    					parser.attachJavadoc((Documentable) classMember, currPos, endPos);
-	    				}	
+	    					ClassMember classMemberWithJavadoc = (ClassMember) parser.attachJavadoc((Documentable) classMember, currPos, endPos);
+	    					a1.add(classMemberWithJavadoc);
+	    				}
+	    				
 	    				endPos = new Pair<>(classMember.position().endLine(), classMember.position().endColumn());
 	    			}
 	    		}
             
-            	RESULT = parser.nf.ClassBody(parser.pos(n, b), a); :}
+            	RESULT = parser.nf.ClassBody(parser.pos(n, b), a1); 
+            :}
     ;
 class_body_declarations_opt ::=
                     // List of ClassMember
@@ -903,17 +924,23 @@ extends_interfaces ::=
 interface_body ::=
                     // ClassBody
         LBRACE:n interface_member_declarations_opt:a RBRACE:d
-            {: if(a != null && a.size() > 0) {
+            {: 
+            	List<ClassMember> a1 = new LinkedList<>();
+            	if(a != null && a.size() > 0) {
 	    	   		Pair<Integer, Integer> endPos = new Pair<>(n.getPosition().endLine(), n.getPosition().endColumn());
+	    	   		
 	    	   		for(ClassMember classMember : a) {
 						if(classMember instanceof Documentable) {
 	    					Pair<Integer, Integer> currPos = new Pair<>(classMember.position().line(), classMember.position().column());
-	    					parser.attachJavadoc((Documentable) classMember, currPos, endPos);
-	    				}	
+	    					ClassMember classMemberWithJavadoc = (ClassMember) parser.attachJavadoc((Documentable) classMember, currPos, endPos);
+	    					a1.add(classMemberWithJavadoc);
+	    				}
+	    					
 	    				endPos = new Pair<>(classMember.position().endLine(), classMember.position().endColumn());
 	    			}
 	    		}
-            	RESULT = parser.nf.ClassBody(parser.pos(n, d), a); :}
+            	RESULT = parser.nf.ClassBody(parser.pos(n, d), a1); 
+            :}
     ;
 interface_member_declarations_opt ::=
                     // List of ClassMember

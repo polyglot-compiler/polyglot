@@ -267,8 +267,15 @@ public abstract class ProcedureDecl_c extends Term_c implements ProcedureDecl,
         }
     }
 
-	@Override
-	public void javadoc(Javadoc javadoc) {
-		this.javadoc = javadoc;
-	}
+    @Override
+    public ProcedureDecl javadoc(Javadoc javadoc) {
+        return javadoc(this, javadoc);
+    }
+
+    protected <N extends ProcedureDecl_c> N javadoc(N n, Javadoc javadoc) {
+        if (n.javadoc == javadoc) return n;
+        n = copyIfNeeded(n);
+        n.javadoc = javadoc;
+        return n;
+    }
 }

@@ -572,8 +572,16 @@ public class FieldDecl_c extends Term_c implements FieldDecl {
                             this.init);
     }
 
-	@Override
-	public void javadoc(Javadoc javadoc) {
-		this.javadoc = javadoc;
-	}
+    @Override
+    public FieldDecl javadoc(Javadoc javadoc) {
+        return javadoc(this, javadoc);
+    }
+
+    protected <N extends FieldDecl_c> N javadoc(N n, Javadoc javadoc) {
+        if (n.javadoc == javadoc)
+            return n;
+        n = copyIfNeeded(n);
+        n.javadoc = javadoc;
+        return n;
+    }
 }

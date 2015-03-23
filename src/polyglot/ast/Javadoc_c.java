@@ -32,23 +32,23 @@ import polyglot.util.SerialVersionUID;
 import polyglot.visit.PrettyPrinter;
 
 public class Javadoc_c extends Node_c implements Javadoc {
-	private static final long serialVersionUID = SerialVersionUID.generate();
+    private static final long serialVersionUID = SerialVersionUID.generate();
 
-	private String text;
+    private String text;
 
-	public Javadoc_c(Position pos, String text) {
-		super(pos, null);
-		this.text = text;
-	}
+    public Javadoc_c(Position pos, String text) {
+        super(pos, null);
+        this.text = text;
+    }
 
-	@Override
-	public void prettyPrint(CodeWriter w, PrettyPrinter pp) {
-		w.write(text.replaceAll("\n\t", "\n    "));
-		w.newline();
-	}
+    @Override
+    public void prettyPrint(CodeWriter w, PrettyPrinter pp) {
+        w.write(text);
+        w.newline();
+    }
 
-	@Override
-	public String getText() {
-		return text;
-	}
+    @Override
+    public String getText() {
+        return text;
+    }
 }

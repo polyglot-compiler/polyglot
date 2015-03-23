@@ -439,8 +439,9 @@ public class AnnotationElemDecl_c extends Term_c implements AnnotationElemDecl {
         return this.annotationElemInstance();
     }
 
-	@Override
-	public void javadoc(Javadoc javadoc) {
-		// No need to attach javadoc to an annotation
-	}
+    @Override
+    public AnnotationElemDecl javadoc(Javadoc javadoc) {
+        // No need to attach javadoc to an annotation
+        return this;
+    }
 }
