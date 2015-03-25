@@ -1,0 +1,322 @@
+
+terminal UNSIGNED_INT, UNSIGNED_REAL, STRING, IDENTIFIER;
+terminal NE, LE, GE, BECOMES, DIV, MOD, NIL, IN, OR, AND, NOT, DOTDOT;
+terminal IF, THEN, ELSE, CASE, OF, REPEAT, UNTIL, WHILE, DO, FOR, TO, DOWNTO;
+terminal SBEGIN, END, WITH, GOTO, CONST, VAR, TYPE, ARRAY, RECORD, SET, SFILE, FUNCTION;
+terminal PROCEDURE, LABEL, PACKED, PROGRAM;
+
+terminal LPAREN, RPAREN, LBRACK, RBRACK, DOT, COMMA, TIMES, PLUS, MINUS,
+LT, GT, XOR, COLON, SEMICOLON, EQ;
+
+non terminal program, external_files, block, opt_declarations, declarations,
+declaration, label_dcl_part, labels, label, const_dcl_part, const_defs,
+const_def, constant, unsigned_num, type_dcl_part, type_defs, type_def, type,
+simple_type, struct_type, index_t_list, field_list, fixed_part, record_section,
+variant_part, tag_field, variants, variant, var_dcl_part, variable_dcls,
+variable_dcl, newident_list, new_id_list, proc_dcl_part, proc_or_func,
+proc_heading, func_heading, function_form, body, formal_params, formal_p_sects,
+formal_p_sect, param_group, paramtype, index_specs, index_spec, statement_part,
+compound_stmt, statements, statement, direction, COLONment, procedure_call,
+actual_params, actuals_list, actual_param, colon_things, case_list,
+case_list_elem, case_label_list, case_label, rec_var_list, expression,
+relational_op, simple_expr, add_op, term, mult_op, factor, unsigned_lit, set,
+member_list, members, member, variable, expressions, record_var, ident,
+newident;
+
+start with program;
+
+program		::= PROGRAM  newident external_files SEMICOLON 
+			block DOT
+		;
+external_files  ::= 
+		| LPAREN  newident_list RPAREN
+		;
+
+block		::= opt_declarations  statement_part
+		;
+opt_declarations::= 
+		| declarations
+		;
+declarations	::= declarations declaration	
+		| declaration
+		;
+declaration	::= label_dcl_part
+		| const_dcl_part
+		| type_dcl_part
+		| var_dcl_part
+		| proc_dcl_part
+		;
+
+label_dcl_part	::= LABEL labels SEMICOLON
+		;
+labels		::= labels COMMA label
+		| label
+		;
+label		::= UNSIGNED_INT		
+		;
+
+const_dcl_part	::= CONST const_defs SEMICOLON
+		;
+const_defs	::= const_defs SEMICOLON const_def
+		| const_def
+		;
+const_def	::=  newident EQ constant
+		;
+
+constant	::= unsigned_num
+		| PLUS unsigned_num
+		| MINUS unsigned_num
+		| ident				
+		| PLUS ident
+		| MINUS ident
+		| STRING			
+		;
+
+unsigned_num	::= UNSIGNED_INT
+		| UNSIGNED_REAL
+		;
+
+type_dcl_part	::= TYPE type_defs SEMICOLON
+		;
+type_defs	::= type_defs SEMICOLON type_def
+		| type_def
+		;
+type_def	::=  newident EQ type
+		;
+
+type		::= simple_type
+		| PACKED struct_type
+		| struct_type
+		| XOR IDENTIFIER    
+		;
+
+simple_type	::= LPAREN  newident_list RPAREN
+		| constant DOTDOT constant
+		| ident
+		;
+
+struct_type	::= ARRAY LBRACK index_t_list RBRACK OF type
+		| RECORD  field_list END
+		| SET OF simple_type
+		| SFILE OF type
+		;
+index_t_list	::= index_t_list COMMA simple_type
+		| simple_type
+		;
+field_list	::= fixed_part
+		| fixed_part SEMICOLON variant_part
+		| variant_part
+		;
+fixed_part	::= fixed_part SEMICOLON record_section
+		| record_section
+		;
+record_section	::=  newident_list COLON type
+		| 
+		;
+variant_part	::= CASE  tag_field OF variants
+		;
+tag_field	::= newident COLON ident 
+		| ident 
+		;
+variants	::= variants SEMICOLON variant
+		| variant
+		;
+variant		::= case_label_list COLON LPAREN field_list RPAREN
+		| 
+		;
+
+var_dcl_part	::= VAR variable_dcls SEMICOLON
+		;
+variable_dcls	::= variable_dcls SEMICOLON variable_dcl
+		| variable_dcl
+		;
+variable_dcl	::=  newident_list COLON type
+		;
+newident_list	::= new_id_list 
+		;
+new_id_list	::= new_id_list COMMA newident
+		| newident
+		;
+
+proc_dcl_part	::= proc_or_func
+		;
+proc_or_func	::= proc_heading SEMICOLON body SEMICOLON     
+			
+		| func_heading SEMICOLON body SEMICOLON  
+			
+		;
+proc_heading	::= PROCEDURE
+			
+		  newident 
+			formal_params
+		;
+func_heading	::= FUNCTION
+			
+		  newident 
+			function_form
+		;
+function_form	::= 			
+		| formal_params COLON ident
+		;
+
+body		::= block
+			
+		| IDENTIFIER				
+		;
+formal_params	::= 
+		| LPAREN  formal_p_sects RPAREN 
+		;
+formal_p_sects	::= formal_p_sects SEMICOLON formal_p_sect
+		| formal_p_sect
+		;
+formal_p_sect	::=  param_group
+		| VAR  param_group
+		|  proc_heading
+			
+		|  func_heading  
+		;
+param_group	::= newident_list COLON paramtype
+		;
+paramtype	::= ident
+		| ARRAY LBRACK index_specs RBRACK OF paramtype
+		| PACKED ARRAY LBRACK index_spec RBRACK OF ident
+		;
+index_specs	::= index_specs SEMICOLON index_spec
+		| index_spec
+		;
+index_spec	::=  newident DOTDOT newident COLON ident
+		;
+
+statement_part	::= compound_stmt
+		;
+compound_stmt	::= SBEGIN statements END
+		;
+statements	::= statements SEMICOLON statement
+		| statement
+		;
+statement	::= 
+		| label COLON statement
+		| compound_stmt
+		| COLONment
+		| procedure_call
+		| GOTO label
+		| IF expression THEN statement ELSE statement
+		| CASE expression OF case_list END
+		| WHILE expression DO statement
+		| REPEAT statements UNTIL expression
+		| FOR ident BECOMES expression direction expression DO statement
+		| WITH rec_var_list DO statement 
+		;
+direction	::= TO
+		| DOWNTO
+		;
+
+COLONment	::= variable BECOMES expression	
+	
+		;
+
+procedure_call	::= ident actual_params
+		;
+
+actual_params	::=  
+		| LPAREN actuals_list RPAREN
+		;
+actuals_list	::= actuals_list COMMA actual_param
+		| actual_param
+		;
+actual_param	::= expression    
+		| expression colon_things  
+		;
+colon_things    ::= COLON expression	
+		| COLON expression COLON expression 
+		;
+
+case_list	::= case_list SEMICOLON case_list_elem
+		| case_list_elem
+		;
+case_list_elem	::= case_label_list COLON statement
+		| 
+		;
+case_label_list	::= case_label_list COMMA case_label
+		| case_label
+		;
+case_label	::= constant
+		;
+
+rec_var_list	::= rec_var_list COMMA record_var
+		| record_var
+		;
+
+expression	::= simple_expr
+		| simple_expr relational_op simple_expr
+		;
+relational_op	::= EQ
+		| LT
+		| GT
+		| LE
+		| GE
+		| NE
+		| IN
+		;
+
+simple_expr	::= term
+		| PLUS term
+		| MINUS term
+		| simple_expr add_op term
+		;
+add_op		::= PLUS
+		| MINUS
+		| OR
+		;
+
+term		::= factor
+		| term mult_op factor
+		;
+mult_op		::= TIMES
+		| DIV
+		| MOD
+		| AND
+		;
+
+factor		::= variable		
+		| unsigned_lit
+		| LPAREN expression RPAREN
+	
+		| set
+		| NOT factor
+		;
+
+unsigned_lit	::= unsigned_num
+		| STRING			
+		| NIL
+		;
+
+
+set		::= LBRACK member_list RBRACK
+		;
+member_list	::= 
+		| members
+		;
+members		::= members COMMA member
+		| member
+		;
+member		::= expression
+		| expression DOTDOT expression
+		;
+
+
+variable	::= ident actual_params	
+		| variable LBRACK expressions RBRACK
+		| variable DOT ident
+		| variable XOR
+		;
+expressions	::= expressions COMMA expression
+		| expression
+		;
+record_var	::= variable
+		;
+ident		::= IDENTIFIER
+		;
+newident	::= IDENTIFIER
+		    
+		;

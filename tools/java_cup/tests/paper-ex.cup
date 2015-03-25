@@ -1,0 +1,12 @@
+terminal IF, THEN, ELSE, COLON, ARR, LBRACK, RBRACK, ASSIGN, PLUS, DIGIT;
+
+non terminal stmt, expr, num;
+
+start with stmt;
+
+stmt ::= IF expr THEN stmt ELSE stmt
+	| IF expr THEN stmt
+	| expr COLON stmt stmt
+	| ARR LBRACK expr RBRACK ASSIGN expr;
+expr ::= num | expr PLUS expr;
+num ::= DIGIT | num DIGIT;

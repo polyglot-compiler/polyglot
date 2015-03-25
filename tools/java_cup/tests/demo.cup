@@ -1,0 +1,5 @@
+terminal Token SKIP, TRY, ELSE;
+
+non terminal stmt;
+
+stmt ::= TRY stmt ELSE stmt | TRY stmt | SKIP;

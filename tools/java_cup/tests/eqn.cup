@@ -110,3 +110,14 @@ Definition ::= VAR LPAREN Formals RPAREN EQUALS Expr
 Formals ::= VAR                    
      | Formals COMMA VAR      
      ;
+
+/*
+Conflict:
+Atom ::= VAR (*)
+Unop ::= VAR (*) LPAREN Exprs RPAREN
+LPAREN
+Example:
+VAR LPAREN Expr RPAREN
+[Unop ::= [LFactor ::= [LFactor ::= [Atom ::= VAR (*)]] [Atom::= LPAREN Expr RPAREN]]]
+[Unop ::= VAR (*) LPAREN [Exprs ::= Expr] RPAREN]
+*/

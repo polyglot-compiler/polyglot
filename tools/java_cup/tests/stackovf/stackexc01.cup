@@ -1,0 +1,11 @@
+//http://math.stackexchange.com/questions/297721/determining-ambiguity-in-context-free-grammars
+//(amb)
+
+terminal Token z, o, l, r;
+
+non terminal S, E;
+
+start with S;
+
+S ::= S l E r | E;
+E ::= l S r E | z | o |;

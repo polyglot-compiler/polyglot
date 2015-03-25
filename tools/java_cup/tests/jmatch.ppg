@@ -1,0 +1,1425 @@
+include "java12.cup"
+
+package polyglot.ext.jmatch.parse;
+
+import polyglot.util.*;
+
+import polyglot.ext.jmatch.ast.*;
+import polyglot.ext.jmatch.types.*;
+import polyglot.ext.jmatch.extension.*;
+
+import polyglot.ext.jmatch.parse.Name;
+
+parser Grm extends polyglot.parse.BaseParser {:
+
+  public Grm( Lexer l, JMatchTypeSystem t, JMatchNodeFactory n,
+      ErrorQueue q ) {
+    super(l,t,n,q);
+  }
+
+  public void syntax_error( Symbol current ) {
+    Position p = ((Token)current.value).getPosition();
+
+    if ( current.sym == sym.EOF ) {
+      report_error( "Unexpected end of file.", p );
+    } else {
+      report_error( "Syntax error.", p );
+    }
+  }
+
+  public void report_error( String message, Object info ) {
+    if ( info instanceof Position ) {
+      eq.enqueue( ErrorInfo.SYNTAX_ERROR, message, (Position)info );
+    } else {
+      eq.enqueue( ErrorInfo.SYNTAX_ERROR, message );
+    }
+  }
+
+  public JMatchNodeFactory jmnf() {
+    return (JMatchNodeFactory)nf;
+  }
+
+  public Multiplicity singular() {
+    return ((JMatchTypeSystem)ts).Singular();
+  }
+
+  public Multiplicity multiple() {
+    return ((JMatchTypeSystem)ts).Multiple();
+  }
+
+  static class Declarator {
+    Position pos;
+    String name;
+    int dims;
+    Expr init;
+
+    Declarator( Position pos, String name ) {
+      this.pos = pos;
+      this.name = name;
+      this.dims = 0;
+      this.init = null;
+    }
+  }
+
+  protected Position posForObject(Object o) {
+      if (o instanceof Name) {
+          return pos ((Name) o);
+      }
+      return super.posForObject(o);
+  }
+
+  public static Position pos( Name n ) {
+    return n == null ? null : n.pos;
+  }
+
+  public static Position pos( Declarator d ) {
+    return d == null ? null : d.pos;
+  }
+
+  public Position pos() {
+    return new Position( lexer.file() );
+  }
+
+  /**
+   * Replaces all extension nodes in the subtree rooted at t with copies of
+   * ext.
+   **/
+  public AmbTypeNode replaceExts( AmbTypeNode t, JMatch ext ) {
+    AmbQualifierNode qual = (AmbQualifierNode)t.qual();
+    t = (AmbTypeNode)t.ext( (JMatch)ext.copy() );
+
+    if ( qual == null ) {
+      return t;
+    }
+    return (AmbTypeNode)t.qual( replaceExts(qual, ext) );
+  }
+
+  /**
+   * Replaces all extension nodes in the subtree rooted at q with copies of
+   * ext.
+   **/
+  public AmbQualifierNode replaceExts( AmbQualifierNode q, JMatch ext ) {
+    Position pos = q.position();
+    AmbQualifierNode qual = (AmbQualifierNode)q.qual();
+    String name = q.name();
+
+    AmbQualifierNode result = q;
+
+    if ( qual != null ) {
+      result = nf.AmbQualifierNode( pos, replaceExts(qual, ext), name );
+    }
+
+    return (AmbQualifierNode)result.ext( (JMatch)ext.copy() );
+  }
+:};
+
+
+terminal Token AS;
+terminal Token COND;
+terminal Token CUT;
+terminal Token EXISTS;
+terminal Token FORALL;
+terminal Token FOREACH;
+terminal Token LET;
+terminal Token ITERATE;
+terminal Token ITERATES;
+terminal Token RESUME;
+terminal Token RETURNS;
+terminal Token TRAP;
+terminal Token TRAPS;
+terminal Token UNDERSCORE;
+terminal Token WHERE;
+terminal Token WITH;
+terminal Token YIELD;
+
+
+non terminal Grm.Declarator variable_declarator, variable_declarator_id;
+non terminal JMatchSwitch switch_statement;
+non terminal JMatchCase switch_label;
+non terminal Expr method_invocation;
+non terminal Expr instanceof_expression;
+
+
+// JMatch extensions
+non terminal Iterate iterate_expression;
+non terminal PredConstructorDecl predicate_constructor_declaration;
+non terminal List predicate_constructor_implementations;
+non terminal PredDecl predicate_declaration;
+non terminal PredDecl abstract_predicate_declaration;
+non terminal PredDecl predicate_header;
+non terminal List catches_no_semi;
+non terminal Trap trap_clause;
+non terminal List default_trap_clause;
+non terminal List traps_opt;
+non terminal List predicate_body;
+non terminal List predicate_body_;
+non terminal List predicate_implementations;
+non terminal List default_predicate_implementation_opt;
+non terminal List default_predicate_implementation;
+non terminal List abstract_predicate_modes;
+non terminal List predicate_modes;
+non terminal List predicate_mode_list;
+non terminal List unknown_lists;
+non terminal Object[] unknown_list;
+non terminal Object[] non_empty_unknown_list;
+non terminal Expr predicate_fmla_impl_body;
+non terminal Block predicate_iter_impl_body;
+non terminal Foreach foreach_statement;
+non terminal Foreach foreach_statement_no_short_if;
+non terminal Let let_statement;
+non terminal Cond cond_statement;
+non terminal List conditions;
+non terminal List expression_list;
+non terminal List case_list;
+non terminal Receiver case;
+non terminal Yield yield_statement;
+non terminal Resume resume_statement;
+non terminal List trap_clauses_opt;
+non terminal List trap_clauses_or_semi;
+non terminal List trap_clauses;
+non terminal List trap_clauses_no_semi;
+non terminal Node with_clause;
+
+// JMatch ambiguous productions
+non terminal Expr formula;
+
+// declared for precedence rules
+terminal STMT;
+
+// shift/reduce conflict resolution
+precedence nonassoc STMT;
+precedence nonassoc ELSE;  // ELSE has higher precedence
+
+start with goal;
+
+
+
+
+/**
+ * Use Grm.Declarator rather than VarDeclarator.
+ **/
+drop {
+  variable_declarators ::=
+      variable_declarator
+    ;
+}
+
+extend
+variable_declarators ::=
+  // Grm.Declarator
+    variable_declarator:a {:
+      List l = new TypedList( new LinkedList(), Grm.Declarator.class, false );
+      l.add(a);
+      RESULT = l;
+    :}
+  ;
+
+drop {
+  variable_declarator ::=
+      variable_declarator_id
+    | variable_declarator_id EQ variable_initializer
+    ;
+}
+
+variable_declarator ::=
+  // Grm.Declarator
+    variable_declarator_id:a {:
+      RESULT = a;
+    :}
+  | variable_declarator_id:a EQ variable_initializer:b {:
+      RESULT = a;
+      a.init = b;
+    :}
+  ;
+
+drop {
+  variable_declarator_id ::=
+      IDENTIFIER
+    | variable_declarator_id LBRACK RBRACK
+    ;
+}
+
+variable_declarator_id ::=
+  // Grm.Declarator
+    IDENTIFIER:a {:
+      RESULT = new Grm.Declarator( parser.pos(a), a.getIdentifier() );
+    :}
+  | variable_declarator_id:a LBRACK RBRACK {:
+      a.dims++;
+      RESULT = a;
+    :}
+  ;
+
+override
+field_declaration ::=
+  // List of ClassMember
+    modifiers_opt:a type:b variable_declarators:c SEMICOLON {:
+      List l = new TypedList( new LinkedList(), ClassMember.class, false );
+      for ( Iterator it = c.iterator(); it.hasNext(); ) {
+        Grm.Declarator d = (Grm.Declarator)it.next();
+	l.add( parser.nf.FieldDecl( parser.pos(b), a, parser.array(b, d.dims),
+	    d.name, d.init ) );
+      }
+
+      RESULT = l;
+    :}
+  ;
+
+
+/**
+ * JMatch statements.
+ **/
+extend
+statement ::=
+  // Stmt
+    foreach_statement:a {:
+      RESULT = a;
+    :}
+  | resume_statement:a {:
+      RESULT = a;
+    :}
+  ;
+
+extend
+statement_no_short_if ::=
+  // Stmt
+    foreach_statement_no_short_if:a {:
+      RESULT = a;
+    :}
+  ;
+
+extend
+statement_without_trailing_substatement ::=
+  // Stmt
+    let_statement:a {:
+      RESULT = a;
+    :}
+  | cond_statement:a {:
+      RESULT = a;
+    :}
+  | yield_statement:a {:
+      RESULT = a;
+    :}
+  ;
+
+override
+catches_opt ::=
+  // List of Catch
+    {:
+      RESULT = new TypedList(new LinkedList(), Catch.class, false);
+    :}
+  | catches_no_semi:a {:
+      RESULT = a;
+    :}
+  ;
+
+override
+catches ::=
+  // List of Catch
+    catch_clause:a {:
+      List l = new TypedList(new LinkedList(), Catch.class, false);
+      l.add(a);
+      RESULT = l;
+    :}
+    trap_clause:a {:
+      List l = new TypedList(new LinkedList(), Catch.class, false);
+      l.add(a);
+      RESULT = l;
+    :}
+  | default_trap_clause:a SEMICOLON {:
+      List l = new TypedList(new LinkedList(), Catch.class, false);
+      l.addAll(a);
+      RESULT = l;
+    :}
+  | catches_no_semi:a catch_clause:b {:
+      RESULT = a;
+      a.add(b);
+    :}
+  | catches_no_semi:a trap_clause:b {:
+      RESULT = a;
+      a.add(b);
+    :}
+  | catches_no_semi:a default_trap_clause:b SEMICOLON {:
+      RESULT = a;
+      a.add(b);
+    :}
+  ;
+
+catches_no_semi ::=
+  // List of Catch
+    catch_clause:a {:
+      List l = new TypedList(new LinkedList(), Catch.class, false);
+      l.add(a);
+      RESULT = l;
+    :}
+    trap_clause:a {:
+      List l = new TypedList(new LinkedList(), Catch.class, false);
+      l.add(a);
+      RESULT = l;
+    :}
+  | default_trap_clause:a {:
+      List l = new TypedList(new LinkedList(), Catch.class, false);
+      l.addAll(a);
+      RESULT = l;
+    :}
+  | catches_no_semi:a catch_clause:b {:
+      RESULT = a;
+      a.add(b);
+    :}
+  | catches_no_semi:a trap_clause:b {:
+      RESULT = a;
+      a.add(b);
+    :}
+  | catches_no_semi:a default_trap_clause:b {:
+      RESULT = a;
+      a.add(b);
+    :}
+  ;
+
+extend
+catch_clause ::=
+  // Catch
+    CATCH:n LPAREN type:a RPAREN block:b {:
+      RESULT =
+	parser.nf.Catch(parser.pos(n),
+	  parser.nf.Formal(parser.pos(a), Flags.NONE, parser.array(a, 0),
+	    UniqueID.newID("t")), b);
+    :}
+  ;
+
+trap_clause ::=
+  // Trap
+    TRAP:n LPAREN type:a RPAREN block:b {:
+      RESULT =
+	parser.jmnf().Trap(parser.pos(n),
+	  parser.nf.Formal(parser.pos(a), Flags.NONE, parser.array(a, 0),
+	    UniqueID.newID("t")), b);
+    :}
+  | TRAP:n LPAREN formal_parameter:a RPAREN block:b {:
+      RESULT =
+	parser.jmnf().Trap(parser.pos(n), a, b);
+    :}
+  ;
+
+default_trap_clause ::=
+  // List of Trap
+    TRAP:n class_type_list:a {:
+      Block body = (Block)parser.jmnf().qq().parseStmt("{ throw new "
+	+ "java.lang.IllegalStateException(); }");
+      List l = new TypedList(new LinkedList(), Trap.class, false);
+      for (Iterator it = a.iterator(); it.hasNext(); ) {
+	TypeNode tn = (TypeNode)it.next();
+	l.add(parser.jmnf().Trap(parser.pos(n),
+	  parser.nf.Formal(parser.pos(tn), Flags.NONE, parser.array(tn, 0),
+	    UniqueID.newID("t")), body));
+      }
+      RESULT = l;
+    :}
+  ;
+
+resume_statement ::=
+  // Resume
+    RESUME:n BREAK SEMICOLON {:
+      RESULT = parser.jmnf().ResumeBreak(parser.pos(n));
+    :}
+  | RESUME:n BREAK trap_clauses:a {:
+      RESULT = parser.jmnf().ResumeBreak(parser.pos(n), a);
+    :}
+  | RESUME:n CONTINUE SEMICOLON {:
+      RESULT = parser.jmnf().ResumeContinue(parser.pos(n));
+    :}
+  | RESUME:n CONTINUE trap_clauses:a {:
+      RESULT = parser.jmnf().ResumeContinue(parser.pos(n), a);
+    :}
+  | RESUME:n SEMICOLON {:
+      RESULT = parser.jmnf().ResumeWith(parser.pos(n));
+    :}
+  | RESUME:n trap_clauses:a {:
+      RESULT = parser.jmnf().ResumeWith(parser.pos(n), a);
+    :}
+  | RESUME:n WITH block:a trap_clauses_opt:b {:
+      RESULT = parser.jmnf().ResumeWith(parser.pos(n), a, b);
+    :}
+  | RESUME:n WITH LPAREN formula:a RPAREN trap_clauses_or_semi:b {:
+      RESULT = parser.jmnf().ResumeWith(parser.pos(n), a, b);
+    :}
+  ;
+
+trap_clauses_or_semi ::=
+  // List of Trap
+    SEMICOLON {:
+      RESULT = new TypedList(new LinkedList(), Trap.class, false);
+    :}
+  | trap_clauses:a {:
+      RESULT = a;
+    :}
+  ;
+
+trap_clauses_opt ::=
+  // List of Trap
+    {:
+      RESULT = new TypedList(new LinkedList(), Trap.class, false);
+    :}
+  | trap_clauses:a {:
+      RESULT = a;
+    :}
+  ;
+
+trap_clauses ::=
+  // List of Trap
+    trap_clause:a {:
+      RESULT = new TypedList(new LinkedList(), Trap.class, false);
+      RESULT.add(a);
+    :}
+  | default_trap_clause:a SEMICOLON {:
+      RESULT = a;
+    :}
+  | trap_clauses_no_semi:a trap_clause:b {:
+      a.add(b);
+      RESULT = a;
+    :}
+  | trap_clauses_no_semi:a default_trap_clause:b SEMICOLON {:
+      a.add(b);
+      RESULT = a;
+    :}
+  ;
+
+trap_clauses_no_semi ::=
+  // List of Trap
+    trap_clause:a {:
+      RESULT = new TypedList(new LinkedList(), Trap.class, false);
+      RESULT.add(a);
+    :}
+  | default_trap_clause:a {:
+      RESULT = a;
+    :}
+  | trap_clauses_no_semi:a trap_clause:b {:
+      a.add(b);
+      RESULT = a;
+    :}
+  | trap_clauses_no_semi:a default_trap_clause:b {:
+      a.add(b);
+      RESULT = a;
+    :}
+  ;
+
+foreach_statement ::=
+  // Foreach
+    FOREACH:n LPAREN formula:a RPAREN statement:b {:
+      RESULT = parser.jmnf().Foreach( parser.pos(n), a, b );
+    :}
+  ;
+
+foreach_statement_no_short_if ::=
+  // Foreach
+    FOREACH:n LPAREN formula:a RPAREN statement_no_short_if:b {:
+      RESULT = parser.jmnf().Foreach( parser.pos(n), a, b );
+    :}
+  ;
+
+let_statement ::=
+  // Let
+    LET:n formula:a SEMICOLON {:
+      RESULT = parser.jmnf().Let( parser.pos(n), a );
+    :}
+  ;
+
+cond_statement ::=
+  // Cond
+    COND:n LBRACE conditions:a RBRACE {:
+      RESULT = parser.jmnf().Cond( parser.pos(n), a );
+    :} // %prec STMT
+  | COND:n LBRACE conditions:a ELSE statement:b RBRACE {:
+      RESULT = parser.jmnf().Cond( parser.pos(n), a, b );
+    :} // %prec ELSE
+  ;
+
+conditions ::=
+  // List of Condition
+    LPAREN expression:a RPAREN block:b {:
+      TypedList l = new TypedList( new LinkedList(), Condition.class, false );
+      l.add( parser.jmnf().Condition( parser.pos(a), a, b ) );
+      RESULT = l;
+    :}
+  | conditions:a LPAREN expression:b RPAREN block:c {:
+      a.add( parser.jmnf().Condition( parser.pos(b), b, c ) );
+      RESULT = a;
+    :}
+  ;
+
+yield_statement ::=
+  // Yield
+    YIELD:n SEMICOLON {:
+      RESULT = parser.jmnf().Yield( parser.pos(n) );
+    :}
+  ;
+
+
+/**
+ * Switch statements.
+ **/
+drop {
+  switch_statement ::=
+      SWITCH LPAREN expression RPAREN switch_block
+    ;
+}
+
+extend
+switch_statement ::=
+  // Switch
+    SWITCH:n LPAREN expression_list:a RPAREN switch_block:b {:
+      RESULT = parser.jmnf().Switch( parser.pos(n), a, b );
+    :}
+  ;
+
+expression_list ::=
+  // List of Expr
+    argument_list:a {:
+      RESULT = a;
+    :}
+  ;
+
+drop {
+  switch_block ::=
+      LBRACE RBRACE
+    ;
+}
+
+extend
+switch_block ::=
+  // List of JMatchSwitchElement
+    LBRACE RBRACE {:
+      RESULT =
+	new TypedList( new LinkedList(), JMatchSwitchElement.class, false );
+    :}
+  ;
+
+drop {
+  switch_block_statement_group ::=
+      switch_labels block_statements
+    ;
+}
+
+extend
+switch_block_statement_group ::=
+  // List of JMatchSwitchElement
+    switch_labels:a block_statements:b {:
+      List l =
+	new TypedList( new LinkedList(), JMatchSwitchElement.class, false );
+      l.addAll(a);
+      l.add( parser.nf.SwitchBlock( parser.pos(a), b ) );
+      RESULT = l;
+    :}
+  ;
+
+drop {
+  switch_labels ::=
+      switch_label
+    ;
+}
+
+extend
+switch_labels ::=
+  // List of JMatchCase
+    switch_label:a {:
+      List l = new TypedList( new LinkedList(), JMatchCase.class, false );
+      l.add(a);
+      RESULT = l;
+    :}
+  ;
+
+drop {
+  switch_label ::=
+      CASE constant_expression COLON
+    ;
+}
+
+drop {
+  constant_expression ::=
+      expression
+    ;
+}
+
+extend
+switch_label ::=
+  // JMatchCase
+    CASE:n case_list:a COLON {:
+      RESULT = parser.jmnf().JMatchCase( parser.pos(n), a );
+    :}
+  | DEFAULT:n COLON {:
+      RESULT = parser.jmnf().JMatchDefault( parser.pos(n) );
+    :}
+  | CASE:n case_list:a WHERE formula:b COLON {:
+      RESULT = parser.jmnf().JMatchCase( parser.pos(n), a, b );
+    :}
+  ;
+
+case_list ::=
+  // List of Receiver
+    case:a {:
+      List l = new TypedList( new LinkedList(), Receiver.class, false );
+      l.add(a);
+      RESULT = l;
+    :}
+  | case_list:a COMMA case:b {:
+      RESULT = a;
+      a.add(b);
+    :}
+  ;
+
+case ::=
+  // Receiver
+    primitive_type:a {:
+      RESULT = a;
+    :}
+  | array_type:a {:
+      RESULT = parser.replaceExts( (AmbTypeNode)a, new JMatchCaseCondExt() );
+    :}
+  | expression:a {:
+      RESULT = a;
+
+      if ( a instanceof AmbExpr || a instanceof Field ) {
+	// Convert to a type and attach a JMatchCaseCondExt extension.
+        if ( a instanceof AmbExpr ) {
+	  RESULT = JMatchCaseCondExt.toType( (AmbExpr)a, parser.nf );
+	} else {
+	  RESULT = JMatchCaseCondExt.toType( (Field)a, parser.nf );
+	}
+
+	RESULT =
+	  parser.replaceExts( (AmbTypeNode)RESULT, new JMatchCaseCondExt() );
+      }
+    :}
+  ;
+
+/**
+ * JMatch expressions.
+ **/
+drop {
+  postfix_expression ::=
+      name
+    ;
+}
+
+extend
+postfix_expression ::=
+    name:a {:
+	RESULT = a.toAmbExpr();
+    :}
+  | type:a variable_declarator_id:b {:
+      RESULT =
+	parser.jmnf().FreeVarDecl( parser.pos(a), Flags.NONE,
+	  parser.array(a, b.dims), b.name );
+    :}
+  | FINAL type:a variable_declarator_id:b {:
+      RESULT =
+	parser.jmnf().FreeVarDecl( parser.pos(a), Flags.FINAL,
+	  parser.array(a, b.dims), b.name );
+    :}
+  | CUT:a LPAREN expression:b RPAREN {:
+      RESULT = parser.jmnf().Cut( parser.pos(a), b );
+    :}
+  | UNDERSCORE:a {:
+      RESULT = parser.jmnf().Wildcard( parser.pos(a) );
+    :}
+  | FORALL:a LPAREN formula:b RPAREN LBRACE formula:c RBRACE {:
+      RESULT = parser.jmnf().Forall( parser.pos(a), b, c );
+    :}
+  | EXISTS:a LPAREN formula:b RPAREN LBRACE formula:c RBRACE {:
+      RESULT = parser.jmnf().Exists( parser.pos(a), b, c );
+    :}
+  | TRY:n LPAREN formula:a RPAREN catches_no_semi:b {:
+      RESULT = parser.jmnf().TryFmla(parser.pos(n), a, b);
+    :}
+  ;
+
+formula ::=
+  // Expr
+    conditional_or_expression:a {:
+      RESULT = a;
+    :}
+  ;
+
+
+/**
+ * Method/constructor calls.
+ **/
+drop {
+  method_invocation ::=
+      name LPAREN argument_list_opt RPAREN
+    | primary DOT IDENTIFIER LPAREN argument_list_opt RPAREN
+    | SUPER DOT IDENTIFIER LPAREN argument_list_opt RPAREN
+    | name DOT SUPER DOT IDENTIFIER LPAREN argument_list_opt RPAREN
+    ;
+}
+
+method_invocation ::=
+    name:a LPAREN argument_list_opt:b RPAREN {:
+      RESULT =
+	parser.jmnf().AmbInvoc( parser.pos(a),
+	  a.prefix == null ? null : a.prefix.toReceiver(),
+	  a.name, a.toType(), b );
+    :}
+  | primary:a DOT IDENTIFIER:b LPAREN argument_list_opt:c RPAREN {:
+      Name n = new Name( parser, parser.pos(b), b.getIdentifier() );
+
+      RESULT =
+	parser.jmnf().AmbInvoc( parser.pos(a), a, b.getIdentifier(), a,
+	  n.toType(), c );
+    :}
+  | SUPER:a DOT IDENTIFIER:b LPAREN argument_list_opt:c RPAREN {:
+      RESULT =
+	parser.nf.Call( parser.pos(b), parser.nf.Super(parser.pos(a)),
+	  b.getIdentifier(), c );
+    :}
+  | name:a DOT SUPER:n DOT IDENTIFIER:b LPAREN argument_list_opt:c RPAREN {:
+      RESULT = parser.nf.Call( parser.pos(b),
+	parser.nf.Super( parser.pos(a), a.toType() ), b.getIdentifier(), c );
+    :}
+  ;
+
+/**
+ * Iterate expressions.
+ **/
+extend
+primary_no_new_array ::=
+    iterate_expression:a {:
+      RESULT = a;
+    :}
+  ;
+
+iterate_expression ::=
+  // Iterate
+    ITERATE:i IDENTIFIER:a LPAREN formula:b RPAREN {:
+	RESULT = parser.jmnf().Iterate( parser.pos(i), a.getIdentifier(), b );
+    :}
+  ;
+
+
+/**
+ * Local variable declarations are subsumed by assignment expressions.
+ **/
+drop {
+  block_statement ::=
+      local_variable_declaration_statement
+    ;
+}
+
+drop {
+  local_variable_declaration_statement ::=
+      local_variable_declaration SEMICOLON
+    ;
+}
+
+drop {
+  local_variable_declaration ::=
+      type variable_declarators
+    | FINAL type variable_declarators
+    ;
+}
+
+drop {
+  for_init ::=
+      local_variable_declaration
+    ;
+}
+
+
+/**
+ * Statement expressions.  ugh.
+ **/
+drop {
+  statement_expression ::=
+      assignment
+    | preincrement_expression
+    | predecrement_expression
+    | postincrement_expression
+    | postdecrement_expression
+    | method_invocation
+    | class_instance_creation_expression
+    ;
+}
+
+extend
+statement_expression ::=
+  // Expr
+    relational_expression:a {:
+      RESULT = a;
+    :}
+  | assignment:a {:
+      RESULT = a;
+    :}
+  ;
+
+transfer relational_expression
+to instanceof_expression {
+    shift_expression
+}
+
+extend
+instanceof_expression ::=
+    instanceof_expression:a INSTANCEOF reference_type:b {:
+      RESULT = parser.nf.Instanceof( parser.pos(a), a, b );
+    :}
+  | instanceof_expression:a AS shift_expression:b {:
+      RESULT = parser.jmnf().As( parser.pos(a), a, b );
+    :}
+  ;
+
+override
+relational_expression ::=
+    instanceof_expression:a {:
+      RESULT = a;
+    :}
+  | instanceof_expression:a LT relational_expression:b {:
+      RESULT = parser.nf.Binary( parser.pos(a), a, Binary.LT, b );
+    :}
+  | instanceof_expression:a GT relational_expression:b {:
+      RESULT = parser.nf.Binary( parser.pos(a), a, Binary.GT, b );
+    :}
+  | instanceof_expression:a LTEQ relational_expression:b {:
+      RESULT = parser.nf.Binary( parser.pos(a), a, Binary.LE, b );
+    :}
+  | instanceof_expression:a GTEQ relational_expression:b {:
+      RESULT = parser.nf.Binary( parser.pos(a), a, Binary.GE, b );
+    :}
+  | instanceof_expression:a EQEQ relational_expression:b {:
+      RESULT = parser.nf.Binary( parser.pos(a), a, Binary.EQ, b );
+    :}
+  | instanceof_expression:a NOTEQ relational_expression:b {:
+      RESULT = parser.nf.Binary( parser.pos(a), a, Binary.NE, b );
+    :}
+  | instanceof_expression:a EQ relational_expression:b {:
+      RESULT = parser.nf.Assign( parser.pos(a), a, Assign.ASSIGN, b );
+    :}
+  | instanceof_expression:a EQ array_initializer:b {:
+      RESULT = parser.nf.Assign( parser.pos(a), a, Assign.ASSIGN, b );
+    :}
+  ;
+
+drop {
+  and_expression ::=
+      equality_expression
+    | and_expression:a AND equality_expression:b
+    ;
+}
+
+and_expression ::=
+    relational_expression:a {:
+      RESULT = a;
+    :}
+  | and_expression:a AND relational_expression:b {:
+      RESULT = parser.nf.Binary( parser.pos(a), a, Binary.BIT_AND, b );
+    :}
+  ;
+
+extend
+conditional_or_expression ::=
+    conditional_or_expression:a ELSE conditional_and_expression:b {:
+      RESULT = parser.nf.Binary( parser.pos(a), a, JMatchBinary.ELSE, b );
+    :}
+  ;
+
+drop {
+  assignment_operator ::=
+      EQ
+    ;
+}
+
+
+/**
+ * Use predicate constructors rather than constructors.
+ **/
+drop {
+  class_body_declaration ::=
+      constructor_declaration
+    ;
+}
+
+extend
+class_body_declaration ::=
+  // List of ClassMemeber
+    predicate_constructor_declaration:a {:
+      List l = new TypedList( new LinkedList(), ClassMember.class, false );
+      l.add(a);
+      RESULT = l;
+    :}
+  ;
+
+drop {
+  constructor_declaration ::=
+      modifiers_opt simple_name LPAREN formal_parameter_list_opt RPAREN
+	  throws_opt constructor_body
+    ;
+}
+
+drop {
+  constructor_body ::=
+      LBRACE explicit_constructor_invocation block_statements RBRACE
+    | LBRACE explicit_constructor_invocation RBRACE
+    | LBRACE block_statements RBRACE
+    | LBRACE RBRACE
+    ;
+}
+
+drop {
+  explicit_constructor_invocation ::=
+      THIS LPAREN argument_list_opt RPAREN SEMICOLON
+    | SUPER LPAREN argument_list_opt RPAREN SEMICOLON
+    | primary DOT THIS LPAREN argument_list_opt RPAREN SEMICOLON
+    | primary DOT SUPER LPAREN argument_list_opt RPAREN SEMICOLON
+    ;
+}
+
+predicate_constructor_declaration ::=
+  // PredConstructorDecl
+    modifiers_opt:a IDENTIFIER:b LPAREN formal_parameter_list_opt:c RPAREN
+	throws_opt:d predicate_constructor_implementations:e {:
+      // Extract the PredMode for the first implementation.
+      PredImpl impl = (PredImpl)e.get(0);
+      PredMode m = impl.mode();
+
+      Set unkSet = new HashSet();
+      if ( m instanceof DefaultPredMode ) {
+        m = parser.jmnf().PredMode( parser.pos(b), unkSet, parser.singular() );
+	impl = impl.mode(m);
+	e.set( 0, impl );
+      } else {
+        // Add a default mode if none was provided.
+	boolean haveDefault = false;
+	for ( Iterator it = e.iterator(); it.hasNext() && !haveDefault; ) {
+	  PredImpl impl_ = (PredImpl)it.next();
+	  m = impl_.mode();
+	  haveDefault = unkSet.equals( m.unknowns() );
+	}
+
+	if ( !haveDefault ) {
+	  m = parser.jmnf().PredMode( parser.pos(impl), unkSet,
+	    parser.singular() );
+	  impl = impl.mode(m);
+	  e.add( 0, impl );
+	}
+      }
+
+      RESULT =
+	parser.jmnf().PredConstructorDecl( parser.pos(b), a, b.getIdentifier(),
+	  c, d, e );
+    :}
+  ;
+
+predicate_constructor_implementations ::=
+  // List of PredImpl
+    default_predicate_implementation_opt:a predicate_implementations:b {:
+      RESULT = a;
+      a.addAll(b);
+    :}
+  | default_predicate_implementation:a {:
+      RESULT = a;
+    :}
+  ;
+
+predicate_declaration ::=
+  // PredDecl
+    predicate_header:a predicate_body:b {:
+      // Extract the PredMode for the first implementation.
+      PredImpl impl = (PredImpl)b.get(0);
+      PredMode m = impl.mode();
+
+      Set unkSet = new HashSet();
+      TypeNode returnType = a.returnType();
+      if ( !parser.ts.Boolean().equals(returnType.type()) ) {
+        unkSet.add( "result" );
+      }
+
+      if ( m instanceof DefaultPredMode ) {
+        m = parser.jmnf().PredMode( parser.pos(a), unkSet, parser.singular() );
+	impl = impl.mode(m);
+	b.set( 0, impl );
+      } else {
+	// Add a default mode if none was provided.
+	boolean haveDefault = false;
+	for ( Iterator it = b.iterator(); it.hasNext() && !haveDefault; ) {
+	  impl = (PredImpl)it.next();
+	  m = impl.mode();
+	  haveDefault = unkSet.equals(m.unknowns()) && m.mult().isSingular();
+	}
+
+	if ( !haveDefault ) {
+	  // Find the first non-iterator implementation.  The default mode
+	  // shares that same implementation.
+	  impl = null;
+	  ListIterator it;
+	  for ( it = b.listIterator(); it.hasNext(); ) {
+	    impl = (PredImpl)it.next();
+	    if ( !(impl instanceof PredIterImpl) ) {
+	      break;
+	    }
+	  }
+
+	  m = parser.jmnf().PredMode( parser.pos(impl), unkSet,
+	    parser.singular() );
+
+	  if ( impl == null || impl instanceof PredIterImpl ) {
+	    // Use an abstract implementation.
+	    impl = parser.jmnf().PredAbstractImpl( parser.pos(a), m );
+	  } else {
+	    impl = impl.mode(m);
+	  }
+
+	  it.add(impl);
+	}
+      }
+
+      RESULT = a.implementations(b);
+    :}
+  ;
+
+abstract_predicate_declaration ::=
+  // PredDecl
+    predicate_header:a abstract_predicate_modes:b SEMICOLON {:
+      RESULT = a.implementations(b);
+    :}
+  | predicate_header:a SEMICOLON {:
+      Set unkSet = new HashSet();
+      TypeNode returnType = a.returnType();
+      if ( !parser.ts.Boolean().equals( returnType.type() ) ) {
+        unkSet.add( "result" );
+      }
+
+      PredMode m = parser.jmnf().PredMode( parser.pos(a), unkSet,
+	parser.singular() );
+      PredImpl impl = parser.jmnf().PredAbstractImpl( parser.pos(a), m );
+
+      TypedList l = new TypedList( new ArrayList(1), PredImpl.class, false );
+      l.add(impl);
+
+      RESULT = a.implementations(l);
+    :}
+  ;
+
+predicate_header ::=
+  // PredDecl
+    modifiers_opt:a type:b IDENTIFIER:c LPAREN formal_parameter_list_opt:d
+	RPAREN dims_opt:e throws_opt:f traps_opt:g {:
+      RESULT = parser.jmnf().PredDecl( parser.pos(c), a,
+	parser.array(b, e.intValue()), c.getIdentifier(), d, f, g,
+	new ArrayList() );
+    :}
+  | modifiers_opt:a VOID:b IDENTIFIER:c LPAREN formal_parameter_list_opt:d
+	RPAREN throws_opt:f traps_opt:g {:
+      RESULT = parser.jmnf().PredDecl( parser.pos(c), a,
+	parser.nf.CanonicalTypeNode( parser.pos(b), parser.ts.Void() ),
+	c.getIdentifier(), d, f, g, new ArrayList() );
+    :}
+  ;
+
+traps_opt ::=
+  // List of TypeNode
+    {:
+      RESULT = new TypedList(new LinkedList(), TypeNode.class, false);
+    :}
+  | TRAPS class_type_list:a {:
+      RESULT = a;
+    :}
+  ;
+
+predicate_body ::=
+  // List of PredImpl
+    default_predicate_implementation_opt:a predicate_body_:b {:
+      RESULT = a;
+      a.addAll(b);
+    :}
+  | default_predicate_implementation:a {:
+      RESULT = a;
+    :}
+  | SEMICOLON:a {:
+      PredMode m = parser.jmnf().DefaultPredMode(parser.pos(a));
+      PredImpl impl = parser.jmnf().PredAbstractImpl( parser.pos(a), m );
+      RESULT = new TypedList( new ArrayList(1), PredImpl.class, false );
+      RESULT.add( impl );
+    :}
+  ;
+
+default_predicate_implementation_opt ::=
+  // List of PredImpl
+    {:
+      RESULT = new TypedList( new LinkedList(), PredImpl.class, false );
+    :}
+  | default_predicate_implementation:a {:
+      RESULT = a;
+    :}
+  ;
+
+default_predicate_implementation ::=
+  // List of PredImpl
+    predicate_iter_impl_body:a {:
+      TypedList l = new TypedList( new LinkedList(), PredImpl.class, false );
+      PredMode m = parser.jmnf().DefaultPredMode( parser.pos(a) );
+      l.add( parser.jmnf().PredIterImpl( parser.pos(a), m, a ) );
+      RESULT = l;
+    :}
+  | predicate_fmla_impl_body:a {:
+      TypedList l = new TypedList( new LinkedList(), PredImpl.class, false );
+      PredMode m = parser.jmnf().DefaultPredMode( parser.pos(a) );
+      l.add( parser.jmnf().PredFmlaImpl( parser.pos(a), m, a ) );
+      RESULT = l;
+    :}
+  ;
+
+predicate_body_ ::=
+  // List of PredImpl
+    predicate_implementations:a abstract_predicate_modes:b SEMICOLON {:
+      a.addAll(b);
+      RESULT = a;
+    :}
+  | predicate_implementations:a {:
+      RESULT = a;
+    :}
+  | abstract_predicate_modes:a SEMICOLON {:
+      RESULT = a;
+    :}
+  ;
+
+predicate_implementations ::=
+  // List of PredImpl
+    predicate_modes:a predicate_fmla_impl_body:b {:
+      TypedList l = new TypedList( new LinkedList(), PredImpl.class, false );
+      for ( Iterator it = a.iterator(); it.hasNext(); ) {
+        PredMode m = (PredMode)it.next();
+	l.add( parser.jmnf().PredFmlaImpl( parser.pos(m), m, b ) );
+      }
+
+      RESULT = l;
+    :}
+  | predicate_modes:a predicate_iter_impl_body:b {:
+      PredMode m = (PredMode)a.get(0);
+
+      // Force there to be only one predicate mode.
+      if ( a.size() != 1 ) {
+	parser.die( parser.pos(m) );
+      }
+
+      TypedList l = new TypedList( new LinkedList(), PredImpl.class, false );
+      l.add( parser.jmnf().PredIterImpl( parser.pos(m), m, b ) );
+
+      RESULT = l;
+    :}
+  | predicate_implementations:a predicate_modes:b predicate_fmla_impl_body:c {:
+      for ( Iterator it = b.iterator(); it.hasNext(); ) {
+        PredMode m = (PredMode)it.next();
+	a.add( parser.jmnf().PredFmlaImpl( parser.pos(m), m, c ) );
+      }
+
+      RESULT = a;
+    :}
+  | predicate_implementations:a predicate_modes:b predicate_iter_impl_body:c {:
+      PredMode m = (PredMode)b.get(0);
+
+      // Force there to be only one predicate mode.
+      if ( b.size() != 1 ) {
+	parser.die( parser.pos(m) );
+      }
+
+      a.add( parser.jmnf().PredIterImpl( parser.pos(m), m, c ) );
+
+      RESULT = a;
+    :}
+  ;
+
+abstract_predicate_modes ::=
+  // List of PredImpl
+    predicate_modes:a {:
+      TypedList l = new TypedList( new LinkedList(), PredImpl.class, false );
+      for ( Iterator it = a.iterator(); it.hasNext(); ) {
+        PredMode m = (PredMode)it.next();
+	l.add( parser.jmnf().PredAbstractImpl( parser.pos(m), m ) );
+      }
+
+      RESULT = l;
+    :}
+  ;
+
+predicate_modes ::=
+  // List of PredMode
+    predicate_mode_list:a {:
+      RESULT = a;
+    :}
+  | predicate_modes:a predicate_mode_list:b {:
+      a.addAll(b);
+      RESULT = a;
+    :}
+  ;
+
+predicate_mode_list ::=
+  // List of PredMode
+    ITERATES:a LPAREN unknown_lists:b RPAREN:c {:
+      List l = new TypedList( new ArrayList(b.size()), PredMode.class, false );
+      for ( Iterator it = b.iterator(); it.hasNext(); ) {
+	Object[] entry = (Object[])it.next();
+	Set mode = (Set)entry[0];
+	Position pos = (Position)entry[1];
+
+	if ( pos == null ) {
+	  pos = parser.pos(c);
+	}
+
+	l.add( parser.jmnf().PredMode( pos, mode, parser.multiple() ) );
+      }
+
+      RESULT = l;
+    :}
+  | RETURNS:a LPAREN unknown_lists:b RPAREN:c {:
+      List l = new TypedList( new ArrayList(b.size()), PredMode.class, false );
+      for ( Iterator it = b.iterator(); it.hasNext(); ) {
+	Object[] entry = (Object[])it.next();
+	Set mode = (Set)entry[0];
+	Position pos = (Position)entry[1];
+
+	if ( pos == null ) {
+	  pos = parser.pos(c);
+	}
+
+	l.add( parser.jmnf().PredMode( pos, mode, parser.singular() ) );
+      }
+
+      RESULT = l;
+    :}
+  ;
+
+unknown_lists ::=
+  // List of Object[2] (First entry = Set of String; second entry = Position)
+    unknown_list:a {:
+      TypedList l = new TypedList( new LinkedList(), Object[].class, false );
+      l.add(a);
+      RESULT = l;
+    :}
+  | unknown_lists:a SEMICOLON:n unknown_list:b {:
+      // If the last unknown list we got was empty, then set its position to
+      // that of the semicolon.
+      Object[] lastMode = (Object[])a.get(a.size()-1);
+      if ( lastMode[1] == null ) {
+        lastMode[1] = parser.pos(n);
+	a.set( a.size()-1, lastMode );
+      }
+
+      a.add(b);
+      RESULT = a;
+    :}
+  ;
+
+unknown_list ::=
+  // Object[2]  (First entry = Set of String; second entry = Position)
+    {:
+      RESULT = new Object[2];
+      RESULT[0] = new HashSet();
+      RESULT[1] = null;
+    :}
+  | non_empty_unknown_list:a {:
+      RESULT = a;
+    :}
+  ;
+
+non_empty_unknown_list ::=
+    IDENTIFIER:a {:
+      Set s = new HashSet();
+      s.add( a.getIdentifier() );
+
+      RESULT = new Object[2];
+      RESULT[0] = s;
+      RESULT[1] = parser.pos(a);
+    :}
+  | non_empty_unknown_list:a COMMA IDENTIFIER:b {:
+      ((Set)a[0]).add( b.getIdentifier() );
+      RESULT = a;
+    :}
+  ;
+
+predicate_fmla_impl_body ::=
+  // Expr
+    LPAREN formula:a RPAREN {:
+      RESULT = a;
+    :}
+  ;
+
+predicate_iter_impl_body ::=
+  // Block
+    block:a {:
+      RESULT = a;
+    :}
+  ;
+
+
+/**
+ * Use predicates rather than methods.
+ **/
+drop {
+  class_member_declaration ::=
+      method_declaration
+    ;
+}
+
+extend
+class_member_declaration ::=
+  // List of ClassMemeber
+    predicate_declaration:a {:
+      List l = new TypedList( new LinkedList(), ClassMember.class, false );
+      l.add(a);
+      RESULT = l;
+    :}
+  ;
+
+drop {
+  method_declaration ::=
+      method_header method_body
+    ;
+}
+
+drop {
+  method_header ::=
+      modifiers_opt type IDENTIFIER LPAREN formal_parameter_list_opt RPAREN
+	  dims_opt throws_opt
+    | modifiers_opt VOID IDENTIFIER LPAREN formal_parameter_list_opt RPAREN
+          throws_opt
+    ;
+}
+
+drop {
+  interface_member_declaration ::=
+      abstract_method_declaration
+    ;
+}
+
+extend
+interface_member_declaration ::=
+  // List of ClassMemeber
+    abstract_predicate_declaration:a {:
+      List l = new TypedList( new LinkedList(), ClassMember.class, false );
+      l.add(a);
+      RESULT = l;
+    :}
+  ;
+
+drop {
+  abstract_method_declaration ::=
+      method_header SEMICOLON
+    ;
+}
+
+
+drop { variable_declarator }
+drop { variable_declarator_id }
+drop { method_declaration }
+drop { method_header }
+drop { method_body }
+drop { constructor_declaration }
+drop { constructor_body }
+drop { explicit_constructor_invocation }
+drop { abstract_method_declaration }
+drop { local_variable_declaration_statement }
+drop { local_variable_declaration }
+drop { switch_statement }
+drop { switch_label }
+drop { method_invocation }
+drop { equality_expression }
+drop { constant_expression }
+

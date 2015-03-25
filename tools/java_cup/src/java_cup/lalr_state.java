@@ -1,12 +1,13 @@
 package java_cup;
 
-import java.io.ByteArrayOutputStream;
-import java.io.PrintStream;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.Stack;
 import java.util.TreeSet;
+
+import parser.Counterexample;
+import parser.UnifiedExample;
 
 /** This class represents a state in the LALR viable prefix recognition machine.
  *  A state consists of an LALR item set and a set of transitions to other
@@ -95,6 +96,7 @@ public class lalr_state {
         _all.clear();
         _all_kernels.clear();
         next_index = 0;
+        clearCexStats();
     }
 
     /*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . .*/
@@ -288,7 +290,7 @@ public class lalr_state {
 
     public static lalr_state build_machine(production start_prod)
             throws internal_error {
-        /* lalr_state    start_state; // ACM -- made static */
+        /* lalr_state    start_state; // CupEx extension -- made static */
         lalr_item_set start_items;
         lalr_item_set new_items;
         lalr_item_set linked_items;
@@ -726,15 +728,6 @@ public class lalr_state {
         }
     }
 
-    private void errOutput(StringBuilder sb, ByteArrayOutputStream s) {
-        try {
-            sb.append(s.toString("UTF-8"));
-        }
-        catch (java.io.UnsupportedEncodingException e) {
-            sb.append("<UNENCODABLE>");
-        }
-    }
-
     /*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . .*/
 
     /** Produce a warning message for one reduce/reduce conflict.
@@ -752,8 +745,8 @@ public class lalr_state {
         message.append("\n  between ");
         message.append(itm1.to_simple_string());
         message.append("\n");
-        /* ACM extension */
-        ByteArrayOutputStream ds = new ByteArrayOutputStream();
+        /* CupEx extension */
+        long start;
         /** conflict_lookaheads is the list of symbols on which the two actions conflict. */
         Set<terminal> conflict_lookaheads = new HashSet<>();
         for (int t = 0; t < terminal.number(); t++) {
@@ -761,35 +754,10 @@ public class lalr_state {
                 conflict_lookaheads.add(terminal.find(t));
         }
         terminal cs = conflict_lookaheads.iterator().next(); // pick one
-        if (Main.report_counterexamples) {
-            message.append("    Example:    ");
-            counterexamples.report_shortest_path(this,
-                                                 itm1,
-                                                 cs,
-                                                 message,
-                                                 new PrintStream(ds));
-            message.append("\n    Derivation: ");
-            errOutput(message, ds);
-            message.append(" ] (*)\n\n");
-        }
-        /* End ACM extension */
+        /* End CupEx extension */
         message.append("  and     ");
         message.append(itm2.to_simple_string());
         message.append("\n");
-        /* ACM extension */
-        ds.reset();
-        if (Main.report_counterexamples) {
-            message.append("    Example:    ");
-            counterexamples.report_shortest_path(this,
-                                                 itm2,
-                                                 cs,
-                                                 message,
-                                                 new PrintStream(ds));
-            message.append(" (*)\n    Derivation: ");
-            errOutput(message, ds);
-            message.append(" ] (*)\n");
-        }
-        /* End ACM extension */
         message.append("  under symbols: {");
         for (int t = 0; t < terminal.number(); t++) {
             if (itm1.lookahead().contains(t) && itm2.lookahead().contains(t)) {
@@ -799,7 +767,47 @@ public class lalr_state {
                 message.append(terminal.find(t).name());
             }
         }
-        message.append("}\n  Resolved in favor of ");
+        message.append("}\n");
+        /* CupEx extension */
+        if (Main.report_counterexamples) {
+            start = System.nanoTime();
+            UnifiedExample ue = new UnifiedExample(this, itm1, itm2, cs);
+            boolean tle = cexTimeLimit();
+            Counterexample cex =
+                    tle ? ue.exampleFromShortestPath(true) : ue.find();
+            if (cex.unifying()) {
+                message.append("  Ambiguity detected for nonterminal ");
+                message.append(cex.cexNonterminal());
+                message.append("\n  Example: ");
+                message.append(cex.prettyExample1());
+                message.append("\n  First derivation : ");
+                message.append(cex.example1());
+                message.append("\n  Second derivation: ");
+                message.append(cex.example2());
+                message.append("\n");
+                numUnif++;
+            }
+            else {
+                message.append("  First example    : ");
+                message.append(cex.prettyExample1());
+                message.append("\n  First derivation : ");
+                message.append(cex.example1());
+                message.append("\n  Second example   : ");
+                message.append(cex.prettyExample2());
+                message.append("\n  Second derivation: ");
+                message.append(cex.example2());
+                message.append("\n");
+                if (!tle) {
+                    if (cex.timeout())
+                        numTimeOut++;
+                    else numNonUnif++;
+                }
+                else numTle++;
+            }
+            reportCexStats(cex, System.nanoTime() - start);
+        }
+        /* End CupEx extension */
+        message.append("  Resolved in favor of ");
         if (itm1.the_production().index() < itm2.the_production().index())
             message.append("the first production.\n");
         else message.append("the second production.\n");
@@ -824,24 +832,13 @@ public class lalr_state {
         StringBuilder message =
                 new StringBuilder("*** Shift/Reduce conflict found in state #");
         message.append(index());
-        message.append("\n  between reduction on ");
-        message.append(red_itm.to_simple_string());
-        message.append("\n");
-        /* ACM extension */
-        ByteArrayOutputStream ds = new ByteArrayOutputStream();
+//        message.append("\n  between reduction on ");
+//        message.append(red_itm.to_simple_string());
+//        message.append("\n");
+        /* CupEx extension */
+        long start;
         terminal cs = terminal.find(conflict_sym);
-        if (Main.report_counterexamples) {
-            message.append("    Example:    ");
-            counterexamples.report_shortest_path(this,
-                                                 red_itm,
-                                                 cs,
-                                                 message,
-                                                 new PrintStream(ds));
-            message.append("\n    Derivation: ");
-            errOutput(message, ds);
-            message.append("\n\n");
-        }
-        /* end ACM extension */
+        /* end CupEx extension */
 
         /* find and report on all items that shift under our conflict symbol */
         for (lalr_item itm : items()) {
@@ -853,68 +850,107 @@ public class lalr_state {
                 if (!shift_sym.is_non_term()
                         && shift_sym.index() == conflict_sym) {
                     /* yes, report on it */
-                    /* APL extension */
-//                    if (Main.report_counterexamples) {
-//                        Chin_examples.DerivableSymbol example = null;
-//                        example =
-//                                Chin_examples.findCounterexample(red_itm,
-//                                                                 itm,
-//                                                                 cs);
-//                        message.append("    Example:    ");
-//                        message.append(example.prettyPrint());
-//                        message.append("\n    Derivation: ");
-//                        message.append(example);
-//                        message.append("\n\n"); // XXX
-//                        // XXX
-//                        Chin_examples.derive(itm, example);
-//                        // XXX
-//                    }
-                    /* end APL extension */
-                    message.append("  and shift on ");
+                    message.append("\n  between reduction on ");
+                    message.append(red_itm.to_simple_string());
+                    message.append("\n");
+                    message.append("  and shift on         ");
                     message.append(itm.to_simple_string());
                     message.append("\n");
-                    /* ACM extension */
+                    message.append("  under symbol ");
+                    message.append(terminal.find(conflict_sym).name());
+                    message.append("\n");
+                    /* CupEx extension */
                     if (Main.report_counterexamples) {
-                        ds.reset();
-                        message.append("    Example:    ");
-                        counterexamples.report_shortest_path(this,
-                                                             itm,
-                                                             cs,
-                                                             message,
-                                                             new PrintStream(ds));
-                        message.append("\n    Derivation: ");
-                        errOutput(message, ds);
-                        message.append("\n\n");
+                        start = System.nanoTime();
+                        UnifiedExample ue =
+                                new UnifiedExample(this, red_itm, itm, cs);
+                        boolean tle = cexTimeLimit();
+                        Counterexample cex =
+                                tle
+                                        ? ue.exampleFromShortestPath(true)
+                                        : ue.find();
+                        if (cex.unifying()) {
+                            message.append("  Ambiguity detected for nonterminal ");
+                            message.append(cex.cexNonterminal());
+                            message.append("\n  Example: ");
+                            message.append(cex.prettyExample1());
+                            message.append("\n  Derivation using reduction: ");
+                            message.append(cex.example1());
+                            message.append("\n  Derivation using shift    : ");
+                            message.append(cex.example2());
+                            message.append("\n");
+                            numUnif++;
+                        }
+                        else {
+                            message.append("  Example using reduction   : ");
+                            message.append(cex.prettyExample1());
+                            message.append("\n  Derivation using reduction: ");
+                            message.append(cex.example1());
+                            message.append("\n  Example using shift       : ");
+                            message.append(cex.prettyExample2());
+                            message.append("\n  Derivation using shift    : ");
+                            message.append(cex.example2());
+                            message.append("\n");
+                            if (!tle) {
+                                if (cex.timeout())
+                                    numTimeOut++;
+                                else numNonUnif++;
+                            }
+                            else numTle++;
+                        }
+                        reportCexStats(cex, System.nanoTime() - start);
                     }
-                    /* end ACM extension */
+                    /* end CupEx extension */
+                    /* count the conflict */
+                    emit.num_conflicts++;
                 }
             }
         }
-        message.append("  under symbol ");
-        message.append(terminal.find(conflict_sym).name());
         message.append("\n  Resolved in favor of shifting.\n");
 
-        /* count the conflict */
-        emit.num_conflicts++;
         ErrorManager.getManager().emit_warning(message.toString());
     }
 
-    /* Begin ACM extension */
-    String right_of_dot(lalr_item itm) throws internal_error {
-        StringBuilder sb = new StringBuilder();
-        production prod = itm.the_production();
-        int pos = itm.dot_pos();
-        for (int i = pos; i < prod.rhs_length(); i++) {
-            if (i != pos) sb.append(" ");
-            production_part pp = prod.rhs(i);
-            if (pp instanceof symbol_part) {
-                sb.append(((symbol_part) pp).the_symbol().name());
+    protected static void reportCexStats(Counterexample cex, long duration) {
+        if (Main.report_cex_stats) {
+            if (Main.report_cex_stats_to_out) {
+                boolean tle = cexTimeLimit();
+                System.out.print("stage4");
+                if (cex.unifying())
+                    System.out.print(" unif");
+                else if (tle)
+                    System.out.print(" tle");
+                else if (cex.timeout())
+                    System.out.print(" t/o");
+                else System.out.print(" nonunif");
+                System.out.println(":\n" + duration);
             }
+            else System.err.println("stage4: " + duration);
         }
-        return sb.toString();
+        cumulativeCexTime += duration;
     }
 
-    /* End ACM extension */
+    protected static boolean cexTimeLimit() {
+        return cumulativeCexTime > 120000000000L;
+    }
+
+    protected static long cumulativeCexTime;
+    protected static int numUnif, numNonUnif, numTimeOut, numTle;
+
+    protected static void clearCexStats() {
+        cumulativeCexTime = 0;
+        numUnif = 0;
+        numNonUnif = 0;
+        numTimeOut = 0;
+        numTle = 0;
+    }
+
+    public static void report() {
+        System.out.println("numUnif:\n" + numUnif);
+        System.out.println("numNonUnif:\n" + numNonUnif);
+        System.out.println("numTimeOut:\n" + numTimeOut);
+        System.out.println("numTle:\n" + numTle);
+    }
 
     /*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . .*/
 
