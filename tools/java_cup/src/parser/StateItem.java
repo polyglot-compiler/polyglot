@@ -19,6 +19,12 @@ import java_cup.symbol_part;
 import java_cup.terminal;
 import java_cup.terminal_set;
 
+/**
+ * A representation of a parser item.
+ * CUP's lalr_item class does not include a corresponding parser state; this
+ * class encapsulates both state and item into one object.
+ *
+ */
 public class StateItem {
     protected final lalr_state state;
     protected final lalr_item item;
@@ -28,6 +34,18 @@ public class StateItem {
         this.item = item;
     }
 
+    /**
+     * Compute a set of StateItems that can make a transition on the given
+     * symbol to this StateItem such that the resulting possible lookahead
+     * symbols are as given.
+     * @param sym The symbol to make a transition on.
+     * @param lookahead The expected possible lookahead symbols
+     * @param guide If not null, restricts the possible parser states to this
+     *          set; otherwise, explore all possible parser states that can
+     *          make the desired transition.
+     * @return A set of StateItems that result from making a reverse transition
+     *          from this StateItem on the given symbol and lookahead set.
+     */
     protected List<StateItem> reverseTransition(symbol sym,
             Set<symbol> lookahead, Set<lalr_state> guide) {
         List<StateItem> result = new LinkedList<>();
@@ -62,6 +80,14 @@ public class StateItem {
         return result;
     }
 
+    /**
+     * Compute a set of sequences of StateItems that can make production steps
+     * to this StateItem such that the resulting possible lookahead symbols are
+     * as given.
+     * @param lookahead The expected possible lookahead symbols.
+     * @return A set of sequences of StateItems that result from making reverse
+     *          production steps from this StateItem on the given lookahead set.
+     */
     protected List<List<StateItem>> reverseProduction(Set<symbol> lookahead) {
         List<List<StateItem>> result = new LinkedList<>();
         List<StateItem> init = new LinkedList<>();
@@ -94,6 +120,14 @@ public class StateItem {
             this.lookahead = lookahead;
         }
 
+        /**
+         * Compute a set of SearchState that can make a production steps to this
+         * SearchState.
+         * @param uniqueItems True if the sequence of StateItems should not be
+         *              repeated; false otherwise.
+         * @return A set of SearchState that result from making a reverse
+         *              production step from this SearchState.
+         */
         protected List<SearchState> reverseProduction(boolean uniqueItems) {
             List<SearchState> result = new LinkedList<>();
             StateItem si = sis.get(0);
@@ -116,13 +150,16 @@ public class StateItem {
                     int prevPos = prev.dot_pos() + 1;
                     terminal_set prevLookahead = prev.lookahead();
                     Set<symbol> nextLookahead;
-                    if (prevPos == prevLen) {
+                    if (prevPos == prevLen) { // reduce item
+                        // Check that some lookaheads can be preserved.
                         if (!intersect(prevLookahead, lookahead)) continue;
                         nextLookahead = new HashSet<>(symbolSet(prevLookahead));
                         nextLookahead.retainAll(lookahead);
                     }
-                    else {
+                    else { // shift item
                         symbol nextSym = rhs(prevProd, prevPos);
+                        // Check that lookaheads is compatible with the next
+                        // symbol in the production.
                         if (lookahead != null) {
                             if (nextSym instanceof terminal
                                     && !intersect((terminal) nextSym, lookahead))
@@ -142,6 +179,14 @@ public class StateItem {
         }
     }
 
+    /**
+     * Determine if the given terminal is in the given symbol set or can begin
+     * a nonterminal in the given symbol set.
+     * @param t A terminal
+     * @param syms A symbol set
+     * @return true if {@code t} is in {@code syms} or can begin a nonterminal
+     *          in {@code syms}; false otherwise
+     */
     protected static boolean intersect(terminal t, Set<symbol> syms) {
         if (syms == null) return true;
         for (symbol sym : syms) {
@@ -153,6 +198,14 @@ public class StateItem {
         return false;
     }
 
+    /**
+     * Determine if any symbol in the given terminal is in the given symbol set
+     * or can begin a nonterminal in the given symbol set.
+     * @param ts A terminal set
+     * @param syms A symbol set
+     * @return true if some terminal in {@code ts} is in {@code syms} or can
+     *          begin a nonterminal in {@code syms}; false otherwise
+     */
     protected static boolean intersect(terminal_set ts, Set<symbol> syms) {
         if (syms == null) return true;
         for (symbol sym : syms) {
@@ -165,6 +218,9 @@ public class StateItem {
         return false;
     }
 
+    /**
+     * Clear parser state maps.
+     */
     public static void clear() {
         stateItms = null;
         trans = null;
@@ -174,6 +230,9 @@ public class StateItem {
         symbolSets.clear();
     }
 
+    /**
+     * Report various statistics on parser state maps.
+     */
     public static void report() {
         init();
         int stateItmSize = 0;
@@ -196,8 +255,12 @@ public class StateItem {
         System.out.println("reverse productions:\n" + revProdSize);
     }
 
+    /** Map: state -> item -> StateItem */
     protected static Map<lalr_state, Map<lalr_item, StateItem>> stateItms;
 
+    /**
+     * Initialize stateItms map.
+     */
     protected static void initStateItms() {
         stateItms = new HashMap<>();
         for (lalr_state state : lalr_state.all_states()) {
@@ -210,14 +273,25 @@ public class StateItem {
         }
     }
 
+    /**
+     * Lookup method for stateItms map
+     * @param state
+     * @param item
+     * @return
+     */
     protected static StateItem lookup(lalr_state state, lalr_item item) {
         Map<lalr_item, StateItem> itms = stateItms.get(state);
         return itms == null ? null : itms.get(item);
     }
 
+    /** Transition map: StateItem -> symbol -> StateItem */
     protected static Map<StateItem, Map<symbol, StateItem>> trans;
+    /** Reverse transition map: StateItem -> symbol -> Set of StateItems */
     protected static Map<StateItem, Map<symbol, Set<StateItem>>> revTrans;
 
+    /**
+     * Initialize trans and revTrans maps.
+     */
     protected static void initTrans() {
         trans = new HashMap<>();
         revTrans = new HashMap<>();
@@ -264,9 +338,14 @@ public class StateItem {
         }
     }
 
+    /** Production map within the same state: StateItem -> Set of items */
     protected static Map<StateItem, Set<lalr_item>> prods;
+    /** Reverse production map: state -> nonterminal -> Set of items */
     protected static Map<lalr_state, Map<non_terminal, Set<lalr_item>>> revProds;
 
+    /**
+     * Initialize prods and revProds maps.
+     */
     protected static void initProds() {
         prods = new HashMap<>();
         revProds = new HashMap<>();
@@ -292,9 +371,11 @@ public class StateItem {
             // Now, if the symbol after dot in any item within this state is in
             // the closure map, add the item to the lookup map.
             for (lalr_item item : state.items()) {
-                // Avoid reduce items.
+                // Avoid reduce items, which cannot make a production step.
                 if (item.dot_at_end()) continue;
                 symbol sym = item.symbol_after_dot();
+                // If next symbol is a terminal, a production step is not
+                // possible.
                 if (sym instanceof terminal) continue;
                 if (closureMap.containsKey(sym)) {
                     non_terminal nt = (non_terminal) sym;
@@ -317,6 +398,9 @@ public class StateItem {
         }
     }
 
+    /**
+     * Initialize all maps, if not already.
+     */
     protected static void init() {
         long start = System.nanoTime();
         if (stateItms == null) initStateItms();
@@ -329,9 +413,15 @@ public class StateItem {
         }
     }
 
+    /** Cache of symbol-set representations of terminal sets */
     protected static Map<terminal_set, Set<symbol>> symbolSets =
             new HashMap<>();
 
+    /**
+     * Return a symbol-set representation of the given terminal set.
+     * @param ts
+     * @return
+     */
     protected static Set<symbol> symbolSet(terminal_set ts) {
         Set<symbol> result = symbolSets.get(ts);
         if (result == null) {
@@ -344,11 +434,25 @@ public class StateItem {
         return result;
     }
 
+    /**
+     * Return the symbol at the desired position of the given production.
+     * @param prod A production
+     * @param pos A desired position
+     * @return
+     */
     protected static symbol rhs(production prod, int pos) {
         symbol_part sp = (symbol_part) prod.rhs(pos);
         return sp.the_symbol();
     }
 
+    /**
+     * Determine, using precedence and associativity, whether the next
+     * production is allowed from the current production.
+     * @param prod The current production.
+     * @param nextProd The next production.
+     * @return true if {@code nextProd} is possible after {@code prod}; false
+     *          otherwise.
+     */
     protected static boolean productionAllowed(production prod,
             production nextProd) {
         int prodPred = prod.precedence_num();

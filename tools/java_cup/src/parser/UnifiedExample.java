@@ -21,12 +21,24 @@ import java_cup.symbol;
 import java_cup.symbol_part;
 import java_cup.terminal;
 
+/**
+ * The main search engine for finding unifying and nonunifying counterexamples
+ * from parser conflicts.
+ *
+ */
 public class UnifiedExample {
 
+    /** True if the time limit is enforced; otherwise, search could run
+     *  indefinitely. */
     public static boolean timeLimitEnforced = true;
+    /** If set to true, when computing the shortest lookahead-sensitive path,
+     *  only consider states that can reach the conflict state. */
     public static boolean optimizeShortestPath = true;
+    /** If set to false, only consider the states on the shortest
+     *  lookahead-sensitive path when constructing a unifying counterexample. */
     public static boolean extendedSearch = false;
 
+    /* various costs for making various steps in a search */
     protected static final int PRODUCTION_COST = 50;
     protected static final int REDUCE_COST = 1;
     protected static final int SHIFT_COST = 1;
@@ -34,18 +46,36 @@ public class UnifiedExample {
     protected static final int DUPLICATE_PRODUCTION_COST = 0;
     protected static final int EXTENDED_COST = 10000;
 
+    /** The time limit before printing an assurance message to the user to
+     *  indicate that the search is still running. */
     protected static final long ASSURANCE_LIMIT = 2 * 1000000000L;
+    /** The time limit before giving up looking for unifying counterexample. */
     protected static final long TIME_LIMIT = 5 * 1000000000L;
 
+    /** The parser state of the conflict. */
     protected lalr_state conflict;
+    /** The first item of the conflict.  Always a reduce item. */
     protected lalr_item itm1;
+    /** The second item of the conflict. */
     protected lalr_item itm2;
     protected terminal nextSym;
+    /** True if {@code conflict} is a shift/reduce conflict; false otherwise. */
     protected boolean isShiftReduce;
+    /** The shortest lookahead-sensitive path to the conflict. */
     protected List<StateItem> shortestConflictPath;
+    /** The set of parser states on the shortest lookahead-sensitive path. */
     protected Set<lalr_state> scpSet;
+    /** The set of parser states used for the conflict reduction rule. */
     protected Set<lalr_state> rppSet;
 
+    /**
+     * Construct a search instance from a given conflict state, pair of items,
+     * and next input symbol.
+     * @param conflict
+     * @param itm1
+     * @param itm2
+     * @param nextSym
+     */
     public UnifiedExample(lalr_state conflict, lalr_item itm1, lalr_item itm2,
             terminal nextSym) {
         this.conflict = conflict;
@@ -71,6 +101,9 @@ public class UnifiedExample {
             isShiftReduce = true;
         }
         else throw new Error("Expected at least one reduce item.");
+
+        // Compute the shortest lookahead-sensitive path and associated sets of
+        // parser states.
         shortestConflictPath = findShortestPathFromStart(optimizeShortestPath);
         scpSet = new HashSet<>(shortestConflictPath.size());
         production reduceProd = this.itm1.the_production();
@@ -84,6 +117,14 @@ public class UnifiedExample {
         }
     }
 
+    /**
+     * Compute the shortest lookahead-sensitive path from the start state to
+     * this conflict.
+     * @param optimized If true, only consider parser states that can reach the
+     *          conflict state; otherwise, consider all parser states.
+     * @return A list of StateItems representing the shortest
+     *          lookahead-sensitive path.
+     */
     protected List<StateItem> findShortestPathFromStart(boolean optimized) {
         StateItem.init();
         long start = System.nanoTime();
@@ -94,6 +135,8 @@ public class UnifiedExample {
         Set<StateItem> eligible =
                 optimized ? eligibleStateItemsToConflict(target) : null;
         Queue<List<StateItemWithLookahead>> queue = new LinkedList<>();
+        // The shortest path does not repeat a vertex in the lookahead-sensitive
+        // graph, even thought it might repeat parser states.
         Set<StateItemWithLookahead> visited = new HashSet<>();
         {
             List<StateItemWithLookahead> init = new LinkedList<>();
@@ -101,6 +144,7 @@ public class UnifiedExample {
                                                 StateItem.symbolSet(source.item.lookahead())));
             queue.add(init);
         }
+        // breadth-first search
         while (!queue.isEmpty()) {
             List<StateItemWithLookahead> path = queue.remove();
             StateItemWithLookahead last = path.get(path.size() - 1);
@@ -124,6 +168,7 @@ public class UnifiedExample {
                     shortestConflictPath.add(sil.si);
                 return shortestConflictPath;
             }
+            // Transition
             if (StateItem.trans.containsKey(last.si)) {
                 for (Map.Entry<symbol, StateItem> trans : StateItem.trans.get(last.si)
                                                                          .entrySet()) {
@@ -137,10 +182,13 @@ public class UnifiedExample {
                     queue.add(nextPath);
                 }
             }
+            // Production step
             if (StateItem.prods.containsKey(last.si)) {
                 production prod = last.si.item.the_production();
                 int len = prod.rhs_length();
                 int pos = last.si.item.dot_pos() + 1;
+                // Compute possible terminals that can follow this production.
+                // (This is first_L in the CupEx paper.)
                 Set<symbol> lookahead = new HashSet<>();
                 do {
                     if (pos == len) {
@@ -161,6 +209,7 @@ public class UnifiedExample {
                     }
                     pos++;
                 } while (pos <= len);
+                // Try all possible production steps within this parser state.
                 for (lalr_item itm : StateItem.prods.get(last.si)) {
                     StateItem nextSI = StateItem.lookup(last.si.state, itm);
                     if (optimized && !eligible.contains(nextSI)) continue;
@@ -176,6 +225,12 @@ public class UnifiedExample {
         throw new Error("Cannot find shortest path to conflict state.");
     }
 
+    /**
+     * Compute the set of StateItems that can reach the given conflict item via
+     * a combination of transitions or production steps.
+     * @param target The conflict item.
+     * @return
+     */
     protected Set<StateItem> eligibleStateItemsToConflict(StateItem target) {
         Set<StateItem> result = new HashSet<>();
         Queue<StateItem> queue = new LinkedList<>();
@@ -203,6 +258,10 @@ public class UnifiedExample {
         return result;
     }
 
+    /**
+     * A representation of a vertex in the lookahead-sensitive graph.
+     *
+     */
     protected class StateItemWithLookahead {
         protected StateItem si;
         protected Set<symbol> lookahead;
@@ -233,16 +292,27 @@ public class UnifiedExample {
         }
     }
 
+    /**
+     * Find a counterexample associated with this conflict.
+     * @return A counterexample, which could be unifying or nonunifying.
+     */
     public Counterexample find() {
+        // Initialize lookup maps if necessary.
         StateItem.init();
         return findExample();
     }
 
+    /**
+     * Auxiliary method to find a counterexample associated with this conflict.
+     * @return A counterexample, which could be unifying or nonunifying.
+     */
     protected Counterexample findExample() {
         SearchState initial =
                 new SearchState(StateItem.lookup(conflict, itm1),
                                 StateItem.lookup(conflict, itm2));
+        // Timer
         long start;
+        // The search uses a priority queue on the complexity of search states.
         Map<Integer, FixedComplexitySearchState> fcssMap = new HashMap<>();
         PriorityQueue<FixedComplexitySearchState> pq = new PriorityQueue<>();
         Map<List<StateItem>, Set<List<StateItem>>> visited = new HashMap<>();
@@ -253,26 +323,41 @@ public class UnifiedExample {
         while (!pq.isEmpty()) {
             FixedComplexitySearchState fcss = pq.remove();
             for (SearchState ss : fcss.sss) {
+                // This variable is mostly for visual guide only.
+                @SuppressWarnings("unused")
                 int stage = 2;
                 StateItem si1src = ss.states1.get(0);
                 StateItem si2src = ss.states2.get(0);
                 visited(visited, ss);
                 if (ss.reduceDepth < 0 && ss.shiftDepth < 0) {
+                    // We have completed the reduce and shift conflict items.
                     // Stage 3
                     stage = 3;
                     if (si1src.item.the_production().lhs().the_symbol() == si2src.item.the_production()
                                                                                       .lhs()
                                                                                       .the_symbol()
                             && hasCommonPrefix(si1src.item, si2src.item)) {
+                        // We have found that both paths begin with the same
+                        // prefix.
                         if (ss.derivs1.size() == 1
                                 && ss.derivs2.size() == 1
                                 && ss.derivs1.get(0).sym == ss.derivs2.get(0).sym) {
+                            // Each path has only one symbol to be processes, and
+                            // they are the same.  This means that the derivation
+                            // of this symbol is the unifying counterexample we are
+                            // looking for.
                             if (Main.report_cex_stats)
                                 System.err.println(ss.complexity);
                             return new Counterexample(ss.derivs1.get(0),
                                                       ss.derivs2.get(0),
                                                       true);
                         }
+                        // Otherwise, we have found a symbol that can begin the
+                        // same sequence of symbols up to the conflict point.
+                        // If unifying counterexample is not found, we will use
+                        // this to construct a nonunifying counterexample that
+                        // is as compact as possible, as this counterexample does
+                        // not begin all the way from the start state.
                         if (stage3result == null) stage3result = ss;
                         stage = 4;
                     }
@@ -293,11 +378,20 @@ public class UnifiedExample {
                         if (stage3result != null) {
                             if (Main.report_cex_stats)
                                 System.err.println(stage3result.complexity);
+                            // If a search state from Stage 3 is available, use it
+                            // to construct a more compact nonunifying counterexample.
                             return completeDivergingExamples(stage3result, true);
                         }
-                        else return exampleFromShortestPath(true);
+                        else {
+                            // Otherwise, construct a nonunifying counterexample that
+                            // begins from the start state using the shortest
+                            // lookahead-sensitive path.
+                            return exampleFromShortestPath(true);
+                        }
                     }
                 }
+
+                // Compute the successor configurations.
                 StateItem si1 = ss.states1.get(ss.states1.size() - 1);
                 StateItem si2 = ss.states2.get(ss.states2.size() - 1);
                 boolean si1reduce = si1.item.dot_at_end();
@@ -305,12 +399,15 @@ public class UnifiedExample {
                 symbol si1sym = si1reduce ? null : si1.item.symbol_after_dot();
                 symbol si2sym = si2reduce ? null : si2.item.symbol_after_dot();
                 if (!si1reduce && !si2reduce) {
-                    // Both paths are not reduce items.
+                    // Both paths are not reduce items, so it is possible to
+                    // search forward in the parser state diagram.
                     // Two actions are possible:
                     // - Make a transition on the next symbol of the items,
                     //   if they are the same.
                     // - Take a production step, avoiding duplicates as necessary.
                     if (si1sym == si2sym) {
+                        // Transition on the same next symbol, taking nullable
+                        // symbol into account.
                         StateItem si1last =
                                 StateItem.trans.get(si1).get(si1sym);
                         StateItem si2last =
@@ -354,6 +451,8 @@ public class UnifiedExample {
                             }
                         }
                     }
+
+                    // Take a production step if possible.
                     if (si1sym instanceof non_terminal
                             && StateItem.prods.containsKey(si1))
                         for (lalr_item itm1 : StateItem.prods.get(si1)) {
@@ -383,7 +482,7 @@ public class UnifiedExample {
                                 SearchState copy = ss.copy();
                                 copy.derivs1.addAll(subderivs1);
                                 copy.states1.addAll(substates1);
-                                // TODO
+                                // TODO Does duplicate production play a role?
                                 if (copy.states1.contains(next))
                                     copy.complexity +=
                                             DUPLICATE_PRODUCTION_COST;
@@ -420,7 +519,7 @@ public class UnifiedExample {
                                 SearchState copy = ss.copy();
                                 copy.derivs2.addAll(subderivs2);
                                 copy.states2.addAll(substates2);
-                                // TODO
+                                // TODO Does duplicate production play a role?
                                 if (copy.states2.contains(next))
                                     copy.complexity +=
                                             DUPLICATE_PRODUCTION_COST;
@@ -449,7 +548,7 @@ public class UnifiedExample {
                             for (SearchState red1 : reduced1) {
                                 for (SearchState candidate : red1.reduce2(si1sym))
                                     add(pq, fcssMap, visited, candidate);
-                                if (si1reduce && red1 != ss)
+                                if (si1reduce && red1 != ss) // avoid duplicate
                                     add(pq, fcssMap, visited, red1);
                             }
                         }
@@ -464,6 +563,7 @@ public class UnifiedExample {
                             add(pq, fcssMap, visited, candidate);
                     }
                     // Otherwise, prepend both paths and continue.
+                    // This is preparing both paths for a reduction.
                     else {
                         symbol sym;
                         if (si1reduce && !ready1)
@@ -482,11 +582,21 @@ public class UnifiedExample {
             }
             fcssMap.remove(fcss.complexity);
         }
-        // No unifying examples.  Construct examples from common shortest path
-        // to conflict state.
+        // No unifying counterexamples.  Construct a counterexample from the
+        // shortest lookahead-sensitive path.
         return exampleFromShortestPath(false);
     }
 
+    /**
+     * Compute the list of StateItems that result from taking a transition on
+     * nullable symbols whenever possible from the given position of a
+     * production.
+     * @param prod The production
+     * @param pos The starting position
+     * @param silast The StateItem to start with
+     * @param states The _output_ sequence of states after taking closure.
+     * @param derivs The _output_ sequence of derivations after taking closure.
+     */
     protected void nullableClosure(production prod, int pos, StateItem silast,
             List<StateItem> states, List<Derivation> derivs) {
         for (int curPos = pos, len = prod.rhs_length(); curPos < len; curPos++) {
@@ -500,6 +610,14 @@ public class UnifiedExample {
         }
     }
 
+    /**
+     * Add a given search state to a given priority queue, avoiding search
+     * states that have already been visited.
+     * @param pq The priority queue.
+     * @param fcssMap Map of search states indexed by complexity.
+     * @param visited Set of visited pairs of StateItems.
+     * @param ss The search state to be added.
+     */
     protected void add(PriorityQueue<FixedComplexitySearchState> pq,
             Map<Integer, FixedComplexitySearchState> fcssMap,
             Map<List<StateItem>, Set<List<StateItem>>> visited, SearchState ss) {
@@ -514,6 +632,11 @@ public class UnifiedExample {
         fcss.add(ss);
     }
 
+    /**
+     * Mark the given search state as visited.
+     * @param visited Set of visited pairs of StateItems.
+     * @param ss The search state to be marked.
+     */
     protected void visited(Map<List<StateItem>, Set<List<StateItem>>> visited,
             SearchState ss) {
         Set<List<StateItem>> visited1 = visited.get(ss.states1);
@@ -524,6 +647,13 @@ public class UnifiedExample {
         visited1.add(ss.states2);
     }
 
+    /**
+     * Construct a nonunifying counterexample from the shortest
+     * lookahead-sensitive path.
+     * @param timeout true if the timeout was reached, resulting in a
+     *          nonunifying counterexample, false otherwise
+     * @return
+     */
     public Counterexample exampleFromShortestPath(boolean timeout) {
         StateItem si = StateItem.lookup(conflict, itm2);
         List<StateItem> result = new LinkedList<>();
@@ -600,6 +730,7 @@ public class UnifiedExample {
                         }
                     }
                     else {
+                        // Take a reverse production step if possible.
                         production prod = sisrc.item.the_production();
                         symbol lhs = prod.lhs().the_symbol();
                         for (lalr_item prev : StateItem.revProds.get(sisrc.state)
@@ -631,6 +762,13 @@ public class UnifiedExample {
         throw new Error("Cannot find derivation to conflict state.");
     }
 
+    /**
+     * Construct a nonunifying counterexample from the given search state.
+     * @param ss The search state.
+     * @param timeout true if the timeout was reached, resulting in a
+     *          nonunifying counterexample, false otherwise
+     * @return
+     */
     protected Counterexample completeDivergingExamples(SearchState ss,
             boolean timeout) {
         Derivation deriv1 = completeDivergingExample(ss.states1, ss.derivs1);
@@ -638,13 +776,28 @@ public class UnifiedExample {
         return new Counterexample(deriv1, deriv2, false, timeout);
     }
 
+    /**
+     * Complete any pending productions in the given sequence of parser states.
+     * @param states The StateItems containing unfinished productions.
+     * @return A top-level derivation after completing all the productions.
+     */
     protected Derivation completeDivergingExample(List<StateItem> states) {
         return completeDivergingExample(states,
                                         Collections.<Derivation> emptyList());
     }
 
+    /**
+     * Auxiliary method to complete any pending productions in the given
+     * sequence of parser states.
+     * @param states The StateItems containing unfinished productions.
+     * @param derivs The pending derivations associated with unfinished
+     *          productions.
+     * @return A top-level derivation after completing all the productions.
+     */
     protected Derivation completeDivergingExample(List<StateItem> states,
             List<Derivation> derivs) {
+        // The idea is to transfer each pending symbol on the productions
+        // associated with the given StateItems to the resulting derivation.
         List<Derivation> result = new LinkedList<>();
         ListIterator<Derivation> dItr = derivs.listIterator(derivs.size());
         boolean lookaheadRequired = false;
@@ -692,6 +845,12 @@ public class UnifiedExample {
         return result.get(0);
     }
 
+    /**
+     * Repeatedly take production steps on the given StateItem so that the
+     * first symbol of the derivation matches the conflict symbol.
+     * @param start The StateItem to start with.
+     * @return A derivation of {@code start} that matches the conflict symbol.
+     */
     protected Derivation expandFirst(StateItem start) {
         Queue<List<StateItem>> queue = new LinkedList<>();
         for (lalr_item itm : StateItem.prods.get(start)) {
@@ -699,6 +858,7 @@ public class UnifiedExample {
             init.add(StateItem.lookup(start.state, itm));
             queue.add(init);
         }
+        // breadth-first search
         while (!queue.isEmpty()) {
             List<StateItem> states = queue.remove();
             StateItem silast = states.get(states.size() - 1);
@@ -737,6 +897,10 @@ public class UnifiedExample {
         throw new Error("Should not reach here.");
     }
 
+    /**
+     * A set of search states containing the same complexity.
+     *
+     */
     protected static class FixedComplexitySearchState implements
             Comparable<FixedComplexitySearchState> {
         protected int complexity;
@@ -770,13 +934,23 @@ public class UnifiedExample {
      * - a shift depth, indicating the number of unreduced production steps
      *   that has been made from the original shift item.  This helps keep
      *   track of when the shift conflict item is reduced.
+     * This is a _configuration_ as denoted in the CupEx paper.
      *
      */
     protected class SearchState implements Comparable<SearchState> {
 
         protected List<Derivation> derivs1, derivs2;
         protected List<StateItem> states1, states2;
-        protected int complexity, reduceDepth, shiftDepth;
+        protected int complexity;
+        /** The number of production steps made since the reduce conflict item.
+         *  If this is -1, the reduce conflict item has been completed.
+         */
+        protected int reduceDepth;
+        /** The number of production steps made since the shift conflict item.
+         *  If this is -1, the shift conflict item has been completed and
+         *  reduced.
+         */
+        protected int shiftDepth;
 
         protected SearchState(StateItem si1, StateItem si2) {
             derivs1 = new LinkedList<>();
@@ -802,6 +976,10 @@ public class UnifiedExample {
             this.shiftDepth = shiftDepth;
         }
 
+        /**
+         * Duplicate a search state.
+         * @return
+         */
         protected SearchState copy() {
             return new SearchState(derivs1,
                                    derivs2,
@@ -817,6 +995,22 @@ public class UnifiedExample {
             return prepend(sym, nextSym1, nextSym2, null);
         }
 
+        /**
+         * Attempt to prepend the given symbol to this search state, respecting
+         * the given subsequent next symbol on each path.
+         * @param sym
+         * @param nextSym1 The expected next symbol for the first path.
+         *              If null, the expected next symbol is the lookahead set
+         *              of the corresponding item.
+         * @param nextSym2 The expected next symbol for the second path.
+         *              If null, the expected next symbol is the lookahead set
+         *              of the corresponding item.
+         * @param guide If not null, restricts the possible parser states to
+         *              this set; otherwise, explore all possible parser states
+         *              that can make the desired transition.
+         * @return A set of SearchStates that result from successful prepending.
+         *              If prepending is not possible, this set is empty.
+         */
         protected List<SearchState> prepend(symbol sym, symbol nextSym1,
                 symbol nextSym2, Set<lalr_state> guide) {
             List<SearchState> result = new LinkedList<>();
@@ -856,6 +1050,7 @@ public class UnifiedExample {
                     boolean guided2 =
                             extendedSearch ? prev2.contains(psis2) : true;
                     StateItem psi2 = psis2 == null ? si2src : psis2;
+                    // Only continue of the StateItems on both paths are the same.
                     if (psi1 == si1src && psi2 == si2src) continue;
                     if (psi1.state != psi2.state) continue;
                     SearchState copy = ss.copy();
@@ -865,6 +1060,9 @@ public class UnifiedExample {
                             && copy.states1.get(0).item.dot_pos() + 1 == copy.states1.get(1).item.dot_pos()) {
                         if (psis2 != null
                                 && copy.states2.get(0).item.dot_pos() + 1 == copy.states2.get(1).item.dot_pos()) {
+                            // Both are reverse transitions; add appropriate
+                            // derivation of the corresponding symbol used for
+                            // the reverse transition.
                             Derivation deriv = new Derivation(sym);
                             copy.derivs1.add(0, deriv);
                             copy.derivs2.add(0, deriv);
@@ -875,6 +1073,9 @@ public class UnifiedExample {
                             && copy.states2.get(0).item.dot_pos() + 1 == copy.states2.get(1).item.dot_pos()) {
                         continue;
                     }
+                    // At this point, either reverse transition is made on both paths,
+                    // or reverse production is made on both paths.
+                    // Now, compute the complexity of the new search state.
                     int prependSize =
                             (psis1 == null ? 0 : 1) + (psis2 == null ? 0 : 1);
                     int productionSteps =
@@ -896,6 +1097,12 @@ public class UnifiedExample {
             return result;
         }
 
+        /**
+         * Reduce the current production on the first path, respecting the
+         * next input symbol.
+         * @param nextSym The next input symbol.
+         * @return A set of possible results of reductions, which could be empty.
+         */
         protected List<SearchState> reduce1(symbol nextSym) {
             List<StateItem> states = states1;
             List<Derivation> derivs = derivs1;
@@ -917,8 +1124,11 @@ public class UnifiedExample {
             Derivation deriv =
                     new Derivation(lhs, new LinkedList<>(derivs.subList(dSize
                             - len, dSize)));
-            if (reduceDepth == 0)
+            if (reduceDepth == 0) {
+                // We are reducing the reduce conflict item.
+                // Add a dot for visual inspection of the resulting counterexample.
                 deriv.deriv.add(itm1.dot_pos(), Derivation.dot);
+            }
             derivs = new LinkedList<>(derivs.subList(0, dSize - len));
             derivs.add(deriv);
             if (sSize == len + 1) {
@@ -981,6 +1191,12 @@ public class UnifiedExample {
             return finalizedResult;
         }
 
+        /**
+         * Reduce the current production on the second path, respecting the
+         * next input symbol.
+         * @param nextSym The next input symbol.
+         * @return A set of possible results of reductions, which could be empty.
+         */
         protected List<SearchState> reduce2(symbol nextSym) {
             List<StateItem> states = states2;
             List<Derivation> derivs = derivs2;
@@ -1002,8 +1218,12 @@ public class UnifiedExample {
             Derivation deriv =
                     new Derivation(lhs, new LinkedList<>(derivs.subList(dSize
                             - len, dSize)));
-            if (shiftDepth == 0)
+            if (shiftDepth == 0) {
+                // We are reducing the shift conflict item (for shift/reduce conflict),
+                // or the other reduce conflict item (for reduce/reduce conflict).
+                // Add a dot for visual inspection of the resulting counterexample.
                 deriv.deriv.add(itm2.dot_pos(), Derivation.dot);
+            }
             derivs = new LinkedList<>(derivs.subList(0, dSize - len));
             derivs.add(deriv);
             if (sSize == len + 1) {
@@ -1090,15 +1310,13 @@ public class UnifiedExample {
         }
     }
 
-    protected static boolean samePrefix(lalr_item itm1, lalr_item itm2) {
-        if (itm1.dot_pos() != itm2.dot_pos()) return false;
-        production prod1 = itm1.the_production();
-        production prod2 = itm2.the_production();
-        for (int i = 0, len = itm1.dot_pos(); i < len; i++)
-            if (rhs(prod1, i) != rhs(prod2, i)) return false;
-        return true;
-    }
-
+    /**
+     * Compute the number of production steps made in the given sequence of
+     * StateItems until reaching the given StateItem
+     * @param sis The sequence of StateItems
+     * @param last The final StateItem to be reached
+     * @return
+     */
     protected static int productionSteps(List<StateItem> sis, StateItem last) {
         int count = 0;
         lalr_state lastState = last.state;
@@ -1111,6 +1329,16 @@ public class UnifiedExample {
         return count;
     }
 
+    /**
+     * Determine if the given symbols are compatible with each other.
+     * That is, if both are terminals, they must be the same; otherwise, if
+     * one is a terminal and the other a nonterminal, the terminal must be a
+     * possible beginning of the nonterminal; finally, if both are nonterminals,
+     * their first sets must intersect.
+     * @param sym1
+     * @param sym2
+     * @return True of both symbols are compatible with each other; false otherwise.
+     */
     protected static boolean compatible(symbol sym1, symbol sym2) {
         if (sym1 instanceof terminal) {
             if (sym2 instanceof terminal) return sym1 == sym2;
@@ -1126,6 +1354,12 @@ public class UnifiedExample {
         }
     }
 
+    /**
+     * Compute the number of consecutive production steps made before reaching
+     * the last StateItem in the given sequence.
+     * @param sis A sequence of StateItems.
+     * @return
+     */
     protected static int reductionStreak(List<StateItem> sis) {
         int count = 0;
         StateItem last = null;
@@ -1141,6 +1375,13 @@ public class UnifiedExample {
         return count;
     }
 
+    /**
+     * Determine if the productions associated with the given parser items have
+     * the same prefix up to the dot.
+     * @param itm1
+     * @param itm2
+     * @return True if the productions have the same prefix; false otherwise.
+     */
     protected static boolean hasCommonPrefix(lalr_item itm1, lalr_item itm2) {
         if (itm1.dot_pos() != itm2.dot_pos()) return false;
         int dotPos = itm1.dot_pos();
@@ -1151,12 +1392,23 @@ public class UnifiedExample {
         return true;
     }
 
+    /**
+     * Construct a set of symbols from the given symbol.
+     * @param sym
+     * @return
+     */
     protected static Set<symbol> symbolSet(symbol sym) {
         Set<symbol> result = new HashSet<>();
         result.add(sym);
         return result;
     }
 
+    /**
+     * Return the symbol at the given position of the given production.
+     * @param prod The production.
+     * @param pos The position.
+     * @return
+     */
     protected static symbol rhs(production prod, int pos) {
         symbol_part sp = (symbol_part) prod.rhs(pos);
         return sp.the_symbol();

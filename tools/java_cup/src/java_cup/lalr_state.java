@@ -775,9 +775,9 @@ public class lalr_state {
             boolean tle = cexTimeLimit();
             Counterexample cex =
                     tle ? ue.exampleFromShortestPath(true) : ue.find();
-            if (cex.unified()) {
+            if (cex.unifying()) {
                 message.append("  Ambiguity detected for nonterminal ");
-                message.append(cex.ambNonterminal());
+                message.append(cex.cexNonterminal());
                 message.append("\n  Example: ");
                 message.append(cex.prettyExample1());
                 message.append("\n  First derivation : ");
@@ -869,9 +869,9 @@ public class lalr_state {
                                 tle
                                         ? ue.exampleFromShortestPath(true)
                                         : ue.find();
-                        if (cex.unified()) {
+                        if (cex.unifying()) {
                             message.append("  Ambiguity detected for nonterminal ");
-                            message.append(cex.ambNonterminal());
+                            message.append(cex.cexNonterminal());
                             message.append("\n  Example: ");
                             message.append(cex.prettyExample1());
                             message.append("\n  Derivation using reduction: ");
@@ -916,7 +916,7 @@ public class lalr_state {
             if (Main.report_cex_stats_to_out) {
                 boolean tle = cexTimeLimit();
                 System.out.print("stage4");
-                if (cex.unified())
+                if (cex.unifying())
                     System.out.print(" unif");
                 else if (tle)
                     System.out.print(" tle");

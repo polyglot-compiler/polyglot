@@ -116,9 +116,11 @@ public class Main {
     /** Whether to report counterexamples when conflicts are found.
      * (CupEx extension) */
     public static boolean report_counterexamples = true;
-    /** Whether to report statistics about counterexample finding */
+    /** Whether to report statistics about counterexample finding.
+     * (CupEx extension) */
     public static boolean report_cex_stats = false;
-    /** Whether to report statistics about counterexample finding to standard output */
+    /** Whether to report statistics about counterexample finding to standard output.
+     * (CupEx extension) */
     public static boolean report_cex_stats_to_out = false;
 
     /* frankf added this 6/18/96 */
@@ -466,6 +468,7 @@ public class Main {
                 report_counterexamples = false;
             else if (argv[i].equals("-extendedsearch"))
                 UnifiedExample.extendedSearch = true;
+            /* End CupEx extension */
             /* CSA 24-Jul-1999; suggestion by Jean Vaucher */
             else if (!argv[i].startsWith("-") && i == len - 1) {
                 /* use input from file. */

@@ -8,9 +8,13 @@ import java_cup.symbol;
  * A derivation consists of
  * - a symbol
  * - a list of derivations that derives the symbol
- *
+ * In other words, a derivation is a tree, where the symbol is the value at the
+ * current node, and the list of derivations forms the node's children.
  */
 class Derivation {
+    /**
+     * A special derivation indicating the dot within the parser state.
+     */
     public static final Derivation dot = new Derivation(new symbol("(*)") {
         @Override
         public boolean is_non_term() {
@@ -21,15 +25,28 @@ class Derivation {
     protected final symbol sym;
     protected final List<Derivation> deriv;
 
+    /**
+     * Construct a leaf node of a derivation tree.
+     * @param sym The symbol to appeat as a leaf
+     */
     protected Derivation(symbol sym) {
         this(sym, null);
     }
 
+    /**
+     * Construct an internal derivation node.
+     * @param sym The symbol at the root of this derivation subtree
+     * @param deriv The derivation of the given symbol
+     */
     protected Derivation(symbol sym, List<Derivation> deriv) {
         this.sym = sym;
         this.deriv = deriv;
     }
 
+    /**
+     *
+     * @return The number of nodes within this derivation tree.
+     */
     protected int size() {
         int size = 1;
         if (deriv != null) {
@@ -56,6 +73,10 @@ class Derivation {
         return sb.toString();
     }
 
+    /**
+     *
+     * @return The sequence of symbols at the leaves of this derivation tree.
+     */
     public String prettyPrint() {
         if (deriv == null) return sym.name();
 
