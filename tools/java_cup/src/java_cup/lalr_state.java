@@ -916,7 +916,7 @@ public class lalr_state {
             if (Main.report_cex_stats_to_out) {
                 boolean tle = cexTimeLimit();
                 System.out.print("stage4");
-                if (cex.unified())
+                if (cex.unifying())
                     System.out.print(" unif");
                 else if (tle)
                     System.out.print(" tle");
