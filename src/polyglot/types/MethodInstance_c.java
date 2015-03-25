@@ -13,12 +13,12 @@
  * This program and the accompanying materials are made available under
  * the terms of the Lesser GNU Public License v2.0 which accompanies this
  * distribution.
- * 
+ *
  * The development of the Polyglot project has been supported by a
  * number of funding sources, including DARPA Contract F30602-99-1-0533,
  * monitored by USAF Rome Laboratory, ONR Grants N00014-01-1-0968 and
  * N00014-09-1-0652, NSF Grants CNS-0208642, CNS-0430161, CCF-0133302,
- * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan 
+ * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan
  * Research Fellowship, and an Intel Research Ph.D. Fellowship.
  *
  * See README for contributors.
@@ -58,7 +58,7 @@ public class MethodInstance_c extends ProcedureInstance_c implements
         this.returnType = returnType;
         this.name = name;
 
-        this.decl = this;
+        decl = this;
     }
 
     protected MethodInstance decl;
@@ -100,8 +100,8 @@ public class MethodInstance_c extends ProcedureInstance_c implements
 
     @Override
     public MethodInstance name(String name) {
-        if ((name != null && !name.equals(this.name))
-                || (name == null && name != this.name)) {
+        if (name != null && !name.equals(this.name) || name == null
+                && name != this.name) {
             MethodInstance_c n = (MethodInstance_c) copy();
             n.setName(name);
             return n;
@@ -121,7 +121,7 @@ public class MethodInstance_c extends ProcedureInstance_c implements
 
     @Override
     public MethodInstance formalTypes(List<? extends Type> l) {
-        if (!CollectionUtil.equals(this.formalTypes, l)) {
+        if (!CollectionUtil.equals(formalTypes, l)) {
             MethodInstance_c n = (MethodInstance_c) copy();
             n.setFormalTypes(l);
             return n;
@@ -131,7 +131,7 @@ public class MethodInstance_c extends ProcedureInstance_c implements
 
     @Override
     public MethodInstance throwTypes(List<? extends Type> l) {
-        if (!CollectionUtil.equals(this.throwTypes, l)) {
+        if (!CollectionUtil.equals(throwTypes, l)) {
             MethodInstance_c n = (MethodInstance_c) copy();
             n.setThrowTypes(l);
             return n;
@@ -241,7 +241,7 @@ public class MethodInstance_c extends ProcedureInstance_c implements
         ReferenceType rt = container();
 
         while (rt != null) {
-            // add any method with the same name and formalTypes from 
+            // add any method with the same name and formalTypes from
             // rt
             l.addAll(rt.methods(name, formalTypes));
 

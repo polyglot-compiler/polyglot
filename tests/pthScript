@@ -31,7 +31,7 @@ javac "-d java-out -cp ." {
 	java-src/ClassFile02.java;
 }
 
-polyglot.frontend.JLExtensionInfo "-d out -cp java-out" {
+polyglot.frontend.JLExtensionInfo "-d out -cp java-out -postopts \"-source 1.4\"" {
         AnonymousClass.jl ;
         AnonymousClass02.jl ;
         AnonymousClass03.jl;
@@ -420,11 +420,11 @@ polyglot.frontend.JLExtensionInfo "-d out -cp java-out" {
 		       (Semantic, "Illegal forward ref"); 
 }
 
-polyglot.frontend.JLExtensionInfo "-d out" {
+polyglot.frontend.JLExtensionInfo "-d out -postopts \"-source 1.4\"" {
 	package3/name/ClassPackConflict.jl;
 }
 
-polyglot.frontend.JLExtensionInfo "-d insensTest -cp insensTest" {
+polyglot.frontend.JLExtensionInfo "-d insensTest -cp insensTest -postopts \"-source 1.4\"" {
 	Insens.jl;
 	InsensBug.jl;
 }

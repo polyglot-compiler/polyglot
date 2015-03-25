@@ -1,0 +1,8 @@
+terminal Token a, b, c, d;
+non terminal Token goal, A, B;
+
+start with goal;
+
+goal ::= A a | b A c | B c | b B a;
+A ::= d;
+B ::= d;

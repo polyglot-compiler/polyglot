@@ -284,22 +284,27 @@ public class lalr_item extends lr_item_core {
     /** Convert to string. */
     @Override
     public String toString() {
-        String result = "";
+        StringBuilder res = new StringBuilder();
 
         // additional output for debugging:
-        // result += "(" + obj_hash() + ")"; 
-        result += "[";
-        result += super.toString();
-        result += ", ";
+        // res += "(" + obj_hash() + ")"; 
+        res.append("[");
+        res.append(super.toString());
+        res.append(",");
+
         if (lookahead() != null) {
-            result += "{";
+            res.append(" {");
+            boolean any = false;
             for (int t = 0; t < terminal.number(); t++)
-                if (lookahead().contains(t))
-                    result += terminal.find(t).name() + " ";
-            result += "}";
+                if (lookahead().contains(t)) {
+                    if (any) res.append(" ");
+                    any = true;
+                    res.append(terminal.find(t).name());
+                }
+            res.append("}");
         }
-        else result += "NULL LOOKAHEAD!!";
-        result += "]";
+        else res.append("NULL LOOKAHEAD!!");
+        res.append("]");
 
         // additional output for debugging:
         // result += " -> ";
@@ -308,7 +313,7 @@ public class lalr_item extends lr_item_core {
         //
         // if (needs_propagation) result += " NP";
 
-        return result;
+        return res.toString();
     }
     /*-----------------------------------------------------------*/
 }
