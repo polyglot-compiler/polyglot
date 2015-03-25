@@ -804,22 +804,7 @@ public class lalr_state {
                 }
                 else numTle++;
             }
-            if (Main.report_cex_stats) {
-                long duration = System.nanoTime() - start;
-                if (Main.report_cex_stats_to_out) {
-                    System.out.print("stage4");
-                    if (cex.unified())
-                        System.out.print(" unif");
-                    else if (tle)
-                        System.out.print(" tle");
-                    else if (cex.timeout())
-                        System.out.print(" t/o");
-                    else System.out.print(" nonunif");
-                    System.out.println(":\n" + duration);
-                }
-                else System.err.println("stage4: " + duration);
-                cumulativeCexTime += duration;
-            }
+            reportCexStats(cex, System.nanoTime() - start);
         }
         /* End CupEx extension */
         message.append("  Resolved in favor of ");
@@ -913,22 +898,7 @@ public class lalr_state {
                             }
                             else numTle++;
                         }
-                        if (Main.report_cex_stats) {
-                            long duration = System.nanoTime() - start;
-                            if (Main.report_cex_stats_to_out) {
-                                System.out.print("stage4");
-                                if (cex.unified())
-                                    System.out.print(" unif");
-                                else if (tle)
-                                    System.out.print(" tle");
-                                else if (cex.timeout())
-                                    System.out.print(" t/o");
-                                else System.out.print(" nonunif");
-                                System.out.println(":\n" + duration);
-                            }
-                            else System.err.println("stage4: " + duration);
-                            cumulativeCexTime += duration;
-                        }
+                        reportCexStats(cex, System.nanoTime() - start);
                     }
                     /* end CupEx extension */
                     /* count the conflict */
@@ -939,6 +909,25 @@ public class lalr_state {
         message.append("\n  Resolved in favor of shifting.\n");
 
         ErrorManager.getManager().emit_warning(message.toString());
+    }
+
+    protected static void reportCexStats(Counterexample cex, long duration) {
+        if (Main.report_cex_stats) {
+            if (Main.report_cex_stats_to_out) {
+                boolean tle = cexTimeLimit();
+                System.out.print("stage4");
+                if (cex.unified())
+                    System.out.print(" unif");
+                else if (tle)
+                    System.out.print(" tle");
+                else if (cex.timeout())
+                    System.out.print(" t/o");
+                else System.out.print(" nonunif");
+                System.out.println(":\n" + duration);
+            }
+            else System.err.println("stage4: " + duration);
+        }
+        cumulativeCexTime += duration;
     }
 
     protected static boolean cexTimeLimit() {

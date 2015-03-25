@@ -262,13 +262,19 @@ public class Main {
 //            System.out.println(state);
 //        }
 
-        if (report_cex_stats && report_cex_stats_to_out) {
-            System.out.println("conflicts:\n" + emit.num_conflicts);
-            System.out.println("nonterminals:\n" + non_terminal.number());
-            System.out.println("productions:\n" + production.number());
-            System.out.println("states:\n" + lalr_state.number());
-            StateItem.report();
-            lalr_state.report();
+        if (report_cex_stats) {
+            if (report_cex_stats_to_out) {
+                System.out.println("conflicts:\n" + emit.num_conflicts);
+                System.out.println("nonterminals:\n" + non_terminal.number());
+                System.out.println("productions:\n" + production.number());
+                System.out.println("states:\n" + lalr_state.number());
+                StateItem.report();
+                lalr_state.report();
+                System.out.println("Total time used for finding counterexamples:\n"
+                        + lalr_state.cumulativeCexTime);
+            }
+            else System.err.println("Total time used for finding counterexamples: "
+                    + lalr_state.cumulativeCexTime);
         }
 
         /* If there were errors during the run,
@@ -320,7 +326,7 @@ public class Main {
                 + "    -dump          produce a dump of all of the above\n"
                 + "    -version       print the version information for CUP and exit\n"
                 + "    -noexamples    do not search for counterexamples in case of conflict\n"
-                + "    -extendedserach do not use optimization when searching for counterexamples\n");
+                + "    -extendedsearch do not use optimization when searching for counterexamples\n");
         System.exit(1);
     }
 
