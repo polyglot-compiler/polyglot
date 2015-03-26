@@ -104,7 +104,8 @@ public class UnifiedExample {
 
         // Compute the shortest lookahead-sensitive path and associated sets of
         // parser states.
-        shortestConflictPath = findShortestPathFromStart(optimizeShortestPath);
+        shortestConflictPath =
+                findShortestPathFromStart(itm1, optimizeShortestPath);
         scpSet = new HashSet<>(shortestConflictPath.size());
         production reduceProd = this.itm1.the_production();
         rppSet = new HashSet<>(reduceProd.rhs_length());
@@ -125,13 +126,14 @@ public class UnifiedExample {
      * @return A list of StateItems representing the shortest
      *          lookahead-sensitive path.
      */
-    protected List<StateItem> findShortestPathFromStart(boolean optimized) {
+    protected List<StateItem> findShortestPathFromStart(lalr_item tgt,
+            boolean optimized) {
         StateItem.init();
         long start = System.nanoTime();
         lalr_state startState = lalr_state.startState();
         lalr_item startItem = lalr_state.startItem();
         StateItem source = StateItem.lookup(startState, startItem);
-        StateItem target = StateItem.lookup(conflict, itm1);
+        StateItem target = StateItem.lookup(conflict, tgt);
         Set<StateItem> eligible =
                 optimized ? eligibleStateItemsToConflict(target) : null;
         Queue<List<StateItemWithLookahead>> queue = new LinkedList<>();
@@ -366,7 +368,7 @@ public class UnifiedExample {
                     if (!assurancePrinted
                             && System.nanoTime() - start > ASSURANCE_LIMIT
                             && stage3result != null) {
-                        System.err.println("Productions leading up to the conflict stage found.  Still finding a possible unified example...");
+                        System.err.println("Productions leading up to the conflict state found.  Still finding a possible unifying counterexample...");
                         assurancePrinted = true;
                     }
                     if (System.nanoTime() - start > TIME_LIMIT) {
@@ -655,6 +657,15 @@ public class UnifiedExample {
      * @return
      */
     public Counterexample exampleFromShortestPath(boolean timeout) {
+        if (!isShiftReduce) {
+            // For reduce/reduce conflicts, simply find the shortest
+            // lookahead-sensitive path to the other conflict item.
+            List<StateItem> shortestConflictPath2 =
+                    findShortestPathFromStart(itm2, optimizeShortestPath);
+            Derivation deriv1 = completeDivergingExample(shortestConflictPath);
+            Derivation deriv2 = completeDivergingExample(shortestConflictPath2);
+            return new Counterexample(deriv1, deriv2, false, timeout);
+        }
         StateItem si = StateItem.lookup(conflict, itm2);
         List<StateItem> result = new LinkedList<>();
         result.add(si);
@@ -826,6 +837,7 @@ public class UnifiedExample {
                                                               .get(rhs(prod,
                                                                        pos))));
                     }
+                    else result.add(new Derivation(sym));
                     lookaheadRequired = false;
                 }
                 else result.add(new Derivation(sym));
