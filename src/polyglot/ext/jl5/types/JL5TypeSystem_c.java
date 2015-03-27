@@ -1211,9 +1211,9 @@ public class JL5TypeSystem_c extends
                     curr.methodsNamed(mi.name());
             for (MethodInstance mj : possible) {
                 if (!mj.flags().isAbstract()
-                        && (isAccessible(mi, ct) && isAccessible(mj, ct) || isAccessible(mi,
-                                                                                         mj.container()
-                                                                                           .toClass()))) {
+                        && (mi.flags().isPublic() || mi.flags().isProtected() || isAccessible(mi,
+                                                                                              mj.container()
+                                                                                                .toClass()))) {
                     // The method mj may be a suitable implementation of mi.
                     // mj is not abstract, and either mj's container
                     // can access mi (thus mj can really override mi), or
